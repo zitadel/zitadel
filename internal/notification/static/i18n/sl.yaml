@@ -1,0 +1,68 @@
+InitCode:
+  Title: Inicializacija uporabnika
+  PreHeader: Inicializacija uporabnika
+  Subject: Inicializacija uporabnika
+  Greeting: Pozdravljeni {{.DisplayName}},
+  Text: Ta uporabnik je bil ustvarjen. Za prijavo uporabite uporabniško ime {{.PreferredLoginName}}. Kliknite na spodnji gumb, da dokončate postopek inicializacije. (Koda {{.Code}}) Če niste zahtevali tega sporočila, ga prezrite.
+  ButtonText: Dokončaj inicializacijo
+PasswordReset:
+  Title: Ponastavitev gesla
+  PreHeader: Ponastavitev gesla
+  Subject: Ponastavitev gesla
+  Greeting: Pozdravljeni {{.DisplayName}},
+  Text: Prejeli smo zahtevo za ponastavitev gesla. Uporabite spodnji gumb za ponastavitev gesla. (Koda {{.Code}}) Če niste zahtevali tega sporočila, ga prezrite.
+  ButtonText: Ponastavi geslo
+VerifyEmail:
+  Title: Preverjanje e-pošte
+  PreHeader: Preverjanje e-pošte
+  Subject: Preverjanje e-pošte
+  Greeting: Pozdravljeni {{.DisplayName}},
+  Text: Dodan je bil nov e-poštni naslov. Uporabite spodnji gumb za preverjanje e-pošte. (Koda {{.Code}}) Če niste dodali novega e-poštnega naslova, prezrite to sporočilo.
+  ButtonText: Preveri e-pošto
+VerifyPhone:
+  Title: Preverjanje telefona
+  PreHeader: Preverjanje telefona
+  Subject: Preverjanje telefona
+  Greeting: Pozdravljeni {{.DisplayName}},
+  Text: Dodana je bila nova telefonska številka. Za preverjanje uporabite naslednjo kodo {{.Code}}
+  ButtonText: Preveri telefon
+VerifyEmailOTP:
+  Title: Preverjanje OTP
+  PreHeader: Preverjanje OTP
+  Subject: Preverjanje OTP
+  Greeting: Pozdravljeni {{.DisplayName}},
+  Text: Uporabite OTP {{.OTP}} za avtentikacijo v naslednjih petih minutah ali kliknite gumb "Avtentikacija".
+  ButtonText: Avtentikacija
+VerifySMSOTP:
+  Text: >-
+    {{.OTP}} je vaš OTP za {{ .Domain }}. Uporabite ga v naslednjih {{.Expiry}}.
+
+    @{{.Domain}} #{{.OTP}}
+DomainClaimed:
+  Title: Domena je bila prevzeta
+  PreHeader: Sprememba e-pošte / uporabniškega imena
+  Subject: Domena je bila prevzeta
+  Greeting: Pozdravljeni {{.DisplayName}},
+  Text: Domeno {{.Domain}} je prevzela organizacija. Vaš trenutni uporabnik {{.Username}} ni del te organizacije. Zato boste morali ob prijavi spremeniti svojo e-pošto. Za to prijavo smo ustvarili začasno uporabniško ime ({{.TempUsername}}).
+  ButtonText: Prijava
+PasswordlessRegistration:
+  Title: Dodajanje prijave s ključem
+  PreHeader: Dodajanje prijave s ključem
+  Subject: Dodajanje prijave s ključem
+  Greeting: Pozdravljeni {{.DisplayName}},
+  Text: Prejeli smo zahtevo za dodajanje žetona za prijavo s ključem. Uporabite spodnji gumb, da dodate svoj žeton ali napravo za prijavo s ključem.
+  ButtonText: Dodaj prijavo s ključem
+PasswordChange:
+  Title: Geslo uporabnika je bilo spremenjeno
+  PreHeader: Sprememba gesla
+  Subject: Geslo uporabnika je bilo spremenjeno
+  Greeting: Pozdravljeni {{.DisplayName}},
+  Text: Geslo vašega uporabnika je bilo spremenjeno. Če te spremembe niste izvedli vi, vam svetujemo, da takoj ponastavite geslo.
+  ButtonText: Prijava
+InviteUser:
+  Title: Povabilo v {{.ApplicationName}}
+  PreHeader: Povabilo v {{.ApplicationName}}
+  Subject: Povabilo v {{.ApplicationName}}
+  Greeting: Pozdravljeni {{.DisplayName}},
+  Text: Vaš uporabnik je bil povabljen v {{.ApplicationName}}. Kliknite na spodnji gumb, da dokončate postopek povabila. Če niste zahtevali tega sporočila, ga prezrite.
+  ButtonText: Sprejmi povabilo

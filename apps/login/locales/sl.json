@@ -1,0 +1,460 @@
+{
+  "common": {
+    "back": "Nazaj",
+    "title": "Prijava z Zitadel"
+  },
+  "accounts": {
+    "title": "Računi",
+    "description": "Izberite račun, ki ga želite uporabiti.",
+    "addAnother": "Dodaj drug račun",
+    "noResults": "Ni najdenih računov",
+    "verified": "potrjen",
+    "expired": "potekel"
+  },
+  "logout": {
+    "title": "Odjava",
+    "description": "Kliknite na račun, da končate sejo",
+    "noResults": "Ni najdenih računov",
+    "clear": "Končaj sejo",
+    "verifiedAt": "Nazadnje aktivno: {time}",
+    "success": {
+      "title": "Odjava uspešna",
+      "description": "Uspešno ste se odjavili."
+    }
+  },
+  "loginname": {
+    "title": "Dobrodošli nazaj!",
+    "description": "Vnesite svoje prijavne podatke.",
+    "register": "Registriraj novega uporabnika",
+    "submit": "Naprej",
+    "labels": {
+      "loginname": "Prijavno ime",
+      "username": "Uporabniško ime",
+      "usernameOrPhoneNumber": "Uporabniško ime ali telefonska številka",
+      "usernameOrEmail": "Uporabniško ime ali e-pošta"
+    },
+    "required": {
+      "loginName": "To polje je obvezno"
+    },
+    "errors": {
+      "internalError": "Prišlo je do notranje napake",
+      "couldNotGetLoginSettings": "Prijavnih nastavitev ni bilo mogoče pridobiti",
+      "couldNotSearchUsers": "Uporabnikov ni bilo mogoče poiskati",
+      "couldNotGetDomain": "Domene ni bilo mogoče pridobiti",
+      "couldNotGetHost": "Gostitelja ni bilo mogoče pridobiti",
+      "couldNotStartIDPFlow": "Toka IDP ni bilo mogoče zagnati",
+      "moreThanOneUserFound": "Najden je bil več kot en uporabnik. Navedite enolični identifikator.",
+      "userNotFound": "Uporabnik ni bil najden v sistemu",
+      "couldNotCreateSession": "Seje za uporabnika ni bilo mogoče ustvariti",
+      "initialUserNotSupported": "Začetni uporabnik ni podprt",
+      "localAuthenticationNotAllowed": "Lokalna avtentikacija ni dovoljena! Za več informacij se obrnite na skrbnika.",
+      "passkeysNotAllowed": "Ključi za dostop niso dovoljeni! Za več informacij se obrnite na skrbnika.",
+      "couldNotFindIdentityProvider": "Ponudnika identitete ni bilo mogoče najti.",
+      "userNotActive": "Uporabnik ni aktiven. Za več informacij se obrnite na skrbnika."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Prišlo je do napake",
+      "multipleUsersFound": "Najdenih je bilo več uporabnikov",
+      "userNotFound": "Uporabnik ni bil najden v sistemu"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "Geslo",
+      "description": "Vnesite svoje geslo.",
+      "resetPassword": "Ponastavi geslo",
+      "submit": "Naprej",
+      "labels": {
+        "password": "Geslo"
+      },
+      "required": {
+        "password": "To polje je obvezno"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "Gesla ni bilo mogoče preveriti",
+        "couldNotResetPassword": "Gesla ni bilo mogoče ponastaviti"
+      },
+      "info": {
+        "passwordResetSent": "Geslo je bilo ponastavljeno. Preverite svojo e-pošto"
+      }
+    },
+    "set": {
+      "title": "Nastavite geslo",
+      "description": "Nastavite geslo za svoj račun",
+      "codeSent": "Koda je bila poslana na vaš e-poštni naslov.",
+      "noCodeReceived": "Niste prejeli kode?",
+      "resend": "Ponovno pošlji kodo",
+      "submit": "Naprej",
+      "labels": {
+        "code": "Koda",
+        "newPassword": "Novo geslo",
+        "confirmPassword": "Potrdite geslo"
+      },
+      "required": {
+        "code": "To polje je obvezno",
+        "newPassword": "Vnesti morate geslo!",
+        "confirmPassword": "To polje je obvezno"
+      },
+      "errors": {
+        "couldNotSetPassword": "Gesla ni bilo mogoče nastaviti",
+        "couldNotResetPassword": "Gesla ni bilo mogoče ponastaviti",
+        "couldNotVerifyPassword": "Gesla ni bilo mogoče preveriti"
+      }
+    },
+    "change": {
+      "title": "Spremenite geslo",
+      "description": "Nastavite geslo za svoj račun",
+      "submit": "Naprej",
+      "labels": {
+        "currentPassword": "Trenutno geslo",
+        "newPassword": "Novo geslo",
+        "confirmPassword": "Potrdite geslo"
+      },
+      "required": {
+        "currentPassword": "Vnesti morate trenutno geslo!",
+        "newPassword": "Vnesti morate novo geslo!",
+        "confirmPassword": "To polje je obvezno"
+      },
+      "errors": {
+        "currentPasswordInvalid": "Trenutno geslo ni pravilno.",
+        "couldNotChangePassword": "Gesla ni bilo mogoče spremeniti",
+        "couldNotVerifyPassword": "Gesla ni bilo mogoče preveriti",
+        "unknownError": "Neznana napaka"
+      }
+    },
+    "complexity": {
+      "length": "Dolgo mora biti vsaj {minLength} znakov.",
+      "hasSymbol": "Vsebovati mora simbol.",
+      "hasNumber": "Vsebovati mora številko.",
+      "hasUppercase": "Vsebovati mora veliko črko.",
+      "hasLowercase": "Vsebovati mora malo črko.",
+      "equals": "Potrditev gesla se ujema.",
+      "matches": "Se ujema",
+      "doesNotMatch": "Se ne ujema"
+    },
+    "errors": {
+      "noHostFound": "Gostitelj ni bil najden",
+      "couldNotSendResetLink": "Povezave za ponastavitev gesla ni bilo mogoče poslati",
+      "couldNotCreateSessionForUser": "Seje za uporabnika ni bilo mogoče ustvariti",
+      "couldNotVerifyPassword": "Gesla ni bilo mogoče preveriti",
+      "failedToAuthenticate": "Avtentikacija ni uspela. Imeli ste {failedAttempts} od {maxPasswordAttempts} poskusov vnosa gesla.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Avtentikacija ni uspela.",
+      "accountLockedContactAdmin": " Obrnite se na skrbnika, da odklene vaš račun",
+      "userNotFound": "Uporabnik ni bil najden v sistemu",
+      "initialUserNotSupported": "Začetni uporabnik ni podprt",
+      "userInitialStateNotSupported": "Začetno stanje uporabnika ni podprto",
+      "codeOrVerificationRequired": "Vnesti morate kodo ali imeti veljavno preverjanje uporabnika",
+      "verificationRequired": "Preverjanje uporabnika mora biti opravljeno",
+      "couldNotLoadSession": "Seje ni bilo mogoče naložiti",
+      "couldNotLoadAuthMethods": "Metod avtentikacije ni bilo mogoče naložiti",
+      "failedPrecondition": "Predpogoj ni izpolnjen",
+      "sessionNotValid": "Seja ni veljavna",
+      "passwordVerificationMissing": "Preverjanje gesla manjka.",
+      "passwordVerificationTooOld": "Preverjanje gesla je preteklo. Ponovno preverite svoje geslo."
+    }
+  },
+  "idp": {
+    "title": "Prijava s SSO",
+    "description": "Izberite enega od naslednjih ponudnikov za prijavo",
+    "orSignInWith": "ali se prijavite z",
+    "signInWithApple": "Prijavite se z Apple",
+    "signInWithGoogle": "Prijavite se z Google",
+    "signInWithAzureAD": "Prijavite se z AzureAD",
+    "signInWithGithub": "Prijavite se z GitHub",
+    "signInWithGitlab": "Prijavite se z GitLab",
+    "loginError": {
+      "title": "Prijava ni uspela",
+      "description": "Med poskusom prijave je prišlo do napake."
+    },
+    "linkingError": {
+      "title": "Povezovanje računa ni uspelo",
+      "description": "Med poskusom povezovanja vašega računa je prišlo do napake."
+    },
+    "completeRegister": {
+      "title": "Dopolnite svoje podatke",
+      "description": "Za dokončanje registracije morate navesti svoj e-poštni naslov in ime."
+    },
+    "accountNotFound": {
+      "title": "Račun ni bil najden",
+      "description": "Računa, povezanega z vašimi poverilnicami ponudnika identitete, nismo našli.",
+      "info": "Obstoječi račun ni bil najden. Prijavite se z obstoječim računom ali se za pomoč obrnite na skrbnika.",
+      "backToLogin": "Nazaj na prijavo"
+    },
+    "registrationFailed": {
+      "title": "Registracija ni na voljo",
+      "description": "Registracijskega postopka ni bilo mogoče dokončati.",
+      "info": "Organizacije za registracijo ni bilo mogoče določiti. Za pomoč se obrnite na skrbnika.",
+      "backToLogin": "Nazaj na prijavo"
+    },
+    "processing": {
+      "message": "Obdelava avtentikacije ...",
+      "noRedirect": "Strežnik ni vrnil preusmeritve ali napake",
+      "unexpectedError": "Prišlo je do nepričakovane napake"
+    },
+    "errors": {
+      "missingParameters": "Manjkajoči obvezni parametri",
+      "missingIdpInfo": "Podatki o IDP manjkajo",
+      "idpNotFound": "Ponudnik identitete ni bil najden",
+      "linkingNotAllowed": "Povezovanje za tega ponudnika identitete ni dovoljeno",
+      "linkingFailed": "Povezovanje ponudnika identitete z računom ni uspelo",
+      "autoLinkingFailed": "Samodejno povezovanje računa ni uspelo",
+      "userCreationFailed": "Uporabniškega računa ni bilo mogoče ustvariti",
+      "orgResolutionFailed": "Organizacije za registracijo ni bilo mogoče določiti",
+      "sessionCreationFailed": "Seje ni bilo mogoče ustvariti ali določiti preusmeritve",
+      "unknownError": "Prišlo je do neznane napake"
+    }
+  },
+  "ldap": {
+    "title": "Prijava LDAP",
+    "description": "Vnesite svoje poverilnice LDAP.",
+    "submit": "Naprej",
+    "labels": {
+      "username": "Uporabniško ime",
+      "password": "Geslo"
+    },
+    "required": {
+      "username": "To polje je obvezno",
+      "password": "To polje je obvezno"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "Potrdite svojo identiteto",
+      "description": "Izberite enega od naslednjih faktorjev.",
+      "noResults": "Ni razpoložljivih drugostopenjskih faktorjev za nastavitev."
+    },
+    "set": {
+      "title": "Nastavite 2-faktorsko avtentikacijo",
+      "description": "Izberite enega od naslednjih drugostopenjskih faktorjev.",
+      "skip": "Preskoči"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "Preverite 2-faktorsko avtentikacijo",
+      "totpDescription": "Vnesite kodo iz aplikacije za avtentikacijo.",
+      "smsDescription": "Vnesite kodo, ki ste jo prejeli prek SMS.",
+      "emailDescription": "Vnesite kodo, ki ste jo prejeli prek e-pošte.",
+      "noCodeReceived": "Niste prejeli kode?",
+      "resendCode": "Ponovno pošlji kodo",
+      "submit": "Naprej",
+      "labels": {
+        "code": "Koda"
+      },
+      "required": {
+        "code": "To polje je obvezno"
+      }
+    },
+    "set": {
+      "title": "Nastavite 2-faktorsko avtentikacijo",
+      "totpDescription": "Skenirajte QR-kodo z aplikacijo za avtentikacijo.",
+      "smsDescription": "Vnesite svojo telefonsko številko za prejemanje kode prek SMS.",
+      "emailDescription": "Vnesite svoj e-poštni naslov za prejemanje kode prek e-pošte.",
+      "totpRegisterDescription": "Skenirajte QR-kodo ali ročno odprite URL.",
+      "submit": "Naprej",
+      "labels": {
+        "code": "Koda"
+      },
+      "required": {
+        "code": "To polje je obvezno"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Avtentikacija s ključem za dostop",
+      "description": "Vaša naprava vas bo pozvala k uporabi prstnega odtisa, obraza ali zaklepanja zaslona",
+      "usePassword": "Uporabi geslo",
+      "submit": "Naprej",
+      "errors": {
+        "couldNotRequestChallenge": "Izziva za ključ za dostop ni bilo mogoče zahtevati",
+        "couldNotVerifyPasskey": "Ključa za dostop ni bilo mogoče preveriti",
+        "noResponseReceived": "Preverjanje ključa za dostop ni uspelo - odgovor ni bil prejet",
+        "noRedirectProvided": "Preverjanje ključa za dostop je končano, vendar preusmeritev ni bila podana",
+        "couldNotRetrievePasskey": "Med pridobivanjem ključa za dostop je prišlo do napake",
+        "verificationCancelled": "Preverjanje ključa za dostop je bilo preklicano",
+        "verificationFailed": "Med preverjanjem ključa za dostop je prišlo do napake",
+        "couldNotFindSession": "Seje ni bilo mogoče najti",
+        "couldNotUpdateSession": "Seje ni bilo mogoče posodobiti",
+        "userNotFound": "Uporabnik ni bil najden v sistemu",
+        "couldNotDetermineRedirect": "Po preverjanju ključa za dostop ni bilo mogoče določiti URL za preusmeritev"
+      }
+    },
+    "set": {
+      "title": "Nastavite ključ za dostop",
+      "description": "Vaša naprava vas bo pozvala k uporabi prstnega odtisa, obraza ali zaklepanja zaslona",
+      "info": {
+        "description": "Ključ za dostop je metoda avtentikacije na napravi, kot je vaš prstni odtis, Apple FaceID ali podobno. ",
+        "link": "Avtentikacija s ključem za dostop"
+      },
+      "skip": "Preskoči",
+      "submit": "Naprej"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "Preverite 2-faktorsko avtentikacijo",
+      "description": "Potrdite svoj račun z napravo."
+    },
+    "set": {
+      "title": "Nastavite 2-faktorsko avtentikacijo",
+      "description": "Nastavite napravo kot drugi faktor.",
+      "submit": "Naprej"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Ključ za dostop",
+      "password": "Geslo"
+    },
+    "disabled": {
+      "title": "Registracija onemogočena",
+      "description": "Registracija je onemogočena. Obrnite se na skrbnika."
+    },
+    "missingdata": {
+      "title": "Manjkajoči podatki",
+      "description": "Za registracijo vnesite e-pošto, ime in priimek."
+    },
+    "title": "Registracija",
+    "description": "Ustvarite svoj račun Zitadel.",
+    "noMethodAvailableWarning": "Ni razpoložljive metode avtentikacije. Obrnite se na skrbnika.",
+    "selectMethod": "Izberite metodo avtentikacije, ki jo želite uporabiti",
+    "agreeTo": "Za registracijo se morate strinjati s pogoji uporabe",
+    "termsOfService": "Pogoji uporabe",
+    "privacyPolicy": "Politika zasebnosti",
+    "submit": "Naprej",
+    "password": {
+      "title": "Nastavite geslo",
+      "description": "Nastavite geslo za svoj račun",
+      "submit": "Naprej",
+      "labels": {
+        "password": "Geslo",
+        "confirmPassword": "Potrdite geslo"
+      },
+      "required": {
+        "password": "Vnesti morate geslo!",
+        "confirmPassword": "To polje je obvezno"
+      }
+    },
+    "labels": {
+      "firstname": "Ime",
+      "lastname": "Priimek",
+      "email": "E-pošta"
+    },
+    "required": {
+      "firstname": "To polje je obvezno",
+      "lastname": "To polje je obvezno",
+      "email": "To polje je obvezno"
+    },
+    "errors": {
+      "couldNotCreateUser": "Uporabnika ni bilo mogoče ustvariti",
+      "couldNotCreateSession": "Seje ni bilo mogoče ustvariti",
+      "userNotFound": "Uporabnik ni bil najden v sistemu",
+      "couldNotLinkIDP": "IDP ni bilo mogoče povezati z uporabnikom",
+      "couldNotRegisterUser": "Uporabnika ni bilo mogoče registrirati"
+    }
+  },
+  "invite": {
+    "title": "Povabi uporabnika",
+    "description": "Vnesite e-poštni naslov in ime uporabnika, ki ga želite povabiti.",
+    "info": "Uporabnik bo prejel e-pošto z nadaljnjimi navodili.",
+    "notAllowed": "Vaše nastavitve ne dovoljujejo povabila uporabnikov.",
+    "submit": "Naprej",
+    "success": {
+      "title": "Uporabnik povabljen",
+      "description": "E-pošta je bila uspešno poslana.",
+      "verified": "Uporabnik je bil povabljen in je že potrdil svojo e-pošto.",
+      "notVerifiedYet": "Uporabnik je bil povabljen. Prejel bo e-pošto z nadaljnjimi navodili.",
+      "submit": "Povabi drugega uporabnika"
+    }
+  },
+  "signedin": {
+    "title": "Dobrodošli, {user}!",
+    "description": "Prijavljeni ste.",
+    "continue": "Naprej",
+    "error": {
+      "title": "Napaka",
+      "description": "Med poskusom prijave je prišlo do napake."
+    }
+  },
+  "verify": {
+    "userIdMissing": "ID uporabnika ni podan!",
+    "successTitle": "Uporabnik potrjen",
+    "successDescription": "Uporabnik je bil uspešno potrjen.",
+    "setupAuthenticator": "Nastavite avtentikator",
+    "verify": {
+      "title": "Potrdite uporabnika",
+      "description": "Vnesite kodo iz potrditvenega e-poštnega sporočila.",
+      "noCodeReceived": "Niste prejeli kode?",
+      "resendCode": "Ponovno pošlji kodo",
+      "codeSent": "Koda je bila pravkar poslana na vaš e-poštni naslov.",
+      "submit": "Naprej",
+      "labels": {
+        "code": "Koda"
+      },
+      "required": {
+        "code": "To polje je obvezno"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "E-pošte ni bilo mogoče ponovno poslati",
+      "couldNotVerifyUser": "Uporabnika ni bilo mogoče potrditi",
+      "couldNotVerifyInvite": "Povabila ni bilo mogoče potrditi",
+      "couldNotVerifyEmail": "E-pošte ni bilo mogoče potrditi",
+      "couldNotVerify": "Potrditev ni bila mogoča",
+      "couldNotLoadUser": "Uporabnika ni bilo mogoče naložiti",
+      "couldNotLoadAuthenticators": "Možnih avtentikatorjev ni bilo mogoče naložiti",
+      "couldNotCreateSession": "Seje ni bilo mogoče ustvariti",
+      "noHostFound": "Gostitelj ni bil najden",
+      "userAlreadyVerified": "Uporabnik je že potrjen!",
+      "couldNotResendInvite": "Povabila ni bilo mogoče ponovno poslati",
+      "inviteSendFailed": "Pošiljanje povabitvenega e-poštnega sporočila ni uspelo",
+      "emailSendFailed": "Pošiljanje potrditvenega e-poštnega sporočila ni uspelo",
+      "contextMissing": "Prišlo je do napake. Poskusite znova."
+    }
+  },
+  "authenticator": {
+    "title": "Izberite metodo avtentikacije",
+    "description": "Izberite metodo avtentikacije, ki jo želite uporabiti",
+    "noMethodsAvailable": "Ni razpoložljivih metod avtentikacije",
+    "allSetup": "Avtentikator ste že nastavili!",
+    "linkWithIDP": "ali povežite s ponudnikom identitete"
+  },
+  "device": {
+    "usercode": {
+      "title": "Koda naprave",
+      "description": "Vnesite kodo, prikazano v vaši aplikaciji ali napravi.",
+      "submit": "Naprej",
+      "labels": {
+        "code": "Koda"
+      },
+      "required": {
+        "code": "To polje je obvezno"
+      }
+    },
+    "request": {
+      "title": "{appName} se želi povezati",
+      "description": "{appName} bo imel dostop do:",
+      "disclaimer": "S klikom na Dovoli dovoljujete {appName} in Zitadel uporabo vaših podatkov v skladu z njunimi pogoji uporabe in politikami zasebnosti. Ta dostop lahko kadar koli prekličete.",
+      "submit": "Dovoli",
+      "deny": "Zavrni"
+    },
+    "scope": {
+      "openid": "Potrdite svojo identiteto.",
+      "email": "Oglejte si svoj e-poštni naslov.",
+      "profile": "Oglejte si vse podatke svojega profila.",
+      "offline_access": "Dovolite dostop brez povezave do vašega računa."
+    }
+  },
+  "error": {
+    "noUserCode": "Uporabniška koda ni podana!",
+    "noDeviceRequest": "Zahteva naprave ni bila najdena.",
+    "unknownContext": "Konteksta uporabnika ni bilo mogoče pridobiti. Najprej vnesite uporabniško ime ali podajte loginName kot iskalni parameter.",
+    "sessionExpired": "Vaša trenutna seja je potekla. Prijavite se znova.",
+    "failedLoading": "Nalaganje podatkov ni uspelo. Poskusite znova.",
+    "tryagain": "Poskusite znova",
+    "couldNotContinueSession": "Nadaljevanje seje ni mogoče - manjkajo podatki o uporabniku"
+  }
+}

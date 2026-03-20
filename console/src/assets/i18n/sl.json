@@ -1,0 +1,2878 @@
+{
+  "APP_NAME": "Zitadel",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "Metapodatki",
+    "HOME": {
+      "TITLE": "Začnite z Zitadel",
+      "NEXT": {
+        "TITLE": "Vaši naslednji koraki",
+        "DESCRIPTION": "Izvedite naslednje korake za zavarovanje vaše aplikacije.",
+        "CREATE_PROJECT": {
+          "TITLE": "Ustvarite projekt",
+          "DESCRIPTION": "Dodajte projekt in določite vloge ter dodelitve vlog."
+        }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "Začnite",
+          "DESCRIPTION": "Sledite vodniku po korakih in takoj začnite z gradnjo."
+        },
+        "DOCS": {
+          "TITLE": "Dokumentacija",
+          "DESCRIPTION": "Raziščite bazo znanja Zitadel, da se seznanite s ključnimi koncepti in idejami. Spoznajte, kako Zitadel deluje in kako ga uporabljati."
+        },
+        "EXAMPLES": {
+          "TITLE": "Primeri in razvojni kompleti (SDK)",
+          "DESCRIPTION": "Preglejte naše primere in SDK-je za uporabo Zitadel skupaj z vašimi najljubšimi programskimi jeziki in orodji."
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "Organizacija",
+      "DESCRIPTION": "Organizacija gosti uporabnike, projekte z aplikacijami, ponudnike identitete in nastavitve, kot je blagovna znamka podjetja. Želite deliti nastavitve med več organizacijami? Konfigurirajte privzete nastavitve.",
+      "METADATA": "Dodajte organizaciji lastne atribute, kot sta lokacija ali identifikator v drugem sistemu. Te informacije lahko uporabite v svojih akcijah."
+    },
+    "PROJECTS": {
+      "TITLE": "Projekti",
+      "DESCRIPTION": "Projekt gosti eno ali več aplikacij, ki jih lahko uporabite za avtentikacijo uporabnikov. Na primer, imate lahko en projekt s tremi aplikacijami: eno za spletni vmesnik, eno za mobilno aplikacijo in eno za zaledne storitve. Uporabnike lahko tudi avtorizirate s projekti. Če želite uporabnikom iz drugih organizacij omogočiti prijavo v vaše aplikacije, jim dodelite dostop do vašega projekta.<br/><br/>Če projekta ne najdete, se obrnite na lastnika projekta ali osebo z ustreznimi pravicami za pridobitev dostopa.",
+      "OWNED": {
+        "TITLE": "Lastni projekti",
+        "DESCRIPTION": "To so projekti, ki jih imate v lasti. Upravljate lahko nastavitve teh projektov, dodelitve vlog in aplikacije."
+      },
+      "GRANTED": {
+        "TITLE": "Podeljeni projekti",
+        "DESCRIPTION": "To so projekti, ki so vam jih podelile druge organizacije. S podeljenimi projekti lahko svojim uporabnikom omogočite dostop do aplikacij drugih organizacij."
+      }
+    },
+    "USERS": {
+      "TITLE": "Uporabniki",
+      "DESCRIPTION": "Uporabnik je oseba ali storitveni račun, ki lahko dostopa do vaših aplikacij.",
+      "HUMANS": {
+        "TITLE": "Uporabniki",
+        "DESCRIPTION": "Uporabniki se avtenticirajo interaktivno v seji brskalnika z uporabo prijavnega obrazca.",
+        "METADATA": "Dodajte uporabniku lastne atribute, kot je oddelek. Te informacije lahko uporabite v svojih akcijah."
+      },
+      "MACHINES": {
+        "TITLE": "Storitveni računi",
+        "DESCRIPTION": "Storitveni računi se avtenticirajo neinteraktivno z uporabo žetona JWT Bearer, podpisanega z zasebnim ključem. Uporabljajo lahko tudi osebni žeton za dostop.",
+        "METADATA": "Dodajte računu lastne atribute, kot je sistem za avtentikacijo. Te informacije lahko uporabite v svojih akcijah."
+      },
+      "SELF": {
+        "METADATA": "Dodajte svojemu uporabniškemu računu lastne atribute, kot je vaš oddelek. Te informacije lahko uporabite v akcijah vaše organizacije."
+      }
+    },
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Dodelitve vlog",
+      "DESCRIPTION": "Dodelitve vlog določajo pravice dostopa uporabnika do projekta. Uporabniku lahko dodelite dostop do projekta in določite njegove vloge znotraj tega projekta."
+    },
+    "ACTIONS": {
+      "TITLE": "Akcije",
+      "DESCRIPTION": "Zaženite lastno kodo ob dogodkih, ki se zgodijo med avtentikacijo uporabnikov v Zitadel. Avtomatizirajte svoje procese, obogatite metapodatke uporabnikov in njihove žetone ali obvestite zunanje sisteme.",
+      "SCRIPTS": {
+        "TITLE": "Skripte",
+        "DESCRIPTION": "Napišite svojo kodo JavaScript enkrat in jo sprožite v več tokovih."
+      },
+      "FLOWS": {
+        "TITLE": "Tokovi",
+        "DESCRIPTION": "Izberite tok avtentikacije in sprožite svojo akcijo ob določenem dogodku znotraj tega toka."
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, nova in izboljšana različica akcij, je zdaj na voljo. Trenutna različica je še vedno dostopna, vendar bo naš prihodnji razvoj osredotočen na novo, ki bo sčasoma nadomestila trenutno."
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "Nastavitve primerka",
+        "DESCRIPTION": "Privzete nastavitve za vse organizacije. Z ustreznimi dovoljenji je nekatere mogoče preglasiti v nastavitvah organizacije."
+      },
+      "ORG": {
+        "TITLE": "Nastavitve organizacije",
+        "DESCRIPTION": "Prilagodite nastavitve vaše organizacije."
+      },
+      "FEATURES": {
+        "TITLE": "Nastavitve funkcionalnosti",
+        "DESCRIPTION": "Odklenite funkcionalnosti za vaš primerek."
+      },
+      "IDPS": {
+        "TITLE": "Ponudniki identitete",
+        "DESCRIPTION": "Ustvarite in aktivirajte zunanje ponudnike identitete. Izberite znanega ponudnika ali konfigurirajte katerega koli drugega ponudnika, združljivega z OIDC, OAuth ali SAML. Svoje obstoječe žetone JWT lahko uporabite tudi kot federativne identitete s konfiguracijo ponudnika identitete JWT.",
+        "NEXT": "Kaj zdaj?",
+        "SAML": {
+          "TITLE": "Konfigurirajte svojega ponudnika identitete SAML",
+          "DESCRIPTION": "Zitadel je konfiguriran. Zdaj morate nastaviti svojega ponudnika identitete SAML. Večina ponudnikov vam omogoča, da preprosto naložite celoten XML z metapodatki Zitadel. Drugi ponudniki zahtevajo le posamezne URL-je, kot so ID entitete (URL metapodatkov), URL storitve za potrjevanje (ACS) ali URL za enotno odjavo."
+        },
+        "CALLBACK": {
+          "TITLE": "Konfigurirajte svojega ponudnika identitete {{ provider }}",
+          "DESCRIPTION": "Preden lahko konfigurirate Zitadel, posredujte ta URL svojemu ponudniku identitete, da omogočite preusmeritev brskalnika nazaj na Zitadel po avtentikaciji."
+        },
+        "JWT": {
+          "TITLE": "Uporaba JWT kot federativnih identitet",
+          "DESCRIPTION": "Ponudnik identitete JWT vam omogoča uporabo obstoječih žetonov JWT kot federativnih identitet. Ta funkcionalnost je uporabna, če že imate izdajatelja JWT. S ponudnikom identitete JWT lahko te žetone JWT uporabite za ustvarjanje in posodabljanje uporabnikov v Zitadel sproti."
+        },
+        "LDAP": {
+          "TITLE": "Konfigurirajte Zitadel za povezavo z vašim ponudnikom identitete LDAP",
+          "DESCRIPTION": "Navedite podatke za povezavo z vašim strežnikom LDAP in konfigurirajte preslikavo vaših atributov LDAP v atribute Zitadel."
+        },
+        "AUTOFILL": {
+          "TITLE": "Samodejno izpolnjevanje podatkov uporabnika",
+          "DESCRIPTION": "Uporabite akcijo za izboljšanje izkušnje uporabnikov. Registracijski obrazec Zitadel lahko vnaprej izpolnite z vrednostmi ponudnika identitete."
+        },
+        "ACTIVATE": {
+          "TITLE": "Aktivirajte ponudnika identitete",
+          "DESCRIPTION": "Vaš ponudnik identitete še ni aktiven. Aktivirajte ga, da omogočite prijavo uporabnikov."
+        }
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "Zahtevnost gesla",
+        "DESCRIPTION": "Zagotovite, da vaši uporabniki uporabljajo močna gesla, tako da določite pravila zahtevnosti."
+      },
+      "BRANDING": {
+        "TITLE": "Blagovna znamka",
+        "DESCRIPTION": "Prilagodite videz in občutek prijavnega obrazca. Ko končate, ne pozabite uporabiti nastavitev."
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "Zunanje povezave",
+        "DESCRIPTION": "Usmerite uporabnike na prilagojene zunanje vire, prikazane na prijavni strani. Uporabniki morajo pred registracijo sprejeti pogoje uporabe in pravilnik o zasebnosti. Spremenite povezavo do dokumentacije ali nastavite prazen niz, da skrijete gumb za dokumentacijo iz upravljalne konzole. Dodajte prilagojeno zunanjo povezavo in besedilo za to povezavo v upravljalni konzoli ali jih pustite prazne, da skrijete ta gumb."
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "Nastavitve SMTP",
+        "DESCRIPTION": "Konfigurirajte svoj strežnik SMTP za uporabo domene za naslov pošiljatelja, ki jo vaši uporabniki poznajo in ji zaupajo."
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "Nastavitve SMS",
+        "DESCRIPTION": "Za odklenitev vseh funkcij Zitadel konfigurirajte Twilio za pošiljanje SMS-sporočil uporabnikom."
+      },
+      "IAM_EVENTS": {
+        "TITLE": "Dogodki",
+        "DESCRIPTION": "Ta stran prikazuje vse spremembe stanja v vašem primerku do omejitve revizijske sledi vašega primerka. Filtrirajte seznam po časovnem razponu za namene razhroščevanja ali po agregatu za namene revizije."
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "Neuspeli dogodki",
+        "DESCRIPTION": "Ta stran prikazuje vse neuspele dogodke v vašem primerku. Če se Zitadel ne obnaša po pričakovanjih, vedno najprej preverite ta seznam."
+      },
+      "IAM_VIEWS": {
+        "TITLE": "Pogledi",
+        "DESCRIPTION": "Ta stran prikazuje vse poglede vaše podatkovne baze in kdaj so obdelali svoj zadnji dogodek. Če vam manjkajo podatki, preverite, ali je pogled posodobljen."
+      },
+      "LANGUAGES": {
+        "TITLE": "Jeziki",
+        "DESCRIPTION": "Omejite jezike, v katere sta prevedena prijavni obrazec in obvestilna sporočila. Če želite onemogočiti nekatere jezike, jih povlecite v razdelek Nedovoljeni jeziki. Dovoljeni jezik lahko določite kot privzeti. Če prednostni jezik uporabnika ni dovoljen, se uporabi privzeti jezik."
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "Generatorji skrivnosti",
+        "DESCRIPTION": "Določite zahtevnosti in življenjske dobe svojih skrivnosti. Višja zahtevnost in daljša življenjska doba izboljšata varnost, nižja zahtevnost in krajša življenjska doba izboljšata zmogljivost dešifriranja."
+      },
+      "SECURITY": {
+        "TITLE": "Varnostne nastavitve",
+        "DESCRIPTION": "Omogočite funkcije Zitadel, ki lahko vplivajo na varnost. Preden te nastavitve spremenite, morate zares vedeti, kaj počnete."
+      },
+      "OIDC": {
+        "TITLE": "Nastavitve OpenID Connect",
+        "DESCRIPTION": "Konfigurirajte življenjske dobe žetonov OIDC. Uporabite krajše življenjske dobe za večjo varnost uporabnikov, daljše pa za večje udobje.",
+        "LABEL_HOURS": "Najdaljša življenjska doba v urah",
+        "LABEL_DAYS": "Najdaljša življenjska doba v dneh",
+        "ACCESS_TOKEN": {
+          "TITLE": "Žeton za dostop",
+          "DESCRIPTION": "Žeton za dostop se uporablja za avtentikacijo uporabnika. Je kratkoživ žeton, ki se uporablja za dostop do podatkov uporabnika. Uporabite kratko življenjsko dobo, da zmanjšate tveganje nepooblaščenega dostopa. Žetone za dostop je mogoče samodejno osvežiti z osvežitvenim žetonom."
+        },
+        "ID_TOKEN": {
+          "TITLE": "Žeton ID",
+          "DESCRIPTION": "Žeton ID je spletni žeton JSON (JWT), ki vsebuje zahtevke o uporabniku. Življenjska doba žetona ID ne sme presegati življenjske dobe žetona za dostop."
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "Osvežitveni žeton",
+          "DESCRIPTION": "Osvežitveni žeton se uporablja za pridobitev novega žetona za dostop. Je dolgoživ žeton, ki se uporablja za osvežitev žetona za dostop. Ko osvežitveni žeton poteče, se mora uporabnik ročno znova avtenticirati."
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "Nedejavni osvežitveni žeton",
+          "DESCRIPTION": "Življenjska doba nedejavnega osvežitvenega žetona je najdaljši čas, ko je osvežitveni žeton lahko neuporabljen."
+        }
+      },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Upravljajte spletne ključe OIDC za varno podpisovanje in preverjanje žetonov za vaš primerek Zitadel.",
+        "TABLE": {
+          "TITLE": "Aktivni in prihodnji spletni ključi",
+          "DESCRIPTION": "Vaši aktivni in prihajajoči spletni ključi. Aktiviranje novega ključa bo deaktiviralo trenutnega.",
+          "NOTE": "Opomba: Končna točka OIDC JWKs vrne odziv, ki ga je mogoče predpomniti (privzeto 5 min). Izogibajte se prezgodnjemu aktiviranju ključa, saj morda še ne bo na voljo predpomnilnikom in aplikacijam.",
+          "ACTIVATE": "Aktiviraj naslednji spletni ključ",
+          "ACTIVE": "Trenutno aktiven",
+          "NEXT": "Naslednji v vrsti",
+          "FUTURE": "Prihodnji",
+          "WARNING": "Spletni ključ je star manj kot 5 minut"
+        },
+        "CREATE": {
+          "TITLE": "Ustvari nov spletni ključ",
+          "DESCRIPTION": "Ustvarjanje novega spletnega ključa ga doda na vaš seznam. Zitadel privzeto uporablja ključe RSA2048 z zgoščevalcem SHA256.",
+          "KEY_TYPE": "Vrsta ključa",
+          "BITS": "Biti",
+          "HASHER": "Zgoščevalec",
+          "CURVE": "Krivulja"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Prejšnji spletni ključi",
+          "DESCRIPTION": "To so vaši prejšnji spletni ključi, ki niso več aktivni.",
+          "DEACTIVATED_ON": "Deaktiviran dne"
+        }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Besedila sporočil",
+        "DESCRIPTION": "Prilagodite besedila obvestilnih e-poštnih ali SMS-sporočil. Če želite onemogočiti nekatere jezike, jih omejite v jezikovnih nastavitvah primerka.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "Ko zahtevate domeno za svojo organizacijo, bodo uporabniki, ki te domene ne uporabljajo v svojem prijavnem imenu, pozvani, da spremenijo prijavno ime, da se ujema z zahtevano domeno.",
+          "INIT": "Ko je uporabnik ustvarjen, bo prejel e-pošto s povezavo za nastavitev gesla.",
+          "PC": "Ko uporabnik spremeni geslo, bo prejel obvestilo o spremembi, če ste to omogočili v nastavitvah obvestil.",
+          "PL": "Ko uporabnik doda metodo avtentikacije s ključem, jo mora aktivirati s klikom na povezavo v e-pošti.",
+          "PR": "Ko uporabnik ponastavi geslo, bo prejel e-pošto s povezavo za nastavitev novega gesla.",
+          "VE": "Ko uporabnik spremeni e-poštni naslov, bo prejel e-pošto s povezavo za potrditev novega naslova.",
+          "VP": "Ko uporabnik spremeni telefonsko številko, bo prejel SMS s kodo za potrditev nove številke.",
+          "VEO": "Ko uporabnik doda metodo OTP prek e-pošte, jo mora aktivirati z vnosom kode, poslane na e-poštni naslov.",
+          "VSO": "Ko uporabnik doda metodo OTP prek SMS, jo mora aktivirati z vnosom kode, poslane na telefonsko številko.",
+          "IU": "Ko je ustvarjena koda za povabilo uporabnika, bo uporabnik prejel e-pošto s povezavo za nastavitev metode avtentikacije."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Besedila prijavnega vmesnika",
+        "DESCRIPTION": "Prilagodite besedila prijavnega obrazca. Če je besedilo prazno, je v nadomestnem besedilu prikazana privzeta vrednost. Če želite onemogočiti nekatere jezike, jih omejite v jezikovnih nastavitvah primerka."
+      },
+      "DOMAINS": {
+        "TITLE": "Nastavitve domene",
+        "DESCRIPTION": "Določite omejitve za vaše domene in konfigurirajte vzorce prijavnih imen.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Zahtevaj potrditev lastnih domen",
+          "DESCRIPTION": "Če je to aktivirano, morajo biti domene organizacije potrjene, preden jih je mogoče uporabiti za odkrivanje domen ali pripono uporabniškega imena."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Vzorec prijavnega imena",
+          "DESCRIPTION": "Upravljajte vzorec prijavnih imen uporabnikov. Zitadel izbere organizacijo uporabnika takoj, ko vnese prijavno ime. Zato morajo biti prijavna imena edinstvena med vsemi organizacijami. Če imate uporabnike z računi v več domenah, lahko zagotovite edinstvenost z dodajanjem domene organizacije kot pripone prijavnim imenom."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Preverjanje domene",
+          "DESCRIPTION": "Dovolite svoji organizaciji samo uporabo domen, ki jih dejansko nadzoruje. Če je aktivirano, se domene organizacije redno preverjajo z izzivom DNS ali HTTP, preden jih je mogoče uporabiti. To je varnostna funkcija za preprečevanje ugrabitve domen."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "Naslov pošiljatelja SMTP",
+          "DESCRIPTION": "Dovolite naslov pošiljatelja SMTP samo, če se ujema z eno od domen vašega primerka."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Življenjske dobe prijave",
+          "DESCRIPTION": "Okrepite varnost z zmanjšanjem nekaterih najdaljših življenjskih dob, povezanih s prijavo.",
+          "LABEL": "Najdaljša življenjska doba v urah",
+          "PW_CHECK": {
+            "TITLE": "Preverjanje gesla",
+            "DESCRIPTION": "Uporabniki bodo morali po tem obdobju znova vnesti geslo."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "Preverjanje zunanje prijave",
+            "DESCRIPTION": "Vaši uporabniki bodo po tem obdobju preusmerjeni k zunanjim ponudnikom identitete."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Inicializacija večfaktorske avtentikacije",
+            "DESCRIPTION": "Po tem obdobju bodo uporabniki pozvani k nastavitvi drugega faktorja ali večfaktorske avtentikacije, če tega še niso storili. Življenjska doba 0 onemogoči ta poziv."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Preverjanje drugega faktorja",
+            "DESCRIPTION": "Vaši uporabniki morajo v teh intervalih znova potrditi svoj drugi faktor."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Preverjanje večfaktorske avtentikacije",
+            "DESCRIPTION": "Vaši uporabniki morajo v teh intervalih znova potrditi svojo večfaktorsko avtentikacijo."
+          }
+        },
+        "FORM": {
+          "TITLE": "Prijavni obrazec",
+          "DESCRIPTION": "Prilagodite prijavni obrazec.",
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Lokalna avtentikacija dovoljena",
+            "DESCRIPTION": "Dovolite uporabnikom prijavo z uporabniškim imenom in geslom ali avtentikacijo s ključem. Če je to deaktivirano, se lahko uporabniki prijavijo samo z zunanjim ponudnikom identitete."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "Registracija uporabnikov dovoljena",
+            "DESCRIPTION": "Dovolite anonimnim uporabnikom ustvarjanje računa."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Registracija organizacij dovoljena",
+            "DESCRIPTION": "Dovolite anonimnim uporabnikom ustvarjanje organizacije."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "Zunanja prijava dovoljena",
+            "DESCRIPTION": "Dovolite uporabnikom prijavo z zunanjim ponudnikom identitete namesto uporabe uporabniškega računa Zitadel."
+          },
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Ponastavitev gesla skrita",
+            "DESCRIPTION": "Ne dovolite uporabnikom ponastavitve gesla."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Odkrivanje domene dovoljeno",
+            "DESCRIPTION": "Najdite organizacije uporabnikov glede na domeno njihovega prijavnega imena, na primer e-poštni naslov."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Prezri neznana uporabniška imena",
+            "DESCRIPTION": "Če je to aktivirano, prijavni obrazec ne bo prikazal sporočila o napaki, če je uporabniško ime neznano. To pomaga preprečiti ugibanje uporabniških imen."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "Onemogoči prijavo z e-pošto",
+            "DESCRIPTION": "Če je to aktivirano, uporabniki ne morejo uporabljati e-poštnih naslovov za prijavo. Upoštevajte, da morajo biti e-poštni naslovi uporabnikov edinstveni med vsemi organizacijami, če to deaktivirate."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Onemogoči prijavo s telefonom",
+            "DESCRIPTION": "Če je to aktivirano, uporabniki ne morejo uporabljati telefonskih številk za prijavo. Upoštevajte, da morajo biti telefonske številke uporabnikov edinstvene med vsemi organizacijami, če to deaktivirate."
+          }
+        }
+      }
+    }
+  },
+  "PAGINATOR": {
+    "PREVIOUS": "Prejšnja",
+    "NEXT": "Naslednja",
+    "COUNT": "Skupno rezultatov",
+    "MORE": "Več"
+  },
+  "FOOTER": {
+    "LINKS": {
+      "CONTACT": "Kontakt",
+      "TOS": "Pogoji uporabe",
+      "PP": "Pravilnik o zasebnosti"
+    },
+    "THEME": {
+      "DARK": "Temna",
+      "LIGHT": "Svetla"
+    }
+  },
+  "HOME": {
+    "WELCOME": "Začnite z Zitadel",
+    "DISCLAIMER": "Zitadel obravnava vaše podatke zaupno in varno.",
+    "DISCLAIMERLINK": "Več informacij",
+    "DOCUMENTATION": {
+      "DESCRIPTION": "Hitro začnite z Zitadel."
+    },
+    "GETSTARTED": {
+      "DESCRIPTION": "Hitro začnite z Zitadel."
+    },
+    "QUICKSTARTS": {
+      "LABEL": "Prvi koraki",
+      "DESCRIPTION": "Hitro začnite z Zitadel."
+    },
+    "SHORTCUTS": {
+      "SHORTCUTS": "Bližnjice",
+      "SETTINGS": "Razpoložljive bližnjice",
+      "PROJECTS": "Projekti",
+      "REORDER": "Držite in povlecite ploščico za premik",
+      "ADD": "Držite in povlecite ploščico za dodajanje"
+    }
+  },
+  "ONBOARDING": {
+    "DESCRIPTION": "Vaši naslednji koraki",
+    "MOREDESCRIPTION": "več bližnjic",
+    "COMPLETED": "zaključeno",
+    "DISMISS": "Ne hvala, sem strokovnjak.",
+    "CARD": {
+      "TITLE": "Zaženite svoj Zitadel",
+      "DESCRIPTION": "Ta kontrolni seznam vam pomaga nastaviti primerek in vas vodi skozi najpomembnejše korake"
+    },
+    "MILESTONES": {
+      "instance.policy.label.added": {
+        "title": "Nastavite svojo blagovno znamko",
+        "description": "Določite barve in oblike prijave ter naložite logotip in ikone.",
+        "action": "Nastavi blagovno znamko"
+      },
+      "instance.smtp.config.added": {
+        "title": "Nastavite SMTP",
+        "description": "Nastavite lastne nastavitve poštnega strežnika.",
+        "action": "Nastavi SMTP"
+      },
+      "PROJECT_CREATED": {
+        "title": "Ustvarite projekt",
+        "description": "Dodajte projekt in določite vloge ter dodelitve vlog.",
+        "action": "Ustvari projekt"
+      },
+      "APPLICATION_CREATED": {
+        "title": "Registrirajte aplikacijo",
+        "description": "Registrirajte svojo spletno, nativno, API ali SAML-aplikacijo in nastavite tok avtentikacije.",
+        "action": "Registriraj aplikacijo"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Prijavite se v aplikacijo",
+        "description": "Integrirajte svojo aplikacijo z Zitadel za avtentikacijo in jo preizkusite s prijavo z administratorskim uporabnikom.",
+        "action": "Prijava"
+      },
+      "user.human.added": {
+        "title": "Dodajte uporabnike",
+        "description": "Dodajte uporabnike vaše aplikacije",
+        "action": "Dodaj uporabnika"
+      },
+      "user.grant.added": {
+        "title": "Dodelite vloge uporabnikom",
+        "description": "Dovolite uporabnikom dostop do vaše aplikacije in nastavite njihove vloge.",
+        "action": "Dodeli vloge uporabnikom"
+      }
+    }
+  },
+  "MENU": {
+    "INSTANCE": "Privzete nastavitve",
+    "DASHBOARD": "Domov",
+    "PERSONAL_INFO": "Osebni podatki",
+    "DOCUMENTATION": "Dokumentacija",
+    "INSTANCEOVERVIEW": "Primerek",
+    "ORGS": "Organizacije",
+    "VIEWS": "Pogledi",
+    "EVENTS": "Dogodki",
+    "FAILEDEVENTS": "Neuspeli dogodki",
+    "ORGANIZATION": "Organizacija",
+    "PROJECT": "Projekti",
+    "PROJECTOVERVIEW": "Pregled",
+    "PROJECTGRANTS": "Podelitve projektov",
+    "ROLES": "Vloge",
+    "GRANTEDPROJECT": "Podeljeni projekti",
+    "HUMANUSERS": "Uporabniki",
+    "MACHINEUSERS": "Storitveni računi",
+    "LOGOUT": "Odjavi vse uporabnike",
+    "NEWORG": "Nova organizacija",
+    "IAMADMIN": "Ste administrator IAM. Upoštevajte, da imate razširjena dovoljenja.",
+    "SHOWORGS": "Prikaži vse organizacije",
+    "GRANTS": "Dodelitve vlog",
+    "ACTIONS": "Akcije",
+    "TARGETS": "Cilji",
+    "PRIVACY": "Zasebnost",
+    "TOS": "Pogoji uporabe",
+    "OPENSHORTCUTSTOOLTIP": "Vnesite ? za prikaz tipkovnih bližnjic",
+    "SETTINGS": "Nastavitve",
+    "CUSTOMERPORTAL": "Portal za stranke"
+  },
+  "QUICKSTART": {
+    "TITLE": "Integrirajte Zitadel v svojo aplikacijo",
+    "DESCRIPTION": "Integrirajte Zitadel v svojo aplikacijo ali uporabite enega od naših vzorcev za začetek v nekaj minutah.",
+    "BTN_START": "Ustvari aplikacijo",
+    "BTN_LEARNMORE": "Več o tem",
+    "CREATEPROJECTFORAPP": "Ustvari projekt {{value}}",
+    "SELECT_FRAMEWORK": "Izberite ogrodje",
+    "FRAMEWORK": "Ogrodje",
+    "FRAMEWORK_OTHER": "Drugo (OIDC, SAML, API)",
+    "ALMOSTDONE": "Skoraj ste končali.",
+    "REVIEWCONFIGURATION": "Preglejte nastavitve",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Ustvarili smo osnovno nastavitev za aplikacije {{value}}. Te nastavitve lahko po ustvaritvi prilagodite.",
+    "REDIRECTS": "Konfigurirajte preusmeritve",
+    "DEVMODEWARN": "Razvojni način je privzeto omogočen. Vrednosti za produkcijo lahko posodobite pozneje.",
+    "GUIDE": "Vodnik",
+    "BROWSEEXAMPLES": "Preglejte primere in SDK-je",
+    "DUPLICATEAPPRENAME": "Aplikacija z istim imenom že obstaja. Izberite drugo ime.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Zamenjaj ogrodje",
+        "DESCRIPTION": "Izberite eno od razpoložljivih ogrodij za hitro nastavitev vaše aplikacije."
+      }
+    }
+  },
+  "ACTIONS": {
+    "ACTIONS": "Akcije",
+    "FILTER": "Filter",
+    "RENAME": "Preimenuj",
+    "SET": "Nastavi",
+    "COPY": "Kopiraj v odložišče",
+    "COPIED": "Kopirano v odložišče.",
+    "RESET": "Ponastavi",
+    "RESETDEFAULT": "Ponastavi na privzeto",
+    "RESETTO": "Ponastavi na: ",
+    "RESETCURRENT": "Ponastavi na trenutno",
+    "SHOW": "Prikaži",
+    "HIDE": "Skrij",
+    "SAVE": "Shrani",
+    "SAVENOW": "Shrani zdaj",
+    "NEW": "Novo",
+    "ADD": "Dodaj",
+    "CREATE": "Ustvari",
+    "CONTINUE": "Nadaljuj",
+    "CONTINUEWITH": "Nadaljuj z {{value}}",
+    "BACK": "Nazaj",
+    "CLOSE": "Zapri",
+    "CLEAR": "Počisti",
+    "CANCEL": "Prekliči",
+    "INFO": "Informacije",
+    "OK": "V redu",
+    "SELECT": "Izberi",
+    "VIEW": "Prikaži",
+    "SELECTIONDELETE": "Izbriši izbrano",
+    "DELETE": "Izbriši",
+    "REMOVE": "Odstrani",
+    "VERIFY": "Preveri",
+    "FINISH": "Končaj",
+    "FINISHED": "Zapri",
+    "CHANGE": "Spremeni",
+    "REACTIVATE": "Ponovno aktiviraj",
+    "ACTIVATE": "Aktiviraj",
+    "DEACTIVATE": "Deaktiviraj",
+    "REFRESH": "Osveži",
+    "LOGIN": "Prijava",
+    "EDIT": "Uredi",
+    "PIN": "Pripni / Odpni",
+    "CONFIGURE": "Konfiguriraj",
+    "SEND": "Pošlji",
+    "NEWVALUE": "Nova vrednost",
+    "RESTORE": "Obnovi",
+    "CONTINUEWITHOUTSAVE": "Nadaljuj brez shranjevanja",
+    "OF": "od",
+    "PREVIOUS": "Prejšnji",
+    "NEXT": "Naslednji",
+    "MORE": "več",
+    "STEP": "Korak",
+    "SETUP": "Nastavitev",
+    "TEST": "Preizkus",
+    "UNSAVEDCHANGES": "Neshranjene spremembe",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Ali ste prepričani, da želite zavreči to novo akcijo? Vaša akcija bo izgubljena",
+        "CANCEL": "Prekliči",
+        "DISCARD": "Zavrzi"
+      }
+    },
+    "TABLE": {
+      "SHOWUSER": "Prikaži uporabnika {{value}}"
+    },
+    "DOWNLOAD": "Prenesi",
+    "APPLY": "Uporabi"
+  },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "Trenutno uporabljate nove Actions V2, ki so v beta različici. Prejšnja različica 1 je še vedno na voljo, vendar bo v prihodnje ukinjena. Prosimo, sporočite morebitne težave ali povratne informacije.",
+    "EXECUTION": {
+      "TITLE": "Akcije",
+      "DESCRIPTION": "Akcije vam omogočajo zagon lastne kode kot odziv na zahteve API, dogodke ali določene funkcije. Uporabite jih za razširitev Zitadel, avtomatizacijo delovnih tokov in integracijo z drugimi sistemi.",
+      "TYPES": {
+        "request": "Zahteva",
+        "response": "Odziv",
+        "event": "Dogodki",
+        "function": "Funkcija"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Ustvari akcijo",
+        "UPDATE_TITLE": "Posodobi akcijo",
+        "TYPE": {
+          "DESCRIPTION": "Izberite, kdaj želite, da se ta akcija zažene",
+          "REQUEST": {
+            "TITLE": "Zahteva",
+            "DESCRIPTION": "Zahteve, ki se pojavijo znotraj Zitadel. To je lahko na primer klic prijavne zahteve."
+          },
+          "RESPONSE": {
+            "TITLE": "Odziv",
+            "DESCRIPTION": "Odziv na zahtevo znotraj Zitadel. Pomislite na odziv, ki ga prejmete ob pridobivanju uporabnika."
+          },
+          "EVENTS": {
+            "TITLE": "Dogodki",
+            "DESCRIPTION": "Dogodki, ki se zgodijo znotraj Zitadel. To je lahko kar koli, od ustvarjanja uporabniškega računa do uspešne prijave itd."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Funkcije",
+            "DESCRIPTION": "Funkcije, ki jih lahko pokličete znotraj Zitadel. To je lahko kar koli, od pošiljanja e-pošte do ustvarjanja uporabnika."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Izberite, ali se ta akcija nanaša na vse zahteve, določeno storitev (npr. upravljanje uporabnikov) ali posamezno zahtevo (npr. ustvari uporabnika).",
+          "ALL": {
+            "TITLE": "Vse",
+            "DESCRIPTION": "Izberite to, če želite zagnati akcijo ob vsaki zahtevi"
+          },
+          "ALL_EVENTS": "Izberite to, če želite zagnati akcijo ob vsakem dogodku",
+          "SELECT_SERVICE": {
+            "TITLE": "Izberite storitev",
+            "DESCRIPTION": "Izberite storitev Zitadel za svojo akcijo."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Izberite metodo",
+            "DESCRIPTION": "Če želite izvajati samo ob določeni zahtevi, jo izberite tukaj",
+            "NOTE": "Če ne izberete metode, se bo vaša akcija zagnala ob vsaki zahtevi v izbrani storitvi."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Ime funkcije",
+            "DESCRIPTION": "Izberite funkcijo, ki jo želite izvesti"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Nastavi skupino",
+            "DESCRIPTION": "Če želite izvajati samo ob skupini dogodkov, nastavite skupino tukaj"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Izberite dogodek",
+            "DESCRIPTION": "Če želite izvajati samo ob določenem dogodku, ga navedite tukaj"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Izberete lahko izvajanje cilja ali zagon pod enakimi pogoji kot drugi cilji.",
+          "TARGET": {
+            "DESCRIPTION": "Cilj, ki ga želite izvesti za to akcijo"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Pogoji izvajanja"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Pogoj",
+        "TYPE": "Vrsta",
+        "TARGET": "Cilj",
+        "CREATIONDATE": "Datum ustvaritve"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Cilji",
+      "DESCRIPTION": "Cilj je ciljna destinacija kode, ki jo želite izvesti iz akcije. Ustvarite cilj tukaj in ga dodajte svojim akcijam.",
+      "CREATE": {
+        "TITLE": "Ustvarite svoj cilj",
+        "DESCRIPTION": "Ustvarite lasten cilj zunaj Zitadel",
+        "NAME": "Ime",
+        "NAME_DESCRIPTION": "Dajte cilju jasno, opisno ime, da ga boste pozneje zlahka prepoznali",
+        "TYPE": "Vrsta",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST Call",
+          "restAsync": "REST Async"
+        },
+        "TYPES_DESCRIPTION": "Webhook, klic obravnava statusno kodo, vendar odziv ni pomemben\nCall, klic obravnava statusno kodo in odziv\nAsync, klic ne obravnava niti statusne kode niti odziva, vendar ga je mogoče klicati vzporedno z drugimi cilji",
+        "PAYLOAD_TYPE": "Vrsta vsebine",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Nedoločeno",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Šifrirani JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Standardna vsebina JSON z glavo podpisa za preverjanje.\nJWT: Vsebina se pošlje kot podpisan JWT. Preverjanje je samostojno z uporabo podpisa JWT.\nJWE: JWT je dodatno šifriran za preprečevanje nepooblaščenega dostopa do informacij v vsebini.",
+        "ENDPOINT": "Končna točka",
+        "ENDPOINT_DESCRIPTION": "Vnesite končno točko, kjer gostuje vaša koda. Prepričajte se, da je dostopna!",
+        "TIMEOUT": "Časovna omejitev",
+        "TIMEOUT_DESCRIPTION": "Nastavite najdaljši čas, ki ga ima cilj na voljo za odziv. Če traja dlje, bomo prekinili zahtevo.",
+        "INTERRUPT_ON_ERROR": "Prekini ob napaki",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Ustavi vsa izvajanja, ko cilj vrne napako",
+        "INTERRUPT_ON_ERROR_WARNING": "Pozor: »Prekini ob napaki« ustavi delovanje ob napaki, kar lahko povzroči zaklenitev. Preizkusite z onemogočeno nastavitvijo, da preprečite blokado prijave/ustvarjanja.",
+        "AWAIT_RESPONSE": "Čakaj na odziv",
+        "AWAIT_RESPONSE_DESCRIPTION": "Počakali bomo na odziv, preden naredimo kar koli drugega. Uporabno, če nameravate uporabiti več ciljev za eno akcijo"
+      },
+      "TABLE": {
+        "NAME": "Ime",
+        "ENDPOINT": "Končna točka",
+        "CREATIONDATE": "Datum ustvaritve",
+        "REORDER": "Preuredi"
+      }
+    }
+  },
+  "MEMBERROLES": {
+    "IAM_OWNER": "Ima nadzor nad celotnim primerkom, vključno z vsemi organizacijami",
+    "IAM_OWNER_VIEWER": "Ima dovoljenje za pregled celotnega primerka, vključno z vsemi organizacijami",
+    "IAM_ORG_MANAGER": "Ima dovoljenje za ustvarjanje in upravljanje organizacij",
+    "IAM_USER_MANAGER": "Ima dovoljenje za ustvarjanje in upravljanje uporabnikov",
+    "IAM_ADMIN_IMPERSONATOR": "Ima dovoljenje za poosebljanje administratorjev in končnih uporabnikov iz vseh organizacij",
+    "IAM_END_USER_IMPERSONATOR": "Ima dovoljenje za poosebljanje končnih uporabnikov iz vseh organizacij",
+    "IAM_LOGIN_CLIENT": "Ima dovoljenje za upravljanje prijavnih aplikacij",
+    "ORG_OWNER": "Ima dovoljenje nad celotno organizacijo",
+    "ORG_USER_MANAGER": "Ima dovoljenje za ustvarjanje in upravljanje uporabnikov organizacije",
+    "ORG_OWNER_VIEWER": "Ima dovoljenje za pregled celotne organizacije",
+    "ORG_SETTINGS_MANAGER": "Ima dovoljenje za upravljanje nastavitev organizacije",
+    "ORG_USER_PERMISSION_EDITOR": "Ima dovoljenje za upravljanje dodelitev vlog",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Ima dovoljenje za upravljanje podelitev projektov",
+    "ORG_PROJECT_CREATOR": "Ima dovoljenje za ustvarjanje lastnih projektov in pripadajočih nastavitev",
+    "ORG_ADMIN_IMPERSONATOR": "Ima dovoljenje za poosebljanje administratorjev in končnih uporabnikov iz organizacije",
+    "ORG_END_USER_IMPERSONATOR": "Ima dovoljenje za poosebljanje končnih uporabnikov iz organizacije",
+    "ORG_USER_SELF_MANAGER": "Ima dovoljenje za upravljanje lastnega uporabniškega računa",
+    "PROJECT_OWNER": "Ima dovoljenje nad celotnim projektom",
+    "PROJECT_OWNER_VIEWER": "Ima dovoljenje za pregled celotnega projekta",
+    "PROJECT_OWNER_GLOBAL": "Ima dovoljenje nad celotnim projektom",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Ima dovoljenje za pregled celotnega projekta",
+    "PROJECT_GRANT_OWNER": "Ima dovoljenje za upravljanje podelitve projekta",
+    "PROJECT_GRANT_OWNER_VIEWER": "Ima dovoljenje za pregled podelitve projekta"
+  },
+  "OVERLAYS": {
+    "ORGSWITCHER": {
+      "TEXT": "Vse nastavitve organizacije in tabele v upravljalni konzoli temeljijo na izbrani organizaciji. Kliknite ta gumb za zamenjavo organizacije ali ustvarjanje nove."
+    },
+    "INSTANCE": {
+      "TEXT": "Kliknite tukaj za dostop do privzetih nastavitev. Upoštevajte, da imate dostop do tega gumba samo, če imate razširjena dovoljenja."
+    },
+    "PROFILE": {
+      "TEXT": "Tukaj lahko preklapljate med uporabniškimi računi ter upravljate seje in profil."
+    },
+    "NAV": {
+      "TEXT": "Ta navigacija se spreminja glede na izbrano organizacijo zgoraj ali vaš primerek"
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "Kontekst organizacije se je spremenil."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "Pogled se je pravkar spremenil na primerek!"
+    }
+  },
+  "FILTER": {
+    "TITLE": "Filter",
+    "ORGNAME": "Ime organizacije",
+    "ORGID": "ID organizacije",
+    "STATE": "Stanje",
+    "PRIMARYDOMAIN": "Domena organizacije",
+    "DISPLAYNAME": "Prikazno ime uporabnika",
+    "EMAIL": "E-pošta",
+    "USERNAME": "Uporabniško ime",
+    "PROJECTNAME": "Ime projekta",
+    "RESOURCEOWNER": "Lastnik vira",
+    "METHODS": {
+      "5": "vsebuje",
+      "7": "se konča z",
+      "1": "je enako"
+    }
+  },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "Tipkovne bližnjice",
+    "UNDERORGCONTEXT": "Na straneh organizacije",
+    "SIDEWIDE": "Bližnjice na ravni spletnega mesta",
+    "SHORTCUTS": {
+      "HOME": "Pojdi na <strong>D</strong>omov",
+      "INSTANCE": "Pojdi na <strong>P</strong>rimerek",
+      "ORG": "Pojdi na <strong>O</strong>rganizacijo",
+      "ORGSETTINGS": "Pojdi na <strong>N</strong>astavitve organizacije",
+      "ORGSWITCHER": "Zamenjaj organizacijo",
+      "ME": "Pojdi na lastni profil",
+      "PROJECTS": "Pojdi na <strong>P</strong>rojekte",
+      "USERS": "Pojdi na <strong>U</strong>porabnike",
+      "ROLEASSIGNMENTS": "Pojdi na dodelitve <strong>V</strong>log",
+      "ACTIONS": "Pojdi na akcije in <strong>T</strong>okove",
+      "DOMAINS": "Pojdi na <strong>D</strong>omene"
+    }
+  },
+  "INSTANCEID": "ID primerka",
+  "RESOURCEID": "ID vira",
+  "NAME": "Ime",
+  "VERSION": "Različica",
+  "TABLE": {
+    "NOROWS": "Ni podatkov"
+  },
+  "ERRORS": {
+    "REQUIRED": "Prosimo, izpolnite to polje.",
+    "ATLEASTONE": "Navedite vsaj eno vrednost.",
+    "TOKENINVALID": {
+      "TITLE": "Vaš avtorizacijski žeton je potekel.",
+      "DESCRIPTION": "Kliknite spodnji gumb za ponovno prijavo."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Vaš primerek je blokiran.",
+      "DESCRIPTION": "Prosite administratorja primerka Zitadel, da posodobi naročnino."
+    },
+    "INVALID_FORMAT": "Oblika ni veljavna.",
+    "NOTANEMAIL": "Vnesena vrednost ni e-poštni naslov.",
+    "MINLENGTH": "Dolžina mora biti vsaj {{requiredLength}} znakov.",
+    "MAXLENGTH": "Dolžina mora biti manj kot {{requiredLength}} znakov.",
+    "UPPERCASEMISSING": "Vsebovati mora veliko črko.",
+    "LOWERCASEMISSING": "Vsebovati mora malo črko.",
+    "SYMBOLERROR": "Vsebovati mora simbol ali ločilo.",
+    "NUMBERERROR": "Vsebovati mora številko.",
+    "PWNOTEQUAL": "Vneseni gesli se ne ujemata.",
+    "PHONE": "Telefonska številka se mora začeti z +."
+  },
+  "USER": {
+    "SETTINGS": {
+      "TITLE": "Nastavitve",
+      "GENERAL": "Splošno",
+      "IDP": "Ponudniki identitete",
+      "SECURITY": "Geslo in varnost",
+      "KEYS": "Ključi",
+      "PAT": "Osebni žetoni za dostop",
+      "ROLEASSIGNMENTS": "Dodelitve vlog",
+      "MEMBERSHIPS": "Administratorske vloge",
+      "METADATA": "Metapodatki"
+    },
+    "TITLE": "Osebni podatki",
+    "DESCRIPTION": "Upravljajte svoje podatke in varnostne nastavitve.",
+    "PAGES": {
+      "TITLE": "Uporabnik",
+      "DETAIL": "Podrobnosti",
+      "CREATE": "Ustvari",
+      "MY": "Moji podatki",
+      "LOGINNAMES": "Prijavna imena",
+      "LOGINMETHODS": "Načini prijave",
+      "LOGINNAMESDESC": "To so vaša prijavna imena:",
+      "NOUSER": "Ni povezanega uporabnika.",
+      "REACTIVATE": "Ponovno aktiviraj",
+      "DEACTIVATE": "Deaktiviraj",
+      "FILTER": "Filter",
+      "STATE": "Stanje",
+      "DELETE": "Izbriši uporabnika",
+      "UNLOCK": "Odkleni uporabnika",
+      "GENERATESECRET": "Generiraj skrivnost odjemalca",
+      "REMOVESECRET": "Odstrani skrivnost odjemalca",
+      "LOCKEDDESCRIPTION": "Ta uporabnik je bil zaklenjen zaradi prekoračitve največjega števila poskusov prijave in ga je treba odkleniti za ponovno uporabo.",
+      "DELETEACCOUNT": "Izbriši račun",
+      "DELETEACCOUNT_DESC": "Če izvedete to dejanje, boste odjavljeni in ne boste več imeli dostopa do svojega računa. To dejanje ni povratno, zato prosimo nadaljujte previdno.",
+      "DELETEACCOUNT_BTN": "Izbriši račun",
+      "DELETEACCOUNT_SUCCESS": "Račun je bil uspešno izbrisan!"
+    },
+    "DETAILS": {
+      "DATECREATED": "Ustvarjeno",
+      "DATECHANGED": "Spremenjeno"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Izbriši uporabnika",
+      "DELETE_SELF_TITLE": "Izbriši račun",
+      "DELETE_DESCRIPTION": "Nameravate trajno izbrisati uporabnika. Ali ste prepričani?",
+      "DELETE_SELF_DESCRIPTION": "Nameravate trajno izbrisati svoj osebni račun. To vas bo odjavilo in izbrisalo vašega uporabnika. Tega dejanja ni mogoče razveljaviti!",
+      "DELETE_AUTH_DESCRIPTION": "Nameravate trajno izbrisati svoj osebni račun. Ali ste prepričani?",
+      "TYPEUSERNAME": "Vnesite '{{value}}' za potrditev in izbris uporabnika.",
+      "USERNAME": "Prijavno ime",
+      "DELETE_BTN": "Trajno izbriši"
+    },
+    "SENDEMAILDIALOG": {
+      "TITLE": "Pošlji e-poštno obvestilo",
+      "DESCRIPTION": "Kliknite spodnji gumb za pošiljanje obvestila na trenutni e-poštni naslov ali spremenite e-poštni naslov v polju.",
+      "NEWEMAIL": "Nov e-poštni naslov"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Skrivnost odjemalca",
+      "CLIENTSECRET_DESCRIPTION": "Shranite skrivnost odjemalca na varno mesto, saj po zaprtju tega pogovornega okna ne bo več vidna."
+    },
+    "TABLE": {
+      "DEACTIVATE": "Deaktiviraj",
+      "ACTIVATE": "Aktiviraj",
+      "CHANGEDATE": "Nazadnje spremenjeno",
+      "CREATIONDATE": "Ustvarjeno",
+      "FILTER": {
+        "0": "Filtriraj po prikaznem imenu",
+        "1": "Filtriraj po uporabniškem imenu",
+        "2": "Filtriraj po prikaznem imenu",
+        "3": "Filtriraj po uporabniškem imenu",
+        "4": "Filtriraj po e-pošti",
+        "5": "Filtriraj po prikaznem imenu",
+        "10": "Filtriraj po imenu organizacije",
+        "12": "Filtriraj po imenu projekta"
+      },
+      "EMPTY": "Ni vnosov"
+    },
+    "PASSWORDLESS": {
+      "SEND": "Pošlji registracijsko povezavo",
+      "TABLETYPE": "Vrsta",
+      "TABLESTATE": "Stanje",
+      "NAME": "Ime",
+      "EMPTY": "Nobena naprava ni nastavljena",
+      "TITLE": "Avtentikacija s ključem",
+      "DESCRIPTION": "Dodajte metode avtentikacije na osnovi WebAuthn za prijavo v Zitadel s ključem.",
+      "MANAGE_DESCRIPTION": "Upravljajte metode drugega faktorja vaših uporabnikov.",
+      "U2F": "Dodaj metodo",
+      "U2F_DIALOG_TITLE": "Preveri avtentikator",
+      "U2F_DIALOG_DESCRIPTION": "Vnesite ime za uporabljeni ključ za prijavo",
+      "U2F_SUCCESS": "Avtentikacija s ključem uspešno ustvarjena!",
+      "U2F_ERROR": "Med nastavitvijo je prišlo do napake!",
+      "U2F_NAME": "Ime avtentikatorja",
+      "TYPE": {
+        "0": "MFA ni določen",
+        "1": "OTP",
+        "2": "Ključ"
+      },
+      "STATE": {
+        "0": "Ni stanja",
+        "1": "Ni pripravljen",
+        "2": "Pripravljen",
+        "3": "Izbrisan"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Odstrani ključ",
+        "DELETE_DESCRIPTION": "Nameravate izbrisati ključ. Ali ste prepričani?",
+        "ADD_TITLE": "Avtentikacija s ključem",
+        "ADD_DESCRIPTION": "Izberite eno od razpoložljivih možnosti za ustvarjanje ključa.",
+        "SEND_DESCRIPTION": "Pošljite si registracijsko povezavo na svoj e-poštni naslov.",
+        "SEND": "Pošlji registracijsko povezavo",
+        "SENT": "E-pošta je bila uspešno dostavljena. Preverite nabiralnik za nadaljevanje nastavitve.",
+        "QRCODE_DESCRIPTION": "Generirajte QR-kodo za optično branje z drugo napravo.",
+        "QRCODE": "Generiraj QR-kodo",
+        "QRCODE_SCAN": "Optično preberite to QR-kodo za nadaljevanje nastavitve na vaši napravi.",
+        "NEW_DESCRIPTION": "Uporabite to napravo za nastavitev ključa.",
+        "NEW": "Dodaj novo"
+      }
+    },
+    "MFA": {
+      "TABLETYPE": "Vrsta",
+      "TABLESTATE": "Stanje",
+      "NAME": "Ime",
+      "EMPTY": "Ni dodatnih faktorjev",
+      "TITLE": "Večfaktorska avtentikacija",
+      "DESCRIPTION": "Dodajte drugi faktor za zagotovitev optimalne varnosti računa.",
+      "MANAGE_DESCRIPTION": "Upravljajte metode drugega faktorja vaših uporabnikov.",
+      "ADD": "Dodaj faktor",
+      "OTP": "Aplikacija za avtentikacijo TOTP",
+      "OTP_DIALOG_TITLE": "Dodaj OTP",
+      "OTP_DIALOG_DESCRIPTION": "Optično preberite QR-kodo z aplikacijo za avtentikacijo in vnesite spodnjo kodo za preverjanje in aktivacijo metode TOTP.",
+      "U2F": "Ključ",
+      "U2F_DIALOG_TITLE": "Preveri faktor",
+      "U2F_DIALOG_DESCRIPTION": "Vnesite ime za uporabljeni univerzalni večfaktorski avtentikator.",
+      "U2F_SUCCESS": "Faktor uspešno dodan!",
+      "U2F_ERROR": "Med nastavitvijo je prišlo do napake!",
+      "U2F_NAME": "Ime avtentikatorja",
+      "OTPSMS": "OTP prek SMS",
+      "OTPEMAIL": "OTP prek e-pošte",
+      "SETUPOTPSMSDESCRIPTION": "Ali želite nastaviti to telefonsko številko kot drugi faktor OTP?",
+      "OTPSMSSUCCESS": "Faktor OTP uspešno nastavljen.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Vaša telefonska številka mora biti potrjena za uporabo te metode.",
+      "OTPEMAILSUCCESS": "Faktor OTP uspešno nastavljen.",
+      "TYPE": {
+        "0": "MFA ni določen",
+        "1": "OTP",
+        "2": "Ključ"
+      },
+      "STATE": {
+        "0": "Ni stanja",
+        "1": "Ni pripravljen",
+        "2": "Pripravljen",
+        "3": "Izbrisan"
+      },
+      "DIALOG": {
+        "MFA_DELETE_TITLE": "Odstrani drugi faktor",
+        "MFA_DELETE_DESCRIPTION": "Nameravate izbrisati drugi faktor. Ali ste prepričani?",
+        "ADD_MFA_TITLE": "Dodaj drugi faktor",
+        "ADD_MFA_DESCRIPTION": "Izberite eno od naslednjih možnosti."
+      }
+    },
+    "EXTERNALIDP": {
+      "TITLE": "Zunanji ponudniki identitete",
+      "DESC": "",
+      "IDPCONFIGID": "ID konfiguracije ponudnika identitete",
+      "IDPNAME": "Ime ponudnika identitete",
+      "USERDISPLAYNAME": "Zunanje ime",
+      "EXTERNALUSERID": "Zunanji ID uporabnika",
+      "EMPTY": "Zunanji ponudnik identitete ni najden",
+      "DIALOG": {
+        "DELETE_TITLE": "Odstrani ponudnika identitete",
+        "DELETE_DESCRIPTION": "Nameravate odstraniti ponudnika identitete od uporabnika. Ali res želite nadaljevati?"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Ustvari novega uporabnika",
+      "DESCRIPTION": "Prosimo, navedite potrebne podatke.",
+      "NAMEANDEMAILSECTION": "Ime in e-pošta",
+      "GENDERLANGSECTION": "Spol in jezik",
+      "PHONESECTION": "Telefonske številke",
+      "PASSWORDSECTION": "Začetno geslo",
+      "ADDRESSANDPHONESECTION": "Telefonska številka",
+      "INITMAILDESCRIPTION": "Če sta izbrani obe možnosti, e-pošta za inicializacijo ne bo poslana. Če je izbrana le ena možnost, bo poslana e-pošta za navedbo/potrditev podatkov.",
+      "SETUPAUTHENTICATIONLATER": "Nastavite avtentikacijo za tega uporabnika pozneje.",
+      "INVITATION": "Pošljite povabilo po e-pošti za nastavitev avtentikacije in potrditev e-pošte.",
+      "INITIALPASSWORD": "Nastavite začetno geslo za uporabnika."
+    },
+    "CODEDIALOG": {
+      "TITLE": "Potrdite telefonsko številko",
+      "DESCRIPTION": "Vnesite kodo, ki ste jo prejeli v besedilnem sporočilu, za potrditev telefonske številke.",
+      "CODE": "Koda"
+    },
+    "DATA": {
+      "STATE": "Stanje",
+      "STATE0": "Neznano",
+      "STATE1": "Aktiven",
+      "STATE2": "Neaktiven",
+      "STATE3": "Izbrisan",
+      "STATE4": "Zaklenjen",
+      "STATE5": "Suspendiran",
+      "STATE6": "Začeten"
+    },
+    "PROFILE": {
+      "TITLE": "Profil",
+      "EMAIL": "E-pošta",
+      "PHONE": "Telefonska številka",
+      "PHONE_HINT": "Uporabite simbol + pred klicno kodo države ali izberite državo iz spustnega menija in nato vnesite telefonsko številko",
+      "PHONE_VERIFIED": "Telefonska številka potrjena",
+      "SEND_SMS": "Pošlji potrditveni SMS",
+      "SEND_EMAIL": "Pošlji e-pošto",
+      "USERNAME": "Uporabniško ime",
+      "CHANGEUSERNAME": "spremeni",
+      "CHANGEUSERNAME_TITLE": "Spremeni uporabniško ime",
+      "CHANGEUSERNAME_DESC": "Vnesite novo ime v spodnje polje.",
+      "FIRSTNAME": "Ime",
+      "LASTNAME": "Priimek",
+      "NICKNAME": "Vzdevek",
+      "DISPLAYNAME": "Prikazno ime",
+      "PREFERREDLOGINNAME": "Prednostno prijavno ime",
+      "PREFERRED_LANGUAGE": "Jezik",
+      "GENDER": "Spol",
+      "PASSWORD": "Geslo",
+      "AVATAR": {
+        "UPLOADTITLE": "Naložite svojo profilno sliko",
+        "UPLOADBTN": "Izberite datoteko",
+        "UPLOAD": "Naloži",
+        "CURRENT": "Trenutna slika",
+        "PREVIEW": "Predogled",
+        "DELETESUCCESS": "Uspešno izbrisano!",
+        "CROPPERERROR": "Med nalaganjem datoteke je prišlo do napake. Po potrebi poskusite z drugo obliko ali velikostjo."
+      },
+      "COUNTRY": "Država"
+    },
+    "MACHINE": {
+      "TITLE": "Podrobnosti storitvenega računa",
+      "USERNAME": "Uporabniško ime",
+      "NAME": "Ime",
+      "DESCRIPTION": "Opis",
+      "KEYSTITLE": "Ključi",
+      "KEYSDESC": "Določite ključe in dodajte neobvezen datum poteka.",
+      "TOKENSTITLE": "Osebni žetoni za dostop",
+      "TOKENSDESC": "Osebni žetoni za dostop delujejo kot običajni žetoni za dostop OAuth.",
+      "ID": "ID ključa",
+      "TYPE": "Vrsta",
+      "EXPIRATIONDATE": "Datum poteka",
+      "CHOOSEDATEAFTER": "Vnesite veljavni datum poteka po",
+      "CHOOSEEXPIRY": "Izberite datum poteka",
+      "CREATIONDATE": "Datum ustvaritve",
+      "KEYDETAILS": "Podrobnosti ključa",
+      "ACCESSTOKENTYPE": "Vrsta žetona za dostop",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
+      "ADD": {
+        "TITLE": "Dodaj ključ",
+        "DESCRIPTION": "Izberite vrsto ključa in neobvezni datum poteka."
+      },
+      "ADDED": {
+        "TITLE": "Ključ je bil ustvarjen",
+        "DESCRIPTION": "Prenesite ključ, saj po zaprtju tega pogovornega okna ne bo več viden!"
+      },
+      "KEYTYPES": {
+        "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "Izbriši ključ",
+          "DESCRIPTION": "Ali želite izbrisati izbrani ključ? Tega ni mogoče razveljaviti."
+        }
+      }
+    },
+    "PASSWORD": {
+      "TITLE": "Geslo",
+      "LABEL": "Varno geslo pomaga zaščititi račun",
+      "DESCRIPTION": "Vnesite novo geslo v skladu s spodnjim pravilnikom.",
+      "OLD": "Trenutno geslo",
+      "NEW": "Novo geslo",
+      "CONFIRM": "Potrdite novo geslo",
+      "NEWINITIAL": "Geslo",
+      "CONFIRMINITIAL": "Potrdite geslo",
+      "RESET": "Ponastavi trenutno geslo",
+      "SET": "Nastavi novo geslo",
+      "RESENDNOTIFICATION": "Pošlji povezavo za ponastavitev gesla",
+      "REQUIRED": "Nekatera obvezna polja manjkajo.",
+      "MINLENGTHERROR": "Dolžina mora biti vsaj {{value}} znakov.",
+      "MAXLENGTHERROR": "Dolžina mora biti manj kot {{value}} znakov."
+    },
+    "ID": "ID uporabnika",
+    "EMAIL": "E-pošta",
+    "PHONE": "Telefonska številka",
+    "PHONEEMPTY": "Telefonska številka ni določena",
+    "PHONEVERIFIED": "Telefonska številka potrjena.",
+    "EMAILVERIFIED": "E-pošta potrjena",
+    "NOTVERIFIED": "ni potrjeno",
+    "PREFERRED_LOGINNAME": "Prednostno prijavno ime",
+    "ISINITIAL": "Uporabnik še ni aktiven.",
+    "LOGINMETHODS": {
+      "TITLE": "Kontaktni podatki",
+      "DESCRIPTION": "Navedeni podatki se uporabljajo za pošiljanje pomembnih informacij, kot so e-pošte za ponastavitev gesla.",
+      "EMAIL": {
+        "TITLE": "E-pošta",
+        "VALID": "potrjeno",
+        "ISVERIFIED": "E-pošta potrjena",
+        "ISVERIFIEDDESC": "Če je e-pošta označena kot potrjena, zahteva za potrditev e-pošte ne bo poslana.",
+        "RESEND": "Ponovno pošlji potrditveno e-pošto",
+        "EDITTITLE": "Spremeni e-pošto",
+        "EDITDESC": "Vnesite novo e-pošto v spodnje polje."
+      },
+      "PHONE": {
+        "TITLE": "Telefon",
+        "VALID": "potrjeno",
+        "RESEND": "Ponovno pošlji potrditveno besedilno sporočilo",
+        "EDITTITLE": "Spremeni številko",
+        "EDITVALUE": "Telefonska številka",
+        "EDITDESC": "Vnesite novo telefonsko številko v spodnje polje.",
+        "DELETETITLE": "Izbriši telefonsko številko",
+        "DELETEDESC": "Ali res želite izbrisati telefonsko številko",
+        "OTPSMSREMOVALWARNING": "Ta račun uporablja to telefonsko številko kot drugi faktor. Po nadaljevanju je ne boste mogli več uporabljati."
+      },
+      "RESENDCODE": "Ponovno pošlji kodo",
+      "ENTERCODE": "Preveri",
+      "ENTERCODE_DESC": "Preveri kodo"
+    },
+    "GRANTS": {
+      "TITLE": "Dodelitve vlog",
+      "DESCRIPTION": "Dodelite temu uporabniku dostop do določenih projektov",
+      "CREATE": {
+        "TITLE": "Ustvari dodelitev vloge",
+        "DESCRIPTION": "Poiščite organizacijo, projekt in ustrezne projektne vloge."
+      },
+      "PROJECTNAME": "Ime projekta",
+      "PROJECT-OWNED": "Projekt",
+      "PROJECT-GRANTED": "Podeljen projekt",
+      "FILTER": {
+        "0": "filtriraj po uporabniku",
+        "1": "filtriraj po domeni",
+        "2": "filtriraj po imenu projekta",
+        "3": "filtriraj po imenu vloge"
+      }
+    },
+    "STATE": {
+      "0": "Neznano",
+      "1": "Aktiven",
+      "2": "Neaktiven",
+      "3": "Izbrisan",
+      "4": "Zaklenjen",
+      "5": "Suspendiran",
+      "6": "Začeten"
+    },
+    "STATEV2": {
+      "0": "Neznano",
+      "1": "Aktiven",
+      "2": "Neaktiven",
+      "3": "Izbrisan",
+      "4": "Zaklenjen",
+      "5": "Začeten"
+    },
+    "SEARCH": {
+      "ADDITIONAL": "Prijavno ime (trenutna organizacija)",
+      "ADDITIONAL-EXTERNAL": "Prijavno ime (zunanja organizacija)"
+    },
+    "TARGET": {
+      "SELF": "Če želite dodeliti vlogo uporabniku iz druge organizacije",
+      "EXTERNAL": "Za dodelitev vloge uporabniku iz vaše organizacije",
+      "CLICKHERE": "kliknite tukaj"
+    },
+    "SIGNEDOUT": "Ste odjavljeni. Kliknite gumb »Prijava« za ponovno prijavo.",
+    "SIGNEDOUT_BTN": "Prijava",
+    "EDITACCOUNT": "Uredi račun",
+    "ADDACCOUNT": "Prijavite se z drugim računom",
+    "RESENDINITIALEMAIL": "Ponovno pošlji aktivacijsko e-pošto",
+    "RESENDEMAILNOTIFICATION": "Ponovno pošlji e-poštno obvestilo",
+    "TOAST": {
+      "CREATED": "Uporabnik uspešno ustvarjen.",
+      "SAVED": "Profil uspešno shranjen.",
+      "USERNAMECHANGED": "Uporabniško ime spremenjeno.",
+      "EMAILSAVED": "E-pošta uspešno shranjena.",
+      "INITEMAILSENT": "Inicializacijska e-pošta poslana.",
+      "PHONESAVED": "Telefon uspešno shranjen.",
+      "PHONEREMOVED": "Telefon je bil odstranjen.",
+      "PHONEVERIFIED": "Telefon uspešno potrjen.",
+      "PHONEVERIFICATIONSENT": "Potrditvena koda za telefon poslana.",
+      "EMAILVERIFICATIONSENT": "Potrditvena koda za e-pošto poslana.",
+      "OTPREMOVED": "OTP odstranjen.",
+      "U2FREMOVED": "Faktor odstranjen.",
+      "PASSWORDLESSREMOVED": "Ključ odstranjen.",
+      "INITIALPASSWORDSET": "Začetno geslo nastavljeno.",
+      "PASSWORDNOTIFICATIONSENT": "Obvestilo o spremembi gesla poslano.",
+      "PASSWORDCHANGED": "Geslo uspešno spremenjeno.",
+      "REACTIVATED": "Uporabnik ponovno aktiviran.",
+      "DEACTIVATED": "Uporabnik deaktiviran.",
+      "SELECTEDREACTIVATED": "Izbrani uporabniki ponovno aktivirani.",
+      "SELECTEDDEACTIVATED": "Izbrani uporabniki deaktivirani.",
+      "SELECTEDKEYSDELETED": "Izbrani ključi izbrisani.",
+      "KEYADDED": "Ključ dodan!",
+      "MACHINEADDED": "Storitveni račun ustvarjen!",
+      "DELETED": "Uporabnik uspešno izbrisan!",
+      "UNLOCKED": "Uporabnik uspešno odklenjen!",
+      "PASSWORDLESSREGISTRATIONSENT": "Registracijska povezava uspešno poslana.",
+      "SECRETGENERATED": "Skrivnost uspešno generirana!",
+      "SECRETREMOVED": "Skrivnost uspešno odstranjena!"
+    },
+    "MEMBERSHIPS": {
+      "TITLE": "Administratorske vloge Zitadel",
+      "DESCRIPTION": "To so vse administratorske vloge uporabnika. Spremenite jih lahko tudi na straneh s podrobnostmi organizacije, projekta ali IAM.",
+      "ORGCONTEXT": "Vidite vse organizacije in projekte, povezane s trenutno izbrano organizacijo.",
+      "USERCONTEXT": "Vidite vse organizacije in projekte, za katere ste pooblaščeni. Vključno z drugimi organizacijami.",
+      "CREATIONDATE": "Datum ustvaritve",
+      "CHANGEDATE": "Nazadnje spremenjeno",
+      "DISPLAYNAME": "Prikazno ime",
+      "REMOVE": "Odstrani",
+      "TYPE": "Vrsta",
+      "ORGID": "ID organizacije",
+      "UPDATED": "Administratorska vloga je bila posodobljena.",
+      "NOPERMISSIONTOEDIT": "Manjkajo vam potrebna dovoljenja za urejanje vlog!",
+      "TYPES": {
+        "UNKNOWN": "Neznano",
+        "ORG": "Organizacija",
+        "PROJECT": "Projekt",
+        "GRANTEDPROJECT": "Podeljen projekt"
+      }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKEN": "Žeton",
+      "ADD": {
+        "TITLE": "Generiraj nov osebni žeton za dostop",
+        "DESCRIPTION": "Določite datum poteka žetona po meri.",
+        "CHOOSEEXPIRY": "Izberite datum poteka",
+        "CHOOSEDATEAFTER": "Vnesite veljavni datum poteka po"
+      },
+      "ADDED": {
+        "TITLE": "Osebni žeton za dostop",
+        "DESCRIPTION": "Kopirajte osebni žeton za dostop. Po tem ga ne boste mogli več videti!"
+      },
+      "DELETE": {
+        "TITLE": "Izbriši žeton",
+        "DESCRIPTION": "Nameravate izbrisati osebni žeton za dostop. Ali ste prepričani?"
+      },
+      "DELETED": "Žeton uspešno izbrisan."
+    }
+  },
+  "METADATA": {
+    "TITLE": "Metapodatki",
+    "KEY": "Ključ",
+    "VALUE": "Vrednost",
+    "ADD": "Nov vnos",
+    "SAVE": "Shrani",
+    "EMPTY": "Ni metapodatkov",
+    "SETSUCCESS": "Element uspešno shranjen",
+    "REMOVESUCCESS": "Element uspešno izbrisan"
+  },
+  "FLOWS": {
+    "ID": "ID",
+    "NAME": "Ime",
+    "STATE": "Stanje",
+    "STATES": {
+      "0": "brez stanja",
+      "1": "neaktiven",
+      "2": "aktiven"
+    },
+    "ADDTRIGGER": "Dodaj sprožilec",
+    "FLOWCHANGED": "Tok je bil uspešno spremenjen",
+    "FLOWCLEARED": "Tok je bil uspešno ponastavljen",
+    "TIMEOUT": "Časovna omejitev",
+    "TIMEOUTINSEC": "Časovna omejitev v sekundah",
+    "ALLOWEDTOFAIL": "Dovoljeno neuspeti",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Opozorilo",
+      "DESCRIPTION": "Če onemogočite to nastavitev, lahko povzročite, da se uporabniki v vaši organizaciji ne morejo prijaviti. Poleg tega ne boste mogli več dostopati do upravljalne konzole za onemogočanje akcije. Priporočamo, da ustvarite administratorskega uporabnika v ločeni organizaciji ali da skripte najprej preizkusite v razvojnem okolju ali razvojni organizaciji."
+    },
+    "SCRIPT": "Skripta",
+    "FLOWTYPE": "Vrsta toka",
+    "TRIGGERTYPE": "Vrsta sprožilca",
+    "ACTIONS": "Akcije",
+    "ACTIONSMAX": "Glede na vaš naročniški paket imate na voljo omejeno število akcij ({{value}}). Deaktivirajte tiste, ki jih ne potrebujete, ali razmislite o nadgradnji paketa.",
+    "DIALOG": {
+      "ADD": {
+        "TITLE": "Ustvari akcijo"
+      },
+      "UPDATE": {
+        "TITLE": "Posodobi akcijo"
+      },
+      "DELETEACTION": {
+        "TITLE": "Izbriši akcijo?",
+        "DESCRIPTION": "Nameravate izbrisati akcijo. Tega ni mogoče razveljaviti. Ali ste prepričani?",
+        "DELETE_SUCCESS": "Akcija uspešno izbrisana."
+      },
+      "CLEAR": {
+        "TITLE": "Počisti tok?",
+        "DESCRIPTION": "Nameravate ponastaviti tok skupaj z njegovimi sprožilci in akcijami. Te spremembe ni mogoče obnoviti. Ali ste prepričani?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Izbriši izbrane akcije?",
+        "DESCRIPTION": "Ali ste prepričani, da želite izbrisati izbrane akcije iz toka?"
+      },
+      "ABOUTNAME": "Ime akcije in ime funkcije v JavaScriptu morata biti enaka"
+    },
+    "TOAST": {
+      "ACTIONSSET": "Akcije nastavljene",
+      "ACTIONREACTIVATED": "Akcije uspešno ponovno aktivirane",
+      "ACTIONDEACTIVATED": "Akcije uspešno deaktivirane"
+    }
+  },
+  "IAM": {
+    "POLICIES": {
+      "TITLE": "Sistemski pravilniki in nastavitve dostopa",
+      "DESCRIPTION": "Upravljajte globalne pravilnike in nastavitve dostopa za upravljanje."
+    },
+    "EVENTSTORE": {
+      "TITLE": "Administracija shrambe IAM",
+      "DESCRIPTION": "Upravljajte poglede in neuspele dogodke Zitadel."
+    },
+    "MEMBER": {
+      "TITLE": "Administratorji",
+      "DESCRIPTION": "Ti administratorji imajo dovoljenje za spremembe v vašem primerku."
+    },
+    "PAGES": {
+      "STATE": "Stanje",
+      "DOMAINLIST": "Lastne domene"
+    },
+    "STATE": {
+      "0": "Nedoločeno",
+      "1": "Ustvarjanje",
+      "2": "Deluje",
+      "3": "Ustavljanje",
+      "4": "Ustavljeno"
+    },
+    "VIEWS": {
+      "VIEWNAME": "Ime",
+      "DATABASE": "Podatkovna baza",
+      "SEQUENCE": "Zaporedje",
+      "EVENTTIMESTAMP": "Časovni žig",
+      "LASTSPOOL": "Uspešno previjanje",
+      "ACTIONS": "Akcije",
+      "CLEAR": "Počisti",
+      "CLEARED": "Pogled je bil uspešno počiščen!",
+      "DIALOG": {
+        "VIEW_CLEAR_TITLE": "Počisti pogled",
+        "VIEW_CLEAR_DESCRIPTION": "Nameravate počistiti pogled. Čiščenje pogleda ustvari proces, med katerim podatki morda ne bodo na voljo končnim uporabnikom. Ali ste res prepričani?"
+      }
+    },
+    "FAILEDEVENTS": {
+      "VIEWNAME": "Ime",
+      "DATABASE": "Podatkovna baza",
+      "FAILEDSEQUENCE": "Neuspelo zaporedje",
+      "FAILURECOUNT": "Število neuspehov",
+      "LASTFAILED": "Zadnjič neuspelo",
+      "ERRORMESSAGE": "Sporočilo o napaki",
+      "ACTIONS": "Akcije",
+      "DELETE": "Odstrani",
+      "DELETESUCCESS": "Neuspeli dogodki odstranjeni."
+    },
+    "EVENTS": {
+      "EDITOR": "Urednik",
+      "EDITORID": "ID urednika",
+      "AGGREGATE": "Agregat",
+      "AGGREGATEID": "ID agregata",
+      "AGGREGATETYPE": "Vrsta agregata",
+      "RESOURCEOWNER": "Lastnik vira",
+      "SEQUENCE": "Zaporedje",
+      "CREATIONDATE": "Ustvarjeno",
+      "TYPE": "Vrsta",
+      "PAYLOAD": "Vsebina",
+      "FILTERS": {
+        "BTN": "Filter",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtriraj po uredniku"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Vrsta agregata",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtriraj po agregatu"
+        },
+        "TYPE": {
+          "TYPELABEL": "Vrsta",
+          "CHECKBOX": "Filtriraj po vrsti"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filtriraj po lastniku vira"
+        },
+        "SEQUENCE": {
+          "LABEL": "Zaporedje",
+          "CHECKBOX": "Filtriraj po zaporedju"
+        },
+        "SORT": "Razvrsti",
+        "ASC": "Naraščajoče",
+        "DESC": "Padajoče",
+        "CREATIONDATE": {
+          "RADIO_FROM": "Od",
+          "RADIO_RANGE": "Razpon",
+          "LABEL_SINCE": "Od",
+          "LABEL_UNTIL": "Do"
+        },
+        "OTHER": "drugo",
+        "OTHERS": "drugi"
+      },
+      "DIALOG": {
+        "TITLE": "Podrobnosti dogodka"
+      }
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Administrator odstranjen.",
+      "MEMBERSADDED": "Administratorji dodani.",
+      "MEMBERADDED": "Administrator dodan.",
+      "MEMBERCHANGED": "Administrator spremenjen.",
+      "ROLEREMOVED": "Vloga odstranjena.",
+      "ROLECHANGED": "Vloga spremenjena.",
+      "REACTIVATED": "Ponovno aktivirano",
+      "DEACTIVATED": "Deaktivirano"
+    }
+  },
+  "ORG": {
+    "PAGES": {
+      "NAME": "Ime",
+      "ID": "ID organizacije",
+      "CREATIONDATE": "Datum ustvaritve",
+      "DATECHANGED": "Spremenjeno",
+      "FILTER": "Filter",
+      "FILTERPLACEHOLDER": "Filtriraj po imenu",
+      "LIST": "Organizacije",
+      "LISTDESCRIPTION": "Izberite organizacijo.",
+      "ACTIVE": "Aktivna",
+      "CREATE": "Ustvari organizacijo",
+      "DEACTIVATE": "Deaktiviraj organizacijo",
+      "REACTIVATE": "Ponovno aktiviraj organizacijo",
+      "NOPERMISSION": "Nimate dovoljenja za dostop do nastavitev organizacije.",
+      "USERSELFACCOUNT": "Uporabite svoj osebni račun kot lastnika organizacije",
+      "ORGDETAIL_TITLE": "Vnesite ime in domeno vaše nove organizacije.",
+      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Vnesite ime vaše nove organizacije.",
+      "ORGDETAILUSER_TITLE": "Konfigurirajte lastnika organizacije",
+      "DELETE": "Izbriši organizacijo",
+      "DEFAULTLABEL": "Privzeta",
+      "SETASDEFAULT": "Nastavi kot privzeto organizacijo",
+      "DEFAULTORGSET": "Privzeta organizacija uspešno spremenjena",
+      "RENAME": {
+        "ACTION": "Preimenuj",
+        "TITLE": "Preimenuj organizacijo",
+        "DESCRIPTION": "Vnesite novo ime za svojo organizacijo",
+        "BTN": "Preimenuj"
+      },
+      "ORGDOMAIN": {
+        "TITLE": "Preverite lastništvo {{value}}",
+        "VERIFICATION": "Ponujamo vam dva načina za ročno potrditev vaše domene:",
+        "VERIFICATION_HTML": "- HTTP. Gostite začasno datoteko za preverjanje na svojem spletnem mestu",
+        "VERIFICATION_DNS": "- DNS. Ustvarite zapis DNS tipa TXT",
+        "VERIFICATION_DNS_DESC": "Če upravljate {{ value }} in imate dostop do zapisov DNS, lahko ustvarite nov zapis TXT z naslednjimi vrednostmi:",
+        "VERIFICATION_DNS_HOST_LABEL": "Gostitelj:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Uporabite to kodo za vrednost zapisa TXT:",
+        "VERIFICATION_HTTP_DESC": "Če imate dostop do gostovanja spletnega mesta, preprosto prenesite datoteko za preverjanje in jo naložite na navedeni URL",
+        "VERIFICATION_HTTP_URL_LABEL": "Pričakovani URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Datoteka za preverjanje:",
+        "VERIFICATION_SKIP": "Preverjanje lahko zaenkrat preskočite in nadaljujete z ustvarjanjem organizacije, vendar morate ta korak dokončati, preden boste lahko uporabili svojo domeno!",
+        "VERIFICATION_VALIDATION_DESC": "Ne izbrišite kode za preverjanje, saj bo Zitadel občasno znova preveril lastništvo vaše domene.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Zahtevaj nov žeton",
+        "VERIFICATION_VALIDATION_ONGOING": "Metoda {{ value }} je bila izbrana za preverjanje domene organizacije. Kliknite gumb za sprožitev preverjanja ali ponastavitev postopka preverjanja.",
+        "VERIFICATION_SUCCESSFUL": "Domena uspešno preverjena!",
+        "RESETMETHOD": "Ponastavi metodo preverjanja"
+      },
+      "DOWNLOAD_FILE": "Prenesi datoteko",
+      "SELECTORGTOOLTIP": "Izberite to organizacijo.",
+      "PRIMARYDOMAIN": "Domena organizacije",
+      "STATE": "Stanje",
+      "USEPASSWORD": "Nastavi začetno geslo",
+      "USEPASSWORDDESC": "Uporabniku ni treba nastavljati gesla med inicializacijo."
+    },
+    "LIST": {
+      "TITLE": "Organizacije",
+      "DESCRIPTION": "To so organizacije v vašem primerku"
+    },
+    "DOMAINS": {
+      "NEW": "Dodaj domeno",
+      "TITLE": "Domene organizacije",
+      "DESCRIPTION": "Konfigurirajte domene organizacije. To domeno je mogoče uporabiti za odkrivanje domene in pripono uporabniškega imena.",
+      "SETPRIMARY": "Nastavi kot domeno organizacije",
+      "DELETE": {
+        "TITLE": "Izbriši domeno",
+        "DESCRIPTION": "Nameravate izbrisati eno od svojih domen."
+      },
+      "ADD": {
+        "TITLE": "Dodaj domeno",
+        "DESCRIPTION": "Nameravate dodati domeno za svojo organizacijo. Po uspešnem postopku se bo domena lahko uporabljala za odkrivanje domene in kot pripona za vaše uporabnike."
+      }
+    },
+    "STATE": {
+      "0": "Ni določeno",
+      "1": "Aktivna",
+      "2": "Deaktivirana"
+    },
+    "MEMBER": {
+      "TITLE": "Administratorji organizacije",
+      "DESCRIPTION": "Določite uporabnike, ki lahko spreminjajo nastavitve vaše organizacije."
+    },
+    "TOAST": {
+      "UPDATED": "Organizacija uspešno posodobljena.",
+      "DEACTIVATED": "Organizacija deaktivirana.",
+      "REACTIVATED": "Organizacija ponovno aktivirana.",
+      "DOMAINADDED": "Domena dodana.",
+      "DOMAINREMOVED": "Domena odstranjena.",
+      "MEMBERADDED": "Administrator dodan.",
+      "MEMBERREMOVED": "Administrator odstranjen.",
+      "MEMBERCHANGED": "Administrator spremenjen.",
+      "SETPRIMARY": "Domena organizacije uspešno nastavljena.",
+      "DELETED": "Organizacija uspešno izbrisana",
+      "DEFAULTORGNOTFOUND": "Privzeta organizacija ni bila najdena",
+      "ORG_WAS_DELETED": "Organizacija je bila izbrisana."
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Deaktiviraj organizacijo",
+        "DESCRIPTION": "Nameravate deaktivirati svojo organizacijo. Uporabniki se po tem ne bodo mogli prijaviti. Ali ste prepričani, da želite nadaljevati?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Ponovno aktiviraj organizacijo",
+        "DESCRIPTION": "Nameravate ponovno aktivirati svojo organizacijo. Uporabniki se bodo lahko znova prijavili. Ali ste prepričani, da želite nadaljevati?"
+      },
+      "DELETE": {
+        "TITLE": "Izbriši organizacijo",
+        "DESCRIPTION": "Nameravate izbrisati svojo organizacijo. To sproži postopek, v katerem bodo vsi podatki, povezani z organizacijo, izbrisani. Tega dejanja za zdaj ni mogoče razveljaviti.",
+        "TYPENAME": "Vnesite '{{value}}' za izbris organizacije.",
+        "ORGNAME": "Ime",
+        "BTN": "Izbriši"
+      }
+    }
+  },
+  "SETTINGS": {
+    "LIST": {
+      "ORGS": "Organizacije",
+      "FEATURESETTINGS": "Funkcionalnosti",
+      "LANGUAGES": "Jeziki",
+      "LOGIN": "Obnašanje in varnost prijave",
+      "LOCKOUT": "Zaklepanje",
+      "AGE": "Potek gesla",
+      "COMPLEXITY": "Zahtevnost gesla",
+      "NOTIFICATIONS": "Obvestila",
+      "SMTP_PROVIDER": "Ponudnik SMTP",
+      "SMS_PROVIDER": "Ponudnik SMS/telefona",
+      "NOTIFICATIONS_DESC": "Nastavitve SMTP in SMS",
+      "MESSAGETEXTS": "Besedila sporočil",
+      "IDP": "Ponudniki identitete",
+      "VERIFIED_DOMAINS": "Domene organizacije",
+      "DOMAIN": "Nastavitve domene",
+      "LOGINTEXTS": "Besedila prijavnega vmesnika",
+      "BRANDING": "Blagovna znamka",
+      "PRIVACYPOLICY": "Zunanje povezave",
+      "OIDC": "Življenjska doba in potek žetonov OIDC",
+      "WEB_KEYS": "Spletni ključi OIDC",
+      "SECRETS": "Generator skrivnosti",
+      "SECURITY": "Varnostne nastavitve",
+      "EVENTS": "Dogodki",
+      "FAILEDEVENTS": "Neuspeli dogodki",
+      "VIEWS": "Pogledi",
+      "ACTIONS": "Akcije",
+      "TARGETS": "Cilji"
+    },
+    "GROUPS": {
+      "GENERAL": "Splošne informacije",
+      "NOTIFICATIONS": "Obvestila",
+      "LOGIN": "Prijava in dostop",
+      "DOMAIN": "Domena",
+      "TEXTS": "Besedila in jeziki",
+      "APPEARANCE": "Videz",
+      "OTHER": "Drugo",
+      "STORAGE": "Shramba",
+      "ACTIONS": "Akcije"
+    },
+    "BETA": "BETA"
+  },
+  "SETTING": {
+    "LANGUAGES": {
+      "DEFAULT": "Privzeti jezik",
+      "ALLOWED": "Dovoljeni jeziki",
+      "NOT_ALLOWED": "Nedovoljeni jeziki",
+      "ALLOW_ALL": "Dovoli vse",
+      "DISALLOW_ALL": "Nedovoli vseh",
+      "SETASDEFAULT": "Nastavi kot privzeti jezik",
+      "DEFAULT_SAVED": "Privzeti jezik shranjen",
+      "ALLOWED_SAVED": "Dovoljeni jeziki shranjeni",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands",
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية",
+        "sl": "Slovenščina"
+      }
+    },
+    "SMTP": {
+      "TITLE": "Ponudnik SMTP",
+      "DESCRIPTION": "Opis",
+      "SENDERADDRESS": "E-poštni naslov pošiljatelja",
+      "SENDERNAME": "Ime pošiljatelja",
+      "REPLYTOADDRESS": "Naslov za odgovor",
+      "HOSTANDPORT": "Gostitelj in vrata",
+      "USER": "Uporabnik",
+      "PASSWORD": "Geslo",
+      "SETPASSWORD": "Nastavi geslo SMTP",
+      "PASSWORDSET": "Geslo SMTP je bilo uspešno nastavljeno.",
+      "TLS": "Varnost transportne plasti (TLS)",
+      "SAVED": "Uspešno shranjeno!",
+      "NOCHANGES": "Brez sprememb!",
+      "REQUIREDWARN": "Za pošiljanje obvestil z vaše domene morate vnesti podatke SMTP."
+    },
+    "SMS": {
+      "PROVIDERS": "Ponudniki",
+      "PROVIDER": "Ponudnik SMS",
+      "ADDPROVIDER": "Dodaj ponudnika SMS",
+      "ADDPROVIDERDESCRIPTION": "Izberite enega od razpoložljivih ponudnikov in vnesite zahtevane podatke.",
+      "REMOVEPROVIDER": "Odstrani ponudnika",
+      "REMOVEPROVIDER_DESC": "Nameravate izbrisati ponudnika. Ali želite nadaljevati?",
+      "SMSPROVIDERSTATE": {
+        "0": "Nedoločeno",
+        "1": "Aktiven",
+        "2": "Neaktiven"
+      },
+      "ACTIVATED": "Ponudnik aktiviran.",
+      "DEACTIVATED": "Ponudnik deaktiviran.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Žeton",
+        "SENDERNUMBER": "Številka pošiljatelja",
+        "VERIFYSERVICESID": "SID storitve za preverjanje",
+        "VERIFYSERVICESID_DESCRIPTION": "Nastavitev SID storitve za preverjanje omogoča uporabo storitve Twilio Verify namesto storitve sporočil za preverjanje telefonskih številk in OTP SMS",
+        "ADDED": "Twilio uspešno dodan.",
+        "UPDATED": "Twilio uspešno posodobljen.",
+        "REMOVED": "Twilio odstranjen",
+        "CHANGETOKEN": "Spremeni žeton",
+        "SETTOKEN": "Nastavi žeton",
+        "TOKENSET": "Žeton uspešno nastavljen."
+      }
+    },
+    "SECRETS": {
+      "TYPES": "Vrste skrivnosti",
+      "TYPE": {
+        "1": "Inicializacijska e-pošta",
+        "2": "Preverjanje e-pošte",
+        "3": "Preverjanje telefona",
+        "4": "Ponastavitev gesla",
+        "5": "Inicializacija ključa",
+        "6": "Skrivnost aplikacije",
+        "7": "OTP - SMS",
+        "8": "OTP - e-pošta"
+      },
+      "EXPIRY": "Potek (v minutah)",
+      "INCLUDEDIGITS": "Vključi številke",
+      "INCLUDESYMBOLS": "Vključi simbole",
+      "INCLUDELOWERLETTERS": "Vključi male črke",
+      "INCLUDEUPPERLETTERS": "Vključi velike črke",
+      "LENGTH": "Dolžina",
+      "UPDATED": "Nastavitve posodobljene."
+    },
+    "SECURITY": {
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Ta nastavitev nastavi CSP za dovoljenje uokvirjanja iz nabora dovoljenih domen. Upoštevajte, da z omogočanjem uporabe iFrame-ov tvegate, da dovolite napade s klikom (clickjacking).",
+      "IFRAMEENABLED": "Dovoli iFrame",
+      "ALLOWEDORIGINS": "Dovoljeni URL-ji",
+      "IMPERSONATIONTITLE": "Poosebljanje",
+      "IMPERSONATIONENABLED": "Dovoli poosebljanje",
+      "IMPERSONATIONDESCRIPTION": "Ta nastavitev načeloma dovoljuje uporabo poosebljanja. Upoštevajte, da mora imeti poosebljevalec dodeljene tudi ustrezne vloge `*_IMPERSONATOR`."
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "Privzeta organizacija za prijavo",
+      "LOGINDEFAULTORG_DESCRIPTION": "Prijavni vmesnik bo uporabil nastavitve privzete organizacije (in ne primerka), če kontekst organizacije ni nastavljen",
+      "USERSCHEMA": "Shema uporabnika",
+      "USERSCHEMA_DESCRIPTION": "Sheme uporabnikov omogočajo upravljanje podatkovnih shem uporabnika. Če je zastavica omogočena, boste lahko uporabljali nov API in njegove funkcionalnosti.",
+      "ACTIONS": "Akcije",
+      "ACTIONS_DESCRIPTION": "Actions v2 omogočajo upravljanje izvajanj in ciljev. Če je zastavica omogočena, boste lahko uporabljali nov API in njegove funkcionalnosti.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "Prekinitev posamezne seje OIDC V1",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Če je zastavica omogočena, boste lahko prekinili posamezno sejo iz prijavnega vmesnika z navedbo id_token z zahtevkom `sid` kot id_token_hint na končni točki end_session. Upoštevajte, da se trenutno v prijavnem vmesniku prekinejo vse seje istega uporabniškega agenta (brskalnika). Seje, upravljane prek API za seje, že omogočajo prekinitev posameznih sej.",
+      "DEBUGOIDCPARENTERROR": "Razhroščevanje nadrejene napake OIDC",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Če je zastavica omogočena, bo nadrejena napaka OIDC zapisana v konzolo.",
+      "PERMISSIONCHECKV2": "Preverjanje dovoljenj V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Če je zastavica omogočena, boste lahko uporabljali nov API in njegove funkcionalnosti.",
+      "STATES": {
+        "INHERITED": "Podeduj",
+        "ENABLED": "Omogočeno",
+        "DISABLED": "Onemogočeno"
+      },
+      "INHERITED_DESCRIPTION": "To nastavi vrednost na privzeto vrednost sistema.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "»Omogočeno« je podedovano",
+        "DISABLED": "»Onemogočeno« je podedovano"
+      },
+      "RESET": "Nastavi vse na podedovano",
+      "CONSOLEUSEV2USERAPI": "Uporabi API V2 v upravljalni konzoli za ustvarjanje uporabnikov",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ko je ta zastavica omogočena, upravljalna konzola uporablja API za uporabnike V2 za ustvarjanje novih uporabnikov. Z API-jem V2 novo ustvarjeni uporabniki nimajo začetnega stanja.",
+      "LOGINV2": "Login V2",
+      "LOGINV2_DESCRIPTION": "Omogočanje tega aktivira nov prijavni vmesnik, ki temelji na TypeScript, z izboljšano varnostjo, zmogljivostjo in prilagodljivostjo.",
+      "LOGINV2_BASEURI": "Osnovni URI",
+      "ENABLERELATIONALTABLES": "Relacijske tabele",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Omogočite to za uporabo relacijskih tabel namesto projekcij za shranjevanje podatkov. Trenutno ta stikalo ne naredi ničesar."
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "Ponastavi nastavitev",
+        "DEFAULTDESCRIPTION": "Nameravate ponastaviti nastavitve na privzete nastavitve primerka. Ali ste prepričani, da želite nadaljevati?",
+        "LOGINPOLICY_DESCRIPTION": "Opozorilo: Če nadaljujete, bodo nastavitve ponudnika identitete prav tako ponastavljene na nastavitve primerka."
+      }
+    }
+  },
+  "POLICY": {
+    "APPLIEDTO": "Velja za",
+    "PWD_COMPLEXITY": {
+      "TITLE": "Zahtevnost gesla",
+      "DESCRIPTION": "Zagotavlja, da vsa nastavljena gesla ustrezajo določenemu vzorcu",
+      "SYMBOLANDNUMBERERROR": "Vsebovati mora številko in simbol/ločilo.",
+      "SYMBOLERROR": "Vsebovati mora simbol/ločilo.",
+      "NUMBERERROR": "Vsebovati mora številko.",
+      "PATTERNERROR": "Geslo ne ustreza zahtevanemu vzorcu."
+    },
+    "NOTIFICATION": {
+      "TITLE": "Obvestilo",
+      "DESCRIPTION": "Določa, ob katerih spremembah bodo poslana obvestila.",
+      "PASSWORDCHANGE": "Geslo spremenjeno"
+    },
+    "PRIVATELABELING": {
+      "DESCRIPTION": "Dajte prijavi svoj lasten slog in spremenite njeno obnašanje.",
+      "PREVIEW_DESCRIPTION": "Spremembe pravilnika bodo samodejno uveljavljene v predogledu.",
+      "BTN": "Izberi datoteko",
+      "ACTIVATEPREVIEW": "Uporabi nastavitve",
+      "DARK": "Temni način",
+      "LIGHT": "Svetli način",
+      "CHANGEVIEW": "Spremeni pogled",
+      "ACTIVATED": "Spremembe pravilnika so zdaj V ŽIVO",
+      "THEME": "Tema",
+      "COLORS": "Barve",
+      "FONT": "Pisava",
+      "ADVANCEDBEHAVIOR": "Napredno obnašanje",
+      "DROP": "Spustite sliko tukaj ali",
+      "RELEASE": "Spustite",
+      "DROPFONT": "Spustite datoteko pisave tukaj",
+      "RELEASEFONT": "Spustite",
+      "USEOFLOGO": "Vaš logotip bo uporabljen na prijavni strani in v e-poštah, medtem ko se ikona uporablja za manjše elemente vmesnika, kot je preklopnik organizacij v upravljalni konzoli",
+      "MAXSIZE": "Največja velikost je omejena na 524 kB",
+      "EMAILNOSVG": "Format SVG ni podprt v e-poštah. Zato naložite logotip v formatu PNG ali drugem podprtem formatu.",
+      "MAXSIZEEXCEEDED": "Največja velikost 524 kB je presežena.",
+      "NOSVGSUPPORTED": "SVG niso podprti!",
+      "FONTINLOGINONLY": "Pisava je trenutno prikazana samo v prijavnem vmesniku.",
+      "BACKGROUNDCOLOR": "Barva ozadja",
+      "PRIMARYCOLOR": "Primarna barva",
+      "WARNCOLOR": "Opozorilna barva",
+      "FONTCOLOR": "Barva pisave",
+      "VIEWS": {
+        "PREVIEW": "Predogled",
+        "CURRENT": "Trenutne nastavitve"
+      },
+      "PREVIEW": {
+        "TITLE": "Prijava",
+        "SECOND": "prijavite se s svojim računom Zitadel.",
+        "ERROR": "Uporabnika ni mogoče najti!",
+        "PRIMARYBUTTON": "naprej",
+        "SECONDARYBUTTON": "registracija"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Samodejni način",
+        "THEME_MODE_LIGHT": "Samo svetli način",
+        "THEME_MODE_DARK": "Samo temni način"
+      }
+    },
+    "PWD_AGE": {
+      "TITLE": "Potek gesla",
+      "DESCRIPTION": "Nastavite lahko pravilnik za potek gesel. Ta pravilnik bo uporabnika ob naslednji prijavi po poteku prisilil v spremembo gesla. Samodejnih opozoril in obvestil ni."
+    },
+    "PWD_LOCKOUT": {
+      "TITLE": "Pravilnik zaklepanja",
+      "DESCRIPTION": "Nastavite največje število ponovnih poskusov gesla, po katerem bodo računi blokirani."
+    },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "Blagovna znamka",
+      "BTN": "Izberi datoteko",
+      "DESCRIPTION": "Prilagodite videz prijave",
+      "ACTIVATEPREVIEW": "Aktiviraj nastavitve"
+    },
+    "LOGIN_POLICY": {
+      "TITLE": "Nastavitve prijave",
+      "DESCRIPTION": "Določite, kako se uporabniki lahko avtenticirajo, in konfigurirajte ponudnike identitete",
+      "DESCRIPTIONCREATEADMIN": "Uporabniki lahko izbirajo med spodaj razpoložljivimi ponudniki identitete.",
+      "DESCRIPTIONCREATEMGMT": "Uporabniki lahko izbirajo med spodaj razpoložljivimi ponudniki identitete. Opomba: Uporabljate lahko ponudnike, nastavljene na ravni sistema, kot tudi ponudnike, nastavljene samo za vašo organizacijo.",
+      "LIFETIME_INVALID": "Obrazec vsebuje neveljavne vrednosti.",
+      "SAVED": "Uspešno shranjeno!",
+      "PROVIDER_ADDED": "Ponudnik identitete aktiviran."
+    },
+    "PRIVACY_POLICY": {
+      "DESCRIPTION": "Nastavite povezave do pravilnika o zasebnosti in pogojev uporabe",
+      "TOSLINK": "Povezava do pogojev uporabe",
+      "POLICYLINK": "Povezava do pravilnika o zasebnosti",
+      "HELPLINK": "Povezava do pomoči",
+      "SUPPORTEMAIL": "E-pošta za podporo",
+      "DOCSLINK": "Povezava do dokumentacije (upravljalna konzola)",
+      "CUSTOMLINK": "Prilagojena povezava (upravljalna konzola)",
+      "CUSTOMLINKTEXT": "Besedilo prilagojene povezave (upravljalna konzola)",
+      "SAVED": "Uspešno shranjeno!",
+      "RESET_TITLE": "Obnovi privzete vrednosti",
+      "RESET_DESCRIPTION": "Nameravate obnoviti privzete povezave za pogoje uporabe in pravilnik o zasebnosti. Ali res želite nadaljevati?"
+    },
+    "LOGIN_TEXTS": {
+      "TITLE": "Besedila prijavnega vmesnika",
+      "DESCRIPTION": "Določite besedila za prijavni vmesnik. Če so besedila prazna, se uporabi privzeta vrednost, prikazana kot nadomestno besedilo.",
+      "DESCRIPTION_SHORT": "Določite besedila za prijavni vmesnik.",
+      "NEWERVERSIONEXISTS": "Obstaja novejša različica",
+      "CURRENTDATE": "Trenutne nastavitve",
+      "CHANGEDATE": "Novejša različica od",
+      "KEYNAME": "Prijavni zaslon / vmesnik",
+      "RESET_TITLE": "Obnovi privzete vrednosti",
+      "RESET_DESCRIPTION": "Nameravate obnoviti vse privzete vrednosti. Vse vaše spremembe bodo trajno izbrisane. Ali res želite nadaljevati?",
+      "UNSAVED_TITLE": "Nadaljuj brez shranjevanja?",
+      "UNSAVED_DESCRIPTION": "Naredili ste spremembe, ne da bi jih shranili. Ali želite shraniti zdaj?",
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Izbrali ste jezik, ki ni dovoljen. Besedila lahko še naprej spreminjate, vendar če želite, da uporabniki dejansko lahko uporabijo ta jezik, spremenite omejitve primerka.",
+      "LANGUAGES_NOT_ALLOWED": "Ni dovoljeno:",
+      "LANGUAGE": "Jezik",
+      "LANGUAGES": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands",
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية",
+        "sl": "Slovenščina"
+      },
+      "KEYS": {
+        "emailVerificationDoneText": "Preverjanje e-pošte končano",
+        "emailVerificationText": "Preverjanje e-pošte",
+        "externalUserNotFoundText": "Zunanji uporabnik ni najden",
+        "footerText": "Noga",
+        "initMfaDoneText": "Inicializacija MFA končana",
+        "initMfaOtpText": "Inicializacija MFA",
+        "initMfaPromptText": "Poziv za inicializacijo MFA",
+        "initMfaU2fText": "Inicializacija univerzalnega drugega faktorja",
+        "initPasswordDoneText": "Inicializacija gesla končana",
+        "initPasswordText": "Inicializacija gesla",
+        "initializeDoneText": "Inicializacija uporabnika končana",
+        "initializeUserText": "Inicializacija uporabnika",
+        "linkingUserDoneText": "Povezovanje uporabnika končano",
+        "loginText": "Prijava",
+        "logoutText": "Odjava",
+        "mfaProvidersText": "Ponudniki MFA",
+        "passwordChangeDoneText": "Sprememba gesla končana",
+        "passwordChangeText": "Sprememba gesla",
+        "passwordResetDoneText": "Ponastavitev gesla končana",
+        "passwordText": "Geslo",
+        "registrationOptionText": "Možnosti registracije",
+        "registrationOrgText": "Registracija organizacije",
+        "registrationUserText": "Registracija uporabnika",
+        "selectAccountText": "Izbira računa",
+        "successLoginText": "Uspešna prijava",
+        "usernameChangeDoneText": "Sprememba uporabniškega imena končana",
+        "usernameChangeText": "Sprememba uporabniškega imena",
+        "verifyMfaOtpText": "Preverjanje OTP",
+        "verifyMfaU2fText": "Preverjanje univerzalnega drugega faktorja",
+        "passwordlessPromptText": "Poziv za ključ",
+        "passwordlessRegistrationDoneText": "Registracija ključa končana",
+        "passwordlessRegistrationText": "Registracija ključa",
+        "passwordlessText": "Ključ",
+        "externalRegistrationUserOverviewText": "Pregled zunanjega registriranega uporabnika"
+      }
+    },
+    "MESSAGE_TEXTS": {
+      "TYPE": "Obvestilo",
+      "TYPES": {
+        "INIT": "Inicializacija",
+        "VE": "Preveri e-pošto",
+        "VP": "Preveri telefon",
+        "VSO": "Preveri OTP SMS",
+        "VEO": "Preveri OTP e-pošto",
+        "PR": "Ponastavitev gesla",
+        "DC": "Zahteva domene",
+        "PL": "Ključ",
+        "PC": "Sprememba gesla",
+        "IU": "Povabi uporabnika"
+      },
+      "CHIPS": {
+        "firstname": "Ime",
+        "lastname": "Priimek",
+        "code": "Koda",
+        "preferredLoginName": "Prednostno prijavno ime",
+        "displayName": "Prikazno ime",
+        "nickName": "Vzdevek",
+        "loginnames": "Prijavna imena",
+        "domain": "Domena",
+        "lastEmail": "Zadnja e-pošta",
+        "lastPhone": "Zadnji telefon",
+        "verifiedEmail": "Potrjena e-pošta",
+        "verifiedPhone": "Potrjen telefon",
+        "changedate": "Datum spremembe",
+        "username": "Uporabniško ime",
+        "tempUsername": "Začasno uporabniško ime",
+        "otp": "OTP",
+        "verifyUrl": "URL za preverjanje OTP",
+        "expiry": "Potek",
+        "applicationName": "Ime aplikacije"
+      },
+      "TOAST": {
+        "UPDATED": "Prilagojena besedila shranjena."
+      }
+    },
+    "DEFAULTLABEL": "Trenutne nastavitve ustrezajo privzetim nastavitvam vašega primerka.",
+    "BTN_INSTALL": "Nastavitev",
+    "BTN_EDIT": "Spremeni",
+    "DATA": {
+      "DESCRIPTION": "Opis",
+      "MINLENGTH": "mora imeti najmanjšo dolžino",
+      "HASNUMBER": "mora vsebovati številko",
+      "HASSYMBOL": "mora vsebovati simbol",
+      "HASLOWERCASE": "mora vsebovati malo črko",
+      "HASUPPERCASE": "mora vsebovati veliko črko",
+      "SHOWLOCKOUTFAILURES": "prikaži neuspehe zaklepanja",
+      "MAXPASSWORDATTEMPTS": "Največje število poskusov gesla",
+      "MAXOTPATTEMPTS": "Največje število poskusov OTP",
+      "EXPIREWARNDAYS": "Opozorilo o poteku po dneh",
+      "MAXAGEDAYS": "Najdaljša veljavnost v dneh",
+      "USERLOGINMUSTBEDOMAIN": "Dodaj domeno organizacije kot pripono prijavnim imenom",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Če omogočite to nastavitev, bodo vsa prijavna imena imela pripono domene organizacije. Če je nastavitev onemogočena, morate zagotoviti, da so uporabniška imena edinstvena med vsemi organizacijami.",
+      "VALIDATEORGDOMAINS": "Zahtevano preverjanje domene organizacije (izziv DNS ali HTTP)",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "Naslov pošiljatelja SMTP se ujema z domeno primerka",
+      "ALLOWUSERNAMEPASSWORD_DESC": "Klasična prijava z uporabniškim imenom in geslom je dovoljena.",
+      "ALLOWEXTERNALIDP_DESC": "Prijava je dovoljena za osnovne ponudnike identitete",
+      "ALLOWREGISTER_DESC": "Če je možnost izbrana, se v prijavi prikaže dodaten korak za registracijo uporabnika.",
+      "FORCEMFA": "Zahtevaj MFA za vse uporabnike",
+      "FORCEMFALOCALONLY": "Zahtevaj MFA samo za lokalno avtenticirane uporabnike",
+      "FORCEMFALOCALONLY_DESC": "Če je možnost izbrana, morajo lokalno avtenticirani uporabniki za prijavo konfigurirati drugi faktor.",
+      "HIDEPASSWORDRESET_DESC": "Če je možnost izbrana, uporabnik ne more ponastaviti gesla v postopku prijave.",
+      "HIDELOGINNAMESUFFIX": "Skrij pripono prijavnega imena",
+      "HIDELOGINNAMESUFFIX_DESC": "Skrije pripono prijavnega imena v prijavnem vmesniku",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "Če je možnost izbrana, se bo v postopku prijave prikazal zaslon za geslo, tudi če uporabnik ni bil najden. Napaka pri preverjanju gesla ne bo razkrila, ali je bilo napačno uporabniško ime ali geslo.",
+      "ALLOWDOMAINDISCOVERY_DESC": "Če je možnost izbrana, se bo pripona (@domena.com) neznanega vnosa uporabniškega imena na prijavnem zaslonu ujemala z domenami organizacije in ob uspehu preusmerila na registracijo te organizacije.",
+      "DEFAULTREDIRECTURI": "Privzeti URI preusmeritve",
+      "DEFAULTREDIRECTURI_DESC": "Določa, kam bo uporabnik preusmerjen, če se je prijava začela brez konteksta aplikacije (npr. iz e-pošte)",
+      "ERRORMSGPOPUP": "Prikaži napako v pogovornem oknu",
+      "DISABLEWATERMARK": "Skrij vodni žig",
+      "DISABLEWATERMARK_DESC": "Skrij vodni žig »Powered by Zitadel« v prijavnem vmesniku"
+    },
+    "RESET": "Ponastavi na privzeto primerka",
+    "CREATECUSTOM": "Ustvari pravilnik po meri",
+    "TOAST": {
+      "SET": "Pravilnik uspešno nastavljen!",
+      "RESETSUCCESS": "Pravilnik uspešno ponastavljen!",
+      "UPLOADSUCCESS": "Uspešno naloženo!",
+      "DELETESUCCESS": "Uspešno izbrisano!",
+      "UPLOADFAILED": "Nalaganje neuspešno!"
+    }
+  },
+  "ORG_DETAIL": {
+    "TITLE": "Organizacija",
+    "DESCRIPTION": "Tukaj lahko urejate nastavitve organizacije in upravljate člane.",
+    "DETAIL": {
+      "TITLE": "Podrobnosti",
+      "NAME": "Ime",
+      "DOMAIN": "Domena",
+      "STATE": {
+        "0": "Ni določeno",
+        "1": "Aktivna",
+        "2": "Neaktivna"
+      }
+    },
+    "MEMBER": {
+      "TITLE": "Administratorji",
+      "USERNAME": "Uporabniško ime",
+      "DISPLAYNAME": "Prikazno ime",
+      "LOGINNAME": "Prijavno ime",
+      "EMAIL": "E-pošta",
+      "ROLES": "Vloge",
+      "ADD": "Dodaj administratorja",
+      "ADDDESCRIPTION": "Vnesite imena uporabnikov, ki jih želite dodati."
+    },
+    "TABLE": {
+      "TOTAL": "Skupno vnosov",
+      "SELECTION": "Izbrani elementi",
+      "DEACTIVATE": "Deaktiviraj uporabnika",
+      "ACTIVATE": "Aktiviraj uporabnika",
+      "DELETE": "Izbriši uporabnika",
+      "CLEAR": "Počisti izbiro"
+    }
+  },
+  "PROJECT": {
+    "PAGES": {
+      "ID": "ID projekta",
+      "TITLE": "Projekt",
+      "DESCRIPTION": "Tukaj lahko določite aplikacije, upravljate vloge in podelite drugim organizacijam uporabo vašega projekta.",
+      "DELETE": "Izbriši projekt",
+      "DETAIL": "Podrobnosti",
+      "CREATE": "Ustvari projekt",
+      "CREATE_DESC": "Vnesite ime projekta.",
+      "ROLE": "Vloga",
+      "NOITEMS": "Ni projektov",
+      "ZITADELPROJECT": "To pripada projektu Zitadel. Pozor: Če naredite spremembe, Zitadel morda ne bo deloval po pričakovanjih.",
+      "TYPE": {
+        "OWNED": "Lastni projekti",
+        "OWNED_SINGULAR": "Lastni projekt",
+        "GRANTED_SINGULAR": "Podeljen projekt od {{name}}"
+      },
+      "PRIVATELABEL": {
+        "TITLE": "Nastavitev blagovne znamke",
+        "0": {
+          "TITLE": "Nedoločeno",
+          "DESC": "Ko je uporabnik prepoznan, se prikaže blagovna znamka organizacije prepoznanega uporabnika, sicer pa privzeta sistemska."
+        },
+        "1": {
+          "TITLE": "Uporabi nastavitev projekta",
+          "DESC": "Prikazana bo blagovna znamka organizacije, ki je lastnica projekta"
+        },
+        "2": {
+          "TITLE": "Uporabi nastavitev organizacije uporabnika",
+          "DESC": "Prikazana bo blagovna znamka organizacije projekta, vendar ko je uporabnik prepoznan, bo prikazana nastavitev organizacije prepoznanega uporabnika."
+        },
+        "DIALOG": {
+          "TITLE": "Nastavitev blagovne znamke",
+          "DESCRIPTION": "Izberite obnašanje prijave pri uporabi projekta."
+        }
+      },
+      "PINNED": "Pripeto",
+      "ALL": "Vse",
+      "CREATEDON": "Ustvarjeno dne",
+      "LASTMODIFIED": "Nazadnje spremenjeno dne",
+      "ADDNEW": "Ustvari nov projekt",
+      "DIALOG": {
+        "REACTIVATE": {
+          "TITLE": "Ponovno aktiviraj projekt",
+          "DESCRIPTION": "Ali res želite ponovno aktivirati projekt?"
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deaktiviraj projekt",
+          "DESCRIPTION": "Ali res želite deaktivirati projekt?"
+        },
+        "DELETE": {
+          "TITLE": "Izbriši projekt",
+          "DESCRIPTION": "Ali res želite izbrisati projekt?",
+          "TYPENAME": "Vnesite ime projekta za trajni izbris."
+        }
+      }
+    },
+    "SETTINGS": {
+      "TITLE": "Nastavitve",
+      "DESCRIPTION": ""
+    },
+    "STATE": {
+      "TITLE": "Stanje",
+      "0": "Ni določeno",
+      "1": "Aktiven",
+      "2": "Neaktiven"
+    },
+    "TYPE": {
+      "TITLE": "Vrsta",
+      "0": "Neznana vrsta",
+      "1": "Lastni",
+      "2": "Podeljeni"
+    },
+    "NAME": "Ime",
+    "NAMEDIALOG": {
+      "TITLE": "Preimenuj projekt",
+      "DESCRIPTION": "Vnesite novo ime za projekt",
+      "NAME": "Novo ime"
+    },
+    "MEMBER": {
+      "TITLE": "Administratorji",
+      "TITLEDESC": "Administratorji lahko na podlagi svoje vloge spreminjajo ta projekt.",
+      "DESCRIPTION": "Ti administratorji morda lahko urejajo vaš projekt.",
+      "USERNAME": "Uporabniško ime",
+      "DISPLAYNAME": "Prikazno ime",
+      "LOGINNAME": "Prijavno ime",
+      "EMAIL": "E-pošta",
+      "ROLES": "Vloge",
+      "USERID": "ID uporabnika"
+    },
+    "GRANT": {
+      "EMPTY": "Ni podeljene organizacije.",
+      "TITLE": "Podelitve projektov",
+      "DESCRIPTION": "Dovolite drugi organizaciji uporabo vašega projekta.",
+      "EDITTITLE": "Uredi vloge",
+      "CREATE": {
+        "TITLE": "Ustvari podelitev projekta",
+        "SEL_USERS": "Izberite uporabnike, ki jim želite dodeliti dostop",
+        "SEL_PROJECT": "Poiščite projekt",
+        "SEL_ROLES": "Izberite vloge, ki jih želite dodati podelitvi projekta",
+        "SEL_USER": "Izberite uporabnike",
+        "SEL_ORG": "Poiščite organizacijo",
+        "SEL_ORG_DESC": "Poiščite organizacijo za podelitev.",
+        "ORG_DESCRIPTION": "Nameravate podeliti uporabniku za organizacijo {{name}}.",
+        "ORG_DESCRIPTION_DESC": "Za podelitev uporabniku za drugo organizacijo zamenjajte kontekst v glavi zgoraj.",
+        "SEL_ORG_FORMFIELD": "Organizacija",
+        "FOR_ORG": "Podelitev projekta je ustvarjena za:"
+      },
+      "DETAIL": {
+        "TITLE": "Podelitev projekta",
+        "DESC": "Izberete lahko, katere vloge lahko uporablja določena organizacija, in določite administratorje",
+        "MEMBERTITLE": "Administratorji",
+        "MEMBERDESC": "To so administratorji podeljene organizacije. Dodajte uporabnike, ki naj dobijo dostop do urejanja podatkov projekta.",
+        "PROJECTNAME": "Ime projekta",
+        "GRANTEDORG": "Podeljena organizacija",
+        "RESOURCEOWNER": "Lastnik vira"
+      },
+      "STATE": "Stanje",
+      "STATES": {
+        "1": "Aktiven",
+        "2": "Neaktiven"
+      },
+      "ALL": "Vse",
+      "SHOWDETAIL": "Prikaži podrobnosti",
+      "USER": "Uporabnik",
+      "MEMBERS": "Administratorji",
+      "ORG": "Organizacija",
+      "PROJECTNAME": "Ime projekta",
+      "GRANTEDORG": "Podeljena organizacija",
+      "GRANTEDORGDOMAIN": "Domena",
+      "RESOURCEOWNER": "Lastnik vira",
+      "GRANTEDORGNAME": "Ime organizacije",
+      "GRANTID": "ID podelitve",
+      "CREATIONDATE": "Datum ustvaritve",
+      "CHANGEDATE": "Nazadnje spremenjeno",
+      "DATES": "Datumi",
+      "ROLENAMESLIST": "Vloge",
+      "NOROLES": "Ni vlog",
+      "TYPE": "Vrsta",
+      "TOAST": {
+        "PROJECTGRANTUSERGRANTADDED": "Podelitev projekta ustvarjena.",
+        "PROJECTGRANTADDED": "Podelitev projekta ustvarjena.",
+        "PROJECTGRANTCHANGED": "Podelitev projekta spremenjena.",
+        "PROJECTGRANTMEMBERADDED": "Administrator podelitve dodan.",
+        "PROJECTGRANTMEMBERCHANGED": "Administrator podelitve spremenjen.",
+        "PROJECTGRANTMEMBERREMOVED": "Administrator podelitve odstranjen.",
+        "PROJECTGRANTUPDATED": "Podelitev projekta posodobljena"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Izbriši podelitev projekta",
+        "DELETE_DESCRIPTION": "Nameravate izbrisati podelitev projekta. Ali ste prepričani?"
+      },
+      "ROLES": "Projektne vloge"
+    },
+    "APP": {
+      "TITLE": "Aplikacije",
+      "NAME": "Ime",
+      "NAMEREQUIRED": "Ime je obvezno."
+    },
+    "ROLE": {
+      "EMPTY": "Nobena vloga še ni bila ustvarjena.",
+      "ADDNEWLINE": "Dodaj dodatno vlogo",
+      "KEY": "Ključ",
+      "TITLE": "Vloge",
+      "DESCRIPTION": "Določite vloge, ki jih je mogoče uporabiti za ustvarjanje podelitev projektov.",
+      "NAME": "Ime",
+      "DISPLAY_NAME": "Prikazno ime",
+      "GROUP": "Skupina",
+      "ACTIONS": "Akcije",
+      "ADDTITLE": "Ustvari vlogo",
+      "ADDDESCRIPTION": "Vnesite podatke za novo vlogo.",
+      "EDITTITLE": "Uredi vlogo",
+      "EDITDESCRIPTION": "Vnesite nove podatke za vlogo.",
+      "DELETE": "Izbriši vlogo",
+      "CREATIONDATE": "Ustvarjeno",
+      "CHANGEDATE": "Nazadnje spremenjeno",
+      "SELECTGROUPTOOLTIP": "Izberite vse vloge iz skupine {{group}}.",
+      "OPTIONS": "Možnosti",
+      "ASSERTION": "Vrni vloge uporabnika med avtentikacijo",
+      "ASSERTION_DESCRIPTION": "Ko se uporabnik avtenticira, so informacije o vlogah posredovane vaši aplikaciji. Za OpenID Connect je mogoče vloge zahtevati s končne točke UserInfo ali jih poslati v žetonu ID ali žetonu za dostop, glede na nastavitve vaše aplikacije.",
+      "CHECK": "Samo pooblaščeni uporabniki se lahko avtenticirajo",
+      "CHECK_DESCRIPTION": "Zavrni avtentikacijo, če uporabnik nima dodeljenih vlog za ta projekt. Dostop do projekta brez posebne vloge, dodeljene uporabniku, je dovoljen.",
+      "DIALOG": {
+        "DELETE_TITLE": "Izbriši vlogo",
+        "DELETE_DESCRIPTION": "Nameravate izbrisati projektno vlogo. Ali ste prepričani?"
+      }
+    },
+    "HAS_PROJECT": "Avtentikacija je omejena na uporabnike iz organizacij, ki jim je bil dodeljen dostop do tega projekta",
+    "HAS_PROJECT_DESCRIPTION": "Preden se uporabnik lahko avtenticira, se preveri, ali ima njegova organizacija dodeljen dostop do tega projekta. Avtentikacija ni dovoljena za uporabnike iz nepooblaščenih organizacij.",
+    "TABLE": {
+      "TOTAL": "Skupno vnosov:",
+      "SELECTION": "Izbrani elementi",
+      "DEACTIVATE": "Deaktiviraj projekt",
+      "ACTIVATE": "Aktiviraj projekt",
+      "DELETE": "Izbriši projekt",
+      "ORGNAME": "Ime organizacije",
+      "ORGID": "ID organizacije",
+      "ORGDOMAIN": "Domena organizacije",
+      "STATE": "Stanje",
+      "TYPE": "Vrsta",
+      "CREATIONDATE": "Ustvarjeno",
+      "CHANGEDATE": "Nazadnje spremenjeno",
+      "RESOURCEOWNER": "Lastnik",
+      "SHOWTABLE": "Prikaži tabelo",
+      "SHOWGRID": "Prikaži mrežo",
+      "EMPTY": "Projekt ni najden"
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Administrator odstranjen.",
+      "MEMBERSADDED": "Administratorji dodani.",
+      "MEMBERADDED": "Administrator dodan.",
+      "MEMBERCHANGED": "Administrator spremenjen.",
+      "ROLESCREATED": "Vloge ustvarjene.",
+      "ROLEREMOVED": "Vloga odstranjena.",
+      "ROLECHANGED": "Vloga spremenjena.",
+      "REACTIVATED": "Ponovno aktivirano.",
+      "DEACTIVATED": "Deaktivirano.",
+      "CREATED": "Projekt ustvarjen.",
+      "UPDATED": "Projekt spremenjen.",
+      "GRANTUPDATED": "Podelitev projekta spremenjena.",
+      "DELETED": "Projekt izbrisan."
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Izbriši vlogo",
+      "DELETE_DESCRIPTION": "Nameravate izbrisati vlogo. Ali ste prepričani?"
+    }
+  },
+  "NEXTSTEPS": {
+    "TITLE": "Naslednji koraki"
+  },
+  "IDP": {
+    "LIST": {
+      "ACTIVETITLE": "Aktivni ponudniki identitete"
+    },
+    "CREATE": {
+      "TITLE": "Dodaj ponudnika",
+      "DESCRIPTION": "Izberite enega ali več od naslednjih ponudnikov.",
+      "STEPPERTITLE": "Ustvari ponudnika",
+      "OIDC": {
+        "TITLE": "Ponudnik OIDC",
+        "DESCRIPTION": "Vnesite zahtevane podatke za svojega ponudnika OIDC."
+      },
+      "OAUTH": {
+        "TITLE": "Ponudnik OAuth",
+        "DESCRIPTION": "Vnesite zahtevane podatke za svojega ponudnika OAuth."
+      },
+      "JWT": {
+        "TITLE": "Ponudnik JWT",
+        "DESCRIPTION": "Vnesite zahtevane podatke za svojega ponudnika JWT."
+      },
+      "GOOGLE": {
+        "TITLE": "Ponudnik Google",
+        "DESCRIPTION": "Vnesite poverilnice za svojega ponudnika identitete Google"
+      },
+      "GITLAB": {
+        "TITLE": "Ponudnik Gitlab",
+        "DESCRIPTION": "Vnesite poverilnice za svojega ponudnika identitete Gitlab"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Ponudnik Gitlab (samo-gostovani)",
+        "DESCRIPTION": "Vnesite poverilnice za svojega samo-gostovanega ponudnika identitete Gitlab"
+      },
+      "GITHUBES": {
+        "TITLE": "Ponudnik GitHub Enterprise Server",
+        "DESCRIPTION": "Vnesite poverilnice za svojega ponudnika identitete GitHub Enterprise Server"
+      },
+      "GITHUB": {
+        "TITLE": "Ponudnik Github",
+        "DESCRIPTION": "Vnesite poverilnice za svojega ponudnika identitete Github"
+      },
+      "AZUREAD": {
+        "TITLE": "Ponudnik Microsoft",
+        "DESCRIPTION": "Vnesite poverilnice za svojega ponudnika identitete Microsoft"
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Vnesite poverilnice za svojega ponudnika LDAP"
+      },
+      "APPLE": {
+        "TITLE": "Prijava z Apple",
+        "DESCRIPTION": "Vnesite poverilnice za svojega ponudnika Apple"
+      },
+      "SAML": {
+        "TITLE": "Prijava s SAML",
+        "DESCRIPTION": "Vnesite poverilnice za svojega ponudnika SAML"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Ponudnik identitete",
+      "DESCRIPTION": "Posodobite nastavitve ponudnika",
+      "DATECREATED": "Ustvarjeno",
+      "DATECHANGED": "Spremenjeno"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Samodejno ustvarjanje",
+      "ISAUTOCREATION_DESC": "Če je izbrano, bo račun ustvarjen, če še ne obstaja.",
+      "ISAUTOUPDATE": "Samodejna posodobitev",
+      "ISAUTOUPDATE_DESC": "Če je izbrano, se računi posodobijo ob ponovni avtentikaciji.",
+      "ISCREATIONALLOWED": "Ustvarjanje računa dovoljeno (ročno)",
+      "ISCREATIONALLOWED_DESC": "Določa, ali je mogoče račune ustvariti z zunanjim računom. Onemogočite, če uporabniki ne bi smeli urejati podatkov računa, ko je omogočeno samodejno ustvarjanje.",
+      "ISLINKINGALLOWED": "Povezovanje računa dovoljeno (ročno)",
+      "ISLINKINGALLOWED_DESC": "Določa, ali je mogoče identiteto ročno povezati z obstoječim računom. Onemogočite, če naj bi uporabniki povezovali samo predlagani račun v primeru aktivnega samodejnega povezovanja.",
+      "AUTOLINKING_DESC": "Določa, ali bo uporabniku predlagano povezovanje identitete z obstoječim računom.",
+      "AUTOLINKINGTYPE": {
+        "0": "Onemogočeno",
+        "1": "Preveri obstoječe uporabniško ime",
+        "2": "Preveri obstoječo e-pošto"
+      }
+    },
+    "OWNERTYPES": {
+      "0": "neznano",
+      "1": "Primerek",
+      "2": "Organizacija"
+    },
+    "STATES": {
+      "1": "aktiven",
+      "2": "neaktiven"
+    },
+    "AZUREADTENANTTYPES": {
+      "3": "ID najemnika",
+      "0": "Skupno",
+      "1": "Organizacije",
+      "2": "Potrošniki"
+    },
+    "AZUREADTENANTTYPE": "Vrsta najemnika",
+    "AZUREADTENANTID": "ID najemnika",
+    "EMAILVERIFIED": "E-pošta potrjena",
+    "NAMEHINT": "Če je navedeno, bo prikazano v prijavnem vmesniku.",
+    "OPTIONAL": "neobvezno",
+    "LDAPATTRIBUTES": "Atributi LDAP",
+    "UPDATEBINDPASSWORD": "posodobi geslo za povezovanje",
+    "UPDATECLIENTSECRET": "posodobi skrivnost odjemalca",
+    "ADD": "Dodaj ponudnika identitete",
+    "TYPE": "Vrsta",
+    "OWNER": "Lastnik",
+    "ID": "ID ponudnika identitete",
+    "NAME": "Ime",
+    "AUTHORIZATIONENDPOINT": "Končna točka za avtorizacijo",
+    "TOKENENDPOINT": "Končna točka za žetone",
+    "USERENDPOINT": "Končna točka za uporabnike",
+    "IDATTRIBUTE": "Atribut ID",
+    "AVAILABILITY": "Razpoložljivost",
+    "AVAILABLE": "razpoložljiv",
+    "AVAILABLEBUTINACTIVE": "razpoložljiv, vendar neaktiven",
+    "SETAVAILABLE": "nastavi kot razpoložljivega",
+    "SETUNAVAILABLE": "nastavi kot nerazpoložljivega",
+    "CONFIG": "Nastavitve",
+    "STATE": "Stanje",
+    "ISSUER": "Izdajatelj",
+    "SCOPESLIST": "Seznam obsegov",
+    "CLIENTID": "ID odjemalca",
+    "CLIENTSECRET": "Skrivnost odjemalca",
+    "LDAPCONNECTION": "Povezava",
+    "LDAPUSERBINDING": "Vezava uporabnika",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Geslo za vezavo",
+    "SERVERS": "Strežniki",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Časovna omejitev v sekundah",
+    "USERBASE": "Baza uporabnikov",
+    "USERFILTERS": "Filtri uporabnikov",
+    "USEROBJECTCLASSES": "Razredi objektov uporabnikov",
+    "REQUIRED": "obvezno",
+    "LDAPIDATTRIBUTE": "Atribut ID",
+    "AVATARURLATTRIBUTE": "Atribut URL avatarja",
+    "DISPLAYNAMEATTRIBUTE": "Atribut prikaznega imena",
+    "EMAILATTRIBUTEATTRIBUTE": "Atribut e-pošte",
+    "EMAILVERIFIEDATTRIBUTE": "Atribut potrjene e-pošte",
+    "FIRSTNAMEATTRIBUTE": "Atribut imena",
+    "LASTNAMEATTRIBUTE": "Atribut priimka",
+    "NICKNAMEATTRIBUTE": "Atribut vzdevka",
+    "PHONEATTRIBUTE": "Atribut telefona",
+    "PHONEVERIFIEDATTRIBUTE": "Atribut potrjenega telefona",
+    "PREFERREDLANGUAGEATTRIBUTE": "Atribut prednostnega jezika",
+    "PREFERREDUSERNAMEATTRIBUTE": "Atribut prednostnega uporabniškega imena",
+    "PROFILEATTRIBUTE": "Atribut profila",
+    "IDPDISPLAYNAMMAPPING": "Preslikava prikaznega imena ponudnika identitete",
+    "USERNAMEMAPPING": "Preslikava uporabniškega imena",
+    "DATES": "Datumi",
+    "CREATIONDATE": "Ustvarjeno",
+    "CHANGEDATE": "Nazadnje spremenjeno",
+    "DEACTIVATE": "Deaktiviraj",
+    "ACTIVATE": "Aktiviraj",
+    "DELETE": "Izbriši",
+    "DELETE_TITLE": "Izbriši ponudnika identitete",
+    "DELETE_DESCRIPTION": "Nameravate izbrisati ponudnika identitete. Nastalih sprememb ni mogoče razveljaviti. Ali res želite to storiti?",
+    "REMOVE_WARN_TITLE": "Odstrani ponudnika identitete",
+    "REMOVE_WARN_DESCRIPTION": "Nameravate odstraniti ponudnika identitete. S tem boste odstranili izbiro razpoložljivega ponudnika za vaše uporabnike in že registrirani uporabniki se ne bodo mogli več prijaviti. Ali ste prepričani, da želite nadaljevati?",
+    "DELETE_SELECTION_TITLE": "Izbriši ponudnika identitete",
+    "DELETE_SELECTION_DESCRIPTION": "Nameravate izbrisati ponudnika identitete. Nastalih sprememb ni mogoče razveljaviti. Ali res želite to storiti?",
+    "FEDERATEDLOGOUTENABLED": "Federativna odjava omogočena",
+    "FEDERATEDLOGOUTENABLED_DESC": "Če je omogočeno, bo uporabnik ob prekinitvi seje v Zitadel odjavljen tudi od ponudnika identitete.",
+    "EMPTY": "Ponudnik identitete ni na voljo",
+    "OIDC": {
+      "GENERAL": "Splošne informacije",
+      "TITLE": "Nastavitve OIDC",
+      "DESCRIPTION": "Vnesite podatke za ponudnika identitete OIDC."
+    },
+    "JWT": {
+      "TITLE": "Nastavitve JWT",
+      "DESCRIPTION": "Vnesite podatke za ponudnika identitete JWT.",
+      "HEADERNAME": "Ime glave",
+      "JWTENDPOINT": "Končna točka JWT",
+      "JWTKEYSENDPOINT": "Končna točka ključev JWT"
+    },
+    "APPLE": {
+      "TEAMID": "ID ekipe",
+      "KEYID": "ID ključa",
+      "PRIVATEKEY": "Zasebni ključ",
+      "UPDATEPRIVATEKEY": "Posodobi zasebni ključ",
+      "UPLOADPRIVATEKEY": "Naloži zasebni ključ",
+      "KEYMAXSIZEEXCEEDED": "Največja velikost 5 kB je presežena."
+    },
+    "SAML": {
+      "METADATAXML": "Metapodatki XML",
+      "METADATAURL": "URL metapodatkov",
+      "BINDING": "Vezava",
+      "SIGNEDREQUEST": "Podpisana zahteva",
+      "SIGNATUREALGORITHM": "Algoritem podpisa",
+      "NAMEIDFORMAT": "Format NameID",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Ime atributa za prilagojeno preslikavo",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternativno ime atributa za preslikavo uporabnika v primeru, da je vrnjen `nameid-format` `transient`, npr. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    },
+    "TOAST": {
+      "SAVED": "Uspešno shranjeno.",
+      "REACTIVATED": "Ponudnik identitete ponovno aktiviran.",
+      "DEACTIVATED": "Ponudnik identitete deaktiviran.",
+      "SELECTEDREACTIVATED": "Izbrani ponudniki identitete ponovno aktivirani.",
+      "SELECTEDDEACTIVATED": "Izbrani ponudniki identitete deaktivirani.",
+      "SELECTEDKEYSDELETED": "Izbrani ponudniki identitete izbrisani.",
+      "DELETED": "Ponudnik identitete uspešno odstranjen!",
+      "ADDED": "Uspešno dodano.",
+      "REMOVED": "Uspešno odstranjeno."
+    },
+    "ISIDTOKENMAPPING": "Preslikava iz žetona ID",
+    "ISIDTOKENMAPPING_DESC": "Če je izbrano, se informacije ponudnika preslikajo iz žetona ID in ne s končne točke userinfo.",
+    "USEPKCE": "Uporabi PKCE",
+    "USEPKCE_DESC": "Določa, ali sta parametra code_challenge in code_challenge_method vključena v zahtevo za avtorizacijo"
+  },
+  "MFA": {
+    "LIST": {
+      "MULTIFACTORTITLE": "Ključ",
+      "MULTIFACTORDESCRIPTION": "Tukaj določite večfaktorske avtentikatorje za ključ.",
+      "SECONDFACTORTITLE": "Večfaktorska avtentikacija",
+      "SECONDFACTORDESCRIPTION": "Določite dodatne možne faktorje, s katerimi lahko zavarujete avtentikacijo z geslom."
+    },
+    "CREATE": {
+      "TITLE": "Nov faktor",
+      "DESCRIPTION": "Izberite vrsto novega faktorja."
+    },
+    "DELETE": {
+      "TITLE": "Izbriši faktor",
+      "DESCRIPTION": "Nameravate izbrisati faktor iz nastavitev prijave. Ali ste prepričani?"
+    },
+    "TOAST": {
+      "ADDED": "Uspešno dodano.",
+      "SAVED": "Uspešno shranjeno.",
+      "DELETED": "Uspešno odstranjeno"
+    },
+    "TYPE": "Vrsta",
+    "MULTIFACTORTYPES": {
+      "0": "Neznano",
+      "1": "Ključ"
+    },
+    "SECONDFACTORTYPES": {
+      "0": "Neznano",
+      "1": "TOTP (aplikacija za avtentikacijo)",
+      "2": "Ključ",
+      "3": "OTP prek e-pošte (OTP Email)",
+      "4": "OTP prek SMS (OTP SMS)",
+      "5": "Kode za obnovitev"
+    }
+  },
+  "LOGINPOLICY": {
+    "CREATE": {
+      "TITLE": "Nastavitve prijave",
+      "DESCRIPTION": "Določite, kako se uporabniki lahko avtenticirajo v vaši organizaciji."
+    },
+    "IDPS": "Ponudniki identitete",
+    "ADDIDP": {
+      "TITLE": "Dodaj ponudnika identitete",
+      "DESCRIPTION": "Za avtentikacijo lahko izberete vnaprej določene ali lastne ponudnike.",
+      "SELECTIDPS": "Ponudniki identitete"
+    },
+    "PASSWORDLESS": "Prijava s ključem",
+    "PASSWORDLESSTYPE": {
+      "0": "Ni dovoljeno",
+      "1": "Dovoljeno"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "Ponudnik SMTP",
+      "DESCRIPTION": "To so ponudniki SMTP za vaš primerek Zitadel. Aktivirajte tistega, ki ga želite uporabiti za pošiljanje obvestil uporabnikom.",
+      "EMPTY": "Ponudnik SMTP ni na voljo",
+      "ACTIVATED": "Aktiviran",
+      "ACTIVATE": "Aktiviraj ponudnika",
+      "DEACTIVATE": "Deaktiviraj ponudnika",
+      "TEST": "Preizkusite ponudnika",
+      "TYPE": "Vrsta",
+      "DIALOG": {
+        "ACTIVATED": "Ponudnik SMTP je bil aktiviran",
+        "ACTIVATE_WARN_TITLE": "Aktiviraj nastavitve SMTP",
+        "ACTIVATE_WARN_DESCRIPTION": "Nameravate aktivirati ponudnika SMTP. Najprej bomo deaktivirali trenutno aktivnega ponudnika in nato aktivirali tega. Ali ste prepričani?",
+        "DEACTIVATE_WARN_TITLE": "Deaktiviraj nastavitve SMTP",
+        "DEACTIVATE_WARN_DESCRIPTION": "Nameravate deaktivirati ponudnika SMTP. Ali ste prepričani?",
+        "DEACTIVATED": "Ponudnik SMTP je bil deaktiviran",
+        "DELETE_TITLE": "Izbriši ponudnika SMTP",
+        "DELETE_DESCRIPTION": "Nameravate izbrisati ponudnika. Potrdite dejanje z vnosom imena pošiljatelja",
+        "DELETED": "Ponudnik SMTP je bil izbrisan",
+        "SENDER": "Vnesite {{value}} za izbris tega ponudnika SMTP.",
+        "TEST_TITLE": "Preizkusite nastavitve SMTP",
+        "TEST_DESCRIPTION": "Navedite e-poštni naslov za preizkus nastavitev SMTP",
+        "TEST_EMAIL": "E-poštni naslov",
+        "TEST_RESULT": "Rezultat preizkusa"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Dodaj ponudnika SMTP",
+      "DESCRIPTION": "Izberite enega ali več od naslednjih ponudnikov.",
+      "STEPS": {
+        "TITLE": "Dodaj ponudnika SMTP {{ value }}",
+        "CREATE_DESC_TITLE": "Vnesite nastavitve SMTP {{ value }} korak za korakom",
+        "CURRENT_DESC_TITLE": "To so vaše nastavitve SMTP",
+        "PROVIDER_SETTINGS": "Nastavitve ponudnika SMTP",
+        "SENDER_SETTINGS": "Nastavitve pošiljatelja",
+        "NEXT_STEPS": "Naslednji koraki",
+        "ACTIVATE": {
+          "TITLE": "Aktivirajte ponudnika SMTP",
+          "DESCRIPTION": "Zitadel ne more uporabiti tega ponudnika SMTP za pošiljanje obvestil, dokler ga ne aktivirate. Če aktivirate tega ponudnika, bo vsak drug ponudnik, ki je bil aktiven, deaktiviran."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deaktivirajte ponudnika SMTP",
+          "DESCRIPTION": "Če deaktivirate tega ponudnika SMTP, ga Zitadel ne more uporabiti za pošiljanje obvestil, dokler ga znova ne aktivirate."
+        },
+        "SAVE_SETTINGS": "Shranite nastavitve",
+        "TEST": {
+          "TITLE": "Preizkusite nastavitve",
+          "DESCRIPTION": "Nastavitve ponudnika SMTP lahko preizkusite in preverite rezultat preizkusa, preden jih shranite",
+          "RESULT": "Vaša e-pošta je bila uspešno poslana"
+        }
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Nastavitve ponudnika SMTP"
+    },
+    "EMPTY": "Ponudnik SMTP ni na voljo",
+    "STEPS": {
+      "SENDGRID": {}
+    }
+  },
+  "APP": {
+    "LIST": "Aplikacije",
+    "COMPLIANCE": "Skladnost OIDC",
+    "URLS": "URL-ji",
+    "CONFIGURATION": "Nastavitve",
+    "TOKEN": "Nastavitve žetonov",
+    "PAGES": {
+      "TITLE": "Aplikacija",
+      "ID": "ID aplikacije",
+      "DESCRIPTION": "Tukaj lahko urejate podatke aplikacije in njene nastavitve.",
+      "CREATE": "Ustvari aplikacijo",
+      "CREATE_SELECT_PROJECT": "Najprej izberite svoj projekt",
+      "CREATE_NEW_PROJECT": "ali vnesite ime za nov projekt",
+      "CREATE_DESC_TITLE": "Vnesite podrobnosti aplikacije korak za korakom",
+      "CREATE_DESC_SUB": "Priporočena nastavitev bo samodejno generirana.",
+      "STATE": "Stanje",
+      "DATECREATED": "Ustvarjeno",
+      "DATECHANGED": "Spremenjeno",
+      "URLS": "URL-ji",
+      "DELETE": "Izbriši aplikacijo",
+      "JUMPTOPROJECT": "Za konfiguracijo vlog, dodelitev vlog in več se pomaknite na projekt.",
+      "DETAIL": {
+        "TITLE": "Podrobnosti",
+        "STATE": {
+          "0": "Ni določeno",
+          "1": "Aktivna",
+          "2": "Neaktivna"
+        }
+      },
+      "DIALOG": {
+        "CONFIG": {
+          "TITLE": "Spremeni nastavitve OIDC"
+        },
+        "DELETE": {
+          "TITLE": "Izbriši aplikacijo",
+          "DESCRIPTION": "Ali res želite izbrisati to aplikacijo?"
+        }
+      },
+      "NEXTSTEPS": {
+        "TITLE": "Naslednji koraki",
+        "0": {
+          "TITLE": "Dodajte vloge",
+          "DESC": "Vnesite projektne vloge"
+        },
+        "1": {
+          "TITLE": "Dodajte uporabnike",
+          "DESC": "Dodajte nove uporabnike vaše organizacije"
+        },
+        "2": {
+          "TITLE": "Pomoč in podpora",
+          "DESC": "Preberite dokumentacijo o ustvarjanju aplikacij ali se obrnite na podporo"
+        }
+      }
+    },
+    "NAMEDIALOG": {
+      "TITLE": "Preimenuj aplikacijo",
+      "DESCRIPTION": "Vnesite novo ime za aplikacijo",
+      "NAME": "Novo ime"
+    },
+    "NAME": "Ime",
+    "TYPE": "Vrsta aplikacije",
+    "AUTHMETHOD": "Metoda avtentikacije",
+    "AUTHMETHODSECTION": "Metoda avtentikacije",
+    "GRANT": "Vrste dodelitev",
+    "ADDITIONALORIGINS": "Dodatni izvori",
+    "ADDITIONALORIGINSDESC": "Če želite aplikaciji dodati dodatne izvore, ki se ne uporabljajo kot preusmeritev, to storite tukaj.",
+    "ORIGINS": "Izvori",
+    "NOTANORIGIN": "Vnesena vrednost ni izvor",
+    "PROSWITCH": "Sem strokovnjak. Preskoči čarovnika.",
+    "NAMEANDTYPESECTION": "Ime in vrsta",
+    "TITLEFIRST": "Ime aplikacije",
+    "TYPETITLE": "Vrsta aplikacije",
+    "OIDC": {
+      "WELLKNOWN": "Nadaljnje povezave je mogoče pridobiti s <a href='{{url}}' title='Končna točka za odkrivanje' target='_blank'>končne točke za odkrivanje</a>.",
+      "INFO": {
+        "ISSUER": "Izdajatelj",
+        "CLIENTID": "ID odjemalca"
+      },
+      "CURRENT": "Trenutna konfiguracija",
+      "TOKENSECTIONTITLE": "Možnosti žetona za avtentikacijo",
+      "REDIRECTSECTIONTITLE": "Nastavitve preusmeritev",
+      "REDIRECTTITLE": "Navedite URI-je, kamor bo prijava preusmerila.",
+      "POSTREDIRECTTITLE": "To je URI preusmeritve po odjavi.",
+      "REDIRECTDESCRIPTIONWEB": "URI-ji preusmeritve se morajo začeti s https://. http:// je veljaven samo z omogočenim razvojnim načinom.",
+      "REDIRECTDESCRIPTIONNATIVE": "URI-ji preusmeritve se morajo začeti z vašim lastnim protokolom, http://127.0.0.1, http://[::1] ali http://localhost.",
+      "REDIRECTNOTVALID": "Ta URI preusmeritve ni veljaven.",
+      "COMMAORENTERSEPERATION": "ločite z ↵",
+      "TYPEREQUIRED": "Vrsta je obvezna.",
+      "TITLE": "Nastavitve OIDC",
+      "CLIENTID": "ID odjemalca",
+      "CLIENTSECRET": "Skrivnost odjemalca",
+      "CLIENTSECRET_NOSECRET": "Z vašim izbranim tokom avtentikacije skrivnost ni potrebna in zato ni na voljo.",
+      "CLIENTSECRET_DESCRIPTION": "Shranite skrivnost odjemalca na varno mesto, saj po zaprtju tega pogovornega okna ne bo več vidna.",
+      "REGENERATESECRET": "Ponovno generiraj skrivnost odjemalca",
+      "DEVMODE": "Razvojni način",
+      "DEVMODE_ENABLED": "Omogočen",
+      "DEVMODE_DISABLED": "Onemogočen",
+      "DEVMODEDESC": "Pozor: Z omogočenim razvojnim načinom URI-ji preusmeritve ne bodo preverjeni.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Preskoči stran uspešne prijave",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Preskoči stran uspešne prijave po prijavi za to nativno aplikacijo.",
+      "REDIRECT": "URI-ji preusmeritve",
+      "REDIRECTSECTION": "URI-ji preusmeritve",
+      "POSTLOGOUTREDIRECT": "URI-ji po odjavi",
+      "RESPONSESECTION": "Vrste odzivov",
+      "GRANTSECTION": "Vrste dodelitev",
+      "GRANTTITLE": "Izberite vrste dodelitev. Opomba: Implicit je na voljo samo za aplikacije v brskalniku.",
+      "APPTYPE": {
+        "0": "Splet",
+        "1": "Uporabniški agent",
+        "2": "Nativna"
+      },
+      "RESPONSETYPE": "Vrste odzivov",
+      "RESPONSE": {
+        "0": "Code",
+        "1": "ID Token",
+        "2": "Token-ID Token"
+      },
+      "REFRESHTOKEN": "Osvežitveni žeton",
+      "GRANTTYPE": "Vrste dodelitev",
+      "GRANT": {
+        "0": "Authorization Code",
+        "1": "Implicit",
+        "2": "Refresh Token",
+        "3": "Device Code",
+        "4": "Token Exchange"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Post",
+        "2": "None",
+        "3": "Private Key JWT"
+      },
+      "TOKENTYPE": "Vrsta žetona za avtentikacijo",
+      "TOKENTYPE0": "Bearer žeton",
+      "TOKENTYPE1": "JWT",
+      "UNSECUREREDIRECT": "Upam, da veste, kaj počnete.",
+      "OVERVIEWSECTION": "Pregled",
+      "OVERVIEWTITLE": "Končali ste. Preglejte nastavitve.",
+      "ACCESSTOKENROLEASSERTION": "Dodaj vloge uporabnika v žeton za dostop",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Če je izbrano, se zahtevane vloge avtenticiranega uporabnika dodajo v žeton za dostop.",
+      "IDTOKENROLEASSERTION": "Vloge uporabnika v žetonu ID",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "Ko je ta možnost omogočena, bodo dodeljene vloge avtenticiranega uporabnika dodane neposredno v njegov žeton ID. Prepričajte se, da ste omogočili nastavitev projekta 'Dodeli vloge uporabnika med avtentikacijo' ali zahtevajte prek obsega po meri.",
+      "IDTOKENUSERINFOASSERTION": "Vključi podatke profila uporabnika v žeton ID",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Omogoča aplikacijam pridobitev zahtevkov profila, e-pošte, telefona in naslova iz žetona ID.",
+      "CLOCKSKEW": "Omogoča aplikacijam obravnavo časovnega zamika med ponudnikom in aplikacijo. Trajanje (0-5s) bo dodano zahtevku exp in odšteto od iat, auth_time in nbf.",
+      "RECOMMENDED": "priporočeno",
+      "NOTRECOMMENDED": "ni priporočeno",
+      "SELECTION": {
+        "APPTYPE": {
+          "WEB": {
+            "TITLE": "Spletna",
+            "DESCRIPTION": "Običajne spletne aplikacije, kot so .net, PHP, Node.js, Java itd."
+          },
+          "NATIVE": {
+            "TITLE": "Nativna",
+            "DESCRIPTION": "Mobilne aplikacije, namizje, pametne naprave itd."
+          },
+          "USERAGENT": {
+            "TITLE": "Uporabniški agent",
+            "DESCRIPTION": "Enostranske aplikacije (SPA) in na splošno vsa ogrodja JS, ki se izvajajo v brskalnikih"
+          }
+        }
+      },
+      "BACKCHANNELLOOGOUTURI": "URI za odjavo po zalednem kanalu"
+    },
+    "API": {
+      "INFO": {
+        "CLIENTID": "ID odjemalca"
+      },
+      "REGENERATESECRET": "Ponovno generiraj skrivnost odjemalca",
+      "SELECTION": {
+        "TITLE": "API",
+        "DESCRIPTION": "API-ji na splošno"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Private Key JWT"
+      }
+    },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "Aplikacije SAML"
+      },
+      "CONFIGSECTION": "Nastavitve SAML",
+      "CHOOSEMETADATASOURCE": "Navedite nastavitve SAML z eno od naslednjih možnosti:",
+      "METADATAOPT1": "Možnost 1. Navedite URL, kjer se nahaja datoteka z metapodatki",
+      "METADATAOPT2": "Možnost 2. Naložite datoteko, ki vsebuje vaše metapodatke XML",
+      "METADATAOPT3": "Možnost 3. Ustvarite minimalno datoteko z metapodatki sproti z navedbo ENTITYID in URL ACS",
+      "UPLOAD": "Naloži datoteko XML",
+      "METADATA": "Metapodatki",
+      "METADATAFROMFILE": "Metapodatki iz datoteke",
+      "CERTIFICATE": "Certifikat SAML",
+      "DOWNLOADCERT": "Prenesi certifikat SAML",
+      "CREATEMETADATA": "Ustvari metapodatke",
+      "ENTITYID": "ID entitete",
+      "ACSURL": "URL končne točke ACS"
+    },
+    "AUTHMETHODS": {
+      "CODE": {
+        "TITLE": "Code",
+        "DESCRIPTION": "Zamenjajte avtorizacijsko kodo za žetone"
+      },
+      "PKCE": {
+        "TITLE": "PKCE",
+        "DESCRIPTION": "Uporabite naključni zgoščeni niz namesto statične skrivnosti odjemalca za večjo varnost"
+      },
+      "POST": {
+        "TITLE": "POST",
+        "DESCRIPTION": "Pošljite client_id in client_secret kot del obrazca"
+      },
+      "PK_JWT": {
+        "TITLE": "Private Key JWT",
+        "DESCRIPTION": "Uporabite zasebni ključ za avtorizacijo aplikacije"
+      },
+      "BASIC": {
+        "TITLE": "Basic",
+        "DESCRIPTION": "Avtentikacija z uporabniškim imenom in geslom"
+      },
+      "IMPLICIT": {
+        "TITLE": "Implicit",
+        "DESCRIPTION": "Pridobite žetone neposredno s končne točke za avtorizacijo"
+      },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Avtorizirajte napravo na računalniku ali pametnem telefonu."
+      },
+      "CUSTOM": {
+        "TITLE": "Po meri",
+        "DESCRIPTION": "Vaša nastavitev ne ustreza nobeni drugi možnosti."
+      }
+    },
+    "TOAST": {
+      "REACTIVATED": "Aplikacija ponovno aktivirana.",
+      "DEACTIVATED": "Aplikacija deaktivirana.",
+      "OIDCUPDATED": "Aplikacija posodobljena.",
+      "APIUPDATED": "Aplikacija posodobljena",
+      "UPDATED": "Aplikacija posodobljena.",
+      "CREATED": "Aplikacija ustvarjena.",
+      "CLIENTSECRETREGENERATED": "Skrivnost odjemalca generirana.",
+      "DELETED": "Aplikacija izbrisana.",
+      "CONFIGCHANGED": "Spremembe zaznane!"
+    },
+    "LOGINV2": {
+      "USEV2": "Uporabi nov prijavni vmesnik",
+      "BASEURL": "Prilagojen osnovni URL za nov prijavni vmesnik"
+    }
+  },
+  "GENDERS": {
+    "0": "Neznano",
+    "1": "Ženski",
+    "2": "Moški",
+    "3": "Drugo"
+  },
+  "LANGUAGES": {
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文",
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский",
+    "nl": "Nederlands",
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română",
+    "tr": "Türkçe",
+    "uk": "Українська",
+    "ar": "العربية",
+    "sl": "Slovenščina"
+  },
+  "MEMBER": {
+    "ADD": "Dodaj administratorja",
+    "CREATIONTYPE": "Vrsta ustvaritve",
+    "CREATIONTYPES": {
+      "3": "IAM",
+      "2": "Organizacija",
+      "0": "Lastni projekt",
+      "1": "Podeljen projekt",
+      "4": "Projekt"
+    },
+    "EDITROLE": "Uredi vloge",
+    "EDITFOR": "Uredi vloge za uporabnika: {{value}}",
+    "DIALOG": {
+      "DELETE_TITLE": "Odstrani administratorja",
+      "DELETE_DESCRIPTION": "Nameravate odstraniti administratorja. Ali ste prepričani?"
+    },
+    "SHOWDETAILS": "Kliknite za prikaz podrobnosti."
+  },
+  "ROLESLABEL": "Vloge",
+  "GRANTS": {
+    "TITLE": "Dodelitve vlog",
+    "DESC": "To so vse dodelitve vlog v vaši organizaciji.",
+    "DELETE": "Izbriši dodelitev vloge",
+    "EMPTY": "Dodelitev vloge ni najdena",
+    "ADD": "Ustvari dodelitev vloge",
+    "ADD_BTN": "Nova",
+    "PROJECT": {
+      "TITLE": "Dodelitev vloge",
+      "DESCRIPTION": "Določite dodelitve vlog za navedeni projekt. Upoštevajte, da lahko vidite samo vnose projektov in uporabnikov, za katere imate dovoljenja."
+    },
+    "USER": {
+      "TITLE": "Dodelitev vloge",
+      "DESCRIPTION": "Določite dodelitve vlog za navedenega uporabnika. Upoštevajte, da lahko vidite samo vnose projektov in uporabnikov, za katere imate dovoljenja."
+    },
+    "CREATE": {
+      "TITLE": "Ustvari dodelitev vloge",
+      "DESCRIPTION": "Poiščite organizacijo, projekt in ustrezne vloge."
+    },
+    "EDIT": {
+      "TITLE": "Spremeni dodelitev vloge"
+    },
+    "DETAIL": {
+      "TITLE": "Podrobnosti dodelitve vloge",
+      "DESCRIPTION": "Tukaj so prikazane vse podrobnosti dodelitve vloge."
+    },
+    "TOAST": {
+      "UPDATED": "Dodelitev vloge posodobljena.",
+      "REMOVED": "Dodelitev vloge odstranjena",
+      "BULKREMOVED": "Dodelitve vlog odstranjene.",
+      "CANTSHOWINFO": "Profila tega uporabnika ne morete obiskati, ker niste administrator organizacije, ki ji ta uporabnik pripada"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Izbriši dodelitev vloge",
+      "DELETE_DESCRIPTION": "Nameravate izbrisati dodelitev vloge. Ali želite nadaljevati?",
+      "BULK_DELETE_TITLE": "Izbriši dodelitve vlog",
+      "BULK_DELETE_DESCRIPTION": "Nameravate izbrisati več dodelitev vlog. Ali želite nadaljevati?"
+    }
+  },
+  "CHANGES": {
+    "LISTTITLE": "Zadnje spremembe",
+    "BOTTOM": "Dosegli ste konec seznama.",
+    "LOADMORE": "Naloži več",
+    "ORG": {
+      "TITLE": "Dejavnost",
+      "DESCRIPTION": "Tukaj so prikazani zadnji dogodki, ki so povzročili spremembo organizacije."
+    },
+    "PROJECT": {
+      "TITLE": "Dejavnost",
+      "DESCRIPTION": "Tukaj so prikazani zadnji dogodki, ki so povzročili spremembo projekta."
+    },
+    "USER": {
+      "TITLE": "Dejavnost",
+      "DESCRIPTION": "Tukaj so prikazani zadnji dogodki, ki so povzročili spremembo uporabnika."
+    }
+  }
+}
