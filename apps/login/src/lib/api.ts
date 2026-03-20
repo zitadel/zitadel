@@ -1,6 +1,5 @@
 import { newSystemToken } from "@zitadel/client/node";
 import { readFile } from "fs/promises";
-import { getLoginSystemUserId } from "./deployment";
 
 // The key token is only loaded once from disk per process.
 // If the file was loaded you need to restart the process to switch the key.
@@ -38,26 +37,25 @@ export async function systemAPIToken() {
 
 /**
  * Creates a signed JWT token by reading a private key from the file path
- * specified in ZITADEL_LOGIN_SERVICE_KEY_FILE. The audience is resolved from
- * AUDIENCE or falls back to ZITADEL_API_URL, and the subject is resolved via
- * {@link getLoginSystemUserId}.
+ * specified in ZITADEL_LOGINCLIENT_KEYFILE. Uses a hardcoded subject of
+ * "login-client". The audience is resolved from AUDIENCE or ZITADEL_API_URL.
  *
  * @returns A signed JWT token string for authenticating API requests.
  * @throws If the key file cannot be read or the token signing fails.
  */
-export async function loginServiceKeyToken() {
-  const keyFile = process.env.ZITADEL_LOGIN_SERVICE_KEY_FILE!;
+export async function loginClientKeyToken() {
+  const keyFile = process.env.ZITADEL_LOGINCLIENT_KEYFILE!;
 
   try {
     const key = await readFile(keyFile, "utf-8");
 
     return newSystemToken({
       audience: process.env.AUDIENCE || process.env.ZITADEL_API_URL,
-      subject: getLoginSystemUserId()!,
+      subject: "login-client",
       key: key,
     });
   } catch (err) {
-    throw new Error(`Failed to read login service key file "${keyFile}": ${err instanceof Error ? err.message : err}`, {
+    throw new Error(`Failed to read login client key file "${keyFile}": ${err instanceof Error ? err.message : err}`, {
       cause: err,
     });
   }

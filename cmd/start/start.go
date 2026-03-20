@@ -443,6 +443,29 @@ func startAPIs(
 		// always set the origin in the context if available in the http headers, no matter for what protocol
 		middleware.WithOrigin(config.ExternalSecure, config.HTTP1HostHeader, config.HTTP2HostHeader, config.InstanceHostHeaders, config.PublicHostHeaders),
 	)
+	if config.LoginClient.KeyFile != "" || config.AdminClient.KeyFile != "" {
+		if config.SystemAPIUsers == nil {
+			config.SystemAPIUsers = make(map[string]*internal_authz.SystemAPIUser)
+		}
+	}
+	if config.LoginClient.KeyFile != "" {
+		config.SystemAPIUsers["login-client"] = &internal_authz.SystemAPIUser{
+			Path: config.LoginClient.KeyFile,
+			Memberships: internal_authz.Memberships{{
+				MemberType: internal_authz.MemberTypeSystem,
+				Roles:      []string{"SYSTEM_OWNER", "IAM_LOGIN_CLIENT"},
+			}},
+		}
+	}
+	if config.AdminClient.KeyFile != "" {
+		config.SystemAPIUsers["admin-client"] = &internal_authz.SystemAPIUser{
+			Path: config.AdminClient.KeyFile,
+			Memberships: internal_authz.Memberships{{
+				MemberType: internal_authz.MemberTypeSystem,
+				Roles:      []string{"SYSTEM_OWNER", "IAM_OWNER"},
+			}},
+		}
+	}
 	systemTokenVerifier, err := internal_authz.StartSystemTokenVerifierFromConfig(http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
 	if err != nil {
 		return nil, err

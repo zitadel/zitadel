@@ -810,6 +810,17 @@ SystemAPIUsers:
 #     KeyData: <base64 encoded key>     # or you can directly embed it as base64 encoded value
 # Configure the SystemAPIUsers by environment variable using JSON notation:
 # ZITADEL_SYSTEMAPIUSERS='{"systemuser":{"Path":"/path/to/superuser/key.pem"},"systemuser2":{"KeyData":"<base64 encoded key>"}}'
+# Or configure system API users with simple environment variables (useful for Kubernetes):
+#
+# Login client (registers user "login-client" with IAM_LOGIN_CLIENT + SYSTEM_OWNER roles):
+# ZITADEL_LOGINCLIENT_KEYFILE=/path/to/cert.pem
+LoginClient:
+  KeyFile: # ZITADEL_LOGINCLIENT_KEYFILE
+#
+# Admin client (registers user "admin-client" with IAM_OWNER + SYSTEM_OWNER roles):
+# ZITADEL_ADMINCLIENT_KEYFILE=/path/to/cert.pem
+AdminClient:
+  KeyFile: # ZITADEL_ADMINCLIENT_KEYFILE
 
 SystemDefaults:
   SecretGenerators:

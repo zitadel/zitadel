@@ -145,6 +145,34 @@ Actions:
 			})
 		},
 	}, {
+		name: "login client key file ok",
+		args: args{yaml: `
+LoginClient:
+  KeyFile: /path/to/cert.pem
+Log:
+  Level: info
+Actions:
+  HTTP:
+    DenyList: []
+`},
+		want: func(t *testing.T, config *Config) {
+			assert.Equal(t, "/path/to/cert.pem", config.LoginClient.KeyFile)
+		},
+	}, {
+		name: "admin client key file ok",
+		args: args{yaml: `
+AdminClient:
+  KeyFile: /path/to/admin-cert.pem
+Log:
+  Level: info
+Actions:
+  HTTP:
+    DenyList: []
+`},
+		want: func(t *testing.T, config *Config) {
+			assert.Equal(t, "/path/to/admin-cert.pem", config.AdminClient.KeyFile)
+		},
+	}, {
 		name: "headers ok",
 		args: args{yaml: `
 Telemetry:
