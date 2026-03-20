@@ -450,7 +450,7 @@ func startAPIs(
 	}
 	if config.LoginClient.KeyFile != "" {
 		if _, exists := config.SystemAPIUsers["login-client"]; exists {
-			return nil, fmt.Errorf("cannot use LoginClient.KeyFile: SystemAPIUsers already contains a \"login-client\" entry")
+			return nil, fmt.Errorf("cannot use ZITADEL_LOGINCLIENT_KEYFILE (LoginClient.KeyFile): SystemAPIUsers already contains a \"login-client\" entry")
 		}
 		config.SystemAPIUsers["login-client"] = &internal_authz.SystemAPIUser{
 			Path: config.LoginClient.KeyFile,
@@ -462,7 +462,7 @@ func startAPIs(
 	}
 	if config.AdminClient.KeyFile != "" {
 		if _, exists := config.SystemAPIUsers["admin-client"]; exists {
-			return nil, fmt.Errorf("cannot use AdminClient.KeyFile: SystemAPIUsers already contains an \"admin-client\" entry")
+			return nil, fmt.Errorf("cannot use ZITADEL_ADMINCLIENT_KEYFILE (AdminClient.KeyFile): SystemAPIUsers already contains an \"admin-client\" entry")
 		}
 		config.SystemAPIUsers["admin-client"] = &internal_authz.SystemAPIUser{
 			Path: config.AdminClient.KeyFile,
