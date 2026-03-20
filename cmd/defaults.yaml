@@ -816,12 +816,14 @@ SystemAPIUsers:
 # It is NOT the DefaultInstance.Org.LoginClient machine user configuration defined below.
 #
 # Login client (registers user "login-client" with IAM_LOGIN_CLIENT + SYSTEM_OWNER roles):
-# The API expects a public certificate/key here to verify JWTs signed by the login container.
-# The login container uses the corresponding private key (same env var name) for signing,
-# so the value cannot be shared unmodified across both containers via a single .env file.
-# ZITADEL_LOGINCLIENT_KEYFILE=/path/to/login-client-cert.pem
+# In the API container, ZITADEL_LOGINCLIENT_KEYFILE must point to the public certificate/key
+# (e.g. /path/to/login-client.crt.pem) used for JWT verification.
+# In the login container, ZITADEL_LOGINCLIENT_KEYFILE must point to the corresponding private
+# key (e.g. /path/to/login-client-key.pem) used for signing.
+# Do not share the same file across both containers via a single .env file.
+# API example: ZITADEL_LOGINCLIENT_KEYFILE=/path/to/login-client.crt.pem
 LoginClient:
-  KeyFile: # ZITADEL_LOGINCLIENT_KEYFILE (public certificate/key for JWT verification)
+  KeyFile: # ZITADEL_LOGINCLIENT_KEYFILE (API: public certificate/key for JWT verification)
 #
 # Admin client (registers user "admin-client" with IAM_OWNER + SYSTEM_OWNER roles):
 # Points to the public certificate or public key used by the API to verify admin-client JWTs.
