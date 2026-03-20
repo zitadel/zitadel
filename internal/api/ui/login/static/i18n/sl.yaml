@@ -1,0 +1,541 @@
+Login:
+  Title: Dobrodošli nazaj!
+  Description: Vnesite svoje podatke za prijavo.
+  TitleLinking: Prijava za povezovanje uporabnika
+  DescriptionLinking: Vnesite svoje podatke za prijavo, da povežete zunanjega uporabnika.
+  LoginNameLabel: Prijavno ime
+  UsernamePlaceHolder: uporabniškoime
+  LoginnamePlaceHolder: uporabniškoime@domena
+  ExternalUserDescription: Prijavite se z zunanjim uporabnikom.
+  MustBeMemberOfOrg: Uporabnik mora biti član organizacije {{.OrgName}}.
+  RegisterButtonText: Registracija
+  NextButtonText: Naprej
+
+LDAP:
+  Title: Prijava
+  Description: Vnesite svoje podatke za prijavo.
+  LoginNameLabel: Prijavno ime
+  PasswordLabel: Geslo
+  NextButtonText: Naprej
+
+SelectAccount:
+  Title: Izberite račun
+  Description: Uporabite svoj račun
+  TitleLinking: Izberite račun za povezovanje uporabnika
+  DescriptionLinking: Izberite svoj račun za povezavo z zunanjim uporabnikom.
+  OtherUser: Drug uporabnik
+  SessionState0: aktivna
+  SessionState1: Odjavljen/a
+  MustBeMemberOfOrg: Uporabnik mora biti član organizacije {{.OrgName}}.
+
+Password:
+  Title: Geslo
+  Description: Vnesite svoje podatke za prijavo.
+  PasswordLabel: Geslo
+  MinLength: Vsebovati mora vsaj
+  MinLengthp2: znakov.
+  MaxLength: Dolgo mora biti manj kot 70 znakov.
+  HasUppercase: Vsebovati mora veliko črko.
+  HasLowercase: Vsebovati mora malo črko.
+  HasNumber: Vsebovati mora številko.
+  HasSymbol: Vsebovati mora simbol.
+  Confirmation: Potrditev gesla se ujema.
+  ResetLinkText: Ponastavitev gesla
+  BackButtonText: Nazaj
+  NextButtonText: Naprej
+
+UsernameChange:
+  Title: Sprememba uporabniškega imena
+  Description: Nastavite novo uporabniško ime
+  UsernameLabel: Uporabniško ime
+  CancelButtonText: Prekliči
+  NextButtonText: Naprej
+
+UsernameChangeDone:
+  Title: Uporabniško ime spremenjeno
+  Description: Vaše uporabniško ime je bilo uspešno spremenjeno.
+  NextButtonText: Naprej
+
+InitPassword:
+  Title: Nastavitev gesla
+  Description: Prejeli ste kodo, ki jo morate vnesti v spodnji obrazec, da nastavite novo geslo.
+  CodeLabel: Koda
+  NewPasswordLabel: Novo geslo
+  NewPasswordConfirmLabel: Potrditev gesla
+  ResendButtonText: Ponovno pošlji kodo
+  NextButtonText: Naprej
+
+InitPasswordDone:
+  Title: Geslo nastavljeno
+  Description: Geslo je bilo uspešno nastavljeno
+  NextButtonText: Naprej
+  CancelButtonText: Prekliči
+
+InitUser:
+  Title: Aktivacija uporabnika
+  Description: Potrdite svojo e-pošto s spodnjo kodo in nastavite geslo.
+  CodeLabel: Koda
+  NewPasswordLabel: Novo geslo
+  NewPasswordConfirm: Potrditev gesla
+  NextButtonText: Naprej
+  ResendButtonText: Ponovno pošlji kodo
+
+InitUserDone:
+  Title: Uporabnik aktiviran
+  Description: E-pošta potrjena in geslo uspešno nastavljeno
+  NextButtonText: Naprej
+  CancelButtonText: Prekliči
+
+InviteUser:
+  Title: Aktivacija uporabnika
+  Description: Potrdite svojo e-pošto s spodnjo kodo in nastavite geslo.
+  CodeLabel: Koda
+  NewPasswordLabel: Novo geslo
+  NewPasswordConfirm: Potrditev gesla
+  NextButtonText: Naprej
+  ResendButtonText: Ponovno pošlji kodo
+
+InitMFAPrompt:
+  Title: Nastavitev 2-faktorske avtentikacije
+  Description: 2-faktorska avtentikacija vam zagotavlja dodatno varnost za vaš uporabniški račun. To zagotavlja, da imate samo vi dostop do svojega računa.
+  Provider0: Aplikacija za avtentikacijo (npr. Google/Microsoft Authenticator, Authy)
+  Provider1: Odvisno od naprave (npr. FaceID, Windows Hello, prstni odtis)
+  Provider3: OTP SMS
+  Provider4: OTP E-pošta
+  NextButtonText: Naprej
+  SkipButtonText: Preskoči
+
+InitMFAOTP:
+  Title: Preverjanje 2-faktorske avtentikacije
+  Description: Ustvarite svoj 2. faktor. Prenesite aplikacijo za avtentikacijo, če je še nimate.
+  OTPDescription: Skenirajte kodo z aplikacijo za avtentikacijo (npr. Google/Microsoft Authenticator, Authy) ali kopirajte skrivnost in vnesite ustvarjeno kodo spodaj.
+  SecretLabel: Skrivnost
+  CodeLabel: Koda
+  NextButtonText: Naprej
+  CancelButtonText: Prekliči
+
+InitMFAOTPSMS:
+  Title: Preverjanje 2-faktorske avtentikacije
+  DescriptionPhone: Ustvarite svoj 2. faktor. Vnesite svojo telefonsko številko za preverjanje.
+  DescriptionCode: Ustvarite svoj 2. faktor. Vnesite prejeto kodo za preverjanje vaše telefonske številke.
+  CountryCodeLabel: Država
+  PhoneLabel: Telefon
+  CodeLabel: Koda
+  EditButtonText: Uredi
+  ResendButtonText: Ponovno pošlji kodo
+  NextButtonText: Naprej
+
+InitMFAU2F:
+  Title: Dodajanje varnostnega ključa
+  Description: Varnostni ključ je metoda preverjanja, ki je lahko vgrajena v vaš telefon, uporablja Bluetooth ali se neposredno priključi v vrata USB vašega računalnika.
+  TokenNameLabel: Ime varnostnega ključa / naprave
+  NotSupported: WebAuthN ni podprt v vašem brskalniku. Poskrbite, da je posodobljen, ali uporabite drugega (npr. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Dodaj varnostni ključ
+  ErrorRetry: Poskusite znova, ustvarite nov izziv ali izberite drugo metodo.
+
+InitMFADone:
+  Title: 2. faktor preverjen
+  Description: Odlično! Uspešno ste nastavili 2-faktorsko avtentikacijo in tako naredili vaš račun veliko bolj varen. Faktor je treba vnesti ob vsaki prijavi.
+  NextButtonText: Naprej
+  CancelButtonText: Prekliči
+
+MFAProvider:
+  Provider0: Aplikacija za avtentikacijo (npr. Google/Microsoft Authenticator, Authy)
+  Provider1: Odvisno od naprave (npr. FaceID, Windows Hello, prstni odtis)
+  Provider3: OTP SMS
+  Provider4: OTP E-pošta
+  ChooseOther: ali izberite drugo možnost
+
+VerifyMFAOTP:
+  Title: Preverjanje 2. faktorja
+  Description: Preverite svoj drugi faktor
+  CodeLabel: Koda
+  NextButtonText: Naprej
+
+VerifyOTP:
+  Title: Preverjanje 2. faktorja
+  Description: Preverite svoj drugi faktor
+  CodeLabel: Koda
+  ResendButtonText: Ponovno pošlji kodo
+  NextButtonText: Naprej
+
+VerifyMFAU2F:
+  Title: Preverjanje 2-faktorske avtentikacije
+  Description: Preverite svoj 2. faktor z registrirano napravo (npr. FaceID, Windows Hello, prstni odtis)
+  NotSupported: WebAuthN ni podprt v vašem brskalniku. Poskrbite, da uporabljate najnovejšo različico, ali zamenjajte brskalnik z podprtim (Chrome, Safari, Firefox)
+  ErrorRetry: Poskusite znova, ustvarite novo zahtevo ali izberite drugo metodo.
+  ValidateTokenButtonText: Preveri 2. faktor
+
+Passwordless:
+  Title: Prijava brez gesla
+  Description: Prijavite se z metodami avtentikacije, ki jih zagotavlja vaša naprava, kot so FaceID, Windows Hello ali prstni odtis.
+  NotSupported: WebAuthN ni podprt v vašem brskalniku. Poskrbite, da je posodobljen, ali uporabite drugega (npr. Chrome, Safari, Firefox)
+  ErrorRetry: Poskusite znova, ustvarite nov izziv ali izberite drugo metodo.
+  LoginWithPwButtonText: Prijava z geslom
+  ValidateTokenButtonText: Prijava brez gesla
+
+PasswordlessPrompt:
+  Title: Nastavitev prijave brez gesla
+  Description: Ali želite nastaviti prijavo brez gesla? (Metode avtentikacije vaše naprave, kot so FaceID, Windows Hello ali prstni odtis)
+  DescriptionInit: Nastaviti morate prijavo brez gesla. Uporabite povezavo, ki ste jo prejeli, da registrirate svojo napravo.
+  PasswordlessButtonText: Brez gesla
+  NextButtonText: Naprej
+  SkipButtonText: Preskoči
+
+PasswordlessRegistration:
+  Title: Nastavitev prijave brez gesla
+  Description: Dodajte svojo avtentikacijo tako, da vnesete ime (npr. MojTelefon, MacBook itd.) in nato kliknete na spodnji gumb 'Registriraj brez gesla'.
+  TokenNameLabel: Ime naprave
+  NotSupported: WebAuthN ni podprt v vašem brskalniku. Poskrbite, da je posodobljen, ali uporabite drugega (npr. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Registriraj brez gesla
+  ErrorRetry: Poskusite znova, ustvarite nov izziv ali izberite drugo metodo.
+
+PasswordlessRegistrationDone:
+  Title: Prijava brez gesla nastavljena
+  Description: Naprava za prijavo brez gesla je bila uspešno dodana.
+  DescriptionClose: Zdaj lahko zaprete to okno.
+  NextButtonText: Naprej
+  CancelButtonText: Prekliči
+
+PasswordChange:
+  Title: Sprememba gesla
+  Description: Spremenite svoje geslo. Vnesite staro in novo geslo.
+  ExpiredDescription: Vaše geslo je poteklo in ga je treba spremeniti. Vnesite staro in novo geslo.
+  OldPasswordLabel: Staro geslo
+  NewPasswordLabel: Novo geslo
+  NewPasswordConfirmLabel: Potrditev gesla
+  CancelButtonText: Prekliči
+  NextButtonText: Naprej
+  Footer: Noga
+
+PasswordChangeDone:
+  Title: Sprememba gesla
+  Description: Vaše geslo je bilo uspešno spremenjeno.
+  NextButtonText: Naprej
+
+PasswordResetDone:
+  Title: Povezava za ponastavitev gesla poslana
+  Description: Preverite svojo e-pošto za ponastavitev gesla.
+  NextButtonText: Naprej
+
+EmailVerification:
+  Title: Preverjanje e-pošte
+  Description: Poslali smo vam e-poštno sporočilo za preverjanje vašega naslova. Vnesite kodo v spodnji obrazec.
+  CodeLabel: Koda
+  NextButtonText: Naprej
+  ResendButtonText: Ponovno pošlji kodo
+
+EmailVerificationDone:
+  Title: Preverjanje e-pošte
+  Description: Vaš e-poštni naslov je bil uspešno preverjen.
+  NextButtonText: Naprej
+  CancelButtonText: Prekliči
+  LoginButtonText: Prijava
+
+RegisterOption:
+  Title: Možnosti registracije
+  Description: Izberite način registracije
+  RegisterUsernamePasswordButtonText: Z uporabniškim imenom in geslom
+  ExternalLoginDescription: ali se registrirajte z zunanjim uporabnikom
+  LoginButtonText: Prijava
+
+RegistrationUser:
+  Title: Registracija
+  Description: Vnesite svoje uporabniške podatke. Vaš e-poštni naslov bo uporabljen kot prijavno ime.
+  DescriptionOrgRegister: Vnesite svoje uporabniške podatke.
+  EmailLabel: E-pošta
+  UsernameLabel: Uporabniško ime
+  FirstnameLabel: Ime
+  LastnameLabel: Priimek
+  LanguageLabel: Jezik
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Slovenian: Slovenščina
+  GenderLabel: Spol
+  Female: Ženski
+  Male: Moški
+  Diverse: raznolik/o / X
+  PasswordLabel: Geslo
+  PasswordConfirmLabel: Potrditev gesla
+  TosAndPrivacyLabel: Pogoji uporabe
+  TosConfirm: Sprejemam
+  TosLinkText: pogoje uporabe
+  PrivacyConfirm: Sprejemam
+  PrivacyLinkText: politiko zasebnosti
+  ExternalLogin: ali se registrirajte z zunanjim uporabnikom
+  BackButtonText: Prijava
+  NextButtonText: Naprej
+
+ExternalRegistrationUserOverview:
+  Title: Registracija zunanjega uporabnika
+  Description: Vaše uporabniške podatke smo prevzeli od izbranega ponudnika. Zdaj jih lahko spremenite ali dopolnite.
+  EmailLabel: E-pošta
+  UsernameLabel: Uporabniško ime
+  FirstnameLabel: Ime
+  LastnameLabel: Priimek
+  NicknameLabel: Vzdevek
+  PhoneLabel: Telefonska številka
+  LanguageLabel: Jezik
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Slovenian: Slovenščina
+  TosAndPrivacyLabel: Pogoji uporabe
+  TosConfirm: Sprejemam
+  TosLinkText: pogoje uporabe
+  PrivacyConfirm: Sprejemam
+  PrivacyLinkText: politiko zasebnosti
+  ExternalLogin: ali se registrirajte z zunanjim uporabnikom
+  BackButtonText: Nazaj
+  NextButtonText: Shrani
+
+RegistrationOrg:
+  Title: Registracija organizacije
+  Description: Vnesite ime organizacije in uporabniške podatke.
+  OrgNameLabel: Ime organizacije
+  EmailLabel: E-pošta
+  UsernameLabel: Uporabniško ime
+  FirstnameLabel: Ime
+  LastnameLabel: Priimek
+  PasswordLabel: Geslo
+  PasswordConfirmLabel: Potrditev gesla
+  TosAndPrivacyLabel: Pogoji uporabe
+  TosConfirm: Sprejemam
+  TosLinkText: pogoje uporabe
+  PrivacyConfirm: Sprejemam
+  PrivacyLinkText: politiko zasebnosti
+  SaveButtonText: Ustvari organizacijo
+
+LoginSuccess:
+  Title: Prijava uspešna
+  AutoRedirectDescription: Samodejno boste preusmerjeni nazaj v svojo aplikacijo. Če ne, kliknite na spodnji gumb. Nato lahko zaprete okno.
+  RedirectedDescription: Zdaj lahko zaprete to okno.
+  NextButtonText: Naprej
+
+LogoutDone:
+  Title: Odjavljeni
+  Description: Uspešno ste se odjavili.
+  LoginButtonText: Prijava
+
+LinkingUserPrompt:
+  Title: Obstoječ uporabnik najden
+  Description: "Ali želite povezati svoj obstoječi račun:"
+  LinkButtonText: Poveži
+  OtherButtonText: Druge možnosti
+
+LinkingUsersDone:
+  Title: Povezovanje uporabnika
+  Description: Uporabnik povezan.
+  CancelButtonText: Prekliči
+  NextButtonText: Naprej
+
+ExternalNotFound:
+  Title: Zunanji uporabnik ni najden
+  Description: Zunanji uporabnik ni bil najden. Ali želite povezati svojega uporabnika ali samodejno registrirati novega?
+  LinkButtonText: Poveži
+  AutoRegisterButtonText: Registracija
+  TosAndPrivacyLabel: Pogoji uporabe
+  TosConfirm: Sprejemam
+  TosLinkText: pogoje uporabe
+  PrivacyConfirm: Sprejemam
+  PrivacyLinkText: politiko zasebnosti
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Slovenian: Slovenščina
+DeviceAuth:
+  Title: Avtorizacija naprave
+  UserCode:
+    Label: Uporabniška koda
+    Description: Vnesite uporabniško kodo, prikazano na napravi.
+    ButtonNext: Naprej
+  Action:
+    Description: Odobrite dostop napravi.
+    GrantDevice: napravi boste odobrili
+    AccessToScopes: dostop do naslednjih obsegov
+    Button:
+      Allow: Dovoli
+      Deny: Zavrni
+  Done:
+    Description: Končano.
+    Approved: Avtorizacija naprave odobrena. Zdaj se lahko vrnete na napravo.
+    Denied: Avtorizacija naprave zavrnjena. Zdaj se lahko vrnete na napravo.
+
+Footer:
+  PoweredBy: Poganja
+  Tos: Pogoji uporabe
+  PrivacyPolicy: Politika zasebnosti
+  Help: Pomoč
+  SupportEmail: E-pošta za podporo
+
+SignIn: Prijava z {{.Provider}}
+
+Errors:
+  Internal: Prišlo je do notranje napake
+  AuthRequest:
+    NotFound: Zahteve za avtentikacijo ni mogoče najti
+    UserAgentNotCorresponding: Uporabniški agent se ne ujema
+    UserAgentNotFound: ID uporabniškega agenta ni bil najden
+    TokenNotFound: Žeton ni bil najden
+    RequestTypeNotSupported: Vrsta zahteve ni podprta
+    MissingParameters: Manjkajo zahtevani parametri
+  User:
+    NotFound: Uporabnika ni mogoče najti
+    AlreadyExists: Uporabnik že obstaja
+    Inactive: Uporabnik ni aktiven
+    NotFoundOnOrg: Uporabnika ni mogoče najti v izbrani organizaciji
+    NotAllowedOrg: Uporabnik ni član zahtevane organizacije
+    NotMatchingUserID: Uporabnik in uporabnik v zahtevi za avtentikacijo se ne ujemata
+    UserIDMissing: ID uporabnika je prazen
+    Invalid: Neveljavni uporabniški podatki
+    DomainNotAllowedAsUsername: Domena je že rezervirana in je ni mogoče uporabiti
+    NotAllowedToLink: Uporabnik ne sme biti povezan z zunanjim ponudnikom prijave
+    Profile:
+      NotFound: Profil ni bil najden
+      NotChanged: Profil ni bil spremenjen
+      Empty: Profil je prazen
+      FirstNameEmpty: Ime v profilu je prazno
+      LastNameEmpty: Priimek v profilu je prazen
+      IDMissing: ID profila manjka
+    Email:
+      NotFound: E-pošta ni bila najdena
+      Invalid: E-pošta je neveljavna
+      AlreadyVerified: E-pošta je že preverjena
+      NotChanged: E-pošta ni bila spremenjena
+      Empty: E-pošta je prazna
+      IDMissing: ID e-pošte manjka
+    Phone:
+      NotFound: Telefon ni bil najden
+      Invalid: Telefon je neveljaven
+      AlreadyVerified: Telefon je že preverjen
+      Empty: Telefon je prazen
+      NotChanged: Telefon ni bil spremenjen
+    Address:
+      NotFound: Naslov ni bil najden
+      NotChanged: Naslov ni bil spremenjen
+    Username:
+      AlreadyExists: Uporabniško ime je že zasedeno
+      Reserved: Uporabniško ime je že zasedeno
+      Empty: Uporabniško ime je prazno
+    Password:
+      ConfirmationWrong: Potrditev gesla je napačna
+      Empty: Geslo je prazno
+      Invalid: Geslo je neveljavno
+      InvalidAndLocked: Geslo je neveljavno in uporabnik je zaklenjen, obrnite se na svojega skrbnika.
+      NotChanged: Novo geslo ne sme biti enako trenutnemu geslu
+    UsernameOrPassword:
+      Invalid: Uporabniško ime ali geslo je neveljavno
+    PasswordComplexityPolicy:
+      NotFound: Politika gesel ni bila najdena
+      MinLength: Geslo je prekratko
+      HasLower: Geslo mora vsebovati malo črko
+      HasUpper: Geslo mora vsebovati veliko črko
+      HasNumber: Geslo mora vsebovati številko
+      HasSymbol: Geslo mora vsebovati simbol
+    Code:
+      Expired: Koda je potekla
+      Invalid: Koda je neveljavna
+      Empty: Koda je prazna
+      CryptoCodeNil: Kriptografska koda je prazna
+      NotFound: Kode ni mogoče najti
+      GeneratorAlgNotSupported: Nepodprt algoritem generatorja
+    EmailVerify:
+      UserIDEmpty: ID uporabnika je prazen
+    ExternalData:
+      CouldNotRead: Zunanjih podatkov ni bilo mogoče pravilno prebrati
+    MFA:
+      NoProviders: Ni razpoložljivih ponudnikov večfaktorske avtentikacije
+      OTP:
+        AlreadyReady: Večfaktorski OTP (enkratno geslo) je že nastavljen
+        NotExisting: Večfaktorski OTP (enkratno geslo) ne obstaja
+        InvalidCode: Neveljavna koda
+        NotReady: Večfaktorski OTP (enkratno geslo) ni pripravljen
+    Locked: Uporabnik je zaklenjen
+    SomethingWentWrong: Nekaj je šlo narobe
+    NotActive: Uporabnik ni aktiven
+    ExternalIDP:
+      IDPTypeNotImplemented: Vrsta IDP ni implementirana
+      NotAllowed: Zunanji ponudnik prijave ni dovoljen
+      IDPConfigIDEmpty: ID ponudnika identitete je prazen
+      ExternalUserIDEmpty: ID zunanjega uporabnika je prazen
+      UserDisplayNameEmpty: Prikazno ime uporabnika je prazno
+      NoExternalUserData: Podatki zunanjega uporabnika niso bili prejeti
+      CreationNotAllowed: Ustvarjanje novega uporabnika pri tem ponudniku ni dovoljeno
+      LinkingNotAllowed: Povezovanje uporabnika pri tem ponudniku ni dovoljeno
+      NoOptionAllowed: Pri tem ponudniku ni dovoljeno niti ustvarjanje niti povezovanje. Obrnite se na svojega skrbnika.
+      LoginFailedSwitchLocal: |
+        Prijava pri zunanjem IDP ni uspela. Vračanje na lokalno prijavo.
+
+        Podrobnosti napake: {{.Details}}
+    GrantRequired: Prijava ni mogoča. Uporabnik mora imeti vsaj eno pooblastilo na aplikaciji. Obrnite se na svojega skrbnika.
+    ProjectRequired: Prijava ni mogoča. Organizacija uporabnika mora biti pooblaščena za projekt. Obrnite se na svojega skrbnika.
+  IdentityProvider:
+    InvalidConfig: Konfiguracija ponudnika identitete je neveljavna
+  IAM:
+    LockoutPolicy:
+      NotExisting: Politika zaklepanja ne obstaja
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Registracija ni dovoljena
+  DeviceAuth:
+    NotExisting: Uporabniška koda ne obstaja
+
+optional: (neobvezno)

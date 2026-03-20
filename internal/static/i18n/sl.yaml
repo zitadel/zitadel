@@ -1,0 +1,1417 @@
+Errors:
+  Internal: "Prišlo je do notranje napake"
+  NoChangesFound: "Brez sprememb"
+  OriginNotAllowed: "Ta \"Origin\" ni dovoljen"
+  IDMissing: "ID manjka"
+  ResourceOwnerMissing: "Organizacija lastnika vira manjka"
+  RemoveFailed: "Ni bilo mogoče odstraniti"
+  ProjectionName:
+    Invalid: "Neveljavno ime projekcije"
+  Assets:
+    EmptyKey: "Ključ sredstva je prazen"
+    Store:
+      NotInitialized: "Shramba sredstev ni inicializirana"
+      NotConfigured: "Shramba sredstev ni konfigurirana"
+    Bucket:
+      Internal: "Notranja napaka pri ustvarjanju vedra"
+      AlreadyExists: "Vedro že obstaja"
+      CreateFailed: "Vedro ni bilo ustvarjeno"
+      ListFailed: "Veder ni bilo mogoče prebrati"
+      RemoveFailed: "Vedro ni bilo izbrisano"
+      SetPublicFailed: "Vedra ni bilo mogoče nastaviti kot javno"
+    Object:
+      PutFailed: "Objekt ni bil ustvarjen"
+      GetFailed: "Objekta ni bilo mogoče prebrati"
+      NotFound: "Objekta ni bilo mogoče najti"
+      PresignedTokenFailed: "Podpisanega žetona ni bilo mogoče ustvariti"
+      ListFailed: "Seznama objektov ni bilo mogoče prebrati"
+      RemoveFailed: "Objekta ni bilo mogoče odstraniti"
+  Limit:
+    ExceedsDefault: "Omejitev presega privzeto omejitev"
+  Limits:
+    NotFound: "Omejitve niso bile najdene"
+    NoneSpecified: "Nobena omejitev ni navedena"
+    Instance:
+      Blocked: "Instanca je blokirana"
+  Restrictions:
+    NoneSpecified: "Nobena omejitev ni navedena"
+    DefaultLanguageMustBeAllowed: "Privzeti jezik mora biti dovoljen"
+  Language:
+    NotParsed: "Jezika ni bilo mogoče razčleniti"
+    NotSupported: "Jezik ni podprt"
+    NotAllowed: "Jezik ni dovoljen"
+    Undefined: "Jezik ni definiran"
+    Duplicate: "Jeziki imajo podvojitve"
+  OIDCSettings:
+    NotFound: "Konfiguracija OIDC ni bila najdena"
+    AlreadyExists: "Konfiguracija OIDC že obstaja"
+  SecretGenerator:
+    AlreadyExists: "Generator skrivnosti že obstaja"
+    TypeMissing: "Vrsta generatorja skrivnosti manjka"
+    NotFound: "Generator skrivnosti ni bil najden"
+  SMSConfig:
+    NotFound: "Konfiguracija SMS ni bila najdena"
+    AlreadyActive: "Konfiguracija SMS je že aktivna"
+    AlreadyDeactivated: "Konfiguracija SMS je že deaktivirana"
+    NotExternalVerification: "Konfiguracija SMS ne podpira preverjanja kode"
+  SMTP:
+    NotEmailMessage: "sporočilo ni e-poštno sporočilo"
+    RequiredAttributes: "predmet, prejemniki in vsebina morajo biti nastavljeni, a nekateri ali vsi so prazni"
+    CouldNotSplit: "ni bilo mogoče ločiti gostitelja in vrat za povezavo na SMTP"
+    CouldNotDial: "ni bilo mogoče vzpostaviti stika s strežnikom SMTP, preverite vrata, težave s požarnim zidom..."
+    CouldNotDialTLS: "ni bilo mogoče vzpostaviti stika s strežnikom SMTP prek TLS, preverite vrata, težave s požarnim zidom..."
+    CouldNotCreateClient: "ni bilo mogoče ustvariti odjemalca SMTP"
+    CouldNotStartTLS: "ni bilo mogoče zagnati TLS"
+    CouldNotAuth: "ni bilo mogoče dodati avtentikacije SMTP, preverite, ali sta uporabniško ime in geslo pravilna; če sta pravilna, morda vaš ponudnik zahteva metodo avtentikacije, ki je Zitadel ne podpira"
+    CouldNotSetSender: "ni bilo mogoče nastaviti pošiljatelja"
+    CouldNotSetRecipient: "ni bilo mogoče nastaviti prejemnika"
+  SMTPConfig:
+    TestPassword: "Geslo za test ni bilo najdeno"
+    NotFound: "Konfiguracija SMTP ni bila najdena"
+    AlreadyExists: "Konfiguracija SMTP že obstaja"
+    AlreadyDeactivated: "Konfiguracija SMTP je že deaktivirana"
+    SenderAdressNotCustomDomain: "Naslov pošiljatelja mora biti konfiguriran kot domena po meri na instanci."
+    TestEmailNotFound: "E-poštni naslov za test ni bil najden"
+  Notification:
+    NoDomain: "Za sporočilo ni bila najdena nobena domena"
+  User:
+    NotFound: "Uporabnika ni mogoče najti"
+    AlreadyExists: "Uporabnik že obstaja"
+    NotFoundOnOrg: "Uporabnika ni mogoče najti v izbrani organizaciji"
+    NotAllowedOrg: "Uporabnik ni član zahtevane organizacije"
+    UserIDMissing: "ID uporabnika manjka"
+    UserIDWrong: "Uporabnik zahteve ni enak avtenticiranemu uporabniku"
+    DomainPolicyNil: "Organizacijska politika je prazna"
+    EmailAsUsernameNotAllowed: "E-pošta ni dovoljena kot uporabniško ime"
+    Invalid: "Uporabniški podatki so neveljavni"
+    DomainNotAllowedAsUsername: "Domena je že rezervirana in je ni mogoče uporabiti"
+    AlreadyInactive: "Uporabnik je že neaktiven"
+    NotInactive: "Uporabnik ni neaktiven"
+    CantDeactivateInitial: "Uporabnika v začetnem stanju je mogoče le izbrisati, ne deaktivirati"
+    ShouldBeActiveOrInitial: "Uporabnik ni aktiven ali v začetnem stanju"
+    AlreadyInitialised: "Uporabnik je že inicializiran"
+    NotInitialised: "Uporabnik še ni inicializiran"
+    NotLocked: "Uporabnik ni zaklenjen"
+    NoChanges: "Brez sprememb"
+    InitCodeNotFound: "Inicializacijska koda ni bila najdena"
+    UsernameNotChanged: "Uporabniško ime ni bilo spremenjeno"
+    InvalidURLTemplate: "Predloga URL je neveljavna"
+    Locked: "Uporabnik je zaklenjen"
+    Profile:
+      NotFound: "Profil ni bil najden"
+      NotChanged: "Profil ni bil spremenjen"
+      Empty: "Profil je prazen"
+      FirstNameEmpty: "Ime v profilu je prazno"
+      LastNameEmpty: "Priimek v profilu je prazen"
+      IDMissing: "ID profila manjka"
+    Email:
+      NotFound: "E-pošta ni bila najdena"
+      Invalid: "E-pošta je neveljavna"
+      AlreadyVerified: "E-pošta je že preverjena"
+      NotChanged: "E-pošta ni bila spremenjena"
+      Empty: "E-pošta je prazna"
+      IDMissing: "ID e-pošte manjka"
+    Phone:
+      NotFound: "Telefon ni bil najden"
+      Invalid: "Telefon je neveljaven"
+      AlreadyVerified: "Telefon je že preverjen"
+      Empty: "Telefon je prazen"
+      NotChanged: "Telefon ni bil spremenjen"
+      VerifyingRemovalIsNotSupported: "Preverjanje odstranitve telefona ni podprto"
+    Address:
+      NotFound: "Naslov ni bil najden"
+      NotChanged: "Naslov ni bil spremenjen"
+    Machine:
+      Key:
+        NotFound: "Ključ strojnega uporabnika ni bil najden"
+        AlreadyExisting: "Ključ strojnega uporabnika že obstaja"
+        Invalid: "Javni ključ ni veljaven javni ključ RSA v formatu PKIX s kodiranjem PEM"
+      Secret:
+        NotExisting: "Skrivnost ne obstaja"
+        Invalid: "Skrivnost je neveljavna"
+        CouldNotGenerate: "Skrivnosti ni bilo mogoče ustvariti"
+    PAT:
+      NotFound: "Osebni dostopni žeton ni bil najden"
+    Metadata:
+      Conflicting: "Metapodatki ne smejo biti nastavljeni tako na poljih uporabnika kot na poljih osebe"
+    NotHuman: "Uporabnik mora biti oseba"
+    NotMachine: "Uporabnik mora biti strojni"
+    WrongType: "Ni dovoljeno za to vrsto uporabnika"
+    NotAllowedToLink: "Uporabnik ne sme biti povezan z zunanjim ponudnikom prijave"
+    Username:
+      AlreadyExists: "Uporabniško ime je že zasedeno"
+      Reserved: "Uporabniško ime je že zasedeno"
+      Empty: "Uporabniško ime je prazno"
+    Code:
+      Empty: "Koda je prazna"
+      NotFound: "Koda ni bila najdena"
+      Expired: "Koda je potekla"
+      GeneratorAlgNotSupported: "Nepodprt algoritem generatorja"
+      Invalid: "Koda je neveljavna"
+    Password:
+      NotFound: "Geslo ni bilo najdeno"
+      Empty: "Geslo je prazno"
+      Invalid: "Geslo je neveljavno"
+      NotSet: "Uporabnik ni nastavil gesla"
+      NotChanged: "Novo geslo ne sme biti enako trenutnemu geslu"
+      NotSupported: "Kodiranje zgoščene vrednosti gesla ni podprto. Glejte https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"
+    PasswordComplexityPolicy:
+      NotFound: "Politika gesel ni bila najdena"
+      MinLength: "Geslo je prekratko"
+      MinLengthNotAllowed: "Navedena minimalna dolžina ni dovoljena"
+      HasLower: "Geslo mora vsebovati malo črko"
+      HasUpper: "Geslo mora vsebovati veliko črko"
+      HasNumber: "Geslo mora vsebovati številko"
+      HasSymbol: "Geslo mora vsebovati simbol"
+    ExternalIDP:
+      Invalid: "Zunanji IDP je neveljaven"
+      IDPConfigNotExisting: "Ponudnik IDP je neveljaven za to organizacijo"
+      NotAllowed: "Zunanji IDP ni dovoljen"
+      MinimumExternalIDPNeeded: "Dodati je treba vsaj enega IDP"
+      AlreadyExists: "Zunanji IDP je že zaseden"
+      NotFound: "Zunanji IDP ni bil najden"
+      LoginFailed: "Prijava pri zunanjem IDP ni uspela"
+    MFA:
+      OTP:
+        AlreadyReady: "Večfaktorski OTP (enkratno geslo) je že nastavljen"
+        NotExisting: "Večfaktorski OTP (enkratno geslo) ne obstaja"
+        NotReady: "Večfaktorski OTP (enkratno geslo) ni pripravljen"
+        InvalidCode: "Neveljavna koda"
+      U2F:
+        NotExisting: "U2F ne obstaja"
+      Passwordless:
+        NotExisting: "Ključ za prijavo ne obstaja"
+      RecoveryCodes:
+        Empty: "Koda za obnovitev je prazna"
+        InvalidCode: "Neveljavna koda za obnovitev"
+        MaxCountExceeded: "Preseženo največje število kod za obnovitev"
+        NotReady: "Kode za obnovitev niso pripravljene za uporabo"
+        ConfigInvalid: "Konfiguracija kod za obnovitev je neveljavna"
+    WebAuthN:
+      NotFound: "Žetona WebAuthN ni bilo mogoče najti"
+      BeginRegisterFailed: "Začetek registracije WebAuthN ni uspel"
+      MarshalError: "Napaka pri pretvorbi podatkov"
+      ErrorOnParseCredential: "Napaka pri razčlenjevanju podatkov o poverilnicah"
+      CreateCredentialFailed: "Napaka pri ustvarjanju poverilnic"
+      BeginLoginFailed: "Začetek prijave WebAuthN ni uspel"
+      ValidateLoginFailed: "Napaka pri preverjanju prijavnih poverilnic"
+      CloneWarning: "Poverilnice so morda klonirane"
+    RefreshToken:
+      Invalid: "Žeton za osvežitev je neveljaven"
+      NotFound: "Žeton za osvežitev ni bil najden"
+  Org:
+    AlreadyExists: "Ime ali ID organizacije je že zaseden/o"
+    Invalid: "Organizacija je neveljavna"
+    AlreadyDeactivated: "Organizacija je že deaktivirana"
+    AlreadyActive: "Organizacija je že aktivna"
+    Empty: "Organizacija je prazna"
+    NotFound: "Organizacija ni bila najdena"
+    NotChanged: "Organizacija ni bila spremenjena"
+    DefaultOrgNotDeletable: "Privzete organizacije ni mogoče izbrisati"
+    ZitadelOrgNotDeletable: "Organizacije s projektom Zitadel ni mogoče izbrisati"
+    InvalidDomain: "Neveljavna domena"
+    DomainMissing: "Domena manjka"
+    DomainNotOnOrg: "Domena ne obstaja v organizaciji"
+    DomainNotVerified: "Domena ni preverjena"
+    DomainAlreadyVerified: "Domena je že preverjena"
+    DomainVerificationTypeInvalid: "Vrsta preverjanja domene je neveljavna"
+    DomainVerificationMissing: "Preverjanje domene se še ni začelo"
+    DomainVerificationFailed: "Preverjanje domene ni uspelo"
+    DomainVerificationTXTNotFound: "Zapis TXT _zitadel-challenge ni bil najden za vašo domeno. Preverite, ali ste ga dodali na svoj strežnik DNS, ali počakajte, da se nov zapis razširi"
+    DomainVerificationTXTNoMatch: "Zapis TXT _zitadel-challenge je bil najden za vašo domeno, vendar ne vsebuje pravilnega besedila žetona. Preverite, ali ste dodali pravi žeton na strežnik DNS, ali počakajte, da se nov zapis razširi"
+    DomainVerificationHTTPNotFound: "Datoteka z izzivom ni bila najdena na pričakovanem URL-ju. Preverite, ali ste jo naložili na pravo mesto z dovoljenjem za branje"
+    DomainVerificationHTTPNoMatch: "Datoteka z izzivom je bila najdena na pričakovanem URL-ju, vendar ne vsebuje pravilnega besedila žetona. Preverite njeno vsebino"
+    DomainVerificationTimeout: "Pri poizvedovanju strežnika DNS je prišlo do časovne omejitve"
+    PrimaryDomainNotDeletable: "Domene organizacije ni mogoče izbrisati"
+    DomainNotFound: "Domena ni bila najdena"
+    MemberIDMissing: "ID člana manjka"
+    MemberNotFound: "Član organizacije ni bil najden"
+    InvalidMember: "Član organizacije je neveljaven"
+    UserIDMissing: "ID uporabnika manjka"
+    PolicyAlreadyExists: "Politika že obstaja"
+    PolicyNotExisting: "Politika ne obstaja"
+    IdpInvalid: "Konfiguracija IDP je neveljavna"
+    IdpNotExisting: "Konfiguracija IDP ne obstaja"
+    OIDCConfigInvalid: "Konfiguracija OIDC IDP je neveljavna"
+    IdpIsNotOIDC: "Konfiguracija IDP ni vrste OIDC"
+    Domain:
+      AlreadyExists: "Domena že obstaja"
+      InvalidCharacter: "Za domeno so dovoljeni samo alfanumerični znaki, . in -"
+      EmptyString: "Neveljavni nenumerični in nealfabetski znaki so bili zamenjani s praznimi presledki in rezultat domene je prazen niz"
+    LoginPolicy:
+      NotFound: "Politika prijave ni bila najdena"
+      Invalid: "Politika prijave je neveljavna"
+      RedirectURIInvalid: "Privzeti URI za preusmeritev je neveljaven"
+      NotExisting: "Politika prijave ne obstaja"
+      AlreadyExists: "Politika prijave že obstaja"
+      IdpProviderAlreadyExisting: "Ponudnik identitete že obstaja"
+      IdpProviderNotExisting: "Ponudnik identitete ne obstaja"
+      RegistrationNotAllowed: "Registracija ni dovoljena"
+      UsernamePasswordNotAllowed: "Prijava z uporabniškim imenom / geslom ni dovoljena"
+      MFA:
+        AlreadyExists: "Večfaktorska avtentikacija že obstaja"
+        NotExisting: "Večfaktorska avtentikacija ne obstaja"
+        Unspecified: "Večfaktorska avtentikacija je neveljavna"
+    MailTemplate:
+      NotFound: "Privzeta e-poštna predloga ni bila najdena"
+      NotChanged: "Privzeta e-poštna predloga ni bila spremenjena"
+      AlreadyExists: "Privzeta e-poštna predloga že obstaja"
+      Invalid: "Privzeta e-poštna predloga je neveljavna"
+    CustomMessageText:
+      NotFound: "Privzeto besedilo sporočila ni bilo najdeno"
+      NotChanged: "Privzeto besedilo sporočila ni bilo spremenjeno"
+      AlreadyExists: "Privzeto besedilo sporočila že obstaja"
+      Invalid: "Privzeto besedilo sporočila je neveljavno"
+    PasswordComplexityPolicy:
+      NotFound: "Politika zahtevnosti gesel ni bila najdena"
+      Empty: "Politika zahtevnosti gesel je prazna"
+      NotExisting: "Politika zahtevnosti gesel ne obstaja"
+      AlreadyExists: "Politika zahtevnosti gesel že obstaja"
+    PasswordLockoutPolicy:
+      NotFound: "Politika zaklepanja gesel ni bila najdena"
+      Empty: "Politika zaklepanja gesel je prazna"
+      NotExisting: "Politika zaklepanja gesel ne obstaja"
+      AlreadyExists: "Politika zaklepanja gesel že obstaja"
+    PasswordAgePolicy:
+      NotFound: "Politika starosti gesel ni bila najdena"
+      Empty: "Politika starosti gesel je prazna"
+      NotExisting: "Politika starosti gesel ne obstaja"
+      AlreadyExists: "Politika starosti gesel že obstaja"
+    NotificationPolicy:
+      NotFound: "Politika obvestil ni bila najdena"
+      NotChanged: "Politika obvestil ni bila spremenjena"
+      AlreadyExists: "Politika obvestil že obstaja"
+    LabelPolicy:
+      NotFound: "Politika zasebne oznake ni bila najdena"
+      NotChanged: "Politika zasebne oznake ni bila spremenjena"
+  Project:
+    ProjectIDMissing: "ID projekta manjka"
+    AlreadyExists: "Projekt že obstaja v organizaciji"
+    OrgNotExisting: "Organizacija ne obstaja"
+    UserNotExisting: "Uporabnik ne obstaja"
+    CouldNotGenerateClientSecret: "Skrivnosti odjemalca ni bilo mogoče ustvariti"
+    Invalid: "Projekt je neveljaven"
+    NotActive: "Projekt ni aktiven"
+    NotInactive: "Projekt ni deaktiviran"
+    NotFound: "Projekt ni bil najden"
+    UserIDMissing: "ID uporabnika manjka"
+    Member:
+      NotFound: "Član projekta ni bil najden"
+      Invalid: "Član projekta je neveljaven"
+      AlreadyExists: "Član projekta že obstaja"
+      NotExisting: "Član projekta ne obstaja"
+    MinimumOneRoleNeeded: "Dodati je treba vsaj eno vlogo"
+    Role:
+      AlreadyExists: "Vloga že obstaja"
+      Invalid: "Vloga je neveljavna"
+      NotExisting: "Vloga ne obstaja"
+    IDMissing: "ID manjka"
+    App:
+      AlreadyExists: "Aplikacija že obstaja"
+      NotFound: "Aplikacija ni bila najdena"
+      Invalid: "Aplikacija je neveljavna"
+      NotExisting: "Aplikacija ne obstaja"
+      NotActive: "Aplikacija ni aktivna"
+      NotInactive: "Aplikacija ni neaktivna"
+      OIDCConfigInvalid: "Konfiguracija OIDC je neveljavna"
+      APIConfigInvalid: "Konfiguracija API je neveljavna"
+      SAMLConfigInvalid: "Konfiguracija SAML je neveljavna"
+      IsNotOIDC: "Aplikacija ni vrste OIDC"
+      IsNotAPI: "Aplikacija ni vrste API"
+      IsNotSAML: "Aplikacija ni vrste SAML"
+      SAMLMetadataMissing: "Metapodatki SAML manjkajo"
+      SAMLMetadataFormat: "Napaka v formatu metapodatkov SAML"
+      SAMLEntityIDAlreadyExisting: "SAML EntityID že obstaja"
+      OIDCAuthMethodNoSecret: "Izbrana metoda avtentikacije OIDC ne zahteva skrivnosti"
+      APIAuthMethodNoSecret: "Izbrana metoda avtentikacije API ne zahteva skrivnosti"
+      AuthMethodNoPrivateKeyJWT: "Izbrana metoda avtentikacije ne zahteva ključa"
+      ClientSecretInvalid: "Skrivnost odjemalca je neveljavna"
+      Key:
+        AlreadyExisting: "Ključ aplikacije že obstaja"
+        NotFound: "Ključ aplikacije ni bil najden"
+    RequiredFieldsMissing: "Nekatera zahtevana polja manjkajo"
+    Grant:
+      AlreadyExists: "Pooblastilo projekta že obstaja"
+      NotFound: "Pooblastilo projekta ni bilo najdeno"
+      Invalid: "Pooblastilo projekta je neveljavno"
+      NotExisting: "Pooblastilo projekta ne obstaja"
+      HasNotExistingRole: "Ena vloga ne obstaja v projektu"
+      NotActive: "Pooblastilo projekta ni aktivno"
+      NotInactive: "Pooblastilo projekta ni neaktivno"
+  Instance:
+    AlreadyExists: "Instanca že obstaja"
+    NotChanged: "Instanca ni bila spremenjena"
+    NotFound: "Instanca ni bila najdena. Preverite, ali imate pravo domeno. Glejte https://zitadel.com/docs/apis/introduction#domains"
+    Member:
+      RolesNotChanged: "Vloge niso bile spremenjene"
+    MemberInvalid: "Član je neveljaven"
+    MemberAlreadyExisting: "Član že obstaja"
+    MemberNotExisting: "Član ne obstaja"
+    IDMissing: "ID manjka"
+    IdpInvalid: "Konfiguracija IDP je neveljavna"
+    IdpNotExisting: "Konfiguracija IDP ne obstaja"
+    OIDCConfigInvalid: "Konfiguracija OIDC IDP je neveljavna"
+    IdpIsNotOIDC: "Konfiguracija IDP ni vrste OIDC"
+    LoginPolicyInvalid: "Politika prijave je neveljavna"
+    LoginPolicyNotExisting: "Politika prijave ne obstaja"
+    IdpProviderInvalid: "Ponudnik identitete je neveljaven"
+    LoginPolicy:
+      NotFound: "Privzeta politika prijave ni bila najdena"
+      NotChanged: "Privzeta politika prijave ni bila spremenjena"
+      NotExisting: "Privzeta politika prijave ne obstaja"
+      AlreadyExists: "Privzeta politika prijave že obstaja"
+      RedirectURIInvalid: "Privzeti URI za preusmeritev je neveljaven"
+      MFA:
+        AlreadyExists: "Večfaktorska avtentikacija že obstaja"
+        NotExisting: "Večfaktorska avtentikacija ne obstaja"
+        Unspecified: "Večfaktorska avtentikacija je neveljavna"
+      IDP:
+        AlreadyExists: "Ponudnik identitete že obstaja"
+        NotExisting: "Ponudnik identitete ne obstaja"
+        Invalid: "Ponudnik identitete je neveljaven"
+      IDPConfig:
+        AlreadyExists: "Konfiguracija ponudnika identitete že obstaja"
+        NotInactive: "Konfiguracija ponudnika identitete ni neaktivna"
+        NotActive: "Konfiguracija ponudnika identitete ni aktivna"
+    LabelPolicy:
+      NotFound: "Privzeta politika zasebne oznake ni bila najdena"
+      NotChanged: "Privzeta politika zasebne oznake ni bila spremenjena"
+    MailTemplate:
+      NotFound: "Privzeta e-poštna predloga ni bila najdena"
+      NotChanged: "Privzeta e-poštna predloga ni bila spremenjena"
+      AlreadyExists: "Privzeta e-poštna predloga že obstaja"
+      Invalid: "Privzeta e-poštna predloga je neveljavna"
+    CustomMessageText:
+      NotFound: "Privzeto besedilo sporočila ni bilo najdeno"
+      NotChanged: "Privzeto besedilo sporočila ni bilo spremenjeno"
+      AlreadyExists: "Privzeto besedilo sporočila že obstaja"
+      Invalid: "Privzeto besedilo sporočila je neveljavno"
+    PasswordComplexityPolicy:
+      NotFound: "Privzeta politika zahtevnosti gesel ni bila najdena"
+      NotExisting: "Privzeta politika zahtevnosti gesel ne obstaja"
+      AlreadyExists: "Privzeta politika zahtevnosti gesel že obstaja"
+      Empty: "Privzeta politika zahtevnosti gesel je prazna"
+      NotChanged: "Privzeta politika zahtevnosti gesel ni bila spremenjena"
+    PasswordAgePolicy:
+      NotFound: "Privzeta politika starosti gesel ni bila najdena"
+      NotExisting: "Privzeta politika starosti gesel ne obstaja"
+      AlreadyExists: "Privzeta politika starosti gesel že obstaja"
+      Empty: "Privzeta politika starosti gesel je prazna"
+      NotChanged: "Privzeta politika starosti gesel ni bila spremenjena"
+    PasswordLockoutPolicy:
+      NotFound: "Privzeta politika zaklepanja gesel ni bila najdena"
+      NotExisting: "Privzeta politika zaklepanja gesel ne obstaja"
+      AlreadyExists: "Privzeta politika zaklepanja gesel že obstaja"
+      Empty: "Privzeta politika zaklepanja gesel je prazna"
+      NotChanged: "Privzeta politika zaklepanja gesel ni bila spremenjena"
+    DomainPolicy:
+      NotFound: "Politika domene organizacije ni bila najdena"
+      Empty: "Politika domene organizacije je prazna"
+      NotExisting: "Politika domene organizacije ne obstaja"
+      AlreadyExists: "Politika domene organizacije že obstaja"
+      NotChanged: "Politika domene organizacije ni bila spremenjena"
+    NotificationPolicy:
+      NotFound: "Privzeta politika obvestil ni bila najdena"
+      NotChanged: "Privzeta politika obvestil ni bila spremenjena"
+      AlreadyExists: "Privzeta politika obvestil že obstaja"
+  Policy:
+    AlreadyExists: "Politika že obstaja"
+    Label:
+      Invalid:
+        PrimaryColor: "Primarna barva ni veljavna vrednost barve Hex"
+        BackgroundColor: "Barva ozadja ni veljavna vrednost barve Hex"
+        WarnColor: "Opozorilna barva ni veljavna vrednost barve Hex"
+        FontColor: "Barva pisave ni veljavna vrednost barve Hex"
+        PrimaryColorDark: "Primarna barva (temni način) ni veljavna vrednost barve Hex"
+        BackgroundColorDark: "Barva ozadja (temni način) ni veljavna vrednost barve Hex"
+        WarnColorDark: "Opozorilna barva (temni način) ni veljavna vrednost barve Hex"
+        FontColorDark: "Barva pisave (temni način) ni veljavna vrednost barve Hex"
+  UserGrant:
+    AlreadyExists: "Pooblastilo uporabnika že obstaja"
+    NotFound: "Pooblastilo uporabnika ni bilo najdeno"
+    Invalid: "Pooblastilo uporabnika je neveljavno"
+    NotChanged: "Pooblastilo uporabnika ni bilo spremenjeno"
+    IDMissing: "ID manjka"
+    NoPermissionForProject: "Uporabnik nima dovoljenj za ta projekt"
+    RoleKeyNotFound: "Vloga ni bila najdena"
+  Member:
+    AlreadyExists: "Član že obstaja"
+  IDPConfig:
+    AlreadyExists: "Konfiguracija IDP s tem imenom že obstaja"
+    NotExisting: "Konfiguracija ponudnika identitete ne obstaja"
+  Changes:
+    NotFound: "Zgodovina ni bila najdena"
+    AuditRetention: "Zgodovina je zunaj obdobja hrambe revizijskega dnevnika"
+  Token:
+    NotFound: "Žeton ni bil najden"
+    Invalid: "Žeton je neveljaven"
+  UserSession:
+    NotFound: "Uporabniška seja ni bila najdena"
+  Key:
+    NotFound: "Ključ ni bil najden"
+    ExpireBeforeNow: "Datum poteka je v preteklosti"
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: "Večfaktorska avtentikacija je konfigurirana kot obvezna, vendar nobeni možni ponudniki niso konfigurirani. Obrnite se na svojega sistemskega skrbnika."
+  Step:
+    Started:
+      AlreadyExists: "Začetek koraka že obstaja"
+    Done:
+      AlreadyExists: "Konec koraka že obstaja"
+  CustomText:
+    AlreadyExists: "Besedilo po meri že obstaja"
+    Invalid: "Besedilo po meri je neveljavno"
+    NotFound: "Besedilo po meri ni bilo najdeno"
+  TranslationFile:
+    ReadError: "Napaka pri branju prevodne datoteke"
+    MergeError: "Prevodne datoteke ni bilo mogoče združiti s prevodi po meri"
+    NotFound: "Prevodna datoteka ne obstaja"
+  Metadata:
+    NotFound: "Metapodatki niso bili najdeni"
+    NoData: "Seznam metapodatkov je prazen"
+    Invalid: "Metapodatki so neveljavni"
+    KeyNotExisting: "Eden ali več ključev ne obstaja"
+  Action:
+    Invalid: "Akcija je neveljavna"
+    NotFound: "Akcija ni bila najdena"
+    NotActive: "Akcija ni aktivna"
+    NotInactive: "Akcija ni neaktivna"
+    MaxAllowed: "Dodatne aktivne akcije niso dovoljene"
+    NotEnabled: "Funkcija \"Action\" ni omogočena"
+  Flow:
+    FlowTypeMissing: "Vrsta toka manjka"
+    Empty: "Tok je že prazen"
+    WrongTriggerType: "Vrsta sprožilca je neveljavna"
+    NoChanges: "Brez sprememb"
+    ActionIDsNotExist: "ID-ji akcij ne obstajajo"
+  Query:
+    CloseRows: "Stavka SQL ni bilo mogoče zaključiti"
+    SQLStatement: "Stavka SQL ni bilo mogoče ustvariti"
+    InvalidRequest: "Zahteva je neveljavna"
+    TooManyNestingLevels: "Preveč ravni gnezdenja poizvedb (največ 20)"
+    LimitExceeded: "Omejitev presežena"
+  Quota:
+    AlreadyExists: "Kvota že obstaja za to enoto"
+    NotFound: "Kvota ni bila najdena za to enoto"
+    Invalid:
+      CallURL: "URL klica kvote je neveljaven"
+      Percent: "Odstotek kvote je manjši od 1"
+      Unimplemented: "Kvote niso implementirane za to enoto"
+      Amount: "Količina kvote je manjša od 1"
+      ResetInterval: "Interval ponastavitve kvote je krajši od minute"
+      Noop: "Neomejena kvota brez obvestil nima učinka"
+    Access:
+      Exhausted: "Kvota za avtenticirane zahteve je izčrpana"
+    Execution:
+      Exhausted: "Kvota za sekunde izvajanja je izčrpana"
+  LogStore:
+    Access:
+      StorageFailed: "Shranjevanje dnevnika dostopa v bazo podatkov ni uspelo"
+      ScanFailed: "Poizvedba o uporabi avtenticiranih zahtev ni uspela"
+    Execution:
+      StorageFailed: "Shranjevanje dnevnika izvajanja akcije v bazo podatkov ni uspelo"
+      ScanFailed: "Poizvedba o uporabi sekund izvajanja akcije ni uspela"
+  Session:
+    NotExisting: "Seja ne obstaja"
+    Terminated: "Seja je že zaključena"
+    Expired: "Seja je potekla"
+    PositiveLifetime: "Življenjska doba seje ne sme biti krajša od 0"
+    Token:
+      Invalid: "Žeton seje je neveljaven"
+    WebAuthN:
+      NoChallenge: "Seja brez izziva WebAuthN"
+  Intent:
+    IDPMissing: "ID IDP manjka v zahtevi"
+    IDPInvalid: "IDP je neveljaven za zahtevo"
+    ResponseInvalid: "Odgovor IDP je neveljaven"
+    MissingSingleMappingAttribute: "Odgovor IDP ne vsebuje atributa preslikave ali ima več kot eno vrednost"
+    SuccessURLMissing: "URL za uspeh manjka v zahtevi"
+    FailureURLMissing: "URL za neuspeh manjka v zahtevi"
+    StateMissing: "Parameter stanja manjka v zahtevi"
+    NotStarted: "Namera ni bila začeta ali je bila že zaključena"
+    NotSucceeded: "Namera ni uspela"
+    Expired: "Namera je potekla"
+    TokenCreationFailed: "Ustvarjanje žetona ni uspelo"
+    InvalidToken: "Žeton namere je neveljaven"
+    OtherUser: "Namera je namenjena drugemu uporabniku"
+  AuthRequest:
+    AlreadyExists: "Zahteva za avtentikacijo že obstaja"
+    NotExisting: "Zahteva za avtentikacijo ne obstaja"
+    WrongLoginClient: "Zahteva za avtentikacijo je bila ustvarjena z drugo prijavno aplikacijo"
+    AlreadyHandled: "Zahteva za avtentikacijo je bila že obdelana"
+  OIDCSession:
+    RefreshTokenInvalid: "Žeton za osvežitev je neveljaven"
+    Token:
+      Invalid: "Žeton je neveljaven"
+      Expired: "Žeton je potekel"
+    InvalidClient: "Žeton ni bil izdan za to aplikacijo"
+  SAMLRequest:
+    AlreadyExists: "Zahteva SAML že obstaja"
+    NotExisting: "Zahteva SAML ne obstaja"
+    WrongLoginClient: "Zahteva SAML je bila ustvarjena z drugo prijavno aplikacijo"
+    AlreadyHandled: "Zahteva SAML je bila že obdelana"
+  SAMLSession:
+    InvalidClient: "Odgovor SAML ni bil izdan za to aplikacijo"
+  DeviceAuth:
+    NotFound: "Zahteva za avtorizacijo naprave ne obstaja"
+    AlreadyHandled: "Zahteva za avtorizacijo naprave je bila že obdelana"
+  Feature:
+    NotExisting: "Funkcija ne obstaja"
+    TypeNotSupported: "Vrsta funkcije ni podprta"
+    InvalidValue: "Neveljavna vrednost za to funkcijo"
+  Target:
+    Invalid: "Cilj je neveljaven"
+    NoTimeout: "Cilj nima časovne omejitve"
+    InvalidURL: "Cilj ima neveljaven URL"
+    NotFound: "Cilj ni bil najden"
+    InvalidExpirationDate: "Datum poteka ključa mora biti v prihodnosti"
+    PublicKeyExpired: "Javni ključ cilja je potekel"
+    PublicKeyActive: "Aktivnega javnega ključa cilja ni mogoče izbrisati"
+    InvalidPublicKey: "Javni ključ je neveljaven. Biti mora javni ključ RSA ali ECDSA s kodiranjem PEM v formatu PKCS#8"
+  Execution:
+    ConditionInvalid: "Pogoj izvajanja je neveljaven"
+    Invalid: "Izvajanje je neveljavno"
+    NotFound: "Izvajanje ni bilo najdeno"
+    IncludeNotFound: "Vključitev ni bila najdena"
+    NoTargets: "Nobeni cilji niso definirani"
+    Failed: "Izvajanje ni uspelo"
+    ResponseIsNotValidJSON: "Odgovor ni veljaven JSON"
+    MissingEncryptionKey: "Za cilj ni bil najden šifrirni ključ"
+  UserSchema:
+    NotEnabled: "Funkcija \"User Schema\" ni omogočena"
+    Type:
+      Missing: "Vrsta uporabniške sheme manjka"
+      AlreadyExists: "Vrsta uporabniške sheme že obstaja"
+    Authenticator:
+      Invalid: "Neveljavna vrsta avtentikatorja"
+    NotActive: "Uporabniška shema ni aktivna"
+    NotInactive: "Uporabniška shema ni neaktivna"
+    NotExists: "Uporabniška shema ne obstaja"
+    ID:
+      Missing: "ID uporabniške sheme manjka"
+    Invalid: "Uporabniška shema je neveljavna"
+    Data:
+      Invalid: "Podatki so neveljavni za uporabniško shemo"
+  TokenExchange:
+    Token:
+      Missing: "Žeton manjka"
+      Invalid: "Žeton je neveljaven"
+      TypeMissing: "Vrsta žetona manjka"
+      TypeNotAllowed: "Vrsta žetona ni dovoljena"
+      TypeNotSupported: "Vrsta žetona ni podprta"
+      NotForAPI: "Prevzeti žetoni niso dovoljeni za API"
+    Impersonation:
+      PolicyDisabled: "Prevzemanje identitete je onemogočeno v varnostni politiki instance"
+  WebKey:
+    ActiveDelete: "Aktivnega spletnega ključa ni mogoče izbrisati"
+    Config: "Neveljavna konfiguracija spletnega ključa"
+    Duplicate: "ID spletnega ključa ni edinstven"
+    NoActive: "Noben aktiven spletni ključ ni bil najden"
+    NotFound: "Spletni ključ ni bil najden"
+  IDP:
+    InvalidSearchQuery: "Neveljavna iskalna poizvedba"
+    ClientIDMissing: "ClientID manjka"
+    TeamIDMissing: "TeamID manjka"
+    KeyIDMissing: "KeyID manjka"
+    PrivateKeyMissing: "Zasebni ključ manjka"
+    InvalidPrivateKey: "Neveljavna oblika zasebnega ključa"
+
+AggregateTypes:
+  action: "Akcija"
+  instance: "Instanca"
+  key_pair: "Par ključev"
+  org: "Organizacija"
+  project: "Projekt"
+  user: "Uporabnik"
+  usergrant: "Pooblastilo uporabnika"
+  quota: "Kvota"
+  feature: "Funkcija"
+  target: "Cilj"
+  execution: "Izvajanje"
+  user_schema: "Uporabniška shema"
+  auth_request: "Zahteva za avtentikacijo"
+  device_auth: "Avtorizacija naprave"
+  idpintent: "Namera IDP"
+  limits: "Omejitve"
+  milestone: "Mejnik"
+  oidc_session: "Seja OIDC"
+  restrictions: "Omejitve"
+  system: "Sistem"
+  session: "Seja"
+  web_key: "Spletni ključ"
+  saml_request: "Zahteva SAML"
+  saml_session: "Seja SAML"
+EventTypes:
+  execution:
+    set: "Izvajanje nastavljeno"
+    removed: "Izvajanje izbrisano"
+  target:
+    added: "Cilj ustvarjen"
+    changed: "Cilj spremenjen"
+    removed: "Cilj izbrisan"
+  user:
+    added: "Uporabnik dodan"
+    selfregistered: "Uporabnik se je registriral sam"
+    initialization:
+      code:
+        added: "Inicializacijska koda ustvarjena"
+        sent: "Inicializacijska koda poslana"
+      check:
+        succeeded: "Preverjanje inicializacije uspešno"
+        failed: "Preverjanje inicializacije neuspešno"
+    token:
+      added: "Dostopni žeton ustvarjen"
+      v2.added: "Dostopni žeton ustvarjen"
+      removed: "Dostopni žeton odstranjen"
+    impersonated: "Identiteta uporabnika prevzeta"
+    username:
+      reserved: "Uporabniško ime rezervirano"
+      released: "Uporabniško ime sproščeno"
+      changed: "Uporabniško ime spremenjeno"
+    email:
+      reserved: "E-poštni naslov rezerviran"
+      released: "E-poštni naslov sproščen"
+      changed: "E-poštni naslov spremenjen"
+      verified: "E-poštni naslov preverjen"
+      verification:
+        failed: "Preverjanje e-poštnega naslova neuspešno"
+      code:
+        added: "Koda za preverjanje e-poštnega naslova ustvarjena"
+        sent: "Koda za preverjanje e-poštnega naslova poslana"
+    machine:
+      added: "Strojni uporabnik dodan"
+      changed: "Strojni uporabnik spremenjen"
+      key:
+        added: "Ključ dodan"
+        removed: "Ključ odstranjen"
+      secret:
+        set: "Skrivnost nastavljena"
+        updated: "Zgoščena vrednost skrivnosti posodobljena"
+        removed: "Skrivnost odstranjena"
+        check:
+          succeeded: "Preverjanje skrivnosti uspešno"
+          failed: "Preverjanje skrivnosti neuspešno"
+    human:
+      added: "Oseba dodana"
+      selfregistered: "Oseba se je registrirala sama"
+      avatar:
+        added: "Avatar dodan"
+        removed: "Avatar odstranjen"
+      initialization:
+        code:
+          added: "Inicializacijska koda ustvarjena"
+          sent: "Inicializacijska koda poslana"
+        check:
+          succeeded: "Preverjanje inicializacije uspešno"
+          failed: "Preverjanje inicializacije neuspešno"
+      invite:
+        code:
+          added: "Koda povabila ustvarjena"
+          sent: "Koda povabila poslana"
+        check:
+          succeeded: "Preverjanje povabila uspešno"
+          failed: "Preverjanje povabila neuspešno"
+      username:
+        reserved: "Uporabniško ime rezervirano"
+        released: "Uporabniško ime sproščeno"
+      email:
+        changed: "E-poštni naslov spremenjen"
+        verified: "E-poštni naslov preverjen"
+        verification:
+          failed: "Preverjanje e-poštnega naslova neuspešno"
+        code:
+          added: "Koda za preverjanje e-poštnega naslova ustvarjena"
+          sent: "Koda za preverjanje e-poštnega naslova poslana"
+      password:
+        changed: "Geslo spremenjeno"
+        code:
+          added: "Koda za geslo ustvarjena"
+          sent: "Koda za geslo poslana"
+        check:
+          succeeded: "Preverjanje gesla uspešno"
+          failed: "Preverjanje gesla neuspešno"
+        change:
+          sent: "Sprememba gesla poslana"
+        hash:
+          updated: "Zgoščena vrednost gesla posodobljena"
+      externallogin:
+        check:
+          succeeded: "Zunanja prijava uspešna"
+      externalidp:
+        added: "Zunanji IDP dodan"
+        removed: "Zunanji IDP odstranjen"
+        cascade:
+          removed: "Zunanji IDP kaskadno odstranjen"
+        id:
+          migrated: "Zunanji ID uporabnika IDP je bil migriran"
+      phone:
+        changed: "Telefonska številka spremenjena"
+        verified: "Telefonska številka preverjena"
+        verification:
+          failed: "Preverjanje telefonske številke neuspešno"
+        code:
+          added: "Koda za telefonsko številko ustvarjena"
+          sent: "Koda za telefonsko številko poslana"
+        removed: "Telefonska številka odstranjena"
+      profile:
+        changed: "Profil uporabnika spremenjen"
+      address:
+        changed: "Naslov uporabnika spremenjen"
+      mfa:
+        otp:
+          added: "Večfaktorski OTP dodan"
+          verified: "Večfaktorski OTP preverjen"
+          removed: "Večfaktorski OTP odstranjen"
+          check:
+            succeeded: "Preverjanje večfaktorskega OTP uspešno"
+            failed: "Preverjanje večfaktorskega OTP neuspešno"
+          sms:
+            added: "Večfaktorski OTP SMS dodan"
+            removed: "Večfaktorski OTP SMS odstranjen"
+            code:
+              added: "Koda večfaktorskega OTP SMS dodana"
+              sent: "Koda večfaktorskega OTP SMS poslana"
+            check:
+              succeeded: "Preverjanje večfaktorskega OTP SMS uspešno"
+              failed: "Preverjanje večfaktorskega OTP SMS neuspešno"
+          email:
+            added: "Večfaktorski OTP e-pošta dodan"
+            removed: "Večfaktorski OTP e-pošta odstranjen"
+            code:
+              added: "Koda večfaktorskega OTP e-pošte dodana"
+              sent: "Koda večfaktorskega OTP e-pošte poslana"
+            check:
+              succeeded: "Preverjanje večfaktorskega OTP e-pošte uspešno"
+              failed: "Preverjanje večfaktorskega OTP e-pošte neuspešno"
+        u2f:
+          token:
+            added: "Žeton večfaktorskega U2F dodan"
+            verified: "Žeton večfaktorskega U2F preverjen"
+            removed: "Žeton večfaktorskega U2F odstranjen"
+            begin:
+              login: "Preverjanje večfaktorskega U2F začeto"
+            check:
+              succeeded: "Preverjanje večfaktorskega U2F uspešno"
+              failed: "Preverjanje večfaktorskega U2F neuspešno"
+            signcount:
+              changed: "Kontrolna vsota žetona večfaktorskega U2F je bila spremenjena"
+        init:
+          skipped: "Inicializacija večfaktorske avtentikacije preskočena"
+      passwordless:
+        token:
+          added: "Žeton za prijavo s ključem dodan"
+          verified: "Žeton za prijavo s ključem preverjen"
+          removed: "Žeton za prijavo s ključem odstranjen"
+          begin:
+            login: "Preverjanje prijave s ključem začeto"
+          check:
+            succeeded: "Preverjanje prijave s ključem uspešno"
+            failed: "Preverjanje prijave s ključem neuspešno"
+          signcount:
+            changed: "Kontrolna vsota žetona za prijavo s ključem je bila spremenjena"
+        initialization:
+          code:
+            added: "Inicializacijska koda za prijavo s ključem dodana"
+            sent: "Inicializacijska koda za prijavo s ključem poslana"
+            requested: "Inicializacijska koda za prijavo s ključem zahtevana"
+            check:
+              succeeded: "Inicializacijska koda za prijavo s ključem uspešno preverjena"
+              failed: "Preverjanje inicializacijske kode za prijavo s ključem neuspešno"
+      signed:
+        out: "Uporabnik odjavljen"
+      refresh:
+        token:
+          added: "Žeton za osvežitev ustvarjen"
+          renewed: "Žeton za osvežitev obnovljen"
+          removed: "Žeton za osvežitev odstranjen"
+    locked: "Uporabnik zaklenjen"
+    unlocked: "Uporabnik odklenjen"
+    deactivated: "Uporabnik deaktiviran"
+    reactivated: "Uporabnik reaktiviran"
+    removed: "Uporabnik odstranjen"
+    password:
+      changed: "Geslo spremenjeno"
+      code:
+        added: "Koda za geslo ustvarjena"
+        sent: "Koda za geslo poslana"
+      check:
+        succeeded: "Preverjanje gesla uspešno"
+        failed: "Preverjanje gesla neuspešno"
+    phone:
+      changed: "Telefonska številka spremenjena"
+      verified: "Telefonska številka preverjena"
+      verification:
+        failed: "Preverjanje telefonske številke neuspešno"
+      code:
+        added: "Koda za telefonsko številko ustvarjena"
+        sent: "Koda za telefonsko številko poslana"
+    profile:
+      changed: "Profil uporabnika spremenjen"
+    address:
+      changed: "Naslov uporabnika spremenjen"
+    mfa:
+      otp:
+        added: "Večfaktorski OTP dodan"
+        verified: "Večfaktorski OTP preverjen"
+        removed: "Večfaktorski OTP odstranjen"
+        check:
+          succeeded: "Preverjanje večfaktorskega OTP uspešno"
+          failed: "Preverjanje večfaktorskega OTP neuspešno"
+        init:
+          skipped: "Inicializacija večfaktorskega OTP preskočena"
+      init:
+        skipped: "Inicializacija večfaktorske avtentikacije preskočena"
+    signed:
+      out: "Uporabnik odjavljen"
+    grant:
+      added: "Pooblastilo dodano"
+      changed: "Pooblastilo spremenjeno"
+      removed: "Pooblastilo odstranjeno"
+      deactivated: "Pooblastilo deaktivirano"
+      reactivated: "Pooblastilo reaktivirano"
+      reserved: "Pooblastilo rezervirano"
+      released: "Pooblastilo sproščeno"
+      cascade:
+        removed: "Pooblastilo odstranjeno"
+        changed: "Pooblastilo spremenjeno"
+    metadata:
+      set: "Metapodatki uporabnika nastavljeni"
+      removed: "Metapodatki uporabnika odstranjeni"
+      removed.all: "Vsi metapodatki uporabnika odstranjeni"
+    domain:
+      claimed: "Domena prevzeta"
+      claimed.sent: "Obvestilo o prevzemu domene poslano"
+    pat:
+      added: "Osebni dostopni žeton dodan"
+      removed: "Osebni dostopni žeton odstranjen"
+  org:
+    added: "Organizacija dodana"
+    changed: "Organizacija spremenjena"
+    deactivated: "Organizacija deaktivirana"
+    reactivated: "Organizacija reaktivirana"
+    removed: "Organizacija odstranjena"
+    domain:
+      added: "Domena dodana"
+      verification:
+        added: "Preverjanje domene dodano"
+        failed: "Preverjanje domene neuspešno"
+      verified: "Domena preverjena"
+      removed: "Domena odstranjena"
+      primary:
+        set: "Domena organizacije nastavljena"
+      reserved: "Domena rezervirana"
+      released: "Domena sproščena"
+    name:
+      reserved: "Ime organizacije rezervirano"
+      released: "Ime organizacije sproščeno"
+    member:
+      added: "Član organizacije dodan"
+      changed: "Član organizacije spremenjen"
+      removed: "Član organizacije odstranjen"
+      cascade:
+        removed: "Član organizacije kaskadno odstranjen"
+    iam:
+      policy:
+        added: "Sistemska politika dodana"
+        changed: "Sistemska politika spremenjena"
+        removed: "Sistemska politika odstranjena"
+    idp:
+      config:
+        added: "Konfiguracija IDP dodana"
+        changed: "Konfiguracija IDP spremenjena"
+        removed: "Konfiguracija IDP odstranjena"
+        deactivated: "Konfiguracija IDP deaktivirana"
+        reactivated: "Konfiguracija IDP reaktivirana"
+      oidc:
+        config:
+          added: "Konfiguracija OIDC IDP dodana"
+          changed: "Konfiguracija OIDC IDP spremenjena"
+      saml:
+        config:
+          added: "Konfiguracija SAML IDP dodana"
+          changed: "Konfiguracija SAML IDP spremenjena"
+      jwt:
+        config:
+          added: "Konfiguracija JWT IDP dodana"
+          changed: "Konfiguracija JWT IDP spremenjena"
+    customtext:
+      set: "Besedilo po meri nastavljeno"
+      removed: "Besedilo po meri odstranjeno"
+      template:
+        removed: "Predloga besedila po meri odstranjena"
+    policy:
+      login:
+        added: "Politika prijave dodana"
+        changed: "Politika prijave spremenjena"
+        removed: "Politika prijave odstranjena"
+        idpprovider:
+          added: "Ponudnik identitete dodan v politiko prijave"
+          removed: "Ponudnik identitete odstranjen iz politike prijave"
+          cascade:
+            removed: "Ponudnik identitete kaskadno odstranjen iz politike prijave"
+        secondfactor:
+          added: "Drugi faktor dodan v politiko prijave"
+          removed: "Drugi faktor odstranjen iz politike prijave"
+        multifactor:
+          added: "Večfaktorska avtentikacija dodana v politiko prijave"
+          removed: "Večfaktorska avtentikacija odstranjena iz politike prijave"
+      password:
+        complexity:
+          added: "Politika zahtevnosti gesel dodana"
+          changed: "Politika zahtevnosti gesel spremenjena"
+          removed: "Politika zahtevnosti gesel odstranjena"
+        age:
+          added: "Politika starosti gesel dodana"
+          changed: "Politika starosti gesel spremenjena"
+          removed: "Politika starosti gesel odstranjena"
+        lockout:
+          added: "Politika zaklepanja gesel dodana"
+          changed: "Politika zaklepanja gesel spremenjena"
+          removed: "Politika zaklepanja gesel odstranjena"
+      label:
+        added: "Politika oznak dodana"
+        changed: "Politika oznak spremenjena"
+        activated: "Politika oznak aktivirana"
+        removed: "Politika oznak odstranjena"
+        logo:
+          added: "Logotip dodan v politiko oznak"
+          removed: "Logotip odstranjen iz politike oznak"
+          dark:
+            added: "Logotip (temni način) dodan v politiko oznak"
+            removed: "Logotip (temni način) odstranjen iz politike oznak"
+        icon:
+          added: "Ikona dodana v politiko oznak"
+          removed: "Ikona odstranjena iz politike oznak"
+          dark:
+            added: "Ikona (temni način) dodana v politiko oznak"
+            removed: "Ikona (temni način) odstranjena iz politike oznak"
+        font:
+          added: "Pisava dodana v politiko oznak"
+          removed: "Pisava odstranjena iz politike oznak"
+        assets:
+          removed: "Sredstva odstranjena iz politike oznak"
+      privacy:
+        added: "Politika zasebnosti in pogoji uporabe dodani"
+        changed: "Politika zasebnosti in pogoji uporabe spremenjeni"
+        removed: "Politika zasebnosti in pogoji uporabe odstranjeni"
+      domain:
+        added: "Politika domen dodana"
+        changed: "Politika domen spremenjena"
+        removed: "Politika domen odstranjena"
+      lockout:
+        added: "Politika zaklepanja dodana"
+        changed: "Politika zaklepanja spremenjena"
+        removed: "Politika zaklepanja odstranjena"
+      notification:
+        added: "Politika obvestil dodana"
+        changed: "Politika obvestil spremenjena"
+        removed: "Politika obvestil odstranjena"
+    flow:
+      trigger_actions:
+        set: "Akcija nastavljena"
+        cascade:
+          removed: "Akcije kaskadno odstranjene"
+        removed: "Akcije odstranjene"
+      cleared: "Tok počiščen"
+    mail:
+      template:
+        added: "E-poštna predloga dodana"
+        changed: "E-poštna predloga spremenjena"
+        removed: "E-poštna predloga odstranjena"
+      text:
+        added: "E-poštno besedilo dodano"
+        changed: "E-poštno besedilo spremenjeno"
+        removed: "E-poštno besedilo odstranjeno"
+    metadata:
+      removed: "Metapodatki odstranjeni"
+      removed.all: "Vsi metapodatki odstranjeni"
+      set: "Metapodatki nastavljeni"
+  project:
+    added: "Projekt dodan"
+    changed: "Projekt spremenjen"
+    deactivated: "Projekt deaktiviran"
+    reactivated: "Projekt reaktiviran"
+    removed: "Projekt odstranjen"
+    member:
+      added: "Član projekta dodan"
+      changed: "Član projekta spremenjen"
+      removed: "Član projekta odstranjen"
+      cascade:
+        removed: "Član projekta kaskadno odstranjen"
+    role:
+      added: "Vloga projekta dodana"
+      changed: "Vloga projekta spremenjena"
+      removed: "Vloga projekta odstranjena"
+    grant:
+      added: "Upravljalni dostop dodan"
+      changed: "Upravljalni dostop spremenjen"
+      removed: "Upravljalni dostop odstranjen"
+      deactivated: "Upravljalni dostop deaktiviran"
+      reactivated: "Upravljalni dostop reaktiviran"
+      cascade:
+        changed: "Upravljalni dostop spremenjen"
+      member:
+        added: "Član upravljalnega dostopa dodan"
+        changed: "Član upravljalnega dostopa spremenjen"
+        removed: "Član upravljalnega dostopa odstranjen"
+        cascade:
+          removed: "Član upravljalnega dostopa kaskadno odstranjen"
+    application:
+      added: "Aplikacija dodana"
+      changed: "Aplikacija spremenjena"
+      removed: "Aplikacija odstranjena"
+      deactivated: "Aplikacija deaktivirana"
+      reactivated: "Aplikacija reaktivirana"
+      oidc:
+        secret:
+          check:
+            succeeded: "Preverjanje skrivnosti odjemalca OIDC uspešno"
+            failed: "Preverjanje skrivnosti odjemalca OIDC neuspešno"
+        key:
+          added: "Ključ aplikacije OIDC dodan"
+          removed: "Ključ aplikacije OIDC odstranjen"
+      api:
+        secret:
+          check:
+            succeeded: "Preverjanje skrivnosti API uspešno"
+            failed: "Preverjanje skrivnosti API neuspešno"
+        key:
+          added: "Ključ aplikacije dodan"
+          removed: "Ključ aplikacije odstranjen"
+      config:
+        saml:
+          added: "Konfiguracija SAML dodana"
+          changed: "Konfiguracija SAML spremenjena"
+        oidc:
+          added: "Konfiguracija OIDC dodana"
+          changed: "Konfiguracija OIDC spremenjena"
+          secret:
+            changed: "Skrivnost OIDC spremenjena"
+            updated: "Zgoščena vrednost skrivnosti OIDC posodobljena"
+        api:
+          added: "Konfiguracija API dodana"
+          changed: "Konfiguracija API spremenjena"
+          secret:
+            changed: "Skrivnost API spremenjena"
+            updated: "Zgoščena vrednost skrivnosti API posodobljena"
+  policy:
+    password:
+      complexity:
+        added: "Politika zahtevnosti gesel dodana"
+        changed: "Politika zahtevnosti gesel spremenjena"
+      age:
+        added: "Politika starosti gesel dodana"
+        changed: "Politika starosti gesel spremenjena"
+      lockout:
+        added: "Politika zaklepanja gesel dodana"
+        changed: "Politika zaklepanja gesel spremenjena"
+  iam:
+    setup:
+      started: "Namestitev Zitadel začeta"
+      done: "Namestitev Zitadel končana"
+    global:
+      org:
+        set: "Globalna organizacija nastavljena"
+    project:
+      iam:
+        set: "Projekt Zitadel nastavljen"
+    member:
+      added: "Član Zitadel dodan"
+      changed: "Član Zitadel spremenjen"
+      removed: "Član Zitadel odstranjen"
+      cascade:
+        removed: "Član Zitadel kaskadno odstranjen"
+    idp:
+      config:
+        added: "Konfiguracija IDP dodana"
+        changed: "Konfiguracija IDP spremenjena"
+        removed: "Konfiguracija IDP odstranjena"
+        deactivated: "Konfiguracija IDP deaktivirana"
+        reactivated: "Konfiguracija IDP reaktivirana"
+      oidc:
+        config:
+          added: "Konfiguracija OIDC IDP dodana"
+          changed: "Konfiguracija OIDC IDP spremenjena"
+      saml:
+        config:
+          added: "Konfiguracija SAML IDP dodana"
+          changed: "Konfiguracija SAML IDP spremenjena"
+      jwt:
+        config:
+          added: "Konfiguracija JWT ponudnika identitete dodana"
+          changed: "Konfiguracija JWT ponudnika identitete odstranjena"
+    customtext:
+      set: "Besedilo nastavljeno"
+      removed: "Besedilo odstranjeno"
+    policy:
+      login:
+        added: "Privzeta politika prijave dodana"
+        changed: "Privzeta politika prijave spremenjena"
+        idpprovider:
+          added: "Ponudnik identitete dodan v privzeto politiko prijave"
+          removed: "Ponudnik identitete odstranjen iz privzete politike prijave"
+      label:
+        added: "Politika oznak dodana"
+        changed: "Politika oznak spremenjena"
+        activated: "Politika oznak aktivirana"
+        logo:
+          added: "Logotip dodan v politiko oznak"
+          removed: "Logotip odstranjen iz politike oznak"
+          dark:
+            added: "Logotip (temni način) dodan v politiko oznak"
+            removed: "Logotip (temni način) odstranjen iz politike oznak"
+        icon:
+          added: "Ikona dodana v politiko oznak"
+          removed: "Ikona odstranjena iz politike oznak"
+          dark:
+            added: "Ikona (temni način) dodana v politiko oznak"
+            removed: "Ikona (temni način) odstranjena iz politike oznak"
+        font:
+          added: "Pisava dodana v politiko oznak"
+          removed: "Pisava odstranjena iz politike oznak"
+        assets:
+          removed: "Sredstva odstranjena iz politike oznak"
+    default:
+      language:
+        set: "Privzeti jezik nastavljen"
+    oidc:
+      settings:
+        added: "Konfiguracija OIDC dodana"
+        changed: "Konfiguracija OIDC spremenjena"
+        removed: "Konfiguracija OIDC odstranjena"
+    secret:
+      generator:
+        added: "Generator skrivnosti dodan"
+        changed: "Generator skrivnosti spremenjen"
+        removed: "Generator skrivnosti odstranjen"
+    smtp:
+      config:
+        added: "Konfiguracija SMTP dodana"
+        changed: "Konfiguracija SMTP spremenjena"
+        activated: "Konfiguracija SMTP aktivirana"
+        deactivated: "Konfiguracija SMTP deaktivirana"
+        removed: "Konfiguracija SMTP odstranjena"
+        password:
+          changed: "Skrivnost konfiguracije SMTP spremenjena"
+    sms:
+      config:
+        twilio:
+          added: "Ponudnik SMS Twilio dodan"
+          changed: "Ponudnik SMS Twilio spremenjen"
+          token:
+            changed: "Žeton ponudnika SMS Twilio spremenjen"
+          removed: "Ponudnik SMS Twilio odstranjen"
+          activated: "Ponudnik SMS Twilio aktiviran"
+          deactivated: "Ponudnik SMS Twilio deaktiviran"
+  key_pair:
+    added: "Par ključev dodan"
+    certificate:
+      added: "Certifikat dodan"
+  action:
+    added: "Akcija dodana"
+    changed: "Akcija spremenjena"
+    deactivated: "Akcija deaktivirana"
+    reactivated: "Akcija reaktivirana"
+    removed: "Akcija odstranjena"
+  instance:
+    added: "Instanca dodana"
+    changed: "Instanca spremenjena"
+    customtext:
+      removed: "Besedilo po meri odstranjeno"
+      set: "Besedilo po meri nastavljeno"
+      template:
+        removed: "Predloga besedila po meri odstranjena"
+    default:
+      language:
+        set: "Privzeti jezik nastavljen"
+      org:
+        set: "Privzeta organizacija nastavljena"
+    domain:
+      added: "Domena dodana"
+      primary:
+        set: "Primarna domena nastavljena"
+      removed: "Domena odstranjena"
+    iam:
+      console:
+        set: "Aplikacija upravljalne konzole Zitadel nastavljena"
+      project:
+        set: "Projekt Zitadel nastavljen"
+    mail:
+      template:
+        added: "E-poštna predloga dodana"
+        changed: "E-poštna predloga spremenjena"
+      text:
+        added: "E-poštno besedilo dodano"
+        changed: "E-poštno besedilo spremenjeno"
+    member:
+      added: "Član instance dodan"
+      changed: "Član instance spremenjen"
+      removed: "Član instance odstranjen"
+      cascade:
+        removed: "Član instance kaskadno odstranjen"
+    notification:
+      provider:
+        debug:
+          fileadded: "Datotečni razhroščevalni ponudnik obvestil dodan"
+          filechanged: "Datotečni razhroščevalni ponudnik obvestil spremenjen"
+          fileremoved: "Datotečni razhroščevalni ponudnik obvestil odstranjen"
+          logadded: "Dnevniški razhroščevalni ponudnik obvestil dodan"
+          logchanged: "Dnevniški razhroščevalni ponudnik obvestil spremenjen"
+          logremoved: "Dnevniški razhroščevalni ponudnik obvestil odstranjen"
+    oidc:
+      settings:
+        added: "Nastavitve OIDC dodane"
+        changed: "Nastavitve OIDC spremenjene"
+    policy:
+      domain:
+        added: "Politika domen dodana"
+        changed: "Politika domen spremenjena"
+      label:
+        activated: "Politika oznak aktivirana"
+        added: "Politika oznak dodana"
+        assets:
+          removed: "Sredstvo iz politike oznak odstranjeno"
+        changed: "Politika oznak spremenjena"
+        font:
+          added: "Pisava dodana v politiko oznak"
+          removed: "Pisava odstranjena iz politike oznak"
+        icon:
+          added: "Ikona dodana v politiko oznak"
+          removed: "Ikona odstranjena iz politike oznak"
+          dark:
+            added: "Ikona dodana v temno politiko oznak"
+            removed: "Ikona odstranjena iz temne politike oznak"
+        logo:
+          added: "Logotip dodan v politiko oznak"
+          removed: "Logotip odstranjen iz politike oznak"
+          dark:
+            added: "Logotip dodan v temno politiko oznak"
+            removed: "Logotip odstranjen iz temne politike oznak"
+      lockout:
+        added: "Politika zaklepanja dodana"
+        changed: "Politika zaklepanja spremenjena"
+      login:
+        added: "Politika prijave dodana"
+        changed: "Politika prijave spremenjena"
+        idpprovider:
+          added: "Ponudnik identitete dodan v politiko prijave"
+          cascade:
+            removed: "Ponudnik identitete kaskadno odstranjen iz politike prijave"
+          removed: "Ponudnik identitete odstranjen iz politike prijave"
+        multifactor:
+          added: "Večfaktorska avtentikacija dodana v politiko prijave"
+          removed: "Večfaktorska avtentikacija odstranjena iz politike prijave"
+        secondfactor:
+          added: "Drugi faktor dodan v politiko prijave"
+          removed: "Drugi faktor odstranjen iz politike prijave"
+      password:
+        age:
+          added: "Politika starosti gesel dodana"
+          changed: "Politika starosti gesel spremenjena"
+        complexity:
+          added: "Politika zahtevnosti gesel dodana"
+          changed: "Politika zahtevnosti gesel odstranjena"
+      privacy:
+        added: "Politika zasebnosti dodana"
+        changed: "Politika zasebnosti spremenjena"
+      security:
+        set: "Varnostna politika nastavljena"
+    removed: "Instanca odstranjena"
+    secret:
+      generator:
+        added: "Generator skrivnosti dodan"
+        changed: "Generator skrivnosti spremenjen"
+        removed: "Generator skrivnosti odstranjen"
+    sms:
+      configtwilio:
+        activated: "Konfiguracija SMS Twilio aktivirana"
+        added: "Konfiguracija SMS Twilio dodana"
+        changed: "Konfiguracija SMS Twilio spremenjena"
+        deactivated: "Konfiguracija SMS Twilio deaktivirana"
+        removed: "Konfiguracija SMS Twilio odstranjena"
+        token:
+          changed: "Žeton konfiguracije SMS Twilio spremenjen"
+    smtp:
+      config:
+        added: "Konfiguracija SMTP dodana"
+        changed: "Konfiguracija SMTP spremenjena"
+        activated: "Konfiguracija SMTP aktivirana"
+        deactivated: "Konfiguracija SMTP deaktivirana"
+        password:
+          changed: "Geslo konfiguracije SMTP spremenjeno"
+        removed: "Konfiguracija SMTP odstranjena"
+  user_schema:
+    created: "Uporabniška shema ustvarjena"
+    updated: "Uporabniška shema posodobljena"
+    deactivated: "Uporabniška shema deaktivirana"
+    reactivated: "Uporabniška shema reaktivirana"
+    deleted: "Uporabniška shema izbrisana"
+    user:
+      created: "Uporabnik ustvarjen"
+      updated: "Uporabnik posodobljen"
+      deleted: "Uporabnik izbrisan"
+      email:
+        updated: "E-poštni naslov spremenjen"
+        verified: "E-poštni naslov preverjen"
+        verification:
+          failed: "Preverjanje e-poštnega naslova neuspešno"
+        code:
+          added: "Koda za preverjanje e-poštnega naslova ustvarjena"
+          sent: "Koda za preverjanje e-poštnega naslova poslana"
+      phone:
+        updated: "Telefonska številka spremenjena"
+        verified: "Telefonska številka preverjena"
+        verification:
+          failed: "Preverjanje telefonske številke neuspešno"
+        code:
+          added: "Koda za preverjanje telefonske številke ustvarjena"
+          sent: "Koda za preverjanje telefonske številke poslana"
+  web_key:
+    added: "Spletni ključ dodan"
+    activated: "Spletni ključ aktiviran"
+    deactivated: "Spletni ključ deaktiviran"
+    removed: "Spletni ključ odstranjen"
+Application:
+  OIDC:
+    UnsupportedVersion: "Vaša različica OIDC ni podprta"
+    V1:
+      NotCompliant: "Vaša konfiguracija ni skladna in odstopa od standarda OIDC 1.0."
+      NoRedirectUris: "Registriran mora biti vsaj en URI za preusmeritev."
+      NotAllCombinationsAreAllowed: "Konfiguracija je skladna, vendar niso dovoljene vse možne kombinacije."
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: "Vrsta odobritve \"code\" dovoljuje le http URI-je za preusmeritev za vrsto aplikacije \"web\"."
+          CustomOnlyForNative: "Vrsta odobritve \"code\" dovoljuje le lastne URI-je za preusmeritev za vrsto aplikacije \"native\" (npr. imeaplikacije://)"
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: "Vrsta odobritve implicit ne dovoljuje lastnih URI-jev za preusmeritev"
+          HttpNotAllowed: "Vrsta odobritve implicit ne dovoljuje http URI-jev za preusmeritev"
+          HttpLocalhostOnlyForNative: "URI za preusmeritev http://localhost je dovoljen samo za izvorne aplikacije."
+      Native:
+        AuthMethodType:
+          NotNone: "Izvorne aplikacije naj imajo vrsto metode avtentikacije none."
+        RedirectUris:
+          MustBeHttpLocalhost: "URI-ji za preusmeritev se morajo začeti z vašim lastnim protokolom, http://127.0.0.1, http://[::1] ali http://localhost."
+      UserAgent:
+        AuthMethodType:
+          NotNone: "Aplikacija uporabniškega agenta naj ima vrsto metode avtentikacije none."
+      GrantType:
+        Refresh:
+          NoAuthCode: "Žeton za osvežitev je dovoljen samo v kombinaciji z avtorizacijsko kodo."
+Action:
+  Flow:
+    Type:
+      Unspecified: "Nedoločeno"
+      ExternalAuthentication: "Zunanja avtentikacija"
+      CustomiseToken: "Dopolnitev žetona"
+      InternalAuthentication: "Notranja avtentikacija"
+      CustomizeSAMLResponse: "Dopolnitev SAMLResponse"
+  TriggerType:
+    Unspecified: "Nedoločeno"
+    PostAuthentication: "Po avtentikaciji"
+    PreCreation: "Pred ustvarjanjem"
+    PostCreation: "Po ustvarjanju"
+    PreUserinfoCreation: "Pred ustvarjanjem uporabniških informacij"
+    PreAccessTokenCreation: "Pred ustvarjanjem dostopnega žetona"
+    PreSAMLResponseCreation: "Pred ustvarjanjem SAMLResponse"
