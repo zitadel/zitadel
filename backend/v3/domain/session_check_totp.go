@@ -20,12 +20,11 @@ type CheckTOTPType struct {
 
 type TOTPCheckCommand struct {
 	CheckTOTP           *CheckTOTPType
-	tarpitFunc          tarpitFn
-	validateFunc        totpValidateFn
-	encryptionAlgorithm crypto.EncryptionAlgorithm
-
-	sessionID  string
-	instanceID string
+	TarpitFunc          tarpitFn
+	ValidateFunc        totpValidateFn
+	EncryptionAlgorithm crypto.EncryptionAlgorithm
+	SessionID           string
+	InstanceID          string
 
 	FetchedUser User
 
@@ -53,11 +52,11 @@ func NewTOTPCheckCommand(sessionID, instanceID string, tarpitFunc tarpitFn, totp
 
 	return &TOTPCheckCommand{
 		CheckTOTP:           request,
-		tarpitFunc:          tf,
-		encryptionAlgorithm: ea,
-		sessionID:           sessionID,
-		instanceID:          instanceID,
-		validateFunc:        totpValidateFunc,
+		TarpitFunc:          tf,
+		EncryptionAlgorithm: ea,
+		SessionID:           sessionID,
+		InstanceID:          instanceID,
+		ValidateFunc:        totpValidateFunc,
 	}
 }
 
@@ -80,9 +79,9 @@ func (t *TOTPCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([]even
 
 	if t.IsUserLocked {
 		toReturn[1] = user.NewUserLockedEvent(ctx, userAgg)
-		toReturn = append(toReturn, session.NewTOTPCheckedEvent(ctx, &session.NewAggregate(t.sessionID, t.instanceID).Aggregate, t.CheckedAt))
+		toReturn = append(toReturn, session.NewTOTPCheckedEvent(ctx, &session.NewAggregate(t.SessionID, t.InstanceID).Aggregate, t.CheckedAt))
 	} else {
-		toReturn[1] = session.NewTOTPCheckedEvent(ctx, &session.NewAggregate(t.sessionID, t.instanceID).Aggregate, t.CheckedAt)
+		toReturn[1] = session.NewTOTPCheckedEvent(ctx, &session.NewAggregate(t.SessionID, t.InstanceID).Aggregate, t.CheckedAt)
 	}
 
 	return toReturn, nil
@@ -102,7 +101,7 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 	if verifyErr == nil {
 		t.CheckedAt = time.Now()
 		rowCount, err := humanRepo.Update(ctx, opts.DB(),
-			humanRepo.PrimaryKeyCondition(t.instanceID, t.FetchedUser.ID),
+			humanRepo.PrimaryKeyCondition(t.InstanceID, t.FetchedUser.ID),
 			humanRepo.SetLastSuccessfulTOTPCheck(t.CheckedAt),
 		)
 		if err := handleUpdateError(err, 1, rowCount, "DOM-aoMAzO", "user"); err != nil {
@@ -110,7 +109,7 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 		}
 
 		rowCount, err = sessionRepo.Update(ctx, opts.DB(),
-			sessionRepo.PrimaryKeyCondition(t.instanceID, t.sessionID),
+			sessionRepo.PrimaryKeyCondition(t.InstanceID, t.SessionID),
 			sessionRepo.SetFactor(&SessionFactorTOTP{LastVerifiedAt: t.CheckedAt}),
 		)
 		if err := handleUpdateError(err, 1, rowCount, "DOM-ymhCTD", "session"); err != nil {
@@ -125,7 +124,7 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 	changes := make(database.Changes, 1, 2)
 	changes[0] = humanRepo.IncrementTOTPFailedAttempts()
 
-	policy, err := getLockoutPolicy(ctx, opts.DB(), opts.lockoutSettingRepo, t.instanceID, t.FetchedUser.OrganizationID)
+	policy, err := getLockoutPolicy(ctx, opts.DB(), opts.lockoutSettingRepo, t.InstanceID, t.FetchedUser.OrganizationID)
 	if err != nil {
 		return err
 	}
@@ -137,20 +136,20 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 		t.IsUserLocked = true
 	}
 
-	rowCount, err := humanRepo.Update(ctx, opts.DB(), humanRepo.PrimaryKeyCondition(t.instanceID, t.FetchedUser.ID), changes)
+	rowCount, err := humanRepo.Update(ctx, opts.DB(), humanRepo.PrimaryKeyCondition(t.InstanceID, t.FetchedUser.ID), changes)
 	if err := handleUpdateError(err, 1, rowCount, "DOM-lQLpIa", "user"); err != nil {
 		return err
 	}
 
 	rowCount, err = sessionRepo.Update(ctx, opts.DB(),
-		sessionRepo.PrimaryKeyCondition(t.instanceID, t.sessionID),
+		sessionRepo.PrimaryKeyCondition(t.InstanceID, t.SessionID),
 		sessionRepo.SetFactor(&SessionFactorTOTP{LastVerifiedAt: t.CheckedAt}),
 	)
 	if err := handleUpdateError(err, 1, rowCount, "DOM-rSa1yU", "session"); err != nil {
 		return err
 	}
 
-	t.tarpitFunc(uint64(t.FetchedUser.Human.TOTP.FailedAttempts + 1))
+	t.TarpitFunc(uint64(t.FetchedUser.Human.TOTP.FailedAttempts + 1))
 
 	// TODO(IAM-Marco): The error returned here will block the transaction and stop events from being emitted.
 	// This error is functional so it should be returned AND the transaction should succeed. How can we fix it?
@@ -168,17 +167,17 @@ func (t *TOTPCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 		return nil
 	}
 
-	if t.sessionID == "" {
+	if t.SessionID == "" {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-ZNWO80", "Errors.Missing.SessionID")
 	}
-	if t.instanceID == "" {
+	if t.InstanceID == "" {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-47G8S3", "Errors.Missing.InstanceID")
 	}
 
 	sessionRepo := opts.sessionRepo
 	userRepo := opts.userRepo
 
-	session, err := sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.PrimaryKeyCondition(t.instanceID, t.sessionID)))
+	session, err := sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.PrimaryKeyCondition(t.InstanceID, t.SessionID)))
 	if err := handleGetError(err, "DOM-e4OuhO", "session"); err != nil {
 		return err
 	}
@@ -186,7 +185,7 @@ func (t *TOTPCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-hord0Z", "Errors.User.UserIDMissing")
 	}
 
-	user, err := userRepo.Get(ctx, opts.DB(), database.WithCondition(userRepo.PrimaryKeyCondition(t.instanceID, session.UserID)))
+	user, err := userRepo.Get(ctx, opts.DB(), database.WithCondition(userRepo.PrimaryKeyCondition(t.InstanceID, session.UserID)))
 	if err := handleGetError(err, "DOM-PZvWq0", "user"); err != nil {
 		return err
 	}
@@ -205,12 +204,12 @@ func (t *TOTPCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 }
 
 func (t *TOTPCheckCommand) verifyTOTP(existingTOTPSecret *crypto.CryptoValue) error {
-	decryptedSecret, err := crypto.DecryptString(existingTOTPSecret, t.encryptionAlgorithm)
+	decryptedSecret, err := crypto.DecryptString(existingTOTPSecret, t.EncryptionAlgorithm)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "DOM-Yqhggx", "failed decrypting TOTP secret")
 	}
 
-	isValid := t.validateFunc(t.CheckTOTP.Code, decryptedSecret)
+	isValid := t.ValidateFunc(t.CheckTOTP.Code, decryptedSecret)
 	if !isValid {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-o5cVir", "Errors.User.MFA.OTP.InvalidCode")
 	}

@@ -32,36 +32,32 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 	notFoundErr := database.NewNoRowFoundError(nil)
 
 	tt := []struct {
-		testName      string
-		sessionRepo   func(ctrl *gomock.Controller) domain.SessionRepository
-		userRepo      func(ctrl *gomock.Controller) domain.UserRepository
-		checkTOTP     *domain.CheckTOTPType
-		sessionID     string
-		instanceID    string
+		testName    string
+		sessionRepo func(ctrl *gomock.Controller) domain.SessionRepository
+		userRepo    func(ctrl *gomock.Controller) domain.UserRepository
+		cmd         *domain.TOTPCheckCommand
+
 		expectedError error
 		expectedUser  domain.User
 	}{
 		{
 			testName:      "when checkTOTP is nil should return no error",
-			checkTOTP:     nil,
+			cmd:           domain.NewTOTPCheckCommand("", "", nil, nil, nil, nil),
 			expectedError: nil,
 		},
 		{
 			testName:      "when session ID is not set should return error",
-			checkTOTP:     &domain.CheckTOTPType{},
+			cmd:           domain.NewTOTPCheckCommand("", "", nil, nil, nil, &domain.CheckTOTPType{}),
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-ZNWO80", "Errors.Missing.SessionID"),
 		},
 		{
 			testName:      "when instance ID is not set should return error",
-			sessionID:     "session-1",
-			checkTOTP:     &domain.CheckTOTPType{},
+			cmd:           domain.NewTOTPCheckCommand("session-1", "", nil, nil, nil, &domain.CheckTOTPType{}),
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-47G8S3", "Errors.Missing.InstanceID"),
 		},
 		{
-			testName:   "when retrieving session fails should return error",
-			checkTOTP:  &domain.CheckTOTPType{Code: "123456"},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
+			testName: "when retrieving session fails should return error",
+			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
@@ -74,10 +70,8 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(sessionGetErr, "DOM-e4OuhO", "failed fetching session"),
 		},
 		{
-			testName:   "when session not found should return not found error",
-			checkTOTP:  &domain.CheckTOTPType{Code: "123456"},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
+			testName: "when session not found should return not found error",
+			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
@@ -90,10 +84,8 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowNotFound(notFoundErr, "DOM-e4OuhO", "session not found"),
 		},
 		{
-			testName:   "when session userID is empty should return precondition failed error",
-			checkTOTP:  &domain.CheckTOTPType{Code: "123456"},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
+			testName: "when session userID is empty should return precondition failed error",
+			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
@@ -106,10 +98,8 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-hord0Z", "Errors.User.UserIDMissing"),
 		},
 		{
-			testName:   "when retrieving user fails should return error",
-			checkTOTP:  &domain.CheckTOTPType{Code: "123456"},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
+			testName: "when retrieving user fails should return error",
+			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
@@ -131,10 +121,8 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(userGetErr, "DOM-PZvWq0", "failed fetching user"),
 		},
 		{
-			testName:   "when user not found should return not found error",
-			checkTOTP:  &domain.CheckTOTPType{Code: "123456"},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
+			testName: "when user not found should return not found error",
+			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
@@ -156,10 +144,8 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowNotFound(notFoundErr, "DOM-PZvWq0", "user not found"),
 		},
 		{
-			testName:   "when user is not human should return precondition failed error",
-			checkTOTP:  &domain.CheckTOTPType{Code: "123456"},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
+			testName: "when user is not human should return precondition failed error",
+			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
@@ -181,10 +167,8 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-zzv1MO", "user not human"),
 		},
 		{
-			testName:   "when user is locked should return precondition failed error",
-			checkTOTP:  &domain.CheckTOTPType{Code: "123456"},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
+			testName: "when user is locked should return precondition failed error",
+			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
@@ -209,10 +193,8 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-gM4SUh", "Errors.User.Locked"),
 		},
 		{
-			testName:   "when all validations pass should return no error and set user",
-			checkTOTP:  &domain.CheckTOTPType{Code: "123456"},
-			sessionID:  "session-1",
-			instanceID: "instance-1",
+			testName: "when all validations pass should return no error and set user",
+			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
@@ -258,7 +240,6 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
 
-			cmd := domain.NewTOTPCheckCommand(tc.sessionID, tc.instanceID, nil, nil, nil, tc.checkTOTP)
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),
 			}
@@ -271,11 +252,11 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 				domain.WithUserRepo(tc.userRepo(ctrl))(opts)
 			}
 
-			err := cmd.Validate(t.Context(), opts)
+			err := tc.cmd.Validate(t.Context(), opts)
 			assert.ErrorIs(t, err, tc.expectedError)
 
 			if tc.expectedError == nil {
-				assert.Equal(t, tc.expectedUser, cmd.FetchedUser)
+				assert.Equal(t, tc.expectedUser, tc.cmd.FetchedUser)
 			}
 		})
 	}
@@ -291,36 +272,37 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 
 	tt := []struct {
 		testName           string
-		checkTOTP          *domain.CheckTOTPType
-		fetchedUser        domain.User
+		cmd                *domain.TOTPCheckCommand
+		encryptionAlgo     func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm
 		userRepo           func(ctrl *gomock.Controller) domain.HumanUserRepository
 		sessionRepo        func(ctrl *gomock.Controller) domain.SessionRepository
 		lockoutSettingRepo func(ctrl *gomock.Controller) domain.LockoutSettingsRepository
-		tarpitFunc         func(uint64)
-		validateFunc       func(string, string) bool
-		encryptionAlgo     func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm
 		expectedError      error
 		expectedSuccess    bool
 		expectedLocked     bool
 	}{
 		{
 			testName:        "when checkTOTP is nil should return no error",
-			checkTOTP:       nil,
+			cmd:             &domain.TOTPCheckCommand{},
 			expectedError:   nil,
 			expectedSuccess: false,
 		},
 		{
-			testName:  "when TOTP verification succeeds should update user and session",
-			checkTOTP: &domain.CheckTOTPType{Code: "123456"},
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
-				Human: &domain.HumanUser{
-					TOTP: &domain.HumanTOTP{
-						Secret: &crypto.CryptoValue{Crypted: []byte("encrypted-secret")}, FailedAttempts: 0},
+			testName: "when TOTP verification succeeds should update user and session",
+			cmd: &domain.TOTPCheckCommand{
+				CheckTOTP:  &domain.CheckTOTPType{Code: "123456"},
+				InstanceID: "instance-1",
+				SessionID:  "session-1",
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+					Human: &domain.HumanUser{
+						TOTP: &domain.HumanTOTP{
+							Secret: &crypto.CryptoValue{Crypted: []byte("encrypted-secret")}, FailedAttempts: 0},
+					},
 				},
+				ValidateFunc: func(_, _ string) bool { return true },
 			},
-			validateFunc: func(_, _ string) bool { return true },
 			encryptionAlgo: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
 				mock := crypto.NewMockEncryptionAlgorithm(ctrl)
 				mock.EXPECT().Algorithm().AnyTimes().Return("")
@@ -349,17 +331,21 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 			expectedSuccess: true,
 		},
 		{
-			testName:  "when user update fails should return error",
-			checkTOTP: &domain.CheckTOTPType{Code: "123456"},
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
-				Human: &domain.HumanUser{
-					TOTP: &domain.HumanTOTP{
-						Secret: &crypto.CryptoValue{Crypted: []byte("encrypted-secret")}, FailedAttempts: 0},
+			testName: "when user update fails should return error",
+			cmd: &domain.TOTPCheckCommand{
+				CheckTOTP:  &domain.CheckTOTPType{Code: "123456"},
+				InstanceID: "instance-1",
+				SessionID:  "session-1",
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+					Human: &domain.HumanUser{
+						TOTP: &domain.HumanTOTP{
+							Secret: &crypto.CryptoValue{Crypted: []byte("encrypted-secret")}, FailedAttempts: 0},
+					},
 				},
+				ValidateFunc: func(_, _ string) bool { return true },
 			},
-			validateFunc: func(_, _ string) bool { return true },
 			userRepo: func(ctrl *gomock.Controller) domain.HumanUserRepository {
 				repo := domainmock.NewHumanRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "user-1")
@@ -379,16 +365,20 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(userUpdateErr, "DOM-aoMAzO", "failed updating user"),
 		},
 		{
-			testName:     "when session update fails after successful TOTP should return error",
-			checkTOTP:    &domain.CheckTOTPType{Code: "123456"},
-			validateFunc: func(_, _ string) bool { return true },
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
-				Human: &domain.HumanUser{
-					TOTP: &domain.HumanTOTP{
-						Secret: &crypto.CryptoValue{Crypted: []byte("encrypted-secret")}, FailedAttempts: 0},
+			testName: "when session update fails after successful TOTP should return error",
+			cmd: &domain.TOTPCheckCommand{
+				CheckTOTP:  &domain.CheckTOTPType{Code: "123456"},
+				InstanceID: "instance-1",
+				SessionID:  "session-1",
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+					Human: &domain.HumanUser{
+						TOTP: &domain.HumanTOTP{
+							Secret: &crypto.CryptoValue{Crypted: []byte("encrypted-secret")}, FailedAttempts: 0},
+					},
 				},
+				ValidateFunc: func(_, _ string) bool { return true },
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.HumanUserRepository {
 				repo := domainmock.NewHumanRepo(ctrl)
@@ -418,15 +408,20 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(sessionUpdateErr, "DOM-ymhCTD", "failed updating session"),
 		},
 		{
-			testName:  "when lockout policy fetch fails should return error",
-			checkTOTP: &domain.CheckTOTPType{Code: "wrong-code"},
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
-				Human: &domain.HumanUser{
-					TOTP: &domain.HumanTOTP{
-						Secret: &crypto.CryptoValue{Crypted: []byte("encrypted-secret")}, FailedAttempts: 0},
+			testName: "when lockout policy fetch fails should return error",
+			cmd: &domain.TOTPCheckCommand{
+				CheckTOTP:  &domain.CheckTOTPType{Code: "wrong-code"},
+				InstanceID: "instance-1",
+				SessionID:  "session-1",
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+					Human: &domain.HumanUser{
+						TOTP: &domain.HumanTOTP{
+							Secret: &crypto.CryptoValue{Crypted: []byte("encrypted-secret")}, FailedAttempts: 0},
+					},
 				},
+				ValidateFunc: func(_, _ string) bool { return false },
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.HumanUserRepository {
 				repo := domainmock.NewHumanRepo(ctrl)
@@ -448,7 +443,6 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 					Return(nil, listErr)
 				return repo
 			},
-			tarpitFunc: func(attempts uint64) {},
 			encryptionAlgo: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
 				mock := crypto.NewMockEncryptionAlgorithm(ctrl)
 				mock.EXPECT().Algorithm().AnyTimes().Return("")
@@ -459,15 +453,20 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(listErr, "DOM-3B8Z6s", "failed fetching lockout settings"),
 		},
 		{
-			testName:  "when TOTP verification fails should update user and fail",
-			checkTOTP: &domain.CheckTOTPType{Code: "wrong-code"},
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
-				Human: &domain.HumanUser{
-					TOTP: &domain.HumanTOTP{
-						Secret: &crypto.CryptoValue{Crypted: []byte("encrypted-secret")}, FailedAttempts: 0},
+			testName: "when TOTP verification fails should update user and fail",
+			cmd: &domain.TOTPCheckCommand{
+				CheckTOTP:  &domain.CheckTOTPType{Code: "wrong-code"},
+				InstanceID: "instance-1",
+				SessionID:  "session-1",
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+					Human: &domain.HumanUser{
+						TOTP: &domain.HumanTOTP{
+							Secret: &crypto.CryptoValue{Crypted: []byte("encrypted-secret")}, FailedAttempts: 0},
+					},
 				},
+				ValidateFunc: func(_, _ string) bool { return false },
 			},
 			encryptionAlgo: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
 				mock := crypto.NewMockEncryptionAlgorithm(ctrl)
@@ -512,15 +511,20 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(userUpdateErr, "DOM-lQLpIa", "failed updating user"),
 		},
 		{
-			testName:  "when TOTP verification fails should update user with failed check and fail on session update",
-			checkTOTP: &domain.CheckTOTPType{Code: "wrong-code"},
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
-				Human: &domain.HumanUser{
-					TOTP: &domain.HumanTOTP{
-						Secret: &crypto.CryptoValue{Crypted: []byte("encrypted-secret")}, FailedAttempts: 0},
+			testName: "when TOTP verification fails should update user with failed check and fail on session update",
+			cmd: &domain.TOTPCheckCommand{
+				CheckTOTP:  &domain.CheckTOTPType{Code: "wrong-code"},
+				InstanceID: "instance-1",
+				SessionID:  "session-1",
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+					Human: &domain.HumanUser{
+						TOTP: &domain.HumanTOTP{
+							Secret: &crypto.CryptoValue{Crypted: []byte("encrypted-secret")}, FailedAttempts: 0},
+					},
 				},
+				ValidateFunc: func(_, _ string) bool { return false },
 			},
 			encryptionAlgo: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
 				mock := crypto.NewMockEncryptionAlgorithm(ctrl)
@@ -579,15 +583,21 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(sessionUpdateErr, "DOM-rSa1yU", "failed updating session"),
 		},
 		{
-			testName:  "when TOTP verification fails should update user with failed check",
-			checkTOTP: &domain.CheckTOTPType{Code: "wrong-code"},
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
-				Human: &domain.HumanUser{
-					TOTP: &domain.HumanTOTP{
-						Secret: &crypto.CryptoValue{Crypted: []byte("encrypted-secret")}, FailedAttempts: 0},
+			testName: "when TOTP verification fails should update user with failed check",
+			cmd: &domain.TOTPCheckCommand{
+				CheckTOTP:  &domain.CheckTOTPType{Code: "wrong-code"},
+				InstanceID: "instance-1",
+				SessionID:  "session-1",
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+					Human: &domain.HumanUser{
+						TOTP: &domain.HumanTOTP{
+							Secret: &crypto.CryptoValue{Crypted: []byte("encrypted-secret")}, FailedAttempts: 0},
+					},
 				},
+				TarpitFunc:   func(_ uint64) {},
+				ValidateFunc: func(_, _ string) bool { return false },
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.HumanUserRepository {
 				repo := domainmock.NewHumanRepo(ctrl)
@@ -636,7 +646,6 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			tarpitFunc: func(attempts uint64) {},
 			encryptionAlgo: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
 				mock := crypto.NewMockEncryptionAlgorithm(ctrl)
 				mock.EXPECT().Algorithm().AnyTimes().Return("")
@@ -647,17 +656,21 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(decryptErr, "DOM-Yqhggx", "failed decrypting TOTP secret"),
 		},
 		{
-			testName:  "when TOTP verification fails and user exceeds max attempts should lock user",
-			checkTOTP: &domain.CheckTOTPType{Code: "wrong-code"},
-			fetchedUser: domain.User{
-				ID:             "user-1",
-				OrganizationID: "org-1",
-				Human: &domain.HumanUser{
-					TOTP: &domain.HumanTOTP{
-						Secret:         &crypto.CryptoValue{Crypted: []byte("encrypted-secret")},
-						FailedAttempts: 4,
+			testName: "when TOTP verification fails and user exceeds max attempts should lock user",
+			cmd: &domain.TOTPCheckCommand{
+				CheckTOTP:  &domain.CheckTOTPType{Code: "wrong-code"},
+				InstanceID: "instance-1",
+				SessionID:  "session-1",
+				FetchedUser: domain.User{
+					ID:             "user-1",
+					OrganizationID: "org-1",
+					Human: &domain.HumanUser{
+						TOTP: &domain.HumanTOTP{
+							Secret: &crypto.CryptoValue{Crypted: []byte("encrypted-secret")}, FailedAttempts: 4},
 					},
 				},
+				TarpitFunc:   func(_ uint64) {},
+				ValidateFunc: func(_, _ string) bool { return false },
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.HumanUserRepository {
 				repo := domainmock.NewHumanRepo(ctrl)
@@ -707,7 +720,6 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			tarpitFunc: func(attempts uint64) {},
 			encryptionAlgo: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
 				mock := crypto.NewMockEncryptionAlgorithm(ctrl)
 				mock.EXPECT().Algorithm().AnyTimes().Return("")
@@ -728,9 +740,8 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 			var encAlgo crypto.EncryptionAlgorithm
 			if tc.encryptionAlgo != nil {
 				encAlgo = tc.encryptionAlgo(ctrl)
+				tc.cmd.EncryptionAlgorithm = encAlgo
 			}
-			cmd := domain.NewTOTPCheckCommand("session-1", "instance-1", tc.tarpitFunc, tc.validateFunc, encAlgo, tc.checkTOTP)
-			cmd.FetchedUser = tc.fetchedUser
 
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),
@@ -750,11 +761,11 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 				domain.WithLockoutSettingsRepo(tc.lockoutSettingRepo(ctrl))(opts)
 			}
 
-			err := cmd.Execute(t.Context(), opts)
+			err := tc.cmd.Execute(t.Context(), opts)
 
 			assert.ErrorIs(t, err, tc.expectedError)
-			assert.Equal(t, tc.expectedSuccess, cmd.IsCheckSuccessful)
-			assert.Equal(t, tc.expectedLocked, cmd.IsUserLocked)
+			assert.Equal(t, tc.expectedSuccess, tc.cmd.IsCheckSuccessful)
+			assert.Equal(t, tc.expectedLocked, tc.cmd.IsUserLocked)
 		})
 	}
 }
@@ -766,51 +777,55 @@ func TestTOTPCheckCommand_Events(t *testing.T) {
 	userAgg := user.NewAggregate("user-1", "org-1").Aggregate
 
 	tt := []struct {
-		testName          string
-		checkTOTP         *domain.CheckTOTPType
-		sessionID         string
-		instanceID        string
-		fetchedUser       domain.User
-		checkedAt         time.Time
-		isCheckSuccessful bool
-		isUserLocked      bool
-		expectedEvents    []eventstore.Command
+		testName       string
+		cmd            *domain.TOTPCheckCommand
+		expectedEvents []eventstore.Command
 	}{
 		{
 			testName:       "when checkTOTP is nil should return no events",
-			checkTOTP:      nil,
+			cmd:            &domain.TOTPCheckCommand{},
 			expectedEvents: []eventstore.Command{},
 		},
 		{
-			testName:          "when check is successful should emit user succeeded and session totp checked events",
-			checkTOTP:         &domain.CheckTOTPType{},
-			checkedAt:         time.Now(),
-			isCheckSuccessful: true,
+			testName: "when check is successful should emit user succeeded and session totp checked events",
+			cmd: &domain.TOTPCheckCommand{
+				CheckTOTP:         &domain.CheckTOTPType{},
+				SessionID:         "session-1",
+				InstanceID:        "instance-1",
+				FetchedUser:       domain.User{ID: "user-1", OrganizationID: "org-1"},
+				IsCheckSuccessful: true,
+				CheckedAt:         time.Now(),
+			},
 
-			fetchedUser: domain.User{ID: "user-1", OrganizationID: "org-1"},
 			expectedEvents: []eventstore.Command{
 				user.NewHumanOTPCheckSucceededEvent(t.Context(), &userAgg, nil),
 				session.NewTOTPCheckedEvent(t.Context(), &sessionAgg, time.Now()),
 			},
 		},
 		{
-			testName:  "when check is unsuccessful should emit user failed and session totp checked events",
-			checkTOTP: &domain.CheckTOTPType{},
-			checkedAt: time.Now(),
-
-			fetchedUser: domain.User{ID: "user-1", OrganizationID: "org-1"},
+			testName: "when check is unsuccessful should emit user failed and session totp checked events",
+			cmd: &domain.TOTPCheckCommand{
+				CheckTOTP:   &domain.CheckTOTPType{},
+				SessionID:   "session-1",
+				InstanceID:  "instance-1",
+				FetchedUser: domain.User{ID: "user-1", OrganizationID: "org-1"},
+				CheckedAt:   time.Now(),
+			},
 			expectedEvents: []eventstore.Command{
 				user.NewHumanOTPCheckFailedEvent(t.Context(), &userAgg, nil),
 				session.NewTOTPCheckedEvent(t.Context(), &sessionAgg, time.Now()),
 			},
 		},
 		{
-			testName:     "when check is unsuccessful and user is locked should emit user failed, user locked and session totp checked events",
-			checkTOTP:    &domain.CheckTOTPType{},
-			checkedAt:    time.Now(),
-			isUserLocked: true,
-
-			fetchedUser: domain.User{ID: "user-1", OrganizationID: "org-1"},
+			testName: "when check is unsuccessful and user is locked should emit user failed, user locked and session totp checked events",
+			cmd: &domain.TOTPCheckCommand{
+				CheckTOTP:    &domain.CheckTOTPType{},
+				SessionID:    "session-1",
+				InstanceID:   "instance-1",
+				FetchedUser:  domain.User{ID: "user-1", OrganizationID: "org-1"},
+				IsUserLocked: true,
+				CheckedAt:    time.Now(),
+			},
 			expectedEvents: []eventstore.Command{
 				user.NewHumanOTPCheckFailedEvent(t.Context(), &userAgg, nil),
 				user.NewUserLockedEvent(t.Context(), &userAgg),
@@ -824,14 +839,9 @@ func TestTOTPCheckCommand_Events(t *testing.T) {
 			t.Parallel()
 			// Given
 			ctx := authz.NewMockContext("instance-1", "", "")
-			cmd := domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, tc.checkTOTP)
-			cmd.FetchedUser = tc.fetchedUser
-			cmd.CheckedAt = tc.checkedAt
-			cmd.IsCheckSuccessful = tc.isCheckSuccessful
-			cmd.IsUserLocked = tc.isUserLocked
 
 			// Test
-			events, err := cmd.Events(ctx, &domain.InvokeOpts{})
+			events, err := tc.cmd.Events(ctx, &domain.InvokeOpts{})
 
 			// Verify
 			assert.NoError(t, err)
@@ -842,7 +852,7 @@ func TestTOTPCheckCommand_Events(t *testing.T) {
 				case *session.TOTPCheckedEvent:
 					actualAssertedType, ok := events[i].(*session.TOTPCheckedEvent)
 					require.True(t, ok)
-					assert.Equal(t, cmd.CheckedAt, actualAssertedType.CheckedAt)
+					assert.Equal(t, tc.cmd.CheckedAt, actualAssertedType.CheckedAt)
 				case *user.HumanOTPCheckSucceededEvent:
 					_, ok := events[i].(*user.HumanOTPCheckSucceededEvent)
 					require.True(t, ok)
