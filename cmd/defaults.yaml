@@ -791,7 +791,7 @@ SystemAPIUsers:
 # - superuser:
 #     # you can provide the key either by reference with the path. The data in this file has to either be a public RSA
 #     # key or a public X.509 certificate
-#     Path: /path/to/superuser/ey.pem
+#     Path: /path/to/superuser/key.pem
 #     Memberships:
 #       # MemberType System allows the user to access all APIs for all instances or organizations
 #       - MemberType: System
