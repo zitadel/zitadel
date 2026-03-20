@@ -313,8 +313,14 @@ type existsCondition struct {
 
 // Matches implements [Condition].
 func (e *existsCondition) Matches(x any) bool {
-	// Unimplemented
-	return false
+	toMatch, ok := x.(*existsCondition)
+	if !ok {
+		return false
+	}
+	if e.table != toMatch.table {
+		return false
+	}
+	return e.condition.Matches(toMatch.condition)
 }
 
 // String implements [Condition].
@@ -364,3 +370,46 @@ func ForceRestrictingColumn(cond Condition, isRestriction bool) Condition {
 }
 
 var _ Condition = (*forcedRestrictingColumnCondition)(nil)
+
+type permissionCheck struct {
+	requiredPermission string
+	throwError         bool
+}
+
+func (p *permissionCheck) Matches(x any) bool {
+	toMatch, ok := x.(*permissionCheck)
+	if !ok {
+		return false
+	}
+	if toMatch.requiredPermission != p.requiredPermission {
+		return false
+	}
+	return toMatch.throwError == p.throwError
+}
+
+func (p *permissionCheck) String() string {
+	return "database.permissionCheck"
+}
+
+func (p *permissionCheck) Write(builder *StatementBuilder) {
+	// TODO: implement actual permission check once we have the necessary tables and functions in place.
+	// For now, we just write a dummy condition that can be used to verify that the permission check is included in the generated SQL.
+	if p.throwError {
+		builder.WriteString(" zitadel.throw_not_permitted() ")
+		return
+	}
+	builder.WriteString(" true ")
+}
+
+func (p *permissionCheck) IsRestrictingColumn(_ Column) bool {
+	return false
+}
+
+func PermissionCheck(requiredPermission string, throwError bool) *permissionCheck {
+	return &permissionCheck{
+		requiredPermission: requiredPermission,
+		throwError:         throwError,
+	}
+}
+
+var _ Condition = (*permissionCheck)(nil)
