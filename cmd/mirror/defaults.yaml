@@ -136,6 +136,7 @@ Source:
   # Postgres is used as soon as a value is set
   # The values describe the possible fields to set values
   postgres:
+    DSN: "" # ZITADEL_SOURCE_POSTGRES_DSN
     Host: # ZITADEL_SOURCE_POSTGRES_HOST
     Port: # ZITADEL_SOURCE_POSTGRES_PORT
     Database: # ZITADEL_SOURCE_POSTGRES_DATABASE
@@ -155,6 +156,7 @@ Source:
 
 Destination:
   postgres:
+    DSN: "" # ZITADEL_DESTINATION_POSTGRES_DSN
     Host: localhost # ZITADEL_DESTINATION_POSTGRES_HOST
     Port: 5432 # ZITADEL_DESTINATION_POSTGRES_PORT
     Database: zitadel # ZITADEL_DESTINATION_POSTGRES_DATABASE
