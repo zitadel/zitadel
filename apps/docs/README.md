@@ -43,8 +43,8 @@ Key scripts for documentation workflows:
 
 ### Validation
 
-* **Code Quality**: From `apps/docs`, run `pnpm lint` to check for syntax and style issues in JS/TS/MDX files.
-* **Content Integrity**: From `apps/docs`, run `pnpm check:links` to validate content structure, including:
+* **Code Quality**: Run `pnpm nx run @zitadel/docs:lint` to check for syntax and style issues in JS/TS/MDX files.
+* **Content Integrity**: Run `pnpm nx run @zitadel/docs:check-links` to validate content structure, including:
   * Broken internal links
   * Missing required front-matter (e.g., `title`)
   * Image references
