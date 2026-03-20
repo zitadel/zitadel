@@ -34,34 +34,46 @@ type TOTPCheckCommand struct {
 	CheckedAt         time.Time
 }
 
+// NewTOTPCheckCommand initializes a new [TOTPCheckCommand]
+//
+// If tarpitFunc is nil, the default tarpit will be used.
+//
+// totpValidator is a function that takes as input a target TOTP to verify
+// and an input cyphered secret.
+// The secret is decyphered first using the input encryptionAlgo,
+// then it is used to verify the TOTP. It returns true if the TOTP is validated successfully.
+//
+//   - totpValidator defaults to [totp.Validate]
+//   - encryptionAlgo defaults to [crypto.NewAESCrypto] using the config specified in defaults.yaml
+//
+// The command does not implement [Transactional] due totpValidator that might take a long time to execute.
+// So the DB transaction will be started only after totpValidator has been run.
+//
+// Moreover, the command may return a functional error so manual management of the transaction is needed
+// to avoid rollbacking a transaction despite having only a functional error.
 func NewTOTPCheckCommand(sessionID, instanceID string, tarpitFunc tarpitFn, totpValidator totpValidateFn, encryptionAlgo crypto.EncryptionAlgorithm, request *CheckTOTPType) *TOTPCheckCommand {
-	tf := sysConfig.Tarpit.Tarpit()
-	if tarpitFunc != nil {
-		tf = tarpitFunc
-	}
-
-	ea := mfaEncryptionAlgo
-	if encryptionAlgo != nil {
-		ea = encryptionAlgo
-	}
-
-	totpValidateFunc := totp.Validate
-	if totpValidator != nil {
-		totpValidateFunc = totpValidator
-	}
-
-	return &TOTPCheckCommand{
+	cmd := &TOTPCheckCommand{
 		CheckTOTP:           request,
-		TarpitFunc:          tf,
-		EncryptionAlgorithm: ea,
+		TarpitFunc:          sysConfig.Tarpit.Tarpit(),
+		EncryptionAlgorithm: mfaEncryptionAlgo,
 		SessionID:           sessionID,
 		InstanceID:          instanceID,
-		ValidateFunc:        totpValidateFunc,
+		ValidateFunc:        totp.Validate,
 	}
-}
+	if tarpitFunc != nil {
+		cmd.TarpitFunc = tarpitFunc
+	}
 
-// RequiresTransaction implements [Transactional].
-func (t *TOTPCheckCommand) RequiresTransaction() {}
+	if encryptionAlgo != nil {
+		cmd.EncryptionAlgorithm = encryptionAlgo
+	}
+
+	if totpValidator != nil {
+		cmd.ValidateFunc = totpValidator
+	}
+
+	return cmd
+}
 
 // Events implements [Commander].
 func (t *TOTPCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
@@ -98,21 +110,39 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 
 	verifyErr := t.verifyTOTP(t.FetchedUser.Human.TOTP.Secret)
 
+	beginner, ok := opts.DB().(database.Beginner)
+	if !ok {
+		return zerrors.ThrowInternal(nil, "DOM-Ug9936", "database doesn't implement database.Beginner")
+	}
+
+	tx, txErr := beginner.Begin(ctx, nil)
+	if txErr != nil {
+		return zerrors.ThrowInternal(txErr, "DOM-pw7gF8", "failed starting transaction")
+	}
+
+	defer func() {
+		if endErr := tx.End(ctx, txErr); endErr != nil {
+			err = endErr
+		}
+	}()
+
 	if verifyErr == nil {
 		t.CheckedAt = time.Now()
-		rowCount, err := humanRepo.Update(ctx, opts.DB(),
+		rowCount, err := humanRepo.Update(ctx, tx,
 			humanRepo.PrimaryKeyCondition(t.InstanceID, t.FetchedUser.ID),
 			humanRepo.SetLastSuccessfulTOTPCheck(t.CheckedAt),
 		)
 		if err := handleUpdateError(err, 1, rowCount, "DOM-aoMAzO", "user"); err != nil {
+			txErr = err
 			return err
 		}
 
-		rowCount, err = sessionRepo.Update(ctx, opts.DB(),
+		rowCount, err = sessionRepo.Update(ctx, tx,
 			sessionRepo.PrimaryKeyCondition(t.InstanceID, t.SessionID),
 			sessionRepo.SetFactor(&SessionFactorTOTP{LastVerifiedAt: t.CheckedAt}),
 		)
 		if err := handleUpdateError(err, 1, rowCount, "DOM-ymhCTD", "session"); err != nil {
+			txErr = err
 			return err
 		}
 
@@ -124,8 +154,9 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 	changes := make(database.Changes, 1, 2)
 	changes[0] = humanRepo.IncrementTOTPFailedAttempts()
 
-	policy, err := getLockoutPolicy(ctx, opts.DB(), opts.lockoutSettingRepo, t.InstanceID, t.FetchedUser.OrganizationID)
+	policy, err := getLockoutPolicy(ctx, tx, opts.lockoutSettingRepo, t.InstanceID, t.FetchedUser.OrganizationID)
 	if err != nil {
+		txErr = err
 		return err
 	}
 
@@ -136,23 +167,23 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 		t.IsUserLocked = true
 	}
 
-	rowCount, err := humanRepo.Update(ctx, opts.DB(), humanRepo.PrimaryKeyCondition(t.InstanceID, t.FetchedUser.ID), changes)
+	rowCount, err := humanRepo.Update(ctx, tx, humanRepo.PrimaryKeyCondition(t.InstanceID, t.FetchedUser.ID), changes)
 	if err := handleUpdateError(err, 1, rowCount, "DOM-lQLpIa", "user"); err != nil {
+		txErr = err
 		return err
 	}
 
-	rowCount, err = sessionRepo.Update(ctx, opts.DB(),
+	rowCount, err = sessionRepo.Update(ctx, tx,
 		sessionRepo.PrimaryKeyCondition(t.InstanceID, t.SessionID),
 		sessionRepo.SetFactor(&SessionFactorTOTP{LastVerifiedAt: t.CheckedAt}),
 	)
 	if err := handleUpdateError(err, 1, rowCount, "DOM-rSa1yU", "session"); err != nil {
+		txErr = err
 		return err
 	}
 
 	t.TarpitFunc(uint64(t.FetchedUser.Human.TOTP.FailedAttempts + 1))
 
-	// TODO(IAM-Marco): The error returned here will block the transaction and stop events from being emitted.
-	// This error is functional so it should be returned AND the transaction should succeed. How can we fix it?
 	return verifyErr
 }
 
@@ -218,4 +249,3 @@ func (t *TOTPCheckCommand) verifyTOTP(existingTOTPSecret *crypto.CryptoValue) er
 }
 
 var _ Commander = (*TOTPCheckCommand)(nil)
-var _ Transactional = (*TOTPCheckCommand)(nil)
