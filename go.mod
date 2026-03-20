@@ -2,6 +2,8 @@ module github.com/zitadel/zitadel
 
 go 1.25.0
 
+toolchain go1.25.8
+
 require (
 	cloud.google.com/go/profiler v0.4.3
 	cloud.google.com/go/storage v1.61.3

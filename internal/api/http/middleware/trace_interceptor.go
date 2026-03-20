@@ -19,7 +19,7 @@ func TraceHandler(ignoredPrefix ...string) func(http.Handler) http.Handler {
 		return otelhttp.NewHandler(handler,
 			"zitadel",
 			otelhttp.WithFilter(instrumentation.RequestFilter(ignoredPrefix...)),
-			otelhttp.WithPublicEndpointFn(func(request *http.Request) bool {
+			otelhttp.WithPublicEndpointFn(func(_ *http.Request) bool {
 				return true
 			}),
 			otelhttp.WithSpanNameFormatter(spanNameFormatter),
