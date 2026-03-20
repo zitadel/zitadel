@@ -78,13 +78,9 @@ type Config struct {
 	EncryptionKeys      *encryption.EncryptionKeyConfig
 	DefaultInstance     command.InstanceSetup
 	AuditLogRetention   time.Duration
-	SystemAPIUsers map[string]*authz.SystemAPIUser
-	LoginClient struct {
-		KeyFile string
-	}
-	AdminClient struct {
-		KeyFile string
-	}
+	SystemAPIUsers      map[string]*authz.SystemAPIUser
+	LoginClient         struct{ KeyFile string }
+	AdminClient         struct{ KeyFile string }
 	CustomerPortal      string
 	Machine             *id.Config
 	Actions             *actions.Config
