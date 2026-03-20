@@ -141,7 +141,7 @@ func (rc *RecoveryCodeCheckCommand) Execute(ctx context.Context, opts *InvokeOpt
 	if checkErr != nil {
 		err = rc.handleRecoveryCodeCheckFailed(ctx, opts)
 		// logging the update error and returning the original error related to recovery code verification
-		logging.OnError(err).Error("failed to update user and session after recovery code check failure")
+		logging.OnError(ctx, err).Error("failed to update user and session after recovery code check failure")
 		return checkErr
 	}
 
@@ -201,7 +201,7 @@ func (rc *RecoveryCodeCheckCommand) handleRecoveryCodeCheckFailed(ctx context.Co
 	checkTime := time.Now()
 
 	lockoutPolicy, err := getLockoutPolicy(ctx, opts, rc.InstanceID, rc.user.OrganizationID)
-	logging.OnError(err).Error("failed to get lockout policy")
+	logging.OnError(ctx, err).Error("failed to get lockout policy")
 
 	// update user state and recovery_code_failed_attempts
 	humanRepo := opts.userRepo.Human()
