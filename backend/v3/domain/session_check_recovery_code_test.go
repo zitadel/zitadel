@@ -31,7 +31,7 @@ func TestRecoveryCodeCheckCommand_Validate(t *testing.T) {
 		name        string
 		sessionID   string
 		instanceID  string
-		check       *domain.CheckRecoveryCode
+		check       *domain.CheckTypeRecoveryCode
 		sessionRepo func(ctrl *gomock.Controller) domain.SessionRepository
 		userRepo    func(ctrl *gomock.Controller) domain.UserRepository
 		wantErr     error
@@ -41,25 +41,25 @@ func TestRecoveryCodeCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			name:    "empty recovery code",
-			check:   &domain.CheckRecoveryCode{},
+			check:   &domain.CheckTypeRecoveryCode{},
 			wantErr: zerrors.ThrowInvalidArgument(nil, "DOM-cEKxoG", "Errors.User.MFA.RecoveryCodes.Empty"),
 		},
 		{
 			name:    "no session id",
-			check:   &domain.CheckRecoveryCode{RecoveryCode: "test-code"},
+			check:   &domain.CheckTypeRecoveryCode{RecoveryCode: "test-code"},
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-hsbVyd", "Errors.Session.IDMissing"),
 		},
 		{
 			name:      "no instance id",
 			sessionID: "session-1",
-			check:     &domain.CheckRecoveryCode{RecoveryCode: "test-code"},
+			check:     &domain.CheckTypeRecoveryCode{RecoveryCode: "test-code"},
 			wantErr:   zerrors.ThrowPreconditionFailed(nil, "DOM-lGIe1v", "Errors.Instance.IDMissing"),
 		},
 		{
 			name:       "failed to get session - session not found",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check:      &domain.CheckRecoveryCode{RecoveryCode: "test-code"},
+			check:      &domain.CheckTypeRecoveryCode{RecoveryCode: "test-code"},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				sessionRepo := domainmock.NewSessionRepo(ctrl)
 				primaryKeyCondition := sessionRepo.PrimaryKeyCondition("instance-1", "session-1")
@@ -75,7 +75,7 @@ func TestRecoveryCodeCheckCommand_Validate(t *testing.T) {
 			name:       "failed to get session - database error",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check:      &domain.CheckRecoveryCode{RecoveryCode: "test-code"},
+			check:      &domain.CheckTypeRecoveryCode{RecoveryCode: "test-code"},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				sessionRepo := domainmock.NewSessionRepo(ctrl)
 				primaryKeyCondition := sessionRepo.PrimaryKeyCondition("instance-1", "session-1")
@@ -91,7 +91,7 @@ func TestRecoveryCodeCheckCommand_Validate(t *testing.T) {
 			name:       "missing user id in session",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check:      &domain.CheckRecoveryCode{RecoveryCode: "test-code"},
+			check:      &domain.CheckTypeRecoveryCode{RecoveryCode: "test-code"},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				sessionRepo := domainmock.NewSessionRepo(ctrl)
 				primaryKeyCondition := sessionRepo.PrimaryKeyCondition("instance-1", "session-1")
@@ -107,7 +107,7 @@ func TestRecoveryCodeCheckCommand_Validate(t *testing.T) {
 			name:       "failed to get user - user not found",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check:      &domain.CheckRecoveryCode{RecoveryCode: "test-code"},
+			check:      &domain.CheckTypeRecoveryCode{RecoveryCode: "test-code"},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				sessionRepo := domainmock.NewSessionRepo(ctrl)
 				primaryKeyCondition := sessionRepo.PrimaryKeyCondition("instance-1", "session-1")
@@ -132,7 +132,7 @@ func TestRecoveryCodeCheckCommand_Validate(t *testing.T) {
 			name:       "failed to get user - database error",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check:      &domain.CheckRecoveryCode{RecoveryCode: "test-code"},
+			check:      &domain.CheckTypeRecoveryCode{RecoveryCode: "test-code"},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				sessionRepo := domainmock.NewSessionRepo(ctrl)
 				primaryKeyCondition := sessionRepo.PrimaryKeyCondition("instance-1", "session-1")
@@ -157,7 +157,7 @@ func TestRecoveryCodeCheckCommand_Validate(t *testing.T) {
 			name:       "user is locked",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check:      &domain.CheckRecoveryCode{RecoveryCode: "test-code"},
+			check:      &domain.CheckTypeRecoveryCode{RecoveryCode: "test-code"},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				sessionRepo := domainmock.NewSessionRepo(ctrl)
 				primaryKeyCondition := sessionRepo.PrimaryKeyCondition("instance-1", "session-1")
@@ -182,7 +182,7 @@ func TestRecoveryCodeCheckCommand_Validate(t *testing.T) {
 			name:       "user does not have recovery codes - not a human user",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check:      &domain.CheckRecoveryCode{RecoveryCode: "test-code"},
+			check:      &domain.CheckTypeRecoveryCode{RecoveryCode: "test-code"},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				sessionRepo := domainmock.NewSessionRepo(ctrl)
 				primaryKeyCondition := sessionRepo.PrimaryKeyCondition("instance-1", "session-1")
@@ -212,7 +212,7 @@ func TestRecoveryCodeCheckCommand_Validate(t *testing.T) {
 			name:       "user does not have recovery codes",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check:      &domain.CheckRecoveryCode{RecoveryCode: "test-code"},
+			check:      &domain.CheckTypeRecoveryCode{RecoveryCode: "test-code"},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				sessionRepo := domainmock.NewSessionRepo(ctrl)
 				primaryKeyCondition := sessionRepo.PrimaryKeyCondition("instance-1", "session-1")
@@ -243,7 +243,7 @@ func TestRecoveryCodeCheckCommand_Validate(t *testing.T) {
 			name:       "valid request",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check:      &domain.CheckRecoveryCode{RecoveryCode: "test-code"},
+			check:      &domain.CheckTypeRecoveryCode{RecoveryCode: "test-code"},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				sessionRepo := domainmock.NewSessionRepo(ctrl)
 				primaryKeyCondition := sessionRepo.PrimaryKeyCondition("instance-1", "session-1")
@@ -306,7 +306,7 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 		name        string
 		sessionID   string
 		instanceID  string
-		check       *domain.CheckRecoveryCode
+		check       *domain.CheckTypeRecoveryCode
 		verify      func(encoded, password string) (updated string, err error)
 		sessionRepo func(ctrl *gomock.Controller) domain.SessionRepository
 		userRepo    func(ctrl *gomock.Controller) domain.UserRepository
@@ -321,7 +321,7 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 			name:       "invalid recovery code - failed to update user",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {
@@ -355,7 +355,7 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 			name:       "invalid recovery code - user not found",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {
@@ -389,7 +389,7 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 			name:       "invalid recovery code - multiple user rows updated",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {
@@ -423,7 +423,7 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 			name:       "invalid recovery code - failed to update session",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {
@@ -461,7 +461,7 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 			name:       "invalid recovery code - session not found",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {
@@ -499,7 +499,7 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 			name:       "invalid recovery code - multiple session rows updated",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {
@@ -537,7 +537,7 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 			name:       "invalid recovery code - update user and session with failed status and return error",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {
@@ -578,7 +578,7 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 			name:       "invalid recovery code - set user as locked, update user and session with failed status, and return error",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {
@@ -620,7 +620,7 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 			name:       "recovery code check succeeded - user update failed, return error",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {
@@ -658,7 +658,7 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 			name:       "recovery code check succeeded - user not found, return error",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {
@@ -696,7 +696,7 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 			name:       "recovery code check succeeded - multiple user rows updated, return error",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {
@@ -734,7 +734,7 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 			name:       "recovery code check succeeded - session update failed, return error",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {
@@ -775,7 +775,7 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 			name:       "recovery code check succeeded - session not found, return error",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {
@@ -816,7 +816,7 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 			name:       "recovery code check succeeded - multiple session rows updated, return error",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {
@@ -857,7 +857,7 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 			name:       "recovery code check succeeded - user and session updated successfully",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {
@@ -938,7 +938,7 @@ func TestRecoveryCodeCheckCommand_Events(t *testing.T) {
 		name        string
 		sessionID   string
 		instanceID  string
-		check       *domain.CheckRecoveryCode
+		check       *domain.CheckTypeRecoveryCode
 		verify      func(encoded, password string) (updated string, err error)
 		sessionRepo func(ctrl *gomock.Controller) domain.SessionRepository
 		userRepo    func(ctrl *gomock.Controller) domain.UserRepository
@@ -955,7 +955,7 @@ func TestRecoveryCodeCheckCommand_Events(t *testing.T) {
 			name:       "recovery code check succeeded - return relevant events",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {
@@ -1013,7 +1013,7 @@ func TestRecoveryCodeCheckCommand_Events(t *testing.T) {
 			name:       "recovery code check succeeded but update failed - return error and relevant events",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {
@@ -1059,7 +1059,7 @@ func TestRecoveryCodeCheckCommand_Events(t *testing.T) {
 			name:       "invalid recovery code and max OTP attempts reached - return relevant events and error",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {
@@ -1117,7 +1117,7 @@ func TestRecoveryCodeCheckCommand_Events(t *testing.T) {
 			name:       "invalid recovery code - return relevant events and error",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {
@@ -1169,7 +1169,7 @@ func TestRecoveryCodeCheckCommand_Events(t *testing.T) {
 			name:       "invalid recovery code and update failed - return relevant events and error",
 			sessionID:  "session-1",
 			instanceID: "instance-1",
-			check: &domain.CheckRecoveryCode{
+			check: &domain.CheckTypeRecoveryCode{
 				RecoveryCode: "test-code",
 			},
 			verify: func(encoded, password string) (updated string, err error) {

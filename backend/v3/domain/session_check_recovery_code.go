@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
-
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/session"
@@ -17,12 +16,12 @@ import (
 var _ Commander = &RecoveryCodeCheckCommand{}
 var _ Transactional = &RecoveryCodeCheckCommand{}
 
-type CheckRecoveryCode struct {
+type CheckTypeRecoveryCode struct {
 	RecoveryCode string
 }
 
 type RecoveryCodeCheckCommand struct {
-	CheckRecoveryCode *CheckRecoveryCode
+	CheckRecoveryCode *CheckTypeRecoveryCode
 
 	SessionID  string
 	InstanceID string
@@ -44,7 +43,7 @@ type RecoveryCodeCheckCommand struct {
 //
 // The check will update the existing session or return an error if the session
 // is not found or validation fails.
-func NewRecoveryCodeCheckCommand(sessionID, instanceID string, check *CheckRecoveryCode, verifier verifierFn) *RecoveryCodeCheckCommand {
+func NewRecoveryCodeCheckCommand(sessionID, instanceID string, check *CheckTypeRecoveryCode, verifier verifierFn) *RecoveryCodeCheckCommand {
 	if verifier == nil {
 		verifier = passwordHasher.Verify
 	}

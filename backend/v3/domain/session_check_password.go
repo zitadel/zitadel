@@ -304,4 +304,3 @@ func (p *PasswordCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (
 }
 
 var _ Commander = (*PasswordCheckCommand)(nil)
-
