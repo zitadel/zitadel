@@ -65,9 +65,7 @@ describe("loginClientKeyToken", () => {
     const { loginClientKeyToken } = await import("./api");
     await loginClientKeyToken();
 
-    expect(mockNewSystemToken).toHaveBeenCalledWith(
-      expect.objectContaining({ audience: "https://zitadel.example.com" }),
-    );
+    expect(mockNewSystemToken).toHaveBeenCalledWith(expect.objectContaining({ audience: "https://zitadel.example.com" }));
   });
 
   test("should throw a clear error when key file cannot be read", async () => {
@@ -76,8 +74,6 @@ describe("loginClientKeyToken", () => {
     mockReadFile.mockRejectedValue(new Error("ENOENT: no such file or directory"));
 
     const { loginClientKeyToken } = await import("./api");
-    await expect(loginClientKeyToken()).rejects.toThrow(
-      'Failed to read login client key file "/nonexistent/key.pem"',
-    );
+    await expect(loginClientKeyToken()).rejects.toThrow('Failed to read login client key file "/nonexistent/key.pem"');
   });
 });
