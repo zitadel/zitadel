@@ -1,6 +1,11 @@
 # Test overlay for x509 system API user authentication.
 # Uses a locally-built API image and a published login image.
 #
+# The API container receives the certificate (public key) via ZITADEL_LOGINCLIENT_KEYFILE
+# to verify JWTs. The login container receives the private key to sign JWTs.
+# The published login image still uses the legacy env vars; once a local build
+# is available, switch to ZITADEL_LOGINCLIENT_KEYFILE on the login side too.
+#
 # Usage:
 #   docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.x509-test.yml up --force-recreate --renew-anon-volumes --wait
 

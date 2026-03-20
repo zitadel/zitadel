@@ -1,9 +1,10 @@
 import { newSystemToken } from "@zitadel/client/node";
 import { readFile } from "fs/promises";
 
-// The key token is only loaded once from disk per process.
-// If the file was loaded you need to restart the process to switch the key.
+// Keys are only loaded once from disk per process.
+// If a file changes you need to restart the process to pick up the new key.
 let keyToken: string | undefined;
+let loginClientKeyCache: string | undefined;
 
 async function getTokenFromFile(): Promise<string> {
   if (keyToken) {
@@ -47,12 +48,14 @@ export async function loginClientKeyToken() {
   const keyFile = process.env.ZITADEL_LOGINCLIENT_KEYFILE!;
 
   try {
-    const key = await readFile(keyFile, "utf-8");
+    if (!loginClientKeyCache) {
+      loginClientKeyCache = await readFile(keyFile, "utf-8");
+    }
 
     return newSystemToken({
       audience: process.env.AUDIENCE || process.env.ZITADEL_API_URL,
       subject: "login-client",
-      key: key,
+      key: loginClientKeyCache,
     });
   } catch (err) {
     throw new Error(`Failed to read login client key file "${keyFile}": ${err instanceof Error ? err.message : err}`, {

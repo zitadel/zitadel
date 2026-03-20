@@ -33,7 +33,7 @@ export async function createServiceForHost<T extends ServiceClass>(service: T, s
     token = process.env.ZITADEL_SERVICE_USER_TOKEN;
   } else {
     throw new Error(
-      "No authentication credentials found. Set ZITADEL_LOGINCLIENT_KEYFILE, or system user credentials (AUDIENCE, SYSTEM_USER_ID, SYSTEM_USER_PRIVATE_KEY), or ZITADEL_SERVICE_USER_TOKEN",
+      "No authentication credentials found. Set ZITADEL_LOGINCLIENT_KEYFILE, or system user credentials (AUDIENCE, SYSTEM_USER_ID, SYSTEM_USER_PRIVATE_KEY or SYSTEM_USER_PRIVATE_KEY_FILE), or ZITADEL_SERVICE_USER_TOKEN",
     );
   }
 
