@@ -293,7 +293,7 @@ func TestRecoveryCodeCheckCommand_Validate(t *testing.T) {
 
 			cmd := domain.NewRecoveryCodeCheckCommand(tt.sessionID, tt.instanceID, tt.check, nil)
 			got := cmd.Validate(context.Background(), opts)
-			assert.ErrorIs(t, tt.wantErr, got)
+			assert.ErrorIs(t, got, tt.wantErr)
 		})
 	}
 }
