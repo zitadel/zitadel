@@ -813,14 +813,17 @@ SystemAPIUsers:
 # Or configure system API users with simple environment variables (useful for Kubernetes):
 #
 # Login client (registers user "login-client" with IAM_LOGIN_CLIENT + SYSTEM_OWNER roles):
-# ZITADEL_LOGINCLIENT_KEYFILE=/path/to/cert.pem
+# Points to the public certificate or public key used by the API to verify login-client JWTs.
+# The login container uses the corresponding private key (same env var name) for signing.
+# ZITADEL_LOGINCLIENT_KEYFILE=/path/to/login-client-cert.pem
 LoginClient:
-  KeyFile: # ZITADEL_LOGINCLIENT_KEYFILE
+  KeyFile: # ZITADEL_LOGINCLIENT_KEYFILE (public certificate/key for JWT verification)
 #
 # Admin client (registers user "admin-client" with IAM_OWNER + SYSTEM_OWNER roles):
-# ZITADEL_ADMINCLIENT_KEYFILE=/path/to/cert.pem
+# Points to the public certificate or public key used by the API to verify admin-client JWTs.
+# ZITADEL_ADMINCLIENT_KEYFILE=/path/to/admin-client-cert.pem
 AdminClient:
-  KeyFile: # ZITADEL_ADMINCLIENT_KEYFILE
+  KeyFile: # ZITADEL_ADMINCLIENT_KEYFILE (public certificate/key for JWT verification)
 
 SystemDefaults:
   SecretGenerators:
