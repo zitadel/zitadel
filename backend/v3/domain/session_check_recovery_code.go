@@ -15,7 +15,6 @@ import (
 )
 
 var _ Commander = &RecoveryCodeCheckCommand{}
-var _ Transactional = &RecoveryCodeCheckCommand{}
 
 type CheckRecoveryCode struct {
 	RecoveryCode string
