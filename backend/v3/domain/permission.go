@@ -26,46 +26,46 @@ type PermissionRepository interface {
 //go:generate mockgen -typed -package domainmock -destination ./mock/permission.mock.go . PermissionChecker
 type PermissionChecker interface {
 	// Check if the authenticated user has the given permission on instance level.
-	CheckInstancePermission(ctx context.Context, permission string) error
+	CheckInstancePermission(ctx context.Context, opts *InvokeOpts, permission string) error
 
 	// Check if the authenticated user has the given permission on the given organization.
 	// A permission may be inherited from the instance level.
-	CheckOrganizationPermission(ctx context.Context, permission, orgID string) error
+	CheckOrganizationPermission(ctx context.Context, opts *InvokeOpts, permission, orgID string) error
 
 	// Check if the authenticated user has the given permission on the given project.
 	// A permission may be inherited from the instance or organization level.
-	CheckProjectPermission(ctx context.Context, permission, projectID string) error
+	CheckProjectPermission(ctx context.Context, opts *InvokeOpts, permission, projectID string) error
 
 	// Check if the authenticated user has the given permission on the given project grant.
 	// A permission may be inherited from the instance or granted organization level.
-	CheckProjectGrantPermission(ctx context.Context, permission, projectGrantID string) error
+	CheckProjectGrantPermission(ctx context.Context, opts *InvokeOpts, permission, projectGrantID string) error
 
 	// Check if the user in context has the given permission on the given session.
 	// A permission may be inherited from the instance or granted organization level.
-	CheckSessionPermission(ctx context.Context, permission, sessionID string) error
+	CheckSessionPermission(ctx context.Context, opts *InvokeOpts, permission, sessionID string) error
 }
 
 type noopPermissionChecker struct{}
 
 // CheckSessionPermission implements [PermissionChecker].
-func (n *noopPermissionChecker) CheckSessionPermission(ctx context.Context, permission string, sessionID string) error {
+func (n *noopPermissionChecker) CheckSessionPermission(ctx context.Context, opts *InvokeOpts, permission, sessionID string) error {
 	return nil
 }
 
 var _ PermissionChecker = (*noopPermissionChecker)(nil)
 
-func (*noopPermissionChecker) CheckInstancePermission(context.Context, string) error {
+func (*noopPermissionChecker) CheckInstancePermission(context.Context, *InvokeOpts, string) error {
 	return nil
 }
 
-func (*noopPermissionChecker) CheckOrganizationPermission(context.Context, string, string) error {
+func (*noopPermissionChecker) CheckOrganizationPermission(context.Context, *InvokeOpts, string, string) error {
 	return nil
 }
 
-func (*noopPermissionChecker) CheckProjectPermission(context.Context, string, string) error {
+func (*noopPermissionChecker) CheckProjectPermission(context.Context, *InvokeOpts, string, string) error {
 	return nil
 }
 
-func (*noopPermissionChecker) CheckProjectGrantPermission(context.Context, string, string) error {
+func (*noopPermissionChecker) CheckProjectGrantPermission(context.Context, *InvokeOpts, string, string) error {
 	return nil
 }

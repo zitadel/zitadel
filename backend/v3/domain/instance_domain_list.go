@@ -119,7 +119,7 @@ func (l *ListInstanceDomainsQuery) Validate(ctx context.Context, opts *InvokeOpt
 	}
 
 	// TODO(IAM-Marco): This is wrong, as it should check the permission for the input instance and not the one in context
-	if authZErr := opts.Permissions.CheckInstancePermission(ctx, InstanceReadPermission); authZErr != nil {
+	if authZErr := opts.Permissions.CheckInstancePermission(ctx, opts, InstanceReadPermission); authZErr != nil {
 		return zerrors.ThrowPermissionDenied(authZErr, "DOM-yN7oCp", "Errors.PermissionDenied")
 	}
 
@@ -127,7 +127,7 @@ func (l *ListInstanceDomainsQuery) Validate(ctx context.Context, opts *InvokeOpt
 }
 
 func (l *ListInstanceDomainsQuery) checkDomainPerms(ctx context.Context, opts *InvokeOpts) error {
-	if authZErr := opts.Permissions.CheckInstancePermission(ctx, DomainReadPermission); authZErr != nil {
+	if authZErr := opts.Permissions.CheckInstancePermission(ctx, opts, DomainReadPermission); authZErr != nil {
 		return zerrors.ThrowPermissionDenied(authZErr, "DOM-RyCEyr", "Errors.PermissionDenied")
 	}
 	return nil

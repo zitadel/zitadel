@@ -35,7 +35,7 @@ func TestListInstanceDomainsQuery_Validate(t *testing.T) {
 			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
 				checker := domainmock.NewMockPermissionChecker(ctrl)
 				checker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.DomainReadPermission).
+					CheckInstancePermission(gomock.Any(), gomock.Any(),domain.DomainReadPermission).
 					Times(1).
 					Return(permissionErr)
 				return checker
@@ -48,7 +48,7 @@ func TestListInstanceDomainsQuery_Validate(t *testing.T) {
 			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
 				checker := domainmock.NewMockPermissionChecker(ctrl)
 				checker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.DomainReadPermission).
+					CheckInstancePermission(gomock.Any(),gomock.Any(),domain.DomainReadPermission).
 					Times(1).
 					Return(nil)
 				return checker
@@ -62,7 +62,7 @@ func TestListInstanceDomainsQuery_Validate(t *testing.T) {
 			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
 				checker := domainmock.NewMockPermissionChecker(ctrl)
 				checker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.InstanceReadPermission).
+					CheckInstancePermission(gomock.Any(), gomock.Any(),domain.InstanceReadPermission).
 					Times(1).
 					Return(permissionErr)
 				return checker
@@ -77,11 +77,11 @@ func TestListInstanceDomainsQuery_Validate(t *testing.T) {
 			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
 				checker := domainmock.NewMockPermissionChecker(ctrl)
 				checker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.InstanceReadPermission).
+					CheckInstancePermission(gomock.Any(), gomock.Any(),domain.InstanceReadPermission).
 					Times(1).
 					Return(nil)
 				checker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.DomainReadPermission).
+					CheckInstancePermission(gomock.Any(), gomock.Any(),domain.DomainReadPermission).
 					Times(1).
 					Return(permissionErr)
 				return checker
@@ -96,11 +96,11 @@ func TestListInstanceDomainsQuery_Validate(t *testing.T) {
 			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
 				checker := domainmock.NewMockPermissionChecker(ctrl)
 				checker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.InstanceReadPermission).
+					CheckInstancePermission(gomock.Any(),gomock.Any(), domain.InstanceReadPermission).
 					Times(1).
 					Return(nil)
 				checker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.DomainReadPermission).
+					CheckInstancePermission(gomock.Any(),gomock.Any(), domain.DomainReadPermission).
 					Times(1).
 					Return(nil)
 				return checker

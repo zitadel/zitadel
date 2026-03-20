@@ -97,7 +97,7 @@ func (d *DeleteInstanceCommand) Validate(ctx context.Context, opts *InvokeOpts) 
 		return zerrors.ThrowInvalidArgument(nil, "DOM-VpQ9lF", "Errors.Invalid.Argument")
 	}
 
-	if authZErr := opts.Permissions.CheckInstancePermission(ctx, InstanceWritePermission); authZErr != nil {
+	if authZErr := opts.Permissions.CheckInstancePermission(ctx, opts, InstanceWritePermission); authZErr != nil {
 		return zerrors.ThrowPermissionDenied(authZErr, "DOM-Yz8f1X", "Errors.PermissionDenied")
 	}
 

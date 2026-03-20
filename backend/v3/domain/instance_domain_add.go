@@ -100,7 +100,7 @@ func (a *AddInstanceDomainCommand) Validate(ctx context.Context, opts *InvokeOpt
 		return zerrors.ThrowInvalidArgument(nil, "DOM-x01cai", "Errors.Invalid.Argument")
 	}
 
-	if authZErr := opts.Permissions.CheckInstancePermission(ctx, DomainWritePermission); authZErr != nil {
+	if authZErr := opts.Permissions.CheckInstancePermission(ctx, opts, DomainWritePermission); authZErr != nil {
 		return zerrors.ThrowPermissionDenied(authZErr, "DOM-c83vPX", "Errors.PermissionDenied")
 	}
 

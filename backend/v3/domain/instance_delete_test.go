@@ -46,7 +46,7 @@ func TestDeleteInstanceCommand_Validate(t *testing.T) {
 				permChecker := domainmock.NewMockPermissionChecker(ctrl)
 
 				permChecker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.InstanceWritePermission).
+					CheckInstancePermission(gomock.Any(), gomock.Any(), domain.InstanceWritePermission).
 					Times(1).
 					Return(permissionErr)
 
@@ -61,7 +61,7 @@ func TestDeleteInstanceCommand_Validate(t *testing.T) {
 				permChecker := domainmock.NewMockPermissionChecker(ctrl)
 
 				permChecker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.InstanceWritePermission).
+					CheckInstancePermission(gomock.Any(), gomock.Any(), domain.InstanceWritePermission).
 					Times(1).
 					Return(nil)
 

@@ -55,7 +55,7 @@ func (g *GetInstanceQuery) Validate(ctx context.Context, opts *InvokeOpts) (err 
 		return zerrors.ThrowPermissionDenied(nil, "DOM-n0SvVB", "input instance ID doesn't match context instance")
 	}
 
-	if authZErr := opts.Permissions.CheckInstancePermission(ctx, InstanceReadPermission); authZErr != nil {
+	if authZErr := opts.Permissions.CheckInstancePermission(ctx, opts, InstanceReadPermission); authZErr != nil {
 		return zerrors.ThrowPermissionDenied(authZErr, "DOM-Uq6b00", "Errors.PermissionDenied")
 	}
 

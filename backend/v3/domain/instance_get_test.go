@@ -54,7 +54,7 @@ func TestGetInstanceCommand_Validate(t *testing.T) {
 				permChecker := domainmock.NewMockPermissionChecker(ctrl)
 
 				permChecker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.InstanceReadPermission).
+					CheckInstancePermission(gomock.Any(), gomock.Any(),domain.InstanceReadPermission).
 					Times(1).
 					Return(permissionErr)
 
@@ -70,7 +70,7 @@ func TestGetInstanceCommand_Validate(t *testing.T) {
 				permChecker := domainmock.NewMockPermissionChecker(ctrl)
 
 				permChecker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.InstanceReadPermission).
+					CheckInstancePermission(gomock.Any(), gomock.Any(),domain.InstanceReadPermission).
 					Times(1).
 					Return(nil)
 

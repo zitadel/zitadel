@@ -84,7 +84,7 @@ func (u *UpdateInstanceCommand) Validate(ctx context.Context, opts *InvokeOpts) 
 		return zerrors.ThrowInvalidArgument(nil, "DOM-FPJcLC", "Errors.Instance.Name")
 	}
 
-	if authZErr := opts.Permissions.CheckInstancePermission(ctx, InstanceWritePermission); authZErr != nil {
+	if authZErr := opts.Permissions.CheckInstancePermission(ctx, opts, InstanceWritePermission); authZErr != nil {
 		return zerrors.ThrowPermissionDenied(authZErr, "DOM-M5ObLP", "Errors.PermissionDenied")
 	}
 

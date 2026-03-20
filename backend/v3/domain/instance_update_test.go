@@ -51,7 +51,7 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 				permChecker := domainmock.NewMockPermissionChecker(ctrl)
 
 				permChecker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.InstanceWritePermission).
+					CheckInstancePermission(gomock.Any(), gomock.Any(), domain.InstanceWritePermission).
 					Times(1).
 					Return(permissionErr)
 
@@ -67,7 +67,7 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 				permChecker := domainmock.NewMockPermissionChecker(ctrl)
 
 				permChecker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.InstanceWritePermission).
+					CheckInstancePermission(gomock.Any(), gomock.Any(), domain.InstanceWritePermission).
 					Times(1).
 					Return(nil)
 
@@ -95,7 +95,7 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 				permChecker := domainmock.NewMockPermissionChecker(ctrl)
 
 				permChecker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.InstanceWritePermission).
+					CheckInstancePermission(gomock.Any(), gomock.Any(), domain.InstanceWritePermission).
 					Times(1).
 					Return(nil)
 
@@ -124,7 +124,7 @@ func TestUpdateInstanceCommand_Validate(t *testing.T) {
 				permChecker := domainmock.NewMockPermissionChecker(ctrl)
 
 				permChecker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.InstanceWritePermission).
+					CheckInstancePermission(gomock.Any(), gomock.Any(), domain.InstanceWritePermission).
 					Times(1).
 					Return(nil)
 

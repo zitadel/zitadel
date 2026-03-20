@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS zitadel.check_permission(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, BOOLEAN);

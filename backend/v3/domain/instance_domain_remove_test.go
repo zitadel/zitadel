@@ -63,7 +63,7 @@ func TestRemoveInstanceDomainCommand_Validate(t *testing.T) {
 			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
 				permChecker := domainmock.NewMockPermissionChecker(ctrl)
 				permChecker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.DomainWritePermission).
+					CheckInstancePermission(gomock.Any(), gomock.Any(),domain.DomainWritePermission).
 					Times(1).
 					Return(permissionErr)
 				return permChecker
@@ -77,7 +77,7 @@ func TestRemoveInstanceDomainCommand_Validate(t *testing.T) {
 			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
 				permChecker := domainmock.NewMockPermissionChecker(ctrl)
 				permChecker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.DomainWritePermission).
+					CheckInstancePermission(gomock.Any(),gomock.Any(), domain.DomainWritePermission).
 					Times(1).
 					Return(nil)
 				return permChecker
@@ -106,7 +106,7 @@ func TestRemoveInstanceDomainCommand_Validate(t *testing.T) {
 			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
 				permChecker := domainmock.NewMockPermissionChecker(ctrl)
 				permChecker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.DomainWritePermission).
+					CheckInstancePermission(gomock.Any(), gomock.Any(),domain.DomainWritePermission).
 					Times(1).
 					Return(nil)
 				return permChecker
@@ -136,7 +136,7 @@ func TestRemoveInstanceDomainCommand_Validate(t *testing.T) {
 			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
 				permChecker := domainmock.NewMockPermissionChecker(ctrl)
 				permChecker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.DomainWritePermission).
+					CheckInstancePermission(gomock.Any(), gomock.Any(),domain.DomainWritePermission).
 					Times(1).
 					Return(nil)
 				return permChecker
@@ -167,7 +167,7 @@ func TestRemoveInstanceDomainCommand_Validate(t *testing.T) {
 			permissionChecker: func(ctrl *gomock.Controller) domain.PermissionChecker {
 				permChecker := domainmock.NewMockPermissionChecker(ctrl)
 				permChecker.EXPECT().
-					CheckInstancePermission(gomock.Any(), domain.DomainWritePermission).
+					CheckInstancePermission(gomock.Any(), gomock.Any(),domain.DomainWritePermission).
 					Times(1).
 					Return(nil)
 				return permChecker

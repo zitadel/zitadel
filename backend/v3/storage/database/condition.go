@@ -371,45 +371,44 @@ func ForceRestrictingColumn(cond Condition, isRestriction bool) Condition {
 
 var _ Condition = (*forcedRestrictingColumnCondition)(nil)
 
-type permissionCheck struct {
-	requiredPermission string
-	throwError         bool
+type raiseException struct {
+	id   string
+	text string
 }
 
-func (p *permissionCheck) Matches(x any) bool {
-	toMatch, ok := x.(*permissionCheck)
+func (p *raiseException) Matches(x any) bool {
+	toMatch, ok := x.(*raiseException)
 	if !ok {
 		return false
 	}
-	if toMatch.requiredPermission != p.requiredPermission {
-		return false
-	}
-	return toMatch.throwError == p.throwError
+	return toMatch.id == p.id && toMatch.text == p.text
 }
 
-func (p *permissionCheck) String() string {
-	return "database.permissionCheck"
+func (p *raiseException) String() string {
+	return "database.raiseException"
 }
 
-func (p *permissionCheck) Write(builder *StatementBuilder) {
-	// TODO: implement actual permission check once we have the necessary tables and functions in place.
-	// For now, we just write a dummy condition that can be used to verify that the permission check is included in the generated SQL.
-	if p.throwError {
-		builder.WriteString(" zitadel.throw_not_permitted() ")
-		return
-	}
-	builder.WriteString(" true ")
+func (p *raiseException) Write(builder *StatementBuilder) {
+	builder.WriteString("zitadel.raise_exception(")
+	builder.WriteArgs(p.id, p.text)
+	builder.WriteString(")")
 }
 
-func (p *permissionCheck) IsRestrictingColumn(_ Column) bool {
+func (p *raiseException) IsRestrictingColumn(_ Column) bool {
 	return false
 }
 
-func PermissionCheck(requiredPermission string, throwError bool) *permissionCheck {
-	return &permissionCheck{
-		requiredPermission: requiredPermission,
-		throwError:         throwError,
+// RaiseException creates a condition that raises an exception with the given id and text when evaluated.
+// Make sure that id is a valid SQL error code (5 characters, first character between 'A' and 'Z') to avoid unexpected errors.
+func RaiseException(id, text string) *raiseException {
+	return &raiseException{
+		id:   id,
+		text: text,
 	}
 }
 
-var _ Condition = (*permissionCheck)(nil)
+func RaisePermissionDeniedException() *raiseException {
+	return RaiseException(PermissionDeniedCode, PermissionDeniedText)
+}
+
+var _ Condition = (*raiseException)(nil)

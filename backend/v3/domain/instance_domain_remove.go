@@ -92,7 +92,7 @@ func (r *RemoveInstanceDomainCommand) Validate(ctx context.Context, opts *Invoke
 		return zerrors.ThrowInvalidArgument(nil, "DOM-83FUdY", "Errors.Invalid.Argument")
 	}
 
-	if authZErr := opts.Permissions.CheckInstancePermission(ctx, DomainWritePermission); authZErr != nil {
+	if authZErr := opts.Permissions.CheckInstancePermission(ctx, opts, DomainWritePermission); authZErr != nil {
 		return zerrors.ThrowPermissionDenied(authZErr, "DOM-eroxID", "Errors.PermissionDenied")
 	}
 

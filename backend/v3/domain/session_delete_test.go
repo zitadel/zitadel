@@ -15,7 +15,6 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	noopdb "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/noop"
 	"github.com/zitadel/zitadel/internal/api/authz"
-	zdomain "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -141,7 +140,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 							repo.PrimaryKeyCondition("inst-1", "session-1"),
 							database.Or(
 								repo.UserIDCondition(userID),
-								database.PermissionCheck(zdomain.PermissionSessionDelete, true),
+								database.RaisePermissionDeniedException(),
 							),
 						).
 						Times(1).
@@ -167,7 +166,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 							repo.PrimaryKeyCondition("inst-1", "session-1"),
 							database.Or(
 								repo.TokenIDCondition("token-1"),
-								database.PermissionCheck(zdomain.PermissionSessionDelete, true),
+								database.RaisePermissionDeniedException(),
 							),
 						).
 						Times(1).
@@ -195,7 +194,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 							repo.PrimaryKeyCondition("inst-1", "session-1"),
 							database.Or(
 								repo.UserIDCondition(userID),
-								database.PermissionCheck(zdomain.PermissionSessionDelete, true),
+								database.RaisePermissionDeniedException(),
 							),
 						).
 						Times(1).

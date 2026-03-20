@@ -1067,7 +1067,7 @@ func TestSession_Delete(t *testing.T) {
 			},
 		},
 		{
-			name: "delete without permission",
+			name: "delete without permission - based on token id",
 			fields: fields{
 				testFunc: func(t *testing.T) []*domain.Session {
 					session := &domain.Session{
@@ -1088,6 +1088,36 @@ func TestSession_Delete(t *testing.T) {
 				},
 				permissionCondition: func(sessions []*domain.Session) database.Condition {
 					return sessionRepo.TokenIDCondition("invalid")
+				},
+			},
+			res: res{
+				noOfDeletedRows: 0,
+				deletedAt:       time.Time{},
+				err:             database.NewPermissionError(nil),
+			},
+		},
+		{
+			name: "delete without permission - based on user role",
+			fields: fields{
+				testFunc: func(t *testing.T) []*domain.Session {
+					session := &domain.Session{
+						InstanceID: instanceId,
+						ID:         gofakeit.Name(),
+						TokenID:    gofakeit.UUID(),
+						Lifetime:   time.Hour * 24,
+						CreatorID:  gofakeit.Name(),
+					}
+					err := sessionRepo.Create(t.Context(), tx, session)
+					require.NoError(t, err)
+					return []*domain.Session{session}
+				},
+			},
+			args: args{
+				condition: func(sessions []*domain.Session) database.Condition {
+					return sessionRepo.InstanceIDCondition(instanceId)
+				},
+				permissionCondition: func(sessions []*domain.Session) database.Condition {
+					return sessionRepo.PermissionCondition(instanceId, gofakeit.Name(), domain.SessionWritePermission, true)
 				},
 			},
 			res: res{
