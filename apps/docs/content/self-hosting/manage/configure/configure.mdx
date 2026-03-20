@@ -93,22 +93,18 @@ There are three ways to pass the masterkey to the `zitadel` binary:
 
 <Tabs
   groupId="installation-target"
-  default="linuxunix"
-  values={[
-    { label: "Linux and Unix", value: "linuxunix" },
-    { label: "Docker Compose", value: "compose" },
-    { label: "Kubernetes (Helm)", value: "k8s" },
-  ]}
+  defaultIndex={1}
+  items={['Linux and Unix','Docker Compose', 'Kubernetes (Helm)']}
 >
-  <Tab value="linuxunix">
+  <Tab value="Linux and Unix">
     <LinuxUnix components={props.components}  />
     <Login components={props.components} />
   </Tab>
-  <Tab value="compose">
+  <Tab value="Docker Compose">
     <Compose components={props.components}  />
     <Login components={props.components} />
   </Tab>
-  <Tab value="k8s">
+  <Tab value="Kubernetes (Helm)">
     <Helm components={props.components}  />
   </Tab>
 </Tabs>

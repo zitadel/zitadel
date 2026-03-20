@@ -132,13 +132,22 @@ When scaling Zitadel horizontally, ensure your PostgreSQL database can handle th
 
 Example connection pooling setup with PgBouncer:
 
+```bash
+kubectl create secret generic zitadel-db-credentials \
+  --from-literal=dsn="postgresql://zitadel:password@pgbouncer.database.svc.cluster.local:6432/zitadel?sslmode=disable"
+```
+
 ```yaml
 zitadel:
+  env:
+    - name: ZITADEL_DATABASE_POSTGRES_DSN
+      valueFrom:
+        secretKeyRef:
+          name: zitadel-db-credentials
+          key: dsn
   configmapConfig:
     Database:
       Postgres:
-        Host: "pgbouncer.database.svc.cluster.local"
-        Port: 6432
         MaxOpenConns: 20
         MaxIdleConns: 10
 ```
