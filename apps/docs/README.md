@@ -12,7 +12,6 @@ Ensure all dependencies are installed:
 
 ```bash
 pnpm install
-pnpm fetch:remote-content
 ```
 
 Start the development server:
