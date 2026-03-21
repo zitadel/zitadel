@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { sendVerification, initialSendVerification } from "./verify";
+import { initialSendVerification, sendVerification } from "./verify";
 
 import {
   createInviteCode,
   getSession,
   getUserByID,
   listAuthenticationMethodTypes,
-  sendEmailCode as zitadelSendEmailCode,
   verifyEmail,
+  sendEmailCode as zitadelSendEmailCode,
 } from "@/lib/zitadel";
 import { cookies } from "next/headers";
 import { getSessionCookieByLoginName } from "../cookies";
@@ -146,8 +146,7 @@ describe("initialSendVerification", () => {
     expect(mockSendEmailCode).toHaveBeenCalledWith({
       serviceConfig: {},
       userId: "user-1",
-      urlTemplate:
-        "https://example.com/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}",
+      urlTemplate: "https://example.com/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}",
     });
     expect(mockCreateInviteCode).not.toHaveBeenCalled();
   });
@@ -161,8 +160,7 @@ describe("initialSendVerification", () => {
     expect(mockCreateInviteCode).toHaveBeenCalledWith({
       serviceConfig: {},
       userId: "user-1",
-      urlTemplate:
-        "https://example.com/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true",
+      urlTemplate: "https://example.com/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true",
     });
     expect(mockSendEmailCode).not.toHaveBeenCalled();
   });
@@ -177,8 +175,7 @@ describe("initialSendVerification", () => {
     expect(mockSendEmailCode).toHaveBeenCalledWith({
       serviceConfig: {},
       userId: "user-1",
-      urlTemplate:
-        "https://example.com/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&requestId=req-123",
+      urlTemplate: "https://example.com/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&requestId=req-123",
     });
   });
 

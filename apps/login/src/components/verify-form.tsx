@@ -3,7 +3,7 @@
 import { Alert, AlertType } from "@/components/alert";
 import { handleServerActionResponse } from "@/lib/client-utils";
 import { UNKNOWN_USER_ID } from "@/lib/constants";
-import { resendVerification, sendVerification, initialSendVerification } from "@/lib/server/verify";
+import { initialSendVerification, resendVerification, sendVerification } from "@/lib/server/verify";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -54,14 +54,13 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
   useEffect(() => {
     if (doSend && userId && userId !== UNKNOWN_USER_ID && !initialSendDone.current) {
       initialSendDone.current = true;
+      setError("");
       initialSendVerification({ userId, isInvite, requestId })
         .then(() => {
           setCodeSent(true);
         })
         .catch(() => {
-          setInitialSendError(
-            isInvite ? t("errors.couldNotResendInvite") : t("errors.couldNotResendEmail"),
-          );
+          setInitialSendError(isInvite ? t("errors.couldNotResendInvite") : t("errors.couldNotResendEmail"));
         });
     }
   }, [doSend, userId, isInvite, requestId, t]);
