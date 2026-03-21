@@ -290,3 +290,35 @@ export async function sendInviteEmailCode(command: SendEmailCommand) {
 
   return createInviteCode({ serviceConfig, userId: command.userId, urlTemplate: command.urlTemplate });
 }
+
+type InitialSendVerificationCommand = {
+  userId: string;
+  isInvite: boolean;
+  requestId?: string;
+};
+
+export async function initialSendVerification(command: InitialSendVerificationCommand) {
+  const _headers = await headers();
+  const { serviceConfig } = getServiceConfig(_headers);
+  const hostWithProtocol = await getPublicHostWithProtocol(_headers);
+
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
+  if (command.isInvite) {
+    return createInviteCode({
+      serviceConfig,
+      userId: command.userId,
+      urlTemplate:
+        `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+        (command.requestId ? `&requestId=${command.requestId}` : ""),
+    });
+  } else {
+    return zitadelSendEmailCode({
+      serviceConfig,
+      userId: command.userId,
+      urlTemplate:
+        `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+        (command.requestId ? `&requestId=${command.requestId}` : ""),
+    });
+  }
+}
