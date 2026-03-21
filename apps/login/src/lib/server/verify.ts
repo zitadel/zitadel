@@ -236,6 +236,25 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   );
 }
 
+function buildVerificationUrlTemplate(
+  hostWithProtocol: string,
+  basePath: string,
+  isInvite: boolean,
+  requestId?: string,
+): string {
+  let urlTemplate = `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}`;
+
+  if (isInvite) {
+    urlTemplate += "&invite=true";
+  }
+
+  if (requestId) {
+    urlTemplate += `&requestId=${encodeURIComponent(requestId)}`;
+  }
+
+  return urlTemplate;
+}
+
 type resendVerifyEmailCommand = {
   userId: string;
   isInvite: boolean;
@@ -249,14 +268,13 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
   const hostWithProtocol = await getPublicHostWithProtocol(_headers);
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+  const urlTemplate = buildVerificationUrlTemplate(hostWithProtocol, basePath, command.isInvite, command.requestId);
 
   return command.isInvite
     ? createInviteCode({
         serviceConfig,
         userId: command.userId,
-        urlTemplate:
-          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
-          (command.requestId ? `&requestId=${command.requestId}` : ""),
+        urlTemplate,
       }).catch((error) => {
         if (error.code === 9) {
           return { error: t("errors.userAlreadyVerified") };
@@ -266,9 +284,7 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
     : zitadelSendEmailCode({
         serviceConfig,
         userId: command.userId,
-        urlTemplate:
-          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
-          (command.requestId ? `&requestId=${command.requestId}` : ""),
+        urlTemplate,
       });
 }
 
@@ -303,22 +319,19 @@ export async function initialSendVerification(command: InitialSendVerificationCo
   const hostWithProtocol = await getPublicHostWithProtocol(_headers);
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+  const urlTemplate = buildVerificationUrlTemplate(hostWithProtocol, basePath, command.isInvite, command.requestId);
 
   if (command.isInvite) {
     return createInviteCode({
       serviceConfig,
       userId: command.userId,
-      urlTemplate:
-        `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
-        (command.requestId ? `&requestId=${command.requestId}` : ""),
+      urlTemplate,
     });
   } else {
     return zitadelSendEmailCode({
       serviceConfig,
       userId: command.userId,
-      urlTemplate:
-        `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
-        (command.requestId ? `&requestId=${command.requestId}` : ""),
+      urlTemplate,
     });
   }
 }

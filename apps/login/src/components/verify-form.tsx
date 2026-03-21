@@ -68,6 +68,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
 
   async function resendCode() {
     setError("");
+    setInitialSendError("");
     setLoading(true);
 
     // do not send code for dummy userid that is set to prevent user enumeration
@@ -102,6 +103,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
   const fcn = useCallback(
     async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
       setError("");
+      setInitialSendError("");
       setLoading(true);
 
       try {
