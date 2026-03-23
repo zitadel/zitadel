@@ -4,6 +4,7 @@ import { setTheme } from "@/helpers/colors";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import { useTheme } from "next-themes";
 import { ReactNode, useEffect } from "react";
+import { BrandingProvider } from "./branding-context";
 
 type Props = {
   branding: BrandingSettings | undefined;
@@ -41,5 +42,9 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
     }
   }, [branding?.themeMode, setNextTheme]);
 
-  return <div>{children}</div>;
+  return (
+    <BrandingProvider themeMode={branding?.themeMode ?? 0}>
+      <div>{children}</div>
+    </BrandingProvider>
+  );
 };
