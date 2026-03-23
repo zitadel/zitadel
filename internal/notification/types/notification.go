@@ -26,7 +26,7 @@ type Notify func(
 ) error
 
 type ChannelChains interface {
-	Email(context.Context) (*senders.Chain, *email.Config, error)
+	Email(ctx context.Context, orgID string) (*senders.Chain, *email.Config, error)
 	SMS(context.Context) (*senders.Chain, *sms.Config, error)
 	Webhook(context.Context, webhook.Config) (*senders.Chain, error)
 	SecurityTokenEvent(context.Context, set.Config) (*senders.Chain, error)

@@ -26,6 +26,7 @@ type Queries interface {
 	NotificationProviderByIDAndType(ctx context.Context, aggID string, providerType domain.NotificationProviderType) (*query.DebugNotificationProvider, error)
 	SMSProviderConfigActive(ctx context.Context, resourceOwner string) (config *query.SMSConfig, err error)
 	SMTPConfigActive(ctx context.Context, resourceOwner string) (*query.SMTPConfig, error)
+	OrgSMTPConfigActive(ctx context.Context, orgID string) (*query.SMTPConfig, error)
 	GetDefaultLanguage(ctx context.Context) language.Tag
 	GetInstanceRestrictions(ctx context.Context) (restrictions query.Restrictions, err error)
 	InstanceByID(ctx context.Context, id string) (instance authz.Instance, err error)
