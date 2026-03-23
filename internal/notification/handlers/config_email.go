@@ -13,9 +13,17 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-// GetActiveEmailConfig reads the iam SMTP provider config
-func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context) (*email.Config, error) {
-	config, err := n.SMTPConfigActive(ctx, authz.GetInstance(ctx).InstanceID())
+// GetActiveEmailConfig reads the SMTP provider config for the given org.
+// Org-level SMTP is required — no fallback to instance-level.
+// If orgID is empty, falls back to instance-level for backward compatibility only.
+func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context, orgID string) (*email.Config, error) {
+	var config *query.SMTPConfig
+	var err error
+	if orgID != "" {
+		config, err = n.OrgSMTPConfigActive(ctx, orgID)
+	} else {
+		config, err = n.SMTPConfigActive(ctx, authz.GetInstance(ctx).InstanceID())
+	}
 	if err != nil {
 		return nil, err
 	}
