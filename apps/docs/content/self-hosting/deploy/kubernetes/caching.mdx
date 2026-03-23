@@ -15,94 +15,66 @@ Caching is an experimental beta feature. See the [Caches](/self-hosting/manage/c
 Zitadel supports Redis or any Redis-compatible store (for example, Valkey) in standalone mode. Sentinel and Redis Cluster are not supported because the cache connector expects a single endpoint and does not implement cluster routing or sentinel failover logic.
 
 <Callout type="note">
-Zitadel supports server-auth TLS (`EnableTLS: true`) but does not support client certificates/mTLS for cache connections.
+Zitadel supports server-auth TLS (`rediss://` scheme) but does not support client certificates/mTLS for cache connections.
 </Callout>
 
 Each cache uses its own Redis database index. Set `DBOffset` so Zitadel-owned indexes do not overlap with other applications. Zitadel issues `FLUSHDB` on its cache databases, so sharing an index with other apps is unsafe.
 
 ## Connect without authentication (development only)
 
+Pass the Redis URL as an environment variable:
+
 ```yaml
 zitadel:
-  configmapConfig:
-    Caches:
-      Connectors:
-        Redis:
-          Enabled: true
-          Addr: "redis-master.caching.svc.cluster.local:6379"
-          DBOffset: 10
-      Instance:
-        Connector: "redis"
-        MaxAge: 1h
-        LastUseAge: 10m
-      Organization:
-        Connector: "redis"
-        MaxAge: 1h
-        LastUseAge: 10m
+  env:
+    - name: ZITADEL_CACHES_CONNECTORS_REDIS_URL
+      value: "redis://redis-master.caching.svc.cluster.local:6379"
+    - name: ZITADEL_CACHES_CONNECTORS_REDIS_ENABLED
+      value: "true"
 ```
 
 Use this only on isolated clusters where the Redis endpoint does not require authentication.
 
 ## Connect with password from a Kubernetes Secret
 
-Keep credentials in a secret while the rest of the cache configuration stays in values:
-
-```yaml
-zitadel:
-  configSecretName: zitadel-cache-credentials
-  configmapConfig:
-    Caches:
-      Connectors:
-        Redis:
-          Enabled: true
-          Addr: "redis.database.svc.cluster.local:6379"
-          DBOffset: 10
-      Instance:
-        Connector: "redis"
-        MaxAge: 1h
-        LastUseAge: 10m
-      Organization:
-        Connector: "redis"
-        MaxAge: 1h
-        LastUseAge: 10m
-```
-
-Create the secret with your Redis ACL user and password:
+Store the Redis URL (with credentials) in a secret and pass it as an environment variable:
 
 ```bash
 kubectl create secret generic zitadel-cache-credentials \
-  --from-literal=config.yaml="
-Caches:
-  Connectors:
-    Redis:
-      Username: cache-user        # Omit for default user
-      Password: your-redis-password
-"
+  --from-literal=url="redis://cache-user:your-redis-password@redis.database.svc.cluster.local:6379"
+```
+
+```yaml
+zitadel:
+  env:
+    - name: ZITADEL_CACHES_CONNECTORS_REDIS_URL
+      valueFrom:
+        secretKeyRef:
+          name: zitadel-cache-credentials
+          key: url
+    - name: ZITADEL_CACHES_CONNECTORS_REDIS_ENABLED
+      value: "true"
 ```
 
 ## Connect with TLS (Redis or Valkey)
 
-Enable TLS when your endpoint requires encryption. This uses server-auth TLS with the container's trust store.
+Use the `rediss://` scheme (note the double `s`) when your endpoint requires encryption. This uses server-auth TLS with the container's trust store.
+
+```bash
+kubectl create secret generic zitadel-cache-credentials \
+  --from-literal=url="rediss://cache-user:your-redis-password@redis.example.com:6380"
+```
 
 ```yaml
 zitadel:
-  configSecretName: zitadel-cache-credentials
-  configmapConfig:
-    Caches:
-      Connectors:
-        Redis:
-          Enabled: true
-          Addr: "redis.example.com:6380"
-          EnableTLS: true
-          DBOffset: 10
-      Instance:
-        Connector: "redis"
-        MaxAge: 1h
-        LastUseAge: 10m
-      Organization:
-        Connector: "redis"
-        MaxAge: 1h
-        LastUseAge: 10m
+  env:
+    - name: ZITADEL_CACHES_CONNECTORS_REDIS_URL
+      valueFrom:
+        secretKeyRef:
+          name: zitadel-cache-credentials
+          key: url
+    - name: ZITADEL_CACHES_CONNECTORS_REDIS_ENABLED
+      value: "true"
 ```
 
-Reuse the secret from the previous section for credentials if needed. Custom certificate authorities must be added to the container's trust bundle (for example, by mounting a CA file into the pod); client certificate authentication is not supported.
+Custom certificate authorities must be added to the container's trust bundle (for example, by mounting a CA file into the pod); client certificate authentication is not supported.
