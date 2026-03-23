@@ -2,6 +2,7 @@
 
 import { APPEARANCE_STYLES, getComponentRoundness, getThemeConfig } from "@/lib/theme";
 import { ComputerDesktopIcon, MoonIcon, SunIcon } from "@heroicons/react/24/outline";
+import { ThemeMode } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { useThemeMode } from "./branding-context";
@@ -50,7 +51,7 @@ export default function ThemeSwitch() {
   if (!mounted) return null;
 
   // Hide toggle when theme is forced to light or dark only
-  if (themeMode === 2 || themeMode === 3) {
+  if (themeMode === ThemeMode.LIGHT || themeMode === ThemeMode.DARK) {
     return null;
   }
 
