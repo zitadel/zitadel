@@ -10,20 +10,16 @@ export default function AuthMethods(props) {
     <div>
       <Tabs
         groupId="auth-type"
-        default="pkce"
-        values={[
-          { label: "PKCE", value: "pkce" },
-          { label: "Basic Auth", value: "basic" },
-          { label: "JWT with Private Key", value: "jwtpk" },
-        ]}
+        defaultIndex={0}
+        items={["PKCE","Basic Auth","JWT with Private Key"]}
       >
-        <Tab value="pkce">
+        <Tab value="PKCE">
           <PKCE components={props.components}  />
         </Tab>
-        <Tab value="basic">
+        <Tab value="Basic Auth">
           <Basic components={props.components}  />
         </Tab>
-        <Tab value="jwtpk">
+        <Tab value="JWT with Private Key">
           <JWTPrivateKey components={props.components}  />
         </Tab>
       </Tabs>
@@ -31,26 +27,23 @@ export default function AuthMethods(props) {
   ) : props.selected == "native" ? (
     <Tabs
       groupId="auth-type"
-      default="pkce"
-      values={[{ label: "PKCE", value: "pkce" }]}
+      defaultIndex={0}
+      items={["PKCE"]}
     >
-      <Tab value="pkce">
+      <Tab value="PKCE">
         <PKCE components={props.components} Native />
       </Tab>
     </Tabs>
   ) : props.selected == "spa" ? (
     <Tabs
       groupId="auth-type"
-      default="pkce"
-      values={[
-        { label: "PKCE", value: "pkce" },
-        { label: "Implicit", value: "implicit" },
-      ]}
+      defaultIndex={0}
+      items={["PKCE","Implicit"]}
     >
-      <Tab value="pkce">
+      <Tab value="PKCE">
         <PKCE components={props.components}  />
       </Tab>
-      <Tab value="implicit">
+      <Tab value="Implicit">
         <Implicit components={props.components}  />
       </Tab>
     </Tabs>
