@@ -1,19 +1,47 @@
 "use client";
 
-import { createContext, ReactNode, useContext } from "react";
+import { useEffect, useState } from "react";
 
-interface BrandingContextValue {
-  themeMode: number; // 0=UNSPECIFIED, 1=AUTO, 2=LIGHT, 3=DARK
+/**
+ * Module-level store for themeMode from branding settings.
+ * This is used instead of React Context because ThemeSwitch in the layout
+ * is a sibling of (not a descendant of) the ThemeWrapper/DynamicTheme tree.
+ */
+let currentThemeMode = 0; // Default to UNSPECIFIED
+const listeners = new Set<() => void>();
+
+function notifyListeners() {
+  listeners.forEach((listener) => listener());
 }
 
-const BrandingContext = createContext<BrandingContextValue>({
-  themeMode: 0, // Default to UNSPECIFIED (toggle visible with system option)
-});
-
-export function BrandingProvider({ themeMode, children }: { themeMode: number; children: ReactNode }) {
-  return <BrandingContext.Provider value={{ themeMode }}>{children}</BrandingContext.Provider>;
+export function setThemeMode(mode: number) {
+  if (currentThemeMode !== mode) {
+    currentThemeMode = mode;
+    notifyListeners();
+  }
 }
 
-export function useBrandingContext() {
-  return useContext(BrandingContext);
+export function getThemeMode() {
+  return currentThemeMode;
+}
+
+/**
+ * Hook to subscribe to themeMode changes.
+ * Works across the component tree regardless of React Context boundaries.
+ */
+export function useThemeMode(): number {
+  const [themeMode, setThemeModeState] = useState(currentThemeMode);
+
+  useEffect(() => {
+    // Sync in case value changed between render and effect
+    setThemeModeState(currentThemeMode);
+
+    const listener = () => setThemeModeState(currentThemeMode);
+    listeners.add(listener);
+    return () => {
+      listeners.delete(listener);
+    };
+  }, []);
+
+  return themeMode;
 }

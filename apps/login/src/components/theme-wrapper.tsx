@@ -4,7 +4,7 @@ import { setTheme } from "@/helpers/colors";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import { useTheme } from "next-themes";
 import { ReactNode, useEffect } from "react";
-import { BrandingProvider } from "./branding-context";
+import { setThemeMode } from "./branding-context";
 
 type Props = {
   branding: BrandingSettings | undefined;
@@ -17,6 +17,11 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
   useEffect(() => {
     setTheme(document, branding);
   }, [branding]);
+
+  // Publish themeMode to the module-level store so ThemeSwitch can read it
+  useEffect(() => {
+    setThemeMode(branding?.themeMode ?? 0);
+  }, [branding?.themeMode]);
 
   // Handle branding themeMode to force specific theme
   useEffect(() => {
@@ -42,9 +47,5 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
     }
   }, [branding?.themeMode, setNextTheme]);
 
-  return (
-    <BrandingProvider themeMode={branding?.themeMode ?? 0}>
-      <div>{children}</div>
-    </BrandingProvider>
-  );
+  return <div>{children}</div>;
 };

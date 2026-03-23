@@ -4,8 +4,7 @@ import { APPEARANCE_STYLES, getComponentRoundness, getThemeConfig } from "@/lib/
 import { ComputerDesktopIcon, MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { useBrandingContext } from "./branding-context";
-
+import { useThemeMode } from "./branding-context";
 function getThemeToggleRoundness() {
   return getComponentRoundness("themeSwitch");
 }
@@ -40,7 +39,7 @@ function getSelectedButtonStyle(isSelected: boolean): string {
 export default function ThemeSwitch() {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
-  const { themeMode } = useBrandingContext();
+  const themeMode = useThemeMode();
   const toggleRoundness = getThemeToggleRoundness();
   const cardAppearance = getThemeSwitchCardAppearance();
 
