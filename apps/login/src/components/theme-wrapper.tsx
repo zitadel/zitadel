@@ -3,7 +3,7 @@
 import { setTheme } from "@/helpers/colors";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import { useTheme } from "next-themes";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useLayoutEffect } from "react";
 import { setThemeMode } from "./branding-context";
 
 type Props = {
@@ -23,8 +23,10 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
     setThemeMode(branding?.themeMode ?? 0);
   }, [branding?.themeMode]);
 
-  // Handle branding themeMode to force specific theme
-  useEffect(() => {
+  // Handle branding themeMode to force specific theme.
+  // Uses useLayoutEffect to apply before paint and writes the forced value
+  // to localStorage so next-themes doesn't fall back to system default.
+  useLayoutEffect(() => {
     if (branding?.themeMode !== undefined) {
       // Based on the proto definition:
       // THEME_MODE_UNSPECIFIED = 0
@@ -33,9 +35,17 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
       // THEME_MODE_DARK = 3
       switch (branding.themeMode) {
         case 2: // THEME_MODE_LIGHT
+          document.documentElement.classList.remove("dark");
+          try {
+            localStorage.setItem("cp-theme", "light");
+          } catch {}
           setNextTheme("light");
           break;
         case 3: // THEME_MODE_DARK
+          document.documentElement.classList.add("dark");
+          try {
+            localStorage.setItem("cp-theme", "dark");
+          } catch {}
           setNextTheme("dark");
           break;
         case 1: // THEME_MODE_AUTO
