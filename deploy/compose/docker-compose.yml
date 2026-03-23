@@ -67,6 +67,11 @@ services:
       ZITADEL_CACHES_MILESTONES_CONNECTOR: ${ZITADEL_CACHES_MILESTONES_CONNECTOR}
       ZITADEL_CACHES_ORGANIZATION_CONNECTOR: ${ZITADEL_CACHES_ORGANIZATION_CONNECTOR}
 
+      # Identity Signals (observability)
+      ZITADEL_IDENTITYSIGNALS_ENABLED: ${ZITADEL_IDENTITYSIGNALS_ENABLED}
+      ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_ENABLED: ${ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_ENABLED}
+      ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_DATAPATH: ${ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_DATAPATH}
+
     healthcheck:
       test:
         - CMD
@@ -78,6 +83,7 @@ services:
       start_period: 20s
     volumes:
       - zitadel-bootstrap:/zitadel/bootstrap:rw
+      - signals-data:${ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_DATAPATH}:rw
     networks:
       - zitadel
     depends_on:
@@ -234,3 +240,4 @@ networks:
 volumes:
   postgres-data:
   zitadel-bootstrap:
+  signals-data:

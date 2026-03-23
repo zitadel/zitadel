@@ -431,6 +431,7 @@
     "SHOWORGS": "Show All Organizations",
     "GRANTS": "Role Assignments",
     "ACTIONS": "Actions",
+    "SIGNALS": "Observability",
     "TARGETS": "Targets",
     "PRIVACY": "Privacy",
     "TOS": "Terms of Service",
@@ -1514,7 +1515,8 @@
       "FAILEDEVENTS": "Failed Events",
       "VIEWS": "Views",
       "ACTIONS": "Actions",
-      "TARGETS": "Targets"
+      "TARGETS": "Targets",
+      "IDENTITY_SIGNALS": "Identity Signals"
     },
     "GROUPS": {
       "GENERAL": "General Information",
@@ -1525,7 +1527,8 @@
       "APPEARANCE": "Appearance",
       "OTHER": "Other",
       "STORAGE": "Storage",
-      "ACTIONS": "Actions"
+      "ACTIONS": "Actions",
+      "OBSERVABILITY": "Observability"
     },
     "BETA": "BETA"
   },
@@ -2870,6 +2873,43 @@
     "USER": {
       "TITLE": "Activity",
       "DESCRIPTION": "Here you can see the latest events that have generated a user change."
+    }
+  },
+  "IDENTITY_SIGNALS": {
+    "TITLE": "Identity Signals",
+    "DESCRIPTION": "Monitor and analyze behavioral signals collected during authentication and API operations. Signals provide observability into authentication traffic patterns across your instance.",
+    "TABS": {
+      "OVERVIEW": "Overview",
+      "LOGS": "Logs"
+    },
+    "OVERVIEW": {
+      "BY_STREAM": "By Stream",
+      "BY_OUTCOME": "By Outcome",
+      "EMPTY": "No signals recorded yet. Signals will appear once Identity Signals is enabled and traffic flows through the instance."
+    },
+    "FILTERS": {
+      "STREAM": "Stream",
+      "OUTCOME": "Outcome",
+      "USER_ID": "User ID",
+      "IP": "IP Address",
+      "ALL": "All"
+    },
+    "TABLE": {
+      "STREAM": "Stream",
+      "OPERATION": "Operation",
+      "OUTCOME": "Outcome",
+      "IP": "IP",
+      "USER_ID": "User ID",
+      "COUNTRY": "Country",
+      "CREATED_AT": "Created At"
+    }
+  },
+  "SIGNALS": {
+    "NAV": {
+      "OVERVIEW": "Overview",
+      "EXPLORE": "Explore",
+      "LOGS": "Logs",
+      "ACTIVITY": "Activity"
     }
   }
 }

@@ -137,6 +137,14 @@ const routes: Routes = [
     },
   },
   {
+    path: 'signals',
+    loadChildren: () => import('./pages/signals/signals.module'),
+    canActivate: [authGuard, roleGuard],
+    data: {
+      roles: ['iam.read'],
+    },
+  },
+  {
     path: '**',
     redirectTo: '/',
   },

@@ -89,6 +89,36 @@
                 "cwd": "{projectRoot}",
                 "command": "docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml -p zitadel-compose-test down --volumes"
             }
+        },
+        "signals-dev-up": {
+            "description": "Builds the signals-enabled Docker image and starts (or updates) the compose stack with identity signals enabled.",
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{projectRoot}",
+                "parallel": false,
+                "commands": [
+                    "docker compose --env-file ${ENV_FILE:-.env.example} -f docker-compose.yml -f docker-compose.signals-dev.yml up -d --force-recreate --wait"
+                ]
+            },
+            "dependsOn": [
+                "@zitadel/api:pack-signals"
+            ]
+        },
+        "signals-dev-down": {
+            "description": "Stops the identity signals dev stack.",
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{projectRoot}",
+                "command": "docker compose --env-file ${ENV_FILE:-.env.example} -f docker-compose.yml -f docker-compose.signals-dev.yml down"
+            }
+        },
+        "signals-dev-rm": {
+            "description": "Tears down the stack and removes volumes and networks.",
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "{projectRoot}",
+                "command": "docker compose --env-file ${ENV_FILE:-.env.example} -f docker-compose.yml -f docker-compose.signals-dev.yml down --volumes --remove-orphans"
+            }
         }
     }
 }

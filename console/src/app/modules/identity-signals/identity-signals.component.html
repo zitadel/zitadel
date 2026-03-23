@@ -1,0 +1,433 @@
+<div class="explorer">
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="nav-tabs">
+        <button class="nav-tab" [class.active]="activeTab === 'overview'" (click)="switchTab('overview')">Overview</button>
+        <button class="nav-tab" [class.active]="activeTab === 'logs'" (click)="switchTab('logs')">Logs</button>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="time-pills">
+        <button
+          *ngFor="let r of timeRanges"
+          class="pill"
+          [class.active]="selectedTimeRange === r"
+          (click)="selectTimeRange(r)"
+        >
+          {{ r.label }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Metric cards -->
+  <div class="metrics-row">
+    <div class="metric-card">
+      <span class="metric-value">{{ metricTotal | number }}</span>
+      <span class="metric-label">Total Signals</span>
+    </div>
+    <div class="metric-card">
+      <span class="metric-value metric-fail">{{ metricFailures | number }}</span>
+      <span class="metric-label">Failures</span>
+    </div>
+    <div class="metric-card">
+      <span class="metric-value">{{ metricSuccessRate }}%</span>
+      <span class="metric-label">Success Rate</span>
+    </div>
+    <div class="metric-card">
+      <span class="metric-value">{{ metricUniqueStreams }}</span>
+      <span class="metric-label">Streams</span>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="chart-card">
+    <div class="chart-wrap">
+      <mat-spinner *ngIf="chartLoading" diameter="20"></mat-spinner>
+      <svg
+        *ngIf="!chartLoading && chartBuckets.length > 0"
+        [attr.viewBox]="'0 0 ' + chartWidth + ' ' + chartHeight"
+        class="area-chart"
+        preserveAspectRatio="none"
+      >
+        <defs>
+          <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.15" />
+            <stop offset="100%" stop-color="var(--accent)" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <path [attr.d]="getChartFillPath()" fill="url(#areaGrad)" />
+        <path
+          [attr.d]="chartPath"
+          fill="none"
+          stroke="var(--accent)"
+          stroke-width="1.5"
+          vector-effect="non-scaling-stroke"
+        />
+      </svg>
+      <div *ngIf="!chartLoading && chartBuckets.length === 0" class="chart-empty">No data in range</div>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <div class="filter-chips">
+      <button
+        *ngFor="let s of streams"
+        class="chip"
+        [class.active]="filterForm.get('stream')?.value === s"
+        (click)="toggleStream(s)"
+      >
+        {{ s }}
+        <span class="chip-n" *ngIf="getDimensionCount(streamCounts, s) > 0">{{ getDimensionCount(streamCounts, s) }}</span>
+      </button>
+      <span class="chip-sep"></span>
+      <button
+        *ngFor="let o of ['success', 'failure']"
+        class="chip"
+        [class.active]="filterForm.get('outcome')?.value === o"
+        [ngClass]="'chip-' + o"
+        (click)="toggleOutcome(o)"
+      >
+        {{ o }}
+        <span class="chip-n" *ngIf="getDimensionCount(outcomeCounts, o) > 0">{{ getDimensionCount(outcomeCounts, o) }}</span>
+      </button>
+    </div>
+    <div class="filter-inputs" [formGroup]="filterForm">
+      <input class="filter-input" placeholder="Operation" formControlName="operation" (keyup.enter)="refresh()" />
+      <input class="filter-input" placeholder="IP" formControlName="ip" (keyup.enter)="refresh()" />
+      <input class="filter-input" placeholder="User ID" formControlName="user_id" (keyup.enter)="refresh()" />
+      <input class="filter-input" placeholder="Org ID" formControlName="org_id" (keyup.enter)="refresh()" />
+      <input class="filter-input" placeholder="Project ID" formControlName="project_id" (keyup.enter)="refresh()" />
+      <input class="filter-input" placeholder="Client ID" formControlName="client_id" (keyup.enter)="refresh()" />
+      <input class="filter-input" placeholder="Search payload…" formControlName="payload" (keyup.enter)="refresh()" />
+      <input
+        class="filter-input filter-input-sm"
+        placeholder="Trace ID"
+        formControlName="trace_id"
+        (keyup.enter)="refresh()"
+      />
+      <input
+        class="filter-input filter-input-sm"
+        placeholder="Span ID"
+        formControlName="span_id"
+        (keyup.enter)="refresh()"
+      />
+      <button class="icon-btn" (click)="resetFilters()" matTooltip="Reset filters">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- ========== OVERVIEW TAB ========== -->
+  <div class="tab-content" *ngIf="activeTab === 'overview'">
+    <div class="breakdowns-grid">
+      <!-- Top Operations -->
+      <div class="breakdown-card">
+        <h3 class="breakdown-title">Top Operations</h3>
+        <div class="breakdown-list">
+          <div class="breakdown-row" *ngFor="let row of topOperations; trackBy: trackByKey">
+            <button class="breakdown-key" (click)="drillDown('operation', row.key)" [matTooltip]="row.key">
+              {{ row.key }}
+            </button>
+            <div class="breakdown-bar-wrap">
+              <div class="breakdown-bar" [style.width.%]="row.pct"></div>
+            </div>
+            <span class="breakdown-count">{{ row.count | number }}</span>
+          </div>
+          <div class="breakdown-empty" *ngIf="topOperations.length === 0">No data</div>
+        </div>
+      </div>
+
+      <!-- Top Resources -->
+      <div class="breakdown-card">
+        <h3 class="breakdown-title">Top Resources</h3>
+        <div class="breakdown-list">
+          <div class="breakdown-row" *ngFor="let row of topResources; trackBy: trackByKey">
+            <button class="breakdown-key" (click)="drillDown('resource', row.key)" [matTooltip]="row.key">
+              {{ row.key }}
+            </button>
+            <div class="breakdown-bar-wrap">
+              <div class="breakdown-bar" [style.width.%]="row.pct"></div>
+            </div>
+            <span class="breakdown-count">{{ row.count | number }}</span>
+          </div>
+          <div class="breakdown-empty" *ngIf="topResources.length === 0">No data</div>
+        </div>
+      </div>
+
+      <!-- Top IPs -->
+      <div class="breakdown-card">
+        <h3 class="breakdown-title">Top IPs</h3>
+        <div class="breakdown-list">
+          <div class="breakdown-row" *ngFor="let row of topIPs; trackBy: trackByKey">
+            <button class="breakdown-key mono" (click)="drillDown('ip', row.key)">
+              {{ row.key }}
+            </button>
+            <div class="breakdown-bar-wrap">
+              <div class="breakdown-bar" [style.width.%]="row.pct"></div>
+            </div>
+            <span class="breakdown-count">{{ row.count | number }}</span>
+          </div>
+          <div class="breakdown-empty" *ngIf="topIPs.length === 0">No data</div>
+        </div>
+      </div>
+
+      <!-- Top Countries -->
+      <div class="breakdown-card">
+        <h3 class="breakdown-title">Top Countries</h3>
+        <div class="breakdown-list">
+          <div class="breakdown-row" *ngFor="let row of topCountries; trackBy: trackByKey">
+            <button class="breakdown-key" (click)="drillDown('country', row.key)">
+              {{ row.key }}
+            </button>
+            <div class="breakdown-bar-wrap">
+              <div class="breakdown-bar" [style.width.%]="row.pct"></div>
+            </div>
+            <span class="breakdown-count">{{ row.count | number }}</span>
+          </div>
+          <div class="breakdown-empty" *ngIf="topCountries.length === 0">No data</div>
+        </div>
+      </div>
+
+      <!-- Top Users -->
+      <div class="breakdown-card">
+        <h3 class="breakdown-title">Top Users</h3>
+        <div class="breakdown-list">
+          <div class="breakdown-row" *ngFor="let row of topUsers; trackBy: trackByKey">
+            <button class="breakdown-key mono" (click)="drillDown('user_id', row.key)" [matTooltip]="row.key">
+              {{ row.key | slice: 0 : 18 }}…
+            </button>
+            <div class="breakdown-bar-wrap">
+              <div class="breakdown-bar" [style.width.%]="row.pct"></div>
+            </div>
+            <span class="breakdown-count">{{ row.count | number }}</span>
+          </div>
+          <div class="breakdown-empty" *ngIf="topUsers.length === 0">No data</div>
+        </div>
+      </div>
+
+      <!-- Top Organizations -->
+      <div class="breakdown-card">
+        <h3 class="breakdown-title">Top Organizations</h3>
+        <div class="breakdown-list">
+          <div class="breakdown-row" *ngFor="let row of topOrgs; trackBy: trackByKey">
+            <button class="breakdown-key mono" (click)="drillDown('org_id', row.key)" [matTooltip]="row.key">
+              {{ row.key | slice: 0 : 18 }}…
+            </button>
+            <div class="breakdown-bar-wrap">
+              <div class="breakdown-bar" [style.width.%]="row.pct"></div>
+            </div>
+            <span class="breakdown-count">{{ row.count | number }}</span>
+          </div>
+          <div class="breakdown-empty" *ngIf="topOrgs.length === 0">No data</div>
+        </div>
+      </div>
+
+      <!-- Top Projects -->
+      <div class="breakdown-card">
+        <h3 class="breakdown-title">Top Projects</h3>
+        <div class="breakdown-list">
+          <div class="breakdown-row" *ngFor="let row of topProjects; trackBy: trackByKey">
+            <button class="breakdown-key mono" (click)="drillDown('project_id', row.key)" [matTooltip]="row.key">
+              {{ row.key | slice: 0 : 18 }}…
+            </button>
+            <div class="breakdown-bar-wrap">
+              <div class="breakdown-bar" [style.width.%]="row.pct"></div>
+            </div>
+            <span class="breakdown-count">{{ row.count | number }}</span>
+          </div>
+          <div class="breakdown-empty" *ngIf="topProjects.length === 0">No data</div>
+        </div>
+      </div>
+
+      <!-- Top Clients -->
+      <div class="breakdown-card">
+        <h3 class="breakdown-title">Top Clients</h3>
+        <div class="breakdown-list">
+          <div class="breakdown-row" *ngFor="let row of topClients; trackBy: trackByKey">
+            <button class="breakdown-key mono" (click)="drillDown('client_id', row.key)" [matTooltip]="row.key">
+              {{ row.key | slice: 0 : 18 }}…
+            </button>
+            <div class="breakdown-bar-wrap">
+              <div class="breakdown-bar" [style.width.%]="row.pct"></div>
+            </div>
+            <span class="breakdown-count">{{ row.count | number }}</span>
+          </div>
+          <div class="breakdown-empty" *ngIf="topClients.length === 0">No data</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== LOGS TAB ========== -->
+  <div class="tab-content" *ngIf="activeTab === 'logs'">
+    <mat-spinner *ngIf="loading" diameter="24" class="center-spinner"></mat-spinner>
+
+    <table mat-table [dataSource]="signals" *ngIf="!loading && signals.length > 0" class="log-table" multiTemplateDataRows>
+      <ng-container matColumnDef="createdAt">
+        <th mat-header-cell *matHeaderCellDef>Time</th>
+        <td mat-cell *matCellDef="let s">
+          <span class="mono ts">{{ toMillis(s.createdAt) | date: 'medium' }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="stream">
+        <th mat-header-cell *matHeaderCellDef>Stream</th>
+        <td mat-cell *matCellDef="let s">
+          <span class="badge badge-stream">{{ s.stream }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="resource">
+        <th mat-header-cell *matHeaderCellDef>Resource</th>
+        <td mat-cell *matCellDef="let s">
+          <span class="mono" *ngIf="s.resource">{{ s.resource }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="operation">
+        <th mat-header-cell *matHeaderCellDef>Operation</th>
+        <td mat-cell *matCellDef="let s">
+          <span class="mono op-text">{{ s.operation }}</span>
+          <span class="inline-error" *ngIf="extractError(s)" [matTooltip]="extractError(s)!">
+            <mat-icon class="inline-error-icon">error_outline</mat-icon>
+            {{ extractError(s) | slice: 0 : 60 }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="outcome">
+        <th mat-header-cell *matHeaderCellDef>Outcome</th>
+        <td mat-cell *matCellDef="let s">
+          <span
+            class="badge"
+            [ngClass]="{
+              'badge-ok': s.outcome === 'success',
+              'badge-fail': s.outcome === 'failure',
+            }"
+            >{{ s.outcome }}</span
+          >
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="ip">
+        <th mat-header-cell *matHeaderCellDef>IP</th>
+        <td mat-cell *matCellDef="let s">
+          <span class="mono">{{ s.ip }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="userId">
+        <th mat-header-cell *matHeaderCellDef>User</th>
+        <td mat-cell *matCellDef="let s">
+          <span class="mono truncated" *ngIf="s.userId" [matTooltip]="s.userId">{{ s.userId | slice: 0 : 12 }}…</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="expand">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let s">
+          <button class="expand-btn" (click)="toggleRow(s, $event)">
+            <mat-icon>{{ expandedSignal === s ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <!-- Detail row -->
+      <ng-container matColumnDef="expandedDetail">
+        <td mat-cell *matCellDef="let s" [attr.colspan]="displayedColumns.length">
+          <div class="detail-pane" *ngIf="expandedSignal === s" @detailExpand>
+            <div class="detail-kv-grid">
+              <div class="kv" *ngIf="s.resource">
+                <span class="kv-label">Resource</span><span class="kv-val mono">{{ s.resource }}</span>
+              </div>
+              <div class="kv" *ngIf="s.userId">
+                <span class="kv-label">User ID</span><span class="kv-val mono">{{ s.userId }}</span>
+              </div>
+              <div class="kv" *ngIf="s.callerId">
+                <span class="kv-label">Caller ID</span><span class="kv-val mono">{{ s.callerId }}</span>
+              </div>
+              <div class="kv" *ngIf="s.sessionId">
+                <span class="kv-label">Session</span><span class="kv-val mono">{{ s.sessionId }}</span>
+              </div>
+              <div class="kv" *ngIf="s.orgId">
+                <span class="kv-label">Organization</span><span class="kv-val mono">{{ s.orgId }}</span>
+              </div>
+              <div class="kv" *ngIf="s.projectId">
+                <span class="kv-label">Project</span><span class="kv-val mono">{{ s.projectId }}</span>
+              </div>
+              <div class="kv" *ngIf="s.clientId">
+                <span class="kv-label">Client</span><span class="kv-val mono">{{ s.clientId }}</span>
+              </div>
+              <div class="kv" *ngIf="s.ip">
+                <span class="kv-label">IP</span><span class="kv-val mono">{{ s.ip }}</span>
+              </div>
+              <div class="kv" *ngIf="s.country">
+                <span class="kv-label">Country</span><span class="kv-val">{{ s.country }}</span>
+              </div>
+              <div class="kv" *ngIf="s.forwardedChain">
+                <span class="kv-label">Forwarded</span><span class="kv-val mono">{{ s.forwardedChain }}</span>
+              </div>
+              <div class="kv" *ngIf="s.userAgent">
+                <span class="kv-label">User Agent</span><span class="kv-val mono">{{ s.userAgent }}</span>
+              </div>
+              <div class="kv" *ngIf="s.acceptLanguage">
+                <span class="kv-label">Language</span><span class="kv-val">{{ s.acceptLanguage }}</span>
+              </div>
+              <div class="kv" *ngIf="s.referer">
+                <span class="kv-label">Referer</span><span class="kv-val mono">{{ s.referer }}</span>
+              </div>
+              <div class="kv" *ngIf="s.secFetchSite">
+                <span class="kv-label">Sec-Fetch-Site</span><span class="kv-val">{{ s.secFetchSite }}</span>
+              </div>
+              <div class="kv">
+                <span class="kv-label">HTTPS</span><span class="kv-val">{{ s.isHttps ? 'Yes' : 'No' }}</span>
+              </div>
+              <div class="kv" *ngIf="s.traceId">
+                <span class="kv-label">Trace ID</span>
+                <span class="kv-val mono">{{ s.traceId }}</span>
+              </div>
+              <div class="kv" *ngIf="s.spanId">
+                <span class="kv-label">Span ID</span>
+                <span class="kv-val mono">{{ s.spanId }}</span>
+              </div>
+            </div>
+
+            <div class="detail-actions" *ngIf="s.traceId">
+              <button class="correlate-btn" (click)="correlate(s)" matTooltip="Show all signals sharing this OTEL trace">
+                <mat-icon>link</mat-icon> Correlate
+              </button>
+            </div>
+
+            <div class="payload-block" *ngIf="s.payload">
+              <span class="payload-label">Payload</span>
+              <pre class="payload-pre">{{ s.payload }}</pre>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        class="log-row"
+        [class.expanded]="expandedSignal === row"
+      ></tr>
+      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
+    </table>
+
+    <div *ngIf="!loading && signals.length === 0" class="empty">
+      <mat-icon>search_off</mat-icon>
+      <p>No signals found</p>
+    </div>
+
+    <div class="pager" *ngIf="totalCount > limit">
+      <span class="pager-info">{{ currentPage }} / {{ totalPages }}</span>
+      <button class="pager-btn" (click)="prevPage()" [disabled]="!hasPrevPage"><mat-icon>chevron_left</mat-icon></button>
+      <button class="pager-btn" (click)="nextPage()" [disabled]="!hasNextPage"><mat-icon>chevron_right</mat-icon></button>
+    </div>
+  </div>
+</div>

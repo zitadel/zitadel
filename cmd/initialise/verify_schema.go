@@ -75,6 +75,11 @@ func VerifyZitadel(ctx context.Context, db *database.DB, config database.Config)
 		return err
 	}
 
+	logging.Info(ctx, "verify signals")
+	if err := exec(ctx, conn, fmt.Sprintf(createSignalsStmt, config.Username()), nil); err != nil {
+		return err
+	}
+
 	logging.Info(ctx, "verify eventstore")
 	if err := exec(ctx, conn, fmt.Sprintf(createEventstoreStmt, config.Username()), nil); err != nil {
 		return err

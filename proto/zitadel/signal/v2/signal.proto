@@ -1,0 +1,123 @@
+syntax = "proto3";
+
+package zitadel.signal.v2;
+
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/signal/v2;signal";
+
+// Signal is a single behavioral observation recorded during an auth operation.
+message Signal {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {title: "Signal" description: "A behavioral observation recorded during an auth operation."}
+  };
+
+  string instance_id = 1;
+  string user_id = 2;
+  string caller_id = 3;
+  string session_id = 4;
+  string fingerprint_id = 5;
+  string operation = 6;
+  string stream = 7;
+  string resource = 8;
+  string outcome = 9;
+  google.protobuf.Timestamp created_at = 10;
+  string ip = 11;
+  string user_agent = 12;
+  string accept_language = 13;
+  string country = 14;
+  string forwarded_chain = 15;
+  string referer = 16;
+  string sec_fetch_site = 17;
+  bool is_https = 18;
+  // Structured findings from detection engines.
+  // This field is reserved for forward-compatibility with the detection engine
+  // and is not populated in the initial identity signals increment.
+  repeated Finding findings = 19;
+  // Raw event body for event-stream signals. Empty for request-stream signals.
+  string payload = 20;
+  // OpenTelemetry trace ID for cross-stream correlation.
+  string trace_id = 21;
+  // OpenTelemetry span ID.
+  string span_id = 22;
+  // Organization the caller belongs to.
+  string org_id = 23;
+  // Project the calling application belongs to.
+  string project_id = 24;
+  // OAuth/OIDC client ID of the calling application.
+  string client_id = 25;
+  // Duration of the operation in milliseconds.
+  // Zero for event-stream signals.
+  int64 duration_ms = 26;
+}
+
+// Finding is a detection outcome attached to a signal.
+// Reserved for forward-compatibility with the detection engine.
+message Finding {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {title: "Finding" description: "A detection outcome produced by a rule engine, LLM, or rate limiter."}
+  };
+
+  string name = 1;
+  string source = 2;
+  string message = 3;
+  double confidence = 4;
+  bool block = 5;
+  bool challenge = 6;
+  string challenge_type = 7;
+}
+
+// SignalFilters narrows the signals returned by List or Aggregate RPCs.
+// The caller's instance_id is always applied automatically from the auth context.
+message SignalFilters {
+  string user_id = 1;
+  string session_id = 2;
+  string ip = 3;
+  string stream = 4;
+  string outcome = 5;
+  string operation = 6;
+  string country = 7;
+  // Only signals recorded after this time are returned.
+  optional google.protobuf.Timestamp after = 8;
+  // Only signals recorded before this time are returned.
+  optional google.protobuf.Timestamp before = 9;
+  string resource = 10;
+  // Substring match (ILIKE) against the payload field.
+  string payload = 11;
+  // Exact match on OpenTelemetry trace ID.
+  string trace_id = 12;
+  // Exact match on OpenTelemetry span ID.
+  string span_id = 13;
+  // Filter by organization ID.
+  string org_id = 14;
+  // Filter by project ID.
+  string project_id = 15;
+  // Filter by client (application) ID.
+  string client_id = 16;
+  // Substring match (ILIKE) against the user agent string.
+  string user_agent = 17;
+  // Exact match on device fingerprint ID.
+  string fingerprint_id = 18;
+  // Exact match on service account (caller) ID.
+  string caller_id = 19;
+  // Substring match (ILIKE) against the HTTP referer header.
+  string referer = 20;
+  // Exact match on Accept-Language header value.
+  string accept_language = 21;
+  // Substring match (ILIKE) against the X-Forwarded-For chain.
+  string forwarded_chain = 22;
+  // Exact match on Sec-Fetch-Site header value.
+  string sec_fetch_site = 23;
+}
+
+// AggregationBucket is one bucket returned by AggregateSignals.
+message AggregationBucket {
+  string key = 1;
+  int64 count = 2;
+  // When secondary_group_by is set, identifies which series this bucket belongs to.
+  string series = 3;
+  // Numeric result for metrics like avg, sum, p50, p95, p99.
+  // For "count" and "distinct_count" metrics this mirrors the count field.
+  double value = 4;
+}

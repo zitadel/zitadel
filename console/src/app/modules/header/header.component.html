@@ -187,6 +187,19 @@
 
     <div class="system-rel" *ngIf="!isOnMe">
       <a
+        id="signalsbutton"
+        *ngIf="(['iam.read$', 'iam.write$'] | hasRole | async)"
+        [routerLink]="['/signals']"
+        [routerLinkActive]="['active']"
+        class="iam-settings"
+        mat-stroked-button
+      >
+        <div class="cnsl-action-button">
+          <span class="iam-label">{{ 'MENU.SIGNALS' | translate }}</span>
+          <i class="las la-chart-line"></i>
+        </div>
+      </a>
+      <a
         id="systembutton"
         *ngIf="!isOnInstance && (['iam.read$', 'iam.write$'] | hasRole | async)"
         [routerLink]="['/instance']"

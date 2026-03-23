@@ -36,6 +36,7 @@ import {
   FEATURESETTINGS,
   ACTIONS,
   ACTIONS_TARGETS,
+  IDENTITY_SIGNALS,
 } from 'src/app/modules/settings-list/settings';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -78,6 +79,7 @@ export class InstanceComponent {
     VIEWS,
     EVENTS,
     FAILEDEVENTS,
+    IDENTITY_SIGNALS,
     //actions
     ACTIONS,
     ACTIONS_TARGETS,

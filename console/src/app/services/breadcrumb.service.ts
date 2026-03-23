@@ -12,6 +12,7 @@ export enum BreadcrumbType {
   APP,
   IDP,
   AUTHUSER,
+  SIGNALS,
 }
 
 export class Breadcrumb {

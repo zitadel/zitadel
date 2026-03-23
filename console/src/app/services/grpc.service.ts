@@ -18,6 +18,7 @@ import { NewConnectWebOrgInterceptor, OrgInterceptor, OrgInterceptorProvider } f
 import { UserServiceClient } from '../proto/generated/zitadel/user/v2/User_serviceServiceClientPb';
 import {
   createFeatureServiceClient,
+  createSignalServiceClient,
   createUserServiceClient,
   createSessionServiceClient,
   createOrganizationServiceClient,
@@ -40,6 +41,7 @@ export class GrpcService {
   public mgmt!: ManagementServiceClient;
   public admin!: AdminServiceClient;
   public user!: UserServiceClient;
+  public signal!: ReturnType<typeof createSignalServiceClient>;
   public userNew!: ReturnType<typeof createUserServiceClient>;
   public session!: ReturnType<typeof createSessionServiceClient>;
   public mgmtNew!: ReturnType<typeof createManagementServiceClient>;
@@ -87,7 +89,6 @@ export class GrpcService {
         this.mgmt = new ManagementServiceClient(env.api, null, interceptors);
         this.admin = new AdminServiceClient(env.api, null, interceptors);
         this.user = new UserServiceClient(env.api, null, interceptors);
-
         const transport = createGrpcWebTransport({
           baseUrl: env.api,
           interceptors: [NewConnectWebAuthInterceptor(this.authInterceptorProvider)],
@@ -103,6 +104,7 @@ export class GrpcService {
         this.session = createSessionServiceClient(transport);
         this.mgmtNew = createManagementServiceClient(transportOldAPIs);
         this.authNew = createAuthServiceClient(transportOldAPIs);
+        this.signal = createSignalServiceClient(transport);
         this.featureNew = createFeatureServiceClient(transport);
         this.actionNew = createActionServiceClient(transport);
         this.webKey = createWebKeyServiceClient(transport);

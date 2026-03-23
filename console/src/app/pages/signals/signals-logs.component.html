@@ -1,0 +1,555 @@
+<div class="signals-page">
+  <!-- Preview banner -->
+  <div class="preview-banner">
+    <mat-icon>science</mat-icon>
+    <span
+      ><strong>Preview Feature</strong> — Identity Signals is in preview. Data format and APIs may change between releases.
+      Not recommended for production use.</span
+    >
+  </div>
+
+  <div class="unavailable-notice" *ngIf="!signalsAvailable">
+    <mat-icon>info_outline</mat-icon>
+    <div>
+      <strong>Identity Signals is not enabled</strong>
+      <p>
+        The Identity Signals subsystem is not configured on this instance. Enable it in the server configuration under
+        <code>IdentitySignals.Enabled</code>.
+      </p>
+    </div>
+  </div>
+
+  <ng-container *ngIf="signalsAvailable">
+    <!-- Vercel-style control rows -->
+    <div class="explore-controls">
+      <!-- Row 1: Stream -->
+      <div class="control-row">
+        <span class="control-label">Stream</span>
+        <div class="control-items">
+          <button class="ctl-dropdown" [matMenuTriggerFor]="sourceMenu">
+            <mat-icon class="ctl-icon">sensors</mat-icon>
+            <span class="ctl-emphasis">{{ filterForm.get('stream')?.value || 'All Signals' }}</span>
+            <mat-icon class="ctl-caret">unfold_more</mat-icon>
+          </button>
+          <mat-menu #sourceMenu="matMenu">
+            <button mat-menu-item (click)="selectStream('')" [class.active-item]="!filterForm.get('stream')?.value">
+              <mat-icon *ngIf="!filterForm.get('stream')?.value" class="check-icon">check</mat-icon>
+              <span>All Signals</span>
+            </button>
+            <button
+              mat-menu-item
+              *ngFor="let s of streams"
+              (click)="selectStream(s)"
+              [class.active-item]="filterForm.get('stream')?.value === s"
+            >
+              <mat-icon *ngIf="filterForm.get('stream')?.value === s" class="check-icon">check</mat-icon>
+              <span>{{ s }}</span>
+              <span class="dim-count" *ngIf="getDimensionCount(streamCounts, s) > 0" style="margin-left: 8px">{{
+                getDimensionCount(streamCounts, s) | number
+              }}</span>
+            </button>
+          </mat-menu>
+
+          <span class="ctl-tilde">~</span>
+
+          <button class="ctl-dropdown" [matMenuTriggerFor]="outcomeMenu">
+            <span>{{ filterForm.get('outcome')?.value || 'All Outcomes' }}</span>
+            <mat-icon class="ctl-caret">unfold_more</mat-icon>
+          </button>
+          <mat-menu #outcomeMenu="matMenu">
+            <button mat-menu-item (click)="selectOutcome('')" [class.active-item]="!filterForm.get('outcome')?.value">
+              <mat-icon *ngIf="!filterForm.get('outcome')?.value" class="check-icon">check</mat-icon>
+              <span>All Outcomes</span>
+            </button>
+            <button
+              mat-menu-item
+              (click)="selectOutcome('success')"
+              [class.active-item]="filterForm.get('outcome')?.value === 'success'"
+            >
+              <mat-icon *ngIf="filterForm.get('outcome')?.value === 'success'" class="check-icon">check</mat-icon>
+              <span>Success</span>
+              <span class="dim-count" *ngIf="getDimensionCount(outcomeCounts, 'success') > 0" style="margin-left: 8px">{{
+                getDimensionCount(outcomeCounts, 'success') | number
+              }}</span>
+            </button>
+            <button
+              mat-menu-item
+              (click)="selectOutcome('failure')"
+              [class.active-item]="filterForm.get('outcome')?.value === 'failure'"
+            >
+              <mat-icon *ngIf="filterForm.get('outcome')?.value === 'failure'" class="check-icon">check</mat-icon>
+              <span>Failure</span>
+              <span class="dim-count" *ngIf="getDimensionCount(outcomeCounts, 'failure') > 0" style="margin-left: 8px">{{
+                getDimensionCount(outcomeCounts, 'failure') | number
+              }}</span>
+            </button>
+          </mat-menu>
+        </div>
+        <div class="control-right">
+          <button class="ctl-dropdown" [matMenuTriggerFor]="timeMenu">
+            <mat-icon class="ctl-icon">calendar_today</mat-icon>
+            <span>{{ selectedTimeRange.label }}</span>
+            <mat-icon class="ctl-caret">expand_more</mat-icon>
+          </button>
+          <mat-menu #timeMenu="matMenu">
+            <button
+              mat-menu-item
+              *ngFor="let r of timeRanges"
+              (click)="selectTimeRange(r)"
+              [class.active-item]="selectedTimeRange === r"
+            >
+              <mat-icon *ngIf="selectedTimeRange === r" class="check-icon">check</mat-icon>
+              <span>{{ r.label }}</span>
+            </button>
+          </mat-menu>
+        </div>
+      </div>
+
+      <!-- Row 2: Filter -->
+      <div class="control-row">
+        <span class="control-label">Filter</span>
+        <div class="control-items">
+          <button class="ctl-chip" *ngFor="let f of activeFilterChips()" (click)="clearFilter(f.key)">
+            {{ f.label }}: {{ f.value }} <mat-icon class="chip-x">close</mat-icon>
+          </button>
+          <button class="ctl-add-filter" [matMenuTriggerFor]="filterMenu">
+            <mat-icon class="ctl-icon">filter_alt</mat-icon> Add filter
+          </button>
+          <mat-menu #filterMenu="matMenu">
+            <button mat-menu-item *ngFor="let fd of filterFieldDefs"
+              (click)="openFilterInput(fd.key)"
+              [disabled]="fd.suggestable && dimensionCounts[fd.key] === 0">
+              <span>{{ fd.label }}</span>
+              <span class="dim-count" *ngIf="dimensionCounts[fd.key]">{{ dimensionCounts[fd.key] }}</span>
+            </button>
+          </mat-menu>
+          <button class="clear-all-btn" *ngIf="hasActiveFilters()" (click)="resetFilters()">Clear all</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter input prompt with suggestions -->
+    <div
+      class="filter-prompt-wrap"
+      *ngIf="pendingFilterKey"
+      [class.has-suggestions]="filterSuggestionsLoading || filterSuggestions.length > 0"
+    >
+      <div class="filter-prompt">
+        <span class="filter-prompt-label">{{ pendingFilterLabel }} =</span>
+        <input
+          class="filter-prompt-input"
+          #filterInput
+          [placeholder]="'Type or pick ' + pendingFilterLabel + '...'"
+          maxlength="512"
+          (keyup.enter)="applyPendingFilter($any($event.target).value)"
+          (keyup.escape)="cancelPendingFilter()"
+          (input)="filterInputValue = $any($event.target).value"
+        />
+        <button class="filter-prompt-cancel" (click)="cancelPendingFilter()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="filter-suggestions" *ngIf="filterSuggestionsLoading || filterSuggestions.length > 0">
+        <mat-spinner *ngIf="filterSuggestionsLoading" diameter="16" class="suggestion-spinner"></mat-spinner>
+        <div class="filter-suggestion" *ngFor="let s of filteredSuggestions()" (click)="selectFilterSuggestion(s.key)">
+          <span class="suggestion-val mono">{{ s.key | slice: 0 : 80 }}</span>
+          <span class="suggestion-count">{{ s.count | number }}</span>
+        </div>
+        <div class="filter-suggestion-empty" *ngIf="!filterSuggestionsLoading && filteredSuggestions().length === 0">
+          No matches — press Enter to use typed value
+        </div>
+      </div>
+    </div>
+
+    <!-- Logs table -->
+    <mat-spinner *ngIf="loading" diameter="24" class="center-spinner"></mat-spinner>
+
+    <table
+      mat-table
+      [dataSource]="sortedSignals"
+      *ngIf="!loading && signals.length > 0"
+      class="log-table"
+      multiTemplateDataRows
+      matSort
+      (matSortChange)="sortData($event)"
+    >
+      <ng-container matColumnDef="createdAt">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Time</th>
+        <td mat-cell *matCellDef="let s">
+          <span class="mono ts">{{ toMillis(s.createdAt) | date: 'medium' }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="stream">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Stream</th>
+        <td mat-cell *matCellDef="let s">
+          <span class="badge badge-stream">{{ s.stream }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="resource">
+        <th mat-header-cell *matHeaderCellDef>Resource</th>
+        <td mat-cell *matCellDef="let s">
+          <span class="mono" *ngIf="s.resource">{{ s.resource }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="operation">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Operation</th>
+        <td mat-cell *matCellDef="let s">
+          <span class="mono op-text" [matTooltip]="s.operation">{{ shortName(s.operation) }}</span>
+          <span class="inline-error" *ngIf="extractError(s)" [matTooltip]="extractError(s)!">
+            <mat-icon class="inline-error-icon">error_outline</mat-icon>
+            {{ extractError(s) | slice: 0 : 60 }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="outcome">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Outcome</th>
+        <td mat-cell *matCellDef="let s">
+          <span class="badge" [ngClass]="{ 'badge-ok': s.outcome === 'success', 'badge-fail': s.outcome === 'failure' }">{{
+            s.outcome
+          }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="ip">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>IP</th>
+        <td mat-cell *matCellDef="let s">
+          <span class="mono">{{ s.ip }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="userId">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>User</th>
+        <td mat-cell *matCellDef="let s">
+          <span
+            class="mono truncated"
+            *ngIf="s.userId"
+            [matTooltip]="s.userId"
+            (click)="viewActivity('user_id', s.userId); $event.stopPropagation()"
+            style="cursor: pointer"
+            >{{ s.userId | slice: 0 : 12 }}…</span
+          >
+          <mat-icon
+            class="kv-link-icon inline-link"
+            *ngIf="s.userId"
+            (click)="navigateToEntity('user', s.userId); $event.stopPropagation()"
+            matTooltip="Open user in console"
+            >open_in_new</mat-icon
+          >
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="expand">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let s">
+          <button class="expand-btn" (click)="toggleRow(s, $event)">
+            <mat-icon>{{ expandedSignals.has(s) ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <!-- Detail row -->
+      <ng-container matColumnDef="expandedDetail">
+        <td mat-cell *matCellDef="let s" [attr.colspan]="displayedColumns.length">
+          <div class="detail-pane" *ngIf="expandedSignals.has(s)" @detailExpand>
+            <div class="detail-kv-grid">
+              <!-- Request -->
+              <div class="kv">
+                <span class="kv-label">Operation</span
+                ><span
+                  class="kv-val mono kv-copiable"
+                  [class.kv-link]="s.operation"
+                  (click)="addFilter('operation', s.operation)"
+                  >{{ s.operation || '—'
+                  }}<mat-icon
+                    class="kv-copy"
+                    *ngIf="s.operation"
+                    (click)="copyToClipboard(s.operation, $event)"
+                    matTooltip="Copy"
+                    >content_copy</mat-icon
+                  ></span
+                >
+              </div>
+              <!-- Identity -->
+              <div class="kv" *ngIf="s.userId">
+                <span class="kv-label">User ID</span
+                ><span class="kv-val mono kv-copiable" [class.kv-link]="s.userId" (click)="addFilter('user_id', s.userId)"
+                  >{{ s.userId
+                  }}<mat-icon class="kv-copy" *ngIf="s.userId" (click)="copyToClipboard(s.userId, $event)" matTooltip="Copy"
+                    >content_copy</mat-icon
+                  ><mat-icon
+                    class="kv-link-icon"
+                    *ngIf="s.userId"
+                    (click)="navigateToEntity('user', s.userId); $event.stopPropagation()"
+                    matTooltip="Open user"
+                    >open_in_new</mat-icon
+                  ></span
+                ><button
+                  class="activity-link-btn"
+                  *ngIf="s.userId"
+                  (click)="viewActivity('user_id', s.userId); $event.stopPropagation()"
+                  matTooltip="View user activity"
+                >
+                  <mat-icon>timeline</mat-icon>
+                </button>
+              </div>
+              <div class="kv" *ngIf="s.callerId">
+                <span class="kv-label">Caller ID</span
+                ><span class="kv-val mono kv-copiable"
+                  >{{ s.callerId
+                  }}<mat-icon
+                    class="kv-copy"
+                    *ngIf="s.callerId"
+                    (click)="copyToClipboard(s.callerId, $event)"
+                    matTooltip="Copy"
+                    >content_copy</mat-icon
+                  ></span
+                >
+              </div>
+              <div class="kv" *ngIf="s.sessionId">
+                <span class="kv-label">Session</span
+                ><span class="kv-val mono kv-copiable"
+                  >{{ s.sessionId
+                  }}<mat-icon
+                    class="kv-copy"
+                    *ngIf="s.sessionId"
+                    (click)="copyToClipboard(s.sessionId, $event)"
+                    matTooltip="Copy"
+                    >content_copy</mat-icon
+                  ></span
+                >
+              </div>
+              <div class="kv" *ngIf="s.fingerprintId">
+                <span class="kv-label">Fingerprint</span
+                ><span class="kv-val mono kv-copiable"
+                  >{{ s.fingerprintId
+                  }}<mat-icon
+                    class="kv-copy"
+                    *ngIf="s.fingerprintId"
+                    (click)="copyToClipboard(s.fingerprintId, $event)"
+                    matTooltip="Copy"
+                    >content_copy</mat-icon
+                  ></span
+                >
+              </div>
+              <!-- Organization -->
+              <div class="kv" *ngIf="s.orgId">
+                <span class="kv-label">Organization</span
+                ><span class="kv-val mono kv-copiable" [class.kv-link]="s.orgId" (click)="addFilter('org_id', s.orgId)"
+                  >{{ s.orgId
+                  }}<mat-icon class="kv-copy" *ngIf="s.orgId" (click)="copyToClipboard(s.orgId, $event)" matTooltip="Copy"
+                    >content_copy</mat-icon
+                  ><mat-icon
+                    class="kv-link-icon"
+                    *ngIf="s.orgId"
+                    (click)="navigateToEntity('org', s.orgId); $event.stopPropagation()"
+                    matTooltip="Open organization"
+                    >open_in_new</mat-icon
+                  ></span
+                >
+              </div>
+              <div class="kv" *ngIf="s.projectId">
+                <span class="kv-label">Project</span
+                ><span
+                  class="kv-val mono kv-copiable"
+                  [class.kv-link]="s.projectId"
+                  (click)="addFilter('project_id', s.projectId)"
+                  >{{ s.projectId
+                  }}<mat-icon
+                    class="kv-copy"
+                    *ngIf="s.projectId"
+                    (click)="copyToClipboard(s.projectId, $event)"
+                    matTooltip="Copy"
+                    >content_copy</mat-icon
+                  ><mat-icon
+                    class="kv-link-icon"
+                    *ngIf="s.projectId"
+                    (click)="navigateToEntity('project', s.projectId); $event.stopPropagation()"
+                    matTooltip="Open project"
+                    >open_in_new</mat-icon
+                  ></span
+                >
+              </div>
+              <div class="kv" *ngIf="s.clientId">
+                <span class="kv-label">Client</span
+                ><span
+                  class="kv-val mono kv-copiable"
+                  [class.kv-link]="s.clientId"
+                  (click)="addFilter('client_id', s.clientId)"
+                  >{{ s.clientId
+                  }}<mat-icon
+                    class="kv-copy"
+                    *ngIf="s.clientId"
+                    (click)="copyToClipboard(s.clientId, $event)"
+                    matTooltip="Copy"
+                    >content_copy</mat-icon
+                  ></span
+                ><button
+                  class="activity-link-btn"
+                  *ngIf="s.clientId"
+                  (click)="viewActivity('client_id', s.clientId); $event.stopPropagation()"
+                  matTooltip="View client activity"
+                >
+                  <mat-icon>timeline</mat-icon>
+                </button>
+              </div>
+              <!-- Network -->
+              <div class="kv">
+                <span class="kv-label">IP</span
+                ><span class="kv-val mono kv-copiable" [class.kv-link]="s.ip" (click)="addFilter('ip', s.ip)"
+                  >{{ s.ip || '—'
+                  }}<mat-icon class="kv-copy" *ngIf="s.ip" (click)="copyToClipboard(s.ip, $event)" matTooltip="Copy"
+                    >content_copy</mat-icon
+                  ></span
+                >
+              </div>
+              <div class="kv" *ngIf="s.country">
+                <span class="kv-label">Country</span
+                ><span class="kv-val kv-copiable" [class.kv-link]="s.country" (click)="addFilter('country', s.country)"
+                  >{{ s.country
+                  }}<mat-icon
+                    class="kv-copy"
+                    *ngIf="s.country"
+                    (click)="copyToClipboard(s.country, $event)"
+                    matTooltip="Copy"
+                    >content_copy</mat-icon
+                  ></span
+                >
+              </div>
+              <div class="kv" *ngIf="s.forwardedChain">
+                <span class="kv-label">Forwarded Chain</span
+                ><span class="kv-val mono kv-copiable"
+                  >{{ s.forwardedChain
+                  }}<mat-icon
+                    class="kv-copy"
+                    *ngIf="s.forwardedChain"
+                    (click)="copyToClipboard(s.forwardedChain, $event)"
+                    matTooltip="Copy"
+                    >content_copy</mat-icon
+                  ></span
+                >
+              </div>
+              <div class="kv">
+                <span class="kv-label">HTTPS</span><span class="kv-val">{{ s.isHttps ? 'Yes' : 'No' }}</span>
+              </div>
+              <!-- HTTP Headers -->
+              <div class="kv" *ngIf="s.userAgent">
+                <span class="kv-label">User Agent</span
+                ><span class="kv-val mono kv-copiable"
+                  >{{ s.userAgent
+                  }}<mat-icon
+                    class="kv-copy"
+                    *ngIf="s.userAgent"
+                    (click)="copyToClipboard(s.userAgent, $event)"
+                    matTooltip="Copy"
+                    >content_copy</mat-icon
+                  ></span
+                >
+              </div>
+              <div class="kv" *ngIf="s.acceptLanguage">
+                <span class="kv-label">Accept-Language</span
+                ><span class="kv-val kv-copiable"
+                  >{{ s.acceptLanguage
+                  }}<mat-icon
+                    class="kv-copy"
+                    *ngIf="s.acceptLanguage"
+                    (click)="copyToClipboard(s.acceptLanguage, $event)"
+                    matTooltip="Copy"
+                    >content_copy</mat-icon
+                  ></span
+                >
+              </div>
+              <div class="kv" *ngIf="s.referer">
+                <span class="kv-label">Referer</span
+                ><span class="kv-val mono kv-copiable"
+                  >{{ s.referer
+                  }}<mat-icon
+                    class="kv-copy"
+                    *ngIf="s.referer"
+                    (click)="copyToClipboard(s.referer, $event)"
+                    matTooltip="Copy"
+                    >content_copy</mat-icon
+                  ></span
+                >
+              </div>
+              <div class="kv" *ngIf="s.secFetchSite">
+                <span class="kv-label">Sec-Fetch-Site</span
+                ><span class="kv-val kv-copiable"
+                  >{{ s.secFetchSite
+                  }}<mat-icon
+                    class="kv-copy"
+                    *ngIf="s.secFetchSite"
+                    (click)="copyToClipboard(s.secFetchSite, $event)"
+                    matTooltip="Copy"
+                    >content_copy</mat-icon
+                  ></span
+                >
+              </div>
+              <!-- Tracing -->
+              <div class="kv">
+                <span class="kv-label">Trace ID</span
+                ><span class="kv-val mono kv-copiable" [class.kv-link]="s.traceId" (click)="addFilter('trace_id', s.traceId)"
+                  >{{ s.traceId || '—'
+                  }}<mat-icon
+                    class="kv-copy"
+                    *ngIf="s.traceId"
+                    (click)="copyToClipboard(s.traceId, $event)"
+                    matTooltip="Copy"
+                    >content_copy</mat-icon
+                  ></span
+                >
+              </div>
+              <div class="kv">
+                <span class="kv-label">Span ID</span
+                ><span class="kv-val mono kv-copiable" [class.kv-link]="s.spanId" (click)="addFilter('span_id', s.spanId)"
+                  >{{ s.spanId || '—'
+                  }}<mat-icon class="kv-copy" *ngIf="s.spanId" (click)="copyToClipboard(s.spanId, $event)" matTooltip="Copy"
+                    >content_copy</mat-icon
+                  ></span
+                >
+              </div>
+            </div>
+            <div class="detail-actions" *ngIf="s.traceId">
+              <button class="correlate-btn" (click)="correlate(s)" matTooltip="Show all signals sharing this OTEL trace">
+                <mat-icon>link</mat-icon> Correlate
+              </button>
+            </div>
+            <div class="payload-block" *ngIf="s.payload">
+              <span class="payload-label">Payload</span>
+              <pre class="payload-pre">{{ s.payload }}</pre>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        class="log-row"
+        [class.expanded]="expandedSignals.has(row)"
+        [class.highlighted]="highlightedSignal === row"
+      ></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: ['expandedDetail']"
+        class="detail-row"
+        [class.highlighted]="highlightedSignal === row"
+      ></tr>
+    </table>
+
+    <div *ngIf="!loading && signals.length === 0" class="empty">
+      <mat-icon>search_off</mat-icon>
+      <p>No signals found</p>
+    </div>
+
+    <div class="pager" *ngIf="totalCount > limit">
+      <span class="pager-info">{{ currentPage }} / {{ totalPages }}</span>
+      <button class="pager-btn" (click)="prevPage()" [disabled]="!hasPrevPage"><mat-icon>chevron_left</mat-icon></button>
+      <button class="pager-btn" (click)="nextPage()" [disabled]="!hasNextPage"><mat-icon>chevron_right</mat-icon></button>
+    </div>
+  </ng-container>
+</div>

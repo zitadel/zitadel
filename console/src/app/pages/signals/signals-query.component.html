@@ -1,0 +1,398 @@
+<div class="signals-page">
+  <!-- Preview banner -->
+  <div class="preview-banner">
+    <mat-icon>science</mat-icon>
+    <span
+      ><strong>Preview Feature</strong> — Identity Signals is in preview. Data format and APIs may change between releases.
+      Not recommended for production use.</span
+    >
+  </div>
+
+  <div class="unavailable-notice" *ngIf="!signalsAvailable">
+    <mat-icon>info_outline</mat-icon>
+    <div>
+      <strong>Identity Signals is not enabled</strong>
+      <p>
+        The Identity Signals subsystem is not configured on this instance. Enable it in the server configuration under
+        <code>IdentitySignals.Enabled</code>.
+      </p>
+    </div>
+  </div>
+
+  <ng-container *ngIf="signalsAvailable">
+    <!-- Control rows (Vercel-style) -->
+    <div class="explore-controls">
+      <!-- Row 1: Metric -->
+      <div class="control-row">
+        <span class="control-label">Metric</span>
+        <div class="control-items">
+          <button class="ctl-dropdown" [matMenuTriggerFor]="sourceMenu">
+            <mat-icon class="ctl-icon">sensors</mat-icon>
+            <span class="ctl-emphasis">{{ selectedSourceLabel }}</span>
+            <span class="ctl-dim">{{ selectedMetricLabel }}</span>
+            <mat-icon class="ctl-caret">unfold_more</mat-icon>
+          </button>
+          <mat-menu #sourceMenu="matMenu">
+            <button mat-menu-item (click)="selectSource('')" [class.active-item]="!selectedSource">
+              <mat-icon *ngIf="!selectedSource" class="check-icon">check</mat-icon>
+              <span>All Signals</span>
+            </button>
+            <button
+              mat-menu-item
+              *ngFor="let s of availableSources"
+              (click)="selectSource(s.key)"
+              [class.active-item]="selectedSource === s.key"
+            >
+              <mat-icon *ngIf="selectedSource === s.key" class="check-icon">check</mat-icon>
+              <span>{{ s.label }}</span>
+            </button>
+          </mat-menu>
+
+          <span class="ctl-tilde">~</span>
+
+          <button class="ctl-dropdown" [matMenuTriggerFor]="metricMenu">
+            <span>{{ selectedMetricLabel }}</span>
+            <mat-icon class="ctl-caret">unfold_more</mat-icon>
+          </button>
+          <mat-menu #metricMenu="matMenu">
+            <button
+              mat-menu-item
+              *ngFor="let m of metrics"
+              (click)="selectMetric(m.key)"
+              [class.active-item]="selectedMetric === m.key"
+            >
+              <mat-icon *ngIf="selectedMetric === m.key" class="check-icon">check</mat-icon>
+              <span>{{ m.label }}</span>
+            </button>
+          </mat-menu>
+        </div>
+        <div class="control-right">
+          <button class="ctl-dropdown" [matMenuTriggerFor]="timeMenu">
+            <mat-icon class="ctl-icon">calendar_today</mat-icon>
+            <span>{{ selectedTimeRange.label }}</span>
+            <mat-icon class="ctl-caret">expand_more</mat-icon>
+          </button>
+          <mat-menu #timeMenu="matMenu">
+            <button
+              mat-menu-item
+              *ngFor="let r of timeRanges"
+              (click)="selectTimeRange(r)"
+              [class.active-item]="selectedTimeRange === r"
+            >
+              <mat-icon *ngIf="selectedTimeRange === r" class="check-icon">check</mat-icon>
+              <span>{{ r.label }}</span>
+            </button>
+          </mat-menu>
+        </div>
+      </div>
+
+      <!-- Row 2: Group By -->
+      <div class="control-row">
+        <span class="control-label">Group By</span>
+        <div class="control-items">
+          <button class="ctl-chip" *ngFor="let g of activeGroupBys" (click)="removeGroupBy(g)">
+            {{ dimensionLabel(g) }} <mat-icon class="chip-x">close</mat-icon>
+          </button>
+          <button class="ctl-add" [matMenuTriggerFor]="groupMenu">
+            <mat-icon>add</mat-icon>
+          </button>
+          <mat-menu #groupMenu="matMenu">
+            <input
+              class="dimension-search"
+              placeholder="Search..."
+              (click)="$event.stopPropagation()"
+              (input)="dimensionSearch = $any($event.target).value"
+            />
+            <button
+              mat-menu-item
+              *ngFor="let d of filteredDimensions()"
+              (click)="addGroupBy(d.key)"
+              [disabled]="dimensionCounts[d.key] === 0"
+            >
+              <span>{{ d.label }}</span>
+              <span class="dim-count" *ngIf="dimensionCounts[d.key] !== undefined">{{ dimensionCounts[d.key] }}</span>
+            </button>
+          </mat-menu>
+        </div>
+      </div>
+
+      <!-- Row 3: Filter -->
+      <div class="control-row">
+        <span class="control-label">Filter</span>
+        <div class="control-items">
+          <button class="ctl-chip" *ngFor="let f of activeFilterChips()" (click)="clearFilter(f.key)">
+            {{ f.label }}: {{ f.value }} <mat-icon class="chip-x">close</mat-icon>
+          </button>
+          <button class="ctl-add-filter" [matMenuTriggerFor]="filterMenu">
+            <mat-icon class="ctl-icon">filter_alt</mat-icon> Add filter
+          </button>
+          <mat-menu #filterMenu="matMenu">
+            <button mat-menu-item (click)="openFilterInput('outcome')" [disabled]="dimensionCounts['outcome'] === 0">
+              <span>Outcome</span
+              ><span class="dim-count" *ngIf="dimensionCounts['outcome']">{{ dimensionCounts['outcome'] }}</span>
+            </button>
+            <button mat-menu-item (click)="openFilterInput('operation')" [disabled]="dimensionCounts['operation'] === 0">
+              <span>Operation</span
+              ><span class="dim-count" *ngIf="dimensionCounts['operation']">{{ dimensionCounts['operation'] }}</span>
+            </button>
+            <button mat-menu-item (click)="openFilterInput('ip')" [disabled]="dimensionCounts['ip'] === 0">
+              <span>IP Address</span><span class="dim-count" *ngIf="dimensionCounts['ip']">{{ dimensionCounts['ip'] }}</span>
+            </button>
+            <button mat-menu-item (click)="openFilterInput('country')" [disabled]="dimensionCounts['country'] === 0">
+              <span>Country</span
+              ><span class="dim-count" *ngIf="dimensionCounts['country']">{{ dimensionCounts['country'] }}</span>
+            </button>
+            <button mat-menu-item (click)="openFilterInput('user_id')" [disabled]="dimensionCounts['user_id'] === 0">
+              <span>User ID</span
+              ><span class="dim-count" *ngIf="dimensionCounts['user_id']">{{ dimensionCounts['user_id'] }}</span>
+            </button>
+            <button mat-menu-item (click)="openFilterInput('org_id')" [disabled]="dimensionCounts['org_id'] === 0">
+              <span>Organization</span
+              ><span class="dim-count" *ngIf="dimensionCounts['org_id']">{{ dimensionCounts['org_id'] }}</span>
+            </button>
+            <button mat-menu-item (click)="openFilterInput('project_id')" [disabled]="dimensionCounts['project_id'] === 0">
+              <span>Project</span
+              ><span class="dim-count" *ngIf="dimensionCounts['project_id']">{{ dimensionCounts['project_id'] }}</span>
+            </button>
+            <button mat-menu-item (click)="openFilterInput('client_id')" [disabled]="dimensionCounts['client_id'] === 0">
+              <span>Client</span
+              ><span class="dim-count" *ngIf="dimensionCounts['client_id']">{{ dimensionCounts['client_id'] }}</span>
+            </button>
+          </mat-menu>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter input prompt with suggestions -->
+    <div
+      class="filter-prompt-wrap"
+      *ngIf="pendingFilterKey"
+      [class.has-suggestions]="filterSuggestionsLoading || filterSuggestions.length > 0"
+    >
+      <div class="filter-prompt">
+        <span class="filter-prompt-label">{{ pendingFilterLabel }} =</span>
+        <input
+          class="filter-prompt-input"
+          #filterInput
+          [placeholder]="'Type or pick ' + pendingFilterLabel + '...'"
+          maxlength="512"
+          (keyup.enter)="applyPendingFilter($any($event.target).value)"
+          (keyup.escape)="cancelPendingFilter()"
+          (input)="filterInputValue = $any($event.target).value"
+        />
+        <button class="filter-prompt-cancel" (click)="cancelPendingFilter()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="filter-suggestions" *ngIf="filterSuggestionsLoading || filterSuggestions.length > 0">
+        <mat-spinner *ngIf="filterSuggestionsLoading" diameter="16" class="suggestion-spinner"></mat-spinner>
+        <div class="filter-suggestion" *ngFor="let s of filteredSuggestions()" (click)="selectFilterSuggestion(s.key)">
+          <span class="suggestion-val mono">{{ s.key | slice: 0 : 80 }}</span>
+          <span class="suggestion-count">{{ s.count | number }}</span>
+        </div>
+        <div class="filter-suggestion-empty" *ngIf="!filterSuggestionsLoading && filteredSuggestions().length === 0">
+          No matches — press Enter to use typed value
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart panel -->
+    <div class="explore-chart-panel">
+      <div class="chart-toolbar">
+        <div class="chart-type-toggle">
+          <button
+            class="chart-type-btn"
+            [class.active]="chartType === 'line'"
+            (click)="chartType = 'line'"
+            matTooltip="Line chart"
+          >
+            <mat-icon>show_chart</mat-icon>
+          </button>
+          <button
+            class="chart-type-btn"
+            [class.active]="chartType === 'bar'"
+            (click)="chartType = 'bar'"
+            matTooltip="Bar chart"
+          >
+            <mat-icon>bar_chart</mat-icon>
+          </button>
+        </div>
+        <button class="ctl-dropdown resolution-btn" [matMenuTriggerFor]="resMenu">
+          <mat-icon class="ctl-icon">tune</mat-icon>
+          <span>{{ activeResolutionLabel }}</span>
+          <mat-icon class="ctl-caret">expand_more</mat-icon>
+        </button>
+        <mat-menu #resMenu="matMenu">
+          <button
+            mat-menu-item
+            *ngFor="let r of availableResolutions"
+            (click)="selectResolution(r)"
+            [class.active-item]="activeResolution.value === r.value"
+          >
+            <mat-icon *ngIf="activeResolution.value === r.value" class="check-icon">check</mat-icon>
+            <span>{{ r.label }}</span>
+          </button>
+        </mat-menu>
+      </div>
+
+      <div class="chart-with-axes">
+        <!-- Y axis -->
+        <div class="chart-y-labels" *ngIf="!chartLoading && chartBuckets.length > 0">
+          <span class="chart-y-unit" *ngIf="yAxisLabel">{{ yAxisLabel }}</span>
+          <span *ngFor="let tick of yAxisTicks">{{
+            isFloatMetric ? (tick | number: '1.0-1') : (tick | number: '1.0-0')
+          }}</span>
+        </div>
+
+        <div class="chart-main-col">
+          <!-- Line chart -->
+          <div class="chart-wrap explore-chart-area" *ngIf="chartType === 'line'">
+            <mat-spinner *ngIf="chartLoading" diameter="20"></mat-spinner>
+            <!-- Single series -->
+            <svg
+              *ngIf="!chartLoading && chartBuckets.length > 0 && !isMultiSeries"
+              [attr.viewBox]="'0 0 ' + chartWidth + ' ' + chartHeight"
+              class="area-chart"
+              preserveAspectRatio="none"
+            >
+              <defs>
+                <linearGradient id="areaGradE" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.15" />
+                  <stop offset="100%" stop-color="var(--accent)" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+              <path [attr.d]="getChartFillPath()" fill="url(#areaGradE)" />
+              <path
+                [attr.d]="chartPath"
+                fill="none"
+                stroke="var(--accent)"
+                stroke-width="1.5"
+                vector-effect="non-scaling-stroke"
+              />
+            </svg>
+            <!-- Multi-series -->
+            <svg
+              *ngIf="!chartLoading && chartBuckets.length > 0 && isMultiSeries"
+              [attr.viewBox]="'0 0 ' + chartWidth + ' ' + chartHeight"
+              class="area-chart"
+              preserveAspectRatio="none"
+            >
+              <ng-container *ngFor="let s of chartSeries; let i = index">
+                <path [attr.d]="s.fillPath" [attr.fill]="s.color" opacity="0.08" />
+                <path
+                  [attr.d]="s.path"
+                  fill="none"
+                  [attr.stroke]="s.color"
+                  stroke-width="1.5"
+                  vector-effect="non-scaling-stroke"
+                />
+              </ng-container>
+            </svg>
+            <div *ngIf="!chartLoading && chartBuckets.length === 0" class="chart-empty">No data in selected range</div>
+          </div>
+
+          <!-- Bar chart -->
+          <div class="chart-wrap explore-chart-area" *ngIf="chartType === 'bar'">
+            <mat-spinner *ngIf="chartLoading" diameter="20"></mat-spinner>
+            <!-- Single series -->
+            <svg
+              *ngIf="!chartLoading && chartBuckets.length > 0 && !isMultiSeries"
+              [attr.viewBox]="'0 0 ' + chartWidth + ' ' + chartHeight"
+              class="area-chart"
+              preserveAspectRatio="none"
+            >
+              <rect
+                *ngFor="let bar of chartBars; trackBy: trackByBar"
+                [attr.x]="bar.x"
+                [attr.y]="bar.y"
+                [attr.width]="bar.w"
+                [attr.height]="bar.h"
+                fill="var(--accent)"
+                opacity="0.7"
+                rx="1"
+              />
+            </svg>
+            <!-- Multi-series -->
+            <svg
+              *ngIf="!chartLoading && chartBuckets.length > 0 && isMultiSeries"
+              [attr.viewBox]="'0 0 ' + chartWidth + ' ' + chartHeight"
+              class="area-chart"
+              preserveAspectRatio="none"
+            >
+              <ng-container *ngFor="let s of chartSeries">
+                <rect
+                  *ngFor="let bar of s.bars; trackBy: trackByBar"
+                  [attr.x]="bar.x"
+                  [attr.y]="bar.y"
+                  [attr.width]="bar.w"
+                  [attr.height]="bar.h"
+                  [attr.fill]="s.color"
+                  opacity="0.7"
+                  rx="1"
+                />
+              </ng-container>
+            </svg>
+            <div *ngIf="!chartLoading && chartBuckets.length === 0" class="chart-empty">No data in selected range</div>
+          </div>
+
+          <!-- X axis labels -->
+          <div class="chart-x-labels" *ngIf="!chartLoading && xAxisLabels.length > 0">
+            <span *ngFor="let lbl of xAxisLabels" [style.left.%]="lbl.pct">{{ lbl.text }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legend (multi-series only) -->
+      <div class="chart-legend" *ngIf="isMultiSeries && !chartLoading">
+        <span class="legend-item" *ngFor="let s of chartSeries" [matTooltip]="s.key">
+          <span class="legend-dot" [style.background]="s.color"></span>
+          {{ shortName(s.key) }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Search + breakdown table -->
+    <div class="explore-breakdown-panel">
+      <div class="breakdown-search-row">
+        <mat-icon class="breakdown-search-icon">search</mat-icon>
+        <input class="breakdown-search" placeholder="Search..." (input)="breakdownSearch = $any($event.target).value" />
+      </div>
+      <div class="breakdown-table" *ngIf="filteredBreakdown().length > 0">
+        <div class="breakdown-header">
+          <span class="bh-key">{{ selectedGroupLabel }}</span>
+          <span class="bh-count">{{ selectedMetricLabel }}</span>
+          <span class="bh-bar"></span>
+        </div>
+        <div
+          class="breakdown-row"
+          *ngFor="let row of filteredBreakdown(); let i = index; trackBy: trackByKey"
+          (click)="drillDownToLogs(selectedGroupBy, row.key)"
+        >
+          <span class="br-key mono" [matTooltip]="row.key">
+            <span class="br-color-dot" [style.background]="breakdownColor(breakdownPage * 10 + i)"></span>
+            {{ shortName(row.key) || '(empty)' }}
+          </span>
+          <span class="br-count">{{ isFloatMetric ? (row.count | number: '1.1-1') : (row.count | number) }}</span>
+          <div class="br-bar-wrap">
+            <div class="br-bar" [style.width.%]="row.pct"></div>
+          </div>
+        </div>
+      </div>
+      <div class="breakdown-empty" *ngIf="filteredBreakdown().length === 0 && !chartLoading">
+        <mat-icon>analytics</mat-icon>
+        <p>
+          No data for <strong>{{ selectedGroupLabel }}</strong>
+        </p>
+      </div>
+      <div class="breakdown-pager" *ngIf="primaryBreakdown.length > 10">
+        <span class="pager-info">{{ breakdownPage + 1 }} of {{ breakdownTotalPages }}</span>
+        <button class="pager-btn" (click)="breakdownPrev()" [disabled]="breakdownPage === 0">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <button class="pager-btn" (click)="breakdownNext()" [disabled]="breakdownPage >= breakdownTotalPages - 1">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</div>

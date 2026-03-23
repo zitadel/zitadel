@@ -23,6 +23,7 @@ var (
 	createEventstoreStmt     string
 	createProjectionsStmt    string
 	createSystemStmt         string
+	createSignalsStmt        string
 	createEncryptionKeysStmt string
 	createEventsStmt         string
 	createUniqueConstraints  string
@@ -142,6 +143,11 @@ func ReadStmts() (err error) {
 	}
 
 	createSystemStmt, err = readStmt("06_system")
+	if err != nil {
+		return err
+	}
+
+	createSignalsStmt, err = readStmt("11_signals")
 	if err != nil {
 		return err
 	}

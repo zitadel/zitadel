@@ -1,0 +1,119 @@
+---
+title: Identity Signals
+sidebar_label: Identity Signals (Preview)
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+<Callout type="warn">
+  **Preview Feature** — Identity Signals is in preview. Configuration, APIs, and
+  data format may change between releases without notice. Do not use in
+  production without accepting this risk.
+</Callout>
+
+## What is Identity Signals?
+
+Identity Signals provides **identity-aware observability** for your ZITADEL instance. It captures structured signals from authentication flows and API operations, giving administrators visibility into:
+
+- **Who** performed an action (user, service account)
+- **What** happened (login, token exchange, API call)
+- **When** and **where** (timestamp, IP, country, user agent)
+- **How it went** (success, failure, duration)
+
+Unlike general-purpose logging, Identity Signals captures identity-scoped data — designed for admin investigations, compliance audits, and understanding user behavior.
+
+## Signal Streams
+
+Identity Signals collects two types of data:
+
+| Stream | Source | Example Operations | Default Retention |
+|--------|--------|--------------------|-------------------|
+| **Requests** | API calls (HTTP/gRPC) | `GetSession`, `CreateCallback`, `ListUsers` | 30 days |
+| **Events** | Domain events | `password.check.succeeded`, `session.token.set` | 90 days |
+
+Each stream can be independently enabled and has its own configurable retention policy.
+
+## Enabling Identity Signals
+
+Identity Signals is **disabled by default**. To enable it, set the following configuration:
+
+```yaml
+IdentitySignals:
+  Enabled: true
+  Store:
+    DuckLake:
+      Enabled: true
+      DataPath: /var/lib/zitadel/signals  # writable path for Parquet data
+```
+
+Or via environment variables:
+
+```bash
+ZITADEL_IDENTITYSIGNALS_ENABLED=true
+ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_ENABLED=true
+ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_DATAPATH=/var/lib/zitadel/signals
+```
+
+<Callout type="info">
+  Identity Signals requires the CGO-enabled build of ZITADEL (`Dockerfile.signals`). The standard release binary (`CGO_ENABLED=0`) includes a no-op stub.
+</Callout>
+
+## Console UI
+
+Once enabled, the **Signals** section appears in the Console navigation (requires `iam.read` permission):
+
+- **Overview** — Dashboard with signal counts, outcome breakdown, and top operations
+- **Explore** — Ad-hoc aggregation queries with time-series charts
+- **Logs** — Searchable signal table with filters and expandable detail rows
+- **Activity** — Per-user/client/org timeline with trace correlation
+
+## Storage
+
+Signal data is stored using [DuckLake](https://duckdb.org/2025/05/16/ducklake.html) — a lakehouse architecture that combines:
+
+- **DuckDB** for fast analytical queries (in-process, no external service)
+- **PostgreSQL** for catalog metadata (uses your existing ZITADEL database)
+- **Parquet files** for columnar data storage (local filesystem or S3-compatible)
+
+### S3-Compatible Storage
+
+For production deployments, configure S3 storage:
+
+```yaml
+IdentitySignals:
+  Store:
+    DuckLake:
+      Backend: s3
+      S3:
+        Endpoint: "s3.amazonaws.com"
+        Bucket: "my-zitadel-signals"
+        AccessKey: "..."
+        SecretKey: "..."
+        UseSSL: true
+```
+
+## Retention
+
+Retention is configured per stream. Expired signals are automatically pruned by a background worker:
+
+```yaml
+IdentitySignals:
+  Streams:
+    Requests:
+      Retention: 720h   # 30 days
+    Events:
+      Retention: 2160h  # 90 days
+  Retention:
+    PruneInterval: 6h   # how often pruning runs
+```
+
+Set retention to `0` to keep signals indefinitely (not recommended for high-traffic instances).
+
+## API
+
+Signals are queryable via the Signal Service API:
+
+- **`POST /v2/signals/search`** — List signals with filters and pagination
+- **`POST /v2/signals/aggregate`** — Aggregate by dimension (operation, user, IP, time bucket) with metrics (count, avg, p50, p95, p99)
+
+Both endpoints require `iam.read` permission and are automatically scoped to the authenticated instance.

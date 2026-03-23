@@ -35,7 +35,8 @@ type Eventstore struct {
 	querier  Querier
 	searcher Searcher
 
-	logger *slog.Logger
+	logger     *slog.Logger
+	signalHook func(ctx context.Context, events []Event)
 }
 
 var (
@@ -87,6 +88,11 @@ func (es *Eventstore) Health(ctx context.Context) error {
 		return err
 	}
 	return es.querier.Health(ctx)
+}
+
+// SetSignalHook registers a callback invoked after every successful push.
+func (es *Eventstore) SetSignalHook(hook func(ctx context.Context, events []Event)) {
+	es.signalHook = hook
 }
 
 // Push pushes the events in a single transaction
@@ -160,6 +166,9 @@ retry:
 		return mappedEvents, err
 	}
 	es.notify(mappedEvents)
+	if es.signalHook != nil {
+		es.signalHook(ctx, mappedEvents)
+	}
 	return mappedEvents, nil
 }
 

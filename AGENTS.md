@@ -15,6 +15,7 @@ ZITADEL is an open-source Identity Management System (IAM) written in Go and Ang
   - **`api`**: Backend Nx app target. See `apps/api/AGENTS.md`.
 - **`console/`**: Angular Management Console. See `console/AGENTS.md`.
 - **`internal/`**: Backend domain and service logic. See `internal/AGENTS.md`.
+  - **`signals`**: Identity observability subsystem (Preview). See `internal/signals/DESIGN.md`.
 - **`proto/`**: API definitions. See `proto/AGENTS.md`.
 - **`packages/`**: Shared TypeScript packages. See `packages/AGENTS.md`.
 - **`tests/functional-ui/`**: Cypress functional UI tests. See `tests/functional-ui/AGENTS.md`.

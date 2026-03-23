@@ -50,6 +50,7 @@ import (
 	feature_v2beta "github.com/zitadel/zitadel/internal/api/grpc/feature/v2beta"
 	group_v2 "github.com/zitadel/zitadel/internal/api/grpc/group/v2"
 	idp_v2 "github.com/zitadel/zitadel/internal/api/grpc/idp/v2"
+	signal_v2 "github.com/zitadel/zitadel/internal/api/grpc/signal/v2"
 	instance_v2 "github.com/zitadel/zitadel/internal/api/grpc/instance/v2"
 	instance_v2beta "github.com/zitadel/zitadel/internal/api/grpc/instance/v2beta"
 	internal_permission_v2 "github.com/zitadel/zitadel/internal/api/grpc/internal_permission/v2"
@@ -95,6 +96,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
+	pg_db "github.com/zitadel/zitadel/internal/database/postgres"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/domain/federatedlogout"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -114,6 +116,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/queue"
 	"github.com/zitadel/zitadel/internal/serviceping"
+	"github.com/zitadel/zitadel/internal/signals"
 	"github.com/zitadel/zitadel/internal/static"
 	es_v4 "github.com/zitadel/zitadel/internal/v2/eventstore"
 	es_v4_pg "github.com/zitadel/zitadel/internal/v2/eventstore/postgres"
@@ -370,6 +373,47 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	if err != nil {
 		return err
 	}
+	// Identity Signals subsystem (optional) — initialise before startAPIs
+	// so the ConnectRPC handler is registered before RouteGRPC finalises
+	// the catch-all gRPC gateway route.
+	var signalReader signals.SignalReader
+	var signalEmitter *signals.Emitter
+	if config.IdentitySignals.Enabled {
+		if err := config.IdentitySignals.Validate(); err != nil {
+			return fmt.Errorf("invalid identity signals config: %w", err)
+		}
+
+		pgCfg, ok := dbClient.Database.(*pg_db.Config)
+		if !ok {
+			return fmt.Errorf("identity signals requires PostgreSQL; current dialect is not supported")
+		}
+		pgDSN := pgCfg.String(false)
+
+		signalStore, storeErr := signals.NewDuckLakeStore(pgDSN, config.IdentitySignals.Store.DuckLake)
+		if storeErr != nil {
+			return fmt.Errorf("error creating signal store: %w", storeErr)
+		}
+		signalStore.LogInfo(ctx)
+		signalReader = signalStore
+		defer signalStore.Close()
+
+		signalMetrics := signals.NewSignalMetrics(ctx)
+
+		signalEmitter = signals.NewEmitter(config.IdentitySignals.Store, signalStore, signalMetrics)
+		go signalEmitter.Start(ctx)
+		defer func() { <-signalEmitter.Done() }()
+
+		eventstoreClient.SetSignalHook(signals.NewEventSignalHook(signalEmitter))
+
+		retentionWorker := signals.NewRetentionWorker(signalStore, config.IdentitySignals.Streams, config.IdentitySignals.Retention, signalMetrics)
+		go retentionWorker.Start(ctx)
+		defer func() { <-retentionWorker.Done() }()
+
+		compactionWorker := signals.NewCompactionWorker(signalStore, config.IdentitySignals.Store.DuckLake.CompactionInterval, signalMetrics)
+		go compactionWorker.Start(ctx)
+		defer func() { <-compactionWorker.Done() }()
+	}
+
 	api, err := startAPIs(
 		ctx,
 		clock,
@@ -384,6 +428,9 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys,
 		permissionCheck,
 		cacheConnectors,
+		signalReader,
+		signalEmitter,
+		config.IdentitySignals.GeoCountryHeader,
 	)
 	if err != nil {
 		return err
@@ -429,6 +476,9 @@ func startAPIs(
 	keys *encryption.EncryptionKeys,
 	permissionCheck domain.PermissionCheck,
 	cacheConnectors connector.Connectors,
+	signalReader signals.SignalReader,
+	signalEmitter *signals.Emitter,
+	geoCountryHeader string,
 ) (*api.API, error) {
 	repo := struct {
 		authz_repo.Repository
@@ -487,6 +537,8 @@ func startAPIs(
 		translator,
 		config.Instrumentation.Trace.TrustRemoteSpans,
 		config.Executions.DenyList,
+		signalEmitter,
+		geoCountryHeader,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error creating api %w", err)
@@ -738,6 +790,15 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, saml_v2.CreateServer(commands, queries, samlProvider, config.ExternalSecure)); err != nil {
 		return nil, err
 	}
+
+	// Identity Signals — register before RouteGRPC() which sets up the
+	// catch-all gRPC gateway route that would shadow later ConnectRPC handlers.
+	if signalReader != nil {
+		if err := apis.RegisterService(ctx, signal_v2.CreateServer(signalReader)); err != nil {
+			return nil, fmt.Errorf("error registering signal service: %w", err)
+		}
+	}
+
 	// handle grpc at last to be able to handle the root, because grpc and gateway require a lot of different prefixes
 	apis.RouteGRPC()
 	return apis, nil

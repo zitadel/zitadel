@@ -1,0 +1,27 @@
+# Excludes artifacts that change between Nx runs and would invalidate
+# Docker's layer cache on the COPY . . step.
+
+# Build artifacts & caches
+.artifacts/
+console/dist/
+console/.angular/
+console/node_modules/
+node_modules/
+
+# IDE / editor state
+.idea/
+.vscode/
+*.swp
+
+# Git metadata (large, not needed in build)
+.git/
+
+# Docker / compose state
+deploy/
+
+# Test data / screenshots
+Screenshots/
+tests/
+
+# Documentation (not compiled into binary)
+apps/docs/

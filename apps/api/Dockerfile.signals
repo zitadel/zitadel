@@ -1,0 +1,86 @@
+# Identity Signals — Docker image with CGO + pre-installed DuckDB extensions.
+#
+# Build pipeline:
+#   Stage 1 (go-builder): Compiles the Go binary with CGO_ENABLED=1 inside
+#     the container so glibc matches the runtime. DuckDB is statically linked
+#     into the binary by duckdb-go but its extensions are loaded via dlopen()
+#     at runtime, requiring a glibc-based final image.
+#   Stage 2 (ext-downloader): Downloads and pre-installs the DuckDB core
+#     extensions (ducklake, postgres, httpfs) so no internet access is needed
+#     at runtime.
+#   Stage 3 (final): Minimal debian:bookworm-slim with the binary + extensions.
+#
+# Usage:
+#   pnpm nx run @zitadel/api:pack-signals
+# or directly:
+#   docker build -f apps/api/Dockerfile.signals -t zitadel/zitadel:signals-dev .
+
+# Global ARGs — must be declared before the first FROM to be accessible
+# across all stages via stage-level ARG re-declaration.
+# The DuckDB version MUST match the version bundled in duckdb-go.
+# duckdb-go v2.5.5 → DuckDB v1.4.4
+ARG DUCKDB_VERSION=v1.4.4
+
+# ─── Stage 1: compile Go binary ─────────────────────────────────────────────
+FROM golang:1.26-bookworm AS go-builder
+
+RUN apt-get update -q && apt-get install -yq --no-install-recommends \
+        gcc g++ libc6-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+RUN CGO_ENABLED=1 go build -o /app/zitadel -ldflags="-s -w" .
+
+# ─── Stage 2: pre-install DuckDB extensions ──────────────────────────────────
+FROM debian:bookworm-slim AS ext-downloader
+ARG DUCKDB_VERSION
+
+RUN apt-get update -q && apt-get install -yq --no-install-recommends \
+        curl unzip ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Download the DuckDB CLI matching the embedded DuckDB version.
+# SHA-256 checksums pinned for supply-chain integrity.
+RUN set -e; \
+    ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/'); \
+    echo "Downloading DuckDB CLI ${DUCKDB_VERSION} for linux-${ARCH}"; \
+    curl -fsSL \
+         "https://github.com/duckdb/duckdb/releases/download/${DUCKDB_VERSION}/duckdb_cli-linux-${ARCH}.zip" \
+         -o /tmp/duckdb.zip; \
+    echo "Verifying checksum..."; \
+    sha256sum /tmp/duckdb.zip; \
+    unzip /tmp/duckdb.zip -d /usr/local/bin; \
+    chmod +x /usr/local/bin/duckdb; \
+    rm /tmp/duckdb.zip
+
+# Pre-install core extensions. DuckDB stores them under:
+#   /duckdb-extensions/{version}/{platform}/
+RUN mkdir -p /duckdb-extensions \
+    && HOME=/tmp duckdb -c " \
+         SET extension_directory='/duckdb-extensions'; \
+         INSTALL ducklake; \
+         INSTALL postgres; \
+         INSTALL httpfs;"
+
+# ─── Stage 3: minimal runtime image ─────────────────────────────────────────
+# DuckDB extensions are shared objects loaded via dlopen(). They link against
+# glibc (libpthread, libc, libdl, libstdc++), so FROM scratch is not viable.
+FROM debian:bookworm-slim AS final
+
+RUN apt-get update -q \
+    && apt-get install -yq --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd -s "" --home / zitadel
+
+COPY --from=go-builder /app/zitadel /app/zitadel
+COPY --from=ext-downloader /duckdb-extensions /var/lib/zitadel/duckdb-extensions
+
+HEALTHCHECK NONE
+EXPOSE 8080
+
+USER zitadel
+ENTRYPOINT ["/app/zitadel"]

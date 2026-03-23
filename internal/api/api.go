@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"connectrpc.com/connect"
 	"connectrpc.com/grpcreflect"
 	"connectrpc.com/otelconnect"
 	"github.com/gorilla/mux"
@@ -29,6 +30,7 @@ import (
 	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/signals"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	instance_pb "github.com/zitadel/zitadel/pkg/grpc/instance/v2"
@@ -59,6 +61,8 @@ type API struct {
 	translator                *i18n.Translator
 	connectOTELInterceptor    *otelconnect.Interceptor
 	actionV2DenyList          []denylist.AddressChecker
+	signalEmitter             *signals.Emitter
+	geoCountryHeader          string
 }
 
 func (a *API) ListGrpcServices() []string {
@@ -114,6 +118,8 @@ func New(
 	translator *i18n.Translator,
 	trustRemoteSpans bool,
 	deniedIPList []denylist.AddressChecker,
+	signalEmitter *signals.Emitter,
+	geoCountryHeader string,
 ) (_ *API, err error) {
 	api := &API{
 		port:                      port,
@@ -130,6 +136,8 @@ func New(
 		targetEncryptionAlgorithm: targetEncryptionAlgorithm,
 		translator:                translator,
 		actionV2DenyList:          deniedIPList,
+		signalEmitter:             signalEmitter,
+		geoCountryHeader:          geoCountryHeader,
 	}
 
 	api.grpcServer = server.CreateServer(api.verifier, systemAuthz, authZ, queries, externalDomain, tlsConfig, accessInterceptor.AccessService(), targetEncryptionAlgorithm, api.translator, deniedIPList)
@@ -151,6 +159,12 @@ func New(
 		return nil, err
 	}
 	api.registerHealthServer()
+
+	// Wire HTTP signal middleware for non-ConnectRPC paths (OIDC, SAML, login UI).
+	// ConnectRPC services are covered by SignalConnectUnaryInterceptor instead.
+	if signalEmitter != nil {
+		api.router.Use(signals.SignalHTTPMiddleware(signalEmitter, geoCountryHeader))
+	}
 
 	api.RegisterHandlerOnPrefix("/debug", api.healthHandler())
 	api.router.Handle("/", http.RedirectHandler(login.HandlerPrefix, http.StatusFound))
@@ -210,7 +224,7 @@ func (a *API) RegisterService(ctx context.Context, srv server.Server) error {
 }
 
 func (a *API) registerConnectServer(service server.ConnectServer) {
-	prefix, handler := service.RegisterConnectServer(
+	interceptors := []connect.Interceptor{
 		connect_middleware.CallDurationHandler(),
 		connect_middleware.RequestDetailsHandler(),
 		a.connectOTELInterceptor,
@@ -228,14 +242,20 @@ func (a *API) registerConnectServer(service server.ConnectServer) {
 		connect_middleware.ValidationHandler(),
 		connect_middleware.ServiceHandler(),
 		connect_middleware.ActivityInterceptor(),
-	)
+	}
+	// Identity Signals interceptor — runs last (after auth) to capture
+	// userId, orgId, projectId, clientId from the auth context.
+	if a.signalEmitter != nil {
+		interceptors = append(interceptors, signals.SignalConnectUnaryInterceptor(a.signalEmitter, a.geoCountryHeader))
+	}
+	prefix, handler := service.RegisterConnectServer(interceptors...)
 	methods := service.FileDescriptor().Services().Get(0).Methods()
 	methodNames := make([]string, methods.Len())
 	for i := 0; i < methods.Len(); i++ {
 		methodNames[i] = string(methods.Get(i).Name())
 	}
 	a.connectServices[prefix] = methodNames
-	a.RegisterHandlerPrefixes(http_mw.CORSInterceptor(handler), prefix)
+	a.RegisterHandlerPrefixes(http_util.CopyHeadersToContext(http_mw.CORSInterceptor(handler)), prefix)
 }
 
 // HandleFunc allows registering a [http.HandlerFunc] on an exact

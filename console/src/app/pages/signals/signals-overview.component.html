@@ -1,0 +1,175 @@
+<div class="signals-page">
+  <!-- Preview banner -->
+  <div class="preview-banner">
+    <mat-icon>science</mat-icon>
+    <span><strong>Preview Feature</strong> — Identity Signals is in preview. Data format and APIs may change between releases. Not recommended for production use.</span>
+  </div>
+
+  <!-- Feature unavailable notice -->
+  <div class="unavailable-notice" *ngIf="!signalsAvailable">
+    <mat-icon>info_outline</mat-icon>
+    <div>
+      <strong>Identity Signals is not enabled</strong>
+      <p>The Identity Signals subsystem is not configured on this instance. Enable it in the server configuration under <code>IdentitySignals.Enabled</code>.</p>
+    </div>
+  </div>
+
+  <ng-container *ngIf="signalsAvailable">
+
+  <!-- Dashboard header with tabs -->
+  <div class="query-bar">
+    <div class="query-left">
+      <div class="dash-tabs">
+        <button class="dash-tab" [class.active]="activeTab === 'signals'" (click)="switchTab('signals')">Signals</button>
+        <button class="dash-tab" [class.active]="activeTab === 'stats'" (click)="switchTab('stats')">Stats</button>
+      </div>
+    </div>
+    <div class="query-right">
+      <button class="time-btn" [matMenuTriggerFor]="timeMenu" *ngIf="activeTab === 'signals'">
+        <mat-icon>schedule</mat-icon> {{ selectedTimeRange.label }}
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #timeMenu="matMenu">
+        <button mat-menu-item *ngFor="let r of timeRanges" (click)="selectTimeRange(r)">
+          {{ r.label }}
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+
+  <!-- ═══ Signals Tab ═══ -->
+  <ng-container *ngIf="activeTab === 'signals'">
+    <!-- Stat cards -->
+    <div class="stat-row">
+      <div class="stat-card">
+        <span class="stat-value">{{ metricTotal | number }}</span>
+        <span class="stat-label">Total Signals</span>
+      </div>
+      <div class="stat-card" *ngFor="let s of streams">
+        <span class="stat-value">{{ getDimensionCount(streamCounts, s) | number }}</span>
+        <span class="stat-label">{{ s | titlecase }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value stat-success">{{ successRate }}%</span>
+        <span class="stat-label">Success Rate</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value stat-failure">{{ getDimensionCount(outcomeCounts, 'failure') | number }}</span>
+        <span class="stat-label">Failures</span>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-total">
+          <span class="chart-total-value">{{ metricTotal | number }}</span>
+          <span class="chart-total-label">signals</span>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <mat-spinner *ngIf="chartLoading" diameter="20"></mat-spinner>
+        <svg
+          *ngIf="!chartLoading && chartBuckets.length > 0"
+          [attr.viewBox]="'0 0 ' + chartWidth + ' ' + chartHeight"
+          class="area-chart"
+          preserveAspectRatio="none"
+        >
+          <defs>
+            <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.15" />
+              <stop offset="100%" stop-color="var(--accent)" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+          <path [attr.d]="getChartFillPath()" fill="url(#areaGrad)" />
+          <path [attr.d]="chartPath" fill="none" stroke="var(--accent)" stroke-width="1.5" vector-effect="non-scaling-stroke" />
+        </svg>
+        <div *ngIf="!chartLoading && chartBuckets.length === 0" class="chart-empty">No data in range</div>
+      </div>
+      <div class="chart-y-axis" *ngIf="!chartLoading && chartBuckets.length > 0">
+        <span>{{ chartMaxCount | number }}</span>
+        <span>{{ chartMaxCount / 2 | number:'1.0-0' }}</span>
+        <span>0</span>
+      </div>
+    </div>
+
+    <!-- Top-N panels -->
+    <div class="overview-grid">
+      <div class="panel" *ngFor="let panel of breakdownPanels">
+        <div class="panel-header">
+          <span class="panel-title">Top {{ panel.label }}</span>
+          <button class="panel-link" (click)="drillDown(panel.key, '')">View all →</button>
+        </div>
+        <div class="breakdown-table" *ngIf="getBreakdown(panel.key).length > 0">
+          <div class="breakdown-row" *ngFor="let row of getBreakdown(panel.key); trackBy: trackByKey"
+               (click)="panel.key === 'user_id' ? viewUserActivity(row.key) : drillDown(panel.key, row.key)">
+            <span class="br-key mono" [matTooltip]="row.key">{{ panel.key === 'operation' ? shortName(row.key) : row.key }}</span>
+            <span class="br-count">{{ row.count | number }}</span>
+            <div class="br-bar-wrap"><div class="br-bar" [style.width.%]="row.pct"></div></div>
+          </div>
+        </div>
+        <div class="panel-empty" *ngIf="getBreakdown(panel.key).length === 0">No data recorded</div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ═══ Stats Tab ═══ -->
+  <ng-container *ngIf="activeTab === 'stats'">
+    <mat-spinner *ngIf="storeHealthLoading" diameter="24" style="margin:40px auto"></mat-spinner>
+    <ng-container *ngIf="!storeHealthLoading">
+      <!-- Summary cards -->
+      <div class="stat-row">
+        <div class="stat-card">
+          <span class="stat-value">{{ totalSignalsStored | number }}</span>
+          <span class="stat-label">Total Stored</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">≈ {{ estimatedStorageMB }} MB</span>
+          <span class="stat-label">Est. Storage</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">{{ ingestRate5m | number }}</span>
+          <span class="stat-label">Signals / min (5m)</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">{{ ingestRate1h | number }}</span>
+          <span class="stat-label">Signals / min (1h)</span>
+        </div>
+      </div>
+
+      <!-- Storage by stream -->
+      <div class="panel" *ngIf="storageByStream.length > 0">
+        <div class="panel-header">
+          <span class="panel-title">Stored by Stream</span>
+        </div>
+        <div class="breakdown-table">
+          <div class="breakdown-row" *ngFor="let s of storageByStream" style="cursor:default">
+            <span class="br-key" style="text-transform:capitalize">{{ s.stream }}</span>
+            <span class="br-count">{{ s.count | number }}</span>
+            <div class="br-bar-wrap"><div class="br-bar" [style.width.%]="s.pct"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OTEL metrics reference -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">OTEL Metrics</span>
+        </div>
+        <div style="padding:12px 16px;font-size:13px;color:var(--t2)">
+          <p style="margin:0 0 8px;color:var(--t1);font-size:12px;font-weight:500">
+            These metrics are exported via your configured OTEL exporter (Prometheus, gRPC, HTTP).
+          </p>
+          <div class="otel-metric-list">
+            <div class="otel-metric"><span class="mono">identity_signals.ingested_total</span> <span class="otel-type">counter</span></div>
+            <div class="otel-metric"><span class="mono">identity_signals.dropped_total</span> <span class="otel-type">counter</span></div>
+            <div class="otel-metric"><span class="mono">identity_signals.batch_write_duration_seconds</span> <span class="otel-type">histogram</span></div>
+            <div class="otel-metric"><span class="mono">identity_signals.compaction_duration_seconds</span> <span class="otel-type">histogram</span></div>
+            <div class="otel-metric"><span class="mono">identity_signals.retention_pruned_total</span> <span class="otel-type">counter</span></div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+  </ng-container>
+</div>

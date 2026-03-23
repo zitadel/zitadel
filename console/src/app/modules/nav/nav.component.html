@@ -111,6 +111,42 @@
               <template [ngTemplateOutlet]="shortcutKeyRef"></template>
             </div>
           </ng-container>
+
+          <ng-container *ngSwitchCase="BreadcrumbType.SIGNALS">
+            <div class="nav-row-abs" @navrowproject>
+              <a
+                class="nav-item"
+                [routerLinkActive]="['active']"
+                [routerLinkActiveOptions]="{ exact: true }"
+                [routerLink]="['/signals']"
+              >
+                <span class="label">{{ 'SIGNALS.NAV.OVERVIEW' | translate }}</span>
+              </a>
+              <a
+                class="nav-item"
+                [routerLinkActive]="['active']"
+                [routerLink]="['/signals/explore']"
+              >
+                <span class="label">{{ 'SIGNALS.NAV.EXPLORE' | translate }}</span>
+              </a>
+              <a
+                class="nav-item"
+                [routerLinkActive]="['active']"
+                [routerLink]="['/signals/logs']"
+              >
+                <span class="label">{{ 'SIGNALS.NAV.LOGS' | translate }}</span>
+              </a>
+              <a
+                class="nav-item"
+                [routerLinkActive]="['active']"
+                [routerLink]="['/signals/activity']"
+              >
+                <span class="label">{{ 'SIGNALS.NAV.ACTIVITY' | translate }}</span>
+              </a>
+
+              <template [ngTemplateOutlet]="shortcutKeyRef"></template>
+            </div>
+          </ng-container>
         </div>
       </ng-container>
     </ng-container>

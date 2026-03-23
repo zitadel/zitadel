@@ -7,6 +7,7 @@ import { OrganizationService } from "@zitadel/proto/zitadel/org/v2/org_service_p
 import { SAMLService } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb.js";
 import { SessionService } from "@zitadel/proto/zitadel/session/v2/session_service_pb.js";
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb.js";
+import { SignalService } from "@zitadel/proto/zitadel/signal/v2/signal_service_pb.js";
 import { UserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb.js";
 
 import { createClientFor } from "./helpers.js";
@@ -19,6 +20,7 @@ export const createSAMLServiceClient = createClientFor(SAMLService);
 export const createOrganizationServiceClient = createClientFor(OrganizationService);
 export const createFeatureServiceClient = createClientFor(FeatureService);
 export const createIdpServiceClient = createClientFor(IdentityProviderService);
+export const createSignalServiceClient = createClientFor(SignalService);
 
 export function makeReqCtx(orgId: string | undefined) {
   return create(RequestContextSchema, {

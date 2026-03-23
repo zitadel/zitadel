@@ -39,6 +39,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/serviceping"
+	"github.com/zitadel/zitadel/internal/signals"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
 )
 
@@ -84,6 +85,7 @@ type Config struct {
 	Actions             *actions.Config
 	Eventstore          *eventstore.Config
 	LogStore            *logstore.Configs
+	IdentitySignals     signals.IdentitySignalsConfig
 	Quotas              *QuotasConfig
 	Telemetry           *handlers.TelemetryPusherConfig
 	ServicePing         *serviceping.Config

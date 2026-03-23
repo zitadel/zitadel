@@ -214,6 +214,16 @@ export const BRANDING: SidenavSetting = {
   },
 };
 
+export const IDENTITY_SIGNALS: SidenavSetting = {
+  id: 'identity-signals',
+  i18nKey: 'SETTINGS.LIST.IDENTITY_SIGNALS',
+  groupI18nKey: 'SETTINGS.GROUPS.OBSERVABILITY',
+  requiredRoles: {
+    [PolicyComponentServiceType.ADMIN]: ['iam.read'],
+  },
+  beta: true,
+};
+
 export const ACTIONS: SidenavSetting = {
   id: 'actions',
   i18nKey: 'SETTINGS.LIST.ACTIONS',

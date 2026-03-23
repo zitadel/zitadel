@@ -1,0 +1,45 @@
+# Identity Signals development overlay.
+#
+# Replaces the published zitadel-api image with a locally-built CGO-enabled
+# variant (zitadel/zitadel:signals-dev) and enables the IdentitySignals
+# subsystem backed by DuckLake (DuckDB in-process + Postgres catalog + Parquet).
+#
+# Prerequisites:
+#   - pnpm nx run @zitadel/api:pack-signals  (builds the CGO binary + Docker image)
+#
+# Usage:
+#   Start/Update: pnpm nx run @zitadel/compose:signals-dev-up
+#   Stop:         pnpm nx run @zitadel/compose:signals-dev-down
+#
+# Direct compose equivalent:
+#   docker compose --env-file .env.example \
+#     -f docker-compose.yml \
+#     -f docker-compose.signals-dev.yml \
+#     up -d
+
+services:
+  zitadel-api:
+    image: zitadel/zitadel:signals-dev
+    # Never pull — this image is always built locally by pack-signals.
+    pull_policy: never
+    environment:
+      ZITADEL_IDENTITYSIGNALS_ENABLED: "true"
+      ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_ENABLED: "true"
+      # Point DuckDB at the pre-installed extensions baked into the image.
+      # INSTALL becomes a no-op; no internet access needed at runtime.
+      ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_EXTENSIONDIRECTORY: /var/lib/zitadel/duckdb-extensions
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  zitadel-login:
+    depends_on:
+      zitadel-api:
+        condition: service_healthy
+
+  proxy:
+    depends_on:
+      zitadel-api:
+        condition: service_healthy
+      zitadel-login:
+        condition: service_healthy

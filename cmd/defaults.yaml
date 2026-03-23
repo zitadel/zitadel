@@ -830,6 +830,70 @@ SystemAPIUsers:
 # Configure the SystemAPIUsers by environment variable using JSON notation:
 # ZITADEL_SYSTEMAPIUSERS='{"systemuser":{"Path":"/path/to/superuser/key.pem"},"systemuser2":{"KeyData":"<base64 encoded key>"}}'
 
+# PREVIEW: Identity Signals is a preview feature. Configuration keys,
+# defaults, and behavior may change between releases without notice.
+#
+# IdentitySignals captures behavioral observations during authentication and
+# API operations — a core domain feature for identity observability.
+# Signals are stored in DuckLake (DuckDB + Parquet + PG catalog) and exposed
+# to admins via the Signal Service API and Console UI.
+IdentitySignals:
+  Enabled: false # ZITADEL_IDENTITYSIGNALS_ENABLED
+  # HTTP header used to extract the client's country code from a reverse proxy
+  # or CDN. Common values: CF-IPCountry (Cloudflare), X-Vercel-IP-Country,
+  # X-Country-Code. Leave empty to disable country detection.
+  GeoCountryHeader: "" # ZITADEL_IDENTITYSIGNALS_GEOCOUNTRYHEADER
+  Store:
+    # Buffer size for the fire-and-forget emission channel.
+    # Signals are dropped when the channel is full.
+    ChannelSize: 4096 # ZITADEL_IDENTITYSIGNALS_STORE_CHANNELSIZE
+    Debounce:
+      # Maximum time between flushes to the DuckLake store.
+      MinFrequency: 1s # ZITADEL_IDENTITYSIGNALS_STORE_DEBOUNCE_MINFREQUENCY
+      # Maximum batch size before a flush is triggered.
+      MaxBulkSize: 100 # ZITADEL_IDENTITYSIGNALS_STORE_DEBOUNCE_MAXBULKSIZE
+    DuckLake:
+      Enabled: false # ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_ENABLED
+      # Root path for Parquet data files.
+      DataPath: /var/lib/zitadel/signals # ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_DATAPATH
+      # Directory where DuckDB extensions (ducklake, postgres, httpfs) are cached.
+      # When set, DuckDB will use this directory instead of the default (~/.duckdb).
+      # In the release container image extensions are pre-downloaded here so no
+      # internet access is required at runtime — INSTALL becomes a no-op.
+      # Leave empty on developer workstations to use the DuckDB default.
+      ExtensionDirectory: "" # ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_EXTENSIONDIRECTORY
+      # PostgreSQL schema used for DuckLake catalog metadata tables.
+      # Created automatically by 'zitadel init'. Using a dedicated schema
+      # avoids PG15+ permission issues on the public schema.
+      MetadataSchema: signals # ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_METADATASCHEMA
+      # Storage backend: "fs" (local filesystem) or "s3" (S3-compatible).
+      Backend: fs # ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_BACKEND
+      # How often the emitter flushes buffered signals to Parquet files.
+      FlushInterval: 30s # ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_FLUSHINTERVAL
+      # How often the compaction worker merges small Parquet files.
+      CompactionInterval: 1h # ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_COMPACTIONINTERVAL
+      # Minimum number of Parquet files before compaction is triggered. Default: 10.
+      CompactionThreshold: 10 # ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_COMPACTIONTHRESHOLD
+      S3:
+        Endpoint: "" # ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_S3_ENDPOINT
+        Bucket: zitadel-signals # ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_S3_BUCKET
+        AccessKey: "" # ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_S3_ACCESSKEY
+        SecretKey: "" # ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_S3_SECRETKEY
+        UseSSL: true # ZITADEL_IDENTITYSIGNALS_STORE_DUCKLAKE_S3_USESSL
+  # Per-stream configuration for signal collection and retention.
+  Streams:
+    Requests:
+      Enabled: true # ZITADEL_IDENTITYSIGNALS_STREAMS_REQUESTS_ENABLED
+      # How long request signals are kept before pruning. 0 = keep forever.
+      Retention: 720h # ZITADEL_IDENTITYSIGNALS_STREAMS_REQUESTS_RETENTION (30 days)
+    Events:
+      Enabled: true # ZITADEL_IDENTITYSIGNALS_STREAMS_EVENTS_ENABLED
+      # How long event signals are kept before pruning. 0 = keep forever.
+      Retention: 2160h # ZITADEL_IDENTITYSIGNALS_STREAMS_EVENTS_RETENTION (90 days)
+  Retention:
+    # How often the background pruning worker runs to delete expired signals.
+    PruneInterval: 6h # ZITADEL_IDENTITYSIGNALS_RETENTION_PRUNEINTERVAL
+
 SystemDefaults:
   SecretGenerators:
     MachineKeySize: 2048 # ZITADEL_SYSTEMDEFAULTS_SECRETGENERATORS_MACHINEKEYSIZE
