@@ -14,66 +14,45 @@ Zitadel requires PostgreSQL 14 or later. The chart supports multiple ways to con
 
 This method connects to PostgreSQL without encryption. Only use this for testing or when the database is on a private network with no risk of interception.
 
-```yaml
-zitadel:
-  configmapConfig:
-    Database:
-      Postgres:
-        Host: "postgres.database.svc.cluster.local"
-        Port: 5432
-        Database: "zitadel"
-        User:
-          Username: "zitadel"
-          Password: "your-password"
-          SSL:
-            Mode: "disable"
-        Admin:
-          Username: "postgres"
-          Password: "your-admin-password"
-          SSL:
-            Mode: "disable"
+Store the DSN in a Kubernetes Secret and pass it as an environment variable:
+
+```bash
+kubectl create secret generic zitadel-db-credentials \
+  --from-literal=dsn="postgresql://zitadel:your-password@postgres.database.svc.cluster.local:5432/zitadel?sslmode=disable"
 ```
 
-The `SSL.Mode: "disable"` setting turns off TLS entirely. Traffic between Zitadel and PostgreSQL is unencrypted.
+```yaml
+zitadel:
+  env:
+    - name: ZITADEL_DATABASE_POSTGRES_DSN
+      valueFrom:
+        secretKeyRef:
+          name: zitadel-db-credentials
+          key: dsn
+```
+
+The `sslmode=disable` setting turns off TLS entirely. Traffic between Zitadel and PostgreSQL is unencrypted.
 
 ### Connecting with Credentials and TLS
 
 This method connects to PostgreSQL with TLS encryption but without certificate verification. Use this when you trust the network path but want encryption in transit.
 
-```yaml
-zitadel:
-  configSecretName: zitadel-db-credentials
-  configmapConfig:
-    Database:
-      Postgres:
-        Host: "postgres.database.svc.cluster.local"
-        Port: 5432
-        Database: "zitadel"
-        User:
-          Username: "zitadel"
-          SSL:
-            Mode: "require"
-        Admin:
-          Username: "postgres"
-          SSL:
-            Mode: "require"
-```
-
-Create a secret for the database passwords:
-
 ```bash
 kubectl create secret generic zitadel-db-credentials \
-  --from-literal=config.yaml="
-Database:
-  Postgres:
-    User:
-      Password: your-secure-app-password
-    Admin:
-      Password: your-secure-admin-password
-"
+  --from-literal=dsn="postgresql://zitadel:your-password@postgres.database.svc.cluster.local:5432/zitadel?sslmode=require"
 ```
 
-The `SSL.Mode: "require"` setting enforces TLS but does not verify the server certificate. This protects against passive eavesdropping but not against man-in-the-middle attacks.
+```yaml
+zitadel:
+  env:
+    - name: ZITADEL_DATABASE_POSTGRES_DSN
+      valueFrom:
+        secretKeyRef:
+          name: zitadel-db-credentials
+          key: dsn
+```
+
+The `sslmode=require` setting enforces TLS but does not verify the server certificate. This protects against passive eavesdropping but not against man-in-the-middle attacks.
 
 ### Connecting with Certificates
 
@@ -81,23 +60,14 @@ This method connects to PostgreSQL with full TLS verification using certificates
 
 ```yaml
 zitadel:
-  configSecretName: zitadel-db-credentials
+  env:
+    - name: ZITADEL_DATABASE_POSTGRES_DSN
+      valueFrom:
+        secretKeyRef:
+          name: zitadel-db-credentials
+          key: dsn
   dbSslCaCrt: "ca.crt"
   dbSslCaCrtSecret: "postgres-ca-cert"
-  configmapConfig:
-    Database:
-      Postgres:
-        Host: "postgres.database.svc.cluster.local"
-        Port: 5432
-        Database: "zitadel"
-        User:
-          Username: "zitadel"
-          SSL:
-            Mode: "verify-full"
-        Admin:
-          Username: "postgres"
-          SSL:
-            Mode: "verify-full"
 ```
 
 Create a secret containing the CA certificate:
@@ -107,18 +77,11 @@ kubectl create secret generic postgres-ca-cert \
   --from-file=ca.crt=/path/to/your/ca-certificate.crt
 ```
 
-Create a secret for the database passwords:
+Create a secret containing the DSN with full verification:
 
 ```bash
 kubectl create secret generic zitadel-db-credentials \
-  --from-literal=config.yaml="
-Database:
-  Postgres:
-    User:
-      Password: your-secure-app-password
-    Admin:
-      Password: your-secure-admin-password
-"
+  --from-literal=dsn="postgresql://zitadel:your-password@postgres.database.svc.cluster.local:5432/zitadel?sslmode=verify-full&sslrootcert=/db-ssl-ca-crt/ca.crt"
 ```
 
-The `SSL.Mode: "verify-full"` setting enforces TLS and verifies that the server certificate is signed by the CA and that the server hostname matches the certificate. This provides full protection against eavesdropping and man-in-the-middle attacks. The `dbSslCaCrtSecret` references the Kubernetes Secret containing the CA certificate, and `dbSslCaCrt` specifies the key within that secret.
+The `sslmode=verify-full` setting enforces TLS and verifies that the server certificate is signed by the CA and that the server hostname matches the certificate. This provides full protection against eavesdropping and man-in-the-middle attacks. The `dbSslCaCrtSecret` references the Kubernetes Secret containing the CA certificate, and `dbSslCaCrt` specifies the key within that secret.
