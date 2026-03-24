@@ -19,6 +19,9 @@ const ROOT_DIR = join(__dirname, '..');
 const OPENAPI_ROOT = join(ROOT_DIR, 'openapi');
 const CONTENT_ROOT = join(ROOT_DIR, 'content');
 const CONTENT_VERSIONS_ROOT = join(ROOT_DIR, 'content');
+const serviceRenameMap: Record<string, string> = {
+  'Authorization': 'Role Assignment',
+};
 
 async function generateVersionApiDocs(version: string) {
   const sourceRoot = join(OPENAPI_ROOT, version);
@@ -68,13 +71,22 @@ async function generateVersionApiDocs(version: string) {
     });
 
     const indexPath = join(outputDir, 'index.mdx');
-    const title = uniqueService.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+    let originalTitle = uniqueService.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+    let newTitle = serviceRenameMap[originalTitle] ?? originalTitle;
+    const hasBeenRenamed = !!newTitle;
+    const title = newTitle ?? originalTitle;
+    const renameNote = hasBeenRenamed
+        ? `\n> **Terminology Update:** We have streamlined our naming conventions to improve clarity. The term **${originalTitle}** has been replaced with **${title}**. To avoid breaking changes the APIs still make use of the old term. Both terms refer to the same underlying functionality.\n`
+        : '';
+
     const indexContent = `---
 title: ${title} API
 description: Explore the ZITADEL ${title} API reference documentation. Learn how to manage resources, handle authentication, and integrate ${title} services into your application.
 ---
 
 API Reference for ${title}
+
+${renameNote}
 `;
     writeFileSync(indexPath, indexContent);
   }

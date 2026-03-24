@@ -428,7 +428,7 @@ func (p *relationalTablesProjection) reduceSessionTerminated(event eventstore.Ev
 
 		sessionRepo := repository.SessionRepository()
 		condition := sessionRepo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID)
-		_, err := sessionRepo.Delete(ctx, v3Tx, condition)
+		_, _, err := sessionRepo.Delete(ctx, v3Tx, condition, nil)
 		return err
 	}), nil
 }

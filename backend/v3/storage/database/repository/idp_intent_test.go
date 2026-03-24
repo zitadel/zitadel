@@ -570,6 +570,11 @@ func TestDeleteIDPIntent(t *testing.T) {
 			),
 			expectedDeletedCount: 2,
 		},
+		{
+			testName:             "when condition matches no record should not delete anything",
+			inputConditions:      idpIntentRepo.PrimaryKeyCondition(instanceID, "not found"),
+			expectedDeletedCount: 0,
+		},
 	}
 
 	for _, tc := range tt {

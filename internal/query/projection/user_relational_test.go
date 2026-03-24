@@ -1,7 +1,6 @@
 package projection
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -23,13 +22,11 @@ func TestUserRelationalProjection_Reducers(t *testing.T) {
 		require.NoError(t, rawTx.Rollback())
 	})
 
-	ctx := t.Context()
-
 	// create instance
 	instanceRepo := repository.InstanceRepository()
 	instanceID := gofakeit.UUID()
 	orgID := gofakeit.UUID()
-	err := instanceRepo.Create(ctx, tx, &domain.Instance{
+	err := instanceRepo.Create(t.Context(), tx, &domain.Instance{
 		ID:           instanceID,
 		Name:         "test-instance",
 		DefaultOrgID: orgID,
@@ -38,7 +35,7 @@ func TestUserRelationalProjection_Reducers(t *testing.T) {
 
 	// create org
 	orgRepo := repository.OrganizationRepository()
-	err = orgRepo.Create(ctx, tx, &domain.Organization{
+	err = orgRepo.Create(t.Context(), tx, &domain.Organization{
 		InstanceID: instanceID,
 		ID:         orgID,
 		Name:       "test-org",
@@ -54,22 +51,22 @@ func TestUserRelationalProjection_Reducers(t *testing.T) {
 	t.Run("reduce user.human.mfa.recoverycode.added event", func(t *testing.T) {
 		// create user
 		existingUserID := gofakeit.UUID()
-		existingUserAgg := createUser(t, ctx, tx, userRepo, instanceID, orgID, existingUserID)
+		existingUserAgg := createUser(t, tx, userRepo, instanceID, orgID, existingUserID)
 
 		// set `user.human.mfa.recoverycode.added` event
 		recoveryCodes := []string{"code1", "code2", "code3"}
 		recoveryCodesAddedEvent := user.NewHumanRecoveryCodesAddedEvent(
-			ctx,
+			t.Context(),
 			&existingUserAgg.Aggregate,
 			recoveryCodes,
 			nil)
 
 		// reduce the event
-		eventReduced := callReduce(t, ctx, rawTx, handler, recoveryCodesAddedEvent)
+		eventReduced := callReduce(t, rawTx, handler, recoveryCodesAddedEvent)
 		require.True(t, eventReduced)
 
 		// assert that the recovery codes are stored
-		gotUser, err := userRepo.Get(ctx, tx, database.WithCondition(
+		gotUser, err := userRepo.Get(t.Context(), tx, database.WithCondition(
 			database.And(
 				userRepo.IDCondition(existingUserID),
 				userRepo.InstanceIDCondition(instanceID),
@@ -84,26 +81,26 @@ func TestUserRelationalProjection_Reducers(t *testing.T) {
 	t.Run("reduce user.human.mfa.recoverycode.removed event", func(t *testing.T) {
 		// create user
 		existingUserID := gofakeit.UUID()
-		existingUserAgg := createUser(t, ctx, tx, userRepo, instanceID, orgID, existingUserID)
+		existingUserAgg := createUser(t, tx, userRepo, instanceID, orgID, existingUserID)
 
 		// add recovery codes to the user
-		_, err = userRepo.Update(ctx, tx,
+		_, err = userRepo.Update(t.Context(), tx,
 			userRepo.PrimaryKeyCondition(instanceID, existingUserID),
 			userRepo.Human().AddRecoveryCodes([]string{"code1", "code2", "code3"}))
 		require.NoError(t, err)
 
 		// set `user.human.mfa.recoverycode.removed` event
 		recoveryCodesRemovedEvent := user.NewHumanRecoveryCodeRemovedEvent(
-			ctx,
+			t.Context(),
 			&existingUserAgg.Aggregate,
 			nil)
 
 		// reduce the event
-		eventReduced := callReduce(t, ctx, rawTx, handler, recoveryCodesRemovedEvent)
+		eventReduced := callReduce(t, rawTx, handler, recoveryCodesRemovedEvent)
 		require.True(t, eventReduced)
 
 		// assert that the recovery codes are removed
-		gotUser, err := userRepo.Get(ctx, tx, database.WithCondition(
+		gotUser, err := userRepo.Get(t.Context(), tx, database.WithCondition(
 			database.And(
 				userRepo.IDCondition(existingUserID),
 				userRepo.InstanceIDCondition(instanceID),
@@ -118,27 +115,27 @@ func TestUserRelationalProjection_Reducers(t *testing.T) {
 	t.Run("reduce user.human.mfa.recoverycode.check.succeeded event", func(t *testing.T) {
 		// create user
 		existingUserID := gofakeit.UUID()
-		existingUserAgg := createUser(t, ctx, tx, userRepo, instanceID, orgID, existingUserID)
+		existingUserAgg := createUser(t, tx, userRepo, instanceID, orgID, existingUserID)
 
 		// add recovery codes to the user
-		_, err = userRepo.Update(ctx, tx,
+		_, err = userRepo.Update(t.Context(), tx,
 			userRepo.PrimaryKeyCondition(instanceID, existingUserID),
 			userRepo.Human().AddRecoveryCodes([]string{"code1", "code2", "code3"}))
 		require.NoError(t, err)
 
 		// set `user.human.mfa.recoverycode.check.succeeded` event
 		recoveryCodeCheckSucceededEvent := user.NewHumanRecoveryCodeCheckSucceededEvent(
-			ctx,
+			t.Context(),
 			&existingUserAgg.Aggregate,
 			"code1",
 			nil)
 
 		// reduce the event
-		eventReduced := callReduce(t, ctx, rawTx, handler, recoveryCodeCheckSucceededEvent)
+		eventReduced := callReduce(t, rawTx, handler, recoveryCodeCheckSucceededEvent)
 		require.True(t, eventReduced)
 
 		// assert that the recovery code is removed and the last_successfully_checked_at timestamp is set
-		gotUser, err := userRepo.Get(ctx, tx, database.WithCondition(
+		gotUser, err := userRepo.Get(t.Context(), tx, database.WithCondition(
 			database.And(
 				userRepo.IDCondition(existingUserID),
 				userRepo.InstanceIDCondition(instanceID),
@@ -153,27 +150,27 @@ func TestUserRelationalProjection_Reducers(t *testing.T) {
 	t.Run("reduce user.human.mfa.recoverycode.check.failed event", func(t *testing.T) {
 		// create user
 		existingUserID := gofakeit.UUID()
-		existingUserAgg := createUser(t, ctx, tx, userRepo, instanceID, orgID, existingUserID)
+		existingUserAgg := createUser(t, tx, userRepo, instanceID, orgID, existingUserID)
 
 		// add recovery codes to the user
-		_, err = userRepo.Update(ctx, tx,
+		_, err = userRepo.Update(t.Context(), tx,
 			userRepo.PrimaryKeyCondition(instanceID, existingUserID),
 			userRepo.Human().AddRecoveryCodes([]string{"code1", "code2", "code3"}))
 		require.NoError(t, err)
 
 		// set `user.human.mfa.recoverycode.check.failed` event
 		recoveryCodeCheckFailedEvent := user.NewHumanRecoveryCodeCheckFailedEvent(
-			ctx,
+			t.Context(),
 			&existingUserAgg.Aggregate,
 			nil,
 		)
 
 		// reduce the event
-		eventReduced := callReduce(t, ctx, rawTx, handler, recoveryCodeCheckFailedEvent)
+		eventReduced := callReduce(t, rawTx, handler, recoveryCodeCheckFailedEvent)
 		require.True(t, eventReduced)
 
 		// assert that the recovery code failed_attempts is incremented
-		gotUser, err := userRepo.Get(ctx, tx, database.WithCondition(
+		gotUser, err := userRepo.Get(t.Context(), tx, database.WithCondition(
 			database.And(
 				userRepo.IDCondition(existingUserID),
 				userRepo.InstanceIDCondition(instanceID),
@@ -187,7 +184,6 @@ func TestUserRelationalProjection_Reducers(t *testing.T) {
 }
 
 func createUser(t *testing.T,
-	ctx context.Context,
 	tx *sql.Transaction,
 	userRepo domain.UserRepository,
 	instanceID,
@@ -197,7 +193,7 @@ func createUser(t *testing.T,
 	userAgg := user.NewAggregate(userID, orgID)
 	userAgg.InstanceID = instanceID
 
-	err := userRepo.Create(ctx, tx, &domain.User{
+	err := userRepo.Create(t.Context(), tx, &domain.User{
 		InstanceID:     instanceID,
 		OrganizationID: orgID,
 		ID:             userID,

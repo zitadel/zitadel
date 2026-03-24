@@ -81,6 +81,12 @@ The login page can be changed by customizing different branding aspects and you 
 By default, the displayed branding is defined [based on the user's domain](/guides/solution-scenarios/domain-discovery). In case you want to show the branding of a specific organization by default, you need to either pass an Organization Domain scope (`urn:zitadel:iam:org:domain:primary:{domainname}`) with the authorization request, or define the behavior on your Project's settings.
 </Callout>
 
+<Callout type="warning" title="Customizing texts in Hosted Login V2">
+Currently, interface texts for the new Hosted Login V2 cannot be customized directly through the Management Console.
+
+To update translations in Login V2, you must use the [Settings V2 API](/apis/resources/settings_service_v2/settings-service-set-hosted-login-translation). You can reference the default keys in the [`en.json` locale file](https://github.com/zitadel/zitadel/blob/main/apps/login/locales/en.json) from the ZITADEL repository. You can send a payload that includes only the keys you want to override; Login V2 will automatically merge your keys with the defaults and handle any fallbacks.
+</Callout>
+
 ### Fast account switching
 
 The hosted login page remembers users who have previously authenticated.
@@ -162,8 +168,12 @@ You can also activate the v2 login for your apps, so users are redirected to `/u
 
 **Customizing the new login:** The easiest way to actually customizing it is to fork the https://github.com/zitadel/zitadel repo and use the [Deploy with Vercel button](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#login-deploy) to run your login code on Vercel.
 
-<Tabs queryString="deployment">
-    <Tab value="zitadel_cloud" label="Activate Zitadel Cloud V2 Login" default="true">
+<Tabs 
+    groupId="deployment" 
+    defaultIndex={0} 
+    items={['Activate Zitadel Cloud V2 Login', 'Vercel Custom Login Deployment']}
+>
+    <Tab value="Activate Zitadel Cloud V2 Login">
 
         Zitadel Cloud provides the V2 login at the fixed path `/ui/v2/login`.
         <PreventLockout components={props.components} />
@@ -175,7 +185,7 @@ You can also activate the v2 login for your apps, so users are redirected to `/u
         2. Enable the [loginV2 feature](/reference/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures) on the instance. Leave the base URI empty to use the default. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://your-zitadel-instance.zitadel.cloud/ui/v2/login)
 
     </Tab>
-    <Tab value="vercel_custom" label="Vercel Custom Login Deployment">
+    <Tab value="Vercel Custom Login Deployment">
 
         The simplest way to deploy the new login for yourself is by using the [Deploy with Vercel button](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#login-deploy) to deploy the login directly to your Vercel.
 
