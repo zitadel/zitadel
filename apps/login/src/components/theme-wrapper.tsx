@@ -33,14 +33,18 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
           document.documentElement.classList.remove("dark");
           try {
             localStorage.setItem("cp-theme", "light");
-          } catch {}
+          } catch {
+            /* localStorage unavailable (e.g. private mode) */
+          }
           setNextTheme("light");
           break;
         case ThemeMode.DARK:
           document.documentElement.classList.add("dark");
           try {
             localStorage.setItem("cp-theme", "dark");
-          } catch {}
+          } catch {
+            /* localStorage unavailable (e.g. private mode) */
+          }
           setNextTheme("dark");
           break;
         case ThemeMode.AUTO:

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 /**
  * Module-level store for themeMode from branding settings.
@@ -21,27 +21,21 @@ export function setThemeMode(mode: number) {
   }
 }
 
-export function getThemeMode() {
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+function getSnapshot() {
   return currentThemeMode;
 }
 
 /**
- * Hook to subscribe to themeMode changes.
- * Works across the component tree regardless of React Context boundaries.
+ * Hook to subscribe to themeMode changes using React 18+ useSyncExternalStore.
+ * Ensures ThemeSwitch always sees a consistent snapshot during concurrent renders.
  */
 export function useThemeMode(): number {
-  const [themeMode, setThemeModeState] = useState(currentThemeMode);
-
-  useEffect(() => {
-    // Sync in case value changed between render and effect
-    setThemeModeState(currentThemeMode);
-
-    const listener = () => setThemeModeState(currentThemeMode);
-    listeners.add(listener);
-    return () => {
-      listeners.delete(listener);
-    };
-  }, []);
-
-  return themeMode;
+  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }

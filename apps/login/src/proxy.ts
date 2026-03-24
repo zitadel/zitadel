@@ -39,34 +39,8 @@ export async function proxy(request: NextRequest) {
     requestHeaders.set("x-zitadel-i18n-organization", organization);
   }
 
-  // Only run the rest of the logic for the original matcher paths
-  const proxyPaths = ["/.well-known/", "/oauth/", "/oidc/", "/idps/callback/", "/saml/"];
-
-  const isMatched = proxyPaths.some((prefix) => request.nextUrl.pathname.startsWith(prefix));
-
-  // Only proxy in self-hosted mode
-  if (!isMatched) {
-    // For multi-tenant or non-proxied routes, just add the header and continue
-    return NextResponse.next({
-      request: { headers: requestHeaders },
-    });
-  }
-
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
-
-  // add additional headers if available
-  if (serviceConfig.publicHost) {
-    requestHeaders.set("x-zitadel-public-host", serviceConfig.publicHost);
-  }
-  if (serviceConfig.instanceHost) {
-    requestHeaders.set("x-zitadel-instance-host", serviceConfig.instanceHost);
-  }
-
-  const responseHeaders = new Headers();
-  responseHeaders.set("Access-Control-Allow-Origin", "*");
-  responseHeaders.set("Access-Control-Allow-Headers", "*");
-
   const securitySettings = await loadSecuritySettings(request);
 
   const iframeOrigins =
@@ -74,11 +48,35 @@ export async function proxy(request: NextRequest) {
       ? securitySettings.embeddedIframe.allowedOrigins
       : undefined;
 
+  // Build security response headers (shared by all routes)
+  const responseHeaders = new Headers();
   responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: serviceConfig.baseUrl, iframeOrigins }));
 
   if (!iframeOrigins) {
     responseHeaders.set("X-Frame-Options", "deny");
   }
+
+  // Only run the rest of the logic for the original matcher paths
+  const proxyPaths = ["/.well-known/", "/oauth/", "/oidc/", "/idps/callback/", "/saml/"];
+  const isMatched = proxyPaths.some((prefix) => request.nextUrl.pathname.startsWith(prefix));
+
+  if (!isMatched) {
+    return NextResponse.next({
+      request: { headers: requestHeaders },
+      headers: responseHeaders,
+    });
+  }
+
+  // Proxy-specific headers
+  if (serviceConfig.publicHost) {
+    requestHeaders.set("x-zitadel-public-host", serviceConfig.publicHost);
+  }
+  if (serviceConfig.instanceHost) {
+    requestHeaders.set("x-zitadel-instance-host", serviceConfig.instanceHost);
+  }
+
+  responseHeaders.set("Access-Control-Allow-Origin", "*");
+  responseHeaders.set("Access-Control-Allow-Headers", "*");
 
   request.nextUrl.href = `${serviceConfig.baseUrl}${request.nextUrl.pathname}${request.nextUrl.search}`;
 
