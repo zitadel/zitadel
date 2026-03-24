@@ -1,7 +1,9 @@
 "use client";
 import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
 import Link from "next/link";
+import { useLocale } from "next-intl";
 import { useState } from "react";
+import { resolveLocalizedLegalLink } from "@/lib/legal-links";
 import { Checkbox } from "./checkbox";
 import { Translated } from "./translated";
 
@@ -16,15 +18,19 @@ type AcceptanceState = {
 };
 
 export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
+  const locale = useLocale();
   const [acceptanceState, setAcceptanceState] = useState<AcceptanceState>({
     tosAccepted: false,
     privacyPolicyAccepted: false,
   });
+  const helpLink = resolveLocalizedLegalLink(legal?.helpLink, locale);
+  const tosLink = resolveLocalizedLegalLink(legal?.tosLink, locale);
+  const privacyPolicyLink = resolveLocalizedLegalLink(legal?.privacyPolicyLink, locale);
 
   // Helper function to check if all required checkboxes are accepted
   const checkAllAccepted = (newState: AcceptanceState) => {
-    const hasTosLink = !!legal?.tosLink;
-    const hasPrivacyLink = !!legal?.privacyPolicyLink;
+    const hasTosLink = !!tosLink;
+    const hasPrivacyLink = !!privacyPolicyLink;
 
     // Check that all required checkboxes are accepted
     return (!hasTosLink || newState.tosAccepted) && (!hasPrivacyLink || newState.privacyPolicyAccepted);
@@ -34,9 +40,9 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
     <>
       <p className="mt-4 flex flex-row items-center text-sm text-text-light-secondary-500 dark:text-text-dark-secondary-500">
         <Translated i18nKey="agreeTo" namespace="register" />
-        {legal?.helpLink && (
+        {helpLink && (
           <span>
-            <Link href={legal.helpLink} target="_blank">
+            <Link href={helpLink} target="_blank">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -55,7 +61,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
           </span>
         )}
       </p>
-      {legal?.tosLink && (
+      {tosLink && (
         <div className="mt-4 flex items-center">
           <Checkbox
             className="mr-4"
@@ -74,14 +80,14 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
 
           <div className="mr-4 w-[28rem]">
             <p className="text-sm text-text-light-500 dark:text-text-dark-500">
-              <Link href={legal.tosLink} className="underline" target="_blank">
+              <Link href={tosLink} className="underline" target="_blank">
                 <Translated i18nKey="termsOfService" namespace="register" />
               </Link>
             </p>
           </div>
         </div>
       )}
-      {legal?.privacyPolicyLink && (
+      {privacyPolicyLink && (
         <div className="mt-4 flex items-center">
           <Checkbox
             className="mr-4"
@@ -100,7 +106,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
 
           <div className="mr-4 w-[28rem]">
             <p className="text-sm text-text-light-500 dark:text-text-dark-500">
-              <Link href={legal.privacyPolicyLink} className="underline" target="_blank">
+              <Link href={privacyPolicyLink} className="underline" target="_blank">
                 <Translated i18nKey="privacyPolicy" namespace="register" />
               </Link>
             </p>
