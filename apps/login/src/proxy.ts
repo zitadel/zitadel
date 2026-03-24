@@ -39,6 +39,11 @@ export async function proxy(request: NextRequest) {
     requestHeaders.set("x-zitadel-i18n-organization", organization);
   }
 
+  // The /security route is an internal API used by this middleware — skip it entirely to prevent a loop
+  if (request.nextUrl.pathname === "/security") {
+    return NextResponse.next({ request: { headers: requestHeaders } });
+  }
+
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
   const securitySettings = await loadSecuritySettings(request);
