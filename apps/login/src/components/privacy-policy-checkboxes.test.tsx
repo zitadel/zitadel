@@ -35,6 +35,6 @@ describe("PrivacyPolicyCheckboxes", () => {
       "href",
       "https://demo.com/privacy-fr",
     );
-    expect(screen.getAllByRole("link")[0]).toHaveAttribute("href", "https://demo.com/help-fr");
+    expect(screen.getByRole("link", { name: "help" })).toHaveAttribute("href", "https://demo.com/help-fr");
   });
 });
