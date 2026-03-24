@@ -27,7 +27,7 @@ jobs:
         if: ${{ github.ref != 'refs/heads/main' }}
         run: git fetch origin main:main
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
       - name: Set up pnpm
