@@ -28,6 +28,11 @@ func TestGetOTPCryptoGeneratorConfigWithDefault(t *testing.T) {
 		wantErr                     error
 	}{
 		{
+			name:       "no default config",
+			instanceID: "instance-1",
+			wantErr:    zerrors.ThrowInternal(nil, "DOM-3AcM0U", "missing default config"),
+		},
+		{
 			name:       "failed to get secret generator settings",
 			instanceID: "instance-1",
 			secretGeneratorSettingsRepo: func(ctrl *gomock.Controller) domain.SecretGeneratorSettingsRepository {
@@ -213,9 +218,14 @@ func TestGetOTPCryptoGeneratorConfigWithDefault(t *testing.T) {
 			},
 		},
 		{
-			name:                        "invalid otp type",
-			instanceID:                  "instance-1",
-			otpType:                     3,
+			name:       "invalid otp type",
+			instanceID: "instance-1",
+			otpType:    3,
+			defaultConfig: &crypto.GeneratorConfig{
+				Length:              6,
+				IncludeUpperLetters: true,
+				IncludeLowerLetters: true,
+			},
 			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPTypeEmail),
 			wantErr:                     zerrors.ThrowInternal(nil, "DOM-3AcM0U", "invalid otp type"),
 		},

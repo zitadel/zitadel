@@ -174,9 +174,9 @@ func (o *OTPSMSChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts) 
 		return zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(expectedUpdatedRows, updateCount), "DOM-gYp8tG", "unexpected number of rows")
 	}
 	// todo (@grvijayan): uncomment after these changes are available
-	//if err := handleUpdateError(err, expectedUpdatedRows, updated, "DOM-AigB0Z", objectTypeSession); err != nil {
+	// if err := handleUpdateError(err, expectedUpdatedRows, updated, "DOM-AigB0Z", objectTypeSession); err != nil {
 	//	return err
-	//}
+	// }
 	o.challengeOTPSMS = challengeOTPSMS
 	if o.ChallengeTypeOTPSMS.ReturnCode {
 		o.otpSMSChallenge = &plain

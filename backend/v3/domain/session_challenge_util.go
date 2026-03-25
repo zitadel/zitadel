@@ -19,7 +19,7 @@ const (
 
 func GetOTPCryptoGeneratorConfigWithDefault(ctx context.Context, instanceID string, opts *InvokeOpts, defaultConfig *crypto.GeneratorConfig, otpType OTPType) (*crypto.GeneratorConfig, error) {
 	if defaultConfig == nil {
-		return nil, zerrors.ThrowInternal(nil, "DOM-3AcM0U", "default config is nil")
+		return nil, zerrors.ThrowInternal(nil, "DOM-3AcM0U", "missing default config")
 	}
 
 	if opts == nil || opts.secretGeneratorSettingsRepo == nil {
