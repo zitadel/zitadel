@@ -87,7 +87,7 @@ func (q *Queries) ActiveOIDCClientByID(ctx context.Context, clientID string, get
 	loginV2 := instance.Features().LoginV2
 	if loginV2.Required {
 		client.LoginVersion = domain.LoginVersion2
-		if client.LoginBaseURI == nil {
+		if client.LoginBaseURI == nil || (*url.URL)(client.LoginBaseURI).String() == "" {
 			client.LoginBaseURI = (*URL)(loginV2.BaseURI)
 		}
 	}
