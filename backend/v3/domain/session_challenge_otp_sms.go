@@ -175,7 +175,7 @@ func (o *OTPSMSChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts) 
 		return zerrors.ThrowNotFound(nil, "DOM-QThZH7", "Errors.Session.NotFound")
 	}
 	if updateCount > 1 {
-		return zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, updateCount), "DOM-gYp8tG", "unexpected number of rows")
+		return zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(expectedUpdatedRows, updateCount), "DOM-gYp8tG", "unexpected number of rows")
 	}
 	// todo (@grvijayan): uncomment after these changes are available
 	//if err := handleUpdateError(err, expectedUpdatedRows, updated, "DOM-AigB0Z", objectTypeSession); err != nil {
