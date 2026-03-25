@@ -344,7 +344,7 @@ func TestNotificationQueries_GetActiveEmailConfig(t *testing.T) {
 			queryMock.EXPECT().SMTPConfigActive(gomock.Any(), instId).Return(tc.smtpConfig, tc.smtpConfigErr)
 
 			notificationQueries := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext domain", uint16(1234), false, "filepath", nil, cryptAlgMock, nil, nil)
-			cfg, err := notificationQueries.GetActiveEmailConfig(ctx)
+			cfg, err := notificationQueries.GetActiveEmailConfig(ctx, "")
 
 			assert.ErrorIs(t, err, tc.expectedErr)
 			if tc.expectedErr != nil {

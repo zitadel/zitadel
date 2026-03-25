@@ -351,12 +351,14 @@ func orgSmtpPlainAuthChanges(wm *instance.PlainAuth, auth instance.PlainAuth) []
 
 func orgSmtpXOAuthChanges(wm *instance.XOAuth2Auth, auth instance.XOAuth2Auth) []org.OrgSMTPConfigChanges {
 	if wm == nil {
-		return []org.OrgSMTPConfigChanges{
-			org.ChangeOrgSMTPConfigXOAuth2ClientCredentialsClientId(auth.ClientCredentials.ClientId),
-			org.ChangeOrgSMTPConfigXOAuth2ClientCredentialsClientSecret(auth.ClientCredentials.ClientSecret),
-			org.ChangeOrgSMTPConfigXOAuth2TokenEndpoint(auth.TokenEndpoint),
-			org.ChangeOrgSMTPConfigXOAuth2Scopes(auth.Scopes),
+		var changes []org.OrgSMTPConfigChanges
+		changes = append(changes, org.ChangeOrgSMTPConfigXOAuth2TokenEndpoint(auth.TokenEndpoint))
+		changes = append(changes, org.ChangeOrgSMTPConfigXOAuth2Scopes(auth.Scopes))
+		if auth.ClientCredentials != nil {
+			changes = append(changes, org.ChangeOrgSMTPConfigXOAuth2ClientCredentialsClientId(auth.ClientCredentials.ClientId))
+			changes = append(changes, org.ChangeOrgSMTPConfigXOAuth2ClientCredentialsClientSecret(auth.ClientCredentials.ClientSecret))
 		}
+		return changes
 	}
 	var changes []org.OrgSMTPConfigChanges
 	if wm.TokenEndpoint != auth.TokenEndpoint {
@@ -373,7 +375,7 @@ func orgSmtpXOAuthChanges(wm *instance.XOAuth2Auth, auth instance.XOAuth2Auth) [
 		}
 	}
 	if auth.ClientCredentials != nil {
-		changes = append(changes, orgSmtpXOAuthClientCredentialChanges(auth.ClientCredentials, *auth.ClientCredentials)...)
+		changes = append(changes, orgSmtpXOAuthClientCredentialChanges(wm.ClientCredentials, *auth.ClientCredentials)...)
 	}
 	return changes
 }

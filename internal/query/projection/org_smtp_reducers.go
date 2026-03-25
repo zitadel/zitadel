@@ -193,12 +193,19 @@ func (p *orgSMTPConfigProjection) reduceOrgSMTPConfigChanged(event eventstore.Ev
 	if !e.PlainAuth.IsEmpty() {
 		smtpColumns = append(smtpColumns,
 			handler.NewCol(OrgSMTPConfigSMTPColumnPlainAuthPassword, e.PlainAuth.Password),
+			// Clear XOAuth2 columns when switching to plain auth
+			handler.NewCol(OrgSMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint, ""),
+			handler.NewCol(OrgSMTPConfigSMTPColumnXOAuth2AuthScope, nil),
+			handler.NewCol(OrgSMTPConfigSMTPColumnXOAuth2AuthClientCredentialsClientId, ""),
+			handler.NewCol(OrgSMTPConfigSMTPColumnXOAuth2AuthClientCredentialsClientSecret, nil),
 		)
 	}
 	if !e.XOAuth2Auth.IsEmpty() {
 		smtpColumns = append(smtpColumns,
 			handler.NewCol(OrgSMTPConfigSMTPColumnXOAuth2AuthTokenEndpoint, e.XOAuth2Auth.TokenEndpoint),
 			handler.NewCol(OrgSMTPConfigSMTPColumnXOAuth2AuthScope, e.XOAuth2Auth.Scopes),
+			// Clear plain auth columns when switching to XOAuth2
+			handler.NewCol(OrgSMTPConfigSMTPColumnPlainAuthPassword, nil),
 		)
 		if !e.XOAuth2Auth.ClientCredentials.IsEmpty() {
 			smtpColumns = append(smtpColumns,
