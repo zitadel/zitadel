@@ -117,6 +117,10 @@ func (o *OTPSMSChallengeCommand) Validate(ctx context.Context, opts *InvokeOpts)
 		return err
 	}
 
+	if retrievedUser.ID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-1bzvsh", "Errors.User.UserIDMissing")
+	}
+
 	// validate human user and user phone
 	if retrievedUser.Human == nil || retrievedUser.Human.Phone == nil {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-7hG2w", "Errors.NotFound.User.Human.Phone")

@@ -27,47 +27,79 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 	otpEnabledAt := time.Now().Add(-30 * time.Minute)
 
 	tests := []struct {
-		name                string
-		sessionID           string
-		instanceID          string
-		requestChallengeOTP *domain.ChallengeTypeOTPSMS
-		userRepo            func(ctrl *gomock.Controller) domain.UserRepository
-		sessionRepo         func(ctrl *gomock.Controller) domain.SessionRepository
-		smsProvider         func(ctx context.Context, instanceID string) (string, error)
-		wantErr             error
+		name                  string
+		sessionID             string
+		instanceID            string
+		secretGeneratorConfig *crypto.GeneratorConfig
+		otpAlgorithm          crypto.EncryptionAlgorithm
+		challengeTypeOTPSMS   *domain.ChallengeTypeOTPSMS
+		userRepo              func(ctrl *gomock.Controller) domain.UserRepository
+		sessionRepo           func(ctrl *gomock.Controller) domain.SessionRepository
+		smsProvider           func(ctx context.Context, instanceID string) (string, error)
+		wantErr               error
 	}{
 		{
 			name:                "no request otpsms challenge",
-			requestChallengeOTP: nil,
+			challengeTypeOTPSMS: nil,
 			wantErr:             nil,
 		},
 		{
 			name:                "no session id",
 			sessionID:           "",
 			instanceID:          "instance-1",
-			requestChallengeOTP: &domain.ChallengeTypeOTPSMS{},
+			challengeTypeOTPSMS: &domain.ChallengeTypeOTPSMS{},
 			wantErr:             zerrors.ThrowPreconditionFailed(nil, "DOM-3XpM6A", "Errors.Missing.SessionID"),
 		},
 		{
 			name:                "no instance id",
 			sessionID:           "session-1",
 			instanceID:          "",
-			requestChallengeOTP: &domain.ChallengeTypeOTPSMS{},
+			challengeTypeOTPSMS: &domain.ChallengeTypeOTPSMS{},
 			wantErr:             zerrors.ThrowPreconditionFailed(nil, "DOM-jNNJ9f", "Errors.Missing.InstanceID"),
 		},
 		{
 			name:                "no sms provider",
 			sessionID:           "session-1",
 			instanceID:          "instance-1",
-			requestChallengeOTP: &domain.ChallengeTypeOTPSMS{},
+			challengeTypeOTPSMS: &domain.ChallengeTypeOTPSMS{},
 			smsProvider:         nil,
-			wantErr:             zerrors.ThrowPreconditionFailed(nil, "DOM-1aGWeE", "Errors.Missing.SMSProvider"),
+			secretGeneratorConfig: &crypto.GeneratorConfig{
+				Expiry: 10 * time.Minute,
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-1aGWeE", "missing sms provider"),
+		},
+		{
+			name:                "no default secret generator config",
+			sessionID:           "session-1",
+			instanceID:          "instance-1",
+			challengeTypeOTPSMS: &domain.ChallengeTypeOTPSMS{},
+			smsProvider: func(ctx context.Context, instanceID string) (string, error) {
+				return "", nil
+			},
+			wantErr: zerrors.ThrowInternal(nil, "DOM-IDcOzP", "missing default secret generator config"),
+		},
+		{
+			name:                "no otp algorithm",
+			sessionID:           "session-1",
+			instanceID:          "instance-1",
+			challengeTypeOTPSMS: &domain.ChallengeTypeOTPSMS{},
+			smsProvider: func(ctx context.Context, instanceID string) (string, error) {
+				return "", nil
+			},
+			secretGeneratorConfig: &crypto.GeneratorConfig{
+				Expiry: 10 * time.Minute,
+			},
+			wantErr: zerrors.ThrowInternal(nil, "DOM-VeBPmV", "missing MFA encryption algorithm"),
 		},
 		{
 			name:                "failed to get session",
 			sessionID:           "session-1",
 			instanceID:          "instance-1",
-			requestChallengeOTP: &domain.ChallengeTypeOTPSMS{},
+			challengeTypeOTPSMS: &domain.ChallengeTypeOTPSMS{},
+			secretGeneratorConfig: &crypto.GeneratorConfig{
+				Expiry: 10 * time.Minute,
+			},
+			otpAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			smsProvider: func(ctx context.Context, instanceID string) (string, error) {
 				return "", nil
 			},
@@ -89,7 +121,11 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			name:                "session not found",
 			sessionID:           "session-1",
 			instanceID:          "instance-1",
-			requestChallengeOTP: &domain.ChallengeTypeOTPSMS{},
+			challengeTypeOTPSMS: &domain.ChallengeTypeOTPSMS{},
+			secretGeneratorConfig: &crypto.GeneratorConfig{
+				Expiry: 10 * time.Minute,
+			},
+			otpAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			smsProvider: func(ctx context.Context, instanceID string) (string, error) {
 				return "", nil
 			},
@@ -111,7 +147,11 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			name:                "missing user id in session",
 			sessionID:           "session-1",
 			instanceID:          "instance-1",
-			requestChallengeOTP: &domain.ChallengeTypeOTPSMS{},
+			challengeTypeOTPSMS: &domain.ChallengeTypeOTPSMS{},
+			secretGeneratorConfig: &crypto.GeneratorConfig{
+				Expiry: 10 * time.Minute,
+			},
+			otpAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			smsProvider: func(ctx context.Context, instanceID string) (string, error) {
 				return "", nil
 			},
@@ -135,7 +175,11 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			name:                "failed to get user",
 			sessionID:           "session-1",
 			instanceID:          "instance-1",
-			requestChallengeOTP: &domain.ChallengeTypeOTPSMS{},
+			challengeTypeOTPSMS: &domain.ChallengeTypeOTPSMS{},
+			secretGeneratorConfig: &crypto.GeneratorConfig{
+				Expiry: 10 * time.Minute,
+			},
+			otpAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			smsProvider: func(ctx context.Context, instanceID string) (string, error) {
 				return "", nil
 			},
@@ -172,7 +216,11 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			name:                "user not found",
 			sessionID:           "session-1",
 			instanceID:          "instance-1",
-			requestChallengeOTP: &domain.ChallengeTypeOTPSMS{},
+			challengeTypeOTPSMS: &domain.ChallengeTypeOTPSMS{},
+			secretGeneratorConfig: &crypto.GeneratorConfig{
+				Expiry: 10 * time.Minute,
+			},
+			otpAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			smsProvider: func(ctx context.Context, instanceID string) (string, error) {
 				return "", nil
 			},
@@ -209,7 +257,11 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			name:                "human user not set",
 			sessionID:           "session-1",
 			instanceID:          "instance-1",
-			requestChallengeOTP: &domain.ChallengeTypeOTPSMS{},
+			challengeTypeOTPSMS: &domain.ChallengeTypeOTPSMS{},
+			secretGeneratorConfig: &crypto.GeneratorConfig{
+				Expiry: 10 * time.Minute,
+			},
+			otpAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			smsProvider: func(ctx context.Context, instanceID string) (string, error) {
 				return "", nil
 			},
@@ -252,7 +304,11 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			name:                "phone not set",
 			sessionID:           "session-1",
 			instanceID:          "instance-1",
-			requestChallengeOTP: &domain.ChallengeTypeOTPSMS{},
+			challengeTypeOTPSMS: &domain.ChallengeTypeOTPSMS{},
+			secretGeneratorConfig: &crypto.GeneratorConfig{
+				Expiry: 10 * time.Minute,
+			},
+			otpAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			smsProvider: func(ctx context.Context, instanceID string) (string, error) {
 				return "", nil
 			},
@@ -298,7 +354,11 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			name:                "phone otp not enabled",
 			sessionID:           "session-1",
 			instanceID:          "instance-1",
-			requestChallengeOTP: &domain.ChallengeTypeOTPSMS{},
+			challengeTypeOTPSMS: &domain.ChallengeTypeOTPSMS{},
+			secretGeneratorConfig: &crypto.GeneratorConfig{
+				Expiry: 10 * time.Minute,
+			},
+			otpAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			smsProvider: func(ctx context.Context, instanceID string) (string, error) {
 				return "", nil
 			},
@@ -347,7 +407,11 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			name:                "valid OTP SMS challenge request",
 			sessionID:           "session-1",
 			instanceID:          "instance-1",
-			requestChallengeOTP: &domain.ChallengeTypeOTPSMS{},
+			challengeTypeOTPSMS: &domain.ChallengeTypeOTPSMS{},
+			secretGeneratorConfig: &crypto.GeneratorConfig{
+				Expiry: 10 * time.Minute,
+			},
+			otpAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			smsProvider: func(ctx context.Context, instanceID string) (string, error) {
 				return "", nil
 			},
@@ -365,18 +429,17 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
 			cmd := domain.NewOTPSMSChallengeCommand(
-				tt.requestChallengeOTP,
+				tt.challengeTypeOTPSMS,
 				tt.sessionID,
 				tt.instanceID,
-				nil,
-				nil,
+				tt.secretGeneratorConfig,
+				tt.otpAlgorithm,
 				tt.smsProvider,
 				nil,
 			)
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),
 			}
-			//domain.WithQueryExecutor(new(noopdb.Pool))(opts)
 			if tt.userRepo != nil {
 				domain.WithUserRepo(tt.userRepo(ctrl))(opts)
 			}
@@ -421,6 +484,10 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 			challengeTypeOTPSMS: &domain.ChallengeTypeOTPSMS{
 				ReturnCode: false,
 			},
+			secretGeneratorConfig: &crypto.GeneratorConfig{
+				Expiry: defaultExpiry,
+			},
+			otpAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				getSessionSucceededExpectation(repo)
@@ -496,7 +563,11 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 			smsProviderFn: func(ctx context.Context, instanceID string) (string, error) {
 				return "external-sms-provider-id", nil // with an external sms provider
 			},
-			userRepo: getUser(otpEnabledAt),
+			secretGeneratorConfig: &crypto.GeneratorConfig{
+				Expiry: defaultExpiry,
+			},
+			otpAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			userRepo:     getUser(otpEnabledAt),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				getSessionSucceededExpectation(repo)
@@ -519,6 +590,10 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 			},
 			smsProviderFn: func(ctx context.Context, instanceID string) (string, error) {
 				return "external-sms-provider-id", nil // with an external sms provider
+			},
+			otpAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			secretGeneratorConfig: &crypto.GeneratorConfig{
+				Expiry: defaultExpiry,
 			},
 			userRepo: getUser(otpEnabledAt),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
@@ -1108,7 +1183,6 @@ func TestOTPSMSChallengeCommand_Events(t *testing.T) {
 				require.Len(t, events, 1)
 				assert.Equal(t, tt.wantEvent, events[0])
 			}
-
 		})
 	}
 }
