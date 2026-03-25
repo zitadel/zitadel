@@ -512,6 +512,32 @@ func (c *MockQueriesSMSProviderConfigActiveCall) DoAndReturn(f func(context.Cont
 }
 
 // SMTPConfigActive mocks base method.
+func (m *MockQueries) OrgSMTPConfigActive(ctx context.Context, orgID string) (*query.SMTPConfig, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "OrgSMTPConfigActive", ctx, orgID)
+	ret0, _ := ret[0].(*query.SMTPConfig)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// OrgSMTPConfigActive indicates an expected call of OrgSMTPConfigActive.
+func (mr *MockQueriesMockRecorder) OrgSMTPConfigActive(ctx, orgID any) *MockQueriesOrgSMTPConfigActiveCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OrgSMTPConfigActive", reflect.TypeOf((*MockQueries)(nil).OrgSMTPConfigActive), ctx, orgID)
+	return &MockQueriesOrgSMTPConfigActiveCall{Call: call}
+}
+
+// MockQueriesOrgSMTPConfigActiveCall wrap *gomock.Call
+type MockQueriesOrgSMTPConfigActiveCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockQueriesOrgSMTPConfigActiveCall) Return(arg0 *query.SMTPConfig, arg1 error) *MockQueriesOrgSMTPConfigActiveCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
 func (m *MockQueries) SMTPConfigActive(ctx context.Context, resourceOwner string) (*query.SMTPConfig, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SMTPConfigActive", ctx, resourceOwner)

@@ -14,8 +14,8 @@ import (
 )
 
 // GetActiveEmailConfig reads the SMTP provider config for the given org.
-// Org-level SMTP is required — no fallback to instance-level.
-// If orgID is empty, falls back to instance-level for backward compatibility only.
+// Uses org-level SMTP when available. Falls back to instance-level
+// when orgID is empty (backward compatibility with instance-scoped callers).
 func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context, orgID string) (*email.Config, error) {
 	var config *query.SMTPConfig
 	var err error

@@ -14846,7 +14846,7 @@ message UpdateOrgEmailProviderHTTPRequest {
     // Regenerate the key used for signing and checking the payload sent to the HTTP provider.
     // Set the graceful period for the existing key. During that time, the previous
     // signing key and the new one will be used to sign the request to allow you a smooth
-    // transition onf your API.
+    // transition of your API.
     //
     // Note that we currently only allow an immediate rotation ("0s") and will support
     // longer expirations in the future.
