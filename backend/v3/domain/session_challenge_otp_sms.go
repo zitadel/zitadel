@@ -38,7 +38,7 @@ type OTPSMSChallengeCommand struct {
 	InstanceID string
 
 	defaultSecretGeneratorConfig *crypto.GeneratorConfig
-	otpAlg                       crypto.EncryptionAlgorithm
+	otpAlgorithm                 crypto.EncryptionAlgorithm
 	smsProvider                  getActiveSMSProviderFn
 	newPhoneCode                 newOTPCodeFunc
 
@@ -74,7 +74,7 @@ func NewOTPSMSChallengeCommand(
 		SessionID:                    sessionID,
 		InstanceID:                   instanceID,
 		defaultSecretGeneratorConfig: secretGeneratorConfig,
-		otpAlg:                       otpAlgorithm,
+		otpAlgorithm:                 otpAlgorithm,
 		smsProvider:                  smsProvider,
 		newPhoneCode:                 newPhoneCodeFn,
 	}
@@ -87,17 +87,9 @@ func (o *OTPSMSChallengeCommand) Validate(ctx context.Context, opts *InvokeOpts)
 		return nil
 	}
 
-	// validate required fields
-	if o.SessionID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-3XpM6A", "Errors.Missing.SessionID")
-	}
-	if o.InstanceID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-jNNJ9f", "Errors.Missing.InstanceID")
-	}
-
-	// validate that sms provider is set
-	if o.smsProvider == nil {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-1aGWeE", "Errors.Missing.SMSProvider")
+	err = o.validatePreConditions()
+	if err != nil {
+		return err
 	}
 
 	// get session
@@ -235,10 +227,36 @@ func (o *OTPSMSChallengeCommand) createPhoneCode(ctx context.Context, opts *Invo
 	if err != nil {
 		return nil, "", "", expiry, err
 	}
-	codeGenerator := crypto.NewEncryptionGenerator(*config, o.otpAlg)
+	codeGenerator := crypto.NewEncryptionGenerator(*config, o.otpAlgorithm)
 	crypted, plain, err := o.newPhoneCode(codeGenerator)
 	if err != nil {
 		return nil, "", "", expiry, err
 	}
 	return crypted, plain, "", config.Expiry, nil
+}
+
+func (o *OTPSMSChallengeCommand) validatePreConditions() error {
+	// validate required fields
+	if o.SessionID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-3XpM6A", "Errors.Missing.SessionID")
+	}
+	if o.InstanceID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-jNNJ9f", "Errors.Missing.InstanceID")
+	}
+
+	// validate that sms provider is set
+	if o.smsProvider == nil {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-1aGWeE", "missing sms provider")
+	}
+
+	// validate that default secret generator config is set
+	if o.defaultSecretGeneratorConfig == nil {
+		return zerrors.ThrowInternal(nil, "DOM-IDcOzP", "missing default secret generator config")
+	}
+
+	// validate that otp algorithm is set
+	if o.otpAlgorithm == nil {
+		return zerrors.ThrowInternal(nil, "DOM-VeBPmV", "missing MFA encryption algorithm")
+	}
+	return nil
 }

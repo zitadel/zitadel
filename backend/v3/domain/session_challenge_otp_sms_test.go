@@ -612,7 +612,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 						Crypted:    []byte("code"),
 					},
 					Expiry:           expiry,
-					CodeReturned:     true,
+					CodeReturned:     false,
 					GeneratorID:      "",
 					LastChallengedAt: challengedAt,
 				})

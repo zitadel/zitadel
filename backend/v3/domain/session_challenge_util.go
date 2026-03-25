@@ -18,6 +18,14 @@ const (
 )
 
 func GetOTPCryptoGeneratorConfigWithDefault(ctx context.Context, instanceID string, opts *InvokeOpts, defaultConfig *crypto.GeneratorConfig, otpType OTPType) (*crypto.GeneratorConfig, error) {
+	if defaultConfig == nil {
+		return nil, zerrors.ThrowInternal(nil, "DOM-3AcM0U", "default config is nil")
+	}
+
+	if opts == nil || opts.secretGeneratorSettingsRepo == nil {
+		return defaultConfig, nil
+	}
+
 	settingsRepo := opts.secretGeneratorSettingsRepo
 	cfg, err := settingsRepo.Get(
 		ctx,
@@ -30,7 +38,7 @@ func GetOTPCryptoGeneratorConfigWithDefault(ctx context.Context, instanceID stri
 		),
 	)
 	if err := handleGetError(err, "DOM-x7Yd3E", "SecretGeneratorSettings"); err != nil {
-		return nil, err
+		return nil, err // todo: or return defaultConfig?
 	}
 
 	if cfg.State != SettingStateActive {
