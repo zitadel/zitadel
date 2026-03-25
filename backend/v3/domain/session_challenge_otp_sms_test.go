@@ -391,6 +391,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 
 func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 	t.Parallel()
+	challengedAt := time.Now()
 	otpEnabledAt := time.Now().Add(-30 * time.Minute)
 	smsProviderErr := errors.New("failed to get active sms provider")
 	codeErr := errors.New("failed to create code")
@@ -482,7 +483,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				return repo
 			},
 			userRepo:                    getUser(otpEnabledAt),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPSMSRequestType),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPTypeSMS),
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			newPhoneCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return nil, "", codeErr
@@ -503,16 +504,16 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				challengeOTPSMSChange := repo.SetChallenge(&domain.SessionChallengeOTPSMS{
 					Code:             nil,
 					Expiry:           0,
-					CodeReturned:     true,
+					CodeReturned:     false,
 					GeneratorID:      "external-sms-provider-id",
-					LastChallengedAt: time.Now(),
+					LastChallengedAt: challengedAt,
 				})
 				updateSessionSucceededExpectation(repo, challengeOTPSMSChange)
 				return repo
 			},
 		},
 		{
-			name: "update successful - external sms provider with return code set to true",
+			name: "update successful - external sms provider with return code true",
 			challengeTypeOTPSMS: &domain.ChallengeTypeOTPSMS{
 				ReturnCode: true,
 			},
@@ -529,7 +530,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 					Expiry:           0,
 					CodeReturned:     true,
 					GeneratorID:      "external-sms-provider-id",
-					LastChallengedAt: time.Now(),
+					LastChallengedAt: challengedAt,
 				})
 				updateSessionSucceededExpectation(repo, challengeOTPSMSChange)
 				return repo
@@ -548,7 +549,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				Expiry: defaultExpiry,
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPSMSRequestType),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPTypeSMS),
 			newPhoneCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
@@ -571,7 +572,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 					Expiry:           expiry,
 					CodeReturned:     true,
 					GeneratorID:      "",
-					LastChallengedAt: time.Now(),
+					LastChallengedAt: challengedAt,
 				})
 				updateSessionSucceededExpectation(repo, challengeOTPSMSChange)
 				return repo
@@ -579,7 +580,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 			wantOTPSMSChallenge: gu.Ptr("code"),
 		},
 		{
-			name: "update successful - internal sms provider - with return code set to false",
+			name: "update successful - internal sms provider - with return code false",
 			challengeTypeOTPSMS: &domain.ChallengeTypeOTPSMS{
 				ReturnCode: false,
 			},
@@ -590,7 +591,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				Expiry: defaultExpiry,
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPSMSRequestType),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPTypeSMS),
 			newPhoneCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
@@ -613,7 +614,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 					Expiry:           expiry,
 					CodeReturned:     true,
 					GeneratorID:      "",
-					LastChallengedAt: time.Now(),
+					LastChallengedAt: challengedAt,
 				})
 				updateSessionSucceededExpectation(repo, challengeOTPSMSChange)
 				return repo
@@ -632,7 +633,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				Expiry: defaultExpiry,
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStatePreview, domain.OTPSMSRequestType),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStatePreview, domain.OTPTypeSMS),
 			newPhoneCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
@@ -656,7 +657,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 					Expiry:           defaultExpiry,
 					CodeReturned:     true,
 					GeneratorID:      "",
-					LastChallengedAt: time.Now(),
+					LastChallengedAt: challengedAt,
 				})
 				updateSessionSucceededExpectation(repo, challengeOTPSMSChange)
 				return repo
@@ -698,7 +699,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 					Expiry:           defaultExpiry,
 					CodeReturned:     true,
 					GeneratorID:      "",
-					LastChallengedAt: time.Now(),
+					LastChallengedAt: challengedAt,
 				})
 				updateSessionSucceededExpectation(repo, challengeOTPSMSChange)
 				return repo
@@ -717,7 +718,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				Expiry: defaultExpiry,
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPSMSRequestType),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPTypeSMS),
 			newPhoneCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
@@ -741,7 +742,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 					Expiry:           expiry,
 					CodeReturned:     true,
 					GeneratorID:      "",
-					LastChallengedAt: time.Now(),
+					LastChallengedAt: challengedAt,
 				})
 				updateSessionFailedExpectation(repo, challengeOTPSMSChange, assert.AnError, 0)
 				return repo
@@ -760,7 +761,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				Expiry: defaultExpiry,
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPSMSRequestType),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPTypeSMS),
 			newPhoneCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
@@ -784,7 +785,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 					Expiry:           expiry,
 					CodeReturned:     true,
 					GeneratorID:      "",
-					LastChallengedAt: time.Now(),
+					LastChallengedAt: challengedAt,
 				})
 				updateSessionFailedExpectation(repo, challengeOTPSMSChange, nil, 0)
 				return repo
@@ -803,7 +804,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				Expiry: defaultExpiry,
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPSMSRequestType),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPTypeSMS),
 			newPhoneCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
@@ -826,7 +827,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 					Expiry:           expiry,
 					CodeReturned:     true,
 					GeneratorID:      "",
-					LastChallengedAt: time.Now(),
+					LastChallengedAt: challengedAt,
 				})
 				updateSessionFailedExpectation(repo, challengeOTPSMSChange, nil, 2)
 				return repo
@@ -873,6 +874,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 
 func TestOTPSMSChallengeCommand_Events(t *testing.T) {
 	t.Parallel()
+	challengedAt := time.Now()
 	otpEnabledAt := time.Now().Add(-30 * time.Minute)
 	defaultExpiry := 10 * time.Minute
 	expiry := 30 * time.Minute
@@ -913,7 +915,7 @@ func TestOTPSMSChallengeCommand_Events(t *testing.T) {
 				Expiry: defaultExpiry,
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPSMSRequestType),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPTypeSMS),
 			newPhoneCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
@@ -934,9 +936,9 @@ func TestOTPSMSChallengeCommand_Events(t *testing.T) {
 						Crypted:    []byte("code"),
 					},
 					Expiry:           expiry,
-					CodeReturned:     true,
+					CodeReturned:     false,
 					GeneratorID:      "",
-					LastChallengedAt: time.Now(),
+					LastChallengedAt: challengedAt,
 				})
 				updateSessionSucceededExpectation(repo, challengeOTPSMSChange)
 				return repo
@@ -961,7 +963,7 @@ func TestOTPSMSChallengeCommand_Events(t *testing.T) {
 				Expiry: defaultExpiry,
 			},
 			otpAlgorithm:                crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPSMSRequestType),
+			secretGeneratorSettingsRepo: secretGeneratorSettingsRepo(domain.SettingStateActive, domain.OTPTypeSMS),
 			newPhoneCodeFn: func(g crypto.Generator) (*crypto.CryptoValue, string, error) {
 				return &crypto.CryptoValue{
 					CryptoType: crypto.TypeEncryption,
@@ -984,7 +986,7 @@ func TestOTPSMSChallengeCommand_Events(t *testing.T) {
 					Expiry:           expiry,
 					CodeReturned:     true,
 					GeneratorID:      "",
-					LastChallengedAt: time.Now(),
+					LastChallengedAt: challengedAt,
 				})
 				updateSessionSucceededExpectation(repo, challengeOTPSMSChange)
 				return repo
@@ -998,7 +1000,7 @@ func TestOTPSMSChallengeCommand_Events(t *testing.T) {
 			),
 		},
 		{
-			name:                "update successful - external sms provider - return code set to false",
+			name:                "update successful - external sms provider - return code false",
 			challengeTypeOTPSMS: &domain.ChallengeTypeOTPSMS{},
 			secretGeneratorConfig: &crypto.GeneratorConfig{
 				Expiry: defaultExpiry,
@@ -1015,9 +1017,9 @@ func TestOTPSMSChallengeCommand_Events(t *testing.T) {
 				challengeOTPSMSChange := repo.SetChallenge(&domain.SessionChallengeOTPSMS{
 					Code:             nil,
 					Expiry:           0,
-					CodeReturned:     true,
+					CodeReturned:     false,
 					GeneratorID:      "external-sms-provider-id",
-					LastChallengedAt: time.Now(),
+					LastChallengedAt: challengedAt,
 				})
 				updateSessionSucceededExpectation(repo, challengeOTPSMSChange)
 				return repo
@@ -1031,7 +1033,7 @@ func TestOTPSMSChallengeCommand_Events(t *testing.T) {
 			),
 		},
 		{
-			name: "update successful - external sms provider - return code set to true",
+			name: "update successful - external sms provider - return code true",
 			challengeTypeOTPSMS: &domain.ChallengeTypeOTPSMS{
 				ReturnCode: true,
 			},
@@ -1052,7 +1054,7 @@ func TestOTPSMSChallengeCommand_Events(t *testing.T) {
 					Expiry:           0,
 					CodeReturned:     true,
 					GeneratorID:      "external-sms-provider-id",
-					LastChallengedAt: time.Now(),
+					LastChallengedAt: challengedAt,
 				})
 				updateSessionSucceededExpectation(repo, challengeOTPSMSChange)
 				return repo
@@ -1111,10 +1113,10 @@ func TestOTPSMSChallengeCommand_Events(t *testing.T) {
 	}
 }
 
-func secretGeneratorSettingsRepo(state domain.SettingState, otpType domain.OTPRequestType) func(ctrl *gomock.Controller) domain.SecretGeneratorSettingsRepository {
+func secretGeneratorSettingsRepo(state domain.SettingState, otpType domain.OTPType) func(ctrl *gomock.Controller) domain.SecretGeneratorSettingsRepository {
 	var attrs domain.SecretGeneratorSettingsAttributes
 	switch otpType {
-	case domain.OTPEmailRequestType:
+	case domain.OTPTypeEmail:
 		attrs = domain.SecretGeneratorSettingsAttributes{
 			OTPEmail: &domain.OTPEmailAttributes{
 				SecretGeneratorAttrsWithExpiry: domain.SecretGeneratorAttrsWithExpiry{
@@ -1129,7 +1131,7 @@ func secretGeneratorSettingsRepo(state domain.SettingState, otpType domain.OTPRe
 				},
 			},
 		}
-	case domain.OTPSMSRequestType:
+	case domain.OTPTypeSMS:
 		attrs = domain.SecretGeneratorSettingsAttributes{
 			OTPSMS: &domain.OTPSMSAttributes{
 				SecretGeneratorAttrsWithExpiry: domain.SecretGeneratorAttrsWithExpiry{

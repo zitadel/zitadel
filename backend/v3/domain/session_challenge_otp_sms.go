@@ -231,7 +231,7 @@ func (o *OTPSMSChallengeCommand) createPhoneCode(ctx context.Context, opts *Invo
 		return nil, "", externalID, expiry, nil
 	}
 
-	config, err := GetOTPCryptoGeneratorConfigWithDefault(ctx, o.InstanceID, opts, o.defaultSecretGeneratorConfig, OTPSMSRequestType)
+	config, err := GetOTPCryptoGeneratorConfigWithDefault(ctx, o.InstanceID, opts, o.defaultSecretGeneratorConfig, OTPTypeSMS)
 	if err != nil {
 		return nil, "", "", expiry, err
 	}

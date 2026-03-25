@@ -10,14 +10,14 @@ import (
 
 type newOTPCodeFunc func(g crypto.Generator) (*crypto.CryptoValue, string, error)
 
-type OTPRequestType int64
+type OTPType int64
 
 const (
-	OTPSMSRequestType OTPRequestType = iota
-	OTPEmailRequestType
+	OTPTypeSMS OTPType = iota
+	OTPTypeEmail
 )
 
-func GetOTPCryptoGeneratorConfigWithDefault(ctx context.Context, instanceID string, opts *InvokeOpts, defaultConfig *crypto.GeneratorConfig, otpType OTPRequestType) (*crypto.GeneratorConfig, error) {
+func GetOTPCryptoGeneratorConfigWithDefault(ctx context.Context, instanceID string, opts *InvokeOpts, defaultConfig *crypto.GeneratorConfig, otpType OTPType) (*crypto.GeneratorConfig, error) {
 	settingsRepo := opts.secretGeneratorSettingsRepo
 	cfg, err := settingsRepo.Get(
 		ctx,
@@ -39,25 +39,33 @@ func GetOTPCryptoGeneratorConfigWithDefault(ctx context.Context, instanceID stri
 
 	var attrs SecretGeneratorAttrsWithExpiry
 	switch otpType {
-	case OTPSMSRequestType:
+	case OTPTypeSMS:
 		if cfg.OTPSMS == nil {
 			return defaultConfig, nil
 		}
 		attrs = cfg.OTPSMS.SecretGeneratorAttrsWithExpiry
-	case OTPEmailRequestType:
+	case OTPTypeEmail:
 		if cfg.OTPEmail == nil {
 			return defaultConfig, nil
 		}
 		attrs = cfg.OTPEmail.SecretGeneratorAttrsWithExpiry
 	default:
-		return nil, zerrors.ThrowInternal(nil, "DOM-3AcM0U", "Errors.Invalid.OTP.Type")
+		return nil, zerrors.ThrowInternal(nil, "DOM-3AcM0U", "invalid otp type")
 	}
 	return &crypto.GeneratorConfig{
-		Length:              *attrs.Length,
-		Expiry:              *attrs.Expiry,
-		IncludeLowerLetters: *attrs.IncludeLowerLetters,
-		IncludeUpperLetters: *attrs.IncludeUpperLetters,
-		IncludeDigits:       *attrs.IncludeDigits,
-		IncludeSymbols:      *attrs.IncludeSymbols,
+		Length:              getValueOrDefault(attrs.Length, defaultConfig.Length),
+		Expiry:              getValueOrDefault(attrs.Expiry, defaultConfig.Expiry),
+		IncludeLowerLetters: getValueOrDefault(attrs.IncludeLowerLetters, defaultConfig.IncludeLowerLetters),
+		IncludeUpperLetters: getValueOrDefault(attrs.IncludeUpperLetters, defaultConfig.IncludeUpperLetters),
+		IncludeDigits:       getValueOrDefault(attrs.IncludeDigits, defaultConfig.IncludeDigits),
+		IncludeSymbols:      getValueOrDefault(attrs.IncludeSymbols, defaultConfig.IncludeSymbols),
 	}, nil
+}
+
+// getValueOrDefault safely dereferences a pointer or returns a default value
+func getValueOrDefault[T any](ptr *T, defaultVal T) T {
+	if ptr != nil {
+		return *ptr
+	}
+	return defaultVal
 }
