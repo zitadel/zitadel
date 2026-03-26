@@ -3,9 +3,6 @@ name: Lint Test Build
 on:
   workflow_call:
     inputs:
-      go_version:
-        required: true
-        type: string
       node_version:
         required: true
         type: string
@@ -30,9 +27,9 @@ jobs:
         if: ${{ github.ref != 'refs/heads/main' }}
         run: git fetch origin main:main
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
-          go-version: ${{ inputs.go_version }}
+          go-version-file: go.mod
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
