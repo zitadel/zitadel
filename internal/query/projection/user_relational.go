@@ -1124,6 +1124,8 @@ func (p *relationalTablesProjection) reducePasskeyVerified(event eventstore.Even
 				repo.SetPasskeySignCount(e.SignCount),
 				repo.SetPasskeyName(e.WebAuthNTokenName),
 				repo.SetPasskeyUpdatedAt(e.CreatedAt()),
+				repo.SetPasskeyVerifiedAt(e.CreatedAt()),
+				repo.SetVerification(nil),
 			),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
