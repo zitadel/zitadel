@@ -168,8 +168,12 @@ You can also activate the v2 login for your apps, so users are redirected to `/u
 
 **Customizing the new login:** The easiest way to actually customizing it is to fork the https://github.com/zitadel/zitadel repo and use the [Deploy with Vercel button](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#login-deploy) to run your login code on Vercel.
 
-<Tabs queryString="deployment">
-    <Tab value="zitadel_cloud" label="Activate Zitadel Cloud V2 Login" default="true">
+<Tabs 
+    groupId="deployment" 
+    defaultIndex={0} 
+    items={['Activate Zitadel Cloud V2 Login', 'Vercel Custom Login Deployment']}
+>
+    <Tab value="Activate Zitadel Cloud V2 Login">
 
         Zitadel Cloud provides the V2 login at the fixed path `/ui/v2/login`.
         <PreventLockout components={props.components} />
@@ -181,7 +185,7 @@ You can also activate the v2 login for your apps, so users are redirected to `/u
         2. Enable the [loginV2 feature](/reference/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures) on the instance. Leave the base URI empty to use the default. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://your-zitadel-instance.zitadel.cloud/ui/v2/login)
 
     </Tab>
-    <Tab value="vercel_custom" label="Vercel Custom Login Deployment">
+    <Tab value="Vercel Custom Login Deployment">
 
         The simplest way to deploy the new login for yourself is by using the [Deploy with Vercel button](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#login-deploy) to deploy the login directly to your Vercel.
 

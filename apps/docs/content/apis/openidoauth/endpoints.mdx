@@ -63,13 +63,8 @@ Depending on your authorization method you will have to provide additional param
 
 <Tabs
     groupId="token-auth-methods"
-    defaultValue="client_secret_basic"
-    values={[
-        {label: 'client_secret_basic', value: 'client_secret_basic'},
-        {label: 'client_secret_post', value: 'client_secret_post'},
-        {label: 'none (PKCE)', value: 'none'},
-        {label: 'private_key_jwt', value: 'private_key_jwt'},
-    ]}
+    defaultIndex={0}
+    items={['client_secret_basic','client_secret_post','none (PKCE)','private_key_jwt']}
 >
 <Tab value="client_secret_basic">
 no additional parameters required
@@ -77,7 +72,7 @@ no additional parameters required
 <Tab value="client_secret_post">
 no additional parameters required
 </Tab>
-<Tab value="none">
+<Tab value="none (PKCE)">
 
 | Parameter             | Description                                           |
 | --------------------- | ----------------------------------------------------- |
@@ -192,13 +187,8 @@ Depending on your authorization method you will have to provide additional param
 
 <Tabs
     groupId="token-auth-methods"
-    defaultValue="client_secret_basic"
-    values={[
-        {label: 'client_secret_basic', value: 'client_secret_basic'},
-        {label: 'client_secret_post', value: 'client_secret_post'},
-        {label: 'none (PKCE)', value: 'none'},
-        {label: 'private_key_jwt', value: 'private_key_jwt'},
-    ]}
+    defaultIndex={0}
+    items={['client_secret_basic','client_secret_post','none (PKCE)','private_key_jwt']}
 >
 <Tab value="client_secret_basic">
 
@@ -215,7 +205,7 @@ Send your `client_id` and `client_secret` as parameters in the body:
 | client_secret | client_secret of the application |
 
 </Tab>
-<Tab value="none">
+<Tab value="none (PKCE)">
 
 Send your `client_id` and `code_verifier` for us to recompute the `code_challenge` of the authorization request.
 
@@ -292,13 +282,8 @@ Depending on your authorization method you will have to provide additional param
 
 <Tabs
     groupId="token-auth-methods"
-    defaultValue="client_secret_basic"
-    values={[
-        {label: 'client_secret_basic', value: 'client_secret_basic'},
-        {label: 'client_secret_post', value: 'client_secret_post'},
-        {label: 'none (PKCE)', value: 'none'},
-        {label: 'private_key_jwt', value: 'private_key_jwt'},
-    ]}
+    defaultIndex={0}
+    items={['client_secret_basic','client_secret_post','none (PKCE)','private_key_jwt']}
 >
 <Tab value="client_secret_basic">
 
@@ -315,7 +300,7 @@ Send your `client_id` and `client_secret` as parameters in the body:
 | client_secret | client_secret of the application |
 
 </Tab>
-<Tab value="none">
+<Tab value="none (PKCE)">
 
 Send your `client_id` as parameter in the body. No authentication is required.
 
@@ -402,13 +387,8 @@ Depending on your authorization method you will have to provide additional param
 
 <Tabs
     groupId="token-auth-methods"
-    defaultValue="client_secret_basic"
-    values={[
-        {label: 'client_secret_basic', value: 'client_secret_basic'},
-        {label: 'client_secret_post', value: 'client_secret_post'},
-        {label: 'none', value: 'none'},
-        {label: 'private_key_jwt', value: 'private_key_jwt'},
-    ]}
+    defaultIndex={0}
+    items={['client_secret_basic','client_secret_post','none (PKCE)','private_key_jwt']}
 >
 
 <Tab value="client_secret_basic">
@@ -426,7 +406,7 @@ Send your `client_id` and `client_secret` as parameters in the body:
 | client_secret | client_secret of the application |
 
 </Tab>
-<Tab value="none">
+<Tab value="none (PKCE)">
 
 Send your `client_id` as parameter in the body. No authentication is required.
 
@@ -477,12 +457,9 @@ this endpoint will check if the token is not revoked (by client or logout).
 Depending on your authorization method you will have to provide additional parameters or headers:
 
 <Tabs
-groupId="introspect-auth-methods"
-defaultValue="client_secret_basic"
-values={[
-{label: 'client_secret_basic', value: 'client_secret_basic'},
-{label: 'private_key_jwt', value: 'private_key_jwt'},
-]}
+    groupId="introspect-auth-methods"
+    defaultIndex={0}
+    items={['client_secret_basic','private_key_jwt']}
 >
 <Tab value="client_secret_basic">
 
@@ -585,14 +562,9 @@ the corresponding `access_token` will be revoked as well.
 Depending on your authorization method you will have to provide additional parameters or headers:
 
 <Tabs
-groupId="token-auth-methods"
-defaultValue="client_secret_basic"
-values={[
-{label: 'client_secret_basic', value: 'client_secret_basic'},
-{label: 'client_secret_post', value: 'client_secret_post'},
-{label: 'none (PKCE)', value: 'none'},
-{label: 'private_key_jwt', value: 'private_key_jwt'},
-]}
+    groupId="token-auth-methods"
+    defaultIndex={0}
+    items={['client_secret_basic','client_secret_post','none (PKCE)','private_key_jwt']}
 >
 <Tab value="client_secret_basic">
 
@@ -609,7 +581,7 @@ Send your `client_id` and `client_secret` as parameters in the body:
 | client_secret | client_secret of the application |
 
 </Tab>
-<Tab value="none">
+<Tab value="none (PKCE)">
 
 Send your `client_id` as parameters in the body:
 
