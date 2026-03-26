@@ -21,6 +21,7 @@
 
 import { ConnectError, Interceptor } from "@connectrpc/connect";
 import { context, propagation, SpanKind, SpanStatusCode, trace } from "@opentelemetry/api";
+import { ClassifiedConnectError } from "./error-classification";
 
 const TRACER_NAME = "zitadel-login-grpc" as const;
 
@@ -73,6 +74,10 @@ export const otelGrpcInterceptor: Interceptor = (next) =>
 
           if (exception instanceof ConnectError) {
             span.setAttribute("rpc.grpc.status_code", exception.code);
+            if (exception instanceof ClassifiedConnectError) {
+              span.setAttribute("error.is_client", exception.isClientError);
+              span.setAttribute("http.status_code", exception.httpStatus);
+            }
           }
           span.setStatus({
             code: SpanStatusCode.ERROR,

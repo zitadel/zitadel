@@ -8,6 +8,18 @@ vi.mock("./session");
 vi.mock("./zitadel");
 vi.mock("./server/loginname");
 
+vi.mock("@zitadel/client", () => ({
+  Code: { FailedPrecondition: 9 },
+  ConnectError: class MockConnectError extends Error {
+    code: number;
+    constructor(msg: string, code: number) {
+      super(msg);
+      this.code = code;
+    }
+  },
+  create: vi.fn(),
+}));
+
 describe("loginWithOIDCAndSession", () => {
   const mockServiceUrl = "https://zitadel.example.com";
   const mockAuthRequest = "auth-123";
@@ -115,8 +127,9 @@ describe("loginWithOIDCAndSession", () => {
   });
 
   it("should handle error code 9 with default redirect", async () => {
+    const { ConnectError } = await import("@zitadel/client");
     vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
-    vi.mocked(zitadelModule.createCallback).mockRejectedValue({ code: 9 });
+    vi.mocked(zitadelModule.createCallback).mockRejectedValue(new ConnectError("already handled", 9));
     vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
       defaultRedirectUri: "https://default.example.com",
     } as any);
@@ -133,8 +146,9 @@ describe("loginWithOIDCAndSession", () => {
   });
 
   it("should redirect to /signedin when error code 9 and no default URI", async () => {
+    const { ConnectError } = await import("@zitadel/client");
     vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
-    vi.mocked(zitadelModule.createCallback).mockRejectedValue({ code: 9 });
+    vi.mocked(zitadelModule.createCallback).mockRejectedValue(new ConnectError("already handled", 9));
     vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({} as any);
 
     const result = await loginWithOIDCAndSession({
