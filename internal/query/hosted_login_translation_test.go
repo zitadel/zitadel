@@ -46,7 +46,7 @@ func TestGetSystemTranslation(t *testing.T) {
 			testName:               "when neither input language nor system default language have translation should return not found error",
 			systemTranslationToSet: okTranslation,
 			inputLanguage:          language.MustParse("ro"),
-			inputInstanceLanguage:  language.MustParse("fr"),
+			inputInstanceLanguage:  language.MustParse("mk"),
 
 			expectedError: zerrors.ThrowNotFoundf(nil, "QUERY-6gb5QR", "Errors.Query.HostedLoginTranslationNotFound-%s", "ro"),
 		},
