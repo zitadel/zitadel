@@ -57,6 +57,12 @@ func WithLockoutSettingsRepo(repo LockoutSettingsRepository) InvokeOpt {
 	}
 }
 
+func WithSecretGeneratorSettingsRepo(repo SecretGeneratorSettingsRepository) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.secretGeneratorSettingsRepo = repo
+	}
+}
+
 func WithPermissionChecker(checker PermissionChecker) InvokeOpt {
 	return func(opts *InvokeOpts) {
 		opts.Permissions = checker
@@ -118,7 +124,8 @@ type InvokeOpts struct {
 	idpIntentRepo          IDPIntentRepository
 
 	// Settings repos
-	lockoutSettingRepo LockoutSettingsRepository
+	lockoutSettingRepo          LockoutSettingsRepository
+	secretGeneratorSettingsRepo SecretGeneratorSettingsRepository
 }
 
 func (o *InvokeOpts) DB() database.QueryExecutor {
