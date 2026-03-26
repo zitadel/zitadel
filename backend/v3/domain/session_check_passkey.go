@@ -123,12 +123,7 @@ func (p *PasskeyCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (er
 	}
 	p.PKeyID = matchingPKey.ID
 
-	beginner, ok := opts.DB().(database.Beginner)
-	if !ok {
-		return zerrors.ThrowInternal(nil, "DOM-LqxZbk", "database doesn't implement database.Beginner")
-	}
-
-	tx, txErr := beginner.Begin(ctx, nil)
+	tx, txErr := opts.StartTransaction(ctx, nil)
 	if txErr != nil {
 		return zerrors.ThrowInternal(txErr, "DOM-sAAd3V", "failed starting transaction")
 	}
