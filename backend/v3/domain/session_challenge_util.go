@@ -31,10 +31,7 @@ func GetOTPCryptoGeneratorConfigWithDefault(ctx context.Context, instanceID stri
 		ctx,
 		opts.DB(),
 		database.WithCondition(
-			database.And(
-				settingsRepo.InstanceIDCondition(instanceID),
-				settingsRepo.TypeCondition(SettingTypeSecretGenerator),
-			),
+			settingsRepo.UniqueCondition(instanceID, nil, SettingTypeSecretGenerator, SettingStateActive),
 		),
 	)
 	if err := handleGetError(err, "DOM-x7Yd3E", "SecretGeneratorSettings"); err != nil {

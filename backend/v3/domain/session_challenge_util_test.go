@@ -41,10 +41,7 @@ func TestGetOTPCryptoGeneratorConfigWithDefault(t *testing.T) {
 					Get(gomock.Any(), gomock.Any(),
 						dbmock.QueryOptions(
 							database.WithCondition(
-								database.And(
-									repo.InstanceIDCondition("instance-1"),
-									repo.TypeCondition(domain.SettingTypeSecretGenerator),
-								),
+								repo.UniqueCondition("instance-1", nil, domain.SettingTypeSecretGenerator, domain.SettingStateActive),
 							),
 						),
 					).Times(1).
@@ -112,10 +109,7 @@ func TestGetOTPCryptoGeneratorConfigWithDefault(t *testing.T) {
 					Get(gomock.Any(), gomock.Any(),
 						dbmock.QueryOptions(
 							database.WithCondition(
-								database.And(
-									repo.InstanceIDCondition("instance-1"),
-									repo.TypeCondition(domain.SettingTypeSecretGenerator),
-								),
+								repo.UniqueCondition("instance-1", nil, domain.SettingTypeSecretGenerator, domain.SettingStateActive),
 							),
 						),
 					).Times(1).
@@ -143,10 +137,7 @@ func TestGetOTPCryptoGeneratorConfigWithDefault(t *testing.T) {
 					Get(gomock.Any(), gomock.Any(),
 						dbmock.QueryOptions(
 							database.WithCondition(
-								database.And(
-									repo.InstanceIDCondition("instance-1"),
-									repo.TypeCondition(domain.SettingTypeSecretGenerator),
-								),
+								repo.UniqueCondition("instance-1", nil, domain.SettingTypeSecretGenerator, domain.SettingStateActive),
 							),
 						),
 					).Times(1).
@@ -174,10 +165,7 @@ func TestGetOTPCryptoGeneratorConfigWithDefault(t *testing.T) {
 					Get(gomock.Any(), gomock.Any(),
 						dbmock.QueryOptions(
 							database.WithCondition(
-								database.And(
-									repo.InstanceIDCondition("instance-1"),
-									repo.TypeCondition(domain.SettingTypeSecretGenerator),
-								),
+								repo.UniqueCondition("instance-1", nil, domain.SettingTypeSecretGenerator, domain.SettingStateActive),
 							),
 						),
 					).Times(1).
