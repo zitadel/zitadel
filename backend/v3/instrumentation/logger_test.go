@@ -91,27 +91,63 @@ func Test_newLoggerProvider_autoexport(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "unspecified type with OTEL_LOGS_EXPORTER=console creates provider",
+			name: "auto type with OTEL_LOGS_EXPORTER=console creates provider",
 			cfg: ExporterConfig{
-				Type: ExporterTypeUnspecified,
+				Type: ExporterTypeAuto,
 			},
 			envVars: map[string]string{
 				"OTEL_LOGS_EXPORTER": "console",
 			},
 		},
 		{
-			name: "unspecified type with no OTEL env vars creates provider (noop fallback)",
+			name: "auto type with no OTEL env vars creates provider (noop fallback)",
 			cfg: ExporterConfig{
-				Type: ExporterTypeUnspecified,
+				Type: ExporterTypeAuto,
 			},
 		},
 		{
-			name: "unspecified type with OTEL_LOGS_EXPORTER=none creates provider (autoexport none)",
+			name: "auto type with OTEL_LOGS_EXPORTER=none creates provider (autoexport none)",
 			cfg: ExporterConfig{
-				Type: ExporterTypeUnspecified,
+				Type: ExporterTypeAuto,
 			},
 			envVars: map[string]string{
 				"OTEL_LOGS_EXPORTER": "none",
+			},
+		},
+		{
+			name: "auto type with only OTEL_EXPORTER_OTLP_ENDPOINT uses OTLP default",
+			cfg: ExporterConfig{
+				Type: ExporterTypeAuto,
+			},
+			envVars: map[string]string{
+				"OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4318",
+			},
+		},
+		{
+			name: "auto type with only OTEL_EXPORTER_OTLP_LOGS_ENDPOINT uses OTLP default",
+			cfg: ExporterConfig{
+				Type: ExporterTypeAuto,
+			},
+			envVars: map[string]string{
+				"OTEL_EXPORTER_OTLP_LOGS_ENDPOINT": "http://localhost:4318",
+			},
+		},
+		{
+			name: "auto type with only OTEL_EXPORTER_OTLP_PROTOCOL uses OTLP default",
+			cfg: ExporterConfig{
+				Type: ExporterTypeAuto,
+			},
+			envVars: map[string]string{
+				"OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+			},
+		},
+		{
+			name: "auto type with only OTEL_EXPORTER_OTLP_LOGS_PROTOCOL uses OTLP default",
+			cfg: ExporterConfig{
+				Type: ExporterTypeAuto,
+			},
+			envVars: map[string]string{
+				"OTEL_EXPORTER_OTLP_LOGS_PROTOCOL": "http/protobuf",
 			},
 		},
 		{
@@ -121,6 +157,46 @@ func Test_newLoggerProvider_autoexport(t *testing.T) {
 			},
 			envVars: map[string]string{
 				"OTEL_LOGS_EXPORTER": "invalid_exporter",
+			},
+		},
+		// Backward compatibility: ExporterTypeNone ignores global OTEL endpoint
+		{
+			name: "none type ignores OTEL_EXPORTER_OTLP_ENDPOINT",
+			cfg: ExporterConfig{
+				Type: ExporterTypeNone,
+			},
+			envVars: map[string]string{
+				"OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4318",
+			},
+		},
+		// Backward compatibility: ExporterTypeNone ignores per-signal OTEL var
+		{
+			name: "none type ignores OTEL_LOGS_EXPORTER=console",
+			cfg: ExporterConfig{
+				Type: ExporterTypeNone,
+			},
+			envVars: map[string]string{
+				"OTEL_LOGS_EXPORTER": "console",
+			},
+		},
+		// Backward compatibility: explicit ZITADEL types take priority over OTEL env vars
+		{
+			name: "stdout type ignores OTEL_LOGS_EXPORTER",
+			cfg: ExporterConfig{
+				Type: ExporterTypeStdOut,
+			},
+			envVars: map[string]string{
+				"OTEL_LOGS_EXPORTER": "grpc",
+			},
+		},
+		{
+			name: "grpc type ignores OTEL_EXPORTER_OTLP_ENDPOINT",
+			cfg: ExporterConfig{
+				Type:     ExporterTypeGRPC,
+				Endpoint: "localhost:4317",
+			},
+			envVars: map[string]string{
+				"OTEL_EXPORTER_OTLP_ENDPOINT": "http://some-other-host:4318",
 			},
 		},
 	}

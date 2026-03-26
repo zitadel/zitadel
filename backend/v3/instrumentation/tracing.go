@@ -137,16 +137,31 @@ func (s *Span) SetStatusByError(err error) {
 func newTracerProvider(ctx context.Context, cfg TraceConfig, resource *resource.Resource) (_ *sdk_trace.TracerProvider, err error) {
 	var exporter sdk_trace.SpanExporter
 	switch cfg.Exporter.Type {
-	case ExporterTypeUnspecified:
-		exporter, err = autoexport.NewSpanExporter(ctx,
-			autoexport.WithFallbackSpanExporter(noopSpanExporterFactory()),
-		)
-		if err == nil {
-			if _, ok := exporter.(noopSpanExporter); ok || autoexport.IsNoneSpanExporter(exporter) {
+	case ExporterTypeAuto:
+		// autoexport delegates exporter selection to the standard OTEL env vars.
+		// We can't just call autoexport.NewSpanExporter unconditionally because
+		// autoexport defaults to "otlp" when OTEL_TRACES_EXPORTER is unset, and
+		// the OTLP exporter silently points at localhost:4318 even with no env
+		// vars configured. That would cause every ZITADEL instance to start
+		// attempting OTLP connections after upgrading, spamming logs with
+		// connection errors.
+		//
+		// This guard is a heuristic: we check the env vars that realistically
+		// indicate someone has intentionally configured OTEL export. It does not
+		// cover every possible OTLP env var (e.g. OTEL_EXPORTER_OTLP_HEADERS or
+		// OTEL_EXPORTER_OTLP_CERTIFICATE on their own), but those vars are
+		// meaningless without an endpoint or exporter type being set too.
+		if os.Getenv("OTEL_TRACES_EXPORTER") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_TRACES_PROTOCOL") != "" {
+			exporter, err = autoexport.NewSpanExporter(ctx)
+			if err == nil && autoexport.IsNoneSpanExporter(exporter) {
 				exporter = nil
 			}
 		}
-	case ExporterTypeNone:
+	case ExporterTypeUnspecified, ExporterTypeNone:
 		// no exporter
 	case ExporterTypeStdOut, ExporterTypeStdErr:
 		exporter, err = traceStdOutExporter(cfg.Exporter)
@@ -222,19 +237,6 @@ func traceHttpExporter(ctx context.Context, cfg ExporterConfig) (sdk_trace.SpanE
 	return exporter, nil
 }
 
-// noopSpanExporterFactory returns a fallback factory for autoexport that produces
-// a noop span exporter, used when no OTEL env vars are configured.
-func noopSpanExporterFactory() func(ctx context.Context) (sdk_trace.SpanExporter, error) {
-	return func(ctx context.Context) (sdk_trace.SpanExporter, error) {
-		return noopSpanExporter{}, nil
-	}
-}
-
-// noopSpanExporter is a span exporter that does nothing.
-type noopSpanExporter struct{}
-
-func (noopSpanExporter) ExportSpans(context.Context, []sdk_trace.ReadOnlySpan) error { return nil }
-func (noopSpanExporter) Shutdown(context.Context) error                              { return nil }
 
 func traceGoogleExporter(ctx context.Context, cfg ExporterConfig) (sdk_trace.SpanExporter, error) {
 	exporter, err := google_trace.New(

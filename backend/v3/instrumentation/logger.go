@@ -16,16 +16,31 @@ import (
 func newLoggerProvider(ctx context.Context, cfg ExporterConfig, resource *resource.Resource) (_ *sdk_log.LoggerProvider, err error) {
 	var exporter sdk_log.Exporter
 	switch cfg.Type {
-	case ExporterTypeUnspecified:
-		exporter, err = autoexport.NewLogExporter(ctx,
-			autoexport.WithFallbackLogExporter(noopLogExporterFactory()),
-		)
-		if err == nil {
-			if _, ok := exporter.(noopLogExporter); ok || autoexport.IsNoneLogExporter(exporter) {
+	case ExporterTypeAuto:
+		// autoexport delegates exporter selection to the standard OTEL env vars.
+		// We can't just call autoexport.NewLogExporter unconditionally because
+		// autoexport defaults to "otlp" when OTEL_LOGS_EXPORTER is unset, and
+		// the OTLP exporter silently points at localhost:4318 even with no env
+		// vars configured. That would cause every ZITADEL instance to start
+		// attempting OTLP connections after upgrading, spamming logs with
+		// connection errors.
+		//
+		// This guard is a heuristic: we check the env vars that realistically
+		// indicate someone has intentionally configured OTEL export. It does not
+		// cover every possible OTLP env var (e.g. OTEL_EXPORTER_OTLP_HEADERS or
+		// OTEL_EXPORTER_OTLP_CERTIFICATE on their own), but those vars are
+		// meaningless without an endpoint or exporter type being set too.
+		if os.Getenv("OTEL_LOGS_EXPORTER") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_LOGS_PROTOCOL") != "" {
+			exporter, err = autoexport.NewLogExporter(ctx)
+			if err == nil && autoexport.IsNoneLogExporter(exporter) {
 				exporter = nil
 			}
 		}
-	case ExporterTypeNone:
+	case ExporterTypeUnspecified, ExporterTypeNone:
 		// no exporter
 	case ExporterTypeStdOut, ExporterTypeStdErr:
 		exporter, err = logStdOutExporter(cfg)
@@ -101,18 +116,3 @@ func logHttpExporter(ctx context.Context, cfg ExporterConfig) (sdk_log.Exporter,
 	}
 	return exporter, nil
 }
-
-// noopLogExporterFactory returns a fallback factory for autoexport that produces
-// a noop log exporter, used when no OTEL env vars are configured.
-func noopLogExporterFactory() func(ctx context.Context) (sdk_log.Exporter, error) {
-	return func(ctx context.Context) (sdk_log.Exporter, error) {
-		return noopLogExporter{}, nil
-	}
-}
-
-// noopLogExporter is a log exporter that does nothing.
-type noopLogExporter struct{}
-
-func (noopLogExporter) Export(context.Context, []sdk_log.Record) error { return nil }
-func (noopLogExporter) Shutdown(context.Context) error                 { return nil }
-func (noopLogExporter) ForceFlush(context.Context) error               { return nil }

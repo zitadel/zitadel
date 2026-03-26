@@ -77,6 +77,22 @@ func TestMetricConfig_SetLegacyConfig(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "auto type is not overridden by legacy config",
+			target: MetricConfig{
+				Exporter: ExporterConfig{
+					Type: ExporterTypeAuto,
+				},
+			},
+			lc: &LegacyMetricConfig{
+				Type: "otel",
+			},
+			want: MetricConfig{
+				Exporter: ExporterConfig{
+					Type: ExporterTypeAuto,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -196,10 +212,10 @@ func Test_newMeterProvider_autoexport(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "unspecified type with OTEL_METRICS_EXPORTER=console creates provider",
+			name: "auto type with OTEL_METRICS_EXPORTER=console creates provider",
 			cfg: MetricConfig{
 				Exporter: ExporterConfig{
-					Type: ExporterTypeUnspecified,
+					Type: ExporterTypeAuto,
 				},
 			},
 			envVars: map[string]string{
@@ -207,22 +223,66 @@ func Test_newMeterProvider_autoexport(t *testing.T) {
 			},
 		},
 		{
-			name: "unspecified type with no OTEL env vars creates provider (noop fallback)",
+			name: "auto type with no OTEL env vars creates provider (noop fallback)",
 			cfg: MetricConfig{
 				Exporter: ExporterConfig{
-					Type: ExporterTypeUnspecified,
+					Type: ExporterTypeAuto,
 				},
 			},
 		},
 		{
-			name: "unspecified type with OTEL_METRICS_EXPORTER=none creates provider (autoexport none)",
+			name: "auto type with OTEL_METRICS_EXPORTER=none creates provider (autoexport none)",
 			cfg: MetricConfig{
 				Exporter: ExporterConfig{
-					Type: ExporterTypeUnspecified,
+					Type: ExporterTypeAuto,
 				},
 			},
 			envVars: map[string]string{
 				"OTEL_METRICS_EXPORTER": "none",
+			},
+		},
+		{
+			name: "auto type with only OTEL_EXPORTER_OTLP_ENDPOINT uses OTLP default",
+			cfg: MetricConfig{
+				Exporter: ExporterConfig{
+					Type: ExporterTypeAuto,
+				},
+			},
+			envVars: map[string]string{
+				"OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4318",
+			},
+		},
+		{
+			name: "auto type with only OTEL_EXPORTER_OTLP_METRICS_ENDPOINT uses OTLP default",
+			cfg: MetricConfig{
+				Exporter: ExporterConfig{
+					Type: ExporterTypeAuto,
+				},
+			},
+			envVars: map[string]string{
+				"OTEL_EXPORTER_OTLP_METRICS_ENDPOINT": "http://localhost:4318",
+			},
+		},
+		{
+			name: "auto type with only OTEL_EXPORTER_OTLP_PROTOCOL uses OTLP default",
+			cfg: MetricConfig{
+				Exporter: ExporterConfig{
+					Type: ExporterTypeAuto,
+				},
+			},
+			envVars: map[string]string{
+				"OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+			},
+		},
+		{
+			name: "auto type with only OTEL_EXPORTER_OTLP_METRICS_PROTOCOL uses OTLP default",
+			cfg: MetricConfig{
+				Exporter: ExporterConfig{
+					Type: ExporterTypeAuto,
+				},
+			},
+			envVars: map[string]string{
+				"OTEL_EXPORTER_OTLP_METRICS_PROTOCOL": "http/protobuf",
 			},
 		},
 		{
@@ -234,6 +294,54 @@ func Test_newMeterProvider_autoexport(t *testing.T) {
 			},
 			envVars: map[string]string{
 				"OTEL_METRICS_EXPORTER": "invalid_exporter",
+			},
+		},
+		// Backward compatibility: ExporterTypeNone ignores global OTEL endpoint
+		{
+			name: "none type ignores OTEL_EXPORTER_OTLP_ENDPOINT",
+			cfg: MetricConfig{
+				Exporter: ExporterConfig{
+					Type: ExporterTypeNone,
+				},
+			},
+			envVars: map[string]string{
+				"OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4318",
+			},
+		},
+		// Backward compatibility: ExporterTypeNone ignores per-signal OTEL var
+		{
+			name: "none type ignores OTEL_METRICS_EXPORTER=console",
+			cfg: MetricConfig{
+				Exporter: ExporterConfig{
+					Type: ExporterTypeNone,
+				},
+			},
+			envVars: map[string]string{
+				"OTEL_METRICS_EXPORTER": "console",
+			},
+		},
+		// Backward compatibility: explicit ZITADEL types take priority over OTEL env vars
+		{
+			name: "stdout type ignores OTEL_METRICS_EXPORTER",
+			cfg: MetricConfig{
+				Exporter: ExporterConfig{
+					Type: ExporterTypeStdOut,
+				},
+			},
+			envVars: map[string]string{
+				"OTEL_METRICS_EXPORTER": "grpc",
+			},
+		},
+		{
+			name: "grpc type ignores OTEL_EXPORTER_OTLP_ENDPOINT",
+			cfg: MetricConfig{
+				Exporter: ExporterConfig{
+					Type:     ExporterTypeGRPC,
+					Endpoint: "localhost:4317",
+				},
+			},
+			envVars: map[string]string{
+				"OTEL_EXPORTER_OTLP_ENDPOINT": "http://some-other-host:4318",
 			},
 		},
 	}

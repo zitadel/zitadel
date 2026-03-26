@@ -7,14 +7,14 @@ Instrumentation:
     TrustRemoteSpans: false # ZITADEL_INSTRUMENTATION_TRACE_TRUSTREMOTESPANS
     Exporter:
       # The following exporter types are supported:
-      # "": Delegates to standard OTEL env vars (OTEL_TRACES_EXPORTER, OTEL_EXPORTER_OTLP_ENDPOINT)
-      # "none": Disables trace exporting (ignores OTEL env vars)
+      # "none": Disables trace exporting
+      # "auto": Delegates to standard OTEL env vars (OTEL_TRACES_EXPORTER, OTEL_EXPORTER_OTLP_ENDPOINT)
       # "stdOut": Exports traces to standard output
       # "stdErr": Exports traces to standard error
       # "grpc": Exports traces using the OTEL gRPC exporter (recommended)
       # "http": Exports traces using the OTEL HTTP exporter
       # "google": Exports traces to Google Cloud. Need to configure GoogleProjectID below!
-      Type: "" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_TYPE
+      Type: "none" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_TYPE
       # Endpoint of the OTEL collector for grpc and http exporters
       Endpoint: "" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_ENDPOINT
       # Disable TLS for grpc and http exporters
@@ -26,15 +26,15 @@ Instrumentation:
   Metric:
     Exporter:
       # The following exporter types are supported:
-      # "": Delegates to standard OTEL env vars (OTEL_METRICS_EXPORTER, OTEL_EXPORTER_OTLP_ENDPOINT)
-      # "none": Disables metric exporting (ignores OTEL env vars)
+      # "none": Disables metric exporting
+      # "auto": Delegates to standard OTEL env vars (OTEL_METRICS_EXPORTER, OTEL_EXPORTER_OTLP_ENDPOINT)
       # "stdOut": Exports metrics to standard output
       # "stdErr": Exports metrics to standard error
       # "grpc": Exports metrics using the OTEL gRPC exporter (recommended)
       # "http": Exports metrics using the OTEL HTTP exporter
       # "google": Exports metrics to Google Cloud. Need to configure GoogleProjectID below!
       # "prometheus": Exposes metrics via an HTTP endpoint for Prometheus to scrape
-      Type: "" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_TYPE
+      Type: "none" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_TYPE
       # Endpoint of the OTEL collector for grpc and http exporters
       Endpoint: "" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_ENDPOINT
       # Disable TLS for grpc and http exporters
@@ -92,13 +92,13 @@ Instrumentation:
       StackTrace: false # ZITADEL_INSTRUMENTATION_LOG_ERRORS_STACKTRACE
     Exporter:
       # The following exporter types are supported:
-      #   - "": Delegates to standard OTEL env vars (OTEL_LOGS_EXPORTER, OTEL_EXPORTER_OTLP_ENDPOINT)
-      #   - "none": Disables OTEL log exporter (ignores OTEL env vars)
+      #   - "none": Disables OTEL log exporter
+      #   - "auto": Delegates to standard OTEL env vars (OTEL_LOGS_EXPORTER, OTEL_EXPORTER_OTLP_ENDPOINT)
       #   - "stdOut": Exports OTEL logs to standard output
       #   - "stdErr": Exports OTEL logs to standard error
       #   - "grpc": Exports OTEL logs using the OTEL gRPC exporter (recommended)
       #   - "http": Exports OTEL logs using the OTEL HTTP exporter
-      Type: "" # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_TYPE
+      Type: "none" # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_TYPE
       # Endpoint of the OTEL collector for grpc and http exporters
       Endpoint: "" # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_ENDPOINT
       # Disable TLS for grpc and http exporters
