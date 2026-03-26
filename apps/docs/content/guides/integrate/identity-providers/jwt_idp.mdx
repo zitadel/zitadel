@@ -52,11 +52,11 @@ The party who issued the token. This is used to validate the `iss` claim in the 
 
 ### Header name
 
-The name of the header in which the JWT will be sent in the proxy request to Zitadel.
+The name of the header in which the JWT will be sent in the proxy request to ZITADEL.
 
 ### Keys Endpoint
 
-Where ZITADEl fetches the public keys for signature validation of the JWT's. This endpoint should return the keys in
+Where ZITADEL fetches the public keys for signature validation of the JWTs. This endpoint should return the keys in
 the format specified in [RFC7517](https://datatracker.ietf.org/doc/html/rfc7517).
 
 *Example: `https://issuer.test.internal/keys`*
@@ -80,8 +80,8 @@ export default {
 
     // 2. Prepare the ZITADEL endpoint URL and copy all query params
     const userUrl = new URL(request.url);
-    // Important: The ZITADEL_JWT_IDP_ENDPOINT should be your ZITADEL custom domain plus "/idps/jwt"
-    // For example: https://accounts.test.com/idps/jwt
+    // Important: ZITADEL_JWT_IDP_ENDPOINT must match your configured JWT IdP endpoint (differs between Login V1 and V2)
+    // For example, Login V2: https://accounts.test.com/idps/jwt, Login V1: https://accounts.test.com/ui/login/idps/jwt
     const zitadelUrl = new URL(env.ZITADEL_JWT_IDP_ENDPOINT);
     userUrl.searchParams.forEach((v, k) => zitadelUrl.searchParams.set(k, v));
 
@@ -107,7 +107,7 @@ export default {
 *Replace `getJwtForCurrentSession` with your logic for retrieving/creating a JWT from the user's WAF session.*
 
 Note: `env.ZITADEL_JWT_IDP_ENDPOINT` should be set to the custom domain of your ZITADEL instance
-with the `/idps/jwt` path, e.g. `https://accounts.test.com/idps/jwt`.*
+with the `/idps/jwt` path, e.g. `https://accounts.test.com/idps/jwt`.
 
 In case you have a WAF/gateway which handles the authentication and forwards the JWT to services behind the WAF, the
 JWT endpoint would exist behind the WAF and `getJwtForCurrentSession` would get the token from that header.
@@ -123,16 +123,16 @@ JWT endpoint would exist behind the WAF and `getJwtForCurrentSession` would get 
 
 </Callout>
 
-After receiving the JWT, ZITADEL will validate that the JWT is valide. It does that by ensuring that:
+After receiving the JWT, ZITADEL will validate that the JWT is valid. It does that by ensuring that:
 - the **signature** matches using keys from the Keys Endpoint.
 - the `issuer` (`iss` claim) matches the configured issuer.
 - The JWT is **not expired** using the `exp` claim.
 
 <Callout type="info">
-    - ZITADEL **does not** re-authenticate the user.
-    - ZITADEL **does not** issue this JWT.
-    - ZITADEL only verifies authenticity and validity.
-    - The JWT is treated as an external ID token, similar to third-party IdPs.
+- ZITADEL **does not** re-authenticate the user.
+- ZITADEL **does not** issue this JWT.
+- ZITADEL only verifies authenticity and validity.
+- The JWT is treated as an external ID token, similar to third-party IdPs.
 </Callout>
 
 ---
