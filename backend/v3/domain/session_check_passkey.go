@@ -73,17 +73,17 @@ func (p *PasskeyCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([]e
 
 	passkeyChallenge := p.FetchedSession.Challenges.GetPasskeyChallenge()
 
-	toReturn := make([]eventstore.Command, 2)
+	events := make([]eventstore.Command, 2)
 
 	sessionAgg := &session.NewAggregate(p.SessionID, p.InstanceID).Aggregate
-	toReturn[0] = session.NewWebAuthNCheckedEvent(ctx, sessionAgg, p.LastVerifiedAt, p.UserVerified)
+	events[0] = session.NewWebAuthNCheckedEvent(ctx, sessionAgg, p.LastVerifiedAt, p.UserVerified)
 	if passkeyChallenge.UserVerification == old_domain.UserVerificationRequirementRequired {
-		toReturn[1] = user.NewHumanPasswordlessSignCountChangedEvent(ctx, sessionAgg, p.PKeyID, p.PKeySignCount)
+		events[1] = user.NewHumanPasswordlessSignCountChangedEvent(ctx, sessionAgg, p.PKeyID, p.PKeySignCount)
 	} else {
-		toReturn[1] = user.NewHumanU2FSignCountChangedEvent(ctx, sessionAgg, p.PKeyID, p.PKeySignCount)
+		events[1] = user.NewHumanU2FSignCountChangedEvent(ctx, sessionAgg, p.PKeyID, p.PKeySignCount)
 	}
 
-	return toReturn, nil
+	return events, nil
 }
 
 // Execute implements [Commander].
