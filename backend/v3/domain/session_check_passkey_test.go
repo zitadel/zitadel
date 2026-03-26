@@ -217,7 +217,7 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 
 				pkeyCondition := humanRepo.
 					PasskeyConditions().
-					TypeCondition(database.TextOperationNotEqual, domain.PasskeyTypePasswordless)
+					TypeCondition(database.TextOperationEqual, domain.PasskeyTypeU2F)
 
 				repo.EXPECT().
 					Get(gomock.Any(), gomock.Any(),

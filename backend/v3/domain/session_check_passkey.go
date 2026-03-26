@@ -199,7 +199,7 @@ func (p *PasskeyCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (e
 	if passkeyChallenge.UserVerification == old_domain.UserVerificationRequirementRequired {
 		passKeyCondition = userRepo.Human().PasskeyConditions().TypeCondition(database.TextOperationEqual, PasskeyTypePasswordless)
 	} else {
-		passKeyCondition = userRepo.Human().PasskeyConditions().TypeCondition(database.TextOperationNotEqual, PasskeyTypePasswordless)
+		passKeyCondition = userRepo.Human().PasskeyConditions().TypeCondition(database.TextOperationEqual, PasskeyTypeU2F)
 	}
 
 	p.FetchedUser, err = userRepo.Get(ctx, opts.DB(),
