@@ -60,6 +60,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
     const response = await resendVerification({
       userId,
       isInvite: isInvite,
+      requestId: requestId,
     })
       .catch(() => {
         setError(t("errors.couldNotResendEmail"));
