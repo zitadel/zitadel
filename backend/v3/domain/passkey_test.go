@@ -3,6 +3,7 @@ package domain_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/stretchr/testify/assert"
@@ -12,6 +13,8 @@ import (
 )
 
 func TestPasskeysToCredentials(t *testing.T) {
+	verificationDate := time.Now()
+
 	t.Parallel()
 	type args struct {
 		ctx      context.Context
@@ -35,6 +38,7 @@ func TestPasskeysToCredentials(t *testing.T) {
 						AuthenticatorAttestationGUID: []byte("aaguid1"),
 						SignCount:                    1,
 						RelyingPartyID:               "example.com",
+						VerifiedAt:                   verificationDate,
 					},
 				},
 				rpID: "example.com",
@@ -63,6 +67,7 @@ func TestPasskeysToCredentials(t *testing.T) {
 						AuthenticatorAttestationGUID: []byte("aaguid1"),
 						SignCount:                    1,
 						RelyingPartyID:               "other.com",
+						VerifiedAt:                   verificationDate,
 					},
 				},
 				rpID: "example.com",
@@ -85,6 +90,7 @@ func TestPasskeysToCredentials(t *testing.T) {
 						AuthenticatorAttestationGUID: []byte("aaguid1"),
 						SignCount:                    1,
 						RelyingPartyID:               "",
+						VerifiedAt:                   verificationDate,
 					},
 				},
 				rpID: "example.com",
@@ -117,6 +123,25 @@ func TestPasskeysToCredentials(t *testing.T) {
 						AuthenticatorAttestationGUID: []byte("aaguid1"),
 						SignCount:                    1,
 						RelyingPartyID:               "",
+						VerifiedAt:                   verificationDate,
+					},
+				},
+				rpID: "example.com",
+			},
+			want: []webauthn.Credential{},
+		},
+		{
+			name: "pkey not verified should return empty",
+			args: args{
+				ctx: context.Background(),
+				passkeys: []*domain.Passkey{
+					{
+						KeyID:                        []byte("key1"),
+						PublicKey:                    []byte("publicKey1"),
+						AttestationType:              "attestation1",
+						AuthenticatorAttestationGUID: []byte("aaguid1"),
+						SignCount:                    1,
+						RelyingPartyID:               "example.com",
 					},
 				},
 				rpID: "example.com",
