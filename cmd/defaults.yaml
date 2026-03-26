@@ -581,6 +581,9 @@ Notifications:
   MaxAttempts: 3 # ZITADEL_NOTIFICATIONS_MAXATTEMPTS
   # Automatically cancel the notification if it cannot be handled within a specific time
   MaxTtl: 5m  # ZITADEL_NOTIFICATIONS_MAXTTL
+  # When an org has no SMTP config, fall back to the instance-level SMTP config.
+  # Set to false to require each org to have its own SMTP provider.
+  OrgSMTPFallbackToInstance: true # ZITADEL_NOTIFICATIONS_ORGSMTPFALLBACKTOINSTANCE
 
 Executions:
   # The amount of workers processing the execution request events.

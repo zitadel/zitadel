@@ -37,14 +37,15 @@ type Queries interface {
 
 type NotificationQueries struct {
 	Queries
-	es                 *eventstore.Eventstore
-	externalDomain     string
-	externalPort       uint16
-	externalSecure     bool
-	fileSystemPath     string
-	UserDataCrypto     crypto.EncryptionAlgorithm
-	SMTPPasswordCrypto crypto.EncryptionAlgorithm
-	SMSTokenCrypto     crypto.EncryptionAlgorithm
+	es                        *eventstore.Eventstore
+	externalDomain            string
+	externalPort              uint16
+	externalSecure            bool
+	fileSystemPath            string
+	UserDataCrypto            crypto.EncryptionAlgorithm
+	SMTPPasswordCrypto        crypto.EncryptionAlgorithm
+	SMSTokenCrypto            crypto.EncryptionAlgorithm
+	OrgSMTPFallbackToInstance bool
 }
 
 func NewNotificationQueries(
@@ -57,16 +58,18 @@ func NewNotificationQueries(
 	userDataCrypto crypto.EncryptionAlgorithm,
 	smtpPasswordCrypto crypto.EncryptionAlgorithm,
 	smsTokenCrypto crypto.EncryptionAlgorithm,
+	orgSMTPFallbackToInstance bool,
 ) *NotificationQueries {
 	return &NotificationQueries{
-		Queries:            baseQueries,
-		es:                 es,
-		externalDomain:     externalDomain,
-		externalPort:       externalPort,
-		externalSecure:     externalSecure,
-		fileSystemPath:     fileSystemPath,
-		UserDataCrypto:     userDataCrypto,
-		SMTPPasswordCrypto: smtpPasswordCrypto,
-		SMSTokenCrypto:     smsTokenCrypto,
+		Queries:                   baseQueries,
+		es:                        es,
+		externalDomain:            externalDomain,
+		externalPort:              externalPort,
+		externalSecure:            externalSecure,
+		fileSystemPath:            fileSystemPath,
+		UserDataCrypto:            userDataCrypto,
+		SMTPPasswordCrypto:        smtpPasswordCrypto,
+		SMSTokenCrypto:            smsTokenCrypto,
+		OrgSMTPFallbackToInstance: orgSMTPFallbackToInstance,
 	}
 }
