@@ -37,22 +37,22 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 	}{
 		{
 			testName:      "when checkPasskey is nil should return no error",
-			cmd:           domain.NewPasskeyCheckCommand("", "", nil, nil),
+			cmd:           &domain.PasskeyCheckCommand{},
 			expectedError: nil,
 		},
 		{
 			testName:      "when sessionID is not set should return error",
-			cmd:           domain.NewPasskeyCheckCommand("", "", []byte{}, nil),
+			cmd:           &domain.PasskeyCheckCommand{CheckPasskey: []byte{}},
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-4QJa2k", "Errors.Missing.SessionID"),
 		},
 		{
 			testName:      "when instanceID is not set should return error",
-			cmd:           domain.NewPasskeyCheckCommand("session-1", "", []byte{}, nil),
+			cmd:           &domain.PasskeyCheckCommand{CheckPasskey: []byte{}, SessionID: "session-1"},
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-XlOhxU", "Errors.Missing.InstanceID"),
 		},
 		{
 			testName: "when retrieving session fails should return error",
-			cmd:      domain.NewPasskeyCheckCommand("session-1", "instance-1", []byte{}, nil),
+			cmd:      &domain.PasskeyCheckCommand{CheckPasskey: []byte{}, SessionID: "session-1", InstanceID: "instance-1"},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -74,7 +74,7 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName: "when session has no passkey challenge should return precondition failed error",
-			cmd:      domain.NewPasskeyCheckCommand("session-1", "instance-1", []byte{}, nil),
+			cmd:      &domain.PasskeyCheckCommand{CheckPasskey: []byte{}, SessionID: "session-1", InstanceID: "instance-1"},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -99,7 +99,7 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName: "when session has no user ID should return precondition failed error",
-			cmd:      domain.NewPasskeyCheckCommand("session-1", "instance-1", []byte{}, nil),
+			cmd:      &domain.PasskeyCheckCommand{CheckPasskey: []byte{}, SessionID: "session-1", InstanceID: "instance-1"},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 
@@ -134,7 +134,7 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName: "when retrieving user fails should return error",
-			cmd:      domain.NewPasskeyCheckCommand("session-1", "instance-1", []byte{}, nil),
+			cmd:      &domain.PasskeyCheckCommand{CheckPasskey: []byte{}, SessionID: "session-1", InstanceID: "instance-1"},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -185,7 +185,7 @@ func TestPasskeyCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName: "when all validations pass should return no error",
-			cmd:      domain.NewPasskeyCheckCommand("session-1", "instance-1", []byte{}, nil),
+			cmd:      &domain.PasskeyCheckCommand{CheckPasskey: []byte{}, SessionID: "session-1", InstanceID: "instance-1"},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.IDCondition("session-1")
@@ -304,7 +304,7 @@ func TestPasskeyCheckCommand_Execute(t *testing.T) {
 	}{
 		{
 			testName:      "when checkPasskey is nil should return no error",
-			cmd:           domain.NewPasskeyCheckCommand("", "", nil, nil),
+			cmd:           &domain.PasskeyCheckCommand{},
 			expectedError: nil,
 		},
 		{

@@ -38,25 +38,31 @@ type PasskeyCheckCommand struct {
 
 // NewPasskeyCheckCommand initializes a new [PasskeyCheckCommand]
 //
-// If finishLoginFn is nil, [webauthn.FinishLoginWithNewDomainModel] will be used.
+// If finishLoginFn is nil, [webauthnConfig.FinishLoginWithNewDomainModel] will be used.
+// If that is nil as well, an error will be returned.
 //
 // assertionData is passkey assertion required for validation
 //
 // The command does not implement [Transactional] due finishLoginFn that might take a long time to execute.
 // So the DB transaction will be started only after finishLoginFn has been run.
-func NewPasskeyCheckCommand(sessionID, instanceID string, assertionData []byte, finishLoginFn FinishLoginFunc) *PasskeyCheckCommand {
+func NewPasskeyCheckCommand(sessionID, instanceID string, assertionData []byte, finishLoginFn FinishLoginFunc) (*PasskeyCheckCommand, error) {
+	if webauthnConfig == nil && finishLoginFn == nil {
+		return nil, zerrors.ThrowInternal(nil, "DOM-bhzmHO", "no finish login function set")
+	}
+
 	pcc := &PasskeyCheckCommand{
-		CheckPasskey:  assertionData,
-		SessionID:     sessionID,
-		InstanceID:    instanceID,
-		FinishLoginFn: webauthnConfig.FinishLoginWithNewDomainModel,
+		CheckPasskey: assertionData,
+		SessionID:    sessionID,
+		InstanceID:   instanceID,
 	}
 
 	if finishLoginFn != nil {
 		pcc.FinishLoginFn = finishLoginFn
+	} else {
+		pcc.FinishLoginFn = webauthnConfig.FinishLoginWithNewDomainModel
 	}
 
-	return pcc
+	return pcc, nil
 }
 
 // Events implements [Commander].
