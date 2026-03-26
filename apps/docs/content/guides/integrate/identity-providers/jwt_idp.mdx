@@ -10,6 +10,18 @@ A **JWT Identity Provider (JWT IdP)** allows ZITADEL to accept a JSON Web Token 
 system as proof that a user has already been authenticated elsewhere. In this flow, ZITADEL does not perform
 authentication itself, but relies on the trustworthiness and validity of the provided JWT.
 
+### Step-by-Step Process
+
+![](../../../../public/img/guides/jwt_idp.png)
+
+1. User opens new application
+2. New app initiates an authorization code flow via ZITADEL
+3. If no session is found, ZITADEL redirects user to JWT endpoint
+4. JWT endpoint forwards token to ZITADEL
+5. ZITADEL responds to the JWT endpoint with an authorization code
+6. JWT endpoint redirects user back to the new app
+7. New app completes the authorization code flow
+
 ## When should I use JWT IdP?
 
 Use JWT IdP if:
@@ -32,19 +44,6 @@ a legacy app. The typical setup involves obtaining the JWT from the user's previ
 
 To configure JWT IdP in ZITADEL, you need to provide the following parameters.
 
-### JWT endpoint
-
-Where ZITADEL redirects users to retrieve the JWT.
-
-*Example: `https://apps.test.com/existing/auth-new`*
-
-### Keys Endpoint
-
-Where ZITADEl fetches the public keys for signature validation of the JWT's. This endpoint should return the keys in
-the format specified in [RFC7517](https://datatracker.ietf.org/doc/html/rfc7517).
-
-*Example: `https://issuer.test.internal/keys`*
-
 ### Issuer
 
 The party who issued the token. This is used to validate the `iss` claim in the JWT.
@@ -55,52 +54,23 @@ The party who issued the token. This is used to validate the `iss` claim in the 
 
 The name of the header in which the JWT will be sent in the proxy request to Zitadel.
 
----
+### Keys Endpoint
 
-## Authentication using JWT IdP
+Where ZITADEl fetches the public keys for signature validation of the JWT's. This endpoint should return the keys in
+the format specified in [RFC7517](https://datatracker.ietf.org/doc/html/rfc7517).
 
-The authentication flow with JWT IdP looks like this:
+*Example: `https://issuer.test.internal/keys`*
 
-![](../../../../public/img/guides/jwt_idp.png)
+### JWT endpoint
 
-### Step-by-Step Process
+Where ZITADEL redirects users to retrieve the JWT.
 
-#### 1. User accesses new app (Browser)
+*Example: `https://apps.test.com/existing/auth-new`*
 
-The user visits the new application, possibly via a link from the existing app. If no session is found, the new app
-initiates an OIDC login via ZITADEL. The user than either selects the JWT IdP in the ZITADEL UI the application uses a
-[custom scope](/apis/openidoauth/scopes#reserved-scopes) to pre-select the JWT IdP in the OIDC Authorization Request.
+The old app generates a JWT which it sends to ZITADEL. ZITADEL passes some query parameters in the request to the JWT
+endpoint. These parameters should be included in the proxy request to ZITADEL. They ensure the request is authentic.
 
-#### 2. ZITADEL redirects to the JWT Endpoint (Browser)
-
-ZITADEL redirects the user's browser to the configured JWT Endpoint. Redirecting the browser ensures that any existing
-session cookies for the previous app/WAF are available, letting the WAF determine the authenticated user and issue the
-appropriate JWT.
-
-#### 3. User is authenticated in your app
-
-The WAF/gateway authenticates the user either by using an existing session on it's side or by requiring the user to
-enter credentials.
-
-#### 4. Your app forwards the token to ZITADEL
-
-The app generates a JWT which it sends to ZITADEL. ZITADEL sends some query parameters in the request from step 3. These
-parameters should be included in the request to ZITADEL. They ensure the request is authentic. An example for this is
-listed below.
-
-Don't forget to:
-- Forward all the query parameters
-- Add the JWT in the header
-
-<Callout type="warning" title="ZITADEL callback url is different for login V1 and V2">
-
-Callback for login V1: `https://accounts.test.com/ui/login/login/jwt/authorize`
-
-Callback for login V2: `https://accounts.test.com/idps/jwt`
-
-</Callout>
-
-Example proxy server:
+Example implementation of the endpoint:
 
 ```js
 export default {
@@ -134,28 +104,36 @@ export default {
   }
 }
 ```
-*Replace `getJwtForCurrentSession` with your logic for retrieving/creating a JWT from the user's WAF session.
+*Replace `getJwtForCurrentSession` with your logic for retrieving/creating a JWT from the user's WAF session.*
+
 Note: `env.ZITADEL_JWT_IDP_ENDPOINT` should be set to the custom domain of your ZITADEL instance
 with the `/idps/jwt` path, e.g. `https://accounts.test.com/idps/jwt`.*
 
-#### 5. ZITADEL receives and validates the JWT (Server-side)
+In case you have a WAF/gateway which handles the authentication and forwards the JWT to services behind the WAF, the
+JWT endpoint would exist behind the WAF and `getJwtForCurrentSession` would get the token from that header.
 
-ZITADEL extracts the JWT from the configured HTTP header and verifies that:
-- The **signature** matches using keys from the Keys Endpoint.
-- The `issuer` (`iss` claim) matches the configured issuer.
+<Callout type="warning" title="`ZITADEL_JWT_IDP_ENDPOINT` is different for login V1 and V2">
+
+    `ZITADEL_JWT_IDP_ENDPOINT` should be set to the custom domain of your ZITADEL instance with the respective path of
+    the login callback:
+
+    Login V1: `https://accounts.test.com/ui/login/login/jwt/authorize`
+
+    Login V2: `https://accounts.test.com/idps/jwt`
+
+</Callout>
+
+After receiving the JWT, ZITADEL will validate that the JWT is valide. It does that by ensuring that:
+- the **signature** matches using keys from the Keys Endpoint.
+- the `issuer` (`iss` claim) matches the configured issuer.
 - The JWT is **not expired** using the `exp` claim.
 
 <Callout type="info">
-- ZITADEL **does not** re-authenticate the user.
-- ZITADEL **does not** issue this JWT.
-- ZITADEL only verifies authenticity and validity.
-- The JWT is treated as an external ID token, similar to third-party IdPs.
+    - ZITADEL **does not** re-authenticate the user.
+    - ZITADEL **does not** issue this JWT.
+    - ZITADEL only verifies authenticity and validity.
+    - The JWT is treated as an external ID token, similar to third-party IdPs.
 </Callout>
-
-#### 6. Login completes (Browser)
-
-ZITADEL finishes the OIDC flow and the browser is redirected to the application’s callback endpoint. The new app
-exchanges the code for tokens, and the user is now logged in.
 
 ---
 
@@ -172,7 +150,7 @@ application from within the existing one without creating a new account or havin
 - New application: `new.test.com`
 - ZITADEL Login UI: `accounts.test.com`
 
-#### What needs to happen:
+#### What needs to happen
 
 - Add a link in the existing application which directs the user to `new.test.com`.
 - Create an application on the domain of the existing application which serves the jwt and keys endpoints.
@@ -200,17 +178,17 @@ application from within the existing one without creating a new account or havin
 
 ## Clarifications and best practices
 
-### Why must the JWT Endpoint be on the same domain as the existing app?
+#### Why must the JWT Endpoint be on the same domain as the existing app?
 
 This ensures browser sessions (cookies) are correctly sent and recognized by the WAF or app, so the right JWT can be
 generated.
 
-### Why are cookies sent automatically?
+#### Why are cookies sent automatically?
 
 Browsers automatically include relevant cookies when redirecting within the same domain, enabling server-side
 authentication seamlessly.
 
-### Why send the JWT in a header, not as a parameter?
+#### Why send the JWT in a header, not as a parameter?
 
 HTTP headers are more secure for transmitting sensitive tokens, prevent them from being exposed in URLs or logs, and
 avoid user tampering.
