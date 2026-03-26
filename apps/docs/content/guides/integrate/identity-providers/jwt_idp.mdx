@@ -153,12 +153,12 @@ application from within the existing one without creating a new account or havin
 #### What needs to happen
 
 - Add a link in the existing application which directs the user to `new.test.com`.
-- Create an application on the domain of the existing application which serves the jwt and keys endpoints.
+- Create an application on the domain of the existing application which serves the JWT and keys endpoints.
   - JWT endpoint: `apps.test.com/existing/auth-new`
   - Keys endpoint: `issuer.test.internal/keys`
-- Configure the jwt endpoint to send the JWT in the specified header
+- Configure the JWT endpoint to send the JWT in the specified header
   - Header name: `x-custom-tkn`
-- Configure the jwt idp in ZITADEL with the parameters above
+- Configure the JWT IdP in ZITADEL with the parameters above
   - JWT endpoint: `apps.test.com/existing/auth-new`
   - Keys endpoint: `issuer.test.internal/keys`
   - Header name: `x-custom-tkn`
@@ -167,7 +167,7 @@ application from within the existing one without creating a new account or havin
 #### Result flow
 
 1. User opens existing app
-2. User authenticates against existing idp
+2. User authenticates against existing IdP
 3. User clicks on link to new app
 4. User is redirected to ZITADEL
 5. ZITADEL redirects to JWT endpoint
