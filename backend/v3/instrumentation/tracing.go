@@ -237,7 +237,6 @@ func traceHttpExporter(ctx context.Context, cfg ExporterConfig) (sdk_trace.SpanE
 	return exporter, nil
 }
 
-
 func traceGoogleExporter(ctx context.Context, cfg ExporterConfig) (sdk_trace.SpanExporter, error) {
 	exporter, err := google_trace.New(
 		google_trace.WithContext(ctx),
