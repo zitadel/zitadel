@@ -1,7 +1,7 @@
 ---
-title: Authenticate users with OpenID Connect
-description: "Authenticate users with OpenID Connect using ZITADEL's authorization code flow and Proof Key for Code Exchange (PKCE)"
-sidebar_label: OIDC Code Flow + PKCE
+title: "OpenID Connect (OIDC) Authentication: Authorization Code Flow & PKCE guide"
+description: "Step-by-step guide to authenticating users in your application using OpenID Connect (OIDC). Learn how to implement the Authorization Code flow with PKCE for maximum security."
+sidebar_label: OIDC Authorization Code Flow + PKCE
 ---
 
 import AuthMethods from "./_authmethods.mdx";
@@ -24,7 +24,7 @@ But regardless of the app type we recommend using Proof Key for Code Exchange (P
 
 Please read the following guide about the [different-client-profiles](./oauth-recommended-flows#different-client-profiles) and why to use PKCE.
 
-### Code Flow
+### Authorization Code Flow
 
 For a basic understanding of OAuth and its flows, we'll briefly describe the most important flow: **Authorization Code**.
 
@@ -53,19 +53,15 @@ This will start a wizard asking you for an application name and a type.
 
 <Tabs
     groupId="app-type"
-    default="web"
-    values={[
-        {'label': 'Web Application', 'value': 'web'},
-        {'label': 'Native Application', 'value': 'native'},
-        {'label': 'Single Page Application', 'value': 'spa'},
-    ]}
+    defaultIndex={0}
+    items={['Web Application','Native Application','Single Page Application']}
 >
-<Tab value="web">
+<Tab value="Web Application">
 
 #### Authentication method
 
 After selecting WEB, you'll next have to choose an authentication method. As mentioned before we recommend using PKCE.
-For even better security you could switch to JWT or just rely on the standard Code Flow. For security reasons we don't
+For even better security you could switch to JWT or just rely on the standard Authorization Code Flow. For security reasons we don't
 recommend using POST and will not cover it in this guide.
 
 Please change the authentication method here as well, if you did so in the wizard, so we can better guide you through the process:
@@ -73,7 +69,7 @@ Please change the authentication method here as well, if you did so in the wizar
 <AuthMethods components={props.components}  selected="web" />
 </Tab>
 
-<Tab value="native">
+<Tab value="Native Application">
 
 #### Authentication method
 
@@ -82,7 +78,7 @@ When selecting Native the authentication method always needs to be PKCE.
 <AuthMethods components={props.components}  selected="native" />
 </Tab>
 
-<Tab value="spa">
+<Tab value="Single Page Application">
 
 #### Authentication method
 

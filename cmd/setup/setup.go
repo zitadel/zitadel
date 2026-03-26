@@ -324,7 +324,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 			defaults:       config.SystemDefaults,
 		},
 		&TransactionalTables{
-			dbClient: dbClient,
+			dbClient:             dbClient,
+			ShouldRecreateSchema: steps.RelationalTables.ShouldRecreateSchema,
 		},
 		&projectionTables{
 			es:      eventstoreClient,

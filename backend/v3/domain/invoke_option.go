@@ -57,9 +57,21 @@ func WithLockoutSettingsRepo(repo LockoutSettingsRepository) InvokeOpt {
 	}
 }
 
+func WithSecretGeneratorSettingsRepo(repo SecretGeneratorSettingsRepository) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.secretGeneratorSettingsRepo = repo
+	}
+}
+
 func WithPermissionChecker(checker PermissionChecker) InvokeOpt {
 	return func(opts *InvokeOpts) {
 		opts.Permissions = checker
+	}
+}
+
+func WithIDPIntentRepo(repo IDPIntentRepository) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.idpIntentRepo = repo
 	}
 }
 
@@ -81,17 +93,27 @@ func WithLegacyEventstore(es eventstore.LegacyEventstore) InvokeOpt {
 	}
 }
 
+// WithSessionTokenDecryptor sets the decryptor for session tokens used by the commands.
+// If not set, the default one will be used.
+// This is mainly used for testing
+func WithSessionTokenDecryptor(decryptor SessionTokenDecryptor) InvokeOpt {
+	return func(opts *InvokeOpts) {
+		opts.sessionTokenDecryptor = decryptor
+	}
+}
+
 // InvokeOpts are passed to each command
 type InvokeOpts struct {
 	// db is the database client.
 	// [Executor]s MUST NOT access this field directly, use [InvokeOpts.DB] to access it.
 	//
 	// [Invoker]s may manipulate this field for example changing it to a transaction.
-	// Its their responsibility to restore it after ending the transaction.
+	// It's their responsibility to restore it after ending the transaction.
 	db                     database.QueryExecutor
 	legacyEventstore       eventstore.LegacyEventstore
 	Invoker                Invoker
 	Permissions            PermissionChecker
+	sessionTokenDecryptor  SessionTokenDecryptor
 	organizationRepo       OrganizationRepository
 	organizationDomainRepo OrganizationDomainRepository
 	projectRepo            ProjectRepository
@@ -99,9 +121,11 @@ type InvokeOpts struct {
 	instanceDomainRepo     InstanceDomainRepository
 	sessionRepo            SessionRepository
 	userRepo               UserRepository
+	idpIntentRepo          IDPIntentRepository
 
 	// Settings repos
-	lockoutSettingRepo LockoutSettingsRepository
+	lockoutSettingRepo          LockoutSettingsRepository
+	secretGeneratorSettingsRepo SecretGeneratorSettingsRepository
 }
 
 func (o *InvokeOpts) DB() database.QueryExecutor {
@@ -132,7 +156,8 @@ func DefaultOpts(invoker Invoker) *InvokeOpts {
 		invoker = &noopInvoker{}
 	}
 	return &InvokeOpts{
-		Invoker:     invoker,
-		Permissions: &noopPermissionChecker{}, // prevent panics for now
+		Invoker:               invoker,
+		Permissions:           &noopPermissionChecker{}, // prevent panics for now
+		sessionTokenDecryptor: sessionTokenDecryptor,
 	}
 }
