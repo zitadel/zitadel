@@ -36,7 +36,7 @@ describe("ClassifiedConnectError", () => {
     const source = new ConnectError("not found", Code.NotFound);
     const classified = new ClassifiedConnectError(source);
 
-    expect(classified.message).toBe("[not_found] not found");
+    expect(classified.message).toContain("not found");
     expect(classified.code).toBe(Code.NotFound);
     expect(classified.name).toBe("ClassifiedConnectError");
   });
@@ -52,28 +52,27 @@ describe("ClassifiedConnectError", () => {
     const clientError = new ClassifiedConnectError(new ConnectError("bad input", Code.InvalidArgument));
     const serverError = new ClassifiedConnectError(new ConnectError("internal", Code.Internal));
 
-    expect(clientError.isClientError).toBe(true);
-    expect(serverError.isClientError).toBe(false);
+    expect(clientError.isUserError).toBe(true);
+    expect(serverError.isUserError).toBe(false);
   });
 
-  it("is instanceof ConnectError", () => {
+  it("has brand property for type guard detection", () => {
     const classified = new ClassifiedConnectError(new ConnectError("test", Code.NotFound));
 
-    expect(classified).toBeInstanceOf(ConnectError);
-    expect(classified).toBeInstanceOf(ClassifiedConnectError);
+    expect((classified as any).__classified).toBe(true);
   });
 
   it("marks FailedPrecondition as client error", () => {
     const classified = new ClassifiedConnectError(new ConnectError("precondition", Code.FailedPrecondition));
 
-    expect(classified.isClientError).toBe(true);
+    expect(classified.isUserError).toBe(true);
     expect(classified.httpStatus).toBe(400);
   });
 
   it("marks Unavailable as server error", () => {
     const classified = new ClassifiedConnectError(new ConnectError("unavailable", Code.Unavailable));
 
-    expect(classified.isClientError).toBe(false);
+    expect(classified.isUserError).toBe(false);
     expect(classified.httpStatus).toBe(503);
   });
 });

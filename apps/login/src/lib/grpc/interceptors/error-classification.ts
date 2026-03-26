@@ -53,20 +53,26 @@ const CLIENT_ERROR_CODES: ReadonlySet<Code> = new Set([
  *
  * All ConnectErrors thrown by service calls through the classified transport
  * will be instances of this class, allowing callers to inspect `httpStatus`
- * and `isClientError` without manual mapping.
+ * and `isUserError` without manual mapping.
  */
 export class ClassifiedConnectError extends ConnectError {
   /** The equivalent HTTP status code for this gRPC error */
   readonly httpStatus: number;
 
   /** Whether this error represents a user input error (true) or a server failure (false) */
-  readonly isClientError: boolean;
+  readonly isUserError: boolean;
+
+  /** @internal Brand property for type guard detection */
+  readonly __classified = true as const;
 
   constructor(source: ConnectError) {
     super(source.message, source.code, source.metadata, undefined, source.cause);
+    // ConnectError's constructor resets the prototype chain via Object.setPrototypeOf.
+    // We must restore it so instanceof ClassifiedConnectError works correctly.
+    Object.setPrototypeOf(this, ClassifiedConnectError.prototype);
     this.name = "ClassifiedConnectError";
     this.httpStatus = GRPC_TO_HTTP[source.code] ?? 500;
-    this.isClientError = CLIENT_ERROR_CODES.has(source.code);
+    this.isUserError = CLIENT_ERROR_CODES.has(source.code);
 
     // Copy details from the source error (avoids OutgoingDetail/IncomingDetail type mismatch)
     if (source.details.length > 0) {
@@ -82,10 +88,10 @@ export class ClassifiedConnectError extends ConnectError {
 
 /**
  * Type guard for ClassifiedConnectError.
- * Use this in catch blocks to safely access httpStatus/isClientError.
+ * Use this in catch blocks to safely access httpStatus/isUserError.
  */
 export function isClassifiedError(error: unknown): error is ClassifiedConnectError {
-  return error instanceof ClassifiedConnectError;
+  return typeof error === "object" && error !== null && "__classified" in error && (error as any).__classified === true;
 }
 
 /**
@@ -98,7 +104,7 @@ export function grpcCodeToHttpStatus(code: Code): number {
 
 /**
  * Transport-level interceptor that catches ConnectError and re-throws
- * it as a ClassifiedConnectError with httpStatus and isClientError metadata.
+ * it as a ClassifiedConnectError with httpStatus and isUserError metadata.
  *
  * Plug this into the transport's interceptor chain to automatically classify
  * every error from every service call.

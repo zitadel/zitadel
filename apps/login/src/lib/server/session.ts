@@ -153,7 +153,7 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       challenges,
       requestId,
     }).catch((error) => {
-      if (isClassifiedError(error) && error.isClientError) {
+      if (isClassifiedError(error) && error.isUserError) {
         logger.warn("Could not create session (client error)", { grpcCode: error.code, httpStatus: error.httpStatus });
       } else {
         logger.error("Could not create session (server error)", { error });

@@ -91,7 +91,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
   try {
     ({ authRequest } = await getAuthRequest({ serviceConfig, authRequestId: requestId.replace("oidc_", "") }));
   } catch (error) {
-    if (isClassifiedError(error) && error.isClientError) {
+    if (isClassifiedError(error) && error.isUserError) {
       logger.warn("Auth request failed (client error)", { grpcCode: error.code, httpStatus: error.httpStatus });
       return NextResponse.json({ error: error.message }, { status: error.httpStatus });
     }
@@ -400,7 +400,7 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
   try {
     ({ samlRequest } = await getSAMLRequest({ serviceConfig, samlRequestId: requestId.replace("saml_", "") }));
   } catch (error) {
-    if (isClassifiedError(error) && error.isClientError) {
+    if (isClassifiedError(error) && error.isUserError) {
       logger.warn("SAML request failed (client error)", { grpcCode: error.code, httpStatus: error.httpStatus });
       return NextResponse.json({ error: error.message }, { status: error.httpStatus });
     }
