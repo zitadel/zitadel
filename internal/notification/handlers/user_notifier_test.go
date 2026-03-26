@@ -1937,6 +1937,7 @@ func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQu
 			smtpAlg,
 			f.SMSTokenCrypto,
 			nil,
+			true,
 		),
 		otpEmailTmpl: func(origin *url.URL) string {
 			return origin.String() + defaultOTPEmailTemplate

@@ -434,6 +434,7 @@ func newNotificationWorker(t *testing.T, ctrl *gomock.Controller, queries *mock.
 			smtpAlg,
 			f.SMSTokenCrypto,
 			nil,
+			true,
 		),
 		channels: &notificationChannels{
 			Chain: *senders.ChainChannels(channel),

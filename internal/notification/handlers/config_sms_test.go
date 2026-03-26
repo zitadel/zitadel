@@ -162,7 +162,7 @@ func TestNotificationQueries_GetActiveSMSConfig(t *testing.T) {
 			queryMock := mock.NewMockQueries(ctrl)
 			queryMock.EXPECT().SMSProviderConfigActive(gomock.Any(), instId).Return(tc.smsConfig, tc.smsConfigErr)
 
-			notificationQueries := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext domain", uint16(1234), false, "filepath", nil, nil, cryptAlgMock, nil)
+			notificationQueries := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext domain", uint16(1234), false, "filepath", nil, nil, cryptAlgMock, nil, true)
 			cfg, err := notificationQueries.GetActiveSMSConfig(ctx)
 
 			assert.ErrorIs(t, err, tc.expectedErr)

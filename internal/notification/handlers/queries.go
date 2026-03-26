@@ -38,15 +38,16 @@ type Queries interface {
 
 type NotificationQueries struct {
 	Queries
-	es                 *eventstore.Eventstore
-	externalDomain     string
-	externalPort       uint16
-	externalSecure     bool
-	fileSystemPath     string
-	UserDataCrypto     crypto.EncryptionAlgorithm
-	SMTPPasswordCrypto crypto.EncryptionAlgorithm
-	SMSTokenCrypto     crypto.EncryptionAlgorithm
-	httpClient         *http.Client
+	es                        *eventstore.Eventstore
+	externalDomain            string
+	externalPort              uint16
+	externalSecure            bool
+	fileSystemPath            string
+	UserDataCrypto            crypto.EncryptionAlgorithm
+	SMTPPasswordCrypto        crypto.EncryptionAlgorithm
+	SMSTokenCrypto            crypto.EncryptionAlgorithm
+	httpClient                *http.Client
+	OrgSMTPFallbackToInstance bool
 }
 
 func NewNotificationQueries(
@@ -60,17 +61,19 @@ func NewNotificationQueries(
 	smtpPasswordCrypto crypto.EncryptionAlgorithm,
 	smsTokenCrypto crypto.EncryptionAlgorithm,
 	httpClient *http.Client,
+	orgSMTPFallbackToInstance bool,
 ) *NotificationQueries {
 	return &NotificationQueries{
-		Queries:            baseQueries,
-		es:                 es,
-		externalDomain:     externalDomain,
-		externalPort:       externalPort,
-		externalSecure:     externalSecure,
-		fileSystemPath:     fileSystemPath,
-		UserDataCrypto:     userDataCrypto,
-		SMTPPasswordCrypto: smtpPasswordCrypto,
-		SMSTokenCrypto:     smsTokenCrypto,
-		httpClient:         httpClient,
+		Queries:                   baseQueries,
+		es:                        es,
+		externalDomain:            externalDomain,
+		externalPort:              externalPort,
+		externalSecure:            externalSecure,
+		fileSystemPath:            fileSystemPath,
+		UserDataCrypto:            userDataCrypto,
+		SMTPPasswordCrypto:        smtpPasswordCrypto,
+		SMSTokenCrypto:            smsTokenCrypto,
+		httpClient:                httpClient,
+		OrgSMTPFallbackToInstance: orgSMTPFallbackToInstance,
 	}
 }
