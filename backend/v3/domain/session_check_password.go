@@ -50,7 +50,7 @@ type PasswordCheckCommand struct {
 // and an input password to verify. It returns an updated hash and an error.
 // It defaults to [passwap.Swapper.Verify]
 //
-// The command does not implement [Transactional] due verifyFn that might take a long time to execute.
+// The command does not implement [Transactional] due to verifyFn that might take a long time to execute.
 // So the DB transaction will be started only after verifyFn has been run.
 //
 // Moreover, the command may return a functional error so manual management of the transaction is needed
@@ -195,7 +195,7 @@ func (p *PasswordCheckCommand) GetPasswordCheckChanges(ctx context.Context, opts
 		}
 	case *VerificationTypeFailed:
 		dbUpdates[0] = humanRepo.IncrementPasswordFailedAttempts()
-		lockoutPolicy, err := GetLockoutPolicy(ctx, opts, p.InstanceID, p.FetchedUser.OrganizationID)
+		lockoutPolicy, err := GetLockoutPolicy(ctx, opts.DB(), opts.lockoutSettingRepo, p.InstanceID, p.FetchedUser.OrganizationID)
 		if err != nil {
 			return nil, err
 		}

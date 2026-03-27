@@ -110,12 +110,7 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 
 	verifyErr := t.verifyTOTP(t.FetchedUser.Human.TOTP.Secret)
 
-	beginner, ok := opts.DB().(database.Beginner)
-	if !ok {
-		return zerrors.ThrowInternal(nil, "DOM-Ug9936", "database doesn't implement database.Beginner")
-	}
-
-	tx, txErr := beginner.Begin(ctx, nil)
+	tx, txErr := opts.StartTransaction(ctx, nil)
 	if txErr != nil {
 		return zerrors.ThrowInternal(txErr, "DOM-pw7gF8", "failed starting transaction")
 	}
@@ -154,7 +149,7 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 	changes := make(database.Changes, 1, 2)
 	changes[0] = humanRepo.IncrementTOTPFailedAttempts()
 
-	policy, err := getLockoutPolicy(ctx, tx, opts.lockoutSettingRepo, t.InstanceID, t.FetchedUser.OrganizationID)
+	policy, err := GetLockoutPolicy(ctx, tx, opts.lockoutSettingRepo, t.InstanceID, t.FetchedUser.OrganizationID)
 	if err != nil {
 		txErr = err
 		return err
