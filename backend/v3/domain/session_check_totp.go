@@ -158,7 +158,7 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 
 	rowCount, err = sessionRepo.Update(ctx, opts.DB(),
 		sessionRepo.PrimaryKeyCondition(t.InstanceID, t.SessionID),
-		sessionRepo.SetFactor(&SessionFactorTOTP{LastVerifiedAt: t.CheckedAt}),
+		sessionRepo.SetFactor(&SessionFactorTOTP{LastFailedAt: t.CheckedAt}),
 	)
 	if err := handleUpdateError(err, 1, rowCount, "DOM-rSa1yU", "session"); err != nil {
 		return err
@@ -204,7 +204,14 @@ func (t *TOTPCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 	}
 	if user.Human == nil {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-zzv1MO", "user not human")
+	}
 
+	if user.Human.TOTP == nil {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-V6Av2a", "user TOTP not set")
+	}
+
+	if user.Human.TOTP.Secret == nil {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-b44CWR", "user TOTP secret not set")
 	}
 
 	if user.State == UserStateLocked {

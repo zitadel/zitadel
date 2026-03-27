@@ -165,7 +165,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-zzv1MO", "user not human"),
 		},
 		{
-			testName: "when user is locked should return precondition failed error",
+			testName: "when user has no TOTP should return precondition failed error",
 			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
@@ -185,6 +185,58 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 					Return(&domain.User{
 						State: domain.UserStateLocked,
 						Human: &domain.HumanUser{},
+					}, nil)
+				return repo
+			},
+			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-V6Av2a", "user TOTP not set"),
+		},
+		{
+			testName: "when user TOTP has no secret set should return precondition failed error",
+			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
+			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+				repo := domainmock.NewSessionRepo(ctrl)
+				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
+				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any(),
+						dbmock.QueryOptions(database.WithCondition(idCondition))).
+					Return(&domain.Session{UserID: "user-1"}, nil)
+				return repo
+			},
+			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
+				repo := domainmock.NewUserRepo(ctrl)
+				idCondition := repo.PrimaryKeyCondition("instance-1", "user-1")
+				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any(),
+						dbmock.QueryOptions(database.WithCondition(idCondition))).
+					Return(&domain.User{
+						State: domain.UserStateLocked,
+						Human: &domain.HumanUser{TOTP: &domain.HumanTOTP{}},
+					}, nil)
+				return repo
+			},
+			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-b44CWR", "user TOTP secret not set"),
+		},
+		{
+			testName: "when user is locked should return precondition failed error",
+			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
+			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+				repo := domainmock.NewSessionRepo(ctrl)
+				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
+				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any(),
+						dbmock.QueryOptions(database.WithCondition(idCondition))).
+					Return(&domain.Session{UserID: "user-1"}, nil)
+				return repo
+			},
+			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
+				repo := domainmock.NewUserRepo(ctrl)
+				idCondition := repo.PrimaryKeyCondition("instance-1", "user-1")
+				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any(),
+						dbmock.QueryOptions(database.WithCondition(idCondition))).
+					Return(&domain.User{
+						State: domain.UserStateLocked,
+						Human: &domain.HumanUser{TOTP: &domain.HumanTOTP{Secret: &crypto.CryptoValue{}}},
 					}, nil)
 				return repo
 			},
