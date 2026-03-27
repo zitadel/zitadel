@@ -64,6 +64,7 @@ type settingsConditions interface {
 	IDCondition(id string) database.Condition
 	PrimaryKeyCondition(instanceID, id string) database.Condition
 	UniqueCondition(instanceID string, orgID *string, typ SettingType, state SettingState) database.Condition
+	TypeCondition(typ SettingType) database.Condition
 }
 
 type settingsChanges interface {
