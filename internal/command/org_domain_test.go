@@ -80,6 +80,40 @@ func TestAddDomain(t *testing.T) {
 			},
 		},
 		{
+			name: "correct when org exists only in the current preparation",
+			args: args{
+				a:      agg,
+				domain: "domain",
+				filter: func() func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					i := 0
+					return func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						i++
+						switch i {
+						case 1:
+							return []eventstore.Event{
+								org.NewOrgAddedEvent(ctx, &agg.Aggregate, "org"),
+							}, nil
+						case 2:
+							return nil, nil
+						case 3:
+							return []eventstore.Event{
+								org.NewDomainPolicyAddedEvent(ctx, &agg.Aggregate, true, true, true),
+							}, nil
+						default:
+							return nil, nil
+						}
+					}
+				}(),
+				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					org.NewDomainAddedEvent(context.Background(), &agg.Aggregate, "domain"),
+				},
+			},
+		},
+		{
 			name: "correct (should not verify domain)",
 			args: args{
 				a:              agg,
