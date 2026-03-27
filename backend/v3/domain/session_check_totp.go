@@ -75,6 +75,9 @@ func NewTOTPCheckCommand(sessionID, instanceID string, tarpitFunc tarpitFn, totp
 	return cmd
 }
 
+// RequiresTransaction implements [Transactional].
+func (t *TOTPCheckCommand) RequiresTransaction() {}
+
 // Events implements [Commander].
 func (t *TOTPCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
 	if t.CheckTOTP == nil {
@@ -110,34 +113,21 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 
 	verifyErr := t.verifyTOTP(t.FetchedUser.Human.TOTP.Secret)
 
-	tx, txErr := opts.StartTransaction(ctx, nil)
-	if txErr != nil {
-		return zerrors.ThrowInternal(txErr, "DOM-pw7gF8", "failed starting transaction")
-	}
-
-	defer func() {
-		if endErr := tx.End(ctx, txErr); endErr != nil {
-			err = endErr
-		}
-	}()
-
 	if verifyErr == nil {
 		t.CheckedAt = time.Now()
-		rowCount, err := humanRepo.Update(ctx, tx,
+		rowCount, err := humanRepo.Update(ctx, opts.DB(),
 			humanRepo.PrimaryKeyCondition(t.InstanceID, t.FetchedUser.ID),
 			humanRepo.SetLastSuccessfulTOTPCheck(t.CheckedAt),
 		)
 		if err := handleUpdateError(err, 1, rowCount, "DOM-aoMAzO", "user"); err != nil {
-			txErr = err
 			return err
 		}
 
-		rowCount, err = sessionRepo.Update(ctx, tx,
+		rowCount, err = sessionRepo.Update(ctx, opts.DB(),
 			sessionRepo.PrimaryKeyCondition(t.InstanceID, t.SessionID),
 			sessionRepo.SetFactor(&SessionFactorTOTP{LastVerifiedAt: t.CheckedAt}),
 		)
 		if err := handleUpdateError(err, 1, rowCount, "DOM-ymhCTD", "session"); err != nil {
-			txErr = err
 			return err
 		}
 
@@ -149,9 +139,8 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 	changes := make(database.Changes, 1, 2)
 	changes[0] = humanRepo.IncrementTOTPFailedAttempts()
 
-	policy, err := GetLockoutPolicy(ctx, tx, opts.lockoutSettingRepo, t.InstanceID, t.FetchedUser.OrganizationID)
+	policy, err := GetLockoutPolicy(ctx, opts.DB(), opts.lockoutSettingRepo, t.InstanceID, t.FetchedUser.OrganizationID)
 	if err != nil {
-		txErr = err
 		return err
 	}
 
@@ -162,18 +151,16 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 		t.IsUserLocked = true
 	}
 
-	rowCount, err := humanRepo.Update(ctx, tx, humanRepo.PrimaryKeyCondition(t.InstanceID, t.FetchedUser.ID), changes)
+	rowCount, err := humanRepo.Update(ctx, opts.DB(), humanRepo.PrimaryKeyCondition(t.InstanceID, t.FetchedUser.ID), changes)
 	if err := handleUpdateError(err, 1, rowCount, "DOM-lQLpIa", "user"); err != nil {
-		txErr = err
 		return err
 	}
 
-	rowCount, err = sessionRepo.Update(ctx, tx,
+	rowCount, err = sessionRepo.Update(ctx, opts.DB(),
 		sessionRepo.PrimaryKeyCondition(t.InstanceID, t.SessionID),
 		sessionRepo.SetFactor(&SessionFactorTOTP{LastVerifiedAt: t.CheckedAt}),
 	)
 	if err := handleUpdateError(err, 1, rowCount, "DOM-rSa1yU", "session"); err != nil {
-		txErr = err
 		return err
 	}
 
@@ -244,3 +231,4 @@ func (t *TOTPCheckCommand) verifyTOTP(existingTOTPSecret *crypto.CryptoValue) er
 }
 
 var _ Commander = (*TOTPCheckCommand)(nil)
+var _ Transactional = (*TOTPCheckCommand)(nil)
