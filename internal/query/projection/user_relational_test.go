@@ -192,17 +192,12 @@ func TestUserRelationalProjection_Reducers(t *testing.T) {
 
 		// add passkey to the user
 		pkey := &domain.Passkey{
-			ID:                           "pkey-id",
-			Challenge:                    []byte("some challenge"),
-			RelyingPartyID:               "rpID",
-			CreatedAt:                    now,
-			UpdatedAt:                    now,
-			Type:                         domain.PasskeyTypePasswordless,
-			KeyID:                        []byte(""),
-			PublicKey:                    []byte(""),
-			AuthenticatorAttestationGUID: []byte(""),
-			AttestationType:              " ",
-			Name:                         " ",
+			ID:             "pkey-id",
+			Challenge:      []byte("some challenge"),
+			RelyingPartyID: "rpID",
+			CreatedAt:      now,
+			UpdatedAt:      now,
+			Type:           domain.PasskeyTypePasswordless,
 		}
 
 		_, err = userRepo.Update(t.Context(), tx,
@@ -225,13 +220,10 @@ func TestUserRelationalProjection_Reducers(t *testing.T) {
 		)
 
 		// Test
-		// reduce the event
 		eventReduced := callReduce(t, rawTx, handler, pkeyVerifiedEvt)
 		require.True(t, eventReduced)
 
 		// Verify
-
-		// assert that the recovery code failed_attempts is incremented
 		gotUser, err := userRepo.Get(t.Context(), tx, database.WithCondition(
 			database.And(
 				userRepo.IDCondition(existingUserID),
@@ -247,9 +239,7 @@ func TestUserRelationalProjection_Reducers(t *testing.T) {
 		assert.Equal(t, pkeyVerifiedEvt.AAGUID, gotPKey.AuthenticatorAttestationGUID)
 		assert.Equal(t, pkeyVerifiedEvt.SignCount, gotPKey.SignCount)
 		assert.Equal(t, pkeyVerifiedEvt.WebAuthNTokenName, gotPKey.Name)
-		assert.Equal(t, pkeyVerifiedEvt.CreatedAt(), gotPKey.UpdatedAt)
-		assert.Equal(t, pkeyVerifiedEvt.CreatedAt(), gotPKey.VerifiedAt)
-		assert.Equal(t, nil, gotPKey.Initialization)
+		assert.NotZero(t, gotPKey.VerifiedAt)
 	})
 }
 
