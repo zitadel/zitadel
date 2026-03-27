@@ -1853,6 +1853,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 					expectFilter(), // org already exists check
 					expectFilter(), // org exists in current preparation
 					expectFilter(), // custom domain does not exist yet
+					expectFilter(), // no org domain policy yet
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDomainPolicyAddedEvent(context.Background(),
