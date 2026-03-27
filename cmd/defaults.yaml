@@ -231,6 +231,16 @@ WebAuthNName: ZITADEL # ZITADEL_WEBAUTHNNAME
 Database:
   # Postgres is the default database of ZITADEL
   postgres:
+    # DSN is a full PostgreSQL connection URL (see
+    # https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING).
+    # When set, individual connection fields (Host, Port, Database, User, Admin,
+    # Options) are ignored.
+    # Format: postgresql://user:password@host:port/dbname?sslmode=disable
+    # Note: In DSN mode, zitadel init cannot use the Admin connection to create
+    # a separate target database/user. The DB and user from the DSN must already
+    # exist and have sufficient privileges, or the DSN must directly point to
+    # the final ZITADEL database.
+    DSN: "" # ZITADEL_DATABASE_POSTGRES_DSN
     Host: localhost # ZITADEL_DATABASE_POSTGRES_HOST
     Port: 5432 # ZITADEL_DATABASE_POSTGRES_PORT
     Database: zitadel # ZITADEL_DATABASE_POSTGRES_DATABASE
@@ -286,6 +296,15 @@ Caches:
         TimeOut: 30s
     Redis:
       Enabled: false
+      # URL is a full Redis connection URL (see
+      # https://redis.io/docs/latest/develop/tools/cli/#host-port-password-and-database).
+      # When set, individual connection fields
+      # (Addr, Username, Password, Network, EnableTLS) are ignored.
+      # Pool, timeout, retry, and circuit breaker settings can still be used as overlays.
+      # Format: redis://user:password@host:port/db or rediss://... for TLS.
+      # Note: ZITADEL ignores the `/db` path when selecting Redis databases; DBs are chosen
+      # internally via DBOffset + purpose. Use `/0` in the URL to avoid confusion.
+      URL: "" # ZITADEL_CACHES_CONNECTORS_REDIS_URL
       # The network type, either tcp or unix.
       # Default is tcp.
       # Network string
@@ -789,7 +808,9 @@ SystemAPIUsers:
 # # Add keys for authentication of the systemAPI here:
 # # you can specify any name for the user, but they will have to match the `issuer` and `sub` claim in the JWT:
 # - superuser:
-#     Path: /path/to/superuser/ey.pem  # you can provide the key either by reference with the path
+#     # you can provide the key either by reference with the path. The data in this file has to either be a public RSA
+#     # key or a public X.509 certificate
+#     Path: /path/to/superuser/key.pem
 #     Memberships:
 #       # MemberType System allows the user to access all APIs for all instances or organizations
 #       - MemberType: System
@@ -807,7 +828,7 @@ SystemAPIUsers:
 #         AggregateID: "123456789012345678"
 # - superuser2:
 #     # If no memberships are specified, the user has a membership of type System with the role "SYSTEM_OWNER"
-#     KeyData: <base64 encoded key>     # or you can directly embed it as base64 encoded value
+#     KeyData: <base64 encoded key>     # or you can directly embed it as base64 encoded value or X.509 certificate contents
 # Configure the SystemAPIUsers by environment variable using JSON notation:
 # ZITADEL_SYSTEMAPIUSERS='{"systemuser":{"Path":"/path/to/superuser/key.pem"},"systemuser2":{"KeyData":"<base64 encoded key>"}}'
 
