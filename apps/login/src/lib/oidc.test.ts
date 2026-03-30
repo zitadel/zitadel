@@ -7,6 +7,10 @@ import * as zitadelModule from "./zitadel";
 vi.mock("./session");
 vi.mock("./zitadel");
 vi.mock("./server/loginname");
+vi.mock("@/lib/grpc/interceptors/error-classification", () => ({
+  isClassifiedError: (error: unknown): boolean =>
+    typeof error === "object" && error !== null && "code" in error && typeof (error as any).code === "number",
+}));
 
 vi.mock("@zitadel/client", () => ({
   Code: { FailedPrecondition: 9 },
