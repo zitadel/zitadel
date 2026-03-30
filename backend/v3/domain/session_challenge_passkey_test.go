@@ -334,7 +334,7 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
 				return getUserByPasskeyType(ctrl, domain.PasskeyTypeU2F)
 			},
-			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-Fy333Q", "Errors.WebAuthN.BeginLogin"),
+			wantErr: assert.AnError,
 		},
 		{
 			name:                 "invalid credential assertion data",
@@ -385,7 +385,7 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 		{
 			name: "failed to update session - no rows updated",
 			challengeTypePasskey: &domain.ChallengeTypePasskey{
-				UserVerificationRequirement: old_domain.UserVerificationRequirementPreferred, // to set userVerification to "preferred"
+				UserVerificationRequirement: old_domain.UserVerificationRequirementPreferred,
 			},
 			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
 				return &webauthn.SessionData{
@@ -413,7 +413,7 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 		{
 			name: "failed to update session - more than 1 row updated",
 			challengeTypePasskey: &domain.ChallengeTypePasskey{
-				UserVerificationRequirement: old_domain.UserVerificationRequirementPreferred, // to set userVerification to "preferred"
+				UserVerificationRequirement: old_domain.UserVerificationRequirementPreferred,
 			},
 			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
 				return &webauthn.SessionData{
@@ -441,7 +441,7 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 		{
 			name: "session updated successfully with the passkey challenge - required user verification",
 			challengeTypePasskey: &domain.ChallengeTypePasskey{
-				UserVerificationRequirement: old_domain.UserVerificationRequirementRequired, // to set userVerification to "preferred"
+				UserVerificationRequirement: old_domain.UserVerificationRequirementRequired,
 			},
 			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
 				return &webauthn.SessionData{
@@ -468,7 +468,7 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 		{
 			name: "session updated successfully with the passkey challenge - preferred user verification",
 			challengeTypePasskey: &domain.ChallengeTypePasskey{
-				UserVerificationRequirement: old_domain.UserVerificationRequirementPreferred, // to set userVerification to "preferred"
+				UserVerificationRequirement: old_domain.UserVerificationRequirementPreferred,
 			},
 			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
 				return &webauthn.SessionData{
@@ -485,6 +485,60 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 					Challenge:        "Y2hhbGxlbmdl",
 					RPID:             "example.com",
 					UserVerification: old_domain.UserVerificationRequirementPreferred,
+					LastChallengedAt: time.Now(),
+				})
+				updateSessionSucceededExpectation(repo, challenge)
+				return repo
+			},
+			wantWebAuthNChallenge: getChallengePasskey(t, credentialAssertionDataPreferred),
+		},
+		{
+			name: "session updated successfully with the passkey challenge - unspecified user verification",
+			challengeTypePasskey: &domain.ChallengeTypePasskey{
+				UserVerificationRequirement: old_domain.UserVerificationRequirementUnspecified,
+			},
+			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
+				return &webauthn.SessionData{
+					Challenge: "Y2hhbGxlbmdl",
+				}, credentialAssertionDataPreferred, "example.com", nil
+			},
+			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
+				return getUserByPasskeyType(ctrl, domain.PasskeyTypeU2F)
+			},
+			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+				repo := domainmock.NewSessionRepo(ctrl)
+				getSessionSucceededExpectation(repo)
+				challenge := repo.SetChallenge(&domain.SessionChallengePasskey{
+					Challenge:        "Y2hhbGxlbmdl",
+					RPID:             "example.com",
+					UserVerification: old_domain.UserVerificationRequirementUnspecified,
+					LastChallengedAt: time.Now(),
+				})
+				updateSessionSucceededExpectation(repo, challenge)
+				return repo
+			},
+			wantWebAuthNChallenge: getChallengePasskey(t, credentialAssertionDataPreferred),
+		},
+		{
+			name: "session updated successfully with the passkey challenge - discouraged user verification",
+			challengeTypePasskey: &domain.ChallengeTypePasskey{
+				UserVerificationRequirement: old_domain.UserVerificationRequirementDiscouraged,
+			},
+			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
+				return &webauthn.SessionData{
+					Challenge: "Y2hhbGxlbmdl",
+				}, credentialAssertionDataPreferred, "example.com", nil
+			},
+			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
+				return getUserByPasskeyType(ctrl, domain.PasskeyTypeU2F)
+			},
+			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+				repo := domainmock.NewSessionRepo(ctrl)
+				getSessionSucceededExpectation(repo)
+				challenge := repo.SetChallenge(&domain.SessionChallengePasskey{
+					Challenge:        "Y2hhbGxlbmdl",
+					RPID:             "example.com",
+					UserVerification: old_domain.UserVerificationRequirementDiscouraged,
 					LastChallengedAt: time.Now(),
 				})
 				updateSessionSucceededExpectation(repo, challenge)
@@ -641,6 +695,39 @@ func TestPasskeyChallengeCommand_Events(t *testing.T) {
 				old_domain.UserVerificationRequirementUnspecified,
 				"example.com"),
 		},
+		{
+			name: "valid request passkey challenge - discouraged user verification",
+			challengeTypePasskey: &domain.ChallengeTypePasskey{
+				UserVerificationRequirement: old_domain.UserVerificationRequirementDiscouraged,
+			},
+			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
+				return &webauthn.SessionData{Challenge: "Y2hhbGxlbmdl"},
+					[]byte(`{"publicKey":{"challenge":"Y2hhbGxlbmdl","timeout":60000,"rpId":"example.com","allowCredentials":[{"type":"public-key","id":"cGFzc2tleS1pZA"}],"userVerification":"preferred"}}`),
+					"example.com",
+					nil
+			},
+			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
+				return getUserByPasskeyType(ctrl, domain.PasskeyTypeU2F)
+			},
+			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+				repo := domainmock.NewSessionRepo(ctrl)
+				getSessionSucceededExpectation(repo)
+				challenge := repo.SetChallenge(&domain.SessionChallengePasskey{
+					Challenge:        "Y2hhbGxlbmdl",
+					RPID:             "example.com",
+					UserVerification: old_domain.UserVerificationRequirementDiscouraged,
+					LastChallengedAt: challengedAt,
+				})
+				updateSessionSucceededExpectation(repo, challenge)
+				return repo
+			},
+			wantEvent: session.NewWebAuthNChallengedEvent(ctx,
+				&session.NewAggregate("session-1", "instance-1").Aggregate,
+				"Y2hhbGxlbmdl",
+				nil,
+				old_domain.UserVerificationRequirementDiscouraged,
+				"example.com"),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -676,7 +763,9 @@ func TestPasskeyChallengeCommand_Events(t *testing.T) {
 			if tt.wantEvent != nil {
 				require.Len(t, events, 1)
 				assert.Equal(t, tt.wantEvent, events[0])
+				return
 			}
+			assert.Empty(t, events)
 		})
 	}
 }
@@ -719,10 +808,12 @@ func getUserByPasskeyType(ctrl *gomock.Controller, passkeyType domain.PasskeyTyp
 			Human: &domain.HumanUser{
 				Passkeys: []*domain.Passkey{
 					{
-						ID:        "passkey-id",
-						PublicKey: []byte("public-key"),
-						Name:      "My Passkey",
-						Type:      passkeyType,
+						ID:         "passkey-id",
+						PublicKey:  []byte("public-key"),
+						Name:       "My Passkey",
+						Type:       passkeyType,
+						KeyID:      []byte("key-id"),
+						VerifiedAt: time.Now().Add(-2 * time.Hour),
 					},
 				},
 				Email: domain.HumanEmail{

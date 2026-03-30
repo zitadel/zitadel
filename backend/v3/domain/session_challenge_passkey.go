@@ -138,7 +138,7 @@ func (p *PasskeyChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts)
 		PublicKeyCredentialRequestOptions: new(structpb.Struct),
 	}
 	if err = json.Unmarshal(credentialAssertionData, webAuthNChallenge.PublicKeyCredentialRequestOptions); err != nil {
-		return zerrors.ThrowInternal(nil, "DOM-liSCA4", "Errors.Unmarshal")
+		return zerrors.ThrowInternal(err, "DOM-liSCA4", "Errors.Unmarshal")
 	}
 
 	// update the session with the passkey challenge
@@ -167,7 +167,7 @@ func (p *PasskeyChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts)
 
 // Events implements [Commander].
 // It creates a WebAuthN challenged event if a passkey challenge was requested and created.
-func (p *PasskeyChallengeCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
+func (p *PasskeyChallengeCommand) Events(ctx context.Context, _ *InvokeOpts) ([]eventstore.Command, error) {
 	if p.ChallengeTypePasskey == nil {
 		return nil, nil
 	}
@@ -206,7 +206,7 @@ func (p *PasskeyChallengeCommand) beginWebAuthNLogin(ctx context.Context, userVe
 		UserVerificationFromDomain(userVerificationDomain),
 	)
 	if err != nil {
-		return nil, nil, "", zerrors.ThrowInternal(err, "DOM-Fy333Q", "Errors.WebAuthN.BeginLogin")
+		return nil, nil, "", err
 	}
 	return sessionData, credentialAssertionData, rpID, nil
 }
