@@ -45,12 +45,6 @@ type TOTPCheckCommand struct {
 //
 //   - totpValidator defaults to [totp.Validate]
 //   - encryptionAlgo defaults to [crypto.NewAESCrypto] using the config specified in defaults.yaml
-//
-// The command does not implement [Transactional] due totpValidator that might take a long time to execute.
-// So the DB transaction will be started only after totpValidator has been run.
-//
-// Moreover, the command may return a functional error so manual management of the transaction is needed
-// to avoid rollbacking a transaction despite having only a functional error.
 func NewTOTPCheckCommand(sessionID, instanceID string, tarpitFunc tarpitFn, totpValidator totpValidateFn, encryptionAlgo crypto.EncryptionAlgorithm, request *CheckTOTPType) *TOTPCheckCommand {
 	cmd := &TOTPCheckCommand{
 		CheckTOTP:           request,
@@ -164,6 +158,17 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 	}
 
 	t.TarpitFunc(uint64(t.FetchedUser.Human.TOTP.FailedAttempts) + 1)
+
+	// TODO(IAM-Marco): This error is a functional error and needs to be returned BUT
+	// the transaction needs to NOT be rollbacked.
+	//
+	// As of now, this check doesn't work because the error will rollback the transaction that is
+	// managed automatically by implementing the [Transactional] interface.
+	//
+	// Not implementing the [Transactional] interface and managing it manually is not possible either
+	// because emitting the events (in [TOTPCheckCommand.Events]) need to happen in the same transaction.
+	//
+	// As of now, we do not have a solution for this.
 	return verifyErr
 }
 
