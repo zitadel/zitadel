@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type InvokeOpt func(*InvokeOpts)
@@ -134,6 +135,34 @@ func (o *InvokeOpts) DB() database.QueryExecutor {
 	}
 	o.db = pool
 	return o.db
+}
+
+// StartTransactionFromDB returns a [database.Transaction] from the input [database.QueryExecutor].
+// Optionally, the caller can pass [database.TransactionOptions] for a customised transaction type.
+//
+// If db doesn't implement [database.Beginner] an internal error is returned.
+//
+// If the transaction [database.Beginner.Begin] call fails, an internal error is returned.
+//
+// The caller is in charge of calling [database.Transaction.End], [database.Transaction.Commit]
+// or [database.Transaction.Rollback] as they see fit.
+func (o *InvokeOpts) StartTransactionFromDB(ctx context.Context, db database.QueryExecutor, opts *database.TransactionOptions) (database.Transaction, error) {
+	beginner, ok := db.(database.Beginner)
+	if !ok {
+		return nil, zerrors.CreateZitadelError(zerrors.KindInternal, nil, "DOM-LqxZbk", "database doesn't implement database.Beginner", 1)
+	}
+
+	tx, txErr := beginner.Begin(ctx, opts)
+	if txErr != nil {
+		return nil, zerrors.CreateZitadelError(zerrors.KindInternal, txErr, "DOM-sAAd3V", "failed starting transaction", 1)
+	}
+
+	return tx, nil
+}
+
+// StartTransaction is the same as [domain.StartTransactionFromDB] but uses the DB provided by [InvokeOpts]
+func (o *InvokeOpts) StartTransaction(ctx context.Context, opts *database.TransactionOptions) (database.Transaction, error) {
+	return o.StartTransactionFromDB(ctx, o.DB(), opts)
 }
 
 func (o *InvokeOpts) LegacyEventstore() eventstore.LegacyEventstore {
