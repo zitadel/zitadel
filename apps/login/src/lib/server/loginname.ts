@@ -1,7 +1,8 @@
 "use server";
 
 import { createLogger } from "@/lib/logger";
-import { ConnectError, create } from "@zitadel/client";
+import { create } from "@zitadel/client";
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getTranslations } from "next-intl/server";
@@ -273,7 +274,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         checks,
         requestId: command.requestId,
       }).catch((error) => {
-        if (error instanceof ConnectError && error.rawMessage?.includes("Errors.User.NotActive")) {
+        if (isClassifiedError(error) && error.message?.includes("Errors.User.NotActive")) {
           return { error: t("errors.userNotActive") };
         }
         throw error;
