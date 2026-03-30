@@ -29,16 +29,11 @@ import type { LoggerProvider } from "@opentelemetry/api-logs";
 let _loggerProvider: LoggerProvider | null = null;
 
 export async function register(): Promise<void> {
-  // Only run OpenTelemetry in the Node.js environment
-  if (process.env.NEXT_RUNTIME === "nodejs") {
-    // Disable by default in local development to avoid unnecessary overhead
-    if (process.env.NODE_ENV === "development" && process.env.OTEL_SDK_DISABLED !== "false") {
-      return;
-    }
-
-    // Explicit check for disabled env variable
-    if (process.env.OTEL_SDK_DISABLED === "true") return;
-
+  // Only run OpenTelemetry in the Node.js environment.
+  // OTel is opt-in: set OTEL_ENABLED=true to enable it.
+  // This prevents unnecessary initialization (and build tracing issues) in
+  // environments like Vercel where OTel is not configured.
+  if (process.env.NEXT_RUNTIME === "nodejs" && process.env.OTEL_ENABLED === "true") {
     const { registerNode } = await import("./instrumentation.node");
     _loggerProvider = await registerNode();
   }

@@ -146,6 +146,7 @@ describe("OpenTelemetry Integration", () => {
       .withEnvironment({
         ZITADEL_API_URL: "http://mock-zitadel:8080",
         ZITADEL_SERVICE_USER_TOKEN: "test-token-for-otel-integration-tests",
+        OTEL_ENABLED: "true",
         OTEL_SERVICE_NAME: "zitadel-login-test",
         OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318",
         OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf",
@@ -1297,7 +1298,6 @@ describe("OpenTelemetry Disabled", () => {
       .withEnvironment({
         ZITADEL_API_URL: "http://mock-zitadel:8080",
         ZITADEL_SERVICE_USER_TOKEN: "test-token",
-        OTEL_SDK_DISABLED: "true",
       })
       .withStartupTimeout(120000)
       .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
@@ -1315,7 +1315,7 @@ describe("OpenTelemetry Disabled", () => {
 
   describe("Application Health", () => {
     it(
-      "starts successfully with OTEL_SDK_DISABLED=true",
+      "starts successfully with OTEL_ENABLED unset (disabled by default)",
       async () => {
         const response = await fetch(`${appUrl}/ui/v2/login/healthy`);
         expect(response.ok).toBe(true);
@@ -1402,7 +1402,6 @@ describe("Log Level Configuration", () => {
           .withEnvironment({
             ZITADEL_API_URL: "http://mock-zitadel:8080",
             ZITADEL_SERVICE_USER_TOKEN: "test-token",
-            OTEL_SDK_DISABLED: "true",
             LOG_LEVEL: "debug",
           })
           .withStartupTimeout(120000)
@@ -1469,7 +1468,6 @@ describe("Log Level Configuration", () => {
           .withEnvironment({
             ZITADEL_API_URL: "http://mock-zitadel:8080",
             ZITADEL_SERVICE_USER_TOKEN: "test-token",
-            OTEL_SDK_DISABLED: "true",
             LOG_LEVEL: "warn",
           })
           .withStartupTimeout(120000)
@@ -1570,6 +1568,7 @@ describe("Log Level Configuration", () => {
           .withEnvironment({
             ZITADEL_API_URL: "http://mock-zitadel:8080",
             ZITADEL_SERVICE_USER_TOKEN: "test-token",
+            OTEL_ENABLED: "true",
             OTEL_SERVICE_NAME: "zitadel-login-loglevel-debug",
             OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318",
             OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf",
@@ -1684,6 +1683,7 @@ describe("Log Level Configuration", () => {
           .withEnvironment({
             ZITADEL_API_URL: "http://mock-zitadel:8080",
             ZITADEL_SERVICE_USER_TOKEN: "test-token",
+            OTEL_ENABLED: "true",
             OTEL_SERVICE_NAME: "zitadel-login-loglevel-warn",
             OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318",
             OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf",

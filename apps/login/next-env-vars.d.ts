@@ -102,10 +102,10 @@ declare namespace NodeJS {
     API_CACHE_CONFIG?: string;
 
     /**
-     * Optional: Disable OpenTelemetry instrumentation.
-     * Set to "true" to bypass OTEL initialization.
-     * In local development (NODE_ENV=development), it is disabled by default unless explicitly set to "false".
+     * Optional: Enable OpenTelemetry instrumentation.
+     * Set to "true" to enable OTEL initialization.
+     * OTel is disabled by default in all environments.
      */
-    OTEL_SDK_DISABLED?: string;
+    OTEL_ENABLED?: string;
   }
 }

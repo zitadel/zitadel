@@ -63,6 +63,15 @@ const nextConfig = {
     '@opentelemetry/resource-detector-container',
     '@opentelemetry/resource-detector-gcp',
   ],
+  // Exclude OpenTelemetry packages from output file tracing when OTel is not
+  // enabled. This prevents lstat ENOENT errors during Vercel builds where
+  // OTel packages are not needed. When OTEL_ENABLED=true, packages are traced
+  // normally so they are available in the deployment output.
+  ...(process.env.OTEL_ENABLED !== "true" && {
+    outputFileTracingExcludes: {
+      '*': ['node_modules/@opentelemetry/**'],
+    },
+  }),
   // Improve SSR stability - not actually needed for React 19 SSR issues
   // onDemandEntries: {
   //   maxInactiveAge: 25 * 1000,
