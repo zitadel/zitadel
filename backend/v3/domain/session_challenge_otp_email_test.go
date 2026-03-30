@@ -889,7 +889,7 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 			}
 			// to fetch/validate session and user before calling Execute
 			err := cmd.Validate(ctx, opts)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			err = cmd.Execute(ctx, opts)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -1097,11 +1097,11 @@ func TestOTPEmailChallengeCommand_Events(t *testing.T) {
 
 			// to fetch/validate session and user before calling Execute
 			err := cmd.Validate(ctx, opts)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			// to set the challengeOTPSMS in the command for event generation
 			err = cmd.Execute(ctx, opts)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			events, err := cmd.Events(ctx, opts)
 			assert.ErrorIs(t, err, tt.wantErr)
 			if tt.wantEvent != nil {
