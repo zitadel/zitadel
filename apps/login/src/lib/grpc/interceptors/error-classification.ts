@@ -14,6 +14,9 @@
 
 import { Code, ConnectError, Interceptor } from "@connectrpc/connect";
 
+/** Unique brand symbol for ClassifiedConnectError type guard detection */
+const CLASSIFIED_BRAND = Symbol.for("ClassifiedConnectError");
+
 /** Canonical gRPC → HTTP status code mapping */
 const GRPC_TO_HTTP: Readonly<Record<number, number>> = {
   [Code.InvalidArgument]: 400,
@@ -62,8 +65,8 @@ export class ClassifiedConnectError extends ConnectError {
   /** Whether this error represents a user input error (true) or a server failure (false) */
   readonly isUserError: boolean;
 
-  /** @internal Brand property for type guard detection */
-  readonly __classified = true as const;
+  /** @internal Brand symbol for type guard detection */
+  readonly [CLASSIFIED_BRAND] = true as const;
 
   constructor(source: ConnectError) {
     super(source.message, source.code, source.metadata, undefined, source.cause);
@@ -91,7 +94,7 @@ export class ClassifiedConnectError extends ConnectError {
  * Use this in catch blocks to safely access httpStatus/isUserError.
  */
 export function isClassifiedError(error: unknown): error is ClassifiedConnectError {
-  return typeof error === "object" && error !== null && "__classified" in error && (error as any).__classified === true;
+  return typeof error === "object" && error !== null && CLASSIFIED_BRAND in (error as object);
 }
 
 /**

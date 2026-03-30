@@ -56,10 +56,10 @@ describe("ClassifiedConnectError", () => {
     expect(serverError.isUserError).toBe(false);
   });
 
-  it("has brand property for type guard detection", () => {
+  it("is detectable via isClassifiedError type guard", () => {
     const classified = new ClassifiedConnectError(new ConnectError("test", Code.NotFound));
 
-    expect((classified as any).__classified).toBe(true);
+    expect(isClassifiedError(classified)).toBe(true);
   });
 
   it("marks FailedPrecondition as client error", () => {
