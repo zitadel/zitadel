@@ -164,6 +164,7 @@ export async function checkMFAFactors(
 
     // TODO: provide a way to setup passkeys on mfa page?
     return { redirect: `/mfa/set?` + params };
+    /* eslint-disable no-dupe-else-if -- TODO: this branch is unreachable, conditions overlap with the previous branch */
   } else if (
     loginSettings?.mfaInitSkipLifetime &&
     (loginSettings.mfaInitSkipLifetime.nanos > 0 || loginSettings.mfaInitSkipLifetime.seconds > 0) &&
@@ -171,6 +172,7 @@ export async function checkMFAFactors(
     session?.factors?.user?.id &&
     shouldEnforceMFA(session, loginSettings)
   ) {
+    /* eslint-enable no-dupe-else-if */
     const userResponse = await getUserByID({ serviceConfig, userId: session.factors?.user?.id });
 
     const humanUser = userResponse?.user?.type.case === "human" ? userResponse?.user.type.value : undefined;

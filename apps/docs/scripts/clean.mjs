@@ -32,7 +32,7 @@ async function run() {
   }
 
   // Versioned content and protos
-  const cleanVersioned = (dir, pattern) => {
+  const cleanVersioned = (dir) => {
     if (!fs.existsSync(dir)) return;
     const files = fs.readdirSync(dir);
     for (const file of files) {

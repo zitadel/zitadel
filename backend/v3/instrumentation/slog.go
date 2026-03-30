@@ -9,7 +9,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/rs/xid"
 	slogmulti "github.com/samber/slog-multi"
 	slogctx "github.com/veqryn/slog-context"
 	slogotel "github.com/veqryn/slog-context/otel"
@@ -158,9 +157,8 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 		stdErrHandler,
 		&slogctx.HandlerOptions{
 			Prependers: []slogctx.AttrExtractor{
-				instanceExtractor,
-				requestIDExtractor,
 				causeExtractor,
+				requestDetailsExtractor,
 				slogotel.ExtractTraceSpanID,
 				slogctx.ExtractPrepended,
 			},
@@ -175,55 +173,6 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 	logger := slog.New(slogmulti.Fanout(stdErrHandler, otelHandler))
 	logger.Info("structured logger configured", "config_level", cfg.Level, "format", cfg.Format)
 	slog.SetDefault(logger)
-}
-
-const (
-	ProtocolHttp    = "http"
-	ProtocolConnect = "connect"
-	ProtocolGrpc    = "grpc"
-)
-
-// Instance is a minimal interface for logging the instance ID.
-type Instance interface {
-	InstanceID() string
-}
-
-// SetInstance adds the instance to the context for logging.
-func SetInstance(ctx context.Context, instance Instance) context.Context {
-	return context.WithValue(ctx, ctxKeyInstance, instance)
-}
-
-// SetRequest generates a new [xid.ID] based on the passed request timestamp
-// and adds it to the context.
-func SetRequestID(ctx context.Context, ts time.Time) context.Context {
-	return context.WithValue(ctx, ctxKeyRequestID, xid.NewWithTime(ts))
-}
-
-type ctxKeyType int
-
-const (
-	ctxKeyRequestID ctxKeyType = iota
-	ctxKeyInstance
-)
-
-// instanceExtractor sets the instance ID from [Instance] to a log entry.
-func instanceExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) []slog.Attr {
-	if instance, ok := ctx.Value(ctxKeyInstance).(Instance); ok {
-		return []slog.Attr{
-			slog.String("instance", instance.InstanceID()),
-		}
-	}
-	return nil
-}
-
-// requestIDExtractor sets the request XID to a log entry.
-func requestIDExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) []slog.Attr {
-	if r, ok := ctx.Value(ctxKeyRequestID).(xid.ID); ok {
-		return []slog.Attr{
-			slog.String("request_id", r.String()),
-		}
-	}
-	return nil
 }
 
 // causeExtractor sets the cause of a canceled context to a log entry.

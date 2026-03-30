@@ -270,7 +270,7 @@ func (i instance) UpdatedAtColumn() database.Column {
 
 type rawInstance struct {
 	*domain.Instance
-	Domains JSONArray[domain.InstanceDomain] `json:"domains,omitempty" db:"domains"`
+	Domains JSONArray[*domain.InstanceDomain] `json:"domains,omitempty" db:"domains"`
 }
 
 func scanInstance(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Instance, error) {

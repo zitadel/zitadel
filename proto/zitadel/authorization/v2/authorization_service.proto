@@ -14,19 +14,19 @@ import "zitadel/filter/v2/filter.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/authorization/v2;authorization";
 
-// AuthorizationService provides methods to manage authorizations for users within your projects and applications.
+// Note: We have streamlined our naming conventions to improve clarity. Authorization in this context refers to role assignments, not to OAuth authorization.
 //
-// Note: Authorization in this context refers to role assignments, not to OAuth authorization.
+// AuthorizationService provides methods to manage authorizations for users within your projects and applications.
 //
 // For managing permissions and roles for Zitadel internal resources, like organizations, projects,
 // users, etc., please use the InternalPermissionService.
 service AuthorizationService {
 
-  // List Authorizations
-  //
-  // ListAuthorizations returns all authorizations matching the request and necessary permissions.
+  // List Role Assignment
   //
   // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
+  //
+  // ListAuthorizations returns all authorizations matching the request and necessary permissions.
   //
   // Required permissions:
   //   - "user.grant.read"
@@ -39,11 +39,11 @@ service AuthorizationService {
     };
   }
 
-  // Create Authorization
-  //
-  // CreateAuthorization creates a new authorization for a user in an owned or granted project.
+  // Create Role Assignment
   //
   // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
+  //
+  // CreateAuthorization creates a new authorization for a user in an owned or granted project.
   //
   // Required permissions:
   //   - "user.grant.write"
@@ -55,11 +55,11 @@ service AuthorizationService {
     };
   }
 
-  // Update Authorization
-  //
-  // UpdateAuthorization updates the authorization.
+  // Update Role Assignments
   //
   // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
+  //
+  // UpdateAuthorization updates the authorization.
   //
   // Note that any role keys previously granted to the user and not present in the request will be revoked.
   //
@@ -73,11 +73,11 @@ service AuthorizationService {
     };
   }
 
-  // Delete Authorization
-  //
-  // DeleteAuthorization deletes the authorization.
+  // Delete Role Assignment
   //
   // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
+  //
+  // DeleteAuthorization deletes the authorization.
   //
   // In case the authorization is not found, the request will return a successful response as
   // the desired state is already achieved.
@@ -93,11 +93,11 @@ service AuthorizationService {
     };
   }
 
-  // Activate Authorization
-  //
-  // ActivateAuthorization activates an existing but inactive authorization.
+  // Activate Role Assignment
   //
   // Note: Authorization in this context refers to role assignments, not to OAuth authorization.
+  //
+  // ActivateAuthorization activates an existing but inactive authorization.
   //
   // In case the authorization is already active, the request will return a successful response as
   // the desired state is already achieved.
@@ -113,7 +113,7 @@ service AuthorizationService {
     };
   }
 
-  // Deactivate Authorization
+  // Deactivate Role Assignment
   //
   // DeactivateAuthorization deactivates an existing and active authorization.
   //

@@ -208,8 +208,14 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	}))
 
 	new_domain.SetLegacyEventstore(eventstoreClient)
+	new_domain.SetSystemConfig(config.SystemDefaults)
+	new_domain.SetIDPEncryptionAlgorithm(keys.IDPConfig)
+	new_domain.SetMFAEncryptionAlgorithm(keys.OTP)
+	new_domain.SetOTPSMSSecretGeneratorConfig(config.DefaultInstance.SecretGenerators.OTPSMS)
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
+	sessionTokenDecryptor := internal_authz.SessionTokenDecryptor(keys.OIDC)
+	new_domain.SetSessionTokenDecryptor(sessionTokenDecryptor)
 	cacheConnectors, err := connector.StartConnectors(config.Caches, dbClient)
 	if err != nil {
 		return fmt.Errorf("unable to start caches: %w", err)
@@ -262,6 +268,9 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		DisplayName:    config.WebAuthNName,
 		ExternalSecure: config.ExternalSecure,
 	}
+
+	new_domain.SetWebAuthNConfig(webAuthNConfig)
+
 	commands, err := command.StartCommands(ctx,
 		eventstoreClient,
 		cacheConnectors,
@@ -687,7 +696,7 @@ func startAPIs(
 			&config.SCIM,
 			translator,
 			instanceInterceptor.HandlerFuncWithError,
-			middleware.AuthorizationInterceptor(verifier, config.SystemAuthZ, config.InternalAuthZ).HandlerFuncWithError))
+			middleware.AuthorizationInterceptor(verifier, config.SystemAuthZ, config.InternalAuthZ).HandlerFuncWithError(schemas.HandlerPrefix)))
 
 	c, err := console.Start(config.Console, config.ExternalSecure, oidcServer.IssuerFromRequest, middleware.CallDurationHandler, instanceInterceptor.Handler, limitingAccessInterceptor, config.CustomerPortal)
 	if err != nil {

@@ -139,6 +139,15 @@ func Test_user_Get(t *testing.T) {
 			Name:        "My Machine",
 			Description: "This is my machine user",
 		},
+		Metadata: []*domain.Metadata{
+			{
+				InstanceID: instanceID,
+				Key:        "key",
+				Value:      []byte(`"something"`),
+				CreatedAt:  now,
+				UpdatedAt:  now,
+			},
+		},
 	}
 
 	err = userRepo.Create(t.Context(), tx, human)
@@ -1564,7 +1573,7 @@ func Test_user_ListConditions(t *testing.T) {
 			opts: []database.QueryOption{
 				database.WithCondition(database.And(
 					userRepo.InstanceIDCondition(instanceID1),
-					humanRepo.ExistsPasskey(humanRepo.PasskeyConditions().TypeCondition(domain.PasskeyTypeU2F)),
+					humanRepo.ExistsPasskey(humanRepo.PasskeyConditions().TypeCondition(database.TextOperationEqual, domain.PasskeyTypeU2F)),
 				)),
 			},
 			want: want{

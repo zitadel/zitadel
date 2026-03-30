@@ -15,13 +15,13 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const { loginName, organization, userId } = searchParams;
 
-  const branding = await getBrandingSettings({ serviceConfig, organization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization });
 
-  const sessionFactors = await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization },
-  }).catch((error) => {
-    console.warn("Error loading session:", error);
-  });
+  const sessionFactors = await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } }).catch(
+    (error) => {
+      console.warn("Error loading session:", error);
+    },
+  );
 
   const id = userId ?? sessionFactors?.factors?.user?.id;
 
@@ -29,8 +29,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     throw Error("Failed to get user id");
   }
 
-  const userResponse = await getUserByID({ serviceConfig, userId: id,
-  });
+  const userResponse = await getUserByID({ serviceConfig, userId: id });
 
   let user: User | undefined;
   let human: HumanUser | undefined;

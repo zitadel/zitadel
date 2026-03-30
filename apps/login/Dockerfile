@@ -1,4 +1,4 @@
-FROM node:22-alpine
+FROM node:24-alpine
 WORKDIR /app
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
@@ -14,9 +14,10 @@ ENV HOSTNAME="::" \
     NODE_OPTIONS="--use-openssl-ca" \
     SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt" \
     SSL_CERT_DIR="/etc/ssl/certs" \
-    ZITADEL_TLS_ENABLED="false"
+    ZITADEL_TLS_ENABLED="false" \
+    OTEL_SERVICE_NAME="zitadel-login" \
+    OTEL_EXPORTER_OTLP_PROTOCOL="http/protobuf"
 
-# TODO: Check healthy, not ready
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD ["/usr/local/bin/node", "/app/healthcheck.mjs"]
-ENTRYPOINT ["/app/entrypoint.sh", "node", "apps/login/server.js" ]
+    CMD ["/usr/local/bin/node", "/app/healthcheck.mjs", "/ui/v2/login/ready"]
+ENTRYPOINT ["/app/entrypoint.sh", "node", "apps/login/server.js"]

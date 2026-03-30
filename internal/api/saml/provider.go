@@ -70,6 +70,8 @@ func NewProvider(
 
 	options := []provider.Option{
 		provider.WithHttpInterceptors(
+			middleware.CallDurationHandler,
+			middleware.RequestDetailsHandler(),
 			middleware.MetricsHandler(metricTypes),
 			middleware.TraceHandler(),
 			middleware.LogHandler("saml"),

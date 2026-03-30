@@ -452,11 +452,12 @@ func (rm *HumanPasswordlessLoginReadModel) Query() *eventstore.SearchQueryBuilde
 type HumanPasswordlessInitCodeWriteModel struct {
 	eventstore.WriteModel
 
-	CodeID     string
-	Attempts   uint8
-	CryptoCode *crypto.CryptoValue
-	Expiration time.Duration
-	State      domain.PasswordlessInitCodeState
+	CodeID           string
+	Attempts         uint8
+	CryptoCode       *crypto.CryptoValue
+	CodeCreationDate time.Time
+	CodeExpiration   time.Duration
+	State            domain.PasswordlessInitCodeState
 }
 
 func NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner string) *HumanPasswordlessInitCodeWriteModel {
@@ -520,13 +521,15 @@ func (wm *HumanPasswordlessInitCodeWriteModel) Reduce() error {
 
 func (wm *HumanPasswordlessInitCodeWriteModel) appendAddedEvent(e *user.HumanPasswordlessInitCodeAddedEvent) {
 	wm.CryptoCode = e.Code
-	wm.Expiration = e.Expiry
+	wm.CodeExpiration = e.Expiry
+	wm.CodeCreationDate = e.CreationDate()
 	wm.State = domain.PasswordlessInitCodeStateActive
 }
 
 func (wm *HumanPasswordlessInitCodeWriteModel) appendRequestedEvent(e *user.HumanPasswordlessInitCodeRequestedEvent) {
 	wm.CryptoCode = e.Code
-	wm.Expiration = e.Expiry
+	wm.CodeExpiration = e.Expiry
+	wm.CodeCreationDate = e.CreationDate()
 	wm.State = domain.PasswordlessInitCodeStateRequested
 	if e.CodeReturned {
 		wm.State = domain.PasswordlessInitCodeStateActive

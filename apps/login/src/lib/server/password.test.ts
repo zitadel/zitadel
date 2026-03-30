@@ -317,7 +317,6 @@ describe("sendPassword", () => {
     const { completeFlowOrGetUrl } = await import("../client");
     vi.mocked(completeFlowOrGetUrl).mockResolvedValue({ redirect: "https://example.com" });
 
-    // eslint-disable-next-line
     const verifyHelper = await import("../verify-helper");
     vi.mocked(verifyHelper.checkPasswordChangeRequired).mockReturnValue(undefined);
     vi.mocked(verifyHelper.checkEmailVerification).mockReturnValue(undefined);
@@ -330,7 +329,7 @@ describe("sendPassword", () => {
   test("should return generic error when user not found and ignoreUnknownUsernames is true", async () => {
     mockGetSessionCookieByLoginName.mockResolvedValue(null);
     mockSearchUsers.mockResolvedValue({ result: [] });
-    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true, allowLocalAuthentication: true });
 
     const result = await sendPassword({
       loginName: "unknown@example.com",
@@ -343,7 +342,7 @@ describe("sendPassword", () => {
   test("should return specific error when user not found and ignoreUnknownUsernames is false", async () => {
     mockGetSessionCookieByLoginName.mockResolvedValue(null);
     mockSearchUsers.mockResolvedValue({ result: [] });
-    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: false });
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: false, allowLocalAuthentication: true });
 
     const result = await sendPassword({
       loginName: "unknown@example.com",
@@ -358,7 +357,7 @@ describe("sendPassword", () => {
     mockSearchUsers.mockResolvedValue({
       result: [{ userId: "user123", type: { case: "human", value: {} }, state: 1 }],
     });
-    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true, allowLocalAuthentication: true });
     mockCreateSessionAndUpdateCookie.mockRejectedValue({ failedAttempts: 1 });
 
     const result = await sendPassword({
@@ -374,7 +373,7 @@ describe("sendPassword", () => {
     mockSearchUsers.mockResolvedValue({
       result: [{ userId: "user123", type: { case: "human", value: {} }, state: 1 }],
     });
-    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true, allowLocalAuthentication: true });
     // Simulate an error that is NOT a failed attempt error (e.g. database error)
     mockCreateSessionAndUpdateCookie.mockRejectedValue(new Error("Some internal error"));
 
@@ -391,7 +390,7 @@ describe("sendPassword", () => {
     mockSearchUsers.mockResolvedValue({
       result: [{ userId: "user123", type: { case: "human", value: {} }, state: 1 }],
     });
-    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: false });
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: false, allowLocalAuthentication: true });
     mockCreateSessionAndUpdateCookie.mockRejectedValue({ failedAttempts: 1 });
     mockGetLockoutSettings.mockResolvedValue({ maxPasswordAttempts: BigInt(5) });
 
@@ -415,7 +414,7 @@ describe("sendPassword", () => {
     const terminatedError = { message: "session already terminated" };
     mockSetSessionAndUpdateCookie.mockRejectedValue(terminatedError);
 
-    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true, allowLocalAuthentication: true });
 
     mockSearchUsers.mockResolvedValue({
       result: [

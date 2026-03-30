@@ -85,7 +85,7 @@ func getTransactions(t *testing.T) (rawTx *sql.Tx, v3SQLTx *v3_sql.Transaction) 
 //  4. the reducer function for the input event executes without errors
 //
 // Returns false if any of the above checks fails
-func callReduce(t *testing.T, ctx context.Context, tx *sql.Tx, projection handler.Projection, event eventstore.Event) bool {
+func callReduce(t *testing.T, tx *sql.Tx, projection handler.Projection, event eventstore.Event) bool {
 	reducers := projection.Reducers()
 	aggregateReducerIdx := slices.IndexFunc(reducers, func(r handler.AggregateReducer) bool {
 		return r.Aggregate == event.Aggregate().Type
@@ -111,6 +111,6 @@ func callReduce(t *testing.T, ctx context.Context, tx *sql.Tx, projection handle
 		return false
 	}
 
-	err = stmt.Execute(ctx, tx, "")
+	err = stmt.Execute(t.Context(), tx, "")
 	return assert.NoError(t, err)
 }
