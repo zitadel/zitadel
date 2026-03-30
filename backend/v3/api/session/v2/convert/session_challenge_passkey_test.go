@@ -65,6 +65,16 @@ func TestChallengePasskeyGRPCToDomain(t *testing.T) {
 				UserVerificationRequirement: old_domain.UserVerificationRequirementDiscouraged,
 			},
 		},
+		{
+			name: "challenge passkey - user verification with no value",
+			challengePasskey: &session_grpc.RequestChallenges_WebAuthN{
+				Domain: "example.com",
+			},
+			want: &domain.ChallengeTypePasskey{
+				Domain:                      "example.com",
+				UserVerificationRequirement: old_domain.UserVerificationRequirementUnspecified,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
