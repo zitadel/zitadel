@@ -1,6 +1,7 @@
 "use server";
 
 import { getSessionCookieById } from "@/lib/cookies";
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/logger";
 import { getServiceConfig } from "@/lib/service-url";
 import {
@@ -18,7 +19,6 @@ import {
   ServiceConfig,
   updateHuman,
 } from "@/lib/zitadel";
-import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { Code, create } from "@zitadel/client";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";

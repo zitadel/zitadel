@@ -1,6 +1,6 @@
 import { Cookie } from "@/lib/cookies";
-import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
+import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { createCallback, getLoginSettings, ServiceConfig } from "@/lib/zitadel";
 import { Code, create } from "@zitadel/client";
 import { CreateCallbackRequestSchema, SessionSchema } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
