@@ -79,12 +79,12 @@ export class ClassifiedConnectError extends ConnectError {
 
     // Copy details from the source error (avoids OutgoingDetail/IncomingDetail type mismatch)
     if (source.details.length > 0) {
-      (this as any).details = source.details;
+      Object.defineProperty(this, "details", { value: source.details, writable: false });
     }
 
     // Preserve the raw message from the original error
     if ("rawMessage" in source) {
-      (this as any).rawMessage = (source as any).rawMessage;
+      Object.defineProperty(this, "rawMessage", { value: source.rawMessage, writable: false });
     }
   }
 }
@@ -94,7 +94,7 @@ export class ClassifiedConnectError extends ConnectError {
  * Use this in catch blocks to safely access httpStatus/isUserError.
  */
 export function isClassifiedError(error: unknown): error is ClassifiedConnectError {
-  return typeof error === "object" && error !== null && CLASSIFIED_BRAND in (error as object);
+  return error !== null && typeof error === "object" && CLASSIFIED_BRAND in error;
 }
 
 /**
