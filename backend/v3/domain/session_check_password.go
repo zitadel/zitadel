@@ -121,12 +121,8 @@ func (p *PasswordCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (e
 	if changesErr != nil {
 		return changesErr
 	}
-	beginner, ok := opts.DB().(database.Beginner)
-	if !ok {
-		return zerrors.ThrowInternal(nil, "DOM-fEhd79", "database doesn't implement database.Beginner")
-	}
 
-	tx, txErr := beginner.Begin(ctx, nil)
+	tx, txErr := opts.StartTransaction(ctx, nil)
 	if txErr != nil {
 		return zerrors.ThrowInternal(txErr, "DOM-IR1vH2", "failed starting transaction")
 	}
