@@ -1379,6 +1379,6 @@ export function createServerTransport(token: string, serviceConfig: ServiceConfi
   return createConnectTransport({
     httpVersion: "1.1",
     baseUrl: serviceConfig.baseUrl,
-    interceptors: [errorClassificationInterceptor, otelGrpcInterceptor, authorizationInterceptor, headerInterceptor],
+    interceptors: [otelGrpcInterceptor, errorClassificationInterceptor, authorizationInterceptor, headerInterceptor],
   });
 }
