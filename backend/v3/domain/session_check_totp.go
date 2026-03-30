@@ -39,8 +39,8 @@ type TOTPCheckCommand struct {
 // If tarpitFunc is nil, the default tarpit will be used.
 //
 // totpValidator is a function that takes as input a target TOTP to verify
-// and an input cyphered secret.
-// The secret is decyphered first using the input encryptionAlgo,
+// and an input ciphered secret.
+// The secret is deciphered first using the input encryptionAlgo,
 // then it is used to verify the TOTP. It returns true if the TOTP is validated successfully.
 //
 //   - totpValidator defaults to [totp.Validate]
@@ -113,8 +113,8 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 
 	verifyErr := t.verifyTOTP(t.FetchedUser.Human.TOTP.Secret)
 
+	t.CheckedAt = time.Now()
 	if verifyErr == nil {
-		t.CheckedAt = time.Now()
 		rowCount, err := humanRepo.Update(ctx, opts.DB(),
 			humanRepo.PrimaryKeyCondition(t.InstanceID, t.FetchedUser.ID),
 			humanRepo.SetLastSuccessfulTOTPCheck(t.CheckedAt),
@@ -135,7 +135,6 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 		return nil
 	}
 
-	t.CheckedAt = time.Now()
 	changes := make(database.Changes, 1, 2)
 	changes[0] = humanRepo.IncrementTOTPFailedAttempts()
 
@@ -146,7 +145,7 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 
 	if policy != nil &&
 		policy.MaxOTPAttempts != nil && *policy.MaxOTPAttempts > 0 &&
-		uint64(t.FetchedUser.Human.TOTP.FailedAttempts+1) >= *policy.MaxOTPAttempts {
+		uint64(t.FetchedUser.Human.TOTP.FailedAttempts)+1 >= *policy.MaxOTPAttempts {
 		changes = append(changes, humanRepo.SetState(UserStateLocked))
 		t.IsUserLocked = true
 	}
@@ -164,8 +163,7 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 		return err
 	}
 
-	t.TarpitFunc(uint64(t.FetchedUser.Human.TOTP.FailedAttempts + 1))
-
+	t.TarpitFunc(uint64(t.FetchedUser.Human.TOTP.FailedAttempts) + 1)
 	return verifyErr
 }
 
@@ -203,7 +201,7 @@ func (t *TOTPCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 		return err
 	}
 	if user.Human == nil {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-zzv1MO", "user not human")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-zzv1MO", "Errors.User.NotHuman")
 	}
 
 	if user.Human.TOTP == nil {

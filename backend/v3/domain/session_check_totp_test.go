@@ -162,7 +162,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 					Return(&domain.User{}, nil)
 				return repo
 			},
-			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-zzv1MO", "user not human"),
+			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-zzv1MO", "Errors.User.NotHuman"),
 		},
 		{
 			testName: "when user has no TOTP should return precondition failed error",
