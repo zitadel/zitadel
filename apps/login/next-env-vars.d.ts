@@ -85,6 +85,14 @@ declare namespace NodeJS {
     NEXT_PUBLIC_AUTO_SUBMIT_CODE?: string;
 
     /**
+     * Optional: Path to a custom CSS file for theming the login UI.
+     * The file must be placed in the public/ directory and referenced by its path.
+     * Allows loading custom styles without requiring a custom build.
+     * Example: /custom-theme.css (for public/custom-theme.css)
+     */
+    NEXT_PUBLIC_THEME_CSS_FILE?: string;
+
+    /**
      * Optional: Enable the SWR in-memory cache for API requests globally.
      * Defaults to true. Set to "false" to disable completely.
      */
@@ -95,9 +103,9 @@ declare namespace NodeJS {
      * Example: '{"defaultMinutes": 15, "longMinutes": 60, "getBrandingSettings": 120}'
      * 
      * Properties:
-     * - \`defaultMinutes\`: The globally utilized default TTL in minutes (falls back to 15 if not set).
-     * - \`longMinutes\`: The TTL utilized string for long-cached routes, like branding/translation (falls back to 60 if not set).
-     * - \`[route_name]\`: Explicit overrides per specific API method (e.g., \`getHostedLoginTranslation\`).
+     * - `defaultMinutes`: The globally utilized default TTL in minutes (falls back to 15 if not set).
+     * - `longMinutes`: The TTL utilized string for long-cached routes, like branding/translation (falls back to 60 if not set).
+     * - `[route_name]`: Explicit overrides per specific API method (e.g., `getHostedLoginTranslation`).
      */
     API_CACHE_CONFIG?: string;
 

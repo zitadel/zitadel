@@ -1,6 +1,7 @@
 import "@/styles/globals.scss";
 
 import { BackgroundWrapper } from "@/components/background-wrapper";
+import { CustomCssWrapper } from "@/components/custom-css-wrapper";
 import { LanguageProvider } from "@/components/language-provider";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Skeleton } from "@/components/skeleton";
@@ -8,6 +9,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import ThemeSwitch from "@/components/theme-switch";
 import { LANGS, getLanguage } from "@/lib/i18n";
 import { getServiceConfig } from "@/lib/service-url";
+import { normalizeCustomCssFile } from "@/lib/theme";
 import { getAllowedLanguages } from "@/lib/zitadel";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import type { Metadata } from "next";
@@ -23,7 +25,14 @@ const lato = Lato({
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("common");
-  return { title: t("title") };
+  const customCssFile = normalizeCustomCssFile(process.env.NEXT_PUBLIC_THEME_CSS_FILE);
+
+  return {
+    title: t("title"),
+    ...(customCssFile && {
+      links: [{ rel: "stylesheet", href: customCssFile }],
+    }),
+  };
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -65,17 +74,19 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               }
             >
               <LanguageProvider>
-                <BackgroundWrapper
-                  className={`relative flex min-h-screen flex-col justify-center bg-background-light-600 dark:bg-background-dark-600`}
-                >
-                  <div className="relative mx-auto w-full max-w-[1100px] py-8">
-                    <div>{children}</div>
-                    <div className="mx-auto flex max-w-[440px] flex-row items-center justify-end space-x-4 px-4 py-4 md:max-w-full md:px-8">
-                      <LanguageSwitcher languages={languages} />
-                      <ThemeSwitch />
+                <CustomCssWrapper>
+                  <BackgroundWrapper
+                    className={`relative flex min-h-screen flex-col justify-center bg-background-light-600 dark:bg-background-dark-600`}
+                  >
+                    <div className="relative mx-auto w-full max-w-[1100px] py-8">
+                      <div>{children}</div>
+                      <div className="mx-auto flex max-w-[440px] flex-row items-center justify-end space-x-4 px-4 py-4 md:max-w-full md:px-8">
+                        <LanguageSwitcher languages={languages} />
+                        <ThemeSwitch />
+                      </div>
                     </div>
-                  </div>
-                </BackgroundWrapper>
+                  </BackgroundWrapper>
+                </CustomCssWrapper>
               </LanguageProvider>
             </Suspense>
           </Tooltip.Provider>
