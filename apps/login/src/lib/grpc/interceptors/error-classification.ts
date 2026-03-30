@@ -74,6 +74,10 @@ export class ClassifiedConnectError extends ConnectError {
     // We must restore it so instanceof ClassifiedConnectError works correctly.
     Object.setPrototypeOf(this, ClassifiedConnectError.prototype);
     this.name = "ClassifiedConnectError";
+    // Preserve the original stack trace so debugging/alert triage can see the RPC call site.
+    if (source.stack) {
+      this.stack = source.stack;
+    }
     this.httpStatus = GRPC_TO_HTTP[source.code] ?? 500;
     this.isUserError = CLIENT_ERROR_CODES.has(source.code);
 
