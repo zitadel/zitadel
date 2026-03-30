@@ -37,7 +37,7 @@
     "js-yaml": "^4.1.1",
     "lucide-react": "^0.574.0",
     "mixpanel-browser": "^2.74.0",
-    "next": "16.1.6",
+    "next": "16.1.7",
     "next-themes": "^0.4.6",
     "react": "^19.2.4",
     "react-copy-to-clipboard": "^5.1.0",
