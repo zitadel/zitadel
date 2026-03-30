@@ -42,8 +42,8 @@ type OTPEmailChallengeCommand struct {
 	otpEncryptionAlgorithm       crypto.EncryptionAlgorithm
 	newEmailCode                 newOTPCodeFunc
 
-	challengeOTPEmail *SessionChallengeOTPEmail // the generated OTP Email challenge that is stored in the session.
-	otpEmailChallenge *string                   // challenge to be set in the CreateSessionResponse
+	sessionChallengeOTPEmail *SessionChallengeOTPEmail // the generated OTP Email challenge that is stored in the session.
+	otpEmailChallenge        *string                   // challenge to be set in the CreateSessionResponse
 }
 
 func NewOTPEmailChallengeCommand(
@@ -131,7 +131,7 @@ func (o *OTPEmailChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts
 	}
 
 	// prepare the otp email challenge
-	challengeOTPEmail, otpEmailChallenge, err := o.prepareOTPEmailChallenge(ctx, opts)
+	sessionChallengeOTPEmail, challenge, err := o.prepareOTPEmailChallenge(ctx, opts)
 	if err != nil {
 		return err
 	}
@@ -142,14 +142,14 @@ func (o *OTPEmailChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts
 		ctx,
 		opts.DB(),
 		sessionRepo.PrimaryKeyCondition(o.InstanceID, o.SessionID),
-		sessionRepo.SetChallenge(challengeOTPEmail),
+		sessionRepo.SetChallenge(sessionChallengeOTPEmail),
 	)
 	if err := handleUpdateError(err, expectedUpdatedRows, updated, "DOM-YfQIA3", objectTypeSession); err != nil {
 		return err
 	}
-	o.challengeOTPEmail = challengeOTPEmail
+	o.sessionChallengeOTPEmail = sessionChallengeOTPEmail
 	if o.ChallengeTypeOTPEmail.DeliveryType.ReturnCode { // only set when the delivery type is ReturnCode
-		o.otpEmailChallenge = &otpEmailChallenge
+		o.otpEmailChallenge = &challenge
 	}
 
 	return nil
@@ -166,10 +166,10 @@ func (o *OTPEmailChallengeCommand) Events(ctx context.Context, opts *InvokeOpts)
 		session.NewOTPEmailChallengedEvent(
 			ctx,
 			&session.NewAggregate(o.SessionID, o.InstanceID).Aggregate,
-			o.challengeOTPEmail.Code,
-			o.challengeOTPEmail.Expiry,
-			o.challengeOTPEmail.CodeReturned,
-			o.challengeOTPEmail.URLTemplate,
+			o.sessionChallengeOTPEmail.Code,
+			o.sessionChallengeOTPEmail.Expiry,
+			o.sessionChallengeOTPEmail.CodeReturned,
+			o.sessionChallengeOTPEmail.URLTemplate,
 		),
 	}, nil
 }
