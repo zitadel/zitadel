@@ -131,7 +131,7 @@ func (p *userAuthMethodProjection) Reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  user.HumanRecoveryCodesAddedType,
-					Reduce: p.reduceInitAuthMethod,
+					Reduce: p.reduceAddRecoveryCodes,
 				},
 				{
 					Event:  user.HumanRecoveryCodesRemovedType,
@@ -175,10 +175,8 @@ func (p *userAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) 
 		rpID = &e.RPID
 	case *user.HumanOTPAddedEvent:
 		methodType = domain.UserAuthMethodTypeTOTP
-	case *user.HumanRecoveryCodesAddedEvent:
-		methodType = domain.UserAuthMethodTypeRecoveryCode
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-f92f", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType, user.HumanMFAOTPAddedType, user.HumanRecoveryCodesAddedType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-f92f", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType, user.HumanMFAOTPAddedType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(UserAuthMethodTokenIDCol, tokenID),
@@ -268,6 +266,33 @@ func (p *userAuthMethodProjection) reduceAddAuthMethod(event eventstore.Event) (
 			handler.NewCol(UserAuthMethodSequenceCol, event.Sequence()),
 			handler.NewCol(UserAuthMethodStateCol, domain.MFAStateReady),
 			handler.NewCol(UserAuthMethodTypeCol, methodType),
+			handler.NewCol(UserAuthMethodNameCol, ""),
+		},
+	), nil
+}
+
+func (p *userAuthMethodProjection) reduceAddRecoveryCodes(event eventstore.Event) (*handler.Statement, error) {
+	if _, ok := event.(*user.HumanRecoveryCodesAddedEvent); !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-x93hq", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanRecoveryCodesAddedType})
+	}
+	return handler.NewUpsertStatement(
+		event,
+		[]handler.Column{
+			handler.NewCol(UserAuthMethodInstanceIDCol, nil),
+			handler.NewCol(UserAuthMethodUserIDCol, nil),
+			handler.NewCol(UserAuthMethodTypeCol, nil),
+			handler.NewCol(UserAuthMethodTokenIDCol, nil),
+		},
+		[]handler.Column{
+			handler.NewCol(UserAuthMethodTokenIDCol, ""),
+			handler.NewCol(UserAuthMethodCreationDateCol, handler.OnlySetValueOnInsert(UserAuthMethodTable, event.CreatedAt())),
+			handler.NewCol(UserAuthMethodChangeDateCol, event.CreatedAt()),
+			handler.NewCol(UserAuthMethodResourceOwnerCol, event.Aggregate().ResourceOwner),
+			handler.NewCol(UserAuthMethodInstanceIDCol, event.Aggregate().InstanceID),
+			handler.NewCol(UserAuthMethodUserIDCol, event.Aggregate().ID),
+			handler.NewCol(UserAuthMethodSequenceCol, event.Sequence()),
+			handler.NewCol(UserAuthMethodStateCol, domain.MFAStateReady),
+			handler.NewCol(UserAuthMethodTypeCol, domain.UserAuthMethodTypeRecoveryCode),
 			handler.NewCol(UserAuthMethodNameCol, ""),
 		},
 	), nil

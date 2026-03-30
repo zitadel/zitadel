@@ -195,8 +195,8 @@ func (u userPasskey) KeyIDCondition(keyID string) database.Condition {
 }
 
 // TypeCondition implements [domain.HumanPasskeyConditions].
-func (u userPasskey) TypeCondition(passkeyType domain.PasskeyType) database.Condition {
-	return database.NewTextCondition(u.typeColumn(), database.TextOperationEqual, passkeyType.String())
+func (u userPasskey) TypeCondition(op database.TextOperation, passkeyType domain.PasskeyType) database.Condition {
+	return database.NewTextCondition(u.typeColumn(), op, passkeyType.String())
 }
 
 // -------------------------------------------------------------
