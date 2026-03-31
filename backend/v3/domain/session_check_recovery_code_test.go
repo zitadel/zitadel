@@ -1320,6 +1320,7 @@ func updateHumanUserFailedExpectation(ctrl *gomock.Controller, userRepo *domainm
 		userUpdates = append(userUpdates, humanRepo.SetState(domain.UserStateLocked))
 	}
 	userRepo.EXPECT().Human().Times(1).Return(humanRepo)
+
 	humanRepo.EXPECT().
 		Update(gomock.Any(), gomock.Any(), primaryKeyCondition, userUpdates).
 		Times(1).
