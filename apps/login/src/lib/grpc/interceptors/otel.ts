@@ -66,6 +66,7 @@ export const otelGrpcInterceptor: Interceptor = (next) =>
 
         try {
           const response = await next(req);
+          span.setAttribute("rpc.grpc.status_code", 0); // Code.OK
           span.setStatus({ code: SpanStatusCode.OK });
           return response;
         } catch (err) {
