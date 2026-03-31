@@ -1,7 +1,14 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
-import { sendVerification } from "./verify";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { initialSendVerification, sendVerification } from "./verify";
 
-import { getSession, getUserByID, listAuthenticationMethodTypes, verifyEmail } from "@/lib/zitadel";
+import {
+  createInviteCode,
+  getSession,
+  getUserByID,
+  listAuthenticationMethodTypes,
+  verifyEmail,
+  sendEmailCode as zitadelSendEmailCode,
+} from "@/lib/zitadel";
 import { cookies } from "next/headers";
 import { getSessionCookieByLoginName } from "../cookies";
 import { createSessionAndUpdateCookie } from "./cookie";
@@ -14,6 +21,8 @@ vi.mock("@/lib/zitadel", () => ({
   getSession: vi.fn(),
   listAuthenticationMethodTypes: vi.fn(),
   getLoginSettings: vi.fn(),
+  sendEmailCode: vi.fn(),
+  createInviteCode: vi.fn(),
 }));
 
 vi.mock("next/headers", () => ({
@@ -35,6 +44,10 @@ vi.mock("../service-url", () => ({
 
 vi.mock("../fingerprint", () => ({
   getOrSetFingerprintId: vi.fn(),
+}));
+
+vi.mock("./host", () => ({
+  getPublicHostWithProtocol: vi.fn(() => "https://example.com"),
 }));
 
 vi.mock("next-intl/server", () => ({
@@ -109,5 +122,104 @@ describe("sendVerification", () => {
     expect(mockGetSession).toHaveBeenCalled();
     // Verify creation was attempted
     expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
+  });
+});
+
+describe("initialSendVerification", () => {
+  let mockSendEmailCode: any;
+  let mockCreateInviteCode: any;
+  let originalBasePath: string | undefined;
+
+  beforeEach(() => {
+    originalBasePath = process.env.NEXT_PUBLIC_BASE_PATH;
+    process.env.NEXT_PUBLIC_BASE_PATH = "/ui/v2/login";
+
+    vi.clearAllMocks();
+    mockSendEmailCode = zitadelSendEmailCode;
+    mockCreateInviteCode = createInviteCode;
+    mockSendEmailCode.mockResolvedValue({});
+    mockCreateInviteCode.mockResolvedValue({});
+  });
+
+  afterEach(() => {
+    if (originalBasePath === undefined) {
+      delete process.env.NEXT_PUBLIC_BASE_PATH;
+    } else {
+      process.env.NEXT_PUBLIC_BASE_PATH = originalBasePath;
+    }
+  });
+
+  test("should call sendEmailCode with correct URL template for non-invite", async () => {
+    await initialSendVerification({
+      userId: "user-1",
+      isInvite: false,
+    });
+
+    expect(mockSendEmailCode).toHaveBeenCalledWith({
+      serviceConfig: {},
+      userId: "user-1",
+      urlTemplate: "https://example.com/ui/v2/login/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}",
+    });
+    expect(mockCreateInviteCode).not.toHaveBeenCalled();
+  });
+
+  test("should call createInviteCode with correct URL template for invite", async () => {
+    await initialSendVerification({
+      userId: "user-1",
+      isInvite: true,
+    });
+
+    expect(mockCreateInviteCode).toHaveBeenCalledWith({
+      serviceConfig: {},
+      userId: "user-1",
+      urlTemplate:
+        "https://example.com/ui/v2/login/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true",
+    });
+    expect(mockSendEmailCode).not.toHaveBeenCalled();
+  });
+
+  test("should include URL-encoded requestId in URL template", async () => {
+    await initialSendVerification({
+      userId: "user-1",
+      isInvite: false,
+      requestId: "req-123",
+    });
+
+    expect(mockSendEmailCode).toHaveBeenCalledWith({
+      serviceConfig: {},
+      userId: "user-1",
+      urlTemplate:
+        "https://example.com/ui/v2/login/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&requestId=req-123",
+    });
+  });
+
+  test("should URL-encode special characters in requestId", async () => {
+    await initialSendVerification({
+      userId: "user-1",
+      isInvite: false,
+      requestId: "req&id=injected",
+    });
+
+    expect(mockSendEmailCode).toHaveBeenCalledWith({
+      serviceConfig: {},
+      userId: "user-1",
+      urlTemplate:
+        "https://example.com/ui/v2/login/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&requestId=req%26id%3Dinjected",
+    });
+  });
+
+  test("should include invite=true and requestId for invite with requestId", async () => {
+    await initialSendVerification({
+      userId: "user-1",
+      isInvite: true,
+      requestId: "req-456",
+    });
+
+    expect(mockCreateInviteCode).toHaveBeenCalledWith({
+      serviceConfig: {},
+      userId: "user-1",
+      urlTemplate:
+        "https://example.com/ui/v2/login/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true&requestId=req-456",
+    });
   });
 });

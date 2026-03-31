@@ -210,6 +210,9 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	new_domain.SetLegacyEventstore(eventstoreClient)
 	new_domain.SetSystemConfig(config.SystemDefaults)
 	new_domain.SetIDPEncryptionAlgorithm(keys.IDPConfig)
+	new_domain.SetMFAEncryptionAlgorithm(keys.OTP)
+	new_domain.SetOTPSMSSecretGeneratorConfig(config.DefaultInstance.SecretGenerators.OTPSMS)
+	new_domain.SetOTPEmailSecretGeneratorConfig(config.DefaultInstance.SecretGenerators.OTPEmail)
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
 	sessionTokenDecryptor := internal_authz.SessionTokenDecryptor(keys.OIDC)
@@ -266,6 +269,9 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		DisplayName:    config.WebAuthNName,
 		ExternalSecure: config.ExternalSecure,
 	}
+
+	new_domain.SetWebAuthNConfig(webAuthNConfig)
+
 	commands, err := command.StartCommands(ctx,
 		eventstoreClient,
 		cacheConnectors,

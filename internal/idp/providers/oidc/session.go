@@ -141,7 +141,7 @@ func (u *User) GetPhone() domain.PhoneNumber {
 }
 
 func (u *User) IsPhoneVerified() bool {
-	return u.PhoneNumberVerified
+	return bool(u.PhoneNumberVerified)
 }
 
 func (u *User) GetPreferredLanguage() language.Tag {
