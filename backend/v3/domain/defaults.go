@@ -9,15 +9,16 @@ import (
 )
 
 var (
-	pool                        database.Pool
-	legacyEventstore            eventstore.LegacyEventstore
-	sysConfig                   systemdefaults.SystemDefaults
-	passwordHasher              *crypto.Hasher
-	idpEncryptionAlgo           crypto.EncryptionAlgorithm
-	sessionTokenDecryptor       SessionTokenDecryptor
-	mfaEncryptionAlgo           crypto.EncryptionAlgorithm
-	otpSMSSecretGeneratorConfig *crypto.GeneratorConfig
-	webauthnConfig              *webauthn.Config
+	pool                          database.Pool
+	legacyEventstore              eventstore.LegacyEventstore
+	sysConfig                     systemdefaults.SystemDefaults
+	passwordHasher                *crypto.Hasher
+	idpEncryptionAlgo             crypto.EncryptionAlgorithm
+	sessionTokenDecryptor         SessionTokenDecryptor
+	mfaEncryptionAlgo             crypto.EncryptionAlgorithm
+	otpSMSSecretGeneratorConfig   *crypto.GeneratorConfig
+	otpEmailSecretGeneratorConfig *crypto.GeneratorConfig
+	webauthnConfig                *webauthn.Config
 )
 
 func SetPool(p database.Pool) {
@@ -46,6 +47,10 @@ func SetSessionTokenDecryptor(decryptor SessionTokenDecryptor) {
 
 func SetOTPSMSSecretGeneratorConfig(cfg *crypto.GeneratorConfig) {
 	otpSMSSecretGeneratorConfig = cfg
+}
+
+func SetOTPEmailSecretGeneratorConfig(cfg *crypto.GeneratorConfig) {
+	otpEmailSecretGeneratorConfig = cfg
 }
 
 func SetMFAEncryptionAlgorithm(mfaEncryptionAlg crypto.EncryptionAlgorithm) {
