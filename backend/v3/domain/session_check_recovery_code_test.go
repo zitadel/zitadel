@@ -1356,17 +1356,10 @@ func updateSessionSucceededExpectation(sessionRepo *domainmock.SessionRepo, chan
 
 func updateSessionFailedExpectation(sessionRepo *domainmock.SessionRepo, change database.Change, err error, updateCount int64) {
 	primaryKeyCondition := sessionRepo.PrimaryKeyCondition("instance-1", "session-1")
-	if err != nil {
-		sessionRepo.EXPECT().
-			Update(gomock.Any(), gomock.Any(), primaryKeyCondition, change).
-			Times(1).
-			Return(updateCount, err)
-		return
-	}
 	sessionRepo.EXPECT().
 		Update(gomock.Any(), gomock.Any(), primaryKeyCondition, change).
 		Times(1).
-		Return(updateCount, nil)
+		Return(updateCount, err)
 }
 
 func getSessionSucceededExpectation(sessionRepo *domainmock.SessionRepo) {
