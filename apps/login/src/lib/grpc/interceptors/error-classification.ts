@@ -69,7 +69,7 @@ export class ClassifiedConnectError extends ConnectError {
   readonly [CLASSIFIED_BRAND] = true as const;
 
   constructor(source: ConnectError) {
-    super(source.message, source.code, source.metadata, undefined, source.cause);
+    super(source.rawMessage, source.code, source.metadata, undefined, source.cause);
     // ConnectError's constructor resets the prototype chain via Object.setPrototypeOf.
     // We must restore it so instanceof ClassifiedConnectError works correctly.
     Object.setPrototypeOf(this, ClassifiedConnectError.prototype);
