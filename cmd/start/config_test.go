@@ -76,6 +76,7 @@ DefaultInstance:
   Features:
     LoginDefaultOrg: true
     UserSchema: true
+    ConsoleUseV2UserApi: true
     LoginV2:
       Required: true
       BaseURI: 'http://zitadel:8080'
@@ -87,8 +88,9 @@ Actions:
 `},
 		want: func(t *testing.T, config *Config) {
 			assert.Equal(t, config.DefaultInstance.Features, &command.InstanceFeatures{
-				LoginDefaultOrg: gu.Ptr(true),
-				UserSchema:      gu.Ptr(true),
+				LoginDefaultOrg:               gu.Ptr(true),
+				UserSchema:                    gu.Ptr(true),
+				ManagementConsoleUseV2UserApi: gu.Ptr(true),
 				LoginV2: &feature.LoginV2{
 					Required: true,
 					BaseURI:  &url.URL{Scheme: "http", Host: "zitadel:8080"},
