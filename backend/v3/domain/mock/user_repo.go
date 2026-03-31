@@ -38,6 +38,10 @@ func (u *UserRepo) Create(ctx context.Context, client database.QueryExecutor, us
 	return u.mock.Create(ctx, client, user)
 }
 
+func (u *UserRepo) Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error) {
+	return u.mock.Update(ctx, client, condition, changes...)
+}
+
 func (u *UserRepo) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
 	return u.mock.Delete(ctx, client, condition)
 }
