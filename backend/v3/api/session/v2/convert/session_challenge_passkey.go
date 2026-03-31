@@ -19,6 +19,8 @@ func ChallengePasskeyGRPCToDomain(challengePasskey *session_grpc.RequestChalleng
 
 func pbUserVerificationRequirementToDomain(req session_grpc.UserVerificationRequirement) old_domain.UserVerificationRequirement {
 	switch req {
+	case session_grpc.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_UNSPECIFIED:
+		return old_domain.UserVerificationRequirementUnspecified
 	case session_grpc.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED:
 		return old_domain.UserVerificationRequirementRequired
 	case session_grpc.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_PREFERRED:

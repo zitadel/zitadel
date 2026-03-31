@@ -11,8 +11,6 @@ import (
 )
 
 func TestChallengePasskeyGRPCToDomain(t *testing.T) {
-	type args struct {
-	}
 	tests := []struct {
 		name             string
 		challengePasskey *session_grpc.RequestChallenges_WebAuthN
