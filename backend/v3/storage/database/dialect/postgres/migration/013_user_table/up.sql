@@ -185,7 +185,7 @@ CREATE TYPE zitadel.passkey_type AS ENUM (
 CREATE TABLE zitadel.user_passkeys(
     instance_id TEXT NOT NULL
     , token_id TEXT NOT NULL
-    , key_id BYTEA NOT NULL
+    , key_id BYTEA
 
     , user_id TEXT NOT NULL
 
@@ -194,12 +194,12 @@ CREATE TABLE zitadel.user_passkeys(
     , verified_at TIMESTAMPTZ
 
     , type zitadel.passkey_type NOT NULL
-    , name TEXT NOT NULL CHECK (name <> '')
+    , name TEXT NOT NULL DEFAULT ''
     , sign_count INT NOT NULL DEFAULT 0 CHECK (sign_count >= 0)
     , challenge BYTEA NOT NULL
-    , public_key BYTEA NOT NULL
-    , attestation_type TEXT NOT NULL CHECK (attestation_type <> '')
-    , authenticator_attestation_guid BYTEA NOT NULL
+    , public_key BYTEA
+    , attestation_type TEXT NOT NULL
+    , authenticator_attestation_guid BYTEA
     , relying_party_id TEXT NOT NULL CHECK (relying_party_id <> '')
 
     , PRIMARY KEY (instance_id, token_id)

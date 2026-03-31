@@ -181,6 +181,66 @@ func TestUserRelationalProjection_Reducers(t *testing.T) {
 		assert.Zero(t, gotUser.Human.RecoveryCodes.LastSuccessfullyCheckedAt)
 		assert.Equal(t, uint8(1), gotUser.Human.RecoveryCodes.FailedAttempts)
 	})
+
+	t.Run("reduce user.HumanWebAuthNVerifiedEvent event", func(t *testing.T) {
+		// Given
+
+		// create user
+		existingUserID := gofakeit.UUID()
+		existingUserAgg := createUser(t, tx, userRepo, instanceID, orgID, existingUserID)
+		now := time.Now()
+
+		// add passkey to the user
+		pkey := &domain.Passkey{
+			ID:             "pkey-id",
+			Challenge:      []byte("some challenge"),
+			RelyingPartyID: "rpID",
+			CreatedAt:      now,
+			UpdatedAt:      now,
+			Type:           domain.PasskeyTypePasswordless,
+		}
+
+		_, err = userRepo.Update(t.Context(), tx,
+			userRepo.PrimaryKeyCondition(instanceID, existingUserID),
+			userRepo.Human().AddPasskey(pkey),
+		)
+		require.NoError(t, err)
+
+		pkeyVerifiedEvt := user.NewHumanPasswordlessVerifiedEvent(
+			t.Context(),
+			&existingUserAgg.Aggregate,
+			pkey.ID,
+			"some-token-name",
+			"attestation-type",
+			[]byte("key-id"),
+			[]byte("public-key-id"),
+			[]byte("authenticator-attestation-guid"),
+			33,
+			"",
+		)
+
+		// Test
+		eventReduced := callReduce(t, rawTx, handler, pkeyVerifiedEvt)
+		require.True(t, eventReduced)
+
+		// Verify
+		gotUser, err := userRepo.Get(t.Context(), tx, database.WithCondition(
+			database.And(
+				userRepo.IDCondition(existingUserID),
+				userRepo.InstanceIDCondition(instanceID),
+			),
+		))
+		require.NoError(t, err)
+		require.Len(t, gotUser.Human.Passkeys, 1)
+		gotPKey := gotUser.Human.Passkeys[0]
+		assert.Equal(t, pkeyVerifiedEvt.KeyID, gotPKey.KeyID)
+		assert.Equal(t, pkeyVerifiedEvt.PublicKey, gotPKey.PublicKey)
+		assert.Equal(t, pkeyVerifiedEvt.AttestationType, gotPKey.AttestationType)
+		assert.Equal(t, pkeyVerifiedEvt.AAGUID, gotPKey.AuthenticatorAttestationGUID)
+		assert.Equal(t, pkeyVerifiedEvt.SignCount, gotPKey.SignCount)
+		assert.Equal(t, pkeyVerifiedEvt.WebAuthNTokenName, gotPKey.Name)
+		assert.NotZero(t, gotPKey.VerifiedAt)
+	})
 }
 
 func createUser(t *testing.T,
