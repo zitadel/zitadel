@@ -42,9 +42,6 @@ type OTPSMSChallengeCommand struct {
 	smsProvider                  getActiveSMSProviderFn
 	newPhoneCode                 newOTPCodeFunc
 
-	session *Session
-	user    *User
-
 	challengeOTPSMS *SessionChallengeOTPSMS // the generated OTP SMS challenge that is stored in the session.
 	otpSMSChallenge *string                 // challenge to be set in the CreateSessionResponse
 }
@@ -117,20 +114,14 @@ func (o *OTPSMSChallengeCommand) Validate(ctx context.Context, opts *InvokeOpts)
 		return err
 	}
 
-	if retrievedUser.ID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-1bzvsh", "Errors.User.UserIDMissing")
-	}
-
 	// validate human user and user phone
-	if retrievedUser.Human == nil || retrievedUser.Human.Phone == nil {
+	if retrievedUser.Human == nil || retrievedUser.Human.Phone == nil || retrievedUser.Human.Phone.Number == "" {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-7hG2w", "Errors.NotFound.User.Human.Phone")
 	}
 	// validate phone OTP is enabled
 	if retrievedUser.Human.Phone.OTP.EnabledAt.IsZero() {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-9kL4m", "Errors.OTPSMS.NotEnabled")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-9kL4m", "Errors.User.MFA.OTP.NotReady")
 	}
-	o.session = retrievedSession
-	o.user = retrievedUser
 
 	return nil
 }
@@ -164,19 +155,9 @@ func (o *OTPSMSChallengeCommand) Execute(ctx context.Context, opts *InvokeOpts) 
 		sessionRepo.PrimaryKeyCondition(o.InstanceID, o.SessionID),
 		sessionRepo.SetChallenge(challengeOTPSMS),
 	)
-	if err != nil {
-		return zerrors.ThrowInternal(err, "DOM-AigB0Z", "session update failed")
+	if err := handleUpdateError(err, expectedUpdatedRows, updateCount, "DOM-AigB0Z", objectTypeSession); err != nil {
+		return err
 	}
-	if updateCount == 0 {
-		return zerrors.ThrowNotFound(nil, "DOM-QThZH7", "Errors.Session.NotFound")
-	}
-	if updateCount > 1 {
-		return zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(expectedUpdatedRows, updateCount), "DOM-gYp8tG", "unexpected number of rows")
-	}
-	// todo (@grvijayan): uncomment after these changes are available
-	// if err := handleUpdateError(err, expectedUpdatedRows, updated, "DOM-AigB0Z", objectTypeSession); err != nil {
-	//	return err
-	// }
 	o.challengeOTPSMS = challengeOTPSMS
 	if o.ChallengeTypeOTPSMS.ReturnCode {
 		o.otpSMSChallenge = &plain
