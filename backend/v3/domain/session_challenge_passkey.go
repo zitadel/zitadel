@@ -48,9 +48,12 @@ func NewPasskeyChallengeCommand(
 	instanceID string,
 	challengePasskey *ChallengeTypePasskey,
 	beginLoginFn beginLoginFn,
-) *PasskeyChallengeCommand {
+) (*PasskeyChallengeCommand, error) {
 
 	if beginLoginFn == nil {
+		if webauthnConfig == nil {
+			return &PasskeyChallengeCommand{}, zerrors.ThrowInternal(nil, "DOM-jwk5Pe", "begin webauthn login function not set")
+		}
 		beginLoginFn = webauthnConfig.BeginWebAuthNLogin
 	}
 	return &PasskeyChallengeCommand{
@@ -58,7 +61,7 @@ func NewPasskeyChallengeCommand(
 		SessionID:            sessionID,
 		InstanceID:           instanceID,
 		beginLogin:           beginLoginFn,
-	}
+	}, nil
 }
 
 // RequiresTransaction implements [Transactional].

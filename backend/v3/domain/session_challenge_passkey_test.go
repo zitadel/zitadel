@@ -25,40 +25,135 @@ import (
 	session_grpc "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
-func TestPasskeyChallengeCommand_Validate(t *testing.T) {
+func TestNewPasskeyChallengeCommand(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name                 string
 		sessionID            string
 		instanceID           string
 		challengeTypePasskey *domain.ChallengeTypePasskey
+		webAuthNBeginLogin   func(
+			ctx context.Context,
+			user webauthn.User,
+			rpID string,
+			userVerification protocol.UserVerificationRequirement,
+		) (sessionData *webauthn.SessionData,
+			cred []byte,
+			relyingPartyID string,
+			err error)
+		wantCmd *domain.PasskeyChallengeCommand
+		wantErr error
+	}{
+		{
+			name:       "missing begin webauthn login function",
+			sessionID:  "session-1",
+			instanceID: "instance-1",
+			challengeTypePasskey: &domain.ChallengeTypePasskey{
+				Domain:                      "example.com",
+				UserVerificationRequirement: old_domain.UserVerificationRequirementRequired,
+			},
+			wantErr: zerrors.ThrowInternal(nil, "DOM-jwk5Pe", "begin webauthn login function not set"),
+		},
+		{
+			name:       "valid passkey challenge command",
+			sessionID:  "session-1",
+			instanceID: "instance-1",
+			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
+				return &webauthn.SessionData{
+					Challenge: "Y2hhbGxlbmdl",
+				}, []byte("assertion data"), "example.com", nil
+			},
+			challengeTypePasskey: &domain.ChallengeTypePasskey{
+				Domain:                      "example.com",
+				UserVerificationRequirement: old_domain.UserVerificationRequirementRequired,
+			},
+			wantCmd: &domain.PasskeyChallengeCommand{
+				InstanceID: "instance-1",
+				SessionID:  "session-1",
+				ChallengeTypePasskey: &domain.ChallengeTypePasskey{
+					Domain:                      "example.com",
+					UserVerificationRequirement: old_domain.UserVerificationRequirementRequired,
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd, err := domain.NewPasskeyChallengeCommand(tt.sessionID, tt.instanceID, tt.challengeTypePasskey, tt.webAuthNBeginLogin)
+			if tt.wantErr != nil {
+				assert.ErrorIs(t, err, tt.wantErr)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.wantCmd.SessionID, cmd.SessionID)
+			assert.Equal(t, tt.wantCmd.InstanceID, cmd.InstanceID)
+			assert.Equal(t, tt.wantCmd.ChallengeTypePasskey, cmd.ChallengeTypePasskey)
+		})
+	}
+}
+
+func TestPasskeyChallengeCommand_Validate(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name               string
+		sessionID          string
+		instanceID         string
+		webAuthNBeginLogin func(
+			ctx context.Context,
+			user webauthn.User,
+			rpID string,
+			userVerification protocol.UserVerificationRequirement,
+		) (sessionData *webauthn.SessionData,
+			cred []byte,
+			relyingPartyID string,
+			err error)
+		challengeTypePasskey *domain.ChallengeTypePasskey
 		userRepo             func(ctrl *gomock.Controller) domain.UserRepository
 		sessionRepo          func(ctrl *gomock.Controller) domain.SessionRepository
 		wantErr              error
 	}{
 		{
-			name:                 "no request passkey challenge",
-			challengeTypePasskey: nil,
-			wantErr:              nil,
+			name: "no request passkey challenge",
+			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
+				return &webauthn.SessionData{
+					Challenge: "Y2hhbGxlbmdl",
+				}, []byte("assertion data"), "example.com", nil
+			},
 		},
 		{
 			name:                 "no session id",
 			challengeTypePasskey: &domain.ChallengeTypePasskey{},
 			sessionID:            "",
-			wantErr:              zerrors.ThrowPreconditionFailed(nil, "DOM-EVo5yE", "Errors.Missing.SessionID"),
+			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
+				return &webauthn.SessionData{
+					Challenge: "Y2hhbGxlbmdl",
+				}, []byte("assertion data"), "example.com", nil
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-EVo5yE", "Errors.Missing.SessionID"),
 		},
 		{
 			name:                 "no instance id",
 			challengeTypePasskey: &domain.ChallengeTypePasskey{},
 			sessionID:            "session-1",
 			instanceID:           "",
-			wantErr:              zerrors.ThrowPreconditionFailed(nil, "DOM-sh8xvQ", "Errors.Missing.InstanceID"),
+			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
+				return &webauthn.SessionData{
+					Challenge: "Y2hhbGxlbmdl",
+				}, []byte("assertion data"), "example.com", nil
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-sh8xvQ", "Errors.Missing.InstanceID"),
 		},
 		{
 			name:                 "failed to fetch session",
 			challengeTypePasskey: &domain.ChallengeTypePasskey{},
 			sessionID:            "session-1",
 			instanceID:           "instance-1",
+			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
+				return &webauthn.SessionData{
+					Challenge: "Y2hhbGxlbmdl",
+				}, []byte("assertion data"), "example.com", nil
+			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
@@ -78,6 +173,11 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 			challengeTypePasskey: &domain.ChallengeTypePasskey{},
 			sessionID:            "session-1",
 			instanceID:           "instance-1",
+			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
+				return &webauthn.SessionData{
+					Challenge: "Y2hhbGxlbmdl",
+				}, []byte("assertion data"), "example.com", nil
+			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
@@ -97,6 +197,11 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 			challengeTypePasskey: &domain.ChallengeTypePasskey{},
 			sessionID:            "session-1",
 			instanceID:           "instance-1",
+			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
+				return &webauthn.SessionData{
+					Challenge: "Y2hhbGxlbmdl",
+				}, []byte("assertion data"), "example.com", nil
+			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				repo.EXPECT().
@@ -118,6 +223,11 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 			challengeTypePasskey: &domain.ChallengeTypePasskey{},
 			sessionID:            "session-1",
 			instanceID:           "instance-1",
+			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
+				return &webauthn.SessionData{
+					Challenge: "Y2hhbGxlbmdl",
+				}, []byte("assertion data"), "example.com", nil
+			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				getSessionSucceededExpectation(repo)
@@ -154,6 +264,11 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 			challengeTypePasskey: &domain.ChallengeTypePasskey{},
 			sessionID:            "session-1",
 			instanceID:           "instance-1",
+			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
+				return &webauthn.SessionData{
+					Challenge: "Y2hhbGxlbmdl",
+				}, []byte("assertion data"), "example.com", nil
+			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				getSessionSucceededExpectation(repo)
@@ -189,6 +304,11 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 			challengeTypePasskey: &domain.ChallengeTypePasskey{},
 			sessionID:            "session-1",
 			instanceID:           "instance-1",
+			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
+				return &webauthn.SessionData{
+					Challenge: "Y2hhbGxlbmdl",
+				}, []byte("assertion data"), "example.com", nil
+			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				getSessionSucceededExpectation(repo)
@@ -224,6 +344,11 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 			challengeTypePasskey: &domain.ChallengeTypePasskey{},
 			sessionID:            "session-1",
 			instanceID:           "instance-1",
+			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
+				return &webauthn.SessionData{
+					Challenge: "Y2hhbGxlbmdl",
+				}, []byte("assertion data"), "example.com", nil
+			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				getSessionSucceededExpectation(repo)
@@ -262,6 +387,11 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 			challengeTypePasskey: &domain.ChallengeTypePasskey{},
 			sessionID:            "session-1",
 			instanceID:           "instance-1",
+			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
+				return &webauthn.SessionData{
+					Challenge: "Y2hhbGxlbmdl",
+				}, []byte("assertion data"), "example.com", nil
+			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				getSessionSucceededExpectation(repo)
@@ -277,12 +407,14 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 			t.Parallel()
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
-			cmd := domain.NewPasskeyChallengeCommand(
+			cmd, err := domain.NewPasskeyChallengeCommand(
 				tt.sessionID,
 				tt.instanceID,
 				tt.challengeTypePasskey,
-				nil,
+				tt.webAuthNBeginLogin,
 			)
+			require.NoError(t, err)
+
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),
 			}
@@ -292,7 +424,7 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 			if tt.sessionRepo != nil {
 				domain.WithSessionRepo(tt.sessionRepo(ctrl))(opts)
 			}
-			err := cmd.Validate(ctx, opts)
+			err = cmd.Validate(ctx, opts)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}
@@ -305,18 +437,29 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 	credentialAssertionDataPreferred := []byte(`{"publicKey":{"challenge":"Y2hhbGxlbmdl","timeout":60000,"rpId":"example.com","allowCredentials":[{"type":"public-key","id":"cGFzc2tleS1pZA"}],"userVerification":"preferred"}}`)
 
 	tests := []struct {
-		name                  string
-		challengeTypePasskey  *domain.ChallengeTypePasskey
-		sessionRepo           func(ctrl *gomock.Controller) domain.SessionRepository
-		userRepo              func(ctrl *gomock.Controller) domain.UserRepository
-		webAuthNBeginLogin    func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error)
+		name                 string
+		challengeTypePasskey *domain.ChallengeTypePasskey
+		sessionRepo          func(ctrl *gomock.Controller) domain.SessionRepository
+		userRepo             func(ctrl *gomock.Controller) domain.UserRepository
+		webAuthNBeginLogin   func(
+			ctx context.Context,
+			user webauthn.User,
+			rpID string,
+			userVerification protocol.UserVerificationRequirement,
+		) (sessionData *webauthn.SessionData,
+			cred []byte,
+			relyingPartyID string,
+			err error)
 		wantErr               error
 		wantWebAuthNChallenge *session_grpc.Challenges_WebAuthN
 	}{
 		{
-			name:                 "no request passkey challenge",
-			challengeTypePasskey: nil,
-			wantErr:              nil,
+			name: "no request passkey challenge",
+			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
+				return &webauthn.SessionData{
+					Challenge: "Y2hhbGxlbmdl",
+				}, credentialAssertionDataPreferred, "example.com", nil
+			},
 		},
 		{
 			name: "failed to begin webauthn login",
@@ -552,12 +695,14 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 			t.Parallel()
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
-			cmd := domain.NewPasskeyChallengeCommand(
+			cmd, err := domain.NewPasskeyChallengeCommand(
 				"session-1",
 				"instance-1",
 				tt.challengeTypePasskey,
 				tt.webAuthNBeginLogin,
 			)
+			require.NoError(t, err)
+
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),
 			}
@@ -569,8 +714,8 @@ func TestPasskeyChallengeCommand_Execute(t *testing.T) {
 			}
 
 			// to fetch/validate session and user before calling Execute
-			err := cmd.Validate(ctx, opts)
-			assert.NoError(t, err)
+			err = cmd.Validate(ctx, opts)
+			require.NoError(t, err)
 
 			err = cmd.Execute(ctx, opts)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -589,12 +734,25 @@ func TestPasskeyChallengeCommand_Events(t *testing.T) {
 		challengeTypePasskey *domain.ChallengeTypePasskey
 		sessionRepo          func(ctrl *gomock.Controller) domain.SessionRepository
 		userRepo             func(ctrl *gomock.Controller) domain.UserRepository
-		webAuthNBeginLogin   func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error)
-		wantEvent            eventstore.Command
-		wantErr              error
+		webAuthNBeginLogin   func(
+			ctx context.Context,
+			user webauthn.User,
+			rpID string,
+			userVerification protocol.UserVerificationRequirement,
+		) (sessionData *webauthn.SessionData,
+			cred []byte,
+			relyingPartyID string,
+			err error)
+		wantEvent eventstore.Command
+		wantErr   error
 	}{
 		{
 			name: "no request passkey challenge",
+			webAuthNBeginLogin: func(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
+				return &webauthn.SessionData{
+					Challenge: "Y2hhbGxlbmdl",
+				}, []byte("assertion data"), "example.com", nil
+			},
 		},
 		{
 			name: "valid request passkey challenge - preferred user verification",
@@ -734,12 +892,14 @@ func TestPasskeyChallengeCommand_Events(t *testing.T) {
 			t.Parallel()
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
-			cmd := domain.NewPasskeyChallengeCommand(
+			cmd, err := domain.NewPasskeyChallengeCommand(
 				"session-1",
 				"instance-1",
 				tt.challengeTypePasskey,
 				tt.webAuthNBeginLogin,
 			)
+			require.NoError(t, err)
+
 			opts := &domain.InvokeOpts{
 				Invoker: domain.NewTransactionInvoker(nil),
 			}
@@ -751,12 +911,12 @@ func TestPasskeyChallengeCommand_Events(t *testing.T) {
 			}
 
 			// to fetch/validate session and user before calling Execute
-			err := cmd.Validate(ctx, opts)
-			assert.NoError(t, err)
+			err = cmd.Validate(ctx, opts)
+			require.NoError(t, err)
 
 			// to update session before calling Execute
 			err = cmd.Execute(ctx, opts)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			events, err := cmd.Events(ctx, opts)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -775,7 +935,7 @@ func getChallengePasskey(t *testing.T, data []byte) *session_grpc.Challenges_Web
 		PublicKeyCredentialRequestOptions: new(structpb.Struct),
 	}
 	err := json.Unmarshal(data, webAuthNChallenge.PublicKeyCredentialRequestOptions)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	return webAuthNChallenge
 }
