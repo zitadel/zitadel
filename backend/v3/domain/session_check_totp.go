@@ -209,6 +209,7 @@ func (t *TOTPCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 		database.WithCondition(
 			userRepo.PrimaryKeyCondition(t.InstanceID, session.UserID),
 		),
+		// TODO(IAM-Marco): This might not work if we do manual transaction management. See https://github.com/zitadel/zitadel/pull/11886#discussion_r3014948862
 		database.WithResultLock(),
 	)
 	if err := handleGetError(err, "DOM-PZvWq0", "user"); err != nil {
@@ -226,7 +227,7 @@ func (t *TOTPCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-b44CWR", "Errors.User.NoTOTPSecret")
 	}
 
-	if user.Human.TOTP.LastSuccessfullyCheckedAt == nil {
+	if user.Human.TOTP.VerifiedAt.IsZero() {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-0g4ZAU", "Errors.User.MFA.OTP.NotReady")
 	}
 

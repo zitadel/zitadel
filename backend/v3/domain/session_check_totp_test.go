@@ -263,7 +263,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 						dbmock.QueryOptions(database.WithCondition(idCondition))).
 					Return(&domain.User{
 						State: domain.UserStateLocked,
-						Human: &domain.HumanUser{TOTP: &domain.HumanTOTP{Secret: &crypto.CryptoValue{}, LastSuccessfullyCheckedAt: &now}},
+						Human: &domain.HumanUser{TOTP: &domain.HumanTOTP{Secret: &crypto.CryptoValue{}, VerifiedAt: now}},
 					}, nil)
 				return repo
 			},
@@ -292,9 +292,9 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 						State: domain.UserStateActive,
 						Human: &domain.HumanUser{
 							TOTP: &domain.HumanTOTP{
-								LastSuccessfullyCheckedAt: &now,
-								Secret:                    &crypto.CryptoValue{Crypted: []byte("123456")},
-								FailedAttempts:            0,
+								VerifiedAt:     now,
+								Secret:         &crypto.CryptoValue{Crypted: []byte("123456")},
+								FailedAttempts: 0,
 							},
 						},
 					}, nil)
@@ -305,9 +305,9 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 				State: domain.UserStateActive,
 				Human: &domain.HumanUser{
 					TOTP: &domain.HumanTOTP{
-						LastSuccessfullyCheckedAt: &now,
-						Secret:                    &crypto.CryptoValue{Crypted: []byte("123456")},
-						FailedAttempts:            0,
+						VerifiedAt:     now,
+						Secret:         &crypto.CryptoValue{Crypted: []byte("123456")},
+						FailedAttempts: 0,
 					},
 				},
 			},
