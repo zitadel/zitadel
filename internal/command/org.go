@@ -327,6 +327,26 @@ func (c *Commands) getOrg(ctx context.Context, orgID string) (*domain.Org, error
 	return orgWriteModelToOrg(writeModel), nil
 }
 
+func checkOrgExistsInPreparation(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) error {
+	orgWriteModel := NewOrgWriteModel(orgID)
+
+	events, err := filter(ctx, orgWriteModel.Query())
+	if err != nil {
+		return err
+	}
+
+	orgWriteModel.AppendEvents(events...)
+	if err = orgWriteModel.Reduce(); err != nil {
+		return err
+	}
+
+	if !isOrgStateExists(orgWriteModel.State) {
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-QXPGs", "Errors.Org.NotFound")
+	}
+
+	return nil
+}
+
 func (c *Commands) checkOrgExists(ctx context.Context, orgID string) error {
 	orgWriteModel, err := c.getOrgWriteModelByID(ctx, orgID)
 	if err != nil {

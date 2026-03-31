@@ -1320,17 +1320,11 @@ func updateHumanUserFailedExpectation(ctrl *gomock.Controller, userRepo *domainm
 		userUpdates = append(userUpdates, humanRepo.SetState(domain.UserStateLocked))
 	}
 	userRepo.EXPECT().Human().Times(1).Return(humanRepo)
-	if err != nil {
-		humanRepo.EXPECT().
-			Update(gomock.Any(), gomock.Any(), primaryKeyCondition, userUpdates).
-			Times(1).
-			Return(int64(0), err)
-		return
-	}
+
 	humanRepo.EXPECT().
 		Update(gomock.Any(), gomock.Any(), primaryKeyCondition, userUpdates).
 		Times(1).
-		Return(updateCount, nil)
+		Return(updateCount, err)
 }
 
 func getUserSucceededExpectation(userRepo *domainmock.UserRepo, failedAttempts uint8) {
@@ -1363,17 +1357,10 @@ func updateSessionSucceededExpectation(sessionRepo *domainmock.SessionRepo, chan
 
 func updateSessionFailedExpectation(sessionRepo *domainmock.SessionRepo, change database.Change, err error, updateCount int64) {
 	primaryKeyCondition := sessionRepo.PrimaryKeyCondition("instance-1", "session-1")
-	if err != nil {
-		sessionRepo.EXPECT().
-			Update(gomock.Any(), gomock.Any(), primaryKeyCondition, change).
-			Times(1).
-			Return(updateCount, err)
-		return
-	}
 	sessionRepo.EXPECT().
 		Update(gomock.Any(), gomock.Any(), primaryKeyCondition, change).
 		Times(1).
-		Return(updateCount, nil)
+		Return(updateCount, err)
 }
 
 func getSessionSucceededExpectation(sessionRepo *domainmock.SessionRepo) {

@@ -1320,7 +1320,6 @@ DefaultInstance:
   Features:
     LoginDefaultOrg: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINDEFAULTORG
     UserSchema: # ZITADEL_DEFAULTINSTANCE_FEATURES_USERSCHEMA
-    TokenExchange: # ZITADEL_DEFAULTINSTANCE_FEATURES_TOKENEXCHANGE
     ImprovedPerformance: # ZITADEL_DEFAULTINSTANCE_FEATURES_IMPROVEDPERFORMANCE
     # https://github.com/zitadel/zitadel/blob/main/internal/feature/feature.go#L64-L68
     #   - 1 # OrgByID
