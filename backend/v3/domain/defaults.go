@@ -5,6 +5,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/webauthn"
 )
 
 var (
@@ -16,6 +17,7 @@ var (
 	sessionTokenDecryptor       SessionTokenDecryptor
 	mfaEncryptionAlgo           crypto.EncryptionAlgorithm
 	otpSMSSecretGeneratorConfig *crypto.GeneratorConfig
+	webauthnConfig              *webauthn.Config
 )
 
 func SetPool(p database.Pool) {
@@ -48,4 +50,8 @@ func SetOTPSMSSecretGeneratorConfig(cfg *crypto.GeneratorConfig) {
 
 func SetMFAEncryptionAlgorithm(mfaEncryptionAlg crypto.EncryptionAlgorithm) {
 	mfaEncryptionAlgo = mfaEncryptionAlg
+}
+
+func SetWebAuthNConfig(cfg *webauthn.Config) {
+	webauthnConfig = cfg
 }
