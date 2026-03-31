@@ -52,7 +52,7 @@ func NewPasskeyChallengeCommand(
 
 	if beginLoginFn == nil {
 		if webauthnConfig == nil {
-			return &PasskeyChallengeCommand{}, zerrors.ThrowInternal(nil, "DOM-jwk5Pe", "begin webauthn login function not set")
+			return nil, zerrors.ThrowInternal(nil, "DOM-jwk5Pe", "begin webauthn login function not set")
 		}
 		beginLoginFn = webauthnConfig.BeginWebAuthNLogin
 	}
