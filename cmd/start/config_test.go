@@ -147,34 +147,6 @@ Actions:
 			})
 		},
 	}, {
-		name: "login client key file ok",
-		args: args{yaml: `
-LoginClient:
-  KeyFile: /path/to/cert.pem
-Log:
-  Level: info
-Actions:
-  HTTP:
-    DenyList: []
-`},
-		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, "/path/to/cert.pem", config.LoginClient.KeyFile)
-		},
-	}, {
-		name: "admin client key file ok",
-		args: args{yaml: `
-AdminClient:
-  KeyFile: /path/to/admin-cert.pem
-Log:
-  Level: info
-Actions:
-  HTTP:
-    DenyList: []
-`},
-		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, "/path/to/admin-cert.pem", config.AdminClient.KeyFile)
-		},
-	}, {
 		name: "headers ok",
 		args: args{yaml: `
 Telemetry:
@@ -315,40 +287,4 @@ Actions:
 			tt.want(t, got)
 		})
 	}
-}
-
-func Test_addSystemAPIUser(t *testing.T) {
-	t.Run("no-op when keyFile is empty", func(t *testing.T) {
-		users := make(map[string]*authz.SystemAPIUser)
-		err := addSystemAPIUser(&users, "", "login-client", "ZITADEL_LOGINCLIENT_KEYFILE", "LoginClient.KeyFile", []string{"IAM_LOGIN_CLIENT"})
-		require.NoError(t, err)
-		assert.Empty(t, users)
-	})
-
-	t.Run("lazily initialises nil map", func(t *testing.T) {
-		var users map[string]*authz.SystemAPIUser
-		err := addSystemAPIUser(&users, "/path/to/cert.pem", "login-client", "ZITADEL_LOGINCLIENT_KEYFILE", "LoginClient.KeyFile", []string{"IAM_LOGIN_CLIENT"})
-		require.NoError(t, err)
-		require.Contains(t, users, "login-client")
-		assert.Equal(t, "/path/to/cert.pem", users["login-client"].Path)
-	})
-
-	t.Run("adds entry with expected roles", func(t *testing.T) {
-		users := make(map[string]*authz.SystemAPIUser)
-		err := addSystemAPIUser(&users, "/path/to/cert.pem", "login-client", "ZITADEL_LOGINCLIENT_KEYFILE", "LoginClient.KeyFile", []string{"IAM_LOGIN_CLIENT"})
-		require.NoError(t, err)
-		require.Contains(t, users, "login-client")
-		assert.Equal(t, "/path/to/cert.pem", users["login-client"].Path)
-		assert.Equal(t, []string{"IAM_LOGIN_CLIENT"}, users["login-client"].Memberships[0].Roles)
-	})
-
-	t.Run("errors when entry already exists", func(t *testing.T) {
-		users := map[string]*authz.SystemAPIUser{
-			"login-client": {Path: "/existing.pem"},
-		}
-		err := addSystemAPIUser(&users, "/new.pem", "login-client", "ZITADEL_LOGINCLIENT_KEYFILE", "LoginClient.KeyFile", []string{"IAM_LOGIN_CLIENT"})
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "ZITADEL_LOGINCLIENT_KEYFILE")
-		assert.Contains(t, err.Error(), "login-client")
-	})
 }

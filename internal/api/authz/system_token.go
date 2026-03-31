@@ -86,8 +86,6 @@ type SystemAPIUser struct {
 	Path        string // if a path is specified, the key/cert will be read from that path
 	KeyData     []byte // else you can also specify the data directly in the KeyData
 	Memberships Memberships
-	NotBefore   *time.Time
-	NotAfter    *time.Time
 }
 
 type SystemAPIPublicKey struct {

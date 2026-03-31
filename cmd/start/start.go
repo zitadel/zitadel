@@ -448,18 +448,6 @@ func startAPIs(
 		// always set the origin in the context if available in the http headers, no matter for what protocol
 		middleware.WithOrigin(config.ExternalSecure, config.HTTP1HostHeader, config.HTTP2HostHeader, config.InstanceHostHeaders, config.PublicHostHeaders),
 	)
-	if err := addSystemAPIUser(&config.SystemAPIUsers, config.LoginClient.KeyFile, "login-client",
-		"ZITADEL_LOGINCLIENT_KEYFILE", "LoginClient.KeyFile",
-		[]string{"IAM_LOGIN_CLIENT"},
-	); err != nil {
-		return nil, err
-	}
-	if err := addSystemAPIUser(&config.SystemAPIUsers, config.AdminClient.KeyFile, "admin-client",
-		"ZITADEL_ADMINCLIENT_KEYFILE", "AdminClient.KeyFile",
-		[]string{"IAM_OWNER"},
-	); err != nil {
-		return nil, err
-	}
 	systemTokenVerifier, err := internal_authz.StartSystemTokenVerifierFromConfig(http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
 	if err != nil {
 		return nil, err
@@ -829,30 +817,6 @@ func showBasicInformation(startConfig *Config) {
 		fmt.Printf(" Visit: %s    \n", color.CyanString("https://zitadel.com/docs/self-hosting/manage/tls_modes"))
 	}
 	fmt.Printf("\n ===============================================================\n\n")
-}
-
-// addSystemAPIUser registers a system API user from a key file path into the
-// SystemAPIUsers map. It lazily initialises the map on first use. It is a
-// no-op if keyFile is empty. Returns an error if the entry already exists (to
-// prevent silent overrides).
-func addSystemAPIUser(users *map[string]*internal_authz.SystemAPIUser, keyFile, name, envVar, configKey string, roles []string) error {
-	if keyFile == "" {
-		return nil
-	}
-	if *users == nil {
-		*users = make(map[string]*internal_authz.SystemAPIUser)
-	}
-	if _, exists := (*users)[name]; exists {
-		return fmt.Errorf("cannot use %s (%s): SystemAPIUsers already contains a %q entry", envVar, configKey, name)
-	}
-	(*users)[name] = &internal_authz.SystemAPIUser{
-		Path: keyFile,
-		Memberships: internal_authz.Memberships{{
-			MemberType: internal_authz.MemberTypeSystem,
-			Roles:      roles,
-		}},
-	}
-	return nil
 }
 
 func checkExisting(values []string) func(string) bool {

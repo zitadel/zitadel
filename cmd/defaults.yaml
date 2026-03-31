@@ -831,26 +831,6 @@ SystemAPIUsers:
 #     KeyData: <base64 encoded key>     # or you can directly embed it as base64 encoded value or X.509 certificate contents
 # Configure the SystemAPIUsers by environment variable using JSON notation:
 # ZITADEL_SYSTEMAPIUSERS='{"systemuser":{"Path":"/path/to/superuser/key.pem"},"systemuser2":{"KeyData":"<base64 encoded key>"}}'
-# Or configure system API users with simple environment variables (useful for Kubernetes):
-#
-# NOTE: This top-level LoginClient is for system API user JWT verification only.
-# It is NOT the DefaultInstance.Org.LoginClient machine user configuration defined below.
-#
-# Login client (registers user "login-client" with IAM_LOGIN_CLIENT role):
-# In the API container, ZITADEL_LOGINCLIENT_KEYFILE must point to the public certificate/key
-# (e.g. /path/to/login-client.crt.pem) used for JWT verification.
-# In the login container, ZITADEL_LOGINCLIENT_KEYFILE must point to the corresponding private
-# key (e.g. /path/to/login-client-key.pem) used for signing.
-# Do not share the same file across both containers via a single .env file.
-# API example: ZITADEL_LOGINCLIENT_KEYFILE=/path/to/login-client.crt.pem
-LoginClient:
-  KeyFile: # ZITADEL_LOGINCLIENT_KEYFILE (API: public certificate/key for JWT verification)
-#
-# Admin client (registers user "admin-client" with IAM_OWNER role):
-# Points to the public certificate or public key used by the API to verify admin-client JWTs.
-# ZITADEL_ADMINCLIENT_KEYFILE=/path/to/admin-client-cert.pem
-AdminClient:
-  KeyFile: # ZITADEL_ADMINCLIENT_KEYFILE (public certificate/key for JWT verification)
 
 SystemDefaults:
   SecretGenerators:
