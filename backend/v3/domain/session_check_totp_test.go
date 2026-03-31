@@ -28,6 +28,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 	sessionGetErr := errors.New("session get error")
 	userGetErr := errors.New("user get error")
 	notFoundErr := database.NewNoRowFoundError(nil)
+	now := time.Now()
 
 	tt := []struct {
 		testName    string
@@ -217,7 +218,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-b44CWR", "Errors.User.NoTOTPSecret"),
 		},
 		{
-			testName: "when user is locked should return precondition failed error",
+			testName: "when TOTP is not successfully checked should return precondition error",
 			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
@@ -237,6 +238,32 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 					Return(&domain.User{
 						State: domain.UserStateLocked,
 						Human: &domain.HumanUser{TOTP: &domain.HumanTOTP{Secret: &crypto.CryptoValue{}}},
+					}, nil)
+				return repo
+			},
+			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-0g4ZAU", "Errors.User.MFA.OTP.NotReady"),
+		},
+		{
+			testName: "when user is locked should return precondition failed error",
+			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
+			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
+				repo := domainmock.NewSessionRepo(ctrl)
+				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
+				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any(),
+						dbmock.QueryOptions(database.WithCondition(idCondition))).
+					Return(&domain.Session{UserID: "user-1"}, nil)
+				return repo
+			},
+			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
+				repo := domainmock.NewUserRepo(ctrl)
+				idCondition := repo.PrimaryKeyCondition("instance-1", "user-1")
+				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any(),
+						dbmock.QueryOptions(database.WithCondition(idCondition))).
+					Return(&domain.User{
+						State: domain.UserStateLocked,
+						Human: &domain.HumanUser{TOTP: &domain.HumanTOTP{Secret: &crypto.CryptoValue{}, LastSuccessfullyCheckedAt: &now}},
 					}, nil)
 				return repo
 			},
@@ -265,8 +292,9 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 						State: domain.UserStateActive,
 						Human: &domain.HumanUser{
 							TOTP: &domain.HumanTOTP{
-								Secret:         &crypto.CryptoValue{Crypted: []byte("123456")},
-								FailedAttempts: 0,
+								LastSuccessfullyCheckedAt: &now,
+								Secret:                    &crypto.CryptoValue{Crypted: []byte("123456")},
+								FailedAttempts:            0,
 							},
 						},
 					}, nil)
@@ -277,8 +305,9 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 				State: domain.UserStateActive,
 				Human: &domain.HumanUser{
 					TOTP: &domain.HumanTOTP{
-						Secret:         &crypto.CryptoValue{Crypted: []byte("123456")},
-						FailedAttempts: 0,
+						LastSuccessfullyCheckedAt: &now,
+						Secret:                    &crypto.CryptoValue{Crypted: []byte("123456")},
+						FailedAttempts:            0,
 					},
 				},
 			},

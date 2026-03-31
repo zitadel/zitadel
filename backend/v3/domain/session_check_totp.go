@@ -217,6 +217,10 @@ func (t *TOTPCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-b44CWR", "Errors.User.NoTOTPSecret")
 	}
 
+	if user.Human.TOTP.LastSuccessfullyCheckedAt == nil {
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-0g4ZAU", "Errors.User.MFA.OTP.NotReady")
+	}
+
 	if user.State == UserStateLocked {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-gM4SUh", "Errors.User.Locked")
 	}
