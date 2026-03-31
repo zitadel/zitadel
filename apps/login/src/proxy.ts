@@ -39,25 +39,46 @@ export async function proxy(request: NextRequest) {
     requestHeaders.set("x-zitadel-i18n-organization", organization);
   }
 
-  // The /security route is an internal API used by this middleware — skip it entirely to prevent a loop
-  if (request.nextUrl.pathname === "/security") {
+  // Internal infrastructure routes — skip middleware entirely.
+  // /security is the internal API this middleware fetches (loop prevention).
+  // /healthy and /ready are Kubernetes/Docker health probes that must respond
+  // without depending on a ZITADEL backend.
+  const skipPaths = ["/security", "/healthy", "/ready"];
+  if (skipPaths.includes(request.nextUrl.pathname)) {
     return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
-  const _headers = await headers();
-  const { serviceConfig } = getServiceConfig(_headers);
-  const securitySettings = await loadSecuritySettings(request);
-
-  const iframeOrigins =
-    securitySettings?.embeddedIframe?.enabled && securitySettings.embeddedIframe.allowedOrigins.length > 0
-      ? securitySettings.embeddedIframe.allowedOrigins
-      : undefined;
-
-  // Build security response headers (shared by all routes)
+  // Build security response headers (shared by all routes).
+  // Wrapped in try/catch so the middleware gracefully degrades with a default
+  // CSP when the ZITADEL backend is unavailable (e.g. during container startup).
   const responseHeaders = new Headers();
-  responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: serviceConfig.baseUrl, iframeOrigins }));
+  let publicHost: string | undefined;
+  let instanceHost: string | undefined;
+  let baseUrl: string | undefined;
 
-  if (!iframeOrigins) {
+  try {
+    const _headers = await headers();
+    const { serviceConfig } = getServiceConfig(_headers);
+    publicHost = serviceConfig.publicHost;
+    instanceHost = serviceConfig.instanceHost;
+    baseUrl = serviceConfig.baseUrl;
+
+    const securitySettings = await loadSecuritySettings(request);
+    const iframeOrigins =
+      securitySettings?.embeddedIframe?.enabled && securitySettings.embeddedIframe.allowedOrigins.length > 0
+        ? securitySettings.embeddedIframe.allowedOrigins
+        : undefined;
+
+    responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: baseUrl, iframeOrigins }));
+
+    if (!iframeOrigins) {
+      responseHeaders.set("X-Frame-Options", "deny");
+    }
+  } catch (err) {
+    logger.error("Failed to load security settings for CSP, using default CSP", {
+      error: err instanceof Error ? err.message : String(err),
+    });
+    responseHeaders.set("Content-Security-Policy", buildCSP());
     responseHeaders.set("X-Frame-Options", "deny");
   }
 
@@ -73,17 +94,17 @@ export async function proxy(request: NextRequest) {
   }
 
   // Proxy-specific headers
-  if (serviceConfig.publicHost) {
-    requestHeaders.set("x-zitadel-public-host", serviceConfig.publicHost);
+  if (publicHost) {
+    requestHeaders.set("x-zitadel-public-host", publicHost);
   }
-  if (serviceConfig.instanceHost) {
-    requestHeaders.set("x-zitadel-instance-host", serviceConfig.instanceHost);
+  if (instanceHost) {
+    requestHeaders.set("x-zitadel-instance-host", instanceHost);
   }
 
   responseHeaders.set("Access-Control-Allow-Origin", "*");
   responseHeaders.set("Access-Control-Allow-Headers", "*");
 
-  request.nextUrl.href = `${serviceConfig.baseUrl}${request.nextUrl.pathname}${request.nextUrl.search}`;
+  request.nextUrl.href = `${baseUrl}${request.nextUrl.pathname}${request.nextUrl.search}`;
 
   return NextResponse.rewrite(request.nextUrl, {
     request: {
