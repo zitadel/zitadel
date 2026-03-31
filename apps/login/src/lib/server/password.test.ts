@@ -9,6 +9,7 @@ vi.mock("next/headers", () => ({
 
 vi.mock("@zitadel/client", () => ({
   create: vi.fn(),
+  Code: { FailedPrecondition: 9 },
   ConnectError: class extends Error {
     code: number;
     constructor(msg: string, code: number) {
@@ -272,7 +273,8 @@ describe("checkSessionAndSetPassword", () => {
   });
 
   test("should handle setPassword failure with failed precondition", async () => {
-    mockSetPassword.mockRejectedValue({ code: 9, message: "User is not yet initialized" });
+    const { ConnectError } = await import("@zitadel/client");
+    mockSetPassword.mockRejectedValue(new ConnectError("User is not yet initialized", 9));
 
     const result = await checkSessionAndSetPassword({
       sessionId: "session123",
