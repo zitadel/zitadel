@@ -79,7 +79,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 			challengeTypeOTPEmail: &domain.ChallengeTypeOTPEmail{
 				DeliveryType: domain.DeliveryType{
 					SendCode: &domain.SendCode{
-						URLTemplate: gu.Ptr("http://{{.Invalid"),
+						URLTemplate: "http://{{.Invalid",
 					},
 				},
 			},
@@ -94,7 +94,7 @@ func TestOTPEmailChallengeCommand_Validate(t *testing.T) {
 			challengeTypeOTPEmail: &domain.ChallengeTypeOTPEmail{
 				DeliveryType: domain.DeliveryType{
 					SendCode: &domain.SendCode{
-						URLTemplate: gu.Ptr("https://example.com"),
+						URLTemplate: "https://example.com",
 					},
 				},
 			},
@@ -570,7 +570,7 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 			challengeTypeOTPEmail: &domain.ChallengeTypeOTPEmail{
 				DeliveryType: domain.DeliveryType{
 					SendCode: &domain.SendCode{
-						URLTemplate: gu.Ptr("http://example.com"),
+						URLTemplate: "http://example.com",
 					},
 				},
 			},
@@ -705,7 +705,7 @@ func TestOTPEmailChallengeCommand_Execute(t *testing.T) {
 			challengeTypeOTPEmail: &domain.ChallengeTypeOTPEmail{
 				DeliveryType: domain.DeliveryType{
 					SendCode: &domain.SendCode{
-						URLTemplate: gu.Ptr("http://example.com"),
+						URLTemplate: "http://example.com",
 					},
 				},
 			},
@@ -976,7 +976,7 @@ func TestOTPEmailChallengeCommand_Events(t *testing.T) {
 			challengeTypeOTPEmail: &domain.ChallengeTypeOTPEmail{
 				DeliveryType: domain.DeliveryType{
 					SendCode: &domain.SendCode{
-						URLTemplate: gu.Ptr("https://example.com"),
+						URLTemplate: "https://example.com",
 					},
 				},
 			},

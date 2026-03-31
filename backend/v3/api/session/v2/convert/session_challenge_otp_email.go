@@ -16,7 +16,7 @@ func ChallengeOTPEmailGRPCToDomain(otpEmailChallenge *session_grpc.RequestChalle
 		return &domain.ChallengeTypeOTPEmail{
 			DeliveryType: domain.DeliveryType{
 				SendCode: &domain.SendCode{
-					URLTemplate: t.SendCode.UrlTemplate,
+					URLTemplate: t.SendCode.GetUrlTemplate(),
 				},
 			},
 		}, nil

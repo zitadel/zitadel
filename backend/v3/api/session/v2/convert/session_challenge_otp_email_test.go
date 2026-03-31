@@ -45,7 +45,7 @@ func TestChallengeOTPEmailGRPCToDomain(t *testing.T) {
 			want: &domain.ChallengeTypeOTPEmail{
 				DeliveryType: domain.DeliveryType{
 					SendCode: &domain.SendCode{
-						URLTemplate: gu.Ptr("https://example.com/otp"),
+						URLTemplate: "https://example.com/otp",
 					},
 				},
 			},

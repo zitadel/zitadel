@@ -6,7 +6,6 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/muhlemmer/gu"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -21,7 +20,7 @@ var _ Commander = (*OTPEmailChallengeCommand)(nil)
 var _ Transactional = (*OTPEmailChallengeCommand)(nil)
 
 type SendCode struct {
-	URLTemplate *string
+	URLTemplate string
 }
 
 type DeliveryType struct {
@@ -201,7 +200,7 @@ func (o *OTPEmailChallengeCommand) prepareOTPEmailChallenge(ctx context.Context,
 	var otpEmailChallenge string
 	switch {
 	case o.ChallengeTypeOTPEmail.DeliveryType.SendCode != nil:
-		challengeOTPEmail.URLTemplate = gu.Value(o.ChallengeTypeOTPEmail.DeliveryType.SendCode.URLTemplate)
+		challengeOTPEmail.URLTemplate = o.ChallengeTypeOTPEmail.DeliveryType.SendCode.URLTemplate
 	case o.ChallengeTypeOTPEmail.DeliveryType.ReturnCode:
 		challengeOTPEmail.CodeReturned = true
 		otpEmailChallenge = plain
@@ -267,8 +266,8 @@ func (o *OTPEmailChallengeCommand) validatePreConditions() error {
 
 	// validate the URL template
 	if sc := o.ChallengeTypeOTPEmail.DeliveryType.SendCode; sc != nil {
-		if urlTemplate := gu.Value(sc.URLTemplate); urlTemplate != "" {
-			if err := validateURLTemplate(io.Discard, urlTemplate); err != nil {
+		if sc.URLTemplate != "" {
+			if err := validateURLTemplate(io.Discard, sc.URLTemplate); err != nil {
 				return err
 			}
 		}
