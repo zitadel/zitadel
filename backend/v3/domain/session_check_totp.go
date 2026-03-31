@@ -45,7 +45,11 @@ type TOTPCheckCommand struct {
 //
 //   - totpValidator defaults to [totp.Validate]
 //   - encryptionAlgo defaults to [crypto.NewAESCrypto] using the config specified in defaults.yaml
-func NewTOTPCheckCommand(sessionID, instanceID string, tarpitFunc tarpitFn, totpValidator totpValidateFn, encryptionAlgo crypto.EncryptionAlgorithm, request *CheckTOTPType) *TOTPCheckCommand {
+func NewTOTPCheckCommand(sessionID, instanceID string, tarpitFunc tarpitFn, totpValidator totpValidateFn, encryptionAlgo crypto.EncryptionAlgorithm, request *CheckTOTPType) (*TOTPCheckCommand, error) {
+	if sysConfig.Tarpit.Tarpit() == nil && tarpitFunc == nil {
+		return nil, zerrors.ThrowInternal(nil, "DOM-o46bLe", "no tarpit function set")
+	}
+
 	cmd := &TOTPCheckCommand{
 		CheckTOTP:           request,
 		TarpitFunc:          sysConfig.Tarpit.Tarpit(),
@@ -66,7 +70,7 @@ func NewTOTPCheckCommand(sessionID, instanceID string, tarpitFunc tarpitFn, totp
 		cmd.ValidateFunc = totpValidator
 	}
 
-	return cmd
+	return cmd, nil
 }
 
 // RequiresTransaction implements [Transactional].
@@ -78,22 +82,22 @@ func (t *TOTPCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([]even
 		return nil, nil
 	}
 
-	toReturn := make([]eventstore.Command, 2, 3)
+	events := make([]eventstore.Command, 2, 3)
 	userAgg := &user.NewAggregate(t.FetchedUser.ID, t.FetchedUser.OrganizationID).Aggregate
 	if t.IsCheckSuccessful {
-		toReturn[0] = user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil)
+		events[0] = user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil)
 	} else {
-		toReturn[0] = user.NewHumanOTPCheckFailedEvent(ctx, userAgg, nil)
+		events[0] = user.NewHumanOTPCheckFailedEvent(ctx, userAgg, nil)
 	}
 
 	if t.IsUserLocked {
-		toReturn[1] = user.NewUserLockedEvent(ctx, userAgg)
-		toReturn = append(toReturn, session.NewTOTPCheckedEvent(ctx, &session.NewAggregate(t.SessionID, t.InstanceID).Aggregate, t.CheckedAt))
+		events[1] = user.NewUserLockedEvent(ctx, userAgg)
+		events = append(events, session.NewTOTPCheckedEvent(ctx, &session.NewAggregate(t.SessionID, t.InstanceID).Aggregate, t.CheckedAt))
 	} else {
-		toReturn[1] = session.NewTOTPCheckedEvent(ctx, &session.NewAggregate(t.SessionID, t.InstanceID).Aggregate, t.CheckedAt)
+		events[1] = session.NewTOTPCheckedEvent(ctx, &session.NewAggregate(t.SessionID, t.InstanceID).Aggregate, t.CheckedAt)
 	}
 
-	return toReturn, nil
+	return events, nil
 }
 
 // Execute implements [Commander].
@@ -201,7 +205,12 @@ func (t *TOTPCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-hord0Z", "Errors.User.UserIDMissing")
 	}
 
-	user, err := userRepo.Get(ctx, opts.DB(), database.WithCondition(userRepo.PrimaryKeyCondition(t.InstanceID, session.UserID)))
+	user, err := userRepo.Get(ctx, opts.DB(),
+		database.WithCondition(
+			userRepo.PrimaryKeyCondition(t.InstanceID, session.UserID),
+		),
+		database.WithResultLock(),
+	)
 	if err := handleGetError(err, "DOM-PZvWq0", "user"); err != nil {
 		return err
 	}

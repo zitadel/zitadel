@@ -41,22 +41,22 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 	}{
 		{
 			testName:      "when checkTOTP is nil should return no error",
-			cmd:           domain.NewTOTPCheckCommand("", "", nil, nil, nil, nil),
+			cmd:           &domain.TOTPCheckCommand{},
 			expectedError: nil,
 		},
 		{
 			testName:      "when session ID is not set should return error",
-			cmd:           domain.NewTOTPCheckCommand("", "", nil, nil, nil, &domain.CheckTOTPType{}),
+			cmd:           &domain.TOTPCheckCommand{CheckTOTP: &domain.CheckTOTPType{}},
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-ZNWO80", "Errors.Missing.SessionID"),
 		},
 		{
 			testName:      "when instance ID is not set should return error",
-			cmd:           domain.NewTOTPCheckCommand("session-1", "", nil, nil, nil, &domain.CheckTOTPType{}),
+			cmd:           &domain.TOTPCheckCommand{SessionID: "session-1", CheckTOTP: &domain.CheckTOTPType{}},
 			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-47G8S3", "Errors.Missing.InstanceID"),
 		},
 		{
 			testName: "when retrieving session fails should return error",
-			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
+			cmd:      &domain.TOTPCheckCommand{SessionID: "session-1", InstanceID: "instance-1", CheckTOTP: &domain.CheckTOTPType{Code: "123456"}},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
@@ -70,7 +70,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName: "when session not found should return not found error",
-			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
+			cmd:      &domain.TOTPCheckCommand{SessionID: "session-1", InstanceID: "instance-1", CheckTOTP: &domain.CheckTOTPType{Code: "123456"}},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
@@ -84,7 +84,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName: "when session userID is empty should return precondition failed error",
-			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
+			cmd:      &domain.TOTPCheckCommand{SessionID: "session-1", InstanceID: "instance-1", CheckTOTP: &domain.CheckTOTPType{Code: "123456"}},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
@@ -98,7 +98,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName: "when retrieving user fails should return error",
-			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
+			cmd:      &domain.TOTPCheckCommand{SessionID: "session-1", InstanceID: "instance-1", CheckTOTP: &domain.CheckTOTPType{Code: "123456"}},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
@@ -121,7 +121,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName: "when user not found should return not found error",
-			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
+			cmd:      &domain.TOTPCheckCommand{SessionID: "session-1", InstanceID: "instance-1", CheckTOTP: &domain.CheckTOTPType{Code: "123456"}},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
@@ -144,7 +144,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName: "when user is not human should return precondition failed error",
-			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
+			cmd:      &domain.TOTPCheckCommand{SessionID: "session-1", InstanceID: "instance-1", CheckTOTP: &domain.CheckTOTPType{Code: "123456"}},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
@@ -167,7 +167,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName: "when user has no TOTP should return precondition failed error",
-			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
+			cmd:      &domain.TOTPCheckCommand{SessionID: "session-1", InstanceID: "instance-1", CheckTOTP: &domain.CheckTOTPType{Code: "123456"}},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
@@ -193,7 +193,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName: "when user TOTP has no secret set should return precondition failed error",
-			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
+			cmd:      &domain.TOTPCheckCommand{SessionID: "session-1", InstanceID: "instance-1", CheckTOTP: &domain.CheckTOTPType{Code: "123456"}},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
@@ -219,7 +219,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName: "when TOTP is not successfully checked should return precondition error",
-			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
+			cmd:      &domain.TOTPCheckCommand{SessionID: "session-1", InstanceID: "instance-1", CheckTOTP: &domain.CheckTOTPType{Code: "123456"}},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
@@ -245,7 +245,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName: "when user is locked should return precondition failed error",
-			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
+			cmd:      &domain.TOTPCheckCommand{SessionID: "session-1", InstanceID: "instance-1", CheckTOTP: &domain.CheckTOTPType{Code: "123456"}},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
@@ -271,7 +271,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 		},
 		{
 			testName: "when all validations pass should return no error and set user",
-			cmd:      domain.NewTOTPCheckCommand("session-1", "instance-1", nil, nil, nil, &domain.CheckTOTPType{Code: "123456"}),
+			cmd:      &domain.TOTPCheckCommand{SessionID: "session-1", InstanceID: "instance-1", CheckTOTP: &domain.CheckTOTPType{Code: "123456"}},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
 				idCondition := repo.PrimaryKeyCondition("instance-1", "session-1")
