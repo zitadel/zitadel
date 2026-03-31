@@ -1,6 +1,7 @@
 "use server";
 
 import { getSessionCookieById } from "@/lib/cookies";
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/logger";
 import { getServiceConfig } from "@/lib/service-url";
 import {
@@ -18,7 +19,7 @@ import {
   ServiceConfig,
   updateHuman,
 } from "@/lib/zitadel";
-import { Code, ConnectError, create } from "@zitadel/client";
+import { Code, create } from "@zitadel/client";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import {
@@ -276,7 +277,7 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
       logger.error("Error linking IDP", { error });
       const errorMessage = error instanceof Error ? error.message : t("errors.unknownError");
       let params = buildRedirectParams({ error: errorMessage });
-      if (error instanceof ConnectError && error.code === Code.AlreadyExists) {
+      if (isClassifiedError(error) && error.code === Code.AlreadyExists) {
         params = buildRedirectParams({ error: "external_idp_taken" });
       }
       return { redirect: `/idp/${provider}/linking-failed?${params}` };

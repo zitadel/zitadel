@@ -185,16 +185,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
-				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(
-						database.WithCondition(
-							repo.PrimaryKeyCondition("instance-1", "session-1"),
-						),
-					)).
-					Times(1).
-					Return(&domain.Session{
-						UserID: "user-1",
-					}, nil)
+				getSessionSucceededExpectation(repo)
 				return repo
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
@@ -226,16 +217,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
-				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(
-						database.WithCondition(
-							repo.PrimaryKeyCondition("instance-1", "session-1"),
-						),
-					)).
-					Times(1).
-					Return(&domain.Session{
-						UserID: "user-1",
-					}, nil)
+				getSessionSucceededExpectation(repo)
 				return repo
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
@@ -267,16 +249,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
-				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(
-						database.WithCondition(
-							repo.PrimaryKeyCondition("instance-1", "session-1"),
-						),
-					)).
-					Times(1).
-					Return(&domain.Session{
-						UserID: "user-1",
-					}, nil)
+				getSessionSucceededExpectation(repo)
 				return repo
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
@@ -314,16 +287,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
-				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(
-						database.WithCondition(
-							repo.PrimaryKeyCondition("instance-1", "session-1"),
-						),
-					)).
-					Times(1).
-					Return(&domain.Session{
-						UserID: "user-1",
-					}, nil)
+				getSessionSucceededExpectation(repo)
 				return repo
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
@@ -364,16 +328,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 			},
 			sessionRepo: func(ctrl *gomock.Controller) domain.SessionRepository {
 				repo := domainmock.NewSessionRepo(ctrl)
-				repo.EXPECT().
-					Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(
-						database.WithCondition(
-							repo.PrimaryKeyCondition("instance-1", "session-1"),
-						),
-					)).
-					Times(1).
-					Return(&domain.Session{
-						UserID: "user-1",
-					}, nil)
+				getSessionSucceededExpectation(repo)
 				return repo
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
@@ -401,7 +356,7 @@ func TestOTPSMSChallengeCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-9kL4m", "Errors.OTPSMS.NotEnabled"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-9kL4m", "Errors.User.MFA.OTP.NotReady"),
 		},
 		{
 			name:                "valid OTP SMS challenge request",
@@ -819,7 +774,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				updateSessionFailedExpectation(repo, challengeOTPSMSChange, assert.AnError, 0)
 				return repo
 			},
-			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-AigB0Z", "session update failed"),
+			wantErr: zerrors.ThrowInternal(assert.AnError, "DOM-AigB0Z", "failed updating Session"),
 		},
 		{
 			name: "failed to update session - no rows updated",
@@ -862,7 +817,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				updateSessionFailedExpectation(repo, challengeOTPSMSChange, nil, 0)
 				return repo
 			},
-			wantErr: zerrors.ThrowNotFound(nil, "DOM-QThZH7", "Errors.Session.NotFound"),
+			wantErr: zerrors.ThrowNotFound(nil, "DOM-AigB0Z", "Session not found"),
 		},
 		{
 			name: "failed to update session - more than 1 row updated",
@@ -904,7 +859,7 @@ func TestOTPSMSChallengeCommand_Execute(t *testing.T) {
 				updateSessionFailedExpectation(repo, challengeOTPSMSChange, nil, 2)
 				return repo
 			},
-			wantErr: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 2), "DOM-gYp8tG", "unexpected number of rows"),
+			wantErr: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 2), "DOM-AigB0Z", "unexpected number of rows updated"),
 		},
 	}
 	for _, tt := range tests {
@@ -1259,6 +1214,12 @@ func getUser(otpEnabledAt time.Time) func(ctrl *gomock.Controller) domain.UserRe
 					LastName:  "last",
 					Phone: &domain.HumanPhone{
 						Number: "09080706050",
+						OTP: domain.OTP{
+							EnabledAt: otpEnabledAt,
+						},
+					},
+					Email: domain.HumanEmail{
+						Address: "testuser@example.com",
 						OTP: domain.OTP{
 							EnabledAt: otpEnabledAt,
 						},
