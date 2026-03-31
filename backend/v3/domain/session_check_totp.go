@@ -210,11 +210,11 @@ func (t *TOTPCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 	}
 
 	if user.Human.TOTP == nil {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-V6Av2a", "user TOTP not set")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-V6Av2a", "Errors.User.NoTOTP")
 	}
 
 	if user.Human.TOTP.Secret == nil {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-b44CWR", "user TOTP secret not set")
+		return zerrors.ThrowPreconditionFailed(nil, "DOM-b44CWR", "Errors.User.NoTOTPSecret")
 	}
 
 	if user.State == UserStateLocked {
@@ -229,7 +229,7 @@ func (t *TOTPCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 func (t *TOTPCheckCommand) verifyTOTP(existingTOTPSecret *crypto.CryptoValue) error {
 	decryptedSecret, err := crypto.DecryptString(existingTOTPSecret, t.EncryptionAlgorithm)
 	if err != nil {
-		return zerrors.ThrowInternal(err, "DOM-Yqhggx", "failed decrypting TOTP secret")
+		return zerrors.ThrowInternal(err, "DOM-Yqhggx", "Errors.TOTP.FailedToDecryptSecret")
 	}
 
 	isValid := t.ValidateFunc(t.CheckTOTP.Code, decryptedSecret)

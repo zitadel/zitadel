@@ -188,7 +188,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-V6Av2a", "user TOTP not set"),
+			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-V6Av2a", "Errors.User.NoTOTP"),
 		},
 		{
 			testName: "when user TOTP has no secret set should return precondition failed error",
@@ -214,7 +214,7 @@ func TestTOTPCheckCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-b44CWR", "user TOTP secret not set"),
+			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-b44CWR", "Errors.User.NoTOTPSecret"),
 		},
 		{
 			testName: "when user is locked should return precondition failed error",
@@ -703,7 +703,7 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 				mock.EXPECT().DecryptString(gomock.Any(), gomock.Any()).AnyTimes().Return("", decryptErr)
 				return mock
 			},
-			expectedError: zerrors.ThrowInternal(decryptErr, "DOM-Yqhggx", "failed decrypting TOTP secret"),
+			expectedError: zerrors.ThrowInternal(decryptErr, "DOM-Yqhggx", "Errors.TOTP.FailedToDecryptSecret"),
 		},
 		{
 			testName: "when TOTP verification fails and user exceeds max attempts should lock user",
