@@ -53,7 +53,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       // ignore error, as we might not have a session yet
       return undefined;
     });
-
   } else if ("userId" in searchParams && userId) {
     const userResponse = await getUserByID({ serviceConfig, userId });
     if (userResponse) {
@@ -90,7 +89,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       if (user.type.case === "human") {
         human = user.type.value as HumanUser;
       }
-
     } else if (loginSettings?.ignoreUnknownUsernames) {
       // Prevent enumeration by pretending we found a user
       id = UNKNOWN_USER_ID;

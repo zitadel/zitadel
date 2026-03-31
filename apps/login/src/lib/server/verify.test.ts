@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { initialSendVerification, sendVerification } from "./verify";
 
 import {
@@ -128,13 +128,25 @@ describe("sendVerification", () => {
 describe("initialSendVerification", () => {
   let mockSendEmailCode: any;
   let mockCreateInviteCode: any;
+  let originalBasePath: string | undefined;
 
   beforeEach(() => {
+    originalBasePath = process.env.NEXT_PUBLIC_BASE_PATH;
+    process.env.NEXT_PUBLIC_BASE_PATH = "/ui/v2/login";
+
     vi.clearAllMocks();
     mockSendEmailCode = zitadelSendEmailCode;
     mockCreateInviteCode = createInviteCode;
     mockSendEmailCode.mockResolvedValue({});
     mockCreateInviteCode.mockResolvedValue({});
+  });
+
+  afterEach(() => {
+    if (originalBasePath === undefined) {
+      delete process.env.NEXT_PUBLIC_BASE_PATH;
+    } else {
+      process.env.NEXT_PUBLIC_BASE_PATH = originalBasePath;
+    }
   });
 
   test("should call sendEmailCode with correct URL template for non-invite", async () => {
@@ -146,7 +158,7 @@ describe("initialSendVerification", () => {
     expect(mockSendEmailCode).toHaveBeenCalledWith({
       serviceConfig: {},
       userId: "user-1",
-      urlTemplate: "https://example.com/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}",
+      urlTemplate: "https://example.com/ui/v2/login/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}",
     });
     expect(mockCreateInviteCode).not.toHaveBeenCalled();
   });
@@ -160,7 +172,8 @@ describe("initialSendVerification", () => {
     expect(mockCreateInviteCode).toHaveBeenCalledWith({
       serviceConfig: {},
       userId: "user-1",
-      urlTemplate: "https://example.com/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true",
+      urlTemplate:
+        "https://example.com/ui/v2/login/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true",
     });
     expect(mockSendEmailCode).not.toHaveBeenCalled();
   });
@@ -175,7 +188,8 @@ describe("initialSendVerification", () => {
     expect(mockSendEmailCode).toHaveBeenCalledWith({
       serviceConfig: {},
       userId: "user-1",
-      urlTemplate: "https://example.com/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&requestId=req-123",
+      urlTemplate:
+        "https://example.com/ui/v2/login/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&requestId=req-123",
     });
   });
 
@@ -190,7 +204,7 @@ describe("initialSendVerification", () => {
       serviceConfig: {},
       userId: "user-1",
       urlTemplate:
-        "https://example.com/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&requestId=req%26id%3Dinjected",
+        "https://example.com/ui/v2/login/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&requestId=req%26id%3Dinjected",
     });
   });
 
@@ -205,7 +219,7 @@ describe("initialSendVerification", () => {
       serviceConfig: {},
       userId: "user-1",
       urlTemplate:
-        "https://example.com/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true&requestId=req-456",
+        "https://example.com/ui/v2/login/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true&requestId=req-456",
     });
   });
 });
