@@ -1,5 +1,6 @@
 "use server";
 
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/logger";
 import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "@/lib/server/cookie";
 import {
@@ -152,7 +153,11 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       challenges,
       requestId,
     }).catch((error) => {
-      logger.error("Could not create session", { error });
+      if (isClassifiedError(error) && error.isUserError) {
+        logger.warn("Could not create session (client error)", { grpcCode: error.code, httpStatus: error.httpStatus });
+      } else {
+        logger.error("Could not create session (server error)", { error });
+      }
       return undefined;
     });
 
