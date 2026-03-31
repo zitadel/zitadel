@@ -1,11 +1,9 @@
-import { Alert, AlertType } from "@/components/alert";
+import { Alert } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
 import { UNKNOWN_USER_ID } from "@/lib/constants";
-import { getPublicHostWithProtocol } from "@/lib/server/host";
-import { sendEmailCode, sendInviteEmailCode } from "@/lib/server/verify";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getLoginSettings, getUserByID, searchUsers } from "@/lib/zitadel";
@@ -36,38 +34,9 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   let id: string | undefined;
   let loginSettings: LoginSettings | undefined;
 
-  let error: string | undefined;
-
   const doSend = send === "true";
 
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
   const autoSubmitCode = process.env.NEXT_PUBLIC_AUTO_SUBMIT_CODE === "true";
-
-  async function sendEmail(userId: string) {
-    const hostWithProtocol = await getPublicHostWithProtocol(_headers);
-
-    if (invite === "true") {
-      await sendInviteEmailCode({
-        userId,
-        urlTemplate:
-          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
-          (requestId ? `&requestId=${requestId}` : ""),
-      }).catch((apiError) => {
-        console.error("Could not send invitation email", apiError);
-        error = "inviteSendFailed";
-      });
-    } else {
-      await sendEmailCode({
-        userId,
-        urlTemplate:
-          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
-          (requestId ? `&requestId=${requestId}` : ""),
-      }).catch((apiError) => {
-        console.error("Could not send verification email", apiError);
-        error = "emailSendFailed";
-      });
-    }
-  }
 
   if ("loginName" in searchParams) {
     sessionFactors = await loadMostRecentSession({
@@ -84,15 +53,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       // ignore error, as we might not have a session yet
       return undefined;
     });
-
-    if (doSend && sessionFactors?.factors?.user?.id) {
-      await sendEmail(sessionFactors.factors.user.id);
-    }
   } else if ("userId" in searchParams && userId) {
-    if (doSend) {
-      await sendEmail(userId);
-    }
-
     const userResponse = await getUserByID({ serviceConfig, userId });
     if (userResponse) {
       user = userResponse.user;
@@ -127,11 +88,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       user = foundUser;
       if (user.type.case === "human") {
         human = user.type.value as HumanUser;
-      }
-
-      // If we found the user and need to send email, do it now
-      if (doSend && id) {
-        await sendEmail(id);
       }
     } else if (loginSettings?.ignoreUnknownUsernames) {
       // Prevent enumeration by pretending we found a user
@@ -189,26 +145,10 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       </div>
 
       <div className="w-full">
-        {error && (
-          <div className="py-4">
-            <Alert>
-              <Translated i18nKey={`errors.${error}`} namespace="verify" />
-            </Alert>
-          </div>
-        )}
-
         {!id && (
           <div className="py-4">
             <Alert>
               <Translated i18nKey="unknownContext" namespace="error" />
-            </Alert>
-          </div>
-        )}
-
-        {id && send && (
-          <div className="w-full py-4">
-            <Alert type={AlertType.INFO}>
-              <Translated i18nKey="verify.codeSent" namespace="verify" />
             </Alert>
           </div>
         )}
@@ -222,6 +162,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
             isInvite={invite === "true"}
             requestId={requestId}
             submit={autoSubmitCode}
+            doSend={doSend}
           />
         )}
       </div>
