@@ -77,7 +77,7 @@ func (s *Server) verifyJWTProfile(ctx context.Context, req *oidc.JWTProfileGrant
 	)
 	_, err = op.VerifyJWTAssertion(ctx, req.Assertion, verifier)
 	if err != nil {
-		return nil, oidc.ErrInvalidClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("invalid assertion")
+		return nil, oidc.ErrInvalidGrant().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("invalid assertion")
 	}
 	return storage.user, nil
 }
