@@ -8,6 +8,17 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+//type Slug struct {
+//	Resource string
+//	Cause    string
+//}
+
+type Slug string
+
+func NewSlug(resource, cause string) zerrors.Slug {
+	return zerrors.Slug(fmt.Sprintf("%s.%s", resource, cause))
+}
+
 type wrongIDPTypeError struct {
 	expected IDPType
 	got      string

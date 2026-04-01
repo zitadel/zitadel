@@ -1,6 +1,8 @@
 package zerrors
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -111,6 +113,8 @@ type ZitadelError struct {
 	Parent  error
 	Message string
 	ID      string
+	Slug    Slug
+	Details ErrorDetails
 
 	// location where the error was created
 	reportLocation *sloggcp.ReportLocation
@@ -118,6 +122,10 @@ type ZitadelError struct {
 	stackTrace    []byte
 	hasStackTrace bool
 }
+
+type Slug string
+
+type ErrorDetails json.ra
 
 func ThrowError(parent error, id, message string) error {
 	return CreateZitadelError(KindUnknown, parent, id, message, 1)
@@ -135,6 +143,39 @@ func CreateZitadelError(kind Kind, parent error, id, message string, skip int) *
 		Kind:    kind,
 		Parent:  parent,
 		ID:      id,
+		Message: message,
+	}
+	var target *ZitadelError
+	if errors.As(parent, &target) {
+		// inherit stack trace and report location from parent error
+		err.reportLocation = target.reportLocation
+		err.stackTrace = target.stackTrace
+		err.hasStackTrace = target.hasStackTrace
+		return err
+	}
+
+	if enableReportLocation.Load() {
+		err.reportLocation = sloggcp.NewReportLocation(skip + 1)
+	}
+	if enableStackTrace.Load() {
+		err.stackTrace = debug.Stack()
+		err.hasStackTrace = true
+	}
+	return err
+}
+
+// CreateZitadelErrorSlug creates a ZitadelError of the given kind.
+// If ReportLocation or StackTrace are enabled, they are added to the error.
+// The skip parameter defines how many stack frames to skip when determining
+// the report location.
+// A skip value of 0 means the location where CreateZitadelError is called.
+// When the parent error is also a ZitadelError, the report location and stack trace
+// are inherited from the parent error.
+func CreateZitadelErrorSlug(kind Kind, parent error, slug Slug, message string, skip int) *ZitadelError {
+	err := &ZitadelError{
+		Kind:    kind,
+		Parent:  parent,
+		Slug:    slug,
 		Message: message,
 	}
 	var target *ZitadelError
@@ -183,6 +224,15 @@ func (err *ZitadelError) GetID() string {
 	return err.ID
 }
 
+func (err *ZitadelError) GetDetails() ErrorDetails {
+	return err.Details
+}
+
+func (err *ZitadelError) WithDetails(details ErrorDetails) *ZitadelError {
+	err.Details = details
+	return err
+}
+
 func (err *ZitadelError) Is(target error) bool {
 	t, ok := target.(*ZitadelError)
 	if !ok {
@@ -194,11 +244,22 @@ func (err *ZitadelError) Is(target error) bool {
 	if t.ID != "" && t.ID != err.ID {
 		return false
 	}
+	if t.Slug != "" && t.Slug != err.Slug {
+		return false
+	}
 	if t.Message != "" && t.Message != err.Message {
 		return false
 	}
 	if t.Parent != nil && !errors.Is(err.Parent, t.Parent) {
 		return false
+	}
+	if t.Details != nil {
+		targetData, err := t.Details.MarshalJSON()
+		if err != nil {
+			return false
+		}
+		errData, err := t.Details.MarshalJSON()
+		return bytes.Equal(targetData, errData)
 	}
 
 	return true
