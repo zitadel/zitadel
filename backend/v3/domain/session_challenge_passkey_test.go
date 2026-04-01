@@ -380,7 +380,7 @@ func TestPasskeyChallengeCommand_Validate(t *testing.T) {
 					}, nil)
 				return repo
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-bnxBdS", "Errors.User.NotActive"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "DOM-bnxBdS", "Errors.User.NotFound"),
 		},
 		{
 			name:                 "valid request passkey challenge",
