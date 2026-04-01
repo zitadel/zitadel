@@ -8,7 +8,7 @@
   },
   "private": true,
   "devDependencies": {
-    "@types/node": "^22.19.7",
+    "@types/node": "^22.19.15",
     "cypress": "^14.5.4",
     "cypress-wait-until": "^3.0.2",
     "jsonwebtoken": "^9.0.3",
