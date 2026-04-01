@@ -49,14 +49,14 @@ func SetOTPSMSSecretGeneratorConfig(cfg *crypto.GeneratorConfig) {
 	otpSMSSecretGeneratorConfig = cfg
 }
 
+func SetWebAuthNConfig(cfg *webauthn.Config) {
+	webauthnConfig = cfg
+}
+
 func SetOTPEmailSecretGeneratorConfig(cfg *crypto.GeneratorConfig) {
 	otpEmailSecretGeneratorConfig = cfg
 }
 
 func SetMFAEncryptionAlgorithm(mfaEncryptionAlg crypto.EncryptionAlgorithm) {
 	mfaEncryptionAlgo = mfaEncryptionAlg
-}
-
-func SetWebAuthNConfig(cfg *webauthn.Config) {
-	webauthnConfig = cfg
 }

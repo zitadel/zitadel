@@ -193,7 +193,7 @@ func (rc *RecoveryCodeCheckCommand) String() string {
 func (rc *RecoveryCodeCheckCommand) handleRecoveryCodeCheckFailed(ctx context.Context, opts *InvokeOpts) error {
 	checkTime := time.Now()
 
-	lockoutPolicy, err := GetLockoutPolicy(ctx, opts, rc.InstanceID, rc.user.OrganizationID)
+	lockoutPolicy, err := GetLockoutPolicy(ctx, opts.DB(), opts.lockoutSettingRepo, rc.InstanceID, rc.user.OrganizationID)
 	logging.OnError(ctx, err).Error("failed to get lockout policy")
 
 	// update user state and recovery_code_failed_attempts
