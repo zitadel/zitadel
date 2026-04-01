@@ -50,14 +50,12 @@ export default async function Page(props: {
           error = err;
         });
     } else if (method === "sms") {
-      await addOTPSMS({ serviceConfig, userId: session.factors.user.id }).catch((_error) => {
-        // TODO: Throw this error?
-        new Error("Could not add OTP via SMS");
+      await addOTPSMS({ serviceConfig, userId: session.factors.user.id }).catch((err) => {
+        error = err instanceof Error ? err : new Error("Could not add OTP via SMS");
       });
     } else if (method === "email") {
-      await addOTPEmail({ serviceConfig, userId: session.factors.user.id }).catch((_error) => {
-        // TODO: Throw this error?
-        new Error("Could not add OTP via Email");
+      await addOTPEmail({ serviceConfig, userId: session.factors.user.id }).catch((err) => {
+        error = err instanceof Error ? err : new Error("Could not add OTP via Email");
       });
     } else {
       throw new Error("Invalid method");
@@ -120,14 +118,6 @@ export default async function Page(props: {
                 ? "Code via SMS was successfully added."
                 : ""}
           </p>
-        )}
-
-        {!session && (
-          <div className="py-4">
-            <Alert>
-              <Translated i18nKey="unknownContext" namespace="error" />
-            </Alert>
-          </div>
         )}
 
         {error && (

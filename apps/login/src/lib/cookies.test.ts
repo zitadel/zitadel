@@ -314,7 +314,7 @@ describe("cookies", () => {
           id: "non-existent-id",
           session: mockSession,
         }),
-      ).rejects.toThrow("updateSessionCookie<T>: session id not found");
+      ).rejects.toThrow("updateSessionCookie: session id not found");
     });
 
     it("should cleanup expired sessions when cleanup is true", async () => {

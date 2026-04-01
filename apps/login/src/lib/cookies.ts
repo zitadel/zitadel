@@ -7,7 +7,6 @@ import { createLogger } from "./logger";
 
 const logger = createLogger("cookies");
 
-// TODO: improve this to handle overflow
 const MAX_COOKIE_SIZE = 2048;
 
 export type Cookie = {
@@ -22,6 +21,20 @@ export type Cookie = {
 };
 
 type SessionCookie<T> = Cookie & T;
+
+function parseSessionsCookie<T>(raw: string | undefined): SessionCookie<T>[] {
+  if (!raw) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    logger.warn("Failed to parse sessions cookie, resetting to empty");
+    return [];
+  }
+}
 
 async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameEnabled: boolean = false) {
   const cookiesList = await cookies();
@@ -76,7 +89,7 @@ export async function addSessionToCookie<T>({
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
-  let currentSessions: SessionCookie<T>[] = stringifiedCookie?.value ? JSON.parse(stringifiedCookie?.value) : [];
+  let currentSessions: SessionCookie<T>[] = parseSessionsCookie<T>(stringifiedCookie?.value);
 
   const index = currentSessions.findIndex((s) => s.loginName === session.loginName);
 
@@ -120,7 +133,9 @@ export async function updateSessionCookie<T>({
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
-  const sessions: SessionCookie<T>[] = stringifiedCookie?.value ? JSON.parse(stringifiedCookie?.value) : [session];
+  const sessions: SessionCookie<T>[] = stringifiedCookie?.value
+    ? parseSessionsCookie<T>(stringifiedCookie.value)
+    : [session];
 
   const foundIndex = sessions.findIndex((session) => session.id === id);
 
@@ -136,7 +151,7 @@ export async function updateSessionCookie<T>({
       return setSessionHttpOnlyCookie(sessions, iFrameEnabled);
     }
   } else {
-    throw "updateSessionCookie<T>: session id not found";
+    throw new Error("updateSessionCookie: session id not found");
   }
 }
 
@@ -152,7 +167,9 @@ export async function removeSessionFromCookie<T>({
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
-  const sessions: SessionCookie<T>[] = stringifiedCookie?.value ? JSON.parse(stringifiedCookie?.value) : [session];
+  const sessions: SessionCookie<T>[] = stringifiedCookie?.value
+    ? parseSessionsCookie<T>(stringifiedCookie.value)
+    : [session];
 
   const reducedSessions = sessions.filter((s) => s.id !== session.id);
   if (cleanup) {
@@ -171,16 +188,18 @@ export async function getMostRecentSessionCookie<T>(): Promise<Cookie | undefine
   const stringifiedCookie = cookiesList.get("sessions");
 
   if (stringifiedCookie?.value) {
-    const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
+    const sessions = parseSessionsCookie<T>(stringifiedCookie.value);
 
-    const latest = sessions.reduce((prev, current) => {
+    if (sessions.length === 0) {
+      return undefined;
+    }
+
+    return sessions.reduce((prev, current) => {
       return prev.changeTs > current.changeTs ? prev : current;
     });
-
-    return latest;
-  } else {
-    return undefined;
   }
+
+  return undefined;
 }
 
 export async function getSessionCookieById<T>({
@@ -194,19 +213,14 @@ export async function getSessionCookieById<T>({
   const stringifiedCookie = cookiesList.get("sessions");
 
   if (stringifiedCookie?.value) {
-    const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
+    const sessions = parseSessionsCookie<T>(stringifiedCookie.value);
 
-    const found = sessions.find((s) =>
+    return sessions.find((s) =>
       organization ? s.organization === organization && s.id === sessionId : s.id === sessionId,
     );
-    if (found) {
-      return found;
-    } else {
-      return undefined;
-    }
-  } else {
-    return undefined;
   }
+
+  return undefined;
 }
 
 export async function getSessionCookieByLoginName<T>({
@@ -223,7 +237,7 @@ export async function getSessionCookieByLoginName<T>({
     return undefined;
   }
 
-  const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie.value);
+  const sessions = parseSessionsCookie<T>(stringifiedCookie.value);
   return sessions.find((s) =>
     organization ? s.organization === organization && s.loginName === loginName : s.loginName === loginName,
   );
@@ -242,7 +256,7 @@ export async function getAllSessionCookieIds<T>(cleanup: boolean = false): Promi
     return [];
   }
 
-  const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie.value);
+  const sessions = parseSessionsCookie<T>(stringifiedCookie.value);
 
   if (cleanup) {
     const now = new Date();
@@ -270,7 +284,7 @@ export async function getAllSessions<T>(cleanup: boolean = false): Promise<Sessi
     return [];
   }
 
-  const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie.value);
+  const sessions = parseSessionsCookie<T>(stringifiedCookie.value);
 
   if (cleanup) {
     const now = new Date();
@@ -302,7 +316,7 @@ export async function getMostRecentCookieWithLoginname<T>({
     return undefined;
   }
 
-  const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie.value);
+  const sessions = parseSessionsCookie<T>(stringifiedCookie.value);
 
   let filtered = sessions;
 

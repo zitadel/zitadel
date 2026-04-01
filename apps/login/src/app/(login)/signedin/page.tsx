@@ -43,7 +43,8 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const branding = await getBrandingSettings({ serviceConfig, organization });
 
-  // complete device authorization flow if device requestId is present
+  let deviceAuthError: string | undefined;
+
   if (requestId && requestId.startsWith("device_")) {
     const cookie = sessionId
       ? await getSessionCookieById({ sessionId, organization })
@@ -57,22 +58,26 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         sessionId: cookie.id,
         sessionToken: cookie.token,
       }).catch((err) => {
-        return (
-          <DynamicTheme branding={branding}>
-            <div className="flex flex-col space-y-4">
-              <h1>
-                <Translated i18nKey="error.title" namespace="signedin" />
-              </h1>
-              <p className="ztdl-p mb-6 block">
-                <Translated i18nKey="error.description" namespace="signedin" />
-              </p>
-              <Alert>{err.message}</Alert>
-            </div>
-            <div className="w-full"></div>
-          </DynamicTheme>
-        );
+        deviceAuthError = err?.message ?? "Device authorization failed";
       });
     }
+  }
+
+  if (deviceAuthError) {
+    return (
+      <DynamicTheme branding={branding}>
+        <div className="flex flex-col space-y-4">
+          <h1>
+            <Translated i18nKey="error.title" namespace="signedin" />
+          </h1>
+          <p className="ztdl-p mb-6 block">
+            <Translated i18nKey="error.description" namespace="signedin" />
+          </p>
+          <Alert>{deviceAuthError}</Alert>
+        </div>
+        <div className="w-full"></div>
+      </DynamicTheme>
+    );
   }
 
   const sessionFactors = sessionId
