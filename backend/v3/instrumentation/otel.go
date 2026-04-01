@@ -36,6 +36,7 @@ const (
 	ExporterTypeHTTP
 	ExporterTypeGoogle
 	ExporterTypePrometheus
+	ExporterTypeAuto
 )
 
 // isNone returns true if the ExporterType is either Unspecified or None.
