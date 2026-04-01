@@ -272,3 +272,26 @@ func (e *UnknownError) Is(target error) bool {
 func (e *UnknownError) Unwrap() error {
 	return e.original
 }
+
+type PermissionError struct {
+	original error
+}
+
+func NewPermissionError(original error) error {
+	return &PermissionError{
+		original: original,
+	}
+}
+
+func (e *PermissionError) Error() string {
+	return fmt.Sprintf("permission error: %v", e.original)
+}
+
+func (e *PermissionError) Is(target error) bool {
+	_, ok := target.(*PermissionError)
+	return ok
+}
+
+func (e *PermissionError) Unwrap() error {
+	return e.original
+}

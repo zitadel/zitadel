@@ -53,14 +53,10 @@ This will start a wizard asking you for an application name and a type.
 
 <Tabs
     groupId="app-type"
-    default="web"
-    values={[
-        {'label': 'Web Application', 'value': 'web'},
-        {'label': 'Native Application', 'value': 'native'},
-        {'label': 'Single Page Application', 'value': 'spa'},
-    ]}
+    defaultIndex={0}
+    items={['Web Application','Native Application','Single Page Application']}
 >
-<Tab value="web">
+<Tab value="Web Application">
 
 #### Authentication method
 
@@ -73,7 +69,7 @@ Please change the authentication method here as well, if you did so in the wizar
 <AuthMethods components={props.components}  selected="web" />
 </Tab>
 
-<Tab value="native">
+<Tab value="Native Application">
 
 #### Authentication method
 
@@ -82,7 +78,7 @@ When selecting Native the authentication method always needs to be PKCE.
 <AuthMethods components={props.components}  selected="native" />
 </Tab>
 
-<Tab value="spa">
+<Tab value="Single Page Application">
 
 #### Authentication method
 

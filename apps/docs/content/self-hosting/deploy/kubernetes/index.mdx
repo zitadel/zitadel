@@ -76,7 +76,7 @@ The bundled PostgreSQL subchart is for quickstart use only. You can replace it i
 
 | Component | How to replace |
 |-----------|---------------|
-| **Database** | Set `postgresql.enabled: false` and configure `zitadel.configmapConfig.Database` pointing to your own PostgreSQL |
+| **Database** | Set `postgresql.enabled: false` and configure `ZITADEL_DATABASE_POSTGRES_DSN` pointing to your own PostgreSQL. Use the `postgres` maintenance database so ZITADEL can create its own database during initialization |
 | **Ingress controller** | Update `ingress.className` (and `login.ingress.className`) to match your controller's IngressClass |
 | **Caching** | Add Redis by configuring `zitadel.configmapConfig.Caches` (see [Caching](/self-hosting/deploy/kubernetes/caching)) |
 
@@ -92,6 +92,10 @@ For production you need:
 - Helm 3.x+
 
 <Callout type="warn">
+**PostgreSQL compatibility:** ZITADEL supports PostgreSQL **14–18**. When using **PostgreSQL 18**, ensure you run **ZITADEL v4.11.0 or newer**. For the most up-to-date compatibility matrix and configuration details, see [Database requirements](/self-hosting/manage/database).
+</Callout>
+
+<Callout type="warn">
 The ZITADEL management console [requires end-to-end HTTP/2 support](/self-hosting/manage/http2). Ensure your ingress controller is configured to forward HTTP/2 (h2c) traffic to ZITADEL pods.
 </Callout>
 
@@ -102,16 +106,9 @@ The ZITADEL management console [requires end-to-end HTTP/2 support](/self-hostin
 kubectl create secret generic zitadel-masterkey \
   --from-literal=masterkey="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)"
 
-# Database credentials
+# Database credentials — store the full DSN
 kubectl create secret generic zitadel-db-credentials \
-  --from-literal=config.yaml="
-Database:
-  Postgres:
-    User:
-      Password: your-secure-app-password
-    Admin:
-      Password: your-secure-admin-password
-"
+  --from-literal=dsn="postgresql://zitadel:your-secure-password@postgres.database.svc.cluster.local:5432/postgres?sslmode=verify-full"
 ```
 
 ### Configure values
@@ -123,26 +120,18 @@ replicaCount: 2
 
 zitadel:
   masterkeySecretName: zitadel-masterkey
-  configSecretName: zitadel-db-credentials
+  env:
+    - name: ZITADEL_DATABASE_POSTGRES_DSN
+      valueFrom:
+        secretKeyRef:
+          name: zitadel-db-credentials
+          key: dsn
   configmapConfig:
     ExternalDomain: "zitadel.example.com"
     ExternalSecure: true
     ExternalPort: 443
     TLS:
       Enabled: false
-    Database:
-      Postgres:
-        Host: "postgres.database.svc.cluster.local"
-        Port: 5432
-        Database: "zitadel"
-        User:
-          Username: "zitadel"
-          SSL:
-            Mode: "verify-full"
-        Admin:
-          Username: "postgres"
-          SSL:
-            Mode: "verify-full"
     FirstInstance:
       Org:
         Human:

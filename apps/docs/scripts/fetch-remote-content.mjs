@@ -108,7 +108,10 @@ export function filterVersions(tags) {
       const valid = semver.valid(v);
       if (!valid) return false;
       // Strict cutoff: Do not fetch or build anything older (including that version)
-      return semver.gt(v, CUTOFF);
+      const isAboveCutoff = semver.gt(v, CUTOFF);
+      if (!isAboveCutoff) return false;
+
+      return semver.prerelease(v) === null;
     })
     .sort((a, b) => semver.rcompare(a, b));
 

@@ -2,6 +2,7 @@ package domainmock
 
 import (
 	context "context"
+	"time"
 
 	gomock "go.uber.org/mock/gomock"
 
@@ -42,6 +43,6 @@ func (s *SessionRepo) Update(ctx context.Context, client database.QueryExecutor,
 	return s.mock.Update(ctx, client, condition, changes...)
 }
 
-func (s *SessionRepo) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
-	return s.mock.Delete(ctx, client, condition)
+func (s *SessionRepo) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, time.Time, error) {
+	return s.mock.Delete(ctx, client, condition, permissionCondition)
 }
