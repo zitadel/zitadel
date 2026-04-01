@@ -90,6 +90,14 @@ var (
 					Name: "owner",
 					Type: textType,
 				},
+				{
+					Name: "enforce_owner",
+					Type: &pgtype.Type{
+						Name:  "bool",
+						OID:   pgtype.BoolOID,
+						Codec: pgtype.BoolCodec{},
+					},
+				},
 			},
 		},
 	}

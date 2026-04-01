@@ -15,8 +15,9 @@ import (
 )
 
 type latestSequence struct {
-	aggregate *eventstore.Aggregate
-	sequence  uint64
+	aggregate    *eventstore.Aggregate
+	sequence     uint64
+	enforceOwner bool
 }
 
 //go:embed sequences_query.sql
@@ -70,7 +71,11 @@ func commandsToSequences(ctx context.Context, commands []eventstore.Command) []*
 	sequences := make([]*latestSequence, 0, len(commands))
 
 	for _, command := range commands {
-		if searchSequenceByCommand(sequences, command) != nil {
+		if existing := searchSequenceByCommand(sequences, command); existing != nil {
+			if eventstore.ShouldEnforceResourceOwner(command) {
+				existing.enforceOwner = true
+				existing.aggregate.ResourceOwner = command.Aggregate().ResourceOwner
+			}
 			continue
 		}
 
@@ -78,7 +83,8 @@ func commandsToSequences(ctx context.Context, commands []eventstore.Command) []*
 			command.Aggregate().InstanceID = authz.GetInstance(ctx).InstanceID()
 		}
 		sequences = append(sequences, &latestSequence{
-			aggregate: command.Aggregate(),
+			aggregate:    command.Aggregate(),
+			enforceOwner: eventstore.ShouldEnforceResourceOwner(command),
 		})
 	}
 
@@ -134,8 +140,9 @@ func scanToSequence(rows database.Rows, sequences []*latestSequence) error {
 			"provided_owner", sequence.aggregate.ResourceOwner,
 		).Info("would have set wrong resource owner")
 	}
+
 	// set resource owner from previous events
-	if resourceOwner != "" {
+	if resourceOwner != "" && !sequence.enforceOwner {
 		sequence.aggregate.ResourceOwner = resourceOwner
 	}
 

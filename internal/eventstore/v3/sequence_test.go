@@ -217,6 +217,86 @@ func Test_commandsToSequences(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "duplicate aggregate with enforcing command updates owner",
+			args: args{
+				ctx: context.Background(),
+				commands: []eventstore.Command{
+					&mockCommand{
+						aggregate: &eventstore.Aggregate{
+							ID:            "V3-bF0Sa",
+							Type:          "type",
+							ResourceOwner: "old",
+							InstanceID:    "instance",
+							Version:       "v1",
+						},
+					},
+					&enforcedMockCommand{
+						mockCommand: &mockCommand{
+							aggregate: &eventstore.Aggregate{
+								ID:            "V3-bF0Sa",
+								Type:          "type",
+								ResourceOwner: "new",
+								InstanceID:    "instance",
+								Version:       "v1",
+							},
+						},
+					},
+				},
+			},
+			want: []*latestSequence{
+				{
+					aggregate: &eventstore.Aggregate{
+						ID:            "V3-bF0Sa",
+						Type:          "type",
+						ResourceOwner: "new",
+						InstanceID:    "instance",
+						Version:       "v1",
+					},
+					enforceOwner: true,
+				},
+			},
+		},
+		{
+			name: "first command enforcing keeps owner for aggregate",
+			args: args{
+				ctx: context.Background(),
+				commands: []eventstore.Command{
+					&enforcedMockCommand{
+						mockCommand: &mockCommand{
+							aggregate: &eventstore.Aggregate{
+								ID:            "V3-3oEV1",
+								Type:          "type",
+								ResourceOwner: "new",
+								InstanceID:    "instance",
+								Version:       "v1",
+							},
+						},
+					},
+					&mockCommand{
+						aggregate: &eventstore.Aggregate{
+							ID:            "V3-3oEV1",
+							Type:          "type",
+							ResourceOwner: "ignored",
+							InstanceID:    "instance",
+							Version:       "v1",
+						},
+					},
+				},
+			},
+			want: []*latestSequence{
+				{
+					aggregate: &eventstore.Aggregate{
+						ID:            "V3-3oEV1",
+						Type:          "type",
+						ResourceOwner: "new",
+						InstanceID:    "instance",
+						Version:       "v1",
+					},
+					enforceOwner: true,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

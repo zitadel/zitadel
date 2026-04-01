@@ -40,6 +40,16 @@ type Command interface {
 	Fields() []*FieldOperation
 }
 
+type EnforceResourceOwnerCommand interface {
+	Command
+	EnforceResourceOwner()
+}
+
+func ShouldEnforceResourceOwner(cmd Command) bool {
+	_, ok := cmd.(EnforceResourceOwnerCommand)
+	return ok
+}
+
 // Event is a stored activity
 type Event interface {
 	action
