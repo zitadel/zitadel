@@ -80,8 +80,8 @@
   },
   "devDependencies": {
     "@bufbuild/protocompile": "^0.0.1",
-    "@eslint/js": "^10.0.0",
-    "@types/node": "^24.12.0",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.5.0",
     "@typescript-eslint/eslint-plugin": "^8.58.0",
     "@typescript-eslint/parser": "^8.58.0",
     "eslint": "^10.1.0",
@@ -92,6 +92,6 @@
     "knip": "^5.88.1",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
-    "vitest": "^2.1.9"
+    "vitest": "^4.1.2"
   }
 }
