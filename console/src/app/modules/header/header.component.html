@@ -1,44 +1,41 @@
 <mat-toolbar class="header-wrapper">
   <div class="header-content">
-    <div *ngIf="authService.labelPolicyLoading$ | async; else logo" class="logo-placeholder">
-      <mat-spinner [diameter]="20"></mat-spinner>
-    </div>
-    <ng-template #logo>
-      <a class="title custom" [routerLink]="['/']" *ngIf="authService.labelpolicy$ | async as lP; else defaultHome">
-        <img
-          class="logo"
-          alt="home logo"
-          *ngIf="isDarkTheme; else customlighttheme"
-          [src]="lP.iconUrlDark ? lP.iconUrlDark : './assets/images/zitadel-logo-solo-light.svg'"
-          (error)="errorHandler($event, './assets/images/zitadel-logo-solo-light.svg')"
-        />
-        <ng-template #customlighttheme>
-          <img
-            alt="home logo"
-            class="logo"
-            [src]="lP.iconUrl ? lP.iconUrl : './assets/images/zitadel-logo-solo-dark.svg'"
-            (error)="errorHandler($event, './assets/images/zitadel-logo-solo-dark.svg')"
-          />
-        </ng-template>
-      </a>
-    </ng-template>
-
-    <ng-template #defaultHome>
-      <a class="title" [routerLink]="(authService.zitadelPermissions | async)?.length ? ['/'] : ['/users', 'me']">
-        <img
-          class="logo"
-          alt="zitadel logo"
-          *ngIf="isDarkTheme; else lighttheme"
-          src="./assets/images/zitadel-logo-solo-light.svg"
-        />
-        <ng-template #lighttheme>
-          <img alt="zitadel logo" class="logo" src="./assets/images/zitadel-logo-solo-dark.svg" />
-        </ng-template>
-      </a>
-    </ng-template>
+    @if (authService.labelPolicyLoading$ | async) {
+      <div class="logo-placeholder">
+        <mat-spinner [diameter]="20"></mat-spinner>
+      </div>
+    } @else {
+      @if (authService.labelpolicy$ | async; as lP) {
+        <a class="title custom" [routerLink]="['/']">
+          @if (isDarkTheme) {
+            <img
+              class="logo"
+              alt="home logo"
+              [src]="lP.iconUrlDark ? lP.iconUrlDark : './assets/images/zitadel-logo-solo-light.svg'"
+              (error)="errorHandler($event, './assets/images/zitadel-logo-solo-light.svg')"
+            />
+          } @else {
+            <img
+              alt="home logo"
+              class="logo"
+              [src]="lP.iconUrl ? lP.iconUrl : './assets/images/zitadel-logo-solo-dark.svg'"
+              (error)="errorHandler($event, './assets/images/zitadel-logo-solo-dark.svg')"
+            />
+          }
+        </a>
+      } @else {
+        <a class="title" [routerLink]="(authService.zitadelPermissions | async)?.length ? ['/'] : ['/users', 'me']">
+          @if (isDarkTheme) {
+            <img class="logo" alt="zitadel logo" src="./assets/images/zitadel-logo-solo-light.svg" />
+          } @else {
+            <img alt="zitadel logo" class="logo" src="./assets/images/zitadel-logo-solo-dark.svg" />
+          }
+        </a>
+      }
+    }
 
     <ng-container *ngFor="let bread of breadcrumbService.breadcrumbs$ | async as bc; index as i">
-      <ng-container *ngIf="bread.type === BreadcrumbType.INSTANCE">
+      @if (bread.type === BreadcrumbType.INSTANCE) {
         <ng-template cnslHasRole [hasRole]="['iam.read']">
           <svg
             class="slash hide-on-small"
@@ -53,16 +50,15 @@
           >
             <path d="M16.88 3.549L7.12 20.451"></path>
           </svg>
-
           <div class="breadcrumb-context hide-on-small">
             <a matRipple [matRippleUnbounded]="false" class="breadcrumb-link" [routerLink]="bread.routerLink">
               {{ 'MENU.INSTANCE' | translate }}
             </a>
           </div>
         </ng-template>
-      </ng-container>
+      }
 
-      <ng-container *ngIf="bread.type === BreadcrumbType.ORG">
+      @if (bread.type === BreadcrumbType.ORG) {
         <svg
           class="slash"
           viewBox="0 0 24 24"
@@ -76,20 +72,13 @@
         >
           <path d="M16.88 3.549L7.12 20.451"></path>
         </svg>
-
         <div class="org-context">
-          <a
-            *ngIf="org() as org"
-            matRipple
-            [matRippleUnbounded]="false"
-            class="org-link"
-            id="orglink"
-            [routerLink]="['/org']"
-          >
-            {{ org.name ? org.name : 'NO NAME' }}</a
-          >
-
-          <div class="org-context-wrapper" *ngIf="org">
+          @if (org(); as org) {
+            <a matRipple [matRippleUnbounded]="false" class="org-link" id="orglink" [routerLink]="['/org']">
+              {{ org.name ? org.name : 'NO NAME' }}</a
+            >
+          }
+          <div class="org-context-wrapper">
             <button
               cdkOverlayOrigin
               #trigger="cdkOverlayOrigin"
@@ -113,7 +102,6 @@
                 [type]="ActionKeysType.ORGSWITCHER"
               ></cnsl-action-keys>
             </button>
-
             <ng-template
               cdkConnectedOverlay
               [cdkConnectedOverlayOrigin]="trigger"
@@ -125,20 +113,21 @@
               (backdropClick)="showOrgContext = false"
               (detach)="showOrgContext = false"
             >
-              <cnsl-org-context
-                class="context_card"
-                *ngIf="showOrgContext && org() as org"
-                (closedCard)="showOrgContext = false"
-                [org]="org"
-                (setOrg)="setActiveOrg($event)"
-              >
-              </cnsl-org-context>
+              @if (showOrgContext && org(); as org) {
+                <cnsl-org-context
+                  class="context_card"
+                  (closedCard)="showOrgContext = false"
+                  [org]="org"
+                  (setOrg)="setActiveOrg($event)"
+                >
+                </cnsl-org-context>
+              }
             </ng-template>
           </div>
         </div>
-      </ng-container>
+      }
 
-      <ng-container *ngIf="bread.type !== BreadcrumbType.INSTANCE && bread.type !== BreadcrumbType.ORG">
+      @if (bread.type !== BreadcrumbType.INSTANCE && bread.type !== BreadcrumbType.ORG) {
         <svg
           class="slash"
           viewBox="0 0 24 24"
@@ -152,7 +141,6 @@
         >
           <path d="M16.88 3.549L7.12 20.451"></path>
         </svg>
-
         <div class="breadcrumb-context">
           <a
             matRipple
@@ -161,58 +149,54 @@
             [ngClass]="{ maxwidth: bc.length > 1 }"
             [routerLink]="bread.routerLink"
           >
-            <ng-container *ngIf="i !== bc.length - 1; else defLabel">
+            @if (i !== bc.length - 1) {
               <span class="desk">{{ bread.name }}</span>
               <span class="mob">...</span>
-            </ng-container>
-            <ng-template #defLabel>
+            } @else {
               <span>{{ bread.name }}</span>
-            </ng-template>
+            }
           </a>
         </div>
-      </ng-container>
+      }
     </ng-container>
 
     <span class="fill-space"></span>
 
-    <ng-container *ngIf="authService.privacypolicy$ | async as pP">
-      <a class="custom-link" *ngIf="pP.customLink" href="{{ pP.customLink }}" mat-stroked-button target="_blank">
-        {{ pP.customLinkText }}
-      </a>
+    @if (authService.privacypolicy$ | async; as pP) {
+      @if (pP.customLink) {
+        <a class="custom-link" href="{{ pP.customLink }}" mat-stroked-button target="_blank">
+          {{ pP.customLinkText }}
+        </a>
+      }
+      @if (pP.docsLink) {
+        <a class="doc-link" href="{{ pP.docsLink }}" mat-stroked-button target="_blank">
+          {{ 'MENU.DOCUMENTATION' | translate }}
+        </a>
+      }
+    }
 
-      <a class="doc-link" *ngIf="pP.docsLink" href="{{ pP.docsLink }}" mat-stroked-button target="_blank">
-        {{ 'MENU.DOCUMENTATION' | translate }}
-      </a>
-    </ng-container>
+    @if (!isOnMe) {
+      <div class="system-rel">
+        @if (!isOnInstance && (['iam.read$', 'iam.write$'] | hasRole | async)) {
+          <a id="systembutton" [routerLink]="['/instance']" class="iam-settings" mat-stroked-button>
+            <div class="cnsl-action-button">
+              <span class="iam-label">{{ 'MENU.INSTANCE' | translate }}</span>
+              <i class="las la-cog"></i>
+            </div>
+          </a>
+        }
+        @if (isOnInstance && (['org.read'] | hasRole | async)) {
+          <a id="orgbutton" [routerLink]="['/org']" class="org-settings" mat-stroked-button>
+            <div class="cnsl-action-button">
+              <span class="iam-label">{{ 'MENU.ORGANIZATION' | translate }}</span>
+              <i class="las la-cog"></i>
+            </div>
+          </a>
+        }
+      </div>
+    }
 
-    <div class="system-rel" *ngIf="!isOnMe">
-      <a
-        id="systembutton"
-        *ngIf="!isOnInstance && (['iam.read$', 'iam.write$'] | hasRole | async)"
-        [routerLink]="['/instance']"
-        class="iam-settings"
-        mat-stroked-button
-      >
-        <div class="cnsl-action-button">
-          <span class="iam-label">{{ 'MENU.INSTANCE' | translate }}</span>
-          <i class="las la-cog"></i>
-        </div>
-      </a>
-      <a
-        id="orgbutton"
-        *ngIf="isOnInstance && (['org.read'] | hasRole | async)"
-        [routerLink]="['/org']"
-        class="org-settings"
-        mat-stroked-button
-      >
-        <div class="cnsl-action-button">
-          <span class="iam-label">{{ 'MENU.ORGANIZATION' | translate }}</span>
-          <i class="las la-cog"></i>
-        </div>
-      </a>
-    </div>
-
-    <ng-container *ngIf="user && user.id">
+    @if (user && user.id) {
       <div class="account-card-wrapper">
         <button
           cdkOverlayOrigin
@@ -244,15 +228,16 @@
         (backdropClick)="showAccount = false"
         (detach)="showAccount = false"
       >
-        <cnsl-accounts-card
-          class="a_card"
-          *ngIf="showAccount"
-          (closedCard)="showAccount = false"
-          [user]="user"
-          [iamuser]="['iam.write$'] | hasRole | async"
-        >
-        </cnsl-accounts-card>
+        @if (showAccount) {
+          <cnsl-accounts-card
+            class="a_card"
+            (closedCard)="showAccount = false"
+            [user]="user"
+            [iamuser]="['iam.write$'] | hasRole | async"
+          >
+          </cnsl-accounts-card>
+        }
       </ng-template>
-    </ng-container>
+    }
   </div>
 </mat-toolbar>

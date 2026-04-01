@@ -1,5 +1,7 @@
 <div class="spinner-wr">
-  <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
+  @if (loading) {
+    <mat-spinner diameter="30" color="primary"></mat-spinner>
+  }
 </div>
 <h2>{{ 'DESCRIPTIONS.SETTINGS.OIDC.TITLE' | translate }}</h2>
 <p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.OIDC.DESCRIPTION' | translate }}</p>
