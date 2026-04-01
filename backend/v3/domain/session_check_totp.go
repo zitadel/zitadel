@@ -82,19 +82,16 @@ func (t *TOTPCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([]even
 		return nil, nil
 	}
 
-	events := make([]eventstore.Command, 2, 3)
+	events := make([]eventstore.Command, 1, 2)
 	userAgg := &user.NewAggregate(t.FetchedUser.ID, t.FetchedUser.OrganizationID).Aggregate
 	if t.IsCheckSuccessful {
 		events[0] = user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil)
-	} else {
-		events[0] = user.NewHumanOTPCheckFailedEvent(ctx, userAgg, nil)
+		return append(events, session.NewTOTPCheckedEvent(ctx, &session.NewAggregate(t.SessionID, t.InstanceID).Aggregate, t.CheckedAt)), nil
 	}
+	events[0] = user.NewHumanOTPCheckFailedEvent(ctx, userAgg, nil)
 
 	if t.IsUserLocked {
-		events[1] = user.NewUserLockedEvent(ctx, userAgg)
-		events = append(events, session.NewTOTPCheckedEvent(ctx, &session.NewAggregate(t.SessionID, t.InstanceID).Aggregate, t.CheckedAt))
-	} else {
-		events[1] = session.NewTOTPCheckedEvent(ctx, &session.NewAggregate(t.SessionID, t.InstanceID).Aggregate, t.CheckedAt)
+		events = append(events, user.NewUserLockedEvent(ctx, userAgg))
 	}
 
 	return events, nil

@@ -882,7 +882,7 @@ func TestTOTPCheckCommand_Events(t *testing.T) {
 			},
 		},
 		{
-			testName: "when check is unsuccessful should emit user failed and session totp checked events",
+			testName: "when check is unsuccessful should emit user failed event",
 			cmd: &domain.TOTPCheckCommand{
 				CheckTOTP:   &domain.CheckTOTPType{},
 				SessionID:   "session-1",
@@ -892,11 +892,10 @@ func TestTOTPCheckCommand_Events(t *testing.T) {
 			},
 			expectedEvents: []eventstore.Command{
 				user.NewHumanOTPCheckFailedEvent(t.Context(), &userAgg, nil),
-				session.NewTOTPCheckedEvent(t.Context(), &sessionAgg, time.Now()),
 			},
 		},
 		{
-			testName: "when check is unsuccessful and user is locked should emit user failed, user locked and session totp checked events",
+			testName: "when check is unsuccessful and user is locked should emit user failed and user locked events",
 			cmd: &domain.TOTPCheckCommand{
 				CheckTOTP:    &domain.CheckTOTPType{},
 				SessionID:    "session-1",
@@ -908,7 +907,6 @@ func TestTOTPCheckCommand_Events(t *testing.T) {
 			expectedEvents: []eventstore.Command{
 				user.NewHumanOTPCheckFailedEvent(t.Context(), &userAgg, nil),
 				user.NewUserLockedEvent(t.Context(), &userAgg),
-				session.NewTOTPCheckedEvent(t.Context(), &sessionAgg, time.Now()),
 			},
 		},
 	}
