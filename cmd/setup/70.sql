@@ -1,37 +1,11 @@
-CREATE OR REPLACE FUNCTION eventstore.latest_aggregate_state(
-    instance_id TEXT
-    , aggregate_type TEXT
-    , aggregate_id TEXT
-    
-    , sequence OUT BIGINT
-    , owner OUT TEXT
-)
-    LANGUAGE 'plpgsql'
-    STABLE PARALLEL SAFE
-AS $$
-    BEGIN
-        SELECT
-            COALESCE(e.sequence, 0) AS sequence
-            , e.owner
-        INTO
-            sequence
-            , owner
-        FROM
-            eventstore.events2 e
-        WHERE
-            e.instance_id = $1
-            AND e.aggregate_type = $2
-            AND e.aggregate_id = $3
-        ORDER BY 
-            e.sequence DESC
-        LIMIT 1;
-
-        RETURN;
-    END;
-$$;
+DO $$ BEGIN
+    ALTER TYPE eventstore.command ADD ATTRIBUTE enforce_owner BOOLEAN;
+EXCEPTION
+    WHEN duplicate_column THEN null;
+END $$;
 
 CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command[])
-    RETURNS SETOF eventstore.events2 
+    RETURNS SETOF eventstore.events2
     LANGUAGE 'plpgsql'
     STABLE PARALLEL SAFE
     ROWS 10
@@ -45,18 +19,18 @@ DECLARE
     created_at TIMESTAMPTZ;
 BEGIN
     created_at := statement_timestamp();
-    FOR "aggregate" IN 
+    FOR "aggregate" IN
         SELECT DISTINCT
             instance_id
             , aggregate_type
             , aggregate_id
         FROM UNNEST(commands)
     LOOP
-        SELECT 
-            * 
+        SELECT
+            *
         INTO
             current_sequence
-            , current_owner 
+            , current_owner
         FROM eventstore.latest_aggregate_state(
             "aggregate".instance_id
             , "aggregate".aggregate_type
@@ -97,15 +71,15 @@ BEGIN
             c.instance_id
             , c.aggregate_type
             , c.aggregate_id
-            , c.command_type -- AS event_type
-            , COALESCE(current_sequence, 0) + ROW_NUMBER() OVER (ORDER BY c.ordinality) -- AS sequence
+            , c.command_type
+            , COALESCE(current_sequence, 0) + ROW_NUMBER() OVER (ORDER BY c.ordinality)
             , c.revision
             , created_at
             , c.payload
             , c.creator
-            , COALESCE(enforced_owner, current_owner, command_owner) -- AS owner
-            , EXTRACT(EPOCH FROM created_at) -- AS position
-            , c.ordinality::{{ .InTxOrderType }} -- AS in_tx_order
+            , COALESCE(enforced_owner, current_owner, command_owner)
+            , EXTRACT(EPOCH FROM created_at)
+            , c.ordinality::%s
         FROM
             UNNEST(commands) WITH ORDINALITY AS c
         WHERE
@@ -118,10 +92,3 @@ BEGIN
     RETURN;
 END;
 $$;
-
-CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command[]) RETURNS SETOF eventstore.events2 VOLATILE AS $$
-INSERT INTO eventstore.events2
-SELECT * FROM eventstore.commands_to_events(commands)
-ORDER BY in_tx_order
-RETURNING *
-$$ LANGUAGE SQL;

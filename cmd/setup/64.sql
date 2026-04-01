@@ -8,6 +8,8 @@ DECLARE
     "aggregate" RECORD;
     current_sequence BIGINT;
     current_owner TEXT;
+    command_owner TEXT;
+    enforced_owner TEXT;
     created_at TIMESTAMPTZ;
 BEGIN
     created_at := statement_timestamp();
@@ -29,26 +31,57 @@ BEGIN
             , "aggregate".aggregate_id
         );
 
+        SELECT
+            c.owner
+        INTO
+            command_owner
+        FROM
+            UNNEST(commands) WITH ORDINALITY AS c
+        WHERE
+            c.instance_id = "aggregate".instance_id
+            AND c.aggregate_type = "aggregate".aggregate_type
+            AND c.aggregate_id = "aggregate".aggregate_id
+        ORDER BY
+            c.ordinality
+        LIMIT 1;
+
+        SELECT
+            c.owner
+        INTO
+            enforced_owner
+        FROM
+            UNNEST(commands) WITH ORDINALITY AS c
+        WHERE
+            c.instance_id = "aggregate".instance_id
+            AND c.aggregate_type = "aggregate".aggregate_type
+            AND c.aggregate_id = "aggregate".aggregate_id
+            AND c.enforce_owner
+        ORDER BY
+            c.ordinality
+        LIMIT 1;
+
         RETURN QUERY
         SELECT
             c.instance_id
             , c.aggregate_type
             , c.aggregate_id
             , c.command_type -- AS event_type
-            , COALESCE(current_sequence, 0) + ROW_NUMBER() OVER () -- AS sequence
+            , COALESCE(current_sequence, 0) + ROW_NUMBER() OVER (ORDER BY c.ordinality) -- AS sequence
             , c.revision
             , created_at
             , c.payload
             , c.creator
-            , COALESCE(current_owner, c.owner) -- AS owner
+            , COALESCE(enforced_owner, current_owner, command_owner) -- AS owner
             , EXTRACT(EPOCH FROM created_at) -- AS position
             , c.ordinality::%s -- AS in_tx_order
         FROM
             UNNEST(commands) WITH ORDINALITY AS c
         WHERE
-            c.instance_id = aggregate.instance_id
-            AND c.aggregate_type = aggregate.aggregate_type
-            AND c.aggregate_id = aggregate.aggregate_id;
+            c.instance_id = "aggregate".instance_id
+            AND c.aggregate_type = "aggregate".aggregate_type
+            AND c.aggregate_id = "aggregate".aggregate_id
+        ORDER BY
+            c.ordinality;
     END LOOP;
     RETURN;
 END;

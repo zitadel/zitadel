@@ -32,12 +32,28 @@ DO $$ BEGIN
         , payload JSONB
         , creator TEXT
         , owner TEXT
+        , enforce_owner BOOLEAN
     );
 EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
 
 CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command[]) RETURNS SETOF eventstore.events2 VOLATILE AS $$
+WITH c AS (
+    SELECT
+        c.instance_id
+        , c.aggregate_type
+        , c.aggregate_id
+        , c.command_type
+        , c.revision
+        , c.payload
+        , c.creator
+        , c.owner
+        , c.enforce_owner
+        , ROW_NUMBER() OVER () AS in_tx_order
+    FROM
+        UNNEST(commands) AS c
+)
 SELECT
     c.instance_id
     , c.aggregate_type
@@ -48,64 +64,80 @@ SELECT
     , NOW() AS created_at
     , c.payload
     , c.creator
-    , cs.owner
+    , COALESCE(cs.enforced_owner, cs.current_owner, cs.command_owner) AS owner
     , EXTRACT(EPOCH FROM NOW()) AS position
     , c.in_tx_order
-FROM (
-    SELECT
-        c.instance_id
-        , c.aggregate_type
-        , c.aggregate_id
-        , c.command_type
-        , c.revision
-        , c.payload
-        , c.creator
-        , c.owner
-        , ROW_NUMBER() OVER () AS in_tx_order
-    FROM
-        UNNEST(commands) AS c
-) AS c
+FROM c
 JOIN (
     SELECT
         cmds.instance_id
         , cmds.aggregate_type
         , cmds.aggregate_id
-        , CASE WHEN (e.owner IS NOT NULL OR e.owner <> '') THEN e.owner ELSE command_owners.owner END AS owner
-        , COALESCE(MAX(e.sequence), 0) AS sequence
+        , current_owners.owner AS current_owner
+        , command_owners.owner AS command_owner
+        , enforced_owners.owner AS enforced_owner
+        , COALESCE(current_owners.sequence, 0) AS sequence
     FROM (
         SELECT DISTINCT
             instance_id
             , aggregate_type
             , aggregate_id
-            , owner
-        FROM UNNEST(commands)
+        FROM c
     ) AS cmds
-    LEFT JOIN eventstore.events2 AS e
-        ON cmds.instance_id = e.instance_id
-        AND cmds.aggregate_type = e.aggregate_type
-        AND cmds.aggregate_id = e.aggregate_id
-    JOIN (
+    LEFT JOIN LATERAL (
         SELECT
-            DISTINCT ON (
-                instance_id
-                , aggregate_type
-                , aggregate_id
-            )
+            e.owner
+            , e.sequence
+        FROM eventstore.events2 AS e
+        WHERE
+            cmds.instance_id = e.instance_id
+            AND cmds.aggregate_type = e.aggregate_type
+            AND cmds.aggregate_id = e.aggregate_id
+        ORDER BY
+            e.sequence DESC
+        LIMIT 1
+    ) AS current_owners ON true
+    JOIN (
+        SELECT DISTINCT ON (
+            instance_id
+            , aggregate_type
+            , aggregate_id
+        )
             instance_id
             , aggregate_type
             , aggregate_id
             , owner
-        FROM
-            UNNEST(commands)
-    ) AS command_owners ON
-        cmds.instance_id = command_owners.instance_id
+        FROM c
+        ORDER BY
+            instance_id
+            , aggregate_type
+            , aggregate_id
+            , in_tx_order
+    ) AS command_owners
+        ON cmds.instance_id = command_owners.instance_id
         AND cmds.aggregate_type = command_owners.aggregate_type
         AND cmds.aggregate_id = command_owners.aggregate_id
-    GROUP BY
-        cmds.instance_id
-        , cmds.aggregate_type
-        , cmds.aggregate_id
-        , 4 -- owner
+    LEFT JOIN (
+        SELECT DISTINCT ON (
+            instance_id
+            , aggregate_type
+            , aggregate_id
+        )
+            instance_id
+            , aggregate_type
+            , aggregate_id
+            , owner
+        FROM c
+        WHERE enforce_owner
+        ORDER BY
+            instance_id
+            , aggregate_type
+            , aggregate_id
+            , in_tx_order
+    ) AS enforced_owners
+        ON cmds.instance_id = enforced_owners.instance_id
+        AND cmds.aggregate_type = enforced_owners.aggregate_type
+        AND cmds.aggregate_id = enforced_owners.aggregate_id
 ) AS cs
     ON c.instance_id = cs.instance_id
     AND c.aggregate_type = cs.aggregate_type
@@ -117,5 +149,6 @@ $$ LANGUAGE SQL;
 CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command[]) RETURNS SETOF eventstore.events2 VOLATILE AS $$
 INSERT INTO eventstore.events2
 SELECT * FROM eventstore.commands_to_events(commands)
+ORDER BY in_tx_order
 RETURNING *
 $$ LANGUAGE SQL;
