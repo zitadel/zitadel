@@ -8,6 +8,7 @@ Instrumentation:
     Exporter:
       # The following exporter types are supported:
       # "none": Disables trace exporting
+      # "auto": Delegates to standard OTEL env vars (OTEL_TRACES_EXPORTER, OTEL_EXPORTER_OTLP_ENDPOINT)
       # "stdOut": Exports traces to standard output
       # "stdErr": Exports traces to standard error
       # "grpc": Exports traces using the OTEL gRPC exporter (recommended)
@@ -26,6 +27,7 @@ Instrumentation:
     Exporter:
       # The following exporter types are supported:
       # "none": Disables metric exporting
+      # "auto": Delegates to standard OTEL env vars (OTEL_METRICS_EXPORTER, OTEL_EXPORTER_OTLP_ENDPOINT)
       # "stdOut": Exports metrics to standard output
       # "stdErr": Exports metrics to standard error
       # "grpc": Exports metrics using the OTEL gRPC exporter (recommended)
@@ -91,6 +93,7 @@ Instrumentation:
     Exporter:
       # The following exporter types are supported:
       #   - "none": Disables OTEL log exporter
+      #   - "auto": Delegates to standard OTEL env vars (OTEL_LOGS_EXPORTER, OTEL_EXPORTER_OTLP_ENDPOINT)
       #   - "stdOut": Exports OTEL logs to standard output
       #   - "stdErr": Exports OTEL logs to standard error
       #   - "grpc": Exports OTEL logs using the OTEL gRPC exporter (recommended)
@@ -100,7 +103,7 @@ Instrumentation:
       Endpoint: "" # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_ENDPOINT
       # Disable TLS for grpc and http exporters
       Insecure: false # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_INSECURE
-      # Interval at which metrics are exported
+      # Interval at which logs are batched for export
       BatchDuration: 1s # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_BATCHDURATION
   Profile:
     Exporter:
@@ -1320,7 +1323,6 @@ DefaultInstance:
   Features:
     LoginDefaultOrg: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINDEFAULTORG
     UserSchema: # ZITADEL_DEFAULTINSTANCE_FEATURES_USERSCHEMA
-    TokenExchange: # ZITADEL_DEFAULTINSTANCE_FEATURES_TOKENEXCHANGE
     ImprovedPerformance: # ZITADEL_DEFAULTINSTANCE_FEATURES_IMPROVEDPERFORMANCE
     # https://github.com/zitadel/zitadel/blob/main/internal/feature/feature.go#L64-L68
     #   - 1 # OrgByID

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"slices"
+	"time"
 
 	"go.uber.org/mock/gomock"
 
@@ -40,6 +41,19 @@ func (c *change[V]) Matches(x any) bool {
 	}
 	colMatch := c.column.Equals(toMatch.column)
 	valueMatch := reflect.DeepEqual(c.value, toMatch.value)
+	if !valueMatch {
+		// if c.value and toMatch.value are [time.Time] values, we want to compare them within a range.
+		if t1, ok1 := any(c.value).(time.Time); ok1 {
+			if t2, ok2 := any(toMatch.value).(time.Time); ok2 {
+				diff := t1.Sub(t2)
+				if diff < 0 {
+					diff = -diff
+				}
+				// We may want to make [time.Second] configurable in the future
+				valueMatch = diff <= time.Second
+			}
+		}
+	}
 	return colMatch && valueMatch
 }
 
