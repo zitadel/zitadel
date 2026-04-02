@@ -54,7 +54,7 @@
         "!{projectRoot}/acceptance/**/*",
         "!{projectRoot}/dockerized/**/*"
       ],
-      "outputs": ["{projectRoot}/.next", "!{projectRoot}/.next/cache", "!{projectRoot}/.next/standalone"]
+      "outputs": ["{projectRoot}/.next/!(cache|standalone)/**"]
     },
     "lint": {
       "description": "Runs all linters",
