@@ -44,7 +44,7 @@
     },
     "build-vercel": {
       "description": "Builds the Next.js Login application for Vercel deployment",
-      "cache": true,
+      "cache": false,
       "dependsOn": ["^build"],
       "inputs": [
         "default",
