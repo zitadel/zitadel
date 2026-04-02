@@ -433,7 +433,24 @@ describe("sendLoginname", () => {
         });
       });
 
-      test("should redirect to IDP when no passkey but IDP available", async () => {
+      test("should redirect to password when both IDP and password available and local auth allowed", async () => {
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.IDP],
+        });
+
+        const result = await sendLoginname({
+          loginName: "user@example.com",
+          requestId: "req123",
+        });
+
+        expect(result).toHaveProperty("redirect");
+        expect((result as any).redirect).toMatch(/^\/password\?/);
+        expect((result as any).redirect).toContain("loginName=user%40example.com");
+        expect((result as any).redirect).toContain("requestId=req123");
+      });
+
+      test("should redirect to IDP when both IDP and password available but local auth not allowed", async () => {
+        mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
         mockListAuthenticationMethodTypes.mockResolvedValue({
           authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.IDP],
         });

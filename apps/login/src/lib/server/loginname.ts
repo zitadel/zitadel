@@ -462,9 +462,31 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
         return { redirect: "/passkey?" + passkeyParams };
       } else if (methods.authMethodTypes.includes(AuthenticationMethodType.IDP)) {
+        if (
+          methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD) &&
+          userLoginSettings?.allowLocalAuthentication
+        ) {
+          const paramsPasswordDefault = new URLSearchParams({
+            loginName: command.ignoreUnknownUsernames
+              ? command.loginName
+              : (session?.factors?.user?.loginName ?? user.preferredLoginName),
+          });
+
+          if (command.requestId) {
+            paramsPasswordDefault.append("requestId", command.requestId);
+          }
+
+          if (organization) {
+            paramsPasswordDefault.append("organization", organization);
+          }
+
+          return {
+            redirect: "/password?" + paramsPasswordDefault,
+          };
+        }
+
         return redirectUserToIDP(userId, organization);
       } else if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)) {
-        // Check if password authentication is allowed
         if (!userLoginSettings?.allowLocalAuthentication) {
           if (command.ignoreUnknownUsernames) {
             return preventUserEnumeration(command.organization);
@@ -474,7 +496,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           };
         }
 
-        // user has no passkey setup and login settings allow passwords
         const paramsPasswordDefault = new URLSearchParams({
           loginName: command.ignoreUnknownUsernames
             ? command.loginName

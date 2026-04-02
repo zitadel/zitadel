@@ -30,7 +30,7 @@ export function ConsentScreen({
     setLoading(true);
     const response = await completeDeviceAuthorization(deviceAuthorizationRequestId)
       .catch(() => {
-        setError("Could not register user");
+        setError("Could not deny device authorization");
         return;
       })
       .finally(() => {
