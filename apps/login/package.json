@@ -96,7 +96,7 @@
     "globals": "^17.4.0",
     "grpc-tools": "^1.13.1",
     "jsdom": "^26.1.0",
-    "lint-staged": "15.5.2",
+    "lint-staged": "^16.4.0",
     "node-forge": "^1.4.0",
     "nodemon": "^3.1.14",
     "postcss": "^8.5.8",
@@ -110,6 +110,6 @@
     "ts-proto": "^2.11.6",
     "typescript": "^5.9.3",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^2.1.9"
+    "vitest": "^4.1.2"
   }
 }
