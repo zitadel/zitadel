@@ -1,0 +1,22 @@
+# dependencies
+node_modules/
+
+# next.js
+.next/
+out/
+
+# production
+build/
+dist/
+
+# env files
+.env
+.env*.local
+
+# lock file (workspace root manages this)
+pnpm-lock.yaml
+
+# misc
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts

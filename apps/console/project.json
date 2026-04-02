@@ -1,0 +1,33 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "@zitadel/console-next",
+  "targets": {
+    "dev": {
+      "description": "Runs the Next.js Console application in development mode with hot-reloading",
+      "continuous": true,
+      "dependsOn": ["^build"]
+    },
+    "build": {
+      "description": "Builds the Next.js Console application for production",
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "!{projectRoot}/.env",
+        "!{projectRoot}/.env.*"
+      ],
+      "outputs": ["{projectRoot}/.next"]
+    },
+    "lint": {
+      "description": "Runs all linters",
+      "dependsOn": ["lint-check-*"]
+    },
+    "lint-check-next": {
+      "description": "Runs Next.js specific lint checks",
+      "cache": true,
+      "inputs": ["default"],
+      "dependsOn": ["^build"]
+    }
+  }
+}

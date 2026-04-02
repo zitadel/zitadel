@@ -11,6 +11,7 @@ ZITADEL is an open-source Identity Management System (IAM) written in Go and Ang
 ## Repository Structure Map
 - **`apps/`**: Consumer-facing web applications.
   - **`login`**: Next.js authentication UI. See `apps/login/AGENTS.md`.
+  - **`console`**: Next.js management console (next-gen). See `apps/console/AGENTS.md`.
   - **`docs`**: Fumadocs documentation app. See `apps/docs/AGENTS.md`.
   - **`api`**: Backend Nx app target. See `apps/api/AGENTS.md`.
 - **`console/`**: Angular Management Console. See `console/AGENTS.md`.

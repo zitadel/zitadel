@@ -1,0 +1,29 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "@zitadel/cloud",
+  "targets": {
+    "dev": {
+      "description": "Runs the ZITADEL Cloud app in development mode",
+      "continuous": true,
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "build": {
+      "description": "Builds the ZITADEL Cloud app for production",
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "!{projectRoot}/.env",
+        "!{projectRoot}/.env.*"
+      ],
+      "outputs": [
+        "{projectRoot}/.next"
+      ]
+    }
+  }
+}

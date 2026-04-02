@@ -28,6 +28,13 @@ packages/zitadel-client/
 packages/zitadel-proto/
 ```
 
+The following files and directories, including their subdirectories, are **source-available but not open source**. You may view the code, but you may not use, modify, or distribute it without explicit written permission from ZITADEL:
+
+```
+apps/cloud/
+apps/website/
+```
+
 ## Community Contributions
 
 To maintain a clear licensing structure and facilitate community contributions, all contributions must be licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) to be accepted. By submitting a contribution, you agree to this licensing.
