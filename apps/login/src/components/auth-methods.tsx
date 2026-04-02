@@ -181,7 +181,7 @@ export const PASSWORD = (alreadyAdded: boolean, link: string) => {
 
 function Setup() {
   return (
-    <div className="absolute right-2 top-0 transform">
+    <div className="absolute top-0 right-2 transform">
       <StateBadge evenPadding={true} state={BadgeState.Success}>
         <CheckIcon className="h-4 w-4" />
       </StateBadge>
