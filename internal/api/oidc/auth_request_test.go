@@ -98,7 +98,7 @@ func TestBuildLoginV2LogoutURL(t *testing.T) {
 			require.NoError(t, err)
 
 			// When
-			got, err := buildLoginV2LogoutURL(logoutURI, tc.redirectURI, tc.logoutHint, tc.uiLocales, signer)
+			got, err := buildLoginV2LogoutURL(logoutURI, v2PostLogoutRedirectURI(tc.redirectURI), tc.logoutHint, tc.uiLocales, signer)
 
 			// Then
 			require.NoError(t, err)
