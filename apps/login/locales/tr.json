@@ -61,6 +61,8 @@
     }
   },
   "password": {
+    "showPassword": "Parolayı göster",
+    "hidePassword": "Parolayı gizle",
     "verify": {
       "title": "Şifre",
       "description": "Şifrenizi girin.",

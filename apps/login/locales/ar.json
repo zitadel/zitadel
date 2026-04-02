@@ -62,6 +62,8 @@
     }
   },
   "password": {
+    "showPassword": "إظهار كلمة المرور",
+    "hidePassword": "إخفاء كلمة المرور",
     "verify": {
       "title": "كلمة المرور",
       "description": "أدخل كلمة المرور الخاصة بك.",

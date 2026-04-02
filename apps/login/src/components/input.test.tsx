@@ -1,6 +1,10 @@
-import { render, screen } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { TextInput } from "./input";
+
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => key,
+}));
 
 describe("TextInput Component", () => {
   const originalEnv = process.env;
@@ -11,6 +15,7 @@ describe("TextInput Component", () => {
 
   afterEach(() => {
     process.env = originalEnv;
+    cleanup();
   });
 
   describe("Component Rendering", () => {
@@ -130,6 +135,25 @@ describe("TextInput Component", () => {
       const { container } = render(<TextInput label="Test" autoFocus />);
       const input = container.querySelector("input");
       expect(input).toHaveFocus();
+    });
+
+    it("should render a toggle for password inputs", () => {
+      render(<TextInput label="Password" type="password" data-testid="password-input" />);
+      expect(screen.getByRole("button", { name: "showPassword" })).toBeTruthy();
+      expect(screen.getByRole("button", { name: "showPassword" })).toHaveAttribute("aria-pressed", "false");
+    });
+
+    it("should toggle password visibility", () => {
+      render(<TextInput label="Password" type="password" data-testid="password-input" />);
+      const input = screen.getByTestId("password-input");
+      const toggle = screen.getByRole("button", { name: "showPassword" });
+
+      expect(input).toHaveAttribute("type", "password");
+
+      fireEvent.click(toggle);
+
+      expect(input).toHaveAttribute("type", "text");
+      expect(screen.getByRole("button", { name: "hidePassword" })).toHaveAttribute("aria-pressed", "true");
     });
   });
 

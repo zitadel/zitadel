@@ -61,6 +61,8 @@
     }
   },
   "password": {
+    "showPassword": "显示密码",
+    "hidePassword": "隐藏密码",
     "verify": {
       "title": "密码",
       "description": "请输入您的密码。",

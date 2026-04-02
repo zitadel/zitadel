@@ -61,6 +61,8 @@
     }
   },
   "password": {
+    "showPassword": "Wachtwoord tonen",
+    "hidePassword": "Wachtwoord verbergen",
     "verify": {
       "title": "Wachtwoord",
       "description": "Voer jouw wachtwoord in.",

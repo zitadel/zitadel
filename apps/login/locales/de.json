@@ -61,6 +61,8 @@
     }
   },
   "password": {
+    "showPassword": "Passwort anzeigen",
+    "hidePassword": "Passwort ausblenden",
     "verify": {
       "title": "Passwort",
       "description": "Geben Sie Ihr Passwort ein.",

@@ -54,6 +54,8 @@
     }
   },
   "password": {
+    "showPassword": "パスワードを表示",
+    "hidePassword": "パスワードを非表示",
     "verify": {
       "title": "パスワード",
       "description": "パスワードを入力してください。",

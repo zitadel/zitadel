@@ -61,6 +61,8 @@
     }
   },
   "password": {
+    "showPassword": "Показать пароль",
+    "hidePassword": "Скрыть пароль",
     "verify": {
       "title": "Пароль",
       "description": "Введите ваш пароль.",

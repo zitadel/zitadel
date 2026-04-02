@@ -61,6 +61,8 @@
     }
   },
   "password": {
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña",
     "verify": {
       "title": "Contraseña",
       "description": "Introduce tu contraseña.",
