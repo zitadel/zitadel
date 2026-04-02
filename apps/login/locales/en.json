@@ -25,7 +25,8 @@
   "loginname": {
     "title": "Welcome back!",
     "description": "Enter your login details.",
-    "register": "Register new user",
+    "register": "Create an Account",
+    "noAccount": "Don't have an account?",
     "submit": "Continue",
     "labels": {
       "loginname": "Loginname",

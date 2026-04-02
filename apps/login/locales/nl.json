@@ -25,7 +25,8 @@
   "loginname": {
     "title": "Welkom terug!",
     "description": "Voer jouw inloggegevens in.",
-    "register": "Nieuwe gebruiker registreren",
+    "register": "Account aanmaken",
+    "noAccount": "Nog geen account?",
     "submit": "Verder",
     "labels": {
       "loginname": "Loginnaam",

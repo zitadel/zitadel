@@ -25,7 +25,8 @@
   "loginname": {
     "title": "Bienvenue!",
     "description": "Entrez vos données de connexion.",
-    "register": "Enregistrer un nouveau compte",
+    "register": "Créer un compte",
+    "noAccount": "Pas encore de compte ?",
     "submit": "Continuer",
     "labels": {
       "loginname": "Identifiant",

@@ -113,27 +113,6 @@ export function UsernameForm({
             data-testid="username-text-input"
             suffix={suffix}
           />
-          {allowRegister && (
-            <button
-              className="text-sm transition-all hover:text-primary-light-500 dark:hover:text-primary-dark-500"
-              onClick={() => {
-                const registerParams = new URLSearchParams();
-                if (organization) {
-                  registerParams.append("organization", organization);
-                }
-                if (requestId) {
-                  registerParams.append("requestId", requestId);
-                }
-
-                router.push("/register?" + registerParams);
-              }}
-              type="button"
-              disabled={loading}
-              data-testid="register-button"
-            >
-              <Translated i18nKey="register" namespace="loginname" />
-            </button>
-          )}
         </div>
 
         {error && (
@@ -157,6 +136,31 @@ export function UsernameForm({
           </Button>
         </div>
       </form>
+
+      {allowRegister && (
+        <div className="mt-2 flex w-full flex-col items-center gap-2">
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t("noAccount")}</p>
+          <Button
+            type="button"
+            variant={ButtonVariants.Secondary}
+            className="w-full justify-center"
+            disabled={loading}
+            data-testid="register-button"
+            onClick={() => {
+              const registerParams = new URLSearchParams();
+              if (organization) {
+                registerParams.append("organization", organization);
+              }
+              if (requestId) {
+                registerParams.append("requestId", requestId);
+              }
+              router.push("/register?" + registerParams);
+            }}
+          >
+            <Translated i18nKey="register" namespace="loginname" />
+          </Button>
+        </div>
+      )}
     </>
   );
 }
