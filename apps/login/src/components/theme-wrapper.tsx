@@ -54,7 +54,7 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
           break;
       }
     }
-  }, [branding?.themeMode, setNextTheme]);
+  }, [branding?.themeMode]);
 
   return <div>{children}</div>;
 };
