@@ -109,6 +109,7 @@
                   </button>
                   <cnsl-contact
                     [disablePhoneCode]="true"
+                    [disableEmailEdit]="(disableEmailEdit$ | async) ?? true"
                     [username]="user.preferredLoginName"
                     [canWrite]="['user.write:' + user.userId, 'user.write$'] | hasRole | async"
                     [human]="user.type.value"
@@ -143,6 +144,7 @@
               *ngIf="currentSetting$().id === 'idp' && user.type.case === 'human' && user.userId"
               [userId]="user.userId"
               [service]="mgmtService"
+              (linkedIdpsChanged)="refreshLinkedIdps()"
             />
 
             <cnsl-card

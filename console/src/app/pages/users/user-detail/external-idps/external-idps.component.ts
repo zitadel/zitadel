@@ -1,5 +1,5 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
@@ -12,6 +12,8 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+const PROJECTION_SETTLE_DELAY_MS = 1000;
+
 @Component({
   selector: 'cnsl-external-idps',
   templateUrl: './external-idps.component.html',
@@ -21,6 +23,7 @@ import { ToastService } from 'src/app/services/toast.service';
 export class ExternalIdpsComponent implements OnInit, OnDestroy {
   @Input({ required: true }) service!: GrpcAuthService | ManagementService;
   @Input() userId!: string;
+  @Output() linkedIdpsChanged = new EventEmitter<void>();
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   public totalResult: number = 0;
   public viewTimestamp!: Timestamp.AsObject;
@@ -63,17 +66,36 @@ export class ExternalIdpsComponent implements OnInit, OnDestroy {
     this.getData(event.pageSize, event.pageIndex * event.pageSize);
   }
 
+  private listLinkedIdps(limit: number, offset: number) {
+    if (this.service instanceof ManagementService) {
+      return this.service.listHumanLinkedIDPs(this.userId, limit, offset);
+    }
+    return this.service.listMyLinkedIDPs(limit, offset);
+  }
+
+  private removeLinkedIdp(idp: IDPUserLink.AsObject) {
+    if (this.service instanceof ManagementService) {
+      return this.service.removeHumanLinkedIDP(idp.idpId, idp.providedUserId, idp.userId);
+    }
+    return this.service.removeMyLinkedIDP(idp.idpId, idp.providedUserId);
+  }
+
+  private waitForProjection(): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, PROJECTION_SETTLE_DELAY_MS));
+  }
+
+  private async refreshAfterMutation(): Promise<void> {
+    await this.waitForProjection();
+    await this.refreshPage();
+    this.linkedIdpsChanged.emit();
+  }
+
   private async getData(limit: number, offset: number): Promise<void> {
     this.loadingSubject.next(true);
 
-    const promise =
-      this.service instanceof ManagementService
-        ? (this.service as ManagementService).listHumanLinkedIDPs(this.userId, limit, offset)
-        : (this.service as GrpcAuthService).listMyLinkedIDPs(limit, offset);
-
     let resp;
     try {
-      resp = await promise;
+      resp = await this.listLinkedIdps(limit, offset);
     } catch (error) {
       this.toast.showError(error);
       this.loadingSubject.next(false);
@@ -92,8 +114,8 @@ export class ExternalIdpsComponent implements OnInit, OnDestroy {
     this.loadingSubject.next(false);
   }
 
-  public refreshPage(): void {
-    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize).then();
+  public refreshPage(): Promise<void> {
+    return this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
   }
 
   public async removeExternalIdp(idp: IDPUserLink.AsObject): Promise<void> {
@@ -112,16 +134,9 @@ export class ExternalIdpsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const promise =
-      this.service instanceof ManagementService
-        ? (this.service as ManagementService).removeHumanLinkedIDP(idp.idpId, idp.providedUserId, idp.userId)
-        : (this.service as GrpcAuthService).removeMyLinkedIDP(idp.idpId, idp.providedUserId);
-
     try {
-      await promise;
-      setTimeout(() => {
-        this.refreshPage();
-      }, 1000);
+      await this.removeLinkedIdp(idp);
+      await this.refreshAfterMutation();
     } catch (error) {
       this.toast.showError(error);
     }
