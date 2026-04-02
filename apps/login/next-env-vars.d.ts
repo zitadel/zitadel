@@ -87,7 +87,7 @@ declare namespace NodeJS {
     /**
      * Optional: JSON string to configure the cache TTLs (in minutes) for specific backend API routes or global fallbacks.
      * Example: '{"defaultMinutes": 15, "longMinutes": 60, "getBrandingSettings": 120}'
-     * 
+     *
      * Properties:
      * - \`defaultMinutes\`: The globally utilized default TTL in minutes (falls back to 15 if not set).
      * - \`longMinutes\`: The TTL utilized string for long-cached routes, like branding/translation (falls back to 60 if not set).

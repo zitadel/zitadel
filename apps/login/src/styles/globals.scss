@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@config '../../tailwind.config.mjs';
+@config "../../tailwind.config.mjs";
 
 @layer base {
   h1,
@@ -8,7 +8,7 @@
   }
 
   .ztdl-p {
-    @apply text-sm text-text-light-secondary-500 dark:text-text-dark-secondary-500;
+    @apply text-text-light-secondary-500 dark:text-text-dark-secondary-500 text-sm;
   }
 }
 
