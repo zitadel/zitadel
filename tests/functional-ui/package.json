@@ -9,10 +9,9 @@
   "private": true,
   "devDependencies": {
     "@types/node": "^25.5.0",
-    "cypress": "^14.5.4",
+    "cypress": "^15.13.0",
     "cypress-wait-until": "^3.0.2",
     "jsonwebtoken": "^9.0.3",
-    "mochawesome": "^7.1.4",
     "prettier": "^3.8.1",
     "typescript": "^5.9.3",
     "uuid": "^13.0.0"
