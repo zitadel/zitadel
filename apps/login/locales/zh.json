@@ -83,7 +83,7 @@
     "set": {
       "title": "设置密码",
       "description": "为您的账户设置密码",
-      "codeSent": "验证码已发送到您的邮箱。",
+      "codeSent": "新代码已发送到您的电子邮件地址。",
       "noCodeReceived": "没有收到验证码？",
       "resend": "重发验证码",
       "submit": "继续",

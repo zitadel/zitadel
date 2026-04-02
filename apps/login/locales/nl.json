@@ -83,7 +83,7 @@
     "set": {
       "title": "Stel Wachtwoord in",
       "description": "Stel het wachtwoord voor jouw account in",
-      "codeSent": "Er is een code naar jouw e-mailadres verzonden.",
+      "codeSent": "Er is een nieuwe code naar uw e-mailadres verzonden.",
       "noCodeReceived": "Geen code ontvangen?",
       "resend": "Code opnieuw versturen",
       "submit": "Verder",

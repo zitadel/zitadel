@@ -83,7 +83,7 @@
     "set": {
       "title": "Set Password",
       "description": "Set the password for your account",
-      "codeSent": "A code has been sent to your email address.",
+      "codeSent": "A new code has been sent to your email address.",
       "noCodeReceived": "Didn't receive a code?",
       "resend": "Resend code",
       "submit": "Continue",
@@ -389,7 +389,7 @@
       "description": "Enter the Code provided in the verification email.",
       "noCodeReceived": "Didn't receive a code?",
       "resendCode": "Resend code",
-      "codeSent": "A code has just been sent to your email address.",
+      "codeSent": "A new code has just been sent to your email address.",
       "submit": "Continue",
       "labels": {
         "code": "Code"
