@@ -1972,6 +1972,24 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 	})
 	require.NoError(t, err)
 
+	userIDWithRecoveryCodes := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	_, err = Client.GenerateRecoveryCodes(OrgCTX, &user.GenerateRecoveryCodesRequest{
+		UserId: userIDWithRecoveryCodes,
+		Count:  5,
+	})
+	require.NoError(t, err)
+
+	userIDWithRemovedRecoveryCodes := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	_, err = Client.GenerateRecoveryCodes(OrgCTX, &user.GenerateRecoveryCodesRequest{
+		UserId: userIDWithRemovedRecoveryCodes,
+		Count:  5,
+	})
+	require.NoError(t, err)
+	_, err = Client.RemoveRecoveryCodes(OrgCTX, &user.RemoveRecoveryCodesRequest{
+		UserId: userIDWithRemovedRecoveryCodes,
+	})
+	require.NoError(t, err)
+
 	_, userLegacyID := ctxFromNewUserWithVerifiedPasswordlessLegacy(t)
 	require.NoError(t, err)
 
@@ -2146,6 +2164,37 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 				},
 				AuthMethodTypes: []user.AuthenticationMethodType{
 					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP,
+				},
+			},
+		},
+		{
+			name: "with auth (recovery codes)",
+			args: args{
+				OrgCTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userIDWithRecoveryCodes,
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+				},
+				AuthMethodTypes: []user.AuthenticationMethodType{
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_RECOVERY_CODE,
+				},
+			},
+		},
+		{
+			name: "with removed recovery codes",
+			args: args{
+				OrgCTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userIDWithRemovedRecoveryCodes,
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
 				},
 			},
 		},
@@ -3453,12 +3502,61 @@ func TestServer_CreateUser(t *testing.T) {
 			},
 		},
 		{
+			name: "org does not exist human, using IAM owner, error",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						IamCTX,
+						&user.CreateUserRequest{
+							OrganizationId: "does not exist",
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
 			name: "org does not exist machine, error",
 			testCase: func(runId string) testCase {
 				username := fmt.Sprintf("donald.duck+%s", runId)
 				return testCase{
 					args: args{
 						OrgCTX,
+						&user.CreateUserRequest{
+							OrganizationId: "does not exist",
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Machine_{
+								Machine: &user.CreateUserRequest_Machine{
+									Name: integration.Username(),
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "org does not exist machine, using IAM owner, error",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				return testCase{
+					args: args{
+						IamCTX,
 						&user.CreateUserRequest{
 							OrganizationId: "does not exist",
 							Username:       &username,

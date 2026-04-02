@@ -6,6 +6,7 @@ import (
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	internaldb "github.com/zitadel/zitadel/internal/database"
 )
 
 // -------------------------------------------------------------
@@ -28,7 +29,7 @@ func (p projectGrant) Get(ctx context.Context, client database.QueryExecutor, op
 	if err != nil {
 		return nil, err
 	}
-	return getOne[domain.ProjectGrant](ctx, client, builder)
+	return scanProjectGrant(ctx, client, builder)
 }
 
 func (p projectGrant) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.ProjectGrant, error) {
@@ -40,7 +41,7 @@ func (p projectGrant) List(ctx context.Context, client database.QueryExecutor, o
 	if err != nil {
 		return nil, err
 	}
-	return getMany[domain.ProjectGrant](ctx, client, builder)
+	return scanProjectGrants(ctx, client, builder)
 }
 
 const insertProjectGrantRolesStmt = `WITH added_roles AS (
@@ -306,4 +307,48 @@ func (p projectGrant) prepareQuery(opts []database.QueryOption) (*database.State
 	options.Write(builder)
 
 	return builder, nil
+}
+
+// rawProjectGrant is used for query collection because ARRAY_AGG role keys cannot be
+// scanned directly into the domain model's []string field when the client is backed
+// by [database/sql]. The intermediate TextArray field works with both [database/sql] and pgx.
+type rawProjectGrant struct {
+	domain.ProjectGrant
+	RoleKeys internaldb.TextArray[string] `db:"role_keys"`
+}
+
+func (p *rawProjectGrant) toDomain() *domain.ProjectGrant {
+	p.ProjectGrant.RoleKeys = []string(p.RoleKeys)
+	return &p.ProjectGrant
+}
+
+func scanProjectGrant(ctx context.Context, client database.QueryExecutor, builder *database.StatementBuilder) (*domain.ProjectGrant, error) {
+	rows, err := client.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+
+	var projectGrant rawProjectGrant
+	if err = rows.(database.CollectableRows).CollectExactlyOneRow(&projectGrant); err != nil {
+		return nil, err
+	}
+	return projectGrant.toDomain(), nil
+}
+
+func scanProjectGrants(ctx context.Context, client database.QueryExecutor, builder *database.StatementBuilder) ([]*domain.ProjectGrant, error) {
+	rows, err := client.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+
+	var projectGrants []rawProjectGrant
+	if err = rows.(database.CollectableRows).Collect(&projectGrants); err != nil {
+		return nil, err
+	}
+
+	result := make([]*domain.ProjectGrant, len(projectGrants))
+	for i := range projectGrants {
+		result[i] = projectGrants[i].toDomain()
+	}
+	return result, nil
 }

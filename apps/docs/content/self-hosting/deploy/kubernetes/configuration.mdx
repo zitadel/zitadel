@@ -162,36 +162,23 @@ kubectl create secret generic zitadel-masterkey \
   --from-literal=masterkey="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)"
 ```
 
-Create a config secret for sensitive values. Save this as `zitadel-config-secret.yaml`:
-
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: zitadel-config-secret
-type: Opaque
-stringData:
-  config.yaml: |
-    Database:
-      Postgres:
-        User:
-          Password: "secure-app-password"
-        Admin:
-          Password: "secure-admin-password"
-```
-
-Apply the secret:
+Create a secret containing the database DSN:
 
 ```bash
-kubectl apply --filename zitadel-config-secret.yaml
+kubectl create secret generic zitadel-config-secret \
+  --from-literal=dsn="postgresql://zitadel:secure-password@postgres.database.svc.cluster.local:5432/zitadel?sslmode=disable"
 ```
 
-Reference it in your values:
+Pass it to Zitadel as an environment variable:
 
 ```yaml
 zitadel:
-  configSecretName: zitadel-config-secret
-  configSecretKey: config.yaml
+  env:
+    - name: ZITADEL_DATABASE_POSTGRES_DSN
+      valueFrom:
+        secretKeyRef:
+          name: zitadel-config-secret
+          key: dsn
 ```
 
 ## Scaling and Availability

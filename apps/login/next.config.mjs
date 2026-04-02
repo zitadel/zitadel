@@ -1,5 +1,4 @@
 import createNextIntlPlugin from "next-intl/plugin";
-import { DEFAULT_CSP } from "./constants/csp.js";
 
 const withNextIntl = createNextIntlPlugin();
 
@@ -19,10 +18,6 @@ const secureHeaders = [
   {
     key: "X-XSS-Protection",
     value: "1; mode=block",
-  },
-  {
-    key: "Content-Security-Policy",
-    value: DEFAULT_CSP,
   },
   { key: "X-Frame-Options", value: "deny" },
 ];
