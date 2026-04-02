@@ -35,6 +35,15 @@ func TestBuildLoginV2LogoutURL(t *testing.T) {
 			},
 		},
 		{
+			testName:     "with url encoded redirectURI",
+			logoutURIStr: "https://example.com/logout",
+			redirectURI:  "https%3A%2F%2Fclient%2Fcb",
+			expectedParams: map[string]string{
+				"post_logout_redirect": "https://client/cb",
+				"logout_token":         "", // presence checked separately
+			},
+		},
+		{
 			testName:     "with logout hint",
 			logoutURIStr: "https://example.com/logout",
 			redirectURI:  "https://client/cb",

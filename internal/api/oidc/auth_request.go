@@ -439,7 +439,11 @@ func buildLoginV2LogoutURL(logoutURI *url.URL, redirectURI, logoutHint string, u
 // we'll return the path for the v2 login.
 func v2PostLogoutRedirectURI(redirectURI string) string {
 	if redirectURI != login.DefaultLoggedOutPath {
-		return redirectURI
+		decoded, err := url.QueryUnescape(redirectURI)
+		if err != nil {
+			return redirectURI
+		}
+		return decoded
 	}
 	return LogoutDonePath
 }
