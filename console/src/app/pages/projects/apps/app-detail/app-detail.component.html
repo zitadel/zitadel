@@ -76,16 +76,23 @@
   <div class="app-main-content">
     <cnsl-meta-layout>
       <cnsl-sidenav [(setting)]="currentSetting" [settingsList]="settingsList">
+        <button mat-raised-button (click)="downloadEnv()">Download .env</button>
         <ng-container *ngIf="currentSetting.id === 'configuration'">
-          <cnsl-card *ngIf="oidcForm && app?.oidcConfig" title=" {{ 'APP.OIDC.TITLE' | translate }}">
-            <div
+          <cnsl-card
+            *ngIf="oidcForm && app?.oidcConfig"
+            title=" {{ 'APP.OIDC.TITLE' | translate }}"
+          >
+
+          <div
               class="current-auth-method"
               *ngIf="currentRadioItemAuthType"
               [ngStyle]="{ background: currentRadioItemAuthType.background }"
             >
               <h3>{{ currentRadioItemAuthType.titleI18nKey | translate }}</h3>
               <p>{{ currentRadioItemAuthType.descI18nKey | translate }}</p>
+
               <span class="fill-space"></span>
+
               <button mat-icon-button (click)="changeAuthMethod()"><i class="las la-pen"></i></button>
             </div>
 
