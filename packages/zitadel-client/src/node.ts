@@ -1,3 +1,4 @@
+import { createPrivateKey } from "crypto";
 import {
   createGrpcTransport,
   GrpcTransportOptions,
@@ -29,6 +30,18 @@ export function createServerTransport(
   });
 }
 
+/**
+ * Normalize a PEM private key to PKCS#8 format. Accepts both PKCS#1
+ * (BEGIN RSA PRIVATE KEY) and PKCS#8 (BEGIN PRIVATE KEY) inputs.
+ * Returns the key as a PKCS#8 PEM string.
+ */
+function toPKCS8(pem: string): string {
+  if (pem.includes("BEGIN PRIVATE KEY")) {
+    return pem;
+  }
+  return createPrivateKey(pem).export({ type: "pkcs8", format: "pem" }) as string;
+}
+
 export async function newSystemToken({
   audience,
   subject,
@@ -47,7 +60,7 @@ export async function newSystemToken({
     .setIssuer(subject)
     .setSubject(subject)
     .setAudience(audience)
-    .sign(await importPKCS8(key, "RS256"));
+    .sign(await importPKCS8(toPKCS8(key), "RS256"));
 }
 
 /**

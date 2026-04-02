@@ -83,7 +83,7 @@
     "set": {
       "title": "Şifre Belirle",
       "description": "Hesabınız için şifre belirleyin",
-      "codeSent": "E-posta adresinize bir kod gönderildi.",
+      "codeSent": "E-posta adresinize yeni bir kod gönderildi.",
       "noCodeReceived": "Kod almadınız mı?",
       "resend": "Kodu tekrar gönder",
       "submit": "Devam",

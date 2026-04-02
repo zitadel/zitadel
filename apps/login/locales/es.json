@@ -83,7 +83,7 @@
     "set": {
       "title": "Establecer Contraseña",
       "description": "Establece la contraseña para tu cuenta",
-      "codeSent": "Se ha enviado un código a su correo electrónico.",
+      "codeSent": "Se ha enviado un nuevo código a su dirección de correo electrónico.",
       "noCodeReceived": "¿No recibiste un código?",
       "resend": "Reenviar código",
       "submit": "Continuar",

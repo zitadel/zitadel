@@ -83,7 +83,7 @@
     "set": {
       "title": "Ustaw hasło",
       "description": "Ustaw hasło dla swojego konta",
-      "codeSent": "Kod został wysłany na twój adres e-mail.",
+      "codeSent": "Nowy kod został wysłany na Twój adres e-mail.",
       "noCodeReceived": "Nie otrzymałeś kodu?",
       "resend": "Wyślij kod ponownie",
       "submit": "Kontynuuj",

@@ -83,7 +83,7 @@
     "set": {
       "title": "Passwort festlegen",
       "description": "Legen Sie das Passwort für Ihr Konto fest",
-      "codeSent": "Ein Code wurde an Ihre E-Mail-Adresse gesendet.",
+      "codeSent": "Ein neuer Code wurde an Ihre E-Mail-Adresse gesendet.",
       "noCodeReceived": "Keinen Code erhalten?",
       "resend": "Erneut senden",
       "submit": "Weiter",
