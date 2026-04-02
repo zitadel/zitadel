@@ -25,18 +25,12 @@ declare namespace NodeJS {
     ZITADEL_SERVICE_USER_TOKEN: string;
 
     /**
-     * Path to a private key file for JWT authentication.
-     * When set, the login service will read the key and sign JWTs for API authentication.
-     * Requires ZITADEL_LOGIN_SYSTEM_USER_ID or SYSTEM_USER_ID to be set.
+     * Path to a private key file for login client JWT authentication.
+     * When set, the login service reads this key and signs JWTs with a
+     * hardcoded subject of "login-client".
      * AUDIENCE defaults to ZITADEL_API_URL if not explicitly set.
      */
-    ZITADEL_LOGIN_SERVICE_KEY_FILE?: string;
-
-    /**
-     * The system user ID for login service key authentication.
-     * Falls back to SYSTEM_USER_ID if not set.
-     */
-    ZITADEL_LOGIN_SYSTEM_USER_ID?: string;
+    ZITADEL_LOGINCLIENT_KEYFILE?: string;
 
     /**
      * Optional: wheter a user must have verified email

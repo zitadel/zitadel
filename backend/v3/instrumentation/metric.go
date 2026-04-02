@@ -9,6 +9,7 @@ import (
 
 	google_metric "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.opentelemetry.io/contrib/exporters/autoexport"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
@@ -160,6 +161,31 @@ func labelsToAttributes(labels map[string]attribute.Value) []attribute.KeyValue 
 func newMeterProvider(ctx context.Context, cfg MetricConfig, resource *resource.Resource) (_ *sdk_metric.MeterProvider, err error) {
 	var readerOption sdk_metric.Option
 	switch cfg.Exporter.Type {
+	case ExporterTypeAuto:
+		// autoexport delegates reader selection to the standard OTEL env vars.
+		// We can't just call autoexport.NewMetricReader unconditionally because
+		// autoexport defaults to "otlp" when OTEL_METRICS_EXPORTER is unset, and
+		// the OTLP exporter silently points at localhost:4318 even with no env
+		// vars configured. That would cause every ZITADEL instance to start
+		// attempting OTLP connections after upgrading, spamming logs with
+		// connection errors.
+		//
+		// This guard is a heuristic: we check the env vars that realistically
+		// indicate someone has intentionally configured OTEL export. It does not
+		// cover every possible OTLP env var (e.g. OTEL_EXPORTER_OTLP_HEADERS or
+		// OTEL_EXPORTER_OTLP_CERTIFICATE on their own), but those vars are
+		// meaningless without an endpoint or exporter type being set too.
+		if os.Getenv("OTEL_METRICS_EXPORTER") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL") != "" {
+			var reader sdk_metric.Reader
+			reader, err = autoexport.NewMetricReader(ctx)
+			if err == nil && !autoexport.IsNoneMetricReader(reader) {
+				readerOption = sdk_metric.WithReader(reader)
+			}
+		}
 	case ExporterTypeUnspecified, ExporterTypeNone:
 		// no reader option
 	case ExporterTypeStdOut, ExporterTypeStdErr:
