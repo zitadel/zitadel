@@ -398,21 +398,25 @@ func updateGitLabSelfHostedProviderToCommand(req *admin_pb.UpdateGitLabSelfHoste
 
 func addGoogleProviderToCommand(req *admin_pb.AddGoogleProviderRequest) command.GoogleProvider {
 	return command.GoogleProvider{
-		Name:         req.Name,
-		ClientID:     req.ClientId,
-		ClientSecret: req.ClientSecret,
-		Scopes:       req.Scopes,
-		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Name:                req.Name,
+		ClientID:            req.ClientId,
+		ClientSecret:        req.ClientSecret,
+		Scopes:              req.Scopes,
+		HostedDomain:        req.HostedDomain,
+		EnforceHostedDomain: req.EnforceHostedDomain,
+		IDPOptions:          idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 
 func updateGoogleProviderToCommand(req *admin_pb.UpdateGoogleProviderRequest) command.GoogleProvider {
 	return command.GoogleProvider{
-		Name:         req.Name,
-		ClientID:     req.ClientId,
-		ClientSecret: req.ClientSecret,
-		Scopes:       req.Scopes,
-		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Name:                req.Name,
+		ClientID:            req.ClientId,
+		ClientSecret:        req.ClientSecret,
+		Scopes:              req.Scopes,
+		HostedDomain:        req.HostedDomain,
+		EnforceHostedDomain: req.EnforceHostedDomain,
+		IDPOptions:          idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 

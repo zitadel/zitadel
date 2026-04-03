@@ -124,11 +124,13 @@ const (
 	GitLabSelfHostedClientSecretCol = "client_secret"
 	GitLabSelfHostedScopesCol       = "scopes"
 
-	GoogleIDCol           = "idp_id"
-	GoogleInstanceIDCol   = "instance_id"
-	GoogleClientIDCol     = "client_id"
-	GoogleClientSecretCol = "client_secret"
-	GoogleScopesCol       = "scopes"
+	GoogleIDCol                  = "idp_id"
+	GoogleInstanceIDCol          = "instance_id"
+	GoogleClientIDCol            = "client_id"
+	GoogleClientSecretCol        = "client_secret"
+	GoogleScopesCol              = "scopes"
+	GoogleHostedDomainCol        = "hosted_domain"
+	GoogleEnforceHostedDomainCol = "enforce_hosted_domain"
 
 	LDAPIDCol                         = "idp_id"
 	LDAPInstanceIDCol                 = "instance_id"
@@ -320,6 +322,8 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			handler.NewColumn(GoogleClientIDCol, handler.ColumnTypeText),
 			handler.NewColumn(GoogleClientSecretCol, handler.ColumnTypeJSONB),
 			handler.NewColumn(GoogleScopesCol, handler.ColumnTypeTextArray, handler.Nullable()),
+			handler.NewColumn(GoogleHostedDomainCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(GoogleEnforceHostedDomainCol, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(GoogleInstanceIDCol, GoogleIDCol),
 			IDPTemplateGoogleSuffix,
@@ -966,6 +970,8 @@ func (p *idpTemplateProjection) reduceOIDCIDPMigratedGoogle(event eventstore.Eve
 				handler.NewCol(GoogleClientIDCol, idpEvent.ClientID),
 				handler.NewCol(GoogleClientSecretCol, idpEvent.ClientSecret),
 				handler.NewCol(GoogleScopesCol, database.TextArray[string](idpEvent.Scopes)),
+				handler.NewCol(GoogleHostedDomainCol, idpEvent.HostedDomain),
+				handler.NewCol(GoogleEnforceHostedDomainCol, idpEvent.EnforceHostedDomain),
 			},
 			handler.WithTableSuffix(IDPTemplateGoogleSuffix),
 		),
@@ -1814,6 +1820,8 @@ func (p *idpTemplateProjection) reduceGoogleIDPAdded(event eventstore.Event) (*h
 				handler.NewCol(GoogleClientIDCol, idpEvent.ClientID),
 				handler.NewCol(GoogleClientSecretCol, idpEvent.ClientSecret),
 				handler.NewCol(GoogleScopesCol, database.TextArray[string](idpEvent.Scopes)),
+				handler.NewCol(GoogleHostedDomainCol, idpEvent.HostedDomain),
+				handler.NewCol(GoogleEnforceHostedDomainCol, idpEvent.EnforceHostedDomain),
 			},
 			handler.WithTableSuffix(IDPTemplateGoogleSuffix),
 		),
@@ -2401,7 +2409,7 @@ func reduceGitLabSelfHostedIDPChangedColumns(idpEvent idp.GitLabSelfHostedIDPCha
 }
 
 func reduceGoogleIDPChangedColumns(idpEvent idp.GoogleIDPChangedEvent) []handler.Column {
-	googleCols := make([]handler.Column, 0, 3)
+	googleCols := make([]handler.Column, 0, 4)
 	if idpEvent.ClientID != nil {
 		googleCols = append(googleCols, handler.NewCol(GoogleClientIDCol, *idpEvent.ClientID))
 	}
@@ -2410,6 +2418,12 @@ func reduceGoogleIDPChangedColumns(idpEvent idp.GoogleIDPChangedEvent) []handler
 	}
 	if idpEvent.Scopes != nil {
 		googleCols = append(googleCols, handler.NewCol(GoogleScopesCol, database.TextArray[string](idpEvent.Scopes)))
+	}
+	if idpEvent.HostedDomain != nil {
+		googleCols = append(googleCols, handler.NewCol(GoogleHostedDomainCol, *idpEvent.HostedDomain))
+	}
+	if idpEvent.EnforceHostedDomain != nil {
+		googleCols = append(googleCols, handler.NewCol(GoogleEnforceHostedDomainCol, *idpEvent.EnforceHostedDomain))
 	}
 	return googleCols
 }

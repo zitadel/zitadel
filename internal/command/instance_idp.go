@@ -1440,6 +1440,9 @@ func (c *Commands) prepareAddInstanceGoogleProvider(a *instance.Aggregate, write
 		if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-W2vqs", "Errors.Invalid.Argument")
 		}
+		if err := validateHostedDomain(provider.HostedDomain); err != nil {
+			return nil, err
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -1462,6 +1465,8 @@ func (c *Commands) prepareAddInstanceGoogleProvider(a *instance.Aggregate, write
 					provider.ClientID,
 					secret,
 					provider.Scopes,
+					provider.HostedDomain,
+					provider.EnforceHostedDomain,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -1476,6 +1481,9 @@ func (c *Commands) prepareUpdateInstanceGoogleProvider(a *instance.Aggregate, wr
 		}
 		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-ds432", "Errors.Invalid.Argument")
+		}
+		if err := validateHostedDomain(provider.HostedDomain); err != nil {
+			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
@@ -1498,6 +1506,8 @@ func (c *Commands) prepareUpdateInstanceGoogleProvider(a *instance.Aggregate, wr
 				provider.ClientSecret,
 				c.idpConfigEncryption,
 				provider.Scopes,
+				provider.HostedDomain,
+				provider.EnforceHostedDomain,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {

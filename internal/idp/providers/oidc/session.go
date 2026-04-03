@@ -69,6 +69,11 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 			return nil, err
 		}
 	}
+	if s.Provider.userValidator != nil {
+		if err = s.Provider.userValidator(info); err != nil {
+			return nil, err
+		}
+	}
 	u := s.Provider.userInfoMapper(info)
 	return u, nil
 }

@@ -251,6 +251,15 @@ message GoogleConfig {
         example:
           "[\"openid\", \"profile\", \"email\"]";
       } ];
+  // The hosted domain parameter restricts sign-in to users from the specified Google Workspace domain (hd parameter). This is a UI hint only — enable enforce_hosted_domain for server-side validation. Leave empty to allow any Google account.
+  string hosted_domain = 3
+      [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example:
+          "\"example.com\"";
+        description: "Restricts sign-in to users from the specified Google Workspace domain (hd parameter). This is a UI hint only — Google does not enforce it server-side. Enable enforce_hosted_domain for server-side validation. Leave empty to allow any Google account.";
+      } ];
+  // When true, Zitadel validates the hd claim in Google's ID token against hosted_domain after authentication, rejecting accounts from other domains. Requires hosted_domain to be set.
+  bool enforce_hosted_domain = 4;
 }
 
 message GitLabConfig {

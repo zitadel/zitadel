@@ -126,10 +126,12 @@ type GitLabSelfHostedIDPTemplate struct {
 }
 
 type GoogleIDPTemplate struct {
-	IDPID        string
-	ClientID     string
-	ClientSecret *crypto.CryptoValue
-	Scopes       database.TextArray[string]
+	IDPID               string
+	ClientID            string
+	ClientSecret        *crypto.CryptoValue
+	Scopes              database.TextArray[string]
+	HostedDomain        string
+	EnforceHostedDomain bool
 }
 
 type LDAPIDPTemplate struct {
@@ -541,6 +543,14 @@ var (
 		name:  projection.GoogleScopesCol,
 		table: googleIdpTemplateTable,
 	}
+	GoogleHostedDomainCol = Column{
+		name:  projection.GoogleHostedDomainCol,
+		table: googleIdpTemplateTable,
+	}
+	GoogleEnforceHostedDomainCol = Column{
+		name:  projection.GoogleEnforceHostedDomainCol,
+		table: googleIdpTemplateTable,
+	}
 )
 
 var (
@@ -949,6 +959,8 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			GoogleClientIDCol.identifier(),
 			GoogleClientSecretCol.identifier(),
 			GoogleScopesCol.identifier(),
+			GoogleHostedDomainCol.identifier(),
+			GoogleEnforceHostedDomainCol.identifier(),
 			// saml
 			SAMLIDCol.identifier(),
 			SAMLMetadataCol.identifier(),
@@ -1070,6 +1082,8 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			googleClientID := sql.NullString{}
 			googleClientSecret := new(crypto.CryptoValue)
 			googleScopes := database.TextArray[string]{}
+			googleHostedDomain := sql.NullString{}
+			googleEnforceHostedDomain := sql.NullBool{}
 
 			samlID := sql.NullString{}
 			var samlMetadata []byte
@@ -1189,6 +1203,8 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				&googleClientID,
 				&googleClientSecret,
 				&googleScopes,
+				&googleHostedDomain,
+				&googleEnforceHostedDomain,
 				// saml
 				&samlID,
 				&samlMetadata,
@@ -1323,10 +1339,12 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			}
 			if googleID.Valid {
 				idpTemplate.GoogleIDPTemplate = &GoogleIDPTemplate{
-					IDPID:        googleID.String,
-					ClientID:     googleClientID.String,
-					ClientSecret: googleClientSecret,
-					Scopes:       googleScopes,
+					IDPID:               googleID.String,
+					ClientID:            googleClientID.String,
+					ClientSecret:        googleClientSecret,
+					Scopes:              googleScopes,
+					HostedDomain:        googleHostedDomain.String,
+					EnforceHostedDomain: googleEnforceHostedDomain.Bool,
 				}
 			}
 			if samlID.Valid {
@@ -1465,6 +1483,8 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			GoogleClientIDCol.identifier(),
 			GoogleClientSecretCol.identifier(),
 			GoogleScopesCol.identifier(),
+			GoogleHostedDomainCol.identifier(),
+			GoogleEnforceHostedDomainCol.identifier(),
 			// saml
 			SAMLIDCol.identifier(),
 			SAMLMetadataCol.identifier(),
@@ -1591,6 +1611,8 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 				googleClientID := sql.NullString{}
 				googleClientSecret := new(crypto.CryptoValue)
 				googleScopes := database.TextArray[string]{}
+				googleHostedDomain := sql.NullString{}
+				googleEnforceHostedDomain := sql.NullBool{}
 
 				samlID := sql.NullString{}
 				var samlMetadata []byte
@@ -1710,6 +1732,8 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					&googleClientID,
 					&googleClientSecret,
 					&googleScopes,
+					&googleHostedDomain,
+					&googleEnforceHostedDomain,
 					// saml
 					&samlID,
 					&samlMetadata,
@@ -1843,10 +1867,12 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 				}
 				if googleID.Valid {
 					idpTemplate.GoogleIDPTemplate = &GoogleIDPTemplate{
-						IDPID:        googleID.String,
-						ClientID:     googleClientID.String,
-						ClientSecret: googleClientSecret,
-						Scopes:       googleScopes,
+						IDPID:               googleID.String,
+						ClientID:            googleClientID.String,
+						ClientSecret:        googleClientSecret,
+						Scopes:              googleScopes,
+						HostedDomain:        googleHostedDomain.String,
+						EnforceHostedDomain: googleEnforceHostedDomain.Bool,
 					}
 				}
 				if samlID.Valid {

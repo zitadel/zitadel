@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"regexp"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -10,6 +11,20 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+// domainPattern matches a valid internet domain name (e.g. "example.com").
+var domainPattern = regexp.MustCompile(`^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$`)
+
+// validateHostedDomain returns an error if domain is non-empty but not a valid domain name.
+func validateHostedDomain(domain string) error {
+	if domain == "" {
+		return nil
+	}
+	if !domainPattern.MatchString(domain) {
+		return zerrors.ThrowInvalidArgument(nil, "IDP-HD-01", "Errors.IDP.Google.HostedDomain.Invalid")
+	}
+	return nil
+}
 
 type GenericOAuthProvider struct {
 	Name                  string
@@ -91,11 +106,13 @@ type GitLabSelfHostedProvider struct {
 }
 
 type GoogleProvider struct {
-	Name         string
-	ClientID     string
-	ClientSecret string
-	Scopes       []string
-	IDPOptions   idp.Options
+	Name                string
+	ClientID            string
+	ClientSecret        string
+	Scopes              []string
+	HostedDomain        string
+	EnforceHostedDomain bool
+	IDPOptions          idp.Options
 }
 
 type LDAPProvider struct {

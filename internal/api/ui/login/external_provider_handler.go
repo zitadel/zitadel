@@ -1048,11 +1048,19 @@ func (l *Login) googleProvider(ctx context.Context, identityProvider *query.IDPT
 	if err != nil {
 		return nil, err
 	}
+	opts := make([]openid.ProviderOpts, 0, 2)
+	if identityProvider.GoogleIDPTemplate.HostedDomain != "" {
+		opts = append(opts, google.WithHostedDomain(identityProvider.GoogleIDPTemplate.HostedDomain))
+	}
+	if identityProvider.GoogleIDPTemplate.EnforceHostedDomain && identityProvider.GoogleIDPTemplate.HostedDomain != "" {
+		opts = append(opts, google.WithEnforceHostedDomain(identityProvider.GoogleIDPTemplate.HostedDomain))
+	}
 	return google.New(
 		identityProvider.GoogleIDPTemplate.ClientID,
 		secret,
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.GoogleIDPTemplate.Scopes,
+		opts...,
 	)
 }
 

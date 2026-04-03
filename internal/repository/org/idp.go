@@ -773,6 +773,8 @@ func NewGoogleIDPAddedEvent(
 	clientID string,
 	clientSecret *crypto.CryptoValue,
 	scopes []string,
+	hostedDomain string,
+	enforceHostedDomain bool,
 	options idp.Options,
 ) *GoogleIDPAddedEvent {
 
@@ -788,6 +790,8 @@ func NewGoogleIDPAddedEvent(
 			clientID,
 			clientSecret,
 			scopes,
+			hostedDomain,
+			enforceHostedDomain,
 			options,
 		),
 	}
