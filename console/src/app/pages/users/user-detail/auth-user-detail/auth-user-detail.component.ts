@@ -7,7 +7,7 @@ import { Buffer } from 'buffer';
 import { defer, EMPTY, Observable, of, shareReplay, Subject, switchMap, take } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
-import { InfoDialogComponent } from 'src/app/modules/info-dialog/info-dialog.component';
+import { InfoDialogComponent, InfoDialogData, InfoDialogResult } from 'src/app/modules/info-dialog/info-dialog.component';
 import {
   MetadataDialogComponent,
   MetadataDialogData,
@@ -252,7 +252,7 @@ export class AuthUserDetailComponent implements OnInit {
   }
 
   public promptSetupforSMSOTP(): void {
-    const dialogRef = this.dialog.open(InfoDialogComponent, {
+    const dialogRef = this.dialog.open<InfoDialogComponent, InfoDialogData, InfoDialogResult>(InfoDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.CONTINUE',
         cancelKey: 'ACTIONS.CANCEL',
@@ -406,6 +406,7 @@ export class AuthUserDetailComponent implements OnInit {
     };
 
     const dialogRef = this.dialog.open<WarnDialogComponent, typeof data, boolean>(WarnDialogComponent, {
+      data,
       width: '400px',
     });
 

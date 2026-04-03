@@ -7,6 +7,7 @@ import { createClientFor } from "@zitadel/client";
 import { SessionService } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { UserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { errorClassificationInterceptor } from "./error-classification";
 import { otelGrpcInterceptor } from "./otel";
 
 const exporter = new InMemorySpanExporter();
@@ -77,7 +78,7 @@ describe("otelGrpcInterceptor", () => {
       },
       {
         transport: {
-          interceptors: [otelGrpcInterceptor],
+          interceptors: [otelGrpcInterceptor, errorClassificationInterceptor],
         },
       },
     );
@@ -95,7 +96,11 @@ describe("otelGrpcInterceptor", () => {
         // code prefix gets added by connect
         message: "[not_found] Session not found",
       },
-      attributes: { "rpc.grpc.status_code": 5 },
+      attributes: {
+        "rpc.grpc.status_code": 5,
+        "error.is_user_error": true,
+        "http.status_code": 404,
+      },
     });
     expect(spans[0].events).toHaveLength(1);
     expect(spans[0].events[0].name).toBe("exception");

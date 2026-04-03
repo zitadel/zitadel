@@ -132,7 +132,7 @@ You will need to implement a listener that can receive HTTP requests.
 For this example, we will use a simple Go HTTP server that will print the received request to standard output.
 As mentioned before, this validation can and should be applied to any target implementation.
 
-<Tabs>
+<Tabs defaultIndex={0} items={['JSON', 'JWT', 'JWE']}>
     <Tab value="JSON">
         <DynamicCodeBlock lang="go" code={JsonGo} />
     </Tab>

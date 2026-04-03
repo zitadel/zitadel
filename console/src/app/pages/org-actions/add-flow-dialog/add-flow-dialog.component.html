@@ -1,25 +1,30 @@
 <span class="title" mat-dialog-title>{{ 'FLOWS.DIALOG.ADD.TITLE' | translate }}</span>
 
 <div mat-dialog-content>
-  <form *ngIf="form" [formGroup]="form">
-    <cnsl-form-field class="form-field">
-      <cnsl-label>{{ 'FLOWS.TRIGGERTYPE' | translate }}</cnsl-label>
-      <mat-select formControlName="triggerType" name="triggerType">
-        <mat-option *ngFor="let type of triggerTypesForSelection" [value]="type">
-          {{ type.name?.localizedMessage }}
-        </mat-option>
-      </mat-select>
-    </cnsl-form-field>
-
-    <cnsl-form-field class="form-field">
-      <cnsl-label>{{ 'FLOWS.ACTIONS' | translate }}</cnsl-label>
-      <mat-select formControlName="actionIdsList" name="actionIdsList" multiple>
-        <mat-option *ngFor="let action of actions" [value]="action.id">
-          {{ action.name }}
-        </mat-option>
-      </mat-select>
-    </cnsl-form-field>
-  </form>
+  @if (form) {
+    <form [formGroup]="form">
+      <cnsl-form-field class="form-field">
+        <cnsl-label>{{ 'FLOWS.TRIGGERTYPE' | translate }}</cnsl-label>
+        <mat-select formControlName="triggerType" name="triggerType">
+          @for (type of triggerTypesForSelection; track type) {
+            <mat-option [value]="type">
+              {{ type.name?.localizedMessage }}
+            </mat-option>
+          }
+        </mat-select>
+      </cnsl-form-field>
+      <cnsl-form-field class="form-field">
+        <cnsl-label>{{ 'FLOWS.ACTIONS' | translate }}</cnsl-label>
+        <mat-select formControlName="actionIdsList" name="actionIdsList" multiple>
+          @for (action of actions; track action) {
+            <mat-option [value]="action.id">
+              {{ action.name }}
+            </mat-option>
+          }
+        </mat-select>
+      </cnsl-form-field>
+    </form>
+  }
 </div>
 <div mat-dialog-actions class="action">
   <span class="fill-space"></span>

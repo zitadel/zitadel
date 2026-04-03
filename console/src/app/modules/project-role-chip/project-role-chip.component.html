@@ -5,7 +5,9 @@
   [style.borderColor]="role.color.hex + '30'"
 >
   <ng-content></ng-content>
-  <button class="role-rm" mat-icon-button *ngIf="showRemove" (click)="emitRemove()">
-    <mat-icon class="role-rm-icon">clear</mat-icon>
-  </button>
+  @if (showRemove) {
+    <button class="role-rm" mat-icon-button (click)="emitRemove()">
+      <mat-icon class="role-rm-icon">clear</mat-icon>
+    </button>
+  }
 </div>

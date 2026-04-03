@@ -16,8 +16,14 @@ Please refer to the separate [vulnerability disclosure policy](https://zitadel.c
 
 ### Supported Versions
 
-Supported are releases that are newer and not older than 6 months from our stable release
-https://github.com/zitadel/zitadel/blob/main/release-channels.yaml#L1
+Supported are releases that are newer and not older than 6 months from our stable release. You can read more about the release cycle [here](https://zitadel.com/docs/product/release-cycle)
+
+### Out of scope (what is NOT a security vulnerability)
+
+- Disclosure of known public files or directories, e.g. robots.txt, files under .well-known, or files that are included in our public repositories (e.g. `go.mod`)
+- DoS of users when [Lockout Policy is enabled](https://zitadel.com/docs/guides/manage/console/default-settings#lockout)
+- You need help applying security related settings
+- When messages sent by Zitadel are reprocessed by third-party clients that automatically change the content of the message.
 
 ## Reporting a vulnerability
 
@@ -38,12 +44,6 @@ If you haven't received a response within 48 hours, or you didn't get a reply fr
 
 Please inform us in your report whether we should mention your contribution.
 We will not publish this information by default to protect your privacy.
-
-### When should I NOT report a vulnerability
-
-- Disclosure of known public files or directories, e.g. robots.txt, files under .well-known, or files that are included in our public repositories (e.g. `go.mod`)
-- DoS of users when [Lockout Policy is enabled](https://zitadel.com/docs/guides/manage/console/default-settings#lockout)
-- You need help applying security related settings
 
 ## Disclosure Process
 

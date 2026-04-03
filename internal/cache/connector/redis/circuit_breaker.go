@@ -39,7 +39,7 @@ func (config *CBConfig) readyToTrip(counts gobreaker.Counts) bool {
 
 // limiter implements [redis.Limiter] as a circuit breaker.
 type limiter struct {
-	inflight chan func(success bool)
+	inflight chan func(err error)
 	cb       *gobreaker.TwoStepCircuitBreaker[struct{}]
 }
 
@@ -53,7 +53,7 @@ func newLimiter(config *CBConfig, maxActiveConns int) redis.Limiter {
 		maxActiveConns = defaultInflightSize
 	}
 	return &limiter{
-		inflight: make(chan func(success bool), maxActiveConns),
+		inflight: make(chan func(err error), maxActiveConns),
 		cb: gobreaker.NewTwoStepCircuitBreaker[struct{}](gobreaker.Settings{
 			Name:        "redis cache",
 			MaxRequests: config.MaxRetryRequests,
@@ -84,8 +84,12 @@ func (l *limiter) Allow() error {
 // Any other error, like connection or [context.DeadlineExceeded] is counted as a failure.
 func (l *limiter) ReportResult(err error) {
 	done := <-l.inflight
-	done(err == nil ||
+	if err == nil ||
 		errors.Is(err, redis.Nil) ||
 		errors.Is(err, context.Canceled) ||
-		redis.HasErrorPrefix(err, "NOSCRIPT"))
+		redis.HasErrorPrefix(err, "NOSCRIPT") {
+		done(nil)
+		return
+	}
+	done(err)
 }

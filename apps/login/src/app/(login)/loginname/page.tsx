@@ -71,7 +71,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
         )}
 
         {loginSettings?.allowExternalIdp && !!identityProviders?.length && (
-          <div className="w-full pb-4 pt-6">
+          <div className="w-full pt-6 pb-4">
             <SignInWithIdp
               identityProviders={identityProviders}
               requestId={requestId}

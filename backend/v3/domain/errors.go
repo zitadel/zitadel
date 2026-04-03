@@ -112,6 +112,26 @@ func handleGetError(inputErr error, errorID, objectType string) error {
 	return zerrors.CreateZitadelError(zerrors.KindInternal, inputErr, errorID, fmt.Sprintf("failed fetching %s", objectType), 1)
 }
 
+func handleUpdateError(inputErr error, expectedRowCount, actualRowCount int64, errorID, objectType string) error {
+	if inputErr == nil && expectedRowCount == actualRowCount {
+		return nil
+	}
+
+	if inputErr != nil {
+		return zerrors.CreateZitadelError(zerrors.KindInternal, inputErr, errorID, fmt.Sprintf("failed updating %s", objectType), 1)
+	}
+
+	if actualRowCount == 0 {
+		return zerrors.CreateZitadelError(zerrors.KindNotFound, nil, errorID, fmt.Sprintf("%s not found", objectType), 1)
+	}
+
+	if actualRowCount != expectedRowCount {
+		return zerrors.CreateZitadelError(zerrors.KindInternal, NewMultipleObjectsUpdatedError(expectedRowCount, actualRowCount), errorID, "unexpected number of rows updated", 1)
+	}
+
+	return nil
+}
+
 func (err *PasswordVerificationError) Is(target error) bool {
 	_, ok := target.(*PasswordVerificationError)
 	return ok

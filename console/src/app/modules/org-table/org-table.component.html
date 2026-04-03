@@ -38,8 +38,12 @@
             [valueToCopy]="org.primaryDomain"
             (copiedValue)="copied = $event"
           >
-            <i *ngIf="copied !== org.primaryDomain" class="las la-clipboard"></i>
-            <i *ngIf="copied === org.primaryDomain" class="las la-clipboard-check"></i>
+            @if (copied !== org.primaryDomain) {
+              <i class="las la-clipboard"></i>
+            }
+            @if (copied === org.primaryDomain) {
+              <i class="las la-clipboard-check"></i>
+            }
           </button>
         </div>
       </td>
@@ -50,25 +54,26 @@
         {{ 'ORG.PAGES.NAME' | translate }}
       </th>
       <td mat-cell *cnslCellDef="let org; dataSource: dataSource" (click)="setAndNavigateToOrg(org)">
-        <span>{{ org.name }}</span
-        ><span *ngIf="defaultOrgId === org.id" class="state orgdefaultlabel">{{
-          'ORG.PAGES.DEFAULTLABEL' | translate
-        }}</span>
+        <span>{{ org.name }}</span>
+        @if (defaultOrgId === org.id) {
+          <span class="state orgdefaultlabel">{{ 'ORG.PAGES.DEFAULTLABEL' | translate }}</span>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="state">
       <th mat-header-cell *matHeaderCellDef>{{ 'ORG.PAGES.STATE' | translate }}</th>
       <td mat-cell *cnslCellDef="let org; dataSource: dataSource" (click)="setAndNavigateToOrg(org)">
-        <span
-          class="state"
-          [ngClass]="{
-            active: org.state === OrganizationState.ACTIVE,
-            inactive: org.state === OrganizationState.INACTIVE,
-          }"
-          *ngIf="org.state"
-          >{{ 'ORG.STATE.' + org.state | translate }}</span
-        >
+        @if (org.state) {
+          <span
+            class="state"
+            [ngClass]="{
+              active: org.state === OrganizationState.ACTIVE,
+              inactive: org.state === OrganizationState.INACTIVE,
+            }"
+            >{{ 'ORG.STATE.' + org.state | translate }}</span
+          >
+        }
       </td>
     </ng-container>
 
