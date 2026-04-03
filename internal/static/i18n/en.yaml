@@ -5,6 +5,7 @@ Errors:
   IDMissing: "ID missing"
   ResourceOwnerMissing: "Resource Owner Organisation missing"
   RemoveFailed: "Could not be removed"
+  PermissionDenied: "Permission denied"
   ProjectionName:
     Invalid: "Invalid projection name"
   Assets:
@@ -513,6 +514,8 @@ Errors:
       StorageFailed: "Storing action execution log to database failed"
       ScanFailed: "Querying usage for action execution seconds failed"
   Session:
+    IDMissing: "Session ID missing"
+    NotFound: "Session not found"
     NotExisting: "Session does not exist"
     Terminated: "Session already terminated"
     Expired: "Session has expired"

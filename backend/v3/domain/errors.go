@@ -1,7 +1,11 @@
 package domain
 
 import (
+	"errors"
 	"fmt"
+
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type wrongIDPTypeError struct {
@@ -87,6 +91,45 @@ func NewPasswordVerificationError(failedPassAttempts uint8) error {
 
 func (e *PasswordVerificationError) Error() string {
 	return fmt.Sprintf("Message=failed password attempts (%d)", e.failedAttempts)
+}
+
+// handleGetError wraps DB errors coming from Get calls into [zerrors] errors.
+//
+//   - errorID should be in the format <package short name>-<random id>
+//   - objectType should be the string representation of a DB object (e.g. 'user', 'session', 'idp'...)
+//
+// The function wraps [database.NoRowFoundError] to [zerrors.NotFound] error
+// and any other error to [zerrors.InternalError]
+func handleGetError(inputErr error, errorID, objectType string) error {
+	if inputErr == nil {
+		return nil
+	}
+
+	if errors.Is(inputErr, &database.NoRowFoundError{}) {
+		return zerrors.CreateZitadelError(zerrors.KindNotFound, inputErr, errorID, fmt.Sprintf("%s not found", objectType), 1)
+	}
+
+	return zerrors.CreateZitadelError(zerrors.KindInternal, inputErr, errorID, fmt.Sprintf("failed fetching %s", objectType), 1)
+}
+
+func handleUpdateError(inputErr error, expectedRowCount, actualRowCount int64, errorID, objectType string) error {
+	if inputErr == nil && expectedRowCount == actualRowCount {
+		return nil
+	}
+
+	if inputErr != nil {
+		return zerrors.CreateZitadelError(zerrors.KindInternal, inputErr, errorID, fmt.Sprintf("failed updating %s", objectType), 1)
+	}
+
+	if actualRowCount == 0 {
+		return zerrors.CreateZitadelError(zerrors.KindNotFound, nil, errorID, fmt.Sprintf("%s not found", objectType), 1)
+	}
+
+	if actualRowCount != expectedRowCount {
+		return zerrors.CreateZitadelError(zerrors.KindInternal, NewMultipleObjectsUpdatedError(expectedRowCount, actualRowCount), errorID, "unexpected number of rows updated", 1)
+	}
+
+	return nil
 }
 
 func (err *PasswordVerificationError) Is(target error) bool {

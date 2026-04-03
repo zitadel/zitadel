@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"go.opentelemetry.io/contrib/exporters/autoexport"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutlog"
@@ -15,6 +16,30 @@ import (
 func newLoggerProvider(ctx context.Context, cfg ExporterConfig, resource *resource.Resource) (_ *sdk_log.LoggerProvider, err error) {
 	var exporter sdk_log.Exporter
 	switch cfg.Type {
+	case ExporterTypeAuto:
+		// autoexport delegates exporter selection to the standard OTEL env vars.
+		// We can't just call autoexport.NewLogExporter unconditionally because
+		// autoexport defaults to "otlp" when OTEL_LOGS_EXPORTER is unset, and
+		// the OTLP exporter silently points at localhost:4318 even with no env
+		// vars configured. That would cause every ZITADEL instance to start
+		// attempting OTLP connections after upgrading, spamming logs with
+		// connection errors.
+		//
+		// This guard is a heuristic: we check the env vars that realistically
+		// indicate someone has intentionally configured OTEL export. It does not
+		// cover every possible OTLP env var (e.g. OTEL_EXPORTER_OTLP_HEADERS or
+		// OTEL_EXPORTER_OTLP_CERTIFICATE on their own), but those vars are
+		// meaningless without an endpoint or exporter type being set too.
+		if os.Getenv("OTEL_LOGS_EXPORTER") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_LOGS_PROTOCOL") != "" {
+			exporter, err = autoexport.NewLogExporter(ctx)
+			if err == nil && autoexport.IsNoneLogExporter(exporter) {
+				exporter = nil
+			}
+		}
 	case ExporterTypeUnspecified, ExporterTypeNone:
 		// no exporter
 	case ExporterTypeStdOut, ExporterTypeStdErr:

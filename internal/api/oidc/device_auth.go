@@ -76,11 +76,11 @@ func (o *OPStorage) StoreDeviceAuthorization(ctx context.Context, clientID, devi
 		logger.OnError(err).Error(logMsg)
 		span.EndWithError(err)
 	}()
-	scope, audience, err := o.createAuthRequestScopeAndAudience(ctx, clientID, scope)
+	scope, audience, orgID, err := o.createAuthRequestScopeAndAudience(ctx, clientID, scope)
 	if err != nil {
 		return err
 	}
-	details, err := o.command.AddDeviceAuth(ctx, clientID, deviceCode, userCode, expires, scope, audience, slices.Contains(scope, oidc.ScopeOfflineAccess))
+	details, err := o.command.AddDeviceAuth(ctx, clientID, deviceCode, userCode, orgID, expires, scope, audience, slices.Contains(scope, oidc.ScopeOfflineAccess))
 	if err == nil {
 		logger.SetFields("details", details).Debug(logMsg)
 	}

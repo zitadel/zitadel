@@ -50,10 +50,14 @@
       <ng-container matColumnDef="type">
         <th mat-header-cell *matHeaderCellDef>{{ 'APP.TYPE' | translate }}</th>
         <td class="pointer" [routerLink]="['/projects', projectId, 'apps', app.id]" mat-cell *matCellDef="let app">
-          <span *ngIf="app?.oidcConfig?.appType !== undefined && app?.oidcConfig?.appType !== null">
-            {{ 'APP.OIDC.APPTYPE.' + app?.oidcConfig?.appType | translate }}
-          </span>
-          <span *ngIf="app.apiConfig">API</span>
+          @if (app?.oidcConfig?.appType !== undefined && app?.oidcConfig?.appType !== null) {
+            <span>
+              {{ 'APP.OIDC.APPTYPE.' + app?.oidcConfig?.appType | translate }}
+            </span>
+          }
+          @if (app.apiConfig) {
+            <span>API</span>
+          }
         </td>
       </ng-container>
 
@@ -75,18 +79,18 @@
       <ng-container matColumnDef="creationDate">
         <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.ROLE.CREATIONDATE' | translate }}</th>
         <td class="pointer" [routerLink]="['/projects', projectId, 'apps', app.id]" mat-cell *matCellDef="let app">
-          <span *ngIf="app?.details?.creationDate">{{
-            app.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm'
-          }}</span>
+          @if (app?.details?.creationDate) {
+            <span>{{ app.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+          }
         </td>
       </ng-container>
 
       <ng-container matColumnDef="changeDate">
         <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.ROLE.CHANGEDATE' | translate }}</th>
         <td class="pointer" [routerLink]="['/projects', projectId, 'apps', app.id]" mat-cell *matCellDef="let app">
-          <span *ngIf="app?.details?.changeDate">{{
-            app.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm'
-          }}</span>
+          @if (app?.details?.changeDate) {
+            <span>{{ app.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+          }
         </td>
       </ng-container>
 

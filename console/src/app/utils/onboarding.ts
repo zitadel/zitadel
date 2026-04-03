@@ -43,7 +43,7 @@ export const ONBOARDING_MILESTONES: OnboardingActions[] = [
   {
     order: 3,
     milestoneType: MilestoneType.MILESTONE_TYPE_AUTHENTICATION_SUCCEEDED_ON_APPLICATION,
-    link: 'https://zitadel.com/docs/guides/integrate/login-users',
+    link: 'https://zitadel.com/docs/guides/integrate/login/login-users',
     externalLink: true,
     iconClasses: 'las la-sign-in-alt',
     darkcolor: sthdark,

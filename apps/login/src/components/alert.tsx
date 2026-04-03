@@ -26,8 +26,8 @@ export function Alert({ children, type = AlertType.ALERT }: Props) {
         [neutral]: type === AlertType.INFO,
       })}
     >
-      {type === AlertType.ALERT && <ExclamationTriangleIcon className="ml-2 mr-2 h-5 w-5 flex-shrink-0" />}
-      {type === AlertType.INFO && <InformationCircleIcon className="ml-2 mr-2 h-5 w-5 flex-shrink-0" />}
+      {type === AlertType.ALERT && <ExclamationTriangleIcon className="mr-2 ml-2 h-5 w-5 flex-shrink-0" />}
+      {type === AlertType.INFO && <InformationCircleIcon className="mr-2 ml-2 h-5 w-5 flex-shrink-0" />}
       <span className="w-full text-sm">{children}</span>
     </div>
   );

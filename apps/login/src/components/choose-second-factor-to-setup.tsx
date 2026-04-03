@@ -83,7 +83,7 @@ export function ChooseSecondFactorToSetup({
       </div>
       {!force && (
         <button
-          className="text-sm transition-all hover:text-primary-light-500 dark:hover:text-primary-dark-500"
+          className="hover:text-primary-light-500 dark:hover:text-primary-dark-500 text-sm transition-all"
           onClick={async () => {
             const skipResponse = await skipMFAAndContinueWithNextUrl({
               userId,

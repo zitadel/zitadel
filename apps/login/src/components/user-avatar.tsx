@@ -40,12 +40,12 @@ export function UserAvatar({ loginName, displayName, showDropdown, searchParams 
       <div>
         <Avatar size="small" name={displayName ?? loginName ?? ""} loginName={loginName ?? ""} />
       </div>
-      <span className="ml-4 max-w-[250px] overflow-hidden text-ellipsis pr-4 text-14px">{loginName}</span>
+      <span className="text-14px ml-4 max-w-[250px] overflow-hidden pr-4 text-ellipsis">{loginName}</span>
       <span className="flex-grow"></span>
       {showDropdown && (
         <Link
           href={"/accounts?" + params}
-          className={`ml-4 mr-1 flex items-center justify-center p-1 transition-all hover:bg-black/10 dark:hover:bg-white/10 ${userAvatarRoundness}`}
+          className={`mr-1 ml-4 flex items-center justify-center p-1 transition-all hover:bg-black/10 dark:hover:bg-white/10 ${userAvatarRoundness}`}
         >
           <ChevronDownIcon className="h-4 w-4" />
         </Link>

@@ -1,10 +1,11 @@
 "use client";
 
 import { APPEARANCE_STYLES, getComponentRoundness, getThemeConfig } from "@/lib/theme";
-import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
+import { ComputerDesktopIcon, MoonIcon, SunIcon } from "@heroicons/react/24/outline";
+import { ThemeMode } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-
+import { useThemeMode } from "./branding-context";
 function getThemeToggleRoundness() {
   return getComponentRoundness("themeSwitch");
 }
@@ -39,6 +40,7 @@ function getSelectedButtonStyle(isSelected: boolean): string {
 export default function ThemeSwitch() {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
+  const themeMode = useThemeMode();
   const toggleRoundness = getThemeToggleRoundness();
   const cardAppearance = getThemeSwitchCardAppearance();
 
@@ -48,6 +50,12 @@ export default function ThemeSwitch() {
 
   if (!mounted) return null;
 
+  // Hide toggle when theme is forced to light or dark only
+  if (themeMode === ThemeMode.LIGHT || themeMode === ThemeMode.DARK) {
+    return null;
+  }
+
+  // themeMode is AUTO (1) or UNSPECIFIED (0): show light, system, dark options
   return (
     <div className={`flex space-x-1 p-1 ${toggleRoundness} ${cardAppearance}`}>
       <button
@@ -56,6 +64,13 @@ export default function ThemeSwitch() {
         aria-label="Switch to light mode"
       >
         <SunIcon className="h-5 w-5" />
+      </button>
+      <button
+        className={`flex h-8 w-8 flex-row items-center justify-center ${toggleRoundness} transition-colors ${getSelectedButtonStyle(theme === "system")}`}
+        onClick={() => setTheme("system")}
+        aria-label="Switch to system mode"
+      >
+        <ComputerDesktopIcon className="h-4 w-4" />
       </button>
       <button
         className={`flex h-8 w-8 flex-row items-center justify-center ${toggleRoundness} transition-colors ${getSelectedButtonStyle(theme === "dark")}`}
