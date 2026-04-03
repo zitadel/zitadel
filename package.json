@@ -15,11 +15,11 @@
     "clean:all": "pnpm run clean && rm -rf .nx node_modules"
   },
   "devDependencies": {
-    "@bufbuild/buf": "^1.65.0",
-    "@changesets/cli": "^2.29.8",
+    "@bufbuild/buf": "^1.66.1",
+    "@changesets/cli": "^2.30.0",
     "nx": "21.6.9",
-    "sass": "^1.97.3",
-    "shiki": "^3.21.0",
-    "wait-on": "^9.0.3"
+    "sass": "^1.98.0",
+    "shiki": "^3.23.0",
+    "wait-on": "^9.0.4"
   }
 }

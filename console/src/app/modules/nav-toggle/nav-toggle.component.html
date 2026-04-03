@@ -1,11 +1,15 @@
 <button class="nav-toggle" [ngClass]="{ active }" (click)="clicked.emit()">
   <div class="c_label">
     <span> {{ label }} </span>
-    <div *ngIf="count && count < 100" class="count">
-      <span>{{ count }}</span>
-    </div>
-    <div *ngIf="count && count >= 100" class="count">
-      <span>99+</span>
-    </div>
+    @if (count && count < 100) {
+      <div class="count">
+        <span>{{ count }}</span>
+      </div>
+    }
+    @if (count && count >= 100) {
+      <div class="count">
+        <span>99+</span>
+      </div>
+    }
   </div>
 </button>

@@ -153,7 +153,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
               aria-label="Resend Code"
               disabled={loading}
               type="button"
-              className="ml-4 cursor-pointer text-primary-light-500 hover:text-primary-light-400 disabled:cursor-default disabled:text-gray-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 dark:disabled:text-gray-700"
+              className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
               onClick={() => {
                 resendCode();
               }}

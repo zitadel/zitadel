@@ -130,7 +130,7 @@ describe("processIDPCallback", () => {
   };
 
   beforeEach(async () => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
 
     // Import mocked modules
     const { headers } = await import("next/headers");
@@ -937,7 +937,7 @@ describe("validateIDPLinkingPermissions", () => {
   let validateIDPLinkingPermissions: any;
 
   beforeEach(async () => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
 
     // Import mocked modules
     const { getLoginSettings, getActiveIdentityProviders } = await import("../zitadel");

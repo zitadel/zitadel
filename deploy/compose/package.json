@@ -2,7 +2,7 @@
   "name": "@zitadel/compose",
   "private": true,
   "devDependencies": {
-    "@playwright/test": "^1.58.0",
+    "@playwright/test": "^1.59.0",
     "dotenv": "^16.0.0"
   }
 }
