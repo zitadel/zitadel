@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"slices"
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -604,7 +605,11 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate, permissionCheck Organizati
 			if err != nil {
 				return nil, err
 			}
-			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, usernames, domainPolicy.UserLoginMustBeDomain || organizationScopedUsername, domains, links, entityIds)}, nil
+			projectNames, err := OrgProjectNames(ctx, filter, a.ID)
+			if err != nil {
+				return nil, err
+			}
+			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, usernames, domainPolicy.UserLoginMustBeDomain || organizationScopedUsername, domains, links, entityIds, projectNames)}, nil
 		}, nil
 	}
 }
@@ -659,6 +664,49 @@ func OrgUserIDPLinks(ctx context.Context, filter preparation.FilterToQueryReduce
 type samlEntityID struct {
 	appID    string
 	entityID string
+}
+
+func OrgProjectNames(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) ([]string, error) {
+	// only 'ProjectAddedType', 'ProjectChangedType' & 'ProjectRemovedType' type of events remove or add the project-name reservation
+	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(orgID).
+		OrderAsc().
+		AddQuery().
+		AggregateTypes(project.AggregateType).
+		EventTypes(
+			project.ProjectAddedType,
+			project.ProjectChangedType,
+			project.ProjectRemovedType,
+		).Builder())
+	if err != nil {
+		return nil, err
+	}
+
+	projectNames := make(map[string]string)
+	for _, event := range events {
+		switch eventTyped := event.(type) {
+		case *project.ProjectAddedEvent:
+			projectNames[eventTyped.Aggregate().ID] = eventTyped.Name
+		case *project.ProjectChangeEvent:
+			if eventTyped.Name == nil {
+				continue
+			}
+			if _, ok := projectNames[eventTyped.Aggregate().ID]; !ok {
+				continue
+			}
+			projectNames[eventTyped.Aggregate().ID] = *eventTyped.Name
+		case *project.ProjectRemovedEvent:
+			delete(projectNames, eventTyped.Aggregate().ID)
+		}
+	}
+
+	names := make([]string, 0, len(projectNames))
+	for _, name := range projectNames {
+		names = append(names, name)
+	}
+	slices.Sort(names)
+
+	return names, nil
 }
 
 func OrgSamlEntityIDs(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) ([]string, error) {
