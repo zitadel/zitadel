@@ -28,7 +28,9 @@ CREATE TABLE zitadel.sessions (
 CREATE OR REPLACE FUNCTION zitadel.update_expiration()
     RETURNS TRIGGER AS $$
 BEGIN
-    NEW.expiration := NEW.updated_at + NEW.lifetime;
+    IF NEW.lifetime IS NOT NULL AND NEW.lifetime <> '0'::interval THEN
+        NEW.expiration := NEW.updated_at + NEW.lifetime;
+    END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

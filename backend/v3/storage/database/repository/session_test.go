@@ -195,7 +195,11 @@ func TestSession_Create(t *testing.T) {
 			assert.Equal(t, tt.session.ID, createdSession.ID)
 			assert.Equal(t, tt.session.InstanceID, createdSession.InstanceID)
 			assert.Equal(t, tt.session.Lifetime, createdSession.Lifetime)
-			assert.Equal(t, createdSession.UpdatedAt.Add(tt.session.Lifetime), createdSession.Expiration)
+			if tt.session.Lifetime != 0 {
+				assert.Equal(t, createdSession.UpdatedAt.Add(tt.session.Lifetime), createdSession.Expiration)
+			} else {
+				assert.Zero(t, createdSession.Expiration)
+			}
 			assert.Equal(t, tt.session.CreatorID, createdSession.CreatorID)
 			assert.Equal(t, tt.session.UserAgent, createdSession.UserAgent)
 			assert.WithinRange(t, createdSession.CreatedAt, beforeCreate.Add(-time.Second), afterCreate.Add(time.Second))
