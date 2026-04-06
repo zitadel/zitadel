@@ -15,6 +15,8 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dbmock"
 	noopdb "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/noop"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	projectrepo "github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -209,14 +211,16 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 	getErr := errors.New("get error")
 
 	tt := []struct {
-		testName string
-		mockTx   func(ctrl *gomock.Controller) database.QueryExecutor
-		orgRepo  func(ctrl *gomock.Controller) domain.OrganizationRepository
+		testName    string
+		mockTx      func(ctrl *gomock.Controller) database.QueryExecutor
+		orgRepo     func(ctrl *gomock.Controller) domain.OrganizationRepository
+		projectRepo func(ctrl *gomock.Controller) domain.ProjectRepository
 
 		inputOrganizationID string
 
-		expectedError   error
-		expectedOrgName string
+		expectedError        error
+		expectedOrgName      string
+		expectedProjectNames []string
 	}{
 		{
 			testName: "when retrieving organization fails should return error",
@@ -242,6 +246,46 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 			},
 			inputOrganizationID: "org-1",
 			expectedError:       getErr,
+		},
+		{
+			testName: "when retrieving organization projects fails should return error",
+			orgRepo: func(ctrl *gomock.Controller) domain.OrganizationRepository {
+				repo := domainmock.NewOrgRepo(ctrl)
+
+				repo.EXPECT().
+					LoadDomains().
+					Times(1).
+					Return(repo)
+
+				repo.EXPECT().
+					Get(
+						gomock.Any(),
+						gomock.Any(),
+						dbmock.QueryOptions(database.WithCondition(
+							repo.PrimaryKeyCondition("inst-1", "org-1"),
+						)),
+					).
+					Times(1).
+					Return(&domain.Organization{
+						ID:   "org-1",
+						Name: "organization 1",
+					}, nil)
+				return repo
+			},
+			projectRepo: func(ctrl *gomock.Controller) domain.ProjectRepository {
+				repo := domainmock.NewProjectRepo(ctrl)
+				repo.EXPECT().
+					List(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(database.And(
+						repo.InstanceIDCondition("inst-1"),
+						repo.OrganizationIDCondition("org-1"),
+					)))).
+					Times(1).
+					Return(nil, getErr)
+				return repo
+			},
+			inputOrganizationID: "org-1",
+			expectedError:       getErr,
+			expectedOrgName:     "organization 1",
 		},
 		{
 			testName: "when delete organization fails should return error",
@@ -274,9 +318,24 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 					Return(int64(0), deleteErr)
 				return repo
 			},
-			inputOrganizationID: "org-1",
-			expectedError:       deleteErr,
-			expectedOrgName:     "organization 1",
+			projectRepo: func(ctrl *gomock.Controller) domain.ProjectRepository {
+				repo := domainmock.NewProjectRepo(ctrl)
+				repo.EXPECT().
+					List(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(database.And(
+						repo.InstanceIDCondition("inst-1"),
+						repo.OrganizationIDCondition("org-1"),
+					)))).
+					Times(1).
+					Return([]*domain.Project{
+						{Name: "project 1"},
+						{Name: "project 2"},
+					}, nil)
+				return repo
+			},
+			inputOrganizationID:  "org-1",
+			expectedError:        deleteErr,
+			expectedOrgName:      "organization 1",
+			expectedProjectNames: []string{"project 1", "project 2"},
 		},
 		{
 			testName: "when more than one row deleted should return internal error",
@@ -307,9 +366,21 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 					Return(int64(2), nil)
 				return repo
 			},
-			inputOrganizationID: "org-1",
-			expectedError:       zerrors.ThrowInternalf(nil, "DOM-5cE9u6", "expecting 1 row deleted, got %d", 2),
-			expectedOrgName:     "organization 1",
+			projectRepo: func(ctrl *gomock.Controller) domain.ProjectRepository {
+				repo := domainmock.NewProjectRepo(ctrl)
+				repo.EXPECT().
+					List(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(database.And(
+						repo.InstanceIDCondition("inst-1"),
+						repo.OrganizationIDCondition("org-1"),
+					)))).
+					Times(1).
+					Return([]*domain.Project{{Name: "project 1"}}, nil)
+				return repo
+			},
+			inputOrganizationID:  "org-1",
+			expectedError:        zerrors.ThrowInternalf(nil, "DOM-5cE9u6", "expecting 1 row deleted, got %d", 2),
+			expectedOrgName:      "organization 1",
+			expectedProjectNames: []string{"project 1"},
 		},
 		{
 			testName: "when no rows deleted should return not found error",
@@ -340,9 +411,21 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 					Return(int64(0), nil)
 				return repo
 			},
-			inputOrganizationID: "org-1",
-			expectedError:       zerrors.ThrowNotFoundf(nil, "DOM-ur6Qyv", "organization not found"),
-			expectedOrgName:     "organization 1",
+			projectRepo: func(ctrl *gomock.Controller) domain.ProjectRepository {
+				repo := domainmock.NewProjectRepo(ctrl)
+				repo.EXPECT().
+					List(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(database.And(
+						repo.InstanceIDCondition("inst-1"),
+						repo.OrganizationIDCondition("org-1"),
+					)))).
+					Times(1).
+					Return(nil, nil)
+				return repo
+			},
+			inputOrganizationID:  "org-1",
+			expectedError:        zerrors.ThrowNotFoundf(nil, "DOM-ur6Qyv", "organization not found"),
+			expectedOrgName:      "organization 1",
+			expectedProjectNames: []string{},
 		},
 		{
 			testName: "when one row deleted should execute successfully",
@@ -373,8 +456,20 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 					Return(int64(1), nil)
 				return repo
 			},
-			inputOrganizationID: "org-1",
-			expectedOrgName:     "organization 1",
+			projectRepo: func(ctrl *gomock.Controller) domain.ProjectRepository {
+				repo := domainmock.NewProjectRepo(ctrl)
+				repo.EXPECT().
+					List(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(database.And(
+						repo.InstanceIDCondition("inst-1"),
+						repo.OrganizationIDCondition("org-1"),
+					)))).
+					Times(1).
+					Return([]*domain.Project{{Name: "project 1"}}, nil)
+				return repo
+			},
+			inputOrganizationID:  "org-1",
+			expectedOrgName:      "organization 1",
+			expectedProjectNames: []string{"project 1"},
 		},
 	}
 	for _, tc := range tt {
@@ -391,6 +486,9 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 			if tc.orgRepo != nil {
 				domain.WithOrganizationRepo(tc.orgRepo(ctrl))(opts)
 			}
+			if tc.projectRepo != nil {
+				domain.WithProjectRepo(tc.projectRepo(ctrl))(opts)
+			}
 
 			// Test
 			err := opts.Invoke(ctx, cmd)
@@ -398,6 +496,7 @@ func TestDeleteOrgCommand_Execute(t *testing.T) {
 			// Verify
 			assert.ErrorIs(t, err, tc.expectedError)
 			assert.Equal(t, tc.expectedOrgName, cmd.OrganizationName)
+			assert.Equal(t, tc.expectedProjectNames, cmd.ProjectNames)
 		})
 	}
 }
@@ -423,6 +522,7 @@ func TestDeleteOrgCommand_Events(t *testing.T) {
 					{Domain: "domain1.com"},
 					{Domain: "domain2.com"},
 				},
+				ProjectNames: []string{"project1", "project2"},
 			},
 			expectedCount: 1,
 		},
@@ -447,6 +547,17 @@ func TestDeleteOrgCommand_Events(t *testing.T) {
 			// Verify
 			require.Equal(t, tc.expectedError, err)
 			assert.Len(t, cmds, tc.expectedCount)
+			require.Len(t, cmds, 1)
+
+			projectConstraints := make(map[string]*eventstore.UniqueConstraint)
+			for _, constraint := range cmds[0].UniqueConstraints() {
+				if constraint.UniqueType == projectrepo.UniqueProjectnameType {
+					projectConstraints[constraint.UniqueField] = constraint
+				}
+			}
+			require.Len(t, projectConstraints, 2)
+			assert.Contains(t, projectConstraints, "project1org-1")
+			assert.Contains(t, projectConstraints, "project2org-1")
 		})
 	}
 }
