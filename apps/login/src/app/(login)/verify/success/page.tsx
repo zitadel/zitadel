@@ -79,9 +79,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           )
         )}
       </div>
-      <div className="w-full">
-        {continueUrl && <VerifySuccessContinue continueUrl={continueUrl} />}
-      </div>
+      <div className="w-full">{continueUrl && <VerifySuccessContinue continueUrl={continueUrl} />}</div>
     </DynamicTheme>
   );
 }
