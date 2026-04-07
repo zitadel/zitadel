@@ -159,7 +159,7 @@ export class AddActionDialogComponent implements OnInit, OnDestroy {
       if (resp) {
         this.mgmtService
           .deleteAction(this.id)
-          .then((resp) => {
+          .then(() => {
             this.dialogRef.close();
           })
           .catch((error: any) => {
