@@ -2,7 +2,7 @@ import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/co
 import { FormControl, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { BehaviorSubject, from, interval, Observable, of, Subject, Subscription, switchMap, take, tap } from 'rxjs';
+import { BehaviorSubject, from, interval, Observable, of, Subject, Subscription, take, tap } from 'rxjs';
 import { map, pairwise, startWith, takeUntil } from 'rxjs/operators';
 import {
   GetCustomLoginTextsRequest as AdminGetCustomLoginTextsRequest,
@@ -27,7 +27,6 @@ import { LanguagesService } from '../../../services/languages.service';
 
 const MIN_INTERVAL_SECONDS = 10; // if the difference of a newer version to the current exceeds this time, a refresh button is shown.
 
-/* eslint-disable */
 const KeyNamesArray = [
   'emailVerificationDoneText',
   'emailVerificationText',
@@ -64,7 +63,6 @@ const KeyNamesArray = [
   'passwordlessText',
   'externalRegistrationUserOverviewText',
 ];
-/* eslint-enable */
 
 const REQUESTMAP = {
   [PolicyComponentServiceType.MGMT]: {
@@ -180,7 +178,7 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
         // debounceTime(5000),
         takeUntil(this.destroy$),
       )
-      .subscribe((x) => {
+      .subscribe(() => {
         this.checkForChanges();
       });
   }

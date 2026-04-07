@@ -1,18 +1,7 @@
 import { Component, computed, DestroyRef, OnInit } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import {
-  map,
-  switchMap,
-  firstValueFrom,
-  mergeWith,
-  Observable,
-  defer,
-  of,
-  shareReplay,
-  combineLatestWith,
-  EMPTY,
-} from 'rxjs';
+import { map, switchMap, firstValueFrom, mergeWith, Observable, defer, of, shareReplay, combineLatestWith } from 'rxjs';
 import { passwordConfirmValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ToastService } from 'src/app/services/toast.service';

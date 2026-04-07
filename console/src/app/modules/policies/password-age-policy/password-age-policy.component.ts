@@ -1,5 +1,5 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { GetPasswordAgePolicyResponse as AdminGetPasswordAgePolicyResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { GetPasswordAgePolicyResponse as MgmtGetPasswordAgePolicyResponse } from 'src/app/proto/generated/zitadel/management_pb';
@@ -11,7 +11,6 @@ import { ToastService } from 'src/app/services/toast.service';
 import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
-import { requiredValidator } from '../../form-field/validators/validators';
 import { Observable } from 'rxjs';
 import { GrpcAuthService } from '../../../services/grpc-auth.service';
 import { take } from 'rxjs/operators';
@@ -123,10 +122,9 @@ export class PasswordAgePolicyComponent implements OnInit {
   }
 
   public savePolicy(): void {
-    let promise: Promise<any>;
     if (this.passwordAgeData) {
       if (this.service instanceof AdminService) {
-        promise = this.service
+        this.service
           .updatePasswordAgePolicy(this.maxAgeDays?.value ?? 0, this.expireWarnDays?.value ?? 0)
           .then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
@@ -137,7 +135,7 @@ export class PasswordAgePolicyComponent implements OnInit {
           });
       } else {
         if ((this.passwordAgeData as PasswordAgePolicy.AsObject).isDefault) {
-          promise = (this.service as ManagementService)
+          (this.service as ManagementService)
             .addCustomPasswordAgePolicy(this.maxAgeDays?.value ?? 0, this.expireWarnDays?.value ?? 0)
             .then(() => {
               this.toast.showInfo('POLICY.TOAST.SET', true);
@@ -147,7 +145,7 @@ export class PasswordAgePolicyComponent implements OnInit {
               this.toast.showError(error);
             });
         } else {
-          promise = (this.service as ManagementService)
+          (this.service as ManagementService)
             .updateCustomPasswordAgePolicy(this.maxAgeDays?.value ?? 0, this.expireWarnDays?.value ?? 0)
             .then(() => {
               this.toast.showInfo('POLICY.TOAST.SET', true);
