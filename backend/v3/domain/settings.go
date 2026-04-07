@@ -22,7 +22,7 @@ const (
 	SettingTypeSecurity
 	SettingTypeOrganization
 	SettingTypeNotification
-	SettingTypeLegalAndSupport
+	SettingTypeLinks
 	SettingTypeSecretGenerator
 )
 
