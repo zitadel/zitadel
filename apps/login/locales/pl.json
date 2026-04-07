@@ -383,6 +383,7 @@
     "userIdMissing": "Nie podano identyfikatora użytkownika!",
     "successTitle": "Weryfikacja zakończona",
     "successDescription": "Użytkownik został pomyślnie zweryfikowany.",
+    "successContinue": "Kontynuuj",
     "setupAuthenticator": "Skonfiguruj uwierzytelnianie",
     "verify": {
       "title": "Zweryfikuj użytkownika",
