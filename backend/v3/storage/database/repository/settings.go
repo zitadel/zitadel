@@ -1308,28 +1308,14 @@ type linksSettings struct {
 
 func (s linksSettings) SetSettingFields(value domain.LinksSettingsAttributes) database.Change {
 	changes := make([]db_json.JsonUpdate, 0)
-	//if value.TOSLink != nil {
-	//	changes = append(changes, s.SetTOSLink(*value.TOSLink))
-	//}
-	//if value.PrivacyPolicyLink != nil {
-	//	changes = append(changes, s.SetPrivacyPolicyLink(*value.PrivacyPolicyLink))
-	//}
-	//if value.HelpLink != nil {
-	//	changes = append(changes, s.SetHelpLink(*value.HelpLink))
-	//}
-	//if value.SupportEmail != nil {
-	//	changes = append(changes, s.SetSupportEmail(*value.SupportEmail))
-	//}
-	//if value.DocsLink != nil {
-	//	changes = append(changes, s.SetDocsLink(*value.DocsLink))
-	//}
-	//if value.CustomLink != nil {
-	//	changes = append(changes, s.SetCustomLink(*value.CustomLink))
-	//}
-	//if value.CustomLinkText != nil {
-	//	changes = append(changes, s.SetCustomLinkText(*value.CustomLinkText))
-	//}
+	if value.Links != nil {
+		changes = append(changes, s.SetLinks(value.Links))
+	}
 	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
+}
+
+func (s linksSettings) SetLinks(value []domain.Link) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"links"}, value)
 }
 
 func LinksSettingsRepository() domain.LinksSettingsRepository {

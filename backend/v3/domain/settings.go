@@ -410,6 +410,8 @@ type NotificationSettingsRepository interface {
 
 type linksSettingsJSONChanges interface {
 	SetSettingFields(value LinksSettingsAttributes) database.Change
+
+	SetLinks(value []Link) db_json.JsonUpdate
 }
 
 type LinksSettings struct {
