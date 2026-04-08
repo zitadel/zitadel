@@ -611,3 +611,20 @@ message AppleConfig {
         }
     ];
 }
+
+message InstanceRolesInfo {
+    string organization_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            description: "the id of the organization";
+        }
+    ];
+    string organization_domain = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"example-org.com\"";
+            description: "the domain of the organization";
+        }
+    ];
+}
