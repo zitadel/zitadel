@@ -1287,24 +1287,23 @@ func TestServer_TestInstanceNotificationSettingsReduces(t *testing.T) {
 	})
 }
 
-func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
+func TestServer_TestInstanceLinksSettingsReduces(t *testing.T) {
 	t.Parallel()
 
-	settingsRepo := repository.LegalAndSupportSettingsRepository()
+	settingsRepo := repository.LinksSettingsRepository()
 
 	before := time.Now()
 	newInstance := integration.NewInstance(t.Context())
 	after := time.Now()
 	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
 
-	t.Run("test add legal and support settings set", func(t *testing.T) {
-
+	t.Run("test add links settings set", func(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.Get(
 				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLinks, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -1321,7 +1320,7 @@ func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test add legal and support settings re-set", func(t *testing.T) {
+	t.Run("test add links settings re-set", func(t *testing.T) {
 		before := time.Now()
 		_, err := newInstance.Client.Admin.UpdatePrivacyPolicy(IAMCTX, &admin.UpdatePrivacyPolicyRequest{
 			TosLink:        "https://tos.example2.com",
@@ -1340,7 +1339,7 @@ func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLinks, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -1362,7 +1361,7 @@ func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLinks, domain.SettingStateActive),
 				),
 			)
 			require.NoError(collect, err)
@@ -1380,7 +1379,7 @@ func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLinks, domain.SettingStateActive),
 				),
 			)
 

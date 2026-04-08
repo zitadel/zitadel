@@ -22,9 +22,8 @@ const (
 	SettingTypeSecurity
 	SettingTypeOrganization
 	SettingTypeNotification
-	SettingTypeLegalAndSupport // deprecated
-	SettingTypeSecretGenerator
 	SettingTypeLinks
+	SettingTypeSecretGenerator
 )
 
 //go:generate enumer -type SettingState -transform snake -trimprefix SettingState -sql
@@ -409,41 +408,6 @@ type NotificationSettingsRepository interface {
 	notificationSettingsJSONChanges
 }
 
-type legalAndSupportSettingsJSONChanges interface {
-	SetSettingFields(value LegalAndSupportSettingsAttributes) database.Change
-
-	SetTOSLink(value string) db_json.JsonUpdate
-	SetPrivacyPolicyLink(value string) db_json.JsonUpdate
-	SetHelpLink(value string) db_json.JsonUpdate
-	SetSupportEmail(value string) db_json.JsonUpdate
-	SetDocsLink(value string) db_json.JsonUpdate
-	SetCustomLink(value string) db_json.JsonUpdate
-	SetCustomLinkText(value string) db_json.JsonUpdate
-}
-
-// LegalAndSupportSettings represents the legal and support settings.
-// Deprecated: Use LinksSettings.
-type LegalAndSupportSettings struct {
-	Settings
-	LegalAndSupportSettingsAttributes
-}
-
-type LegalAndSupportSettingsAttributes struct {
-	TOSLink           *string `json:"tosLink,omitempty"`
-	PrivacyPolicyLink *string `json:"privacyPolicyLink,omitempty"`
-	HelpLink          *string `json:"helpLink,omitempty"`
-	SupportEmail      *string `json:"supportEmail,omitempty"`
-	DocsLink          *string `json:"docsLink,omitempty"`
-	CustomLink        *string `json:"customLink,omitempty"`
-	CustomLinkText    *string `json:"customLinkText,omitempty"`
-}
-
-//go:generate mockgen -typed -package domainmock -destination ./mock/legal_and_support_settings.mock.go . LegalAndSupportSettingsRepository
-type LegalAndSupportSettingsRepository interface {
-	settingsRepository[LegalAndSupportSettings]
-	legalAndSupportSettingsJSONChanges
-}
-
 type linksSettingsJSONChanges interface {
 	SetSettingFields(value LinksSettingsAttributes) database.Change
 }
@@ -472,7 +436,7 @@ const (
 type LinkTarget int32
 
 const (
-	LinkTargetUnspecified LinkType = iota
+	LinkTargetUnspecified LinkTarget = iota
 	LinkTargetSelf
 	LinkTargetBlank
 )

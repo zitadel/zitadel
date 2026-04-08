@@ -1432,15 +1432,16 @@ func TestServer_TestNotificationSettingsReduces(t *testing.T) {
 	})
 }
 
-func TestServer_TestLegalAndSupportSettingsReduces(t *testing.T) {
+func TestServer_TestLinksSettingsReduces(t *testing.T) {
 	t.Parallel()
 
-	settingsRepo := repository.LegalAndSupportSettingsRepository()
+	settingsRepo := repository.LinksSettingsRepository()
 
 	IAMCTX, newInstance, orgId := createInstanceWithOrg(t)
 
 	t.Run("test add legal and support settings set", func(t *testing.T) {
 		before := time.Now()
+		// TODO
 		_, err := newInstance.Client.Mgmt.AddCustomPrivacyPolicy(IAMCTX, &management.AddCustomPrivacyPolicyRequest{
 			TosLink:        "https://tos.example.com",
 			PrivacyLink:    "https://privacy.example.com",

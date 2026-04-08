@@ -1270,23 +1270,39 @@ func (p *relationalTablesProjection) reducePrivacyPolicyAdded(event eventstore.E
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-chduE", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.LegalAndSupportSettingsRepository()
-		email := string(policyEvent.SupportEmail)
-		settings := domain.LegalAndSupportSettings{
+		settingsRepo := repository.LinksSettingsRepository()
+		//email := string(policyEvent.SupportEmail)
+		settings := domain.LinksSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
 				CreatedAt:      policyEvent.Creation,
 				UpdatedAt:      policyEvent.Creation,
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           &policyEvent.TOSLink,
-				PrivacyPolicyLink: &policyEvent.PrivacyLink,
-				HelpLink:          &policyEvent.HelpLink,
-				SupportEmail:      &email,
-				DocsLink:          &policyEvent.DocsLink,
-				CustomLink:        &policyEvent.CustomLink,
-				CustomLinkText:    &policyEvent.CustomLinkText,
+			LinksSettingsAttributes: domain.LinksSettingsAttributes{
+				Links: []domain.Link{
+					{
+						Type:   gu.Ptr(domain.LinkTypeTermsOfService),
+						URL:    gu.Ptr("https://host"),
+						Target: gu.Ptr(domain.LinkTargetBlank),
+					},
+					{
+						Type:   gu.Ptr(domain.LinkTypePrivacyPolicy),
+						URL:    gu.Ptr("https://host"),
+						Target: gu.Ptr(domain.LinkTargetBlank),
+					},
+					{
+						Type:   gu.Ptr(domain.LinkTypeSupport),
+						URL:    gu.Ptr("email"),
+						Target: gu.Ptr(domain.LinkTargetSelf),
+					},
+					{
+						Type:           gu.Ptr(domain.LinkTypeCustom),
+						URL:            gu.Ptr("https://host"),
+						TranslationKey: gu.Ptr("linktext"),
+						Target:         gu.Ptr(domain.LinkTargetBlank),
+					},
+				},
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
@@ -1312,25 +1328,41 @@ func (p *relationalTablesProjection) reducePrivacyPolicyChanged(event eventstore
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rbsxy", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.LegalAndSupportSettingsRepository()
-		var email string
-		if policyEvent.SupportEmail != nil {
-			email = string(*policyEvent.SupportEmail)
-		}
-		settings := domain.LegalAndSupportSettings{
+		settingsRepo := repository.LinksSettingsRepository()
+		//var email string
+		//if policyEvent.SupportEmail != nil {
+		//	email = string(*policyEvent.SupportEmail)
+		//}
+		settings := domain.LinksSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
 				UpdatedAt:      policyEvent.Creation,
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           policyEvent.TOSLink,
-				PrivacyPolicyLink: policyEvent.PrivacyLink,
-				HelpLink:          policyEvent.HelpLink,
-				SupportEmail:      &email,
-				DocsLink:          policyEvent.DocsLink,
-				CustomLink:        policyEvent.CustomLink,
-				CustomLinkText:    policyEvent.CustomLinkText,
+			LinksSettingsAttributes: domain.LinksSettingsAttributes{
+				Links: []domain.Link{
+					{
+						Type:   gu.Ptr(domain.LinkTypeTermsOfService),
+						URL:    gu.Ptr("https://host"),
+						Target: gu.Ptr(domain.LinkTargetBlank),
+					},
+					{
+						Type:   gu.Ptr(domain.LinkTypePrivacyPolicy),
+						URL:    gu.Ptr("https://host"),
+						Target: gu.Ptr(domain.LinkTargetBlank),
+					},
+					{
+						Type:   gu.Ptr(domain.LinkTypeSupport),
+						URL:    gu.Ptr("email"),
+						Target: gu.Ptr(domain.LinkTargetSelf),
+					},
+					{
+						Type:           gu.Ptr(domain.LinkTypeCustom),
+						URL:            gu.Ptr("https://host"),
+						TranslationKey: gu.Ptr("linktext"),
+						Target:         gu.Ptr(domain.LinkTargetBlank),
+					},
+				},
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
@@ -1348,9 +1380,9 @@ func (p *relationalTablesProjection) reduceOrgPrivacyPolicyRemoved(event eventst
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-UrdHy", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.LegalAndSupportSettingsRepository()
+		settingsRepo := repository.LinksSettingsRepository()
 		_, err := settingsRepo.Delete(ctx, v3_sql.SQLTx(tx),
-			settingsRepo.UniqueCondition(policyEvent.Aggregate().InstanceID, &policyEvent.Aggregate().ID, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+			settingsRepo.UniqueCondition(policyEvent.Aggregate().InstanceID, &policyEvent.Aggregate().ID, domain.SettingTypeLinks, domain.SettingStateActive),
 		)
 		return err
 	}), nil

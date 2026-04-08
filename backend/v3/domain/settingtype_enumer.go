@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-const _SettingTypeName = "loginbrandingpassword_complexitypassword_expirydomainlockoutsecurityorganizationnotificationlegal_and_supportsecret_generatorlinks"
+const _SettingTypeName = "loginbrandingpassword_complexitypassword_expirydomainlockoutsecurityorganizationnotificationlinkssecret_generator"
 
-var _SettingTypeIndex = [...]uint8{0, 5, 13, 32, 47, 53, 60, 68, 80, 92, 109, 125, 130}
+var _SettingTypeIndex = [...]uint8{0, 5, 13, 32, 47, 53, 60, 68, 80, 92, 97, 113}
 
-const _SettingTypeLowerName = "loginbrandingpassword_complexitypassword_expirydomainlockoutsecurityorganizationnotificationlegal_and_supportsecret_generatorlinks"
+const _SettingTypeLowerName = "loginbrandingpassword_complexitypassword_expirydomainlockoutsecurityorganizationnotificationlinkssecret_generator"
 
 func (i SettingType) String() string {
 	if i >= SettingType(len(_SettingTypeIndex)-1) {
@@ -34,38 +34,35 @@ func _SettingTypeNoOp() {
 	_ = x[SettingTypeSecurity-(6)]
 	_ = x[SettingTypeOrganization-(7)]
 	_ = x[SettingTypeNotification-(8)]
-	_ = x[SettingTypeLegalAndSupport-(9)]
+	_ = x[SettingTypeLinks-(9)]
 	_ = x[SettingTypeSecretGenerator-(10)]
-	_ = x[SettingTypeLinks-(11)]
 }
 
-var _SettingTypeValues = []SettingType{SettingTypeLogin, SettingTypeBranding, SettingTypePasswordComplexity, SettingTypePasswordExpiry, SettingTypeDomain, SettingTypeLockout, SettingTypeSecurity, SettingTypeOrganization, SettingTypeNotification, SettingTypeLegalAndSupport, SettingTypeSecretGenerator, SettingTypeLinks}
+var _SettingTypeValues = []SettingType{SettingTypeLogin, SettingTypeBranding, SettingTypePasswordComplexity, SettingTypePasswordExpiry, SettingTypeDomain, SettingTypeLockout, SettingTypeSecurity, SettingTypeOrganization, SettingTypeNotification, SettingTypeLinks, SettingTypeSecretGenerator}
 
 var _SettingTypeNameToValueMap = map[string]SettingType{
-	_SettingTypeName[0:5]:          SettingTypeLogin,
-	_SettingTypeLowerName[0:5]:     SettingTypeLogin,
-	_SettingTypeName[5:13]:         SettingTypeBranding,
-	_SettingTypeLowerName[5:13]:    SettingTypeBranding,
-	_SettingTypeName[13:32]:        SettingTypePasswordComplexity,
-	_SettingTypeLowerName[13:32]:   SettingTypePasswordComplexity,
-	_SettingTypeName[32:47]:        SettingTypePasswordExpiry,
-	_SettingTypeLowerName[32:47]:   SettingTypePasswordExpiry,
-	_SettingTypeName[47:53]:        SettingTypeDomain,
-	_SettingTypeLowerName[47:53]:   SettingTypeDomain,
-	_SettingTypeName[53:60]:        SettingTypeLockout,
-	_SettingTypeLowerName[53:60]:   SettingTypeLockout,
-	_SettingTypeName[60:68]:        SettingTypeSecurity,
-	_SettingTypeLowerName[60:68]:   SettingTypeSecurity,
-	_SettingTypeName[68:80]:        SettingTypeOrganization,
-	_SettingTypeLowerName[68:80]:   SettingTypeOrganization,
-	_SettingTypeName[80:92]:        SettingTypeNotification,
-	_SettingTypeLowerName[80:92]:   SettingTypeNotification,
-	_SettingTypeName[92:109]:       SettingTypeLegalAndSupport,
-	_SettingTypeLowerName[92:109]:  SettingTypeLegalAndSupport,
-	_SettingTypeName[109:125]:      SettingTypeSecretGenerator,
-	_SettingTypeLowerName[109:125]: SettingTypeSecretGenerator,
-	_SettingTypeName[125:130]:      SettingTypeLinks,
-	_SettingTypeLowerName[125:130]: SettingTypeLinks,
+	_SettingTypeName[0:5]:         SettingTypeLogin,
+	_SettingTypeLowerName[0:5]:    SettingTypeLogin,
+	_SettingTypeName[5:13]:        SettingTypeBranding,
+	_SettingTypeLowerName[5:13]:   SettingTypeBranding,
+	_SettingTypeName[13:32]:       SettingTypePasswordComplexity,
+	_SettingTypeLowerName[13:32]:  SettingTypePasswordComplexity,
+	_SettingTypeName[32:47]:       SettingTypePasswordExpiry,
+	_SettingTypeLowerName[32:47]:  SettingTypePasswordExpiry,
+	_SettingTypeName[47:53]:       SettingTypeDomain,
+	_SettingTypeLowerName[47:53]:  SettingTypeDomain,
+	_SettingTypeName[53:60]:       SettingTypeLockout,
+	_SettingTypeLowerName[53:60]:  SettingTypeLockout,
+	_SettingTypeName[60:68]:       SettingTypeSecurity,
+	_SettingTypeLowerName[60:68]:  SettingTypeSecurity,
+	_SettingTypeName[68:80]:       SettingTypeOrganization,
+	_SettingTypeLowerName[68:80]:  SettingTypeOrganization,
+	_SettingTypeName[80:92]:       SettingTypeNotification,
+	_SettingTypeLowerName[80:92]:  SettingTypeNotification,
+	_SettingTypeName[92:97]:       SettingTypeLinks,
+	_SettingTypeLowerName[92:97]:  SettingTypeLinks,
+	_SettingTypeName[97:113]:      SettingTypeSecretGenerator,
+	_SettingTypeLowerName[97:113]: SettingTypeSecretGenerator,
 }
 
 var _SettingTypeNames = []string{
@@ -78,9 +75,8 @@ var _SettingTypeNames = []string{
 	_SettingTypeName[60:68],
 	_SettingTypeName[68:80],
 	_SettingTypeName[80:92],
-	_SettingTypeName[92:109],
-	_SettingTypeName[109:125],
-	_SettingTypeName[125:130],
+	_SettingTypeName[92:97],
+	_SettingTypeName[97:113],
 }
 
 // SettingTypeString retrieves an enum value from the enum constants string name.
