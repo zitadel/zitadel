@@ -243,7 +243,10 @@
               color="primary"
               data-e2e="create-button"
               [disabled]="
-                state.mainForm.invalid || state.senderForm.invalid || (['iam.policy.write'] | hasRole | async) === false
+                updateDataMutation.isPending() ||
+                state.mainForm.invalid ||
+                state.senderForm.invalid ||
+                (['iam.policy.write'] | hasRole | async) === false
               "
             >
               {{ 'config' in state ? ('ACTIONS.SAVE' | translate) : ('ACTIONS.CREATE' | translate) }}

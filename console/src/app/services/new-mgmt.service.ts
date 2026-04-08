@@ -23,7 +23,6 @@ import {
   ResendHumanInitializationResponse,
   ResendHumanPhoneVerificationRequestSchema,
   ResendHumanPhoneVerificationResponse,
-  SendHumanResetPasswordNotificationRequest_Type,
   SendHumanResetPasswordNotificationRequestSchema,
   SendHumanResetPasswordNotificationResponse,
   SetUserMetadataRequestSchema,

@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
 import { App, AppState } from 'src/app/proto/generated/zitadel/app_pb';
-import { IDP, IDPState } from 'src/app/proto/generated/zitadel/idp_pb';
 import { InstanceDetail, State } from 'src/app/proto/generated/zitadel/instance_pb';
 import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';

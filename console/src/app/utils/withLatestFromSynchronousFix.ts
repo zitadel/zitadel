@@ -1,4 +1,4 @@
-import { combineLatestWith, distinctUntilChanged, Observable, ObservableInput, ObservableInputTuple } from 'rxjs';
+import { combineLatestWith, distinctUntilChanged, Observable, ObservableInputTuple } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 // withLatestFrom does not work in this case, so we use

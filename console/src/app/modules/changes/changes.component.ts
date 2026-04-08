@@ -1,8 +1,8 @@
 import { KeyValue } from '@angular/common';
-import { Component, DestroyRef, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, Input, OnInit } from '@angular/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
-import { catchError, debounceTime, scan, take, takeUntil, tap } from 'rxjs/operators';
+import { BehaviorSubject, from, Observable, of } from 'rxjs';
+import { catchError, debounceTime, scan, take, tap } from 'rxjs/operators';
 import { ListMyUserChangesResponse } from 'src/app/proto/generated/zitadel/auth_pb';
 import { Change } from 'src/app/proto/generated/zitadel/change_pb';
 import {
@@ -269,7 +269,6 @@ export class ChangesComponent implements OnInit {
   }
 
   // Order by ascending property value
-  /* eslint-disable */
   valueAscOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
     return a.value.localeCompare(b.value);
   };
@@ -278,5 +277,4 @@ export class ChangesComponent implements OnInit {
   keyDescOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
     return a.key > b.key ? -1 : b.key > a.key ? 1 : 0;
   };
-  /* eslint-enable */
 }
