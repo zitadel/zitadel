@@ -23,6 +23,7 @@ import (
 type MockExecutionQueue struct {
 	ctrl     *gomock.Controller
 	recorder *MockExecutionQueueMockRecorder
+	isgomock struct{}
 }
 
 // MockExecutionQueueMockRecorder is the mock recorder for MockExecutionQueue.
@@ -43,10 +44,10 @@ func (m *MockExecutionQueue) EXPECT() *MockExecutionQueueMockRecorder {
 }
 
 // InsertManyFastTx mocks base method.
-func (m *MockExecutionQueue) InsertManyFastTx(arg0 context.Context, arg1 *sql.Tx, arg2 []river.JobArgs, arg3 ...queue.InsertOpt) error {
+func (m *MockExecutionQueue) InsertManyFastTx(ctx context.Context, tx *sql.Tx, args []river.JobArgs, opts ...queue.InsertOpt) error {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1, arg2}
-	for _, a := range arg3 {
+	varargs := []any{ctx, tx, args}
+	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "InsertManyFastTx", varargs...)
@@ -55,8 +56,8 @@ func (m *MockExecutionQueue) InsertManyFastTx(arg0 context.Context, arg1 *sql.Tx
 }
 
 // InsertManyFastTx indicates an expected call of InsertManyFastTx.
-func (mr *MockExecutionQueueMockRecorder) InsertManyFastTx(arg0, arg1, arg2 any, arg3 ...any) *gomock.Call {
+func (mr *MockExecutionQueueMockRecorder) InsertManyFastTx(ctx, tx, args any, opts ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1, arg2}, arg3...)
+	varargs := append([]any{ctx, tx, args}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertManyFastTx", reflect.TypeOf((*MockExecutionQueue)(nil).InsertManyFastTx), varargs...)
 }
