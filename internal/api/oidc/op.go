@@ -27,7 +27,6 @@ import (
 )
 
 type Config struct {
-	AcceptLegacyTokens                bool
 	CodeMethodS256                    bool
 	AuthMethodPost                    bool
 	AuthMethodPrivateKeyJWT           bool
@@ -119,6 +118,7 @@ func NewServer(
 	command *command.Commands,
 	query *query.Queries,
 	repo repository.Repository,
+	acceptLegacyTokens bool,
 	encryptionAlg crypto.EncryptionAlgorithm,
 	targetEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	cryptoKey []byte,
@@ -139,7 +139,7 @@ func NewServer(
 	idTokenHintKeySet := newOidcKeySet(keyCache)
 
 	crypto := op.NewAES256GCMCrypto(opConfig.CryptoKey, "")
-	if config.AcceptLegacyTokens {
+	if acceptLegacyTokens {
 		crypto = op.NewCompositeCrypto(
 			crypto,
 			[]op.Decrypter{

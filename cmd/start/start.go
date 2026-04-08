@@ -665,6 +665,7 @@ func startAPIs(
 		commands,
 		queries,
 		authRepo,
+		keys.AcceptLegacyValue,
 		keys.OIDC,
 		keys.Target,
 		keys.OIDCKey,

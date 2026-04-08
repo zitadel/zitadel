@@ -107,3 +107,140 @@ func FuzzAESCrypto_DecryptString(f *testing.F) {
 		assert.True(t, utf8.ValidString(got), "result is not valid UTF-8")
 	})
 }
+
+func newTestAES256GCMCrypto(fallbackDecrypt func(value []byte, key string) ([]byte, error)) func(t testing.TB) EncryptionAlgorithm {
+	keyConfig := &KeyConfig{
+		EncryptionKeyID:  "keyID",
+		DecryptionKeyIDs: []string{"keyID"},
+	}
+	keys := Keys{"keyID": "ThisKeyNeedsToHave32Characters!!"}
+	return func(t testing.TB) EncryptionAlgorithm {
+		aesCrypto, err := NewAES256GCMCrypto(
+			keyConfig,
+			&mockKeyStorage{keys: keys},
+			WithAES256GCMCryptoFallbackDecrypt(fallbackDecrypt),
+		)
+		require.NoError(t, err)
+		return aesCrypto
+	}
+}
+
+func TestAES256GCMCrypto_EncryptString(t *testing.T) {
+	tests := []struct {
+		name       string
+		config     *KeyConfig
+		keyStorage KeyStorage
+		value      string
+		want       bool
+		wantErr    error
+	}{
+		{
+			name: "ok",
+			config: &KeyConfig{
+				EncryptionKeyID:  "keyID",
+				DecryptionKeyIDs: []string{"keyID"},
+			},
+			keyStorage: &mockKeyStorage{keys: Keys{"keyID": "ThisKeyNeedsToHave32Characters!!"}},
+			value:      "SecretData",
+			want:       true,
+			wantErr:    nil,
+		},
+		{
+			name: "empty key error",
+			config: &KeyConfig{
+				EncryptionKeyID:  "keyID",
+				DecryptionKeyIDs: []string{"keyID"},
+			},
+			keyStorage: &mockKeyStorage{keys: Keys{"keyID": ""}},
+			value:      "SecretData",
+			want:       false,
+			wantErr:    zerrors.ThrowInternal(nil, "CRYPTO-Woox3", "Errors.Internal"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			a, err := NewAES256GCMCrypto(tt.config, tt.keyStorage)
+			require.NoError(t, err)
+			got, gotErr := a.EncryptString([]byte(tt.value))
+			require.ErrorIs(t, gotErr, tt.wantErr)
+			if tt.want {
+				assert.NotEmpty(t, got, "expected non-empty result")
+			}
+		})
+	}
+}
+
+func TestAES256GCMCrypto_DecryptString(t *testing.T) {
+	tests := []struct {
+		name    string
+		crypto  func(testing.TB) EncryptionAlgorithm
+		payload func(*testing.T) []byte
+		keyID   string
+		want    string
+		wantErr error
+	}{
+		{
+			name:   "ok",
+			crypto: newTestAES256GCMCrypto(nil),
+			payload: func(t *testing.T) []byte {
+				a := newTestAES256GCMCrypto(nil)(t)
+				crypted, err := a.Encrypt([]byte("SecretData"))
+				require.NoError(t, err)
+				return crypted
+			},
+			keyID:   "keyID",
+			want:    "SecretData",
+			wantErr: nil,
+		},
+		{
+			name:   "wrong key id",
+			crypto: newTestAES256GCMCrypto(nil),
+			payload: func(t *testing.T) []byte {
+				a := newTestAES256GCMCrypto(nil)(t)
+				crypted, err := a.Encrypt([]byte("SecretData"))
+				require.NoError(t, err)
+				return crypted
+			},
+			keyID:   "foo",
+			wantErr: zerrors.ThrowNotFound(nil, "CRYPT-nkj1s", "unknown key id"),
+		},
+		{
+			name:   "malformed encrypted value",
+			crypto: newTestAES256GCMCrypto(nil),
+			payload: func(t *testing.T) []byte {
+				return []byte("malformed")
+			},
+			keyID:   "keyID",
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "CRYPT-ha6Oh", "malformed encypted value"),
+		},
+		{
+			name:   "invalid value",
+			crypto: newTestAES256GCMCrypto(nil),
+			payload: func(t *testing.T) []byte {
+				return []byte("eyJhbGciOiJBMjU2R0NNS1ciLCJlbmMiOiJBMjU2R0NNIiwiaXYiOiJfcUNRelpoVDF4bjJfUjJiIiwia2lkIjoia2V5SUQiLCJ0YWciOiJlcm1EV1oySE5mOGctMHRJa29zdHpRIn0.zGWGOxwPI8iq-ZSwmAqc1Ps8tltCp-g815nj7jY_m9Q.U_tpQDuz8SzrDEAD._YzsLNPi2BrmWA.G0I-gIfkWy6DNhqXPD_EXg")
+			},
+			keyID:   "keyID",
+			wantErr: zerrors.ThrowUnauthenticated(nil, "CRYPT-OhN2u", "failed to decrypt value"),
+		},
+		{
+			name:   "fallback decrypt",
+			crypto: newTestAES256GCMCrypto(DecryptAES),
+			payload: func(t *testing.T) []byte {
+				a := newTestAESCrypto(t)
+				crypted, err := a.Encrypt([]byte("SecretData"))
+				require.NoError(t, err)
+				return crypted
+			},
+			keyID: "keyID",
+			want:  "SecretData",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			a := tt.crypto(t)
+			got, gotErr := a.DecryptString(tt.payload(t), tt.keyID)
+			require.ErrorIs(t, gotErr, tt.wantErr)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
