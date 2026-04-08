@@ -36,7 +36,10 @@ func WithHostedDomain(hostedDomain string) oidc.ProviderOpts {
 // Requires WithHostedDomain to be set with the same domain.
 func WithEnforceHostedDomain(domain string) oidc.ProviderOpts {
 	return oidc.WithUserValidator(func(info *openid.UserInfo) error {
-		hd, _ := info.Claims["hd"].(string)
+		hd, ok := info.Claims["hd"].(string)
+		if !ok || hd == "" {
+			return zerrors.ThrowPermissionDenied(nil, "GOOGLE-HD-02", fmt.Sprintf("hd claim is missing or invalid, required domain %q", domain))
+		}
 		if hd != domain {
 			return zerrors.ThrowPermissionDenied(nil, "GOOGLE-HD-01", fmt.Sprintf("hd claim %q does not match required domain %q", hd, domain))
 		}

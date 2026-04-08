@@ -6988,7 +6988,7 @@ message AddGoogleProviderRequest {
             description: "Restricts sign-in to users from the specified Google Workspace domain (hd parameter). This is a UI hint only — Google does not enforce it server-side. Enable enforce_hosted_domain for server-side validation. Leave empty to allow any Google account.";
         }
     ];
-    bool enforce_hosted_domain = 8 [
+    bool enforce_hosted_domain = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "When true, Zitadel validates the hd claim in Google's ID token against hosted_domain after authentication, rejecting accounts from other domains. Requires hosted_domain to be set.";
         }
@@ -7038,7 +7038,7 @@ message UpdateGoogleProviderRequest {
             description: "Restricts sign-in to users from the specified Google Workspace domain (hd parameter). This is a UI hint only — Google does not enforce it server-side. Enable enforce_hosted_domain for server-side validation. Leave empty to allow any Google account.";
         }
     ];
-    bool enforce_hosted_domain = 9 [
+    bool enforce_hosted_domain = 8 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "When true, Zitadel validates the hd claim in Google's ID token against hosted_domain after authentication, rejecting accounts from other domains. Requires hosted_domain to be set.";
         }
@@ -9513,4 +9513,3 @@ message GetRestrictionsResponse {
         }
     ];
 }
-
