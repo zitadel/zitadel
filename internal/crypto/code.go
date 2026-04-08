@@ -23,6 +23,8 @@ type GeneratorConfig struct {
 	IncludeSymbols      bool
 }
 
+//go:generate mockgen -source code.go -destination ./code_mock.go -package crypto
+
 type Generator interface {
 	Length() uint
 	Expiry() time.Duration

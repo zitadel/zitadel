@@ -30,7 +30,7 @@ export class PosthogService implements OnDestroy {
         enable_heatmaps: true,
         persistence: 'memory',
         loaded: (posthog) => {
-          posthog.onFeatureFlags((flags) => {
+          posthog.onFeatureFlags(() => {
             if (posthog.isFeatureEnabled('session_recording')) {
               posthog.startSessionRecording();
             }

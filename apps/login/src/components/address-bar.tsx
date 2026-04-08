@@ -22,7 +22,7 @@ export function AddressBar({ domain }: Props) {
         </svg>
       </div>
       <div className="flex space-x-1 text-sm font-medium">
-        <div className="max-w-[150px] overflow-hidden text-ellipsis px-2 text-gray-500">
+        <div className="max-w-[150px] overflow-hidden px-2 text-ellipsis text-gray-500">
           <span className="whitespace-nowrap">{domain}</span>
         </div>
         {pathname ? (
