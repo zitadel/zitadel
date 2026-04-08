@@ -14,7 +14,7 @@ import (
 )
 
 func ListSessions(ctx context.Context, request *connect.Request[session.ListSessionsRequest]) (*connect.Response[session.ListSessionsResponse], error) {
-	req, err := convert.ListSessionsRequestGRPCToDomain(request.Msg)
+	req, err := convert.ListSessionsRequestGRPCToDomain(ctx, request.Msg)
 	if err != nil {
 		return nil, err
 	}

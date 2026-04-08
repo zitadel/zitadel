@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
@@ -167,23 +166,10 @@ func TestListSessionsQuery_Conditions(t *testing.T) {
 			},
 		},
 		{
-			name: "SessionCreatorFilter with nil ID uses caller's userID",
+			name: "SessionCreatorFilter",
 			request: &domain.ListSessionsRequest{
 				Filters: []domain.SessionFilter{
-					domain.SessionCreatorFilter{},
-				},
-			},
-			expectedCond: func(repo *domainmock.SessionRepo) database.Condition {
-				return database.And(
-					appendToDefaultConditions(repo, repo.CreatorIDCondition(userID)),
-				)
-			},
-		},
-		{
-			name: "SessionCreatorFilter with explicit ID",
-			request: &domain.ListSessionsRequest{
-				Filters: []domain.SessionFilter{
-					domain.SessionCreatorFilter{ID: gu.Ptr("other-creator")},
+					domain.SessionCreatorFilter{ID: "other-creator"},
 				},
 			},
 			expectedCond: func(repo *domainmock.SessionRepo) database.Condition {
@@ -193,23 +179,10 @@ func TestListSessionsQuery_Conditions(t *testing.T) {
 			},
 		},
 		{
-			name: "SessionUserAgentFilter with nil FingerprintID uses caller's agentID",
+			name: "SessionUserAgentFilter",
 			request: &domain.ListSessionsRequest{
 				Filters: []domain.SessionFilter{
-					domain.SessionUserAgentFilter{},
-				},
-			},
-			expectedCond: func(repo *domainmock.SessionRepo) database.Condition {
-				return database.And(
-					appendToDefaultConditions(repo, repo.UserAgentIDCondition(agentID)),
-				)
-			},
-		},
-		{
-			name: "SessionUserAgentFilter with explicit FingerprintID",
-			request: &domain.ListSessionsRequest{
-				Filters: []domain.SessionFilter{
-					domain.SessionUserAgentFilter{FingerprintID: gu.Ptr("explicit-fp")},
+					domain.SessionUserAgentFilter{FingerprintID: "explicit-fp"},
 				},
 			},
 			expectedCond: func(repo *domainmock.SessionRepo) database.Condition {
@@ -280,7 +253,7 @@ func TestListSessionsQuery_Conditions(t *testing.T) {
 			request: &domain.ListSessionsRequest{
 				Filters: []domain.SessionFilter{
 					domain.SessionUserIDFilter{UserID: "target-user"},
-					domain.SessionCreatorFilter{ID: gu.Ptr("creator-1")},
+					domain.SessionCreatorFilter{ID: "creator-1"},
 				},
 			},
 			expectedCond: func(repo *domainmock.SessionRepo) database.Condition {

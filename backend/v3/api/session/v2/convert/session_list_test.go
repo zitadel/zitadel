@@ -11,6 +11,7 @@ import (
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	objpb "github.com/zitadel/zitadel/pkg/grpc/object"
 	objv2 "github.com/zitadel/zitadel/pkg/grpc/object/v2"
@@ -24,6 +25,8 @@ func TestSearchQueryGRPCToDomain(t *testing.T) {
 	nowPB := timestamppb.New(now)
 	creatorID := "creator-123"
 	fingerprintID := "fp-123"
+	userID := "user-1"
+	agentID := "agent-1"
 	emptyStr := ""
 
 	tests := []struct {
@@ -111,20 +114,13 @@ func TestSearchQueryGRPCToDomain(t *testing.T) {
 			want: domain.SessionCreationDateFilter{Op: database.NumberOperationLessThanOrEqual, Date: now},
 		},
 		{
-			name: "CreatorQuery with nil inner query uses nil ID",
-			input: &session_grpc.SearchQuery{
-				Query: &session_grpc.SearchQuery_CreatorQuery{CreatorQuery: nil},
-			},
-			want: domain.SessionCreatorFilter{ID: nil},
-		},
-		{
-			name: "CreatorQuery with nil ID uses nil ID",
+			name: "CreatorQuery with nil ID uses userID from context",
 			input: &session_grpc.SearchQuery{
 				Query: &session_grpc.SearchQuery_CreatorQuery{
 					CreatorQuery: &session_grpc.CreatorQuery{},
 				},
 			},
-			want: domain.SessionCreatorFilter{ID: nil},
+			want: domain.SessionCreatorFilter{ID: userID},
 		},
 		{
 			name: "CreatorQuery with empty ID returns error",
@@ -142,23 +138,16 @@ func TestSearchQueryGRPCToDomain(t *testing.T) {
 					CreatorQuery: &session_grpc.CreatorQuery{Id: &creatorID},
 				},
 			},
-			want: domain.SessionCreatorFilter{ID: &creatorID},
+			want: domain.SessionCreatorFilter{ID: creatorID},
 		},
 		{
-			name: "UserAgentQuery with nil inner query uses nil FingerprintID",
-			input: &session_grpc.SearchQuery{
-				Query: &session_grpc.SearchQuery_UserAgentQuery{UserAgentQuery: nil},
-			},
-			want: domain.SessionUserAgentFilter{FingerprintID: nil},
-		},
-		{
-			name: "UserAgentQuery with nil FingerprintID uses nil FingerprintID",
+			name: "UserAgentQuery with nil FingerprintID uses agentID in context",
 			input: &session_grpc.SearchQuery{
 				Query: &session_grpc.SearchQuery_UserAgentQuery{
 					UserAgentQuery: &session_grpc.UserAgentQuery{},
 				},
 			},
-			want: domain.SessionUserAgentFilter{FingerprintID: nil},
+			want: domain.SessionUserAgentFilter{FingerprintID: agentID},
 		},
 		{
 			name: "UserAgentQuery with empty FingerprintID returns error",
@@ -176,7 +165,7 @@ func TestSearchQueryGRPCToDomain(t *testing.T) {
 					UserAgentQuery: &session_grpc.UserAgentQuery{FingerprintId: &fingerprintID},
 				},
 			},
-			want: domain.SessionUserAgentFilter{FingerprintID: &fingerprintID},
+			want: domain.SessionUserAgentFilter{FingerprintID: fingerprintID},
 		},
 		{
 			name: "ExpirationDateQuery with EQUALS method",
@@ -212,8 +201,9 @@ func TestSearchQueryGRPCToDomain(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
+			ctx := authz.NewMockContextWithAgent("instance-1", "org-1", userID, agentID)
 
-			got, err := searchQueryGRPCToDomain(tc.input)
+			got, err := searchQueryGRPCToDomain(ctx, tc.input)
 
 			assert.ErrorIs(t, err, tc.wantErr)
 			assert.Equal(t, tc.want, got)
@@ -269,8 +259,9 @@ func TestSearchQueriesGRPCToDomain(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
+			ctx := authz.NewMockContext("instance-1", "org-1", "user-1")
 
-			got, err := searchQueriesGRPCToDomain(tc.input)
+			got, err := searchQueriesGRPCToDomain(ctx, tc.input)
 
 			if tc.wantErr {
 				assert.Error(t, err)
@@ -361,8 +352,9 @@ func TestListSessionsRequestGRPCToDomain(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
+			ctx := authz.NewMockContext("instance-1", "org-1", "user-2")
 
-			got, err := ListSessionsRequestGRPCToDomain(tc.input)
+			got, err := ListSessionsRequestGRPCToDomain(ctx, tc.input)
 
 			if tc.wantErr {
 				assert.Error(t, err)

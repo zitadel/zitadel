@@ -32,12 +32,12 @@ type SessionCreationDateFilter struct {
 func (SessionCreationDateFilter) sessionFilter() {}
 
 // SessionCreatorFilter filters sessions by the creator's ID.
-type SessionCreatorFilter struct{ ID *string }
+type SessionCreatorFilter struct{ ID string }
 
 func (SessionCreatorFilter) sessionFilter() {}
 
 // SessionUserAgentFilter filters sessions by user-agent fingerprint.
-type SessionUserAgentFilter struct{ FingerprintID *string }
+type SessionUserAgentFilter struct{ FingerprintID string }
 
 func (SessionUserAgentFilter) sessionFilter() {}
 
@@ -208,18 +208,10 @@ func (l *ListSessionsQuery) sessionFilterToCondition(ctx context.Context, repo S
 		return repo.CreatedAtCondition(typedFilter.Op, typedFilter.Date), nil
 
 	case SessionCreatorFilter:
-		creatorID := authz.GetCtxData(ctx).UserID
-		if typedFilter.ID != nil {
-			creatorID = *typedFilter.ID
-		}
-		return repo.CreatorIDCondition(creatorID), nil
+		return repo.CreatorIDCondition(typedFilter.ID), nil
 
 	case SessionUserAgentFilter:
-		fp := authz.GetCtxData(ctx).AgentID
-		if typedFilter.FingerprintID != nil {
-			fp = *typedFilter.FingerprintID
-		}
-		return repo.UserAgentIDCondition(fp), nil
+		return repo.UserAgentIDCondition(typedFilter.FingerprintID), nil
 
 	case SessionExpirationDateFilter:
 		// Unlike ES side, we are also including NOT EQUAL. This is an impossible case though since gRPC has no value for it

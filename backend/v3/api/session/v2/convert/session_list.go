@@ -1,28 +1,21 @@
 package convert
 
 import (
+	"context"
+
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
-	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	objpb "github.com/zitadel/zitadel/pkg/grpc/object"
 	session_grpc "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
-
-var grpcTimestampOpToDomain = map[objpb.TimestampQueryMethod]database.NumberOperation{
-	objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_EQUALS:            database.NumberOperationEqual,
-	objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_GREATER:           database.NumberOperationGreaterThan,
-	objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_GREATER_OR_EQUALS: database.NumberOperationGreaterThanOrEqual,
-	objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_LESS:              database.NumberOperationLessThan,
-	objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_LESS_OR_EQUALS:    database.NumberOperationLessThanOrEqual,
-}
 
 // ListSessionsRequestGRPCToDomain converts a gRPC [session_grpc.ListSessionsRequest] to
 // the domain [domain.ListSessionsRequest]. It validates the request and returns an error
 // for any invalid filter values.
-func ListSessionsRequestGRPCToDomain(req *session_grpc.ListSessionsRequest) (*domain.ListSessionsRequest, error) {
-	filters, err := searchQueriesGRPCToDomain(req.GetQueries())
+func ListSessionsRequestGRPCToDomain(ctx context.Context, req *session_grpc.ListSessionsRequest) (*domain.ListSessionsRequest, error) {
+	filters, err := searchQueriesGRPCToDomain(ctx, req.GetQueries())
 	if err != nil {
 		return nil, err
 	}
@@ -41,13 +34,13 @@ func ListSessionsRequestGRPCToDomain(req *session_grpc.ListSessionsRequest) (*do
 	}, nil
 }
 
-func searchQueriesGRPCToDomain(queries []*session_grpc.SearchQuery) ([]domain.SessionFilter, error) {
+func searchQueriesGRPCToDomain(ctx context.Context, queries []*session_grpc.SearchQuery) ([]domain.SessionFilter, error) {
 	if len(queries) == 0 {
 		return nil, nil
 	}
 	filters := make([]domain.SessionFilter, 0, len(queries))
 	for _, q := range queries {
-		f, err := searchQueryGRPCToDomain(q)
+		f, err := searchQueryGRPCToDomain(ctx, q)
 		if err != nil {
 			return nil, err
 		}
@@ -56,7 +49,7 @@ func searchQueriesGRPCToDomain(queries []*session_grpc.SearchQuery) ([]domain.Se
 	return filters, nil
 }
 
-func searchQueryGRPCToDomain(q *session_grpc.SearchQuery) (domain.SessionFilter, error) {
+func searchQueryGRPCToDomain(ctx context.Context, q *session_grpc.SearchQuery) (domain.SessionFilter, error) {
 	switch typedQuery := q.GetQuery().(type) {
 	case *session_grpc.SearchQuery_IdsQuery:
 		return domain.SessionIDsFilter{IDs: typedQuery.IdsQuery.GetIds()}, nil
@@ -71,22 +64,22 @@ func searchQueryGRPCToDomain(q *session_grpc.SearchQuery) (domain.SessionFilter,
 		}, nil
 
 	case *session_grpc.SearchQuery_CreatorQuery:
-		var id *string
+		id := authz.GetCtxData(ctx).UserID
 		if typedQuery.CreatorQuery != nil && typedQuery.CreatorQuery.Id != nil {
 			if typedQuery.CreatorQuery.GetId() == "" {
 				return nil, zerrors.ThrowInvalidArgument(nil, "DOM-x8n24uh", "List.Query.Invalid")
 			}
-			id = typedQuery.CreatorQuery.Id
+			id = typedQuery.CreatorQuery.GetId()
 		}
 		return domain.SessionCreatorFilter{ID: id}, nil
 
 	case *session_grpc.SearchQuery_UserAgentQuery:
-		var fp *string
+		fp := authz.GetCtxData(ctx).AgentID
 		if typedQuery.UserAgentQuery != nil && typedQuery.UserAgentQuery.FingerprintId != nil {
 			if typedQuery.UserAgentQuery.GetFingerprintId() == "" {
 				return nil, zerrors.ThrowInvalidArgument(nil, "DOM-x8n23uh", "List.Query.Invalid")
 			}
-			fp = typedQuery.UserAgentQuery.FingerprintId
+			fp = typedQuery.UserAgentQuery.GetFingerprintId()
 		}
 		return domain.SessionUserAgentFilter{FingerprintID: fp}, nil
 
