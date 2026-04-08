@@ -55,7 +55,7 @@ export class SearchRolesAutocompleteComponent implements OnDestroy {
           this.isLoading = false;
           this.filteredRoles = resp.resultList;
         },
-        (error) => {
+        () => {
           this.isLoading = false;
         },
       );

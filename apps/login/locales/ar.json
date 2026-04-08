@@ -84,7 +84,7 @@
     "set": {
       "title": "تعيين كلمة المرور",
       "description": "تعيين كلمة المرور لحسابك",
-      "codeSent": "تم إرسال رمز إلى عنوان بريدك الإلكتروني.",
+      "codeSent": "تم إرسال رمز جديد إلى عنوان بريدك الإلكتروني.",
       "noCodeReceived": "لم تستلم رمزاً؟",
       "resend": "إعادة إرسال الرمز",
       "submit": "متابعة",
@@ -382,6 +382,7 @@
     "userIdMissing": "لم يتم تقديم userId!",
     "successTitle": "تم التحقق من المستخدم",
     "successDescription": "تم التحقق من المستخدم بنجاح.",
+    "successContinue": "متابعة",
     "setupAuthenticator": "إعداد المصادق",
     "verify": {
       "title": "التحقق من المستخدم",

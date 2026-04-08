@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, signal } from '@angular/core';
 import { WebKeysService } from 'src/app/services/webkeys.service';
-import { defer, EMPTY, firstValueFrom, Observable, ObservedValueOf, of, shareReplay, Subject, switchMap } from 'rxjs';
-import { catchError, map, startWith, withLatestFrom } from 'rxjs/operators';
+import { firstValueFrom, Observable, ObservedValueOf, shareReplay, Subject, switchMap } from 'rxjs';
+import { catchError, map, startWith } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast.service';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { OidcWebKeysCreateComponent } from './oidc-webkeys-create/oidc-webkeys-create.component';
@@ -9,9 +9,8 @@ import { TimestampToDatePipe } from 'src/app/pipes/timestamp-to-date-pipe/timest
 import { MatDialog } from '@angular/material/dialog';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { State, WebKey } from '@zitadel/proto/zitadel/webkey/v2/key_pb';
 import { CreateWebKeyRequestSchema } from '@zitadel/proto/zitadel/webkey/v2/webkey_service_pb';
-import { RSAHasher, RSABits, ECDSACurve } from '@zitadel/proto/zitadel/webkey/v2/key_pb';
+import { RSAHasher, RSABits, ECDSACurve, State, WebKey } from '@zitadel/proto/zitadel/webkey/v2/key_pb';
 
 const CACHE_WARNING_MS = 5 * 60 * 1000; // 5 minutes
 

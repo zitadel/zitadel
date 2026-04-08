@@ -83,7 +83,7 @@
     "set": {
       "title": "Définir le mot de passe",
       "description": "Définissez le mot de passe de votre compte",
-      "codeSent": "Un code a été envoyé à votre adresse e-mail.",
+      "codeSent": "Un nouveau code a été envoyé à votre adresse e-mail.",
       "noCodeReceived": "Vous n'avez pas reçu de code ?",
       "resend": "Renvoyer le code",
       "submit": "Continuer",
@@ -351,6 +351,7 @@
     "userIdMissing": "Aucun identifiant utilisateur fourni !",
     "successTitle": "Utilisateur vérifié",
     "successDescription": "L'utilisateur a été vérifié avec succès.",
+    "successContinue": "Continuer",
     "setupAuthenticator": "Configurer l'authentificateur",
     "verify": {
       "title": "Vérifier l'utilisateur",

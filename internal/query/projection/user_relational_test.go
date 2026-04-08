@@ -218,6 +218,7 @@ func TestUserRelationalProjection_Reducers(t *testing.T) {
 			33,
 			"",
 		)
+		pkeyVerifiedEvt.Creation = time.Now()
 
 		// Test
 		eventReduced := callReduce(t, rawTx, handler, pkeyVerifiedEvt)
@@ -239,6 +240,8 @@ func TestUserRelationalProjection_Reducers(t *testing.T) {
 		assert.Equal(t, pkeyVerifiedEvt.AAGUID, gotPKey.AuthenticatorAttestationGUID)
 		assert.Equal(t, pkeyVerifiedEvt.SignCount, gotPKey.SignCount)
 		assert.Equal(t, pkeyVerifiedEvt.WebAuthNTokenName, gotPKey.Name)
+		assert.Equal(t, pkeyVerifiedEvt.Creation.Round(time.Millisecond), gotPKey.UpdatedAt.Round(time.Millisecond))
+		assert.Equal(t, pkey.CreatedAt.Round(time.Millisecond), gotPKey.CreatedAt.Round(time.Millisecond))
 		assert.NotZero(t, gotPKey.VerifiedAt)
 	})
 }

@@ -1,7 +1,7 @@
 import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSelectChange } from '@angular/material/select';
-import { BehaviorSubject, from, Observable, of, Subscription, switchMap, take, tap } from 'rxjs';
+import { BehaviorSubject, from, Observable, of, Subscription, take, tap } from 'rxjs';
 import {
   GetDefaultDomainClaimedMessageTextRequest as AdminGetDefaultDomainClaimedMessageTextRequest,
   GetDefaultInitMessageTextRequest as AdminGetDefaultInitMessageTextRequest,
@@ -65,7 +65,6 @@ import { ToastService } from 'src/app/services/toast.service';
 import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
-import { map } from 'rxjs/operators';
 import { LanguagesService } from '../../../services/languages.service';
 
 enum MESSAGETYPES {
