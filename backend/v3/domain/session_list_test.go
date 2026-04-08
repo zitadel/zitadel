@@ -129,6 +129,17 @@ func TestListSessionsQuery_Conditions(t *testing.T) {
 			},
 		},
 		{
+			name: "SessionIDsFilter empty returns empty OR",
+			request: &domain.ListSessionsRequest{
+				Filters: []domain.SessionFilter{
+					domain.SessionIDsFilter{IDs: []string{}},
+				},
+			},
+			expectedCond: func(repo *domainmock.SessionRepo) database.Condition {
+				return appendToDefaultConditions(repo, database.Or())
+			},
+		},
+		{
 			name: "SessionIDsFilter with multiple IDs returns OR",
 			request: &domain.ListSessionsRequest{
 				Filters: []domain.SessionFilter{

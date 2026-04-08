@@ -183,7 +183,7 @@ func (l *ListSessionsQuery) Conditions(ctx context.Context, sessionRepo SessionR
 	conds[1] = l.permissionCondition(ctx, sessionRepo)
 
 	for _, f := range l.Request.Filters {
-		cond, err := l.sessionFilterToCondition(ctx, sessionRepo, f)
+		cond, err := l.sessionFilterToCondition(sessionRepo, f)
 		if err != nil {
 			return nil, err
 		}
@@ -192,7 +192,7 @@ func (l *ListSessionsQuery) Conditions(ctx context.Context, sessionRepo SessionR
 	return database.And(conds...), nil
 }
 
-func (l *ListSessionsQuery) sessionFilterToCondition(ctx context.Context, repo SessionRepository, filter SessionFilter) (database.Condition, error) {
+func (l *ListSessionsQuery) sessionFilterToCondition(repo SessionRepository, filter SessionFilter) (database.Condition, error) {
 	switch typedFilter := filter.(type) {
 	case SessionIDsFilter:
 		idConds := make([]database.Condition, len(typedFilter.IDs))
