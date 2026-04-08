@@ -545,3 +545,24 @@ func signatureAlgorithmToCommand(signatureAlgorithm idp_pb.SAMLSignatureAlgorith
 		return ""
 	}
 }
+
+func addZitadelProviderToCommand(req *admin_pb.AddZitadelProviderRequest) command.ZitadelProvider {
+	instanceRolesInfo := make([]command.RolesInfo, 0, len(req.InstanceRolesInfo))
+	for _, info := range req.InstanceRolesInfo {
+		instanceRolesInfo = append(instanceRolesInfo, command.RolesInfo{
+			OrganizationID:     info.OrganizationId,
+			OrganizationDomain: info.OrganizationDomain,
+		})
+	}
+	return command.ZitadelProvider{
+		Name:              req.Name,
+		Issuer:            req.Issuer,
+		ClientID:          req.ClientId,
+		ClientSecret:      req.ClientSecret,
+		Scopes:            req.Scopes,
+		IsIDTokenMapping:  req.IsIdTokenMapping,
+		UsePKCE:           req.UsePkce,
+		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+		InstanceRolesInfo: instanceRolesInfo,
+	}
+}
