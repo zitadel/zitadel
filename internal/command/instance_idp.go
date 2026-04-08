@@ -1937,3 +1937,7 @@ func (c *Commands) prepareDeleteInstanceProvider(a *instance.Aggregate, id strin
 		}, nil
 	}
 }
+
+func (c *Commands) AddInstanceZitadelProvider(ctx context.Context, provider ZitadelProvider) (string, *domain.ObjectDetails, error) {
+	return "", nil, zerrors.ThrowUnimplemented(nil, "INST-9sdf3", "Errors.API.NotImplemented")
+}
