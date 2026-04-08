@@ -22,8 +22,9 @@ const (
 	SettingTypeSecurity
 	SettingTypeOrganization
 	SettingTypeNotification
-	SettingTypeLegalAndSupport
+	SettingTypeLegalAndSupport // deprecated
 	SettingTypeSecretGenerator
+	SettingTypeLinks
 )
 
 //go:generate enumer -type SettingState -transform snake -trimprefix SettingState -sql
