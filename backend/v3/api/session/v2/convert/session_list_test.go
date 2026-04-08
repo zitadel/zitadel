@@ -380,15 +380,15 @@ func TestDomainSessionListToGRPCResponse(t *testing.T) {
 
 	t.Run("empty slice returns empty response slice", func(t *testing.T) {
 		t.Parallel()
-		got := DomainSessionListToGRPCResponse([]*domain.Session{})
+		got := DomainSessionListToGRPCResponse([]domain.ListSessionResponse{})
 		assert.Empty(t, got)
 	})
 
 	t.Run("each session is converted", func(t *testing.T) {
 		t.Parallel()
-		sessions := []*domain.Session{
-			{ID: "sess-1"},
-			{ID: "sess-2"},
+		sessions := []domain.ListSessionResponse{
+			{Session: &domain.Session{ID: "sess-1"}},
+			{Session: &domain.Session{ID: "sess-2"}},
 		}
 		got := DomainSessionListToGRPCResponse(sessions)
 		assert.Len(t, got, 2)
@@ -406,12 +406,15 @@ func TestDomainSessionToGRPCResponse(t *testing.T) {
 
 	t.Run("basic fields are mapped", func(t *testing.T) {
 		t.Parallel()
-		s := &domain.Session{
-			ID:        "sess-abc",
-			CreatedAt: createdAt,
-			UpdatedAt: updatedAt,
+		lsr := domain.ListSessionResponse{
+			Session: &domain.Session{
+				ID:        "sess-abc",
+				CreatedAt: createdAt,
+				UpdatedAt: updatedAt,
+			},
 		}
-		got := DomainSessionToGRPCResponse(s)
+
+		got := DomainSessionToGRPCResponse(lsr)
 		assert.Equal(t, "sess-abc", got.Id)
 		assert.Equal(t, timestamppb.New(createdAt), got.CreationDate)
 		assert.Equal(t, timestamppb.New(updatedAt), got.ChangeDate)
@@ -422,34 +425,36 @@ func TestDomainSessionToGRPCResponse(t *testing.T) {
 
 	t.Run("expiration is set when non-zero", func(t *testing.T) {
 		t.Parallel()
-		s := &domain.Session{Expiration: expiration}
-		got := DomainSessionToGRPCResponse(s)
+		lsr := domain.ListSessionResponse{Session: &domain.Session{Expiration: expiration}}
+		got := DomainSessionToGRPCResponse(lsr)
 		assert.Equal(t, timestamppb.New(expiration), got.ExpirationDate)
 	})
 
 	t.Run("zero expiration is not set", func(t *testing.T) {
 		t.Parallel()
-		s := &domain.Session{}
-		got := DomainSessionToGRPCResponse(s)
+		lsr := domain.ListSessionResponse{Session: &domain.Session{}}
+		got := DomainSessionToGRPCResponse(lsr)
 		assert.Nil(t, got.ExpirationDate)
 	})
 
 	t.Run("metadata is mapped to key-value pairs", func(t *testing.T) {
 		t.Parallel()
-		s := &domain.Session{
+		lsr := domain.ListSessionResponse{Session: &domain.Session{
 			Metadata: []*domain.SessionMetadata{
 				{Metadata: domain.Metadata{Key: "k1", Value: []byte("v1")}},
 				{Metadata: domain.Metadata{Key: "k2", Value: []byte("v2")}},
 			},
-		}
-		got := DomainSessionToGRPCResponse(s)
+		}}
+		got := DomainSessionToGRPCResponse(lsr)
 		assert.Equal(t, map[string][]byte{"k1": []byte("v1"), "k2": []byte("v2")}, got.Metadata)
 	})
 
 	t.Run("empty metadata is not set", func(t *testing.T) {
 		t.Parallel()
-		s := &domain.Session{Metadata: []*domain.SessionMetadata{}}
-		got := DomainSessionToGRPCResponse(s)
+		lsr := domain.ListSessionResponse{Session: &domain.Session{
+			Metadata: []*domain.SessionMetadata{},
+		}}
+		got := DomainSessionToGRPCResponse(lsr)
 		assert.Nil(t, got.Metadata)
 	})
 }
@@ -462,14 +467,35 @@ func TestDomainFactorsToGRPC(t *testing.T) {
 
 	t.Run("no user factor returns nil", func(t *testing.T) {
 		t.Parallel()
-		got := domainFactorsToGRPC(domain.SessionFactors{})
+		got := domainFactorsToGRPC(domain.SessionFactors{}, nil)
 		assert.Nil(t, got)
 	})
 
 	t.Run("no factors returns nil", func(t *testing.T) {
 		t.Parallel()
-		got := domainFactorsToGRPC(nil)
+		got := domainFactorsToGRPC(nil, nil)
 		assert.Nil(t, got)
+	})
+
+	t.Run("only user factor maps User field with nil user", func(t *testing.T) {
+		t.Parallel()
+		factors := domain.SessionFactors{
+			&domain.SessionFactorUser{UserID: "user-1", LastVerifiedAt: verifiedAt},
+		}
+		got := domainFactorsToGRPC(factors, nil)
+		assert.NotNil(t, got)
+		assert.Equal(t, verifiedAtPB, got.User.VerifiedAt)
+		assert.Equal(t, "user-1", got.User.Id)
+		assert.Zero(t, got.User.LoginName)
+		assert.Zero(t, got.User.OrganizationId)
+		assert.Zero(t, got.User.DisplayName)
+		assert.Nil(t, got.Password)
+		assert.Nil(t, got.WebAuthN)
+		assert.Nil(t, got.Intent)
+		assert.Nil(t, got.Totp)
+		assert.Nil(t, got.OtpSms)
+		assert.Nil(t, got.OtpEmail)
+		assert.Nil(t, got.RecoveryCode)
 	})
 
 	t.Run("only user factor maps User field", func(t *testing.T) {
@@ -477,10 +503,22 @@ func TestDomainFactorsToGRPC(t *testing.T) {
 		factors := domain.SessionFactors{
 			&domain.SessionFactorUser{UserID: "user-1", LastVerifiedAt: verifiedAt},
 		}
-		got := domainFactorsToGRPC(factors)
+		user := &domain.User{
+			OrganizationID: "org-1",
+			LoginNames: []domain.LoginName{
+				{LoginName: "not preferred"},
+				{LoginName: "the preferred", IsPreferred: true},
+			},
+			Machine: &domain.MachineUser{},
+			Human:   &domain.HumanUser{DisplayName: "displayed name"},
+		}
+		got := domainFactorsToGRPC(factors, user)
 		assert.NotNil(t, got)
 		assert.Equal(t, "user-1", got.User.Id)
 		assert.Equal(t, verifiedAtPB, got.User.VerifiedAt)
+		assert.Equal(t, "the preferred", got.User.LoginName)
+		assert.Equal(t, "org-1", got.User.OrganizationId)
+		assert.Equal(t, "displayed name", got.User.DisplayName)
 		assert.Nil(t, got.Password)
 		assert.Nil(t, got.WebAuthN)
 		assert.Nil(t, got.Intent)
@@ -502,8 +540,22 @@ func TestDomainFactorsToGRPC(t *testing.T) {
 			&domain.SessionFactorOTPEmail{LastVerifiedAt: verifiedAt},
 			&domain.SessionFactorRecoveryCode{LastVerifiedAt: verifiedAt},
 		}
-		got := domainFactorsToGRPC(factors)
+		user := &domain.User{
+			OrganizationID: "org-1",
+			LoginNames: []domain.LoginName{
+				{LoginName: "not preferred"},
+				{LoginName: "the preferred", IsPreferred: true},
+			},
+			Machine: &domain.MachineUser{},
+			Human:   &domain.HumanUser{DisplayName: "displayed name"},
+		}
+		got := domainFactorsToGRPC(factors, user)
 		assert.NotNil(t, got)
+		assert.Equal(t, "user-1", got.User.Id)
+		assert.Equal(t, verifiedAtPB, got.User.VerifiedAt)
+		assert.Equal(t, "the preferred", got.User.LoginName)
+		assert.Equal(t, "org-1", got.User.OrganizationId)
+		assert.Equal(t, "displayed name", got.User.DisplayName)
 		assert.Equal(t, verifiedAtPB, got.User.VerifiedAt)
 		assert.Equal(t, verifiedAtPB, got.Password.VerifiedAt)
 		assert.Equal(t, verifiedAtPB, got.WebAuthN.VerifiedAt)

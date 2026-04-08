@@ -102,7 +102,7 @@ func searchQueryGRPCToDomain(q *session_grpc.SearchQuery) (domain.SessionFilter,
 }
 
 // DomainSessionListToGRPCResponse converts a slice of domain sessions to gRPC response sessions.
-func DomainSessionListToGRPCResponse(sessions []*domain.Session) []*session_grpc.Session {
+func DomainSessionListToGRPCResponse(sessions []domain.ListSessionResponse) []*session_grpc.Session {
 	out := make([]*session_grpc.Session, len(sessions))
 	for i, s := range sessions {
 		out[i] = DomainSessionToGRPCResponse(s)
@@ -111,30 +111,30 @@ func DomainSessionListToGRPCResponse(sessions []*domain.Session) []*session_grpc
 }
 
 // DomainSessionToGRPCResponse converts a single domain session to its gRPC representation.
-func DomainSessionToGRPCResponse(s *domain.Session) *session_grpc.Session {
+func DomainSessionToGRPCResponse(lsr domain.ListSessionResponse) *session_grpc.Session {
 	pb := &session_grpc.Session{
-		Id:           s.ID,
-		CreationDate: timestamppb.New(s.CreatedAt),
-		ChangeDate:   timestamppb.New(s.UpdatedAt),
-		Factors:      domainFactorsToGRPC(s.Factors),
-		UserAgent:    domainUserAgentToGRPC(s.UserAgent),
+		Id:           lsr.Session.ID,
+		CreationDate: timestamppb.New(lsr.Session.CreatedAt),
+		ChangeDate:   timestamppb.New(lsr.Session.UpdatedAt),
+		Factors:      domainFactorsToGRPC(lsr.Session.Factors, lsr.User),
+		UserAgent:    domainUserAgentToGRPC(lsr.Session.UserAgent),
 	}
 
-	if len(s.Metadata) > 0 {
-		pb.Metadata = make(map[string][]byte, len(s.Metadata))
-		for _, m := range s.Metadata {
+	if len(lsr.Session.Metadata) > 0 {
+		pb.Metadata = make(map[string][]byte, len(lsr.Session.Metadata))
+		for _, m := range lsr.Session.Metadata {
 			pb.Metadata[m.Key] = m.Value
 		}
 	}
 
-	if !s.Expiration.IsZero() {
-		pb.ExpirationDate = timestamppb.New(s.Expiration)
+	if !lsr.Session.Expiration.IsZero() {
+		pb.ExpirationDate = timestamppb.New(lsr.Session.Expiration)
 	}
 
 	return pb
 }
 
-func domainFactorsToGRPC(factors domain.SessionFactors) *session_grpc.Factors {
+func domainFactorsToGRPC(factors domain.SessionFactors, user *domain.User) *session_grpc.Factors {
 	userFactor := factors.GetUserFactor()
 	if userFactor == nil {
 		return nil
@@ -144,8 +144,25 @@ func domainFactorsToGRPC(factors domain.SessionFactors) *session_grpc.Factors {
 		User: &session_grpc.UserFactor{
 			VerifiedAt: timestamppb.New(userFactor.LastVerifiedAt),
 			Id:         userFactor.UserID,
-			// TODO(IAM-Marco): Should I fetch also the user = session.UserID and insert its data here?
 		},
+	}
+
+	if user != nil {
+		// Set the first loginname in the list, regardless the preferred boolean
+		// In case no preferred is found, at least we have one loginname
+		preferredLoginName := user.LoginNames[0].LoginName
+		for _, ln := range user.LoginNames {
+			if ln.IsPreferred {
+				preferredLoginName = ln.LoginName
+				break
+			}
+		}
+
+		pb.User.LoginName = preferredLoginName
+		pb.User.OrganizationId = user.OrganizationID
+		if user.Human != nil {
+			pb.User.DisplayName = user.Human.DisplayName
+		}
 	}
 
 	if f := factors.GetPasswordFactor(); f != nil {
