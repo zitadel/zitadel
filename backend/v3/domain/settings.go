@@ -421,6 +421,8 @@ type legalAndSupportSettingsJSONChanges interface {
 	SetCustomLinkText(value string) db_json.JsonUpdate
 }
 
+// LegalAndSupportSettings represents the legal and support settings.
+// Deprecated: Use LinksSettings.
 type LegalAndSupportSettings struct {
 	Settings
 	LegalAndSupportSettingsAttributes
@@ -440,6 +442,52 @@ type LegalAndSupportSettingsAttributes struct {
 type LegalAndSupportSettingsRepository interface {
 	settingsRepository[LegalAndSupportSettings]
 	legalAndSupportSettingsJSONChanges
+}
+
+type linksSettingsJSONChanges interface {
+	SetSettingFields(value LinksSettingsAttributes) database.Change
+}
+
+type LinksSettings struct {
+	Settings
+	LinksSettingsAttributes
+}
+
+type LinksSettingsAttributes struct {
+	Links []Link `json:"links,omitempty"`
+}
+
+type LinkType int32
+
+const (
+	LinkTypeUnspecified LinkType = iota
+	LinkTypeTermsOfService
+	LinkTypePrivacyPolicy
+	LinkTypeHelp
+	LinkTypeSupport
+	LinkTypeDocs
+	LinkTypeCustom
+)
+
+type LinkTarget int32
+
+const (
+	LinkTargetUnspecified LinkType = iota
+	LinkTargetSelf
+	LinkTargetBlank
+)
+
+type Link struct {
+	Type           *LinkType   `json:"type,omitempty"`
+	URL            *string     `json:"url,omitempty"`
+	TranslationKey *string     `json:"translationKey,omitempty"`
+	Target         *LinkTarget `json:"target,omitempty"`
+}
+
+//go:generate mockgen -typed -package domainmock -destination ./mock/links_settings.mock.go . LinksSettingsRepository
+type LinksSettingsRepository interface {
+	settingsRepository[LinksSettings]
+	linksSettingsJSONChanges
 }
 
 type SecretGeneratorSettings struct {
