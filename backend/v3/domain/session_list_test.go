@@ -21,80 +21,15 @@ import (
 func TestListSessionsQuery_Validate(t *testing.T) {
 	t.Parallel()
 
-	tt := []struct {
-		name          string
-		request       *domain.ListSessionsRequest
-		expectedError error
-	}{
-		{
-			name:    "valid request with no filters",
-			request: &domain.ListSessionsRequest{},
-		},
-		{
-			name: "valid CreatorFilter with explicit non-empty ID",
-			request: &domain.ListSessionsRequest{
-				Filters: []domain.SessionFilter{
-					domain.SessionCreatorFilter{ID: gu.Ptr("user-1")},
-				},
-			},
-		},
-		{
-			name: "valid CreatorFilter with nil ID (use caller's ID)",
-			request: &domain.ListSessionsRequest{
-				Filters: []domain.SessionFilter{
-					domain.SessionCreatorFilter{},
-				},
-			},
-		},
-		{
-			name: "invalid CreatorFilter with explicit empty-string ID",
-			request: &domain.ListSessionsRequest{
-				Filters: []domain.SessionFilter{
-					domain.SessionCreatorFilter{ID: gu.Ptr("")},
-				},
-			},
-			expectedError: zerrors.ThrowInvalidArgument(nil, "DOM-x8n24uh", "List.Query.Invalid"),
-		},
-		{
-			name: "valid UserAgentFilter with explicit non-empty FingerprintID",
-			request: &domain.ListSessionsRequest{
-				Filters: []domain.SessionFilter{
-					domain.SessionUserAgentFilter{FingerprintID: gu.Ptr("fp-1")},
-				},
-			},
-		},
-		{
-			name: "valid UserAgentFilter with nil FingerprintID (use caller's agent)",
-			request: &domain.ListSessionsRequest{
-				Filters: []domain.SessionFilter{
-					domain.SessionUserAgentFilter{},
-				},
-			},
-		},
-		{
-			name: "invalid UserAgentFilter with explicit empty-string FingerprintID",
-			request: &domain.ListSessionsRequest{
-				Filters: []domain.SessionFilter{
-					domain.SessionUserAgentFilter{FingerprintID: gu.Ptr("")},
-				},
-			},
-			expectedError: zerrors.ThrowInvalidArgument(nil, "DOM-x8n23uh", "List.Query.Invalid"),
-		},
-	}
+	// Given
+	q := domain.NewListSessionsQuery(nil)
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-			// Given
-			q := domain.NewListSessionsQuery(tc.request)
+	// Test
+	err := q.Validate(t.Context(), nil)
 
-			// Test
-			err := q.Validate(authz.NewMockContext("inst-1", "org-1", "user-1"), &domain.InvokeOpts{})
+	// Verify
+	assert.NoError(t, err)
 
-			// Verify
-			assert.ErrorIs(t, err, tc.expectedError)
-		})
-	}
 }
 
 func TestListSessionsQuery_Sorting(t *testing.T) {

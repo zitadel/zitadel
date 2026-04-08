@@ -92,20 +92,6 @@ func (*ListSessionsQuery) String() string { return "ListSessionsQuery" }
 
 // Validate implements [Querier].
 func (l *ListSessionsQuery) Validate(_ context.Context, _ *InvokeOpts) error {
-	for _, f := range l.Request.Filters {
-		switch typedFilter := f.(type) {
-		case SessionCreatorFilter:
-			// Explicit empty-string ID pointer is invalid (nil means "use caller's ID").
-			if typedFilter.ID != nil && *typedFilter.ID == "" {
-				return zerrors.ThrowInvalidArgument(nil, "DOM-x8n24uh", "List.Query.Invalid")
-			}
-		case SessionUserAgentFilter:
-			// Explicit empty-string FingerprintID pointer is invalid (nil means "use caller's agent").
-			if typedFilter.FingerprintID != nil && *typedFilter.FingerprintID == "" {
-				return zerrors.ThrowInvalidArgument(nil, "DOM-x8n23uh", "List.Query.Invalid")
-			}
-		}
-	}
 	return nil
 }
 
