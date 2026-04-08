@@ -2,7 +2,6 @@ package domain
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -12,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/session"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type DeleteSessionCommand struct {
@@ -51,30 +49,6 @@ func (cmd *DeleteSessionCommand) Events(ctx context.Context, opts *InvokeOpts) (
 	}, nil
 }
 
-var (
-	SlugSessionTokenInvalid   = NewSlug("session", "token_invalid")
-	SlugAuthMissingPermission = NewSlug("auth", "missing_permission")
-	SlugRequestInvalid        = NewSlug("request", "invalid")
-	SlugInternalError         = NewSlug("zitadel", "internal_error")
-)
-
-var (
-	ErrSessionTokenInvalid = func(err error) error {
-		return zerrors.ThrowPermissionDeniedSlug(err, SlugSessionTokenInvalid, "the provided session token is invalid, either the token is malformed, expired or does not match the session")
-	}
-	ErrAuthMissingPermission = func(err error, message string) error {
-		return zerrors.ThrowPermissionDeniedSlug(err, SlugAuthMissingPermission, message)
-	}
-	ErrIDMissing         = zerrors.ThrowInvalidArgumentSlug(nil, SlugRequestInvalid, "validation failed: id is required", json.RawMessage{"id": "required"})
-	ErrInstanceIDMissing = zerrors.ThrowInvalidArgumentSlug(nil, SlugRequestInvalid, "validation failed: instance_id is required", map[string]interface{}{"instance_id": "required"})
-	ErrInternal          = func(err error, message string) error {
-		return zerrors.ThrowInternalSlug(err, SlugInternalError, message, nil)
-	}
-	ErrMoreThanOneRowAffected = func(message string, rows int64) error {
-		return zerrors.ThrowInternalSlug(nil, SlugInternalError, message, map[string]interface{}{"rows": rows})
-	}
-)
-
 func (cmd *DeleteSessionCommand) sessionDeletePermissionCheckCondition(ctx context.Context, sessionRepo SessionRepository, decryptor SessionTokenDecryptor) (database.Condition, error) {
 	if !cmd.MustCheckPermission {
 		return nil, nil
@@ -111,7 +85,7 @@ func (cmd *DeleteSessionCommand) Execute(ctx context.Context, opts *InvokeOpts) 
 	)
 	if err != nil {
 		if errors.Is(err, new(database.PermissionError)) {
-			return ErrAuthMissingPermission(err, "insufficient permissions to delete session, require `session.delete` permission, ownership of the session or current session token")
+			return ErrAuthMissingPermission(err, "insufficient permissions to delete session, require `session.delete` permission, ownership of the session or current session token", SessionDeletePermission)
 		}
 		return ErrInternal(err, "an unexpected error occurred while deleting the session")
 	}

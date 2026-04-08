@@ -421,7 +421,7 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					OrganizationID: "org-1",
 				},
 			},
-			expectedError: zerrors.ThrowInternal(updateErr, "DOM-netNam", "failed updating session"),
+			expectedError: domain.ErrInternal(updateErr, "failed to update the session"),
 		},
 		{
 			testName: "when session update returns no rows should return not found error",
@@ -457,7 +457,7 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					OrganizationID: "org-1",
 				},
 			},
-			expectedError: zerrors.ThrowNotFound(nil, "DOM-FszyWS", "session not found"),
+			expectedError: domain.ErrSessionNotFound(nil, "session-1"),
 		},
 		{
 			testName: "when session update returns multiple rows should return internal error",
@@ -493,7 +493,7 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					OrganizationID: "org-1",
 				},
 			},
-			expectedError: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 2), "DOM-SsIwDt", "unexpected number of rows updated"),
+			expectedError: domain.ErrMoreThanOneRowAffected("unexpected number of rows updated", 2),
 		},
 		{
 			testName: "when session has no user and user is set should execute successfully",

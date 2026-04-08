@@ -7,6 +7,7 @@ import "zitadel/object/v2/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/session/v2/challenge.proto";
 import "zitadel/session/v2/session.proto";
+import "zitadel/error/v2/error.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/struct.proto";

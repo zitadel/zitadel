@@ -113,7 +113,6 @@ type ZitadelError struct {
 	Parent  error
 	Message string
 	ID      string
-	Slug    Slug
 	Details ErrorDetails
 
 	// location where the error was created
@@ -125,7 +124,13 @@ type ZitadelError struct {
 
 type Slug string
 
-type ErrorDetails json.ra
+type ErrorDetails json.Marshaler
+
+type ErrorDetailsMap map[string]any
+
+func (m ErrorDetailsMap) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]any(m))
+}
 
 func ThrowError(parent error, id, message string) error {
 	return CreateZitadelError(KindUnknown, parent, id, message, 1)
@@ -143,39 +148,6 @@ func CreateZitadelError(kind Kind, parent error, id, message string, skip int) *
 		Kind:    kind,
 		Parent:  parent,
 		ID:      id,
-		Message: message,
-	}
-	var target *ZitadelError
-	if errors.As(parent, &target) {
-		// inherit stack trace and report location from parent error
-		err.reportLocation = target.reportLocation
-		err.stackTrace = target.stackTrace
-		err.hasStackTrace = target.hasStackTrace
-		return err
-	}
-
-	if enableReportLocation.Load() {
-		err.reportLocation = sloggcp.NewReportLocation(skip + 1)
-	}
-	if enableStackTrace.Load() {
-		err.stackTrace = debug.Stack()
-		err.hasStackTrace = true
-	}
-	return err
-}
-
-// CreateZitadelErrorSlug creates a ZitadelError of the given kind.
-// If ReportLocation or StackTrace are enabled, they are added to the error.
-// The skip parameter defines how many stack frames to skip when determining
-// the report location.
-// A skip value of 0 means the location where CreateZitadelError is called.
-// When the parent error is also a ZitadelError, the report location and stack trace
-// are inherited from the parent error.
-func CreateZitadelErrorSlug(kind Kind, parent error, slug Slug, message string, skip int) *ZitadelError {
-	err := &ZitadelError{
-		Kind:    kind,
-		Parent:  parent,
-		Slug:    slug,
 		Message: message,
 	}
 	var target *ZitadelError
@@ -244,9 +216,6 @@ func (err *ZitadelError) Is(target error) bool {
 	if t.ID != "" && t.ID != err.ID {
 		return false
 	}
-	if t.Slug != "" && t.Slug != err.Slug {
-		return false
-	}
 	if t.Message != "" && t.Message != err.Message {
 		return false
 	}
@@ -254,11 +223,17 @@ func (err *ZitadelError) Is(target error) bool {
 		return false
 	}
 	if t.Details != nil {
-		targetData, err := t.Details.MarshalJSON()
-		if err != nil {
+		if err.Details == nil {
 			return false
 		}
-		errData, err := t.Details.MarshalJSON()
+		targetData, detailsErr := t.Details.MarshalJSON()
+		if detailsErr != nil {
+			return false
+		}
+		errData, detailsErr := err.Details.MarshalJSON()
+		if detailsErr != nil {
+			return false
+		}
 		return bytes.Equal(targetData, errData)
 	}
 

@@ -207,7 +207,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 				mustCheckPermission: true,
 			},
 			res: res{
-				error: new(database.PermissionError),
+				error: domain.ErrAuthMissingPermission(nil, "", domain.SessionDeletePermission),
 			},
 		},
 		{
@@ -229,7 +229,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 				sessionID: "session-1",
 			},
 			res: res{
-				error: domain.ErrMoreThanOneRowAffected("expected 1 session to be deleted, got %d", 2),
+				error: domain.ErrMoreThanOneRowAffected("expected 1 session to be deleted, got 2", 2),
 			},
 		},
 		{

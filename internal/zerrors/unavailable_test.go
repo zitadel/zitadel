@@ -54,6 +54,28 @@ func TestUnavailable(t *testing.T) {
 		}
 	})
 
+	t.Run("ThrowUnavailableError", func(t *testing.T) {
+		slug := zerrors.Slug(id)
+		details := zerrors.ErrorDetailsMap{"details": "details"}
+
+		err := zerrors.ThrowUnavailableError(parentErr, slug, message, details)
+		assert.NotNil(t, err)
+
+		zitadelErr, ok := zerrors.AsZitadelError(err)
+		assert.True(t, ok)
+		assert.Equal(t, zerrors.KindUnavailable, zitadelErr.Kind)
+
+		zitadelError := new(zerrors.ZitadelError)
+		if errors.As(err, &zitadelError) {
+			assert.Equal(t, parentErr, zitadelError.Unwrap())
+			assert.Equal(t, id, zitadelError.ID)
+			assert.Equal(t, message, zitadelError.Message)
+			assert.Equal(t, details, zitadelError.Details)
+		} else {
+			t.Errorf("error is not of type ZitadelError")
+		}
+	})
+
 	t.Run("IsUnavailable", func(t *testing.T) {
 		err := zerrors.ThrowUnavailable(parentErr, id, message)
 		isUnavailable := zerrors.IsUnavailable(err)

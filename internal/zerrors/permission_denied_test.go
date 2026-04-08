@@ -54,6 +54,28 @@ func TestPermissionDenied(t *testing.T) {
 		}
 	})
 
+	t.Run("ThrowPermissionDeniedError", func(t *testing.T) {
+		slug := zerrors.Slug(id)
+		details := zerrors.ErrorDetailsMap{"details": "details"}
+
+		err := zerrors.ThrowPermissionDeniedError(parentErr, slug, message, details)
+		assert.NotNil(t, err)
+
+		zitadelErr, ok := zerrors.AsZitadelError(err)
+		assert.True(t, ok)
+		assert.Equal(t, zerrors.KindPermissionDenied, zitadelErr.Kind)
+
+		zitadelError := new(zerrors.ZitadelError)
+		if errors.As(err, &zitadelError) {
+			assert.Equal(t, parentErr, zitadelError.Unwrap())
+			assert.Equal(t, id, zitadelError.ID)
+			assert.Equal(t, message, zitadelError.Message)
+			assert.Equal(t, details, zitadelError.Details)
+		} else {
+			t.Errorf("error is not of type ZitadelError")
+		}
+	})
+
 	t.Run("IsPermissionDenied", func(t *testing.T) {
 		err := zerrors.ThrowPermissionDenied(parentErr, id, message)
 		isPermissionDenied := zerrors.IsPermissionDenied(err)
