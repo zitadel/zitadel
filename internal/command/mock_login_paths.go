@@ -20,6 +20,7 @@ import (
 type MockLoginPaths struct {
 	ctrl     *gomock.Controller
 	recorder *MockLoginPathsMockRecorder
+	isgomock struct{}
 }
 
 // MockLoginPathsMockRecorder is the mock recorder for MockLoginPaths.
@@ -40,57 +41,57 @@ func (m *MockLoginPaths) EXPECT() *MockLoginPathsMockRecorder {
 }
 
 // DefaultDomainClaimedURLTemplate mocks base method.
-func (m *MockLoginPaths) DefaultDomainClaimedURLTemplate(arg0 context.Context) string {
+func (m *MockLoginPaths) DefaultDomainClaimedURLTemplate(ctx context.Context) string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DefaultDomainClaimedURLTemplate", arg0)
+	ret := m.ctrl.Call(m, "DefaultDomainClaimedURLTemplate", ctx)
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
 // DefaultDomainClaimedURLTemplate indicates an expected call of DefaultDomainClaimedURLTemplate.
-func (mr *MockLoginPathsMockRecorder) DefaultDomainClaimedURLTemplate(arg0 any) *gomock.Call {
+func (mr *MockLoginPathsMockRecorder) DefaultDomainClaimedURLTemplate(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DefaultDomainClaimedURLTemplate", reflect.TypeOf((*MockLoginPaths)(nil).DefaultDomainClaimedURLTemplate), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DefaultDomainClaimedURLTemplate", reflect.TypeOf((*MockLoginPaths)(nil).DefaultDomainClaimedURLTemplate), ctx)
 }
 
 // DefaultEmailCodeURLTemplate mocks base method.
-func (m *MockLoginPaths) DefaultEmailCodeURLTemplate(arg0 context.Context) string {
+func (m *MockLoginPaths) DefaultEmailCodeURLTemplate(ctx context.Context) string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DefaultEmailCodeURLTemplate", arg0)
+	ret := m.ctrl.Call(m, "DefaultEmailCodeURLTemplate", ctx)
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
 // DefaultEmailCodeURLTemplate indicates an expected call of DefaultEmailCodeURLTemplate.
-func (mr *MockLoginPathsMockRecorder) DefaultEmailCodeURLTemplate(arg0 any) *gomock.Call {
+func (mr *MockLoginPathsMockRecorder) DefaultEmailCodeURLTemplate(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DefaultEmailCodeURLTemplate", reflect.TypeOf((*MockLoginPaths)(nil).DefaultEmailCodeURLTemplate), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DefaultEmailCodeURLTemplate", reflect.TypeOf((*MockLoginPaths)(nil).DefaultEmailCodeURLTemplate), ctx)
 }
 
 // DefaultPasskeySetURLTemplate mocks base method.
-func (m *MockLoginPaths) DefaultPasskeySetURLTemplate(arg0 context.Context) string {
+func (m *MockLoginPaths) DefaultPasskeySetURLTemplate(ctx context.Context) string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DefaultPasskeySetURLTemplate", arg0)
+	ret := m.ctrl.Call(m, "DefaultPasskeySetURLTemplate", ctx)
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
 // DefaultPasskeySetURLTemplate indicates an expected call of DefaultPasskeySetURLTemplate.
-func (mr *MockLoginPathsMockRecorder) DefaultPasskeySetURLTemplate(arg0 any) *gomock.Call {
+func (mr *MockLoginPathsMockRecorder) DefaultPasskeySetURLTemplate(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DefaultPasskeySetURLTemplate", reflect.TypeOf((*MockLoginPaths)(nil).DefaultPasskeySetURLTemplate), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DefaultPasskeySetURLTemplate", reflect.TypeOf((*MockLoginPaths)(nil).DefaultPasskeySetURLTemplate), ctx)
 }
 
 // DefaultPasswordSetURLTemplate mocks base method.
-func (m *MockLoginPaths) DefaultPasswordSetURLTemplate(arg0 context.Context) string {
+func (m *MockLoginPaths) DefaultPasswordSetURLTemplate(ctx context.Context) string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DefaultPasswordSetURLTemplate", arg0)
+	ret := m.ctrl.Call(m, "DefaultPasswordSetURLTemplate", ctx)
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
 // DefaultPasswordSetURLTemplate indicates an expected call of DefaultPasswordSetURLTemplate.
-func (mr *MockLoginPathsMockRecorder) DefaultPasswordSetURLTemplate(arg0 any) *gomock.Call {
+func (mr *MockLoginPathsMockRecorder) DefaultPasswordSetURLTemplate(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DefaultPasswordSetURLTemplate", reflect.TypeOf((*MockLoginPaths)(nil).DefaultPasswordSetURLTemplate), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DefaultPasswordSetURLTemplate", reflect.TypeOf((*MockLoginPaths)(nil).DefaultPasswordSetURLTemplate), ctx)
 }

@@ -383,6 +383,7 @@
     "userIdMissing": "userId не надано!",
     "successTitle": "Користувача підтверджено",
     "successDescription": "Користувача успішно підтверджено.",
+    "successContinue": "Продовжити",
     "setupAuthenticator": "Налаштувати автентифікатор",
     "verify": {
       "title": "Підтвердити користувача",

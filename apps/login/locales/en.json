@@ -383,6 +383,7 @@
     "userIdMissing": "No userId provided!",
     "successTitle": "User verified",
     "successDescription": "The user has been verified successfully.",
+    "successContinue": "Continue",
     "setupAuthenticator": "Setup authenticator",
     "verify": {
       "title": "Verify user",
