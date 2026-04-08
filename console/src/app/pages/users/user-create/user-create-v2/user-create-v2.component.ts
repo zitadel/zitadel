@@ -253,7 +253,7 @@ export class UserCreateV2Component implements OnInit {
     try {
       // first we try to create a URL directly from the baseUri
       return new URL(baseUriWithTrailingSlash);
-    } catch (_) {
+    } catch {
       // if this does not work we assume that the baseUri is relative,
       // and we need to add the location.origin
       // we make sure the relative url has a slash at the beginning and end

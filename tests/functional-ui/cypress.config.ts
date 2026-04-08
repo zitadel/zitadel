@@ -38,7 +38,6 @@ let webhookEvents = new Array<ZITADELWebhookEvent>()
 let failWebhookEventsCount = 0
 
 export default defineConfig({
-  reporter: 'mochawesome',
   video: true,
   reporterOptions: {
     overwrite: false,

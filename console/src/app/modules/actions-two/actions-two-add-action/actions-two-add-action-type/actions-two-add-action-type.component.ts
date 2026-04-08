@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Observable, Subject, map, of, startWith, switchMap, tap } from 'rxjs';
+import { Observable, startWith } from 'rxjs';
 import { MatRadioModule } from '@angular/material/radio';
 import { ConditionType } from '../actions-two-add-action-condition/actions-two-add-action-condition.component';
 
