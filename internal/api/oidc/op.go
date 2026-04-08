@@ -27,6 +27,7 @@ import (
 )
 
 type Config struct {
+	AcceptLegacyTokens                bool
 	CodeMethodS256                    bool
 	AuthMethodPost                    bool
 	AuthMethodPrivateKeyJWT           bool
@@ -137,7 +138,19 @@ func NewServer(
 	accessTokenKeySet := newOidcKeySet(keyCache, withKeyExpiryCheck(true))
 	idTokenHintKeySet := newOidcKeySet(keyCache)
 
-	var options []op.Option
+	crypto := op.NewAES256GCMCrypto(opConfig.CryptoKey, "")
+	if config.AcceptLegacyTokens {
+		crypto = op.NewCompositeCrypto(
+			crypto,
+			[]op.Decrypter{
+				crypto,
+				op.NewAESCrypto(opConfig.CryptoKey),
+			},
+		)
+	}
+	options := []op.Option{
+		op.WithCrypto(crypto),
+	}
 	if !externalSecure {
 		options = append(options, op.WithAllowInsecure())
 	}
@@ -175,7 +188,7 @@ func NewServer(
 		hasher:                     hasher,
 		encAlg:                     encryptionAlg,
 		targetEncryptionAlgorithm:  targetEncryptionAlgorithm,
-		opCrypto:                   op.NewAESCrypto(opConfig.CryptoKey),
+		opCrypto:                   crypto,
 		assetAPIPrefix:             assets.AssetAPI(),
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}

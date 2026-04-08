@@ -636,6 +636,18 @@ UserAgentCookie:
   MaxAge: 8760h # ZITADEL_USERAGENTCOOKIE_MAXAGE
 
 OIDC:
+  # Accept opaque tokens signed by older ZITADEL versions.
+  # Legacy tokens are vulnerable to certain cypto attacks, 
+  # so this should only be enabled during a migration and disabled afterwards.
+  # After upgrading ZITADEL, new tokens will be signed with the new signing method.
+  # When this option is enabled tokens emitted from before the upgrade will still be accepted until they expire,
+  # allowing gradual rollout of new tokens.
+  # This allows upgrading ZITADEL without forcing logout of all users.
+  # This option should be disabled after the duration of access token lifetime.
+  # Note: older versions of ZITADEL aren't able to verify newer tokens.
+  # Downgrading ZITADEL will always logout all users that obtained a token after the upgrade. 
+  AcceptLegacyTokens: true # ZITADEL_OIDC_ACCEPTLEGACYTOKENS
+
   CodeMethodS256: true # ZITADEL_OIDC_CODEMETHODS256
   AuthMethodPost: true # ZITADEL_OIDC_AUTHMETHODPOST
   AuthMethodPrivateKeyJWT: true # ZITADEL_OIDC_AUTHMETHODPRIVATEKEYJWT
