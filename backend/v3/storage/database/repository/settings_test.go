@@ -4791,27 +4791,27 @@ func TestDeleteLegalAndSupportSettings(t *testing.T) {
 		},
 		{
 			name:             "not found",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypeLinks, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete instance",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeLinks, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete instance twice",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeLinks, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete organization",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeLinks, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete organization twice",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeLinks, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 	}

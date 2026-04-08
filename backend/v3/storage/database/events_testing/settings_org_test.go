@@ -1458,7 +1458,7 @@ func TestServer_TestLegalAndSupportSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLinks, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -1494,7 +1494,7 @@ func TestServer_TestLegalAndSupportSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLinks, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
@@ -1519,7 +1519,7 @@ func TestServer_TestLegalAndSupportSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLinks, domain.SettingStateActive),
 				),
 			)
 
@@ -1540,7 +1540,7 @@ func TestServer_TestLegalAndSupportSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLinks, domain.SettingStateActive),
 				),
 			)
 

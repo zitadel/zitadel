@@ -1350,7 +1350,7 @@ func (p *relationalTablesProjection) reduceOrgPrivacyPolicyRemoved(event eventst
 
 		settingsRepo := repository.LegalAndSupportSettingsRepository()
 		_, err := settingsRepo.Delete(ctx, v3_sql.SQLTx(tx),
-			settingsRepo.UniqueCondition(policyEvent.Aggregate().InstanceID, &policyEvent.Aggregate().ID, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+			settingsRepo.UniqueCondition(policyEvent.Aggregate().InstanceID, &policyEvent.Aggregate().ID, domain.SettingTypeLinks, domain.SettingStateActive),
 		)
 		return err
 	}), nil

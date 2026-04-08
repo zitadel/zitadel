@@ -1373,7 +1373,7 @@ func (s legalAndSupportSettings) Set(ctx context.Context, client database.QueryE
 		return database.ErrInvalidChangeTarget
 	}
 
-	settings.Type = domain.SettingTypeLegalAndSupport
+	settings.Type = domain.SettingTypeLinks
 	settings.State = domain.SettingStateActive
 
 	settingsJSON, err := json.Marshal(settings.LegalAndSupportSettingsAttributes)
