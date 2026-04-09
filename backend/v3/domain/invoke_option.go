@@ -225,6 +225,5 @@ func DefaultOpts(invoker Invoker) *InvokeOpts {
 		Invoker:               invoker,
 		Permissions:           &noopPermissionChecker{}, // prevent panics for now
 		sessionTokenDecryptor: sessionTokenDecryptor,
-		idGenerator:           id.SonyFlakeGenerator(),
 	}
 }

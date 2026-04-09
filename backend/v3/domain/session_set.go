@@ -59,7 +59,7 @@ func NewSetSessionCommand(instanceID, sessionID string, opts ...SetSessionOption
 
 // Events implements [Commander].
 func (cmd *SetSessionCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
-	fetchedSession, err := cmd.fetchSession(ctx, opts)
+	fetchedSession, err := cmd.FetchSession(ctx, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -135,12 +135,12 @@ func (cmd *SetSessionCommand) String() string {
 
 // Validate implements [Commander].
 func (cmd *SetSessionCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
-	_, err = cmd.fetchSession(ctx, opts)
+	_, err = cmd.FetchSession(ctx, opts)
 	return err
 }
 
-// setUserConditionProvider implements [CheckUserParent].
-func (cmd *SetSessionCommand) setUserConditionProvider(provider userConditionProvider) {
+// SetUserConditionProvider implements [CheckUserParent].
+func (cmd *SetSessionCommand) SetUserConditionProvider(provider UserConditionProvider) {
 	cmd.user = &lazyGetter[*User]{
 		get: func(ctx context.Context, opts *InvokeOpts) (*User, error) {
 			return opts.userRepo.Get(ctx, opts.DB(), database.WithCondition(database.And(
@@ -151,14 +151,14 @@ func (cmd *SetSessionCommand) setUserConditionProvider(provider userConditionPro
 	}
 }
 
-// fetchSession implements [CheckPasswordParent] and [CheckUserParent].
-func (cmd *SetSessionCommand) fetchSession(ctx context.Context, opts *InvokeOpts) (session *Session, err error) {
+// FetchSession implements [CheckPasswordParent] and [CheckUserParent].
+func (cmd *SetSessionCommand) FetchSession(ctx context.Context, opts *InvokeOpts) (session *Session, err error) {
 	return cmd.session.fetch(ctx, opts)
 }
 
-// fetchUser implements [CheckUserParent].
-func (cmd *SetSessionCommand) fetchUser(ctx context.Context, opts *InvokeOpts) (user *User, err error) {
-	fetchedSession, err := cmd.fetchSession(ctx, opts)
+// FetchUser implements [CheckUserParent].
+func (cmd *SetSessionCommand) FetchUser(ctx context.Context, opts *InvokeOpts) (user *User, err error) {
+	fetchedSession, err := cmd.FetchSession(ctx, opts)
 	if err != nil {
 		return nil, err
 	}

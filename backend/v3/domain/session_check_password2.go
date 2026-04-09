@@ -61,7 +61,7 @@ func (cmd *CheckPasswordCommand) Events(ctx context.Context, opts *InvokeOpts) (
 		return nil, nil
 	}
 
-	fetchedSession, err := cmd.parent.fetchSession(ctx, opts)
+	fetchedSession, err := cmd.parent.FetchSession(ctx, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +171,7 @@ func (cmd *CheckPasswordCommand) PreValidate(ctx context.Context, opts *InvokeOp
 		err = close(err)
 	}()
 
-	cmd.validatedUser, err = cmd.parent.fetchUser(ctx, opts)
+	cmd.validatedUser, err = cmd.parent.FetchUser(ctx, opts)
 	if err != nil {
 		return err
 	}
@@ -209,8 +209,8 @@ func (cmd *CheckPasswordCommand) checkResult() SessionFactor {
 }
 
 type CheckPasswordParent interface {
-	fetchSession(ctx context.Context, opts *InvokeOpts) (session *Session, err error)
-	fetchUser(ctx context.Context, opts *InvokeOpts) (user *User, err error)
+	FetchSession(ctx context.Context, opts *InvokeOpts) (session *Session, err error)
+	FetchUser(ctx context.Context, opts *InvokeOpts) (user *User, err error)
 	reloadUser(ctx context.Context, opts *InvokeOpts) (user *User, err error)
 }
 

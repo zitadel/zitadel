@@ -107,8 +107,8 @@ func (cmd *CreateSessionCommand) Validate(ctx context.Context, opts *InvokeOpts)
 	return nil
 }
 
-// setUserConditionProvider implements [CheckUserParent].
-func (cmd *CreateSessionCommand) setUserConditionProvider(provider userConditionProvider) {
+// SetUserConditionProvider implements [CheckUserParent].
+func (cmd *CreateSessionCommand) SetUserConditionProvider(provider UserConditionProvider) {
 	cmd.user = lazyGetter[*User]{
 		get: func(ctx context.Context, opts *InvokeOpts) (*User, error) {
 			return opts.userRepo.Get(ctx, opts.DB(), database.WithCondition(database.And(
@@ -119,16 +119,16 @@ func (cmd *CreateSessionCommand) setUserConditionProvider(provider userCondition
 	}
 }
 
-// fetchSession implements [CheckPasswordParent] and [CheckUserParent].
-func (cmd *CreateSessionCommand) fetchSession(ctx context.Context, opts *InvokeOpts) (session *Session, err error) {
+// FetchSession implements [CheckPasswordParent] and [CheckUserParent].
+func (cmd *CreateSessionCommand) FetchSession(ctx context.Context, opts *InvokeOpts) (session *Session, err error) {
 	if cmd.session.ID == "" {
 		cmd.session.ID = opts.MustNewID()
 	}
 	return cmd.session, nil
 }
 
-// fetchUser implements [CheckUserParent].
-func (cmd *CreateSessionCommand) fetchUser(ctx context.Context, opts *InvokeOpts) (user *User, err error) {
+// FetchUser implements [CheckUserParent].
+func (cmd *CreateSessionCommand) FetchUser(ctx context.Context, opts *InvokeOpts) (user *User, err error) {
 	return cmd.user.fetch(ctx, opts)
 }
 
