@@ -123,6 +123,100 @@ describe("sendVerification", () => {
     // Verify creation was attempted
     expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
   });
+
+  test("should include requestId in /authenticator/set redirect when provided", async () => {
+    // 1. No existing session cookie
+    mockGetSessionCookieByLoginName.mockResolvedValue(undefined);
+
+    // 2. No auth methods (user needs setup)
+    mockListAuthenticationMethodTypes.mockResolvedValue({
+      authMethodTypes: [],
+    });
+
+    // 3. Mock session creation success
+    mockCreateSessionAndUpdateCookie.mockResolvedValue({
+      session: {
+        id: "new-session-id",
+        factors: { user: { id: "user-1", loginName: "test@example.com", organizationId: "org-1" } },
+      },
+    });
+
+    const result = await sendVerification({
+      userId: "user-1",
+      code: "123456",
+      isInvite: false,
+      requestId: "oidc_auth-req-123",
+    });
+
+    // Expect redirect to include requestId
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/authenticator/set?"),
+    });
+    const redirectUrl = (result as { redirect: string }).redirect;
+    const params = new URLSearchParams(redirectUrl.split("?")[1]);
+    expect(params.get("requestId")).toBe("oidc_auth-req-123");
+    expect(params.get("sessionId")).toBe("new-session-id");
+    expect(params.get("loginName")).toBe("test@example.com");
+  });
+
+  test("should NOT include requestId in /authenticator/set redirect when not provided", async () => {
+    // 1. No existing session cookie
+    mockGetSessionCookieByLoginName.mockResolvedValue(undefined);
+
+    // 2. No auth methods (user needs setup)
+    mockListAuthenticationMethodTypes.mockResolvedValue({
+      authMethodTypes: [],
+    });
+
+    // 3. Mock session creation success
+    mockCreateSessionAndUpdateCookie.mockResolvedValue({
+      session: {
+        id: "new-session-id",
+        factors: { user: { id: "user-1", loginName: "test@example.com", organizationId: "org-1" } },
+      },
+    });
+
+    const result = await sendVerification({
+      userId: "user-1",
+      code: "123456",
+      isInvite: false,
+      // no requestId
+    });
+
+    const redirectUrl = (result as { redirect: string }).redirect;
+    const params = new URLSearchParams(redirectUrl.split("?")[1]);
+    expect(params.get("requestId")).toBeNull();
+  });
+
+  test("should fall back to user.preferredLoginName for session cookie lookup when loginName is undefined", async () => {
+    // Simulate the email-link scenario: loginName is undefined but userId is provided
+    mockGetSessionCookieByLoginName.mockResolvedValue(undefined);
+    mockGetUserByID.mockResolvedValue({
+      user: { userId: "user-1", preferredLoginName: "test@example.com" },
+    });
+    mockListAuthenticationMethodTypes.mockResolvedValue({
+      authMethodTypes: [],
+    });
+    mockCreateSessionAndUpdateCookie.mockResolvedValue({
+      session: {
+        id: "new-session-id",
+        factors: { user: { id: "user-1", loginName: "test@example.com", organizationId: "org-1" } },
+      },
+    });
+
+    await sendVerification({
+      userId: "user-1",
+      code: "123456",
+      isInvite: false,
+      loginName: undefined, // explicitly undefined, like from email link
+    });
+
+    // The key assertion: session cookie lookup should use preferredLoginName as fallback
+    expect(mockGetSessionCookieByLoginName).toHaveBeenCalledWith({
+      loginName: "test@example.com",
+      organization: undefined,
+    });
+  });
 });
 
 describe("initialSendVerification", () => {
