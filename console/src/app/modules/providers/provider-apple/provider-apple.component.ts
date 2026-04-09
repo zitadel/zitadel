@@ -219,7 +219,7 @@ export class ProviderAppleComponent {
         this.loading = true;
         (this.service as ManagementService)
           .updateAppleProvider(req)
-          .then((idp) => {
+          .then(() => {
             setTimeout(() => {
               this.loading = false;
               this.close();
@@ -246,7 +246,7 @@ export class ProviderAppleComponent {
         this.loading = true;
         (this.service as AdminService)
           .updateAppleProvider(req)
-          .then((idp) => {
+          .then(() => {
             setTimeout(() => {
               this.loading = false;
               this.close();
@@ -272,7 +272,7 @@ export class ProviderAppleComponent {
       } else {
         this.privateKey?.setValue('');
         const reader = new FileReader();
-        reader.onload = ((aXML) => {
+        reader.onload = (() => {
           return (e) => {
             const keyBase64 = e.target?.result;
             if (keyBase64 && typeof keyBase64 === 'string') {
@@ -281,7 +281,7 @@ export class ProviderAppleComponent {
               this.privateKey?.setValue(cropped);
             }
           };
-        })(file);
+        })();
         reader.readAsDataURL(file);
       }
     }

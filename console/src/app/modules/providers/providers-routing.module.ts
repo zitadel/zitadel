@@ -33,17 +33,17 @@ const typeMap = {
   [ProviderType.PROVIDER_TYPE_SAML]: { path: 'saml', component: ProviderSamlSpComponent },
 };
 
-const routes: Routes = Object.entries(typeMap).map(([key, value]) => {
+const routes: Routes = Object.values(typeMap).map(({ path, component }) => {
   return {
-    path: value.path,
+    path,
     children: [
       {
         path: 'create',
-        component: value.component,
+        component,
       },
       {
         path: ':id',
-        component: value.component,
+        component,
       },
     ],
   };

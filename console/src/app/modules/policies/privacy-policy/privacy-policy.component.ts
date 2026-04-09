@@ -117,7 +117,7 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
           });
         }
       })
-      .catch((error) => {
+      .catch(() => {
         this.privacyPolicy = undefined;
         this.form.patchValue({
           tosLink: '',

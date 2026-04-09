@@ -25,7 +25,7 @@
     </div>
 
     <div class="shortcut-list-row">
-      <div cdkDropList [cdkDropListData]="main" class="shortcut-list" (cdkDropListDropped)="drop($event, 'main')">
+      <div cdkDropList [cdkDropListData]="main" class="shortcut-list" (cdkDropListDropped)="drop($event)">
         @if (editState) {
           <p class="shortcut-desc cnsl-secondary-text">{{ 'HOME.SHORTCUTS.REORDER' | translate }}</p>
         }
@@ -74,7 +74,7 @@
         }
       </div>
 
-      <div cdkDropList [cdkDropListData]="secondary" class="shortcut-list" (cdkDropListDropped)="drop($event, 'secondary')">
+      <div cdkDropList [cdkDropListData]="secondary" class="shortcut-list" (cdkDropListDropped)="drop($event)">
         @if (editState) {
           <p class="shortcut-desc cnsl-secondary-text">{{ 'HOME.SHORTCUTS.REORDER' | translate }}</p>
         }
@@ -123,7 +123,7 @@
         }
       </div>
 
-      <div cdkDropList [cdkDropListData]="third" class="shortcut-list" (cdkDropListDropped)="drop($event, 'third')">
+      <div cdkDropList [cdkDropListData]="third" class="shortcut-list" (cdkDropListDropped)="drop($event)">
         @if (editState) {
           <p class="shortcut-desc cnsl-secondary-text">{{ 'HOME.SHORTCUTS.REORDER' | translate }}</p>
         }
@@ -185,7 +185,7 @@
           cdkDropList
           [cdkDropListData]="allAvailableShortcuts"
           class="available-shortcut-list"
-          (cdkDropListDropped)="drop($event, 'main')"
+          (cdkDropListDropped)="drop($event)"
         >
           @for (shortcut of allAvailableShortcuts; track shortcut) {
             <ng-template cnslHasRole [hasRole]="shortcut.withRole">
