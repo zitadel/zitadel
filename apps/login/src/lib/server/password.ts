@@ -1,5 +1,6 @@
 "use server";
 
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/logger";
 import { recordAuthAttempt, recordAuthFailure, recordAuthSuccess } from "@/lib/metrics";
 import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "@/lib/server/cookie";
@@ -15,7 +16,6 @@ import {
   setPassword,
   setUserPassword,
 } from "@/lib/zitadel";
-import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { Code, create, Duration } from "@zitadel/client";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
