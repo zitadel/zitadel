@@ -1,6 +1,7 @@
 import { isRSCRequest, validateAuthRequest } from "@/lib/auth-utils";
 import { getAllSessions } from "@/lib/cookies";
 import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
+import { createLogger } from "@/lib/logger";
 import { FlowInitiationParams, handleOIDCFlowInitiation, handleSAMLFlowInitiation } from "@/lib/server/flow-initiation";
 import { getServiceConfig } from "@/lib/service-url";
 import { listSessions, ServiceConfig } from "@/lib/zitadel";
@@ -11,6 +12,8 @@ import { NextRequest, NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 export const revalidate = false;
 export const fetchCache = "default-no-store";
+
+const logger = createLogger("login-route");
 
 async function loadSessions({ serviceConfig, ids }: { serviceConfig: ServiceConfig; ids: string[] }): Promise<Session[]> {
   const response = await listSessions({ serviceConfig, ids: ids.filter((id: string | undefined) => !!id) });
@@ -50,6 +53,11 @@ export async function GET(request: NextRequest) {
       return await handleOIDCFlowInitiation(flowParams);
     } catch (error) {
       const status = isClassifiedError(error) ? error.httpStatus : 500;
+      logger.error("OIDC flow initiation failed", {
+        error,
+        isClassified: isClassifiedError(error),
+        status,
+      });
       return NextResponse.json({ error: "Authentication flow failed" }, { status });
     }
   } else if (requestId.startsWith("saml_")) {
@@ -57,6 +65,11 @@ export async function GET(request: NextRequest) {
       return await handleSAMLFlowInitiation(flowParams);
     } catch (error) {
       const status = isClassifiedError(error) ? error.httpStatus : 500;
+      logger.error("SAML flow initiation failed", {
+        error,
+        isClassified: isClassifiedError(error),
+        status,
+      });
       return NextResponse.json({ error: "SAML flow failed" }, { status });
     }
   } else if (requestId.startsWith("device_")) {
