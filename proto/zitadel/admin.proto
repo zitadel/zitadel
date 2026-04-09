@@ -2253,7 +2253,7 @@ service AdminService {
         };
     }
 
-    // Add a new Zitadel identity provider
+    // Add a new Zitadel identity provider in the instance
     rpc AddZitadelProvider(AddZitadelProviderRequest) returns (AddZitadelProviderResponse) {
         option (google.api.http) = {
             post: "/idps/zitadel"
