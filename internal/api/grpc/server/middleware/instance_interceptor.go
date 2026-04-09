@@ -69,7 +69,11 @@ func addInstanceByID(ctx context.Context, req interface{}, handler grpc.UnaryHan
 		if errors.As(err, &notFoundErr) {
 			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
 		}
-		return nil, status.Error(codes.NotFound, fmt.Errorf("unable to set instance using id %s: %w", id, notFoundErr).Error())
+		code := codes.Internal
+		if zerrors.IsNotFound(err) {
+			code = codes.NotFound
+		}
+		return nil, status.Error(code, fmt.Errorf("unable to set instance using id %s: %w", id, err).Error())
 	}
 	return handler(authz.WithInstance(ctx, instance), req)
 }
@@ -81,7 +85,11 @@ func addInstanceByDomain(ctx context.Context, req interface{}, handler grpc.Unar
 		if errors.As(err, &notFoundErr) && notFoundErr.Kind == zerrors.KindNotFound {
 			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
 		}
-		return nil, status.Error(codes.NotFound, fmt.Errorf("unable to set instance using domain %s: %w", domain, notFoundErr).Error())
+		code := codes.Internal
+		if zerrors.IsNotFound(err) {
+			code = codes.NotFound
+		}
+		return nil, status.Error(code, fmt.Errorf("unable to set instance using domain %s: %w", domain, err).Error())
 	}
 	return handler(authz.WithInstance(ctx, instance), req)
 }
@@ -96,13 +104,16 @@ func addInstanceByRequestedHost(ctx context.Context, req interface{}, handler gr
 	if err != nil {
 		origin := zitadel_http.DomainContext(ctx)
 		logging.WithFields("origin", requestContext.Origin(), "externalDomain", externalDomain).WithError(err).Error("unable to set instance")
+		code := codes.Internal
+		if zerrors.IsNotFound(err) {
+			code = codes.NotFound
+		}
 		zErr := new(zerrors.ZitadelError)
 		if errors.As(err, &zErr) {
 			zErr.SetMessage(translator.LocalizeFromCtx(ctx, zErr.GetMessage(), nil))
-			zErr.Parent = err
-			return nil, status.Error(codes.NotFound, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s): %s", origin, externalDomain, zErr))
+			return nil, status.Error(code, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s): %s", origin, externalDomain, zErr.Error()))
 		}
-		return nil, status.Error(codes.NotFound, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s)", origin, externalDomain))
+		return nil, status.Error(code, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s)", origin, externalDomain))
 	}
 	return handler(authz.WithInstance(ctx, instance), req)
 }
