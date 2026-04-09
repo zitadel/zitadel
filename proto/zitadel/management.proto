@@ -14061,7 +14061,7 @@ message AddZitadelProviderRequest {
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://zitadel.example.com/\"";
-            description: "the issuer of the identity provider";
+            description: "the OIDC issuer of the identity provider";
         }
     ];
     string client_id = 3 [
