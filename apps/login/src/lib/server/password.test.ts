@@ -273,8 +273,14 @@ describe("checkSessionAndSetPassword", () => {
   });
 
   test("should handle setPassword failure with failed precondition", async () => {
-    const { ConnectError } = await import("@zitadel/client");
-    mockSetPassword.mockRejectedValue(new ConnectError("User is not yet initialized", 9));
+    // Create an error that satisfies isClassifiedError (uses Symbol.for brand check)
+    const classifiedError = Object.assign(new Error("[failed_precondition] User is not yet initialized"), {
+      code: 9, // Code.FailedPrecondition
+      [Symbol.for("ClassifiedConnectError")]: true,
+      isUserError: true,
+      httpStatus: 400,
+    });
+    mockSetPassword.mockRejectedValue(classifiedError);
 
     const result = await checkSessionAndSetPassword({
       sessionId: "session123",

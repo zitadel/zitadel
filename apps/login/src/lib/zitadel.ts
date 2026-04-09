@@ -34,9 +34,9 @@ import { getTranslations } from "next-intl/server";
 import { getUserAgent } from "./fingerprint";
 import { createLogger } from "./logger";
 
-import { errorClassificationInterceptor } from "@/lib/grpc/interceptors/error-classification";
+import { errorClassificationInterceptor, isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { otelGrpcInterceptor } from "@/lib/grpc/interceptors/otel";
-import { Code, ConnectError, Interceptor } from "@connectrpc/connect";
+import { Code, Interceptor } from "@connectrpc/connect";
 import { createServiceForHost } from "./service";
 
 const logger = createLogger("zitadel");
@@ -1155,7 +1155,7 @@ export async function setUserPassword({
 
   return userService.setPassword(payload, {}).catch((error) => {
     // throw error if failed precondition (ex. User is not yet initialized)
-    if (error instanceof ConnectError && error.code === Code.FailedPrecondition && error.message) {
+    if (isClassifiedError(error) && error.code === Code.FailedPrecondition && error.message) {
       return { error: error.message };
     } else {
       throw error;
