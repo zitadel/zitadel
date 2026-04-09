@@ -85,18 +85,18 @@ func TestBytesToPublicKey_Ed25519(t *testing.T) {
 
 func TestBytesToPublicKey_Empty(t *testing.T) {
 	_, err := BytesToPublicKey(nil)
-	if err != ErrEmpty {
+	if !errors.Is(err, ErrEmpty) {
 		t.Fatalf("expected ErrEmpty, got %v", err)
 	}
 	_, err = BytesToPublicKey([]byte{})
-	if err != ErrEmpty {
+	if !errors.Is(err, ErrEmpty) {
 		t.Fatalf("expected ErrEmpty, got %v", err)
 	}
 }
 
 func TestBytesToPublicKey_InvalidPEM(t *testing.T) {
 	_, err := BytesToPublicKey([]byte("not a PEM block"))
-	if err != ErrEmpty {
+	if !errors.Is(err, ErrEmpty) {
 		t.Fatalf("expected ErrEmpty for non-PEM data, got %v", err)
 	}
 }
