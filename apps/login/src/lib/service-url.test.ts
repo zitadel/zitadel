@@ -1,6 +1,6 @@
-import { describe, expect, test, beforeEach, afterEach, vi } from "vitest";
-import { getServiceConfig, constructUrl } from "./service-url";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { constructUrl, getServiceConfig } from "./service-url";
 
 describe("Service URL utilities", () => {
   const originalEnv = process.env;

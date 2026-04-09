@@ -1,5 +1,6 @@
 "use server";
 
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/logger";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -273,7 +274,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         checks,
         requestId: command.requestId,
       }).catch((error) => {
-        if (error?.rawMessage === "Errors.User.NotActive (SESSION-Gj4ko)") {
+        if (isClassifiedError(error) && error.message?.includes("Errors.User.NotActive")) {
           return { error: t("errors.userNotActive") };
         }
         throw error;
@@ -337,10 +338,16 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       logger.debug("humanUser.email?.isVerified", {
         isVerified: humanUser?.email?.isVerified,
       });
+
+      // If the user's email is not verified, they likely already have a code from the
+      // initial verification email. Auto-sending a new one here invalidates their existing code
+      // and causes confusion. Only auto-send (`send=true`) if the email is already verified.
+      const shouldSend = humanUser?.email?.isVerified === true;
+
       const params = new URLSearchParams({
         loginName: (session?.factors?.user?.loginName ?? user.preferredLoginName) as string,
-        send: "true", // set this to true to request a new code immediately
-        invite: humanUser?.email?.isVerified ? "false" : "true", // sendInviteEmailCode results in an error if user is already initialized
+        send: shouldSend ? "true" : "false",
+        invite: "true", // always send invite code if user has no primary auth method
       });
 
       if (command.requestId) {
@@ -374,29 +381,28 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             };
           }
 
-          const paramsPassword = new URLSearchParams({
-            loginName: command.ignoreUnknownUsernames
-              ? command.loginName
-              : (session?.factors?.user?.loginName ?? user.preferredLoginName),
-          });
+          {
+            const paramsPassword = new URLSearchParams({
+              loginName: command.ignoreUnknownUsernames
+                ? command.loginName
+                : (session?.factors?.user?.loginName ?? user.preferredLoginName),
+            });
 
-          if (organization) {
-            paramsPassword.append("organization", organization);
+            if (organization) {
+              paramsPassword.append("organization", organization);
+            }
+
+            if (command.requestId) {
+              paramsPassword.append("requestId", command.requestId);
+            }
+
+            return {
+              redirect: "/password?" + paramsPassword,
+            };
           }
-
-          if (command.requestId) {
-            paramsPassword.append("requestId", command.requestId);
-          }
-
-          return {
-            redirect: "/password?" + paramsPassword,
-          };
 
         case AuthenticationMethodType.PASSKEY: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
-          if (
-            userLoginSettings?.passkeysType === PasskeysType.NOT_ALLOWED ||
-            !userLoginSettings?.allowLocalAuthentication
-          ) {
+          if (userLoginSettings?.passkeysType === PasskeysType.NOT_ALLOWED || !userLoginSettings?.allowLocalAuthentication) {
             if (command.ignoreUnknownUsernames) {
               return preventUserEnumeration(command.organization);
             }
@@ -405,22 +411,24 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             };
           }
 
-          const paramsPasskey = new URLSearchParams({
-            loginName: command.ignoreUnknownUsernames
-              ? command.loginName
-              : (session?.factors?.user?.loginName ?? user.preferredLoginName),
-          });
-          if (command.requestId) {
-            paramsPasskey.append("requestId", command.requestId);
+          {
+            const paramsPasskey = new URLSearchParams({
+              loginName: command.ignoreUnknownUsernames
+                ? command.loginName
+                : (session?.factors?.user?.loginName ?? user.preferredLoginName),
+            });
+            if (command.requestId) {
+              paramsPasskey.append("requestId", command.requestId);
+            }
+
+            if (organization) {
+              paramsPasskey.append("organization", organization);
+            }
+
+            return { redirect: "/passkey?" + paramsPasskey };
           }
 
-          if (organization) {
-            paramsPasskey.append("organization", organization);
-          }
-
-          return { redirect: "/passkey?" + paramsPasskey };
-
-        case AuthenticationMethodType.IDP:
+        case AuthenticationMethodType.IDP: {
           const resp = await redirectUserToIDP(userId, organization);
 
           if (resp?.error) {
@@ -428,6 +436,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           }
 
           return resp;
+        }
       }
     } else {
       // prefer passkey in favor of other methods
@@ -504,7 +513,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     const matched = ORG_SUFFIX_REGEX.exec(command.loginName);
     const suffix = matched?.[1] ?? "";
 
-    // this just returns orgs where the suffix is set as the Organization Domain 
+    // this just returns orgs where the suffix is set as the Organization Domain
     const orgs = await getOrgsByDomain({ serviceConfig, domain: suffix });
 
     const orgToCheckForDiscovery = orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
@@ -527,7 +536,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   // user not found, check if IDPs are available when local auth is not allowed
   if (!effectiveLoginSettings?.allowLocalAuthentication) {
-    console.log("redirecting to IDP (register allowed, password not allowed)");
     logger.debug("redirecting to IDP (register allowed, password not allowed)");
     const resp = await redirectUserToIDP(undefined, discoveredOrganization);
     if (resp) {

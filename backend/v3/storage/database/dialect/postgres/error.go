@@ -10,6 +10,10 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
+const (
+	ZIT01 = "ZIT01" // custom error code to express missing permissions by the end-user
+)
+
 func wrapError(err error) error {
 	if err == nil {
 		return nil
@@ -54,6 +58,9 @@ func wrapPgError(err *pgconn.PgError) error {
 	// 22P02: integrity violation - A value is being inserted into a enum that is not valid
 	case "22P02":
 		return database.NewCheckError(err.TableName, err.ConstraintName, err)
+	// ZIT01: missing permissions by the end-user
+	case ZIT01:
+		return database.NewPermissionError(err)
 	default:
 		return database.NewUnknownError(err)
 	}

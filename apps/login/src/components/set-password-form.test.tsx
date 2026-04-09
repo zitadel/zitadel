@@ -1,8 +1,8 @@
 import { cleanup, render } from "@testing-library/react";
-import { afterEach, describe, expect, test, vi } from "vitest";
-import { SetPasswordForm } from "./set-password-form";
 import { create } from "@zitadel/client";
 import { PasswordComplexitySettingsSchema } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
+import { afterEach, describe, expect, test, vi } from "vitest";
+import { SetPasswordForm } from "./set-password-form";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),

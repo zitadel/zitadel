@@ -255,7 +255,7 @@ func userInfoPhoneToOIDC(user *query.User) oidc.UserInfoPhone {
 	if human := user.Human; human != nil {
 		return oidc.UserInfoPhone{
 			PhoneNumber:         string(human.Phone),
-			PhoneNumberVerified: human.IsPhoneVerified,
+			PhoneNumberVerified: oidc.Bool(human.IsPhoneVerified),
 		}
 	}
 	return oidc.UserInfoPhone{}

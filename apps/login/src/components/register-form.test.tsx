@@ -1,8 +1,8 @@
 import { cleanup, render } from "@testing-library/react";
-import { afterEach, describe, expect, test, vi } from "vitest";
-import { RegisterForm } from "./register-form";
 import { create } from "@zitadel/client";
 import { LegalAndSupportSettingsSchema } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
+import { afterEach, describe, expect, test, vi } from "vitest";
+import { RegisterForm } from "./register-form";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),
@@ -26,13 +26,7 @@ describe("RegisterForm", () => {
   afterEach(cleanup);
 
   test("should autofocus the firstname input on mount", () => {
-    const { getByTestId } = render(
-      <RegisterForm
-        legal={defaultLegal}
-        organization="org-1"
-        idpCount={0}
-      />,
-    );
+    const { getByTestId } = render(<RegisterForm legal={defaultLegal} organization="org-1" idpCount={0} />);
     expect(getByTestId("firstname-text-input")).toHaveFocus();
   });
 });

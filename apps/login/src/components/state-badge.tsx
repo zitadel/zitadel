@@ -28,12 +28,6 @@ const getBadgeClasses = (state: BadgeState, evenPadding: boolean) =>
     "p-[2px]": evenPadding,
   });
 
-export function StateBadge({
-  state = BadgeState.Success,
-  evenPadding = false,
-  children,
-}: StateBadgeProps) {
-  return (
-    <span className={`${getBadgeClasses(state, evenPadding)}`}>{children}</span>
-  );
+export function StateBadge({ state = BadgeState.Success, evenPadding = false, children }: StateBadgeProps) {
+  return <span className={`${getBadgeClasses(state, evenPadding)}`}>{children}</span>;
 }

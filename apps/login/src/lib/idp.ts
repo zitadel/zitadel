@@ -34,9 +34,7 @@ export function idpTypeToSlug(idpType: IdentityProviderType) {
 }
 
 // TODO: this is ugly but needed atm as the getIDPByID returns a IDPType and not a IdentityProviderType
-export function idpTypeToIdentityProviderType(
-  idpType: IDPType,
-): IdentityProviderType {
+export function idpTypeToIdentityProviderType(idpType: IDPType): IdentityProviderType {
   switch (idpType) {
     case IDPType.IDP_TYPE_GITHUB:
       return IdentityProviderType.GITHUB;

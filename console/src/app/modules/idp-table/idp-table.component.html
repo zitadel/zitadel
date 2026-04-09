@@ -13,16 +13,12 @@
           <span>{{ 'IDP.AVAILABILITY' | translate }}</span>
         </th>
         <td class="pointer availability" mat-cell *matCellDef="let idp">
-          <i
-            matTooltip="{{ 'IDP.AVAILABLE' | translate }}"
-            *ngIf="isEnabled(idp) && idp.state === IDPState.IDP_STATE_ACTIVE"
-            class="idp-available las la-check-circle"
-          ></i>
-          <i
-            matTooltip="{{ 'IDP.AVAILABLEBUTINACTIVE' | translate }}"
-            *ngIf="isEnabled(idp) && idp.state === IDPState.IDP_STATE_INACTIVE"
-            class="idp-not-available las la-check-circle"
-          ></i>
+          @if (isEnabled(idp) && idp.state === IDPState.IDP_STATE_ACTIVE) {
+            <i matTooltip="{{ 'IDP.AVAILABLE' | translate }}" class="idp-available las la-check-circle"></i>
+          }
+          @if (isEnabled(idp) && idp.state === IDPState.IDP_STATE_INACTIVE) {
+            <i matTooltip="{{ 'IDP.AVAILABLEBUTINACTIVE' | translate }}" class="idp-not-available las la-check-circle"></i>
+          }
         </td>
       </ng-container>
 
@@ -36,59 +32,87 @@
       <ng-container matColumnDef="type">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.TYPE' | translate }}</th>
         <td class="pointer" mat-cell *matCellDef="let idp">
-          <div [ngSwitch]="idp.type">
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_AZURE_AD">
-              <img class="idp-logo" src="./assets/images/idp/ms.svg" alt="azure ad" />
-              Microsoft
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GOOGLE">
-              <img class="idp-logo" src="./assets/images/idp/google.png" alt="google" />
-              Google
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GITHUB">
-              <img class="idp-logo dark" src="./assets/images/idp/github-dark.svg" alt="github" />
-              <img class="idp-logo light" src="./assets/images/idp/github.svg" alt="github" />
-              GitHub
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_OIDC">
-              <mat-icon class="idp-icon" svgIcon="mdi_openid" alt="oidc" />
-              Generic OIDC
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_OAUTH">
-              <img class="idp-logo" src="./assets/images/idp/oauth.svg" alt="oauth" />
-              Generic OAuth
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_JWT">
-              <mat-icon class="idp-icon" svgIcon="mdi_jwt" alt="jwt" />
-              Generic JWT
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GITLAB">
-              <img class="idp-logo" src="./assets/images/idp/gitlab.svg" alt="gitlab" />
-              Gitlab
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GITLAB_SELF_HOSTED">
-              <img class="idp-logo" src="./assets/images/idp/gitlab.svg" alt="gitlab self hosted" />
-              Gitlab Self Hosted
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GITHUB_ES">
-              <img class="idp-logo dark" src="./assets/images/idp/github-dark.svg" alt="github" />
-              <img class="idp-logo light" src="./assets/images/idp/github.svg" alt="github" />
-              GitHub Enterprise Server
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_LDAP">
-              <i class="idp-icon las la-building"></i>
-              Active Directory / LDAP
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_APPLE">
-              <img class="idp-logo apple dark" src="./assets/images/idp/apple-dark.svg" alt="apple" />
-              <img class="idp-logo apple light" src="./assets/images/idp/apple.svg" alt="apple" />
-              Apple
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_SAML">
-              <img class="idp-logo" src="./assets/images/idp/saml-icon.svg" alt="saml" />
-              SAML
-            </div>
-            <div class="idp-table-provider-type" *ngSwitchDefault>coming soon</div>
+          <div>
+            @switch (idp.type) {
+              @case (ProviderType.PROVIDER_TYPE_AZURE_AD) {
+                <div class="idp-table-provider-type">
+                  <img class="idp-logo" src="./assets/images/idp/ms.svg" alt="azure ad" />
+                  Microsoft
+                </div>
+              }
+              @case (ProviderType.PROVIDER_TYPE_GOOGLE) {
+                <div class="idp-table-provider-type">
+                  <img class="idp-logo" src="./assets/images/idp/google.png" alt="google" />
+                  Google
+                </div>
+              }
+              @case (ProviderType.PROVIDER_TYPE_GITHUB) {
+                <div class="idp-table-provider-type">
+                  <img class="idp-logo dark" src="./assets/images/idp/github-dark.svg" alt="github" />
+                  <img class="idp-logo light" src="./assets/images/idp/github.svg" alt="github" />
+                  GitHub
+                </div>
+              }
+              @case (ProviderType.PROVIDER_TYPE_OIDC) {
+                <div class="idp-table-provider-type">
+                  <mat-icon class="idp-icon" svgIcon="mdi_openid" alt="oidc" />
+                  Generic OIDC
+                </div>
+              }
+              @case (ProviderType.PROVIDER_TYPE_OAUTH) {
+                <div class="idp-table-provider-type">
+                  <img class="idp-logo" src="./assets/images/idp/oauth.svg" alt="oauth" />
+                  Generic OAuth
+                </div>
+              }
+              @case (ProviderType.PROVIDER_TYPE_JWT) {
+                <div class="idp-table-provider-type">
+                  <mat-icon class="idp-icon" svgIcon="mdi_jwt" alt="jwt" />
+                  Generic JWT
+                </div>
+              }
+              @case (ProviderType.PROVIDER_TYPE_GITLAB) {
+                <div class="idp-table-provider-type">
+                  <img class="idp-logo" src="./assets/images/idp/gitlab.svg" alt="gitlab" />
+                  Gitlab
+                </div>
+              }
+              @case (ProviderType.PROVIDER_TYPE_GITLAB_SELF_HOSTED) {
+                <div class="idp-table-provider-type">
+                  <img class="idp-logo" src="./assets/images/idp/gitlab.svg" alt="gitlab self hosted" />
+                  Gitlab Self Hosted
+                </div>
+              }
+              @case (ProviderType.PROVIDER_TYPE_GITHUB_ES) {
+                <div class="idp-table-provider-type">
+                  <img class="idp-logo dark" src="./assets/images/idp/github-dark.svg" alt="github" />
+                  <img class="idp-logo light" src="./assets/images/idp/github.svg" alt="github" />
+                  GitHub Enterprise Server
+                </div>
+              }
+              @case (ProviderType.PROVIDER_TYPE_LDAP) {
+                <div class="idp-table-provider-type">
+                  <i class="idp-icon las la-building"></i>
+                  Active Directory / LDAP
+                </div>
+              }
+              @case (ProviderType.PROVIDER_TYPE_APPLE) {
+                <div class="idp-table-provider-type">
+                  <img class="idp-logo apple dark" src="./assets/images/idp/apple-dark.svg" alt="apple" />
+                  <img class="idp-logo apple light" src="./assets/images/idp/apple.svg" alt="apple" />
+                  Apple
+                </div>
+              }
+              @case (ProviderType.PROVIDER_TYPE_SAML) {
+                <div class="idp-table-provider-type">
+                  <img class="idp-logo" src="./assets/images/idp/saml-icon.svg" alt="saml" />
+                  SAML
+                </div>
+              }
+              @default {
+                <div class="idp-table-provider-type">coming soon</div>
+              }
+            }
           </div>
         </td>
       </ng-container>
@@ -132,71 +156,75 @@
         <th class="idp-table-actions" mat-header-cell *matHeaderCellDef></th>
         <td class="idp-table-actions" mat-cell *matCellDef="let idp">
           <cnsl-table-actions>
-            <button
-              actions
-              *ngIf="!isEnabled(idp)"
-              [disabled]="
-                ([
-                  serviceType === PolicyComponentServiceType.ADMIN
-                    ? 'iam.idp.write'
-                    : serviceType === PolicyComponentServiceType.MGMT
-                      ? 'org.idp.write'
-                      : '',
-                ]
-                  | hasRole
-                  | async) === false
-              "
-              mat-icon-button
-              matTooltip="{{ 'IDP.SETAVAILABLE' | translate }}"
-              (click)="addIdp(idp); $event.stopPropagation()"
-            >
-              <i class="las la-check-circle"></i>
-            </button>
-            <button
-              actions
-              *ngIf="isEnabled(idp)"
-              [disabled]="
-                ([
-                  serviceType === PolicyComponentServiceType.ADMIN
-                    ? 'iam.idp.write'
-                    : serviceType === PolicyComponentServiceType.MGMT
-                      ? 'org.idp.write'
-                      : '',
-                ]
-                  | hasRole
-                  | async) === false
-              "
-              mat-icon-button
-              matTooltip="{{ 'IDP.SETUNAVAILABLE' | translate }}"
-              (click)="removeIdp(idp); $event.stopPropagation()"
-            >
-              <i class="las la-times-circle"></i>
-            </button>
-            <button
-              actions
-              *ngIf="
-                (serviceType === PolicyComponentServiceType.MGMT && idp.owner === IDPOwnerType.IDP_OWNER_TYPE_ORG) ||
-                (serviceType === PolicyComponentServiceType.ADMIN && idp.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM)
-              "
-              [disabled]="
-                (serviceType === PolicyComponentServiceType.MGMT && idp?.providerType === IDPOwnerType.IDP_OWNER_TYPE_ORG) ||
-                ([
-                  serviceType === PolicyComponentServiceType.ADMIN
-                    ? 'iam.idp.write'
-                    : serviceType === PolicyComponentServiceType.MGMT
-                      ? 'org.idp.write'
-                      : '',
-                ]
-                  | hasRole
-                  | async) === false
-              "
-              mat-icon-button
-              color="warn"
-              matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
-              (click)="deleteIdp(idp); $event.stopPropagation()"
-            >
-              <i class="las la-trash"></i>
-            </button>
+            @if (!isEnabled(idp)) {
+              <button
+                actions
+                [disabled]="
+                  ([
+                    serviceType === PolicyComponentServiceType.ADMIN
+                      ? 'iam.idp.write'
+                      : serviceType === PolicyComponentServiceType.MGMT
+                        ? 'org.idp.write'
+                        : '',
+                  ]
+                    | hasRole
+                    | async) === false
+                "
+                mat-icon-button
+                matTooltip="{{ 'IDP.SETAVAILABLE' | translate }}"
+                (click)="addIdp(idp); $event.stopPropagation()"
+              >
+                <i class="las la-check-circle"></i>
+              </button>
+            }
+            @if (isEnabled(idp)) {
+              <button
+                actions
+                [disabled]="
+                  ([
+                    serviceType === PolicyComponentServiceType.ADMIN
+                      ? 'iam.idp.write'
+                      : serviceType === PolicyComponentServiceType.MGMT
+                        ? 'org.idp.write'
+                        : '',
+                  ]
+                    | hasRole
+                    | async) === false
+                "
+                mat-icon-button
+                matTooltip="{{ 'IDP.SETUNAVAILABLE' | translate }}"
+                (click)="removeIdp(idp); $event.stopPropagation()"
+              >
+                <i class="las la-times-circle"></i>
+              </button>
+            }
+            @if (
+              (serviceType === PolicyComponentServiceType.MGMT && idp.owner === IDPOwnerType.IDP_OWNER_TYPE_ORG) ||
+              (serviceType === PolicyComponentServiceType.ADMIN && idp.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM)
+            ) {
+              <button
+                actions
+                [disabled]="
+                  (serviceType === PolicyComponentServiceType.MGMT &&
+                    idp?.providerType === IDPOwnerType.IDP_OWNER_TYPE_ORG) ||
+                  ([
+                    serviceType === PolicyComponentServiceType.ADMIN
+                      ? 'iam.idp.write'
+                      : serviceType === PolicyComponentServiceType.MGMT
+                        ? 'org.idp.write'
+                        : '',
+                  ]
+                    | hasRole
+                    | async) === false
+                "
+                mat-icon-button
+                color="warn"
+                matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+                (click)="deleteIdp(idp); $event.stopPropagation()"
+              >
+                <i class="las la-trash"></i>
+              </button>
+            }
           </cnsl-table-actions>
         </td>
       </ng-container>
@@ -206,10 +234,12 @@
     </table>
   </div>
 
-  <div *ngIf="(loading$ | async) === false && !dataSource?.data?.length" class="no-content-row">
-    <i class="las la-exclamation"></i>
-    <span>{{ 'IDP.EMPTY' | translate }}</span>
-  </div>
+  @if ((loading$ | async) === false && !dataSource?.data?.length) {
+    <div class="no-content-row">
+      <i class="las la-exclamation"></i>
+      <span>{{ 'IDP.EMPTY' | translate }}</span>
+    </div>
+  }
 
   <cnsl-paginator
     #paginator

@@ -33,6 +33,10 @@ export const LANGS: Lang[] = [
     code: "pl",
   },
   {
+    name: "Português",
+    code: "pt",
+  },
+  {
     name: "简体中文",
     code: "zh",
   },
@@ -60,7 +64,6 @@ export const LANGS: Lang[] = [
 
 export const LANGUAGE_COOKIE_NAME = "NEXT_LOCALE";
 export const LANGUAGE_HEADER_NAME = "accept-language";
-
 
 export function shouldUILocalesOverrideCookie(): boolean {
   return process.env.ZITADEL_UI_LOCALES_OVERRIDE_COOKIE === "true";

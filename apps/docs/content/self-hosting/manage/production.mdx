@@ -125,19 +125,28 @@ please create an issue in our [github repository](https://github.com/zitadel/zit
 
 Depending on your environment, you maybe would want to tweak some settings about how ZITADEL interacts with the database in the database section of your ZITADEL configuration. Read more about your [database configuration options](/self-hosting/manage/database).
 
+Set the database connection via environment variable:
+
+```bash
+export ZITADEL_DATABASE_POSTGRES_DSN=postgresql://zitadel:password@localhost:5432/zitadel?sslmode=disable
+export ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS=10
+export ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS=5
+export ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME=30m
+export ZITADEL_DATABASE_POSTGRES_MAXCONNIDLETIME=5m
+```
+
+Or in a configuration file:
+
 ```yaml
 Database:
   postgres:
-    Host: localhost
-    Port: 5432
-    Database: zitadel
+    DSN: postgresql://zitadel:password@localhost:5432/zitadel?sslmode=disable
     //highlight-start
     MaxOpenConns: 10
     MaxIdleConns: 5
     MaxConnLifetime: 30m
     MaxConnIdleTime: 5m
     //highlight-end
-    Options: ""
 ```
 
 You also might want to configure how [projections](/concepts/eventstore/implementation#projections) are computed. These are the default values:

@@ -2,7 +2,10 @@ package authz
 
 import (
 	"context"
+	"crypto"
 	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
 	"errors"
 	"os"
 	"sync"
@@ -11,7 +14,7 @@ import (
 	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
-	"github.com/zitadel/zitadel/internal/crypto"
+	zcrypto "github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -44,7 +47,7 @@ func StartSystemTokenVerifierFromConfig(issuer string, keys map[string]*SystemAP
 		systemJWTProfile: op.NewJWTProfileVerifier(
 			&systemJWTStorage{
 				keys:       keys,
-				cachedKeys: make(map[string]*rsa.PublicKey),
+				cachedKeys: make(map[string]*SystemAPIPublicKey),
 			},
 			issuer,
 			1*time.Hour,
@@ -77,16 +80,22 @@ func (s *SystemTokenVerifierFromConfig) VerifySystemToken(ctx context.Context, t
 type systemJWTStorage struct {
 	keys       map[string]*SystemAPIUser
 	mutex      sync.RWMutex
-	cachedKeys map[string]*rsa.PublicKey
+	cachedKeys map[string]*SystemAPIPublicKey
 }
 
 type SystemAPIUser struct {
-	Path        string // if a path is specified, the key will be read from that path
+	Path        string // if a path is specified, the key/cert will be read from that path
 	KeyData     []byte // else you can also specify the data directly in the KeyData
 	Memberships Memberships
 }
 
-func (s *SystemAPIUser) readKey() (*rsa.PublicKey, error) {
+type SystemAPIPublicKey struct {
+	Data      crypto.PublicKey
+	NotBefore *time.Time
+	NotAfter  *time.Time
+}
+
+func (s *SystemAPIUser) readKey() (*SystemAPIPublicKey, error) {
 	if s.Path != "" {
 		var err error
 		s.KeyData, err = os.ReadFile(s.Path)
@@ -94,26 +103,78 @@ func (s *SystemAPIUser) readKey() (*rsa.PublicKey, error) {
 			return nil, zerrors.ThrowInternal(err, "AUTHZ-JK31F", "Errors.NotFound")
 		}
 	}
-	return crypto.BytesToPublicKey(s.KeyData)
+
+	// when an RSA key is provided, use the raw data
+	key, err := zcrypto.BytesToPublicKey(s.KeyData)
+	if err == nil {
+		return &SystemAPIPublicKey{Data: key}, nil
+	}
+
+	// when x.509 cert is provided, parse it and extract RSA key
+	block, _ := pem.Decode(s.KeyData)
+	if block == nil {
+		return nil, zerrors.ThrowInternal(err, "AUTHZ-FC8ohc", "Errors.SystemApiUser.CertDecodeFailed")
+	}
+
+	cert, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "AUTHZ-64nMHP", "Errors.SystemApiUser.CertParseFailed")
+	}
+
+	key, ok := cert.PublicKey.(*rsa.PublicKey)
+	if !ok {
+		return nil, zerrors.ThrowInternal(err, "AUTHZ-PNKOMf", "Errors.SystemApiUser.UnsupportedPublicKey")
+	}
+
+	return &SystemAPIPublicKey{
+		Data:      key,
+		NotBefore: &cert.NotBefore,
+		NotAfter:  &cert.NotAfter,
+	}, nil
 }
 
 func (s *systemJWTStorage) GetKeyByIDAndClientID(_ context.Context, _, userID string) (*jose.JSONWebKey, error) {
+	now := time.Now().UTC()
+
 	s.mutex.RLock()
-	cachedKey, ok := s.cachedKeys[userID]
-	s.mutex.RUnlock()
-	if ok {
-		return &jose.JSONWebKey{KeyID: userID, Key: cachedKey}, nil
+	key, ok := s.cachedKeys[userID]
+	// If a key is found but expired, read delete it and mark it as not found. This will trigger the key to be read from
+	// file again in case the file was replaced with a new key.
+	if ok && key.NotAfter != nil && now.After(*key.NotAfter) {
+		delete(s.cachedKeys, userID)
+		key = nil
+		ok = false
 	}
-	key, ok := s.keys[userID]
+	s.mutex.RUnlock()
+
+	var err error
+	if !ok {
+		if key, err = s.readKey(userID); err != nil {
+			return nil, err
+		}
+	}
+
+	if key.NotBefore != nil && now.Before(*key.NotBefore) {
+		return nil, zerrors.ThrowNotFound(nil, "AUTHZ-NiJstf", "Errors.User.NotBefore")
+	}
+	if key.NotAfter != nil && now.After(*key.NotAfter) {
+		return nil, zerrors.ThrowNotFound(nil, "AUTHZ-CGmV4b", "Errors.User.NotAfter")
+	}
+
+	return &jose.JSONWebKey{KeyID: userID, Key: key.Data}, nil
+}
+
+func (s *systemJWTStorage) readKey(userID string) (*SystemAPIPublicKey, error) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	user, ok := s.keys[userID]
 	if !ok {
 		return nil, zerrors.ThrowNotFound(nil, "AUTHZ-asfd3", "Errors.User.NotFound")
 	}
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-	publicKey, err := key.readKey()
+	key, err := user.readKey()
 	if err != nil {
 		return nil, err
 	}
-	s.cachedKeys[userID] = publicKey
-	return &jose.JSONWebKey{KeyID: userID, Key: publicKey}, nil
+	s.cachedKeys[userID] = key
+	return key, err
 }

@@ -234,18 +234,19 @@ func (c *MockSessionRepositoryCreatorIDConditionCall) DoAndReturn(f func(string)
 }
 
 // Delete mocks base method.
-func (m *MockSessionRepository) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+func (m *MockSessionRepository) Delete(ctx context.Context, client database.QueryExecutor, condition, permissionCondition database.Condition) (int64, time.Time, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Delete", ctx, client, condition)
+	ret := m.ctrl.Call(m, "Delete", ctx, client, condition, permissionCondition)
 	ret0, _ := ret[0].(int64)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret1, _ := ret[1].(time.Time)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *MockSessionRepositoryMockRecorder) Delete(ctx, client, condition any) *MockSessionRepositoryDeleteCall {
+func (mr *MockSessionRepositoryMockRecorder) Delete(ctx, client, condition, permissionCondition any) *MockSessionRepositoryDeleteCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockSessionRepository)(nil).Delete), ctx, client, condition)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockSessionRepository)(nil).Delete), ctx, client, condition, permissionCondition)
 	return &MockSessionRepositoryDeleteCall{Call: call}
 }
 
@@ -255,19 +256,19 @@ type MockSessionRepositoryDeleteCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockSessionRepositoryDeleteCall) Return(arg0 int64, arg1 error) *MockSessionRepositoryDeleteCall {
-	c.Call = c.Call.Return(arg0, arg1)
+func (c *MockSessionRepositoryDeleteCall) Return(arg0 int64, arg1 time.Time, arg2 error) *MockSessionRepositoryDeleteCall {
+	c.Call = c.Call.Return(arg0, arg1, arg2)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockSessionRepositoryDeleteCall) Do(f func(context.Context, database.QueryExecutor, database.Condition) (int64, error)) *MockSessionRepositoryDeleteCall {
+func (c *MockSessionRepositoryDeleteCall) Do(f func(context.Context, database.QueryExecutor, database.Condition, database.Condition) (int64, time.Time, error)) *MockSessionRepositoryDeleteCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockSessionRepositoryDeleteCall) DoAndReturn(f func(context.Context, database.QueryExecutor, database.Condition) (int64, error)) *MockSessionRepositoryDeleteCall {
+func (c *MockSessionRepositoryDeleteCall) DoAndReturn(f func(context.Context, database.QueryExecutor, database.Condition, database.Condition) (int64, time.Time, error)) *MockSessionRepositoryDeleteCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -1116,6 +1117,44 @@ func (c *MockSessionRepositoryTokenIDColumnCall) Do(f func() database.Column) *M
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockSessionRepositoryTokenIDColumnCall) DoAndReturn(f func() database.Column) *MockSessionRepositoryTokenIDColumnCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// TokenIDCondition mocks base method.
+func (m *MockSessionRepository) TokenIDCondition(tokenID string) database.Condition {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TokenIDCondition", tokenID)
+	ret0, _ := ret[0].(database.Condition)
+	return ret0
+}
+
+// TokenIDCondition indicates an expected call of TokenIDCondition.
+func (mr *MockSessionRepositoryMockRecorder) TokenIDCondition(tokenID any) *MockSessionRepositoryTokenIDConditionCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TokenIDCondition", reflect.TypeOf((*MockSessionRepository)(nil).TokenIDCondition), tokenID)
+	return &MockSessionRepositoryTokenIDConditionCall{Call: call}
+}
+
+// MockSessionRepositoryTokenIDConditionCall wrap *gomock.Call
+type MockSessionRepositoryTokenIDConditionCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockSessionRepositoryTokenIDConditionCall) Return(arg0 database.Condition) *MockSessionRepositoryTokenIDConditionCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockSessionRepositoryTokenIDConditionCall) Do(f func(string) database.Condition) *MockSessionRepositoryTokenIDConditionCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockSessionRepositoryTokenIDConditionCall) DoAndReturn(f func(string) database.Condition) *MockSessionRepositoryTokenIDConditionCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

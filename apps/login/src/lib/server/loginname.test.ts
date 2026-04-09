@@ -1,9 +1,9 @@
-import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
-import { sendLoginname } from "./loginname";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { getIDPByID } from "../zitadel";
+import { sendLoginname } from "./loginname";
 
 // Mock all the dependencies
 vi.mock("next/headers", () => ({
@@ -198,12 +198,35 @@ describe("sendLoginname", () => {
       mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
     });
 
-    test("should redirect to verify when user has no authentication methods", async () => {
+    test("should redirect to verify with send=false when user has no authentication methods and email is unverified", async () => {
       mockListAuthenticationMethodTypes.mockResolvedValue({ authMethodTypes: [] });
 
       const result = await sendLoginname({
         loginName: "user@example.com",
         requestId: "req123",
+        organization: "org123",
+      });
+
+      expect(result).toHaveProperty("redirect");
+      expect((result as any).redirect).toMatch(/^\/verify\?/);
+      expect((result as any).redirect).toContain("loginName=user%40example.com");
+      expect((result as any).redirect).toContain("send=false");
+      expect((result as any).redirect).toContain("invite=true");
+      expect((result as any).redirect).toContain("requestId=req123");
+    });
+
+    test("should redirect to verify with send=true when user has no authentication methods and email is already verified", async () => {
+      const verifiedEmailUser = {
+        ...mockUser,
+        type: { case: "human", value: { email: { email: "user@example.com", isVerified: true } } },
+      };
+      mockSearchUsers.mockResolvedValue({ result: [verifiedEmailUser] });
+      mockListAuthenticationMethodTypes.mockResolvedValue({ authMethodTypes: [] });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+        requestId: "req123",
+        organization: "org123",
       });
 
       expect(result).toHaveProperty("redirect");

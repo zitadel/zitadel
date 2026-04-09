@@ -1,7 +1,8 @@
 import { Cookie } from "@/lib/cookies";
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { createCallback, getLoginSettings, ServiceConfig } from "@/lib/zitadel";
-import { create } from "@zitadel/client";
+import { Code, create } from "@zitadel/client";
 import { CreateCallbackRequestSchema, SessionSchema } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { isSessionValid } from "./session";
@@ -70,7 +71,7 @@ export async function loginWithOIDCAndSession({
       } catch (error: unknown) {
         // handle already handled gracefully as these could come up if old emails with requestId are used (reset password, register emails etc.)
         console.error(error);
-        if (error && typeof error === "object" && "code" in error && error?.code === 9) {
+        if (isClassifiedError(error) && error.code === Code.FailedPrecondition) {
           const loginSettings = await getLoginSettings({
             serviceConfig,
             organization: selectedSession.factors?.user?.organizationId,

@@ -1,101 +1,58 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const mdx = require('eslint-plugin-mdx');
-const mdxParser = require('eslint-mdx');
-const tsParser = require('@typescript-eslint/parser');
-const tsPlugin = require('@typescript-eslint/eslint-plugin');
-import globals from 'globals';
-
-import js from '@eslint/js';
-// import { FlatCompat } from '@eslint/eslintrc';
-// import path from 'path';
-// import { fileURLToPath } from 'url';
-
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
-
-// const compat = new FlatCompat({
-//   baseDirectory: __dirname,
-// });
+import js from "@eslint/js";
+import tsPlugin from "@typescript-eslint/eslint-plugin";
+import tsParser from "@typescript-eslint/parser";
+import prettierConfig from "eslint-config-prettier/flat";
+import importPlugin from "eslint-plugin-import";
+import * as mdx from "eslint-plugin-mdx";
+import globals from "globals";
 
 export default [
-  // 1. Base JS Rules
+  {
+    ignores: [
+      "node_modules/",
+      ".next/",
+      "out/",
+      "build/",
+      ".source/",
+      "next-env.d.ts",
+    ],
+  },
   js.configs.recommended,
-
-  // 2. Import Next.js Core Web Vitals (via compat because it doesn't support Flat Config natively yet)
-  // ...compat.extends('next/core-web-vitals'),
-  // ...compat.extends('next', 'next/typescript'), // Causes circular JSON error
-
-
-  // ...
-  // 3. MDX Configuration
   {
-    files: ['*.mdx'],
-    ...mdx.flat,
-    processor: mdx.createRemarkProcessor({
-      lintCodeBlocks: false,
-    }),
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-        props: 'readonly',
-      },
-      parser: mdxParser,
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-    },
-    rules: {
-      'react/no-unescaped-entities': 'off', 
-      'no-unused-vars': 'off',
-      'no-irregular-whitespace': 'off',
-      'no-useless-escape': 'off',
-    },
-  },
-  // ...
-  
-  // 4. Code Blocks inside MDX (virtual files)
-  {
-    files: ['*.mdx/*.{js,jsx,ts,tsx}'],
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-        props: 'readonly', // common in MDX
-      }
-    },
-    rules: {
-      'no-unused-vars': 'off',
-      'import/no-anonymous-default-export': 'off',
-    },
-  },
-  
-  // 5. Global Ignores
-  {
-    ignores: ["node_modules/", ".next/", "out/", "build/", ".source/", "next-env.d.ts"],
-  },
-  
-  // 6. Global options for JS files
-  {
-    files: ['**/*.{js,mjs,cjs}'],
+    files: ["**/*.{js,mjs,cjs}"],
     languageOptions: {
       globals: {
         ...globals.browser,
         ...globals.node,
       },
-    }
+    },
   },
-  // 7. Manual TypeScript Configuration
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ["**/*.jsx"],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+      parserOptions: {
+        ecmaFeatures: { jsx: true },
+      },
+    },
+    rules: {
+      "no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^React$" }],
+    },
+  },
+  {
+    files: ["**/*.{ts,tsx}"],
     plugins: {
-      '@typescript-eslint': tsPlugin,
+      "@typescript-eslint": tsPlugin,
+      import: importPlugin,
     },
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
+        ecmaVersion: "latest",
+        sourceType: "module",
         ecmaFeatures: { jsx: true },
       },
       globals: {
@@ -103,24 +60,61 @@ export default [
         ...globals.node,
       },
     },
+    settings: {
+      "import/resolver": {
+        typescript: true,
+      },
+    },
     rules: {
       ...tsPlugin.configs.recommended.rules,
-      'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-      '@typescript-eslint/no-explicit-any': 'off', // Disable for legacy code
-      '@typescript-eslint/ban-ts-comment': 'off',
+      ...importPlugin.configs.recommended.rules,
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_" },
+      ],
+      "no-undef": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
     },
   },
-  // 8. Scripts Config
   {
-    files: ['scripts/**/*.{js,mjs,ts}'],
+    files: ["**/*.mdx"],
+    ...mdx.flat,
+    processor: mdx.createRemarkProcessor({
+      lintCodeBlocks: false,
+    }),
+    languageOptions: {
+      ...mdx.flat.languageOptions,
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        props: "readonly",
+      },
+      ecmaVersion: "latest",
+      sourceType: "module",
+    },
     rules: {
-      'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
-      'no-undef': 'off',
-      'no-useless-escape': 'off',
-      'no-empty': 'off',
-      'no-async-promise-executor': 'off',
-    }
-  }
+      "no-unused-vars": "off",
+      "no-irregular-whitespace": "off",
+      "no-useless-escape": "off",
+    },
+  },
+  {
+    files: ["**/*.mdx/*.{js,jsx,ts,tsx}"],
+    plugins: {
+      import: importPlugin,
+    },
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        props: "readonly",
+      },
+    },
+    rules: {
+      "no-unused-vars": "off",
+    },
+  },
+  prettierConfig,
 ];
