@@ -81,7 +81,11 @@ func addInstanceByDomain(ctx context.Context, req connect.AnyRequest, handler co
 		if errors.As(err, &notFoundErr) && notFoundErr.Kind == zerrors.KindNotFound {
 			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
 		}
-		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("unable to set instance using domain %s: %w", domain, notFoundErr))
+		code := connect.CodeInternal
+		if zerrors.IsNotFound(err) {
+			code = connect.CodeNotFound
+		}
+		return nil, connect.NewError(code, fmt.Errorf("unable to set instance using domain %s: %w", domain, err))
 	}
 	return handler(authz.WithInstance(ctx, instance), req)
 }
@@ -96,13 +100,16 @@ func addInstanceByRequestedHost(ctx context.Context, req connect.AnyRequest, han
 	if err != nil {
 		origin := zitadel_http.DomainContext(ctx)
 		logging.WithFields("origin", requestContext.Origin(), "externalDomain", externalDomain).WithError(err).Error("unable to set instance")
+		code := connect.CodeInternal
+		if zerrors.IsNotFound(err) {
+			code = connect.CodeNotFound
+		}
 		zErr := new(zerrors.ZitadelError)
 		if errors.As(err, &zErr) {
 			zErr.SetMessage(translator.LocalizeFromCtx(ctx, zErr.GetMessage(), nil))
-			zErr.Parent = err
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("unable to set instance using origin %s (ExternalDomain is %s): %s", origin, externalDomain, zErr.Error()))
+			return nil, connect.NewError(code, fmt.Errorf("unable to set instance using origin %s (ExternalDomain is %s): %s", origin, externalDomain, zErr.Error()))
 		}
-		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("unable to set instance using origin %s (ExternalDomain is %s)", origin, externalDomain))
+		return nil, connect.NewError(code, fmt.Errorf("unable to set instance using origin %s (ExternalDomain is %s)", origin, externalDomain))
 	}
 	return handler(authz.WithInstance(ctx, instance), req)
 }

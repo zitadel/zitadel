@@ -234,9 +234,13 @@ type mockInstanceVerifier struct {
 	id           string
 	instanceHost string
 	publicHost   string
+	err          error
 }
 
 func (m *mockInstanceVerifier) InstanceByHost(_ context.Context, instanceHost, publicHost string) (authz.Instance, error) {
+	if m.err != nil {
+		return nil, m.err
+	}
 	if instanceHost != m.instanceHost {
 		return nil, fmt.Errorf("invalid host")
 	}
@@ -250,6 +254,9 @@ func (m *mockInstanceVerifier) InstanceByHost(_ context.Context, instanceHost, p
 }
 
 func (m *mockInstanceVerifier) InstanceByID(_ context.Context, id string) (authz.Instance, error) {
+	if m.err != nil {
+		return nil, m.err
+	}
 	if id != m.id {
 		return nil, fmt.Errorf("not found")
 	}
@@ -337,7 +344,7 @@ func Test_setInstance_errorCodes(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		verifier := &errorVerifier{err: tc.err}
+		verifier := &mockInstanceVerifier{err: tc.err}
 
 		t.Run("byRequestedHost/"+tc.name, func(t *testing.T) {
 			ctx := http_util.WithDomainContext(context.Background(), &http_util.DomainCtx{InstanceHost: "host"})
@@ -380,16 +387,4 @@ func Test_setInstance_errorCodes(t *testing.T) {
 			}
 		})
 	}
-}
-
-type errorVerifier struct {
-	err error
-}
-
-func (v *errorVerifier) InstanceByHost(_ context.Context, _, _ string) (authz.Instance, error) {
-	return nil, v.err
-}
-
-func (v *errorVerifier) InstanceByID(_ context.Context, _ string) (authz.Instance, error) {
-	return nil, v.err
 }
