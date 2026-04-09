@@ -1,9 +1,9 @@
-import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
-import { sendLoginname } from "./loginname";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { getIDPByID } from "../zitadel";
+import { sendLoginname } from "./loginname";
 
 // Mock all the dependencies
 vi.mock("next/headers", () => ({
@@ -198,12 +198,35 @@ describe("sendLoginname", () => {
       mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
     });
 
-    test("should redirect to verify when user has no authentication methods", async () => {
+    test("should redirect to verify with send=false when user has no authentication methods and email is unverified", async () => {
       mockListAuthenticationMethodTypes.mockResolvedValue({ authMethodTypes: [] });
 
       const result = await sendLoginname({
         loginName: "user@example.com",
         requestId: "req123",
+        organization: "org123",
+      });
+
+      expect(result).toHaveProperty("redirect");
+      expect((result as any).redirect).toMatch(/^\/verify\?/);
+      expect((result as any).redirect).toContain("loginName=user%40example.com");
+      expect((result as any).redirect).toContain("send=false");
+      expect((result as any).redirect).toContain("invite=true");
+      expect((result as any).redirect).toContain("requestId=req123");
+    });
+
+    test("should redirect to verify with send=true when user has no authentication methods and email is already verified", async () => {
+      const verifiedEmailUser = {
+        ...mockUser,
+        type: { case: "human", value: { email: { email: "user@example.com", isVerified: true } } },
+      };
+      mockSearchUsers.mockResolvedValue({ result: [verifiedEmailUser] });
+      mockListAuthenticationMethodTypes.mockResolvedValue({ authMethodTypes: [] });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+        requestId: "req123",
+        organization: "org123",
       });
 
       expect(result).toHaveProperty("redirect");
@@ -276,7 +299,7 @@ describe("sendLoginname", () => {
         });
         mockListIDPLinks.mockResolvedValue({ result: [] });
         mockGetActiveIdentityProviders.mockResolvedValue({
-          identityProviders: [{ id: "org-idp-123", type: 0 }],
+          identityProviders: [{ id: "org-idp-123", type: 0, options: { isAutoCreation: true } }],
         });
         mockIdpTypeToSlug.mockReturnValue("google");
         mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://org-idp.example.com/auth" });
@@ -469,7 +492,7 @@ describe("sendLoginname", () => {
         allowLocalAuthentication: false,
       });
       mockGetActiveIdentityProviders.mockResolvedValue({
-        identityProviders: [{ id: "idp123", type: "OIDC" }],
+        identityProviders: [{ id: "idp123", type: "OIDC", options: { isAutoCreation: true } }],
       });
       mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
 
@@ -503,6 +526,7 @@ describe("sendLoginname", () => {
     test("should redirect to password when ignoreUnknownUsernames is true", async () => {
       mockGetLoginSettings.mockResolvedValue({
         ignoreUnknownUsernames: true,
+        allowLocalAuthentication: true,
       });
 
       const result = await sendLoginname({
@@ -523,6 +547,39 @@ describe("sendLoginname", () => {
       mockGetLoginSettings.mockResolvedValue({
         allowRegister: false,
         allowLocalAuthentication: true,
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+      });
+
+      expect(result).toEqual({ error: "errors.userNotFound" });
+    });
+
+    test("should redirect to IDP when allowRegister: false, allowLocalAuthentication: false and a single active IDP exists", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowRegister: false,
+        allowLocalAuthentication: false,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp123", type: "OIDC", options: { isAutoCreation: true } }],
+      });
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+      });
+
+      expect(result).toEqual({ redirect: "https://idp.example.com/auth" });
+    });
+
+    test("should not redirect to IDP when single active IDP does not allow creation", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowRegister: false,
+        allowLocalAuthentication: false,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp123", type: "OIDC", options: { isAutoCreation: false, isCreationAllowed: false } }],
       });
 
       const result = await sendLoginname({
@@ -592,7 +649,7 @@ describe("sendLoginname", () => {
       });
 
       mockGetActiveIdentityProviders.mockResolvedValue({
-        identityProviders: [{ id: "idp123", type: "OIDC" }],
+        identityProviders: [{ id: "idp123", type: "OIDC", options: { isAutoCreation: true } }],
       });
       mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth?org=discovered-org-456" });
 

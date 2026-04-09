@@ -24,6 +24,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	"github.com/zitadel/zitadel/internal/api/oidc/sign"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/execution"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -405,7 +406,11 @@ func Test_CallTarget(t *testing.T) {
 			respBody, err := testServer(
 				t,
 				tt.args.server,
-				testCallTarget(tt.args.ctx, tt.args.info, tt.args.target, crypto.CreateMockEncryptionAlg(gomock.NewController(t)), tt.args.signer, &sync.Map{}),
+				testCallTarget(
+					tt.args.ctx, tt.args.info, tt.args.target,
+					crypto.CreateMockEncryptionAlg(gomock.NewController(t)), tt.args.signer, &sync.Map{},
+					[]denylist.AddressChecker{},
+				),
 			)
 			if tt.res.wantErr {
 				assert.Error(t, err)
@@ -418,6 +423,9 @@ func Test_CallTarget(t *testing.T) {
 }
 
 func Test_CallTargets(t *testing.T) {
+	deniedLocalhost, err := denylist.NewHostChecker("127.0.0.1")
+	require.NoError(t, err)
+	deniedIPs := []denylist.AddressChecker{deniedLocalhost}
 	type args struct {
 		ctx                    context.Context
 		info                   *middleware.ContextInfoRequest
@@ -426,17 +434,18 @@ func Test_CallTargets(t *testing.T) {
 		getActiveSigningWebKey func(*int32) execution.GetActiveSigningWebKey
 	}
 	type res struct {
-		ret     interface{}
+		ret     any
 		wantErr bool
 	}
 	tests := []struct {
-		name string
-		args args
-		res  res
+		name     string
+		denyList []denylist.AddressChecker
+		args     args
+		res      res
 	}{
 		{
-			"interrupt on status",
-			args{
+			name: "interrupt on status",
+			args: args{
 				ctx:  context.Background(),
 				info: requestContextInfo1,
 				servers: []*callTestServer{{
@@ -457,13 +466,13 @@ func Test_CallTargets(t *testing.T) {
 					{InterruptOnError: true},
 				},
 			},
-			res{
+			res: res{
 				wantErr: true,
 			},
 		},
 		{
-			"continue on status",
-			args{
+			name: "continue on status",
+			args: args{
 				ctx:  context.Background(),
 				info: requestContextInfo1,
 				servers: []*callTestServer{{
@@ -484,13 +493,13 @@ func Test_CallTargets(t *testing.T) {
 					{InterruptOnError: false},
 				},
 			},
-			res{
+			res: res{
 				ret: requestContextInfo1.GetContent(),
 			},
 		},
 		{
-			"interrupt on json error",
-			args{
+			name: "interrupt on json error",
+			args: args{
 				ctx:  context.Background(),
 				info: requestContextInfo1,
 				servers: []*callTestServer{{
@@ -511,13 +520,13 @@ func Test_CallTargets(t *testing.T) {
 					{InterruptOnError: true},
 				},
 			},
-			res{
+			res: res{
 				wantErr: true,
 			},
 		},
 		{
-			"continue on json error",
-			args{
+			name: "continue on json error",
+			args: args{
 				ctx:  context.Background(),
 				info: requestContextInfo1,
 				servers: []*callTestServer{{
@@ -537,13 +546,13 @@ func Test_CallTargets(t *testing.T) {
 					{InterruptOnError: false},
 					{InterruptOnError: false},
 				}},
-			res{
+			res: res{
 				ret: requestContextInfo1.GetContent(),
 			},
 		},
 		{
-			"multiple JWT/JWE targets, ok",
-			args{
+			name: "multiple JWT/JWE targets, ok",
+			args: args{
 				ctx:  context.Background(),
 				info: requestContextInfo1,
 				servers: []*callTestServer{{
@@ -573,8 +582,36 @@ func Test_CallTargets(t *testing.T) {
 				},
 				getActiveSigningWebKey: testActiveSingingWebKey,
 			},
-			res{
+			res: res{
 				ret: requestContextInfo1.GetContent(),
+			},
+		},
+		{
+			name:     "block request when target in denylist",
+			denyList: deniedIPs,
+			args: args{
+				ctx:  context.Background(),
+				info: requestContextInfo1,
+				servers: []*callTestServer{{
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  validateJSONPayload(requestContextInfoBody1),
+					respondBody: requestContextInfoBody2,
+					statusCode:  http.StatusOK,
+				}, {
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  validateJSONPayload(requestContextInfoBody1),
+					respondBody: []byte("just a string, not json"),
+					statusCode:  http.StatusOK,
+				}},
+				targets: []target_domain.Target{
+					{InterruptOnError: false},
+					{InterruptOnError: true},
+				},
+			},
+			res: res{
+				wantErr: true,
 			},
 		},
 	}
@@ -587,7 +624,9 @@ func Test_CallTargets(t *testing.T) {
 			}
 			respBody, err := testServers(t,
 				tt.args.servers,
-				testCallTargets(tt.args.ctx, tt.args.info, tt.args.targets, crypto.CreateMockEncryptionAlg(gomock.NewController(t)), getActiveSigningWebKey),
+				testCallTargets(
+					tt.args.ctx, tt.args.info, tt.args.targets,
+					crypto.CreateMockEncryptionAlg(gomock.NewController(t)), getActiveSigningWebKey, tt.denyList),
 			)
 			if tt.res.wantErr {
 				assert.Error(t, err)
@@ -691,10 +730,11 @@ func testCallTarget(ctx context.Context,
 	alg crypto.EncryptionAlgorithm,
 	signerOnce sign.SignerFunc,
 	encrypters *sync.Map,
+	actionsDenyList []denylist.AddressChecker,
 ) func(string) ([]byte, error) {
 	return func(url string) (r []byte, err error) {
 		target.Endpoint = url
-		return execution.CallTarget(ctx, target, info, alg, signerOnce, encrypters)
+		return execution.CallTarget(ctx, target, info, alg, signerOnce, encrypters, actionsDenyList)
 	}
 }
 
@@ -703,14 +743,15 @@ func testCallTargets(ctx context.Context,
 	target []target_domain.Target,
 	alg crypto.EncryptionAlgorithm,
 	activeSigningKey execution.GetActiveSigningWebKey,
-) func([]string) (interface{}, error) {
-	return func(urls []string) (interface{}, error) {
+	actionsDenyList []denylist.AddressChecker,
+) func([]string) (any, error) {
+	return func(urls []string) (any, error) {
 		targets := make([]target_domain.Target, len(target))
 		for i, t := range target {
 			t.Endpoint = urls[i]
 			targets[i] = t
 		}
-		return execution.CallTargets(ctx, targets, info, alg, activeSigningKey)
+		return execution.CallTargets(ctx, targets, info, alg, activeSigningKey, actionsDenyList)
 	}
 }
 
@@ -722,10 +763,6 @@ var requestContextInfo1 = &middleware.ContextInfoRequest{
 
 var requestContextInfoBody1 = []byte("{\"request\":{\"content\":\"request1\"}}")
 var requestContextInfoBody2 = []byte("{\"request\":{\"content\":\"request2\"}}")
-
-type request struct {
-	Request string `json:"request"`
-}
 
 func testErrorBody(code int, message string) []byte {
 	body := &execution.ErrorBody{ForwardedStatusCode: code, ForwardedErrorMessage: message}

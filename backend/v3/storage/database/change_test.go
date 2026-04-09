@@ -43,22 +43,31 @@ func TestChangeWrite(t *testing.T) {
 			},
 		},
 		{
+			name:   "change to NULL",
+			change: NewChangeToNull(NewColumn("table", "column")),
+			want: want{
+				stmt: "column = NULL",
+				args: nil,
+			},
+		},
+		{
 			name: "multiple changes",
 			change: NewChanges(
 				NewChange(NewColumn("table", "column1"), "value1"),
 				NewChangePtr[int](NewColumn("table", "column2"), nil),
 				NewChange(NewColumn("table", "column3"), 123),
+				NewChangeToNull(NewColumn("table", "column4")),
 			),
 			want: want{
-				stmt: "column1 = $1, column2 = NULL, column3 = $2",
+				stmt: "column1 = $1, column2 = NULL, column3 = $2, column4 = NULL",
 				args: []any{"value1", 123},
 			},
 		},
 		{
 			name:   "increment change",
-			change: NewIncrementColumnChange(NewColumn("table", "counter")),
+			change: NewIncrementColumnChange(NewColumn("table", "counter"), NewColumn("table", "counter")),
 			want: want{
-				stmt: "counter = counter + 1",
+				stmt: "counter = table.counter + 1",
 			},
 		},
 	} {
@@ -111,11 +120,11 @@ func TestChangeToStatement(t *testing.T) {
 			name: "change to statement with existing builder args",
 			prefillBuilder: func(builder *StatementBuilder) {
 				builder.WriteString("UPDATE table SET ")
-				NewChanges(
+				assert.NoError(t, NewChanges(
 					NewChange(NewColumn("table", "field1"), "asdf"),
 					NewChangeToNull(NewColumn("table", "field2")),
 					NewChangeToColumn(NewColumn("table", "field3"), NewColumn("table", "field4")),
-				).Write(builder)
+				).Write(builder))
 				builder.WriteString(", ")
 			},
 			change: NewChangeToStatement(NewColumn("table", "column"), func(builder *StatementBuilder) {
@@ -135,7 +144,7 @@ func TestChangeToStatement(t *testing.T) {
 			if test.prefillBuilder != nil {
 				test.prefillBuilder(&builder)
 			}
-			test.change.Write(&builder)
+			assert.NoError(t, test.change.Write(&builder))
 			assert.Equal(t, test.want.stmt, builder.String())
 			assert.Equal(t, builder.Args(), test.want.args)
 		})
@@ -250,7 +259,7 @@ func TestCTEChange(t *testing.T) {
 			if test.afterCTE != nil {
 				test.afterCTE(&builder)
 			}
-			test.change.Write(&builder)
+			assert.NoError(t, test.change.Write(&builder))
 
 			assert.Equal(t, test.want.stmt, builder.String())
 			assert.Equal(t, builder.Args(), test.want.args)

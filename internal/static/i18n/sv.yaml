@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "Hemlig kod kunde inte genereras"
     PAT:
       NotFound: "Personlig åtkomst-token hittades inte"
+    Metadata:
+      Conflicting: "Metadata får inte anges samtidigt i fälten [user] och [human]"
     NotHuman: "Användaren måste vara en person"
     NotMachine: "Användaren måste vara en maskin"
     WrongType: "Inte tillåtet för denna användartyp"
@@ -195,10 +197,6 @@ Errors:
     RefreshToken:
       Invalid: "Uppdateringstoken är ogiltigt"
       NotFound: "Uppdateringstoken hittades inte"
-  Instance:
-    NotFound: "Instans hittades inte"
-    AlreadyExists: "Instans finns redan"
-    NotChanged: "Instans ändrades inte"
   Org:
     AlreadyExists: "Organisationens namn eller ID är redan upptaget"
     Invalid: "Organisationen är ogiltigt"
@@ -238,12 +236,6 @@ Errors:
       AlreadyExists: "Domänen finns redan"
       InvalidCharacter: "Endast alfanumeriska tecken, . och - är tillåtna för en domän"
       EmptyString: "Ogiltiga icke-numeriska och alfabetiska tecken ersattes med tomma utrymmen och den resulterande domänen är en tom sträng"
-    IDP:
-      InvalidSearchQuery: "Ogiltig sökfråga"
-      ClientIDMissing: "ClientID saknas"
-      TeamIDMissing: "TeamID saknas"
-      KeyIDMissing: "KeyID saknas"
-      PrivateKeyMissing: "Privat nyckel saknas"
     LoginPolicy:
       NotFound: "Inloggningspolicyn hittades inte"
       Invalid: "Inloggningspolicyn är ogiltig"
@@ -345,6 +337,8 @@ Errors:
       NotActive: "Projektets medgivande är inte aktivt"
       NotInactive: "Projektets medgivande är inte inaktivt"
   Instance:
+    AlreadyExists: "Instans finns redan"
+    NotChanged: "Instans ändrades inte"
     NotFound: "Instansen hittades inte. Se till att du har rätt domän. Kolla https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Roller har inte ändrats"
@@ -613,6 +607,13 @@ Errors:
     Duplicate: "Webnyckel-ID är inte unikt"
     NoActive: "Ingen aktiv webbnyckel hittades"
     NotFound: "Webnyckel hittades inte"
+  IDP:
+    InvalidSearchQuery: "Ogiltig sökfråga"
+    ClientIDMissing: "ClientID saknas"
+    TeamIDMissing: "TeamID saknas"
+    KeyIDMissing: "KeyID saknas"
+    PrivateKeyMissing: "Privat nyckel saknas"
+    InvalidPrivateKey: "Ogiltigt format för privat nyckel"
 
 AggregateTypes:
   action: "Åtgärd"

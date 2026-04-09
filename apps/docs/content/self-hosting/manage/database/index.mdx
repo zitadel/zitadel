@@ -3,15 +3,103 @@ title: Database
 description: Configure and manage the ZITADEL database using PostgreSQL for persistent storage and audit logs
 ---
 
-import Postgres from './_postgres.mdx'
-
 ## Database Configuration
 
-<Postgres components={props.components} />
+<Callout type="info">
+Even if you provision the PostgreSQL user and database manually, you must still run `zitadel init schema`
+to bootstrap the required schemas and tables before running `start-from-setup` or `zitadel start`.
+Skipping this step causes `relation "eventstore.events" does not exist` errors.
+See the [Managed PostgreSQL / No Admin Access](#managed-postgresql--no-admin-access) section below for the exact steps.
+
+The command is `zitadel init schema` (alias: `zitadel init zitadel` for backwards compatibility).
+</Callout>
+
+## ZITADEL with Postgres
+
+PostgreSQL is the default database for ZITADEL due to its reliability, robustness, and adherence to SQL standards. It is well-suited for handling the complex data requirements of an identity management system.
+
+If you are using Zitadel v2 and want to use a PostgreSQL database, you can [overwrite the default configuration](/self-hosting/manage/configure/configure).
+
+Currently, versions 14 to 18 are supported.
+
+Connect ZITADEL to your PostgreSQL database by providing a DSN (connection URL) via the environment variable:
+
+```bash
+export ZITADEL_DATABASE_POSTGRES_DSN=postgresql://zitadel:password@localhost:5432/zitadel?sslmode=disable
+```
+
+If you prefer configuration files, set the DSN in your YAML config:
+
+```yaml
+Database:
+  postgres:
+    DSN: postgresql://zitadel:password@localhost:5432/zitadel?sslmode=disable
+    MaxOpenConns: 15
+    MaxIdleConns: 10
+    MaxConnLifetime: 1h
+    MaxConnIdleTime: 5m
+```
+
+Pool and tuning settings can be configured alongside the DSN as overlays.
+SSL is configured through DSN query parameters. For example, to require TLS with certificate verification:
+
+```bash
+postgresql://zitadel:password@db.example.com:5432/zitadel?sslmode=verify-full&sslrootcert=/path/to/ca.crt
+```
+
+### Managed PostgreSQL / No Admin Access
+
+If you don't have a PostgreSQL superuser available (e.g. managed services like RDS, Cloud SQL, or Azure Database),
+you can pre-provision the user and database yourself and skip the admin-credential requirement.
+
+The `init` command performs two steps that require different privileges:
+
+- **Provisioning step** — `CREATE ROLE`, `CREATE DATABASE`, `GRANT` → requires a superuser/admin.
+- **Schema bootstrapping step** — creates schemas (`eventstore`, `projections`, `system`) and tables → requires only database owner privileges.
+
+If you handle the provisioning step manually, you still **must** run the schema bootstrapping step. Use the dedicated sub-command `zitadel init schema`, which performs only schema bootstrapping using the service user credentials — no admin privileges needed.
+
+**Provisioning step — Provision user and database (run as superuser)**
+
+<Callout type="warn">
+Replace `<strong-password>` with a strong, unique password and store it in a secret manager. Do not use trivial passwords in production.
+</Callout>
+
+```sql
+CREATE ROLE zitadel LOGIN PASSWORD '<strong-password>';
+CREATE DATABASE zitadel WITH OWNER zitadel;
+-- The GRANT below is redundant when zitadel is the database owner,
+-- but is included for clarity. Owners implicitly hold all privileges.
+GRANT CONNECT, CREATE ON DATABASE zitadel TO zitadel;
+```
+
+Adjust `pg_hba.conf` if needed to allow the zitadel user to connect.
+
+**Schema bootstrapping step — Bootstrap schemas and tables (run as the service user)**
+
+Provide the DSN with the service user credentials. For managed/remote PostgreSQL, set `sslmode` to `require` or `verify-full` to encrypt the connection. `disable` is only appropriate for local development.
+
+```bash
+ZITADEL_DATABASE_POSTGRES_DSN=postgresql://zitadel:<strong-password>@<your-host>:5432/zitadel?sslmode=require \
+    zitadel init schema
+```
+
+**Run setup and start**
+
+<Callout type="note">
+For production deployments, configure TLS to encrypt authentication traffic. See the [TLS configuration guide](/self-hosting/manage/tls_modes) for the available modes.
+</Callout>
+
+```bash
+ZITADEL_DATABASE_POSTGRES_DSN=postgresql://zitadel:<strong-password>@<your-host>:5432/zitadel?sslmode=require \
+    zitadel start-from-setup --masterkey "<32-character-key>"
+```
+
+See the [phases guide](/self-hosting/manage/updating_scaling#separating-init-and-setup-from-the-runtime) for details on separating init, setup, and runtime for production deployments.
 
 ## Zitadel Credentials
 
-The [init phase](/self-hosting/manage/updating_scaling#separating-init-and-setup-from-the-runtime) of ZITADEL creates the ZITADEL database user (`Database.*.User.Username` & `Database.*.User.Password`) if it does not exist and admin credentials are provided. **Init does not update or deprecate existing users or passwords.** If you need to change the ZITADEL database user or rotate its password, you must do this manually.
+The [init phase](/self-hosting/manage/updating_scaling#separating-init-and-setup-from-the-runtime) of ZITADEL creates the ZITADEL database user if it does not exist and admin credentials are provided. **Init does not update or deprecate existing users or passwords.** If you need to change the ZITADEL database user or rotate its password, you must do this manually.
 
 <Callout type="warn">
 The `init` command is designed to be run **only once**, during the initial setup of ZITADEL. Running `init` again after changing the database user or credentials does **not** migrate database object ownerships, nor does it reassign permissions on schemas, tables, or other objects to a new user. You must update these permissions manually if you switch users.

@@ -5,13 +5,7 @@ import { clsx } from "clsx";
 import Link from "next/link";
 import { useSelectedLayoutSegment } from "next/navigation";
 
-export const Tab = ({
-  path,
-  item: { slug, text },
-}: {
-  path: string;
-  item: Item;
-}) => {
+export const Tab = ({ path, item: { slug, text } }: { path: string; item: Item }) => {
   const segment = useSelectedLayoutSegment();
   const href = slug ? path + "/" + slug : path;
   const isActive =
@@ -23,9 +17,8 @@ export const Tab = ({
   return (
     <Link
       href={href}
-      className={clsx("mr-2 mt-2 rounded-lg px-3 py-1 text-sm font-medium", {
-        "bg-gray-700 text-gray-100 hover:bg-gray-500 hover:text-white":
-          !isActive,
+      className={clsx("mt-2 mr-2 rounded-lg px-3 py-1 text-sm font-medium", {
+        "bg-gray-700 text-gray-100 hover:bg-gray-500 hover:text-white": !isActive,
         "bg-blue-500 text-white": isActive,
       })}
     >

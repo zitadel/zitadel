@@ -131,6 +131,8 @@ Errors:
         CouldNotGenerate: "Не вдалося згенерувати секрет"
     PAT:
       NotFound: "Персональний токен доступу не знайдено"
+    Metadata:
+      Conflicting: "Метадані не повинні бути встановлені одночасно в полях [user] і [human]"
     NotHuman: "Користувач повинен бути особистим"
     NotMachine: "Користувач повинен бути технічним"
     WrongType: "Не дозволено для цього типу користувача"
@@ -190,10 +192,6 @@ Errors:
     RefreshToken:
       Invalid: "Токен оновлення недійсний"
       NotFound: "Токен оновлення не знайдено"
-  Instance:
-    NotFound: "Інстанс не знайдено"
-    AlreadyExists: "Інстанс вже існує"
-    NotChanged: "Інстанс не змінено"
   Org:
     AlreadyExists: "Назва або ідентифікатор організації вже зайняті"
     Invalid: "Організація недійсна"
@@ -233,12 +231,6 @@ Errors:
       AlreadyExists: "Домен вже існує"
       InvalidCharacter: "Для домену дозволені лише буквено-цифрові символи, . та -"
       EmptyString: "Недійсні не цифрові та не алфавітні символи були замінені порожніми пробілами і результуючий домен є порожнім рядком"
-    IDP:
-      InvalidSearchQuery: "Недійсний пошуковий запит"
-      ClientIDMissing: "Відсутній ClientID"
-      TeamIDMissing: "Відсутній TeamID"
-      KeyIDMissing: "Відсутній KeyID"
-      PrivateKeyMissing: "Відсутній приватний ключ"
     LoginPolicy:
       NotFound: "Політика входу не знайдена"
       Invalid: "Політика входу недійсна"
@@ -340,6 +332,8 @@ Errors:
       NotActive: "Грант проекту не активний"
       NotInactive: "Грант проекту не неактивний"
   Instance:
+    AlreadyExists: "Інстанс вже існує"
+    NotChanged: "Інстанс не змінено"
     NotFound: "Інстанс не знайдено. Переконайтеся, що домен правильний. Перегляньте https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Ролі не були змінені"
@@ -608,6 +602,13 @@ Errors:
     Duplicate: "Ідентифікатор веб-ключа не унікальний"
     NoActive: "Активний веб-ключ не знайдено"
     NotFound: "Веб-ключ не знайдено"
+  IDP:
+    InvalidSearchQuery: "Недійсний пошуковий запит"
+    ClientIDMissing: "Відсутній ClientID"
+    TeamIDMissing: "Відсутній TeamID"
+    KeyIDMissing: "Відсутній KeyID"
+    PrivateKeyMissing: "Відсутній приватний ключ"
+    InvalidPrivateKey: "Невірний формат приватного ключа"
 
 AggregateTypes:
   action: "Дія"

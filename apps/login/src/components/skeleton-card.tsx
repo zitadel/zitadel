@@ -1,6 +1,6 @@
-import { clsx } from "clsx";
+import { getComponentRoundness, getThemeConfig, SPACING_STYLES } from "@/lib/theme";
 import { ThemeableProps } from "@/lib/themeUtils";
-import { getThemeConfig, SPACING_STYLES, getComponentRoundness } from "@/lib/theme";
+import { clsx } from "clsx";
 
 interface SkeletonCardProps extends ThemeableProps {
   isLoading?: boolean;

@@ -28,9 +28,7 @@ export function ConsentScreen({
 
   async function denyDeviceAuth() {
     setLoading(true);
-    const response = await completeDeviceAuthorization(
-      deviceAuthorizationRequestId,
-    )
+    const response = await completeDeviceAuthorization(deviceAuthorizationRequestId)
       .catch(() => {
         setError("Could not register user");
         return;
@@ -50,7 +48,7 @@ export function ConsentScreen({
     <div className="flex w-full flex-col items-center space-y-4 pt-4">
       <ul className="w-full list-disc space-y-2">
         {scopes?.length === 0 && (
-          <span className="flex w-full flex-row items-center rounded-md border border-divider-light bg-background-light-400 px-4 py-2 text-sm transition-all dark:bg-background-dark-400">
+          <span className="border-divider-light bg-background-light-400 dark:bg-background-dark-400 flex w-full flex-row items-center rounded-md border px-4 py-2 text-sm transition-all">
             <Translated i18nKey="device.scope.openid" namespace="device" />
           </span>
         )}
@@ -59,13 +57,12 @@ export function ConsentScreen({
           const description = t(translationKey);
 
           // Check if the key itself is returned and provide a fallback
-          const resolvedDescription =
-            description === translationKey ? "" : description;
+          const resolvedDescription = description === translationKey ? "" : description;
 
           return (
             <li
               key={s}
-              className="flex w-full flex-row items-center rounded-md border border-divider-light bg-background-light-400 px-4 py-2 text-sm transition-all dark:bg-background-dark-400"
+              className="border-divider-light bg-background-light-400 dark:bg-background-dark-400 flex w-full flex-row items-center rounded-md border px-4 py-2 text-sm transition-all"
             >
               <span>{resolvedDescription}</span>
             </li>
@@ -74,11 +71,7 @@ export function ConsentScreen({
       </ul>
 
       <p className="ztdl-p text-left text-xs">
-        <Translated
-          i18nKey="request.disclaimer"
-          namespace="device"
-          data={{ appName: appName }}
-        />
+        <Translated i18nKey="request.disclaimer" namespace="device" data={{ appName: appName }} />
       </p>
 
       {error && (
@@ -101,12 +94,7 @@ export function ConsentScreen({
         <span className="flex-grow"></span>
 
         <Link href={nextUrl}>
-          <Button
-            data-testid="submit-button"
-            type="submit"
-            className="self-end"
-            variant={ButtonVariants.Primary}
-          >
+          <Button data-testid="submit-button" type="submit" className="self-end" variant={ButtonVariants.Primary}>
             <Translated i18nKey="device.request.submit" namespace="device" />
           </Button>
         </Link>

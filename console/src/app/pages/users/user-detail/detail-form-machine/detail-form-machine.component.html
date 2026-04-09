@@ -15,9 +15,11 @@
     <cnsl-form-field class="formfield">
       <cnsl-label>{{ 'USER.MACHINE.ACCESSTOKENTYPE' | translate }}</cnsl-label>
       <mat-select formControlName="accessTokenType" required>
-        <mat-option *ngFor="let aTT of accessTokenTypes" [value]="aTT">
-          {{ 'USER.MACHINE.ACCESSTOKENTYPES.' + aTT | translate }}
-        </mat-option>
+        @for (aTT of accessTokenTypes; track aTT) {
+          <mat-option [value]="aTT">
+            {{ 'USER.MACHINE.ACCESSTOKENTYPES.' + aTT | translate }}
+          </mat-option>
+        }
       </mat-select>
     </cnsl-form-field>
   </div>

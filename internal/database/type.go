@@ -15,6 +15,11 @@ type TextArray[T ~string] pgtype.FlatArray[T]
 
 // Scan implements the [database/sql.Scanner] interface.
 func (s *TextArray[T]) Scan(src any) error {
+	if src == nil {
+		*s = nil
+		return nil
+	}
+
 	var typedArray []string
 	err := pgtype.NewMap().SQLScanner(&typedArray).Scan(src)
 	if err != nil {
@@ -27,6 +32,46 @@ func (s *TextArray[T]) Scan(src any) error {
 	}
 
 	return nil
+}
+
+func (s TextArray[T]) Dimensions() []pgtype.ArrayDimension {
+	if s == nil {
+		return nil
+	}
+
+	return []pgtype.ArrayDimension{{Length: int32(len(s)), LowerBound: 1}}
+}
+
+func (s TextArray[T]) Index(i int) any {
+	return s[i]
+}
+
+func (s TextArray[T]) IndexType() any {
+	var el T
+	return el
+}
+
+func (s *TextArray[T]) SetDimensions(dimensions []pgtype.ArrayDimension) error {
+	if dimensions == nil {
+		*s = nil
+		return nil
+	}
+
+	elementCount := 1
+	for _, dimension := range dimensions {
+		elementCount *= int(dimension.Length)
+	}
+
+	*s = make(TextArray[T], elementCount)
+	return nil
+}
+
+func (s TextArray[T]) ScanIndex(i int) any {
+	return &s[i]
+}
+
+func (s TextArray[T]) ScanIndexType() any {
+	return new(T)
 }
 
 // Value implements the [database/sql/driver.Valuer] interface.

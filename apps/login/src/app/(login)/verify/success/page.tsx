@@ -1,6 +1,7 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
+import { VerifySuccessContinue } from "@/components/verify-success-continue";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
@@ -13,15 +14,15 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  const { loginName, organization, userId } = searchParams;
+  const { loginName, organization, userId, requestId } = searchParams;
 
-  const branding = await getBrandingSettings({ serviceConfig, organization,
-  });
+  const branding = await getBrandingSettings({ serviceConfig, organization });
 
-  const sessionFactors = await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization },
-  }).catch((error) => {
-    console.warn("Error loading session:", error);
-  });
+  const sessionFactors = await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } }).catch(
+    (error) => {
+      console.warn("Error loading session:", error);
+    },
+  );
 
   const id = userId ?? sessionFactors?.factors?.user?.id;
 
@@ -29,8 +30,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     throw Error("Failed to get user id");
   }
 
-  const userResponse = await getUserByID({ serviceConfig, userId: id,
-  });
+  const userResponse = await getUserByID({ serviceConfig, userId: id });
 
   let user: User | undefined;
   let human: HumanUser | undefined;
@@ -40,6 +40,20 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     if (user?.type.case === "human") {
       human = user.type.value as HumanUser;
     }
+  }
+
+  // Build continue URL to re-enter the login flow with requestId preserved
+  let continueUrl: string | undefined;
+  if (requestId) {
+    const params = new URLSearchParams();
+    if (loginName || user?.preferredLoginName) {
+      params.set("loginName", loginName ?? user?.preferredLoginName ?? "");
+    }
+    if (organization) {
+      params.set("organization", organization);
+    }
+    params.set("requestId", requestId);
+    continueUrl = `/loginname?${params}`;
   }
 
   return (
@@ -65,7 +79,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           )
         )}
       </div>
-      <div className="w-full"></div>
+      <div className="w-full">{continueUrl && <VerifySuccessContinue continueUrl={continueUrl} />}</div>
     </DynamicTheme>
   );
 }

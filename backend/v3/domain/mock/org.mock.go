@@ -12,6 +12,7 @@ package domainmock
 import (
 	context "context"
 	reflect "reflect"
+	time "time"
 
 	domain "github.com/zitadel/zitadel/backend/v3/domain"
 	database "github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -773,6 +774,44 @@ func (c *MockOrganizationRepositorySetStateCall) Do(f func(domain.OrgState) data
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockOrganizationRepositorySetStateCall) DoAndReturn(f func(domain.OrgState) database.Change) *MockOrganizationRepositorySetStateCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SetUpdatedAt mocks base method.
+func (m *MockOrganizationRepository) SetUpdatedAt(updatedAt time.Time) database.Change {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetUpdatedAt", updatedAt)
+	ret0, _ := ret[0].(database.Change)
+	return ret0
+}
+
+// SetUpdatedAt indicates an expected call of SetUpdatedAt.
+func (mr *MockOrganizationRepositoryMockRecorder) SetUpdatedAt(updatedAt any) *MockOrganizationRepositorySetUpdatedAtCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetUpdatedAt", reflect.TypeOf((*MockOrganizationRepository)(nil).SetUpdatedAt), updatedAt)
+	return &MockOrganizationRepositorySetUpdatedAtCall{Call: call}
+}
+
+// MockOrganizationRepositorySetUpdatedAtCall wrap *gomock.Call
+type MockOrganizationRepositorySetUpdatedAtCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockOrganizationRepositorySetUpdatedAtCall) Return(arg0 database.Change) *MockOrganizationRepositorySetUpdatedAtCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockOrganizationRepositorySetUpdatedAtCall) Do(f func(time.Time) database.Change) *MockOrganizationRepositorySetUpdatedAtCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockOrganizationRepositorySetUpdatedAtCall) DoAndReturn(f func(time.Time) database.Change) *MockOrganizationRepositorySetUpdatedAtCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -255,7 +255,7 @@ func userInfoPhoneToOIDC(user *query.User) oidc.UserInfoPhone {
 	if human := user.Human; human != nil {
 		return oidc.UserInfoPhone{
 			PhoneNumber:         string(human.Phone),
-			PhoneNumberVerified: human.IsPhoneVerified,
+			PhoneNumberVerified: oidc.Bool(human.IsPhoneVerified),
 		}
 	}
 	return oidc.UserInfoPhone{}
@@ -461,7 +461,7 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 		UserGrants:   qu.UserGrants,
 	}
 
-	resp, err := execution.CallTargets(ctx, executionTargets, info, s.targetEncryptionAlgorithm, s.query.GetActiveSigningWebKey)
+	resp, err := execution.CallTargets(ctx, executionTargets, info, s.targetEncryptionAlgorithm, s.query.GetActiveSigningWebKey, s.command.ActionsV2DenyList)
 	if err != nil {
 		return err
 	}

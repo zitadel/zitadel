@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"go.opentelemetry.io/otel"
@@ -35,6 +36,7 @@ const (
 	ExporterTypeHTTP
 	ExporterTypeGoogle
 	ExporterTypePrometheus
+	ExporterTypeAuto
 )
 
 // isNone returns true if the ExporterType is either Unspecified or None.
@@ -79,7 +81,7 @@ func setupOTelSDK(ctx context.Context, cfg Config) (*log.LoggerProvider, Shutdow
 	prop := newPropagator()
 	otel.SetTextMapPropagator(prop)
 
-	resource, err := resourceWithService("ZITADEL")
+	resource, err := resourceWithService(cfg.ServiceName)
 	if err != nil {
 		return nil, shutdown, err
 	}
@@ -121,6 +123,11 @@ func newPropagator() propagation.TextMapPropagator {
 }
 
 func resourceWithService(serviceName string) (*resource.Resource, error) {
+	// OTEL_SERVICE_NAME takes priority over programmatic config per the
+	// OpenTelemetry specification.
+	if envName := os.Getenv("OTEL_SERVICE_NAME"); envName != "" {
+		serviceName = envName
+	}
 	attributes := []attribute.KeyValue{
 		semconv.ServiceNameKey.String(serviceName),
 	}

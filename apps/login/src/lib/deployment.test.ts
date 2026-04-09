@@ -1,5 +1,5 @@
-import { describe, expect, test, beforeEach, afterEach } from "vitest";
-import { hasSystemUserCredentials, hasServiceUserToken } from "./deployment";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { hasLoginClientKey, hasServiceUserToken, hasSystemUserCredentials } from "./deployment";
 
 describe("Deployment utilities", () => {
   const originalEnv = process.env;
@@ -52,6 +52,26 @@ describe("Deployment utilities", () => {
       process.env.SYSTEM_USER_PRIVATE_KEY = undefined as any;
 
       expect(hasSystemUserCredentials()).toBe(false);
+    });
+  });
+
+  describe("hasLoginClientKey", () => {
+    test("should return true when ZITADEL_LOGINCLIENT_KEYFILE is set", () => {
+      process.env.ZITADEL_LOGINCLIENT_KEYFILE = "/path/to/key.pem";
+
+      expect(hasLoginClientKey()).toBe(true);
+    });
+
+    test("should return false when ZITADEL_LOGINCLIENT_KEYFILE is missing", () => {
+      process.env.ZITADEL_LOGINCLIENT_KEYFILE = undefined as any;
+
+      expect(hasLoginClientKey()).toBe(false);
+    });
+
+    test("should return false when ZITADEL_LOGINCLIENT_KEYFILE is empty string", () => {
+      process.env.ZITADEL_LOGINCLIENT_KEYFILE = "";
+
+      expect(hasLoginClientKey()).toBe(false);
     });
   });
 

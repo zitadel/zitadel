@@ -1,4 +1,9 @@
+import { getValidLocaleFromUILocales } from "@/lib/auth-utils";
+import { getLanguageCookie, setLanguageCookie } from "@/lib/cookies";
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
+import { shouldUILocalesOverrideCookie } from "@/lib/i18n";
 import { idpTypeToSlug } from "@/lib/idp";
+import { createLogger } from "@/lib/logger";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { constructUrl } from "@/lib/service-url";
 import { findValidSession } from "@/lib/session";
@@ -20,9 +25,11 @@ import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { SecuritySettings } from "@zitadel/proto/zitadel/settings/v2/security_settings_pb";
+import escapeHtml from "escape-html";
 import { NextRequest, NextResponse } from "next/server";
 import { buildCSP } from "../csp";
-import escapeHtml from "escape-html";
+
+const logger = createLogger("flow-initiation");
 
 const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/;
@@ -38,10 +45,7 @@ function setCSPHeaders(
       ? securitySettings.embeddedIframe.allowedOrigins
       : undefined;
 
-  response.headers.set(
-    "Content-Security-Policy",
-    buildCSP({ serviceUrl: serviceConfig.baseUrl, iframeOrigins }),
-  );
+  response.headers.set("Content-Security-Policy", buildCSP({ serviceUrl: serviceConfig.baseUrl, iframeOrigins }));
 
   if (!iframeOrigins) {
     response.headers.set("X-Frame-Options", "deny");
@@ -83,7 +87,24 @@ export interface FlowInitiationParams {
 export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Promise<NextResponse> {
   const { serviceConfig, requestId, sessions, sessionCookies, request } = params;
 
-  const { authRequest } = await getAuthRequest({ serviceConfig, authRequestId: requestId.replace("oidc_", "") });
+  let authRequest;
+  try {
+    ({ authRequest } = await getAuthRequest({ serviceConfig, authRequestId: requestId.replace("oidc_", "") }));
+  } catch (error) {
+    if (isClassifiedError(error) && error.isUserError) {
+      logger.warn("Auth request failed (client error)", { grpcCode: error.code, httpStatus: error.httpStatus });
+      return NextResponse.json({ error: error.message }, { status: error.httpStatus });
+    }
+    throw error;
+  }
+
+  const locale = getValidLocaleFromUILocales(authRequest?.uiLocales);
+  if (locale) {
+    const existingLanguage = await getLanguageCookie();
+    if (shouldUILocalesOverrideCookie() || !existingLanguage) {
+      await setLanguageCookie(locale);
+    }
+  }
 
   let organization = "";
   let suffix = "";
@@ -103,7 +124,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         const matched = ORG_DOMAIN_SCOPE_REGEX.exec(orgDomainScope);
         const orgDomain = matched?.[1] ?? "";
 
-        console.log("Extracted Organization Domain:", orgDomain);
+        logger.info("Extracted org domain:", { orgDomain });
         if (orgDomain) {
           const orgs = await getOrgsByDomain({ serviceConfig, domain: orgDomain });
 
@@ -184,7 +205,6 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
             </html>
           `;
 
-
           return new NextResponse(html, {
             headers: { "Content-Type": "text/html" },
           });
@@ -238,7 +258,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
             return NextResponse.redirect(absoluteUrl.toString());
           }
         } catch (error) {
-          console.error("Failed to execute sendLoginname:", error);
+          logger.error("Failed to execute sendLoginname:", { error });
         }
       }
 
@@ -258,7 +278,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
     } else if (authRequest.prompt.includes(Prompt.NONE)) {
       const securitySettings = await getSecuritySettings({ serviceConfig });
 
-      const selectedSession = await findValidSession({ serviceConfig, sessions, authRequest });
+      const selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
 
       const noSessionResponse = NextResponse.json({ error: "No active session found" }, { status: 400 });
       setCSPHeaders(noSessionResponse, serviceConfig, securitySettings);
@@ -294,7 +314,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
       return callbackResponse;
     } else {
-      let selectedSession = await findValidSession({ serviceConfig, sessions, authRequest });
+      let selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
 
       if (!selectedSession || !selectedSession.id) {
         return gotoAccounts({
@@ -333,7 +353,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         if (callbackUrl) {
           return NextResponse.redirect(callbackUrl);
         } else {
-          console.log("could not create callback, redirect user to choose other account");
+          logger.info("could not create callback, redirect user to choose other account");
           return gotoAccounts({
             request,
             organization,
@@ -341,7 +361,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           });
         }
       } catch (error) {
-        console.error(error);
+        logger.error("Error creating callback:", { error });
         return gotoAccounts({
           request,
           requestId,
@@ -376,7 +396,16 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Promise<NextResponse> {
   const { serviceConfig, requestId, sessions, sessionCookies, request } = params;
 
-  const { samlRequest } = await getSAMLRequest({ serviceConfig, samlRequestId: requestId.replace("saml_", "") });
+  let samlRequest;
+  try {
+    ({ samlRequest } = await getSAMLRequest({ serviceConfig, samlRequestId: requestId.replace("saml_", "") }));
+  } catch (error) {
+    if (isClassifiedError(error) && error.isUserError) {
+      logger.warn("SAML request failed (client error)", { grpcCode: error.code, httpStatus: error.httpStatus });
+      return NextResponse.json({ error: error.message }, { status: error.httpStatus });
+    }
+    throw error;
+  }
 
   if (!samlRequest) {
     return NextResponse.json({ error: "No samlRequest found" }, { status: 400 });
@@ -451,7 +480,7 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
       });
     }
   } catch (error) {
-    console.error("SAML createResponse failed:", error);
+    logger.error("SAML createResponse failed:", { error });
   }
 
   // Final fallback: SAML response creation failed - show account selection

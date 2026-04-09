@@ -1,9 +1,7 @@
 version: "2"
 run:
   concurrency: 4
-  go: "1.24"
-  skip-dirs:
-    - apps/docs
+  go: "1.25"
 linters:
   enable:
     - asciicheck
@@ -94,6 +92,15 @@ linters:
       - common-false-positives
       - legacy
       - std-error-handling
+    rules:
+      - path: apps/docs/.*
+        linters:
+          - typecheck
+      # contextcheck requires a context to be passed to the function, but in tests we use `testing.T.Context()` which is not recognized as a context by the linter, so we disable it for the function.
+      - path: internal/query/projection/.*_relational_test\.go
+        linters:
+          - contextcheck
+        source: callReduce\(
     paths:
       - .artifacts
       - .backups
@@ -123,10 +130,6 @@ issues:
   max-issues-per-linter: 0
   max-same-issues: 0
   new-from-rev: origin/main
-  exclude-rules:
-    - path: apps/docs/.*
-      linters:
-        - typecheck
 formatters:
   enable:
     - gci
