@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
@@ -547,9 +548,9 @@ func signatureAlgorithmToCommand(signatureAlgorithm idp_pb.SAMLSignatureAlgorith
 }
 
 func addZitadelProviderToCommand(req *admin_pb.AddZitadelProviderRequest) command.ZitadelProvider {
-	instanceRolesInfo := make([]command.RolesInfo, 0, len(req.InstanceRolesInfo))
+	instanceRolesInfo := make([]idp.RolesInfo, 0, len(req.InstanceRolesInfo))
 	for _, info := range req.InstanceRolesInfo {
-		instanceRolesInfo = append(instanceRolesInfo, command.RolesInfo{
+		instanceRolesInfo = append(instanceRolesInfo, idp.RolesInfo{
 			OrganizationID:     info.OrganizationId,
 			OrganizationDomain: info.OrganizationDomain,
 		})

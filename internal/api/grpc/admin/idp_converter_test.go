@@ -248,7 +248,7 @@ func Test_addZitadelOIDCConfigToDomain(t *testing.T) {
 				},
 				IsIDTokenMapping: true,
 				UsePKCE:          true,
-				InstanceRolesInfo: []command.RolesInfo{
+				InstanceRolesInfo: []idp.RolesInfo{
 					{
 						OrganizationID:     "org1",
 						OrganizationDomain: "org1.com",

@@ -146,12 +146,7 @@ type ZitadelProvider struct {
 	IsIDTokenMapping  bool
 	UsePKCE           bool
 	IDPOptions        idp.Options
-	InstanceRolesInfo []RolesInfo
-}
-
-type RolesInfo struct {
-	OrganizationID     string
-	OrganizationDomain string
+	InstanceRolesInfo []idp.RolesInfo
 }
 
 // ExistsIDPOnOrgOrInstance query first org level IDPs and then instance level IDPs, no check if the IDP is active
