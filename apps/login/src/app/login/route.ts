@@ -42,7 +42,11 @@ export async function GET(request: NextRequest) {
   const ids = sessionCookies.map((s) => s.id);
   let sessions: Session[] = [];
   if (ids && ids.length) {
-    sessions = await loadSessions({ serviceConfig, ids });
+    try {
+      sessions = await loadSessions({ serviceConfig, ids });
+    } catch (error) {
+      logger.error("Failed to load sessions", { error });
+    }
   }
 
   // Flow initiation - delegate to appropriate handler
@@ -53,24 +57,18 @@ export async function GET(request: NextRequest) {
       return await handleOIDCFlowInitiation(flowParams);
     } catch (error) {
       const status = isClassifiedError(error) ? error.httpStatus : 500;
-      logger.error("OIDC flow initiation failed", {
-        error,
-        isClassified: isClassifiedError(error),
-        status,
-      });
-      return NextResponse.json({ error: "Authentication flow failed" }, { status });
+      const message = error instanceof Error ? error.message : "Unknown error";
+      logger.error("OIDC flow initiation failed", { error, status });
+      return NextResponse.json({ error: message }, { status });
     }
   } else if (requestId.startsWith("saml_")) {
     try {
       return await handleSAMLFlowInitiation(flowParams);
     } catch (error) {
       const status = isClassifiedError(error) ? error.httpStatus : 500;
-      logger.error("SAML flow initiation failed", {
-        error,
-        isClassified: isClassifiedError(error),
-        status,
-      });
-      return NextResponse.json({ error: "SAML flow failed" }, { status });
+      const message = error instanceof Error ? error.message : "Unknown error";
+      logger.error("SAML flow initiation failed", { error, status });
+      return NextResponse.json({ error: message }, { status });
     }
   } else if (requestId.startsWith("device_")) {
     // Device Authorization does not need to start here as it is handled on the /device endpoint
