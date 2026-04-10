@@ -29,7 +29,7 @@ message Link {
   // May contain language placeholders ({{.Lang}}) to support localized destinations.
   string url = 2 [
     (validate.rules).string = {
-      uri: true;
+      pattern: "^(https?://|mailto:).+"
       min_len: 1;
     }
   ];
