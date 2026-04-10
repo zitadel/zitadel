@@ -1,7 +1,5 @@
 import { isRSCRequest, validateAuthRequest } from "@/lib/auth-utils";
 import { getAllSessions } from "@/lib/cookies";
-import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
-import { createLogger } from "@/lib/logger";
 import { FlowInitiationParams, handleOIDCFlowInitiation, handleSAMLFlowInitiation } from "@/lib/server/flow-initiation";
 import { getServiceConfig } from "@/lib/service-url";
 import { listSessions, ServiceConfig } from "@/lib/zitadel";
@@ -12,8 +10,6 @@ import { NextRequest, NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 export const revalidate = false;
 export const fetchCache = "default-no-store";
-
-const logger = createLogger("login-route");
 
 async function loadSessions({ serviceConfig, ids }: { serviceConfig: ServiceConfig; ids: string[] }): Promise<Session[]> {
   const response = await listSessions({ serviceConfig, ids: ids.filter((id: string | undefined) => !!id) });
@@ -42,34 +38,16 @@ export async function GET(request: NextRequest) {
   const ids = sessionCookies.map((s) => s.id);
   let sessions: Session[] = [];
   if (ids && ids.length) {
-    try {
-      sessions = await loadSessions({ serviceConfig, ids });
-    } catch (error) {
-      logger.error("Failed to load sessions", { error });
-    }
+    sessions = await loadSessions({ serviceConfig, ids });
   }
 
   // Flow initiation - delegate to appropriate handler
   const flowParams: FlowInitiationParams = { serviceConfig, requestId, sessions, sessionCookies, request };
 
   if (requestId.startsWith("oidc_")) {
-    try {
-      return await handleOIDCFlowInitiation(flowParams);
-    } catch (error) {
-      const status = isClassifiedError(error) ? error.httpStatus : 500;
-      const message = isClassifiedError(error) && error.isUserError ? error.message : "Authentication flow failed";
-      logger.error("OIDC flow initiation failed", { error, status });
-      return NextResponse.json({ error: message }, { status });
-    }
+    return handleOIDCFlowInitiation(flowParams);
   } else if (requestId.startsWith("saml_")) {
-    try {
-      return await handleSAMLFlowInitiation(flowParams);
-    } catch (error) {
-      const status = isClassifiedError(error) ? error.httpStatus : 500;
-      const message = isClassifiedError(error) && error.isUserError ? error.message : "SAML flow failed";
-      logger.error("SAML flow initiation failed", { error, status });
-      return NextResponse.json({ error: message }, { status });
-    }
+    return handleSAMLFlowInitiation(flowParams);
   } else if (requestId.startsWith("device_")) {
     // Device Authorization does not need to start here as it is handled on the /device endpoint
     return NextResponse.json({ error: "Device authorization should use /device endpoint" }, { status: 400 });
