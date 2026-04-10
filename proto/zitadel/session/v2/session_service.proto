@@ -259,7 +259,7 @@ service SessionService {
   //   - `session.delete`
   //   - no permission required for own sessions or when providing the current session token
   //
-  // Possible error slugs:
+  // Possible error slugs include (non-exhaustive):
   //   - "request.invalid" when required fields such as the session ID are missing or invalid
   //   - "auth.missing_permission" when the caller does not have the required permissions to delete the session
   //   - "session.token_invalid" when the provided session token is invalid

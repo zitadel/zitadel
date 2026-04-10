@@ -541,7 +541,7 @@ HTTP/2.0 200 OK
 Content-Type: application/grpc
 Grpc-Message: The provided session token is invalid: either the token is malformed, expired or does not match the session (session.token_invalid)
 Grpc-Status: 7
-Grcp-Status-Details-Bin: CAcSgwFUaGUgcHJvdmlkZWQgc2Vzc2lvbiB0b2tlbiBpcyBpbnZhbGlkOiBlaXRoZXIgdGhlIHRva2VuIGlzIG1hbGZvcm1lZCwgZXhwaXJlZCBvciBkb2VzIG5vdCBtYXRjaCB0aGUgc2Vzc2lvbiAoc2Vzc2lvbi50b2tlbl9pbnZhbGlkKRq5AQowdHlwZS5nb29nbGVhcGlzLmNvbS96aXRhZGVsLmVycm9yLnYyLkVycm9yRGV0YWlsEoQBChVzZXNzaW9uLnRva2VuX2ludmFsaWQSa1RoZSBwcm92aWRlZCBzZXNzaW9uIHRva2VuIGlzIGludmFsaWQ6IGVpdGhlciB0aGUgdG9rZW4gaXMgbWFsZm9ybWVkLCBleHBpcmVkIG9yIGRvZXMgbm90IG1hdGNoIHRoZSBzZXNzaW9u
+Grpc-Status-Details-Bin: CAcSgwFUaGUgcHJvdmlkZWQgc2Vzc2lvbiB0b2tlbiBpcyBpbnZhbGlkOiBlaXRoZXIgdGhlIHRva2VuIGlzIG1hbGZvcm1lZCwgZXhwaXJlZCBvciBkb2VzIG5vdCBtYXRjaCB0aGUgc2Vzc2lvbiAoc2Vzc2lvbi50b2tlbl9pbnZhbGlkKRq5AQowdHlwZS5nb29nbGVhcGlzLmNvbS96aXRhZGVsLmVycm9yLnYyLkVycm9yRGV0YWlsEoQBChVzZXNzaW9uLnRva2VuX2ludmFsaWQSa1RoZSBwcm92aWRlZCBzZXNzaW9uIHRva2VuIGlzIGludmFsaWQ6IGVpdGhlciB0aGUgdG9rZW4gaXMgbWFsZm9ybWVkLCBleHBpcmVkIG9yIGRvZXMgbm90IG1hdGNoIHRoZSBzZXNzaW9u
 
 {
   "code": 7,
@@ -561,7 +561,7 @@ HTTP/2.0 200 OK
 Content-Type: application/grpc
 Grpc-Message: the username is already taken (user.already_exists)
 Grpc-Status: 6
-Grcp-Status-Details-Bin: dGhlIHVzZXJuYW1lIGlzIGFscmVhZHkgdGFrZW4gKHVzZXIuYWxyZWFkeV9leGlzdHMp...
+Grpc-Status-Details-Bin: dGhlIHVzZXJuYW1lIGlzIGFscmVhZHkgdGFrZW4gKHVzZXIuYWxyZWFkeV9leGlzdHMp...
 
 {
   "code": 6,
