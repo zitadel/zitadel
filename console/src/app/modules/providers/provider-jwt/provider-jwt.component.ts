@@ -68,6 +68,7 @@ export class ProviderJWTComponent {
     this.service$,
   );
   public expandWhatNow$ = this.nextSvc.expandWhatNow(this.id$, this.activateLink$, this.justCreated$);
+  protected readonly copyUrls$ = this.nextSvc.jwtCallbackUrls();
 
   constructor(
     private authService: GrpcAuthService,
