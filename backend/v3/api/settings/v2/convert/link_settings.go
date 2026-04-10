@@ -31,10 +31,9 @@ func DomainLinkSettingsModelToGRPCResponse(model *domain.LinkSettings) (*setting
 	return ls, nil
 }
 
-func GrpcLinksToDomain(ls *settings.LinkSettings, source int) (*domain.LinkSettings, error) {
-	links := ls.GetLinks()
-	models := make([]domain.Link, len(links), len(links))
-	for i, l := range links {
+func GrpcLinksToDomain(ls []*settings.Link) ([]domain.Link, error) {
+	models := make([]domain.Link, len(ls), len(ls))
+	for i, l := range ls {
 		tp, err := grpcLinkTypeToDomain(l.Type)
 		if err != nil {
 			return nil, err
@@ -52,10 +51,7 @@ func GrpcLinksToDomain(ls *settings.LinkSettings, source int) (*domain.LinkSetti
 			Target:         target,
 		}
 	}
-	return &domain.LinkSettings{
-		Links:  models,
-		Source: source,
-	}, nil
+	return models, nil
 }
 
 func domainLinkTypeToGrpc(tp domain.LinkType) (settings.LinkType, error) {

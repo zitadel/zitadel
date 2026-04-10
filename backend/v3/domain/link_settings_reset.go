@@ -31,7 +31,9 @@ func (cmd *ResetLinkSettingsCommand) Events(ctx context.Context, opts *InvokeOpt
 }
 
 // Validate implements [Querier].
-func (q *ResetLinkSettingsCommand) Validate(ctx context.Context, opts *InvokeOpts) error { return nil }
+func (q *ResetLinkSettingsCommand) Validate(ctx context.Context, opts *InvokeOpts) error {
+	return nil
+}
 
 func (q *ResetLinkSettingsCommand) Execute(ctx context.Context, opts *InvokeOpts) error {
 	// TODO(wim) implement this
