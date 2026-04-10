@@ -2369,3 +2369,89 @@ func (wm *ZitadelIDPWriteModel) reduceAddedEvent(e *idp.ZitadelIDPAddedEvent) {
 func (wm *ZitadelIDPWriteModel) reduceChangedEvent(e *idp.ZitadelIDPChangedEvent) {
 	// todo (@grvijayan): will be implemented along with UpdateZitadelProvider changes
 }
+
+type ZitadelIDPInstanceRolesInfoWriteModel struct {
+	eventstore.WriteModel
+
+	rolesInfo []idp.RolesInfo
+
+	orgStates       map[string]domain.OrgState
+	orgDomainStates map[string]domain.OrgDomainState
+}
+
+func NewZitadelIDPInstanceRolesInfoWriteModel(rolesInfo []idp.RolesInfo) *ZitadelIDPInstanceRolesInfoWriteModel {
+	orgStates := make(map[string]domain.OrgState, len(rolesInfo))
+	orgDomainStates := make(map[string]domain.OrgDomainState, len(rolesInfo))
+
+	for _, info := range rolesInfo {
+		orgStates[info.OrganizationID] = domain.OrgStateUnspecified
+		orgDomainStates[info.OrganizationID+":"+info.OrganizationDomain] = domain.OrgDomainStateUnspecified
+	}
+
+	return &ZitadelIDPInstanceRolesInfoWriteModel{
+		rolesInfo:       rolesInfo,
+		orgStates:       orgStates,
+		orgDomainStates: orgDomainStates,
+	}
+}
+
+func (wm *ZitadelIDPInstanceRolesInfoWriteModel) AppendEvents(events ...eventstore.Event) {
+	wm.WriteModel.AppendEvents(events...)
+}
+
+func (wm *ZitadelIDPInstanceRolesInfoWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *org.OrgAddedEvent:
+			wm.orgStates[e.Aggregate().ID] = domain.OrgStateActive
+		case *org.OrgDeactivatedEvent:
+			wm.orgStates[e.Aggregate().ID] = domain.OrgStateInactive
+		case *org.OrgReactivatedEvent:
+			wm.orgStates[e.Aggregate().ID] = domain.OrgStateActive
+		case *org.OrgRemovedEvent:
+			wm.orgStates[e.Aggregate().ID] = domain.OrgStateRemoved
+		case *org.DomainAddedEvent:
+			if _, ok := wm.orgDomainStates[e.Aggregate().ID+":"+e.Domain]; ok {
+				wm.orgDomainStates[e.Aggregate().ID+":"+e.Domain] = domain.OrgDomainStateActive
+			}
+		case *org.DomainRemovedEvent:
+			if _, ok := wm.orgDomainStates[e.Aggregate().ID+":"+e.Domain]; ok {
+				wm.orgDomainStates[e.Aggregate().ID+":"+e.Domain] = domain.OrgDomainStateRemoved
+			}
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *ZitadelIDPInstanceRolesInfoWriteModel) Query() *eventstore.SearchQueryBuilder {
+	orgIDs := make([]string, 0, len(wm.orgStates))
+	for orgID := range wm.orgStates {
+		orgIDs = append(orgIDs, orgID)
+	}
+
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(orgIDs...).
+		EventTypes(
+			org.OrgAddedEventType,
+			org.OrgDeactivatedEventType,
+			org.OrgReactivatedEventType,
+			org.OrgRemovedEventType,
+			org.OrgDomainAddedEventType,
+			org.OrgDomainRemovedEventType,
+		).
+		Builder()
+}
+
+func (wm *ZitadelIDPInstanceRolesInfoWriteModel) Validate() error {
+	for _, info := range wm.rolesInfo {
+		if wm.orgStates[info.OrganizationID] != domain.OrgStateActive {
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-6EDZCc", "Errors.Org.NotFound")
+		}
+		if wm.orgDomainStates[info.OrganizationID+":"+info.OrganizationDomain] != domain.OrgDomainStateActive {
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-mUqUG3", "Errors.Org.DomainNotOnOrg")
+		}
+	}
+	return nil
+}

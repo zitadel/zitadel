@@ -160,7 +160,7 @@ func Test_AddZitadelProvider(t *testing.T) {
 					},
 				},
 			},
-			wantErr: status.Error(codes.FailedPrecondition, "Organisation not found (COMMAND-QXPGs)"),
+			wantErr: status.Error(codes.FailedPrecondition, "Organisation not found (COMMAND-6EDZCc)"),
 		},
 		{
 			name: "invalid org domain in instance roles info",
@@ -189,7 +189,7 @@ func Test_AddZitadelProvider(t *testing.T) {
 					},
 				},
 			},
-			wantErr: status.Error(codes.FailedPrecondition, "Domain doesn't exist on organization (INST-mUqUG3)"),
+			wantErr: status.Error(codes.FailedPrecondition, "Domain doesn't exist on organization (COMMAND-mUqUG3)"),
 		},
 		{
 			name: "valid request without instance roles info",

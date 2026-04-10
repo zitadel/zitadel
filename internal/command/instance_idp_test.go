@@ -5941,6 +5941,7 @@ func TestCommandSide_RegenerateInstanceSAMLProviderCertificate(t *testing.T) {
 
 func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
 	filterErr := errors.New("filter error")
+	pushErr := errors.New("push error")
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
@@ -6035,7 +6036,7 @@ func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
 			},
 		},
 		{
-			name: "failed to get org",
+			name: "failed to get instance role info model",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilterError(filterErr),
@@ -6065,7 +6066,7 @@ func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, filterErr)
+					return errors.Is(err, zerrors.ThrowInternal(filterErr, "INST-i1bqpP", "Errors.Internal"))
 				},
 			},
 		},
@@ -6077,13 +6078,10 @@ func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org1.com"),
 						),
-					),
-					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "example-org1.com"),
 						),
 					),
-					expectFilter(),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -6110,57 +6108,7 @@ func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-QXPGs", "Errors.Org.NotFound"))
-				},
-			},
-		},
-		{
-			name: "failed to get org domain",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org1.com"),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "example-org1.com"),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org2").Aggregate, "org2.com"),
-						),
-					),
-					expectFilterError(filterErr),
-				),
-				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			},
-			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "instance1"),
-				provider: ZitadelProvider{
-					Name:         "name",
-					Issuer:       "issuer",
-					ClientID:     "clientID",
-					ClientSecret: "clientSecret",
-					UsePKCE:      true,
-					InstanceRolesInfo: []idp.RolesInfo{
-						{
-							OrganizationID:     "org1",
-							OrganizationDomain: "example-org1.com",
-						},
-						{
-							OrganizationID:     "org2",
-							OrganizationDomain: "example-org2.com",
-						},
-					},
-				},
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInternal(filterErr, "INST-6EDZCc", "Errors.Internal"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-6EDZCc", "Errors.Org.NotFound"))
 				},
 			},
 		},
@@ -6172,18 +6120,13 @@ func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org1.com"),
 						),
-					),
-					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "example-org1.com"),
 						),
-					),
-					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org2").Aggregate, "org2.com"),
 						),
 					),
-					expectFilter(),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -6210,7 +6153,85 @@ func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "INST-mUqUG3", "Errors.Org.DomainNotOnOrg"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-mUqUG3", "Errors.Org.DomainNotOnOrg"))
+				},
+			},
+		},
+		{
+			name: "push error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org1.com"),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "example-org1.com"),
+						),
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org2").Aggregate, "org2.com"),
+						),
+						eventFromEventPusher(
+							org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org2").Aggregate, "example-org2.com"),
+						),
+					),
+					expectFilter(),
+					expectPushFailed(
+						pushErr,
+						instance.NewZitadelIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"issuer",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							nil,
+							false,
+							true,
+							idp.Options{},
+							[]idp.RolesInfo{
+								{
+									OrganizationID:     "org1",
+									OrganizationDomain: "example-org1.com",
+								},
+								{
+									OrganizationID:     "org2",
+									OrganizationDomain: "example-org2.com",
+								},
+							},
+						),
+					),
+				),
+				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: ZitadelProvider{
+					Name:         "name",
+					Issuer:       "issuer",
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+					UsePKCE:      true,
+					InstanceRolesInfo: []idp.RolesInfo{
+						{
+							OrganizationID:     "org1",
+							OrganizationDomain: "example-org1.com",
+						},
+						{
+							OrganizationID:     "org2",
+							OrganizationDomain: "example-org2.com",
+						},
+					},
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, pushErr)
 				},
 			},
 		},
@@ -6222,18 +6243,12 @@ func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org1.com"),
 						),
-					),
-					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "example-org1.com"),
 						),
-					),
-					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org2").Aggregate, "org2.com"),
 						),
-					),
-					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org2").Aggregate, "example-org2.com"),
 						),
@@ -6304,18 +6319,12 @@ func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org1.com"),
 						),
-					),
-					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "example-org1.com"),
 						),
-					),
-					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org2").Aggregate, "org2.com"),
 						),
-					),
-					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org2").Aggregate, "example-org2.com"),
 						),

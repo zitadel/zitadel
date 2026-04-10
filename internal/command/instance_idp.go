@@ -2014,12 +2014,12 @@ func (c *Commands) validateZitadelProvider(ctx context.Context, provider *Zitade
 
 	// if InstanceRolesInfo is set, check that the org and the org domain are valid
 	if len(provider.InstanceRolesInfo) > 0 {
-		return c.validateOrgAndOrgDomain(ctx, provider)
+		return c.validateZitadelIDPOrgAndOrgDomain(ctx, provider)
 	}
 	return nil
 }
 
-func (c *Commands) validateOrgAndOrgDomain(ctx context.Context, provider *ZitadelProvider) error {
+func (c *Commands) validateZitadelIDPOrgAndOrgDomain(ctx context.Context, provider *ZitadelProvider) error {
 	for _, rolesInfo := range provider.InstanceRolesInfo {
 		if rolesInfo.OrganizationID == "" {
 			return zerrors.ThrowInvalidArgument(nil, "INST-9uEJaM", "Errors.Invalid.Argument")
@@ -2027,17 +2027,10 @@ func (c *Commands) validateOrgAndOrgDomain(ctx context.Context, provider *Zitade
 		if rolesInfo.OrganizationDomain == "" {
 			return zerrors.ThrowInvalidArgument(nil, "INST-y4Ib4D", "Errors.Invalid.Argument")
 		}
-		err := c.checkOrgExists(ctx, rolesInfo.OrganizationID)
-		if err != nil {
-			return err
-		}
-		existingOrgDomain, err := c.getOrgDomainWriteModel(ctx, rolesInfo.OrganizationID, rolesInfo.OrganizationDomain)
-		if err != nil {
-			return zerrors.ThrowInternal(err, "INST-6EDZCc", "Errors.Internal")
-		}
-		if existingOrgDomain.State != domain.OrgDomainStateActive {
-			return zerrors.ThrowPreconditionFailed(nil, "INST-mUqUG3", "Errors.Org.DomainNotOnOrg")
-		}
 	}
-	return nil
+	instanceRolesInfoWM := NewZitadelIDPInstanceRolesInfoWriteModel(provider.InstanceRolesInfo)
+	if err := c.eventstore.FilterToQueryReducer(ctx, instanceRolesInfoWM); err != nil {
+		return zerrors.ThrowInternal(err, "INST-i1bqpP", "Errors.Internal")
+	}
+	return instanceRolesInfoWM.Validate()
 }
