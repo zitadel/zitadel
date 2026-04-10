@@ -1271,7 +1271,58 @@ func (p *relationalTablesProjection) reducePrivacyPolicyAdded(event eventstore.E
 		}
 
 		settingsRepo := repository.LinksSettingsRepository()
-		//email := string(policyEvent.SupportEmail)
+
+		links := make([]domain.Link, 0, 6)
+
+		if policyEvent.TOSLink != "" {
+			links = append(links, domain.Link{
+				Type:   domain.LinkTypeTermsOfService,
+				URL:    policyEvent.TOSLink,
+				Target: domain.LinkTargetBlank,
+			})
+		}
+
+		if policyEvent.PrivacyLink != "" {
+			links = append(links, domain.Link{
+				Type:   domain.LinkTypePrivacyPolicy,
+				URL:    policyEvent.PrivacyLink,
+				Target: domain.LinkTargetBlank,
+			})
+		}
+
+		if policyEvent.HelpLink != "" {
+			links = append(links, domain.Link{
+				Type:   domain.LinkTypeHelp,
+				URL:    policyEvent.HelpLink,
+				Target: domain.LinkTargetBlank,
+			})
+		}
+
+		if policyEvent.SupportEmail != "" {
+			links = append(links, domain.Link{
+				Type:   domain.LinkTypeSupport,
+				URL:    string(policyEvent.SupportEmail),
+				Target: domain.LinkTargetBlank,
+			})
+		}
+
+		if policyEvent.DocsLink != "" {
+			links = append(links, domain.Link{
+				Type:   domain.LinkTypeDocs,
+				URL:    policyEvent.DocsLink,
+				Target: domain.LinkTargetBlank,
+			})
+		}
+
+		if policyEvent.CustomLink != "" {
+			links = append(links, domain.Link{
+				Type:           domain.LinkTypeCustom,
+				URL:            policyEvent.CustomLink,
+				TranslationKey: &policyEvent.CustomLinkText,
+				Target:         domain.LinkTargetBlank,
+			})
+		}
+
 		settings := domain.LinksSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
@@ -1280,29 +1331,7 @@ func (p *relationalTablesProjection) reducePrivacyPolicyAdded(event eventstore.E
 				UpdatedAt:      policyEvent.Creation,
 			},
 			LinksSettingsAttributes: domain.LinksSettingsAttributes{
-				Links: []domain.Link{
-					{
-						Type:   gu.Ptr(domain.LinkTypeTermsOfService),
-						URL:    gu.Ptr("https://host"),
-						Target: gu.Ptr(domain.LinkTargetBlank),
-					},
-					{
-						Type:   gu.Ptr(domain.LinkTypePrivacyPolicy),
-						URL:    gu.Ptr("https://host"),
-						Target: gu.Ptr(domain.LinkTargetBlank),
-					},
-					{
-						Type:   gu.Ptr(domain.LinkTypeSupport),
-						URL:    gu.Ptr("email"),
-						Target: gu.Ptr(domain.LinkTargetSelf),
-					},
-					{
-						Type:           gu.Ptr(domain.LinkTypeCustom),
-						URL:            gu.Ptr("https://host"),
-						TranslationKey: gu.Ptr("linktext"),
-						Target:         gu.Ptr(domain.LinkTargetBlank),
-					},
-				},
+				Links: links,
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
@@ -1329,10 +1358,58 @@ func (p *relationalTablesProjection) reducePrivacyPolicyChanged(event eventstore
 		}
 
 		settingsRepo := repository.LinksSettingsRepository()
-		//var email string
-		//if policyEvent.SupportEmail != nil {
-		//	email = string(*policyEvent.SupportEmail)
-		//}
+
+		links := make([]domain.Link, 0, 6)
+
+		if policyEvent.TOSLink != nil {
+			links = append(links, domain.Link{
+				Type:   domain.LinkTypeTermsOfService,
+				URL:    *policyEvent.TOSLink,
+				Target: domain.LinkTargetBlank,
+			})
+		}
+
+		if policyEvent.PrivacyLink != nil {
+			links = append(links, domain.Link{
+				Type:   domain.LinkTypePrivacyPolicy,
+				URL:    *policyEvent.PrivacyLink,
+				Target: domain.LinkTargetBlank,
+			})
+		}
+
+		if policyEvent.HelpLink != nil {
+			links = append(links, domain.Link{
+				Type:   domain.LinkTypeHelp,
+				URL:    *policyEvent.HelpLink,
+				Target: domain.LinkTargetBlank,
+			})
+		}
+
+		if policyEvent.SupportEmail != nil {
+			links = append(links, domain.Link{
+				Type:   domain.LinkTypeSupport,
+				URL:    string(*policyEvent.SupportEmail),
+				Target: domain.LinkTargetBlank,
+			})
+		}
+
+		if policyEvent.DocsLink != nil {
+			links = append(links, domain.Link{
+				Type:   domain.LinkTypeDocs,
+				URL:    *policyEvent.DocsLink,
+				Target: domain.LinkTargetBlank,
+			})
+		}
+
+		if policyEvent.CustomLink != nil {
+			links = append(links, domain.Link{
+				Type:           domain.LinkTypeCustom,
+				URL:            *policyEvent.CustomLink,
+				TranslationKey: policyEvent.CustomLinkText,
+				Target:         domain.LinkTargetBlank,
+			})
+		}
+
 		settings := domain.LinksSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
@@ -1340,29 +1417,7 @@ func (p *relationalTablesProjection) reducePrivacyPolicyChanged(event eventstore
 				UpdatedAt:      policyEvent.Creation,
 			},
 			LinksSettingsAttributes: domain.LinksSettingsAttributes{
-				Links: []domain.Link{
-					{
-						Type:   gu.Ptr(domain.LinkTypeTermsOfService),
-						URL:    gu.Ptr("https://host"),
-						Target: gu.Ptr(domain.LinkTargetBlank),
-					},
-					{
-						Type:   gu.Ptr(domain.LinkTypePrivacyPolicy),
-						URL:    gu.Ptr("https://host"),
-						Target: gu.Ptr(domain.LinkTargetBlank),
-					},
-					{
-						Type:   gu.Ptr(domain.LinkTypeSupport),
-						URL:    gu.Ptr("email"),
-						Target: gu.Ptr(domain.LinkTargetSelf),
-					},
-					{
-						Type:           gu.Ptr(domain.LinkTypeCustom),
-						URL:            gu.Ptr("https://host"),
-						TranslationKey: gu.Ptr("linktext"),
-						Target:         gu.Ptr(domain.LinkTargetBlank),
-					},
-				},
+				Links: links,
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)

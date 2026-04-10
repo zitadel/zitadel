@@ -444,10 +444,10 @@ const (
 )
 
 type Link struct {
-	Type           *LinkType   `json:"type,omitempty"`
-	URL            *string     `json:"url,omitempty"`
-	TranslationKey *string     `json:"translationKey,omitempty"`
-	Target         *LinkTarget `json:"target,omitempty"`
+	Type           LinkType   `json:"type"`
+	URL            string     `json:"url"`
+	Target         LinkTarget `json:"target"`
+	TranslationKey *string    `json:"translationKey,omitempty"`
 }
 
 //go:generate mockgen -typed -package domainmock -destination ./mock/links_settings.mock.go . LinksSettingsRepository

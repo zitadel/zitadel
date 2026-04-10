@@ -13,6 +13,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
@@ -1308,13 +1309,8 @@ func TestServer_TestInstanceLinksSettingsReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			assert.Equal(t, "", *setting.TOSLink)
-			assert.Equal(t, "", *setting.PrivacyPolicyLink)
-			assert.Equal(t, "", *setting.HelpLink)
-			assert.Equal(t, "", *setting.SupportEmail)
-			assert.Equal(t, "https://zitadel.com/docs", *setting.DocsLink)
-			assert.Equal(t, "", *setting.CustomLink)
-			assert.Equal(t, "", *setting.CustomLinkText)
+			assert.Len(t, setting.Links, 1)
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeDocs, URL: "https://zitadel.com/docs", Target: domain.LinkTargetBlank})
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1344,13 +1340,12 @@ func TestServer_TestInstanceLinksSettingsReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			assert.Equal(t, "https://tos.example2.com", *setting.TOSLink)
-			assert.Equal(t, "https://privacy.example2.com", *setting.PrivacyPolicyLink)
-			assert.Equal(t, "https://help.example2.com", *setting.HelpLink)
-			assert.Equal(t, "support@example2.com", *setting.SupportEmail)
-			assert.Equal(t, "https://docs.example2.com", *setting.DocsLink)
-			assert.Equal(t, "https://custom.example2.com", *setting.CustomLink)
-			assert.Equal(t, "Custom link text2", *setting.CustomLinkText)
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeTermsOfService, URL: "https://tos.example2.com", Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypePrivacyPolicy, URL: "https://privacy.example2.com", Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeHelp, URL: "https://help.example2.com", Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeSupport, URL: "support@example2.com", Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeDocs, URL: "https://docs.example2.com", Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeCustom, URL: "https://custom.example2.com", Target: domain.LinkTargetBlank, TranslationKey: gu.Ptr("Custom link text2")})
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})

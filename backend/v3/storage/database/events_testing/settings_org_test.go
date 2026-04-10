@@ -1459,18 +1459,18 @@ func TestServer_TestLinksSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLinks, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
 
-			assert.Equal(t, "https://tos.example.com", *setting.TOSLink)
-			assert.Equal(t, "https://privacy.example.com", *setting.PrivacyPolicyLink)
-			assert.Equal(t, "https://help.example.com", *setting.HelpLink)
-			assert.Equal(t, "support@example.com", *setting.SupportEmail)
-			assert.Equal(t, "https://docs.example.com", *setting.DocsLink)
-			assert.Equal(t, "https://custom.example.com", *setting.CustomLink)
-			assert.Equal(t, "Custom link text", *setting.CustomLinkText)
+			assert.Len(t, setting.Links, 6)
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeTermsOfService, URL: "https://tos.example.com", Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypePrivacyPolicy, URL: "https://privacy.example.com", Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeHelp, URL: "https://help.example.com", Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeSupport, URL: "support@example.com", Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeDocs, URL: "https://docs.example.com", Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeCustom, URL: "https://custom.example.com", Target: domain.LinkTargetBlank, TranslationKey: gu.Ptr("Custom link text")})
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1495,18 +1495,18 @@ func TestServer_TestLinksSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLinks, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
 
-			assert.Equal(t, "https://tos.example2.com", *setting.TOSLink)
-			assert.Equal(t, "https://privacy.example2.com", *setting.PrivacyPolicyLink)
-			assert.Equal(t, "https://help.example2.com", *setting.HelpLink)
-			assert.Equal(t, "support@example2.com", *setting.SupportEmail)
-			assert.Equal(t, "https://docs.example2.com", *setting.DocsLink)
-			assert.Equal(t, "https://custom.example2.com", *setting.CustomLink)
-			assert.Equal(t, "Custom link text2", *setting.CustomLinkText)
+			assert.Len(t, setting.Links, 6)
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeTermsOfService, URL: "https://tos.example2.com", Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypePrivacyPolicy, URL: "https://privacy.example2.com", Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeHelp, URL: "https://help.example2.com", Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeSupport, URL: "support@example2.com", Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeDocs, URL: "https://docs.example2.com", Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeCustom, URL: "https://custom.example2.com", Target: domain.LinkTargetBlank, TranslationKey: gu.Ptr("Custom link text2")})
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1520,7 +1520,7 @@ func TestServer_TestLinksSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLinks, domain.SettingStateActive),
 				),
 			)
 
@@ -1541,7 +1541,7 @@ func TestServer_TestLinksSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLinks, domain.SettingStateActive),
 				),
 			)
 
