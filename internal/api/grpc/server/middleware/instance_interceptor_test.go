@@ -337,9 +337,9 @@ func Test_setInstance_errorCodes(t *testing.T) {
 			wantCode: codes.Internal,
 		},
 		{
-			name:     "unavailable error from verifier propagates as Internal",
+			name:     "unavailable error from verifier propagates as Unavailable",
 			err:      zerrors.ThrowUnavailable(nil, "TEST-003", "Errors.Unavailable"),
-			wantCode: codes.Internal,
+			wantCode: codes.Unavailable,
 		},
 	}
 
