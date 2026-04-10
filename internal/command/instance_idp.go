@@ -1952,7 +1952,7 @@ func (c *Commands) AddInstanceZitadelProvider(ctx context.Context, provider Zita
 	}
 
 	writeModel := NewInstanceZitadelIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceZitadelProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceZitadelProvider(instanceAgg, writeModel, provider)) //nolint:staticcheck
 	if err != nil {
 		return "", nil, err
 	}
