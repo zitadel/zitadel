@@ -31,7 +31,6 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getTranslations } from "next-intl/server";
 
-
 import { getUserAgent } from "./fingerprint";
 import { createLogger } from "./logger";
 
