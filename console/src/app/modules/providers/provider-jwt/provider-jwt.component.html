@@ -28,6 +28,7 @@
       [autofillLink]="autofillLink$ | async"
       [activateLink]="activateLink$ | async"
       [expanded]="!!(expandWhatNow$ | async)"
+      [copyUrls]="copyUrls$ | async"
       (activate)="activate()"
     ></cnsl-provider-next>
 
