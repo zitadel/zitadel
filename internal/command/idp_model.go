@@ -2345,6 +2345,9 @@ func (wm *ZitadelIDPWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *idp.ZitadelIDPAddedEvent:
 			wm.reduceAddedEvent(e)
+		case *idp.ZitadelIDPChangedEvent:
+			// todo (@grvijayan): to please the linter for now
+			wm.reduceChangedEvent(e)
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -2361,4 +2364,8 @@ func (wm *ZitadelIDPWriteModel) reduceAddedEvent(e *idp.ZitadelIDPAddedEvent) {
 	wm.Options = e.Options
 	wm.InstanceRolesInfo = e.InstanceRolesInfo
 	wm.State = domain.IDPStateActive
+}
+
+func (wm *ZitadelIDPWriteModel) reduceChangedEvent(e *idp.ZitadelIDPChangedEvent) {
+	// todo (@grvijayan): will be implemented along with UpdateZitadelProvider changes
 }

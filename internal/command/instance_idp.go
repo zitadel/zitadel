@@ -1945,6 +1945,12 @@ func (c *Commands) AddInstanceZitadelProvider(ctx context.Context, provider Zita
 	if err != nil {
 		return "", nil, err
 	}
+
+	err = c.validateZitadelProvider(ctx, &provider)
+	if err != nil {
+		return "", nil, err
+	}
+
 	writeModel := NewInstanceZitadelIDPWriteModel(instanceID, id)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceZitadelProvider(instanceAgg, writeModel, provider))
 	if err != nil {
@@ -1959,18 +1965,6 @@ func (c *Commands) AddInstanceZitadelProvider(ctx context.Context, provider Zita
 
 func (c *Commands) prepareAddInstanceZitadelProvider(a *instance.Aggregate, writeModel *InstanceZitadelIDPWriteModel, provider ZitadelProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "INST-Sgtj5", "Errors.Invalid.Argument")
-		}
-		if provider.Issuer = strings.TrimSpace(provider.Issuer); provider.Issuer == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "INST-Hz6zj", "Errors.Invalid.Argument")
-		}
-		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "INST-fb5jm", "Errors.Invalid.Argument")
-		}
-		if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "INST-Sfdf4", "Errors.Invalid.Argument")
-		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -2002,4 +1996,48 @@ func (c *Commands) prepareAddInstanceZitadelProvider(a *instance.Aggregate, writ
 			}, nil
 		}, nil
 	}
+}
+
+func (c *Commands) validateZitadelProvider(ctx context.Context, provider *ZitadelProvider) error {
+	if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+		return zerrors.ThrowInvalidArgument(nil, "INST-Sgtj5", "Errors.Invalid.Argument")
+	}
+	if provider.Issuer = strings.TrimSpace(provider.Issuer); provider.Issuer == "" {
+		return zerrors.ThrowInvalidArgument(nil, "INST-Hz6zj", "Errors.Invalid.Argument")
+	}
+	if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+		return zerrors.ThrowInvalidArgument(nil, "INST-fb5jm", "Errors.Invalid.Argument")
+	}
+	if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
+		return zerrors.ThrowInvalidArgument(nil, "INST-Sfdf4", "Errors.Invalid.Argument")
+	}
+
+	// if InstanceRolesInfo is set, check that the org and the org domain are valid
+	if len(provider.InstanceRolesInfo) > 0 {
+		return c.validateOrgAndOrgDomain(ctx, provider)
+	}
+	return nil
+}
+
+func (c *Commands) validateOrgAndOrgDomain(ctx context.Context, provider *ZitadelProvider) error {
+	for _, rolesInfo := range provider.InstanceRolesInfo {
+		if rolesInfo.OrganizationID == "" {
+			return zerrors.ThrowInvalidArgument(nil, "INST-9uEJaM", "Errors.Invalid.Argument")
+		}
+		if rolesInfo.OrganizationDomain == "" {
+			return zerrors.ThrowInvalidArgument(nil, "INST-y4Ib4D", "Errors.Invalid.Argument")
+		}
+		err := c.checkOrgExists(ctx, rolesInfo.OrganizationID)
+		if err != nil {
+			return err
+		}
+		existingOrgDomain, err := c.getOrgDomainWriteModel(ctx, rolesInfo.OrganizationID, rolesInfo.OrganizationDomain)
+		if err != nil {
+			return zerrors.ThrowInternal(err, "INST-6EDZCc", "Errors.Internal")
+		}
+		if existingOrgDomain.State != domain.OrgDomainStateActive {
+			return zerrors.ThrowPreconditionFailed(nil, "INST-mUqUG3", "Errors.Org.DomainNotOnOrg")
+		}
+	}
+	return nil
 }

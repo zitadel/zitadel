@@ -73,3 +73,8 @@ func ZitadelIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error
 
 	return e, nil
 }
+
+type ZitadelIDPChangedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	// todo (@grvijayan): will be added along with UpdateZitadelProvider changes
+}
