@@ -6,11 +6,9 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 )
 
-func DomainLinkSettingsModelToGRPCResponse(model *domain.LinkSettings) (*settings.LinkSettings, error) {
-	ls := &settings.LinkSettings{
-		Links: make([]*settings.Link, len(model.Links), len(model.Links)),
-	}
-	for i, l := range model.Links {
+func DomainLinksModelToGRPCResponse(models []domain.Link) ([]*settings.Link, error) {
+	ls := make([]*settings.Link, len(models), len(models))
+	for i, l := range models {
 		tp, err := domainLinkTypeToGrpc(l.Type)
 		if err != nil {
 			return nil, err
@@ -21,7 +19,7 @@ func DomainLinkSettingsModelToGRPCResponse(model *domain.LinkSettings) (*setting
 			return nil, err
 		}
 
-		ls.Links[i] = &settings.Link{
+		ls[i] = &settings.Link{
 			Type:           tp,
 			Url:            l.Url,
 			TranslationKey: l.TranslationKey,
@@ -119,5 +117,13 @@ func grpcLinkTargetToDomain(target settings.LinkTarget) (domain.LinkTarget, erro
 		return domain.LinkTypeBlank, nil
 	default:
 		return domain.LinkTargetUnspecified, zerrors.ThrowInvalidArgumentf(nil, "yJJTA3", "unknown target type %v", target)
+	}
+}
+
+func DomainSettingsSourceToSourceToGrpc(s domain.SettingsSource) (settings.Source, error) {
+	switch s {
+	// TODO(wim): add cases
+	default:
+		return settings.Source_SOURCE_UNSPECIFIED, zerrors.ThrowInvalidArgumentf(nil, "fylcBu", "unknown source %v", s)
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"connectrpc.com/connect"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/backend/v3/api/settings/v2/convert"
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -22,20 +23,26 @@ func GetLinkSettings(ctx context.Context, request *connect.Request[settings.GetL
 	}
 
 	res := q.Result()
-	linkSettings, err := convert.DomainLinkSettingsModelToGRPCResponse(res)
+
+	ls, err := convert.DomainLinksModelToGRPCResponse(res.Links)
+	if err != nil {
+		return nil, err
+	}
+
+	source, err := convert.DomainSettingsSourceToSourceToGrpc(res.Source)
 	if err != nil {
 		return nil, err
 	}
 
 	return &connect.Response[settings.GetLinkSettingsResponse]{
 		Msg: &settings.GetLinkSettingsResponse{
-			Settings: linkSettings,
-			Source:   0,
+			Settings: &settings.LinkSettings{Links: ls},
+			Source:   source,
 		},
 	}, nil
 }
 
-func SetLinkSettings(ctx context.Context, request *connect.Request[settings.SetLinkSettingsRequest]) (*connect.Response[settings.GetLinkSettingsResponse], error) {
+func SetLinkSettings(ctx context.Context, request *connect.Request[settings.SetLinkSettingsRequest]) (*connect.Response[settings.SetLinkSettingsResponse], error) {
 	ls, err := convert.GrpcLinksToDomain(request.Msg.GetLinks())
 	if err != nil {
 		return nil, err
@@ -52,7 +59,16 @@ func SetLinkSettings(ctx context.Context, request *connect.Request[settings.SetL
 		return nil, err
 	}
 
-	// TODO(wim): should a query be invoked to retrieve the return object?
+	changeDate := cmd.Result()
+
+	return &connect.Response[settings.SetLinkSettingsResponse]{
+		Msg: &settings.SetLinkSettingsResponse{
+			ChangeDate: timestamppb.New(changeDate),
+			Settings: &settings.LinkSettings{
+				Links: request.Msg.GetLinks(),
+			},
+		},
+	}, nil
 }
 
 func ResetLinkSettings(ctx context.Context, request *connect.Request[settings.ResetLinkSettingsRequest]) (*connect.Response[settings.ResetLinkSettingsResponse], error) {
@@ -66,5 +82,17 @@ func ResetLinkSettings(ctx context.Context, request *connect.Request[settings.Re
 		return nil, err
 	}
 
-	// TODO(wim): should a query be invoked to retrieve the return object?
+	res := cmd.Result()
+
+	links, err := convert.DomainLinksModelToGRPCResponse(res.Links)
+	if err != nil {
+		return nil, err
+	}
+
+	return &connect.Response[settings.ResetLinkSettingsResponse]{
+		Msg: &settings.ResetLinkSettingsResponse{
+			ChangeDate: timestamppb.New(res.ChangeTime),
+			Settings:   &settings.LinkSettings{Links: links},
+		},
+	}, nil
 }
