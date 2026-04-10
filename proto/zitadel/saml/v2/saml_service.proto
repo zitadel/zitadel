@@ -217,7 +217,7 @@ message Session {
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 200;
+      max_length: 500;
     }
   ];
 }

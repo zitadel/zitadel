@@ -324,7 +324,7 @@ message GetSessionRequest{
     (validate.rules).string = {min_len: 1, max_len: 500},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 200;
+      max_length: 500;
       example: "\"222430354126975533\"";
     }
    ];
