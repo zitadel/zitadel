@@ -6,12 +6,10 @@ func ThrowInvalidArgumentError(parent error, slug Slug, message string, details 
 	return CreateZitadelError(KindInvalidArgument, parent, string(slug), message, 1).WithDetails(details)
 }
 
-// Deprecated: use ThrowInvalidArgumentError instead
 func ThrowInvalidArgument(parent error, id, message string) error {
 	return CreateZitadelError(KindInvalidArgument, parent, id, message, 1)
 }
 
-// Deprecated: use ThrowInvalidArgumentError instead
 func ThrowInvalidArgumentf(parent error, id, format string, a ...any) error {
 	return CreateZitadelError(KindInvalidArgument, parent, id, fmt.Sprintf(format, a...), 1)
 }

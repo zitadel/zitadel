@@ -6,12 +6,10 @@ func ThrowAlreadyExistsError(parent error, slug Slug, message string, details Er
 	return CreateZitadelError(KindAlreadyExists, parent, string(slug), message, 1).WithDetails(details)
 }
 
-// Deprecated: use ThrowAlreadyExistsError instead
 func ThrowAlreadyExists(parent error, id, message string) error {
 	return CreateZitadelError(KindAlreadyExists, parent, id, message, 1)
 }
 
-// Deprecated: use ThrowAlreadyExistsError instead
 func ThrowAlreadyExistsf(parent error, id, format string, a ...any) error {
 	return CreateZitadelError(KindAlreadyExists, parent, id, fmt.Sprintf(format, a...), 1)
 }

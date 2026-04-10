@@ -6,12 +6,10 @@ func ThrowNotFoundError(parent error, slug Slug, message string, details ErrorDe
 	return CreateZitadelError(KindNotFound, parent, string(slug), message, 1).WithDetails(details)
 }
 
-// Deprecated: use ThrowNotFoundError instead
 func ThrowNotFound(parent error, id, message string) error {
 	return CreateZitadelError(KindNotFound, parent, id, message, 1)
 }
 
-// Deprecated: use ThrowNotFoundError instead
 func ThrowNotFoundf(parent error, id, format string, a ...any) error {
 	return CreateZitadelError(KindNotFound, parent, id, fmt.Sprintf(format, a...), 1)
 }

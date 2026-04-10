@@ -6,12 +6,10 @@ func ThrowUnavailableError(parent error, slug Slug, message string, details Erro
 	return CreateZitadelError(KindUnavailable, parent, string(slug), message, 1).WithDetails(details)
 }
 
-// Deprecated: use ThrowUnavailableError instead
 func ThrowUnavailable(parent error, id, message string) error {
 	return CreateZitadelError(KindUnavailable, parent, id, message, 1)
 }
 
-// Deprecated: use ThrowUnavailableError instead
 func ThrowUnavailablef(parent error, id, format string, a ...any) error {
 	return CreateZitadelError(KindUnavailable, parent, id, fmt.Sprintf(format, a...), 1)
 }
