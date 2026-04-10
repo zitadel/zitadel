@@ -1,4 +1,3 @@
-import * as https from "node:https";
 import { createConnectTransport } from "@connectrpc/connect-node";
 import { Client, create, Duration } from "@zitadel/client";
 import { makeReqCtx } from "@zitadel/client/v2";
@@ -31,6 +30,7 @@ import {
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getTranslations } from "next-intl/server";
+import * as https from "node:https";
 
 import { getUserAgent } from "./fingerprint";
 import { createLogger } from "./logger";
