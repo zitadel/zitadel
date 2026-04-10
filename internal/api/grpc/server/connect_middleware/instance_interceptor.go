@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/gerrors"
 	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -81,7 +82,8 @@ func addInstanceByDomain(ctx context.Context, req connect.AnyRequest, handler co
 		if errors.As(err, &notFoundErr) && notFoundErr.Kind == zerrors.KindNotFound {
 			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
 		}
-		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("unable to set instance using domain %s: %w", domain, notFoundErr))
+		code, _, _ := gerrors.ExtractZITADELError(err)
+		return nil, connect.NewError(connect.Code(code), fmt.Errorf("unable to set instance using domain %s: %w", domain, err))
 	}
 	return handler(authz.WithInstance(ctx, instance), req)
 }
@@ -97,12 +99,12 @@ func addInstanceByRequestedHost(ctx context.Context, req connect.AnyRequest, han
 		origin := zitadel_http.DomainContext(ctx)
 		logging.WithFields("origin", requestContext.Origin(), "externalDomain", externalDomain).WithError(err).Error("unable to set instance")
 		zErr := new(zerrors.ZitadelError)
+		code, _, _ := gerrors.ExtractZITADELError(err)
 		if errors.As(err, &zErr) {
 			zErr.SetMessage(translator.LocalizeFromCtx(ctx, zErr.GetMessage(), nil))
-			zErr.Parent = err
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("unable to set instance using origin %s (ExternalDomain is %s): %s", origin, externalDomain, zErr.Error()))
+			return nil, connect.NewError(connect.Code(code), fmt.Errorf("unable to set instance using origin %s (ExternalDomain is %s): %s", origin, externalDomain, zErr.Error()))
 		}
-		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("unable to set instance using origin %s (ExternalDomain is %s)", origin, externalDomain))
+		return nil, connect.NewError(connect.Code(code), fmt.Errorf("unable to set instance using origin %s (ExternalDomain is %s)", origin, externalDomain))
 	}
 	return handler(authz.WithInstance(ctx, instance), req)
 }
