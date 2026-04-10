@@ -135,7 +135,7 @@ func extractError(err error) (c codes.Code, msg, id string, lvl slog.Level) {
 }
 
 func grpcStatusLevel(code codes.Code) slog.Level {
-	switch code {
+	switch code { //nolint:exhaustive
 	case codes.AlreadyExists,
 		codes.Canceled,
 		codes.FailedPrecondition,
