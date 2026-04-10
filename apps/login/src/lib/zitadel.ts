@@ -30,7 +30,7 @@ import {
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getTranslations } from "next-intl/server";
-import * as https from "node:https";
+
 
 import { getUserAgent } from "./fingerprint";
 import { createLogger } from "./logger";
@@ -1380,9 +1380,6 @@ export function createServerTransport(token: string, serviceConfig: ServiceConfi
   return createConnectTransport({
     httpVersion: "1.1",
     baseUrl: serviceConfig.baseUrl,
-    nodeOptions: {
-      agent: new https.Agent({ keepAlive: false }),
-    },
     interceptors: [otelGrpcInterceptor, errorClassificationInterceptor, authorizationInterceptor, headerInterceptor],
   });
 }
