@@ -7,7 +7,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/protoadapt"
 
 	commandErrors "github.com/zitadel/zitadel/internal/command/errors"
@@ -47,6 +49,14 @@ func TestCaosToGRPCError(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestZITADELToGRPCError_PreservesGRPCStatus(t *testing.T) {
+	err := ZITADELToGRPCError(t.Context(), status.Error(codes.Unauthenticated, "auth header missing"))
+	grpcStatus, ok := status.FromError(err)
+	require.True(t, ok)
+	assert.Equal(t, codes.Unauthenticated, grpcStatus.Code())
+	assert.Equal(t, "auth header missing", grpcStatus.Message())
 }
 
 func Test_getErrorInfo(t *testing.T) {
@@ -204,6 +214,14 @@ func Test_extractError(t *testing.T) {
 			"unknown",
 			"",
 			slog.LevelError,
+		},
+		{
+			"grpc unauthenticated",
+			args{status.Error(codes.Unauthenticated, "auth header missing")},
+			codes.Unauthenticated,
+			"auth header missing",
+			"",
+			slog.LevelWarn,
 		},
 	}
 	for _, tt := range tests {
