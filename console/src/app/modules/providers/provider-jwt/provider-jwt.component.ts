@@ -68,6 +68,7 @@ export class ProviderJWTComponent {
     this.service$,
   );
   public expandWhatNow$ = this.nextSvc.expandWhatNow(this.id$, this.activateLink$, this.justCreated$);
+  protected readonly copyUrls$ = this.nextSvc.jwtCallbackUrls();
 
   constructor(
     private authService: GrpcAuthService,
@@ -208,7 +209,7 @@ export class ProviderJWTComponent {
       this.loading = true;
       this.service
         .updateJWTProvider(req)
-        .then((idp) => {
+        .then(() => {
           setTimeout(() => {
             this.loading = false;
             this.close();

@@ -31,7 +31,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
             disabled={disabled}
             type="checkbox"
             className={classNames(
-              "form-checkbox rounded border-gray-300 text-primary-light-500 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 focus:ring-offset-0 dark:text-primary-dark-500",
+              "form-checkbox text-primary-light-500 focus:ring-opacity-50 dark:text-primary-dark-500 rounded border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-offset-0",
               className,
             )}
             {...props}

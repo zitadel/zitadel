@@ -2,6 +2,7 @@ package authz
 
 import (
 	"context"
+	"crypto"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
@@ -13,7 +14,7 @@ import (
 	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
-	"github.com/zitadel/zitadel/internal/crypto"
+	zcrypto "github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -89,7 +90,7 @@ type SystemAPIUser struct {
 }
 
 type SystemAPIPublicKey struct {
-	Data      *rsa.PublicKey
+	Data      crypto.PublicKey
 	NotBefore *time.Time
 	NotAfter  *time.Time
 }
@@ -104,7 +105,7 @@ func (s *SystemAPIUser) readKey() (*SystemAPIPublicKey, error) {
 	}
 
 	// when an RSA key is provided, use the raw data
-	key, err := crypto.BytesToPublicKey(s.KeyData)
+	key, err := zcrypto.BytesToPublicKey(s.KeyData)
 	if err == nil {
 		return &SystemAPIPublicKey{Data: key}, nil
 	}

@@ -209,7 +209,7 @@ export class ProviderGoogleComponent {
         this.loading = true;
         (this.service as ManagementService)
           .updateGoogleProvider(req)
-          .then((idp) => {
+          .then(() => {
             setTimeout(() => {
               this.loading = false;
               this.close();
@@ -234,7 +234,7 @@ export class ProviderGoogleComponent {
         this.loading = true;
         (this.service as AdminService)
           .updateGoogleProvider(req)
-          .then((idp) => {
+          .then(() => {
             setTimeout(() => {
               this.loading = false;
               this.close();

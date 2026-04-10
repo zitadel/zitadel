@@ -106,7 +106,7 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
       {uri && (
         <>
           <QRCodeSVG className="my-4 h-40 w-40 rounded-md bg-white p-2" value={uri} />
-          <div className="my-2 mb-4 flex w-96 rounded-lg border border-divider-light px-4 py-2 pr-2 text-sm dark:border-divider-dark">
+          <div className="border-divider-light dark:border-divider-dark my-2 mb-4 flex w-96 rounded-lg border px-4 py-2 pr-2 text-sm">
             <Link href={uri} target="_blank" className="flex-1 overflow-x-auto">
               {uri}
             </Link>

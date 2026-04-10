@@ -213,7 +213,7 @@ export class ProviderGitlabComponent {
       this.loading = true;
       this.service
         .updateGitLabProvider(req)
-        .then((idp) => {
+        .then(() => {
           setTimeout(() => {
             this.loading = false;
             this.close();
