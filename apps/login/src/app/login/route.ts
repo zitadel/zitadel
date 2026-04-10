@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       return await handleOIDCFlowInitiation(flowParams);
     } catch (error) {
       const status = isClassifiedError(error) ? error.httpStatus : 500;
-      const message = error instanceof Error ? error.message : "Unknown error";
+      const message = isClassifiedError(error) ? error.message : "Authentication flow failed";
       logger.error("OIDC flow initiation failed", { error, status });
       return NextResponse.json({ error: message }, { status });
     }
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
       return await handleSAMLFlowInitiation(flowParams);
     } catch (error) {
       const status = isClassifiedError(error) ? error.httpStatus : 500;
-      const message = error instanceof Error ? error.message : "Unknown error";
+      const message = isClassifiedError(error) ? error.message : "SAML flow failed";
       logger.error("SAML flow initiation failed", { error, status });
       return NextResponse.json({ error: message }, { status });
     }
