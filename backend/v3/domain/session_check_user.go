@@ -88,7 +88,7 @@ func (u *UserCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 	}
 
 	if session.UserID != "" && u.FetchedUser.ID != "" && session.UserID != u.FetchedUser.ID {
-		return ErrSessionUserChange
+		return ErrSessionUserChange()
 	}
 	userFactor := &SessionFactorUser{
 		UserID:         u.FetchedUser.ID,
@@ -124,10 +124,10 @@ func (u *UserCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err 
 	}
 
 	if u.SessionID == "" {
-		return ErrIDMissing // TODO: precondition failed vs invalid argument
+		return ErrIDMissing() // TODO: precondition failed vs invalid argument
 	}
 	if u.InstanceID == "" {
-		return ErrInstanceIDMissing // TODO: precondition failed vs invalid argument
+		return ErrInstanceIDMissing() // TODO: precondition failed vs invalid argument
 	}
 
 	if authZErr := opts.Permissions.CheckSessionPermission(ctx, SessionWritePermission, u.SessionID); authZErr != nil {

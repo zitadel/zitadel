@@ -29,32 +29,40 @@ var (
 
 var (
 	// ErrIDMissing is an error that can be returned on any resource if the necessary (resource) ID is missing
-	ErrIDMissing = zerrors.ThrowInvalidArgumentError(nil, SlugRequestInvalid, "validation failed: id is required", zerrors.ErrorDetailsMap{"id": "required"})
+	ErrIDMissing = func() error {
+		return zerrors.CreateZitadelError(zerrors.KindInvalidArgument, nil, string(SlugRequestInvalid), "validation failed: id is required", 1).
+			WithDetails(zerrors.ErrorDetailsMap{"id": "required"})
+	}
 
 	// ErrInstanceIDMissing is an error that can be returned on any resource if the necessary instance ID is missing
-	ErrInstanceIDMissing = zerrors.ThrowInvalidArgumentError(nil, SlugRequestInvalid, "validation failed: instance_id is required", zerrors.ErrorDetailsMap{"instance_id": "required"})
+	ErrInstanceIDMissing = func() error {
+		return zerrors.CreateZitadelError(zerrors.KindInvalidArgument, nil, string(SlugRequestInvalid), "validation failed: instance_id is required", 1).
+			WithDetails(zerrors.ErrorDetailsMap{"instance_id": "required"})
+	}
 
 	// ErrInvalidRequest is a general error for any invalid request type, like missing or wrong parameters.
 	ErrInvalidRequest = func(message string) error {
-		return zerrors.ThrowInvalidArgumentError(nil, SlugRequestInvalid, message, nil)
+		return zerrors.CreateZitadelError(zerrors.KindInvalidArgument, nil, string(SlugRequestInvalid), message, 1)
 	}
 
 	// ErrInternal is a general error for any internal error, where the client doesn't have any influence on the error.
 	// This error should be used for any error that is not caused by the client's request, but rather by an unexpected condition in the server.
 	ErrInternal = func(err error, message string) error {
-		return zerrors.ThrowInternalError(err, SlugInternalError, message, nil)
+		return zerrors.CreateZitadelError(zerrors.KindInternal, err, string(SlugInternalError), message, 1)
 	}
 
 	// ErrMoreThanOneRowAffected is an error that can be returned when a database operation affects more rows than expected,
 	// which could indicate a potential issue with the query or the data integrity.
 	ErrMoreThanOneRowAffected = func(message string, rows int64) error {
-		return zerrors.ThrowInternalError(nil, SlugInternalError, message, zerrors.ErrorDetailsMap{"rows": rows})
+		return zerrors.CreateZitadelError(zerrors.KindInternal, nil, string(SlugInternalError), message, 1).
+			WithDetails(zerrors.ErrorDetailsMap{"rows": rows})
 	}
 
 	// ErrAuthMissingPermission is an error that can be returned when a user tries to perform an action that requires a specific permission,
 	// but the user does not have that permission.
 	ErrAuthMissingPermission = func(err error, message, permission string) error {
-		return zerrors.ThrowPermissionDeniedError(err, SlugAuthMissingPermission, message, zerrors.ErrorDetailsMap{"permission": permission})
+		return zerrors.CreateZitadelError(zerrors.KindPermissionDenied, err, string(SlugAuthMissingPermission), message, 1).
+			WithDetails(zerrors.ErrorDetailsMap{"permission": permission})
 	}
 )
 

@@ -2,10 +2,6 @@ package zerrors
 
 import "fmt"
 
-func ThrowUnauthenticatedError(parent error, slug Slug, message string, details ErrorDetails) error {
-	return CreateZitadelError(KindUnauthenticated, parent, string(slug), message, 1).WithDetails(details)
-}
-
 func ThrowUnauthenticated(parent error, id, message string) error {
 	return CreateZitadelError(KindUnauthenticated, parent, id, message, 1)
 }

@@ -241,11 +241,11 @@ func AssertErrorDetail(t *testing.T, detail, targetDetail *errorpb.ErrorDetail) 
 	if !assert.Equal(t, targetDetail.GetSlug(), detail.GetSlug(), "expected different slug") {
 		return false
 	}
-	if targetDetail.GetMessage() != "" {
-		return assert.Equal(t, targetDetail.GetMessage(), detail.GetMessage(), "expected different message")
+	if targetDetail.GetMessage() != "" && !assert.Equal(t, targetDetail.GetMessage(), detail.GetMessage(), "expected different message") {
+		return false
 	}
-	if targetDetail.GetDetails() != nil {
-		assert.Equal(t, targetDetail.GetDetails().AsMap(), detail.GetDetails().AsMap(), "expected different details")
+	if targetDetail.GetDetails() != nil && !assert.Equal(t, targetDetail.GetDetails().AsMap(), detail.GetDetails().AsMap(), "expected different details") {
+		return false
 	}
 	return true
 }

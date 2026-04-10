@@ -107,7 +107,7 @@ func (*DeleteSessionCommand) String() string {
 // Validate implements [Commander].
 func (cmd *DeleteSessionCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
 	if cmd.ID = strings.TrimSpace(cmd.ID); cmd.ID == "" {
-		return ErrIDMissing
+		return ErrIDMissing()
 	}
 	return nil
 }

@@ -2,10 +2,6 @@ package zerrors
 
 import "fmt"
 
-func ThrowPreconditionFailedError(parent error, slug Slug, message string, details ErrorDetails) error {
-	return CreateZitadelError(KindPreconditionFailed, parent, string(slug), message, 1).WithDetails(details)
-}
-
 func ThrowPreconditionFailed(parent error, id, message string) error {
 	return CreateZitadelError(KindPreconditionFailed, parent, id, message, 1)
 }

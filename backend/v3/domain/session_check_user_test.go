@@ -43,7 +43,7 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 			cmd: &domain.UserCheckCommand{
 				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
 			},
-			expectedError: domain.ErrIDMissing,
+			expectedError: domain.ErrIDMissing(),
 		},
 		{
 			testName: "when instance ID is not set should return error",
@@ -51,7 +51,7 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
 				SessionID:      "session-1",
 			},
-			expectedError: domain.ErrInstanceIDMissing,
+			expectedError: domain.ErrInstanceIDMissing(),
 		},
 		{
 			testName: "when permission check fails should return permission denied error",
@@ -385,7 +385,7 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					OrganizationID: "org-1",
 				},
 			},
-			expectedError: domain.ErrSessionUserChange,
+			expectedError: domain.ErrSessionUserChange(),
 		},
 		{
 			testName: "when session update fails should return error",

@@ -2,10 +2,6 @@ package zerrors
 
 import "fmt"
 
-func ThrowResourceExhaustedError(parent error, slug Slug, message string, details ErrorDetails) error {
-	return CreateZitadelError(KindResourceExhausted, parent, string(slug), message, 1).WithDetails(details)
-}
-
 func ThrowResourceExhausted(parent error, id, message string) error {
 	return CreateZitadelError(KindResourceExhausted, parent, id, message, 1)
 }

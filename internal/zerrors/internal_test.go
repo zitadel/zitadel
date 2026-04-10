@@ -54,28 +54,6 @@ func TestInternal(t *testing.T) {
 		}
 	})
 
-	t.Run("ThrowInternalError", func(t *testing.T) {
-		slug := zerrors.Slug(id)
-		details := zerrors.ErrorDetailsMap{"details": "details"}
-
-		err := zerrors.ThrowInternalError(parentErr, slug, message, details)
-		assert.NotNil(t, err)
-
-		zitadelErr, ok := zerrors.AsZitadelError(err)
-		assert.True(t, ok)
-		assert.Equal(t, zerrors.KindInternal, zitadelErr.Kind)
-
-		zitadelError := new(zerrors.ZitadelError)
-		if errors.As(err, &zitadelError) {
-			assert.Equal(t, parentErr, zitadelError.Unwrap())
-			assert.Equal(t, id, zitadelError.ID)
-			assert.Equal(t, message, zitadelError.Message)
-			assert.Equal(t, details, zitadelError.Details)
-		} else {
-			t.Errorf("error is not of type ZitadelError")
-		}
-	})
-
 	t.Run("IsInternal", func(t *testing.T) {
 		err := zerrors.ThrowInternal(parentErr, id, message)
 		isInternal := zerrors.IsInternal(err)

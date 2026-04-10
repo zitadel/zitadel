@@ -151,7 +151,7 @@ func getErrorInfo(ctx context.Context, id, key string, err error) protoadapt.Mes
 		details := new(structpb.Struct)
 		err = details.UnmarshalJSON(errDetails)
 		if err != nil {
-			logging.WithError(ctx, err).Error("unable to marshal error details")
+			logging.WithError(ctx, err).Error("unable to unmarshal error details")
 			return &errorpb.ErrorDetail{Slug: id, Message: key}
 		}
 		return &errorpb.ErrorDetail{Slug: id, Message: key, Details: details}

@@ -2,10 +2,6 @@ package zerrors
 
 import "fmt"
 
-func ThrowUnimplementedError(parent error, slug Slug, message string, details ErrorDetails) error {
-	return CreateZitadelError(KindUnimplemented, parent, string(slug), message, 1).WithDetails(details)
-}
-
 func ThrowUnimplemented(parent error, id, message string) error {
 	return CreateZitadelError(KindUnimplemented, parent, id, message, 1)
 }

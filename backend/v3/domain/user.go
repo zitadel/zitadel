@@ -265,12 +265,14 @@ var (
 var (
 	// ErrUserNotFound is an error that can be used when a user is not found by the provided identifier.
 	ErrUserNotFound = func(err error, identifier string) error {
-		return zerrors.ThrowNotFoundError(err, SlugUserNotFound, "user was not found", zerrors.ErrorDetailsMap{"identifier": identifier})
+		return zerrors.CreateZitadelError(zerrors.KindNotFound, err, string(SlugUserNotFound), "user was not found", 1).
+			WithDetails(zerrors.ErrorDetailsMap{"identifier": identifier})
 	}
 
 	// ErrUserNotActive is an error that can be returned when a user needs to be active for the operation,
 	// e.g. sign in, reactivation, etc. but has a different state.
 	ErrUserNotActive = func(id, message string) error {
-		return zerrors.ThrowPreconditionFailedError(nil, SlugUserNotActive, message, zerrors.ErrorDetailsMap{"id": id})
+		return zerrors.CreateZitadelError(zerrors.KindPreconditionFailed, nil, string(SlugUserNotActive), message, 1).
+			WithDetails(zerrors.ErrorDetailsMap{"id": id})
 	}
 )

@@ -507,7 +507,7 @@ HTTP/2.0 200 OK
 Content-Type: application/grpc
 Grpc-Message: invalid information provided for the creation of the user (user.invalid_information)
 Grpc-Status: 3
-Grcp-Status-Details-Bin: aW52YWxpZCBpbmZvcm1hdGlvbiBwcm92aWRlZCBmb3IgdGhlIGNyZWF0aW9uIG9mIHRoZSB1c2VyICh1c2VyLmludmFsaWRfaW5mb3JtYXRpb24p...
+Grpc-Status-Details-Bin: aW52YWxpZCBpbmZvcm1hdGlvbiBwcm92aWRlZCBmb3IgdGhlIGNyZWF0aW9uIG9mIHRoZSB1c2VyICh1c2VyLmludmFsaWRfaW5mb3JtYXRpb24p...
 
 {
   "code": 3,
@@ -545,7 +545,7 @@ Grcp-Status-Details-Bin: CAcSgwFUaGUgcHJvdmlkZWQgc2Vzc2lvbiB0b2tlbiBpcyBpbnZhbGl
 
 {
   "code": 7,
-  "message": The provided session token is invalid: either the token is malformed, expired or does not match the session (session.token_invalid),
+  "message": "The provided session token is invalid: either the token is malformed, expired or does not match the session (session.token_invalid)",
   "details": [
     {
       "@type": "type.googleapis.com/zitadel.error.v2.ErrorDetail",
@@ -568,7 +568,7 @@ Grcp-Status-Details-Bin: dGhlIHVzZXJuYW1lIGlzIGFscmVhZHkgdGFrZW4gKHVzZXIuYWxyZWF
   "message": "the username is already taken (user.already_exists)",
   "details": [ 
     {
-      "@type": "type.googleapis.com/zitadel.v2.ErrorDetail",
+      "@type": "type.googleapis.com/zitadel.error.v2.ErrorDetail",
       "slug": "user.already_exists",
       "message": "the username is already taken",
       "details": {

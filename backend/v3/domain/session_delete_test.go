@@ -43,7 +43,7 @@ func TestDeleteSessionCommand_Validate(t *testing.T) {
 				sessionID: "",
 			},
 			fields:        fields{},
-			expectedError: domain.ErrIDMissing,
+			expectedError: domain.ErrIDMissing(),
 		},
 		{
 			name: "when sessionID is provided must validate successfully",

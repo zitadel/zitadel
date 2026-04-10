@@ -139,14 +139,17 @@ var (
 var (
 	// ErrSessionNotFound is an error that can be returned when a session with the requested id was not found.
 	ErrSessionNotFound = func(err error, id string) error {
-		return zerrors.ThrowNotFoundError(err, SlugSessionNotFound, "session was not found", zerrors.ErrorDetailsMap{"id": id})
+		return zerrors.CreateZitadelError(zerrors.KindNotFound, err, string(SlugSessionNotFound), "session was not found", 1).
+			WithDetails(zerrors.ErrorDetailsMap{"id": id})
 	}
 
 	// ErrSessionUserChange is an error that can be returned when trying to change the user of an already authenticated session, which is not allowed.
-	ErrSessionUserChange = zerrors.ThrowInvalidArgumentError(nil, SlugSessionUserChange, "session was already authenticated with another user, you cannot change it to a different one", nil)
+	ErrSessionUserChange = func() error {
+		return zerrors.CreateZitadelError(zerrors.KindInvalidArgument, nil, string(SlugSessionUserChange), "session was already authenticated with another user, you cannot change it to a different one", 1)
+	}
 
 	// ErrSessionTokenInvalid is an error that can be returned whenever the provided (session) token is invalid for the intended session.
 	ErrSessionTokenInvalid = func(err error) error {
-		return zerrors.ThrowPermissionDeniedError(err, SlugSessionTokenInvalid, "The provided session token is invalid: either the token is malformed, expired or does not match the session", nil)
+		return zerrors.CreateZitadelError(zerrors.KindPermissionDenied, err, string(SlugSessionTokenInvalid), "The provided session token is invalid: either the token is malformed, expired or does not match the session", 1)
 	}
 )

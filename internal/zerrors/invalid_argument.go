@@ -2,10 +2,6 @@ package zerrors
 
 import "fmt"
 
-func ThrowInvalidArgumentError(parent error, slug Slug, message string, details ErrorDetails) error {
-	return CreateZitadelError(KindInvalidArgument, parent, string(slug), message, 1).WithDetails(details)
-}
-
 func ThrowInvalidArgument(parent error, id, message string) error {
 	return CreateZitadelError(KindInvalidArgument, parent, id, message, 1)
 }

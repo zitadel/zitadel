@@ -54,28 +54,6 @@ func TestResourceExhausted(t *testing.T) {
 		}
 	})
 
-	t.Run("ThrowResourceExhaustedError", func(t *testing.T) {
-		slug := zerrors.Slug(id)
-		details := zerrors.ErrorDetailsMap{"details": "details"}
-
-		err := zerrors.ThrowResourceExhaustedError(parentErr, slug, message, details)
-		assert.NotNil(t, err)
-
-		zitadelErr, ok := zerrors.AsZitadelError(err)
-		assert.True(t, ok)
-		assert.Equal(t, zerrors.KindResourceExhausted, zitadelErr.Kind)
-
-		zitadelError := new(zerrors.ZitadelError)
-		if errors.As(err, &zitadelError) {
-			assert.Equal(t, parentErr, zitadelError.Unwrap())
-			assert.Equal(t, id, zitadelError.ID)
-			assert.Equal(t, message, zitadelError.Message)
-			assert.Equal(t, details, zitadelError.Details)
-		} else {
-			t.Errorf("error is not of type ZitadelError")
-		}
-	})
-
 	t.Run("IsResourceExhausted", func(t *testing.T) {
 		err := zerrors.ThrowResourceExhausted(parentErr, id, message)
 		isResourceExhausted := zerrors.IsResourceExhausted(err)

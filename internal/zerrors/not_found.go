@@ -2,10 +2,6 @@ package zerrors
 
 import "fmt"
 
-func ThrowNotFoundError(parent error, slug Slug, message string, details ErrorDetails) error {
-	return CreateZitadelError(KindNotFound, parent, string(slug), message, 1).WithDetails(details)
-}
-
 func ThrowNotFound(parent error, id, message string) error {
 	return CreateZitadelError(KindNotFound, parent, id, message, 1)
 }

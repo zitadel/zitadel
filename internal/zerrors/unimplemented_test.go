@@ -54,28 +54,6 @@ func TestUnimplemented(t *testing.T) {
 		}
 	})
 
-	t.Run("ThrowUnimplementedError", func(t *testing.T) {
-		slug := zerrors.Slug(id)
-		details := zerrors.ErrorDetailsMap{"details": "details"}
-
-		err := zerrors.ThrowUnimplementedError(parentErr, slug, message, details)
-		assert.NotNil(t, err)
-
-		zitadelErr, ok := zerrors.AsZitadelError(err)
-		assert.True(t, ok)
-		assert.Equal(t, zerrors.KindUnimplemented, zitadelErr.Kind)
-
-		zitadelError := new(zerrors.ZitadelError)
-		if errors.As(err, &zitadelError) {
-			assert.Equal(t, parentErr, zitadelError.Unwrap())
-			assert.Equal(t, id, zitadelError.ID)
-			assert.Equal(t, message, zitadelError.Message)
-			assert.Equal(t, details, zitadelError.Details)
-		} else {
-			t.Errorf("error is not of type ZitadelError")
-		}
-	})
-
 	t.Run("IsUnimplemented", func(t *testing.T) {
 		err := zerrors.ThrowUnimplemented(parentErr, id, message)
 		isUnimplemented := zerrors.IsUnimplemented(err)

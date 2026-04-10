@@ -2,10 +2,6 @@ package zerrors
 
 import "fmt"
 
-func ThrowUnknownError(parent error, slug Slug, message string, details ErrorDetails) error {
-	return CreateZitadelError(KindUnknown, parent, string(slug), message, 1).WithDetails(details)
-}
-
 func ThrowUnknown(parent error, id, message string) error {
 	return CreateZitadelError(KindUnknown, parent, id, message, 1)
 }

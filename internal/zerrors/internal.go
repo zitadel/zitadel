@@ -2,10 +2,6 @@ package zerrors
 
 import "fmt"
 
-func ThrowInternalError(parent error, slug Slug, message string, details ErrorDetails) error {
-	return CreateZitadelError(KindInternal, parent, string(slug), message, 1).WithDetails(details)
-}
-
 func ThrowInternal(parent error, id, message string) error {
 	return CreateZitadelError(KindInternal, parent, id, message, 1)
 }
