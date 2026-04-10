@@ -784,7 +784,7 @@ EncryptionKeys:
     # This option should be disabled as soon as all tokens have been replaced and PATs rotated.
     # Note: older versions of ZITADEL aren't able to verify newer tokens.
     # Downgrading ZITADEL will always logout all users that obtained a token after the upgrade.
-    LegacyToken: false # ZITADEL_ENCRYPTIONKEYS_OIDC_LEGACYTOKEN
+    LegacyToken: true # ZITADEL_ENCRYPTIONKEYS_OIDC_LEGACYTOKEN
     EncryptionKeyID: "oidcKey" # ZITADEL_ENCRYPTIONKEYS_OIDC_ENCRYPTIONKEYID
     DecryptionKeyIDs: # ZITADEL_ENCRYPTIONKEYS_OIDC_DECRYPTIONKEYIDS (comma separated list)
   SAML:
