@@ -21,12 +21,20 @@ const SMOCKER_ADMIN_PORT = 8081;
  * Integration tests for custom CA certificate support in the login application.
  *
  * These tests verify that the Dockerfile correctly configures Node.js to trust
- * custom Certificate Authorities via the SSL_CERT_FILE environment variable and
- * the NODE_OPTIONS=--use-openssl-ca flag.
+ * custom Certificate Authorities via SSL_CERT_FILE, SSL_CERT_DIR, and the
+ * load-ssl-cert-dir.cjs preload script.
  *
- * We use Smocker as a TLS server and test CA loading by making curl requests
- * from inside the container - this verifies TLS at the transport layer without
- * needing gRPC/HTTP2 support.
+ * OpenSSL (used by Node with --use-openssl-ca) only reads certs from
+ * SSL_CERT_DIR when they have hashed filenames (e.g. "9d66eef0.0").  Go's
+ * crypto/x509 reads any file.  The preload script bridges this gap so that
+ * operators get the same behaviour with both the Go backend and the login
+ * container.
+ *
+ * We use Smocker as a TLS server whose certificate is signed by a test CA
+ * that is NOT in the system trust store.  Each test block configures the
+ * login container differently and asserts whether the TLS handshake to
+ * Smocker succeeds or fails — verifying actual trust-store behaviour, not
+ * just environment variable values.
  */
 const LOGIN_IMAGE_TAG = `zitadel-login-test:${process.env.GITHUB_SHA || "local"}`;
 
@@ -84,7 +92,7 @@ describe("Custom CA Certificate Integration", () => {
     await network?.stop().catch(() => {});
   });
 
-  describe("when custom CA certificate is provided", () => {
+  describe("when custom CA is provided via SSL_CERT_FILE", () => {
     let container: StartedTestContainer;
 
     beforeAll(async () => {
@@ -113,24 +121,40 @@ describe("Custom CA Certificate Integration", () => {
       const result = await testTlsConnection(container, "https://mock-zitadel/");
       expect(result.exitCode).toBe(0);
     });
+  });
 
-    it("has NODE_OPTIONS set with --use-openssl-ca", async () => {
-      const result = await container.exec(["printenv", "NODE_OPTIONS"]);
-      expect(result.output.trim()).toContain("--use-openssl-ca");
+  describe("when custom CA is provided via SSL_CERT_DIR (non-hashed filename)", () => {
+    let container: StartedTestContainer;
+    let customCaDir: string;
+
+    beforeAll(async () => {
+      customCaDir = fs.mkdtempSync(path.join(os.tmpdir(), "ca-dir-test-"));
+      fs.writeFileSync(path.join(customCaDir, "corp-root.crt"), fs.readFileSync(path.join(certsDir, "ca.crt")));
+
+      container = await new GenericContainer(LOGIN_IMAGE_TAG)
+        .withNetwork(network)
+        .withExposedPorts(3000)
+        .withEnvironment({
+          SSL_CERT_DIR: "/custom-certs",
+        })
+        .withCopyFilesToContainer([
+          {
+            source: path.join(customCaDir, "corp-root.crt"),
+            target: "/custom-certs/corp-root.crt",
+          },
+        ])
+        .withStartupTimeout(180_000)
+        .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
+        .start();
+    }, 180_000);
+
+    afterAll(async () => {
+      await container?.stop().catch(() => {});
     });
 
-    it("has SSL_CERT_FILE pointing to custom CA", async () => {
-      const result = await container.exec(["printenv", "SSL_CERT_FILE"]);
-      expect(result.output.trim()).toBe("/etc/ssl/certs/custom-ca.crt");
-    });
-
-    it("has CA certificate accessible in container", async () => {
-      const result = await container.exec([
-        "sh",
-        "-c",
-        "test -f /etc/ssl/certs/custom-ca.crt && echo exists",
-      ]);
-      expect(result.output.trim()).toContain("exists");
+    it("can establish TLS connection with non-hashed cert in SSL_CERT_DIR", async () => {
+      const result = await testTlsConnection(container, "https://mock-zitadel/");
+      expect(result.exitCode).toBe(0);
     });
   });
 
@@ -153,20 +177,6 @@ describe("Custom CA Certificate Integration", () => {
     it("cannot establish TLS connection without custom CA", async () => {
       const result = await testTlsConnection(container, "https://mock-zitadel/");
       expect(result.exitCode).not.toBe(0);
-    });
-
-    it("uses system CA store by default", async () => {
-      const result = await container.exec(["printenv", "SSL_CERT_FILE"]);
-      expect(result.output.trim()).toBe("/etc/ssl/certs/ca-certificates.crt");
-    });
-
-    it("does not have custom CA certificate mounted", async () => {
-      const result = await container.exec([
-        "sh",
-        "-c",
-        "test -f /etc/ssl/certs/custom-ca.crt && echo exists || echo missing",
-      ]);
-      expect(result.output.trim()).toContain("missing");
     });
   });
 });
