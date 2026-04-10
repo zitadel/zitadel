@@ -2,6 +2,7 @@ package crypto
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"testing"
 	"unicode/utf8"
@@ -191,7 +192,7 @@ func TestAESCrypto_DecryptToken(t *testing.T) {
 			payload: func(t *testing.T) string {
 				return "malformed"
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "CRYPT-ha6Oh", "malformed encypted value"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "CRYPT-ha6Oh", "malformed encrypted value"),
 		},
 		{
 			name:   "invalid value",
@@ -206,9 +207,9 @@ func TestAESCrypto_DecryptToken(t *testing.T) {
 			crypto: newTestAESCryptoLegacyToken,
 			payload: func(t *testing.T) string {
 				a := newTestAESCryptoLegacyToken(t)
-				crypted, err := EncryptAESString("SecretData", a.encryptionKey())
+				encrypted, err := a.Encrypt([]byte("SecretData"))
 				require.NoError(t, err)
-				return crypted
+				return base64.RawURLEncoding.EncodeToString(encrypted)
 			},
 			want: "SecretData",
 		},
@@ -218,7 +219,7 @@ func TestAESCrypto_DecryptToken(t *testing.T) {
 			payload: func(t *testing.T) string {
 				return "invalid_base64"
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "CRYPT-ha6Oh", "malformed encypted value"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "CRYPT-ha6Oh", "malformed encrypted value"),
 		},
 		{
 			name:   "legacy invalid token",

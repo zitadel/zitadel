@@ -135,7 +135,7 @@ func (a *AESCrypto) decryptA256GCM(value string, key string) (string, error) {
 }
 
 func (a *AESCrypto) decryptLegacyToken(value string, key string) (string, error) {
-	text, err := base64.URLEncoding.DecodeString(value)
+	text, err := base64.RawURLEncoding.DecodeString(value)
 	if err != nil {
 		return "", zerrors.ThrowPreconditionFailed(err, "CRYPT-Eep6o", "malformed encrypted value")
 	}

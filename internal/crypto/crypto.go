@@ -36,7 +36,7 @@ type EncryptionAlgorithm interface {
 // used for sensitive data sent to the client, such as access tokens and refresh tokens.
 // Implementation must obfuscate and authenticate the token.
 type AuthAlgorithm interface {
-	// EncryptToken encrypts the token using the encryption key using.
+	// EncryptToken encrypts the token using authenticated encryption with the current encryption key.
 	EncryptToken(data string) (string, error)
 
 	// DecryptToken authenticates and decrypts the token using the encryption key.
