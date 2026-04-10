@@ -308,17 +308,16 @@ func TestListSessionsQuery_Execute(t *testing.T) {
 	listErr := errors.New("list mock error")
 
 	tt := []struct {
-		name                   string
-		request                *domain.ListSessionsRequest
-		sessionRepoExpecations func(sessionRepo *domainmock.SessionRepo)
-		userRepoExpectations   func(userRepo *domainmock.UserRepo)
-		expectedSessions       []domain.ListSessionResponse
-		expectedError          error
+		name             string
+		request          *domain.ListSessionsRequest
+		setupMock        func(sessionRepo *domainmock.SessionRepo)
+		expectedSessions []*domain.Session
+		expectedError    error
 	}{
 		{
 			name:    "when List fails should return internal error",
 			request: &domain.ListSessionsRequest{},
-			sessionRepoExpecations: func(sessionRepo *domainmock.SessionRepo) {
+			setupMock: func(sessionRepo *domainmock.SessionRepo) {
 				instanceCond := sessionRepo.InstanceIDCondition(instanceID)
 				permCond := database.Or(
 					sessionRepo.UserIDCondition(userID),
@@ -326,6 +325,10 @@ func TestListSessionsQuery_Execute(t *testing.T) {
 					sessionRepo.CreatorIDCondition(userID),
 					database.PermissionCheck(domain.SessionReadPermission, false),
 				)
+				sessionRepo.EXPECT().
+					LoadUserData().
+					Times(1).
+					Return(sessionRepo)
 				sessionRepo.EXPECT().
 					List(gomock.Any(), gomock.Any(),
 						dbmock.QueryOptions(database.WithCondition(database.And(instanceCond, permCond))),
@@ -339,130 +342,14 @@ func TestListSessionsQuery_Execute(t *testing.T) {
 			expectedError: zerrors.ThrowInternal(listErr, "DOM-Yx8q2r", "Errors.Session.List"),
 		},
 		{
-			name:    "when user listing fails should return internal error",
-			request: &domain.ListSessionsRequest{},
-			sessionRepoExpecations: func(sessionRepo *domainmock.SessionRepo) {
-				instanceCond := sessionRepo.InstanceIDCondition(instanceID)
-				permCond := database.Or(
-					sessionRepo.UserIDCondition(userID),
-					sessionRepo.UserAgentIDCondition(agentID),
-					sessionRepo.CreatorIDCondition(userID),
-					database.PermissionCheck(domain.SessionReadPermission, false),
-				)
-				sessionRepo.EXPECT().
-					List(gomock.Any(), gomock.Any(),
-						dbmock.QueryOptions(database.WithCondition(database.And(instanceCond, permCond))),
-						dbmock.QueryOptions(func(*database.QueryOpts) {}),
-						dbmock.QueryOptions(database.WithLimit(0)),
-						dbmock.QueryOptions(database.WithOffset(0)),
-					).
-					Times(1).
-					Return([]*domain.Session{
-						{ID: "session-1", UserID: userID},
-						{ID: "session-2"},
-					}, nil)
-			},
-			userRepoExpectations: func(userRepo *domainmock.UserRepo) {
-				instanceCond := userRepo.InstanceIDCondition(instanceID)
-				userRepo.EXPECT().
-					List(gomock.Any(), gomock.Any(),
-						dbmock.QueryOptions(database.WithCondition(database.And(
-							instanceCond,
-							database.Or(userRepo.IDCondition(userID)),
-						))),
-					).
-					Times(1).
-					Return(nil, listErr)
-			},
-			expectedError: zerrors.ThrowInternal(listErr, "DOM-ILxIlM", "Errors.User.List"),
-		},
-		{
-			name:    "when user listing returns wrong number of items should return not found error",
-			request: &domain.ListSessionsRequest{},
-			sessionRepoExpecations: func(sessionRepo *domainmock.SessionRepo) {
-				instanceCond := sessionRepo.InstanceIDCondition(instanceID)
-				permCond := database.Or(
-					sessionRepo.UserIDCondition(userID),
-					sessionRepo.UserAgentIDCondition(agentID),
-					sessionRepo.CreatorIDCondition(userID),
-					database.PermissionCheck(domain.SessionReadPermission, false),
-				)
-				sessionRepo.EXPECT().
-					List(gomock.Any(), gomock.Any(),
-						dbmock.QueryOptions(database.WithCondition(database.And(instanceCond, permCond))),
-						dbmock.QueryOptions(func(*database.QueryOpts) {}),
-						dbmock.QueryOptions(database.WithLimit(0)),
-						dbmock.QueryOptions(database.WithOffset(0)),
-					).
-					Times(1).
-					Return([]*domain.Session{
-						{ID: "session-1", UserID: userID},
-						{ID: "session-2"},
-					}, nil)
-			},
-			userRepoExpectations: func(userRepo *domainmock.UserRepo) {
-				instanceCond := userRepo.InstanceIDCondition(instanceID)
-				userRepo.EXPECT().
-					List(gomock.Any(), gomock.Any(),
-						dbmock.QueryOptions(database.WithCondition(database.And(
-							instanceCond,
-							database.Or(userRepo.IDCondition(userID)),
-						))),
-					).
-					Times(1).
-					Return(nil, nil)
-			},
-			expectedError: zerrors.ThrowNotFound(nil, "DOM-vh3SVZ", "Errors.User.Mismatch"),
-		},
-		{
-			name:    "when user listing returns wrong users should return internal error",
-			request: &domain.ListSessionsRequest{},
-			sessionRepoExpecations: func(sessionRepo *domainmock.SessionRepo) {
-				instanceCond := sessionRepo.InstanceIDCondition(instanceID)
-				permCond := database.Or(
-					sessionRepo.UserIDCondition(userID),
-					sessionRepo.UserAgentIDCondition(agentID),
-					sessionRepo.CreatorIDCondition(userID),
-					database.PermissionCheck(domain.SessionReadPermission, false),
-				)
-				sessionRepo.EXPECT().
-					List(gomock.Any(), gomock.Any(),
-						dbmock.QueryOptions(database.WithCondition(database.And(instanceCond, permCond))),
-						dbmock.QueryOptions(func(*database.QueryOpts) {}),
-						dbmock.QueryOptions(database.WithLimit(0)),
-						dbmock.QueryOptions(database.WithOffset(0)),
-					).
-					Times(1).
-					Return([]*domain.Session{
-						{ID: "session-1", UserID: userID},
-						{ID: "session-2"},
-					}, nil)
-			},
-			userRepoExpectations: func(userRepo *domainmock.UserRepo) {
-				instanceCond := userRepo.InstanceIDCondition(instanceID)
-				userRepo.EXPECT().
-					List(gomock.Any(), gomock.Any(),
-						dbmock.QueryOptions(database.WithCondition(database.And(
-							instanceCond,
-							database.Or(userRepo.IDCondition(userID)),
-						))),
-					).
-					Times(1).
-					Return([]*domain.User{
-						{ID: "wrong-user-id"},
-					}, nil)
-			},
-			expectedError: zerrors.ThrowInternal(nil, "DOM-69ICaj", "Errors.SessionByUser.NotFound"),
-		},
-		{
-			name: "when user listing succeeds should return valid response",
+			name: "when List succeeds should return sessions",
 			request: &domain.ListSessionsRequest{
 				SortColumn: domain.SessionSortColumnCreationDate,
 				Ascending:  true,
 				Limit:      10,
 				Offset:     5,
 			},
-			sessionRepoExpecations: func(sessionRepo *domainmock.SessionRepo) {
+			setupMock: func(sessionRepo *domainmock.SessionRepo) {
 				instanceCond := sessionRepo.InstanceIDCondition(instanceID)
 				permCond := database.Or(
 					sessionRepo.UserIDCondition(userID),
@@ -470,6 +357,10 @@ func TestListSessionsQuery_Execute(t *testing.T) {
 					sessionRepo.CreatorIDCondition(userID),
 					database.PermissionCheck(domain.SessionReadPermission, false),
 				)
+				sessionRepo.EXPECT().
+					LoadUserData().
+					Times(1).
+					Return(sessionRepo)
 				sessionRepo.EXPECT().
 					List(gomock.Any(), gomock.Any(),
 						dbmock.QueryOptions(database.WithCondition(database.And(instanceCond, permCond))),
@@ -478,29 +369,9 @@ func TestListSessionsQuery_Execute(t *testing.T) {
 						dbmock.QueryOptions(database.WithOffset(5)),
 					).
 					Times(1).
-					Return([]*domain.Session{
-						{ID: "session-1", UserID: userID},
-						{ID: "session-2"},
-					}, nil)
+					Return([]*domain.Session{{ID: "session-1", UserID: userID}}, nil)
 			},
-			userRepoExpectations: func(userRepo *domainmock.UserRepo) {
-				instanceCond := userRepo.InstanceIDCondition(instanceID)
-				userRepo.EXPECT().
-					List(gomock.Any(), gomock.Any(),
-						dbmock.QueryOptions(database.WithCondition(database.And(
-							instanceCond,
-							database.Or(userRepo.IDCondition(userID)),
-						))),
-					).
-					Times(1).
-					Return([]*domain.User{
-						{ID: userID},
-					}, nil)
-			},
-			expectedSessions: []domain.ListSessionResponse{
-				{Session: &domain.Session{ID: "session-1", UserID: userID}, User: &domain.User{ID: userID}},
-				{Session: &domain.Session{ID: "session-2"}},
-			},
+			expectedSessions: []*domain.Session{{ID: "session-1", UserID: userID}},
 		},
 	}
 
@@ -511,21 +382,14 @@ func TestListSessionsQuery_Execute(t *testing.T) {
 			ctx := authz.NewMockContextWithAgent(instanceID, orgID, userID, agentID)
 			ctrl := gomock.NewController(t)
 			sessionRepo := domainmock.NewSessionRepo(ctrl)
-			userRepo := domainmock.NewUserRepo(ctrl)
 
-			if tc.sessionRepoExpecations != nil {
-				tc.sessionRepoExpecations(sessionRepo)
-			}
-			if tc.userRepoExpectations != nil {
-				tc.userRepoExpectations(userRepo)
+			if tc.setupMock != nil {
+				tc.setupMock(sessionRepo)
 			}
 
-			opts := &domain.InvokeOpts{
-				Invoker: domain.NewTransactionInvoker(nil),
-			}
+			opts := domain.DefaultOpts(nil)
 			domain.WithQueryExecutor(new(noopdb.Pool))(opts)
 			domain.WithSessionRepo(sessionRepo)(opts)
-			domain.WithUserRepo(userRepo)(opts)
 
 			q := domain.NewListSessionsQuery(tc.request)
 			err := q.Execute(ctx, opts)

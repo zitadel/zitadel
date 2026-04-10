@@ -95,7 +95,7 @@ func searchQueryGRPCToDomain(ctx context.Context, q *session_grpc.SearchQuery) (
 }
 
 // DomainSessionListToGRPCResponse converts a slice of domain sessions to gRPC response sessions.
-func DomainSessionListToGRPCResponse(sessions []domain.ListSessionResponse) []*session_grpc.Session {
+func DomainSessionListToGRPCResponse(sessions []*domain.Session) []*session_grpc.Session {
 	out := make([]*session_grpc.Session, len(sessions))
 	for i, s := range sessions {
 		out[i] = DomainSessionToGRPCResponse(s)
@@ -104,31 +104,31 @@ func DomainSessionListToGRPCResponse(sessions []domain.ListSessionResponse) []*s
 }
 
 // DomainSessionToGRPCResponse converts a single domain session to its gRPC representation.
-func DomainSessionToGRPCResponse(lsr domain.ListSessionResponse) *session_grpc.Session {
+func DomainSessionToGRPCResponse(session *domain.Session) *session_grpc.Session {
 	pb := &session_grpc.Session{
-		Id:           lsr.Session.ID,
-		CreationDate: timestamppb.New(lsr.Session.CreatedAt),
-		ChangeDate:   timestamppb.New(lsr.Session.UpdatedAt),
-		Factors:      domainFactorsToGRPC(lsr.Session.Factors, lsr.User),
-		UserAgent:    domainUserAgentToGRPC(lsr.Session.UserAgent),
+		Id:           session.ID,
+		CreationDate: timestamppb.New(session.CreatedAt),
+		ChangeDate:   timestamppb.New(session.UpdatedAt),
+		Factors:      domainFactorsToGRPC(session),
+		UserAgent:    domainUserAgentToGRPC(session.UserAgent),
 	}
 
-	if len(lsr.Session.Metadata) > 0 {
-		pb.Metadata = make(map[string][]byte, len(lsr.Session.Metadata))
-		for _, m := range lsr.Session.Metadata {
+	if len(session.Metadata) > 0 {
+		pb.Metadata = make(map[string][]byte, len(session.Metadata))
+		for _, m := range session.Metadata {
 			pb.Metadata[m.Key] = m.Value
 		}
 	}
 
-	if !lsr.Session.Expiration.IsZero() {
-		pb.ExpirationDate = timestamppb.New(lsr.Session.Expiration)
+	if !session.Expiration.IsZero() {
+		pb.ExpirationDate = timestamppb.New(session.Expiration)
 	}
 
 	return pb
 }
 
-func domainFactorsToGRPC(factors domain.SessionFactors, user *domain.User) *session_grpc.Factors {
-	userFactor := factors.GetUserFactor()
+func domainFactorsToGRPC(session *domain.Session) *session_grpc.Factors {
+	userFactor := session.Factors.GetUserFactor()
 	if userFactor == nil {
 		return nil
 	}
@@ -140,56 +140,46 @@ func domainFactorsToGRPC(factors domain.SessionFactors, user *domain.User) *sess
 		},
 	}
 
-	if user != nil {
-		// Set the first loginname in the list, regardless the preferred boolean
-		// In case no preferred is found, at least we have one loginname
-		preferredLoginName := user.LoginNames[0].LoginName
-		for _, ln := range user.LoginNames {
-			if ln.IsPreferred {
-				preferredLoginName = ln.LoginName
-				break
-			}
-		}
-
-		pb.User.LoginName = preferredLoginName
-		pb.User.OrganizationId = user.OrganizationID
-		if user.Human != nil {
-			pb.User.DisplayName = user.Human.DisplayName
-		}
+	pb.User.LoginName = session.UserPreferredLoginName
+	if session.UserOrganizationID != nil {
+		pb.User.OrganizationId = *session.UserOrganizationID
+	}
+	if session.UserDisplayName != nil {
+		pb.User.DisplayName = *session.UserDisplayName
 	}
 
-	if f := factors.GetPasswordFactor(); f != nil {
+	if f := session.Factors.GetPasswordFactor(); f != nil {
 		pb.Password = &session_grpc.PasswordFactor{
 			VerifiedAt: timestamppb.New(f.LastVerifiedAt),
 		}
 	}
-	if f := factors.GetPasskeyFactor(); f != nil {
+	if f := session.Factors.GetPasskeyFactor(); f != nil {
 		pb.WebAuthN = &session_grpc.WebAuthNFactor{
 			VerifiedAt:   timestamppb.New(f.LastVerifiedAt),
 			UserVerified: f.UserVerified,
 		}
 	}
-	if f := factors.GetIDPIntentFactor(); f != nil {
+	if f := session.Factors.GetIDPIntentFactor(); f != nil {
 		pb.Intent = &session_grpc.IntentFactor{
 			VerifiedAt: timestamppb.New(f.LastVerifiedAt),
 		}
 	}
-	if f := factors.GetTOTPFactor(); f != nil {
+	if f := session.Factors.GetTOTPFactor(); f != nil {
 		pb.Totp = &session_grpc.TOTPFactor{
 			VerifiedAt: timestamppb.New(f.LastVerifiedAt),
 		}
 	}
-	if f := factors.GetOTPSMSFactor(); f != nil {
+	if f := session.Factors.GetOTPSMSFactor(); f != nil {
 		pb.OtpSms = &session_grpc.OTPFactor{
 			VerifiedAt: timestamppb.New(f.LastVerifiedAt),
 		}
 	}
-	if f := factors.GetOTPEmailFactor(); f != nil {
+	if f := session.Factors.GetOTPEmailFactor(); f != nil {
 		pb.OtpEmail = &session_grpc.OTPFactor{
 			VerifiedAt: timestamppb.New(f.LastVerifiedAt),
 		}
 	}
-	if f := factors.GetRecoveryCodeFactor(); f != nil {
+	if f := session.Factors.GetRecoveryCodeFactor(); f != nil {
 		pb.RecoveryCode = &session_grpc.RecoveryCodeFactor{
 			VerifiedAt: timestamppb.New(f.LastVerifiedAt),
 		}

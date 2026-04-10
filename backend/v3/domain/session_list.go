@@ -66,21 +66,16 @@ type ListSessionsRequest struct {
 	Offset     uint32
 }
 
-type ListSessionResponse struct {
-	Session *Session
-	User    *User
-}
-
 // ListSessionsQuery implements [Querier] for listing sessions.
 type ListSessionsQuery struct {
-	Request             *ListSessionsRequest
-	listSessionResponse []ListSessionResponse
+	Request  *ListSessionsRequest
+	sessions []*Session
 }
 
 // Result implements [Querier].
-func (l *ListSessionsQuery) Result() []ListSessionResponse { return l.listSessionResponse }
+func (l *ListSessionsQuery) Result() []*Session { return l.sessions }
 
-var _ Querier[[]ListSessionResponse] = (*ListSessionsQuery)(nil)
+var _ Querier[[]*Session] = (*ListSessionsQuery)(nil)
 
 // NewListSessionsQuery returns a new [ListSessionsQuery] for the given request.
 func NewListSessionsQuery(req *ListSessionsRequest) *ListSessionsQuery {
@@ -97,14 +92,14 @@ func (l *ListSessionsQuery) Validate(_ context.Context, _ *InvokeOpts) error {
 
 // Execute implements [Querier].
 func (l *ListSessionsQuery) Execute(ctx context.Context, opts *InvokeOpts) error {
-	sessionRepo := opts.sessionRepo
+	sessionRepo := opts.sessionRepo.LoadUserData()
 
 	conds, err := l.Conditions(ctx, sessionRepo)
 	if err != nil {
 		return err
 	}
 
-	sessions, err := sessionRepo.List(ctx, opts.DB(),
+	l.sessions, err = sessionRepo.List(ctx, opts.DB(),
 		database.WithCondition(conds),
 		l.Sorting(sessionRepo),
 		database.WithLimit(l.Request.Limit),
@@ -112,56 +107,6 @@ func (l *ListSessionsQuery) Execute(ctx context.Context, opts *InvokeOpts) error
 	)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "DOM-Yx8q2r", "Errors.Session.List")
-	}
-
-	if len(sessions) == 0 {
-		return nil
-	}
-
-	userRepo := opts.userRepo
-	sessionByUserID := make(map[string][]*Session, len(sessions))
-	userIDs := make([]database.Condition, 0, len(sessions))
-	l.listSessionResponse = make([]ListSessionResponse, 0, len(sessions))
-
-	for _, session := range sessions {
-		if session.UserID != "" {
-			sessionByUserID[session.UserID] = append(sessionByUserID[session.UserID], session)
-			userIDs = append(userIDs, userRepo.IDCondition(session.UserID))
-			continue
-		}
-		// Sessions not associated with any user (e.g. newly created ones?) get added right away
-		l.listSessionResponse = append(l.listSessionResponse, ListSessionResponse{Session: session})
-	}
-
-	users, err := userRepo.List(ctx, opts.DB(),
-		database.WithCondition(database.And(
-			userRepo.InstanceIDCondition(authz.GetInstance(ctx).InstanceID()),
-			database.Or(
-				userIDs...,
-			),
-		)),
-	)
-	if err != nil {
-		l.listSessionResponse = []ListSessionResponse{}
-		return zerrors.ThrowInternal(err, "DOM-ILxIlM", "Errors.User.List")
-	}
-
-	if len(users) != len(userIDs) {
-		// If there is a mismatch between the 2 slices, it means that a session has
-		// a user ID that doesn't exist on DB. That should not happen.
-		l.listSessionResponse = []ListSessionResponse{}
-		return zerrors.ThrowNotFound(nil, "DOM-vh3SVZ", "Errors.User.Mismatch")
-	}
-
-	for _, user := range users {
-		sessions, ok := sessionByUserID[user.ID]
-		if !ok {
-			l.listSessionResponse = []ListSessionResponse{}
-			return zerrors.ThrowInternal(nil, "DOM-69ICaj", "Errors.SessionByUser.NotFound")
-		}
-		for _, s := range sessions {
-			l.listSessionResponse = append(l.listSessionResponse, ListSessionResponse{Session: s, User: user})
-		}
 	}
 
 	return nil

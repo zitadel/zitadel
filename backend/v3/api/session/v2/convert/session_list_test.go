@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -372,15 +373,15 @@ func TestDomainSessionListToGRPCResponse(t *testing.T) {
 
 	t.Run("empty slice returns empty response slice", func(t *testing.T) {
 		t.Parallel()
-		got := DomainSessionListToGRPCResponse([]domain.ListSessionResponse{})
+		got := DomainSessionListToGRPCResponse([]*domain.Session{})
 		assert.Empty(t, got)
 	})
 
 	t.Run("each session is converted", func(t *testing.T) {
 		t.Parallel()
-		sessions := []domain.ListSessionResponse{
-			{Session: &domain.Session{ID: "sess-1"}},
-			{Session: &domain.Session{ID: "sess-2"}},
+		sessions := []*domain.Session{
+			{ID: "sess-1"},
+			{ID: "sess-2"},
 		}
 		got := DomainSessionListToGRPCResponse(sessions)
 		assert.Len(t, got, 2)
@@ -398,12 +399,10 @@ func TestDomainSessionToGRPCResponse(t *testing.T) {
 
 	t.Run("basic fields are mapped", func(t *testing.T) {
 		t.Parallel()
-		lsr := domain.ListSessionResponse{
-			Session: &domain.Session{
-				ID:        "sess-abc",
-				CreatedAt: createdAt,
-				UpdatedAt: updatedAt,
-			},
+		lsr := &domain.Session{
+			ID:        "sess-abc",
+			CreatedAt: createdAt,
+			UpdatedAt: updatedAt,
 		}
 
 		got := DomainSessionToGRPCResponse(lsr)
@@ -417,35 +416,35 @@ func TestDomainSessionToGRPCResponse(t *testing.T) {
 
 	t.Run("expiration is set when non-zero", func(t *testing.T) {
 		t.Parallel()
-		lsr := domain.ListSessionResponse{Session: &domain.Session{Expiration: expiration}}
+		lsr := &domain.Session{Expiration: expiration}
 		got := DomainSessionToGRPCResponse(lsr)
 		assert.Equal(t, timestamppb.New(expiration), got.ExpirationDate)
 	})
 
 	t.Run("zero expiration is not set", func(t *testing.T) {
 		t.Parallel()
-		lsr := domain.ListSessionResponse{Session: &domain.Session{}}
+		lsr := &domain.Session{}
 		got := DomainSessionToGRPCResponse(lsr)
 		assert.Nil(t, got.ExpirationDate)
 	})
 
 	t.Run("metadata is mapped to key-value pairs", func(t *testing.T) {
 		t.Parallel()
-		lsr := domain.ListSessionResponse{Session: &domain.Session{
+		lsr := &domain.Session{
 			Metadata: []*domain.SessionMetadata{
 				{Metadata: domain.Metadata{Key: "k1", Value: []byte("v1")}},
 				{Metadata: domain.Metadata{Key: "k2", Value: []byte("v2")}},
 			},
-		}}
+		}
 		got := DomainSessionToGRPCResponse(lsr)
 		assert.Equal(t, map[string][]byte{"k1": []byte("v1"), "k2": []byte("v2")}, got.Metadata)
 	})
 
 	t.Run("empty metadata is not set", func(t *testing.T) {
 		t.Parallel()
-		lsr := domain.ListSessionResponse{Session: &domain.Session{
+		lsr := &domain.Session{
 			Metadata: []*domain.SessionMetadata{},
-		}}
+		}
 		got := DomainSessionToGRPCResponse(lsr)
 		assert.Nil(t, got.Metadata)
 	})
@@ -459,13 +458,13 @@ func TestDomainFactorsToGRPC(t *testing.T) {
 
 	t.Run("no user factor returns nil", func(t *testing.T) {
 		t.Parallel()
-		got := domainFactorsToGRPC(domain.SessionFactors{}, nil)
+		got := domainFactorsToGRPC(&domain.Session{Factors: domain.SessionFactors{}})
 		assert.Nil(t, got)
 	})
 
 	t.Run("no factors returns nil", func(t *testing.T) {
 		t.Parallel()
-		got := domainFactorsToGRPC(nil, nil)
+		got := domainFactorsToGRPC(&domain.Session{})
 		assert.Nil(t, got)
 	})
 
@@ -474,7 +473,7 @@ func TestDomainFactorsToGRPC(t *testing.T) {
 		factors := domain.SessionFactors{
 			&domain.SessionFactorUser{UserID: "user-1", LastVerifiedAt: verifiedAt},
 		}
-		got := domainFactorsToGRPC(factors, nil)
+		got := domainFactorsToGRPC(&domain.Session{Factors: factors})
 		assert.NotNil(t, got)
 		assert.Equal(t, verifiedAtPB, got.User.VerifiedAt)
 		assert.Equal(t, "user-1", got.User.Id)
@@ -495,20 +494,17 @@ func TestDomainFactorsToGRPC(t *testing.T) {
 		factors := domain.SessionFactors{
 			&domain.SessionFactorUser{UserID: "user-1", LastVerifiedAt: verifiedAt},
 		}
-		user := &domain.User{
-			OrganizationID: "org-1",
-			LoginNames: []domain.LoginName{
-				{LoginName: "not preferred"},
-				{LoginName: "the preferred", IsPreferred: true},
-			},
-			Machine: &domain.MachineUser{},
-			Human:   &domain.HumanUser{DisplayName: "displayed name"},
-		}
-		got := domainFactorsToGRPC(factors, user)
+
+		got := domainFactorsToGRPC(&domain.Session{
+			Factors:                factors,
+			UserPreferredLoginName: "preferred ln",
+			UserOrganizationID:     gu.Ptr("org-1"),
+			UserDisplayName:        gu.Ptr("displayed name"),
+		})
 		assert.NotNil(t, got)
 		assert.Equal(t, "user-1", got.User.Id)
 		assert.Equal(t, verifiedAtPB, got.User.VerifiedAt)
-		assert.Equal(t, "the preferred", got.User.LoginName)
+		assert.Equal(t, "preferred ln", got.User.LoginName)
 		assert.Equal(t, "org-1", got.User.OrganizationId)
 		assert.Equal(t, "displayed name", got.User.DisplayName)
 		assert.Nil(t, got.Password)
@@ -532,20 +528,17 @@ func TestDomainFactorsToGRPC(t *testing.T) {
 			&domain.SessionFactorOTPEmail{LastVerifiedAt: verifiedAt},
 			&domain.SessionFactorRecoveryCode{LastVerifiedAt: verifiedAt},
 		}
-		user := &domain.User{
-			OrganizationID: "org-1",
-			LoginNames: []domain.LoginName{
-				{LoginName: "not preferred"},
-				{LoginName: "the preferred", IsPreferred: true},
-			},
-			Machine: &domain.MachineUser{},
-			Human:   &domain.HumanUser{DisplayName: "displayed name"},
+		session := &domain.Session{
+			Factors:                factors,
+			UserPreferredLoginName: "preferred ln",
+			UserOrganizationID:     gu.Ptr("org-1"),
+			UserDisplayName:        gu.Ptr("displayed name"),
 		}
-		got := domainFactorsToGRPC(factors, user)
+		got := domainFactorsToGRPC(session)
 		assert.NotNil(t, got)
 		assert.Equal(t, "user-1", got.User.Id)
 		assert.Equal(t, verifiedAtPB, got.User.VerifiedAt)
-		assert.Equal(t, "the preferred", got.User.LoginName)
+		assert.Equal(t, "preferred ln", got.User.LoginName)
 		assert.Equal(t, "org-1", got.User.OrganizationId)
 		assert.Equal(t, "displayed name", got.User.DisplayName)
 		assert.Equal(t, verifiedAtPB, got.User.VerifiedAt)
