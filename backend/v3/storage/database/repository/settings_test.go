@@ -4383,22 +4383,22 @@ func TestGetLinksSettings(t *testing.T) {
 				Links: []domain.Link{
 					{
 						Type:   domain.LinkTypeTermsOfService,
-						URL:    "https://host",
+						URL:    gu.Ptr("https://host"),
 						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:   domain.LinkTypePrivacyPolicy,
-						URL:    "https://host",
+						URL:    gu.Ptr("https://host"),
 						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:   domain.LinkTypeSupport,
-						URL:    "email",
+						URL:    gu.Ptr("email"),
 						Target: domain.LinkTargetSelf,
 					},
 					{
 						Type:           domain.LinkTypeCustom,
-						URL:            "https://host",
+						URL:            gu.Ptr("https://host"),
 						TranslationKey: gu.Ptr("linktext"),
 						Target:         domain.LinkTargetBlank,
 					},
@@ -4414,22 +4414,22 @@ func TestGetLinksSettings(t *testing.T) {
 				Links: []domain.Link{
 					{
 						Type:   domain.LinkTypeTermsOfService,
-						URL:    "https://host",
+						URL:    gu.Ptr("https://host"),
 						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:   domain.LinkTypePrivacyPolicy,
-						URL:    "https://host",
+						URL:    gu.Ptr("https://host"),
 						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:   domain.LinkTypeSupport,
-						URL:    "email",
+						URL:    gu.Ptr("email"),
 						Target: domain.LinkTargetSelf,
 					},
 					{
 						Type:           domain.LinkTypeCustom,
-						URL:            "https://host",
+						URL:            gu.Ptr("https://host"),
 						TranslationKey: gu.Ptr("linktext"),
 						Target:         domain.LinkTargetBlank,
 					},
@@ -4445,22 +4445,22 @@ func TestGetLinksSettings(t *testing.T) {
 				Links: []domain.Link{
 					{
 						Type:   domain.LinkTypeTermsOfService,
-						URL:    "https://host",
+						URL:    gu.Ptr("https://host"),
 						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:   domain.LinkTypePrivacyPolicy,
-						URL:    "https://host",
+						URL:    gu.Ptr("https://host"),
 						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:   domain.LinkTypeSupport,
-						URL:    "email",
+						URL:    gu.Ptr("email"),
 						Target: domain.LinkTargetSelf,
 					},
 					{
 						Type:           domain.LinkTypeCustom,
-						URL:            "https://host",
+						URL:            gu.Ptr("https://host"),
 						TranslationKey: gu.Ptr("linktext"),
 						Target:         domain.LinkTargetBlank,
 					},
@@ -4476,22 +4476,22 @@ func TestGetLinksSettings(t *testing.T) {
 				Links: []domain.Link{
 					{
 						Type:   domain.LinkTypeTermsOfService,
-						URL:    "https://host",
+						URL:    gu.Ptr("https://host"),
 						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:   domain.LinkTypePrivacyPolicy,
-						URL:    "https://host",
+						URL:    gu.Ptr("https://host"),
 						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:   domain.LinkTypeSupport,
-						URL:    "email",
+						URL:    gu.Ptr("email"),
 						Target: domain.LinkTargetSelf,
 					},
 					{
 						Type:           domain.LinkTypeCustom,
-						URL:            "https://host",
+						URL:            gu.Ptr("https://host"),
 						TranslationKey: gu.Ptr("linktext"),
 						Target:         domain.LinkTargetBlank,
 					},
@@ -4566,22 +4566,22 @@ func TestListLinkstSettings(t *testing.T) {
 				Links: []domain.Link{
 					{
 						Type:   domain.LinkTypeTermsOfService,
-						URL:    "https://host",
+						URL:    gu.Ptr("https://host"),
 						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:   domain.LinkTypePrivacyPolicy,
-						URL:    "https://host",
+						URL:    gu.Ptr("https://host"),
 						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:   domain.LinkTypeSupport,
-						URL:    "email",
+						URL:    gu.Ptr("email"),
 						Target: domain.LinkTargetSelf,
 					},
 					{
 						Type:           domain.LinkTypeCustom,
-						URL:            "https://host",
+						URL:            gu.Ptr("https://host"),
 						TranslationKey: gu.Ptr("linktext"),
 						Target:         domain.LinkTargetBlank,
 					},
@@ -4597,22 +4597,22 @@ func TestListLinkstSettings(t *testing.T) {
 				Links: []domain.Link{
 					{
 						Type:   domain.LinkTypeTermsOfService,
-						URL:    "https://host",
+						URL:    gu.Ptr("https://host"),
 						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:   domain.LinkTypePrivacyPolicy,
-						URL:    "https://host",
+						URL:    gu.Ptr("https://host"),
 						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:   domain.LinkTypeSupport,
-						URL:    "email",
+						URL:    gu.Ptr("email"),
 						Target: domain.LinkTargetSelf,
 					},
 					{
 						Type:           domain.LinkTypeCustom,
-						URL:            "https://host",
+						URL:            gu.Ptr("https://host"),
 						TranslationKey: gu.Ptr("linktext"),
 						Target:         domain.LinkTargetBlank,
 					},
@@ -4628,22 +4628,22 @@ func TestListLinkstSettings(t *testing.T) {
 				Links: []domain.Link{
 					{
 						Type:   domain.LinkTypeTermsOfService,
-						URL:    "https://host",
+						URL:    gu.Ptr("https://host"),
 						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:   domain.LinkTypePrivacyPolicy,
-						URL:    "https://host",
+						URL:    gu.Ptr("https://host"),
 						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:   domain.LinkTypeSupport,
-						URL:    "email",
+						URL:    gu.Ptr("email"),
 						Target: domain.LinkTargetSelf,
 					},
 					{
 						Type:           domain.LinkTypeCustom,
-						URL:            "https://host",
+						URL:            gu.Ptr("https://host"),
 						TranslationKey: gu.Ptr("linktext"),
 						Target:         domain.LinkTargetBlank,
 					},
@@ -4659,22 +4659,22 @@ func TestListLinkstSettings(t *testing.T) {
 				Links: []domain.Link{
 					{
 						Type:   domain.LinkTypeTermsOfService,
-						URL:    "https://host",
+						URL:    gu.Ptr("https://host"),
 						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:   domain.LinkTypePrivacyPolicy,
-						URL:    "https://host",
+						URL:    gu.Ptr("https://host"),
 						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:   domain.LinkTypeSupport,
-						URL:    "email",
+						URL:    gu.Ptr("email"),
 						Target: domain.LinkTargetSelf,
 					},
 					{
 						Type:           domain.LinkTypeCustom,
-						URL:            "https://host",
+						URL:            gu.Ptr("https://host"),
 						TranslationKey: gu.Ptr("linktext"),
 						Target:         domain.LinkTargetBlank,
 					},
@@ -4756,22 +4756,22 @@ func TestSetLinksSettings(t *testing.T) {
 			Links: []domain.Link{
 				{
 					Type:   domain.LinkTypeTermsOfService,
-					URL:    "https://host",
+					URL:    gu.Ptr("https://host"),
 					Target: domain.LinkTargetBlank,
 				},
 				{
 					Type:   domain.LinkTypePrivacyPolicy,
-					URL:    "https://host",
+					URL:    gu.Ptr("https://host"),
 					Target: domain.LinkTargetBlank,
 				},
 				{
 					Type:   domain.LinkTypeSupport,
-					URL:    "email",
+					URL:    gu.Ptr("email"),
 					Target: domain.LinkTargetSelf,
 				},
 				{
 					Type:           domain.LinkTypeCustom,
-					URL:            "https://host",
+					URL:            gu.Ptr("https://host"),
 					TranslationKey: gu.Ptr("linktext"),
 					Target:         domain.LinkTargetBlank,
 				},
@@ -4798,22 +4798,22 @@ func TestSetLinksSettings(t *testing.T) {
 					Links: []domain.Link{
 						{
 							Type:   domain.LinkTypeTermsOfService,
-							URL:    "https://host",
+							URL:    gu.Ptr("https://host"),
 							Target: domain.LinkTargetBlank,
 						},
 						{
 							Type:   domain.LinkTypePrivacyPolicy,
-							URL:    "https://host",
+							URL:    gu.Ptr("https://host"),
 							Target: domain.LinkTargetBlank,
 						},
 						{
 							Type:   domain.LinkTypeSupport,
-							URL:    "email",
+							URL:    gu.Ptr("email"),
 							Target: domain.LinkTargetSelf,
 						},
 						{
 							Type:           domain.LinkTypeCustom,
-							URL:            "https://host",
+							URL:            gu.Ptr("https://host"),
 							TranslationKey: gu.Ptr("linktext"),
 							Target:         domain.LinkTargetBlank,
 						},
@@ -4832,22 +4832,22 @@ func TestSetLinksSettings(t *testing.T) {
 					Links: []domain.Link{
 						{
 							Type:   domain.LinkTypeTermsOfService,
-							URL:    "https://host",
+							URL:    gu.Ptr("https://host"),
 							Target: domain.LinkTargetBlank,
 						},
 						{
 							Type:   domain.LinkTypePrivacyPolicy,
-							URL:    "https://host",
+							URL:    gu.Ptr("https://host"),
 							Target: domain.LinkTargetBlank,
 						},
 						{
 							Type:   domain.LinkTypeSupport,
-							URL:    "email",
+							URL:    gu.Ptr("email"),
 							Target: domain.LinkTargetSelf,
 						},
 						{
 							Type:           domain.LinkTypeCustom,
-							URL:            "https://host",
+							URL:            gu.Ptr("https://host"),
 							TranslationKey: gu.Ptr("linktext"),
 							Target:         domain.LinkTargetBlank,
 						},
@@ -4866,22 +4866,22 @@ func TestSetLinksSettings(t *testing.T) {
 					Links: []domain.Link{
 						{
 							Type:   domain.LinkTypeTermsOfService,
-							URL:    "https://host",
+							URL:    gu.Ptr("https://host"),
 							Target: domain.LinkTargetBlank,
 						},
 						{
 							Type:   domain.LinkTypePrivacyPolicy,
-							URL:    "https://host",
+							URL:    gu.Ptr("https://host"),
 							Target: domain.LinkTargetBlank,
 						},
 						{
 							Type:   domain.LinkTypeSupport,
-							URL:    "email",
+							URL:    gu.Ptr("email"),
 							Target: domain.LinkTargetSelf,
 						},
 						{
 							Type:           domain.LinkTypeCustom,
-							URL:            "https://host",
+							URL:            gu.Ptr("https://host"),
 							TranslationKey: gu.Ptr("linktext"),
 							Target:         domain.LinkTargetBlank,
 						},
@@ -4901,22 +4901,22 @@ func TestSetLinksSettings(t *testing.T) {
 					Links: []domain.Link{
 						{
 							Type:   domain.LinkTypeTermsOfService,
-							URL:    "https://host",
+							URL:    gu.Ptr("https://host"),
 							Target: domain.LinkTargetBlank,
 						},
 						{
 							Type:   domain.LinkTypePrivacyPolicy,
-							URL:    "https://host",
+							URL:    gu.Ptr("https://host"),
 							Target: domain.LinkTargetBlank,
 						},
 						{
 							Type:   domain.LinkTypeSupport,
-							URL:    "email",
+							URL:    gu.Ptr("email"),
 							Target: domain.LinkTargetSelf,
 						},
 						{
 							Type:           domain.LinkTypeCustom,
-							URL:            "https://host",
+							URL:            gu.Ptr("https://host"),
 							TranslationKey: gu.Ptr("linktext"),
 							Target:         domain.LinkTargetBlank,
 						},
@@ -4958,22 +4958,22 @@ func TestDeleteLinksSettings(t *testing.T) {
 			Links: []domain.Link{
 				{
 					Type:   domain.LinkTypeTermsOfService,
-					URL:    "https://host",
+					URL:    gu.Ptr("https://host"),
 					Target: domain.LinkTargetBlank,
 				},
 				{
 					Type:   domain.LinkTypePrivacyPolicy,
-					URL:    "https://host",
+					URL:    gu.Ptr("https://host"),
 					Target: domain.LinkTargetBlank,
 				},
 				{
 					Type:   domain.LinkTypeSupport,
-					URL:    "email",
+					URL:    gu.Ptr("email"),
 					Target: domain.LinkTargetSelf,
 				},
 				{
 					Type:           domain.LinkTypeCustom,
-					URL:            "https://host",
+					URL:            gu.Ptr("https://host"),
 					TranslationKey: gu.Ptr("linktext"),
 					Target:         domain.LinkTargetBlank,
 				},
@@ -4992,22 +4992,22 @@ func TestDeleteLinksSettings(t *testing.T) {
 			Links: []domain.Link{
 				{
 					Type:   domain.LinkTypeTermsOfService,
-					URL:    "https://host",
+					URL:    gu.Ptr("https://host"),
 					Target: domain.LinkTargetBlank,
 				},
 				{
 					Type:   domain.LinkTypePrivacyPolicy,
-					URL:    "https://host",
+					URL:    gu.Ptr("https://host"),
 					Target: domain.LinkTargetBlank,
 				},
 				{
 					Type:   domain.LinkTypeSupport,
-					URL:    "email",
+					URL:    gu.Ptr("email"),
 					Target: domain.LinkTargetSelf,
 				},
 				{
 					Type:           domain.LinkTypeCustom,
-					URL:            "https://host",
+					URL:            gu.Ptr("https://host"),
 					TranslationKey: gu.Ptr("linktext"),
 					Target:         domain.LinkTargetBlank,
 				},

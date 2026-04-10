@@ -3,12 +3,14 @@ package projection
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"net/url"
 	"time"
 
 	"github.com/muhlemmer/gu"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	legacy_domain "github.com/zitadel/zitadel/internal/domain"
@@ -1272,55 +1274,25 @@ func (p *relationalTablesProjection) reducePrivacyPolicyAdded(event eventstore.E
 
 		settingsRepo := repository.LinksSettingsRepository()
 
-		links := make([]domain.Link, 0, 6)
+		links := []domain.Link{}
 
 		if policyEvent.TOSLink != "" {
-			links = append(links, domain.Link{
-				Type:   domain.LinkTypeTermsOfService,
-				URL:    policyEvent.TOSLink,
-				Target: domain.LinkTargetBlank,
-			})
+			links = append(links, domain.Link{Type: domain.LinkTypeTermsOfService, URL: gu.Ptr(policyEvent.TOSLink), Target: domain.LinkTargetBlank})
 		}
-
 		if policyEvent.PrivacyLink != "" {
-			links = append(links, domain.Link{
-				Type:   domain.LinkTypePrivacyPolicy,
-				URL:    policyEvent.PrivacyLink,
-				Target: domain.LinkTargetBlank,
-			})
+			links = append(links, domain.Link{Type: domain.LinkTypePrivacyPolicy, URL: gu.Ptr(policyEvent.PrivacyLink), Target: domain.LinkTargetBlank})
 		}
-
 		if policyEvent.HelpLink != "" {
-			links = append(links, domain.Link{
-				Type:   domain.LinkTypeHelp,
-				URL:    policyEvent.HelpLink,
-				Target: domain.LinkTargetBlank,
-			})
+			links = append(links, domain.Link{Type: domain.LinkTypeHelp, URL: gu.Ptr(policyEvent.HelpLink), Target: domain.LinkTargetBlank})
 		}
-
 		if policyEvent.SupportEmail != "" {
-			links = append(links, domain.Link{
-				Type:   domain.LinkTypeSupport,
-				URL:    string(policyEvent.SupportEmail),
-				Target: domain.LinkTargetBlank,
-			})
+			links = append(links, domain.Link{Type: domain.LinkTypeSupport, URL: gu.Ptr(string(policyEvent.SupportEmail)), Target: domain.LinkTargetBlank})
 		}
-
 		if policyEvent.DocsLink != "" {
-			links = append(links, domain.Link{
-				Type:   domain.LinkTypeDocs,
-				URL:    policyEvent.DocsLink,
-				Target: domain.LinkTargetBlank,
-			})
+			links = append(links, domain.Link{Type: domain.LinkTypeDocs, URL: gu.Ptr(policyEvent.DocsLink), Target: domain.LinkTargetBlank})
 		}
-
 		if policyEvent.CustomLink != "" {
-			links = append(links, domain.Link{
-				Type:           domain.LinkTypeCustom,
-				URL:            policyEvent.CustomLink,
-				TranslationKey: &policyEvent.CustomLinkText,
-				Target:         domain.LinkTargetBlank,
-			})
+			links = append(links, domain.Link{Type: domain.LinkTypeCustom, URL: gu.Ptr(policyEvent.CustomLink), TranslationKey: &policyEvent.CustomLinkText, Target: domain.LinkTargetBlank})
 		}
 
 		settings := domain.LinksSettings{
@@ -1359,56 +1331,15 @@ func (p *relationalTablesProjection) reducePrivacyPolicyChanged(event eventstore
 
 		settingsRepo := repository.LinksSettingsRepository()
 
-		links := make([]domain.Link, 0, 6)
-
-		if policyEvent.TOSLink != nil {
-			links = append(links, domain.Link{
-				Type:   domain.LinkTypeTermsOfService,
-				URL:    *policyEvent.TOSLink,
-				Target: domain.LinkTargetBlank,
-			})
+		// Retrieve the current list of links
+		currentLinks, err := settingsRepo.Get(ctx, v3_sql.SQLTx(tx), database.WithCondition(
+			settingsRepo.UniqueCondition(event.Aggregate().InstanceID, orgId, domain.SettingTypeLinks, domain.SettingStateActive),
+		))
+		if err != nil && !errors.Is(err, &database.NoRowFoundError{}) {
+			return zerrors.ThrowInternalf(err, "HANDL-TxiHwy", "failed to get current links settings")
 		}
 
-		if policyEvent.PrivacyLink != nil {
-			links = append(links, domain.Link{
-				Type:   domain.LinkTypePrivacyPolicy,
-				URL:    *policyEvent.PrivacyLink,
-				Target: domain.LinkTargetBlank,
-			})
-		}
-
-		if policyEvent.HelpLink != nil {
-			links = append(links, domain.Link{
-				Type:   domain.LinkTypeHelp,
-				URL:    *policyEvent.HelpLink,
-				Target: domain.LinkTargetBlank,
-			})
-		}
-
-		if policyEvent.SupportEmail != nil {
-			links = append(links, domain.Link{
-				Type:   domain.LinkTypeSupport,
-				URL:    string(*policyEvent.SupportEmail),
-				Target: domain.LinkTargetBlank,
-			})
-		}
-
-		if policyEvent.DocsLink != nil {
-			links = append(links, domain.Link{
-				Type:   domain.LinkTypeDocs,
-				URL:    *policyEvent.DocsLink,
-				Target: domain.LinkTargetBlank,
-			})
-		}
-
-		if policyEvent.CustomLink != nil {
-			links = append(links, domain.Link{
-				Type:           domain.LinkTypeCustom,
-				URL:            *policyEvent.CustomLink,
-				TranslationKey: policyEvent.CustomLinkText,
-				Target:         domain.LinkTargetBlank,
-			})
-		}
+		links := applyPrivacyPolicyChangedEventIntoExistingLinks(policyEvent, currentLinks)
 
 		settings := domain.LinksSettings{
 			Settings: domain.Settings{
@@ -1422,6 +1353,89 @@ func (p *relationalTablesProjection) reducePrivacyPolicyChanged(event eventstore
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
 	}), nil
+}
+
+// applyPrivacyPolicyChangedEventIntoExistingLinks applies a partial update event to the existing ordered list of links by updating, removing,
+// or appending entries while preserving the original order and metadata of unaffected links.
+func applyPrivacyPolicyChangedEventIntoExistingLinks(policyEvent policy.PrivacyPolicyChangedEvent, currentLinks *domain.LinksSettings) []domain.Link {
+	result := []domain.Link{}
+	processed := make(map[domain.LinkType]bool)
+
+	// 1 - Convert PrivacyPolicyChangedEvent to a map
+	updateMap := make(map[domain.LinkType]domain.Link)
+	if policyEvent.TOSLink != nil {
+		updateMap[domain.LinkTypeTermsOfService] = domain.Link{Type: domain.LinkTypeTermsOfService, URL: policyEvent.TOSLink, Target: domain.LinkTargetBlank}
+	}
+	if policyEvent.PrivacyLink != nil {
+		updateMap[domain.LinkTypePrivacyPolicy] = domain.Link{Type: domain.LinkTypePrivacyPolicy, URL: policyEvent.PrivacyLink, Target: domain.LinkTargetBlank}
+	}
+	if policyEvent.HelpLink != nil {
+		updateMap[domain.LinkTypeHelp] = domain.Link{Type: domain.LinkTypeHelp, URL: policyEvent.HelpLink, Target: domain.LinkTargetBlank}
+	}
+	if policyEvent.SupportEmail != nil {
+		supportURL := string(*policyEvent.SupportEmail)
+		updateMap[domain.LinkTypeSupport] = domain.Link{Type: domain.LinkTypeSupport, URL: &supportURL, Target: domain.LinkTargetBlank}
+	}
+	if policyEvent.DocsLink != nil {
+		updateMap[domain.LinkTypeDocs] = domain.Link{Type: domain.LinkTypeDocs, URL: policyEvent.DocsLink, Target: domain.LinkTargetBlank}
+	}
+	if policyEvent.CustomLink != nil || policyEvent.CustomLinkText != nil {
+		link := domain.Link{Type: domain.LinkTypeCustom, Target: domain.LinkTargetBlank}
+		if policyEvent.CustomLink != nil {
+			link.URL = policyEvent.CustomLink
+		}
+		link.TranslationKey = policyEvent.CustomLinkText
+		updateMap[domain.LinkTypeCustom] = link
+	}
+
+	// 2 - Update/remove links
+	for _, link := range currentLinks.Links {
+		upd, ok := updateMap[link.Type]
+		if !ok {
+			result = append(result, link)
+			continue
+		}
+
+		processed[link.Type] = true
+
+		// Remove if URL is explicitly set to empty string
+		if upd.URL != nil && *upd.URL == "" {
+			continue
+		}
+
+		// Update URL if provided
+		if upd.URL != nil {
+			link.URL = upd.URL
+		}
+
+		// Update translation key if provided
+		if upd.TranslationKey != nil {
+			link.TranslationKey = upd.TranslationKey
+		}
+
+		result = append(result, link)
+	}
+
+	// 3 - append new links
+	for _, upd := range updateMap {
+		if processed[upd.Type] {
+			continue
+		}
+
+		// Skip if URL is nil or empty (can't create a link without a URL)
+		if upd.URL == nil || *upd.URL == "" {
+			continue
+		}
+
+		result = append(result, domain.Link{
+			Type:           upd.Type,
+			URL:            upd.URL,
+			Target:         domain.LinkTargetBlank,
+			TranslationKey: upd.TranslationKey,
+		})
+	}
+
+	return result
 }
 
 func (p *relationalTablesProjection) reduceOrgPrivacyPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {

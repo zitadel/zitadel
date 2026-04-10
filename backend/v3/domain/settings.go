@@ -445,7 +445,7 @@ const (
 
 type Link struct {
 	Type           LinkType   `json:"type"`
-	URL            string     `json:"url"`
+	URL            *string    `json:"url,omitempty"`
 	Target         LinkTarget `json:"target"`
 	TranslationKey *string    `json:"translationKey,omitempty"`
 }
