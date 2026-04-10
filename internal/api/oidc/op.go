@@ -137,18 +137,18 @@ func NewServer(
 	accessTokenKeySet := newOidcKeySet(keyCache, withKeyExpiryCheck(true))
 	idTokenHintKeySet := newOidcKeySet(keyCache)
 
-	crypto := op.NewAES256GCMCrypto(opConfig.CryptoKey, "")
+	alg := op.NewAES256GCMCrypto(opConfig.CryptoKey, "")
 	if authAlg.LegacyTokenEnabled() {
-		crypto = op.NewCompositeCrypto(
-			crypto,
+		alg = op.NewCompositeCrypto(
+			alg,
 			[]op.Decrypter{
-				crypto,
+				alg,
 				op.NewAESCrypto(opConfig.CryptoKey),
 			},
 		)
 	}
 	options := []op.Option{
-		op.WithCrypto(crypto),
+		op.WithCrypto(alg),
 	}
 	if !externalSecure {
 		options = append(options, op.WithAllowInsecure())
@@ -187,7 +187,7 @@ func NewServer(
 		hasher:                     hasher,
 		encAlg:                     authAlg,
 		targetEncryptionAlgorithm:  targetEncryptionAlgorithm,
-		opCrypto:                   crypto,
+		opCrypto:                   alg,
 		assetAPIPrefix:             assets.AssetAPI(),
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}

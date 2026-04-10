@@ -101,7 +101,7 @@ func (a *AESCrypto) DecryptToken(value string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	decrypted, err := a.decryptAS256GCM(value, key)
+	decrypted, err := a.decryptA256GCM(value, key)
 	if err == nil {
 		return decrypted, nil
 	}
@@ -119,10 +119,10 @@ func (a *AESCrypto) LegacyTokenEnabled() bool {
 	return a.legacyToken
 }
 
-func (a *AESCrypto) decryptAS256GCM(value string, key string) (string, error) {
+func (a *AESCrypto) decryptA256GCM(value string, key string) (string, error) {
 	jwe, err := jose.ParseEncrypted(value, []jose.KeyAlgorithm{jose.A256GCMKW}, []jose.ContentEncryption{jose.A256GCM})
 	if err != nil {
-		return "", zerrors.ThrowPreconditionFailed(err, "CRYPT-ha6Oh", "malformed encypted value")
+		return "", zerrors.ThrowPreconditionFailed(err, "CRYPT-ha6Oh", "malformed encrypted value")
 	}
 	decrypted, err := jwe.Decrypt(key)
 	if err != nil {
@@ -137,7 +137,7 @@ func (a *AESCrypto) decryptAS256GCM(value string, key string) (string, error) {
 func (a *AESCrypto) decryptLegacyToken(value string, key string) (string, error) {
 	text, err := base64.URLEncoding.DecodeString(value)
 	if err != nil {
-		return "", zerrors.ThrowPreconditionFailed(err, "CRYPT-Eep6o", "malformed encypted value")
+		return "", zerrors.ThrowPreconditionFailed(err, "CRYPT-Eep6o", "malformed encrypted value")
 	}
 	decrypted, err := DecryptAES(text, key)
 	if err != nil {
