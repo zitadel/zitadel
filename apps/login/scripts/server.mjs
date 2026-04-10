@@ -1,7 +1,6 @@
 import { accessSync, constants, readFileSync } from "node:fs";
 import { request as httpRequest } from "node:http";
-import { request as httpsRequest } from "node:https";
-import { createServer } from "node:https";
+import { createServer, request as httpsRequest } from "node:https";
 import { createRequire } from "node:module";
 
 /**
@@ -48,7 +47,10 @@ async function pollReady(url, timeoutMs) {
         resolve(res.statusCode === 200);
       });
       req.on("error", () => resolve(false));
-      req.on("timeout", () => { req.destroy(); resolve(false); });
+      req.on("timeout", () => {
+        req.destroy();
+        resolve(false);
+      });
       req.end();
     });
 
