@@ -24,7 +24,6 @@ var (
 )
 
 type EncryptionKeyConfig struct {
-	AcceptLegacyValue    bool
 	DomainVerification   *crypto.KeyConfig
 	IDPConfig            *crypto.KeyConfig
 	OIDC                 *crypto.KeyConfig
@@ -39,10 +38,9 @@ type EncryptionKeyConfig struct {
 }
 
 type EncryptionKeys struct {
-	AcceptLegacyValue  bool
 	DomainVerification crypto.EncryptionAlgorithm
 	IDPConfig          crypto.EncryptionAlgorithm
-	OIDC               crypto.EncryptionAlgorithm
+	OIDC               crypto.AuthEncryptionAlgorithm
 	SAML               crypto.EncryptionAlgorithm
 	OTP                crypto.EncryptionAlgorithm
 	SMS                crypto.EncryptionAlgorithm
@@ -58,15 +56,7 @@ func EnsureEncryptionKeys(ctx context.Context, keyConfig *EncryptionKeyConfig, k
 	if err := VerifyDefaultKeys(ctx, keyStorage); err != nil {
 		return nil, err
 	}
-	var aes256GCMOptions []crypto.AES256GCMCryptoOption
-	if keyConfig.AcceptLegacyValue {
-		aes256GCMOptions = append(aes256GCMOptions,
-			crypto.WithAES256GCMCryptoFallbackDecrypt(crypto.DecryptAES),
-		)
-	}
-
 	keys = new(EncryptionKeys)
-	keys.AcceptLegacyValue = keyConfig.AcceptLegacyValue
 	keys.DomainVerification, err = crypto.NewAESCrypto(keyConfig.DomainVerification, keyStorage)
 	if err != nil {
 		return nil, err
@@ -75,7 +65,7 @@ func EnsureEncryptionKeys(ctx context.Context, keyConfig *EncryptionKeyConfig, k
 	if err != nil {
 		return nil, err
 	}
-	keys.OIDC, err = crypto.NewAES256GCMCrypto(keyConfig.OIDC, keyStorage, aes256GCMOptions...)
+	keys.OIDC, err = crypto.NewAESCrypto(keyConfig.OIDC, keyStorage)
 	if err != nil {
 		return nil, err
 	}

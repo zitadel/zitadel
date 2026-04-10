@@ -42,6 +42,18 @@ func newTestAESCrypto(t testing.TB) *AESCrypto {
 	return aesCrypto
 }
 
+func newTestAESCryptoLegacyToken(t testing.TB) *AESCrypto {
+	keyConfig := &KeyConfig{
+		LegacyToken:      true,
+		EncryptionKeyID:  "keyID",
+		DecryptionKeyIDs: []string{"keyID"},
+	}
+	keys := Keys{"keyID": "ThisKeyNeedsToHave32Characters!!"}
+	aesCrypto, err := NewAESCrypto(keyConfig, &mockKeyStorage{keys: keys})
+	require.NoError(t, err)
+	return aesCrypto
+}
+
 func TestAESCrypto_DecryptString(t *testing.T) {
 	aesCrypto := newTestAESCrypto(t)
 	const input = "SecretData"
@@ -108,24 +120,7 @@ func FuzzAESCrypto_DecryptString(f *testing.F) {
 	})
 }
 
-func newTestAES256GCMCrypto(fallbackDecrypt func(value []byte, key string) ([]byte, error)) func(t testing.TB) EncryptionAlgorithm {
-	keyConfig := &KeyConfig{
-		EncryptionKeyID:  "keyID",
-		DecryptionKeyIDs: []string{"keyID"},
-	}
-	keys := Keys{"keyID": "ThisKeyNeedsToHave32Characters!!"}
-	return func(t testing.TB) EncryptionAlgorithm {
-		aesCrypto, err := NewAES256GCMCrypto(
-			keyConfig,
-			&mockKeyStorage{keys: keys},
-			WithAES256GCMCryptoFallbackDecrypt(fallbackDecrypt),
-		)
-		require.NoError(t, err)
-		return aesCrypto
-	}
-}
-
-func TestAES256GCMCrypto_EncryptString(t *testing.T) {
+func TestAESCrypto_EncryptToken(t *testing.T) {
 	tests := []struct {
 		name       string
 		config     *KeyConfig
@@ -159,9 +154,9 @@ func TestAES256GCMCrypto_EncryptString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			a, err := NewAES256GCMCrypto(tt.config, tt.keyStorage)
+			a, err := NewAESCrypto(tt.config, tt.keyStorage)
 			require.NoError(t, err)
-			got, gotErr := a.EncryptString([]byte(tt.value))
+			got, gotErr := a.EncryptToken(tt.value)
 			require.ErrorIs(t, gotErr, tt.wantErr)
 			if tt.want {
 				assert.NotEmpty(t, got, "expected non-empty result")
@@ -170,75 +165,74 @@ func TestAES256GCMCrypto_EncryptString(t *testing.T) {
 	}
 }
 
-func TestAES256GCMCrypto_DecryptString(t *testing.T) {
+func TestAESCrypto_DecryptToken(t *testing.T) {
 	tests := []struct {
 		name    string
-		crypto  func(testing.TB) EncryptionAlgorithm
-		payload func(*testing.T) []byte
-		keyID   string
+		crypto  func(testing.TB) *AESCrypto
+		payload func(*testing.T) string
 		want    string
 		wantErr error
 	}{
 		{
 			name:   "ok",
-			crypto: newTestAES256GCMCrypto(nil),
-			payload: func(t *testing.T) []byte {
-				a := newTestAES256GCMCrypto(nil)(t)
-				crypted, err := a.Encrypt([]byte("SecretData"))
+			crypto: newTestAESCrypto,
+			payload: func(t *testing.T) string {
+				a := newTestAESCrypto(t)
+				crypted, err := a.EncryptToken("SecretData")
 				require.NoError(t, err)
 				return crypted
 			},
-			keyID:   "keyID",
 			want:    "SecretData",
 			wantErr: nil,
 		},
 		{
-			name:   "wrong key id",
-			crypto: newTestAES256GCMCrypto(nil),
-			payload: func(t *testing.T) []byte {
-				a := newTestAES256GCMCrypto(nil)(t)
-				crypted, err := a.Encrypt([]byte("SecretData"))
-				require.NoError(t, err)
-				return crypted
-			},
-			keyID:   "foo",
-			wantErr: zerrors.ThrowNotFound(nil, "CRYPT-nkj1s", "unknown key id"),
-		},
-		{
 			name:   "malformed encrypted value",
-			crypto: newTestAES256GCMCrypto(nil),
-			payload: func(t *testing.T) []byte {
-				return []byte("malformed")
+			crypto: newTestAESCrypto,
+			payload: func(t *testing.T) string {
+				return "malformed"
 			},
-			keyID:   "keyID",
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "CRYPT-ha6Oh", "malformed encypted value"),
 		},
 		{
 			name:   "invalid value",
-			crypto: newTestAES256GCMCrypto(nil),
-			payload: func(t *testing.T) []byte {
-				return []byte("eyJhbGciOiJBMjU2R0NNS1ciLCJlbmMiOiJBMjU2R0NNIiwiaXYiOiJfcUNRelpoVDF4bjJfUjJiIiwia2lkIjoia2V5SUQiLCJ0YWciOiJlcm1EV1oySE5mOGctMHRJa29zdHpRIn0.zGWGOxwPI8iq-ZSwmAqc1Ps8tltCp-g815nj7jY_m9Q.U_tpQDuz8SzrDEAD._YzsLNPi2BrmWA.G0I-gIfkWy6DNhqXPD_EXg")
+			crypto: newTestAESCrypto,
+			payload: func(t *testing.T) string {
+				return "eyJhbGciOiJBMjU2R0NNS1ciLCJlbmMiOiJBMjU2R0NNIiwiaXYiOiJfcUNRelpoVDF4bjJfUjJiIiwia2lkIjoia2V5SUQiLCJ0YWciOiJlcm1EV1oySE5mOGctMHRJa29zdHpRIn0.zGWGOxwPI8iq-ZSwmAqc1Ps8tltCp-g815nj7jY_m9Q.U_tpQDuz8SzrDEAD._YzsLNPi2BrmWA.G0I-gIfkWy6DNhqXPD_EXg"
 			},
-			keyID:   "keyID",
 			wantErr: zerrors.ThrowUnauthenticated(nil, "CRYPT-OhN2u", "failed to decrypt value"),
 		},
 		{
-			name:   "fallback decrypt",
-			crypto: newTestAES256GCMCrypto(DecryptAES),
-			payload: func(t *testing.T) []byte {
-				a := newTestAESCrypto(t)
-				crypted, err := a.Encrypt([]byte("SecretData"))
+			name:   "legacy decrypt",
+			crypto: newTestAESCryptoLegacyToken,
+			payload: func(t *testing.T) string {
+				a := newTestAESCryptoLegacyToken(t)
+				crypted, err := EncryptAESString("SecretData", a.encryptionKey())
 				require.NoError(t, err)
 				return crypted
 			},
-			keyID: "keyID",
-			want:  "SecretData",
+			want: "SecretData",
+		},
+		{
+			name:   "legacy invalid base64",
+			crypto: newTestAESCryptoLegacyToken,
+			payload: func(t *testing.T) string {
+				return "invalid_base64"
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "CRYPT-ha6Oh", "malformed encypted value"),
+		},
+		{
+			name:   "legacy invalid token",
+			crypto: newTestAESCryptoLegacyToken,
+			payload: func(t *testing.T) string {
+				return "DEADBEEFDEADBEEFDEADBEEF"
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "CRYPT-ohGh6", "non-UTF-8 in decrypted string"),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			a := tt.crypto(t)
-			got, gotErr := a.DecryptString(tt.payload(t), tt.keyID)
+			got, gotErr := a.DecryptToken(tt.payload(t))
 			require.ErrorIs(t, gotErr, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})

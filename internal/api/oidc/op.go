@@ -83,7 +83,7 @@ type OPStorage struct {
 	defaultIdTokenLifetime            time.Duration
 	defaultRefreshTokenIdleExpiration time.Duration
 	defaultRefreshTokenExpiration     time.Duration
-	encAlg                            crypto.EncryptionAlgorithm
+	authAlg                           crypto.AuthAlgorithm
 	assetAPIPrefix                    func(ctx context.Context) string
 	contextToIssuer                   func(context.Context) string
 	federateLogoutCache               cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout]
@@ -118,8 +118,7 @@ func NewServer(
 	command *command.Commands,
 	query *query.Queries,
 	repo repository.Repository,
-	acceptLegacyTokens bool,
-	encryptionAlg crypto.EncryptionAlgorithm,
+	authAlg crypto.AuthAlgorithm,
 	targetEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	cryptoKey []byte,
 	es *eventstore.Eventstore,
@@ -133,13 +132,13 @@ func NewServer(
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
-	storage := newStorage(config, command, query, repo, encryptionAlg, es, ContextToIssuer, federatedLogoutCache)
+	storage := newStorage(config, command, query, repo, authAlg, es, ContextToIssuer, federatedLogoutCache)
 	keyCache := newPublicKeyCache(ctx, config.PublicKeyCacheMaxAge, queryKeyFunc(query))
 	accessTokenKeySet := newOidcKeySet(keyCache, withKeyExpiryCheck(true))
 	idTokenHintKeySet := newOidcKeySet(keyCache)
 
 	crypto := op.NewAES256GCMCrypto(opConfig.CryptoKey, "")
-	if acceptLegacyTokens {
+	if authAlg.LegacyTokenEnabled() {
 		crypto = op.NewCompositeCrypto(
 			crypto,
 			[]op.Decrypter{
@@ -186,7 +185,7 @@ func NewServer(
 		jwksCacheControlMaxAge:     config.JWKSCacheControlMaxAge,
 		fallbackLogger:             fallbackLogger,
 		hasher:                     hasher,
-		encAlg:                     encryptionAlg,
+		encAlg:                     authAlg,
 		targetEncryptionAlgorithm:  targetEncryptionAlgorithm,
 		opCrypto:                   crypto,
 		assetAPIPrefix:             assets.AssetAPI(),
@@ -260,7 +259,7 @@ func newStorage(
 	command *command.Commands,
 	query *query.Queries,
 	repo repository.Repository,
-	encAlg crypto.EncryptionAlgorithm,
+	authAlg crypto.AuthAlgorithm,
 	es *eventstore.Eventstore,
 	contextToIssuer func(context.Context) string,
 	federateLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
@@ -277,7 +276,7 @@ func newStorage(
 		defaultIdTokenLifetime:            config.DefaultIdTokenLifetime,
 		defaultRefreshTokenIdleExpiration: config.DefaultRefreshTokenIdleExpiration,
 		defaultRefreshTokenExpiration:     config.DefaultRefreshTokenExpiration,
-		encAlg:                            encAlg,
+		authAlg:                           authAlg,
 		assetAPIPrefix:                    assets.AssetAPI(),
 		contextToIssuer:                   contextToIssuer,
 		federateLogoutCache:               federateLogoutCache,

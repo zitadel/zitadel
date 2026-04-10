@@ -20,6 +20,7 @@ type AESCrypto struct {
 	keys            map[string]string
 	encryptionKeyID string
 	keyIDs          []string
+	legacyToken     bool
 }
 
 func NewAESCrypto(config *KeyConfig, keyStorage KeyStorage) (*AESCrypto, error) {
@@ -31,6 +32,7 @@ func NewAESCrypto(config *KeyConfig, keyStorage KeyStorage) (*AESCrypto, error) 
 		keys:            keys,
 		encryptionKeyID: config.EncryptionKeyID,
 		keyIDs:          ids,
+		legacyToken:     config.LegacyToken,
 	}, nil
 }
 
@@ -70,6 +72,81 @@ func (a *AESCrypto) EncryptionKeyID() string {
 
 func (a *AESCrypto) DecryptionKeyIDs() []string {
 	return a.keyIDs
+}
+
+func (a *AESCrypto) EncryptToken(data string) (string, error) {
+	encrypter, err := jose.NewEncrypter(jose.A256GCM, jose.Recipient{
+		Algorithm: jose.A256GCMKW,
+		Key:       a.encryptionKey(),
+		KeyID:     a.encryptionKeyID,
+	}, nil)
+	if err != nil {
+		return "", zerrors.ThrowInternal(err, "CRYPTO-Woox2", "Errors.Internal")
+	}
+
+	encrypted, err := encrypter.Encrypt([]byte(data))
+	if err != nil {
+		return "", zerrors.ThrowInternal(err, "CRYPTO-Woox3", "Errors.Internal")
+	}
+
+	serialized, err := encrypted.CompactSerialize()
+	if err != nil {
+		return "", zerrors.ThrowInternal(err, "CRYPT-Woox4", "Errors.Internal")
+	}
+	return serialized, nil
+}
+
+func (a *AESCrypto) DecryptToken(value string) (string, error) {
+	key, err := a.decryptionKey(a.encryptionKeyID)
+	if err != nil {
+		return "", err
+	}
+	decrypted, err := a.decryptAS256GCM(value, key)
+	if err == nil {
+		return decrypted, nil
+	}
+	if !a.legacyToken {
+		return "", err
+	}
+	decrypted, err2 := a.decryptLegacyToken(value, key)
+	if err2 != nil {
+		return "", errors.Join(err, err2)
+	}
+	return decrypted, nil
+}
+
+func (a *AESCrypto) LegacyTokenEnabled() bool {
+	return a.legacyToken
+}
+
+func (a *AESCrypto) decryptAS256GCM(value string, key string) (string, error) {
+	jwe, err := jose.ParseEncrypted(value, []jose.KeyAlgorithm{jose.A256GCMKW}, []jose.ContentEncryption{jose.A256GCM})
+	if err != nil {
+		return "", zerrors.ThrowPreconditionFailed(err, "CRYPT-ha6Oh", "malformed encypted value")
+	}
+	decrypted, err := jwe.Decrypt(key)
+	if err != nil {
+		return "", zerrors.ThrowUnauthenticated(err, "CRYPT-OhN2u", "failed to decrypt value")
+	}
+	if !utf8.Valid(decrypted) {
+		return "", zerrors.ThrowPreconditionFailed(err, "CRYPT-Koh1u", "non-UTF-8 in decrypted string")
+	}
+	return string(decrypted), nil
+}
+
+func (a *AESCrypto) decryptLegacyToken(value string, key string) (string, error) {
+	text, err := base64.URLEncoding.DecodeString(value)
+	if err != nil {
+		return "", zerrors.ThrowPreconditionFailed(err, "CRYPT-Eep6o", "malformed encypted value")
+	}
+	decrypted, err := DecryptAES(text, key)
+	if err != nil {
+		return "", err
+	}
+	if !utf8.Valid(decrypted) {
+		return "", zerrors.ThrowPreconditionFailed(err, "CRYPT-ohGh6", "non-UTF-8 in decrypted string")
+	}
+	return string(decrypted), nil
 }
 
 func (a *AESCrypto) encryptionKey() string {
@@ -148,130 +225,7 @@ func DecryptAES(text []byte, key string) ([]byte, error) {
 	return cipherText, err
 }
 
-// AES256GCMCrypto implements the EncryptionAlgorithm interface using AES-256-GCM for encryption and decryption.
-type AES256GCMCrypto struct {
-	keys            map[string]string
-	encryptionKeyID string
-	keyIDs          []string
-	fallbackDecrypt func(value []byte, key string) ([]byte, error)
-}
-
-var _ EncryptionAlgorithm = (*AES256GCMCrypto)(nil)
-
-func NewAES256GCMCrypto(config *KeyConfig, keyStorage KeyStorage, options ...AES256GCMCryptoOption) (*AES256GCMCrypto, error) {
-	keys, ids, err := LoadKeys(config, keyStorage)
-	if err != nil {
-		return nil, err
-	}
-	crypto := &AES256GCMCrypto{
-		keys:            keys,
-		encryptionKeyID: config.EncryptionKeyID,
-		keyIDs:          ids,
-	}
-	for _, option := range options {
-		option(crypto)
-	}
-	return crypto, nil
-}
-
-func (a *AES256GCMCrypto) Algorithm() string {
-	return string(jose.A256GCMKW)
-}
-
-func (a *AES256GCMCrypto) EncryptString(value []byte) (string, error) {
-	encrypter, err := jose.NewEncrypter(jose.A256GCM, jose.Recipient{
-		Algorithm: jose.A256GCMKW,
-		Key:       a.encryptionKey(),
-		KeyID:     a.encryptionKeyID,
-	}, nil)
-	if err != nil {
-		return "", zerrors.ThrowInternal(err, "CRYPTO-Woox2", "Errors.Internal")
-	}
-
-	encrypted, err := encrypter.Encrypt(value)
-	if err != nil {
-		return "", zerrors.ThrowInternal(err, "CRYPTO-Woox3", "Errors.Internal")
-	}
-
-	serialized, err := encrypted.CompactSerialize()
-	if err != nil {
-		return "", zerrors.ThrowInternal(err, "CRYPT-Woox4", "Errors.Internal")
-	}
-	return serialized, nil
-}
-
-func (a *AES256GCMCrypto) Encrypt(value []byte) ([]byte, error) {
-	encrypted, err := a.EncryptString(value)
-	if err != nil {
-		return nil, err
-	}
-	return []byte(encrypted), nil
-}
-
-// DecryptString decrypts the value using the key identified by keyID.
-// When the decrypted value contains non-UTF8 characters an error is returned.
-func (a *AES256GCMCrypto) DecryptString(value []byte, keyID string) (string, error) {
-	b, err := a.Decrypt(value, keyID)
-	if err != nil {
-		return "", err
-	}
-	if !utf8.Valid(b) {
-		return "", zerrors.ThrowPreconditionFailed(err, "CRYPT-Koh1u", "non-UTF-8 in decrypted string")
-	}
-	return string(b), nil
-}
-
-func (a *AES256GCMCrypto) Decrypt(value []byte, keyID string) ([]byte, error) {
-	key, err := a.decryptionKey(keyID)
-	if err != nil {
-		return nil, err
-	}
-	decrypted, err := a.decryptAS256GCM(value, key)
-	if err == nil {
-		return decrypted, nil
-	}
-	if a.fallbackDecrypt == nil {
-		return nil, err
-	}
-	decrypted, fbErr := a.fallbackDecrypt(value, key)
-	if fbErr == nil {
-		return decrypted, nil
-	}
-	return nil, errors.Join(err, fbErr)
-}
-
-func (a *AES256GCMCrypto) decryptAS256GCM(value []byte, key string) ([]byte, error) {
-	jwe, err := jose.ParseEncrypted(string(value), []jose.KeyAlgorithm{jose.A256GCMKW}, []jose.ContentEncryption{jose.A256GCM})
-	if err != nil {
-		return nil, zerrors.ThrowPreconditionFailed(err, "CRYPT-ha6Oh", "malformed encypted value")
-	}
-	decrypted, err := jwe.Decrypt(key)
-	if err != nil {
-		return nil, zerrors.ThrowUnauthenticated(err, "CRYPT-OhN2u", "failed to decrypt value")
-	}
-	return decrypted, nil
-}
-
-func (a *AES256GCMCrypto) EncryptionKeyID() string {
-	return a.encryptionKeyID
-}
-
-func (a *AES256GCMCrypto) DecryptionKeyIDs() []string {
-	return a.keyIDs
-}
-
-func (a *AES256GCMCrypto) encryptionKey() string {
-	return a.keys[a.encryptionKeyID]
-}
-
-func (a *AES256GCMCrypto) decryptionKey(keyID string) (string, error) {
-	key, ok := a.keys[keyID]
-	if !ok {
-		return "", zerrors.ThrowNotFound(nil, "CRYPT-nkj1s", "unknown key id")
-	}
-	return key, nil
-}
-
+/*
 type AES256GCMCryptoOption func(*AES256GCMCrypto)
 
 // WithAES256GCMCryptoFallbackDecrypt adds a fallback decryption function to the AES256GCMCrypto.
@@ -281,3 +235,4 @@ func WithAES256GCMCryptoFallbackDecrypt(fallback func(value []byte, key string) 
 		c.fallbackDecrypt = fallback
 	}
 }
+*/

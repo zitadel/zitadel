@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"encoding/base64"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -85,7 +84,7 @@ func (c *Commands) AddPersonalAccessToken(ctx context.Context, pat *PersonalAcce
 			return nil, err
 		}
 	}
-	validation := prepareAddPersonalAccessToken(pat, c.keyAlgorithm)
+	validation := prepareAddPersonalAccessToken(pat, c.authAlgorithm)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -101,7 +100,7 @@ func (c *Commands) AddPersonalAccessToken(ctx context.Context, pat *PersonalAcce
 	}, nil
 }
 
-func prepareAddPersonalAccessToken(pat *PersonalAccessToken, algorithm crypto.EncryptionAlgorithm) preparation.Validation {
+func prepareAddPersonalAccessToken(pat *PersonalAccessToken, algorithm crypto.AuthAlgorithm) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if err := pat.valid(); err != nil {
 			return nil, err
@@ -114,7 +113,7 @@ func prepareAddPersonalAccessToken(pat *PersonalAccessToken, algorithm crypto.En
 			if err != nil {
 				return nil, err
 			}
-			pat.Token, err = createToken(algorithm, writeModel.TokenID, writeModel.AggregateID)
+			pat.Token, err = algorithm.EncryptToken(pat.TokenID + ":" + pat.AggregateID)
 			if err != nil {
 				return nil, err
 			}
@@ -171,14 +170,6 @@ func prepareRemovePersonalAccessToken(pat *PersonalAccessToken) preparation.Vali
 			}, nil
 		}, nil
 	}
-}
-
-func createToken(algorithm crypto.EncryptionAlgorithm, tokenID, userID string) (string, error) {
-	encrypted, err := algorithm.Encrypt([]byte(tokenID + ":" + userID))
-	if err != nil {
-		return "", err
-	}
-	return base64.RawURLEncoding.EncodeToString(encrypted), nil
 }
 
 func getPersonalAccessTokenWriteModelByID(ctx context.Context, filter preparation.FilterToQueryReducer, userID, tokenID, resourceOwner string, check PermissionCheck) (_ *PersonalAccessTokenWriteModel, err error) {
