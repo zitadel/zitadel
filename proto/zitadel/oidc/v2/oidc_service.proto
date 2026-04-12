@@ -315,10 +315,10 @@ message GetDeviceAuthorizationRequestResponse {
 message AuthorizeOrDenyDeviceAuthorizationRequest {
   // The device authorization id returned when submitting the user code.
   string device_authorization_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 501},
+    (validate.rules).string = {min_len: 1, max_len: 500},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 501;
+      max_length: 500;
     },
     (google.api.field_behavior) = REQUIRED
   ];
