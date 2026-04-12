@@ -45,22 +45,24 @@ networks:
     driver: bridge
 services:
   openldap:
-    image: bitnami/openldap:latest
+    image: osixia/openldap:1.5.0
     ports:
-      - '389:1389'
+      - '389:389'
+      - '636:636'
     environment:
-      - LDAP_ADMIN_USERNAME=admin
+      - LDAP_ORGANISATION=Example Inc.
+      - LDAP_DOMAIN=example.com
       - LDAP_ADMIN_PASSWORD=Password1!
-      - LDAP_USERS=test
-      - LDAP_PASSWORDS=Password1!
-      - LDAP_ROOT=dc=example,dc=com
-      - LDAP_ADMIN_DN=cn=admin,dc=example,dc=com
+      - LDAP_TLS=false
     networks:
       - my-network
     volumes:
-      - 'openldap_data:/bitnami/openldap'
+      - 'openldap_data:/var/lib/ldap'
+      - 'openldap_config:/etc/ldap/slapd.d'
 volumes:
   openldap_data:
+    driver: local
+  openldap_config:
     driver: local
 ````
 
