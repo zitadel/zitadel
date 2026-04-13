@@ -227,6 +227,12 @@ Please check out the dedicated [API guidelines](./API_DESIGN.md) page when contr
 To start developing, make sure you followed the [quick start](#quick-start) steps.
 
 > [!IMPORTANT]
+> For stable `v2` API services, add `import "zitadel/error/v2/error.proto";` to each `*_service.proto`.
+> This enables reflection-aware clients to resolve `zitadel.error.v2.ErrorDetail` and use the `slug` field for programmatic handling.
+> Scope note: this is relevant for backend/domain flows that run with relational-storage-backed logic.
+> Do not apply this to `v1`, `v2beta`, or `v3alpha` APIs.
+
+> [!IMPORTANT]
 > The relational database migrations are work in progress on main. Therefore they are objectives to change. To simplify the development process you can add the following configuration to your setup step config (`--steps /path/to/config.yaml`). This re-initiates the relational tables on each restart.
 
 ```yaml
