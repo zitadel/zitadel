@@ -281,7 +281,7 @@ func (s session) Delete(ctx context.Context, client database.QueryExecutor, cond
 }
 
 // LoadUserData implements [domain.SessionRepository].
-func (s *session) LoadUserData() domain.SessionRepository {
+func (s session) LoadUserData() domain.SessionRepository {
 	return &session{shouldLoadUser: true}
 }
 
