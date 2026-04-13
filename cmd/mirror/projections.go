@@ -203,9 +203,9 @@ func projections(
 		keys.SMS,
 		keys.User,
 		keys.DomainVerification,
-		keys.OIDC,
 		keys.SAML,
 		keys.Target,
+		keys.OIDC,
 		&http.Client{},
 		func(ctx context.Context, permission, orgID, resourceID string) (err error) {
 			return internal_authz.CheckPermission(ctx, authZRepo, config.SystemAuthZ.RolePermissionMappings, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)

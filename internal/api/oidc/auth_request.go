@@ -2,7 +2,6 @@ package oidc
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -202,15 +201,6 @@ func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRe
 
 func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (_ op.AuthRequest, err error) {
 	panic(o.panicErr("AuthRequestByCode"))
-}
-
-// decryptGrant decrypts a code or refresh_token
-func (o *OPStorage) decryptGrant(grant string) (string, error) {
-	decodedGrant, err := base64.RawURLEncoding.DecodeString(grant)
-	if err != nil {
-		return "", err
-	}
-	return o.encAlg.DecryptString(decodedGrant, o.encAlg.EncryptionKeyID())
 }
 
 func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) (err error) {
@@ -529,7 +519,7 @@ func (o *OPStorage) GetRefreshTokenInfo(ctx context.Context, clientID string, to
 		span.EndWithError(err)
 	}()
 
-	plainToken, err := o.decryptGrant(token)
+	plainToken, err := o.authAlg.DecryptToken(token)
 	if err != nil {
 		return "", "", op.ErrInvalidRefreshToken
 	}
