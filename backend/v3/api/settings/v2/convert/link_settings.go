@@ -122,7 +122,18 @@ func grpcLinkTargetToDomain(target settings.LinkTarget) (domain.LinkTarget, erro
 
 func DomainSettingsSourceToSourceToGrpc(s domain.SettingsSource) (settings.Source, error) {
 	switch s {
-	// TODO(wim): add cases
+	case domain.SettingsSourceUnspecified:
+		return settings.Source_SOURCE_UNSPECIFIED, nil
+	case domain.SettingsSourceSystem:
+		return settings.Source_SOURCE_SYSTEM, nil
+	case domain.SettingsSourceInstance:
+		return settings.Source_SOURCE_INSTANCE, nil
+	case domain.SettingsSourceOrganization:
+		return settings.Source_SOURCE_ORGANIZATION, nil
+	case domain.SettingsSourceProject:
+		return settings.Source_SOURCE_PROJECT, nil
+	case domain.SettingsSourceApplication:
+		return settings.Source_SOURCE_APPLICATION, nil
 	default:
 		return settings.Source_SOURCE_UNSPECIFIED, zerrors.ThrowInvalidArgumentf(nil, "fylcBu", "unknown source %v", s)
 	}

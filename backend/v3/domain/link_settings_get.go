@@ -43,6 +43,15 @@ const (
 
 type SettingsSource int
 
+const (
+	SettingsSourceUnspecified = iota
+	SettingsSourceSystem
+	SettingsSourceInstance
+	SettingsSourceOrganization
+	SettingsSourceProject
+	SettingsSourceApplication
+)
+
 // -------------------------------------------
 // QUERY
 // -------------------------------------------
