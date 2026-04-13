@@ -738,7 +738,6 @@ func (s session) joinLoginNames() database.QueryOption {
 
 	if !s.shouldLoadUser {
 		columns = append(columns, database.IsNull(s.loginNamesRepo.loginNameColumn()))
-		// TODO(IAM-Marco): Not sure if I need s.loginNamesRepo.userIDColumn() as well
 	}
 
 	return database.WithLeftJoin(
