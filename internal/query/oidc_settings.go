@@ -84,7 +84,7 @@ func (q *Queries) OIDCSettingsByAggID(ctx context.Context, aggregateID string) (
 		OIDCSettingsColumnInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-s9nle", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-s9nle", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {

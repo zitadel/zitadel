@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -18,7 +19,7 @@ func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGr
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
 		span.EndWithError(err)
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 	}()
 
 	user, err := s.verifyJWTProfile(ctx, r.Data)
@@ -45,7 +46,7 @@ func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGr
 		client.userID,
 		client.resourceOwner,
 		client.clientID,
-		"", // backChannelLogoutURI not needed for service user session
+		"", // backChannelLogoutURI not needed for service account session
 		scope,
 		domain.AddAudScopeToAudience(ctx, nil, r.Data.Scope),
 		[]domain.UserAuthMethodType{domain.UserAuthMethodTypePrivateKey},
@@ -76,7 +77,7 @@ func (s *Server) verifyJWTProfile(ctx context.Context, req *oidc.JWTProfileGrant
 	)
 	_, err = op.VerifyJWTAssertion(ctx, req.Assertion, verifier)
 	if err != nil {
-		return nil, err
+		return nil, oidc.ErrInvalidGrant().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("invalid assertion")
 	}
 	return storage.user, nil
 }

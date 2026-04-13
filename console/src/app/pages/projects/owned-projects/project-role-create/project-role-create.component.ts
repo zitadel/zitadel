@@ -26,6 +26,7 @@ import { ToastService } from 'src/app/services/toast.service';
       ]),
     ]),
   ],
+  standalone: false,
 })
 export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();

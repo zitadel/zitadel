@@ -6,6 +6,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
   selector: 'cnsl-user-list',
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.scss'],
+  standalone: false,
 })
 export class UserListComponent {
   constructor(

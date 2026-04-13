@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -22,6 +23,8 @@ type SearchRequest struct {
 	Limit         uint64
 	SortingColumn Column
 	Asc           bool
+
+	sortingConsumed bool
 }
 
 func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -31,15 +34,20 @@ func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	if req.Limit > 0 {
 		query = query.Limit(req.Limit)
 	}
+	return req.consumeSorting(query)
+}
 
-	if !req.SortingColumn.isZero() {
+// consumeSorting sets the sorting column to the query once.
+// subsequent calls will not set the sorting column again.
+func (req *SearchRequest) consumeSorting(query sq.SelectBuilder) sq.SelectBuilder {
+	if !req.sortingConsumed && !req.SortingColumn.isZero() {
 		clause := req.SortingColumn.orderBy()
 		if !req.Asc {
 			clause += " DESC"
 		}
 		query = query.OrderByClause(clause)
+		req.sortingConsumed = true
 	}
-
 	return query
 }
 
@@ -287,9 +295,7 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*textQuery,
 	}
 	// handle the comparisons which use (i)like and therefore need to escape potential wildcards in the value
 	switch compare {
-	case TextEqualsIgnoreCase,
-		TextNotEqualsIgnoreCase,
-		TextStartsWith,
+	case TextStartsWith,
 		TextStartsWithIgnoreCase,
 		TextEndsWith,
 		TextEndsWithIgnoreCase,
@@ -299,6 +305,8 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*textQuery,
 	case TextEquals,
 		TextListContains,
 		TextNotEquals,
+		TextEqualsIgnoreCase,
+		TextNotEqualsIgnoreCase,
 		textCompareMax:
 		// do nothing
 	}
@@ -334,23 +342,23 @@ func (q *textQuery) comp() sq.Sqlizer {
 	case TextNotEquals:
 		return sq.NotEq{q.Column.identifier(): q.Text}
 	case TextEqualsIgnoreCase:
-		return sq.ILike{q.Column.identifier(): q.Text}
+		return sq.Eq{"LOWER(" + q.Column.identifier() + ")": strings.ToLower(q.Text)}
 	case TextNotEqualsIgnoreCase:
-		return sq.NotILike{q.Column.identifier(): q.Text}
+		return sq.NotEq{"LOWER(" + q.Column.identifier() + ")": strings.ToLower(q.Text)}
 	case TextStartsWith:
 		return sq.Like{q.Column.identifier(): q.Text + "%"}
 	case TextStartsWithIgnoreCase:
-		return sq.ILike{q.Column.identifier(): q.Text + "%"}
+		return sq.Like{"LOWER(" + q.Column.identifier() + ")": strings.ToLower(q.Text) + "%"}
 	case TextEndsWith:
 		return sq.Like{q.Column.identifier(): "%" + q.Text}
 	case TextEndsWithIgnoreCase:
-		return sq.ILike{q.Column.identifier(): "%" + q.Text}
+		return sq.Like{"LOWER(" + q.Column.identifier() + ")": "%" + strings.ToLower(q.Text)}
 	case TextContains:
 		return sq.Like{q.Column.identifier(): "%" + q.Text + "%"}
 	case TextContainsIgnoreCase:
-		return sq.ILike{q.Column.identifier(): "%" + q.Text + "%"}
+		return sq.Like{"LOWER(" + q.Column.identifier() + ")": "%" + strings.ToLower(q.Text) + "%"}
 	case TextListContains:
-		return &listContains{col: q.Column, args: []interface{}{q.Text}}
+		return &listContains{col: q.Column, args: []any{q.Text}}
 	case textCompareMax:
 		return nil
 	}
@@ -647,13 +655,12 @@ func (q *BytesQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 func (q *BytesQuery) comp() sq.Sqlizer {
 	switch q.Compare {
 	case BytesEquals:
-		return sq.Eq{q.Column.identifier(): q.Value}
+		return sq.Expr("sha256("+q.Column.identifier()+") = sha256(?)", q.Value)
 	case BytesNotEquals:
-		return sq.NotEq{q.Column.identifier(): q.Value}
+		return sq.Expr("sha256("+q.Column.identifier()+") <> sha256(?)", q.Value)
 	case bytesCompareMax:
 		return nil
 	}
-
 	return nil
 }
 
@@ -674,6 +681,9 @@ type TimestampQuery struct {
 }
 
 func NewTimestampQuery(c Column, value time.Time, compare TimestampComparison) (*TimestampQuery, error) {
+	if c.isZero() {
+		return nil, ErrMissingColumn
+	}
 	return &TimestampQuery{
 		Column:  c,
 		Compare: compare,

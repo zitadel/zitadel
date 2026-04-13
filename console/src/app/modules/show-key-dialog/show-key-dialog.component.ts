@@ -8,6 +8,7 @@ import { InfoSectionType } from '../info-section/info-section.component';
   selector: 'cnsl-show-key-dialog',
   templateUrl: './show-key-dialog.component.html',
   styleUrls: ['./show-key-dialog.component.scss'],
+  standalone: false,
 })
 export class ShowKeyDialogComponent {
   public keyResponse!: AddMachineKeyResponse.AsObject | AddAppKeyResponse.AsObject;

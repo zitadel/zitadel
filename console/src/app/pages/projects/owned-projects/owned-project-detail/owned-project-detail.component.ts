@@ -1,4 +1,3 @@
-import { Location } from '@angular/common';
 import { Component, EventEmitter, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -32,6 +31,7 @@ const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'MENU.GRANTS' };
   selector: 'cnsl-owned-project-detail',
   templateUrl: './owned-project-detail.component.html',
   styleUrls: ['./owned-project-detail.component.scss'],
+  standalone: false,
 })
 export class OwnedProjectDetailComponent implements OnInit {
   public projectId: string = '';

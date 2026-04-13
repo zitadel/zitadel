@@ -157,6 +157,7 @@ type AddSMSHTTP struct {
 
 	Description string
 	Endpoint    string
+	SigningKey  string
 }
 
 func (c *Commands) AddSMSConfigHTTP(ctx context.Context, config *AddSMSHTTP) (err error) {
@@ -174,6 +175,12 @@ func (c *Commands) AddSMSConfigHTTP(ctx context.Context, config *AddSMSHTTP) (er
 		return err
 	}
 
+	code, err := c.newSigningKey(ctx, c.eventstore.Filter, c.smsEncryption) //nolint
+	if err != nil {
+		return err
+	}
+	config.SigningKey = code.PlainCode()
+
 	err = c.pushAppendAndReduce(ctx,
 		smsConfigWriteModel,
 		instance.NewSMSConfigHTTPAddedEvent(
@@ -182,6 +189,7 @@ func (c *Commands) AddSMSConfigHTTP(ctx context.Context, config *AddSMSHTTP) (er
 			config.ID,
 			config.Description,
 			config.Endpoint,
+			code.Crypted,
 		),
 	)
 	if err != nil {
@@ -196,8 +204,10 @@ type ChangeSMSHTTP struct {
 	ResourceOwner string
 	ID            string
 
-	Description *string
-	Endpoint    *string
+	Description          *string
+	Endpoint             *string
+	ExpirationSigningKey bool
+	SigningKey           *string
 }
 
 func (c *Commands) ChangeSMSConfigHTTP(ctx context.Context, config *ChangeSMSHTTP) (err error) {
@@ -214,12 +224,24 @@ func (c *Commands) ChangeSMSConfigHTTP(ctx context.Context, config *ChangeSMSHTT
 	if !smsConfigWriteModel.State.Exists() || smsConfigWriteModel.HTTP == nil {
 		return zerrors.ThrowNotFound(nil, "COMMAND-6NW4I5Kqzj", "Errors.SMSConfig.NotFound")
 	}
+
+	var changedSigningKey *crypto.CryptoValue
+	if config.ExpirationSigningKey {
+		code, err := c.newSigningKey(ctx, c.eventstore.Filter, c.smtpEncryption) //nolint
+		if err != nil {
+			return err
+		}
+		changedSigningKey = code.Crypted
+		config.SigningKey = &code.Plain
+	}
+
 	changedEvent, hasChanged, err := smsConfigWriteModel.NewHTTPChangedEvent(
 		ctx,
 		InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel),
 		config.ID,
 		config.Description,
-		config.Endpoint)
+		config.Endpoint,
+		changedSigningKey)
 	if err != nil {
 		return err
 	}

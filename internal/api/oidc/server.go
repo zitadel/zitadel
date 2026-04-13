@@ -36,11 +36,12 @@ type Server struct {
 	defaultIdTokenLifetime     time.Duration
 	jwksCacheControlMaxAge     time.Duration
 
-	fallbackLogger      *slog.Logger
-	hasher              *crypto.Hasher
-	signingKeyAlgorithm string
-	encAlg              crypto.EncryptionAlgorithm
-	opCrypto            op.Crypto
+	fallbackLogger            *slog.Logger
+	hasher                    *crypto.Hasher
+	signingKeyAlgorithm       string
+	encAlg                    crypto.EncryptionAlgorithm
+	targetEncryptionAlgorithm crypto.EncryptionAlgorithm
+	opCrypto                  op.Crypto
 
 	assetAPIPrefix func(ctx context.Context) string
 }
@@ -116,14 +117,10 @@ func (s *Server) Ready(ctx context.Context, r *op.Request[struct{}]) (_ *op.Resp
 func (s *Server) Discovery(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
-	restrictions, err := s.query.GetInstanceRestrictions(ctx)
-	if err != nil {
-		return nil, op.NewStatusError(oidc.ErrServerError().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("internal server error"), http.StatusInternalServerError)
-	}
-	allowedLanguages := restrictions.AllowedLanguages
+	allowedLanguages := authz.GetInstance(ctx).AllowedLanguages()
 	if len(allowedLanguages) == 0 {
 		allowedLanguages = i18n.SupportedLanguages()
 	}
@@ -139,9 +136,19 @@ func (s *Server) VerifyAuthRequest(ctx context.Context, r *op.Request[oidc.AuthR
 
 func (s *Server) Authorize(ctx context.Context, r *op.ClientRequest[oidc.AuthRequest]) (_ *op.Redirect, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer span.End()
 
-	return s.LegacyServer.Authorize(ctx, r)
+	// Use an own method to validate the id_token_hint, because in case of an error, we don't want to fail the request.
+	// We just want to ignore the hint.
+	userID, err := op.ValidateAuthReqIDTokenHint(ctx, r.Data.IDTokenHint, s.Provider().IDTokenHintVerifier(ctx))
+	logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID()).
+		OnError(err).Error("invalid id_token_hint")
+
+	req, err := s.Provider().Storage().CreateAuthRequest(ctx, r.Data, userID)
+	if err != nil {
+		return op.TryErrorRedirect(ctx, r.Data, oidc.DefaultToServerError(err, "unable to save auth request"), s.Provider().Encoder(), s.Provider().Logger())
+	}
+	return op.NewRedirect(r.Client.LoginURL(req.GetID())), nil
 }
 
 func (s *Server) DeviceAuthorization(ctx context.Context, r *op.ClientRequest[oidc.DeviceAuthorizationRequest]) (_ *op.Response, err error) {
@@ -167,7 +174,6 @@ func (s *Server) EndSession(ctx context.Context, r *op.Request[oidc.EndSessionRe
 
 func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales oidc.Locales) *oidc.DiscoveryConfiguration {
 	issuer := op.IssuerFromContext(ctx)
-	backChannelLogoutSupported := authz.GetInstance(ctx).Features().EnableBackChannelLogout
 
 	return &oidc.DiscoveryConfiguration{
 		Issuer:                      issuer,
@@ -188,7 +194,7 @@ func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales o
 		},
 		GrantTypesSupported:                                op.GrantTypes(s.Provider()),
 		SubjectTypesSupported:                              op.SubjectTypes(s.Provider()),
-		IDTokenSigningAlgValuesSupported:                   supportedSigningAlgs(ctx),
+		IDTokenSigningAlgValuesSupported:                   supportedSigningAlgs(),
 		RequestObjectSigningAlgValuesSupported:             op.RequestObjectSigAlgorithms(s.Provider()),
 		TokenEndpointAuthMethodsSupported:                  op.AuthMethodsTokenEndpoint(s.Provider()),
 		TokenEndpointAuthSigningAlgValuesSupported:         op.TokenSigAlgorithms(s.Provider()),
@@ -200,8 +206,8 @@ func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales o
 		CodeChallengeMethodsSupported:                      op.CodeChallengeMethods(s.Provider()),
 		UILocalesSupported:                                 supportedUILocales,
 		RequestParameterSupported:                          s.Provider().RequestObjectSupported(),
-		BackChannelLogoutSupported:                         backChannelLogoutSupported,
-		BackChannelLogoutSessionSupported:                  backChannelLogoutSupported,
+		BackChannelLogoutSupported:                         true,
+		BackChannelLogoutSessionSupported:                  true,
 	}
 }
 

@@ -322,7 +322,9 @@ func Test_idpIntentToIDPIntentPb(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := idpIntentToIDPIntentPb(tt.args.intent, tt.args.alg)
 			require.ErrorIs(t, err, tt.res.err)
-			grpc.AllFieldsEqual(t, tt.res.resp.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
+			if tt.res.resp != nil {
+				grpc.AllFieldsEqual(t, tt.res.resp.ProtoReflect(), got.Msg.ProtoReflect(), grpc.CustomMappers)
+			}
 		})
 	}
 }

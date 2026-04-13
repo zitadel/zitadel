@@ -3,6 +3,8 @@ package user
 import (
 	"context"
 
+	"connectrpc.com/connect"
+
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -11,22 +13,22 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_ *user.AddIDPLinkResponse, err error) {
-	details, err := s.command.AddUserIDPLink(ctx, req.UserId, "", &command.AddLink{
-		IDPID:         req.GetIdpLink().GetIdpId(),
-		DisplayName:   req.GetIdpLink().GetUserName(),
-		IDPExternalID: req.GetIdpLink().GetUserId(),
+func (s *Server) AddIDPLink(ctx context.Context, req *connect.Request[user.AddIDPLinkRequest]) (_ *connect.Response[user.AddIDPLinkResponse], err error) {
+	details, err := s.command.AddUserIDPLink(ctx, req.Msg.GetUserId(), "", &command.AddLink{
+		IDPID:         req.Msg.GetIdpLink().GetIdpId(),
+		DisplayName:   req.Msg.GetIdpLink().GetUserName(),
+		IDPExternalID: req.Msg.GetIdpLink().GetUserId(),
 	})
 	if err != nil {
 		return nil, err
 	}
-	return &user.AddIDPLinkResponse{
+	return connect.NewResponse(&user.AddIDPLinkResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ListIDPLinks(ctx context.Context, req *user.ListIDPLinksRequest) (_ *user.ListIDPLinksResponse, err error) {
-	queries, err := ListLinkedIDPsRequestToQuery(req)
+func (s *Server) ListIDPLinks(ctx context.Context, req *connect.Request[user.ListIDPLinksRequest]) (_ *connect.Response[user.ListIDPLinksResponse], err error) {
+	queries, err := ListLinkedIDPsRequestToQuery(req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -34,10 +36,10 @@ func (s *Server) ListIDPLinks(ctx context.Context, req *user.ListIDPLinksRequest
 	if err != nil {
 		return nil, err
 	}
-	return &user.ListIDPLinksResponse{
+	return connect.NewResponse(&user.ListIDPLinksResponse{
 		Result:  IDPLinksToPb(res.Links),
 		Details: object.ToListDetails(res.SearchResponse),
-	}, nil
+	}), nil
 }
 
 func ListLinkedIDPsRequestToQuery(req *user.ListIDPLinksRequest) (*query.IDPUserLinksSearchQuery, error) {
@@ -72,14 +74,14 @@ func IDPLinkToPb(link *query.IDPUserLink) *user.IDPLink {
 	}
 }
 
-func (s *Server) RemoveIDPLink(ctx context.Context, req *user.RemoveIDPLinkRequest) (*user.RemoveIDPLinkResponse, error) {
-	objectDetails, err := s.command.RemoveUserIDPLink(ctx, RemoveIDPLinkRequestToDomain(ctx, req))
+func (s *Server) RemoveIDPLink(ctx context.Context, req *connect.Request[user.RemoveIDPLinkRequest]) (*connect.Response[user.RemoveIDPLinkResponse], error) {
+	objectDetails, err := s.command.RemoveUserIDPLink(ctx, RemoveIDPLinkRequestToDomain(ctx, req.Msg))
 	if err != nil {
 		return nil, err
 	}
-	return &user.RemoveIDPLinkResponse{
+	return connect.NewResponse(&user.RemoveIDPLinkResponse{
 		Details: object.DomainToDetailsPb(objectDetails),
-	}, nil
+	}), nil
 }
 
 func RemoveIDPLinkRequestToDomain(ctx context.Context, req *user.RemoveIDPLinkRequest) *domain.UserIDPLink {

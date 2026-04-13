@@ -30,17 +30,17 @@ import (
 
 func instanceSetupZitadelIDs() ZitadelConfig {
 	return ZitadelConfig{
-		instanceID:   "INSTANCE",
-		orgID:        "ORG",
-		projectID:    "PROJECT",
-		consoleAppID: "console-id",
-		authAppID:    "auth-id",
-		mgmtAppID:    "mgmt-id",
-		adminAppID:   "admin-id",
+		instanceID:             "INSTANCE",
+		orgID:                  "ORG",
+		projectID:              "PROJECT",
+		managementConsoleAppID: "console-id",
+		authAppID:              "auth-id",
+		mgmtAppID:              "mgmt-id",
+		adminAppID:             "admin-id",
 	}
 }
 
-func projectAddedEvents(ctx context.Context, instanceID, orgID, id, owner string, externalSecure bool) []eventstore.Command {
+func projectAddedEvents(ctx context.Context, instanceID, orgID, id string, externalSecure bool) []eventstore.Command {
 	events := []eventstore.Command{
 		project.NewProjectAddedEvent(ctx,
 			&project.NewAggregate(id, orgID).Aggregate,
@@ -59,14 +59,14 @@ func projectAddedEvents(ctx context.Context, instanceID, orgID, id, owner string
 	events = append(events, apiAppEvents(ctx, orgID, id, "admin-id", "Admin-API")...)
 	events = append(events, apiAppEvents(ctx, orgID, id, "auth-id", "Auth-API")...)
 
-	consoleAppID := "console-id"
-	consoleClientID := "clientID"
-	events = append(events, oidcAppEvents(ctx, orgID, id, consoleAppID, "Console", consoleClientID, externalSecure)...)
+	managementConsoleAppID := "console-id"
+	managementConsoleClientID := "clientID"
+	events = append(events, oidcAppEvents(ctx, orgID, id, managementConsoleAppID, "Management Console", managementConsoleClientID, externalSecure)...)
 	events = append(events,
-		instance.NewIAMConsoleSetEvent(ctx,
+		instance.NewIAMManagementConsoleSetEvent(ctx,
 			&instance.NewAggregate(instanceID).Aggregate,
-			&consoleClientID,
-			&consoleAppID,
+			&managementConsoleClientID,
+			&managementConsoleAppID,
 		),
 	)
 	return events
@@ -129,7 +129,7 @@ func oidcAppEvents(ctx context.Context, orgID, projectID, id, name, clientID str
 	}
 }
 
-func orgFilters(orgID string, machine, human bool) []expect {
+func orgFilters(orgID string, machine, human, loginClient bool) []expect {
 	filters := []expect{
 		expectFilter(),
 		expectFilter(
@@ -144,13 +144,17 @@ func orgFilters(orgID string, machine, human bool) []expect {
 		filters = append(filters, humanFilters(orgID)...)
 		filters = append(filters, adminMemberFilters(orgID, "USER")...)
 	}
+	if loginClient {
+		filters = append(filters, loginClientFilters(orgID, true)...)
+		filters = append(filters, instanceMemberFilters(orgID, "USER-LOGIN-CLIENT")...)
+	}
 
 	return append(filters,
 		projectFilters()...,
 	)
 }
 
-func orgEvents(ctx context.Context, instanceID, orgID, name, projectID, defaultDomain string, externalSecure bool, machine, human bool) []eventstore.Command {
+func orgEvents(ctx context.Context, instanceID, orgID, name, projectID, defaultDomain string, externalSecure bool, machine, human, loginClient bool) []eventstore.Command {
 	instanceAgg := instance.NewAggregate(instanceID)
 	orgAgg := org.NewAggregate(orgID)
 	domain := strings.ToLower(name + "." + defaultDomain)
@@ -162,27 +166,28 @@ func orgEvents(ctx context.Context, instanceID, orgID, name, projectID, defaultD
 		instance.NewDefaultOrgSetEventEvent(ctx, &instanceAgg.Aggregate, orgID),
 	}
 
-	owner := ""
 	if machine {
 		machineID := "USER-MACHINE"
 		events = append(events, machineEvents(ctx, instanceID, orgID, machineID, "PAT")...)
-		owner = machineID
 	}
 	if human {
 		userID := "USER"
 		events = append(events, humanEvents(ctx, instanceID, orgID, userID)...)
-		owner = userID
+	}
+	if loginClient {
+		userID := "USER-LOGIN-CLIENT"
+		events = append(events, loginClientEvents(ctx, instanceID, orgID, userID, "LOGIN-CLIENT-PAT")...)
 	}
 
-	events = append(events, projectAddedEvents(ctx, instanceID, orgID, projectID, owner, externalSecure)...)
+	events = append(events, projectAddedEvents(ctx, instanceID, orgID, projectID, externalSecure)...)
 	return events
 }
 
 func orgIDs() []string {
-	return slices.Concat([]string{"USER-MACHINE", "PAT", "USER"}, projectClientIDs())
+	return slices.Concat([]string{"USER-MACHINE", "PAT", "USER", "USER-LOGIN-CLIENT", "LOGIN-CLIENT-PAT"}, projectClientIDs())
 }
 
-func instancePoliciesFilters(instanceID string) []expect {
+func instancePoliciesFilters(_ string) []expect {
 	return []expect{
 		expectFilter(),
 		expectFilter(),
@@ -241,7 +246,7 @@ func instanceSetupPoliciesConfig() *InstanceSetup {
 			ForceMFA                   bool
 			ForceMFALocalOnly          bool
 			HidePasswordReset          bool
-			IgnoreUnknownUsername      bool
+			IgnoreUnknownUsernames     bool
 			AllowDomainDiscovery       bool
 			DisableLoginWithEmail      bool
 			DisableLoginWithPhone      bool
@@ -345,6 +350,7 @@ func instanceElementsEvents(ctx context.Context, instanceID, instanceName string
 		instance.NewSecretGeneratorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecretGeneratorTypeOTPEmail, 8, 5*time.Minute, false, false, true, false),
 	}
 }
+
 func instanceElementsConfig() *SecretGenerators {
 	return &SecretGenerators{
 		ClientSecret:             &crypto.GeneratorConfig{Length: 64, IncludeLowerLetters: true, IncludeUpperLetters: true, IncludeDigits: true},
@@ -359,19 +365,28 @@ func instanceElementsConfig() *SecretGenerators {
 	}
 }
 
-func setupInstanceFilters(instanceID, orgID, projectID, appID, domain string) []expect {
+func setupInstanceFilters(instanceID, orgID, projectID, appID, domain string, trustedDomains []string) []expect {
 	return slices.Concat(
 		setupInstanceElementsFilters(instanceID),
-		orgFilters(orgID, true, true),
+		orgFilters(orgID, true, true, true),
 		generatedDomainFilters(instanceID, orgID, projectID, appID, domain),
+		generatedTrustedDomainsFilters(trustedDomains),
 	)
 }
 
-func setupInstanceEvents(ctx context.Context, instanceID, orgID, projectID, appID, instanceName, orgName string, defaultLanguage language.Tag, domain string, externalSecure bool) []eventstore.Command {
+func setupInstanceEvents(
+	ctx context.Context,
+	instanceID, orgID, projectID, appID, instanceName, orgName string,
+	defaultLanguage language.Tag,
+	domain string,
+	externalSecure bool,
+	trustedDomains []string,
+) []eventstore.Command {
 	return slices.Concat(
 		setupInstanceElementsEvents(ctx, instanceID, instanceName, defaultLanguage),
-		orgEvents(ctx, instanceID, orgID, orgName, projectID, domain, externalSecure, true, true),
+		orgEvents(ctx, instanceID, orgID, orgName, projectID, domain, externalSecure, true, true, true),
 		generatedDomainEvents(ctx, instanceID, orgID, projectID, appID, domain),
+		generatedTrustedDomainEvents(ctx, instanceID, trustedDomains),
 		instanceCreatedMilestoneEvent(ctx, instanceID),
 	)
 }
@@ -379,11 +394,13 @@ func setupInstanceEvents(ctx context.Context, instanceID, orgID, projectID, appI
 func setupInstanceConfig() *InstanceSetup {
 	conf := setupInstanceElementsConfig()
 	conf.Org = InstanceOrgSetup{
-		Name:    "ZITADEL",
-		Machine: instanceSetupMachineConfig(),
-		Human:   instanceSetupHumanConfig(),
+		Name:        "ZITADEL",
+		Machine:     instanceSetupMachineConfig(),
+		Human:       instanceSetupHumanConfig(),
+		LoginClient: instanceSetupLoginClientConfig(),
 	}
 	conf.CustomDomain = ""
+	conf.TrustedDomains = []string{"trusted-domain.com", "another-trusted-domain.com"}
 	return conf
 }
 
@@ -400,6 +417,14 @@ func generatedDomainEvents(ctx context.Context, instanceID, orgID, projectID, ap
 		changed,
 		instance.NewDomainPrimarySetEvent(ctx, &instanceAgg.Aggregate, defaultDomain),
 	}
+}
+
+func generatedTrustedDomainEvents(ctx context.Context, instanceID string, trustedDomains []string) []eventstore.Command {
+	commands := make([]eventstore.Command, len(trustedDomains))
+	for i, trustedDomain := range trustedDomains {
+		commands[i] = instance.NewTrustedDomainAddedEvent(ctx, &instance.NewAggregate(instanceID).Aggregate, trustedDomain)
+	}
+	return commands
 }
 
 func instanceCreatedMilestoneEvent(ctx context.Context, instanceID string) []eventstore.Command {
@@ -456,6 +481,14 @@ func generatedDomainFilters(instanceID, orgID, projectID, appID, generatedDomain
 	}
 }
 
+func generatedTrustedDomainsFilters(trustedDomains []string) []expect {
+	filters := make([]expect, len(trustedDomains))
+	for i := range trustedDomains {
+		filters[i] = expectFilter()
+	}
+	return filters
+}
+
 func humanFilters(orgID string) []expect {
 	return []expect{
 		expectFilter(),
@@ -468,6 +501,7 @@ func humanFilters(orgID string) []expect {
 				true,
 			),
 		),
+		expectFilterOrganizationSettings("org1", false, false),
 		expectFilter(
 			org.NewPasswordComplexityPolicyAddedEvent(
 				context.Background(),
@@ -509,6 +543,7 @@ func machineFilters(orgID string, pat bool) []expect {
 				true,
 			),
 		),
+		expectFilterOrganizationSettings("org1", false, false),
 	}
 	if pat {
 		filters = append(filters,
@@ -540,6 +575,44 @@ func instanceSetupMachineConfig() *AddMachine {
 	}
 }
 
+func loginClientFilters(orgID string, pat bool) []expect {
+	filters := []expect{
+		expectFilter(),
+		expectFilter(
+			org.NewDomainPolicyAddedEvent(
+				context.Background(),
+				&org.NewAggregate(orgID).Aggregate,
+				true,
+				true,
+				true,
+			),
+		),
+		expectFilterOrganizationSettings("org1", false, false),
+	}
+	if pat {
+		filters = append(filters,
+			expectFilter(),
+			expectFilter(),
+		)
+	}
+	return filters
+}
+
+func instanceSetupLoginClientConfig() *AddLoginClient {
+	return &AddLoginClient{
+		Machine: &Machine{
+			Username:        "zitadel-login-client",
+			Name:            "ZITADEL-login-client",
+			Description:     "Login Client",
+			AccessTokenType: domain.OIDCTokenTypeBearer,
+		},
+		Pat: &AddPat{
+			ExpirationDate: time.Time{},
+			Scopes:         nil,
+		},
+	}
+}
+
 func projectFilters() []expect {
 	return []expect{
 		expectFilter(),
@@ -550,11 +623,23 @@ func projectFilters() []expect {
 }
 
 func adminMemberFilters(orgID, userID string) []expect {
+	filters := append(
+		orgMemberFilters(orgID, userID),
+		instanceMemberFilters(orgID, userID)...,
+	)
+	return filters
+}
+func orgMemberFilters(orgID, userID string) []expect {
 	return []expect{
 		expectFilter(
 			addHumanEvent(context.Background(), orgID, userID),
 		),
 		expectFilter(),
+	}
+}
+
+func instanceMemberFilters(orgID, userID string) []expect {
+	return []expect{
 		expectFilter(
 			addHumanEvent(context.Background(), orgID, userID),
 		),
@@ -595,7 +680,7 @@ func addHumanEvent(ctx context.Context, orgID, userID string) *user.HumanAddedEv
 	}()
 }
 
-// machineEvents all events from setup to create the machine user, machinekey can't be tested here, as the public key is not provided and as such the value in the event can't be expected
+// machineEvents all events from setup to create the service account, machinekey can't be tested here, as the public key is not provided and as such the value in the event can't be expected
 func machineEvents(ctx context.Context, instanceID, orgID, userID, patID string) []eventstore.Command {
 	agg := user.NewAggregate(userID, orgID)
 	instanceAgg := instance.NewAggregate(instanceID)
@@ -625,6 +710,40 @@ func addMachineEvent(ctx context.Context, orgID, userID string) *user.MachineAdd
 		"zitadel-admin-machine",
 		"ZITADEL-machine",
 		"Admin",
+		false,
+		domain.OIDCTokenTypeBearer,
+	)
+}
+
+// loginClientEvents all events from setup to create the login client user
+func loginClientEvents(ctx context.Context, instanceID, orgID, userID, patID string) []eventstore.Command {
+	agg := user.NewAggregate(userID, orgID)
+	instanceAgg := instance.NewAggregate(instanceID)
+	events := []eventstore.Command{
+		addLoginClientEvent(ctx, orgID, userID),
+		instance.NewMemberAddedEvent(ctx, &instanceAgg.Aggregate, userID, domain.RoleIAMLoginClient),
+	}
+	if patID != "" {
+		events = append(events,
+			user.NewPersonalAccessTokenAddedEvent(
+				ctx,
+				&agg.Aggregate,
+				patID,
+				time.Date(9999, time.December, 31, 23, 59, 59, 0, time.UTC),
+				nil,
+			),
+		)
+	}
+	return events
+}
+
+func addLoginClientEvent(ctx context.Context, orgID, userID string) *user.MachineAddedEvent {
+	agg := user.NewAggregate(userID, orgID)
+	return user.NewMachineAddedEvent(ctx,
+		&agg.Aggregate,
+		"zitadel-login-client",
+		"ZITADEL-login-client",
+		"Login Client",
 		false,
 		domain.OIDCTokenTypeBearer,
 	)
@@ -668,22 +787,22 @@ func TestCommandSide_setupMinimalInterfaces(t *testing.T) {
 				eventstore: expectEventstore(
 					slices.Concat(
 						projectFilters(),
-						[]expect{expectPush(
-							projectAddedEvents(context.Background(),
-								"INSTANCE",
-								"ORG",
-								"PROJECT",
-								"owner",
-								false,
-							)...,
-						),
+						[]expect{
+							expectPush(
+								projectAddedEvents(context.Background(),
+									"INSTANCE",
+									"ORG",
+									"PROJECT",
+									false,
+								)...,
+							),
 						},
 					)...,
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, projectClientIDs()...),
 			},
 			args: args{
-				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN"),
+				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN", language.Dutch),
 				instanceAgg: instance.NewAggregate("INSTANCE"),
 				orgAgg:      org.NewAggregate("ORG"),
 				owner:       "owner",
@@ -713,6 +832,13 @@ func TestCommandSide_setupMinimalInterfaces(t *testing.T) {
 		})
 	}
 }
+func validZitadelRoles() []authz.RoleMapping {
+	return []authz.RoleMapping{
+		{Role: domain.RoleOrgOwner, Permissions: []string{""}},
+		{Role: domain.RoleIAMOwner, Permissions: []string{""}},
+		{Role: domain.RoleIAMLoginClient, Permissions: []string{""}},
+	}
+}
 
 func TestCommandSide_setupAdmins(t *testing.T) {
 	type fields struct {
@@ -728,12 +854,14 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 		orgAgg      *org.Aggregate
 		machine     *AddMachine
 		human       *AddHuman
+		loginClient *AddLoginClient
 	}
 	type res struct {
-		owner      string
-		pat        bool
-		machineKey bool
-		err        func(error) bool
+		owner          string
+		pat            bool
+		machineKey     bool
+		loginClientPat bool
+		err            func(error) bool
 	}
 	tests := []struct {
 		name   string
@@ -761,13 +889,10 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "USER"),
 				userPasswordHasher: mockPasswordHasher("x"),
-				roles: []authz.RoleMapping{
-					{Role: domain.RoleOrgOwner, Permissions: []string{""}},
-					{Role: domain.RoleIAMOwner, Permissions: []string{""}},
-				},
+				roles:              validZitadelRoles(),
 			},
 			args: args{
-				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN"),
+				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN", language.Dutch),
 				instanceAgg: instance.NewAggregate("INSTANCE"),
 				orgAgg:      org.NewAggregate("ORG"),
 				human:       instanceSetupHumanConfig(),
@@ -798,15 +923,12 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 						},
 					)...,
 				),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "USER-MACHINE", "PAT"),
-				roles: []authz.RoleMapping{
-					{Role: domain.RoleOrgOwner, Permissions: []string{""}},
-					{Role: domain.RoleIAMOwner, Permissions: []string{""}},
-				},
+				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "USER-MACHINE", "PAT"),
+				roles:        validZitadelRoles(),
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN"),
+				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN", language.Dutch),
 				instanceAgg: instance.NewAggregate("INSTANCE"),
 				orgAgg:      org.NewAggregate("ORG"),
 				machine:     instanceSetupMachineConfig(),
@@ -848,14 +970,11 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 				),
 				userPasswordHasher: mockPasswordHasher("x"),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "USER-MACHINE", "PAT", "USER"),
-				roles: []authz.RoleMapping{
-					{Role: domain.RoleOrgOwner, Permissions: []string{""}},
-					{Role: domain.RoleIAMOwner, Permissions: []string{""}},
-				},
-				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				roles:              validZitadelRoles(),
+				keyAlgorithm:       crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN"),
+				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN", language.Dutch),
 				instanceAgg: instance.NewAggregate("INSTANCE"),
 				orgAgg:      org.NewAggregate("ORG"),
 				machine:     instanceSetupMachineConfig(),
@@ -866,6 +985,63 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 				pat:        true,
 				machineKey: false,
 				err:        nil,
+			},
+		},
+		{
+			name: "human, machine and login client, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					slices.Concat(
+						machineFilters("ORG", true),
+						adminMemberFilters("ORG", "USER-MACHINE"),
+						humanFilters("ORG"),
+						adminMemberFilters("ORG", "USER"),
+						loginClientFilters("ORG", true),
+						instanceMemberFilters("ORG", "USER-LOGIN-CLIENT"),
+						[]expect{
+							expectPush(
+								slices.Concat(
+									machineEvents(context.Background(),
+										"INSTANCE",
+										"ORG",
+										"USER-MACHINE",
+										"PAT",
+									),
+									humanEvents(context.Background(),
+										"INSTANCE",
+										"ORG",
+										"USER",
+									),
+									loginClientEvents(context.Background(),
+										"INSTANCE",
+										"ORG",
+										"USER-LOGIN-CLIENT",
+										"LOGIN-CLIENT-PAT",
+									),
+								)...,
+							),
+						},
+					)...,
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "USER-MACHINE", "PAT", "USER", "USER-LOGIN-CLIENT", "LOGIN-CLIENT-PAT"),
+				roles:              validZitadelRoles(),
+				keyAlgorithm:       crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN", language.Dutch),
+				instanceAgg: instance.NewAggregate("INSTANCE"),
+				orgAgg:      org.NewAggregate("ORG"),
+				machine:     instanceSetupMachineConfig(),
+				human:       instanceSetupHumanConfig(),
+				loginClient: instanceSetupLoginClientConfig(),
+			},
+			res: res{
+				owner:          "USER",
+				pat:            true,
+				machineKey:     false,
+				loginClientPat: true,
+				err:            nil,
 			},
 		},
 	}
@@ -879,7 +1055,7 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 				keyAlgorithm:       tt.fields.keyAlgorithm,
 			}
 			validations := make([]preparation.Validation, 0)
-			owner, pat, mk, err := setupAdmins(r, &validations, tt.args.instanceAgg, tt.args.orgAgg, tt.args.machine, tt.args.human)
+			owner, pat, mk, loginClientPat, err := setupAdmins(r, &validations, tt.args.instanceAgg, tt.args.orgAgg, tt.args.machine, tt.args.human, tt.args.loginClient)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -903,6 +1079,9 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 				if tt.res.machineKey {
 					assert.NotNil(t, mk)
 				}
+				if tt.res.loginClientPat {
+					assert.NotNil(t, loginClientPat)
+				}
 			}
 		})
 	}
@@ -922,12 +1101,14 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 		orgName     string
 		machine     *AddMachine
 		human       *AddHuman
+		loginClient *AddLoginClient
 		ids         ZitadelConfig
 	}
 	type res struct {
-		pat        bool
-		machineKey bool
-		err        func(error) bool
+		pat            bool
+		machineKey     bool
+		loginClientPat bool
+		err            func(error) bool
 	}
 	tests := []struct {
 		name   string
@@ -936,12 +1117,13 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "human and machine, ok",
+			name: "human, machine and login client, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					slices.Concat(
 						orgFilters(
 							"ORG",
+							true,
 							true,
 							true,
 						),
@@ -957,6 +1139,7 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 										false,
 										true,
 										true,
+										true,
 									),
 								)...,
 							),
@@ -965,14 +1148,11 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 				),
 				userPasswordHasher: mockPasswordHasher("x"),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, orgIDs()...),
-				roles: []authz.RoleMapping{
-					{Role: domain.RoleOrgOwner, Permissions: []string{""}},
-					{Role: domain.RoleIAMOwner, Permissions: []string{""}},
-				},
-				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				roles:              validZitadelRoles(),
+				keyAlgorithm:       crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN"),
+				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN", language.Dutch),
 				instanceAgg: instance.NewAggregate("INSTANCE"),
 				orgName:     "ZITADEL",
 				machine: &AddMachine{
@@ -1005,20 +1185,33 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 					Password:               "password",
 					PasswordChangeRequired: false,
 				},
+				loginClient: &AddLoginClient{
+					Machine: &Machine{
+						Username:        "zitadel-login-client",
+						Name:            "ZITADEL-login-client",
+						Description:     "Login Client",
+						AccessTokenType: domain.OIDCTokenTypeBearer,
+					},
+					Pat: &AddPat{
+						ExpirationDate: time.Time{},
+						Scopes:         nil,
+					},
+				},
 				ids: ZitadelConfig{
-					instanceID:   "INSTANCE",
-					orgID:        "ORG",
-					projectID:    "PROJECT",
-					consoleAppID: "console-id",
-					authAppID:    "auth-id",
-					mgmtAppID:    "mgmt-id",
-					adminAppID:   "admin-id",
+					instanceID:             "INSTANCE",
+					orgID:                  "ORG",
+					projectID:              "PROJECT",
+					managementConsoleAppID: "console-id",
+					authAppID:              "auth-id",
+					mgmtAppID:              "mgmt-id",
+					adminAppID:             "admin-id",
 				},
 			},
 			res: res{
-				pat:        true,
-				machineKey: false,
-				err:        nil,
+				pat:            true,
+				machineKey:     false,
+				loginClientPat: true,
+				err:            nil,
 			},
 		},
 	}
@@ -1032,7 +1225,7 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 				keyAlgorithm:       tt.fields.keyAlgorithm,
 			}
 			validations := make([]preparation.Validation, 0)
-			pat, mk, err := setupDefaultOrg(tt.args.ctx, r, &validations, tt.args.instanceAgg, tt.args.orgName, tt.args.machine, tt.args.human, tt.args.ids)
+			pat, mk, loginClientPat, err := setupDefaultOrg(tt.args.ctx, r, &validations, tt.args.instanceAgg, tt.args.orgName, tt.args.machine, tt.args.human, tt.args.loginClient, tt.args.ids)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1054,6 +1247,9 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 				}
 				if tt.res.machineKey {
 					assert.NotNil(t, mk)
+				}
+				if tt.res.loginClientPat {
+					assert.NotNil(t, loginClientPat)
 				}
 			}
 		})
@@ -1097,7 +1293,7 @@ func TestCommandSide_setupInstanceElements(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN"),
+				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN", language.Dutch),
 				instanceAgg: instance.NewAggregate("INSTANCE"),
 				setup:       setupInstanceElementsConfig(),
 			},
@@ -1138,9 +1334,10 @@ func TestCommandSide_setUpInstance(t *testing.T) {
 		setup *InstanceSetup
 	}
 	type res struct {
-		pat        bool
-		machineKey bool
-		err        func(error) bool
+		pat            bool
+		machineKey     bool
+		loginClientPat bool
+		err            func(error) bool
 	}
 	tests := []struct {
 		name   string
@@ -1153,7 +1350,7 @@ func TestCommandSide_setUpInstance(t *testing.T) {
 			fields: fields{
 				eventstore: expectEventstore(
 					slices.Concat(
-						setupInstanceFilters("INSTANCE", "ORG", "PROJECT", "console-id", "DOMAIN"),
+						setupInstanceFilters("INSTANCE", "ORG", "PROJECT", "console-id", "DOMAIN", []string{"trusted-domain.com", "another-trusted-domain.com"}),
 						[]expect{
 							expectPush(
 								setupInstanceEvents(context.Background(),
@@ -1166,6 +1363,7 @@ func TestCommandSide_setUpInstance(t *testing.T) {
 									language.English,
 									"DOMAIN",
 									false,
+									[]string{"trusted-domain.com", "another-trusted-domain.com"},
 								)...,
 							),
 						},
@@ -1173,17 +1371,14 @@ func TestCommandSide_setUpInstance(t *testing.T) {
 				),
 				userPasswordHasher: mockPasswordHasher("x"),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, orgIDs()...),
-				roles: []authz.RoleMapping{
-					{Role: domain.RoleOrgOwner, Permissions: []string{""}},
-					{Role: domain.RoleIAMOwner, Permissions: []string{""}},
-				},
-				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				roles:              validZitadelRoles(),
+				keyAlgorithm:       crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				generateDomain: func(string, string) (string, error) {
 					return "DOMAIN", nil
 				},
 			},
 			args: args{
-				ctx:   contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN"),
+				ctx:   contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN", language.Dutch),
 				setup: setupInstanceConfig(),
 			},
 			res: res{
@@ -1202,7 +1397,7 @@ func TestCommandSide_setUpInstance(t *testing.T) {
 				GenerateDomain:     tt.fields.generateDomain,
 			}
 
-			validations, pat, mk, err := setUpInstance(tt.args.ctx, r, tt.args.setup)
+			validations, pat, mk, loginClientPat, err := setUpInstance(tt.args.ctx, r, tt.args.setup)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1225,6 +1420,9 @@ func TestCommandSide_setUpInstance(t *testing.T) {
 				if tt.res.machineKey {
 					assert.NotNil(t, mk)
 				}
+				if tt.res.loginClientPat {
+					assert.NotNil(t, loginClientPat)
+				}
 			}
 		})
 	}
@@ -1232,7 +1430,7 @@ func TestCommandSide_setUpInstance(t *testing.T) {
 
 func TestCommandSide_UpdateInstance(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx  context.Context
@@ -1251,13 +1449,11 @@ func TestCommandSide_UpdateInstance(t *testing.T) {
 		{
 			name: "empty name, invalid error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:  authz.WithInstanceID(context.Background(), "INSTANCE"),
-				name: "",
+				name: " ",
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -1266,8 +1462,7 @@ func TestCommandSide_UpdateInstance(t *testing.T) {
 		{
 			name: "instance not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -1282,8 +1477,7 @@ func TestCommandSide_UpdateInstance(t *testing.T) {
 		{
 			name: "instance removed, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewInstanceAddedEvent(
@@ -1313,8 +1507,7 @@ func TestCommandSide_UpdateInstance(t *testing.T) {
 		{
 			name: "no changes, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewInstanceAddedEvent(
@@ -1331,14 +1524,15 @@ func TestCommandSide_UpdateInstance(t *testing.T) {
 				name: "INSTANCE",
 			},
 			res: res{
-				err: zerrors.IsPreconditionFailed,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
 			},
 		},
 		{
 			name: "instance change, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
@@ -1370,7 +1564,7 @@ func TestCommandSide_UpdateInstance(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.UpdateInstance(tt.args.ctx, tt.args.name)
 			if tt.res.err == nil {
@@ -1391,8 +1585,9 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
+		ctx             context.Context
+		instanceID      string
+		errorIfNotFound bool
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1405,6 +1600,32 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 		res    res
 	}{
 		{
+			name: "instance empty, invalid argument error",
+			fields: fields{
+				eventstore: func(t *testing.T) *eventstore.Eventstore { return &eventstore.Eventstore{} },
+			},
+			args: args{
+				ctx:        authz.WithInstanceID(context.Background(), " "),
+				instanceID: " ",
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "instance too long, invalid argument error",
+			fields: fields{
+				eventstore: func(t *testing.T) *eventstore.Eventstore { return &eventstore.Eventstore{} },
+			},
+			args: args{
+				ctx:        authz.WithInstanceID(context.Background(), "averylonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonginstance"),
+				instanceID: "averylonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonginstance",
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
 			name: "instance not existing, not found error",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -1412,12 +1633,27 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        authz.WithInstanceID(context.Background(), "INSTANCE"),
-				instanceID: "INSTANCE",
+				ctx:             authz.WithInstanceID(context.Background(), "INSTANCE"),
+				instanceID:      "INSTANCE",
+				errorIfNotFound: true,
 			},
 			res: res{
 				err: zerrors.IsNotFound,
 			},
+		},
+		{
+			name: "instance not existing, no error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:             authz.WithInstanceID(context.Background(), "INSTANCE"),
+				instanceID:      "INSTANCE",
+				errorIfNotFound: false,
+			},
+			res: res{},
 		},
 		{
 			name: "instance removed, not found error",
@@ -1442,12 +1678,42 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        authz.WithInstanceID(context.Background(), "INSTANCE"),
-				instanceID: "INSTANCE",
+				ctx:             authz.WithInstanceID(context.Background(), "INSTANCE"),
+				instanceID:      "INSTANCE",
+				errorIfNotFound: true,
 			},
 			res: res{
 				err: zerrors.IsNotFound,
 			},
+		},
+		{
+			name: "instance removed, no error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewInstanceAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"INSTANCE",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewInstanceRemovedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"INSTANCE",
+								nil,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:             authz.WithInstanceID(context.Background(), "INSTANCE"),
+				instanceID:      "INSTANCE",
+				errorIfNotFound: false,
+			},
+			res: res{},
 		},
 		{
 			name: "instance remove, ok",
@@ -1513,7 +1779,7 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 					milestones: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
 				},
 			}
-			got, err := r.RemoveInstance(tt.args.ctx, tt.args.instanceID)
+			got, err := r.RemoveInstance(tt.args.ctx, tt.args.instanceID, tt.args.errorIfNotFound)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

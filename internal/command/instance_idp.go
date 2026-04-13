@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/idp/providers/apple"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -1668,6 +1669,9 @@ func (c *Commands) prepareAddInstanceAppleProvider(a *instance.Aggregate, writeM
 		if len(provider.PrivateKey) == 0 {
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-GVD4n", "Errors.IDP.PrivateKeyMissing")
 		}
+		if _, err := apple.BytesToPrivateKey(provider.PrivateKey); err != nil {
+			return nil, zerrors.ThrowInvalidArgument(err, "INST-Fk38d", "Errors.IDP.InvalidPrivateKey")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -1712,6 +1716,11 @@ func (c *Commands) prepareUpdateInstanceAppleProvider(a *instance.Aggregate, wri
 		}
 		if provider.KeyID = strings.TrimSpace(provider.KeyID); provider.KeyID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-Gh4z2", "Errors.IDP.KeyIDMissing")
+		}
+		if len(provider.PrivateKey) > 0 {
+			if _, err := apple.BytesToPrivateKey(provider.PrivateKey); err != nil {
+				return nil, zerrors.ThrowInvalidArgument(err, "INST-eWSDf", "Errors.IDP.InvalidPrivateKey")
+			}
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
@@ -1793,8 +1802,10 @@ func (c *Commands) prepareAddInstanceSAMLProvider(a *instance.Aggregate, writeMo
 					cert,
 					provider.Binding,
 					provider.WithSignedRequest,
+					provider.SignatureAlgorithm,
 					provider.NameIDFormat,
 					provider.TransientMappingAttributeName,
+					provider.FederatedLogoutEnabled,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -1846,8 +1857,10 @@ func (c *Commands) prepareUpdateInstanceSAMLProvider(a *instance.Aggregate, writ
 				c.idpConfigEncryption,
 				provider.Binding,
 				provider.WithSignedRequest,
+				provider.SignatureAlgorithm,
 				provider.NameIDFormat,
 				provider.TransientMappingAttributeName,
+				provider.FederatedLogoutEnabled,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {
@@ -1891,8 +1904,10 @@ func (c *Commands) prepareRegenerateInstanceSAMLProviderCertificate(a *instance.
 				c.idpConfigEncryption,
 				writeModel.Binding,
 				writeModel.WithSignedRequest,
+				writeModel.SignatureAlgorithm,
 				writeModel.NameIDFormat,
 				writeModel.TransientMappingAttributeName,
+				writeModel.FederatedLogoutEnabled,
 				writeModel.Options,
 			)
 			if err != nil || event == nil {

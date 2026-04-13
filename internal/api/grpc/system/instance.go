@@ -40,7 +40,7 @@ func (s *Server) GetInstance(ctx context.Context, req *system_pb.GetInstanceRequ
 }
 
 func (s *Server) AddInstance(ctx context.Context, req *system_pb.AddInstanceRequest) (*system_pb.AddInstanceResponse, error) {
-	id, _, _, details, err := s.command.SetUpInstance(ctx, AddInstancePbToSetupInstance(req, s.defaultInstance, s.externalDomain))
+	id, _, _, _, details, err := s.command.SetUpInstance(ctx, AddInstancePbToSetupInstance(req, s.defaultInstance, s.externalDomain))
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (s *Server) UpdateInstance(ctx context.Context, req *system_pb.UpdateInstan
 }
 
 func (s *Server) CreateInstance(ctx context.Context, req *system_pb.CreateInstanceRequest) (*system_pb.CreateInstanceResponse, error) {
-	id, pat, key, details, err := s.command.SetUpInstance(ctx, CreateInstancePbToSetupInstance(req, s.defaultInstance, s.externalDomain))
+	id, pat, key, _, details, err := s.command.SetUpInstance(ctx, CreateInstancePbToSetupInstance(req, s.defaultInstance, s.externalDomain))
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (s *Server) CreateInstance(ctx context.Context, req *system_pb.CreateInstan
 }
 
 func (s *Server) RemoveInstance(ctx context.Context, req *system_pb.RemoveInstanceRequest) (*system_pb.RemoveInstanceResponse, error) {
-	details, err := s.command.RemoveInstance(ctx, req.InstanceId)
+	details, err := s.command.RemoveInstance(ctx, req.InstanceId, true)
 	if err != nil {
 		return nil, err
 	}
@@ -103,8 +103,7 @@ func (s *Server) ListIAMMembers(ctx context.Context, req *system_pb.ListIAMMembe
 	}
 	return &system_pb.ListIAMMembersResponse{
 		Details: object.ToListDetails(res.Count, res.Sequence, res.LastRun),
-		//TODO: resource owner of user of the member instead of the membership resource owner
-		Result: member.MembersToPb("", res.Members),
+		Result:  member.MembersToPb("", res.Members),
 	}, nil
 }
 
@@ -160,7 +159,7 @@ func (s *Server) AddDomain(ctx context.Context, req *system_pb.AddDomainRequest)
 }
 
 func (s *Server) RemoveDomain(ctx context.Context, req *system_pb.RemoveDomainRequest) (*system_pb.RemoveDomainResponse, error) {
-	details, err := s.command.RemoveInstanceDomain(ctx, req.Domain)
+	details, err := s.command.RemoveInstanceDomain(ctx, req.Domain, true)
 	if err != nil {
 		return nil, err
 	}

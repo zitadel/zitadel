@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { IdpTableComponent } from './smtp-table.component';
+import { SMTPTableComponent } from './smtp-table.component';
 
 describe('UserTableComponent', () => {
-  let component: IdpTableComponent;
-  let fixture: ComponentFixture<IdpTableComponent>;
+  let component: SMTPTableComponent;
+  let fixture: ComponentFixture<SMTPTableComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [IdpTableComponent],
+      declarations: [SMTPTableComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(IdpTableComponent);
+    fixture = TestBed.createComponent(SMTPTableComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

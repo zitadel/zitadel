@@ -32,14 +32,14 @@
           "urn:ietf:params:scim:schemas:core:2.0:User"
         ],
         "externalId": "scim-bulk-created-user-0",
-        "userName": "scim-bulk-created-user-0",
+        "userName": "{{ .Username }}",
         "name": {
           "familyName": "scim-bulk-created-user-0-family-name",
           "givenName": "scim-bulk-created-user-0-given-name"
         },
         "emails": [
           {
-            "value": "scim-bulk-created-user-0@example.com",
+            "value": "{{ .Username }}@example.com",
             "primary": true
           }
         ],

@@ -10,7 +10,7 @@ WITH found_users AS (
     LEFT JOIN projections.login_names3_policies p_custom
       ON  u.instance_id = p_custom.instance_id
         AND p_custom.instance_id = $4 AND p_custom.resource_owner = u.resource_owner
-    LEFT JOIN projections.login_names3_policies p_default
+    JOIN projections.login_names3_policies p_default
       ON  u.instance_id = p_default.instance_id
       AND p_default.instance_id = $4 AND p_default.is_default IS TRUE
       AND (

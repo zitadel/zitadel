@@ -3,10 +3,10 @@ package admin
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/tracing"
 	event_grpc "github.com/zitadel/zitadel/internal/api/grpc/event"
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	event_pb "github.com/zitadel/zitadel/pkg/grpc/event"
 )
 

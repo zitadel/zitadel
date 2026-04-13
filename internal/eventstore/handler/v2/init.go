@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/jackc/pgx/v5/pgconn"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -198,15 +198,18 @@ func (h *Handler) Init(ctx context.Context) error {
 	if err != nil {
 		return zerrors.ThrowInternal(err, "CRDB-SAdf2", "begin failed")
 	}
+	ctx = logging.With(ctx, "projection", h.ProjectionName())
 	for i, execute := range check.Init().Executes {
-		logging.WithFields("projection", h.projection.Name(), "execute", i).Debug("executing check")
-		next, err := execute(tx, h.projection.Name())
+		logging.Debug(ctx, "executing check", "execute", i)
+		next, err := execute(ctx, tx, h.projection.Name())
 		if err != nil {
-			logging.OnError(tx.Rollback()).Debug("unable to rollback")
+			if rollbackErr := tx.Rollback(); rollbackErr != nil {
+				logging.Error(ctx, "unable to rollback", "err", rollbackErr)
+			}
 			return err
 		}
 		if !next {
-			logging.WithFields("projection", h.projection.Name(), "execute", i).Debug("projection set up")
+			logging.Debug(ctx, "projection set up", "execute", i)
 			break
 		}
 	}
@@ -218,7 +221,7 @@ func NewTableCheck(table *Table, opts ...execOption) *handler.Check {
 	create := func(config execConfig) string {
 		return createTableStatement(table, config.tableName, "")
 	}
-	executes := make([]func(handler.Executer, string) (bool, error), len(table.indices)+1)
+	executes := make([]func(context.Context, handler.Executer, string) (bool, error), len(table.indices)+1)
 	executes[0] = execNextIfExists(config, create, opts, true)
 	for i, index := range table.indices {
 		executes[i+1] = execNextIfExists(config, createIndexCheck(index), opts, true)
@@ -239,7 +242,7 @@ func NewMultiTableCheck(primaryTable *Table, secondaryTables ...*SuffixedTable) 
 	}
 
 	return &handler.Check{
-		Executes: []func(handler.Executer, string) (bool, error){
+		Executes: []func(context.Context, handler.Executer, string) (bool, error){
 			execNextIfExists(config, create, nil, true),
 		},
 	}
@@ -257,14 +260,14 @@ func NewViewCheck(selectStmt string, secondaryTables ...*SuffixedTable) *handler
 	}
 
 	return &handler.Check{
-		Executes: []func(handler.Executer, string) (bool, error){
+		Executes: []func(context.Context, handler.Executer, string) (bool, error){
 			execNextIfExists(config, create, nil, false),
 		},
 	}
 }
 
-func execNextIfExists(config execConfig, q query, opts []execOption, executeNext bool) func(handler.Executer, string) (bool, error) {
-	return func(handler handler.Executer, name string) (shouldExecuteNext bool, err error) {
+func execNextIfExists(config execConfig, q query, opts []execOption, executeNext bool) func(ctx context.Context, handler handler.Executer, name string) (bool, error) {
+	return func(ctx context.Context, handler handler.Executer, name string) (shouldExecuteNext bool, err error) {
 		_, err = handler.Exec("SAVEPOINT exec_stmt")
 		if err != nil {
 			return false, zerrors.ThrowInternal(err, "V2-U1wlz", "create savepoint failed")
@@ -280,7 +283,7 @@ func execNextIfExists(config execConfig, q query, opts []execOption, executeNext
 				return
 			}
 		}()
-		err = exec(config, q, opts)(handler, name)
+		err = exec(config, q, opts)(ctx, handler, name)
 		return false, err
 	}
 }

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"time"
 
 	"github.com/go-jose/go-jose/v4"
 	"golang.org/x/text/language"
@@ -14,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 )
 
+//go:generate mockgen -typed -package mock -destination ./mock/queries.mock.go . Queries
 type Queries interface {
 	ActiveLabelPolicyByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (*query.LabelPolicy, error)
 	MailTemplateByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (*query.MailTemplate, error)
@@ -30,7 +30,6 @@ type Queries interface {
 	GetInstanceRestrictions(ctx context.Context) (restrictions query.Restrictions, err error)
 	InstanceByID(ctx context.Context, id string) (instance authz.Instance, err error)
 	GetActiveSigningWebKey(ctx context.Context) (*jose.JSONWebKey, error)
-	ActivePrivateSigningKey(ctx context.Context, t time.Time) (keys *query.PrivateKeys, err error)
 
 	ActiveInstances() []string
 }

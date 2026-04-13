@@ -452,9 +452,6 @@ func (c *OIDCSessionEvents) RegisterLogout(ctx context.Context, sessionID, userI
 	if sessionID == "" || backChannelLogoutURI == "" {
 		return
 	}
-	if !authz.GetFeatures(ctx).EnableBackChannelLogout {
-		return
-	}
 
 	c.events = append(c.events, sessionlogout.NewBackChannelLogoutRegisteredEvent(
 		ctx,
@@ -473,9 +470,6 @@ func (c *OIDCSessionEvents) AddAccessToken(ctx context.Context, scope []string, 
 	}
 	c.accessTokenID = AccessTokenPrefix + accessTokenID
 	c.events = append(c.events, oidcsession.NewAccessTokenAddedEvent(ctx, c.oidcSessionWriteModel.aggregate, c.accessTokenID, scope, c.accessTokenLifetime, reason, actor))
-	if !authz.GetFeatures(ctx).DisableUserTokenEvent {
-		c.events = append(c.events, user.NewUserTokenV2AddedEvent(ctx, &user.NewAggregate(userID, resourceOwner).Aggregate, c.accessTokenID))
-	}
 	return nil
 }
 

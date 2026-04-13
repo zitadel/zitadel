@@ -2,28 +2,37 @@ package command
 
 import (
 	"context"
+	"net"
 	"testing"
 	"time"
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
+	internal_net "github.com/zitadel/zitadel/internal/net"
 	"github.com/zitadel/zitadel/internal/repository/target"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_AddTarget(t *testing.T) {
+	localhostAddrChecker, err := denylist.NewHostChecker("localhost")
+	require.NoError(t, err)
+
 	type fields struct {
 		eventstore                  func(t *testing.T) *eventstore.Eventstore
 		idGenerator                 id.Generator
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 		defaultSecretGenerators     *SecretGenerators
+		denyList                    []denylist.AddressChecker
+		lookupFunc                  internal_net.IPLookupFunc
 	}
 	type args struct {
 		ctx           context.Context
@@ -121,6 +130,28 @@ func TestCommands_AddTarget(t *testing.T) {
 			},
 		},
 		{
+			"ip not allowed, error",
+			fields{
+				eventstore: expectEventstore(),
+				denyList:   []denylist.AddressChecker{localhostAddrChecker},
+				lookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{[]byte("127.0.0.1")}, nil
+				},
+			},
+			args{
+				ctx: context.Background(),
+				add: &AddTarget{
+					Name:     "name",
+					Timeout:  time.Second,
+					Endpoint: "http://localhost",
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
 			"unique constraint failed, error",
 			fields{
 				eventstore: expectEventstore(
@@ -130,7 +161,7 @@ func TestCommands_AddTarget(t *testing.T) {
 						target.NewAddedEvent(context.Background(),
 							target.NewAggregate("id1", "instance"),
 							"name",
-							domain.TargetTypeWebhook,
+							target_domain.TargetTypeWebhook,
 							"https://example.com",
 							time.Second,
 							false,
@@ -140,20 +171,26 @@ func TestCommands_AddTarget(t *testing.T) {
 								KeyID:      "id",
 								Crypted:    []byte("12345678"),
 							},
+							target_domain.PayloadTypeJSON,
 						),
 					),
 				),
 				idGenerator:                 mock.ExpectID(t, "id1"),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
 				defaultSecretGenerators:     &SecretGenerators{},
+				denyList:                    []denylist.AddressChecker{localhostAddrChecker},
+				lookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{[]byte("192.168.1.1")}, nil
+				},
 			},
 			args{
 				ctx: context.Background(),
 				add: &AddTarget{
-					Name:       "name",
-					Endpoint:   "https://example.com",
-					Timeout:    time.Second,
-					TargetType: domain.TargetTypeWebhook,
+					Name:        "name",
+					Endpoint:    "https://example.com",
+					Timeout:     time.Second,
+					TargetType:  target_domain.TargetTypeWebhook,
+					PayloadType: target_domain.PayloadTypeJSON,
 				},
 				resourceOwner: "instance",
 			},
@@ -172,12 +209,16 @@ func TestCommands_AddTarget(t *testing.T) {
 					),
 				),
 				idGenerator: mock.ExpectID(t, "id1"),
+				denyList:    []denylist.AddressChecker{localhostAddrChecker},
+				lookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{[]byte("192.168.1.1")}, nil
+				},
 			},
 			args{
 				ctx: context.Background(),
 				add: &AddTarget{
 					Name:       "name",
-					TargetType: domain.TargetTypeWebhook,
+					TargetType: target_domain.TargetTypeWebhook,
 					Timeout:    time.Second,
 					Endpoint:   "https://example.com",
 				},
@@ -199,14 +240,19 @@ func TestCommands_AddTarget(t *testing.T) {
 				idGenerator:                 mock.ExpectID(t, "id1"),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
 				defaultSecretGenerators:     &SecretGenerators{},
+				denyList:                    []denylist.AddressChecker{localhostAddrChecker},
+				lookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{[]byte("192.168.1.1")}, nil
+				},
 			},
 			args{
 				ctx: context.Background(),
 				add: &AddTarget{
-					Name:       "name",
-					TargetType: domain.TargetTypeWebhook,
-					Timeout:    time.Second,
-					Endpoint:   "https://example.com",
+					Name:        "name",
+					TargetType:  target_domain.TargetTypeWebhook,
+					Timeout:     time.Second,
+					Endpoint:    "https://example.com",
+					PayloadType: target_domain.PayloadTypeJSON,
 				},
 				resourceOwner: "instance",
 			},
@@ -230,15 +276,20 @@ func TestCommands_AddTarget(t *testing.T) {
 				idGenerator:                 mock.ExpectID(t, "id1"),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
 				defaultSecretGenerators:     &SecretGenerators{},
+				denyList:                    []denylist.AddressChecker{localhostAddrChecker},
+				lookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{[]byte("192.168.1.1")}, nil
+				},
 			},
 			args{
 				ctx: context.Background(),
 				add: &AddTarget{
 					Name:             "name",
-					TargetType:       domain.TargetTypeWebhook,
+					TargetType:       target_domain.TargetTypeWebhook,
 					Endpoint:         "https://example.com",
 					Timeout:          time.Second,
 					InterruptOnError: true,
+					PayloadType:      target_domain.PayloadTypeJSON,
 				},
 				resourceOwner: "instance",
 			},
@@ -254,6 +305,7 @@ func TestCommands_AddTarget(t *testing.T) {
 				idGenerator:                 tt.fields.idGenerator,
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
+				ActionsV2DenyList:           tt.fields.denyList,
 			}
 			_, err := c.AddTarget(tt.args.ctx, tt.args.add, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -270,10 +322,15 @@ func TestCommands_AddTarget(t *testing.T) {
 }
 
 func TestCommands_ChangeTarget(t *testing.T) {
+	localhostAddrChecker, err := denylist.NewHostChecker("localhost")
+	require.NoError(t, err)
+
 	type fields struct {
 		eventstore                  func(t *testing.T) *eventstore.Eventstore
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 		defaultSecretGenerators     *SecretGenerators
+		denyList                    []denylist.AddressChecker
+		lookupFunc                  internal_net.IPLookupFunc
 	}
 	type args struct {
 		ctx           context.Context
@@ -382,11 +439,38 @@ func TestCommands_ChangeTarget(t *testing.T) {
 			},
 		},
 		{
+			"ip not allowed, error",
+			fields{
+				eventstore: expectEventstore(),
+				denyList:   []denylist.AddressChecker{localhostAddrChecker},
+				lookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{[]byte("127.0.0.1")}, nil
+				},
+			},
+			args{
+				ctx: context.Background(),
+				change: &ChangeTarget{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "id1",
+					},
+					Endpoint: gu.Ptr("http://localhost"),
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
 			"not found, error",
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				denyList: []denylist.AddressChecker{localhostAddrChecker},
+				lookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{[]byte("192.168.1.1")}, nil
+				},
 			},
 			args{
 				ctx: context.Background(),
@@ -412,6 +496,10 @@ func TestCommands_ChangeTarget(t *testing.T) {
 						),
 					),
 				),
+				denyList: []denylist.AddressChecker{localhostAddrChecker},
+				lookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{[]byte("192.168.1.1")}, nil
+				},
 			},
 			args{
 				ctx: context.Background(),
@@ -419,7 +507,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "id1",
 					},
-					TargetType: gu.Ptr(domain.TargetTypeWebhook),
+					TargetType: gu.Ptr(target_domain.TargetTypeWebhook),
 				},
 				resourceOwner: "instance",
 			},
@@ -444,6 +532,10 @@ func TestCommands_ChangeTarget(t *testing.T) {
 						),
 					),
 				),
+				denyList: []denylist.AddressChecker{localhostAddrChecker},
+				lookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{[]byte("192.168.1.1")}, nil
+				},
 			},
 			args{
 				ctx: context.Background(),
@@ -477,6 +569,10 @@ func TestCommands_ChangeTarget(t *testing.T) {
 						),
 					),
 				),
+				denyList: []denylist.AddressChecker{localhostAddrChecker},
+				lookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{[]byte("192.168.1.1")}, nil
+				},
 			},
 			args{
 				ctx: context.Background(),
@@ -505,7 +601,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 							[]target.Changes{
 								target.ChangeName("name", "name2"),
 								target.ChangeEndpoint("https://example2.com"),
-								target.ChangeTargetType(domain.TargetTypeCall),
+								target.ChangeTargetType(target_domain.TargetTypeCall),
 								target.ChangeTimeout(10 * time.Second),
 								target.ChangeInterruptOnError(true),
 								target.ChangeSigningKey(&crypto.CryptoValue{
@@ -514,12 +610,17 @@ func TestCommands_ChangeTarget(t *testing.T) {
 									KeyID:      "id",
 									Crypted:    []byte("12345678"),
 								}),
+								target.ChangePayloadType(target_domain.PayloadTypeJWE),
 							},
 						),
 					),
 				),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
 				defaultSecretGenerators:     &SecretGenerators{},
+				denyList:                    []denylist.AddressChecker{localhostAddrChecker},
+				lookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{[]byte("192.168.1.1")}, nil
+				},
 			},
 			args{
 				ctx: context.Background(),
@@ -529,10 +630,11 @@ func TestCommands_ChangeTarget(t *testing.T) {
 					},
 					Name:                 gu.Ptr("name2"),
 					Endpoint:             gu.Ptr("https://example2.com"),
-					TargetType:           gu.Ptr(domain.TargetTypeCall),
+					TargetType:           gu.Ptr(target_domain.TargetTypeCall),
 					Timeout:              gu.Ptr(10 * time.Second),
 					InterruptOnError:     gu.Ptr(true),
 					ExpirationSigningKey: true,
+					PayloadType:          target_domain.PayloadTypeJWE,
 				},
 				resourceOwner: "instance",
 			},
@@ -545,6 +647,8 @@ func TestCommands_ChangeTarget(t *testing.T) {
 				eventstore:                  tt.fields.eventstore(t),
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
+				ActionsV2DenyList:           tt.fields.denyList,
+				IPLookupFunction:            tt.fields.lookupFunc,
 			}
 			_, err := c.ChangeTarget(tt.args.ctx, tt.args.change, tt.args.resourceOwner)
 			if tt.res.err == nil {

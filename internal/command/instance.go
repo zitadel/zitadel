@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -28,17 +29,18 @@ import (
 )
 
 const (
-	zitadelProjectName = "ZITADEL"
-	mgmtAppName        = "Management-API"
-	adminAppName       = "Admin-API"
-	authAppName        = "Auth-API"
-	consoleAppName     = "Console"
+	zitadelProjectName       = "ZITADEL"
+	mgmtAppName              = "Management-API"
+	adminAppName             = "Admin-API"
+	authAppName              = "Auth-API"
+	managementConsoleAppName = "Management Console"
 )
 
 type InstanceSetup struct {
 	zitadel          ZitadelConfig
 	InstanceName     string
 	CustomDomain     string
+	TrustedDomains   []string
 	DefaultLanguage  language.Tag
 	Org              InstanceOrgSetup
 	SecretGenerators *SecretGenerators
@@ -73,7 +75,7 @@ type InstanceSetup struct {
 		ForceMFA                   bool
 		ForceMFALocalOnly          bool
 		HidePasswordReset          bool
-		IgnoreUnknownUsername      bool
+		IgnoreUnknownUsernames     bool
 		AllowDomainDiscovery       bool
 		DisableLoginWithEmail      bool
 		DisableLoginWithPhone      bool
@@ -162,15 +164,15 @@ type SecretGenerators struct {
 }
 
 type ZitadelConfig struct {
-	instanceID     string
-	orgID          string
-	projectID      string
-	mgmtAppID      string
-	adminAppID     string
-	authAppID      string
-	consoleAppID   string
-	limitsID       string
-	restrictionsID string
+	instanceID             string
+	orgID                  string
+	projectID              string
+	mgmtAppID              string
+	adminAppID             string
+	authAppID              string
+	managementConsoleAppID string
+	limitsID               string
+	restrictionsID         string
 }
 
 func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
@@ -204,7 +206,7 @@ func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
 		return err
 	}
 
-	s.zitadel.consoleAppID, err = idGenerator.Next()
+	s.zitadel.managementConsoleAppID, err = idGenerator.Next()
 	if err != nil {
 		return err
 	}
@@ -216,33 +218,33 @@ func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
 	return err
 }
 
-func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, string, *MachineKey, *domain.ObjectDetails, error) {
+func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, string, *MachineKey, string, *domain.ObjectDetails, error) {
 	if err := setup.generateIDs(c.idGenerator); err != nil {
-		return "", "", nil, nil, err
+		return "", "", nil, "", nil, err
 	}
-	ctx = contextWithInstanceSetupInfo(ctx, setup.zitadel.instanceID, setup.zitadel.projectID, setup.zitadel.consoleAppID, c.externalDomain)
+	ctx = contextWithInstanceSetupInfo(ctx, setup.zitadel.instanceID, setup.zitadel.projectID, setup.zitadel.managementConsoleAppID, c.externalDomain, setup.DefaultLanguage)
 
-	validations, pat, machineKey, err := setUpInstance(ctx, c, setup)
+	validations, pat, machineKey, loginClientPat, err := setUpInstance(ctx, c, setup)
 	if err != nil {
-		return "", "", nil, nil, err
+		return "", "", nil, "", nil, err
 	}
 
 	//nolint:staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
 	if err != nil {
-		return "", "", nil, nil, err
+		return "", "", nil, "", nil, err
 	}
 
 	_, err = c.eventstore.Push(ctx, cmds...)
 	if err != nil {
-		return "", "", nil, nil, err
+		return "", "", nil, "", nil, err
 	}
 
 	// RolePermissions need to be pushed in separate transaction.
 	// https://github.com/zitadel/zitadel/issues/9293
 	details, err := c.SynchronizeRolePermission(ctx, setup.zitadel.instanceID, setup.RolePermissionMappings)
 	if err != nil {
-		return "", "", nil, nil, err
+		return "", "", nil, "", nil, err
 	}
 	details.ResourceOwner = setup.zitadel.orgID
 
@@ -250,58 +252,66 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	if pat != nil {
 		token = pat.Token
 	}
+	var loginClientToken string
+	if loginClientPat != nil {
+		loginClientToken = loginClientPat.Token
+	}
 
-	return setup.zitadel.instanceID, token, machineKey, details, nil
+	return setup.zitadel.instanceID, token, machineKey, loginClientToken, details, nil
 }
 
-func contextWithInstanceSetupInfo(ctx context.Context, instanceID, projectID, consoleAppID, externalDomain string) context.Context {
-	return authz.WithConsole(
-		authz.SetCtxData(
-			http.WithRequestedHost(
-				authz.WithInstanceID(
-					ctx,
-					instanceID),
-				externalDomain,
+func contextWithInstanceSetupInfo(ctx context.Context, instanceID, projectID, managementConsoleAppID, externalDomain string, defaultLanguage language.Tag) context.Context {
+	return authz.WithDefaultLanguage(
+		authz.WithManagementConsole(
+			authz.SetCtxData(
+				http.WithRequestedHost(
+					authz.WithInstanceID(
+						ctx,
+						instanceID),
+					externalDomain,
+				),
+				authz.CtxData{ResourceOwner: instanceID},
 			),
-			authz.CtxData{ResourceOwner: instanceID},
+			projectID,
+			managementConsoleAppID,
 		),
-		projectID,
-		consoleAppID,
+		defaultLanguage,
 	)
 }
 
-func setUpInstance(ctx context.Context, c *Commands, setup *InstanceSetup) (validations []preparation.Validation, pat *PersonalAccessToken, machineKey *MachineKey, err error) {
+func setUpInstance(ctx context.Context, c *Commands, setup *InstanceSetup) (validations []preparation.Validation, pat *PersonalAccessToken, machineKey *MachineKey, loginClientPat *PersonalAccessToken, err error) {
 	instanceAgg := instance.NewAggregate(setup.zitadel.instanceID)
 
 	validations = setupInstanceElements(instanceAgg, setup)
 
 	// default organization on setup'd instance
-	pat, machineKey, err = setupDefaultOrg(ctx, c, &validations, instanceAgg, setup.Org.Name, setup.Org.Machine, setup.Org.Human, setup.zitadel)
+	pat, machineKey, loginClientPat, err = setupDefaultOrg(ctx, c, &validations, instanceAgg, setup.Org.Name, setup.Org.Machine, setup.Org.Human, setup.Org.LoginClient, setup.zitadel)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	// domains
 	if err := setupGeneratedDomain(ctx, c, &validations, instanceAgg, setup.InstanceName); err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 	setupCustomDomain(c, &validations, instanceAgg, setup.CustomDomain)
+	setupTrustedDomains(c, &validations, instanceAgg, setup.TrustedDomains)
 
 	// optional setting if set
 	setupMessageTexts(&validations, setup.MessageTexts, instanceAgg)
 	if err := setupQuotas(c, &validations, setup.Quotas, setup.zitadel.instanceID); err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 	setupSMTPSettings(c, &validations, setup.SMTPConfiguration, instanceAgg)
 	if err := setupWebKeys(c, &validations, setup.zitadel.instanceID, setup); err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 	setupOIDCSettings(c, &validations, setup.OIDCSettings, instanceAgg)
 	setupFeatures(&validations, setup.Features, setup.zitadel.instanceID)
 	setupLimits(c, &validations, limits.NewAggregate(setup.zitadel.limitsID, setup.zitadel.instanceID), setup.Limits)
 	setupRestrictions(c, &validations, restrictions.NewAggregate(setup.zitadel.restrictionsID, setup.zitadel.instanceID, setup.zitadel.instanceID), setup.Restrictions)
 	setupInstanceCreatedMilestone(&validations, setup.zitadel.instanceID)
-	return validations, pat, machineKey, nil
+	return validations, pat, machineKey, loginClientPat, nil
 }
 
 func setupInstanceElements(instanceAgg *instance.Aggregate, setup *InstanceSetup) []preparation.Validation {
@@ -344,7 +354,7 @@ func setupInstanceElements(instanceAgg *instance.Aggregate, setup *InstanceSetup
 			setup.LoginPolicy.ForceMFA,
 			setup.LoginPolicy.ForceMFALocalOnly,
 			setup.LoginPolicy.HidePasswordReset,
-			setup.LoginPolicy.IgnoreUnknownUsername,
+			setup.LoginPolicy.IgnoreUnknownUsernames,
 			setup.LoginPolicy.AllowDomainDiscovery,
 			setup.LoginPolicy.DisableLoginWithEmail,
 			setup.LoginPolicy.DisableLoginWithPhone,
@@ -461,6 +471,14 @@ func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation
 	if smtpConfig == nil {
 		return
 	}
+	var username string
+	var pwd []byte
+	if smtpConfig.SMTP.PlainAuth != nil {
+		username = smtpConfig.SMTP.PlainAuth.User
+		if smtpConfig.SMTP.PlainAuth != nil {
+			pwd = []byte(smtpConfig.SMTP.PlainAuth.Password)
+		}
+	}
 	*validations = append(*validations,
 		commands.prepareAddAndActivateSMTPConfig(
 			instanceAgg,
@@ -469,8 +487,8 @@ func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation
 			smtpConfig.FromName,
 			smtpConfig.ReplyToAddress,
 			smtpConfig.SMTP.Host,
-			smtpConfig.SMTP.User,
-			[]byte(smtpConfig.SMTP.Password),
+			username,
+			pwd,
 			smtpConfig.Tls,
 		),
 	)
@@ -495,14 +513,22 @@ func setupGeneratedDomain(ctx context.Context, commands *Commands, validations *
 	return nil
 }
 
+func setupTrustedDomains(commands *Commands, validations *[]preparation.Validation, instanceAgg *instance.Aggregate, trustedDomains []string) {
+	for _, trustedDomain := range trustedDomains {
+		*validations = append(*validations,
+			commands.setupTrustedDomain(instanceAgg, trustedDomain),
+		)
+	}
+}
+
 func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Validation, instanceAgg *instance.Aggregate, orgAgg *org.Aggregate, projectOwner string, ids ZitadelConfig) {
 	projectAgg := project.NewAggregate(ids.projectID, orgAgg.ID)
 
 	cnsl := &addOIDCApp{
 		AddApp: AddApp{
 			Aggregate: *projectAgg,
-			ID:        ids.consoleAppID,
-			Name:      consoleAppName,
+			ID:        ids.managementConsoleAppID,
+			Name:      managementConsoleAppName,
 		},
 		Version:                  domain.OIDCVersionV1,
 		RedirectUris:             []string{},
@@ -557,7 +583,7 @@ func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Valid
 		),
 
 		commands.AddOIDCAppCommand(cnsl),
-		SetIAMConsoleID(instanceAgg, &cnsl.ClientID, &ids.consoleAppID),
+		SetIAMConsoleID(instanceAgg, &cnsl.ClientID, &ids.managementConsoleAppID),
 	)
 }
 
@@ -568,8 +594,9 @@ func setupDefaultOrg(ctx context.Context,
 	name string,
 	machine *AddMachine,
 	human *AddHuman,
+	loginClient *AddLoginClient,
 	ids ZitadelConfig,
-) (pat *PersonalAccessToken, machineKey *MachineKey, err error) {
+) (pat *PersonalAccessToken, machineKey *MachineKey, loginClientPat *PersonalAccessToken, err error) {
 	orgAgg := org.NewAggregate(ids.orgID)
 
 	*validations = append(
@@ -578,12 +605,12 @@ func setupDefaultOrg(ctx context.Context,
 		commands.prepareSetDefaultOrg(instanceAgg, ids.orgID),
 	)
 
-	projectOwner, pat, machineKey, err := setupAdmins(commands, validations, instanceAgg, orgAgg, machine, human)
+	projectOwner, pat, machineKey, loginClientPat, err := setupAdmins(commands, validations, instanceAgg, orgAgg, machine, human, loginClient)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	setupMinimalInterfaces(commands, validations, instanceAgg, orgAgg, projectOwner, ids)
-	return pat, machineKey, nil
+	return pat, machineKey, loginClientPat, nil
 }
 
 func setupAdmins(commands *Commands,
@@ -592,21 +619,22 @@ func setupAdmins(commands *Commands,
 	orgAgg *org.Aggregate,
 	machine *AddMachine,
 	human *AddHuman,
-) (owner string, pat *PersonalAccessToken, machineKey *MachineKey, err error) {
+	loginClient *AddLoginClient,
+) (owner string, pat *PersonalAccessToken, machineKey *MachineKey, loginClientPat *PersonalAccessToken, err error) {
 	if human == nil && machine == nil {
-		return "", nil, nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-z1yi2q2ot7", "Error.Instance.NoAdmin")
+		return "", nil, nil, nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-z1yi2q2ot7", "Error.Instance.NoAdmin")
 	}
 
 	if machine != nil && machine.Machine != nil && !machine.Machine.IsZero() {
 		machineUserID, err := commands.idGenerator.Next()
 		if err != nil {
-			return "", nil, nil, err
+			return "", nil, nil, nil, err
 		}
 		owner = machineUserID
 
 		pat, machineKey, err = setupMachineAdmin(commands, validations, machine, orgAgg.ID, machineUserID)
 		if err != nil {
-			return "", nil, nil, err
+			return "", nil, nil, nil, err
 		}
 
 		setupAdminMembers(commands, validations, instanceAgg, orgAgg, machineUserID)
@@ -614,18 +642,33 @@ func setupAdmins(commands *Commands,
 	if human != nil {
 		humanUserID, err := commands.idGenerator.Next()
 		if err != nil {
-			return "", nil, nil, err
+			return "", nil, nil, nil, err
 		}
 		owner = humanUserID
 		human.ID = humanUserID
 
 		*validations = append(*validations,
-			commands.AddHumanCommand(human, orgAgg.ID, commands.userPasswordHasher, commands.userEncryption, true),
+			// We no longer send an init mail anymore even if no auth method is set.
+			// This allows us to create the initial user without a password and send them an invitation mail if needed later on,
+			// which will be a necessary step for the new onboarding flow in the customer portal.
+			// Also since login v2 is now the default, we anyway wouldn't be able to handle the init link properly anymore.
+			commands.AddHumanCommand(human, orgAgg.ID, commands.userPasswordHasher, commands.userEncryption, false),
 		)
 
 		setupAdminMembers(commands, validations, instanceAgg, orgAgg, humanUserID)
 	}
-	return owner, pat, machineKey, nil
+	if loginClient != nil {
+		loginClientUserID, err := commands.idGenerator.Next()
+		if err != nil {
+			return "", nil, nil, nil, err
+		}
+
+		loginClientPat, err = setupLoginClient(commands, validations, instanceAgg, loginClient, orgAgg.ID, loginClientUserID)
+		if err != nil {
+			return "", nil, nil, nil, err
+		}
+	}
+	return owner, pat, machineKey, loginClientPat, nil
 }
 
 func setupMachineAdmin(commands *Commands, validations *[]preparation.Validation, machine *AddMachine, orgID, userID string) (pat *PersonalAccessToken, machineKey *MachineKey, err error) {
@@ -651,9 +694,25 @@ func setupMachineAdmin(commands *Commands, validations *[]preparation.Validation
 	return pat, machineKey, nil
 }
 
+func setupLoginClient(commands *Commands, validations *[]preparation.Validation, instanceAgg *instance.Aggregate, loginClient *AddLoginClient, orgID, userID string) (pat *PersonalAccessToken, err error) {
+	*validations = append(*validations,
+		AddMachineCommand(user.NewAggregate(userID, orgID), loginClient.Machine),
+		commands.AddInstanceMemberCommand(instanceAgg, userID, domain.RoleIAMLoginClient),
+	)
+	if loginClient.Pat != nil {
+		pat = NewPersonalAccessToken(orgID, userID, loginClient.Pat.ExpirationDate, loginClient.Pat.Scopes, domain.UserTypeMachine)
+		pat.TokenID, err = commands.idGenerator.Next()
+		if err != nil {
+			return nil, err
+		}
+		*validations = append(*validations, prepareAddPersonalAccessToken(pat, commands.keyAlgorithm))
+	}
+	return pat, nil
+}
+
 func setupAdminMembers(commands *Commands, validations *[]preparation.Validation, instanceAgg *instance.Aggregate, orgAgg *org.Aggregate, userID string) {
 	*validations = append(*validations,
-		commands.AddOrgMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
+		commands.AddOrgMemberCommand(&AddOrgMember{orgAgg.ID, userID, []string{domain.RoleOrgOwner}}),
 		commands.AddInstanceMemberCommand(instanceAgg, userID, domain.RoleIAMOwner),
 	)
 }
@@ -665,17 +724,25 @@ func setupMessageTexts(validations *[]preparation.Validation, setupMessageTexts 
 }
 
 func (c *Commands) UpdateInstance(ctx context.Context, name string) (*domain.ObjectDetails, error) {
+	name = strings.TrimSpace(name)
+	if name == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "INST-092mid", "Errors.Invalid.Argument")
+	}
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareUpdateInstance(instanceAgg, name)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	writeModel, err := getInstanceWriteModel(ctx, c.eventstore.Filter) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
+	if !writeModel.State.Exists() {
+		return nil, zerrors.ThrowNotFound(nil, "INST-nuso2m", "Errors.Instance.NotFound")
+	}
+	if writeModel.Name == name {
+		return writeModelToObjectDetails(&writeModel.WriteModel), nil
+	}
+	if err := c.pushAppendAndReduce(ctx, writeModel, instance.NewInstanceChangedEvent(ctx, &instanceAgg.Aggregate, name)); err != nil {
 		return nil, err
 	}
-	return pushedEventsToObjectDetails(events), nil
+	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
 func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage language.Tag) (*domain.ObjectDetails, error) {
@@ -715,7 +782,7 @@ func (c *Commands) ChangeSystemConfig(ctx context.Context, externalDomain string
 		if len(instanceValidations.Validations) == 0 {
 			continue
 		}
-		ctx := authz.WithConsole(authz.WithInstanceID(ctx, instanceID), instanceValidations.ProjectID, instanceValidations.ConsoleAppID)
+		ctx := authz.WithManagementConsole(authz.WithInstanceID(ctx, instanceID), instanceValidations.ProjectID, instanceValidations.ManagementConsoleAppID)
 		cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, instanceValidations.Validations...)
 		if err != nil {
 			return err
@@ -766,12 +833,12 @@ func SetIAMProject(a *instance.Aggregate, projectID string) preparation.Validati
 	}
 }
 
-// SetIAMConsoleID defines the command to set the clientID of the Console App onto the instance
+// SetIAMConsoleID defines the command to set the clientID of the Management Console App onto the instance
 func SetIAMConsoleID(a *instance.Aggregate, clientID, appID *string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{
-				instance.NewIAMConsoleSetEvent(ctx, &a.Aggregate, clientID, appID),
+				instance.NewIAMManagementConsoleSetEvent(ctx, &a.Aggregate, clientID, appID),
 			}, nil
 		}, nil
 	}
@@ -794,38 +861,6 @@ func (c *Commands) prepareSetDefaultOrg(a *instance.Aggregate, orgID string) pre
 				return nil, zerrors.ThrowPreconditionFailed(err, "INSTA-Wfe21", "Errors.Org.NotFound")
 			}
 			return []eventstore.Command{instance.NewDefaultOrgSetEventEvent(ctx, &a.Aggregate, orgID)}, nil
-		}, nil
-	}
-}
-
-func (c *Commands) setIAMProject(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *InstanceWriteModel, projectID string) (eventstore.Command, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
-	if err != nil {
-		return nil, err
-	}
-	if iamWriteModel.ProjectID != "" {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "IAM-EGbw2", "Errors.IAM.IAMProjectAlreadySet")
-	}
-	return instance.NewIAMProjectSetEvent(ctx, iamAgg, projectID), nil
-}
-
-func (c *Commands) prepareUpdateInstance(a *instance.Aggregate, name string) preparation.Validation {
-	return func() (preparation.CreateCommands, error) {
-		if name == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "INST-092mid", "Errors.Invalid.Argument")
-		}
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel, err := getInstanceWriteModel(ctx, filter)
-			if err != nil {
-				return nil, err
-			}
-			if !writeModel.State.Exists() {
-				return nil, zerrors.ThrowNotFound(nil, "INST-nuso2m", "Errors.Instance.NotFound")
-			}
-			if writeModel.Name == name {
-				return nil, zerrors.ThrowPreconditionFailed(nil, "INST-alpxism", "Errors.Instance.NotChanged")
-			}
-			return []eventstore.Command{instance.NewInstanceChangedEvent(ctx, &a.Aggregate, name)}, nil
 		}, nil
 	}
 }
@@ -884,49 +919,42 @@ func getSystemConfigWriteModel(ctx context.Context, filter preparation.FilterToQ
 	return writeModel, err
 }
 
-func (c *Commands) RemoveInstance(ctx context.Context, id string) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveInstance(instanceAgg))
+func (c *Commands) RemoveInstance(ctx context.Context, id string, errorIfNotFound bool) (*domain.ObjectDetails, error) {
+	instID := strings.TrimSpace(id)
+	if instID == "" || len(instID) > 200 {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-VeS2zI", "Errors.Invalid.Argument")
+	}
+
+	instanceAgg := instance.NewAggregate(instID)
+	writeModel, err := c.getInstanceWriteModelByID(ctx, instanceAgg.ID)
 	if err != nil {
+		return nil, err
+	}
+	if !writeModel.State.Exists() {
+		if errorIfNotFound {
+			return nil, zerrors.ThrowNotFound(err, "COMMA-AE3GS", "Errors.Instance.NotFound")
+		}
+		return nil, nil
+	}
+
+	milestoneAggregate := milestone.NewInstanceAggregate(instanceAgg.ID)
+	cmds := []eventstore.Command{
+		instance.NewInstanceRemovedEvent(ctx,
+			&instanceAgg.Aggregate,
+			writeModel.Name,
+			writeModel.Domains),
+		milestone.NewReachedEvent(ctx,
+			milestoneAggregate,
+			milestone.InstanceDeleted),
+	}
+
+	if err := c.pushAppendAndReduce(ctx, writeModel, cmds...); err != nil {
 		return nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
-		return nil, err
-	}
 	err = c.caches.milestones.Invalidate(ctx, milestoneIndexInstanceID, id)
 	logging.OnError(err).Error("milestone invalidate")
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreatedAt(),
-		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
-	}, nil
-}
-
-func (c *Commands) prepareRemoveInstance(a *instance.Aggregate) preparation.Validation {
-	return func() (preparation.CreateCommands, error) {
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel, err := c.getInstanceWriteModelByID(ctx, a.ID)
-			if err != nil {
-				return nil, zerrors.ThrowNotFound(err, "COMMA-pax9m3", "Errors.Instance.NotFound")
-			}
-			if !writeModel.State.Exists() {
-				return nil, zerrors.ThrowNotFound(err, "COMMA-AE3GS", "Errors.Instance.NotFound")
-			}
-			milestoneAggregate := milestone.NewInstanceAggregate(a.ID)
-			return []eventstore.Command{
-					instance.NewInstanceRemovedEvent(ctx,
-						&a.Aggregate,
-						writeModel.Name,
-						writeModel.Domains),
-					milestone.NewReachedEvent(ctx,
-						milestoneAggregate,
-						milestone.InstanceDeleted),
-				},
-				nil
-		}, nil
-	}
+	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
 func (c *Commands) getInstanceWriteModelByID(ctx context.Context, orgID string) (*InstanceWriteModel, error) {

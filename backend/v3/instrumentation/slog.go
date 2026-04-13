@@ -1,0 +1,207 @@
+package instrumentation
+
+import (
+	"context"
+	"errors"
+	"log/slog"
+	"os"
+	"slices"
+	"sync/atomic"
+	"time"
+
+	slogmulti "github.com/samber/slog-multi"
+	slogctx "github.com/veqryn/slog-context"
+	slogotel "github.com/veqryn/slog-context/otel"
+	old_logging "github.com/zitadel/logging" //nolint:staticcheck
+	"github.com/zitadel/sloggcp"
+	"go.opentelemetry.io/contrib/bridges/otelslog"
+	"go.opentelemetry.io/otel/sdk/log"
+
+	"github.com/zitadel/zitadel/internal/zerrors"
+)
+
+type LogFormat int
+
+//go:generate enumer -type=LogFormat -trimprefix=LogFormat -text -linecomment -transform=snake
+const (
+	// Empty line comment sets empty string of unspecified value
+	LogFormatUnspecified LogFormat = iota //
+	LogFormatDisabled
+	LogFormatText
+	LogFormatJSON
+	// JSON formatted logs compatible with Google Cloud Platform
+	LogFormatGCP
+	LogFormatGCPErrorReporting
+)
+
+func (f LogFormat) isDisabled() bool {
+	return f == LogFormatUnspecified || f == LogFormatDisabled
+}
+
+type LogConfig struct {
+	Level     slog.Level
+	Streams   []Stream
+	Mask      MaskConfig
+	Format    LogFormat
+	AddSource bool
+	Errors    ErrorConfig
+	Exporter  ExporterConfig
+}
+
+func (c *LogConfig) SetLegacyConfig(lc *old_logging.Config) {
+	if lc == nil || !c.Format.isDisabled() {
+		return
+	}
+	err := c.Level.UnmarshalText([]byte(lc.Level))
+	if err != nil {
+		c.Level = slog.LevelInfo
+	}
+	c.Format, err = LogFormatString(lc.Formatter.Format)
+	if err != nil {
+		c.Format = LogFormatText
+	}
+	c.AddSource = lc.AddSource
+}
+
+func (c LogConfig) replacer() replacer {
+	var replacers []replacer
+	if len(c.Mask.Keys) > 0 {
+		replacers = append(replacers, c.Mask.replacer())
+	}
+	if c.Format == LogFormatGCP {
+		replacers = append(replacers, sloggcp.ReplaceAttr)
+	}
+	if c.Format == LogFormatGCPErrorReporting {
+		replacers = append(replacers, errReplacer())
+	}
+	return chainReplacers(replacers...)
+}
+
+type MaskConfig struct {
+	Keys  []string
+	Value string
+}
+
+// replacer returns a function that replaces the value of any attribute whose key matches
+// one of the configured keys with the configured value.
+// If a group key matches, all attribute values in that group are replaced.
+// Attribute structure is preserved, e.g. "password" is replaced with "masked" but still appears as "password" in the logs.
+func (c MaskConfig) replacer() replacer {
+	keys := slices.Clone(c.Keys)
+	slices.Sort(keys)
+	return func(groups []string, a slog.Attr) slog.Attr {
+		// mask all entries in a matching group, e.g. "data.*"
+		for _, g := range groups {
+			if _, found := slices.BinarySearch(keys, g); found {
+				a.Value = slog.StringValue(c.Value)
+				return a
+			}
+		}
+		if _, found := slices.BinarySearch(keys, a.Key); found {
+			a.Value = slog.StringValue(c.Value)
+		}
+		return a
+	}
+}
+
+type ErrorConfig struct {
+	ReportLocation bool
+	StackTrace     bool
+}
+
+var addSourceEnabled atomic.Bool
+
+func IsAddSourceEnabled() bool {
+	return addSourceEnabled.Load()
+}
+
+// setLogger configures the global slog logger.
+// Logs are sent to [os.Stderr] and/or the [log.LoggerProvider].
+//
+// When present in the context, each line emitted contains:
+//   - Trace ID
+//   - Span ID
+//   - Service name
+//   - Sanitized request hosts from [http_util.DomainCtx]
+//   - Request details, such as method and path.
+func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
+	options := &slog.HandlerOptions{
+		AddSource:   cfg.AddSource,
+		Level:       cfg.Level,
+		ReplaceAttr: cfg.replacer(),
+	}
+	addSourceEnabled.Store(cfg.AddSource)
+
+	var stdErrHandler slog.Handler
+	switch cfg.Format {
+	case LogFormatUnspecified:
+		return // uses default slog logger
+	case LogFormatDisabled:
+		stdErrHandler = slog.DiscardHandler
+	case LogFormatText:
+		stdErrHandler = slog.NewTextHandler(os.Stderr, options)
+	case LogFormatJSON:
+		stdErrHandler = slog.NewJSONHandler(os.Stderr, options)
+	case LogFormatGCP:
+		stdErrHandler = slog.NewJSONHandler(os.Stderr, options)
+	case LogFormatGCPErrorReporting:
+		zerrors.GCPErrorReportingEnabled(true)
+		stdErrHandler = sloggcp.NewErrorReportingHandler(os.Stderr, options)
+	}
+
+	EnableStreams(cfg.Streams...)
+	zerrors.EnableReportLocation(cfg.Errors.ReportLocation)
+	zerrors.EnableStackTrace(cfg.Errors.StackTrace)
+
+	stdErrHandler = slogctx.NewHandler(
+		stdErrHandler,
+		&slogctx.HandlerOptions{
+			Prependers: []slogctx.AttrExtractor{
+				causeExtractor,
+				requestDetailsExtractor,
+				slogotel.ExtractTraceSpanID,
+				slogctx.ExtractPrepended,
+			},
+		},
+	)
+
+	otelHandler := otelslog.NewHandler(
+		Name,
+		otelslog.WithLoggerProvider(provider),
+	)
+
+	logger := slog.New(slogmulti.Fanout(stdErrHandler, otelHandler))
+	logger.Info("structured logger configured", "config_level", cfg.Level, "format", cfg.Format)
+	slog.SetDefault(logger)
+}
+
+// causeExtractor sets the cause of a canceled context to a log entry.
+func causeExtractor(ctx context.Context, _ time.Time, _ slog.Level, _ string) []slog.Attr {
+	err := context.Cause(ctx)
+	if err != nil && !errors.Is(err, context.Canceled) && !errors.Is(err, context.DeadlineExceeded) {
+		return []slog.Attr{
+			slog.String("cause", err.Error()),
+		}
+	}
+	return nil
+}
+
+type replacer func(groups []string, a slog.Attr) slog.Attr
+
+func chainReplacers(replacers ...replacer) replacer {
+	return func(groups []string, a slog.Attr) slog.Attr {
+		for _, r := range replacers {
+			a = r(groups, a)
+		}
+		return a
+	}
+}
+
+func errReplacer() replacer {
+	return func(groups []string, a slog.Attr) slog.Attr {
+		if len(groups) == 0 && a.Key == "err" {
+			a.Key = sloggcp.ErrorKey
+		}
+		return a
+	}
+}

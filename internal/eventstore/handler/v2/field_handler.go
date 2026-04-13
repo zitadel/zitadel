@@ -8,8 +8,12 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/shopspring/decimal"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type FieldHandler struct {
@@ -68,9 +72,15 @@ func (h *FieldHandler) Trigger(ctx context.Context, opts ...TriggerOpt) (err err
 	defer cancel()
 
 	for i := 0; ; i++ {
-		additionalIteration, err := h.processEvents(ctx, config)
-		h.log().OnError(err).Info("process events failed")
-		h.log().WithField("iteration", i).Debug("trigger iteration")
+		var additionalIteration bool
+		var wg sync.WaitGroup
+		wg.Add(1)
+		queue <- func() {
+			additionalIteration, err = h.processEvents(ctx, config)
+			wg.Done()
+		}
+		wg.Wait()
+		logging.Debug(ctx, "trigger iteration", "iteration", i)
 		if !additionalIteration || err != nil {
 			return err
 		}
@@ -83,7 +93,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		if errors.As(err, &pgErr) {
 			// error returned if the row is currently locked by another connection
 			if pgErr.Code == "55P03" {
-				h.log().Debug("state already locked")
+				logging.WithError(ctx, err).Info("another handler is already updating this projection")
 				err = nil
 				additionalIteration = false
 			}
@@ -100,14 +110,14 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		defer cancel()
 	}
 
-	tx, err := h.client.BeginTx(txCtx, &sql.TxOptions{Isolation: sql.LevelReadCommitted})
+	tx, err := h.client.BeginTx(txCtx, nil)
 	if err != nil {
 		return false, err
 	}
 	defer func() {
 		if err != nil && !errors.Is(err, &executionError{}) {
 			rollbackErr := tx.Rollback()
-			h.log().OnError(rollbackErr).Debug("unable to rollback tx")
+			logging.OnError(ctx, rollbackErr).Error("unable to rollback tx")
 			return
 		}
 		commitErr := tx.Commit()
@@ -116,18 +126,29 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		}
 	}()
 
+	var hasLocked bool
+	err = tx.QueryRowContext(ctx, "SELECT pg_try_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()).Scan(&hasLocked)
+	if err != nil {
+		return false, err
+	}
+	if !hasLocked {
+		return false, zerrors.ThrowInternal(nil, "V2-xRffO", "projection already locked")
+	}
+
 	// always await currently running transactions
 	config.awaitRunning = true
-	currentState, err := h.currentState(ctx, tx, config)
+	currentState, err := h.currentState(ctx, tx)
 	if err != nil {
-		if errors.Is(err, errJustUpdated) {
-			return false, nil
-		}
 		return additionalIteration, err
 	}
 	// stop execution if currentState.eventTimestamp >= config.maxCreatedAt
-	if config.maxPosition != 0 && currentState.position >= config.maxPosition {
+	if !config.maxPosition.IsZero() && currentState.position.GreaterThanOrEqual(config.maxPosition) {
 		return false, nil
+	}
+
+	if config.minPosition.GreaterThan(decimal.NewFromInt(0)) {
+		currentState.position = config.minPosition
+		currentState.offset = 0
 	}
 
 	events, additionalIteration, err := h.fetchEvents(ctx, tx, currentState)
@@ -135,7 +156,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		return additionalIteration, err
 	}
 	if len(events) == 0 {
-		err = h.setState(tx, currentState)
+		err = h.setState(ctx, tx, currentState)
 		return additionalIteration, err
 	}
 
@@ -144,7 +165,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		return false, err
 	}
 
-	err = h.setState(tx, currentState)
+	err = h.setState(ctx, tx, currentState)
 
 	return additionalIteration, err
 }
@@ -152,14 +173,14 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState *state) (_ []eventstore.FillFieldsEvent, additionalIteration bool, err error) {
 	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
 	if err != nil || len(events) == 0 {
-		h.log().OnError(err).Debug("filter eventstore failed")
+		logging.OnError(ctx, err).Debug("filter eventstore failed")
 		return nil, false, err
 	}
 	eventAmount := len(events)
 
 	idx, offset := skipPreviouslyReducedEvents(events, currentState)
 
-	if currentState.position == events[len(events)-1].Position() {
+	if currentState.position.Equal(events[len(events)-1].Position()) {
 		offset += currentState.offset
 	}
 	currentState.position = events[len(events)-1].Position()
@@ -179,7 +200,7 @@ func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState
 	fillFieldsEvents := make([]eventstore.FillFieldsEvent, len(events))
 	highestPosition := events[len(events)-1].Position()
 	for i, event := range events {
-		if event.Position() == highestPosition {
+		if event.Position().Equal(highestPosition) {
 			offset++
 		}
 		fillFieldsEvents[i] = event.(eventstore.FillFieldsEvent)
@@ -189,14 +210,14 @@ func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState
 }
 
 func skipPreviouslyReducedEvents(events []eventstore.Event, currentState *state) (index int, offset uint32) {
-	var position float64
+	var position decimal.Decimal
 	for i, event := range events {
-		if event.Position() != position {
+		if !event.Position().Equal(position) {
 			offset = 0
 			position = event.Position()
 		}
 		offset++
-		if event.Position() == currentState.position &&
+		if event.Position().Equal(currentState.position) &&
 			event.Aggregate().ID == currentState.aggregateID &&
 			event.Aggregate().Type == currentState.aggregateType &&
 			event.Sequence() == currentState.sequence {

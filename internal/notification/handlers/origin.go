@@ -52,10 +52,6 @@ func enrichCtx(ctx context.Context, origin string) (context.Context, error) {
 	if err != nil {
 		return nil, err
 	}
-	ctx = http_utils.WithDomainContext(ctx, &http_utils.DomainCtx{
-		InstanceHost: u.Host,
-		PublicHost:   u.Host,
-		Protocol:     u.Scheme,
-	})
+	ctx = http_utils.WithDomainContext(ctx, http_utils.NewDomainCtxFromOrigin(u))
 	return ctx, nil
 }

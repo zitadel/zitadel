@@ -3,11 +3,13 @@ package initialise
 import (
 	"context"
 	"embed"
+	"errors"
+	"fmt"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 )
 
@@ -42,32 +44,52 @@ The user provided by flags needs privileges to
 - create the database if it does not exist
 - see other users and create a new one if the user does not exist
 - grant all rights of the ZITADEL database to the user created if not yet set
-`,
-		Run: func(cmd *cobra.Command, args []string) {
-			config := MustNewConfig(viper.GetViper())
 
-			InitAll(cmd.Context(), config)
+If you don't have admin/superuser credentials (e.g. on a managed PostgreSQL
+service), you can provision the database user and database manually and then
+run only 'zitadel init schema' to bootstrap the required schemas and tables
+using the service user credentials. No admin privileges are needed for that
+sub-command. See the database documentation for details.
+`,
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				logging.OnError(cmd.Context(), err).Error("zitadel init command failed")
+			}()
+			config, shutdown, err := NewConfig(cmd, viper.GetViper())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
+
+			return InitAll(cmd.Context(), config)
 		},
 	}
 
-	cmd.AddCommand(newZitadel(), newDatabase(), newUser(), newGrant())
+	cmd.AddCommand(newSchema(), newDatabase(), newUser(), newGrant())
 	return cmd
 }
 
-func InitAll(ctx context.Context, config *Config) {
+func InitAll(ctx context.Context, config *Config) error {
 	err := initialise(ctx, config.Database,
 		VerifyUser(config.Database.Username(), config.Database.Password()),
 		VerifyDatabase(config.Database.DatabaseName()),
 		VerifyGrant(config.Database.DatabaseName(), config.Database.Username()),
 	)
-	logging.OnError(err).Fatal("unable to initialize the database")
+	if err != nil {
+		return fmt.Errorf("initialize database failed: %w", err)
+	}
 
 	err = verifyZitadel(ctx, config.Database)
-	logging.OnError(err).Fatal("unable to initialize ZITADEL")
+	if err != nil {
+		return fmt.Errorf("initialize ZITADEL failed: %w", err)
+	}
+	return nil
 }
 
 func initialise(ctx context.Context, config database.Config, steps ...func(context.Context, *database.DB) error) error {
-	logging.Info("initialization started")
+	logging.Info(ctx, "initialization started")
 
 	err := ReadStmts()
 	if err != nil {

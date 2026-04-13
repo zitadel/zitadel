@@ -77,7 +77,7 @@ message Machine {
     ];
     string description = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"The one and only IAM\"";
+            example: "\"The one and only instance\"";
         }
     ];
     bool has_secret = 3 [
@@ -110,7 +110,7 @@ message Profile {
     ];
     string display_name = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "a user can set the display name, if nothing is set ZITADEL computes \"first_name last_name\""
+            description: "a user can set the display name, if nothing is set Zitadel computes \"first_name last_name\""
             example: "\"Gigi Giraffe\"";
         }
     ];
@@ -504,22 +504,22 @@ message Membership {
     oneof type {
         bool iam = 5 [
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "one of type use iam, org id, project id or project grant id"
+                description: "one of type use instance, org id, project id or project grant id"
             }
         ];
         string org_id = 6 [
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "one of type use iam, org id, project id or project grant id"
+                description: "one of type use instance, org id, project id or project grant id"
             }
         ];
         string project_id = 7 [
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "one of type use iam, org id, project id or project grant id"
+                description: "one of type use instance, org id, project id or project grant id"
             }
         ];
         string project_grant_id = 8 [
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "one of type use iam, org id, project id or project grant id"
+                description: "one of type use instance, org id, project id or project grant id"
             }
         ];
     }
@@ -690,6 +690,7 @@ message PersonalAccessToken {
     ];
 }
 
+// User grant refers to role assignments, i.e., the roles users have for a specific project and organization.
 message UserGrant {
     string id = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -829,6 +830,7 @@ message UserGrantQuery {
         UserGrantProjectNameQuery project_name_query = 12;
         UserGrantDisplayNameQuery display_name_query = 13;
         UserGrantUserTypeQuery user_type_query = 14;
+        UserGrantInUserIDsQuery in_user_ids_query = 15;
     }
 }
 
@@ -846,6 +848,15 @@ message UserGrantUserIDQuery {
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334\""
+        }
+    ];
+}
+
+message UserGrantInUserIDsQuery {
+    repeated string in_user_ids = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the IDs of the users to include"
+            example: "[\"69629023906488334\",\"69629023906488335\"]";
         }
     ];
 }

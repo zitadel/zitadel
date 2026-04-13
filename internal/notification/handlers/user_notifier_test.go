@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"net/url"
 	"testing"
 	"time"
 
@@ -188,7 +189,7 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -366,7 +367,7 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 				assert.Nil(t, stmt.Execute)
 				return
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -601,7 +602,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 				assert.Nil(t, stmt.Execute)
 				return
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -731,7 +732,7 @@ func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -906,7 +907,7 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 				assert.Nil(t, stmt.Execute)
 				return
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1066,7 +1067,7 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1329,7 +1330,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 				assert.Nil(t, stmt.Execute)
 				return
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1349,19 +1350,12 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				testCode := "testcode"
 				_, code := cryptoValue(t, ctrl, testCode)
-				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any(), nil).Return(&query.Session{
-					ID:            sessionID,
-					ResourceOwner: instanceID,
-					UserFactor: query.SessionUserFactor{
-						UserID:        userID,
-						ResourceOwner: orgID,
-					},
-				}, nil)
+
 				queue.EXPECT().Insert(
 					gomock.Any(),
 					&notification.Request{
-						UserID:                        userID,
-						UserResourceOwner:             orgID,
+						UserID:                        "", // Empty since no session events are provided
+						UserResourceOwner:             "", // Empty since no session events are provided
 						TriggeredAtOrigin:             eventOrigin,
 						URLTemplate:                   "",
 						Code:                          code,
@@ -1387,11 +1381,15 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 					gomock.Any(),
 					gomock.Any(),
 				).Return(nil)
+
+				mockQuerier := es_repo_mock.NewMockQuerier(ctrl)
+				mockQuerier.EXPECT().FilterToReducer(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
+
 				return fields{
 						queries: queries,
 						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+							Querier: mockQuerier,
 						}),
 					}, args{
 						event: &session.OTPSMSChallengedEvent{
@@ -1421,19 +1419,12 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 						IsPrimary: true,
 					}},
 				}, nil)
-				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any(), nil).Return(&query.Session{
-					ID:            sessionID,
-					ResourceOwner: instanceID,
-					UserFactor: query.SessionUserFactor{
-						UserID:        userID,
-						ResourceOwner: orgID,
-					},
-				}, nil)
+
 				queue.EXPECT().Insert(
 					gomock.Any(),
 					&notification.Request{
-						UserID:                        userID,
-						UserResourceOwner:             orgID,
+						UserID:                        "", // Empty since no session events are provided
+						UserResourceOwner:             "", // Empty since no session events are provided
 						TriggeredAtOrigin:             fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
 						URLTemplate:                   "",
 						Code:                          code,
@@ -1459,11 +1450,15 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 					gomock.Any(),
 					gomock.Any(),
 				).Return(nil)
+
+				mockQuerier := es_repo_mock.NewMockQuerier(ctrl)
+				mockQuerier.EXPECT().FilterToReducer(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
+
 				return fields{
 						queries: queries,
 						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+							Querier: mockQuerier,
 						}),
 					}, args{
 						event: &session.OTPSMSChallengedEvent{
@@ -1484,19 +1479,11 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 		{
 			name: "external code",
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
-				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any(), nil).Return(&query.Session{
-					ID:            sessionID,
-					ResourceOwner: instanceID,
-					UserFactor: query.SessionUserFactor{
-						UserID:        userID,
-						ResourceOwner: orgID,
-					},
-				}, nil)
 				queue.EXPECT().Insert(
 					gomock.Any(),
 					&notification.Request{
-						UserID:                        userID,
-						UserResourceOwner:             orgID,
+						UserID:                        "", // Empty since no session events are provided
+						UserResourceOwner:             "", // Empty since no session events are provided
 						TriggeredAtOrigin:             eventOrigin,
 						URLTemplate:                   "",
 						Code:                          nil,
@@ -1522,11 +1509,15 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 					gomock.Any(),
 					gomock.Any(),
 				).Return(nil)
+
+				mockQuerier := es_repo_mock.NewMockQuerier(ctrl)
+				mockQuerier.EXPECT().FilterToReducer(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
+
 				return fields{
 						queries: queries,
 						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+							Querier: mockQuerier,
 						}),
 					}, args{
 						event: &session.OTPSMSChallengedEvent{
@@ -1590,7 +1581,7 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 				assert.Nil(t, stmt.Execute)
 				return
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1886,7 +1877,7 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 				assert.Nil(t, stmt.Execute)
 				return
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1946,7 +1937,9 @@ func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQu
 			smtpAlg,
 			f.SMSTokenCrypto,
 		),
-		otpEmailTmpl: defaultOTPEmailTemplate,
+		otpEmailTmpl: func(origin *url.URL) string {
+			return origin.String() + defaultOTPEmailTemplate
+		},
 	}
 }
 
@@ -2025,7 +2018,7 @@ func expectTemplateWithNotifyUserQueriesSMS(queries *mock.MockQueries) {
 	queries.EXPECT().CustomTextListByTemplate(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(2).Return(&query.CustomTexts{}, nil)
 }
 
-func cryptoValue(t *testing.T, ctrl *gomock.Controller, value string) (*crypto.MockEncryptionAlgorithm, *crypto.CryptoValue) {
+func cryptoValue(t *testing.T, ctrl *gomock.Controller, value string) (crypto.EncryptionAlgorithm, *crypto.CryptoValue) {
 	encAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
 	encAlg.EXPECT().Algorithm().AnyTimes().Return("enc")
 	encAlg.EXPECT().EncryptionKeyID().AnyTimes().Return("id")

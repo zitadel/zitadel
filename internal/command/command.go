@@ -8,6 +8,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"math/big"
+	"net"
 	"net/http"
 	"slices"
 	"strconv"
@@ -18,15 +19,18 @@ import (
 	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/logging"
 
+	new_domain "github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
+	internal_net "github.com/zitadel/zitadel/internal/net"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -70,6 +74,7 @@ type Commands struct {
 	defaultRefreshTokenLifetime     time.Duration
 	defaultRefreshTokenIdleLifetime time.Duration
 	phoneCodeVerifier               func(ctx context.Context, id string) (senders.CodeGenerator, error)
+	tarpit                          func(failedAttempts uint64)
 
 	multifactors            domain.MultifactorConfigs
 	webauthnConfig          *webauthn_helper.Config
@@ -97,8 +102,20 @@ type Commands struct {
 	caches *Caches
 	// Store instance IDs where all milestones are reached (except InstanceDeleted).
 	// These instance's milestones never need to be invalidated,
-	// so the query and cache overhead can completely eliminated.
+	// so the query and cache overhead can be completely eliminated.
 	milestonesCompleted sync.Map
+
+	loginPaths        LoginPaths
+	ActionsV2DenyList []denylist.AddressChecker
+	IPLookupFunction  internal_net.IPLookupFunc
+}
+
+//go:generate mockgen -package command -destination ./mock_login_paths.go . LoginPaths
+type LoginPaths interface {
+	DefaultEmailCodeURLTemplate(ctx context.Context) string
+	DefaultPasswordSetURLTemplate(ctx context.Context) string
+	DefaultPasskeySetURLTemplate(ctx context.Context) string
+	DefaultDomainClaimedURLTemplate(ctx context.Context) string
 }
 
 func StartCommands(
@@ -116,10 +133,10 @@ func StartCommands(
 	httpClient *http.Client,
 	permissionCheck domain.PermissionCheck,
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
-	defaultAccessTokenLifetime,
-	defaultRefreshTokenLifetime,
-	defaultRefreshTokenIdleLifetime time.Duration,
+	defaultAccessTokenLifetime, defaultRefreshTokenLifetime, defaultRefreshTokenIdleLifetime time.Duration,
 	defaultSecretGenerators *SecretGenerators,
+	loginPaths LoginPaths,
+	actionsDeniedHostList []denylist.AddressChecker,
 ) (repo *Commands, err error) {
 	if externalDomain == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
@@ -136,6 +153,9 @@ func StartCommands(
 	if err != nil {
 		return nil, fmt.Errorf("password hasher: %w", err)
 	}
+
+	new_domain.SetPasswordHasher(userPasswordHasher)
+
 	caches, err := startCaches(ctx, cacheConnectors)
 	if err != nil {
 		return nil, fmt.Errorf("caches: %w", err)
@@ -198,15 +218,25 @@ func StartCommands(
 				CryptoMFA: otpEncryption,
 				Issuer:    defaults.Multifactors.OTP.Issuer,
 			},
+			RecoveryCodes: domain.RecoveryCodesConfig{
+				MaxCount:   defaults.Multifactors.RecoveryCodes.MaxCount,
+				Format:     domain.RecoveryCodeFormat(defaults.Multifactors.RecoveryCodes.Format),
+				Length:     defaults.Multifactors.RecoveryCodes.Length,
+				WithHyphen: defaults.Multifactors.RecoveryCodes.WithHyphen,
+			},
 		},
-		GenerateDomain: domain.NewGeneratedInstanceDomain,
-		caches:         caches,
+		GenerateDomain:    domain.NewGeneratedInstanceDomain,
+		caches:            caches,
+		loginPaths:        loginPaths,
+		ActionsV2DenyList: actionsDeniedHostList,
+		IPLookupFunction:  net.LookupIP,
 	}
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {
 		repo.newHashedSecret = newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret)
 	}
 	repo.phoneCodeVerifier = repo.phoneCodeVerifierFromConfig
+	repo.tarpit = defaults.Tarpit.Tarpit()
 	return repo, nil
 }
 
@@ -287,7 +317,12 @@ func samlCertificateAndKeyGenerator(keySize int, lifetime time.Duration) func(id
 			SerialNumber: big.NewInt(int64(serial)),
 			Subject: pkix.Name{
 				Organization: []string{"ZITADEL"},
+				CommonName:   fmt.Sprintf("ZITADEL SP %s", id),
 				SerialNumber: id,
+			},
+			Issuer: pkix.Name{
+				Organization: []string{"ZITADEL"},
+				CommonName:   "ZITADEL",
 			},
 			NotBefore:             now,
 			NotAfter:              now.Add(lifetime),

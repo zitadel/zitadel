@@ -1,11 +1,14 @@
 package oidc
 
 import (
+	"context"
 	"errors"
+	"net/http"
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -15,7 +18,7 @@ import (
 // When err is already of the correct type is passed as-is.
 // If the err is a Zitadel error, it is transformed with a proper HTTP status code.
 // Unknown errors are treated as internal server errors.
-func oidcError(err error) error {
+func oidcError(ctx context.Context, err error) error {
 	if err == nil {
 		return nil
 	}
@@ -37,15 +40,16 @@ func oidcError(err error) error {
 		errors.As(err, &zError)
 	}
 
-	statusCode, _ := http_util.ZitadelErrorToHTTPStatusCode(err)
+	statusCode, _ := http_util.ZitadelErrorToHTTPStatusCode(ctx, err)
 	newOidcErr := oidc.ErrServerError
 	if statusCode < 500 {
 		newOidcErr = oidc.ErrInvalidRequest
 	}
-	return op.NewStatusError(
-		newOidcErr().
-			WithParent(err).
-			WithDescription(zError.GetMessage()),
-		statusCode,
-	)
+	oidcErr := newOidcErr().WithParent(err)
+	oidcErr.Description = zError.GetMessage()
+	return op.NewStatusError(oidcErr, statusCode)
+}
+
+func writeRecoverError(w http.ResponseWriter, r *http.Request, err error) {
+	op.WriteError(w, r, err, logging.FromCtx(r.Context()))
 }

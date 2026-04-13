@@ -119,13 +119,13 @@ func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest,
 		UserID:              userID,
 		InstanceID:          authz.GetInstance(ctx).InstanceID(),
 		Audience:            audience,
-		Request: &domain.AuthRequestOIDC{
-			Scopes:        authReq.Scopes,
-			ResponseType:  ResponseTypeToBusiness(authReq.ResponseType),
-			ResponseMode:  ResponseModeToBusiness(authReq.ResponseMode),
-			Nonce:         authReq.Nonce,
-			CodeChallenge: CodeChallengeToBusiness(authReq.CodeChallenge, authReq.CodeChallengeMethod),
-		},
+		Request: domain.NewAuthRequestOIDC(
+			authReq.Scopes,
+			ResponseTypeToBusiness(authReq.ResponseType),
+			ResponseModeToBusiness(authReq.ResponseMode),
+			authReq.Nonce,
+			CodeChallengeToBusiness(authReq.CodeChallenge, authReq.CodeChallengeMethod),
+		),
 	}
 }
 
@@ -140,13 +140,8 @@ func HttpHeadersFromContext(ctx context.Context) (userAgent, acceptLang string) 
 	if !ok {
 		return
 	}
-	if agents, ok := ctxHeaders[http_utils.UserAgentHeader]; ok {
-		userAgent = agents[0]
-	}
-	if langs, ok := ctxHeaders[http_utils.AcceptLanguage]; ok {
-		acceptLang = langs[0]
-	}
-	return userAgent, acceptLang
+	return ctxHeaders.Get(http_utils.UserAgentHeader),
+		ctxHeaders.Get(http_utils.AcceptLanguage)
 }
 
 func IpFromContext(ctx context.Context) net.IP {

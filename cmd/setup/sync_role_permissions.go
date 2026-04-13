@@ -5,8 +5,7 @@ import (
 	_ "embed"
 	"fmt"
 
-	"github.com/zitadel/logging"
-
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -23,6 +22,7 @@ type SyncRolePermissions struct {
 }
 
 func (mig *SyncRolePermissions) Execute(ctx context.Context, _ eventstore.Event) error {
+	ctx = logging.With(ctx, "migration", mig.String())
 	if err := mig.executeSystem(ctx); err != nil {
 		return err
 	}
@@ -30,12 +30,12 @@ func (mig *SyncRolePermissions) Execute(ctx context.Context, _ eventstore.Event)
 }
 
 func (mig *SyncRolePermissions) executeSystem(ctx context.Context) error {
-	logging.WithFields("migration", mig.String()).Info("prepare system role permission sync events")
+	logging.Info(ctx, "prepare system role permission sync events")
 	details, err := mig.commands.SynchronizeRolePermission(ctx, "SYSTEM", mig.rolePermissionMappings)
 	if err != nil {
 		return err
 	}
-	logging.WithFields("migration", mig.String(), "sequence", details.Sequence).Info("pushed system role permission sync events")
+	logging.Info(ctx, "pushed system role permission sync events", "sequence", details.Sequence)
 	return nil
 }
 
@@ -57,12 +57,12 @@ func (mig *SyncRolePermissions) executeInstances(ctx context.Context) error {
 		return err
 	}
 	for i, instanceID := range instances {
-		logging.WithFields("instance_id", instanceID, "migration", mig.String(), "progress", fmt.Sprintf("%d/%d", i+1, len(instances))).Info("prepare instance role permission sync events")
+		logging.Info(ctx, "prepare instance role permission sync events", "instance", instanceID, "progress", fmt.Sprintf("%d/%d", i+1, len(instances)))
 		details, err := mig.commands.SynchronizeRolePermission(ctx, instanceID, mig.rolePermissionMappings)
 		if err != nil {
 			return err
 		}
-		logging.WithFields("instance_id", instanceID, "migration", mig.String(), "sequence", details.Sequence).Info("pushed instance role permission sync events")
+		logging.Info(ctx, "pushed instance role permission sync events", "instance", instanceID, "sequence", details.Sequence)
 	}
 	return nil
 }

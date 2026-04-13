@@ -16,6 +16,16 @@ The following files and directories, including their subdirectories, are license
 
 ```
 proto/
+apps/docs/
+```
+
+
+The following files and directories, including their subdirectories, are licensed under the [MIT License](https://opensource.org/license/mit/):
+
+```
+apps/login/
+packages/zitadel-client/
+packages/zitadel-proto/
 ```
 
 ## Community Contributions

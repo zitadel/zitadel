@@ -65,6 +65,7 @@ const MAX_ALLOWED_SIZE = 1 * 1024 * 1024;
   selector: 'cnsl-app-detail',
   templateUrl: './app-detail.component.html',
   styleUrls: ['./app-detail.component.scss'],
+  standalone: false,
 })
 export class AppDetailComponent implements OnInit, OnDestroy {
   public editState: boolean = false;
@@ -91,16 +92,14 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             ['Admin Service URL', `${env.api}/admin/v1`],
             ['Management Service URL', `${env.api}/management/v1`],
             ['Auth Service URL', `${env.api}/auth/v1`],
-            ...wellknown.filter(
-              ([k, v]) => k === 'Revocation Endpoint' || k === 'JKWS URI' || k === 'Introspection Endpoint',
-            ),
+            ...wellknown.filter(([k]) => k === 'Revocation Endpoint' || k === 'JKWS URI' || k === 'Introspection Endpoint'),
           ];
         }),
       ),
     ),
   );
 
-  public issuer$ = this.apiURLs$.pipe(map((urls) => urls.find(([k, v]) => k === 'Issuer')?.[1]));
+  public issuer$ = this.apiURLs$.pipe(map((urls) => urls.find(([k]) => k === 'Issuer')?.[1]));
 
   public samlURLs$ = this.envSvc.env.pipe(
     map((env) => {
@@ -207,6 +206,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       authMethodType: [{ value: '', disabled: true }],
       loginV2: [{ value: false, disabled: true }],
       loginV2BaseURL: [{ value: '', disabled: true }],
+      backChannelLogoutURI: [{ value: '', disabled: true }],
     });
 
     this.oidcTokenForm = this.fb.group({
@@ -423,6 +423,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
               if (allowed) {
                 this.oidcForm.enable();
+                this.oidcForm.controls['clientId'].disable();
                 this.oidcTokenForm.enable();
                 this.apiForm.enable();
                 this.samlForm.enable();
@@ -441,6 +442,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               if (this.app.oidcConfig?.clockSkew) {
                 const inSecs = this.app.oidcConfig?.clockSkew.seconds + this.app.oidcConfig?.clockSkew.nanos / 100000;
                 this.oidcTokenForm.controls['clockSkewSeconds'].setValue(inSecs);
+              }
+              if (this.app.oidcConfig?.backChannelLogoutUri) {
+                this.oidcForm.controls['backChannelLogoutURI'].setValue(this.app.oidcConfig.backChannelLogoutUri);
               }
               if (this.app.oidcConfig?.loginVersion?.loginV1) {
                 this.oidcForm.controls['loginV2'].setValue(false);
@@ -516,7 +520,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.entityId?.setValue('');
         this.acsURL?.setValue('');
         const reader = new FileReader();
-        reader.onload = ((aXML) => {
+        reader.onload = (() => {
           return (e) => {
             const xmlBase64 = e.target?.result;
             if (xmlBase64 && typeof xmlBase64 === 'string' && this.app?.samlConfig) {
@@ -526,7 +530,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               this.app.samlConfig.metadataXml = cropped;
             }
           };
-        })(file);
+        })();
         reader.readAsDataURL(file);
       }
     }
@@ -650,6 +654,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.app.oidcConfig.grantTypesList = this.grantTypesList?.value;
         this.app.oidcConfig.appType = this.appType?.value;
         this.app.oidcConfig.authMethodType = this.authMethodType?.value;
+        this.app.oidcConfig.backChannelLogoutUri = this.backChannelLogoutURI?.value;
 
         // token
         this.app.oidcConfig.accessTokenType = this.accessTokenType?.value;
@@ -673,6 +678,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         req.setAuthMethodType(this.app.oidcConfig.authMethodType);
         req.setGrantTypesList(this.app.oidcConfig.grantTypesList);
         req.setAppType(this.app.oidcConfig.appType);
+        req.setBackChannelLogoutUri(this.app.oidcConfig.backChannelLogoutUri);
         const login = new LoginVersion();
         if (this.oidcLoginV2?.value) {
           const loginV2 = new LoginV2();
@@ -874,6 +880,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public get authMethodType(): AbstractControl | null {
     return this.oidcForm.get('authMethodType');
+  }
+
+  public get backChannelLogoutURI(): AbstractControl | null {
+    return this.oidcForm.get('backChannelLogoutURI');
   }
 
   public get oidcLoginV2(): FormControl<boolean> | null {

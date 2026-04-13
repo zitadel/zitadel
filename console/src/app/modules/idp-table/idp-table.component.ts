@@ -4,7 +4,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router, RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { BehaviorSubject, firstValueFrom, Observable, Subject } from 'rxjs';
 import {
   ListProvidersRequest as AdminListProvidersRequest,
@@ -20,8 +19,6 @@ import {
   ProviderType,
 } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
-  AddCustomLoginPolicyRequest,
-  AddCustomLoginPolicyResponse,
   ListProvidersRequest as MgmtListProvidersRequest,
   ListProvidersResponse as MgmtListProvidersResponse,
 } from 'src/app/proto/generated/zitadel/management_pb';
@@ -37,12 +34,12 @@ import { PageEvent, PaginatorComponent } from '../paginator/paginator.component'
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 import { LoginPolicyService } from '../../services/login-policy.service';
-import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'cnsl-idp-table',
   templateUrl: './idp-table.component.html',
   styleUrls: ['./idp-table.component.scss'],
+  standalone: false,
 })
 export class IdpTableComponent implements OnInit, OnDestroy {
   @Input() public serviceType!: PolicyComponentServiceType;
@@ -234,6 +231,7 @@ export class IdpTableComponent implements OnInit, OnDestroy {
     } else if (this.service instanceof ManagementService) {
       return ['/org', 'idp', 'create'];
     }
+    return undefined;
   }
 
   public routerLinkForRow(row: Provider.AsObject): any {

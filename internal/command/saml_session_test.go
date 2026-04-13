@@ -334,6 +334,7 @@ func TestCommands_CreateSAMLSessionFromSAMLRequest(t *testing.T) {
 				idGenerator:  tt.fields.idGenerator,
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
+			c.setMilestonesCompletedForTest("instanceID")
 			err := c.CreateSAMLSessionFromSAMLRequest(tt.args.ctx, tt.args.samlRequestID, tt.args.complianceCheck, tt.args.samlResponseID, tt.args.samlResponseLifetime)
 			require.ErrorIs(t, err, tt.res.err)
 		})

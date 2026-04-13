@@ -90,6 +90,7 @@ type ScimIms struct {
 type ScimEmail struct {
 	Value   string `json:"value" scim:"required"`
 	Primary bool   `json:"primary"`
+	Type    string `json:"type,omitempty"`
 }
 
 type ScimPhoneNumber struct {
@@ -199,12 +200,11 @@ func (h *UsersHandler) Update(ctx context.Context, id string, operations patch.O
 }
 
 func (h *UsersHandler) Delete(ctx context.Context, id string) error {
-	memberships, grants, err := h.queryUserDependencies(ctx, id)
+	memberships, grants, groupIDs, err := h.queryUserDependencies(ctx, id)
 	if err != nil {
 		return err
 	}
-
-	_, err = h.command.RemoveUserV2(ctx, id, authz.GetCtxData(ctx).OrgID, memberships, grants...)
+	_, err = h.command.RemoveUserV2(ctx, id, authz.GetCtxData(ctx).OrgID, memberships, grants, groupIDs)
 	return err
 }
 
@@ -254,22 +254,22 @@ func (h *UsersHandler) List(ctx context.Context, request *ListRequest) (*ListRes
 	return NewListResponse(users.SearchResponse.Count, q.SearchRequest, scimUsers), nil
 }
 
-func (h *UsersHandler) queryUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, error) {
+func (h *UsersHandler) queryUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, []string, error) {
 	userGrantUserQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	grants, err := h.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{userGrantUserQuery},
-	}, true)
+	}, true, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	membershipsUserQuery, err := query.NewMembershipUserIDQuery(userID)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	memberships, err := h.query.Memberships(ctx, &query.MembershipSearchQuery{
@@ -277,7 +277,35 @@ func (h *UsersHandler) queryUserDependencies(ctx context.Context, userID string)
 	}, false)
 
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-	return cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants), nil
+	groupIDs, err := h.getGroupsByUserID(ctx, userID)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	return cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants), groupIDs, nil
+}
+
+func (h *UsersHandler) getGroupsByUserID(ctx context.Context, userID string) ([]string, error) {
+	groupUserQuery, err := query.NewGroupUsersUserIDsSearchQuery([]string{userID})
+	if err != nil {
+		return nil, err
+	}
+	groupUsers, err := h.query.SearchGroupUsers(ctx,
+		&query.GroupUsersSearchQuery{
+			Queries: []query.SearchQuery{
+				groupUserQuery,
+			},
+		}, nil)
+	if err != nil {
+		return nil, err
+	}
+	if len(groupUsers.GroupUsers) == 0 {
+		return nil, nil
+	}
+	groupIDs := make([]string, 0, len(groupUsers.GroupUsers))
+	for _, groupUser := range groupUsers.GroupUsers {
+		groupIDs = append(groupIDs, groupUser.GroupID)
+	}
+	return groupIDs, nil
 }

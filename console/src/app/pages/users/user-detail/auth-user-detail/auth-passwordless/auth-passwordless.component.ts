@@ -26,6 +26,7 @@ export interface WebAuthNOptions {
   selector: 'cnsl-auth-passwordless',
   templateUrl: './auth-passwordless.component.html',
   styleUrls: ['./auth-passwordless.component.scss'],
+  standalone: false,
 })
 export class AuthPasswordlessComponent implements OnInit, OnDestroy {
   public displayedColumns: string[] = ['name', 'state', 'actions'];
@@ -76,7 +77,7 @@ export class AuthPasswordlessComponent implements OnInit, OnDestroy {
               },
             });
 
-            dialogRef.afterClosed().subscribe((done) => {
+            dialogRef.afterClosed().subscribe(() => {
               setTimeout(() => {
                 this.getPasswordless();
               }, 1000);

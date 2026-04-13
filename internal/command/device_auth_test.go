@@ -19,7 +19,6 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
@@ -50,6 +49,7 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 		scopes           []string
 		audience         []string
 		needRefreshToken bool
+		organizationID   string
 	}
 	tests := []struct {
 		name        string
@@ -67,7 +67,7 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 						deviceauth.NewAggregate("123", "instance1"),
 						"client_id", "123", "456", now,
 						[]string{"a", "b", "c"},
-						[]string{"projectID", "clientID"}, true,
+						[]string{"projectID", "clientID"}, true, "orgID",
 					),
 				)),
 			},
@@ -80,6 +80,7 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 				scopes:           []string{"a", "b", "c"},
 				audience:         []string{"projectID", "clientID"},
 				needRefreshToken: true,
+				organizationID:   "orgID",
 			},
 			wantDetails: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
@@ -94,7 +95,7 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 						deviceauth.NewAggregate("123", "instance1"),
 						"client_id", "123", "456", now,
 						[]string{"a", "b", "c"},
-						[]string{"projectID", "clientID"}, false,
+						[]string{"projectID", "clientID"}, false, "orgID",
 					)),
 				),
 			},
@@ -107,6 +108,7 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 				scopes:           []string{"a", "b", "c"},
 				audience:         []string{"projectID", "clientID"},
 				needRefreshToken: false,
+				organizationID:   "orgID",
 			},
 			wantErr: pushErr,
 		},
@@ -116,7 +118,17 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			gotDetails, err := c.AddDeviceAuth(tt.args.ctx, tt.args.clientID, tt.args.deviceCode, tt.args.userCode, tt.args.expires, tt.args.scopes, tt.args.audience, tt.args.needRefreshToken)
+			gotDetails, err := c.AddDeviceAuth(
+				tt.args.ctx,
+				tt.args.clientID,
+				tt.args.deviceCode,
+				tt.args.userCode,
+				tt.args.organizationID,
+				tt.args.expires,
+				tt.args.scopes,
+				tt.args.audience,
+				tt.args.needRefreshToken,
+			)
 			require.ErrorIs(t, err, tt.wantErr)
 			assertObjectDetails(t, tt.wantDetails, gotDetails)
 		})
@@ -170,6 +182,35 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-Hief9", "Errors.DeviceAuth.NotFound"),
 		},
 		{
+			name: "invalid org",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(eventFromEventPusherWithInstanceID(
+						"instance1",
+						deviceauth.NewAddedEvent(
+							ctx,
+							deviceauth.NewAggregate("123", "instance1"),
+							"client_id", "123", "456", now,
+							[]string{"a", "b", "c"},
+							[]string{"projectID", "clientID"}, true, "orgID2",
+						),
+					)),
+				),
+			},
+			args: args{
+				ctx, "123", "subj", "orgID",
+				[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				time.Unix(123, 456), &language.Afrikaans, &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				"sessionID",
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-3tgws", "Errors.User.NotAllowedOrg"),
+		},
+		{
 			name: "push error",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -180,7 +221,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 							deviceauth.NewAggregate("123", "instance1"),
 							"client_id", "123", "456", now,
 							[]string{"a", "b", "c"},
-							[]string{"projectID", "clientID"}, true,
+							[]string{"projectID", "clientID"}, true, "",
 						),
 					)),
 					expectPushFailed(pushErr,
@@ -222,7 +263,51 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 							deviceauth.NewAggregate("123", "instance1"),
 							"client_id", "123", "456", now,
 							[]string{"a", "b", "c"},
-							[]string{"projectID", "clientID"}, true,
+							[]string{"projectID", "clientID"}, true, "",
+						),
+					)),
+					expectPush(
+						deviceauth.NewApprovedEvent(
+							ctx, deviceauth.NewAggregate("123", "instance1"), "subj", "orgID",
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+							time.Unix(123, 456), &language.Afrikaans, &domain.UserAgent{
+								FingerprintID: gu.Ptr("fp1"),
+								IP:            net.ParseIP("1.2.3.4"),
+								Description:   gu.Ptr("firefox"),
+								Header:        http.Header{"foo": []string{"bar"}},
+							},
+							"sessionID",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx, "123", "subj", "orgID",
+				[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				time.Unix(123, 456), &language.Afrikaans, &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				"sessionID",
+			},
+			wantDetails: &domain.ObjectDetails{
+				ResourceOwner: "instance1",
+			},
+		},
+		{
+			name: "success with organizationID in device auth",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(eventFromEventPusherWithInstanceID(
+						"instance1",
+						deviceauth.NewAddedEvent(
+							ctx,
+							deviceauth.NewAggregate("123", "instance1"),
+							"client_id", "123", "456", now,
+							[]string{"a", "b", "c"},
+							[]string{"projectID", "clientID"}, true, "orgID",
 						),
 					)),
 					expectPush(
@@ -318,7 +403,7 @@ func TestCommands_ApproveDeviceAuthFromSession(t *testing.T) {
 								deviceauth.NewAggregate("deviceCode", "instance1"),
 								"client_id", "deviceCode", "456", now,
 								[]string{"a", "b", "c"},
-								[]string{"projectID", "clientID"}, true,
+								[]string{"projectID", "clientID"}, true, "",
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -350,7 +435,7 @@ func TestCommands_ApproveDeviceAuthFromSession(t *testing.T) {
 							deviceauth.NewAggregate("deviceCode", "instance1"),
 							"client_id", "deviceCode", "456", now,
 							[]string{"a", "b", "c"},
-							[]string{"projectID", "clientID"}, true,
+							[]string{"projectID", "clientID"}, true, "",
 						),
 					)),
 				),
@@ -375,7 +460,7 @@ func TestCommands_ApproveDeviceAuthFromSession(t *testing.T) {
 							deviceauth.NewAggregate("deviceCode", "instance1"),
 							"client_id", "deviceCode", "456", now,
 							[]string{"a", "b", "c"},
-							[]string{"projectID", "clientID"}, true,
+							[]string{"projectID", "clientID"}, true, "",
 						),
 					)),
 					expectFilter(),
@@ -401,7 +486,7 @@ func TestCommands_ApproveDeviceAuthFromSession(t *testing.T) {
 							deviceauth.NewAggregate("deviceCode", "instance1"),
 							"client_id", "deviceCode", "456", now,
 							[]string{"a", "b", "c"},
-							[]string{"projectID", "clientID"}, true,
+							[]string{"projectID", "clientID"}, true, "",
 						),
 					)),
 					expectFilter(eventFromEventPusherWithInstanceID(
@@ -428,6 +513,57 @@ func TestCommands_ApproveDeviceAuthFromSession(t *testing.T) {
 			wantErr: zerrors.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid"),
 		},
 		{
+			name: "invalid organization, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(eventFromEventPusherWithInstanceID(
+						"instance1",
+						deviceauth.NewAddedEvent(
+							ctx,
+							deviceauth.NewAggregate("deviceCode", "instance1"),
+							"client_id", "deviceCode", "456", now,
+							[]string{"a", "b", "c"},
+							[]string{"projectID", "clientID"}, true, "orgID2",
+						),
+					)),
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"instance1",
+							session.NewAddedEvent(ctx,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(ctx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"userID", "orgID", testNow, &language.Afrikaans),
+						),
+						eventFromEventPusher(
+							session.NewPasswordCheckedEvent(ctx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								testNow),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							session.NewLifetimeSetEvent(ctx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								2*time.Minute),
+						),
+					),
+				),
+				tokenVerifier:   newMockTokenVerifierValid(),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx,
+				"deviceCode",
+				"sessionID",
+				"sessionToken",
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-D2j34", "Errors.User.NotAllowedOrg"),
+		},
+		{
 			name: "push error",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -438,7 +574,7 @@ func TestCommands_ApproveDeviceAuthFromSession(t *testing.T) {
 							deviceauth.NewAggregate("deviceCode", "instance1"),
 							"client_id", "deviceCode", "456", now,
 							[]string{"a", "b", "c"},
-							[]string{"projectID", "clientID"}, true,
+							[]string{"projectID", "clientID"}, true, "",
 						),
 					)),
 					expectFilter(
@@ -502,7 +638,73 @@ func TestCommands_ApproveDeviceAuthFromSession(t *testing.T) {
 							deviceauth.NewAggregate("deviceCode", "instance1"),
 							"client_id", "deviceCode", "456", now,
 							[]string{"a", "b", "c"},
-							[]string{"projectID", "clientID"}, true,
+							[]string{"projectID", "clientID"}, true, "",
+						),
+					)),
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(ctx,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							),
+						),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(ctx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"userID", "orgID", testNow, &language.Afrikaans),
+						),
+						eventFromEventPusher(
+							session.NewPasswordCheckedEvent(ctx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								testNow),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							session.NewLifetimeSetEvent(ctx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								2*time.Minute),
+						),
+					),
+					expectPush(
+						deviceauth.NewApprovedEvent(
+							ctx, deviceauth.NewAggregate("deviceCode", "instance1"), "userID", "orgID",
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+							testNow, &language.Afrikaans, &domain.UserAgent{
+								FingerprintID: gu.Ptr("fp1"),
+								IP:            net.ParseIP("1.2.3.4"),
+								Description:   gu.Ptr("firefox"),
+								Header:        http.Header{"foo": []string{"bar"}},
+							},
+							"sessionID",
+						),
+					),
+				),
+				tokenVerifier:   newMockTokenVerifierValid(),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx,
+				"deviceCode",
+				"sessionID",
+				"sessionToken",
+			},
+			wantDetails: &domain.ObjectDetails{
+				ResourceOwner: "instance1",
+			},
+		},
+		{
+			name: "authorized with organizationID in device auth",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(eventFromEventPusherWithInstanceID(
+						"instance1",
+						deviceauth.NewAddedEvent(
+							ctx,
+							deviceauth.NewAggregate("deviceCode", "instance1"),
+							"client_id", "deviceCode", "456", now,
+							[]string{"a", "b", "c"},
+							[]string{"projectID", "clientID"}, true, "orgID",
 						),
 					)),
 					expectFilter(
@@ -578,7 +780,8 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 	pushErr := errors.New("pushErr")
 
 	type fields struct {
-		eventstore func(*testing.T) *eventstore.Eventstore
+		eventstore      func(*testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx    context.Context
@@ -603,6 +806,26 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-gee5A", "Errors.DeviceAuth.NotFound"),
 		},
 		{
+			name: "missing permission, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(eventFromEventPusherWithInstanceID(
+						"instance1",
+						deviceauth.NewAddedEvent(
+							ctx,
+							deviceauth.NewAggregate("123", "instance1"),
+							"client_id", "123", "456", now,
+							[]string{"a", "b", "c"},
+							[]string{"projectID", "clientID"}, true, "",
+						),
+					)),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args:    args{ctx, "123", domain.DeviceAuthCanceledDenied},
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+		},
+		{
 			name: "push error",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -613,7 +836,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 							deviceauth.NewAggregate("123", "instance1"),
 							"client_id", "123", "456", now,
 							[]string{"a", "b", "c"},
-							[]string{"projectID", "clientID"}, true,
+							[]string{"projectID", "clientID"}, true, "",
 						),
 					)),
 					expectPushFailed(pushErr,
@@ -623,6 +846,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args:    args{ctx, "123", domain.DeviceAuthCanceledDenied},
 			wantErr: pushErr,
@@ -638,7 +862,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 							deviceauth.NewAggregate("123", "instance1"),
 							"client_id", "123", "456", now,
 							[]string{"a", "b", "c"},
-							[]string{"projectID", "clientID"}, true,
+							[]string{"projectID", "clientID"}, true, "",
 						),
 					)),
 					expectPush(
@@ -648,6 +872,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{ctx, "123", domain.DeviceAuthCanceledDenied},
 			wantDetails: &domain.ObjectDetails{
@@ -665,7 +890,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 							deviceauth.NewAggregate("123", "instance1"),
 							"client_id", "123", "456", now,
 							[]string{"a", "b", "c"},
-							[]string{"projectID", "clientID"}, true,
+							[]string{"projectID", "clientID"}, true, "",
 						),
 					)),
 					expectPush(
@@ -675,6 +900,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{ctx, "123", domain.DeviceAuthCanceledExpired},
 			wantDetails: &domain.ObjectDetails{
@@ -685,7 +911,8 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			gotDetails, err := c.CancelDeviceAuth(tt.args.ctx, tt.args.id, tt.args.reason)
 			require.ErrorIs(t, err, tt.wantErr)
@@ -743,7 +970,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 								deviceauth.NewAggregate("123", "instance1"),
 								"clientID", "123", "456", time.Now().Add(time.Minute),
 								[]string{"openid", "offline_access"},
-								[]string{"audience"}, false,
+								[]string{"audience"}, false, "",
 							),
 						),
 					),
@@ -782,7 +1009,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 								deviceauth.NewAggregate("123", "instance1"),
 								"clientID", "123", "456", time.Now().Add(-time.Minute),
 								[]string{"openid", "offline_access"},
-								[]string{"audience"}, false,
+								[]string{"audience"}, false, "",
 							),
 						),
 					),
@@ -811,7 +1038,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 								deviceauth.NewAggregate("123", "instance1"),
 								"clientID", "123", "456", time.Now().Add(-time.Minute),
 								[]string{"openid", "offline_access"},
-								[]string{"audience"}, false,
+								[]string{"audience"}, false, "",
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -843,7 +1070,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 								deviceauth.NewAggregate("123", "instance1"),
 								"clientID", "123", "456", time.Now().Add(-time.Minute),
 								[]string{"openid", "offline_access"},
-								[]string{"audience"}, false,
+								[]string{"audience"}, false, "",
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -875,7 +1102,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 								deviceauth.NewAggregate("123", "instance1"),
 								"clientID", "123", "456", time.Now().Add(-time.Minute),
 								[]string{"openid", "offline_access"},
-								[]string{"audience"}, false,
+								[]string{"audience"}, false, "",
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -913,7 +1140,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 								deviceauth.NewAggregate("123", "instance1"),
 								"clientID", "123", "456", time.Now().Add(-time.Minute),
 								[]string{"openid", "offline_access"},
-								[]string{"audience"}, false,
+								[]string{"audience"}, false, "",
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -977,7 +1204,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 								deviceauth.NewAggregate("123", "instance1"),
 								"clientID", "123", "456", time.Now().Add(-time.Minute),
 								[]string{"openid", "offline_access"},
-								[]string{"audience"}, false,
+								[]string{"audience"}, false, "",
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -1026,7 +1253,6 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil,
 						),
-						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
 						deviceauth.NewDoneEvent(ctx,
 							deviceauth.NewAggregate("123", "instance1"),
 						),
@@ -1064,7 +1290,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 			},
 		},
 		{
-			name: "approved with backChannelLogout (feature enabled), success",
+			name: "approved with backChannelLogout, success",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -1075,7 +1301,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 								deviceauth.NewAggregate("123", "instance1"),
 								"clientID", "123", "456", time.Now().Add(-time.Minute),
 								[]string{"openid", "offline_access"},
-								[]string{"audience"}, false,
+								[]string{"audience"}, false, "",
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -1131,7 +1357,6 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil,
 						),
-						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
 						deviceauth.NewDoneEvent(ctx,
 							deviceauth.NewAggregate("123", "instance1"),
 						),
@@ -1144,9 +1369,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				authz.WithFeatures(ctx, feature.Features{
-					EnableBackChannelLogout: true,
-				}),
+				ctx,
 				"123",
 				"backChannelLogoutURI",
 			},
@@ -1182,7 +1405,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 								deviceauth.NewAggregate("123", "instance1"),
 								"clientID", "123", "456", time.Now().Add(-time.Minute),
 								[]string{"openid", "offline_access"},
-								[]string{"audience"}, true,
+								[]string{"audience"}, true, "",
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -1231,7 +1454,6 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil,
 						),
-						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
 						oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour,
 						),

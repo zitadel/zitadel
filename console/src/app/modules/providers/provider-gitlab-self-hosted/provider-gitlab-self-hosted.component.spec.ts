@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { ProviderGoogleComponent } from './provider-google.component';
+import { ProviderGitlabSelfHostedComponent } from './provider-gitlab-self-hosted.component';
 
 describe('ProviderGoogleComponent', () => {
-  let component: ProviderGoogleComponent;
-  let fixture: ComponentFixture<ProviderGoogleComponent>;
+  let component: ProviderGitlabSelfHostedComponent;
+  let fixture: ComponentFixture<ProviderGitlabSelfHostedComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ProviderGoogleComponent],
+      declarations: [ProviderGitlabSelfHostedComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ProviderGoogleComponent);
+    fixture = TestBed.createComponent(ProviderGitlabSelfHostedComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

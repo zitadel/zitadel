@@ -16,15 +16,15 @@ import (
 
 func TestCommandSide_AddProjectRole(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
-		ctx           context.Context
-		role          *domain.ProjectRole
-		resourceOwner string
+		ctx  context.Context
+		role *AddProjectRole
 	}
 	type res struct {
-		want *domain.ProjectRole
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -36,8 +36,7 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 		{
 			name: "project not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -55,16 +54,16 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
-				role: &domain.ProjectRole{
+				role: &AddProjectRole{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
 					Key: "key1",
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -73,8 +72,7 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 		{
 			name: "invalid role, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -85,15 +83,15 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
-				role: &domain.ProjectRole{
+				role: &AddProjectRole{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -102,8 +100,7 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 		{
 			name: "role key already exists, already exists error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -123,10 +120,11 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
-				role: &domain.ProjectRole{
+				role: &AddProjectRole{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
@@ -134,7 +132,6 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 					DisplayName: "key",
 					Group:       "group",
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsErrorAlreadyExists,
@@ -143,8 +140,7 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 		{
 			name: "add role,ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -164,10 +160,11 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
-				role: &domain.ProjectRole{
+				role: &AddProjectRole{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
@@ -175,10 +172,41 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 					DisplayName: "key",
 					Group:       "group",
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
-				want: &domain.ProjectRole{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "add role, resourceowner, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1", true, true, true,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+					),
+					expectPush(
+						project.NewRoleAddedEvent(
+							context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"key1",
+							"key",
+							"group",
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx: context.Background(),
+				role: &AddProjectRole{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "project1",
 						ResourceOwner: "org1",
@@ -188,14 +216,20 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 					Group:       "group",
 				},
 			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := r.AddProjectRole(tt.args.ctx, tt.args.role, tt.args.resourceOwner)
+			got, err := r.AddProjectRole(tt.args.ctx, tt.args.role)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -203,7 +237,7 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -211,11 +245,12 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 
 func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx           context.Context
-		roles         []*domain.ProjectRole
+		roles         []*AddProjectRole
 		projectID     string
 		resourceOwner string
 	}
@@ -232,8 +267,7 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 		{
 			name: "project not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -251,10 +285,11 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
-				roles: []*domain.ProjectRole{
+				roles: []*AddProjectRole{
 					{
 						ObjectRoot: models.ObjectRoot{
 							AggregateID: "project1",
@@ -271,8 +306,7 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 		{
 			name: "invalid role, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -283,10 +317,11 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
-				roles: []*domain.ProjectRole{
+				roles: []*AddProjectRole{
 					{
 						ObjectRoot: models.ObjectRoot{},
 					},
@@ -304,8 +339,7 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 		{
 			name: "role key already exists, already exists error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -332,16 +366,23 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
-				roles: []*domain.ProjectRole{
+				roles: []*AddProjectRole{
 					{
+						ObjectRoot: models.ObjectRoot{
+							AggregateID: "project1",
+						},
 						Key:         "key1",
 						DisplayName: "key",
 						Group:       "group",
 					},
 					{
+						ObjectRoot: models.ObjectRoot{
+							AggregateID: "project1",
+						},
 						Key:         "key2",
 						DisplayName: "key2",
 						Group:       "group",
@@ -357,8 +398,7 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 		{
 			name: "add roles,ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -385,16 +425,23 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
-				roles: []*domain.ProjectRole{
+				roles: []*AddProjectRole{
 					{
+						ObjectRoot: models.ObjectRoot{
+							AggregateID: "project1",
+						},
 						Key:         "key1",
 						DisplayName: "key",
 						Group:       "group",
 					},
 					{
+						ObjectRoot: models.ObjectRoot{
+							AggregateID: "project1",
+						},
 						Key:         "key2",
 						DisplayName: "key2",
 						Group:       "group",
@@ -413,7 +460,8 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.BulkAddProjectRole(tt.args.ctx, tt.args.projectID, tt.args.resourceOwner, tt.args.roles)
 			if tt.res.err == nil {
@@ -431,15 +479,15 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 
 func TestCommandSide_ChangeProjectRole(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
-		ctx           context.Context
-		role          *domain.ProjectRole
-		resourceOwner string
+		ctx  context.Context
+		role *ChangeProjectRole
 	}
 	type res struct {
-		want *domain.ProjectRole
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -451,18 +499,16 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 		{
 			name: "invalid role, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
-				role: &domain.ProjectRole{
+				role: &ChangeProjectRole{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -471,8 +517,7 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 		{
 			name: "project not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -490,16 +535,16 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
-				role: &domain.ProjectRole{
+				role: &ChangeProjectRole{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
 					Key: "key1",
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -508,8 +553,7 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 		{
 			name: "role removed, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -536,10 +580,11 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
-				role: &domain.ProjectRole{
+				role: &ChangeProjectRole{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
@@ -547,7 +592,6 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 					DisplayName: "key",
 					Group:       "group",
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsNotFound,
@@ -556,8 +600,7 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 		{
 			name: "role not changed, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -578,10 +621,11 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
-				role: &domain.ProjectRole{
+				role: &ChangeProjectRole{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
@@ -589,17 +633,17 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 					DisplayName: "key",
 					Group:       "group",
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
-				err: zerrors.IsPreconditionFailed,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
 			},
 		},
 		{
 			name: "role changed, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -623,10 +667,11 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 						newRoleChangedEvent(context.Background(), "project1", "org1", "key1", "keychanged", "groupchanged"),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
-				role: &domain.ProjectRole{
+				role: &ChangeProjectRole{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
 					},
@@ -634,17 +679,10 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 					DisplayName: "keychanged",
 					Group:       "groupchanged",
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
-				want: &domain.ProjectRole{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "project1",
-						ResourceOwner: "org1",
-					},
-					Key:         "key1",
-					DisplayName: "keychanged",
-					Group:       "groupchanged",
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -652,9 +690,10 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := r.ChangeProjectRole(tt.args.ctx, tt.args.role, tt.args.resourceOwner)
+			got, err := r.ChangeProjectRole(tt.args.ctx, tt.args.role)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -662,7 +701,7 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -670,7 +709,8 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 
 func TestCommandSide_RemoveProjectRole(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx                      context.Context
@@ -693,9 +733,8 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 		{
 			name: "invalid projectid, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -709,9 +748,8 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 		{
 			name: "invalid key, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -726,10 +764,10 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 		{
 			name: "role not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -738,14 +776,15 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: zerrors.IsNotFound,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
 			},
 		},
 		{
 			name: "role removed, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewRoleAddedEvent(context.Background(),
@@ -763,6 +802,7 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -771,14 +811,15 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: zerrors.IsNotFound,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
 			},
 		},
 		{
 			name: "role removed, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewRoleAddedEvent(context.Background(),
@@ -796,6 +837,7 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -812,8 +854,7 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 		{
 			name: "role removed with cascadingProjectGrantids, grant not found, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewRoleAddedEvent(context.Background(),
@@ -832,6 +873,7 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:                      context.Background(),
@@ -849,8 +891,7 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 		{
 			name: "role removed with cascadingProjectGrantids, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewRoleAddedEvent(context.Background(),
@@ -883,6 +924,7 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:                      context.Background(),
@@ -900,8 +942,7 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 		{
 			name: "role removed with cascadingUserGrantIDs, grant not found, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewRoleAddedEvent(context.Background(),
@@ -920,6 +961,7 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:                   context.Background(),
@@ -937,8 +979,7 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 		{
 			name: "role removed with cascadingUserGrantIDs, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewRoleAddedEvent(context.Background(),
@@ -969,6 +1010,7 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:                   context.Background(),
@@ -987,7 +1029,8 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.RemoveProjectRole(tt.args.ctx, tt.args.projectID, tt.args.key, tt.args.resourceOwner, tt.args.cascadingProjectGrantIDs, tt.args.cascadingUserGrantIDs...)
 			if tt.res.err == nil {

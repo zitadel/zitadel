@@ -128,7 +128,7 @@ func prepareProjectGrantMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memb
 			LeftJoin(join(MachineUserIDCol, ProjectGrantMemberUserID)).
 			LeftJoin(join(UserIDCol, ProjectGrantMemberUserID)).
 			LeftJoin(join(LoginNameUserIDCol, ProjectGrantMemberUserID)).
-			LeftJoin(join(ProjectGrantColumnGrantID, ProjectGrantMemberGrantID)).
+			LeftJoin(join(ProjectGrantColumnGrantID, ProjectGrantMemberGrantID) + " AND " + ProjectGrantMemberProjectID.identifier() + " = " + ProjectGrantColumnProjectID.identifier()).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),

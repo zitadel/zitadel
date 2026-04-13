@@ -132,7 +132,7 @@ func (q *Queries) SecretGeneratorByType(ctx context.Context, generatorType domai
 		SecretGeneratorColumnInstanceID.identifier():    instanceID,
 	}).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-3k99f", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-3k99f", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {

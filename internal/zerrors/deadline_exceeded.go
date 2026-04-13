@@ -1,46 +1,16 @@
 package zerrors
 
-import (
-	"fmt"
-)
-
-var (
-	_ DeadlineExceeded = (*DeadlineExceededError)(nil)
-	_ Error            = (*DeadlineExceededError)(nil)
-)
-
-type DeadlineExceeded interface {
-	error
-	IsDeadlineExceeded()
-}
-
-type DeadlineExceededError struct {
-	*ZitadelError
-}
+import "fmt"
 
 func ThrowDeadlineExceeded(parent error, id, message string) error {
-	return &DeadlineExceededError{CreateZitadelError(parent, id, message)}
+	return CreateZitadelError(KindDeadlineExceeded, parent, id, message, 1)
 }
 
-func ThrowDeadlineExceededf(parent error, id, format string, a ...interface{}) error {
-	return ThrowDeadlineExceeded(parent, id, fmt.Sprintf(format, a...))
+func ThrowDeadlineExceededf(parent error, id, format string, a ...any) error {
+	return CreateZitadelError(KindDeadlineExceeded, parent, id, fmt.Sprintf(format, a...), 1)
 }
-
-func (err *DeadlineExceededError) IsDeadlineExceeded() {}
 
 func IsDeadlineExceeded(err error) bool {
-	_, ok := err.(DeadlineExceeded)
-	return ok
-}
-
-func (err *DeadlineExceededError) Is(target error) bool {
-	t, ok := target.(*DeadlineExceededError)
-	if !ok {
-		return false
-	}
-	return err.ZitadelError.Is(t.ZitadelError)
-}
-
-func (err *DeadlineExceededError) Unwrap() error {
-	return err.ZitadelError
+	zitadelErr, ok := AsZitadelError(err)
+	return ok && zitadelErr.Kind == KindDeadlineExceeded
 }

@@ -20,6 +20,7 @@ enum Gender {
 }
 
 message SetHumanProfile {
+  // The given name is the first name of the user
   string given_name = 1  [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -29,6 +30,7 @@ message SetHumanProfile {
       example: "\"Minnie\"";
     }
   ];
+  // The family name is the last name of the user
   string family_name = 2  [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -67,6 +69,7 @@ message SetHumanProfile {
 }
 
 message HumanProfile {
+  // The given name is the first name of the user
   string given_name = 1  [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
@@ -74,6 +77,7 @@ message HumanProfile {
       example: "\"Minnie\"";
     }
   ];
+  // The family name is the last name of the user
   string family_name = 2  [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
@@ -226,7 +230,7 @@ message MachineUser {
   ];
   string description = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"The one and only IAM\"";
+      example: "\"The one and only instance\"";
     }
   ];
   bool has_secret = 3 [

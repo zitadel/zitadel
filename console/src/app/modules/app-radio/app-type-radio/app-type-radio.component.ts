@@ -5,6 +5,7 @@ import { RadioItemAppType, WEB_TYPE } from 'src/app/pages/projects/apps/authtype
   selector: 'cnsl-type-radio',
   templateUrl: './app-type-radio.component.html',
   styleUrls: ['./app-type-radio.component.scss'],
+  standalone: false,
 })
 export class AppTypeRadioComponent {
   @Input() selected: RadioItemAppType = WEB_TYPE;

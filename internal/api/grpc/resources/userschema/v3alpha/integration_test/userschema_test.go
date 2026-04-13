@@ -6,7 +6,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -35,7 +34,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.UserSchema{
-					Type: gofakeit.Name(),
+					Type: integration.Username(),
 				},
 			},
 			wantErr: true,
@@ -55,7 +54,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.UserSchema{
-					Type: gofakeit.Name(),
+					Type: integration.UserSchemaName(),
 				},
 			},
 			wantErr: true,
@@ -65,7 +64,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.UserSchema{
-					Type: gofakeit.Name(),
+					Type: integration.UserSchemaName(),
 					DataType: &schema.UserSchema_Schema{
 						Schema: func() *structpb.Struct {
 							s := new(structpb.Struct)
@@ -96,7 +95,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.UserSchema{
-					Type: gofakeit.Name(),
+					Type: integration.UserSchemaName(),
 					DataType: &schema.UserSchema_Schema{
 						Schema: func() *structpb.Struct {
 							s := new(structpb.Struct)
@@ -135,7 +134,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.UserSchema{
-					Type: gofakeit.Name(),
+					Type: integration.UserSchemaName(),
 					DataType: &schema.UserSchema_Schema{
 						Schema: func() *structpb.Struct {
 							s := new(structpb.Struct)
@@ -169,7 +168,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.UserSchema{
-					Type: gofakeit.Name(),
+					Type: integration.UserSchemaName(),
 					DataType: &schema.UserSchema_Schema{
 						Schema: func() *structpb.Struct {
 							s := new(structpb.Struct)
@@ -211,7 +210,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.UserSchema{
-					Type: gofakeit.Name(),
+					Type: integration.UserSchemaName(),
 					DataType: &schema.UserSchema_Schema{
 						Schema: func() *structpb.Struct {
 							s := new(structpb.Struct)
@@ -246,7 +245,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.UserSchema{
-					Type: gofakeit.Name(),
+					Type: integration.UserSchemaName(),
 					DataType: &schema.UserSchema_Schema{
 						Schema: func() *structpb.Struct {
 							s := new(structpb.Struct)
@@ -329,7 +328,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 				req: &schema.PatchUserSchemaRequest{
 					UserSchema: &schema.PatchUserSchema{
-						Type: gu.Ptr(gofakeit.Name()),
+						Type: gu.Ptr(integration.UserSchemaName()),
 					},
 				},
 			},
@@ -386,7 +385,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
 					UserSchema: &schema.PatchUserSchema{
-						Type: gu.Ptr(gofakeit.Name()),
+						Type: gu.Ptr(integration.UserSchemaName()),
 					},
 				},
 			},
@@ -570,7 +569,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
 					UserSchema: &schema.PatchUserSchema{
-						Type: gu.Ptr(gofakeit.Name()),
+						Type: gu.Ptr(integration.UserSchemaName()),
 					},
 				},
 			},

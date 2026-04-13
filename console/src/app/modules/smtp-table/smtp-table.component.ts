@@ -1,9 +1,8 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { SMTPConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
 import { ListQuery } from 'src/app/proto/generated/zitadel/object_pb';
 import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -12,7 +11,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import { ListSMTPConfigsRequest, ListSMTPConfigsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
-import { SMTPConfig } from 'src/app/proto/generated/zitadel/settings_pb';
+import { SMTPConfig, SMTPConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
@@ -22,6 +21,7 @@ import { SmtpTestDialogComponent } from '../smtp-test-dialog/smtp-test-dialog.co
   selector: 'cnsl-smtp-table',
   templateUrl: './smtp-table.component.html',
   styleUrls: ['./smtp-table.component.scss'],
+  standalone: false,
 })
 export class SMTPTableComponent implements OnInit {
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
@@ -192,16 +192,8 @@ export class SMTPTableComponent implements OnInit {
     this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
   }
 
-  public get createRouterLink(): RouterLink | any {
-    return ['/instance', 'idp', 'create'];
-  }
-
   public routerLinkForRow(row: SMTPConfig.AsObject): any {
     return ['/instance', 'smtpprovider', row.id];
-  }
-
-  public get displayedColumnsWithActions(): string[] {
-    return ['actions', ...this.displayedColumns];
   }
 
   public navigateToProvider(row: SMTPConfig.AsObject) {

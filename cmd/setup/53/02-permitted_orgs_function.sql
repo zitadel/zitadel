@@ -38,7 +38,7 @@ BEGIN
         RETURN;
     END IF;
   
-    -- if human/machine user
+    -- if human/service account
     DECLARE
     	matched_roles TEXT[] := eventstore.find_roles(req_instance_id, perm);
 	BEGIN

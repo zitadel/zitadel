@@ -104,6 +104,18 @@ func (s *UserSession) Reducers() []handler.AggregateReducer {
 					Reduce: s.Reduce,
 				},
 				{
+					Event:  user.HumanRecoveryCodeCheckSucceededType,
+					Reduce: s.Reduce,
+				},
+				{
+					Event:  user.HumanRecoveryCodeCheckFailedType,
+					Reduce: s.Reduce,
+				},
+				{
+					Event:  user.HumanRecoveryCodesRemovedType,
+					Reduce: s.Reduce,
+				},
+				{
 					Event:  user.HumanU2FTokenCheckSucceededType,
 					Reduce: s.Reduce,
 				},
@@ -245,13 +257,21 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
 	case user.UserV1PasswordCheckFailedType,
 		user.HumanPasswordCheckFailedType:
-		columns, err := u.sessionColumnsActivate(event,
-			handler.NewCol(view_model.UserSessionKeyPasswordVerification, time.Time{}),
-		)
+		userAgent, err := agentIDFromSession(event)
 		if err != nil {
 			return nil, err
 		}
-		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
+		return handler.NewUpdateStatement(event,
+			[]handler.Column{
+				handler.NewCol(view_model.UserSessionKeyPasswordVerification, time.Time{}),
+				handler.NewCol(view_model.UserSessionKeyChangeDate, event.CreatedAt()),
+				handler.NewCol(view_model.UserSessionKeySequence, event.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(view_model.UserSessionKeyUserAgentID, userAgent),
+				handler.NewCond(view_model.UserSessionKeyUserID, event.Aggregate().ID),
+				handler.NewCond(view_model.UserSessionKeyInstanceID, event.Aggregate().InstanceID),
+			}), nil
 	case user.UserV1MFAOTPCheckSucceededType,
 		user.HumanMFAOTPCheckSucceededType:
 		columns, err := u.sessionColumnsActivate(event,
@@ -265,6 +285,23 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 	case user.UserV1MFAOTPCheckFailedType,
 		user.HumanMFAOTPCheckFailedType,
 		user.HumanU2FTokenCheckFailedType:
+		columns, err := u.sessionColumnsActivate(event,
+			handler.NewCol(view_model.UserSessionKeySecondFactorVerification, time.Time{}),
+		)
+		if err != nil {
+			return nil, err
+		}
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
+	case user.HumanRecoveryCodeCheckSucceededType:
+		columns, err := u.sessionColumnsActivate(event,
+			handler.NewCol(view_model.UserSessionKeySecondFactorVerification, event.CreatedAt()),
+			handler.NewCol(view_model.UserSessionKeySecondFactorVerificationType, domain.MFATypeRecoveryCode),
+		)
+		if err != nil {
+			return nil, err
+		}
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
+	case user.HumanRecoveryCodeCheckFailedType:
 		columns, err := u.sessionColumnsActivate(event,
 			handler.NewCol(view_model.UserSessionKeySecondFactorVerification, time.Time{}),
 		)
@@ -399,7 +436,8 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		), nil
 	case user.UserV1MFAOTPRemovedType,
 		user.HumanMFAOTPRemovedType,
-		user.HumanU2FTokenRemovedType:
+		user.HumanU2FTokenRemovedType,
+		user.HumanRecoveryCodesRemovedType:
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
 				handler.NewCol(view_model.UserSessionKeySecondFactorVerification, time.Time{}),

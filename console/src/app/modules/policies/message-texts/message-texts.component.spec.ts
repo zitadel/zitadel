@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { LoginPolicyComponent } from './login-policy.component';
+import { MessageTextsComponent } from './message-texts.component';
 
 describe('LoginPolicyComponent', () => {
-  let component: LoginPolicyComponent;
-  let fixture: ComponentFixture<LoginPolicyComponent>;
+  let component: MessageTextsComponent;
+  let fixture: ComponentFixture<MessageTextsComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [LoginPolicyComponent],
+      declarations: [MessageTextsComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LoginPolicyComponent);
+    fixture = TestBed.createComponent(MessageTextsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -10,6 +10,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 import "zitadel/user/v2/user.proto";
 import "zitadel/object/v2/object.proto";
+import "zitadel/metadata/v2/metadata.proto";
 
 message SearchQuery {
     oneof query {
@@ -31,6 +32,8 @@ message SearchQuery {
         InUserEmailsQuery in_user_emails_query = 14;
         OrganizationIdQuery organization_id_query = 15;
         PhoneQuery phone_query = 16;
+        zitadel.metadata.v2.MetadataKeyFilter metadata_key_filter = 17;
+        zitadel.metadata.v2.MetadataValueFilter metadata_value_filter = 18;
     }
 }
 

@@ -103,7 +103,9 @@ func (l *Login) handleOTPVerificationCheck(w http.ResponseWriter, r *http.Reques
 	case domain.MFATypeOTPEmail:
 		actionType = authMethodOTPEmail
 		verifyCode = l.authRepo.VerifyMFAOTPEmail
-		// another type should never be passed, but just making sure
+	case domain.MFATypeRecoveryCode:
+		actionType = authMethodRecoveryCode
+		verifyCode = l.authRepo.VerifyMFARecoveryCode
 	case domain.MFATypeU2F,
 		domain.MFATypeTOTP,
 		domain.MFATypeU2FUserVerification:
@@ -114,7 +116,7 @@ func (l *Login) handleOTPVerificationCheck(w http.ResponseWriter, r *http.Reques
 
 	metadata, actionErr := l.runPostInternalAuthenticationActions(authReq, r, actionType, err)
 	if err == nil && actionErr == nil && len(metadata) > 0 {
-		_, err = l.command.BulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, metadata...)
+		err = l.bulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, metadata)
 	} else if actionErr != nil && err == nil {
 		err = actionErr
 	}

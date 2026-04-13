@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -112,7 +113,7 @@ func userAuthMethodPermissionCheckV2(ctx context.Context, query sq.SelectBuilder
 		ctx,
 		UserAuthMethodColumnResourceOwner,
 		domain.PermissionUserRead,
-		OwnedRowsPermissionOption(UserIDCol),
+		OwnedRowsPermissionOption(UserAuthMethodColumnUserID),
 	)
 	return query.JoinClause(join, args...)
 }
@@ -222,9 +223,11 @@ func (q *Queries) ListUserAuthMethodTypes(ctx context.Context, userID string, ac
 }
 
 type UserAuthMethodRequirements struct {
-	UserType          domain.UserType
-	ForceMFA          bool
-	ForceMFALocalOnly bool
+	UserType             domain.UserType
+	ForceMFA             bool
+	ForceMFALocalOnly    bool
+	AllowedSecondFactors []domain.SecondFactorType
+	SetUpFactors         []domain.UserAuthMethodType
 }
 
 //go:embed user_auth_method_types_required.sql
@@ -245,10 +248,14 @@ func (q *Queries) ListUserAuthMethodTypesRequired(ctx context.Context, userID st
 			var userType sql.NullInt32
 			var forceMFA sql.NullBool
 			var forceMFALocalOnly sql.NullBool
+			var allowedSecondFactors database.NumberArray[domain.SecondFactorType]
+			var setUpFactors database.NumberArray[domain.UserAuthMethodType]
 			err := row.Scan(
 				&userType,
 				&forceMFA,
 				&forceMFALocalOnly,
+				&allowedSecondFactors,
+				&setUpFactors,
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
@@ -257,9 +264,11 @@ func (q *Queries) ListUserAuthMethodTypesRequired(ctx context.Context, userID st
 				return zerrors.ThrowInternal(err, "QUERY-Sf3rt", "Errors.Internal")
 			}
 			requirements = &UserAuthMethodRequirements{
-				UserType:          domain.UserType(userType.Int32),
-				ForceMFA:          forceMFA.Bool,
-				ForceMFALocalOnly: forceMFALocalOnly.Bool,
+				UserType:             domain.UserType(userType.Int32),
+				ForceMFA:             forceMFA.Bool,
+				ForceMFALocalOnly:    forceMFALocalOnly.Bool,
+				AllowedSecondFactors: allowedSecondFactors,
+				SetUpFactors:         setUpFactors,
 			}
 			return nil
 		},
@@ -475,7 +484,7 @@ func prepareUserAuthMethodTypesQuery(activeOnly bool, includeWithoutDomain bool,
 				userAuthMethodTypes = append(userAuthMethodTypes, domain.UserAuthMethodTypePassword)
 			}
 			if idp.Valid && idp.Int64 > 0 {
-				logging.Error("IDP", idp.Int64)
+				logging.Debug("Adding IDP ", idp.Int64, " to userAuthMethodTypes")
 				userAuthMethodTypes = append(userAuthMethodTypes, domain.UserAuthMethodTypeIDP)
 			}
 

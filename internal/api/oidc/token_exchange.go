@@ -10,6 +10,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/oidc/sign"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -31,7 +32,7 @@ func init() {
 func (s *Server) TokenExchange(ctx context.Context, r *op.ClientRequest[oidc.TokenExchangeRequest]) (_ *op.Response, err error) {
 	resp, err := s.tokenExchange(ctx, r)
 	if err != nil {
-		return nil, oidcError(err)
+		return nil, oidcError(ctx, err)
 	}
 	return resp, nil
 }
@@ -40,9 +41,6 @@ func (s *Server) tokenExchange(ctx context.Context, r *op.ClientRequest[oidc.Tok
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if !authz.GetFeatures(ctx).TokenExchange {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-oan4I", "Errors.TokenExchange.FeatureDisabled")
-	}
 	if len(r.Data.Resource) > 0 {
 		return nil, oidc.ErrInvalidTarget().WithDescription("resource parameter not supported")
 	}
@@ -218,7 +216,7 @@ func validateTokenExchangeAudience(requestedAudience, subjectAudience, actorAudi
 // Both tokens may point to the same object (subjectToken) in case of a regular Token Exchange.
 // When the subject and actor Tokens point to different objects, the new tokens will be for impersonation / delegation.
 func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenType, client *Client, subjectToken, actorToken *exchangeToken, audience, scopes []string) (_ *oidc.TokenExchangeResponse, err error) {
-	getUserInfo := s.getUserInfo(subjectToken.userID, client.client.ProjectID, client.client.ProjectRoleAssertion, client.IDTokenUserinfoClaimsAssertion(), scopes)
+	getUserInfo := s.getUserInfo(subjectToken.userID, client.client.ProjectID, client.GetID(), client.client.ProjectRoleAssertion, client.IDTokenUserinfoClaimsAssertion(), scopes)
 	getSigner := s.getSignerOnce()
 
 	resp := &oidc.TokenExchangeResponse{
@@ -317,7 +315,7 @@ func (s *Server) createExchangeJWT(
 	client *Client,
 	getUserInfo userInfoFunc,
 	roleAssertion bool,
-	getSigner SignerFunc,
+	getSigner sign.SignerFunc,
 	userID,
 	resourceOwner string,
 	audience,

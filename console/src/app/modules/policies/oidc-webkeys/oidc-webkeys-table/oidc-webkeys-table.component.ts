@@ -2,13 +2,14 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { ReplaySubject } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { MatTableDataSource } from '@angular/material/table';
-import { State, WebKey } from '@zitadel/proto/zitadel/webkey/v2beta/key_pb';
+import { State, WebKey } from '@zitadel/proto/zitadel/webkey/v2/key_pb';
 
 @Component({
   selector: 'cnsl-oidc-webkeys-table',
   templateUrl: './oidc-webkeys-table.component.html',
   styleUrls: ['./oidc-webkeys-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class OidcWebKeysTableComponent {
   @Output()

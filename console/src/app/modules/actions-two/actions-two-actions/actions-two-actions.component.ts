@@ -13,16 +13,17 @@ import {
 } from '../actions-two-add-action/actions-two-add-action-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageInitShape } from '@bufbuild/protobuf';
-import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
-import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
+import { SetExecutionRequestSchema } from '@zitadel/proto/zitadel/action/v2/action_service_pb';
+import { Target } from '@zitadel/proto/zitadel/action/v2/target_pb';
 import { InfoSectionType } from '../../info-section/info-section.component';
-import { ExecutionFieldName } from '@zitadel/proto/zitadel/action/v2beta/query_pb';
+import { ExecutionFieldName } from '@zitadel/proto/zitadel/action/v2/query_pb';
 
 @Component({
   selector: 'cnsl-actions-two-actions',
   templateUrl: './actions-two-actions.component.html',
   styleUrls: ['./actions-two-actions.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ActionsTwoActionsComponent {
   protected readonly refresh$ = new Subject<true>();
@@ -45,7 +46,7 @@ export class ActionsTwoActionsComponent {
       switchMap(() => {
         return this.actionService.listExecutions({ sortingColumn: ExecutionFieldName.ID, pagination: { asc: true } });
       }),
-      map(({ result }) => result.map(correctlyTypeExecution)),
+      map(({ executions }) => executions.map(correctlyTypeExecution)),
       catchError((err) => {
         this.toast.showError(err);
         return of([]);
@@ -59,7 +60,7 @@ export class ActionsTwoActionsComponent {
       switchMap(() => {
         return this.actionService.listTargets({});
       }),
-      map(({ result }) => result),
+      map(({ targets }) => targets),
       catchError((err) => {
         this.toast.showError(err);
         return of([]);
@@ -72,7 +73,7 @@ export class ActionsTwoActionsComponent {
       .open<ActionTwoAddActionDialogComponent, ActionTwoAddActionDialogData, ActionTwoAddActionDialogResult>(
         ActionTwoAddActionDialogComponent,
         {
-          width: '400px',
+          width: '500px',
           data: execution
             ? {
                 execution,

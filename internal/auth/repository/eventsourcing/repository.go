@@ -125,7 +125,7 @@ func (q queryViewWrapper) UserGrantsByProjectAndUserID(ctx context.Context, proj
 		return nil, err
 	}
 	queries := &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantUserID, userGrantProjectID, activeQuery}}
-	grants, err := q.Queries.UserGrants(ctx, queries, true)
+	grants, err := q.Queries.UserGrants(ctx, queries, true, nil)
 	if err != nil {
 		return nil, err
 	}

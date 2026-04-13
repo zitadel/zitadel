@@ -4,17 +4,14 @@
   <div class="home-wrapper enlarged-container">
     <cnsl-quickstart></cnsl-quickstart>
 
-    <ng-container *ngIf="['iam.read$'] | hasRole | async; else defaultHome">
-      <cnsl-onboarding></cnsl-onboarding>
-    </ng-container>
-    <ng-template #defaultHome>
-      <cnsl-shortcuts></cnsl-shortcuts>
-    </ng-template>
-
-    <p class="disclaimer cnsl-secondary-text">{{ 'HOME.DISCLAIMER' | translate }}</p>
+    @if (['iam.read$'] | hasRole | async) {
+      <cnsl-onboarding />
+    } @else {
+      <cnsl-shortcuts />
+    }
 
     <span class="fill-space"></span>
-    <h2 class="desc">{{ 'ONBOARDING.MOREDESCRIPTION' | translate }}</h2>
+    <h2 class="home-desc">{{ 'ONBOARDING.MOREDESCRIPTION' | translate }}</h2>
 
     <div class="home-grid-container">
       <a href="https://zitadel.com/docs/guides/start/quickstart" target="_blank" rel="noreferrer" class="grid-item">

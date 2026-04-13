@@ -5,7 +5,7 @@ import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
   name: 'timestampToRetention',
 })
 export class TimestampToRetentionPipe implements PipeTransform {
-  transform(value?: Duration.AsObject, ...args: unknown[]): unknown {
+  transform(value?: Duration.AsObject): unknown {
     if (value) {
       return this.retentionFromTimestamp(value);
     } else {

@@ -32,6 +32,7 @@ import { withLatestFromSynchronousFix } from 'src/app/utils/withLatestFromSynchr
 import { PasswordComplexityValidatorFactoryService } from 'src/app/services/password-complexity-validator-factory.service';
 import { NewFeatureService } from 'src/app/services/new-feature.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 type PwdForm = ReturnType<UserCreateV2Component['buildPwdForm']>;
 type AuthenticationFactor =
@@ -44,6 +45,7 @@ type AuthenticationFactor =
   templateUrl: './user-create-v2.component.html',
   styleUrls: ['./user-create-v2.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class UserCreateV2Component implements OnInit {
   protected readonly loading = signal(false);
@@ -65,6 +67,7 @@ export class UserCreateV2Component implements OnInit {
     private readonly destroyRef: DestroyRef,
     private readonly route: ActivatedRoute,
     protected readonly location: Location,
+    private readonly authService: GrpcAuthService,
   ) {
     this.userForm = this.buildUserForm();
 
@@ -94,9 +97,9 @@ export class UserCreateV2Component implements OnInit {
 
     return this.fb.group({
       email: new FormControl('', { nonNullable: true, validators: [requiredValidator, emailValidator] }),
-      username: new FormControl('', { nonNullable: true, validators: [requiredValidator, minLengthValidator(2)] }),
-      givenName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
-      familyName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
+      userName: new FormControl('', { nonNullable: true, validators: [requiredValidator, minLengthValidator(2)] }),
+      firstName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
+      lastName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
       emailVerified: new FormControl(false, { nonNullable: true }),
       authenticationFactor: new FormControl<AuthenticationFactor['factor']>(authenticationFactor, {
         nonNullable: true,
@@ -180,13 +183,19 @@ export class UserCreateV2Component implements OnInit {
   private async createUserV2Try(authenticationFactor: AuthenticationFactor) {
     this.loading.set(true);
 
+    const activeOrg = await this.authService.getActiveOrg();
+    if (!activeOrg) {
+      console.log('No active organization found. Cannot create user.');
+      return;
+    }
     const userValues = this.userForm.getRawValue();
 
     const humanReq: MessageInitShape<typeof AddHumanUserRequestSchema> = {
-      username: userValues.username,
+      organization: { org: { case: 'orgId', value: activeOrg.id } },
+      username: userValues.userName,
       profile: {
-        givenName: userValues.givenName,
-        familyName: userValues.familyName,
+        givenName: userValues.firstName,
+        familyName: userValues.lastName,
       },
       email: {
         email: userValues.email,
@@ -199,7 +208,7 @@ export class UserCreateV2Component implements OnInit {
 
     if (authenticationFactor.factor === 'initialPassword') {
       const { password } = authenticationFactor.form.getRawValue();
-      humanReq.passwordType = {
+      humanReq['passwordType'] = {
         case: 'password',
         value: {
           password,
@@ -244,7 +253,7 @@ export class UserCreateV2Component implements OnInit {
     try {
       // first we try to create a URL directly from the baseUri
       return new URL(baseUriWithTrailingSlash);
-    } catch (_) {
+    } catch {
       // if this does not work we assume that the baseUri is relative,
       // and we need to add the location.origin
       // we make sure the relative url has a slash at the beginning and end

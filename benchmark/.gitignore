@@ -1,0 +1,5 @@
+.env
+dist/**
+.keys/**
+output/**
+

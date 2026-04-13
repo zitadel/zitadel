@@ -275,13 +275,13 @@ func OrgReactivatedEventMapper(event eventstore.Event) (eventstore.Event, error)
 }
 
 type OrgRemovedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-	name                 string
-	usernames            []string
-	loginMustBeDomain    bool
-	domains              []string
-	externalIDPs         []*domain.UserIDPLink
-	samlEntityIDs        []string
+	eventstore.BaseEvent        `json:"-"`
+	name                        string
+	usernames                   []string
+	organizationScopedUsernames bool
+	domains                     []string
+	externalIDPs                []*domain.UserIDPLink
+	samlEntityIDs               []string
 }
 
 func (e *OrgRemovedEvent) Payload() interface{} {
@@ -293,7 +293,7 @@ func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 		NewRemoveOrgNameUniqueConstraint(e.name),
 	}
 	for _, name := range e.usernames {
-		constraints = append(constraints, user.NewRemoveUsernameUniqueConstraint(name, e.Aggregate().ID, e.loginMustBeDomain))
+		constraints = append(constraints, user.NewRemoveUsernameUniqueConstraint(name, e.Aggregate().ID, e.organizationScopedUsernames))
 	}
 	for _, domain := range e.domains {
 		constraints = append(constraints, NewRemoveOrgDomainUniqueConstraint(domain))
@@ -314,19 +314,19 @@ func (e *OrgRemovedEvent) Fields() []*eventstore.FieldOperation {
 	}
 }
 
-func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string, usernames []string, loginMustBeDomain bool, domains []string, externalIDPs []*domain.UserIDPLink, samlEntityIDs []string) *OrgRemovedEvent {
+func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string, usernames []string, organizationScopedUsernames bool, domains []string, externalIDPs []*domain.UserIDPLink, samlEntityIDs []string) *OrgRemovedEvent {
 	return &OrgRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			OrgRemovedEventType,
 		),
-		name:              name,
-		usernames:         usernames,
-		domains:           domains,
-		externalIDPs:      externalIDPs,
-		samlEntityIDs:     samlEntityIDs,
-		loginMustBeDomain: loginMustBeDomain,
+		name:                        name,
+		usernames:                   usernames,
+		domains:                     domains,
+		externalIDPs:                externalIDPs,
+		samlEntityIDs:               samlEntityIDs,
+		organizationScopedUsernames: organizationScopedUsernames,
 	}
 }
 

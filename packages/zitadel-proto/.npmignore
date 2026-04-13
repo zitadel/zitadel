@@ -1,0 +1,6 @@
+node_modules
+.nx
+*.log
+.DS_Store
+buf.gen.yaml
+nx.json

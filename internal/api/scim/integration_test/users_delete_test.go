@@ -76,13 +76,12 @@ func TestDeleteUser_errors(t *testing.T) {
 func TestDeleteUser_ensureReallyDeleted(t *testing.T) {
 	// create user and dependencies
 	createUserResp := Instance.CreateHumanUser(CTX)
-	proj, err := Instance.CreateProject(CTX)
-	require.NoError(t, err)
+	proj := Instance.CreateProject(CTX, t, Instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 
-	Instance.CreateProjectUserGrant(t, CTX, proj.Id, createUserResp.UserId)
+	Instance.CreateProjectUserGrant(t, CTX, Instance.DefaultOrg.GetId(), proj.Id, createUserResp.UserId)
 
 	// delete user via scim
-	err = Instance.Client.SCIM.Users.Delete(CTX, Instance.DefaultOrg.Id, createUserResp.UserId)
+	err := Instance.Client.SCIM.Users.Delete(CTX, Instance.DefaultOrg.Id, createUserResp.UserId)
 	assert.NoError(t, err)
 
 	// ensure it is really deleted => try to delete again => should 404

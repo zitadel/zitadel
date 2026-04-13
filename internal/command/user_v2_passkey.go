@@ -47,7 +47,7 @@ func (c *Commands) verifyUserPasskeyCode(ctx context.Context, userID, resourceOw
 	if err != nil {
 		return nil, err
 	}
-	err = crypto.VerifyCode(wm.ChangeDate, wm.Expiration, wm.CryptoCode, code, alg)
+	err = crypto.VerifyCode(wm.CodeCreationDate, wm.CodeExpiration, wm.CryptoCode, code, alg)
 	if err != nil || wm.State != domain.PasswordlessInitCodeStateActive {
 		c.verifyUserPasskeyCodeFailed(ctx, wm)
 		return nil, zerrors.ThrowInvalidArgument(err, "COMMAND-Eeb2a", "Errors.User.Code.Invalid")
@@ -142,6 +142,10 @@ func (c *Commands) addUserPasskeyCode(ctx context.Context, userID, resourceOwner
 		return nil, err
 	}
 	agg := UserAggregateFromWriteModel(&wm.WriteModel)
+
+	if urlTmpl == "" {
+		urlTmpl = c.loginPaths.DefaultPasskeySetURLTemplate(ctx)
+	}
 
 	cmd := user.NewHumanPasswordlessInitCodeRequestedEvent(ctx, agg, codeID, code.Crypted, code.Expiry, urlTmpl, returnCode)
 	err = c.pushAppendAndReduce(ctx, wm, cmd)

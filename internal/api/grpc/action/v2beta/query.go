@@ -4,12 +4,14 @@ import (
 	"context"
 	"strings"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
@@ -22,14 +24,14 @@ const (
 	conditionIDEventGroupSegmentCount             = 1
 )
 
-func (s *Server) GetTarget(ctx context.Context, req *action.GetTargetRequest) (*action.GetTargetResponse, error) {
-	resp, err := s.query.GetTargetByID(ctx, req.GetId())
+func (s *Server) GetTarget(ctx context.Context, req *connect.Request[action.GetTargetRequest]) (*connect.Response[action.GetTargetResponse], error) {
+	resp, err := s.query.GetTargetByID(ctx, req.Msg.GetId())
 	if err != nil {
 		return nil, err
 	}
-	return &action.GetTargetResponse{
+	return connect.NewResponse(&action.GetTargetResponse{
 		Target: targetToPb(resp),
-	}, nil
+	}), nil
 }
 
 type InstanceContext interface {
@@ -41,8 +43,8 @@ type Context interface {
 	GetOwner() InstanceContext
 }
 
-func (s *Server) ListTargets(ctx context.Context, req *action.ListTargetsRequest) (*action.ListTargetsResponse, error) {
-	queries, err := s.ListTargetsRequestToModel(req)
+func (s *Server) ListTargets(ctx context.Context, req *connect.Request[action.ListTargetsRequest]) (*connect.Response[action.ListTargetsResponse], error) {
+	queries, err := s.ListTargetsRequestToModel(req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -50,14 +52,14 @@ func (s *Server) ListTargets(ctx context.Context, req *action.ListTargetsRequest
 	if err != nil {
 		return nil, err
 	}
-	return &action.ListTargetsResponse{
-		Result:     targetsToPb(resp.Targets),
+	return connect.NewResponse(&action.ListTargetsResponse{
+		Targets:    targetsToPb(resp.Targets),
 		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ListExecutions(ctx context.Context, req *action.ListExecutionsRequest) (*action.ListExecutionsResponse, error) {
-	queries, err := s.ListExecutionsRequestToModel(req)
+func (s *Server) ListExecutions(ctx context.Context, req *connect.Request[action.ListExecutionsRequest]) (*connect.Response[action.ListExecutionsResponse], error) {
+	queries, err := s.ListExecutionsRequestToModel(req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -65,10 +67,10 @@ func (s *Server) ListExecutions(ctx context.Context, req *action.ListExecutionsR
 	if err != nil {
 		return nil, err
 	}
-	return &action.ListExecutionsResponse{
-		Result:     executionsToPb(resp.Executions),
+	return connect.NewResponse(&action.ListExecutionsResponse{
+		Executions: executionsToPb(resp.Executions),
 		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
-	}, nil
+	}), nil
 }
 
 func targetsToPb(targets []*query.Target) []*action.Target {
@@ -81,28 +83,28 @@ func targetsToPb(targets []*query.Target) []*action.Target {
 
 func targetToPb(t *query.Target) *action.Target {
 	target := &action.Target{
-		Id:         t.ObjectDetails.ID,
+		Id:         t.ID,
 		Name:       t.Name,
 		Timeout:    durationpb.New(t.Timeout),
 		Endpoint:   t.Endpoint,
 		SigningKey: t.SigningKey,
 	}
 	switch t.TargetType {
-	case domain.TargetTypeWebhook:
+	case target_domain.TargetTypeWebhook:
 		target.TargetType = &action.Target_RestWebhook{RestWebhook: &action.RESTWebhook{InterruptOnError: t.InterruptOnError}}
-	case domain.TargetTypeCall:
+	case target_domain.TargetTypeCall:
 		target.TargetType = &action.Target_RestCall{RestCall: &action.RESTCall{InterruptOnError: t.InterruptOnError}}
-	case domain.TargetTypeAsync:
+	case target_domain.TargetTypeAsync:
 		target.TargetType = &action.Target_RestAsync{RestAsync: &action.RESTAsync{}}
 	default:
 		target.TargetType = nil
 	}
 
-	if !t.ObjectDetails.EventDate.IsZero() {
-		target.ChangeDate = timestamppb.New(t.ObjectDetails.EventDate)
+	if !t.EventDate.IsZero() {
+		target.ChangeDate = timestamppb.New(t.EventDate)
 	}
-	if !t.ObjectDetails.CreationDate.IsZero() {
-		target.CreationDate = timestamppb.New(t.ObjectDetails.CreationDate)
+	if !t.CreationDate.IsZero() {
+		target.CreationDate = timestamppb.New(t.CreationDate)
 	}
 	return target
 }
@@ -333,11 +335,11 @@ func executionToPb(e *query.Execution) *action.Execution {
 		Condition: executionIDToCondition(e.ID),
 		Targets:   targets,
 	}
-	if !e.ObjectDetails.EventDate.IsZero() {
-		exec.ChangeDate = timestamppb.New(e.ObjectDetails.EventDate)
+	if !e.EventDate.IsZero() {
+		exec.ChangeDate = timestamppb.New(e.EventDate)
 	}
-	if !e.ObjectDetails.CreationDate.IsZero() {
-		exec.CreationDate = timestamppb.New(e.ObjectDetails.CreationDate)
+	if !e.CreationDate.IsZero() {
+		exec.CreationDate = timestamppb.New(e.CreationDate)
 	}
 	return exec
 }

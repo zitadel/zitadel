@@ -10,6 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   selector: 'cnsl-detail-form-machine',
   templateUrl: './detail-form-machine.component.html',
   styleUrls: ['./detail-form-machine.component.scss'],
+  standalone: false,
 })
 export class DetailFormMachineComponent {
   @Input({ required: true }) public set username(username: string) {

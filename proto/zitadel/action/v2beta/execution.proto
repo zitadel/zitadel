@@ -11,7 +11,6 @@ import "validate/validate.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 import "google/protobuf/timestamp.proto";
-import "zitadel/object/v3alpha/object.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/action/v2beta;action";
 

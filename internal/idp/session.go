@@ -7,11 +7,28 @@ import (
 
 // Session is the minimal implementation for a session of a 3rd party authentication [Provider]
 type Session interface {
-	GetAuth(ctx context.Context) (content string, redirect bool)
+	GetAuth(ctx context.Context) (Auth, error)
 	PersistentParameters() map[string]any
 	FetchUser(ctx context.Context) (User, error)
 	ExpiresAt() time.Time
 }
+
+type Auth interface {
+	auth()
+}
+
+type RedirectAuth struct {
+	RedirectURL string
+}
+
+func (r *RedirectAuth) auth() {}
+
+type FormAuth struct {
+	URL    string
+	Fields map[string]string
+}
+
+func (f *FormAuth) auth() {}
 
 // SessionSupportsMigration is an optional extension to the Session interface.
 // It can be implemented to support migrating users, were the initial external id has changed because of a migration of the Provider type.
@@ -22,10 +39,13 @@ type SessionSupportsMigration interface {
 	RetrievePreviousID() (previousID string, err error)
 }
 
-func Redirect(redirectURL string) (string, bool) {
-	return redirectURL, true
+func Redirect(redirectURL string) (*RedirectAuth, error) {
+	return &RedirectAuth{RedirectURL: redirectURL}, nil
 }
 
-func Form(html string) (string, bool) {
-	return html, false
+func Form(url string, fields map[string]string) (*FormAuth, error) {
+	return &FormAuth{
+		URL:    url,
+		Fields: fields,
+	}, nil
 }

@@ -1,11 +1,12 @@
+@use 'sass:map';
 @import './preview/preview.component.scss';
 
 @mixin private-label-theme($theme) {
-  $primary: map-get($theme, primary);
-  $primary-color: map-get($primary, 500);
-  $is-dark-theme: map-get($theme, is-dark);
-  $background: map-get($theme, background);
-  $foreground: map-get($theme, foreground);
+  $primary: map.get($theme, primary);
+  $primary-color: map.get($primary, 500);
+  $is-dark-theme: map.get($theme, is-dark);
+  $background: map.get($theme, background);
+  $foreground: map.get($theme, foreground);
   $p-border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
   $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
 
@@ -118,7 +119,7 @@
         .expansion {
           box-shadow: none;
           border: 1px solid $p-border-color;
-          background-color: map-get($background, cards);
+          background-color: map.get($background, cards);
 
           .header {
             justify-content: flex-start;
@@ -160,7 +161,7 @@
 
           .asset-add-btn {
             &[disabled] {
-              color: map-get($foreground, disabled-text);
+              color: map.get($foreground, disabled-text);
             }
           }
 
@@ -171,7 +172,7 @@
             box-sizing: border-box;
             border-radius: 0.5rem;
             margin-top: 0.5rem;
-            border: 1px solid map-get($foreground, divider);
+            border: 1px solid map.get($foreground, divider);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -238,7 +239,7 @@
             justify-content: center;
             border-radius: 0.5rem;
             margin-bottom: 1rem;
-            border: 1px solid map-get($foreground, divider);
+            border: 1px solid map.get($foreground, divider);
             position: relative;
             padding: 1rem 0.5rem 1rem 0.75rem;
 
@@ -266,7 +267,7 @@
             box-sizing: border-box;
             border-radius: 0.5rem;
             margin-top: 0.5rem;
-            border: 1px solid map-get($foreground, divider);
+            border: 1px solid map.get($foreground, divider);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -292,7 +293,7 @@
 
     .vertical-divider {
       width: 1px;
-      background-color: map-get($foreground, divider);
+      background-color: map.get($foreground, divider);
       margin: 0 1rem;
     }
 

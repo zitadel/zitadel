@@ -1,8 +1,8 @@
 package initialise
 
 import (
-	"context"
 	"database/sql"
+	"database/sql/driver"
 	"errors"
 	"testing"
 )
@@ -24,9 +24,15 @@ func Test_verifyDB(t *testing.T) {
 		targetErr error
 	}{
 		{
-			name: "doesn't exists, create fails",
+			name: "doesn't exist, create fails",
 			args: args{
 				db: prepareDB(t,
+					expectQuery("SELECT current_database()", nil, []string{"current_database"}, [][]driver.Value{
+						{"postgres"},
+					}),
+					expectQuery("SELECT EXISTS(SELECT 1 FROM pg_database WHERE datname = $1)", nil, []string{"exists"}, [][]driver.Value{
+						{false},
+					}, "zitadel"),
 					expectExec("-- replace zitadel with the name of the database\nCREATE DATABASE \"zitadel\"", sql.ErrTxDone),
 				),
 				database: "zitadel",
@@ -34,9 +40,15 @@ func Test_verifyDB(t *testing.T) {
 			targetErr: sql.ErrTxDone,
 		},
 		{
-			name: "doesn't exists, create successful",
+			name: "doesn't exist, create successful",
 			args: args{
 				db: prepareDB(t,
+					expectQuery("SELECT current_database()", nil, []string{"current_database"}, [][]driver.Value{
+						{"postgres"},
+					}),
+					expectQuery("SELECT EXISTS(SELECT 1 FROM pg_database WHERE datname = $1)", nil, []string{"exists"}, [][]driver.Value{
+						{false},
+					}, "zitadel"),
 					expectExec("-- replace zitadel with the name of the database\nCREATE DATABASE \"zitadel\"", nil),
 				),
 				database: "zitadel",
@@ -44,10 +56,40 @@ func Test_verifyDB(t *testing.T) {
 			targetErr: nil,
 		},
 		{
-			name: "already exists",
+			name: "already exists in catalog, skip creation",
 			args: args{
 				db: prepareDB(t,
-					expectExec("-- replace zitadel with the name of the database\nCREATE DATABASE \"zitadel\"", nil),
+					expectQuery("SELECT current_database()", nil, []string{"current_database"}, [][]driver.Value{
+						{"postgres"},
+					}),
+					expectQuery("SELECT EXISTS(SELECT 1 FROM pg_database WHERE datname = $1)", nil, []string{"exists"}, [][]driver.Value{
+						{true},
+					}, "zitadel"),
+				),
+				database: "zitadel",
+			},
+			targetErr: nil,
+		},
+		{
+			name: "catalog check fails",
+			args: args{
+				db: prepareDB(t,
+					expectQuery("SELECT current_database()", nil, []string{"current_database"}, [][]driver.Value{
+						{"postgres"},
+					}),
+					expectQuery("SELECT EXISTS(SELECT 1 FROM pg_database WHERE datname = $1)", sql.ErrConnDone, []string{"exists"}, [][]driver.Value{}, "zitadel"),
+				),
+				database: "zitadel",
+			},
+			targetErr: sql.ErrConnDone,
+		},
+		{
+			name: "same database as admin connection, skip creation",
+			args: args{
+				db: prepareDB(t,
+					expectQuery("SELECT current_database()", nil, []string{"current_database"}, [][]driver.Value{
+						{"zitadel"},
+					}),
 				),
 				database: "zitadel",
 			},
@@ -56,7 +98,7 @@ func Test_verifyDB(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := VerifyDatabase(tt.args.database)(context.Background(), tt.args.db.db); !errors.Is(err, tt.targetErr) {
+			if err := VerifyDatabase(tt.args.database)(t.Context(), tt.args.db.db); !errors.Is(err, tt.targetErr) {
 				t.Errorf("verifyDB() error = %v, want: %v", err, tt.targetErr)
 			}
 			if err := tt.args.db.mock.ExpectationsWereMet(); err != nil {

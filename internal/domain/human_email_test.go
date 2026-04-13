@@ -68,6 +68,20 @@ func TestEmailValid(t *testing.T) {
 			},
 			result: true,
 		},
+		{
+			name: "email UTF-8, valid", // https://github.com/zitadel/zitadel/issues/9821
+			args: args{
+				email: &Email{EmailAddress: "abc@sünde.com"},
+			},
+			result: true,
+		},
+		{
+			name: "email with name, invalid",
+			args: args{
+				email: &Email{EmailAddress: "John Doe <john.doe@example.com>"},
+			},
+			result: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -14,6 +14,7 @@ const MIN_LENGTH = 6;
   selector: 'cnsl-secret-generator-card',
   templateUrl: './secret-generator-card.component.html',
   styleUrls: ['./secret-generator-card.component.scss'],
+  standalone: false,
 })
 export class SecretGeneratorCardComponent implements OnInit {
   @Input({ required: true }) generatorType!: SecretGeneratorType;

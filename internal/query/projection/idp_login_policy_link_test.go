@@ -22,7 +22,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "iam reduceAdded",
+			name: "Instance reduceAdded",
 			args: args{
 				event: getEvent(
 					testEvent(
@@ -58,7 +58,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam reduceRemoved",
+			name: "Instance reduceRemoved",
 			args: args{
 				event: getEvent(
 					testEvent(
@@ -89,7 +89,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam reduceCascadeRemoved",
+			name: "Instance reduceCascadeRemoved",
 			args: args{
 				event: getEvent(
 					testEvent(
@@ -301,7 +301,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam IDPConfigRemovedEvent",
+			name: "Instance IDPConfigRemovedEvent",
 			args: args{
 				event: getEvent(
 					testEvent(
@@ -360,7 +360,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam IDPRemovedEvent",
+			name: "Instance IDPRemovedEvent",
 			args: args{
 				event: getEvent(
 					testEvent(

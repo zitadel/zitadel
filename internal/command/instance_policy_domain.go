@@ -49,7 +49,7 @@ func (c *Commands) getDefaultDomainPolicy(ctx context.Context) (*domain.DomainPo
 		return nil, err
 	}
 	if !policyWriteModel.State.Exists() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-3n8fs", "Errors.IAM.PasswordComplexityPolicy.NotFound")
+		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-3n8fs", "Errors.Instance.PasswordComplexityPolicy.NotFound")
 	}
 	policy := writeModelToDomainPolicy(policyWriteModel)
 	policy.Default = true
@@ -130,11 +130,20 @@ func prepareChangeDefaultDomainPolicy(
 			// loop over all found organisations to get their usernames
 			// and to compute the username changed events
 			for _, orgID := range orgsWriteModel.OrgIDs {
+				organizationScopedUsernames, err := checkOrganizationScopedUsernames(ctx, filter, a.ID, nil)
+				if err != nil {
+					return nil, err
+				}
+
 				usersWriteModel, err := domainPolicyUsernames(ctx, filter, orgID)
 				if err != nil {
 					return nil, err
 				}
-				cmds = append(cmds, usersWriteModel.NewUsernameChangedEvents(ctx, userLoginMustBeDomain)...)
+				cmds = append(cmds, usersWriteModel.NewUsernameChangedEvents(ctx,
+					userLoginMustBeDomain,
+					organizationScopedUsernames,
+					writeModel.UserLoginMustBeDomain,
+				)...)
 			}
 			return cmds, nil
 		}, nil

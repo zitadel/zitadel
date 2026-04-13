@@ -26,17 +26,12 @@ func (s ProjectGrantState) Valid() bool {
 	return s > ProjectGrantStateUnspecified && s < projectGrantStateMax
 }
 
-func (p *ProjectGrant) IsValid() bool {
-	return p.GrantedOrgID != ""
+func (s ProjectGrantState) Exists() bool {
+	return s != ProjectGrantStateUnspecified && s != ProjectGrantStateRemoved
 }
 
-func (g *ProjectGrant) HasInvalidRoles(validRoles []string) bool {
-	for _, roleKey := range g.RoleKeys {
-		if !containsRoleKey(roleKey, validRoles) {
-			return true
-		}
-	}
-	return false
+func (p *ProjectGrant) IsValid() bool {
+	return p.GrantedOrgID != ""
 }
 
 func GetRemovedRoles(existingRoles, newRoles []string) []string {

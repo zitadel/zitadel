@@ -78,6 +78,7 @@ const CREATE_USER: ShortcutItem = {
   selector: 'cnsl-shortcuts',
   templateUrl: './shortcuts.component.html',
   styleUrls: ['./shortcuts.component.scss'],
+  standalone: false,
 })
 export class ShortcutsComponent implements OnDestroy {
   public org!: Org.AsObject;
@@ -231,7 +232,7 @@ export class ShortcutsComponent implements OnDestroy {
     this.destroy$.complete();
   }
 
-  public drop(event: CdkDragDrop<ShortcutItem[]>, listName: string) {
+  public drop(event: CdkDragDrop<ShortcutItem[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
       this.saveStateToStorage();

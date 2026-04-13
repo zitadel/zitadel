@@ -3,23 +3,25 @@ package admin
 import (
 	member_grpc "github.com/zitadel/zitadel/internal/api/grpc/member"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	member_pb "github.com/zitadel/zitadel/pkg/grpc/member"
 )
 
-func AddIAMMemberToDomain(req *admin_pb.AddIAMMemberRequest) *domain.Member {
-	return &domain.Member{
-		UserID: req.UserId,
-		Roles:  req.Roles,
+func AddIAMMemberToCommand(req *admin_pb.AddIAMMemberRequest, instanceID string) *command.AddInstanceMember {
+	return &command.AddInstanceMember{
+		InstanceID: instanceID,
+		UserID:     req.UserId,
+		Roles:      req.Roles,
 	}
 }
 
-func UpdateIAMMemberToDomain(req *admin_pb.UpdateIAMMemberRequest) *domain.Member {
-	return &domain.Member{
-		UserID: req.UserId,
-		Roles:  req.Roles,
+func UpdateIAMMemberToCommand(req *admin_pb.UpdateIAMMemberRequest, instanceID string) *command.ChangeInstanceMember {
+	return &command.ChangeInstanceMember{
+		InstanceID: instanceID,
+		UserID:     req.UserId,
+		Roles:      req.Roles,
 	}
 }
 

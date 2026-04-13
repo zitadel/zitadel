@@ -20,18 +20,9 @@ import (
 func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionRequest]) (resp *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
-
-	features := authz.GetFeatures(ctx)
-	if features.LegacyIntrospection {
-		return s.LegacyServer.Introspect(ctx, r)
-	}
-	if features.TriggerIntrospectionProjections {
-		query.TriggerIntrospectionProjections(ctx)
-	}
-
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -109,6 +100,7 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 		token.userID,
 		token.scope,
 		client.projectID,
+		client.clientID,
 		client.projectRoleAssertion,
 		true,
 		true,

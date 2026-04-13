@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
@@ -24,6 +25,7 @@ func genericRowsQuery[R any](
 
 	stmt, args, err := query.ToSql()
 	if err != nil {
+		logging.OnError(err).Warn("query: invalid request")
 		return rnil, zerrors.ThrowInvalidArgument(err, "QUERY-05wf2q36ji", "Errors.Query.InvalidRequest")
 	}
 	err = client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -31,6 +33,7 @@ func genericRowsQuery[R any](
 		return err
 	}, stmt, args...)
 	if err != nil {
+		logging.OnError(err).Error("query: internal error")
 		return rnil, zerrors.ThrowInternal(err, "QUERY-y2u7vctrha", "Errors.Internal")
 	}
 	return resp, err
@@ -50,6 +53,7 @@ func genericRowsQueryWithState[R Stateful](
 	}
 	state, err := latestState(ctx, client, projection)
 	if err != nil {
+		logging.OnError(err).Error("query: latest state")
 		return rnil, err
 	}
 	resp.SetState(state)

@@ -70,7 +70,7 @@ func Test_InstancePrepares(t *testing.T) {
 		{
 			name: "prepareInstancesQuery no result",
 			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery()
+				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},
 			want: want{
@@ -85,7 +85,7 @@ func Test_InstancePrepares(t *testing.T) {
 		{
 			name: "prepareInstancesQuery one result",
 			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery()
+				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},
 			want: want{
@@ -121,16 +121,16 @@ func Test_InstancePrepares(t *testing.T) {
 				},
 				Instances: []*Instance{
 					{
-						ID:           "id",
-						CreationDate: testNow,
-						ChangeDate:   testNow,
-						Sequence:     20211108,
-						Name:         "test",
-						DefaultOrgID: "global-org-id",
-						IAMProjectID: "project-id",
-						ConsoleID:    "client-id",
-						ConsoleAppID: "app-id",
-						DefaultLang:  language.English,
+						ID:                     "id",
+						CreationDate:           testNow,
+						ChangeDate:             testNow,
+						Sequence:               20211108,
+						Name:                   "test",
+						DefaultOrgID:           "global-org-id",
+						IAMProjectID:           "project-id",
+						ManagementConsoleID:    "client-id",
+						ManagementConsoleAppID: "app-id",
+						DefaultLang:            language.English,
 						Domains: []*InstanceDomain{
 							{
 								CreationDate: testNow,
@@ -149,7 +149,7 @@ func Test_InstancePrepares(t *testing.T) {
 		{
 			name: "prepareInstancesQuery multiple results",
 			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery()
+				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},
 			want: want{
@@ -223,16 +223,16 @@ func Test_InstancePrepares(t *testing.T) {
 				},
 				Instances: []*Instance{
 					{
-						ID:           "id",
-						CreationDate: testNow,
-						ChangeDate:   testNow,
-						Sequence:     20211108,
-						Name:         "test",
-						DefaultOrgID: "global-org-id",
-						IAMProjectID: "project-id",
-						ConsoleID:    "client-id",
-						ConsoleAppID: "app-id",
-						DefaultLang:  language.English,
+						ID:                     "id",
+						CreationDate:           testNow,
+						ChangeDate:             testNow,
+						Sequence:               20211108,
+						Name:                   "test",
+						DefaultOrgID:           "global-org-id",
+						IAMProjectID:           "project-id",
+						ManagementConsoleID:    "client-id",
+						ManagementConsoleAppID: "app-id",
+						DefaultLang:            language.English,
 						Domains: []*InstanceDomain{
 							{
 								CreationDate: testNow,
@@ -253,17 +253,18 @@ func Test_InstancePrepares(t *testing.T) {
 								IsPrimary:    true,
 							},
 						},
-					}, {
-						ID:           "id2",
-						CreationDate: testNow,
-						ChangeDate:   testNow,
-						Sequence:     20211108,
-						Name:         "test2",
-						DefaultOrgID: "global-org-id",
-						IAMProjectID: "project-id",
-						ConsoleID:    "client-id",
-						ConsoleAppID: "app-id",
-						DefaultLang:  language.English,
+					},
+					{
+						ID:                     "id2",
+						CreationDate:           testNow,
+						ChangeDate:             testNow,
+						Sequence:               20211108,
+						Name:                   "test2",
+						DefaultOrgID:           "global-org-id",
+						IAMProjectID:           "project-id",
+						ManagementConsoleID:    "client-id",
+						ManagementConsoleAppID: "app-id",
+						DefaultLang:            language.English,
 						Domains: []*InstanceDomain{
 							{
 								CreationDate: testNow,
@@ -282,7 +283,7 @@ func Test_InstancePrepares(t *testing.T) {
 		{
 			name: "prepareInstancesQuery sql err",
 			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery()
+				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},
 			want: want{
