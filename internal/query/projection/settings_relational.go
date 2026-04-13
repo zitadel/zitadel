@@ -1382,7 +1382,7 @@ func mergePrivacyPolicyChangedIntoLinks(policyEvent policy.PrivacyPolicyChangedE
 	}
 	if policyEvent.SupportEmail != nil {
 		supportURL := string(*policyEvent.SupportEmail)
-		if !strings.HasPrefix(supportURL, "mailto:") {
+		if supportURL != "" && !strings.HasPrefix(supportURL, "mailto:") {
 			supportURL = "mailto:" + supportURL
 		}
 		updateMap[domain.LinkTypeSupport] = domain.Link{Type: domain.LinkTypeSupport, URL: &supportURL, Target: domain.LinkTargetBlank}

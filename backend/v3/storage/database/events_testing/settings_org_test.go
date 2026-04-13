@@ -1622,6 +1622,41 @@ func TestServer_TestLinksSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
+	t.Run("test remove support email", func(t *testing.T) {
+		before := time.Now()
+		// Remove support email by setting it to empty
+		_, err := newInstance.Client.Mgmt.UpdateCustomPrivacyPolicy(IAMCTX, &management.UpdateCustomPrivacyPolicyRequest{
+			TosLink:        "https://tos.example3.com",
+			PrivacyLink:    "https://privacy.example3.com",
+			HelpLink:       "",
+			SupportEmail:   "",
+			DocsLink:       "https://docs.example2.com",
+			CustomLink:     "https://custom.example2.com",
+			CustomLinkText: "Updated custom link text",
+		})
+		require.NoError(t, err)
+		after := time.Now()
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLinks, domain.SettingStateActive),
+				),
+			)
+			require.NoError(t, err)
+
+			// Support link should be removed, so only 4 links remain
+			assert.Len(t, setting.Links, 4)
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeTermsOfService, URL: gu.Ptr("https://tos.example3.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypePrivacyPolicy, URL: gu.Ptr("https://privacy.example3.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeDocs, URL: gu.Ptr("https://docs.example2.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeCustom, URL: gu.Ptr("https://custom.example2.com"), Target: domain.LinkTargetBlank, TranslationKey: gu.Ptr("Updated custom link text")})
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
+
 	t.Run("test legal and support settings removed reduces", func(t *testing.T) {
 		_, err := newInstance.Client.Mgmt.ResetPrivacyPolicyToDefault(IAMCTX, &management.ResetPrivacyPolicyToDefaultRequest{})
 		require.NoError(t, err)
