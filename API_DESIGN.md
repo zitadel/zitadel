@@ -41,7 +41,7 @@ These conventions are described in the following sections.
 
 ### File Structure
 
-In addition to the files structure proposed by Protobuf and connectRPC, the ZITADEL API uses the following order for `Everything else` section of files:
+In addition to the files structure proposed by [Protobuf](https://protobuf.dev/programming-guides/style/#file-structure) and [connectRPC](https://buf.build/docs/best-practices/style-guide/#recommendations), the ZITADEL API uses the following order for `Everything else` section of files:
 - `Service(s)`
 - `Messages` / `Enums`
 
@@ -58,7 +58,7 @@ Please check out the structure Buf style guide for more information about the fo
 
 When ever a message field is not supported anymore, deprecation of the field is preferred over removal.
 This prevents breaking changes and allows the client to handle the deprecation gracefully.
-The field should be marked as deprecated and the reason for the deprecation should be documented in the proto file.
+The field MUST be marked as deprecated and the reason for the deprecation MUST be documented in the proto file as well as the major version the field will be removed. 
 Additionally, the field should be removed in the next major version of the API.
 
 As a rule of thumb, redundant API methods are deprecated.
@@ -255,7 +255,6 @@ message IdentiyProviderLink {
 ```
 
 Return messages should only contain the fields that are required to be returned. Endpoints manipulating or deleting a resource SHOULD whenever possible only return the change or deletion date.
-
 
 #### Operations and Methods
 
