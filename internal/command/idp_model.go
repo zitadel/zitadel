@@ -2326,14 +2326,12 @@ func (wm *AllIDPWriteModel) ToSAMLProvider(callbackURL string, idpAlg crypto.Enc
 type ZitadelIDPWriteModel struct {
 	eventstore.WriteModel
 
-	Name             string
-	ID               string
-	Issuer           string
-	ClientID         string
-	ClientSecret     *crypto.CryptoValue
-	Scopes           []string
-	IsIDTokenMapping bool
-	UsePKCE          bool
+	Name         string
+	ID           string
+	Issuer       string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       []string
 	idp.Options
 	InstanceRolesInfo []idp.RolesInfo
 
@@ -2359,8 +2357,6 @@ func (wm *ZitadelIDPWriteModel) reduceAddedEvent(e *idp.ZitadelIDPAddedEvent) {
 	wm.ClientID = e.ClientID
 	wm.ClientSecret = e.ClientSecret
 	wm.Scopes = e.Scopes
-	wm.IsIDTokenMapping = e.IsIDTokenMapping
-	wm.UsePKCE = e.UsePKCE
 	wm.Options = e.Options
 	wm.InstanceRolesInfo = e.InstanceRolesInfo
 	wm.State = domain.IDPStateActive

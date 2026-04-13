@@ -20,8 +20,6 @@ type ZitadelIDPAddedEvent struct {
 	ClientID          string              `json:"clientId"`
 	ClientSecret      *crypto.CryptoValue `json:"clientSecret"`
 	Scopes            []string            `json:"scopes,omitempty"`
-	IsIDTokenMapping  bool                `json:"idTokenMapping,omitempty"`
-	UsePKCE           bool                `json:"usePKCE,omitempty"`
 	InstanceRolesInfo []RolesInfo         `json:"instanceRolesInfo,omitempty"`
 	Options
 }
