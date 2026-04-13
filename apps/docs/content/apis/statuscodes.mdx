@@ -18,3 +18,14 @@ sidebar_label: GRPC Status Codes
 | 13          | INTERNAL            | 500              | Internal            | Internal errors. This means that some invariants expected by the underlying system have been broken. This error code is reserved for serious errors.                                                                      |
 | 14          | UNAVAILABLE         | 503              | Service Unavailable | The service is currently unavailable.                                                                                                                                                                                     |
 | 16          | UNAUTHENTICATED     | 401              | Unauthorized        | The request does not have valid authentication credentials for the operation.                                                                                                                                             |
+
+## Error details and slugs
+
+For stable `v2` APIs, services import `zitadel/error/v2/error.proto` so reflection-aware clients can resolve `zitadel.error.v2.ErrorDetail`.
+
+When present, inspect `ErrorDetail.slug` first for programmatic handling. Slugs are stable machine-readable identifiers such as `user.already_exists`.
+
+Use `ErrorDetail.message` for developer diagnostics, not end-user text. Prefer mapping slugs to your own localized messages in clients.
+
+This slug-based handling is currently relevant for backend/domain paths that run with relational-storage-backed logic.
+Do not assume it for `v1`, `v2beta`, or `v3alpha` APIs or when using a v2 endpoint without having the relational storage feature enabled.
