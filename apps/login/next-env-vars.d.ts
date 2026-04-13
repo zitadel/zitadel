@@ -85,12 +85,13 @@ declare namespace NodeJS {
     API_CACHE_ENABLED?: string;
 
     /**
-     * Optional: JSON string to configure the cache TTLs (in minutes) for specific backend API routes or global fallbacks.
-     * Example: '{"defaultMinutes": 15, "longMinutes": 60, "getBrandingSettings": 120}'
-     *
+     * Optional: JSON string to configure the cache TTLs (in minutes) and size limits for specific backend API routes or global fallbacks.
+     * Example: '{"defaultMinutes": 15, "longMinutes": 60, "maxSize": 200, "getBrandingSettings": 120}'
+     * 
      * Properties:
      * - \`defaultMinutes\`: The globally utilized default TTL in minutes (falls back to 15 if not set).
      * - \`longMinutes\`: The TTL utilized string for long-cached routes, like branding/translation (falls back to 60 if not set).
+     * - \`maxSize\`: Maximum number of entries the in-memory cache may hold. Oldest entries are evicted when capacity is reached (defaults to 100).
      * - \`[route_name]\`: Explicit overrides per specific API method (e.g., \`getHostedLoginTranslation\`).
      */
     API_CACHE_CONFIG?: string;

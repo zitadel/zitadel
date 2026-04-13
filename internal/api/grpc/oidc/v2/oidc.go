@@ -2,7 +2,6 @@ package oidc
 
 import (
 	"context"
-	"encoding/base64"
 
 	"connectrpc.com/connect"
 	"github.com/zitadel/logging"
@@ -46,13 +45,13 @@ func (s *Server) GetDeviceAuthorizationRequest(ctx context.Context, req *connect
 	if err != nil {
 		return nil, err
 	}
-	encrypted, err := s.encryption.Encrypt([]byte(deviceRequest.DeviceCode))
+	encrypted, err := s.authAlg.EncryptToken(deviceRequest.DeviceCode)
 	if err != nil {
 		return nil, err
 	}
 	return connect.NewResponse(&oidc_pb.GetDeviceAuthorizationRequestResponse{
 		DeviceAuthorizationRequest: &oidc_pb.DeviceAuthorizationRequest{
-			Id:          base64.RawURLEncoding.EncodeToString(encrypted),
+			Id:          encrypted,
 			ClientId:    deviceRequest.ClientID,
 			Scope:       deviceRequest.Scopes,
 			AppName:     deviceRequest.AppName,
@@ -62,7 +61,7 @@ func (s *Server) GetDeviceAuthorizationRequest(ctx context.Context, req *connect
 }
 
 func (s *Server) AuthorizeOrDenyDeviceAuthorization(ctx context.Context, req *connect.Request[oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest]) (*connect.Response[oidc_pb.AuthorizeOrDenyDeviceAuthorizationResponse], error) {
-	deviceCode, err := s.deviceCodeFromID(req.Msg.GetDeviceAuthorizationId())
+	deviceCode, err := s.authAlg.DecryptToken(req.Msg.GetDeviceAuthorizationId())
 	if err != nil {
 		return nil, err
 	}
@@ -257,12 +256,4 @@ func errorReasonToOIDC(reason oidc_pb.ErrorReason) string {
 	default:
 		return "server_error"
 	}
-}
-
-func (s *Server) deviceCodeFromID(deviceAuthID string) (string, error) {
-	decoded, err := base64.RawURLEncoding.DecodeString(deviceAuthID)
-	if err != nil {
-		return "", err
-	}
-	return s.encryption.DecryptString(decoded, s.encryption.EncryptionKeyID())
 }

@@ -774,6 +774,17 @@ EncryptionKeys:
     EncryptionKeyID: "idpConfigKey" # ZITADEL_ENCRYPTIONKEYS_IDPCONFIG_ENCRYPTIONKEYID
     DecryptionKeyIDs: # ZITADEL_ENCRYPTIONKEYS_IDPCONFIG_DECRYPTIONKEYIDS (comma separated list)
   OIDC:
+    # Accept opaque tokens (access, session, refresh tokens, PATs etc) created by older ZITADEL versions.
+    # Legacy tokens are vulnerable to certain crypto attacks,
+    # so this should only be enabled during a migration and disabled afterwards.
+    # After upgrading ZITADEL, new values will use authenticated encryption.
+    # When this option is enabled tokens emitted from before the upgrade will still be accepted until they expire,
+    # allowing gradual rollout of new tokens.
+    # This allows upgrading ZITADEL without forcing logout of all users (and invalidating all PATs)
+    # This option should be disabled as soon as all tokens have been replaced and PATs rotated.
+    # Note: older versions of ZITADEL aren't able to verify newer tokens.
+    # Downgrading ZITADEL will always logout all users that obtained a token after the upgrade.
+    LegacyToken: true # ZITADEL_ENCRYPTIONKEYS_OIDC_LEGACYTOKEN
     EncryptionKeyID: "oidcKey" # ZITADEL_ENCRYPTIONKEYS_OIDC_ENCRYPTIONKEYID
     DecryptionKeyIDs: # ZITADEL_ENCRYPTIONKEYS_OIDC_DECRYPTIONKEYIDS (comma separated list)
   SAML:
