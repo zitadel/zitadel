@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -17,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/i18n"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func Test_instanceInterceptor_Handler(t *testing.T) {
@@ -278,6 +280,43 @@ func Test_setInstance(t *testing.T) {
 	}
 }
 
+func Test_instanceInterceptor_HandlerFunc_statusCodes(t *testing.T) {
+	cases := []struct {
+		name           string
+		err            error
+		wantStatusCode int
+	}{
+		{
+			name:           "not found from verifier propagates as 404",
+			err:            zerrors.ThrowNotFound(nil, "TEST-001", "Errors.Instance.NotFound"),
+			wantStatusCode: http.StatusNotFound,
+		},
+		{
+			name:           "internal error from verifier propagates as 500",
+			err:            zerrors.ThrowInternal(errors.New("FATAL: the database system is shutting down (SQLSTATE 57P03)"), "TEST-002", "Errors.Internal"),
+			wantStatusCode: http.StatusInternalServerError,
+		},
+		{
+			name:           "unavailable error from verifier propagates as 500",
+			err:            zerrors.ThrowUnavailable(nil, "TEST-003", "Errors.Unavailable"),
+			wantStatusCode: http.StatusInternalServerError,
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			a := &instanceInterceptor{
+				verifier:   &mockInstanceVerifier{err: tc.err},
+				translator: i18n.NewZitadelTranslator(language.English),
+			}
+			r := httptest.NewRequest("", "/url", nil)
+			r = r.WithContext(zitadel_http.WithDomainContext(r.Context(), &zitadel_http.DomainCtx{InstanceHost: "host"}))
+			rr := httptest.NewRecorder()
+			a.HandlerFunc(&testHandler{}).ServeHTTP(rr, r)
+			assert.Equal(t, tc.wantStatusCode, rr.Code)
+		})
+	}
+}
+
 type testHandler struct {
 	context context.Context
 }
@@ -289,9 +328,13 @@ func (t *testHandler) ServeHTTP(_ http.ResponseWriter, r *http.Request) {
 type mockInstanceVerifier struct {
 	instanceHost string
 	publicHost   string
+	err          error
 }
 
 func (m *mockInstanceVerifier) InstanceByHost(_ context.Context, instanceHost, publicHost string) (authz.Instance, error) {
+	if m.err != nil {
+		return nil, m.err
+	}
 	if instanceHost != m.instanceHost {
 		return nil, fmt.Errorf("invalid host")
 	}

@@ -83,7 +83,7 @@
     "set": {
       "title": "Şifre Belirle",
       "description": "Hesabınız için şifre belirleyin",
-      "codeSent": "E-posta adresinize bir kod gönderildi.",
+      "codeSent": "E-posta adresinize yeni bir kod gönderildi.",
       "noCodeReceived": "Kod almadınız mı?",
       "resend": "Kodu tekrar gönder",
       "submit": "Devam",
@@ -383,6 +383,7 @@
     "userIdMissing": "userId sağlanmadı!",
     "successTitle": "Kullanıcı doğrulandı",
     "successDescription": "Kullanıcı başarıyla doğrulandı.",
+    "successContinue": "Devam",
     "setupAuthenticator": "Kimlik doğrulayıcı kur",
     "verify": {
       "title": "Kullanıcıyı doğrula",

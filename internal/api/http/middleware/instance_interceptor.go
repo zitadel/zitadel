@@ -48,14 +48,18 @@ func (a *instanceInterceptor) HandlerFunc(next http.Handler) http.HandlerFunc {
 		origin := zitadel_http.DomainContext(r.Context())
 		logging.WithFields("origin", origin.Origin(), "externalDomain", a.externalDomain).WithError(err).Error("unable to set instance")
 
+		statusCode := http.StatusInternalServerError
+		if zerrors.IsNotFound(err) {
+			statusCode = http.StatusNotFound
+		}
 		zErr := new(zerrors.ZitadelError)
 		if errors.As(err, &zErr) {
 			zErr.SetMessage(a.translator.LocalizeFromRequest(r, zErr.GetMessage(), nil))
-			http.Error(w, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s): %s", origin, a.externalDomain, zErr), http.StatusNotFound)
+			http.Error(w, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s): %s", origin, a.externalDomain, zErr), statusCode)
 			return
 		}
 
-		http.Error(w, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s)", origin, a.externalDomain), http.StatusNotFound)
+		http.Error(w, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s)", origin, a.externalDomain), statusCode)
 	}
 }
 
