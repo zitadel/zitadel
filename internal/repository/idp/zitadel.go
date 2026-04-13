@@ -3,7 +3,6 @@ package idp
 import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type RolesInfo struct {
@@ -54,19 +53,6 @@ func (e *ZitadelIDPAddedEvent) Payload() interface{} {
 
 func (e *ZitadelIDPAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
-}
-
-func ZitadelIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	e := &ZitadelIDPAddedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-
-	err := event.Unmarshal(e)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IDP-Et1dq", "unable to unmarshal event")
-	}
-
-	return e, nil
 }
 
 type ZitadelIDPChangedEvent struct {
