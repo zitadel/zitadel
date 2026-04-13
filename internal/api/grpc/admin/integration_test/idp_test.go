@@ -247,7 +247,7 @@ func Test_AddZitadelProvider(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			before := time.Now()
-			got, err := Client.AddZitadelProvider(AdminCTX, tt.args.req)
+			got, err := Client.AddZitadelProvider(tt.args.ctx, tt.args.req)
 			after := time.Now()
 			if tt.wantErr != nil {
 				require.Error(t, err)

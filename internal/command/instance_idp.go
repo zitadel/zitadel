@@ -2020,11 +2020,13 @@ func (c *Commands) validateZitadelProvider(ctx context.Context, provider *Zitade
 }
 
 func (c *Commands) validateZitadelIDPOrgAndOrgDomain(ctx context.Context, provider *ZitadelProvider) error {
-	for _, rolesInfo := range provider.InstanceRolesInfo {
-		if rolesInfo.OrganizationID == "" {
+	for i := range provider.InstanceRolesInfo {
+		provider.InstanceRolesInfo[i].OrganizationID = strings.TrimSpace(provider.InstanceRolesInfo[i].OrganizationID)
+		if provider.InstanceRolesInfo[i].OrganizationID == "" {
 			return zerrors.ThrowInvalidArgument(nil, "INST-9uEJaM", "Errors.Invalid.Argument")
 		}
-		if rolesInfo.OrganizationDomain == "" {
+		provider.InstanceRolesInfo[i].OrganizationDomain = strings.TrimSpace(provider.InstanceRolesInfo[i].OrganizationDomain)
+		if provider.InstanceRolesInfo[i].OrganizationDomain == "" {
 			return zerrors.ThrowInvalidArgument(nil, "INST-y4Ib4D", "Errors.Invalid.Argument")
 		}
 	}
