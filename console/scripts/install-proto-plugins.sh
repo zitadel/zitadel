@@ -23,12 +23,12 @@ GRPC_WEB_SHA256_linux_arm64="522e958568cdeabdd20ef3c97394fc067ff8e374a728c08b741
 GRPC_WEB_SHA256_darwin_amd64="1fa3ef92194d06c03448a5cba82759e9773e43d8b188866a1f1d4fc23bb1ecb7"
 GRPC_WEB_SHA256_darwin_arm64="a12b759629b943ebac5528f58fac5039d9aa2fb7abb9e9684d1b481b35afbfc6"
 
-PROTOC_GEN_JS_VERSION="3.21.4"
-# checksums of release tarballs (this release ships no upstream checksum file)
-PROTOC_GEN_JS_SHA256_linux_amd64="c57ba4130471c642462fcf98c844a3c933f6c4708b9fddc859900fd2a2e72a45"
-PROTOC_GEN_JS_SHA256_linux_arm64="86194b1c6baee994bb06d162887b9edace6b32a8ed971eac07fdf5d2470c6937"
-PROTOC_GEN_JS_SHA256_darwin_amd64="9bfa23630fb2fd99c0328d247f91a454b4d4a2276dd4953af0a052430554510d"
-PROTOC_GEN_JS_SHA256_darwin_arm64="308b3713bc6f2147c8622d0dbb82b2ffcb2e25860c89d763ea00c2d768589989"
+PROTOC_GEN_JS_VERSION="4.0.2"
+# checksums of release zip assets (this release ships no upstream checksum file)
+PROTOC_GEN_JS_SHA256_linux_amd64="e4b0bc2c9fe32a21167c6d84a50df21c2f405552f9a6ed7d5e858d92cac46d22"
+PROTOC_GEN_JS_SHA256_linux_arm64="5c0242143a99d2ca1f84453ada97bfb156fda2b7bdad9f8ca01aa8c40b681499"
+PROTOC_GEN_JS_SHA256_darwin_amd64="9d61a636f392d020f1224aa6e533e65bd7b65da71219742a0b5a84de60d6f59d"
+PROTOC_GEN_JS_SHA256_darwin_arm64="73092321c6655a61991d57b5d9a9c54640517f58bcb379d6b8db0220905cef5d"
 
 OPENAPIV2_VERSION="2.22.0"
 # checksums from grpc-gateway_${OPENAPIV2_VERSION}_checksums.txt
@@ -104,10 +104,10 @@ esac
 sha256_var="PROTOC_GEN_JS_SHA256_${GOOS}_${GOARCH}"
 echo "Downloading protoc-gen-js v${PROTOC_GEN_JS_VERSION} (${JS_OS}/${JS_ARCH})..."
 curl -fsSL \
-  "https://github.com/protocolbuffers/protobuf-javascript/releases/download/v${PROTOC_GEN_JS_VERSION}/protobuf-javascript-${PROTOC_GEN_JS_VERSION}-${JS_OS}-${JS_ARCH}.tar.gz" \
-  -o "${TMP}/p.tar.gz"
-verify_sha256 "${TMP}/p.tar.gz" "${!sha256_var}"
-tar -xzf "${TMP}/p.tar.gz" -C "${TMP}"
+  "https://github.com/protocolbuffers/protobuf-javascript/releases/download/v${PROTOC_GEN_JS_VERSION}/protobuf-javascript-${PROTOC_GEN_JS_VERSION}-${JS_OS}-${JS_ARCH}.zip" \
+  -o "${TMP}/p.zip"
+verify_sha256 "${TMP}/p.zip" "${!sha256_var}"
+unzip -q "${TMP}/p.zip" -d "${TMP}"
 install -m 755 "${TMP}/bin/protoc-gen-js" "${BIN_DIR}/protoc-gen-js"
 
 # ----- protoc-gen-openapiv2 (grpc-ecosystem/grpc-gateway) -----
