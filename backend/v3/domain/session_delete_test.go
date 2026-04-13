@@ -16,7 +16,6 @@ import (
 	noopdb "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/noop"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	zdomain "github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestDeleteSessionCommand_Validate(t *testing.T) {
@@ -44,7 +43,7 @@ func TestDeleteSessionCommand_Validate(t *testing.T) {
 				sessionID: "",
 			},
 			fields:        fields{},
-			expectedError: zerrors.ThrowInvalidArgument(nil, domain.ErrIDMissing, "Errors.IDMissing"),
+			expectedError: domain.ErrIDMissing(),
 		},
 		{
 			name: "when sessionID is provided must validate successfully",
@@ -208,7 +207,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 				mustCheckPermission: true,
 			},
 			res: res{
-				error: new(database.PermissionError),
+				error: domain.ErrAuthMissingPermission(nil, "", domain.SessionDeletePermission),
 			},
 		},
 		{
@@ -230,7 +229,7 @@ func TestDeleteSessionCommand_Execute(t *testing.T) {
 				sessionID: "session-1",
 			},
 			res: res{
-				error: zerrors.ThrowInternalf(nil, domain.ErrMoreThanOneRowAffected, "expected 1 session to be deleted, got %d", 2),
+				error: domain.ErrMoreThanOneRowAffected("expected 1 session to be deleted, got 2", 2),
 			},
 		},
 		{
@@ -339,7 +338,7 @@ func mockSessionTokenDecryptor(expectedSessionToken, returnSessionID, returnSess
 	return func(t *testing.T) domain.SessionTokenDecryptor {
 		return func(ctx context.Context, sessionToken string) (sessionID, tokenID string, err error) {
 			if sessionToken != expectedSessionToken {
-				return "", "", zerrors.ThrowInvalidArgumentf(nil, "SESS-S3gq1", "Errors.Session.TokenInvalid")
+				return "", "", domain.ErrSessionTokenInvalid(nil)
 			}
 			return returnSessionID, returnSessionToken, nil
 		}
