@@ -34,21 +34,23 @@ async function resolveAuthToken(): Promise<string> {
 }
 
 /**
- * Fetches iframe origins from security settings using the ZITADEL API directly
- * via the Connect protocol (POST + JSON). This avoids the HTTPS self-loopback
- * through the load balancer that caused TLS errors on Cloud Run.
- *
- * Results are cached using the LRU PromiseCache with stale-while-revalidate
- * semantics — stale data is served immediately while a background refresh runs.
- *
- * @param baseUrl - The ZITADEL API base URL (ZITADEL_API_URL)
- * @param instanceHost - Optional instance host for multi-tenant deployments
- * @returns An array of allowed iframe origins, or undefined if not configured
+ * Wrapper to store in the cache — lru-cache treats `undefined` returns from
+ * fetchMethod as failures, so we wrap the result to allow caching "no origins".
  */
+interface IframeOriginsResult {
+  origins: string[] | undefined;
+}
+
 export async function getIframeOrigins(baseUrl: string, instanceHost?: string): Promise<string[] | undefined> {
   const cacheKey = `security-settings:${instanceHost || "__default__"}`;
 
-  return securityCache.getOrFetch(cacheKey, () => fetchIframeOrigins(baseUrl, instanceHost), SECURITY_SETTINGS_TTL_MS);
+  const result = await securityCache.getOrFetch<IframeOriginsResult>(
+    cacheKey,
+    async () => ({ origins: await fetchIframeOrigins(baseUrl, instanceHost) }),
+    SECURITY_SETTINGS_TTL_MS,
+  );
+
+  return result.origins;
 }
 
 async function fetchIframeOrigins(baseUrl: string, instanceHost?: string): Promise<string[] | undefined> {
@@ -98,3 +100,4 @@ async function fetchIframeOrigins(baseUrl: string, instanceHost?: string): Promi
     ? settings.embeddedIframe.allowedOrigins
     : undefined;
 }
+
