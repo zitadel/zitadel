@@ -221,8 +221,6 @@ func Test_addZitadelProviderToCommand(t *testing.T) {
 					IsAutoUpdate:      true,
 					AutoLinking:       0,
 				},
-				IsIdTokenMapping: true,
-				UsePkce:          true,
 				InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
 					{
 						OrganizationId:     "org1",
@@ -246,8 +244,6 @@ func Test_addZitadelProviderToCommand(t *testing.T) {
 					IsLinkingAllowed:  false,
 					IsAutoUpdate:      true,
 				},
-				IsIDTokenMapping: true,
-				UsePKCE:          true,
 				InstanceRolesInfo: []idp.RolesInfo{
 					{
 						OrganizationID:     "org1",
