@@ -43,7 +43,7 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 			cmd: &domain.UserCheckCommand{
 				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
 			},
-			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-00o0ys", "Errors.Missing.SessionID"),
+			expectedError: domain.ErrIDMissing(),
 		},
 		{
 			testName: "when instance ID is not set should return error",
@@ -51,7 +51,7 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 				InputCheckUser: &domain.CheckUserType{UserID: "user-123"},
 				SessionID:      "session-1",
 			},
-			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-Oe1dtz", "Errors.Missing.InstanceID"),
+			expectedError: domain.ErrInstanceIDMissing(),
 		},
 		{
 			testName: "when permission check fails should return permission denied error",
@@ -140,7 +140,7 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 				SessionID:      "session-1",
 				InstanceID:     "instance-1",
 			},
-			expectedError: zerrors.ThrowPreconditionFailed(nil, "DOM-vgDIu9", "Errors.User.NotActive"),
+			expectedError: domain.ErrUserNotActive("user-123", ""),
 		},
 		{
 			testName: "when user retrieval fails should return error",
@@ -171,7 +171,7 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 				SessionID:      "session-1",
 				InstanceID:     "instance-1",
 			},
-			expectedError: zerrors.ThrowInternal(getErr, "DOM-Y846I0", "failed fetching user"),
+			expectedError: domain.ErrInternal(getErr, ""),
 		},
 		{
 			testName: "when user not found should return not found error",
@@ -202,7 +202,7 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 				SessionID:      "session-1",
 				InstanceID:     "instance-1",
 			},
-			expectedError: zerrors.ThrowNotFound(notFoundErr, "DOM-lcZeXI", "user not found"),
+			expectedError: domain.ErrUserNotFound(notFoundErr, "user-123"),
 		},
 		{
 			testName: "when search type is LoginName should attempt to fetch by login name",
@@ -257,7 +257,7 @@ func TestUserCheckCommand_Validate(t *testing.T) {
 				SessionID:      "session-1",
 				InstanceID:     "instance-1",
 			},
-			expectedError: zerrors.ThrowInvalidArgumentf(nil, "DOM-7B2m0b", "no valid query option"),
+			expectedError: domain.ErrInvalidRequest(""),
 		},
 	}
 
@@ -330,7 +330,7 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					OrganizationID: "org-1",
 				},
 			},
-			expectedError: zerrors.ThrowInternal(getErr, "DOM-To1rLz", "failed fetching session"),
+			expectedError: domain.ErrInternal(getErr, ""),
 		},
 		{
 			testName: "when session not found should return not found error",
@@ -357,7 +357,7 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					},
 				},
 			},
-			expectedError: zerrors.ThrowNotFound(sessionNotFoundErr, "DOM-rbdCv3", "session not found"),
+			expectedError: domain.ErrSessionNotFound(sessionNotFoundErr, "session-1"),
 		},
 		{
 			testName: "when user change is attempted should return invalid argument error",
@@ -385,7 +385,7 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					OrganizationID: "org-1",
 				},
 			},
-			expectedError: zerrors.ThrowInvalidArgument(nil, "DOM-78g1TV", "user change not possible"),
+			expectedError: domain.ErrSessionUserChange(),
 		},
 		{
 			testName: "when session update fails should return error",
@@ -421,7 +421,7 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					OrganizationID: "org-1",
 				},
 			},
-			expectedError: zerrors.ThrowInternal(updateErr, "DOM-netNam", "failed updating session"),
+			expectedError: domain.ErrInternal(updateErr, "failed to update the session"),
 		},
 		{
 			testName: "when session update returns no rows should return not found error",
@@ -457,7 +457,7 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					OrganizationID: "org-1",
 				},
 			},
-			expectedError: zerrors.ThrowNotFound(nil, "DOM-FszyWS", "session not found"),
+			expectedError: domain.ErrSessionNotFound(nil, "session-1"),
 		},
 		{
 			testName: "when session update returns multiple rows should return internal error",
@@ -493,7 +493,7 @@ func TestUserCheckCommand_Execute(t *testing.T) {
 					OrganizationID: "org-1",
 				},
 			},
-			expectedError: zerrors.ThrowInternal(domain.NewMultipleObjectsUpdatedError(1, 2), "DOM-SsIwDt", "unexpected number of rows updated"),
+			expectedError: domain.ErrMoreThanOneRowAffected("unexpected number of rows updated", 2),
 		},
 		{
 			testName: "when session has no user and user is set should execute successfully",
