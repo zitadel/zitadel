@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/muhlemmer/gu"
@@ -1286,7 +1287,11 @@ func (p *relationalTablesProjection) reducePrivacyPolicyAdded(event eventstore.E
 			links = append(links, domain.Link{Type: domain.LinkTypeHelp, URL: gu.Ptr(policyEvent.HelpLink), Target: domain.LinkTargetBlank})
 		}
 		if policyEvent.SupportEmail != "" {
-			links = append(links, domain.Link{Type: domain.LinkTypeSupport, URL: gu.Ptr(string(policyEvent.SupportEmail)), Target: domain.LinkTargetBlank})
+			supportURL := string(policyEvent.SupportEmail)
+			if !strings.HasPrefix(supportURL, "mailto:") {
+				supportURL = "mailto:" + supportURL
+			}
+			links = append(links, domain.Link{Type: domain.LinkTypeSupport, URL: gu.Ptr(supportURL), Target: domain.LinkTargetBlank})
 		}
 		if policyEvent.DocsLink != "" {
 			links = append(links, domain.Link{Type: domain.LinkTypeDocs, URL: gu.Ptr(policyEvent.DocsLink), Target: domain.LinkTargetBlank})
@@ -1377,6 +1382,9 @@ func mergePrivacyPolicyChangedIntoLinks(policyEvent policy.PrivacyPolicyChangedE
 	}
 	if policyEvent.SupportEmail != nil {
 		supportURL := string(*policyEvent.SupportEmail)
+		if !strings.HasPrefix(supportURL, "mailto:") {
+			supportURL = "mailto:" + supportURL
+		}
 		updateMap[domain.LinkTypeSupport] = domain.Link{Type: domain.LinkTypeSupport, URL: &supportURL, Target: domain.LinkTargetBlank}
 	}
 	if policyEvent.DocsLink != nil {

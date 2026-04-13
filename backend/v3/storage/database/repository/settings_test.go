@@ -4393,8 +4393,8 @@ func TestGetLinksSettings(t *testing.T) {
 					},
 					{
 						Type:   domain.LinkTypeSupport,
-						URL:    gu.Ptr("email"),
-						Target: domain.LinkTargetSelf,
+						URL:    gu.Ptr("mailto:email"),
+						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:           domain.LinkTypeCustom,
@@ -4424,8 +4424,8 @@ func TestGetLinksSettings(t *testing.T) {
 					},
 					{
 						Type:   domain.LinkTypeSupport,
-						URL:    gu.Ptr("email"),
-						Target: domain.LinkTargetSelf,
+						URL:    gu.Ptr("mailto:email"),
+						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:           domain.LinkTypeCustom,
@@ -4455,8 +4455,8 @@ func TestGetLinksSettings(t *testing.T) {
 					},
 					{
 						Type:   domain.LinkTypeSupport,
-						URL:    gu.Ptr("email"),
-						Target: domain.LinkTargetSelf,
+						URL:    gu.Ptr("mailto:email"),
+						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:           domain.LinkTypeCustom,
@@ -4486,8 +4486,8 @@ func TestGetLinksSettings(t *testing.T) {
 					},
 					{
 						Type:   domain.LinkTypeSupport,
-						URL:    gu.Ptr("email"),
-						Target: domain.LinkTargetSelf,
+						URL:    gu.Ptr("mailto:email"),
+						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:           domain.LinkTypeCustom,
@@ -4576,8 +4576,8 @@ func TestListLinksSettings(t *testing.T) {
 					},
 					{
 						Type:   domain.LinkTypeSupport,
-						URL:    gu.Ptr("email"),
-						Target: domain.LinkTargetSelf,
+						URL:    gu.Ptr("mailto:email"),
+						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:           domain.LinkTypeCustom,
@@ -4607,8 +4607,8 @@ func TestListLinksSettings(t *testing.T) {
 					},
 					{
 						Type:   domain.LinkTypeSupport,
-						URL:    gu.Ptr("email"),
-						Target: domain.LinkTargetSelf,
+						URL:    gu.Ptr("mailto:email"),
+						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:           domain.LinkTypeCustom,
@@ -4638,8 +4638,8 @@ func TestListLinksSettings(t *testing.T) {
 					},
 					{
 						Type:   domain.LinkTypeSupport,
-						URL:    gu.Ptr("email"),
-						Target: domain.LinkTargetSelf,
+						URL:    gu.Ptr("mailto:email"),
+						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:           domain.LinkTypeCustom,
@@ -4669,8 +4669,8 @@ func TestListLinksSettings(t *testing.T) {
 					},
 					{
 						Type:   domain.LinkTypeSupport,
-						URL:    gu.Ptr("email"),
-						Target: domain.LinkTargetSelf,
+						URL:    gu.Ptr("mailto:email"),
+						Target: domain.LinkTargetBlank,
 					},
 					{
 						Type:           domain.LinkTypeCustom,
@@ -4766,8 +4766,8 @@ func TestSetLinksSettings(t *testing.T) {
 				},
 				{
 					Type:   domain.LinkTypeSupport,
-					URL:    gu.Ptr("email"),
-					Target: domain.LinkTargetSelf,
+					URL:    gu.Ptr("mailto:email"),
+					Target: domain.LinkTargetBlank,
 				},
 				{
 					Type:           domain.LinkTypeCustom,
@@ -4808,8 +4808,8 @@ func TestSetLinksSettings(t *testing.T) {
 						},
 						{
 							Type:   domain.LinkTypeSupport,
-							URL:    gu.Ptr("email"),
-							Target: domain.LinkTargetSelf,
+							URL:    gu.Ptr("mailto:email"),
+							Target: domain.LinkTargetBlank,
 						},
 						{
 							Type:           domain.LinkTypeCustom,
@@ -4842,8 +4842,8 @@ func TestSetLinksSettings(t *testing.T) {
 						},
 						{
 							Type:   domain.LinkTypeSupport,
-							URL:    gu.Ptr("email"),
-							Target: domain.LinkTargetSelf,
+							URL:    gu.Ptr("mailto:email"),
+							Target: domain.LinkTargetBlank,
 						},
 						{
 							Type:           domain.LinkTypeCustom,
@@ -4876,8 +4876,8 @@ func TestSetLinksSettings(t *testing.T) {
 						},
 						{
 							Type:   domain.LinkTypeSupport,
-							URL:    gu.Ptr("email"),
-							Target: domain.LinkTargetSelf,
+							URL:    gu.Ptr("mailto:email"),
+							Target: domain.LinkTargetBlank,
 						},
 						{
 							Type:           domain.LinkTypeCustom,
@@ -4911,8 +4911,8 @@ func TestSetLinksSettings(t *testing.T) {
 						},
 						{
 							Type:   domain.LinkTypeSupport,
-							URL:    gu.Ptr("email"),
-							Target: domain.LinkTargetSelf,
+							URL:    gu.Ptr("mailto:email"),
+							Target: domain.LinkTargetBlank,
 						},
 						{
 							Type:           domain.LinkTypeCustom,
@@ -4968,8 +4968,8 @@ func TestDeleteLinksSettings(t *testing.T) {
 				},
 				{
 					Type:   domain.LinkTypeSupport,
-					URL:    gu.Ptr("email"),
-					Target: domain.LinkTargetSelf,
+					URL:    gu.Ptr("mailto:email"),
+					Target: domain.LinkTargetBlank,
 				},
 				{
 					Type:           domain.LinkTypeCustom,
@@ -5002,8 +5002,8 @@ func TestDeleteLinksSettings(t *testing.T) {
 				},
 				{
 					Type:   domain.LinkTypeSupport,
-					URL:    gu.Ptr("email"),
-					Target: domain.LinkTargetSelf,
+					URL:    gu.Ptr("mailto:email"),
+					Target: domain.LinkTargetBlank,
 				},
 				{
 					Type:           domain.LinkTypeCustom,
