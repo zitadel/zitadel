@@ -1332,14 +1332,18 @@ func (p *relationalTablesProjection) reducePrivacyPolicyChanged(event eventstore
 		settingsRepo := repository.LinksSettingsRepository()
 
 		// Retrieve the current list of links
-		currentLinks, err := settingsRepo.Get(ctx, v3_sql.SQLTx(tx), database.WithCondition(
+		linksSettings, err := settingsRepo.Get(ctx, v3_sql.SQLTx(tx), database.WithCondition(
 			settingsRepo.UniqueCondition(event.Aggregate().InstanceID, orgId, domain.SettingTypeLinks, domain.SettingStateActive),
 		))
 		if err != nil && !errors.Is(err, &database.NoRowFoundError{}) {
 			return zerrors.ThrowInternalf(err, "HANDL-TxiHwy", "failed to get current links settings")
 		}
 
-		links := applyPrivacyPolicyChangedEventIntoExistingLinks(policyEvent, currentLinks)
+		var existingLinks []domain.Link
+		if linksSettings != nil {
+			existingLinks = linksSettings.Links
+		}
+		links := mergePrivacyPolicyChangedIntoLinks(policyEvent, existingLinks)
 
 		settings := domain.LinksSettings{
 			Settings: domain.Settings{
@@ -1355,9 +1359,8 @@ func (p *relationalTablesProjection) reducePrivacyPolicyChanged(event eventstore
 	}), nil
 }
 
-// applyPrivacyPolicyChangedEventIntoExistingLinks applies a partial update event to the existing ordered list of links by updating, removing,
-// or appending entries while preserving the original order and metadata of unaffected links.
-func applyPrivacyPolicyChangedEventIntoExistingLinks(policyEvent policy.PrivacyPolicyChangedEvent, currentLinks *domain.LinksSettings) []domain.Link {
+// mergePrivacyPolicyChangedIntoLinks merges a partial update event into the existing ordered list of links.
+func mergePrivacyPolicyChangedIntoLinks(policyEvent policy.PrivacyPolicyChangedEvent, existingLinks []domain.Link) []domain.Link {
 	result := []domain.Link{}
 	processed := make(map[domain.LinkType]bool)
 
@@ -1389,7 +1392,7 @@ func applyPrivacyPolicyChangedEventIntoExistingLinks(policyEvent policy.PrivacyP
 	}
 
 	// 2 - Update/remove links
-	for _, link := range currentLinks.Links {
+	for _, link := range existingLinks {
 		upd, ok := updateMap[link.Type]
 		if !ok {
 			result = append(result, link)
@@ -1416,9 +1419,18 @@ func applyPrivacyPolicyChangedEventIntoExistingLinks(policyEvent policy.PrivacyP
 		result = append(result, link)
 	}
 
-	// 3 - append new links
-	for _, upd := range updateMap {
-		if processed[upd.Type] {
+	// 3 - append new links in deterministic order
+	linkTypes := []domain.LinkType{
+		domain.LinkTypeTermsOfService,
+		domain.LinkTypePrivacyPolicy,
+		domain.LinkTypeHelp,
+		domain.LinkTypeSupport,
+		domain.LinkTypeDocs,
+		domain.LinkTypeCustom,
+	}
+	for _, linkType := range linkTypes {
+		upd, ok := updateMap[linkType]
+		if !ok || processed[linkType] {
 			continue
 		}
 

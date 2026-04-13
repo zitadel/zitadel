@@ -4546,7 +4546,7 @@ func TestGetLinksSettings(t *testing.T) {
 	}
 }
 
-func TestListLinkstSettings(t *testing.T) {
+func TestListLinksSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
 	defer rollback()
 
