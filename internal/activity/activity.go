@@ -72,6 +72,24 @@ func Trigger(ctx context.Context, orgID, userID string, trigger TriggerMethod, r
 	)
 }
 
+// TriggerWithoutOrg is used to log a specific events for a user (e.g. session or oidc token creation)
+func TriggerWithoutOrg(ctx context.Context, userID string, trigger TriggerMethod) {
+	ai := info.ActivityInfoFromContext(ctx)
+	triggerLog(
+		authz.GetInstance(ctx).InstanceID(),
+		"",
+		userID,
+		http_utils.DomainContext(ctx).Origin(), // TODO: origin?
+		trigger,
+		ai.Method,
+		ai.Path,
+		ai.RequestMethod,
+		"",
+		"",
+		authz.GetCtxData(ctx).SystemMemberships != nil,
+	)
+}
+
 func TriggerGRPCWithContext(ctx context.Context, trigger TriggerMethod) {
 	ai := info.ActivityInfoFromContext(ctx)
 	triggerLog(

@@ -2,7 +2,6 @@ package domain
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"golang.org/x/text/language"
@@ -13,156 +12,129 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type CheckUserType struct {
-	UserID    string
-	LoginName string
+type CheckUserCommand struct {
+	parent CheckUserParent
+
+	userID    *string
+	loginName *string
+
+	user   *User
+	factor *SessionFactorUser
 }
 
-type UserCheckCommand struct {
-	InputCheckUser *CheckUserType
-	SessionID      string
-	InstanceID     string
-
-	FetchedUser User
-
-	// Out
-	PreferredUserLanguage *language.Tag
-	UserCheckedAt         time.Time
+// Result implements [Querier].
+func (cmd *CheckUserCommand) Result() *User {
+	return cmd.user
 }
 
-// NewUserCheckCommand returns a check Commander validating the input user.
-//
-// It assumes that a [Session] already exists: this check should be part of the
-// batch call to create/set a session.
-//
-// The check will update the existing session or return an error if the session
-// is not found or validation fails.
-func NewUserCheckCommand(sessionID, instanceID string, checkUser *CheckUserType) *UserCheckCommand {
-	return &UserCheckCommand{
-		SessionID:      sessionID,
-		InstanceID:     instanceID,
-		InputCheckUser: checkUser,
+func NewCheckUserCommand(parent CheckUserParent, userID, loginName *string) *CheckUserCommand {
+	cmd := &CheckUserCommand{
+		parent:    parent,
+		userID:    userID,
+		loginName: loginName,
 	}
+	cmd.parent.SetUserConditionProvider(cmd.userCondition)
+	return cmd
 }
-
-// RequiresTransaction implements [Transactional].
-func (u *UserCheckCommand) RequiresTransaction() {}
 
 // Events implements [Commander].
-func (u *UserCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
-	if u.InputCheckUser == nil {
-		return nil, nil
+func (cmd *CheckUserCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
+	var preferredLanguage *language.Tag
+	if cmd.user.Human != nil && !cmd.user.Human.PreferredLanguage.IsRoot() {
+		preferredLanguage = &cmd.user.Human.PreferredLanguage
 	}
-
+	fetchedSession, err := cmd.parent.FetchSession(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
 	return []eventstore.Command{
 		session.NewUserCheckedEvent(
 			ctx,
-			&session.NewAggregate(u.SessionID, u.InstanceID).Aggregate,
-			u.FetchedUser.ID,
-			u.FetchedUser.OrganizationID,
-			u.UserCheckedAt,
-			u.PreferredUserLanguage,
+			&session.NewAggregate(fetchedSession.ID, fetchedSession.InstanceID).Aggregate,
+			cmd.user.ID,
+			cmd.user.OrganizationID,
+			cmd.factor.LastVerifiedAt,
+			preferredLanguage,
 		),
 	}, nil
 }
 
 // Execute implements [Commander].
-func (u *UserCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
-	if u.InputCheckUser == nil {
-		return err
-	}
-	sessionRepo := opts.sessionRepo
-
-	if human := u.FetchedUser.Human; human != nil {
-		if !human.PreferredLanguage.IsRoot() {
-			u.PreferredUserLanguage = &human.PreferredLanguage
-		}
-	}
-
-	session, err := sessionRepo.Get(ctx, opts.DB(), database.WithCondition(sessionRepo.IDCondition(u.SessionID)))
+func (cmd *CheckUserCommand) Execute(ctx context.Context, opts *InvokeOpts) (err error) {
+	close, err := opts.ensureIsolated(ctx)
 	if err != nil {
-		if errors.Is(err, &database.NoRowFoundError{}) {
-			return zerrors.ThrowNotFound(err, "DOM-rbdCv3", "session not found")
-		}
-		return zerrors.ThrowInternal(err, "DOM-To1rLz", "failed fetching session")
-	}
-
-	if session.UserID != "" && u.FetchedUser.ID != "" && session.UserID != u.FetchedUser.ID {
-		return zerrors.ThrowInvalidArgument(nil, "DOM-78g1TV", "user change not possible")
-	}
-	userFactor := &SessionFactorUser{
-		UserID:         u.FetchedUser.ID,
-		LastVerifiedAt: time.Now(),
-	}
-
-	updateCount, err := sessionRepo.Update(ctx, opts.DB(), sessionRepo.IDCondition(session.ID), sessionRepo.SetFactor(userFactor))
-	if err != nil {
-		return zerrors.ThrowInternal(err, "DOM-netNam", "failed updating session")
-	}
-
-	if updateCount == 0 {
-		err = zerrors.ThrowNotFound(nil, "DOM-FszyWS", "session not found")
 		return err
 	}
-	if updateCount > 1 {
-		err = zerrors.ThrowInternal(NewMultipleObjectsUpdatedError(1, updateCount), "DOM-SsIwDt", "unexpected number of rows updated")
-		return err
-	}
-
-	u.UserCheckedAt = userFactor.LastVerifiedAt
-
-	return err
-}
-
-// String implements [Commander].
-func (u *UserCheckCommand) String() string {
-	return "UserCheckCommand"
-}
-
-// Validate implements [Commander].
-func (u *UserCheckCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
-	if u.InputCheckUser == nil {
+	defer func() {
+		err = close(err)
+	}()
+	user, err := cmd.parent.FetchUser(ctx, opts)
+	if err != nil && zerrors.IsNotFound(err) {
 		return nil
 	}
-
-	if u.SessionID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-00o0ys", "Errors.Missing.SessionID")
-	}
-	if u.InstanceID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "DOM-Oe1dtz", "Errors.Missing.InstanceID")
-	}
-
-	if authZErr := opts.Permissions.CheckSessionPermission(ctx, SessionWritePermission, u.SessionID); authZErr != nil {
-		return zerrors.ThrowPermissionDenied(authZErr, "DOM-4qz3mt", "Errors.PermissionDenied")
-	}
-
-	var usrQueryOpt database.QueryOption
-	userRepo := opts.userRepo
-
-	if loginName := u.InputCheckUser.LoginName; loginName != "" {
-		usrQueryOpt = database.WithCondition(userRepo.LoginNameCondition(database.TextOperationEqual, loginName))
-	} else if userID := u.InputCheckUser.UserID; userID != "" {
-		usrQueryOpt = database.WithCondition(userRepo.IDCondition(userID))
-	} else {
-		return zerrors.ThrowInvalidArgument(nil, "DOM-7B2m0b", "no valid query option")
-	}
-
-	usr, err := userRepo.Get(ctx, opts.DB(), usrQueryOpt)
 	if err != nil {
-		if errors.Is(err, &database.NoRowFoundError{}) {
-			return zerrors.ThrowNotFound(err, "DOM-lcZeXI", "user not found")
-		}
-		return zerrors.ThrowInternal(err, "DOM-Y846I0", "failed fetching user")
+		return err
 	}
-
-	if usr.State != UserStateActive {
+	if user.State != UserStateActive {
 		return zerrors.ThrowPreconditionFailed(nil, "DOM-vgDIu9", "Errors.User.NotActive")
 	}
-
-	u.FetchedUser = *usr
+	session, err := cmd.parent.FetchSession(ctx, opts)
+	if err != nil {
+		return err
+	}
+	if session.UserID != "" && user.ID != "" && session.UserID != user.ID {
+		return zerrors.ThrowInvalidArgument(nil, "DOM-78g1TV", "user change not possible")
+	}
+	cmd.factor = &SessionFactorUser{
+		UserID:         user.ID,
+		LastVerifiedAt: time.Now(), // TODO(adlerhurst): use a consistent time source
+	}
+	cmd.user = user
 
 	return nil
 }
 
-var _ Commander = (*UserCheckCommand)(nil)
-var _ Transactional = (*UserCheckCommand)(nil)
+// String implements [Commander].
+func (cmd *CheckUserCommand) String() string {
+	return "CheckUserCommand"
+}
+
+// Validate implements [Commander].
+func (cmd *CheckUserCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
+	if cmd.userID == nil && cmd.loginName == nil {
+		return zerrors.ThrowInvalidArgument(nil, "DOMAI-D0UTe", "neither login name nor id provided")
+	}
+	return nil
+}
+
+func (cmd *CheckUserCommand) userCondition(ctx context.Context, opts *InvokeOpts) (condition database.Condition) {
+	if cmd.userID != nil {
+		return opts.userRepo.IDCondition(*cmd.userID)
+	}
+	return opts.userRepo.LoginNameCondition(database.TextOperationEqualIgnoreCase, *cmd.loginName)
+}
+
+// checkResult implements [sessionCheckSubCommand].
+func (cmd *CheckUserCommand) checkResult() SessionFactor {
+	return cmd.factor
+}
+
+var (
+	_ Commander              = (*CheckUserCommand)(nil)
+	_ Querier[*User]         = (*CheckUserCommand)(nil)
+	_ sessionCheckSubCommand = (*CheckUserCommand)(nil)
+)
+
+//go:generate mockgen -typed -package domainmock -destination ./mock/session_check_user_parent.mock.go . CheckUserParent
+type CheckUserParent interface {
+	// SetUserConditionProvider is used to set the user condition provider for the command.
+	SetUserConditionProvider(provider UserConditionProvider)
+
+	// FetchSession is used to fetch the session.
+	FetchSession(ctx context.Context, opts *InvokeOpts) (session *Session, err error)
+	// FetchUser is used to fetch the user based on the condition set by setUserConditionProvider.
+	// It might get called multiple times, so it should be implemented with caching in mind.
+	FetchUser(ctx context.Context, opts *InvokeOpts) (user *User, err error)
+}
+
+type UserConditionProvider func(ctx context.Context, opts *InvokeOpts) (condition database.Condition)

@@ -43,9 +43,11 @@ func Invoke(ctx context.Context, executor Executor, opts ...InvokeOpt) error {
 	invokeOpts := DefaultOpts(
 		NewLoggingInvoker(
 			NewTraceInvoker(
-				NewEventStoreInvoker(
-					NewTransactionInvoker(
-						NewValidatorInvoker(nil),
+				NewPreValidationInvoker(
+					NewEventStoreInvoker(
+						NewTransactionInvoker(
+							NewValidatorInvoker(nil),
+						),
 					),
 				),
 			),

@@ -123,3 +123,13 @@ type sessionChanges interface {
 	// SetMetadata adds or updates the metadata of the session.
 	SetMetadata(metadata []*SessionMetadata) database.Change
 }
+
+type sessionCheckSubCommand interface {
+	Commander
+	checkResult() SessionFactor
+}
+
+type sessionChallengeSubCommand interface {
+	Commander
+	challengeResult() SessionChallenge
+}

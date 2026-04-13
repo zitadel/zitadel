@@ -19,6 +19,10 @@ func BatchExecutors(executors ...Executor) *batchExecutor {
 	}
 }
 
+func (b *batchExecutor) Append(executors ...Executor) {
+	b.executors = append(b.executors, executors...)
+}
+
 // String implements [Executor].
 func (cmd *batchExecutor) String() string {
 	names := make([]string, len(cmd.executors))

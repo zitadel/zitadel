@@ -13,6 +13,11 @@ import (
 )
 
 func DeleteSession(ctx context.Context, request *connect.Request[session.DeleteSessionRequest]) (*connect.Response[session.DeleteSessionResponse], error) {
+	return defaultServer.DeleteSession(ctx, request)
+}
+
+// DeleteSession implements [sessionconnect.SessionServiceHandler].
+func (s *server) DeleteSession(ctx context.Context, request *connect.Request[session.DeleteSessionRequest]) (*connect.Response[session.DeleteSessionResponse], error) {
 	sessionDeleteCmd := domain.NewDeleteSessionCommand(request.Msg.GetSessionId(), request.Msg.GetSessionToken(), true)
 
 	err := domain.Invoke(ctx, sessionDeleteCmd,

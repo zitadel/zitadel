@@ -230,6 +230,7 @@ func (s *SessionCommands) SetToken(ctx context.Context, tokenID string) {
 }
 
 func (s *SessionCommands) ChangeMetadata(ctx context.Context, metadata map[string][]byte) {
+	// the logic got copied to the `Events`-method in https://github.com/zitadel/zitadel/blob/main/backend/v3/domain/session_set.go
 	var changed bool
 	for key, value := range metadata {
 		currentValue, exists := s.sessionWriteModel.Metadata[key]
