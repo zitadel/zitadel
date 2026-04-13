@@ -24,7 +24,7 @@ GRPC_WEB_SHA256_darwin_amd64="1fa3ef92194d06c03448a5cba82759e9773e43d8b188866a1f
 GRPC_WEB_SHA256_darwin_arm64="a12b759629b943ebac5528f58fac5039d9aa2fb7abb9e9684d1b481b35afbfc6"
 
 PROTOC_GEN_JS_VERSION="4.0.2"
-# checksums of release tarballs (this release ships no upstream checksum file)
+# checksums of release zip assets (this release ships no upstream checksum file)
 PROTOC_GEN_JS_SHA256_linux_amd64="e4b0bc2c9fe32a21167c6d84a50df21c2f405552f9a6ed7d5e858d92cac46d22"
 PROTOC_GEN_JS_SHA256_linux_arm64="5c0242143a99d2ca1f84453ada97bfb156fda2b7bdad9f8ca01aa8c40b681499"
 PROTOC_GEN_JS_SHA256_darwin_amd64="9d61a636f392d020f1224aa6e533e65bd7b65da71219742a0b5a84de60d6f59d"
