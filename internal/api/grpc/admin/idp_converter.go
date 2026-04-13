@@ -563,8 +563,6 @@ func addZitadelProviderToCommand(req *admin_pb.AddZitadelProviderRequest) comman
 		ClientID:          req.ClientId,
 		ClientSecret:      req.ClientSecret,
 		Scopes:            req.Scopes,
-		IsIDTokenMapping:  req.IsIdTokenMapping,
-		UsePKCE:           req.UsePkce,
 		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
 		InstanceRolesInfo: instanceRolesInfo,
 	}

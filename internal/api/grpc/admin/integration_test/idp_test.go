@@ -92,8 +92,6 @@ func Test_AddZitadelProvider(t *testing.T) {
 					ProviderOptions: &idp_pb.Options{
 						IsCreationAllowed: true,
 					},
-					IsIdTokenMapping: true,
-					UsePkce:          true,
 					InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
 						{
 							OrganizationId: "",
@@ -119,8 +117,6 @@ func Test_AddZitadelProvider(t *testing.T) {
 					ProviderOptions: &idp_pb.Options{
 						IsCreationAllowed: true,
 					},
-					IsIdTokenMapping: true,
-					UsePkce:          true,
 					InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
 						{
 							OrganizationId:     "org1",
@@ -138,60 +134,6 @@ func Test_AddZitadelProvider(t *testing.T) {
 			),
 		},
 		{
-			name: "organization in instance roles info does not exist",
-			args: args{
-				ctx: AdminCTX,
-				req: &admin_pb.AddZitadelProviderRequest{
-					Name:         "Zitadel Support IdP",
-					Issuer:       "zitadel.example.com",
-					ClientId:     "test-client",
-					ClientSecret: "test-secret",
-					Scopes:       []string{"email", "profile"},
-					ProviderOptions: &idp_pb.Options{
-						IsCreationAllowed: true,
-					},
-					IsIdTokenMapping: true,
-					UsePkce:          true,
-					InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-						{
-							OrganizationId:     "org1",
-							OrganizationDomain: "org1.com",
-						},
-					},
-				},
-			},
-			wantErr: status.Error(codes.FailedPrecondition, "Organisation not found (COMMAND-6EDZCc)"),
-		},
-		{
-			name: "invalid org domain in instance roles info",
-			args: args{
-				ctx: AdminCTX,
-				req: &admin_pb.AddZitadelProviderRequest{
-					Name:         "Zitadel Support IdP",
-					Issuer:       "zitadel.example.com",
-					ClientId:     "test-client",
-					ClientSecret: "test-secret",
-					Scopes:       []string{"email", "profile"},
-					ProviderOptions: &idp_pb.Options{
-						IsCreationAllowed: true,
-					},
-					IsIdTokenMapping: true,
-					UsePkce:          true,
-					InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-						{
-							OrganizationId:     Instance.DefaultOrg.GetId(),
-							OrganizationDomain: orgDomain,
-						},
-						{
-							OrganizationId:     Instance.DefaultOrg.GetId(),
-							OrganizationDomain: "org1.com",
-						},
-					},
-				},
-			},
-			wantErr: status.Error(codes.FailedPrecondition, "Domain doesn't exist on organization (COMMAND-mUqUG3)"),
-		},
-		{
 			name: "valid request without instance roles info",
 			args: args{
 				ctx: AdminCTX,
@@ -204,8 +146,6 @@ func Test_AddZitadelProvider(t *testing.T) {
 					ProviderOptions: &idp_pb.Options{
 						IsCreationAllowed: true,
 					},
-					IsIdTokenMapping: true,
-					UsePkce:          true,
 				},
 			},
 			wantResponse: &admin_pb.AddZitadelProviderResponse{
@@ -227,8 +167,6 @@ func Test_AddZitadelProvider(t *testing.T) {
 					ProviderOptions: &idp_pb.Options{
 						IsCreationAllowed: true,
 					},
-					IsIdTokenMapping: true,
-					UsePkce:          true,
 					InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
 						{
 							OrganizationId:     Instance.DefaultOrg.GetId(),

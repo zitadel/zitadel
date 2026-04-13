@@ -34,7 +34,6 @@ func NewZitadelIDPAddedEvent(
 	clientID string,
 	clientSecret *crypto.CryptoValue,
 	scopes []string,
-	isIDTokenMapping, usePKCE bool,
 	options Options,
 	instanceRolesInfo []RolesInfo,
 ) *ZitadelIDPAddedEvent {
@@ -46,8 +45,6 @@ func NewZitadelIDPAddedEvent(
 		ClientID:          clientID,
 		ClientSecret:      clientSecret,
 		Scopes:            scopes,
-		IsIDTokenMapping:  isIDTokenMapping,
-		UsePKCE:           usePKCE,
 		Options:           options,
 		InstanceRolesInfo: instanceRolesInfo,
 	}

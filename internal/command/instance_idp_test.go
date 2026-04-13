@@ -22,7 +22,6 @@ import (
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -5940,7 +5939,6 @@ func TestCommandSide_RegenerateInstanceSAMLProviderCertificate(t *testing.T) {
 }
 
 func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
-	filterErr := errors.New("filter error")
 	pushErr := errors.New("push error")
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
@@ -6036,145 +6034,9 @@ func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
 			},
 		},
 		{
-			name: "failed to get instance role info model",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilterError(filterErr),
-				),
-				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			},
-			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "instance1"),
-				provider: ZitadelProvider{
-					Name:         "name",
-					Issuer:       "issuer",
-					ClientID:     "clientID",
-					ClientSecret: "clientSecret",
-					UsePKCE:      true,
-					InstanceRolesInfo: []idp.RolesInfo{
-						{
-							OrganizationID:     "org1",
-							OrganizationDomain: "example-org1.com",
-						},
-						{
-							OrganizationID:     "org2",
-							OrganizationDomain: "example-org2.com",
-						},
-					},
-				},
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInternal(filterErr, "INST-i1bqpP", "Errors.Internal"))
-				},
-			},
-		},
-		{
-			name: "org not found",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org1.com"),
-						),
-						eventFromEventPusher(
-							org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "example-org1.com"),
-						),
-					),
-				),
-				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			},
-			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "instance1"),
-				provider: ZitadelProvider{
-					Name:         "name",
-					Issuer:       "issuer",
-					ClientID:     "clientID",
-					ClientSecret: "clientSecret",
-					UsePKCE:      true,
-					InstanceRolesInfo: []idp.RolesInfo{
-						{
-							OrganizationID:     "org1",
-							OrganizationDomain: "example-org1.com",
-						},
-						{
-							OrganizationID:     "org2",
-							OrganizationDomain: "example-org2.com",
-						},
-					},
-				},
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-6EDZCc", "Errors.Org.NotFound"))
-				},
-			},
-		},
-		{
-			name: "org domain not found",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org1.com"),
-						),
-						eventFromEventPusher(
-							org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "example-org1.com"),
-						),
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org2").Aggregate, "org2.com"),
-						),
-					),
-				),
-				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			},
-			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "instance1"),
-				provider: ZitadelProvider{
-					Name:         "name",
-					Issuer:       "issuer",
-					ClientID:     "clientID",
-					ClientSecret: "clientSecret",
-					UsePKCE:      true,
-					InstanceRolesInfo: []idp.RolesInfo{
-						{
-							OrganizationID:     "org1",
-							OrganizationDomain: "example-org1.com",
-						},
-						{
-							OrganizationID:     "org2",
-							OrganizationDomain: "example-org2.com",
-						},
-					},
-				},
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-mUqUG3", "Errors.Org.DomainNotOnOrg"))
-				},
-			},
-		},
-		{
 			name: "push error",
 			fields: fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org1.com"),
-						),
-						eventFromEventPusher(
-							org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "example-org1.com"),
-						),
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org2").Aggregate, "org2.com"),
-						),
-						eventFromEventPusher(
-							org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org2").Aggregate, "example-org2.com"),
-						),
-					),
 					expectFilter(),
 					expectPushFailed(
 						pushErr,
@@ -6190,8 +6052,6 @@ func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
 								Crypted:    []byte("clientSecret"),
 							},
 							nil,
-							false,
-							true,
 							idp.Options{},
 							[]idp.RolesInfo{
 								{
@@ -6216,7 +6076,6 @@ func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
 					Issuer:       "issuer",
 					ClientID:     "clientID",
 					ClientSecret: "clientSecret",
-					UsePKCE:      true,
 					InstanceRolesInfo: []idp.RolesInfo{
 						{
 							OrganizationID:     "org1",
@@ -6239,20 +6098,6 @@ func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
 			name: "ok",
 			fields: fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org1.com"),
-						),
-						eventFromEventPusher(
-							org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "example-org1.com"),
-						),
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org2").Aggregate, "org2.com"),
-						),
-						eventFromEventPusher(
-							org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org2").Aggregate, "example-org2.com"),
-						),
-					),
 					expectFilter(),
 					expectPush(
 						instance.NewZitadelIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
@@ -6267,8 +6112,6 @@ func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
 								Crypted:    []byte("clientSecret"),
 							},
 							nil,
-							false,
-							true,
 							idp.Options{},
 							[]idp.RolesInfo{
 								{
@@ -6293,7 +6136,6 @@ func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
 					Issuer:       "issuer",
 					ClientID:     "clientID",
 					ClientSecret: "clientSecret",
-					UsePKCE:      true,
 					InstanceRolesInfo: []idp.RolesInfo{
 						{
 							OrganizationID:     "org1",
@@ -6315,20 +6157,6 @@ func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
 			name: "ok all set",
 			fields: fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org1.com"),
-						),
-						eventFromEventPusher(
-							org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "example-org1.com"),
-						),
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org2").Aggregate, "org2.com"),
-						),
-						eventFromEventPusher(
-							org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org2").Aggregate, "example-org2.com"),
-						),
-					),
 					expectFilter(),
 					expectPush(
 						instance.NewZitadelIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
@@ -6343,8 +6171,6 @@ func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
 								Crypted:    []byte("clientSecret"),
 							},
 							[]string{openid.ScopeOpenID},
-							true,
-							true,
 							idp.Options{
 								IsCreationAllowed: true,
 								IsLinkingAllowed:  true,
@@ -6370,13 +6196,11 @@ func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				provider: ZitadelProvider{
-					Name:             "name",
-					Issuer:           "issuer",
-					ClientID:         "clientID",
-					ClientSecret:     "clientSecret",
-					Scopes:           []string{openid.ScopeOpenID},
-					IsIDTokenMapping: true,
-					UsePKCE:          true,
+					Name:         "name",
+					Issuer:       "issuer",
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+					Scopes:       []string{openid.ScopeOpenID},
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,

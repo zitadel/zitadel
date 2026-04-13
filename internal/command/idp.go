@@ -143,8 +143,6 @@ type ZitadelProvider struct {
 	ClientID          string
 	ClientSecret      string
 	Scopes            []string
-	IsIDTokenMapping  bool
-	UsePKCE           bool
 	IDPOptions        idp.Options
 	InstanceRolesInfo []idp.RolesInfo
 }

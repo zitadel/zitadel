@@ -1988,8 +1988,6 @@ func (c *Commands) prepareAddInstanceZitadelProvider(a *instance.Aggregate, writ
 					provider.ClientID,
 					secret,
 					provider.Scopes,
-					provider.IsIDTokenMapping,
-					provider.UsePKCE,
 					provider.IDPOptions,
 					provider.InstanceRolesInfo,
 				),
@@ -2012,14 +2010,6 @@ func (c *Commands) validateZitadelProvider(ctx context.Context, provider *Zitade
 		return zerrors.ThrowInvalidArgument(nil, "INST-Sfdf4", "Errors.Invalid.Argument")
 	}
 
-	// if InstanceRolesInfo is set, check that the org and the org domain are valid
-	if len(provider.InstanceRolesInfo) > 0 {
-		return c.validateZitadelIDPOrgAndOrgDomain(ctx, provider)
-	}
-	return nil
-}
-
-func (c *Commands) validateZitadelIDPOrgAndOrgDomain(ctx context.Context, provider *ZitadelProvider) error {
 	for i := range provider.InstanceRolesInfo {
 		provider.InstanceRolesInfo[i].OrganizationID = strings.TrimSpace(provider.InstanceRolesInfo[i].OrganizationID)
 		if provider.InstanceRolesInfo[i].OrganizationID == "" {
@@ -2030,9 +2020,6 @@ func (c *Commands) validateZitadelIDPOrgAndOrgDomain(ctx context.Context, provid
 			return zerrors.ThrowInvalidArgument(nil, "INST-y4Ib4D", "Errors.Invalid.Argument")
 		}
 	}
-	instanceRolesInfoWM := NewZitadelIDPInstanceRolesInfoWriteModel(provider.InstanceRolesInfo)
-	if err := c.eventstore.FilterToQueryReducer(ctx, instanceRolesInfoWM); err != nil {
-		return zerrors.ThrowInternal(err, "INST-i1bqpP", "Errors.Internal")
-	}
-	return instanceRolesInfoWM.Validate()
+
+	return nil
 }
