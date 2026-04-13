@@ -137,6 +137,16 @@ type AppleProvider struct {
 	IDPOptions idp.Options
 }
 
+type ZitadelProvider struct {
+	Name              string
+	Issuer            string
+	ClientID          string
+	ClientSecret      string
+	Scopes            []string
+	IDPOptions        idp.Options
+	InstanceRolesInfo []idp.RolesInfo
+}
+
 // ExistsIDPOnOrgOrInstance query first org level IDPs and then instance level IDPs, no check if the IDP is active
 func ExistsIDPOnOrgOrInstance(ctx context.Context, filter preparation.FilterToQueryReducer, instanceID, orgID, id string) (exists bool, err error) {
 	ctx, span := tracing.NewSpan(ctx)

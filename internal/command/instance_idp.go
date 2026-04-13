@@ -1937,3 +1937,89 @@ func (c *Commands) prepareDeleteInstanceProvider(a *instance.Aggregate, id strin
 		}, nil
 	}
 }
+
+func (c *Commands) AddInstanceZitadelProvider(ctx context.Context, provider ZitadelProvider) (string, *domain.ObjectDetails, error) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceAgg := instance.NewAggregate(instanceID)
+	id, err := c.idGenerator.Next()
+	if err != nil {
+		return "", nil, err
+	}
+
+	err = c.validateZitadelProvider(ctx, &provider)
+	if err != nil {
+		return "", nil, err
+	}
+
+	writeModel := NewInstanceZitadelIDPWriteModel(instanceID, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceZitadelProvider(instanceAgg, writeModel, provider)) //nolint:staticcheck
+	if err != nil {
+		return "", nil, err
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return "", nil, err
+	}
+	return id, pushedEventsToObjectDetails(pushedEvents), nil
+}
+
+func (c *Commands) prepareAddInstanceZitadelProvider(a *instance.Aggregate, writeModel *InstanceZitadelIDPWriteModel, provider ZitadelProvider) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
+			if err != nil {
+				return nil, err
+			}
+			return []eventstore.Command{
+				instance.NewZitadelIDPAddedEvent(
+					ctx,
+					&a.Aggregate,
+					writeModel.ID,
+					provider.Name,
+					provider.Issuer,
+					provider.ClientID,
+					secret,
+					provider.Scopes,
+					provider.IDPOptions,
+					provider.InstanceRolesInfo,
+				),
+			}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) validateZitadelProvider(ctx context.Context, provider *ZitadelProvider) error {
+	if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+		return zerrors.ThrowInvalidArgument(nil, "INST-Sgtj5", "Errors.Invalid.Argument")
+	}
+	if provider.Issuer = strings.TrimSpace(provider.Issuer); provider.Issuer == "" {
+		return zerrors.ThrowInvalidArgument(nil, "INST-Hz6zj", "Errors.Invalid.Argument")
+	}
+	if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+		return zerrors.ThrowInvalidArgument(nil, "INST-fb5jm", "Errors.Invalid.Argument")
+	}
+	if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
+		return zerrors.ThrowInvalidArgument(nil, "INST-Sfdf4", "Errors.Invalid.Argument")
+	}
+
+	for i := range provider.InstanceRolesInfo {
+		provider.InstanceRolesInfo[i].OrganizationID = strings.TrimSpace(provider.InstanceRolesInfo[i].OrganizationID)
+		if provider.InstanceRolesInfo[i].OrganizationID == "" {
+			return zerrors.ThrowInvalidArgument(nil, "INST-9uEJaM", "Errors.Invalid.Argument")
+		}
+		provider.InstanceRolesInfo[i].OrganizationDomain = strings.TrimSpace(provider.InstanceRolesInfo[i].OrganizationDomain)
+		if provider.InstanceRolesInfo[i].OrganizationDomain == "" {
+			return zerrors.ThrowInvalidArgument(nil, "INST-y4Ib4D", "Errors.Invalid.Argument")
+		}
+	}
+
+	return nil
+}
