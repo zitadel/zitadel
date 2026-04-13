@@ -46,6 +46,10 @@ In addition to the files structure proposed by [Protobuf](https://protobuf.dev/p
 - `Service(s)`
 - `Messages` / `Enums`
 
+Related endpoints and messages are grouped together in the same proto file and SHOULD be ordered by reading > creation > update > remove.
+For example, all endpoints and messages related to managing project roles are grouped together in the `ProjectService` and corresponding messages 
+are defined in the same proto file in the same order.
+
 ### Versioning
 
 The services and messages are versioned using major version numbers. This means that any change within a major version number is backward compatible.
@@ -57,10 +61,10 @@ Please check out the structure Buf style guide for more information about the fo
 
 #### Removal and Deprecation of Message Fields
 
-When ever a message field is not supported anymore, deprecation of the field is preferred over removal.
+Whenever a message field is not supported anymore, deprecation of the field is preferred over removal.
 This prevents breaking changes and allows the client to handle the deprecation gracefully.
 The field MUST be marked as deprecated and the reason for the deprecation MUST be documented in the proto file as well as the major version the field will be removed. 
-Additionally, the field should be removed in the next major version of the API.
+Additionally, the field SHOULD be removed in the next major version of the API.
 
 As a rule of thumb, redundant API methods are deprecated.
 
@@ -115,7 +119,7 @@ Do not rely on implicit fallbacks or defaults if the client does not provide cer
 Only use defaults if they are explicitly documented, such as returning a result set for the whole instance if no filter is provided.
 
 Some API calls may create multiple resources such as in the case of `zitadel.org.v2.AddOrganization`, where you can create an organization AND multiple users as admin.
-In such cases the response should include **ALL** created resources and their ids. This removes any ambiguity from the users perspective whether or not
+In such cases the response SHOULD include **ALL** created resources and their ids. This removes any ambiguity from the users perspective whether or not
 the additional resources were created and it also helps in testing.
 
 ### Naming Conventions
@@ -154,7 +158,7 @@ However, it is possible to provide the `organization_id` as a filter to retrieve
 
 ##### Context information in Responses
 
-When the action of creation, update or deletion of a resource was successful, the returned response has to include the time of the operation and the generated identifiers.
+When the action of creation, update or deletion of a resource was successful, the returned response MUST include the time of the operation and the generated identifiers.
 This is achieved through the addition of a timestamp attribute with the operation as a prefix, and the generated information as separate attributes.
 
 ```protobuf
