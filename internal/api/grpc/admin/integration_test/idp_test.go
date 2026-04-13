@@ -12,19 +12,12 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/zitadel/zitadel/internal/integration"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
-	management_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object"
 )
 
 func Test_AddZitadelProvider(t *testing.T) {
-	// add org domain
-	orgDomain := integration.DomainName()
-	_, err := Instance.Client.Mgmt.AddOrgDomain(AdminCTX, &management_pb.AddOrgDomainRequest{Domain: orgDomain})
-	require.NoError(t, err)
-
 	type args struct {
 		ctx context.Context
 		req *admin_pb.AddZitadelProviderRequest
@@ -169,8 +162,8 @@ func Test_AddZitadelProvider(t *testing.T) {
 					},
 					InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
 						{
-							OrganizationId:     Instance.DefaultOrg.GetId(),
-							OrganizationDomain: orgDomain,
+							OrganizationId:     "org1",
+							OrganizationDomain: "org1.com",
 						},
 					},
 				},
