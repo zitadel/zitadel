@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/session"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type DeleteSessionCommand struct {
@@ -49,14 +49,6 @@ func (cmd *DeleteSessionCommand) Events(ctx context.Context, opts *InvokeOpts) (
 	}, nil
 }
 
-const (
-	ErrSessionTokenInvalid    = "ErrSessionTokenInvalid"
-	ErrMoreThanOneRowAffected = "ErrMoreThanOneRowAffected"
-	ErrIDMissing              = "ErrIDMissing"
-	ErrMissingPermission      = "ErrMissingPermission"
-	ErrInternal               = "ErrInternal"
-)
-
 func (cmd *DeleteSessionCommand) sessionDeletePermissionCheckCondition(ctx context.Context, sessionRepo SessionRepository, decryptor SessionTokenDecryptor) (database.Condition, error) {
 	if !cmd.MustCheckPermission {
 		return nil, nil
@@ -64,7 +56,7 @@ func (cmd *DeleteSessionCommand) sessionDeletePermissionCheckCondition(ctx conte
 	if cmd.Token != "" {
 		sessionID, tokenID, err := decryptor(ctx, cmd.Token)
 		if err != nil || sessionID != cmd.ID {
-			return nil, zerrors.ThrowPermissionDenied(err, ErrSessionTokenInvalid, "Errors.Session.Token.Invalid")
+			return nil, ErrSessionTokenInvalid(err)
 		}
 		return database.Or(
 			sessionRepo.TokenIDCondition(tokenID),
@@ -93,14 +85,13 @@ func (cmd *DeleteSessionCommand) Execute(ctx context.Context, opts *InvokeOpts) 
 	)
 	if err != nil {
 		if errors.Is(err, new(database.PermissionError)) {
-			return zerrors.ThrowPermissionDenied(err, ErrMissingPermission,
-				"insufficient permissions to delete session, require `session.delete` permission, ownership of the session or current session token")
+			return ErrAuthMissingPermission(err, "insufficient permissions to delete session, require `session.delete` permission, ownership of the session or current session token", SessionDeletePermission)
 		}
-		return zerrors.ThrowInternal(err, ErrInternal, "an unexpected error occurred while deleting the session")
+		return ErrInternal(err, "an unexpected error occurred while deleting the session")
 	}
 
 	if deletedRows > 1 {
-		return zerrors.ThrowInternalf(nil, ErrMoreThanOneRowAffected, "expected 1 session to be deleted, got %d", deletedRows)
+		return ErrMoreThanOneRowAffected(fmt.Sprintf("expected 1 session to be deleted, got %d", deletedRows), deletedRows)
 	}
 
 	cmd.DeletedAt = deletedAt
@@ -116,7 +107,7 @@ func (*DeleteSessionCommand) String() string {
 // Validate implements [Commander].
 func (cmd *DeleteSessionCommand) Validate(ctx context.Context, opts *InvokeOpts) (err error) {
 	if cmd.ID = strings.TrimSpace(cmd.ID); cmd.ID == "" {
-		return zerrors.ThrowInvalidArgument(nil, ErrIDMissing, "Errors.IDMissing")
+		return ErrIDMissing()
 	}
 	return nil
 }
