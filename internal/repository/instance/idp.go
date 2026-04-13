@@ -1169,11 +1169,6 @@ func NewZitadelIDPAddedEvent(
 	}
 }
 
-func ZitadelIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	e, err := idp.ZitadelIDPAddedEventMapper(event)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ZitadelIDPAddedEvent{ZitadelIDPAddedEvent: *e.(*idp.ZitadelIDPAddedEvent)}, nil
+func (e *ZitadelIDPAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
 }

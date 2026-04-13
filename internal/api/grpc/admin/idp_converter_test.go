@@ -200,7 +200,7 @@ func Test_signatureAlgorithmToCommand(t *testing.T) {
 	}
 }
 
-func Test_addZitadelOIDCConfigToDomain(t *testing.T) {
+func Test_addZitadelProviderToCommand(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name string

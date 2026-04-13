@@ -1039,11 +1039,12 @@ type InstanceZitadelIDPWriteModel struct {
 	ZitadelIDPWriteModel
 }
 
-func NewInstanceZitadelIDPWriteModel(resourceOwner string, id string) *InstanceZitadelIDPWriteModel {
+func NewInstanceZitadelIDPWriteModel(instanceID, id string) *InstanceZitadelIDPWriteModel {
 	return &InstanceZitadelIDPWriteModel{
 		ZitadelIDPWriteModel: ZitadelIDPWriteModel{
 			WriteModel: eventstore.WriteModel{
-				ResourceOwner: resourceOwner,
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
 			},
 			ID: id,
 		},
