@@ -2,7 +2,6 @@ package eventstore_test
 
 import (
 	"context"
-	"encoding/json"
 	"os"
 	"testing"
 	"time"
@@ -239,16 +238,6 @@ func generateRemoveUniqueConstraint(table, uniqueField string) func(e *testEvent
 func withEventType(eventType eventstore.EventType) func(e *testEvent) {
 	return func(e *testEvent) {
 		e.BaseEvent.EventType = eventType
-	}
-}
-
-func withTestData(data any) func(e *testEvent) {
-	return func(e *testEvent) {
-		d, err := json.Marshal(data)
-		if err != nil {
-			panic("marshal data failed")
-		}
-		e.BaseEvent.Data = d
 	}
 }
 
