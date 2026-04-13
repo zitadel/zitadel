@@ -92,7 +92,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   const user = userResponse.user;
 
   const sessionCookie = await getSessionCookieByLoginName({
-    loginName: "loginName" in command ? command.loginName : user.preferredLoginName,
+    loginName: command.loginName ?? user.preferredLoginName,
     organization: command.organization,
   });
 
@@ -154,6 +154,10 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
     if (session.factors?.user?.loginName) {
       params.set("loginName", session.factors?.user?.loginName);
+    }
+
+    if (command.requestId) {
+      params.set("requestId", command.requestId);
     }
 
     // set hash of userId and userAgentId to prevent attacks, checks are done for users with invalid sessions and invalid userAgentId

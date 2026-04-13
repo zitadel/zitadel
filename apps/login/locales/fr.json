@@ -351,6 +351,7 @@
     "userIdMissing": "Aucun identifiant utilisateur fourni !",
     "successTitle": "Utilisateur vérifié",
     "successDescription": "L'utilisateur a été vérifié avec succès.",
+    "successContinue": "Continuer",
     "setupAuthenticator": "Configurer l'authentificateur",
     "verify": {
       "title": "Vérifier l'utilisateur",
