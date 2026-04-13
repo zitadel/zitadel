@@ -1,5 +1,5 @@
-import { createLogger } from "@/lib/logger";
 import { PromiseCache } from "@/lib/cache";
+import { createLogger } from "@/lib/logger";
 
 const logger = createLogger("security-settings");
 
@@ -45,23 +45,13 @@ async function resolveAuthToken(): Promise<string> {
  * @param instanceHost - Optional instance host for multi-tenant deployments
  * @returns An array of allowed iframe origins, or undefined if not configured
  */
-export async function getIframeOrigins(
-  baseUrl: string,
-  instanceHost?: string,
-): Promise<string[] | undefined> {
+export async function getIframeOrigins(baseUrl: string, instanceHost?: string): Promise<string[] | undefined> {
   const cacheKey = `security-settings:${instanceHost || "__default__"}`;
 
-  return securityCache.getOrFetch(
-    cacheKey,
-    () => fetchIframeOrigins(baseUrl, instanceHost),
-    SECURITY_SETTINGS_TTL_MS,
-  );
+  return securityCache.getOrFetch(cacheKey, () => fetchIframeOrigins(baseUrl, instanceHost), SECURITY_SETTINGS_TTL_MS);
 }
 
-async function fetchIframeOrigins(
-  baseUrl: string,
-  instanceHost?: string,
-): Promise<string[] | undefined> {
+async function fetchIframeOrigins(baseUrl: string, instanceHost?: string): Promise<string[] | undefined> {
   const token = await resolveAuthToken();
 
   const reqHeaders: Record<string, string> = {
@@ -87,14 +77,11 @@ async function fetchIframeOrigins(
     });
   }
 
-  const response = await fetch(
-    `${baseUrl}/zitadel.settings.v2.SettingsService/GetSecuritySettings`,
-    {
-      method: "POST",
-      headers: reqHeaders,
-      body: "{}",
-    },
-  );
+  const response = await fetch(`${baseUrl}/zitadel.settings.v2.SettingsService/GetSecuritySettings`, {
+    method: "POST",
+    headers: reqHeaders,
+    body: "{}",
+  });
 
   if (!response.ok) {
     logger.error("Failed to fetch security settings from API", {
