@@ -19,6 +19,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/integration/sink"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
@@ -917,6 +918,9 @@ func TestServer_DeleteSession_token(t *testing.T) {
 				SessionToken: gu.Ptr("invalid"),
 			})
 			require.Error(t, err)
+			if stateCase.Enabled {
+				integration.RequireStatusError(t, err, domain.ErrSessionTokenInvalid(nil))
+			}
 
 			_, err = stateCase.Inst.Client.SessionV2.DeleteSession(stateCase.InstOwner, &session.DeleteSessionRequest{
 				SessionId:    createResp.GetSessionId(),
@@ -965,6 +969,9 @@ func TestServer_DeleteSession_own_session(t *testing.T) {
 				SessionId: createResp.GetSessionId(),
 			})
 			require.Error(t, err)
+			if stateCase.Enabled {
+				integration.RequireStatusError(t, err, domain.ErrAuthMissingPermission(nil, "", domain.SessionDeletePermission))
+			}
 
 			// delete the new (user1) session by themselves
 			_, err = stateCase.Inst.Client.SessionV2.DeleteSession(integration.WithAuthorizationToken(t.Context(), token1), &session.DeleteSessionRequest{
@@ -1039,6 +1046,7 @@ func TestServer_DeleteSession_expired(t *testing.T) {
 			sessionResp, err := stateCase.Inst.Client.SessionV2.GetSession(stateCase.Inst.WithAuthorizationToken(t.Context(), integration.UserTypeOrgOwner),
 				&session.GetSessionRequest{SessionId: createResp.GetSessionId()})
 			require.Error(t, err)
+			// TODO: implement error check once the query side is relational
 			require.Nil(t, sessionResp)
 		})
 	}

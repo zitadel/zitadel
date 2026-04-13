@@ -37,12 +37,11 @@ import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.com
 import { ToastService } from 'src/app/services/toast.service';
 import { UserService } from 'src/app/services/user.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { SearchQuery as UserSearchQuery } from 'src/app/proto/generated/zitadel/user_pb';
 import { Type, UserFieldName } from '@zitadel/proto/zitadel/user/v2/query_pb';
 import { UserState, User } from '@zitadel/proto/zitadel/user/v2/user_pb';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { ListUsersRequestSchema, ListUsersResponse } from '@zitadel/proto/zitadel/user/v2/user_service_pb';
-import { UserState as UserStateV1 } from 'src/app/proto/generated/zitadel/user_pb';
+import { UserState as UserStateV1, SearchQuery as UserSearchQuery } from 'src/app/proto/generated/zitadel/user_pb';
 import { NewOrganizationService } from 'src/app/services/new-organization.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';

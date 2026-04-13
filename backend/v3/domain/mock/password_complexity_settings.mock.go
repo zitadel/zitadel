@@ -931,6 +931,44 @@ func (c *MockPasswordComplexitySettingsRepositoryTypeColumnCall) DoAndReturn(f f
 	return c
 }
 
+// TypeCondition mocks base method.
+func (m *MockPasswordComplexitySettingsRepository) TypeCondition(typ domain.SettingType) database.Condition {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TypeCondition", typ)
+	ret0, _ := ret[0].(database.Condition)
+	return ret0
+}
+
+// TypeCondition indicates an expected call of TypeCondition.
+func (mr *MockPasswordComplexitySettingsRepositoryMockRecorder) TypeCondition(typ any) *MockPasswordComplexitySettingsRepositoryTypeConditionCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TypeCondition", reflect.TypeOf((*MockPasswordComplexitySettingsRepository)(nil).TypeCondition), typ)
+	return &MockPasswordComplexitySettingsRepositoryTypeConditionCall{Call: call}
+}
+
+// MockPasswordComplexitySettingsRepositoryTypeConditionCall wrap *gomock.Call
+type MockPasswordComplexitySettingsRepositoryTypeConditionCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockPasswordComplexitySettingsRepositoryTypeConditionCall) Return(arg0 database.Condition) *MockPasswordComplexitySettingsRepositoryTypeConditionCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockPasswordComplexitySettingsRepositoryTypeConditionCall) Do(f func(domain.SettingType) database.Condition) *MockPasswordComplexitySettingsRepositoryTypeConditionCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockPasswordComplexitySettingsRepositoryTypeConditionCall) DoAndReturn(f func(domain.SettingType) database.Condition) *MockPasswordComplexitySettingsRepositoryTypeConditionCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // UniqueColumns mocks base method.
 func (m *MockPasswordComplexitySettingsRepository) UniqueColumns() []database.Column {
 	m.ctrl.T.Helper()
