@@ -90,7 +90,7 @@ func grpcLinkTypeToDomain(tp settings.LinkType) (domain.LinkType, error) {
 	case settings.LinkType_LINK_TYPE_CUSTOM:
 		return domain.LinkTypeCustom, nil
 	default:
-		return domain.LinkTypeUnspecified, zerrors.ThrowInvalidArgumentf(nil, "BCgEF3", "unknown link type %v", tp)
+		return domain.LinkTypeUnspecified, zerrors.ThrowInvalidArgumentf(nil, "GJeupd", "unknown link type %v", tp)
 	}
 }
 
@@ -100,7 +100,7 @@ func domainLinkTargetToGrpc(target domain.LinkTarget) (settings.LinkTarget, erro
 		return settings.LinkTarget_LINK_TARGET_UNSPECIFIED, nil
 	case domain.LinkTargetSelf:
 		return settings.LinkTarget_LINK_TARGET_SELF, nil
-	case domain.LinkTypeBlank:
+	case domain.LinkTargetBlank:
 		return settings.LinkTarget_LINK_TARGET_BLANK, nil
 	default:
 		return settings.LinkTarget_LINK_TARGET_UNSPECIFIED, zerrors.ThrowInvalidArgumentf(nil, "W35qZF", "unknown target type %v", target)
@@ -114,7 +114,7 @@ func grpcLinkTargetToDomain(target settings.LinkTarget) (domain.LinkTarget, erro
 	case settings.LinkTarget_LINK_TARGET_SELF:
 		return domain.LinkTargetSelf, nil
 	case settings.LinkTarget_LINK_TARGET_BLANK:
-		return domain.LinkTypeBlank, nil
+		return domain.LinkTargetBlank, nil
 	default:
 		return domain.LinkTargetUnspecified, zerrors.ThrowInvalidArgumentf(nil, "yJJTA3", "unknown target type %v", target)
 	}

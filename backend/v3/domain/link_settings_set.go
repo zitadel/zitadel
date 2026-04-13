@@ -36,7 +36,7 @@ func (q *SetLinkSettingsCommand) Validate(ctx context.Context, opts *InvokeOpts)
 	foundLinkTypes := make(map[LinkType]bool)
 
 	for _, l := range q.Links {
-		switch {
+		switch l.Type {
 		case LinkTypeUnspecified:
 			return zerrors.ThrowInvalidArgument(nil, "ccHyiN", "unspecified links are not allowed")
 		case LinkTypeCustom:

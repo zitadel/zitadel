@@ -38,7 +38,7 @@ type LinkTarget int
 const (
 	LinkTargetUnspecified = iota
 	LinkTargetSelf
-	LinkTypeBlank
+	LinkTargetBlank
 )
 
 type SettingsSource int
