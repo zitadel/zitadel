@@ -224,15 +224,3 @@ func DecryptAES(text []byte, key string) ([]byte, error) {
 
 	return cipherText, err
 }
-
-/*
-type AES256GCMCryptoOption func(*AES256GCMCrypto)
-
-// WithAES256GCMCryptoFallbackDecrypt adds a fallback decryption function to the AES256GCMCrypto.
-// This is used to support decrypting values that were encrypted with a different algorithm, such as AES-CFB, before migrating to AES-256-GCM.
-func WithAES256GCMCryptoFallbackDecrypt(fallback func(value []byte, key string) ([]byte, error)) AES256GCMCryptoOption {
-	return func(c *AES256GCMCrypto) {
-		c.fallbackDecrypt = fallback
-	}
-}
-*/
