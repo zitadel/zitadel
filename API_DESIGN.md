@@ -42,7 +42,7 @@ These conventions are described in the following sections.
 
 ### File Structure
 
-In addition to the files structure proposed by [Protobuf](https://protobuf.dev/programming-guides/style/#file-structure) and [connectRPC](https://buf.build/docs/best-practices/style-guide/#recommendations), the ZITADEL API uses the following order for `Everything else` section of files:
+In addition to the file structure proposed by [Protobuf](https://protobuf.dev/programming-guides/style/#file-structure) and [connectRPC / buf](https://buf.build/docs/best-practices/style-guide/#recommendations), the ZITADEL API uses the following order for `Everything else` section of files:
 - `Service(s)`
 - `Messages` / `Enums`
 
@@ -63,8 +63,10 @@ Please check out the structure Buf style guide for more information about the fo
 
 Whenever a message field is not supported anymore, deprecation of the field is preferred over removal.
 This prevents breaking changes and allows the client to handle the deprecation gracefully.
-The field MUST be marked as deprecated and the reason for the deprecation MUST be documented in the proto file as well as the major version the field will be removed. 
+The field MUST be marked as deprecated and the reason for the deprecation MUST be documented in the proto file as well as the major version in which the field will be removed. 
 Additionally, the field SHOULD be removed in the next major version of the API.
+
+#### Removal and Deprecation of API Methods
 
 As a rule of thumb, redundant API methods are deprecated.
 
@@ -72,7 +74,7 @@ As a rule of thumb, redundant API methods are deprecated.
 - One or more links to recommended replacement methods CAN be added to the deprecation message as a proto comment above the rpc spec.
 - Guidance for switching to the recommended methods for common use cases SHOULD be added as a proto comment above the rpc spec.
 
-*Example*
+##### Example
 
 ```protobuf
 // Delete the user phone
@@ -259,8 +261,6 @@ message IdentiyProviderLink {
 } 
 ```
 
-Return messages SHOULD only contain the fields that are required to be returned. Endpoints manipulating or deleting a resource SHOULD whenever possible only return the change or deletion date.
-
 #### Operations and Methods
 
 Methods on a resource MUST be named using the following convention:
@@ -422,8 +422,10 @@ the status code is returned as an HTTP status code or as a gRPC / connectRPC sta
 Check the possible status codes https://zitadel.com/docs/apis/statuscodes
 
 > [!NOTE]
-> REST specific status codes e.g. 201, 204, etc. previously used in ZITADEL will no longer be used.
-> The proto annotation `http_response` of the zitadel option MUST not be used anymore.
+> For new services and new endpoints, do not introduce REST-specific success codes such as `201` or `204`.
+> Likewise, do not introduce new uses of the `http_response` proto annotation of the zitadel option.
+> Existing stable protos may still contain legacy `http_response` annotations and REST-specific success codes.
+> Treat those cases as backwards-compatible legacy behavior and avoid expanding that pattern.
 
 ### Error Slugs
 
