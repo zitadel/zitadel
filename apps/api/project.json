@@ -78,24 +78,6 @@
                 "runtime",
                 {
                     "dependentTasksOutputFiles": "internal/api/ui/console/static/**/*"
-                },
-                {
-                    "dependentTasksOutputFiles": "pkg/grpc/**/*.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/statik/statik.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/notification/statik/statik.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/api/ui/login/statik/statik.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/api/assets/authz.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/api/assets/router.go"
                 }
             ],
             "outputs": [
@@ -117,24 +99,6 @@
                 "runtime",
                 {
                     "dependentTasksOutputFiles": "internal/api/ui/console/static/**/*"
-                },
-                {
-                    "dependentTasksOutputFiles": "pkg/grpc/**/*.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/statik/statik.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/notification/statik/statik.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/api/ui/login/statik/statik.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/api/assets/authz.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/api/assets/router.go"
                 }
             ],
             "outputs": [
@@ -184,16 +148,7 @@
             "cache": true,
             "inputs": [
                 "sources",
-                "{workspaceRoot}/.golangci.yaml",
-                {
-                    "dependentTasksOutputFiles": "pkg/grpc/**/*.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/api/assets/authz.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/api/assets/router.go"
-                }
+                "{workspaceRoot}/.golangci.yaml"
             ]
         },
         "test": {
@@ -212,25 +167,7 @@
             "command": "go test -race -coverprofile=profile.api.test-unit.cov -coverpkg=./internal/...,./backend/...  ./...",
             "inputs": [
                 "sources",
-                "{workspaceRoot}/go*",
-                {
-                    "dependentTasksOutputFiles": "pkg/grpc/**/*.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/statik/statik.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/notification/statik/statik.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/api/ui/login/statik/statik.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/api/assets/authz.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/api/assets/router.go"
-                }
+                "{workspaceRoot}/go*"
             ],
             "outputs": [
                 "{workspaceRoot}/profile.api.test-unit.cov"
@@ -252,25 +189,7 @@
                 },
                 "sources",
                 "{workspaceRoot}/internal/integration/**",
-                "{workspaceRoot}/go*",
-                {
-                    "dependentTasksOutputFiles": "pkg/grpc/**/*.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/statik/statik.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/notification/statik/statik.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/api/ui/login/statik/statik.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/api/assets/authz.go"
-                },
-                {
-                    "dependentTasksOutputFiles": "internal/api/assets/router.go"
-                }
+                "{workspaceRoot}/go*"
             ],
             "outputs": [
                 "{workspaceRoot}/.artifacts/bin/*/*/zitadel.test"
