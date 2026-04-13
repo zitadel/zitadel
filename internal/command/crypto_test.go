@@ -99,6 +99,20 @@ func testSecretGeneratorAddedEvent(typ domain.SecretGeneratorType) *instance.Sec
 	)
 }
 
+type mockAuthCrypto struct{}
+
+func (m *mockAuthCrypto) EncryptToken(data string) (string, error) {
+	return data, nil
+}
+
+func (m *mockAuthCrypto) DecryptToken(token string) (string, error) {
+	return token, nil
+}
+
+func (m *mockAuthCrypto) LegacyTokenEnabled() bool {
+	return false
+}
+
 func Test_newCryptoCode(t *testing.T) {
 	type args struct {
 		typ domain.SecretGeneratorType
