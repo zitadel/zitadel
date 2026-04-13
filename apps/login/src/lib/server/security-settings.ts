@@ -1,16 +1,16 @@
-import { PromiseCache } from "@/lib/cache";
 import { createLogger } from "@/lib/logger";
 
 const logger = createLogger("security-settings");
 
-/**
- * Cache TTL for security settings: 15 minutes (matching default in zitadel.ts).
- * Uses the same PromiseCache (LRU + stale-while-revalidate) as the rest of
- * the app for consistent caching behavior and deduplication of concurrent requests.
- */
-const SECURITY_SETTINGS_TTL_MS = 15 * 60 * 1000;
+/** Cache TTL: 1 hour. Security settings rarely change. */
+const CACHE_TTL_MS = 60 * 60 * 1000;
 
-const securityCache = new PromiseCache(100);
+interface CacheEntry {
+  origins: string[] | undefined;
+  expiresAt: number;
+}
+
+const cache = new Map<string, CacheEntry>();
 
 /**
  * Resolves an authentication token from available credential sources.
@@ -34,28 +34,33 @@ async function resolveAuthToken(): Promise<string> {
 }
 
 /**
- * Wrapper to store in the cache — lru-cache treats `undefined` returns from
- * fetchMethod as failures, so we wrap the result to allow caching "no origins".
+ * Fetches iframe origins from security settings using the ZITADEL API directly
+ * via the Connect protocol (POST + JSON). This avoids the HTTPS self-loopback
+ * through the load balancer that caused TLS errors on Cloud Run.
+ *
+ * Results are cached in-memory for 1 hour per instance host.
+ *
+ * @param baseUrl - The ZITADEL API base URL (ZITADEL_API_URL)
+ * @param instanceHost - Optional instance host for multi-tenant deployments
+ * @returns An array of allowed iframe origins, or undefined if not configured
  */
-interface IframeOriginsResult {
-  origins: string[] | undefined;
-}
-
 export async function getIframeOrigins(baseUrl: string, instanceHost?: string): Promise<string[] | undefined> {
-  const cacheKey = `security-settings:${instanceHost || "__default__"}`;
+  const cacheKey = instanceHost || "__default__";
+  const cached = cache.get(cacheKey);
 
-  const result = await securityCache.getOrFetch<IframeOriginsResult>(
-    cacheKey,
-    async () => ({ origins: await fetchIframeOrigins(baseUrl, instanceHost) }),
-    SECURITY_SETTINGS_TTL_MS,
-  );
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.origins;
+  }
 
-  return result.origins;
+  const origins = await fetchIframeOrigins(baseUrl, instanceHost);
+
+  cache.set(cacheKey, { origins, expiresAt: Date.now() + CACHE_TTL_MS });
+
+  return origins;
 }
 
 async function fetchIframeOrigins(baseUrl: string, instanceHost?: string): Promise<string[] | undefined> {
   const token = await resolveAuthToken();
-
   const reqHeaders: Record<string, string> = {
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
@@ -100,4 +105,3 @@ async function fetchIframeOrigins(baseUrl: string, instanceHost?: string): Promi
     ? settings.embeddedIframe.allowedOrigins
     : undefined;
 }
-
