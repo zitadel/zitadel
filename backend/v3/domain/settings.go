@@ -420,7 +420,7 @@ type LinksSettings struct {
 }
 
 type LinksSettingsAttributes struct {
-	Links []Link `json:"links,omitempty"`
+	Links []Link `json:"links"`
 }
 
 type LinkType int32
