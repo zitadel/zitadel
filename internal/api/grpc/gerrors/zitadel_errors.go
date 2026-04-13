@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"strings"
 
 	"connectrpc.com/connect"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -12,10 +13,12 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/protoadapt"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	commandErrors "github.com/zitadel/zitadel/internal/command/errors"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/pkg/grpc/error/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/message"
 )
 
@@ -34,7 +37,7 @@ func ZITADELToGRPCError(ctx context.Context, err error) error {
 	msg += " (" + id + ")"
 	logging.Log(ctx, lvl, msg, "err", err, "code", code)
 
-	errorInfo := getErrorInfo(id, key, err)
+	errorInfo := getErrorInfo(ctx, id, key, err)
 
 	s, err := status.New(code, msg).WithDetails(errorInfo)
 	if err != nil {
@@ -61,7 +64,7 @@ func ZITADELToConnectError(ctx context.Context, err error) error {
 	msg += " (" + id + ")"
 	logging.Log(ctx, lvl, msg, "err", err)
 
-	errorInfo := getErrorInfo(id, key, err)
+	errorInfo := getErrorInfo(ctx, id, key, err)
 
 	cErr := connect.NewError(connect.Code(code), errors.New(msg))
 	if detail, detailErr := connect.NewErrorDetail(errorInfo.(proto.Message)); detailErr == nil {
@@ -152,15 +155,32 @@ func grpcStatusLevel(code codes.Code) slog.Level {
 	}
 }
 
-func getErrorInfo(id, key string, err error) protoadapt.MessageV1 {
-	var errorInfo protoadapt.MessageV1
 
+func getErrorInfo(ctx context.Context, id, key string, err error) protoadapt.MessageV1 {
 	var wpe *commandErrors.WrongPasswordError
+	var zerr *zerrors.ZitadelError
 	if err != nil && errors.As(err, &wpe) {
-		errorInfo = &message.CredentialsCheckError{Id: id, Message: key, FailedAttempts: wpe.FailedAttempts}
-	} else {
-		errorInfo = &message.ErrorDetail{Id: id, Message: key}
+		return &message.CredentialsCheckError{Id: id, Message: key, FailedAttempts: wpe.FailedAttempts}
 	}
+	// Let's check the error is a zitadel error and does contain a slug, which should be the case for almost any error
+	// in the future, but not yet. In case it's not, we'll fall back to the old error details to prevent a breaking change.
+	if err != nil && errors.As(err, &zerr) && strings.Contains(zerr.GetID(), ".") {
+		if zerr.Details == nil {
+			return &errorpb.ErrorDetail{Slug: id, Message: key}
+		}
+		errDetails, err := zerr.GetDetails().MarshalJSON()
+		if err != nil {
+			logging.WithError(ctx, err).Error("unable to marshal error details")
+			return &errorpb.ErrorDetail{Slug: id, Message: key}
+		}
 
-	return errorInfo
+		details := new(structpb.Struct)
+		err = details.UnmarshalJSON(errDetails)
+		if err != nil {
+			logging.WithError(ctx, err).Error("unable to unmarshal error details")
+			return &errorpb.ErrorDetail{Slug: id, Message: key}
+		}
+		return &errorpb.ErrorDetail{Slug: id, Message: key, Details: details}
+	}
+	return &message.ErrorDetail{Id: id, Message: key}
 }
