@@ -7,6 +7,7 @@ import "zitadel/object/v2/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/session/v2/challenge.proto";
 import "zitadel/session/v2/session.proto";
+import "zitadel/error/v2/error.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/struct.proto";
@@ -257,6 +258,11 @@ service SessionService {
   // Required permissions:
   //   - `session.delete`
   //   - no permission required for own sessions or when providing the current session token
+  //
+  // Possible error slugs include (non-exhaustive):
+  //   - "request.invalid" when required fields such as the session ID are missing or invalid
+  //   - "auth.missing_permission" when the caller does not have the required permissions to delete the session
+  //   - "session.token_invalid" when the provided session token is invalid
   rpc DeleteSession (DeleteSessionRequest) returns (DeleteSessionResponse) {
     option (google.api.http) = {
       delete: "/v2/sessions/{session_id}"

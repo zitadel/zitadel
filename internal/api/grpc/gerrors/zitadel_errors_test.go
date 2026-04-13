@@ -7,11 +7,16 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/protoadapt"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	commandErrors "github.com/zitadel/zitadel/internal/command/errors"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	errorpb "github.com/zitadel/zitadel/pkg/grpc/error/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/message"
 )
 
@@ -47,6 +52,14 @@ func TestCaosToGRPCError(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestZITADELToGRPCError_PreservesGRPCStatus(t *testing.T) {
+	err := ZITADELToGRPCError(t.Context(), status.Error(codes.Unauthenticated, "auth header missing"))
+	grpcStatus, ok := status.FromError(err)
+	require.True(t, ok)
+	assert.Equal(t, codes.Unauthenticated, grpcStatus.Code())
+	assert.Equal(t, "auth header missing", grpcStatus.Message())
 }
 
 func Test_getErrorInfo(t *testing.T) {
@@ -88,11 +101,35 @@ func Test_getErrorInfo(t *testing.T) {
 			}(),
 			result: &message.CredentialsCheckError{Id: "id", Message: "key", FailedAttempts: 26},
 		},
+		{
+			name: "parent error not nil wrapped zerrors.ZitadelError{} with id, message errorpb.ErrorDetail{}",
+			id:   "id",
+			key:  "key",
+			err: func() error {
+				err := fmt.Errorf("normal error")
+				zerr := &zerrors.ZitadelError{ID: "id", Message: "key"}
+				return fmt.Errorf("%w: %w", err, zerr)
+			}(),
+			result: &message.ErrorDetail{Id: "id", Message: "key"},
+		},
+		{
+			name: "parent error not nil wrapped zerrors.ZitadelError{} with slug, return errorpb.ErrorDetail{}",
+			id:   "slug.reason",
+			key:  "message",
+			err: func() error {
+				err := fmt.Errorf("normal error")
+				zerr := &zerrors.ZitadelError{ID: "slug.reason", Message: "message", Details: zerrors.ErrorDetailsMap{"some": "details"}}
+				return fmt.Errorf("%w: %w", err, zerr)
+			}(),
+			result: &errorpb.ErrorDetail{Slug: "slug.reason", Message: "message", Details: &structpb.Struct{Fields: map[string]*structpb.Value{"some": {Kind: &structpb.Value_StringValue{StringValue: "details"}}}}},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			errorInfo := getErrorInfo(tt.id, tt.key, tt.err)
-			assert.Equal(t, tt.result, errorInfo)
+			errorInfo := getErrorInfo(t.Context(), tt.id, tt.key, tt.err)
+			if !proto.Equal(tt.result.(proto.Message), errorInfo.(proto.Message)) {
+				t.Errorf("getErrorInfo() = %v, want %v", errorInfo, tt.result)
+			}
 		})
 	}
 }
@@ -204,6 +241,14 @@ func Test_extractError(t *testing.T) {
 			"unknown",
 			"",
 			slog.LevelError,
+		},
+		{
+			"grpc unauthenticated",
+			args{status.Error(codes.Unauthenticated, "auth header missing")},
+			codes.Unauthenticated,
+			"auth header missing",
+			"",
+			slog.LevelWarn,
 		},
 	}
 	for _, tt := range tests {

@@ -1,6 +1,109 @@
 import { accessSync, constants, readFileSync } from "node:fs";
-import { createServer } from "node:https";
+import { request as httpRequest } from "node:http";
+import { createServer, request as httpsRequest } from "node:https";
 import { createRequire } from "node:module";
+
+/**
+ * Parses a Go-style duration string into milliseconds.
+ *
+ * This uses the same format as Go's time.ParseDuration (e.g. "30s", "5m",
+ * "1m30s") to stay consistent with the ZITADEL backend, which uses
+ * time.Duration for its own ZITADEL_DATABASE_POSTGRES_AWAITINITIALCONN
+ * setting. Operators configuring both services use the same syntax.
+ *
+ * Valid units are "ms", "s", "m", and "h".
+ * Returns null if the string is empty, zero, or contains invalid syntax.
+ */
+function parseDuration(raw) {
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+
+  let totalMs = 0;
+  let remaining = trimmed;
+  const unitMap = { ms: 1, s: 1_000, m: 60_000, h: 3_600_000 };
+
+  while (remaining.length > 0) {
+    const match = remaining.match(/^(\d+)(ms|s|m|h)/);
+    if (!match) return null;
+    totalMs += parseInt(match[1], 10) * unitMap[match[2]];
+    remaining = remaining.slice(match[0].length);
+  }
+
+  return totalMs > 0 ? totalMs : null;
+}
+
+/**
+ * Polls an HTTP(S) URL until it returns HTTP 200 or the deadline is reached.
+ */
+async function pollReady(url, timeoutMs) {
+  const parsedUrl = new URL(url);
+  const doRequest = parsedUrl.protocol === "https:" ? httpsRequest : httpRequest;
+  const deadline = Date.now() + timeoutMs;
+
+  while (Date.now() < deadline) {
+    const ok = await new Promise((resolve) => {
+      const req = doRequest(parsedUrl, { method: "GET", timeout: 5_000, rejectUnauthorized: false }, (res) => {
+        res.resume();
+        resolve(res.statusCode === 200);
+      });
+      req.on("error", () => resolve(false));
+      req.on("timeout", () => {
+        req.destroy();
+        resolve(false);
+      });
+      req.end();
+    });
+
+    if (ok) return true;
+
+    await new Promise((r) => setTimeout(r, 1_000));
+  }
+
+  return false;
+}
+
+/**
+ * Waits for the ZITADEL API to become ready before starting the server.
+ *
+ * When ZITADEL_API_AWAITINITIALCONN is set (e.g. "60s", "5m", "120s"), this
+ * function blocks until GET {ZITADEL_API_URL}/debug/ready returns HTTP 200
+ * or the timeout expires. This replaces the wait4x init container that was
+ * previously used in the Helm chart.
+ *
+ * If the timeout expires without a successful response, the process exits
+ * with code 1.
+ */
+async function awaitApiReady() {
+  const raw = process.env.ZITADEL_API_AWAITINITIALCONN;
+  if (!raw) return;
+
+  const apiUrl = process.env.ZITADEL_API_URL;
+  if (!apiUrl) {
+    console.error("ZITADEL_API_AWAITINITIALCONN is set but ZITADEL_API_URL is not configured.");
+    process.exit(1);
+  }
+
+  const timeoutMs = parseDuration(raw);
+  if (timeoutMs === null) {
+    console.error(
+      `Invalid ZITADEL_API_AWAITINITIALCONN value "${raw}". Expected a Go-style duration like "30s", "5m", or "1m30s".`,
+    );
+    process.exit(1);
+  }
+
+  const readyUrl = new URL("/debug/ready", apiUrl).toString();
+  console.log(`Waiting up to ${raw} for API to be ready at ${readyUrl} ...`);
+
+  const ok = await pollReady(readyUrl, timeoutMs);
+  if (ok) {
+    console.log("API is ready.");
+  } else {
+    console.error(`Timed out after ${raw} waiting for API readiness at ${readyUrl}`);
+    process.exit(1);
+  }
+}
+
+await awaitApiReady();
 
 if (process.env.ZITADEL_TLS_ENABLED !== "true") {
   // The build script must rename the Next.js-generated server.js to next-server.js.
