@@ -20,6 +20,8 @@ import "zitadel/settings/v2/settings.proto";
 import "google/protobuf/timestamp.proto";
 import "zitadel/filter/v2/filter.proto";
 import "zitadel/settings/v2/organization_settings.proto";
+import "zitadel/settings/v2/link_settings.proto";
+import "zitadel/settings/v2/effective_settings.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
 
@@ -329,7 +331,11 @@ service SettingsService {
   //
   // Required permissions:
   //   - `policy.read`
+  //
+  // Deprecated: use GetLinkSettings instead
   rpc GetLegalAndSupportSettings (GetLegalAndSupportSettingsRequest) returns (GetLegalAndSupportSettingsResponse) {
+    option deprecated = true;
+
     option (google.api.http) = {
       get: "/v2/settings/legal_support"
     };
@@ -341,6 +347,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true,
       responses: {
         key: "200"
         value: {
@@ -574,6 +581,63 @@ service SettingsService {
       }
     };
   }
+
+  // Get Link settings
+  //
+  // Returns the effective links for the requested scope.
+  // Source is tracked for the list as a whole — the entire list
+  // is either inherited or overridden, never partially merged.
+  rpc GetLinkSettings(GetLinkSettingsRequest) returns (GetLinkSettingsResponse){
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.read"
+      }
+    };
+  }
+
+  // Set Link settings
+  //
+  // Replaces the entire link list at the requested scope.
+  // This is a full replacement, not a merge — omitted links are removed.
+  //
+  // To add a link, include the full list with the new link appended.
+  // To remove a link, include the full list without it.
+  rpc SetLinkSettings(SetLinkSettingsRequest) returns (SetLinkSettingsResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.write"
+      }
+    };
+  }
+
+  // Reset link settings
+  //
+  // Removes all link overrides at the requested scope.
+  // The scope falls back to its parent's values.
+  //
+  // Unlike other settings, there is no per-field reset — links are
+  // managed as a list, so reset always clears the entire list.
+  rpc ResetLinkSettings(ResetLinkSettingsRequest) returns (ResetLinkSettingsResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.write"
+      }
+    };
+  }
+
+  // Get effective settings
+  //
+  // Gets all settings which are requested in the request.
+  // The settings values are resolved using the hierarchical model.
+  // Only the resolved settings are returned, without the source
+  // which describes from which hierarchical level they came.
+  rpc GetEffectiveSettings(GetEffectiveSettingsRequest) returns (GetEffectiveSettingsResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.read"
+      }
+    };
+  }
 }
 
 message GetLoginSettingsRequest {
@@ -641,6 +705,7 @@ message GetDomainSettingsResponse {
   zitadel.settings.v2.DomainSettings settings = 2;
 }
 
+// Deprecated: use GetLinkSettings instead
 message GetLegalAndSupportSettingsRequest {
   // Specify the context for which the legal and support settings should be returned.
   // This can be the instance or an organization.
@@ -649,6 +714,7 @@ message GetLegalAndSupportSettingsRequest {
   zitadel.object.v2.RequestContext ctx = 1;
 }
 
+// Deprecated: use GetLinkSettings instead
 message GetLegalAndSupportSettingsResponse {
   zitadel.object.v2.Details details = 1;
   zitadel.settings.v2.LegalAndSupportSettings settings = 2;
