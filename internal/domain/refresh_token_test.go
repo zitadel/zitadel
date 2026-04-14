@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"encoding/base64"
 	"errors"
 	"testing"
 
@@ -49,12 +48,12 @@ func TestFromRefreshToken(t *testing.T) {
 	refreshToken, err := NewRefreshToken(userID, tokenID, algorithm)
 	require.NoError(t, err)
 
-	invalidRefreshToken, err := algorithm.Encrypt([]byte(userID + ":" + tokenID))
+	invalidRefreshToken, err := algorithm.EncryptToken(userID + ":" + tokenID)
 	require.NoError(t, err)
 
 	type args struct {
 		refreshToken string
-		algorithm    crypto.EncryptionAlgorithm
+		algorithm    crypto.AuthAlgorithm
 	}
 	tests := []struct {
 		name        string
@@ -65,18 +64,18 @@ func TestFromRefreshToken(t *testing.T) {
 		wantErr     error
 	}{
 		{
-			name:    "invalid base64",
+			name:    "invalid encoding",
 			args:    args{"~~~", algorithm},
-			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-BGDhn", "Errors.User.RefreshToken.Invalid"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-rie9A", "Errors.User.RefreshToken.Invalid"),
 		},
 		{
 			name:    "short cipher text",
 			args:    args{"DEADBEEF", algorithm},
-			wantErr: zerrors.ThrowInvalidArgument(err, "DOMAIN-rie9A", "Errors.User.RefreshToken.Invalid"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-rie9A", "Errors.User.RefreshToken.Invalid"),
 		},
 		{
 			name:    "incorrect amount of segments",
-			args:    args{base64.RawURLEncoding.EncodeToString(invalidRefreshToken), algorithm},
+			args:    args{invalidRefreshToken, algorithm},
 			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-Se8oh", "Errors.User.RefreshToken.Invalid"),
 		},
 		{
@@ -101,6 +100,7 @@ func TestFromRefreshToken(t *testing.T) {
 // Fuzz test invalid inputs. None of the inputs should result in a success.
 func FuzzFromRefreshToken(f *testing.F) {
 	keyConfig := &crypto.KeyConfig{
+		LegacyToken:      true,
 		EncryptionKeyID:  "keyID",
 		DecryptionKeyIDs: []string{"keyID"},
 	}
@@ -108,13 +108,13 @@ func FuzzFromRefreshToken(f *testing.F) {
 	algorithm, err := crypto.NewAESCrypto(keyConfig, &mockKeyStorage{keys: keys})
 	require.NoError(f, err)
 
-	invalidRefreshToken, err := algorithm.Encrypt([]byte("userID:tokenID"))
+	invalidRefreshToken, err := algorithm.EncryptToken("userID:tokenID")
 	require.NoError(f, err)
 
 	tests := []string{
-		"~~~",      // invalid base64
-		"DEADBEEF", // short cipher text
-		base64.RawURLEncoding.EncodeToString(invalidRefreshToken), // incorrect amount of segments
+		"~~~",               // invalid base64
+		"DEADBEEF",          // short cipher text
+		invalidRefreshToken, // incorrect amount of segments
 	}
 	for _, tc := range tests {
 		f.Add(tc)

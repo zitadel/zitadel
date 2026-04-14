@@ -331,10 +331,8 @@ export class InputDirective implements MatFormFieldControl<any>, OnChanges, OnDe
   // In Ivy the `host` bindings will be merged when this class is extended, whereas in
   // ViewEngine they're overwritten.
   /** Callback for the cases where the focused state of the input changes. */
-  /* eslint-disable  */
   @HostListener('focus', ['true'])
   @HostListener('blur', ['false'])
-  /* eslint-enable  */
   _focusChanged(isFocused: boolean): void {
     if (isFocused !== this.focused && (!this.readonly || !isFocused)) {
       this.focused = isFocused;
@@ -345,7 +343,6 @@ export class InputDirective implements MatFormFieldControl<any>, OnChanges, OnDe
   // We have to use a `HostListener` here in order to support both Ivy and ViewEngine.
   // In Ivy the `host` bindings will be merged when this class is extended, whereas in
   // ViewEngine they're overwritten.
-  // eslint-disable-next-line
   @HostListener('input')
   _onInput(): void {
     // This is a noop function and is used to let Angular know whenever the value changes.
@@ -461,7 +458,6 @@ export class InputDirective implements MatFormFieldControl<any>, OnChanges, OnDe
       this.focus();
     }
   }
-  /* eslint-disable */
   static ngAcceptInputType_disabled: BooleanInput;
   static ngAcceptInputType_readonly: BooleanInput;
   static ngAcceptInputType_required: BooleanInput;
@@ -469,5 +465,4 @@ export class InputDirective implements MatFormFieldControl<any>, OnChanges, OnDe
   // Accept `any` to avoid conflicts with other directives on `<input>` that may
   // accept different types.
   static ngAcceptInputType_value: any;
-  /* eslint-enable */
 }

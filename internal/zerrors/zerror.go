@@ -1,6 +1,8 @@
 package zerrors
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -111,12 +113,23 @@ type ZitadelError struct {
 	Parent  error
 	Message string
 	ID      string
+	Details ErrorDetails
 
 	// location where the error was created
 	reportLocation *sloggcp.ReportLocation
 	// stack trace at the point the error was created
 	stackTrace    []byte
 	hasStackTrace bool
+}
+
+type Slug string
+
+type ErrorDetails json.Marshaler
+
+type ErrorDetailsMap map[string]any
+
+func (m ErrorDetailsMap) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]any(m))
 }
 
 func ThrowError(parent error, id, message string) error {
@@ -183,6 +196,15 @@ func (err *ZitadelError) GetID() string {
 	return err.ID
 }
 
+func (err *ZitadelError) GetDetails() ErrorDetails {
+	return err.Details
+}
+
+func (err *ZitadelError) WithDetails(details ErrorDetails) *ZitadelError {
+	err.Details = details
+	return err
+}
+
 func (err *ZitadelError) Is(target error) bool {
 	t, ok := target.(*ZitadelError)
 	if !ok {
@@ -199,6 +221,20 @@ func (err *ZitadelError) Is(target error) bool {
 	}
 	if t.Parent != nil && !errors.Is(err.Parent, t.Parent) {
 		return false
+	}
+	if t.Details != nil {
+		if err.Details == nil {
+			return false
+		}
+		targetData, detailsErr := t.Details.MarshalJSON()
+		if detailsErr != nil {
+			return false
+		}
+		errData, detailsErr := err.Details.MarshalJSON()
+		if detailsErr != nil {
+			return false
+		}
+		return bytes.Equal(targetData, errData)
 	}
 
 	return true

@@ -232,7 +232,7 @@ export class ShortcutsComponent implements OnDestroy {
     this.destroy$.complete();
   }
 
-  public drop(event: CdkDragDrop<ShortcutItem[]>, listName: string) {
+  public drop(event: CdkDragDrop<ShortcutItem[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
       this.saveStateToStorage();

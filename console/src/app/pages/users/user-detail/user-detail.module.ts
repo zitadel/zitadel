@@ -36,7 +36,6 @@ import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
-import { InfoDialogModule } from 'src/app/modules/info-dialog/info-dialog.module';
 import { MetadataModule } from 'src/app/modules/metadata/metadata.module';
 import { CountryCallingCodesService } from 'src/app/services/country-calling-codes.service';
 import { InfoRowModule } from 'src/app/modules/info-row/info-row.module';
@@ -61,6 +60,7 @@ import { PasswordlessComponent } from './user-detail/passwordless/passwordless.c
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
 import { QRCodeComponent } from 'angularx-qrcode';
+import { InfoDialogComponent } from 'src/app/modules/info-dialog/info-dialog.component';
 
 @NgModule({
   declarations: [
@@ -87,7 +87,7 @@ import { QRCodeComponent } from 'angularx-qrcode';
     ChangesModule,
     CommonModule,
     SidenavModule,
-    InfoDialogModule,
+    InfoDialogComponent,
     FormsModule,
     ReactiveFormsModule,
     MembershipsTableModule,
