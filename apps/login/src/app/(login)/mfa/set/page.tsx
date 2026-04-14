@@ -113,11 +113,9 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   const { valid } = sessionWithData ? isSessionValid(sessionWithData) : { valid: false };
 
-  const resolvedLoginName = sessionWithData?.factors?.user?.loginName ?? loginName;
-  const emailVerified = sessionWithData?.emailVerified ?? false;
-  const phoneVerified = sessionWithData?.phoneVerified ?? false;
-
-  if (force === "true" && (valid || !sessionWithData) && loginSettings && resolvedLoginName) {
+  if (force === "true" && valid && sessionWithData?.factors?.user?.loginName && loginSettings) {
+    const emailVerified = sessionWithData.emailVerified ?? false;
+    const phoneVerified = sessionWithData.phoneVerified ?? false;
     const hasVisibleFactor = loginSettings.secondFactors.some((f) => {
       switch (f) {
         case SecondFactorType.OTP:
@@ -134,11 +132,16 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
     if (!hasVisibleFactor && !emailVerified
       && loginSettings.secondFactors.includes(SecondFactorType.OTP_EMAIL)) {
-      const verifyParams = new URLSearchParams({ loginName: resolvedLoginName, send: "true" });
+      const verifyParams = new URLSearchParams({
+        loginName: sessionWithData.factors.user.loginName,
+        send: "true",
+      });
+      const org = organization ?? sessionWithData.factors.user.organizationId;
+
       if (requestId) {
         verifyParams.set("requestId", requestId);
       }
-      const org = organization ?? sessionWithData?.factors?.user?.organizationId;
+      
       if (org) {
         verifyParams.set("organization", org as string);
       }
