@@ -20,10 +20,20 @@ export async function loadMostRecentSession({
   serviceConfig,
   sessionParams,
 }: LoadMostRecentSessionParams): Promise<Session | undefined> {
-  const recent = await getMostRecentCookieWithLoginname({
+  // Try with both loginName and organization first
+  let recent = await getMostRecentCookieWithLoginname({
     loginName: sessionParams.loginName,
     organization: sessionParams.organization,
   });
+
+  // Fall back to loginName-only if the org-scoped lookup found nothing.
+  // This handles the case where the URL's organization (request context)
+  // differs from the cookie's organization (user's actual org).
+  if (!recent && sessionParams.loginName && sessionParams.organization) {
+    recent = await getMostRecentCookieWithLoginname({
+      loginName: sessionParams.loginName,
+    });
+  }
 
   if (!recent) {
     return undefined;

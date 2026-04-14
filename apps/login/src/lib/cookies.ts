@@ -27,14 +27,22 @@ async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameE
   const cookiesList = await cookies();
 
   // "none" is required for iframe embedding (with secure flag)
-  let resolvedSameSite: "lax" | "strict" | "none";
+  const resolvedSameSite: "lax" | "none" = iFrameEnabled ? "none" : "lax";
 
-  if (iFrameEnabled) {
-    // When embedded in iframe, must use "none" with secure flag
-    resolvedSameSite = "none";
-  } else {
-    // This allows cookies during top-level navigation while blocking cross-origin requests
-    resolvedSameSite = "lax";
+  // Expire the sessions cookie for BOTH sameSite variants to prevent duplicates.
+  // Browsers treat cookies with different sameSite as separate entries, so
+  // changing the iframe setting without this cleanup leaves a stale duplicate
+  // that shadows the new cookie on subsequent reads.
+  for (const sameSite of ["lax", "none"] as const) {
+    cookiesList.set({
+      name: "sessions",
+      value: "",
+      httpOnly: true,
+      path: "/",
+      sameSite,
+      secure: sameSite === "none" || process.env.NODE_ENV === "production",
+      maxAge: 0,
+    });
   }
 
   return cookiesList.set({
@@ -43,7 +51,7 @@ async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameE
     httpOnly: true,
     path: "/",
     sameSite: resolvedSameSite,
-    secure: process.env.NODE_ENV === "production",
+    secure: resolvedSameSite === "none" || process.env.NODE_ENV === "production",
   });
 }
 
