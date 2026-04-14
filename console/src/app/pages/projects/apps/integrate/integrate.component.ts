@@ -1,29 +1,11 @@
-import { C, COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
-import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { Location } from '@angular/common';
-import { Component, OnDestroy, OnInit, Signal, computed, effect, signal } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { Component, OnDestroy, OnInit, effect, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Buffer } from 'buffer';
-import { BehaviorSubject, Subject, Subscription, combineLatest } from 'rxjs';
-import { debounceTime, map, takeUntil } from 'rxjs/operators';
-import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
-import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
-import {
-  APIAuthMethodType,
-  OIDCAppType,
-  OIDCAuthMethodType,
-  OIDCGrantType,
-  OIDCResponseType,
-} from 'src/app/proto/generated/zitadel/app_pb';
-import {
-  AddAPIAppRequest,
-  AddAPIAppResponse,
-  AddOIDCAppRequest,
-  AddOIDCAppResponse,
-  AddSAMLAppRequest,
-} from 'src/app/proto/generated/zitadel/management_pb';
+import { ActivatedRoute, Router } from '@angular/router';
+import { BehaviorSubject, Subject, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { OIDCAppType } from 'src/app/proto/generated/zitadel/app_pb';
+import { AddAPIAppResponse, AddOIDCAppRequest, AddOIDCAppResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';

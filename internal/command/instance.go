@@ -681,7 +681,7 @@ func setupMachineAdmin(commands *Commands, validations *[]preparation.Validation
 		if err != nil {
 			return nil, nil, err
 		}
-		*validations = append(*validations, prepareAddPersonalAccessToken(pat, commands.keyAlgorithm))
+		*validations = append(*validations, prepareAddPersonalAccessToken(pat, commands.authAlgorithm))
 	}
 	if machine.MachineKey != nil {
 		machineKey = NewMachineKey(orgID, userID, machine.MachineKey.ExpirationDate, machine.MachineKey.Type)
@@ -705,7 +705,7 @@ func setupLoginClient(commands *Commands, validations *[]preparation.Validation,
 		if err != nil {
 			return nil, err
 		}
-		*validations = append(*validations, prepareAddPersonalAccessToken(pat, commands.keyAlgorithm))
+		*validations = append(*validations, prepareAddPersonalAccessToken(pat, commands.authAlgorithm))
 	}
 	return pat, nil
 }

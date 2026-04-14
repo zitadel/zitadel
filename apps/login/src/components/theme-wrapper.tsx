@@ -54,7 +54,8 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
           break;
       }
     }
-  }, [branding?.themeMode, setNextTheme]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [branding?.themeMode]);
 
   return <div>{children}</div>;
 };

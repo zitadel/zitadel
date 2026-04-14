@@ -164,7 +164,7 @@ func (c *orgSetupCommands) setupOrgAdminMachine(orgAgg *org.Aggregate, machine *
 		}
 		pat.TokenID = tokenID
 		c.pats = append(c.pats, pat)
-		c.validations = append(c.validations, prepareAddPersonalAccessToken(pat, c.commands.keyAlgorithm))
+		c.validations = append(c.validations, prepareAddPersonalAccessToken(pat, c.commands.authAlgorithm))
 	}
 	if machine.MachineKey != nil {
 		machineKey = NewMachineKey(orgAgg.ID, machine.Machine.AggregateID, machine.MachineKey.ExpirationDate, machine.MachineKey.Type)

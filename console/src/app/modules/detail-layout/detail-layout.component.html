@@ -4,9 +4,11 @@
       <div class="detail-layout-top-view">
         <div>
           <div class="back-row">
-            <a *ngIf="hasBackButton" cnslBack mat-icon-button>
-              <mat-icon class="icon">arrow_back</mat-icon>
-            </a>
+            @if (hasBackButton) {
+              <a cnslBack mat-icon-button>
+                <mat-icon class="icon">arrow_back</mat-icon>
+              </a>
+            }
             <div>
               <h1>{{ title }}</h1>
               <ng-content select="[sub]"></ng-content>

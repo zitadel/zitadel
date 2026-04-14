@@ -376,6 +376,7 @@
     "userIdMissing": "ユーザーIDが指定されていません！",
     "successTitle": "ユーザー確認完了",
     "successDescription": "ユーザーの確認が正常に完了しました。",
+    "successContinue": "続行",
     "setupAuthenticator": "認証の設定",
     "verify": {
       "title": "ユーザー確認",
