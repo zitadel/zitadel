@@ -11,8 +11,15 @@ import (
 
 type verifierFn func(encoded, password string) (updated string, err error)
 
-func GetLockoutPolicy(ctx context.Context, opts *InvokeOpts, instanceID, orgID string) (*LockoutSettings, error) {
-	lockoutSettingRepo := opts.lockoutSettingRepo
+// tarpitFn represents a tarpit function
+//
+// The input is the number of failed attempts after which the tarpit is started
+type tarpitFn func(failedAttempts uint64)
+
+// totpValidateFn represents a function to validate TOTP
+type totpValidateFn func(toValidate, verifier string) bool
+
+func GetLockoutPolicy(ctx context.Context, db database.QueryExecutor, lockoutSettingsRepo LockoutSettingsRepository, instanceID, orgID string) (*LockoutSettings, error) {
 
 	// We need the organization lockout policy first, and if not available, the instance (default) policy.
 	// So we retrieve all records with a matching instance ID and organization ID OR
@@ -20,9 +27,9 @@ func GetLockoutPolicy(ctx context.Context, opts *InvokeOpts, instanceID, orgID s
 	// Then we assume NULLs are sorted as largest numbers (that's the case in Postgres),
 	// so we sort ascending by organization ID.
 	// We limit the result to 1 so that we get either the org policy or the instance one.
-	settings, err := lockoutSettingRepo.List(ctx, opts.DB(),
-		listLockoutSettingCondition(lockoutSettingRepo, instanceID, orgID),
-		database.WithOrderByAscending(lockoutSettingRepo.OrganizationIDColumn(), lockoutSettingRepo.InstanceIDColumn()),
+	settings, err := lockoutSettingsRepo.List(ctx, db,
+		listLockoutSettingCondition(lockoutSettingsRepo, instanceID, orgID),
+		database.WithOrderByAscending(lockoutSettingsRepo.OrganizationIDColumn(), lockoutSettingsRepo.InstanceIDColumn()),
 		database.WithLimit(1),
 	)
 	if err != nil {

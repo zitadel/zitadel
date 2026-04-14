@@ -3,11 +3,14 @@ package admin
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/test"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
-	"github.com/zitadel/zitadel/pkg/grpc/idp"
+	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
 )
 
 func Test_addOIDCIDPRequestToDomain(t *testing.T) {
@@ -23,13 +26,13 @@ func Test_addOIDCIDPRequestToDomain(t *testing.T) {
 			args: args{
 				req: &admin_pb.AddOIDCIDPRequest{
 					Name:               "ZITADEL",
-					StylingType:        idp.IDPStylingType_STYLING_TYPE_GOOGLE,
+					StylingType:        idp_pb.IDPStylingType_STYLING_TYPE_GOOGLE,
 					ClientId:           "test1234",
 					ClientSecret:       "test4321",
 					Issuer:             "zitadel.ch",
 					Scopes:             []string{"email", "profile"},
-					DisplayNameMapping: idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
-					UsernameMapping:    idp.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
+					DisplayNameMapping: idp_pb.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
+					UsernameMapping:    idp_pb.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
 					AutoRegister:       true,
 				},
 			},
@@ -70,8 +73,8 @@ func Test_addOIDCIDPRequestToDomainOIDCIDPConfig(t *testing.T) {
 					ClientSecret:       "test4321",
 					Issuer:             "zitadel.ch",
 					Scopes:             []string{"email", "profile"},
-					DisplayNameMapping: idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
-					UsernameMapping:    idp.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
+					DisplayNameMapping: idp_pb.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
+					UsernameMapping:    idp_pb.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
 				},
 			},
 		},
@@ -104,7 +107,7 @@ func Test_updateIDPToDomain(t *testing.T) {
 				req: &admin_pb.UpdateIDPRequest{
 					IdpId:        "13523",
 					Name:         "new name",
-					StylingType:  idp.IDPStylingType_STYLING_TYPE_GOOGLE,
+					StylingType:  idp_pb.IDPStylingType_STYLING_TYPE_GOOGLE,
 					AutoRegister: true,
 				},
 			},
@@ -141,8 +144,8 @@ func Test_updateOIDCConfigToDomain(t *testing.T) {
 					ClientId:           "ZITEADEL",
 					ClientSecret:       "i'm so secret",
 					Scopes:             []string{"profile"},
-					DisplayNameMapping: idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
-					UsernameMapping:    idp.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
+					DisplayNameMapping: idp_pb.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
+					UsernameMapping:    idp_pb.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
 				},
 			},
 		},
@@ -164,7 +167,7 @@ func Test_signatureAlgorithmToCommand(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name                   string
-		signatureAlgorithm     idp.SAMLSignatureAlgorithm
+		signatureAlgorithm     idp_pb.SAMLSignatureAlgorithm
 		wantSignatureAlgorithm string
 	}{
 		{
@@ -174,17 +177,17 @@ func Test_signatureAlgorithmToCommand(t *testing.T) {
 		},
 		{
 			name:                   "RSA_SHA1",
-			signatureAlgorithm:     idp.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1,
+			signatureAlgorithm:     idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1,
 			wantSignatureAlgorithm: "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
 		},
 		{
 			name:                   "RSA_SHA256",
-			signatureAlgorithm:     idp.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA256,
+			signatureAlgorithm:     idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA256,
 			wantSignatureAlgorithm: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
 		},
 		{
 			name:                   "RSA_SHA512",
-			signatureAlgorithm:     idp.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA512,
+			signatureAlgorithm:     idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA512,
 			wantSignatureAlgorithm: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512",
 		},
 	}
@@ -193,6 +196,72 @@ func Test_signatureAlgorithmToCommand(t *testing.T) {
 			t.Parallel()
 			got := signatureAlgorithmToCommand(tt.signatureAlgorithm)
 			require.Equal(t, tt.wantSignatureAlgorithm, got)
+		})
+	}
+}
+
+func Test_addZitadelProviderToCommand(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name string
+		req  *admin_pb.AddZitadelProviderRequest
+		want command.ZitadelProvider
+	}{
+		{
+			name: "all fields filled",
+			req: &admin_pb.AddZitadelProviderRequest{
+				Name:         "Zitadel Support IdP",
+				ClientId:     "test-client",
+				ClientSecret: "test-secret",
+				Scopes:       []string{"email", "profile", "urn:zitadel:iam:org:project:roles"},
+				ProviderOptions: &idp_pb.Options{
+					IsLinkingAllowed:  false,
+					IsCreationAllowed: true,
+					IsAutoCreation:    false,
+					IsAutoUpdate:      true,
+					AutoLinking:       0,
+				},
+				InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
+					{
+						OrganizationId:     "org1",
+						OrganizationDomain: "org1.com",
+					},
+					{
+
+						OrganizationId:     "org2",
+						OrganizationDomain: "org2.com",
+					},
+				},
+			},
+			want: command.ZitadelProvider{
+				Name:         "Zitadel Support IdP",
+				ClientID:     "test-client",
+				ClientSecret: "test-secret",
+				Scopes:       []string{"email", "profile", "urn:zitadel:iam:org:project:roles"},
+				IDPOptions: idp.Options{
+					IsCreationAllowed: true,
+					IsAutoCreation:    false,
+					IsLinkingAllowed:  false,
+					IsAutoUpdate:      true,
+				},
+				InstanceRolesInfo: []idp.RolesInfo{
+					{
+						OrganizationID:     "org1",
+						OrganizationDomain: "org1.com",
+					},
+					{
+						OrganizationID:     "org2",
+						OrganizationDomain: "org2.com",
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			got := addZitadelProviderToCommand(tt.req)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

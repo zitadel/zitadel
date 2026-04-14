@@ -226,7 +226,7 @@ export class ProviderOAuthComponent {
       this.loading = true;
       this.service
         .updateGenericOAuthProvider(req)
-        .then((idp) => {
+        .then(() => {
           setTimeout(() => {
             this.loading = false;
             this.close();

@@ -11,9 +11,8 @@ USER nextjs
 ENV HOSTNAME="::" \
     PORT="3000" \
     NODE_ENV="production" \
-    NODE_OPTIONS="--use-openssl-ca" \
+    NODE_OPTIONS="--use-openssl-ca --require /app/load-ssl-cert-dir.cjs" \
     SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt" \
-    SSL_CERT_DIR="/etc/ssl/certs" \
     ZITADEL_TLS_ENABLED="false" \
     OTEL_SERVICE_NAME="zitadel-login" \
     OTEL_EXPORTER_OTLP_PROTOCOL="http/protobuf"

@@ -76,7 +76,7 @@
     "set": {
       "title": "パスワード設定",
       "description": "アカウントのパスワードを設定してください",
-      "codeSent": "確認コードをメールアドレスに送信しました。",
+      "codeSent": "新しいコードがメールアドレスに送信されました。",
       "noCodeReceived": "コードが届きませんか？",
       "resend": "コードを再送信",
       "submit": "続行",
@@ -376,6 +376,7 @@
     "userIdMissing": "ユーザーIDが指定されていません！",
     "successTitle": "ユーザー確認完了",
     "successDescription": "ユーザーの確認が正常に完了しました。",
+    "successContinue": "続行",
     "setupAuthenticator": "認証の設定",
     "verify": {
       "title": "ユーザー確認",

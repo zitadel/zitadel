@@ -159,7 +159,7 @@ export function RegisterForm({
         {/* show chooser if both methods are allowed */}
         {loginSettings && loginSettings.allowLocalAuthentication && loginSettings.passkeysType == PasskeysType.ALLOWED && (
           <>
-            <p className="ztdl-p mb-6 mt-4 block text-left">
+            <p className="ztdl-p mt-4 mb-6 block text-left">
               <Translated i18nKey="selectMethod" namespace="register" />
             </p>
 

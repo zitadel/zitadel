@@ -6,6 +6,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type User struct {
@@ -252,3 +253,26 @@ type HumanRecoveryCodes struct {
 	// It is reset to 0 on successful verification
 	FailedAttempts uint8 `json:"failedAttempts,omitempty" db:"-"`
 }
+
+var (
+	// SlugUserNotFound is the slug whenever a user is not found by the provided identifier.
+	SlugUserNotFound = NewSlug("user", "not_found")
+
+	// SlugUserNotActive is the slug whenever the user requires to be in state "active", but isn't.
+	SlugUserNotActive = NewSlug("user", "not_active")
+)
+
+var (
+	// ErrUserNotFound is an error that can be used when a user is not found by the provided identifier.
+	ErrUserNotFound = func(err error, identifier string) error {
+		return zerrors.CreateZitadelError(zerrors.KindNotFound, err, string(SlugUserNotFound), "user was not found", 1).
+			WithDetails(zerrors.ErrorDetailsMap{"identifier": identifier})
+	}
+
+	// ErrUserNotActive is an error that can be returned when a user needs to be active for the operation,
+	// e.g. sign in, reactivation, etc. but has a different state.
+	ErrUserNotActive = func(id, message string) error {
+		return zerrors.CreateZitadelError(zerrors.KindPreconditionFailed, nil, string(SlugUserNotActive), message, 1).
+			WithDetails(zerrors.ErrorDetailsMap{"id": id})
+	}
+)
