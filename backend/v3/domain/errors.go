@@ -8,6 +8,64 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+func NewSlug(resource, cause string) zerrors.Slug {
+	return zerrors.Slug(fmt.Sprintf("%s.%s", resource, cause))
+}
+
+var (
+	// SlugInternalError is a general slug for any internal error, where the client doesn't have any influence on the error.
+	// It's returned when an unexpected condition in the server occurs, such as a database error, an external service failure, or any other error that is not caused by the client's request.
+	// The error details might contain additional information.
+	SlugInternalError = NewSlug("zitadel", "internal_error")
+
+	// SlugRequestInvalid is a general slug for any request containing missing, malformed or otherwise invalid parameters.
+	// The details typically contain additional information on how to resolve the problem.
+	SlugRequestInvalid = NewSlug("request", "invalid")
+
+	// SlugAuthMissingPermission is a general slug for any authorization error where the user is missing a required permission to perform an action.
+	// The details typically contain the necessary required permission.
+	SlugAuthMissingPermission = NewSlug("auth", "missing_permission")
+)
+
+var (
+	// ErrIDMissing is an error that can be returned on any resource if the necessary (resource) ID is missing
+	ErrIDMissing = func() error {
+		return zerrors.CreateZitadelError(zerrors.KindInvalidArgument, nil, string(SlugRequestInvalid), "validation failed: id is required", 1).
+			WithDetails(zerrors.ErrorDetailsMap{"id": "required"})
+	}
+
+	// ErrInstanceIDMissing is an error that can be returned on any resource if the necessary instance ID is missing
+	ErrInstanceIDMissing = func() error {
+		return zerrors.CreateZitadelError(zerrors.KindInvalidArgument, nil, string(SlugRequestInvalid), "validation failed: instance_id is required", 1).
+			WithDetails(zerrors.ErrorDetailsMap{"instance_id": "required"})
+	}
+
+	// ErrInvalidRequest is a general error for any invalid request type, like missing or wrong parameters.
+	ErrInvalidRequest = func(message string) error {
+		return zerrors.CreateZitadelError(zerrors.KindInvalidArgument, nil, string(SlugRequestInvalid), message, 1)
+	}
+
+	// ErrInternal is a general error for any internal error, where the client doesn't have any influence on the error.
+	// This error should be used for any error that is not caused by the client's request, but rather by an unexpected condition in the server.
+	ErrInternal = func(err error, message string) error {
+		return zerrors.CreateZitadelError(zerrors.KindInternal, err, string(SlugInternalError), message, 1)
+	}
+
+	// ErrMoreThanOneRowAffected is an error that can be returned when a database operation affects more rows than expected,
+	// which could indicate a potential issue with the query or the data integrity.
+	ErrMoreThanOneRowAffected = func(message string, rows int64) error {
+		return zerrors.CreateZitadelError(zerrors.KindInternal, nil, string(SlugInternalError), message, 1).
+			WithDetails(zerrors.ErrorDetailsMap{"rows": rows})
+	}
+
+	// ErrAuthMissingPermission is an error that can be returned when a user tries to perform an action that requires a specific permission,
+	// but the user does not have that permission.
+	ErrAuthMissingPermission = func(err error, message, permission string) error {
+		return zerrors.CreateZitadelError(zerrors.KindPermissionDenied, err, string(SlugAuthMissingPermission), message, 1).
+			WithDetails(zerrors.ErrorDetailsMap{"permission": permission})
+	}
+)
+
 type wrongIDPTypeError struct {
 	expected IDPType
 	got      string
