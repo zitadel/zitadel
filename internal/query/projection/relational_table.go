@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	settings "github.com/zitadel/zitadel/internal/repository/organization_settings"
+	"github.com/zitadel/zitadel/internal/repository/permission"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -26,6 +27,19 @@ func (*relationalTablesProjection) Name() string {
 
 func (p *relationalTablesProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
+		{
+			Aggregate: permission.AggregateType,
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  permission.AddedType,
+					Reduce: p.reduceAdministratorRolePermissionAdded,
+				},
+				{
+					Event:  permission.RemovedType,
+					Reduce: p.reduceAdministratorRolePermissionRemoved,
+				},
+			},
+		},
 		{
 			Aggregate: instance.AggregateType,
 			EventReducers: []handler.EventReducer{

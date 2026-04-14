@@ -2322,3 +2322,46 @@ func (wm *AllIDPWriteModel) ToSAMLProvider(callbackURL string, idpAlg crypto.Enc
 	}
 	return wm.samlModel.ToProvider(callbackURL, idpAlg, getRequest, addRequest)
 }
+
+type ZitadelIDPWriteModel struct {
+	eventstore.WriteModel
+
+	Name         string
+	ID           string
+	Issuer       string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       []string
+	idp.Options
+	InstanceRolesInfo []idp.RolesInfo
+
+	State domain.IDPState
+}
+
+func (wm *ZitadelIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.ZitadelIDPAddedEvent:
+			wm.reduceAddedEvent(e)
+		case *idp.ZitadelIDPChangedEvent:
+			// todo (@grvijayan): to please the linter for now
+			wm.reduceChangedEvent(e)
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *ZitadelIDPWriteModel) reduceAddedEvent(e *idp.ZitadelIDPAddedEvent) {
+	wm.Name = e.Name
+	wm.Issuer = e.Issuer
+	wm.ClientID = e.ClientID
+	wm.ClientSecret = e.ClientSecret
+	wm.Scopes = e.Scopes
+	wm.Options = e.Options
+	wm.InstanceRolesInfo = e.InstanceRolesInfo
+	wm.State = domain.IDPStateActive
+}
+
+func (wm *ZitadelIDPWriteModel) reduceChangedEvent(e *idp.ZitadelIDPChangedEvent) {
+	// todo (@grvijayan): will be implemented along with UpdateZitadelProvider changes
+}
