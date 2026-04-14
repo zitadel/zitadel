@@ -1063,6 +1063,17 @@ func NewZitadelOrgIDPWriteModel(orgID, id string) *OrgZitadelIDPWriteModel {
 	}
 }
 
+func (wm *OrgZitadelIDPWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *org.ZitadelIDPAddedEvent:
+			wm.ZitadelIDPWriteModel.AppendEvents(&e.ZitadelIDPAddedEvent)
+		default:
+			wm.ZitadelIDPWriteModel.AppendEvents(e)
+		}
+	}
+}
+
 func (wm *OrgZitadelIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
