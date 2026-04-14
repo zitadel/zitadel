@@ -34,7 +34,7 @@
     margin-bottom: 2px;
 
     &:hover {
-      border-color: if($is-dark-theme, #e0e0e0, #1a1b1b);
+      border-color: if(sass($is-dark-theme): #e0e0e0; else: #1a1b1b);
     }
 
     &:active,
