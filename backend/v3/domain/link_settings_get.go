@@ -57,15 +57,15 @@ const (
 // -------------------------------------------
 
 type GetLinkSettingsQuery struct {
-	instance       bool
-	organizationId string
+	instanceID     string
+	organizationID string
 	result         *LinkSettings
 }
 
-func NewGetLinkSettingsQuery(instance bool, organizationId string) *GetLinkSettingsQuery {
+func NewGetLinkSettingsQuery(instanceID string, organizationID string) *GetLinkSettingsQuery {
 	return &GetLinkSettingsQuery{
-		instance:       instance,
-		organizationId: organizationId,
+		instanceID:     instanceID,
+		organizationID: organizationID,
 	}
 }
 

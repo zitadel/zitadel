@@ -6,6 +6,7 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	apiv3 "github.com/zitadel/zitadel/backend/v3/api/settings/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 )
@@ -58,17 +59,17 @@ func (s *Server) DeleteOrganizationSettings(ctx context.Context, req *connect.Re
 }
 
 func (s *Server) GetLinkSettings(ctx context.Context, req *connect.Request[settings.GetLinkSettingsRequest]) (*connect.Response[settings.GetLinkSettingsResponse], error) {
-	panic("implement me")
+	return apiv3.GetLinkSettings(ctx, req)
 }
 
 func (s *Server) SetLinkSettings(ctx context.Context, req *connect.Request[settings.SetLinkSettingsRequest]) (*connect.Response[settings.SetLinkSettingsResponse], error) {
-	panic("implement me")
+	return apiv3.SetLinkSettings(ctx, req)
 }
 
 func (s *Server) ResetLinkSettings(ctx context.Context, req *connect.Request[settings.ResetLinkSettingsRequest]) (*connect.Response[settings.ResetLinkSettingsResponse], error) {
-	panic("implement me")
+	return apiv3.ResetLinkSettings(ctx, req)
 }
 
 func (s *Server) GetEffectiveSettings(ctx context.Context, req *connect.Request[settings.GetEffectiveSettingsRequest]) (*connect.Response[settings.GetEffectiveSettingsResponse], error) {
-	panic("implement me")
+	return apiv3.GetEffectiveSettings(ctx, req)
 }

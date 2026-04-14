@@ -12,37 +12,6 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 )
 
-func GetLinkSettings(ctx context.Context, request *connect.Request[settings.GetLinkSettingsRequest]) (*connect.Response[settings.GetLinkSettingsResponse], error) {
-	q := domain.NewGetLinkSettingsQuery(
-		request.Msg.Ctx.GetInstance(),
-		request.Msg.Ctx.GetOrgId(),
-	)
-
-	err := domain.Invoke(ctx, q)
-	if err != nil {
-		return nil, err
-	}
-
-	res := q.Result()
-
-	ls, err := convert.DomainLinksModelToGRPCResponse(res.Links)
-	if err != nil {
-		return nil, err
-	}
-
-	source, err := convert.DomainSettingsSourceToSourceToGrpc(res.Source)
-	if err != nil {
-		return nil, err
-	}
-
-	return &connect.Response[settings.GetLinkSettingsResponse]{
-		Msg: &settings.GetLinkSettingsResponse{
-			Settings: &settings.LinkSettings{Links: ls},
-			Source:   source,
-		},
-	}, nil
-}
-
 func SetLinkSettings(ctx context.Context, request *connect.Request[settings.SetLinkSettingsRequest]) (*connect.Response[settings.SetLinkSettingsResponse], error) {
 	ls, err := convert.GrpcLinksToDomain(request.Msg.GetLinks())
 	if err != nil {
@@ -95,5 +64,51 @@ func ResetLinkSettings(ctx context.Context, request *connect.Request[settings.Re
 			ChangeDate: timestamppb.New(res.ChangeTime),
 			Settings:   &settings.LinkSettings{Links: links},
 		},
+	}, nil
+}
+
+func GetLinkSettings(ctx context.Context, request *connect.Request[settings.GetLinkSettingsRequest]) (*connect.Response[settings.GetLinkSettingsResponse], error) {
+	q := domain.NewGetLinkSettingsQuery(
+		authz.GetInstance(ctx).InstanceID(),
+		request.Msg.Ctx.GetOrgId(),
+	)
+
+	err := domain.Invoke(ctx, q)
+	if err != nil {
+		return nil, err
+	}
+
+	res := q.Result()
+
+	ls, err := convert.DomainLinksModelToGRPCResponse(res.Links)
+	if err != nil {
+		return nil, err
+	}
+
+	source, err := convert.DomainSettingsSourceToSourceToGrpc(res.Source)
+	if err != nil {
+		return nil, err
+	}
+
+	return &connect.Response[settings.GetLinkSettingsResponse]{
+		Msg: &settings.GetLinkSettingsResponse{
+			Settings: &settings.LinkSettings{Links: ls},
+			Source:   source,
+		},
+	}, nil
+}
+
+func GetEffectiveSettings(ctx context.Context, request *connect.Request[settings.GetEffectiveSettingsRequest]) (*connect.Response[settings.GetEffectiveSettingsResponse], error) {
+	q := domain.NewGetEffectiveSettingsQuery()
+
+	err := domain.Invoke(ctx, q)
+	if err != nil {
+		return nil, err
+	}
+
+	res := q.Result()
+
+	return &connect.Response[settings.GetEffectiveSettingsResponse]{
+		Msg: &settings.GetEffectiveSettingsResponse{},
 	}, nil
 }
