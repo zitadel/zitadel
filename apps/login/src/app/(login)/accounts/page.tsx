@@ -11,6 +11,7 @@ import { getTranslations } from "next-intl/server";
 // import { getLocale } from "next-intl/server";
 import { headers } from "next/headers";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("accounts");
@@ -57,8 +58,6 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   let sessions = await loadSessions({ serviceConfig, organization });
 
-  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization });
-
   const params = new URLSearchParams();
 
   if (requestId) {
@@ -68,6 +67,12 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   if (organization) {
     params.append("organization", organization);
   }
+
+  if (sessions.length === 0) {
+    redirect(`/loginname?${params}`);
+  }
+
+  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization });
 
   return (
     <DynamicTheme branding={branding}>

@@ -317,6 +317,15 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       let selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
 
       if (!selectedSession || !selectedSession.id) {
+        if (organization) {
+          const loginNameUrl = constructUrl(request, "/loginname");
+          loginNameUrl.searchParams.set("requestId", requestId);
+          loginNameUrl.searchParams.set("organization", organization);
+          if (suffix) {
+            loginNameUrl.searchParams.set("suffix", suffix);
+          }
+          return NextResponse.redirect(loginNameUrl);
+        }
         return gotoAccounts({
           request,
           requestId: `oidc_${authRequest.id}`,

@@ -179,3 +179,83 @@ describe("handleOIDCFlowInitiation — locale / cookie handling", () => {
     });
   });
 });
+
+describe("handleOIDCFlowInitiation — account selection with org scope", () => {
+  let mockGetAuthRequest: ReturnType<typeof vi.fn>;
+  let mockConstructUrl: ReturnType<typeof vi.fn>;
+  let mockFindValidSession: ReturnType<typeof vi.fn>;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.unstubAllEnvs();
+
+    const zitadel = await import("@/lib/zitadel");
+    const serviceUrl = await import("@/lib/service-url");
+    const session = await import("@/lib/session");
+
+    mockGetAuthRequest = vi.mocked(zitadel.getAuthRequest);
+    mockConstructUrl = vi.mocked(serviceUrl.constructUrl);
+    mockFindValidSession = vi.mocked(session.findValidSession);
+
+    mockConstructUrl.mockImplementation((_req: any, path: string) => {
+      return new URL(`https://example.com${path}`);
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  test("should redirect to /loginname when org scope is set and no valid session exists", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: ["openid", "urn:zitadel:iam:org:id:12345"],
+        prompt: [],
+        loginHint: undefined,
+      },
+    });
+    mockFindValidSession.mockResolvedValue(null);
+
+    const session = { factors: { user: { id: "u1", organizationId: "99999" } } };
+    const result = await handleOIDCFlowInitiation(
+      makeBaseParams({
+        sessions: [session] as any,
+        sessionCookies: [{ id: "s1", token: "t1" }],
+      }),
+    );
+
+    expect(result.status).toBe(307);
+    const location = result.headers.get("location")!;
+    expect(location).toContain("/loginname");
+    expect(location).toContain("organization=12345");
+    expect(location).toContain("requestId=oidc_abc123");
+    expect(location).not.toContain("/accounts");
+  });
+
+  test("should redirect to /accounts when no org scope and no valid session exists", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: ["openid"],
+        prompt: [],
+        loginHint: undefined,
+      },
+    });
+    mockFindValidSession.mockResolvedValue(null);
+
+    const session = { factors: { user: { id: "u1", organizationId: "99999" } } };
+    const result = await handleOIDCFlowInitiation(
+      makeBaseParams({
+        sessions: [session] as any,
+        sessionCookies: [{ id: "s1", token: "t1" }],
+      }),
+    );
+
+    expect(result.status).toBe(307);
+    const location = result.headers.get("location")!;
+    expect(location).toContain("/accounts");
+  });
+});
