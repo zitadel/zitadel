@@ -4525,6 +4525,7 @@ func TestIDPTemplateProjection_reducesZitadel(t *testing.T) {
 						instance.AggregateType,
 						[]byte(`{
 	"id": "idp-id",
+	"name": "idp-name",
 	"issuer": "issuer",
 	"clientId": "client_id",
 	"clientSecret": {
@@ -4557,7 +4558,7 @@ func TestIDPTemplateProjection_reducesZitadel(t *testing.T) {
 								"ro-id",
 								"instance-id",
 								domain.IDPStateActive,
-								"",
+								"idp-name",
 								domain.IdentityProviderTypeSystem,
 								domain.IDPTypeZitadel,
 								true,
@@ -4591,6 +4592,7 @@ func TestIDPTemplateProjection_reducesZitadel(t *testing.T) {
 						instance.AggregateType,
 						[]byte(`{
 	"id": "idp-id",
+	"name": "idp-name",
 	"issuer": "issuer",
 	"clientId": "client_id",
 	"clientSecret": {
@@ -4631,7 +4633,7 @@ func TestIDPTemplateProjection_reducesZitadel(t *testing.T) {
 								"ro-id",
 								"instance-id",
 								domain.IDPStateActive,
-								"",
+								"idp-name",
 								domain.IdentityProviderTypeSystem,
 								domain.IDPTypeZitadel,
 								true,
