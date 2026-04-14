@@ -3,7 +3,7 @@
 import { Alert, AlertType } from "@/components/alert";
 import { handleServerActionResponse } from "@/lib/client-utils";
 import { UNKNOWN_USER_ID } from "@/lib/constants";
-import { resendVerification, sendVerification } from "@/lib/server/verify";
+import { initialSendVerification, resendVerification, sendVerification } from "@/lib/server/verify";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -27,9 +27,10 @@ type Props = {
   isInvite: boolean;
   requestId?: string;
   submit: boolean;
+  doSend?: boolean;
 };
 
-export function VerifyForm({ userId, loginName, organization, requestId, code, isInvite, submit }: Props) {
+export function VerifyForm({ userId, loginName, organization, requestId, code, isInvite, submit, doSend }: Props) {
   const router = useRouter();
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
@@ -46,8 +47,27 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
 
   const [loading, setLoading] = useState<boolean>(false);
 
+  const initialSendDone = useRef(false);
+  const [initialSendError, setInitialSendError] = useState<string>("");
+  const [codeSent, setCodeSent] = useState(false);
+
+  useEffect(() => {
+    if (doSend && userId && userId !== UNKNOWN_USER_ID && !initialSendDone.current) {
+      initialSendDone.current = true;
+      setError("");
+      initialSendVerification({ userId, isInvite, requestId })
+        .then(() => {
+          setCodeSent(true);
+        })
+        .catch(() => {
+          setInitialSendError(isInvite ? t("errors.couldNotResendInvite") : t("errors.couldNotResendEmail"));
+        });
+    }
+  }, [doSend, userId, isInvite, requestId, t]);
+
   async function resendCode() {
     setError("");
+    setInitialSendError("");
     setLoading(true);
 
     // do not send code for dummy userid that is set to prevent user enumeration
@@ -60,6 +80,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
     const response = await resendVerification({
       userId,
       isInvite: isInvite,
+      requestId: requestId,
     })
       .catch(() => {
         setError(t("errors.couldNotResendEmail"));
@@ -82,6 +103,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
   const fcn = useCallback(
     async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
       setError("");
+      setInitialSendError("");
       setLoading(true);
 
       try {
@@ -114,6 +136,13 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
   return (
     <>
       {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
+      {codeSent && !initialSendError && (
+        <div className="w-full py-4">
+          <Alert type={AlertType.INFO}>
+            <Translated i18nKey="verify.codeSent" namespace="verify" />
+          </Alert>
+        </div>
+      )}
       <form className="w-full">
         <Alert type={AlertType.INFO}>
           <div className="flex flex-row">
@@ -124,7 +153,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
               aria-label="Resend Code"
               disabled={loading}
               type="button"
-              className="ml-4 cursor-pointer text-primary-light-500 hover:text-primary-light-400 disabled:cursor-default disabled:text-gray-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 dark:disabled:text-gray-700"
+              className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
               onClick={() => {
                 resendCode();
               }}
@@ -145,9 +174,9 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
           />
         </div>
 
-        {error && (
+        {(error || initialSendError) && (
           <div className="py-4" data-testid="error">
-            <Alert>{error}</Alert>
+            <Alert>{error || initialSendError}</Alert>
           </div>
         )}
 

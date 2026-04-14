@@ -1,3 +1,4 @@
+import { createPrivateKey } from "crypto";
 import {
   createGrpcTransport,
   GrpcTransportOptions,
@@ -18,7 +19,7 @@ import { NewAuthorizationBearerInterceptor } from "./interceptors.js";
  */
 export function createServerTransport(
   token: string,
-  opts: GrpcTransportOptions
+  opts: GrpcTransportOptions,
 ) {
   return createGrpcTransport({
     ...opts,
@@ -27,6 +28,21 @@ export function createServerTransport(
       NewAuthorizationBearerInterceptor(token),
     ],
   });
+}
+
+/**
+ * Normalize a PEM private key to PKCS#8 format. Accepts both PKCS#1
+ * (BEGIN RSA PRIVATE KEY) and PKCS#8 (BEGIN PRIVATE KEY) inputs.
+ * Returns the key as a PKCS#8 PEM string.
+ */
+function toPKCS8(pem: string): string {
+  if (pem.includes("BEGIN PRIVATE KEY")) {
+    return pem;
+  }
+  return createPrivateKey(pem).export({
+    type: "pkcs8",
+    format: "pem",
+  }) as string;
 }
 
 export async function newSystemToken({
@@ -47,7 +63,7 @@ export async function newSystemToken({
     .setIssuer(subject)
     .setSubject(subject)
     .setAudience(audience)
-    .sign(await importPKCS8(key, "RS256"));
+    .sign(await importPKCS8(toPKCS8(key), "RS256"));
 }
 
 /**
@@ -66,14 +82,14 @@ export async function verifyJwt<T = JWTPayload>(
     publicHost?: string;
   },
 ): Promise<T & JWTPayload> {
-   const headers: Record<string, string> = {};
-   if (options?.instanceHost) {
-     headers["x-zitadel-instance-host"] = options.instanceHost;
-   }
-   if (options?.publicHost) {
-     headers["x-zitadel-public-host"] = options.publicHost;
-   }
-  const JWKS = createRemoteJWKSet(new URL(keysEndpoint), {headers: headers});
+  const headers: Record<string, string> = {};
+  if (options?.instanceHost) {
+    headers["x-zitadel-instance-host"] = options.instanceHost;
+  }
+  if (options?.publicHost) {
+    headers["x-zitadel-public-host"] = options.publicHost;
+  }
+  const JWKS = createRemoteJWKSet(new URL(keysEndpoint), { headers: headers });
 
   const { payload } = await jwtVerify(token, JWKS, {
     issuer: options?.issuer,

@@ -15,11 +15,6 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-// tarpitFn represents a tarpit function
-//
-// The input is the number of failed attempts after which the tarpit is started
-type tarpitFn func(failedAttempts uint64)
-
 type CheckPasswordType struct {
 	Password string
 }
@@ -55,7 +50,7 @@ type PasswordCheckCommand struct {
 // and an input password to verify. It returns an updated hash and an error.
 // It defaults to [passwap.Swapper.Verify]
 //
-// The command does not implement [Transactional] due verifyFn that might take a long time to execute.
+// The command does not implement [Transactional] due to verifyFn that might take a long time to execute.
 // So the DB transaction will be started only after verifyFn has been run.
 //
 // Moreover, the command may return a functional error so manual management of the transaction is needed
@@ -121,12 +116,8 @@ func (p *PasswordCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (e
 	if changesErr != nil {
 		return changesErr
 	}
-	beginner, ok := opts.DB().(database.Beginner)
-	if !ok {
-		return zerrors.ThrowInternal(nil, "DOM-fEhd79", "database doesn't implement database.Beginner")
-	}
 
-	tx, txErr := beginner.Begin(ctx, nil)
+	tx, txErr := opts.StartTransaction(ctx, nil)
 	if txErr != nil {
 		return zerrors.ThrowInternal(txErr, "DOM-IR1vH2", "failed starting transaction")
 	}
@@ -204,7 +195,7 @@ func (p *PasswordCheckCommand) GetPasswordCheckChanges(ctx context.Context, opts
 		}
 	case *VerificationTypeFailed:
 		dbUpdates[0] = humanRepo.IncrementPasswordFailedAttempts()
-		lockoutPolicy, err := GetLockoutPolicy(ctx, opts, p.InstanceID, p.FetchedUser.OrganizationID)
+		lockoutPolicy, err := GetLockoutPolicy(ctx, opts.DB(), opts.lockoutSettingRepo, p.InstanceID, p.FetchedUser.OrganizationID)
 		if err != nil {
 			return nil, err
 		}

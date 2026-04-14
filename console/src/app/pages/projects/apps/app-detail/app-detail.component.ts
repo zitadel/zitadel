@@ -92,16 +92,14 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             ['Admin Service URL', `${env.api}/admin/v1`],
             ['Management Service URL', `${env.api}/management/v1`],
             ['Auth Service URL', `${env.api}/auth/v1`],
-            ...wellknown.filter(
-              ([k, v]) => k === 'Revocation Endpoint' || k === 'JKWS URI' || k === 'Introspection Endpoint',
-            ),
+            ...wellknown.filter(([k]) => k === 'Revocation Endpoint' || k === 'JKWS URI' || k === 'Introspection Endpoint'),
           ];
         }),
       ),
     ),
   );
 
-  public issuer$ = this.apiURLs$.pipe(map((urls) => urls.find(([k, v]) => k === 'Issuer')?.[1]));
+  public issuer$ = this.apiURLs$.pipe(map((urls) => urls.find(([k]) => k === 'Issuer')?.[1]));
 
   public samlURLs$ = this.envSvc.env.pipe(
     map((env) => {
@@ -522,7 +520,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.entityId?.setValue('');
         this.acsURL?.setValue('');
         const reader = new FileReader();
-        reader.onload = ((aXML) => {
+        reader.onload = (() => {
           return (e) => {
             const xmlBase64 = e.target?.result;
             if (xmlBase64 && typeof xmlBase64 === 'string' && this.app?.samlConfig) {
@@ -532,7 +530,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               this.app.samlConfig.metadataXml = cropped;
             }
           };
-        })(file);
+        })();
         reader.readAsDataURL(file);
       }
     }

@@ -1079,9 +1079,7 @@ func (p *relationalTablesProjection) reducePasskeyAdded(event eventstore.Event) 
 		}
 		repo := repository.HumanUserRepository()
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
-			database.And(
-				repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			),
+			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
 			repo.AddPasskey(&domain.Passkey{
 				ID:             e.WebAuthNTokenID,
 				Challenge:      []byte(e.Challenge),
@@ -1126,6 +1124,7 @@ func (p *relationalTablesProjection) reducePasskeyVerified(event eventstore.Even
 				repo.SetPasskeySignCount(e.SignCount),
 				repo.SetPasskeyName(e.WebAuthNTokenName),
 				repo.SetPasskeyUpdatedAt(e.CreatedAt()),
+				repo.SetPasskeyVerifiedAt(e.CreatedAt()),
 			),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)

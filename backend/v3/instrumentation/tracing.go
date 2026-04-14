@@ -9,6 +9,7 @@ import (
 	"slices"
 
 	google_trace "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
+	"go.opentelemetry.io/contrib/exporters/autoexport"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -136,6 +137,30 @@ func (s *Span) SetStatusByError(err error) {
 func newTracerProvider(ctx context.Context, cfg TraceConfig, resource *resource.Resource) (_ *sdk_trace.TracerProvider, err error) {
 	var exporter sdk_trace.SpanExporter
 	switch cfg.Exporter.Type {
+	case ExporterTypeAuto:
+		// autoexport delegates exporter selection to the standard OTEL env vars.
+		// We can't just call autoexport.NewSpanExporter unconditionally because
+		// autoexport defaults to "otlp" when OTEL_TRACES_EXPORTER is unset, and
+		// the OTLP exporter silently points at localhost:4318 even with no env
+		// vars configured. That would cause every ZITADEL instance to start
+		// attempting OTLP connections after upgrading, spamming logs with
+		// connection errors.
+		//
+		// This guard is a heuristic: we check the env vars that realistically
+		// indicate someone has intentionally configured OTEL export. It does not
+		// cover every possible OTLP env var (e.g. OTEL_EXPORTER_OTLP_HEADERS or
+		// OTEL_EXPORTER_OTLP_CERTIFICATE on their own), but those vars are
+		// meaningless without an endpoint or exporter type being set too.
+		if os.Getenv("OTEL_TRACES_EXPORTER") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL") != "" ||
+			os.Getenv("OTEL_EXPORTER_OTLP_TRACES_PROTOCOL") != "" {
+			exporter, err = autoexport.NewSpanExporter(ctx)
+			if err == nil && autoexport.IsNoneSpanExporter(exporter) {
+				exporter = nil
+			}
+		}
 	case ExporterTypeUnspecified, ExporterTypeNone:
 		// no exporter
 	case ExporterTypeStdOut, ExporterTypeStdErr:
@@ -147,7 +172,7 @@ func newTracerProvider(ctx context.Context, cfg TraceConfig, resource *resource.
 	case ExporterTypeGoogle:
 		exporter, err = traceGoogleExporter(ctx, cfg.Exporter)
 	case ExporterTypePrometheus:
-		fallthrough // prometheus is not supported for logs
+		fallthrough // prometheus is not supported for traces
 	default:
 		err = errExporterType(cfg.Exporter.Type, "tracer")
 	}
@@ -160,7 +185,7 @@ func newTracerProvider(ctx context.Context, cfg TraceConfig, resource *resource.
 		sdk_trace.WithSampler(sampler),
 	}
 	if exporter != nil {
-		opts = append(opts, sdk_trace.WithBatcher(exporter))
+		opts = append(opts, sdk_trace.WithBatcher(exporter, sdk_trace.WithBatchTimeout(cfg.Exporter.BatchDuration)))
 	}
 	tracerProvider := sdk_trace.NewTracerProvider(opts...)
 	return tracerProvider, nil

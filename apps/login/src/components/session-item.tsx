@@ -92,7 +92,7 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
               }
             }
           }}
-          className="group flex flex-row items-center rounded-md border border-divider-light bg-background-light-400 px-4 py-2 transition-all hover:shadow-lg dark:bg-background-dark-400 dark:hover:bg-white/10"
+          className="group border-divider-light bg-background-light-400 dark:bg-background-dark-400 flex flex-row items-center rounded-md border px-4 py-2 transition-all hover:shadow-lg dark:hover:bg-white/10"
         >
           <div className="pr-4">
             <Avatar
@@ -104,15 +104,15 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
 
           <div className="flex flex-col items-start overflow-hidden">
             <span className="">{session.factors?.user?.displayName}</span>
-            <span className="text-ellipsis text-xs opacity-80">{session.factors?.user?.loginName}</span>
+            <span className="text-xs text-ellipsis opacity-80">{session.factors?.user?.loginName}</span>
             {valid ? (
-              <span className="text-ellipsis text-xs opacity-80">
+              <span className="text-xs text-ellipsis opacity-80">
                 <Translated i18nKey="verified" namespace="accounts" />{" "}
                 {verifiedAt && moment(timestampDate(verifiedAt)).fromNow()}
               </span>
             ) : (
               verifiedAt && (
-                <span className="text-ellipsis text-xs opacity-80">
+                <span className="text-xs text-ellipsis opacity-80">
                   <Translated i18nKey="expired" namespace="accounts" />{" "}
                   {session.expirationDate && moment(timestampDate(session.expirationDate)).fromNow()}
                 </span>
@@ -129,7 +129,7 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
             )}
 
             <XCircleIcon
-              className="h-5 w-5 opacity-50 transition-all hover:opacity-100 group-hover:block sm:hidden"
+              className="h-5 w-5 opacity-50 transition-all group-hover:block hover:opacity-100 sm:hidden"
               onClick={async (event: React.MouseEvent) => {
                 event.preventDefault();
                 event.stopPropagation();
@@ -143,7 +143,7 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
       {valid && session.expirationDate && (
         <Tooltip.Portal>
           <Tooltip.Content
-            className="z-50 select-none rounded-md border bg-background-light-500 px-3 py-2 text-xs text-black shadow-xl dark:border-white/20 dark:bg-background-dark-500 dark:text-white"
+            className="bg-background-light-500 dark:bg-background-dark-500 z-50 rounded-md border px-3 py-2 text-xs text-black shadow-xl select-none dark:border-white/20 dark:text-white"
             sideOffset={5}
           >
             Expires {moment(timestampDate(session.expirationDate)).fromNow()}

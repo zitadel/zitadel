@@ -2,7 +2,6 @@ package domain
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
@@ -88,11 +87,8 @@ func (rc *RecoveryCodeCheckCommand) Validate(ctx context.Context, opts *InvokeOp
 		opts.DB(),
 		database.WithCondition(sessionRepo.PrimaryKeyCondition(rc.InstanceID, rc.SessionID)),
 	)
-	if err != nil {
-		if errors.Is(err, &database.NoRowFoundError{}) {
-			return zerrors.ThrowNotFound(err, "DOM-Ot3qO6", "Errors.Session.NotFound")
-		}
-		return zerrors.ThrowInternal(err, "DOM-2sF2kF", "Errors.Internal")
+	if err := handleGetError(err, "DOM-2sF2kF", objectTypeSession); err != nil {
+		return err
 	}
 
 	if retrievedSession.UserID == "" {
@@ -107,11 +103,8 @@ func (rc *RecoveryCodeCheckCommand) Validate(ctx context.Context, opts *InvokeOp
 		database.WithCondition(userRepo.IDCondition(retrievedSession.UserID)),
 		database.WithResultLock(),
 	)
-	if err != nil {
-		if errors.Is(err, &database.NoRowFoundError{}) {
-			return zerrors.ThrowNotFound(err, "DOM-Ot3qO6", "Errors.User.NotFound")
-		}
-		return zerrors.ThrowInternal(err, "DOM-7sWTNf", "Errors.Internal")
+	if err := handleGetError(err, "DOM-Ot3qO6", objectTypeUser); err != nil {
+		return err
 	}
 
 	// check user state
@@ -200,7 +193,7 @@ func (rc *RecoveryCodeCheckCommand) String() string {
 func (rc *RecoveryCodeCheckCommand) handleRecoveryCodeCheckFailed(ctx context.Context, opts *InvokeOpts) error {
 	checkTime := time.Now()
 
-	lockoutPolicy, err := GetLockoutPolicy(ctx, opts, rc.InstanceID, rc.user.OrganizationID)
+	lockoutPolicy, err := GetLockoutPolicy(ctx, opts.DB(), opts.lockoutSettingRepo, rc.InstanceID, rc.user.OrganizationID)
 	logging.OnError(ctx, err).Error("failed to get lockout policy")
 
 	// update user state and recovery_code_failed_attempts

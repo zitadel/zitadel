@@ -80,7 +80,7 @@ func (c *Commands) CheckWebAuthN(credentialAssertionData json.Marshaler) Session
 		if err != nil && (credential == nil || credential.ID == nil) {
 			return nil, err
 		}
-		_, token := domain.GetTokenByKeyID(webAuthNTokens.tokens, credential.ID)
+		token := domain.GetTokenByKeyID(webAuthNTokens.tokens, credential.ID)
 		if token == nil {
 			return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Aej7i", "Errors.User.WebAuthN.NotFound")
 		}
