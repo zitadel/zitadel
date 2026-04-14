@@ -63,14 +63,16 @@ export async function getIframeOrigins(baseUrl: string, instanceHost?: string): 
     return existing;
   }
 
-  const promise = fetchIframeOrigins(baseUrl, instanceHost).then((origins) => {
-    cache.set(cacheKey, { origins, expiresAt: Date.now() + CACHE_TTL_MS });
-    inflight.delete(cacheKey);
-    return origins;
-  }).catch((err) => {
-    inflight.delete(cacheKey);
-    throw err;
-  });
+  const promise = fetchIframeOrigins(baseUrl, instanceHost)
+    .then((origins) => {
+      cache.set(cacheKey, { origins, expiresAt: Date.now() + CACHE_TTL_MS });
+      inflight.delete(cacheKey);
+      return origins;
+    })
+    .catch((err) => {
+      inflight.delete(cacheKey);
+      throw err;
+    });
 
   inflight.set(cacheKey, promise);
 
