@@ -12,12 +12,12 @@ import (
 type View struct {
 	Db           *gorm.DB
 	client       *database.DB
-	keyAlgorithm crypto.EncryptionAlgorithm
+	keyAlgorithm crypto.AuthAlgorithm
 	query        *query.Queries
 	es           *eventstore.Eventstore
 }
 
-func StartView(sqlClient *database.DB, keyAlgorithm crypto.EncryptionAlgorithm, queries *query.Queries, es *eventstore.Eventstore) (*View, error) {
+func StartView(sqlClient *database.DB, keyAlgorithm crypto.AuthAlgorithm, queries *query.Queries, es *eventstore.Eventstore) (*View, error) {
 	gorm, err := gorm.Open("postgres", sqlClient.DB)
 	if err != nil {
 		return nil, err

@@ -1490,7 +1490,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 					Header:        http.Header{"foo": []string{"bar"}},
 				},
 				Reason:       domain.TokenReasonAuthRequest,
-				RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID-rt_refreshTokenID:userID
+				RefreshToken: "V2_oidcSessionID-rt_refreshTokenID:userID",
 				SessionID:    "sessionID",
 			},
 		},
@@ -1504,6 +1504,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				defaultRefreshTokenLifetime:     tt.fields.defaultRefreshTokenLifetime,
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
+				authAlgorithm:                   &mockAuthCrypto{},
 			}
 			got, err := c.CreateOIDCSessionFromDeviceAuth(tt.args.ctx, tt.args.deviceCode, tt.args.backChannelLogoutURI)
 			c.jobs.Wait()

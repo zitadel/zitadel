@@ -14087,13 +14087,9 @@ message AddZitadelProviderRequest {
     ];
     zitadel.idp.v1.Options provider_options = 6;
 
-    bool is_id_token_mapping = 7;
-    // Enable the use of Proof Key for Code Exchange (PKCE) for the OIDC flow.
-    bool use_pkce = 8;
-
     // Optionally specify the details (organization_id, organization_domain) related to instance roles.
     // It is used to determine if a user should be assigned instance administrator roles after authenticating with the provider.
-    repeated zitadel.idp.v1.InstanceRolesInfo instance_roles_info = 9 [(validate.rules).repeated = {max_items: 20}];
+    repeated zitadel.idp.v1.InstanceRolesInfo instance_roles_info = 7 [(validate.rules).repeated = {max_items: 20}];
 }
 
 message AddZitadelProviderResponse {
