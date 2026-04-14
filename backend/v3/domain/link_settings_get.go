@@ -15,10 +15,10 @@ type LinkSettings struct {
 }
 
 type Link struct {
-	Type           LinkType
-	Url            string
-	TranslationKey string
-	Target         LinkTarget
+	Type           LinkType   `json:"type"`
+	Url            string     `json:"url"`
+	TranslationKey string     `json:"translation_key"`
+	Target         LinkTarget `json:"target"`
 }
 
 type LinkType int

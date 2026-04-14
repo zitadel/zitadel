@@ -5,12 +5,15 @@ import (
 	"errors"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 type ResetLinkSettingsCommand struct {
-	Instance       bool   `json:"instance"`
-	OrganizationId string `json:"organization_id"`
+	InstanceID     string `json:"instance_id"`
+	OrganizationID string `json:"organization_id"`
 	result         *ResetLinkSettingsCommandResult
 }
 
@@ -19,35 +22,48 @@ type ResetLinkSettingsCommandResult struct {
 	Links      []Link
 }
 
-func NewResetLinkSettingsCommand(instance bool, organizationId string) *ResetLinkSettingsCommand {
+func NewResetLinkSettingsCommand(instanceID string, organizationID string) *ResetLinkSettingsCommand {
 	return &ResetLinkSettingsCommand{
-		Instance:       instance,
-		OrganizationId: organizationId,
+		InstanceID:     instanceID,
+		OrganizationID: organizationID,
 	}
 }
 
 func (cmd *ResetLinkSettingsCommand) RequiresTransaction() {}
 
 func (cmd *ResetLinkSettingsCommand) Events(ctx context.Context, opts *InvokeOpts) ([]eventstore.Command, error) {
-	// TODO(wim) implement this
-	return nil, errors.New("NOT YET IMPLEMENTED")
+	var agg eventstore.Aggregate
+	if cmd.OrganizationID == "" {
+		agg = org.NewAggregate(cmd.OrganizationID).Aggregate
+	} else {
+		agg = instance.NewAggregate(authz.GetInstance(ctx).InstanceID()).Aggregate
+	}
+
+	return []eventstore.Command{
+		NewLinkSettingsChangedEvent(
+			eventstore.NewBaseEventForPush(ctx, &agg, LinkSettingsChangedEventType),
+			cmd.InstanceID,
+			cmd.OrganizationID,
+			nil,
+		),
+	}, nil
 }
 
 // Validate implements [Commander].
-func (q *ResetLinkSettingsCommand) Validate(ctx context.Context, opts *InvokeOpts) error {
+func (cmd *ResetLinkSettingsCommand) Validate(ctx context.Context, opts *InvokeOpts) error {
 	return nil
 }
 
-func (q *ResetLinkSettingsCommand) Execute(ctx context.Context, opts *InvokeOpts) error {
+func (cmd *ResetLinkSettingsCommand) Execute(ctx context.Context, opts *InvokeOpts) error {
 	// TODO(wim) implement this
 	return errors.New("NOT YET IMPLEMENTED")
 }
 
 // String implements [Commander].
-func (q *ResetLinkSettingsCommand) String() string { return "ResetLinkSettingsCommand" }
+func (cmd *ResetLinkSettingsCommand) String() string { return "ResetLinkSettingsCommand" }
 
-func (q *ResetLinkSettingsCommand) Result() *ResetLinkSettingsCommandResult {
-	return q.result
+func (cmd *ResetLinkSettingsCommand) Result() *ResetLinkSettingsCommandResult {
+	return cmd.result
 }
 
 var (

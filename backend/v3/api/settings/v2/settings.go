@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/zitadel/backend/v3/api/settings/v2/convert"
 	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 )
 
@@ -49,7 +50,7 @@ func SetLinkSettings(ctx context.Context, request *connect.Request[settings.SetL
 	}
 
 	cmd := domain.NewSetLinkSettingsCommand(
-		request.Msg.Ctx.GetInstance(),
+		authz.GetInstance(ctx).InstanceID(),
 		request.Msg.Ctx.GetOrgId(),
 		ls,
 	)
@@ -73,7 +74,7 @@ func SetLinkSettings(ctx context.Context, request *connect.Request[settings.SetL
 
 func ResetLinkSettings(ctx context.Context, request *connect.Request[settings.ResetLinkSettingsRequest]) (*connect.Response[settings.ResetLinkSettingsResponse], error) {
 	cmd := domain.NewResetLinkSettingsCommand(
-		request.Msg.Ctx.GetInstance(),
+		authz.GetInstance(ctx).InstanceID(),
 		request.Msg.Ctx.GetOrgId(),
 	)
 
