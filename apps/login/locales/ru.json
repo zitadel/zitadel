@@ -383,6 +383,7 @@
     "userIdMissing": "Не указан userId!",
     "successTitle": "Пользователь подтверждён",
     "successDescription": "Пользователь успешно подтверждён.",
+    "successContinue": "Продолжить",
     "setupAuthenticator": "Настроить аутентификатор",
     "verify": {
       "title": "Подтверждение пользователя",

@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { Action, ActionState, Flow, FlowType, TriggerType } from 'src/app/proto/generated/zitadel/action_pb';
+import { Action, ActionState, Flow, FlowType } from 'src/app/proto/generated/zitadel/action_pb';
 import { SetTriggerActionsRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -100,7 +100,7 @@ export class ActionsComponent {
     });
   }
 
-  protected openAddTrigger(flow: FlowType.AsObject, trigger?: TriggerType.AsObject): void {
+  protected openAddTrigger(flow: FlowType.AsObject): void {
     const dialogRef = this.dialog.open(AddFlowDialogComponent, {
       data: {
         flowType: flow,

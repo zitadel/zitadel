@@ -14,7 +14,6 @@ import {
   AutoLinkingOption,
   AzureADTenant,
   AzureADTenantType,
-  IDPOwnerType,
   Options,
   Provider,
 } from 'src/app/proto/generated/zitadel/idp_pb';
@@ -273,7 +272,7 @@ export class ProviderAzureADComponent {
       this.loading = true;
       this.service
         .updateAzureADProvider(req)
-        .then((idp) => {
+        .then(() => {
           setTimeout(() => {
             this.loading = false;
             this.close();

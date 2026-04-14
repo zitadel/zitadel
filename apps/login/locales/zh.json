@@ -383,6 +383,7 @@
     "userIdMissing": "未提供用户 ID！",
     "successTitle": "用户已验证",
     "successDescription": "用户已成功验证。",
+    "successContinue": "继续",
     "setupAuthenticator": "设置认证器",
     "verify": {
       "title": "验证用户",
