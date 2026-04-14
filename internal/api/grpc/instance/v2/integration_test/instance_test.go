@@ -34,14 +34,10 @@ func TestDeleteInstance(t *testing.T) {
 	instES2 := integration.NewInstance(ctxWithSysAuthZ)
 
 	instRelational := integration.NewInstance(ctxWithSysAuthZ)
-	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
-	})
+	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)})
 	instanceRelationalOwnerCtx := instRelational.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
 	instRelational2 := integration.NewInstance(ctxWithSysAuthZ)
-	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational2, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
-	})
+	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational2, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)})
 
 	type instAndCtx struct {
 		testType string
@@ -175,15 +171,11 @@ func TestUpdateInstance(t *testing.T) {
 
 	// Relational
 	instRelational := integration.NewInstance(ctxWithSysAuthZ)
-	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
-	})
+	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)})
 	instanceOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
 	orgOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
 	inst2Relational := integration.NewInstance(ctxWithSysAuthZ)
-	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, inst2Relational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
-	})
+	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, inst2Relational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)})
 
 	t.Cleanup(func() {
 		instES.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instES.ID()})

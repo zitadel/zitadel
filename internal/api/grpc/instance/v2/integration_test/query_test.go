@@ -36,9 +36,7 @@ func TestGetInstance(t *testing.T) {
 
 	// Relational
 	instRelational := integration.NewInstance(ctxWithSysAuthZ)
-	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
-	})
+	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)})
 	instanceOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
 	organizationOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
 
@@ -271,9 +269,7 @@ func TestListCustomDomains(t *testing.T) {
 
 	// Relational objects
 	instRelational := integration.NewInstance(ctxWithSysAuthZ)
-	integration.EnsureInstanceFeature(t, ctx, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
-	})
+	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)})
 	orgOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
 	instanceOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
 	d1Relational, d2Relational := "custom."+integration.DomainName(), "custom."+integration.DomainName()
@@ -426,9 +422,7 @@ func TestListTrustedDomains(t *testing.T) {
 
 	// Relational objects
 	instRelational := integration.NewInstance(ctxWithSysAuthZ)
-	integration.EnsureInstanceFeature(t, ctx, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
-	})
+	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)})
 	orgOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
 	instanceOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
 	d1Relational, d2Relational := "trusted."+integration.DomainName(), "trusted."+integration.DomainName()

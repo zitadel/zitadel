@@ -5,13 +5,12 @@ import (
 	"testing"
 
 	"github.com/muhlemmer/gu"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 )
 
-func EnsureInstanceFeature(t *testing.T, ctx context.Context, instance *Instance, features *feature.SetInstanceFeaturesRequest, assertFeatures func(t *assert.CollectT, got *feature.GetInstanceFeaturesResponse)) {
+func EnsureInstanceFeature(t *testing.T, ctx context.Context, instance *Instance, features *feature.SetInstanceFeaturesRequest) {
 	ctx = instance.WithAuthorizationToken(ctx, UserTypeIAMOwner)
 	_, err := instance.Client.FeatureV2.SetInstanceFeatures(ctx, features)
 	require.NoError(t, err)
@@ -41,8 +40,6 @@ func RelationalTablesEnableMatrix(t *testing.T, ctx context.Context, sysAuthZ co
 			instOwner := inst.WithAuthorizationToken(ctx, UserTypeIAMOwner)
 			EnsureInstanceFeature(t, ctx, inst, &feature.SetInstanceFeaturesRequest{
 				EnableRelationalTables: gu.Ptr(true),
-			}, func(tt *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-				assert.True(tt, got.GetEnableRelationalTables().GetEnabled(), "expected relational tables to be enabled")
 			})
 			return RelationalTableFeatureMatrix{
 				Name:      "when relational tables are enabled",
