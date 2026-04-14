@@ -28,16 +28,20 @@ CREATE TABLE zitadel.sessions (
 CREATE OR REPLACE FUNCTION zitadel.update_expiration()
     RETURNS TRIGGER AS $$
 BEGIN
-    IF NEW.lifetime IS NOT NULL AND NEW.lifetime <> '0'::interval THEN
-        NEW.expiration := NEW.updated_at + NEW.lifetime;
-    END IF;
+    NEW.expiration := NEW.updated_at + NEW.lifetime;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER set_expiration
-    BEFORE INSERT OR UPDATE OF lifetime ON zitadel.sessions
+CREATE TRIGGER set_expiration_on_update
+    BEFORE UPDATE OF lifetime ON zitadel.sessions
     FOR EACH ROW
+EXECUTE FUNCTION zitadel.update_expiration();
+
+CREATE TRIGGER set_expiration_on_insert
+    BEFORE INSERT ON zitadel.sessions
+    FOR EACH ROW
+    WHEN (NEW.lifetime <> '0'::interval)
 EXECUTE FUNCTION zitadel.update_expiration();
 
 CREATE TYPE zitadel.session_factor_type AS ENUM (
