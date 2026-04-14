@@ -12,6 +12,9 @@ interface CacheEntry {
 
 const cache = new Map<string, CacheEntry>();
 
+/** In-flight promises per cache key to deduplicate concurrent fetches. */
+const inflight = new Map<string, Promise<string[] | undefined>>();
+
 /**
  * Resolves an authentication token from available credential sources.
  * Priority: system user JWT > login client key > service account token.
@@ -38,7 +41,9 @@ async function resolveAuthToken(): Promise<string> {
  * via the Connect protocol (POST + JSON). This avoids the HTTPS self-loopback
  * through the load balancer that caused TLS errors on Cloud Run.
  *
- * Results are cached in-memory for 1 hour per instance host.
+ * Results are cached in-memory for 1 hour per instance host. Concurrent
+ * requests that arrive while a fetch is in-flight share the same promise
+ * to prevent thundering-herd stampedes on the backend.
  *
  * @param baseUrl - The ZITADEL API base URL (ZITADEL_API_URL)
  * @param instanceHost - Optional instance host for multi-tenant deployments
@@ -52,11 +57,24 @@ export async function getIframeOrigins(baseUrl: string, instanceHost?: string): 
     return cached.origins;
   }
 
-  const origins = await fetchIframeOrigins(baseUrl, instanceHost);
+  // Deduplicate concurrent fetches for the same key
+  const existing = inflight.get(cacheKey);
+  if (existing) {
+    return existing;
+  }
 
-  cache.set(cacheKey, { origins, expiresAt: Date.now() + CACHE_TTL_MS });
+  const promise = fetchIframeOrigins(baseUrl, instanceHost).then((origins) => {
+    cache.set(cacheKey, { origins, expiresAt: Date.now() + CACHE_TTL_MS });
+    inflight.delete(cacheKey);
+    return origins;
+  }).catch((err) => {
+    inflight.delete(cacheKey);
+    throw err;
+  });
 
-  return origins;
+  inflight.set(cacheKey, promise);
+
+  return promise;
 }
 
 async function fetchIframeOrigins(baseUrl: string, instanceHost?: string): Promise<string[] | undefined> {

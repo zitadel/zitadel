@@ -34,7 +34,7 @@ import { getTranslations } from "next-intl/server";
 import { getUserAgent } from "./fingerprint";
 import { createLogger } from "./logger";
 
-import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
+import { errorClassificationInterceptor, isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { otelGrpcInterceptor } from "@/lib/grpc/interceptors/otel";
 import { Code, Interceptor } from "@connectrpc/connect";
 import { PromiseCache } from "./cache";
@@ -1393,6 +1393,6 @@ export function createServerTransport(token: string, serviceConfig: ServiceConfi
   return createConnectTransport({
     httpVersion: "1.1",
     baseUrl: serviceConfig.baseUrl,
-    interceptors: [otelGrpcInterceptor, authorizationInterceptor, headerInterceptor],
+    interceptors: [otelGrpcInterceptor, errorClassificationInterceptor, authorizationInterceptor, headerInterceptor],
   });
 }
