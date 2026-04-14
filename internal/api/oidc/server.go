@@ -39,7 +39,7 @@ type Server struct {
 	fallbackLogger            *slog.Logger
 	hasher                    *crypto.Hasher
 	signingKeyAlgorithm       string
-	encAlg                    crypto.EncryptionAlgorithm
+	encAlg                    crypto.AuthAlgorithm
 	targetEncryptionAlgorithm crypto.EncryptionAlgorithm
 	opCrypto                  op.Crypto
 

@@ -14,7 +14,6 @@ import {
   GetPreviewLabelPolicyResponse as MgmtGetPreviewLabelPolicyResponse,
   UpdateCustomLabelPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
-import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LabelPolicy, ThemeMode } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { AssetEndpoint, AssetService, AssetType } from 'src/app/services/asset.service';
@@ -724,7 +723,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
         try {
           const font = opentype.parse(e.target.result);
           this.fontName = font.names.fullName['en'];
-        } catch (e) {
+        } catch {
           this.fontName = 'Could not parse font name';
         }
       }

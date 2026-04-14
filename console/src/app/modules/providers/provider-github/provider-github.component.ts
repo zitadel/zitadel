@@ -213,7 +213,7 @@ export class ProviderGithubComponent {
       this.loading = true;
       this.service
         .updateGitHubProvider(req)
-        .then((idp) => {
+        .then(() => {
           setTimeout(() => {
             this.loading = false;
             this.close();

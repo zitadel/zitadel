@@ -44,6 +44,18 @@ func Test_toGRPCError(t *testing.T) {
 			wantCode: codes.FailedPrecondition,
 		},
 		{
+			name: "grpc status error",
+			args: args{
+				ctx: context.Background(),
+				req: &mockReq{},
+				handler: func(context.Context, any) (any, error) {
+					return nil, status.Error(codes.Unauthenticated, "auth header missing")
+				},
+			},
+			want:     nil,
+			wantCode: codes.Unauthenticated,
+		},
+		{
 			name: "panic with string",
 			args: args{
 				ctx:     context.Background(),

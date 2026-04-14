@@ -1,27 +1,28 @@
-import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, inject } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 
 import { InfoSectionType } from '../info-section/info-section.component';
+import { TranslateModule } from '@ngx-translate/core';
+import { MatButtonModule } from '@angular/material/button';
+
+export type InfoDialogData = {
+  confirmKey: string;
+  cancelKey: string;
+  titleKey: string;
+  descriptionKey: string;
+};
+
+export type InfoDialogResult = boolean;
 
 @Component({
   selector: 'cnsl-info-dialog',
   templateUrl: './info-dialog.component.html',
   styleUrls: ['./info-dialog.component.scss'],
-  standalone: false,
+  imports: [TranslateModule, MatDialogModule, MatButtonModule],
 })
 export class InfoDialogComponent {
-  public confirm: string = '';
-  InfoSectionType: any = InfoSectionType;
-  constructor(
-    public dialogRef: MatDialogRef<InfoDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-  ) {}
+  protected readonly InfoSectionType = InfoSectionType;
 
-  public closeDialog(): void {
-    this.dialogRef.close(false);
-  }
-
-  public closeDialogWithSuccess(): void {
-    this.dialogRef.close(true);
-  }
+  protected readonly dialogRef = inject<MatDialogRef<InfoDialogComponent>>(MatDialogRef);
+  protected readonly data = inject<InfoDialogData>(MAT_DIALOG_DATA);
 }

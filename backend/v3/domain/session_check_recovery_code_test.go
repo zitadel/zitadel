@@ -69,7 +69,7 @@ func TestRecoveryCodeCheckCommand_Validate(t *testing.T) {
 					Return(nil, &database.NoRowFoundError{})
 				return sessionRepo
 			},
-			wantErr: zerrors.ThrowNotFound(&database.NoRowFoundError{}, "DOM-Ot3qO6", "Errors.Session.NotFound"),
+			wantErr: zerrors.ThrowNotFound(&database.NoRowFoundError{}, "DOM-2sF2kF", "Session not found"),
 		},
 		{
 			name:       "failed to get session - database error",
@@ -85,7 +85,7 @@ func TestRecoveryCodeCheckCommand_Validate(t *testing.T) {
 					Return(nil, getError)
 				return sessionRepo
 			},
-			wantErr: zerrors.ThrowInternal(getError, "DOM-2sF2kF", "Errors.Internal"),
+			wantErr: zerrors.ThrowInternal(getError, "DOM-2sF2kF", "failed fetching Session"),
 		},
 		{
 			name:       "missing user id in session",
@@ -126,7 +126,7 @@ func TestRecoveryCodeCheckCommand_Validate(t *testing.T) {
 					Return(nil, &database.NoRowFoundError{})
 				return userRepo
 			},
-			wantErr: zerrors.ThrowNotFound(&database.NoRowFoundError{}, "DOM-Ot3qO6", "Errors.User.NotFound"),
+			wantErr: zerrors.ThrowNotFound(&database.NoRowFoundError{}, "DOM-Ot3qO6", "User not found"),
 		},
 		{
 			name:       "failed to get user - database error",
@@ -151,7 +151,7 @@ func TestRecoveryCodeCheckCommand_Validate(t *testing.T) {
 					Return(nil, getError)
 				return userRepo
 			},
-			wantErr: zerrors.ThrowInternal(getError, "DOM-7sWTNf", "Errors.Internal"),
+			wantErr: zerrors.ThrowInternal(getError, "DOM-Ot3qO6", "failed fetching User"),
 		},
 		{
 			name:       "user is locked",
@@ -435,7 +435,10 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 				getSessionSucceededExpectation(sessionRepo)
 
 				// set up expectation to update session in Execute()
-				updateSessionFailedExpectation(sessionRepo, dbError, 0)
+				factor := sessionRepo.SetFactor(&domain.SessionFactorRecoveryCode{
+					LastFailedAt: time.Now(),
+				})
+				updateSessionFailedExpectation(sessionRepo, factor, dbError, 0)
 				return sessionRepo
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
@@ -473,7 +476,10 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 				getSessionSucceededExpectation(sessionRepo)
 
 				// set up expectation to update session in Execute()
-				updateSessionFailedExpectation(sessionRepo, nil, 0)
+				factor := sessionRepo.SetFactor(&domain.SessionFactorRecoveryCode{
+					LastFailedAt: time.Now(),
+				})
+				updateSessionFailedExpectation(sessionRepo, factor, nil, 0)
 				return sessionRepo
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
@@ -511,7 +517,10 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 				getSessionSucceededExpectation(sessionRepo)
 
 				// set up expectation to update session in Execute()
-				updateSessionFailedExpectation(sessionRepo, nil, 2)
+				factor := sessionRepo.SetFactor(&domain.SessionFactorRecoveryCode{
+					LastFailedAt: time.Now(),
+				})
+				updateSessionFailedExpectation(sessionRepo, factor, nil, 2)
 				return sessionRepo
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
@@ -746,7 +755,10 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 				getSessionSucceededExpectation(sessionRepo)
 
 				// set up expectation to update session in Execute()
-				updateSessionFailedExpectation(sessionRepo, dbError, 0)
+				factor := sessionRepo.SetFactor(&domain.SessionFactorRecoveryCode{
+					LastFailedAt: time.Now(),
+				})
+				updateSessionFailedExpectation(sessionRepo, factor, dbError, 0)
 				return sessionRepo
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
@@ -787,7 +799,10 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 				getSessionSucceededExpectation(sessionRepo)
 
 				// set up expectation to update session in Execute()
-				updateSessionFailedExpectation(sessionRepo, nil, 0)
+				factor := sessionRepo.SetFactor(&domain.SessionFactorRecoveryCode{
+					LastFailedAt: time.Now(),
+				})
+				updateSessionFailedExpectation(sessionRepo, factor, nil, 0)
 				return sessionRepo
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
@@ -828,7 +843,10 @@ func TestRecoveryCodeCheckCommand_Execute(t *testing.T) {
 				getSessionSucceededExpectation(sessionRepo)
 
 				// set up expectation to update session in Execute()
-				updateSessionFailedExpectation(sessionRepo, nil, 2)
+				factor := sessionRepo.SetFactor(&domain.SessionFactorRecoveryCode{
+					LastFailedAt: time.Now(),
+				})
+				updateSessionFailedExpectation(sessionRepo, factor, nil, 2)
 				return sessionRepo
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.UserRepository {
@@ -1302,30 +1320,11 @@ func updateHumanUserFailedExpectation(ctrl *gomock.Controller, userRepo *domainm
 		userUpdates = append(userUpdates, humanRepo.SetState(domain.UserStateLocked))
 	}
 	userRepo.EXPECT().Human().Times(1).Return(humanRepo)
-	if err != nil {
-		humanRepo.EXPECT().
-			Update(gomock.Any(), gomock.Any(), primaryKeyCondition, userUpdates).
-			Times(1).
-			Return(int64(0), err)
-		return
-	}
-	switch updateCount {
-	case 0:
-		humanRepo.EXPECT().
-			Update(gomock.Any(), gomock.Any(), primaryKeyCondition, userUpdates).
-			Times(1).
-			Return(int64(0), nil)
-	case 1:
-		humanRepo.EXPECT().
-			Update(gomock.Any(), gomock.Any(), primaryKeyCondition, userUpdates).
-			Times(1).
-			Return(int64(1), nil)
-	default:
-		humanRepo.EXPECT().
-			Update(gomock.Any(), gomock.Any(), primaryKeyCondition, userUpdates).
-			Times(1).
-			Return(updateCount, nil)
-	}
+
+	humanRepo.EXPECT().
+		Update(gomock.Any(), gomock.Any(), primaryKeyCondition, userUpdates).
+		Times(1).
+		Return(updateCount, err)
 }
 
 func getUserSucceededExpectation(userRepo *domainmock.UserRepo, failedAttempts uint8) {
@@ -1356,37 +1355,12 @@ func updateSessionSucceededExpectation(sessionRepo *domainmock.SessionRepo, chan
 		Return(int64(1), nil)
 }
 
-func updateSessionFailedExpectation(sessionRepo *domainmock.SessionRepo, err error, updateCount int64) {
+func updateSessionFailedExpectation(sessionRepo *domainmock.SessionRepo, change database.Change, err error, updateCount int64) {
 	primaryKeyCondition := sessionRepo.PrimaryKeyCondition("instance-1", "session-1")
-	factor := sessionRepo.SetFactor(&domain.SessionFactorRecoveryCode{
-		LastFailedAt: time.Now(),
-	})
-
-	if err != nil {
-		sessionRepo.EXPECT().
-			Update(gomock.Any(), gomock.Any(), primaryKeyCondition, factor).
-			Times(1).
-			Return(int64(0), err)
-		return
-	}
-
-	switch updateCount {
-	case 0:
-		sessionRepo.EXPECT().
-			Update(gomock.Any(), gomock.Any(), primaryKeyCondition, factor).
-			Times(1).
-			Return(int64(0), nil)
-	case 1:
-		sessionRepo.EXPECT().
-			Update(gomock.Any(), gomock.Any(), primaryKeyCondition, factor).
-			Times(1).
-			Return(int64(1), nil)
-	default:
-		sessionRepo.EXPECT().
-			Update(gomock.Any(), gomock.Any(), primaryKeyCondition, factor).
-			Times(1).
-			Return(updateCount, nil)
-	}
+	sessionRepo.EXPECT().
+		Update(gomock.Any(), gomock.Any(), primaryKeyCondition, change).
+		Times(1).
+		Return(updateCount, err)
 }
 
 func getSessionSucceededExpectation(sessionRepo *domainmock.SessionRepo) {
@@ -1394,7 +1368,11 @@ func getSessionSucceededExpectation(sessionRepo *domainmock.SessionRepo) {
 	sessionRepo.EXPECT().
 		Get(gomock.Any(), gomock.Any(), dbmock.QueryOptions(database.WithCondition(primaryKeyCondition))).
 		Times(1).
-		Return(&domain.Session{UserID: "user-1"}, nil)
+		Return(&domain.Session{
+			UserID:     "user-1",
+			InstanceID: "instance-1",
+			ID:         "session-1",
+		}, nil)
 }
 
 func getLockoutSettingsSucceededExpectation(instanceID, orgID string, lockoutRepo *domainmock.LockoutSettingsRepo) {

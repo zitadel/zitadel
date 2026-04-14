@@ -164,7 +164,7 @@ func (c *orgSetupCommands) setupOrgAdminMachine(orgAgg *org.Aggregate, machine *
 		}
 		pat.TokenID = tokenID
 		c.pats = append(c.pats, pat)
-		c.validations = append(c.validations, prepareAddPersonalAccessToken(pat, c.commands.keyAlgorithm))
+		c.validations = append(c.validations, prepareAddPersonalAccessToken(pat, c.commands.authAlgorithm))
 	}
 	if machine.MachineKey != nil {
 		machineKey = NewMachineKey(orgAgg.ID, machine.Machine.AggregateID, machine.MachineKey.ExpirationDate, machine.MachineKey.Type)
@@ -325,6 +325,26 @@ func (c *Commands) getOrg(ctx context.Context, orgID string) (*domain.Org, error
 		return nil, zerrors.ThrowInternal(err, "COMMAND-4M9sf", "Errors.Org.NotFound")
 	}
 	return orgWriteModelToOrg(writeModel), nil
+}
+
+func checkOrgExistsInPreparation(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) error {
+	orgWriteModel := NewOrgWriteModel(orgID)
+
+	events, err := filter(ctx, orgWriteModel.Query())
+	if err != nil {
+		return err
+	}
+
+	orgWriteModel.AppendEvents(events...)
+	if err = orgWriteModel.Reduce(); err != nil {
+		return err
+	}
+
+	if !isOrgStateExists(orgWriteModel.State) {
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-QXPGs", "Errors.Org.NotFound")
+	}
+
+	return nil
 }
 
 func (c *Commands) checkOrgExists(ctx context.Context, orgID string) error {

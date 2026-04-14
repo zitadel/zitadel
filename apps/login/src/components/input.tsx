@@ -59,7 +59,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     const actualRoundness = roundness || getDefaultInputRoundness();
 
     return (
-      <label className="relative flex flex-col text-12px text-input-light-label dark:text-input-dark-label">
+      <label className="text-12px text-input-light-label dark:text-input-dark-label relative flex flex-col">
         <span className={`mb-1 leading-3 ${error ? "text-warn-light-500 dark:text-warn-dark-500" : ""}`}>
           {label} {required && "*"}
         </span>
@@ -80,7 +80,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
         {suffix && (
           <span
             className={clsx(
-              "absolute bottom-[22px] right-[3px] z-30 translate-y-1/2 transform bg-background-light-500 p-2 dark:bg-background-dark-500",
+              "bg-background-light-500 dark:bg-background-dark-500 absolute right-[3px] bottom-[22px] z-30 translate-y-1/2 transform p-2",
               // Extract just the roundness part for the suffix (no padding)
               actualRoundness.split(" ")[0], // Take only the first part (rounded-full, rounded-md, etc.)
             )}
@@ -89,7 +89,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           </span>
         )}
 
-        <div className="leading-14.5px h-14.5px flex flex-row items-center text-12px text-warn-light-500 dark:text-warn-dark-500">
+        <div className="leading-14.5px h-14.5px text-12px text-warn-light-500 dark:text-warn-dark-500 flex flex-row items-center">
           <span>{error ? error : " "}</span>
         </div>
 

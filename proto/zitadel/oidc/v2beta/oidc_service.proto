@@ -210,10 +210,10 @@ message Session {
   ];
 
   string session_token = 2 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
+    (validate.rules).string = {min_len: 1, max_len: 500},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 200;
+      max_length: 500;
       description: "Token to verify the session is valid";
     }
   ];

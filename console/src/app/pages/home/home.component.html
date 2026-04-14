@@ -4,12 +4,11 @@
   <div class="home-wrapper enlarged-container">
     <cnsl-quickstart></cnsl-quickstart>
 
-    <ng-container *ngIf="['iam.read$'] | hasRole | async; else defaultHome">
+    @if (['iam.read$'] | hasRole | async) {
       <cnsl-onboarding />
-    </ng-container>
-    <ng-template #defaultHome>
+    } @else {
       <cnsl-shortcuts />
-    </ng-template>
+    }
 
     <span class="fill-space"></span>
     <h2 class="home-desc">{{ 'ONBOARDING.MOREDESCRIPTION' | translate }}</h2>

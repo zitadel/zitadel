@@ -95,7 +95,7 @@ export function LDAPUsernamePasswordForm({
         data-testid="username-text-input"
       />
 
-      <div className={`${error && "transform-gpu animate-shake"}`}>
+      <div className={`${error && "animate-shake transform-gpu"}`}>
         <TextInput
           type="password"
           autoComplete="password"

@@ -34,6 +34,9 @@ func TestAddDomain(t *testing.T) {
 	}
 
 	agg := org.NewAggregate("test")
+	noEvents := func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+		return nil, nil
+	}
 
 	tests := []struct {
 		name string
@@ -58,19 +61,47 @@ func TestAddDomain(t *testing.T) {
 				a:              agg,
 				domain:         "domain",
 				claimedUserIDs: []string{"userID1"},
-				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-					return []eventstore.Event{
-						org.NewDomainPolicyAddedEvent(ctx, &agg.Aggregate, true, true, true),
-					}, nil
+				filter: NewMultiFilter().
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							org.NewOrgAddedEvent(ctx, &agg.Aggregate, "org"),
+						}, nil
+					}).
+					Append(noEvents).
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							org.NewDomainPolicyAddedEvent(ctx, &agg.Aggregate, true, true, true),
+						}, nil
+					}).
+					Filter(),
+				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					org.NewDomainAddedEvent(context.Background(), &agg.Aggregate, "domain"),
 				},
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
-								"org"),
-						),
-					),
-				),
+			},
+		},
+		{
+			name: "correct when org exists only in the current preparation",
+			args: args{
+				a:      agg,
+				domain: "domain",
+				filter: NewMultiFilter().
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							org.NewOrgAddedEvent(ctx, &agg.Aggregate, "org"),
+						}, nil
+					}).
+					Append(noEvents).
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							org.NewDomainPolicyAddedEvent(ctx, &agg.Aggregate, true, true, true),
+						}, nil
+					}).
+					Filter(),
+				eventstore: expectEventstore(),
 				loginPaths: expectLoginPathsNoCall,
 			},
 			want: Want{
@@ -86,41 +117,41 @@ func TestAddDomain(t *testing.T) {
 				domain:         "domain",
 				claimedUserIDs: []string{"userID1"},
 				idGenerator:    id_mock.ExpectID(t, "newID"),
-				filter: func() func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-					i := 0 //TODO: we should fix this in the future to use some kind of mock struct and expect filter calls
-					return func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-						if i == 2 {
-							i++
-							return []eventstore.Event{user.NewHumanAddedEvent(
-								ctx,
-								&user.NewAggregate("userID1", "org2").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.Und,
-								domain.GenderUnspecified,
-								"email",
-								false,
-							)}, nil
-						}
-						if i == 3 {
-							i++
-							return []eventstore.Event{org.NewDomainPolicyAddedEvent(ctx, &agg.Aggregate, false, false, false)}, nil
-						}
-						i++
-						return []eventstore.Event{org.NewDomainPolicyAddedEvent(ctx, &agg.Aggregate, true, false, false)}, nil
-					}
-				}(),
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
-								"org"),
-						),
-					),
-				),
+				filter: NewMultiFilter().
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							org.NewOrgAddedEvent(ctx, &agg.Aggregate, "org"),
+						}, nil
+					}).
+					Append(noEvents).
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							org.NewDomainPolicyAddedEvent(ctx, &agg.Aggregate, false, false, false),
+						}, nil
+					}).
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{user.NewHumanAddedEvent(
+							ctx,
+							&user.NewAggregate("userID1", "org2").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Und,
+							domain.GenderUnspecified,
+							"email",
+							false,
+						)}, nil
+					}).
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							org.NewDomainPolicyAddedEvent(ctx, &org.NewAggregate("org2").Aggregate, false, false, false),
+						}, nil
+					}).
+					Append(noEvents).
+					Filter(),
+				eventstore: expectEventstore(),
 				loginPaths: expectLoginPathsDefaultDomainClaimedURLTemplate(""),
 			},
 			want: Want{
@@ -137,21 +168,21 @@ func TestAddDomain(t *testing.T) {
 				a:              agg,
 				domain:         "domain",
 				claimedUserIDs: []string{"userID1"},
-				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-					return []eventstore.Event{
-						org.NewDomainAddedEvent(ctx, &agg.Aggregate, "domain"),
-						org.NewDomainVerificationAddedEvent(ctx, &agg.Aggregate, "domain", domain.OrgDomainValidationTypeHTTP, nil),
-						org.NewDomainVerifiedEvent(ctx, &agg.Aggregate, "domain"),
-					}, nil
-				},
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
-								"org"),
-						),
-					),
-				),
+				filter: NewMultiFilter().
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							org.NewOrgAddedEvent(ctx, &agg.Aggregate, "org"),
+						}, nil
+					}).
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							org.NewDomainAddedEvent(ctx, &agg.Aggregate, "domain"),
+							org.NewDomainVerificationAddedEvent(ctx, &agg.Aggregate, "domain", domain.OrgDomainValidationTypeHTTP, nil),
+							org.NewDomainVerifiedEvent(ctx, &agg.Aggregate, "domain"),
+						}, nil
+					}).
+					Filter(),
+				eventstore: expectEventstore(),
 				loginPaths: expectLoginPathsNoCall,
 			},
 			want: Want{
@@ -179,19 +210,20 @@ func TestAddDomain(t *testing.T) {
 				a:              agg,
 				domain:         "domain",
 				claimedUserIDs: []string{"userID1"},
-				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-					return []eventstore.Event{
-						org.NewDomainPolicyAddedEvent(ctx, &agg.Aggregate, true, true, true),
-					}, nil
-				},
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
-								"org"),
-						),
-					),
-				),
+				filter: NewMultiFilter().
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							org.NewOrgAddedEvent(ctx, &agg.Aggregate, "org"),
+						}, nil
+					}).
+					Append(noEvents).
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							org.NewDomainPolicyAddedEvent(ctx, &agg.Aggregate, true, true, true),
+						}, nil
+					}).
+					Filter(),
+				eventstore:      expectEventstore(),
 				loginPaths:      expectLoginPathsNoCall,
 				permissionCheck: newMockOrganizationPermissionCheckAllowed(),
 			},

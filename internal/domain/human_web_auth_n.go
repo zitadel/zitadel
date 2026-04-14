@@ -62,13 +62,13 @@ func GetTokenToVerify(tokens []*WebAuthNToken) (int, *WebAuthNToken) {
 	return -1, nil
 }
 
-func GetTokenByKeyID(tokens []*WebAuthNToken, keyID []byte) (int, *WebAuthNToken) {
-	for i, token := range tokens {
-		if bytes.Compare(token.KeyID, keyID) == 0 {
-			return i, token
+func GetTokenByKeyID(tokens []*WebAuthNToken, keyID []byte) *WebAuthNToken {
+	for _, token := range tokens {
+		if bytes.Equal(token.KeyID, keyID) {
+			return token
 		}
 	}
-	return -1, nil
+	return nil
 }
 
 type PasswordlessInitCodeState int32
