@@ -2582,7 +2582,7 @@ func (p *idpTemplateProjection) reduceZitadelIDPAdded(event eventstore.Event) (*
 		idpEvent = e.ZitadelIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeOrg
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ZCpH41", "reduce.wrong.event.type %v", []eventstore.EventType{instance.ZitadelIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ZCpH41", "reduce.wrong.event.type %v", []eventstore.EventType{instance.ZitadelIDPAddedEventType, org.ZitadelIDPAddedEventType})
 	}
 
 	zitadelIDPCols := []handler.Column{
