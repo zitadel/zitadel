@@ -548,16 +548,14 @@ func signatureAlgorithmToCommand(signatureAlgorithm idp_pb.SAMLSignatureAlgorith
 }
 
 func addZitadelProviderToCommand(req *admin_pb.AddZitadelProviderRequest) command.ZitadelProvider {
-	var instanceRolesInfo []idp.RolesInfo
-	if len(req.InstanceRolesInfo) > 0 {
-		instanceRolesInfo = make([]idp.RolesInfo, 0, len(req.InstanceRolesInfo))
-		for _, info := range req.InstanceRolesInfo {
-			instanceRolesInfo = append(instanceRolesInfo, idp.RolesInfo{
-				OrganizationID:     info.OrganizationId,
-				OrganizationDomain: info.OrganizationDomain,
-			})
-		}
+	instanceRolesInfo := make([]idp.RolesInfo, 0, len(req.InstanceRolesInfo))
+	for _, info := range req.InstanceRolesInfo {
+		instanceRolesInfo = append(instanceRolesInfo, idp.RolesInfo{
+			OrganizationID:     info.OrganizationId,
+			OrganizationDomain: info.OrganizationDomain,
+		})
 	}
+
 	return command.ZitadelProvider{
 		Name:              req.Name,
 		Issuer:            req.Issuer,
