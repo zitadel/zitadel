@@ -1,8 +1,6 @@
 package admin
 
 import (
-	"strings"
-
 	"github.com/crewjam/saml"
 	"github.com/muhlemmer/gu"
 	dsig "github.com/russellhaering/goxmldsig"
@@ -553,10 +551,11 @@ func addZitadelProviderToCommand(req *admin_pb.AddZitadelProviderRequest) comman
 	instanceRolesInfo := make([]idp.RolesInfo, 0, len(req.InstanceRolesInfo))
 	for _, info := range req.InstanceRolesInfo {
 		instanceRolesInfo = append(instanceRolesInfo, idp.RolesInfo{
-			OrganizationID:     strings.TrimSpace(info.OrganizationId),
-			OrganizationDomain: strings.TrimSpace(info.OrganizationDomain),
+			OrganizationID:     info.OrganizationId,
+			OrganizationDomain: info.OrganizationDomain,
 		})
 	}
+
 	return command.ZitadelProvider{
 		Name:              req.Name,
 		Issuer:            req.Issuer,
