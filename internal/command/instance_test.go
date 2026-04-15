@@ -1053,6 +1053,7 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 				zitadelRoles:       tt.fields.roles,
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				keyAlgorithm:       tt.fields.keyAlgorithm,
+				authAlgorithm:      &mockAuthCrypto{},
 			}
 			validations := make([]preparation.Validation, 0)
 			owner, pat, mk, loginClientPat, err := setupAdmins(r, &validations, tt.args.instanceAgg, tt.args.orgAgg, tt.args.machine, tt.args.human, tt.args.loginClient)
@@ -1223,6 +1224,7 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 				zitadelRoles:       tt.fields.roles,
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				keyAlgorithm:       tt.fields.keyAlgorithm,
+				authAlgorithm:      &mockAuthCrypto{},
 			}
 			validations := make([]preparation.Validation, 0)
 			pat, mk, loginClientPat, err := setupDefaultOrg(tt.args.ctx, r, &validations, tt.args.instanceAgg, tt.args.orgName, tt.args.machine, tt.args.human, tt.args.loginClient, tt.args.ids)
@@ -1395,6 +1397,7 @@ func TestCommandSide_setUpInstance(t *testing.T) {
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				keyAlgorithm:       tt.fields.keyAlgorithm,
 				GenerateDomain:     tt.fields.generateDomain,
+				authAlgorithm:      &mockAuthCrypto{},
 			}
 
 			validations, pat, mk, loginClientPat, err := setUpInstance(tt.args.ctx, r, tt.args.setup)
