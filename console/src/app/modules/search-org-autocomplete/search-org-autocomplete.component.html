@@ -4,7 +4,7 @@
     <input
       cnslInput
       type="text"
-      class="max-w-125"
+      class="tw:max-w-125"
       [matAutocomplete]="auto"
       [formControl]="searchControl"
       name="name"
@@ -19,21 +19,21 @@
       [autoActiveFirstOption]="true"
       (optionSelected)="searchControl.value && selectionChanged.emit(searchControl.value)"
     >
-      <div cnslScrollable class="overflow-y-scroll max-h-full" (scrollPosition)="onScroll($event)">
+      <div cnslScrollable class="tw:overflow-y-scroll tw:max-h-full" (scrollPosition)="onScroll($event)">
         @for (page of query.data()?.pages; track $index) {
           @for (org of page.result; track org.id) {
             <mat-option
-              class="max-w-full relative"
+              class="tw:max-w-full tw:relative"
               [value]="org"
               data-e2e="org-option"
               [matTooltip]="name.scrollWidth > name.clientWidth ? org.name : ''"
             >
               <div
-                class="absolute inset-0 pl-4 pr-4 flex h-full w-full min-w-0 flex-col justify-center"
+                class="tw:absolute tw:inset-0 tw:pl-4 tw:pr-4 tw:flex tw:h-full tw:w-full tw:min-w-0 tw:flex-col tw:justify-center"
                 data-e2e="org-option"
               >
-                <span #name class="block truncate">{{ org.name }}</span>
-                <span class="block truncate text-[13px] text-gray-500">{{ org.primaryDomain }}</span>
+                <span #name class="tw:block tw:truncate">{{ org.name }}</span>
+                <span class="tw:block tw:truncate tw:text-[13px] tw:text-gray-500">{{ org.primaryDomain }}</span>
               </div>
             </mat-option>
           }
