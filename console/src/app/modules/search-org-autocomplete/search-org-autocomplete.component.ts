@@ -25,6 +25,8 @@ import { MessageInitShape } from '@bufbuild/protobuf';
 import { MatTooltip } from '@angular/material/tooltip';
 import { requiredValidator } from '../form-field/validators/validators';
 import { ScrollableDirective } from '../../directives/scrollable/scrollable.directive';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { debounceTime } from 'rxjs';
 
 @Component({
   selector: 'cnsl-search-org-autocomplete',
@@ -50,6 +52,9 @@ export class SearchOrgAutocompleteComponent {
 
   protected readonly searchControl = new FormControl<Org | null>(null, { validators: [requiredValidator] });
   protected readonly searchSignal = signal('');
+  protected readonly debouncedSearchSignal = toSignal(toObservable(this.searchSignal).pipe(debounceTime(250)), {
+    initialValue: this.searchSignal(),
+  });
 
   private readonly matAutocompleteSignal = viewChild<MatAutocomplete, ElementRef<Element>>(MatAutocomplete, {
     read: ElementRef,
@@ -74,7 +79,7 @@ export class SearchOrgAutocompleteComponent {
   }
 
   protected readonly query = injectInfiniteQuery(() => {
-    const search = this.searchSignal();
+    const search = this.debouncedSearchSignal();
 
     const stateQuery = [
       {
