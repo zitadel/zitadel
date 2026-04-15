@@ -24,7 +24,7 @@ import (
 )
 
 var (
-	armPasskey  = []string{oidc_api.UserPresence, oidc_api.MFA}
+	armPasskey  = oidc.AuthenticationMethodsReferences{oidc_api.UserPresence, oidc_api.MFA}
 	armPassword = []string{oidc_api.PWD}
 )
 
@@ -697,7 +697,7 @@ func assertTokens(t *testing.T, tokens *oidc.Tokens[*oidc.IDTokenClaims], requir
 	assert.Empty(t, tokens.Extra("state"))
 }
 
-func assertIDTokenClaims(t *testing.T, claims *oidc.IDTokenClaims, userID string, arm []string, sessionStart, sessionChange time.Time, sessionID string) {
+func assertIDTokenClaims(t *testing.T, claims *oidc.IDTokenClaims, userID string, arm oidc.AuthenticationMethodsReferences, sessionStart, sessionChange time.Time, sessionID string) {
 	assert.Equal(t, userID, claims.Subject)
 	assert.Equal(t, arm, claims.AuthenticationMethodsReferences)
 	assertOIDCTimeRange(t, claims.AuthTime, sessionStart, sessionChange)
