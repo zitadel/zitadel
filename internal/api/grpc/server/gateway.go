@@ -132,6 +132,7 @@ func CreateGatewayWithPrefix(
 			client_middleware.UnaryActivityClientInterceptor(),
 		),
 		grpc.WithStatsHandler(client_middleware.DefaultTracingClient()),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(10 * 1024 * 1024)), // Increase to 10MB for exports
 	}
 	connection, err := dial(ctx, port, opts)
 	if err != nil {
@@ -159,6 +160,7 @@ func CreateGateway(
 				client_middleware.UnaryActivityClientInterceptor(),
 			),
 			grpc.WithStatsHandler(client_middleware.DefaultTracingClient()),
+			grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(10 * 1024 * 1024)), // Increase to 10MB for exports
 		})
 	if err != nil {
 		return nil, err
