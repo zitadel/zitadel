@@ -88,7 +88,7 @@
   }
 
   .no-content-row {
-    background-color: if($is-dark-theme, #ffffff10, #f4f4f470);
+    background-color: if(sass($is-dark-theme): #ffffff10; else: #f4f4f470);
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     display: flex;
@@ -137,7 +137,7 @@
     }
 
     &.neutral {
-      background: if($is-dark-theme, #01489c78, #47a8ff82);
+      background: if(sass($is-dark-theme): #01489c78; else: #47a8ff82);
       color: if(sass($is-dark-theme): #47a8ff; else: #01489c);
     }
   }
