@@ -29,11 +29,11 @@ export function AuthenticationMethodRadio({
                 value={method}
                 data-testid={method + "-radio"}
                 className={({ focus, checked }) =>
-                  `${focus ? "ring-2 ring-primary-light-500 ring-opacity-60 dark:ring-white/20" : ""} ${
+                  `${focus ? "ring-primary-light-500 ring-opacity-60 ring-2 dark:ring-white/20" : ""} ${
                     checked
-                      ? "bg-background-light-400 ring-2 ring-primary-light-500 dark:bg-background-dark-400 dark:ring-primary-dark-500"
+                      ? "bg-background-light-400 ring-primary-light-500 dark:bg-background-dark-400 dark:ring-primary-dark-500 ring-2"
                       : "bg-background-light-400 dark:bg-background-dark-400"
-                  } boder-divider-light relative flex h-full flex-1 cursor-pointer rounded-lg border px-5 py-4 hover:shadow-lg focus:outline-none dark:border-divider-dark dark:hover:bg-white/10`
+                  } boder-divider-light dark:border-divider-dark relative flex h-full flex-1 cursor-pointer rounded-lg border px-5 py-4 hover:shadow-lg focus:outline-none dark:hover:bg-white/10`
                 }
               >
                 <div className="flex w-full flex-col items-center text-sm">

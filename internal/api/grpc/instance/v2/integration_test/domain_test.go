@@ -43,6 +43,9 @@ func TestAddCustomDomain(t *testing.T) {
 		relationalInst.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: relationalInst.ID()})
 	})
 
+	// ugly fix to wait until instances are projected in all read models.
+	time.Sleep(10 * time.Second)
+
 	type instanceAndCtx struct {
 		testType string
 		instance *integration.Instance

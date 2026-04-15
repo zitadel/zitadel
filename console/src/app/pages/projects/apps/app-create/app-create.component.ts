@@ -158,7 +158,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
       acsURL: ['', []],
     });
 
-    this.firstFormGroup.valueChanges.subscribe((value) => {
+    this.firstFormGroup.valueChanges.subscribe(() => {
       if (this.firstFormGroup.valid) {
         this.oidcAppRequest.setName(this.name?.value);
         this.apiAppRequest.setName(this.name?.value);
@@ -380,7 +380,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         this.toast.showInfo('POLICY.PRIVATELABELING.MAXSIZEEXCEEDED', true);
       } else {
         const reader = new FileReader();
-        reader.onload = ((aXML) => {
+        reader.onload = (() => {
           return (e) => {
             const xmlBase64 = e.target?.result;
             if (xmlBase64 && typeof xmlBase64 === 'string') {
@@ -388,7 +388,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
               this.samlAppRequest.setMetadataXml(cropped);
             }
           };
-        })(file);
+        })();
         reader.readAsDataURL(file);
       }
     }

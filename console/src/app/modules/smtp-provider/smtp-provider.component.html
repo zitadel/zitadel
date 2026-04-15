@@ -215,22 +215,23 @@
               />
             </cnsl-form-field>
 
-            <div class="is-loading" *ngIf="testEmailConfigurationMutation.isPending()">
-              <mat-spinner diameter="50"></mat-spinner>
-            </div>
+            @if (testEmailConfigurationMutation.isPending()) {
+              <div class="is-loading">
+                <mat-spinner diameter="50"></mat-spinner>
+              </div>
+            }
 
-            <cnsl-form-field
-              class="formfield"
-              *ngIf="testEmailConfigurationMutation.isError() || testEmailConfigurationMutation.isSuccess()"
-            >
-              <cnsl-label>{{ 'SMTP.LIST.DIALOG.TEST_RESULT' | translate }}</cnsl-label>
-              @let error = testEmailConfigurationMutation.error();
-              <textarea
-                cnslInput
-                [ngModel]="error ? error.message : ('SMTP.CREATE.STEPS.TEST.RESULT' | translate)"
-                [ngModelOptions]="{ standalone: true }"
-              ></textarea>
-            </cnsl-form-field>
+            @if (testEmailConfigurationMutation.isError() || testEmailConfigurationMutation.isSuccess()) {
+              <cnsl-form-field class="formfield">
+                <cnsl-label>{{ 'SMTP.LIST.DIALOG.TEST_RESULT' | translate }}</cnsl-label>
+                @let error = testEmailConfigurationMutation.error();
+                <textarea
+                  cnslInput
+                  [ngModel]="error ? error.message : ('SMTP.CREATE.STEPS.TEST.RESULT' | translate)"
+                  [ngModelOptions]="{ standalone: true }"
+                ></textarea>
+              </cnsl-form-field>
+            }
           </cnsl-info-section>
 
           <div class="smtp-create-actions">
@@ -242,7 +243,10 @@
               color="primary"
               data-e2e="create-button"
               [disabled]="
-                state.mainForm.invalid || state.senderForm.invalid || (['iam.policy.write'] | hasRole | async) === false
+                updateDataMutation.isPending() ||
+                state.mainForm.invalid ||
+                state.senderForm.invalid ||
+                (['iam.policy.write'] | hasRole | async) === false
               "
             >
               {{ 'config' in state ? ('ACTIONS.SAVE' | translate) : ('ACTIONS.CREATE' | translate) }}

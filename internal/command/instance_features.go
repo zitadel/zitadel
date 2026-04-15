@@ -20,7 +20,7 @@ type InstanceFeatures struct {
 	OIDCSingleV1SessionTermination *bool
 	LoginV2                        *feature.LoginV2
 	PermissionCheckV2              *bool
-	ManagementConsoleUseV2UserApi  *bool
+	ManagementConsoleUseV2UserApi  *bool `mapstructure:"ConsoleUseV2UserApi"` // for backwards compatibility we need to change this back to the old config name
 	EnableRelationalTables         *bool
 }
 

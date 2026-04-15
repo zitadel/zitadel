@@ -215,8 +215,6 @@ import {
   GetProjectGrantByIDResponse,
   GetProviderByIDRequest,
   GetProviderByIDResponse,
-  GetSupportedLanguagesRequest,
-  GetSupportedLanguagesResponse,
   GetUserByIDRequest,
   GetUserByIDResponse,
   GetUserByLoginNameGlobalRequest,

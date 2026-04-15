@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -1846,6 +1847,64 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 			},
 		},
 		{
+			name: "no admin added, custom domain",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(), // org already exists check
+					expectFilter(), // org exists in current preparation
+					expectFilter(), // custom domain does not exist yet
+					expectFilter(), // no org domain policy yet
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("instance1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(org.NewOrgAddedEvent(context.Background(),
+							&org.NewAggregate("orgID").Aggregate,
+							"Org",
+						)),
+						eventFromEventPusher(org.NewDomainAddedEvent(context.Background(),
+							&org.NewAggregate("orgID").Aggregate, "org.iam-domain",
+						)),
+						eventFromEventPusher(org.NewDomainVerifiedEvent(context.Background(),
+							&org.NewAggregate("orgID").Aggregate,
+							"org.iam-domain",
+						)),
+						eventFromEventPusher(org.NewDomainPrimarySetEvent(context.Background(),
+							&org.NewAggregate("orgID").Aggregate,
+							"org.iam-domain",
+						)),
+						eventFromEventPusher(org.NewDomainAddedEvent(context.Background(),
+							&org.NewAggregate("orgID").Aggregate,
+							"custom.example.com",
+						)),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID"),
+			},
+			args: args{
+				ctx: http_util.WithRequestedHost(authz.WithInstanceID(context.Background(), "instance1"), "iam-domain"),
+				setupOrg: &OrgSetup{
+					Name:         "Org",
+					CustomDomain: "custom.example.com",
+				},
+			},
+			res: res{
+				createdOrg: &CreatedOrg{
+					ObjectDetails: &domain.ObjectDetails{
+						ResourceOwner: "orgID",
+					},
+					OrgAdmins: []OrgAdmin{},
+				},
+			},
+		},
+		{
 			name: "existing human added",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -2037,7 +2096,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 								Scopes:          []string{openid.ScopeOpenID},
 								AllowedUserType: domain.UserTypeMachine,
 								TokenID:         "tokenID",
-								Token:           "dG9rZW5JRDp1c2VySUQ", // token
+								Token:           "tokenID:userID",
 							},
 						},
 					},
@@ -2092,6 +2151,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 						Role: domain.RoleOrgOwner,
 					},
 				},
+				authAlgorithm: &mockAuthCrypto{},
 			}
 			got, err := r.SetUpOrg(tt.args.ctx, tt.args.setupOrg, tt.args.allowInitialMail, tt.args.permissionCheck, tt.args.userIDs...)
 			assert.ErrorIs(t, err, tt.res.err)

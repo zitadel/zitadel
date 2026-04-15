@@ -1,12 +1,11 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { UntypedFormBuilder } from '@angular/forms';
 import { LanguagesService } from '../../../services/languages.service';
-import { BehaviorSubject, concat, forkJoin, from, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
+import { BehaviorSubject, forkJoin, from, Observable, take } from 'rxjs';
 import { GrpcAuthService } from '../../../services/grpc-auth.service';
 import { CdkDrag, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { catchError, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 interface State {
   allowed: string[];

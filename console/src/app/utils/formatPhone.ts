@@ -10,7 +10,7 @@ export function formatPhone(phone?: string): { phone: string; country: CountryCo
       if (phoneNumber) {
         return { phone: phoneNumber.formatInternational(), country };
       }
-    } catch (e) {
+    } catch {
       return null;
     }
   }

@@ -114,6 +114,9 @@ func generateAlphanumericCode(length int, withHyphen bool) (string, error) {
 	return code, nil
 }
 
+// ValidateRecoveryCode validates the input code against the saved recovery codes of a user.
+// The validation logic is also implemented in backend/v3/domain/session_check_recovery_code.go.
+// Keep both implementations in sync until this duplication is removed.
 func ValidateRecoveryCode(ctx context.Context, code string, recoveryCodes *HumanRecoveryCodes, hasher *crypto.Hasher) (_ string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

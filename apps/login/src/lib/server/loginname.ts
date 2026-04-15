@@ -1,5 +1,6 @@
 "use server";
 
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/logger";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -273,7 +274,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         checks,
         requestId: command.requestId,
       }).catch((error) => {
-        if (error?.rawMessage === "Errors.User.NotActive (SESSION-Gj4ko)") {
+        if (isClassifiedError(error) && error.message?.includes("Errors.User.NotActive")) {
           return { error: t("errors.userNotActive") };
         }
         throw error;
@@ -337,10 +338,16 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       logger.debug("humanUser.email?.isVerified", {
         isVerified: humanUser?.email?.isVerified,
       });
+
+      // If the user's email is not verified, they likely already have a code from the
+      // initial verification email. Auto-sending a new one here invalidates their existing code
+      // and causes confusion. Only auto-send (`send=true`) if the email is already verified.
+      const shouldSend = humanUser?.email?.isVerified === true;
+
       const params = new URLSearchParams({
         loginName: (session?.factors?.user?.loginName ?? user.preferredLoginName) as string,
-        send: "true", // set this to true to request a new code immediately
-        invite: humanUser?.email?.isVerified ? "false" : "true", // sendInviteEmailCode results in an error if user is already initialized
+        send: shouldSend ? "true" : "false",
+        invite: "true", // always send invite code if user has no primary auth method
       });
 
       if (command.requestId) {

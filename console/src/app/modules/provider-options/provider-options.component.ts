@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@a
 import { FormControl, FormGroup } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { Options, AutoLinkingOption } from 'src/app/proto/generated/zitadel/idp_pb';
-import { AccessTokenType } from '../../proto/generated/zitadel/user_pb';
 
 @Component({
   selector: 'cnsl-provider-options',

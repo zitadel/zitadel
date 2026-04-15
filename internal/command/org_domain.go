@@ -35,7 +35,8 @@ func (c *Commands) prepareAddOrgDomain(a *org.Aggregate, addDomain string, userI
 					return nil, err
 				}
 			}
-			if err := c.checkOrgExists(ctx, a.ID); err != nil {
+
+			if err := checkOrgExistsInPreparation(ctx, filter, a.ID); err != nil {
 				return nil, err
 			}
 
