@@ -1,3 +1,4 @@
+import { applyCustomHeaders } from "@/lib/custom-headers";
 import { createLogger } from "@/lib/logger";
 
 const logger = createLogger("security-settings");
@@ -90,19 +91,15 @@ async function fetchIframeOrigins(baseUrl: string, instanceHost?: string): Promi
     reqHeaders["x-zitadel-instance-host"] = instanceHost;
   }
 
-  // Apply custom headers from environment, matching the pattern in zitadel.ts
-  if (process.env.CUSTOM_REQUEST_HEADERS) {
-    process.env.CUSTOM_REQUEST_HEADERS.split(",").forEach((header) => {
-      const kv = header.indexOf(":");
-      if (kv > 0) {
-        const key = header.slice(0, kv).trim();
-        const value = header.slice(kv + 1).trim();
-        if (value) {
-          reqHeaders[key] = value;
-        }
-      }
-    });
-  }
+  // Apply custom headers from environment
+  applyCustomHeaders({
+    set: (key, value) => {
+      reqHeaders[key] = value;
+    },
+    remove: (key) => {
+      delete reqHeaders[key];
+    },
+  });
 
   const response = await fetch(`${baseUrl}/zitadel.settings.v2.SettingsService/GetSecuritySettings`, {
     method: "POST",

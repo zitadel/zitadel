@@ -34,6 +34,7 @@ import { getTranslations } from "next-intl/server";
 import { getUserAgent } from "./fingerprint";
 import { createLogger } from "./logger";
 
+import { applyCustomHeaders } from "@/lib/custom-headers";
 import { errorClassificationInterceptor, isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { otelGrpcInterceptor } from "@/lib/grpc/interceptors/otel";
 import { Code, Interceptor } from "@connectrpc/connect";
@@ -1370,22 +1371,10 @@ export function createServerTransport(token: string, serviceConfig: ServiceConfi
     }
 
     // Apply headers from CUSTOM_REQUEST_HEADERS environment variable
-    if (process.env.CUSTOM_REQUEST_HEADERS) {
-      process.env.CUSTOM_REQUEST_HEADERS.split(",").forEach((header) => {
-        const kv = header.indexOf(":");
-        if (kv > 0) {
-          const key = header.slice(0, kv).trim();
-          const value = header.slice(kv + 1).trim();
-          if (value) {
-            req.header.set(key, value);
-          } else {
-            req.header.delete(key);
-          }
-        } else {
-          logger.warn("Skipping malformed header", { header });
-        }
-      });
-    }
+    applyCustomHeaders({
+      set: (key, value) => req.header.set(key, value),
+      remove: (key) => req.header.delete(key),
+    });
 
     return next(req);
   };

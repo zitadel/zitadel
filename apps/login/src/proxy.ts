@@ -28,20 +28,15 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
+  const _headers = await headers();
+  const { serviceConfig } = getServiceConfig(_headers);
+  const { baseUrl, publicHost, instanceHost } = serviceConfig;
+
   // Build CSP headers using security settings fetched directly from the
   // ZITADEL API (no self-loopback through the load balancer).
   const responseHeaders = new Headers();
-  let baseUrl: string | undefined;
-  let publicHost: string | undefined;
-  let instanceHost: string | undefined;
 
   try {
-    const _headers = await headers();
-    const { serviceConfig } = getServiceConfig(_headers);
-    baseUrl = serviceConfig.baseUrl;
-    publicHost = serviceConfig.publicHost;
-    instanceHost = serviceConfig.instanceHost;
-
     const iframeOrigins = await getIframeOrigins(baseUrl, instanceHost);
 
     responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: baseUrl, iframeOrigins }));
@@ -50,10 +45,10 @@ export async function proxy(request: NextRequest) {
       responseHeaders.set("X-Frame-Options", "deny");
     }
   } catch (err) {
-    logger.error("Failed to build CSP, using default", {
+    logger.error("Failed to load security settings for CSP, using default CSP", {
       error: err instanceof Error ? err.message : String(err),
     });
-    responseHeaders.set("Content-Security-Policy", buildCSP());
+    responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: baseUrl }));
     responseHeaders.set("X-Frame-Options", "deny");
   }
 
