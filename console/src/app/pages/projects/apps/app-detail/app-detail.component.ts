@@ -696,9 +696,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         req.setIdTokenUserinfoAssertion(this.app.oidcConfig.idTokenUserinfoAssertion);
 
         // redirects
-        req.setRedirectUrisList(this.app.oidcConfig.redirectUrisList);
-        req.setAdditionalOriginsList(this.app.oidcConfig.additionalOriginsList);
-        req.setPostLogoutRedirectUrisList(this.app.oidcConfig.postLogoutRedirectUrisList);
+        req.setRedirectUrisList(this.normalizeOIDCListForUpdate(this.app.oidcConfig.redirectUrisList));
+        req.setAdditionalOriginsList(this.normalizeOIDCListForUpdate(this.app.oidcConfig.additionalOriginsList));
+        req.setPostLogoutRedirectUrisList(this.normalizeOIDCListForUpdate(this.app.oidcConfig.postLogoutRedirectUrisList));
         req.setDevMode(this.app.oidcConfig.devMode);
         req.setSkipNativeAppSuccessPage(this.app.oidcConfig.skipNativeAppSuccessPage);
 
@@ -726,6 +726,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
           });
       }
     }
+  }
+
+  private normalizeOIDCListForUpdate(values: string[]): string[] {
+    return values.length === 0 ? [''] : values;
   }
 
   public saveAPIApp(): void {
