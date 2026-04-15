@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _ExporterTypeName = "NoneStdOutStdErrGRPCHTTPGooglePrometheus"
+const _ExporterTypeName = "NoneStdOutStdErrGRPCHTTPGooglePrometheusAuto"
 
-var _ExporterTypeIndex = [...]uint8{0, 0, 4, 10, 16, 20, 24, 30, 40}
+var _ExporterTypeIndex = [...]uint8{0, 0, 4, 10, 16, 20, 24, 30, 40, 44}
 
-const _ExporterTypeLowerName = "nonestdoutstderrgrpchttpgoogleprometheus"
+const _ExporterTypeLowerName = "nonestdoutstderrgrpchttpgoogleprometheusauto"
 
 func (i ExporterType) String() string {
 	if i < 0 || i >= ExporterType(len(_ExporterTypeIndex)-1) {
@@ -32,9 +32,10 @@ func _ExporterTypeNoOp() {
 	_ = x[ExporterTypeHTTP-(5)]
 	_ = x[ExporterTypeGoogle-(6)]
 	_ = x[ExporterTypePrometheus-(7)]
+	_ = x[ExporterTypeAuto-(8)]
 }
 
-var _ExporterTypeValues = []ExporterType{ExporterTypeUnspecified, ExporterTypeNone, ExporterTypeStdOut, ExporterTypeStdErr, ExporterTypeGRPC, ExporterTypeHTTP, ExporterTypeGoogle, ExporterTypePrometheus}
+var _ExporterTypeValues = []ExporterType{ExporterTypeUnspecified, ExporterTypeNone, ExporterTypeStdOut, ExporterTypeStdErr, ExporterTypeGRPC, ExporterTypeHTTP, ExporterTypeGoogle, ExporterTypePrometheus, ExporterTypeAuto}
 
 var _ExporterTypeNameToValueMap = map[string]ExporterType{
 	_ExporterTypeName[0:0]:        ExporterTypeUnspecified,
@@ -53,6 +54,8 @@ var _ExporterTypeNameToValueMap = map[string]ExporterType{
 	_ExporterTypeLowerName[24:30]: ExporterTypeGoogle,
 	_ExporterTypeName[30:40]:      ExporterTypePrometheus,
 	_ExporterTypeLowerName[30:40]: ExporterTypePrometheus,
+	_ExporterTypeName[40:44]:      ExporterTypeAuto,
+	_ExporterTypeLowerName[40:44]: ExporterTypeAuto,
 }
 
 var _ExporterTypeNames = []string{
@@ -64,6 +67,7 @@ var _ExporterTypeNames = []string{
 	_ExporterTypeName[20:24],
 	_ExporterTypeName[24:30],
 	_ExporterTypeName[30:40],
+	_ExporterTypeName[40:44],
 }
 
 // ExporterTypeString retrieves an enum value from the enum constants string name.

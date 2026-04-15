@@ -112,7 +112,7 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
     <>
       {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
-        <div className={`${error && "transform-gpu animate-shake"}`}>
+        <div className={`${error && "animate-shake transform-gpu"}`}>
           <TextInput
             type="password"
             autoComplete="password"
@@ -123,7 +123,7 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
           />
           {!loginSettings?.hidePasswordReset && (
             <button
-              className="text-sm transition-all hover:text-primary-light-500 dark:hover:text-primary-dark-500"
+              className="hover:text-primary-light-500 dark:hover:text-primary-dark-500 text-sm transition-all"
               onClick={() => resetPasswordAndContinue()}
               type="button"
               disabled={loading}

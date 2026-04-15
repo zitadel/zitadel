@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"strings"
 	"time"
@@ -314,7 +313,7 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, userID, resource
 	return &OIDCSessionEvents{
 		commands:                 c,
 		idGenerator:              c.idGenerator,
-		encryptionAlg:            c.keyAlgorithm,
+		authAlg:                  c.authAlgorithm,
 		events:                   pending,
 		oidcSessionWriteModel:    NewOIDCSessionWriteModel(sessionID, resourceOwner),
 		userStateModel:           userStateModel,
@@ -325,11 +324,7 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, userID, resource
 }
 
 func (c *Commands) decryptRefreshToken(refreshToken string) (sessionID, refreshTokenID string, err error) {
-	decoded, err := base64.RawURLEncoding.DecodeString(refreshToken)
-	if err != nil {
-		return "", "", zerrors.ThrowInvalidArgument(err, "OIDCS-Cux9a", "Errors.User.RefreshToken.Invalid")
-	}
-	decrypted, err := c.keyAlgorithm.DecryptString(decoded, c.keyAlgorithm.EncryptionKeyID())
+	decrypted, err := c.authAlgorithm.DecryptToken(refreshToken)
 	if err != nil {
 		return "", "", zerrors.ThrowInvalidArgument(err, "OIDCS-Jei0i", "Errors.User.RefreshToken.Invalid")
 	}
@@ -372,7 +367,7 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken 
 	return &OIDCSessionEvents{
 		commands:                 c,
 		idGenerator:              c.idGenerator,
-		encryptionAlg:            c.keyAlgorithm,
+		authAlg:                  c.authAlgorithm,
 		oidcSessionWriteModel:    sessionWriteModel,
 		accessTokenLifetime:      accessTokenLifetime,
 		refreshTokenLifeTime:     refreshTokenLifeTime,
@@ -383,7 +378,7 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken 
 type OIDCSessionEvents struct {
 	commands              *Commands
 	idGenerator           id.Generator
-	encryptionAlg         crypto.EncryptionAlgorithm
+	authAlg               crypto.AuthAlgorithm
 	events                []eventstore.Command
 	oidcSessionWriteModel *OIDCSessionWriteModel
 	userStateModel        *UserV2WriteModel
@@ -502,11 +497,11 @@ func (c *OIDCSessionEvents) generateRefreshToken(userID string) (refreshTokenID,
 		return "", "", err
 	}
 	refreshTokenID = RefreshTokenPrefix + refreshTokenID
-	token, err := c.encryptionAlg.Encrypt([]byte(fmt.Sprintf(oidcTokenFormat, c.oidcSessionWriteModel.OIDCRefreshTokenID(refreshTokenID), userID)))
+	token, err := c.authAlg.EncryptToken(fmt.Sprintf(oidcTokenFormat, c.oidcSessionWriteModel.OIDCRefreshTokenID(refreshTokenID), userID))
 	if err != nil {
 		return "", "", err
 	}
-	return refreshTokenID, base64.RawURLEncoding.EncodeToString(token), nil
+	return refreshTokenID, token, nil
 }
 
 func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (*OIDCSession, error) {

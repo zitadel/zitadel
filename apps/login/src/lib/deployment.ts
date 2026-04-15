@@ -5,34 +5,27 @@
  * - AUDIENCE: The API audience for JWT authentication
  * - SYSTEM_USER_ID: The system user's ID
  * - SYSTEM_USER_PRIVATE_KEY: The private key for JWT signing
+ * - SYSTEM_USER_PRIVATE_KEY_FILE: The private key file path for JWT signing
  *
  * Both multi-tenant and self-hosted deployments can use system user authentication.
  *
  * @returns true if system user credentials are present, false otherwise
  */
 export function hasSystemUserCredentials(): boolean {
-  return !!process.env.AUDIENCE && !!process.env.SYSTEM_USER_ID && !!process.env.SYSTEM_USER_PRIVATE_KEY;
-}
-
-/**
- * Checks if login service key file is available for JWT authentication.
- *
- * @returns true if ZITADEL_LOGIN_SERVICE_KEY_FILE and a user ID are present, false otherwise
- */
-export function hasLoginServiceKey(): boolean {
   return (
-    !!process.env.ZITADEL_LOGIN_SERVICE_KEY_FILE &&
-    !!(process.env.ZITADEL_LOGIN_SYSTEM_USER_ID || process.env.SYSTEM_USER_ID)
+    !!process.env.AUDIENCE &&
+    !!process.env.SYSTEM_USER_ID &&
+    (!!process.env.SYSTEM_USER_PRIVATE_KEY || !!process.env.SYSTEM_USER_PRIVATE_KEY_FILE)
   );
 }
 
 /**
- * Gets the system user ID for login service key authentication.
+ * Checks if login client key file is available for JWT authentication.
  *
- * @returns ZITADEL_LOGIN_SYSTEM_USER_ID if set, otherwise SYSTEM_USER_ID
+ * @returns true if ZITADEL_LOGINCLIENT_KEYFILE is present, false otherwise
  */
-export function getLoginSystemUserId(): string | undefined {
-  return process.env.ZITADEL_LOGIN_SYSTEM_USER_ID || process.env.SYSTEM_USER_ID;
+export function hasLoginClientKey(): boolean {
+  return !!process.env.ZITADEL_LOGINCLIENT_KEYFILE;
 }
 
 /**

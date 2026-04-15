@@ -1,7 +1,10 @@
 <h1 mat-dialog-title>
   <span
-    >{{ 'USER.CODEDIALOG.TITLE' | translate }} <span *ngIf="data?.number.phone">{{ data.number.phone }}</span></span
-  >
+    >{{ 'USER.CODEDIALOG.TITLE' | translate }}
+    @if (data?.number.phone) {
+      <span>{{ data.number.phone }}</span>
+    }
+  </span>
 </h1>
 <p class="desc cnsl-secondary-text">{{ 'USER.CODEDIALOG.DESCRIPTION' | translate }}</p>
 <div mat-dialog-content>

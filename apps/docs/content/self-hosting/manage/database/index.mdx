@@ -22,35 +22,29 @@ If you are using Zitadel v2 and want to use a PostgreSQL database, you can [over
 
 Currently, versions 14 to 18 are supported.
 
-Postgres can be configured as follows:
+Connect ZITADEL to your PostgreSQL database by providing a DSN (connection URL) via the environment variable:
+
+```bash
+export ZITADEL_DATABASE_POSTGRES_DSN=postgresql://zitadel:password@localhost:5432/zitadel?sslmode=disable
+```
+
+If you prefer configuration files, set the DSN in your YAML config:
+
 ```yaml
 Database:
   postgres:
-    Host: localhost
-    Port: 5432
-    Database: zitadel
-    AwaitInitialConn: 5m
+    DSN: postgresql://zitadel:password@localhost:5432/zitadel?sslmode=disable
     MaxOpenConns: 15
     MaxIdleConns: 10
     MaxConnLifetime: 1h
     MaxConnIdleTime: 5m
-    Options:
-    User:
-      Username: zitadel
-      Password: zitadel
-      SSL:
-        Mode: disable  # Use 'require' or 'verify-full' for production
-        RootCert:
-        Cert:
-        Key:
-    Admin:
-      Username: postgres
-      Password: postgres
-      SSL:
-        Mode: disable  # Use 'require' or 'verify-full' for production
-        RootCert:
-        Cert:
-        Key:
+```
+
+Pool and tuning settings can be configured alongside the DSN as overlays.
+SSL is configured through DSN query parameters. For example, to require TLS with certificate verification:
+
+```bash
+postgresql://zitadel:password@db.example.com:5432/zitadel?sslmode=verify-full&sslrootcert=/path/to/ca.crt
 ```
 
 ### Managed PostgreSQL / No Admin Access
@@ -83,17 +77,10 @@ Adjust `pg_hba.conf` if needed to allow the zitadel user to connect.
 
 **Schema bootstrapping step — Bootstrap schemas and tables (run as the service user)**
 
-Set only the service user credentials — no `Admin.*` variables are needed for this command.
-
-For managed/remote PostgreSQL, set `SSL_MODE` to `require` or `verify-full` to encrypt the connection. `disable` is only appropriate for local development.
+Provide the DSN with the service user credentials. For managed/remote PostgreSQL, set `sslmode` to `require` or `verify-full` to encrypt the connection. `disable` is only appropriate for local development.
 
 ```bash
-ZITADEL_DATABASE_POSTGRES_HOST=<your-host> \
-    ZITADEL_DATABASE_POSTGRES_PORT=5432 \
-    ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel \
-    ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel \
-    ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=<strong-password> \
-    ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=require \
+ZITADEL_DATABASE_POSTGRES_DSN=postgresql://zitadel:<strong-password>@<your-host>:5432/zitadel?sslmode=require \
     zitadel init schema
 ```
 
@@ -104,12 +91,7 @@ For production deployments, configure TLS to encrypt authentication traffic. See
 </Callout>
 
 ```bash
-ZITADEL_DATABASE_POSTGRES_HOST=<your-host> \
-    ZITADEL_DATABASE_POSTGRES_PORT=5432 \
-    ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel \
-    ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel \
-    ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=<strong-password> \
-    ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=require \
+ZITADEL_DATABASE_POSTGRES_DSN=postgresql://zitadel:<strong-password>@<your-host>:5432/zitadel?sslmode=require \
     zitadel start-from-setup --masterkey "<32-character-key>"
 ```
 
@@ -117,7 +99,7 @@ See the [phases guide](/self-hosting/manage/updating_scaling#separating-init-and
 
 ## Zitadel Credentials
 
-The [init phase](/self-hosting/manage/updating_scaling#separating-init-and-setup-from-the-runtime) of ZITADEL creates the ZITADEL database user (`Database.*.User.Username` & `Database.*.User.Password`) if it does not exist and admin credentials are provided. **Init does not update or deprecate existing users or passwords.** If you need to change the ZITADEL database user or rotate its password, you must do this manually.
+The [init phase](/self-hosting/manage/updating_scaling#separating-init-and-setup-from-the-runtime) of ZITADEL creates the ZITADEL database user if it does not exist and admin credentials are provided. **Init does not update or deprecate existing users or passwords.** If you need to change the ZITADEL database user or rotate its password, you must do this manually.
 
 <Callout type="warn">
 The `init` command is designed to be run **only once**, during the initial setup of ZITADEL. Running `init` again after changing the database user or credentials does **not** migrate database object ownerships, nor does it reassign permissions on schemas, tables, or other objects to a new user. You must update these permissions manually if you switch users.

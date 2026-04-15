@@ -19,6 +19,7 @@ import (
 	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/logging"
 
+	new_domain "github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/cache/connector"
@@ -79,6 +80,7 @@ type Commands struct {
 	webauthnConfig          *webauthn_helper.Config
 	keySize                 int
 	keyAlgorithm            crypto.EncryptionAlgorithm
+	authAlgorithm           crypto.AuthAlgorithm
 	certificateAlgorithm    crypto.EncryptionAlgorithm
 	certKeySize             int
 	privateKeyLifetime      time.Duration
@@ -128,7 +130,8 @@ func StartCommands(
 	externalDomain string,
 	externalSecure bool,
 	externalPort uint16,
-	idpConfigEncryption, otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, oidcEncryption, samlEncryption, targetEncryption crypto.EncryptionAlgorithm,
+	idpConfigEncryption, otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, samlEncryption, targetEncryption crypto.EncryptionAlgorithm,
+	oidcEncryption crypto.AuthEncryptionAlgorithm,
 	httpClient *http.Client,
 	permissionCheck domain.PermissionCheck,
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
@@ -152,6 +155,9 @@ func StartCommands(
 	if err != nil {
 		return nil, fmt.Errorf("password hasher: %w", err)
 	}
+
+	new_domain.SetPasswordHasher(userPasswordHasher)
+
 	caches, err := startCaches(ctx, cacheConnectors)
 	if err != nil {
 		return nil, fmt.Errorf("caches: %w", err)
@@ -183,6 +189,7 @@ func StartCommands(
 		domainVerificationGenerator:     crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, domainVerificationEncryption),
 		domainVerificationValidator:     api_http.ValidateDomain,
 		keyAlgorithm:                    oidcEncryption,
+		authAlgorithm:                   oidcEncryption,
 		certificateAlgorithm:            samlEncryption,
 		webauthnConfig:                  webAuthN,
 		httpClient:                      httpClient,

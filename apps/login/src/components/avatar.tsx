@@ -13,30 +13,21 @@ interface AvatarProps {
 }
 
 export function getInitials(name: string, loginName: string) {
-  let credentials = "";
   if (name) {
     const split = name.split(" ");
-    if (split) {
-      const initials = split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
-      credentials = initials;
-    } else {
-      credentials = name.charAt(0);
-    }
-  } else {
-    const username = loginName.split("@")[0];
-    let separator = "_";
-    if (username.includes("-")) {
-      separator = "-";
-    }
-    if (username.includes(".")) {
-      separator = ".";
-    }
-    const split = username.split(separator);
-    const initials = split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
-    credentials = initials;
+    return split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
   }
 
-  return credentials;
+  const username = loginName.split("@")[0];
+  let separator = "_";
+  if (username.includes("-")) {
+    separator = "-";
+  }
+  if (username.includes(".")) {
+    separator = ".";
+  }
+  const split = username.split(separator);
+  return split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
 }
 
 // Helper function to get avatar roundness from theme
@@ -63,7 +54,7 @@ export function Avatar({ size = "base", name, loginName, imageUrl, shadow }: Ava
 
   return (
     <div
-      className={`dark:group-focus:ring-offset-blue dark:text-blue pointer-events-none flex h-full w-full flex-shrink-0 cursor-default items-center justify-center bg-primary-light-500 text-primary-light-contrast-500 transition-colors duration-200 hover:bg-primary-light-400 group-focus:outline-none group-focus:ring-2 group-focus:ring-primary-light-200 dark:bg-primary-dark-300 dark:text-primary-dark-contrast-300 hover:dark:bg-primary-dark-500 dark:group-focus:ring-primary-dark-400 ${avatarRoundness} ${
+      className={`dark:group-focus:ring-offset-blue dark:text-blue bg-primary-light-500 text-primary-light-contrast-500 hover:bg-primary-light-400 group-focus:ring-primary-light-200 dark:bg-primary-dark-300 dark:text-primary-dark-contrast-300 hover:dark:bg-primary-dark-500 dark:group-focus:ring-primary-dark-400 pointer-events-none flex h-full w-full flex-shrink-0 cursor-default items-center justify-center transition-colors duration-200 group-focus:ring-2 group-focus:outline-none ${avatarRoundness} ${
         shadow ? "shadow" : ""
       } ${
         size === "large"
@@ -81,7 +72,7 @@ export function Avatar({ size = "base", name, loginName, imageUrl, shadow }: Ava
           height={48}
           width={48}
           alt="avatar"
-          className={`h-full w-full border border-divider-light dark:border-divider-dark ${avatarRoundness}`}
+          className={`border-divider-light dark:border-divider-dark h-full w-full border ${avatarRoundness}`}
           src={imageUrl}
         />
       ) : (

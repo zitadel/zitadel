@@ -6,7 +6,7 @@ import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
   standalone: false,
 })
 export class DurationToSecondsPipe implements PipeTransform {
-  transform(value?: Duration.AsObject, ...args: unknown[]): unknown {
+  transform(value?: Duration.AsObject): unknown {
     if (value) {
       return this.durationToSeconds(value);
     } else {

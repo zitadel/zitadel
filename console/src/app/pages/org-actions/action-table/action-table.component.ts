@@ -106,7 +106,7 @@ export class ActionTableComponent implements OnInit {
       if (req) {
         this.mgmtService
           .createAction(req)
-          .then((resp) => {
+          .then(() => {
             this.refreshPage();
           })
           .catch((error: any) => {
@@ -129,7 +129,7 @@ export class ActionTableComponent implements OnInit {
       if (req) {
         this.mgmtService
           .updateAction(req)
-          .then((resp) => {
+          .then(() => {
             this.refreshPage();
           })
           .catch((error: any) => {

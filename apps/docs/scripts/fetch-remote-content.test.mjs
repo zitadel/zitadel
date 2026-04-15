@@ -128,21 +128,33 @@ describe('fetch-remote-content', () => {
         const { filterVersions } = await import('./fetch-remote-content.mjs');
         const tags = [
             { name: 'v4.9.0' },
-            { name: 'v4.10.0' }, // Matches cutoff strictly > 4.10.0? No, gt is strict.
+            { name: 'v4.10.0' }, // Equal to cutoff — excluded (gt is strict)
             { name: 'v4.11.0' },
-            { name: 'v5.0.0-alpha' },
             { name: 'invalid' }
         ];
         
         const result = filterVersions(tags);
-        // Expect only v4.11.0 and v5.0.0-alpha, but slice(0, 3) logic applies
-        // If gt(4.10.0), then 4.10.0 is excluded.
-        // sort is rcompare (descending).
-        // 5.0.0-alpha, 4.11.0
-        
         assert.ok(result.includes('v4.11.0'));
         assert.ok(!result.includes('v4.10.0'));
         assert.ok(!result.includes('v4.9.0'));
+    });
+
+    test('excludes prerelease tags', async () => {
+        const { filterVersions } = await import('./fetch-remote-content.mjs');
+        const tags = [
+            { name: 'v5.0.0' },
+            { name: 'v5.0.0-alpha' },
+            { name: 'v5.0.0-beta.1' },
+            { name: 'v4.11.0-rc.1' },
+            { name: 'v4.11.0' },
+        ];
+
+        const result = filterVersions(tags);
+        assert.ok(result.includes('v5.0.0'), 'stable release should be included');
+        assert.ok(result.includes('v4.11.0'), 'stable release should be included');
+        assert.ok(!result.includes('v5.0.0-alpha'), 'alpha prerelease should be excluded');
+        assert.ok(!result.includes('v5.0.0-beta.1'), 'beta prerelease should be excluded');
+        assert.ok(!result.includes('v4.11.0-rc.1'), 'rc prerelease should be excluded');
     });
   });
 
