@@ -4505,3 +4505,172 @@ func stringToJSONByte(data string) string {
 	jsondata, _ := json.Marshal([]byte(data))
 	return string(jsondata)
 }
+
+func TestIDPTemplateProjection_reducesZitadel(t *testing.T) {
+	type args struct {
+		event func(t *testing.T) eventstore.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		reduce func(event eventstore.Event) (*handler.Statement, error)
+		want   wantReduce
+	}{
+		{
+			name: "instance reduceZitadelIDPAdded without instance roles info",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.ZitadelIDPAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"name": "idp-name",
+	"issuer": "issuer",
+	"clientId": "client_id",
+	"clientSecret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
+}`),
+					), eventstore.GenericEventMapper[instance.ZitadelIDPAddedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPAdded,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateInsertStmt,
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"idp-name",
+								domain.IdentityProviderTypeSystem,
+								domain.IDPTypeZitadel,
+								true,
+								true,
+								true,
+								true,
+								domain.AutoLinkingOptionUsername,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates6_zitadel (idp_id, instance_id, issuer, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"issuer",
+								"client_id",
+								anyArg{},
+								database.TextArray[string]{"profile"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceZitadelIDPAdded with instance roles info",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.ZitadelIDPAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"name": "idp-name",
+	"issuer": "issuer",
+	"clientId": "client_id",
+	"clientSecret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1,
+    "instanceRolesInfo": [{
+        "organizationId": "org1",
+        "organizationDomain": "org1.com"
+    },
+	{
+        "organizationId": "org2",
+        "organizationDomain": "org2.com"
+    }]
+}`),
+					), eventstore.GenericEventMapper[instance.ZitadelIDPAddedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPAdded,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateInsertStmt,
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"idp-name",
+								domain.IdentityProviderTypeSystem,
+								domain.IDPTypeZitadel,
+								true,
+								true,
+								true,
+								true,
+								domain.AutoLinkingOptionUsername,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates6_zitadel (idp_id, instance_id, issuer, client_id, client_secret, scopes, instance_roles_info) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"issuer",
+								"client_id",
+								anyArg{},
+								database.TextArray[string]{"profile"},
+								[]byte(`[{"organizationId":"org1","organizationDomain":"org1.com"},{"organizationId":"org2","organizationDomain":"org2.com"}]`),
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			event := baseEvent(t)
+			got, err := tt.reduce(event)
+			if !zerrors.IsErrorInvalidArgument(err) {
+				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
+			}
+
+			event = tt.args.event(t)
+			got, err = tt.reduce(event)
+			assertReduce(t, got, err, IDPTemplateTable, tt.want)
+		})
+	}
+}
