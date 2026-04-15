@@ -90,6 +90,7 @@ func CreateServer(
 			),
 		),
 		grpc.StatsHandler(middleware.DefaultTracingServer()),
+		grpc.MaxSendMsgSize(10 * 1024 * 1024), // Increase to 10MB for exports
 	}
 	if tlsConfig != nil {
 		serverOptions = append(serverOptions, grpc.Creds(credentials.NewTLS(tlsConfig)))
