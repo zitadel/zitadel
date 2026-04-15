@@ -130,8 +130,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
       }
     });
 
-    if (!hasVisibleFactor && !emailVerified
-      && loginSettings.secondFactors.includes(SecondFactorType.OTP_EMAIL)) {
+    if (!hasVisibleFactor && !emailVerified && loginSettings.secondFactors.includes(SecondFactorType.OTP_EMAIL)) {
       const verifyParams = new URLSearchParams({
         loginName: sessionWithData.factors.user.loginName,
         send: "true",
@@ -141,7 +140,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
       if (requestId) {
         verifyParams.set("requestId", requestId);
       }
-      
+
       if (org) {
         verifyParams.set("organization", org as string);
       }
