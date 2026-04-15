@@ -100,8 +100,8 @@ require (
 	github.com/veqryn/slog-context/otel v0.9.0
 	github.com/zitadel/exifremove v0.1.0
 	github.com/zitadel/logging v0.7.0
-	github.com/zitadel/oidc/v3 v3.47.0
-	github.com/zitadel/passwap v0.11.0
+	github.com/zitadel/oidc/v3 v3.47.3
+	github.com/zitadel/passwap v0.12.1
 	github.com/zitadel/saml v0.4.1
 	github.com/zitadel/schema v1.3.2
 	github.com/zitadel/sloggcp v0.6.0
@@ -133,7 +133,7 @@ require (
 	golang.org/x/oauth2 v0.36.0
 	golang.org/x/sync v0.20.0
 	golang.org/x/sys v0.42.0
-	golang.org/x/text v0.35.0
+	golang.org/x/text v0.36.0
 	google.golang.org/api v0.272.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260319201613-d00831a3d3e7
 	google.golang.org/grpc v1.79.3
