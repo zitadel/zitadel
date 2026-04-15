@@ -32,7 +32,6 @@ import {
 import { getTranslations } from "next-intl/server";
 
 import { getUserAgent } from "./fingerprint";
-import { createLogger } from "./logger";
 
 import { applyCustomHeaders } from "@/lib/custom-headers";
 import { errorClassificationInterceptor, isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
@@ -40,8 +39,6 @@ import { otelGrpcInterceptor } from "@/lib/grpc/interceptors/otel";
 import { Code, Interceptor } from "@connectrpc/connect";
 import { PromiseCache } from "./cache";
 import { createServiceForHost } from "./service";
-
-const logger = createLogger("zitadel");
 
 const useCache = process.env.API_CACHE_ENABLED !== "false";
 
