@@ -1946,7 +1946,7 @@ func (c *Commands) AddInstanceZitadelProvider(ctx context.Context, provider Zita
 		return "", nil, err
 	}
 
-	err = c.validateZitadelProvider(ctx, &provider)
+	err = c.validateInstanceZitadelProvider(&provider)
 	if err != nil {
 		return "", nil, err
 	}
@@ -1996,7 +1996,7 @@ func (c *Commands) prepareAddInstanceZitadelProvider(a *instance.Aggregate, writ
 	}
 }
 
-func (c *Commands) validateZitadelProvider(ctx context.Context, provider *ZitadelProvider) error {
+func (c *Commands) validateInstanceZitadelProvider(provider *ZitadelProvider) error {
 	if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 		return zerrors.ThrowInvalidArgument(nil, "INST-Sgtj5", "Errors.Invalid.Argument")
 	}
