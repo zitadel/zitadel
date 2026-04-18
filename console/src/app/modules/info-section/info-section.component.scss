@@ -9,7 +9,7 @@
     display: flex;
     border-radius: 4px;
     padding: 0.5rem 0;
-    padding-right: 1rem;
+    padding-inline-end: 1rem;
     font-size: 14px;
     margin: 0.5rem 0;
     box-shadow: 0 2px 5px rgb(0 0 0 / 10%);
@@ -19,11 +19,11 @@
     }
 
     .icon {
-      margin-right: 1rem;
+      margin-inline-end: 1rem;
       height: 1.2rem;
       line-height: 1.2rem;
       font-size: 1.2rem;
-      margin-left: 0.5rem;
+      margin-inline-start: 0.5rem;
       padding: 0.25rem 0;
     }
 

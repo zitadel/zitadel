@@ -13,7 +13,7 @@ h1 {
 
     .abort {
       font-size: 1.2rem;
-      margin-left: 1.5rem;
+      margin-inline-start: 1.5rem;
       text-transform: uppercase;
       font-size: 14px;
       opacity: 0.8;
@@ -21,7 +21,7 @@ h1 {
     }
 
     .progress-spinner {
-      margin-left: 2rem;
+      margin-inline-start: 2rem;
     }
   }
 }
@@ -194,7 +194,7 @@ h1 {
         color: map-get($primary, 400);
 
         .icon {
-          margin-left: 0rem;
+          margin-inline-start: 0rem;
         }
       }
     }

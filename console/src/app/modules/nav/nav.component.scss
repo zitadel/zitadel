@@ -38,9 +38,9 @@
         align-self: stretch;
         position: absolute;
         top: 0;
-        right: 0;
+        inset-inline-end: 0;
         bottom: 0;
-        left: 0;
+        inset-inline-start: 0;
 
         @media only screen and (max-width: 500px) {
           padding: 0 1rem 0 1rem;
@@ -81,7 +81,7 @@
               border-radius: 50%;
               padding: 2px;
               margin: -2px -9px -2px 8px;
-              margin-left: 6px;
+              margin-inline-start: 6px;
               background-color: if(sass($is-dark-theme): #ffffff20; else: #00000020);
               line-height: 18px;
               font-size: 11px;
@@ -90,11 +90,11 @@
           }
 
           &.external-link {
-            padding-right: 2rem;
+            padding-inline-end: 2rem;
 
             i {
               position: absolute;
-              right: 8px;
+              inset-inline-end: 8px;
               font-size: 1.2rem;
             }
           }
@@ -182,7 +182,7 @@
   }
 
   .progress-bar {
-    margin-right: 0.5rem;
+    margin-inline-end: 0.5rem;
     width: 100px;
     min-width: 50px;
     background: if(sass($is-dark-theme): #ffffff20; else: #00000010);
@@ -224,9 +224,9 @@
       position: absolute;
       z-index: -1;
       top: 0;
-      right: 0;
+      inset-inline-end: 0;
       bottom: 0;
-      left: 0;
+      inset-inline-start: 0;
       background: if(sass($is-dark-theme): #fff; else: #000);
       opacity: 0.15;
       border-radius: 4px;
@@ -235,7 +235,7 @@
     .span {
       position: absolute;
       top: 50%;
-      left: 50%;
+      inset-inline-start: 50%;
       transform: translate(-50% -50%);
       opacity: 1;
     }

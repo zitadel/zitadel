@@ -50,7 +50,7 @@
         border-radius: 50%;
         padding: 2px;
         margin: -2px -9px -2px 8px;
-        margin-left: 6px;
+        margin-inline-start: 6px;
         background-color: if(sass($is-dark-theme): #ffffff20; else: #00000020);
         line-height: 18px;
         font-size: 11px;
@@ -59,11 +59,11 @@
     }
 
     &.external-link {
-      padding-right: 2rem;
+      padding-inline-end: 2rem;
 
       i {
         position: absolute;
-        right: 8px;
+        inset-inline-end: 8px;
         font-size: 1.2rem;
       }
     }

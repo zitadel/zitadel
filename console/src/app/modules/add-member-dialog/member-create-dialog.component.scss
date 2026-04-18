@@ -17,14 +17,14 @@
     box-sizing: border-box;
 
     .role-cb-content {
-      padding-left: 0.5rem;
+      padding-inline-start: 0.5rem;
       display: flex;
       flex-direction: row;
       align-items: center;
 
       .info-hover {
         font-size: 1.2rem;
-        margin-left: 0.5rem;
+        margin-inline-start: 0.5rem;
       }
     }
   }
@@ -35,6 +35,6 @@
   justify-content: space-between;
 
   .ok-button {
-    margin-left: 0.5rem;
+    margin-inline-start: 0.5rem;
   }
 }

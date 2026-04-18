@@ -362,18 +362,18 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
 .cnsl-action-button {
   display: flex;
   align-items: center;
-  margin-left: -0.5rem;
+  margin-inline-start: -0.5rem;
   height: 100%;
-  padding-left: 0.25rem;
+  padding-inline-start: 0.25rem;
   height: 36px;
 
   i:not(.no-margin) {
-    margin-right: 0.25rem;
+    margin-inline-end: 0.25rem;
     font-size: 1.3rem;
   }
 
   .mat-icon {
-    margin-right: 0.25rem;
+    margin-inline-end: 0.25rem;
   }
 }
 
@@ -382,7 +382,7 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
 }
 
 .mat-mdc-select-panel {
-  margin-left: -11px;
+  margin-inline-start: -11px;
 }
 
 .mat-mdc-select {

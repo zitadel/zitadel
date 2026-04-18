@@ -17,7 +17,7 @@
     justify-content: space-between;
 
     .bck-button {
-      margin-right: 1rem;
+      margin-inline-end: 1rem;
     }
 
     .create-button {
@@ -36,14 +36,14 @@
     align-items: center;
 
     .smtp-logo {
-      margin-right: 1rem;
+      margin-inline-end: 1rem;
       height: 48px;
       width: 48px;
       flex-shrink: 0;
     }
 
     .smtp-icon {
-      margin-right: 1rem;
+      margin-inline-end: 1rem;
       display: flex;
       justify-content: center;
       align-items: center;

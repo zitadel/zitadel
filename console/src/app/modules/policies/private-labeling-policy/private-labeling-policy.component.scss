@@ -21,7 +21,7 @@
       .col {
         display: flex;
         flex-direction: column;
-        margin-left: 1rem;
+        margin-inline-start: 1rem;
 
         h1 {
           margin: 0;
@@ -50,7 +50,7 @@
       margin-bottom: 1rem;
 
       .buttongroup {
-        margin-right: 0.5rem;
+        margin-inline-end: 0.5rem;
         margin-top: 0.5rem;
 
         .toggle-row {
@@ -58,13 +58,13 @@
           align-items: center;
 
           i {
-            margin-right: 0.5rem;
+            margin-inline-end: 0.5rem;
           }
 
           .info-i {
             font-size: 1.2rem;
-            margin-left: 0.5rem;
-            margin-right: 0;
+            margin-inline-start: 0.5rem;
+            margin-inline-end: 0;
           }
 
           .current-dot {
@@ -72,7 +72,7 @@
             width: 8px;
             border-radius: 50%;
             background-color: rgb(84, 142, 230);
-            margin-left: 0.5rem;
+            margin-inline-start: 0.5rem;
           }
         }
       }
@@ -84,10 +84,10 @@
       .pl-action-button {
         align-self: flex-start;
         margin-top: 0.5rem;
-        margin-right: 0.5rem;
+        margin-inline-end: 0.5rem;
 
         &:last-child {
-          margin-right: 0;
+          margin-inline-end: 0;
         }
       }
     }
@@ -109,7 +109,7 @@
         }
 
         .settings {
-          margin-right: 1rem;
+          margin-inline-end: 1rem;
         }
       }
 
@@ -130,7 +130,7 @@
             align-items: center;
 
             .icon {
-              margin-right: 0.5rem;
+              margin-inline-end: 0.5rem;
             }
 
             .space {
@@ -180,7 +180,7 @@
             .dl-btn {
               z-index: 2;
               position: absolute;
-              right: 0;
+              inset-inline-end: 0;
               top: 0;
               cursor: pointer;
               visibility: hidden;
@@ -189,7 +189,7 @@
 
             img {
               top: 0;
-              left: 0;
+              inset-inline-start: 0;
               width: 70px;
               height: 70px;
               object-fit: contain;
@@ -244,7 +244,7 @@
             padding: 1rem 0.5rem 1rem 0.75rem;
 
             .font-name {
-              margin-left: 0.5rem;
+              margin-inline-start: 0.5rem;
               font-size: 16px;
             }
 
@@ -305,7 +305,7 @@
       box-sizing: border-box;
 
       @media only screen and (min-width: 950px) {
-        margin-left: 1rem;
+        margin-inline-start: 1rem;
       }
 
       .col {

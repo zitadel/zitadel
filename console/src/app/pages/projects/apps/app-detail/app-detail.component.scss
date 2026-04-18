@@ -180,7 +180,7 @@
       }
 
       button {
-        margin-left: 1rem;
+        margin-inline-start: 1rem;
       }
     }
 
@@ -189,7 +189,7 @@
       align-items: center;
 
       .cnsl-app-or {
-        margin-right: 1rem;
+        margin-inline-end: 1rem;
       }
     }
 
@@ -223,7 +223,7 @@
   .toggle {
     outline: none;
     margin-top: 1rem;
-    margin-right: 1rem;
+    margin-inline-end: 1rem;
     border-radius: 0.5rem;
 
     * {
@@ -231,7 +231,7 @@
     }
 
     i {
-      margin-right: 1rem;
+      margin-inline-end: 1rem;
     }
   }
 
@@ -262,7 +262,7 @@
 
   .rt {
     margin-top: 1.7rem;
-    margin-left: 0.5rem;
+    margin-inline-start: 0.5rem;
   }
 }
 
@@ -290,7 +290,7 @@
 
 .app-full-width {
   flex-basis: 100%;
-  margin-right: 0.5rem;
+  margin-inline-end: 0.5rem;
 }
 
 .clockskew-title {
@@ -323,5 +323,5 @@
 }
 
 .download-button {
-  margin-left: 1rem;
+  margin-inline-start: 1rem;
 }

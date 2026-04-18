@@ -17,7 +17,7 @@ function CheckIcon({ title }: { title: string }) {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className="las la-check mr-2 h-6 w-6 flex-none text-lg text-green-500 dark:text-green-500"
+      className="las la-check me-2 h-6 w-6 flex-none text-lg text-green-500 dark:text-green-500"
       role="img"
     >
       <title>{title}</title>
@@ -29,7 +29,7 @@ function CheckIcon({ title }: { title: string }) {
 function CrossIcon({ title }: { title: string }) {
   return (
     <svg
-      className="las la-times text-warn-light-500 dark:text-warn-dark-500 mr-2 h-6 w-6 flex-none text-lg"
+      className="las la-times text-warn-light-500 dark:text-warn-dark-500 me-2 h-6 w-6 flex-none text-lg"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"

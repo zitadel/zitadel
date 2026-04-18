@@ -21,7 +21,7 @@
       height: 36px;
       align-items: center;
       width: fit-content;
-      float: right;
+      float: inline-end;
       overflow: hidden;
 
       button {
@@ -39,18 +39,18 @@
       }
 
       button:only-of-type {
-        border-left: 1px solid $border-color;
-        border-right: 1px solid $border-color;
+        border-inline-start: 1px solid $border-color;
+        border-inline-end: 1px solid $border-color;
         border-radius: 0.5rem;
       }
 
       button:first-of-type {
-        border-left: 1px solid $border-color;
+        border-inline-start: 1px solid $border-color;
         border-radius: 0.5rem;
       }
 
       button:last-of-type {
-        border-right: 1px solid $border-color;
+        border-inline-end: 1px solid $border-color;
         border-radius: 0.5rem;
       }
 

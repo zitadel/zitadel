@@ -12,11 +12,11 @@
       position: relative;
 
       &.indented {
-        margin-right: 2rem;
+        margin-inline-end: 2rem;
 
         .sidenav-sticky-rel {
-          margin-left: -2rem;
-          padding-left: 2rem;
+          margin-inline-start: -2rem;
+          padding-inline-start: 2rem;
           background: map-get($background, footer);
         }
       }
@@ -63,7 +63,7 @@
         .sidenav-setting-list-element {
           border: none;
           background: none;
-          text-align: left;
+          text-align: start;
           padding: 0.75rem 0;
           font-size: 15px;
           cursor: pointer;
@@ -83,7 +83,7 @@
 
           .warn-icon {
             color: map-get($background, alert);
-            margin-left: 0.5rem;
+            margin-inline-start: 0.5rem;
             font-size: 1.2rem;
             height: 1.2rem;
             width: 1.2rem;
@@ -91,7 +91,7 @@
           }
 
           .state {
-            margin-left: 0.5rem;
+            margin-inline-start: 0.5rem;
           }
 
           &:hover {

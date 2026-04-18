@@ -91,7 +91,7 @@
             font-size: 14px;
             padding: 0.5rem 1.5rem 0.5rem 0.75rem;
             height: 2.5rem;
-            text-align: left;
+            text-align: start;
             background-color: transparent;
             cursor: pointer;
             transition: all ease 0.2s;
@@ -101,14 +101,14 @@
             }
 
             .svgspan {
-              margin-left: 0.75rem;
+              margin-inline-start: 0.75rem;
               position: absolute;
               top: 0;
               bottom: 0;
-              right: 0;
+              inset-inline-end: 0;
               display: flex;
               align-items: center;
-              padding-right: 0.5rem;
+              padding-inline-end: 0.5rem;
               pointer-events: none;
 
               svg {
@@ -226,7 +226,7 @@
 
       .doc-link,
       .custom-link {
-        margin-right: 1rem;
+        margin-inline-end: 1rem;
 
         @media only screen and (max-width: 800px) {
           display: none;
@@ -239,7 +239,7 @@
 
         .iam-settings,
         .org-settings {
-          margin-right: 1rem;
+          margin-inline-end: 1rem;
           display: none;
           position: relative;
           height: 36px;
@@ -251,8 +251,8 @@
           display: inline;
 
           i {
-            margin-right: -0.5rem;
-            margin-left: 0.25rem;
+            margin-inline-end: -0.5rem;
+            margin-inline-start: 0.25rem;
           }
 
           @media only screen and (max-width: 375px) {
@@ -308,7 +308,7 @@
             position: absolute;
             z-index: 300;
             top: 55px;
-            right: 0;
+            inset-inline-end: 0;
             overflow: hidden;
             box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);
             border-radius: 0.5rem;

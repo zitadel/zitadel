@@ -15,13 +15,13 @@
 
   .cnsl-filter-button-wrapper {
     position: relative;
-    padding-right: 0.5rem;
+    padding-inline-end: 0.5rem;
 
     .filter-toggle {
       .filter-count {
         font-size: 14px;
         color: $primary-color;
-        margin-left: 0.5rem;
+        margin-inline-start: 0.5rem;
       }
     }
   }
@@ -83,7 +83,7 @@
 
         .filter-select-method {
           min-width: 100px;
-          margin-right: 0.5rem;
+          margin-inline-end: 0.5rem;
         }
 
         .filter-input-value {

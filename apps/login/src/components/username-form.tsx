@@ -152,7 +152,7 @@ export function UsernameForm({
             disabled={loading || !formState.isValid}
             onClick={handleSubmit((e) => submitLoginName(e, organization))}
           >
-            {loading && <Spinner className="mr-2 h-5 w-5" />}
+            {loading && <Spinner className="me-2 h-5 w-5" />}
             <Translated i18nKey="submit" namespace="loginname" />
           </Button>
         </div>

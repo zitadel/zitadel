@@ -43,7 +43,7 @@
       }
 
       i {
-        margin-left: 0.5rem;
+        margin-inline-start: 0.5rem;
       }
     }
 
@@ -71,7 +71,7 @@
         .type-button-icon,
         .type-icon,
         span {
-          margin-right: 1rem;
+          margin-inline-end: 1rem;
         }
 
         .type-icon,
@@ -92,7 +92,7 @@
             display: flex;
             align-items: center;
             margin-bottom: 0.5rem;
-            padding-left: 7px;
+            padding-inline-start: 7px;
 
             .fill-space {
               flex: 1;
@@ -100,7 +100,7 @@
           }
 
           .icon {
-            margin-right: 1rem;
+            margin-inline-end: 1rem;
             color: $primary-color;
           }
 
@@ -120,7 +120,7 @@
               cursor: move;
 
               .flow-action-name {
-                margin-right: 1rem;
+                margin-inline-end: 1rem;
               }
 
               .fill-space {
@@ -128,12 +128,12 @@
               }
 
               i {
-                margin-right: 0.5rem;
+                margin-inline-end: 0.5rem;
               }
             }
 
             .state {
-              margin-left: 1rem;
+              margin-inline-start: 1rem;
             }
           }
         }
@@ -143,7 +143,7 @@
         position: absolute;
         top: 26px;
         bottom: 1.5rem;
-        left: 35px;
+        inset-inline-start: 35px;
         width: 2px;
         z-index: 0;
         background-color: $primary-color;
@@ -171,7 +171,7 @@
         0 3px 14px 2px rgba(0, 0, 0, 0.12);
 
       i {
-        margin-right: 0.5rem;
+        margin-inline-end: 0.5rem;
       }
     }
 

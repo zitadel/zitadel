@@ -15,7 +15,7 @@
     align-items: center;
 
     .smtp-logo {
-      margin-right: 1rem;
+      margin-inline-end: 1rem;
       height: 28px;
       width: 28px;
       flex-shrink: 0;
@@ -33,13 +33,13 @@
       font-size: 1.75rem;
       height: 1.75rem;
       width: 1.75rem;
-      margin-right: 1rem;
+      margin-inline-end: 1rem;
       flex-shrink: 0;
     }
   }
 }
 .smtp-margin-right {
-  margin-right: 0.5rem;
+  margin-inline-end: 0.5rem;
 }
 
 td {

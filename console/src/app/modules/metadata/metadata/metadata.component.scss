@@ -2,7 +2,7 @@
   padding-bottom: 1rem;
 
   .refresh {
-    margin-left: 0.5rem;
+    margin-inline-start: 0.5rem;
     font-size: 1.2rem;
 
     i {
@@ -22,7 +22,7 @@
     .first {
       flex: 1;
       font-size: 13px;
-      margin-right: 0.5rem;
+      margin-inline-end: 0.5rem;
     }
 
     .fill-space {
@@ -61,7 +61,7 @@
 }
 
 .refresh-btn {
-  float: left;
+  float: inline-start;
 
   .icon {
     font-size: 1.2rem;

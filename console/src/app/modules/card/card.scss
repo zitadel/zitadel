@@ -23,7 +23,7 @@
       opacity: 0;
       position: absolute;
       top: -12px;
-      left: -12px;
+      inset-inline-start: -12px;
       color: $border-color;
     }
 
@@ -77,8 +77,8 @@
     flex-shrink: 0;
     border-radius: 50%;
     background-color: #cd5c5c;
-    margin-left: -4px;
-    margin-right: 8px;
+    margin-inline-start: -4px;
+    margin-inline-end: 8px;
     box-shadow: 0 0 3px #0000001a;
   }
 }

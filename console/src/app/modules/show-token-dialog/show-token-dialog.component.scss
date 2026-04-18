@@ -13,7 +13,7 @@
   justify-content: flex-end;
 
   .ok-button {
-    margin-left: 0.5rem;
+    margin-inline-start: 0.5rem;
   }
 }
 
@@ -28,7 +28,7 @@
   }
 
   .left {
-    margin-right: 1rem;
+    margin-inline-end: 1rem;
     margin-top: 0;
     margin-bottom: 0.5rem;
   }
@@ -46,7 +46,7 @@
     }
 
     .ctc {
-      margin-right: 1rem;
+      margin-inline-end: 1rem;
     }
   }
 }

@@ -21,7 +21,7 @@
         .setting-list-element {
           border: none;
           background: none;
-          text-align: left;
+          text-align: start;
           padding: 0.75rem 0;
           opacity: 0.6;
           font-size: 15px;
@@ -97,7 +97,7 @@
 }
 
 .resendemail {
-  margin-right: 1rem;
+  margin-inline-end: 1rem;
   margin-top: 0.5rem;
 }
 

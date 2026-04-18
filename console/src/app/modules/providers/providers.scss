@@ -17,7 +17,7 @@
       .idp-logo {
         height: 36px;
         width: 36px;
-        margin-right: 1rem;
+        margin-inline-end: 1rem;
         flex-shrink: 0;
 
         &.apple {
@@ -35,7 +35,7 @@
 
       .idp-icon {
         font-size: 36px;
-        margin-right: 1rem;
+        margin-inline-end: 1rem;
         flex-shrink: 0;
       }
 
@@ -99,7 +99,7 @@
       .dl-btn {
         z-index: 2;
         position: absolute;
-        right: 0;
+        inset-inline-end: 0;
         top: 0;
         cursor: pointer;
         visibility: hidden;
@@ -108,7 +108,7 @@
 
       img {
         top: 0;
-        left: 0;
+        inset-inline-start: 0;
         width: 70px;
         height: 70px;
         object-fit: contain;

@@ -159,7 +159,7 @@ export function RegisterForm({
         {/* show chooser if both methods are allowed */}
         {loginSettings && loginSettings.allowLocalAuthentication && loginSettings.passkeysType == PasskeysType.ALLOWED && (
           <>
-            <p className="ztdl-p mt-4 mb-6 block text-left">
+            <p className="ztdl-p mt-4 mb-6 block text-start">
               <Translated i18nKey="selectMethod" namespace="register" />
             </p>
 
@@ -200,7 +200,7 @@ export function RegisterForm({
             })}
             data-testid="submit-button"
           >
-            {loading && <Spinner className="mr-2 h-5 w-5" />}
+            {loading && <Spinner className="me-2 h-5 w-5" />}
             <Translated i18nKey="submit" namespace="register" />
           </Button>
         </div>

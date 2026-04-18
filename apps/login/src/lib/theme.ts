@@ -95,7 +95,7 @@ export const ROUNDNESS_CLASSES = {
   full: {
     card: "rounded-3xl",
     button: "rounded-full",
-    input: "rounded-full pl-4",
+    input: "rounded-full ps-4",
     image: "rounded-full",
     avatar: "rounded-full",
     avatarContainer: "rounded-full",

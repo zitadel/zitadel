@@ -28,7 +28,7 @@
       font-size: 12px;
       background: #5282c1;
       color: white;
-      margin-right: 0.5rem;
+      margin-inline-end: 0.5rem;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -41,7 +41,7 @@
       i {
         opacity: 0.5;
         font-size: 1.1rem;
-        margin-left: 0.5rem;
+        margin-inline-start: 0.5rem;
       }
 
       .key {

@@ -25,7 +25,7 @@
         justify-content: space-between;
 
         .buttongroup {
-          margin-right: 0.5rem;
+          margin-inline-end: 0.5rem;
           margin-top: 0.5rem;
 
           .toggle-row {
@@ -33,13 +33,13 @@
             align-items: center;
 
             i {
-              margin-right: 0.5rem;
+              margin-inline-end: 0.5rem;
             }
 
             .info-i {
               font-size: 1.2rem;
-              margin-left: 0.5rem;
-              margin-right: 0;
+              margin-inline-start: 0.5rem;
+              margin-inline-end: 0;
             }
 
             .current-dot {
@@ -47,7 +47,7 @@
               width: 8px;
               border-radius: 50%;
               // background-color: rgb(84, 142, 230);
-              margin-left: 0.5rem;
+              margin-inline-start: 0.5rem;
 
               &.enabled {
                 background-color: var(--success);

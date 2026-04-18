@@ -21,7 +21,7 @@ export const SignInWithAzureAd = forwardRef<HTMLButtonElement, SignInWithIdentit
         {children ? (
           children
         ) : (
-          <span className="ml-4">{name ? name : <Translated i18nKey="signInWithAzureAD" namespace="idp" />}</span>
+          <span className="ms-4">{name ? name : <Translated i18nKey="signInWithAzureAD" namespace="idp" />}</span>
         )}
       </BaseButton>
     );

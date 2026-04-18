@@ -46,7 +46,7 @@ export const SignInWithGoogle = forwardRef<HTMLButtonElement, SignInWithIdentity
         {children ? (
           children
         ) : (
-          <span className="ml-4">{name ? name : <Translated i18nKey="signInWithGoogle" namespace="idp" />}</span>
+          <span className="ms-4">{name ? name : <Translated i18nKey="signInWithGoogle" namespace="idp" />}</span>
         )}
       </BaseButton>
     );

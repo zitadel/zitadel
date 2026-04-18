@@ -260,7 +260,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
           }}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="verify.submit" namespace="passkey" />
+          {loading && <Spinner className="me-2 h-5 w-5" />} <Translated i18nKey="verify.submit" namespace="passkey" />
         </Button>
       </div>
     </div>
