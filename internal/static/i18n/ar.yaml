@@ -5,6 +5,7 @@ Errors:
   IDMissing: "المعرف مفقود"
   ResourceOwnerMissing: "منظمة مالك المورد مفقودة"
   RemoveFailed: "تعذر الحذف"
+  PermissionDenied: "تم رفض الإذن"
   ProjectionName:
     Invalid: "اسم الإسقاط (Projection) غير صالح"
   Assets:
@@ -182,6 +183,7 @@ Errors:
       Passwordless:
         NotExisting: "بدون كلمة مرور غير موجود"
       RecoveryCodes:
+        Empty: "رمز الاسترداد فارغ"
         InvalidCode: "رمز الاسترداد المقدم غير صالح"
         MaxCountExceeded: "تم تجاوز الحد الأقصى لرموز الاسترداد"
         NotReady: "رموز الاسترداد ليست جاهزة للاستخدام"
@@ -512,6 +514,8 @@ Errors:
       StorageFailed: "فشل تخزين سجل تنفيذ الإجراء في قاعدة البيانات"
       ScanFailed: "فشل الاستعلام عن الاستخدام لثواني تنفيذ الإجراء"
   Session:
+    IDMissing: "معرف الجلسة مفقود"
+    NotFound: "الجلسة غير موجودة"
     NotExisting: "الجلسة غير موجودة"
     Terminated: "الجلسة منتهية بالفعل"
     Expired: "انتهت صلاحية الجلسة"
@@ -564,6 +568,10 @@ Errors:
     NoTimeout: "الهدف ليس له مهلة"
     InvalidURL: "الهدف لديه عنوان URL غير صالح"
     NotFound: "الهدف غير موجود"
+    InvalidExpirationDate: "يجب أن يكون تاريخ انتهاء صلاحية المفتاح في المستقبل"
+    PublicKeyExpired: "انتهت صلاحية المفتاح العام للهدف"
+    PublicKeyActive: "لا يمكن حذف المفتاح العام النشط للهدف"
+    InvalidPublicKey: "المفتاح العام غير صالح. يجب أن يكون مفتاح RSA أو ECDSA عام مُرمّز بصيغة PEM وبتنسيق PKCS#8"
   Execution:
     ConditionInvalid: "شرط التنفيذ غير صالح"
     Invalid: "التنفيذ غير صالح"
@@ -572,6 +580,7 @@ Errors:
     NoTargets: "لا توجد أهداف محددة"
     Failed: "فشل التنفيذ"
     ResponseIsNotValidJSON: "الاستجابة ليست JSON صالحاً"
+    MissingEncryptionKey: "لم يتم العثور على مفتاح تشفير للهدف"
   UserSchema:
     NotEnabled: "ميزة \"مخطط المستخدم\" غير مفعلة"
     Type:

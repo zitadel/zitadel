@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: التحقق من المصادقة الثنائية
   DescriptionPhone: أنشئ عاملك الثاني. أدخل رقم هاتفك للتحقق منه.
   DescriptionCode: أنشئ عاملك الثاني. أدخل الرمز المستلم للتحقق من رقم هاتفك.
+  CountryCodeLabel: الدولة
   PhoneLabel: الهاتف
   CodeLabel: الرمز
   EditButtonText: تعديل
@@ -267,6 +268,7 @@ RegistrationUser:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   Arabic: العربية
   GenderLabel: الجنس
   Female: أنثى
@@ -313,6 +315,7 @@ ExternalRegistrationUserOverview:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   Arabic: العربية
   TosAndPrivacyLabel: الشروط والأحكام
   TosConfirm: أنا أقبل
@@ -393,6 +396,7 @@ ExternalNotFound:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Ukrainian: Українська
   Arabic: العربية
 DeviceAuth:
   Title: تفويض الجهاز
