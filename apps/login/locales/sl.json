@@ -383,6 +383,7 @@
     "userIdMissing": "ID uporabnika ni podan!",
     "successTitle": "Uporabnik potrjen",
     "successDescription": "Uporabnik je bil uspešno potrjen.",
+    "successContinue": "Naprej",
     "setupAuthenticator": "Nastavite avtentikator",
     "verify": {
       "title": "Potrdite uporabnika",
