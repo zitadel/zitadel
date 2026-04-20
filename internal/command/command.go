@@ -74,6 +74,7 @@ type Commands struct {
 	defaultRefreshTokenLifetime     time.Duration
 	defaultRefreshTokenIdleLifetime time.Duration
 	phoneCodeVerifier               func(ctx context.Context, id string) (senders.CodeGenerator, error)
+	emailCodeVerifier               func(ctx context.Context, id string) (senders.CodeGenerator, error)
 	tarpit                          func(failedAttempts uint64)
 
 	multifactors            domain.MultifactorConfigs
@@ -239,6 +240,7 @@ func StartCommands(
 		repo.newHashedSecret = newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret)
 	}
 	repo.phoneCodeVerifier = repo.phoneCodeVerifierFromConfig
+	repo.emailCodeVerifier = repo.emailCodeVerifierFromConfig
 	repo.tarpit = defaults.Tarpit.Tarpit()
 	return repo, nil
 }
