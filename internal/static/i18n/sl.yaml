@@ -5,6 +5,7 @@ Errors:
   IDMissing: "ID manjka"
   ResourceOwnerMissing: "Organizacija lastnika vira manjka"
   RemoveFailed: "Ni bilo mogoče odstraniti"
+  PermissionDenied: "Dostop zavrnjen"
   ProjectionName:
     Invalid: "Neveljavno ime projekcije"
   Assets:
@@ -513,6 +514,8 @@ Errors:
       StorageFailed: "Shranjevanje dnevnika izvajanja akcije v bazo podatkov ni uspelo"
       ScanFailed: "Poizvedba o uporabi sekund izvajanja akcije ni uspela"
   Session:
+    IDMissing: "Manjka ID seje"
+    NotFound: "Seja ni najdena"
     NotExisting: "Seja ne obstaja"
     Terminated: "Seja je že zaključena"
     Expired: "Seja je potekla"
