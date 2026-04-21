@@ -1,17 +1,24 @@
 <form>
   <cnsl-form-field>
     <cnsl-label>{{ 'PROJECT.GRANT.CREATE.SEL_ORG_FORMFIELD' | translate }}</cnsl-label>
-    <input
-      cnslInput
-      type="text"
-      class="tw:max-w-125"
-      [matAutocomplete]="auto"
-      [formControl]="searchControl"
-      name="name"
-      data-e2e="add-org-input"
-      #input
-      (keyup)="searchSignal.set(input.value)"
-    />
+    <span class="tw:relative">
+      <input
+        cnslInput
+        type="text"
+        class="tw:max-w-125"
+        [matAutocomplete]="auto"
+        [formControl]="searchControl"
+        name="name"
+        data-e2e="add-org-input"
+        #input
+        (keyup)="searchSignal.set(input.value)"
+      />
+      @if (query.isFetching()) {
+        <span class="tw:absolute tw:inset-2 tw:flex tw:items-center tw:justify-end">
+          <mat-spinner diameter="25" color="primary"></mat-spinner>
+        </span>
+      }
+    </span>
     <mat-autocomplete
       #auto="matAutocomplete"
       [displayWith]="displayOrg"

@@ -14,10 +14,10 @@ import { CreateLayoutModule } from 'src/app/modules/create-layout/create-layout.
 import { InputModule } from 'src/app/modules/input/input.module';
 import { ProjectRolesTableModule } from 'src/app/modules/project-roles-table/project-roles-table.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
+import { SearchOrgAutocompleteComponent } from 'src/app/modules/search-org-autocomplete/search-org-autocomplete.component';
 
 import { ProjectGrantCreateRoutingModule } from './project-grant-create-routing.module';
 import { ProjectGrantCreateComponent } from './project-grant-create.component';
-import { SearchOrgAutocompleteComponent } from '../../../../modules/search-org-autocomplete/search-org-autocomplete.component';
 
 @NgModule({
   declarations: [ProjectGrantCreateComponent],

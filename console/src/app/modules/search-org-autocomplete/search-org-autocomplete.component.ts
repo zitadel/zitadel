@@ -9,9 +9,9 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { NewAuthService } from '../../services/new-auth.service';
+import { NewAuthService } from 'src/app/services/new-auth.service';
 import { injectInfiniteQuery, keepPreviousData } from '@tanstack/angular-query-experimental';
-import { UserService } from '../../services/user.service';
+import { UserService } from 'src/app/services/user.service';
 import { AuthService, ListMyProjectOrgsRequestSchema } from '@zitadel/proto/zitadel/auth_pb';
 import { MatAutocomplete, MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -24,9 +24,11 @@ import { Org, OrgFieldName, OrgState } from '@zitadel/proto/zitadel/org_pb';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { MatTooltip } from '@angular/material/tooltip';
 import { requiredValidator } from '../form-field/validators/validators';
-import { ScrollableDirective } from '../../directives/scrollable/scrollable.directive';
+import { ScrollableDirective } from 'src/app/directives/scrollable/scrollable.directive';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { debounceTime } from 'rxjs';
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {ToastService} from "src/app/services/toast.service";
 
 @Component({
   selector: 'cnsl-search-org-autocomplete',
@@ -43,12 +45,11 @@ import { debounceTime } from 'rxjs';
     FormsModule,
     MatTooltip,
     ScrollableDirective,
+    MatProgressSpinner,
   ],
 })
 export class SearchOrgAutocompleteComponent {
   public readonly selectionChanged = output<Org>();
-  private readonly authService = inject(NewAuthService);
-  private readonly userService = inject(UserService);
 
   protected readonly searchControl = new FormControl<Org | null>(null, { validators: [requiredValidator] });
   protected readonly searchSignal = signal('');
@@ -60,23 +61,8 @@ export class SearchOrgAutocompleteComponent {
     read: ElementRef,
   });
 
-  constructor() {
-    const cdr = inject(ChangeDetectorRef);
-    // this makes sure the mat tooltip is visible on text-overflow ellipsis when the browser size changes
-    effect((onCleanup) => {
-      const { nativeElement } = this.matAutocompleteSignal() ?? {};
-      if (!nativeElement) {
-        return;
-      }
-
-      const observer = new ResizeObserver(() => cdr.detectChanges());
-      observer.observe(nativeElement);
-
-      onCleanup(() => {
-        observer.disconnect();
-      });
-    });
-  }
+  private readonly authService = inject(NewAuthService);
+  private readonly userService = inject(UserService);
 
   protected readonly query = injectInfiniteQuery(() => {
     const search = this.debouncedSearchSignal();
@@ -132,6 +118,32 @@ export class SearchOrgAutocompleteComponent {
       },
     };
   });
+
+  constructor() {
+    const cdr = inject(ChangeDetectorRef);
+    // this makes sure the mat tooltip is visible on text-overflow ellipsis when the browser size changes
+    effect((onCleanup) => {
+      const { nativeElement } = this.matAutocompleteSignal() ?? {};
+      if (!nativeElement) {
+        return;
+      }
+
+      const observer = new ResizeObserver(() => cdr.detectChanges());
+      observer.observe(nativeElement);
+
+      onCleanup(() => {
+        observer.disconnect();
+      });
+    });
+
+    const toastService = inject(ToastService);
+    effect(() => {
+      const error = this.query.error();
+      if(error) {
+        toastService.showError(error)
+      }
+    });
+  }
 
   protected async onScroll(position: 'bottom' | 'top') {
     if (this.query.isFetchingNextPage() || !this.query.hasNextPage() || position === 'top') {

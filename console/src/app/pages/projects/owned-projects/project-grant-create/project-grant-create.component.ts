@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { Org } from '@zitadel/proto/zitadel/org_pb';
-import { NewMgmtService } from '../../../../services/new-mgmt.service';
+import { NewMgmtService } from 'src/app/services/new-mgmt.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const ROUTEPARAM = 'projectid';
