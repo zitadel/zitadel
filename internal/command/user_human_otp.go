@@ -463,10 +463,6 @@ func (c *Commands) HumanSendOTPEmail(ctx context.Context, userID, resourceOwner 
 	codeAddedEvent := func(ctx context.Context, aggregate *eventstore.Aggregate, code *crypto.CryptoValue, expiry time.Duration, info *user.AuthRequestInfo, generatorID string) eventstore.Command {
 		return user.NewHumanOTPEmailCodeAddedEvent(ctx, aggregate, code, expiry, info, generatorID)
 	}
-	generateCode := func(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (*EncryptedCode, string, error) {
-		code, err := c.newEncryptedCodeWithDefault(ctx, filter, typ, alg, defaultConfig)
-		return code, "", err
-	}
 	return c.sendHumanOTP(
 		ctx,
 		userID,
@@ -476,7 +472,7 @@ func (c *Commands) HumanSendOTPEmail(ctx context.Context, userID, resourceOwner 
 		domain.SecretGeneratorTypeOTPEmail,
 		c.defaultSecretGenerators.OTPEmail,
 		codeAddedEvent,
-		generateCode,
+		c.newEmailCodeWithHook(userID, resourceOwner),
 	)
 }
 

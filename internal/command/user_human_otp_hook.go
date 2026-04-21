@@ -121,6 +121,92 @@ func validateGenerationConfig(cfg *crypto.GeneratorConfig) error {
 	return nil
 }
 
+// preOTPEmailCodeHookFromTargets is the default implementation of the preotpemailcode
+// hook invocation. Mirrors preOTPSMSCodeHookFromTargets for the email channel.
+func (c *Commands) preOTPEmailCodeHookFromTargets(ctx context.Context, userID, resourceOwner string, effectiveConfig *crypto.GeneratorConfig) (*otp.PreOTPEmailCodeResponse, error) {
+	fnID := exec_repo.ID(domain.ExecutionTypeFunction, domain.ActionFunctionPreOTPEmailCode.LocalizationKey())
+	targets := execution.QueryExecutionTargetsForFunction(ctx, fnID)
+	if len(targets) == 0 {
+		return nil, nil
+	}
+
+	emailWM, err := c.emailWriteModel(ctx, userID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+
+	// OTP Email enrollment requires a verified email (AddHumanOTPEmail precondition),
+	// so emailWM.Email is the verified address at this point.
+	ctxInfo := &otp.PreOTPEmailCodeContext{
+		FunctionName:          domain.ActionFunctionPreOTPEmailCode.LocalizationKey(),
+		RecipientEmailAddress: string(emailWM.Email),
+		GeneratorConfig:       publicGeneratorConfigFrom(effectiveConfig),
+	}
+
+	resp, err := execution.CallTargets(ctx, targets, ctxInfo, c.targetEncryption, c.GetActiveSigningWebKey, c.ActionsV2DenyList)
+	if err != nil {
+		return nil, err
+	}
+	response, ok := resp.(*otp.PreOTPEmailCodeResponse)
+	if !ok {
+		return nil, nil
+	}
+	return response, nil
+}
+
+// newEmailCodeWithHook wraps the default email code generator so that, when
+// AllowOTPCodeOverride is enabled, the preotpemailcode hook can supply an
+// override code or adjust generator parameters before local code generation.
+// Unlike the SMS wrapper there is no external-provider bypass — email has no
+// provider-level CodeGenerator equivalent to Twilio Verify.
+func (c *Commands) newEmailCodeWithHook(userID, resourceOwner string) encryptedCodeGeneratorWithDefaultFunc {
+	base := func(ctx context.Context, filter preparation.FilterToQueryReducer, secretGeneratorType domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (*EncryptedCode, string, error) {
+		code, err := c.newEncryptedCodeWithDefault(ctx, filter, secretGeneratorType, alg, defaultConfig)
+		return code, "", err
+	}
+	return func(ctx context.Context, filter preparation.FilterToQueryReducer, secretGeneratorType domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (*EncryptedCode, string, error) {
+		if !authz.GetFeatures(ctx).AllowOTPCodeOverride {
+			slog.DebugContext(ctx, "preotpemailcode hook skipped: AllowOTPCodeOverride disabled", "userID", userID)
+			return base(ctx, filter, secretGeneratorType, alg, defaultConfig)
+		}
+		if c.preOTPEmailCodeHook == nil {
+			slog.DebugContext(ctx, "preotpemailcode hook skipped: no hook implementation", "userID", userID)
+			return base(ctx, filter, secretGeneratorType, alg, defaultConfig)
+		}
+
+		effectiveConfig, err := cryptoGeneratorConfigWithDefault(ctx, filter, secretGeneratorType, defaultConfig)
+		if err != nil {
+			return nil, "", err
+		}
+
+		hookResp, err := c.preOTPEmailCodeHook(ctx, userID, resourceOwner, effectiveConfig)
+		if err != nil {
+			return nil, "", err
+		}
+
+		if hookResp != nil && hookResp.Code != nil {
+			code, err := encryptOverriddenOTPCode(*hookResp.Code, alg, overrideExpiry(effectiveConfig.Expiry, hookResp.Expiry))
+			if err != nil {
+				return nil, "", err
+			}
+			return code, "", nil
+		}
+
+		codeConfig := effectiveConfig
+		if hookResp != nil && (hookResp.Generate != nil || hookResp.Expiry != nil) {
+			codeConfig = applyGenerationOverrides(effectiveConfig, hookResp.Generate, hookResp.Expiry)
+			if err := validateGenerationConfig(codeConfig); err != nil {
+				return nil, "", err
+			}
+		}
+		crypted, plain, err := crypto.NewCode(crypto.NewEncryptionGenerator(*codeConfig, alg))
+		if err != nil {
+			return nil, "", err
+		}
+		return &EncryptedCode{Crypted: crypted, Plain: plain, Expiry: codeConfig.Expiry}, "", nil
+	}
+}
+
 func publicGeneratorConfigFrom(cfg *crypto.GeneratorConfig) *otp.PublicGeneratorConfig {
 	if cfg == nil {
 		return nil

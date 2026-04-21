@@ -102,7 +102,8 @@ type Commands struct {
 
 	GetActiveSigningWebKey func(ctx context.Context) (*jose.JSONWebKey, error)
 
-	preOTPSMSCodeHook func(ctx context.Context, userID, resourceOwner string, effectiveConfig *crypto.GeneratorConfig) (*otp.PreOTPSMSCodeResponse, error)
+	preOTPSMSCodeHook   func(ctx context.Context, userID, resourceOwner string, effectiveConfig *crypto.GeneratorConfig) (*otp.PreOTPSMSCodeResponse, error)
+	preOTPEmailCodeHook func(ctx context.Context, userID, resourceOwner string, effectiveConfig *crypto.GeneratorConfig) (*otp.PreOTPEmailCodeResponse, error)
 
 	GenerateDomain func(instanceName, domain string) (string, error)
 
@@ -247,6 +248,7 @@ func StartCommands(
 	repo.phoneCodeVerifier = repo.phoneCodeVerifierFromConfig
 	repo.emailCodeVerifier = repo.emailCodeVerifierFromConfig
 	repo.preOTPSMSCodeHook = repo.preOTPSMSCodeHookFromTargets
+	repo.preOTPEmailCodeHook = repo.preOTPEmailCodeHookFromTargets
 	repo.tarpit = defaults.Tarpit.Tarpit()
 	return repo, nil
 }
