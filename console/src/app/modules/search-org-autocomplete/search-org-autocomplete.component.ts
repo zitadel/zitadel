@@ -81,28 +81,31 @@ export class SearchOrgAutocompleteComponent {
     return {
       queryKey: [this.userService.userId(), AuthService.name, AuthService.method.listMyProjectOrgs.name, 'infinite', search],
       placeholderData: keepPreviousData,
-      queryFn: async ({ pageParam }) =>
-        this.authService.listMyProjectOrgs({
-          query: {
-            limit: 20,
-            offset: BigInt(pageParam.offset),
-          },
-          sortingColumn: OrgFieldName.NAME,
-          queries: search
-            ? [
-                ...stateQuery,
-                {
-                  query: {
-                    case: 'nameQuery',
-                    value: {
-                      name: search,
-                      method: TextQueryMethod.CONTAINS_IGNORE_CASE,
+      queryFn: async ({ pageParam, signal }) =>
+        this.authService.listMyProjectOrgs(
+          {
+            query: {
+              limit: 20,
+              offset: BigInt(pageParam.offset),
+            },
+            sortingColumn: OrgFieldName.NAME,
+            queries: search
+              ? [
+                  ...stateQuery,
+                  {
+                    query: {
+                      case: 'nameQuery',
+                      value: {
+                        name: search,
+                        method: TextQueryMethod.CONTAINS_IGNORE_CASE,
+                      },
                     },
                   },
-                },
-              ]
-            : stateQuery,
-        }),
+                ]
+              : stateQuery,
+          },
+          signal,
+        ),
       initialPageParam: {
         offset: 0,
       },

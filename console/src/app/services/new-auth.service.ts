@@ -84,7 +84,7 @@ export class NewAuthService {
     }));
   }
 
-  public listMyProjectOrgs(req: MessageInitShape<typeof ListMyProjectOrgsRequestSchema>) {
-    return this.grpcService.authNew.listMyProjectOrgs(req);
+  public listMyProjectOrgs(req: MessageInitShape<typeof ListMyProjectOrgsRequestSchema>, signal?: AbortSignal) {
+    return this.grpcService.authNew.listMyProjectOrgs(req, { signal });
   }
 }
