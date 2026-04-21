@@ -154,7 +154,7 @@ export class ProjectGrantDetailComponent {
 
       this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERREMOVED', true);
 
-      await new Promise<void>(res => setTimeout(res, 1000))
+      await new Promise<void>((res) => setTimeout(res, 1000));
     } catch (error) {
       this.toast.showError(error);
     } finally {
