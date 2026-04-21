@@ -27,8 +27,8 @@ import { requiredValidator } from '../form-field/validators/validators';
 import { ScrollableDirective } from 'src/app/directives/scrollable/scrollable.directive';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { debounceTime } from 'rxjs';
-import {MatProgressSpinner} from "@angular/material/progress-spinner";
-import {ToastService} from "src/app/services/toast.service";
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
   selector: 'cnsl-search-org-autocomplete',
@@ -139,8 +139,8 @@ export class SearchOrgAutocompleteComponent {
     const toastService = inject(ToastService);
     effect(() => {
       const error = this.query.error();
-      if(error) {
-        toastService.showError(error)
+      if (error) {
+        toastService.showError(error);
       }
     });
   }
