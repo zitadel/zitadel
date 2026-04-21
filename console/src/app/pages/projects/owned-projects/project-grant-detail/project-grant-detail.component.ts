@@ -148,19 +148,18 @@ export class ProjectGrantDetailComponent {
     await Promise.all(this.selection.map((member) => this.removeProjectMember(grant, member)));
   }
 
-  public removeProjectMember(grant: GrantedProject.AsObject, member: Member.AsObject): void {
-    this.mgmtService
-      .removeProjectGrantMember(grant.projectId, grant.grantId, member.userId)
-      .then(() => {
-        this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERREMOVED', true);
-        setTimeout(() => {
-          this.changePage.emit();
-        }, 1000);
-      })
-      .catch((error) => {
-        this.changePage.emit();
-        this.toast.showError(error);
-      });
+  public async removeProjectMember(grant: GrantedProject.AsObject, member: Member.AsObject) {
+    try {
+      await this.mgmtService.removeProjectGrantMember(grant.projectId, grant.grantId, member.userId);
+
+      this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERREMOVED', true);
+
+      await new Promise<void>(res => setTimeout(res, 1000))
+    } catch (error) {
+      this.toast.showError(error);
+    } finally {
+      this.changePage.emit();
+    }
   }
 
   public async openAddMember(grant: GrantedProject.AsObject): Promise<any> {
