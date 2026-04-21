@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/logging"
 
 	new_domain "github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/internal/api/action/otp"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/cache/connector"
@@ -98,6 +99,10 @@ type Commands struct {
 	ActionFunctionExisting func(function string) bool
 	EventExisting          func(event string) bool
 	EventGroupExisting     func(group string) bool
+
+	GetActiveSigningWebKey func(ctx context.Context) (*jose.JSONWebKey, error)
+
+	preOTPSMSCodeHook func(ctx context.Context, userID, resourceOwner string, effectiveConfig *crypto.GeneratorConfig) (*otp.PreOTPSMSCodeResponse, error)
 
 	GenerateDomain func(instanceName, domain string) (string, error)
 
@@ -241,6 +246,7 @@ func StartCommands(
 	}
 	repo.phoneCodeVerifier = repo.phoneCodeVerifierFromConfig
 	repo.emailCodeVerifier = repo.emailCodeVerifierFromConfig
+	repo.preOTPSMSCodeHook = repo.preOTPSMSCodeHookFromTargets
 	repo.tarpit = defaults.Tarpit.Tarpit()
 	return repo, nil
 }

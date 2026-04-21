@@ -396,6 +396,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	}
 	commands.GrpcMethodExisting = checkExisting(api.ListGrpcMethods())
 	commands.GrpcServiceExisting = checkExisting(api.ListGrpcServices())
+	commands.GetActiveSigningWebKey = queries.GetActiveSigningWebKey
 
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)

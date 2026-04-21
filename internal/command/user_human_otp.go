@@ -341,7 +341,7 @@ func (c *Commands) HumanSendOTPSMS(ctx context.Context, userID, resourceOwner st
 		domain.SecretGeneratorTypeOTPSMS,
 		c.defaultSecretGenerators.OTPSMS,
 		codeAddedEvent,
-		c.newPhoneCode,
+		c.newPhoneCodeWithHook(userID, resourceOwner),
 	)
 }
 
