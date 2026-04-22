@@ -6,6 +6,7 @@
         cnslInput
         type="text"
         class="tw:max-w-125"
+        [class.tw:pr-9]="query.isFetching()"
         [matAutocomplete]="auto"
         [formControl]="searchControl"
         name="name"
@@ -33,14 +34,19 @@
               class="tw:max-w-full tw:relative"
               [value]="org"
               data-e2e="org-option"
-              [matTooltip]="name.scrollWidth > name.clientWidth ? org.name : ''"
+              [matTooltip]="org.name"
+              (mouseenter)="showTooltip.set(name.scrollWidth > name.clientWidth)"
+              (mouseleave)="showTooltip.set(false)"
+              [matTooltipDisabled]="!showTooltip()"
             >
               <div
-                class="tw:absolute tw:inset-0 tw:pl-4 tw:pr-4 tw:flex tw:h-full tw:w-full tw:min-w-0 tw:flex-col tw:justify-center"
+                class="tw:absolute tw:inset-0 tw:flex tw:h-full tw:w-full tw:min-w-0 tw:flex-col tw:justify-center"
                 data-e2e="org-option"
               >
-                <span #name class="tw:block tw:truncate">{{ org.name }}</span>
-                <span class="tw:block tw:truncate tw:text-[13px] tw:text-gray-500">{{ org.primaryDomain }}</span>
+                <span #name class="tw:block tw:mr-4 tw:ml-4 tw:truncate">{{ org.name }}</span>
+                <span class="tw:block tw:mr-4 tw:ml-4 tw:truncate tw:text-[13px] tw:text-gray-500">{{
+                  org.primaryDomain
+                }}</span>
               </div>
             </mat-option>
           }

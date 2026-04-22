@@ -1,19 +1,9 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  effect,
-  ElementRef,
-  inject,
-  output,
-  signal,
-  viewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, output, signal } from '@angular/core';
 import { NewAuthService } from 'src/app/services/new-auth.service';
 import { injectInfiniteQuery, keepPreviousData } from '@tanstack/angular-query-experimental';
 import { UserService } from 'src/app/services/user.service';
 import { AuthService, ListMyProjectOrgsRequestSchema } from '@zitadel/proto/zitadel/auth_pb';
-import { MatAutocomplete, MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { InputModule } from '../input/input.module';
@@ -55,10 +45,6 @@ export class SearchOrgAutocompleteComponent {
   protected readonly searchSignal = signal('');
   protected readonly debouncedSearchSignal = toSignal(toObservable(this.searchSignal).pipe(debounceTime(250)), {
     initialValue: this.searchSignal(),
-  });
-
-  private readonly matAutocompleteSignal = viewChild<MatAutocomplete, ElementRef<Element>>(MatAutocomplete, {
-    read: ElementRef,
   });
 
   private readonly authService = inject(NewAuthService);
@@ -122,23 +108,10 @@ export class SearchOrgAutocompleteComponent {
     };
   });
 
+  // used to only open matTooltip if the text gets truncated
+  protected readonly showTooltip = signal(false);
+
   constructor() {
-    const cdr = inject(ChangeDetectorRef);
-    // this makes sure the mat tooltip is visible on text-overflow ellipsis when the browser size changes
-    effect((onCleanup) => {
-      const { nativeElement } = this.matAutocompleteSignal() ?? {};
-      if (!nativeElement) {
-        return;
-      }
-
-      const observer = new ResizeObserver(() => cdr.detectChanges());
-      observer.observe(nativeElement);
-
-      onCleanup(() => {
-        observer.disconnect();
-      });
-    });
-
     const toastService = inject(ToastService);
     effect(() => {
       const error = this.query.error();
