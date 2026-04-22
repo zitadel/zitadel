@@ -1,20 +1,31 @@
+import { PromiseCache } from "@/lib/cache";
 import { applyCustomHeaders } from "@/lib/custom-headers";
 import { createLogger } from "@/lib/logger";
 
 const logger = createLogger("security-settings");
 
-/** Cache TTL: 1 hour. Security settings rarely change. */
-const CACHE_TTL_MS = 60 * 60 * 1000;
-
-interface CacheEntry {
-  origins: string[] | undefined;
-  expiresAt: number;
+let cacheConfig: Record<string, number> = {};
+try {
+  if (process.env.API_CACHE_CONFIG) {
+    cacheConfig = JSON.parse(process.env.API_CACHE_CONFIG);
+  }
+} catch (e) {
+  console.error("Failed to parse API_CACHE_CONFIG", e);
 }
 
-const cache = new Map<string, CacheEntry>();
+/** Cache TTL: defaults to longMinutes (1 hour). Security settings rarely change. */
+const CACHE_TTL_MS = (cacheConfig.longMinutes ?? 60) * 60 * 1000;
 
-/** In-flight promises per cache key to deduplicate concurrent fetches. */
-const inflight = new Map<string, Promise<string[] | undefined>>();
+/**
+ * Bounded LRU cache for security settings per instance host.
+ *
+ * Uses the shared PromiseCache which provides:
+ * - LRU eviction (capped by API_CACHE_CONFIG maxSize, default 10 000)
+ * - Automatic TTL expiry (API_CACHE_CONFIG longMinutes, default 60 min)
+ * - Stale-while-revalidate (serves stale data while refreshing in background)
+ * - Built-in in-flight request deduplication
+ */
+const cache = new PromiseCache(Number(cacheConfig.maxSize) || 10_000);
 
 /**
  * Resolves an authentication token from available credential sources.
@@ -42,9 +53,9 @@ async function resolveAuthToken(): Promise<string> {
  * via the Connect protocol (POST + JSON). This avoids the HTTPS self-loopback
  * through the load balancer that caused TLS errors on Cloud Run.
  *
- * Results are cached in-memory for 1 hour per instance host. Concurrent
- * requests that arrive while a fetch is in-flight share the same promise
- * to prevent thundering-herd stampedes on the backend.
+ * Results are cached in-memory for 1 hour per instance host using a bounded
+ * LRU cache. Concurrent requests for the same key share a single in-flight
+ * promise to prevent thundering-herd stampedes on the backend.
  *
  * @param baseUrl - The ZITADEL API base URL (ZITADEL_API_URL)
  * @param instanceHost - Optional instance host for multi-tenant deployments
@@ -52,32 +63,8 @@ async function resolveAuthToken(): Promise<string> {
  */
 export async function getIframeOrigins(baseUrl: string, instanceHost?: string): Promise<string[] | undefined> {
   const cacheKey = instanceHost || "__default__";
-  const cached = cache.get(cacheKey);
 
-  if (cached && cached.expiresAt > Date.now()) {
-    return cached.origins;
-  }
-
-  // Deduplicate concurrent fetches for the same key
-  const existing = inflight.get(cacheKey);
-  if (existing) {
-    return existing;
-  }
-
-  const promise = fetchIframeOrigins(baseUrl, instanceHost)
-    .then((origins) => {
-      cache.set(cacheKey, { origins, expiresAt: Date.now() + CACHE_TTL_MS });
-      inflight.delete(cacheKey);
-      return origins;
-    })
-    .catch((err) => {
-      inflight.delete(cacheKey);
-      throw err;
-    });
-
-  inflight.set(cacheKey, promise);
-
-  return promise;
+  return cache.getOrFetch<string[] | undefined>(cacheKey, () => fetchIframeOrigins(baseUrl, instanceHost), CACHE_TTL_MS);
 }
 
 async function fetchIframeOrigins(baseUrl: string, instanceHost?: string): Promise<string[] | undefined> {
