@@ -51,8 +51,8 @@ async function resolveAuthToken(): Promise<string> {
 
 /**
  * Fetches iframe origins from security settings using the ZITADEL API directly
- * via the Connect protocol (POST + JSON). This avoids the HTTPS self-loopback
- * through the load balancer that caused TLS errors on Cloud Run.
+ * via the Connect protocol (POST + JSON). This uses raw fetch (no connectRPC
+ * node transport) so it stays compatible with the Next.js proxy runtime.
  *
  * Results are cached in-memory for 1 hour per instance host using a bounded
  * LRU cache. Concurrent requests for the same key share a single in-flight
