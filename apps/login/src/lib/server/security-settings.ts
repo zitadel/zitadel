@@ -1,6 +1,7 @@
 import { PromiseCache } from "@/lib/cache";
 import { applyCustomHeaders } from "@/lib/custom-headers";
 import { createLogger } from "@/lib/logger";
+import type { GetSecuritySettingsResponseJson } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 
 const logger = createLogger("security-settings");
 
@@ -102,10 +103,10 @@ async function fetchIframeOrigins(baseUrl: string, instanceHost?: string): Promi
     return undefined;
   }
 
-  const data = await response.json();
-  const settings = data?.settings;
+  const data: GetSecuritySettingsResponseJson = await response.json();
+  const settings = data.settings;
 
-  return settings?.embeddedIframe?.enabled && settings.embeddedIframe.allowedOrigins?.length > 0
-    ? settings.embeddedIframe.allowedOrigins
-    : undefined;
+  const origins = settings?.embeddedIframe?.enabled ? settings.embeddedIframe.allowedOrigins : undefined;
+
+  return origins && origins.length > 0 ? origins : undefined;
 }
