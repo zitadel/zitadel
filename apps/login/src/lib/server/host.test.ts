@@ -242,6 +242,38 @@ describe("Host utility functions", () => {
       );
     });
 
+    test("should throw when ZITADEL_PUBLIC_URL has unsupported scheme", () => {
+      process.env.ZITADEL_PUBLIC_URL = "javascript:alert(1)";
+
+      const mockHeaders = {
+        get: vi.fn(() => "localhost:3000"),
+      } as any;
+
+      expect(() => getPublicHost(mockHeaders)).toThrow(
+        "ZITADEL_PUBLIC_URL must be a valid absolute URL, for example: https://login.example.com",
+      );
+    });
+
+    test("should throw when ZITADEL_PUBLIC_URL includes path, query, hash, or credentials", () => {
+      const invalidPublicURLs = [
+        "https://user:pass@login.example.com",
+        "https://login.example.com/path",
+        "https://login.example.com?foo=bar",
+        "https://login.example.com#anchor",
+      ];
+
+      const mockHeaders = {
+        get: vi.fn(() => "localhost:3000"),
+      } as any;
+
+      for (const invalidURL of invalidPublicURLs) {
+        process.env.ZITADEL_PUBLIC_URL = invalidURL;
+        expect(() => getPublicHost(mockHeaders)).toThrow(
+          "ZITADEL_PUBLIC_URL must be a valid absolute URL, for example: https://login.example.com",
+        );
+      }
+    });
+
     test("should use x-zitadel-public-host when available", () => {
       const mockHeaders = {
         get: vi.fn((key: string) => {

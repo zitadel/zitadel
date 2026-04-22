@@ -1,6 +1,6 @@
 import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
 import { NextRequest } from "next/server";
-import { getConfiguredPublicURL, getInstanceHost, getPublicHost } from "./server/host";
+import { getInstanceHost, getPublicHost, getPublicOrigin } from "./server/host";
 import { ServiceConfig } from "./zitadel";
 
 /**
@@ -39,9 +39,7 @@ export function getServiceConfig(headers: ReadonlyHeaders): { serviceConfig: Ser
 }
 
 export function constructUrl(request: NextRequest, path: string) {
-  const configuredPublicURL = getConfiguredPublicURL();
-  const protocol = configuredPublicURL?.protocol ?? request.nextUrl.protocol;
-  const forwardedHost = configuredPublicURL?.host ?? getPublicHost(request.headers);
+  const origin = getPublicOrigin(request.headers, request.nextUrl.protocol);
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
-  return new URL(`${basePath}${path}`, `${protocol}//${forwardedHost}`);
+  return new URL(`${basePath}${path}`, origin);
 }

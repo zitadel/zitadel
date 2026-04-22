@@ -11,10 +11,39 @@ export function getConfiguredPublicURL(): URL | null {
   }
 
   try {
-    return new URL(configuredPublicURL);
+    const publicURL = new URL(configuredPublicURL);
+
+    const isValidOrigin =
+      (publicURL.protocol === "http:" || publicURL.protocol === "https:") &&
+      publicURL.host !== "" &&
+      publicURL.pathname === "/" &&
+      publicURL.search === "" &&
+      publicURL.hash === "" &&
+      publicURL.username === "" &&
+      publicURL.password === "";
+
+    if (!isValidOrigin) {
+      throw new Error(INVALID_PUBLIC_URL_ERROR);
+    }
+
+    return publicURL;
   } catch {
     throw new Error(INVALID_PUBLIC_URL_ERROR);
   }
+}
+
+function getPublicHostFromHeaders(headers: ReadonlyHeaders): string {
+  const publicHost =
+    headers.get("x-zitadel-public-host") ||
+    headers.get("x-zitadel-forward-host") ||
+    headers.get("x-forwarded-host") ||
+    headers.get("host");
+
+  if (!publicHost || typeof publicHost !== "string") {
+    throw new Error("No host found in headers");
+  }
+
+  return publicHost;
 }
 
 /**
@@ -50,26 +79,22 @@ export function getPublicHost(headers: ReadonlyHeaders): string {
 
   // Only use standard proxy headers (x-zitadel-public-host → x-zitadel-forward-host → x-forwarded-host → host)
   // Do NOT use x-zitadel-instance-host as it may differ from what the user sees
-  const publicHost =
-    headers.get("x-zitadel-public-host") ||
-    headers.get("x-zitadel-forward-host") ||
-    headers.get("x-forwarded-host") ||
-    headers.get("host");
+  return getPublicHostFromHeaders(headers);
+}
 
-  if (!publicHost || typeof publicHost !== "string") {
-    throw new Error("No host found in headers");
+export function getPublicOrigin(headers: ReadonlyHeaders, fallbackProtocol?: string): string {
+  const configuredPublicURL = getConfiguredPublicURL();
+  if (configuredPublicURL) {
+    return configuredPublicURL.origin;
   }
 
-  return publicHost;
+  const host = getPublicHostFromHeaders(headers);
+  const protocol = fallbackProtocol ?? (host.includes("localhost") ? "http:" : "https:");
+  const normalizedProtocol = protocol.endsWith(":") ? protocol : `${protocol}:`;
+
+  return `${normalizedProtocol}//${host}`;
 }
 
 export function getPublicHostWithProtocol(headers: ReadonlyHeaders): string {
-  const configuredPublicURL = getConfiguredPublicURL();
-  if (configuredPublicURL) {
-    return `${configuredPublicURL.protocol}//${configuredPublicURL.host}`;
-  }
-
-  const host = getPublicHost(headers);
-  const protocol = host.includes("localhost") ? "http://" : "https://";
-  return `${protocol}${host}`;
+  return getPublicOrigin(headers);
 }
