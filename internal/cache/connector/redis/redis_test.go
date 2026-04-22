@@ -170,11 +170,7 @@ func Test_redisCache_set(t *testing.T) {
 		// the RESP3 handshake leaks through the shared Limiter and trips
 		// the circuit breaker, causing all cache operations to fail.
 		t.Run(tt.name+" with circuit breaker", func(t *testing.T) {
-			c, server := prepareCache(t, tt.config, withCircuitBreakerOption(&CBConfig{
-				MaxConsecutiveFailures: 5,
-				MaxFailureRatio:        0.1,
-				Timeout:                60 * time.Second,
-			}))
+			c, server := prepareCache(t, tt.config, withProductionCircuitBreaker())
 			rc := c.(*redisCache[testIndex, string, *testObject])
 			objectID, err := rc.set(tt.args.ctx, tt.args.value)
 			require.ErrorIs(t, err, tt.wantErr)
@@ -343,11 +339,7 @@ func Test_redisCache_Get(t *testing.T) {
 		})
 
 		t.Run(tt.name+" with circuit breaker", func(t *testing.T) {
-			c, server := prepareCache(t, tt.config, withCircuitBreakerOption(&CBConfig{
-				MaxConsecutiveFailures: 5,
-				MaxFailureRatio:        0.1,
-				Timeout:                60 * time.Second,
-			}))
+			c, server := prepareCache(t, tt.config, withProductionCircuitBreaker())
 			tt.preparation(t, c, server)
 			t.Log(server.Keys())
 
@@ -518,11 +510,7 @@ func Test_redisCache_Invalidate(t *testing.T) {
 		})
 
 		t.Run(tt.name+" with circuit breaker", func(t *testing.T) {
-			c, server := prepareCache(t, tt.config, withCircuitBreakerOption(&CBConfig{
-				MaxConsecutiveFailures: 5,
-				MaxFailureRatio:        0.1,
-				Timeout:                60 * time.Second,
-			}))
+			c, server := prepareCache(t, tt.config, withProductionCircuitBreaker())
 			tt.preparation(t, c, server)
 			t.Log(server.Keys())
 
@@ -669,11 +657,7 @@ func Test_redisCache_Delete(t *testing.T) {
 		})
 
 		t.Run(tt.name+" with circuit breaker", func(t *testing.T) {
-			c, server := prepareCache(t, tt.config, withCircuitBreakerOption(&CBConfig{
-				MaxConsecutiveFailures: 5,
-				MaxFailureRatio:        0.1,
-				Timeout:                60 * time.Second,
-			}))
+			c, server := prepareCache(t, tt.config, withProductionCircuitBreaker())
 			tt.preparation(t, c, server)
 			t.Log(server.Keys())
 
@@ -752,11 +736,7 @@ func Test_redisCache_Truncate(t *testing.T) {
 		})
 
 		t.Run(tt.name+" with circuit breaker", func(t *testing.T) {
-			c, server := prepareCache(t, tt.config, withCircuitBreakerOption(&CBConfig{
-				MaxConsecutiveFailures: 5,
-				MaxFailureRatio:        0.1,
-				Timeout:                60 * time.Second,
-			}))
+			c, server := prepareCache(t, tt.config, withProductionCircuitBreaker())
 			tt.preparation(t, c, server)
 			t.Log(server.Keys())
 
@@ -801,4 +781,12 @@ func withCircuitBreakerOption(cb *CBConfig) func(*Config) {
 	return func(c *Config) {
 		c.CircuitBreaker = cb
 	}
+}
+
+func withProductionCircuitBreaker() func(*Config) {
+	return withCircuitBreakerOption(&CBConfig{
+		MaxConsecutiveFailures: 5,
+		MaxFailureRatio:        0.1,
+		Timeout:                60 * time.Second,
+	})
 }
