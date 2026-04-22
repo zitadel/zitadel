@@ -788,5 +788,6 @@ func withProductionCircuitBreaker() func(*Config) {
 		MaxConsecutiveFailures: 5,
 		MaxFailureRatio:        0.1,
 		Timeout:                60 * time.Second,
+		MaxRetryRequests:       1,
 	})
 }
