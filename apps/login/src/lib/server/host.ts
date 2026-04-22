@@ -1,5 +1,22 @@
 import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
 
+const INVALID_PUBLIC_URL_ERROR =
+  "ZITADEL_PUBLIC_URL must be a valid absolute URL, for example: https://login.example.com";
+
+export function getConfiguredPublicURL(): URL | null {
+  const configuredPublicURL = process.env.ZITADEL_PUBLIC_URL?.trim();
+
+  if (!configuredPublicURL) {
+    return null;
+  }
+
+  try {
+    return new URL(configuredPublicURL);
+  } catch {
+    throw new Error(INVALID_PUBLIC_URL_ERROR);
+  }
+}
+
 /**
  * Gets the original host that the user sees in their browser URL.
  * When using rewrites this function prioritizes forwarded headers that preserve the original host.
@@ -26,6 +43,11 @@ export function getInstanceHost(headers: ReadonlyHeaders): string | null {
  * @throws Error if no host is found
  */
 export function getPublicHost(headers: ReadonlyHeaders): string {
+  const configuredPublicURL = getConfiguredPublicURL();
+  if (configuredPublicURL) {
+    return configuredPublicURL.host;
+  }
+
   // Only use standard proxy headers (x-zitadel-public-host → x-zitadel-forward-host → x-forwarded-host → host)
   // Do NOT use x-zitadel-instance-host as it may differ from what the user sees
   const publicHost =
@@ -42,6 +64,11 @@ export function getPublicHost(headers: ReadonlyHeaders): string {
 }
 
 export function getPublicHostWithProtocol(headers: ReadonlyHeaders): string {
+  const configuredPublicURL = getConfiguredPublicURL();
+  if (configuredPublicURL) {
+    return `${configuredPublicURL.protocol}//${configuredPublicURL.host}`;
+  }
+
   const host = getPublicHost(headers);
   const protocol = host.includes("localhost") ? "http://" : "https://";
   return `${protocol}${host}`;
