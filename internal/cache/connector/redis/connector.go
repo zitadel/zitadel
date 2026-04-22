@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/redis/go-redis/v9/maintnotifications"
 )
 
 type Config struct {
@@ -205,6 +206,7 @@ func optionsFromURL(c Config) (*redis.Options, error) {
 		opts.IdentitySuffix = c.IdentitySuffix
 	}
 
+	opts.MaintNotificationsConfig = &maintnotifications.Config{Mode: maintnotifications.ModeDisabled}
 	opts.Limiter = newLimiter(c.CircuitBreaker, c.MaxActiveConns)
 
 	return opts, nil
@@ -233,9 +235,10 @@ func optionsFromConfig(c Config) *redis.Options {
 		MaxActiveConns:        c.MaxActiveConns,
 		ConnMaxIdleTime:       c.ConnMaxIdleTime,
 		ConnMaxLifetime:       c.ConnMaxLifetime,
-		DisableIndentity:      c.DisableIndentity,
-		IdentitySuffix:        c.IdentitySuffix,
-		Limiter:               newLimiter(c.CircuitBreaker, c.MaxActiveConns),
+		DisableIndentity:         c.DisableIndentity,
+		IdentitySuffix:           c.IdentitySuffix,
+		MaintNotificationsConfig: &maintnotifications.Config{Mode: maintnotifications.ModeDisabled},
+		Limiter:                  newLimiter(c.CircuitBreaker, c.MaxActiveConns),
 	}
 	if c.EnableTLS {
 		opts.TLSConfig = new(tls.Config)
