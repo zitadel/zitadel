@@ -164,6 +164,7 @@ func Test_redisCache_set(t *testing.T) {
 			t.Log(rc.connector.HGetAll(context.Background(), objectID))
 			tt.assertions(t, server, objectID)
 		})
+
 		// Run the same test with the production circuit breaker config.
 		// This reproduces the bug where CLIENT MAINT_NOTIFICATIONS during
 		// the RESP3 handshake leaks through the shared Limiter and trips
@@ -340,6 +341,7 @@ func Test_redisCache_Get(t *testing.T) {
 			require.Equal(t, tt.wantOK, ok)
 			assert.Equal(t, tt.want, got)
 		})
+
 		t.Run(tt.name+" with circuit breaker", func(t *testing.T) {
 			c, server := prepareCache(t, tt.config, withCircuitBreakerOption(&CBConfig{
 				MaxConsecutiveFailures: 5,
@@ -514,6 +516,7 @@ func Test_redisCache_Invalidate(t *testing.T) {
 			}
 			require.NoError(t, err)
 		})
+
 		t.Run(tt.name+" with circuit breaker", func(t *testing.T) {
 			c, server := prepareCache(t, tt.config, withCircuitBreakerOption(&CBConfig{
 				MaxConsecutiveFailures: 5,
@@ -664,6 +667,7 @@ func Test_redisCache_Delete(t *testing.T) {
 			}
 			require.NoError(t, err)
 		})
+
 		t.Run(tt.name+" with circuit breaker", func(t *testing.T) {
 			c, server := prepareCache(t, tt.config, withCircuitBreakerOption(&CBConfig{
 				MaxConsecutiveFailures: 5,
@@ -746,6 +750,7 @@ func Test_redisCache_Truncate(t *testing.T) {
 			}
 			require.NoError(t, err)
 		})
+
 		t.Run(tt.name+" with circuit breaker", func(t *testing.T) {
 			c, server := prepareCache(t, tt.config, withCircuitBreakerOption(&CBConfig{
 				MaxConsecutiveFailures: 5,
