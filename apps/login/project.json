@@ -40,7 +40,7 @@
         "{projectRoot}/Dockerfile",
         "!{projectRoot}/.env.*",
         "!{projectRoot}/acceptance/**/*"
-      ]
+      ]   
     },
     "build-vercel": {
       "description": "Builds the Next.js Login application for Vercel deployment",

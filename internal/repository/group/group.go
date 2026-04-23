@@ -7,10 +7,12 @@ import (
 )
 
 const (
-	uniqueGroupname       = "group_name"
-	GroupAddedEventType   = groupEventTypePrefix + "added"
-	GroupChangedEventType = groupEventTypePrefix + "changed"
-	GroupRemovedEventType = groupEventTypePrefix + "removed"
+	uniqueGroupname           = "group_name"
+	GroupAddedEventType       = groupEventTypePrefix + "added"
+	GroupChangedEventType     = groupEventTypePrefix + "changed"
+	GroupRemovedEventType     = groupEventTypePrefix + "removed"
+	GroupDeactivatedEventType = groupEventTypePrefix + "deactivated"
+	GroupReactivatedEventType = groupEventTypePrefix + "reactivated"
 )
 
 type GroupAddedEvent struct {
@@ -152,4 +154,56 @@ func (g *GroupRemovedEvent) Payload() any {
 
 func (g *GroupRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewRemoveGroupNameUniqueConstraint(g.name, g.Aggregate().ResourceOwner)}
+}
+
+type GroupDeactivatedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (g *GroupDeactivatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	g.BaseEvent = *event
+}
+
+func (e *GroupDeactivatedEvent) Payload() interface{} {
+	return nil
+}
+
+func (e *GroupDeactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewGroupDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *GroupDeactivatedEvent {
+	return &GroupDeactivatedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			GroupDeactivatedEventType,
+		),
+	}
+}
+
+type GroupReactivatedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (g *GroupReactivatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	g.BaseEvent = *event
+}
+
+func (e *GroupReactivatedEvent) Payload() interface{} {
+	return nil
+}
+
+func (e *GroupReactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewGroupReactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *GroupReactivatedEvent {
+	return &GroupReactivatedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			GroupReactivatedEventType,
+		),
+	}
 }

@@ -73,6 +73,14 @@ func (g *groupProjection) Reducers() []handler.AggregateReducer {
 					Event:  group.GroupRemovedEventType,
 					Reduce: g.reduceGroupRemoved,
 				},
+				{
+					Event:  group.GroupDeactivatedEventType,
+					Reduce: g.reduceGroupDeactivated,
+				},
+				{
+					Event:  group.GroupReactivatedEventType,
+					Reduce: g.reduceGroupReactivated,
+				},
 			},
 		},
 		{
@@ -177,6 +185,45 @@ func (g *groupProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.S
 		[]handler.Condition{
 			handler.NewCond(GroupColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(GroupColumnResourceOwner, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (g *groupProjection) reduceGroupDeactivated(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*group.GroupDeactivatedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(GroupColumnChangeDate, e.CreationDate()),
+			handler.NewCol(GroupColumnSequence, e.Sequence()),
+			handler.NewCol(GroupColumnState, domain.GroupStateInactive),
+		},
+		[]handler.Condition{
+			handler.NewCond(GroupColumnID, e.Aggregate().ID),
+			handler.NewCond(GroupColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (g *groupProjection) reduceGroupReactivated(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*group.GroupReactivatedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return handler.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(GroupColumnChangeDate, e.CreationDate()),
+			handler.NewCol(GroupColumnSequence, e.Sequence()),
+			handler.NewCol(GroupColumnState, domain.GroupStateActive),
+		},
+		[]handler.Condition{
+			handler.NewCond(GroupColumnID, e.Aggregate().ID),
+			handler.NewCond(GroupColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

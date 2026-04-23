@@ -206,6 +206,8 @@ func groupUsersToPb(groupUsers []*query.GroupUser) []*group_v2.GroupUser {
 }
 
 func groupUserToPb(gu *query.GroupUser) *group_v2.GroupUser {
+	// gu.Attributes is database.Map[string] (underlying map[string]string) — nil
+	// when no attributes were stored, which proto serializes as an absent field.
 	return &group_v2.GroupUser{
 		GroupId:        gu.GroupID,
 		OrganizationId: gu.ResourceOwner,
@@ -217,5 +219,6 @@ func groupUserToPb(gu *query.GroupUser) *group_v2.GroupUser {
 			OrganizationId:     gu.ResourceOwner,
 		},
 		CreationDate: timestamppb.New(gu.CreationDate),
+		Attributes:   gu.Attributes,
 	}
 }

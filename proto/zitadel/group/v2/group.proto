@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+import "google/api/field_behavior.proto";
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
@@ -55,6 +56,30 @@ message Group {
   ];
 }
 
+// AddGroupUser is the input form of a user to be added to a group. Unlike
+// GroupUser (which is returned from list endpoints), AddGroupUser carries only
+// the fields the caller provides: the user ID and optional per-user attributes.
+message AddGroupUser {
+  // UserID is the ID of the user to add to the group.
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629023906488334\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // Attributes are optional per-user key/value attributes attached to this
+  // user's membership in the group (e.g. role, label).
+  map<string, string> attributes = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "{\"role\":\"admin\"}";
+    }
+  ];
+}
+
 message GroupUser {
   // GroupID is the unique identifier of the user group.
   string group_id = 1 [
@@ -77,6 +102,15 @@ message GroupUser {
   google.protobuf.Timestamp creation_date = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+
+  // Attributes are per-user key/value attributes attached to this user's
+  // membership in the group, supplied at add time via AddGroupUser.
+  // Absent when no attributes were set.
+  map<string, string> attributes = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "{\"role\":\"admin\"}";
     }
   ];
 }

@@ -6,11 +6,20 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/repository/group"
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 )
 
 func (s *Server) AddUsersToGroup(ctx context.Context, c *connect.Request[group_v2.AddUsersToGroupRequest]) (*connect.Response[group_v2.AddUsersToGroupResponse], error) {
-	addUsersResp, err := s.command.AddUsersToGroup(ctx, c.Msg.GetId(), c.Msg.GetUserIds())
+	reqUsers := c.Msg.GetUsers()
+	users := make([]group.GroupUser, 0, len(reqUsers))
+	for _, u := range reqUsers {
+		users = append(users, group.GroupUser{
+			UserID:     u.GetUserId(),
+			Attributes: u.GetAttributes(),
+		})
+	}
+	addUsersResp, err := s.command.AddUsersToGroup(ctx, c.Msg.GetId(), users)
 	if err != nil {
 		return nil, err
 	}

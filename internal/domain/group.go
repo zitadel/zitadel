@@ -5,6 +5,7 @@ type GroupState int32
 const (
 	GroupStateUnspecified GroupState = iota
 	GroupStateActive
+	GroupStateInactive
 	GroupStateRemoved
 )
 

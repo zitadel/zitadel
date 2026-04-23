@@ -1530,13 +1530,13 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 						eventFromEventPusher(
 							group.NewGroupUsersAddedEvent(context.Background(),
 								&group.NewAggregate("group1", "org1").Aggregate,
-								[]string{"user1"},
+								toGroupUsers("user1"),
 							),
 						),
 						eventFromEventPusher(
 							group.NewGroupUsersAddedEvent(context.Background(),
 								&group.NewAggregate("group2", "org1").Aggregate,
-								[]string{"user1"},
+								toGroupUsers("user1"),
 							),
 						),
 					),

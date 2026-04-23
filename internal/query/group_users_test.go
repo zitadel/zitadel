@@ -10,27 +10,31 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 var (
 	groupUsersStmt = regexp.QuoteMeta(
-		"SELECT projections.group_users1.group_id" +
-			", projections.group_users1.user_id" +
+		"SELECT projections.group_users2.group_id" +
+			", projections.group_users2.user_id" +
+			", projections.group_users2.attributes" +
 			", projections.users14_humans.display_name" +
 			", projections.login_names3.login_name" +
-			", projections.group_users1.resource_owner" +
+			", projections.group_users2.resource_owner" +
 			", projections.users14_humans.avatar_key" +
-			", projections.group_users1.creation_date" +
-			", projections.group_users1.sequence" +
+			", projections.group_users2.creation_date" +
+			", projections.group_users2.sequence" +
 			", COUNT(*) OVER ()" +
-			" FROM projections.group_users1" +
-			" LEFT JOIN projections.users14_humans ON projections.group_users1.user_id = projections.users14_humans.user_id AND projections.group_users1.instance_id = projections.users14_humans.instance_id" +
-			" LEFT JOIN projections.login_names3 ON projections.group_users1.user_id = projections.login_names3.user_id AND projections.group_users1.instance_id = projections.login_names3.instance_id" +
+			" FROM projections.group_users2" +
+			" LEFT JOIN projections.users14_humans ON projections.group_users2.user_id = projections.users14_humans.user_id AND projections.group_users2.instance_id = projections.users14_humans.instance_id" +
+			" LEFT JOIN projections.login_names3 ON projections.group_users2.user_id = projections.login_names3.user_id AND projections.group_users2.instance_id = projections.login_names3.instance_id" +
 			" WHERE projections.login_names3.is_primary = $1")
 
 	groupUsersColumns = []string{
 		"group_id",
 		"user_id",
+		"attributes",
 		"display_name",
 		"login_name",
 		"resource_owner",
@@ -76,6 +80,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 						{
 							"group-id",
 							"user-id",
+							[]byte(nil),
 							"display-name",
 							"login-name",
 							"resource-owner",
@@ -115,6 +120,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 						{
 							"group-id-1",
 							"user-id-1",
+							[]byte(nil),
 							"display-name-1",
 							"login-name-1",
 							"resource-owner",
@@ -125,6 +131,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 						{
 							"group-id-1",
 							"user-id-2",
+							[]byte(`{"role":"admin"}`),
 							"display-name-2",
 							"login-name-2",
 							"resource-owner",
@@ -159,6 +166,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 						PreferredLoginName: "login-name-2",
 						DisplayName:        "display-name-2",
 						AvatarUrl:          "avatar-key",
+						Attributes:         database.Map[string]{"role": "admin"},
 					},
 				},
 			},

@@ -2,114 +2,83 @@ package command
 
 import (
 	"context"
-	"slices"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	repo "github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddUsersToGroup(ctx context.Context, groupID string, userIDs []string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) AddUsersToGroup(ctx context.Context, groupID string, users []repo.GroupUser) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	// precondition: check whether the group exists
-	group, err := c.checkGroupExists(ctx, groupID, userIDs)
+	groupUsers, err := c.getGroupUsersWriteModel(ctx, groupID, "")
 	if err != nil {
 		return nil, err
 	}
+	if !groupUsers.State.Exists() {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "CMDGRP-eQfeur", "Errors.Group.NotFound")
+	}
 
-	// check whether the requester has permissions to add users to the group
-	err = c.checkPermissionAddUserToGroup(ctx, group.ResourceOwner, group.AggregateID)
-	if err != nil {
+	if err = c.checkPermissionAddUserToGroup(ctx, groupUsers.ResourceOwner, groupUsers.AggregateID); err != nil {
 		return nil, err
 	}
 
-	// add the users to the group
-	return c.addUsersToGroup(ctx, group)
+	toAdd := groupUsers.UsersToAdd(users)
+	if len(toAdd) == 0 {
+		// all requested users are already in the group; desired state achieved
+		return writeModelToObjectDetails(&groupUsers.WriteModel), nil
+	}
+
+	// precondition: all users must exist in the same organization as the group
+	for _, u := range toAdd {
+		if _, err := c.checkUserExists(ctx, u.UserID, groupUsers.ResourceOwner); err != nil {
+			return nil, err
+		}
+	}
+
+	return c.pushAppendAndReduceDetails(ctx,
+		groupUsers,
+		repo.NewGroupUsersAddedEvent(
+			ctx,
+			GroupAggregateFromWriteModel(ctx, &groupUsers.WriteModel),
+			toAdd,
+		),
+	)
 }
 
 func (c *Commands) RemoveUsersFromGroup(ctx context.Context, groupID string, userIDs []string) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	// precondition: check whether the group exists
-	group, err := c.checkGroupExists(ctx, groupID, userIDs)
+	groupUsers, err := c.getGroupUsersWriteModel(ctx, groupID, "")
 	if err != nil {
 		return nil, err
 	}
+	if !groupUsers.State.Exists() {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "CMDGRP-eQfeur", "Errors.Group.NotFound")
+	}
 
-	// check whether the requester has permissions to remove users from the group
-	err = c.checkPermissionRemoveUserFromGroup(ctx, group.ResourceOwner, group.AggregateID)
-	if err != nil {
+	if err = c.checkPermissionRemoveUserFromGroup(ctx, groupUsers.ResourceOwner, groupUsers.AggregateID); err != nil {
 		return nil, err
 	}
 
-	userIDsToRemove := group.getUserIDsToRemove()
-	if len(userIDsToRemove) == 0 {
-		// the userIDs are not present in the group; desired state achieved
-		return writeModelToObjectDetails(&group.WriteModel), nil
+	toRemove := groupUsers.UserIDsToRemove(userIDs)
+	if len(toRemove) == 0 {
+		// none of the requested userIDs are in the group; desired state achieved
+		return writeModelToObjectDetails(&groupUsers.WriteModel), nil
 	}
 
-	// remove users from the group
 	return c.pushAppendAndReduceDetails(ctx,
-		group,
+		groupUsers,
 		repo.NewGroupUsersRemovedEvent(
 			ctx,
-			GroupAggregateFromWriteModel(ctx, &group.WriteModel),
-			userIDsToRemove,
-		))
-}
-
-func (c *Commands) addUsersToGroup(ctx context.Context, group *GroupWriteModel) (*domain.ObjectDetails, error) {
-	userIDsToAdd := group.getUserIDsToAdd()
-	if len(userIDsToAdd) == 0 {
-		// no new users to add
-		return writeModelToObjectDetails(&group.WriteModel), nil
-	}
-
-	// precondition: check whether the users exist
-	for _, userID := range userIDsToAdd {
-		// check whether the user exists in the same organization as the group
-		_, err := c.checkUserExists(ctx, userID, group.ResourceOwner)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// add users to the group
-	return c.pushAppendAndReduceDetails(ctx,
-		group,
-		repo.NewGroupUsersAddedEvent(
-			ctx,
-			GroupAggregateFromWriteModel(ctx, &group.WriteModel),
-			userIDsToAdd,
+			GroupAggregateFromWriteModel(ctx, &groupUsers.WriteModel),
+			toRemove,
 		),
 	)
-}
-
-// getUserIDsToAdd returns the userIDs that are not already in the group
-func (g *GroupWriteModel) getUserIDsToAdd() []string {
-	userIDsToAdd := make([]string, 0)
-	for _, userID := range g.UserIDs {
-		if _, ok := g.existingUserIDs[userID]; !ok && !slices.Contains(userIDsToAdd, userID) {
-			userIDsToAdd = append(userIDsToAdd, userID)
-		}
-	}
-	return userIDsToAdd
-}
-
-// getUserIDsToRemove returns the userIDs that are in the group and should be removed
-// if a userID is not in the group, the desired state has already been achieved
-func (g *GroupWriteModel) getUserIDsToRemove() []string {
-	userIDsToRemove := make([]string, 0)
-	for _, userID := range g.UserIDs {
-		if _, ok := g.existingUserIDs[userID]; ok && !slices.Contains(userIDsToRemove, userID) {
-			userIDsToRemove = append(userIDsToRemove, userID)
-		}
-	}
-	return userIDsToRemove
 }
 
 // removeUserFromGroups returns the events to remove a user from multiple groups.

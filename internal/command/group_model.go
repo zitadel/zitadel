@@ -8,7 +8,9 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/group"
 )
 
-// GroupWriteModel represents the write-model for a group.
+// GroupWriteModel represents the write-model for a group record itself
+// (name, description, state). User-membership is tracked separately by
+// GroupUsersWriteModel — do not mix the two concerns back together.
 type GroupWriteModel struct {
 	eventstore.WriteModel
 
@@ -16,20 +18,15 @@ type GroupWriteModel struct {
 	Description string
 
 	State domain.GroupState
-
-	UserIDs         []string
-	existingUserIDs map[string]struct{}
 }
 
 // NewGroupWriteModel initializes a new instance of GroupWriteModel from the given Group.
-func NewGroupWriteModel(groupID, orgID string, userIDs []string) *GroupWriteModel {
+func NewGroupWriteModel(groupID, orgID string) *GroupWriteModel {
 	return &GroupWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   groupID,
 			ResourceOwner: orgID,
 		},
-		UserIDs:         userIDs,
-		existingUserIDs: make(map[string]struct{}),
 	}
 }
 
@@ -39,20 +36,16 @@ func (g *GroupWriteModel) GetWriteModel() *eventstore.WriteModel {
 
 // Query constructs a search query for retrieving group-related events based on the GroupWriteModel attributes.
 func (g *GroupWriteModel) Query() *eventstore.SearchQueryBuilder {
-	eventTypes := []eventstore.EventType{
-		group.GroupAddedEventType,
-		group.GroupChangedEventType,
-		group.GroupRemovedEventType,
-	}
-	if g.UserIDs != nil {
-		eventTypes = append(eventTypes, group.GroupUsersAddedEventType, group.GroupUsersRemovedEventType)
-	}
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(g.ResourceOwner).
 		AddQuery().
 		AggregateTypes(group.AggregateType).
 		AggregateIDs(g.AggregateID).
-		EventTypes(eventTypes...).Builder()
+		EventTypes(
+			group.GroupAddedEventType,
+			group.GroupChangedEventType,
+			group.GroupRemovedEventType,
+		).Builder()
 }
 
 func (g *GroupWriteModel) Reduce() error {
@@ -72,14 +65,6 @@ func (g *GroupWriteModel) Reduce() error {
 			}
 		case *group.GroupRemovedEvent:
 			g.State = domain.GroupStateRemoved
-		case *group.GroupUsersAddedEvent:
-			for _, userID := range e.UserIDs {
-				g.existingUserIDs[userID] = struct{}{}
-			}
-		case *group.GroupUsersRemovedEvent:
-			for _, userID := range e.UserIDs {
-				delete(g.existingUserIDs, userID)
-			}
 		}
 	}
 	return g.WriteModel.Reduce()

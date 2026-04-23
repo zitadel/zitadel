@@ -118,7 +118,7 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 					expectPush(
 						group.NewGroupUsersAddedEvent(context.Background(),
 							&group.NewAggregate("group1", "org1").Aggregate,
-							[]string{"user2"},
+							toGroupUsers("user2"),
 						),
 					),
 				),
@@ -175,7 +175,7 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 						pushErr,
 						group.NewGroupUsersAddedEvent(context.Background(),
 							&group.NewAggregate("group1", "org1").Aggregate,
-							[]string{"user1"},
+							toGroupUsers("user1"),
 						),
 					),
 				),
@@ -211,7 +211,7 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 					expectPush(
 						group.NewGroupUsersAddedEvent(context.Background(),
 							&group.NewAggregate("group1", "org1").Aggregate,
-							[]string{"user1", "user2"},
+							toGroupUsers("user1", "user2"),
 						),
 					),
 				),
@@ -248,7 +248,7 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 					expectPush(
 						group.NewGroupUsersAddedEvent(context.Background(),
 							&group.NewAggregate("group1", "org1").Aggregate,
-							[]string{"user1", "user2"},
+							toGroupUsers("user1", "user2"),
 						),
 					),
 				),
@@ -272,7 +272,7 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := c.AddUsersToGroup(context.Background(), tt.args.groupID, tt.args.userIDs)
+			got, err := c.AddUsersToGroup(context.Background(), tt.args.groupID, toGroupUsers(tt.args.userIDs...))
 			if tt.wantErr != nil {
 				require.True(t, tt.wantErr(err))
 				return
@@ -521,8 +521,17 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 func addNewGroupUsersAddedEvent(groupID, orgID string, userIds []string) *group.GroupUsersAddedEvent {
 	return group.NewGroupUsersAddedEvent(context.Background(),
 		&group.NewAggregate(groupID, orgID).Aggregate,
-		userIds,
+		toGroupUsers(userIds...),
 	)
+}
+
+// toGroupUsers is a test helper that maps plain user IDs to GroupUser values with empty attributes
+func toGroupUsers(userIDs ...string) []group.GroupUser {
+	out := make([]group.GroupUser, len(userIDs))
+	for i, id := range userIDs {
+		out[i] = group.GroupUser{UserID: id}
+	}
+	return out
 }
 
 func addNewUserEvent(userID, orgID string) *user.HumanAddedEvent {

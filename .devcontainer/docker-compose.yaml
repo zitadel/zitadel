@@ -43,7 +43,7 @@ services:
       - ./.env.db
     environment:
       PGPORT: 5433
-    command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all -c shared_buffers=1GB -c work_mem=16MB -c effective_io_concurrency=100 -c wal_level=minimal -c archive_mode=off -c max_wal_senders=0
+    command: postgres -c shared_preload_librarzitadel_db-data-devies=pg_stat_statements -c pg_stat_statements.track=all -c shared_buffers=1GB -c work_mem=16MB -c effective_io_concurrency=100 -c wal_level=minimal -c archive_mode=off -c max_wal_senders=0
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-U", "postgres"]
       interval: "10s"

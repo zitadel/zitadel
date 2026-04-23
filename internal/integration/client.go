@@ -1409,9 +1409,13 @@ func (i *Instance) DeleteGroup(ctx context.Context, t *testing.T, id string) *gr
 }
 
 func (i *Instance) AddUsersToGroup(ctx context.Context, t *testing.T, groupID string, userIDs []string) *group_v2.AddUsersToGroupResponse {
+	users := make([]*group_v2.AddGroupUser, len(userIDs))
+	for idx, id := range userIDs {
+		users[idx] = &group_v2.AddGroupUser{UserId: id}
+	}
 	resp, err := i.Client.GroupV2.AddUsersToGroup(ctx, &group_v2.AddUsersToGroupRequest{
-		Id:      groupID,
-		UserIds: userIDs,
+		Id:    groupID,
+		Users: users,
 	})
 	require.NoError(t, err)
 	return resp

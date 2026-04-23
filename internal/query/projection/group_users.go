@@ -3,6 +3,7 @@ package projection
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -12,7 +13,7 @@ import (
 )
 
 const (
-	GroupUsersProjectionTable = "projections.group_users1"
+	GroupUsersProjectionTable = "projections.group_users2"
 
 	GroupUsersColumnGroupID       = "group_id"
 	GroupUsersColumnUserID        = "user_id"
@@ -20,6 +21,8 @@ const (
 	GroupUsersColumnInstanceID    = "instance_id"
 	GroupUsersColumnSequence      = "sequence"
 	GroupUsersColumnCreationDate  = "creation_date"
+	GroupUsersColumnChangeDate    = "change_date"
+	GroupUsersColumnAttributes    = "attributes"
 )
 
 type groupUsersProjection struct{}
@@ -41,6 +44,8 @@ func (*groupUsersProjection) Init() *old_handler.Check {
 			handler.NewColumn(GroupUsersColumnInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(GroupUsersColumnSequence, handler.ColumnTypeInt64),
 			handler.NewColumn(GroupUsersColumnCreationDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(GroupUsersColumnChangeDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(GroupUsersColumnAttributes, handler.ColumnTypeJSONB, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(GroupUsersColumnInstanceID, GroupUsersColumnGroupID, GroupUsersColumnUserID),
 			handler.WithIndex(handler.NewIndex("user_id", []string{GroupUsersColumnUserID})),
@@ -57,6 +62,10 @@ func (g *groupUsersProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  group.GroupUsersAddedEventType,
 					Reduce: g.reduceGroupUsersAdded,
+				},
+				{
+					Event:  group.GroupUsersChangedEventType,
+					Reduce: g.reduceGroupUsersChanged,
 				},
 				{
 					Event:  group.GroupUsersRemovedEventType,
@@ -100,16 +109,18 @@ func (g *groupUsersProjection) reduceGroupUsersAdded(event eventstore.Event) (*h
 		return nil, err
 	}
 
-	stmts := make([]func(eventstore.Event) handler.Exec, 0, len(e.UserIDs))
-	for _, userID := range e.UserIDs {
+	stmts := make([]func(eventstore.Event) handler.Exec, 0, len(e.Users))
+	for _, u := range e.Users {
 		stmts = append(stmts, handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(GroupUsersColumnGroupID, e.Aggregate().ID),
-				handler.NewCol(GroupUsersColumnUserID, userID),
+				handler.NewCol(GroupUsersColumnUserID, u.UserID),
 				handler.NewCol(GroupUsersColumnResourceOwner, e.Aggregate().ResourceOwner),
 				handler.NewCol(GroupUsersColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(GroupUsersColumnSequence, e.Sequence()),
 				handler.NewCol(GroupUsersColumnCreationDate, e.CreationDate()),
+				handler.NewCol(GroupUsersColumnChangeDate, e.CreationDate()),
+				handler.NewCol(GroupUsersColumnAttributes, database.Map[string](u.Attributes)),
 			},
 		))
 	}
@@ -164,4 +175,20 @@ func (g *groupUsersProjection) reduceOwnerRemoved(event eventstore.Event) (*hand
 			handler.NewCond(GroupUsersColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
+}
+
+func (g *groupUsersProjection) reduceGroupUsersChanged(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*group.GroupUserChangedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler.NewUpdateStatement(e, []handler.Column{
+		handler.NewCol(GroupUsersColumnChangeDate, e.CreatedAt()),
+		handler.NewCol(GroupUsersColumnSequence, e.Sequence()),
+		handler.NewCol(GroupUsersColumnAttributes, database.Map[string](e.Attributes)),
+	}, []handler.Condition{
+		handler.NewCond(GroupUsersColumnInstanceID, e.Aggregate().InstanceID),
+		handler.NewCond(GroupUsersColumnUserID, e.UserID),
+	}), nil
 }

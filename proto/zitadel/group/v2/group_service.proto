@@ -13,6 +13,7 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 import "zitadel/filter/v2/filter.proto";
 import "zitadel/group/v2/group.proto";
+import "zitadel/metadata/v2/metadata.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/group/v2;group";
 
@@ -345,6 +346,94 @@ service GroupService {
       }
     };
   }
+
+  // Set Group Metadata
+  // Required permissions:
+  //   - group.write
+  rpc SetGroupMetadata(SetGroupMetadataRequest) returns (SetGroupMetadataResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The group metadata was set successfully.";
+        };
+      };
+      responses: {
+        key: "404";
+        value: {
+          description: "The group was not found.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
+
+  // List Group Metadata
+  //
+  // Lists metadata of a single group filtered by query.
+  //
+  // Required permissions:
+  //   - group.read
+  rpc ListGroupMetadata(ListGroupMetadataRequest) returns (ListGroupMetadataResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The group metadata matching the query was retrieved successfully.";
+        };
+      };
+    };
+  }
+
+  // Delete Group Metadata
+  //
+  // Deletes metadata entries from a group by key.
+  //
+  // Required permissions:
+  //   - group.write
+  rpc DeleteGroupMetadata(DeleteGroupMetadataRequest) returns (DeleteGroupMetadataResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The group metadata was deleted successfully.";
+        };
+      };
+      responses: {
+        key: "404";
+        value: {
+          description: "The group or one of the metadata keys was not found.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
 }
 
 message CreateGroupRequest {
@@ -521,11 +610,13 @@ message AddUsersToGroupRequest {
     (google.api.field_behavior) = REQUIRED
   ];
 
-  // UserIds is a list of IDs of the users who should be added to the group.
-  repeated string user_ids = 2 [
-    (validate.rules).repeated = {min_items: 1, items: {string: {min_len: 1, max_len: 200}}},
+  // Users is the list of users to add to the group, each with its own optional
+  // per-user attributes. Replaces the previous user_ids field so attributes can
+  // be attached at add time.
+  repeated AddGroupUser users = 2 [
+    (validate.rules).repeated = {min_items: 1},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "[\"69629023906488334\",\"69622366012355662\"]";
+      example: "[{\"userId\":\"69629023906488334\",\"attributes\":{\"role\":\"admin\"}},{\"userId\":\"69622366012355662\"}]";
     }
   ];
 }
@@ -584,4 +675,114 @@ message ListGroupUsersResponse {
 
   // Contains the total number of users matching the query and the applied limit.
   zitadel.filter.v2.PaginationResponse pagination = 2;
+}
+
+// Metadata is a single key/value metadata entry sent in SetGroupMetadataRequest.
+// For reading metadata the richer zitadel.metadata.v2.Metadata type is used.
+message Metadata {
+  // Key of the metadata entry.
+  string key = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"role\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // Value of the metadata entry. Must be base64 encoded for HTTP requests.
+  bytes value = 2 [
+    (validate.rules).bytes = {min_len: 1, max_len: 500000},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"VGhpcyBpcyBteSBmaXJzdCB2YWx1ZQ==\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message SetGroupMetadataRequest {
+  // ID of the group whose metadata is being set.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // Metadata entries to set. Existing keys are overwritten; new keys are inserted.
+  repeated Metadata metadata = 2 [
+    (validate.rules).repeated = {min_items: 1},
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message SetGroupMetadataResponse {
+  // SetDate is the timestamp at which the group metadata was set.
+  google.protobuf.Timestamp set_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-08-11T15:00:00.051Z\"";
+    }
+  ];
+}
+
+message ListGroupMetadataRequest {
+  // ID of the group whose metadata is being listed.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // Pagination and sorting.
+  zitadel.filter.v2.PaginationRequest pagination = 2;
+
+  // Filters narrow the set of returned metadata entries (e.g. by key).
+  repeated zitadel.metadata.v2.MetadataSearchFilter filters = 3;
+}
+
+message ListGroupMetadataResponse {
+  // Pagination response with counts and applied limit.
+  zitadel.filter.v2.PaginationResponse pagination = 1;
+
+  // Metadata is the list of metadata entries that matched the query.
+  repeated zitadel.metadata.v2.Metadata metadata = 2;
+}
+
+message DeleteGroupMetadataRequest {
+  // ID of the group whose metadata is being deleted.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // Keys of the metadata entries to delete.
+  repeated string keys = 2 [
+    (validate.rules).repeated = {min_items: 1, items: {string: {min_len: 1, max_len: 200}}},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"role\",\"label\"]";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message DeleteGroupMetadataResponse {
+  // DeletionDate is the timestamp at which the group metadata was deleted.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-08-11T15:00:00.051Z\"";
+    }
+  ];
 }

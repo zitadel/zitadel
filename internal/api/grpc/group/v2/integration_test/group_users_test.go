@@ -16,6 +16,17 @@ import (
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 )
 
+// idsToAddGroupUsers wraps plain user IDs in AddGroupUser values with empty
+// attributes — used so existing integration cases stay concise after the RPC
+// moved from `repeated string user_ids` to `repeated AddGroupUser users`.
+func idsToAddGroupUsers(ids ...string) []*group_v2.AddGroupUser {
+	out := make([]*group_v2.AddGroupUser, len(ids))
+	for i, id := range ids {
+		out[i] = &group_v2.AddGroupUser{UserId: id}
+	}
+	return out
+}
+
 func TestServer_AddUsersToGroup(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	// group and user in the default org
@@ -46,8 +57,8 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 			name: "unauthenticated, error",
 			ctx:  context.Background(),
 			req: &group_v2.AddUsersToGroupRequest{
-				Id:      group.GetId(),
-				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
+				Id:    group.GetId(),
+				Users: idsToAddGroupUsers(user1.GetUserId(), user2.GetUserId()),
 			},
 			wantErrCode: codes.Unauthenticated,
 		},
@@ -55,7 +66,7 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 			name: "missing id, error",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.AddUsersToGroupRequest{
-				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
+				Users: idsToAddGroupUsers(user1.GetUserId(), user2.GetUserId()),
 			},
 			wantErrCode: codes.InvalidArgument,
 		},
@@ -71,8 +82,8 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 			name: "group does not exist, error",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.AddUsersToGroupRequest{
-				Id:      "randomGroup",
-				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
+				Id:    "randomGroup",
+				Users: idsToAddGroupUsers(user1.GetUserId(), user2.GetUserId()),
 			},
 			wantErrCode: codes.FailedPrecondition,
 		},
@@ -80,8 +91,8 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 			name: "missing permission, error",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 			req: &group_v2.AddUsersToGroupRequest{
-				Id:      group.GetId(),
-				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
+				Id:    group.GetId(),
+				Users: idsToAddGroupUsers(user1.GetUserId(), user2.GetUserId()),
 			},
 			wantErrCode: codes.NotFound,
 		},
@@ -89,8 +100,8 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 			name: "organization owner, missing permission, error",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 			req: &group_v2.AddUsersToGroupRequest{
-				Id:      group.GetId(),
-				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
+				Id:    group.GetId(),
+				Users: idsToAddGroupUsers(user1.GetUserId(), user2.GetUserId()),
 			},
 			wantErrCode: codes.NotFound,
 		},
@@ -98,16 +109,16 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 			name: "organization owner, with permission, ok",
 			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 			req: &group_v2.AddUsersToGroupRequest{
-				Id:      defOrgGroup.GetId(),
-				UserIds: []string{defOrgUser.GetUserId()},
+				Id:    defOrgGroup.GetId(),
+				Users: idsToAddGroupUsers(defOrgUser.GetUserId()),
 			},
 		},
 		{
 			name: "some users not found, ok",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.AddUsersToGroupRequest{
-				Id:      group.GetId(),
-				UserIds: []string{user1.GetUserId(), user2.GetUserId(), "randomUser"},
+				Id:    group.GetId(),
+				Users: idsToAddGroupUsers(user1.GetUserId(), user2.GetUserId(), "randomUser"),
 			},
 			wantErrCode: codes.FailedPrecondition,
 		},
@@ -115,8 +126,8 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 			name: "user in a different org not added, ok",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.AddUsersToGroupRequest{
-				Id:      group.GetId(),
-				UserIds: []string{user1.GetUserId(), user2.GetUserId(), defOrgUser.GetUserId()},
+				Id:    group.GetId(),
+				Users: idsToAddGroupUsers(user1.GetUserId(), user2.GetUserId(), defOrgUser.GetUserId()),
 			},
 			wantErrCode: codes.FailedPrecondition,
 		},
@@ -124,8 +135,8 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 			name: "add all users to group, ok",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.AddUsersToGroupRequest{
-				Id:      group.GetId(),
-				UserIds: []string{user1.GetUserId(), user2.GetUserId()},
+				Id:    group.GetId(),
+				Users: idsToAddGroupUsers(user1.GetUserId(), user2.GetUserId()),
 			},
 			wantChangeDate: true,
 		},
@@ -133,8 +144,8 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 			name: "some users already in the group, ok",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.AddUsersToGroupRequest{
-				Id:      group.GetId(),
-				UserIds: []string{user1.GetUserId(), user2.GetUserId(), user3.GetUserId()},
+				Id:    group.GetId(),
+				Users: idsToAddGroupUsers(user1.GetUserId(), user2.GetUserId(), user3.GetUserId()),
 			},
 			wantChangeDate: true,
 		},
@@ -142,8 +153,8 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 			name: "add all users to group (with duplicate user IDs), ok",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.AddUsersToGroupRequest{
-				Id:      group.GetId(),
-				UserIds: []string{user1.GetUserId(), user4.GetUserId(), user4.GetUserId()},
+				Id:    group.GetId(),
+				Users: idsToAddGroupUsers(user1.GetUserId(), user4.GetUserId(), user4.GetUserId()),
 			},
 			wantChangeDate: true,
 		},
@@ -175,8 +186,8 @@ func TestServer_RemoveUsersFromGroup(t *testing.T) {
 
 	// add user to the group in def org
 	_, err := instance.Client.GroupV2.AddUsersToGroup(iamOwnerCtx, &group_v2.AddUsersToGroupRequest{
-		Id:      defOrgGroup.GetId(),
-		UserIds: []string{defOrgUser.GetUserId()},
+		Id:    defOrgGroup.GetId(),
+		Users: idsToAddGroupUsers(defOrgUser.GetUserId()),
 	})
 	require.NoError(t, err)
 
@@ -193,8 +204,8 @@ func TestServer_RemoveUsersFromGroup(t *testing.T) {
 
 	// add user1, user2, user3 to the group
 	_, err = instance.Client.GroupV2.AddUsersToGroup(iamOwnerCtx, &group_v2.AddUsersToGroupRequest{
-		Id:      group.GetId(),
-		UserIds: []string{user1.GetUserId(), user2.GetUserId(), user3.GetUserId()},
+		Id:    group.GetId(),
+		Users: idsToAddGroupUsers(user1.GetUserId(), user2.GetUserId(), user3.GetUserId()),
 	})
 	require.NoError(t, err)
 

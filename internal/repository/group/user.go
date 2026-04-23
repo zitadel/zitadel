@@ -8,23 +8,30 @@ import (
 
 const (
 	GroupUsersAddedEventType   = groupEventTypePrefix + "users.added"
+	GroupUsersChangedEventType = groupEventTypePrefix + "users.changed"
 	GroupUsersRemovedEventType = groupEventTypePrefix + "users.removed"
 )
+
+// GroupUser represents a user's membership in a group along with per-user attributes.
+type GroupUser struct {
+	UserID     string            `json:"userId"`
+	Attributes map[string]string `json:"attributes,omitempty"`
+}
 
 type GroupUsersAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserIDs []string `json:"userIds"`
+	Users []GroupUser `json:"users"`
 }
 
-func NewGroupUsersAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, userIDs []string) *GroupUsersAddedEvent {
+func NewGroupUsersAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, users []GroupUser) *GroupUsersAddedEvent {
 	return &GroupUsersAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			GroupUsersAddedEventType,
 		),
-		UserIDs: userIDs,
+		Users: users,
 	}
 }
 
@@ -71,4 +78,36 @@ func (e *GroupUsersRemovedEvent) Payload() interface{} {
 
 func (e *GroupUsersRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
+}
+
+type GroupUserChangedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	UserID     string            `json:"userId,omitempty"`
+	Attributes map[string]string `json:"attributes,omitempty"`
+}
+
+func (e *GroupUserChangedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func (e *GroupUserChangedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *GroupUserChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewGroupUserChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	userID string,
+	attributes map[string]string,
+) *GroupUserChangedEvent {
+	return &GroupUserChangedEvent{
+		BaseEvent:  *eventstore.NewBaseEventForPush(ctx, aggregate, GroupUsersChangedEventType),
+		UserID:     userID,
+		Attributes: attributes,
+	}
 }

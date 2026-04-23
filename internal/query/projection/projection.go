@@ -97,8 +97,9 @@ var (
 	MembershipFields        *handler.FieldHandler
 	PermissionFields        *handler.FieldHandler
 
-	GroupProjection      *handler.Handler
-	GroupUsersProjection *handler.Handler
+	GroupProjection         *handler.Handler
+	GroupUsersProjection    *handler.Handler
+	GroupMetadataProjection *handler.Handler
 )
 
 type projection interface {
@@ -206,6 +207,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 
 	GroupProjection = newGroupProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["groups"]))
 	GroupUsersProjection = newGroupUsersProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["group_users"]))
+	GroupMetadataProjection = newGroupMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["group_metadata"]))
 
 	RelationalTablesProjection = newRelationalTablesProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["relational_tables"]))
 
@@ -392,6 +394,7 @@ func newProjectionsList() {
 		OrganizationSettingsProjection,
 		GroupProjection,
 		GroupUsersProjection,
+		GroupMetadataProjection,
 
 		RelationalTablesProjection,
 	}

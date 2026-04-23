@@ -3,6 +3,7 @@ package projection
 import (
 	"testing"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/group"
@@ -30,7 +31,11 @@ func Test_GroupUsersReduces(t *testing.T) {
 						group.AggregateType,
 						[]byte(
 							`{
-"userIds": ["user-id-1", "user-id-2", "user-id-3"]
+"users": [
+    {"userId": "user-id-1"},
+    {"userId": "user-id-2", "attributes": {"role": "admin"}},
+    {"userId": "user-id-3"}
+]
 }`),
 					), eventstore.GenericEventMapper[group.GroupUsersAddedEvent],
 				),
@@ -42,7 +47,7 @@ func Test_GroupUsersReduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.group_users1 (group_id, user_id, resource_owner, instance_id, sequence, creation_date) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.group_users2 (group_id, user_id, resource_owner, instance_id, sequence, creation_date, attributes) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"user-id-1",
@@ -50,10 +55,11 @@ func Test_GroupUsersReduces(t *testing.T) {
 								"instance-id",
 								uint64(15),
 								anyArg{},
+								database.Map[string](nil),
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.group_users1 (group_id, user_id, resource_owner, instance_id, sequence, creation_date) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.group_users2 (group_id, user_id, resource_owner, instance_id, sequence, creation_date, attributes) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"user-id-2",
@@ -61,10 +67,11 @@ func Test_GroupUsersReduces(t *testing.T) {
 								"instance-id",
 								uint64(15),
 								anyArg{},
+								database.Map[string]{"role": "admin"},
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.group_users1 (group_id, user_id, resource_owner, instance_id, sequence, creation_date) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.group_users2 (group_id, user_id, resource_owner, instance_id, sequence, creation_date, attributes) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"user-id-3",
@@ -72,6 +79,7 @@ func Test_GroupUsersReduces(t *testing.T) {
 								"instance-id",
 								uint64(15),
 								anyArg{},
+								database.Map[string](nil),
 							},
 						},
 					},
@@ -99,11 +107,11 @@ func Test_GroupUsersReduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.group_users1 WHERE (group_id = $1) AND (user_id = $2) AND (resource_owner = $3) AND (instance_id = $4)",
+							expectedStmt: "DELETE FROM projections.group_users2 WHERE (group_id = $1) AND (user_id = $2) AND (resource_owner = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{"agg-id", "user-id-1", "ro-id", "instance-id"},
 						},
 						{
-							expectedStmt: "DELETE FROM projections.group_users1 WHERE (group_id = $1) AND (user_id = $2) AND (resource_owner = $3) AND (instance_id = $4)",
+							expectedStmt: "DELETE FROM projections.group_users2 WHERE (group_id = $1) AND (user_id = $2) AND (resource_owner = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{"agg-id", "user-id-2", "ro-id", "instance-id"},
 						},
 					},
@@ -128,7 +136,7 @@ func Test_GroupUsersReduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.group_users1 WHERE (group_id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
+							expectedStmt: "DELETE FROM projections.group_users2 WHERE (group_id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{"agg-id", "ro-id", "instance-id"},
 						},
 					},
@@ -153,7 +161,7 @@ func Test_GroupUsersReduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.group_users1 WHERE (resource_owner = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.group_users2 WHERE (resource_owner = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{"agg-id", "instance-id"},
 						},
 					},

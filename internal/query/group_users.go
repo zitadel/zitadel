@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -44,6 +45,10 @@ var (
 		name:  projection.GroupUsersColumnSequence,
 		table: groupUsersTable,
 	}
+	GroupUserAttributes = Column{
+		name:  projection.GroupUsersColumnAttributes,
+		table: groupUsersTable,
+	}
 )
 
 type GroupUsers struct {
@@ -55,10 +60,14 @@ type GroupUser struct {
 	GroupID       string
 	ResourceOwner string
 	CreationDate  time.Time
+	ChangeDate    time.Time
 	Sequence      uint64
 
 	// user fields
-	UserID             string
+	UserID string
+	// Attributes are per-user attributes of this group-user relation, stored as
+	// a JSONB map in projections.group_users2.attributes.
+	Attributes         database.Map[string]
 	PreferredLoginName string
 	DisplayName        string
 	AvatarUrl          string
@@ -132,6 +141,8 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 	return sq.Select(
 			GroupUsersColumnGroupID.identifier(),
 			GroupUsersColumnUserID.identifier(),
+			GroupUserAttributes.identifier(),
+
 			HumanDisplayNameCol.identifier(),
 			LoginNameNameCol.identifier(),
 			GroupUsersColumnResourceOwner.identifier(),
@@ -160,6 +171,7 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 				err := rows.Scan(
 					&g.GroupID,
 					&g.UserID,
+					&g.Attributes,
 					&displayName,
 					&preferredLoginName,
 					&g.ResourceOwner,

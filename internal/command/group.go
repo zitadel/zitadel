@@ -56,7 +56,7 @@ func (c *Commands) CreateGroup(ctx context.Context, group *CreateGroup) (details
 	}
 
 	// check if a group with the same ID already exists
-	groupWriteModel, err := c.getGroupWriteModelByID(ctx, group.AggregateID, group.ResourceOwner, nil)
+	groupWriteModel, err := c.getGroupWriteModelByID(ctx, group.AggregateID, group.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (c *Commands) UpdateGroup(ctx context.Context, groupUpdate *UpdateGroup) (d
 		return nil, err
 	}
 
-	existingGroup, err := c.getGroupWriteModelByID(ctx, groupUpdate.AggregateID, groupUpdate.ResourceOwner, nil)
+	existingGroup, err := c.getGroupWriteModelByID(ctx, groupUpdate.AggregateID, groupUpdate.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +136,7 @@ func (c *Commands) DeleteGroup(ctx context.Context, groupID string) (details *do
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	existingGroup, err := c.getGroupWriteModelByID(ctx, groupID, "", nil)
+	existingGroup, err := c.getGroupWriteModelByID(ctx, groupID, "")
 	if err != nil {
 		return nil, err
 	}
@@ -160,8 +160,8 @@ func (c *Commands) DeleteGroup(ctx context.Context, groupID string) (details *do
 	return writeModelToObjectDetails(&existingGroup.WriteModel), nil
 }
 
-func (c *Commands) getGroupWriteModelByID(ctx context.Context, groupID, orgID string, userIDs []string) (*GroupWriteModel, error) {
-	groupWriteModel := NewGroupWriteModel(groupID, orgID, userIDs)
+func (c *Commands) getGroupWriteModelByID(ctx context.Context, groupID, orgID string) (*GroupWriteModel, error) {
+	groupWriteModel := NewGroupWriteModel(groupID, orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, groupWriteModel)
 	if err != nil {
 		return nil, err
@@ -169,8 +169,19 @@ func (c *Commands) getGroupWriteModelByID(ctx context.Context, groupID, orgID st
 	return groupWriteModel, nil
 }
 
-func (c *Commands) checkGroupExists(ctx context.Context, groupID string, userIDs []string) (*GroupWriteModel, error) {
-	group, err := c.getGroupWriteModelByID(ctx, groupID, "", userIDs)
+// getGroupUsersWriteModel loads the membership state of a group — who is a member
+// and their per-user attributes — independently of the group's base record.
+func (c *Commands) getGroupUsersWriteModel(ctx context.Context, groupID, orgID string) (*GroupUsersWriteModel, error) {
+	writeModel := NewGroupUsersWriteModel(groupID, orgID)
+	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
+		return nil, err
+	}
+	return writeModel, nil
+}
+
+// checkGroupExists verifies the group exists within the optional resourceOwner scope.
+func (c *Commands) checkGroupExists(ctx context.Context, groupID, resourceOwner string) (*GroupWriteModel, error) {
+	group, err := c.getGroupWriteModelByID(ctx, groupID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
