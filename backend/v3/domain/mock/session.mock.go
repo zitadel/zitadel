@@ -741,6 +741,44 @@ func (c *MockSessionRepositoryListCall) DoAndReturn(f func(context.Context, data
 	return c
 }
 
+// LoadUserData mocks base method.
+func (m *MockSessionRepository) LoadUserData() domain.SessionRepository {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoadUserData")
+	ret0, _ := ret[0].(domain.SessionRepository)
+	return ret0
+}
+
+// LoadUserData indicates an expected call of LoadUserData.
+func (mr *MockSessionRepositoryMockRecorder) LoadUserData() *MockSessionRepositoryLoadUserDataCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadUserData", reflect.TypeOf((*MockSessionRepository)(nil).LoadUserData))
+	return &MockSessionRepositoryLoadUserDataCall{Call: call}
+}
+
+// MockSessionRepositoryLoadUserDataCall wrap *gomock.Call
+type MockSessionRepositoryLoadUserDataCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockSessionRepositoryLoadUserDataCall) Return(arg0 domain.SessionRepository) *MockSessionRepositoryLoadUserDataCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockSessionRepositoryLoadUserDataCall) Do(f func() domain.SessionRepository) *MockSessionRepositoryLoadUserDataCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockSessionRepositoryLoadUserDataCall) DoAndReturn(f func() domain.SessionRepository) *MockSessionRepositoryLoadUserDataCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // MetadataConditions mocks base method.
 func (m *MockSessionRepository) MetadataConditions() domain.SessionMetadataConditions {
 	m.ctrl.T.Helper()

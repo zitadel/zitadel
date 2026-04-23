@@ -19,9 +19,13 @@ import (
 var _ domain.SessionRepository = (*session)(nil)
 
 type session struct {
-	factorRepo    sessionFactor
-	metadataRepo  sessionMetadata
-	userAgentRepo sessionUserAgent
+	factorRepo     sessionFactor
+	metadataRepo   sessionMetadata
+	userAgentRepo  sessionUserAgent
+	userRepo       user
+	loginNamesRepo userLoginName
+	// shouldLoadUser loads a part of the user data (display name, organization ID and login names)
+	shouldLoadUser bool
 }
 
 func (s session) qualifiedTableName() string {
@@ -78,6 +82,9 @@ SELECT
 			, 'headers', session_user_agents.headers
 		)
 	END as user_agent
+	, users.organization_id 
+	, jsonb_agg(DISTINCT jsonb_build_object('loginName', login_names.login_name, 'isPreferred', login_names.is_preferred)) FILTER (WHERE login_names.user_id IS NOT NULL) AS login_names
+	, users.display_name
 	FROM zitadel.sessions`
 
 // Get implements [domain.SessionRepository].
@@ -86,6 +93,8 @@ func (s session) Get(ctx context.Context, client database.QueryExecutor, opts ..
 		s.joinFactors(),
 		s.joinMetadata(),
 		s.joinUserAgent(),
+		s.joinUser(),
+		s.joinLoginNames(),
 		database.WithGroupBy(
 			s.InstanceIDColumn(),
 			s.IDColumn(),
@@ -93,6 +102,8 @@ func (s session) Get(ctx context.Context, client database.QueryExecutor, opts ..
 			s.userAgentRepo.descriptionColumn(),
 			s.userAgentRepo.ipColumn(),
 			s.userAgentRepo.headersColumn(),
+			s.userRepo.organizationIDColumn(),
+			s.userRepo.Human().DisplayNameColumn(),
 		),
 	)
 
@@ -118,6 +129,8 @@ func (s session) List(ctx context.Context, client database.QueryExecutor, opts .
 		s.joinFactors(),
 		s.joinMetadata(),
 		s.joinUserAgent(),
+		s.joinUser(),
+		s.joinLoginNames(),
 		database.WithGroupBy(
 			s.InstanceIDColumn(),
 			s.IDColumn(),
@@ -125,6 +138,8 @@ func (s session) List(ctx context.Context, client database.QueryExecutor, opts .
 			s.userAgentRepo.descriptionColumn(),
 			s.userAgentRepo.ipColumn(),
 			s.userAgentRepo.headersColumn(),
+			s.userRepo.organizationIDColumn(),
+			s.userRepo.Human().DisplayNameColumn(),
 		),
 	)
 
@@ -263,6 +278,11 @@ func (s session) Delete(ctx context.Context, client database.QueryExecutor, cond
 		return 0, time.Time{}, err
 	}
 	return deletedSessions, deletedAt.V, nil
+}
+
+// LoadUserData implements [domain.SessionRepository].
+func (s session) LoadUserData() domain.SessionRepository {
+	return &session{shouldLoadUser: true}
 }
 
 // -------------------------------------------------------------
@@ -588,6 +608,7 @@ type rawSession struct {
 	CreatorID  *string                            `json:"creatorID" db:"creator_id"`
 	Factors    JSONArray[*rawFactor]              `json:"factors,omitempty" db:"factors"`
 	Metadata   JSONArray[*domain.SessionMetadata] `json:"metadata,omitempty" db:"metadata"`
+	LoginNames JSONArray[*domain.LoginName]       `json:"login_names,omitempty" db:"login_names"`
 }
 
 func scanSession(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Session, error) {
@@ -631,6 +652,13 @@ func rawSessionToDomain(raw *rawSession) (*domain.Session, error) {
 	raw.Session.Expiration = gu.Value(raw.Expiration)
 	raw.Session.UserID = gu.Value(raw.UserID)
 	raw.Session.CreatorID = gu.Value(raw.CreatorID)
+
+	for _, ln := range raw.LoginNames {
+		if ln.IsPreferred {
+			raw.UserPreferredLoginName = ln.LoginName
+			break
+		}
+	}
 
 	for _, factor := range raw.Factors {
 		f, ch, err := factor.ToDomain()
@@ -684,6 +712,36 @@ func (s session) joinMetadata() database.QueryOption {
 	)
 	return database.WithLeftJoin(
 		s.metadataRepo.qualifiedTableName(),
+		database.And(columns...),
+	)
+}
+
+func (s session) joinUser() database.QueryOption {
+	columns := make([]database.Condition, 2, 3)
+	columns[0] = database.NewColumnCondition(s.InstanceIDColumn(), s.userRepo.InstanceIDColumn())
+	columns[1] = database.NewColumnCondition(s.UserIDColumn(), s.userRepo.IDColumn())
+
+	if !s.shouldLoadUser {
+		columns = append(columns, database.IsNull(s.userRepo.IDColumn()))
+	}
+
+	return database.WithLeftJoin(
+		s.userRepo.qualifiedTableName(),
+		database.And(columns...),
+	)
+}
+
+func (s session) joinLoginNames() database.QueryOption {
+	columns := make([]database.Condition, 2, 3)
+	columns[0] = database.NewColumnCondition(s.InstanceIDColumn(), s.loginNamesRepo.instanceIDColumn())
+	columns[1] = database.NewColumnCondition(s.UserIDColumn(), s.loginNamesRepo.userIDColumn())
+
+	if !s.shouldLoadUser {
+		columns = append(columns, database.IsNull(s.loginNamesRepo.loginNameColumn()))
+	}
+
+	return database.WithLeftJoin(
+		s.loginNamesRepo.qualifiedTableName(),
 		database.And(columns...),
 	)
 }

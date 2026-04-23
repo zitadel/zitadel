@@ -87,11 +87,11 @@
         }
 
         &.dark {
-          display: if($is-dark-theme, block, none);
+          display: if(sass($is-dark-theme): block; else: none);
         }
 
         &.light {
-          display: if($is-dark-theme, none, block);
+          display: if(sass($is-dark-theme): none; else: block);
         }
       }
 

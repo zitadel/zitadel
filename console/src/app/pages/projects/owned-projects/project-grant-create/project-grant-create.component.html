@@ -6,7 +6,7 @@
 >
   @if (currentCreateStep === 1) {
     <h1>{{ 'PROJECT.GRANT.CREATE.SEL_ORG' | translate }}</h1>
-    <cnsl-search-org-autocomplete class="block" (selectionChanged)="selectOrg($event)"> </cnsl-search-org-autocomplete>
+    <cnsl-search-org-autocomplete (selectionChanged)="selectOrg($event)" class="block"> </cnsl-search-org-autocomplete>
     @if (org) {
       <span> {{ 'PROJECT.GRANT.CREATE.FOR_ORG' | translate }} {{ org.name }} - {{ org.primaryDomain }} </span>
     }

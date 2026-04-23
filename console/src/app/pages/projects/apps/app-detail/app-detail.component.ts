@@ -6,8 +6,17 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { MessageInitShape } from '@bufbuild/protobuf';
 import { Buffer } from 'buffer';
-import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
+import { LoginVersionSchema } from '@zitadel/proto/zitadel/application/v2/login_pb';
+import { UpdateApplicationRequestSchema } from '@zitadel/proto/zitadel/application/v2/application_service_pb';
+import {
+  OIDCApplicationType as OIDCV2ApplicationType,
+  OIDCAuthMethodType as OIDCV2AuthMethodType,
+  OIDCGrantType as OIDCV2GrantType,
+  OIDCResponseType as OIDCV2ResponseType,
+  OIDCTokenType as OIDCV2TokenType,
+} from '@zitadel/proto/zitadel/application/v2/oidc_pb';
 import { mergeMap, Subject, Subscription } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
@@ -35,7 +44,6 @@ import {
 import {
   GetOIDCInformationResponse,
   UpdateAPIAppConfigRequest,
-  UpdateOIDCAppConfigRequest,
   UpdateSAMLAppConfigRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -43,6 +51,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { ApplicationService } from 'src/app/services/application.service';
 import { EnvironmentService } from 'src/app/services/environment.service';
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
 import {
@@ -192,6 +201,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     private _location: Location,
     private dialog: MatDialog,
     private mgmtService: ManagementService,
+    private applicationService: ApplicationService,
     private authService: GrpcAuthService,
     private router: Router,
     private breadcrumbService: BreadcrumbService,
@@ -669,48 +679,60 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.app.oidcConfig.devMode = !!this.devMode?.value;
         this.app.oidcConfig.skipNativeAppSuccessPage = !!this.skipNativeAppSuccessPage?.value;
 
-        const req = new UpdateOIDCAppConfigRequest();
-        req.setProjectId(this.projectId);
-        req.setAppId(this.app.id);
+        const loginVersion: MessageInitShape<typeof LoginVersionSchema> = this.oidcLoginV2?.value
+          ? {
+              version: {
+                case: 'loginV2',
+                value: { baseUri: this.oidcLoginV2BaseURL?.value },
+              },
+            }
+          : {
+              version: {
+                case: 'loginV1',
+                value: {},
+              },
+            };
 
-        // configuration
-        req.setResponseTypesList(this.app.oidcConfig.responseTypesList);
-        req.setAuthMethodType(this.app.oidcConfig.authMethodType);
-        req.setGrantTypesList(this.app.oidcConfig.grantTypesList);
-        req.setAppType(this.app.oidcConfig.appType);
-        req.setBackChannelLogoutUri(this.app.oidcConfig.backChannelLogoutUri);
-        const login = new LoginVersion();
-        if (this.oidcLoginV2?.value) {
-          const loginV2 = new LoginV2();
-          loginV2.setBaseUri(this.oidcLoginV2BaseURL?.value);
-          login.setLoginV2(loginV2);
-        } else {
-          login.setLoginV1(new LoginV1());
-        }
-        req.setLoginVersion(login);
+        const req: MessageInitShape<typeof UpdateApplicationRequestSchema> = {
+          projectId: this.projectId,
+          applicationId: this.app.id,
+          applicationType: {
+            case: 'oidcConfiguration',
+            value: {
+              // configuration
+              responseTypes: this.app.oidcConfig.responseTypesList.map((type) => this.toOIDCV2ResponseType(type)),
+              authMethodType: this.app.oidcConfig.authMethodType as unknown as OIDCV2AuthMethodType,
+              grantTypes: this.app.oidcConfig.grantTypesList as unknown as OIDCV2GrantType[],
+              applicationType: this.app.oidcConfig.appType as unknown as OIDCV2ApplicationType,
+              backChannelLogoutUri: this.app.oidcConfig.backChannelLogoutUri,
+              loginVersion,
 
-        // token
-        req.setAccessTokenType(this.app.oidcConfig.accessTokenType);
-        req.setAccessTokenRoleAssertion(this.app.oidcConfig.accessTokenRoleAssertion);
-        req.setIdTokenRoleAssertion(this.app.oidcConfig.idTokenRoleAssertion);
-        req.setIdTokenUserinfoAssertion(this.app.oidcConfig.idTokenUserinfoAssertion);
+              // token
+              accessTokenType: this.app.oidcConfig.accessTokenType as unknown as OIDCV2TokenType,
+              accessTokenRoleAssertion: this.app.oidcConfig.accessTokenRoleAssertion,
+              idTokenRoleAssertion: this.app.oidcConfig.idTokenRoleAssertion,
+              idTokenUserinfoAssertion: this.app.oidcConfig.idTokenUserinfoAssertion,
 
-        // redirects
-        req.setRedirectUrisList(this.app.oidcConfig.redirectUrisList);
-        req.setAdditionalOriginsList(this.app.oidcConfig.additionalOriginsList);
-        req.setPostLogoutRedirectUrisList(this.app.oidcConfig.postLogoutRedirectUrisList);
-        req.setDevMode(this.app.oidcConfig.devMode);
-        req.setSkipNativeAppSuccessPage(this.app.oidcConfig.skipNativeAppSuccessPage);
+              // redirects
+              redirectUris: this.normalizeOIDCListForUpdate(this.app.oidcConfig.redirectUrisList),
+              additionalOrigins: this.app.oidcConfig.additionalOriginsList,
+              postLogoutRedirectUris: this.normalizeOIDCListForUpdate(this.app.oidcConfig.postLogoutRedirectUrisList),
+              developmentMode: this.app.oidcConfig.devMode,
+              skipNativeAppSuccessPage: this.app.oidcConfig.skipNativeAppSuccessPage,
+              ...(this.clockSkewSeconds?.value
+                ? {
+                    clockSkew: {
+                      seconds: BigInt(Math.floor(this.clockSkewSeconds?.value)),
+                      nanos: Math.floor(this.clockSkewSeconds?.value % 1) * 10000,
+                    },
+                  }
+                : {}),
+            },
+          },
+        };
 
-        if (this.clockSkewSeconds?.value) {
-          const dur = new Duration();
-          dur.setSeconds(Math.floor(this.clockSkewSeconds?.value));
-          dur.setNanos(Math.floor(this.clockSkewSeconds?.value % 1) * 10000);
-          req.setClockSkew(dur);
-        }
-
-        this.mgmtService
-          .updateOIDCAppConfig(req)
+        this.applicationService
+          .updateApplication(req)
           .then(() => {
             if (this.app?.oidcConfig) {
               const config = { oidc: this.app.oidcConfig };
@@ -725,6 +747,21 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.toast.showError(error);
           });
       }
+    }
+  }
+
+  private normalizeOIDCListForUpdate(values: string[]): string[] {
+    return values.length === 0 ? [''] : values;
+  }
+
+  private toOIDCV2ResponseType(type: OIDCResponseType): OIDCV2ResponseType {
+    switch (type) {
+      case OIDCResponseType.OIDC_RESPONSE_TYPE_CODE:
+        return OIDCV2ResponseType.OIDC_RESPONSE_TYPE_CODE;
+      case OIDCResponseType.OIDC_RESPONSE_TYPE_ID_TOKEN:
+        return OIDCV2ResponseType.OIDC_RESPONSE_TYPE_ID_TOKEN;
+      case OIDCResponseType.OIDC_RESPONSE_TYPE_ID_TOKEN_TOKEN:
+        return OIDCV2ResponseType.OIDC_RESPONSE_TYPE_ID_TOKEN_TOKEN;
     }
   }
 

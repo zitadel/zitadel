@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GrpcService } from './grpc.service';
-import { create } from '@bufbuild/protobuf';
+import { create, MessageInitShape } from '@bufbuild/protobuf';
 import {
   AddMyAuthFactorOTPSMSResponse,
   GetMyLoginPolicyResponse,
@@ -19,6 +19,7 @@ import {
   ListMyMetadataResponse,
   VerifyMyPhoneResponse,
   ListMyZitadelPermissionsResponse,
+  ListMyProjectOrgsRequestSchema,
 } from '@zitadel/proto/zitadel/auth_pb';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { UserService } from './user.service';
@@ -81,5 +82,9 @@ export class NewAuthService {
       queryKey: [this.userService.userId(), 'auth', 'listMyZitadelPermissions'],
       queryFn: () => this.listMyZitadelPermissions().then(({ result }) => result),
     }));
+  }
+
+  public listMyProjectOrgs(req: MessageInitShape<typeof ListMyProjectOrgsRequestSchema>, signal?: AbortSignal) {
+    return this.grpcService.authNew.listMyProjectOrgs(req, { signal });
   }
 }

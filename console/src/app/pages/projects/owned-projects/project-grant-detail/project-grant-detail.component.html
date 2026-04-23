@@ -28,13 +28,13 @@
   </div>
 
   <mat-menu #actions="matMenu" xPosition="before">
-    @if (grant?.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE) {
-      <button mat-menu-item (click)="changeState(ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE)">
+    @if (grant && grant.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE) {
+      <button mat-menu-item (click)="changeState(grant, ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE)">
         {{ 'USER.PAGES.DEACTIVATE' | translate }}
       </button>
     }
-    @if (grant?.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE) {
-      <button mat-menu-item (click)="changeState(ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE)">
+    @if (grant && grant.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE) {
+      <button mat-menu-item (click)="changeState(grant, ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE)">
         {{ 'USER.PAGES.REACTIVATE' | translate }}
       </button>
     }
@@ -48,8 +48,8 @@
     <cnsl-project-grant-illustration
       [grantedProject]="grant"
       [projectRoleOptions]="projectRoleOptions"
-      (roleRemoved)="removeRole($event)"
-      (editRoleClicked)="editRoles()"
+      (roleRemoved)="removeRole(grant, $event)"
+      (editRoleClicked)="editRoles(grant)"
     >
     </cnsl-project-grant-illustration>
   }
@@ -63,15 +63,15 @@
       [canWrite]="['project.grant.member.write', 'project.grant.member.write:' + grant.grantId] | hasRole | async"
       [canDelete]="['project.grant.member.delete', 'project.grant.member.delete:' + grant.grantId] | hasRole | async"
       [memberRoleOptions]="memberRoleOptions"
-      (updateRoles)="updateMemberRoles($event.member, $event.change)"
-      (deleteMember)="removeProjectMember($event)"
+      (updateRoles)="updateMemberRoles(grant, $event.member, $event.change)"
+      (deleteMember)="removeProjectMember(grant, $event)"
       [factoryLoadFunc]="changePageFactory"
       (changedSelection)="selection = $event"
       [refreshTrigger]="changePage"
     >
       <button
         selectactions
-        (click)="removeProjectMemberSelection()"
+        (click)="removeProjectMemberSelection(grant)"
         [disabled]="
           (['project.grant.member.delete', 'project.grant.member.delete:' + grant.grantId] | hasRole | async) === false
         "
@@ -82,7 +82,7 @@
         <div class="cnsl-action-button">
           <i class="las la-trash"></i>
           <span>{{ 'ACTIONS.SELECTIONDELETE' | translate }}</span>
-          <cnsl-action-keys [type]="ActionKeysType.DELETE" (actionTriggered)="removeProjectMemberSelection()">
+          <cnsl-action-keys [type]="ActionKeysType.DELETE" (actionTriggered)="removeProjectMemberSelection(grant)">
           </cnsl-action-keys>
         </div>
       </button>
@@ -92,13 +92,13 @@
         [disabled]="
           (['project.grant.member.write', 'project.grant.member.write:' + grant.grantId] | hasRole | async) === false
         "
-        (click)="openAddMember()"
+        (click)="openAddMember(grant)"
         color="primary"
         mat-raised-button
       >
         <div class="cnsl-action-button">
           <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
-          <cnsl-action-keys (actionTriggered)="openAddMember()"> </cnsl-action-keys>
+          <cnsl-action-keys (actionTriggered)="openAddMember(grant)"> </cnsl-action-keys>
         </div>
       </button>
     </cnsl-members-table>

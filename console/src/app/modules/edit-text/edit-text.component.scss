@@ -24,7 +24,7 @@
           min-height: 80px;
 
           &.defaulttext {
-            color: if($is-dark-theme, #ffffff50, #00000050);
+            color: if(sass($is-dark-theme): #ffffff50; else: #00000050);
           }
         }
 

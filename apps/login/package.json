@@ -101,7 +101,7 @@
     "node-forge": "^1.4.0",
     "nodemon": "^3.1.14",
     "postcss": "^8.5.8",
-    "prettier": "^3.8.1",
+    "prettier": "^3.8.3",
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "sass": "^1.98.0",
