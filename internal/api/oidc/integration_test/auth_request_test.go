@@ -697,9 +697,9 @@ func assertTokens(t *testing.T, tokens *oidc.Tokens[*oidc.IDTokenClaims], requir
 	assert.Empty(t, tokens.Extra("state"))
 }
 
-func assertIDTokenClaims(t *testing.T, claims *oidc.IDTokenClaims, userID string, arm []string, sessionStart, sessionChange time.Time, sessionID string) {
+func assertIDTokenClaims(t *testing.T, claims *oidc.IDTokenClaims, userID string, amr oidc.AuthenticationMethodsReferences, sessionStart, sessionChange time.Time, sessionID string) {
 	assert.Equal(t, userID, claims.Subject)
-	assert.Equal(t, arm, claims.AuthenticationMethodsReferences)
+	assert.Equal(t, amr, claims.AuthenticationMethodsReferences)
 	assertOIDCTimeRange(t, claims.AuthTime, sessionStart, sessionChange)
 	assert.Equal(t, sessionID, claims.SessionID)
 	assert.Empty(t, claims.Name)
