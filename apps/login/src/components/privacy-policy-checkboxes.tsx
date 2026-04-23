@@ -42,7 +42,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
         <Translated i18nKey="agreeTo" namespace="register" />
         {helpLink && (
           <span>
-            <Link href={helpLink} target="_blank" aria-label="Open help in a new tab">
+            <Link href={helpLink} target="_blank" aria-label="Open help in a new tab" data-testid="help-link">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -80,7 +80,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
 
           <div className="mr-4 w-[28rem]">
             <p className="text-text-light-500 dark:text-text-dark-500 text-sm">
-              <Link href={tosLink} className="underline" target="_blank">
+              <Link href={tosLink} className="underline" target="_blank" data-testid="tos-link">
                 <Translated i18nKey="termsOfService" namespace="register" />
               </Link>
             </p>
@@ -106,7 +106,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
 
           <div className="mr-4 w-[28rem]">
             <p className="text-text-light-500 dark:text-text-dark-500 text-sm">
-              <Link href={privacyPolicyLink} className="underline" target="_blank">
+              <Link href={privacyPolicyLink} className="underline" target="_blank" data-testid="privacy-policy-link">
                 <Translated i18nKey="privacyPolicy" namespace="register" />
               </Link>
             </p>
