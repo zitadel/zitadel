@@ -2,7 +2,7 @@
   <div class="info-row">
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'USER.PAGES.STATE' | translate }}</p>
-      @if (user?.state) {
+      @if (user.state) {
         <p
           class="state"
           [ngClass]="{
@@ -60,7 +60,7 @@
   <div class="info-row">
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'IAM.PAGES.STATE' | translate }}</p>
-      @if (instance?.state) {
+      @if (instance.state) {
         <p
           class="state"
           [ngClass]="{
@@ -74,25 +74,25 @@
     </div>
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'INSTANCEID' | translate }}</p>
-      @if (instance?.id) {
+      @if (instance.id) {
         <p class="info-row-desc">{{ instance.id }}</p>
       }
     </div>
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'NAME' | translate }}</p>
-      @if (instance?.name) {
+      @if (instance.name) {
         <p class="info-row-desc">{{ instance.name }}</p>
       }
     </div>
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'VERSION' | translate }}</p>
-      @if (instance?.version) {
+      @if (instance.version) {
         <p class="info-row-desc">{{ instance.version }}</p>
       }
     </div>
     <div class="info-wrapper width">
       <p class="info-row-title">{{ 'IAM.PAGES.DOMAINLIST' | translate }}</p>
-      @for (domain of instance?.domainsList; track domain) {
+      @for (domain of instance.domainsList; track domain) {
         <div class="copy-row">
           <button
             [disabled]="copied === domain.domain"
@@ -108,7 +108,7 @@
     </div>
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'ORG.PAGES.CREATIONDATE' | translate }}</p>
-      @if (instance?.details?.creationDate; as creationDate) {
+      @if (instance.details?.creationDate; as creationDate) {
         <p class="info-row-desc">
           {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
         </p>
@@ -116,7 +116,7 @@
     </div>
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'ORG.PAGES.DATECHANGED' | translate }}</p>
-      @if (instance?.details?.changeDate; as changeDate) {
+      @if (instance.details?.changeDate; as changeDate) {
         <p class="info-row-desc">
           {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
         </p>
@@ -129,7 +129,7 @@
   <div class="info-row">
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'ORG.PAGES.STATE' | translate }}</p>
-      @if (org?.state) {
+      @if (org.state) {
         <p
           class="state"
           [ngClass]="{
@@ -143,7 +143,7 @@
     </div>
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'ORG.PAGES.ID' | translate }}</p>
-      @if (org?.id) {
+      @if (org.id) {
         <p class="info-row-desc">{{ org.id }}</p>
       }
     </div>
@@ -165,7 +165,7 @@
     </div>
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'ORG.PAGES.CREATIONDATE' | translate }}</p>
-      @if (org?.details?.creationDate; as creationDate) {
+      @if (org.details?.creationDate; as creationDate) {
         <p class="info-row-desc">
           {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
         </p>
@@ -173,7 +173,7 @@
     </div>
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'ORG.PAGES.DATECHANGED' | translate }}</p>
-      @if (org?.details?.changeDate; as changeDate) {
+      @if (org.details?.changeDate; as changeDate) {
         <p class="info-row-desc">
           {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
         </p>
@@ -186,7 +186,7 @@
   <div class="info-row">
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'PROJECT.STATE.TITLE' | translate }}</p>
-      @if (project?.state) {
+      @if (project.state) {
         <p
           class="state"
           [ngClass]="{
@@ -200,13 +200,13 @@
     </div>
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'PROJECT.PAGES.ID' | translate }}</p>
-      @if (project?.id) {
+      @if (project.id) {
         <p class="info-row-desc">{{ project.id }}</p>
       }
     </div>
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'PROJECT.PAGES.CREATEDON' | translate }}</p>
-      @if (project?.details?.creationDate; as creationDate) {
+      @if (project.details?.creationDate; as creationDate) {
         <p class="info-row-desc">
           {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
         </p>
@@ -214,7 +214,7 @@
     </div>
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'PROJECT.PAGES.LASTMODIFIED' | translate }}</p>
-      @if (project?.details?.changeDate; as changeDate) {
+      @if (project.details?.changeDate; as changeDate) {
         <p class="info-row-desc">
           {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
         </p>
@@ -227,7 +227,7 @@
   <div class="info-row">
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'PROJECT.STATE.TITLE' | translate }}</p>
-      @if (grantedProject?.state) {
+      @if (grantedProject.state) {
         <p
           class="state"
           [ngClass]="{
@@ -241,19 +241,19 @@
     </div>
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'PROJECT.PAGES.ID' | translate }}</p>
-      @if (grantedProject?.projectId) {
+      @if (grantedProject.projectId) {
         <p class="info-row-desc">{{ grantedProject.projectId }}</p>
       }
     </div>
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'PROJECT.GRANT.GRANTID' | translate }}</p>
-      @if (grantedProject?.grantId) {
+      @if (grantedProject.grantId) {
         <p class="info-row-desc">{{ grantedProject.grantId }}</p>
       }
     </div>
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'PROJECT.PAGES.CREATEDON' | translate }}</p>
-      @if (grantedProject?.details?.creationDate; as creationDate) {
+      @if (grantedProject.details?.creationDate; as creationDate) {
         <p class="info-row-desc">
           {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
         </p>
@@ -261,7 +261,7 @@
     </div>
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'PROJECT.PAGES.LASTMODIFIED' | translate }}</p>
-      @if (grantedProject?.details?.changeDate; as changeDate) {
+      @if (grantedProject.details?.changeDate; as changeDate) {
         <p class="info-row-desc">
           {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
         </p>
@@ -274,7 +274,7 @@
   <div class="info-row">
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'APP.PAGES.STATE' | translate }}</p>
-      @if (app?.state) {
+      @if (app.state) {
         <p
           class="state"
           [ngClass]="{
@@ -286,7 +286,7 @@
         </p>
       }
     </div>
-    @if (app?.apiConfig?.authMethodType; as authMethodType) {
+    @if (app.apiConfig?.authMethodType; as authMethodType) {
       <div class="info-wrapper">
         <p class="info-row-title">{{ 'APP.AUTHMETHOD' | translate }}</p>
         <p class="info-row-desc">
@@ -294,7 +294,7 @@
         </p>
       </div>
     }
-    @if (app?.oidcConfig?.authMethodType; as authMethodType) {
+    @if (app.oidcConfig?.authMethodType; as authMethodType) {
       <div class="info-wrapper">
         <p class="info-row-title">{{ 'APP.AUTHMETHOD' | translate }}</p>
         <p class="info-row-desc">
@@ -304,13 +304,13 @@
     }
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'APP.PAGES.ID' | translate }}</p>
-      @if (app?.id) {
+      @if (app.id) {
         <p class="info-row-desc">{{ app.id }}</p>
       }
     </div>
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'APP.PAGES.DATECREATED' | translate }}</p>
-      @if (app?.details?.creationDate; as creationDate) {
+      @if (app.details?.creationDate; as creationDate) {
         <p class="info-row-desc">
           {{ creationDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
         </p>
@@ -318,46 +318,44 @@
     </div>
     <div class="info-wrapper">
       <p class="info-row-title">{{ 'APP.PAGES.DATECHANGED' | translate }}</p>
-      @if (app?.details?.changeDate; as changeDate) {
+      @if (app.details?.changeDate; as changeDate) {
         <p class="info-row-desc">
           {{ changeDate | timestampToDate | localizedDate: 'dd. MMMM yyyy, HH:mm' }}
         </p>
       }
     </div>
-    @if (app) {
-      <div class="info-wrapper">
-        <p class="info-row-title">{{ 'APP.OIDC.INFO.CLIENTID' | translate }}</p>
-        @if (app.oidcConfig?.clientId) {
-          <div class="copy-row">
-            @if (app.oidcConfig?.clientId; as clientId) {
-              <button
-                [disabled]="copied === clientId"
-                [matTooltip]="(copied !== clientId ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
-                cnslCopyToClipboard
-                [valueToCopy]="clientId"
-                (copiedValue)="copied = $event"
-              >
-                {{ clientId }}
-              </button>
-            }
-          </div>
-        }
-        @if (app.apiConfig?.clientId) {
-          <div class="copy-row">
-            @if (app.apiConfig?.clientId; as clientId) {
-              <button
-                [disabled]="copied === clientId"
-                [matTooltip]="(copied !== clientId ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
-                cnslCopyToClipboard
-                [valueToCopy]="clientId"
-                (copiedValue)="copied = $event"
-              >
-                {{ clientId }}
-              </button>
-            }
-          </div>
-        }
-      </div>
-    }
+    <div class="info-wrapper">
+      <p class="info-row-title">{{ 'APP.OIDC.INFO.CLIENTID' | translate }}</p>
+      @if (app.oidcConfig?.clientId) {
+        <div class="copy-row">
+          @if (app.oidcConfig?.clientId; as clientId) {
+            <button
+              [disabled]="copied === clientId"
+              [matTooltip]="(copied !== clientId ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
+              cnslCopyToClipboard
+              [valueToCopy]="clientId"
+              (copiedValue)="copied = $event"
+            >
+              {{ clientId }}
+            </button>
+          }
+        </div>
+      }
+      @if (app.apiConfig?.clientId) {
+        <div class="copy-row">
+          @if (app.apiConfig?.clientId; as clientId) {
+            <button
+              [disabled]="copied === clientId"
+              [matTooltip]="(copied !== clientId ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
+              cnslCopyToClipboard
+              [valueToCopy]="clientId"
+              (copiedValue)="copied = $event"
+            >
+              {{ clientId }}
+            </button>
+          }
+        </div>
+      }
+    </div>
   </div>
 }

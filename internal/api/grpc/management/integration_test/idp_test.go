@@ -1,6 +1,6 @@
 //go:build integration
 
-package admin_test
+package management_test
 
 import (
 	"context"
@@ -13,32 +13,35 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object"
 )
 
 func Test_AddZitadelProvider(t *testing.T) {
 	type args struct {
 		ctx context.Context
-		req *admin_pb.AddZitadelProviderRequest
+		req *mgmt_pb.AddZitadelProviderRequest
 	}
 	tests := []struct {
 		name         string
 		args         args
 		wantErr      error
-		wantResponse *admin_pb.AddZitadelProviderResponse
+		wantResponse *mgmt_pb.AddZitadelProviderResponse
 	}{
 		{
 			name: "no permissions, error",
 			args: args{
 				ctx: Instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
-				req: &admin_pb.AddZitadelProviderRequest{
+				req: &mgmt_pb.AddZitadelProviderRequest{
 					Name:         "Zitadel Support IdP",
 					Issuer:       "zitadel.example.com",
 					ClientId:     "test-client",
 					ClientSecret: "test-secret",
 					Scopes:       []string{"email", "profile"},
+					ProviderOptions: &idp_pb.Options{
+						IsCreationAllowed: true,
+					},
 				},
 			},
 			wantErr: status.Error(codes.NotFound, "membership not found (AUTHZ-cdgFk)"),
@@ -47,12 +50,15 @@ func Test_AddZitadelProvider(t *testing.T) {
 			name: "insufficient permissions, error",
 			args: args{
 				ctx: Instance.WithAuthorizationToken(CTX, integration.UserTypeLogin),
-				req: &admin_pb.AddZitadelProviderRequest{
+				req: &mgmt_pb.AddZitadelProviderRequest{
 					Name:         "Zitadel Support IdP",
 					Issuer:       "zitadel.example.com",
 					ClientId:     "test-client",
 					ClientSecret: "test-secret",
 					Scopes:       []string{"email", "profile"},
+					ProviderOptions: &idp_pb.Options{
+						IsCreationAllowed: true,
+					},
 				},
 			},
 			wantErr: status.Error(codes.PermissionDenied, "No matching permissions found (AUTH-5mWD2)"),
@@ -60,16 +66,16 @@ func Test_AddZitadelProvider(t *testing.T) {
 		{
 			name: "missing required field: name",
 			args: args{
-				ctx: AdminCTX,
-				req: &admin_pb.AddZitadelProviderRequest{},
+				ctx: OrgCTX,
+				req: &mgmt_pb.AddZitadelProviderRequest{},
 			},
 			wantErr: status.Error(codes.InvalidArgument, "invalid AddZitadelProviderRequest.Name: value length must be between 1 and 200 runes, inclusive"),
 		},
 		{
 			name: "missing required field: issuer",
 			args: args{
-				ctx: AdminCTX,
-				req: &admin_pb.AddZitadelProviderRequest{
+				ctx: OrgCTX,
+				req: &mgmt_pb.AddZitadelProviderRequest{
 					Name: "Zitadel Support IdP",
 				},
 			},
@@ -78,8 +84,8 @@ func Test_AddZitadelProvider(t *testing.T) {
 		{
 			name: "missing required field: client_id",
 			args: args{
-				ctx: AdminCTX,
-				req: &admin_pb.AddZitadelProviderRequest{
+				ctx: OrgCTX,
+				req: &mgmt_pb.AddZitadelProviderRequest{
 					Name:   "Zitadel Support IdP",
 					Issuer: "zitadel.example.com",
 				},
@@ -89,8 +95,8 @@ func Test_AddZitadelProvider(t *testing.T) {
 		{
 			name: "missing required field: client_secret",
 			args: args{
-				ctx: AdminCTX,
-				req: &admin_pb.AddZitadelProviderRequest{
+				ctx: OrgCTX,
+				req: &mgmt_pb.AddZitadelProviderRequest{
 					Name:     "Zitadel Support IdP",
 					Issuer:   "zitadel.example.com",
 					ClientId: "test-client",
@@ -104,8 +110,8 @@ func Test_AddZitadelProvider(t *testing.T) {
 		{
 			name: "missing org ID in instance roles info",
 			args: args{
-				ctx: AdminCTX,
-				req: &admin_pb.AddZitadelProviderRequest{
+				ctx: OrgCTX,
+				req: &mgmt_pb.AddZitadelProviderRequest{
 					Name:         "Zitadel Support IdP",
 					Issuer:       "zitadel.example.com",
 					ClientId:     "test-client",
@@ -129,8 +135,8 @@ func Test_AddZitadelProvider(t *testing.T) {
 		{
 			name: "missing org domain in instance roles info",
 			args: args{
-				ctx: AdminCTX,
-				req: &admin_pb.AddZitadelProviderRequest{
+				ctx: OrgCTX,
+				req: &mgmt_pb.AddZitadelProviderRequest{
 					Name:         "Zitadel Support IdP",
 					Issuer:       "zitadel.example.com",
 					ClientId:     "test-client",
@@ -158,8 +164,8 @@ func Test_AddZitadelProvider(t *testing.T) {
 		{
 			name: "valid request without instance roles info",
 			args: args{
-				ctx: AdminCTX,
-				req: &admin_pb.AddZitadelProviderRequest{
+				ctx: OrgCTX,
+				req: &mgmt_pb.AddZitadelProviderRequest{
 					Name:         "Zitadel Support IdP",
 					Issuer:       "zitadel.example.com",
 					ClientId:     "test-client",
@@ -170,17 +176,17 @@ func Test_AddZitadelProvider(t *testing.T) {
 					},
 				},
 			},
-			wantResponse: &admin_pb.AddZitadelProviderResponse{
+			wantResponse: &mgmt_pb.AddZitadelProviderResponse{
 				Details: &object_pb.ObjectDetails{
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
 		{
 			name: "valid request with instance roles info",
 			args: args{
-				ctx: AdminCTX,
-				req: &admin_pb.AddZitadelProviderRequest{
+				ctx: OrgCTX,
+				req: &mgmt_pb.AddZitadelProviderRequest{
 					Name:         "Zitadel Support IdP",
 					Issuer:       "zitadel.example.com",
 					ClientId:     "test-client",
@@ -197,9 +203,9 @@ func Test_AddZitadelProvider(t *testing.T) {
 					},
 				},
 			},
-			wantResponse: &admin_pb.AddZitadelProviderResponse{
+			wantResponse: &mgmt_pb.AddZitadelProviderResponse{
 				Details: &object_pb.ObjectDetails{
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},

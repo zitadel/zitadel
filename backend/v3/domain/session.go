@@ -22,6 +22,10 @@ type Session struct {
 	Challenges SessionChallenges  `json:"challenges,omitempty"`
 	Metadata   []*SessionMetadata `json:"metadata,omitempty"`
 	UserAgent  *SessionUserAgent  `json:"userAgent,omitempty"`
+
+	UserOrganizationID     *string `json:"organizationId,omitempty" db:"organization_id"`
+	UserDisplayName        *string `json:"display_name" db:"display_name"`
+	UserPreferredLoginName string
 }
 
 //go:generate mockgen -typed -package domainmock -destination ./mock/session.mock.go . SessionRepository
@@ -51,6 +55,9 @@ type SessionRepository interface {
 	// In case the session was previously deleted, the method returns 0 and the previous deletion timestamp.
 	// If multiple sessions are deleted, the method returns the number of deleted sessions and no timestamp, as it cannot be determined which session's deletion timestamp to return.
 	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, time.Time, error)
+	// LoadUserData loads user data associated to the given session.
+	// If called, the [Session.UserOrganizationID], [Session.UserDisplayName] and [Session.UserPreferredLoginName] fields will be populated on future calls to [SessionRepository.Get] or [SessionRepository.List].
+	LoadUserData() SessionRepository
 }
 
 // sessionColumns define all the columns of the session table.
