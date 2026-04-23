@@ -1,11 +1,11 @@
 import { Location } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
-import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
-import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { Org } from '@zitadel/proto/zitadel/org_pb';
+import { NewMgmtService } from 'src/app/services/new-mgmt.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const ROUTEPARAM = 'projectid';
 
@@ -15,8 +15,8 @@ const ROUTEPARAM = 'projectid';
   styleUrls: ['./project-grant-create.component.scss'],
   standalone: false,
 })
-export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
-  public org?: Org.AsObject;
+export class ProjectGrantCreateComponent implements OnInit {
+  public org?: Org;
   public projectId: string = '';
   public grantId: string = '';
   public rolesKeyList: string[] = [];
@@ -24,17 +24,17 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
   public createSteps: number = 2;
   public currentCreateStep: number = 1;
 
-  private destroy$: Subject<void> = new Subject();
   constructor(
-    private route: ActivatedRoute,
-    private toast: ToastService,
-    private mgmtService: ManagementService,
-    private _location: Location,
-    private breadcrumbService: BreadcrumbService,
+    private readonly route: ActivatedRoute,
+    private readonly toast: ToastService,
+    private readonly mgmtService: NewMgmtService,
+    private readonly _location: Location,
+    private readonly breadcrumbService: BreadcrumbService,
+    private readonly destroyRef: DestroyRef,
   ) {}
 
   public ngOnInit(): void {
-    this.route.params.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+    this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       this.projectId = params['projectid'];
 
       const breadcrumbs = [
@@ -53,25 +53,6 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
     });
   }
 
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  public searchOrg(domain: string): void {
-    this.mgmtService
-      .getOrgByDomainGlobal(domain)
-      .then((ret) => {
-        if (ret.org) {
-          const tmp = ret.org;
-          this.org = tmp;
-        }
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
-  }
-
   public close(): void {
     this._location.back();
   }
@@ -79,7 +60,7 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
   public addGrant(): void {
     if (this.org) {
       this.mgmtService
-        .addProjectGrant(this.org.id, this.projectId, this.rolesKeyList)
+        .addProjectGrant({ grantedOrgId: this.org.id, projectId: this.projectId, roleKeys: this.rolesKeyList })
         .then(() => {
           this.close();
         })
@@ -89,7 +70,7 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
     }
   }
 
-  public selectOrg(org: Org.AsObject): void {
+  public selectOrg(org: Org): void {
     this.org = org;
   }
 

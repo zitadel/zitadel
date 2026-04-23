@@ -1,36 +1,43 @@
 <cnsl-card class="metadata-details" [title]="'DESCRIPTIONS.METADATA_TITLE' | translate" [description]="description">
-  <mat-spinner card-actions class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
+  @if (loading) {
+    <mat-spinner card-actions class="spinner" diameter="20"></mat-spinner>
+  }
 
-  <cnsl-refresh-table *ngIf="dataSource$ | async as dataSource" [loading]="loading" (refreshed)="refresh.emit()">
-    <button actions [disabled]="disabled" mat-raised-button color="primary" class="edit" (click)="editClicked.emit()">
-      {{ 'ACTIONS.EDIT' | translate }}
-    </button>
-
-    <table class="table" mat-table [dataSource]="dataSource">
-      <ng-container matColumnDef="key">
-        <th mat-header-cell *matHeaderCellDef>{{ 'METADATA.KEY' | translate }}</th>
-        <td mat-cell *matCellDef="let metadata">
-          <span *ngIf="metadata?.key" class="centered">
-            {{ metadata.key }}
-          </span>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="value">
-        <th mat-header-cell *matHeaderCellDef>{{ 'METADATA.VALUE' | translate }}</th>
-        <td mat-cell *matCellDef="let metadata">
-          <span *ngIf="metadata?.value" class="centered">
-            {{ metadata.value }}
-          </span>
-        </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-    </table>
-    <div *ngIf="!loading && !dataSource?.data?.length" class="no-content-row">
-      <i class="las la-exclamation"></i>
-      <span>{{ 'USER.MFA.EMPTY' | translate }}</span>
-    </div>
-  </cnsl-refresh-table>
+  @if (dataSource$ | async; as dataSource) {
+    <cnsl-refresh-table [loading]="loading" (refreshed)="refresh.emit()">
+      <button actions [disabled]="disabled" mat-raised-button color="primary" class="edit" (click)="editClicked.emit()">
+        {{ 'ACTIONS.EDIT' | translate }}
+      </button>
+      <table class="table" mat-table [dataSource]="dataSource">
+        <ng-container matColumnDef="key">
+          <th mat-header-cell *matHeaderCellDef>{{ 'METADATA.KEY' | translate }}</th>
+          <td mat-cell *matCellDef="let metadata">
+            @if (metadata?.key) {
+              <span class="centered">
+                {{ metadata.key }}
+              </span>
+            }
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="value">
+          <th mat-header-cell *matHeaderCellDef>{{ 'METADATA.VALUE' | translate }}</th>
+          <td mat-cell *matCellDef="let metadata">
+            @if (metadata?.value) {
+              <span class="centered">
+                {{ metadata.value }}
+              </span>
+            }
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+      @if (!loading && !dataSource?.data?.length) {
+        <div class="no-content-row">
+          <i class="las la-exclamation"></i>
+          <span>{{ 'USER.MFA.EMPTY' | translate }}</span>
+        </div>
+      }
+    </cnsl-refresh-table>
+  }
 </cnsl-card>

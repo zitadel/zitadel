@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { getLoginSystemUserId, hasLoginServiceKey, hasServiceUserToken, hasSystemUserCredentials } from "./deployment";
+import { hasLoginClientKey, hasServiceUserToken, hasSystemUserCredentials } from "./deployment";
 
 describe("Deployment utilities", () => {
   const originalEnv = process.env;
@@ -55,58 +55,23 @@ describe("Deployment utilities", () => {
     });
   });
 
-  describe("hasLoginServiceKey", () => {
-    test("should return true with ZITADEL_LOGIN_SERVICE_KEY_FILE and ZITADEL_LOGIN_SYSTEM_USER_ID", () => {
-      process.env.ZITADEL_LOGIN_SERVICE_KEY_FILE = "/path/to/key.pem";
-      process.env.ZITADEL_LOGIN_SYSTEM_USER_ID = "login-user";
+  describe("hasLoginClientKey", () => {
+    test("should return true when ZITADEL_LOGINCLIENT_KEYFILE is set", () => {
+      process.env.ZITADEL_LOGINCLIENT_KEYFILE = "/path/to/key.pem";
 
-      expect(hasLoginServiceKey()).toBe(true);
+      expect(hasLoginClientKey()).toBe(true);
     });
 
-    test("should return true with ZITADEL_LOGIN_SERVICE_KEY_FILE and SYSTEM_USER_ID fallback", () => {
-      process.env.ZITADEL_LOGIN_SERVICE_KEY_FILE = "/path/to/key.pem";
-      process.env.ZITADEL_LOGIN_SYSTEM_USER_ID = undefined as any;
-      process.env.SYSTEM_USER_ID = "system-user";
+    test("should return false when ZITADEL_LOGINCLIENT_KEYFILE is missing", () => {
+      process.env.ZITADEL_LOGINCLIENT_KEYFILE = undefined as any;
 
-      expect(hasLoginServiceKey()).toBe(true);
+      expect(hasLoginClientKey()).toBe(false);
     });
 
-    test("should return false when ZITADEL_LOGIN_SERVICE_KEY_FILE is missing", () => {
-      process.env.ZITADEL_LOGIN_SERVICE_KEY_FILE = undefined as any;
-      process.env.ZITADEL_LOGIN_SYSTEM_USER_ID = "login-user";
+    test("should return false when ZITADEL_LOGINCLIENT_KEYFILE is empty string", () => {
+      process.env.ZITADEL_LOGINCLIENT_KEYFILE = "";
 
-      expect(hasLoginServiceKey()).toBe(false);
-    });
-
-    test("should return false when no user ID is set", () => {
-      process.env.ZITADEL_LOGIN_SERVICE_KEY_FILE = "/path/to/key.pem";
-      process.env.ZITADEL_LOGIN_SYSTEM_USER_ID = undefined as any;
-      process.env.SYSTEM_USER_ID = undefined as any;
-
-      expect(hasLoginServiceKey()).toBe(false);
-    });
-  });
-
-  describe("getLoginSystemUserId", () => {
-    test("should return ZITADEL_LOGIN_SYSTEM_USER_ID when set", () => {
-      process.env.ZITADEL_LOGIN_SYSTEM_USER_ID = "login-user";
-      process.env.SYSTEM_USER_ID = "system-user";
-
-      expect(getLoginSystemUserId()).toBe("login-user");
-    });
-
-    test("should return SYSTEM_USER_ID as fallback", () => {
-      process.env.ZITADEL_LOGIN_SYSTEM_USER_ID = undefined as any;
-      process.env.SYSTEM_USER_ID = "system-user";
-
-      expect(getLoginSystemUserId()).toBe("system-user");
-    });
-
-    test("should return undefined when neither is set", () => {
-      process.env.ZITADEL_LOGIN_SYSTEM_USER_ID = undefined as any;
-      process.env.SYSTEM_USER_ID = undefined as any;
-
-      expect(getLoginSystemUserId()).toBeUndefined();
+      expect(hasLoginClientKey()).toBe(false);
     });
   });
 

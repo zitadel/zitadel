@@ -329,10 +329,10 @@ message SetSessionRequest{
     }
   ];
   string session_token = 2 [
-    (validate.rules).string = {min_len: 0, max_len: 200},
+    (validate.rules).string = {min_len: 0, max_len: 500},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
-      max_length: 200;
+      min_length: 0;
+      max_length: 500;
       description: "\"DEPRECATED: this field is ignored.\"";
     }
   ];

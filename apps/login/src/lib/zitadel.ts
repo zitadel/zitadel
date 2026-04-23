@@ -32,13 +32,13 @@ import {
 import { getTranslations } from "next-intl/server";
 
 import { getUserAgent } from "./fingerprint";
-import { createLogger } from "./logger";
 
+import { applyCustomHeaders } from "@/lib/custom-headers";
+import { errorClassificationInterceptor, isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { otelGrpcInterceptor } from "@/lib/grpc/interceptors/otel";
-import { Interceptor } from "@connectrpc/connect";
+import { Code, Interceptor } from "@connectrpc/connect";
+import { PromiseCache } from "./cache";
 import { createServiceForHost } from "./service";
-
-const logger = createLogger("zitadel");
 
 const useCache = process.env.API_CACHE_ENABLED !== "false";
 
@@ -66,29 +66,30 @@ function getTTLForKey(keyPrefix: string, fallbackTtl: number) {
   return fallbackTtl;
 }
 
-const promiseCache = new Map<string, { promise: Promise<any>; expiresAt: number }>();
+/**
+ * Build a cache key scoped to the current instance.
+ * In multi-tenant mode serviceConfig.instanceHost distinguishes tenants;
+ * without it we fall back to "default" (single-tenant / self-hosted).
+ */
+function instanceCacheKey(serviceConfig: ServiceConfig, key: string): string {
+  return `${serviceConfig.instanceHost || "default"}:${key}`;
+}
+
+const promiseCache = new PromiseCache(Number(cacheConfig.maxSize) || 100);
 
 /**
  * A stale-while-revalidate in-memory cache to keep data fresh and deduplicate concurrent requests.
  * We cache the Promise, so concurrent requests share the exact same execution.
+ *
+ * The cache is bounded and periodically swept for expired entries
+ * to prevent unbounded memory growth.
  */
 function freshCache<T>(key: string, fetcher: () => Promise<T>, ttlMs: number): Promise<T> {
   if (!useCache) {
     return fetcher();
   }
 
-  const now = Date.now();
-  const cached = promiseCache.get(key);
-  if (cached && now < cached.expiresAt) {
-    return cached.promise;
-  }
-
-  const promise = fetcher();
-  promiseCache.set(key, { promise, expiresAt: now + ttlMs });
-
-  promise.catch(() => promiseCache.delete(key));
-
-  return promise;
+  return promiseCache.getOrFetch(key, fetcher, ttlMs);
 }
 
 export async function getHostedLoginTranslation({
@@ -124,7 +125,7 @@ export async function getHostedLoginTranslation({
   };
 
   return freshCache(
-    `getHostedLoginTranslation-${organization || "instance"}-${locale || "default"}`,
+    instanceCacheKey(serviceConfig, `getHostedLoginTranslation-${organization || "instance"}-${locale || "default"}`),
     fetcher,
     getTTLForKey("getHostedLoginTranslation", longCacheTTL),
   );
@@ -145,7 +146,7 @@ export async function getBrandingSettings({
   };
 
   return freshCache(
-    `getBrandingSettings-${organization || "instance"}`,
+    instanceCacheKey(serviceConfig, `getBrandingSettings-${organization || "instance"}`),
     fetcher,
     getTTLForKey("getBrandingSettings", longCacheTTL),
   );
@@ -166,7 +167,7 @@ export async function getLoginSettings({
   };
 
   return freshCache(
-    `getLoginSettings-${organization || "instance"}`,
+    instanceCacheKey(serviceConfig, `getLoginSettings-${organization || "instance"}`),
     fetcher,
     getTTLForKey("getLoginSettings", defaultCacheTTL),
   );
@@ -179,7 +180,11 @@ export async function getSecuritySettings({ serviceConfig }: WithServiceConfig) 
     return settingsService.getSecuritySettings({}).then((resp) => (resp.settings ? resp.settings : undefined));
   };
 
-  return freshCache(`getSecuritySettings-instance`, fetcher, getTTLForKey("getSecuritySettings", defaultCacheTTL));
+  return freshCache(
+    instanceCacheKey(serviceConfig, `getSecuritySettings-instance`),
+    fetcher,
+    getTTLForKey("getSecuritySettings", defaultCacheTTL),
+  );
 }
 
 export async function getLockoutSettings({ serviceConfig, orgId }: WithServiceConfig<{ orgId?: string }>) {
@@ -192,7 +197,7 @@ export async function getLockoutSettings({ serviceConfig, orgId }: WithServiceCo
   };
 
   return freshCache(
-    `getLockoutSettings-${orgId || "instance"}`,
+    instanceCacheKey(serviceConfig, `getLockoutSettings-${orgId || "instance"}`),
     fetcher,
     getTTLForKey("getLockoutSettings", defaultCacheTTL),
   );
@@ -208,7 +213,7 @@ export async function getPasswordExpirySettings({ serviceConfig, orgId }: WithSe
   };
 
   return freshCache(
-    `getPasswordExpirySettings-${orgId || "instance"}`,
+    instanceCacheKey(serviceConfig, `getPasswordExpirySettings-${orgId || "instance"}`),
     fetcher,
     getTTLForKey("getPasswordExpirySettings", defaultCacheTTL),
   );
@@ -250,7 +255,11 @@ export async function getAllowedLanguages({ serviceConfig }: WithServiceConfig) 
     });
   };
 
-  return freshCache(`getGeneralSettings-instance`, fetcher, getTTLForKey("getGeneralSettings", longCacheTTL));
+  return freshCache(
+    instanceCacheKey(serviceConfig, `getGeneralSettings-instance`),
+    fetcher,
+    getTTLForKey("getGeneralSettings", longCacheTTL),
+  );
 }
 
 export async function getLegalAndSupportSettings({
@@ -268,7 +277,7 @@ export async function getLegalAndSupportSettings({
   };
 
   return freshCache(
-    `getLegalAndSupportSettings-${organization || "instance"}`,
+    instanceCacheKey(serviceConfig, `getLegalAndSupportSettings-${organization || "instance"}`),
     fetcher,
     getTTLForKey("getLegalAndSupportSettings", longCacheTTL),
   );
@@ -289,7 +298,7 @@ export async function getPasswordComplexitySettings({
   };
 
   return freshCache(
-    `getPasswordComplexitySettings-${organization || "instance"}`,
+    instanceCacheKey(serviceConfig, `getPasswordComplexitySettings-${organization || "instance"}`),
     fetcher,
     getTTLForKey("getPasswordComplexitySettings", defaultCacheTTL),
   );
@@ -849,7 +858,11 @@ export async function getDefaultOrg({ serviceConfig }: WithServiceConfig): Promi
   };
 
   return useCache
-    ? freshCache(`getDefaultOrg-${"instance"}`, fetcher, getTTLForKey("getDefaultOrg", defaultCacheTTL))
+    ? freshCache(
+        instanceCacheKey(serviceConfig, "getDefaultOrg-instance"),
+        fetcher,
+        getTTLForKey("getDefaultOrg", defaultCacheTTL),
+      )
     : fetcher();
 }
 
@@ -1154,7 +1167,7 @@ export async function setUserPassword({
 
   return userService.setPassword(payload, {}).catch((error) => {
     // throw error if failed precondition (ex. User is not yet initialized)
-    if (error.code === 9 && error.message) {
+    if (isClassifiedError(error) && error.code === Code.FailedPrecondition && error.message) {
       return { error: error.message };
     } else {
       throw error;
@@ -1355,22 +1368,10 @@ export function createServerTransport(token: string, serviceConfig: ServiceConfi
     }
 
     // Apply headers from CUSTOM_REQUEST_HEADERS environment variable
-    if (process.env.CUSTOM_REQUEST_HEADERS) {
-      process.env.CUSTOM_REQUEST_HEADERS.split(",").forEach((header) => {
-        const kv = header.indexOf(":");
-        if (kv > 0) {
-          const key = header.slice(0, kv).trim();
-          const value = header.slice(kv + 1).trim();
-          if (value) {
-            req.header.set(key, value);
-          } else {
-            req.header.delete(key);
-          }
-        } else {
-          logger.warn("Skipping malformed header", { header });
-        }
-      });
-    }
+    applyCustomHeaders({
+      set: (key, value) => req.header.set(key, value),
+      remove: (key) => req.header.delete(key),
+    });
 
     return next(req);
   };
@@ -1378,6 +1379,6 @@ export function createServerTransport(token: string, serviceConfig: ServiceConfi
   return createConnectTransport({
     httpVersion: "1.1",
     baseUrl: serviceConfig.baseUrl,
-    interceptors: [otelGrpcInterceptor, authorizationInterceptor, headerInterceptor],
+    interceptors: [otelGrpcInterceptor, errorClassificationInterceptor, authorizationInterceptor, headerInterceptor],
   });
 }

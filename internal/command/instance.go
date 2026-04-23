@@ -648,7 +648,11 @@ func setupAdmins(commands *Commands,
 		human.ID = humanUserID
 
 		*validations = append(*validations,
-			commands.AddHumanCommand(human, orgAgg.ID, commands.userPasswordHasher, commands.userEncryption, true),
+			// We no longer send an init mail anymore even if no auth method is set.
+			// This allows us to create the initial user without a password and send them an invitation mail if needed later on,
+			// which will be a necessary step for the new onboarding flow in the customer portal.
+			// Also since login v2 is now the default, we anyway wouldn't be able to handle the init link properly anymore.
+			commands.AddHumanCommand(human, orgAgg.ID, commands.userPasswordHasher, commands.userEncryption, false),
 		)
 
 		setupAdminMembers(commands, validations, instanceAgg, orgAgg, humanUserID)
@@ -677,7 +681,7 @@ func setupMachineAdmin(commands *Commands, validations *[]preparation.Validation
 		if err != nil {
 			return nil, nil, err
 		}
-		*validations = append(*validations, prepareAddPersonalAccessToken(pat, commands.keyAlgorithm))
+		*validations = append(*validations, prepareAddPersonalAccessToken(pat, commands.authAlgorithm))
 	}
 	if machine.MachineKey != nil {
 		machineKey = NewMachineKey(orgID, userID, machine.MachineKey.ExpirationDate, machine.MachineKey.Type)
@@ -701,7 +705,7 @@ func setupLoginClient(commands *Commands, validations *[]preparation.Validation,
 		if err != nil {
 			return nil, err
 		}
-		*validations = append(*validations, prepareAddPersonalAccessToken(pat, commands.keyAlgorithm))
+		*validations = append(*validations, prepareAddPersonalAccessToken(pat, commands.authAlgorithm))
 	}
 	return pat, nil
 }

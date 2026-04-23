@@ -2,7 +2,6 @@ package eventstore
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"slices"
 	"strings"
@@ -30,11 +29,11 @@ import (
 )
 
 type TokenVerifierRepo struct {
-	TokenVerificationKey crypto.EncryptionAlgorithm
-	Eventstore           *eventstore.Eventstore
-	View                 *view.View
-	Query                *query.Queries
-	ExternalSecure       bool
+	AuthAlgorithm  crypto.AuthAlgorithm
+	Eventstore     *eventstore.Eventstore
+	View           *view.View
+	Query          *query.Queries
+	ExternalSecure bool
 }
 
 func (repo *TokenVerifierRepo) Health() error {
@@ -306,7 +305,7 @@ func (repo *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instan
 func (repo *TokenVerifierRepo) getTokenIDAndSubject(ctx context.Context, accessToken string) (tokenID string, subject string, valid bool) {
 	// accessToken can be either opaque or JWT
 	// let's try opaque first:
-	tokenIDSubject, err := repo.decryptAccessToken(accessToken)
+	tokenIDSubject, err := repo.AuthAlgorithm.DecryptToken(accessToken)
 	if err != nil {
 		logging.WithError(err).Warn("token verifier repo: decrypt access token")
 		// if decryption did not work, it might be a JWT
@@ -327,18 +326,6 @@ func (repo *TokenVerifierRepo) getTokenIDAndSubject(ctx context.Context, accessT
 func (repo *TokenVerifierRepo) jwtTokenVerifier(ctx context.Context) *op.AccessTokenVerifier {
 	keySet := &openIDKeySet{repo.Query}
 	return op.NewAccessTokenVerifier(http_util.DomainContext(ctx).Origin(), keySet)
-}
-
-func (repo *TokenVerifierRepo) decryptAccessToken(token string) (string, error) {
-	tokenData, err := base64.RawURLEncoding.DecodeString(token)
-	if err != nil {
-		return "", zerrors.ThrowUnauthenticated(nil, "APP-ASdgg", "invalid token")
-	}
-	tokenIDSubject, err := repo.TokenVerificationKey.DecryptString(tokenData, repo.TokenVerificationKey.EncryptionKeyID())
-	if err != nil {
-		return "", zerrors.ThrowUnauthenticated(nil, "APP-8EF0zZ", "invalid token")
-	}
-	return tokenIDSubject, nil
 }
 
 func verifyAudience(audience []string, verifierClientID, projectID string) error {

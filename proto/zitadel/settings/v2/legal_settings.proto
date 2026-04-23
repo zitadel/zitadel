@@ -8,6 +8,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "zitadel/settings/v2/settings.proto";
 import "validate/validate.proto";
 
+// Deprecated: use GetLinkSettings instead
 message LegalAndSupportSettings {
   // Link to the Terms of Service. Can be a relative or absolute URL.
   string tos_link = 1 [

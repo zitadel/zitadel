@@ -38,7 +38,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
 
   return (
     <>
-      <p className="mt-4 flex flex-row items-center text-sm text-text-light-secondary-500 dark:text-text-dark-secondary-500">
+      <p className="text-text-light-secondary-500 dark:text-text-dark-secondary-500 mt-4 flex flex-row items-center text-sm">
         <Translated i18nKey="agreeTo" namespace="register" />
         {helpLink && (
           <span>
@@ -79,7 +79,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
           />
 
           <div className="mr-4 w-[28rem]">
-            <p className="text-sm text-text-light-500 dark:text-text-dark-500">
+            <p className="text-text-light-500 dark:text-text-dark-500 text-sm">
               <Link href={tosLink} className="underline" target="_blank">
                 <Translated i18nKey="termsOfService" namespace="register" />
               </Link>
@@ -105,7 +105,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
           />
 
           <div className="mr-4 w-[28rem]">
-            <p className="text-sm text-text-light-500 dark:text-text-dark-500">
+            <p className="text-text-light-500 dark:text-text-dark-500 text-sm">
               <Link href={privacyPolicyLink} className="underline" target="_blank">
                 <Translated i18nKey="privacyPolicy" namespace="register" />
               </Link>

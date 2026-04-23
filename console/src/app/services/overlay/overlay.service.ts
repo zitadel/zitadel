@@ -31,7 +31,7 @@ export class OverlayService {
 
     const dialogRef = new CnslOverlayRef(overlayRef);
 
-    const overlayComponent = this.attachOverlayContainer(overlayRef, dialogConfig, overlayRef);
+    this.attachOverlayContainer(overlayRef, dialogConfig, overlayRef);
 
     overlayRef.backdropClick().subscribe((_) => dialogRef.close());
 

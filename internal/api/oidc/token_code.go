@@ -27,7 +27,7 @@ func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.Acce
 		return nil, zerrors.ThrowInternal(nil, "OIDC-Ae2ph", "Error.Internal")
 	}
 
-	plainCode, err := s.decryptCode(ctx, r.Data.Code)
+	plainCode, err := s.encAlg.DecryptToken(r.Data.Code)
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "OIDC-ahLi2", "Errors.User.Code.Invalid")
 	}

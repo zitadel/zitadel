@@ -22,6 +22,7 @@ import (
 type MockTelemetryServiceClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockTelemetryServiceClientMockRecorder
+	isgomock struct{}
 }
 
 // MockTelemetryServiceClientMockRecorder is the mock recorder for MockTelemetryServiceClient.
@@ -42,10 +43,10 @@ func (m *MockTelemetryServiceClient) EXPECT() *MockTelemetryServiceClientMockRec
 }
 
 // ReportBaseInformation mocks base method.
-func (m *MockTelemetryServiceClient) ReportBaseInformation(arg0 context.Context, arg1 *analytics.ReportBaseInformationRequest, arg2 ...grpc.CallOption) (*analytics.ReportBaseInformationResponse, error) {
+func (m *MockTelemetryServiceClient) ReportBaseInformation(ctx context.Context, in *analytics.ReportBaseInformationRequest, opts ...grpc.CallOption) (*analytics.ReportBaseInformationResponse, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1}
-	for _, a := range arg2 {
+	varargs := []any{ctx, in}
+	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ReportBaseInformation", varargs...)
@@ -55,17 +56,17 @@ func (m *MockTelemetryServiceClient) ReportBaseInformation(arg0 context.Context,
 }
 
 // ReportBaseInformation indicates an expected call of ReportBaseInformation.
-func (mr *MockTelemetryServiceClientMockRecorder) ReportBaseInformation(arg0, arg1 any, arg2 ...any) *gomock.Call {
+func (mr *MockTelemetryServiceClientMockRecorder) ReportBaseInformation(ctx, in any, opts ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1}, arg2...)
+	varargs := append([]any{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReportBaseInformation", reflect.TypeOf((*MockTelemetryServiceClient)(nil).ReportBaseInformation), varargs...)
 }
 
 // ReportResourceCounts mocks base method.
-func (m *MockTelemetryServiceClient) ReportResourceCounts(arg0 context.Context, arg1 *analytics.ReportResourceCountsRequest, arg2 ...grpc.CallOption) (*analytics.ReportResourceCountsResponse, error) {
+func (m *MockTelemetryServiceClient) ReportResourceCounts(ctx context.Context, in *analytics.ReportResourceCountsRequest, opts ...grpc.CallOption) (*analytics.ReportResourceCountsResponse, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1}
-	for _, a := range arg2 {
+	varargs := []any{ctx, in}
+	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ReportResourceCounts", varargs...)
@@ -75,8 +76,8 @@ func (m *MockTelemetryServiceClient) ReportResourceCounts(arg0 context.Context, 
 }
 
 // ReportResourceCounts indicates an expected call of ReportResourceCounts.
-func (mr *MockTelemetryServiceClientMockRecorder) ReportResourceCounts(arg0, arg1 any, arg2 ...any) *gomock.Call {
+func (mr *MockTelemetryServiceClientMockRecorder) ReportResourceCounts(ctx, in any, opts ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1}, arg2...)
+	varargs := append([]any{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReportResourceCounts", reflect.TypeOf((*MockTelemetryServiceClient)(nil).ReportResourceCounts), varargs...)
 }

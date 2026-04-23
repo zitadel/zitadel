@@ -41,7 +41,7 @@ export class AppComponent {
   @HostBinding('class') public componentCssClass: string = 'dark-theme';
 
   public yoffset: number = 0;
-  @HostListener('window:scroll', ['$event']) onScroll(event: Event): void {
+  @HostListener('window:scroll') onScroll(): void {
     this.yoffset = this.viewPortScroller.getScrollPosition()[1];
   }
   public showAccount: boolean = false;

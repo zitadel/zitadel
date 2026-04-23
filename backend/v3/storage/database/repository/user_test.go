@@ -1573,7 +1573,7 @@ func Test_user_ListConditions(t *testing.T) {
 			opts: []database.QueryOption{
 				database.WithCondition(database.And(
 					userRepo.InstanceIDCondition(instanceID1),
-					humanRepo.ExistsPasskey(humanRepo.PasskeyConditions().TypeCondition(domain.PasskeyTypeU2F)),
+					humanRepo.ExistsPasskey(humanRepo.PasskeyConditions().TypeCondition(database.TextOperationEqual, domain.PasskeyTypeU2F)),
 				)),
 			},
 			want: want{

@@ -9,8 +9,8 @@
   $secondary-text: map-get($foreground, secondary-text);
   $is-dark-theme: map-get($theme, is-dark);
 
-  $link-hover-color: if($is-dark-theme, map-get($primary, 200), $primary-color);
-  $link-color: if($is-dark-theme, $lighter-primary-color, $primary-color);
+  $link-hover-color: if(sass($is-dark-theme): map-get($primary, 200) ; else: $primary-color);
+  $link-color: if(sass($is-dark-theme): $lighter-primary-color; else: $primary-color);
 
   .filter-events-wrapper {
     border-radius: 0.5rem;
@@ -38,7 +38,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 0 0.5rem 0.5rem 0.5rem;
-      border-bottom: 2px solid if($is-dark-theme, #ffffff15, #00000015);
+      border-bottom: 2px solid if(sass($is-dark-theme): #ffffff15; else: #00000015);
 
       .filter-middle {
         margin: 0 1rem;
@@ -73,7 +73,7 @@
       align-items: center;
       justify-content: space-around;
       padding: 0 0.5rem;
-      background-color: if($is-dark-theme, #00000020, #00000008);
+      background-color: if(sass($is-dark-theme): #00000020; else: #00000008);
       margin: 0 -0.5rem;
 
       .aggregate-type-select .mat-mdc-select {

@@ -24,7 +24,7 @@ type Server struct {
 
 	op             *oidc.Server
 	externalSecure bool
-	encryption     crypto.EncryptionAlgorithm
+	authAlg        crypto.AuthAlgorithm
 }
 
 type Config struct{}
@@ -34,14 +34,14 @@ func CreateServer(
 	query *query.Queries,
 	op *oidc.Server,
 	externalSecure bool,
-	encryption crypto.EncryptionAlgorithm,
+	authAlg crypto.AuthAlgorithm,
 ) *Server {
 	return &Server{
 		command:        command,
 		query:          query,
 		op:             op,
 		externalSecure: externalSecure,
-		encryption:     encryption,
+		authAlg:        authAlg,
 	}
 }
 
