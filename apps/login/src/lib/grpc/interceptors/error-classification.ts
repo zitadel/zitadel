@@ -70,10 +70,10 @@ export class ClassifiedConnectError extends ConnectError {
 
   constructor(source: ConnectError) {
     super(source.rawMessage, source.code, source.metadata, undefined, source.cause);
-    // ConnectError's constructor resets the prototype chain via Object.setPrototypeOf.
-    // We must restore it so instanceof ClassifiedConnectError works correctly.
-    Object.setPrototypeOf(this, ClassifiedConnectError.prototype);
-    this.name = "ClassifiedConnectError";
+    // Keep name as "ConnectError" so that ConnectError's custom Symbol.hasInstance
+    // duck-typing check (v.name === "ConnectError") passes. The branded Symbol.for
+    // check via isClassifiedError() is used to distinguish this subclass instead.
+    this.name = "ConnectError";
     // Preserve the original stack trace so debugging/alert triage can see the RPC call site.
     if (source.stack) {
       this.stack = source.stack;

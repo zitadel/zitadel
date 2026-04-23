@@ -1,6 +1,6 @@
 import { getValidLocaleFromUILocales } from "@/lib/auth-utils";
 import { getLanguageCookie, setLanguageCookie } from "@/lib/cookies";
-import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
+
 import { shouldUILocalesOverrideCookie } from "@/lib/i18n";
 import { idpTypeToSlug } from "@/lib/idp";
 import { createLogger } from "@/lib/logger";
@@ -87,16 +87,7 @@ export interface FlowInitiationParams {
 export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Promise<NextResponse> {
   const { serviceConfig, requestId, sessions, sessionCookies, request } = params;
 
-  let authRequest;
-  try {
-    ({ authRequest } = await getAuthRequest({ serviceConfig, authRequestId: requestId.replace("oidc_", "") }));
-  } catch (error) {
-    if (isClassifiedError(error) && error.isUserError) {
-      logger.warn("Auth request failed (client error)", { grpcCode: error.code, httpStatus: error.httpStatus });
-      return NextResponse.json({ error: error.message }, { status: error.httpStatus });
-    }
-    throw error;
-  }
+  const { authRequest } = await getAuthRequest({ serviceConfig, authRequestId: requestId.replace("oidc_", "") });
 
   const locale = getValidLocaleFromUILocales(authRequest?.uiLocales);
   if (locale) {
@@ -396,16 +387,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Promise<NextResponse> {
   const { serviceConfig, requestId, sessions, sessionCookies, request } = params;
 
-  let samlRequest;
-  try {
-    ({ samlRequest } = await getSAMLRequest({ serviceConfig, samlRequestId: requestId.replace("saml_", "") }));
-  } catch (error) {
-    if (isClassifiedError(error) && error.isUserError) {
-      logger.warn("SAML request failed (client error)", { grpcCode: error.code, httpStatus: error.httpStatus });
-      return NextResponse.json({ error: error.message }, { status: error.httpStatus });
-    }
-    throw error;
-  }
+  const { samlRequest } = await getSAMLRequest({ serviceConfig, samlRequestId: requestId.replace("saml_", "") });
 
   if (!samlRequest) {
     return NextResponse.json({ error: "No samlRequest found" }, { status: 400 });
