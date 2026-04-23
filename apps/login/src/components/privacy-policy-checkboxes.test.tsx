@@ -31,10 +31,7 @@ describe("PrivacyPolicyCheckboxes", () => {
     render(<PrivacyPolicyCheckboxes legal={legal} onChange={vi.fn()} />);
 
     expect(screen.getByRole("link", { name: "termsOfService" })).toHaveAttribute("href", "https://demo.com/tos-fr");
-    expect(screen.getByRole("link", { name: "privacyPolicy" })).toHaveAttribute(
-      "href",
-      "https://demo.com/privacy-fr",
-    );
+    expect(screen.getByRole("link", { name: "privacyPolicy" })).toHaveAttribute("href", "https://demo.com/privacy-fr");
     expect(screen.getByRole("link", { name: "help" })).toHaveAttribute("href", "https://demo.com/help-fr");
   });
 });

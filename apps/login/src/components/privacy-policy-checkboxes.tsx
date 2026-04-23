@@ -1,9 +1,9 @@
 "use client";
-import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
-import Link from "next/link";
-import { useLocale } from "next-intl";
-import { useState } from "react";
 import { resolveLocalizedLegalLink } from "@/lib/legal-links";
+import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
+import { useLocale } from "next-intl";
+import Link from "next/link";
+import { useState } from "react";
 import { Checkbox } from "./checkbox";
 import { Translated } from "./translated";
 
