@@ -41,7 +41,7 @@ export async function proxy(request: NextRequest) {
 
     responseHeaders.set(
       "Content-Security-Policy",
-      buildCSP({ serviceUrl: baseUrl, iframeOrigins: iframeOrigins ?? undefined }),
+      buildCSP({ serviceUrl: baseUrl, iframeOrigins }),
     );
 
     if (!iframeOrigins) {

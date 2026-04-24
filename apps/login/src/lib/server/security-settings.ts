@@ -60,11 +60,13 @@ async function resolveAuthToken(): Promise<string> {
  *
  * @param baseUrl - The ZITADEL API base URL (ZITADEL_API_URL)
  * @param instanceHost - Optional instance host for multi-tenant deployments
- * @returns An array of allowed iframe origins, or undefined if not configured
+ * @returns An array of allowed iframe origins, or null if not configured
  */
 export async function getIframeOrigins(baseUrl: string, instanceHost?: string): Promise<string[] | null> {
   const cacheKey = instanceHost || "__default__";
 
+  // The fetcher returns null (not undefined) because lru-cache treats
+  // undefined as a fetch failure.
   return cache.getOrFetch<string[] | null>(cacheKey, () => fetchIframeOrigins(baseUrl, instanceHost), CACHE_TTL_MS);
 }
 
