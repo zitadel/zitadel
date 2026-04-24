@@ -5,6 +5,9 @@ import { getIframeOrigins } from "./lib/server/security-settings";
 import { getServiceConfig } from "./lib/service-url";
 
 const logger = createLogger("middleware");
+
+export const runtime = "nodejs";
+
 export const config = {
   matcher: ["/.well-known/:path*", "/oauth/:path*", "/oidc/:path*", "/idps/callback/:path*", "/saml/:path*", "/:path*"],
 };
