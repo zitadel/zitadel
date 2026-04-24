@@ -8,7 +8,7 @@ export const dynamicParams = false;
 export const dynamic = 'force-static';
 
 export async function GET(request: Request, context: any) {
-  const { slug } = context.params;
+  const { slug } = await context.params;
   const page = source.getPage(slug.slice(0, -1));
   if (!page) notFound();
 
