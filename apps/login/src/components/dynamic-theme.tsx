@@ -99,7 +99,7 @@ export function DynamicTheme({
               <div className="relative mx-auto w-full max-w-[440px] px-4 py-4">
                 <Card>
                   <div className="mx-auto flex flex-col items-center space-y-8">
-                    <div className="relative -mb-4 flex flex-row items-center justify-center">
+                    <div className="relative flex flex-row items-center justify-center">
                       {branding && (
                         <Logo
                           lightSrc={branding.lightTheme?.logoUrl}

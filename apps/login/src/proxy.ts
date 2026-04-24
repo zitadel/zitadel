@@ -39,7 +39,10 @@ export async function proxy(request: NextRequest) {
   try {
     const iframeOrigins = await getIframeOrigins(baseUrl, instanceHost);
 
-    responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: baseUrl, iframeOrigins }));
+    responseHeaders.set(
+      "Content-Security-Policy",
+      buildCSP({ serviceUrl: baseUrl, iframeOrigins: iframeOrigins ?? undefined }),
+    );
 
     if (!iframeOrigins) {
       responseHeaders.set("X-Frame-Options", "deny");

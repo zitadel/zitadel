@@ -62,13 +62,13 @@ async function resolveAuthToken(): Promise<string> {
  * @param instanceHost - Optional instance host for multi-tenant deployments
  * @returns An array of allowed iframe origins, or undefined if not configured
  */
-export async function getIframeOrigins(baseUrl: string, instanceHost?: string): Promise<string[] | undefined> {
+export async function getIframeOrigins(baseUrl: string, instanceHost?: string): Promise<string[] | null> {
   const cacheKey = instanceHost || "__default__";
 
-  return cache.getOrFetch<string[] | undefined>(cacheKey, () => fetchIframeOrigins(baseUrl, instanceHost), CACHE_TTL_MS);
+  return cache.getOrFetch<string[] | null>(cacheKey, () => fetchIframeOrigins(baseUrl, instanceHost), CACHE_TTL_MS);
 }
 
-async function fetchIframeOrigins(baseUrl: string, instanceHost?: string): Promise<string[] | undefined> {
+async function fetchIframeOrigins(baseUrl: string, instanceHost?: string): Promise<string[] | null> {
   const token = await resolveAuthToken();
   const reqHeaders: Record<string, string> = {
     "Content-Type": "application/json",
@@ -100,13 +100,15 @@ async function fetchIframeOrigins(baseUrl: string, instanceHost?: string): Promi
       status: response.status,
       statusText: response.statusText,
     });
-    return undefined;
+    // Return null instead of undefined — lru-cache treats undefined as a
+    // fetch failure and throws "fetch() returned undefined".
+    return null;
   }
 
   const data: GetSecuritySettingsResponseJson = await response.json();
   const settings = data.settings;
 
-  const origins = settings?.embeddedIframe?.enabled ? settings.embeddedIframe.allowedOrigins : undefined;
+  const origins = settings?.embeddedIframe?.enabled ? settings.embeddedIframe.allowedOrigins : null;
 
-  return origins && origins.length > 0 ? origins : undefined;
+  return origins && origins.length > 0 ? origins : null;
 }

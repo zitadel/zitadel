@@ -38,7 +38,14 @@ export async function GET(request: NextRequest) {
   const ids = sessionCookies.map((s) => s.id);
   let sessions: Session[] = [];
   if (ids && ids.length) {
-    sessions = await loadSessions({ serviceConfig, ids });
+    try {
+      sessions = await loadSessions({ serviceConfig, ids });
+    } catch (error) {
+      // listSessions can fail for various reasons (stale/expired session IDs
+      // still in cookies, API errors, etc.).  Treat any failure as "no valid
+      // sessions" so the user is redirected to loginname instead of a 500.
+      sessions = [];
+    }
   }
 
   // Flow initiation - delegate to appropriate handler
