@@ -1,5 +1,6 @@
 import { isRSCRequest, validateAuthRequest } from "@/lib/auth-utils";
 import { getAllSessions } from "@/lib/cookies";
+import { createLogger } from "@/lib/logger";
 import { FlowInitiationParams, handleOIDCFlowInitiation, handleSAMLFlowInitiation } from "@/lib/server/flow-initiation";
 import { getServiceConfig } from "@/lib/service-url";
 import { listSessions, ServiceConfig } from "@/lib/zitadel";
@@ -10,6 +11,8 @@ import { NextRequest, NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 export const revalidate = false;
 export const fetchCache = "default-no-store";
+
+const logger = createLogger("login-route");
 
 async function loadSessions({ serviceConfig, ids }: { serviceConfig: ServiceConfig; ids: string[] }): Promise<Session[]> {
   const response = await listSessions({ serviceConfig, ids: ids.filter((id: string | undefined) => !!id) });
@@ -44,6 +47,9 @@ export async function GET(request: NextRequest) {
       // listSessions can fail for various reasons (stale/expired session IDs
       // still in cookies, API errors, etc.).  Treat any failure as "no valid
       // sessions" so the user is redirected to loginname instead of a 500.
+      logger.error("Failed to load sessions, continuing without sessions", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       sessions = [];
     }
   }
