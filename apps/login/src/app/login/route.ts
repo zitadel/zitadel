@@ -5,7 +5,7 @@ import { FlowInitiationParams, handleOIDCFlowInitiation, handleSAMLFlowInitiatio
 import { getServiceConfig } from "@/lib/service-url";
 import { listSessions, ServiceConfig } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { headers } from "next/headers";
+
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -21,8 +21,7 @@ async function loadSessions({ serviceConfig, ids }: { serviceConfig: ServiceConf
 }
 
 export async function GET(request: NextRequest) {
-  const _headers = await headers();
-  const { serviceConfig } = getServiceConfig(_headers);
+  const { serviceConfig } = getServiceConfig(request.headers);
 
   const searchParams = request.nextUrl.searchParams;
 

@@ -1,4 +1,3 @@
-import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { buildCSP } from "./lib/csp";
 import { createLogger } from "./lib/logger";
@@ -28,8 +27,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
-  const _headers = await headers();
-  const { serviceConfig } = getServiceConfig(_headers);
+  const { serviceConfig } = getServiceConfig(request.headers);
   const { baseUrl, publicHost, instanceHost } = serviceConfig;
 
   // Build CSP headers using security settings fetched directly from the
