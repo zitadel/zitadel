@@ -1073,6 +1073,22 @@ func (p *relationalTablesProjection) reducePasskeyAdded(event eventstore.Event) 
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-nd7f3", "reduce.wrong.event.type for passkey %s", event.Type())
 	}
 	return handler.NewStatement(&e, func(ctx context.Context, ex handler.Executer, _ string) error {
+		// Skip events with an empty RPID. The user_passkeys table enforces
+		// CHECK (relying_party_id <> ''), so these would fail to insert and
+		// stall projection replay. Legacy v1 command paths (see
+		// internal/command/user_human_webauthn.go HumanAddU2FSetup /
+		// HumanAddPasswordlessSetup) hardcode rpID="" when emitting the
+		// HumanU2FAddedEvent / HumanPasswordlessAddedEvent, and pre-RPID
+		// historical events also deserialize with RPID="" because the field
+		// is `json:"rpID,omitempty"`. Such tokens are not usable for
+		// WebAuthn anyway (no relying party = no valid assertion), so
+		// projecting "no row" is the correct read-side state. Sibling
+		// reducers (Verified/SignCount/Removed) filter by WebAuthNTokenID
+		// and remain no-ops when the row is absent, so the cascade stays
+		// consistent.
+		if e.RPID == "" {
+			return nil
+		}
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
