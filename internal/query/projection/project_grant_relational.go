@@ -23,6 +23,13 @@ func (p *relationalTablesProjection) reduceProjectGrantAdded(event eventstore.Ev
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5w96sjaQ16", "reduce.wrong.db.pool %T", ex)
 		}
+		// Same pattern as reduceAuthorizationAdded: legacy project.grant.added
+		// events can reference role keys that were later removed from the project.
+		// project_grant_roles_*_key_fkey would otherwise fail forever.
+		validRoles, err := filterExistingRoleKeys(ctx, tx, e.Aggregate().InstanceID, e.Aggregate().ID, e.RoleKeys)
+		if err != nil {
+			return err
+		}
 		repo := repository.ProjectGrantRepository()
 		return repo.Create(ctx, v3_sql.SQLTx(tx), &repoDomain.ProjectGrant{
 			InstanceID:             e.Aggregate().InstanceID,
@@ -33,7 +40,7 @@ func (p *relationalTablesProjection) reduceProjectGrantAdded(event eventstore.Ev
 			CreatedAt:              e.CreationDate(),
 			UpdatedAt:              e.CreationDate(),
 			State:                  repoDomain.ProjectGrantStateActive,
-			RoleKeys:               e.RoleKeys,
+			RoleKeys:               validRoles,
 		})
 	}), nil
 }

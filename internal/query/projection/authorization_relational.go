@@ -26,6 +26,19 @@ func (p *relationalTablesProjection) reduceAuthorizationAdded(event eventstore.E
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-FrDVPk", "reduce.wrong.db.pool %T", ex)
 		}
 
+		// Filter the granted role keys down to ones that actually exist in
+		// project_roles for this project. Historical user_grant.added events
+		// can reference roles that were since removed from the project — the
+		// authorization_roles_*_role_key_fkey would otherwise fail forever.
+		// Keeping only the still-valid roles preserves whatever access the user
+		// can legitimately retain; if every role is gone, we still create the
+		// authorization with an empty role set (the user/project/grant linkage
+		// itself is preserved for audit and Changed events to update later).
+		validRoles, err := filterExistingRoleKeys(ctx, tx, e.Aggregate().InstanceID, e.ProjectID, e.RoleKeys)
+		if err != nil {
+			return err
+		}
+
 		repo := repository.AuthorizationRepository()
 		var grantID *string
 		if e.ProjectGrantID != "" {
@@ -37,12 +50,42 @@ func (p *relationalTablesProjection) reduceAuthorizationAdded(event eventstore.E
 			UserID:     e.UserID,
 			ProjectID:  e.ProjectID,
 			GrantID:    grantID,
-			Roles:      e.RoleKeys,
+			Roles:      validRoles,
 			CreatedAt:  e.CreationDate(),
 			UpdatedAt:  e.CreationDate(),
 			State:      repoDomain.AuthorizationStateActive,
 		})
 	}), nil
+}
+
+// filterExistingRoleKeys returns the subset of the given role keys that exist
+// in zitadel.project_roles for the (instance, project) pair. Used by the
+// authorization and project_grant reducers to avoid FK violations when historical
+// events reference roles that were later removed from a project.
+func filterExistingRoleKeys(ctx context.Context, tx *sql.Tx, instanceID, projectID string, requested []string) ([]string, error) {
+	if len(requested) == 0 {
+		return requested, nil
+	}
+	rows, err := tx.QueryContext(ctx,
+		`SELECT key FROM zitadel.project_roles WHERE instance_id = $1 AND project_id = $2 AND key = ANY($3)`,
+		instanceID, projectID, requested,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var existing []string
+	for rows.Next() {
+		var k string
+		if err := rows.Scan(&k); err != nil {
+			return nil, err
+		}
+		existing = append(existing, k)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return existing, nil
 }
 
 func (p *relationalTablesProjection) reduceAuthorizationChanged(event eventstore.Event) (*handler.Statement, error) {

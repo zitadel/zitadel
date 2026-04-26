@@ -263,6 +263,21 @@ func (p *relationalTablesProjection) reduceUserRemoved(event eventstore.Event) (
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-iZGH3", "reduce.wrong.db.pool %T", ex)
 		}
+		// Pre-delete sessions for this user with the user row still present, so
+		// trg_move_to_archived_sessions can satisfy archived_sessions FK to users.
+		// Without this, the cascade DELETE triggered by removing the user fires
+		// the trigger inside the same transaction, but archived_sessions FK is
+		// checked while the user row is being deleted -> 23503 violation. Doing
+		// it explicitly here lets the archive INSERT succeed; the user DELETE
+		// below then CASCADE-deletes those archive rows. End state is identical
+		// to the schema's intent (no active session, no archive after user gone),
+		// just without the projection crash mid-replay.
+		if _, err := tx.ExecContext(ctx,
+			`DELETE FROM zitadel.sessions WHERE instance_id = $1 AND user_id = $2`,
+			e.Agg.InstanceID, e.Aggregate().ID,
+		); err != nil {
+			return err
+		}
 		repo := repository.UserRepository()
 		_, err := repo.Delete(
 			ctx,
@@ -503,13 +518,34 @@ func (p *relationalTablesProjection) reduceHumanEmailChanged(event eventstore.Ev
 		}
 		repo := repository.UserRepository().Human()
 
+		// users_check17 forbids holding both a verified email AND an active
+		// email_verification_id when email == unverified_email. Some legacy
+		// email.changed events re-issue the user's already-verified address;
+		// stamping a fresh verification on top would violate the constraint.
+		// Pre-read the current verified email; if it matches the new value,
+		// just refresh unverified_email/updated_at and skip creating a
+		// verification (there is nothing to verify).
+		var currentEmail sql.NullString
+		if err := tx.QueryRowContext(ctx,
+			`SELECT email FROM zitadel.users WHERE instance_id = $1 AND id = $2`,
+			e.Aggregate().InstanceID, e.Aggregate().ID,
+		).Scan(&currentEmail); err != nil && err != sql.ErrNoRows {
+			return err
+		}
+
+		changes := []database.Change{
+			repo.SetUnverifiedEmail(string(e.EmailAddress)),
+			repo.SetUpdatedAt(e.CreatedAt()),
+		}
+		if !currentEmail.Valid || currentEmail.String != string(e.EmailAddress) {
+			changes = append(changes, repo.SetEmailVerification(&domain.VerificationTypeInit{
+				CreatedAt: e.CreatedAt(),
+			}))
+		}
+
 		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.Aggregate().ID),
-			repo.SetUnverifiedEmail(string(e.EmailAddress)),
-			repo.SetEmailVerification(&domain.VerificationTypeInit{
-				CreatedAt: e.CreatedAt(),
-			}),
-			repo.SetUpdatedAt(e.CreatedAt()),
+			changes...,
 		)
 		return err
 	}), nil

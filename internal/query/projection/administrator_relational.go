@@ -193,6 +193,23 @@ func (p *relationalTablesProjection) createAdministratorStatement(event eventsto
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-v3ADM13", "reduce.wrong.db.pool %T", ex)
 		}
+		// Skip admin grants for users that no longer exist in zitadel.users.
+		// During migration replay this happens when the user was user.removed in
+		// event history (CASCADE-deleted from users) or their user.added failed
+		// for a legacy constraint. Without this guard, administrators_*_user_id_fkey
+		// would fail forever. Sibling reducers (Changed/Removed) use conditional
+		// Update/Delete and remain no-ops when the row is absent, so skipping the
+		// Add stays consistent.
+		var exists bool
+		if err := tx.QueryRowContext(ctx,
+			`SELECT EXISTS(SELECT 1 FROM zitadel.users WHERE instance_id = $1 AND id = $2)`,
+			administrator.InstanceID, administrator.UserID,
+		).Scan(&exists); err != nil {
+			return err
+		}
+		if !exists {
+			return nil
+		}
 		return repository.AdministratorRepository().Create(ctx, v3_sql.SQLTx(tx), administrator)
 	}), nil
 }
