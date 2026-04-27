@@ -1611,7 +1611,8 @@
         "5": "Inițializarea Passkey",
         "6": "Secretul aplicației",
         "7": "OTP - SMS",
-        "8": "OTP - E-mail"
+        "8": "OTP - E-mail",
+        "9": "Cod de invitație"
       },
       "EXPIRY": "Expirare (în minute)",
       "INCLUDEDIGITS": "Includeți numere",

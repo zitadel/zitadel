@@ -1613,7 +1613,8 @@
         "5": "Initialisation de clé d'accès",
         "6": "Secret de l'application",
         "7": "OTP - SMS",
-        "8": "OTP - e-mail"
+        "8": "OTP - e-mail",
+        "9": "Code d'invitation"
       },
       "EXPIRY": "Expiration (en minutes)",
       "INCLUDEDIGITS": "Inclure les chiffres",
