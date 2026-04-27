@@ -165,11 +165,11 @@ With the encoded JWT from the previous step, craft a POST request to ZITADEL's t
 
 ```bash
 curl --request POST \
-  --url https:/$CUSTOM-DOMAIN/oauth/v2/token \
-  --header 'Content-Type: application/x-www-form-urlencoded' \
-  --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
-  --data scope='openid' \
-  --data assertion=eyJ0eXAiOiJKV1QiL...
+  --url https://${CUSTOM_DOMAIN}/oauth/v2/token \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
+  --data scope='openid' \
+  --data assertion=eyJ0eXAiOiJKV1QiL...
 ```
 
 * `grant_type`: Must be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
