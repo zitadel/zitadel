@@ -84,11 +84,7 @@ export async function getIframeOrigins(
   );
 }
 
-async function fetchIframeOrigins(
-  baseUrl: string,
-  instanceHost?: string,
-  publicHost?: string,
-): Promise<string[] | null> {
+async function fetchIframeOrigins(baseUrl: string, instanceHost?: string, publicHost?: string): Promise<string[] | null> {
   const token = await resolveAuthToken();
   const reqHeaders: Record<string, string> = {
     "Content-Type": "application/json",

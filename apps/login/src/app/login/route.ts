@@ -85,7 +85,9 @@ export async function GET(request: NextRequest) {
     } catch {
       raw = String(error);
     }
-    console.error(`Flow initiation failed | requestId=${requestId} | code=${code} | msg=${msg} | stack=${stack} | raw=${raw}`);
+    console.error(
+      `Flow initiation failed | requestId=${requestId} | code=${code} | msg=${msg} | stack=${stack} | raw=${raw}`,
+    );
     logger.error("Flow initiation failed", { requestId, error: msg, code, stack });
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
