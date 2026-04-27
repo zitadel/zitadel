@@ -23,6 +23,14 @@ async function loadSessions({ serviceConfig, ids }: { serviceConfig: ServiceConf
 export async function GET(request: NextRequest) {
   const { serviceConfig } = getServiceConfig(request.headers);
 
+  logger.info("login route: resolved serviceConfig", {
+    instanceHost: serviceConfig.instanceHost,
+    publicHost: serviceConfig.publicHost,
+    rawInstanceHeader: request.headers.get("x-zitadel-instance-host"),
+    rawForwardHost: request.headers.get("x-zitadel-forward-host"),
+    rawHost: request.headers.get("host"),
+  });
+
   const searchParams = request.nextUrl.searchParams;
 
   // Defensive check: block RSC requests early

@@ -1367,6 +1367,16 @@ export function createServerTransport(token: string, serviceConfig: ServiceConfi
       req.header.set("x-zitadel-public-host", serviceConfig.publicHost);
     }
 
+    // Diagnostic: trace instance vs public host on outgoing API calls
+    if (serviceConfig.instanceHost !== serviceConfig.publicHost) {
+      console.warn("transport: instanceHost differs from publicHost", {
+        instanceHost: serviceConfig.instanceHost,
+        publicHost: serviceConfig.publicHost,
+        method: req.method.name,
+        service: req.service.typeName,
+      });
+    }
+
     // Apply headers from CUSTOM_REQUEST_HEADERS environment variable
     applyCustomHeaders({
       set: (key, value) => req.header.set(key, value),
