@@ -32,8 +32,6 @@ const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/;
 const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
 
-
-
 const gotoAccounts = ({
   request,
   requestId,
@@ -249,7 +247,6 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       }
       return NextResponse.redirect(loginNameUrl);
     } else if (authRequest.prompt.includes(Prompt.NONE)) {
-
       const selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
 
       const noSessionResponse = NextResponse.json({ error: "No active session found" }, { status: 400 });
