@@ -1,22 +1,24 @@
 import { ImageResponse } from 'next/og';
 import { notFound } from 'next/navigation';
-import { source, getPageImage } from '@/lib/source';
+import { getAllDocPages, getPage, getPageImage } from '@/lib/source';
 import { generate as DefaultImage } from 'fumadocs-ui/og';
 
 export const revalidate = false;
 export const dynamicParams = false;
 export const dynamic = 'force-static';
 
-export async function GET(request: Request, context: any) {
+export async function GET(_request: Request, context: any) {
   const { slug } = await context.params;
-  const page = source.getPage(slug.slice(0, -1));
+  if (slug[slug.length - 1] !== 'image.png') notFound();
+
+  const { page } = getPage(slug.slice(0, -1));
   if (!page) notFound();
 
   return new ImageResponse(
     <DefaultImage
       title={page.data.title}
       description={page.data.description}
-      site="My App"
+      site="ZITADEL Docs"
     />,
     {
       width: 1200,
@@ -26,7 +28,7 @@ export async function GET(request: Request, context: any) {
 }
 
 export function generateStaticParams() {
-  return source.getPages().map((page) => ({
+  return getAllDocPages().map((page) => ({
     slug: getPageImage(page).segments,
   }));
 }
