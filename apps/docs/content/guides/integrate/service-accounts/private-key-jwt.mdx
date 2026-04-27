@@ -80,10 +80,10 @@ If you let ZITADEL generate a key for you and download the JSON file, it will lo
 
 ```json
 {
-    "type": "serviceaccount",
-    "keyId": "100509901696068329",
-    "key": "-----BEGIN RSA PRIVATE KEY----- [...] -----END RSA PRIVATE KEY-----\n",
-    "userId": "100507859606888466"
+    "type": "serviceaccount",
+    "keyId": "100509901696068329",
+    "key": "-----BEGIN RSA PRIVATE KEY----- [...] -----END RSA PRIVATE KEY-----\n",
+    "userId": "100507859606888466"
 }
 ```
 
@@ -95,8 +95,8 @@ Header:
 
 ```json
 {
-    "alg": "RS256",
-    "kid": "100509901696068329"
+    "alg": "RS256",
+    "kid": "100509901696068329"
 }
 ```
 
@@ -106,11 +106,11 @@ Payload:
 
 ```json
 {
-    "iss": "100507859606888466",
-    "sub": "100507859606888466",
-    "aud": "https://$CUSTOM-DOMAIN",
-    "iat": [Current UTC timestamp, e.g. 1605179982, must be no older than 1 hour],
-    "exp": [Expiration UTC timestamp, e.g. 1605183582]
+    "iss": "100507859606888466",
+    "sub": "100507859606888466",
+    "aud": "https://$CUSTOM-DOMAIN",
+    "iat": [Current UTC timestamp, e.g. 1605179982, must be no older than 1 hour],
+    "exp": [Expiration UTC timestamp, e.g. 1605183582]
 }
 ```
 
@@ -118,7 +118,7 @@ Payload:
 * `sub`: The application. Set this to the same value as `userId`.
 * `aud`: Your [Custom Domain](../../../concepts/features/custom-domain).
 * `iat`: The Unix timestamp when the JWT is created/signed (must be no older than 1 hour).
-* `exp`: The Unix timestamp when this assertion expires.
+* `exp`: The Unix timestamp when this assertion expires. The value of `exp` is strictly enforced. However, if `exp` is set to more than 1 hour in the future, `iat` will take precedence (the JWT will stop working once the `iat` timestamp is older than 1 hour).
 
 For further details, see the [JWT with private key](/apis/openidoauth/authn-methods#jwt-with-private-key) API reference.
 
@@ -141,16 +141,16 @@ api_url = "your_custom_domain"
 
 # Generate JWT claims
 payload = {
-    "iss": service_user_id,
-    "sub": service_user_id,
-    "aud": api_url,
-    "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=5),
-    "iat": datetime.datetime.now(datetime.timezone.utc)
+    "iss": service_user_id,
+    "sub": service_user_id,
+    "aud": api_url,
+    "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=5),
+    "iat": datetime.datetime.now(datetime.timezone.utc)
 }
 
 header = {
-    "alg": "RS256",
-    "kid": key_id
+    "alg": "RS256",
+    "kid": key_id
 }
 
 # Sign the JWT using the RS256 algorithm
@@ -165,11 +165,11 @@ With the encoded JWT from the previous step, craft a POST request to ZITADEL's t
 
 ```bash
 curl --request POST \
-  --url https:/$CUSTOM-DOMAIN/oauth/v2/token \
-  --header 'Content-Type: application/x-www-form-urlencoded' \
-  --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
-  --data scope='openid' \
-  --data assertion=eyJ0eXAiOiJKV1QiL...
+  --url https:/$CUSTOM-DOMAIN/oauth/v2/token \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
+  --data scope='openid' \
+  --data assertion=eyJ0eXAiOiJKV1QiL...
 ```
 
 * `grant_type`: Must be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
@@ -189,9 +189,9 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "access_token": "MtjHodGy4zxKylDOhg6kW90WeEQs2q...",
-  "token_type": "Bearer",
-  "expires_in": 43199
+  "access_token": "MtjHodGy4zxKylDOhg6kW90WeEQs2q...",
+  "token_type": "Bearer",
+  "expires_in": 43199
 }
 ```
 
@@ -201,9 +201,9 @@ When making API requests as the service account, include the generated token in 
 
 ```bash
 curl --request POST \
-  --url $YOUR_API_ENDPOINT \
-  --header 'Content-Type: application/x-www-form-urlencoded' \
-  --header 'Authorization: Bearer MtjHodGy4zxKylDOhg6kW90WeEQs2q...'
+  --url $YOUR_API_ENDPOINT \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --header 'Authorization: Bearer MtjHodGy4zxKylDOhg6kW90WeEQs2q...'
 ```
 
 ## Accessing ZITADEL APIs
