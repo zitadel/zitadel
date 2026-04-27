@@ -48,7 +48,7 @@ export async function proxy(request: NextRequest) {
 
   if (cspFetchEnabled) {
     try {
-      const iframeOrigins = await getIframeOrigins(baseUrl, publicHost);
+      const iframeOrigins = await getIframeOrigins(baseUrl, instanceHost);
 
       responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: baseUrl, iframeOrigins }));
 
