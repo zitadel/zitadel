@@ -95,6 +95,7 @@ async function fetchIframeOrigins(baseUrl: string, instanceHost?: string): Promi
     method: "POST",
     headers: reqHeaders,
     body: "{}",
+    cache: "no-store",
   });
 
   if (!response.ok) {
