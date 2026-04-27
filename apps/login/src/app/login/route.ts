@@ -64,14 +64,23 @@ export async function GET(request: NextRequest) {
   // Flow initiation - delegate to appropriate handler
   const flowParams: FlowInitiationParams = { serviceConfig, requestId, sessions, sessionCookies, request };
 
-  if (requestId.startsWith("oidc_")) {
-    return handleOIDCFlowInitiation(flowParams);
-  } else if (requestId.startsWith("saml_")) {
-    return handleSAMLFlowInitiation(flowParams);
-  } else if (requestId.startsWith("device_")) {
-    // Device Authorization does not need to start here as it is handled on the /device endpoint
-    return NextResponse.json({ error: "Device authorization should use /device endpoint" }, { status: 400 });
-  } else {
-    return NextResponse.json({ error: "Invalid request ID format" }, { status: 400 });
+  try {
+    if (requestId.startsWith("oidc_")) {
+      return await handleOIDCFlowInitiation(flowParams);
+    } else if (requestId.startsWith("saml_")) {
+      return await handleSAMLFlowInitiation(flowParams);
+    } else if (requestId.startsWith("device_")) {
+      // Device Authorization does not need to start here as it is handled on the /device endpoint
+      return NextResponse.json({ error: "Device authorization should use /device endpoint" }, { status: 400 });
+    } else {
+      return NextResponse.json({ error: "Invalid request ID format" }, { status: 400 });
+    }
+  } catch (error) {
+    logger.error("Flow initiation failed", {
+      requestId,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
