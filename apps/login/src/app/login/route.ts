@@ -75,12 +75,18 @@ export async function GET(request: NextRequest) {
     } else {
       return NextResponse.json({ error: "Invalid request ID format" }, { status: 400 });
     }
-  } catch (error) {
-    logger.error("Flow initiation failed", {
-      requestId,
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-    });
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    const stack = error instanceof Error ? error.stack : undefined;
+    const code = (error as any)?.code;
+    let raw: string;
+    try {
+      raw = JSON.stringify(error, Object.getOwnPropertyNames(error as object));
+    } catch {
+      raw = String(error);
+    }
+    console.error(`Flow initiation failed | requestId=${requestId} | code=${code} | msg=${msg} | stack=${stack} | raw=${raw}`);
+    logger.error("Flow initiation failed", { requestId, error: msg, code, stack });
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

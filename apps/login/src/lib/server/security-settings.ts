@@ -54,30 +54,54 @@ async function resolveAuthToken(): Promise<string> {
  * via the Connect protocol (POST + JSON). This uses raw fetch (no connectRPC
  * node transport) so it stays compatible with the Next.js proxy runtime.
  *
+ * Uses the same header pattern as createServerTransport in zitadel.ts:
+ * - baseUrl (ZITADEL_API_URL) as the fetch URL
+ * - x-zitadel-instance-host and x-zitadel-public-host as headers
+ * - CUSTOM_REQUEST_HEADERS applied
+ *
  * Results are cached in-memory for 1 hour per instance host using a bounded
  * LRU cache. Concurrent requests for the same key share a single in-flight
  * promise to prevent thundering-herd stampedes on the backend.
  *
- * @param baseUrl - The ZITADEL API base URL (ZITADEL_API_URL), used as fallback for self-hosted
- * @param instanceHost - Optional instance host for multi-tenant deployments. Used as the API base
- *   URL so the backend resolves the instance from the HTTP Host header (no x-zitadel-instance-host
- *   header needed, avoiding AsyncLocalStorage contamination in the Next.js proxy).
+ * @param baseUrl - The ZITADEL API base URL (ZITADEL_API_URL)
+ * @param instanceHost - Optional instance host for multi-tenant routing
+ * @param publicHost - Optional public host for multi-tenant routing
  * @returns An array of allowed iframe origins, or null if not configured
  */
-export async function getIframeOrigins(baseUrl: string, instanceHost?: string): Promise<string[] | null> {
+export async function getIframeOrigins(
+  baseUrl: string,
+  instanceHost?: string,
+  publicHost?: string,
+): Promise<string[] | null> {
   const cacheKey = instanceHost || "__default__";
 
   // The fetcher returns null (not undefined) because lru-cache treats
   // undefined as a fetch failure.
-  return cache.getOrFetch<string[] | null>(cacheKey, () => fetchIframeOrigins(baseUrl, instanceHost), CACHE_TTL_MS);
+  return cache.getOrFetch<string[] | null>(
+    cacheKey,
+    () => fetchIframeOrigins(baseUrl, instanceHost, publicHost),
+    CACHE_TTL_MS,
+  );
 }
 
-async function fetchIframeOrigins(baseUrl: string, instanceHost?: string): Promise<string[] | null> {
+async function fetchIframeOrigins(
+  baseUrl: string,
+  instanceHost?: string,
+  publicHost?: string,
+): Promise<string[] | null> {
   const token = await resolveAuthToken();
   const reqHeaders: Record<string, string> = {
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
   };
+
+  // Apply instance/public host headers — same pattern as createServerTransport
+  if (instanceHost) {
+    reqHeaders["x-zitadel-instance-host"] = instanceHost;
+  }
+  if (publicHost) {
+    reqHeaders["x-zitadel-public-host"] = publicHost;
+  }
 
   // Apply custom headers from environment
   applyCustomHeaders({
@@ -89,18 +113,7 @@ async function fetchIframeOrigins(baseUrl: string, instanceHost?: string): Promi
     },
   });
 
-  // Use the instance host as the API base URL directly. The backend resolves
-  // the instance from the HTTP Host header, avoiding the need for an
-  // x-zitadel-instance-host header (which is susceptible to AsyncLocalStorage
-  // contamination when fetch() is called inside the Next.js proxy).
-  // Falls back to ZITADEL_API_URL for self-hosted single-instance deployments.
-  let apiBaseUrl = baseUrl;
-  if (instanceHost) {
-    const protocol = instanceHost.includes("localhost") ? "http" : "https";
-    apiBaseUrl = `${protocol}://${instanceHost}`;
-  }
-
-  const response = await fetch(`${apiBaseUrl}/zitadel.settings.v2.SettingsService/GetSecuritySettings`, {
+  const response = await fetch(`${baseUrl}/zitadel.settings.v2.SettingsService/GetSecuritySettings`, {
     method: "POST",
     headers: reqHeaders,
     body: "{}",
