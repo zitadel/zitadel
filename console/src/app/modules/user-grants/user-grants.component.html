@@ -196,7 +196,7 @@
       ></tr>
     </table>
   </div>
-  @if ((dataSource.loading$ | async) === false && !dataSource?.totalResult) {
+  @if ((dataSource.loading$ | async) === false && !dataSource.totalResult) {
     <div class="no-content-row">
       <i class="las la-exclamation"></i>
       <span>{{ 'GRANTS.EMPTY' | translate }}</span>

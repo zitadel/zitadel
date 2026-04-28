@@ -21,10 +21,10 @@
     <span class="left cnsl-secondary-text">
       {{ 'APP.GRANT' | translate }}
     </span>
-    @if (configuration.grantTypesList && configuration.grantTypesList.length > 0) {
+    @if (configuration.grantTypesList && configuration.grantTypesList.length) {
       <span class="right">
         [
-        @for (element of configuration.grantTypesList ?? []; track element; let i = $index) {
+        @for (element of configuration.grantTypesList; track element; let i = $index) {
           <span>
             {{ 'APP.OIDC.GRANT.' + element | translate }}
             {{ i < configuration.grantTypesList.length - 1 ? ', ' : '' }}
@@ -38,10 +38,10 @@
     <span class="left cnsl-secondary-text">
       {{ 'APP.OIDC.RESPONSETYPE' | translate }}
     </span>
-    @if (configuration.responseTypesList && configuration.responseTypesList.length > 0) {
+    @if (configuration.responseTypesList && configuration.responseTypesList.length) {
       <span class="right">
         [
-        @for (element of configuration.responseTypesList ?? []; track element; let i = $index) {
+        @for (element of configuration.responseTypesList; track element; let i = $index) {
           <span>
             {{ 'APP.OIDC.RESPONSE.' + element | translate }}
             {{ i < configuration.responseTypesList.length - 1 ? ', ' : '' }}

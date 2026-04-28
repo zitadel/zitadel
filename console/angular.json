@@ -22,9 +22,7 @@
               "base": "dist/console"
             },
             "index": "src/index.html",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -37,23 +35,13 @@
                 "output": "assets/docs/img/tech"
               }
             ],
-            "styles": [
-              "src/styles.scss"
-            ],
-            "scripts": [
-              "./node_modules/tinycolor2/dist/tinycolor-min.js"
-            ],
+            "styles": ["src/styles.scss", "src/tailwind.css"],
+            "scripts": ["./node_modules/tinycolor2/dist/tinycolor-min.js"],
             "stylePreprocessorOptions": {
               "sass": {
-                "silenceDeprecations": [
-                  "import",
-                  "mixed-decls"
-                ]
+                "silenceDeprecations": ["import", "mixed-decls"]
               },
-              "includePaths": [
-                "node_modules",
-                "."
-              ]
+              "includePaths": ["node_modules", "."]
             },
             "allowedCommonJsDependencies": [
               "opentype.js",
@@ -158,29 +146,18 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-              "src/styles.scss"
-            ],
+            "assets": ["src/favicon.ico", "src/assets"],
+            "styles": ["src/styles.scss"],
             "scripts": []
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "src/**/*.ts",
-              "src/**/*.html"
-            ]
+            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
           }
         }
       }
@@ -188,9 +165,7 @@
   },
   "cli": {
     "analytics": false,
-    "schematicCollections": [
-      "@angular-eslint/schematics"
-    ],
+    "schematicCollections": ["@angular-eslint/schematics"],
     "packageManager": "pnpm"
   },
   "schematics": {

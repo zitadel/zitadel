@@ -131,7 +131,7 @@
     </table>
   </div>
 
-  @if ((loading$ | async) === false && !dataSource?.data?.length) {
+  @if ((loading$ | async) === false && !dataSource.data.length) {
     <div class="no-content-row">
       <i class="las la-exclamation"></i>
       <span>{{ 'SMTP.LIST.EMPTY' | translate }}</span>
@@ -139,7 +139,6 @@
   }
 
   <cnsl-paginator
-    #paginator
     class="paginator"
     [timestamp]="configsResult?.details?.viewTimestamp"
     [length]="configsResult?.details?.totalResult || 0"

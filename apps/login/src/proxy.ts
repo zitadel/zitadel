@@ -1,33 +1,14 @@
-import { SecuritySettings } from "@zitadel/proto/zitadel/settings/v2/security_settings_pb";
-
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { buildCSP } from "./lib/csp";
 import { createLogger } from "./lib/logger";
+import { getIframeOrigins } from "./lib/server/security-settings";
 import { getServiceConfig } from "./lib/service-url";
 
 const logger = createLogger("middleware");
 export const config = {
   matcher: ["/.well-known/:path*", "/oauth/:path*", "/oidc/:path*", "/idps/callback/:path*", "/saml/:path*", "/:path*"],
 };
-
-async function loadSecuritySettings(request: NextRequest): Promise<SecuritySettings | null> {
-  const securityResponse = await fetch(`${request.nextUrl.origin}/security`);
-
-  if (!securityResponse.ok) {
-    logger.error("Failed to fetch security settings:", { status: securityResponse.statusText });
-    return null;
-  }
-
-  const response = await securityResponse.json();
-
-  if (!response || !response.settings) {
-    logger.error("No security settings found in the response.");
-    return null;
-  }
-
-  return response.settings;
-}
 
 export async function proxy(request: NextRequest) {
   // Add the original URL as a header to all requests
@@ -40,34 +21,23 @@ export async function proxy(request: NextRequest) {
   }
 
   // Internal infrastructure routes — skip middleware entirely.
-  // /security is the internal API this middleware fetches (loop prevention).
   // /healthy and /ready are Kubernetes/Docker health probes that must respond
   // without depending on a ZITADEL backend.
-  const skipPaths = ["/security", "/healthy", "/ready"];
+  const skipPaths = ["/healthy", "/ready"];
   if (skipPaths.includes(request.nextUrl.pathname)) {
     return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
-  // Build security response headers (shared by all routes).
-  // Wrapped in try/catch so the middleware gracefully degrades with a default
-  // CSP when the ZITADEL backend is unavailable (e.g. during container startup).
+  const _headers = await headers();
+  const { serviceConfig } = getServiceConfig(_headers);
+  const { baseUrl, publicHost, instanceHost } = serviceConfig;
+
+  // Build CSP headers using security settings fetched directly from the
+  // ZITADEL API (no self-loopback through the load balancer).
   const responseHeaders = new Headers();
-  let publicHost: string | undefined;
-  let instanceHost: string | undefined;
-  let baseUrl: string | undefined;
 
   try {
-    const _headers = await headers();
-    const { serviceConfig } = getServiceConfig(_headers);
-    publicHost = serviceConfig.publicHost;
-    instanceHost = serviceConfig.instanceHost;
-    baseUrl = serviceConfig.baseUrl;
-
-    const securitySettings = await loadSecuritySettings(request);
-    const iframeOrigins =
-      securitySettings?.embeddedIframe?.enabled && securitySettings.embeddedIframe.allowedOrigins.length > 0
-        ? securitySettings.embeddedIframe.allowedOrigins
-        : undefined;
+    const iframeOrigins = await getIframeOrigins(baseUrl, instanceHost);
 
     responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: baseUrl, iframeOrigins }));
 
@@ -78,11 +48,11 @@ export async function proxy(request: NextRequest) {
     logger.error("Failed to load security settings for CSP, using default CSP", {
       error: err instanceof Error ? err.message : String(err),
     });
-    responseHeaders.set("Content-Security-Policy", buildCSP());
+    responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: baseUrl }));
     responseHeaders.set("X-Frame-Options", "deny");
   }
 
-  // Only run the rest of the logic for the original matcher paths
+  // Only proxy paths need to be rewritten to the ZITADEL backend
   const proxyPaths = ["/.well-known/", "/oauth/", "/oidc/", "/idps/callback/", "/saml/"];
   const isMatched = proxyPaths.some((prefix) => request.nextUrl.pathname.startsWith(prefix));
 

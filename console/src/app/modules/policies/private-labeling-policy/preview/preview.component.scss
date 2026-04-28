@@ -2,7 +2,7 @@
 @use '../../../label/label.component.scss' as label;
 
 @mixin preview-theme($show-dark) {
-  $theme: if($show-dark, $caos-dark-app-theme, $caos-light-app-theme);
+  $theme: if(sass($show-dark): $caos-dark-app-theme; else: $caos-light-app-theme);
 
   @include input.input-theme($theme);
   @include label.cnsl-label-theme($theme);

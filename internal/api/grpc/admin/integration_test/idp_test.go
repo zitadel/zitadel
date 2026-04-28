@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/zitadel/zitadel/internal/integration"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object"
@@ -28,6 +29,34 @@ func Test_AddZitadelProvider(t *testing.T) {
 		wantErr      error
 		wantResponse *admin_pb.AddZitadelProviderResponse
 	}{
+		{
+			name: "no permissions, error",
+			args: args{
+				ctx: Instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
+				req: &admin_pb.AddZitadelProviderRequest{
+					Name:         "Zitadel Support IdP",
+					Issuer:       "zitadel.example.com",
+					ClientId:     "test-client",
+					ClientSecret: "test-secret",
+					Scopes:       []string{"email", "profile"},
+				},
+			},
+			wantErr: status.Error(codes.NotFound, "membership not found (AUTHZ-cdgFk)"),
+		},
+		{
+			name: "insufficient permissions, error",
+			args: args{
+				ctx: Instance.WithAuthorizationToken(CTX, integration.UserTypeLogin),
+				req: &admin_pb.AddZitadelProviderRequest{
+					Name:         "Zitadel Support IdP",
+					Issuer:       "zitadel.example.com",
+					ClientId:     "test-client",
+					ClientSecret: "test-secret",
+					Scopes:       []string{"email", "profile"},
+				},
+			},
+			wantErr: status.Error(codes.PermissionDenied, "No matching permissions found (AUTH-5mWD2)"),
+		},
 		{
 			name: "missing required field: name",
 			args: args{

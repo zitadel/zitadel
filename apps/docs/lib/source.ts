@@ -1,6 +1,8 @@
 import { docs, versions } from '../.source/server';
-import { type InferPageType, loader } from 'fumadocs-core/source';
+import { loader } from 'fumadocs-core/source';
 import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
+
+const DOCS_BASE_PATH = '/docs';
 
 // See https://fumadocs.dev/docs/headless/source-api for more info
 export const source = loader({
@@ -15,6 +17,11 @@ export const versionSource = loader({
   plugins: [lucideIconsPlugin()],
 });
 
+type LatestPage = ReturnType<typeof source.getPages>[number];
+export type DocPage =
+  | LatestPage
+  | ReturnType<typeof versionSource.getPages>[number];
+
 export function getPage(slugs: string[] | undefined) {
   const safeSlugs = slugs || [];
   // If the first slug matches a known version pattern (e.g., starts with 'v' and is in our list), use versionSource
@@ -27,16 +34,24 @@ export function getPage(slugs: string[] | undefined) {
   return { page: source.getPage(safeSlugs), source: source };
 }
 
-export function getPageImage(page: InferPageType<typeof source>) {
+export function getAllDocPages(): DocPage[] {
+  return [...source.getPages(), ...versionSource.getPages()];
+}
+
+export function generateAllDocParams() {
+  return [...source.generateParams(), ...versionSource.generateParams()];
+}
+
+export function getPageImage(page: DocPage) {
   const segments = [...page.slugs, 'image.png'];
 
   return {
     segments,
-    url: `/og/docs/${segments.join('/')}`,
+    url: `${DOCS_BASE_PATH}/og/docs/${segments.join('/')}`,
   };
 }
 
-export async function getLLMText(page: InferPageType<typeof source>) {
+export async function getLLMText(page: LatestPage) {
   const processed = await page.data.getText('processed');
 
   return `# ${page.data.title}
