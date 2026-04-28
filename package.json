@@ -9,7 +9,7 @@
   "devDependencies": {
     "@bufbuild/buf": "^1.68.4",
     "@changesets/cli": "^2.31.0",
-    "nx": "21.6.10",
+    "nx": "21.6.11",
     "sass": "^1.99.0",
     "shiki": "^3.23.0",
     "wait-on": "^9.0.5"

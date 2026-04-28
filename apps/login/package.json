@@ -54,7 +54,7 @@
     "react-hook-form": "^7.74.0",
     "server-only": "^0.0.1",
     "tinycolor2": "^1.6.0",
-    "uuid": "^13.0.0",
+    "uuid": "^14.0.0",
     "winston": "^3.19.0"
   },
   "devDependencies": {
