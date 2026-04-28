@@ -8,6 +8,7 @@ import (
 	"github.com/muhlemmer/gu"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	sessionv2 "github.com/zitadel/zitadel/backend/v3/api/session/v2"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -38,6 +39,9 @@ func (s *Server) GetSession(ctx context.Context, req *connect.Request[session.Ge
 }
 
 func (s *Server) ListSessions(ctx context.Context, req *connect.Request[session.ListSessionsRequest]) (*connect.Response[session.ListSessionsResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return sessionv2.ListSessions(ctx, req)
+	}
 	queries, err := listSessionsRequestToQuery(ctx, req.Msg)
 	if err != nil {
 		return nil, err

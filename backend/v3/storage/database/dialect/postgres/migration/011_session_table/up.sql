@@ -33,9 +33,15 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER set_expiration
-    BEFORE INSERT OR UPDATE OF lifetime ON zitadel.sessions
+CREATE TRIGGER set_expiration_on_update
+    BEFORE UPDATE OF lifetime ON zitadel.sessions
     FOR EACH ROW
+EXECUTE FUNCTION zitadel.update_expiration();
+
+CREATE TRIGGER set_expiration_on_insert
+    BEFORE INSERT ON zitadel.sessions
+    FOR EACH ROW
+    WHEN (NEW.lifetime <> '0'::interval)
 EXECUTE FUNCTION zitadel.update_expiration();
 
 CREATE TYPE zitadel.session_factor_type AS ENUM (

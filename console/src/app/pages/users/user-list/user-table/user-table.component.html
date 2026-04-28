@@ -233,7 +233,7 @@
           ></tr>
         </table>
       </div>
-      @if (!loading() && !dataSource?.data?.length) {
+      @if (!loading() && !dataSource.data.length) {
         <div class="no-content-row">
           <i class="las la-exclamation"></i>
           <span>{{ 'USER.TABLE.EMPTY' | translate }}</span>
