@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - fix/login-v2-password-session-handoff
+  workflow_dispatch:
 
 env:
   IMAGE_NAME: ghcr.io/mrtomyum/zitadel-login
