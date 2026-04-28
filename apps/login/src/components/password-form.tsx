@@ -27,9 +27,10 @@ type Props = {
   organization?: string;
   defaultOrganization?: string;
   requestId?: string;
+  sessionId?: string;
 };
 
-export function PasswordForm({ loginSettings, loginName, organization, defaultOrganization, requestId }: Props) {
+export function PasswordForm({ loginSettings, loginName, organization, defaultOrganization, requestId, sessionId }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onChange",
   });
@@ -57,6 +58,7 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
           password: { password: values.password },
         }),
         requestId,
+        sessionId,
       });
 
       handleServerActionResponse(response, router, setSamlData, setError);

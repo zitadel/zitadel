@@ -134,6 +134,7 @@ export type UpdateSessionCommand = {
   defaultOrganization?: string;
   checks: Checks;
   requestId?: string;
+  sessionId?: string;
 };
 
 export async function sendPassword(
@@ -145,10 +146,18 @@ export async function sendPassword(
 
   recordAuthAttempt("password", command.organization);
 
-  let sessionCookie = await getSessionCookieByLoginName({
-    loginName: command.loginName,
-    organization: command.organization,
-  });
+  // Prefer sessionId-based lookup (stronger handoff from loginname step),
+  // falling back to loginName-based cookie lookup if no sessionId provided or session not found
+  let sessionCookie = command.sessionId
+    ? await getSessionCookieById({ sessionId: command.sessionId, organization: command.organization })
+    : undefined;
+
+  if (!sessionCookie) {
+    sessionCookie = await getSessionCookieByLoginName({
+      loginName: command.loginName,
+      organization: command.organization,
+    });
+  }
 
   let session;
   let user: User | undefined;

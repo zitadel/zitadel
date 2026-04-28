@@ -396,6 +396,10 @@ export async function sendLoginname(command: SendLoginnameCommand) {
               paramsPassword.append("requestId", command.requestId);
             }
 
+            if (session?.id) {
+              paramsPassword.append("sessionId", session.id);
+            }
+
             return {
               redirect: "/password?" + paramsPassword,
             };
@@ -487,6 +491,10 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
         if (organization) {
           paramsPasswordDefault.append("organization", organization);
+        }
+
+        if (session?.id) {
+          paramsPasswordDefault.append("sessionId", session.id);
         }
 
         return {

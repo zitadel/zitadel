@@ -401,6 +401,70 @@ describe("sendLoginname", () => {
         expect((result as any).redirect).toMatch(/^\/password\?/);
         expect((result as any).redirect).toContain("loginName=user%40example.com");
       });
+
+      test("should redirect to password with sessionId when session was created", async () => {
+        const mockSessionWithId = {
+          ...mockSession,
+          id: "session-abc-123",
+        };
+
+        mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSessionWithId, sessionCookie: {} });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD],
+        });
+
+        const result = await sendLoginname({
+          loginName: "user@example.com",
+          requestId: "req123",
+        });
+
+        expect(result).toHaveProperty("redirect");
+        expect((result as any).redirect).toMatch(/^\/password\?/);
+        expect((result as any).redirect).toContain("loginName=user%40example.com");
+        expect((result as any).redirect).toContain("requestId=req123");
+        expect((result as any).redirect).toContain("sessionId=session-abc-123");
+      });
+
+      test("should include sessionId in multi-method fallback to password", async () => {
+        const mockSessionWithId = {
+          ...mockSession,
+          id: "session-fallback-456",
+        };
+
+        mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSessionWithId, sessionCookie: {} });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD],
+        });
+
+        const result = await sendLoginname({
+          loginName: "user@example.com",
+        });
+
+        expect(result).toBeDefined();
+        expect(result?.redirect).toMatch(/^\/password\?/);
+        expect((result as any).redirect).toContain("sessionId=session-fallback-456");
+      });
+
+      test("should NOT include sessionId when ignoreUnknownUsernames skips session creation", async () => {
+        mockGetLoginSettings.mockResolvedValue({
+          allowLocalAuthentication: true,
+          ignoreUnknownUsernames: true,
+        });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD],
+        });
+
+        const result = await sendLoginname({
+          loginName: "user@example.com",
+          requestId: "req123",
+        });
+
+        expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+
+        expect(result).toHaveProperty("redirect");
+        expect((result as any).redirect).toMatch(/^\/password\?/);
+        expect((result as any).redirect).not.toContain("sessionId=");
+      });
     });
 
     describe("Multiple authentication methods", () => {

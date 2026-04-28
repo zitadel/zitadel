@@ -3,9 +3,10 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { PasswordForm } from "@/components/password-form";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
+import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getDefaultOrg, getLoginSettings } from "@/lib/zitadel";
+import { getBrandingSettings, getDefaultOrg, getLoginSettings, getSession } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -18,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
-  let { loginName, organization, requestId } = searchParams;
+  let { loginName, organization, requestId, sessionId } = searchParams;
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
@@ -32,19 +33,36 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     }
   }
 
-  // also allow no session to be found (ignoreUnkownUsername)
+  // Prefer loading session by sessionId if provided (stronger handoff from loginname step)
   let sessionFactors;
   try {
-    sessionFactors = await loadMostRecentSession({
-      serviceConfig,
-      sessionParams: {
-        loginName,
-        organization,
-      },
-    });
+    if (sessionId) {
+      sessionFactors = await loadSessionById(sessionId, organization);
+    }
+    if (!sessionFactors) {
+      sessionFactors = await loadMostRecentSession({
+        serviceConfig,
+        sessionParams: {
+          loginName,
+          organization,
+        },
+      });
+    }
   } catch (error) {
     // ignore error to continue to show the password form
     console.warn(error);
+  }
+
+  async function loadSessionById(sessionId: string, org?: string) {
+    const recent = await getSessionCookieById({ sessionId, organization: org });
+
+    if (!recent) {
+      return undefined;
+    }
+
+    return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then(
+      (response) => response?.session,
+    );
   }
 
   const branding = await getBrandingSettings({
@@ -95,6 +113,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
             defaultOrganization={defaultOrganization}
             loginSettings={loginSettings}
+            sessionId={sessionId}
           />
         )}
       </div>
