@@ -227,7 +227,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
           });
       } else if (membership.projectGrantId) {
         this.mgmtService
-          .updateProjectGrantMember(membership.projectId, membership.projectGrantId, membership.userId, newRoles)
+          .updateProjectGrantMember(membership.projectId!, membership.projectGrantId, membership.userId, newRoles)
           .then(() => {
             this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
             this.changePage(this.paginator);

@@ -28,6 +28,9 @@ on:
       APP_PRIVATE_KEY:
         description: 'GH App Private Key to request token for homebrew update'
         required: true
+      BUF_TOKEN:
+        description: 'buf.build bsr token currently only user scoped tokens are supported this one is created for @conblem'
+        required: true
 
 jobs:
   version:
@@ -192,3 +195,19 @@ jobs:
           version: ${{ needs.version.outputs.version }}
           cwd: packages
           createGithubReleases: false
+
+  bsr:
+    runs-on: ubuntu-latest
+    needs: version
+    if: needs.version.outputs.published == 'true' && github.ref_name == 'next'
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup buf tooling
+        uses: bufbuild/buf-action@v1
+        with:
+          token: ${{ secrets.BUF_TOKEN }}
+          setup_only: "true"
+      - name: Publish proto files to bsr
+        run: buf push --label ${{ needs.version.outputs.version }} --source-control-url https://github.com/zitadel/zitadel/commits/${{ github.sha }} ./proto

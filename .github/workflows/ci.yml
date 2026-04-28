@@ -1,4 +1,4 @@
-name: CI 
+name: CI
 
 on:
   push:
@@ -30,6 +30,7 @@ jobs:
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       NX_CLOUD_ACCESS_TOKEN_READONLY: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+      BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
 
   pack:
     uses: ./.github/workflows/pack.yml
@@ -62,6 +63,7 @@ jobs:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
       APP_ID: ${{ secrets.APP_ID }}
       APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
+      BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
     with:
       semantic_version: "23.0.7"
       image_name_github_api: "ghcr.io/zitadel/zitadel"

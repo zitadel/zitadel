@@ -4,11 +4,14 @@ managed:
   enabled: true
 plugins:
   - plugin: js
+    path: '../.artifacts/bin/protoc-gen-js'
     out: src/app/proto/generated
     opt: import_style=commonjs,binary
   - plugin: grpc-web
+    path: '../.artifacts/bin/protoc-gen-grpc-web'
     out: src/app/proto/generated
     opt: import_style=typescript,mode=grpcweb
   - plugin: openapiv2
+    path: '../.artifacts/bin/protoc-gen-openapiv2'
     out: src/app/proto/generated
     opt: allow_delete_body

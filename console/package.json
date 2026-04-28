@@ -98,5 +98,42 @@
     "prettier-plugin-organize-imports": "^4.3.0",
     "tailwindcss": "^4.2.2",
     "typescript": "5.9.2"
+  },
+  "installProto": {
+    "packages": {
+      "grpc/grpc-web": {
+        "version": "2.0.2",
+        "fileTemplate": "protoc-gen-grpc-web-{VERSION}-{PLATFORM}-{ARCH}{EXE}",
+        "extractTemplate": "protoc-gen-grpc-web{EXE}",
+        "overrides": {
+          "arm64": "aarch64",
+          "x64": "x86_64",
+          "win32": "windows"
+        }
+      },
+      "protocolbuffers/protobuf-javascript": {
+        "version": "v4.0.2",
+        "fileTemplate": "protobuf-javascript-{VERSION}-{PLATFORM}-{ARCH}.zip",
+        "extractTemplate": "bin/protoc-gen-js{EXE}",
+        "overrides": {
+          "arm64": "aarch_64",
+          "x64": "x86_64",
+          "darwin": "osx",
+          "win32-x86_64": "win64",
+          "win32-aarch_64": "win64",
+          "linux-aarch_64.zip": "linux-aarch_64.tar.gz",
+          "linux-x86_64.zip": "linux-x86_64.tar.gz"
+        }
+      },
+      "grpc-ecosystem/grpc-gateway": {
+        "version": "v2.28.0",
+        "fileTemplate": "protoc-gen-openapiv2-v{VERSION}-{PLATFORM}-{ARCH}{EXE}",
+        "extractTemplate": "protoc-gen-openapiv2{EXE}",
+        "overrides": {
+          "x64": "x86_64",
+          "win32": "windows"
+        }
+      }
+    }
   }
 }

@@ -76,6 +76,7 @@ build/local/*.env
 .notifications
 .artifacts/*
 !.artifacts/bin
+.artifacts/bin/*
 .artifacts/bin/*/*/**/*
 !.artifacts/zitadel
 /zitadel

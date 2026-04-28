@@ -75,5 +75,20 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "yaml-loader": "^0.9.0"
+  },
+  "installProto": {
+    "packages": {
+      "sudorandom/protoc-gen-connect-openapi": {
+        "version": "v0.25.5",
+        "fileTemplate": "protoc-gen-connect-openapi_{VERSION}_{PLATFORM}_{ARCH}.tar.gz",
+        "extractTemplate": "protoc-gen-connect-openapi{EXE}",
+        "overrides": {
+          "darwin_x64": "darwin_all",
+          "darwin_arm64": "darwin_all",
+          "x64": "amd64",
+          "win32": "windows"
+        }
+      }
+    }
   }
 }
