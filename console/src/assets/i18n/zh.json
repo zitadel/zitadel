@@ -2611,7 +2611,7 @@
       "TYPEREQUIRED": "类型是必填的。",
       "TITLE": "OIDC 配置",
       "CLIENTID": "客户端 ID",
-      "CLIENTSECRET": "客户端秘钥",
+      "CLIENTDETAILS": "客户端详情",
       "CLIENTSECRET_NOSECRET": "使用您选择的身份验证流程，不需要任何秘密，因此不可用。",
       "CLIENTSECRET_DESCRIPTION": "将您的客户保密在一个安全的地方，因为一旦对话框关闭，便无法再次查看。",
       "REGENERATESECRET": "重新生成客户端密钥",

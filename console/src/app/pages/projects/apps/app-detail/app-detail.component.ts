@@ -53,7 +53,7 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { ApplicationService } from 'src/app/services/application.service';
 import { EnvironmentService } from 'src/app/services/environment.service';
-import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
+import { AppSecretDialogComponent, AppSecretDialogData } from '../app-secret-dialog/app-secret-dialog.component';
 import {
   BASIC_AUTH_METHOD,
   CODE_METHOD,
@@ -840,7 +840,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         .regenerateOIDCClientSecret(this.app.id, this.projectId)
         .then((resp) => {
           this.toast.showInfo('APP.TOAST.CLIENTSECRETREGENERATED', true);
-          this.dialog.open(AppSecretDialogComponent, {
+          this.dialog.open<AppSecretDialogComponent, AppSecretDialogData>(AppSecretDialogComponent, {
             data: {
               // clientId: data.toObject() as ClientSecret.AsObject.clientId,
               clientSecret: resp.clientSecret,
@@ -878,7 +878,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         .regenerateAPIClientSecret(this.app.id, this.projectId)
         .then((resp) => {
           this.toast.showInfo('APP.TOAST.CLIENTSECRETREGENERATED', true);
-          this.dialog.open(AppSecretDialogComponent, {
+          this.dialog.open<AppSecretDialogComponent, AppSecretDialogData>(AppSecretDialogComponent, {
             data: {
               clientSecret: resp.clientSecret,
             },
