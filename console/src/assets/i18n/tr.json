@@ -2607,7 +2607,7 @@
       "TYPEREQUIRED": "Tür gereklidir.",
       "TITLE": "OIDC Yapılandırması",
       "CLIENTID": "Client ID",
-      "CLIENTSECRET": "Client Secret",
+      "CLIENTDETAILS": "İstemci ayrıntıları",
       "CLIENTSECRET_NOSECRET": "Seçtiğiniz kimlik doğrulama akışıyla gizli anahtar gerekmez ve bu nedenle mevcut değildir.",
       "CLIENTSECRET_DESCRIPTION": "Dialog kapandığında kaybolacağı için client secret'ınızı güvenli bir yerde saklayın.",
       "REGENERATESECRET": "Client Secret'ı Yeniden Oluştur",

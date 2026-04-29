@@ -2579,7 +2579,7 @@
       "TYPEREQUIRED": "Il tipo è necessario per completare.",
       "TITLE": "Configurazione OIDC",
       "CLIENTID": "Client ID",
-      "CLIENTSECRET": "Client Secret",
+      "CLIENTDETAILS": "Dettagli del client",
       "CLIENTSECRET_NOSECRET": "Con il flusso di autenticazione scelto, non è richiesto alcun Client Secret e quindi non è disponibile.",
       "CLIENTSECRET_DESCRIPTION": "Salvate il Client Secret in un luogo sicuro, perché non sarà più disponibile dopo aver chiuso la finestra di dialogo",
       "REGENERATESECRET": "Rigenera il Client Secret",

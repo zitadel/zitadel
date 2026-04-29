@@ -2609,7 +2609,7 @@
       "TYPEREQUIRED": "The type is required.",
       "TITLE": "OIDC Settings",
       "CLIENTID": "Client ID",
-      "CLIENTSECRET": "Client Secret",
+      "CLIENTDETAILS": "Client Details",
       "CLIENTSECRET_NOSECRET": "With your chosen authentication flow, no secret is required and is therefore not available.",
       "CLIENTSECRET_DESCRIPTION": "Keep your client secret at a safe place as it will disappear once the dialog is closed.",
       "REGENERATESECRET": "Regenerate Client Secret",
