@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"encoding/base64"
 	"testing"
 	"time"
 
@@ -203,7 +202,7 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 				want: &domain.ObjectDetails{
 					ResourceOwner: "org1",
 				},
-				token: base64.RawURLEncoding.EncodeToString([]byte("token1:user1")),
+				token: "token1:user1",
 			},
 		},
 		{
@@ -251,16 +250,17 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 				want: &domain.ObjectDetails{
 					ResourceOwner: "org1",
 				},
-				token: base64.RawURLEncoding.EncodeToString([]byte("token1:user1")),
+				token: "token1:user1",
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:   tt.fields.eventstore,
-				idGenerator:  tt.fields.idGenerator,
-				keyAlgorithm: tt.fields.keyAlgorithm,
+				eventstore:    tt.fields.eventstore,
+				idGenerator:   tt.fields.idGenerator,
+				keyAlgorithm:  tt.fields.keyAlgorithm,
+				authAlgorithm: &mockAuthCrypto{},
 			}
 			got, err := c.AddPersonalAccessToken(tt.args.ctx, tt.args.pat)
 			if tt.res.err == nil {

@@ -9,6 +9,7 @@ import (
 )
 
 type KeyConfig struct {
+	LegacyToken      bool
 	EncryptionKeyID  string
 	DecryptionKeyIDs []string
 }

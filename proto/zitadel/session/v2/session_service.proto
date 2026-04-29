@@ -327,10 +327,10 @@ message GetSessionRequest{
   // - the security token provided in the authorization header has the same user agent as the session
   // - the caller is granted the permission session.read permission on either the instance or on the checked user's organization
   optional string session_token = 2 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
+    (validate.rules).string = {min_len: 1, max_len: 500},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 200;
+      max_length: 500;
       example: "\"222430354126975533\"";
     }
    ];

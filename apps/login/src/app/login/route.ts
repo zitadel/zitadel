@@ -1,6 +1,5 @@
 import { isRSCRequest, validateAuthRequest } from "@/lib/auth-utils";
 import { getAllSessions } from "@/lib/cookies";
-import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { FlowInitiationParams, handleOIDCFlowInitiation, handleSAMLFlowInitiation } from "@/lib/server/flow-initiation";
 import { getServiceConfig } from "@/lib/service-url";
 import { listSessions, ServiceConfig } from "@/lib/zitadel";
@@ -46,19 +45,9 @@ export async function GET(request: NextRequest) {
   const flowParams: FlowInitiationParams = { serviceConfig, requestId, sessions, sessionCookies, request };
 
   if (requestId.startsWith("oidc_")) {
-    try {
-      return await handleOIDCFlowInitiation(flowParams);
-    } catch (error) {
-      const status = isClassifiedError(error) ? error.httpStatus : 500;
-      return NextResponse.json({ error: "Authentication flow failed" }, { status });
-    }
+    return handleOIDCFlowInitiation(flowParams);
   } else if (requestId.startsWith("saml_")) {
-    try {
-      return await handleSAMLFlowInitiation(flowParams);
-    } catch (error) {
-      const status = isClassifiedError(error) ? error.httpStatus : 500;
-      return NextResponse.json({ error: "SAML flow failed" }, { status });
-    }
+    return handleSAMLFlowInitiation(flowParams);
   } else if (requestId.startsWith("device_")) {
     // Device Authorization does not need to start here as it is handled on the /device endpoint
     return NextResponse.json({ error: "Device authorization should use /device endpoint" }, { status: 400 });

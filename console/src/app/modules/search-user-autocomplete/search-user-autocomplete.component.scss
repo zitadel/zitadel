@@ -9,8 +9,8 @@
   $secondary-text: map-get($foreground, secondary-text);
   $is-dark-theme: map-get($theme, is-dark);
 
-  $link-hover-color: if($is-dark-theme, map-get($primary, 200), $primary-color);
-  $link-color: if($is-dark-theme, $lighter-primary-color, $primary-color);
+  $link-hover-color: if(sass($is-dark-theme): map-get($primary, 200) ; else: $primary-color);
+  $link-color: if(sass($is-dark-theme): $lighter-primary-color; else: $primary-color);
 
   .user-autocomplete-found {
     margin: 0.5rem 0;
