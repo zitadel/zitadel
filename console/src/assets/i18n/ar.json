@@ -2598,7 +2598,7 @@
       "TYPEREQUIRED": "النوع مطلوب.",
       "TITLE": "تكوين OIDC",
       "CLIENTID": "معرف العميل",
-      "CLIENTSECRET": "سر العميل",
+      "CLIENTDETAILS": "تفاصيل العميل",
       "CLIENTSECRET_NOSECRET": "مع تدفق المصادقة المختار، لا يتطلب الأمر سراً وبالتالي فهو غير متاح.",
       "CLIENTSECRET_DESCRIPTION": "احتفظ بسر العميل الخاص بك في مكان آمن حيث سيختفي بمجرد إغلاق الحوار.",
       "REGENERATESECRET": "إعادة توليد سر العميل",

@@ -2597,7 +2597,7 @@
       "TYPEREQUIRED": "Het type is vereist.",
       "TITLE": "OIDC Configuratie",
       "CLIENTID": "Client ID",
-      "CLIENTSECRET": "Client Geheim",
+      "CLIENTDETAILS": "Clientdetails",
       "CLIENTSECRET_NOSECRET": "Met uw gekozen authenticatiestroom is geen geheim vereist en is daarom niet beschikbaar.",
       "CLIENTSECRET_DESCRIPTION": "Bewaar uw client geheim op een veilige plaats aangezien het zal verdwijnen zodra het dialoogvenster wordt gesloten.",
       "REGENERATESECRET": "Regenereer Client Geheim",
