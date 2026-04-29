@@ -1,0 +1,461 @@
+{
+  "common": {
+    "back": "กลับ",
+    "title": "เข้าสู่ระบบด้วย Zitadel"
+  },
+  "accounts": {
+    "title": "บัญชี",
+    "description": "เลือกบัญชีที่คุณต้องการใช้",
+    "addAnother": "เพิ่มอีกบัญชี",
+    "noResults": "ไม่พบบัญชี",
+    "verified": "ยืนยันแล้ว",
+    "expired": "หมดอายุ"
+  },
+  "logout": {
+    "title": "ออกจากระบบ",
+    "description": "คลิกที่บัญชีเพื่อสิ้นสุดเซสชัน",
+    "noResults": "ไม่พบบัญชี",
+    "clear": "สิ้นสุดเซสชัน",
+    "verifiedAt": "ใช้งานล่าสุด: {time}",
+    "success": {
+      "title": "ออกจากระบบสำเร็จ",
+      "description": "คุณได้ออกจากระบบเรียบร้อยแล้ว"
+    }
+  },
+  "loginname": {
+    "title": "ยินดีต้อนรับกลับ!",
+    "description": "กรอกรายละเอียดการเข้าสู่ระบบของคุณ",
+    "register": "ลงทะเบียนผู้ใช้ใหม่",
+    "submit": "ดำเนินการต่อ",
+    "labels": {
+      "loginname": "ชื่อเข้าสู่ระบบ",
+      "username": "ชื่อผู้ใช้",
+      "usernameOrPhoneNumber": "ชื่อผู้ใช้หรือหมายเลขโทรศัพท์",
+      "usernameOrEmail": "ชื่อผู้ใช้หรืออีเมล"
+    },
+    "required": {
+      "loginName": "จำเป็นต้องกรอกข้อมูลนี้"
+    },
+    "errors": {
+      "internalError": "เกิดข้อผิดพลาดภายในระบบ",
+      "couldNotGetLoginSettings": "ไม่สามารถดึงการตั้งค่าการเข้าสู่ระบบได้",
+      "couldNotSearchUsers": "ไม่สามารถค้นหาผู้ใช้ได้",
+      "couldNotGetDomain": "ไม่สามารถดึงโดเมนได้",
+      "couldNotGetHost": "ไม่สามารถดึงโฮสต์ได้",
+      "couldNotStartIDPFlow": "ไม่สามารถเริ่มกระบวนการ IDP ได้",
+      "moreThanOneUserFound": "พบผู้ใช้มากกว่าหนึ่งราย โปรดระบุตัวระบุที่ไม่ซ้ำกัน",
+      "userNotFound": "ไม่พบผู้ใช้ในระบบ",
+      "couldNotCreateSession": "ไม่สามารถสร้างเซสชันสำหรับผู้ใช้ได้",
+      "initialUserNotSupported": "ไม่รองรับผู้ใช้เริ่มต้น",
+      "localAuthenticationNotAllowed": "ไม่อนุญาตให้ใช้การยืนยันตัวตนภายในระบบ! โปรดติดต่อผู้ดูแลระบบของคุณสำหรับข้อมูลเพิ่มเติม",
+      "passkeysNotAllowed": "ไม่อนุญาตให้ใช้ Passkey! โปรดติดต่อผู้ดูแลระบบของคุณสำหรับข้อมูลเพิ่มเติม",
+      "couldNotFindIdentityProvider": "ไม่พบผู้ให้บริการตัวตน",
+      "userNotActive": "ผู้ใช้ไม่ได้ใช้งานอยู่ โปรดติดต่อผู้ดูแลระบบของคุณสำหรับข้อมูลเพิ่มเติม"
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "เกิดข้อผิดพลาด",
+      "multipleUsersFound": "พบผู้ใช้หลายราย",
+      "userNotFound": "ไม่พบผู้ใช้ในระบบ"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "รหัสผ่าน",
+      "description": "กรอกรหัสผ่านของคุณ",
+      "resetPassword": "รีเซ็ตรหัสผ่าน",
+      "submit": "ดำเนินการต่อ",
+      "labels": {
+        "password": "รหัสผ่าน"
+      },
+      "required": {
+        "password": "จำเป็นต้องกรอกข้อมูลนี้"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "ไม่สามารถตรวจสอบรหัสผ่านได้",
+        "couldNotResetPassword": "ไม่สามารถรีเซ็ตรหัสผ่านได้"
+      },
+      "info": {
+        "passwordResetSent": "รีเซ็ตรหัสผ่านแล้ว โปรดตรวจสอบอีเมลของคุณ"
+      }
+    },
+    "set": {
+      "title": "ตั้งรหัสผ่าน",
+      "description": "ตั้งรหัสผ่านสำหรับบัญชีของคุณ",
+      "codeSent": "ระบบได้ส่งรหัสใหม่ไปยังอีเมลของคุณแล้ว",
+      "noCodeReceived": "ยังไม่ได้รับรหัสใช่ไหม?",
+      "resend": "ส่งรหัสอีกครั้ง",
+      "submit": "ดำเนินการต่อ",
+      "labels": {
+        "code": "รหัส",
+        "newPassword": "รหัสผ่านใหม่",
+        "confirmPassword": "ยืนยันรหัสผ่าน"
+      },
+      "required": {
+        "code": "จำเป็นต้องกรอกข้อมูลนี้",
+        "newPassword": "คุณต้องระบุรหัสผ่าน!",
+        "confirmPassword": "จำเป็นต้องกรอกข้อมูลนี้"
+      },
+      "errors": {
+        "couldNotSetPassword": "ไม่สามารถตั้งรหัสผ่านได้",
+        "couldNotResetPassword": "ไม่สามารถรีเซ็ตรหัสผ่านได้",
+        "couldNotVerifyPassword": "ไม่สามารถตรวจสอบรหัสผ่านได้"
+      }
+    },
+    "change": {
+      "title": "เปลี่ยนรหัสผ่าน",
+      "description": "ตั้งรหัสผ่านสำหรับบัญชีของคุณ",
+      "submit": "ดำเนินการต่อ",
+      "labels": {
+        "currentPassword": "รหัสผ่านปัจจุบัน",
+        "newPassword": "รหัสผ่านใหม่",
+        "confirmPassword": "ยืนยันรหัสผ่าน"
+      },
+      "required": {
+        "currentPassword": "คุณต้องระบุรหัสผ่านปัจจุบันของคุณ!",
+        "newPassword": "คุณต้องระบุรหัสผ่านใหม่!",
+        "confirmPassword": "จำเป็นต้องกรอกข้อมูลนี้"
+      },
+      "errors": {
+        "currentPasswordInvalid": "รหัสผ่านปัจจุบันไม่ถูกต้อง",
+        "couldNotChangePassword": "ไม่สามารถเปลี่ยนรหัสผ่านได้",
+        "couldNotVerifyPassword": "ไม่สามารถตรวจสอบรหัสผ่านได้",
+        "unknownError": "ข้อผิดพลาดที่ไม่ทราบสาเหตุ"
+      }
+    },
+    "complexity": {
+      "length": "ต้องมีความยาวอย่างน้อย {minLength} อักขระ",
+      "hasSymbol": "ต้องมีสัญลักษณ์",
+      "hasNumber": "ต้องมีตัวเลข",
+      "hasUppercase": "ต้องมีอักษรตัวพิมพ์ใหญ่",
+      "hasLowercase": "ต้องมีอักษรตัวพิมพ์เล็ก",
+      "equals": "การยืนยันรหัสผ่านตรงกัน",
+      "matches": "ตรงกัน",
+      "doesNotMatch": "ไม่ตรงกัน"
+    },
+    "errors": {
+      "noHostFound": "ไม่พบโฮสต์",
+      "couldNotSendResetLink": "ไม่สามารถส่งลิงก์รีเซ็ตรหัสผ่านได้",
+      "couldNotCreateSessionForUser": "ไม่สามารถสร้างเซสชันสำหรับผู้ใช้ได้",
+      "couldNotVerifyPassword": "ไม่สามารถตรวจสอบรหัสผ่านได้",
+      "failedToAuthenticate": "ยืนยันตัวตนไม่สำเร็จ คุณได้ลองรหัสผ่านไปแล้ว {failedAttempts} จาก {maxPasswordAttempts} ครั้ง{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "ยืนยันตัวตนไม่สำเร็จ",
+      "accountLockedContactAdmin": " โปรดติดต่อผู้ดูแลระบบเพื่อปลดล็อกบัญชีของคุณ",
+      "userNotFound": "ไม่พบผู้ใช้ในระบบ",
+      "initialUserNotSupported": "ไม่รองรับผู้ใช้เริ่มต้น",
+      "userInitialStateNotSupported": "ไม่รองรับสถานะเริ่มต้นของผู้ใช้",
+      "codeOrVerificationRequired": "คุณต้องระบุรหัสหรือมีการตรวจสอบยืนยันผู้ใช้ที่ถูกต้อง",
+      "verificationRequired": "ต้องทำการตรวจสอบยืนยันผู้ใช้",
+      "couldNotLoadSession": "ไม่สามารถโหลดเซสชันได้",
+      "couldNotLoadAuthMethods": "ไม่สามารถโหลดวิธีการยืนยันตัวตนได้",
+      "failedPrecondition": "เงื่อนไขเบื้องต้นไม่ผ่าน",
+      "sessionNotValid": "เซสชันไม่ถูกต้อง",
+      "passwordVerificationMissing": "ไม่มีการตรวจสอบรหัสผ่าน",
+      "passwordVerificationTooOld": "การตรวจสอบรหัสผ่านเก่าเกินไป โปรดตรวจสอบรหัสผ่านของคุณอีกครั้ง"
+    }
+  },
+  "idp": {
+    "title": "เข้าสู่ระบบด้วย SSO",
+    "description": "เลือกผู้ให้บริการต่อไปนี้เพื่อเข้าสู่ระบบ",
+    "orSignInWith": "หรือเข้าสู่ระบบด้วย",
+    "signInWithApple": "เข้าสู่ระบบด้วย Apple",
+    "signInWithGoogle": "เข้าสู่ระบบด้วย Google",
+    "signInWithAzureAD": "เข้าสู่ระบบด้วย AzureAD",
+    "signInWithGithub": "เข้าสู่ระบบด้วย GitHub",
+    "signInWithGitlab": "เข้าสู่ระบบด้วย GitLab",
+    "loginError": {
+      "title": "เข้าสู่ระบบไม่สำเร็จ",
+      "description": "เกิดข้อผิดพลาดขณะพยายามเข้าสู่ระบบ"
+    },
+    "linkingError": {
+      "title": "เชื่อมโยงบัญชีไม่สำเร็จ",
+      "description": "เกิดข้อผิดพลาดขณะพยายามเชื่อมโยงบัญชีของคุณ"
+    },
+    "completeRegister": {
+      "title": "กรอกข้อมูลของคุณให้ครบถ้วน",
+      "description": "คุณต้องกรอกอีเมลและชื่อของคุณให้ครบถ้วนเพื่อดำเนินการลงทะเบียนต่อ"
+    },
+    "accountNotFound": {
+      "title": "ไม่พบบัญชี",
+      "description": "เราไม่พบบัญชีที่เชื่อมโยงกับข้อมูลรับรองจากผู้ให้บริการตัวตนของคุณ",
+      "info": "ไม่พบบัญชีที่มีอยู่ โปรดเข้าสู่ระบบด้วยบัญชีที่มีอยู่หรือขอความช่วยเหลือจากผู้ดูแลระบบของคุณ",
+      "backToLogin": "กลับไปหน้าเข้าสู่ระบบ"
+    },
+    "registrationFailed": {
+      "title": "ไม่สามารถลงทะเบียนได้",
+      "description": "เราไม่สามารถดำเนินการลงทะเบียนให้เสร็จสมบูรณ์ได้",
+      "info": "ไม่สามารถระบุองค์กรสำหรับการลงทะเบียนได้ โปรดติดต่อผู้ดูแลระบบของคุณเพื่อขอความช่วยเหลือ",
+      "backToLogin": "กลับไปหน้าเข้าสู่ระบบ"
+    },
+    "processing": {
+      "message": "กำลังประมวลผลการยืนยันตัวตน...",
+      "noRedirect": "ไม่มีการเปลี่ยนเส้นทางหรือข้อผิดพลาดที่ส่งกลับจากเซิร์ฟเวอร์",
+      "unexpectedError": "เกิดข้อผิดพลาดที่ไม่คาดคิด"
+    },
+    "errors": {
+      "missingParameters": "ไม่มีพารามิเตอร์ที่จำเป็น",
+      "missingIdpInfo": "ไม่มีข้อมูล IDP",
+      "idpNotFound": "ไม่พบผู้ให้บริการตัวตน",
+      "linkingNotAllowed": "ไม่อนุญาตให้เชื่อมโยงสำหรับผู้ให้บริการตัวตนนี้",
+      "linkingFailed": "เชื่อมโยงผู้ให้บริการตัวตนกับบัญชีไม่สำเร็จ",
+      "autoLinkingFailed": "เชื่อมโยงบัญชีอัตโนมัติไม่สำเร็จ",
+      "userCreationFailed": "สร้างบัญชีผู้ใช้ไม่สำเร็จ",
+      "orgResolutionFailed": "ไม่สามารถระบุองค์กรสำหรับการลงทะเบียนได้",
+      "sessionCreationFailed": "ไม่สามารถสร้างเซสชันหรือระบุการเปลี่ยนเส้นทางได้",
+      "unknownError": "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ"
+    }
+  },
+  "ldap": {
+    "title": "เข้าสู่ระบบด้วย LDAP",
+    "description": "กรอกข้อมูลรับรอง LDAP ของคุณ",
+    "submit": "ดำเนินการต่อ",
+    "labels": {
+      "username": "ชื่อผู้ใช้",
+      "password": "รหัสผ่าน"
+    },
+    "required": {
+      "username": "จำเป็นต้องกรอกข้อมูลนี้",
+      "password": "จำเป็นต้องกรอกข้อมูลนี้"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "ยืนยันตัวตนของคุณ",
+      "description": "เลือกปัจจัยการยืนยันตัวตนหนึ่งรายการจากต่อไปนี้",
+      "noResults": "ไม่มีปัจจัยที่สองให้ตั้งค่า"
+    },
+    "set": {
+      "title": "ตั้งค่าการยืนยัน 2 ขั้นตอน",
+      "description": "เลือกปัจจัยที่สองหนึ่งรายการจากต่อไปนี้",
+      "skip": "ข้าม"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "ยืนยันการยืนยัน 2 ขั้นตอน",
+      "totpDescription": "กรอกรหัสจากแอปยืนยันตัวตนของคุณ",
+      "smsDescription": "กรอกรหัสที่คุณได้รับทาง SMS",
+      "emailDescription": "กรอกรหัสที่คุณได้รับทางอีเมล",
+      "noCodeReceived": "ยังไม่ได้รับรหัสใช่ไหม?",
+      "resendCode": "ส่งรหัสอีกครั้ง",
+      "submit": "ดำเนินการต่อ",
+      "labels": {
+        "code": "รหัส"
+      },
+      "required": {
+        "code": "จำเป็นต้องกรอกข้อมูลนี้"
+      }
+    },
+    "set": {
+      "title": "ตั้งค่าการยืนยัน 2 ขั้นตอน",
+      "totpDescription": "สแกน QR code ด้วยแอปยืนยันตัวตนของคุณ",
+      "smsDescription": "กรอกหมายเลขโทรศัพท์ของคุณเพื่อรับรหัสทาง SMS",
+      "emailDescription": "กรอกอีเมลของคุณเพื่อรับรหัสทางอีเมล",
+      "totpRegisterDescription": "สแกน QR Code หรือไปที่ URL ด้วยตนเอง",
+      "submit": "ดำเนินการต่อ",
+      "labels": {
+        "code": "รหัส"
+      },
+      "required": {
+        "code": "จำเป็นต้องกรอกข้อมูลนี้"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "ยืนยันตัวตนด้วย Passkey",
+      "description": "อุปกรณ์ของคุณจะขอให้ใช้ลายนิ้วมือ ใบหน้า หรือล็อกหน้าจอ",
+      "usePassword": "ใช้รหัสผ่าน",
+      "submit": "ดำเนินการต่อ",
+      "errors": {
+        "couldNotRequestChallenge": "ไม่สามารถขอ challenge ของ Passkey ได้",
+        "couldNotVerifyPasskey": "ไม่สามารถตรวจสอบ Passkey ได้",
+        "noResponseReceived": "การตรวจสอบ Passkey ล้มเหลว - ไม่ได้รับการตอบกลับ",
+        "noRedirectProvided": "การตรวจสอบ Passkey เสร็จสิ้นแล้ว แต่ไม่มีการเปลี่ยนเส้นทางที่ระบุไว้",
+        "couldNotRetrievePasskey": "เกิดข้อผิดพลาดขณะเรียกข้อมูล Passkey",
+        "verificationCancelled": "ยกเลิกการตรวจสอบ Passkey แล้ว",
+        "verificationFailed": "เกิดข้อผิดพลาดระหว่างการตรวจสอบ Passkey",
+        "couldNotFindSession": "ไม่สามารถค้นหาเซสชันได้",
+        "couldNotUpdateSession": "ไม่สามารถอัปเดตเซสชันได้",
+        "userNotFound": "ไม่พบผู้ใช้ในระบบ",
+        "couldNotDetermineRedirect": "ไม่สามารถระบุ URL สำหรับเปลี่ยนเส้นทางหลังการตรวจสอบ Passkey ได้"
+      }
+    },
+    "set": {
+      "title": "ตั้งค่า Passkey",
+      "description": "อุปกรณ์ของคุณจะขอให้ใช้ลายนิ้วมือ ใบหน้า หรือล็อกหน้าจอ",
+      "info": {
+        "description": "Passkey คือวิธีการยืนยันตัวตนบนอุปกรณ์ เช่น ลายนิ้วมือ Apple FaceID หรือวิธีที่คล้ายกัน ",
+        "link": "การยืนยันตัวตนด้วย Passkey"
+      },
+      "skip": "ข้าม",
+      "submit": "ดำเนินการต่อ"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "ยืนยันการยืนยัน 2 ขั้นตอน",
+      "description": "ยืนยันบัญชีของคุณด้วยอุปกรณ์ของคุณ"
+    },
+    "set": {
+      "title": "ตั้งค่าการยืนยัน 2 ขั้นตอน",
+      "description": "ตั้งค่าอุปกรณ์เป็นปัจจัยที่สอง",
+      "submit": "ดำเนินการต่อ"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "รหัสผ่าน"
+    },
+    "disabled": {
+      "title": "ปิดการลงทะเบียนอยู่",
+      "description": "การลงทะเบียนถูกปิดใช้งาน โปรดติดต่อผู้ดูแลระบบของคุณ"
+    },
+    "missingdata": {
+      "title": "ข้อมูลไม่ครบถ้วน",
+      "description": "กรอกอีเมล ชื่อ และนามสกุลเพื่อสมัครลงทะเบียน"
+    },
+    "title": "ลงทะเบียน",
+    "description": "สร้างบัญชี Zitadel ของคุณ",
+    "noMethodAvailableWarning": "ไม่มีวิธีการยืนยันตัวตนที่พร้อมใช้งาน โปรดติดต่อผู้ดูแลระบบของคุณ",
+    "selectMethod": "เลือกวิธีที่คุณต้องการใช้ในการยืนยันตัวตน",
+    "agreeTo": "ในการลงทะเบียน คุณต้องยอมรับข้อกำหนดและเงื่อนไข",
+    "termsOfService": "ข้อกำหนดการใช้งาน",
+    "privacyPolicy": "นโยบายความเป็นส่วนตัว",
+    "submit": "ดำเนินการต่อ",
+    "password": {
+      "title": "ตั้งรหัสผ่าน",
+      "description": "ตั้งรหัสผ่านสำหรับบัญชีของคุณ",
+      "submit": "ดำเนินการต่อ",
+      "labels": {
+        "password": "รหัสผ่าน",
+        "confirmPassword": "ยืนยันรหัสผ่าน"
+      },
+      "required": {
+        "password": "คุณต้องระบุรหัสผ่าน!",
+        "confirmPassword": "จำเป็นต้องกรอกข้อมูลนี้"
+      }
+    },
+    "labels": {
+      "firstname": "ชื่อ",
+      "lastname": "นามสกุล",
+      "email": "อีเมล"
+    },
+    "required": {
+      "firstname": "จำเป็นต้องกรอกข้อมูลนี้",
+      "lastname": "จำเป็นต้องกรอกข้อมูลนี้",
+      "email": "จำเป็นต้องกรอกข้อมูลนี้"
+    },
+    "errors": {
+      "couldNotCreateUser": "ไม่สามารถสร้างผู้ใช้ได้",
+      "couldNotCreateSession": "ไม่สามารถสร้างเซสชันได้",
+      "userNotFound": "ไม่พบผู้ใช้ในระบบ",
+      "couldNotLinkIDP": "ไม่สามารถเชื่อมโยง IDP กับผู้ใช้ได้",
+      "couldNotRegisterUser": "ไม่สามารถลงทะเบียนผู้ใช้ได้"
+    }
+  },
+  "invite": {
+    "title": "เชิญผู้ใช้",
+    "description": "กรอกอีเมลและชื่อของผู้ใช้ที่คุณต้องการเชิญ",
+    "info": "ผู้ใช้จะได้รับอีเมลพร้อมคำแนะนำเพิ่มเติม",
+    "notAllowed": "การตั้งค่าของคุณไม่อนุญาตให้เชิญผู้ใช้",
+    "submit": "ดำเนินการต่อ",
+    "success": {
+      "title": "เชิญผู้ใช้แล้ว",
+      "description": "ส่งอีเมลเรียบร้อยแล้ว",
+      "verified": "ได้เชิญผู้ใช้แล้ว และผู้ใช้ได้ยืนยันอีเมลเรียบร้อยแล้ว",
+      "notVerifiedYet": "ได้เชิญผู้ใช้แล้ว ผู้ใช้จะได้รับอีเมลพร้อมคำแนะนำเพิ่มเติม",
+      "submit": "เชิญผู้ใช้อีกคน"
+    }
+  },
+  "signedin": {
+    "title": "ยินดีต้อนรับ {user}!",
+    "description": "คุณได้เข้าสู่ระบบแล้ว",
+    "continue": "ดำเนินการต่อ",
+    "error": {
+      "title": "ข้อผิดพลาด",
+      "description": "เกิดข้อผิดพลาดขณะพยายามเข้าสู่ระบบ"
+    }
+  },
+  "verify": {
+    "userIdMissing": "ไม่ได้ระบุ userId!",
+    "successTitle": "ยืนยันผู้ใช้แล้ว",
+    "successDescription": "ยืนยันผู้ใช้เรียบร้อยแล้ว",
+    "successContinue": "ดำเนินการต่อ",
+    "setupAuthenticator": "ตั้งค่าแอปยืนยันตัวตน",
+    "verify": {
+      "title": "ยืนยันผู้ใช้",
+      "description": "กรอกรหัสที่ระบุในอีเมลยืนยัน",
+      "noCodeReceived": "ยังไม่ได้รับรหัสใช่ไหม?",
+      "resendCode": "ส่งรหัสอีกครั้ง",
+      "codeSent": "ระบบได้ส่งรหัสใหม่ไปยังอีเมลของคุณแล้ว",
+      "submit": "ดำเนินการต่อ",
+      "labels": {
+        "code": "รหัส"
+      },
+      "required": {
+        "code": "จำเป็นต้องกรอกข้อมูลนี้"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "ไม่สามารถส่งอีเมลอีกครั้งได้",
+      "couldNotVerifyUser": "ไม่สามารถยืนยันผู้ใช้ได้",
+      "couldNotVerifyInvite": "ไม่สามารถยืนยันคำเชิญได้",
+      "couldNotVerifyEmail": "ไม่สามารถยืนยันอีเมลได้",
+      "couldNotVerify": "ไม่สามารถยืนยันได้",
+      "couldNotLoadUser": "ไม่สามารถโหลดผู้ใช้ได้",
+      "couldNotLoadAuthenticators": "ไม่สามารถโหลดวิธีการยืนยันตัวตนที่เป็นไปได้ได้",
+      "couldNotCreateSession": "ไม่สามารถสร้างเซสชันได้",
+      "noHostFound": "ไม่พบโฮสต์",
+      "userAlreadyVerified": "ผู้ใช้ได้รับการยืนยันแล้ว!",
+      "couldNotResendInvite": "ไม่สามารถส่งคำเชิญอีกครั้งได้",
+      "inviteSendFailed": "ส่งอีเมลเชิญไม่สำเร็จ",
+      "emailSendFailed": "ส่งอีเมลยืนยันไม่สำเร็จ",
+      "contextMissing": "เกิดข้อผิดพลาด โปรดลองอีกครั้ง"
+    }
+  },
+  "authenticator": {
+    "title": "เลือกวิธีการยืนยันตัวตน",
+    "description": "เลือกวิธีที่คุณต้องการใช้ในการยืนยันตัวตน",
+    "noMethodsAvailable": "ไม่มีวิธีการยืนยันตัวตนที่พร้อมใช้งาน",
+    "allSetup": "คุณได้ตั้งค่าแอปยืนยันตัวตนครบแล้ว!",
+    "linkWithIDP": "หรือเชื่อมโยงกับผู้ให้บริการตัวตน"
+  },
+  "device": {
+    "usercode": {
+      "title": "รหัสอุปกรณ์",
+      "description": "กรอกรหัสที่แสดงบนแอปหรืออุปกรณ์ของคุณ",
+      "submit": "ดำเนินการต่อ",
+      "labels": {
+        "code": "รหัส"
+      },
+      "required": {
+        "code": "จำเป็นต้องกรอกข้อมูลนี้"
+      }
+    },
+    "request": {
+      "title": "{appName} ต้องการเชื่อมต่อ",
+      "description": "{appName} จะสามารถเข้าถึง:",
+      "disclaimer": "เมื่อคลิก อนุญาต คุณยินยอมให้ {appName} และ Zitadel ใช้ข้อมูลของคุณตามข้อกำหนดการใช้งานและนโยบายความเป็นส่วนตัวของแต่ละฝ่าย คุณสามารถเพิกถอนสิทธิ์เข้าถึงนี้ได้ทุกเมื่อ",
+      "submit": "อนุญาต",
+      "deny": "ปฏิเสธ"
+    },
+    "scope": {
+      "openid": "ยืนยันตัวตนของคุณ",
+      "email": "ดูที่อยู่อีเมลของคุณ",
+      "profile": "ดูข้อมูลโปรไฟล์ทั้งหมดของคุณ",
+      "offline_access": "อนุญาตให้เข้าถึงบัญชีของคุณแบบออฟไลน์"
+    }
+  },
+  "error": {
+    "noUserCode": "ไม่ได้ระบุรหัสผู้ใช้!",
+    "noDeviceRequest": "ไม่พบคำขอจากอุปกรณ์",
+    "unknownContext": "ไม่สามารถดึงบริบทของผู้ใช้ได้ โปรดตรวจสอบว่าได้กรอกชื่อผู้ใช้ก่อน หรือระบุ loginName เป็น searchParam",
+    "sessionExpired": "เซสชันปัจจุบันของคุณหมดอายุแล้ว โปรดเข้าสู่ระบบอีกครั้ง",
+    "failedLoading": "โหลดข้อมูลไม่สำเร็จ โปรดลองอีกครั้ง",
+    "tryagain": "ลองอีกครั้ง",
+    "couldNotContinueSession": "ไม่สามารถดำเนินการต่อด้วยเซสชันได้ - ไม่มีข้อมูลผู้ใช้"
+  }
+}
