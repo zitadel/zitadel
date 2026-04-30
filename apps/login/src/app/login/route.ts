@@ -43,6 +43,7 @@ export async function GET(request: NextRequest) {
     try {
       sessions = await loadSessions({ serviceConfig, ids });
     } catch (error) {
+      logger.warn("Failed to load sessions", { error });
       // listSessions can fail for various reasons (stale/expired session IDs
       // still in cookies, API errors, etc.).  Treat any failure as "no valid
       // sessions" so the user is redirected to loginname instead of a 500.
