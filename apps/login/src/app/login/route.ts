@@ -23,14 +23,6 @@ async function loadSessions({ serviceConfig, ids }: { serviceConfig: ServiceConf
 export async function GET(request: NextRequest) {
   const { serviceConfig } = getServiceConfig(request.headers);
 
-  logger.info("login route: resolved serviceConfig", {
-    instanceHost: serviceConfig.instanceHost,
-    publicHost: serviceConfig.publicHost,
-    rawInstanceHeader: request.headers.get("x-zitadel-instance-host"),
-    rawForwardHost: request.headers.get("x-zitadel-forward-host"),
-    rawHost: request.headers.get("host"),
-  });
-
   const searchParams = request.nextUrl.searchParams;
 
   // Defensive check: block RSC requests early
@@ -54,9 +46,6 @@ export async function GET(request: NextRequest) {
       // listSessions can fail for various reasons (stale/expired session IDs
       // still in cookies, API errors, etc.).  Treat any failure as "no valid
       // sessions" so the user is redirected to loginname instead of a 500.
-      logger.error("Failed to load sessions, continuing without sessions", {
-        error: error instanceof Error ? error.message : String(error),
-      });
       sessions = [];
     }
   }
@@ -76,19 +65,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Invalid request ID format" }, { status: 400 });
     }
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : String(error);
-    const stack = error instanceof Error ? error.stack : undefined;
-    const code = (error as any)?.code;
-    let raw: string;
-    try {
-      raw = JSON.stringify(error, Object.getOwnPropertyNames(error as object));
-    } catch {
-      raw = String(error);
-    }
-    console.error(
-      `Flow initiation failed | requestId=${requestId} | code=${code} | msg=${msg} | stack=${stack} | raw=${raw}`,
-    );
-    logger.error("Flow initiation failed", { requestId, error: msg, code, stack });
+    logger.error("Flow initiation failed", { requestId, error });
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
