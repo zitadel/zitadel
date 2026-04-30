@@ -39,9 +39,6 @@ export const versions = defineDocs({
       sidebar_label: z.string().optional(),
     }),
     files: ['v*/**/*.md', 'v*/**/*.mdx', '!**/_*'], // Include only versioned folders from content
-    postprocess: {
-      includeProcessedMarkdown: true,
-    },
   },
   meta: {
     schema: metaSchema,
