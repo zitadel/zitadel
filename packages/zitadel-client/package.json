@@ -71,7 +71,7 @@
     "clean": "rm -rf node_modules dist"
   },
   "dependencies": {
-    "@bufbuild/protobuf": "^2.11.0",
+    "@bufbuild/protobuf": "^2.12.0",
     "@connectrpc/connect": "^2.1.1",
     "@connectrpc/connect-node": "^2.1.1",
     "@connectrpc/connect-web": "^2.1.1",
@@ -81,17 +81,17 @@
   "devDependencies": {
     "@bufbuild/protocompile": "^0.0.1",
     "@eslint/js": "^10.0.1",
-    "@types/node": "^25.5.0",
-    "@typescript-eslint/eslint-plugin": "^8.58.0",
-    "@typescript-eslint/parser": "^8.58.0",
-    "eslint": "^10.1.0",
+    "@types/node": "^25.6.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.1",
+    "@typescript-eslint/parser": "^8.59.1",
+    "eslint": "^10.2.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
-    "globals": "^17.4.0",
-    "knip": "^6.2.0",
+    "globals": "^17.5.0",
+    "knip": "^6.7.0",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
-    "vitest": "^4.1.2"
+    "vitest": "^4.1.5"
   }
 }
