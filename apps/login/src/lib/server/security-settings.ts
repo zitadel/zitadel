@@ -54,29 +54,49 @@ async function resolveAuthToken(): Promise<string> {
  * via the Connect protocol (POST + JSON). This uses raw fetch (no connectRPC
  * node transport) so it stays compatible with the Next.js proxy runtime.
  *
+ * Uses the same header pattern as createServerTransport in zitadel.ts:
+ * - baseUrl (ZITADEL_API_URL) as the fetch URL
+ * - x-zitadel-instance-host and x-zitadel-public-host as headers
+ * - CUSTOM_REQUEST_HEADERS applied
+ *
  * Results are cached in-memory for 1 hour per instance host using a bounded
  * LRU cache. Concurrent requests for the same key share a single in-flight
  * promise to prevent thundering-herd stampedes on the backend.
  *
  * @param baseUrl - The ZITADEL API base URL (ZITADEL_API_URL)
- * @param instanceHost - Optional instance host for multi-tenant deployments
- * @returns An array of allowed iframe origins, or undefined if not configured
+ * @param instanceHost - Optional instance host for multi-tenant routing
+ * @param publicHost - Optional public host for multi-tenant routing
+ * @returns An array of allowed iframe origins, or null if not configured
  */
-export async function getIframeOrigins(baseUrl: string, instanceHost?: string): Promise<string[] | undefined> {
+export async function getIframeOrigins(
+  baseUrl: string,
+  instanceHost?: string,
+  publicHost?: string,
+): Promise<string[] | null> {
   const cacheKey = instanceHost || "__default__";
 
-  return cache.getOrFetch<string[] | undefined>(cacheKey, () => fetchIframeOrigins(baseUrl, instanceHost), CACHE_TTL_MS);
+  // The fetcher returns null (not undefined) because lru-cache treats
+  // undefined as a fetch failure.
+  return cache.getOrFetch<string[] | null>(
+    cacheKey,
+    () => fetchIframeOrigins(baseUrl, instanceHost, publicHost),
+    CACHE_TTL_MS,
+  );
 }
 
-async function fetchIframeOrigins(baseUrl: string, instanceHost?: string): Promise<string[] | undefined> {
+async function fetchIframeOrigins(baseUrl: string, instanceHost?: string, publicHost?: string): Promise<string[] | null> {
   const token = await resolveAuthToken();
   const reqHeaders: Record<string, string> = {
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
   };
 
+  // Apply instance/public host headers — same pattern as createServerTransport
   if (instanceHost) {
     reqHeaders["x-zitadel-instance-host"] = instanceHost;
+  }
+  if (publicHost) {
+    reqHeaders["x-zitadel-public-host"] = publicHost;
   }
 
   // Apply custom headers from environment
@@ -93,6 +113,7 @@ async function fetchIframeOrigins(baseUrl: string, instanceHost?: string): Promi
     method: "POST",
     headers: reqHeaders,
     body: "{}",
+    cache: "no-store",
   });
 
   if (!response.ok) {
@@ -100,13 +121,15 @@ async function fetchIframeOrigins(baseUrl: string, instanceHost?: string): Promi
       status: response.status,
       statusText: response.statusText,
     });
-    return undefined;
+    // Return null instead of undefined — lru-cache treats undefined as a
+    // fetch failure and throws "fetch() returned undefined".
+    return null;
   }
 
   const data: GetSecuritySettingsResponseJson = await response.json();
   const settings = data.settings;
 
-  const origins = settings?.embeddedIframe?.enabled ? settings.embeddedIframe.allowedOrigins : undefined;
+  const origins = settings?.embeddedIframe?.enabled ? settings.embeddedIframe.allowedOrigins : null;
 
-  return origins && origins.length > 0 ? origins : undefined;
+  return origins && origins.length > 0 ? origins : null;
 }
