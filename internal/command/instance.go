@@ -16,7 +16,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
-	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/limits"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
@@ -131,11 +130,36 @@ type InstanceSetup struct {
 
 type SMTPConfiguration struct {
 	Description    string
-	SMTP           smtp.SMTP
+	SMTP           SMTPConfigurationSMTP
 	Tls            bool
 	From           string
 	FromName       string
 	ReplyToAddress string
+}
+
+// SMTPConfigurationSMTP mirrors the flat shape documented in
+// `cmd/defaults.yaml` and `apps/docs/content/self-hosting/manage/production.mdx`,
+// where users are told to set:
+//
+//	DefaultInstance.SMTPConfiguration.SMTP.{Host,User,Password}
+//
+// Previously this field reused the runtime
+// `internal/notification/channels/smtp.SMTP` struct, whose authentication
+// fields are nested under `PlainAuth *PlainAuthConfig`. That mismatch
+// silently dropped any `ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_USER`
+// / `_SMTP_PASSWORD` env vars (no matching struct field), and the
+// `_SMTP_PLAINAUTH_*` form did not bind either because viper does not
+// allocate the pointer-to-struct from a nested env path. Result: the
+// FirstInstance SMTP record had `plainAuth: {}` despite documented env
+// vars being set — see https://github.com/zitadel/zitadel/issues/11765.
+//
+// Keeping this sub-struct decoupled from the runtime channel struct also
+// stops a future change to the channel (e.g. adding XOAuth2) from silently
+// changing the FirstInstance bootstrap contract.
+type SMTPConfigurationSMTP struct {
+	Host     string
+	User     string
+	Password string
 }
 
 type OIDCSettings struct {
@@ -471,13 +495,13 @@ func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation
 	if smtpConfig == nil {
 		return
 	}
-	var username string
+	// Leave password as nil when empty so prepareAddAndActivateSMTPConfig
+	// skips the encrypt/persist branch — encrypting an empty string would
+	// store an empty `plainAuth.password` and mark the row as auth-required
+	// with no usable credential.
 	var pwd []byte
-	if smtpConfig.SMTP.PlainAuth != nil {
-		username = smtpConfig.SMTP.PlainAuth.User
-		if smtpConfig.SMTP.PlainAuth != nil {
-			pwd = []byte(smtpConfig.SMTP.PlainAuth.Password)
-		}
+	if smtpConfig.SMTP.Password != "" {
+		pwd = []byte(smtpConfig.SMTP.Password)
 	}
 	*validations = append(*validations,
 		commands.prepareAddAndActivateSMTPConfig(
@@ -487,7 +511,7 @@ func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation
 			smtpConfig.FromName,
 			smtpConfig.ReplyToAddress,
 			smtpConfig.SMTP.Host,
-			username,
+			smtpConfig.SMTP.User,
 			pwd,
 			smtpConfig.Tls,
 		),
