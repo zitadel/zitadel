@@ -495,12 +495,17 @@ func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation
 	if smtpConfig == nil {
 		return
 	}
-	// Leave password as nil when empty so prepareAddAndActivateSMTPConfig
-	// skips the encrypt/persist branch — encrypting an empty string would
-	// store an empty `plainAuth.password` and mark the row as auth-required
-	// with no usable credential.
+	// Treat user/password atomically: persist BOTH or NEITHER. The runtime
+	// channel's smtpToEmailConfig enables PlainAuth whenever the username
+	// is non-empty, so persisting a username without a password would force
+	// an AUTH attempt with an empty password and break otherwise-working
+	// unauthenticated SMTP setups (HOST set, USER+PASSWORD both empty).
+	// Encrypting an empty string would also produce an unusable
+	// `plainAuth.password` ciphertext.
+	var username string
 	var pwd []byte
-	if smtpConfig.SMTP.Password != "" {
+	if smtpConfig.SMTP.User != "" && smtpConfig.SMTP.Password != "" {
+		username = smtpConfig.SMTP.User
 		pwd = []byte(smtpConfig.SMTP.Password)
 	}
 	*validations = append(*validations,
@@ -511,7 +516,7 @@ func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation
 			smtpConfig.FromName,
 			smtpConfig.ReplyToAddress,
 			smtpConfig.SMTP.Host,
-			smtpConfig.SMTP.User,
+			username,
 			pwd,
 			smtpConfig.Tls,
 		),
