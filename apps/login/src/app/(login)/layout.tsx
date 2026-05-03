@@ -19,6 +19,9 @@ import React, { Suspense } from "react";
 const lato = Lato({
   weight: ["400", "700", "900"],
   subsets: ["latin"],
+  // Lato ships only Latin glyphs; the auto-generated Lato Fallback
+  // metrics clip Cyrillic descenders.
+  adjustFontFallback: false,
 });
 
 export async function generateMetadata(): Promise<Metadata> {
