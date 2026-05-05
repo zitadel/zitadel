@@ -1150,7 +1150,9 @@
         "couldNotLoadSession": "Impossible de charger la session",
         "couldNotLoadAuthMethods": "Impossible de charger les méthodes d'authentification",
         "failedPrecondition": "Pré-condition non remplie",
-        "sessionNotValid": "La session n'est pas valide"
+        "sessionNotValid": "La session n'est pas valide",
+        "passwordVerificationMissing": "La vérification du mot de passe est manquante.",
+        "passwordVerificationTooOld": "La vérification du mot de passe est trop ancienne. Veuillez vérifier votre mot de passe à nouveau."
       }
     },
     "idp": {
@@ -1162,17 +1164,34 @@
       "signInWithAzureAD": "Se connecter avec AzureAD",
       "signInWithGithub": "Se connecter avec GitHub",
       "signInWithGitlab": "Se connecter avec GitLab",
-      "loginSuccess": {
-        "title": "Connexion réussie",
-        "description": "Vous vous êtes connecté avec succès !"
+      "accountNotFound": {
+        "title": "Compte introuvable",
+        "description": "Nous n'avons pas trouvé de compte associé à vos identifiants de fournisseur d'identité.",
+        "info": "Aucun compte existant n'a été trouvé. Veuillez vous connecter avec un compte existant ou contacter votre administrateur pour obtenir de l'aide.",
+        "backToLogin": "Retour à la connexion"
       },
-      "linkingSuccess": {
-        "title": "Compte lié",
-        "description": "Votre compte a été lié avec succès !"
+      "registrationFailed": {
+        "title": "Inscription non disponible",
+        "description": "Nous n'avons pas pu terminer le processus d'inscription.",
+        "info": "Impossible de déterminer l'organisation pour l'inscription. Veuillez contacter votre administrateur pour obtenir de l'aide.",
+        "backToLogin": "Retour à la connexion"
       },
-      "registerSuccess": {
-        "title": "Inscription réussie",
-        "description": "Vous vous êtes inscrit avec succès !"
+      "processing": {
+        "message": "Authentification en cours...",
+        "noRedirect": "Aucune redirection ou erreur retournée par le serveur",
+        "unexpectedError": "Une erreur inattendue s'est produite"
+      },
+      "errors": {
+        "missingParameters": "Paramètres requis manquants",
+        "missingIdpInfo": "Informations du fournisseur d'identité manquantes",
+        "idpNotFound": "Fournisseur d'identité introuvable",
+        "linkingNotAllowed": "La liaison n'est pas autorisée pour ce fournisseur d'identité",
+        "linkingFailed": "Échec de la liaison du fournisseur d'identité au compte",
+        "autoLinkingFailed": "Échec de la liaison automatique du compte",
+        "userCreationFailed": "Échec de la création du compte utilisateur",
+        "orgResolutionFailed": "Impossible de déterminer l'organisation pour l'inscription",
+        "sessionCreationFailed": "Impossible de créer une session ou de déterminer la redirection",
+        "unknownError": "Une erreur inconnue s'est produite"
       },
       "loginError": {
         "title": "Échec de la connexion",
@@ -1248,7 +1267,20 @@
         "title": "S'authentifier avec une clé d'accès",
         "description": "Votre appareil vous demandera votre empreinte digitale, votre visage ou votre verrouillage d'écran",
         "usePassword": "Utiliser un mot de passe",
-        "submit": "Continuer"
+        "submit": "Continuer",
+        "errors": {
+          "couldNotRequestChallenge": "Impossible de demander le défi de la clé d'accès",
+          "couldNotVerifyPasskey": "Impossible de vérifier la clé d'accès",
+          "noResponseReceived": "Échec de la vérification de la clé d'accès - aucune réponse reçue",
+          "noRedirectProvided": "Vérification de la clé d'accès terminée, mais aucune redirection fournie",
+          "couldNotRetrievePasskey": "Une erreur s'est produite lors de la récupération de la clé d'accès",
+          "verificationCancelled": "La vérification de la clé d'accès a été annulée",
+          "verificationFailed": "Une erreur s'est produite lors de la vérification de la clé d'accès",
+          "couldNotFindSession": "Impossible de trouver la session",
+          "couldNotUpdateSession": "Impossible de mettre à jour la session",
+          "userNotFound": "Utilisateur introuvable dans le système",
+          "couldNotDetermineRedirect": "Impossible de déterminer l'URL de redirection après la vérification de la clé d'accès"
+        }
       },
       "set": {
         "title": "Configurer une clé d'accès",
@@ -1378,7 +1410,10 @@
         "couldNotCreateSession": "Impossible de créer la session",
         "noHostFound": "Aucun hôte trouvé",
         "userAlreadyVerified": "L'utilisateur est déjà vérifié !",
-        "couldNotResendInvite": "Impossible de renvoyer l'invitation"
+        "couldNotResendInvite": "Impossible de renvoyer l'invitation",
+        "inviteSendFailed": "Échec de l'envoi de l'e-mail d'invitation",
+        "emailSendFailed": "Échec de l'envoi de l'e-mail de vérification",
+        "contextMissing": "Une erreur s'est produite. Veuillez réessayer."
       }
     },
     "authenticator": {
@@ -1420,7 +1455,8 @@
       "unknownContext": "Impossible d'obtenir le contexte de l'utilisateur. Assurez-vous d'abord de saisir le nom d'utilisateur ou de fournir un loginName comme paramètre de recherche.",
       "sessionExpired": "Votre session actuelle a expiré. Veuillez vous reconnecter.",
       "failedLoading": "Échec du chargement des données. Veuillez réessayer.",
-      "tryagain": "Réessayer"
+      "tryagain": "Réessayer",
+      "couldNotContinueSession": "Impossible de continuer la session - informations utilisateur manquantes"
     }
   },
   "it": {
@@ -1698,6 +1734,7 @@
       "userIdMissing": "Nessun userId fornito!",
       "successTitle": "Utente verificato",
       "successDescription": "L'utente è stato verificato con successo.",
+      "successContinue": "Continua",
       "setupAuthenticator": "Configura autenticatore",
       "verify": {
         "title": "Verifica utente",
@@ -1712,6 +1749,22 @@
         "required": {
           "code": "Questo campo è obbligatorio"
         }
+      },
+      "errors": {
+        "couldNotResendEmail": "Impossibile reinviare l'email",
+        "couldNotVerifyUser": "Impossibile verificare l'utente",
+        "couldNotVerifyInvite": "Impossibile verificare l'invito",
+        "couldNotVerifyEmail": "Impossibile verificare l'email",
+        "couldNotVerify": "Impossibile verificare",
+        "couldNotLoadUser": "Impossibile caricare l'utente",
+        "couldNotLoadAuthenticators": "Impossibile caricare gli autenticatori possibili",
+        "couldNotCreateSession": "Impossibile creare la sessione",
+        "noHostFound": "Nessun host trovato",
+        "userAlreadyVerified": "L'utente è già verificato!",
+        "couldNotResendInvite": "Impossibile reinviare l'invito",
+        "inviteSendFailed": "Impossibile inviare l'email di invito",
+        "emailSendFailed": "Impossibile inviare l'email di verifica",
+        "contextMissing": "Si è verificato un errore. Riprova."
       }
     },
     "authenticator": {
@@ -3389,6 +3442,7 @@
       "userIdMissing": "Nenhum ID de usuário fornecido!",
       "successTitle": "Usuário verificado",
       "successDescription": "O usuário foi verificado com sucesso.",
+      "successContinue": "Continuar",
       "setupAuthenticator": "Configurar autenticador",
       "verify": {
         "title": "Verificar usuário",
