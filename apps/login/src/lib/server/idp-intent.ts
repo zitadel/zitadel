@@ -1,11 +1,5 @@
 "use server";
 
-import crypto from "crypto";
-import { headers } from "next/headers";
-import { getTranslations } from "next-intl/server";
-import { Code, ConnectError, create } from "@zitadel/client";
-import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
-import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import {
   AddHumanUserRequest,
   AddHumanUserRequestSchema,
@@ -41,7 +35,7 @@ import {
   UpdateUserRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getTranslations } from "next-intl/server";
-import crypto from "crypto";
+import crypto from "node:crypto";
 import { headers } from "next/headers";
 import { getFingerprintIdCookie } from "../fingerprint";
 import { createNewSessionFromIdpIntent } from "./idp";

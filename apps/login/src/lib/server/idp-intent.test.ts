@@ -1076,13 +1076,13 @@ describe("processIDPCallback", () => {
     });
 
     test("should return samlData when session returns SAML response after auto-creation", async () => {
-      mockAddHuman.mockResolvedValue({ userId: "newuser123" });
+      mockCreateUser.mockResolvedValue({ id: "newuser123" });
       const samlData = { url: "https://saml.example.com/acs", fields: { SAMLResponse: "abc123" } };
       mockCreateNewSessionFromIdpIntent.mockResolvedValue({ samlData });
 
       const result = await processIDPCallback(defaultParams);
 
-      expect(mockAddHuman).toHaveBeenCalled();
+      expect(mockCreateUser).toHaveBeenCalled();
       expect(result.samlData).toEqual(samlData);
       expect(result.redirect).toBeUndefined();
       expect(result.error).toBeUndefined();
