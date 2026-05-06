@@ -1806,7 +1806,8 @@
       "unknownContext": "Impossibile ottenere il contesto dell'utente. Assicurati di inserire prima il nome utente o di fornire un loginName come parametro di ricerca.",
       "sessionExpired": "La tua sessione attuale è scaduta. Effettua nuovamente l'accesso.",
       "failedLoading": "Impossibile caricare i dati. Riprova.",
-      "tryagain": "Riprova"
+      "tryagain": "Riprova",
+      "couldNotContinueSession": "Impossibile continuare la sessione. Riprova."
     }
   },
   "ja": {
@@ -3345,7 +3346,7 @@
         "title": "Configurar chave de acesso",
         "description": "Seu dispositivo solicitará sua impressão digital, rosto ou bloqueio de tela",
         "info": {
-          "description": "Uma chave de acesso é um método de autenticação no seu dispositivo, como impressão digital, Apple FaceID ou similar. ",
+          "description": "Uma chave de acesso é um método de autenticação no seu dispositivo, como impressão digital, Apple FaceID ou similar.",
           "link": "Autenticação por Chave de Acesso"
         },
         "skip": "Pular",
