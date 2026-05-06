@@ -1807,7 +1807,7 @@
       "sessionExpired": "La tua sessione attuale è scaduta. Effettua nuovamente l'accesso.",
       "failedLoading": "Impossibile caricare i dati. Riprova.",
       "tryagain": "Riprova",
-      "couldNotContinueSession": "Impossibile continuare la sessione. Riprova."
+      "couldNotContinueSession": "Impossibile continuare con la sessione - informazioni utente mancanti"
     }
   },
   "ja": {
