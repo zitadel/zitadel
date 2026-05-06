@@ -2,7 +2,6 @@ package oidc
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"net/http"
 	"net/url"
