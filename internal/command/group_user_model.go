@@ -14,7 +14,7 @@ type GroupUsersWriteModel struct {
 
 	State domain.GroupState
 
-	existingUsers map[string]map[string]string
+	existingUsers map[string]map[string]group.AttributeValue
 }
 
 func NewGroupUsersWriteModel(groupID, orgID string) *GroupUsersWriteModel {
@@ -23,7 +23,7 @@ func NewGroupUsersWriteModel(groupID, orgID string) *GroupUsersWriteModel {
 			AggregateID:   groupID,
 			ResourceOwner: orgID,
 		},
-		existingUsers: make(map[string]map[string]string),
+		existingUsers: make(map[string]map[string]group.AttributeValue),
 	}
 }
 
@@ -53,7 +53,7 @@ func (g *GroupUsersWriteModel) Reduce() error {
 			g.State = domain.GroupStateActive
 		case *group.GroupRemovedEvent:
 			g.State = domain.GroupStateRemoved
-			g.existingUsers = make(map[string]map[string]string)
+			g.existingUsers = make(map[string]map[string]group.AttributeValue)
 		case *group.GroupUsersAddedEvent:
 			for _, u := range e.Users {
 				g.existingUsers[u.UserID] = u.Attributes

@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -67,7 +68,7 @@ type GroupUser struct {
 	UserID string
 	// Attributes are per-user attributes of this group-user relation, stored as
 	// a JSONB map in projections.group_users2.attributes.
-	Attributes         database.Map[string]
+	Attributes         database.Map[group.AttributeValue]
 	PreferredLoginName string
 	DisplayName        string
 	AvatarUrl          string

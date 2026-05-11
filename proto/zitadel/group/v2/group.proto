@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "google/api/field_behavior.proto";
+import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
@@ -11,6 +12,10 @@ import "zitadel/authorization/v2beta/authorization.proto";
 package zitadel.group.v2;
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/group/v2;group";
+
+// Attributes use google.protobuf.Value to allow flat JSON:
+// - Single value: {"role": "admin"}
+// - Multiple values: {"role": ["admin", "user"]}
 
 message Group {
   // Unique identifier of the user group.
@@ -73,9 +78,10 @@ message AddGroupUser {
 
   // Attributes are optional per-user key/value attributes attached to this
   // user's membership in the group (e.g. role, label).
-  map<string, string> attributes = 2 [
+  // Values can be either single strings or lists of strings.
+  map<string, google.protobuf.Value> attributes = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "{\"role\":\"admin\"}";
+      example: "{\"role\":\"admin\",\"tags\":[\"tag1\",\"tag2\"]}";
     }
   ];
 }
@@ -108,9 +114,10 @@ message GroupUser {
   // Attributes are per-user key/value attributes attached to this user's
   // membership in the group, supplied at add time via AddGroupUser.
   // Absent when no attributes were set.
-  map<string, string> attributes = 5 [
+  // Values can be either single strings or lists of strings.
+  map<string, google.protobuf.Value> attributes = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "{\"role\":\"admin\"}";
+      example: "{\"role\":\"admin\",\"tags\":[\"tag1\",\"tag2\"]}";
     }
   ];
 }

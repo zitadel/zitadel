@@ -120,7 +120,7 @@ func (g *groupUsersProjection) reduceGroupUsersAdded(event eventstore.Event) (*h
 				handler.NewCol(GroupUsersColumnSequence, e.Sequence()),
 				handler.NewCol(GroupUsersColumnCreationDate, e.CreationDate()),
 				handler.NewCol(GroupUsersColumnChangeDate, e.CreationDate()),
-				handler.NewCol(GroupUsersColumnAttributes, database.Map[string](u.Attributes)),
+				handler.NewCol(GroupUsersColumnAttributes, database.Map[group.AttributeValue](u.Attributes)),
 			},
 		))
 	}
@@ -186,7 +186,7 @@ func (g *groupUsersProjection) reduceGroupUsersChanged(event eventstore.Event) (
 	return handler.NewUpdateStatement(e, []handler.Column{
 		handler.NewCol(GroupUsersColumnChangeDate, e.CreatedAt()),
 		handler.NewCol(GroupUsersColumnSequence, e.Sequence()),
-		handler.NewCol(GroupUsersColumnAttributes, database.Map[string](e.Attributes)),
+		handler.NewCol(GroupUsersColumnAttributes, database.Map[group.AttributeValue](e.Attributes)),
 	}, []handler.Condition{
 		handler.NewCond(GroupUsersColumnInstanceID, e.Aggregate().InstanceID),
 		handler.NewCond(GroupUsersColumnUserID, e.UserID),

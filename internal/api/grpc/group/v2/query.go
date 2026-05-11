@@ -4,11 +4,14 @@ import (
 	"context"
 
 	"connectrpc.com/connect"
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	authorization_v2beta "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
@@ -205,9 +208,28 @@ func groupUsersToPb(groupUsers []*query.GroupUser) []*group_v2.GroupUser {
 	return pbGroupUsers
 }
 
+func groupUserAttrsToProto(attrs database.Map[group.AttributeValue]) map[string]*structpb.Value {
+	if len(attrs) == 0 {
+		return nil
+	}
+	result := make(map[string]*structpb.Value, len(attrs))
+	for k, v := range attrs {
+		if len(v) == 0 {
+			result[k] = structpb.NewStringValue("")
+		} else if len(v) == 1 {
+			result[k] = structpb.NewStringValue(v[0])
+		} else {
+			values := make([]*structpb.Value, len(v))
+			for i, str := range v {
+				values[i] = structpb.NewStringValue(str)
+			}
+			result[k] = structpb.NewListValue(&structpb.ListValue{Values: values})
+		}
+	}
+	return result
+}
+
 func groupUserToPb(gu *query.GroupUser) *group_v2.GroupUser {
-	// gu.Attributes is database.Map[string] (underlying map[string]string) — nil
-	// when no attributes were stored, which proto serializes as an absent field.
 	return &group_v2.GroupUser{
 		GroupId:        gu.GroupID,
 		OrganizationId: gu.ResourceOwner,
@@ -219,6 +241,6 @@ func groupUserToPb(gu *query.GroupUser) *group_v2.GroupUser {
 			OrganizationId:     gu.ResourceOwner,
 		},
 		CreationDate: timestamppb.New(gu.CreationDate),
-		Attributes:   gu.Attributes,
+		Attributes:   groupUserAttrsToProto(gu.Attributes),
 	}
 }

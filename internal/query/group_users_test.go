@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/repository/group"
 )
 
 var (
@@ -166,7 +167,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 						PreferredLoginName: "login-name-2",
 						DisplayName:        "display-name-2",
 						AvatarUrl:          "avatar-key",
-						Attributes:         database.Map[string]{"role": "admin"},
+						Attributes:         database.Map[group.AttributeValue]{"role": {"admin"}},
 					},
 				},
 			},
