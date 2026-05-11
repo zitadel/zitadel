@@ -210,9 +210,8 @@
           "TITLE": "Chei Web Anterioare",
           "DESCRIPTION": "Acestea sunt cheile tale web anterioare care nu mai sunt active.",
           "DEACTIVATED_ON": "Dezactivată pe",
-          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
-          "DELETE_TITLE": "Delete previous Web Key",
-          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
+          "DELETE_TITLE": "Șterge cheia web anterioară",
+          "DELETE_DESCRIPTION": "Eliminarea acestei chei web anterioare invalidează toate tokenurile semnate cu aceasta. Această acțiune nu poate fi anulată."
         }
       },
       "MESSAGE_TEXTS": {

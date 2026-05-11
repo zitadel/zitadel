@@ -3,9 +3,6 @@
   [description]="'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.DESCRIPTION' | translate"
 >
   <cnsl-refresh-table [hideRefresh]="true" [loading]="inactiveWebKeys() === null">
-    <p class="cnsl-secondary-text">
-      {{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.DELETE_INFO' | translate }}
-    </p>
     <div class="table-wrapper">
       <table mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
         <ng-container matColumnDef="timestamp">

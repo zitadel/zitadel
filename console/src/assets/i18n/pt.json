@@ -210,9 +210,8 @@
           "TITLE": "Chaves Web Anteriores",
           "DESCRIPTION": "Estas são suas chaves web anteriores que não estão mais ativas.",
           "DEACTIVATED_ON": "Desativada em",
-          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
-          "DELETE_TITLE": "Delete previous Web Key",
-          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
+          "DELETE_TITLE": "Excluir chave web anterior",
+          "DELETE_DESCRIPTION": "Remover esta chave web anterior invalida todos os tokens que foram assinados com ela. Esta ação não pode ser desfeita."
         }
       },
       "MESSAGE_TEXTS": {

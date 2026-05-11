@@ -210,9 +210,8 @@
           "TITLE": "Tidigare webbnycklar",
           "DESCRIPTION": "Detta är dina tidigare webbnycklar som inte längre är aktiva.",
           "DEACTIVATED_ON": "Inaktiverad den",
-          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
-          "DELETE_TITLE": "Delete previous Web Key",
-          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
+          "DELETE_TITLE": "Ta bort tidigare webbnyckel",
+          "DELETE_DESCRIPTION": "Om du tar bort den här tidigare webbnyckeln ogiltigförklaras alla token som signerats med den. Den här åtgärden kan inte ångras."
         }
       },
       "MESSAGE_TEXTS": {

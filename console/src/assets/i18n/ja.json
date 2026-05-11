@@ -210,9 +210,8 @@
           "TITLE": "以前のWebキー",
           "DESCRIPTION": "これらは、すでに無効になった以前のWebキーです。",
           "DEACTIVATED_ON": "無効化日",
-          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
-          "DELETE_TITLE": "Delete previous Web Key",
-          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
+          "DELETE_TITLE": "以前のWebキーを削除",
+          "DELETE_DESCRIPTION": "この以前のWebキーを削除すると、そのキーで署名されたすべてのトークンが無効になります。この操作は元に戻せません。"
         }
       },
       "MESSAGE_TEXTS": {

@@ -210,9 +210,8 @@
           "TITLE": "Kunci Web Sebelumnya",
           "DESCRIPTION": "Ini adalah kunci web sebelumnya yang tidak lagi aktif.",
           "DEACTIVATED_ON": "Dinonaktifkan pada",
-          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
-          "DELETE_TITLE": "Delete previous Web Key",
-          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
+          "DELETE_TITLE": "Hapus Kunci Web Sebelumnya",
+          "DELETE_DESCRIPTION": "Menghapus kunci web sebelumnya ini akan membatalkan semua token yang ditandatangani dengannya. Tindakan ini tidak dapat dibatalkan."
         }
       },
       "MESSAGE_TEXTS": {

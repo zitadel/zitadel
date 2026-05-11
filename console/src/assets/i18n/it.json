@@ -210,9 +210,8 @@
           "TITLE": "Chiavi Web Precedenti",
           "DESCRIPTION": "Queste sono le tue chiavi web precedenti che non sono più attive.",
           "DEACTIVATED_ON": "Disattivata il",
-          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
-          "DELETE_TITLE": "Delete previous Web Key",
-          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
+          "DELETE_TITLE": "Elimina chiave web precedente",
+          "DELETE_DESCRIPTION": "La rimozione di questa chiave web precedente invalida tutti i token firmati con essa. Questa azione non può essere annullata."
         }
       },
       "MESSAGE_TEXTS": {

@@ -210,9 +210,8 @@
           "TITLE": "Poprzednie Klucze Internetowe",
           "DESCRIPTION": "To są Twoje poprzednie klucze internetowe, które nie są już aktywne.",
           "DEACTIVATED_ON": "Dezaktywowany dnia",
-          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
-          "DELETE_TITLE": "Delete previous Web Key",
-          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
+          "DELETE_TITLE": "Usuń poprzedni klucz internetowy",
+          "DELETE_DESCRIPTION": "Usunięcie tego poprzedniego klucza internetowego unieważnia wszystkie tokeny, które zostały nim podpisane. Tej akcji nie można cofnąć."
         }
       },
       "MESSAGE_TEXTS": {

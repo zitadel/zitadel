@@ -210,9 +210,8 @@
           "TITLE": "先前的 Web 密钥",
           "DESCRIPTION": "这些是您之前使用但不再活动的 Web 密钥。",
           "DEACTIVATED_ON": "停用时间",
-          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
-          "DELETE_TITLE": "Delete previous Web Key",
-          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
+          "DELETE_TITLE": "删除先前的 Web 密钥",
+          "DELETE_DESCRIPTION": "删除此前的 Web 密钥会使所有使用该密钥签名的令牌失效。此操作无法撤销。"
         }
       },
       "MESSAGE_TEXTS": {

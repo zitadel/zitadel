@@ -210,9 +210,8 @@
           "TITLE": "Попередні веб-ключі",
           "DESCRIPTION": "Це ваші попередні веб-ключі, які більше не активні.",
           "DEACTIVATED_ON": "Деактивовано",
-          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
-          "DELETE_TITLE": "Delete previous Web Key",
-          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
+          "DELETE_TITLE": "Видалити попередній веб-ключ",
+          "DELETE_DESCRIPTION": "Видалення цього попереднього веб-ключа зробить недійсними всі токени, підписані ним. Цю дію не можна скасувати."
         }
       },
       "MESSAGE_TEXTS": {

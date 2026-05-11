@@ -210,9 +210,8 @@
           "TITLE": "Korábbi Webkulcsok",
           "DESCRIPTION": "Ezek a korábbi webkulcsai, amelyek már nem aktívak.",
           "DEACTIVATED_ON": "Deaktiválva ekkor",
-          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
-          "DELETE_TITLE": "Delete previous Web Key",
-          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
+          "DELETE_TITLE": "Korábbi webkulcs törlése",
+          "DELETE_DESCRIPTION": "Ennek a korábbi webkulcsnak az eltávolítása érvényteleníti az összes tokent, amelyet azzal írtak alá. Ez a művelet nem vonható vissza."
         }
       },
       "MESSAGE_TEXTS": {

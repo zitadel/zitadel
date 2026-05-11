@@ -210,9 +210,8 @@
           "TITLE": "Vorige Websleutels",
           "DESCRIPTION": "Dit zijn je vorige websleutels die niet langer actief zijn.",
           "DEACTIVATED_ON": "Gedeactiveerd op",
-          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
-          "DELETE_TITLE": "Delete previous Web Key",
-          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
+          "DELETE_TITLE": "Vorige websleutel verwijderen",
+          "DELETE_DESCRIPTION": "Het verwijderen van deze vorige websleutel maakt alle tokens ongeldig die ermee zijn ondertekend. Deze actie kan niet ongedaan worden gemaakt."
         }
       },
       "MESSAGE_TEXTS": {

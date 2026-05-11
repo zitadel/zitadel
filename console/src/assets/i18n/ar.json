@@ -210,9 +210,8 @@
           "TITLE": "مفاتيح الويب السابقة",
           "DESCRIPTION": "مفاتيح الويب السابقة التي لم تعد نشطة.",
           "DEACTIVATED_ON": "تم التعطيل في",
-          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
-          "DELETE_TITLE": "Delete previous Web Key",
-          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
+          "DELETE_TITLE": "حذف مفتاح ويب سابق",
+          "DELETE_DESCRIPTION": "تؤدي إزالة مفتاح الويب السابق هذا إلى إبطال جميع الرموز المميزة التي تم توقيعها به. لا يمكن التراجع عن هذا الإجراء."
         }
       },
       "MESSAGE_TEXTS": {

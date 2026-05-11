@@ -210,9 +210,8 @@
           "TITLE": "Frühere Web Keys",
           "DESCRIPTION": "Dies sind deine früheren Web Keys, die nicht mehr aktiv sind.",
           "DEACTIVATED_ON": "Deaktiviert am",
-          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
-          "DELETE_TITLE": "Delete previous Web Key",
-          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
+          "DELETE_TITLE": "Früheren Web Key löschen",
+          "DELETE_DESCRIPTION": "Wenn du diesen früheren Web Key entfernst, werden alle Tokens ungültig, die damit signiert wurden. Diese Aktion kann nicht rückgängig gemacht werden."
         }
       },
       "MESSAGE_TEXTS": {

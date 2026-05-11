@@ -210,9 +210,8 @@
           "TITLE": "Претходни веб-клучеви",
           "DESCRIPTION": "Ова се вашите претходни веб-клучеви кои повеќе не се активни.",
           "DEACTIVATED_ON": "Деактивиран на",
-          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
-          "DELETE_TITLE": "Delete previous Web Key",
-          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
+          "DELETE_TITLE": "Избриши претходен веб-клуч",
+          "DELETE_DESCRIPTION": "Отстранувањето на овој претходен веб-клуч ги поништува сите токени потпишани со него. Ова дејство не може да се врати."
         }
       },
       "MESSAGE_TEXTS": {
