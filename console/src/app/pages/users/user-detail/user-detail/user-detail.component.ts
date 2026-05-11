@@ -483,16 +483,18 @@ export class UserDetailComponent implements OnInit {
       width: '400px',
     });
 
-    const { value, isVerified } = (await lastValueFrom(dialogRefEmail.afterClosed())) ?? {};
+    const { value, isVerified } = (await lastValueFrom(dialogRefEmail.afterClosed())) ?? { isVerified: false };
     if (!value) {
       return;
     }
 
     try {
-      await this.userService.setEmail({
+      await this.userService.updateUser({
         userId: user.userId,
-        email: value,
-        verification: isVerified ? { case: 'isVerified', value: isVerified } : { case: undefined },
+        email: {
+          email: value,
+          verification: { case: 'isVerified', value: isVerified },
+        },
       });
       this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
       this.refreshChanges$.emit();
