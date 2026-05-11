@@ -466,7 +466,7 @@ export class UserDetailComponent implements OnInit {
   }
 
   private async openEditEmailDialog(user: UserWithHumanType) {
-    const data: EditDialogData = {
+    const data = {
       confirmKey: 'ACTIONS.SAVE',
       cancelKey: 'ACTIONS.CANCEL',
       labelKey: 'ACTIONS.NEWVALUE',
@@ -476,7 +476,7 @@ export class UserDetailComponent implements OnInit {
       isVerifiedTextDescKey: 'USER.LOGINMETHODS.EMAIL.ISVERIFIEDDESC',
       value: user.type.value?.email?.email,
       type: EditDialogType.EMAIL,
-    } as const;
+    } as const satisfies EditDialogData;
 
     const dialogRefEmail = this.dialog.open<EditDialogComponent, EditDialogData, EditDialogResult>(EditDialogComponent, {
       data,
@@ -515,7 +515,8 @@ export class UserDetailComponent implements OnInit {
       value: user.type.value.phone?.phone,
       type: EditDialogType.PHONE,
       validator: Validators.compose([phoneValidator, requiredValidator]) ?? undefined,
-    };
+    } as const satisfies EditDialogData;
+
     const dialogRefPhone = this.dialog.open<EditDialogComponent, EditDialogData, EditDialogResult>(EditDialogComponent, {
       data,
       width: '400px',

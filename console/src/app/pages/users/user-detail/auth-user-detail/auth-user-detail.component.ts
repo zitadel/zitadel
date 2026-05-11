@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
-import { defer, EMPTY, lastValueFrom, Observable, of, shareReplay, Subject, switchMap } from 'rxjs';
+import { defer, EMPTY, firstValueFrom, lastValueFrom, Observable, of, shareReplay, Subject, switchMap } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { InfoDialogComponent, InfoDialogData, InfoDialogResult } from 'src/app/modules/info-dialog/info-dialog.component';
@@ -263,8 +263,7 @@ export class AuthUserDetailComponent implements OnInit {
 
     try {
       await this.newAuthService.addMyAuthFactorOTPSMS();
-      const msg = await lastValueFrom(this.translate.get('USER.MFA.OTPSMSSUCCESS'));
-      this.toast.showInfo(msg);
+      this.toast.showInfo('USER.MFA.OTPSMSSUCCESS', true);
     } catch (error) {
       this.toast.showError(error);
     }
@@ -307,11 +306,9 @@ export class AuthUserDetailComponent implements OnInit {
   public async openEditDialog(user: UserWithHumanType, type: EditDialogType) {
     switch (type) {
       case EditDialogType.PHONE:
-        await this.openEditPhoneDialog(user);
-        return;
+        return this.openEditPhoneDialog(user);
       case EditDialogType.EMAIL:
-        await this.openEditEmailDialog(user);
-        return;
+        return this.openEditEmailDialog(user);
     }
   }
 
@@ -324,7 +321,7 @@ export class AuthUserDetailComponent implements OnInit {
       descriptionKey: 'USER.LOGINMETHODS.EMAIL.EDITDESC',
       value: user.type.value?.email?.email,
       type: EditDialogType.EMAIL,
-    } as const;
+    } as const satisfies EditDialogData;
 
     const dialogRefEmail = this.dialog.open<EditDialogComponent, EditDialogData, EditDialogResult>(EditDialogComponent, {
       data,
@@ -415,7 +412,7 @@ export class AuthUserDetailComponent implements OnInit {
         value: Buffer.from(value),
         id: user.userId,
       });
-    const removeFcn = (key: string): Promise<any> => this.newMgmtService.removeUserMetadata({ key, id: user.userId });
+    const removeFcn = (key: string) => this.newMgmtService.removeUserMetadata({ key, id: user.userId });
 
     const dialogRef = this.dialog.open<MetadataDialogComponent, MetadataDialogData>(MetadataDialogComponent, {
       data: {
@@ -428,8 +425,6 @@ export class AuthUserDetailComponent implements OnInit {
     await lastValueFrom(dialogRef.afterClosed());
     this.refreshMetadata$.next(true);
   }
-
-  protected readonly query = query;
 
   public humanUser(user: User | undefined): UserWithHumanType | undefined {
     if (user?.type.case === 'human') {
