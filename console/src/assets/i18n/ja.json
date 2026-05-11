@@ -209,7 +209,10 @@
         "PREVIOUS_TABLE": {
           "TITLE": "以前のWebキー",
           "DESCRIPTION": "これらは、すでに無効になった以前のWebキーです。",
-          "DEACTIVATED_ON": "無効化日"
+          "DEACTIVATED_ON": "無効化日",
+          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
+          "DELETE_TITLE": "Delete previous Web Key",
+          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
         }
       },
       "MESSAGE_TEXTS": {

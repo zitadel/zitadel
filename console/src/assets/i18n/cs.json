@@ -209,7 +209,10 @@
         "PREVIOUS_TABLE": {
           "TITLE": "Předchozí webové klíče",
           "DESCRIPTION": "Toto jsou vaše předchozí webové klíče, které již nejsou aktivní.",
-          "DEACTIVATED_ON": "Deaktivováno dne"
+          "DEACTIVATED_ON": "Deaktivováno dne",
+          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
+          "DELETE_TITLE": "Delete previous Web Key",
+          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
         }
       },
       "MESSAGE_TEXTS": {

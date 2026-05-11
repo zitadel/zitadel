@@ -209,7 +209,10 @@
         "PREVIOUS_TABLE": {
           "TITLE": "Frühere Web Keys",
           "DESCRIPTION": "Dies sind deine früheren Web Keys, die nicht mehr aktiv sind.",
-          "DEACTIVATED_ON": "Deaktiviert am"
+          "DEACTIVATED_ON": "Deaktiviert am",
+          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
+          "DELETE_TITLE": "Delete previous Web Key",
+          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
         }
       },
       "MESSAGE_TEXTS": {

@@ -129,11 +129,30 @@ export class OidcWebKeysComponent {
 
   protected async deleteWebKey(row: WebKey) {
     try {
+      if (row.state === State.INACTIVE && !(await this.openDeleteInactiveWebKeyDialog())) {
+        return;
+      }
+
       await this.webKeysService.DeleteWebKey(row.id);
       this.refresh.next(true);
     } catch (err) {
       this.toast.showError(err);
     }
+  }
+
+  private openDeleteInactiveWebKeyDialog() {
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.DELETE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.DELETE_TITLE',
+        descriptionKey: 'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.DELETE_DESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    const obs = dialogRef.afterClosed().pipe(map(Boolean), takeUntilDestroyed(this.destroyRef));
+    return firstValueFrom(obs);
   }
 
   protected async activateWebKey(nextWebKey: WebKey) {

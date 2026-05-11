@@ -209,7 +209,10 @@
         "PREVIOUS_TABLE": {
           "TITLE": "Poprzednie Klucze Internetowe",
           "DESCRIPTION": "To są Twoje poprzednie klucze internetowe, które nie są już aktywne.",
-          "DEACTIVATED_ON": "Dezaktywowany dnia"
+          "DEACTIVATED_ON": "Dezaktywowany dnia",
+          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
+          "DELETE_TITLE": "Delete previous Web Key",
+          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
         }
       },
       "MESSAGE_TEXTS": {

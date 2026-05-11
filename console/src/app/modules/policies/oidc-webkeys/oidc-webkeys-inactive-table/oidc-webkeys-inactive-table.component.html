@@ -3,6 +3,9 @@
   [description]="'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.DESCRIPTION' | translate"
 >
   <cnsl-refresh-table [hideRefresh]="true" [loading]="(dataSource$ | async) === null">
+    <p class="cnsl-secondary-text">
+      {{ 'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.DELETE_INFO' | translate }}
+    </p>
     <div class="table-wrapper">
       @if (dataSource$ | async; as dataSource) {
         <table mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
@@ -26,8 +29,24 @@
               {{ row.key.case | uppercase }}
             </td>
           </ng-container>
-          <tr mat-header-row *matHeaderRowDef="['timestamp', 'id', 'type']"></tr>
-          <tr mat-row *matRowDef="let row; columns: ['timestamp', 'id', 'type']"></tr>
+          <ng-container matColumnDef="actions" stickyEnd>
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *cnslCellDef="let row; dataSource: dataSource">
+              <cnsl-table-actions>
+                <button
+                  actions
+                  matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+                  color="warn"
+                  (click)="delete.emit(row)"
+                  mat-icon-button
+                >
+                  <i class="las la-trash"></i>
+                </button>
+              </cnsl-table-actions>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="['timestamp', 'id', 'type', 'actions']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['timestamp', 'id', 'type', 'actions']"></tr>
         </table>
       }
     </div>

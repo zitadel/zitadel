@@ -209,7 +209,10 @@
         "PREVIOUS_TABLE": {
           "TITLE": "Chei Web Anterioare",
           "DESCRIPTION": "Acestea sunt cheile tale web anterioare care nu mai sunt active.",
-          "DEACTIVATED_ON": "Dezactivată pe"
+          "DEACTIVATED_ON": "Dezactivată pe",
+          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
+          "DELETE_TITLE": "Delete previous Web Key",
+          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
         }
       },
       "MESSAGE_TEXTS": {

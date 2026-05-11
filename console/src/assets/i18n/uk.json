@@ -209,7 +209,10 @@
         "PREVIOUS_TABLE": {
           "TITLE": "Попередні веб-ключі",
           "DESCRIPTION": "Це ваші попередні веб-ключі, які більше не активні.",
-          "DEACTIVATED_ON": "Деактивовано"
+          "DEACTIVATED_ON": "Деактивовано",
+          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
+          "DELETE_TITLE": "Delete previous Web Key",
+          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
         }
       },
       "MESSAGE_TEXTS": {

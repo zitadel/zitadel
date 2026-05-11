@@ -209,7 +209,10 @@
         "PREVIOUS_TABLE": {
           "TITLE": "이전 웹 키",
           "DESCRIPTION": "더 이상 활성 상태가 아닌 이전 웹 키 목록입니다.",
-          "DEACTIVATED_ON": "비활성화된 날짜"
+          "DEACTIVATED_ON": "비활성화된 날짜",
+          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
+          "DELETE_TITLE": "Delete previous Web Key",
+          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
         }
       },
       "MESSAGE_TEXTS": {

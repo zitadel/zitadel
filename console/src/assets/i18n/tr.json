@@ -209,7 +209,10 @@
         "PREVIOUS_TABLE": {
           "TITLE": "Önceki Web Anahtarları",
           "DESCRIPTION": "Bunlar artık aktif olmayan önceki web anahtarlarınızdır.",
-          "DEACTIVATED_ON": "Devre dışı bırakıldığı tarih"
+          "DEACTIVATED_ON": "Devre dışı bırakıldığı tarih",
+          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
+          "DELETE_TITLE": "Delete previous Web Key",
+          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
         }
       },
       "MESSAGE_TEXTS": {

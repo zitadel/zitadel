@@ -209,7 +209,10 @@
         "PREVIOUS_TABLE": {
           "TITLE": "مفاتيح الويب السابقة",
           "DESCRIPTION": "مفاتيح الويب السابقة التي لم تعد نشطة.",
-          "DEACTIVATED_ON": "تم التعطيل في"
+          "DEACTIVATED_ON": "تم التعطيل في",
+          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
+          "DELETE_TITLE": "Delete previous Web Key",
+          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
         }
       },
       "MESSAGE_TEXTS": {

@@ -209,7 +209,10 @@
         "PREVIOUS_TABLE": {
           "TITLE": "Претходни веб-клучеви",
           "DESCRIPTION": "Ова се вашите претходни веб-клучеви кои повеќе не се активни.",
-          "DEACTIVATED_ON": "Деактивиран на"
+          "DEACTIVATED_ON": "Деактивиран на",
+          "DELETE_INFO": "Removing a previous web key invalidates all tokens that were signed with it.",
+          "DELETE_TITLE": "Delete previous Web Key",
+          "DELETE_DESCRIPTION": "Removing this previous web key invalidates all tokens that were signed with it. This action cannot be undone."
         }
       },
       "MESSAGE_TEXTS": {
