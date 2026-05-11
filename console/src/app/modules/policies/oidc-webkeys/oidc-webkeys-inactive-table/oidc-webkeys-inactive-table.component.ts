@@ -1,6 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { ReplaySubject } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { ChangeDetectionStrategy, Component, effect, input, output } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { WebKey } from '@zitadel/proto/zitadel/webkey/v2/key_pb';
 
@@ -11,17 +9,18 @@ import { WebKey } from '@zitadel/proto/zitadel/webkey/v2/key_pb';
   standalone: false,
 })
 export class OidcWebKeysInactiveTableComponent {
-  @Output()
-  public readonly delete = new EventEmitter<WebKey>();
+  public readonly delete = output<WebKey>();
 
-  @Input({ required: true })
-  public set inactiveWebKeys(webKeys: WebKey[] | null) {
-    this.inactiveWebKeys$.next(webKeys);
+  public inactiveWebKeys = input.required<WebKey[] | null>();
+
+  protected dataSource = new MatTableDataSource<WebKey>([]);
+
+  constructor() {
+    effect(() => {
+      const inactiveWebKeys = this.inactiveWebKeys();
+      if (inactiveWebKeys) {
+        this.dataSource.data = inactiveWebKeys;
+      }
+    });
   }
-
-  private inactiveWebKeys$ = new ReplaySubject<WebKey[] | null>(1);
-  protected dataSource$ = this.inactiveWebKeys$.pipe(
-    filter(Boolean),
-    map((webKeys) => new MatTableDataSource(webKeys)),
-  );
 }
