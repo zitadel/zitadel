@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildCSP } from "./lib/csp";
+import { applyCustomHeaders } from "./lib/custom-headers";
 import { createLogger } from "./lib/logger";
 import { getIframeOrigins } from "./lib/server/security-settings";
 import { getServiceConfig } from "./lib/service-url";
@@ -76,6 +77,12 @@ export async function proxy(request: NextRequest) {
   if (instanceHost) {
     requestHeaders.set("x-zitadel-instance-host", instanceHost);
   }
+
+  // Apply headers from CUSTOM_REQUEST_HEADERS environment variable
+  applyCustomHeaders({
+    set: (key, value) => requestHeaders.set(key, value),
+    remove: (key) => requestHeaders.delete(key),
+  });
 
   responseHeaders.set("Access-Control-Allow-Origin", "*");
   responseHeaders.set("Access-Control-Allow-Headers", "*");
