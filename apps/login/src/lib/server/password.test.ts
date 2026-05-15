@@ -1,5 +1,7 @@
+import { Code, ConnectError } from "@connectrpc/connect";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import { ClassifiedConnectError } from "../grpc/interceptors/error-classification";
 import { changePassword, checkSessionAndSetPassword, resetPassword, sendPassword } from "./password";
 
 // Mock dependencies
@@ -273,8 +275,12 @@ describe("checkSessionAndSetPassword", () => {
   });
 
   test("should handle setPassword failure with failed precondition", async () => {
-    const { ConnectError } = await import("@zitadel/client");
-    mockSetPassword.mockRejectedValue(new ConnectError("User is not yet initialized", 9));
+    // Use real ConnectError + ClassifiedConnectError to match runtime behavior
+    // where the error-classification interceptor wraps transport errors.
+    const classifiedError = new ClassifiedConnectError(
+      new ConnectError("User is not yet initialized", Code.FailedPrecondition),
+    );
+    mockSetPassword.mockRejectedValue(classifiedError);
 
     const result = await checkSessionAndSetPassword({
       sessionId: "session123",

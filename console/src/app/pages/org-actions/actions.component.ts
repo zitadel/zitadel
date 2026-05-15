@@ -21,7 +21,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   standalone: false,
 })
 export class ActionsComponent {
-  protected flow!: Flow.AsObject;
+  protected flow?: Flow.AsObject;
 
   protected typeControl: UntypedFormControl = new UntypedFormControl();
 
@@ -124,23 +124,23 @@ export class ActionsComponent {
     });
   }
 
-  drop(triggerActionsListIndex: number, array: any[], event: CdkDragDrop<Action.AsObject[]>) {
+  drop(flow: Flow.AsObject, triggerActionsListIndex: number, array: any[], event: CdkDragDrop<Action.AsObject[]>) {
     moveItemInArray(array, event.previousIndex, event.currentIndex);
-    this.saveFlow(triggerActionsListIndex);
+    this.saveFlow(flow, triggerActionsListIndex);
   }
 
-  saveFlow(index: number) {
+  saveFlow(flow: Flow.AsObject, index: number) {
     if (
-      this.flow.type &&
-      this.flow.triggerActionsList &&
-      this.flow.triggerActionsList[index] &&
-      this.flow.triggerActionsList[index]?.triggerType
+      flow.type &&
+      flow.triggerActionsList &&
+      flow.triggerActionsList[index] &&
+      flow.triggerActionsList[index]?.triggerType
     ) {
       this.mgmtService
         .setTriggerActions(
-          this.flow.triggerActionsList[index].actionsList.map((action) => action.id),
-          this.flow.type.id,
-          this.flow.triggerActionsList[index].triggerType?.id ?? '',
+          flow.triggerActionsList[index].actionsList.map((action) => action.id),
+          flow.type.id,
+          flow.triggerActionsList[index].triggerType?.id ?? '',
         )
         .then(() => {
           this.toast.showInfo('FLOWS.TOAST.ACTIONSSET', true);
@@ -151,8 +151,8 @@ export class ActionsComponent {
     }
   }
 
-  protected removeTriggerActionsList(index: number) {
-    if (this.flow.type && this.flow.triggerActionsList && this.flow.triggerActionsList[index]) {
+  protected removeTriggerActionsList(flow: Flow.AsObject, index: number) {
+    if (flow.type && flow.triggerActionsList && flow.triggerActionsList[index]) {
       const dialogRef = this.dialog.open(WarnDialogComponent, {
         data: {
           confirmKey: 'ACTIONS.CLEAR',
@@ -166,10 +166,10 @@ export class ActionsComponent {
       dialogRef.afterClosed().subscribe((resp) => {
         if (resp) {
           this.mgmtService
-            .setTriggerActions([], this.flow?.type?.id ?? '', this.flow.triggerActionsList[index].triggerType?.id ?? '')
+            .setTriggerActions([], flow?.type?.id ?? '', flow.triggerActionsList[index].triggerType?.id ?? '')
             .then(() => {
               this.toast.showInfo('FLOWS.TOAST.ACTIONSSET', true);
-              this.loadFlow(this.flow?.type?.id ?? '');
+              this.loadFlow(flow?.type?.id ?? '');
             })
             .catch((error) => {
               this.toast.showError(error);

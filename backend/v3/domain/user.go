@@ -225,7 +225,7 @@ type IdentityProviderLink struct {
 	UpdatedAt time.Time `json:"updatedAt,omitzero" db:"-"`
 }
 
-//go:generate enumer -type UserType -transform lower -trimprefix UserType
+//go:generate enumer -type UserType -transform lower -trimprefix UserType -sql
 
 type UserType uint8
 

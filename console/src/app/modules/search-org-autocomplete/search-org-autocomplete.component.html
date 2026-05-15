@@ -1,36 +1,57 @@
 <form>
-  <cnsl-form-field class="full-width">
+  <cnsl-form-field>
     <cnsl-label>{{ 'PROJECT.GRANT.CREATE.SEL_ORG_FORMFIELD' | translate }}</cnsl-label>
-    <input
-      cnslInput
-      type="text"
-      placeholder="Organization XY"
-      #nameInput
-      [formControl]="myControl"
-      [matAutocomplete]="auto"
-      data-e2e="add-org-input"
-    />
-
-    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayFn">
-      @if (isLoading) {
-        <mat-option class="is-loading">
-          <mat-spinner diameter="30"></mat-spinner>
-        </mat-option>
+    <span class="tw:relative">
+      <input
+        cnslInput
+        type="text"
+        class="tw:max-w-125"
+        [class.tw:pr-9]="query.isFetching()"
+        [matAutocomplete]="auto"
+        [formControl]="searchControl"
+        name="name"
+        data-e2e="add-org-input"
+        #input
+        (keyup)="searchSignal.set(input.value)"
+      />
+      @if (query.isFetching()) {
+        <span class="tw:absolute tw:inset-2 tw:flex tw:items-center tw:justify-end">
+          <mat-spinner diameter="25" color="primary"></mat-spinner>
+        </span>
       }
-      @for (org of filteredOrgs; track org) {
-        <mat-option [value]="org">
-          <div class="org-option" data-e2e="org-option">
-            <div class="org-option-column">
-              <span>{{ org.name }}</span>
-              <span class="fill-space"></span>
-              <span class="smaller cnsl-secondary-text">{{ org.primaryDomain }}</span>
-            </div>
-          </div>
-        </mat-option>
-      }
-    </mat-autocomplete>
-    <span class="org-autocomplete-target-desc">
-      {{ 'PROJECT.GRANT.CREATE.SEL_ORG_DESC' | translate }}
     </span>
+    <mat-autocomplete
+      #auto="matAutocomplete"
+      [displayWith]="displayOrg"
+      [requireSelection]="true"
+      [autoActiveFirstOption]="true"
+      (optionSelected)="searchControl.value && selectionChanged.emit(searchControl.value)"
+    >
+      <div cnslScrollable class="tw:overflow-y-scroll tw:max-h-full" (scrollPosition)="onScroll($event)">
+        @for (page of query.data()?.pages; track $index) {
+          @for (org of page.result; track org.id) {
+            <mat-option
+              class="tw:max-w-full tw:relative"
+              [value]="org"
+              data-e2e="org-option"
+              [matTooltip]="org.name"
+              (mouseenter)="showTooltip.set(name.scrollWidth > name.clientWidth)"
+              (mouseleave)="showTooltip.set(false)"
+              [matTooltipDisabled]="!showTooltip()"
+            >
+              <div
+                class="tw:absolute tw:inset-0 tw:flex tw:h-full tw:w-full tw:min-w-0 tw:flex-col tw:justify-center"
+                data-e2e="org-option"
+              >
+                <span #name class="tw:block tw:mr-4 tw:ml-4 tw:truncate">{{ org.name }}</span>
+                <span class="tw:block tw:mr-4 tw:ml-4 tw:truncate tw:text-[13px] tw:text-gray-500">{{
+                  org.primaryDomain
+                }}</span>
+              </div>
+            </mat-option>
+          }
+        }
+      </div>
+    </mat-autocomplete>
   </cnsl-form-field>
 </form>
