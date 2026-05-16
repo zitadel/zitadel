@@ -24,6 +24,7 @@ type PasswordComplexityPolicyWriteModel struct {
 	HasUppercase bool
 	HasNumber    bool
 	HasSymbol    bool
+	HistoryCount uint64
 	State        domain.PolicyState
 }
 
@@ -36,6 +37,7 @@ func (wm *PasswordComplexityPolicyWriteModel) Reduce() error {
 			wm.HasUppercase = e.HasUppercase
 			wm.HasNumber = e.HasNumber
 			wm.HasSymbol = e.HasSymbol
+			wm.HistoryCount = e.HistoryCount
 			wm.State = domain.PolicyStateActive
 		case *policy.PasswordComplexityPolicyChangedEvent:
 			if e.MinLength != nil {
@@ -52,6 +54,9 @@ func (wm *PasswordComplexityPolicyWriteModel) Reduce() error {
 			}
 			if e.HasSymbol != nil {
 				wm.HasSymbol = *e.HasSymbol
+			}
+			if e.HistoryCount != nil {
+				wm.HistoryCount = *e.HistoryCount
 			}
 		case *policy.PasswordComplexityPolicyRemovedEvent:
 			wm.State = domain.PolicyStateRemoved

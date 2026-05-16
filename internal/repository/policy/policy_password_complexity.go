@@ -19,6 +19,7 @@ type PasswordComplexityPolicyAddedEvent struct {
 	HasUppercase bool   `json:"hasUppercase,omitempty"`
 	HasNumber    bool   `json:"hasNumber,omitempty"`
 	HasSymbol    bool   `json:"hasSymbol,omitempty"`
+	HistoryCount uint64 `json:"historyCount,omitempty"`
 }
 
 func (e *PasswordComplexityPolicyAddedEvent) Payload() interface{} {
@@ -36,6 +37,7 @@ func NewPasswordComplexityPolicyAddedEvent(
 	hasUpperCase,
 	hasNumber,
 	hasSymbol bool,
+	historyCount uint64,
 ) *PasswordComplexityPolicyAddedEvent {
 	return &PasswordComplexityPolicyAddedEvent{
 		BaseEvent:    *base,
@@ -44,6 +46,7 @@ func NewPasswordComplexityPolicyAddedEvent(
 		HasUppercase: hasUpperCase,
 		HasNumber:    hasNumber,
 		HasSymbol:    hasSymbol,
+		HistoryCount: historyCount,
 	}
 }
 
@@ -68,6 +71,7 @@ type PasswordComplexityPolicyChangedEvent struct {
 	HasUppercase *bool   `json:"hasUppercase,omitempty"`
 	HasNumber    *bool   `json:"hasNumber,omitempty"`
 	HasSymbol    *bool   `json:"hasSymbol,omitempty"`
+	HistoryCount *uint64 `json:"historyCount,omitempty"`
 }
 
 func (e *PasswordComplexityPolicyChangedEvent) Payload() interface{} {
@@ -123,6 +127,12 @@ func ChangeHasNumber(hasNumber bool) func(*PasswordComplexityPolicyChangedEvent)
 func ChangeHasSymbol(hasSymbol bool) func(*PasswordComplexityPolicyChangedEvent) {
 	return func(e *PasswordComplexityPolicyChangedEvent) {
 		e.HasSymbol = &hasSymbol
+	}
+}
+
+func ChangeHistoryCount(historyCount uint64) func(*PasswordComplexityPolicyChangedEvent) {
+	return func(e *PasswordComplexityPolicyChangedEvent) {
+		e.HistoryCount = &historyCount
 	}
 }
 

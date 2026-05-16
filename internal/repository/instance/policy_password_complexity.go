@@ -24,6 +24,7 @@ func NewPasswordComplexityPolicyAddedEvent(
 	hasUppercase,
 	hasNumber,
 	hasSymbol bool,
+	historyCount uint64,
 ) *PasswordComplexityPolicyAddedEvent {
 	return &PasswordComplexityPolicyAddedEvent{
 		PasswordComplexityPolicyAddedEvent: *policy.NewPasswordComplexityPolicyAddedEvent(
@@ -35,7 +36,8 @@ func NewPasswordComplexityPolicyAddedEvent(
 			hasLowercase,
 			hasUppercase,
 			hasNumber,
-			hasSymbol),
+			hasSymbol,
+			historyCount),
 	}
 }
 

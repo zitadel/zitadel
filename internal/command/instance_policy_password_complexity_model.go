@@ -59,6 +59,7 @@ func (wm *InstancePasswordComplexityPolicyWriteModel) NewChangedEvent(
 	hasUppercase,
 	hasNumber,
 	hasSymbol bool,
+	historyCount uint64,
 ) (*instance.PasswordComplexityPolicyChangedEvent, bool) {
 
 	changes := make([]policy.PasswordComplexityPolicyChanges, 0)
@@ -76,6 +77,9 @@ func (wm *InstancePasswordComplexityPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.HasSymbol != hasSymbol {
 		changes = append(changes, policy.ChangeHasSymbol(hasSymbol))
+	}
+	if wm.HistoryCount != historyCount {
+		changes = append(changes, policy.ChangeHistoryCount(historyCount))
 	}
 	if len(changes) == 0 {
 		return nil, false
