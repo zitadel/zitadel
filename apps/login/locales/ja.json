@@ -145,7 +145,8 @@
       "hasLowercase": "小文字を含める必要があります。",
       "equals": "パスワード確認が一致しました。",
       "matches": "一致します",
-      "doesNotMatch": "一致しません"
+      "doesNotMatch": "一致しません",
+      "historyHint": "You can't reuse your last {count} {count, plural, one {password} other {passwords}}."
     }
   },
   "idp": {

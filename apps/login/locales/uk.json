@@ -132,7 +132,8 @@
       "hasLowercase": "Повинен містити малу літеру.",
       "equals": "Підтвердження пароля збігається.",
       "matches": "Збігається",
-      "doesNotMatch": "Не збігається"
+      "doesNotMatch": "Не збігається",
+      "historyHint": "You can't reuse your last {count} {count, plural, one {password} other {passwords}}."
     },
     "errors": {
       "noHostFound": "Хост не знайдено",

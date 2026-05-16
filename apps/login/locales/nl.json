@@ -132,7 +132,8 @@
       "hasLowercase": "Moet een kleine letter bevatten.",
       "equals": "Wachtwoordbevestiging komt overeen.",
       "matches": "Komt overeen",
-      "doesNotMatch": "Komt niet overeen"
+      "doesNotMatch": "Komt niet overeen",
+      "historyHint": "You can't reuse your last {count} {count, plural, one {password} other {passwords}}."
     },
     "errors": {
       "noHostFound": "Geen host gevonden",

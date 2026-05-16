@@ -132,7 +132,8 @@
       "hasLowercase": "Must include a lowercase letter.",
       "equals": "Password confirmation matched.",
       "matches": "Matches",
-      "doesNotMatch": "Doesn't match"
+      "doesNotMatch": "Doesn't match",
+      "historyHint": "You can't reuse your last {count} {count, plural, one {password} other {passwords}}."
     },
     "errors": {
       "noHostFound": "No host found",

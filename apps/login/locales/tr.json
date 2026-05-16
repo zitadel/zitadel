@@ -132,7 +132,8 @@
       "hasLowercase": "Bir küçük harf içermelidir.",
       "equals": "Şifre onayı eşleşti.",
       "matches": "Eşleşiyor",
-      "doesNotMatch": "Eşleşmiyor"
+      "doesNotMatch": "Eşleşmiyor",
+      "historyHint": "You can't reuse your last {count} {count, plural, one {password} other {passwords}}."
     },
     "errors": {
       "noHostFound": "Host bulunamadı",

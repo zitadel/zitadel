@@ -132,7 +132,8 @@
       "hasLowercase": "Doit inclure une lettre minuscule.",
       "equals": "La confirmation du mot de passe correspond.",
       "matches": "Correspond",
-      "doesNotMatch": "Ne correspond pas"
+      "doesNotMatch": "Ne correspond pas",
+      "historyHint": "You can't reuse your last {count} {count, plural, one {password} other {passwords}}."
     },
     "errors": {
       "noHostFound": "Aucun hôte trouvé",

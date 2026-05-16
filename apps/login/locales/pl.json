@@ -132,7 +132,8 @@
       "hasLowercase": "Musi zawierać małą literę.",
       "equals": "Potwierdzenie hasła pasuje.",
       "matches": "Pasuje",
-      "doesNotMatch": "Nie pasuje"
+      "doesNotMatch": "Nie pasuje",
+      "historyHint": "You can't reuse your last {count} {count, plural, one {password} other {passwords}}."
     },
     "errors": {
       "noHostFound": "Nie znaleziono hosta",

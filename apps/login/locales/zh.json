@@ -132,7 +132,8 @@
       "hasLowercase": "必须包含一个小写字母。",
       "equals": "密码确认匹配。",
       "matches": "匹配",
-      "doesNotMatch": "不匹配"
+      "doesNotMatch": "不匹配",
+      "historyHint": "You can't reuse your last {count} {count, plural, one {password} other {passwords}}."
     },
     "errors": {
       "noHostFound": "未找到主机",

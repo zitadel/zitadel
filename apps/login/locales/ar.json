@@ -133,7 +133,8 @@
       "hasLowercase": "يجب أن تتضمن حرفاً صغيراً.",
       "equals": "تأكيد كلمة المرور متطابق.",
       "matches": "مطابق",
-      "doesNotMatch": "غير مطابق"
+      "doesNotMatch": "غير مطابق",
+      "historyHint": "You can't reuse your last {count} {count, plural, one {password} other {passwords}}."
     },
     "errors": {
       "noHostFound": "لم يتم العثور على مضيف",

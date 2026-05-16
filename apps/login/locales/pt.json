@@ -132,7 +132,8 @@
       "hasLowercase": "Deve incluir uma letra minúscula.",
       "equals": "A confirmação de senha coincide.",
       "matches": "Coincide",
-      "doesNotMatch": "Não coincide"
+      "doesNotMatch": "Não coincide",
+      "historyHint": "You can't reuse your last {count} {count, plural, one {password} other {passwords}}."
     },
     "errors": {
       "noHostFound": "Nenhum host encontrado",
