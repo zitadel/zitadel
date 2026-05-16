@@ -156,6 +156,7 @@ Errors:
       NotSet: "User has not set a password"
       NotChanged: "New password cannot be the same as your current password"
       NotSupported: "Password hash encoding not supported. Check out https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"
+      Reused: "Password recently used, choose another"
     PasswordComplexityPolicy:
       NotFound: "Password policy not found"
       MinLength: "Password is too short"

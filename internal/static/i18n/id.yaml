@@ -154,6 +154,7 @@ Errors:
       NotSet: "Pengguna belum menetapkan kata sandi"
       NotChanged: "Kata sandi baru tidak boleh sama dengan kata sandi Anda saat ini"
       NotSupported: "Pengkodean hash kata sandi tidak didukung. "
+      Reused: "Password recently used, choose another"
     PasswordComplexityPolicy:
       NotFound: "Kebijakan kata sandi tidak ditemukan"
       MinLength: "Kata sandi terlalu pendek"
