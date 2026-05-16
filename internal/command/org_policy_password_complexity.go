@@ -61,7 +61,8 @@ func (c *Commands) AddPasswordComplexityPolicy(ctx context.Context, resourceOwne
 			policy.HasLowercase,
 			policy.HasUppercase,
 			policy.HasNumber,
-			policy.HasSymbol))
+			policy.HasSymbol,
+			policy.HistoryCount))
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +91,7 @@ func (c *Commands) ChangePasswordComplexityPolicy(ctx context.Context, resourceO
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PasswordComplexityPolicyWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol, policy.HistoryCount)
 	if !hasChanged {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "Org-DAs21", "Errors.Org.PasswordComplexityPolicy.NotChanged")
 	}

@@ -334,6 +334,7 @@ func setupInstanceElements(instanceAgg *instance.Aggregate, setup *InstanceSetup
 			setup.PasswordComplexityPolicy.HasUppercase,
 			setup.PasswordComplexityPolicy.HasNumber,
 			setup.PasswordComplexityPolicy.HasSymbol,
+			0,
 		),
 		prepareAddDefaultPasswordAgePolicy(
 			instanceAgg,

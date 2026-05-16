@@ -102,6 +102,7 @@ func writeModelToPasswordComplexityPolicy(wm *PasswordComplexityPolicyWriteModel
 		HasUppercase: wm.HasUppercase,
 		HasNumber:    wm.HasNumber,
 		HasSymbol:    wm.HasSymbol,
+		HistoryCount: wm.HistoryCount,
 	}
 }
 

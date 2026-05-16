@@ -29,6 +29,7 @@ const (
 	ComplexityPolicyHasUppercaseCol  = "has_uppercase"
 	ComplexityPolicyHasSymbolCol     = "has_symbol"
 	ComplexityPolicyHasNumberCol     = "has_number"
+	ComplexityPolicyHistoryCountCol  = "history_count"
 	ComplexityPolicyOwnerRemovedCol  = "owner_removed"
 )
 
@@ -58,6 +59,7 @@ func (*passwordComplexityProjection) Init() *old_handler.Check {
 			handler.NewColumn(ComplexityPolicyHasUppercaseCol, handler.ColumnTypeBool),
 			handler.NewColumn(ComplexityPolicyHasSymbolCol, handler.ColumnTypeBool),
 			handler.NewColumn(ComplexityPolicyHasNumberCol, handler.ColumnTypeBool),
+			handler.NewColumn(ComplexityPolicyHistoryCountCol, handler.ColumnTypeInt64, handler.Default(0)),
 			handler.NewColumn(ComplexityPolicyOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(ComplexityPolicyInstanceIDCol, ComplexityPolicyIDCol),
@@ -135,6 +137,7 @@ func (p *passwordComplexityProjection) reduceAdded(event eventstore.Event) (*han
 			handler.NewCol(ComplexityPolicyHasUppercaseCol, policyEvent.HasUppercase),
 			handler.NewCol(ComplexityPolicyHasSymbolCol, policyEvent.HasSymbol),
 			handler.NewCol(ComplexityPolicyHasNumberCol, policyEvent.HasNumber),
+			handler.NewCol(ComplexityPolicyHistoryCountCol, policyEvent.HistoryCount),
 			handler.NewCol(ComplexityPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
 			handler.NewCol(ComplexityPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 			handler.NewCol(ComplexityPolicyIsDefaultCol, isDefault),
@@ -169,6 +172,9 @@ func (p *passwordComplexityProjection) reduceChanged(event eventstore.Event) (*h
 	}
 	if policyEvent.HasNumber != nil {
 		cols = append(cols, handler.NewCol(ComplexityPolicyHasNumberCol, *policyEvent.HasNumber))
+	}
+	if policyEvent.HistoryCount != nil {
+		cols = append(cols, handler.NewCol(ComplexityPolicyHistoryCountCol, *policyEvent.HistoryCount))
 	}
 	return handler.NewUpdateStatement(
 		&policyEvent,

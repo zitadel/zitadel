@@ -12,9 +12,9 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddDefaultPasswordComplexityPolicy(ctx context.Context, minLength uint64, hasLowercase, hasUppercase, hasNumber, hasSymbol bool) (*domain.ObjectDetails, error) {
+func (c *Commands) AddDefaultPasswordComplexityPolicy(ctx context.Context, minLength uint64, hasLowercase, hasUppercase, hasNumber, hasSymbol bool, historyCount uint64) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultPasswordComplexityPolicy(instanceAgg, minLength, hasLowercase, hasUppercase, hasNumber, hasSymbol))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultPasswordComplexityPolicy(instanceAgg, minLength, hasLowercase, hasUppercase, hasNumber, hasSymbol, historyCount))
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (c *Commands) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, po
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.PasswordComplexityPolicyWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol, policy.HistoryCount)
 	if !hasChanged {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-9jlsf", "Errors.Instance.PasswordComplexityPolicy.NotChanged")
 	}
@@ -61,6 +61,7 @@ func prepareAddDefaultPasswordComplexityPolicy(
 	hasUppercase,
 	hasNumber,
 	hasSymbol bool,
+	historyCount uint64,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if minLength == 0 || minLength > 72 {
@@ -86,6 +87,7 @@ func prepareAddDefaultPasswordComplexityPolicy(
 					hasUppercase,
 					hasNumber,
 					hasSymbol,
+					historyCount,
 				),
 			}, nil
 		}, nil
