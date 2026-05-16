@@ -12,6 +12,7 @@ func AddPasswordComplexityPolicyToDomain(req *mgmt_pb.AddCustomPasswordComplexit
 		HasUppercase: req.HasUppercase,
 		HasNumber:    req.HasNumber,
 		HasSymbol:    req.HasSymbol,
+		HistoryCount: req.HistoryCount,
 	}
 }
 
@@ -22,5 +23,6 @@ func UpdatePasswordComplexityPolicyToDomain(req *mgmt_pb.UpdateCustomPasswordCom
 		HasUppercase: req.HasUppercase,
 		HasNumber:    req.HasNumber,
 		HasSymbol:    req.HasSymbol,
+		HistoryCount: req.HistoryCount,
 	}
 }
