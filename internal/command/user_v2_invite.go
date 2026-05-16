@@ -151,6 +151,8 @@ func (c *Commands) VerifyInviteCodeSetPassword(ctx context.Context, userID, code
 			"",
 			userAgentID,
 			false,
+			"",
+			nil,
 			nil,
 		)
 		if err != nil {

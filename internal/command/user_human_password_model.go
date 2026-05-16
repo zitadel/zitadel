@@ -71,14 +71,17 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 		case *user.HumanInitializedCheckSucceededEvent:
 			wm.UserState = domain.UserStateActive
 		case *user.HumanPasswordChangedEvent:
-			if e.EncodedHash == "" {
-				// Legacy event: only Secret is set; skip history accumulation and hash update.
-				break
+			if e.EncodedHash != "" {
+				// Modern passwap-encoded event: accumulate history and update current hash.
+				if wm.EncodedHash != "" {
+					wm.PreviousHashes = append([]string{wm.EncodedHash}, wm.PreviousHashes...)
+				}
+				wm.EncodedHash = e.EncodedHash
+			} else {
+				// Legacy Secret-only event: update current hash but skip history accumulation.
+				// Legacy hashes cannot be compared against new passwap-format passwords.
+				wm.EncodedHash = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 			}
-			if wm.EncodedHash != "" {
-				wm.PreviousHashes = append([]string{wm.EncodedHash}, wm.PreviousHashes...)
-			}
-			wm.EncodedHash = e.EncodedHash
 			wm.SecretChangeRequired = e.ChangeRequired
 			wm.Code = nil
 			wm.PasswordCheckFailedCount = 0

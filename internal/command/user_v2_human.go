@@ -508,6 +508,8 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 		password.EncodedPasswordHash,
 		"",
 		password.ChangeRequired,
+		"",
+		nil,
 		verification,
 	)
 	if cmd != nil {
