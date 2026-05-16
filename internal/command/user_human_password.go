@@ -64,6 +64,13 @@ func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID,
 	if err != nil {
 		return nil, err
 	}
+	// Use a non-nil slice to signal that history checking is enabled.
+	// Even when PreviousHashes is nil (first password change), the current
+	// stored hash is still checked via currentEncodedHash in setPasswordCommand.
+	previousHashes := wm.PreviousHashes
+	if previousHashes == nil {
+		previousHashes = []string{}
+	}
 	return c.setPassword(
 		ctx,
 		wm,
@@ -71,7 +78,7 @@ func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID,
 		"",
 		userAgentID,
 		changeRequired,
-		wm.PreviousHashes, // enforce history on reset-with-code path
+		previousHashes, // enforce history on reset-with-code path
 		c.setPasswordWithVerifyCode(
 			wm.CodeCreationDate,
 			wm.CodeExpiry,
@@ -98,6 +105,11 @@ func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPasswor
 	if err != nil {
 		return nil, err
 	}
+	// Use a non-nil slice to signal that history checking is enabled.
+	previousHashes := wm.PreviousHashes
+	if previousHashes == nil {
+		previousHashes = []string{}
+	}
 	return c.setPassword(
 		ctx,
 		wm,
@@ -105,7 +117,7 @@ func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPasswor
 		"",
 		userAgentID,
 		changeRequired,
-		wm.PreviousHashes, // enforce history on self-service path
+		previousHashes, // enforce history on self-service path
 		c.checkCurrentPassword(newPassword, "", oldPassword, wm, c.tarpit),
 	)
 }
