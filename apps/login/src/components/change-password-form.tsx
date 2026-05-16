@@ -10,7 +10,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
-import { Alert } from "./alert";
+import { Alert, AlertType } from "./alert";
 import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
@@ -33,9 +33,17 @@ type Props = {
   loginName: string;
   requestId?: string;
   organization?: string;
+  historyCount?: number;
 };
 
-export function ChangePasswordForm({ passwordComplexitySettings, sessionId, loginName, requestId, organization }: Props) {
+export function ChangePasswordForm({
+  passwordComplexitySettings,
+  sessionId,
+  loginName,
+  requestId,
+  organization,
+  historyCount = 0,
+}: Props) {
   const router = useRouter();
 
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
@@ -173,6 +181,10 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
             password={watchPassword}
             equals={!!watchPassword && watchPassword === watchConfirmPassword}
           />
+        )}
+
+        {historyCount > 0 && (
+          <Alert type={AlertType.INFO}>{t("complexity.historyHint", { count: historyCount })}</Alert>
         )}
 
         {error && <Alert>{error}</Alert>}

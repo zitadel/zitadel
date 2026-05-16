@@ -36,6 +36,7 @@ type Props = {
   defaultOrganization?: string;
   requestId?: string;
   codeRequired: boolean;
+  historyCount?: number;
 };
 
 export function SetPasswordForm({
@@ -47,6 +48,7 @@ export function SetPasswordForm({
   userId,
   code,
   codeRequired,
+  historyCount = 0,
 }: Props) {
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onChange",
@@ -248,6 +250,10 @@ export function SetPasswordForm({
             password={watchPassword}
             equals={!!watchPassword && watchPassword === watchConfirmPassword}
           />
+        )}
+
+        {historyCount > 0 && (
+          <Alert type={AlertType.INFO}>{t("complexity.historyHint", { count: historyCount })}</Alert>
         )}
 
         {error && <Alert>{error}</Alert>}
