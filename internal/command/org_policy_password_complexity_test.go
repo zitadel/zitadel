@@ -65,6 +65,7 @@ func TestCommandSide_AddPasswordComplexityPolicy(t *testing.T) {
 								&org.NewAggregate("org1").Aggregate,
 								8,
 								true, true, true, true,
+								0,
 							),
 						),
 					),
@@ -96,6 +97,7 @@ func TestCommandSide_AddPasswordComplexityPolicy(t *testing.T) {
 							&org.NewAggregate("org1").Aggregate,
 							8,
 							true, true, true, true,
+							0,
 						),
 					),
 				),
@@ -122,6 +124,49 @@ func TestCommandSide_AddPasswordComplexityPolicy(t *testing.T) {
 					HasLowercase: true,
 					HasNumber:    true,
 					HasSymbol:    true,
+				},
+			},
+		},
+		{
+			name: "add policy with history count, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectPush(
+						org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							8,
+							true, true, true, true,
+							5,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				policy: &domain.PasswordComplexityPolicy{
+					MinLength:    8,
+					HasUppercase: true,
+					HasLowercase: true,
+					HasNumber:    true,
+					HasSymbol:    true,
+					HistoryCount: 5,
+				},
+			},
+			res: res{
+				want: &domain.PasswordComplexityPolicy{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "org1",
+						ResourceOwner: "org1",
+					},
+					MinLength:    8,
+					HasUppercase: true,
+					HasLowercase: true,
+					HasNumber:    true,
+					HasSymbol:    true,
+					HistoryCount: 5,
 				},
 			},
 		},
@@ -219,6 +264,7 @@ func TestCommandSide_ChangePasswordComplexityPolicy(t *testing.T) {
 								&org.NewAggregate("org1").Aggregate,
 								8,
 								true, true, true, true,
+								0,
 							),
 						),
 					),
@@ -250,6 +296,7 @@ func TestCommandSide_ChangePasswordComplexityPolicy(t *testing.T) {
 								&org.NewAggregate("org1").Aggregate,
 								8,
 								true, true, true, true,
+								0,
 							),
 						),
 					),
@@ -280,6 +327,53 @@ func TestCommandSide_ChangePasswordComplexityPolicy(t *testing.T) {
 					HasLowercase: false,
 					HasNumber:    false,
 					HasSymbol:    false,
+				},
+			},
+		},
+		{
+			name: "change history count, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								8,
+								true, true, true, true,
+								0,
+							),
+						),
+					),
+					expectPush(
+						newPasswordComplexityPolicyChangedEventWithHistory(context.Background(), "org1", 3),
+					),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				policy: &domain.PasswordComplexityPolicy{
+					MinLength:    8,
+					HasUppercase: true,
+					HasLowercase: true,
+					HasNumber:    true,
+					HasSymbol:    true,
+					HistoryCount: 3,
+				},
+			},
+			res: res{
+				want: &domain.PasswordComplexityPolicy{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "org1",
+						ResourceOwner: "org1",
+					},
+					MinLength:    8,
+					HasUppercase: true,
+					HasLowercase: true,
+					HasNumber:    true,
+					HasSymbol:    true,
+					HistoryCount: 3,
 				},
 			},
 		},
@@ -362,6 +456,7 @@ func TestCommandSide_RemovePasswordComplexityPolicy(t *testing.T) {
 								&org.NewAggregate("org1").Aggregate,
 								8,
 								true, true, true, true,
+								0,
 							),
 						),
 					),
@@ -410,6 +505,16 @@ func newPasswordComplexityPolicyChangedEvent(ctx context.Context, orgID string, 
 			policy.ChangeHasLowercase(hasLower),
 			policy.ChangeHasSymbol(hasNumber),
 			policy.ChangeHasNumber(hasSymbol),
+		},
+	)
+	return event
+}
+
+func newPasswordComplexityPolicyChangedEventWithHistory(ctx context.Context, orgID string, historyCount uint64) *org.PasswordComplexityPolicyChangedEvent {
+	event, _ := org.NewPasswordComplexityPolicyChangedEvent(ctx,
+		&org.NewAggregate(orgID).Aggregate,
+		[]policy.PasswordComplexityPolicyChanges{
+			policy.ChangeHistoryCount(historyCount),
 		},
 	)
 	return event
