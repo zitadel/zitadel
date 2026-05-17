@@ -38,6 +38,13 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password stri
 	if err != nil {
 		return nil, err
 	}
+	// Use a non-nil slice to signal that history checking is enabled.
+	// Even when PreviousHashes is nil (first password change), the current
+	// stored hash is still checked via currentEncodedHash in setPasswordCommand.
+	previousHashes := wm.PreviousHashes
+	if previousHashes == nil {
+		previousHashes = []string{}
+	}
 	return c.setPassword(
 		ctx,
 		wm,
@@ -45,7 +52,7 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password stri
 		"", // current api implementations never provide an encoded password
 		"",
 		oneTime,
-		nil, // admin set: no history check
+		previousHashes, // enforce history even on admin set path
 		c.setPasswordWithPermission(wm.AggregateID, wm.ResourceOwner),
 	)
 }
@@ -179,8 +186,16 @@ func (c *Commands) checkCurrentPassword(
 				spanPasswap.EndWithError(err)
 				return "", convertPasswapErr(err)
 			}
-			// otherwise, let's directly verify and return the new generated hash, so we can reuse it in the event
-			return c.verifyAndUpdatePassword(ctx, hash, password, newPassword)
+			// Otherwise verify + compute a new hash for the new password in one shot.
+			// passwap.VerifyAndUpdate returns ErrPasswordNoChange when old == new.
+			// We treat that as "verification succeeded" so the downstream history check
+			// can fire and produce a clear "Errors.User.Password.Reused" instead of an
+			// opaque "NotChanged" error wrapped twice into Internal.
+			updated, err := c.verifyAndUpdatePassword(ctx, hash, password, newPassword)
+			if errors.Is(err, passwap.ErrPasswordNoChange) {
+				return "", nil
+			}
+			return updated, err
 		}
 		commands, updated, err := verifyPasswordWithLockoutPolicy(ctx, wm, currentPassword, c.eventstore, verify, nil, tarpit)
 		// The verification was successful, and we might have an updated hash.
