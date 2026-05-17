@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "无法设置密码",
         "couldNotResetPassword": "无法重置密码",
-        "couldNotVerifyPassword": "无法验证密码"
+        "couldNotVerifyPassword": "无法验证密码",
+        "reused": "您不能重复使用近期使用过的密码。请选择其他密码。"
       }
     },
     "change": {
@@ -121,7 +122,8 @@
         "currentPasswordInvalid": "当前密码不正确。",
         "couldNotChangePassword": "无法更改密码",
         "couldNotVerifyPassword": "无法验证密码",
-        "unknownError": "未知错误"
+        "unknownError": "未知错误",
+        "reused": "您不能重复使用近期使用过的密码。请选择其他密码。"
       }
     },
     "complexity": {

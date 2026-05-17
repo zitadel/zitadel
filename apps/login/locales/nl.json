@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "Kon wachtwoord niet instellen",
         "couldNotResetPassword": "Kon wachtwoord niet resetten",
-        "couldNotVerifyPassword": "Kon wachtwoord niet verifiëren"
+        "couldNotVerifyPassword": "Kon wachtwoord niet verifiëren",
+        "reused": "Je kunt een recent wachtwoord niet hergebruiken. Kies een ander wachtwoord."
       }
     },
     "change": {
@@ -121,7 +122,8 @@
         "currentPasswordInvalid": "Het huidige wachtwoord is onjuist.",
         "couldNotChangePassword": "Kon wachtwoord niet wijzigen",
         "couldNotVerifyPassword": "Kon wachtwoord niet verifiëren",
-        "unknownError": "Onbekende fout"
+        "unknownError": "Onbekende fout",
+        "reused": "Je kunt een recent wachtwoord niet hergebruiken. Kies een ander wachtwoord."
       }
     },
     "complexity": {

@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "No se pudo establecer la contraseña",
         "couldNotResetPassword": "No se pudo restablecer la contraseña",
-        "couldNotVerifyPassword": "No se pudo verificar la contraseña"
+        "couldNotVerifyPassword": "No se pudo verificar la contraseña",
+        "reused": "No puedes reutilizar una contraseña reciente. Por favor, elige una diferente."
       }
     },
     "change": {
@@ -121,7 +122,8 @@
         "currentPasswordInvalid": "La contraseña actual es incorrecta.",
         "couldNotChangePassword": "No se pudo cambiar la contraseña",
         "couldNotVerifyPassword": "No se pudo verificar la contraseña",
-        "unknownError": "Error desconocido"
+        "unknownError": "Error desconocido",
+        "reused": "No puedes reutilizar una contraseña reciente. Por favor, elige una diferente."
       }
     },
     "complexity": {

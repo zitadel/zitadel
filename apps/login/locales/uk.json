@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "Не вдалося встановити пароль",
         "couldNotResetPassword": "Не вдалося скинути пароль",
-        "couldNotVerifyPassword": "Не вдалося перевірити пароль"
+        "couldNotVerifyPassword": "Не вдалося перевірити пароль",
+        "reused": "Не можна повторно використовувати нещодавній пароль. Будь ласка, виберіть інший."
       }
     },
     "change": {
@@ -121,7 +122,8 @@
         "currentPasswordInvalid": "Поточний пароль невірний.",
         "couldNotChangePassword": "Не вдалося змінити пароль",
         "couldNotVerifyPassword": "Не вдалося перевірити пароль",
-        "unknownError": "Невідома помилка"
+        "unknownError": "Невідома помилка",
+        "reused": "Не можна повторно використовувати нещодавній пароль. Будь ласка, виберіть інший."
       }
     },
     "complexity": {

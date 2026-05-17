@@ -93,7 +93,8 @@
       "errors": {
         "couldNotSetPassword": "パスワードを設定できませんでした",
         "couldNotResetPassword": "パスワードをリセットできませんでした",
-        "couldNotVerifyPassword": "パスワードを確認できませんでした"
+        "couldNotVerifyPassword": "パスワードを確認できませんでした",
+        "reused": "最近使用したパスワードは再利用できません。別のパスワードを選択してください。"
       }
     },
     "change": {
@@ -114,7 +115,8 @@
         "currentPasswordInvalid": "現在のパスワードが正しくありません。",
         "couldNotChangePassword": "パスワードを変更できませんでした",
         "couldNotVerifyPassword": "パスワードを確認できませんでした",
-        "unknownError": "不明なエラー"
+        "unknownError": "不明なエラー",
+        "reused": "最近使用したパスワードは再利用できません。別のパスワードを選択してください。"
       }
     },
     "errors": {

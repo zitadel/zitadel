@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "Şifre belirlenemedi",
         "couldNotResetPassword": "Şifre sıfırlanamadı",
-        "couldNotVerifyPassword": "Şifre doğrulanamadı"
+        "couldNotVerifyPassword": "Şifre doğrulanamadı",
+        "reused": "Son kullandığınız şifreyi tekrar kullanamazsınız. Lütfen farklı bir şifre seçin."
       }
     },
     "change": {
@@ -121,7 +122,8 @@
         "currentPasswordInvalid": "Mevcut şifre yanlış.",
         "couldNotChangePassword": "Şifre değiştirilemedi",
         "couldNotVerifyPassword": "Şifre doğrulanamadı",
-        "unknownError": "Bilinmeyen hata"
+        "unknownError": "Bilinmeyen hata",
+        "reused": "Son kullandığınız şifreyi tekrar kullanamazsınız. Lütfen farklı bir şifre seçin."
       }
     },
     "complexity": {
