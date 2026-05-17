@@ -1,118 +1,95 @@
-# Session 7 handoff — password reuse prevention
+# Session 8 handoff — password reuse prevention (final pass)
 
 Paste the prompt below into a fresh Claude Code session at this repo root.
 
 ---
 
-We're mid-feature: password reuse prevention for NIST alignment, multi-session, architect-driven (you are the architect, you do not write code — you dispatch Sonnet sub-agents and review). Branch: `password-age-new`.
+We're at the end of a multi-session feature: password reuse prevention for NIST alignment. Branch: `password-age-new`. Tasks 1–6 are done. Your job, Session 8, is **Task 7 — architect review pass + PR creation**. This is the closing pass; it lives entirely in your hands (no sub-agent).
 
 **Read these in order before doing anything:**
 
 1. `docs/superpowers/specs/2026-05-16-password-reuse-prevention-design.md` — authoritative design.
-2. `docs/superpowers/plans/2026-05-16-password-reuse-prevention.md` — 7-task plan with file maps and gate commands. Each task is one session.
+2. `docs/superpowers/plans/2026-05-16-password-reuse-prevention.md` — 7-task plan. Re-read Task 7 specifically.
 
-**Sessions 1–6 (already done):**
+**Sessions 1–7 (already done):**
 - Session 1: spec + plan + Session 2 handoff. Commits `8a1c4fc1d`, `cb62b9631`, `85114cc51`.
-- Session 2: **Task 1 — Schema, events, projection, migration.** Commits `6283c6ecd`, `bdef6e80b`, `8d09be34c`, `82254b056`. `HistoryCount uint64` is live across domain, repository events, write models, projection, query, and migration (`cmd/setup/70`).
-- Session 3: **Task 2 — Proto + gRPC converters + regen.** Commits `b6debd810`, `b12aeb7b5`. `history_count` is wire-visible end to end across `policy.proto`, `admin.proto`, `management.proto`, and settings v2 + v2beta. Converters in `internal/api/grpc/policy/`, `admin/`, `management/`, `settings/v2/`, `settings/v2beta/` all map the field. Generated `.pb.go` and `.ts` files are gitignored — a fresh clone needs `PATH=.artifacts/bin/linux/amd64:$PATH buf generate` at the repo root, plus `buf generate` inside `packages/zitadel-proto/` for the TS client.
-- Session 4: **Task 3 — Password change wiring + history check + i18n.** Commits `09d5231a6`, `c9d192c01`, `730d35bee`, `0797dd49b`. `HumanPasswordWriteModel` accumulates `PreviousHashes []string` via `Reduce()`. `checkPasswordHistory` is wired into `setPasswordCommand`; only `ChangePassword` and `SetPasswordWithVerifyCode` pass `wm.PreviousHashes`. `Errors.User.Password.Reused` is in all 22 Go locale yaml files. Gate green.
-- Session 5: **Task 4 — Login-app UI.** Commits `6cf83ed53`, `326105b39`. `historyCount?: number` prop on three form components; hint renders `<Alert type={AlertType.INFO}>` only when `historyCount > 0` using i18n key `password.complexity.historyHint` (ICU plural). All 14 `apps/login/locales/*.json` files have the new key. Three parent server components pass `historyCount={Number(passwordComplexity.historyCount)}`. Gate green.
-- Session 6: **Task 5 — Console UI.** Commits `a9c3a8fb8`, `17450b72c`. Console password-complexity policy form takes a `historyCount` numeric input; submit handlers for admin (default) + mgmt (custom add/update) all wire it. `POLICY.PWD_COMPLEXITY.HISTORYCOUNT: "Password history (generations)"` is in all 22 `console/src/assets/i18n/*.json` files. Both gates green (`pnpm exec tsc --noEmit` silent, `pnpm build` "Application bundle generation complete" in ~78s, only pre-existing CommonJS bailout warnings).
+- Session 2: **Task 1 — Schema, events, projection, migration.** Commits `6283c6ecd`, `bdef6e80b`, `8d09be34c`, `82254b056`. `HistoryCount uint64` live across domain, repository events, write models, projection, query, and migration (`cmd/setup/70`).
+- Session 3: **Task 2 — Proto + gRPC converters + regen.** Commits `b6debd810`, `b12aeb7b5`. `history_count` is wire-visible across `policy.proto`, `admin.proto`, `management.proto`, and settings v2 + v2beta. Note: generated `.pb.go` and `.ts` files are gitignored — a fresh clone needs `PATH=.artifacts/bin/linux/amd64:$PATH buf generate` at the repo root, plus `buf generate` inside `packages/zitadel-proto/` for the TS client. Console needs `cd console && PATH=/home/zacharya/projects/zitadel/.artifacts/bin/linux/amd64:$PATH pnpm generate`.
+- Session 4: **Task 3 — Password change wiring + history check + i18n.** Commits `09d5231a6`, `c9d192c01`, `730d35bee`, `0797dd49b`. `HumanPasswordWriteModel.PreviousHashes` accumulates via `Reduce()`. `checkPasswordHistory` is wired into `setPasswordCommand`; `ChangePassword` and `SetPasswordWithVerifyCode` pass `wm.PreviousHashes`; admin `SetPassword` does not (passes `nil`). `Errors.User.Password.Reused` in all 22 Go locale yaml files.
+- Session 5: **Task 4 — Login-app UI.** Commits `6cf83ed53`, `326105b39`. `historyCount?: number` prop on three form components renders `<Alert type={AlertType.INFO}>` only when `historyCount > 0` using i18n key `password.complexity.historyHint` (ICU plural). All 14 `apps/login/locales/*.json` files have the new key.
+- Session 6: **Task 5 — Console UI.** Commits `a9c3a8fb8`, `17450b72c`. Console password-complexity policy form takes a `historyCount` numeric input bound via `[(ngModel)]` against a getter/setter that proxies `complexityData.historyCount` (NOT reactive forms — sibling `password-age` form IS reactive forms, complexity is not). The input has `class="history-count-input"`. Submit handlers for admin (default) + mgmt (custom add/update) all wire it. `POLICY.PWD_COMPLEXITY.HISTORYCOUNT: "Password history (generations)"` is in all 22 `console/src/assets/i18n/*.json` files.
+- Session 7: **Task 6 — Integration + E2E tests.** Commits `ffdfcb6de`, `36406e51b`, `98e2fc98f`, `6c5b9f0a9`. `TestServer_PasswordHistoryReuse` added to v2 + v2beta integration test files with two sub-scenarios (A: outside-window permitted + in-window rejected; B: current-hash inclusion via verify-code path). Cypress `password-complexity.cy.ts` replaces a stub with 3 instance-scope tests (history-count input visible; save `history_count=3` and persist after reload + restore to 0; save 0 and persist) plus 1 org-scope visibility test. `go vet -tags integration` clean; Cypress typecheck clean for the new file (3 pre-existing errors in `cypress/support/commands.ts` are untouched).
 
-  Important Session 6 nuances for the next session:
-  - **The plan said the complexity component uses Angular reactive forms; it does not.** It uses object-mutation against `complexityData?: PasswordComplexityPolicy.AsObject` with `[(ngModel)]` two-way binding (look at `incrementLength()`/`decrementLength()` for the prior pattern). The sub-agent adapted correctly — exposed `historyCount` as a TS getter/setter on the component that reads/writes `complexityData.historyCount`. The sibling `password-age` policy form uses reactive forms; complexity does NOT.
-  - The numeric input uses a raw `<input type="number" min="0">` wrapped in `.length-wrapper`, not the `+/-` icon-button pattern that `minLength` uses. Defensible (history counts can be 24+ where button-clicking is tedious) and the plan was OK with "wrap in a `<cnsl-form-field>` or whatever wrapper the existing inputs use."
-  - The sub-agent also touched `console/src/app/services/admin.service.ts` and `mgmt.service.ts` to add a `historyCount` parameter on three RPC wrapper methods. This wasn't in the plan's listed files but was structurally required to pass the form value to the gRPC call. Correct.
-  - The view component (`console/src/app/modules/password-complexity-view/`) was deliberately left alone — it renders live client-side validation hints as a user types (length progress, symbol/number/case checks). History reuse can't be validated client-side (requires hash comparison server-side), so no hint is appropriate there.
-  - No `HISTORYCOUNT_DESC` helper key was added; siblings in `POLICY.PWD_COMPLEXITY` don't have `_DESC` keys.
-  - The sub-agent **manually patched gitignored proto stubs** (`policy_pb.js/.d.ts`, `admin_pb.js/.d.ts`, `management_pb.js/.d.ts`) because it tried `pnpm generate` without `.artifacts/bin/linux/amd64` on PATH and `protoc` was missing. Those manual edits are obsolete: a real `cd console && PATH=/home/zacharya/projects/zitadel/.artifacts/bin/linux/amd64:$PATH pnpm generate` works (just produces some harmless "path … is not equal to" warnings) and writes correct generated files containing `historyCount` from the committed `.proto` source. The architect verified this and re-ran both gates against a freshly-regenerated baseline — still green.
+  **Important Session 7 nuances:**
+  - The first sub-agent dispatch produced a buggy "in-window" assertion (chain `pw0→pw1→pw2` then `pw2→pw0` with `history_count=2`). With `checkPasswordHistory`'s "first N entries of `[current] ++ PreviousHashes`" semantic, `history_count=2` only checks `[pw2, pw1]` — pw0 at index 2 is OUTSIDE the window. The architect caught this against the Session 4 unit test `user_human_password_test.go:1596` ("history_count=3 permits new password just outside history window (previous[2])"), which establishes that `HistoryCount=N` covers `current + first (N-1) previous` = N entries. A second sub-agent dispatch (commit `6c5b9f0a9`) shortened the in-window chain to `pw0→pw1` then `pw1→pw0`, which correctly places pw0 at `PreviousHashes[0]` and triggers rejection.
+  - **Implication for any future reuse-window scenarios:** `HistoryCount=N` includes the current hash + the most-recent `N-1` previous hashes. To force a hit, ensure the target plaintext sits at `PreviousHashes[k]` where `k <= N-2`.
+  - Neither `go test -tags integration` nor `cypress run` was actually executed locally — both require a dedicated zitadel test stack (DB + server + login app) that this dev environment does not have spun up dedicated to this repo. The test code compiles and vets clean; it must be exercised in CI before claiming green.
+  - Admin round-trip test was deliberately skipped per the plan ("if no parallel test exists, skip") — `internal/api/grpc/admin/integration_test/` has no existing complexity-policy test file to extend.
 
-**Your job in Session 7: Execute Task 6 from the plan — "Integration + E2E tests."**
+**Your job in Session 8: Task 7 — architect review + PR.**
 
-This is the proof-the-feature-actually-works pass. Two gRPC integration tests + one Cypress extension. After this lands, Task 7 (architect review + PR) is the final wrap.
+This is **not** a sub-agent task. The architect (you) reads the full diff, runs the review skill, fixes anything flagged, and opens the PR. The plan defines 5 steps.
 
-**Dispatch instructions:**
+**Step-by-step:**
 
-1. Confirm branch is `password-age-new` and clean (`git status`). Confirm Session 6's two commits are on top of Session 5's two (`git log --oneline -10`).
-2. Read the spec doc fully (re-read the "Testing strategy → Integration (gRPC)" and "Cypress" subsections), then re-read Task 6 in the plan.
-3. **Decide infra strategy before dispatching.** Integration tests in this repo need a running test DB (Postgres) + the auth fixtures. Discover what's expected:
-   - `grep -rn "TestMain\|integrationTest\|require.*Integration" internal/api/grpc/user/v2/integration_test/ | head -20` — see how existing tests bootstrap.
-   - `cat Makefile | grep -A3 "test-integration\|integration"` — find the make target. Common targets: `make test-integration` or a `docker compose` invocation.
-   - If Docker / a long-running Postgres is required and not already up, the sub-agent should NOT spin up infra blindly. Tell it to write the tests and run only what's runnable locally; the architect will run the full suite manually on the architect's machine.
-4. Dispatch ONE Sonnet sub-agent (Agent tool, `subagent_type: general-purpose`, `model: sonnet`) with this prompt:
+1. **Confirm branch state.** `git status` → clean. `git log --oneline main..HEAD` → should show ~18 commits across the 7 tasks. Sanity-check that nothing's missing.
 
-   > Read `docs/superpowers/specs/2026-05-16-password-reuse-prevention-design.md` first — authoritative. Then execute Task 6 from `docs/superpowers/plans/2026-05-16-password-reuse-prevention.md` end-to-end: 4 steps, commit at the boundaries the task specifies (one commit per test file). Run the gate commands at the end and report pass/fail with the actual output.
-   >
-   > Tasks 1–5 already landed `HistoryCount` end-to-end through Go (domain, events, projection, query, command-layer enforcement, command-layer unit tests), proto/gRPC, the Next.js login app, and the Angular console. You're proving the feature works via integration + e2e tests.
-   >
-   > Specific guards:
-   > - Files to create/extend:
-   >   - `internal/api/grpc/user/v2/integration_test/password_test.go` — extend existing tests, do not create a new file. Inspect surrounding tests in the same file to see how complexity-policy + change-password are exercised. Use existing `Tester` / `Instance` / `IAMOwnerCtx` helpers — discover via `grep -n "func Test\|Instance.\|UserV2\|Tester" internal/api/grpc/user/v2/integration_test/password_test.go`.
-   >   - `internal/api/grpc/user/v2beta/integration_test/password_test.go` — mirror the v2 changes. v2beta is typically a thinner copy.
-   >   - `tests/functional-ui/cypress/e2e/settings/password-complexity.cy.ts` — extend existing test, do not create a new file. Inspect the file first to see the structure for the policy-edit flow.
-   > - Scenarios required (from the plan + spec):
-   >   - **gRPC scenario A**: instance policy `history_count=2`, fixture user changes password three times (track plaintexts), fourth change uses the original plaintext (now 3-back, outside window) → expect SUCCESS. Fresh fixture user with `history_count=2`, change twice, attempt to change to the first password → expect `INVALID_ARGUMENT` containing `Errors.User.Password.Reused` (or the code `COMMAND-PwReuse` — match how other invalid-argument assertions in this file check the error).
-   >   - **gRPC scenario B (current-hash inclusion)**: `history_count=1`, reset via verify code with new password equal to **current** stored password → expect `INVALID_ARGUMENT`. This proves the current hash is in the comparison list, not just previous events.
-   >   - **Admin (instance) gRPC round-trip** (optional per plan, do it if a similar test exists): set `history_count=N` via admin RPC, read it back via management/admin getter, assert the value round-trips. Look for an existing complexity-policy admin integration test before writing a new one.
-   >   - **Cypress**: visit the instance complexity policy page, assert the history-count input is visible, save with `history_count=3`, reload, assert it persists. Save with `history_count=0`, reload, assert it persists. If there's an org-scope custom complexity policy page in existing tests, exercise `history_count=5` there too. Mirror the structure of existing complexity tests (don't invent a new pattern).
-   > - The console field on the form is bound via `[(ngModel)]="historyCount"`; the input element has no special selector beyond `class="history-count-input"`. Cypress should target it via that class or via the parent row's i18n label.
-   > - Do not exceed Task 6's scope: no production-code edits, no review commits (Task 7), no doc updates.
-   >
-   > **Commit boundaries (per plan):** one commit per test file. Three commits expected (v2 + v2beta + cypress); a fourth if you add an admin round-trip test.
-   >
-   > **Gate (must run, report output):**
-   > ```
-   > # Integration (Go) — discover the right invocation; common forms:
-   > go test ./internal/api/grpc/user/v2/integration_test/... -run Password -v 2>&1 | tail -80
-   > go test ./internal/api/grpc/user/v2beta/integration_test/... -run Password -v 2>&1 | tail -80
-   > # If infra is required (Docker/Postgres) and not up, REPORT THAT — do not start infra. The architect will run it.
-   >
-   > # Cypress — discover canonical invocation in tests/functional-ui/package.json
-   > cd tests/functional-ui && pnpm exec cypress run --spec "cypress/e2e/settings/password-complexity.cy.ts" 2>&1 | tail -60
-   > # If Cypress requires a running app (the typical case), REPORT THAT — do not start the app. The architect will run e2e.
-   > ```
-   > If the suites can't run locally because they need infra, that is OK — the deliverable is correct, complete, compileable test code. Report:
-   > - For Go: `go vet ./internal/api/grpc/user/v2/integration_test/... ./internal/api/grpc/user/v2beta/integration_test/...` must be clean. Report the output.
-   > - For Cypress: `cd tests/functional-ui && pnpm exec tsc --noEmit` (or whatever the canonical typecheck for cypress files is) — clean for new code. Report the output.
-   >
-   > **Final report:**
-   > - Commit SHAs and one-line subjects.
-   > - For each new test scenario, one paragraph: which scenario, what asserts what, which helpers used.
-   > - Output of `go vet` (or `go test` if runnable).
-   > - Output of cypress typecheck (or `cypress run` if runnable).
-   > - Any judgement calls (e.g. whether an admin round-trip test was added, whether existing fixture helpers needed extending).
-   > - If anything is red — STOP. Report status. Don't paper over a real failure.
+2. **Read the full diff.** `git diff main...HEAD --stat` for the shape, then `git diff main...HEAD` for the substance. Spot-check:
+   - **Domain & events:** `HistoryCount uint64` is on `PasswordComplexityPolicy`, the `PasswordComplexityPolicyAddedEvent` payload, and as `*uint64` on `PasswordComplexityPolicyChangedEvent` with a `ChangeHistoryCount` option func.
+   - **Write model:** `HumanPasswordWriteModel.PreviousHashes []string` is appended in `Reduce()` for `HumanPasswordChangedEvent`, with the "prepend old EncodedHash if non-empty" semantic. Legacy `Secret`-only events are skipped from history.
+   - **Check function:** `checkPasswordHistory` builds `[current] ++ previousHashes`, truncates to `HistoryCount`, iterates calling `c.userPasswordHasher.Verify`, returns `INVALID_ARGUMENT / Errors.User.Password.Reused / COMMAND-PwReuse` on match.
+   - **Caller wiring:** `ChangePassword` and `SetPasswordWithVerifyCode` pass `wm.PreviousHashes`. Admin `SetPassword` and initial-set paths (register, invite, init, email-verify) pass `nil`.
+   - **Projection + migration:** `history_count INT8 NOT NULL DEFAULT 0` column, `cmd/setup/70` step registered in `config.go` and `setup.go`.
+   - **Proto:** `history_count` on `PasswordComplexityPolicy`, both admin + management request messages, and v2 + v2beta `PasswordComplexitySettings`.
+   - **UI:** Login app forms (three) render the hint via `password.complexity.historyHint`. Console complexity form has the numeric input + `[(ngModel)]="historyCount"` binding.
+   - **Tests:** Six new command-layer test cases (commit `0797dd49b`), two integration scenarios + verify-code scenario across v2 + v2beta (commits `ffdfcb6de`, `36406e51b`, `6c5b9f0a9`), three Cypress instance-scope tests + 1 org-scope visibility test (commit `98e2fc98f`).
+   - **i18n coverage:** 22 Go locales (`Errors.User.Password.Reused`), 14 login-app locales (`password.complexity.historyHint`), 22 console locales (`POLICY.PWD_COMPLEXITY.HISTORYCOUNT`).
 
-5. When the sub-agent returns, **verify the diff yourself** before trusting the "done" claim:
-   - `git log --oneline -10` — should see 3–4 new commits from this task on top of Session 6's two.
-   - `git diff HEAD~3 --stat` (or `~4`) — expect: 1 `internal/.../user/v2/integration_test/password_test.go`, 1 `internal/.../user/v2beta/integration_test/password_test.go`, 1 `tests/functional-ui/cypress/e2e/settings/password-complexity.cy.ts`, possibly an admin-integration test.
-   - Spot-check each test file for: (a) `history_count=2` scenario with the 3-back permitted assertion, (b) `Errors.User.Password.Reused` or `COMMAND-PwReuse` assertion on reuse attempts, (c) current-hash-inclusion test, (d) cypress assertions that persist + reload.
-   - `go vet ./internal/api/grpc/user/v2/integration_test/... ./internal/api/grpc/user/v2beta/integration_test/...` — must be clean.
-   - If the architect has Docker + the test DB available, run `go test` for the new `-run` names. If not, document that as "ready for CI" in the Task 7 handoff.
+3. **Run the review skill.** Try `/review` (if loaded) or read `~/.claude/skills/` for the canonical name in this environment. If a `superpowers:review` skill loads it as documented earlier, use that. Capture the output. The skill scans the diff for SQL safety, trust-boundary issues, conditional side effects, and structural problems. Fix anything that looks legitimately flagged; ignore false positives but document why in the PR description.
 
-6. **If green and diff looks sane:** overwrite `next_prompt.md` with a Session 8 handoff for Task 7 (architect review + PR — diff review, spec/plan reconciliation, PR creation). Commit the new handoff. Stop.
+4. **Reconcile spec + plan.** Read both docs once more and confirm:
+   - Every "Architecture" section maps to a commit.
+   - Every "Schema changes" entry has a corresponding diff.
+   - The two intentional placeholders called out in the spec (proto field numbers and migration step number) were resolved (sub-agents picked at time of work).
+   - Open questions in the spec are answered: the verify decision on `password-complexity-view.component` (left alone, deliberate — Session 6 decided correctly that client-side hash comparison isn't possible); the Cypress decision (one-policy-save test added, reuse-rejection e2e skipped per the spec's default).
+   - If anything in the spec is now contradicted by what shipped (e.g. a different file got touched), update the spec to reflect reality. Commit any doc edits as their own commit.
 
-7. **If red or diff looks wrong:** do NOT dispatch a second sub-agent reflexively. Read the failure, decide if it's a sub-agent mistake (re-dispatch with a corrective prompt) or a plan/spec gap (update the spec or plan first, then re-dispatch). Common failure modes to watch for: (a) integration test uses a stale fixture helper that doesn't set instance policy correctly — verify `SetDefaultPasswordComplexityPolicy` or equivalent is being called with `historyCount` set; (b) test asserts on `INVALID_ARGUMENT` gRPC code but the actual returned error wraps a Zitadel-internal error code — check existing reuse-rejection tests in the command layer (`internal/command/user_human_password_test.go`) to see how they assert; (c) Cypress targets a `formControlName` selector — there is no form control, it's `[(ngModel)]` with `class="history-count-input"`; (d) v2beta tests fail because v2beta uses a different test scaffold (occasionally `IAMOwnerCtx` vs a different ctx).
+5. **Verify gates one more time before PR.** Run, with the architect's hands, each gate command listed in the plan (Tasks 1–6). Capture each command + output. If any are red:
+   - For the integration test gate: it needs Docker + a zitadel test stack. If the architect's machine doesn't have one running, document this as "needs CI" in the PR description rather than blocking the PR.
+   - For the Cypress gate: same — `cypress run` needs the login app + zitadel server up. Document.
+   - For all Go unit-test gates, login-app build, console build: these should run cleanly on the architect's machine. They MUST be green before opening the PR.
+
+6. **Open the PR.** `gh pr create` against `main`. PR body must reference the spec doc and summarize:
+   - One-line problem statement (NIST 800-63B password reuse prevention).
+   - Bullet list of what shipped per layer (domain, events, projection, proto, command, login UI, console UI, tests).
+   - Test plan (which gates passed locally, which need CI).
+   - "Generated with Claude Code" footer per the standard PR template.
 
 **Hard rules:**
 
-- You don't write code. Only design docs / plan files / next_prompt.md.
-- All implementation goes through Sonnet sub-agents.
-- One sub-agent at a time per session — they need a clean handoff, not parallel races on the same files.
-- Verify before trusting. Sub-agents will claim success. Read the diff and re-run the gate yourself (or document why you can't, e.g. infra requirements).
-- If scope grows past Task 6, stop and write a recovery `next_prompt.md`. Don't try to do Tasks 6 + 7 in one session.
+- This is the architect's own work — no sub-agent dispatch in this session.
+- If anything in the review surfaces a real bug (not a style nit), **stop and decide**: fix it inline (small) or write a recovery prompt for Session 9 (large). Don't ship known bugs.
+- If the spec or plan needs reconciling, commit those edits before opening the PR so the PR diff is complete.
+- The PR is the final deliverable. Make it clean.
+
+**Useful one-shot commands:**
+
+```bash
+git diff main...HEAD --stat                                 # shape of the change
+git log --oneline main..HEAD                                # commit titles
+ls /home/zacharya/projects/zitadel/.artifacts/bin/linux/amd64 # confirm proto toolchain available
+go vet -tags integration ./internal/api/grpc/user/v2/integration_test/... \
+                          ./internal/api/grpc/user/v2beta/integration_test/...
+go test ./internal/command/... ./internal/query/... ./internal/repository/... \
+        ./internal/api/grpc/... 2>&1 | tail -40
+cd console && PATH=/home/zacharya/projects/zitadel/.artifacts/bin/linux/amd64:$PATH pnpm build 2>&1 | tail -20
+cd apps/login && pnpm typecheck 2>&1 | tail -20
+cd tests/functional-ui && pnpm exec tsc --noEmit -p cypress/tsconfig.json 2>&1 | tail -10
+```
 
 **User preferences (from memory):**
 
-- Sonnet for structured/mechanical work like extending existing test files with new scenarios. Opus only for hard reasoning. ✓
-- Skill priority: invoke any matching skill before action. `superpowers:subagent-driven-development` may apply — check, but the user has consistently preferred the lighter "architect-verification" path (skip spec-reviewer/code-quality-reviewer sub-agents, do the verification yourself by reading the diff and re-running the gate). Default to that unless the user opts up.
+- Sonnet for mechanical work, Opus for hard reasoning. Task 7 is architect-only — no delegation.
+- Skill priority: invoke any matching skill before action. `/review` (or `superpowers:requesting-code-review`) is the canonical step here.
 
-**Useful context from Sessions 1–6 (so you don't re-derive):**
-
-- Field naming is consistent: Go `HistoryCount uint64`, SQL column `history_count`, proto `uint64 history_count`. Login-app i18n key is `password.complexity.historyHint`; Console i18n key is `POLICY.PWD_COMPLEXITY.HISTORYCOUNT`. Backend error key is `Errors.User.Password.Reused`, error code `COMMAND-PwReuse`.
-- Console has 22 locale files; login-app has 14 (different sets).
-- Command-layer unit tests for reuse logic already exist (Session 4 commit `0797dd49b`) in `internal/command/user_human_password_test.go` — read them first; they're the closest existing model for how the gRPC integration tests should assert.
-- The Console form is **not reactive forms** for complexity — `[(ngModel)]="historyCount"` against a getter/setter that proxies `complexityData.historyCount`. Cypress targets via `class="history-count-input"` or the row's i18n label.
-- After Task 6 lands, Task 7 is the architect's review pass + PR creation. Task 7 does NOT delegate to a sub-agent — it's the closing pass that lives entirely in the architect's hands.
-
-Good luck. Bite-sized scope. Be the architect.
+Bite-sized scope. Close the loop. Be the architect.
