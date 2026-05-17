@@ -184,10 +184,16 @@ export function ChangePasswordForm({
         )}
 
         {historyCount > 0 && (
-          <Alert type={AlertType.INFO}>{t("complexity.historyHint", { count: historyCount })}</Alert>
+          <div className="py-2">
+            <Alert type={AlertType.INFO}>{t("complexity.historyHint", { count: historyCount })}</Alert>
+          </div>
         )}
 
-        {error && <Alert>{error}</Alert>}
+        {error && (
+          <div className="py-2">
+            <Alert>{error}</Alert>
+          </div>
+        )}
 
         <div className="mt-8 flex w-full flex-row items-center justify-between">
           <BackButton data-testid="back-button" />

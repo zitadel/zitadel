@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "Could not set password",
         "couldNotResetPassword": "Could not reset password",
-        "couldNotVerifyPassword": "Could not verify password"
+        "couldNotVerifyPassword": "Could not verify password",
+        "reused": "You can't reuse a recent password. Please choose a different one."
       }
     },
     "change": {
@@ -121,7 +122,8 @@
         "currentPasswordInvalid": "Current password is incorrect.",
         "couldNotChangePassword": "Could not change password",
         "couldNotVerifyPassword": "Could not verify password",
-        "unknownError": "Unknown error"
+        "unknownError": "Unknown error",
+        "reused": "You can't reuse a recent password. Please choose a different one."
       }
     },
     "complexity": {
