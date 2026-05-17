@@ -1042,7 +1042,8 @@
       "RESENDNOTIFICATION": "Odeslat odkaz pro reset hesla",
       "REQUIRED": "Některá povinná pole nejsou vyplněna.",
       "MINLENGTHERROR": "Musí být alespoň {{value}} znaků dlouhé.",
-      "MAXLENGTHERROR": "Musí být kratší než {{value}} znaků."
+      "MAXLENGTHERROR": "Musí být kratší než {{value}} znaků.",
+      "HISTORYHINT": "Nemůžete znovu použít posledních {{count}} hesel."
     },
     "ID": "ID uživatele",
     "EMAIL": "E-mail",

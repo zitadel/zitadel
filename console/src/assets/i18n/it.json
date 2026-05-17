@@ -1041,7 +1041,8 @@
       "RESENDNOTIFICATION": "Invia email per la reimpostazione",
       "REQUIRED": "Mancano alcuni campi obbligatori.",
       "MINLENGTHERROR": "Deve essere lunga almeno {{valore}} caratteri.",
-      "MAXLENGTHERROR": "Deve contenere meno di {{value}} caratteri"
+      "MAXLENGTHERROR": "Deve contenere meno di {{value}} caratteri",
+      "HISTORYHINT": "Non puoi riutilizzare le ultime {{count}} password."
     },
     "ID": "ID utente",
     "EMAIL": "E-mail",

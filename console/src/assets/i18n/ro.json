@@ -1040,7 +1040,8 @@
       "RESENDNOTIFICATION": "Trimiteți linkul de resetare a parolei",
       "REQUIRED": "Lipsesc unele câmpuri obligatorii.",
       "MINLENGTHERROR": "Trebuie să aibă cel puțin {{value}} caractere.",
-      "MAXLENGTHERROR": "Trebuie să aibă mai puțin de {{value}} caractere."
+      "MAXLENGTHERROR": "Trebuie să aibă mai puțin de {{value}} caractere.",
+      "HISTORYHINT": "Nu poți refolosi ultimele {{count}} parole."
     },
     "ID": "ID utilizator",
     "EMAIL": "E-mail",

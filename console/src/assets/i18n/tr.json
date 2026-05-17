@@ -1042,7 +1042,8 @@
       "RESENDNOTIFICATION": "Şifre Sıfırlama Bağlantısı Gönder",
       "REQUIRED": "Bazı gerekli alanlar eksik.",
       "MINLENGTHERROR": "En az {{value}} karakter uzunluğunda olmalıdır.",
-      "MAXLENGTHERROR": "{{value}} karakterden az olmalıdır."
+      "MAXLENGTHERROR": "{{value}} karakterden az olmalıdır.",
+      "HISTORYHINT": "Son {{count}} şifrenizi yeniden kullanamazsınız."
     },
     "ID": "Kullanıcı Kimliği",
     "EMAIL": "E-posta",

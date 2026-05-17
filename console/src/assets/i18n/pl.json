@@ -1041,7 +1041,8 @@
       "RESENDNOTIFICATION": "Wyślij link resetowania hasła",
       "REQUIRED": "Brakuje niektórych wymaganych pól.",
       "MINLENGTHERROR": "Musi mieć co najmniej {{value}} znaków.",
-      "MAXLENGTHERROR": "Musi zawierać mniej niż {{value}} znaków"
+      "MAXLENGTHERROR": "Musi zawierać mniej niż {{value}} znaków",
+      "HISTORYHINT": "Nie możesz ponownie używać ostatnich {{count}} haseł."
     },
     "ID": "ID użytkownika",
     "EMAIL": "E-mail",

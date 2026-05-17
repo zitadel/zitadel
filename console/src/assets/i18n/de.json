@@ -1042,7 +1042,8 @@
       "RESENDNOTIFICATION": "E-Mail zum Zurücksetzen senden",
       "REQUIRED": "Bitte prüfe, ob alle notwendigen Felder ausgefüllt sind.",
       "MINLENGTHERROR": "Muss mindestens {{value}} Zeichen lang sein.",
-      "MAXLENGTHERROR": "Muss weniger als {{value}} Zeichen umfassen."
+      "MAXLENGTHERROR": "Muss weniger als {{value}} Zeichen umfassen.",
+      "HISTORYHINT": "Sie können Ihre letzten {{count}} Passwörter nicht wiederverwenden."
     },
     "ID": "Benutzer-ID",
     "EMAIL": "E-Mail",
