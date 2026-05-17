@@ -1,95 +1,186 @@
-# Session 8 handoff — password reuse prevention (final pass)
+# Session 9 handoff — password reuse prevention (security + i18n + PR)
 
 Paste the prompt below into a fresh Claude Code session at this repo root.
 
 ---
 
-We're at the end of a multi-session feature: password reuse prevention for NIST alignment. Branch: `password-age-new`. Tasks 1–6 are done. Your job, Session 8, is **Task 7 — architect review pass + PR creation**. This is the closing pass; it lives entirely in your hands (no sub-agent).
+We're closing out a multi-session feature: password reuse prevention for NIST 800-63B (issue #8034). Branch: `password-age-new`. Sessions 1–8 are done and committed. Your job, Session 9, has three parts:
 
-**Read these in order before doing anything:**
+1. **Security review** — verify we never expose sensitive data to end users.
+2. **i18n** — translate all the English-only strings we added across every locale file.
+3. **Open the PR** — concise body, references issue #8034.
 
-1. `docs/superpowers/specs/2026-05-16-password-reuse-prevention-design.md` — authoritative design.
-2. `docs/superpowers/plans/2026-05-16-password-reuse-prevention.md` — 7-task plan. Re-read Task 7 specifically.
+**Read first:**
+- `docs/superpowers/specs/2026-05-16-password-reuse-prevention-design.md`
+- `docs/superpowers/plans/2026-05-16-password-reuse-prevention.md`
 
-**Sessions 1–7 (already done):**
-- Session 1: spec + plan + Session 2 handoff. Commits `8a1c4fc1d`, `cb62b9631`, `85114cc51`.
-- Session 2: **Task 1 — Schema, events, projection, migration.** Commits `6283c6ecd`, `bdef6e80b`, `8d09be34c`, `82254b056`. `HistoryCount uint64` live across domain, repository events, write models, projection, query, and migration (`cmd/setup/70`).
-- Session 3: **Task 2 — Proto + gRPC converters + regen.** Commits `b6debd810`, `b12aeb7b5`. `history_count` is wire-visible across `policy.proto`, `admin.proto`, `management.proto`, and settings v2 + v2beta. Note: generated `.pb.go` and `.ts` files are gitignored — a fresh clone needs `PATH=.artifacts/bin/linux/amd64:$PATH buf generate` at the repo root, plus `buf generate` inside `packages/zitadel-proto/` for the TS client. Console needs `cd console && PATH=/home/zacharya/projects/zitadel/.artifacts/bin/linux/amd64:$PATH pnpm generate`.
-- Session 4: **Task 3 — Password change wiring + history check + i18n.** Commits `09d5231a6`, `c9d192c01`, `730d35bee`, `0797dd49b`. `HumanPasswordWriteModel.PreviousHashes` accumulates via `Reduce()`. `checkPasswordHistory` is wired into `setPasswordCommand`; `ChangePassword` and `SetPasswordWithVerifyCode` pass `wm.PreviousHashes`; admin `SetPassword` does not (passes `nil`). `Errors.User.Password.Reused` in all 22 Go locale yaml files.
-- Session 5: **Task 4 — Login-app UI.** Commits `6cf83ed53`, `326105b39`. `historyCount?: number` prop on three form components renders `<Alert type={AlertType.INFO}>` only when `historyCount > 0` using i18n key `password.complexity.historyHint` (ICU plural). All 14 `apps/login/locales/*.json` files have the new key.
-- Session 6: **Task 5 — Console UI.** Commits `a9c3a8fb8`, `17450b72c`. Console password-complexity policy form takes a `historyCount` numeric input bound via `[(ngModel)]` against a getter/setter that proxies `complexityData.historyCount` (NOT reactive forms — sibling `password-age` form IS reactive forms, complexity is not). The input has `class="history-count-input"`. Submit handlers for admin (default) + mgmt (custom add/update) all wire it. `POLICY.PWD_COMPLEXITY.HISTORYCOUNT: "Password history (generations)"` is in all 22 `console/src/assets/i18n/*.json` files.
-- Session 7: **Task 6 — Integration + E2E tests.** Commits `ffdfcb6de`, `36406e51b`, `98e2fc98f`, `6c5b9f0a9`. `TestServer_PasswordHistoryReuse` added to v2 + v2beta integration test files with two sub-scenarios (A: outside-window permitted + in-window rejected; B: current-hash inclusion via verify-code path). Cypress `password-complexity.cy.ts` replaces a stub with 3 instance-scope tests (history-count input visible; save `history_count=3` and persist after reload + restore to 0; save 0 and persist) plus 1 org-scope visibility test. `go vet -tags integration` clean; Cypress typecheck clean for the new file (3 pre-existing errors in `cypress/support/commands.ts` are untouched).
+**Sessions 1–8 (done):**
+- Sessions 1–7 shipped schema, events, projection, proto, command, login UI, console UI, integration tests.
+- Session 8 (this previous session) caught and fixed three real bugs during manual verification:
+  - **v3 relational projection panic** when only `historyCount` changed (commit `55773d419`).
+  - **Internal error on identical-password change** caused by passwap `ErrPasswordNoChange` double-conversion; admin SetPassword also now enforces history per NIST (commit `cb29f5b5a`).
+  - **`{{value}}` placeholder not interpolated** in console min-length validation (BigInt → ngx-translate); fixed via numeric getter (commit `c349d1b8c`).
+  - Added a +/- stepper for history-count in the policy form and a reuse hint banner on the console change-password page (commit `651b6826d`).
+  - Mapped `COMMAND-PwReuse` to a clean reuse message in the login app and added padding between hint + error alerts (commit `e843ce903`).
+  - Updated Cypress for the stepper (commit `136ade4c9`).
 
-  **Important Session 7 nuances:**
-  - The first sub-agent dispatch produced a buggy "in-window" assertion (chain `pw0→pw1→pw2` then `pw2→pw0` with `history_count=2`). With `checkPasswordHistory`'s "first N entries of `[current] ++ PreviousHashes`" semantic, `history_count=2` only checks `[pw2, pw1]` — pw0 at index 2 is OUTSIDE the window. The architect caught this against the Session 4 unit test `user_human_password_test.go:1596` ("history_count=3 permits new password just outside history window (previous[2])"), which establishes that `HistoryCount=N` covers `current + first (N-1) previous` = N entries. A second sub-agent dispatch (commit `6c5b9f0a9`) shortened the in-window chain to `pw0→pw1` then `pw1→pw0`, which correctly places pw0 at `PreviousHashes[0]` and triggers rejection.
-  - **Implication for any future reuse-window scenarios:** `HistoryCount=N` includes the current hash + the most-recent `N-1` previous hashes. To force a hit, ensure the target plaintext sits at `PreviousHashes[k]` where `k <= N-2`.
-  - Neither `go test -tags integration` nor `cypress run` was actually executed locally — both require a dedicated zitadel test stack (DB + server + login app) that this dev environment does not have spun up dedicated to this repo. The test code compiles and vets clean; it must be exercised in CI before claiming green.
-  - Admin round-trip test was deliberately skipped per the plan ("if no parallel test exists, skip") — `internal/api/grpc/admin/integration_test/` has no existing complexity-policy test file to extend.
+---
 
-**Your job in Session 8: Task 7 — architect review + PR.**
+## Step 1 — Security review
 
-This is **not** a sub-agent task. The architect (you) reads the full diff, runs the review skill, fixes anything flagged, and opens the PR. The plan defines 5 steps.
+This feature stores password **history hashes** in event payloads and projects them through write models. Before opening the PR, prove that none of this leaks to end users or unauthorized callers.
 
-**Step-by-step:**
+**Read these and confirm each claim:**
 
-1. **Confirm branch state.** `git status` → clean. `git log --oneline main..HEAD` → should show ~18 commits across the 7 tasks. Sanity-check that nothing's missing.
+1. **`user.human.password.changed` event payload** — Already includes `encodedHash` (existing field, not added by us). The reuse feature reads `HumanPasswordWriteModel.PreviousHashes` which is built by reducing this existing field. We added no new persisted secrets.
+   - Verify: `grep -n "PreviousHashes\|encodedHash" internal/repository/user/*password*` and confirm `PreviousHashes` is only a write-model field, never persisted on a new event.
 
-2. **Read the full diff.** `git diff main...HEAD --stat` for the shape, then `git diff main...HEAD` for the substance. Spot-check:
-   - **Domain & events:** `HistoryCount uint64` is on `PasswordComplexityPolicy`, the `PasswordComplexityPolicyAddedEvent` payload, and as `*uint64` on `PasswordComplexityPolicyChangedEvent` with a `ChangeHistoryCount` option func.
-   - **Write model:** `HumanPasswordWriteModel.PreviousHashes []string` is appended in `Reduce()` for `HumanPasswordChangedEvent`, with the "prepend old EncodedHash if non-empty" semantic. Legacy `Secret`-only events are skipped from history.
-   - **Check function:** `checkPasswordHistory` builds `[current] ++ previousHashes`, truncates to `HistoryCount`, iterates calling `c.userPasswordHasher.Verify`, returns `INVALID_ARGUMENT / Errors.User.Password.Reused / COMMAND-PwReuse` on match.
-   - **Caller wiring:** `ChangePassword` and `SetPasswordWithVerifyCode` pass `wm.PreviousHashes`. Admin `SetPassword` and initial-set paths (register, invite, init, email-verify) pass `nil`.
-   - **Projection + migration:** `history_count INT8 NOT NULL DEFAULT 0` column, `cmd/setup/70` step registered in `config.go` and `setup.go`.
-   - **Proto:** `history_count` on `PasswordComplexityPolicy`, both admin + management request messages, and v2 + v2beta `PasswordComplexitySettings`.
-   - **UI:** Login app forms (three) render the hint via `password.complexity.historyHint`. Console complexity form has the numeric input + `[(ngModel)]="historyCount"` binding.
-   - **Tests:** Six new command-layer test cases (commit `0797dd49b`), two integration scenarios + verify-code scenario across v2 + v2beta (commits `ffdfcb6de`, `36406e51b`, `6c5b9f0a9`), three Cypress instance-scope tests + 1 org-scope visibility test (commit `98e2fc98f`).
-   - **i18n coverage:** 22 Go locales (`Errors.User.Password.Reused`), 14 login-app locales (`password.complexity.historyHint`), 22 console locales (`POLICY.PWD_COMPLEXITY.HISTORYCOUNT`).
+2. **gRPC / Connect API responses** — Search for any endpoint that returns `encodedHash` or `previousHashes` or history hashes in its response.
+   - `grep -rn "EncodedHash\|PreviousHashes" internal/api/grpc/` — flag anything that surfaces those to a response message.
+   - `grep -rn "encodedHash\|previousHashes" proto/` — should only appear in event/internal definitions, never on a user-facing response. (Note: the `HumanAddedEvent` proto does carry `encoded_hash` for migration imports — that's pre-existing and not user-facing.)
 
-3. **Run the review skill.** Try `/review` (if loaded) or read `~/.claude/skills/` for the canonical name in this environment. If a `superpowers:review` skill loads it as documented earlier, use that. Capture the output. The skill scans the diff for SQL safety, trust-boundary issues, conditional side effects, and structural problems. Fix anything that looks legitimately flagged; ignore false positives but document why in the PR description.
+3. **Logs / tracing** — Confirm `checkPasswordHistory` doesn't log the plaintext or any of the candidate hashes.
+   - Read `internal/command/user_human_password.go:295-320`. The function should call only `c.userPasswordHasher.Verify(...)` and return; no `logging.OnError(...).WithField("hash", ...)` etc. If you find any field-attaching log, redact.
+   - Spot-check `tracing.NewNamedSpan("passwap.Verify")` — spans should not record the hash or password as an attribute.
 
-4. **Reconcile spec + plan.** Read both docs once more and confirm:
-   - Every "Architecture" section maps to a commit.
-   - Every "Schema changes" entry has a corresponding diff.
-   - The two intentional placeholders called out in the spec (proto field numbers and migration step number) were resolved (sub-agents picked at time of work).
-   - Open questions in the spec are answered: the verify decision on `password-complexity-view.component` (left alone, deliberate — Session 6 decided correctly that client-side hash comparison isn't possible); the Cypress decision (one-policy-save test added, reuse-rejection e2e skipped per the spec's default).
-   - If anything in the spec is now contradicted by what shipped (e.g. a different file got touched), update the spec to reflect reality. Commit any doc edits as their own commit.
+4. **Error messages** — The reuse rejection error message is `"Password recently used, choose another"`. Does it leak whether the password was the *exact previous* vs a *recent* one? It should say only "recent" — and it does (`internal/static/i18n/en.yaml:159`). Confirm no other path leaks position-in-history.
 
-5. **Verify gates one more time before PR.** Run, with the architect's hands, each gate command listed in the plan (Tasks 1–6). Capture each command + output. If any are red:
-   - For the integration test gate: it needs Docker + a zitadel test stack. If the architect's machine doesn't have one running, document this as "needs CI" in the PR description rather than blocking the PR.
-   - For the Cypress gate: same — `cypress run` needs the login app + zitadel server up. Document.
-   - For all Go unit-test gates, login-app build, console build: these should run cleanly on the architect's machine. They MUST be green before opening the PR.
+5. **Console / login UI** — Confirm the reuse hint banner shows only the *count* of generations restricted, never any hash material.
+   - `apps/login/src/components/change-password-form.tsx:186-188`
+   - `console/src/app/pages/users/user-detail/password/password.component.html` — the banner renders `passwordPolicy.historyCount.toString()` only.
 
-6. **Open the PR.** `gh pr create` against `main`. PR body must reference the spec doc and summarize:
-   - One-line problem statement (NIST 800-63B password reuse prevention).
-   - Bullet list of what shipped per layer (domain, events, projection, proto, command, login UI, console UI, tests).
-   - Test plan (which gates passed locally, which need CI).
-   - "Generated with Claude Code" footer per the standard PR template.
+6. **Admin set-password path** — Session 8 made admin `SetPassword` *enforce* history (not bypass). Confirm an admin who attempts to reuse a target user's recent password gets the same `Errors.User.Password.Reused` and is **not** given a hint about *what* the recent password was. The check returns one boolean ("matches one of the recent N"), it never reveals which one.
+
+7. **Audit / activity feed** — When `HumanPasswordChangedEvent` is rejected for reuse, does anything get logged with `recent_password_hash` or similar? No new events are pushed on rejection (rejection is a command return, not a persisted event), so this should be a non-issue. Confirm with `grep -n "Reuse" internal/command/*.go`.
+
+**Output of Step 1:** a markdown bullet list, one bullet per check above, with the verifying command + result for each. If anything fails, fix it before continuing.
+
+---
+
+## Step 2 — Translate all new i18n keys
+
+We left English-only strings in many locale files during Session 8 with the understanding that Session 9 would fan them out. The keys and locale counts:
+
+**Go locales** (`internal/static/i18n/*.yaml`, 22 files):
+- `Errors.User.Password.Reused` — currently `"Password recently used, choose another"` in every locale. Translate to each locale's native equivalent. Existing key (added in Session 4) — already present in all 22 files but uniformly English. Use the surrounding context (look at the parent `Password:` group's other keys per locale — `Invalid`, `Empty`, `NotChanged`, etc. — and match register and tone).
+
+**Login app locales** (`apps/login/locales/*.json`, 14 files):
+- `password.set.errors.reused` and `password.change.errors.reused` — currently both `"You can't reuse a recent password. Please choose a different one."` (en only). 13 non-en files need the same key with translated copy.
+- (`historyHint` was already translated in Session 5 — leave it alone.)
+
+**Console locales** (`console/src/assets/i18n/*.json`, 22 files):
+- `USER.PASSWORD.HISTORYHINT` — currently `"You can't reuse your recent {{count}} passwords."` (en only). 21 non-en files need translated copy. Preserve the `{{count}}` placeholder verbatim.
+- (`POLICY.PWD_COMPLEXITY.HISTORYCOUNT` was already translated in Session 6 — leave it alone.)
+
+**Approach** — delegate to a Sonnet sub-agent (mechanical translation work). One agent per surface (Go / login / console) so they run in parallel. Each agent's contract:
+- Translate ONLY the keys listed above.
+- Preserve every placeholder verbatim (`{{count}}`, `{count}`, etc.).
+- Match the tone of surrounding keys in each file (formal/informal register, gender if applicable).
+- Do not touch any other keys.
+- Return the list of files touched and a one-line per locale summary of the chosen translation.
+
+After agents return, spot-check 3 locales by eye (e.g., de, fr, ja) and commit each surface as its own `i18n(...)` commit.
+
+---
+
+## Step 3 — PR body draft (for the user to approve before `gh pr create`)
+
+The repo enforces semantic PR titles (see `.github/semantic.yml`). Use:
+
+**Title:** `feat: password reuse prevention (NIST 800-63B)`
+
+**Draft body** (paste this verbatim into your final message asking the user to confirm; do NOT run `gh pr create` until they say go):
+
+```markdown
+## Summary
+
+Implements password reuse prevention per NIST 800-63B for issue #8034. Adds
+an instance-/org-scoped `history_count` on the password complexity policy.
+When set, the configured number of most-recent password generations are
+rejected on every password change (self-service, verify-code reset, and
+admin set).
+
+## What shipped
+
+- **Policy**: `history_count` on `PasswordComplexityPolicy`, `Added`/`Changed`
+  events, both projections (legacy + v3 relational), and migration step 70.
+- **Proto / gRPC**: `history_count` on the policy and on admin/management
+  request messages; new field on v2 + v2beta `PasswordComplexitySettings`.
+- **Command**: `HumanPasswordWriteModel.PreviousHashes` accumulates from
+  existing event payloads. `checkPasswordHistory` builds
+  `[current] ++ previous`, truncates to `history_count`, and rejects with
+  `Errors.User.Password.Reused` (`COMMAND-PwReuse`). Wired into
+  `ChangePassword`, `SetPasswordWithVerifyCode`, and admin `SetPassword`.
+- **Console**: history-count `+/-` stepper on the complexity policy form;
+  reuse hint banner on the user change-password page.
+- **Login UI**: hint banner on change/set/register password forms when
+  `history_count > 0`; `COMMAND-PwReuse` surfaces as a clear "you can't
+  reuse a recent password" message instead of a generic error.
+- **i18n**: `Errors.User.Password.Reused` in all 22 Go locales;
+  `complexity.historyHint` / `password.change.errors.reused` /
+  `password.set.errors.reused` in all 14 login locales;
+  `POLICY.PWD_COMPLEXITY.HISTORYCOUNT` / `USER.PASSWORD.HISTORYHINT` in all
+  22 console locales.
+- **Tests**: command-layer unit tests, integration scenarios for v2 +
+  v2beta (outside-window permitted, in-window rejected, verify-code path),
+  Cypress instance + org scope policy save.
+
+## Test plan
+
+- [x] `go test ./internal/command/... ./internal/query/... ./internal/repository/...` — green locally.
+- [x] `pnpm nx run @zitadel/console:build` — green.
+- [x] `cd apps/login && pnpm typecheck` — green.
+- [x] Manual verification via console + login app: policy save persists in
+      both projections, reuse rejection fires with the proper error, hint
+      banners render, login app shows the friendly reuse message.
+- [ ] `go test -tags integration ./internal/api/grpc/user/v2/...` — needs
+      CI; requires a dedicated zitadel test stack.
+- [ ] Cypress full run — needs CI; requires the login + zitadel server up.
+
+Closes #8034.
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+```
+
+---
+
+## Step 4 — Open the PR
+
+Only after Steps 1–3 are complete and the user has approved the PR body:
+
+```bash
+gh pr create --base main --title "feat: password reuse prevention (NIST 800-63B)" --body "$(cat <<'EOF'
+<paste approved body here>
+EOF
+)"
+```
+
+Return the PR URL.
+
+---
 
 **Hard rules:**
 
-- This is the architect's own work — no sub-agent dispatch in this session.
-- If anything in the review surfaces a real bug (not a style nit), **stop and decide**: fix it inline (small) or write a recovery prompt for Session 9 (large). Don't ship known bugs.
-- If the spec or plan needs reconciling, commit those edits before opening the PR so the PR diff is complete.
-- The PR is the final deliverable. Make it clean.
+- Step 1 must produce evidence (commands run, output observed) for each security claim. Don't skip.
+- Step 2 must touch ALL locale files — partial completion isn't acceptable for an i18n session.
+- Do not run `gh pr create` until the user explicitly approves the PR body. Show it to them first.
+- This session does NOT add new features. If you uncover a real bug during security review, **stop and decide**: small fix inline, or write Session 10 handoff for a real issue.
+- The PR is the deliverable. Don't rebase, don't squash — preserve the commit log so reviewers can read each session's work.
 
 **Useful one-shot commands:**
 
 ```bash
-git diff main...HEAD --stat                                 # shape of the change
-git log --oneline main..HEAD                                # commit titles
-ls /home/zacharya/projects/zitadel/.artifacts/bin/linux/amd64 # confirm proto toolchain available
-go vet -tags integration ./internal/api/grpc/user/v2/integration_test/... \
-                          ./internal/api/grpc/user/v2beta/integration_test/...
-go test ./internal/command/... ./internal/query/... ./internal/repository/... \
-        ./internal/api/grpc/... 2>&1 | tail -40
-cd console && PATH=/home/zacharya/projects/zitadel/.artifacts/bin/linux/amd64:$PATH pnpm build 2>&1 | tail -20
-cd apps/login && pnpm typecheck 2>&1 | tail -20
-cd tests/functional-ui && pnpm exec tsc --noEmit -p cypress/tsconfig.json 2>&1 | tail -10
+git log --oneline main..HEAD                                # 27 commits
+git diff main...HEAD --stat                                 # shape
+gh issue view 8034                                          # context for the PR
+ls internal/static/i18n/ | wc -l                            # 22 Go locales
+ls apps/login/locales/ | wc -l                              # 14 login locales
+ls console/src/assets/i18n/ | wc -l                         # 22 console locales
 ```
 
 **User preferences (from memory):**
 
-- Sonnet for mechanical work, Opus for hard reasoning. Task 7 is architect-only — no delegation.
-- Skill priority: invoke any matching skill before action. `/review` (or `superpowers:requesting-code-review`) is the canonical step here.
+- Sonnet/Haiku for mechanical work, Opus for genuinely hard reasoning. Step 2 is pure delegation territory.
+- Skill priority: invoke `superpowers:dispatching-parallel-agents` before kicking off Step 2's three agents; `superpowers:requesting-code-review` could be useful before opening the PR.
 
-Bite-sized scope. Close the loop. Be the architect.
+Close the loop. Open the PR.
