@@ -114,9 +114,15 @@ export class PasswordComplexityPolicyComponent implements OnInit {
     return this.complexityData?.historyCount ?? 0;
   }
 
-  public set historyCount(value: number) {
-    if (this.complexityData) {
-      this.complexityData.historyCount = value >= 0 ? value : 0;
+  public incrementHistoryCount(): void {
+    if (this.complexityData && (this.complexityData.historyCount ?? 0) < 24) {
+      this.complexityData.historyCount = (this.complexityData.historyCount ?? 0) + 1;
+    }
+  }
+
+  public decrementHistoryCount(): void {
+    if (this.complexityData && (this.complexityData.historyCount ?? 0) > 0) {
+      this.complexityData.historyCount = (this.complexityData.historyCount ?? 0) - 1;
     }
   }
 

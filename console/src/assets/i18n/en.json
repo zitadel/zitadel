@@ -1044,7 +1044,8 @@
       "RESENDNOTIFICATION": "Send Password Reset Link",
       "REQUIRED": "Some required fields are missing.",
       "MINLENGTHERROR": "Must be at least {{value}} characters long.",
-      "MAXLENGTHERROR": "Must be less than {{value}} characters."
+      "MAXLENGTHERROR": "Must be less than {{value}} characters.",
+      "HISTORYHINT": "You can't reuse your recent {{count}} passwords."
     },
     "ID": "User ID",
     "EMAIL": "E-mail",
