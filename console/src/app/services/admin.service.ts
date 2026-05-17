@@ -845,6 +845,7 @@ export class AdminService {
     hasNumber: boolean,
     hasSymbol: boolean,
     minLength: number,
+    historyCount: number = 0,
   ): Promise<UpdatePasswordComplexityPolicyResponse.AsObject> {
     const req = new UpdatePasswordComplexityPolicyRequest();
     req.setHasLowercase(hasLowerCase);
@@ -852,6 +853,7 @@ export class AdminService {
     req.setHasNumber(hasNumber);
     req.setHasSymbol(hasSymbol);
     req.setMinLength(minLength);
+    req.setHistoryCount(historyCount);
     return this.grpcService.admin.updatePasswordComplexityPolicy(req, null).then((resp) => resp.toObject());
   }
 

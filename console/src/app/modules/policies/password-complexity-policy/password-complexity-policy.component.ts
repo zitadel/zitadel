@@ -110,6 +110,16 @@ export class PasswordComplexityPolicyComponent implements OnInit {
     }
   }
 
+  public get historyCount(): number {
+    return this.complexityData?.historyCount ?? 0;
+  }
+
+  public set historyCount(value: number) {
+    if (this.complexityData) {
+      this.complexityData.historyCount = value >= 0 ? value : 0;
+    }
+  }
+
   public savePolicy(): void {
     if (this.complexityData) {
       switch (this.serviceType) {
@@ -122,6 +132,7 @@ export class PasswordComplexityPolicyComponent implements OnInit {
                 this.complexityData.hasNumber,
                 this.complexityData.hasSymbol,
                 this.complexityData.minLength,
+                this.complexityData.historyCount ?? 0,
               )
               .then(() => {
                 this.toast.showInfo('POLICY.TOAST.SET', true);
@@ -137,6 +148,7 @@ export class PasswordComplexityPolicyComponent implements OnInit {
                 this.complexityData.hasNumber,
                 this.complexityData.hasSymbol,
                 this.complexityData.minLength,
+                this.complexityData.historyCount ?? 0,
               )
               .then(() => {
                 this.toast.showInfo('POLICY.TOAST.SET', true);
@@ -154,6 +166,7 @@ export class PasswordComplexityPolicyComponent implements OnInit {
               this.complexityData.hasNumber,
               this.complexityData.hasSymbol,
               this.complexityData.minLength,
+              this.complexityData.historyCount ?? 0,
             )
             .then(() => {
               this.toast.showInfo('POLICY.TOAST.SET', true);
