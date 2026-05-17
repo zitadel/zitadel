@@ -8,11 +8,25 @@ import { login, User } from '../../support/login/users';
 // Instance-scope policy: /instance?id=complexity  (requires IAM admin login)
 // Org-scope policy:      /org path, click Modify on the Password Complexity card
 //
-// The history-count input uses [(ngModel)]="historyCount" with class="history-count-input"
-// (no formControlName). We target it by class.
+// The history-count value uses a +/- stepper mirroring the min-length row.
+// The current value is rendered in span.history-count-input. Increment and
+// decrement buttons carry .history-count-increment and .history-count-decrement.
 
 describe('password complexity', () => {
   const instanceComplexityPath = '/instance?id=complexity';
+
+  const setHistoryCountTo = (target: number) => {
+    cy.get('.history-count-input')
+      .invoke('text')
+      .then((text) => {
+        const current = parseInt(text.trim(), 10) || 0;
+        const delta = target - current;
+        const button = delta > 0 ? '.history-count-increment' : '.history-count-decrement';
+        for (let i = 0; i < Math.abs(delta); i++) {
+          cy.get(button).click();
+        }
+      });
+  };
 
   describe('instance-scope policy (history count)', () => {
     beforeEach(() => {
@@ -27,30 +41,30 @@ describe('password complexity', () => {
     });
 
     it('should save history_count=3 and persist after reload', () => {
-      cy.get('.history-count-input').clear().type('3');
+      setHistoryCountTo(3);
       cy.contains('button', 'Save').click();
       cy.shouldConfirmSuccess();
       cy.reload();
       cy.get('cnsl-password-complexity-policy').should('be.visible');
-      cy.get('.history-count-input').should('have.value', '3');
+      cy.get('.history-count-input').should('have.text', '3');
       // Restore to 0 so other tests start clean
-      cy.get('.history-count-input').clear().type('0');
+      setHistoryCountTo(0);
       cy.contains('button', 'Save').click();
       cy.shouldConfirmSuccess();
     });
 
     it('should save history_count=0 and persist after reload', () => {
       // First set to a non-zero value so the test is meaningful
-      cy.get('.history-count-input').clear().type('5');
+      setHistoryCountTo(5);
       cy.contains('button', 'Save').click();
       cy.shouldConfirmSuccess();
       // Now set back to 0
-      cy.get('.history-count-input').clear().type('0');
+      setHistoryCountTo(0);
       cy.contains('button', 'Save').click();
       cy.shouldConfirmSuccess();
       cy.reload();
       cy.get('cnsl-password-complexity-policy').should('be.visible');
-      cy.get('.history-count-input').should('have.value', '0');
+      cy.get('.history-count-input').should('have.text', '0');
     });
   });
 
