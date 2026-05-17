@@ -243,7 +243,7 @@ func TestServer_SetPassword(t *testing.T) {
 // Scenario A: reuse rejection + outside-window permitted.
 //   - Set instance complexity policy to history_count=2.
 //   - Change pw0→pw1→pw2→pw3; attempt pw3→pw0 (3 back, outside window) → success.
-//   - Fresh user: pw0→pw1→pw2; attempt pw2→pw0 (within window) → INVALID_ARGUMENT.
+//   - Fresh user: pw0→pw1; attempt pw1→pw0 (within window) → INVALID_ARGUMENT.
 //
 // Scenario B: current-hash inclusion.
 //   - Set history_count=1; password-reset code; attempt new password == current → INVALID_ARGUMENT.
@@ -321,10 +321,10 @@ func TestServer_PasswordHistoryReuse(t *testing.T) {
 		t.Run("in-window password is rejected", func(t *testing.T) {
 			userID := Instance.CreateHumanUser(CTX).GetUserId()
 			adminSetPassword(t, userID, pw0)
+			// Chain: pw0 → pw1 (one self-service change).
 			require.NoError(t, changePassword(t, userID, pw0, pw1))
-			require.NoError(t, changePassword(t, userID, pw1, pw2))
-			// pw0 is 2 back; history_count=2 window is current+1 → pw0 is within window.
-			err := changePassword(t, userID, pw2, pw0)
+			// pw0 is at PreviousHashes[0]; history_count=2 window covers current + 1 previous → pw0 is within window.
+			err := changePassword(t, userID, pw1, pw0)
 			require.Error(t, err)
 			s, ok := status.FromError(err)
 			require.True(t, ok)

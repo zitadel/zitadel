@@ -242,7 +242,7 @@ func TestServer_Deprecated_SetPassword(t *testing.T) {
 //   - Set instance complexity policy to history_count=2.
 //   - Change pw0→pw1→pw2→pw3 (four sequential self-service changes).
 //   - Attempt pw3→pw0: pw0 is 3 generations back (outside the window of 2) → success.
-//   - On a fresh user: pw0→pw1→pw2; attempt pw2→pw0 (pw0 is within window) → INVALID_ARGUMENT.
+//   - On a fresh user: pw0→pw1; attempt pw1→pw0 (pw0 is within window) → INVALID_ARGUMENT.
 //
 // Scenario B: current-hash inclusion.
 //   - Set history_count=1.
@@ -323,11 +323,10 @@ func TestServer_PasswordHistoryReuse(t *testing.T) {
 		t.Run("in-window password is rejected", func(t *testing.T) {
 			userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 			adminSetPassword(t, userID, pw0)
-			// Chain: pw0 → pw1 → pw2 (two self-service changes).
+			// Chain: pw0 → pw1 (one self-service change).
 			require.NoError(t, changePassword(t, userID, pw0, pw1))
-			require.NoError(t, changePassword(t, userID, pw1, pw2))
-			// pw0 is 2 generations back; history_count=2 window includes current+1 previous → pw0 is in window.
-			err := changePassword(t, userID, pw2, pw0)
+			// pw0 is at PreviousHashes[0]; history_count=2 window covers current + 1 previous → pw0 is within window.
+			err := changePassword(t, userID, pw1, pw0)
 			require.Error(t, err)
 			s, ok := status.FromError(err)
 			require.True(t, ok)
