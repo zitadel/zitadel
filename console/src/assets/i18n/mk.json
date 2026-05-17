@@ -1681,7 +1681,8 @@
       "SYMBOLANDNUMBERERROR": "Мора да се состои од цифра и симбол/ознака за интерпункција.",
       "SYMBOLERROR": "Мора да содржи симбол/ознака за интерпункција.",
       "NUMBERERROR": "Мора да содржи цифра.",
-      "PATTERNERROR": "Лозинката не соодветствува на бараниот модел."
+      "PATTERNERROR": "Лозинката не соодветствува на бараниот модел.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Известување",

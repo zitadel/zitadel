@@ -1683,7 +1683,8 @@
       "SYMBOLANDNUMBERERROR": "密码必须由数字和符号/标点符号组成。",
       "SYMBOLERROR": "密码必须包含符号/标点符号。",
       "NUMBERERROR": "密码必须包含数字。",
-      "PATTERNERROR": "密码不符合要求。"
+      "PATTERNERROR": "密码不符合要求。",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "通知",

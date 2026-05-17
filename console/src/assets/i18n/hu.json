@@ -1678,7 +1678,8 @@
       "SYMBOLANDNUMBERERROR": "Tartalmaznia kell egy számjegyet és egy szimbólumot/pontozási jelet.",
       "SYMBOLERROR": "Tartalmaznia kell egy szimbólumot/pontozási jelet.",
       "NUMBERERROR": "Tartalmaznia kell egy számjegyet.",
-      "PATTERNERROR": "A jelszó nem felel meg a szükséges mintának."
+      "PATTERNERROR": "A jelszó nem felel meg a szükséges mintának.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Értesítés",

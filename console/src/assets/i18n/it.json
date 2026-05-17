@@ -1680,7 +1680,8 @@
       "SYMBOLANDNUMBERERROR": "Deve essere composta da una cifra e un simbolo/segno di interpunzione.",
       "SYMBOLERROR": "Deve includere un simbolo/segno di punteggiatura.",
       "NUMBERERROR": "Deve includere una cifra.",
-      "PATTERNERROR": "La password non corrisponde al modello richiesto."
+      "PATTERNERROR": "La password non corrisponde al modello richiesto.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Notifiche",

@@ -1680,7 +1680,8 @@
       "SYMBOLANDNUMBERERROR": "Doit être composé d'un chiffre et d'un symbole/signe de ponctuation.",
       "SYMBOLERROR": "Doit inclure un symbole/un signe de ponctuation.",
       "NUMBERERROR": "Doit inclure un chiffre.",
-      "PATTERNERROR": "Le mot de passe ne correspond pas au modèle requis."
+      "PATTERNERROR": "Le mot de passe ne correspond pas au modèle requis.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Notifications",

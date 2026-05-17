@@ -1679,7 +1679,8 @@
       "SYMBOLANDNUMBERERROR": "Musi składać się z cyfry i znaku specjalnego/interpunkcyjnego.",
       "SYMBOLERROR": "Musi zawierać znak specjalny/interpunkcyjny.",
       "NUMBERERROR": "Musi zawierać cyfrę.",
-      "PATTERNERROR": "Hasło nie spełnia wymaganego wzoru."
+      "PATTERNERROR": "Hasło nie spełnia wymaganego wzoru.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Powiadomienie",

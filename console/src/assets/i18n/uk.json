@@ -1684,7 +1684,8 @@
       "SYMBOLANDNUMBERERROR": "Повинен містити цифру та символ/розділовий знак.",
       "SYMBOLERROR": "Повинен містити символ/розділовий знак.",
       "NUMBERERROR": "Повинен містити цифру.",
-      "PATTERNERROR": "Пароль не відповідає необхідному шаблону."
+      "PATTERNERROR": "Пароль не відповідає необхідному шаблону.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Сповіщення",

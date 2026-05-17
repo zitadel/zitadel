@@ -1685,7 +1685,8 @@
       "SYMBOLANDNUMBERERROR": "Must consist of a digit and a symbol/punctuation mark.",
       "SYMBOLERROR": "Must include a symbol/punctuation mark.",
       "NUMBERERROR": "Must include a digit.",
-      "PATTERNERROR": "The password does not meet the required pattern."
+      "PATTERNERROR": "The password does not meet the required pattern.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Notification",

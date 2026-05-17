@@ -1740,7 +1740,8 @@
       "SYMBOLANDNUMBERERROR": "Должен состоять из цифры и символа/знака препинания.",
       "SYMBOLERROR": "Должен содержать символ/знак препинания.",
       "NUMBERERROR": "Должен содержать цифру.",
-      "PATTERNERROR": "Пароль не соответствует требованиям."
+      "PATTERNERROR": "Пароль не соответствует требованиям.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Уведомление",

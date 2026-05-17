@@ -1680,7 +1680,8 @@
       "SYMBOLANDNUMBERERROR": "Moet bestaan uit een cijfer en een symbool/leesteken.",
       "SYMBOLERROR": "Moet een symbool/leesteken bevatten.",
       "NUMBERERROR": "Moet een cijfer bevatten.",
-      "PATTERNERROR": "Het wachtwoord voldoet niet aan het vereiste patroon."
+      "PATTERNERROR": "Het wachtwoord voldoet niet aan het vereiste patroon.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Notificatie",

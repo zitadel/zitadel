@@ -1675,7 +1675,8 @@
       "SYMBOLANDNUMBERERROR": "يجب أن تتكون من رقم ورمز/علامة ترقيم.",
       "SYMBOLERROR": "يجب أن تتضمن رمزاً/علامة ترقيم.",
       "NUMBERERROR": "يجب أن تتضمن رقماً.",
-      "PATTERNERROR": "لا تفي كلمة المرور بالنمط المطلوب."
+      "PATTERNERROR": "لا تفي كلمة المرور بالنمط المطلوب.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "الإشعار",

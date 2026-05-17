@@ -1680,7 +1680,8 @@
       "SYMBOLANDNUMBERERROR": "숫자와 기호/구두점이 포함되어야 합니다.",
       "SYMBOLERROR": "기호/구두점이 포함되어야 합니다.",
       "NUMBERERROR": "숫자가 포함되어야 합니다.",
-      "PATTERNERROR": "비밀번호가 요구되는 패턴에 맞지 않습니다."
+      "PATTERNERROR": "비밀번호가 요구되는 패턴에 맞지 않습니다.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "알림",

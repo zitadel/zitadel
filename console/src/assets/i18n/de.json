@@ -1680,7 +1680,8 @@
       "SYMBOLANDNUMBERERROR": "Muss ein Symbol/Satzzeichen und eine Ziffer beinhalten.",
       "SYMBOLERROR": "Muss ein Symbol/Satzzeichen beinhalten.",
       "NUMBERERROR": "Muss eine Ziffer beinhalten.",
-      "PATTERNERROR": "Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
+      "PATTERNERROR": "Das Passwort erfüllt nicht die vorgeschriebene Richtlinie.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Benachrichtigung",

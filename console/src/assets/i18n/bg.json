@@ -1682,7 +1682,8 @@
       "SYMBOLANDNUMBERERROR": "Трябва да се състои от цифра и символ/препинателен знак.",
       "SYMBOLERROR": "Трябва да включва символ/препинателен знак.",
       "NUMBERERROR": "Трябва да включва цифра.",
-      "PATTERNERROR": "Паролата не отговаря на необходимия шаблон."
+      "PATTERNERROR": "Паролата не отговаря на необходимия шаблон.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "уведомление",

@@ -1684,7 +1684,8 @@
       "SYMBOLANDNUMBERERROR": "Måste bestå av en siffra och en symbol/tecken.",
       "SYMBOLERROR": "Måste inkludera en symbol/tecken.",
       "NUMBERERROR": "Måste inkludera en siffra.",
-      "PATTERNERROR": "Lösenordet uppfyller inte det nödvändiga mönstret."
+      "PATTERNERROR": "Lösenordet uppfyller inte det nödvändiga mönstret.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Meddelande",

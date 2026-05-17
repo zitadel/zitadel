@@ -1681,7 +1681,8 @@
       "SYMBOLANDNUMBERERROR": "Debe consistir en un dígito y un signo de puntuación/símbolo.",
       "SYMBOLERROR": "Debe inclur un símbolo/signo de puntuación.",
       "NUMBERERROR": "Debe incluir un dígito.",
-      "PATTERNERROR": "La contraseña no cumple con el patrón requerido."
+      "PATTERNERROR": "La contraseña no cumple con el patrón requerido.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Notificación",

@@ -1680,7 +1680,8 @@
       "SYMBOLANDNUMBERERROR": "数字とシンボル・句読点で構成されている必要があります。",
       "SYMBOLERROR": "シンボル・句読点を含める必要があります。",
       "NUMBERERROR": "数字を含める必要があります。",
-      "PATTERNERROR": "パスワードは必要なパターンを満たしていません。"
+      "PATTERNERROR": "パスワードは必要なパターンを満たしていません。",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "通知",

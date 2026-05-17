@@ -1680,7 +1680,8 @@
       "SYMBOLANDNUMBERERROR": "Musí obsahovat číslici a symbol/interpunkční znaménko.",
       "SYMBOLERROR": "Musí zahrnovat symbol/interpunkční znaménko.",
       "NUMBERERROR": "Musí obsahovat číslici.",
-      "PATTERNERROR": "Heslo nesplňuje požadovaný vzor."
+      "PATTERNERROR": "Heslo nesplňuje požadovaný vzor.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Oznámení",
