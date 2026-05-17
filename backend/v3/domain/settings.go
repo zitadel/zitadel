@@ -249,6 +249,7 @@ type passwordComplexitySettingsJSONChanges interface {
 	SetHasUppercase(value bool) db_json.JsonUpdate
 	SetHasNumber(value bool) db_json.JsonUpdate
 	SetHasSymbol(value bool) db_json.JsonUpdate
+	SetHistoryCount(value uint64) db_json.JsonUpdate
 }
 
 type PasswordComplexitySettings struct {
@@ -262,6 +263,7 @@ type PasswordComplexitySettingsAttributes struct {
 	HasUppercase *bool   `json:"hasUppercase,omitempty"`
 	HasNumber    *bool   `json:"hasNumber,omitempty"`
 	HasSymbol    *bool   `json:"hasSymbol,omitempty"`
+	HistoryCount *uint64 `json:"historyCount,omitempty"`
 }
 
 //go:generate mockgen -typed -package domainmock -destination ./mock/password_complexity_settings.mock.go . PasswordComplexitySettingsRepository
