@@ -460,6 +460,32 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 	}
 }
 
+func TestHasher_ValidateEncodedHash(t *testing.T) {
+	cfg := &HashConfig{
+		Hasher: HasherConfig{
+			Algorithm: HashNameBcrypt,
+			Params: map[string]any{
+				"cost": 12,
+			},
+		},
+		Limits: HashLimitsConfig{
+			Bcrypt: BcryptLimitsConfig{MinCost: 10, MaxCost: 16},
+		},
+	}
+	hasher, err := cfg.NewHasher()
+	require.NoError(t, err)
+
+	valid, err := hasher.Hash("password")
+	require.NoError(t, err)
+	require.NoError(t, hasher.ValidateEncodedHash(valid))
+
+	err = hasher.ValidateEncodedHash("$2a$31$aaaaaaaaaaaaaaaaaaaaaa$aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+	require.Error(t, err)
+
+	err = hasher.ValidateEncodedHash("$unknown$hash")
+	require.Error(t, err)
+}
+
 func TestHasherConfig_decodeParams(t *testing.T) {
 	type dst struct {
 		A int
@@ -666,7 +692,7 @@ func TestHasherConfig_scryptParams(t *testing.T) {
 				},
 			},
 			want: scrypt.Params{
-				N:       4,
+				LN:      2,
 				R:       8,
 				P:       1,
 				KeyLen:  32,
