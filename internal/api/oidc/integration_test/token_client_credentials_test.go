@@ -170,6 +170,8 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 			}
 			require.NoError(t, err)
 			require.NotNil(t, tokens)
+			// RFC 9068 §2.2.3: JWT access tokens should carry the granted scopes.
+			assert.ElementsMatch(t, tt.scope, []string(decodeJWTAccessToken(t, Instance, tokens.AccessToken).Scopes))
 			userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, oidc.BearerToken, machine.GetUserId(), provider)
 			require.NoError(t, err)
 			assert.Equal(t, tt.wantClaims.resourceOwnerID, userinfo.Claims[oidc_api.ClaimResourceOwnerID])
