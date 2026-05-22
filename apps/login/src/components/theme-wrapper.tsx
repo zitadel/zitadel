@@ -27,6 +27,20 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
     const STYLE_ID = "zitadel-custom-font";
 
     if (branding?.fontUrl) {
+      // Convert absolute fontUrl to a relative path to avoid CORS issues.
+      // The font asset is served by the ZITADEL backend (e.g.,
+      // https://instance.zitadel.app/assets/v1/.../font-123), but browsers
+      // block cross-origin @font-face requests unless the server sends
+      // Access-Control-Allow-Origin. Using a relative path routes the request
+      // through the same origin and the Next.js proxy forwards it to the backend.
+      let fontSrc = branding.fontUrl;
+      try {
+        const url = new URL(branding.fontUrl);
+        fontSrc = url.pathname + url.search;
+      } catch {
+        // If parsing fails, use the original URL as-is (it might already be relative)
+      }
+
       let styleEl = document.getElementById(STYLE_ID) as HTMLStyleElement | null;
       if (!styleEl) {
         styleEl = document.createElement("style");
@@ -39,7 +53,7 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
           font-family: 'ZitadelCustomFont';
           font-style: normal;
           font-display: swap;
-          src: url('${branding.fontUrl}');
+          src: url('${fontSrc}');
         }
       `;
 
@@ -47,13 +61,19 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
         "--zitadel-font-family",
         "'ZitadelCustomFont', sans-serif",
       );
+      // Inline style overrides the class-based Lato from next/font
+      document.documentElement.style.setProperty(
+        "font-family",
+        "'ZitadelCustomFont', sans-serif",
+      );
     } else {
-      // No custom font — remove injected style and CSS variable
+      // No custom font — remove injected style and let Lato class take over
       const existing = document.getElementById(STYLE_ID);
       if (existing) {
         existing.remove();
       }
       document.documentElement.style.removeProperty("--zitadel-font-family");
+      document.documentElement.style.removeProperty("font-family");
     }
 
     return () => {
@@ -62,6 +82,7 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
         existing.remove();
       }
       document.documentElement.style.removeProperty("--zitadel-font-family");
+      document.documentElement.style.removeProperty("font-family");
     };
   }, [branding?.fontUrl]);
 

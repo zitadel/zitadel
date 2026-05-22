@@ -8,7 +8,7 @@ import { getServiceConfig } from "./lib/service-url";
 const logger = createLogger("middleware");
 
 export const config = {
-  matcher: ["/.well-known/:path*", "/oauth/:path*", "/oidc/:path*", "/idps/callback/:path*", "/saml/:path*", "/:path*"],
+  matcher: ["/.well-known/:path*", "/oauth/:path*", "/oidc/:path*", "/idps/callback/:path*", "/saml/:path*", "/assets/:path*", "/:path*"],
 };
 
 export async function proxy(request: NextRequest) {
@@ -60,7 +60,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Only proxy paths need to be rewritten to the ZITADEL backend
-  const proxyPaths = ["/.well-known/", "/oauth/", "/oidc/", "/idps/callback/", "/saml/"];
+  const proxyPaths = ["/.well-known/", "/oauth/", "/oidc/", "/idps/callback/", "/saml/", "/assets/"];
   const isMatched = proxyPaths.some((prefix) => request.nextUrl.pathname.startsWith(prefix));
 
   if (!isMatched) {
