@@ -11,7 +11,7 @@ const BASE_DIRECTIVES: Record<string, string[]> = {
 
 export interface CSPOptions {
   serviceUrl?: string;
-  iframeOrigins?: string[];
+  iframeOrigins?: string[] | null;
 }
 
 export function buildCSP(options: CSPOptions = {}): string {

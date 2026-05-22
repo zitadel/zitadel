@@ -2587,7 +2587,7 @@
       "TYPEREQUIRED": "Typ je vyžadován.",
       "TITLE": "OIDC Konfigurace",
       "CLIENTID": "ID klienta",
-      "CLIENTSECRET": "Tajemství klienta",
+      "CLIENTDETAILS": "Podrobnosti klienta",
       "CLIENTSECRET_NOSECRET": "S vaším vybraným způsobem autentizace není požadováno žádné tajemství a proto není dostupné.",
       "CLIENTSECRET_DESCRIPTION": "Uchovávejte toto tajemství klienta na bezpečném místě, jakmile je dialog zavřen, nelze jej již znovu zobrazit.",
       "REGENERATESECRET": "Regenerovat tajemství klienta",

@@ -4,8 +4,8 @@
   $background: map-get($theme, background);
   $card-background-color: map-get($background, cards);
   $is-dark-theme: map-get($theme, is-dark);
-  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
-  $border-selected-color: if($is-dark-theme, #fff, #000);
+  $border-color: if(sass($is-dark-theme): rgba(#8795a1, 0.2) ; else: rgba(#8795a1, 0.2));
+  $border-selected-color: if(sass($is-dark-theme): #fff; else: #000);
 
   .card {
     background-color: $card-background-color;
@@ -57,7 +57,7 @@
   .cnsl-chip {
     height: auto;
     border: 1px solid $border-color;
-    background: if($is-dark-theme, map-get($background, state), #e4e7e4) !important;
+    background: if(sass($is-dark-theme): map-get($background, state) ; else: #e4e7e4) !important;
 
     .cnsl-chip-content {
       display: flex;

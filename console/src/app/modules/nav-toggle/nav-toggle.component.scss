@@ -51,7 +51,7 @@
         padding: 2px;
         margin: -2px -9px -2px 8px;
         margin-left: 6px;
-        background-color: if($is-dark-theme, #ffffff20, #00000020);
+        background-color: if(sass($is-dark-theme): #ffffff20; else: #00000020);
         line-height: 18px;
         font-size: 11px;
         transition: background 0.2s ease;
@@ -69,7 +69,7 @@
     }
 
     &:hover {
-      background: if($is-dark-theme, #ffffff40, #00000010);
+      background: if(sass($is-dark-theme): #ffffff40; else: #00000010);
     }
 
     &.active {
@@ -78,7 +78,7 @@
 
       .c_label {
         .count {
-          background-color: if($is-dark-theme, #00000020, #ffffff20);
+          background-color: if(sass($is-dark-theme): #00000020; else: #ffffff20);
         }
       }
     }
