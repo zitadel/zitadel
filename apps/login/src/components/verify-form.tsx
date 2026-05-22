@@ -5,7 +5,7 @@ import { handleServerActionResponse } from "@/lib/client-utils";
 import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { resendVerification, sendVerification } from "@/lib/server/verify";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AutoSubmitForm } from "./auto-submit-form";
@@ -31,6 +31,9 @@ type Props = {
 
 export function VerifyForm({ userId, loginName, organization, requestId, code, isInvite, submit }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const codeSent = searchParams.get("codeSent") === "true";
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onChange",
@@ -47,7 +50,6 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
   const [loading, setLoading] = useState<boolean>(false);
 
   const [initialSendError, setInitialSendError] = useState<string>("");
-  const [codeSent, setCodeSent] = useState(false);
 
   async function resendCode() {
     setError("");
@@ -78,6 +80,11 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
       setError(response.error);
       return;
     }
+
+    // Signal success via URL search param so the "code sent" alert is shown
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("codeSent", "true");
+    router.replace(`${pathname}?${params.toString()}`);
 
     return response;
   }

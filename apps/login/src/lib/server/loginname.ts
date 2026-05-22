@@ -345,20 +345,29 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       // and causes confusion. Only auto-send if the email is already verified.
       const shouldSend = humanUser?.email?.isVerified === true;
 
+      let codeSent = false;
       if (shouldSend) {
         await initialSendVerification({
           userId: session?.factors?.user?.id ?? user.userId,
           isInvite: true,
           requestId: command.requestId,
-        }).catch((err: any) => {
-          console.error("Failed to send initial verification email during loginname", err);
-        });
+        })
+          .then(() => {
+            codeSent = true;
+          })
+          .catch((err: any) => {
+            logger.error("Failed to send initial verification email during loginname", { error: err });
+          });
       }
 
       const params = new URLSearchParams({
         loginName: (session?.factors?.user?.loginName ?? user.preferredLoginName) as string,
         invite: "true", // always send invite code if user has no primary auth method
       });
+
+      if (codeSent) {
+        params.append("codeSent", "true");
+      }
 
       if (command.requestId) {
         params.append("requestId", command.requestId);
