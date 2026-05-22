@@ -56,3 +56,19 @@ func (s *Server) DeleteOrganizationSettings(ctx context.Context, req *connect.Re
 		DeletionDate: deletionDate,
 	}), nil
 }
+
+func (s *Server) GetLinkSettings(ctx context.Context, req *connect.Request[settings.GetLinkSettingsRequest]) (*connect.Response[settings.GetLinkSettingsResponse], error) {
+	panic("implement me")
+}
+
+func (s *Server) SetLinkSettings(ctx context.Context, req *connect.Request[settings.SetLinkSettingsRequest]) (*connect.Response[settings.SetLinkSettingsResponse], error) {
+	panic("implement me")
+}
+
+func (s *Server) ResetLinkSettings(ctx context.Context, req *connect.Request[settings.ResetLinkSettingsRequest]) (*connect.Response[settings.ResetLinkSettingsResponse], error) {
+	panic("implement me")
+}
+
+func (s *Server) GetEffectiveSettings(ctx context.Context, req *connect.Request[settings.GetEffectiveSettingsRequest]) (*connect.Response[settings.GetEffectiveSettingsResponse], error) {
+	panic("implement me")
+}

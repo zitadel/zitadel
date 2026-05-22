@@ -38,6 +38,7 @@ const (
 	IDPTypeGoogle
 	IDPTypeApple
 	IDPTypeSAML
+	IDPTypeZitadel
 )
 
 func (t IDPType) GetCSSClass() string {

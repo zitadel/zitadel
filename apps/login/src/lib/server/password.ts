@@ -1,5 +1,6 @@
 "use server";
 
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/logger";
 import { recordAuthAttempt, recordAuthFailure, recordAuthSuccess } from "@/lib/metrics";
 import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "@/lib/server/cookie";
@@ -15,7 +16,7 @@ import {
   setPassword,
   setUserPassword,
 } from "@/lib/zitadel";
-import { Code, ConnectError, create, Duration } from "@zitadel/client";
+import { Code, create, Duration } from "@zitadel/client";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
@@ -585,7 +586,7 @@ export async function checkSessionAndSetPassword({
 
   return setPassword({ serviceConfig, payload }).catch((error) => {
     // throw error if failed precondition (ex. User is not yet initialized)
-    if (error instanceof ConnectError && error.code === Code.FailedPrecondition && error.message) {
+    if (isClassifiedError(error) && error.code === Code.FailedPrecondition && error.message) {
       return { error: t("errors.failedPrecondition") };
     }
     return { error: "Could not set password" };

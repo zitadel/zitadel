@@ -24,6 +24,10 @@ import (
 	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
+const (
+	MaxSendMsgSize = 10 * 1024 * 1024 // 10MiB, global value required for exports.
+)
+
 type Server interface {
 	AppName() string
 	MethodPrefix() string
@@ -90,6 +94,7 @@ func CreateServer(
 			),
 		),
 		grpc.StatsHandler(middleware.DefaultTracingServer()),
+		grpc.MaxSendMsgSize(MaxSendMsgSize),
 	}
 	if tlsConfig != nil {
 		serverOptions = append(serverOptions, grpc.Creds(credentials.NewTLS(tlsConfig)))

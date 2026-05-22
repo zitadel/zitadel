@@ -7,8 +7,8 @@
   $is-dark-theme: map.get($theme, is-dark);
   $background: map.get($theme, background);
   $foreground: map.get($theme, foreground);
-  $p-border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
-  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+  $p-border-color: if(sass($is-dark-theme): rgba(#8795a1, 0.2) ; else: rgba(#8795a1, 0.2));
+  $border-color: if(sass($is-dark-theme): rgba(#8795a1, 0.2) ; else: rgba(#8795a1, 0.2));
 
   .privatelabeling-policy {
     .header {

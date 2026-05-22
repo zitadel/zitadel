@@ -274,10 +274,10 @@ message Session {
 
   // Token of the session used to login the user. This token verifies that the session is valid.
   string session_token = 2 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
+    (validate.rules).string = {min_len: 1, max_len: 500},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 200;
+      max_length: 500;
     },
     (google.api.field_behavior) = REQUIRED
   ];
@@ -315,10 +315,10 @@ message GetDeviceAuthorizationRequestResponse {
 message AuthorizeOrDenyDeviceAuthorizationRequest {
   // The device authorization id returned when submitting the user code.
   string device_authorization_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
+    (validate.rules).string = {min_len: 1, max_len: 500},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 200;
+      max_length: 500;
     },
     (google.api.field_behavior) = REQUIRED
   ];

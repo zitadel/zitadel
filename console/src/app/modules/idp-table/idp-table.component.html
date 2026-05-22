@@ -234,7 +234,7 @@
     </table>
   </div>
 
-  @if ((loading$ | async) === false && !dataSource?.data?.length) {
+  @if ((loading$ | async) === false && !dataSource.data.length) {
     <div class="no-content-row">
       <i class="las la-exclamation"></i>
       <span>{{ 'IDP.EMPTY' | translate }}</span>

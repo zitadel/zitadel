@@ -13,8 +13,8 @@
 
   $list-background-color: map-get($background, 300);
   $card-background-color: map-get($background, cards);
-  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
-  $border-selected-color: if($is-dark-theme, #fff, #000);
+  $border-color: if(sass($is-dark-theme): rgba(#8795a1, 0.2) ; else: rgba(#8795a1, 0.2));
+  $border-selected-color: if(sass($is-dark-theme): #fff; else: #000);
 
   .project-role-chip {
     display: flex;
