@@ -43,7 +43,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <html className={`${lato.className}`} suppressHydrationWarning>
+    <html className={`${lato.className}`} style={{ fontFamily: "var(--zitadel-font-family, inherit)" }} suppressHydrationWarning>
       <head />
       <body>
         <ThemeProvider>

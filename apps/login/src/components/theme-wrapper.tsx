@@ -18,6 +18,53 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
     setTheme(document, branding);
   }, [branding]);
 
+  // Apply custom font from branding settings.
+  // When a custom font is uploaded via the label/branding policy, fontUrl
+  // contains a fully-resolved URL to the font file served by the assets API.
+  // We inject a @font-face rule and set a CSS custom property so the entire
+  // login UI picks up the custom font with Lato as fallback.
+  useEffect(() => {
+    const STYLE_ID = "zitadel-custom-font";
+
+    if (branding?.fontUrl) {
+      let styleEl = document.getElementById(STYLE_ID) as HTMLStyleElement | null;
+      if (!styleEl) {
+        styleEl = document.createElement("style");
+        styleEl.id = STYLE_ID;
+        document.head.appendChild(styleEl);
+      }
+
+      styleEl.textContent = `
+        @font-face {
+          font-family: 'ZitadelCustomFont';
+          font-style: normal;
+          font-display: swap;
+          src: url('${branding.fontUrl}');
+        }
+      `;
+
+      document.documentElement.style.setProperty(
+        "--zitadel-font-family",
+        "'ZitadelCustomFont', sans-serif",
+      );
+    } else {
+      // No custom font — remove injected style and CSS variable
+      const existing = document.getElementById(STYLE_ID);
+      if (existing) {
+        existing.remove();
+      }
+      document.documentElement.style.removeProperty("--zitadel-font-family");
+    }
+
+    return () => {
+      const existing = document.getElementById(STYLE_ID);
+      if (existing) {
+        existing.remove();
+      }
+      document.documentElement.style.removeProperty("--zitadel-font-family");
+    };
+  }, [branding?.fontUrl]);
+
   // Publish themeMode to the module-level store so ThemeSwitch can read it
   useEffect(() => {
     setThemeMode(branding?.themeMode ?? ThemeMode.UNSPECIFIED);
