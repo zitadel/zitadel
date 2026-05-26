@@ -729,7 +729,18 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, statement *S
 	if err = statement.Execute(ctx, tx, h.projection.Name()); err != nil {
 		logging.WithError(ctx, err).Error("statement execution failed")
 
-		_, rollbackErr := tx.ExecContext(ctx, "ROLLBACK TO SAVEPOINT exec_stmt")
+		// Use a context that is decoupled from the parent ctx for the
+		// rollback. If the request ctx was already cancelled by the time
+		// the projection statement returned (e.g. h.txDuration timeout
+		// fired, or the caller cancelled), ExecContext on the parent ctx
+		// short-circuits with context.Canceled BEFORE issuing the SQL.
+		// The savepoint then stays live server-side and the underlying
+		// connection is handed back to the pool with the outer
+		// BEGIN + SAVEPOINT still open. Postgres terminates the session
+		// after idle_in_transaction_session_timeout (SQLSTATE 25P03),
+		// effectively leaking one connection per projection cancel.
+		rollbackCtx := context.WithoutCancel(ctx)
+		_, rollbackErr := tx.ExecContext(rollbackCtx, "ROLLBACK TO SAVEPOINT exec_stmt")
 		logging.OnError(ctx, rollbackErr).Debug("rollback to savepoint failed")
 
 		shouldContinue := h.handleFailedStmt(ctx, tx, failureFromStatement(statement, err))
