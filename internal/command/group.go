@@ -169,8 +169,8 @@ func (c *Commands) getGroupWriteModelByID(ctx context.Context, groupID, orgID st
 	return groupWriteModel, nil
 }
 
-// getGroupUsersWriteModel loads the membership state of a group — who is a member
-// and their per-user attributes — independently of the group's base record.
+// getGroupUsersWriteModel loads the membership state of a group - who is a member
+// and their per-user attributes - independently of the group's base record.
 func (c *Commands) getGroupUsersWriteModel(ctx context.Context, groupID, orgID string) (*GroupUsersWriteModel, error) {
 	writeModel := NewGroupUsersWriteModel(groupID, orgID)
 	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {

@@ -32,9 +32,9 @@ func (c *Commands) AddUsersToGroup(ctx context.Context, groupID string, users []
 		return writeModelToObjectDetails(&groupUsers.WriteModel), nil
 	}
 
-	// precondition: all users must exist in the same organization as the group
+	// precondition: all users must exist within the same instance
 	for _, u := range toAdd {
-		if _, err := c.checkUserExists(ctx, u.UserID, groupUsers.ResourceOwner); err != nil {
+		if _, err := c.checkUserExists(ctx, u.UserID, ""); err != nil {
 			return nil, err
 		}
 	}
@@ -67,7 +67,6 @@ func (c *Commands) RemoveUsersFromGroup(ctx context.Context, groupID string, use
 
 	toRemove := groupUsers.UserIDsToRemove(userIDs)
 	if len(toRemove) == 0 {
-		// none of the requested userIDs are in the group; desired state achieved
 		return writeModelToObjectDetails(&groupUsers.WriteModel), nil
 	}
 
@@ -81,17 +80,23 @@ func (c *Commands) RemoveUsersFromGroup(ctx context.Context, groupID string, use
 	)
 }
 
+// GroupUserRef identifies a group membership for cascading operations (e.g. user deletion).
+type GroupUserRef struct {
+	GroupID       string
+	ResourceOwner string
+}
+
 // removeUserFromGroups returns the events to remove a user from multiple groups.
 // This is needed when a user is deleted and subsequently needs to be removed from all groups.
-// Note: Ensure that the groupIDs are retrieved via SearchGroupUsers before calling this method
-func (c *Commands) removeUserFromGroups(ctx context.Context, userID string, groupIDs []string, resourceOwner string) ([]eventstore.Command, error) {
-	events := make([]eventstore.Command, 0, len(groupIDs))
-	for _, groupID := range groupIDs {
+// Note: Ensure that the groupRefs are retrieved via SearchGroupUsers before calling this method
+func (c *Commands) removeUserFromGroups(ctx context.Context, userID string, groupRefs []GroupUserRef) ([]eventstore.Command, error) {
+	events := make([]eventstore.Command, 0, len(groupRefs))
+	for _, ref := range groupRefs {
 		events = append(
 			events,
 			repo.NewGroupUsersRemovedEvent(
 				ctx,
-				&repo.NewAggregate(groupID, resourceOwner).Aggregate,
+				&repo.NewAggregate(ref.GroupID, ref.ResourceOwner).Aggregate,
 				[]string{userID},
 			),
 		)

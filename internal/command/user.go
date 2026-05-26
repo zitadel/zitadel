@@ -177,7 +177,7 @@ func (c *Commands) UnlockUser(ctx context.Context, userID, resourceOwner string)
 	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
-func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingUserMemberships []*CascadingMembership, cascadingGrantIDs, cascadingGroupIDs []string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingUserMemberships []*CascadingMembership, cascadingGrantIDs []string, cascadingGroupUsers []GroupUserRef) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
 	}
@@ -220,8 +220,8 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 	}
 
 	// remove user from user groups
-	if len(cascadingGroupIDs) > 0 {
-		groupUserEvents, err := c.removeUserFromGroups(ctx, userID, cascadingGroupIDs, resourceOwner)
+	if len(cascadingGroupUsers) > 0 {
+		groupUserEvents, err := c.removeUserFromGroups(ctx, userID, cascadingGroupUsers)
 		if err != nil {
 			return nil, err
 		}

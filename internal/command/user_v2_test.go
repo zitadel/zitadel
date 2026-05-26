@@ -1100,7 +1100,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 			userID               string
 			cascadingMemberships []*CascadingMembership
 			grantIDs             []string
-			groupIDs             []string
+			groupUsers           []GroupUserRef
 		}
 	)
 	type res struct {
@@ -1417,9 +1417,9 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 			},
 			args: args{
 				userID: "user1",
-				groupIDs: []string{
-					"group1",
-					"group2",
+				groupUsers: []GroupUserRef{
+					{GroupID: "group1", ResourceOwner: "org1"},
+					{GroupID: "group2", ResourceOwner: "org1"},
 				},
 			},
 			res: res{
@@ -1466,7 +1466,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 				checkPermission: tt.fields.checkPermission,
 			}
 
-			got, err := r.RemoveUserV2(ctx, tt.args.userID, "", tt.args.cascadingMemberships, tt.args.grantIDs, tt.args.groupIDs)
+			got, err := r.RemoveUserV2(ctx, tt.args.userID, "", tt.args.cascadingMemberships, tt.args.grantIDs, tt.args.groupUsers)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

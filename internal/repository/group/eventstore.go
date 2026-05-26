@@ -9,6 +9,15 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, GroupUsersAddedEventType, eventstore.GenericEventMapper[GroupUsersAddedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, GroupUsersChangedEventType, eventstore.GenericEventMapper[GroupUserChangedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, GroupUsersRemovedEventType, eventstore.GenericEventMapper[GroupUsersRemovedEvent])
+	// TODO(legacy-cleanup): Remove these two registrations once all pre-migration group
+	// memberships have been re-added via AddUsersToGroup and the old events are gone.
+	// Legacy event types — registered for backward-compatible replay only; never written.
+	eventstore.RegisterFilterEventMapper(AggregateType, LegacyGroupUserAddedEventType, eventstore.GenericEventMapper[LegacyGroupUserAddedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, LegacyGroupUserRemovedEventType, eventstore.GenericEventMapper[LegacyGroupUserRemovedEvent])
+	// TODO(legacy-cleanup): Remove these two registrations once all pre-migration group
+	// memberships have been re-added via AddUsersToGroup and the old member events are gone.
+	eventstore.RegisterFilterEventMapper(AggregateType, LegacyGroupMemberAddedEventType, eventstore.GenericEventMapper[LegacyGroupMemberAddedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, LegacyGroupMemberRemovedEventType, eventstore.GenericEventMapper[LegacyGroupMemberRemovedEvent])
 	// eventstore.RegisterFilterEventMapper(AggregateType, GroupUserCascadeRemovedEventType, eventstore.GenericEventMapper[GroupUserCascadeRemovedEvent]) // TODO: Check if need a cascade removed event.
 	eventstore.RegisterFilterEventMapper(AggregateType, GroupDeactivatedEventType, eventstore.GenericEventMapper[GroupDeactivatedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, GroupReactivatedEventType, eventstore.GenericEventMapper[GroupReactivatedEvent])

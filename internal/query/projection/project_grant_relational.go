@@ -55,10 +55,16 @@ func (p *relationalTablesProjection) reduceProjectGrantChanged(event eventstore.
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ANaKzWKAUc", "reduce.wrong.db.pool %T", ex)
 		}
+		// Filter role keys to only those that exist in project_roles.
+		// Historical project.grant.changed events can reference roles that were later removed.
+		validRoles, err := filterExistingRoleKeys(ctx, tx, e.Aggregate().InstanceID, e.Aggregate().ID, e.RoleKeys)
+		if err != nil {
+			return err
+		}
 		repo := repository.ProjectGrantRepository()
-		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+		_, err = repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.GrantID),
-			e.RoleKeys,
+			validRoles,
 			repo.SetUpdatedAt(e.CreationDate()),
 		)
 		return err
@@ -75,10 +81,16 @@ func (p *relationalTablesProjection) reduceProjectGrantCascadeChanged(event even
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-aI2o6NlWpv", "reduce.wrong.db.pool %T", ex)
 		}
+		// Filter role keys to only those that exist in project_roles.
+		// Historical project.grant.cascade.changed events can reference roles that were later removed.
+		validRoles, err := filterExistingRoleKeys(ctx, tx, e.Aggregate().InstanceID, e.Aggregate().ID, e.RoleKeys)
+		if err != nil {
+			return err
+		}
 		repo := repository.ProjectGrantRepository()
-		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+		_, err = repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Aggregate().InstanceID, e.GrantID),
-			e.RoleKeys,
+			validRoles,
 			repo.SetUpdatedAt(e.CreationDate()),
 		)
 		return err

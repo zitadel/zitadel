@@ -105,14 +105,43 @@ func (p *relationalTablesProjection) reduceAuthorizationChanged(event eventstore
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-sBwGEW", "reduce.wrong.db.pool %T", ex)
 		}
 
+		// Changed/cascade.changed events do not carry project_id in payload.
+		// Resolve the existing authorization's project_id so we can filter role keys
+		// against zitadel.project_roles and avoid FK violations on update.
+		projectID, err := authorizationProjectID(ctx, tx, event.Aggregate().InstanceID, event.Aggregate().ID)
+		if err != nil {
+			return err
+		}
+		validRoles, err := filterExistingRoleKeys(ctx, tx, event.Aggregate().InstanceID, projectID, roles)
+		if err != nil {
+			return err
+		}
+
 		repo := repository.AuthorizationRepository()
-		_, err := repo.Update(ctx, v3_sql.SQLTx(tx),
+		_, err = repo.Update(ctx, v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(event.Aggregate().InstanceID, event.Aggregate().ID),
-			roles,
+			validRoles,
 			repo.SetUpdatedAt(event.CreatedAt()),
 		)
 		return err
 	}), nil
+}
+
+// authorizationProjectID resolves project_id for an existing authorization row.
+func authorizationProjectID(ctx context.Context, tx *sql.Tx, instanceID, authorizationID string) (string, error) {
+	var projectID string
+	err := tx.QueryRowContext(ctx,
+		`SELECT project_id FROM zitadel.authorizations WHERE instance_id = $1 AND id = $2`,
+		instanceID, authorizationID,
+	).Scan(&projectID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// No existing row to update; returning empty project keeps behavior noop-like.
+			return "", nil
+		}
+		return "", err
+	}
+	return projectID, nil
 }
 
 func (p *relationalTablesProjection) reduceAuthorizationRemoved(event eventstore.Event) (*handler.Statement, error) {

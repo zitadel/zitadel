@@ -254,7 +254,7 @@ func (h *UsersHandler) List(ctx context.Context, request *ListRequest) (*ListRes
 	return NewListResponse(users.SearchResponse.Count, q.SearchRequest, scimUsers), nil
 }
 
-func (h *UsersHandler) queryUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, []string, error) {
+func (h *UsersHandler) queryUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, []command.GroupUserRef, error) {
 	userGrantUserQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
 	if err != nil {
 		return nil, nil, nil, err
@@ -286,7 +286,7 @@ func (h *UsersHandler) queryUserDependencies(ctx context.Context, userID string)
 	return cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants), groupIDs, nil
 }
 
-func (h *UsersHandler) getGroupsByUserID(ctx context.Context, userID string) ([]string, error) {
+func (h *UsersHandler) getGroupsByUserID(ctx context.Context, userID string) ([]command.GroupUserRef, error) {
 	groupUserQuery, err := query.NewGroupUsersUserIDsSearchQuery([]string{userID})
 	if err != nil {
 		return nil, err
@@ -303,9 +303,12 @@ func (h *UsersHandler) getGroupsByUserID(ctx context.Context, userID string) ([]
 	if len(groupUsers.GroupUsers) == 0 {
 		return nil, nil
 	}
-	groupIDs := make([]string, 0, len(groupUsers.GroupUsers))
+	refs := make([]command.GroupUserRef, 0, len(groupUsers.GroupUsers))
 	for _, groupUser := range groupUsers.GroupUsers {
-		groupIDs = append(groupIDs, groupUser.GroupID)
+		refs = append(refs, command.GroupUserRef{
+			GroupID:       groupUser.GroupID,
+			ResourceOwner: groupUser.ResourceOwner,
+		})
 	}
-	return groupIDs, nil
+	return refs, nil
 }

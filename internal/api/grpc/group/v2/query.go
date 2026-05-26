@@ -238,7 +238,7 @@ func groupUserToPb(gu *query.GroupUser) *group_v2.GroupUser {
 			PreferredLoginName: gu.PreferredLoginName,
 			DisplayName:        gu.DisplayName,
 			AvatarUrl:          gu.AvatarUrl,
-			OrganizationId:     gu.ResourceOwner,
+			OrganizationId:     gu.UserResourceOwner,
 		},
 		CreationDate: timestamppb.New(gu.CreationDate),
 		Attributes:   groupUserAttrsToProto(gu.Attributes),

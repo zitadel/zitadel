@@ -43,6 +43,12 @@ func (g *GroupUsersWriteModel) Query() *eventstore.SearchQueryBuilder {
 			group.GroupUsersAddedEventType,
 			group.GroupUsersChangedEventType,
 			group.GroupUsersRemovedEventType,
+			// TODO(legacy-cleanup): Remove the four lines below once all pre-migration group
+			// memberships have been re-added via AddUsersToGroup and the old events are gone.
+			group.LegacyGroupUserAddedEventType,
+			group.LegacyGroupUserRemovedEventType,
+			group.LegacyGroupMemberAddedEventType,
+			group.LegacyGroupMemberRemovedEventType,
 		).Builder()
 }
 
@@ -66,6 +72,20 @@ func (g *GroupUsersWriteModel) Reduce() error {
 			for _, userID := range e.UserIDs {
 				delete(g.existingUsers, userID)
 			}
+		// TODO(legacy-cleanup): Remove the four cases below once all pre-migration group
+		// memberships have been re-added via AddUsersToGroup and the old events are gone.
+		case *group.LegacyGroupUserAddedEvent:
+			if e.UserID != "" {
+				g.existingUsers[e.UserID] = nil
+			}
+		case *group.LegacyGroupUserRemovedEvent:
+			delete(g.existingUsers, e.UserID)
+		case *group.LegacyGroupMemberAddedEvent:
+			if e.UserID != "" {
+				g.existingUsers[e.UserID] = nil
+			}
+		case *group.LegacyGroupMemberRemovedEvent:
+			delete(g.existingUsers, e.UserID)
 		}
 	}
 	return g.WriteModel.Reduce()

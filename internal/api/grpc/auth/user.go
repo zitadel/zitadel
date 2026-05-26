@@ -326,7 +326,7 @@ func userGrantsToIDs(userGrants []*query.UserGrant) []string {
 	return converted
 }
 
-func (s *Server) getGroupsByUserID(ctx context.Context, userID string) ([]string, error) {
+func (s *Server) getGroupsByUserID(ctx context.Context, userID string) ([]command.GroupUserRef, error) {
 	groupUserQuery, err := query.NewGroupUsersUserIDsSearchQuery([]string{userID})
 	if err != nil {
 		return nil, err
@@ -343,9 +343,12 @@ func (s *Server) getGroupsByUserID(ctx context.Context, userID string) ([]string
 	if len(groupUsers.GroupUsers) == 0 {
 		return nil, nil
 	}
-	groupIDs := make([]string, 0, len(groupUsers.GroupUsers))
+	refs := make([]command.GroupUserRef, 0, len(groupUsers.GroupUsers))
 	for _, groupUser := range groupUsers.GroupUsers {
-		groupIDs = append(groupIDs, groupUser.GroupID)
+		refs = append(refs, command.GroupUserRef{
+			GroupID:       groupUser.GroupID,
+			ResourceOwner: groupUser.ResourceOwner,
+		})
 	}
-	return groupIDs, nil
+	return refs, nil
 }

@@ -189,6 +189,7 @@ func (g *groupUsersProjection) reduceGroupUsersChanged(event eventstore.Event) (
 		handler.NewCol(GroupUsersColumnAttributes, database.Map[group.AttributeValue](e.Attributes)),
 	}, []handler.Condition{
 		handler.NewCond(GroupUsersColumnInstanceID, e.Aggregate().InstanceID),
+		handler.NewCond(GroupUsersColumnGroupID, e.Aggregate().ID),
 		handler.NewCond(GroupUsersColumnUserID, e.UserID),
 	}), nil
 }

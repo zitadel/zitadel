@@ -123,13 +123,12 @@ func TestServer_AddUsersToGroup(t *testing.T) {
 			wantErrCode: codes.FailedPrecondition,
 		},
 		{
-			name: "user in a different org not added, ok",
+			name: "user in a different org added, ok",
 			ctx:  iamOwnerCtx,
 			req: &group_v2.AddUsersToGroupRequest{
 				Id:    group.GetId(),
 				Users: idsToAddGroupUsers(user1.GetUserId(), user2.GetUserId(), defOrgUser.GetUserId()),
 			},
-			wantErrCode: codes.FailedPrecondition,
 		},
 		{
 			name: "add all users to group, ok",

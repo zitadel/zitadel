@@ -66,6 +66,9 @@ type GroupUser struct {
 
 	// user fields
 	UserID string
+	// UserResourceOwner is the org that owns the user (may differ from ResourceOwner
+	// when a cross-org user is added to the group).
+	UserResourceOwner string
 	// Attributes are per-user attributes of this group-user relation, stored as
 	// a JSONB map in projections.group_users2.attributes.
 	Attributes         database.Map[group.AttributeValue]
@@ -150,8 +153,10 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 			HumanAvatarURLCol.identifier(),
 			GroupUsersColumnCreationDate.identifier(),
 			GroupUsersColumnSequence.identifier(),
+			UserResourceOwnerCol.identifier(),
 			countColumn.identifier(),
 		).From(groupUsersTable.identifier()).
+			LeftJoin(join(UserIDCol, GroupUsersColumnUserID)).
 			LeftJoin(join(HumanUserIDCol, GroupUsersColumnUserID)).
 			LeftJoin(join(LoginNameUserIDCol, GroupUsersColumnUserID)).
 			Where(
@@ -167,6 +172,7 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 					displayName        sql.NullString
 					avatarURL          sql.NullString
 					preferredLoginName sql.NullString
+					userResourceOwner  sql.NullString
 				)
 
 				err := rows.Scan(
@@ -179,6 +185,7 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 					&avatarURL,
 					&g.CreationDate,
 					&g.Sequence,
+					&userResourceOwner,
 					&count,
 				)
 				if err != nil {
@@ -188,6 +195,7 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 				g.DisplayName = displayName.String
 				g.AvatarUrl = avatarURL.String
 				g.PreferredLoginName = preferredLoginName.String
+				g.UserResourceOwner = userResourceOwner.String
 				groupUsers = append(groupUsers, g)
 			}
 			if err := rows.Close(); err != nil {

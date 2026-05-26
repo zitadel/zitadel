@@ -1158,7 +1158,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 			userID                 string
 			cascadeUserMemberships []*CascadingMembership
 			cascadeUserGrants      []string
-			cascadeUserGroups      []string
+			cascadeUserGroups      []GroupUserRef
 		}
 	)
 	type res struct {
@@ -1574,7 +1574,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				ctx:               context.Background(),
 				orgID:             "org1",
 				userID:            "user1",
-				cascadeUserGroups: []string{"group1", "group2"},
+				cascadeUserGroups: []GroupUserRef{{GroupID: "group1", ResourceOwner: "org1"}, {GroupID: "group2", ResourceOwner: "org1"}},
 			},
 			res: res{
 				want: &domain.ObjectDetails{

@@ -349,11 +349,11 @@ func (s *Server) UnlockUser(ctx context.Context, req *mgmt_pb.UnlockUserRequest)
 }
 
 func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest) (*mgmt_pb.RemoveUserResponse, error) {
-	memberships, grants, groupIDs, err := s.removeUserDependencies(ctx, req.Id)
+	memberships, grants, groupUsers, err := s.removeUserDependencies(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, memberships, grants, groupIDs)
+	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, memberships, grants, groupUsers)
 	if err != nil {
 		return nil, err
 	}
@@ -362,7 +362,7 @@ func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest)
 	}, nil
 }
 
-func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, []string, error) {
+func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, []command.GroupUserRef, error) {
 	userGrantUserQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
 	if err != nil {
 		return nil, nil, nil, err
@@ -990,7 +990,7 @@ func userGrantsToIDs(userGrants []*query.UserGrant) []string {
 	return converted
 }
 
-func (s *Server) getGroupsByUserID(ctx context.Context, userID string) ([]string, error) {
+func (s *Server) getGroupsByUserID(ctx context.Context, userID string) ([]command.GroupUserRef, error) {
 	groupUserQuery, err := query.NewGroupUsersUserIDsSearchQuery([]string{userID})
 	if err != nil {
 		return nil, err
@@ -1007,9 +1007,12 @@ func (s *Server) getGroupsByUserID(ctx context.Context, userID string) ([]string
 	if len(groupUsers.GroupUsers) == 0 {
 		return nil, nil
 	}
-	groupIDs := make([]string, 0, len(groupUsers.GroupUsers))
+	refs := make([]command.GroupUserRef, 0, len(groupUsers.GroupUsers))
 	for _, groupUser := range groupUsers.GroupUsers {
-		groupIDs = append(groupIDs, groupUser.GroupID)
+		refs = append(refs, command.GroupUserRef{
+			GroupID:       groupUser.GroupID,
+			ResourceOwner: groupUser.ResourceOwner,
+		})
 	}
-	return groupIDs, nil
+	return refs, nil
 }

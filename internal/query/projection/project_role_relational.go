@@ -103,3 +103,18 @@ func (p *relationalTablesProjection) reduceProjectRoleRemoved(event eventstore.E
 		return err
 	}), nil
 }
+
+// projectExistsInDB checks if a project exists in zitadel.projects for the given
+// instance and project ID. Used by the project_role reducer to avoid FK violations
+// when historical events reference projects that have been deleted.
+func projectExistsInDB(ctx context.Context, tx *sql.Tx, instanceID, projectID string) (bool, error) {
+	var exists bool
+	err := tx.QueryRowContext(ctx,
+		`SELECT EXISTS(SELECT 1 FROM zitadel.projects WHERE instance_id = $1 AND id = $2)`,
+		instanceID, projectID,
+	).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
