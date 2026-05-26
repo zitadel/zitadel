@@ -739,7 +739,14 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, statement *S
 		// BEGIN + SAVEPOINT still open. Postgres terminates the session
 		// after idle_in_transaction_session_timeout (SQLSTATE 25P03),
 		// effectively leaking one connection per projection cancel.
-		rollbackCtx := context.WithoutCancel(ctx)
+		//
+		// context.WithoutCancel strips the parent's Done channel,
+		// Deadline and Err (only Values are inherited — see Go stdlib
+		// context docs). We still cap the rollback with a small
+		// dedicated timeout so a wedged connection cannot hold this
+		// goroutine indefinitely.
+		rollbackCtx, cancelRollback := context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
+		defer cancelRollback()
 		_, rollbackErr := tx.ExecContext(rollbackCtx, "ROLLBACK TO SAVEPOINT exec_stmt")
 		logging.OnError(ctx, rollbackErr).Debug("rollback to savepoint failed")
 

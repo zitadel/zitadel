@@ -43,11 +43,15 @@ func TestHandler_executeStatement_rollbackSurvivesContextCancellation(t *testing
 	// follow-up UPDATE and executeStatement returns &executionError{}.
 	// This keeps the test focused on the rollback signal and avoids
 	// duplicating the failed_event SQL contract in the assertion.
-	mock.ExpectQuery(".*").WillReturnError(sql.ErrConnDone)
+	// Match the actual failure_event_get_count.sql shape rather than
+	// any query — keeps the test strict against unrelated statements.
+	mock.ExpectQuery(`(?i)SELECT.+failed_events`).WillReturnError(sql.ErrConnDone)
+	// The deferred tx.Rollback() in t.Cleanup() below issues a ROLLBACK
+	// that sqlmock would otherwise flag as unexpected.
+	mock.ExpectRollback()
 
 	tx, err := db.Begin()
 	require.NoError(t, err)
-	t.Cleanup(func() { _ = tx.Rollback() })
 
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
@@ -77,6 +81,13 @@ func TestHandler_executeStatement_rollbackSurvivesContextCancellation(t *testing
 	// returns the wrapped executionError. The exact error type is
 	// secondary to the real assertion: ExpectationsWereMet().
 	assert.Error(t, execErr)
+
+	// Close the outer tx so the ExpectRollback expectation can settle
+	// before we verify all expectations. This mirrors what the
+	// production caller (processEvents) does in its deferred
+	// tx.Rollback() / tx.Commit() chain.
+	require.NoError(t, tx.Rollback(), "outer tx.Rollback() must succeed")
+
 	require.NoError(t, mock.ExpectationsWereMet(),
 		"ROLLBACK TO SAVEPOINT must reach the database even when the request context was cancelled during statement execution")
 }
