@@ -1,0 +1,82 @@
+InitCode:
+  Title: Khởi tạo người dùng
+  PreHeader: Khởi tạo người dùng
+  Subject: Khởi tạo người dùng
+  Greeting: Xin chào {{\.DisplayName}} ,
+  Text: Người dùng này đã được tạo. Sử dụng tên người dùng {{\.PreferredLoginName}}
+    để đăng nhập. Vui lòng nhấp vào nút bên dưới để hoàn tất quá trình khởi tạo. (Mã
+    {{\.Code}} ) Nếu bạn không yêu cầu thư này, vui lòng bỏ qua nó.
+  ButtonText: Kết thúc quá trình khởi tạo
+PasswordReset:
+  Title: Đặt lại mật khẩu
+  PreHeader: Đặt lại mật khẩu
+  Subject: Đặt lại mật khẩu
+  Greeting: Xin chào {{\.DisplayName}} ,
+  Text: Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu. Vui lòng sử dụng nút bên
+    dưới để đặt lại mật khẩu của bạn. (Mã {{\.Code}} ) Nếu bạn không yêu cầu thư này,
+    vui lòng bỏ qua nó.
+  ButtonText: Đặt lại mật khẩu
+VerifyEmail:
+  Title: Xác minh email
+  PreHeader: Xác minh email
+  Subject: Xác minh email
+  Greeting: Xin chào {{\.DisplayName}} ,
+  Text: Một email mới đã được thêm vào. Vui lòng sử dụng nút bên dưới để xác minh
+    email của bạn. (Mã {{\.Code}} ) Nếu bạn chưa thêm email mới, vui lòng bỏ qua email
+    này.
+  ButtonText: Xác minh email
+VerifyPhone:
+  Title: Xác minh số điện thoại
+  PreHeader: Xác minh số điện thoại
+  Subject: Xác minh số điện thoại
+  Greeting: Xin chào {{\.DisplayName}} ,
+  Text: Một số điện thoại mới đã được thêm vào. Vui lòng sử dụng mã sau để xác minh
+    {{\.Code}}
+  ButtonText: Xác minh số điện thoại
+VerifyEmailOTP:
+  Title: Xác minh OTP
+  PreHeader: Xác minh OTP
+  Subject: Xác minh OTP
+  Greeting: Xin chào {{\.DisplayName}} ,
+  Text: Vui lòng sử dụng OTP {{\.OTP}} để xác thực trong vòng năm phút tiếp theo hoặc
+    nhấp vào nút "Xác thực".
+  ButtonText: Xác thực
+VerifySMSOTP:
+  Text: '{{\.OTP}} là OTP của bạn cho {{\.Domain}} . Hãy sử dụng nó trong vòng {{\.Expiry}}
+    tiếp theo. @ {{\.Domain}} # {{\.OTP}}'
+DomainClaimed:
+  Title: Tên miền đã được xác nhận
+  PreHeader: Thay đổi email/tên người dùng
+  Subject: Tên miền đã được xác nhận
+  Greeting: Xin chào {{\.DisplayName}} ,
+  Text: Miền {{\.Domain}} đã được một tổ chức xác nhận quyền sở hữu. Người dùng hiện
+    tại của bạn {{\.Username}} không thuộc tổ chức này. Vì vậy bạn sẽ phải thay đổi
+    email khi đăng nhập. Chúng tôi đã tạo tên người dùng tạm thời ( {{\.TempUsername}}
+    ) cho lần đăng nhập này.
+  ButtonText: Đăng nhập
+PasswordlessRegistration:
+  Title: Thêm mật khẩu Đăng nhập
+  PreHeader: Thêm mật khẩu Đăng nhập
+  Subject: Thêm mật khẩu Đăng nhập
+  Greeting: Xin chào {{\.DisplayName}} ,
+  Text: Chúng tôi đã nhận được yêu cầu thêm mã thông báo để đăng nhập bằng mật mã.
+    Vui lòng sử dụng nút bên dưới để thêm mã thông báo hoặc thiết bị của bạn để đăng
+    nhập bằng mật mã.
+  ButtonText: Thêm mật khẩu Đăng nhập
+PasswordChange:
+  Title: Mật khẩu của người dùng đã thay đổi
+  PreHeader: Đổi mật khẩu
+  Subject: Mật khẩu của người dùng đã thay đổi
+  Greeting: Xin chào {{\.DisplayName}} ,
+  Text: Mật khẩu người dùng của bạn đã thay đổi. Nếu thay đổi này không phải do bạn
+    thực hiện, vui lòng đặt lại mật khẩu của bạn ngay lập tức.
+  ButtonText: Đăng nhập
+InviteUser:
+  Title: Lời mời tới {{\.ApplicationName}}
+  PreHeader: Lời mời tới {{\.ApplicationName}}
+  Subject: Lời mời tới {{\.ApplicationName}}
+  Greeting: Xin chào {{\.DisplayName}} ,
+  Text: Người dùng của bạn đã được mời tham gia {{\.ApplicationName}} . Vui lòng nhấp
+    vào nút bên dưới để hoàn tất quá trình mời. Nếu bạn không yêu cầu thư này, vui
+    lòng bỏ qua nó.
+  ButtonText: Chấp nhận lời mời

@@ -270,6 +270,7 @@ RegistrationUser:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: 베트남 사람
   GenderLabel: 성별
   Female: 여성
   Male: 남성
@@ -284,7 +285,6 @@ RegistrationUser:
   ExternalLogin: 또는 외부 사용자로 등록
   BackButtonText: 로그인
   NextButtonText: 다음
-
 ExternalRegistrationUserOverview:
   Title: 외부 사용자 등록
   Description: 선택한 제공자에서 사용자 정보를 가져왔습니다. 이제 정보를 수정하거나 완성할 수 있습니다.
@@ -317,6 +317,7 @@ ExternalRegistrationUserOverview:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: 베트남 사람
   TosAndPrivacyLabel: 동의사항
   TosConfirm: 이용 약관에 동의합니다.
   TosLinkText: 이용 약관
@@ -325,7 +326,6 @@ ExternalRegistrationUserOverview:
   ExternalLogin: 또는 외부 사용자로 등록
   BackButtonText: 뒤로
   NextButtonText: 저장
-
 RegistrationOrg:
   Title: 조직 등록
   Description: 조직 이름과 사용자 정보를 입력하세요.
@@ -398,6 +398,7 @@ ExternalNotFound:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: 베트남 사람
 DeviceAuth:
   Title: 기기 인증
   UserCode:

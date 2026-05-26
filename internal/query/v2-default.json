@@ -3671,5 +3671,338 @@
       "failedLoading": "فشل تحميل البيانات. يرجى المحاولة مرة أخرى.",
       "tryagain": "حاول مرة أخرى"
     }
+  },
+  "vi": {
+    "common": {
+      "back": "Quay lại",
+      "title": "Đăng nhập bằng Zitadel"
+    },
+    "accounts": {
+      "title": "Tài khoản",
+      "description": "Chọn tài khoản bạn muốn sử dụng.",
+      "addAnother": "Thêm tài khoản khác",
+      "noResults": "Không tìm thấy tài khoản",
+      "verified": "đã xác minh",
+      "expired": "hết hạn"
+    },
+    "logout": {
+      "title": "Đăng xuất",
+      "description": "Nhấp vào một tài khoản để kết thúc phiên",
+      "noResults": "Không tìm thấy tài khoản",
+      "clear": "Kết thúc phiên",
+      "verifiedAt": "Hoạt động lần cuối: {time}",
+      "success": {
+        "title": "Đăng xuất thành công",
+        "description": "Bạn đã đăng xuất thành công."
+      }
+    },
+    "loginname": {
+      "title": "Chào mừng trở lại!",
+      "description": "Nhập chi tiết đăng nhập của bạn.",
+      "register": "Đăng ký người dùng mới",
+      "submit": "Tiếp tục",
+      "labels": {
+        "loginname": "Tên đăng nhập",
+        "username": "Tên người dùng",
+        "usernameOrPhoneNumber": "Tên người dùng hoặc số điện thoại",
+        "usernameOrEmail": "Tên người dùng hoặc email"
+      },
+      "required": {
+        "loginName": "Trường này là bắt buộc"
+      }
+    },
+    "password": {
+      "verify": {
+        "title": "Mật khẩu",
+        "description": "Nhập mật khẩu của bạn.",
+        "resetPassword": "Đặt lại mật khẩu",
+        "submit": "Tiếp tục",
+        "labels": {
+          "password": "Mật khẩu"
+        },
+        "required": {
+          "password": "Trường này là bắt buộc"
+        }
+      },
+      "set": {
+        "title": "Đặt mật khẩu",
+        "description": "Đặt mật khẩu cho tài khoản của bạn",
+        "codeSent": "Một mã đã được gửi đến địa chỉ email của bạn.",
+        "noCodeReceived": "Không nhận được mã?",
+        "resend": "Gửi lại mã",
+        "submit": "Tiếp tục",
+        "labels": {
+          "code": "Mã",
+          "newPassword": "Mật khẩu mới",
+          "confirmPassword": "Xác nhận mật khẩu"
+        },
+        "required": {
+          "code": "Trường này là bắt buộc",
+          "newPassword": "Bạn phải cung cấp mật khẩu!",
+          "confirmPassword": "Trường này là bắt buộc"
+        }
+      },
+      "change": {
+        "title": "Đổi mật khẩu",
+        "description": "Đặt mật khẩu cho tài khoản của bạn",
+        "submit": "Tiếp tục",
+        "labels": {
+          "newPassword": "Mật khẩu mới",
+          "confirmPassword": "Xác nhận mật khẩu"
+        },
+        "required": {
+          "newPassword": "Bạn phải cung cấp mật khẩu mới!",
+          "confirmPassword": "Trường này là bắt buộc"
+        }
+      }
+    },
+    "idp": {
+      "title": "Đăng nhập bằng SSO",
+      "description": "Chọn một trong các nhà cung cấp sau để đăng nhập",
+      "orSignInWith": "hoặc đăng nhập bằng",
+      "signInWithApple": "Đăng nhập bằng Apple",
+      "signInWithGoogle": "Đăng nhập bằng Google",
+      "signInWithAzureAD": "Đăng nhập bằng AzureAD",
+      "signInWithGithub": "Đăng nhập bằng GitHub",
+      "signInWithGitlab": "Đăng nhập bằng GitLab",
+      "loginSuccess": {
+        "title": "Đăng nhập thành công",
+        "description": "Bạn đã đăng nhập thành công!"
+      },
+      "linkingSuccess": {
+        "title": "Đã liên kết tài khoản",
+        "description": "Bạn đã liên kết thành công tài khoản của mình!"
+      },
+      "registerSuccess": {
+        "title": "Đăng ký thành công",
+        "description": "Bạn đã đăng ký thành công!"
+      },
+      "loginError": {
+        "title": "Đăng nhập thất bại",
+        "description": "Đã xảy ra lỗi khi cố gắng đăng nhập."
+      },
+      "linkingError": {
+        "title": "Liên kết tài khoản không thành công",
+        "description": "Đã xảy ra lỗi khi cố gắng liên kết tài khoản của bạn."
+      },
+      "completeRegister": {
+        "title": "Hoàn thành dữ liệu của bạn",
+        "description": "Bạn cần hoàn tất đăng ký bằng cách cung cấp địa chỉ email và tên của bạn."
+      }
+    },
+    "ldap": {
+      "title": "Đăng nhập LDAP",
+      "description": "Nhập thông tin đăng nhập LDAP của bạn.",
+      "submit": "Tiếp tục",
+      "labels": {
+        "username": "Tên người dùng",
+        "password": "Mật khẩu"
+      },
+      "required": {
+        "username": "Trường này là bắt buộc",
+        "password": "Trường này là bắt buộc"
+      }
+    },
+    "mfa": {
+      "verify": {
+        "title": "Xác minh danh tính của bạn",
+        "description": "Hãy chọn một trong các yếu tố sau.",
+        "noResults": "Không có yếu tố thứ hai có sẵn để thiết lập."
+      },
+      "set": {
+        "title": "Thiết lập 2 yếu tố",
+        "description": "Chọn một trong các yếu tố thứ hai sau đây.",
+        "skip": "Bỏ qua"
+      }
+    },
+    "otp": {
+      "verify": {
+        "title": "Xác minh 2 yếu tố",
+        "totpDescription": "Nhập mã từ ứng dụng xác thực của bạn.",
+        "smsDescription": "Nhập mã bạn nhận được qua SMS.",
+        "emailDescription": "Nhập mã bạn nhận được qua email.",
+        "noCodeReceived": "Không nhận được mã?",
+        "resendCode": "Gửi lại mã",
+        "submit": "Tiếp tục",
+        "labels": {
+          "code": "Mã"
+        },
+        "required": {
+          "code": "Trường này là bắt buộc"
+        }
+      },
+      "set": {
+        "title": "Thiết lập 2 yếu tố",
+        "totpDescription": "Quét mã QR bằng ứng dụng xác thực của bạn.",
+        "smsDescription": "Nhập số điện thoại của bạn để nhận mã qua SMS.",
+        "emailDescription": "Nhập địa chỉ email của bạn để nhận mã qua email.",
+        "totpRegisterDescription": "Quét mã QR hoặc điều hướng đến URL theo cách thủ công.",
+        "submit": "Tiếp tục",
+        "labels": {
+          "code": "Mã"
+        },
+        "required": {
+          "code": "Trường này là bắt buộc"
+        }
+      }
+    },
+    "passkey": {
+      "verify": {
+        "title": "Xác thực bằng mật mã",
+        "description": "Thiết bị của bạn sẽ yêu cầu bạn cung cấp dấu vân tay, khuôn mặt hoặc khóa màn hình",
+        "usePassword": "Sử dụng mật khẩu",
+        "submit": "Tiếp tục"
+      },
+      "set": {
+        "title": "Thiết lập mật mã",
+        "description": "Thiết bị của bạn sẽ yêu cầu bạn cung cấp dấu vân tay, khuôn mặt hoặc khóa màn hình",
+        "info": {
+          "description": "Mật mã là một phương thức xác thực trên thiết bị như dấu vân tay của bạn, Apple FaceID hoặc tương tự.",
+          "link": "xác thực mật mã"
+        },
+        "skip": "Bỏ qua",
+        "submit": "Tiếp tục"
+      }
+    },
+    "u2f": {
+      "verify": {
+        "title": "Xác minh 2 yếu tố",
+        "description": "Xác minh tài khoản của bạn với thiết bị của bạn."
+      },
+      "set": {
+        "title": "Thiết lập 2 yếu tố",
+        "description": "Thiết lập thiết bị làm yếu tố thứ hai.",
+        "submit": "Tiếp tục"
+      }
+    },
+    "register": {
+      "methods": {
+        "passkey": "Mã khóa",
+        "password": "Mật khẩu"
+      },
+      "disabled": {
+        "title": "Đăng ký bị vô hiệu hóa",
+        "description": "Việc đăng ký bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên của bạn."
+      },
+      "missingdata": {
+        "title": "Thiếu dữ liệu",
+        "description": "Cung cấp email, họ và tên để đăng ký."
+      },
+      "title": "Đăng ký",
+      "description": "Tạo tài khoản Zitadel của bạn.",
+      "noMethodAvailableWarning": "Không có phương thức xác thực có sẵn. Vui lòng liên hệ với quản trị viên của bạn.",
+      "selectMethod": "Chọn phương thức bạn muốn xác thực",
+      "agreeTo": "Để đăng ký bạn phải đồng ý với các điều khoản và điều kiện",
+      "termsOfService": "Điều khoản dịch vụ",
+      "privacyPolicy": "Chính sách bảo mật",
+      "submit": "Tiếp tục",
+      "password": {
+        "title": "Đặt mật khẩu",
+        "description": "Đặt mật khẩu cho tài khoản của bạn",
+        "submit": "Tiếp tục",
+        "labels": {
+          "password": "Mật khẩu",
+          "confirmPassword": "Xác nhận mật khẩu"
+        },
+        "required": {
+          "password": "Bạn phải cung cấp mật khẩu!",
+          "confirmPassword": "Trường này là bắt buộc"
+        }
+      },
+      "labels": {
+        "firstname": "Họ tên",
+        "lastname": "Họ",
+        "email": "Thư điện tử"
+      },
+      "required": {
+        "firstname": "Trường này là bắt buộc",
+        "lastname": "Trường này là bắt buộc",
+        "email": "Trường này là bắt buộc"
+      }
+    },
+    "invite": {
+      "title": "Mời người dùng",
+      "description": "Cung cấp địa chỉ email và tên của người dùng bạn muốn mời.",
+      "info": "Người dùng sẽ nhận được email có hướng dẫn thêm.",
+      "notAllowed": "Cài đặt của bạn không cho phép bạn mời người dùng.",
+      "submit": "Tiếp tục",
+      "success": {
+        "title": "Người dùng đã mời",
+        "description": "Email đã được gửi thành công.",
+        "verified": "Người dùng đã được mời và đã xác minh email của mình.",
+        "notVerifiedYet": "Người dùng đã được mời. Họ sẽ nhận được email có hướng dẫn thêm.",
+        "submit": "Mời người dùng khác"
+      }
+    },
+    "signedin": {
+      "title": "Chào mừng {user} !",
+      "description": "Bạn đã đăng nhập.",
+      "continue": "Tiếp tục",
+      "error": {
+        "title": "Lỗi",
+        "description": "Đã xảy ra lỗi khi cố đăng nhập."
+      }
+    },
+    "verify": {
+      "userIdMissing": "Không có userId nào được cung cấp!",
+      "successTitle": "Người dùng đã xác minh",
+      "successDescription": "Người dùng đã được xác minh thành công.",
+      "setupAuthenticator": "Thiết lập trình xác thực",
+      "verify": {
+        "title": "Xác minh người dùng",
+        "description": "Nhập Mã được cung cấp trong email xác minh.",
+        "noCodeReceived": "Không nhận được mã?",
+        "resendCode": "Gửi lại mã",
+        "codeSent": "Một mã vừa được gửi đến địa chỉ email của bạn.",
+        "submit": "Tiếp tục",
+        "labels": {
+          "code": "Mã"
+        },
+        "required": {
+          "code": "Trường này là bắt buộc"
+        }
+      }
+    },
+    "authenticator": {
+      "title": "Chọn phương thức xác thực",
+      "description": "Chọn phương thức bạn muốn xác thực",
+      "noMethodsAvailable": "Không có phương thức xác thực nào",
+      "allSetup": "Bạn đã thiết lập trình xác thực!",
+      "linkWithIDP": "hoặc liên kết với Nhà cung cấp danh tính"
+    },
+    "device": {
+      "usercode": {
+        "title": "Mã thiết bị",
+        "description": "Nhập mã được hiển thị trên ứng dụng hoặc thiết bị của bạn.",
+        "submit": "Tiếp tục",
+        "labels": {
+          "code": "Mã"
+        },
+        "required": {
+          "code": "Trường này là bắt buộc"
+        }
+      },
+      "request": {
+        "title": "{appName} muốn kết nối",
+        "description": "{appName} sẽ có quyền truy cập vào:",
+        "disclaimer": "Bằng cách nhấp vào Cho phép, bạn cho phép {appName} và Zitadel sử dụng thông tin của bạn theo các điều khoản dịch vụ và chính sách bảo mật tương ứng của họ. Bạn có thể thu hồi quyền truy cập này bất cứ lúc nào.",
+        "submit": "Cho phép",
+        "deny": "Từ chối"
+      },
+      "scope": {
+        "openid": "Xác minh danh tính của bạn.",
+        "email": "Xem địa chỉ email của bạn.",
+        "profile": "Xem thông tin hồ sơ đầy đủ của bạn.",
+        "offline_access": "Cho phép truy cập ngoại tuyến vào tài khoản của bạn."
+      }
+    },
+    "error": {
+      "noUserCode": "Không có mã người dùng được cung cấp!",
+      "noDeviceRequest": "Không tìm thấy yêu cầu thiết bị.",
+      "unknownContext": "Không thể lấy được ngữ cảnh của người dùng. Đảm bảo nhập tên người dùng trước hoặc cung cấp Tên đăng nhập dưới dạng searchParam.",
+      "sessionExpired": "Phiên hiện tại của bạn đã hết hạn. Vui lòng đăng nhập lại.",
+      "failedLoading": "Không thể tải dữ liệu. Vui lòng thử lại.",
+      "tryagain": "Thử lại"
+    }
   }
 }

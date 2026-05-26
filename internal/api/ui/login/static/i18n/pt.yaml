@@ -266,6 +266,7 @@ RegistrationUser:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: vietnamita
   GenderLabel: Gênero
   Female: Feminino
   Male: Masculino
@@ -280,7 +281,6 @@ RegistrationUser:
   ExternalLogin: ou registre-se com um usuário externo
   BackButtonText: login
   NextButtonText: próximo
-
 ExternalRegistrationUserOverview:
   Title: Registro de usuário externo
   Description: Coletamos seus detalhes de usuário do provedor selecionado. Agora você pode alterá-los ou completá-los.
@@ -313,6 +313,7 @@ ExternalRegistrationUserOverview:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: vietnamita
   TosAndPrivacyLabel: Termos e condições
   TosConfirm: Eu aceito os
   TosLinkText: termos de serviço
@@ -321,7 +322,6 @@ ExternalRegistrationUserOverview:
   ExternalLogin: ou registre-se com um usuário externo
   BackButtonText: voltar
   NextButtonText: salvar
-
 RegistrationOrg:
   Title: Registro de organização
   Description: Insira o nome de sua organização e seus dados de usuário.
@@ -394,7 +394,7 @@ ExternalNotFound:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
-
+  Vietnamese: vietnamita
 DeviceAuth:
   Title: Autorização de dispositivo
   UserCode:
