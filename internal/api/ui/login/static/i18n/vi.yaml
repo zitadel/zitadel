@@ -316,7 +316,7 @@ ExternalRegistrationUserOverview:
   PrivacyConfirm: Tôi chấp nhận
   PrivacyLinkText: chính sách bảo mật
   ExternalLogin: hoặc đăng ký với người dùng bên ngoài
-  BackButtonText: Nack
+  BackButtonText: Quay lại
   NextButtonText: Lưu
 RegistrationOrg:
   Title: Đăng ký tổ chức
