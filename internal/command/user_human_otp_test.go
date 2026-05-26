@@ -2073,7 +2073,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 						eventFromEventPusher(
 							org.NewLockoutPolicyAddedEvent(ctx,
 								&org.NewAggregate("orgID").Aggregate,
-								3, 3, true,
+								3, 3, true, 3, true, true,
 							),
 						),
 					),
@@ -2152,7 +2152,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 						eventFromEventPusher(
 							org.NewLockoutPolicyAddedEvent(ctx,
 								&org.NewAggregate("orgID").Aggregate,
-								1, 1, true,
+								1, 1, true, 1, true, true,
 							),
 						),
 					),
@@ -3259,7 +3259,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 						eventFromEventPusher(
 							org.NewLockoutPolicyAddedEvent(ctx,
 								&org.NewAggregate("orgID").Aggregate,
-								3, 3, true,
+								3, 3, true, 3, true, true,
 							),
 						),
 					),
@@ -3337,7 +3337,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 						eventFromEventPusher(
 							org.NewLockoutPolicyAddedEvent(ctx,
 								&org.NewAggregate("orgID").Aggregate,
-								1, 1, true,
+								1, 1, true, 1, true, true,
 							),
 						),
 					),

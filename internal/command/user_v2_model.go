@@ -54,6 +54,8 @@ type UserV2WriteModel struct {
 	PasswordCodeGeneratorID    string
 	PasswordCodeVerificationID string
 
+	LockedAt time.Time
+
 	EmailWriteModel       bool
 	Email                 domain.EmailAddress
 	IsEmailVerified       bool
@@ -90,6 +92,10 @@ func (wm *UserV2WriteModel) GetPasswordCheckFailedCount() uint64 {
 
 func (wm *UserV2WriteModel) GetEncodedHash() string {
 	return wm.PasswordEncodedHash
+}
+
+func (wm *UserV2WriteModel) GetLockedAt() time.Time {
+	return wm.LockedAt
 }
 
 func (wm *UserV2WriteModel) GetResourceOwner() string {
@@ -291,9 +297,11 @@ func (wm *UserV2WriteModel) Reduce() error {
 
 		case *user.UserLockedEvent:
 			wm.UserState = domain.UserStateLocked
+			wm.LockedAt = e.CreationDate()
 		case *user.UserUnlockedEvent:
 			wm.PasswordCheckFailedCount = 0
 			wm.UserState = domain.UserStateActive
+			wm.LockedAt = time.Time{}
 
 		case *user.UserDeactivatedEvent:
 			wm.UserState = domain.UserStateInactive

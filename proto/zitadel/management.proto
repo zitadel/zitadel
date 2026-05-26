@@ -11404,6 +11404,22 @@ message AddCustomLockoutPolicyRequest {
             example: "\"10\""
         }
     ];
+    uint32 auto_unlock_after_min = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Amount of minutes after which the account will be automatically unlocked. If set to 0 the account will never be unlocked automatically."
+            example: "\"60\""
+        }
+    ];
+    bool show_remaining_lockout_time = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Defines if the remaining lockout time should be shown to the user on the login screen after the account got locked."
+        }
+    ];
+    bool show_absolute_lockout_time = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Defines if the absolute lockout time should be shown to the user on the login screen after the account got locked. Takes only affect if show_remaining_lockout_time is set to false."
+        }
+    ];
 }
 
 message AddCustomLockoutPolicyResponse {
@@ -11420,6 +11436,22 @@ message UpdateCustomLockoutPolicyRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Maximum failed attempts for a single OTP type (TOTP, SMS, Email) before the account gets locked. Attempts are reset as soon as the OTP is entered correctly. If set to 0 the account will never be locked."
             example: "\"10\""
+        }
+    ];
+    uint32 auto_unlock_after_min = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Amount of minutes after which the account will be automatically unlocked. If set to 0 the account will never be unlocked automatically."
+            example: "\"60\""
+        }
+    ];
+    bool show_remaining_lockout_time = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Defines if the remaining lockout time should be shown to the user on the login screen after the account got locked."
+        }
+    ];
+    bool show_absolute_lockout_time = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Defines if the absolute lockout time should be shown to the user on the login screen after the account got locked. Takes only affect if show_remaining_lockout_time is set to false."
         }
     ];
 }

@@ -22,6 +22,7 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/integration/sink"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/pkg/grpc/message"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
@@ -298,6 +299,155 @@ func TestServer_CreateSession_lock_user(t *testing.T) {
 		}
 		assert.Equal(t, expectedCode, statusCode)
 	}
+}
+
+func TestServer_CreateSession_lock_user_show_remaining_lockout_time(t *testing.T) {
+	org := Instance.CreateOrganization(IAMOwnerCTX, integration.OrganizationName(), integration.Email())
+	userID := org.CreatedAdmins[0].GetUserId()
+	Instance.SetUserPassword(IAMOwnerCTX, userID, integration.UserPassword, false)
+
+	maxAttempts := 1
+	ctxOrg := metadata.AppendToOutgoingContext(IAMOwnerCTX, "x-zitadel-orgid", org.GetOrganizationId())
+	_, err := Instance.Client.Mgmt.AddCustomLockoutPolicy(ctxOrg, &mgmt.AddCustomLockoutPolicyRequest{
+		MaxPasswordAttempts:      uint32(maxAttempts),
+		AutoUnlockAfterMin:       1,
+		ShowRemainingLockoutTime: true,
+	})
+	require.NoError(t, err)
+
+	// exhaust the allowed attempts to trigger a lockout
+	for i := 0; i < maxAttempts; i++ {
+		_, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
+			Checks: &session.Checks{
+				User:     &session.CheckUser{Search: &session.CheckUser_UserId{UserId: userID}},
+				Password: &session.CheckPassword{Password: "invalid"},
+			},
+		})
+		assert.Error(t, err)
+	}
+
+	// next attempt must fail with FailedPrecondition and carry RemainingLockDuration > 0
+	_, err = Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User:     &session.CheckUser{Search: &session.CheckUser_UserId{UserId: userID}},
+			Password: &session.CheckPassword{Password: "invalid"},
+		},
+	})
+	require.Error(t, err)
+	assert.Equal(t, codes.FailedPrecondition, status.Code(err))
+
+	grpcStatus, ok := status.FromError(err)
+	require.True(t, ok)
+	var credErr *message.CredentialsCheckError
+	for _, detail := range grpcStatus.Details() {
+		if ce, ok := detail.(*message.CredentialsCheckError); ok {
+			credErr = ce
+			break
+		}
+	}
+	require.NotNil(t, credErr, "expected CredentialsCheckError in status details")
+	assert.Greater(t, credErr.GetRemainingLockDuration(), int32(0))
+}
+
+func TestServer_CreateSession_lock_user_show_absolute_lockout_time(t *testing.T) {
+	org := Instance.CreateOrganization(IAMOwnerCTX, integration.OrganizationName(), integration.Email())
+	userID := org.CreatedAdmins[0].GetUserId()
+	Instance.SetUserPassword(IAMOwnerCTX, userID, integration.UserPassword, false)
+
+	const autoUnlockMin = uint32(5)
+	maxAttempts := 1
+	ctxOrg := metadata.AppendToOutgoingContext(IAMOwnerCTX, "x-zitadel-orgid", org.GetOrganizationId())
+	_, err := Instance.Client.Mgmt.AddCustomLockoutPolicy(ctxOrg, &mgmt.AddCustomLockoutPolicyRequest{
+		MaxPasswordAttempts:     uint32(maxAttempts),
+		AutoUnlockAfterMin:      autoUnlockMin,
+		ShowAbsoluteLockoutTime: true,
+	})
+	require.NoError(t, err)
+
+	// exhaust the allowed attempts to trigger a lockout
+	for i := 0; i < maxAttempts; i++ {
+		_, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
+			Checks: &session.Checks{
+				User:     &session.CheckUser{Search: &session.CheckUser_UserId{UserId: userID}},
+				Password: &session.CheckPassword{Password: "invalid"},
+			},
+		})
+		assert.Error(t, err)
+	}
+
+	// next attempt must fail with FailedPrecondition and carry the fixed duration
+	_, err = Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User:     &session.CheckUser{Search: &session.CheckUser_UserId{UserId: userID}},
+			Password: &session.CheckPassword{Password: "invalid"},
+		},
+	})
+	require.Error(t, err)
+	assert.Equal(t, codes.FailedPrecondition, status.Code(err))
+
+	grpcStatus, ok := status.FromError(err)
+	require.True(t, ok)
+	var credErr *message.CredentialsCheckError
+	for _, detail := range grpcStatus.Details() {
+		if ce, ok := detail.(*message.CredentialsCheckError); ok {
+			credErr = ce
+			break
+		}
+	}
+	require.NotNil(t, credErr, "expected CredentialsCheckError in status details")
+	assert.Equal(t, int32(autoUnlockMin), credErr.GetRemainingLockDuration())
+}
+
+func TestServer_CreateSession_lock_user_auto_unlock(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping auto-unlock test in short mode: requires ~65s")
+	}
+
+	org := Instance.CreateOrganization(IAMOwnerCTX, integration.OrganizationName(), integration.Email())
+	userID := org.CreatedAdmins[0].GetUserId()
+	Instance.SetUserPassword(IAMOwnerCTX, userID, integration.UserPassword, false)
+
+	maxAttempts := 1
+	ctxOrg := metadata.AppendToOutgoingContext(IAMOwnerCTX, "x-zitadel-orgid", org.GetOrganizationId())
+	_, err := Instance.Client.Mgmt.AddCustomLockoutPolicy(ctxOrg, &mgmt.AddCustomLockoutPolicyRequest{
+		MaxPasswordAttempts: uint32(maxAttempts),
+		AutoUnlockAfterMin:  1,
+	})
+	require.NoError(t, err)
+
+	// lock the user by exhausting max attempts
+	for i := 0; i < maxAttempts; i++ {
+		_, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
+			Checks: &session.Checks{
+				User:     &session.CheckUser{Search: &session.CheckUser_UserId{UserId: userID}},
+				Password: &session.CheckPassword{Password: "invalid"},
+			},
+		})
+		assert.Error(t, err)
+	}
+
+	// verify the user is now locked
+	_, err = Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User:     &session.CheckUser{Search: &session.CheckUser_UserId{UserId: userID}},
+			Password: &session.CheckPassword{Password: integration.UserPassword},
+		},
+	})
+	require.Error(t, err)
+	assert.Equal(t, codes.FailedPrecondition, status.Code(err))
+
+	// wait for the auto-unlock window to expire (1 minute + buffer)
+	time.Sleep(65 * time.Second)
+
+	// after the lock duration has passed, login with correct credentials must succeed
+	resp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User:     &session.CheckUser{Search: &session.CheckUser_UserId{UserId: userID}},
+			Password: &session.CheckPassword{Password: integration.UserPassword},
+		},
+	})
+	require.NoError(t, err)
+	assert.NotEmpty(t, resp.GetSessionId())
 }
 
 func TestServer_CreateSession_webauthn(t *testing.T) {

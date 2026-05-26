@@ -56,7 +56,10 @@ func (wm *InstanceLockoutPolicyWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	maxPasswordAttempts,
 	maxOTPAttempts uint64,
-	showLockoutFailure bool) (*instance.LockoutPolicyChangedEvent, bool) {
+	showLockoutFailure bool,
+	autoUnlockAfterMin uint64,
+	showRemainingLockoutTime bool,
+	showAbsoluteLockoutTime bool) (*instance.LockoutPolicyChangedEvent, bool) {
 	changes := make([]policy.LockoutPolicyChanges, 0)
 	if wm.MaxPasswordAttempts != maxPasswordAttempts {
 		changes = append(changes, policy.ChangeMaxPasswordAttempts(maxPasswordAttempts))
@@ -66,6 +69,15 @@ func (wm *InstanceLockoutPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.ShowLockOutFailures != showLockoutFailure {
 		changes = append(changes, policy.ChangeShowLockOutFailures(showLockoutFailure))
+	}
+	if wm.AutoUnlockAfterMin != autoUnlockAfterMin {
+		changes = append(changes, policy.ChangeAutoUnlockAfterMin(autoUnlockAfterMin))
+	}
+	if wm.ShowRemainingLockoutTime != showRemainingLockoutTime {
+		changes = append(changes, policy.ChangeShowRemainingLockoutTime(showRemainingLockoutTime))
+	}
+	if wm.ShowAbsoluteLockoutTime != showAbsoluteLockoutTime {
+		changes = append(changes, policy.ChangeShowAbsoluteLockoutTime(showAbsoluteLockoutTime))
 	}
 	if len(changes) == 0 {
 		return nil, false

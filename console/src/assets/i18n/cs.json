@@ -1894,6 +1894,7 @@
       "HASUPPERCASE": "obsahuje velká písmena",
       "SHOWLOCKOUTFAILURES": "zobrazit neúspěšné pokusy o uzamčení",
       "MAXPASSWORDATTEMPTS": "Maximální počet pokusů o heslo",
+      "AUTOUNLOCKAFTERMIN": "Automatické odblokování po (v minutách)",
       "MAXOTPATTEMPTS": "Maximální počet pokusů o OTP",
       "EXPIREWARNDAYS": "Upozornění na uplynutí po dnech",
       "MAXAGEDAYS": "Maximální platnost v dnech",

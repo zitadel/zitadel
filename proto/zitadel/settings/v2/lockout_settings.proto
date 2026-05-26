@@ -29,4 +29,24 @@ message LockoutSettings {
       example: "\"10\""
     }
   ];
+
+  // The amount of minutes after the account gets automatically unlocked.
+  // If set to 0 the account will never be automatically unlocked.
+  uint64 auto_unlock_after_min = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"60\""
+    }
+  ];
+  // Defines if the remaining lockout time should be shown to the user on the login screen after the account got locked.
+  bool show_remaining_lockout_time = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"true\""
+    }
+  ];
+  // Defines if the absolute lockout time should be shown to the user on the login screen after the account got locked. Takes only affect if show_remaining_lockout_time is set to false.
+  bool show_absolute_lockout_time = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"true\""
+    }
+  ];
 }

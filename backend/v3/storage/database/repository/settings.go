@@ -885,6 +885,15 @@ func (s lockoutSettings) SetSettingFields(value domain.LockoutSettingsAttributes
 	if value.ShowLockOutFailures != nil {
 		changes = append(changes, s.SetShowLockOutFailures(*value.ShowLockOutFailures))
 	}
+	if value.AutoUnlockAfterMin != nil {
+		changes = append(changes, s.SetAutoUnlockAfterMin(*value.AutoUnlockAfterMin))
+	}
+	if value.ShowRemainingLockoutTime != nil {
+		changes = append(changes, s.SetShowRemainingLockoutTime(*value.ShowRemainingLockoutTime))
+	}
+	if value.ShowAbsoluteLockoutTime != nil {
+		changes = append(changes, s.SetShowAbsoluteLockoutTime(*value.ShowAbsoluteLockoutTime))
+	}
 	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
 }
 
@@ -898,6 +907,18 @@ func (lockoutSettings) SetMaxOTPAttempts(value uint64) db_json.JsonUpdate {
 
 func (lockoutSettings) SetShowLockOutFailures(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"showLockOutFailures"}, value)
+}
+
+func (lockoutSettings) SetAutoUnlockAfterMin(value uint64) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"autoUnlockAfterMin"}, value)
+}
+
+func (lockoutSettings) SetShowRemainingLockoutTime(value bool) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"showRemainingLockoutTime"}, value)
+}
+
+func (lockoutSettings) SetShowAbsoluteLockoutTime(value bool) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"showAbsoluteLockoutTime"}, value)
 }
 
 func LockoutSettingsRepository() domain.LockoutSettingsRepository {

@@ -413,10 +413,13 @@ func lockoutPolicyToDomain(policy *query.LockoutPolicy) *domain.LockoutPolicy {
 			CreationDate:  policy.CreationDate,
 			ChangeDate:    policy.ChangeDate,
 		},
-		Default:             policy.IsDefault,
-		MaxPasswordAttempts: policy.MaxPasswordAttempts,
-		MaxOTPAttempts:      policy.MaxOTPAttempts,
-		ShowLockOutFailures: policy.ShowFailures,
+		Default:                  policy.IsDefault,
+		MaxPasswordAttempts:      policy.MaxPasswordAttempts,
+		MaxOTPAttempts:           policy.MaxOTPAttempts,
+		AutoUnlockAfterMin:       policy.AutoUnlockAfterMin,
+		ShowLockOutFailures:      policy.ShowFailures,
+		ShowRemainingLockoutTime: policy.ShowRemainingLockoutTime,
+		ShowAbsoluteLockoutTime:  policy.ShowAbsoluteLockoutTime,
 	}
 }
 

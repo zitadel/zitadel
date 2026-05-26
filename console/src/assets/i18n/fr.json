@@ -1894,6 +1894,7 @@
       "HASUPPERCASE": "doit comporter une majuscule",
       "SHOWLOCKOUTFAILURES": "montrer les échecs de verrouillage",
       "MAXPASSWORDATTEMPTS": "Tentatives maximales du mot de passe",
+      "AUTOUNLOCKAFTERMIN" : "Déverrouillage automatique après (en minutes)",
       "MAXOTPATTEMPTS": "Tentatives maximales de l'OTP",
       "EXPIREWARNDAYS": "Avertissement d'expiration après jours",
       "MAXAGEDAYS": "Validité maximale en jours",

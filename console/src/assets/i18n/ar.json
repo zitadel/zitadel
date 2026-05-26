@@ -1888,6 +1888,7 @@
       "HASUPPERCASE": "يجب أن يتضمن حرفاً كبيراً",
       "SHOWLOCKOUTFAILURES": "إظهار حالات فشل القفل",
       "MAXPASSWORDATTEMPTS": "الحد الأقصى لمحاولات كلمة المرور",
+      "AUTOUNLOCKAFTERMIN": "إلغاء القفل تلقائيًا بعد (دقائق)",
       "MAXOTPATTEMPTS": "الحد الأقصى لمحاولات OTP",
       "EXPIREWARNDAYS": "تحذير انتهاء الصلاحية بعد أيام",
       "MAXAGEDAYS": "الحد الأقصى للصلاحية بالأيام",

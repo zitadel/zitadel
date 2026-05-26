@@ -1892,6 +1892,7 @@
       "HASUPPERCASE": "trebuie să includă o literă mare",
       "SHOWLOCKOUTFAILURES": "afișați erorile de blocare",
       "MAXPASSWORDATTEMPTS": "Numărul maxim de încercări de parolă",
+      "AUTOUNLOCKAFTERMIN":"Deblocare automată după (în minute)",
       "MAXOTPATTEMPTS": "Numărul maxim de încercări OTP",
       "EXPIREWARNDAYS": "Avertisment de expirare după zile",
       "MAXAGEDAYS": "Valabilitate maximă în zile",

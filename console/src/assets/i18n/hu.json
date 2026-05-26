@@ -1892,6 +1892,7 @@
       "HASUPPERCASE": "nagybetűt kell tartalmaznia",
       "SHOWLOCKOUTFAILURES": "zárási hibák megjelenítése",
       "MAXPASSWORDATTEMPTS": "Jelszó maximális próbálkozások",
+      "AUTOUNLOCKAFTERMIN" : "Automatikus feloldás (percek múlva)",
       "MAXOTPATTEMPTS": "OTP maximális próbálkozások",
       "EXPIREWARNDAYS": "Lejárati figyelmeztetés ennyi nap után",
       "MAXAGEDAYS": "Maximális érvényesség napokban",

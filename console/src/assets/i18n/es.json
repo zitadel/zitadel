@@ -1895,6 +1895,7 @@
       "HASUPPERCASE": "tiene mayúsculas",
       "SHOWLOCKOUTFAILURES": "mostrar fallos de bloqueo",
       "MAXPASSWORDATTEMPTS": "Intentos máximos de contraseña",
+      "AUTOUNLOCKAFTERMIN": "Desbloqueo automático después de (minutos)",
       "MAXOTPATTEMPTS": "Intentos máximos de OTP",
       "EXPIREWARNDAYS": "Aviso de caducidad después de días",
       "MAXAGEDAYS": "Validez máxima en días",

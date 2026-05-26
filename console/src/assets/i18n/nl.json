@@ -1894,6 +1894,7 @@
       "HASUPPERCASE": "heeft hoofdletters",
       "SHOWLOCKOUTFAILURES": "toon lockout mislukkingen",
       "MAXPASSWORDATTEMPTS": "Maximum pogingen voor wachtwoord",
+      "AUTOUNLOCKAFTERMIN": "Automatische ontgrendeling na (in minuten)",
       "MAXOTPATTEMPTS": "Maximale OTP-pogingen",
       "EXPIREWARNDAYS": "Waarschuwing voor verlopen na dagen",
       "MAXAGEDAYS": "Maximale geldigheid in dagen",

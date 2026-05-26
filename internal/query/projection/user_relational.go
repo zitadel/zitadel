@@ -144,6 +144,7 @@ func (p *relationalTablesProjection) reduceUserLocked(event eventstore.Event) (*
 				v3_sql.SQLTx(tx),
 				repo.PrimaryKeyCondition(e.Agg.InstanceID, e.Aggregate().ID),
 				repo.SetState(domain.UserStateLocked),
+				database.NewChange(database.NewColumn("users", "password_locked_at"), e.CreatedAt()),
 				repo.SetUpdatedAt(e.CreatedAt()),
 			)
 			return err
@@ -183,6 +184,7 @@ func (p *relationalTablesProjection) reduceUserUnlocked(event eventstore.Event) 
 			v3_sql.SQLTx(tx),
 			repo.PrimaryKeyCondition(e.Agg.InstanceID, e.Aggregate().ID),
 			repo.SetState(domain.UserStateActive),
+			database.NewChange(database.NewColumn("users", "password_locked_at"), database.NullInstruction),
 			repo.SetUpdatedAt(e.CreatedAt()),
 		)
 		return err

@@ -1898,6 +1898,7 @@
       "HASUPPERCASE": "måste inkludera en versal bokstav",
       "SHOWLOCKOUTFAILURES": "visa låsning misslyckanden",
       "MAXPASSWORDATTEMPTS": "Maximalt antal lösenordsförsök",
+      "AUTOUNLOCKAFTERMIN": "Automatisk upplåsning efter (i minuter)",
       "MAXOTPATTEMPTS": "Maximalt antal OTP-försök",
       "EXPIREWARNDAYS": "Utgångsvarning efter dagar",
       "MAXAGEDAYS": "Maximal giltighetstid i dagar",

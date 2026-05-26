@@ -790,14 +790,16 @@ func TestCheckOTPSMS(t *testing.T) {
 				code: "code",
 			},
 			res: res{
-				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-S453v", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-M4rp1", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
 			name: "missing code",
 			fields: fields{
-				eventstore: expectEventstore(),
-				userID:     "userID",
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+				userID: "userID",
 			},
 			args: args{},
 			res: res{
@@ -808,6 +810,7 @@ func TestCheckOTPSMS(t *testing.T) {
 			name: "not set up",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectFilter(),
 				),
 				userID: "userID",
@@ -823,6 +826,7 @@ func TestCheckOTPSMS(t *testing.T) {
 			name: "missing challenge",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(user.NewHumanOTPSMSAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate)),
 					),
@@ -841,6 +845,7 @@ func TestCheckOTPSMS(t *testing.T) {
 			name: "invalid code",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(user.NewHumanOTPSMSAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate)),
 					),
@@ -848,7 +853,7 @@ func TestCheckOTPSMS(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLockoutPolicyAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
-								0, 0, false,
+								0, 0, false, 0, false, false,
 							),
 						),
 					),
@@ -880,6 +885,7 @@ func TestCheckOTPSMS(t *testing.T) {
 			name: "invalid code, locked",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(user.NewHumanOTPSMSAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate)),
 					),
@@ -887,7 +893,7 @@ func TestCheckOTPSMS(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLockoutPolicyAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
-								0, 1, false,
+								0, 1, false, 0, false, false,
 							),
 						),
 					),
@@ -920,6 +926,7 @@ func TestCheckOTPSMS(t *testing.T) {
 			name: "check ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(user.NewHumanOTPSMSAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate)),
 					),
@@ -954,6 +961,7 @@ func TestCheckOTPSMS(t *testing.T) {
 			name: "check ok (external)",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(user.NewHumanOTPSMSAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate)),
 					),
@@ -989,6 +997,7 @@ func TestCheckOTPSMS(t *testing.T) {
 			name: "check ok, locked in the meantime",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(user.NewHumanOTPSMSAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate)),
 					),
@@ -1083,15 +1092,17 @@ func TestCheckOTPEmail(t *testing.T) {
 				code: "code",
 			},
 			res: res{
-				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-S453v", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-M4rp1", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
 			name: "missing code",
 			fields: fields{
-				eventstore: expectEventstore(),
-				userID:     "userID",
-				tarpit:     expectTarpit(0),
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+				userID: "userID",
+				tarpit: expectTarpit(0),
 			},
 			args: args{},
 			res: res{
@@ -1102,6 +1113,7 @@ func TestCheckOTPEmail(t *testing.T) {
 			name: "not set up",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectFilter(),
 				),
 				userID: "userID",
@@ -1118,6 +1130,7 @@ func TestCheckOTPEmail(t *testing.T) {
 			name: "missing challenge",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(user.NewHumanOTPEmailAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate)),
 					),
@@ -1137,6 +1150,7 @@ func TestCheckOTPEmail(t *testing.T) {
 			name: "invalid code",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(user.NewHumanOTPEmailAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate)),
 					),
@@ -1144,7 +1158,7 @@ func TestCheckOTPEmail(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLockoutPolicyAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
-								0, 0, false,
+								0, 0, false, 0, false, false,
 							),
 						),
 					),
@@ -1177,6 +1191,7 @@ func TestCheckOTPEmail(t *testing.T) {
 			name: "invalid code, locked",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(user.NewHumanOTPEmailAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate)),
 					),
@@ -1184,7 +1199,7 @@ func TestCheckOTPEmail(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLockoutPolicyAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
-								0, 1, false,
+								0, 1, false, 0, false, false,
 							),
 						),
 					),
@@ -1218,6 +1233,7 @@ func TestCheckOTPEmail(t *testing.T) {
 			name: "check ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(user.NewHumanOTPEmailAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate)),
 					),
@@ -1253,6 +1269,7 @@ func TestCheckOTPEmail(t *testing.T) {
 			name: "check ok, locked in the meantime",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(user.NewHumanOTPEmailAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate)),
 					),

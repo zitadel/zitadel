@@ -115,6 +115,14 @@ func (c *Commands) OTPEmailSent(ctx context.Context, sessionID, resourceOwner st
 
 func CheckOTPSMS(code string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) (_ []eventstore.Command, err error) {
+		humanWriteModel, err := cmd.getStateIndependentHumanWriteModel(ctx)
+		if err != nil {
+			return nil, err
+		}
+		if humanWriteModel.UserState == domain.UserStateLocked {
+			return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-M4rp2", "Errors.User.NotFound")
+		}
+
 		writeModel := func(ctx context.Context, userID string, resourceOwner string) (OTPCodeWriteModel, error) {
 			otpWriteModel := NewHumanOTPSMSCodeWriteModel(cmd.sessionWriteModel.UserID, "")
 			err := cmd.eventstore.FilterToQueryReducer(ctx, otpWriteModel)
@@ -156,6 +164,14 @@ func CheckOTPSMS(code string) SessionCommand {
 
 func CheckOTPEmail(code string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) (_ []eventstore.Command, err error) {
+		humanWriteModel, err := cmd.getStateIndependentHumanWriteModel(ctx)
+		if err != nil {
+			return nil, err
+		}
+		if humanWriteModel.UserState == domain.UserStateLocked {
+			return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-M4rp3", "Errors.User.NotFound")
+		}
+
 		writeModel := func(ctx context.Context, userID string, resourceOwner string) (OTPCodeWriteModel, error) {
 			otpWriteModel := NewHumanOTPEmailCodeWriteModel(cmd.sessionWriteModel.UserID, "")
 			err := cmd.eventstore.FilterToQueryReducer(ctx, otpWriteModel)

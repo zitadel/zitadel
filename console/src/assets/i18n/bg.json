@@ -1896,6 +1896,7 @@
       "HASUPPERCASE": "има главни букви",
       "SHOWLOCKOUTFAILURES": "показва грешки при блокиране",
       "MAXPASSWORDATTEMPTS": "Максимален брой опити за парола",
+      "AUTOUNLOCKAFTERMIN": "Автоматично отключване след (в минути)",
       "MAXOTPATTEMPTS": "Максимален брой опити за OTP",
       "EXPIREWARNDAYS": "Предупреждение за изтичане след дни",
       "MAXAGEDAYS": "Максимална валидност в дни",

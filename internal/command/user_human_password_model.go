@@ -23,6 +23,8 @@ type HumanPasswordWriteModel struct {
 	VerificationID           string
 
 	UserState domain.UserState
+
+	LockedAt time.Time
 }
 
 func (wm *HumanPasswordWriteModel) GetUserState() domain.UserState {
@@ -43,6 +45,10 @@ func (wm *HumanPasswordWriteModel) GetResourceOwner() string {
 
 func (wm *HumanPasswordWriteModel) GetWriteModel() *eventstore.WriteModel {
 	return &wm.WriteModel
+}
+
+func (wm *HumanPasswordWriteModel) GetLockedAt() time.Time {
+	return wm.LockedAt
 }
 
 func NewHumanPasswordWriteModel(userID, resourceOwner string) *HumanPasswordWriteModel {
@@ -92,11 +98,13 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 			wm.PasswordCheckFailedCount = 0
 		case *user.UserLockedEvent:
 			wm.UserState = domain.UserStateLocked
+			wm.LockedAt = e.CreationDate()
 		case *user.UserUnlockedEvent:
 			wm.PasswordCheckFailedCount = 0
 			if wm.UserState != domain.UserStateDeleted {
 				wm.UserState = domain.UserStateActive
 			}
+			wm.LockedAt = time.Time{}
 		case *user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
 		case *user.HumanPasswordHashUpdatedEvent:

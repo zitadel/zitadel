@@ -118,12 +118,21 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 		return nil, err
 	}
 	sessionChecks := make([]command.SessionCommand, 0, 7)
+
 	if checkUser != nil {
 		user, err := checkUser.search(ctx, s.query)
 		if err != nil {
 			return nil, err
 		}
-		if !user.State.IsEnabled() {
+
+		// allow Active, Initial and Locked.
+		// checking for locked state is processed in the individual checks.
+		// in password check it is possible to unlock the user with LockoutPolicy,
+		// in other checks the user will be rejected with not found error if locked.
+		switch user.State {
+		case domain.UserStateActive, domain.UserStateInitial, domain.UserStateLocked:
+			// ok
+		default:
 			return nil, zerrors.ThrowPreconditionFailed(nil, "SESSION-Gj4ko", "Errors.User.NotActive")
 		}
 
