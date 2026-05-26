@@ -174,7 +174,7 @@ PasswordlessPrompt:
     thức xác thực thiết bị của bạn như FaceID, Windows Hello hoặc Vân tay)
   DescriptionInit: Bạn cần thiết lập đăng nhập không cần mật khẩu. Sử dụng liên kết
     bạn đã được cung cấp để đăng ký thiết bị của bạn.
-  PasswordlessButtonText: Đi không cần mật khẩu
+  PasswordlessButtonText: Đăng nhập không cần mật khẩu
   NextButtonText: Tiếp theo
   SkipButtonText: Bỏ qua
 PasswordlessRegistration:
@@ -237,7 +237,7 @@ RegistrationUser:
   DescriptionOrgRegister: Nhập dữ liệu người dùng của bạn.
   EmailLabel: Thư điện tử
   UsernameLabel: Tên người dùng
-  FirstnameLabel: Họ tên
+  FirstnameLabel: Tên
   LastnameLabel: Họ
   LanguageLabel: Ngôn ngữ
   German: Tiếng Đức
@@ -249,17 +249,17 @@ RegistrationUser:
   Japanese: 日本語
   Spanish: Tiếng Tây Ban Nha
   Bulgarian: Български
-  Portuguese: Người Bồ Đào Nha
+  Portuguese: Português
   Macedonian: Македонски
   Czech: Čeština
   Russian: Русский
-  Dutch: Hà Lan
+  Dutch: Nederlands
   Swedish: Svenska
-  Indonesian: Tiếng Bahasa Indonesia
-  Hungarian: Tiếng Magyar
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   Korean: 한국어
   Romanian: Română
-  Turkish: Thổ Nhĩ Kỳ
+  Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
   Vietnamese: Tiếng Việt
@@ -283,7 +283,7 @@ ExternalRegistrationUserOverview:
     cấp đã chọn. Bây giờ bạn có thể thay đổi hoặc hoàn thành chúng.
   EmailLabel: Thư điện tử
   UsernameLabel: Tên người dùng
-  FirstnameLabel: Họ tên
+  FirstnameLabel: Tên
   LastnameLabel: Họ
   NicknameLabel: Biệt danh
   PhoneLabel: Số điện thoại
@@ -297,19 +297,20 @@ ExternalRegistrationUserOverview:
   Japanese: 日本語
   Spanish: Tiếng Tây Ban Nha
   Bulgarian: Български
-  Portuguese: Người Bồ Đào Nha
+  Portuguese: Português
   Macedonian: Македонски
   Czech: Čeština
   Russian: Русский
-  Dutch: Hà Lan
+  Dutch: Nederlands
   Swedish: Svenska
-  Indonesian: Tiếng Bahasa Indonesia
-  Hungarian: Tiếng Magyar
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   Korean: 한국어
   Romanian: Română
-  Turkish: Thổ Nhĩ Kỳ
+  Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: Tiếng Việt
   TosAndPrivacyLabel: Điều khoản và điều kiện
   TosConfirm: Tôi chấp nhận
   TosLinkText: ĐKDV
@@ -324,7 +325,7 @@ RegistrationOrg:
   OrgNameLabel: Tên tổ chức
   EmailLabel: Thư điện tử
   UsernameLabel: Tên người dùng
-  FirstnameLabel: Họ tên
+  FirstnameLabel: Tên
   LastnameLabel: Họ
   PasswordLabel: Mật khẩu
   PasswordConfirmLabel: Xác nhận mật khẩu
@@ -374,17 +375,17 @@ ExternalNotFound:
   Japanese: 日本語
   Spanish: Tiếng Tây Ban Nha
   Bulgarian: Български
-  Portuguese: Người Bồ Đào Nha
+  Portuguese: Português
   Macedonian: Македонски
   Czech: Čeština
   Russian: Русский
-  Dutch: Hà Lan
+  Dutch: Nederlands
   Swedish: Svenska
-  Indonesian: Tiếng Bahasa Indonesia
-  Hungarian: Tiếng Magyar
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   Korean: 한국어
   Romanian: Română
-  Turkish: Thổ Nhĩ Kỳ
+  Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
   Vietnamese: Tiếng Việt
@@ -481,7 +482,7 @@ Errors:
       Expired: Mã đã hết hạn
       Invalid: Mã không hợp lệ
       Empty: Mã trống
-      CryptoCodeNil: Mã tiền điện tử là con số không
+      CryptoCodeNil: Mã xác minh không hợp lệ (nil)
       NotFound: Không thể tìm thấy mã
       GeneratorAlgNotSupported: Thuật toán tạo không được hỗ trợ
     EmailVerify:
