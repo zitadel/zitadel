@@ -324,7 +324,7 @@ ExternalRegistrationUserOverview:
   PrivacyConfirm: I accept the
   PrivacyLinkText: privacy policy
   ExternalLogin: or register with an external user
-  BackButtonText: Nack
+  BackButtonText: Back
   NextButtonText: Save
 RegistrationOrg:
   Title: Organization Registration
