@@ -2602,7 +2602,7 @@
       "TYPEREQUIRED": "Jenisnya wajib diisi.",
       "TITLE": "Konfigurasi OIDC",
       "CLIENTID": "ID Klien",
-      "CLIENTSECRET": "Rahasia Klien",
+      "CLIENTDETAILS": "Detail klien",
       "CLIENTSECRET_NOSECRET": "Dengan alur autentikasi yang Anda pilih, tidak ada rahasia yang diperlukan dan oleh karena itu tidak tersedia.",
       "CLIENTSECRET_DESCRIPTION": "Jaga rahasia klien Anda di tempat yang aman karena akan hilang setelah dialog ditutup.",
       "REGENERATESECRET": "Regenerasi Rahasia Klien",

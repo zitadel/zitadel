@@ -2575,7 +2575,7 @@
       "TYPEREQUIRED": "Se requiere el tipo.",
       "TITLE": "Ajustes OIDC",
       "CLIENTID": "ID de cliente",
-      "CLIENTSECRET": "Secreto de cliente",
+      "CLIENTDETAILS": "Detalles del cliente",
       "CLIENTSECRET_NOSECRET": "Con tu flujo de autenticación elegido, no se requiere ningún secreto y por tanto no está disponible.",
       "CLIENTSECRET_DESCRIPTION": "Mantén tu secreto de cliente en un lugar seguro puesto que desaparecerá una vez que se cierre el diálogo.",
       "REGENERATESECRET": "Regenerar secreto de cliente",

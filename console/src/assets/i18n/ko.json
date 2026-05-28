@@ -2604,7 +2604,7 @@
       "TYPEREQUIRED": "유형은 필수 항목입니다.",
       "TITLE": "OIDC 구성",
       "CLIENTID": "클라이언트 ID",
-      "CLIENTSECRET": "클라이언트 시크릿",
+      "CLIENTDETAILS": "클라이언트 세부정보",
       "CLIENTSECRET_NOSECRET": "선택한 인증 플로우에서는 시크릿이 필요하지 않으므로 사용할 수 없습니다.",
       "CLIENTSECRET_DESCRIPTION": "클라이언트 시크릿을 안전한 곳에 보관하세요. 대화 상자가 닫히면 시크릿이 사라집니다.",
       "REGENERATESECRET": "클라이언트 시크릿 재생성",
