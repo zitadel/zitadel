@@ -35,26 +35,26 @@ func TestTokenVerifierRepo_getTokenIDAndSubject(t *testing.T) {
 		wantValid     bool
 	}{
 		{
-			name:          "user ID simple sans deux-points",
+			name:          "simple user ID without colons",
 			decryptResult: "tokenID123:userID456",
 			wantTokenID:   "tokenID123",
 			wantSubject:   "userID456",
 			wantValid:     true,
 		},
 		{
-			name:          "user ID au format URN avec deux-points",
+			name:          "user ID in URN format with colons",
 			decryptResult: "sessionID-at_abc:urn:myorg:user:550e8400-e29b-41d4-a716-446655440000",
 			wantTokenID:   "sessionID-at_abc",
 			wantSubject:   "urn:myorg:user:550e8400-e29b-41d4-a716-446655440000",
 			wantValid:     true,
 		},
 		{
-			name:          "token sans séparateur",
+			name:          "token without separator",
 			decryptResult: "invalidtoken",
 			wantValid:     false,
 		},
 		{
-			name:       "erreur de déchiffrement",
+			name:       "decryption error",
 			decryptErr: errors.New("decrypt failed"),
 			wantValid:  false,
 		},

@@ -16,24 +16,24 @@ func Test_splitDecryptedOpaqueToken(t *testing.T) {
 		wantErr     bool
 	}{
 		{
-			name:        "user ID simple sans deux-points",
+			name:        "simple user ID without colons",
 			decrypted:   "tokenID123:userID456",
 			wantTokenID: "tokenID123",
 			wantSubject: "userID456",
 		},
 		{
-			name:        "user ID au format URN avec deux-points",
+			name:        "user ID in URN format with colons",
 			decrypted:   "sessionID-at_abc:urn:myorg:user:550e8400-e29b-41d4-a716-446655440000",
 			wantTokenID: "sessionID-at_abc",
 			wantSubject: "urn:myorg:user:550e8400-e29b-41d4-a716-446655440000",
 		},
 		{
-			name:      "token sans séparateur",
+			name:      "token without separator",
 			decrypted: "invalidtoken",
 			wantErr:   true,
 		},
 		{
-			name:      "chaîne vide",
+			name:      "empty string",
 			decrypted: "",
 			wantErr:   true,
 		},
