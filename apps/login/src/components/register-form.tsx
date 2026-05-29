@@ -51,7 +51,7 @@ export function RegisterForm({
     mode: "onChange",
     defaultValues: {
       email: email ?? "",
-      firstName: firstname ?? "",
+      firstname: firstname ?? "",
       lastname: lastname ?? "",
     },
   });
