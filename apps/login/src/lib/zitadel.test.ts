@@ -44,4 +44,16 @@ describe("zitadel settings helpers", () => {
 
     expect(result).toBeUndefined();
   });
+
+  test("getDefaultOrg returns null when the backend call fails", async () => {
+    const { createServiceForHost } = await import("./service");
+    vi.mocked(createServiceForHost).mockResolvedValue({
+      listOrganizations: vi.fn().mockRejectedValue(new Error("backend unavailable")),
+    } as any);
+
+    const { getDefaultOrg } = await import("./zitadel");
+    const result = await getDefaultOrg({ serviceConfig: { baseUrl: "https://api.example.com" } as any });
+
+    expect(result).toBeNull();
+  });
 });

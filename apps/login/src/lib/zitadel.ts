@@ -838,8 +838,8 @@ export async function getDefaultOrg({ serviceConfig }: WithServiceConfig): Promi
   const fetcher = async () => {
     const orgService: Client<typeof OrganizationService> = await createServiceForHost(OrganizationService, serviceConfig);
 
-    return orgService
-      .listOrganizations(
+    try {
+      const resp = await orgService.listOrganizations(
         {
           queries: [
             {
@@ -851,8 +851,12 @@ export async function getDefaultOrg({ serviceConfig }: WithServiceConfig): Promi
           ],
         },
         {},
-      )
-      .then((resp) => (resp?.result && resp.result[0] ? resp.result[0] : null));
+      );
+
+      return resp?.result && resp.result[0] ? resp.result[0] : null;
+    } catch {
+      return null;
+    }
   };
 
   const org = useCache
