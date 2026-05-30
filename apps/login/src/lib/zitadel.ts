@@ -36,6 +36,7 @@ import { getUserAgent } from "./fingerprint";
 import { applyCustomHeaders } from "@/lib/custom-headers";
 import { errorClassificationInterceptor, isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { otelGrpcInterceptor } from "@/lib/grpc/interceptors/otel";
+import { createLogger } from "@/lib/logger";
 import { Code, Interceptor } from "@connectrpc/connect";
 import { PromiseCache } from "./cache";
 import { createServiceForHost } from "./service";
@@ -53,6 +54,7 @@ try {
 
 const defaultCacheTTL = (cacheConfig.defaultMinutes ?? 15) * 60 * 1000; // 15 mins default
 const longCacheTTL = (cacheConfig.longMinutes ?? 60) * 60 * 1000; // 1 hour default
+const logger = createLogger("zitadel");
 
 /**
  * Helper to determine the TTL for a specific API method.
@@ -835,10 +837,10 @@ export async function searchUsers({
 }
 
 export async function getDefaultOrg({ serviceConfig }: WithServiceConfig): Promise<Organization | null> {
-  const fetcher = async () => {
-    const orgService: Client<typeof OrganizationService> = await createServiceForHost(OrganizationService, serviceConfig);
+  try {
+    const fetcher = async () => {
+      const orgService: Client<typeof OrganizationService> = await createServiceForHost(OrganizationService, serviceConfig);
 
-    try {
       const resp = await orgService.listOrganizations(
         {
           queries: [
@@ -854,20 +856,37 @@ export async function getDefaultOrg({ serviceConfig }: WithServiceConfig): Promi
       );
 
       return resp?.result && resp.result[0] ? resp.result[0] : null;
-    } catch {
-      return null;
+    };
+
+    const org = useCache
+      ? await freshCache(
+          instanceCacheKey(serviceConfig, "getDefaultOrg-instance"),
+          fetcher,
+          getTTLForKey("getDefaultOrg", defaultCacheTTL),
+        )
+      : await fetcher();
+
+    return org ?? null;
+  } catch (error) {
+    if (isClassifiedError(error)) {
+      const log = error.code === Code.NotFound ? logger.warn : logger.error;
+      log("Failed to load default organization", {
+        instanceHost: serviceConfig.instanceHost,
+        publicHost: serviceConfig.publicHost,
+        code: error.code,
+        httpStatus: error.httpStatus,
+        isUserError: error.isUserError,
+      });
+    } else {
+      logger.error("Failed to load default organization", {
+        instanceHost: serviceConfig.instanceHost,
+        publicHost: serviceConfig.publicHost,
+        error: error instanceof Error ? { message: error.message, stack: error.stack } : error,
+      });
     }
-  };
 
-  const org = useCache
-    ? await freshCache(
-        instanceCacheKey(serviceConfig, "getDefaultOrg-instance"),
-        fetcher,
-        getTTLForKey("getDefaultOrg", defaultCacheTTL),
-      )
-    : await fetcher();
-
-  return org ?? null;
+    return null;
+  }
 }
 
 export async function getOrgsByDomain({ serviceConfig, domain }: WithServiceConfig<{ domain: string }>) {
