@@ -1,4 +1,14 @@
-import test from "@playwright/test";
+import { expect, test } from "@playwright/test";
+
+test("ldap login page renders without crashing", async ({ page }) => {
+  await page.goto("./idp/ldap?idpId=test-idp&requestId=oidc_test");
+
+  await expect(page.getByTestId("username-text-input").first()).toBeVisible({
+    timeout: 120_000,
+  });
+  await expect(page.getByTestId("password-text-input").first()).toBeVisible();
+  await expect(page.locator("body")).not.toContainText("An error occurred in the Server Components render");
+});
 
 test("login with LDAP IDP", async ({ page }) => {
   test.skip();
