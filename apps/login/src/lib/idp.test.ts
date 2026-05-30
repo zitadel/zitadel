@@ -283,6 +283,7 @@ describe("idp type mapping utilities", () => {
         { idpType: IDPType.IDP_TYPE_APPLE, slug: "apple" },
         { idpType: IDPType.IDP_TYPE_GOOGLE, slug: "google" },
         { idpType: IDPType.IDP_TYPE_AZURE_AD, slug: "azure" },
+        { idpType: IDPType.IDP_TYPE_LDAP, slug: "ldap" },
         { idpType: IDPType.IDP_TYPE_SAML, slug: "saml" },
         { idpType: IDPType.IDP_TYPE_OAUTH, slug: "oauth" },
         { idpType: IDPType.IDP_TYPE_OIDC, slug: "oidc" },

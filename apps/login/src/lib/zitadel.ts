@@ -84,7 +84,7 @@ const promiseCache = new PromiseCache(Number(cacheConfig.maxSize) || 100);
  * The cache is bounded and periodically swept for expired entries
  * to prevent unbounded memory growth.
  */
-function freshCache<T>(key: string, fetcher: () => Promise<T>, ttlMs: number): Promise<T> {
+function freshCache<T>(key: string, fetcher: () => Promise<T>, ttlMs: number): Promise<T | undefined> {
   if (!useCache) {
     return fetcher();
   }
@@ -120,7 +120,7 @@ export async function getHostedLoginTranslation({
         {},
       )
       .then((resp) => {
-        return resp.translations ? resp.translations : undefined;
+        return resp.translations ?? undefined;
       });
   };
 
@@ -142,7 +142,7 @@ export async function getBrandingSettings({
 
     return settingsService
       .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
-      .then((resp) => (resp.settings ? resp.settings : undefined));
+      .then((resp) => resp.settings ?? undefined);
   };
 
   return freshCache(
@@ -163,7 +163,7 @@ export async function getLoginSettings({
 
     return settingsService
       .getLoginSettings({ ctx: makeReqCtx(organization) }, {})
-      .then((resp) => (resp.settings ? resp.settings : undefined));
+      .then((resp) => resp.settings ?? undefined);
   };
 
   return freshCache(
@@ -177,7 +177,7 @@ export async function getSecuritySettings({ serviceConfig }: WithServiceConfig) 
   const fetcher = async () => {
     const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
 
-    return settingsService.getSecuritySettings({}).then((resp) => (resp.settings ? resp.settings : undefined));
+    return settingsService.getSecuritySettings({}).then((resp) => resp.settings ?? undefined);
   };
 
   return freshCache(
@@ -191,9 +191,7 @@ export async function getLockoutSettings({ serviceConfig, orgId }: WithServiceCo
   const fetcher = async () => {
     const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
 
-    return settingsService
-      .getLockoutSettings({ ctx: makeReqCtx(orgId) }, {})
-      .then((resp) => (resp.settings ? resp.settings : undefined));
+    return settingsService.getLockoutSettings({ ctx: makeReqCtx(orgId) }, {}).then((resp) => resp.settings ?? undefined);
   };
 
   return freshCache(
@@ -209,7 +207,7 @@ export async function getPasswordExpirySettings({ serviceConfig, orgId }: WithSe
 
     return settingsService
       .getPasswordExpirySettings({ ctx: makeReqCtx(orgId) }, {})
-      .then((resp) => (resp.settings ? resp.settings : undefined));
+      .then((resp) => resp.settings ?? undefined);
   };
 
   return freshCache(
@@ -273,7 +271,7 @@ export async function getLegalAndSupportSettings({
 
     return settingsService
       .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
-      .then((resp) => (resp.settings ? resp.settings : undefined));
+      .then((resp) => resp.settings ?? undefined);
   };
 
   return freshCache(
@@ -294,7 +292,7 @@ export async function getPasswordComplexitySettings({
 
     return settingsService
       .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
-      .then((resp) => (resp.settings ? resp.settings : undefined));
+      .then((resp) => resp.settings ?? undefined);
   };
 
   return freshCache(
@@ -857,13 +855,15 @@ export async function getDefaultOrg({ serviceConfig }: WithServiceConfig): Promi
       .then((resp) => (resp?.result && resp.result[0] ? resp.result[0] : null));
   };
 
-  return useCache
-    ? freshCache(
+  const org = useCache
+    ? await freshCache(
         instanceCacheKey(serviceConfig, "getDefaultOrg-instance"),
         fetcher,
         getTTLForKey("getDefaultOrg", defaultCacheTTL),
       )
-    : fetcher();
+    : await fetcher();
+
+  return org ?? null;
 }
 
 export async function getOrgsByDomain({ serviceConfig, domain }: WithServiceConfig<{ domain: string }>) {

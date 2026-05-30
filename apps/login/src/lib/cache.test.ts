@@ -57,6 +57,23 @@ describe("PromiseCache", () => {
       expect(callCount).toBe(1);
     });
 
+    test("should cache undefined results without treating them as fetch failures", async () => {
+      cache = new PromiseCache(10);
+      let callCount = 0;
+      const fetcher = () => {
+        callCount++;
+        return Promise.resolve(undefined as undefined);
+      };
+
+      const first = await cache.getOrFetch("key1", fetcher, 60_000);
+      const second = await cache.getOrFetch("key1", fetcher, 60_000);
+
+      expect(first).toBeUndefined();
+      expect(second).toBeUndefined();
+      expect(callCount).toBe(1);
+      expect(cache.size).toBe(1);
+    });
+
     test("should return stale value immediately after TTL expires (SWR)", async () => {
       const clock = mockClock();
       cache = new PromiseCache(10, clock.perf);

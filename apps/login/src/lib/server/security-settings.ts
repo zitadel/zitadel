@@ -75,13 +75,13 @@ export async function getIframeOrigins(
 ): Promise<string[] | null> {
   const cacheKey = instanceHost || "__default__";
 
-  // The fetcher returns null (not undefined) because lru-cache treats
-  // undefined as a fetch failure.
-  return cache.getOrFetch<string[] | null>(
+  const origins = await cache.getOrFetch<string[] | null>(
     cacheKey,
     () => fetchIframeOrigins(baseUrl, instanceHost, publicHost),
     CACHE_TTL_MS,
   );
+
+  return origins ?? null;
 }
 
 async function fetchIframeOrigins(baseUrl: string, instanceHost?: string, publicHost?: string): Promise<string[] | null> {
@@ -121,8 +121,6 @@ async function fetchIframeOrigins(baseUrl: string, instanceHost?: string, public
       status: response.status,
       statusText: response.statusText,
     });
-    // Return null instead of undefined — lru-cache treats undefined as a
-    // fetch failure and throws "fetch() returned undefined".
     return null;
   }
 
