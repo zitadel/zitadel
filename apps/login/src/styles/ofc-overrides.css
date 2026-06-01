@@ -1,0 +1,15 @@
+/*
+ * OFC-eigene Stil-Overrides für die Login-V2-Fork.
+ *
+ * BEWUSST eine eigene Datei (kein Edit an Upstream-Komponenten) → updatesicher:
+ * Diese Datei existiert bei Zitadel nicht und kann beim Rebase nie konfligieren.
+ * Einzige Upstream-Berührung ist die eine Import-Zeile in app/(login)/layout.tsx.
+ *
+ * Zweck: Hintergrundbild „fit" wie in der alten ProjectDB — fixiert (scrollt
+ * nicht mit). Das Bild selbst kommt aus NEXT_PUBLIC_THEME_BACKGROUND_IMAGE (env).
+ * Der BackgroundWrapper setzt das Bild inline; background-attachment setzt er
+ * NICHT → wir ergänzen es hier (Selektor: Element mit inline background-image).
+ */
+[style*="background-image"] {
+  background-attachment: fixed !important;
+}

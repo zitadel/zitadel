@@ -1,4 +1,5 @@
 import "@/styles/globals.scss";
+import "@/styles/ofc-overrides.css"; // OFC: eigene Overrides (updatesicher, eigene Datei)
 
 import { BackgroundWrapper } from "@/components/background-wrapper";
 import { LanguageProvider } from "@/components/language-provider";
