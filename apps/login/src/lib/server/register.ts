@@ -25,7 +25,7 @@ const RETRY_DELAYS_MS = [500, 1000, 2000];
  */
 async function createSessionWithRetry(command: { checks: Checks; requestId: string | undefined; lifetime?: Duration }) {
   let lastError: unknown;
-  for (let attempt = 0; attempt <= MAX_SESSION_RETRIES; attempt++) {
+  for (let attempt = 0; attempt < MAX_SESSION_RETRIES; attempt++) {
     try {
       return await createSessionAndUpdateCookie(command);
     } catch (error) {
