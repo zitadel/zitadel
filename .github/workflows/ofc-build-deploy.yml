@@ -1,0 +1,261 @@
+name: OFC Build & Deploy to GHCR (self-hosted)
+
+# Builds the zitadel API (core) and login images from OUR fork, pushes them to
+# ghcr.io/o-f-c/zitadel(+-login), then rolls them out to the two OFC servers via
+# SSH. Manual only — never runs automatically.
+#
+# The compose file is copied to /root/zitadel/docker-compose.yml on each deploy.
+# The /root/zitadel/.env (ZITADEL_MASTERKEY, ZITADEL_DOMAIN, ZITADEL_DB_PASSWORD)
+# already exists on the servers and is NOT touched. The exact built image tag is
+# injected via the deploy shell environment, overriding compose's fallback.
+#
+# Required secrets (org-level):
+#   GHCR_USERNAME            - GHCR user for pulling on the servers
+#   GHCR_READ_TOKEN          - GHCR read:packages token for the servers
+#   SENSORIK_SSH_PRIVATE_KEY - SSH key authorized for root@<server>
+#   KNOWN_HOSTS              - (optional) pinned SSH host keys; else ssh-keyscan
+# Pushing to GHCR uses the built-in GITHUB_TOKEN (packages: write).
+
+on:
+  workflow_dispatch:
+    inputs:
+      force_rebuild:
+        description: "Force build and push even if the image tag already exists"
+        type: boolean
+        default: false
+        required: false
+      deploy_only:
+        description: "Skip build/push — only deploy existing images from GHCR"
+        type: boolean
+        default: false
+        required: false
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: ofc-build-deploy
+  cancel-in-progress: false
+
+env:
+  # Deploy targets
+  SERVER1_IP: "10.209.0.2"
+  SERVER2_IP: "10.209.0.4"
+  SSH_PORT: "6130"
+  SSH_USER: "root"
+  DEPLOY_ROOT: /root/zitadel
+  # GHCR pull credentials used on the target servers
+  GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+  GHCR_READ_TOKEN: ${{ secrets.GHCR_READ_TOKEN }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  prepare:
+    name: Compute image names and tag
+    runs-on: [self-hosted, sensorik]
+    outputs:
+      owner: ${{ steps.compute.outputs.owner }}
+      tag: ${{ steps.compute.outputs.tag }}
+      api_base: ${{ steps.compute.outputs.api_base }}
+      login_base: ${{ steps.compute.outputs.login_base }}
+      api_image: ${{ steps.compute.outputs.api_image }}
+      login_image: ${{ steps.compute.outputs.login_image }}
+    steps:
+      - id: compute
+        env:
+          OWNER_RAW: ${{ github.repository_owner }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          owner="${OWNER_RAW,,}"                 # ghcr requires lowercase
+          tag="sha-${SHA:0:12}"
+          api_base="ghcr.io/${owner}/zitadel"
+          login_base="ghcr.io/${owner}/zitadel-login"
+
+          echo "owner=${owner}"            >> "$GITHUB_OUTPUT"
+          echo "tag=${tag}"                >> "$GITHUB_OUTPUT"
+          echo "api_base=${api_base}"      >> "$GITHUB_OUTPUT"
+          echo "login_base=${login_base}"  >> "$GITHUB_OUTPUT"
+          echo "api_image=${api_base}:${tag}"     >> "$GITHUB_OUTPUT"
+          echo "login_image=${login_base}:${tag}" >> "$GITHUB_OUTPUT"
+
+  check_images:
+    name: Check if image tag exists in GHCR
+    runs-on: [self-hosted, sensorik]
+    needs: [prepare]
+    if: ${{ github.event.inputs.deploy_only != 'true' }}
+    outputs:
+      exists: ${{ steps.decide.outputs.exists }}
+    steps:
+      - id: decide
+        env:
+          OWNER: ${{ needs.prepare.outputs.owner }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+          GH_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          probe() {
+            local name="$1"
+            local url="https://ghcr.io/v2/${OWNER}/${name}/manifests/${TAG}"
+            local code
+            code=$(curl -fsSLI -o /dev/null -w "%{http_code}" \
+              -u "${GH_ACTOR}:${GITHUB_TOKEN}" \
+              -H 'Accept: application/vnd.oci.image.index.v1+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json, application/vnd.docker.distribution.manifest.list.v2+json' \
+              "$url" || true)
+            echo "HEAD $url -> $code"
+            [[ "$code" == "200" ]]
+          }
+
+          if probe "zitadel" && probe "zitadel-login"; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Both images already exist for ${TAG}."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "At least one image is missing for ${TAG}."
+          fi
+
+  build:
+    name: Build and push images to GHCR
+    runs-on: [self-hosted, sensorik]
+    needs: [prepare, check_images]
+    if: ${{ github.event.inputs.deploy_only != 'true' && (github.event.inputs.force_rebuild == 'true' || needs.check_images.outputs.exists != 'true') }}
+    env:
+      API_BASE: ${{ needs.prepare.outputs.api_base }}
+      LOGIN_BASE: ${{ needs.prepare.outputs.login_base }}
+      TAG: ${{ needs.prepare.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build local images (api + login)
+        # Per-project nx pack targets build single-arch (host = amd64) docker
+        # images: zitadel/zitadel:local and zitadel/zitadel-login:local.
+        # generate-install go-installs all codegen tools (buf, protoc-gen-*,
+        # statik) into .artifacts/bin, so no extra system deps are needed.
+        env:
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
+        run: pnpm nx run-many --target=pack --projects=@zitadel/api,@zitadel/login --parallel=false
+
+      - name: Login to GHCR (push)
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Tag and push API image
+        run: |
+          set -euo pipefail
+          docker tag zitadel/zitadel:local "${API_BASE}:${TAG}"
+          docker tag zitadel/zitadel:local "${API_BASE}:latest"
+          docker push "${API_BASE}:${TAG}"
+          docker push "${API_BASE}:latest"
+
+      - name: Tag and push Login image
+        run: |
+          set -euo pipefail
+          docker tag zitadel/zitadel-login:local "${LOGIN_BASE}:${TAG}"
+          docker tag zitadel/zitadel-login:local "${LOGIN_BASE}:latest"
+          docker push "${LOGIN_BASE}:${TAG}"
+          docker push "${LOGIN_BASE}:latest"
+
+  deploy:
+    name: Deploy to servers (pull from GHCR)
+    runs-on: [self-hosted, sensorik]
+    needs: [prepare, check_images, build]
+    # deploy always runs; build may be skipped (deploy_only / image exists)
+    if: ${{ always() && needs.prepare.result == 'success' && (needs.build.result == 'success' || needs.build.result == 'skipped') }}
+    env:
+      IMAGE_ZITADEL: ${{ needs.prepare.outputs.api_image }}
+      IMAGE_LOGIN: ${{ needs.prepare.outputs.login_image }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate deploy configuration
+        run: |
+          set -euo pipefail
+          required_vars=(SERVER1_IP SERVER2_IP SSH_PORT SSH_USER DEPLOY_ROOT IMAGE_ZITADEL IMAGE_LOGIN GHCR_USERNAME GHCR_READ_TOKEN)
+          missing=0
+          for var_name in "${required_vars[@]}"; do
+            if [[ -z "${!var_name:-}" ]]; then echo "${var_name} is empty." >&2; missing=1; fi
+          done
+          [[ "$missing" == "0" ]] || exit 1
+
+      - name: Start ssh-agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SENSORIK_SSH_PRIVATE_KEY }}
+
+      - name: Write known_hosts
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          : > ~/.ssh/known_hosts
+          if [[ -n "${{ secrets.KNOWN_HOSTS }}" ]]; then
+            printf '%s\n' "${{ secrets.KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+          else
+            for host in "${SERVER1_IP}" "${SERVER2_IP}"; do
+              ssh-keyscan -4 -T 5 -p "${SSH_PORT}" -H -t ed25519,ecdsa,rsa "$host" 2>/dev/null || true
+            done | sort -u >> ~/.ssh/known_hosts
+          fi
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Login to GHCR on servers
+        run: |
+          set -euo pipefail
+          for host in "${SERVER1_IP}" "${SERVER2_IP}"; do
+            echo "Login to GHCR on $host"
+            ssh -p "${SSH_PORT}" "${SSH_USER}@${host}" \
+              "echo '${GHCR_READ_TOKEN}' | docker login ghcr.io -u '${GHCR_USERNAME}' --password-stdin"
+          done
+
+      - name: Sync compose to servers (.env is left untouched)
+        run: |
+          set -euo pipefail
+          for host in "${SERVER1_IP}" "${SERVER2_IP}"; do
+            echo "Sync compose to ${host}:${DEPLOY_ROOT}"
+            ssh -p "${SSH_PORT}" "${SSH_USER}@${host}" "mkdir -p '${DEPLOY_ROOT}'"
+            scp -P "${SSH_PORT}" \
+              "deploy/ofc/docker-compose.yml" \
+              "${SSH_USER}@${host}:${DEPLOY_ROOT}/docker-compose.yml"
+          done
+
+      - name: Pull and run compose on both servers
+        run: |
+          set -euo pipefail
+          for host in "${SERVER1_IP}" "${SERVER2_IP}"; do
+            echo "Pull and start stack on ${host}:${DEPLOY_ROOT}"
+            ssh -p "${SSH_PORT}" "${SSH_USER}@${host}" "
+              set -euo pipefail &&
+              cd '${DEPLOY_ROOT}' &&
+              export IMAGE_ZITADEL='${IMAGE_ZITADEL}' &&
+              export IMAGE_LOGIN='${IMAGE_LOGIN}' &&
+              docker compose -f docker-compose.yml pull &&
+              docker compose -f docker-compose.yml up -d --remove-orphans
+            "
+          done
+
+      - name: Post-deploy wait
+        run: |
+          ssh -p "${SSH_PORT}" "${SSH_USER}@${SERVER1_IP}" "sleep 5 || true"
+          ssh -p "${SSH_PORT}" "${SSH_USER}@${SERVER2_IP}" "sleep 5 || true"

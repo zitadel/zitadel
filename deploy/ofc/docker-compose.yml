@@ -1,0 +1,64 @@
+# OFC ZITADEL stack — images built from our fork's main and pushed to GHCR by
+# .github/workflows/ofc-build-deploy.yml. The CI overwrites this file on the
+# server and pins IMAGE_ZITADEL / IMAGE_LOGIN to the built commit via the deploy
+# shell environment. The secrets (ZITADEL_MASTERKEY, ZITADEL_DOMAIN,
+# ZITADEL_DB_PASSWORD) live in the pre-existing /root/zitadel/.env and are NOT
+# managed by CI. Fallbacks below point at our fork's :latest for manual runs.
+services:
+  init-login-client:
+    image: alpine:3
+    command: ["sh", "-c", "chown -R 1000:1000 /login-client && chmod 770 /login-client"]
+    volumes:
+      - login-client:/login-client
+    restart: "no"
+
+  zitadel:
+    image: ${IMAGE_ZITADEL:-ghcr.io/o-f-c/zitadel:latest}
+    restart: unless-stopped
+    command: 'start-from-init --masterkey "${ZITADEL_MASTERKEY}"'
+    depends_on:
+      init-login-client:
+        condition: service_completed_successfully
+    environment:
+      # --- Proxy / Domain ---
+      ZITADEL_EXTERNALDOMAIN: ${ZITADEL_DOMAIN}
+      ZITADEL_EXTERNALPORT: 443
+      ZITADEL_EXTERNALSECURE: true
+      ZITADEL_TLS_ENABLED: false        # TLS macht Caddy
+      # --- DB: euer externes HA-Cluster (DSN überschreibt Einzelfelder) ---
+      ZITADEL_DATABASE_POSTGRES_DSN: "postgresql://zitadel:${ZITADEL_DB_PASSWORD}@10.209.0.7:5432,10.209.0.8:5432,10.209.0.9:5432/zitadel?target_session_attrs=read-write&sslmode=disable"
+      ZITADEL_DATABASE_POSTGRES_ADMIN_DSN: "postgresql://zitadel:${ZITADEL_DB_PASSWORD}@10.209.0.7:5432,10.209.0.8:5432,10.209.0.9:5432/postgres?target_session_attrs=read-write&sslmode=disable"
+      # --- Login V2 Client bootstrap ---
+      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_USERNAME: login-client
+      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_NAME: Login Client
+      ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH: /login-client/pat
+      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_PAT_EXPIRATIONDATE: '2030-01-01T00:00:00Z'
+    ports:
+      - "127.0.0.1:8123:8080"
+    volumes:
+      - login-client:/login-client
+    healthcheck:
+      test: ["CMD", "/app/zitadel", "ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  login:
+    image: ${IMAGE_LOGIN:-ghcr.io/o-f-c/zitadel-login:latest}
+    restart: unless-stopped
+    environment:
+      ZITADEL_API_URL: http://zitadel:8080
+      NEXT_PUBLIC_BASE_PATH: /ui/v2/login
+      ZITADEL_SERVICE_USER_TOKEN_FILE: /login-client/pat
+      CUSTOM_REQUEST_HEADERS: Host:${ZITADEL_DOMAIN}
+    depends_on:
+      zitadel:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3333:3000"
+    volumes:
+      - login-client:/login-client
+
+volumes:
+  login-client:
