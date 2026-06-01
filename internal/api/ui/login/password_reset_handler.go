@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -17,15 +18,21 @@ func (l *Login) handlePasswordReset(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	user, err := l.query.GetUserByLoginName(setContext(r.Context(), authReq.UserOrgID), true, authReq.LoginName)
-	if err != nil {
-		if authReq.LoginPolicy.IgnoreUnknownUsernames && zerrors.IsNotFound(err) {
-			err = nil
+	userID := authReq.UserID
+	if userID == "" {
+		var user *query.User
+		user, err = l.query.GetUserByLoginName(setContext(r.Context(), authReq.UserOrgID), true, authReq.LoginName)
+		if err != nil {
+			if authReq.LoginPolicy.IgnoreUnknownUsernames && zerrors.IsNotFound(err) {
+				l.renderPasswordResetDone(w, r, authReq, nil)
+				return
+			}
+			l.renderError(w, r, authReq, err)
+			return
 		}
-		l.renderPasswordResetDone(w, r, authReq, err)
-		return
+		userID = user.ID
 	}
-	_, err = l.command.RequestSetPassword(setContext(r.Context(), authReq.UserOrgID), user.ID, authReq.UserOrgID, domain.NotificationTypeEmail, authReq.ID)
+	_, err = l.command.RequestSetPassword(setContext(r.Context(), authReq.UserOrgID), userID, authReq.UserOrgID, domain.NotificationTypeEmail, authReq.ID)
 	l.renderPasswordResetDone(w, r, authReq, err)
 }
 
