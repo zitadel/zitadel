@@ -7,9 +7,11 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	change_grpc "github.com/zitadel/zitadel/internal/api/grpc/change"
 	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -57,6 +59,44 @@ func (s *Server) ListGroupUsers(ctx context.Context, req *connect.Request[group_
 	return connect.NewResponse(&group_v2.ListGroupUsersResponse{
 		GroupUsers: groupUsersToPb(resp.GroupUsers),
 		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
+	}), nil
+}
+
+func (s *Server) ListGroupChange(ctx context.Context, req *connect.Request[group_v2.ListGroupChangeRequest]) (*connect.Response[group_v2.ListGroupChangeResponse], error) {
+	grp, err := s.query.GetGroupByID(ctx, req.Msg.GetId(), s.checkPermission)
+	if err != nil {
+		return nil, err
+	}
+
+	var limit uint64
+	var sequence uint64
+	asc := false
+	if req.Msg.Query != nil {
+		limit = uint64(req.Msg.Query.Limit)
+		sequence = req.Msg.Query.Sequence
+		asc = req.Msg.Query.Asc
+	}
+
+	q := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		Limit(limit).
+		OrderDesc().
+		AwaitOpenTransactions().
+		ResourceOwner(grp.ResourceOwner).
+		SequenceGreater(sequence).
+		AddQuery().
+		AggregateTypes(group.AggregateType).
+		AggregateIDs(req.Msg.GetId()).
+		Builder()
+	if asc {
+		q.OrderAsc()
+	}
+
+	changes, err := s.query.SearchEvents(ctx, q)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&group_v2.ListGroupChangeResponse{
+		Results: change_grpc.EventsToChangesPb(changes, s.assetAPIPrefix(ctx)),
 	}), nil
 }
 

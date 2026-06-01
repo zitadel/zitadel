@@ -14,6 +14,8 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/filter/v2/filter.proto";
 import "zitadel/group/v2/group.proto";
 import "zitadel/metadata/v2/metadata.proto";
+import "zitadel/change.proto";
+
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/group/v2;group";
 
@@ -434,6 +436,21 @@ service GroupService {
       };
     };
   }
+
+
+  // List Group Change 
+  //
+  // Retrieves the change history of a group.
+  //
+  // Required permissions:
+  //   - group.read
+  rpc ListGroupChange(ListGroupChangeRequest) returns (ListGroupChangeResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
 }
 
 message CreateGroupRequest {
@@ -785,4 +802,28 @@ message DeleteGroupMetadataResponse {
       example: "\"2025-08-11T15:00:00.051Z\"";
     }
   ];
+}
+
+
+message ListGroupChangeRequest {
+  //list limitations and ordering
+  zitadel.change.v1.ChangeQuery query = 1; 
+
+  // ID of the group whose change history is being retrieved.
+  string id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message ListGroupChangeResponse {
+  reserved 1;
+  reserved "details";
+  // Changes is the list of changes that matched the query.
+  repeated zitadel.change.v1.Change results = 2;
 }

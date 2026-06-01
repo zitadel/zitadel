@@ -1,11 +1,13 @@
 package group
 
 import (
+	"context"
 	"net/http"
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
+	"github.com/zitadel/zitadel/internal/api/assets"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
@@ -18,11 +20,11 @@ import (
 var _ groupconnect.GroupServiceHandler = (*Server)(nil)
 
 type Server struct {
-	systemDefaults systemdefaults.SystemDefaults
-	command        *command.Commands
-	query          *query.Queries
-
+	systemDefaults  systemdefaults.SystemDefaults
+	command         *command.Commands
+	query           *query.Queries
 	checkPermission domain.PermissionCheck
+	assetAPIPrefix  func(context.Context) string
 }
 
 func CreateServer(
@@ -36,6 +38,7 @@ func CreateServer(
 		command:         command,
 		query:           query,
 		checkPermission: checkPermission,
+		assetAPIPrefix:  assets.AssetAPI(),
 	}
 }
 
