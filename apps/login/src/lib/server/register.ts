@@ -31,7 +31,8 @@ async function createSessionWithRetry(command: { checks: Checks; requestId: stri
     } catch (error) {
       lastError = error;
       const isNotFound = error instanceof ConnectError && error.code === Code.NotFound;
-      if (!isNotFound || attempt >= MAX_SESSION_RETRIES) {
+      const isLastAttempt = attempt + 1 >= MAX_SESSION_RETRIES;
+      if (!isNotFound || isLastAttempt) {
         throw error;
       }
       const delay = RETRY_DELAYS_MS[attempt] ?? 2000;
