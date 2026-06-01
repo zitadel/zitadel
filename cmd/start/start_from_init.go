@@ -1,10 +1,14 @@
 package start
 
 import (
+	"context"
+	"errors"
+	"fmt"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/initialise"
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/setup"
@@ -22,26 +26,62 @@ Last ZITADEL starts.
 
 Requirements:
 - postgreSQL`,
-		Run: func(cmd *cobra.Command, args []string) {
-			err := tls.ModeFromFlag(cmd)
-			logging.OnError(err).Fatal("invalid tlsMode")
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				logging.OnError(cmd.Context(), err).Error("zitadel start-from-init command failed")
+			}()
+
+			err = tls.ModeFromFlag(cmd)
+			if err != nil {
+				return fmt.Errorf("invalid tlsMode: %w", err)
+			}
 
 			masterKey, err := key.MasterKey(cmd)
-			logging.OnError(err).Panic("No master key provided")
+			if err != nil {
+				return fmt.Errorf("no master key provided: %w", err)
+			}
 
-			initialise.InitAll(cmd.Context(), initialise.MustNewConfig(viper.GetViper()))
+			initConfig, shutdown, err := initialise.NewConfig(cmd, viper.GetViper())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
+			initCtx, cancel := context.WithCancel(cmd.Context())
+			defer cancel()
+
+			err = initialise.InitAll(initCtx, initConfig)
+			if err != nil {
+				return err
+			}
 
 			err = setup.BindInitProjections(cmd)
-			logging.OnError(err).Fatal("unable to bind \"init-projections\" flag")
+			if err != nil {
+				return fmt.Errorf("unable to bind \"init-projections\" flag: %w", err)
+			}
 
-			setupConfig := setup.MustNewConfig(viper.GetViper())
-			setupSteps := setup.MustNewSteps(viper.New())
-			setup.Setup(cmd.Context(), setupConfig, setupSteps, masterKey)
+			setupConfig, _, err := setup.NewConfig(cmd, viper.GetViper())
+			if err != nil {
+				return err
+			}
 
-			startConfig := MustNewConfig(viper.GetViper())
+			setupSteps, err := setup.NewSteps(cmd.Context(), viper.New())
+			if err != nil {
+				return err
+			}
 
-			err = startZitadel(cmd.Context(), startConfig, masterKey, server)
-			logging.OnError(err).Fatal("unable to start zitadel")
+			err = setup.Setup(cmd.Context(), setupConfig, setupSteps, masterKey)
+			if err != nil {
+				return err
+			}
+
+			startConfig, _, err := NewConfig(cmd, viper.GetViper())
+			if err != nil {
+				return err
+			}
+
+			return startZitadel(cmd.Context(), startConfig, masterKey, server)
 		},
 	}
 

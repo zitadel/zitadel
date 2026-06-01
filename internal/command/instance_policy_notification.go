@@ -78,11 +78,11 @@ func prepareChangeDefaultNotificationPolicy(
 			}
 
 			if writeModel.State == domain.PolicyStateUnspecified || writeModel.State == domain.PolicyStateRemoved {
-				return nil, zerrors.ThrowNotFound(nil, "INSTANCE-x891na", "Errors.IAM.NotificationPolicy.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "INSTANCE-x891na", "Errors.Instance.NotificationPolicy.NotFound")
 			}
 			change, hasChanged := writeModel.NewChangedEvent(ctx, &a.Aggregate, passwordChange)
 			if !hasChanged {
-				return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-29x02n", "Errors.IAM.NotificationPolicy.NotChanged")
+				return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-29x02n", "Errors.Instance.NotificationPolicy.NotChanged")
 			}
 			return []eventstore.Command{
 				change,

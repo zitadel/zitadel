@@ -125,6 +125,18 @@ func (p *userAuthMethodProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.HumanOTPEmailRemovedType,
 					Reduce: p.reduceRemoveAuthMethod,
 				},
+				{
+					Event:  user.UserRemovedType,
+					Reduce: p.reduceUserRemoved,
+				},
+				{
+					Event:  user.HumanRecoveryCodesAddedType,
+					Reduce: p.reduceAddRecoveryCodes,
+				},
+				{
+					Event:  user.HumanRecoveryCodesRemovedType,
+					Reduce: p.reduceRemoveAuthMethod,
+				},
 			},
 		},
 		{
@@ -164,7 +176,7 @@ func (p *userAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) 
 	case *user.HumanOTPAddedEvent:
 		methodType = domain.UserAuthMethodTypeTOTP
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-f92f", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-f92f", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType, user.HumanMFAOTPAddedType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(UserAuthMethodTokenIDCol, tokenID),
@@ -259,6 +271,33 @@ func (p *userAuthMethodProjection) reduceAddAuthMethod(event eventstore.Event) (
 	), nil
 }
 
+func (p *userAuthMethodProjection) reduceAddRecoveryCodes(event eventstore.Event) (*handler.Statement, error) {
+	if _, ok := event.(*user.HumanRecoveryCodesAddedEvent); !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-x93hq", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanRecoveryCodesAddedType})
+	}
+	return handler.NewUpsertStatement(
+		event,
+		[]handler.Column{
+			handler.NewCol(UserAuthMethodInstanceIDCol, nil),
+			handler.NewCol(UserAuthMethodUserIDCol, nil),
+			handler.NewCol(UserAuthMethodTypeCol, nil),
+			handler.NewCol(UserAuthMethodTokenIDCol, nil),
+		},
+		[]handler.Column{
+			handler.NewCol(UserAuthMethodTokenIDCol, ""),
+			handler.NewCol(UserAuthMethodCreationDateCol, handler.OnlySetValueOnInsert(UserAuthMethodTable, event.CreatedAt())),
+			handler.NewCol(UserAuthMethodChangeDateCol, event.CreatedAt()),
+			handler.NewCol(UserAuthMethodResourceOwnerCol, event.Aggregate().ResourceOwner),
+			handler.NewCol(UserAuthMethodInstanceIDCol, event.Aggregate().InstanceID),
+			handler.NewCol(UserAuthMethodUserIDCol, event.Aggregate().ID),
+			handler.NewCol(UserAuthMethodSequenceCol, event.Sequence()),
+			handler.NewCol(UserAuthMethodStateCol, domain.MFAStateReady),
+			handler.NewCol(UserAuthMethodTypeCol, domain.UserAuthMethodTypeRecoveryCode),
+			handler.NewCol(UserAuthMethodNameCol, ""),
+		},
+	), nil
+}
+
 func (p *userAuthMethodProjection) reduceRemoveAuthMethod(event eventstore.Event) (*handler.Statement, error) {
 	var tokenID string
 	var methodType domain.UserAuthMethodType
@@ -276,11 +315,12 @@ func (p *userAuthMethodProjection) reduceRemoveAuthMethod(event eventstore.Event
 		methodType = domain.UserAuthMethodTypeOTPSMS
 	case *user.HumanOTPEmailRemovedEvent:
 		methodType = domain.UserAuthMethodTypeOTPEmail
-
+	case *user.HumanRecoveryCodesRemovedEvent:
+		methodType = domain.UserAuthMethodTypeRecoveryCode
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-f92f", "reduce.wrong.event.type %v",
 			[]eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType, user.HumanMFAOTPRemovedType,
-				user.HumanOTPSMSRemovedType, user.HumanPhoneRemovedType, user.HumanOTPEmailRemovedType})
+				user.HumanOTPSMSRemovedType, user.HumanPhoneRemovedType, user.HumanOTPEmailRemovedType, user.HumanRecoveryCodesRemovedType})
 	}
 	conditions := []handler.Condition{
 		handler.NewCond(UserAuthMethodUserIDCol, event.Aggregate().ID),
@@ -308,6 +348,21 @@ func (p *userAuthMethodProjection) reduceOwnerRemoved(event eventstore.Event) (*
 		[]handler.Condition{
 			handler.NewCond(UserAuthMethodInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(UserAuthMethodResourceOwnerCol, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *userAuthMethodProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.UserRemovedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-FwDZ8", "reduce.wrong.event.type %s", user.UserRemovedType)
+	}
+	return handler.NewDeleteStatement(
+		e,
+		[]handler.Condition{
+			handler.NewCond(UserAuthMethodInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(UserAuthMethodResourceOwnerCol, e.Aggregate().ResourceOwner),
+			handler.NewCond(UserAuthMethodUserIDCol, e.Aggregate().ID),
 		},
 	), nil
 }

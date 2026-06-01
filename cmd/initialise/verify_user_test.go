@@ -3,6 +3,7 @@ package initialise
 import (
 	"context"
 	"database/sql"
+	"database/sql/driver"
 	"errors"
 	"testing"
 )
@@ -28,6 +29,9 @@ func Test_verifyUser(t *testing.T) {
 			name: "doesn't exists, create fails",
 			args: args{
 				db: prepareDB(t,
+					expectQuery("SELECT current_user", nil, []string{"current_user"}, [][]driver.Value{
+						{"postgres"},
+					}),
 					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER \"zitadel-user\"", sql.ErrTxDone),
 				),
 				username: "zitadel-user",
@@ -39,6 +43,9 @@ func Test_verifyUser(t *testing.T) {
 			name: "correct without password",
 			args: args{
 				db: prepareDB(t,
+					expectQuery("SELECT current_user", nil, []string{"current_user"}, [][]driver.Value{
+						{"postgres"},
+					}),
 					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER \"zitadel-user\"", nil),
 				),
 				username: "zitadel-user",
@@ -50,6 +57,9 @@ func Test_verifyUser(t *testing.T) {
 			name: "correct with password",
 			args: args{
 				db: prepareDB(t,
+					expectQuery("SELECT current_user", nil, []string{"current_user"}, [][]driver.Value{
+						{"postgres"},
+					}),
 					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER \"zitadel-user\" WITH PASSWORD 'password'", nil),
 				),
 				username: "zitadel-user",
@@ -61,6 +71,9 @@ func Test_verifyUser(t *testing.T) {
 			name: "already exists",
 			args: args{
 				db: prepareDB(t,
+					expectQuery("SELECT current_user", nil, []string{"current_user"}, [][]driver.Value{
+						{"postgres"},
+					}),
 					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER \"zitadel-user\" WITH PASSWORD 'password'", nil),
 				),
 				username: "zitadel-user",
@@ -68,11 +81,23 @@ func Test_verifyUser(t *testing.T) {
 			},
 			targetErr: nil,
 		},
+		{
+			name: "same user, skip create",
+			args: args{
+				db: prepareDB(t,
+					expectQuery("SELECT current_user", nil, []string{"current_user"}, [][]driver.Value{
+						{"zitadel-user"},
+					}),
+				),
+				username: "zitadel-user",
+			},
+			targetErr: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := VerifyUser(tt.args.username, tt.args.password)(context.Background(), tt.args.db.db); !errors.Is(err, tt.targetErr) {
-				t.Errorf("VerifyGrant() error = %v, want: %v", err, tt.targetErr)
+				t.Errorf("VerifyUser() error = %v, want: %v", err, tt.targetErr)
 			}
 			if err := tt.args.db.mock.ExpectationsWereMet(); err != nil {
 				t.Error(err)

@@ -18,7 +18,6 @@ const (
 	HumanEmailVerificationFailedType = emailEventPrefix + "verification.failed"
 	HumanEmailCodeAddedType          = emailEventPrefix + "code.added"
 	HumanEmailCodeSentType           = emailEventPrefix + "code.sent"
-	HumanEmailConfirmURLAddedType    = emailEventPrefix + "confirm_url.added"
 )
 
 type HumanEmailChangedEvent struct {
@@ -143,16 +142,6 @@ func (e *HumanEmailCodeAddedEvent) TriggerOrigin() string {
 }
 
 func NewHumanEmailCodeAddedEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-	code *crypto.CryptoValue,
-	expiry time.Duration,
-	authRequestID string,
-) *HumanEmailCodeAddedEvent {
-	return NewHumanEmailCodeAddedEventV2(ctx, aggregate, code, expiry, "", false, authRequestID)
-}
-
-func NewHumanEmailCodeAddedEventV2(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,

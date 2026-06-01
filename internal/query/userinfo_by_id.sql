@@ -62,6 +62,18 @@ user_org as (
 		join usr u on o.id = u.resource_owner
 	) r
 ),
+-- find the user's groups
+user_groups as (
+    select json_agg(row_to_json(r)) as user_groups from (
+        select g.id, g.name
+        from projections.group_users1 as gu
+            left join projections.groups1 as g on gu.group_id = g.id and gu.instance_id = g.instance_id
+        where gu.user_id = $1
+          and gu.instance_id = $2
+          and g.state = 1
+        )
+        r
+),
 -- join user grants to orgs, projects and user
 grants as (
 	select json_agg(row_to_json(r)) as grants from (
@@ -87,5 +99,6 @@ select json_build_object(
 	),
 	'org', (select organization from user_org),
 	'metadata', (select metadata from metadata),
-	'user_grants', (select grants from grants)
+	'user_grants', (select grants from grants),
+    'user_groups', (select user_groups from user_groups)
 );

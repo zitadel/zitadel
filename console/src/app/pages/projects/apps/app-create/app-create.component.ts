@@ -28,7 +28,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
+import { AppSecretDialogComponent, AppSecretDialogData } from '../app-secret-dialog/app-secret-dialog.component';
 import {
   BASIC_AUTH_METHOD,
   CODE_METHOD,
@@ -48,6 +48,7 @@ const MAX_ALLOWED_SIZE = 1 * 1024 * 1024;
   selector: 'cnsl-app-create',
   templateUrl: './app-create.component.html',
   styleUrls: ['./app-create.component.scss'],
+  standalone: false,
 })
 export class AppCreateComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
@@ -157,7 +158,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
       acsURL: ['', []],
     });
 
-    this.firstFormGroup.valueChanges.subscribe((value) => {
+    this.firstFormGroup.valueChanges.subscribe(() => {
       if (this.firstFormGroup.valid) {
         this.oidcAppRequest.setName(this.name?.value);
         this.apiAppRequest.setName(this.name?.value);
@@ -379,7 +380,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         this.toast.showInfo('POLICY.PRIVATELABELING.MAXSIZEEXCEEDED', true);
       } else {
         const reader = new FileReader();
-        reader.onload = ((aXML) => {
+        reader.onload = (() => {
           return (e) => {
             const xmlBase64 = e.target?.result;
             if (xmlBase64 && typeof xmlBase64 === 'string') {
@@ -387,7 +388,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
               this.samlAppRequest.setMetadataXml(cropped);
             }
           };
-        })(file);
+        })();
         reader.readAsDataURL(file);
       }
     }
@@ -460,7 +461,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     if (added.clientId) {
       clientId = added.clientId;
     }
-    const dialogRef = this.dialog.open(AppSecretDialogComponent, {
+    const dialogRef = this.dialog.open<AppSecretDialogComponent, AppSecretDialogData>(AppSecretDialogComponent, {
       data: {
         clientSecret: clientSecret,
         clientId: clientId,

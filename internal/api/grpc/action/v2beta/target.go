@@ -3,18 +3,19 @@ package action
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"github.com/muhlemmer/gu"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 )
 
-func (s *Server) CreateTarget(ctx context.Context, req *action.CreateTargetRequest) (*action.CreateTargetResponse, error) {
-	add := createTargetToCommand(req)
+func (s *Server) CreateTarget(ctx context.Context, req *connect.Request[action.CreateTargetRequest]) (*connect.Response[action.CreateTargetResponse], error) {
+	add := createTargetToCommand(req.Msg)
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	createdAt, err := s.command.AddTarget(ctx, add, instanceID)
 	if err != nil {
@@ -24,16 +25,16 @@ func (s *Server) CreateTarget(ctx context.Context, req *action.CreateTargetReque
 	if !createdAt.IsZero() {
 		creationDate = timestamppb.New(createdAt)
 	}
-	return &action.CreateTargetResponse{
+	return connect.NewResponse(&action.CreateTargetResponse{
 		Id:           add.AggregateID,
 		CreationDate: creationDate,
 		SigningKey:   add.SigningKey,
-	}, nil
+	}), nil
 }
 
-func (s *Server) UpdateTarget(ctx context.Context, req *action.UpdateTargetRequest) (*action.UpdateTargetResponse, error) {
+func (s *Server) UpdateTarget(ctx context.Context, req *connect.Request[action.UpdateTargetRequest]) (*connect.Response[action.UpdateTargetResponse], error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	update := updateTargetToCommand(req)
+	update := updateTargetToCommand(req.Msg)
 	changedAt, err := s.command.ChangeTarget(ctx, update, instanceID)
 	if err != nil {
 		return nil, err
@@ -42,15 +43,15 @@ func (s *Server) UpdateTarget(ctx context.Context, req *action.UpdateTargetReque
 	if !changedAt.IsZero() {
 		changeDate = timestamppb.New(changedAt)
 	}
-	return &action.UpdateTargetResponse{
+	return connect.NewResponse(&action.UpdateTargetResponse{
 		ChangeDate: changeDate,
 		SigningKey: update.SigningKey,
-	}, nil
+	}), nil
 }
 
-func (s *Server) DeleteTarget(ctx context.Context, req *action.DeleteTargetRequest) (*action.DeleteTargetResponse, error) {
+func (s *Server) DeleteTarget(ctx context.Context, req *connect.Request[action.DeleteTargetRequest]) (*connect.Response[action.DeleteTargetResponse], error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	deletedAt, err := s.command.DeleteTarget(ctx, req.GetId(), instanceID)
+	deletedAt, err := s.command.DeleteTarget(ctx, req.Msg.GetId(), instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -58,25 +59,25 @@ func (s *Server) DeleteTarget(ctx context.Context, req *action.DeleteTargetReque
 	if !deletedAt.IsZero() {
 		deletionDate = timestamppb.New(deletedAt)
 	}
-	return &action.DeleteTargetResponse{
+	return connect.NewResponse(&action.DeleteTargetResponse{
 		DeletionDate: deletionDate,
-	}, nil
+	}), nil
 }
 
 func createTargetToCommand(req *action.CreateTargetRequest) *command.AddTarget {
 	var (
-		targetType       domain.TargetType
+		targetType       target_domain.TargetType
 		interruptOnError bool
 	)
 	switch t := req.GetTargetType().(type) {
 	case *action.CreateTargetRequest_RestWebhook:
-		targetType = domain.TargetTypeWebhook
+		targetType = target_domain.TargetTypeWebhook
 		interruptOnError = t.RestWebhook.InterruptOnError
 	case *action.CreateTargetRequest_RestCall:
-		targetType = domain.TargetTypeCall
+		targetType = target_domain.TargetTypeCall
 		interruptOnError = t.RestCall.InterruptOnError
 	case *action.CreateTargetRequest_RestAsync:
-		targetType = domain.TargetTypeAsync
+		targetType = target_domain.TargetTypeAsync
 	}
 	return &command.AddTarget{
 		Name:             req.GetName(),
@@ -108,13 +109,13 @@ func updateTargetToCommand(req *action.UpdateTargetRequest) *command.ChangeTarge
 	if req.TargetType != nil {
 		switch t := req.GetTargetType().(type) {
 		case *action.UpdateTargetRequest_RestWebhook:
-			target.TargetType = gu.Ptr(domain.TargetTypeWebhook)
+			target.TargetType = gu.Ptr(target_domain.TargetTypeWebhook)
 			target.InterruptOnError = gu.Ptr(t.RestWebhook.InterruptOnError)
 		case *action.UpdateTargetRequest_RestCall:
-			target.TargetType = gu.Ptr(domain.TargetTypeCall)
+			target.TargetType = gu.Ptr(target_domain.TargetTypeCall)
 			target.InterruptOnError = gu.Ptr(t.RestCall.InterruptOnError)
 		case *action.UpdateTargetRequest_RestAsync:
-			target.TargetType = gu.Ptr(domain.TargetTypeAsync)
+			target.TargetType = gu.Ptr(target_domain.TargetTypeAsync)
 			target.InterruptOnError = gu.Ptr(false)
 		}
 	}

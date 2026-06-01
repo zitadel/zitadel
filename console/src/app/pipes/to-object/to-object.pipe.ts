@@ -4,6 +4,7 @@ import { Event } from 'src/app/proto/generated/zitadel/event_pb';
 
 @Pipe({
   name: 'toobject',
+  standalone: false,
 })
 export class ToObjectPipe implements PipeTransform {
   public transform(value: Event | Struct): any {

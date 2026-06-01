@@ -69,8 +69,8 @@ func (h *UsersHandler) buildListQuery(ctx context.Context, request *ListRequest)
 		SearchRequest: searchRequest,
 	}
 
-	// the zitadel scim implementation only supports humans for now
-	userTypeQuery, err := query.NewUserTypeSearchQuery(int32(domain.UserTypeHuman))
+	// the zitadel scim implementation only supports User (Humans) for now
+	userTypeQuery, err := query.NewUserTypeSearchQuery(domain.UserTypeHuman)
 	if err != nil {
 		return nil, err
 	}

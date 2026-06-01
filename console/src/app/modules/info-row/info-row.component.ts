@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
 import { App, AppState } from 'src/app/proto/generated/zitadel/app_pb';
-import { IDP, IDPState } from 'src/app/proto/generated/zitadel/idp_pb';
 import { InstanceDetail, State } from 'src/app/proto/generated/zitadel/instance_pb';
 import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
@@ -9,29 +8,30 @@ import { User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { User as UserV1 } from '@zitadel/proto/zitadel/user_pb';
 import { User as UserV2 } from '@zitadel/proto/zitadel/user/v2/user_pb';
 import { LoginPolicy as LoginPolicyV2 } from '@zitadel/proto/zitadel/policy_pb';
+import { Organization as OrgV2 } from '@zitadel/proto/zitadel/org/v2/org_pb';
+import { Org as OrgV1 } from '@zitadel/proto/zitadel/org_pb';
 
 @Component({
   selector: 'cnsl-info-row',
   templateUrl: './info-row.component.html',
   styleUrls: ['./info-row.component.scss'],
+  standalone: false,
 })
 export class InfoRowComponent {
   @Input() public user?: User.AsObject | UserV2 | UserV1;
-  @Input() public org!: Org.AsObject;
+  @Input() public org!: Org.AsObject | OrgV2 | OrgV1;
   @Input() public instance!: InstanceDetail.AsObject;
   @Input() public app!: App.AsObject;
-  @Input() public idp!: IDP.AsObject;
   @Input() public project!: Project.AsObject;
   @Input() public grantedProject!: GrantedProject.AsObject;
   @Input() public loginPolicy?: LoginPolicy.AsObject | LoginPolicyV2;
 
-  public UserState: any = UserState;
-  public State: any = State;
-  public OrgState: any = OrgState;
-  public AppState: any = AppState;
-  public IDPState: any = IDPState;
-  public ProjectState: any = ProjectState;
-  public ProjectGrantState: any = ProjectGrantState;
+  public UserState = UserState;
+  public State = State;
+  public OrgState = OrgState;
+  public AppState = AppState;
+  public ProjectState = ProjectState;
+  public ProjectGrantState = ProjectGrantState;
 
   public copied: string = '';
 

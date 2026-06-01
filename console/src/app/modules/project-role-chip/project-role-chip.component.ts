@@ -28,6 +28,7 @@ export class CnslProjectRole {
   selector: 'cnsl-project-role-chip',
   templateUrl: './project-role-chip.component.html',
   styleUrls: ['./project-role-chip.component.scss'],
+  standalone: false,
 })
 export class ProjectRoleChipComponent implements OnInit {
   @Input() roleName: string = '';

@@ -16,7 +16,7 @@ func (s *Server) ClientCredentialsExchange(ctx context.Context, r *op.ClientRequ
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
 		span.EndWithError(err)
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 	}()
 	client, ok := r.Client.(*clientCredentialsClient)
 	if !ok {
@@ -35,7 +35,7 @@ func (s *Server) ClientCredentialsExchange(ctx context.Context, r *op.ClientRequ
 		client.userID,
 		client.resourceOwner,
 		client.clientID,
-		"", // backChannelLogoutURI not needed for service user session
+		"", // backChannelLogoutURI not needed for service account session
 		scope,
 		domain.AddAudScopeToAudience(ctx, nil, r.Data.Scope),
 		[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},

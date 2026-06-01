@@ -1037,6 +1037,9 @@ func TestCheckOTPSMS(t *testing.T) {
 				now: func() time.Time {
 					return testNow
 				},
+				tarpit: func(failedAttempts uint64) {
+
+				},
 			}
 
 			gotCmds, err := cmd(context.Background(), cmds)
@@ -1053,6 +1056,7 @@ func TestCheckOTPEmail(t *testing.T) {
 		userID           string
 		otpCodeChallenge *OTPCode
 		otpAlg           crypto.EncryptionAlgorithm
+		tarpit           Tarpit
 	}
 	type args struct {
 		code string
@@ -1073,6 +1077,7 @@ func TestCheckOTPEmail(t *testing.T) {
 			fields: fields{
 				eventstore: expectEventstore(),
 				userID:     "",
+				tarpit:     expectTarpit(0),
 			},
 			args: args{
 				code: "code",
@@ -1086,6 +1091,7 @@ func TestCheckOTPEmail(t *testing.T) {
 			fields: fields{
 				eventstore: expectEventstore(),
 				userID:     "userID",
+				tarpit:     expectTarpit(0),
 			},
 			args: args{},
 			res: res{
@@ -1099,6 +1105,7 @@ func TestCheckOTPEmail(t *testing.T) {
 					expectFilter(),
 				),
 				userID: "userID",
+				tarpit: expectTarpit(0),
 			},
 			args: args{
 				code: "code",
@@ -1117,6 +1124,7 @@ func TestCheckOTPEmail(t *testing.T) {
 				),
 				userID:           "userID",
 				otpCodeChallenge: nil,
+				tarpit:           expectTarpit(0),
 			},
 			args: args{
 				code: "code",
@@ -1153,6 +1161,7 @@ func TestCheckOTPEmail(t *testing.T) {
 					CreationDate: testNow.Add(-10 * time.Minute),
 				},
 				otpAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				tarpit: expectTarpit(1),
 			},
 			args: args{
 				code: "code",
@@ -1192,6 +1201,7 @@ func TestCheckOTPEmail(t *testing.T) {
 					CreationDate: testNow.Add(-10 * time.Minute),
 				},
 				otpAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				tarpit: expectTarpit(1),
 			},
 			args: args{
 				code: "code",
@@ -1225,6 +1235,7 @@ func TestCheckOTPEmail(t *testing.T) {
 					CreationDate: testNow,
 				},
 				otpAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				tarpit: expectTarpit(0),
 			},
 			args: args{
 				code: "code",
@@ -1261,6 +1272,7 @@ func TestCheckOTPEmail(t *testing.T) {
 					CreationDate: testNow,
 				},
 				otpAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				tarpit: expectTarpit(0),
 			},
 			args: args{
 				code: "code",
@@ -1289,12 +1301,39 @@ func TestCheckOTPEmail(t *testing.T) {
 				now: func() time.Time {
 					return testNow
 				},
+				tarpit: tt.fields.tarpit.tarpit,
 			}
 
 			gotCmds, err := cmd(context.Background(), cmds)
 			assert.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.errorCommands, gotCmds)
 			assert.Equal(t, tt.res.commands, cmds.eventCommands)
+			tt.fields.tarpit.metExpectedCalls(t)
 		})
 	}
+}
+
+func expectTarpit(requiredFailedAttempts uint64) Tarpit {
+	return &mockTarpit{
+		requiredFailedAttempts: requiredFailedAttempts,
+	}
+}
+
+type mockTarpit struct {
+	requiredFailedAttempts uint64
+	failedAttempts         uint64
+}
+
+func (m *mockTarpit) tarpit(failedAttempts uint64) {
+	m.failedAttempts = failedAttempts
+}
+
+func (m *mockTarpit) metExpectedCalls(t *testing.T) bool {
+	t.Helper()
+	return assert.Equalf(t, m.requiredFailedAttempts, m.failedAttempts, "tarpit was called with %d failed attempts, but %d were expected", m.failedAttempts, m.requiredFailedAttempts)
+}
+
+type Tarpit interface {
+	tarpit(failedAttempts uint64)
+	metExpectedCalls(t *testing.T) bool
 }

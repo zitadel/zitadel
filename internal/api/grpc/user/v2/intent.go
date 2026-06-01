@@ -6,6 +6,7 @@ import (
 	"errors"
 	"time"
 
+	"connectrpc.com/connect"
 	oidc_pkg "github.com/zitadel/oidc/v3/pkg/oidc"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -32,43 +33,52 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *user.StartIdentityProviderIntentRequest) (_ *user.StartIdentityProviderIntentResponse, err error) {
-	switch t := req.GetContent().(type) {
+func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *connect.Request[user.StartIdentityProviderIntentRequest]) (_ *connect.Response[user.StartIdentityProviderIntentResponse], err error) {
+	switch t := req.Msg.GetContent().(type) {
 	case *user.StartIdentityProviderIntentRequest_Urls:
-		return s.startIDPIntent(ctx, req.GetIdpId(), t.Urls)
+		return s.startIDPIntent(ctx, req.Msg.GetIdpId(), t.Urls, t.Urls.LoginHint)
 	case *user.StartIdentityProviderIntentRequest_Ldap:
-		return s.startLDAPIntent(ctx, req.GetIdpId(), t.Ldap)
+		return s.startLDAPIntent(ctx, req.Msg.GetIdpId(), t.Ldap)
 	default:
 		return nil, zerrors.ThrowUnimplementedf(nil, "USERv2-S2g21", "type oneOf %T in method StartIdentityProviderIntent not implemented", t)
 	}
 }
 
-func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs) (*user.StartIdentityProviderIntentResponse, error) {
-	state, session, err := s.command.AuthFromProvider(ctx, idpID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID))
+func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs, loginHint string) (*connect.Response[user.StartIdentityProviderIntentResponse], error) {
+	state, session, err := s.command.AuthFromProvider(ctx, idpID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID), loginHint)
 	if err != nil {
 		return nil, err
 	}
-	_, details, err := s.command.CreateIntent(ctx, state, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetInstance(ctx).InstanceID(), session.PersistentParameters())
+	_, details, err := s.command.CreateIntent(ctx, state, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetInstance(ctx).InstanceID(), loginHint, session.PersistentParameters())
 	if err != nil {
 		return nil, err
 	}
-	content, redirect := session.GetAuth(ctx)
-	if redirect {
-		return &user.StartIdentityProviderIntentResponse{
+	auth, err := session.GetAuth(ctx)
+	if err != nil {
+		return nil, err
+	}
+	switch a := auth.(type) {
+	case *idp.RedirectAuth:
+		return connect.NewResponse(&user.StartIdentityProviderIntentResponse{
 			Details:  object.DomainToDetailsPb(details),
-			NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{AuthUrl: content},
-		}, nil
+			NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{AuthUrl: a.RedirectURL},
+		}), nil
+	case *idp.FormAuth:
+		return connect.NewResponse(&user.StartIdentityProviderIntentResponse{
+			Details: object.DomainToDetailsPb(details),
+			NextStep: &user.StartIdentityProviderIntentResponse_FormData{
+				FormData: &user.FormData{
+					Url:    a.URL,
+					Fields: a.Fields,
+				},
+			},
+		}), nil
 	}
-	return &user.StartIdentityProviderIntentResponse{
-		Details: object.DomainToDetailsPb(details),
-		NextStep: &user.StartIdentityProviderIntentResponse_PostForm{
-			PostForm: []byte(content),
-		},
-	}, nil
+	return nil, zerrors.ThrowInvalidArgumentf(nil, "USERv2-3g2j3", "type oneOf %T in method StartIdentityProviderIntent not implemented", auth)
 }
 
-func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderIntentResponse, error) {
-	intentWriteModel, details, err := s.command.CreateIntent(ctx, "", idpID, "", "", authz.GetInstance(ctx).InstanceID(), nil)
+func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*connect.Response[user.StartIdentityProviderIntentResponse], error) {
+	intentWriteModel, details, err := s.command.CreateIntent(ctx, "", idpID, "", "", authz.GetInstance(ctx).InstanceID(), "", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +93,7 @@ func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredenti
 	if err != nil {
 		return nil, err
 	}
-	return &user.StartIdentityProviderIntentResponse{
+	return connect.NewResponse(&user.StartIdentityProviderIntentResponse{
 		Details: object.DomainToDetailsPb(details),
 		NextStep: &user.StartIdentityProviderIntentResponse_IdpIntent{
 			IdpIntent: &user.IDPIntent{
@@ -92,7 +102,7 @@ func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredenti
 				UserId:         userID,
 			},
 		},
-	}, nil
+	}), nil
 }
 
 func (s *Server) checkLinkedExternalUser(ctx context.Context, idpID, externalUserID string) (string, error) {
@@ -141,12 +151,12 @@ func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string
 	return externalUser, userID, session, nil
 }
 
-func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.RetrieveIdentityProviderIntentRequest) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
-	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIdpIntentId(), "")
+func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *connect.Request[user.RetrieveIdentityProviderIntentRequest]) (_ *connect.Response[user.RetrieveIdentityProviderIntentResponse], err error) {
+	intent, err := s.command.GetIntentWriteModel(ctx, req.Msg.GetIdpIntentId(), "")
 	if err != nil {
 		return nil, err
 	}
-	if err := s.checkIntentToken(req.GetIdpIntentToken(), intent.AggregateID); err != nil {
+	if err := s.checkIntentToken(req.Msg.GetIdpIntentToken(), intent.AggregateID); err != nil {
 		return nil, err
 	}
 	if intent.State != domain.IDPIntentStateSucceeded {
@@ -159,42 +169,46 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.R
 	if err != nil {
 		return nil, err
 	}
-	if idpIntent.UserId == "" {
-		provider, err := s.command.GetProvider(ctx, idpIntent.IdpInformation.IdpId, "", "")
-		if err != nil && !errors.Is(err, oidc_pkg.ErrDiscoveryFailed) {
-			return nil, err
-		}
-		var idpUser idp.User
-		switch p := provider.(type) {
-		case *apple.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &apple.User{})
-		case *oauth.Provider:
-			idpUser, err = unmarshalRawIdpUser(intent.IDPUser, p.User())
-		case *oidc.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &oidc.User{UserInfo: &oidc_pkg.UserInfo{}})
-		case *jwt.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &jwt.User{})
-		case *azuread.Provider:
-			idpUser, err = unmarshalRawIdpUser(intent.IDPUser, p.User())
-		case *github.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &github.User{})
-		case *gitlab.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &oidc.User{UserInfo: &oidc_pkg.UserInfo{}})
-		case *google.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &google.User{User: &oidc.User{UserInfo: &oidc_pkg.UserInfo{}}})
-		case *saml.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &saml.UserMapper{})
-		case *ldap.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &ldap.User{})
-		default:
-			return nil, zerrors.ThrowInvalidArgument(nil, "IDP-7rPBbls4Zn", "Errors.ExternalIDP.IDPTypeNotImplemented")
-		}
-		if err != nil {
-			return nil, err
-		}
-		idpIntent.AddHumanUser = idpUserToAddHumanUser(idpUser, idpIntent.IdpInformation.IdpId)
+	provider, err := s.command.GetProvider(ctx, idpIntent.IdpInformation.IdpId, "", "")
+	if err != nil && !errors.Is(err, oidc_pkg.ErrDiscoveryFailed) {
+		return nil, err
 	}
-	return idpIntent, nil
+	var idpUser idp.User
+	switch p := provider.(type) {
+	case *apple.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, apple.InitUser())
+	case *oauth.Provider:
+		idpUser, err = unmarshalRawIdpUser(intent.IDPUser, p.User())
+	case *oidc.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
+	case *jwt.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, jwt.InitUser())
+	case *azuread.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, p.User())
+	case *github.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, &github.User{})
+	case *gitlab.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
+	case *google.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, google.InitUser())
+	case *saml.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, &saml.UserMapper{})
+	case *ldap.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, &ldap.User{})
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "IDP-7rPBbls4Zn", "Errors.ExternalIDP.IDPTypeNotImplemented")
+	}
+	if err != nil {
+		return nil, err
+	}
+	if idpIntent.UserId == "" {
+		idpIntent.AddHumanUser = idpUserToAddHumanUser(idpUser, idpIntent.IdpInformation.IdpId) //nolint:staticcheck
+		idpIntent.UserAction = idpUserToCreateUser(idpUser, idpIntent.IdpInformation.IdpId)
+	} else {
+		idpIntent.UpdateHumanUser = idpUserToUpdateHumanUser(intent.UserID, idpUser) //nolint:staticcheck
+		idpIntent.UserAction = idpUserToUpdateUser(intent.UserID, idpUser)
+	}
+	return connect.NewResponse(idpIntent), nil
 }
 
 type rawUserMapper struct {
@@ -238,7 +252,7 @@ func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.Encr
 	information.Details = intentToDetailsPb(intent)
 	// OAuth / OIDC
 	if intent.IDPIDToken != "" || intent.IDPAccessToken != nil {
-		information.IdpInformation.Access, err = idpOAuthTokensToPb(intent.IDPIDToken, intent.IDPAccessToken, alg)
+		information.IdpInformation.Access, err = idpOAuthTokensToPb(intent.IDPIDToken, intent.IDPAccessToken, intent.IDPRefreshToken, alg)
 		if err != nil {
 			return nil, err
 		}
@@ -262,7 +276,7 @@ func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.Encr
 	return information, nil
 }
 
-func idpOAuthTokensToPb(idpIDToken string, idpAccessToken *crypto.CryptoValue, alg crypto.EncryptionAlgorithm) (_ *user.IDPInformation_Oauth, err error) {
+func idpOAuthTokensToPb(idpIDToken string, idpAccessToken, idpRefreshToken *crypto.CryptoValue, alg crypto.EncryptionAlgorithm) (_ *user.IDPInformation_Oauth, err error) {
 	var idToken *string
 	if idpIDToken != "" {
 		idToken = &idpIDToken
@@ -274,10 +288,19 @@ func idpOAuthTokensToPb(idpIDToken string, idpAccessToken *crypto.CryptoValue, a
 			return nil, err
 		}
 	}
+	var refreshToken *string
+	if idpRefreshToken != nil {
+		decryptedRefreshToken, err := crypto.DecryptString(idpRefreshToken, alg)
+		if err != nil {
+			return nil, err
+		}
+		refreshToken = &decryptedRefreshToken
+	}
 	return &user.IDPInformation_Oauth{
 		Oauth: &user.IDPOAuthAccessInformation{
-			AccessToken: accessToken,
-			IdToken:     idToken,
+			AccessToken:  accessToken,
+			RefreshToken: refreshToken,
+			IdToken:      idToken,
 		},
 	}, nil
 }
@@ -366,4 +389,147 @@ func idpUserToAddHumanUser(idpUser idp.User, idpID string) *user.AddHumanUserReq
 		}
 	}
 	return addHumanUser
+}
+
+func idpUserToUpdateHumanUser(userID string, idpUser idp.User) *user.UpdateHumanUserRequest {
+	updateHumanUser := &user.UpdateHumanUserRequest{
+		UserId: userID,
+		Profile: &user.SetHumanProfile{
+			GivenName:  idpUser.GetFirstName(),
+			FamilyName: idpUser.GetLastName(),
+		},
+	}
+	if username := idpUser.GetPreferredUsername(); username != "" {
+		updateHumanUser.Username = &username
+	}
+	if nickName := idpUser.GetNickname(); nickName != "" {
+		updateHumanUser.Profile.NickName = &nickName
+	}
+	if displayName := idpUser.GetDisplayName(); displayName != "" {
+		updateHumanUser.Profile.DisplayName = &displayName
+	}
+	if lang := idpUser.GetPreferredLanguage().String(); lang != "" {
+		updateHumanUser.Profile.PreferredLanguage = &lang
+	}
+	if email := string(idpUser.GetEmail()); email != "" {
+		updateHumanUser.Email = &user.SetHumanEmail{
+			Email:        email,
+			Verification: &user.SetHumanEmail_SendCode{},
+		}
+		if isEmailVerified := idpUser.IsEmailVerified(); isEmailVerified {
+			updateHumanUser.Email.Verification = &user.SetHumanEmail_IsVerified{IsVerified: isEmailVerified}
+		}
+	}
+	if phone := string(idpUser.GetPhone()); phone != "" {
+		updateHumanUser.Phone = &user.SetHumanPhone{
+			Phone:        phone,
+			Verification: &user.SetHumanPhone_SendCode{},
+		}
+		if isPhoneVerified := idpUser.IsPhoneVerified(); isPhoneVerified {
+			updateHumanUser.Phone.Verification = &user.SetHumanPhone_IsVerified{IsVerified: isPhoneVerified}
+		}
+	}
+	return updateHumanUser
+}
+
+func idpUserToCreateUser(idpUser idp.User, idpID string) *user.RetrieveIdentityProviderIntentResponse_CreateUser {
+	createUser := &user.CreateUserRequest{
+		UserType: &user.CreateUserRequest_Human_{
+			Human: &user.CreateUserRequest_Human{
+				Profile: &user.SetHumanProfile{
+					GivenName:  idpUser.GetFirstName(),
+					FamilyName: idpUser.GetLastName(),
+				},
+				Email: &user.SetHumanEmail{
+					Email:        string(idpUser.GetEmail()),
+					Verification: &user.SetHumanEmail_SendCode{},
+				},
+				IdpLinks: []*user.IDPLink{
+					{
+						IdpId:    idpID,
+						UserId:   idpUser.GetID(),
+						UserName: idpUser.GetPreferredUsername(),
+					},
+				},
+			},
+		},
+	}
+	if username := idpUser.GetPreferredUsername(); username != "" {
+		createUser.Username = &username
+	}
+	if nickName := idpUser.GetNickname(); nickName != "" {
+		createUser.GetHuman().GetProfile().NickName = &nickName
+	}
+	if displayName := idpUser.GetDisplayName(); displayName != "" {
+		createUser.GetHuman().GetProfile().DisplayName = &displayName
+	}
+	if lang := idpUser.GetPreferredLanguage().String(); lang != "" {
+		createUser.GetHuman().GetProfile().PreferredLanguage = &lang
+	}
+	if isEmailVerified := idpUser.IsEmailVerified(); isEmailVerified {
+		createUser.GetHuman().GetEmail().Verification = &user.SetHumanEmail_IsVerified{IsVerified: isEmailVerified}
+	}
+	if phone := idpUser.GetPhone(); phone != "" {
+		createUser.GetHuman().Phone = &user.SetHumanPhone{
+			Phone:        string(phone),
+			Verification: &user.SetHumanPhone_SendCode{},
+		}
+		if isPhoneVerified := idpUser.IsPhoneVerified(); isPhoneVerified {
+			createUser.GetHuman().GetPhone().Verification = &user.SetHumanPhone_IsVerified{IsVerified: isPhoneVerified}
+		}
+	}
+	return &user.RetrieveIdentityProviderIntentResponse_CreateUser{
+		CreateUser: createUser,
+	}
+}
+
+func idpUserToUpdateUser(userID string, idpUser idp.User) *user.RetrieveIdentityProviderIntentResponse_UpdateUser {
+	updateUser := &user.UpdateUserRequest{
+		UserId: userID,
+		UserType: &user.UpdateUserRequest_Human_{
+			Human: &user.UpdateUserRequest_Human{
+				Profile: &user.UpdateUserRequest_Human_Profile{},
+			},
+		},
+	}
+	if username := idpUser.GetPreferredUsername(); username != "" {
+		updateUser.Username = &username
+	}
+	if firstName := idpUser.GetFirstName(); firstName != "" {
+		updateUser.GetHuman().GetProfile().GivenName = &firstName
+	}
+	if lastName := idpUser.GetLastName(); lastName != "" {
+		updateUser.GetHuman().GetProfile().FamilyName = &lastName
+	}
+	if nickName := idpUser.GetNickname(); nickName != "" {
+		updateUser.GetHuman().GetProfile().NickName = &nickName
+	}
+	if displayName := idpUser.GetDisplayName(); displayName != "" {
+		updateUser.GetHuman().GetProfile().DisplayName = &displayName
+	}
+	if lang := idpUser.GetPreferredLanguage().String(); lang != "" {
+		updateUser.GetHuman().GetProfile().PreferredLanguage = &lang
+	}
+	if email := string(idpUser.GetEmail()); email != "" {
+		updateUser.GetHuman().Email = &user.SetHumanEmail{
+			Email:        email,
+			Verification: &user.SetHumanEmail_SendCode{},
+		}
+		if isEmailVerified := idpUser.IsEmailVerified(); isEmailVerified {
+			updateUser.GetHuman().GetEmail().Verification = &user.SetHumanEmail_IsVerified{IsVerified: isEmailVerified}
+		}
+	}
+	if phone := string(idpUser.GetPhone()); phone != "" {
+		updateUser.GetHuman().Phone = &user.SetHumanPhone{
+			Phone:        phone,
+			Verification: &user.SetHumanPhone_SendCode{},
+		}
+		if isPhoneVerified := idpUser.IsPhoneVerified(); isPhoneVerified {
+			updateUser.GetHuman().GetPhone().Verification = &user.SetHumanPhone_IsVerified{IsVerified: isPhoneVerified}
+		}
+	}
+
+	return &user.RetrieveIdentityProviderIntentResponse_UpdateUser{
+		UpdateUser: updateUser,
+	}
 }

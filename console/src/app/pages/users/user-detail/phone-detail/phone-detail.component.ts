@@ -5,6 +5,7 @@ import { formatPhone } from 'src/app/utils/formatPhone';
   selector: 'cnsl-phone-detail',
   templateUrl: './phone-detail.component.html',
   styleUrls: ['./phone-detail.component.scss'],
+  standalone: false,
 })
 export class PhoneDetailComponent implements OnChanges {
   @Input() phone: string | undefined;

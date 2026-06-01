@@ -25,6 +25,26 @@ type HumanPasswordWriteModel struct {
 	UserState domain.UserState
 }
 
+func (wm *HumanPasswordWriteModel) GetUserState() domain.UserState {
+	return wm.UserState
+}
+
+func (wm *HumanPasswordWriteModel) GetPasswordCheckFailedCount() uint64 {
+	return wm.PasswordCheckFailedCount
+}
+
+func (wm *HumanPasswordWriteModel) GetEncodedHash() string {
+	return wm.EncodedHash
+}
+
+func (wm *HumanPasswordWriteModel) GetResourceOwner() string {
+	return wm.ResourceOwner
+}
+
+func (wm *HumanPasswordWriteModel) GetWriteModel() *eventstore.WriteModel {
+	return &wm.WriteModel
+}
+
 func NewHumanPasswordWriteModel(userID, resourceOwner string) *HumanPasswordWriteModel {
 	return &HumanPasswordWriteModel{
 		WriteModel: eventstore.WriteModel{

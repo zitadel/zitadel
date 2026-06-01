@@ -34,6 +34,7 @@ const (
 	SessionColumnTOTPCheckedAt          = "totp_checked_at"
 	SessionColumnOTPSMSCheckedAt        = "otp_sms_checked_at"
 	SessionColumnOTPEmailCheckedAt      = "otp_email_checked_at"
+	SessionColumnRecoveryCodeCheckedAt  = "mfa_recovery_code_checked_at"
 	SessionColumnMetadata               = "metadata"
 	SessionColumnTokenID                = "token_id"
 	SessionColumnUserAgentFingerprintID = "user_agent_fingerprint_id"
@@ -74,6 +75,7 @@ func (*sessionProjection) Init() *old_handler.Check {
 			handler.NewColumn(SessionColumnTOTPCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(SessionColumnOTPSMSCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(SessionColumnOTPEmailCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
+			handler.NewColumn(SessionColumnRecoveryCodeCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(SessionColumnMetadata, handler.ColumnTypeJSONB, handler.Nullable()),
 			handler.NewColumn(SessionColumnTokenID, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(SessionColumnUserAgentFingerprintID, handler.ColumnTypeText, handler.Nullable()),
@@ -87,6 +89,7 @@ func (*sessionProjection) Init() *old_handler.Check {
 				SessionColumnUserAgentFingerprintID+"_idx",
 				[]string{SessionColumnUserAgentFingerprintID},
 			)),
+			handler.WithIndex(handler.NewIndex(SessionColumnUserID+"_idx", []string{SessionColumnUserID})),
 		),
 	)
 }
@@ -129,6 +132,10 @@ func (p *sessionProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceOTPEmailChecked,
 				},
 				{
+					Event:  session.RecoveryCodeCheckedType,
+					Reduce: p.reduceRecoveryCodeChecked,
+				},
+				{
 					Event:  session.TokenSetType,
 					Reduce: p.reduceTokenSet,
 				},
@@ -161,6 +168,18 @@ func (p *sessionProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  user.HumanPasswordChangedType,
 					Reduce: p.reducePasswordChanged,
+				},
+				{
+					Event:  user.UserDeactivatedType,
+					Reduce: p.reduceUserStateNotActive,
+				},
+				{
+					Event:  user.UserLockedType,
+					Reduce: p.reduceUserStateNotActive,
+				},
+				{
+					Event:  user.UserRemovedType,
+					Reduce: p.reduceUserStateNotActive,
 				},
 			},
 		},
@@ -345,6 +364,26 @@ func (p *sessionProjection) reduceOTPEmailChecked(event eventstore.Event) (*hand
 	), nil
 }
 
+func (p *sessionProjection) reduceRecoveryCodeChecked(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*session.RecoveryCodeCheckedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
+			handler.NewCol(SessionColumnSequence, e.Sequence()),
+			handler.NewCol(SessionColumnRecoveryCodeCheckedAt, e.CheckedAt),
+		},
+		[]handler.Condition{
+			handler.NewCond(SessionColumnID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
 func (p *sessionProjection) reduceTokenSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*session.TokenSetEvent)
 	if !ok {
@@ -435,6 +474,23 @@ func (p *sessionProjection) reducePasswordChanged(event eventstore.Event) (*hand
 			handler.NewCond(SessionColumnUserID, e.Aggregate().ID),
 			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewLessThanCond(SessionColumnPasswordCheckedAt, e.CreationDate()),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reduceUserStateNotActive(event eventstore.Event) (_ *handler.Statement, err error) {
+	switch t := event.(type) {
+	case *user.UserDeactivatedEvent, *user.UserRemovedEvent, *user.UserLockedEvent:
+		// ok
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-7zALpR", "reduce.wrong.event.type %v", t)
+	}
+
+	return handler.NewDeleteStatement(
+		event,
+		[]handler.Condition{
+			handler.NewCond(SessionColumnUserID, event.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }

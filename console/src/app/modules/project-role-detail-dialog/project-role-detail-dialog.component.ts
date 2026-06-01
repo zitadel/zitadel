@@ -9,6 +9,7 @@ import { requiredValidator } from '../form-field/validators/validators';
   selector: 'cnsl-project-role-detail-dialog',
   templateUrl: './project-role-detail-dialog.component.html',
   styleUrls: ['./project-role-detail-dialog.component.scss'],
+  standalone: false,
 })
 export class ProjectRoleDetailDialogComponent {
   public projectId: string = '';

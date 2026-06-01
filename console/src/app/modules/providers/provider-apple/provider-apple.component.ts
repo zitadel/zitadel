@@ -4,7 +4,7 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, Observable, take } from 'rxjs';
+import { BehaviorSubject, take } from 'rxjs';
 import {
   AddAppleProviderRequest as AdminAddAppleProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -31,6 +31,7 @@ const MAX_ALLOWED_SIZE = 5 * 1024;
 @Component({
   selector: 'cnsl-provider-apple',
   templateUrl: './provider-apple.component.html',
+  standalone: false,
 })
 export class ProviderAppleComponent {
   public showOptional: boolean = false;
@@ -71,7 +72,7 @@ export class ProviderAppleComponent {
     this.service$,
   );
   public expandWhatNow$ = this.nextSvc.expandWhatNow(this.id$, this.activateLink$, this.justCreated$);
-  public copyUrls$ = this.nextSvc.callbackUrls();
+  public copyUrls$ = this.nextSvc.callbackUrls(true);
 
   constructor(
     private authService: GrpcAuthService,
@@ -218,7 +219,7 @@ export class ProviderAppleComponent {
         this.loading = true;
         (this.service as ManagementService)
           .updateAppleProvider(req)
-          .then((idp) => {
+          .then(() => {
             setTimeout(() => {
               this.loading = false;
               this.close();
@@ -245,7 +246,7 @@ export class ProviderAppleComponent {
         this.loading = true;
         (this.service as AdminService)
           .updateAppleProvider(req)
-          .then((idp) => {
+          .then(() => {
             setTimeout(() => {
               this.loading = false;
               this.close();
@@ -271,7 +272,7 @@ export class ProviderAppleComponent {
       } else {
         this.privateKey?.setValue('');
         const reader = new FileReader();
-        reader.onload = ((aXML) => {
+        reader.onload = (() => {
           return (e) => {
             const keyBase64 = e.target?.result;
             if (keyBase64 && typeof keyBase64 === 'string') {
@@ -280,7 +281,7 @@ export class ProviderAppleComponent {
               this.privateKey?.setValue(cropped);
             }
           };
-        })(file);
+        })();
         reader.readAsDataURL(file);
       }
     }

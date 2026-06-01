@@ -60,6 +60,7 @@ interface ValidationError {
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [cnslFormFieldAnimations.transitionMessages],
+  standalone: false,
 })
 export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestroy, AfterContentInit, AfterViewInit {
   focused: boolean = false;

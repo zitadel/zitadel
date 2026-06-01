@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/saml/pkg/provider/xml"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -16,10 +17,22 @@ func (c *Commands) AddSAMLApplication(ctx context.Context, application *domain.S
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-35Fn0", "Errors.Project.App.Invalid")
 	}
 
-	if err := c.checkProjectExists(ctx, application.AggregateID, resourceOwner); err != nil {
+	projectResOwner, err := c.checkProjectExists(ctx, application.AggregateID, resourceOwner)
+	if err != nil {
 		return nil, err
 	}
+	if resourceOwner == "" {
+		resourceOwner = projectResOwner
+	}
+
 	addedApplication := NewSAMLApplicationWriteModel(application.AggregateID, resourceOwner)
+	if err := c.eventstore.FilterToQueryReducer(ctx, addedApplication); err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionUpdateApplication(ctx, addedApplication.ResourceOwner, addedApplication.AggregateID); err != nil {
+		return nil, err
+	}
+
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
 	events, err := c.addSAMLApplication(ctx, projectAgg, application)
 	if err != nil {
@@ -49,12 +62,8 @@ func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstor
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-1n9df", "Errors.Project.App.Invalid")
 	}
 
-	if samlApp.Metadata == nil && samlApp.MetadataURL == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "SAML-podix9", "Errors.Project.App.SAMLMetadataMissing")
-	}
-
-	if samlApp.MetadataURL != "" {
-		data, err := xml.ReadMetadataFromURL(c.httpClient, samlApp.MetadataURL)
+	if samlApp.MetadataURL != nil && *samlApp.MetadataURL != "" {
+		data, err := xml.ReadMetadataFromURL(c.httpClient, *samlApp.MetadataURL)
 		if err != nil {
 			return nil, zerrors.ThrowInvalidArgument(err, "SAML-wmqlo1", "Errors.Project.App.SAMLMetadataMissing")
 		}
@@ -78,14 +87,14 @@ func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstor
 			samlApp.AppID,
 			string(entity.EntityID),
 			samlApp.Metadata,
-			samlApp.MetadataURL,
-			samlApp.LoginVersion,
-			samlApp.LoginBaseURI,
+			gu.Value(samlApp.MetadataURL),
+			gu.Value(samlApp.LoginVersion),
+			gu.Value(samlApp.LoginBaseURI),
 		),
 	}, nil
 }
 
-func (c *Commands) ChangeSAMLApplication(ctx context.Context, samlApp *domain.SAMLApp, resourceOwner string) (*domain.SAMLApp, error) {
+func (c *Commands) UpdateSAMLApplication(ctx context.Context, samlApp *domain.SAMLApp, resourceOwner string) (*domain.SAMLApp, error) {
 	if !samlApp.IsValid() || samlApp.AppID == "" || samlApp.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-5n9fs", "Errors.Project.App.SAMLConfigInvalid")
 	}
@@ -100,10 +109,15 @@ func (c *Commands) ChangeSAMLApplication(ctx context.Context, samlApp *domain.SA
 	if !existingSAML.IsSAML() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-GBr35", "Errors.Project.App.IsNotSAML")
 	}
+
+	if err := c.checkPermissionUpdateApplication(ctx, existingSAML.ResourceOwner, existingSAML.AggregateID); err != nil {
+		return nil, err
+	}
+
 	projectAgg := ProjectAggregateFromWriteModel(&existingSAML.WriteModel)
 
-	if samlApp.MetadataURL != "" {
-		data, err := xml.ReadMetadataFromURL(c.httpClient, samlApp.MetadataURL)
+	if samlApp.MetadataURL != nil && *samlApp.MetadataURL != "" {
+		data, err := xml.ReadMetadataFromURL(c.httpClient, *samlApp.MetadataURL)
 		if err != nil {
 			return nil, zerrors.ThrowInvalidArgument(err, "SAML-J3kg3", "Errors.Project.App.SAMLMetadataMissing")
 		}

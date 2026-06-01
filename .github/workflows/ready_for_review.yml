@@ -13,8 +13,9 @@ jobs:
 
             Please make sure you tick the following checkboxes before marking this Pull Request (PR) as ready for review:
             
-              - [ ] I am happy with the code
+              - [ ] I have reviewed my changes and would approve it
               - [ ] Documentations and examples are up-to-date
+              - [ ] Terminology updates follow issue #5888 and TERMINOLOGY.md
               - [ ] Logical behavior changes are tested automatically
               - [ ] No debug or dead code
               - [ ] My code has no repetitions

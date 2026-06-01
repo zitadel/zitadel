@@ -1,7 +1,10 @@
 package session
 
 import (
-	"google.golang.org/grpc"
+	"net/http"
+
+	"connectrpc.com/connect"
+	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
@@ -9,12 +12,12 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/session/v2beta/sessionconnect"
 )
 
-var _ session.SessionServiceServer = (*Server)(nil)
+var _ sessionconnect.SessionServiceHandler = (*Server)(nil)
 
 type Server struct {
-	session.UnimplementedSessionServiceServer
 	command *command.Commands
 	query   *query.Queries
 
@@ -35,8 +38,12 @@ func CreateServer(
 	}
 }
 
-func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	session.RegisterSessionServiceServer(grpcServer, s)
+func (s *Server) RegisterConnectServer(interceptors ...connect.Interceptor) (string, http.Handler) {
+	return sessionconnect.NewSessionServiceHandler(s, connect.WithInterceptors(interceptors...))
+}
+
+func (s *Server) FileDescriptor() protoreflect.FileDescriptor {
+	return session.File_zitadel_session_v2beta_session_service_proto
 }
 
 func (s *Server) AppName() string {

@@ -1,0 +1,21 @@
+# Cursor Rules for ZITADEL
+
+You are working in the ZITADEL monorepo. 
+
+**ALWAYS** read `AGENTS.md` files in this order:
+1. Root `AGENTS.md`
+2. The nearest scoped `AGENTS.md` for the files you are changing
+
+If you touch Go code or run Go tooling, inspect `go.mod` first for the required Go version/toolchain.
+
+Use verified Nx targets only. If a target is unclear or missing, run `pnpm nx show project <project>`.
+
+- **Root Context**: [AGENTS.md](AGENTS.md)
+- **API App**: [apps/api/AGENTS.md](apps/api/AGENTS.md)
+- **Login App**: [apps/login/AGENTS.md](apps/login/AGENTS.md)
+- **Docs Site**: [apps/docs/AGENTS.md](apps/docs/AGENTS.md)
+- **Management Console**: [console/AGENTS.md](console/AGENTS.md)
+- **Backend Internal**: [internal/AGENTS.md](internal/AGENTS.md)
+- **Proto Definitions**: [proto/AGENTS.md](proto/AGENTS.md)
+- **Shared Packages**: [packages/AGENTS.md](packages/AGENTS.md)
+- **Functional UI Tests**: [tests/functional-ui/AGENTS.md](tests/functional-ui/AGENTS.md)

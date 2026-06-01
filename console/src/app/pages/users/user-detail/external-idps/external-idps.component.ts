@@ -16,6 +16,7 @@ import { ToastService } from 'src/app/services/toast.service';
   selector: 'cnsl-external-idps',
   templateUrl: './external-idps.component.html',
   styleUrls: ['./external-idps.component.scss'],
+  standalone: false,
 })
 export class ExternalIdpsComponent implements OnInit, OnDestroy {
   @Input({ required: true }) service!: GrpcAuthService | ManagementService;

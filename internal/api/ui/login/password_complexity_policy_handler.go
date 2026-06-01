@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 )
 
@@ -22,12 +23,13 @@ func (l *Login) getPasswordComplexityPolicy(r *http.Request, orgID string) *iam_
 }
 
 func (l *Login) getPasswordComplexityPolicyByUserID(r *http.Request, userID string) *iam_model.PasswordComplexityPolicyView {
+	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
 	user, err := l.query.GetUserByID(r.Context(), false, userID)
-	if err != nil {
-		logging.WithFields("userID", userID).OnError(err).Error("could not load user for password complexity policy")
-		return nil
+	logging.WithFields("userID", userID).OnError(err).Error("could not load user for password complexity policy")
+	if err == nil {
+		resourceOwner = user.ResourceOwner
 	}
-	policy, err := l.authRepo.GetMyPasswordComplexityPolicy(setContext(r.Context(), user.ResourceOwner))
-	logging.WithFields("orgID", user.ResourceOwner, "userID", userID).OnError(err).Error("could not load password complexity policy")
+	policy, err := l.authRepo.GetMyPasswordComplexityPolicy(setContext(r.Context(), resourceOwner))
+	logging.WithFields("orgID", resourceOwner, "userID", userID).OnError(err).Error("could not load password complexity policy")
 	return policy
 }

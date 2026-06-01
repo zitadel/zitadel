@@ -439,7 +439,7 @@ func TestCommands_ResendUserEmailCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -556,7 +556,7 @@ func TestCommands_SendUserEmailCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -647,7 +647,7 @@ func TestCommands_ResendUserEmailCodeURLTemplate(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -778,7 +778,7 @@ func TestCommands_SendUserEmailCodeURLTemplate(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -858,7 +858,7 @@ func TestCommands_ResendUserEmailReturnCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -975,7 +975,7 @@ func TestCommands_SendUserEmailReturnCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -1160,8 +1160,9 @@ func TestCommands_ChangeUserEmailVerified(t *testing.T) {
 
 func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
+		eventstore      func(*testing.T) *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
+		loginPaths      func(*testing.T) LoginPaths
 	}
 	type args struct {
 		userID     string
@@ -1179,7 +1180,8 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 		{
 			name: "missing user",
 			fields: fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				userID:     "",
@@ -1192,8 +1194,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 		{
 			name: "missing permission",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1212,6 +1213,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				userID:     "user1",
@@ -1224,8 +1226,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 		{
 			name: "missing email",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1244,6 +1245,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				userID:     "user1",
@@ -1256,8 +1258,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 		{
 			name: "not changed",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1276,6 +1277,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				userID:     "user1",
@@ -1288,8 +1290,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 		{
 			name: "email changed",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1311,7 +1312,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 							&user.NewAggregate("user1", "org1").Aggregate,
 							"email-changed@test.ch",
 						),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -1320,11 +1321,13 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 								Crypted:    []byte("a"),
 							},
 							time.Hour*1,
-							"", false, "",
+							"http://example.com/{{.user}}/email/{{.code}}",
+							false, "",
 						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				loginPaths:      expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				userID:     "user1",
@@ -1344,8 +1347,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 		{
 			name: "email changed, return code",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1367,7 +1369,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 							&user.NewAggregate("user1", "org1").Aggregate,
 							"email-changed@test.ch",
 						),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -1376,11 +1378,12 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 								Crypted:    []byte("a"),
 							},
 							time.Hour*1,
-							"", true, "",
+							"http://example.com/{{.user}}/email/{{.code2}}", true, "",
 						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				loginPaths:      expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code2}}"),
 			},
 			args: args{
 				userID:     "user1",
@@ -1401,8 +1404,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 		{
 			name: "email changed, URL template",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1424,7 +1426,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 							&user.NewAggregate("user1", "org1").Aggregate,
 							"email-changed@test.ch",
 						),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -1438,6 +1440,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				userID:     "user1",
@@ -1458,8 +1461,9 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:      tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
+				loginPaths:      tt.fields.loginPaths(t),
 			}
 			got, err := c.changeUserEmailWithGenerator(context.Background(), tt.args.userID, tt.args.email, GetMockSecretGenerator(t), tt.args.returnCode, tt.args.urlTmpl)
 			require.ErrorIs(t, tt.wantErr, err)
@@ -1472,6 +1476,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
+		loginPaths      func(*testing.T) LoginPaths
 	}
 	type args struct {
 		userID        string
@@ -1490,6 +1495,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 			name: "missing user",
 			fields: fields{
 				eventstore: eventstoreExpect(t),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				userID:     "",
@@ -1519,7 +1525,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -1534,6 +1540,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				userID:     "user1",
@@ -1564,7 +1571,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 						),
 					),
 					expectPush(
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -1573,11 +1580,12 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 								Crypted:    []byte("a"),
 							},
 							time.Hour*1,
-							"", false, "",
+							"http://example.com/{{.user}}/email/{{.code}}", false, "",
 						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				loginPaths:      expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				userID:        "user1",
@@ -1615,7 +1623,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -1624,12 +1632,12 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 									Crypted:    []byte("a"),
 								},
 								time.Hour*1,
-								"", false, "",
+								"http://example.com/{{.user}}/email/{{.code2}}", false, "",
 							),
 						),
 					),
 					expectPush(
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -1638,11 +1646,12 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 								Crypted:    []byte("a"),
 							},
 							time.Hour*1,
-							"", false, "",
+							"http://example.com/{{.user}}/email/{{.code2}}", false, "",
 						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				loginPaths:      expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code2}}"),
 			},
 			args: args{
 				userID:        "user1",
@@ -1682,6 +1691,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				userID:        "user1",
@@ -1713,7 +1723,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 						),
 					),
 					expectPush(
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -1722,11 +1732,12 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 								Crypted:    []byte("a"),
 							},
 							time.Hour*1,
-							"", true, "",
+							"http://example.com/{{.user}}/email/{{.code}}", true, "",
 						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				loginPaths:      expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				userID:        "user1",
@@ -1766,7 +1777,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 						),
 					),
 					expectPush(
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -1780,6 +1791,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				userID:        "user1",
@@ -1802,6 +1814,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 			c := &Commands{
 				eventstore:      tt.fields.eventstore,
 				checkPermission: tt.fields.checkPermission,
+				loginPaths:      tt.fields.loginPaths(t),
 			}
 			got, err := c.sendUserEmailCodeWithGenerator(context.Background(), tt.args.userID, GetMockSecretGenerator(t), tt.args.returnCode, tt.args.urlTmpl, tt.args.checkExisting)
 			require.ErrorIs(t, err, tt.wantErr)
@@ -1914,7 +1927,7 @@ func TestCommands_VerifyUserEmail(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -2029,7 +2042,7 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -2076,7 +2089,7 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 							),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,

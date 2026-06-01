@@ -20,10 +20,10 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 	client_middleware "github.com/zitadel/zitadel/internal/api/grpc/client/middleware"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
 const (
@@ -132,6 +132,7 @@ func CreateGatewayWithPrefix(
 			client_middleware.UnaryActivityClientInterceptor(),
 		),
 		grpc.WithStatsHandler(client_middleware.DefaultTracingClient()),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(MaxSendMsgSize)),
 	}
 	connection, err := dial(ctx, port, opts)
 	if err != nil {
@@ -159,6 +160,7 @@ func CreateGateway(
 				client_middleware.UnaryActivityClientInterceptor(),
 			),
 			grpc.WithStatsHandler(client_middleware.DefaultTracingClient()),
+			grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(MaxSendMsgSize)),
 		})
 	if err != nil {
 		return nil, err
@@ -171,7 +173,7 @@ func CreateGateway(
 	}, nil
 }
 
-func RegisterGateway(ctx context.Context, gateway *Gateway, server Server) error {
+func RegisterGateway(ctx context.Context, gateway *Gateway, server WithGateway) error {
 	err := server.RegisterGateway()(ctx, gateway.mux, gateway.connection)
 	if err != nil {
 		return fmt.Errorf("failed to register grpc gateway: %w", err)
@@ -207,9 +209,10 @@ func addInterceptors(
 	accessInterceptor *http_mw.AccessInterceptor,
 ) http.Handler {
 	handler = http_mw.CallDurationHandler(handler)
+	handler = http_mw.RequestDetailsHandler()(handler)
 	handler = http_mw.CORSInterceptor(handler)
 	handler = http_mw.RobotsTagHandler(handler)
-	handler = http_mw.DefaultTelemetryHandler(handler)
+	handler = http_mw.DefaultTraceHandler(handler)
 	handler = http_mw.ActivityHandler(handler)
 	// For some non-obvious reason, the exhaustedCookieInterceptor sends the SetCookie header
 	// only if it follows the http_mw.DefaultTelemetryHandler
@@ -218,6 +221,7 @@ func addInterceptors(
 		metrics.MetricTypeTotalCount,
 		metrics.MetricTypeStatusCode,
 	}, http_utils.Probes...)(handler)
+	handler = http_mw.LogHandler("grpc_gateway", http_utils.Probes...)(handler)
 	return handler
 }
 
@@ -283,5 +287,4 @@ func setRequestURIPattern(ctx context.Context) {
 	}
 	span := trace.SpanFromContext(ctx)
 	span.SetName(pattern)
-	metrics.SetRequestURIPattern(ctx, pattern)
 }

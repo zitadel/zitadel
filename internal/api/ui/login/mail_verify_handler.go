@@ -9,6 +9,7 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -121,6 +122,10 @@ func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	_, err = l.command.CreateHumanEmailVerificationCode(setContext(r.Context(), userOrg), data.UserID, userOrg, emailCodeGenerator, authReqID)
+	if !zerrors.IsInternal(err) {
+		logging.WithFields("instanceID", authz.GetInstance(r.Context()).InstanceID(), "userID", data.UserID).WithError(err).Warn("error requesting mail verification")
+		err = nil // we ignore errors on resend to not leak information
+	}
 	l.renderMailVerification(w, r, authReq, data.UserID, "", data.PasswordInit, err)
 }
 
@@ -138,7 +143,8 @@ func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *d
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	_, err = l.command.VerifyHumanEmail(setContext(r.Context(), userOrg), userID, code, userOrg, password, userAgentID, emailCodeGenerator)
 	if err != nil {
-		l.renderMailVerification(w, r, authReq, userID, "", password != "", err)
+		logging.WithFields("instanceID", authz.GetInstance(r.Context()).InstanceID(), "userID", userID).WithError(err).Warn("error verifying email code")
+		l.renderMailVerification(w, r, authReq, userID, "", password != "", zerrors.ThrowInvalidArgument(nil, "LOGIN-WSdsg", "Errors.User.Code.Invalid"))
 		return
 	}
 	l.renderMailVerified(w, r, authReq, userOrg)

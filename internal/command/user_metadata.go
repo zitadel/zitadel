@@ -1,6 +1,7 @@
 package command
 
 import (
+	"bytes"
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -10,16 +11,31 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) SetUserMetadata(ctx context.Context, metadata *domain.Metadata, userID, resourceOwner string) (_ *domain.Metadata, err error) {
+func (c *Commands) SetUserMetadata(ctx context.Context, metadata *domain.Metadata, userID, resourceOwner string, check PermissionCheck) (_ *domain.Metadata, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	err = c.checkUserExists(ctx, userID, resourceOwner)
+	userResourceOwner, err := c.checkUserExists(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	setMetadata := NewUserMetadataWriteModel(userID, resourceOwner, metadata.Key)
+
+	if check != nil {
+		if err := check(userResourceOwner, userID); err != nil {
+			return nil, err
+		}
+	}
+
+	setMetadata, err := c.getUserMetadataModelByID(ctx, userID, userResourceOwner, metadata.Key)
+	if err != nil {
+		return nil, err
+	}
 	userAgg := UserAggregateFromWriteModel(&setMetadata.WriteModel)
+	// return if no change in the metadata
+	if setMetadata.State == domain.MetadataStateActive && bytes.Equal(setMetadata.Value, metadata.Value) {
+		return writeModelToUserMetadata(setMetadata), nil
+	}
+
 	event, err := c.setUserMetadata(ctx, userAgg, metadata)
 	if err != nil {
 		return nil, err
@@ -36,24 +52,34 @@ func (c *Commands) SetUserMetadata(ctx context.Context, metadata *domain.Metadat
 	return writeModelToUserMetadata(setMetadata), nil
 }
 
-func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwner string, metadatas ...*domain.Metadata) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwner string, check PermissionCheck, metadatas ...*domain.Metadata) (_ *domain.ObjectDetails, err error) {
 	if len(metadatas) == 0 {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "META-9mm2d", "Errors.Metadata.NoData")
 	}
-	err = c.checkUserExists(ctx, userID, resourceOwner)
+	userResourceOwner, err := c.checkUserExists(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 
-	events := make([]eventstore.Command, len(metadatas))
-	setMetadata := NewUserMetadataListWriteModel(userID, resourceOwner)
-	userAgg := UserAggregateFromWriteModel(&setMetadata.WriteModel)
-	for i, data := range metadatas {
-		event, err := c.setUserMetadata(ctx, userAgg, data)
-		if err != nil {
+	if check != nil {
+		if err := check(userResourceOwner, userID); err != nil {
 			return nil, err
 		}
-		events[i] = event
+	}
+
+	setMetadata, err := c.getUserMetadataListModelByID(ctx, userID, userResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	userAgg := UserAggregateFromWriteModel(&setMetadata.WriteModel)
+	events, err := c.createMetadataEvents(ctx, metadatas, setMetadata.metadataList, userAgg)
+	if err != nil {
+		return nil, err
+	}
+
+	// no changes for the metadata
+	if len(events) == 0 {
+		return writeModelToObjectDetails(&setMetadata.WriteModel), nil
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
@@ -68,6 +94,37 @@ func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwne
 	return writeModelToObjectDetails(&setMetadata.WriteModel), nil
 }
 
+// createMetadataEvents compares the existing metadata key-value pair before creating metadata set/remove events
+func (c *Commands) createMetadataEvents(ctx context.Context, reqMetadata []*domain.Metadata, currentMetadataMap map[string][]byte, userAgg *eventstore.Aggregate) ([]eventstore.Command, error) {
+	events := make([]eventstore.Command, 0)
+	for _, data := range reqMetadata {
+		existingValue, keyExists := currentMetadataMap[data.Key]
+
+		// if the value is empty, a metadata remove event has to be pushed
+		if len(data.Value) == 0 {
+			// Ignore deletion if the key does not exist
+			if !keyExists {
+				continue
+			}
+
+			event := user.NewMetadataRemovedEvent(ctx, userAgg, data.Key)
+			events = append(events, event)
+			continue
+		}
+
+		// if no change to metadata, no event has to be pushed
+		if keyExists && bytes.Equal(existingValue, data.Value) {
+			continue
+		}
+		event, err := c.setUserMetadata(ctx, userAgg, data)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, event)
+	}
+	return events, nil
+}
+
 func (c *Commands) setUserMetadata(ctx context.Context, userAgg *eventstore.Aggregate, metadata *domain.Metadata) (command eventstore.Command, err error) {
 	if !metadata.IsValid() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "META-2m00f", "Errors.Metadata.Invalid")
@@ -80,15 +137,21 @@ func (c *Commands) setUserMetadata(ctx context.Context, userAgg *eventstore.Aggr
 	), nil
 }
 
-func (c *Commands) RemoveUserMetadata(ctx context.Context, metadataKey, userID, resourceOwner string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) RemoveUserMetadata(ctx context.Context, metadataKey, userID, resourceOwner string, check PermissionCheck) (_ *domain.ObjectDetails, err error) {
 	if metadataKey == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "META-2n0fs", "Errors.Metadata.Invalid")
 	}
-	err = c.checkUserExists(ctx, userID, resourceOwner)
+	userResourceOwner, err := c.checkUserExists(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	removeMetadata, err := c.getUserMetadataModelByID(ctx, userID, resourceOwner, metadataKey)
+	if check != nil {
+		if err := check(userResourceOwner, userID); err != nil {
+			return nil, err
+		}
+	}
+
+	removeMetadata, err := c.getUserMetadataModelByID(ctx, userID, userResourceOwner, metadataKey)
 	if err != nil {
 		return nil, err
 	}
@@ -112,17 +175,22 @@ func (c *Commands) RemoveUserMetadata(ctx context.Context, metadataKey, userID, 
 	return writeModelToObjectDetails(&removeMetadata.WriteModel), nil
 }
 
-func (c *Commands) BulkRemoveUserMetadata(ctx context.Context, userID, resourceOwner string, metadataKeys ...string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) BulkRemoveUserMetadata(ctx context.Context, userID, resourceOwner string, check PermissionCheck, metadataKeys ...string) (_ *domain.ObjectDetails, err error) {
 	if len(metadataKeys) == 0 {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "META-9mm2d", "Errors.Metadata.NoData")
 	}
-	err = c.checkUserExists(ctx, userID, resourceOwner)
+	userResourceOwner, err := c.checkUserExists(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
+	if check != nil {
+		if err := check(userResourceOwner, userID); err != nil {
+			return nil, err
+		}
+	}
 
 	events := make([]eventstore.Command, len(metadataKeys))
-	removeMetadata, err := c.getUserMetadataListModelByID(ctx, userID, resourceOwner)
+	removeMetadata, err := c.getUserMetadataListModelByID(ctx, userID, userResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -153,24 +221,6 @@ func (c *Commands) BulkRemoveUserMetadata(ctx context.Context, userID, resourceO
 	return writeModelToObjectDetails(&removeMetadata.WriteModel), nil
 }
 
-func (c *Commands) removeUserMetadataFromOrg(ctx context.Context, resourceOwner string) ([]eventstore.Command, error) {
-	existingUserMetadata, err := c.getUserMetadataByOrgListModelByID(ctx, resourceOwner)
-	if err != nil {
-		return nil, err
-	}
-	if len(existingUserMetadata.UserMetadata) == 0 {
-		return nil, nil
-	}
-	events := make([]eventstore.Command, 0)
-	for key, value := range existingUserMetadata.UserMetadata {
-		if len(value) == 0 {
-			continue
-		}
-		events = append(events, user.NewMetadataRemovedAllEvent(ctx, &user.NewAggregate(key, resourceOwner).Aggregate))
-	}
-	return events, nil
-}
-
 func (c *Commands) removeUserMetadata(ctx context.Context, userAgg *eventstore.Aggregate, metadataKey string) (command eventstore.Command, err error) {
 	command = user.NewMetadataRemovedEvent(
 		ctx,
@@ -191,15 +241,6 @@ func (c *Commands) getUserMetadataModelByID(ctx context.Context, userID, resourc
 
 func (c *Commands) getUserMetadataListModelByID(ctx context.Context, userID, resourceOwner string) (*UserMetadataListWriteModel, error) {
 	userMetadataWriteModel := NewUserMetadataListWriteModel(userID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, userMetadataWriteModel)
-	if err != nil {
-		return nil, err
-	}
-	return userMetadataWriteModel, nil
-}
-
-func (c *Commands) getUserMetadataByOrgListModelByID(ctx context.Context, resourceOwner string) (*UserMetadataByOrgListWriteModel, error) {
-	userMetadataWriteModel := NewUserMetadataByOrgListWriteModel(resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, userMetadataWriteModel)
 	if err != nil {
 		return nil, err

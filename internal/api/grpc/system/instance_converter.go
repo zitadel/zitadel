@@ -157,7 +157,7 @@ func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInst
 	}
 
 	if defaultInstance.Org.Human != nil {
-		// used to not overwrite the default human later
+		// used to not overwrite the default User (human) later
 		humanCopy := *defaultInstance.Org.Human
 		instance.Org.Human = &humanCopy
 	} else {

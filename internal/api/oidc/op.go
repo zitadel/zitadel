@@ -10,18 +10,19 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 	"github.com/zitadel/zitadel/internal/api/assets"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/auth/repository"
+	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain/federatedlogout"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -42,6 +43,16 @@ type Config struct {
 	DefaultLogoutURLV2                string
 	PublicKeyCacheMaxAge              time.Duration
 	DefaultBackChannelLogoutLifetime  time.Duration
+	BackChannelLogout                 handlers.BackChannelLogoutWorkerConfig
+}
+
+// BackChannelLogoutConfig returns the BackChannelLogoutWorkerConfig and takes the deprecated TokenLifetime into account.
+func (c *Config) BackChannelLogoutConfig() *handlers.BackChannelLogoutWorkerConfig {
+	if c.DefaultBackChannelLogoutLifetime == 0 {
+		return &c.BackChannelLogout
+	}
+	c.BackChannelLogout.TokenLifetime = c.DefaultBackChannelLogoutLifetime
+	return &c.BackChannelLogout
 }
 
 type EndpointConfig struct {
@@ -72,10 +83,10 @@ type OPStorage struct {
 	defaultIdTokenLifetime            time.Duration
 	defaultRefreshTokenIdleExpiration time.Duration
 	defaultRefreshTokenExpiration     time.Duration
-	encAlg                            crypto.EncryptionAlgorithm
-	locker                            crdb.Locker
+	authAlg                           crypto.AuthAlgorithm
 	assetAPIPrefix                    func(ctx context.Context) string
 	contextToIssuer                   func(context.Context) string
+	federateLogoutCache               cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout]
 }
 
 // Provider is used to overload certain [op.Provider] methods
@@ -88,14 +99,14 @@ type Provider struct {
 // IDTokenHintVerifier configures a Verifier and supported signing algorithms based on the Web Key feature in the context.
 func (o *Provider) IDTokenHintVerifier(ctx context.Context) *op.IDTokenHintVerifier {
 	return op.NewIDTokenHintVerifier(op.IssuerFromContext(ctx), o.idTokenHintKeySet, op.WithSupportedIDTokenHintSigningAlgorithms(
-		supportedSigningAlgs(ctx)...,
+		supportedSigningAlgs()...,
 	))
 }
 
 // AccessTokenVerifier configures a Verifier and supported signing algorithms based on the Web Key feature in the context.
 func (o *Provider) AccessTokenVerifier(ctx context.Context) *op.AccessTokenVerifier {
 	return op.NewAccessTokenVerifier(op.IssuerFromContext(ctx), o.accessTokenKeySet, op.WithSupportedAccessTokenSigningAlgorithms(
-		supportedSigningAlgs(ctx)...,
+		supportedSigningAlgs()...,
 	))
 }
 
@@ -107,25 +118,38 @@ func NewServer(
 	command *command.Commands,
 	query *query.Queries,
 	repo repository.Repository,
-	encryptionAlg crypto.EncryptionAlgorithm,
+	authAlg crypto.AuthAlgorithm,
+	targetEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	cryptoKey []byte,
 	es *eventstore.Eventstore,
-	projections *database.DB,
 	userAgentCookie, instanceHandler func(http.Handler) http.Handler,
 	accessHandler *middleware.AccessInterceptor,
 	fallbackLogger *slog.Logger,
 	hashConfig crypto.HashConfig,
+	federatedLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
 ) (*Server, error) {
 	opConfig, err := createOPConfig(config, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
-	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections, ContextToIssuer)
+	storage := newStorage(config, command, query, repo, authAlg, es, ContextToIssuer, federatedLogoutCache)
 	keyCache := newPublicKeyCache(ctx, config.PublicKeyCacheMaxAge, queryKeyFunc(query))
 	accessTokenKeySet := newOidcKeySet(keyCache, withKeyExpiryCheck(true))
 	idTokenHintKeySet := newOidcKeySet(keyCache)
 
-	var options []op.Option
+	alg := op.NewAES256GCMCrypto(opConfig.CryptoKey, "")
+	if authAlg.LegacyTokenEnabled() {
+		alg = op.NewCompositeCrypto(
+			alg,
+			[]op.Decrypter{
+				alg,
+				op.NewAESCrypto(opConfig.CryptoKey),
+			},
+		)
+	}
+	options := []op.Option{
+		op.WithCrypto(alg),
+	}
 	if !externalSecure {
 		options = append(options, op.WithAllowInsecure())
 	}
@@ -161,8 +185,9 @@ func NewServer(
 		jwksCacheControlMaxAge:     config.JWKSCacheControlMaxAge,
 		fallbackLogger:             fallbackLogger,
 		hasher:                     hasher,
-		encAlg:                     encryptionAlg,
-		opCrypto:                   op.NewAESCrypto(opConfig.CryptoKey),
+		encAlg:                     authAlg,
+		targetEncryptionAlgorithm:  targetEncryptionAlgorithm,
+		opCrypto:                   alg,
 		assetAPIPrefix:             assets.AssetAPI(),
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
@@ -170,8 +195,12 @@ func NewServer(
 		server.authorizeCallbackHandler,
 		op.WithFallbackLogger(fallbackLogger),
 		op.WithHTTPMiddleware(
+			middleware.CallDurationHandler,
+			middleware.RequestDetailsHandler(),
 			middleware.MetricsHandler(metricTypes),
-			middleware.TelemetryHandler(),
+			middleware.TraceHandler(),
+			middleware.LogHandler("oidc"),
+			middleware.RecoverHandler(writeRecoverError),
 			middleware.NoCacheInterceptor().Handler,
 			instanceHandler,
 			userAgentCookie,
@@ -225,7 +254,16 @@ func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []
 	return opConfig, nil
 }
 
-func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, encAlg crypto.EncryptionAlgorithm, es *eventstore.Eventstore, db *database.DB, contextToIssuer func(context.Context) string) *OPStorage {
+func newStorage(
+	config Config,
+	command *command.Commands,
+	query *query.Queries,
+	repo repository.Repository,
+	authAlg crypto.AuthAlgorithm,
+	es *eventstore.Eventstore,
+	contextToIssuer func(context.Context) string,
+	federateLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
+) *OPStorage {
 	return &OPStorage{
 		repo:                              repo,
 		command:                           command,
@@ -238,10 +276,10 @@ func newStorage(config Config, command *command.Commands, query *query.Queries, 
 		defaultIdTokenLifetime:            config.DefaultIdTokenLifetime,
 		defaultRefreshTokenIdleExpiration: config.DefaultRefreshTokenIdleExpiration,
 		defaultRefreshTokenExpiration:     config.DefaultRefreshTokenExpiration,
-		encAlg:                            encAlg,
-		locker:                            crdb.NewLocker(db.DB, locksTable, signingKey),
+		authAlg:                           authAlg,
 		assetAPIPrefix:                    assets.AssetAPI(),
 		contextToIssuer:                   contextToIssuer,
+		federateLogoutCache:               federateLogoutCache,
 	}
 }
 

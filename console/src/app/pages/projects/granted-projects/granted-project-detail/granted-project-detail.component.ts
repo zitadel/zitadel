@@ -19,6 +19,7 @@ import { ToastService } from 'src/app/services/toast.service';
   selector: 'cnsl-granted-project-detail',
   templateUrl: './granted-project-detail.component.html',
   styleUrls: ['./granted-project-detail.component.scss'],
+  standalone: false,
 })
 export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
   public projectId: string = '';

@@ -1758,8 +1758,10 @@ type SAMLIDPWriteModel struct {
 	Certificate                   []byte
 	Binding                       string
 	WithSignedRequest             bool
+	SignatureAlgorithm            string
 	NameIDFormat                  *domain.SAMLNameIDFormat
 	TransientMappingAttributeName string
+	FederatedLogoutEnabled        bool
 	idp.Options
 
 	State domain.IDPState
@@ -1786,8 +1788,10 @@ func (wm *SAMLIDPWriteModel) reduceAddedEvent(e *idp.SAMLIDPAddedEvent) {
 	wm.Certificate = e.Certificate
 	wm.Binding = e.Binding
 	wm.WithSignedRequest = e.WithSignedRequest
+	wm.SignatureAlgorithm = e.SignatureAlgorithm
 	wm.NameIDFormat = e.NameIDFormat
 	wm.TransientMappingAttributeName = e.TransientMappingAttributeName
+	wm.FederatedLogoutEnabled = e.FederatedLogoutEnabled
 	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
@@ -1811,11 +1815,17 @@ func (wm *SAMLIDPWriteModel) reduceChangedEvent(e *idp.SAMLIDPChangedEvent) {
 	if e.WithSignedRequest != nil {
 		wm.WithSignedRequest = *e.WithSignedRequest
 	}
+	if e.SignatureAlgorithm != nil {
+		wm.SignatureAlgorithm = *e.SignatureAlgorithm
+	}
 	if e.NameIDFormat != nil {
 		wm.NameIDFormat = e.NameIDFormat
 	}
 	if e.TransientMappingAttributeName != nil {
 		wm.TransientMappingAttributeName = *e.TransientMappingAttributeName
+	}
+	if e.FederatedLogoutEnabled != nil {
+		wm.FederatedLogoutEnabled = *e.FederatedLogoutEnabled
 	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
@@ -1828,8 +1838,10 @@ func (wm *SAMLIDPWriteModel) NewChanges(
 	secretCrypto crypto.EncryptionAlgorithm,
 	binding string,
 	withSignedRequest bool,
+	signatureAlgorithm string,
 	nameIDFormat *domain.SAMLNameIDFormat,
 	transientMappingAttributeName string,
+	federatedLogoutEnabled bool,
 	options idp.Options,
 ) ([]idp.SAMLIDPChanges, error) {
 	changes := make([]idp.SAMLIDPChanges, 0)
@@ -1855,11 +1867,17 @@ func (wm *SAMLIDPWriteModel) NewChanges(
 	if wm.WithSignedRequest != withSignedRequest {
 		changes = append(changes, idp.ChangeSAMLWithSignedRequest(withSignedRequest))
 	}
+	if wm.SignatureAlgorithm != signatureAlgorithm {
+		changes = append(changes, idp.ChangeSAMLSignatureAlgorithm(signatureAlgorithm))
+	}
 	if wm.NameIDFormat != nameIDFormat {
 		changes = append(changes, idp.ChangeSAMLNameIDFormat(nameIDFormat))
 	}
 	if wm.TransientMappingAttributeName != transientMappingAttributeName {
 		changes = append(changes, idp.ChangeSAMLTransientMappingAttributeName(transientMappingAttributeName))
+	}
+	if wm.FederatedLogoutEnabled != federatedLogoutEnabled {
+		changes = append(changes, idp.ChangeSAMLFederatedLogoutEnabled(federatedLogoutEnabled))
 	}
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {
@@ -1893,12 +1911,16 @@ func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 	if wm.Binding != "" {
 		opts = append(opts, saml2.WithBinding(wm.Binding))
 	}
+	if wm.WithSignedRequest && wm.SignatureAlgorithm != "" {
+		opts = append(opts, saml2.WithSignatureAlgorithm(wm.SignatureAlgorithm))
+	}
 	if wm.NameIDFormat != nil {
 		opts = append(opts, saml2.WithNameIDFormat(*wm.NameIDFormat))
 	}
 	if wm.TransientMappingAttributeName != "" {
 		opts = append(opts, saml2.WithTransientMappingAttributeName(wm.TransientMappingAttributeName))
 	}
+	// TODO: ? if wm.FederatedLogoutEnabled
 	opts = append(opts, saml2.WithCustomRequestTracker(
 		requesttracker.New(
 			addRequest,
@@ -2299,4 +2321,47 @@ func (wm *AllIDPWriteModel) ToSAMLProvider(callbackURL string, idpAlg crypto.Enc
 		return nil, zerrors.ThrowInternal(nil, "COMMAND-csi30hdscv", "ErrorsIDPConfig.NotExisting")
 	}
 	return wm.samlModel.ToProvider(callbackURL, idpAlg, getRequest, addRequest)
+}
+
+type ZitadelIDPWriteModel struct {
+	eventstore.WriteModel
+
+	Name         string
+	ID           string
+	Issuer       string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       []string
+	idp.Options
+	InstanceRolesInfo []idp.RolesInfo
+
+	State domain.IDPState
+}
+
+func (wm *ZitadelIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.ZitadelIDPAddedEvent:
+			wm.reduceAddedEvent(e)
+		case *idp.ZitadelIDPChangedEvent:
+			// todo (@grvijayan): to please the linter for now
+			wm.reduceChangedEvent(e)
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *ZitadelIDPWriteModel) reduceAddedEvent(e *idp.ZitadelIDPAddedEvent) {
+	wm.Name = e.Name
+	wm.Issuer = e.Issuer
+	wm.ClientID = e.ClientID
+	wm.ClientSecret = e.ClientSecret
+	wm.Scopes = e.Scopes
+	wm.Options = e.Options
+	wm.InstanceRolesInfo = e.InstanceRolesInfo
+	wm.State = domain.IDPStateActive
+}
+
+func (wm *ZitadelIDPWriteModel) reduceChangedEvent(e *idp.ZitadelIDPChangedEvent) {
+	// todo (@grvijayan): will be implemented along with UpdateZitadelProvider changes
 }

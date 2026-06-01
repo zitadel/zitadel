@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { DetailFormComponent } from './detail-form.component';
+import { DetailFormMachineComponent } from './detail-form-machine.component';
 
 describe('DetailFormComponent', () => {
-  let component: DetailFormComponent;
-  let fixture: ComponentFixture<DetailFormComponent>;
+  let component: DetailFormMachineComponent;
+  let fixture: ComponentFixture<DetailFormMachineComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [DetailFormComponent],
+      declarations: [DetailFormMachineComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DetailFormComponent);
+    fixture = TestBed.createComponent(DetailFormMachineComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

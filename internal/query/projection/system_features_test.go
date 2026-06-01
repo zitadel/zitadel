@@ -24,7 +24,7 @@ func TestSystemFeaturesProjection_reduces(t *testing.T) {
 			args: args{
 				event: getEvent(
 					testEvent(
-						feature_v2.SystemLegacyIntrospectionEventType,
+						feature_v2.SystemUserSchemaEventType,
 						feature_v2.AggregateType,
 						[]byte(`{"value": true}`),
 					), eventstore.GenericEventMapper[feature_v2.SetEvent[bool]]),
@@ -36,9 +36,9 @@ func TestSystemFeaturesProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.system_features (key, creation_date, change_date, sequence, value) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (key) DO UPDATE SET (creation_date, change_date, sequence, value) = (projections.system_features.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.value)",
+							expectedStmt: "INSERT INTO projections.system_features4 (key, creation_date, change_date, sequence, value) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (key) DO UPDATE SET (creation_date, change_date, sequence, value) = (projections.system_features4.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.value)",
 							expectedArgs: []interface{}{
-								"legacy_introspection",
+								"user_schema",
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -66,7 +66,7 @@ func TestSystemFeaturesProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.system_features WHERE (key IS NOT NULL)",
+							expectedStmt: "DELETE FROM projections.system_features4 WHERE (key IS NOT NULL)",
 							expectedArgs: []interface{}{},
 						},
 					},

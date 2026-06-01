@@ -34,7 +34,6 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, LabelPolicyIconDarkRemovedEventType, LabelPolicyIconDarkRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LabelPolicyFontAddedEventType, LabelPolicyFontAddedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LabelPolicyFontRemovedEventType, LabelPolicyFontRemovedEventMapper)
-	eventstore.RegisterFilterEventMapper(AggregateType, LabelPolicyAssetsRemovedEventType, LabelPolicyAssetsRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LoginPolicyAddedEventType, LoginPolicyAddedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LoginPolicyChangedEventType, LoginPolicyChangedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LoginPolicyRemovedEventType, LoginPolicyRemovedEventMapper)
@@ -104,6 +103,7 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, AppleIDPChangedEventType, AppleIDPChangedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, SAMLIDPAddedEventType, SAMLIDPAddedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, SAMLIDPChangedEventType, SAMLIDPChangedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, ZitadelIDPAddedEventType, eventstore.GenericEventMapper[ZitadelIDPAddedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, IDPRemovedEventType, IDPRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, TriggerActionsSetEventType, TriggerActionsSetEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, TriggerActionsCascadeRemovedEventType, TriggerActionsCascadeRemovedEventMapper)
@@ -114,4 +114,5 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, NotificationPolicyAddedEventType, NotificationPolicyAddedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, NotificationPolicyChangedEventType, NotificationPolicyChangedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, NotificationPolicyRemovedEventType, NotificationPolicyRemovedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, HostedLoginTranslationSet, HostedLoginTranslationSetEventMapper)
 }

@@ -1,5 +1,5 @@
 import { Component, OnDestroy, signal } from '@angular/core';
-import { ActivatedRoute, Navigation, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
@@ -9,7 +9,7 @@ import { GrantedProject, Project } from 'src/app/proto/generated/zitadel/project
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { Framework } from 'src/app/components/quickstart/quickstart.component';
-import frameworkDefinition from '../../../../../docs/frameworks.json';
+import frameworkDefinition from '../../../../../apps/docs/frameworks.json';
 import { NavigationService } from 'src/app/services/navigation.service';
 import { Location } from '@angular/common';
 
@@ -17,6 +17,7 @@ import { Location } from '@angular/common';
   selector: 'cnsl-app-create',
   templateUrl: './app-create.component.html',
   styleUrls: ['./app-create.component.scss'],
+  standalone: false,
 })
 export class AppCreateComponent implements OnDestroy {
   public InfoSectionType: any = InfoSectionType;

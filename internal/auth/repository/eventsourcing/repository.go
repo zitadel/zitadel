@@ -32,7 +32,7 @@ type EsRepository struct {
 	eventstore.OrgRepository
 }
 
-func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *database.DB, esV2 *eventstore2.Eventstore, oidcEncryption crypto.EncryptionAlgorithm, userEncryption crypto.EncryptionAlgorithm) (*EsRepository, error) {
+func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *database.DB, esV2 *eventstore2.Eventstore, oidcEncryption crypto.AuthAlgorithm, userEncryption crypto.EncryptionAlgorithm) (*EsRepository, error) {
 	view, err := auth_view.StartView(dbClient, oidcEncryption, queries, esV2)
 	if err != nil {
 		return nil, err
@@ -125,7 +125,7 @@ func (q queryViewWrapper) UserGrantsByProjectAndUserID(ctx context.Context, proj
 		return nil, err
 	}
 	queries := &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantUserID, userGrantProjectID, activeQuery}}
-	grants, err := q.Queries.UserGrants(ctx, queries, true)
+	grants, err := q.Queries.UserGrants(ctx, queries, true, nil)
 	if err != nil {
 		return nil, err
 	}

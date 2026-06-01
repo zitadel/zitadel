@@ -7,7 +7,7 @@ import (
 func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, DefaultOrgSetEventType, DefaultOrgSetMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, ProjectSetEventType, ProjectSetMapper)
-	eventstore.RegisterFilterEventMapper(AggregateType, ConsoleSetEventType, ConsoleSetMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, ManagementConsoleSetEventType, ManagementConsoleSetMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, DefaultLanguageSetEventType, DefaultLanguageSetMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, SecretGeneratorAddedEventType, SecretGeneratorAddedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, SecretGeneratorChangedEventType, SecretGeneratorChangedEventMapper)
@@ -53,7 +53,6 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, LabelPolicyIconDarkRemovedEventType, LabelPolicyIconDarkRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LabelPolicyFontAddedEventType, LabelPolicyFontAddedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LabelPolicyFontRemovedEventType, LabelPolicyFontRemovedEventMapper)
-	eventstore.RegisterFilterEventMapper(AggregateType, LabelPolicyAssetsRemovedEventType, LabelPolicyAssetsRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LoginPolicyAddedEventType, LoginPolicyAddedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LoginPolicyChangedEventType, LoginPolicyChangedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, DomainPolicyAddedEventType, DomainPolicyAddedEventMapper)
@@ -106,6 +105,7 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, SAMLIDPAddedEventType, SAMLIDPAddedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, SAMLIDPChangedEventType, SAMLIDPChangedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, IDPRemovedEventType, IDPRemovedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, ZitadelIDPAddedEventType, eventstore.GenericEventMapper[ZitadelIDPAddedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, LoginPolicyIDPProviderAddedEventType, IdentityProviderAddedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LoginPolicyIDPProviderRemovedEventType, IdentityProviderRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LoginPolicyIDPProviderCascadeRemovedEventType, IdentityProviderCascadeRemovedEventMapper)
@@ -130,4 +130,5 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, NotificationPolicyChangedEventType, NotificationPolicyChangedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, TrustedDomainAddedEventType, eventstore.GenericEventMapper[TrustedDomainAddedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, TrustedDomainRemovedEventType, eventstore.GenericEventMapper[TrustedDomainRemovedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, HostedLoginTranslationSet, HostedLoginTranslationSetEventMapper)
 }

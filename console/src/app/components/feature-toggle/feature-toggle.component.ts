@@ -1,4 +1,4 @@
-import { AsyncPipe, NgIf, UpperCasePipe } from '@angular/common';
+import { AsyncPipe, UpperCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -11,7 +11,6 @@ import { ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Component({
-  standalone: true,
   selector: 'cnsl-feature-toggle',
   templateUrl: './feature-toggle.component.html',
   styleUrls: ['./feature-toggle.component.scss'],
@@ -24,7 +23,6 @@ import { map } from 'rxjs/operators';
     MatTooltipModule,
     InfoSectionModule,
     AsyncPipe,
-    NgIf,
   ],
 })
 export class FeatureToggleComponent<TKey extends ToggleStateKeys, TValue extends ToggleStates[TKey]> {

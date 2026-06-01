@@ -143,6 +143,7 @@ func CheckOTPSMS(code string) SessionCommand {
 			cmd.getCodeVerifier,
 			succeededEvent,
 			failedEvent,
+			cmd.tarpit,
 		)
 		if err != nil {
 			return commands, err
@@ -183,6 +184,7 @@ func CheckOTPEmail(code string) SessionCommand {
 			nil, // email currently always uses local code checks
 			succeededEvent,
 			failedEvent,
+			cmd.tarpit,
 		)
 		if err != nil {
 			return commands, err

@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"encoding/base64"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -21,6 +20,7 @@ type AddPat struct {
 
 type PersonalAccessToken struct {
 	models.ObjectRoot
+	PermissionCheck PermissionCheck
 
 	ExpirationDate  time.Time
 	Scopes          []string
@@ -43,7 +43,7 @@ func NewPersonalAccessToken(resourceOwner string, userID string, expirationDate 
 }
 
 func (pat *PersonalAccessToken) content() error {
-	if pat.ResourceOwner == "" {
+	if pat.ResourceOwner == "" && pat.PermissionCheck == nil {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-xs0k2n", "Errors.ResourceOwnerMissing")
 	}
 	if pat.AggregateID == "" {
@@ -84,7 +84,7 @@ func (c *Commands) AddPersonalAccessToken(ctx context.Context, pat *PersonalAcce
 			return nil, err
 		}
 	}
-	validation := prepareAddPersonalAccessToken(pat, c.keyAlgorithm)
+	validation := prepareAddPersonalAccessToken(pat, c.authAlgorithm)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -100,7 +100,7 @@ func (c *Commands) AddPersonalAccessToken(ctx context.Context, pat *PersonalAcce
 	}, nil
 }
 
-func prepareAddPersonalAccessToken(pat *PersonalAccessToken, algorithm crypto.EncryptionAlgorithm) preparation.Validation {
+func prepareAddPersonalAccessToken(pat *PersonalAccessToken, algorithm crypto.AuthAlgorithm) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if err := pat.valid(); err != nil {
 			return nil, err
@@ -109,12 +109,11 @@ func prepareAddPersonalAccessToken(pat *PersonalAccessToken, algorithm crypto.En
 			if err := pat.checkAggregate(ctx, filter); err != nil {
 				return nil, err
 			}
-			writeModel, err := getPersonalAccessTokenWriteModelByID(ctx, filter, pat.AggregateID, pat.TokenID, pat.ResourceOwner)
+			writeModel, err := getPersonalAccessTokenWriteModelByID(ctx, filter, pat.AggregateID, pat.TokenID, pat.ResourceOwner, pat.PermissionCheck)
 			if err != nil {
 				return nil, err
 			}
-
-			pat.Token, err = createToken(algorithm, writeModel.TokenID, writeModel.AggregateID)
+			pat.Token, err = algorithm.EncryptToken(pat.TokenID + ":" + pat.AggregateID)
 			if err != nil {
 				return nil, err
 			}
@@ -155,7 +154,7 @@ func prepareRemovePersonalAccessToken(pat *PersonalAccessToken) preparation.Vali
 			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (_ []eventstore.Command, err error) {
-			writeModel, err := getPersonalAccessTokenWriteModelByID(ctx, filter, pat.AggregateID, pat.TokenID, pat.ResourceOwner)
+			writeModel, err := getPersonalAccessTokenWriteModelByID(ctx, filter, pat.AggregateID, pat.TokenID, pat.ResourceOwner, pat.PermissionCheck)
 			if err != nil {
 				return nil, err
 			}
@@ -173,24 +172,18 @@ func prepareRemovePersonalAccessToken(pat *PersonalAccessToken) preparation.Vali
 	}
 }
 
-func createToken(algorithm crypto.EncryptionAlgorithm, tokenID, userID string) (string, error) {
-	encrypted, err := algorithm.Encrypt([]byte(tokenID + ":" + userID))
-	if err != nil {
-		return "", err
-	}
-	return base64.RawURLEncoding.EncodeToString(encrypted), nil
-}
-
-func getPersonalAccessTokenWriteModelByID(ctx context.Context, filter preparation.FilterToQueryReducer, userID, tokenID, resourceOwner string) (_ *PersonalAccessTokenWriteModel, err error) {
+func getPersonalAccessTokenWriteModelByID(ctx context.Context, filter preparation.FilterToQueryReducer, userID, tokenID, resourceOwner string, check PermissionCheck) (_ *PersonalAccessTokenWriteModel, err error) {
 	writeModel := NewPersonalAccessTokenWriteModel(userID, tokenID, resourceOwner)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
 		return nil, err
 	}
-	if len(events) == 0 {
-		return writeModel, nil
-	}
 	writeModel.AppendEvents(events...)
-	err = writeModel.Reduce()
+	if err = writeModel.Reduce(); err != nil {
+		return nil, err
+	}
+	if check != nil {
+		err = check(writeModel.ResourceOwner, writeModel.AggregateID)
+	}
 	return writeModel, err
 }

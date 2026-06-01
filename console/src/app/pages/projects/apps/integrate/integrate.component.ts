@@ -1,34 +1,16 @@
-import { C, COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
-import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { Location } from '@angular/common';
-import { Component, OnDestroy, OnInit, Signal, computed, effect, signal } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { Component, OnDestroy, OnInit, effect, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Buffer } from 'buffer';
-import { BehaviorSubject, Subject, Subscription, combineLatest } from 'rxjs';
-import { debounceTime, map, takeUntil } from 'rxjs/operators';
-import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
-import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
-import {
-  APIAuthMethodType,
-  OIDCAppType,
-  OIDCAuthMethodType,
-  OIDCGrantType,
-  OIDCResponseType,
-} from 'src/app/proto/generated/zitadel/app_pb';
-import {
-  AddAPIAppRequest,
-  AddAPIAppResponse,
-  AddOIDCAppRequest,
-  AddOIDCAppResponse,
-  AddSAMLAppRequest,
-} from 'src/app/proto/generated/zitadel/management_pb';
+import { ActivatedRoute, Router } from '@angular/router';
+import { BehaviorSubject, Subject, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { OIDCAppType } from 'src/app/proto/generated/zitadel/app_pb';
+import { AddAPIAppResponse, AddOIDCAppRequest, AddOIDCAppResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
+import { AppSecretDialogComponent, AppSecretDialogData } from '../app-secret-dialog/app-secret-dialog.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { Framework } from 'src/app/components/quickstart/quickstart.component';
 import { OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
@@ -39,6 +21,7 @@ import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.com
   selector: 'cnsl-integrate',
   templateUrl: './integrate.component.html',
   styleUrls: ['./integrate.component.scss'],
+  standalone: false,
 })
 export class IntegrateAppComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject();
@@ -186,7 +169,7 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
     if (added.clientId) {
       clientId = added.clientId;
     }
-    const dialogRef = this.dialog.open(AppSecretDialogComponent, {
+    const dialogRef = this.dialog.open<AppSecretDialogComponent, AppSecretDialogData>(AppSecretDialogComponent, {
       data: {
         clientSecret: clientSecret,
         clientId: clientId,

@@ -1,0 +1,97 @@
+{
+  "name": "@zitadel/client",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./v1": {
+      "types": {
+        "import": "./dist/v1.d.ts",
+        "require": "./dist/v1.d.cts",
+        "default": "./dist/v1.d.ts"
+      },
+      "import": "./dist/v1.js",
+      "require": "./dist/v1.cjs"
+    },
+    "./v2": {
+      "types": {
+        "import": "./dist/v2.d.ts",
+        "require": "./dist/v2.d.cts",
+        "default": "./dist/v2.d.ts"
+      },
+      "import": "./dist/v2.js",
+      "require": "./dist/v2.cjs"
+    },
+    "./v3alpha": {
+      "types": {
+        "import": "./dist/v3alpha.d.ts",
+        "require": "./dist/v3alpha.d.cts",
+        "default": "./dist/v3alpha.d.ts"
+      },
+      "import": "./dist/v3alpha.js",
+      "require": "./dist/v3alpha.cjs"
+    },
+    "./node": {
+      "types": {
+        "import": "./dist/node.d.ts",
+        "require": "./dist/node.d.cts",
+        "default": "./dist/node.d.ts"
+      },
+      "import": "./dist/node.js",
+      "require": "./dist/node.cjs"
+    },
+    "./web": {
+      "types": {
+        "import": "./dist/web.d.ts",
+        "require": "./dist/web.d.cts",
+        "default": "./dist/web.d.ts"
+      },
+      "import": "./dist/web.js",
+      "require": "./dist/web.cjs"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "lint-check-eslint": "eslint .",
+    "lint-check-knip": "knip",
+    "test-unit": "vitest --run",
+    "clean": "rm -rf node_modules dist"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.12.0",
+    "@connectrpc/connect": "^2.1.1",
+    "@connectrpc/connect-node": "^2.1.1",
+    "@connectrpc/connect-web": "^2.1.1",
+    "@zitadel/proto": "workspace:*",
+    "jose": "^5.10.0"
+  },
+  "devDependencies": {
+    "@bufbuild/protocompile": "^0.0.1",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.6.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.1",
+    "@typescript-eslint/parser": "^8.59.1",
+    "eslint": "^10.2.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
+    "globals": "^17.5.0",
+    "knip": "^6.7.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.5"
+  }
+}

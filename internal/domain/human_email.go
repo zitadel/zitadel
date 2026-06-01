@@ -1,8 +1,9 @@
 package domain
 
 import (
+	"errors"
 	"io"
-	"regexp"
+	"net/mail"
 	"strings"
 	"time"
 
@@ -11,18 +12,20 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-var (
-	emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
-)
-
 type EmailAddress string
+
+var errEmailNameProvided = errors.New("email with name provided")
 
 func (e EmailAddress) Validate() error {
 	if e == "" {
 		return zerrors.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty")
 	}
-	if !emailRegex.MatchString(string(e)) {
-		return zerrors.ThrowInvalidArgument(nil, "EMAIL-599BI", "Errors.User.Email.Invalid")
+	p, err := mail.ParseAddress(string(e))
+	if err != nil {
+		return zerrors.ThrowInvalidArgument(err, "EMAIL-599BI", "Errors.User.Email.Invalid")
+	}
+	if p.Name != "" {
+		return zerrors.ThrowInvalidArgument(errEmailNameProvided, "EMAIL-599GV", "Errors.User.Email.Invalid")
 	}
 	return nil
 }

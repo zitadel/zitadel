@@ -117,7 +117,8 @@ func NewDomainVerificationAddedEvent(
 	aggregate *eventstore.Aggregate,
 	domain string,
 	validationType domain.OrgDomainValidationType,
-	validationCode *crypto.CryptoValue) *DomainVerificationAddedEvent {
+	validationCode *crypto.CryptoValue,
+) *DomainVerificationAddedEvent {
 	return &DomainVerificationAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,

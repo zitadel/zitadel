@@ -39,7 +39,7 @@ func ListQueryToQuery(query *object.ListQuery) (offset, limit uint64, asc bool) 
 	if query == nil {
 		return 0, 0, false
 	}
-	return query.Offset, uint64(query.Limit), query.Asc
+	return query.Offset, uint64(query.GetLimit()), query.GetAsc()
 }
 
 func ResourceOwnerFromReq(ctx context.Context, req *object.RequestContext) string {

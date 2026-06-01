@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	InstanceFeatureTable = "projections.instance_features2"
+	InstanceFeatureTable = "projections.instance_features5"
 
 	InstanceFeatureInstanceIDCol   = "instance_id"
 	InstanceFeatureKeyCol          = "key"
@@ -65,19 +65,7 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{
-				Event:  feature_v2.InstanceTriggerIntrospectionProjectionsEventType,
-				Reduce: reduceInstanceSetFeature[bool],
-			},
-			{
-				Event:  feature_v2.InstanceLegacyIntrospectionEventType,
-				Reduce: reduceInstanceSetFeature[bool],
-			},
-			{
 				Event:  feature_v2.InstanceUserSchemaEventType,
-				Reduce: reduceInstanceSetFeature[bool],
-			},
-			{
-				Event:  feature_v2.InstanceTokenExchangeEventType,
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{
@@ -85,23 +73,11 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 				Reduce: reduceInstanceSetFeature[[]feature.ImprovedPerformanceType],
 			},
 			{
-				Event:  feature_v2.InstanceWebKeyEventType,
-				Reduce: reduceInstanceSetFeature[bool],
-			},
-			{
 				Event:  feature_v2.InstanceDebugOIDCParentErrorEventType,
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{
 				Event:  feature_v2.InstanceOIDCSingleV1SessionTerminationEventType,
-				Reduce: reduceInstanceSetFeature[bool],
-			},
-			{
-				Event:  feature_v2.InstanceDisableUserTokenEvent,
-				Reduce: reduceInstanceSetFeature[bool],
-			},
-			{
-				Event:  feature_v2.InstanceEnableBackChannelLogout,
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{
@@ -113,12 +89,16 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{
-				Event:  feature_v2.InstanceConsoleUseV2UserApi,
+				Event:  feature_v2.InstanceManagementConsoleUseV2UserApi,
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{
 				Event:  instance.InstanceRemovedEventType,
 				Reduce: reduceInstanceRemovedHelper(InstanceDomainInstanceIDCol),
+			},
+			{
+				Event:  feature_v2.InstanceEnableRelationalTables,
+				Reduce: reduceInstanceSetFeature[bool],
 			},
 		},
 	}}

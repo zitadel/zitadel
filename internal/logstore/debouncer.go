@@ -25,7 +25,7 @@ type debouncer[T LogRecord[T]] struct {
 	// However, debouncer starts a go routine that triggers side effects itself.
 	// So, there is no incoming context.Context available when these events trigger.
 	// The only context we can use for the side effects is the app context.
-	// Because this can be cancelled by os signals, it's the better solution than creating new background contexts.
+	// Because this can be canceled by os signals, it's the better solution than creating new background contexts.
 	binarySignaledCtx context.Context
 	clock             clock.Clock
 	ticker            *clock.Ticker

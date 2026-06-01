@@ -6,7 +6,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -17,8 +16,8 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func TestServer_SetPhone(t *testing.T) {
-	userID := Instance.CreateHumanUser(CTX).GetUserId()
+func TestServer_Deprecated_SetPhone(t *testing.T) {
+	userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 
 	tests := []struct {
 		name    string
@@ -106,7 +105,7 @@ func TestServer_SetPhone(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.SetPhone(CTX, tt.req)
+			got, err := Client.SetPhone(OrgCTX, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -122,8 +121,8 @@ func TestServer_SetPhone(t *testing.T) {
 }
 
 func TestServer_ResendPhoneCode(t *testing.T) {
-	userID := Instance.CreateHumanUser(CTX).GetUserId()
-	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, gofakeit.Email(), gofakeit.Phone()).GetUserId()
+	userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	verifiedUserID := Instance.CreateHumanUserVerified(OrgCTX, Instance.DefaultOrg.Id, integration.Email(), integration.Phone()).GetUserId()
 
 	tests := []struct {
 		name    string
@@ -181,7 +180,7 @@ func TestServer_ResendPhoneCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.ResendPhoneCode(CTX, tt.req)
+			got, err := Client.ResendPhoneCode(OrgCTX, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -197,7 +196,7 @@ func TestServer_ResendPhoneCode(t *testing.T) {
 }
 
 func TestServer_VerifyPhone(t *testing.T) {
-	userResp := Instance.CreateHumanUser(CTX)
+	userResp := Instance.CreateHumanUser(OrgCTX)
 	tests := []struct {
 		name    string
 		req     *user.VerifyPhoneRequest
@@ -237,7 +236,7 @@ func TestServer_VerifyPhone(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.VerifyPhone(CTX, tt.req)
+			got, err := Client.VerifyPhone(OrgCTX, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -249,14 +248,14 @@ func TestServer_VerifyPhone(t *testing.T) {
 	}
 }
 
-func TestServer_RemovePhone(t *testing.T) {
-	userResp := Instance.CreateHumanUser(CTX)
-	failResp := Instance.CreateHumanUserNoPhone(CTX)
-	otherUser := Instance.CreateHumanUser(CTX).GetUserId()
-	doubleRemoveUser := Instance.CreateHumanUser(CTX)
+func TestServer_Deprecated_RemovePhone(t *testing.T) {
+	userResp := Instance.CreateHumanUser(OrgCTX)
+	failResp := Instance.CreateHumanUserNoPhone(OrgCTX)
+	otherUser := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	doubleRemoveUser := Instance.CreateHumanUser(OrgCTX)
 
-	Instance.RegisterUserPasskey(CTX, otherUser)
-	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
+	Instance.RegisterUserPasskey(OrgCTX, otherUser)
+	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, otherUser)
 
 	tests := []struct {
 		name    string
@@ -268,7 +267,7 @@ func TestServer_RemovePhone(t *testing.T) {
 	}{
 		{
 			name: "remove phone",
-			ctx:  CTX,
+			ctx:  OrgCTX,
 			req: &user.RemovePhoneRequest{
 				UserId: userResp.GetUserId(),
 			},
@@ -285,7 +284,7 @@ func TestServer_RemovePhone(t *testing.T) {
 		},
 		{
 			name: "user without phone",
-			ctx:  CTX,
+			ctx:  OrgCTX,
 			req: &user.RemovePhoneRequest{
 				UserId: failResp.GetUserId(),
 			},
@@ -296,7 +295,7 @@ func TestServer_RemovePhone(t *testing.T) {
 		},
 		{
 			name: "remove previously deleted phone",
-			ctx:  CTX,
+			ctx:  OrgCTX,
 			req: &user.RemovePhoneRequest{
 				UserId: doubleRemoveUser.GetUserId(),
 			},
@@ -309,7 +308,7 @@ func TestServer_RemovePhone(t *testing.T) {
 		},
 		{
 			name:    "no user id",
-			ctx:     CTX,
+			ctx:     OrgCTX,
 			req:     &user.RemovePhoneRequest{},
 			wantErr: true,
 			dep: func(ctx context.Context, userID string) (*user.RemovePhoneResponse, error) {
@@ -318,7 +317,7 @@ func TestServer_RemovePhone(t *testing.T) {
 		},
 		{
 			name: "other user, no permission",
-			ctx:  integration.WithAuthorizationToken(CTX, sessionTokenOtherUser),
+			ctx:  integration.WithAuthorizationToken(OrgCTX, sessionTokenOtherUser),
 			req: &user.RemovePhoneRequest{
 				UserId: userResp.GetUserId(),
 			},

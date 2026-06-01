@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/v2/database"
 )
 
@@ -74,13 +76,13 @@ func TestPaginationOpt(t *testing.T) {
 			name: "global position greater",
 			args: args{
 				opts: []paginationOpt{
-					GlobalPositionGreater(&GlobalPosition{Position: 10}),
+					GlobalPositionGreater(&GlobalPosition{Position: decimal.NewFromInt(10)}),
 				},
 			},
 			want: &Pagination{
 				position: &PositionCondition{
 					min: &GlobalPosition{
-						Position:        10,
+						Position:        decimal.NewFromInt(10),
 						InPositionOrder: 0,
 					},
 				},
@@ -90,13 +92,13 @@ func TestPaginationOpt(t *testing.T) {
 			name: "position greater",
 			args: args{
 				opts: []paginationOpt{
-					PositionGreater(10, 0),
+					PositionGreater(decimal.NewFromInt(10), 0),
 				},
 			},
 			want: &Pagination{
 				position: &PositionCondition{
 					min: &GlobalPosition{
-						Position:        10,
+						Position:        decimal.NewFromInt(10),
 						InPositionOrder: 0,
 					},
 				},
@@ -107,13 +109,13 @@ func TestPaginationOpt(t *testing.T) {
 			name: "position less",
 			args: args{
 				opts: []paginationOpt{
-					PositionLess(10, 12),
+					PositionLess(decimal.NewFromInt(10), 12),
 				},
 			},
 			want: &Pagination{
 				position: &PositionCondition{
 					max: &GlobalPosition{
-						Position:        10,
+						Position:        decimal.NewFromInt(10),
 						InPositionOrder: 12,
 					},
 				},
@@ -123,13 +125,13 @@ func TestPaginationOpt(t *testing.T) {
 			name: "global position less",
 			args: args{
 				opts: []paginationOpt{
-					GlobalPositionLess(&GlobalPosition{Position: 12, InPositionOrder: 24}),
+					GlobalPositionLess(&GlobalPosition{Position: decimal.NewFromInt(12), InPositionOrder: 24}),
 				},
 			},
 			want: &Pagination{
 				position: &PositionCondition{
 					max: &GlobalPosition{
-						Position:        12,
+						Position:        decimal.NewFromInt(12),
 						InPositionOrder: 24,
 					},
 				},
@@ -140,19 +142,19 @@ func TestPaginationOpt(t *testing.T) {
 			args: args{
 				opts: []paginationOpt{
 					PositionBetween(
-						&GlobalPosition{10, 12},
-						&GlobalPosition{20, 0},
+						&GlobalPosition{decimal.NewFromInt(10), 12},
+						&GlobalPosition{decimal.NewFromInt(20), 0},
 					),
 				},
 			},
 			want: &Pagination{
 				position: &PositionCondition{
 					min: &GlobalPosition{
-						Position:        10,
+						Position:        decimal.NewFromInt(10),
 						InPositionOrder: 12,
 					},
 					max: &GlobalPosition{
-						Position:        20,
+						Position:        decimal.NewFromInt(20),
 						InPositionOrder: 0,
 					},
 				},

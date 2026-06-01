@@ -84,11 +84,11 @@ func EmailQueryToQuery(q *user_pb.EmailQuery) (query.SearchQuery, error) {
 }
 
 func StateQueryToQuery(q *user_pb.StateQuery) (query.SearchQuery, error) {
-	return query.NewUserStateSearchQuery(int32(q.State))
+	return query.NewUserStateSearchQuery(q.State.ToDomain())
 }
 
 func TypeQueryToQuery(q *user_pb.TypeQuery) (query.SearchQuery, error) {
-	return query.NewUserTypeSearchQuery(int32(q.Type))
+	return query.NewUserTypeSearchQuery(q.Type.ToDomain())
 }
 
 func LoginNameQueryToQuery(q *user_pb.LoginNameQuery) (query.SearchQuery, error) {

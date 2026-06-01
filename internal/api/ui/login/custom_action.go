@@ -40,7 +40,7 @@ func (l *Login) runPostExternalAuthenticationActions(
 		// so let's do a workaround and resourceOwnerOfUserIDPLink if there would be a IDP link
 		resourceOwner, err = l.resourceOwnerOfUserIDPLink(ctx, authRequest.SelectedIDPConfigID, user.ExternalUserID)
 		logging.WithFields("authReq", authRequest.ID, "idpID", authRequest.SelectedIDPConfigID).OnError(err).
-			Warn("could not determine resource owner for runPostExternalAuthenticationActions, fall back to default org id")
+			Warn("could not determine Organization ID for runPostExternalAuthenticationActions, fall back to default org id")
 	}
 	// fallback to default org id
 	if resourceOwner == "" {
@@ -127,9 +127,10 @@ func (l *Login) runPostExternalAuthenticationActions(
 						return func(goja.FunctionCall) goja.Value {
 							metadata, err := l.query.SearchOrgMetadata(
 								ctx,
-								true,
+								false,
 								resourceOwner,
 								&query.OrgMetadataSearchQueries{},
+								false,
 								false,
 							)
 							if err != nil {
@@ -169,6 +170,7 @@ const (
 	authMethodOTP          authMethod = "OTP"
 	authMethodOTPSMS       authMethod = "OTP SMS"
 	authMethodOTPEmail     authMethod = "OTP Email"
+	authMethodRecoveryCode authMethod = "recovery code"
 	authMethodU2F          authMethod = "U2F"
 	authMethodPasswordless authMethod = "passwordless"
 )
@@ -321,9 +323,10 @@ func (l *Login) runPreCreationActions(
 						return func(goja.FunctionCall) goja.Value {
 							metadata, err := l.query.SearchOrgMetadata(
 								ctx,
-								true,
+								false,
 								resourceOwner,
 								&query.OrgMetadataSearchQueries{},
+								false,
 								false,
 							)
 							if err != nil {
@@ -397,9 +400,10 @@ func (l *Login) runPostCreationActions(
 						return func(goja.FunctionCall) goja.Value {
 							metadata, err := l.query.SearchOrgMetadata(
 								ctx,
-								true,
+								false,
 								resourceOwner,
 								&query.OrgMetadataSearchQueries{},
+								false,
 								false,
 							)
 							if err != nil {

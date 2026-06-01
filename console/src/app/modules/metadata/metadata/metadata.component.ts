@@ -5,7 +5,6 @@ import { Observable, ReplaySubject } from 'rxjs';
 import { Metadata as MetadataV2 } from '@zitadel/proto/zitadel/metadata_pb';
 import { map, startWith } from 'rxjs/operators';
 import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
-import { Buffer } from 'buffer';
 
 type StringMetadata = {
   key: string;
@@ -16,6 +15,7 @@ type StringMetadata = {
   selector: 'cnsl-metadata',
   templateUrl: './metadata.component.html',
   styleUrls: ['./metadata.component.scss'],
+  standalone: false,
 })
 export class MetadataComponent implements OnInit {
   @Input({ required: true }) public set metadata(metadata: (Metadata.AsObject | MetadataV2)[]) {
@@ -37,12 +37,13 @@ export class MetadataComponent implements OnInit {
 
   ngOnInit() {
     this.dataSource$ = this.metadata$.pipe(
-      map((metadata) =>
-        metadata.map(({ key, value }) => ({
+      map((metadata) => {
+        const decoder = new TextDecoder();
+        return metadata.map(({ key, value }) => ({
           key,
-          value: Buffer.from(value as any as string, 'base64').toString('utf-8'),
-        })),
-      ),
+          value: typeof value === 'string' ? value : decoder.decode(value),
+        }));
+      }),
       startWith([] as StringMetadata[]),
       map((metadata) => new MatTableDataSource(metadata)),
     );

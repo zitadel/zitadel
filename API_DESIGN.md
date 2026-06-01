@@ -4,6 +4,7 @@ This document describes the design principles and conventions for the ZITADEL AP
 endpoints of the proprietary ZITADEL API and does not cover any standardized APIs like OAuth 2, OpenID Connect or SCIM.  
 
 ## The Basics
+
 ZITADEL follows an API first approach. This means all features can not only be accessed via the UI but also via the API.
 The API is designed using the Protobuf specification. The Protobuf specification is then used to generate the API client
 and server code in different programming languages.
@@ -48,6 +49,52 @@ When creating a new service, start with version `2`, as version `1` is reserved 
 
 Please check out the structure Buf style guide for more information about the folder and package structure: https://buf.build/docs/best-practices/style-guide/
 
+### Deprecations
+
+As a rule of thumb, redundant API methods are deprecated.
+
+- The proto option `grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation.deprecated` MUST be set to true.
+- One or more links to recommended replacement methods CAN be added to the deprecation message as a proto comment above the rpc spec.
+- Guidance for switching to the recommended methods for common use cases SHOULD be added as a proto comment above the rpc spec.
+
+#### Example
+
+```protobuf
+// Delete the user phone
+//
+// Deprecated: [Update the user's phone field](apis/resources/user_service_v2/user-service-update-user.api.mdx) to remove the phone number.
+//
+// Delete the phone number of a user.
+rpc RemovePhone(RemovePhoneRequest) returns (RemovePhoneResponse) {
+  option (google.api.http) = {
+    delete: "/v2/users/{user_id}/phone"
+    body: "*"
+  };
+
+  option (zitadel.protoc_gen_zitadel.v2.options) = {
+    auth_option: {
+      permission: "authenticated"
+    }
+  };
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    deprecated: true;
+    responses: {
+      key: "200"
+      value: {
+        description: "OK";
+      }
+    };
+    responses: {
+      key: "404";
+      value: {
+        description: "User ID does not exist.";
+      }
+    }
+  };
+}
+```
+
 ### Explicitness
 
 Make the handling of the API as explicit as possible. Do not make assumptions about the client's knowledge of the system or the API. 
@@ -73,6 +120,8 @@ For example, use `organization_id` instead of **org_id** or **resource_owner** f
 
 #### Resources and Fields
 
+##### Context information in Requests
+
 When a context is required for creating a resource, the context is added as a field to the resource.
 For example, when creating a new user, the organization's id is required. The `organization_id` is added as a field to the `CreateUserRequest`.
 
@@ -87,8 +136,69 @@ message CreateUserRequest {
 ```
 
 Only allow providing a context where it is required. The context MUST not be provided if not required.
+If the context is required but deferrable, the context can be defaulted.
+For example, creating an Authorization without an organization id will default the organization id to the projects resource owner.
 For example, when retrieving or updating a user, the `organization_id` is not required, since the user can be determined by the user's id.
 However, it is possible to provide the `organization_id` as a filter to retrieve a list of users of a specific organization.
+
+##### Context information in Responses
+
+When the action of creation, update or deletion of a resource was successful, the returned response has to include the time of the operation and the generated identifiers.
+This is achieved through the addition of a timestamp attribute with the operation as a prefix, and the generated information as separate attributes.
+
+```protobuf
+message SetExecutionResponse {
+  // The timestamp of the execution set.
+  google.protobuf.Timestamp set_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}
+
+message CreateTargetResponse {
+  // The unique identifier of the newly created target.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // The timestamp of the target creation.
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // Key used to sign and check payload sent to the target.
+  string signing_key = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"98KmsU67\""
+    }
+  ];
+}
+
+message UpdateProjectGrantResponse {
+  // The timestamp of the change of the project grant.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message DeleteProjectGrantResponse {
+  // The timestamp of the deletion of the project grant.
+  // Note that the deletion date is only guaranteed to be set if the deletion was successful during the request.
+  // In case the deletion occurred in a previous request, the deletion date might be empty.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+```
+
+##### Global messages
 
 Prevent the creation of global messages that are used in multiple resources unless they always follow the same pattern.
 Use dedicated fields as described above or create a separate message for the specific context, that is only used in the boundary of the same resource.  
@@ -97,7 +207,11 @@ In this case, the settings could share the same `SettingsContext` message to det
 But do not create a global `Context` message that is used across the whole API if there are different scenarios and different fields required for the context.  
 The same applies to messages that are returned by multiple resources.  
 For example, information about the `User` might be different when managing the user resource itself than when it's returned
-as part of an authorization or a manager role, where only limited information is needed.
+as part of an authorization or an administrator role, where only limited information is needed.
+
+On the other hand, types that always follow the same pattern and are used in multiple resources, such as `IDFilter`, `TimestampFilter` or `InIDsFilter` SHOULD be globalized and reused.
+
+##### Re-using messages
 
 Prevent reusing messages for the creation and the retrieval of a resource.
 Returning messages might contain additional information that is not required or even not available for the creation of the resource.  
@@ -139,7 +253,7 @@ Methods on a resource MUST be named using the following convention:
 | Create    | Create\<resource\> | Create a new resource. If the new resource conflicts with an existing resources uniqueness (id, loginname, ...) the creation MUST be prevented and an error returned.                                                                       |
 | Update    | Update\<resource\> | Update an existing resource. In most cases this SHOULD allow partial updates. If there are exception, they MUST be explicitly documented on the endpoint. The resource MUST already exists. An error is returned otherwise.                 |
 | Delete    | Delete\<resource\> | Delete an existing resource. If the resource does not exist, no error SHOULD be returned. In case of an exception to this rule, the behavior MUST clearly be documented.                                                                    |
-| Set       | Set\<resource\>    | Set a resource. This will replace the existing resource with the new resource. In case where the creation and update of a resource do not need to be differentiated, a single `Set` method SHOULD be used. It SHOULD allow partial changes. |
+| Set       | Set\<resource\>    | Set a resource. This will replace the existing resource with the new resource. In case where the creation and update of a resource do not need to be differentiated, a single `Set` method SHOULD be used. |
 | Get       | Get\<resource\>    | Retrieve a single resource by its unique identifier. If the resource does not exist, an error MUST be returned.                                                                                                                             |
 | List      | List\<resource\>   | Retrieve a list of resources. The endpoint SHOULD provide options to filter, sort and paginate.                                                                                                                                             |
 
@@ -157,12 +271,41 @@ Additionally, state changes, specific actions or operations that do not fit into
 - `Send` for sending a resource.
 - etc.
 
+#### REST Path (Deprecated)
+
+> [!NOTE]
+> REST path annotation is deprecated and MUST only be used for existing services still using REST.
+> All new services MUST use connectRPC, which allows clients to call the API using connectRPC, gRPC and also HTTP/1.1 
+> without the need for additional REST annotations.
+
+Paths of operations MUST be structured as follows:
+
+| Operation     | Method | Path                                     |
+|---------------|--------|------------------------------------------|
+| Create/Add    | POST   | /\<version\>/\<resource\>                |
+| Update        | POST   | /\<version\>/\<resource\>/\<identifier\> |
+| Delete/Remove | DELETE | /\<version\>/\<resource\>/\<identifier\> |
+| Set           | PUT    | /\<version\>/\<resource\>                |
+| Get           | GET    | /\<version\>/\<resource\>/\<identifier\> |
+| List          | POST   | /\<version\>/\<resource\>/search         |
+
+Which results in an example path for operations like `/v2beta/users/search`.
+
+Paths of status changes on resources MUST be structured as follows:
+
+| Operation  | Method | Path                                                |
+|------------|--------|-----------------------------------------------------|
+| Activate   | POST   | /\<version\>/\<resource\>/\<identifier\>/activate   |
+| Deactivate | POST   | /\<version\>/\<resource\>/\<identifier\>/deactivate |
+
+Which results in an example path for status changes like `/v2beta/users/1234567890/activate`.
+
 ## Authentication and Authorization
 
 The API uses OAuth 2 for authorization. There are corresponding middlewares that check the access token for validity and 
 automatically return an error if the token is invalid.
 
-Permissions grated to the user might be organization specific and can therefore only be checked based on the queried resource.
+Permissions granted to the user might be organization specific and can therefore only be checked based on the queried resource.
 In such case, the API does not check the permissions itself but relies on the checks of the functions that are called by the API.
 If the permission can be checked by the API itself, e.g. if the permission is instance wide, it can be annotated on the endpoint in the proto file (see below).
 In any case, the required permissions need to be documented in the [API documentation](#documentation).
@@ -173,6 +316,8 @@ Permissions can be annotated on the endpoint in the proto file. This allows the 
 The permissions are checked by the middleware and an error is returned if the user does not have the required permissions.
 
 The following example requires the user to have the `iam.web_key.write` permission to call the `CreateWebKey` method.
+This is an instance wide permission and can therefore be checked by the API itself. If the user does not have the required permission,
+an error is returned by the middleware before the API method is called.
 ```protobuf
  option (zitadel.protoc_gen_zitadel.v2.options) = {
   auth_option: {
@@ -182,6 +327,10 @@ The following example requires the user to have the `iam.web_key.write` permissi
 ```
 
 In case the permission cannot be checked by the API itself, but all requests need to be from an authenticated user, the `auth_option` can be set to `authenticated`.
+This is the case for a lot of resources that are organization specific, such as users, projects or authorizations.
+The API will not check the permissions for the user, but it will check if the user is authenticated. If the user is not authenticated, 
+an error is returned by the middleware before the API method is called. The user's permissions need to be checked by the functions 
+that are called by the API method, based on the queried resource and the user's context.
 ```protobuf
  option (zitadel.protoc_gen_zitadel.v2.options) = {
   auth_option: {
@@ -190,37 +339,64 @@ In case the permission cannot be checked by the API itself, but all requests nee
 };
 ```
 
-## Pagination
+## Listing resources
 
 The API uses pagination for listing resources. The client can specify a limit and an offset to retrieve a subset of the resources.
 Additionally, the client can specify sorting options to sort the resources by a specific field.
 
-Most listing methods SHOULD provide use the `ListQuery` message to allow the client to specify the limit, offset, and sorting options.
-```protobuf
+### Pagination
 
-// ListQuery is a general query object for lists to allow pagination and sorting.
-message ListQuery {
-  uint64 offset = 1;
-  // limit is the maximum amount of objects returned. The default is set to 100
-  // with a maximum of 1000 in the runtime configuration.
-  // If the limit exceeds the maximum configured ZITADEL will throw an error.
-  // If no limit is present the default is taken.
-  uint32 limit = 2;
-  // Asc is the sorting order. If true the list is sorted ascending, if false
-  // the list is sorted descending. The default is descending.
-  bool asc = 3;
+Most listing methods SHOULD use the `PaginationRequest` message to allow the client to specify the limit, offset, and sorting options.
+```protobuf
+message ListTargetsRequest {
+  // List limitations and ordering.
+  optional zitadel.filter.v2beta.PaginationRequest pagination = 1;
+  // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
+  optional TargetFieldName sorting_column = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"TARGET_FIELD_NAME_CREATION_DATE\""
+    }
+  ];
+  // Define the criteria to query for.
+  repeated TargetSearchFilter filters = 3;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"pagination\":{\"offset\":0,\"limit\":0,\"asc\":true},\"sortingColumn\":\"TARGET_FIELD_NAME_CREATION_DATE\",\"filters\":[{\"targetNameFilter\":{\"targetName\":\"ip_allow_list\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}},{\"inTargetIdsFilter\":{\"targetIds\":[\"69629023906488334\",\"69622366012355662\"]}}]}";
+  };
 }
 ```
-On the corresponding responses the `ListDetails` can be used to return the total count of the resources
+
+On the corresponding responses the `PaginationResponse` can be used to return the total count of the resources
 and allow the user to handle their offset and limit accordingly.
 
 The API MUST enforce a reasonable maximum limit for the number of resources that can be retrieved and returned in a single request.
 The default limit is set to 100 and the maximum limit is set to 1000. If the client requests a limit that exceeds the maximum limit, an error is returned.
 
+### Filter method
+
+All filters in List operations SHOULD provide a method if not already specified by the filters name.
+```protobuf
+message TargetNameFilter {
+  // Defines the name of the target to query for.
+  string target_name = 1 [
+    (validate.rules).string = {max_len: 200}
+  ];
+  // Defines which text comparison method used for the name query.
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true
+  ];
+}
+```
+
 ## Error Handling
 
-The API returns machine-readable errors in the response body. This includes a status code, an error code and possibly 
-some details about the error. See the following sections for more information about the status codes, error codes and error messages.
+The API returns machine-readable errors in the response body. This includes a status code, an error slug, a human-readable message
+and possibly some details about the error. See the following sections for more information about the status codes, error slug and error messages.
+
+> [!IMPORTANT]
+> For stable `v2` service protos, always import `zitadel/error/v2/error.proto` in each `*_service.proto` file.
+> This ensures reflection-aware clients can resolve `zitadel.error.v2.ErrorDetail` and read the `slug` field reliably.
+> Scope note: slug-based handling is currently relevant for backend/domain paths that run with relational-storage-backed logic.
+> Do not apply this rule to `v1`, `v2beta`, or `v3alpha` APIs.
 
 ### Status Codes
 
@@ -228,13 +404,13 @@ The API uses status codes to indicate the status of a request. Depending on the 
 the status code is returned as an HTTP status code or as a gRPC / connectRPC status code.
 Check the possible status codes https://zitadel.com/docs/apis/statuscodes
 
-### Error Codes
+### Error Slugs
 
-Additionally to the status code, the API returns unique error codes for each type of error.
-The error codes are used to identify a specific error and can be used to handle the error programmatically.
+Additionally to the status code, the API returns unique error slug for each type of error.
+The error slugs are used to identify a specific error and can be used to handle the error programmatically.
 
 > [!NOTE]
-> Currently, ZITADEL might already return some error codes. However, they do not follow a specific pattern yet
+> Currently, ZITADEL might already return some error codes in the error message. However, they do not follow a specific pattern yet
 > and are not documented. We will update the error codes and document them in the future.
 
 ### Error Message and Details
@@ -242,33 +418,84 @@ The error codes are used to identify a specific error and can be used to handle 
 The API returns additional details about the error in the response body.
 This includes a human-readable error message and additional information that can help the client to understand the error
 as well as machine-readable details that can be used to handle the error programmatically.
-Error details use the Google RPC error details format: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
+Clients are encouraged not to present the error message to their end-users, but rather use their own translation logic based on the slug.
+Error details use a custom ErrorDetail message containing the slug, message and additional details.
 
-### Example
+### Examples
 
-HTTP/1.1 example:
+HTTP/1.1 examples:
 ```
 HTTP/1.1 400 Bad Request
 Content-Type: application/json
 
 {
-  "code": "user_invalid_information",
-  "message": "invalid or missing information provided for the creation of the user",
+  "code": "invalid_argument",
+  "message": "invalid or missing information provided for the creation of the user (user.invalid_information)",
   "details": [
     {
-      "@type": "type.googleapis.com/google.rpc.BadRequest",
-      "fieldViolations": [
-        {
-          "field": "given_name",
-          "description": "given name is required",
-          "reason": "MISSING_VALUE"
-        },
-        {
-          "field": "family_name",
-          "description": "family name must not exceed 200 characters",
-          "reason": "INVALID_LENGTH"
+      "type": "zitadel.error.v2.ErrorDetail",
+      "value": "aW52YWxpZCBvciBtaXNzaW5nIGluZm9ybWF0aW9uIHByb3ZpZGVkIGZvciB0aGUgY3JlYXRpb24gb2YgdGhlIHVzZXIgKHVzZXIuaW52YWxpZF9pbmZvcm1hdGlvbik...",
+      "debug": {
+        "slug": "user.invalid_information",
+        "message": "invalid or missing information provided for the creation of the user",
+        "details": {
+          "fieldViolations": [
+            {
+              "field": "given_name",
+              "description": "given name is required",
+              "reason": "MISSING_VALUE"
+            },
+            {
+              "field": "family_name",
+              "description": "family name must not exceed 200 characters",
+              "reason": "INVALID_LENGTH"
+            }
+          ]
         }
-      ]
+      }
+    }
+  ]
+}
+```
+
+```
+HTTP/1.1 403 Forbidden
+Content-Type: application/json
+
+{
+  "code": "permission_denied",
+  "message": "The provided session token is invalid: either the token is malformed, expired or does not match the session (session.token_invalid)",
+  "details": [
+    {
+      "type": "zitadel.error.v2.ErrorDetail",
+      "value": "ChVzZXNzaW9uLnRva2VuX2ludmFsaWQSa1RoZSBwcm92aWRlZCBzZXNzaW9uIHRva2VuIGlzIGludmFsaWQ6IGVpdGhlciB0aGUgdG9rZW4gaXMgbWFsZm9ybWVkLCBleHBpcmVkIG9yIGRvZXMgbm90IG1hdGNoIHRoZSBzZXNzaW9u",
+      "debug": {
+        "slug": "session.token_invalid",
+        "message": "The provided session token is invalid: either the token is malformed, expired or does not match the session"
+      }
+    }
+  ]
+}
+```
+
+```
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+
+{
+  "code": "already_exists",
+  "message": "the username is already taken (user.already_exists)",
+  "details": [
+    {
+      "type": "zitadel.error.v2.ErrorDetail",
+      "value": "ChN1c2VyLmFscmVhZHlfZXhpc3RzEh10aGUgdXNlcm5hbWUgaXMgYWxyZWFkeSB0YWtlbhoUChIKCHVzZXJuYW1lEgYaBHRlc3Q",
+      "debug": {
+        "slug": "user.already_exists",
+        "message": "the username is already taken",
+        "details": {
+          "username": "test"
+        }
+      }
     }
   ]
 }
@@ -278,30 +505,81 @@ gRPC / connectRPC example:
 ```
 HTTP/2.0 200 OK
 Content-Type: application/grpc
-Grpc-Message: invalid information provided for the creation of the user
+Grpc-Message: invalid information provided for the creation of the user (user.invalid_information)
 Grpc-Status: 3
+Grpc-Status-Details-Bin: aW52YWxpZCBpbmZvcm1hdGlvbiBwcm92aWRlZCBmb3IgdGhlIGNyZWF0aW9uIG9mIHRoZSB1c2VyICh1c2VyLmludmFsaWRfaW5mb3JtYXRpb24p...
 
 {
-  "code": "user_invalid_information",
-  "message": "invalid or missing information provided for the creation of the user",
+  "code": 3,
+  "message": "invalid or missing information provided for the creation of the user (user.invalid_information)",
   "details": [
     {
-      "@type": "type.googleapis.com/google.rpc.BadRequest",
-      "fieldViolations": [
-        {
-          "field": "given_name",
-          "description": "given name is required",
-          "reason": "MISSING_VALUE"
-        },
-        {
-          "field": "family_name",
-          "description": "family name must not exceed 200 characters",
-          "reason": "INVALID_LENGTH"
-        }
-      ]
+      "@type": "type.googleapis.com/zitadel.error.v2.ErrorDetail",
+      "slug": "user.invalid_information",
+      "message": "invalid or missing information provided for the creation of the user",
+      "details": {
+        "fieldViolations": [
+          {
+            "field": "given_name",
+            "description": "given name is required",
+            "reason": "MISSING_VALUE"
+          },
+          {
+            "field": "family_name",
+            "description": "family name must not exceed 200 characters",
+            "reason": "INVALID_LENGTH"
+          }
+        ]
+      }
     }
   ]
 }
+```
+
+```
+HTTP/2.0 200 OK
+Content-Type: application/grpc
+Grpc-Message: The provided session token is invalid: either the token is malformed, expired or does not match the session (session.token_invalid)
+Grpc-Status: 7
+Grpc-Status-Details-Bin: CAcSgwFUaGUgcHJvdmlkZWQgc2Vzc2lvbiB0b2tlbiBpcyBpbnZhbGlkOiBlaXRoZXIgdGhlIHRva2VuIGlzIG1hbGZvcm1lZCwgZXhwaXJlZCBvciBkb2VzIG5vdCBtYXRjaCB0aGUgc2Vzc2lvbiAoc2Vzc2lvbi50b2tlbl9pbnZhbGlkKRq5AQowdHlwZS5nb29nbGVhcGlzLmNvbS96aXRhZGVsLmVycm9yLnYyLkVycm9yRGV0YWlsEoQBChVzZXNzaW9uLnRva2VuX2ludmFsaWQSa1RoZSBwcm92aWRlZCBzZXNzaW9uIHRva2VuIGlzIGludmFsaWQ6IGVpdGhlciB0aGUgdG9rZW4gaXMgbWFsZm9ybWVkLCBleHBpcmVkIG9yIGRvZXMgbm90IG1hdGNoIHRoZSBzZXNzaW9u
+
+{
+  "code": 7,
+  "message": "The provided session token is invalid: either the token is malformed, expired or does not match the session (session.token_invalid)",
+  "details": [
+    {
+      "@type": "type.googleapis.com/zitadel.error.v2.ErrorDetail",
+      "slug": "session.token_invalid",
+      "message": "The provided session token is invalid: either the token is malformed, expired or does not match the session"
+    }
+  ]
+}
+```
+
+```
+HTTP/2.0 200 OK
+Content-Type: application/grpc
+Grpc-Message: the username is already taken (user.already_exists)
+Grpc-Status: 6
+Grpc-Status-Details-Bin: dGhlIHVzZXJuYW1lIGlzIGFscmVhZHkgdGFrZW4gKHVzZXIuYWxyZWFkeV9leGlzdHMp...
+
+{
+  "code": 6,
+  "message": "the username is already taken (user.already_exists)",
+  "details": [ 
+    {
+      "@type": "type.googleapis.com/zitadel.error.v2.ErrorDetail",
+      "slug": "user.already_exists",
+      "message": "the username is already taken",
+      "details": {
+        "fields": {
+          "username": { "string_value": "test" }
+        }
+      }
+    }
+  ]
+}
+
 ```
 
 ### Documentation

@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
@@ -60,9 +59,9 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 			wantErr:      true,
 		},
 		{
-			name: "machine user without secret error",
+			name: "service account without secret error",
 			clientID: func() string {
-				name := gofakeit.Username()
+				name := integration.Username()
 				_, err := Instance.Client.Mgmt.AddMachineUser(CTX, &management.AddMachineUserRequest{
 					Name:            name,
 					UserName:        name,
@@ -76,7 +75,7 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 			wantErr:      true,
 		},
 		{
-			name:         "inactive machine user error",
+			name:         "inactive service account error",
 			clientID:     clientIDInactive,
 			clientSecret: clientSecretInactive,
 			scope:        []string{oidc.ScopeOpenID},

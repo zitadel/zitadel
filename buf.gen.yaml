@@ -19,3 +19,5 @@ plugins:
     out: .artifacts/grpc
   - plugin: zitadel
     out: .artifacts/grpc
+  - plugin: connect-go
+    out: .artifacts/grpc

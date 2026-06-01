@@ -19,7 +19,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "User Schema Service";
     version: "3.0-preview";
-    description: "This API is intended to manage data schemas for users in a ZITADEL instance. This project is in preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.";
+    description: "This API is intended to manage data schemas for users in a Zitadel instance. This project is in preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -42,7 +42,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$CUSTOM-DOMAIN";
+  host: "$CUSTOM_DOMAIN";
   base_path: "/";
 
   external_docs: {
@@ -55,8 +55,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";

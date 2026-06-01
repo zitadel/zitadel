@@ -8,6 +8,8 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/oidc/v2;oidc";
 
+// AuthRequest represents an OpenID Connect Authorization Request as defined in
+// https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest
 message AuthRequest{
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     external_docs: {
@@ -15,66 +17,42 @@ message AuthRequest{
       description: "Find out more about OIDC Auth Request parameters";
     }
   };
-  
-  string id = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "ID of the authorization request";
-    }
-  ];
 
-  google.protobuf.Timestamp creation_date = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Time when the auth request was created";
-    }
-  ];
+  // The unique identifier of the authorization request.
+  string id = 1;
 
-  string client_id = 3 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "OIDC client ID of the application that created the auth request";
-    }
-  ];
+  // The timestamp when the authorization request was created.
+  google.protobuf.Timestamp creation_date = 2;
 
-  repeated string scope = 4 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Requested scopes by the application, which the user must consent to.";
-    }
-  ];
-  
-  string redirect_uri = 5 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Base URI that points back to the application";
-    }
-  ];
+  // The OAuth2/OIDC client_id of the application that initiated the authorization request.
+  string client_id = 3;
 
-  repeated Prompt prompt = 6 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Prompts that must be displayed to the user";
-    }
-  ];
+  // The scopes by the application that the user must consent to.
+  repeated string scope = 4;
 
-  repeated string ui_locales = 7 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "End-User's preferred languages and scripts for the user interface, represented as a list of BCP47 [RFC5646] language tag values, ordered by preference. For instance, the value [fr-CA, fr, en] represents a preference for French as spoken in Canada, then French (without a region designation), followed by English (without a region designation). An error SHOULD NOT result if some or all of the requested locales are not supported.";
-    }
-  ];
+  // The redirect_uri used in the authorization request. This must exactly match one of the redirect URIs registered for the client.
+  // This uri is used to send the authorization code or tokens back to the application.
+  string redirect_uri = 5;
 
-  optional string login_hint = 8 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Login hint can be set by the application with a user identifier such as an email or phone number.";
-    }
-  ];
+  // Prompts that must be displayed to the user.
+  repeated Prompt prompt = 6;
 
-  optional google.protobuf.Duration max_age = 9 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Specifies the allowable elapsed time in seconds since the last time the End-User was actively authenticated. If the elapsed time is greater than this value, or the field is present with 0 duration, the user must be re-authenticated.";
-    }
-  ];
-  
-  optional string hint_user_id = 10 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "User ID taken from a ID Token Hint if it was present and valid.";
-    }
-  ];
+  // End-User's preferred languages and scripts for the user interface, represented as a list of BCP47 [RFC5646]
+  // language tag values, ordered by preference.
+  // For instance, the value [fr-CA, fr, en] represents a preference for French as spoken in Canada,
+  // then French (without a region designation), followed by English (without a region designation).
+  // An error SHOULD NOT result if some or all of the requested locales are not supported.
+  repeated string ui_locales = 7;
+
+  // Login hint can be set by the application with a user identifier such as an email or phone number.
+  optional string login_hint = 8;
+
+  // Specifies the allowable elapsed time in seconds since the last time the End-User was actively authenticated.
+  // If the elapsed time is greater than this value, or the field is present with 0 duration, the user must be re-authenticated.
+  optional google.protobuf.Duration max_age = 9;
+
+  // User ID taken from a ID Token Hint if it was present and valid.
+  optional string hint_user_id = 10;
 }
 
 enum Prompt {
@@ -119,12 +97,16 @@ enum ErrorReason {
 message DeviceAuthorizationRequest {
   // The unique identifier of the device authorization request to be used for authorizing or denying the request.
   string id = 1;
+
   // The client_id of the application that initiated the device authorization request.
   string client_id = 2;
+
   // The scopes requested by the application.
   repeated string scope = 3;
+
   // Name of the client application.
   string app_name = 4;
+
   // Name of the project the client application is part of.
   string project_name = 5;
 }

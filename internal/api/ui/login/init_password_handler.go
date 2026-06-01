@@ -5,6 +5,9 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -92,7 +95,8 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *dom
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	_, err := l.command.SetPasswordWithVerifyCode(setContext(r.Context(), userOrg), userOrg, data.UserID, data.Code, data.Password, userAgentID, false)
 	if err != nil {
-		l.renderInitPassword(w, r, authReq, data.UserID, "", err)
+		logging.WithFields("instanceID", authz.GetInstance(r.Context()).InstanceID(), "userID", data.UserID).WithError(err).Warn("error setting initial password")
+		l.renderInitPassword(w, r, authReq, data.UserID, "", zerrors.ThrowInvalidArgument(nil, "LOGIN-as3k2", "Errors.User.Code.Invalid"))
 		return
 	}
 	l.renderInitPasswordDone(w, r, authReq, userOrg)
@@ -108,7 +112,11 @@ func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authRe
 		authReqID = authReq.ID
 	}
 	_, err := l.command.RequestSetPassword(setContext(r.Context(), userOrg), userID, userOrg, domain.NotificationTypeEmail, authReqID)
-	l.renderInitPassword(w, r, authReq, userID, "", err)
+	if !zerrors.IsInternal(err) {
+		logging.WithFields("instanceID", authz.GetInstance(r.Context()).InstanceID(), "userID", userID).WithError(err).Warn("error requesting password reset")
+		err = nil // we ignore errors on resend to not leak information
+	}
+	l.renderInitPassword(w, r, authReq, userID, "", nil)
 }
 
 func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, code string, err error) {

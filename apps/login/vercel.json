@@ -1,0 +1,4 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "NX_DAEMON=false NX_DISABLE_DB=true pnpm nx run @zitadel/login:build-vercel"
+}

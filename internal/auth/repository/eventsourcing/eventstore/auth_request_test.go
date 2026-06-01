@@ -237,7 +237,7 @@ type mockViewOrg struct {
 	State domain.OrgState
 }
 
-func (m *mockViewOrg) OrgByID(context.Context, bool, string) (*query.Org, error) {
+func (m *mockViewOrg) OrgByID(context.Context, string) (*query.Org, error) {
 	return &query.Org{
 		State: m.State,
 	}, nil
@@ -251,7 +251,7 @@ func (m *mockViewOrg) OrgByPrimaryDomain(context.Context, string) (*query.Org, e
 
 type mockViewErrOrg struct{}
 
-func (m *mockViewErrOrg) OrgByID(context.Context, bool, string) (*query.Org, error) {
+func (m *mockViewErrOrg) OrgByID(context.Context, string) (*query.Org, error) {
 	return nil, zerrors.ThrowInternal(nil, "id", "internal error")
 }
 
@@ -286,7 +286,7 @@ func (m *mockProject) ProjectByClientID(ctx context.Context, s string) (*query.P
 	return &query.Project{ResourceOwner: m.resourceOwner, HasProjectCheck: m.projectCheck}, nil
 }
 
-func (m *mockProject) SearchProjectGrants(ctx context.Context, queries *query.ProjectGrantSearchQueries) (*query.ProjectGrants, error) {
+func (m *mockProject) SearchProjectGrants(ctx context.Context, queries *query.ProjectGrantSearchQueries, permissionCheck domain.PermissionCheck) (*query.ProjectGrants, error) {
 	if m.hasProject {
 		mockProjectGrant := new(query.ProjectGrant)
 		return &query.ProjectGrants{ProjectGrants: []*query.ProjectGrant{mockProjectGrant}}, nil
@@ -1917,6 +1917,60 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
+			"password change expiry for non local user ignored, next possible step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					ExternalLoginVerification: testNow.Add(-5 * time.Minute),
+					SecondFactorVerification:  testNow.Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:            false,
+					PasswordChangeRequired: false,
+					IsEmailVerified:        false,
+					MFAMaxSetUp:            int32(domain.MFALevelSecondFactor),
+				},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				passwordAgePolicyProvider: &mockPasswordAgePolicy{
+					policy: &query.PasswordAgePolicy{
+						MaxAgeDays: 30,
+					},
+				},
+				idpUserLinksProvider: &mockIDPUserLinks{
+					[]*query.IDPUserLink{
+						{
+							IDPID:            "idpID",
+							UserID:           "userID",
+							IDPName:          "idpName",
+							ProvidedUserID:   "providedUserID",
+							ProvidedUsername: "providedUsername",
+						},
+					},
+				},
+			},
+			args{&domain.AuthRequest{
+				UserID: "UserID",
+				LoginPolicy: &domain.LoginPolicy{
+					AllowUsernamePassword:      true,
+					SecondFactors:              []domain.SecondFactorType{domain.SecondFactorTypeTOTP},
+					PasswordCheckLifetime:      10 * 24 * time.Hour,
+					ExternalLoginCheckLifetime: 18 * time.Hour,
+					SecondFactorCheckLifetime:  18 * time.Hour,
+				},
+				PasswordAgePolicy: &domain.PasswordAgePolicy{
+					MaxAgeDays: 30,
+				},
+				SelectedIDPConfigID: "idpID",
+			}, false},
+			[]domain.NextStep{&domain.VerifyEMailStep{}},
+			nil,
+		},
+		{
 			"email verified and no password change required, redirect to callback step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
@@ -2796,7 +2850,7 @@ func Test_userSessionByIDs(t *testing.T) {
 		userProvider  userSessionViewProvider
 		eventProvider userEventProvider
 		agentID       string
-		user          *user_model.UserView
+		userID        string
 	}
 	tests := []struct {
 		name    string
@@ -2809,7 +2863,7 @@ func Test_userSessionByIDs(t *testing.T) {
 			args{
 				userProvider:  &mockViewNoUserSession{},
 				eventProvider: &mockEventErrUser{},
-				user:          &user_model.UserView{ID: "id"},
+				userID:        "id",
 			},
 			&user_model.UserSessionView{UserID: "id"},
 			nil,
@@ -2818,7 +2872,7 @@ func Test_userSessionByIDs(t *testing.T) {
 			"internal error, internal error",
 			args{
 				userProvider: &mockViewErrUserSession{},
-				user:         &user_model.UserView{ID: "id"},
+				userID:       "id",
 			},
 			nil,
 			zerrors.IsInternal,
@@ -2829,7 +2883,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				userProvider: &mockViewUserSession{
 					PasswordVerification: testNow,
 				},
-				user:          &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
+				userID:        "id",
 				eventProvider: &mockEventErrUser{},
 			},
 			&user_model.UserSessionView{
@@ -2846,7 +2900,7 @@ func Test_userSessionByIDs(t *testing.T) {
 					PasswordVerification: testNow,
 				},
 				agentID: "agentID",
-				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
+				userID:  "id",
 				eventProvider: &mockEventUser{
 					Events: []eventstore.Event{
 						&es_models.Event{
@@ -2871,7 +2925,7 @@ func Test_userSessionByIDs(t *testing.T) {
 					PasswordVerification: testNow,
 				},
 				agentID: "agentID",
-				user:    &user_model.UserView{ID: "id"},
+				userID:  "id",
 				eventProvider: &mockEventUser{
 					Events: []eventstore.Event{
 						&es_models.Event{
@@ -2900,7 +2954,7 @@ func Test_userSessionByIDs(t *testing.T) {
 					PasswordVerification: testNow,
 				},
 				agentID: "agentID",
-				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
+				userID:  "id",
 				eventProvider: &mockEventUser{
 					Events: []eventstore.Event{
 						&es_models.Event{
@@ -2929,7 +2983,7 @@ func Test_userSessionByIDs(t *testing.T) {
 					PasswordVerification: testNow,
 				},
 				agentID: "agentID",
-				user:    &user_model.UserView{ID: "id"},
+				userID:  "id",
 				eventProvider: &mockEventUser{
 					Events: []eventstore.Event{
 						&es_models.Event{
@@ -2953,7 +3007,7 @@ func Test_userSessionByIDs(t *testing.T) {
 					PasswordVerification: testNow,
 				},
 				agentID: "agentID",
-				user:    &user_model.UserView{ID: "id"},
+				userID:  "id",
 				eventProvider: &mockEventUser{
 					Events: []eventstore.Event{
 						&es_models.Event{
@@ -2986,7 +3040,7 @@ func Test_userSessionByIDs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := userSessionByIDs(context.Background(), tt.args.userProvider, tt.args.eventProvider, tt.args.agentID, tt.args.user)
+			got, err := userSessionByIDs(context.Background(), tt.args.userProvider, tt.args.eventProvider, tt.args.agentID, tt.args.userID)
 			if (err != nil && tt.wantErr == nil) || (tt.wantErr != nil && !tt.wantErr(err)) {
 				t.Errorf("nextSteps() wrong error = %v", err)
 				return

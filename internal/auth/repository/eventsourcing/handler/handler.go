@@ -2,9 +2,11 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -78,9 +80,17 @@ func Projections() []*handler2.Handler {
 func ProjectInstance(ctx context.Context) error {
 	for i, projection := range projections {
 		logging.WithFields("name", projection.ProjectionName(), "instance", authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("starting auth projection")
-		_, err := projection.Trigger(ctx)
-		if err != nil {
-			return err
+		for {
+			_, err := projection.Trigger(ctx)
+			if err == nil {
+				break
+			}
+			var pgErr *pgconn.PgError
+			errors.As(err, &pgErr)
+			if pgErr.Code != database.PgUniqueConstraintErrorCode {
+				return err
+			}
+			logging.WithFields("name", projection.ProjectionName(), "instance", authz.GetInstance(ctx).InstanceID()).WithError(err).Debug("auth projection failed because of unique constraint, retrying")
 		}
 		logging.WithFields("name", projection.ProjectionName(), "instance", authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("auth projection done")
 	}

@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/idp/providers/apple"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -1642,6 +1643,9 @@ func (c *Commands) prepareAddOrgAppleProvider(a *org.Aggregate, writeModel *OrgA
 		if len(provider.PrivateKey) == 0 {
 			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-GVD4n", "Errors.IDP.PrivateKeyMissing")
 		}
+		if _, err := apple.BytesToPrivateKey(provider.PrivateKey); err != nil {
+			return nil, zerrors.ThrowInvalidArgument(err, "ORG-Fk38d", "Errors.IDP.InvalidPrivateKey")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -1686,6 +1690,11 @@ func (c *Commands) prepareUpdateOrgAppleProvider(a *org.Aggregate, writeModel *O
 		}
 		if provider.KeyID = strings.TrimSpace(provider.KeyID); provider.KeyID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-Gh4z2", "Errors.IDP.KeyIDMissing")
+		}
+		if len(provider.PrivateKey) > 0 {
+			if _, err := apple.BytesToPrivateKey(provider.PrivateKey); err != nil {
+				return nil, zerrors.ThrowInvalidArgument(err, "ORG-eWSDf", "Errors.IDP.InvalidPrivateKey")
+			}
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
@@ -1766,8 +1775,10 @@ func (c *Commands) prepareAddOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSA
 					cert,
 					provider.Binding,
 					provider.WithSignedRequest,
+					provider.SignatureAlgorithm,
 					provider.NameIDFormat,
 					provider.TransientMappingAttributeName,
+					provider.FederatedLogoutEnabled,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -1819,8 +1830,10 @@ func (c *Commands) prepareUpdateOrgSAMLProvider(a *org.Aggregate, writeModel *Or
 				c.idpConfigEncryption,
 				provider.Binding,
 				provider.WithSignedRequest,
+				provider.SignatureAlgorithm,
 				provider.NameIDFormat,
 				provider.TransientMappingAttributeName,
+				provider.FederatedLogoutEnabled,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {
@@ -1864,8 +1877,10 @@ func (c *Commands) prepareRegenerateOrgSAMLProviderCertificate(a *org.Aggregate,
 				c.idpConfigEncryption,
 				writeModel.Binding,
 				writeModel.WithSignedRequest,
+				writeModel.SignatureAlgorithm,
 				writeModel.NameIDFormat,
 				writeModel.TransientMappingAttributeName,
+				writeModel.FederatedLogoutEnabled,
 				writeModel.Options,
 			)
 			if err != nil || event == nil {
@@ -1894,4 +1909,88 @@ func (c *Commands) prepareDeleteOrgProvider(a *org.Aggregate, resourceOwner, id 
 			return []eventstore.Command{org.NewIDPRemovedEvent(ctx, &a.Aggregate, id)}, nil
 		}, nil
 	}
+}
+
+func (c *Commands) AddOrgZitadelProvider(ctx context.Context, resourceOwner string, provider ZitadelProvider) (string, *domain.ObjectDetails, error) {
+	id, err := c.idGenerator.Next()
+	if err != nil {
+		return "", nil, err
+	}
+
+	err = c.validateOrgZitadelProvider(&provider)
+	if err != nil {
+		return "", nil, err
+	}
+
+	orgAgg := org.NewAggregate(resourceOwner)
+	writeModel := NewZitadelOrgIDPWriteModel(resourceOwner, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgZitadelProvider(orgAgg, writeModel, provider)) //nolint:staticcheck
+	if err != nil {
+		return "", nil, err
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return "", nil, err
+	}
+	return id, pushedEventsToObjectDetails(pushedEvents), nil
+}
+
+func (c *Commands) prepareAddOrgZitadelProvider(a *org.Aggregate, writeModel *OrgZitadelIDPWriteModel, provider ZitadelProvider) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
+			if err != nil {
+				return nil, err
+			}
+			return []eventstore.Command{
+				org.NewZitadelIDPAddedEvent(
+					ctx,
+					&a.Aggregate,
+					writeModel.ID,
+					provider.Name,
+					provider.Issuer,
+					provider.ClientID,
+					secret,
+					provider.Scopes,
+					provider.IDPOptions,
+					provider.InstanceRolesInfo,
+				),
+			}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) validateOrgZitadelProvider(provider *ZitadelProvider) error {
+	if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+		return zerrors.ThrowInvalidArgument(nil, "ORG-c3EC3W", "Errors.Invalid.Argument")
+	}
+	if provider.Issuer = strings.TrimSpace(provider.Issuer); provider.Issuer == "" {
+		return zerrors.ThrowInvalidArgument(nil, "ORG-TYAbiK", "Errors.Invalid.Argument")
+	}
+	if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+		return zerrors.ThrowInvalidArgument(nil, "ORG-feyb3A", "Errors.Invalid.Argument")
+	}
+	if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
+		return zerrors.ThrowInvalidArgument(nil, "ORG-DxaSb9", "Errors.Invalid.Argument")
+	}
+
+	for i := range provider.InstanceRolesInfo {
+		provider.InstanceRolesInfo[i].OrganizationID = strings.TrimSpace(provider.InstanceRolesInfo[i].OrganizationID)
+		if provider.InstanceRolesInfo[i].OrganizationID == "" {
+			return zerrors.ThrowInvalidArgument(nil, "ORG-M0QmjB", "Errors.Invalid.Argument")
+		}
+		provider.InstanceRolesInfo[i].OrganizationDomain = strings.TrimSpace(provider.InstanceRolesInfo[i].OrganizationDomain)
+		if provider.InstanceRolesInfo[i].OrganizationDomain == "" {
+			return zerrors.ThrowInvalidArgument(nil, "ORG-HAELEz", "Errors.Invalid.Argument")
+		}
+	}
+	return nil
 }

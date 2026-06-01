@@ -18,6 +18,7 @@ import { ProjectMembersDataSource, ProjectType } from './project-members-datasou
   selector: 'cnsl-project-members',
   templateUrl: './project-members.component.html',
   styleUrls: ['./project-members.component.scss'],
+  standalone: false,
 })
 export class ProjectMembersComponent {
   public INITIALPAGESIZE: number = 25;

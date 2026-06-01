@@ -13,10 +13,11 @@ import (
 )
 
 const (
-	authURL    = "https://github.com/login/oauth/authorize"
-	tokenURL   = "https://github.com/login/oauth/access_token"
-	profileURL = "https://api.github.com/user"
-	name       = "GitHub"
+	authURL        = "https://github.com/login/oauth/authorize"
+	tokenURL       = "https://github.com/login/oauth/access_token"
+	profileURL     = "https://api.github.com/user"
+	emailURLSuffix = "/emails"
+	name           = "GitHub"
 )
 
 var _ idp.Provider = (*Provider)(nil)
@@ -43,12 +44,14 @@ func NewCustomURL(name, clientID, secret, callbackURL, authURL, tokenURL, profil
 	}
 	return &Provider{
 		Provider: rp,
+		emailURL: profileURL + emailURLSuffix,
 	}, nil
 }
 
 // Provider is the [idp.Provider] implementation for GitHub
 type Provider struct {
 	*oauth.Provider
+	emailURL string
 }
 
 func newConfig(clientID, secret, callbackURL, authURL, tokenURL string, scopes []string) *oauth2.Config {

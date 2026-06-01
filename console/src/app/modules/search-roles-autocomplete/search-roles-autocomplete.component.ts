@@ -12,6 +12,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
   selector: 'cnsl-search-roles-autocomplete',
   templateUrl: './search-roles-autocomplete.component.html',
   styleUrls: ['./search-roles-autocomplete.component.scss'],
+  standalone: false,
 })
 export class SearchRolesAutocompleteComponent implements OnDestroy {
   public removable: boolean = true;
@@ -54,7 +55,7 @@ export class SearchRolesAutocompleteComponent implements OnDestroy {
           this.isLoading = false;
           this.filteredRoles = resp.resultList;
         },
-        (error) => {
+        () => {
           this.isLoading = false;
         },
       );

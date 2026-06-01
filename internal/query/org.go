@@ -8,12 +8,10 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	domain_pkg "github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/feature"
+	es "github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
@@ -77,6 +75,8 @@ type Org struct {
 	ResourceOwner string
 	State         domain_pkg.OrgState
 	Sequence      uint64
+	// instanceID is used to create a unique cache key for the org
+	instanceID string
 
 	Name   string
 	Domain string
@@ -118,11 +118,11 @@ func (q *OrgSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (org *Org, err error) {
+func (q *Queries) OrgByID(ctx context.Context, id string) (org *Org, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if org, ok := q.caches.org.Get(ctx, orgIndexByID, id); ok {
+	if org, ok := q.caches.org.Get(ctx, orgIndexByID, orgCacheKey(authz.GetInstance(ctx).InstanceID(), id)); ok {
 		return org, nil
 	}
 	defer func() {
@@ -130,10 +130,6 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 			q.caches.org.Set(ctx, org)
 		}
 	}()
-
-	if !authz.GetInstance(ctx).Features().ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeOrgByID) {
-		return q.oldOrgByID(ctx, shouldTriggerBulk, id)
-	}
 
 	foundOrg := readmodel.NewOrg(id)
 	eventCount, err := q.eventStoreV4.Query(
@@ -159,43 +155,17 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 		ResourceOwner: foundOrg.Owner,
 		State:         domain_pkg.OrgState(foundOrg.State.State),
 		Sequence:      uint64(foundOrg.Sequence),
+		instanceID:    foundOrg.InstanceID,
 		Name:          foundOrg.Name,
 		Domain:        foundOrg.PrimaryDomain.Domain,
 	}, nil
-}
-
-func (q *Queries) oldOrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (org *Org, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	if shouldTriggerBulk {
-		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerOrgProjection")
-		ctx, err = projection.OrgProjection.Trigger(ctx, handler.WithAwaitRunning())
-		logging.OnError(err).Debug("trigger failed")
-		traceSpan.EndWithError(err)
-	}
-
-	stmt, scan := prepareOrgQuery()
-	query, args, err := stmt.Where(sq.Eq{
-		OrgColumnID.identifier():         id,
-		OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}).ToSql()
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-AWx52", "Errors.Query.SQLStatement")
-	}
-
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		org, err = scan(row)
-		return err
-	}, query, args...)
-	return org, err
 }
 
 func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (org *Org, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	org, ok := q.caches.org.Get(ctx, orgIndexByPrimaryDomain, domain)
+	org, ok := q.caches.org.Get(ctx, orgIndexByPrimaryDomain, orgCacheKey(authz.GetInstance(ctx).InstanceID(), domain))
 	if ok {
 		return org, nil
 	}
@@ -284,7 +254,7 @@ func (q *Queries) ExistsOrg(ctx context.Context, id, domain string) (verifiedID 
 
 	var org *Org
 	if id != "" {
-		org, err = q.OrgByID(ctx, true, id)
+		org, err = q.OrgByID(ctx, id)
 	} else {
 		org, err = q.OrgByVerifiedDomain(ctx, domain)
 	}
@@ -430,6 +400,7 @@ func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 			OrgColumnResourceOwner.identifier(),
 			OrgColumnState.identifier(),
 			OrgColumnSequence.identifier(),
+			OrgColumnInstanceID.identifier(),
 			OrgColumnName.identifier(),
 			OrgColumnDomain.identifier(),
 		).
@@ -444,6 +415,7 @@ func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 				&o.ResourceOwner,
 				&o.State,
 				&o.Sequence,
+				&o.instanceID,
 				&o.Name,
 				&o.Domain,
 			)
@@ -521,15 +493,21 @@ const (
 func (o *Org) Keys(index orgIndex) []string {
 	switch index {
 	case orgIndexByID:
-		return []string{o.ID}
+		return []string{orgCacheKey(o.instanceID, o.ID)}
 	case orgIndexByPrimaryDomain:
-		return []string{o.Domain}
+		return []string{orgCacheKey(o.instanceID, o.Domain)}
 	case orgIndexUnspecified:
 	}
 	return nil
 }
 
+func orgCacheKey(instanceID, key string) string {
+	return instanceID + "-" + key
+}
+
 func (c *Caches) registerOrgInvalidation() {
-	invalidate := cacheInvalidationFunc(c.org, orgIndexByID, getAggregateID)
+	invalidate := cacheInvalidationFunc(c.org, orgIndexByID, func(aggregate *es.Aggregate) string {
+		return orgCacheKey(aggregate.InstanceID, aggregate.ID)
+	})
 	projection.OrgProjection.RegisterCacheInvalidation(invalidate)
 }

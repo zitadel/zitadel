@@ -2,7 +2,6 @@ package oidc
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -10,26 +9,34 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/logging"
+	"github.com/zitadel/oidc/v3/pkg/crypto"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	zdomain "github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/api/oidc/sign"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/handler"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/domain/federatedlogout"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"github.com/zitadel/zitadel/internal/user/model"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
 	LoginClientHeader            = "x-zitadel-login-client"
 	LoginPostLogoutRedirectParam = "post_logout_redirect"
+	LoginLogoutHintParam         = "logout_hint"
+	LoginUILocalesParam          = "ui_locales"
+	LoginLogoutTokenParam        = "logout_token"
 	LoginPath                    = "/login"
 	LogoutPath                   = "/logout"
 	LogoutDonePath               = "/logout/done"
@@ -38,7 +45,7 @@ const (
 func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (_ op.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
 
@@ -74,25 +81,31 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	}
 }
 
-func (o *OPStorage) createAuthRequestScopeAndAudience(ctx context.Context, clientID string, reqScope []string) (scope, audience []string, err error) {
+func (o *OPStorage) createAuthRequestScopeAndAudience(ctx context.Context, clientID string, reqScope []string) (scope, audience []string, orgID string, err error) {
 	project, err := o.query.ProjectByClientID(ctx, clientID)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, "", err
 	}
+
+	orgID, err = o.assertOrgScope(ctx, reqScope)
+	if err != nil {
+		return nil, nil, "", err
+	}
+
 	scope, err = o.assertProjectRoleScopesByProject(ctx, project, reqScope)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, "", err
 	}
 	audience, err = o.audienceFromProjectID(ctx, project.ID)
 	audience = domain.AddAudScopeToAudience(ctx, audience, scope)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, "", err
 	}
-	return scope, audience, nil
+	return scope, audience, orgID, nil
 }
 
 func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.AuthRequest, hintUserID, loginClient string) (op.AuthRequest, error) {
-	scope, audience, err := o.createAuthRequestScopeAndAudience(ctx, req.ClientID, req.Scopes)
+	scope, audience, orgID, err := o.createAuthRequestScopeAndAudience(ctx, req.ClientID, req.Scopes)
 	if err != nil {
 		return nil, err
 	}
@@ -112,6 +125,7 @@ func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.
 		UILocales:        UILocalesToBusiness(req.UILocales),
 		MaxAge:           MaxAgeToBusiness(req.MaxAge),
 		Issuer:           o.contextToIssuer(ctx),
+		OrganizationID:   orgID,
 	}
 	if req.LoginHint != "" {
 		authRequest.LoginHint = &req.LoginHint
@@ -132,7 +146,8 @@ func (o *OPStorage) createAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	if !ok {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
 	}
-	scope, audience, err := o.createAuthRequestScopeAndAudience(ctx, req.ClientID, req.Scopes)
+	// we do not need to handle the orgID for the v1 login, since it handles it already
+	scope, audience, _, err := o.createAuthRequestScopeAndAudience(ctx, req.ClientID, req.Scopes)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +176,7 @@ func (o *OPStorage) audienceFromProjectID(ctx context.Context, projectID string)
 func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
 
@@ -188,19 +203,10 @@ func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (_ op.Au
 	panic(o.panicErr("AuthRequestByCode"))
 }
 
-// decryptGrant decrypts a code or refresh_token
-func (o *OPStorage) decryptGrant(grant string) (string, error) {
-	decodedGrant, err := base64.RawURLEncoding.DecodeString(grant)
-	if err != nil {
-		return "", err
-	}
-	return o.encAlg.DecryptString(decodedGrant, o.encAlg.EncryptionKeyID())
-}
-
 func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
 
@@ -215,11 +221,11 @@ func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) (err erro
 	return o.repo.SaveAuthCode(ctx, id, code, userAgentID)
 }
 
-func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) (err error) {
+func (o *OPStorage) DeleteAuthRequest(context.Context, string) error {
 	panic(o.panicErr("DeleteAuthRequest"))
 }
 
-func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) (string, time.Time, error) {
+func (o *OPStorage) CreateAccessToken(context.Context, op.TokenRequest) (string, time.Time, error) {
 	panic(o.panicErr("CreateAccessToken"))
 }
 
@@ -236,36 +242,41 @@ func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken
 }
 
 func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID string) (err error) {
+	_, err = o.terminateSession(ctx, userID)
+	return err
+}
+
+func (o *OPStorage) terminateSession(ctx context.Context, userID string) (sessions []command.HumanSignOutSession, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		logging.Error("no user agent id")
-		return zerrors.ThrowPreconditionFailed(nil, "OIDC-fso7F", "no user agent id")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-fso7F", "no user agent id")
 	}
-	sessions, err := o.repo.UserSessionsByAgentID(ctx, userAgentID)
+	sessions, err = o.repo.UserSessionsByAgentID(ctx, userAgentID)
 	if err != nil {
 		logging.WithError(err).Error("error retrieving user sessions")
-		return err
+		return nil, err
 	}
 	if len(sessions) == 0 {
-		return nil
+		return nil, nil
 	}
 	data := authz.CtxData{
 		UserID: userID,
 	}
 	err = o.command.HumansSignOut(authz.SetCtxData(ctx, data), userAgentID, sessions)
 	logging.OnError(err).Error("error signing out")
-	return err
+	return sessions, err
 }
 
 func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionRequest *op.EndSessionRequest) (redirectURI string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
 
@@ -278,14 +289,23 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 	// we'll redirect to the UI (V2) and let it decide which session to terminate
 	//
 	// If there's no id_token_hint and for v1 logins, we handle them separately
-	if endSessionRequest.IDTokenHintClaims == nil &&
-		(authz.GetFeatures(ctx).LoginV2.Required || headers.Get(LoginClientHeader) != "") {
+	if endSessionRequest.IDTokenHintClaims == nil && (authz.GetFeatures(ctx).LoginV2.Required || headers.Get(LoginClientHeader) != "") {
 		redirectURI := v2PostLogoutRedirectURI(endSessionRequest.RedirectURI)
-		// if no base uri is set, fallback to the default configured in the runtime config
-		if authz.GetFeatures(ctx).LoginV2.BaseURI == nil || authz.GetFeatures(ctx).LoginV2.BaseURI.String() == "" {
-			return o.defaultLogoutURLV2 + redirectURI, nil
+		logoutURI := authz.GetFeatures(ctx).LoginV2.BaseURI
+		// if no logout uri is set, fallback to the default configured in the runtime config
+		if logoutURI == nil || logoutURI.String() == "" {
+			logoutURI, err = url.Parse(o.defaultLogoutURLV2)
+			if err != nil {
+				return "", err
+			}
+		} else {
+			logoutURI = logoutURI.JoinPath(LogoutPath)
 		}
-		return buildLoginV2LogoutURL(authz.GetFeatures(ctx).LoginV2.BaseURI, redirectURI), nil
+		signer, _, err := sign.GetSignerOnce(o.query.GetActiveSigningWebKey)(ctx)
+		if err != nil {
+			return "", err
+		}
+		return buildLoginV2LogoutURL(logoutURI, redirectURI, endSessionRequest.LogoutHint, endSessionRequest.UILocales, signer)
 	}
 
 	// V1:
@@ -294,7 +314,16 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 	// So if any condition is not met, we handle the request as a V1 request and do a (v1) TerminateSession,
 	// which terminates all sessions of the user agent, identified by cookie.
 	if endSessionRequest.IDTokenHintClaims == nil || endSessionRequest.IDTokenHintClaims.SessionID == "" {
-		return endSessionRequest.RedirectURI, o.TerminateSession(ctx, endSessionRequest.UserID, endSessionRequest.ClientID)
+		sessions, err := o.terminateSession(ctx, endSessionRequest.UserID)
+		if err != nil {
+			return "", err
+		}
+		if len(sessions) == 1 {
+			if path := o.federatedLogout(ctx, sessions[0].ID, endSessionRequest.RedirectURI); path != "" {
+				return path, nil
+			}
+		}
+		return endSessionRequest.RedirectURI, nil
 	}
 
 	// V1:
@@ -305,11 +334,24 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 		if err != nil {
 			return "", err
 		}
+		if path := o.federatedLogout(ctx, endSessionRequest.IDTokenHintClaims.SessionID, endSessionRequest.RedirectURI); path != "" {
+			return path, nil
+		}
 		return endSessionRequest.RedirectURI, nil
 	}
 
 	// V2:
 	// Terminate the v2 session of the id_token_hint
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		if err := zdomain.Invoke(
+			ctx,
+			zdomain.NewDeleteSessionCommand(endSessionRequest.IDTokenHintClaims.SessionID, "", false),
+			zdomain.WithSessionRepo(repository.SessionRepository()),
+		); err != nil {
+			return "", err
+		}
+		return v2PostLogoutRedirectURI(endSessionRequest.RedirectURI), nil
+	}
 	_, err = o.command.TerminateSessionWithoutTokenCheck(ctx, endSessionRequest.IDTokenHintClaims.SessionID)
 	if err != nil {
 		return "", err
@@ -317,12 +359,69 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 	return v2PostLogoutRedirectURI(endSessionRequest.RedirectURI), nil
 }
 
-func buildLoginV2LogoutURL(baseURI *url.URL, redirectURI string) string {
-	baseURI.JoinPath(LogoutPath)
-	q := baseURI.Query()
+// federatedLogout checks whether the session has an idp session linked and the IDP template is configured for federated logout.
+// If so, it creates a federated logout request and stores it in the cache and returns the logout path.
+func (o *OPStorage) federatedLogout(ctx context.Context, sessionID string, postLogoutRedirectURI string) string {
+	session, err := o.repo.UserSessionByID(ctx, sessionID)
+	if err != nil {
+		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "sessionID", sessionID).
+			WithError(err).Error("error retrieving user session")
+		return ""
+	}
+	if session.SelectedIDPConfigID.String == "" {
+		return ""
+	}
+	identityProvider, err := o.query.IDPTemplateByID(ctx, false, session.SelectedIDPConfigID.String, false, nil)
+	if err != nil {
+		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "idpID", session.SelectedIDPConfigID.String, "sessionID", sessionID).
+			WithError(err).Error("error retrieving idp template")
+		return ""
+	}
+	if identityProvider.SAMLIDPTemplate == nil || !identityProvider.FederatedLogoutEnabled {
+		return ""
+	}
+	o.federateLogoutCache.Set(ctx, &federatedlogout.FederatedLogout{
+		InstanceID:            authz.GetInstance(ctx).InstanceID(),
+		FingerPrintID:         authz.GetCtxData(ctx).AgentID,
+		SessionID:             sessionID,
+		IDPID:                 session.SelectedIDPConfigID.String,
+		UserID:                session.UserID,
+		PostLogoutRedirectURI: postLogoutRedirectURI,
+		State:                 federatedlogout.StateCreated,
+	})
+	return login.ExternalLogoutPath(sessionID)
+}
+
+type logoutTokenPayload struct {
+	PostLogoutRedirectURI string       `json:"post_logout_redirect_uri,omitempty"`
+	LogoutHint            string       `json:"logout_hint,omitempty"`
+	UILocales             oidc.Locales `json:"ui_locales,omitempty"`
+}
+
+func buildLoginV2LogoutURL(logoutURI *url.URL, redirectURI, logoutHint string, uiLocales oidc.Locales, signer jose.Signer) (string, error) {
+	if strings.HasSuffix(logoutURI.Path, "/") && len(logoutURI.Path) > 1 {
+		logoutURI.Path = strings.TrimSuffix(logoutURI.Path, "/")
+	}
+
+	q := logoutURI.Query()
 	q.Set(LoginPostLogoutRedirectParam, redirectURI)
-	baseURI.RawQuery = q.Encode()
-	return baseURI.String()
+	if logoutHint != "" {
+		q.Set(LoginLogoutHintParam, logoutHint)
+	}
+	if len(uiLocales) > 0 {
+		q.Set(LoginUILocalesParam, uiLocales.String())
+	}
+	logoutToken, err := crypto.Sign(&logoutTokenPayload{
+		PostLogoutRedirectURI: redirectURI,
+		LogoutHint:            logoutHint,
+		UILocales:             uiLocales,
+	}, signer)
+	if err != nil {
+		return "", err
+	}
+	q.Set(LoginLogoutTokenParam, logoutToken)
+	logoutURI.RawQuery = q.Encode()
+	return logoutURI.String(), nil
 }
 
 // v2PostLogoutRedirectURI will take care that the post_logout_redirect_uri is correctly set for v2 logins.
@@ -416,11 +515,11 @@ func (o *OPStorage) revokeTokenV1(ctx context.Context, token, userID, clientID s
 func (o *OPStorage) GetRefreshTokenInfo(ctx context.Context, clientID string, token string) (userID string, tokenID string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		err = oidcError(err)
+		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
 
-	plainToken, err := o.decryptGrant(token)
+	plainToken, err := o.authAlg.DecryptToken(token)
 	if err != nil {
 		return "", "", op.ErrInvalidRefreshToken
 	}
@@ -441,32 +540,37 @@ func (o *OPStorage) GetRefreshTokenInfo(ctx context.Context, clientID string, to
 	return refreshToken.UserID, refreshToken.ID, nil
 }
 
-func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string, scopes []string) ([]string, error) {
+// assertOrgScope checks the scopes for organization scopes and returns the orgID if exactly one org scope is found.
+// If multiple org scopes are found or if the org scope is invalid, an error is returned.
+// For backwards compatibility, we support both orgID and orgDomain scopes, but they need to be consistent,
+// meaning that if both are provided, they need to belong to the same organization.
+func (o *OPStorage) assertOrgScope(ctx context.Context, scopes []string) (string, error) {
+	var id string
 	for _, scope := range scopes {
-		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
-			return scopes, nil
+		if orgID, ok := strings.CutPrefix(scope, domain.OrgIDScope); ok {
+			org, err := o.query.OrgByID(ctx, orgID)
+			if err != nil {
+				return "", err
+			}
+			if id != "" && id != org.ID {
+				return "", oidc.ErrInvalidScope().WithDescription("Only one organization scope may be provided")
+			}
+			id = org.ID
+			continue
+		}
+
+		if orgDomain, ok := strings.CutPrefix(scope, domain.OrgDomainPrimaryScope); ok {
+			org, err := o.query.OrgByPrimaryDomain(ctx, orgDomain)
+			if err != nil {
+				return "", err
+			}
+			if id != "" && id != org.ID {
+				return "", oidc.ErrInvalidScope().WithDescription("Only one organization scope may be provided")
+			}
+			id = org.ID
 		}
 	}
-
-	project, err := o.query.ProjectByOIDCClientID(ctx, clientID)
-	if err != nil {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-w4wIn", "Errors.Internal")
-	}
-	if !project.ProjectRoleAssertion {
-		return scopes, nil
-	}
-	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(project.ID)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
-	}
-	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
-	if err != nil {
-		return nil, err
-	}
-	for _, role := range roles.ProjectRoles {
-		scopes = append(scopes, ScopeProjectRolePrefix+role.Key)
-	}
-	return scopes, nil
+	return id, nil
 }
 
 func (o *OPStorage) assertProjectRoleScopesByProject(ctx context.Context, project *query.Project, scopes []string) ([]string, error) {
@@ -482,7 +586,7 @@ func (o *OPStorage) assertProjectRoleScopesByProject(ctx context.Context, projec
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
-	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -490,22 +594,6 @@ func (o *OPStorage) assertProjectRoleScopesByProject(ctx context.Context, projec
 		scopes = append(scopes, ScopeProjectRolePrefix+role.Key)
 	}
 	return scopes, nil
-}
-
-func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.TokenView, clientID, projectID string) error {
-	token.Audience = append(token.Audience, clientID)
-	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(projectID)
-	if err != nil {
-		return zerrors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
-	}
-	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
-	if err != nil {
-		return err
-	}
-	for _, role := range roles.ProjectRoles {
-		token.Scopes = append(token.Scopes, ScopeProjectRolePrefix+role.Key)
-	}
-	return nil
 }
 
 func setContextUserSystem(ctx context.Context) context.Context {

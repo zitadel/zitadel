@@ -6,6 +6,7 @@ import { PrivateLabelingSetting } from 'src/app/proto/generated/zitadel/project_
   selector: 'cnsl-project-private-labeling-dialog',
   templateUrl: './project-private-labeling-dialog.component.html',
   styleUrls: ['./project-private-labeling-dialog.component.scss'],
+  standalone: false,
 })
 export class ProjectPrivateLabelingDialogComponent {
   public setting: PrivateLabelingSetting = PrivateLabelingSetting.PRIVATE_LABELING_SETTING_UNSPECIFIED;

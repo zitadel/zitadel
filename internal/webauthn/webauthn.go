@@ -57,7 +57,7 @@ func (w *Config) BeginRegistration(ctx context.Context, user *domain.Human, acco
 	if err != nil {
 		return nil, err
 	}
-	creds := WebAuthNsToCredentials(webAuthNs, rpID)
+	creds := WebAuthNsToCredentials(ctx, webAuthNs, rpID)
 	existing := make([]protocol.CredentialDescriptor, len(creds))
 	for i, cred := range creds {
 		existing[i] = protocol.CredentialDescriptor{
@@ -136,7 +136,7 @@ func (w *Config) BeginLogin(ctx context.Context, user *domain.Human, userVerific
 	}
 	assertion, sessionData, err := webAuthNServer.BeginLogin(&webUser{
 		Human:       user,
-		credentials: WebAuthNsToCredentials(webAuthNs, rpID),
+		credentials: WebAuthNsToCredentials(ctx, webAuthNs, rpID),
 	}, webauthn.WithUserVerification(UserVerificationFromDomain(userVerification)))
 	if err != nil {
 		logging.WithFields("error", tryExtractProtocolErrMsg(err)).Debug("webauthn login could not be started")
@@ -155,6 +155,23 @@ func (w *Config) BeginLogin(ctx context.Context, user *domain.Human, userVerific
 	}, nil
 }
 
+func (w *Config) BeginWebAuthNLogin(ctx context.Context, user webauthn.User, rpID string, userVerification protocol.UserVerificationRequirement) (sessionData *webauthn.SessionData, cred []byte, relyingPartyID string, err error) {
+	webAuthNServer, err := w.serverFromContext(ctx, rpID, "")
+	if err != nil {
+		return nil, nil, "", err
+	}
+	assertion, sessionData, err := webAuthNServer.BeginLogin(user, webauthn.WithUserVerification(userVerification))
+	if err != nil {
+		logging.WithFields("error", tryExtractProtocolErrMsg(err)).Debug("webauthn login could not be started")
+		return nil, nil, "", zerrors.ThrowInternal(err, "WEBAU-4G8sw", "Errors.User.WebAuthN.BeginLoginFailed")
+	}
+	cred, err = json.Marshal(assertion)
+	if err != nil {
+		return nil, nil, "", zerrors.ThrowInternal(err, "WEBAU-2M0s9", "Errors.User.WebAuthN.MarshalError")
+	}
+	return sessionData, cred, webAuthNServer.Config.RPID, nil
+}
+
 func (w *Config) FinishLogin(ctx context.Context, user *domain.Human, webAuthN *domain.WebAuthNLogin, credData []byte, webAuthNs ...*domain.WebAuthNToken) (*webauthn.Credential, error) {
 	assertionData, err := protocol.ParseCredentialRequestResponseBody(bytes.NewReader(credData))
 	if err != nil {
@@ -163,7 +180,7 @@ func (w *Config) FinishLogin(ctx context.Context, user *domain.Human, webAuthN *
 	}
 	webUser := &webUser{
 		Human:       user,
-		credentials: WebAuthNsToCredentials(webAuthNs, webAuthN.RPID),
+		credentials: WebAuthNsToCredentials(ctx, webAuthNs, webAuthN.RPID),
 	}
 	webAuthNServer, err := w.serverFromContext(ctx, webAuthN.RPID, assertionData.Response.CollectedClientData.Origin)
 	if err != nil {
@@ -178,6 +195,30 @@ func (w *Config) FinishLogin(ctx context.Context, user *domain.Human, webAuthN *
 	if credential.Authenticator.CloneWarning {
 		return credential, zerrors.ThrowInternal(nil, "WEBAU-4M90s", "Errors.User.WebAuthN.CloneWarning")
 	}
+	return credential, nil
+}
+
+func (w *Config) FinishLoginWithNewDomainModel(ctx context.Context, sessionData webauthn.SessionData, user webauthn.User, credentials []byte, rpID string) (*webauthn.Credential, error) {
+	assertionData, err := protocol.ParseCredentialRequestResponseBody(bytes.NewReader(credentials))
+	if err != nil {
+		logging.WithFields("error", tryExtractProtocolErrMsg(err)).Debug("webauthn assertion could not be parsed")
+		return nil, zerrors.ThrowInternal(err, "WEBAU-ytJJmg", "Errors.User.WebAuthN.ValidateLoginFailed")
+	}
+	webAuthNServer, err := w.serverFromContext(ctx, rpID, assertionData.Response.CollectedClientData.Origin)
+	if err != nil {
+		return nil, err
+	}
+
+	credential, err := webAuthNServer.ValidateLogin(user, sessionData, assertionData)
+	if err != nil {
+		logging.WithFields("error", tryExtractProtocolErrMsg(err)).Debug("webauthn assertion failed")
+		return nil, zerrors.ThrowInternal(err, "WEBAU-zHfUKX", "Errors.User.WebAuthN.ValidateLoginFailed")
+	}
+
+	if credential.Authenticator.CloneWarning {
+		return credential, zerrors.ThrowInternal(nil, "WEBAU-eDG7kQ", "Errors.User.WebAuthN.CloneWarning")
+	}
+
 	return credential, nil
 }
 

@@ -12,6 +12,9 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/api/grpc/gerrors"
+	errorpb "github.com/zitadel/zitadel/pkg/grpc/error/v2"
+	metadata "github.com/zitadel/zitadel/pkg/grpc/metadata/v2"
 	resources_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 )
 
@@ -48,7 +51,7 @@ type ResourceListDetailsMsg interface {
 // It targets API v2 messages that have the `GetDetails()` method.
 //
 // Dynamically generated values are not compared with expected.
-// Instead a sanity check is performed.
+// Instead, a sanity check is performed.
 // For the sequence a non-zero value is expected.
 // If the change date is populated, it is checked with a tolerance of 1 minute around Now.
 //
@@ -149,7 +152,7 @@ func AssertGrpcStatus(t assert.TestingT, expected codes.Code, err error) {
 //
 // As [assert.Equal] is based on reflection, comparing 2 proto messages sometimes fails,
 // due to their internal state.
-// Expected messages are usually with a vanilla state, eg only exported fields contain data.
+// Expected messages are usually with a vanilla state, e.g. only exported fields contain data.
 // Actual messages obtained from the gRPC client had unexported fields with data.
 // This makes them hard to compare.
 func EqualProto(t testing.TB, expected, actual proto.Message) bool {
@@ -175,4 +178,74 @@ func diffProto(expected, actual proto.Message) string {
 		panic(err)
 	}
 	return "\n\nDiff:\n" + diff
+}
+
+// AssertMetadataEquals verifies that two slices of proto Metadata are equal, comparing both length and content by key-value mapping.
+func AssertMetadataEquals(t assert.TestingT, expected []*metadata.Metadata, actual []*metadata.Metadata) {
+	assert.Equal(t, len(expected), len(actual), "metadata length mismatch")
+	assert.Equal(t, getMetadataMap(expected), getMetadataMap(actual), "metadata content mismatch")
+}
+
+func getMetadataMap(metadataEntries []*metadata.Metadata) map[string][]byte {
+	metadataByKey := make(map[string][]byte, len(metadataEntries))
+	for _, md := range metadataEntries {
+		metadataByKey[md.Key] = md.Value
+	}
+	return metadataByKey
+}
+
+func RequireStatusError(t *testing.T, err, targetErr error) {
+	t.Helper()
+
+	if AssertStatusError(t, err, targetErr) {
+		return
+	}
+	t.FailNow()
+}
+
+func AssertStatusError(t *testing.T, err, targetErr error) bool {
+	t.Helper()
+
+	cErr, ok := status.FromError(err)
+	if !ok {
+		return assert.Fail(t, "expected status error")
+	}
+
+	tErr, ok := status.FromError(gerrors.ZITADELToGRPCError(t.Context(), targetErr))
+	if !ok {
+		return assert.Fail(t, "expected status error")
+	}
+	if !assert.Equal(t, tErr.Code(), cErr.Code(), "expected different status code") {
+		return false
+	}
+	if len(tErr.Details()) == 1 {
+		if len(cErr.Details()) != 1 {
+			return assert.Fail(t, "missing details")
+		}
+		targetDetails, ok := tErr.Details()[0].(*errorpb.ErrorDetail)
+		if !ok {
+			return assert.Failf(t, "expected error detail in target error", "got %#v", tErr.Details()[0])
+		}
+		details, ok := cErr.Details()[0].(*errorpb.ErrorDetail)
+		if !ok {
+			return assert.Failf(t, "expected error detail in actual error", "got %#v", cErr.Details()[0])
+		}
+		return AssertErrorDetail(t, details, targetDetails)
+	}
+	return true
+}
+
+func AssertErrorDetail(t *testing.T, detail, targetDetail *errorpb.ErrorDetail) bool {
+	t.Helper()
+
+	if !assert.Equal(t, targetDetail.GetSlug(), detail.GetSlug(), "expected different slug") {
+		return false
+	}
+	if targetDetail.GetMessage() != "" && !assert.Equal(t, targetDetail.GetMessage(), detail.GetMessage(), "expected different message") {
+		return false
+	}
+	if targetDetail.GetDetails() != nil && !assert.Equal(t, targetDetail.GetDetails().AsMap(), detail.GetDetails().AsMap(), "expected different details") {
+		return false
+	}
+	return true
 }

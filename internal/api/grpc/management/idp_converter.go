@@ -5,6 +5,7 @@ import (
 
 	"github.com/crewjam/saml"
 	"github.com/muhlemmer/gu"
+	dsig "github.com/russellhaering/goxmldsig"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
@@ -13,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
@@ -473,14 +475,17 @@ func addSAMLProviderToCommand(req *mgmt_pb.AddSAMLProviderRequest) *command.SAML
 	if req.NameIdFormat != nil {
 		nameIDFormat = gu.Ptr(idp_grpc.SAMLNameIDFormatToDomain(req.GetNameIdFormat()))
 	}
+
 	return &command.SAMLProvider{
 		Name:                          req.Name,
 		Metadata:                      req.GetMetadataXml(),
 		MetadataURL:                   req.GetMetadataUrl(),
 		Binding:                       bindingToCommand(req.Binding),
 		WithSignedRequest:             req.WithSignedRequest,
+		SignatureAlgorithm:            signatureAlgorithmToCommand(req.GetSignatureAlgorithm()),
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
+		FederatedLogoutEnabled:        req.GetFederatedLogoutEnabled(),
 		IDPOptions:                    idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -490,14 +495,17 @@ func updateSAMLProviderToCommand(req *mgmt_pb.UpdateSAMLProviderRequest) *comman
 	if req.NameIdFormat != nil {
 		nameIDFormat = gu.Ptr(idp_grpc.SAMLNameIDFormatToDomain(req.GetNameIdFormat()))
 	}
+
 	return &command.SAMLProvider{
 		Name:                          req.Name,
 		Metadata:                      req.GetMetadataXml(),
 		MetadataURL:                   req.GetMetadataUrl(),
 		Binding:                       bindingToCommand(req.Binding),
 		WithSignedRequest:             req.WithSignedRequest,
+		SignatureAlgorithm:            signatureAlgorithmToCommand(req.GetSignatureAlgorithm()),
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
+		FederatedLogoutEnabled:        req.GetFederatedLogoutEnabled(),
 		IDPOptions:                    idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -514,5 +522,40 @@ func bindingToCommand(binding idp_pb.SAMLBinding) string {
 		return saml.HTTPArtifactBinding
 	default:
 		return ""
+	}
+}
+
+func signatureAlgorithmToCommand(signatureAlgorithm idp_pb.SAMLSignatureAlgorithm) string {
+	switch signatureAlgorithm {
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_UNSPECIFIED:
+		return ""
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1:
+		return dsig.RSASHA1SignatureMethod
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA256:
+		return dsig.RSASHA256SignatureMethod
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA512:
+		return dsig.RSASHA512SignatureMethod
+	default:
+		return ""
+	}
+}
+
+func addZitadelProviderToCommand(req *mgmt_pb.AddZitadelProviderRequest) command.ZitadelProvider {
+	instanceRolesInfo := make([]idp.RolesInfo, 0, len(req.InstanceRolesInfo))
+	for _, info := range req.InstanceRolesInfo {
+		instanceRolesInfo = append(instanceRolesInfo, idp.RolesInfo{
+			OrganizationID:     info.OrganizationId,
+			OrganizationDomain: info.OrganizationDomain,
+		})
+	}
+
+	return command.ZitadelProvider{
+		Name:              req.Name,
+		Issuer:            req.Issuer,
+		ClientID:          req.ClientId,
+		ClientSecret:      req.ClientSecret,
+		Scopes:            req.Scopes,
+		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+		InstanceRolesInfo: instanceRolesInfo,
 	}
 }

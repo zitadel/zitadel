@@ -1,0 +1,236 @@
+syntax = "proto3";
+
+package zitadel.internal_permission.v2;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/filter/v2/filter.proto";
+import "zitadel/internal_permission/v2/query.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2;internal_permission";
+
+// InternalPermissionService provides methods to manage permissions for resource
+// and their management in Zitadel itself also known as "administrators".
+//
+// If you want to manage permissions and roles within your project or application,
+// please use the AuthorizationsService.
+service InternalPermissionService {
+
+  // List Administrators
+  //
+  // ListAdministrators returns all administrators and their roles matching the request and the caller's permissions to retrieve.
+  //
+  // Required permissions depend on the resource type:
+  //   - "iam.member.read" for instance administrators
+  //   - "org.member.read" for organization administrators
+  //   - "project.member.read" for project administrators
+  //   - "project.grant.member.read" for project grant administrators
+  //   - no permissions required for listing own administrator roles
+  rpc ListAdministrators(ListAdministratorsRequest) returns (ListAdministratorsResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {permission: "authenticated"}
+    };
+  }
+
+  // Create Administrator
+  //
+  // CreateAdministrator grants an administrator role to a user for a specific resource.
+  //
+  // Note that the roles are specific to the resource type.
+  // This means that if you want to grant a user the administrator role for an organization and a project,
+  // you need to create two administrator roles.
+  //
+  // Required permissions depend on the resource type:
+  //   - "iam.member.write" for instance administrators
+  //   - "org.member.write" for organization administrators
+  //   - "project.member.write" for project administrators
+  //   - "project.grant.member.write" for project grant administrators
+  rpc CreateAdministrator(CreateAdministratorRequest) returns (CreateAdministratorResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {permission: "authenticated"}
+    };
+  }
+
+  // Update Administrator
+  //
+  // UpdateAdministrator updates the specific administrator role.
+  //
+  // Note that any role previously granted to the user and not present in the request will be revoked.
+  //
+  // Required permissions depend on the resource type:
+  //   - "iam.member.write" for instance administrators
+  //   - "org.member.write" for organization administrators
+  //   - "project.member.write" for project administrators
+  //   - "project.grant.member.write" for project grant administrators
+  rpc UpdateAdministrator(UpdateAdministratorRequest) returns (UpdateAdministratorResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {permission: "authenticated"}
+    };
+  }
+
+  // Delete Administrator
+  //
+  // DeleteAdministrator revokes an administrator role from a user.
+  //
+  // In case the administrator role is not found, the request will return a successful response as
+  // the desired state is already achieved.
+  // You can check the deletion date in the response to verify if the administrator role was deleted during the request.
+  //
+  // Required permissions depend on the resource type:
+  //   - "iam.member.delete" for instance administrators
+  //   - "org.member.delete" for organization administrators
+  //   - "project.member.delete" for project administrators
+  //   - "project.grant.member.delete" for project grant administrators
+  rpc DeleteAdministrator(DeleteAdministratorRequest) returns (DeleteAdministratorResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {permission: "authenticated"}
+    };
+  }
+}
+
+message ListAdministratorsRequest {
+  // Paginate through the results using a limit, offset and sorting.
+  optional zitadel.filter.v2.PaginationRequest pagination = 1;
+
+  // The field the result is sorted by. The default is the creation date.
+  // Beware that if you change this, your result pagination might be inconsistent.
+  AdministratorFieldName sorting_column = 2;
+
+  // Filter the administrator roles to be returned.
+  repeated AdministratorSearchFilter filters = 3;
+}
+
+message ListAdministratorsResponse {
+  // Pagination contains the current sequence and the total result count.
+  zitadel.filter.v2.PaginationResponse pagination = 1;
+
+  // Administrators contains the list of administrators matching the request.
+  repeated Administrator administrators = 2;
+}
+
+message CreateAdministratorRequest {
+  // UserID is the ID of the user who should be granted the administrator role.
+  string user_id = 1 [
+    (validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+
+  // Resource is the type of the resource the administrator roles should be granted for.
+  ResourceType resource = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Roles are the roles that should be granted to the user for the specified resource.
+  // Note that roles are currently specific to the resource type.
+  // This means that if you want to grant a user the administrator role for an organization and a project,
+  // you need to create two administrator roles.
+  repeated string roles = 3 [
+    (validate.rules).repeated = {
+      unique: true
+      items: {
+        string: {
+          min_len: 1
+          max_len: 200
+        }
+      }
+    },
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message ResourceType {
+  message ProjectGrant {
+    // ProjectID is the unique identifier of the project the project grant belongs to.
+    string project_id = 1 [
+      (validate.rules).string = {
+        min_len: 1
+        max_len: 200
+      },
+      (google.api.field_behavior) = REQUIRED
+    ];
+
+    // OrganizationID is the unique identifier of the organization the project was granted to
+    // and on which the administrator role should be granted.
+    string organization_id = 2 [
+      (validate.rules).string = {
+        min_len: 1
+        max_len: 200
+      },
+      (google.api.field_behavior) = REQUIRED
+    ];
+  }
+
+  // Resource is the type of the resource the administrator roles should be granted for.
+  oneof resource {
+    option (validate.required) = true;
+
+    // Instance is the resource type for granting administrator privileges on the instance level.
+    bool instance = 1 [(validate.rules).bool = {const: true}];
+
+    // OrganizationID is required to grant administrator privileges for a specific organization.
+    string organization_id = 2;
+
+    // ProjectID is required to grant administrator privileges for a specific project.
+    string project_id = 3;
+
+    // ProjectGrantID is required to grant administrator privileges for a specific project grant.
+    ProjectGrant project_grant = 4;
+  }
+}
+
+message CreateAdministratorResponse {
+  // CreationDate is the timestamp when the administrator role was created.
+  google.protobuf.Timestamp creation_date = 1;
+}
+
+message UpdateAdministratorRequest {
+  // UserID is the ID of the user whose administrator roles should be updated.
+  string user_id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+
+  // Resource is the type of the resource the administrator roles should be granted for.
+  ResourceType resource = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Roles are the roles that the user should be granted.
+  // Note that any role previously granted to the user and not present in the list will be revoked.
+  repeated string roles = 3 [(validate.rules).repeated = {
+    unique: true
+    items: {
+      string: {
+        min_len: 1
+        max_len: 200
+      }
+    }
+  }];
+}
+
+message UpdateAdministratorResponse {
+  // ChangeDate is the timestamp when the administrator role was last updated.
+  google.protobuf.Timestamp change_date = 1;
+}
+
+message DeleteAdministratorRequest {
+  // UserID is the ID of the user whose administrator roles should be removed.
+  string user_id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+
+  // Resource is the type of the resource the administrator roles should be removed for.
+  ResourceType resource = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message DeleteAdministratorResponse {
+  // DeletionDate is the timestamp when the administrator role was deleted.
+  // Note that the deletion date is only guaranteed to be set if the deletion was successful during the request.
+  // In case the deletion occurred in a previous request, the deletion date might not be set.
+  google.protobuf.Timestamp deletion_date = 1;
+}

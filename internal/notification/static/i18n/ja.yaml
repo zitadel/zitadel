@@ -1,68 +1,67 @@
 InitCode:
-  Title: ZITADEL - ユーザーの初期セットアップ
-  PreHeader: ユーザーの初期セットアップ
-  Subject: ユーザーの初期セットアップ
-  Greeting: こんにちは {{.DisplayName}} さん、
-  Text: このユーザーはZITADELで作成されました。ユーザー名 {{.PreferredLoginName}} を使用してログインします。以下のボタンから、初期セットアップを完了してください。（コード {{.Code}}）このメールの受信を希望していない場合は、無視してください。
-  ButtonText: 初期セットアップを完了する
+  Title: "Zitadel - ユーザーの初期セットアップ"
+  PreHeader: "ユーザーの初期セットアップ"
+  Subject: "ユーザーの初期セットアップ"
+  Greeting: "こんにちは {{.DisplayName}} さん、"
+  Text: "このユーザーはZitadelで作成されました。ユーザー名 {{.PreferredLoginName}} を使用してログインします。以下のボタンから、初期セットアップを完了してください。（コード {{.Code}}）このメールの受信を希望していない場合は、無視してください。"
+  ButtonText: "初期セットアップを完了する"
 PasswordReset:
-  Title: ZITADEL - パスワードをリセットします
-  PreHeader: パスワードの再設定
-  Subject: パスワードの再設定
-  Greeting: こんにちは {{.DisplayName}} さん、
-  Text: パスワードリセットのリクエストを受け取りました。以下のボタンから、パスワードをリセットしてください。（コード {{.Code}}）このメールの受信を希望していない場合は、無視してください。
-  ButtonText: パスワードを再設定
+  Title: "Zitadel - パスワードをリセットします"
+  PreHeader: "パスワードの再設定"
+  Subject: "パスワードの再設定"
+  Greeting: "こんにちは {{.DisplayName}} さん、"
+  Text: "パスワードリセットのリクエストを受け取りました。以下のボタンから、パスワードをリセットしてください。（コード {{.Code}}）このメールの受信を希望していない場合は、無視してください。"
+  ButtonText: "パスワードを再設定"
 VerifyEmail:
-  Title: ZITADEL - メールアドレスの認証
-  PreHeader: メールアドレスの認証
-  Subject: メールアドレスの認証
-  Greeting: こんにちは {{.DisplayName}} さん、
-  Text: 新しいメールアドレスが追加されました。以下のボタンから、メールアドレスを認証してください。（コード {{.Code}}）新しいメールアドレスを追加していない場合は、このメールを無視してください。
-  ButtonText: メールアドレスを認証
+  Title: "Zitadel - メールアドレスの認証"
+  PreHeader: "メールアドレスの認証"
+  Subject: "メールアドレスの認証"
+  Greeting: "こんにちは {{.DisplayName}} さん、"
+  Text: "新しいメールアドレスが追加されました。以下のボタンから、メールアドレスを認証してください。（コード {{.Code}}）新しいメールアドレスを追加していない場合は、このメールを無視してください。"
+  ButtonText: "メールアドレスを認証"
 VerifyPhone:
-  Title: ZITADEL - 電話番号の認証
-  PreHeader: 電話番号の認証
-  Subject: 電話番号の認証
-  Greeting: こんにちは {{.DisplayName}} さん、
-  Text: 新しい電話番号が追加されました。次のコードを使用してを認証してください {{.Code}}
-  ButtonText: 電話番号を認証
+  Title: "Zitadel - 電話番号の認証"
+  PreHeader: "電話番号の認証"
+  Subject: "電話番号の認証"
+  Greeting: "こんにちは {{.DisplayName}} さん、"
+  Text: "新しい電話番号が追加されました。次のコードを使用してを認証してください {{.Code}}"
+  ButtonText: "電話番号を認証"
 VerifyEmailOTP:
-  Title: ZITADEL - ワンタイムパスワードを確認する
-  PreHeader: ワンタイムパスワードを確認する
-  Subject: ワンタイムパスワードを確認する
-  Greeting: こんにちは、{{.DisplayName}}さん
-  Text: 認証ボタンを使用するか、ワンタイムパスワード {{.OTP}} をコピーして認証画面に貼り付け、次の5分以内にZITADELで認証してください。
-  ButtonText: 認証
+  Title: "Zitadel - OTPを確認する"
+  PreHeader: "OTPを確認する"
+  Subject: "OTPを確認する"
+  Greeting: "こんにちは、{{.DisplayName}}さん"
+  Text: "認証ボタンを使用するか、OTP {{.OTP}} をコピーして認証画面に貼り付け、次の5分以内にZitadelで認証してください。"
+  ButtonText: "認証"
 VerifySMSOTP:
-  Text: >-
-    {{.OTP}} は、{{ .Domain }} のワンタイムパスワードです。次の {{.Expiry}} 以内に使用してください。
-    
+  Text: |-
+    {{.OTP}} は、{{ .Domain }} のOTPです。次の {{.Expiry}} 以内に使用してください。
     @{{.Domain}} #{{.OTP}}
 DomainClaimed:
-  Title: ZITADEL - ドメインの登録
-  PreHeader: メールアドレス・ユーザー名の変更
-  Subject: ドメインの登録
-  Greeting: こんにちは {{.DisplayName}} さん、
-  Text: ドメイン {{.Domain}} が組織によって登録されました。現在のユーザー {{.Username}} はこの組織のメンバーでないため、ログイン時にメールアドレスを変更する必要があります。一時的なユーザー名（{{.TempUsername}}）を使用してログインし、設定を進めてください。
-  ButtonText: ログイン
+  Title: "Zitadel - ドメインの登録"
+  PreHeader: "メールアドレス・ユーザー名の変更"
+  Subject: "ドメインの登録"
+  Greeting: "こんにちは {{.DisplayName}} さん、"
+  Text: "ドメイン {{.Domain}} が組織によって登録されました。現在のユーザー {{.Username}} はこの組織のメンバーでないため、ログイン時にメールアドレスを変更する必要があります。一時的なユーザー名（{{.TempUsername}}）を使用してログインし、設定を進めてください。"
+  ButtonText: "ログイン"
 PasswordlessRegistration:
-  Title: ZITADEL - パスワードレスログインの追加
-  PreHeader: パスワードレスログインの追加
-  Subject: パスワードレスログインの追加
-  Greeting: こんにちは {{.DisplayName}} さん、
-  Text: パスワードレスログイン用のトークンを追加するリクエストを受け取りました。以下のボタンから、パスワードレスログイン用のトークンやデバイスを追加してください。
-  ButtonText: パスワードレスログインを追加
+  Title: "Zitadel - パスワードレスログインの追加"
+  PreHeader: "パスワードレスログインの追加"
+  Subject: "パスワードレスログインの追加"
+  Greeting: "こんにちは {{.DisplayName}} さん、"
+  Text: "パスワードレスログイン用のトークンを追加するリクエストを受け取りました。以下のボタンから、パスワードレスログイン用のトークンやデバイスを追加してください。"
+  ButtonText: "パスワードレスログインを追加"
 PasswordChange:
-  Title: ZITADEL - ユーザーのパスワードが変更されました
-  PreHeader: パスワードの変更
-  Subject: ユーザーのパスワードが変更されました
-  Greeting: こんにちは {{.DisplayName}} さん、
-  Text: ユーザーのパスワードが変更されました。この変更があなたによって行われなかった場合は、すぐにパスワードをリセットすることをお勧めします。
-  ButtonText: ログイン
+  Title: "Zitadel - ユーザーのパスワードが変更されました"
+  PreHeader: "パスワードの変更"
+  Subject: "ユーザーのパスワードが変更されました"
+  Greeting: "こんにちは {{.DisplayName}} さん、"
+  Text: "ユーザーのパスワードが変更されました。この変更があなたによって行われなかった場合は、すぐにパスワードをリセットすることをお勧めします。"
+  ButtonText: "ログイン"
 InviteUser:
-  Title: '{{.ApplicationName}}への招待'
-  PreHeader: '{{.ApplicationName}}への招待'
-  Subject: '{{.ApplicationName}}への招待'
-  Greeting: こんにちは {{.DisplayName}} さん、
-  Text: あなたのユーザーは{{.ApplicationName}}に招待されました。下のボタンをクリックして、招待プロセスを完了してください。このメールをリクエストしていない場合は、無視してください。
-  ButtonText: 招待を受け入れる
+  Title: "{{.ApplicationName}}への招待"
+  PreHeader: "{{.ApplicationName}}への招待"
+  Subject: "{{.ApplicationName}}への招待"
+  Greeting: "こんにちは {{.DisplayName}} さん、"
+  Text: "あなたのユーザーは{{.ApplicationName}}に招待されました。下のボタンをクリックして、招待プロセスを完了してください。このメールをリクエストしていない場合は、無視してください。"
+  ButtonText: "招待を受け入れる"

@@ -1,0 +1,534 @@
+Login:
+  Title: مرحباً بعودتك!
+  Description: أدخل بيانات الدخول الخاصة بك.
+  TitleLinking: تسجيل الدخول لربط المستخدم
+  DescriptionLinking: أدخل بيانات الدخول لربط حسابك الخارجي.
+  LoginNameLabel: اسم الدخول
+  UsernamePlaceHolder: اسم المستخدم
+  LoginnamePlaceHolder: username@domain
+  ExternalUserDescription: تسجيل الدخول بمستخدم خارجي.
+  MustBeMemberOfOrg: يجب أن يكون المستخدم عضواً في المنظمة {{.OrgName}}.
+  RegisterButtonText: تسجيل
+  NextButtonText: التالي
+
+LDAP:
+  Title: تسجيل الدخول
+  Description: أدخل بيانات الدخول الخاصة بك.
+  LoginNameLabel: اسم الدخول
+  PasswordLabel: كلمة المرور
+  NextButtonText: التالي
+
+SelectAccount:
+  Title: اختيار الحساب
+  Description: استخدم حسابك
+  TitleLinking: اختيار الحساب لربط المستخدم
+  DescriptionLinking: اختر حسابك لربطه مع المستخدم الخارجي.
+  OtherUser: مستخدم آخر
+  SessionState0: نشط
+  SessionState1: تم تسجيل الخروج
+  MustBeMemberOfOrg: يجب أن يكون المستخدم عضواً في المنظمة {{.OrgName}}.
+
+Password:
+  Title: كلمة المرور
+  Description: أدخل بيانات الدخول الخاصة بك.
+  PasswordLabel: كلمة المرور
+  MinLength: يجب أن تكون على الأقل
+  MinLengthp2: حرفاً.
+  MaxLength: يجب أن تكون أقل من 70 حرفاً.
+  HasUppercase: يجب أن تتضمن حرفاً كبيراً (Large/Upper case).
+  HasLowercase: يجب أن تتضمن حرفاً صغيراً (Small/Lower case).
+  HasNumber: يجب أن تتضمن رقماً.
+  HasSymbol: يجب أن تتضمن رمزاً.
+  Confirmation: تطابقت كلمة المرور.
+  ResetLinkText: إعادة تعيين كلمة المرور
+  BackButtonText: رجوع
+  NextButtonText: التالي
+
+UsernameChange:
+  Title: تغيير اسم المستخدم
+  Description: تعيين اسم المستخدم الجديد الخاص بك
+  UsernameLabel: اسم المستخدم
+  CancelButtonText: إلغاء
+  NextButtonText: التالي
+
+UsernameChangeDone:
+  Title: تم تغيير اسم المستخدم
+  Description: تم تغيير اسم المستخدم الخاص بك بنجاح.
+  NextButtonText: التالي
+
+InitPassword:
+  Title: تعيين كلمة المرور
+  Description: لقد تلقيت رمزاً، يجب عليك إدخاله في النموذج أدناه لتعيين كلمة المرور الجديدة.
+  CodeLabel: الرمز
+  NewPasswordLabel: كلمة المرور الجديدة
+  NewPasswordConfirmLabel: تأكيد كلمة المرور
+  ResendButtonText: إعادة إرسال الرمز
+  NextButtonText: التالي
+
+InitPasswordDone:
+  Title: تم تعيين كلمة المرور
+  Description: تم تعيين كلمة المرور بنجاح
+  NextButtonText: التالي
+  CancelButtonText: إلغاء
+
+InitUser:
+  Title: تفعيل المستخدم
+  Description: تحقق من بريدك الإلكتروني باستخدام الرمز أدناه وقم بتعيين كلمة المرور الخاصة بك.
+  CodeLabel: الرمز
+  NewPasswordLabel: كلمة المرور الجديدة
+  NewPasswordConfirm: تأكيد كلمة المرور
+  NextButtonText: التالي
+  ResendButtonText: إعادة إرسال الرمز
+
+InitUserDone:
+  Title: تم تفعيل المستخدم
+  Description: تم التحقق من البريد الإلكتروني وتعيين كلمة المرور بنجاح
+  NextButtonText: التالي
+  CancelButtonText: إلغاء
+
+InviteUser:
+  Title: تفعيل المستخدم
+  Description: تحقق من بريدك الإلكتروني باستخدام الرمز أدناه وقم بتعيين كلمة المرور الخاصة بك.
+  CodeLabel: الرمز
+  NewPasswordLabel: كلمة المرور الجديدة
+  NewPasswordConfirm: تأكيد كلمة المرور
+  NextButtonText: التالي
+  ResendButtonText: إعادة إرسال الرمز
+
+InitMFAPrompt:
+  Title: إعداد المصادقة الثنائية
+  Description: تمنحك المصادقة الثنائية أماناً إضافياً لحساب المستخدم الخاص بك. وهذا يضمن أنك الوحيد الذي يملك حق الوصول إلى حسابك.
+  Provider0: تطبيق المصادقة (مثل Google/Microsoft Authenticator، Authy)
+  Provider1: يعتمد على الجهاز (مثل FaceID، Windows Hello، البصمة)
+  Provider3: كلمة مرور لمرة واحدة عبر SMS
+  Provider4: كلمة مرور لمرة واحدة عبر البريد الإلكتروني
+  NextButtonText: التالي
+  SkipButtonText: تخطي
+
+InitMFAOTP:
+  Title: التحقق من المصادقة الثنائية
+  Description: أنشئ عاملك الثاني. قم بتنزيل تطبيق مصادقة إذا لم يكن لديك واحد بالفعل.
+  OTPDescription: امسح الرمز باستخدام تطبيق المصادقة الخاص بك (مثل Google/Microsoft Authenticator، Authy) أو انسخ السر وأدخل الرمز المولد أدناه.
+  SecretLabel: السر (Secret)
+  CodeLabel: الرمز
+  NextButtonText: التالي
+  CancelButtonText: إلغاء
+
+InitMFAOTPSMS:
+  Title: التحقق من المصادقة الثنائية
+  DescriptionPhone: أنشئ عاملك الثاني. أدخل رقم هاتفك للتحقق منه.
+  DescriptionCode: أنشئ عاملك الثاني. أدخل الرمز المستلم للتحقق من رقم هاتفك.
+  PhoneLabel: الهاتف
+  CodeLabel: الرمز
+  EditButtonText: تعديل
+  ResendButtonText: إعادة إرسال الرمز
+  NextButtonText: التالي
+
+InitMFAU2F:
+  Title: إضافة مفتاح أمان
+  Description: مفتاح الأمان هو وسيلة تحقق يمكن أن تكون مدمجة في هاتفك، أو تستخدم البلوتوث، أو توصل مباشرة بمنفذ USB بجهاز الكمبيوتر الخاص بك.
+  TokenNameLabel: اسم مفتاح الأمان / الجهاز
+  NotSupported: WebAuthN غير مدعوم من قبل متصفحك. يرجى التأكد من تحديثه أو استخدام متصفح مختلف (مثل Chrome، Safari، Firefox)
+  RegisterTokenButtonText: إضافة مفتاح أمان
+  ErrorRetry: أعد المحاولة، أنشئ تحدياً جديداً أو اختر طريقة مختلفة.
+
+InitMFADone:
+  Title: تم التحقق من العامل الثاني
+  Description: رائع! لقد قمت بإعداد المصادقة الثنائية بنجاح وجعلت حسابك أكثر أماناً. يجب إدخال العامل عند كل تسجيل دخول.
+  NextButtonText: التالي
+  CancelButtonText: إلغاء
+
+MFAProvider:
+  Provider0: تطبيق المصادقة (مثل Google/Microsoft Authenticator، Authy)
+  Provider1: يعتمد على الجهاز (مثل FaceID، Windows Hello، البصمة)
+  Provider3: كلمة مرور لمرة واحدة عبر SMS
+  Provider4: كلمة مرور لمرة واحدة عبر البريد الإلكتروني
+  ChooseOther: أو اختر خياراً آخر
+
+VerifyMFAOTP:
+  Title: التحقق من العامل الثاني
+  Description: تحقق من عاملك الثاني
+  CodeLabel: الرمز
+  NextButtonText: التالي
+
+VerifyOTP:
+  Title: التحقق من العامل الثاني
+  Description: تحقق من عاملك الثاني
+  CodeLabel: الرمز
+  ResendButtonText: إعادة إرسال الرمز
+  NextButtonText: التالي
+
+VerifyMFAU2F:
+  Title: التحقق من المصادقة الثنائية
+  Description: تحقق من العامل الثاني باستخدام الجهاز المسجل (مثل FaceID، Windows Hello، البصمة)
+  NotSupported: WebAuthN غير مدعوم من قبل متصفحك. تأكد من أنك تستخدم أحدث إصدار أو غيّر متصفحك إلى متصفح مدعوم (Chrome، Safari، Firefox)
+  ErrorRetry: أعد المحاولة، أنشئ طلباً جديداً أو اختر طريقة أخرى.
+  ValidateTokenButtonText: التحقق من العامل الثاني
+
+Passwordless:
+  Title: تسجيل الدخول بدون كلمة مرور
+  Description: تسجيل الدخول باستخدام طرق المصادقة التي يوفرها جهازك مثل FaceID أو Windows Hello أو البصمة.
+  NotSupported: WebAuthN غير مدعوم من قبل متصفحك. يرجى التأكد من تحديثه أو استخدام متصفح مختلف (مثل Chrome، Safari، Firefox)
+  ErrorRetry: أعد المحاولة، أنشئ تحدياً جديداً أو اختر طريقة مختلفة.
+  LoginWithPwButtonText: تسجيل الدخول بكلمة المرور
+  ValidateTokenButtonText: تسجيل الدخول بدون كلمة مرور
+
+PasswordlessPrompt:
+  Title: إعداد الدخول بدون كلمة مرور
+  Description: هل ترغب في إعداد تسجيل الدخول بدون كلمة مرور؟ (طرق المصادقة الخاصة بجهازك مثل FaceID أو Windows Hello أو البصمة)
+  DescriptionInit: تحتاج إلى إعداد تسجيل الدخول بدون كلمة مرور. استخدم الرابط الذي تم إعطاؤه لك لتسجيل جهازك.
+  PasswordlessButtonText: انتقل إلى بدون كلمة مرور
+  NextButtonText: التالي
+  SkipButtonText: تخطي
+
+PasswordlessRegistration:
+  Title: إعداد الدخول بدون كلمة مرور
+  Description: أضف مصادقتك من خلال توفير اسم (مثل هاتفي، ماك بوك، إلخ) ثم النقر على زر 'تسجيل بدون كلمة مرور' أدناه.
+  TokenNameLabel: اسم الجهاز
+  NotSupported: WebAuthN غير مدعوم من قبل متصفحك. يرجى التأكد من تحديثه أو استخدام متصفح مختلف (مثل Chrome، Safari، Firefox)
+  RegisterTokenButtonText: تسجيل بدون كلمة مرور
+  ErrorRetry: أعد المحاولة، أنشئ تحدياً جديداً أو اختر طريقة مختلفة.
+
+PasswordlessRegistrationDone:
+  Title: تم إعداد الدخول بدون كلمة مرور
+  Description: تمت إضافة جهاز الدخول بدون كلمة مرور بنجاح.
+  DescriptionClose: يمكنك الآن إغلاق هذه النافذة.
+  NextButtonText: التالي
+  CancelButtonText: إلغاء
+
+PasswordChange:
+  Title: تغيير كلمة المرور
+  Description: غيّر كلمة المرور الخاصة بك. أدخل كلمة المرور القديمة والجديدة.
+  ExpiredDescription: انتهت صلاحية كلمة المرور الخاصة بك ويجب تغييرها. أدخل كلمة المرور القديمة والجديدة.
+  OldPasswordLabel: كلمة المرور القديمة
+  NewPasswordLabel: كلمة المرور الجديدة
+  NewPasswordConfirmLabel: تأكيد كلمة المرور
+  CancelButtonText: إلغاء
+  NextButtonText: التالي
+  Footer: تذييل
+
+PasswordChangeDone:
+  Title: تغيير كلمة المرور
+  Description: تم تغيير كلمة المرور بنجاح.
+  NextButtonText: التالي
+
+PasswordResetDone:
+  Title: تم إرسال رابط إعادة تعيين كلمة المرور
+  Description: تحقق من بريدك الإلكتروني لإعادة تعيين كلمة المرور.
+  NextButtonText: التالي
+
+EmailVerification:
+  Title: التحقق من البريد الإلكتروني
+  Description: لقد أرسلنا لك بريداً إلكترونياً للتحقق من عنوانك. يرجى إدخال الرمز في النموذج أدناه.
+  CodeLabel: الرمز
+  NextButtonText: التالي
+  ResendButtonText: إعادة إرسال الرمز
+
+EmailVerificationDone:
+  Title: التحقق من البريد الإلكتروني
+  Description: تم التحقق من عنوان بريدك الإلكتروني بنجاح.
+  NextButtonText: التالي
+  CancelButtonText: إلغاء
+  LoginButtonText: تسجيل الدخول
+
+RegisterOption:
+  Title: خيارات التسجيل
+  Description: اختر كيف ترغب في التسجيل
+  RegisterUsernamePasswordButtonText: باستخدام اسم المستخدم وكلمة المرور
+  ExternalLoginDescription: أو سجل بمستخدم خارجي
+  LoginButtonText: تسجيل الدخول
+
+RegistrationUser:
+  Title: التسجيل
+  Description: أدخل بيانات المستخدم الخاصة بك. سيتم استخدام بريدك الإلكتروني كاسم للدخول.
+  DescriptionOrgRegister: أدخل بيانات المستخدم الخاصة بك.
+  EmailLabel: البريد الإلكتروني
+  UsernameLabel: اسم المستخدم
+  FirstnameLabel: الاسم الأول
+  LastnameLabel: اسم العائلة
+  LanguageLabel: اللغة
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Arabic: العربية
+  GenderLabel: الجنس
+  Female: أنثى
+  Male: ذكر
+  Diverse: متنوع / X
+  PasswordLabel: كلمة المرور
+  PasswordConfirmLabel: تأكيد كلمة المرور
+  TosAndPrivacyLabel: الشروط والأحكام
+  TosConfirm: أنا أقبل
+  TosLinkText: شروط الخدمة
+  PrivacyConfirm: أنا أقبل
+  PrivacyLinkText: سياسة الخصوصية
+  ExternalLogin: أو سجل بمستخدم خارجي
+  BackButtonText: تسجيل الدخول
+  NextButtonText: التالي
+
+ExternalRegistrationUserOverview:
+  Title: تسجيل مستخدم خارجي
+  Description: لقد أخذنا تفاصيل المستخدم الخاصة بك من المزود المحدد. يمكنك الآن تغييرها أو إكمالها.
+  EmailLabel: البريد الإلكتروني
+  UsernameLabel: اسم المستخدم
+  FirstnameLabel: الاسم الأول
+  LastnameLabel: اسم العائلة
+  NicknameLabel: اللقب
+  PhoneLabel: رقم الهاتف
+  LanguageLabel: اللغة
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Arabic: العربية
+  TosAndPrivacyLabel: الشروط والأحكام
+  TosConfirm: أنا أقبل
+  TosLinkText: شروط الخدمة
+  PrivacyConfirm: أنا أقبل
+  PrivacyLinkText: سياسة الخصوصية
+  ExternalLogin: أو سجل بمستخدم خارجي
+  BackButtonText: رجوع
+  NextButtonText: حفظ
+
+RegistrationOrg:
+  Title: تسجيل المنظمة
+  Description: أدخل اسم المنظمة وبيانات المستخدم.
+  OrgNameLabel: اسم المنظمة
+  EmailLabel: البريد الإلكتروني
+  UsernameLabel: اسم المستخدم
+  FirstnameLabel: الاسم الأول
+  LastnameLabel: اسم العائلة
+  PasswordLabel: كلمة المرور
+  PasswordConfirmLabel: تأكيد كلمة المرور
+  TosAndPrivacyLabel: الشروط والأحكام
+  TosConfirm: أنا أقبل
+  TosLinkText: شروط الخدمة
+  PrivacyConfirm: أنا أقبل
+  PrivacyLinkText: سياسة الخصوصية
+  SaveButtonText: إنشاء منظمة
+
+LoginSuccess:
+  Title: تم تسجيل الدخول بنجاح
+  AutoRedirectDescription: سيتم توجيهك تلقائياً للعودة إلى التطبيق الخاص بك. إذا لم يحدث ذلك، انقر على الزر أدناه. يمكنك إغلاق النافذة بعد ذلك.
+  RedirectedDescription: يمكنك الآن إغلاق هذه النافذة.
+  NextButtonText: التالي
+
+LogoutDone:
+  Title: تم تسجيل الخروج
+  Description: لقد قمت بتسجيل الخروج بنجاح.
+  LoginButtonText: تسجيل الدخول
+
+LinkingUserPrompt:
+  Title: تم العثور على مستخدم موجود
+  Description: "هل تريد ربط حسابك الحالي:"
+  LinkButtonText: ربط
+  OtherButtonText: خيارات أخرى
+
+LinkingUsersDone:
+  Title: ربط المستخدم
+  Description: تم ربط المستخدم.
+  CancelButtonText: إلغاء
+  NextButtonText: التالي
+
+ExternalNotFound:
+  Title: لم يتم العثور على مستخدم خارجي
+  Description: لم يتم العثور على المستخدم الخارجي. هل تريد ربط المستخدم الخاص بك أو التسجيل التلقائي لمستخدم جديد؟
+  LinkButtonText: ربط
+  AutoRegisterButtonText: تسجيل
+  TosAndPrivacyLabel: الشروط والأحكام
+  TosConfirm: أنا أقبل
+  TosLinkText: شروط الخدمة
+  PrivacyConfirm: أنا أقبل
+  PrivacyLinkText: سياسة الخصوصية
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Arabic: العربية
+DeviceAuth:
+  Title: تفويض الجهاز
+  UserCode:
+    Label: رمز المستخدم
+    Description: أدخل رمز المستخدم المعروض على الجهاز.
+    ButtonNext: التالي
+  Action:
+    Description: منح الوصول للجهاز.
+    GrantDevice: أنت على وشك منح الجهاز
+    AccessToScopes: الوصول إلى النطاقات التالية
+    Button:
+      Allow: سماح
+      Deny: رفض
+  Done:
+    Description: تم.
+    Approved: تمت الموافقة على تفويض الجهاز. يمكنك الآن العودة إلى الجهاز.
+    Denied: تم رفض تفويض الجهاز. يمكنك الآن العودة إلى الجهاز.
+
+Footer:
+  PoweredBy: بدعم من
+  Tos: شروط الخدمة
+  PrivacyPolicy: سياسة الخصوصية
+  Help: مساعدة
+  SupportEmail: البريد الإلكتروني للدعم
+
+SignIn: تسجيل الدخول باستخدام {{.Provider}}
+
+Errors:
+  Internal: حدث خطأ داخلي
+  AuthRequest:
+    NotFound: تعذر العثور على طلب المصادقة
+    UserAgentNotCorresponding: وكيل المستخدم (User Agent) لا يتطابق
+    UserAgentNotFound: معرف وكيل المستخدم غير موجود
+    TokenNotFound: الرمز غير موجود
+    RequestTypeNotSupported: نوع الطلب غير مدعوم
+    MissingParameters: المعلمات المطلوبة مفقودة
+  User:
+    NotFound: تعذر العثور على المستخدم
+    AlreadyExists: المستخدم موجود بالفعل
+    Inactive: المستخدم غير نشط
+    NotFoundOnOrg: تعذر العثور على المستخدم في المنظمة المختارة
+    NotAllowedOrg: المستخدم ليس عضواً في المنظمة المطلوبة
+    NotMatchingUserID: المستخدم والمستخدم في طلب المصادقة غير متطابقين
+    UserIDMissing: معرف المستخدم فارغ
+    Invalid: بيانات المستخدم غير صالحة
+    DomainNotAllowedAsUsername: النطاق محجوز بالفعل ولا يمكن استخدامه
+    NotAllowedToLink: غير مسموح للمستخدم بالربط مع مزود تسجيل دخول خارجي
+    Profile:
+      NotFound: الملف الشخصي غير موجود
+      NotChanged: لم يتم تغيير الملف الشخصي
+      Empty: الملف الشخصي فارغ
+      FirstNameEmpty: الاسم الأول في الملف الشخصي فارغ
+      LastNameEmpty: اسم العائلة في الملف الشخصي فارغ
+      IDMissing: معرف الملف الشخصي مفقود
+    Email:
+      NotFound: البريد الإلكتروني غير موجود
+      Invalid: البريد الإلكتروني غير صالح
+      AlreadyVerified: تم التحقق من البريد الإلكتروني بالفعل
+      NotChanged: لم يتم تغيير البريد الإلكتروني
+      Empty: البريد الإلكتروني فارغ
+      IDMissing: معرف البريد الإلكتروني مفقود
+    Phone:
+      NotFound: الهاتف غير موجود
+      Invalid: الهاتف غير صالح
+      AlreadyVerified: تم التحقق من الهاتف بالفعل
+      Empty: الهاتف فارغ
+      NotChanged: لم يتم تغيير الهاتف
+    Address:
+      NotFound: العنوان غير موجود
+      NotChanged: لم يتم تغيير العنوان
+    Username:
+      AlreadyExists: اسم المستخدم مأخوذ بالفعل
+      Reserved: اسم المستخدم محجوز بالفعل
+      Empty: اسم المستخدم فارغ
+    Password:
+      ConfirmationWrong: تأكيد كلمة المرور خاطئ
+      Empty: كلمة المرور فارغة
+      Invalid: كلمة المرور غير صالحة
+      InvalidAndLocked: كلمة المرور غير صالحة والمستخدم مقفل، اتصل بالمسؤول.
+      NotChanged: لا يمكن أن تكون كلمة المرور الجديدة هي نفس كلمة المرور الحالية
+    UsernameOrPassword:
+      Invalid: اسم المستخدم أو كلمة المرور غير صالحة
+    PasswordComplexityPolicy:
+      NotFound: سياسة كلمة المرور غير موجودة
+      MinLength: كلمة المرور قصيرة جداً
+      HasLower: يجب أن تحتوي كلمة المرور على حرف صغير
+      HasUpper: يجب أن تحتوي كلمة المرور على حرف كبير
+      HasNumber: يجب أن تحتوي كلمة المرور على رقم
+      HasSymbol: يجب أن تحتوي كلمة المرور على رمز
+    Code:
+      Expired: الرمز منتهي الصلاحية
+      Invalid: الرمز غير صالح
+      Empty: الرمز فارغ
+      CryptoCodeNil: رمز التشفير (Crypto code) عدمي (nil)
+      NotFound: تعذر العثور على الرمز
+      GeneratorAlgNotSupported: خوارزمية التوليد غير مدعومة
+    EmailVerify:
+      UserIDEmpty: معرف المستخدم فارغ
+    ExternalData:
+      CouldNotRead: تعذر قراءة البيانات الخارجية بشكل صحيح
+    MFA:
+      NoProviders: لا توجد مزودات مصادقة متعددة العوامل متاحة
+      OTP:
+        AlreadyReady: المصادقة متعددة العوامل OTP (كلمة مرور لمرة واحدة) معدة بالفعل
+        NotExisting: المصادقة متعددة العوامل OTP (كلمة مرور لمرة واحدة) غير موجودة
+        InvalidCode: رمز غير صالح
+        NotReady: المصادقة متعددة العوامل OTP (كلمة مرور لمرة واحدة) ليست جاهزة
+    Locked: المستخدم مقفل
+    SomethingWentWrong: حدث خطأ ما
+    NotActive: المستخدم غير نشط
+    ExternalIDP:
+      IDPTypeNotImplemented: نوع IDP غير منفذ
+      NotAllowed: مزود تسجيل الدخول الخارجي غير مسموح به
+      IDPConfigIDEmpty: معرف مزود الهوية فارغ
+      ExternalUserIDEmpty: معرف المستخدم الخارجي فارغ
+      UserDisplayNameEmpty: اسم عرض المستخدم فارغ
+      NoExternalUserData: لم يتم استلام بيانات مستخدم خارجية
+      CreationNotAllowed: إنشاء مستخدم جديد غير مسموح به على هذا المزود
+      LinkingNotAllowed: ربط مستخدم غير مسموح به على هذا المزود
+      NoOptionAllowed: لا يُسمح بالإنشاء أو الربط على هذا المزود. يرجى الاتصال بالمسؤول.
+      LoginFailedSwitchLocal: |
+        فشل تسجيل الدخول في IDP الخارجي. العودة إلى تسجيل الدخول المحلي.
+                
+        تفاصيل الخطأ: {{.Details}}
+    GrantRequired: تسجيل الدخول غير ممكن. مطلوب من المستخدم أن يكون لديه منح واحد على الأقل على التطبيق. يرجى الاتصال بالمسؤول.
+    ProjectRequired: تسجيل الدخول غير ممكن. يجب منح منظمة المستخدم للمشروع. يرجى الاتصال بالمسؤول.
+  IdentityProvider:
+    InvalidConfig: تكوين مزود الهوية غير صالح
+  IAM:
+    LockoutPolicy:
+      NotExisting: سياسة القفل غير موجودة
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: التسجيل غير مسموح به
+  DeviceAuth:
+    NotExisting: رمز المستخدم غير موجود
+
+optional: (اختياري)

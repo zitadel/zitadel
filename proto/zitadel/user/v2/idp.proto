@@ -20,7 +20,7 @@ message LDAPCredentials {
     }
   ];
   string password = 2[
-    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Password used to login through LDAP"
       min_length: 1;
@@ -49,6 +49,14 @@ message RedirectURLs {
       example: "\"https://custom.com/login/idp/fail\"";
     }
   ];
+  string login_hint = 3 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "login_hint hints to the login page which user wants to log in."
+      max_length: 200;
+      example: "\"someone@example.com\"";
+    }
+  ];
 }
 
 message IDPIntent {
@@ -70,7 +78,7 @@ message IDPIntent {
   ];
   string user_id = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "ID of the ZITADEL user if external user already linked"
+      description: "ID of the Zitadel user if external user already linked"
       max_length: 200;
       example: "\"163840776835432345\"";
     }
@@ -121,8 +129,24 @@ message IDPInformation{
 }
 
 message IDPOAuthAccessInformation{
-  string access_token = 1;
-  optional string id_token = 2;
+  // The access token returned by the external identity provider.
+  string access_token = 1[
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Access token returned by the external identity provider"
+    }
+  ];
+  // The ID token is only set when it is returned by the external identity provider.
+  optional string id_token = 2[
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID token returned by the external identity provider. Only set if the external identity provider returns an ID token."
+    }
+  ];
+  // The refresh token is only set when it is returned by the external identity provider.
+  optional string refresh_token = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Refresh token returned by the external identity provider. Only set if the external identity provider returns a refresh token."
+    }
+  ];
 }
 
 message IDPLDAPAccessInformation{
@@ -161,4 +185,22 @@ message IDPLink {
       example: "\"user@external.com\"";
     }
   ];
+}
+
+message FormData {
+  // The URL to which the form should be submitted using the POST method.
+  string url = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"https://idp.com/saml/v2/acs\"";
+    }
+  ];
+  // The form fields to be submitted.
+  // Each field is represented as a key-value pair, where the key is the field / input name
+  // and the value is the field / input value.
+  // All fields need to be submitted as is and as input type "text".
+  map<string, string> fields = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "{\"relayState\":\"state\",\"SAMLRequest\":\"asjfkj3ir2fj248=\"}";
+    }
+ ];
 }

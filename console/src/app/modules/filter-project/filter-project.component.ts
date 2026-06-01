@@ -17,6 +17,7 @@ enum SubQuery {
   selector: 'cnsl-filter-project',
   templateUrl: './filter-project.component.html',
   styleUrls: ['./filter-project.component.scss'],
+  standalone: false,
 })
 export class FilterProjectComponent extends FilterComponent implements OnInit {
   public SubQuery: any = SubQuery;

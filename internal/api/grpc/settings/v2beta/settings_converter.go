@@ -243,3 +243,10 @@ func securitySettingsToCommand(req *settings.SetSecuritySettingsRequest) *comman
 		EnableImpersonation:   req.GetEnableImpersonation(),
 	}
 }
+
+func organizationSettingsToCommand(req *settings.SetOrganizationSettingsRequest) *command.SetOrganizationSettings {
+	return &command.SetOrganizationSettings{
+		OrganizationID:              req.OrganizationId,
+		OrganizationScopedUsernames: req.OrganizationScopedUsernames,
+	}
+}

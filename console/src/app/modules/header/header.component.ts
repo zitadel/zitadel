@@ -1,28 +1,31 @@
 import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, input, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ActionKeysType } from '../action-keys/action-keys.component';
+import { Organization } from '@zitadel/proto/zitadel/org/v2/org_pb';
+import { Org } from '@zitadel/proto/zitadel/org_pb';
 
 @Component({
   selector: 'cnsl-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
+  standalone: false,
 })
 export class HeaderComponent {
   @Input() public isDarkTheme: boolean = true;
   @Input({ required: true }) public user!: User.AsObject;
   public showOrgContext: boolean = false;
 
-  @Input() public org!: Org.AsObject;
-  @Output() public changedActiveOrg: EventEmitter<Org.AsObject> = new EventEmitter();
+  public org = input<Organization | Org | null>();
+
+  @Output() public changedActiveOrg = new EventEmitter<void>();
   public showAccount: boolean = false;
-  public BreadcrumbType: any = BreadcrumbType;
-  public ActionKeysType: any = ActionKeysType;
+  public BreadcrumbType = BreadcrumbType;
+  public ActionKeysType = ActionKeysType;
 
   public positions: ConnectedPosition[] = [
     new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),
@@ -40,10 +43,9 @@ export class HeaderComponent {
     public router: Router,
   ) {}
 
-  public setActiveOrg(org: Org.AsObject): void {
-    this.org = org;
-    this.authService.setActiveOrg(org);
-    this.changedActiveOrg.emit(org);
+  public async setActiveOrg(orgId: string): Promise<void> {
+    await this.authService.getActiveOrg(orgId);
+    this.changedActiveOrg.emit();
   }
 
   public get isOnMe(): boolean {

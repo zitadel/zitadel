@@ -1,0 +1,121 @@
+syntax = "proto3";
+
+package zitadel.app.v2beta;
+
+import "zitadel/app/v2beta/oidc.proto";
+import "zitadel/app/v2beta/saml.proto";
+import "zitadel/app/v2beta/api.proto";
+import "zitadel/filter/v2/filter.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/app/v2beta;app";
+
+message Application {
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+
+    // The timestamp of the app creation.
+    google.protobuf.Timestamp creation_date = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2024-12-18T07:50:47.492Z\"";
+        }
+    ];
+
+    // The timestamp of the app update.
+    google.protobuf.Timestamp change_date = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2024-12-18T07:50:47.492Z\"";
+        }
+    ];
+
+    AppState state = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "current state of the application";
+        }
+    ];
+    string name = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Console\"";
+        }
+    ];
+    oneof config {
+        OIDCConfig oidc_config = 6;
+        APIConfig api_config = 7;
+        SAMLConfig saml_config = 8;
+    }
+}
+
+enum AppState {
+    APP_STATE_UNSPECIFIED = 0;
+    APP_STATE_ACTIVE = 1;
+    APP_STATE_INACTIVE = 2;
+    APP_STATE_REMOVED = 3;
+}
+
+enum AppSorting {
+    APP_SORT_BY_ID = 0;
+    APP_SORT_BY_NAME = 1;
+    APP_SORT_BY_STATE = 2;
+    APP_SORT_BY_CREATION_DATE = 3;
+    APP_SORT_BY_CHANGE_DATE = 4;
+}
+
+message ApplicationSearchFilter {
+    oneof filter {
+        option (validate.required) = true;
+        ApplicationNameQuery name_filter = 1;
+        AppState state_filter = 2;
+        bool api_app_only = 3;
+        bool oidc_app_only = 4;
+        bool saml_app_only = 5;
+    }
+}
+
+message ApplicationNameQuery {
+    string name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Conso\""
+        }
+    ];
+
+    zitadel.filter.v2.TextFilterMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used"
+        }
+    ];
+}
+
+enum ApplicationKeysSorting {
+    APPLICATION_KEYS_SORT_BY_ID = 0;
+    APPLICATION_KEYS_SORT_BY_PROJECT_ID = 1;
+    APPLICATION_KEYS_SORT_BY_APPLICATION_ID = 2;
+    APPLICATION_KEYS_SORT_BY_CREATION_DATE = 3;
+    APPLICATION_KEYS_SORT_BY_ORGANIZATION_ID = 4;
+    APPLICATION_KEYS_SORT_BY_EXPIRATION = 5;
+    APPLICATION_KEYS_SORT_BY_TYPE = 6;
+}
+
+message ApplicationKey {
+    string id = 1;
+    string application_id = 2;
+    string project_id = 3;
+    google.protobuf.Timestamp creation_date = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2024-12-18T07:50:47.492Z\"";
+        }
+    ];
+    string organization_id = 5;
+    google.protobuf.Timestamp expiration_date = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2024-12-18T07:50:47.492Z\"";
+        }
+    ];
+}

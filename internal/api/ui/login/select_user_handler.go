@@ -46,7 +46,7 @@ func (l *Login) handleSelectUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.SelectUser(r.Context(), authSession.ID, data.UserID, userAgentID)
+	err = l.authRepo.SelectUser(r.Context(), authSession.ID, data.UserID, userAgentID, true)
 	if err != nil {
 		l.renderError(w, r, authSession, err)
 		return

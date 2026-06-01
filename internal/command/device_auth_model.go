@@ -29,6 +29,7 @@ type DeviceAuthWriteModel struct {
 	UserAgent         *domain.UserAgent
 	NeedRefreshToken  bool
 	SessionID         string
+	OrganizationID    string
 }
 
 func NewDeviceAuthWriteModel(deviceCode, resourceOwner string) *DeviceAuthWriteModel {
@@ -53,6 +54,7 @@ func (m *DeviceAuthWriteModel) Reduce() error {
 			m.Audience = e.Audience
 			m.State = e.State
 			m.NeedRefreshToken = e.NeedRefreshToken
+			m.OrganizationID = e.OrganizationID
 		case *deviceauth.ApprovedEvent:
 			m.State = domain.DeviceAuthStateApproved
 			m.UserID = e.UserID

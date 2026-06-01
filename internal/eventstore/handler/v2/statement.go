@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -9,9 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zitadel/logging"
+	"github.com/shopspring/decimal"
 	"golang.org/x/exp/constraints"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -37,7 +39,7 @@ func (s *executionError) Unwrap() error {
 	return s.parent
 }
 
-func (h *Handler) eventsToStatements(tx *sql.Tx, events []eventstore.Event, currentState *state) (statements []*Statement, err error) {
+func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []eventstore.Event, currentState *state) (statements []*Statement, err error) {
 	statements = make([]*Statement, 0, len(events))
 
 	previousPosition := currentState.position
@@ -45,14 +47,14 @@ func (h *Handler) eventsToStatements(tx *sql.Tx, events []eventstore.Event, curr
 	for _, event := range events {
 		statement, err := h.reduce(event)
 		if err != nil {
-			h.logEvent(event).WithError(err).Error("reduce failed")
-			if shouldContinue := h.handleFailedStmt(tx, failureFromEvent(event, err)); shouldContinue {
+			logging.Error(ctx, "reduce failed", "err", err, "event", failureFromEvent(event, err))
+			if shouldContinue := h.handleFailedStmt(ctx, tx, failureFromEvent(event, err)); shouldContinue {
 				continue
 			}
-			return statements, err
+			return statements, &executionError{err}
 		}
 		offset++
-		if previousPosition != event.Position() {
+		if !previousPosition.Equal(event.Position()) {
 			// offset is 1 because we want to skip this event
 			offset = 1
 		}
@@ -82,7 +84,7 @@ func (h *Handler) reduce(event eventstore.Event) (*Statement, error) {
 type Statement struct {
 	Aggregate    *eventstore.Aggregate
 	Sequence     uint64
-	Position     float64
+	Position     decimal.Decimal
 	CreationDate time.Time
 
 	offset uint32
@@ -90,7 +92,7 @@ type Statement struct {
 	Execute Exec
 }
 
-type Exec func(ex Executer, projectionName string) error
+type Exec func(ctx context.Context, ex Executer, projectionName string) error
 
 func WithTableSuffix(name string) func(*execConfig) {
 	return func(o *execConfig) {
@@ -365,6 +367,12 @@ func AddNoOpStatement() func(eventstore.Event) Exec {
 	}
 }
 
+func AddStatement(e Exec) func(eventstore.Event) Exec {
+	return func(event eventstore.Event) Exec {
+		return NewStatement(event, e).Execute
+	}
+}
+
 func AddCreateStatement(columns []Column, opts ...execOption) func(eventstore.Event) Exec {
 	return func(event eventstore.Event) Exec {
 		return NewCreateStatement(event, columns, opts...).Execute
@@ -575,7 +583,9 @@ func NewCol(name string, value interface{}) Column {
 func NewJSONCol(name string, value interface{}) Column {
 	marshalled, err := json.Marshal(value)
 	if err != nil {
-		logging.WithFields("column", name).WithError(err).Panic("unable to marshal column")
+		err = zerrors.ThrowInternal(err, "V2-aez5X", "unable to marshal column")
+		ctx := logging.NewCtx(context.Background(), logging.StreamEventHandler)
+		logging.OnError(ctx, err).Panic("unable to marshal column", "column", name, "err", err)
 	}
 
 	return NewCol(name, marshalled)
@@ -669,7 +679,7 @@ type execConfig struct {
 type query func(config execConfig) string
 
 func exec(config execConfig, q query, opts []execOption) Exec {
-	return func(ex Executer, projectionName string) (err error) {
+	return func(ctx context.Context, ex Executer, projectionName string) (err error) {
 		if projectionName == "" {
 			return ErrNoProjection
 		}
@@ -693,12 +703,12 @@ func exec(config execConfig, q query, opts []execOption) Exec {
 }
 
 func multiExec(execList []Exec) Exec {
-	return func(ex Executer, projectionName string) error {
+	return func(ctx context.Context, ex Executer, projectionName string) error {
 		for _, exec := range execList {
 			if exec == nil {
 				continue
 			}
-			if err := exec(ex, projectionName); err != nil {
+			if err := exec(ctx, ex, projectionName); err != nil {
 				return err
 			}
 		}

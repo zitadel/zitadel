@@ -1,14 +1,6 @@
 import { Component, Inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogActions,
-  MatDialogClose,
-  MatDialogContent,
-  MatDialogModule,
-  MatDialogRef,
-  MatDialogTitle,
-} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { FrameworkAutocompleteComponent } from '../framework-autocomplete/framework-autocomplete.component';
 import { Framework } from '../quickstart/quickstart.component';
 import { TranslateModule } from '@ngx-translate/core';
@@ -17,7 +9,6 @@ import { TranslateModule } from '@ngx-translate/core';
   selector: 'cnsl-framework-change-dialog',
   templateUrl: './framework-change-dialog.component.html',
   styleUrls: ['./framework-change-dialog.component.scss'],
-  standalone: true,
   imports: [MatButtonModule, MatDialogModule, TranslateModule, FrameworkAutocompleteComponent],
 })
 export class FrameworkChangeDialogComponent {

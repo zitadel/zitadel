@@ -60,13 +60,13 @@ message LoginV2FeatureFlag {
 }
 
 enum ImprovedPerformance {
+  reserved 1;
+  reserved "IMPROVED_PERFORMANCE_ORG_BY_ID";
+
   IMPROVED_PERFORMANCE_UNSPECIFIED = 0;
-  // Uses the eventstore to query the org by id
-  // instead of the sql table.
-  IMPROVED_PERFORMANCE_ORG_BY_ID = 1;
   // Improves performance on write side by using
   // optimized processes to query data to determine
-  // correctnes of data.
+  // correctness of data.
   IMPROVED_PERFORMANCE_PROJECT_GRANT = 2;
   IMPROVED_PERFORMANCE_PROJECT = 3;
   IMPROVED_PERFORMANCE_USER_GRANT = 4;

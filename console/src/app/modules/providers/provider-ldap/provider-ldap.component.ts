@@ -28,6 +28,7 @@ import { ProviderNextService } from '../provider-next/provider-next.service';
 @Component({
   selector: 'cnsl-provider-ldap',
   templateUrl: './provider-ldap.component.html',
+  standalone: false,
 })
 export class ProviderLDAPComponent {
   public updateBindPassword: boolean = false;
@@ -242,7 +243,7 @@ export class ProviderLDAPComponent {
       this.loading = true;
       (this.service as ManagementService)
         .updateLDAPProvider(req)
-        .then((idp) => {
+        .then(() => {
           setTimeout(() => {
             this.loading = false;
             this.close();
