@@ -1531,6 +1531,7 @@
       "DEFAULT_SAVED": "تم حفظ اللغة الافتراضية",
       "ALLOWED_SAVED": "تم حفظ اللغات المسموح بها",
       "OPTIONS": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1778,6 +1779,7 @@
       "LANGUAGES_NOT_ALLOWED": "غير مسموح:",
       "LANGUAGE": "اللغة",
       "LANGUAGES": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -2763,6 +2765,7 @@
     "3": "آخر"
   },
   "LANGUAGES": {
+    "da": "Dansk",
     "de": "Deutsch",
     "en": "English",
     "es": "Español",

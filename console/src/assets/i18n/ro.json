@@ -1533,6 +1533,7 @@
       "DEFAULT_SAVED": "Limba implicită a fost salvată",
       "ALLOWED_SAVED": "Limbile permise au fost salvate",
       "OPTIONS": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1781,6 +1782,7 @@
       "LANGUAGES_NOT_ALLOWED": "Nepermise:",
       "LANGUAGE": "Limbă",
       "LANGUAGES": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -2765,6 +2767,7 @@
     "3": "Altul"
   },
   "LANGUAGES": {
+    "da": "Dansk",
     "de": "Deutsch",
     "en": "English",
     "es": "Español",

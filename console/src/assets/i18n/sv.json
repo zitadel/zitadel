@@ -1539,6 +1539,7 @@
       "DEFAULT_SAVED": "Standardspråk sparat",
       "ALLOWED_SAVED": "Tillåtna språk sparade",
       "OPTIONS": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1787,6 +1788,7 @@
       "LANGUAGES_NOT_ALLOWED": "Inte tillåtet:",
       "LANGUAGE": "Språk",
       "LANGUAGES": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -2772,6 +2774,7 @@
     "3": "Annat"
   },
   "LANGUAGES": {
+    "da": "Dansk",
     "de": "Deutsch",
     "en": "English",
     "es": "Español",

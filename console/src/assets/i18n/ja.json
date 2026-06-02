@@ -1535,6 +1535,7 @@
       "DEFAULT_SAVED": "デフォルト言語が保存されました",
       "ALLOWED_SAVED": "許可された言語が保存されました",
       "OPTIONS": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1783,6 +1784,7 @@
       "LANGUAGES_NOT_ALLOWED": "許可されていない言語：",
       "LANGUAGE": "言語",
       "LANGUAGES": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -2769,6 +2771,7 @@
     "3": "その他"
   },
   "LANGUAGES": {
+    "da": "Dansk",
     "de": "Deutsch",
     "en": "English",
     "es": "Español",

@@ -1535,6 +1535,7 @@
       "DEFAULT_SAVED": "기본 언어가 저장되었습니다.",
       "ALLOWED_SAVED": "허용하는 언어가 저장되었습니다.",
       "OPTIONS": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1783,6 +1784,7 @@
       "LANGUAGES_NOT_ALLOWED": "허용되지 않은 언어:",
       "LANGUAGE": "언어",
       "LANGUAGES": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -2765,6 +2767,7 @@
     "3": "기타"
   },
   "LANGUAGES": {
+    "da": "Dansk",
     "de": "Deutsch",
     "en": "English",
     "es": "Español",

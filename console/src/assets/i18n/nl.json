@@ -1535,6 +1535,7 @@
       "DEFAULT_SAVED": "Standaardtaal opgeslagen",
       "ALLOWED_SAVED": "Toegestane talen opgeslagen",
       "OPTIONS": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "Engels",
         "es": "Español",
@@ -1783,6 +1784,7 @@
       "LANGUAGES_NOT_ALLOWED": "Niet toegestaan:",
       "LANGUAGE": "Taal",
       "LANGUAGES": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -2762,6 +2764,7 @@
     "3": "Anders"
   },
   "LANGUAGES": {
+    "da": "Dansk",
     "de": "Deutsch",
     "en": "English",
     "es": "Español",

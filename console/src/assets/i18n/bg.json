@@ -1537,6 +1537,7 @@
       "DEFAULT_SAVED": "Езикът по подразбиране е запазен успешно.",
       "ALLOWED_SAVED": "Разрешените езици са запазени успешно.",
       "OPTIONS": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1785,6 +1786,7 @@
       "LANGUAGES_NOT_ALLOWED": "Не е разрешено:",
       "LANGUAGE": "Език",
       "LANGUAGES": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -2770,6 +2772,7 @@
     "3": "други"
   },
   "LANGUAGES": {
+    "da": "Dansk",
     "de": "Deutsch",
     "en": "English",
     "es": "Español",
