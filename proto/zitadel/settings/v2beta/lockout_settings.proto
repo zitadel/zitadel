@@ -43,7 +43,7 @@ message LockoutSettings {
   ];
   bool show_absolute_lockout_time = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "Defines if the absolute lockout time should be shown to the user on the login screen after the account got locked. Takes only affect if show_remaining_lockout_time is set to false."
+        description: "Defines if the absolute lockout time should be shown to the user on the login screen after the account got locked. Takes affect if show_remaining_lockout_time is set to false."
         example: "\"true\""
     }
   ];
