@@ -142,6 +142,8 @@
       "failedToAuthenticate": "Authentifizierung fehlgeschlagen. Sie haben {failedAttempts} von {maxPasswordAttempts} Passwortversuchen.{lockoutMessage}",
       "failedToAuthenticateNoLimit": "Authentifizierung fehlgeschlagen.",
       "accountLockedContactAdmin": " Kontaktieren Sie Ihren Administrator, um Ihr Konto zu entsperren",
+      "accountLocked": "Account ist gesperrt. Verbleibende Sperrzeit: {remainingLockDuration} Minuten",
+      "accountLockedAbsolute": "Das Konto ist gesperrt. Sperrdauer: {lockDuration} Minuten.",
       "userNotFound": "Benutzer nicht im System gefunden",
       "initialUserNotSupported": "Initialbenutzer wird nicht unterstützt",
       "userInitialStateNotSupported": "Anfangszustand des Benutzers wird nicht unterstützt",

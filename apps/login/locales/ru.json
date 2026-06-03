@@ -142,6 +142,8 @@
       "failedToAuthenticate": "Не удалось пройти аутентификацию. У вас было {failedAttempts} из {maxPasswordAttempts} попыток ввода пароля.{lockoutMessage}",
       "failedToAuthenticateNoLimit": "Не удалось пройти аутентификацию.",
       "accountLockedContactAdmin": " Свяжитесь с администратором, чтобы разблокировать вашу учетную запись",
+      "accountLocked": "Учётная запись заблокирована. Оставшееся время блокировки: {remainingLockDuration} минут",
+      "accountLockedAbsolute": "Аккаунт заблокирован. Длительность блокировки: {lockDuration} минут.",
       "userNotFound": "Пользователь не найден в системе",
       "initialUserNotSupported": "Первичный пользователь не поддерживается",
       "userInitialStateNotSupported": "Начальное состояние пользователя не поддерживается",

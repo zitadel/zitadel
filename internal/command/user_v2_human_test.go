@@ -3720,6 +3720,9 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 								0,
 								0,
 								false,
+								0,
+								false,
+								false,
 							),
 						),
 					),
@@ -3749,6 +3752,127 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			res: res{
 				err: func(err error) bool {
 					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Invalid"))
+				},
+			},
+		},
+		{
+			name: "change human password, old password, user locked, precondition error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher(
+							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
+								&userAgg.Aggregate,
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserLockedEvent(context.Background(),
+								&userAgg.Aggregate,
+							),
+						),
+					),
+					expectFilter(), // org lockout policy for auto-unlock check
+					expectFilter(), // instance lockout policy fallback (org policy not active)
+				),
+				checkPermission:    newMockPermissionCheckAllowed(),
+				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
+				loginPaths:         expectLoginPathsNoCall,
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Password: &Password{
+						Password:       "password2",
+						OldPassword:    "password",
+						ChangeRequired: true,
+					},
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return zerrors.IsPreconditionFailed(err)
+				},
+			},
+		},
+		{
+			name: "change human password, old password, user locked, auto unlock after min, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher(
+							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
+								&userAgg.Aggregate,
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserLockedEvent(context.Background(),
+								&userAgg.Aggregate,
+							),
+						),
+					),
+					// Org lockout policy with AutoUnlockAfterMin=1; state active - no instance fallback.
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLockoutPolicyAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								5,
+								0,
+								false,
+								1,
+								false,
+								false,
+							),
+						),
+					),
+					expectFilter(), // recheck for concurrent locking events - none
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&userAgg.Aggregate,
+							"$plain$x$password2",
+							true,
+							"",
+						),
+					),
+				),
+				checkPermission:    newMockPermissionCheckAllowed(),
+				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
+				loginPaths:         expectLoginPathsNoCall,
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Password: &Password{
+						Password:       "password2",
+						OldPassword:    "password",
+						ChangeRequired: true,
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},

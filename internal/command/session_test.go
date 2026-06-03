@@ -590,7 +590,7 @@ func TestCommands_updateSession(t *testing.T) {
 					),
 					expectFilter(), // recheck
 					expectFilter(
-						org.NewLockoutPolicyAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, 0, 0, false),
+						org.NewLockoutPolicyAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, 0, 0, false, 0, false, false),
 					),
 					expectPush(
 						user.NewHumanPasswordCheckFailedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, nil),
@@ -691,6 +691,7 @@ func TestCommands_updateSession(t *testing.T) {
 			"set user, intent not successful",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(), // human write model check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
@@ -729,6 +730,7 @@ func TestCommands_updateSession(t *testing.T) {
 			"set user, intent not for user",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(), // human write model check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
@@ -779,7 +781,9 @@ func TestCommands_updateSession(t *testing.T) {
 		{
 			"set user, intent incorrect token",
 			fields{
-				eventstore: expectEventstore(),
+				eventstore: expectEventstore(
+					expectFilter(), // human write model check
+				),
 			},
 			args{
 				ctx: authz.NewMockContext("instance1", "", ""),
@@ -811,6 +815,7 @@ func TestCommands_updateSession(t *testing.T) {
 			"set user, intent token already consumed",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(), // human write model check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
@@ -867,6 +872,7 @@ func TestCommands_updateSession(t *testing.T) {
 			"set user, intent token already expired",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(), // human write model check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
@@ -918,6 +924,7 @@ func TestCommands_updateSession(t *testing.T) {
 			"set user, intent, metadata and token",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(), // human write model check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
@@ -986,6 +993,7 @@ func TestCommands_updateSession(t *testing.T) {
 			"set user, intent (user not linked yet)",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(), // human write model check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
@@ -1118,7 +1126,7 @@ func TestCheckTOTP(t *testing.T) {
 				eventstore: expectEventstore(),
 				tarpit:     expectTarpit(0),
 			},
-			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-M4rp1", "Errors.User.UserIDMissing"),
 		},
 		{
 			name: "filter error",
@@ -1146,6 +1154,7 @@ func TestCheckTOTP(t *testing.T) {
 					aggregate:     sessAgg,
 				},
 				eventstore: expectEventstore(
+					expectFilter(), // human write model check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
@@ -1166,6 +1175,7 @@ func TestCheckTOTP(t *testing.T) {
 					aggregate:     sessAgg,
 				},
 				eventstore: expectEventstore(
+					expectFilter(), // human write model check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
@@ -1176,7 +1186,7 @@ func TestCheckTOTP(t *testing.T) {
 					),
 					expectFilter(), // recheck
 					expectFilter(
-						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 0, 0, false)),
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 0, 0, false, 0, false, false)),
 					),
 				),
 				tarpit: expectTarpit(1),
@@ -1196,6 +1206,7 @@ func TestCheckTOTP(t *testing.T) {
 					aggregate:     sessAgg,
 				},
 				eventstore: expectEventstore(
+					expectFilter(), // human write model check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
@@ -1206,7 +1217,7 @@ func TestCheckTOTP(t *testing.T) {
 					),
 					expectFilter(), // recheck
 					expectFilter(
-						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 1, 1, false)),
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 1, 1, false, 0, false, false)),
 					),
 				),
 				tarpit: expectTarpit(1),
@@ -1227,6 +1238,7 @@ func TestCheckTOTP(t *testing.T) {
 					aggregate:     sessAgg,
 				},
 				eventstore: expectEventstore(
+					expectFilter(), // human write model check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
@@ -1254,6 +1266,7 @@ func TestCheckTOTP(t *testing.T) {
 					aggregate:     sessAgg,
 				},
 				eventstore: expectEventstore(
+					expectFilter(), // human write model check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
@@ -1378,7 +1391,7 @@ func TestCheckRecoveryCode(t *testing.T) {
 					),
 					expectFilter(), // additional lock check
 					expectFilter(
-						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 0, 0, false)),
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 0, 0, false, 0, false, false)),
 					),
 				),
 				hasher: hasher,
@@ -1404,7 +1417,7 @@ func TestCheckRecoveryCode(t *testing.T) {
 					),
 					expectFilter(), // additional lock check
 					expectFilter(
-						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 1, 1, false)),
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 1, 1, false, 0, false, false)),
 					),
 				),
 				hasher: hasher,

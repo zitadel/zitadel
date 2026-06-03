@@ -1894,6 +1894,7 @@
       "HASUPPERCASE": "대문자를 포함해야 함",
       "SHOWLOCKOUTFAILURES": "잠금 실패 표시",
       "MAXPASSWORDATTEMPTS": "비밀번호 최대 시도 횟수",
+      "AUTOUNLOCKAFTERMIN": "(분) 후 자동 잠금 해제",
       "MAXOTPATTEMPTS": "OTP 최대 시도 횟수",
       "EXPIREWARNDAYS": "만료 경고 (일)",
       "MAXAGEDAYS": "최대 유효 기간 (일)",

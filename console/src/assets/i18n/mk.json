@@ -1895,6 +1895,7 @@
       "HASUPPERCASE": "има големи букви",
       "SHOWLOCKOUTFAILURES": "прикажи неуспешни заклучувања",
       "MAXPASSWORDATTEMPTS": "Максимален број на обиди за лозинка",
+      "AUTOUNLOCKAFTERMIN": "Автоматско отклучување по (во минути)",
       "MAXOTPATTEMPTS": "Максимални обиди за OTP",
       "EXPIREWARNDAYS": "Предупредување за истекување по денови",
       "MAXAGEDAYS": "Максимална валидност во денови",

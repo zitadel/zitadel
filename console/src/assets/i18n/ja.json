@@ -1894,6 +1894,7 @@
       "HASUPPERCASE": "大文字を含める",
       "SHOWLOCKOUTFAILURES": "ロックアウトの失敗を表示する",
       "MAXPASSWORDATTEMPTS": "パスワードの最大試行",
+      "AUTOUNLOCKAFTERMIN" : "自動ロック解除までの残り時間（分）",
       "MAXOTPATTEMPTS": "最大OTP試行回数",
       "EXPIREWARNDAYS": "数日後に有効期限が切れます",
       "MAXAGEDAYS": "最大有効期限 (日数)",

@@ -412,6 +412,44 @@ describe("sendPassword", () => {
     });
   });
 
+  test("should return remaining lockout duration error when account is temporarily locked", async () => {
+    mockGetSessionCookieByLoginName.mockResolvedValue(null);
+    mockSearchUsers.mockResolvedValue({
+      result: [{ userId: "user123", type: { case: "human", value: {} }, state: 1 }],
+    });
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: false, allowLocalAuthentication: true });
+    mockCreateSessionAndUpdateCookie.mockRejectedValue({ remainingLockDuration: 10 });
+    mockGetLockoutSettings.mockResolvedValue({ maxPasswordAttempts: BigInt(5), showAbsoluteLockoutTime: false });
+
+    const result = await sendPassword({
+      loginName: "user@example.com",
+      checks: { password: { password: "wrong" } } as any,
+    });
+
+    expect(result).toEqual({
+      error: "errors.accountLocked",
+    });
+  });
+
+  test("should return absolute lockout time error when account is temporarily locked and showAbsoluteLockoutTime is true", async () => {
+    mockGetSessionCookieByLoginName.mockResolvedValue(null);
+    mockSearchUsers.mockResolvedValue({
+      result: [{ userId: "user123", type: { case: "human", value: {} }, state: 1 }],
+    });
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: false, allowLocalAuthentication: true });
+    mockCreateSessionAndUpdateCookie.mockRejectedValue({ remainingLockDuration: 10 });
+    mockGetLockoutSettings.mockResolvedValue({ maxPasswordAttempts: BigInt(5), showAbsoluteLockoutTime: true });
+
+    const result = await sendPassword({
+      loginName: "user@example.com",
+      checks: { password: { password: "wrong" } } as any,
+    });
+
+    expect(result).toEqual({
+      error: "errors.accountLockedAbsolute",
+    });
+  });
+
   test("should recreate session when session verification fails with keys/session terminated error and ignoreUnknownUsernames is true", async () => {
     mockGetSessionCookieByLoginName.mockResolvedValue({
       id: "session123",

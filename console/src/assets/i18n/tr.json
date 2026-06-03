@@ -1897,6 +1897,7 @@
       "HASUPPERCASE": "büyük harf içermeli",
       "SHOWLOCKOUTFAILURES": "kilitleme başarısızlıklarını göster",
       "MAXPASSWORDATTEMPTS": "Şifre maksimum deneme sayısı",
+      "AUTOUNLOCKAFTERMIN":"Otomatik kilit açma süresi (dakika)",
       "MAXOTPATTEMPTS": "OTP maksimum deneme sayısı",
       "EXPIREWARNDAYS": "Gün sonra son kullanma uyarısı",
       "MAXAGEDAYS": "Gün cinsinden maksimum geçerlilik",

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
@@ -26,6 +27,7 @@ import { PasswordLockoutPolicyComponent } from './password-lockout-policy.compon
     FormsModule,
     InputModule,
     MatButtonModule,
+    MatCheckboxModule,
     MatSlideToggleModule,
     HasRolePipeModule,
     MatDialogModule,

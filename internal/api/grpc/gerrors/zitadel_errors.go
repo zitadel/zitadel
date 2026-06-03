@@ -18,7 +18,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	commandErrors "github.com/zitadel/zitadel/internal/command/errors"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	"github.com/zitadel/zitadel/pkg/grpc/error/v2"
+	errorpb "github.com/zitadel/zitadel/pkg/grpc/error/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/message"
 )
 
@@ -155,13 +155,27 @@ func grpcStatusLevel(code codes.Code) slog.Level {
 	}
 }
 
-
-func getErrorInfo(ctx context.Context, id, key string, err error) protoadapt.MessageV1 {
+func handleCommandErrors(id, key string, err error) protoadapt.MessageV1 {
 	var wpe *commandErrors.WrongPasswordError
-	var zerr *zerrors.ZitadelError
 	if err != nil && errors.As(err, &wpe) {
 		return &message.CredentialsCheckError{Id: id, Message: key, FailedAttempts: wpe.FailedAttempts}
 	}
+
+	var sne *commandErrors.LockDurationNotExceededError
+	if err != nil && errors.As(err, &sne) {
+		return &message.CredentialsCheckError{Id: id, Message: key, RemainingLockDuration: sne.RemainingTime}
+	}
+	return nil
+}
+
+func getErrorInfo(ctx context.Context, id, key string, err error) protoadapt.MessageV1 {
+	commandError := handleCommandErrors(id, key, err)
+	if commandError != nil {
+		return commandError
+	}
+
+	var zerr *zerrors.ZitadelError
+
 	// Let's check the error is a zitadel error and does contain a slug, which should be the case for almost any error
 	// in the future, but not yet. In case it's not, we'll fall back to the old error details to prevent a breaking change.
 	if err != nil && errors.As(err, &zerr) && strings.Contains(zerr.GetID(), ".") {

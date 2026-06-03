@@ -1897,6 +1897,7 @@
       "HASUPPERCASE": "包含大写字母",
       "SHOWLOCKOUTFAILURES": "显示锁定失败",
       "MAXPASSWORDATTEMPTS": "密码最大尝试次数",
+      "AUTOUNLOCKAFTERMIN":"自动解锁后（分钟）",
       "MAXOTPATTEMPTS": "最多尝试 OTP 次数",
       "EXPIREWARNDAYS": "密码将在几天后过期",
       "MAXAGEDAYS": "最大有效期 (天)",

@@ -1892,6 +1892,7 @@
       "HASUPPERCASE": "harus menyertakan huruf besar",
       "SHOWLOCKOUTFAILURES": "menunjukkan kegagalan penguncian",
       "MAXPASSWORDATTEMPTS": "Upaya maksimal kata sandi",
+      "AUTOUNLOCKAFTERMIN" : "Pembukaan kunci otomatis setelah (menit)",
       "MAXOTPATTEMPTS": "Upaya maksimal OTP",
       "EXPIREWARNDAYS": "Peringatan Kedaluwarsa setelah beberapa hari",
       "MAXAGEDAYS": "Validitas maksimum dalam beberapa hari",

@@ -8,9 +8,12 @@ import (
 
 func ModelLockoutPolicyToPb(policy *query.LockoutPolicy) *policy_pb.LockoutPolicy {
 	return &policy_pb.LockoutPolicy{
-		IsDefault:           policy.IsDefault,
-		MaxPasswordAttempts: policy.MaxPasswordAttempts,
-		MaxOtpAttempts:      policy.MaxOTPAttempts,
+		IsDefault:                policy.IsDefault,
+		MaxPasswordAttempts:      policy.MaxPasswordAttempts,
+		MaxOtpAttempts:           policy.MaxOTPAttempts,
+		AutoUnlockAfterMin:       policy.AutoUnlockAfterMin,
+		ShowRemainingLockoutTime: policy.ShowRemainingLockoutTime,
+		ShowAbsoluteLockoutTime:  policy.ShowAbsoluteLockoutTime,
 		Details: object.ToViewDetailsPb(
 			policy.Sequence,
 			policy.CreationDate,

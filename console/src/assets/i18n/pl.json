@@ -1893,6 +1893,7 @@
       "HASUPPERCASE": "zawiera duże litery",
       "SHOWLOCKOUTFAILURES": "pokaż blokady nieudanych prób",
       "MAXPASSWORDATTEMPTS": "Maksymalna liczba prób wprowadzenia hasła",
+      "AUTOUNLOCKAFTERMIN": "Automatyczne odblokowanie po (w minutach)",
       "MAXOTPATTEMPTS": "Maksymalna liczba prób OTP",
       "EXPIREWARNDAYS": "Ostrzeżenie o wygaśnięciu po dniach",
       "MAXAGEDAYS": "Maksymalna ważność w dniach",
