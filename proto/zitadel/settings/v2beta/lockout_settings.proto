@@ -27,7 +27,7 @@ message LockoutSettings {
     }
   ];
 
-    // The amount of minutes after the account gets automatically unlocked.
+  // The amount of minutes after the account gets automatically unlocked.
   // If set to 0 the account will never be automatically unlocked.
   uint64 auto_unlock_after_min = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
