@@ -3008,3 +3008,42 @@ func Test_convertPasswapErr(t *testing.T) {
 		})
 	}
 }
+
+type unexpectedHumanPasswordCheckWriteModel struct {
+	*HumanPasswordWriteModel
+}
+
+func Test_handleLockedUserWithLockoutPolicy_unexpectedModelType(t *testing.T) {
+	es := expectEventstore(
+		expectFilter(
+			eventFromEventPusher(
+				org.NewLockoutPolicyAddedEvent(context.Background(),
+					&org.NewAggregate("org1").Aggregate,
+					1,
+					0,
+					false,
+					1,
+					false,
+					false,
+				),
+			),
+		),
+	)(t)
+
+	wm := &unexpectedHumanPasswordCheckWriteModel{
+		HumanPasswordWriteModel: &HumanPasswordWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   "user1",
+				ResourceOwner: "org1",
+			},
+			UserState: domain.UserStateLocked,
+			LockedAt:  time.Time{},
+		},
+	}
+
+	adapted, err := handleLockedUserWithLockoutPolicy(context.Background(), wm, es)
+	assert.Nil(t, adapted)
+	assert.Error(t, err)
+	assert.True(t, zerrors.IsInternal(err))
+	assert.ErrorContains(t, err, "unexpected HumanPasswordCheckWriteModel type")
+}

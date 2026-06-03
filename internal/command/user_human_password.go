@@ -460,7 +460,7 @@ func handleLockedUserWithLockoutPolicy(ctx context.Context, wm HumanPasswordChec
 			adapted.LockedAt = time.Time{}
 			return &adapted, nil
 		default:
-			return wm, nil
+			return nil, zerrors.ThrowInternal(fmt.Errorf("unexpected HumanPasswordCheckWriteModel type %T", wm), "COMMAND-M4rp7", "Errors.Internal")
 		}
 	}
 
