@@ -1041,7 +1041,8 @@
       "RESENDNOTIFICATION": "Wyślij link resetowania hasła",
       "REQUIRED": "Brakuje niektórych wymaganych pól.",
       "MINLENGTHERROR": "Musi mieć co najmniej {{value}} znaków.",
-      "MAXLENGTHERROR": "Musi zawierać mniej niż {{value}} znaków"
+      "MAXLENGTHERROR": "Musi zawierać mniej niż {{value}} znaków",
+      "HISTORYHINT": "Nie możesz ponownie używać ostatnich {{count}} haseł."
     },
     "ID": "ID użytkownika",
     "EMAIL": "E-mail",
@@ -1679,7 +1680,8 @@
       "SYMBOLANDNUMBERERROR": "Musi składać się z cyfry i znaku specjalnego/interpunkcyjnego.",
       "SYMBOLERROR": "Musi zawierać znak specjalny/interpunkcyjny.",
       "NUMBERERROR": "Musi zawierać cyfrę.",
-      "PATTERNERROR": "Hasło nie spełnia wymaganego wzoru."
+      "PATTERNERROR": "Hasło nie spełnia wymaganego wzoru.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Powiadomienie",

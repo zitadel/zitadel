@@ -36,6 +36,7 @@ type Props = {
   defaultOrganization?: string;
   requestId?: string;
   codeRequired: boolean;
+  historyCount?: number;
 };
 
 export function SetPasswordForm({
@@ -47,6 +48,7 @@ export function SetPasswordForm({
   userId,
   code,
   codeRequired,
+  historyCount = 0,
 }: Props) {
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onChange",
@@ -250,7 +252,17 @@ export function SetPasswordForm({
           />
         )}
 
-        {error && <Alert>{error}</Alert>}
+        {historyCount > 0 && (
+          <div className="py-2">
+            <Alert type={AlertType.INFO}>{t("complexity.historyHint", { count: historyCount })}</Alert>
+          </div>
+        )}
+
+        {error && (
+          <div className="py-2">
+            <Alert>{error}</Alert>
+          </div>
+        )}
 
         <div className="mt-8 flex w-full flex-row items-center justify-between">
           <BackButton data-testid="back-button" />

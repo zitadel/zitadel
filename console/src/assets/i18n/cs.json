@@ -1042,7 +1042,8 @@
       "RESENDNOTIFICATION": "Odeslat odkaz pro reset hesla",
       "REQUIRED": "Některá povinná pole nejsou vyplněna.",
       "MINLENGTHERROR": "Musí být alespoň {{value}} znaků dlouhé.",
-      "MAXLENGTHERROR": "Musí být kratší než {{value}} znaků."
+      "MAXLENGTHERROR": "Musí být kratší než {{value}} znaků.",
+      "HISTORYHINT": "Nemůžete znovu použít posledních {{count}} hesel."
     },
     "ID": "ID uživatele",
     "EMAIL": "E-mail",
@@ -1680,7 +1681,8 @@
       "SYMBOLANDNUMBERERROR": "Musí obsahovat číslici a symbol/interpunkční znaménko.",
       "SYMBOLERROR": "Musí zahrnovat symbol/interpunkční znaménko.",
       "NUMBERERROR": "Musí obsahovat číslici.",
-      "PATTERNERROR": "Heslo nesplňuje požadovaný vzor."
+      "PATTERNERROR": "Heslo nesplňuje požadovaný vzor.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Oznámení",

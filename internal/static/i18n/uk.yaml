@@ -154,6 +154,7 @@ Errors:
       NotSet: "Користувач не встановив пароль"
       NotChanged: "Новий пароль не може бути таким же як поточний пароль"
       NotSupported: "Кодування хеша пароля не підтримується. Перегляньте https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"
+      Reused: "Пароль нещодавно використано, оберіть інший"
     PasswordComplexityPolicy:
       NotFound: "Політика паролів не знайдена"
       MinLength: "Пароль занадто короткий"

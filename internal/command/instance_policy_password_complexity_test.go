@@ -26,6 +26,7 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 		hasUppercase bool
 		hasNumber    bool
 		hasSymbol    bool
+		historyCount uint64
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -67,6 +68,7 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								8,
 								true, true, true, true,
+								0,
 							),
 						),
 					),
@@ -95,6 +97,7 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 							&instance.NewAggregate("INSTANCE").Aggregate,
 							8,
 							true, true, true, true,
+							0,
 						),
 					),
 				),
@@ -113,13 +116,44 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "add policy with history count, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectPush(
+						instance.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							8,
+							true, true, true, true,
+							5,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:          authz.WithInstanceID(context.Background(), "INSTANCE"),
+				minLength:    8,
+				hasUppercase: true,
+				hasLowercase: true,
+				hasNumber:    true,
+				hasSymbol:    true,
+				historyCount: 5,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddDefaultPasswordComplexityPolicy(tt.args.ctx, tt.args.minLength, tt.args.hasLowercase, tt.args.hasUppercase, tt.args.hasNumber, tt.args.hasSymbol)
+			got, err := r.AddDefaultPasswordComplexityPolicy(tt.args.ctx, tt.args.minLength, tt.args.hasLowercase, tt.args.hasUppercase, tt.args.hasNumber, tt.args.hasSymbol, tt.args.historyCount)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -205,6 +239,7 @@ func TestCommandSide_ChangeDefaultPasswordComplexityPolicy(t *testing.T) {
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								8,
 								true, true, true, true,
+								0,
 							),
 						),
 					),
@@ -235,6 +270,7 @@ func TestCommandSide_ChangeDefaultPasswordComplexityPolicy(t *testing.T) {
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								8,
 								true, true, true, true,
+								0,
 							),
 						),
 					),
@@ -268,6 +304,53 @@ func TestCommandSide_ChangeDefaultPasswordComplexityPolicy(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "change history count, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								8,
+								true, true, true, true,
+								0,
+							),
+						),
+					),
+					expectPush(
+						newDefaultPasswordComplexityPolicyChangedEventWithHistory(context.Background(), 3),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				policy: &domain.PasswordComplexityPolicy{
+					MinLength:    8,
+					HasUppercase: true,
+					HasLowercase: true,
+					HasNumber:    true,
+					HasSymbol:    true,
+					HistoryCount: 3,
+				},
+			},
+			res: res{
+				want: &domain.PasswordComplexityPolicy{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
+						InstanceID:    "INSTANCE",
+					},
+					MinLength:    8,
+					HasUppercase: true,
+					HasLowercase: true,
+					HasNumber:    true,
+					HasSymbol:    true,
+					HistoryCount: 3,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -297,6 +380,16 @@ func newDefaultPasswordComplexityPolicyChangedEvent(ctx context.Context, minLeng
 			policy.ChangeHasLowercase(hasLower),
 			policy.ChangeHasSymbol(hasNumber),
 			policy.ChangeHasNumber(hasSymbol),
+		},
+	)
+	return event
+}
+
+func newDefaultPasswordComplexityPolicyChangedEventWithHistory(ctx context.Context, historyCount uint64) *instance.PasswordComplexityPolicyChangedEvent {
+	event, _ := instance.NewPasswordComplexityPolicyChangedEvent(ctx,
+		&instance.NewAggregate("INSTANCE").Aggregate,
+		[]policy.PasswordComplexityPolicyChanges{
+			policy.ChangeHistoryCount(historyCount),
 		},
 	)
 	return event

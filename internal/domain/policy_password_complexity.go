@@ -22,6 +22,7 @@ type PasswordComplexityPolicy struct {
 	HasUppercase bool
 	HasNumber    bool
 	HasSymbol    bool
+	HistoryCount uint64
 
 	Default bool
 }

@@ -1042,7 +1042,8 @@
       "RESENDNOTIFICATION": "パスワードリセットのリンクを送信する",
       "REQUIRED": "一部の必須項目が不足しています。",
       "MINLENGTHERROR": "最小で{{value}}文字の長さが必要です。",
-      "MAXLENGTHERROR": "{{value}}文字以下でなければなりません"
+      "MAXLENGTHERROR": "{{value}}文字以下でなければなりません",
+      "HISTORYHINT": "直近の{{count}}個のパスワードは再使用できません。"
     },
     "ID": "ユーザーID",
     "EMAIL": "Eメール",
@@ -1680,7 +1681,8 @@
       "SYMBOLANDNUMBERERROR": "数字とシンボル・句読点で構成されている必要があります。",
       "SYMBOLERROR": "シンボル・句読点を含める必要があります。",
       "NUMBERERROR": "数字を含める必要があります。",
-      "PATTERNERROR": "パスワードは必要なパターンを満たしていません。"
+      "PATTERNERROR": "パスワードは必要なパターンを満たしていません。",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "通知",

@@ -1042,7 +1042,8 @@
       "RESENDNOTIFICATION": "发送重置密码链接",
       "REQUIRED": "缺少必填字段。",
       "MINLENGTHERROR": "密码长度必须至少为 {{value}} 个字符。",
-      "MAXLENGTHERROR": "必须少于{{value}}个字符"
+      "MAXLENGTHERROR": "必须少于{{value}}个字符",
+      "HISTORYHINT": "您不能重复使用最近的 {{count}} 个密码。"
     },
     "ID": "用户ID",
     "EMAIL": "电子邮件",
@@ -1683,7 +1684,8 @@
       "SYMBOLANDNUMBERERROR": "密码必须由数字和符号/标点符号组成。",
       "SYMBOLERROR": "密码必须包含符号/标点符号。",
       "NUMBERERROR": "密码必须包含数字。",
-      "PATTERNERROR": "密码不符合要求。"
+      "PATTERNERROR": "密码不符合要求。",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "通知",

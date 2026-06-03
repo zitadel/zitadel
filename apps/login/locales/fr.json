@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "Impossible de définir le mot de passe",
         "couldNotResetPassword": "Impossible de réinitialiser le mot de passe",
-        "couldNotVerifyPassword": "Impossible de vérifier le mot de passe"
+        "couldNotVerifyPassword": "Impossible de vérifier le mot de passe",
+        "reused": "Vous ne pouvez pas réutiliser un mot de passe récent. Veuillez en choisir un autre."
       }
     },
     "change": {
@@ -121,7 +122,8 @@
         "currentPasswordInvalid": "Le mot de passe actuel est incorrect.",
         "couldNotChangePassword": "Impossible de changer le mot de passe",
         "couldNotVerifyPassword": "Impossible de vérifier le mot de passe",
-        "unknownError": "Erreur inconnue"
+        "unknownError": "Erreur inconnue",
+        "reused": "Vous ne pouvez pas réutiliser un mot de passe récent. Veuillez en choisir un autre."
       }
     },
     "complexity": {
@@ -132,7 +134,8 @@
       "hasLowercase": "Doit inclure une lettre minuscule.",
       "equals": "La confirmation du mot de passe correspond.",
       "matches": "Correspond",
-      "doesNotMatch": "Ne correspond pas"
+      "doesNotMatch": "Ne correspond pas",
+      "historyHint": "You can't reuse your last {count} {count, plural, one {password} other {passwords}}."
     },
     "errors": {
       "noHostFound": "Aucun hôte trouvé",

@@ -206,7 +206,7 @@ func instancePoliciesFilters(_ string) []expect {
 func instancePoliciesEvents(ctx context.Context, instanceID string) []eventstore.Command {
 	instanceAgg := instance.NewAggregate(instanceID)
 	return []eventstore.Command{
-		instance.NewPasswordComplexityPolicyAddedEvent(ctx, &instanceAgg.Aggregate, 8, true, true, true, true),
+		instance.NewPasswordComplexityPolicyAddedEvent(ctx, &instanceAgg.Aggregate, 8, true, true, true, true, 0),
 		instance.NewPasswordAgePolicyAddedEvent(ctx, &instanceAgg.Aggregate, 0, 0),
 		instance.NewDomainPolicyAddedEvent(ctx, &instanceAgg.Aggregate, false, false, false),
 		instance.NewLoginPolicyAddedEvent(ctx, &instanceAgg.Aggregate, true, true, true, false, false, false, false, true, false, false, domain.PasswordlessTypeAllowed, "", 240*time.Hour, 240*time.Hour, 720*time.Hour, 18*time.Hour, 12*time.Hour),
@@ -511,6 +511,7 @@ func humanFilters(orgID string) []expect {
 				false,
 				false,
 				false,
+				0,
 			),
 		),
 	}

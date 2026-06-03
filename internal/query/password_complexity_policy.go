@@ -30,6 +30,7 @@ type PasswordComplexityPolicy struct {
 	HasUppercase bool
 	HasNumber    bool
 	HasSymbol    bool
+	HistoryCount uint64
 
 	IsDefault bool
 }
@@ -148,6 +149,10 @@ var (
 		name:  projection.ComplexityPolicyHasSymbolCol,
 		table: passwordComplexityTable,
 	}
+	PasswordComplexityColHistoryCount = Column{
+		name:  projection.ComplexityPolicyHistoryCountCol,
+		table: passwordComplexityTable,
+	}
 	PasswordComplexityColIsDefault = Column{
 		name:  projection.ComplexityPolicyIsDefaultCol,
 		table: passwordComplexityTable,
@@ -174,6 +179,7 @@ func preparePasswordComplexityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*
 			PasswordComplexityColHasUpperCase.identifier(),
 			PasswordComplexityColHasNumber.identifier(),
 			PasswordComplexityColHasSymbol.identifier(),
+			PasswordComplexityColHistoryCount.identifier(),
 			PasswordComplexityColIsDefault.identifier(),
 			PasswordComplexityColState.identifier(),
 		).
@@ -192,6 +198,7 @@ func preparePasswordComplexityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*
 				&policy.HasUppercase,
 				&policy.HasNumber,
 				&policy.HasSymbol,
+				&policy.HistoryCount,
 				&policy.IsDefault,
 				&policy.State,
 			)

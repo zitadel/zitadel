@@ -699,11 +699,18 @@ func (s passwordComplexitySettings) SetSettingFields(value domain.PasswordComple
 	if value.HasSymbol != nil {
 		changes = append(changes, s.SetHasSymbol(*value.HasSymbol))
 	}
+	if value.HistoryCount != nil {
+		changes = append(changes, s.SetHistoryCount(*value.HistoryCount))
+	}
 	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
 }
 
 func (passwordComplexitySettings) SetMinLength(value uint64) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"minLength"}, value)
+}
+
+func (passwordComplexitySettings) SetHistoryCount(value uint64) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"historyCount"}, value)
 }
 
 func (passwordComplexitySettings) SetHasLowercase(value bool) db_json.JsonUpdate {

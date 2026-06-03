@@ -57,6 +57,7 @@ func Test_customPasswordComplexityPolicy(t *testing.T) {
 							true,
 							true,
 							true,
+							0,
 						),
 					}, nil
 				},
@@ -134,6 +135,7 @@ func Test_defaultPasswordComplexityPolicy(t *testing.T) {
 							true,
 							true,
 							true,
+							0,
 						),
 					}, nil
 				},
@@ -202,6 +204,7 @@ func Test_passwordComplexityPolicy(t *testing.T) {
 							true,
 							true,
 							true,
+							0,
 						),
 					}, nil
 				},
@@ -253,6 +256,7 @@ func Test_passwordComplexityPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								0,
 							),
 						}, nil
 					}).

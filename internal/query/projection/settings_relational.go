@@ -825,6 +825,7 @@ func (p *relationalTablesProjection) reducePasswordComplexityPolicyAdded(event e
 				HasUppercase: &policyEvent.HasUppercase,
 				HasNumber:    &policyEvent.HasNumber,
 				HasSymbol:    &policyEvent.HasSymbol,
+				HistoryCount: &policyEvent.HistoryCount,
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
@@ -863,6 +864,7 @@ func (p *relationalTablesProjection) reducePasswordComplexityPolicyChanged(event
 				HasUppercase: policyEvent.HasUppercase,
 				HasNumber:    policyEvent.HasNumber,
 				HasSymbol:    policyEvent.HasSymbol,
+				HistoryCount: policyEvent.HistoryCount,
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)

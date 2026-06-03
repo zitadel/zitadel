@@ -99,6 +99,7 @@ func passwordComplexitySettingsToPb(current *query.PasswordComplexityPolicy) *se
 		RequiresNumber:    current.HasNumber,
 		RequiresSymbol:    current.HasSymbol,
 		ResourceOwnerType: isDefaultToResourceOwnerTypePb(current.IsDefault),
+		HistoryCount:      current.HistoryCount,
 	}
 }
 

@@ -148,6 +148,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             defaultOrganization={defaultOrganization}
             passwordComplexitySettings={passwordComplexity}
             codeRequired={!(initial === "true")}
+            historyCount={Number(passwordComplexity.historyCount)}
           />
         ) : (
           <div className="py-4">

@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "Не удалось установить пароль",
         "couldNotResetPassword": "Не удалось сбросить пароль",
-        "couldNotVerifyPassword": "Не удалось проверить пароль"
+        "couldNotVerifyPassword": "Не удалось проверить пароль",
+        "reused": "Нельзя повторно использовать недавний пароль. Пожалуйста, выберите другой."
       }
     },
     "change": {
@@ -121,7 +122,8 @@
         "currentPasswordInvalid": "Текущий пароль неверен.",
         "couldNotChangePassword": "Не удалось изменить пароль",
         "couldNotVerifyPassword": "Не удалось проверить пароль",
-        "unknownError": "Неизвестная ошибка"
+        "unknownError": "Неизвестная ошибка",
+        "reused": "Нельзя повторно использовать недавний пароль. Пожалуйста, выберите другой."
       }
     },
     "complexity": {
@@ -132,7 +134,8 @@
       "hasLowercase": "Должен содержать строчную букву.",
       "equals": "Пароли должны совпадать.",
       "matches": "Совпадает",
-      "doesNotMatch": "Не совпадает"
+      "doesNotMatch": "Не совпадает",
+      "historyHint": "You can't reuse your last {count} {count, plural, one {password} other {passwords}}."
     },
     "errors": {
       "noHostFound": "Хост не найден",

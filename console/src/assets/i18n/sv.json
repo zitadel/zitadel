@@ -1042,7 +1042,8 @@
       "RESENDNOTIFICATION": "Skicka länk för återställning av lösenord",
       "REQUIRED": "Några obligatoriska fält saknas.",
       "MINLENGTHERROR": "Måste vara minst {{value}} tecken långt.",
-      "MAXLENGTHERROR": "Måste vara mindre än {{value}} tecken."
+      "MAXLENGTHERROR": "Måste vara mindre än {{value}} tecken.",
+      "HISTORYHINT": "Du kan inte återanvända dina senaste {{count}} lösenord."
     },
     "ID": "Användar-ID",
     "EMAIL": "E-post",
@@ -1684,7 +1685,8 @@
       "SYMBOLANDNUMBERERROR": "Måste bestå av en siffra och en symbol/tecken.",
       "SYMBOLERROR": "Måste inkludera en symbol/tecken.",
       "NUMBERERROR": "Måste inkludera en siffra.",
-      "PATTERNERROR": "Lösenordet uppfyller inte det nödvändiga mönstret."
+      "PATTERNERROR": "Lösenordet uppfyller inte det nödvändiga mönstret.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Meddelande",

@@ -155,6 +155,7 @@ Errors:
       NotSet: "用户未设置密码"
       NotChanged: "新密码不能与您当前的密码相同"
       NotSupported: "不支持密码哈希编码。查看 https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"
+      Reused: "密码最近已使用，请选择其他密码"
     PasswordComplexityPolicy:
       NotFound: "未找到密码策略"
       MinLength: "密码太短"

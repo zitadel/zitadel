@@ -486,7 +486,13 @@ export async function changePassword(command: { code?: string; userId: string; p
     }
   }
 
-  return setUserPassword({ serviceConfig, userId, password: command.password, code: command.code });
+  return setUserPassword({ serviceConfig, userId, password: command.password, code: command.code }).catch((error) => {
+    // InvalidArgument with reuse key means the password was used before; surface a specific message
+    if (isClassifiedError(error) && error.code === Code.InvalidArgument && (error.rawMessage?.includes("COMMAND-PwReuse") || error.rawMessage?.includes("Errors.User.Password.Reused"))) {
+      return { error: t("set.errors.reused") };
+    }
+    return { error: t("set.errors.couldNotSetPassword") };
+  });
 }
 
 type CheckSessionAndSetPasswordCommand = {
@@ -589,6 +595,10 @@ export async function checkSessionAndSetPassword({
     if (isClassifiedError(error) && error.code === Code.FailedPrecondition && error.message) {
       return { error: t("errors.failedPrecondition") };
     }
-    return { error: "Could not set password" };
+    // InvalidArgument with reuse key means the password was used before; surface a specific message
+    if (isClassifiedError(error) && error.code === Code.InvalidArgument && (error.rawMessage?.includes("COMMAND-PwReuse") || error.rawMessage?.includes("Errors.User.Password.Reused"))) {
+      return { error: t("change.errors.reused") };
+    }
+    return { error: t("change.errors.couldNotChangePassword") };
   });
 }

@@ -150,6 +150,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 								false,
 								false,
 								false,
+								0,
 							),
 						),
 					),
@@ -212,6 +213,78 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 								false,
 								false,
 								false,
+								0,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$password",
+							false,
+							"",
+						),
+					),
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+				checkPermission:    newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+				oneTime:       false,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "admin set bypasses history check even when history_count=3 and password reused, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPasswordChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"$plain$x$password",
+								false,
+								"",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+								3,
 							),
 						),
 					),
@@ -463,6 +536,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 								false,
 								false,
 								false,
+								0,
 							),
 						),
 					),
@@ -540,6 +614,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 								false,
 								false,
 								false,
+								0,
 							),
 						),
 					),
@@ -618,6 +693,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 								false,
 								false,
 								false,
+								0,
 							),
 						),
 					),
@@ -701,6 +777,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 								false,
 								false,
 								false,
+								0,
 							),
 						),
 					),
@@ -732,6 +809,67 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 				want: &domain.ObjectDetails{
 					ResourceOwner: "org1",
 				},
+			},
+		},
+		{
+			name: "history_count=3 rejects SetPasswordWithVerifyCode when new equals current stored password",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username", "firstname", "lastname", "nickname", "displayname",
+								language.German, domain.GenderUnspecified, "email@test.ch", true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPasswordChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"$plain$x$password", false, ""),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanPasswordCodeAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+								time.Hour*1,
+								domain.NotificationTypeEmail,
+								"",
+								"",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1, false, false, false, false, 3,
+							),
+						),
+					),
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+				userEncryption:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+				code:          "a",
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 	}
@@ -936,6 +1074,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 							true,
 							true,
 							true,
+							0,
 						),
 					),
 				),
@@ -1124,6 +1263,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 							false,
 							false,
 							false,
+							0,
 						),
 					),
 				),
@@ -1194,6 +1334,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 							false,
 							false,
 							false,
+							0,
 						),
 					),
 				),
@@ -1265,6 +1406,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 							false,
 							false,
 							false,
+							0,
 						),
 					),
 				),
@@ -1281,6 +1423,241 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				want: &domain.ObjectDetails{
 					ResourceOwner: "org1",
 				},
+			},
+		},
+		{
+			name: "history_count=0 permits reuse of previous password",
+			fields: fields{
+				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				oldPassword:   "current",
+				newPassword:   "prev0",
+			},
+			expect: []expect{
+				expectFilter(
+					eventFromEventPusher(
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username", "firstname", "lastname", "nickname", "displayname",
+							language.German, domain.GenderUnspecified, "email@test.ch", true,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$prev0", false, ""),
+					),
+					eventFromEventPusher(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$current", false, ""),
+					),
+				),
+				expectFilter(),
+				expectFilter(
+					eventFromEventPusher(
+						org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							1, false, false, false, false, 0,
+						),
+					),
+				),
+				expectPush(
+					user.NewHumanPasswordChangedEvent(context.Background(),
+						&user.NewAggregate("user1", "org1").Aggregate,
+						"$plain$x$prev0", false, "",
+					),
+				),
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+		{
+			name: "history_count=3 rejects new password matching previous[0]",
+			fields: fields{
+				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				oldPassword:   "current",
+				newPassword:   "prev0",
+			},
+			expect: []expect{
+				expectFilter(
+					eventFromEventPusher(
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username", "firstname", "lastname", "nickname", "displayname",
+							language.German, domain.GenderUnspecified, "email@test.ch", true,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$prev0", false, ""),
+					),
+					eventFromEventPusher(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$current", false, ""),
+					),
+				),
+				expectFilter(),
+				expectFilter(
+					eventFromEventPusher(
+						org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							1, false, false, false, false, 3,
+						),
+					),
+				),
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "history_count=3 rejects new password matching previous[1]",
+			fields: fields{
+				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				oldPassword:   "current",
+				newPassword:   "prev1",
+			},
+			expect: []expect{
+				expectFilter(
+					eventFromEventPusher(
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username", "firstname", "lastname", "nickname", "displayname",
+							language.German, domain.GenderUnspecified, "email@test.ch", true,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$prev1", false, ""),
+					),
+					eventFromEventPusher(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$prev0", false, ""),
+					),
+					eventFromEventPusher(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$current", false, ""),
+					),
+				),
+				expectFilter(),
+				expectFilter(
+					eventFromEventPusher(
+						org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							1, false, false, false, false, 3,
+						),
+					),
+				),
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "history_count=3 permits new password just outside history window (previous[2])",
+			fields: fields{
+				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				oldPassword:   "current",
+				newPassword:   "prev2",
+			},
+			expect: []expect{
+				expectFilter(
+					eventFromEventPusher(
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username", "firstname", "lastname", "nickname", "displayname",
+							language.German, domain.GenderUnspecified, "email@test.ch", true,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$prev2", false, ""),
+					),
+					eventFromEventPusher(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$prev1", false, ""),
+					),
+					eventFromEventPusher(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$prev0", false, ""),
+					),
+					eventFromEventPusher(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$current", false, ""),
+					),
+				),
+				expectFilter(),
+				expectFilter(
+					eventFromEventPusher(
+						org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							1, false, false, false, false, 3,
+						),
+					),
+				),
+				expectPush(
+					user.NewHumanPasswordChangedEvent(context.Background(),
+						&user.NewAggregate("user1", "org1").Aggregate,
+						"$plain$x$prev2", false, "",
+					),
+				),
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
 			},
 		},
 	}

@@ -1584,6 +1584,7 @@ export class ManagementService {
     hasNumber: boolean,
     hasSymbol: boolean,
     minLength: number,
+    historyCount: number = 0,
   ): Promise<AddCustomPasswordComplexityPolicyResponse.AsObject> {
     const req = new AddCustomPasswordComplexityPolicyRequest();
     req.setHasLowercase(hasLowerCase);
@@ -1591,6 +1592,7 @@ export class ManagementService {
     req.setHasNumber(hasNumber);
     req.setHasSymbol(hasSymbol);
     req.setMinLength(minLength);
+    req.setHistoryCount(historyCount);
     return this.grpcService.mgmt.addCustomPasswordComplexityPolicy(req, null).then((resp) => resp.toObject());
   }
 
@@ -1605,6 +1607,7 @@ export class ManagementService {
     hasNumber: boolean,
     hasSymbol: boolean,
     minLength: number,
+    historyCount: number = 0,
   ): Promise<UpdateCustomPasswordComplexityPolicyResponse.AsObject> {
     const req = new UpdateCustomPasswordComplexityPolicyRequest();
     req.setHasLowercase(hasLowerCase);
@@ -1612,6 +1615,7 @@ export class ManagementService {
     req.setHasNumber(hasNumber);
     req.setHasSymbol(hasSymbol);
     req.setMinLength(minLength);
+    req.setHistoryCount(historyCount);
     return this.grpcService.mgmt.updateCustomPasswordComplexityPolicy(req, null).then((resp) => resp.toObject());
   }
 

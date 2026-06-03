@@ -12,5 +12,6 @@ func UpdatePasswordComplexityPolicyToDomain(req *admin_pb.UpdatePasswordComplexi
 		HasUppercase: req.HasUppercase,
 		HasNumber:    req.HasNumber,
 		HasSymbol:    req.HasSymbol,
+		HistoryCount: req.HistoryCount,
 	}
 }

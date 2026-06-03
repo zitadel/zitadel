@@ -1042,7 +1042,8 @@
       "RESENDNOTIFICATION": "E-Mail zum Zurücksetzen senden",
       "REQUIRED": "Bitte prüfe, ob alle notwendigen Felder ausgefüllt sind.",
       "MINLENGTHERROR": "Muss mindestens {{value}} Zeichen lang sein.",
-      "MAXLENGTHERROR": "Muss weniger als {{value}} Zeichen umfassen."
+      "MAXLENGTHERROR": "Muss weniger als {{value}} Zeichen umfassen.",
+      "HISTORYHINT": "Sie können Ihre letzten {{count}} Passwörter nicht wiederverwenden."
     },
     "ID": "Benutzer-ID",
     "EMAIL": "E-Mail",
@@ -1680,7 +1681,8 @@
       "SYMBOLANDNUMBERERROR": "Muss ein Symbol/Satzzeichen und eine Ziffer beinhalten.",
       "SYMBOLERROR": "Muss ein Symbol/Satzzeichen beinhalten.",
       "NUMBERERROR": "Muss eine Ziffer beinhalten.",
-      "PATTERNERROR": "Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
+      "PATTERNERROR": "Das Passwort erfüllt nicht die vorgeschriebene Richtlinie.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Benachrichtigung",

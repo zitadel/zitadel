@@ -38,6 +38,13 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password stri
 	if err != nil {
 		return nil, err
 	}
+	// Use a non-nil slice to signal that history checking is enabled.
+	// Even when PreviousHashes is nil (first password change), the current
+	// stored hash is still checked via currentEncodedHash in setPasswordCommand.
+	previousHashes := wm.PreviousHashes
+	if previousHashes == nil {
+		previousHashes = []string{}
+	}
 	return c.setPassword(
 		ctx,
 		wm,
@@ -45,6 +52,7 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password stri
 		"", // current api implementations never provide an encoded password
 		"",
 		oneTime,
+		previousHashes, // enforce history even on admin set path
 		c.setPasswordWithPermission(wm.AggregateID, wm.ResourceOwner),
 	)
 }
@@ -63,6 +71,13 @@ func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID,
 	if err != nil {
 		return nil, err
 	}
+	// Use a non-nil slice to signal that history checking is enabled.
+	// Even when PreviousHashes is nil (first password change), the current
+	// stored hash is still checked via currentEncodedHash in setPasswordCommand.
+	previousHashes := wm.PreviousHashes
+	if previousHashes == nil {
+		previousHashes = []string{}
+	}
 	return c.setPassword(
 		ctx,
 		wm,
@@ -70,6 +85,7 @@ func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID,
 		"",
 		userAgentID,
 		changeRequired,
+		previousHashes, // enforce history on reset-with-code path
 		c.setPasswordWithVerifyCode(
 			wm.CodeCreationDate,
 			wm.CodeExpiry,
@@ -96,6 +112,11 @@ func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPasswor
 	if err != nil {
 		return nil, err
 	}
+	// Use a non-nil slice to signal that history checking is enabled.
+	previousHashes := wm.PreviousHashes
+	if previousHashes == nil {
+		previousHashes = []string{}
+	}
 	return c.setPassword(
 		ctx,
 		wm,
@@ -103,6 +124,7 @@ func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPasswor
 		"",
 		userAgentID,
 		changeRequired,
+		previousHashes, // enforce history on self-service path
 		c.checkCurrentPassword(newPassword, "", oldPassword, wm, c.tarpit),
 	)
 }
@@ -164,8 +186,16 @@ func (c *Commands) checkCurrentPassword(
 				spanPasswap.EndWithError(err)
 				return "", convertPasswapErr(err)
 			}
-			// otherwise, let's directly verify and return the new generated hash, so we can reuse it in the event
-			return c.verifyAndUpdatePassword(ctx, hash, password, newPassword)
+			// Otherwise verify + compute a new hash for the new password in one shot.
+			// passwap.VerifyAndUpdate returns ErrPasswordNoChange when old == new.
+			// We treat that as "verification succeeded" so the downstream history check
+			// can fire and produce a clear "Errors.User.Password.Reused" instead of an
+			// opaque "NotChanged" error wrapped twice into Internal.
+			updated, err := c.verifyAndUpdatePassword(ctx, hash, password, newPassword)
+			if errors.Is(err, passwap.ErrPasswordNoChange) {
+				return "", nil
+			}
+			return updated, err
 		}
 		commands, updated, err := verifyPasswordWithLockoutPolicy(ctx, wm, currentPassword, c.eventstore, verify, nil, tarpit)
 		// The verification was successful, and we might have an updated hash.
@@ -192,10 +222,11 @@ func (c *Commands) setPassword(
 	wm *HumanPasswordWriteModel,
 	password, encodedPassword, userAgentID string,
 	changeRequired bool,
+	previousHashes []string,
 	verificationCheck setPasswordVerification,
 ) (*domain.ObjectDetails, error) {
 	agg := user.NewAggregate(wm.AggregateID, wm.ResourceOwner)
-	command, err := c.setPasswordCommand(ctx, &agg.Aggregate, wm.UserState, password, encodedPassword, userAgentID, changeRequired, verificationCheck)
+	command, err := c.setPasswordCommand(ctx, &agg.Aggregate, wm.UserState, password, encodedPassword, userAgentID, changeRequired, wm.EncodedHash, previousHashes, verificationCheck)
 	if err != nil {
 		return nil, err
 	}
@@ -210,8 +241,9 @@ func (c *Commands) setPassword(
 // It will check the user's [domain.UserState] to be existing and not initial,
 // if the caller is allowed to change the password (permission, by code or by providing the current password),
 // and it will ensure the new password (if provided as plain) corresponds to the password complexity policy.
-// If not already encoded, the new password will be hashed.
-func (c *Commands) setPasswordCommand(ctx context.Context, agg *eventstore.Aggregate, userState domain.UserState, password, encodedPassword, userAgentID string, changeRequired bool, verificationCheck setPasswordVerification) (_ eventstore.Command, err error) {
+// When previousHashes is non-nil and the resolved complexity policy has HistoryCount > 0, the new password
+// is also checked against the recent password history. If not already encoded, the new password will be hashed.
+func (c *Commands) setPasswordCommand(ctx context.Context, agg *eventstore.Aggregate, userState domain.UserState, password, encodedPassword, userAgentID string, changeRequired bool, currentEncodedHash string, previousHashes []string, verificationCheck setPasswordVerification) (_ eventstore.Command, err error) {
 	if !isUserStateExists(userState) {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-G8dh3", "Errors.User.Password.NotFound")
 	}
@@ -228,11 +260,20 @@ func (c *Commands) setPasswordCommand(ctx context.Context, agg *eventstore.Aggre
 			encodedPassword = newEncodedPassword
 		}
 	}
-	// If password is provided, let's check if is compliant with the policy.
-	// If only a encodedPassword is passed, we can skip this.
+	// If password is provided, check complexity policy and optionally password history.
+	// If only an encodedPassword is passed, we can skip these checks.
 	if password != "" {
-		if err = c.checkPasswordComplexity(ctx, password, agg.ResourceOwner); err != nil {
+		policy, err := c.getOrgPasswordComplexityPolicy(ctx, agg.ResourceOwner)
+		if err != nil {
 			return nil, err
+		}
+		if err = policy.Check(password); err != nil {
+			return nil, err
+		}
+		if previousHashes != nil && policy.HistoryCount > 0 {
+			if err = c.checkPasswordHistory(ctx, password, currentEncodedHash, previousHashes, policy); err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -261,18 +302,34 @@ func (c *Commands) verifyAndUpdatePassword(ctx context.Context, encodedHash, old
 	return updated, convertPasswapErr(err)
 }
 
-// checkPasswordComplexity checks uf the given password can be used to be the password of a user
-func (c *Commands) checkPasswordComplexity(ctx context.Context, newPassword string, resourceOwner string) (err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	policy, err := c.getOrgPasswordComplexityPolicy(ctx, resourceOwner)
-	if err != nil {
-		return err
+// checkPasswordHistory rejects newPlaintext when it matches any stored hash within
+// the last policy.HistoryCount generations (current hash first, then previous).
+// Empty-string entries are skipped. Hashes whose format is not recognised by the
+// configured verifiers are also skipped (ErrNoVerifier / SkipErrors). On a match,
+// zerrors.ThrowInvalidArgument is returned with key "Errors.User.Password.Reused".
+func (c *Commands) checkPasswordHistory(ctx context.Context, newPlaintext, currentEncodedHash string, previousHashes []string, policy *domain.PasswordComplexityPolicy) error {
+	checkList := append([]string{currentEncodedHash}, previousHashes...)
+	count := int(policy.HistoryCount)
+	if count > len(checkList) {
+		count = len(checkList)
 	}
-
-	if err := policy.Check(newPassword); err != nil {
-		return err
+	for _, hash := range checkList[:count] {
+		if hash == "" {
+			continue
+		}
+		_, err := c.userPasswordHasher.Verify(hash, newPlaintext)
+		if err == nil {
+			return zerrors.ThrowInvalidArgument(nil, "COMMAND-PwReuse", "Errors.User.Password.Reused")
+		}
+		if errors.Is(err, passwap.ErrPasswordMismatch) {
+			continue
+		}
+		if errors.Is(err, passwap.ErrNoVerifier) {
+			// Hash format not supported by any configured verifier (e.g. legacy crypto hash).
+			// Cannot compare — treat as mismatch and skip.
+			continue
+		}
+		return zerrors.ThrowInternal(err, "COMMAND-PwHistory", "Errors.Internal")
 	}
 	return nil
 }

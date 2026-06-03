@@ -1042,7 +1042,8 @@
       "RESENDNOTIFICATION": "비밀번호 재설정 링크 보내기",
       "REQUIRED": "필수 필드가 누락되었습니다.",
       "MINLENGTHERROR": "{{value}}자 이상이어야 합니다.",
-      "MAXLENGTHERROR": "{{value}}자 이하이어야 합니다."
+      "MAXLENGTHERROR": "{{value}}자 이하이어야 합니다.",
+      "HISTORYHINT": "최근 {{count}}개의 비밀번호는 재사용할 수 없습니다."
     },
     "ID": "사용자 ID",
     "EMAIL": "이메일",
@@ -1680,7 +1681,8 @@
       "SYMBOLANDNUMBERERROR": "숫자와 기호/구두점이 포함되어야 합니다.",
       "SYMBOLERROR": "기호/구두점이 포함되어야 합니다.",
       "NUMBERERROR": "숫자가 포함되어야 합니다.",
-      "PATTERNERROR": "비밀번호가 요구되는 패턴에 맞지 않습니다."
+      "PATTERNERROR": "비밀번호가 요구되는 패턴에 맞지 않습니다.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "알림",

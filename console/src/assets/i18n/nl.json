@@ -1042,7 +1042,8 @@
       "RESENDNOTIFICATION": "Stuur wachtwoord reset link",
       "REQUIRED": "Sommige verplichte velden ontbreken.",
       "MINLENGTHERROR": "Moet minstens {{value}} tekens lang zijn.",
-      "MAXLENGTHERROR": "Moet minder dan {{value}} tekens bevatten"
+      "MAXLENGTHERROR": "Moet minder dan {{value}} tekens bevatten",
+      "HISTORYHINT": "U kunt uw laatste {{count}} wachtwoorden niet opnieuw gebruiken."
     },
     "ID": "Gebruikers-ID",
     "EMAIL": "E-mail",
@@ -1680,7 +1681,8 @@
       "SYMBOLANDNUMBERERROR": "Moet bestaan uit een cijfer en een symbool/leesteken.",
       "SYMBOLERROR": "Moet een symbool/leesteken bevatten.",
       "NUMBERERROR": "Moet een cijfer bevatten.",
-      "PATTERNERROR": "Het wachtwoord voldoet niet aan het vereiste patroon."
+      "PATTERNERROR": "Het wachtwoord voldoet niet aan het vereiste patroon.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Notificatie",

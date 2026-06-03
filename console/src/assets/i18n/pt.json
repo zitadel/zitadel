@@ -1042,7 +1042,8 @@
       "RESENDNOTIFICATION": "Enviar Link de Redefinição de Senha",
       "REQUIRED": "Algumas informações obrigatórias estão faltando.",
       "MINLENGTHERROR": "Deve ter pelo menos {{value}} caracteres.",
-      "MAXLENGTHERROR": "Deve ter menos de {{value}} caracteres"
+      "MAXLENGTHERROR": "Deve ter menos de {{value}} caracteres",
+      "HISTORYHINT": "Não é possível reutilizar as suas últimas {{count}} senhas."
     },
     "ID": "ID do utilizador",
     "EMAIL": "E-mail",
@@ -1681,7 +1682,8 @@
       "SYMBOLANDNUMBERERROR": "Deve conter um dígito e um símbolo/ponto de pontuação.",
       "SYMBOLERROR": "Deve incluir um símbolo/ponto de pontuação.",
       "NUMBERERROR": "Deve incluir um dígito.",
-      "PATTERNERROR": "A senha não atende ao padrão exigido."
+      "PATTERNERROR": "A senha não atende ao padrão exigido.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Notificação",

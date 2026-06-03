@@ -155,6 +155,7 @@ Errors:
       NotSet: "لم يقم المستخدم بتعيين كلمة مرور"
       NotChanged: "لا يمكن أن تكون كلمة المرور الجديدة هي نفس كلمة المرور الحالية"
       NotSupported: "تشفير تجزئة كلمة المرور غير مدعوم. تحقق من https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"
+      Reused: "كلمة المرور مستخدمة مؤخراً، اختر أخرى"
     PasswordComplexityPolicy:
       NotFound: "سياسة كلمة المرور غير موجودة"
       MinLength: "كلمة المرور قصيرة جداً"

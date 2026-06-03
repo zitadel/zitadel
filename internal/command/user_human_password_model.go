@@ -13,6 +13,7 @@ type HumanPasswordWriteModel struct {
 	eventstore.WriteModel
 
 	EncodedHash          string
+	PreviousHashes       []string // most recent first; used for password history check
 	SecretChangeRequired bool
 
 	Code                     *crypto.CryptoValue
@@ -70,7 +71,17 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 		case *user.HumanInitializedCheckSucceededEvent:
 			wm.UserState = domain.UserStateActive
 		case *user.HumanPasswordChangedEvent:
-			wm.EncodedHash = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
+			if e.EncodedHash != "" {
+				// Modern passwap-encoded event: accumulate history and update current hash.
+				if wm.EncodedHash != "" {
+					wm.PreviousHashes = append([]string{wm.EncodedHash}, wm.PreviousHashes...)
+				}
+				wm.EncodedHash = e.EncodedHash
+			} else {
+				// Legacy Secret-only event: update current hash but skip history accumulation.
+				// Legacy hashes cannot be compared against new passwap-format passwords.
+				wm.EncodedHash = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
+			}
 			wm.SecretChangeRequired = e.ChangeRequired
 			wm.Code = nil
 			wm.PasswordCheckFailedCount = 0

@@ -234,6 +234,7 @@ func Test_passwordComplexitySettingsToPb(t *testing.T) {
 		HasNumber:    true,
 		HasSymbol:    true,
 		IsDefault:    true,
+		HistoryCount: 3,
 	}
 	want := &settings.PasswordComplexitySettings{
 		MinLength:         12,
@@ -242,6 +243,7 @@ func Test_passwordComplexitySettingsToPb(t *testing.T) {
 		RequiresNumber:    true,
 		RequiresSymbol:    true,
 		ResourceOwnerType: settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE,
+		HistoryCount:      3,
 	}
 
 	got := passwordComplexitySettingsToPb(arg)

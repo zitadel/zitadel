@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "Passwort konnte nicht gesetzt werden",
         "couldNotResetPassword": "Passwort konnte nicht zurückgesetzt werden",
-        "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden"
+        "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
+        "reused": "Sie können kein kürzlich verwendetes Passwort wiederverwenden. Bitte wählen Sie ein anderes."
       }
     },
     "change": {
@@ -121,7 +122,8 @@
         "currentPasswordInvalid": "Das aktuelle Passwort ist falsch.",
         "couldNotChangePassword": "Passwort konnte nicht geändert werden",
         "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
-        "unknownError": "Unbekannter Fehler"
+        "unknownError": "Unbekannter Fehler",
+        "reused": "Sie können kein kürzlich verwendetes Passwort wiederverwenden. Bitte wählen Sie ein anderes."
       }
     },
     "complexity": {
@@ -132,7 +134,8 @@
       "hasLowercase": "Muss einen Kleinbuchstaben enthalten.",
       "equals": "Passwortbestätigung stimmt überein.",
       "matches": "Stimmt überein",
-      "doesNotMatch": "Stimmt nicht überein"
+      "doesNotMatch": "Stimmt nicht überein",
+      "historyHint": "You can't reuse your last {count} {count, plural, one {password} other {passwords}}."
     },
     "errors": {
       "noHostFound": "Kein Host gefunden",

@@ -91,7 +91,7 @@ func (c *Commands) VerifyHumanEmail(ctx context.Context, userID, code, resourceo
 		user.NewHumanEmailVerifiedEvent(ctx, userAgg),
 	}
 	if optionalPassword != "" {
-		passwordCommand, err := c.setPasswordCommand(ctx, userAgg, domain.UserStateActive, optionalPassword, "", optionalUserAgentID, false, nil)
+		passwordCommand, err := c.setPasswordCommand(ctx, userAgg, domain.UserStateActive, optionalPassword, "", optionalUserAgentID, false, "", nil, nil)
 		if err != nil {
 			return nil, err
 		}

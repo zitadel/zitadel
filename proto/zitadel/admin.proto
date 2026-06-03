@@ -7972,6 +7972,12 @@ message UpdatePasswordComplexityPolicyRequest {
             description: "Defines if the password MUST contain a symbol. E.g. \"$\""
         }
     ];
+    // Minimum number of previous passwords that cannot be reused. Set to 0 to disable history check.
+    uint64 history_count = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"3\""
+        }
+    ];
 }
 
 message UpdatePasswordComplexityPolicyResponse {

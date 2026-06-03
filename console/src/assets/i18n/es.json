@@ -1042,7 +1042,8 @@
       "RESENDNOTIFICATION": "Enviar enlace para restablecer la contraseña",
       "REQUIRED": "Faltan algunos campos requeridos.",
       "MINLENGTHERROR": "Debe tener al menos {{value}} caracteres de longitud.",
-      "MAXLENGTHERROR": "Debe tener menos de {{value}} caracteres"
+      "MAXLENGTHERROR": "Debe tener menos de {{value}} caracteres",
+      "HISTORYHINT": "No puedes reutilizar tus últimas {{count}} contraseñas."
     },
     "ID": "ID de usuario",
     "EMAIL": "Email",
@@ -1681,7 +1682,8 @@
       "SYMBOLANDNUMBERERROR": "Debe consistir en un dígito y un signo de puntuación/símbolo.",
       "SYMBOLERROR": "Debe inclur un símbolo/signo de puntuación.",
       "NUMBERERROR": "Debe incluir un dígito.",
-      "PATTERNERROR": "La contraseña no cumple con el patrón requerido."
+      "PATTERNERROR": "La contraseña no cumple con el patrón requerido.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Notificación",

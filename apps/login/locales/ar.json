@@ -101,7 +101,8 @@
       "errors": {
         "couldNotSetPassword": "تعذر تعيين كلمة المرور",
         "couldNotResetPassword": "تعذر إعادة تعيين كلمة المرور",
-        "couldNotVerifyPassword": "تعذر التحقق من كلمة المرور"
+        "couldNotVerifyPassword": "تعذر التحقق من كلمة المرور",
+        "reused": "لا يمكنك إعادة استخدام كلمة مرور حديثة. يرجى اختيار كلمة مرور مختلفة."
       }
     },
     "change": {
@@ -122,7 +123,8 @@
         "currentPasswordInvalid": "كلمة المرور الحالية غير صحيحة.",
         "couldNotChangePassword": "تعذر تغيير كلمة المرور",
         "couldNotVerifyPassword": "تعذر التحقق من كلمة المرور",
-        "unknownError": "خطأ غير معروف"
+        "unknownError": "خطأ غير معروف",
+        "reused": "لا يمكنك إعادة استخدام كلمة مرور حديثة. يرجى اختيار كلمة مرور مختلفة."
       }
     },
     "complexity": {
@@ -133,7 +135,8 @@
       "hasLowercase": "يجب أن تتضمن حرفاً صغيراً.",
       "equals": "تأكيد كلمة المرور متطابق.",
       "matches": "مطابق",
-      "doesNotMatch": "غير مطابق"
+      "doesNotMatch": "غير مطابق",
+      "historyHint": "You can't reuse your last {count} {count, plural, one {password} other {passwords}}."
     },
     "errors": {
       "noHostFound": "لم يتم العثور على مضيف",

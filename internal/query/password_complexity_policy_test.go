@@ -23,6 +23,7 @@ var (
 		` projections.password_complexity_policies2.has_uppercase,` +
 		` projections.password_complexity_policies2.has_number,` +
 		` projections.password_complexity_policies2.has_symbol,` +
+		` projections.password_complexity_policies2.history_count,` +
 		` projections.password_complexity_policies2.is_default,` +
 		` projections.password_complexity_policies2.state` +
 		` FROM projections.password_complexity_policies2`
@@ -37,6 +38,7 @@ var (
 		"has_uppercase",
 		"has_number",
 		"has_symbol",
+		"history_count",
 		"is_default",
 		"state",
 	}
@@ -89,6 +91,7 @@ func Test_PasswordComplexityPolicyPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						uint64(3),
 						true,
 						domain.PolicyStateActive,
 					},
@@ -106,6 +109,7 @@ func Test_PasswordComplexityPolicyPrepares(t *testing.T) {
 				HasUppercase:  true,
 				HasNumber:     true,
 				HasSymbol:     true,
+				HistoryCount:  3,
 				IsDefault:     true,
 			},
 		},

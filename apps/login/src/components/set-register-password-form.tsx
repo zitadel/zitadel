@@ -8,7 +8,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
-import { Alert } from "./alert";
+import { Alert, AlertType } from "./alert";
 import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
@@ -31,6 +31,7 @@ type Props = {
   lastname: string;
   organization: string;
   requestId?: string;
+  historyCount?: number;
 };
 
 export function SetRegisterPasswordForm({
@@ -40,6 +41,7 @@ export function SetRegisterPasswordForm({
   lastname,
   organization,
   requestId,
+  historyCount = 0,
 }: Props) {
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onChange",
@@ -51,6 +53,7 @@ export function SetRegisterPasswordForm({
   });
 
   const t = useTranslations("register");
+  const tPassword = useTranslations("password");
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -139,7 +142,17 @@ export function SetRegisterPasswordForm({
           />
         )}
 
-        {error && <Alert>{error}</Alert>}
+        {historyCount > 0 && (
+          <div className="py-2">
+            <Alert type={AlertType.INFO}>{tPassword("complexity.historyHint", { count: historyCount })}</Alert>
+          </div>
+        )}
+
+        {error && (
+          <div className="py-2">
+            <Alert>{error}</Alert>
+          </div>
+        )}
 
         <div className="mt-8 flex w-full flex-row items-center justify-between">
           <BackButton data-testid="back-button" />

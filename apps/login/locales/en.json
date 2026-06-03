@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "Could not set password",
         "couldNotResetPassword": "Could not reset password",
-        "couldNotVerifyPassword": "Could not verify password"
+        "couldNotVerifyPassword": "Could not verify password",
+        "reused": "You can't reuse a recent password. Please choose a different one."
       }
     },
     "change": {
@@ -121,7 +122,8 @@
         "currentPasswordInvalid": "Current password is incorrect.",
         "couldNotChangePassword": "Could not change password",
         "couldNotVerifyPassword": "Could not verify password",
-        "unknownError": "Unknown error"
+        "unknownError": "Unknown error",
+        "reused": "You can't reuse a recent password. Please choose a different one."
       }
     },
     "complexity": {
@@ -132,7 +134,8 @@
       "hasLowercase": "Must include a lowercase letter.",
       "equals": "Password confirmation matched.",
       "matches": "Matches",
-      "doesNotMatch": "Doesn't match"
+      "doesNotMatch": "Doesn't match",
+      "historyHint": "You can't reuse your last {count} {count, plural, one {password} other {passwords}}."
     },
     "errors": {
       "noHostFound": "No host found",

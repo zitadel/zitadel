@@ -68,6 +68,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             lastname={lastname}
             organization={organization as string} // organization is guaranteed to be a string here otherwise we would have returned earlier
             requestId={requestId}
+            historyCount={Number(passwordComplexitySettings.historyCount)}
           ></SetRegisterPasswordForm>
         )}
       </div>

@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "Nie można ustawić hasła",
         "couldNotResetPassword": "Nie można zresetować hasła",
-        "couldNotVerifyPassword": "Nie można zweryfikować hasła"
+        "couldNotVerifyPassword": "Nie można zweryfikować hasła",
+        "reused": "Nie możesz ponownie użyć ostatnio używanego hasła. Wybierz inne hasło."
       }
     },
     "change": {
@@ -121,7 +122,8 @@
         "currentPasswordInvalid": "Aktualne hasło jest nieprawidłowe.",
         "couldNotChangePassword": "Nie można zmienić hasła",
         "couldNotVerifyPassword": "Nie można zweryfikować hasła",
-        "unknownError": "Nieznany błąd"
+        "unknownError": "Nieznany błąd",
+        "reused": "Nie możesz ponownie użyć ostatnio używanego hasła. Wybierz inne hasło."
       }
     },
     "complexity": {
@@ -132,7 +134,8 @@
       "hasLowercase": "Musi zawierać małą literę.",
       "equals": "Potwierdzenie hasła pasuje.",
       "matches": "Pasuje",
-      "doesNotMatch": "Nie pasuje"
+      "doesNotMatch": "Nie pasuje",
+      "historyHint": "You can't reuse your last {count} {count, plural, one {password} other {passwords}}."
     },
     "errors": {
       "noHostFound": "Nie znaleziono hosta",

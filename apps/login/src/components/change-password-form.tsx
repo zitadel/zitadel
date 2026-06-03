@@ -10,7 +10,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
-import { Alert } from "./alert";
+import { Alert, AlertType } from "./alert";
 import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
@@ -33,9 +33,17 @@ type Props = {
   loginName: string;
   requestId?: string;
   organization?: string;
+  historyCount?: number;
 };
 
-export function ChangePasswordForm({ passwordComplexitySettings, sessionId, loginName, requestId, organization }: Props) {
+export function ChangePasswordForm({
+  passwordComplexitySettings,
+  sessionId,
+  loginName,
+  requestId,
+  organization,
+  historyCount = 0,
+}: Props) {
   const router = useRouter();
 
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
@@ -175,7 +183,17 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
           />
         )}
 
-        {error && <Alert>{error}</Alert>}
+        {historyCount > 0 && (
+          <div className="py-2">
+            <Alert type={AlertType.INFO}>{t("complexity.historyHint", { count: historyCount })}</Alert>
+          </div>
+        )}
+
+        {error && (
+          <div className="py-2">
+            <Alert>{error}</Alert>
+          </div>
+        )}
 
         <div className="mt-8 flex w-full flex-row items-center justify-between">
           <BackButton data-testid="back-button" />

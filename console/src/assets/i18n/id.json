@@ -1042,7 +1042,8 @@
       "RESENDNOTIFICATION": "Kirim Tautan Reset Kata Sandi",
       "REQUIRED": "Beberapa bidang wajib diisi tidak ada.",
       "MINLENGTHERROR": "Panjangnya minimal harus {{value}} karakter.",
-      "MAXLENGTHERROR": "Harus kurang dari {{value}} karakter."
+      "MAXLENGTHERROR": "Harus kurang dari {{value}} karakter.",
+      "HISTORYHINT": "Anda tidak dapat menggunakan kembali {{count}} kata sandi terakhir Anda."
     },
     "ID": "ID Pengguna",
     "EMAIL": "E-mail",
@@ -1677,7 +1678,8 @@
       "SYMBOLANDNUMBERERROR": "Harus terdiri dari angka dan simbol/tanda baca.",
       "SYMBOLERROR": "Harus mencantumkan simbol/tanda baca.",
       "NUMBERERROR": "Harus menyertakan angka.",
-      "PATTERNERROR": "Kata sandi tidak memenuhi pola yang diperlukan."
+      "PATTERNERROR": "Kata sandi tidak memenuhi pola yang diperlukan.",
+      "HISTORYCOUNT": "Password history (generations)"
     },
     "NOTIFICATION": {
       "TITLE": "Pemberitahuan",

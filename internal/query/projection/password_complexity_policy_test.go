@@ -44,7 +44,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.password_complexity_policies2 (creation_date, change_date, sequence, id, state, min_length, has_lowercase, has_uppercase, has_symbol, has_number, resource_owner, instance_id, is_default) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+							expectedStmt: "INSERT INTO projections.password_complexity_policies2 (creation_date, change_date, sequence, id, state, min_length, has_lowercase, has_uppercase, has_symbol, has_number, history_count, resource_owner, instance_id, is_default) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -56,6 +56,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 								true,
 								true,
 								true,
+								uint64(0),
 								"ro-id",
 								"instance-id",
 								false,
@@ -97,6 +98,38 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 								true,
 								true,
 								true,
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:   "org reduceChanged with historyCount",
+			reduce: (&passwordComplexityProjection{}).reduceChanged,
+			args: args{
+				event: getEvent(
+					testEvent(
+						org.PasswordComplexityPolicyChangedEventType,
+						org.AggregateType,
+						[]byte(`{
+			"historyCount": 3
+		}`),
+					), org.PasswordComplexityPolicyChangedEventMapper),
+			},
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.password_complexity_policies2 SET (change_date, sequence, history_count) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								uint64(3),
 								"agg-id",
 								"instance-id",
 							},
@@ -181,7 +214,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.password_complexity_policies2 (creation_date, change_date, sequence, id, state, min_length, has_lowercase, has_uppercase, has_symbol, has_number, resource_owner, instance_id, is_default) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+							expectedStmt: "INSERT INTO projections.password_complexity_policies2 (creation_date, change_date, sequence, id, state, min_length, has_lowercase, has_uppercase, has_symbol, has_number, history_count, resource_owner, instance_id, is_default) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -193,6 +226,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 								true,
 								true,
 								true,
+								uint64(0),
 								"ro-id",
 								"instance-id",
 								true,
