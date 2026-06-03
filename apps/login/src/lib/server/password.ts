@@ -279,8 +279,8 @@ export async function sendPassword(
         session = result.session;
         sessionCookie = result.sessionCookie;
       } catch (error: any) {
-        const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: command.organization });
         if ("failedAttempts" in error && error.failedAttempts) {
+          const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: command.organization });
           recordAuthFailure("password", "invalid_password", command.organization);
           if (loginSettingsByContext?.ignoreUnknownUsernames) {
             return { error: t("errors.failedToAuthenticateNoLimit") };
@@ -301,6 +301,7 @@ export async function sendPassword(
         }
 
         if ("remainingLockDuration" in error && error.remainingLockDuration) {
+          const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: command.organization });
           recordAuthFailure("password", "account_locked", command.organization);
           if (lockoutSettings?.showAbsoluteLockoutTime) {
             return {
