@@ -43,7 +43,7 @@ const passwordAttemptsAndLockDurationHandler = (error: ConnectError) => {
   if (details[0] && "remainingLockDuration" in details[0] && details[0].remainingLockDuration > 0) {
     const remainingLockDuration = details[0].remainingLockDuration;
     throw {
-      error: `Failed to authenticate: Your account is locked. Remaining lock duration: ${remainingLockDuration} seconds.`,
+      error: `Failed to authenticate: Your account is locked. Remaining lock duration: ${remainingLockDuration} minutes.`,
       remainingLockDuration: remainingLockDuration,
     };
   }
