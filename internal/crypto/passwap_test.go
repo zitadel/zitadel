@@ -4,10 +4,12 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zitadel/passwap"
 	"github.com/zitadel/passwap/argon2"
 	"github.com/zitadel/passwap/bcrypt"
 	"github.com/zitadel/passwap/drupal7"
@@ -16,7 +18,24 @@ import (
 	"github.com/zitadel/passwap/pbkdf2"
 	"github.com/zitadel/passwap/scrypt"
 	"github.com/zitadel/passwap/sha2"
+	"github.com/zitadel/passwap/verifier"
+
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+type skipHasher struct{}
+
+func (skipHasher) Hash(string) (string, error) {
+	return "", nil
+}
+
+func (skipHasher) Validate(string) (verifier.Result, error) {
+	return verifier.Skip, nil
+}
+
+func (skipHasher) Verify(string, string) (verifier.Result, error) {
+	return verifier.Skip, nil
+}
 
 func TestPasswordHasher_EncodingSupported(t *testing.T) {
 	tests := []struct {
@@ -461,7 +480,7 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 }
 
 func TestHasher_ValidateEncodedHash(t *testing.T) {
-	cfg := &HashConfig{
+	validateCfg := &HashConfig{
 		Hasher: HasherConfig{
 			Algorithm: HashNameBcrypt,
 			Params: map[string]any{
@@ -472,18 +491,71 @@ func TestHasher_ValidateEncodedHash(t *testing.T) {
 			Bcrypt: BcryptLimitsConfig{MinCost: 10, MaxCost: 16},
 		},
 	}
-	hasher, err := cfg.NewHasher()
+	hasher, err := validateCfg.NewHasher()
 	require.NoError(t, err)
 
 	valid, err := hasher.Hash("password")
 	require.NoError(t, err)
 	require.NoError(t, hasher.ValidateEncodedHash(valid))
 
-	err = hasher.ValidateEncodedHash("$2a$31$aaaaaaaaaaaaaaaaaaaaaa$aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-	require.Error(t, err)
+	lowCostCfg := &HashConfig{
+		Hasher: HasherConfig{
+			Algorithm: HashNameBcrypt,
+			Params: map[string]any{
+				"cost": 4,
+			},
+		},
+		Limits: HashLimitsConfig{
+			Bcrypt: BcryptLimitsConfig{MinCost: 4, MaxCost: 16},
+		},
+	}
+	lowCostHasher, err := lowCostCfg.NewHasher()
+	require.NoError(t, err)
+	outOfBounds, err := lowCostHasher.Hash("password")
+	require.NoError(t, err)
+	noVerifierHasher := &Hasher{Swapper: passwap.NewSwapper(skipHasher{})}
 
-	err = hasher.ValidateEncodedHash("$unknown$hash")
-	require.Error(t, err)
+	tests := []struct {
+		name       string
+		hasher     *Hasher
+		encoded    string
+		wantErr    error
+		wantParent error
+	}{
+		{
+			name:       "bounds error",
+			hasher:     hasher,
+			encoded:    outOfBounds,
+			wantErr:    zerrors.ThrowInvalidArgument(nil, "CRYPT-5uV9n", "Errors.User.Password.Invalid"),
+			wantParent: &verifier.BoundsError{},
+		},
+		{
+			name:       "no verifier",
+			hasher:     noVerifierHasher,
+			encoded:    "$unknown$hash",
+			wantErr:    zerrors.ThrowInvalidArgument(nil, "CRYPT-2xK7d", "Errors.Hash.NotSupported"),
+			wantParent: passwap.ErrNoVerifier,
+		},
+		{
+			name:    "invalid hash",
+			hasher:  hasher,
+			encoded: "not-a-hash",
+			wantErr: zerrors.ThrowInvalidArgument(nil, "CRYPT-r8Qm2", "Errors.User.Password.Invalid"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.hasher.ValidateEncodedHash(tt.encoded)
+			require.Error(t, err)
+			assert.ErrorIs(t, err, tt.wantErr)
+			if tt.name == "bounds error" {
+				var bounds *verifier.BoundsError
+				assert.True(t, errors.As(err, &bounds))
+			} else if tt.wantParent != nil {
+				assert.ErrorIs(t, err, tt.wantParent)
+			}
+		})
+	}
 }
 
 func TestHasherConfig_decodeParams(t *testing.T) {

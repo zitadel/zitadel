@@ -48,6 +48,7 @@ func (h *Hasher) EncodingSupported(encodedHash string) bool {
 // ValidateEncodedHash checks that encoded is parseable by a configured verifier
 // and that its cost parameters are within configured bounds.
 // Use when accepting pre-encoded hashes from untrusted sources (import, create with hash).
+// It intentionally returns password-scoped errors for compatibility with current callers.
 func (h *Hasher) ValidateEncodedHash(encoded string) error {
 	if encoded == "" {
 		return nil
@@ -57,13 +58,13 @@ func (h *Hasher) ValidateEncodedHash(encoded string) error {
 		return nil
 	}
 	if errors.Is(err, passwap.ErrNoVerifier) {
-		return zerrors.ThrowInvalidArgument(err, "USER-JDk4t", "Errors.User.Password.NotSupported")
+		return zerrors.ThrowInvalidArgument(err, "CRYPT-2xK7d", "Errors.Hash.NotSupported")
 	}
 	var bounds *verifier.BoundsError
 	if errors.As(err, &bounds) {
-		return zerrors.ThrowInvalidArgument(err, "CRYPT-hashbounds", "Errors.User.Password.Invalid")
+		return zerrors.ThrowInvalidArgument(err, "CRYPT-5uV9n", "Errors.User.Password.Invalid")
 	}
-	return zerrors.ThrowInvalidArgument(err, "CRYPT-hashvalid", "Errors.User.Password.Invalid")
+	return zerrors.ThrowInvalidArgument(err, "CRYPT-r8Qm2", "Errors.User.Password.Invalid")
 }
 
 type HashName string
@@ -241,6 +242,7 @@ type verifierFactory func(limits HashLimitsConfig) prefixVerifier
 var knowVerifiers = map[HashName]verifierFactory{
 	HashNameArgon2: func(l HashLimitsConfig) prefixVerifier {
 		return prefixVerifier{
+			// verifier for both argon2i and argon2id.
 			prefixes: []string{argon2.Prefix},
 			verifier: argon2.NewVerifier(l.Argon2.validationOpts()),
 		}
@@ -259,6 +261,7 @@ var knowVerifiers = map[HashName]verifierFactory{
 	},
 	HashNameMd5Plain: func(_ HashLimitsConfig) prefixVerifier {
 		return prefixVerifier{
+			// hex encoded without identifier or prefix.
 			prefixes: nil,
 			verifier: md5plain.NewVerifier(),
 		}

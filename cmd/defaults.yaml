@@ -949,9 +949,10 @@ SystemDefaults:
       # Hash takes effect for the algorithm pbkdf2
       # Can be "sha1", "sha224", "sha256", "sha384" or "sha512"
       Hash: sha256 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_HASH
+    # Limits bound cost parameters of imported or pre-encoded secret hashes.
     Limits:
       Bcrypt:
-        MinCost: 10 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_BCRYPT_MINCOST
+        MinCost: 4 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_BCRYPT_MINCOST
         MaxCost: 16 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_BCRYPT_MAXCOST
       Argon2:
         MinTime: 1 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_ARGON2_MINTIME
