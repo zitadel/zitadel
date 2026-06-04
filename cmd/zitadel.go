@@ -45,7 +45,7 @@ func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server
 	viper.SetEnvPrefix("ZITADEL")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.SetConfigType("yaml")
-	err := viper.ReadConfig(bytes.NewBuffer(defaultConfig))
+	err := loadDefaultConfig()
 	logging.OnError(context.Background(), err).Fatal("unable to read default config")
 
 	cobra.OnInitialize(initConfig)
@@ -66,6 +66,17 @@ func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server
 	cmd.InitDefaultVersionFlag()
 
 	return cmd
+}
+
+func loadDefaultConfig() error {
+	return loadDefaultConfigInto(viper.GetViper())
+}
+
+func loadDefaultConfigInto(v *viper.Viper) error {
+	if err := v.ReadConfig(bytes.NewBuffer(defaultConfig)); err != nil {
+		return err
+	}
+	return mergeFipsDefaultConfig(v)
 }
 
 func initConfig() {
