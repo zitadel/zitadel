@@ -17,6 +17,8 @@ The **API App** (`apps/api`) is the Nx application target for building and runni
 - **Test (all)**: `pnpm nx run @zitadel/api:test`
 - **Test (unit)**: `pnpm nx run @zitadel/api:test-unit`
 - **Test (integration)**: `pnpm nx run @zitadel/api:test-integration`
+- **Test (unit, FIPS tag)**: `pnpm nx run @zitadel/api:test-unit-fips`
+- **Test (integration, FIPS tag)**: `pnpm nx run @zitadel/api:test-integration-fips`
 - **Build Linux**: `pnpm nx run @zitadel/api:build-linux` — cross-compiles a Linux binary for Docker packaging
 - **Pack (Docker)**: `pnpm nx run @zitadel/api:pack` — builds a local Docker image `zitadel/zitadel:local`. Requires Docker daemon.
 

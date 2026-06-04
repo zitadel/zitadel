@@ -66,6 +66,18 @@
         "default"
       ],
       "cache": true
+    },
+    "test-unit-fips": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
+    "test-integration-fips": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
     }
   }
 }
