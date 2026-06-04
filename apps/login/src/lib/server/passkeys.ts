@@ -167,8 +167,9 @@ export async function registerPasskeyLink(
   }
 
   const [hostname] = host.split(":");
+  const domain = process.env.ZITADEL_WEBAUTHN_RPID || hostname;
 
-  if (!hostname) {
+  if (!domain) {
     throw new Error("Could not get hostname");
   }
 
@@ -176,7 +177,7 @@ export async function registerPasskeyLink(
     throw new Error("Could not determine user");
   }
 
-  return registerPasskey({ serviceConfig, userId: currentUserId, code: registerCode, domain: hostname });
+  return registerPasskey({ serviceConfig, userId: currentUserId, code: registerCode, domain });
 }
 
 export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {

@@ -38,7 +38,7 @@
             "options": {
                 "parallel": false,
                 "commands": [
-                    "./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters"
+                    "./.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/${ZITADEL_BINARY:-zitadel.local} start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey \"QtU1qI12Gr41KZ2V3lVK3l02PNiuGU9n\""
                 ]
             },
             "defaultConfiguration": "default",

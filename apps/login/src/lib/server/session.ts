@@ -130,7 +130,7 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
   if (challenges && challenges.webAuthN && !challenges.webAuthN.domain) {
     const [hostname] = host.split(":");
 
-    challenges.webAuthN.domain = hostname;
+    challenges.webAuthN.domain = process.env.ZITADEL_WEBAUTHN_RPID || hostname;
   }
 
   let recentSession = sessionId
