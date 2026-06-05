@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/muhlemmer/gu"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -196,13 +195,6 @@ func ensureFeaturePermissionV2Enabled(t *testing.T, instance *integration.Instan
 		PermissionCheckV2: gu.Ptr(true),
 	})
 	require.NoError(t, err)
-
-	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, 5*time.Minute)
-	require.EventuallyWithT(t, func(tt *assert.CollectT) {
-		f, err := instance.Client.FeatureV2.GetInstanceFeatures(ctx, &feature.GetInstanceFeaturesRequest{Inheritance: true})
-		require.NoError(tt, err)
-		assert.True(tt, f.PermissionCheckV2.GetEnabled())
-	}, retryDuration, tick, "timed out waiting for ensuring instance feature")
 }
 
 func createAppKey(t *testing.T, ctx context.Context, inst *integration.Instance, projectID, appID string, expirationDate time.Time) *application.CreateApplicationKeyResponse {

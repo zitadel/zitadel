@@ -47,21 +47,6 @@ func ensureFeatureEnabled(t *testing.T, instance *integration.Instance) {
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, 5*time.Minute)
 	require.EventuallyWithT(t,
 		func(ttt *assert.CollectT) {
-			f, err := instance.Client.FeatureV2.GetInstanceFeatures(ctx, &feature.GetInstanceFeaturesRequest{
-				Inheritance: true,
-			})
-			assert.NoError(ttt, err)
-			if f.UserSchema.GetEnabled() {
-				return
-			}
-		},
-		retryDuration,
-		tick,
-		"timed out waiting for ensuring instance feature")
-
-	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, 5*time.Minute)
-	require.EventuallyWithT(t,
-		func(ttt *assert.CollectT) {
 			_, err := instance.Client.UserSchemaV3.SearchUserSchemas(ctx, &schema.SearchUserSchemasRequest{})
 			assert.NoError(ttt, err)
 		},

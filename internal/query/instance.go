@@ -222,6 +222,7 @@ func (q *Queries) InstanceByHost(ctx context.Context, instanceDomain, publicDoma
 		return nil, err
 	}
 	q.caches.instance.Set(ctx, instance)
+	q.instanceFeaturesForIntegrationTests(ctx, &instance.Feature)
 
 	return instance, instance.checkDomain(instanceDomain, publicDomain)
 }

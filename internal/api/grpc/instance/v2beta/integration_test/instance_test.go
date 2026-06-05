@@ -31,9 +31,7 @@ func TestDeleteInstace(t *testing.T) {
 	instEventStore := integration.NewInstance(ctxWithSysAuthZ)
 
 	instRelational := integration.NewInstance(ctxWithSysAuthZ)
-	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
-	})
+	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)})
 
 	type instanceWithType struct {
 		instType string
@@ -114,9 +112,7 @@ func TestUpdateInstace(t *testing.T) {
 	orgOwnerESCtx := instEventStore.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
 
 	instRelational := integration.NewInstance(ctxWithSysAuthZ)
-	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
-	})
+	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)})
 	orgOwnerRelationalCtx := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
 
 	instances := []struct {

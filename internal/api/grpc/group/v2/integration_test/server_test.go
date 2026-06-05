@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/muhlemmer/gu"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/integration"
@@ -48,11 +47,4 @@ func ensureFeaturePermissionV2Enabled(t *testing.T, testInstance *integration.In
 		PermissionCheckV2: gu.Ptr(true),
 	})
 	require.NoError(t, err)
-
-	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, 5*time.Minute)
-	require.EventuallyWithT(t, func(tt *assert.CollectT) {
-		f, err := testInstance.Client.FeatureV2.GetInstanceFeatures(ctx, &feature.GetInstanceFeaturesRequest{Inheritance: true})
-		require.NoError(tt, err)
-		assert.True(tt, f.PermissionCheckV2.GetEnabled())
-	}, retryDuration, tick, "timed out waiting for ensuring testInstance feature")
 }
