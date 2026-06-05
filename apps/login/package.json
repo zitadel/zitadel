@@ -31,7 +31,7 @@
     "@opentelemetry/api-logs": "^0.218.0",
     "@opentelemetry/auto-instrumentations-node": "^0.76.0",
     "@opentelemetry/resource-detector-container": "^0.8.8",
-    "@opentelemetry/resource-detector-gcp": "^0.52.0",
+    "@opentelemetry/resource-detector-gcp": "^0.53.0",
     "@opentelemetry/resources": "^2.7.1",
     "@opentelemetry/sdk-node": "^0.218.0",
     "@opentelemetry/winston-transport": "^0.28.0",
