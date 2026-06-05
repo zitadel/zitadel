@@ -53,7 +53,7 @@ func (h *Hasher) ValidateEncodedHash(encoded string) error {
 	if encoded == "" {
 		return nil
 	}
-	err := h.Swapper.Validate(encoded)
+	err := h.Validate(encoded)
 	if err == nil {
 		return nil
 	}
