@@ -9,63 +9,45 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestIsNonFIPSHasherAlgorithm(t *testing.T) {
-	tests := []struct {
-		alg  HashName
-		want bool
-	}{
-		{HashNameBcrypt, true},
-		{HashNameScrypt, true},
-		{HashNameArgon2i, true},
-		{HashNameArgon2id, true},
-		{HashNamePBKDF2, false},
-		{HashNameSha2, false},
-		{HashNameArgon2, false},
-	}
-	for _, tt := range tests {
-		t.Run(string(tt.alg), func(t *testing.T) {
-			assert.Equal(t, tt.want, isNonFIPSHasherAlgorithm(tt.alg))
-		})
-	}
-}
-
-func TestIsNonFIPSVerifier(t *testing.T) {
+func TestHashName_IsFIPSCompliant(t *testing.T) {
 	tests := []struct {
 		name HashName
 		want bool
 	}{
-		{HashNameArgon2, true},
-		{HashNameBcrypt, true},
-		{HashNameScrypt, true},
-		{HashNameMd5, true},
-		{HashNameMd5Plain, true},
-		{HashNameMd5Salted, true},
-		{HashNamePHPass, true},
-		{HashNameDrupal7, true},
-		{HashNamePBKDF2, false},
+		{HashNamePBKDF2, true},
+		{HashNameArgon2, false},
+		{HashNameArgon2i, false},
+		{HashNameArgon2id, false},
+		{HashNameBcrypt, false},
+		{HashNameMd5, false},
+		{HashNameMd5Plain, false},
+		{HashNameMd5Salted, false},
+		{HashNamePHPass, false},
 		{HashNameSha2, false},
+		{HashNameScrypt, false},
+		{HashNameDrupal7, false},
 	}
 	for _, tt := range tests {
 		t.Run(string(tt.name), func(t *testing.T) {
-			assert.Equal(t, tt.want, isNonFIPSVerifier(tt.name))
+			assert.Equal(t, tt.want, tt.name.IsFIPSCompliant())
 		})
 	}
 }
 
-func TestIsNonFIPSPBKDF2HashMode(t *testing.T) {
+func TestHashMode_IsFIPSCompliant(t *testing.T) {
 	tests := []struct {
 		mode HashMode
 		want bool
 	}{
-		{HashModeSHA1, true},
-		{HashModeSHA224, true},
-		{HashModeSHA256, false},
-		{HashModeSHA384, false},
-		{HashModeSHA512, false},
+		{HashModeSHA256, true},
+		{HashModeSHA384, true},
+		{HashModeSHA512, true},
+		{HashModeSHA1, false},
+		{HashModeSHA224, false},
 	}
 	for _, tt := range tests {
 		t.Run(string(tt.mode), func(t *testing.T) {
-			assert.Equal(t, tt.want, isNonFIPSPBKDF2HashMode(tt.mode))
+			assert.Equal(t, tt.want, tt.mode.IsFIPSCompliant())
 		})
 	}
 }
@@ -73,7 +55,8 @@ func TestIsNonFIPSPBKDF2HashMode(t *testing.T) {
 func TestNonFIPSVerifiersConfigured(t *testing.T) {
 	got := nonFIPSVerifiersConfigured([]HashName{HashNamePBKDF2, HashNameBcrypt, HashNameMd5})
 	assert.Equal(t, []HashName{HashNameBcrypt, HashNameMd5}, got)
-	assert.Nil(t, nonFIPSVerifiersConfigured([]HashName{HashNamePBKDF2, HashNameSha2}))
+	assert.Equal(t, []HashName{HashNameSha2}, nonFIPSVerifiersConfigured([]HashName{HashNamePBKDF2, HashNameSha2}))
+	assert.Nil(t, nonFIPSVerifiersConfigured([]HashName{HashNamePBKDF2}))
 }
 
 func TestValidateFIPSPBKDF2Hasher(t *testing.T) {

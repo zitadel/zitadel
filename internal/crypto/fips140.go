@@ -11,38 +11,22 @@ import (
 // fipsPBKDF2MinIterations is the minimum PBKDF2 iteration count per NIST SP 800-132 §5.2.
 const fipsPBKDF2MinIterations uint32 = 1000
 
-func isNonFIPSHasherAlgorithm(alg HashName) bool {
-	switch alg {
-	case HashNameBcrypt, HashNameScrypt, HashNameArgon2i, HashNameArgon2id:
-		return true
-	default:
-		return false
-	}
+// IsFIPSCompliant reports whether the algorithm is approved for password
+// hashing/verification under FIPS 140-3 (NIST SP 800-132).
+func (n HashName) IsFIPSCompliant() bool {
+	return n == HashNamePBKDF2
 }
 
-func isNonFIPSVerifier(name HashName) bool {
-	switch name {
-	case HashNameArgon2, HashNameBcrypt, HashNameScrypt,
-		HashNameMd5, HashNameMd5Plain, HashNameMd5Salted, HashNamePHPass, HashNameDrupal7:
-		return true
-	default:
-		return false
-	}
-}
-
-func isNonFIPSPBKDF2HashMode(mode HashMode) bool {
-	switch mode {
-	case HashModeSHA1, HashModeSHA224:
-		return true
-	default:
-		return false
-	}
+// IsFIPSCompliant reports whether the hash mode is an approved PBKDF2 PRF
+// under FIPS 140-3 (SHA-2 family; SHA-1/SHA-224 rejected for new use).
+func (m HashMode) IsFIPSCompliant() bool {
+	return m == HashModeSHA256 || m == HashModeSHA384 || m == HashModeSHA512
 }
 
 func nonFIPSVerifiersConfigured(verifiers []HashName) []HashName {
 	var found []HashName
 	for _, v := range verifiers {
-		if isNonFIPSVerifier(v) {
+		if !v.IsFIPSCompliant() {
 			found = append(found, v)
 		}
 	}
@@ -54,7 +38,7 @@ func validateFIPSPBKDF2Hasher(c HasherConfig) error {
 	if err != nil {
 		return fmt.Errorf("decode pbkdf2 hasher for FIPS validation: %w", err)
 	}
-	if isNonFIPSPBKDF2HashMode(hashMode) {
+	if !hashMode.IsFIPSCompliant() {
 		return fmt.Errorf(
 			"application cannot start in uncertified cryptographic state: pbkdf2 hash mode %q is not FIPS 140-3 compliant while FIPS mode is enabled",
 			hashMode,
@@ -75,7 +59,7 @@ func (c *HashConfig) validateFIPS140() error {
 	}
 
 	alg := c.Hasher.Algorithm
-	if isNonFIPSHasherAlgorithm(alg) {
+	if !alg.IsFIPSCompliant() {
 		return fmt.Errorf(
 			"application cannot start in uncertified cryptographic state: password hasher algorithm %q is not FIPS 140-3 compliant while FIPS mode is enabled",
 			alg,
