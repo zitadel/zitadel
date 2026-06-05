@@ -26,7 +26,6 @@ overrides:
   "follow-redirects@<1.16.0": "^1.16.0"
   "axios@<1.17.0": "^1.17.0"
   "protobufjs@>=7.0.0 <7.5.7": "^7.5.7"
-  "protobufjs@>=8.0.0 <8.0.2": "^8.0.2"
   "systeminformation@<5.31.6": "^5.31.6"
   "tmp@<0.2.6": "^0.2.6"
   "fast-uri@<3.1.2": "^3.1.2"
