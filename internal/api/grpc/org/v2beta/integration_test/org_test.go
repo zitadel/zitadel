@@ -311,62 +311,62 @@ func TestServer_UpdateOrganization(t *testing.T) {
 	instOwner := inst.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
 
 	t.Cleanup(func() {
-		_, err := inst.Client.InstanceV2.DeleteInstance(sysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+		_, err := inst.Client.InstanceV2.DeleteInstance(integration.WithSystemAuthorization(context.Background()), &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 		assert.NoError(t, err)
 	})
 
 	t.Run("happy/new name", func(ttt *testing.T) {
-				// given
-				organisation, orgName, _ := createOrg(sysAuthZ, ttt, client)
+		// given
+		organisation, orgName, _ := createOrg(sysAuthZ, ttt, client)
 
-				// when
-				_, err := client.UpdateOrganization(instOwner, &v2beta_org.UpdateOrganizationRequest{
-					Id:   organisation.GetId(),
-					Name: "Not " + orgName,
-				})
+		// when
+		_, err := client.UpdateOrganization(instOwner, &v2beta_org.UpdateOrganizationRequest{
+			Id:   organisation.GetId(),
+			Name: "Not " + orgName,
+		})
 
-				// then
-				assert.NoError(ttt, err)
-			})
+		// then
+		assert.NoError(ttt, err)
+	})
 
 	t.Run("unhappy: same name", func(ttt *testing.T) {
-				// given
-				organisation, orgName, _ := createOrg(sysAuthZ, ttt, client)
+		// given
+		organisation, orgName, _ := createOrg(sysAuthZ, ttt, client)
 
-				// when
-				_, err := client.UpdateOrganization(instOwner, &v2beta_org.UpdateOrganizationRequest{
-					Id:   organisation.GetId(),
-					Name: orgName,
-				})
+		// when
+		_, err := client.UpdateOrganization(instOwner, &v2beta_org.UpdateOrganizationRequest{
+			Id:   organisation.GetId(),
+			Name: orgName,
+		})
 
-				// then
-				assert.Error(ttt, err)
-			})
+		// then
+		assert.Error(ttt, err)
+	})
 
 	t.Run("unhappy: non existent org id", func(ttt *testing.T) {
-				// when
-				_, err := client.UpdateOrganization(instOwner, &v2beta_org.UpdateOrganizationRequest{
-					Id:   "non existing org id",
-					Name: "new name",
-				})
+		// when
+		_, err := client.UpdateOrganization(instOwner, &v2beta_org.UpdateOrganizationRequest{
+			Id:   "non existing org id",
+			Name: "new name",
+		})
 
-				// then
-				assert.Error(ttt, err)
-			})
+		// then
+		assert.Error(ttt, err)
+	})
 
 	t.Run("unhappy: no org id", func(ttt *testing.T) {
-				// given
-				createOrg(sysAuthZ, ttt, client)
+		// given
+		createOrg(sysAuthZ, ttt, client)
 
-				// when
-				_, err := client.UpdateOrganization(instOwner, &v2beta_org.UpdateOrganizationRequest{
-					Id:   " ",
-					Name: "new name",
-				})
+		// when
+		_, err := client.UpdateOrganization(instOwner, &v2beta_org.UpdateOrganizationRequest{
+			Id:   " ",
+			Name: "new name",
+		})
 
-				// then
-				assert.Error(ttt, err)
-			})
+		// then
+		assert.Error(ttt, err)
+	})
 
 	t.Run("unhappy: no permission", func(ttt *testing.T) {
 		// given
@@ -400,15 +400,15 @@ func TestServer_ListOrganizations(t *testing.T) {
 	instOwner := inst.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
 
 	t.Cleanup(func() {
-		_, err := inst.Client.InstanceV2.DeleteInstance(sysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+		_, err := inst.Client.InstanceV2.DeleteInstance(integration.WithSystemAuthorization(context.Background()), &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 		assert.NoError(t, err)
 	})
 
 	orgs := make([]struct {
-				organisation *v2beta_org.CreateOrganizationResponse
-				name         string
-				domain       string
-			}, 3)
+		organisation *v2beta_org.CreateOrganizationResponse
+		name         string
+		domain       string
+	}, 3)
 
 	for i := range orgs {
 		orgs[i].organisation, orgs[i].name, orgs[i].domain = createOrg(instOwner, t, client)
@@ -421,263 +421,263 @@ func TestServer_ListOrganizations(t *testing.T) {
 	require.NoError(t, err)
 
 	happyTestCases := []struct {
-				name  string
-				query []*v2beta_org.OrganizationSearchFilter
-				want  *v2beta_org.ListOrganizationsResponse
-			}{
+		name  string
+		query []*v2beta_org.OrganizationSearchFilter
+		want  *v2beta_org.ListOrganizationsResponse
+	}{
+		{
+			name: "list organizations happy path, no filter",
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 4,
+				},
+				Organizations: []*v2beta_org.Organization{
+					{Id: inst.DefaultOrg.Id, Name: inst.DefaultOrg.Name},
+					{Id: orgs[0].organisation.Id, Name: orgs[0].name},
+					{Id: orgs[1].organisation.Id, Name: orgs[1].name},
+					{Id: orgs[2].organisation.Id, Name: orgs[2].name},
+				},
+			},
+		},
+		{
+			name: "list organizations by id happy path",
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					name: "list organizations happy path, no filter",
-					want: &v2beta_org.ListOrganizationsResponse{
-						Pagination: &filter.PaginationResponse{
-							TotalResult: 4,
-						},
-						Organizations: []*v2beta_org.Organization{
-							{Id: inst.DefaultOrg.Id, Name: inst.DefaultOrg.Name},
-							{Id: orgs[0].organisation.Id, Name: orgs[0].name},
-							{Id: orgs[1].organisation.Id, Name: orgs[1].name},
-							{Id: orgs[2].organisation.Id, Name: orgs[2].name},
+					Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{
+						IdFilter: &v2beta_org.OrgIDFilter{
+							Id: orgs[1].organisation.Id,
 						},
 					},
 				},
+			},
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 1,
+				},
+				Organizations: []*v2beta_org.Organization{
+					{Id: orgs[1].organisation.Id, Name: orgs[1].name},
+				},
+			},
+		},
+		{
+			name: "list organizations by state active",
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					name: "list organizations by id happy path",
-					query: []*v2beta_org.OrganizationSearchFilter{
-						{
-							Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{
-								IdFilter: &v2beta_org.OrgIDFilter{
-									Id: orgs[1].organisation.Id,
-								},
-							},
-						},
-					},
-					want: &v2beta_org.ListOrganizationsResponse{
-						Pagination: &filter.PaginationResponse{
-							TotalResult: 1,
-						},
-						Organizations: []*v2beta_org.Organization{
-							{Id: orgs[1].organisation.Id, Name: orgs[1].name},
+					Filter: &v2beta_org.OrganizationSearchFilter_StateFilter{
+						StateFilter: &v2beta_org.OrgStateFilter{
+							State: v2beta_org.OrgState_ORG_STATE_ACTIVE,
 						},
 					},
 				},
+			},
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 3,
+				},
+				Organizations: []*v2beta_org.Organization{
+					{Id: inst.DefaultOrg.Id, Name: inst.DefaultOrg.Name},
+					{Id: orgs[0].organisation.Id, Name: orgs[0].name},
+					{Id: orgs[2].organisation.Id, Name: orgs[2].name},
+				},
+			},
+		},
+		{
+			name: "list organizations by state inactive",
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					name: "list organizations by state active",
-					query: []*v2beta_org.OrganizationSearchFilter{
-						{
-							Filter: &v2beta_org.OrganizationSearchFilter_StateFilter{
-								StateFilter: &v2beta_org.OrgStateFilter{
-									State: v2beta_org.OrgState_ORG_STATE_ACTIVE,
-								},
-							},
-						},
-					},
-					want: &v2beta_org.ListOrganizationsResponse{
-						Pagination: &filter.PaginationResponse{
-							TotalResult: 3,
-						},
-						Organizations: []*v2beta_org.Organization{
-							{Id: inst.DefaultOrg.Id, Name: inst.DefaultOrg.Name},
-							{Id: orgs[0].organisation.Id, Name: orgs[0].name},
-							{Id: orgs[2].organisation.Id, Name: orgs[2].name},
+					Filter: &v2beta_org.OrganizationSearchFilter_StateFilter{
+						StateFilter: &v2beta_org.OrgStateFilter{
+							State: v2beta_org.OrgState_ORG_STATE_INACTIVE,
 						},
 					},
 				},
+			},
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 1,
+				},
+				Organizations: []*v2beta_org.Organization{
+					{Id: orgs[1].organisation.Id, Name: orgs[1].name},
+				},
+			},
+		},
+		{
+			name: "list organizations by id bad id",
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					name: "list organizations by state inactive",
-					query: []*v2beta_org.OrganizationSearchFilter{
-						{
-							Filter: &v2beta_org.OrganizationSearchFilter_StateFilter{
-								StateFilter: &v2beta_org.OrgStateFilter{
-									State: v2beta_org.OrgState_ORG_STATE_INACTIVE,
-								},
-							},
-						},
-					},
-					want: &v2beta_org.ListOrganizationsResponse{
-						Pagination: &filter.PaginationResponse{
-							TotalResult: 1,
-						},
-						Organizations: []*v2beta_org.Organization{
-							{Id: orgs[1].organisation.Id, Name: orgs[1].name},
+					Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{
+						IdFilter: &v2beta_org.OrgIDFilter{
+							Id: "bad id",
 						},
 					},
 				},
-				{
-					name: "list organizations by id bad id",
-					query: []*v2beta_org.OrganizationSearchFilter{
-						{
-							Filter: &v2beta_org.OrganizationSearchFilter_IdFilter{
-								IdFilter: &v2beta_org.OrgIDFilter{
-									Id: "bad id",
-								},
-							},
-						},
-					},
-					want: &v2beta_org.ListOrganizationsResponse{
-						Pagination: &filter.PaginationResponse{
-							TotalResult: 0,
-						},
-						Organizations: nil,
-					},
+			},
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 0,
 				},
+				Organizations: nil,
+			},
+		},
+		{
+			name: "list organizations specify org name equals",
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					name: "list organizations specify org name equals",
-					query: []*v2beta_org.OrganizationSearchFilter{
-						{
-							Filter: &v2beta_org.OrganizationSearchFilter_NameFilter{
-								NameFilter: &v2beta_org.OrgNameFilter{
-									Name:   orgs[1].name,
-									Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS,
-								},
-							},
-						},
-					},
-					want: &v2beta_org.ListOrganizationsResponse{
-						Pagination: &filter.PaginationResponse{
-							TotalResult: 1,
-						},
-						Organizations: []*v2beta_org.Organization{
-							{Id: orgs[1].organisation.Id, Name: orgs[1].name},
+					Filter: &v2beta_org.OrganizationSearchFilter_NameFilter{
+						NameFilter: &v2beta_org.OrgNameFilter{
+							Name:   orgs[1].name,
+							Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS,
 						},
 					},
 				},
+			},
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 1,
+				},
+				Organizations: []*v2beta_org.Organization{
+					{Id: orgs[1].organisation.Id, Name: orgs[1].name},
+				},
+			},
+		},
+		{
+			name: "list organizations specify org name contains",
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					name: "list organizations specify org name contains",
-					query: []*v2beta_org.OrganizationSearchFilter{
-						{
-							Filter: &v2beta_org.OrganizationSearchFilter_NameFilter{
-								NameFilter: &v2beta_org.OrgNameFilter{
-									Name: func() string {
-										return orgs[1].name[1 : len(orgs[1].name)-2]
-									}(),
-									Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS,
-								},
-							},
-						},
-					},
-					want: &v2beta_org.ListOrganizationsResponse{
-						Pagination: &filter.PaginationResponse{
-							TotalResult: 1,
-						},
-						Organizations: []*v2beta_org.Organization{
-							{Id: orgs[1].organisation.Id, Name: orgs[1].name},
+					Filter: &v2beta_org.OrganizationSearchFilter_NameFilter{
+						NameFilter: &v2beta_org.OrgNameFilter{
+							Name: func() string {
+								return orgs[1].name[1 : len(orgs[1].name)-2]
+							}(),
+							Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS,
 						},
 					},
 				},
+			},
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 1,
+				},
+				Organizations: []*v2beta_org.Organization{
+					{Id: orgs[1].organisation.Id, Name: orgs[1].name},
+				},
+			},
+		},
+		{
+			name: "list organizations specify org name contains IGNORE CASE",
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					name: "list organizations specify org name contains IGNORE CASE",
-					query: []*v2beta_org.OrganizationSearchFilter{
-						{
-							Filter: &v2beta_org.OrganizationSearchFilter_NameFilter{
-								NameFilter: &v2beta_org.OrgNameFilter{
-									Name: func() string {
-										return strings.ToUpper(orgs[1].name[1 : len(orgs[1].name)-2])
-									}(),
-									Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE,
-								},
-							},
-						},
-					},
-					want: &v2beta_org.ListOrganizationsResponse{
-						Pagination: &filter.PaginationResponse{
-							TotalResult: 1,
-						},
-						Organizations: []*v2beta_org.Organization{
-							{Id: orgs[1].organisation.Id, Name: orgs[1].name},
+					Filter: &v2beta_org.OrganizationSearchFilter_NameFilter{
+						NameFilter: &v2beta_org.OrgNameFilter{
+							Name: func() string {
+								return strings.ToUpper(orgs[1].name[1 : len(orgs[1].name)-2])
+							}(),
+							Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE,
 						},
 					},
 				},
+			},
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 1,
+				},
+				Organizations: []*v2beta_org.Organization{
+					{Id: orgs[1].organisation.Id, Name: orgs[1].name},
+				},
+			},
+		},
+		{
+			name: "list organizations specify domain name equals",
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					name: "list organizations specify domain name equals",
-					query: []*v2beta_org.OrganizationSearchFilter{
-						{
-							Filter: &v2beta_org.OrganizationSearchFilter_DomainFilter{
-								DomainFilter: &v2beta_org.OrgDomainFilter{
-									Domain: orgs[1].domain,
-									Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS,
-								},
-							},
-						},
-					},
-					want: &v2beta_org.ListOrganizationsResponse{
-						Pagination: &filter.PaginationResponse{
-							TotalResult: 1,
-						},
-						Organizations: []*v2beta_org.Organization{
-							{Id: orgs[1].organisation.Id, Name: orgs[1].name},
+					Filter: &v2beta_org.OrganizationSearchFilter_DomainFilter{
+						DomainFilter: &v2beta_org.OrgDomainFilter{
+							Domain: orgs[1].domain,
+							Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS,
 						},
 					},
 				},
+			},
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 1,
+				},
+				Organizations: []*v2beta_org.Organization{
+					{Id: orgs[1].organisation.Id, Name: orgs[1].name},
+				},
+			},
+		},
+		{
+			name: "list organizations specify domain name contains",
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					name: "list organizations specify domain name contains",
-					query: []*v2beta_org.OrganizationSearchFilter{
-						{
-							Filter: &v2beta_org.OrganizationSearchFilter_DomainFilter{
-								DomainFilter: &v2beta_org.OrgDomainFilter{
-									Domain: orgs[1].domain[1 : len(orgs[1].domain)-2],
-									Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS,
-								},
-							},
-						},
-					},
-					want: &v2beta_org.ListOrganizationsResponse{
-						Pagination: &filter.PaginationResponse{
-							TotalResult: 1,
-						},
-						Organizations: []*v2beta_org.Organization{
-							{Id: orgs[1].organisation.Id, Name: orgs[1].name},
+					Filter: &v2beta_org.OrganizationSearchFilter_DomainFilter{
+						DomainFilter: &v2beta_org.OrgDomainFilter{
+							Domain: orgs[1].domain[1 : len(orgs[1].domain)-2],
+							Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS,
 						},
 					},
 				},
+			},
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 1,
+				},
+				Organizations: []*v2beta_org.Organization{
+					{Id: orgs[1].organisation.Id, Name: orgs[1].name},
+				},
+			},
+		},
+		{
+			name: "list organizations specify org name contains IGNORE CASE",
+			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					name: "list organizations specify org name contains IGNORE CASE",
-					query: []*v2beta_org.OrganizationSearchFilter{
-						{
-							Filter: &v2beta_org.OrganizationSearchFilter_DomainFilter{
-								DomainFilter: &v2beta_org.OrgDomainFilter{
-									Domain: strings.ToUpper(orgs[1].domain[1 : len(orgs[1].domain)-2]),
-									Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE,
-								},
-							},
-						},
-					},
-					want: &v2beta_org.ListOrganizationsResponse{
-						Pagination: &filter.PaginationResponse{
-							TotalResult: 1,
-						},
-						Organizations: []*v2beta_org.Organization{
-							{Id: orgs[1].organisation.Id, Name: orgs[1].name},
+					Filter: &v2beta_org.OrganizationSearchFilter_DomainFilter{
+						DomainFilter: &v2beta_org.OrgDomainFilter{
+							Domain: strings.ToUpper(orgs[1].domain[1 : len(orgs[1].domain)-2]),
+							Method: v2beta_object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE,
 						},
 					},
 				},
-			}
+			},
+			want: &v2beta_org.ListOrganizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult: 1,
+				},
+				Organizations: []*v2beta_org.Organization{
+					{Id: orgs[1].organisation.Id, Name: orgs[1].name},
+				},
+			},
+		},
+	}
 
 	for _, happyTestCase := range happyTestCases {
 		t.Run(happyTestCase.name, func(ttt *testing.T) {
-					retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 20*time.Second)
-					require.EventuallyWithT(ttt, func(tttt *assert.CollectT) {
-						got, err := client.ListOrganizations(instOwner, &v2beta_org.ListOrganizationsRequest{
-							Filter:        happyTestCase.query,
-							Pagination:    &filter.PaginationRequest{Asc: true},
-							SortingColumn: v2beta_org.OrgFieldName_ORG_FIELD_NAME_CREATION_DATE,
-						})
-						require.NoError(tttt, err)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 20*time.Second)
+			require.EventuallyWithT(ttt, func(tttt *assert.CollectT) {
+				got, err := client.ListOrganizations(instOwner, &v2beta_org.ListOrganizationsRequest{
+					Filter:        happyTestCase.query,
+					Pagination:    &filter.PaginationRequest{Asc: true},
+					SortingColumn: v2beta_org.OrgFieldName_ORG_FIELD_NAME_CREATION_DATE,
+				})
+				require.NoError(tttt, err)
 
-						require.Equal(tttt, happyTestCase.want.GetPagination(), got.GetPagination())
+				require.Equal(tttt, happyTestCase.want.GetPagination(), got.GetPagination())
 
-						require.Len(tttt, got.Organizations, len(happyTestCase.want.Organizations))
+				require.Len(tttt, got.Organizations, len(happyTestCase.want.Organizations))
 
-						for i, got := range got.Organizations {
-							// created/chagned date
-							gotCD := got.GetCreationDate().AsTime()
-							now := time.Now()
-							assert.WithinRange(tttt, gotCD, testStartTimestamp, now.Add(time.Minute))
-							gotCD = got.GetChangedDate().AsTime()
-							assert.WithinRange(tttt, gotCD, testStartTimestamp, now.Add(time.Minute))
+				for i, got := range got.Organizations {
+					// created/chagned date
+					gotCD := got.GetCreationDate().AsTime()
+					now := time.Now()
+					assert.WithinRange(tttt, gotCD, testStartTimestamp, now.Add(time.Minute))
+					gotCD = got.GetChangedDate().AsTime()
+					assert.WithinRange(tttt, gotCD, testStartTimestamp, now.Add(time.Minute))
 
-							assert.Equal(tttt, happyTestCase.want.Organizations[i].Id, got.Id)
-							assert.Equal(tttt, happyTestCase.want.Organizations[i].Name, got.Name)
-						}
-				}, retryDuration, tick, "timeout waiting for expected organizations being created")
+					assert.Equal(tttt, happyTestCase.want.Organizations[i].Id, got.Id)
+					assert.Equal(tttt, happyTestCase.want.Organizations[i].Name, got.Name)
+				}
+			}, retryDuration, tick, "timeout waiting for expected organizations being created")
 		})
 	}
 }
@@ -694,23 +694,23 @@ func TestServer_DeleteOrganization(t *testing.T) {
 	instOwner := inst.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
 
 	t.Cleanup(func() {
-		_, err := inst.Client.InstanceV2.DeleteInstance(sysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+		_, err := inst.Client.InstanceV2.DeleteInstance(integration.WithSystemAuthorization(context.Background()), &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 		assert.NoError(t, err)
 	})
 
 	t.Run("happy path", func(ttt *testing.T) {
-				// given
-				organisation, _, _ := createOrg(instOwner, ttt, client)
+		// given
+		organisation, _, _ := createOrg(instOwner, ttt, client)
 
-				// when
-				got, err := client.DeleteOrganization(instOwner, &v2beta_org.DeleteOrganizationRequest{Id: organisation.Id})
+		// when
+		got, err := client.DeleteOrganization(instOwner, &v2beta_org.DeleteOrganizationRequest{Id: organisation.Id})
 
-				// then
-				assert.NoError(ttt, err)
-				deletionTime := got.GetDeletionDate().AsTime()
-				now := time.Now()
-				assert.WithinRange(t, deletionTime, now.Add(-time.Minute), now.Add(time.Minute))
-			})
+		// then
+		assert.NoError(ttt, err)
+		deletionTime := got.GetDeletionDate().AsTime()
+		now := time.Now()
+		assert.WithinRange(t, deletionTime, now.Add(-time.Minute), now.Add(time.Minute))
+	})
 
 	t.Run("unhappy: no permission", func(ttt *testing.T) {
 		// given
@@ -733,17 +733,17 @@ func TestServer_DeleteOrganization(t *testing.T) {
 	})
 
 	t.Run("happy: already deleted", func(ttt *testing.T) {
-				// given
-				organisation, _, _ := createOrg(instOwner, ttt, client)
-				_, err := client.DeleteOrganization(instOwner, &v2beta_org.DeleteOrganizationRequest{Id: organisation.Id})
-				require.NoError(ttt, err)
+		// given
+		organisation, _, _ := createOrg(instOwner, ttt, client)
+		_, err := client.DeleteOrganization(instOwner, &v2beta_org.DeleteOrganizationRequest{Id: organisation.Id})
+		require.NoError(ttt, err)
 
-				// when
-				_, err = client.DeleteOrganization(instOwner, &v2beta_org.DeleteOrganizationRequest{Id: organisation.Id})
+		// when
+		_, err = client.DeleteOrganization(instOwner, &v2beta_org.DeleteOrganizationRequest{Id: organisation.Id})
 
-				// then
-				require.NoError(ttt, err)
-			})
+		// then
+		require.NoError(ttt, err)
+	})
 
 	t.Run("happy: non existing", func(ttt *testing.T) {
 		// when
@@ -782,7 +782,7 @@ func TestServer_ActivateOrganization(t *testing.T) {
 	instOwner := inst.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
 
 	t.Cleanup(func() {
-		_, err := inst.Client.InstanceV2.DeleteInstance(sysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+		_, err := inst.Client.InstanceV2.DeleteInstance(integration.WithSystemAuthorization(context.Background()), &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 		assert.NoError(t, err)
 	})
 
@@ -855,7 +855,7 @@ func TestServer_DeactivateOrganization(t *testing.T) {
 	instOwner := inst.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
 
 	t.Cleanup(func() {
-		_, err := inst.Client.InstanceV2.DeleteInstance(sysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+		_, err := inst.Client.InstanceV2.DeleteInstance(integration.WithSystemAuthorization(context.Background()), &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 		require.NoError(t, err)
 	})
 
