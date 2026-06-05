@@ -903,9 +903,10 @@ func TestServer_DeleteSession_token(t *testing.T) {
 
 	inst := integration.NewInstance(sysAuthZ)
 	instOwner := inst.WithAuthorizationToken(IAMOwnerCTX, integration.UserTypeIAMOwner)
-	t.Cleanup(func() {
-		inst.Client.InstanceV2.DeleteInstance(sysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
-	})
+t.Cleanup(func() {
+	_, err := inst.Client.InstanceV2.DeleteInstance(integration.WithSystemAuthorization(context.Background()), &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+	require.NoError(t, err)
+})
 
 	loginCTX := inst.WithAuthorizationToken(t.Context(), integration.UserTypeLogin)
 	createResp, err := inst.Client.SessionV2.CreateSession(loginCTX, &session.CreateSessionRequest{})
@@ -929,9 +930,10 @@ func TestServer_DeleteSession_own_session(t *testing.T) {
 
 	inst := integration.NewInstance(sysAuthZ)
 	instOwner := inst.WithAuthorizationToken(IAMOwnerCTX, integration.UserTypeIAMOwner)
-	t.Cleanup(func() {
-		inst.Client.InstanceV2.DeleteInstance(sysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
-	})
+t.Cleanup(func() {
+	_, err := inst.Client.InstanceV2.DeleteInstance(integration.WithSystemAuthorization(context.Background()), &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+	require.NoError(t, err)
+})
 
 	loginCTX := inst.WithAuthorizationToken(t.Context(), integration.UserTypeLogin)
 	// create two users for the test and a session each to get tokens for authorization
@@ -973,9 +975,10 @@ func TestServer_DeleteSession_with_permission(t *testing.T) {
 
 	inst := integration.NewInstance(sysAuthZ)
 	instOwner := inst.WithAuthorizationToken(IAMOwnerCTX, integration.UserTypeIAMOwner)
-	t.Cleanup(func() {
-		inst.Client.InstanceV2.DeleteInstance(sysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
-	})
+t.Cleanup(func() {
+	_, err := inst.Client.InstanceV2.DeleteInstance(integration.WithSystemAuthorization(context.Background()), &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+	require.NoError(t, err)
+})
 
 	loginCTX := inst.WithAuthorizationToken(t.Context(), integration.UserTypeLogin)
 	user1 := inst.CreateUserTypeHuman(instOwner, integration.Email())
@@ -1008,9 +1011,10 @@ func TestServer_DeleteSession_expired(t *testing.T) {
 	sysAuthZ := integration.WithSystemAuthorization(CTX)
 
 	inst := integration.NewInstance(sysAuthZ)
-	t.Cleanup(func() {
-		inst.Client.InstanceV2.DeleteInstance(sysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
-	})
+t.Cleanup(func() {
+	_, err := inst.Client.InstanceV2.DeleteInstance(integration.WithSystemAuthorization(context.Background()), &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
+	require.NoError(t, err)
+})
 
 	loginCTX := inst.WithAuthorizationToken(t.Context(), integration.UserTypeLogin)
 	createResp, err := inst.Client.SessionV2.CreateSession(loginCTX, &session.CreateSessionRequest{
