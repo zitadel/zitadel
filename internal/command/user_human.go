@@ -119,8 +119,8 @@ func (h *AddHuman) Validate(hasher *crypto.Hasher) (err error) {
 		}
 	}
 	if h.EncodedPasswordHash != "" {
-		if !hasher.EncodingSupported(h.EncodedPasswordHash) {
-			return zerrors.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.User.Password.NotSupported")
+		if err := hasher.ValidateEncodedHash(h.EncodedPasswordHash); err != nil {
+			return err
 		}
 	}
 	return nil
@@ -369,6 +369,9 @@ func addHumanCommandPassword(ctx context.Context, filter preparation.FilterToQue
 	}
 
 	if human.EncodedPasswordHash != "" {
+		if err := hasher.ValidateEncodedHash(human.EncodedPasswordHash); err != nil {
+			return err
+		}
 		createCmd.AddPasswordData(human.EncodedPasswordHash, human.PasswordChangeRequired)
 	}
 	return nil
@@ -555,6 +558,11 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	human.EnsureDisplayName()
 	if human.Password != nil {
 		if err := human.HashPasswordIfExisting(ctx, pwPolicy, c.userPasswordHasher, human.Password.ChangeRequired); err != nil {
+			return nil, nil, nil, err
+		}
+	}
+	if human.HashedPassword != "" {
+		if err := c.userPasswordHasher.ValidateEncodedHash(human.HashedPassword); err != nil {
 			return nil, nil, nil, err
 		}
 	}

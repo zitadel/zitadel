@@ -9,6 +9,7 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zitadel/passwap"
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
@@ -3817,7 +3818,7 @@ func TestAddHumanCommand(t *testing.T) {
 				hasher: mockPasswordHasher("x"),
 			},
 			want: Want{
-				ValidationErr: zerrors.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.User.Password.NotSupported"),
+				ValidationErr: zerrors.ThrowInvalidArgument(passwap.ErrNoVerifier, "CRYPT-2xK7d", "Errors.Hash.NotSupported"),
 			},
 		},
 		{

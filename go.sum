@@ -810,8 +810,8 @@ github.com/zitadel/logging v0.7.0 h1:eugftwMM95Wgqwftsvj81isL0JK/hoScVqp/7iA2adQ
 github.com/zitadel/logging v0.7.0/go.mod h1:9A6h9feBF/3u0IhA4uffdzSDY7mBaf7RE78H5sFMINQ=
 github.com/zitadel/oidc/v3 v3.47.5 h1:cR2z0oqa5XZkwpXQiPCUGqKtndrjHgEXb81y3oXocK4=
 github.com/zitadel/oidc/v3 v3.47.5/go.mod h1:XxFh0666HRXycyrKmono+3gY0RACpYJLgy4r/+kliKY=
-github.com/zitadel/passwap v0.11.0 h1:EL1A8dWz83xiJYru2326i+chkVKVR7YZq5Wep1GKQ3k=
-github.com/zitadel/passwap v0.11.0/go.mod h1:Jn7sqawaxrwRL24byEJ1CVIAmznR6LsMsKcCfO/dIsg=
+github.com/zitadel/passwap v0.12.1 h1:QAMccBfdQ2b0hRKXJ/qY4/kdddXkXqlDNXeVwEr2318=
+github.com/zitadel/passwap v0.12.1/go.mod h1:atRozvPTTrwYUJdyxpxoxlIbI6Sr2O/ef/9URcn5EmY=
 github.com/zitadel/saml v0.4.1 h1:4PPOAvnUFcfwOFIAFZ3oGTMD+tKVeF96ySfGBf5j3IU=
 github.com/zitadel/saml v0.4.1/go.mod h1:ybs3e4tIWdYgSYBpuCsvf3T4FNDfbXYM+GPv5vIpHYk=
 github.com/zitadel/schema v1.3.2 h1:gfJvt7dOMfTmxzhscZ9KkapKo3Nei3B6cAxjav+lyjI=
