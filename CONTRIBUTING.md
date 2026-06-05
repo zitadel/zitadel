@@ -317,7 +317,7 @@ go test -count 1 -tags integration ./internal/api/grpc/management/integration_te
 To run all available integration tests:
 
 ```bash
-go test -count 1 -tags integration -parallel 1 $(go list -tags integration ./... | grep -e \"integration_test\" -e \"events_testing\")
+go test -count 1 -tags integration -parallel 1 $(go list -tags integration ./... | grep -e \"integration_test\")
 ```
 
 It is also possible to run the API in a debugger and run the integrations tests against it.
