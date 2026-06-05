@@ -8,8 +8,8 @@ import (
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
-	"github.com/zitadel/passwap"
 	"github.com/stretchr/testify/require"
+	"github.com/zitadel/passwap"
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
