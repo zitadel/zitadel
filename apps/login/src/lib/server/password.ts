@@ -299,6 +299,20 @@ export async function sendPassword(
             }),
           };
         }
+        // If the server returned INVALID_ARGUMENT or UNAUTHENTICATED, the password was simply
+        // wrong but no CredentialsCheckError details were included (so failedAttempts was 0).
+        // Show the specific "could not verify password" message rather than the generic session error.
+        if (
+          isClassifiedError(error) &&
+          "code" in error &&
+          (error.code === Code.InvalidArgument || error.code === Code.Unauthenticated)
+        ) {
+          recordAuthFailure("password", "invalid_password", command.organization);
+          if (loginSettingsByContext?.ignoreUnknownUsernames) {
+            return { error: t("errors.failedToAuthenticateNoLimit") };
+          }
+          return { error: t("errors.couldNotVerifyPassword") };
+        }
         recordAuthFailure("password", "session_creation_failed", command.organization);
         if (loginSettingsByContext?.ignoreUnknownUsernames) {
           return { error: t("errors.failedToAuthenticateNoLimit") };
