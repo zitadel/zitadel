@@ -789,9 +789,11 @@ func assertRedirectAuthWithPKCE(t *testing.T, expected, actual idp.Auth) {
 
 	actualQuery.Del("code_challenge")
 	actualQuery.Del("code_challenge_method")
-	actualURL.RawQuery = actualQuery.Encode()
 
-	assert.Equal(t, expectedURL.String(), actualURL.String())
+	assert.Equal(t, expectedURL.Scheme, actualURL.Scheme)
+	assert.Equal(t, expectedURL.Host, actualURL.Host)
+	assert.Equal(t, expectedURL.Path, actualURL.Path)
+	assert.Equal(t, expectedURL.Query(), actualQuery)
 }
 
 func TestCommands_AuthFromProvider_SAML(t *testing.T) {

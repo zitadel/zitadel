@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	providers "github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -404,6 +405,7 @@ func TestOIDCIDPWriteModel_ToProvider_WithPKCE(t *testing.T) {
 
 	provider, err := wm.ToProvider("https://zitadel.example.com/idps/callback", plainTextEncryption{})
 	require.NoError(t, err)
+	require.True(t, gock.IsDone(), "expected OIDC discovery request to be consumed")
 
 	assertProviderUsesPKCE(t, provider)
 }
@@ -423,7 +425,7 @@ func assertProviderUsesPKCE(t *testing.T, provider providers.Provider) {
 	query := authURL.Query()
 	assert.NotEmpty(t, query.Get("code_challenge"))
 	assert.Equal(t, "S256", query.Get("code_challenge_method"))
-	assert.NotEmpty(t, session.PersistentParameters()["codeVerifier"])
+	assert.NotEmpty(t, session.PersistentParameters()[oauth.CodeVerifier])
 }
 
 type plainTextEncryption struct{}
