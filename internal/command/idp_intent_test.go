@@ -439,8 +439,9 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 		samlRootURL string
 	}
 	type res struct {
-		auth idp.Auth
-		err  error
+		auth       idp.Auth
+		expectPKCE bool
+		err        error
 	}
 	tests := []struct {
 		name   string
@@ -585,7 +586,8 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 				callbackURL: "url",
 			},
 			res{
-				auth: &idp.RedirectAuth{RedirectURL: "auth?client_id=clientID&prompt=select_account&redirect_uri=url&response_type=code&state=id"},
+				auth:       &idp.RedirectAuth{RedirectURL: "auth?client_id=clientID&prompt=select_account&redirect_uri=url&response_type=code&state=id"},
+				expectPKCE: true,
 			},
 		},
 		{
@@ -647,7 +649,8 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 				loginHint:   "user@example.com",
 			},
 			res{
-				auth: &idp.RedirectAuth{RedirectURL: "auth?client_id=clientID&login_hint=user%40example.com&redirect_uri=url&response_type=code&state=id"},
+				auth:       &idp.RedirectAuth{RedirectURL: "auth?client_id=clientID&login_hint=user%40example.com&redirect_uri=url&response_type=code&state=id"},
+				expectPKCE: true,
 			},
 		},
 		{
@@ -755,11 +758,40 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 			var got idp.Auth
 			if err == nil {
 				got, err = session.GetAuth(tt.args.ctx)
-				assert.Equal(t, tt.res.auth, got)
 				assert.NoError(t, err)
+				if tt.res.expectPKCE {
+					assertRedirectAuthWithPKCE(t, tt.res.auth, got)
+					assert.NotEmpty(t, session.PersistentParameters()[oauth.CodeVerifier])
+				} else {
+					assert.Equal(t, tt.res.auth, got)
+				}
 			}
 		})
 	}
+}
+
+func assertRedirectAuthWithPKCE(t *testing.T, expected, actual idp.Auth) {
+	t.Helper()
+
+	expectedRedirect, ok := expected.(*idp.RedirectAuth)
+	require.True(t, ok)
+	actualRedirect, ok := actual.(*idp.RedirectAuth)
+	require.True(t, ok)
+
+	expectedURL, err := url.Parse(expectedRedirect.RedirectURL)
+	require.NoError(t, err)
+	actualURL, err := url.Parse(actualRedirect.RedirectURL)
+	require.NoError(t, err)
+
+	actualQuery := actualURL.Query()
+	assert.NotEmpty(t, actualQuery.Get("code_challenge"))
+	assert.Equal(t, "S256", actualQuery.Get("code_challenge_method"))
+
+	actualQuery.Del("code_challenge")
+	actualQuery.Del("code_challenge_method")
+	actualURL.RawQuery = actualQuery.Encode()
+
+	assert.Equal(t, expectedURL.String(), actualURL.String())
 }
 
 func TestCommands_AuthFromProvider_SAML(t *testing.T) {
