@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -1164,6 +1164,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 		checkPermission domain.PermissionCheck
 	}
 	type args struct {
+		ctx        context.Context
 		userID     string
 		email      string
 		returnCode bool
@@ -1182,6 +1183,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 				eventstore: eventstoreExpect(t),
 			},
 			args: args{
+				ctx:        t.Context(),
 				userID:     "",
 				email:      "email@test.ch",
 				returnCode: false,
@@ -1214,6 +1216,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
+				ctx:        t.Context(),
 				userID:     "user1",
 				email:      "email@test.ch",
 				returnCode: false,
@@ -1246,6 +1249,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
+				ctx:        t.Context(),
 				userID:     "user1",
 				email:      "",
 				returnCode: false,
@@ -1278,6 +1282,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
+				ctx:        t.Context(),
 				userID:     "user1",
 				email:      "email@test.ch",
 				returnCode: false,
@@ -1327,6 +1332,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
+				ctx:        t.Context(),
 				userID:     "user1",
 				email:      "email-changed@test.ch",
 				returnCode: false,
@@ -1342,7 +1348,9 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 			},
 		},
 		{
-			name: "email changed, return code",
+			// returnCode=true returns the plaintext code to the caller, bypassing email delivery.
+			// Self-management must not be sufficient — explicit write permission is required.
+			name: "email change not allowed when return code=true for self-management",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -1362,41 +1370,17 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 							),
 						),
 					),
-					expectPush(
-						user.NewHumanEmailChangedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-							"email-changed@test.ch",
-						),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("a"),
-							},
-							time.Hour*1,
-							"", true, "",
-						),
-					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
+				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
+				ctx:        authz.SetCtxData(t.Context(), authz.CtxData{UserID: "user1"}),
 				userID:     "user1",
 				email:      "email-changed@test.ch",
 				returnCode: true,
 				urlTmpl:    "",
 			},
-			want: &domain.Email{
-				ObjectRoot: models.ObjectRoot{
-					AggregateID:   "user1",
-					ResourceOwner: "org1",
-				},
-				EmailAddress:    "email-changed@test.ch",
-				IsEmailVerified: false,
-				PlainCode:       gu.Ptr("a"),
-			},
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "email changed, URL template",
@@ -1440,6 +1424,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
+				ctx:        t.Context(),
 				userID:     "user1",
 				email:      "email-changed@test.ch",
 				returnCode: false,
@@ -1461,7 +1446,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 				eventstore:      tt.fields.eventstore,
 				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := c.changeUserEmailWithGenerator(context.Background(), tt.args.userID, tt.args.email, GetMockSecretGenerator(t), tt.args.returnCode, tt.args.urlTmpl)
+			got, err := c.changeUserEmailWithGenerator(tt.args.ctx, tt.args.userID, tt.args.email, GetMockSecretGenerator(t), tt.args.returnCode, tt.args.urlTmpl)
 			require.ErrorIs(t, tt.wantErr, err)
 			assert.Equal(t, tt.want, got)
 		})
@@ -1474,6 +1459,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 		checkPermission domain.PermissionCheck
 	}
 	type args struct {
+		ctx           context.Context
 		userID        string
 		returnCode    bool
 		urlTmpl       string
@@ -1492,6 +1478,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 				eventstore: eventstoreExpect(t),
 			},
 			args: args{
+				ctx:        t.Context(),
 				userID:     "",
 				returnCode: false,
 				urlTmpl:    "",
@@ -1536,6 +1523,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
+				ctx:        t.Context(),
 				userID:     "user1",
 				returnCode: false,
 				urlTmpl:    "",
@@ -1580,6 +1568,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
+				ctx:           t.Context(),
 				userID:        "user1",
 				returnCode:    false,
 				urlTmpl:       "",
@@ -1645,6 +1634,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
+				ctx:           t.Context(),
 				userID:        "user1",
 				returnCode:    false,
 				urlTmpl:       "",
@@ -1684,6 +1674,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
+				ctx:           t.Context(),
 				userID:        "user1",
 				returnCode:    false,
 				urlTmpl:       "",
@@ -1692,7 +1683,9 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "EMAIL-5w5ilin4yt", "Errors.User.Code.Empty"),
 		},
 		{
-			name: "send code, return code",
+			// returnCode=true returns the plaintext code to the caller, bypassing email delivery.
+			// Self-management must not be sufficient — explicit write permission is required.
+			name: "send code not allowed when return code=true for self-management",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -1712,37 +1705,17 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 							),
 						),
 					),
-					expectPush(
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("a"),
-							},
-							time.Hour*1,
-							"", true, "",
-						),
-					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
+				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
+				ctx:           authz.SetCtxData(t.Context(), authz.CtxData{UserID: "user1"}),
 				userID:        "user1",
 				returnCode:    true,
 				urlTmpl:       "",
 				checkExisting: false,
 			},
-			want: &domain.Email{
-				ObjectRoot: models.ObjectRoot{
-					AggregateID:   "user1",
-					ResourceOwner: "org1",
-				},
-				EmailAddress:    "email@test.ch",
-				IsEmailVerified: false,
-				PlainCode:       gu.Ptr("a"),
-			},
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "send code, URL template",
@@ -1782,6 +1755,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
+				ctx:           t.Context(),
 				userID:        "user1",
 				returnCode:    false,
 				urlTmpl:       "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
@@ -1803,7 +1777,7 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 				eventstore:      tt.fields.eventstore,
 				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := c.sendUserEmailCodeWithGenerator(context.Background(), tt.args.userID, GetMockSecretGenerator(t), tt.args.returnCode, tt.args.urlTmpl, tt.args.checkExisting)
+			got, err := c.sendUserEmailCodeWithGenerator(tt.args.ctx, tt.args.userID, GetMockSecretGenerator(t), tt.args.returnCode, tt.args.urlTmpl, tt.args.checkExisting)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})
