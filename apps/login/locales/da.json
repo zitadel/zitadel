@@ -183,7 +183,7 @@
       "backToLogin": "Tilbage til login"
     },
     "registrationFailed": {
-      "title": "Registrering ikke tilgængelig",
+      "title": "Registrering fejlede",
       "description": "Vi kunne ikke gennemføre registreringsprocessen.",
       "info": "Det var ikke muligt at fastslå organisationen for registreringen. Kontakt venligst din administrator for at få hjælp.",
       "backToLogin": "Tilbage til login"
