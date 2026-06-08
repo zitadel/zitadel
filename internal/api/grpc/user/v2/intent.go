@@ -345,11 +345,66 @@ func (s *Server) checkIntentToken(token string, intentID string) error {
 	return crypto.CheckToken(s.idpAlg, token, intentID)
 }
 
+// idpUserFallbackUsername returns a non-empty username for an external user,
+// preferring the upstream preferred_username, then the email, then the stable
+// external subject id. Many real-world IdPs (e.g. Auth0, Supabase) do not emit
+// a preferred_username, so a fallback is required to satisfy the non-empty
+// IDPLink.UserName / username constraints during brokered onboarding.
+func idpUserFallbackUsername(idpUser idp.User) string {
+	if username := strings.TrimSpace(idpUser.GetPreferredUsername()); username != "" {
+		return username
+	}
+	if email := strings.TrimSpace(string(idpUser.GetEmail())); email != "" {
+		return email
+	}
+	return strings.TrimSpace(idpUser.GetID())
+}
+
+// idpUserFallbackNames resolves given and family names for an external user.
+// Names provided by the IdP always win; when they are missing the values are
+// derived from the display name and finally the local part of the email so that
+// brokered onboarding succeeds even when the upstream profile only carries a
+// subject and email. Both returned values are guaranteed to be non-empty as
+// long as the user has a username, email or external id.
+func idpUserFallbackNames(idpUser idp.User) (givenName, familyName string) {
+	givenName = strings.TrimSpace(idpUser.GetFirstName())
+	familyName = strings.TrimSpace(idpUser.GetLastName())
+	if givenName != "" && familyName != "" {
+		return givenName, familyName
+	}
+
+	source := strings.TrimSpace(idpUser.GetDisplayName())
+	if source == "" {
+		if email := strings.TrimSpace(string(idpUser.GetEmail())); email != "" {
+			source = strings.SplitN(email, "@", 2)[0]
+		}
+	}
+	if parts := strings.Fields(source); len(parts) > 0 {
+		if givenName == "" {
+			givenName = parts[0]
+		}
+		if familyName == "" && len(parts) > 1 {
+			familyName = strings.Join(parts[1:], " ")
+		}
+	}
+
+	// Guarantee both fields are non-empty so the profile passes validation even
+	// when only a single token (or no name at all) could be derived.
+	if givenName == "" {
+		givenName = idpUserFallbackUsername(idpUser)
+	}
+	if familyName == "" {
+		familyName = givenName
+	}
+	return givenName, familyName
+}
+
 func idpUserToAddHumanUser(idpUser idp.User, idpID string) *user.AddHumanUserRequest {
+	givenName, familyName := idpUserFallbackNames(idpUser)
 	addHumanUser := &user.AddHumanUserRequest{
 		Profile: &user.SetHumanProfile{
-			GivenName:  idpUser.GetFirstName(),
-			FamilyName: idpUser.GetLastName(),
+			GivenName:  givenName,
+			FamilyName: familyName,
 		},
 		Email: &user.SetHumanEmail{
 			Email:        string(idpUser.GetEmail()),
@@ -360,7 +415,7 @@ func idpUserToAddHumanUser(idpUser idp.User, idpID string) *user.AddHumanUserReq
 			{
 				IdpId:    idpID,
 				UserId:   idpUser.GetID(),
-				UserName: idpUser.GetPreferredUsername(),
+				UserName: idpUserFallbackUsername(idpUser),
 			},
 		},
 	}
@@ -433,12 +488,13 @@ func idpUserToUpdateHumanUser(userID string, idpUser idp.User) *user.UpdateHuman
 }
 
 func idpUserToCreateUser(idpUser idp.User, idpID string) *user.RetrieveIdentityProviderIntentResponse_CreateUser {
+	givenName, familyName := idpUserFallbackNames(idpUser)
 	createUser := &user.CreateUserRequest{
 		UserType: &user.CreateUserRequest_Human_{
 			Human: &user.CreateUserRequest_Human{
 				Profile: &user.SetHumanProfile{
-					GivenName:  idpUser.GetFirstName(),
-					FamilyName: idpUser.GetLastName(),
+					GivenName:  givenName,
+					FamilyName: familyName,
 				},
 				Email: &user.SetHumanEmail{
 					Email:        string(idpUser.GetEmail()),
@@ -448,7 +504,7 @@ func idpUserToCreateUser(idpUser idp.User, idpID string) *user.RetrieveIdentityP
 					{
 						IdpId:    idpID,
 						UserId:   idpUser.GetID(),
-						UserName: idpUser.GetPreferredUsername(),
+						UserName: idpUserFallbackUsername(idpUser),
 					},
 				},
 			},
