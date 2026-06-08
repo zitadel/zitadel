@@ -1,6 +1,8 @@
+import { readFileSync } from "node:fs";
+
 import { describe, expect, test } from "vitest";
 
-import { isProxyPath, normalizeProxyPathname, PROXY_MATCHER } from "./proxy";
+import { isProxyPath, normalizeProxyPathname } from "./proxy";
 
 describe("proxy path normalization", () => {
   test("normalizes callback paths under the login base path", () => {
@@ -21,6 +23,7 @@ describe("proxy path normalization", () => {
   });
 
   test("declares the bare callback route in the middleware matcher", () => {
-    expect(PROXY_MATCHER).toContain("/idps/callback");
+    const source = readFileSync(new URL("./proxy.ts", import.meta.url), "utf8");
+    expect(source).toContain('"/idps/callback"');
   });
 });
