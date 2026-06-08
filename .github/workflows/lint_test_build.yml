@@ -125,7 +125,7 @@ jobs:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
           NX_DAEMON: "false"
           NX_DISABLE_DB: "true"
-        run: pnpm nx affected --nxBail --target=${{ matrix.target }} --projects @zitadel/api
+        run: pnpm nx run @zitadel/api:${{ matrix.target }}
       - name: Suggest Pipeline Fix By Nx Cloud AI
         if: failure() || cancelled()
         env:
@@ -201,7 +201,7 @@ jobs:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
           NX_DAEMON: "false"
           NX_DISABLE_DB: "true"
-        run: pnpm nx affected --nxBail --target=${{ matrix.target }} --projects @zitadel/api
+        run: pnpm nx run @zitadel/api:${{ matrix.target }}
       - name: Suggest Pipeline Fix By Nx Cloud AI
         if: failure() || cancelled()
         env:
