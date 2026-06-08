@@ -32,8 +32,18 @@ export function isProxyPath(pathname: string, basePath = getBasePath()): boolean
   return PROXY_PATHS.some((prefix) => normalizedPath.startsWith(prefix));
 }
 
+export const PROXY_MATCHER = [
+  "/.well-known/:path*",
+  "/oauth/:path*",
+  "/oidc/:path*",
+  "/idps/callback",
+  "/idps/callback/:path*",
+  "/saml/:path*",
+  "/:path*",
+];
+
 export const config = {
-  matcher: ["/.well-known/:path*", "/oauth/:path*", "/oidc/:path*", "/idps/callback/:path*", "/saml/:path*", "/:path*"],
+  matcher: PROXY_MATCHER,
 };
 
 export async function proxy(request: NextRequest) {
