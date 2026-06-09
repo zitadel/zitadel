@@ -1,6 +1,6 @@
+import { getFips } from "node:crypto";
 import * as http from "node:http";
 import * as https from "node:https";
-import { getFips } from "node:crypto";
 
 if (process.env.ZITADEL_FIPS_REQUIRED === "true" && getFips() !== 1) {
   console.error("Healthcheck failed: FIPS mode required but not enabled");
