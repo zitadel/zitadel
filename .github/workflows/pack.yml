@@ -222,6 +222,9 @@ jobs:
           push: true
           labels: ${{ steps.debug-meta.outputs.labels }}
           tags: ${{ steps.debug-meta.outputs.tags }}
+      - name: Build Login standalone
+        if: matrix.push_ghcr
+        run: pnpm nx run --nxBail @zitadel/login:build
       - name: Generate Standard Tags and Labels from the GitHub Context for the Login Container Image
         if: matrix.push_ghcr
         id: login-meta
@@ -248,3 +251,30 @@ jobs:
           push: true
           labels: ${{ steps.login-meta.outputs.labels }}
           tags: ${{ steps.login-meta.outputs.tags }}
+      - name: Build Login standalone
+        if: ${{ !matrix.push_ghcr }}
+        run: pnpm nx run --nxBail @zitadel/login:build
+      - name: Generate tags for FIPS Login image
+        if: ${{ !matrix.push_ghcr }}
+        id: login-fips-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ inputs.image_name_google_login }}
+          labels: |
+            org.opencontainers.image.licenses=MIT
+            ${{ env.default_labels}}
+          tags: |
+            type=sha,prefix=,suffix=-fips,format=long
+      - name: Build and Push FIPS Login image (GAR only)
+        if: ${{ !matrix.push_ghcr }}
+        uses: docker/build-push-action@v6
+        timeout-minutes: 3
+        with:
+          context: apps/login
+          file: apps/login/Dockerfile.fips
+          cache-from: type=gha,scope=login-fips
+          cache-to: type=gha,mode=max,scope=login-fips
+          platforms: linux/amd64,linux/arm64
+          push: true
+          labels: ${{ steps.login-fips-meta.outputs.labels }}
+          tags: ${{ steps.login-fips-meta.outputs.tags }}

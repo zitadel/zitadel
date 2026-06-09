@@ -115,6 +115,9 @@ jobs:
         docker buildx imagetools create \
           --tag ${{ inputs.image_name_google_login }}:${{ needs.version.outputs.version }} \
           ${{ inputs.image_name_google_login }}:${{ github.sha }}
+        docker buildx imagetools create \
+          --tag ${{ inputs.image_name_google_login }}:${{ needs.version.outputs.version }}-fips \
+          ${{ inputs.image_name_google_login }}:${{ github.sha }}-fips
     -
       name: Publish latest
       if: ${{ github.ref_name == 'next' }}
@@ -134,6 +137,9 @@ jobs:
         docker buildx imagetools create \
           --tag ${{ inputs.image_name_google_api }}:latest-fips-debug \
           ${{ inputs.image_name_google_api }}:${{ github.sha }}-fips-debug
+        docker buildx imagetools create \
+          --tag ${{ inputs.image_name_google_login }}:latest-fips \
+          ${{ inputs.image_name_google_login }}:${{ github.sha }}-fips
 
   homebrew-tap:
     runs-on: ubuntu-22.04
