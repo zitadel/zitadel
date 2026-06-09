@@ -83,7 +83,7 @@
     "set": {
       "title": "Imposta Password",
       "description": "Imposta la password per il tuo account",
-      "codeSent": "Un codice è stato inviato al tuo indirizzo email.",
+      "codeSent": "Un nuovo codice è stato inviato al tuo indirizzo email.",
       "noCodeReceived": "Non hai ricevuto un codice?",
       "resend": "Invia di nuovo",
       "submit": "Continua",
@@ -383,6 +383,7 @@
     "userIdMissing": "Nessun userId fornito!",
     "successTitle": "Utente verificato",
     "successDescription": "L'utente è stato verificato con successo.",
+    "successContinue": "Continua",
     "setupAuthenticator": "Configura autenticatore",
     "verify": {
       "title": "Verifica utente",

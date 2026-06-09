@@ -1046,3 +1046,43 @@ func (wm *OrgIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventData(map[string]interface{}{"idpConfigId": wm.ID}).
 		Builder()
 }
+
+type OrgZitadelIDPWriteModel struct {
+	ZitadelIDPWriteModel
+}
+
+func NewZitadelOrgIDPWriteModel(orgID, id string) *OrgZitadelIDPWriteModel {
+	return &OrgZitadelIDPWriteModel{
+		ZitadelIDPWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
+			},
+			ID: id,
+		},
+	}
+}
+
+func (wm *OrgZitadelIDPWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *org.ZitadelIDPAddedEvent:
+			wm.ZitadelIDPWriteModel.AppendEvents(&e.ZitadelIDPAddedEvent)
+		default:
+			wm.ZitadelIDPWriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *OrgZitadelIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			org.ZitadelIDPAddedEventType,
+		).
+		EventData(map[string]interface{}{"id": wm.ID}).
+		Builder()
+}

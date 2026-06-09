@@ -4,6 +4,7 @@ This document describes the design principles and conventions for the ZITADEL AP
 endpoints of the proprietary ZITADEL API and does not cover any standardized APIs like OAuth 2, OpenID Connect or SCIM.  
 
 ## The Basics
+
 ZITADEL follows an API first approach. This means all features can not only be accessed via the UI but also via the API.
 The API is designed using the Protobuf specification. The Protobuf specification is then used to generate the API client
 and server code in different programming languages.
@@ -270,7 +271,12 @@ Additionally, state changes, specific actions or operations that do not fit into
 - `Send` for sending a resource.
 - etc.
 
-#### REST Path
+#### REST Path (Deprecated)
+
+> [!NOTE]
+> REST path annotation is deprecated and MUST only be used for existing services still using REST.
+> All new services MUST use connectRPC, which allows clients to call the API using connectRPC, gRPC and also HTTP/1.1 
+> without the need for additional REST annotations.
 
 Paths of operations MUST be structured as follows:
 
@@ -310,6 +316,8 @@ Permissions can be annotated on the endpoint in the proto file. This allows the 
 The permissions are checked by the middleware and an error is returned if the user does not have the required permissions.
 
 The following example requires the user to have the `iam.web_key.write` permission to call the `CreateWebKey` method.
+This is an instance wide permission and can therefore be checked by the API itself. If the user does not have the required permission,
+an error is returned by the middleware before the API method is called.
 ```protobuf
  option (zitadel.protoc_gen_zitadel.v2.options) = {
   auth_option: {
@@ -319,6 +327,10 @@ The following example requires the user to have the `iam.web_key.write` permissi
 ```
 
 In case the permission cannot be checked by the API itself, but all requests need to be from an authenticated user, the `auth_option` can be set to `authenticated`.
+This is the case for a lot of resources that are organization specific, such as users, projects or authorizations.
+The API will not check the permissions for the user, but it will check if the user is authenticated. If the user is not authenticated, 
+an error is returned by the middleware before the API method is called. The user's permissions need to be checked by the functions 
+that are called by the API method, based on the queried resource and the user's context.
 ```protobuf
  option (zitadel.protoc_gen_zitadel.v2.options) = {
   auth_option: {
@@ -377,8 +389,14 @@ message TargetNameFilter {
 
 ## Error Handling
 
-The API returns machine-readable errors in the response body. This includes a status code, an error code and possibly 
-some details about the error. See the following sections for more information about the status codes, error codes and error messages.
+The API returns machine-readable errors in the response body. This includes a status code, an error slug, a human-readable message
+and possibly some details about the error. See the following sections for more information about the status codes, error slug and error messages.
+
+> [!IMPORTANT]
+> For stable `v2` service protos, always import `zitadel/error/v2/error.proto` in each `*_service.proto` file.
+> This ensures reflection-aware clients can resolve `zitadel.error.v2.ErrorDetail` and read the `slug` field reliably.
+> Scope note: slug-based handling is currently relevant for backend/domain paths that run with relational-storage-backed logic.
+> Do not apply this rule to `v1`, `v2beta`, or `v3alpha` APIs.
 
 ### Status Codes
 
@@ -386,13 +404,13 @@ The API uses status codes to indicate the status of a request. Depending on the 
 the status code is returned as an HTTP status code or as a gRPC / connectRPC status code.
 Check the possible status codes https://zitadel.com/docs/apis/statuscodes
 
-### Error Codes
+### Error Slugs
 
-Additionally to the status code, the API returns unique error codes for each type of error.
-The error codes are used to identify a specific error and can be used to handle the error programmatically.
+Additionally to the status code, the API returns unique error slug for each type of error.
+The error slugs are used to identify a specific error and can be used to handle the error programmatically.
 
 > [!NOTE]
-> Currently, ZITADEL might already return some error codes. However, they do not follow a specific pattern yet
+> Currently, ZITADEL might already return some error codes in the error message. However, they do not follow a specific pattern yet
 > and are not documented. We will update the error codes and document them in the future.
 
 ### Error Message and Details
@@ -400,33 +418,84 @@ The error codes are used to identify a specific error and can be used to handle 
 The API returns additional details about the error in the response body.
 This includes a human-readable error message and additional information that can help the client to understand the error
 as well as machine-readable details that can be used to handle the error programmatically.
-Error details use the Google RPC error details format: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
+Clients are encouraged not to present the error message to their end-users, but rather use their own translation logic based on the slug.
+Error details use a custom ErrorDetail message containing the slug, message and additional details.
 
-### Example
+### Examples
 
-HTTP/1.1 example:
+HTTP/1.1 examples:
 ```
 HTTP/1.1 400 Bad Request
 Content-Type: application/json
 
 {
-  "code": "user_invalid_information",
-  "message": "invalid or missing information provided for the creation of the user",
+  "code": "invalid_argument",
+  "message": "invalid or missing information provided for the creation of the user (user.invalid_information)",
   "details": [
     {
-      "@type": "type.googleapis.com/google.rpc.BadRequest",
-      "fieldViolations": [
-        {
-          "field": "given_name",
-          "description": "given name is required",
-          "reason": "MISSING_VALUE"
-        },
-        {
-          "field": "family_name",
-          "description": "family name must not exceed 200 characters",
-          "reason": "INVALID_LENGTH"
+      "type": "zitadel.error.v2.ErrorDetail",
+      "value": "aW52YWxpZCBvciBtaXNzaW5nIGluZm9ybWF0aW9uIHByb3ZpZGVkIGZvciB0aGUgY3JlYXRpb24gb2YgdGhlIHVzZXIgKHVzZXIuaW52YWxpZF9pbmZvcm1hdGlvbik...",
+      "debug": {
+        "slug": "user.invalid_information",
+        "message": "invalid or missing information provided for the creation of the user",
+        "details": {
+          "fieldViolations": [
+            {
+              "field": "given_name",
+              "description": "given name is required",
+              "reason": "MISSING_VALUE"
+            },
+            {
+              "field": "family_name",
+              "description": "family name must not exceed 200 characters",
+              "reason": "INVALID_LENGTH"
+            }
+          ]
         }
-      ]
+      }
+    }
+  ]
+}
+```
+
+```
+HTTP/1.1 403 Forbidden
+Content-Type: application/json
+
+{
+  "code": "permission_denied",
+  "message": "The provided session token is invalid: either the token is malformed, expired or does not match the session (session.token_invalid)",
+  "details": [
+    {
+      "type": "zitadel.error.v2.ErrorDetail",
+      "value": "ChVzZXNzaW9uLnRva2VuX2ludmFsaWQSa1RoZSBwcm92aWRlZCBzZXNzaW9uIHRva2VuIGlzIGludmFsaWQ6IGVpdGhlciB0aGUgdG9rZW4gaXMgbWFsZm9ybWVkLCBleHBpcmVkIG9yIGRvZXMgbm90IG1hdGNoIHRoZSBzZXNzaW9u",
+      "debug": {
+        "slug": "session.token_invalid",
+        "message": "The provided session token is invalid: either the token is malformed, expired or does not match the session"
+      }
+    }
+  ]
+}
+```
+
+```
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+
+{
+  "code": "already_exists",
+  "message": "the username is already taken (user.already_exists)",
+  "details": [
+    {
+      "type": "zitadel.error.v2.ErrorDetail",
+      "value": "ChN1c2VyLmFscmVhZHlfZXhpc3RzEh10aGUgdXNlcm5hbWUgaXMgYWxyZWFkeSB0YWtlbhoUChIKCHVzZXJuYW1lEgYaBHRlc3Q",
+      "debug": {
+        "slug": "user.already_exists",
+        "message": "the username is already taken",
+        "details": {
+          "username": "test"
+        }
+      }
     }
   ]
 }
@@ -436,30 +505,81 @@ gRPC / connectRPC example:
 ```
 HTTP/2.0 200 OK
 Content-Type: application/grpc
-Grpc-Message: invalid information provided for the creation of the user
+Grpc-Message: invalid information provided for the creation of the user (user.invalid_information)
 Grpc-Status: 3
+Grpc-Status-Details-Bin: aW52YWxpZCBpbmZvcm1hdGlvbiBwcm92aWRlZCBmb3IgdGhlIGNyZWF0aW9uIG9mIHRoZSB1c2VyICh1c2VyLmludmFsaWRfaW5mb3JtYXRpb24p...
 
 {
-  "code": "user_invalid_information",
-  "message": "invalid or missing information provided for the creation of the user",
+  "code": 3,
+  "message": "invalid or missing information provided for the creation of the user (user.invalid_information)",
   "details": [
     {
-      "@type": "type.googleapis.com/google.rpc.BadRequest",
-      "fieldViolations": [
-        {
-          "field": "given_name",
-          "description": "given name is required",
-          "reason": "MISSING_VALUE"
-        },
-        {
-          "field": "family_name",
-          "description": "family name must not exceed 200 characters",
-          "reason": "INVALID_LENGTH"
-        }
-      ]
+      "@type": "type.googleapis.com/zitadel.error.v2.ErrorDetail",
+      "slug": "user.invalid_information",
+      "message": "invalid or missing information provided for the creation of the user",
+      "details": {
+        "fieldViolations": [
+          {
+            "field": "given_name",
+            "description": "given name is required",
+            "reason": "MISSING_VALUE"
+          },
+          {
+            "field": "family_name",
+            "description": "family name must not exceed 200 characters",
+            "reason": "INVALID_LENGTH"
+          }
+        ]
+      }
     }
   ]
 }
+```
+
+```
+HTTP/2.0 200 OK
+Content-Type: application/grpc
+Grpc-Message: The provided session token is invalid: either the token is malformed, expired or does not match the session (session.token_invalid)
+Grpc-Status: 7
+Grpc-Status-Details-Bin: CAcSgwFUaGUgcHJvdmlkZWQgc2Vzc2lvbiB0b2tlbiBpcyBpbnZhbGlkOiBlaXRoZXIgdGhlIHRva2VuIGlzIG1hbGZvcm1lZCwgZXhwaXJlZCBvciBkb2VzIG5vdCBtYXRjaCB0aGUgc2Vzc2lvbiAoc2Vzc2lvbi50b2tlbl9pbnZhbGlkKRq5AQowdHlwZS5nb29nbGVhcGlzLmNvbS96aXRhZGVsLmVycm9yLnYyLkVycm9yRGV0YWlsEoQBChVzZXNzaW9uLnRva2VuX2ludmFsaWQSa1RoZSBwcm92aWRlZCBzZXNzaW9uIHRva2VuIGlzIGludmFsaWQ6IGVpdGhlciB0aGUgdG9rZW4gaXMgbWFsZm9ybWVkLCBleHBpcmVkIG9yIGRvZXMgbm90IG1hdGNoIHRoZSBzZXNzaW9u
+
+{
+  "code": 7,
+  "message": "The provided session token is invalid: either the token is malformed, expired or does not match the session (session.token_invalid)",
+  "details": [
+    {
+      "@type": "type.googleapis.com/zitadel.error.v2.ErrorDetail",
+      "slug": "session.token_invalid",
+      "message": "The provided session token is invalid: either the token is malformed, expired or does not match the session"
+    }
+  ]
+}
+```
+
+```
+HTTP/2.0 200 OK
+Content-Type: application/grpc
+Grpc-Message: the username is already taken (user.already_exists)
+Grpc-Status: 6
+Grpc-Status-Details-Bin: dGhlIHVzZXJuYW1lIGlzIGFscmVhZHkgdGFrZW4gKHVzZXIuYWxyZWFkeV9leGlzdHMp...
+
+{
+  "code": 6,
+  "message": "the username is already taken (user.already_exists)",
+  "details": [ 
+    {
+      "@type": "type.googleapis.com/zitadel.error.v2.ErrorDetail",
+      "slug": "user.already_exists",
+      "message": "the username is already taken",
+      "details": {
+        "fields": {
+          "username": { "string_value": "test" }
+        }
+      }
+    }
+  ]
+}
+
 ```
 
 ### Documentation

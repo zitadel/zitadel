@@ -2604,7 +2604,7 @@
       "TYPEREQUIRED": "タイプが必要です。",
       "TITLE": "OIDC構成",
       "CLIENTID": "クライアントID",
-      "CLIENTSECRET": "クライアントシークレット",
+      "CLIENTDETAILS": "クライアント詳細",
       "CLIENTSECRET_NOSECRET": "選択した認証フローでは、シークレットは必要ないため、利用できません。",
       "CLIENTSECRET_DESCRIPTION": "クライアントシークレットは、ダイアログを閉じた後は表示されません。安全な場所に保管してください。",
       "REGENERATESECRET": "クライアントシークレットを再生成する",

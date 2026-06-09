@@ -69,7 +69,7 @@ export function DynamicTheme({
                         {hasLeftRightStructure && (
                           <div className="flex flex-col items-start space-y-4 text-left">
                             {/* Apply larger styling to the content */}
-                            <div className="space-y-6 [&_h1]:text-left [&_h1]:text-4xl [&_h1]:leading-tight [&_h1]:text-gray-900 [&_h1]:dark:text-white [&_h1]:lg:text-4xl [&_p]:text-left [&_p]:leading-relaxed [&_p]:text-gray-700 [&_p]:dark:text-gray-300">
+                            <div className="space-y-6 [&_h1]:text-left [&_h1]:text-4xl [&_h1]:leading-tight [&_h1]:text-gray-900 [&_h1]:lg:text-4xl [&_h1]:dark:text-white [&_p]:text-left [&_p]:leading-relaxed [&_p]:text-gray-700 [&_p]:dark:text-gray-300">
                               {leftContent}
                             </div>
                           </div>
@@ -99,7 +99,7 @@ export function DynamicTheme({
               <div className="relative mx-auto w-full max-w-[440px] px-4 py-4">
                 <Card>
                   <div className="mx-auto flex flex-col items-center space-y-8">
-                    <div className="relative -mb-4 flex flex-row items-center justify-center">
+                    <div className="relative flex flex-row items-center justify-center">
                       {branding && (
                         <Logo
                           lightSrc={branding.lightTheme?.logoUrl}

@@ -195,6 +195,13 @@ func (u user) unqualifiedTableName() string {
 	return "users"
 }
 
+func (u user) qualifiedTableName() string {
+	if u.tableName != "" {
+		return "zitadel." + u.tableName
+	}
+	return "zitadel.users"
+}
+
 // -------------------------------------------------------------
 // changes
 // -------------------------------------------------------------

@@ -88,7 +88,7 @@
   }
 
   .no-content-row {
-    background-color: if($is-dark-theme, #ffffff10, #f4f4f470);
+    background-color: if(sass($is-dark-theme): #ffffff10; else: #f4f4f470);
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     display: flex;
@@ -123,41 +123,41 @@
     font-weight: 500;
     font-size: 12px;
     white-space: nowrap;
-    background-color: if($is-dark-theme, map.get($background, state), #e4e7e4);
+    background-color: if(sass($is-dark-theme): map.get($background, state) ; else: #e4e7e4);
     box-shadow: 0 0 3px #0000001a;
 
     &.active {
-      background-color: if($is-dark-theme, map.get($background, state-active), #cbf4c9);
-      color: if($is-dark-theme, #cbf4c9, #0e6245);
+      background-color: if(sass($is-dark-theme): map.get($background, state-active) ; else: #cbf4c9);
+      color: if(sass($is-dark-theme): #cbf4c9; else: #0e6245);
     }
 
     &.inactive {
-      color: if($is-dark-theme, #ffc1c1, #620e0e);
-      background-color: if($is-dark-theme, map.get($background, state-inactive), #ffc1c1);
+      color: if(sass($is-dark-theme): #ffc1c1; else: #620e0e);
+      background-color: if(sass($is-dark-theme): map.get($background, state-inactive) ; else: #ffc1c1);
     }
 
     &.neutral {
-      background: if($is-dark-theme, #01489c78, #47a8ff82);
-      color: if($is-dark-theme, #47a8ff, #01489c);
+      background: if(sass($is-dark-theme): #01489c78; else: #47a8ff82);
+      color: if(sass($is-dark-theme): #47a8ff; else: #01489c);
     }
   }
 
   .bg-state {
-    background-color: if($is-dark-theme, map.get($background, state), #e4e7e4) !important;
+    background-color: if(sass($is-dark-theme): map.get($background, state) ; else: #e4e7e4) !important;
 
     &.active {
-      background-color: if($is-dark-theme, map.get($background, state-active), #cbf4c9) !important;
-      color: if($is-dark-theme, #cbf4c9, #0e6245) !important;
+      background-color: if(sass($is-dark-theme): map.get($background, state-active) ; else: #cbf4c9) !important;
+      color: if(sass($is-dark-theme): #cbf4c9; else: #0e6245) !important;
     }
 
     &.inactive {
-      color: if($is-dark-theme, #ffc1c1, #620e0e) !important;
-      background-color: if($is-dark-theme, map.get($background, state-inactive), #ffc1c1) !important;
+      color: if(sass($is-dark-theme): #ffc1c1; else: #620e0e) !important;
+      background-color: if(sass($is-dark-theme): map.get($background, state-inactive) ; else: #ffc1c1) !important;
     }
   }
 
   .color-shadow {
-    border: 1px solid if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+    border: 1px solid if(sass($is-dark-theme): rgba(#8795a1, 0.2) ; else: rgba(#8795a1, 0.2));
     box-shadow: 0 0 3px #0000001a;
   }
 }

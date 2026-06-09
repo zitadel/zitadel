@@ -2602,7 +2602,7 @@
       "TYPEREQUIRED": "A típus megadása kötelező.",
       "TITLE": "OIDC konfiguráció",
       "CLIENTID": "Ügyfél azonosító",
-      "CLIENTSECRET": "Ügyfél titok",
+      "CLIENTDETAILS": "Ügyfél részletei",
       "CLIENTSECRET_NOSECRET": "A választott hitelesítési folyamatnál nem szükséges titok, ezért nem érhető el.",
       "CLIENTSECRET_DESCRIPTION": "Tartsd biztonságos helyen az ügyfél titkot, mert eltűnik, miután a párbeszédablak bezárul.",
       "REGENERATESECRET": "Ügyfél titok újragenerálása",

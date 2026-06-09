@@ -13,11 +13,15 @@
     </div>
   </div>
   <div class="quickstart-card-wrapper">
-    <ng-container *ngFor="let framework of frameworks.slice(0, 18)">
+    @for (framework of frameworks.slice(0, 18); track framework) {
       <a [routerLink]="['/projects', 'app-create']" [queryParams]="{ framework: framework.id }" class="quickstart-card card">
-        <img class="dark-only" *ngIf="framework.imgSrcDark" [src]="framework.imgSrcDark" alt="{{ framework.title }}" />
-        <img class="light-only" *ngIf="framework.imgSrcLight" [src]="framework.imgSrcLight" alt="{{ framework.title }}" />
+        @if (framework.imgSrcDark) {
+          <img class="dark-only" [src]="framework.imgSrcDark" alt="{{ framework.title }}" />
+        }
+        @if (framework.imgSrcLight) {
+          <img class="light-only" [src]="framework.imgSrcLight" alt="{{ framework.title }}" />
+        }
       </a>
-    </ng-container>
+    }
   </div>
 </div>

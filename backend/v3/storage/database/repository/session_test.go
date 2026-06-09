@@ -12,6 +12,7 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -195,7 +196,11 @@ func TestSession_Create(t *testing.T) {
 			assert.Equal(t, tt.session.ID, createdSession.ID)
 			assert.Equal(t, tt.session.InstanceID, createdSession.InstanceID)
 			assert.Equal(t, tt.session.Lifetime, createdSession.Lifetime)
-			assert.Equal(t, createdSession.UpdatedAt.Add(tt.session.Lifetime), createdSession.Expiration)
+			if tt.session.Lifetime != 0 {
+				assert.Equal(t, createdSession.UpdatedAt.Add(tt.session.Lifetime), createdSession.Expiration)
+			} else {
+				assert.Zero(t, createdSession.Expiration)
+			}
 			assert.Equal(t, tt.session.CreatorID, createdSession.CreatorID)
 			assert.Equal(t, tt.session.UserAgent, createdSession.UserAgent)
 			assert.WithinRange(t, createdSession.CreatedAt, beforeCreate.Add(-time.Second), afterCreate.Add(time.Second))
@@ -1159,9 +1164,12 @@ func TestSession_Get(t *testing.T) {
 			t.Logf("error during rollback: %v", err)
 		}
 	}()
-
 	instanceRepo := repository.InstanceRepository()
-	sessionRepo := repository.SessionRepository()
+	sessionRepo := repository.SessionRepository().LoadUserData()
+	orgRepo := repository.OrganizationRepository()
+	orgDomainRepo := repository.OrganizationDomainRepository()
+	userRepo := repository.UserRepository()
+	settingsRepo := repository.DomainSettingsRepository()
 
 	// create instance
 	instanceId := gofakeit.Name()
@@ -1177,6 +1185,62 @@ func TestSession_Get(t *testing.T) {
 	err = instanceRepo.Create(t.Context(), tx, &instance)
 	require.NoError(t, err)
 
+	// Create Organization
+	orgID := gofakeit.UUID()
+	org := domain.Organization{
+		ID:         orgID,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	err = orgRepo.Create(t.Context(), tx, &org)
+	require.NoError(t, err)
+
+	domainName := gofakeit.DomainName()
+	err = orgDomainRepo.Add(t.Context(), tx, &domain.AddOrganizationDomain{
+		InstanceID: instanceId,
+		OrgID:      orgID,
+		Domain:     domainName,
+		IsVerified: true,
+		IsPrimary:  true,
+	})
+	require.NoError(t, err)
+
+	err = settingsRepo.Set(t.Context(), tx, &domain.DomainSettings{
+		Settings: domain.Settings{
+			InstanceID:     instanceId,
+			OrganizationID: &orgID,
+			Type:           domain.SettingTypeDomain,
+			State:          domain.SettingStateActive,
+		},
+		DomainSettingsAttributes: domain.DomainSettingsAttributes{
+			LoginNameIncludesDomain: gu.Ptr(false),
+		},
+	})
+	require.NoError(t, err)
+
+	preferredLoginName := gofakeit.Name()
+	userID := gofakeit.UUID()
+	displayName := gofakeit.Username()
+	user := domain.User{
+		InstanceID:     instanceId,
+		OrganizationID: orgID,
+		ID:             userID,
+		Username:       preferredLoginName,
+		State:          domain.UserStateActive,
+		Human: &domain.HumanUser{
+			FirstName:         gofakeit.Name(),
+			LastName:          gofakeit.Name(),
+			Nickname:          gofakeit.Username(),
+			DisplayName:       displayName,
+			PreferredLanguage: language.English,
+			Gender:            domain.HumanGenderMale,
+		},
+	}
+
+	err = userRepo.Create(t.Context(), tx, &user)
+	require.NoError(t, err)
+
 	session := &domain.Session{
 		InstanceID: instanceId,
 		ID:         gofakeit.Name(),
@@ -1184,6 +1248,11 @@ func TestSession_Get(t *testing.T) {
 		CreatorID:  gofakeit.Name(),
 	}
 	err = sessionRepo.Create(t.Context(), tx, session)
+	require.NoError(t, err)
+	_, err = sessionRepo.Update(t.Context(), tx, sessionRepo.PrimaryKeyCondition(instanceId, session.ID), sessionRepo.SetFactor(&domain.SessionFactorUser{
+		UserID:         userID,
+		LastVerifiedAt: time.Now(),
+	}))
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -1222,6 +1291,11 @@ func TestSession_Get(t *testing.T) {
 			assert.Equal(t, session.InstanceID, got.InstanceID)
 			assert.Equal(t, session.Lifetime, got.Lifetime)
 			assert.Equal(t, session.CreatorID, got.CreatorID)
+			require.NotNil(t, got.UserOrganizationID)
+			assert.Equal(t, orgID, *got.UserOrganizationID)
+			assert.Equal(t, preferredLoginName, got.UserPreferredLoginName)
+			require.NotNil(t, got.UserDisplayName)
+			assert.Equal(t, displayName, *got.UserDisplayName)
 		})
 	}
 }

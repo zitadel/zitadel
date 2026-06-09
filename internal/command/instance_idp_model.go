@@ -1034,3 +1034,43 @@ func (wm *InstanceIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventData(map[string]interface{}{"idpConfigId": wm.ID}).
 		Builder()
 }
+
+type InstanceZitadelIDPWriteModel struct {
+	ZitadelIDPWriteModel
+}
+
+func NewInstanceZitadelIDPWriteModel(instanceID, id string) *InstanceZitadelIDPWriteModel {
+	return &InstanceZitadelIDPWriteModel{
+		ZitadelIDPWriteModel: ZitadelIDPWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
+			},
+			ID: id,
+		},
+	}
+}
+
+func (wm *InstanceZitadelIDPWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *instance.ZitadelIDPAddedEvent:
+			wm.ZitadelIDPWriteModel.AppendEvents(&e.ZitadelIDPAddedEvent)
+		default:
+			wm.ZitadelIDPWriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *InstanceZitadelIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(instance.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			instance.ZitadelIDPAddedEventType,
+		).
+		EventData(map[string]interface{}{"id": wm.ID}).
+		Builder()
+}

@@ -395,16 +395,16 @@ export class AdminService {
               }),
             };
           });
-          const toArray = Object.entries(obj).sort(([key0, a], [key1, b]) => a.order - b.order);
+          const toArray = Object.entries(obj).sort(([_key0, a], [_key1, b]) => a.order - b.order);
 
-          const toDo = toArray.filter(([key, value]) => value.reached === undefined);
-          const done = toArray.filter(([key, value]) => !!value.reached);
+          const toDo = toArray.filter(([_, value]) => value.reached === undefined);
+          const done = toArray.filter(([_, value]) => !!value.reached);
 
           return [...toDo, ...done];
         }),
         tap((milestones) => {
           const total = milestones.length;
-          const done = milestones.map(([type, value]) => value.reached !== undefined).filter((res) => !!res).length;
+          const done = milestones.map(([_, value]) => value.reached !== undefined).filter((res) => !!res).length;
           const percentage = Math.round((done / total) * 100);
           this.progressDone.next(done);
           this.progressTotal.next(total);
