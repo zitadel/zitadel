@@ -13,8 +13,8 @@ on:
         required: true
 
 jobs:
-  lint_build:
-    name: Lint and Build
+  lint_test_build:
+    name: Lint, Test and Build
     runs-on: depot-ubuntu-22.04-16
     environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
     steps:
@@ -55,14 +55,12 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Set SHAs for nx affected commands
         uses: nrwl/nx-set-shas@v4
-      - name: Lint and Build
+      - name: Lint, Test and Build
         env:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
           NX_DAEMON: "false"
           NX_DISABLE_DB: "true"
-        run: |
-          pnpm nx affected --nxBail --targets lint,build --exclude @zitadel/docs
-          pnpm nx affected --nxBail --targets test --exclude @zitadel/api,@zitadel/functional-ui
+        run: pnpm nx affected --nxBail --targets lint test build --exclude @zitadel/docs
       - name: Check for uncommitted changes (Codegen mismatch)
         run: git diff --exit-code
       - name: Suggest Pipeline Fix By Nx Cloud AI
@@ -70,61 +68,27 @@ jobs:
         env:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
         run: pnpm nx fix-ci
-
-  functional_ui_tests:
-    name: Functional UI tests
-    needs: lint_build
-    runs-on: depot-ubuntu-22.04-16
-    environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - name: Publish API Unit Test Coverage
+        uses: codecov/codecov-action@v4.3.0
         with:
-          fetch-depth: 0
-          filter: tree:0
-      - name: Fetch main branch
-        if: ${{ github.ref != 'refs/heads/main' }}
-        run: git fetch origin main:main
-      - name: Set up Go
-        uses: actions/setup-go@v6
+          file: profile.api.test-unit.cov
+          name: api-test-unit
+          flags: api-test-unit
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Publish API Integration Test Coverage
+        uses: codecov/codecov-action@v4.3.0
         with:
-          go-version-file: go.mod
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ inputs.node_version }}
-          cache: "pnpm"
-      - name: Set up Docker
-        uses: docker/setup-docker-action@v4
-        with:
-          version: v28.3.2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          version: v0.28.0
-      - name: Set up Docker Compose
-        uses: docker/setup-compose-action@v1
-        with:
-          version: v2.38.2
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Set SHAs for nx affected commands
-        uses: nrwl/nx-set-shas@v4
-      - name: Run Functional UI tests
-        env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-          NX_DAEMON: "false"
-          NX_DISABLE_DB: "true"
-        run: pnpm nx affected --nxBail --target=test --exclude @zitadel/api,@zitadel/client,@zitadel/compose,@zitadel/login,@zitadel/docs
-      - name: Suggest Pipeline Fix By Nx Cloud AI
+          file: profile.api.test-integration.cov
+          name: api-test-integration
+          flags: api-test-integration
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload API Integration Test Race Logs
         if: failure() || cancelled()
-        env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-        run: pnpm nx fix-ci
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-integration-test-race-logs
+          path: |
+            .artifacts/api-test-integration/race.log.*
       - name: Upload Functional UI Test Artifacts
         uses: actions/upload-artifact@v4
         if: failure() || cancelled()
@@ -134,144 +98,3 @@ jobs:
             tests/functional-ui/cypress/screenshots
             tests/functional-ui/cypress/videos
             tests/functional-ui/cypress/results
-
-  go_unit_tests:
-    name: API unit tests (${{ matrix.codecov_flag }})
-    needs: lint_build
-    runs-on: depot-ubuntu-22.04-16
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - target: test-unit
-            coverage_file: profile.api.test-unit.cov
-            codecov_flag: api-test-unit
-          - target: test-unit-fips
-            coverage_file: profile.api.test-unit-fips.cov
-            codecov_flag: api-test-unit-fips
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          filter: tree:0
-      - name: Fetch main branch
-        if: ${{ github.ref != 'refs/heads/main' }}
-        run: git fetch origin main:main
-      - name: Set up Go
-        uses: actions/setup-go@v6
-        with:
-          go-version-file: go.mod
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ inputs.node_version }}
-          cache: "pnpm"
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Set SHAs for nx affected commands
-        uses: nrwl/nx-set-shas@v4
-      - name: Run API unit tests
-        env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-          NX_DAEMON: "false"
-          NX_DISABLE_DB: "true"
-        run: pnpm nx run @zitadel/api:${{ matrix.target }}
-      - name: Suggest Pipeline Fix By Nx Cloud AI
-        if: failure() || cancelled()
-        env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-        run: pnpm nx fix-ci
-      - name: Publish API Unit Test Coverage
-        uses: codecov/codecov-action@v4.3.0
-        with:
-          file: ${{ matrix.coverage_file }}
-          name: ${{ matrix.codecov_flag }}
-          flags: ${{ matrix.codecov_flag }}
-          token: ${{ secrets.CODECOV_TOKEN }}
-
-  go_integration_tests:
-    name: API integration tests (${{ matrix.codecov_flag }})
-    needs: lint_build
-    runs-on: depot-ubuntu-22.04-16
-    strategy:
-      fail-fast: false
-      max-parallel: 1
-      matrix:
-        include:
-          - target: test-integration
-            coverage_file: profile.api.test-integration.cov
-            codecov_flag: api-test-integration
-            race_log_glob: .artifacts/api-test-integration/race.log.*
-            race_log_artifact: api-integration-test-race-logs
-          - target: test-integration-fips
-            coverage_file: profile.api.test-integration-fips.cov
-            codecov_flag: api-test-integration-fips
-            race_log_glob: .artifacts/api-test-integration-fips/race.log.*
-            race_log_artifact: api-integration-test-fips-race-logs
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          filter: tree:0
-      - name: Fetch main branch
-        if: ${{ github.ref != 'refs/heads/main' }}
-        run: git fetch origin main:main
-      - name: Set up Go
-        uses: actions/setup-go@v6
-        with:
-          go-version-file: go.mod
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ inputs.node_version }}
-          cache: "pnpm"
-      - name: Set up Docker
-        uses: docker/setup-docker-action@v4
-        with:
-          version: v28.3.2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          version: v0.28.0
-      - name: Set up Docker Compose
-        uses: docker/setup-compose-action@v1
-        with:
-          version: v2.38.2
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Set SHAs for nx affected commands
-        uses: nrwl/nx-set-shas@v4
-      - name: Run API integration tests
-        env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-          NX_DAEMON: "false"
-          NX_DISABLE_DB: "true"
-        run: pnpm nx run @zitadel/api:${{ matrix.target }}
-      - name: Suggest Pipeline Fix By Nx Cloud AI
-        if: failure() || cancelled()
-        env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-        run: pnpm nx fix-ci
-      - name: Publish API Integration Test Coverage
-        uses: codecov/codecov-action@v4.3.0
-        with:
-          file: ${{ matrix.coverage_file }}
-          name: ${{ matrix.codecov_flag }}
-          flags: ${{ matrix.codecov_flag }}
-          token: ${{ secrets.CODECOV_TOKEN }}
-      - name: Upload API Integration Test Race Logs
-        if: failure() || cancelled()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.race_log_artifact }}
-          path: ${{ matrix.race_log_glob }}

@@ -1,4 +1,4 @@
-# FIPS build overlay: merged on top of defaults.yaml when compiled with -tags fips.
+# FIPS runtime overlay: merged on top of defaults.yaml when FIPS 140-3 mode is enabled (GODEBUG=fips140=on|only).
 SystemDefaults:
   PasswordHasher:
     Hasher:

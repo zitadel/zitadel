@@ -156,9 +156,7 @@
             "description": "Runs all tests (unit and integration)",
             "dependsOn": [
                 "test-unit",
-                "test-unit-fips",
-                "test-integration",
-                "test-integration-fips"
+                "test-integration"
             ]
         },
         "test-unit": {
@@ -174,21 +172,6 @@
             ],
             "outputs": [
                 "{workspaceRoot}/profile.api.test-unit.cov"
-            ]
-        },
-        "test-unit-fips": {
-            "description": "Runs the unit tests with the FIPS build tag and coverage",
-            "dependsOn": [
-                "generate"
-            ],
-            "cache": true,
-            "command": "go test -race -tags fips -coverprofile=profile.api.test-unit-fips.cov -coverpkg=./internal/...,./backend/...  ./...",
-            "inputs": [
-                "sources",
-                "{workspaceRoot}/go*"
-            ],
-            "outputs": [
-                "{workspaceRoot}/profile.api.test-unit-fips.cov"
             ]
         },
         "test-integration-build": {
@@ -275,87 +258,6 @@
         },
         "test-integration-stop": {
             "description": "Stops the database and cache containers used for integration tests.",
-            "command": "nx run @zitadel/devcontainer:compose down --volumes db-api-integration cache-api-integration"
-        },
-        "test-integration-build-fips": {
-            "description": "Builds the FIPS-tagged test binary for integration tests.",
-            "dependsOn": [
-                "generate"
-            ],
-            "command": "go build -cover -race -tags 'integration,fips' -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test.fips main.go",
-            "cache": false,
-            "inputs": [
-                {
-                    "runtime": "go env GOOS"
-                },
-                {
-                    "runtime": "go env GOARCH"
-                },
-                "sources",
-                "{workspaceRoot}/internal/integration/**",
-                "{workspaceRoot}/go*"
-            ],
-            "outputs": [
-                "{workspaceRoot}/.artifacts/bin/*/*/zitadel.test.fips"
-            ]
-        },
-        "test-integration-run-api-fips": {
-            "description": "Runs the FIPS-tagged API server for integration tests.",
-            "continuous": true,
-            "dependsOn": [
-                "test-integration-build-fips"
-            ],
-            "executor": "nx:run-commands",
-            "options": {
-                "env": {
-                    "ZITADEL_BINARY": "zitadel.test.fips",
-                    "GOCOVERDIR": "{workspaceRoot}/.artifacts/api-test-integration-fips/coverage",
-                    "GORACE": "log_path=.artifacts/api-test-integration-fips/race.log"
-                },
-                "parallel": false,
-                "commands": [
-                    "rm -rf .artifacts/api-test-integration-fips",
-                    "mkdir -p ${GOCOVERDIR}",
-                    "nx run @zitadel/api:prod:test-integration-api --excludeTaskDependencies"
-                ]
-            }
-        },
-        "test-integration-fips": {
-            "description": "Runs integration tests against the FIPS-tagged API binary with coverage and race detection.",
-            "dependsOn": [
-                "test-integration-run-db",
-                "test-integration-run-api-fips"
-            ],
-            "executor": "nx:run-commands",
-            "options": {
-                "parallel": false,
-                "env": {
-                    "GOCOVERDIR": "{workspaceRoot}/.artifacts/api-test-integration-fips/coverage"
-                },
-                "commands": [
-                    "wait-on --verbose --interval 2000 --simultaneous 1 --timeout 30m \"${ZITADEL_API_URL}/debug/ready\"",
-                    "bash -c 'go test -race -count 1 -tags \"integration,fips\" -timeout 60m -parallel 1 $(go list -tags \"integration,fips\" ./... | grep -e \"integration_test\" -e \"events_testing\")'",
-                    "go tool covdata textfmt -i=$GOCOVERDIR -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/...,github.com/zitadel/zitadel/backend/... -o profile.api.test-integration-fips.cov",
-                    "nx run @zitadel/api:test-integration-stop-fips"
-                ]
-            },
-            "inputs": [
-                {
-                    "runtime": "go env GOOS"
-                },
-                {
-                    "runtime": "go env GOARCH"
-                },
-                "sources",
-                "{workspaceRoot}/internal/integration/**",
-                "{workspaceRoot}/go*"
-            ],
-            "outputs": [
-                "{workspaceRoot}/profile.api.test-integration-fips.cov"
-            ]
-        },
-        "test-integration-stop-fips": {
-            "description": "Stops the database and cache containers used for FIPS integration tests.",
             "command": "nx run @zitadel/devcontainer:compose down --volumes db-api-integration cache-api-integration"
         },
         "build-console": {

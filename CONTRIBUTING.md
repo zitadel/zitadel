@@ -303,14 +303,6 @@ To test the code without dependencies, run the unit tests:
 pnpm nx run @zitadel/api:test-unit
 ```
 
-For binaries built with the `fips` build tag (PBKDF2-SHA256 compile-time defaults), run:
-
-```bash
-pnpm nx run @zitadel/api:test-unit-fips
-```
-
-CI runs both variants in parallel via a GitHub Actions matrix.
-
 ### Run API Integration Tests
 
 API tests are run as gRPC clients against a running Zitadel server binary.
@@ -319,14 +311,6 @@ The server binary is [built with coverage enabled](https://go.dev/doc/build-cove
 ```bash
 pnpm nx run @zitadel/api:test-integration
 ```
-
-Against a FIPS-tagged test binary (`-tags integration,fips`), run:
-
-```bash
-pnpm nx run @zitadel/api:test-integration-fips
-```
-
-CI runs default and FIPS integration tests sequentially (shared database port) in a separate matrix job.
 
 To develop and run the test cases from within your IDE or by the command line, start only the database and the API.
 The actual integration test clients reside in the `integration_test` subdirectory of the package they aim to test.

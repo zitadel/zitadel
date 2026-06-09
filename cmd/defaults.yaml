@@ -893,7 +893,7 @@ SystemDefaults:
         MinP: 1 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MINP
         MaxP: 16 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MAXP
       PBKDF2:
-        # FIPS builds: MinRounds below 1000 (NIST SP 800-132) logs a startup warning; primary Hasher Rounds must be >= 1000.
+        # FIPS mode: MinRounds below 1000 (NIST SP 800-132) logs a startup warning; primary Hasher Rounds must be >= 1000.
         MinRounds: 1000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_PBKDF2_MINROUNDS
         MaxRounds: 10000000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_PBKDF2_MAXROUNDS
       Sha2:
@@ -970,7 +970,7 @@ SystemDefaults:
         MinP: 1 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MINP
         MaxP: 16 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MAXP
       PBKDF2:
-        # FIPS builds: MinRounds below 1000 (NIST SP 800-132) logs a startup warning; primary Hasher Rounds must be >= 1000.
+        # FIPS mode: MinRounds below 1000 (NIST SP 800-132) logs a startup warning; primary Hasher Rounds must be >= 1000.
         MinRounds: 1000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_PBKDF2_MINROUNDS
         MaxRounds: 10000000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_PBKDF2_MAXROUNDS
       Sha2:
