@@ -91,6 +91,23 @@ func (wm *HumanWriteModel) Reduce() error {
 				wm.UserState = domain.UserStateActive
 			}
 		case *user.UserRemovedEvent:
+			wm.UserName = ""
+			wm.FirstName = ""
+			wm.LastName = ""
+			wm.NickName = ""
+			wm.DisplayName = ""
+			wm.PreferredLanguage = language.Und
+			wm.Gender = domain.GenderUnspecified
+			wm.Avatar = ""
+			wm.Email = ""
+			wm.IsEmailVerified = false
+			wm.Phone = ""
+			wm.IsPhoneVerified = false
+			wm.Country = ""
+			wm.Locality = ""
+			wm.PostalCode = ""
+			wm.Region = ""
+			wm.StreetAddress = ""
 			wm.UserState = domain.UserStateDeleted
 		}
 	}

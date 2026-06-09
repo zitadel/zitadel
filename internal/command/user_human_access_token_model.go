@@ -82,6 +82,16 @@ func (wm *UserAccessTokenWriteModel) Reduce() error {
 			*user.UserLockedEvent,
 			*user.UserDeactivatedEvent,
 			*user.UserRemovedEvent:
+
+			wm.TokenID = ""
+			wm.ApplicationID = ""
+			wm.UserAgentID = ""
+			wm.Audience = nil
+			wm.Scopes = nil
+			wm.Expiration = time.Time{}
+			wm.PreferredLanguage = ""
+			wm.Reason = domain.TokenReasonUnspecified
+			wm.Actor = nil
 			wm.UserState = domain.UserStateDeleted
 		}
 	}

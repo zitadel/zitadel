@@ -301,6 +301,56 @@ func (wm *UserV2WriteModel) Reduce() error {
 			wm.UserState = domain.UserStateActive
 
 		case *user.UserRemovedEvent:
+			wm.CreationDate = time.Time{}
+			wm.UserName = ""
+			wm.MachineWriteModel = false
+			wm.Name = ""
+			wm.Description = ""
+			wm.AccessTokenType = domain.OIDCTokenTypeBearer
+			wm.MachineSecretWriteModel = false
+			wm.ClientSecret = nil
+			wm.ProfileWriteModel = false
+			wm.FirstName = ""
+			wm.LastName = ""
+			wm.NickName = ""
+			wm.DisplayName = ""
+			wm.PreferredLanguage = language.Und
+			wm.Gender = domain.GenderUnspecified
+			wm.AvatarWriteModel = false
+			wm.Avatar = ""
+			wm.HumanWriteModel = false
+			wm.InitCode = nil
+			wm.InitCodeCreationDate = time.Time{}
+			wm.InitCodeExpiry = 0
+			wm.InitCheckFailedCount = 0
+			wm.PasswordWriteModel = false
+			wm.PasswordEncodedHash = ""
+			wm.PasswordChangeRequired = false
+			wm.PasswordCode = nil
+			wm.PasswordCodeCreationDate = time.Time{}
+			wm.PasswordCodeExpiry = 0
+			wm.PasswordCheckFailedCount = 0
+			wm.PasswordCodeGeneratorID = ""
+			wm.PasswordCodeVerificationID = ""
+			wm.EmailWriteModel = false
+			wm.Email = ""
+			wm.IsEmailVerified = false
+			wm.EmailCode = nil
+			wm.EmailCodeCreationDate = time.Time{}
+			wm.EmailCodeExpiry = 0
+			wm.EmailCheckFailedCount = 0
+			wm.PhoneWriteModel = false
+			wm.Phone = ""
+			wm.IsPhoneVerified = false
+			wm.PhoneCode = nil
+			wm.PhoneCodeCreationDate = time.Time{}
+			wm.PhoneCodeExpiry = 0
+			wm.PhoneCheckFailedCount = 0
+			wm.StateWriteModel = false
+			wm.IDPLinkWriteModel = false
+			wm.IDPLinks = nil
+			wm.MetadataWriteModel = false
+			wm.Metadata = nil
 			wm.UserState = domain.UserStateDeleted
 
 		case *user.HumanPasswordHashUpdatedEvent:

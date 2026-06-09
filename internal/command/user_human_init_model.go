@@ -57,6 +57,12 @@ func (wm *HumanInitCodeWriteModel) Reduce() error {
 			wm.Code = nil
 			wm.UserState = domain.UserStateActive
 		case *user.UserRemovedEvent:
+			wm.Email = ""
+			wm.IsEmailVerified = false
+			wm.Code = nil
+			wm.CodeCreationDate = time.Time{}
+			wm.CodeExpiry = 0
+			wm.AuthRequestID = ""
 			wm.UserState = domain.UserStateDeleted
 		}
 	}

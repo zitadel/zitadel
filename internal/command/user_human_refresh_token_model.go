@@ -84,6 +84,15 @@ func (wm *HumanRefreshTokenWriteModel) Reduce() error {
 			*user.UserLockedEvent,
 			*user.UserDeactivatedEvent,
 			*user.UserRemovedEvent:
+
+			wm.TokenID = ""
+			wm.RefreshToken = ""
+			wm.AuthTime = time.Time{}
+			wm.IdleExpiration = time.Time{}
+			wm.Expiration = time.Time{}
+			wm.UserAgentID = ""
+			wm.AuthMethodsReferences = nil
+			wm.Actor = nil
 			wm.UserState = domain.UserStateDeleted
 		}
 	}

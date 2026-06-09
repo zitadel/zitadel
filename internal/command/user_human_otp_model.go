@@ -48,6 +48,9 @@ func (wm *HumanTOTPWriteModel) Reduce() error {
 		case *user.HumanOTPRemovedEvent:
 			wm.State = domain.MFAStateRemoved
 		case *user.UserRemovedEvent:
+			wm.Secret = nil
+			wm.CheckFailedCount = 0
+			wm.UserLocked = false
 			wm.State = domain.MFAStateRemoved
 		}
 	}
@@ -130,6 +133,7 @@ func (wm *HumanOTPSMSWriteModel) Reduce() error {
 			wm.otpAdded = false
 		case *user.HumanPhoneRemovedEvent,
 			*user.UserRemovedEvent:
+			*wm = HumanOTPSMSWriteModel{}
 			wm.phoneVerified = false
 			wm.otpAdded = false
 		}
@@ -301,6 +305,7 @@ func (wm *HumanOTPEmailWriteModel) Reduce() error {
 		case *user.HumanOTPEmailRemovedEvent:
 			wm.otpAdded = false
 		case *user.UserRemovedEvent:
+			*wm = HumanOTPEmailWriteModel{}
 			wm.emailVerified = false
 			wm.otpAdded = false
 		}

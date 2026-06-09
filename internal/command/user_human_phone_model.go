@@ -75,6 +75,12 @@ func (wm *HumanPhoneWriteModel) Reduce() error {
 			wm.IsPhoneVerified = false
 			wm.Phone = ""
 		case *user.UserRemovedEvent:
+			wm.IsPhoneVerified = false
+			wm.Code = nil
+			wm.CodeCreationDate = time.Time{}
+			wm.CodeExpiry = 0
+			wm.GeneratorID = ""
+			wm.VerificationID = ""
 			wm.UserState = domain.UserStateDeleted
 			wm.IsPhoneVerified = false
 			wm.Phone = ""

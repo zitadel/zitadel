@@ -83,6 +83,16 @@ func (wm *UserV2InviteWriteModel) Reduce() error {
 		case *user.UserReactivatedEvent:
 			wm.UserState = domain.UserStateActive
 		case *user.UserRemovedEvent:
+			wm.InviteCode = nil
+			wm.InviteCodeCreationDate = time.Time{}
+			wm.InviteCodeExpiry = 0
+			wm.InviteCheckFailureCount = 0
+			wm.ApplicationName = ""
+			wm.AuthRequestID = ""
+			wm.URLTemplate = ""
+			wm.CodeReturned = false
+			wm.EmailVerified = false
+			wm.AuthMethodSet = false
 			wm.UserState = domain.UserStateDeleted
 		case *user.HumanPasswordChangedEvent:
 			wm.AuthMethodSet = true

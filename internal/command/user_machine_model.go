@@ -68,6 +68,10 @@ func (wm *MachineWriteModel) Reduce() error {
 				wm.UserState = domain.UserStateActive
 			}
 		case *user.UserRemovedEvent:
+			wm.Name = ""
+			wm.Description = ""
+			wm.AccessTokenType = domain.OIDCTokenTypeBearer
+			wm.HashedSecret = ""
 			wm.UserState = domain.UserStateDeleted
 		case *user.MachineSecretSetEvent:
 			wm.HashedSecret = crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)

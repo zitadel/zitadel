@@ -58,6 +58,9 @@ func (wm *MachineKeyWriteModel) Reduce() error {
 		case *user.MachineKeyRemovedEvent:
 			wm.State = domain.MachineKeyStateRemoved
 		case *user.UserRemovedEvent:
+			wm.KeyID = ""
+			wm.KeyType = domain.AuthNKeyTypeNONE
+			wm.ExpirationDate = time.Time{}
 			wm.State = domain.MachineKeyStateRemoved
 		}
 	}

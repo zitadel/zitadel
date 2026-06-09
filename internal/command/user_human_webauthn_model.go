@@ -105,6 +105,15 @@ func (wm *HumanWebAuthNWriteModel) Reduce() error {
 		case *user.HumanWebAuthNRemovedEvent:
 			wm.State = domain.MFAStateRemoved
 		case *user.UserRemovedEvent:
+			wm.WebauthNTokenID = ""
+			wm.Challenge = ""
+			wm.KeyID = nil
+			wm.PublicKey = nil
+			wm.AttestationType = ""
+			wm.AAGUID = nil
+			wm.SignCount = 0
+			wm.WebAuthNTokenName = ""
+			wm.RPID = ""
 			wm.State = domain.MFAStateRemoved
 		}
 	}
@@ -206,6 +215,7 @@ func (wm *HumanU2FTokensReadModel) Reduce() error {
 			wm.WebAuthNTokens[len(wm.WebAuthNTokens)-1] = nil
 			wm.WebAuthNTokens = wm.WebAuthNTokens[:len(wm.WebAuthNTokens)-1]
 		case *user.UserRemovedEvent:
+			*wm = HumanU2FTokensReadModel{}
 			wm.UserState = domain.UserStateDeleted
 		}
 	}
@@ -293,6 +303,7 @@ func (wm *HumanPasswordlessTokensReadModel) Reduce() error {
 			wm.WebAuthNTokens[len(wm.WebAuthNTokens)-1] = nil
 			wm.WebAuthNTokens = wm.WebAuthNTokens[:len(wm.WebAuthNTokens)-1]
 		case *user.UserRemovedEvent:
+			*wm = HumanPasswordlessTokensReadModel{}
 			wm.UserState = domain.UserStateDeleted
 		}
 	}
@@ -369,6 +380,7 @@ func (wm *HumanU2FLoginReadModel) Reduce() error {
 			wm.UserVerification = e.UserVerification
 			wm.State = domain.UserStateActive
 		case *user.UserRemovedEvent:
+			*wm = HumanU2FLoginReadModel{}
 			wm.State = domain.UserStateDeleted
 		}
 	}
@@ -430,6 +442,7 @@ func (wm *HumanPasswordlessLoginReadModel) Reduce() error {
 			wm.UserVerification = e.UserVerification
 			wm.State = domain.UserStateActive
 		case *user.UserRemovedEvent:
+			*wm = HumanPasswordlessLoginReadModel{}
 			wm.State = domain.UserStateDeleted
 		}
 	}
@@ -513,6 +526,7 @@ func (wm *HumanPasswordlessInitCodeWriteModel) Reduce() error {
 		case *user.HumanPasswordlessInitCodeCheckSucceededEvent:
 			wm.State = domain.PasswordlessInitCodeStateRemoved
 		case *user.UserRemovedEvent:
+			*wm = HumanPasswordlessInitCodeWriteModel{}
 			wm.State = domain.PasswordlessInitCodeStateRemoved
 		}
 	}

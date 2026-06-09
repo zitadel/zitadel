@@ -63,6 +63,9 @@ func (wm *HumanRecoveryCodeWriteModel) Reduce() error {
 			wm.userLocked = false
 			wm.FailedAttempts = 0
 		case *user.UserRemovedEvent:
+			wm.FailedAttempts = 0
+			wm.codes = nil
+			wm.userLocked = false
 			wm.State = domain.MFAStateRemoved
 		}
 	}

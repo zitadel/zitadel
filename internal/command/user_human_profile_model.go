@@ -71,6 +71,12 @@ func (wm *HumanProfileWriteModel) Reduce() error {
 				wm.Gender = *e.Gender
 			}
 		case *user.UserRemovedEvent:
+			wm.FirstName = ""
+			wm.LastName = ""
+			wm.NickName = ""
+			wm.DisplayName = ""
+			wm.PreferredLanguage = language.Und
+			wm.Gender = domain.GenderUnspecified
 			wm.UserState = domain.UserStateDeleted
 		}
 	}

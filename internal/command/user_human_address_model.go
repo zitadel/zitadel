@@ -63,6 +63,11 @@ func (wm *HumanAddressWriteModel) Reduce() error {
 				wm.StreetAddress = *e.StreetAddress
 			}
 		case *user.UserRemovedEvent:
+			wm.Country = ""
+			wm.Locality = ""
+			wm.PostalCode = ""
+			wm.Region = ""
+			wm.StreetAddress = ""
 			wm.State = domain.AddressStateRemoved
 		}
 	}

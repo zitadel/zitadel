@@ -83,6 +83,9 @@ func (wm *UserWriteModel) Reduce() error {
 				wm.UserState = domain.UserStateActive
 			}
 		case *user.UserRemovedEvent:
+			wm.UserName = ""
+			wm.IDPLinks = nil
+			wm.UserType = domain.UserTypeUnspecified
 			wm.UserState = domain.UserStateDeleted
 		}
 	}

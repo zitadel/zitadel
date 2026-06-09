@@ -108,6 +108,12 @@ func (wm *HumanPasswordReadModel) Reduce() error {
 				wm.UserState = domain.UserStateActive
 			}
 		case *user.UserRemovedEvent:
+			wm.EncodedHash = ""
+			wm.SecretChangeRequired = false
+			wm.Code = nil
+			wm.CodeCreationDate = time.Time{}
+			wm.CodeExpiry = 0
+			wm.PasswordCheckFailedCount = 0
 			wm.UserState = domain.UserStateDeleted
 		case *user.HumanPasswordHashUpdatedEvent:
 			wm.EncodedHash = e.EncodedHash
