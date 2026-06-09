@@ -15,9 +15,8 @@ import (
 )
 
 type latestSequence struct {
-	aggregate    *eventstore.Aggregate
-	sequence     uint64
-	enforceOwner bool
+	aggregate *eventstore.Aggregate
+	sequence  uint64
 }
 
 //go:embed sequences_query.sql
@@ -46,14 +45,7 @@ func latestSequences(ctx context.Context, tx database.Transaction, commands []ev
 }
 
 func searchSequenceByCommand(sequences []*latestSequence, command eventstore.Command) *latestSequence {
-	for _, sequence := range sequences {
-		if sequence.aggregate.Type == command.Aggregate().Type &&
-			sequence.aggregate.ID == command.Aggregate().ID &&
-			sequence.aggregate.InstanceID == command.Aggregate().InstanceID {
-			return sequence
-		}
-	}
-	return nil
+	return searchSequence(sequences, command.Aggregate().Type, command.Aggregate().ID, command.Aggregate().InstanceID)
 }
 
 func searchSequence(sequences []*latestSequence, aggregateType eventstore.AggregateType, aggregateID, instanceID string) *latestSequence {
@@ -71,11 +63,7 @@ func commandsToSequences(ctx context.Context, commands []eventstore.Command) []*
 	sequences := make([]*latestSequence, 0, len(commands))
 
 	for _, command := range commands {
-		if existing := searchSequenceByCommand(sequences, command); existing != nil {
-			if eventstore.ShouldEnforceResourceOwner(command) {
-				existing.enforceOwner = true
-				existing.aggregate.ResourceOwner = command.Aggregate().ResourceOwner
-			}
+		if searchSequenceByCommand(sequences, command) != nil {
 			continue
 		}
 
@@ -83,8 +71,7 @@ func commandsToSequences(ctx context.Context, commands []eventstore.Command) []*
 			command.Aggregate().InstanceID = authz.GetInstance(ctx).InstanceID()
 		}
 		sequences = append(sequences, &latestSequence{
-			aggregate:    command.Aggregate(),
-			enforceOwner: eventstore.ShouldEnforceResourceOwner(command),
+			aggregate: command.Aggregate(),
 		})
 	}
 
@@ -140,9 +127,8 @@ func scanToSequence(rows database.Rows, sequences []*latestSequence) error {
 			"provided_owner", sequence.aggregate.ResourceOwner,
 		).Info("would have set wrong resource owner")
 	}
-
 	// set resource owner from previous events
-	if resourceOwner != "" && !sequence.enforceOwner {
+	if resourceOwner != "" {
 		sequence.aggregate.ResourceOwner = resourceOwner
 	}
 

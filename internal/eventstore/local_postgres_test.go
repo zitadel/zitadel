@@ -237,7 +237,7 @@ func generateRemoveUniqueConstraint(table, uniqueField string) func(e *testEvent
 
 func withEventType(eventType eventstore.EventType) func(e *testEvent) {
 	return func(e *testEvent) {
-		e.BaseEvent.EventType = eventType
+		e.EventType = eventType
 	}
 }
 

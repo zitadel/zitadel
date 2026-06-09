@@ -40,8 +40,13 @@ type Command interface {
 	Fields() []*FieldOperation
 }
 
+// Error returned when a command is rejected by the eventstore. Because the ID was already used on a different resource owner.
+var ErrIDReused = zerrors.ThrowPreconditionFailed(nil, "EVENT-YH9fn", "Errors.IDReused")
+
 type EnforceResourceOwnerCommand interface {
 	Command
+	// EnforceResourceOwner indicates that the resource owner of the event MUST be the same owner as on previous events of the aggregate.
+	// If this is not the case, the command will be rejected with an [ErrIDReused].
 	EnforceResourceOwner()
 }
 

@@ -101,6 +101,10 @@ func (mig *CorrectProjectOwners) correctInstanceProjects(ctx context.Context, in
 		return false, rows.Err()
 	}
 
+	if len(correctedOwners) == 0 {
+		return false, nil
+	}
+
 	_, err = mig.eventstore.PushWithClient(ctx, tx, correctedOwners...)
 	return len(correctedOwners) > 0, err
 }

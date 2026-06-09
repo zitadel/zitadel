@@ -5,7 +5,6 @@ import (
 	_ "embed"
 	"fmt"
 
-	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -20,23 +19,13 @@ type AddEventStoreCommandEnforceOwnerColumn struct {
 }
 
 func (mig *AddEventStoreCommandEnforceOwnerColumn) Execute(ctx context.Context, _ eventstore.Event) error {
-	conn, err := mig.dbClient.Conn(ctx)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		closeErr := conn.Close()
-		logging.OnError(ctx, closeErr).Debug("failed to release connection")
-		mig.dbClient.Pool.Reset()
-	}()
-
-	inTxOrderType, err := (&ChangePushPosition{dbClient: mig.dbClient}).inTxOrderType(ctx)
+	inTxOrderType, err := inTxOrderType(ctx, mig.dbClient)
 	if err != nil {
 		return err
 	}
 
 	stmt := fmt.Sprintf(addEventStoreCommandEnforceOwnerColumn, inTxOrderType)
-	_, err = conn.ExecContext(ctx, stmt)
+	_, err = mig.dbClient.ExecContext(ctx, stmt)
 	return err
 }
 

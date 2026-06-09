@@ -258,7 +258,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	for _, step := range []migration.Migration{
 		steps.s14NewEventsTable,
 		steps.s40InitPushFunc,
-		steps.s70AddEventStoreCommandEnforceOwner,
+		// steps.s70AddEventStoreCommandEnforceOwner,
 		steps.s1ProjectionTable,
 		steps.s2AssetsTable,
 		steps.s28AddFieldTable,

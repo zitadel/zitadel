@@ -626,7 +626,7 @@ func TestEventstore_Push_ResourceOwner_ReusedAggregateID(t *testing.T) {
 				generateCommand(
 					aggregateType,
 					aggregateID,
-					func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "old" },
+					func(e *testEvent) { e.Agg.ResourceOwner = "old" },
 					withEventType("test.initial"),
 				),
 			)
@@ -644,13 +644,13 @@ func TestEventstore_Push_ResourceOwner_ReusedAggregateID(t *testing.T) {
 				generateEnforcedCommand(
 					aggregateType,
 					aggregateID,
-					func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "new" },
+					func(e *testEvent) { e.Agg.ResourceOwner = "new" },
 					withEventType("test.recreated"),
 				),
 				generateCommand(
 					aggregateType,
 					aggregateID,
-					func(e *testEvent) { e.BaseEvent.Agg.ResourceOwner = "ignored" },
+					func(e *testEvent) { e.Agg.ResourceOwner = "ignored" },
 					withEventType("test.followup"),
 				),
 			)
