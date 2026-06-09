@@ -29,7 +29,7 @@ Read more about how to set the default redirect URI: [Settings - Default Redirec
 ### Restricting Management Console in default-project
 
 With this workaround, you will limit users from accessing the [default-project](/guides/manage/console/projects-overview#the-default-project) if they are not explicitly granted access to it.
-When enabling the "**Authentication is restricted to users from organizations that have been granted access to this project**" setting on a project, only users from organizations with a grant to that project can access it.
+When enabling the "**Authentication is restricted to users from organizations that have been granted access to this project**" setting on a project, only users from organizations with a Project Grant for that project can access it.
 By default, this setting is disabled, so all users can access the project.
 
 <Callout type="info">
@@ -40,7 +40,7 @@ By default, this setting is disabled, so all users can access the project.
 
 Start by granting the organization of your administrators access to the ZITADEL project (default project):
 
-1. Go to the **ZITADEL** project, select **Grants**, and click **New**.
+1. Go to the **ZITADEL** project, select **Project Grants**, and click **New**.
    ![](../../../public/img/guides/solution-scenarios/console-zitadel-project-grants.png)
 
 2. Select the organization you want to grant access to.
@@ -49,16 +49,16 @@ Start by granting the organization of your administrators access to the ZITADEL 
 3. You can skip the role selection and click **Save**.
 4. Ensure the grant appears in the overview and is marked as **Active**.
 
-To avoid accidental lock-out, the [default project](/guides/manage/console/projects-overview#the-default-project) hides the "**Authentication is restricted to users from organizations that have been granted access to this project**" checkbox in the Management Console:
+To avoid accidental lockout, the [default project](/guides/manage/console/projects-overview#the-default-project) hides the "**Authentication is restricted to users from organizations that have been granted access to this project**" checkbox in the Management Console:
 ![Default Project](../../../public/img/guides/solution-scenarios/console-default-project.png)
 
 You need to use the [Update Project API](/reference/api/management/zitadel.management.v1.ManagementService.UpdateProject) to configure this setting on the project.
 
 First, you need a user with administrator permissions to change the project settings in that organization.
-This means either you add the manager to the organization or you use an administrator on the instance level with `IAM-OWNER` permissions.
+This means either you add the Administrator to the organization or you use an administrator on the instance level with `IAM-OWNER` permissions.
 After that, create a Personal Access Token (PAT) for the administrator.
 
-More detailed information about creating a PAT and administrator roles can be found [here](/guides/integrate/service-accounts/personal-access-token).
+More detailed information about creating a PAT and Administrator Roles can be found [here](/guides/integrate/service-accounts/personal-access-token).
 
 Then, send the following request:
 ```bash
@@ -77,14 +77,14 @@ curl -L -X PUT "https://${CUSTOM_DOMAIN}/management/v1/projects/${PROJECT_ID}" \
 
 Where:
 - `${CUSTOM_DOMAIN}` is your custom domain (e.g., `mydemo.zitadel.cloud`).
-- `${PAT}` is your service account's Personal Access Token.
+- `${PAT}` is the administrator's Personal Access Token.
 - `${PROJECT_ID}` is the default project's ID, which can be found in the Management Console (see screenshot above).
 
 <Callout type="info">
   You can also use the [V2 Update Project API](/reference/api/project/zitadel.project.v2.ProjectService.UpdateProject) to perform this action.
 </Callout>
 
-You should now be able to log in with users of the organization that have the grant (in this example, users of the organization "Customer-A").
+You should now be able to log in with users of the organization that have the Project Grant (in this example, users of the organization "Customer-A").
 All other users should see the following error message after authentication:
 
 ![](../../../public/img/guides/solution-scenarios/console-access-restricted.png)
