@@ -53,6 +53,7 @@
     "react-dom": "19.2.6",
     "react-hook-form": "^7.75.0",
     "server-only": "^0.0.1",
+    "simple-icons": "^16.23.0",
     "tinycolor2": "^1.6.0",
     "uuid": "^14.0.0",
     "winston": "^3.19.0"
