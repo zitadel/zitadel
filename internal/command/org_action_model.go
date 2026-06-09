@@ -55,6 +55,10 @@ func (wm *ActionWriteModel) Reduce() error {
 		case *action.ReactivatedEvent:
 			wm.State = domain.ActionStateActive
 		case *action.RemovedEvent:
+			wm.Name = ""
+			wm.Script = ""
+			wm.Timeout = 0
+			wm.AllowedToFail = false
 			wm.State = domain.ActionStateRemoved
 		}
 	}
@@ -132,6 +136,7 @@ func (wm *ActionExistsModel) Reduce() error {
 		case *action.AddedEvent:
 			wm.checkedIDs = append(wm.checkedIDs, e.Aggregate().ID)
 		case *action.RemovedEvent:
+			// TODO
 			for i := len(wm.checkedIDs) - 1; i >= 0; i-- {
 				if wm.checkedIDs[i] == e.Aggregate().ID {
 					wm.checkedIDs[i] = wm.checkedIDs[len(wm.checkedIDs)-1]
@@ -188,6 +193,7 @@ func (wm *ActionsListByOrgModel) Reduce() error {
 		case *action.ReactivatedEvent:
 			wm.Actions[e.Aggregate().ID].State = domain.ActionStateActive
 		case *action.RemovedEvent:
+			// TODO
 			delete(wm.Actions, e.Aggregate().ID)
 		}
 	}

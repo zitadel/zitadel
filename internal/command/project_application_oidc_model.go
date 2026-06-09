@@ -143,6 +143,31 @@ func (wm *OIDCApplicationWriteModel) Reduce() error {
 		case *project.OIDCConfigSecretHashUpdatedEvent:
 			wm.HashedSecret = e.HashedSecret
 		case *project.ProjectRemovedEvent:
+			// wm.AppID = "" TODO(adlerhurst): reset or not?
+			wm.AppName = ""
+			wm.ClientID = ""
+			wm.HashedSecret = ""
+			wm.ClientSecretString = ""
+			wm.RedirectUris = nil
+			wm.ResponseTypes = nil
+			wm.GrantTypes = nil
+			wm.ApplicationType = domain.OIDCApplicationTypeWeb
+			wm.AuthMethodType = domain.OIDCAuthMethodTypeBasic
+			wm.PostLogoutRedirectUris = nil
+			wm.OIDCVersion = domain.OIDCVersionV1
+			wm.Compliance = nil
+			wm.DevMode = false
+			wm.AccessTokenType = domain.OIDCTokenTypeBearer
+			wm.AccessTokenRoleAssertion = false
+			wm.IDTokenRoleAssertion = false
+			wm.IDTokenUserinfoAssertion = false
+			wm.ClockSkew = 0
+			wm.AdditionalOrigins = nil
+			wm.SkipNativeAppSuccessPage = false
+			wm.BackChannelLogoutURI = ""
+			wm.LoginVersion = domain.LoginVersionUnspecified
+			wm.LoginBaseURI = ""
+			wm.oidc = false
 			wm.State = domain.AppStateRemoved
 		}
 	}

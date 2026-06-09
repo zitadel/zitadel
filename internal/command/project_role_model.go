@@ -80,6 +80,9 @@ func (wm *ProjectRoleWriteModel) Reduce() error {
 		case *project.RoleRemovedEvent:
 			wm.State = domain.ProjectRoleStateRemoved
 		case *project.ProjectRemovedEvent:
+			// wm.Key TODO(adlerhurst): reset or not?
+			// wm.DisplayName TODO(adlerhurst): reset or not?
+			// wm.Group TODO(adlerhurst): reset or not?
 			wm.State = domain.ProjectRoleStateRemoved
 		}
 	}

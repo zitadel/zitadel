@@ -97,6 +97,12 @@ func (wm *ApplicationKeyWriteModel) Reduce() error {
 		case *project.ApplicationKeyRemovedEvent:
 			wm.State = domain.AppStateRemoved
 		case *project.ProjectRemovedEvent:
+			// wm.AppID = "" TODO(adlerhurst): reset or not?
+			wm.ClientID = ""
+			wm.KeyID = ""
+			wm.KeyType = domain.AuthNKeyTypeNONE
+			wm.ExpirationDate = time.Time{}
+			wm.KeysAllowed = false
 			wm.State = domain.AppStateRemoved
 		}
 	}

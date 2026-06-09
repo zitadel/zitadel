@@ -123,6 +123,13 @@ func (wm *APIApplicationWriteModel) Reduce() error {
 		case *project.APIConfigSecretHashUpdatedEvent:
 			wm.HashedSecret = e.HashedSecret
 		case *project.ProjectRemovedEvent:
+			// wm.AppID = "" TODO(adlerhurst): reset or not?
+			wm.AppName = ""
+			wm.ClientID = ""
+			wm.HashedSecret = ""
+			wm.ClientSecretString = ""
+			wm.AuthMethodType = domain.APIAuthMethodTypeBasic
+			wm.api = false
 			wm.State = domain.AppStateRemoved
 		}
 	}

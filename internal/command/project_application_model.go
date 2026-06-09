@@ -87,6 +87,8 @@ func (wm *ApplicationWriteModel) Reduce() error {
 		case *project.ApplicationRemovedEvent:
 			wm.State = domain.AppStateRemoved
 		case *project.ProjectRemovedEvent:
+			// wm.AppID = "" TODO(adlerhurst): reset or not?
+			wm.Name = ""
 			wm.State = domain.AppStateRemoved
 		}
 	}

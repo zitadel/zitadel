@@ -103,6 +103,11 @@ func (wm *ProjectGrantWriteModel) Reduce() error {
 		case *project.GrantRemovedEvent:
 			wm.State = domain.ProjectGrantStateRemoved
 		case *project.ProjectRemovedEvent:
+			// wm.GrantID TODO(adlerhurst): reset or not?
+			// wm.GrantedOrgID TODO(adlerhurst): reset or not?
+			// wm.RoleKeys TODO(adlerhurst): reset or not?
+			// wm.State TODO(adlerhurst): reset or not?
+			// wm.FoundGrantID TODO(adlerhurst): reset or not?
 			wm.State = domain.ProjectGrantStateRemoved
 		}
 	}
@@ -158,6 +163,7 @@ func (wm *ProjectGrantPreConditionReadModel) Reduce() error {
 			}
 			wm.ProjectExists = true
 		case *project.ProjectRemovedEvent:
+			// TODO
 			if wm.ProjectResourceOwner != e.Aggregate().ResourceOwner {
 				continue
 			}
