@@ -22,19 +22,19 @@ type fakeIDPUser struct {
 	phone             domain.PhoneNumber
 }
 
-func (u fakeIDPUser) GetID() string                       { return u.id }
-func (u fakeIDPUser) GetFirstName() string                { return u.firstName }
-func (u fakeIDPUser) GetLastName() string                 { return u.lastName }
-func (u fakeIDPUser) GetDisplayName() string              { return u.displayName }
-func (u fakeIDPUser) GetNickname() string                 { return u.nickname }
-func (u fakeIDPUser) GetPreferredUsername() string        { return u.preferredUsername }
-func (u fakeIDPUser) GetEmail() domain.EmailAddress       { return u.email }
-func (u fakeIDPUser) IsEmailVerified() bool               { return false }
-func (u fakeIDPUser) GetPhone() domain.PhoneNumber        { return u.phone }
-func (u fakeIDPUser) IsPhoneVerified() bool               { return false }
-func (u fakeIDPUser) GetPreferredLanguage() language.Tag  { return language.Und }
-func (u fakeIDPUser) GetAvatarURL() string                { return "" }
-func (u fakeIDPUser) GetProfile() string                  { return "" }
+func (u fakeIDPUser) GetID() string                      { return u.id }
+func (u fakeIDPUser) GetFirstName() string               { return u.firstName }
+func (u fakeIDPUser) GetLastName() string                { return u.lastName }
+func (u fakeIDPUser) GetDisplayName() string             { return u.displayName }
+func (u fakeIDPUser) GetNickname() string                { return u.nickname }
+func (u fakeIDPUser) GetPreferredUsername() string       { return u.preferredUsername }
+func (u fakeIDPUser) GetEmail() domain.EmailAddress      { return u.email }
+func (u fakeIDPUser) IsEmailVerified() bool              { return false }
+func (u fakeIDPUser) GetPhone() domain.PhoneNumber       { return u.phone }
+func (u fakeIDPUser) IsPhoneVerified() bool              { return false }
+func (u fakeIDPUser) GetPreferredLanguage() language.Tag { return language.Und }
+func (u fakeIDPUser) GetAvatarURL() string               { return "" }
+func (u fakeIDPUser) GetProfile() string                 { return "" }
 
 func Test_idpUserFallbackUsername(t *testing.T) {
 	tests := []struct {
