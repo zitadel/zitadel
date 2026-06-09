@@ -38,10 +38,6 @@ let webhookEvents = new Array<ZITADELWebhookEvent>()
 let failWebhookEventsCount = 0
 
 export default defineConfig({
-  retries: {
-    runMode: 2,
-    openMode: 0,
-  },
   video: true,
   reporterOptions: {
     overwrite: false,
