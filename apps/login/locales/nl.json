@@ -381,6 +381,7 @@
     "userIdMissing": "Geen gebruikers-ID opgegeven!",
     "successTitle": "Gebruiker geverifieerd",
     "successDescription": "De gebruiker is succesvol geverifieerd.",
+    "successContinue": "Doorgaan",
     "setupAuthenticator": "Authenticator instellen",
     "verify": {
       "title": "Gebruiker verifiëren",

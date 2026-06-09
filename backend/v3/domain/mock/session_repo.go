@@ -46,3 +46,7 @@ func (s *SessionRepo) Update(ctx context.Context, client database.QueryExecutor,
 func (s *SessionRepo) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, time.Time, error) {
 	return s.mock.Delete(ctx, client, condition, permissionCondition)
 }
+
+func (s *SessionRepo) LoadUserData() domain.SessionRepository {
+	return s.mock.LoadUserData()
+}

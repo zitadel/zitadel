@@ -3,7 +3,6 @@ package command
 import (
 	"bytes"
 	"context"
-	"encoding/base64"
 	"fmt"
 	"time"
 
@@ -451,17 +450,17 @@ func (c *Commands) sessionUserResourceOwner(ctx context.Context, model *SessionW
 	return r.resourceOwner, nil
 }
 
-func sessionTokenCreator(idGenerator id.Generator, sessionAlg crypto.EncryptionAlgorithm) func(sessionID string) (id string, token string, err error) {
+func sessionTokenCreator(idGenerator id.Generator, sessionAlg crypto.AuthAlgorithm) func(sessionID string) (id string, token string, err error) {
 	return func(sessionID string) (id string, token string, err error) {
 		id, err = idGenerator.Next()
 		if err != nil {
 			return "", "", err
 		}
-		encrypted, err := sessionAlg.Encrypt([]byte(fmt.Sprintf(authz.SessionTokenFormat, sessionID, id)))
+		token, err = sessionAlg.EncryptToken(fmt.Sprintf(authz.SessionTokenFormat, sessionID, id))
 		if err != nil {
 			return "", "", err
 		}
-		return id, base64.RawURLEncoding.EncodeToString(encrypted), nil
+		return id, token, nil
 	}
 }
 

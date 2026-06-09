@@ -44,7 +44,7 @@
     },
     "build-vercel": {
       "description": "Builds the Next.js Login application for Vercel deployment",
-      "cache": true,
+      "cache": false,
       "dependsOn": ["^build"],
       "inputs": [
         "default",
@@ -54,7 +54,7 @@
         "!{projectRoot}/acceptance/**/*",
         "!{projectRoot}/dockerized/**/*"
       ],
-      "outputs": ["{projectRoot}/.next", "!{projectRoot}/.next/cache", "!{projectRoot}/.next/standalone"]
+      "outputs": ["{projectRoot}/.next/!(cache|standalone)/**"]
     },
     "lint": {
       "description": "Runs all linters",
@@ -77,7 +77,7 @@
     },
     "test-unit": {
       "description": "Runs unit tests using Vitest",
-      "dependsOn": ["^build"]
+      "dependsOn": ["build"]
     },
     "test-dockerized": {
       "description": "Runs dockerized integration tests (OpenTelemetry and custom CA certificate tests)",

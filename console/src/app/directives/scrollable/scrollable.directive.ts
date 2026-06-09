@@ -6,9 +6,9 @@ import { Directive, ElementRef, EventEmitter, HostListener, Output } from '@angu
 })
 export class ScrollableDirective {
   // when using this directive, add overflow-y scroll to css
-  @Output() scrollPosition: EventEmitter<any> = new EventEmitter();
+  @Output() scrollPosition: EventEmitter<'bottom' | 'top'> = new EventEmitter();
 
-  constructor(public el: ElementRef) {}
+  constructor(private readonly el: ElementRef) {}
 
   @HostListener('scroll', ['$event'])
   public onScroll(event: any): void {

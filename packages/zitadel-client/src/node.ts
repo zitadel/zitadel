@@ -19,7 +19,7 @@ import { NewAuthorizationBearerInterceptor } from "./interceptors.js";
  */
 export function createServerTransport(
   token: string,
-  opts: GrpcTransportOptions
+  opts: GrpcTransportOptions,
 ) {
   return createGrpcTransport({
     ...opts,
@@ -39,7 +39,10 @@ function toPKCS8(pem: string): string {
   if (pem.includes("BEGIN PRIVATE KEY")) {
     return pem;
   }
-  return createPrivateKey(pem).export({ type: "pkcs8", format: "pem" }) as string;
+  return createPrivateKey(pem).export({
+    type: "pkcs8",
+    format: "pem",
+  }) as string;
 }
 
 export async function newSystemToken({
@@ -79,14 +82,14 @@ export async function verifyJwt<T = JWTPayload>(
     publicHost?: string;
   },
 ): Promise<T & JWTPayload> {
-   const headers: Record<string, string> = {};
-   if (options?.instanceHost) {
-     headers["x-zitadel-instance-host"] = options.instanceHost;
-   }
-   if (options?.publicHost) {
-     headers["x-zitadel-public-host"] = options.publicHost;
-   }
-  const JWKS = createRemoteJWKSet(new URL(keysEndpoint), {headers: headers});
+  const headers: Record<string, string> = {};
+  if (options?.instanceHost) {
+    headers["x-zitadel-instance-host"] = options.instanceHost;
+  }
+  if (options?.publicHost) {
+    headers["x-zitadel-public-host"] = options.publicHost;
+  }
+  const JWKS = createRemoteJWKSet(new URL(keysEndpoint), { headers: headers });
 
   const { payload } = await jwtVerify(token, JWKS, {
     issuer: options?.issuer,

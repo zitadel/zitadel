@@ -2096,7 +2096,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 								Scopes:          []string{openid.ScopeOpenID},
 								AllowedUserType: domain.UserTypeMachine,
 								TokenID:         "tokenID",
-								Token:           "dG9rZW5JRDp1c2VySUQ", // token
+								Token:           "tokenID:userID",
 							},
 						},
 					},
@@ -2151,6 +2151,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 						Role: domain.RoleOrgOwner,
 					},
 				},
+				authAlgorithm: &mockAuthCrypto{},
 			}
 			got, err := r.SetUpOrg(tt.args.ctx, tt.args.setupOrg, tt.args.allowInitialMail, tt.args.permissionCheck, tt.args.userIDs...)
 			assert.ErrorIs(t, err, tt.res.err)

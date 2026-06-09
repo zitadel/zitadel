@@ -99,6 +99,20 @@ func testSecretGeneratorAddedEvent(typ domain.SecretGeneratorType) *instance.Sec
 	)
 }
 
+type mockAuthCrypto struct{}
+
+func (m *mockAuthCrypto) EncryptToken(data string) (string, error) {
+	return data, nil
+}
+
+func (m *mockAuthCrypto) DecryptToken(token string) (string, error) {
+	return token, nil
+}
+
+func (m *mockAuthCrypto) LegacyTokenEnabled() bool {
+	return false
+}
+
 func Test_newCryptoCode(t *testing.T) {
 	type args struct {
 		typ domain.SecretGeneratorType
@@ -248,7 +262,7 @@ func Test_newHashedSecretWithDefault(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			hasher := &crypto.Hasher{
-				Swapper: passwap.NewSwapper(bcrypt.New(bcrypt.MinCost)),
+				Swapper: passwap.NewSwapper(bcrypt.New(bcrypt.DefaultMinCost, nil)),
 			}
 			defaultConfig := &crypto.GeneratorConfig{
 				Length:              32,

@@ -2,7 +2,6 @@ package oidc
 
 import (
 	"context"
-	"encoding/base64"
 	"slices"
 	"time"
 
@@ -144,16 +143,4 @@ func (s *Server) createJWT(ctx context.Context, client op.Client, session *comma
 	claims.Claims = userInfo.Claims
 
 	return crypto.Sign(claims, signer)
-}
-
-// decryptCode decrypts a code or refresh_token
-func (s *Server) decryptCode(ctx context.Context, code string) (_ string, err error) {
-	_, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	decoded, err := base64.RawURLEncoding.DecodeString(code)
-	if err != nil {
-		return "", err
-	}
-	return s.encAlg.DecryptString(decoded, s.encAlg.EncryptionKeyID())
 }

@@ -124,7 +124,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
           const membershipOrg = await this.authService.getActiveOrg(membership.orgId);
           await this.router.navigate(['/org/members']);
           this.startOrgContextWorkflow(membershipOrg?.id, org.id);
-        } catch (error) {
+        } catch {
           this.toast.showInfo('USER.MEMBERSHIPS.NOPERMISSIONTOEDIT', true);
         }
       } else if (membership.projectGrantId && membership.details?.resourceOwner) {
@@ -133,7 +133,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
           const membershipOrg = await this.authService.getActiveOrg(membership.details?.resourceOwner);
           await this.router.navigate(['/granted-projects', membership.projectId, 'grants', membership.projectGrantId]);
           this.startOrgContextWorkflow(membershipOrg?.id, org.id);
-        } catch (error) {
+        } catch {
           this.toast.showInfo('USER.MEMBERSHIPS.NOPERMISSIONTOEDIT', true);
         }
       } else if (membership.projectId && membership.details?.resourceOwner) {
@@ -142,7 +142,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
           const membershipOrg = await this.authService.getActiveOrg(membership.details?.resourceOwner);
           await this.router.navigate(['/projects', membership.projectId, 'members']);
           this.startOrgContextWorkflow(membershipOrg?.id, org.id);
-        } catch (error) {
+        } catch {
           this.toast.showInfo('USER.MEMBERSHIPS.NOPERMISSIONTOEDIT', true);
         }
       } else if (membership.iam) {

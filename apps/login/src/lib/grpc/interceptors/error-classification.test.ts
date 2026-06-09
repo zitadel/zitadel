@@ -38,7 +38,15 @@ describe("ClassifiedConnectError", () => {
 
     expect(classified.message).toContain("not found");
     expect(classified.code).toBe(Code.NotFound);
-    expect(classified.name).toBe("ClassifiedConnectError");
+    // name must remain "ConnectError" so ConnectError's custom Symbol.hasInstance passes
+    expect(classified.name).toBe("ConnectError");
+  });
+
+  it("is instanceof ConnectError (required for ConnectError.from compatibility)", () => {
+    const source = new ConnectError("test", Code.FailedPrecondition);
+    const classified = new ClassifiedConnectError(source);
+
+    expect(classified instanceof ConnectError).toBe(true);
   });
 
   it("sets httpStatus from gRPC code", () => {

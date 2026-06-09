@@ -82,7 +82,7 @@
               padding: 2px;
               margin: -2px -9px -2px 8px;
               margin-left: 6px;
-              background-color: if($is-dark-theme, #ffffff20, #00000020);
+              background-color: if(sass($is-dark-theme): #ffffff20; else: #00000020);
               line-height: 18px;
               font-size: 11px;
               transition: background 0.2s ease;
@@ -100,7 +100,7 @@
           }
 
           &:hover {
-            background: if($is-dark-theme, #ffffff40, #00000010);
+            background: if(sass($is-dark-theme): #ffffff40; else: #00000010);
           }
 
           &.active {
@@ -110,7 +110,7 @@
             .c_label {
               .count {
                 display: inline-block;
-                background-color: if($is-dark-theme, #00000020, #ffffff20);
+                background-color: if(sass($is-dark-theme): #00000020; else: #ffffff20);
               }
             }
           }
@@ -136,7 +136,7 @@
       transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
 
       .slash {
-        color: if($is-dark-theme, #525454, #d1d5d9);
+        color: if(sass($is-dark-theme): #525454; else: #d1d5d9);
       }
 
       .org-button {
@@ -185,7 +185,7 @@
     margin-right: 0.5rem;
     width: 100px;
     min-width: 50px;
-    background: if($is-dark-theme, #ffffff20, #00000010);
+    background: if(sass($is-dark-theme): #ffffff20; else: #00000010);
     border: none;
     padding: 2px;
     border-radius: 50vw;
@@ -193,7 +193,7 @@
     display: flex;
 
     &:hover {
-      background: if($is-dark-theme, #ffffff, $primary-color);
+      background: if(sass($is-dark-theme): #ffffff; else: $primary-color);
       transition: background ease 0.15s;
     }
 
@@ -227,7 +227,7 @@
       right: 0;
       bottom: 0;
       left: 0;
-      background: if($is-dark-theme, #fff, #000);
+      background: if(sass($is-dark-theme): #fff; else: #000);
       opacity: 0.15;
       border-radius: 4px;
     }

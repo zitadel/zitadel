@@ -40,7 +40,7 @@ type EncryptionKeyConfig struct {
 type EncryptionKeys struct {
 	DomainVerification crypto.EncryptionAlgorithm
 	IDPConfig          crypto.EncryptionAlgorithm
-	OIDC               crypto.EncryptionAlgorithm
+	OIDC               crypto.AuthEncryptionAlgorithm
 	SAML               crypto.EncryptionAlgorithm
 	OTP                crypto.EncryptionAlgorithm
 	SMS                crypto.EncryptionAlgorithm
