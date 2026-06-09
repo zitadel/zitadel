@@ -2,6 +2,7 @@ package crypto
 
 import (
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -44,6 +45,28 @@ func (h *Hasher) EncodingSupported(encodedHash string) bool {
 	return false
 }
 
+// ValidateEncodedHash checks that encoded is parseable by a configured verifier
+// and that its cost parameters are within configured bounds.
+// Use when accepting pre-encoded hashes from untrusted sources (import, create with hash).
+// It intentionally returns password-scoped errors for compatibility with current callers.
+func (h *Hasher) ValidateEncodedHash(encoded string) error {
+	if encoded == "" {
+		return nil
+	}
+	err := h.Validate(encoded)
+	if err == nil {
+		return nil
+	}
+	if errors.Is(err, passwap.ErrNoVerifier) {
+		return zerrors.ThrowInvalidArgument(err, "CRYPT-2xK7d", "Errors.Hash.NotSupported")
+	}
+	var bounds *verifier.BoundsError
+	if errors.As(err, &bounds) {
+		return zerrors.ThrowInvalidArgument(err, "CRYPT-5uV9n", "Errors.User.Password.Invalid")
+	}
+	return zerrors.ThrowInvalidArgument(err, "CRYPT-r8Qm2", "Errors.User.Password.Invalid")
+}
+
 type HashName string
 
 const (
@@ -76,6 +99,121 @@ const (
 type HashConfig struct {
 	Verifiers []HashName
 	Hasher    HasherConfig
+	Limits    HashLimitsConfig
+}
+
+type HashLimitsConfig struct {
+	Bcrypt  BcryptLimitsConfig
+	Argon2  Argon2LimitsConfig
+	Scrypt  ScryptLimitsConfig
+	PBKDF2  PBKDF2LimitsConfig
+	Sha2    Sha2LimitsConfig
+	PHPass  PHPassLimitsConfig
+	Drupal7 Drupal7LimitsConfig
+}
+
+type BcryptLimitsConfig struct {
+	MinCost int
+	MaxCost int
+}
+
+func (l BcryptLimitsConfig) validationOpts() *bcrypt.ValidationOpts {
+	return &bcrypt.ValidationOpts{
+		MinCost: l.MinCost,
+		MaxCost: l.MaxCost,
+	}
+}
+
+type Argon2LimitsConfig struct {
+	MinTime    uint32
+	MaxTime    uint32
+	MinMemory  uint32
+	MaxMemory  uint32
+	MinThreads uint8
+	MaxThreads uint8
+}
+
+func (l Argon2LimitsConfig) validationOpts() *argon2.ValidationOpts {
+	return &argon2.ValidationOpts{
+		MinTime:    l.MinTime,
+		MaxTime:    l.MaxTime,
+		MinMemory:  l.MinMemory,
+		MaxMemory:  l.MaxMemory,
+		MinThreads: l.MinThreads,
+		MaxThreads: l.MaxThreads,
+	}
+}
+
+type ScryptLimitsConfig struct {
+	MinLN int
+	MaxLN int
+	MinR  int
+	MaxR  int
+	MinP  int
+	MaxP  int
+}
+
+func (l ScryptLimitsConfig) validationOpts() *scrypt.ValidationOpts {
+	return &scrypt.ValidationOpts{
+		MinLN: l.MinLN,
+		MaxLN: l.MaxLN,
+		MinR:  l.MinR,
+		MaxR:  l.MaxR,
+		MinP:  l.MinP,
+		MaxP:  l.MaxP,
+	}
+}
+
+type PBKDF2LimitsConfig struct {
+	MinRounds uint32
+	MaxRounds uint32
+}
+
+func (l PBKDF2LimitsConfig) validationOpts() *pbkdf2.ValidationOpts {
+	return &pbkdf2.ValidationOpts{
+		MinRounds: l.MinRounds,
+		MaxRounds: l.MaxRounds,
+	}
+}
+
+type Sha2LimitsConfig struct {
+	MinSha256Rounds int
+	MaxSha256Rounds int
+	MinSha512Rounds int
+	MaxSha512Rounds int
+}
+
+func (l Sha2LimitsConfig) validationOpts() *sha2.ValidationOpts {
+	return &sha2.ValidationOpts{
+		MinSha256Rounds: l.MinSha256Rounds,
+		MaxSha256Rounds: l.MaxSha256Rounds,
+		MinSha512Rounds: l.MinSha512Rounds,
+		MaxSha512Rounds: l.MaxSha512Rounds,
+	}
+}
+
+type PHPassLimitsConfig struct {
+	MinRounds int
+	MaxRounds int
+}
+
+func (l PHPassLimitsConfig) validationOpts() *phpass.ValidationOpts {
+	return &phpass.ValidationOpts{
+		MinRounds: l.MinRounds,
+		MaxRounds: l.MaxRounds,
+	}
+}
+
+type Drupal7LimitsConfig struct {
+	MinIterations int
+	MaxIterations int
+}
+
+func (l Drupal7LimitsConfig) validationOpts() *drupal7.ValidationOpts {
+	return &drupal7.ValidationOpts{
+		MinIterations: l.MinIterations,
+		MaxIterations: l.MaxIterations,
+	}
 }
 
 func (c *HashConfig) NewHasher() (*Hasher, error) {
@@ -83,7 +221,7 @@ func (c *HashConfig) NewHasher() (*Hasher, error) {
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "CRYPT-sahW9", "password hash config invalid")
 	}
-	hasher, hPrefixes, err := c.Hasher.buildHasher()
+	hasher, hPrefixes, err := c.Hasher.buildHasher(c.Limits)
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "CRYPT-Que4r", "password hash config invalid")
 	}
@@ -99,49 +237,70 @@ type prefixVerifier struct {
 	verifier verifier.Verifier
 }
 
-// map HashNames to Verifier instances.
-var knowVerifiers = map[HashName]prefixVerifier{
-	HashNameArgon2: {
-		// only argon2i and argon2id are suppored.
-		// The Prefix constant also covers argon2d.
-		prefixes: []string{argon2.Prefix},
-		verifier: argon2.Verifier,
+type verifierFactory func(limits HashLimitsConfig) prefixVerifier
+
+var knowVerifiers = map[HashName]verifierFactory{
+	HashNameArgon2: func(l HashLimitsConfig) prefixVerifier {
+		return prefixVerifier{
+			// verifier for both argon2i and argon2id.
+			prefixes: []string{argon2.Prefix},
+			verifier: argon2.NewVerifier(l.Argon2.validationOpts()),
+		}
 	},
-	HashNameBcrypt: {
-		prefixes: []string{bcrypt.Prefix},
-		verifier: bcrypt.Verifier,
+	HashNameBcrypt: func(l HashLimitsConfig) prefixVerifier {
+		return prefixVerifier{
+			prefixes: []string{bcrypt.Prefix},
+			verifier: bcrypt.NewVerifier(l.Bcrypt.validationOpts()),
+		}
 	},
-	HashNameMd5: {
-		prefixes: []string{md5.Prefix},
-		verifier: md5.Verifier,
+	HashNameMd5: func(_ HashLimitsConfig) prefixVerifier {
+		return prefixVerifier{
+			prefixes: []string{md5.Prefix},
+			verifier: md5.NewVerifier(),
+		}
 	},
-	HashNameMd5Plain: {
-		prefixes: nil, // hex encoded without identifier or prefix
-		verifier: md5plain.Verifier,
+	HashNameMd5Plain: func(_ HashLimitsConfig) prefixVerifier {
+		return prefixVerifier{
+			// hex encoded without identifier or prefix.
+			prefixes: nil,
+			verifier: md5plain.NewVerifier(),
+		}
 	},
-	HashNameScrypt: {
-		prefixes: []string{scrypt.Prefix, scrypt.Prefix_Linux},
-		verifier: scrypt.Verifier,
+	HashNameScrypt: func(l HashLimitsConfig) prefixVerifier {
+		return prefixVerifier{
+			prefixes: []string{scrypt.Prefix, scrypt.Prefix_Linux},
+			verifier: scrypt.NewVerifier(l.Scrypt.validationOpts()),
+		}
 	},
-	HashNamePBKDF2: {
-		prefixes: []string{pbkdf2.Prefix},
-		verifier: pbkdf2.Verifier,
+	HashNamePBKDF2: func(l HashLimitsConfig) prefixVerifier {
+		return prefixVerifier{
+			prefixes: []string{pbkdf2.Prefix},
+			verifier: pbkdf2.NewVerifier(l.PBKDF2.validationOpts()),
+		}
 	},
-	HashNameMd5Salted: {
-		prefixes: []string{md5salted.Prefix},
-		verifier: md5salted.Verifier,
+	HashNameMd5Salted: func(_ HashLimitsConfig) prefixVerifier {
+		return prefixVerifier{
+			prefixes: []string{md5salted.Prefix},
+			verifier: md5salted.NewVerifier(),
+		}
 	},
-	HashNameSha2: {
-		prefixes: []string{sha2.Sha256Identifier, sha2.Sha512Identifier},
-		verifier: sha2.Verifier,
+	HashNameSha2: func(l HashLimitsConfig) prefixVerifier {
+		return prefixVerifier{
+			prefixes: []string{sha2.Sha256Identifier, sha2.Sha512Identifier},
+			verifier: sha2.NewVerifier(l.Sha2.validationOpts()),
+		}
 	},
-	HashNamePHPass: {
-		prefixes: []string{phpass.IdentifierP, phpass.IdentifierH},
-		verifier: phpass.Verifier,
+	HashNamePHPass: func(l HashLimitsConfig) prefixVerifier {
+		return prefixVerifier{
+			prefixes: []string{phpass.IdentifierP, phpass.IdentifierH},
+			verifier: phpass.NewVerifier(l.PHPass.validationOpts()),
+		}
 	},
-	HashNameDrupal7: {
-		prefixes: []string{drupal7.Identifier},
-		verifier: drupal7.Verifier,
+	HashNameDrupal7: func(l HashLimitsConfig) prefixVerifier {
+		return prefixVerifier{
+			prefixes: []string{drupal7.Identifier},
+			verifier: drupal7.NewVerifier(l.Drupal7.validationOpts()),
+		}
 	},
 }
 
@@ -149,10 +308,11 @@ func (c *HashConfig) buildVerifiers() (verifiers []verifier.Verifier, prefixes [
 	verifiers = make([]verifier.Verifier, len(c.Verifiers))
 	prefixes = make([]string, 0, len(c.Verifiers)+1)
 	for i, name := range c.Verifiers {
-		v, ok := knowVerifiers[name]
+		factory, ok := knowVerifiers[name]
 		if !ok {
 			return nil, nil, fmt.Errorf("invalid verifier %q", name)
 		}
+		v := factory(c.Limits)
 		verifiers[i] = v.verifier
 		prefixes = append(prefixes, v.prefixes...)
 	}
@@ -164,20 +324,20 @@ type HasherConfig struct {
 	Params    map[string]any `mapstructure:",remain"`
 }
 
-func (c *HasherConfig) buildHasher() (hasher passwap.Hasher, prefixes []string, err error) {
+func (c *HasherConfig) buildHasher(limits HashLimitsConfig) (hasher passwap.Hasher, prefixes []string, err error) {
 	switch c.Algorithm {
 	case HashNameArgon2i:
-		return c.argon2i()
+		return c.argon2i(limits)
 	case HashNameArgon2id:
-		return c.argon2id()
+		return c.argon2id(limits)
 	case HashNameBcrypt:
-		return c.bcrypt()
+		return c.bcrypt(limits)
 	case HashNameScrypt:
-		return c.scrypt()
+		return c.scrypt(limits)
 	case HashNamePBKDF2:
-		return c.pbkdf2()
+		return c.pbkdf2(limits)
 	case HashNameSha2:
-		return c.sha2()
+		return c.sha2(limits)
 	case "":
 		return nil, nil, fmt.Errorf("missing hasher algorithm")
 	case HashNameArgon2, HashNameMd5, HashNameMd5Plain, HashNameMd5Salted, HashNamePHPass, HashNameDrupal7:
@@ -220,20 +380,20 @@ func (c *HasherConfig) argon2Params(p argon2.Params) (argon2.Params, error) {
 	return p, nil
 }
 
-func (c *HasherConfig) argon2i() (passwap.Hasher, []string, error) {
+func (c *HasherConfig) argon2i(limits HashLimitsConfig) (passwap.Hasher, []string, error) {
 	p, err := c.argon2Params(argon2.RecommendedIParams)
 	if err != nil {
 		return nil, nil, err
 	}
-	return argon2.NewArgon2i(p), []string{argon2.Prefix}, nil
+	return argon2.NewArgon2i(p, limits.Argon2.validationOpts()), []string{argon2.Prefix}, nil
 }
 
-func (c *HasherConfig) argon2id() (passwap.Hasher, []string, error) {
+func (c *HasherConfig) argon2id(limits HashLimitsConfig) (passwap.Hasher, []string, error) {
 	p, err := c.argon2Params(argon2.RecommendedIDParams)
 	if err != nil {
 		return nil, nil, err
 	}
-	return argon2.NewArgon2id(p), []string{argon2.Prefix}, nil
+	return argon2.NewArgon2id(p, limits.Argon2.validationOpts()), []string{argon2.Prefix}, nil
 }
 
 func (c *HasherConfig) bcryptCost() (int, error) {
@@ -246,12 +406,12 @@ func (c *HasherConfig) bcryptCost() (int, error) {
 	return dst.Cost, nil
 }
 
-func (c *HasherConfig) bcrypt() (passwap.Hasher, []string, error) {
+func (c *HasherConfig) bcrypt(limits HashLimitsConfig) (passwap.Hasher, []string, error) {
 	cost, err := c.bcryptCost()
 	if err != nil {
 		return nil, nil, err
 	}
-	return bcrypt.New(cost), []string{bcrypt.Prefix}, nil
+	return bcrypt.New(cost, limits.Bcrypt.validationOpts()), []string{bcrypt.Prefix}, nil
 }
 
 func (c *HasherConfig) scryptParams() (scrypt.Params, error) {
@@ -262,16 +422,16 @@ func (c *HasherConfig) scryptParams() (scrypt.Params, error) {
 		return scrypt.Params{}, fmt.Errorf("decode scrypt params: %w", err)
 	}
 	p := scrypt.RecommendedParams // copy
-	p.N = 1 << dst.Cost
+	p.LN = dst.Cost
 	return p, nil
 }
 
-func (c *HasherConfig) scrypt() (passwap.Hasher, []string, error) {
+func (c *HasherConfig) scrypt(limits HashLimitsConfig) (passwap.Hasher, []string, error) {
 	p, err := c.scryptParams()
 	if err != nil {
 		return nil, nil, err
 	}
-	return scrypt.New(p), []string{scrypt.Prefix, scrypt.Prefix_Linux}, nil
+	return scrypt.New(p, limits.Scrypt.validationOpts()), []string{scrypt.Prefix, scrypt.Prefix_Linux}, nil
 }
 
 func (c *HasherConfig) pbkdf2Params() (p pbkdf2.Params, _ HashMode, _ error) {
@@ -298,23 +458,24 @@ func (c *HasherConfig) pbkdf2Params() (p pbkdf2.Params, _ HashMode, _ error) {
 	return p, dst.Hash, nil
 }
 
-func (c *HasherConfig) pbkdf2() (passwap.Hasher, []string, error) {
+func (c *HasherConfig) pbkdf2(limits HashLimitsConfig) (passwap.Hasher, []string, error) {
 	p, hash, err := c.pbkdf2Params()
 	if err != nil {
 		return nil, nil, err
 	}
+	opts := limits.PBKDF2.validationOpts()
 	prefix := []string{pbkdf2.Prefix}
 	switch hash {
 	case HashModeSHA1:
-		return pbkdf2.NewSHA1(p), prefix, nil
+		return pbkdf2.NewSHA1(p, opts), prefix, nil
 	case HashModeSHA224:
-		return pbkdf2.NewSHA224(p), prefix, nil
+		return pbkdf2.NewSHA224(p, opts), prefix, nil
 	case HashModeSHA256:
-		return pbkdf2.NewSHA256(p), prefix, nil
+		return pbkdf2.NewSHA256(p, opts), prefix, nil
 	case HashModeSHA384:
-		return pbkdf2.NewSHA384(p), prefix, nil
+		return pbkdf2.NewSHA384(p, opts), prefix, nil
 	case HashModeSHA512:
-		return pbkdf2.NewSHA512(p), prefix, nil
+		return pbkdf2.NewSHA512(p, opts), prefix, nil
 	default:
 		return nil, nil, fmt.Errorf("unsupported pbkdf2 hash mode: %s", hash)
 	}
@@ -346,14 +507,14 @@ func (c *HasherConfig) sha2Params() (use512 bool, rounds int, err error) {
 	return use512, rounds, nil
 }
 
-func (c *HasherConfig) sha2() (passwap.Hasher, []string, error) {
+func (c *HasherConfig) sha2(limits HashLimitsConfig) (passwap.Hasher, []string, error) {
 	use512, rounds, err := c.sha2Params()
 	if err != nil {
 		return nil, nil, err
 	}
+	opts := limits.Sha2.validationOpts()
 	if use512 {
-		return sha2.New512(rounds), []string{sha2.Sha256Identifier, sha2.Sha512Identifier}, nil
-	} else {
-		return sha2.New256(rounds), []string{sha2.Sha256Identifier, sha2.Sha512Identifier}, nil
+		return sha2.New512(rounds, opts), []string{sha2.Sha256Identifier, sha2.Sha512Identifier}, nil
 	}
+	return sha2.New256(rounds, opts), []string{sha2.Sha256Identifier, sha2.Sha512Identifier}, nil
 }
