@@ -85,7 +85,7 @@
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
     "globals": "^17.6.0",
-    "jasmine-core": "~5.12.1",
+    "jasmine-core": "~6.3.0",
     "jasmine-spec-reporter": "~7.0.0",
     "karma": "^6.4.4",
     "karma-chrome-launcher": "^3.2.0",
