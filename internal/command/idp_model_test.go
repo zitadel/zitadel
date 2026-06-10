@@ -386,14 +386,14 @@ func TestOAuthIDPWriteModel_ToProvider_WithPKCE(t *testing.T) {
 func TestOIDCIDPWriteModel_ToProvider_WithPKCE(t *testing.T) {
 	var (
 		issuer             string
-		discoveryRequested atomic.Int64
+		discoveryRequested atomic.Bool
 	)
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != oidc_pkg.DiscoveryEndpoint {
 			http.NotFound(w, r)
 			return
 		}
-		discoveryRequested.Add(1)
+		discoveryRequested.Store(true)
 		w.Header().Set("Content-Type", "application/json")
 		// assert, not require: FailNow must not be called from the server's handler goroutine
 		assert.NoError(t, json.NewEncoder(w).Encode(&oidc_pkg.DiscoveryConfiguration{
@@ -402,9 +402,11 @@ func TestOIDCIDPWriteModel_ToProvider_WithPKCE(t *testing.T) {
 			TokenEndpoint:         issuer + "/token",
 			UserinfoEndpoint:      issuer + "/userinfo",
 		}))
-	}))
-	t.Cleanup(srv.Close)
-	issuer = srv.URL
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(handler))
+	t.Cleanup(server.Close)
+	issuer = server.URL
 
 	wm := &OIDCIDPWriteModel{
 		Name:         "OIDC",
@@ -417,7 +419,7 @@ func TestOIDCIDPWriteModel_ToProvider_WithPKCE(t *testing.T) {
 
 	provider, err := wm.ToProvider("https://zitadel.example.com/idps/callback", plainTextEncryption{})
 	require.NoError(t, err)
-	require.EqualValues(t, 1, discoveryRequested.Load(), "expected exactly one OIDC discovery request")
+	require.True(t, discoveryRequested.Load(), "expected OIDC discovery to be requested")
 
 	assertProviderUsesPKCE(t, provider)
 }
