@@ -342,18 +342,6 @@ func (wm *UserV2WriteModel) Reduce() error {
 			wm.Metadata = nil
 			wm.UserState = domain.UserStateDeleted
 
-			// wm.MachineWriteModel = false TODO(adlerhurst): reset or not?
-			// wm.MachineSecretWriteModel = false TODO(adlerhurst): reset or not?
-			// wm.ProfileWriteModel = false TODO(adlerhurst): reset or not?
-			// wm.AvatarWriteModel = false TODO(adlerhurst): reset or not?
-			// wm.HumanWriteModel = false TODO(adlerhurst): reset or not?
-			// wm.PasswordWriteModel = false TODO(adlerhurst): reset or not?
-			// wm.EmailWriteModel = false TODO(adlerhurst): reset or not?
-			// wm.PhoneWriteModel = false TODO(adlerhurst): reset or not?
-			// wm.StateWriteModel = false TODO(adlerhurst): reset or not?
-			// wm.IDPLinkWriteModel = false TODO(adlerhurst): reset or not?
-			// wm.MetadataWriteModel = false TODO(adlerhurst): reset or not?
-
 		case *user.HumanPasswordHashUpdatedEvent:
 			wm.PasswordEncodedHash = e.EncodedHash
 		case *user.HumanPasswordCheckFailedEvent:
