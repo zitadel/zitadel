@@ -117,9 +117,9 @@ BEGIN
             ELSE COALESCE(e.owner, c.owner)
         END AS owner
         , EXTRACT(EPOCH FROM NOW()) AS position
-        , c.ordinality::%s -- AS in_tx_order
+        , c.ordinality::%s AS in_tx_order
     FROM UNNEST(commands) WITH ORDINALITY AS c
-    LEFT JOIN unnest(latest_events) AS e
+    LEFT JOIN unnest(_latest_events) AS e
         ON c.instance_id = e.instance_id
         AND c.aggregate_type = e.aggregate_type
         AND c.aggregate_id = e.aggregate_id
