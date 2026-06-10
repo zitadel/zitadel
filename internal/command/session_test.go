@@ -1029,7 +1029,7 @@ func TestCommands_updateSession(t *testing.T) {
 							"userID", "org1", testNow, &language.Afrikaans),
 						session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							testNow),
-						idpintent.NewConsumedEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate),
+						idpintent.NewConsumedEvent(context.Background(), &idpintent.NewAggregate("intent", "instance1").Aggregate), // TODO(adlerhurst): previously it was the org id of the user, but that doesn't make sense, should be the instance id
 						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							"tokenID"),
 					),
