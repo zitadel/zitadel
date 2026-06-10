@@ -125,7 +125,7 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build Linux API binaries
         env:
-          GOFIPS140: ${{ matrix.gofips140 }}
+          ZITADEL_GOFIPS140: ${{ matrix.gofips140 }}
           ZITADEL_VERSION: ${{ needs.version.outputs.version }}
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
         run: pnpm nx run-many --nxBail -p @zitadel/api -t pack-linux-amd64,pack-linux-arm64
