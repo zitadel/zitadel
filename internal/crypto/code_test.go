@@ -207,3 +207,64 @@ func Test_verifyEncryptedCode(t *testing.T) {
 		})
 	}
 }
+
+func TestGenerateRandomString(t *testing.T) {
+	tests := []struct {
+		name    string
+		length  uint
+		chars   []rune
+		want    string
+		wantErr bool
+	}{
+		{
+			name:    "empty chars returns error",
+			length:  5,
+			chars:   nil,
+			wantErr: true,
+		},
+		{
+			name:   "zero length returns empty string",
+			length: 0,
+			chars:  []rune{'a', 'b'},
+			want:   "",
+		},
+		{
+			name:   "single charset char is used for all positions",
+			length: 4,
+			chars:  []rune{'x'},
+			want:   "xxxx",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GenerateRandomString(tt.length, tt.chars)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("GenerateRandomString() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if got != tt.want {
+				t.Errorf("GenerateRandomString() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGenerateRandomString_UsesOnlyProvidedChars(t *testing.T) {
+	chars := []rune("abcXYZ09")
+	got, err := GenerateRandomString(32, chars)
+	if err != nil {
+		t.Fatalf("GenerateRandomString() error = %v", err)
+	}
+	if len([]rune(got)) != 32 {
+		t.Fatalf("GenerateRandomString() length = %d, want %d", len([]rune(got)), 32)
+	}
+	allowed := make(map[rune]struct{}, len(chars))
+	for _, r := range chars {
+		allowed[r] = struct{}{}
+	}
+	for _, r := range got {
+		if _, ok := allowed[r]; !ok {
+			t.Fatalf("GenerateRandomString() produced rune %q not in charset", r)
+		}
+	}
+}
