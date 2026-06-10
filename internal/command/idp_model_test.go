@@ -2,10 +2,13 @@ package command
 
 import (
 	"context"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"net/url"
+	"sync/atomic"
 	"testing"
 
-	"github.com/h2non/gock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	oidc_pkg "github.com/zitadel/oidc/v3/pkg/oidc"
@@ -381,18 +384,27 @@ func TestOAuthIDPWriteModel_ToProvider_WithPKCE(t *testing.T) {
 }
 
 func TestOIDCIDPWriteModel_ToProvider_WithPKCE(t *testing.T) {
-	issuer := "https://idp.example.com"
-
-	defer gock.Off()
-	gock.New(issuer).
-		Get(oidc_pkg.DiscoveryEndpoint).
-		Reply(200).
-		JSON(&oidc_pkg.DiscoveryConfiguration{
+	var (
+		issuer             string
+		discoveryRequested atomic.Int64
+	)
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != oidc_pkg.DiscoveryEndpoint {
+			http.NotFound(w, r)
+			return
+		}
+		discoveryRequested.Add(1)
+		w.Header().Set("Content-Type", "application/json")
+		// assert, not require: FailNow must not be called from the server's handler goroutine
+		assert.NoError(t, json.NewEncoder(w).Encode(&oidc_pkg.DiscoveryConfiguration{
 			Issuer:                issuer,
 			AuthorizationEndpoint: issuer + "/authorize",
 			TokenEndpoint:         issuer + "/token",
 			UserinfoEndpoint:      issuer + "/userinfo",
-		})
+		}))
+	}))
+	t.Cleanup(srv.Close)
+	issuer = srv.URL
 
 	wm := &OIDCIDPWriteModel{
 		Name:         "OIDC",
@@ -405,7 +417,7 @@ func TestOIDCIDPWriteModel_ToProvider_WithPKCE(t *testing.T) {
 
 	provider, err := wm.ToProvider("https://zitadel.example.com/idps/callback", plainTextEncryption{})
 	require.NoError(t, err)
-	require.True(t, gock.IsDone(), "expected OIDC discovery request to be consumed")
+	require.EqualValues(t, 1, discoveryRequested.Load(), "expected exactly one OIDC discovery request")
 
 	assertProviderUsesPKCE(t, provider)
 }
