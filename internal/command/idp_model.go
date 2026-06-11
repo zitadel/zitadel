@@ -179,7 +179,10 @@ func (wm *OAuthIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encry
 		RedirectURL: callbackURL,
 		Scopes:      wm.Scopes,
 	}
-	opts := make([]oauth.ProviderOpts, 0, 4)
+	opts := make([]oauth.ProviderOpts, 0, 5)
+	if wm.UsePKCE {
+		opts = append(opts, oauth.WithRelyingPartyOption(rp.WithPKCE(nil)))
+	}
 	if wm.IsCreationAllowed {
 		opts = append(opts, oauth.WithCreationAllowed())
 	}
@@ -382,10 +385,13 @@ func (wm *OIDCIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]oidc.ProviderOpts, 1, 6)
+	opts := make([]oidc.ProviderOpts, 1, 7)
 	opts[0] = oidc.WithSelectAccount()
 	if wm.IsIDTokenMapping {
 		opts = append(opts, oidc.WithIDTokenMapping())
+	}
+	if wm.UsePKCE {
+		opts = append(opts, oidc.WithRelyingPartyOption(rp.WithPKCE(nil)))
 	}
 	if wm.IsCreationAllowed {
 		opts = append(opts, oidc.WithCreationAllowed())
