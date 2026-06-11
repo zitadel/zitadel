@@ -304,6 +304,7 @@ func (wm *UserV2WriteModel) Reduce() error {
 			wm.UserState = domain.UserStateActive
 
 		case *user.UserRemovedEvent:
+			wm.reset()
 			wm.UserState = domain.UserStateDeleted
 
 		case *user.HumanPasswordHashUpdatedEvent:
