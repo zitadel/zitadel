@@ -79,10 +79,7 @@ func (wm *ProjectRoleWriteModel) Reduce() error {
 			}
 		case *project.RoleRemovedEvent:
 			wm.State = domain.ProjectRoleStateRemoved
-		case *project.ProjectRemovedEvent:
-			// wm.Key TODO(adlerhurst): reset or not?
-			// wm.DisplayName TODO(adlerhurst): reset or not?
-			// wm.Group TODO(adlerhurst): reset or not?
+		case *project.ProjectRemovedEvent, *project.ProjectAddedEvent:
 			wm.State = domain.ProjectRoleStateRemoved
 		}
 	}
@@ -96,6 +93,7 @@ func (wm *ProjectRoleWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			project.ProjectAddedType,
 			project.RoleAddedType,
 			project.RoleChangedType,
 			project.RoleRemovedType,

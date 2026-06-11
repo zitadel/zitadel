@@ -96,6 +96,16 @@ func (wm *HumanWebAuthNWriteModel) AppendEvents(events ...eventstore.Event) {
 func (wm *HumanWebAuthNWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent:
+			wm.WebauthNTokenID = ""
+			wm.Challenge = ""
+			wm.KeyID = nil
+			wm.PublicKey = nil
+			wm.AttestationType = ""
+			wm.AAGUID = nil
+			wm.SignCount = 0
+			wm.WebAuthNTokenName = ""
+			wm.RPID = ""
 		case *user.HumanWebAuthNAddedEvent:
 			wm.appendAddedEvent(e)
 		case *user.HumanWebAuthNVerifiedEvent:
@@ -143,7 +153,11 @@ func (wm *HumanWebAuthNWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		EventTypes(user.HumanU2FTokenAddedType,
+		EventTypes(
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
+			user.HumanU2FTokenAddedType,
 			user.HumanPasswordlessTokenAddedType,
 			user.HumanU2FTokenAddedType,
 			user.HumanPasswordlessTokenAddedType,

@@ -93,6 +93,19 @@ func (wm *UserAccessTokenWriteModel) Reduce() error {
 			wm.Reason = domain.TokenReasonUnspecified
 			wm.Actor = nil
 			wm.UserState = domain.UserStateDeleted
+
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent:
+
+			wm.TokenID = ""
+			wm.ApplicationID = ""
+			wm.UserAgentID = ""
+			wm.Audience = nil
+			wm.Scopes = nil
+			wm.Expiration = time.Time{}
+			wm.PreferredLanguage = ""
+			wm.Reason = domain.TokenReasonUnspecified
+			wm.Actor = nil
+			wm.UserState = domain.UserStateUnspecified
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -104,6 +117,9 @@ func (wm *UserAccessTokenWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
 			user.UserTokenAddedType,
 			user.UserTokenRemovedType,
 			user.HumanSignedOutType,

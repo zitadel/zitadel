@@ -52,6 +52,11 @@ func (wm *HumanTOTPWriteModel) Reduce() error {
 			wm.CheckFailedCount = 0
 			wm.UserLocked = false
 			wm.State = domain.MFAStateRemoved
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent:
+			wm.Secret = nil
+			wm.CheckFailedCount = 0
+			wm.UserLocked = false
+			wm.State = domain.MFAStateUnspecified
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -62,7 +67,11 @@ func (wm *HumanTOTPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		EventTypes(user.HumanMFAOTPAddedType,
+		EventTypes(
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
+			user.HumanMFAOTPAddedType,
 			user.HumanMFAOTPVerifiedType,
 			user.HumanMFAOTPRemovedType,
 			user.HumanMFAOTPCheckSucceededType,
@@ -304,8 +313,7 @@ func (wm *HumanOTPEmailWriteModel) Reduce() error {
 			wm.otpAdded = true
 		case *user.HumanOTPEmailRemovedEvent:
 			wm.otpAdded = false
-		case *user.UserRemovedEvent:
-			*wm = HumanOTPEmailWriteModel{}
+		case *user.UserRemovedEvent, *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent:
 			wm.emailVerified = false
 			wm.otpAdded = false
 		}
@@ -319,6 +327,9 @@ func (wm *HumanOTPEmailWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
 			user.HumanEmailVerifiedType,
 			user.HumanOTPEmailAddedType,
 			user.HumanOTPEmailRemovedType,

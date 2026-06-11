@@ -134,16 +134,8 @@ func (wm *UserGrantPreConditionReadModel) Reduce() error {
 			// We store the organization of the project for later checks, e.g. in case of a project grant
 			wm.ProjectResourceOwner = e.Aggregate().ResourceOwner
 		case *project.ProjectRemovedEvent:
-			// wm.UserID TODO(adlerhurst): reset or not?
-			// wm.ProjectID TODO(adlerhurst): reset or not?
-			// wm.ProjectResourceOwner TODO(adlerhurst): reset or not?
-			// wm.ProjectGrantID TODO(adlerhurst): reset or not?
-			// wm.FoundGrantID TODO(adlerhurst): reset or not?
-			// wm.ResourceOwner TODO(adlerhurst): reset or not?
-			// wm.UserExists TODO(adlerhurst): reset or not?
-			// wm.ProjectExists TODO(adlerhurst): reset or not?
-			// wm.ExistingRoleKeysProject TODO(adlerhurst): reset or not?
-			// wm.ExistingRoleKeysGrant TODO(adlerhurst): reset or not?
+			wm.ExistingRoleKeysProject = nil
+			wm.ExistingRoleKeysGrant = nil
 			wm.ProjectExists = false
 		case *project.GrantAddedEvent:
 			if projectGrantExistsOnOrganization(wm.ProjectGrantID, wm.ResourceOwner, e.GrantID, e.GrantedOrgID) {

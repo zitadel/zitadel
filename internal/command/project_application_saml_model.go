@@ -112,7 +112,6 @@ func (wm *SAMLApplicationWriteModel) Reduce() error {
 		case *project.SAMLConfigChangedEvent:
 			wm.appendChangeSAMLEvent(e)
 		case *project.ProjectRemovedEvent:
-			// wm.AppID = "" TODO(adlerhurst): reset or not?
 			wm.AppName = ""
 			wm.EntityID = ""
 			wm.Metadata = nil
@@ -121,6 +120,15 @@ func (wm *SAMLApplicationWriteModel) Reduce() error {
 			wm.LoginBaseURI = ""
 			wm.saml = false
 			wm.State = domain.AppStateRemoved
+		case *project.ProjectAddedEvent:
+			wm.AppName = ""
+			wm.EntityID = ""
+			wm.Metadata = nil
+			wm.MetadataURL = ""
+			wm.LoginVersion = domain.LoginVersionUnspecified
+			wm.LoginBaseURI = ""
+			wm.saml = false
+			wm.State = domain.AppStateUnspecified
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -161,6 +169,7 @@ func (wm *SAMLApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			project.ProjectAddedType,
 			project.ApplicationAddedType,
 			project.ApplicationChangedType,
 			project.ApplicationDeactivatedType,

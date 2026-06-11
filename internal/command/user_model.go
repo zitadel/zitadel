@@ -34,10 +34,12 @@ func (wm *UserWriteModel) Reduce() error {
 			wm.UserName = e.UserName
 			wm.UserState = domain.UserStateActive
 			wm.UserType = domain.UserTypeHuman
+			wm.IDPLinks = nil
 		case *user.HumanRegisteredEvent:
 			wm.UserName = e.UserName
 			wm.UserState = domain.UserStateActive
 			wm.UserType = domain.UserTypeHuman
+			wm.IDPLinks = nil
 		case *user.HumanInitialCodeAddedEvent:
 			wm.UserState = domain.UserStateInitial
 		case *user.HumanInitializedCheckSucceededEvent:
@@ -64,6 +66,7 @@ func (wm *UserWriteModel) Reduce() error {
 			wm.UserName = e.UserName
 			wm.UserState = domain.UserStateActive
 			wm.UserType = domain.UserTypeMachine
+			wm.IDPLinks = nil
 		case *user.UsernameChangedEvent:
 			wm.UserName = e.UserName
 		case *user.UserLockedEvent:

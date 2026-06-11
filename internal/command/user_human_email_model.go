@@ -37,9 +37,19 @@ func (wm *HumanEmailWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
+			wm.IsEmailVerified = false
+			wm.Code = nil
+			wm.CodeCreationDate = time.Time{}
+			wm.CodeExpiry = 0
+			wm.AuthRequestID = ""
 			wm.Email = e.EmailAddress
 			wm.UserState = domain.UserStateActive
 		case *user.HumanRegisteredEvent:
+			wm.IsEmailVerified = false
+			wm.Code = nil
+			wm.CodeCreationDate = time.Time{}
+			wm.CodeExpiry = 0
+			wm.AuthRequestID = ""
 			wm.Email = e.EmailAddress
 			wm.UserState = domain.UserStateActive
 		case *user.HumanInitialCodeAddedEvent:
@@ -67,6 +77,15 @@ func (wm *HumanEmailWriteModel) Reduce() error {
 			wm.AuthRequestID = ""
 
 			wm.UserState = domain.UserStateDeleted
+		case *user.MachineAddedEvent:
+			wm.Email = ""
+			wm.IsEmailVerified = false
+			wm.Code = nil
+			wm.CodeCreationDate = time.Time{}
+			wm.CodeExpiry = 0
+			wm.AuthRequestID = ""
+
+			wm.UserState = domain.UserStateUnspecified
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -81,6 +100,7 @@ func (wm *HumanEmailWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanAddedType,
 			user.UserV1RegisteredType,
 			user.HumanRegisteredType,
+			user.MachineAddedEventType,
 			user.UserV1InitialCodeAddedType,
 			user.HumanInitialCodeAddedType,
 			user.UserV1InitializedCheckSucceededType,

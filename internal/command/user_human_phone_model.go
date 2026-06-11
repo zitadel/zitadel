@@ -39,17 +39,41 @@ func (wm *HumanPhoneWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
-			if e.PhoneNumber != "" {
-				wm.Phone = e.PhoneNumber
+			wm.IsPhoneVerified = false
+			wm.Code = nil
+			wm.CodeCreationDate = time.Time{}
+			wm.CodeExpiry = 0
+			wm.GeneratorID = ""
+			wm.VerificationID = ""
+			wm.Phone = e.PhoneNumber
+
+			if wm.Phone != "" {
 				wm.State = domain.PhoneStateActive
 			}
 			wm.UserState = domain.UserStateActive
 		case *user.HumanRegisteredEvent:
-			if e.PhoneNumber != "" {
-				wm.Phone = e.PhoneNumber
+			wm.IsPhoneVerified = false
+			wm.Code = nil
+			wm.CodeCreationDate = time.Time{}
+			wm.CodeExpiry = 0
+			wm.GeneratorID = ""
+			wm.VerificationID = ""
+			wm.Phone = e.PhoneNumber
+
+			if wm.Phone != "" {
 				wm.State = domain.PhoneStateActive
 			}
 			wm.UserState = domain.UserStateActive
+		case *user.MachineAddedEvent:
+			wm.IsPhoneVerified = false
+			wm.Code = nil
+			wm.CodeCreationDate = time.Time{}
+			wm.CodeExpiry = 0
+			wm.GeneratorID = ""
+			wm.VerificationID = ""
+			wm.Phone = ""
+			wm.State = domain.PhoneStateUnspecified
+			wm.UserState = domain.UserStateUnspecified
 		case *user.HumanInitialCodeAddedEvent:
 			wm.UserState = domain.UserStateInitial
 		case *user.HumanInitializedCheckSucceededEvent:

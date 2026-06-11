@@ -67,6 +67,11 @@ func (wm *HumanRecoveryCodeWriteModel) Reduce() error {
 			wm.codes = nil
 			wm.userLocked = false
 			wm.State = domain.MFAStateRemoved
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent:
+			wm.FailedAttempts = 0
+			wm.codes = nil
+			wm.userLocked = false
+			wm.State = domain.MFAStateUnspecified
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -77,7 +82,11 @@ func (wm *HumanRecoveryCodeWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		EventTypes(user.HumanRecoveryCodesAddedType,
+		EventTypes(
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
+			user.HumanRecoveryCodesAddedType,
 			user.HumanRecoveryCodesRemovedType,
 			user.HumanRecoveryCodeCheckSucceededType,
 			user.HumanRecoveryCodeCheckFailedType,

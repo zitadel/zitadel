@@ -74,10 +74,8 @@ func (wm *ProjectGrantMemberWriteModel) Reduce() error {
 			wm.State = domain.MemberStateRemoved
 		case *project.GrantMemberCascadeRemovedEvent:
 			wm.State = domain.MemberStateRemoved
-		case *project.GrantRemovedEvent, *project.ProjectRemovedEvent:
-			// wm.GrantID TODO(adlerhurst): reset or not?
-			// wm.UserID TODO(adlerhurst): reset or not?
-			// wm.Roles TODO(adlerhurst): reset or not?
+		case *project.GrantRemovedEvent, *project.ProjectRemovedEvent, *project.ProjectAddedEvent:
+			wm.Roles = nil
 			wm.State = domain.MemberStateRemoved
 		}
 	}
@@ -91,6 +89,7 @@ func (wm *ProjectGrantMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			project.ProjectAddedType,
 			project.GrantMemberAddedType,
 			project.GrantMemberChangedType,
 			project.GrantMemberRemovedType,

@@ -44,17 +44,31 @@ func (wm *UserV2InviteWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
-			wm.UserState = domain.UserStateActive
-			wm.AuthMethodSet = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""
 			wm.EmptyInviteCode()
 			wm.ApplicationName = ""
 			wm.AuthRequestID = ""
+			wm.URLTemplate = ""
+			wm.CodeReturned = false
+			wm.EmailVerified = false
+			wm.UserState = domain.UserStateActive
+			wm.AuthMethodSet = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""
 		case *user.HumanRegisteredEvent:
-			wm.UserState = domain.UserStateActive
-			wm.AuthMethodSet = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""
 			wm.EmptyInviteCode()
 			wm.ApplicationName = ""
 			wm.AuthRequestID = ""
+			wm.URLTemplate = ""
+			wm.CodeReturned = false
+			wm.EmailVerified = false
+			wm.UserState = domain.UserStateActive
+			wm.AuthMethodSet = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""
+		case *user.MachineAddedEvent:
+			wm.EmptyInviteCode()
+			wm.ApplicationName = ""
+			wm.AuthRequestID = ""
+			wm.URLTemplate = ""
+			wm.CodeReturned = false
+			wm.EmailVerified = false
+			wm.AuthMethodSet = false
 		case *user.HumanInviteCodeAddedEvent:
 			wm.SetInviteCode(e.Code, e.Expiry, e.CreationDate())
 			wm.URLTemplate = e.URLTemplate
@@ -83,10 +97,7 @@ func (wm *UserV2InviteWriteModel) Reduce() error {
 		case *user.UserReactivatedEvent:
 			wm.UserState = domain.UserStateActive
 		case *user.UserRemovedEvent:
-			wm.InviteCode = nil
-			wm.InviteCodeCreationDate = time.Time{}
-			wm.InviteCodeExpiry = 0
-			wm.InviteCheckFailureCount = 0
+			wm.EmptyInviteCode()
 			wm.ApplicationName = ""
 			wm.AuthRequestID = ""
 			wm.URLTemplate = ""
@@ -128,6 +139,7 @@ func (wm *UserV2InviteWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanAddedType,
 			user.UserV1RegisteredType,
 			user.HumanRegisteredType,
+			user.MachineAddedEventType,
 			user.HumanInviteCodeAddedType,
 			user.HumanInviteCheckSucceededType,
 			user.HumanInviteCheckFailedType,
