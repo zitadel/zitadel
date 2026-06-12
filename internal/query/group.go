@@ -135,6 +135,10 @@ func NewGroupOrganizationIdSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(GroupColumnResourceOwner, id, TextEquals)
 }
 
+func NewGroupDescriptionSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
+	return NewTextQuery(GroupColumnDescription, value, comparison)
+}
+
 func groupCheckPermission(ctx context.Context, resourceOwner, groupID string, permissionCheck domain.PermissionCheck) error {
 	return permissionCheck(ctx, domain.PermissionGroupRead, resourceOwner, groupID)
 }

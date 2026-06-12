@@ -95,6 +95,8 @@ func groupFilterToQuery(f *group_v2.GroupsSearchFilter) (query.SearchQuery, erro
 		return query.NewGroupNameSearchQuery(q.NameFilter.GetName(), filter.TextMethodPbToQuery(q.NameFilter.GetMethod()))
 	case *group_v2.GroupsSearchFilter_OrganizationId:
 		return query.NewGroupOrganizationIdSearchQuery(q.OrganizationId.GetId())
+	case *group_v2.GroupsSearchFilter_DescriptionFilter:
+		return query.NewGroupDescriptionSearchQuery(q.DescriptionFilter.GetDescription(), filter.TextMethodPbToQuery(q.DescriptionFilter.GetMethod()))
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-g3f4g", "List.Query.Invalid")
 	}
@@ -175,6 +177,8 @@ func groupUsersFilterToQuery(f *group_v2.GroupUsersSearchFilter) (query.SearchQu
 		return query.NewGroupUsersUserIDsSearchQuery(q.UserIds.GetIds())
 	case *group_v2.GroupUsersSearchFilter_GroupIds:
 		return query.NewGroupUsersGroupIDsSearchQuery(q.GroupIds.GetIds())
+	case *group_v2.GroupUsersSearchFilter_OrganizationId:
+		return query.NewGroupUsersOrganizationIDSearchQuery(q.OrganizationId.GetId())
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-osMHhx", "List.Query.Invalid")
 	}
@@ -208,6 +212,7 @@ func groupUsersToPb(groupUsers []*query.GroupUser) []*group_v2.GroupUser {
 func groupUserToPb(gu *query.GroupUser) *group_v2.GroupUser {
 	return &group_v2.GroupUser{
 		GroupId:        gu.GroupID,
+		GroupName:      gu.GroupName,
 		OrganizationId: gu.ResourceOwner,
 		User: &group_v2.User{
 			Id:                 gu.UserID,

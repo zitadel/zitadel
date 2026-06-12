@@ -15,6 +15,7 @@ import (
 var (
 	groupUsersStmt = regexp.QuoteMeta(
 		"SELECT projections.group_users1.group_id" +
+			", projections.groups1.name" +
 			", projections.group_users1.user_id" +
 			", projections.users14_humans.display_name" +
 			", projections.users14_machines.name" +
@@ -25,6 +26,7 @@ var (
 			", projections.group_users1.sequence" +
 			", COUNT(*) OVER ()" +
 			" FROM projections.group_users1" +
+			" LEFT JOIN projections.groups1 ON projections.group_users1.group_id = projections.groups1.id AND projections.group_users1.instance_id = projections.groups1.instance_id" +
 			" LEFT JOIN projections.users14_humans ON projections.group_users1.user_id = projections.users14_humans.user_id AND projections.group_users1.instance_id = projections.users14_humans.instance_id" +
 			" LEFT JOIN projections.users14_machines ON projections.group_users1.user_id = projections.users14_machines.user_id AND projections.group_users1.instance_id = projections.users14_machines.instance_id" +
 			" LEFT JOIN projections.login_names3 ON projections.group_users1.user_id = projections.login_names3.user_id AND projections.group_users1.instance_id = projections.login_names3.instance_id" +
@@ -32,6 +34,7 @@ var (
 
 	groupUsersColumns = []string{
 		"group_id",
+		"group_name",
 		"user_id",
 		"display_name",
 		"machine_name",
@@ -78,6 +81,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"group-id",
+							"test-group",
 							"user-id",
 							"display-name",
 							nil,
@@ -97,6 +101,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 				GroupUsers: []*GroupUser{
 					{
 						GroupID:            "group-id",
+						GroupName:          "test-group",
 						UserID:             "user-id",
 						ResourceOwner:      "resource-owner",
 						CreationDate:       testNow,
@@ -118,6 +123,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"group-id",
+							"test-group",
 							"machine-user-id",
 							nil,
 							"machine-name",
@@ -137,6 +143,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 				GroupUsers: []*GroupUser{
 					{
 						GroupID:            "group-id",
+						GroupName:          "test-group",
 						UserID:             "machine-user-id",
 						ResourceOwner:      "resource-owner",
 						CreationDate:       testNow,
@@ -158,6 +165,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"group-id-1",
+							"test-group",
 							"user-id-1",
 							"display-name-1",
 							nil,
@@ -169,6 +177,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 						},
 						{
 							"group-id-1",
+							"test-group",
 							"user-id-2",
 							"display-name-2",
 							nil,
@@ -188,6 +197,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 				GroupUsers: []*GroupUser{
 					{
 						GroupID:            "group-id-1",
+						GroupName:          "test-group",
 						UserID:             "user-id-1",
 						ResourceOwner:      "resource-owner",
 						CreationDate:       testNow,
@@ -198,6 +208,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 					},
 					{
 						GroupID:            "group-id-1",
+						GroupName:          "test-group",
 						UserID:             "user-id-2",
 						ResourceOwner:      "resource-owner",
 						CreationDate:       testNow,

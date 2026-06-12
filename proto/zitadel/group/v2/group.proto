@@ -83,6 +83,13 @@ message GroupUser {
     }
   ];
 
+  // GroupName is the name of the user group.
+  string group_name = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"Support Group\"";
+    }
+  ];
+
   // OrganizationID is the unique identifier of the organization to which the group belongs.
   string organization_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -111,7 +118,29 @@ message GroupsSearchFilter {
     GroupNameFilter name_filter = 2;
     // Search for groups by their organization ID.
     zitadel.filter.v2.IDFilter organization_id = 3;
+    // Search for groups by their description.
+    GroupDescriptionFilter description_filter = 4;
   }
+}
+
+message GroupDescriptionFilter {
+  // Description of the user group.
+  string description = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"My Group description\"";
+    }
+  ];
+
+  // Defines which text comparison method is used for the description query.
+  zitadel.filter.v2.TextFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines which text equality method is used";
+    }
+  ];
 }
 
 message GroupNameFilter {
@@ -151,6 +180,8 @@ message GroupUsersSearchFilter {
     zitadel.filter.v2.InIDsFilter user_ids = 1;
     // Search for users in groups by group IDs
     zitadel.filter.v2.InIDsFilter group_ids = 2;
+    // Search for group memberships by the organization the groups belong to.
+    zitadel.filter.v2.IDFilter organization_id = 3;
   }
 }
 

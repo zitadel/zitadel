@@ -53,6 +53,7 @@ type GroupUsers struct {
 
 type GroupUser struct {
 	GroupID       string
+	GroupName     string
 	ResourceOwner string
 	CreationDate  time.Time
 	Sequence      uint64
@@ -101,6 +102,10 @@ func NewGroupUsersGroupIDsSearchQuery(groupIDs []string) (SearchQuery, error) {
 	return NewListQuery(GroupUsersColumnGroupID, list, ListIn)
 }
 
+func NewGroupUsersOrganizationIDSearchQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(GroupUsersColumnResourceOwner, id, TextEquals)
+}
+
 func (q *Queries) searchGroupUsers(ctx context.Context, queries *GroupUsersSearchQuery, permissionCheckV2 bool) (groupUsers *GroupUsers, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -131,6 +136,7 @@ func (q *Queries) searchGroupUsers(ctx context.Context, queries *GroupUsersSearc
 func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*GroupUsers, error)) {
 	return sq.Select(
 			GroupUsersColumnGroupID.identifier(),
+			GroupColumnName.identifier(),
 			GroupUsersColumnUserID.identifier(),
 			HumanDisplayNameCol.identifier(),
 			MachineNameCol.identifier(),
@@ -141,6 +147,7 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 			GroupUsersColumnSequence.identifier(),
 			countColumn.identifier(),
 		).From(groupUsersTable.identifier()).
+			LeftJoin(join(GroupColumnID, GroupUsersColumnGroupID)).
 			LeftJoin(join(HumanUserIDCol, GroupUsersColumnUserID)).
 			LeftJoin(join(MachineUserIDCol, GroupUsersColumnUserID)).
 			LeftJoin(join(LoginNameUserIDCol, GroupUsersColumnUserID)).
@@ -154,6 +161,7 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 				g := new(GroupUser)
 
 				var (
+					groupName          sql.NullString
 					displayName        sql.NullString
 					machineName        sql.NullString
 					avatarURL          sql.NullString
@@ -162,6 +170,7 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 
 				err := rows.Scan(
 					&g.GroupID,
+					&groupName,
 					&g.UserID,
 					&displayName,
 					&machineName,
@@ -176,6 +185,7 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 					return nil, err
 				}
 
+				g.GroupName = groupName.String
 				if displayName.Valid {
 					g.DisplayName = displayName.String
 				} else {
