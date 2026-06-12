@@ -36,6 +36,10 @@ func TestServer_UserInfo_GroupGrantRoles(t *testing.T) {
 
 	group := Instance.CreateGroup(CTXIAM, t, Instance.DefaultOrg.GetId(), integration.GroupName())
 	Instance.AddUsersToGroup(CTXIAM, t, group.GetId(), []string{User.GetUserId()})
+	t.Cleanup(func() {
+		// the User is shared in this package; other tests assert its exact memberships
+		Instance.RemoveUsersFromGroup(CTXIAM, t, group.GetId(), []string{User.GetUserId()})
+	})
 
 	_, err = Instance.Client.GroupV2.CreateGroupGrant(CTXIAM, &group_v2.CreateGroupGrantRequest{
 		GroupId:   group.GetId(),

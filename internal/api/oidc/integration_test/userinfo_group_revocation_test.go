@@ -36,6 +36,10 @@ func TestServer_UserInfo_GroupRevocation(t *testing.T) {
 	groupName := integration.GroupName()
 	group := Instance.CreateGroup(CTXIAM, t, Instance.DefaultOrg.GetId(), groupName)
 	Instance.AddUsersToGroup(CTXIAM, t, group.GetId(), []string{User.GetUserId()})
+	t.Cleanup(func() {
+		// the User is shared in this package; other tests assert its exact memberships
+		Instance.RemoveUsersFromGroup(CTXIAM, t, group.GetId(), []string{User.GetUserId()})
+	})
 
 	grant, err := Instance.Client.GroupV2.CreateGroupGrant(CTXIAM, &group_v2.CreateGroupGrantRequest{
 		GroupId:   group.GetId(),
