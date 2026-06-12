@@ -18,12 +18,12 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
     setTheme(document, branding);
   }, [branding]);
 
-  // Apply custom font from branding settings.
+  // Apply custom font from branding settings before paint to avoid FOUC.
   // When a custom font is uploaded via the label/branding policy, fontUrl
   // contains a fully-resolved URL to the font file served by the assets API.
   // We inject a @font-face rule and set a CSS custom property so the entire
-  // login UI picks up the custom font with Lato as fallback.
-  useEffect(() => {
+  // login UI picks up the custom font with the existing font as fallback.
+  useLayoutEffect(() => {
     const STYLE_ID = "zitadel-custom-font";
 
     if (branding?.fontUrl) {
