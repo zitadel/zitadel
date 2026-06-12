@@ -81,6 +81,8 @@ func (cmd *DeleteOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]ev
 	// 	samlEntityIDs = append(samlEntityIDs, ei.ID)
 	// }
 
+	groupNames := []string{}
+
 	return []eventstore.Command{
 		org.NewOrgRemovedEvent(
 			ctx,
@@ -91,6 +93,7 @@ func (cmd *DeleteOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]ev
 			domainNames,
 			externalIDPLinks,
 			samlEntityIDs,
+			groupNames,
 		),
 	}, nil
 }
