@@ -8,7 +8,7 @@ import { getServiceConfig } from "./lib/service-url";
 const logger = createLogger("middleware");
 
 export const config = {
-  matcher: ["/.well-known/:path*", "/oauth/:path*", "/oidc/:path*", "/idps/callback/:path*", "/saml/:path*", "/assets/:path*", "/:path*"],
+  matcher: ["/.well-known/:path*", "/oauth/:path*", "/oidc/:path*", "/idps/callback/:path*", "/saml/:path*", "/:path*"],
 };
 
 export async function proxy(request: NextRequest) {
