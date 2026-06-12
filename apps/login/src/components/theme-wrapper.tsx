@@ -43,8 +43,7 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
       }
       // Capture the current font-family (Lato from next/font) before overriding,
       // so it serves as fallback if the custom font fails to load.
-      const existingFont =
-        getComputedStyle(document.documentElement).fontFamily || "sans-serif";
+      const existingFont = getComputedStyle(document.documentElement).fontFamily || "sans-serif";
       const fontStack = `'ZitadelCustomFont', ${existingFont}`;
 
       styleEl.textContent = `
