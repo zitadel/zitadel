@@ -40,5 +40,9 @@ Request the [`groups` scope](/apis/openidoauth/scopes) to receive the
 }
 ```
 
-Note that group membership is not an authorization mechanism yet:
-to grant project roles, use [role assignments](/guides/manage/console/roles).
+## Grant Project Roles to a Group
+
+Open the authorizations action on a group row to grant project roles to all of its members
+(requires the `group.grant.write` permission). Enter the project ID and the role keys to grant.
+Members receive the roles in addition to their personal [role assignments](/guides/manage/console/roles),
+and lose them immediately when they leave the group or the grant is removed.

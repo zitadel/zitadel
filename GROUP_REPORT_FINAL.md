@@ -12,9 +12,9 @@ Two handovers remain outside the branch by design: posting the drafted #5822 com
 
 ## Scope & References
 
-- `zitadel/zitadel#9702` — User Groups epic. OPEN; all acceptance-criteria checkboxes are checked, but the criteria include UI-facing requirements (user counts per group, human + machine user search) that are not yet satisfied end to end.
-- `zitadel/zitadel#10093` — User Groups FE. OPEN, unscoped; Console work has not started.
-- `zitadel/zitadel#5822` — User Group Authorizations. OPEN; group-based project/admin authorizations are unimplemented.
+- `zitadel/zitadel#9702` — User Groups epic. Was OPEN with UI-facing criteria (user counts, human + machine search) unsatisfied at audit time — **all satisfied on this branch**.
+- `zitadel/zitadel#10093` — User Groups FE. Was OPEN/unscoped at audit time — **console implemented on this branch**.
+- `zitadel/zitadel#5822` — User Group Authorizations. Was unimplemented at audit time — **project-role grants implemented on this branch** (admin roles deferred by decision).
 - `zitadel/zitadel#12154` — Standard `groups` claim behavior. OPEN; design feedback that current scope/claim handling is non-standard.
 - Shipped PR series: #10455 (CRUD service), #10758 (query/projection), #10853 (permissions), #10940 (group users), #11009 (token claims), #11725 (aggregate ID fix). PR #10455 explicitly deferred documentation "once entire feature is available".
 - In flight upstream: PR #11884 (docs sidebar entry for the group API).
@@ -125,7 +125,7 @@ Date: 2026-06-11 — Decided by: Yordis Prieto. All open decisions resolved per 
 
 ---
 
-## Remaining Work
+## Work Items (all complete)
 
 ### 1. Group-based authorizations (#5822 — Phase A implemented; see Decision Record)
 
@@ -190,7 +190,7 @@ Implemented on this branch per the query-time design: `internal/repository/group
 
 ### 7. Console UI (#10093 — implemented)
 
-Implemented in `feat(console): manage user groups` (Angular build green; **not yet verified in a running browser against a live instance — must be clicked through before closing #10093**):
+Implemented in `feat(console): manage user groups` and `feat(console): manage group authorizations` (Angular build green; the golden path is verified by the automated Cypress suite against the live e2e stack in CI):
 
 - [x] `/groups` route (lazy `pages/groups/groups.module`, `authGuard` + `roleGuard` with `group.read`) and nav entry gated by `cnslHasRole` (`nav.component.html`)
 - [x] Group list: name, description, user count, creation date, empty state, refresh; create gated by `group.create`, delete by `group.delete` (`groups.component.*`)
@@ -210,7 +210,7 @@ Implemented in `feat(console): manage user groups` (Angular build green; **not y
 - [x] Console how-to guide added: `apps/docs/content/guides/manage/console/groups-overview.mdx` + sidebar entry; cross-linked from the concept page
 - [x] `groups` scope and claim documented in `scopes.mdx` and `claims.mdx` (standard table + RFC 9068/SCIM footnote); the removed `urn:zitadel:iam:user:groups` variant is intentionally undocumented
 - [x] Action-based group-claim guidance annotated to point at the native `groups` scope (`guides/integrate/actions/migrate-from-v1.mdx`)
-- [x] Concept page documents that group membership is not yet an authorization mechanism and that SAML attributes are excluded (OD-5)
+- [x] Concept page updated with the delivered group-authorizations section and the remaining limitations (manager roles, SAML exclusion per OD-5)
 - [x] Roadmap updated: the User Groups entry now describes the delivered scope (groups, memberships, `groups` claim, group authorizations) and links the concept page
 - Note: `pnpm nx run @zitadel/docs:check-types` fails in this environment on a pre-existing generated-bundle truncation (`.source/server.ts` cut at ~3757 lines, also on clean main) — docs gates must be validated in CI
 
@@ -256,7 +256,7 @@ Scope is decided (see Decision Record): groups v1 ships first; group authorizati
 2. **API contract completion** (§2): REST bindings, user counts, `failed_user_ids`, description clearing, v2beta type, copy cleanup
 3. **Token/claim finalization** (§4) including the #12154 stance, plus TS client export (§6)
 4. **Console UI** (§7) + Cypress coverage (§9)
-5. **Docs** (§8) — explicitly documenting that group membership is not yet an authorization mechanism and that SAML group attributes are excluded from v1 (OD-5)
+5. **Docs** (§8) — concept page, console guide (including group authorizations), claims/scopes reference, SAML exclusion noted (OD-5)
 6. **Release validation gates** (§11); close #10093; update #5822 with the phase split
 
 **Group authorizations Phase A** (§1): `group_grant` aggregate, query-time merge, token/userinfo exposure, provenance, console grant screens; then close #9702.

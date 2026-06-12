@@ -58,8 +58,15 @@ with values encoded according to [SCIM (RFC 7643)](https://www.rfc-editor.org/rf
 `value` contains the stable group ID, `display` the group name.
 Use `value` for stable references in your application, since group names can change.
 
+## Group Authorizations
+
+Project roles can be granted to a group: every member receives the granted roles in addition to their
+personal [authorizations](/concepts/structure/granted_projects).
+Group authorizations resolve when a user authenticates, so adding or removing members — or deleting the
+group or the grant — changes the effective roles immediately, without leftover permissions.
+Listings name the supplying group, so group-sourced roles can be distinguished from personal ones.
+
 ## Current Limitations
 
-- Group membership is **not an authorization mechanism** yet: roles and permissions cannot be granted to a group.
-  Use [authorizations](/concepts/structure/granted_projects) to grant project roles to individual users.
+- ZITADEL manager roles (IAM/organization memberships) cannot be granted to a group; only project roles can.
 - SAML assertions do not include group attributes; the `groups` claim is available for OIDC/OAuth 2 clients only.
