@@ -65,50 +65,55 @@ Resolution for #12154: native `groups` scope/claim exists, claim shape follows R
 
 ---
 
-## Open Decisions
+## Decision Record: OD-1 … OD-9
 
-Pending product/architecture calls, with options and current recommendation. Decided items move up into Decision Records.
+Date: 2026-06-11 — Decided by: Yordis Prieto. All open decisions resolved per the recommendations below; options retained for context.
 
 ### Blocking for groups v1 GA
 
 **OD-1. `AddUsersToGroup` partial-failure semantics**
 - Options: (a) keep all-or-nothing and fix the proto comment that promises `failed_user_ids`; (b) implement partial success returning a `failed_user_ids` list.
 - Impacts: API contract freeze (§2), console bulk-add error UX (§7).
-- Recommendation: **(a) all-or-nothing**. Simpler contract, transactional semantics match the eventstore model, callers retry the whole batch; the proto comment is the bug, not the behavior.
+- **Decision: (a) all-or-nothing.** Simpler contract; the single `GroupUsersAddedEvent` push is atomic by construction; idempotent already-member skip makes retry-after-fix safe, so partial success adds nothing. The proto comment is the bug, not the behavior. Implementation additionally includes: precise errors naming the offending user ID(s), batched existence check (one eventstore filter for all users, reporting ALL missing IDs at once instead of fail-first), and renumbering `change_date` to field 1 pre-GA. Prerequisite: idempotent membership projection (OD-9).
 
 **OD-2. Feature gating**
 - Options: (a) always-on (current state — API live on every instance, no flag); (b) add a feature flag before console/docs make groups discoverable.
 - Impacts: §10, rollout of Phase A (group grants will change token contents for group members).
-- Recommendation: **always-on for groups v1; introduce a flag only for Phase A token-merge behavior**, since that is the change with blast radius on existing tokens.
+- **Decision: always-on for groups v1; introduce a flag only for Phase A token-merge behavior**, since that is the change with blast radius on existing tokens.
 
 **OD-3. `GroupUser` v2beta type dependency**
 - Options: (a) keep `zitadel.authorization.v2beta.User` inside stable `group.v2`; (b) define a stable v2 user reference type now.
 - Impacts: §2; breaking-ish — far cheaper before GA than after.
-- Recommendation: **(b) stable type now**. A stable API depending on v2beta types inherits v2beta's right-to-break.
+- **Decision: (b) stable type now.** A stable API depending on v2beta types inherits v2beta's right-to-break.
 
 **OD-4. Group name uniqueness semantics**
 - Options: (a) case-sensitive (current accidental behavior of the unique-constraint string); (b) case-insensitive.
 - Impacts: §2 contract, §3 unique-constraint fix (decide before fixing the rename-constraint bug so it's only touched once), docs/tests.
-- Recommendation: **(b) case-insensitive**. Matches user expectations for human-named entities; "Admins" vs "admins" coexisting is a support ticket, not a feature.
+- **Decision: (b) case-insensitive.** Matches user expectations for human-named entities; "Admins" vs "admins" coexisting is a support ticket, not a feature. Decide-once note: implement together with the rename unique-constraint fix (§3) so the constraint string is only touched once.
 
-### Decidable as the work comes up
+### Scoping decisions
 
 **OD-5. SAML group attributes**
 - Options: implement group attributes in SAML assertions for v1, or explicitly exclude from scope.
-- Recommendation: **exclude from v1, document the exclusion**; revisit with Phase A when group-derived roles exist (SAML consumers mostly want roles, not raw membership).
+- **Decision: exclude from v1, document the exclusion**; revisit with Phase A when group-derived roles exist (SAML consumers mostly want roles, not raw membership).
 
 **OD-6. SCIM `/Groups` endpoint (RFC 7644)**
 - Options: in-scope for this feature vs separate SCIM-compliance effort.
-- Recommendation: **separate effort**, tracked independently; the claims decision already reserves `$ref` synergy for when it lands.
+- **Decision: separate effort**, tracked independently; the claims decision already reserves `$ref` synergy for when it lands.
 
 **OD-7. Actions v2 triggers for group events**
 - Options: expose group lifecycle/membership events as action trigger conditions, or not.
-- Recommendation: **defer**; no demand signal yet, and the events API already exposes group events for observers.
+- **Decision: defer**; no demand signal yet, and the events API already exposes group events for observers.
 
 **OD-8. Org-removal cascade semantics**
 - Options: (a) keep projection-only cleanup (current; consistent with other resources, but eventstore unique name constraints never released, no per-group audit record); (b) emit per-group `GroupRemovedEvent`s on org removal.
 - Impacts: §3 correctness work; event-stream guarantees.
-- Recommendation: **(a) plus targeted constraint release** — keep projection cleanup for parity with other aggregates, but release the org's `group_name` unique constraints during org removal so a re-created org with the same ID can't hit ghost name collisions. Full per-group event emission only if audit requirements demand it.
+- **Decision: (a) plus targeted constraint release** — keep projection cleanup for parity with other aggregates, but release the org's `group_name` unique constraints during org removal so a re-created org with the same ID can't hit ghost name collisions. Full per-group event emission only if audit requirements demand it.
+
+**OD-9. Eventstore unique constraints for group membership**
+- Options: (a) projection idempotency only (ON CONFLICT DO NOTHING in `reduceGroupUsersAdded`) — duplicate `users.added` events remain possible under concurrency but become harmless; (b) additionally adopt member-style unique constraints (`groupID:userID`, like `member.NewAddMemberUniqueConstraint`) so concurrent duplicate adds are rejected at push time.
+- Impacts: §3 correctness; (b) requires constraint release on `users.removed` (easy — event carries IDs), on `group.removed` (hard — no per-user events; delete must enumerate members), and on org removal (compounds OD-8).
+- **Decision: (a) projection idempotency only.** Matches the API's documented desired-state semantics and avoids the constraint-release cascade complexity; duplicate events are benign once the read model is idempotent.
 
 ---
 
@@ -133,21 +138,23 @@ No implementation exists: no group-grant domain model, events, projections, comm
 
 - [ ] **REST bindings**: add `google.api.http` annotations to every RPC in `group_service.proto` (the file imports `annotations.proto` but defines no routes); regenerate gateway + OpenAPI. Group is the only v2 service that is gRPC-only
 - [ ] **Per-group user counts**: #9702 requires group listings to show user count; `Group` has no count field and no count endpoint exists — implement efficiently at query/projection level, not console fan-out
-- [ ] **`failed_user_ids` discrepancy** (OD-1): `AddUsersToGroup` comment (`group_service.proto:307`) promises failed user IDs in the response, but `AddUsersToGroupResponse` only has `change_date` and the command is all-or-nothing — add the field or fix the contract/comment
+- [ ] **`AddUsersToGroup` contract fix** (OD-1, decided: all-or-nothing): remove the partial-failure comment at `group_service.proto:306-307` and document all-or-nothing + idempotent-skip semantics (mirror `RemoveUsersFromGroup` wording); renumber `change_date` to field 1; make per-user existence errors name the offending user ID(s); replace the N+1 per-user `checkUserExists` loop (`group_users.go:73-79`) with one batched eventstore filter that reports ALL missing IDs at once
 - [ ] **Description clearing**: `UpdateGroupRequest.description` has `min_len: 1` when set, so an existing description can never be cleared; `CreateGroupRequest` allows empty — make consistent
-- [ ] **v2beta dependency** (OD-3): `zitadel.group.v2.GroupUser` references `zitadel.authorization.v2beta.User`; a stable v2 API should not depend on v2beta types without an explicit compatibility decision
+- [ ] **v2beta dependency** (OD-3, decided): replace `zitadel.authorization.v2beta.User` in `zitadel.group.v2.GroupUser` with a stable v2 type
 - [ ] **Stale/inaccurate API copy**: `UpdateGroup` 404 text mentions roles; `DeleteGroup` documents idempotent success *and* a 404; permission docs are comments rather than declarative proto role options like other services — confirm intentional
 - [ ] **Proto hygiene**: `AddUsersToGroupResponse` skips field number 1
-- [ ] **Name-uniqueness semantics** (OD-4): decide case-sensitive vs case-insensitive uniqueness; cover with tests and docs
+- [ ] **Name-uniqueness semantics** (OD-4, decided: case-insensitive): implement case-insensitive uniqueness together with the rename unique-constraint fix in §3; cover with tests and docs
 - [ ] Search-filter ergonomics (nice-to-have): `ListGroups` supports only `group_ids`/`name`/`organization_id` (consider description, state, creation-date); `ListGroupUsers` lacks an org filter and doesn't return group name; no lookup-by-name query despite per-org uniqueness
 
 ### 3. Backend correctness
 
 - [ ] **Unique-constraint on rename**: `GroupChangedEvent` (`internal/repository/group/group.go`) does not release/re-add the `group_name` unique constraint when a group is renamed — renames can collide with or orphan name uniqueness
-- [ ] **Org-removal cascade** (OD-8): `prepareRemoveOrg` (`internal/command/org.go:607`) emits no per-group events; projections clean the read model, but eventstore unique name constraints for the removed org are never released and the event stream has no group-removal record — emit cascading events or release constraints
+- [ ] **Org-removal cascade** (OD-8, decided): keep projection-level cleanup, but release the org's `group_name` unique constraints in `prepareRemoveOrg` (`internal/command/org.go:607`) so re-created orgs can't hit ghost name collisions
 - [ ] **Group-deletion membership events**: the projection removes `group_users` rows on `GroupRemovedEvent`, but the command emits no membership-removal events when a group is deleted — confirm the event-sourced audit trail is acceptable or emit cascades
 - [ ] **`ListGroupUsers` join semantics**: query left-joins login names but filters `LoginNameIsPrimaryCol = true`, effectively inner-filtering — verify users without a primary login row (e.g., some machine users) still appear
 - [ ] **Machine-user coverage**: #9702 requires human and machine accounts; membership query tests only exercise human display/login joins
+- [ ] **Non-idempotent membership projection**: `reduceGroupUsersAdded` uses plain INSERT (`AddCreateStatement`, no ON CONFLICT) against PK `(instance_id, group_id, user_id)` (`internal/query/projection/group_users.go:97-117`). Concurrent duplicate `group.users.added` events (possible — see next item) cause a PK violation that fails the whole multi-statement; after max retries the event is skipped, silently dropping the *other* users batched in that event from the read model. Fix: ON CONFLICT DO NOTHING / upsert
+- [ ] **No membership unique constraints** (OD-9, decided: no constraints — projection idempotency instead): `GroupUsersAddedEvent.UniqueConstraints()` returns nil (`internal/repository/group/user.go:39-41`) unlike the member pattern; per OD-9 the duplicate-event risk is accepted and neutralized by the idempotent projection above
 - [ ] **Error clarity**: `AddUsersToGroup` returns "user not found" when the user exists in another org (`internal/command/group_users.go:73`)
 - [ ] **`groupUserToPb`** (`internal/api/grpc/group/v2/query.go:217`) sets `organization_id` to the group's resource owner, not the user's org — verify
 - [ ] **Idempotency semantics**: add explicit tests for duplicate user IDs in add/remove requests and document behavior
@@ -158,14 +165,14 @@ No implementation exists: no group-grant domain model, events, projections, comm
 - [ ] **Implement #12154 decision** (see Decision Record): re-encode the `groups` claim per RFC 9068/RFC 7643 (`[{value, display}]`) in JWT access tokens, userinfo, and ID token; keep scope-gating; deprecate `urn:zitadel:iam:user:groups` before GA
 - [ ] **Wording mismatch**: #9702 says "group roles" in tokens; the implementation emits group names / ID+name objects — reconcile spec vs implementation (ties into §1 merge work)
 - [ ] **Flow verification**: confirm the claims appear (or are deliberately absent) in ID tokens, JWT access tokens, and userinfo across auth-code, refresh, machine/client-credentials flows; decide bearer-token vs JWT delivery; add integration tests per chosen behavior
-- [ ] **SAML** (OD-5): no group attributes in SAML assertions (`internal/api/saml/` has zero group references) — implement or explicitly exclude
+- [ ] **SAML** (OD-5, decided: excluded from v1): document the exclusion; revisit with Phase A when group-derived roles exist
 - [ ] **Perf**: `userinfo_by_id.sql:65-70` unconditionally LEFT JOINs group tables even when no group scope is requested
 - [ ] Update/retire docs that direct users to Actions for group claims once native behavior is final
 
 ### 5. Protocol / ecosystem integrations
 
-- [ ] **SCIM** (OD-6): no `/Groups` endpoint (`internal/api/scim/resources/` is user-only); RFC 7644 expects one for full compliance
-- [ ] **Actions v2** (OD-7): no group-related trigger conditions/executions — decide whether group lifecycle/membership events should be actionable
+- [ ] **SCIM** (OD-6, decided: separate effort): no `/Groups` endpoint (`internal/api/scim/resources/` is user-only); track RFC 7644 compliance as its own initiative; `$ref` synergy reserved in the claims decision
+- [ ] **Actions v2** (OD-7, decided: deferred): no group trigger conditions for now; events API already exposes group events for observers
 
 ### 6. TypeScript SDK
 
@@ -205,7 +212,7 @@ Nothing exists under `console/src`: no route, page, module, service, or sidenav 
 
 ### 10. Feature gating decision
 
-- [ ] No feature flag exists for groups (`internal/feature/feature.go` has no group key) — the API is live on every instance (OD-2). Decide whether GA requires a flag/rollout mechanism or always-on is intended
+- [ ] (OD-2, decided) Groups v1 stays always-on (no flag); add a feature flag for Phase A token-merge behavior when group authorizations land
 
 ### 11. Release validation gates
 
@@ -235,7 +242,7 @@ Scope is decided (see Decision Record): groups v1 ships first; group authorizati
 2. **API contract completion** (§2): REST bindings, user counts, `failed_user_ids`, description clearing, v2beta type, copy cleanup
 3. **Token/claim finalization** (§4) including the #12154 stance, plus TS client export (§6)
 4. **Console UI** (§7) + Cypress coverage (§9)
-5. **Docs** (§8) — explicitly documenting that group membership is not yet an authorization mechanism — protocol decisions (SAML/SCIM/Actions, §4–5), and the gating decision (§10)
+5. **Docs** (§8) — explicitly documenting that group membership is not yet an authorization mechanism and that SAML group attributes are excluded from v1 (OD-5)
 6. **Release validation gates** (§11); close #10093; update #5822 with the phase split
 
 **Group authorizations Phase A** (§1): `group_grant` aggregate, query-time merge, token/userinfo exposure, provenance, console grant screens; then close #9702.
