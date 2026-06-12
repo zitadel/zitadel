@@ -164,6 +164,108 @@ func TestServer_GetGroup(t *testing.T) {
 	}
 }
 
+func TestServer_GetGroup_WithPermissionV2(t *testing.T) {
+	ensureFeaturePermissionV2Enabled(t, instancePermissionV2)
+	iamOwnerCtx := instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	type args struct {
+		ctx context.Context
+		req *group_v2.GetGroupRequest
+		dep func(*group_v2.GetGroupRequest, *group_v2.GetGroupResponse)
+	}
+	tests := []struct {
+		name        string
+		args        args
+		want        *group_v2.GetGroupResponse
+		wantErrCode codes.Code
+		wantErrMsg  string
+	}{
+		{
+			name: "get group, missing permission, error",
+			args: args{
+				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
+				dep: func(req *group_v2.GetGroupRequest, resp *group_v2.GetGroupResponse) {
+					groupName := integration.GroupName()
+					group := instancePermissionV2.CreateGroup(iamOwnerCtx, t, instancePermissionV2.DefaultOrg.GetId(), groupName)
+
+					req.Id = group.GetId()
+				},
+				req: &group_v2.GetGroupRequest{},
+			},
+			wantErrCode: codes.NotFound,
+			wantErrMsg:  "membership not found (AUTHZ-cdgFk)",
+		},
+		{
+			name: "get group, organization owner, with permission, found",
+			args: args{
+				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+				dep: func(req *group_v2.GetGroupRequest, resp *group_v2.GetGroupResponse) {
+					groupName := integration.GroupName()
+					group := instancePermissionV2.CreateGroup(iamOwnerCtx, t, instancePermissionV2.DefaultOrg.GetId(), groupName)
+
+					req.Id = group.GetId()
+					resp.Group = &group_v2.Group{
+						Id:             group.GetId(),
+						Name:           groupName,
+						Description:    "",
+						OrganizationId: instancePermissionV2.DefaultOrg.GetId(),
+						ChangeDate:     group.GetCreationDate(),
+						CreationDate:   group.GetCreationDate(),
+					}
+				},
+				req: &group_v2.GetGroupRequest{},
+			},
+			want: &group_v2.GetGroupResponse{
+				Group: &group_v2.Group{},
+			},
+		},
+		{
+			name: "get group, instance owner, found",
+			args: args{
+				ctx: iamOwnerCtx,
+				dep: func(req *group_v2.GetGroupRequest, resp *group_v2.GetGroupResponse) {
+					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+					groupName := integration.GroupName()
+					group := instancePermissionV2.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName)
+
+					req.Id = group.GetId()
+					resp.Group = &group_v2.Group{
+						Id:             group.GetId(),
+						Name:           groupName,
+						Description:    "",
+						OrganizationId: orgResp.GetOrganizationId(),
+						ChangeDate:     group.GetCreationDate(),
+						CreationDate:   group.GetCreationDate(),
+					}
+				},
+				req: &group_v2.GetGroupRequest{},
+			},
+			want: &group_v2.GetGroupResponse{
+				Group: &group_v2.Group{},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.dep != nil {
+				tt.args.dep(tt.args.req, tt.want)
+			}
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCtx, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := instancePermissionV2.Client.GroupV2.GetGroup(tt.args.ctx, tt.args.req)
+				if tt.wantErrCode != codes.OK {
+					require.Error(ttt, err)
+					assert.Equal(ttt, tt.wantErrCode, status.Code(err))
+					assert.Equal(ttt, tt.wantErrMsg, status.Convert(err).Message())
+					return
+				}
+				require.NoError(ttt, err)
+				assert.EqualExportedValues(t, tt.want.Group, got.Group, "want: %v, got: %v", tt.want.Group, got.Group)
+			}, retryDuration, tick, "timeout waiting for expected result")
+		})
+	}
+}
+
 func TestServer_ListGroups(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	type args struct {

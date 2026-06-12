@@ -4,6 +4,7 @@ package group_test
 
 import (
 	"context"
+	"strings"
 	"testing"
 	"time"
 
@@ -83,6 +84,15 @@ func TestServer_CreateGroup(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			req: &group_v2.CreateGroupRequest{
 				Name:           alreadyExistingGroupName,
+				OrganizationId: orgResp.GetOrganizationId(),
+			},
+			wantErrCode: codes.AlreadyExists,
+		},
+		{
+			name: "instance owner, already existing group name in different case, error",
+			ctx:  iamOwnerCtx,
+			req: &group_v2.CreateGroupRequest{
+				Name:           strings.ToUpper(alreadyExistingGroupName),
 				OrganizationId: orgResp.GetOrganizationId(),
 			},
 			wantErrCode: codes.AlreadyExists,
