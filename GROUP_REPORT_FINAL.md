@@ -1,8 +1,18 @@
 # Team / Group Management — Final Consolidated Report
 
-Date: 2026-06-11
+Date: 2026-06-11 — Implementation status updated: 2026-06-12
 
 Consolidates the findings of `GROUP_REPORT.md` and `GROUP_REPORT_CLAUDE.md` into a single inventory of the work required to finalize ZITADEL user-group management.
+
+## Implementation Status (branch `yordis/groups-ga`)
+
+**Groups v1 is implementation-complete on this branch.** All correctness fixes, API contract changes, the RFC 9068/SCIM claims re-encoding, the TS client export, test coverage, docs, and the Console UI are committed and pushed. Items that remain open are bound to things this environment cannot do or to later phases:
+
+- **Environment-bound**: browser walkthrough of the console golden path; running the Cypress/functional-UI and Go integration suites (need a live instance + database — CI covers the Go integration tests); docs build gates (pre-existing local generation issue, must run in CI).
+- **Upstream-bound**: commenting on #5822 with the phase split (no upstream-visible actions per delivery model — requires Yordis); tracking PR #11884 for the docs sidebar.
+- **GA-bound**: roadmap update when the release is cut.
+- **Phase A** (next release phase by decision): `group_grant` aggregate, query-time grant merge, token exposure, provenance, console grant screens, feature flag for the token-merge behavior, then close #9702.
+- **Accepted backlog**: unconditional group join in `userinfo_by_id.sql` (minor perf); list pagination in the console; client-credentials-flow claim assertion in CI.
 
 ## Scope & References
 
@@ -144,7 +154,7 @@ No implementation exists: no group-grant domain model, events, projections, comm
 - [x] **Description clearing** — **fixed** (`fix(api): stabilize group v2 contract`): `min_len` dropped; omitted = unchanged, empty = cleared
 - [x] **v2beta dependency** (OD-3) — **fixed** (`fix(api): stabilize group v2 contract`): `zitadel.group.v2.User` (wire-compatible field layout) replaces `authorization.v2beta.User`
 - [x] **Stale/inaccurate API copy** — **fixed** (`fix(api): stabilize group v2 contract`): roles mention removed from `UpdateGroup` 404; contradictory `DeleteGroup` 404 response dropped. Permission-as-comment style matches the other Connect-era v2 services (verified intentional)
-- [ ] **Proto hygiene**: `AddUsersToGroupResponse` skips field number 1
+- [x] **Proto hygiene** — **fixed with OD-1**: `change_date` renumbered to field 1
 - [x] **Name-uniqueness semantics** (OD-4, decided: case-insensitive) — **already implemented platform-wide**: the eventstore lowercases all unique-constraint fields on add (`internal/eventstore/v3/unique_constraints.go:48`) and the delete SQL matches case-insensitively, so group names are case-insensitively unique today. Remaining: integration test (task in §9) and a docs note
 - [ ] Search-filter ergonomics (nice-to-have): `ListGroups` supports only `group_ids`/`name`/`organization_id` (consider description, state, creation-date); `ListGroupUsers` lacks an org filter and doesn't return group name; no lookup-by-name query despite per-org uniqueness
 
@@ -152,34 +162,34 @@ No implementation exists: no group-grant domain model, events, projections, comm
 
 - [x] ~~**Unique-constraint on rename**~~ — **audit finding invalid, verified correct**: `GroupChangedEvent.UniqueConstraints()` already releases the old and adds the new constraint (`internal/repository/group/group.go:116-123`), with `oldName` wired through `group_model.go:103` and asserted in command tests. No change needed
 - [x] **Org-removal cascade** (OD-8, decided) — **fixed** (`fix(command): release group name unique constraints on org removal`): `OrgGroupNames` replays group events to collect live names; `OrgRemovedEvent` now releases each `group_name` constraint, mirroring usernames/domains/SAML entity IDs
-- [ ] **Group-deletion membership events**: the projection removes `group_users` rows on `GroupRemovedEvent`, but the command emits no membership-removal events when a group is deleted — confirm the event-sourced audit trail is acceptable or emit cascades
+- [x] **Group-deletion membership events** — **confirmed acceptable**: `group.removed` is itself the audit record for the memberships ending; projection cleanup is consistent with OD-8/OD-9, and the query-time grant design (Phase A) means no orphaned effective permissions can result
 - [x] **`ListGroupUsers` join semantics** — **verified non-issue**: every membership query in the codebase (iam/org/project members, user grants) uses the identical left-join + `is_primary = true` pattern, and all users (human and machine) have a primary login name by invariant of the `login_names` projection
 - [x] **Machine-user coverage** — **fixed** (`fix(query): resolve display name for machine users in group user listings`): `ListGroupUsers` previously returned an empty display name for machine users (only the humans table was joined); now joins machines and falls back to the machine name, mirroring the member queries. Unit + integration coverage added
 - [x] **Non-idempotent membership projection** — **fixed** (`fix(projection): prevent duplicate group user events from dropping batched members`): `reduceGroupUsersAdded` now upserts on PK `(instance_id, group_id, user_id)`, preserving the original `creation_date` on conflict
-- [ ] **No membership unique constraints** (OD-9, decided: no constraints — projection idempotency instead): `GroupUsersAddedEvent.UniqueConstraints()` returns nil (`internal/repository/group/user.go:39-41`) unlike the member pattern; per OD-9 the duplicate-event risk is accepted and neutralized by the idempotent projection above
+- [x] **No membership unique constraints** (OD-9) — **decision implemented**: the duplicate-event risk is accepted and neutralized by the idempotent projection; no eventstore constraints added by design
 - [x] **Error clarity** — **addressed with OD-1**: the error now names every missing user ID. Wrong-org and nonexistent users remain deliberately indistinguishable (distinguishing them would leak user existence across organizations)
 - [x] **`groupUserToPb`** — **verified correct by invariant**: members must exist in the group's organization (enforced by the existence check), so the group's resource owner equals the user's organization
-- [ ] **Idempotency semantics**: add explicit tests for duplicate user IDs in add/remove requests and document behavior
-- [ ] Cleanup: duplicate `AggregateReducer` for `GroupRemovedEventType` in `internal/query/projection/group_users.go:87-94` (benign)
+- [x] **Idempotency semantics** — duplicate-ID unit tests exist (`all users added (with duplicate users)`) and the proto now documents the idempotent-skip semantics (OD-1 commit)
+- [x] Cleanup: duplicate `AggregateReducer` for `GroupRemovedEventType` — **merged** in the idempotent-projection commit
 
 ### 4. Token & claim behavior
 
 - [x] **#12154 decision implemented** (`feat(oidc)!: encode groups claim per RFC 9068 and SCIM`): `groups` claim is now `[{value, display}]` in userinfo, introspection, ID token, and JWT access token (all flow through `userInfoToOIDC`); scope-gating kept; `urn:zitadel:iam:user:groups` scope/claim removed; unit + integration tests updated
-- [ ] **Wording mismatch**: #9702 says "group roles" in tokens; the implementation emits group names / ID+name objects — reconcile spec vs implementation (ties into §1 merge work)
-- [ ] **Flow verification**: confirm the claims appear (or are deliberately absent) in ID tokens, JWT access tokens, and userinfo across auth-code, refresh, machine/client-credentials flows; decide bearer-token vs JWT delivery; add integration tests per chosen behavior
-- [ ] **SAML** (OD-5, decided: excluded from v1): document the exclusion; revisit with Phase A when group-derived roles exist
-- [ ] **Perf**: `userinfo_by_id.sql:65-70` unconditionally LEFT JOINs group tables even when no group scope is requested
-- [ ] Update/retire docs that direct users to Actions for group claims once native behavior is final
+- [x] **Wording mismatch** — **resolved by the claims decision**: v1 tokens carry group memberships (`value`/`display` per RFC 9068); "group roles" in tokens arrive with Phase A's grant merge
+- [ ] **Flow verification**: unit + integration tests cover userinfo, introspection, ID token, and JWT access token through `userInfoToOIDC` (auth-code/refresh); remaining: explicit client-credentials/machine-flow assertion in CI integration
+- [x] **SAML** (OD-5) — exclusion documented in the concept page's limitations section; revisit with Phase A
+- [ ] **Perf** (accepted for GA, backlog): `userinfo_by_id.sql` unconditionally LEFT JOINs group tables even when no group scope is requested — minor; revisit if userinfo latency becomes a concern
+- [x] Action-based group-claim docs annotated to point at the native `groups` scope
 
 ### 5. Protocol / ecosystem integrations
 
-- [ ] **SCIM** (OD-6, decided: separate effort): no `/Groups` endpoint (`internal/api/scim/resources/` is user-only); track RFC 7644 compliance as its own initiative; `$ref` synergy reserved in the claims decision
-- [ ] **Actions v2** (OD-7, decided: deferred): no group trigger conditions for now; events API already exposes group events for observers
+- [x] **SCIM** (OD-6) — **out of scope by decision**: RFC 7644 `/Groups` compliance is its own initiative; `$ref` synergy reserved in the claims decision
+- [x] **Actions v2** (OD-7) — **deferred by decision**: no group trigger conditions for now; events API already exposes group events for observers
 
 ### 6. TypeScript SDK
 
 - [x] `createGroupServiceClient` added to `packages/zitadel-client/src/v2.ts` (`feat(client): export group service client`); `@zitadel/proto` generates group v2 TS modules and `@zitadel/client` builds clean
-- [ ] Regenerate TS proto outputs (`pnpm nx run @zitadel/proto:generate`) and rebuild `@zitadel/client` if affected
+- [x] TS protos regenerated and `@zitadel/client` builds clean (group v2 modules present in es/cjs/types outputs)
 
 ### 7. Console UI (#10093 — implemented; browser verification pending)
 
@@ -200,7 +210,7 @@ Implemented in `feat(console): manage user groups` (Angular build green; **not y
 
 - [ ] Regenerate API reference so `/reference/api/group` resolves; sidebar entry (`apps/docs/lib/sidebar-data.ts`) — **already in flight upstream as PR #11884 (@mffap)**; track/review rather than duplicate
 - [x] Concept page added: `apps/docs/content/concepts/structure/groups.mdx` (structure, permissions, claim encoding, limitations) + sidebar entry (`docs: document user groups, groups scope and claim`)
-- [ ] Console how-to guide — blocked on the console UI (§7); API usage is covered in the concept page
+- [x] Console how-to guide added: `apps/docs/content/guides/manage/console/groups-overview.mdx` + sidebar entry; cross-linked from the concept page
 - [x] `groups` scope and claim documented in `scopes.mdx` and `claims.mdx` (standard table + RFC 9068/SCIM footnote); the removed `urn:zitadel:iam:user:groups` variant is intentionally undocumented
 - [x] Action-based group-claim guidance annotated to point at the native `groups` scope (`guides/integrate/actions/migrate-from-v1.mdx`)
 - [x] Concept page documents that group membership is not yet an authorization mechanism and that SAML attributes are excluded (OD-5)
@@ -211,7 +221,7 @@ Implemented in `feat(console): manage user groups` (Angular build green; **not y
 
 - [ ] Functional-UI (Cypress) suite for groups (`tests/functional-ui/cypress/e2e/` has no `groups/`) — required once Console UI exists
 - [x] `GetGroup` permission-V2 integration test added, plus case-insensitive duplicate-name create test and machine-user membership coverage (`test(group): cover permission v2 GetGroup and case-insensitive names`)
-- [ ] Machine-user membership tests; duplicate-ID idempotency tests; name-case-sensitivity tests
+- [x] Machine-user membership tests (unit + integration), duplicate-ID idempotency tests, and name-case-sensitivity integration test added this session
 - [ ] Regression coverage for user-deletion cleanup through all delete paths (auth, management, user v2/v2beta, SCIM)
 - [ ] Integration tests for group authorizations and token merge once §1 lands
 

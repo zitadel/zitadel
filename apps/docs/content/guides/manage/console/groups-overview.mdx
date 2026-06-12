@@ -1,0 +1,44 @@
+---
+title: User Groups
+description: "Create user groups, manage their members, and use group memberships in tokens."
+sidebar_label: User Groups
+---
+
+[User groups](/concepts/structure/groups) let you organize the users of an organization — by team, department,
+or any structure that fits your domain — and let applications receive a user's memberships through the `groups` claim.
+
+## Create a Group
+
+1. Select the organization the group should belong to.
+2. Go to **Groups** in the navigation (visible with the `group.read` permission).
+3. Click **New**, enter a unique name and an optional description, and save.
+
+Group names are unique inside the organization, regardless of case.
+
+## Manage Members
+
+1. Open the members action on a group row.
+2. Search for users of the organization by login name — both human users and service accounts can be members.
+3. Select one or more users and add them.
+4. Remove a member with the remove action next to their name.
+
+The group list shows the number of users in each group.
+
+## Update or Delete a Group
+
+- Click a group row to change its name or description. Clearing the description removes it.
+- Use the delete action to remove a group. Its members lose the membership; the users themselves are not affected.
+
+## Use Group Memberships in Your Application
+
+Request the [`groups` scope](/apis/openidoauth/scopes) to receive the
+[`groups` claim](/apis/openidoauth/claims) in userinfo and tokens:
+
+```json
+{
+  "groups": [{ "value": "317391152422278297", "display": "Support Team" }]
+}
+```
+
+Note that group membership is not an authorization mechanism yet:
+to grant project roles, use [role assignments](/guides/manage/console/roles).
