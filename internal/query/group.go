@@ -140,6 +140,10 @@ func NewGroupDescriptionSearchQuery(value string, comparison TextComparison) (Se
 }
 
 func groupCheckPermission(ctx context.Context, resourceOwner, groupID string, permissionCheck domain.PermissionCheck) error {
+	// a nil check indicates an internal call where permissions are enforced by the caller
+	if permissionCheck == nil {
+		return nil
+	}
 	return permissionCheck(ctx, domain.PermissionGroupRead, resourceOwner, groupID)
 }
 
