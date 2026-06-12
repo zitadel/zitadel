@@ -11,6 +11,8 @@ Consolidates the findings of `GROUP_REPORT.md` and `GROUP_REPORT_CLAUDE.md` into
 - `zitadel/zitadel#5822` — User Group Authorizations. OPEN; group-based project/admin authorizations are unimplemented.
 - `zitadel/zitadel#12154` — Standard `groups` claim behavior. OPEN; design feedback that current scope/claim handling is non-standard.
 - Shipped PR series: #10455 (CRUD service), #10758 (query/projection), #10853 (permissions), #10940 (group users), #11009 (token claims), #11725 (aggregate ID fix). PR #10455 explicitly deferred documentation "once entire feature is available".
+- In flight upstream: PR #11884 (docs sidebar entry for the group API).
+- Adjacent scope (not in this plan, design-aware only): `zitadel/zitadel#6270` — Groups from LDAP / external IdP group sync; group provenance in Phase A's grant model should not preclude externally-sourced memberships later.
 
 ## Current State (Shipped)
 
@@ -194,7 +196,7 @@ Nothing exists under `console/src`: no route, page, module, service, or sidenav 
 
 ### 8. Documentation (deferred in PR #10455)
 
-- [ ] Regenerate API reference so `/reference/api/group` resolves; add the entry to the docs sidebar (`apps/docs/lib/sidebar-data.ts`) — `apis/introduction.mdx` links to it but the nav entry is absent
+- [ ] Regenerate API reference so `/reference/api/group` resolves; sidebar entry (`apps/docs/lib/sidebar-data.ts`) — **already in flight upstream as PR #11884 (@mffap)**; track/review rather than duplicate
 - [ ] Concept page: what a Group is in ZITADEL's data model (`apps/docs/content/concepts/structure/`)
 - [ ] Console how-to guide for managing user groups; API examples for all 8 RPCs
 - [ ] Document `groups` / `urn:zitadel:iam:user:groups` scopes and exact claim shapes (userinfo, ID token, JWT access token) in `apps/docs/content/apis/openidoauth/claims.mdx` and scopes docs
@@ -236,6 +238,8 @@ Run before declaring the feature final (generation must precede Go tests because
 ## Work Order
 
 Scope is decided (see Decision Record): groups v1 ships first; group authorizations (Phase A) follow; admin-roles-via-group (Phase B) deferred.
+
+**Delivery model: all work happens on a single branch** (`yordis/groups-ga`), committed incrementally in work-order sequence (DCO-signed commits, one logical change per commit). No per-fix PR slicing. Never commit to `main`. **Do NOT create any pull requests — push the branch only.**
 
 **Groups v1 (GA-able without authorizations):**
 1. **Correctness fixes** (§3): rename unique-constraint, org-removal cascade, group-deletion semantics, join/machine-user issues — small, prevent data-integrity bugs
