@@ -13,7 +13,9 @@ type GoogleIDPAddedEvent struct {
 	Name         string              `json:"name,omitempty"`
 	ClientID     string              `json:"clientId"`
 	ClientSecret *crypto.CryptoValue `json:"clientSecret"`
-	Scopes       []string            `json:"scopes,omitempty"`
+	Scopes               []string            `json:"scopes,omitempty"`
+	HostedDomain         string              `json:"hostedDomain,omitempty"`
+	EnforceHostedDomain  bool                `json:"enforceHostedDomain,omitempty"`
 	Options
 }
 
@@ -24,16 +26,20 @@ func NewGoogleIDPAddedEvent(
 	clientID string,
 	clientSecret *crypto.CryptoValue,
 	scopes []string,
+	hostedDomain string,
+	enforceHostedDomain bool,
 	options Options,
 ) *GoogleIDPAddedEvent {
 	return &GoogleIDPAddedEvent{
-		BaseEvent:    *base,
-		ID:           id,
-		Name:         name,
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
-		Scopes:       scopes,
-		Options:      options,
+		BaseEvent:           *base,
+		ID:                  id,
+		Name:                name,
+		ClientID:            clientID,
+		ClientSecret:        clientSecret,
+		Scopes:              scopes,
+		HostedDomain:        hostedDomain,
+		EnforceHostedDomain: enforceHostedDomain,
+		Options:             options,
 	}
 }
 
@@ -65,7 +71,9 @@ type GoogleIDPChangedEvent struct {
 	Name         *string             `json:"name,omitempty"`
 	ClientID     *string             `json:"clientId,omitempty"`
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	Scopes       []string            `json:"scopes,omitempty"`
+	Scopes              []string            `json:"scopes,omitempty"`
+	HostedDomain        *string             `json:"hostedDomain,omitempty"`
+	EnforceHostedDomain *bool               `json:"enforceHostedDomain,omitempty"`
 	OptionChanges
 }
 
@@ -109,6 +117,18 @@ func ChangeGoogleClientSecret(clientSecret *crypto.CryptoValue) func(*GoogleIDPC
 func ChangeGoogleScopes(scopes []string) func(*GoogleIDPChangedEvent) {
 	return func(e *GoogleIDPChangedEvent) {
 		e.Scopes = scopes
+	}
+}
+
+func ChangeGoogleHostedDomain(hostedDomain string) func(*GoogleIDPChangedEvent) {
+	return func(e *GoogleIDPChangedEvent) {
+		e.HostedDomain = &hostedDomain
+	}
+}
+
+func ChangeGoogleEnforceHostedDomain(enforce bool) func(*GoogleIDPChangedEvent) {
+	return func(e *GoogleIDPChangedEvent) {
+		e.EnforceHostedDomain = &enforce
 	}
 }
 

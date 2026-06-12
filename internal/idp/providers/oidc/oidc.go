@@ -23,6 +23,7 @@ type Provider struct {
 	isAutoUpdate      bool
 	useIDToken        bool
 	userInfoMapper    func(info *oidc.UserInfo) idp.User
+	userValidator     func(info *oidc.UserInfo) error
 	authOptions       []func(bool) rp.AuthURLOpt
 	generateVerifier  func() string
 }
@@ -90,6 +91,26 @@ func WithResponseMode(mode oidc.ResponseMode) ProviderOpts {
 		paramOpt := rp.WithResponseModeURLParam(mode)
 		p.authOptions = append(p.authOptions, func(_ bool) rp.AuthURLOpt {
 			return rp.AuthURLOpt(paramOpt)
+		})
+	}
+}
+
+// WithUserValidator sets a function called after the userinfo endpoint returns.
+// If the validator returns an error, FetchUser will fail with that error.
+// This enables provider-specific claim checks (e.g. verifying the Google `hd` claim).
+func WithUserValidator(validator func(info *oidc.UserInfo) error) ProviderOpts {
+	return func(p *Provider) {
+		p.userValidator = validator
+	}
+}
+
+// WithAuthURLParam adds a static key-value pair as a URL parameter to every auth request.
+func WithAuthURLParam(key, value string) ProviderOpts {
+	return func(p *Provider) {
+		p.authOptions = append(p.authOptions, func(_ bool) rp.AuthURLOpt {
+			return func() []oauth2.AuthCodeOption {
+				return []oauth2.AuthCodeOption{oauth2.SetAuthURLParam(key, value)}
+			}
 		})
 	}
 }

@@ -1254,11 +1254,13 @@ func (wm *GitLabSelfHostedIDPWriteModel) GetProviderOptions() idp.Options {
 type GoogleIDPWriteModel struct {
 	eventstore.WriteModel
 
-	ID           string
-	Name         string
-	ClientID     string
-	ClientSecret *crypto.CryptoValue
-	Scopes       []string
+	ID                  string
+	Name                string
+	ClientID            string
+	ClientSecret        *crypto.CryptoValue
+	Scopes              []string
+	HostedDomain        string
+	EnforceHostedDomain bool
 	idp.Options
 
 	State domain.IDPState
@@ -1285,6 +1287,8 @@ func (wm *GoogleIDPWriteModel) reduceAddedEvent(e *idp.GoogleIDPAddedEvent) {
 	wm.ClientID = e.ClientID
 	wm.ClientSecret = e.ClientSecret
 	wm.Scopes = e.Scopes
+	wm.HostedDomain = e.HostedDomain
+	wm.EnforceHostedDomain = e.EnforceHostedDomain
 	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
@@ -1302,6 +1306,12 @@ func (wm *GoogleIDPWriteModel) reduceChangedEvent(e *idp.GoogleIDPChangedEvent) 
 	if e.Scopes != nil {
 		wm.Scopes = e.Scopes
 	}
+	if e.HostedDomain != nil {
+		wm.HostedDomain = *e.HostedDomain
+	}
+	if e.EnforceHostedDomain != nil {
+		wm.EnforceHostedDomain = *e.EnforceHostedDomain
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
@@ -1311,6 +1321,8 @@ func (wm *GoogleIDPWriteModel) NewChanges(
 	clientSecretString string,
 	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
+	hostedDomain string,
+	enforceHostedDomain bool,
 	options idp.Options,
 ) ([]idp.GoogleIDPChanges, error) {
 	changes := make([]idp.GoogleIDPChanges, 0)
@@ -1332,6 +1344,12 @@ func (wm *GoogleIDPWriteModel) NewChanges(
 	if !reflect.DeepEqual(wm.Scopes, scopes) {
 		changes = append(changes, idp.ChangeGoogleScopes(scopes))
 	}
+	if wm.HostedDomain != hostedDomain {
+		changes = append(changes, idp.ChangeGoogleHostedDomain(hostedDomain))
+	}
+	if wm.EnforceHostedDomain != enforceHostedDomain {
+		changes = append(changes, idp.ChangeGoogleEnforceHostedDomain(enforceHostedDomain))
+	}
 
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {
@@ -1350,7 +1368,7 @@ func (wm *GoogleIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encr
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]oidc.ProviderOpts, 0, 4)
+	opts := make([]oidc.ProviderOpts, 0, 5)
 	if wm.IsCreationAllowed {
 		opts = append(opts, oidc.WithCreationAllowed())
 	}
@@ -1362,6 +1380,12 @@ func (wm *GoogleIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encr
 	}
 	if wm.IsAutoUpdate {
 		opts = append(opts, oidc.WithAutoUpdate())
+	}
+	if wm.HostedDomain != "" {
+		opts = append(opts, google.WithHostedDomain(wm.HostedDomain))
+	}
+	if wm.EnforceHostedDomain && wm.HostedDomain != "" {
+		opts = append(opts, google.WithEnforceHostedDomain(wm.HostedDomain))
 	}
 	return google.New(
 		wm.ClientID,

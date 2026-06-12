@@ -143,9 +143,11 @@ type IDPAzureAD struct {
 }
 
 type Google struct {
-	ClientID     string              `json:"clientId"`
-	ClientSecret *crypto.CryptoValue `json:"clientSecret"`
-	Scopes       []string            `json:"scopes,omitempty"`
+	ClientID            string              `json:"clientId"`
+	ClientSecret        *crypto.CryptoValue `json:"clientSecret"`
+	Scopes              []string            `json:"scopes,omitempty"`
+	HostedDomain        string              `json:"hostedDomain,omitempty"`
+	EnforceHostedDomain bool                `json:"enforceHostedDomain,omitempty"`
 }
 
 type IDPGoogle struct {

@@ -34,9 +34,11 @@ func (p *relationalTablesProjection) reduceOIDCIDPMigratedGoogle(event eventstor
 	}
 
 	google := domain.Google{
-		ClientID:     idpEvent.ClientID,
-		ClientSecret: idpEvent.ClientSecret,
-		Scopes:       idpEvent.Scopes,
+		ClientID:            idpEvent.ClientID,
+		ClientSecret:        idpEvent.ClientSecret,
+		Scopes:              idpEvent.Scopes,
+		HostedDomain:        idpEvent.HostedDomain,
+		EnforceHostedDomain: idpEvent.EnforceHostedDomain,
 	}
 
 	payloadJSON, err := json.Marshal(google)
@@ -82,9 +84,11 @@ func (p *relationalTablesProjection) reduceGoogleIDPAdded(event eventstore.Event
 	}
 
 	google := domain.Google{
-		ClientID:     idpEvent.ClientID,
-		ClientSecret: idpEvent.ClientSecret,
-		Scopes:       idpEvent.Scopes,
+		ClientID:            idpEvent.ClientID,
+		ClientSecret:        idpEvent.ClientSecret,
+		Scopes:              idpEvent.Scopes,
+		HostedDomain:        idpEvent.HostedDomain,
+		EnforceHostedDomain: idpEvent.EnforceHostedDomain,
 	}
 
 	payloadJSON, err := json.Marshal(google)
@@ -178,6 +182,14 @@ func (p *relationalTablesProjection) reduceGoogleIDPChangedColumns(payload *doma
 	if idpEvent.Scopes != nil && !slices.Equal(idpEvent.Scopes, payload.Scopes) {
 		payloadChanged = true
 		payload.Scopes = idpEvent.Scopes
+	}
+	if idpEvent.HostedDomain != nil && *idpEvent.HostedDomain != payload.HostedDomain {
+		payloadChanged = true
+		payload.HostedDomain = *idpEvent.HostedDomain
+	}
+	if idpEvent.EnforceHostedDomain != nil && *idpEvent.EnforceHostedDomain != payload.EnforceHostedDomain {
+		payloadChanged = true
+		payload.EnforceHostedDomain = *idpEvent.EnforceHostedDomain
 	}
 	return payloadChanged
 }

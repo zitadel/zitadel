@@ -711,10 +711,12 @@ func (wm *OrgGoogleIDPWriteModel) NewChangedEvent(
 	clientSecretString string,
 	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
+	hostedDomain string,
+	enforceHostedDomain bool,
 	options idp.Options,
 ) (*org.GoogleIDPChangedEvent, error) {
 
-	changes, err := wm.GoogleIDPWriteModel.NewChanges(name, clientID, clientSecretString, secretCrypto, scopes, options)
+	changes, err := wm.GoogleIDPWriteModel.NewChanges(name, clientID, clientSecretString, secretCrypto, scopes, hostedDomain, enforceHostedDomain, options)
 	if err != nil || len(changes) == 0 {
 		return nil, err
 	}

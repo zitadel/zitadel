@@ -270,8 +270,10 @@ func gitlabSelfHostedConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.Git
 func googleConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.GoogleIDPTemplate) {
 	idpConfig.Config = &idp_pb.IDPConfig_Google{
 		Google: &idp_pb.GoogleConfig{
-			ClientId: template.ClientID,
-			Scopes:   template.Scopes,
+			ClientId:            template.ClientID,
+			Scopes:              template.Scopes,
+			HostedDomain:        template.HostedDomain,
+			EnforceHostedDomain: template.EnforceHostedDomain,
 		},
 	}
 }
