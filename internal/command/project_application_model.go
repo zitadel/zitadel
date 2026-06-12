@@ -60,7 +60,7 @@ func (wm *ApplicationWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
-		case *project.ProjectRemovedEvent:
+		default:
 			wm.WriteModel.AppendEvents(e)
 		}
 	}
@@ -89,6 +89,9 @@ func (wm *ApplicationWriteModel) Reduce() error {
 		case *project.ProjectRemovedEvent:
 			wm.Name = ""
 			wm.State = domain.AppStateRemoved
+		case *project.ProjectAddedEvent:
+			wm.Name = ""
+			wm.State = domain.AppStateUnspecified
 		}
 	}
 	return wm.WriteModel.Reduce()

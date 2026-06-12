@@ -87,7 +87,7 @@ func (wm *HumanWebAuthNWriteModel) AppendEvents(events ...eventstore.Event) {
 			if wm.WebauthNTokenID == e.WebAuthNTokenID {
 				wm.WriteModel.AppendEvents(&e.HumanWebAuthNRemovedEvent)
 			}
-		case *user.UserRemovedEvent:
+		default:
 			wm.WriteModel.AppendEvents(e)
 		}
 	}
@@ -96,16 +96,6 @@ func (wm *HumanWebAuthNWriteModel) AppendEvents(events ...eventstore.Event) {
 func (wm *HumanWebAuthNWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent:
-			wm.WebauthNTokenID = ""
-			wm.Challenge = ""
-			wm.KeyID = nil
-			wm.PublicKey = nil
-			wm.AttestationType = ""
-			wm.AAGUID = nil
-			wm.SignCount = 0
-			wm.WebAuthNTokenName = ""
-			wm.RPID = ""
 		case *user.HumanWebAuthNAddedEvent:
 			wm.appendAddedEvent(e)
 		case *user.HumanWebAuthNVerifiedEvent:
@@ -114,7 +104,7 @@ func (wm *HumanWebAuthNWriteModel) Reduce() error {
 			wm.SignCount = e.SignCount
 		case *user.HumanWebAuthNRemovedEvent:
 			wm.State = domain.MFAStateRemoved
-		case *user.UserRemovedEvent:
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent, *user.UserRemovedEvent:
 			wm.WebauthNTokenID = ""
 			wm.Challenge = ""
 			wm.KeyID = nil
@@ -229,8 +219,11 @@ func (wm *HumanU2FTokensReadModel) Reduce() error {
 			wm.WebAuthNTokens[len(wm.WebAuthNTokens)-1] = nil
 			wm.WebAuthNTokens = wm.WebAuthNTokens[:len(wm.WebAuthNTokens)-1]
 		case *user.UserRemovedEvent:
-			*wm = HumanU2FTokensReadModel{}
+			wm.WebAuthNTokens = nil
 			wm.UserState = domain.UserStateDeleted
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent:
+			wm.WebAuthNTokens = nil
+			wm.UserState = domain.UserStateUnspecified
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -245,7 +238,12 @@ func (rm *HumanU2FTokensReadModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			user.HumanU2FTokenAddedType,
 			user.HumanU2FTokenVerifiedType,
-			user.HumanU2FTokenRemovedType).
+			user.HumanU2FTokenRemovedType,
+			user.UserRemovedType,
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
+		).
 		Builder()
 
 }
@@ -317,8 +315,11 @@ func (wm *HumanPasswordlessTokensReadModel) Reduce() error {
 			wm.WebAuthNTokens[len(wm.WebAuthNTokens)-1] = nil
 			wm.WebAuthNTokens = wm.WebAuthNTokens[:len(wm.WebAuthNTokens)-1]
 		case *user.UserRemovedEvent:
-			*wm = HumanPasswordlessTokensReadModel{}
+			wm.WebAuthNTokens = nil
 			wm.UserState = domain.UserStateDeleted
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent:
+			wm.WebAuthNTokens = nil
+			wm.UserState = domain.UserStateUnspecified
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -333,7 +334,12 @@ func (rm *HumanPasswordlessTokensReadModel) Query() *eventstore.SearchQueryBuild
 		EventTypes(
 			user.HumanPasswordlessTokenAddedType,
 			user.HumanPasswordlessTokenVerifiedType,
-			user.HumanPasswordlessTokenRemovedType).
+			user.HumanPasswordlessTokenRemovedType,
+			user.UserRemovedType,
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
+		).
 		Builder()
 
 }
@@ -379,7 +385,7 @@ func (wm *HumanU2FLoginReadModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
-		case *user.UserRemovedEvent:
+		default:
 			wm.WriteModel.AppendEvents(e)
 		}
 	}
@@ -394,8 +400,15 @@ func (wm *HumanU2FLoginReadModel) Reduce() error {
 			wm.UserVerification = e.UserVerification
 			wm.State = domain.UserStateActive
 		case *user.UserRemovedEvent:
-			*wm = HumanU2FLoginReadModel{}
+			wm.Challenge = ""
+			wm.AllowedCredentialIDs = nil
+			wm.UserVerification = domain.UserVerificationRequirementUnspecified
 			wm.State = domain.UserStateDeleted
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent:
+			wm.Challenge = ""
+			wm.AllowedCredentialIDs = nil
+			wm.UserVerification = domain.UserVerificationRequirementUnspecified
+			wm.State = domain.UserStateUnspecified
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -409,7 +422,11 @@ func (rm *HumanU2FLoginReadModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(rm.AggregateID).
 		EventTypes(
 			user.HumanU2FTokenBeginLoginType,
-			user.UserRemovedType).
+			user.UserRemovedType,
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
+		).
 		Builder()
 }
 
@@ -441,7 +458,7 @@ func (wm *HumanPasswordlessLoginReadModel) AppendEvents(events ...eventstore.Eve
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
-		case *user.UserRemovedEvent:
+		default:
 			wm.WriteModel.AppendEvents(e)
 		}
 	}
@@ -456,8 +473,15 @@ func (wm *HumanPasswordlessLoginReadModel) Reduce() error {
 			wm.UserVerification = e.UserVerification
 			wm.State = domain.UserStateActive
 		case *user.UserRemovedEvent:
-			*wm = HumanPasswordlessLoginReadModel{}
+			wm.Challenge = ""
+			wm.AllowedCredentialIDs = nil
+			wm.UserVerification = domain.UserVerificationRequirementUnspecified
 			wm.State = domain.UserStateDeleted
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent:
+			wm.Challenge = ""
+			wm.AllowedCredentialIDs = nil
+			wm.UserVerification = domain.UserVerificationRequirementUnspecified
+			wm.State = domain.UserStateUnspecified
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -471,7 +495,11 @@ func (rm *HumanPasswordlessLoginReadModel) Query() *eventstore.SearchQueryBuilde
 		AggregateIDs(rm.AggregateID).
 		EventTypes(
 			user.HumanPasswordlessTokenBeginLoginType,
-			user.UserRemovedType).
+			user.UserRemovedType,
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
+		).
 		Builder()
 
 }
@@ -520,7 +548,7 @@ func (wm *HumanPasswordlessInitCodeWriteModel) AppendEvents(events ...eventstore
 			if wm.CodeID == e.ID {
 				wm.WriteModel.AppendEvents(e)
 			}
-		case *user.UserRemovedEvent:
+		default:
 			wm.WriteModel.AppendEvents(e)
 		}
 	}
@@ -539,8 +567,13 @@ func (wm *HumanPasswordlessInitCodeWriteModel) Reduce() error {
 			wm.appendCheckFailedEvent(e)
 		case *user.HumanPasswordlessInitCodeCheckSucceededEvent:
 			wm.State = domain.PasswordlessInitCodeStateRemoved
-		case *user.UserRemovedEvent:
-			*wm = HumanPasswordlessInitCodeWriteModel{}
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent, *user.UserRemovedEvent:
+			wm.CodeID = ""
+			wm.Attempts = 0
+			wm.CryptoCode = nil
+			wm.CodeCreationDate = time.Time{}
+			wm.CodeExpiration = 0
+			wm.State = domain.PasswordlessInitCodeStateUnspecified
 			wm.State = domain.PasswordlessInitCodeStateRemoved
 		}
 	}
@@ -582,6 +615,10 @@ func (wm *HumanPasswordlessInitCodeWriteModel) Query() *eventstore.SearchQueryBu
 			user.HumanPasswordlessInitCodeSentType,
 			user.HumanPasswordlessInitCodeCheckFailedType,
 			user.HumanPasswordlessInitCodeCheckSucceededType,
-			user.UserRemovedType).
+			user.UserRemovedType,
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
+		).
 		Builder()
 }

@@ -42,8 +42,7 @@ type Command interface {
 
 type EnforceResourceOwnerCommand interface {
 	Command
-	// EnforceResourceOwner indicates that the resource owner of the event MUST be the same owner as on previous events of the aggregate.
-	// If this is not the case, the command will be rejected with an [ErrIDReused].
+	// EnforceResourceOwner indicates that the resource owner of the event does not respect the previous events and should be enforced by the eventstore.
 	EnforceResourceOwner()
 }
 

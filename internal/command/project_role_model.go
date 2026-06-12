@@ -55,7 +55,7 @@ func (wm *ProjectRoleWriteModel) AppendEvents(events ...eventstore.Event) {
 			if e.Key == wm.Key {
 				wm.WriteModel.AppendEvents(e)
 			}
-		case *project.ProjectRemovedEvent:
+		default:
 			wm.WriteModel.AppendEvents(e)
 		}
 	}

@@ -141,8 +141,11 @@ func (wm *HumanOTPSMSWriteModel) Reduce() error {
 		case *user.HumanOTPSMSRemovedEvent:
 			wm.otpAdded = false
 		case *user.HumanPhoneRemovedEvent,
-			*user.UserRemovedEvent:
-			*wm = HumanOTPSMSWriteModel{}
+			*user.UserRemovedEvent,
+			*user.HumanAddedEvent,
+			*user.HumanRegisteredEvent,
+			*user.MachineAddedEvent:
+
 			wm.phoneVerified = false
 			wm.otpAdded = false
 		}
@@ -160,6 +163,9 @@ func (wm *HumanOTPSMSWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanOTPSMSRemovedType,
 			user.HumanPhoneRemovedType,
 			user.UserRemovedType,
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
 		).
 		Builder()
 

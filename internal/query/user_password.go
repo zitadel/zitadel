@@ -87,6 +87,14 @@ func (wm *HumanPasswordReadModel) Reduce() error {
 			wm.EncodedHash = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 			wm.SecretChangeRequired = e.ChangeRequired
 			wm.UserState = domain.UserStateActive
+		case *user.MachineAddedEvent:
+			wm.Code = nil
+			wm.CodeCreationDate = time.Time{}
+			wm.CodeExpiry = 0
+			wm.PasswordCheckFailedCount = 0
+			wm.EncodedHash = ""
+			wm.SecretChangeRequired = false
+			wm.UserState = domain.UserStateUnspecified
 		case *user.HumanInitialCodeAddedEvent:
 			wm.UserState = domain.UserStateInitial
 		case *user.HumanInitializedCheckSucceededEvent:
@@ -138,6 +146,7 @@ func (wm *HumanPasswordReadModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(user.HumanAddedType,
 			user.HumanRegisteredType,
+			user.MachineAddedEventType,
 			user.HumanInitialCodeAddedType,
 			user.HumanInitializedCheckSucceededType,
 			user.HumanPasswordChangedType,
