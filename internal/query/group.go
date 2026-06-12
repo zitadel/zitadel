@@ -58,6 +58,11 @@ var (
 		name:  projection.GroupColumnState,
 		table: groupsTable,
 	}
+
+	// groupUserCountColumn counts the members of a group as a correlated subquery
+	groupUserCountColumn = "(SELECT COUNT(*) FROM " + groupUsersTable.identifier() +
+		" WHERE " + GroupUsersColumnGroupID.identifier() + " = " + GroupColumnID.identifier() +
+		" AND " + GroupUsersColumnInstanceID.identifier() + " = " + GroupColumnInstanceID.identifier() + ")"
 )
 
 type Groups struct {
@@ -75,6 +80,7 @@ type Group struct {
 	InstanceID    string
 	State         domain.GroupState
 	Sequence      uint64
+	UserCount     uint64
 }
 
 type GroupSearchQuery struct {
@@ -169,7 +175,8 @@ func prepareGroupQuery() (sq.SelectBuilder, func(*sql.Row) (*Group, error)) {
 			GroupColumnResourceOwner.identifier(),
 			GroupColumnInstanceID.identifier(),
 			GroupColumnSequence.identifier(),
-			GroupColumnState.identifier()).
+			GroupColumnState.identifier(),
+			groupUserCountColumn).
 			From(groupsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Group, error) {
@@ -184,6 +191,7 @@ func prepareGroupQuery() (sq.SelectBuilder, func(*sql.Row) (*Group, error)) {
 				&group.InstanceID,
 				&group.Sequence,
 				&group.State,
+				&group.UserCount,
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
@@ -245,6 +253,7 @@ func prepareGroupsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Groups, error)) {
 			GroupColumnInstanceID.identifier(),
 			GroupColumnSequence.identifier(),
 			GroupColumnState.identifier(),
+			groupUserCountColumn,
 			countColumn.identifier()).
 			From(groupsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
@@ -263,6 +272,7 @@ func prepareGroupsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Groups, error)) {
 					&group.InstanceID,
 					&group.Sequence,
 					&group.State,
+					&group.UserCount,
 					&count,
 				)
 				if err != nil {

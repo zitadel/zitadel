@@ -135,6 +135,7 @@ func groupToPb(g *query.Group) *group_v2.Group {
 		OrganizationId: g.ResourceOwner,
 		CreationDate:   timestamppb.New(g.CreationDate),
 		ChangeDate:     timestamppb.New(g.ChangeDate),
+		UserCount:      g.UserCount,
 	}
 }
 

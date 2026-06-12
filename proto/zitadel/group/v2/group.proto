@@ -53,6 +53,13 @@ message Group {
       example: "\"2025-01-23T10:34:18.051Z\"";
     }
   ];
+
+  // Number of users in the group.
+  uint64 user_count = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"5\"";
+    }
+  ];
 }
 
 message GroupUser {

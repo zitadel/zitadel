@@ -16,6 +16,10 @@ import (
 )
 
 var (
+	groupUserCountStmt = `(SELECT COUNT(*) FROM projections.group_users1` +
+		` WHERE projections.group_users1.group_id = projections.groups1.id` +
+		` AND projections.group_users1.instance_id = projections.groups1.instance_id)`
+
 	prepareGroupsStmt = `SELECT projections.groups1.id,` +
 		` projections.groups1.name,` +
 		` projections.groups1.description,` +
@@ -25,6 +29,7 @@ var (
 		` projections.groups1.instance_id,` +
 		` projections.groups1.sequence,` +
 		` projections.groups1.state,` +
+		` ` + groupUserCountStmt + `,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.groups1`
 
@@ -38,6 +43,7 @@ var (
 		"instance_id",
 		"sequence",
 		"state",
+		"user_count",
 		"count",
 	}
 
@@ -49,7 +55,8 @@ var (
 		` projections.groups1.resource_owner,` +
 		` projections.groups1.instance_id,` +
 		` projections.groups1.sequence,` +
-		` projections.groups1.state` +
+		` projections.groups1.state,` +
+		` ` + groupUserCountStmt +
 		` FROM projections.groups1`
 
 	prepareGroupColumns = []string{
@@ -62,6 +69,7 @@ var (
 		"instance_id",
 		"sequence",
 		"state",
+		"user_count",
 	}
 )
 
@@ -106,6 +114,7 @@ func Test_GroupPrepares(t *testing.T) {
 							"instance1",
 							1,
 							domain.GroupStateActive,
+							2,
 						},
 					},
 				),
@@ -125,6 +134,7 @@ func Test_GroupPrepares(t *testing.T) {
 						InstanceID:    "instance1",
 						Sequence:      1,
 						State:         domain.GroupStateActive,
+						UserCount:     2,
 					},
 				},
 			},
@@ -147,6 +157,7 @@ func Test_GroupPrepares(t *testing.T) {
 							"instance1",
 							1,
 							domain.GroupStateActive,
+							2,
 						},
 						{
 							"9092",
@@ -158,6 +169,7 @@ func Test_GroupPrepares(t *testing.T) {
 							"instance1",
 							1,
 							domain.GroupStateActive,
+							2,
 						},
 					},
 				),
@@ -177,6 +189,7 @@ func Test_GroupPrepares(t *testing.T) {
 						InstanceID:    "instance1",
 						Sequence:      1,
 						State:         domain.GroupStateActive,
+						UserCount:     2,
 					},
 					{
 						ID:            "9092",
@@ -188,6 +201,7 @@ func Test_GroupPrepares(t *testing.T) {
 						InstanceID:    "instance1",
 						Sequence:      1,
 						State:         domain.GroupStateActive,
+						UserCount:     2,
 					},
 				},
 			},
@@ -237,7 +251,7 @@ func Test_GroupPrepares(t *testing.T) {
 			prepare: prepareGroupQuery,
 			want: want{
 				sqlExpectations: mockQueriesScanErr(
-					prepareGroupStmt,
+					regexp.QuoteMeta(prepareGroupStmt),
 					nil,
 					nil,
 				),
@@ -284,6 +298,7 @@ func Test_GroupPrepares(t *testing.T) {
 						"instance1",
 						1,
 						domain.GroupStateActive,
+						2,
 					},
 				),
 			},
@@ -297,6 +312,7 @@ func Test_GroupPrepares(t *testing.T) {
 				InstanceID:    "instance1",
 				Sequence:      1,
 				State:         domain.GroupStateActive,
+				UserCount:     2,
 			},
 		},
 	}
