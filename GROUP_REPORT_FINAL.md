@@ -253,6 +253,8 @@ Scope is decided (see Decision Record): groups v1 ships first; group authorizati
 
 **Delivery model: all work happens on a single branch** (`yordis/groups-ga`), committed incrementally in work-order sequence (DCO-signed commits, one logical change per commit). No per-fix PR slicing. Never commit to `main`. **Do NOT create any pull requests — push the branch only.**
 
+**Working principle (Yordis, 2026-06-12): the only thing that matters is making the entire feature actually work.** No focus on CI, GitHub, or branch logistics. That explicitly includes docs, end-to-end testing, integration tests, and whatever else proves the feature functions — verification is done here, against a real running stack, not delegated to CI.
+
 **Groups v1 (GA-able without authorizations):**
 1. **Correctness fixes** (§3): rename unique-constraint, org-removal cascade, group-deletion semantics, join/machine-user issues — small, prevent data-integrity bugs
 2. **API contract completion** (§2): REST bindings, user counts, `failed_user_ids`, description clearing, v2beta type, copy cleanup
