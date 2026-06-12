@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/internal/integration/scim"
 )
 
 func TestGroups_lifecycle(t *testing.T) {
@@ -42,7 +43,7 @@ func TestGroups_lifecycle(t *testing.T) {
 
 	// list contains the group
 	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-		list, err := Instance.Client.SCIM.Groups.List(CTX, orgID, nil)
+		list, err := Instance.Client.SCIM.Groups.List(CTX, orgID, &scim.ListRequest{})
 		require.NoError(ttt, err)
 		found := false
 		for _, group := range list.Resources {
@@ -54,14 +55,19 @@ func TestGroups_lifecycle(t *testing.T) {
 	}, retryDuration, tick, "timeout waiting for group listing")
 
 	// replace renames and removes the member
-	replaced, err := Instance.Client.SCIM.Groups.Replace(CTX, orgID, created.ID, []byte(fmt.Sprintf(`{
+	_, err = Instance.Client.SCIM.Groups.Replace(CTX, orgID, created.ID, []byte(fmt.Sprintf(`{
 		"schemas": ["urn:ietf:params:scim:schemas:core:2.0:Group"],
 		"displayName": %q,
 		"members": []
 	}`, renamedGroupName)))
 	require.NoError(t, err)
-	assert.Equal(t, renamedGroupName, replaced.DisplayName)
-	assert.Empty(t, replaced.Members)
+	// the projection applies the change eventually
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		group, err := Instance.Client.SCIM.Groups.Get(CTX, orgID, created.ID)
+		require.NoError(ttt, err)
+		assert.Equal(ttt, renamedGroupName, group.DisplayName)
+		assert.Empty(ttt, group.Members)
+	}, retryDuration, tick, "timeout waiting for replaced group")
 
 	// delete; a second delete returns not found per RFC 7644
 	require.NoError(t, Instance.Client.SCIM.Groups.Delete(CTX, orgID, created.ID))
