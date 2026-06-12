@@ -86,7 +86,7 @@
     "concurrently": "^9.2.1",
     "dotenv-cli": "^11.0.0",
     "env-cmd": "^11.0.0",
-    "esbuild": "^0.28.0",
+    "esbuild": "^0.28.1",
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
