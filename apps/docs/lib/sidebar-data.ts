@@ -47,6 +47,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "guides/manage/console/projects-overview",
           "guides/manage/console/applications-overview",
           "guides/manage/console/users-overview",
+          "concepts/structure/groups",
           "concepts/structure/administrators",
         ],
       },

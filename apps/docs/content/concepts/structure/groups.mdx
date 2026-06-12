@@ -1,0 +1,64 @@
+---
+title: User Groups
+description: "Organize the users of an organization into groups, manage memberships, and include group memberships in tokens."
+sidebar_label: User Groups
+---
+
+A user group is a named collection of users that belongs to an [organization](/guides/manage/console/organizations-overview).
+Groups help administrators organize users — for example by team, department, or customer — and allow applications
+to receive a user's group memberships in tokens.
+
+## Group Structure
+
+- A group has a **name** and an optional **description**.
+- Group names are unique inside their organization. Uniqueness is case-insensitive: `Admins` and `admins` are considered the same name.
+- Both **human users** and **machine users** can be members of a group, as long as they belong to the same organization as the group.
+- Deleting a user removes them from all groups. Deleting an organization removes all of its groups.
+
+## Managing Groups
+
+Groups are managed through the [Group API](/reference/api/group): create, update, and delete groups,
+add or remove users, and search groups or memberships.
+Group listings include the number of users per group.
+
+Adding users to a group is all-or-nothing: if any of the given users does not exist in the organization,
+no users are added and the error lists all missing user IDs.
+Users that are already members are ignored, so requests can safely be retried.
+
+The following permissions control access to groups:
+
+| Permission          | Allows                          |
+| ------------------- | ------------------------------- |
+| `group.create`      | Create groups                   |
+| `group.read`        | Read and search groups          |
+| `group.write`       | Update groups                   |
+| `group.delete`      | Delete groups                   |
+| `group.user.write`  | Add users to groups             |
+| `group.user.read`   | Read and search group members   |
+| `group.user.delete` | Remove users from groups        |
+
+These permissions are included in the default `IAM_OWNER`, `ORG_OWNER`, and related manager roles.
+
+## Group Memberships in Tokens
+
+Applications can request the user's group memberships with the [`groups` scope](/apis/openidoauth/scopes).
+The resulting `groups` claim follows [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068.html#section-2.2.3.1),
+with values encoded according to [SCIM (RFC 7643)](https://www.rfc-editor.org/rfc/rfc7643#section-4.1.2):
+
+```json
+{
+  "groups": [
+    { "value": "317391152422278297", "display": "Support Team" },
+    { "value": "317391152422278312", "display": "Engineering" }
+  ]
+}
+```
+
+`value` contains the stable group ID, `display` the group name.
+Use `value` for stable references in your application, since group names can change.
+
+## Current Limitations
+
+- Group membership is **not an authorization mechanism** yet: roles and permissions cannot be granted to a group.
+  Use [authorizations](/concepts/structure/granted_projects) to grant project roles to individual users.
+- SAML assertions do not include group attributes; the `groups` claim is available for OIDC/OAuth 2 clients only.
