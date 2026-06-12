@@ -1,0 +1,243 @@
+# Team / Group Management — Final Consolidated Report
+
+Date: 2026-06-11
+
+Consolidates the findings of `GROUP_REPORT.md` and `GROUP_REPORT_CLAUDE.md` into a single inventory of the work required to finalize ZITADEL user-group management.
+
+## Scope & References
+
+- `zitadel/zitadel#9702` — User Groups epic. OPEN; all acceptance-criteria checkboxes are checked, but the criteria include UI-facing requirements (user counts per group, human + machine user search) that are not yet satisfied end to end.
+- `zitadel/zitadel#10093` — User Groups FE. OPEN, unscoped; Console work has not started.
+- `zitadel/zitadel#5822` — User Group Authorizations. OPEN; group-based project/admin authorizations are unimplemented.
+- `zitadel/zitadel#12154` — Standard `groups` claim behavior. OPEN; design feedback that current scope/claim handling is non-standard.
+- Shipped PR series: #10455 (CRUD service), #10758 (query/projection), #10853 (permissions), #10940 (group users), #11009 (token claims), #11725 (aggregate ID fix). PR #10455 explicitly deferred documentation "once entire feature is available".
+
+## Current State (Shipped)
+
+| Area | Status | Location |
+|---|---|---|
+| Proto API (8 RPCs: Create/Get/List/Update/Delete group, Add/Remove/List group users) | Done | `proto/zitadel/group/v2/` |
+| Connect/gRPC handlers + unit and integration tests; service registered | Done | `internal/api/grpc/group/v2/`, `cmd/start/start.go` |
+| Commands (CRUD, membership, validations) + unit tests | Done | `internal/command/group.go`, `group_users.go` |
+| Queries + projections (`groups1`, `group_users1`), registered, org/instance-removal cleanup | Done | `internal/query/group*.go`, `internal/query/projection/group*.go` |
+| Events (`group.added/changed/removed`, `group.users.added/removed`) | Done | `internal/repository/group/` |
+| Permissions (`group.create/write/read/delete`, `group.user.write/read/delete`) mapped to IAM_OWNER, ORG_OWNER, viewers, user managers, SYSTEM_OWNER | Done | `internal/domain/permission.go:79-85`, `cmd/defaults.yaml` |
+| User-deletion cascade through all delete paths (auth, management, user v2/v2beta, SCIM) | Done | `internal/command/user.go:224`, `user_v2.go:176` |
+| OIDC group claims via `groups` and `urn:zitadel:iam:user:groups` scopes (userinfo, introspection, id_token / JWT access token via userinfo assertion) | Done (partial — see §4) | `internal/api/oidc/userinfo.go:193-196`, `internal/api/oidc/client.go`, `internal/query/userinfo_by_id.sql` |
+| Group events exposed in admin events/audit API | Done (automatic via `RegisterFilterEventMapper`) | `internal/repository/group/eventstore.go` |
+
+### Reconciled discrepancy: "missing generated artifacts"
+
+`GROUP_REPORT.md` flagged `pkg/grpc/group/v2` as absent and `go test ./internal/api/grpc/group/v2` as failing. Verified: `**.pb.go`, `pkg/**/**.connect.go`, etc. are **gitignored repo-wide** (`.gitignore:52-57`) — the same is true for `pkg/grpc/session`, `org`, `project`, and every other v2 service. This is repo convention, not missing work. Generation (`pnpm nx run @zitadel/api:generate`) is a required local/CI build step before running Go tests, and is captured in the release-validation gates (§11), not as feature work.
+
+---
+
+## Decision Record: Group-Based Authorizations
+
+Date: 2026-06-11 — Decided by: Yordis Prieto
+
+**Decision: build group-based authorizations (#5822), as a separate phase after groups v1, using query-time resolution, with admin-role-via-group descoped from the first authorization phase.**
+
+1. **In scope, but phased.** Lifecycle + membership + claims ship first as a documented "user groups v1" (console, docs, GA gates) without blocking on authorizations. Group authorizations follow as their own release phase.
+   - *Why*: without authorizations, groups are only name labels in tokens; customers would hard-code RBAC against group names in app code, bypassing ZITADEL's role system while ZITADEL carries the feature's maintenance cost. Half of #9702's promises (permissions revoked on group deletion) only make sense once authorizations exist.
+2. **Query-time resolution, not materialized grants.** New `group_grant` aggregate (group → project + roles) with its own events and projection, merged with `usergrant` at token/userinfo/authorization-query time.
+   - *Why*: fanning out real user grants per member on membership change is hostile to the eventstore model (one membership change → N grant events; group deletion → N revocations) and recreates the orphan-permission problem #9702 warns about. Query-time merge makes deletion-revocation free (the join stops matching) and yields provenance ("role came from group X") naturally. The cost — an extra join on token-issuance hot paths — matches the existing pattern (`userinfo_by_id.sql` already joins group tables).
+3. **Admin-role-via-group descoped from phase one.** Group-sourced IAM/org memberships touch the permission-check core (`org_members`/`instance_members` resolution) and carry security-review weight; project-role grants deliver most customer value at a fraction of the risk. Revisit after project grants ship — or never, if demand doesn't materialize.
+
+Sequencing: group project grants + token merge → console support for group grants → admin roles later, if at all. Follow-up: update #5822 to reflect the split and reference this decision.
+
+---
+
+## Decision Record: `groups` Claim Standardization (#12154)
+
+Date: 2026-06-11 — Decided by: Yordis Prieto
+
+**Decision: follow the RFCs — RFC 9068 §2.2.3.1 defines the `groups` claim with values encoded per RFC 7643 (SCIM Core Schema) §4.1.2/§8.2.**
+
+1. **Claim shape**: the `groups` claim becomes an RFC 7643-encoded array — `[{"value": "<groupID>", "display": "<groupName>"}]` — emitted in JWT access tokens (where RFC 9068 applies) and mirrored in userinfo/ID token for consistency.
+   - *Why*: RFC 9068 is the only standard that defines a `groups` claim; "copy the market" is ambiguous (Okta emits names, Entra emits GUIDs, Auth0 requires namespaced custom claims), and the RFC shape is a superset of all of them.
+2. **Breaking-shape change accepted now**: the array-of-names claim shipped in #11009 changes to the SCIM object array. Pre-GA and undocumented, so the cost is ~zero today and real after GA.
+3. **Scope-gated, not default-on**: no RFC governs scope names; the `groups` scope (Okta-style de-facto pattern) remains the gate. Default emission is rejected (token bloat, org-structure leakage).
+4. **Deprecate `urn:zitadel:iam:user:groups` before GA**: the RFC shape already carries id+name, so the custom URN claim is redundant. (If names-only ergonomics are later demanded, reintroduce a ZITADEL-flavored variant behind a URN scope rather than bending the standard claim.)
+5. **Forward synergy**: when SCIM `/Groups` (RFC 7644) ships, populate `$ref` in each claim entry.
+
+Resolution for #12154: native `groups` scope/claim exists, claim shape follows RFC 9068/RFC 7643, actions no longer required; docs to be updated accordingly.
+
+---
+
+## Open Decisions
+
+Pending product/architecture calls, with options and current recommendation. Decided items move up into Decision Records.
+
+### Blocking for groups v1 GA
+
+**OD-1. `AddUsersToGroup` partial-failure semantics**
+- Options: (a) keep all-or-nothing and fix the proto comment that promises `failed_user_ids`; (b) implement partial success returning a `failed_user_ids` list.
+- Impacts: API contract freeze (§2), console bulk-add error UX (§7).
+- Recommendation: **(a) all-or-nothing**. Simpler contract, transactional semantics match the eventstore model, callers retry the whole batch; the proto comment is the bug, not the behavior.
+
+**OD-2. Feature gating**
+- Options: (a) always-on (current state — API live on every instance, no flag); (b) add a feature flag before console/docs make groups discoverable.
+- Impacts: §10, rollout of Phase A (group grants will change token contents for group members).
+- Recommendation: **always-on for groups v1; introduce a flag only for Phase A token-merge behavior**, since that is the change with blast radius on existing tokens.
+
+**OD-3. `GroupUser` v2beta type dependency**
+- Options: (a) keep `zitadel.authorization.v2beta.User` inside stable `group.v2`; (b) define a stable v2 user reference type now.
+- Impacts: §2; breaking-ish — far cheaper before GA than after.
+- Recommendation: **(b) stable type now**. A stable API depending on v2beta types inherits v2beta's right-to-break.
+
+**OD-4. Group name uniqueness semantics**
+- Options: (a) case-sensitive (current accidental behavior of the unique-constraint string); (b) case-insensitive.
+- Impacts: §2 contract, §3 unique-constraint fix (decide before fixing the rename-constraint bug so it's only touched once), docs/tests.
+- Recommendation: **(b) case-insensitive**. Matches user expectations for human-named entities; "Admins" vs "admins" coexisting is a support ticket, not a feature.
+
+### Decidable as the work comes up
+
+**OD-5. SAML group attributes**
+- Options: implement group attributes in SAML assertions for v1, or explicitly exclude from scope.
+- Recommendation: **exclude from v1, document the exclusion**; revisit with Phase A when group-derived roles exist (SAML consumers mostly want roles, not raw membership).
+
+**OD-6. SCIM `/Groups` endpoint (RFC 7644)**
+- Options: in-scope for this feature vs separate SCIM-compliance effort.
+- Recommendation: **separate effort**, tracked independently; the claims decision already reserves `$ref` synergy for when it lands.
+
+**OD-7. Actions v2 triggers for group events**
+- Options: expose group lifecycle/membership events as action trigger conditions, or not.
+- Recommendation: **defer**; no demand signal yet, and the events API already exposes group events for observers.
+
+**OD-8. Org-removal cascade semantics**
+- Options: (a) keep projection-only cleanup (current; consistent with other resources, but eventstore unique name constraints never released, no per-group audit record); (b) emit per-group `GroupRemovedEvent`s on org removal.
+- Impacts: §3 correctness work; event-stream guarantees.
+- Recommendation: **(a) plus targeted constraint release** — keep projection cleanup for parity with other aggregates, but release the org's `group_name` unique constraints during org removal so a re-created org with the same ID can't hit ghost name collisions. Full per-group event emission only if audit requirements demand it.
+
+---
+
+## Remaining Work
+
+### 1. Group-based authorizations (#5822 — largest item, not started; see Decision Record)
+
+No implementation exists: no group-grant domain model, events, projections, commands, queries, or merge logic. `usergrant` still models grants by user ID only.
+
+**Phase A — group project grants (committed):**
+- [ ] `group_grant` aggregate: domain model, events, projections, commands, queries, API contract, permission checks (add/remove project-role authorization to/from a group)
+- [ ] Merge personal + group authorizations at query time when a user authenticates
+- [ ] Expose group-derived authorizations in tokens and userinfo (project-role-assertion equivalent)
+- [ ] List a user's authorizations with provenance (direct vs group-sourced)
+- [ ] On group deletion, group-sourced permissions stop resolving with no orphaned effective grants (falls out of query-time design; cover with tests) (#9702 requires this)
+- [ ] Update #5822 to record the phase split and reference the decision record
+
+**Phase B — admin roles via group (deferred, revisit after Phase A):**
+- [ ] Group-based ZITADEL admin/IAM memberships: add/remove manager roles on a group; reflect in `org_members`/`instance_members` resolution; list per user with group origin
+
+### 2. Finish the API contract
+
+- [ ] **REST bindings**: add `google.api.http` annotations to every RPC in `group_service.proto` (the file imports `annotations.proto` but defines no routes); regenerate gateway + OpenAPI. Group is the only v2 service that is gRPC-only
+- [ ] **Per-group user counts**: #9702 requires group listings to show user count; `Group` has no count field and no count endpoint exists — implement efficiently at query/projection level, not console fan-out
+- [ ] **`failed_user_ids` discrepancy** (OD-1): `AddUsersToGroup` comment (`group_service.proto:307`) promises failed user IDs in the response, but `AddUsersToGroupResponse` only has `change_date` and the command is all-or-nothing — add the field or fix the contract/comment
+- [ ] **Description clearing**: `UpdateGroupRequest.description` has `min_len: 1` when set, so an existing description can never be cleared; `CreateGroupRequest` allows empty — make consistent
+- [ ] **v2beta dependency** (OD-3): `zitadel.group.v2.GroupUser` references `zitadel.authorization.v2beta.User`; a stable v2 API should not depend on v2beta types without an explicit compatibility decision
+- [ ] **Stale/inaccurate API copy**: `UpdateGroup` 404 text mentions roles; `DeleteGroup` documents idempotent success *and* a 404; permission docs are comments rather than declarative proto role options like other services — confirm intentional
+- [ ] **Proto hygiene**: `AddUsersToGroupResponse` skips field number 1
+- [ ] **Name-uniqueness semantics** (OD-4): decide case-sensitive vs case-insensitive uniqueness; cover with tests and docs
+- [ ] Search-filter ergonomics (nice-to-have): `ListGroups` supports only `group_ids`/`name`/`organization_id` (consider description, state, creation-date); `ListGroupUsers` lacks an org filter and doesn't return group name; no lookup-by-name query despite per-org uniqueness
+
+### 3. Backend correctness
+
+- [ ] **Unique-constraint on rename**: `GroupChangedEvent` (`internal/repository/group/group.go`) does not release/re-add the `group_name` unique constraint when a group is renamed — renames can collide with or orphan name uniqueness
+- [ ] **Org-removal cascade** (OD-8): `prepareRemoveOrg` (`internal/command/org.go:607`) emits no per-group events; projections clean the read model, but eventstore unique name constraints for the removed org are never released and the event stream has no group-removal record — emit cascading events or release constraints
+- [ ] **Group-deletion membership events**: the projection removes `group_users` rows on `GroupRemovedEvent`, but the command emits no membership-removal events when a group is deleted — confirm the event-sourced audit trail is acceptable or emit cascades
+- [ ] **`ListGroupUsers` join semantics**: query left-joins login names but filters `LoginNameIsPrimaryCol = true`, effectively inner-filtering — verify users without a primary login row (e.g., some machine users) still appear
+- [ ] **Machine-user coverage**: #9702 requires human and machine accounts; membership query tests only exercise human display/login joins
+- [ ] **Error clarity**: `AddUsersToGroup` returns "user not found" when the user exists in another org (`internal/command/group_users.go:73`)
+- [ ] **`groupUserToPb`** (`internal/api/grpc/group/v2/query.go:217`) sets `organization_id` to the group's resource owner, not the user's org — verify
+- [ ] **Idempotency semantics**: add explicit tests for duplicate user IDs in add/remove requests and document behavior
+- [ ] Cleanup: duplicate `AggregateReducer` for `GroupRemovedEventType` in `internal/query/projection/group_users.go:87-94` (benign)
+
+### 4. Token & claim behavior
+
+- [ ] **Implement #12154 decision** (see Decision Record): re-encode the `groups` claim per RFC 9068/RFC 7643 (`[{value, display}]`) in JWT access tokens, userinfo, and ID token; keep scope-gating; deprecate `urn:zitadel:iam:user:groups` before GA
+- [ ] **Wording mismatch**: #9702 says "group roles" in tokens; the implementation emits group names / ID+name objects — reconcile spec vs implementation (ties into §1 merge work)
+- [ ] **Flow verification**: confirm the claims appear (or are deliberately absent) in ID tokens, JWT access tokens, and userinfo across auth-code, refresh, machine/client-credentials flows; decide bearer-token vs JWT delivery; add integration tests per chosen behavior
+- [ ] **SAML** (OD-5): no group attributes in SAML assertions (`internal/api/saml/` has zero group references) — implement or explicitly exclude
+- [ ] **Perf**: `userinfo_by_id.sql:65-70` unconditionally LEFT JOINs group tables even when no group scope is requested
+- [ ] Update/retire docs that direct users to Actions for group claims once native behavior is final
+
+### 5. Protocol / ecosystem integrations
+
+- [ ] **SCIM** (OD-6): no `/Groups` endpoint (`internal/api/scim/resources/` is user-only); RFC 7644 expects one for full compliance
+- [ ] **Actions v2** (OD-7): no group-related trigger conditions/executions — decide whether group lifecycle/membership events should be actionable
+
+### 6. TypeScript SDK
+
+- [ ] Add `createGroupServiceClient` to `packages/zitadel-client/src/v2.ts` — every other v2 service is exported; group is missing
+- [ ] Regenerate TS proto outputs (`pnpm nx run @zitadel/proto:generate`) and rebuild `@zitadel/client` if affected
+
+### 7. Console UI (#10093 — not started)
+
+Nothing exists under `console/src`: no route, page, module, service, or sidenav entry. Only unrelated matches (project-role display groups, form groups).
+
+- [ ] User Groups section in the organization context with permissions-aware navigation and route guards (`group.read/write/delete`, `group.user.*`)
+- [ ] Group list: name, description, **user count**, dates, search/sort/pagination, empty state, permission-aware actions (pattern: `pages/grants` + `modules/user-grants`)
+- [ ] Create/edit flows with uniqueness validation, required name, optional (clearable) description, API error handling
+- [ ] Delete flow with confirmation and messaging about membership/authorization consequences
+- [ ] Group detail + membership management: list members, search humans and machine users, bulk add/remove, surface partial-failure semantics per final API contract
+- [ ] Wire `@zitadel/proto` group v2 service into console gRPC services; sidenav entry in `sidenav.component.ts`
+- [ ] If §1 stays in scope: group project-role and administrator-role management screens
+- [ ] English copy + localization keys, propagated per repo translation workflow
+
+### 8. Documentation (deferred in PR #10455)
+
+- [ ] Regenerate API reference so `/reference/api/group` resolves; add the entry to the docs sidebar (`apps/docs/lib/sidebar-data.ts`) — `apis/introduction.mdx` links to it but the nav entry is absent
+- [ ] Concept page: what a Group is in ZITADEL's data model (`apps/docs/content/concepts/structure/`)
+- [ ] Console how-to guide for managing user groups; API examples for all 8 RPCs
+- [ ] Document `groups` / `urn:zitadel:iam:user:groups` scopes and exact claim shapes (userinfo, ID token, JWT access token) in `apps/docs/content/apis/openidoauth/claims.mdx` and scopes docs
+- [ ] Update or retire action-based group-claim guidance (`guides/integrate/actions/migrate-from-v1.mdx`)
+- [ ] If §1 is deferred: document that group membership is not yet an authorization mechanism
+- [ ] Update roadmap (`apps/docs/content/product/roadmap.mdx`) at GA
+
+### 9. Testing
+
+- [ ] Functional-UI (Cypress) suite for groups (`tests/functional-ui/cypress/e2e/` has no `groups/`) — required once Console UI exists
+- [ ] `GetGroup` permission-V2 integration test (only `ListGroups_WithPermissionV2` exists)
+- [ ] Machine-user membership tests; duplicate-ID idempotency tests; name-case-sensitivity tests
+- [ ] Regression coverage for user-deletion cleanup through all delete paths (auth, management, user v2/v2beta, SCIM)
+- [ ] Integration tests for group authorizations and token merge once §1 lands
+
+### 10. Feature gating decision
+
+- [ ] No feature flag exists for groups (`internal/feature/feature.go` has no group key) — the API is live on every instance (OD-2). Decide whether GA requires a flag/rollout mechanism or always-on is intended
+
+### 11. Release validation gates
+
+Run before declaring the feature final (generation must precede Go tests because generated packages are gitignored):
+
+- `pnpm nx run @zitadel/api:generate`, `@zitadel/proto:generate`, `@zitadel/docs:generate`
+- `pnpm nx run @zitadel/api:lint`, `@zitadel/api:test-unit`, `@zitadel/api:test-integration`
+- `pnpm nx run @zitadel/console:lint`, `@zitadel/console:build`
+- `pnpm nx run @zitadel/docs:check-types`, `@zitadel/docs:check-links`, `@zitadel/docs:build`
+- `pnpm nx run @zitadel/client:build` (if generated proto changes affect the TS client)
+- Targeted Go tests:
+  - `go test ./internal/api/grpc/group/v2`
+  - `go test ./internal/command -run 'TestCommands_(CreateGroup|UpdateGroup|DeleteGroup|AddUsersToGroup|RemoveUsersFromGroup)'`
+  - `go test ./internal/query -run 'Test_Group|Test_GroupUsers'`
+  - `go test ./internal/query/projection -run 'Test_Group|Test_GroupUsers'`
+  - `go test ./internal/api/oidc -run 'Test.*Group'`
+  - `go test ./internal/api/oidc/integration_test -run 'TestServer_Userinfo.*group|TestOPStorage.*group'`
+
+---
+
+## Work Order
+
+Scope is decided (see Decision Record): groups v1 ships first; group authorizations (Phase A) follow; admin-roles-via-group (Phase B) deferred.
+
+**Groups v1 (GA-able without authorizations):**
+1. **Correctness fixes** (§3): rename unique-constraint, org-removal cascade, group-deletion semantics, join/machine-user issues — small, prevent data-integrity bugs
+2. **API contract completion** (§2): REST bindings, user counts, `failed_user_ids`, description clearing, v2beta type, copy cleanup
+3. **Token/claim finalization** (§4) including the #12154 stance, plus TS client export (§6)
+4. **Console UI** (§7) + Cypress coverage (§9)
+5. **Docs** (§8) — explicitly documenting that group membership is not yet an authorization mechanism — protocol decisions (SAML/SCIM/Actions, §4–5), and the gating decision (§10)
+6. **Release validation gates** (§11); close #10093; update #5822 with the phase split
+
+**Group authorizations Phase A** (§1): `group_grant` aggregate, query-time merge, token/userinfo exposure, provenance, console grant screens; then close #9702.
+
+**Phase B** (deferred): admin roles via group — revisit after Phase A.
