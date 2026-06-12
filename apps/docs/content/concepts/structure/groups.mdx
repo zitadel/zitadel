@@ -69,6 +69,11 @@ Group authorizations resolve when a user authenticates, so adding or removing me
 group or the grant — changes the effective roles immediately, without leftover permissions.
 Listings name the supplying group, so group-sourced roles can be distinguished from personal ones.
 
+Groups can also receive **ZITADEL manager roles** for their organization (e.g. `ORG_OWNER_VIEWER`):
+every member of the group acts with these roles, resolved when permissions are evaluated.
+Setting an empty role list removes them. Managing group manager roles requires the permission
+to manage organization members (`org.member.write`).
+
 ## Automate with Actions
 
 Group changes can be automated with [Actions](/concepts/features/actions):
@@ -76,11 +81,6 @@ all group events (`group.added`, `group.changed`, `group.removed`, `group.users.
 `group.users.removed`, `group.grant.*`) can be used as event execution conditions, and every
 Group API method (e.g. `/zitadel.group.v2.GroupService/CreateGroup`) can be used as a
 request or response condition.
-
-Groups can also receive **ZITADEL manager roles** for their organization (e.g. `ORG_OWNER_VIEWER`):
-every member of the group acts with these roles, resolved when permissions are evaluated.
-Setting an empty role list removes them. Managing group manager roles requires the permission
-to manage organization members (`org.member.write`).
 
 ## Current Limitations
 

@@ -36,6 +36,11 @@ func (e *GroupUsersAddedEvent) Payload() interface{} {
 	return e
 }
 
+// UniqueConstraints intentionally returns nil: membership has desired-state
+// semantics, so duplicate added events under concurrency are tolerated and
+// neutralized by the idempotent projection. Member-style eventstore constraints
+// would require releasing them on group and org removal, where no per-user
+// events exist.
 func (e *GroupUsersAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }

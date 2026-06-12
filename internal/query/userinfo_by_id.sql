@@ -43,6 +43,9 @@ user_grants as (
 	and resource_owner = any($4)
 	{{- end }}
 	union all
+	-- group grants resolve at query time through the user's memberships:
+	-- removing a member, a grant, or the group itself instantly stops the
+	-- derived roles without any cleanup events
 	select gg.id, gg.grant_id, gg.state, gg.creation_date, gg.change_date, gg.sequence, gu.user_id, gg.roles, gg.resource_owner, gg.project_id
 	from projections.group_grants1 gg
 	join projections.group_users1 gu on gu.group_id = gg.group_id and gu.instance_id = gg.instance_id
