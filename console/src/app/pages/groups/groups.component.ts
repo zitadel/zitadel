@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, Component, DestroyRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { Group } from '@zitadel/proto/zitadel/group/v2/group_pb';
 import { CreateGroupRequestSchema, UpdateGroupRequestSchema } from '@zitadel/proto/zitadel/group/v2/group_service_pb';
-import { defer, firstValueFrom, lastValueFrom, Observable, of, ReplaySubject, shareReplay } from 'rxjs';
-import { catchError, filter, map, startWith, switchMap } from 'rxjs/operators';
+import { PageEvent } from '@angular/material/paginator';
+import { BehaviorSubject, combineLatest, defer, firstValueFrom, lastValueFrom, Observable, of, ReplaySubject, shareReplay } from 'rxjs';
+import { catchError, filter, map, startWith, switchMap, tap } from 'rxjs/operators';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { GroupService } from 'src/app/services/group.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -25,6 +26,8 @@ import { GroupMembersDialogComponent } from './group-members-dialog/group-member
 export class GroupsComponent {
   protected readonly groups$: Observable<Group[]>;
   protected readonly refresh$ = new ReplaySubject<true>(1);
+  protected readonly page$ = new BehaviorSubject<{ pageIndex: number; pageSize: number }>({ pageIndex: 0, pageSize: 20 });
+  protected readonly totalResult = signal(0);
   private readonly orgId$: Observable<string>;
 
   constructor(
@@ -48,23 +51,33 @@ export class GroupsComponent {
   }
 
   private getGroups$(): Observable<Group[]> {
-    return this.orgId$.pipe(
-      switchMap((orgId) =>
+    return combineLatest([this.orgId$, this.page$]).pipe(
+      switchMap(([orgId, page]) =>
         this.refresh$.pipe(
           startWith(true),
           switchMap(() =>
             this.groupService.listGroups({
               filters: [{ filter: { case: 'organizationId', value: { id: orgId } } }],
+              pagination: {
+                offset: BigInt(page.pageIndex * page.pageSize),
+                limit: page.pageSize,
+                asc: true,
+              },
             }),
           ),
         ),
       ),
+      tap((resp) => this.totalResult.set(Number(resp.pagination?.totalResult ?? 0))),
       map(({ groups }) => groups),
       catchError((err) => {
         this.toast.showError(err);
         return of([]);
       }),
     );
+  }
+
+  protected changePage(event: PageEvent): void {
+    this.page$.next({ pageIndex: event.pageIndex, pageSize: event.pageSize });
   }
 
   protected async openGroupDialog(group?: Group): Promise<void> {

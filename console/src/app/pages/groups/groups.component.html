@@ -93,5 +93,14 @@
         <span>{{ 'GROUPS.TABLE.EMPTY' | translate }}</span>
       </div>
     </div>
+
+    <cnsl-paginator
+      class="paginator"
+      [length]="totalResult()"
+      [pageSize]="page$.value.pageSize"
+      [pageIndex]="page$.value.pageIndex"
+      [pageSizeOptions]="[10, 20, 50, 100]"
+      (page)="changePage($event)"
+    ></cnsl-paginator>
   </cnsl-refresh-table>
 </div>

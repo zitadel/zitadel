@@ -5,6 +5,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
@@ -27,6 +28,7 @@ import { GroupsComponent } from './groups.component';
     MatIconModule,
     MatTableModule,
     MatTooltipModule,
+    PaginatorModule,
     RefreshTableModule,
     TableActionsModule,
     TranslateModule,
