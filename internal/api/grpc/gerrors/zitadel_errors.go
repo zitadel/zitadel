@@ -155,7 +155,6 @@ func grpcStatusLevel(code codes.Code) slog.Level {
 	}
 }
 
-
 func getErrorInfo(ctx context.Context, id, key string, err error) protoadapt.MessageV1 {
 	var wpe *commandErrors.WrongPasswordError
 	var zerr *zerrors.ZitadelError

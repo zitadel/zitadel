@@ -293,6 +293,14 @@ func (h plainHasher) Hash(password string) (string, error) {
 	return strings.Join([]string{"", "plain", h.x, password}, "$"), nil
 }
 
+func (h plainHasher) Validate(encoded string) (verifier.Result, error) {
+	nodes := strings.Split(encoded, "$")
+	if len(nodes) != 4 || nodes[1] != "plain" {
+		return verifier.Skip, nil
+	}
+	return verifier.OK, nil
+}
+
 func (h plainHasher) Verify(encoded, password string) (verifier.Result, error) {
 	nodes := strings.Split(encoded, "$")
 	if len(nodes) != 4 || nodes[1] != "plain" {
