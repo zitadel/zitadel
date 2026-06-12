@@ -43,20 +43,21 @@ Instrumentation:
       BatchDuration: 1m # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_BATCHDURATION
       # Project ID for Google Cloud Trace exporter
       GoogleProjectID: "" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_GOOGLEPROJECTID
-  
+
   # Structured logging can print logs on standard error and/or export them using OTEL.
   Log:
     # Log lines lower than this level are not emitted.
     Level: "INFO" # ZITADEL_INSTRUMENTATION_LOG_LEVEL
     # Streams enable logging for specific parts of the application.
-    Streams: # ZITADEL_INSTRUMENTATION_LOG_STREAMS (comma separated list)
+    Streams:
+      # ZITADEL_INSTRUMENTATION_LOG_STREAMS (comma separated list)
       - runtime # General runtime logs, such as startup and shutdown messages.
       - ready # Logs related to readiness and health checks. (zitadel ready command)
       - request # Logs for incoming API and HTTP requests.
       - event_handler # Logs for event handling in projections.
       - queue # Logs for the job queue processing.
       #- event_pusher # Logs for event pushing to the database. Warning: contains sensitive information.
-    # Mask replaces sensitive information with Value in logs matched by Key
+      # Mask replaces sensitive information with Value in logs matched by Key
     Mask:
       # Keys are the attribute keys to be masked in logs.
       # Keys are unqualified attribute names and apply to all attributes with the specified name,
@@ -66,10 +67,12 @@ Instrumentation:
       # group are masked and the structure of the group is preserved.
       # When the key matches a non-group attribute whose value is a nested object/array
       # (e.g. added via slog.Any), the entire value is replaced with Value and its structure is not preserved.
-      Keys: # ZITADEL_INSTRUMENTATION_LOG_MASK_KEYS (comma separated list)
+      Keys:
+        # ZITADEL_INSTRUMENTATION_LOG_MASK_KEYS (comma separated list)
         # - "first_name"
         # - "last_name"
-      # Value is the string that replaces the original value of masked attributes.
+        # Value is the string that replaces the original value of masked attributes.
+
       Value: "****" # ZITADEL_INSTRUMENTATION_LOG_MASK_VALUE
     # Enable printing structured logs to standard error in the specified format.
     # When disabled, the legacy Log configuration is used.
@@ -80,7 +83,7 @@ Instrumentation:
     #   - "json": Logs are printed on StdErr as JSON objects
     #   - "gcp": JSON formatted logs compatible with Google Cloud Platform logging.
     #   - "gcp_error_reporting": JSON formatted logs compatible with Google Cloud Platform Error Reporting.
-    Format: "disabled" # ZITADEL_INSTRUMENTATION_LOG_STDERR
+    Format: "disabled" # ZITADEL_INSTRUMENTATION_LOG_FORMAT
     # Adds the source file and line number where the log line was emitted.
     # Not to be confused with the source of an error.
     AddSource: true # ZITADEL_INSTRUMENTATION_LOG_ADDSOURCE
@@ -125,7 +128,6 @@ Metrics:
   # Select type otel (OpenTelemetry) or none (disables collection and endpoint)
   Type: otel # ZITADEL_METRICS_TYPE
 
-
 # Collects and exports tracing information (Deprecated, see Instrumentation.Trace)
 Tracing:
   # Choose one in "otel", "google", "log" and "none"
@@ -157,7 +159,7 @@ Profiler:
   # type 'none' or '' disables profiling
   Type: none # ZITADEL_PROFILER_TYPE
   # projectID for google
-  ProjectID: ''  # ZITADEL_PROFILER_PROJECTID
+  ProjectID: "" # ZITADEL_PROFILER_PROJECTID
 
 Telemetry:
   # As long as Enabled is true, ZITADEL tries to send usage data to the configured Telemetry.Endpoints.
@@ -176,8 +178,10 @@ Telemetry:
   # These headers are sent with every request to the configured endpoints.
   # Configure headers by environment variable using a JSON string with header values as arrays, like this:
   # ZITADEL_TELEMETRY_HEADERS='{"header1": ["value1"], "header2": ["value2", "value3"]}'
-  Headers: # ZITADEL_TELEMETRY_HEADERS
-  # single-value: "single-value"
+  Headers:
+    # ZITADEL_TELEMETRY_HEADERS
+    # single-value: "single-value"
+
   # multi-value:
   #   - "multi-value-1"
   #   - "multi-value-2"
@@ -204,29 +208,38 @@ TLS:
   # Path to the private key of the TLS certificate, will be loaded into the key
   # and overwrite any existing value
   # E.g. /path/to/key/file.pem
-  KeyPath: # ZITADEL_TLS_KEYPATH
-  # Private key of the TLS certificate (KeyPath has a higher priority than Key)
+  KeyPath:
+    # ZITADEL_TLS_KEYPATH
+    # Private key of the TLS certificate (KeyPath has a higher priority than Key)
+
   # base64 encoded content of a pem file
-  Key: # ZITADEL_TLS_KEY
-  # Path to the certificate for the TLS connection, will be loaded into the Cert
+  Key:
+    # ZITADEL_TLS_KEY
+    # Path to the certificate for the TLS connection, will be loaded into the Cert
+
   # and overwrite any existing value
   # E.g. /path/to/cert/file.pem
-  CertPath: # ZITADEL_TLS_CERTPATH
-  # Certificate for the TLS connection (CertPath will this overwrite if specified)
-  # base64 encoded content of a pem file
-  Cert: # ZITADEL_TLS_CERT
+  CertPath:
+    # ZITADEL_TLS_CERTPATH
+    # Certificate for the TLS connection (CertPath will this overwrite if specified)
 
-# Header name of HTTP2 (incl. gRPC) calls from which the instance will be matched
-# Deprecated: Use the InstanceHostHeaders instead
+  # base64 encoded content of a pem file
+  Cert:
+    # ZITADEL_TLS_CERT
+
+    # Header name of HTTP2 (incl. gRPC) calls from which the instance will be matched
+    # Deprecated: Use the InstanceHostHeaders instead
 HTTP2HostHeader: ":authority" # ZITADEL_HTTP2HOSTHEADER
 # Header name of HTTP1 calls from which the instance will be matched
 # Deprecated: Use the InstanceHostHeaders instead
 HTTP1HostHeader: "host" # ZITADEL_HTTP1HOSTHEADER
 # Ordered header name list, which will be used to match the instance
-InstanceHostHeaders: # ZITADEL_INSTANCEHOSTHEADERS
+InstanceHostHeaders:
+  # ZITADEL_INSTANCEHOSTHEADERS
   - "x-zitadel-instance-host"
 # Ordered header name list, which will be used as the public host
-PublicHostHeaders: # ZITADEL_PUBLICHOSTHEADERS
+PublicHostHeaders:
+  # ZITADEL_PUBLICHOSTHEADERS
   - "x-zitadel-public-host"
 
 WebAuthNName: ZITADEL # ZITADEL_WEBAUTHNNAME
@@ -495,7 +508,7 @@ Machine:
     #   Url: "http://169.254.169.254/metadata/instance?api-version=2021-02-01" # ZITADEL_MACHINE_IDENTIFICATION_WEBHOOK_URL
     #   JPath: "$.compute.vmId" # ZITADEL_MACHINE_IDENTIFICATION_WEBHOOK_JPATH
 
-# Storage for assets like user avatar, organization logo, icon, font, ...
+    # Storage for assets like user avatar, organization logo, icon, font, ...
 AssetStorage:
   Type: db # ZITADEL_ASSET_STORAGE_TYPE
   # HTTP cache control settings for serving assets in the assets API and login UI
@@ -583,7 +596,7 @@ Notifications:
   # Automatically cancel the notification after the amount of failed attempts
   MaxAttempts: 3 # ZITADEL_NOTIFICATIONS_MAXATTEMPTS
   # Automatically cancel the notification if it cannot be handled within a specific time
-  MaxTtl: 5m  # ZITADEL_NOTIFICATIONS_MAXTTL
+  MaxTtl: 5m # ZITADEL_NOTIFICATIONS_MAXTTL
 
 Executions:
   # The amount of workers processing the execution request events.
@@ -595,10 +608,11 @@ Executions:
   # to limit the runtime of a singular execution.
   TransactionDuration: 10s # ZITADEL_EXECUTIONS_TRANSACTIONDURATION
   # Automatically cancel the notification if it cannot be handled within a specific time
-  MaxTtl: 5m  # ZITADEL_EXECUTIONS_MAXTTL
+  MaxTtl: 5m # ZITADEL_EXECUTIONS_MAXTTL
   # List of domains and IPs that are not valid execution target's endpoints
   # Wildcard sub domains are currently unsupported
-  DenyList: # ZITADEL_EXECUTIONS_DENYLIST (comma separated list)
+  DenyList:
+    # ZITADEL_EXECUTIONS_DENYLIST (comma separated list)
     - localhost
     - "127.0.0.0/8"
     - "::1"
@@ -696,7 +710,7 @@ OIDC:
     # Automatically cancel the notification after the amount of failed attempts
     MaxAttempts: 3 # ZITADEL_OIDC_BACKCHANNELLOGOUT_MAXATTEMPTS
     # Automatically cancel the notification if it cannot be handled within a specific time
-    MaxTtl: 5m  # ZITADEL_OIDC_BACKCHANNELLOGOUT_MAXTTL
+    MaxTtl: 5m # ZITADEL_OIDC_BACKCHANNELLOGOUT_MAXTTL
     # Lifetime of the token used to notify clients through OIDC back-channel logout.
     TokenLifetime: 15m # ZITADEL_OIDC_BACKCHANNELLOGOUT_TOKENLIFETIME
 
@@ -710,13 +724,13 @@ SAML:
       SignatureAlgorithm: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256" # ZITADEL_SAML_PROVIDERCONFIG_IDPCONFIG_SIGNATUREALGORITHM
       WantAuthRequestsSigned: true # ZITADEL_SAML_PROVIDERCONFIG_IDPCONFIG_WANTAUTHREQUESTSSIGNED
       Endpoints:
-    #Organisation:
-    #  Name: ZITADEL # ZITADEL_SAML_PROVIDERCONFIG_ORGANISATION_NAME
-    #  URL: https://zitadel.com # ZITADEL_SAML_PROVIDERCONFIG_ORGANISATION_URL
-    #ContactPerson:
-    #  ContactType: "technical" # ZITADEL_SAML_PROVIDERCONFIG_CONTACTPERSON_CONTACTTYPE
-    #  Company: ZITADEL # ZITADEL_SAML_PROVIDERCONFIG_CONTACTPERSON_COMPANY
-    #  EmailAddress: hi@zitadel.com # ZITADEL_SAML_PROVIDERCONFIG_CONTACTPERSON_EMAILADDRESS
+        #Organisation:
+        #  Name: ZITADEL # ZITADEL_SAML_PROVIDERCONFIG_ORGANISATION_NAME
+        #  URL: https://zitadel.com # ZITADEL_SAML_PROVIDERCONFIG_ORGANISATION_URL
+        #ContactPerson:
+        #  ContactType: "technical" # ZITADEL_SAML_PROVIDERCONFIG_CONTACTPERSON_CONTACTTYPE
+        #  Company: ZITADEL # ZITADEL_SAML_PROVIDERCONFIG_CONTACTPERSON_COMPANY
+        #  EmailAddress: hi@zitadel.com # ZITADEL_SAML_PROVIDERCONFIG_CONTACTPERSON_EMAILADDRESS
 
 SCIM:
   DocumentationUrl: https://zitadel.com/docs/guides/manage/user/scim2
@@ -749,7 +763,8 @@ Login:
     # OTPEmailPath is used to create the link for verifying the user's OTP during login
     OTPEmailPath: "otp/email?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}"
     # PasskeySetPath is used to create the link for adding a passkey to the user's account though the login UI
-    PasskeySetPath: "passkey/set?codeId={{.CodeID}}&code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}"
+    PasskeySetPath: "passkey/set?codeId={{.CodeID}}&code={{.Code}}&userId={{.UserID\
+      }}&organization={{.OrgID}}"
     # DomainClaimedPath is used to create the link to the login UI after an organization has claimed a domain and the user's loginname was updated
     DomainClaimedPath: "loginname?loginName={{.TempUsername}}&organization={{.OrgID}}"
 
@@ -817,7 +832,6 @@ SystemAPIUsers:
   #       AggregateID: "123456789012345678"
   #     - MemberType: Project
   #       Roles: "PROJECT_OWNER"
-
 
 # # Add keys for authentication of the systemAPI here:
 # # you can specify any name for the user, but they will have to match the `issuer` and `sub` claim in the JWT:
@@ -920,16 +934,17 @@ SystemDefaults:
     # https://passlib.readthedocs.io/en/stable/modular_crypt_format.html
     #
     # Supported verifiers: (uncomment to enable)
-    Verifiers: # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_VERIFIERS
-    #   - "argon2"   # verifier for both argon2i and argon2id.
-    #   - "bcrypt"
-    #   - "md5"      # md5Crypt with salt and password shuffling.
-    #   - "md5plain" # md5 digest of a password without salt
-    #   - "md5salted" # md5 digest of a salted password
-    #   - "phpass"
-    #   - "sha2" # crypt(3) SHA-256 and SHA-512
-    #   - "scrypt"
-    #   - "pbkdf2"   # verifier for all pbkdf2 hash modes.
+    Verifiers:
+      # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_VERIFIERS
+      #   - "argon2"   # verifier for both argon2i and argon2id.
+      #   - "bcrypt"
+      #   - "md5"      # md5Crypt with salt and password shuffling.
+      #   - "md5plain" # md5 digest of a password without salt
+      #   - "md5salted" # md5 digest of a salted password
+      #   - "phpass"
+      #   - "sha2" # crypt(3) SHA-256 and SHA-512
+      #   - "scrypt"
+      #   - "pbkdf2"   # verifier for all pbkdf2 hash modes.
   SecretHasher:
     # Set hasher configuration for service accounts, API and OIDC client secrets.
     Hasher:
@@ -1033,7 +1048,8 @@ SystemDefaults:
 Actions:
   HTTP:
     # Wildcard sub domains are currently unsupported
-    DenyList: # ZITADEL_ACTIONS_HTTP_DENYLIST (comma separated list)
+    DenyList:
+      # ZITADEL_ACTIONS_HTTP_DENYLIST (comma separated list)
       - localhost
       - "127.0.0.0/8"
       - "::1"
@@ -1101,17 +1117,20 @@ DefaultInstance:
       Phone:
         Number: # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_PHONE_NUMBER
         Verified: # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_PHONE_VERIFIED
-      Password: # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_PASSWORD
-    # In the DefaultInstance.Org.Machine section, the initial organization's admin user with the role IAM_OWNER is defined.
-    # If DefaultInstance.Org.Machine.Machine is defined, a service account is created with the IAM_OWNER role.
+      Password:
+        # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_PASSWORD
+        # In the DefaultInstance.Org.Machine section, the initial organization's admin user with the role IAM_OWNER is defined.
+        # If DefaultInstance.Org.Machine.Machine is defined, a service account is created with the IAM_OWNER role.
     Machine:
       Machine:
         Username: # ZITADEL_DEFAULTINSTANCE_ORG_MACHINE_MACHINE_USERNAME
         Name: # ZITADEL_DEFAULTINSTANCE_ORG_MACHINE_MACHINE_NAME
       MachineKey:
         # date format: 2023-01-01T00:00:00Z
-        ExpirationDate: # ZITADEL_DEFAULTINSTANCE_ORG_MACHINE_MACHINEKEY_EXPIRATIONDATE
-        # Currently, the only supported value is 1 for JSON
+        ExpirationDate:
+          # ZITADEL_DEFAULTINSTANCE_ORG_MACHINE_MACHINEKEY_EXPIRATIONDATE
+          # Currently, the only supported value is 1 for JSON
+
         Type: # ZITADEL_DEFAULTINSTANCE_ORG_MACHINE_MACHINEKEY_TYPE
       Pat:
         # date format: 2023-01-01T00:00:00Z
@@ -1222,8 +1241,10 @@ DefaultInstance:
     # 1 is allowed, 0 is not allowed
     PasswordlessType: 1 # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_PASSWORDLESSTYPE
     # DefaultRedirectURL is empty by default because we use the Management Console UI
-    DefaultRedirectURI: # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_DEFAULTREDIRECTURI
-    # 240h = 10d
+    DefaultRedirectURI:
+      # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_DEFAULTREDIRECTURI
+      # 240h = 10d
+
     PasswordCheckLifetime: 240h # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_PASSWORDCHECKLIFETIME
     # 240h = 10d
     ExternalLoginCheckLifetime: 240h # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_EXTERNALLOGINCHECKLIFETIME
@@ -1263,8 +1284,8 @@ DefaultInstance:
   WebKeys:
     Type: "rsa" # ZITADEL_DEFAULTINSTANCE_WEBKEYS_TYPE
     Config:
-     RSABits: "2048" # ZITADEL_DEFAULTINSTANCE_WEBKEYS_CONFIG_BITS
-     RSAHasher: "sha256" # ZITADEL_DEFAULTINSTANCE_WEBKEYS_CONFIG_HASHER
+      RSABits: "2048" # ZITADEL_DEFAULTINSTANCE_WEBKEYS_CONFIG_BITS
+      RSAHasher: "sha256" # ZITADEL_DEFAULTINSTANCE_WEBKEYS_CONFIG_HASHER
   # WebKeys:
   #  Type: "ecdsa"
   #  Config:
@@ -1289,14 +1310,17 @@ DefaultInstance:
       Host: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_HOST
       User: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_USER
       Password: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_PASSWORD
-    TLS: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_TLS
-    # If the host of the sender is different from ExternalDomain set DefaultInstance.DomainPolicy.SMTPSenderAddressMatchesInstanceDomain to false
+    TLS:
+      # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_TLS
+      # If the host of the sender is different from ExternalDomain set DefaultInstance.DomainPolicy.SMTPSenderAddressMatchesInstanceDomain to false
+
     From: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_FROM
     FromName: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_FROMNAME
-    ReplyToAddress: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_REPLYTOADDRESS
-  # Configure the MessageTexts by environment variable using JSON notation:
-  # ZITADEL_DEFAULTINSTANCE_MESSAGETEXTS='[{"messageTextType": "InitCode", "title": "My custom title"},{"messageTextType": "PasswordReset", "greeting": "Hi there!"}]'
-  # Beware that if you configure the MessageTexts by environment variable, all the default MessageTexts are lost.
+    ReplyToAddress:
+      # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_REPLYTOADDRESS
+      # Configure the MessageTexts by environment variable using JSON notation:
+      # ZITADEL_DEFAULTINSTANCE_MESSAGETEXTS='[{"messageTextType": "InitCode", "title": "My custom title"},{"messageTextType": "PasswordReset", "greeting": "Hi there!"}]'
+      # Beware that if you configure the MessageTexts by environment variable, all the default MessageTexts are lost.
   MessageTexts:
     - MessageTextType: InitCode
       Language: de
@@ -1304,7 +1328,11 @@ DefaultInstance:
       PreHeader: User initialisieren
       Subject: User initialisieren
       Greeting: Hallo {{.DisplayName}},
-      Text: Dieser Benutzer wurde soeben im Zitadel erstellt. Mit dem Benutzernamen <br><strong>{{.PreferredLoginName}}</strong><br> kannst du dich anmelden. Nutze den untenstehenden Button, um die Initialisierung abzuschliessen <br>(Code <strong>{{.Code}}</strong>).<br> Falls du dieses Mail nicht angefordert hast, kannst du es einfach ignorieren.
+      Text: Dieser Benutzer wurde soeben im Zitadel erstellt. Mit dem Benutzernamen
+        <br><strong>{{.PreferredLoginName}}</strong><br> kannst du dich
+        anmelden. Nutze den untenstehenden Button, um die Initialisierung
+        abzuschliessen <br>(Code <strong>{{.Code}}</strong>).<br> Falls du
+        dieses Mail nicht angefordert hast, kannst du es einfach ignorieren.
       ButtonText: Initialisierung abschliessen
     - MessageTextType: PasswordReset
       Language: de
@@ -1312,7 +1340,10 @@ DefaultInstance:
       PreHeader: Passwort zurücksetzen
       Subject: Passwort zurücksetzen
       Greeting: Hallo {{.DisplayName}},
-      Text: Wir haben eine Anfrage für das Zurücksetzen deines Passwortes bekommen. Du kannst den untenstehenden Button verwenden, um dein Passwort zurückzusetzen <br>(Code <strong>{{.Code}}</strong>).<br> Falls du dieses Mail nicht angefordert hast, kannst du es ignorieren.
+      Text: Wir haben eine Anfrage für das Zurücksetzen deines Passwortes bekommen. Du
+        kannst den untenstehenden Button verwenden, um dein Passwort
+        zurückzusetzen <br>(Code <strong>{{.Code}}</strong>).<br> Falls du
+        dieses Mail nicht angefordert hast, kannst du es ignorieren.
       ButtonText: Passwort zurücksetzen
     - MessageTextType: VerifyEmail
       Language: de
@@ -1320,7 +1351,10 @@ DefaultInstance:
       PreHeader: Email verifizieren
       Subject: Email verifizieren
       Greeting: Hallo {{.DisplayName}},
-      Text: Eine neue E-Mail Adresse wurde hinzugefügt. Bitte verwende den untenstehenden Button um diese zu verifizieren <br>(Code <strong>{{.Code}}</strong>).<br> Falls du deine E-Mail Adresse nicht selber hinzugefügt hast, kannst du dieses E-Mail ignorieren.
+      Text: Eine neue E-Mail Adresse wurde hinzugefügt. Bitte verwende den
+        untenstehenden Button um diese zu verifizieren <br>(Code
+        <strong>{{.Code}}</strong>).<br> Falls du deine E-Mail Adresse nicht
+        selber hinzugefügt hast, kannst du dieses E-Mail ignorieren.
       ButtonText: Email verifizieren
     - MessageTextType: VerifyPhone
       Language: de
@@ -1328,7 +1362,8 @@ DefaultInstance:
       PreHeader: Telefonnummer verifizieren
       Subject: Telefonnummer verifizieren
       Greeting: Hallo {{.DisplayName}},
-      Text: Eine Telefonnummer wurde hinzugefügt. Bitte verifiziere diese in dem du folgenden Code eingibst (Code {{.Code}})
+      Text: Eine Telefonnummer wurde hinzugefügt. Bitte verifiziere diese in dem du
+        folgenden Code eingibst (Code {{.Code}})
       ButtonText: Telefon verifizieren
     - MessageTextType: DomainClaimed
       Language: de
@@ -1336,7 +1371,11 @@ DefaultInstance:
       PreHeader: Email / Username ändern
       Subject: Domain wurde beansprucht
       Greeting: Hallo {{.DisplayName}},
-      Text: Die Domain {{.Domain}} wurde von einer Organisation beansprucht. Dein derzeitiger User {{.Username}} ist nicht Teil dieser Organisation. Daher musst du beim nächsten Login eine neue Email hinterlegen. Für diesen Login haben wir dir einen temporären Usernamen ({{.TempUsername}}) erstellt.
+      Text: Die Domain {{.Domain}} wurde von einer Organisation beansprucht. Dein
+        derzeitiger User {{.Username}} ist nicht Teil dieser Organisation. Daher
+        musst du beim nächsten Login eine neue Email hinterlegen. Für diesen
+        Login haben wir dir einen temporären Usernamen ({{.TempUsername}})
+        erstellt.
       ButtonText: Login
     - MessageTextType: PasswordChange
       Language: de
@@ -1344,7 +1383,9 @@ DefaultInstance:
       PreHeader: Passwort Änderung
       Subject: Passwort von Benutzer wurde geändert
       Greeting: Hallo {{.DisplayName}},
-      Text: Das Password vom Benutzer wurde geändert. Wenn diese Änderung von jemand anderem gemacht wurde, empfehlen wir die sofortige Zurücksetzung ihres Passworts.
+      Text: Das Password vom Benutzer wurde geändert. Wenn diese Änderung von jemand
+        anderem gemacht wurde, empfehlen wir die sofortige Zurücksetzung ihres
+        Passworts.
       ButtonText: Login
     - MessageTextType: InitCode
       Language: en
@@ -1352,7 +1393,10 @@ DefaultInstance:
       PreHeader: Initialize User
       Subject: Initialize User
       Greeting: Hello {{.DisplayName}},
-      Text: This user was created in Zitadel. Use the username {{.PreferredLoginName}} to login. Please click the button below to finish the initialization process. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.
+      Text: This user was created in Zitadel. Use the username {{.PreferredLoginName}}
+        to login. Please click the button below to finish the initialization
+        process. (Code {{.Code}}) If you didn't ask for this mail, please ignore
+        it.
       ButtonText: Finish initialization
     - MessageTextType: PasswordReset
       Language: en
@@ -1360,7 +1404,9 @@ DefaultInstance:
       PreHeader: Reset password
       Subject: Reset password
       Greeting: Hello {{.DisplayName}},
-      Text: We received a password reset request. Please use the button below to reset your password. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.
+      Text: We received a password reset request. Please use the button below to reset
+        your password. (Code {{.Code}}) If you didn't ask for this mail, please
+        ignore it.
       ButtonText: Reset password
     - MessageTextType: VerifyEmail
       Language: en
@@ -1368,7 +1414,9 @@ DefaultInstance:
       PreHeader: Verify email
       Subject: Verify email
       Greeting: Hello {{.DisplayName}},
-      Text: A new email has been added. Please use the button below to verify your email. (Code {{.Code}}) If you didn't add a new email, please ignore this email.
+      Text: A new email has been added. Please use the button below to verify your
+        email. (Code {{.Code}}) If you didn't add a new email, please ignore
+        this email.
       ButtonText: Verify email
     - MessageTextType: VerifyPhone
       Language: en
@@ -1376,7 +1424,8 @@ DefaultInstance:
       PreHeader: Verify phone
       Subject: Verify phone
       Greeting: Hello {{.DisplayName}},
-      Text: A new phone number has been added. Please use the following code to verify it {{.Code}}.
+      Text: A new phone number has been added. Please use the following code to verify
+        it {{.Code}}.
       ButtonText: Verify phone
     - MessageTextType: DomainClaimed
       Language: en
@@ -1384,7 +1433,10 @@ DefaultInstance:
       PreHeader: Change email/username
       Subject: Domain has been claimed
       Greeting: Hello {{.DisplayName}},
-      Text: The domain {{.Domain}} has been claimed by an organization. Your current user {{.UserName}} is not part of this organization. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.
+      Text: The domain {{.Domain}} has been claimed by an organization. Your current
+        user {{.UserName}} is not part of this organization. Therefore you'll
+        have to change your email when you login. We have created a temporary
+        username ({{.TempUsername}}) for this login.
       ButtonText: Login
     - MessageTextType: PasswordChange
       Language: en
@@ -1392,7 +1444,8 @@ DefaultInstance:
       PreHeader: Change password
       Subject: Password of user has changed
       Greeting: Hello {{.DisplayName}},
-      Text: The password of your user has changed. If this change was not done by you, please be advised to immediately reset your password.
+      Text: The password of your user has changed. If this change was not done by you,
+        please be advised to immediately reset your password.
       ButtonText: Login
 
   # Once a feature is set on the instance (true or false), system level feature settings
@@ -1400,8 +1453,10 @@ DefaultInstance:
   Features:
     LoginDefaultOrg: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINDEFAULTORG
     UserSchema: # ZITADEL_DEFAULTINSTANCE_FEATURES_USERSCHEMA
-    ImprovedPerformance: # ZITADEL_DEFAULTINSTANCE_FEATURES_IMPROVEDPERFORMANCE
-    # https://github.com/zitadel/zitadel/blob/main/internal/feature/feature.go#L64-L68
+    ImprovedPerformance:
+      # ZITADEL_DEFAULTINSTANCE_FEATURES_IMPROVEDPERFORMANCE
+      # https://github.com/zitadel/zitadel/blob/main/internal/feature/feature.go#L64-L68
+
     #   - 1 # OrgByID
     #   - 2 # ProjectGrant
     #   - 3 # Project
@@ -1414,25 +1469,31 @@ DefaultInstance:
       BaseURI: # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI
     PermissionCheckV2: # ZITADEL_DEFAULTINSTANCE_FEATURES_PERMISSIONCHECKV2
     ConsoleUseV2UserApi: true # ZITADEL_DEFAULTINSTANCE_FEATURES_CONSOLEUSEV2USERAPI
-    EnableRelationalTables: # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLERELATIONALTABLES
+    EnableRelationalTables:
+      # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLERELATIONALTABLES
 
   Limits:
     # AuditLogRetention limits the number of events that can be queried via the events API by their age.
     # A value of "0s" means that all events are available.
     # If this value is set, it overwrites the system default unless it is not reset via the admin API.
-    AuditLogRetention: # ZITADEL_DEFAULTINSTANCE_LIMITS_AUDITLOGRETENTION
-    # If Block is true, all requests except to /ui/console or the system API are blocked and /ui/login is redirected to /ui/console.
+    AuditLogRetention:
+      # ZITADEL_DEFAULTINSTANCE_LIMITS_AUDITLOGRETENTION
+      # If Block is true, all requests except to /ui/console or the system API are blocked and /ui/login is redirected to /ui/console.
+
     # /ui/console shows a message that the instance is blocked with a link to Console.InstanceManagementURL
     Block: # ZITADEL_DEFAULTINSTANCE_LIMITS_BLOCK
   Restrictions:
     # DisallowPublicOrgRegistration defines if ZITADEL should expose the endpoint /ui/login/register/org
     # If it is true, the endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.
-    DisallowPublicOrgRegistration: # ZITADEL_DEFAULTINSTANCE_RESTRICTIONS_DISALLOWPUBLICORGREGISTRATION
-    # AllowedLanguages restricts the languages that can be used.
+    DisallowPublicOrgRegistration:
+      # ZITADEL_DEFAULTINSTANCE_RESTRICTIONS_DISALLOWPUBLICORGREGISTRATION
+      # AllowedLanguages restricts the languages that can be used.
+
     # If the list is empty, all supported languages are allowed.
-    AllowedLanguages: # ZITADEL_DEFAULTINSTANCE_RESTRICTIONS_ALLOWEDLANGUAGES
-    # - en
-    # - de
+    AllowedLanguages:
+      # ZITADEL_DEFAULTINSTANCE_RESTRICTIONS_ALLOWEDLANGUAGES
+      # - en
+      # - de
   Quotas:
     # Items take a slice of quota settings, whereas, for each unit type and instance, one or zero quotas may exist.
     # The following unit types are supported
@@ -1449,30 +1510,31 @@ DefaultInstance:
     # The sum of all actions run durations in seconds
     # Configure the Items by environment variable using JSON notation:
     # ZITADEL_DEFAULTINSTANCE_QUOTAS_ITEMS='[{"unit": "requests.all.authenticated", "notifications": [{"percent": 100}]}]'
-    Items: # ZITADEL_DEFAULTINSTANCE_QUOTAS_ITEMS
-#      - Unit: "requests.all.authenticated"
-#        # From defines the starting time from which the current quota period is calculated.
-#        # This is relevant for querying the current usage.
-#        From: "2023-01-01T00:00:00Z"
-#        # ResetInterval defines the quota periods duration
-#        ResetInterval: 720h # 30 days
-#        # Amount defines the number of units for this quota
-#        Amount: 25000
-#        # Limit defines whether ZITADEL should block further authenticated requests when the configured amount is used.
-#        # If you not only want to block authenticated requests but also authentication itself, consider using the system APIs SetLimits method.
-#        Limit: false
-#        # Notifications are emitted by ZITADEL when certain quota percentages are reached
-#        Notifications:
-#            # Percent defines the relative amount of used units, after which a notification should be emitted.
-#          - Percent: 100
-#            # Repeat defines, whether a notification should be emitted each time when a multitude of the configured Percent is used.
-#            Repeat: true
-#            # CallURL is called when a relative amount of the quota is used.
-#            CallURL: "https://httpbin.org/post"
+    Items:
+      # ZITADEL_DEFAULTINSTANCE_QUOTAS_ITEMS
+      #      - Unit: "requests.all.authenticated"
+      #        # From defines the starting time from which the current quota period is calculated.
+      #        # This is relevant for querying the current usage.
+      #        From: "2023-01-01T00:00:00Z"
+      #        # ResetInterval defines the quota periods duration
+      #        ResetInterval: 720h # 30 days
+      #        # Amount defines the number of units for this quota
+      #        Amount: 25000
+      #        # Limit defines whether ZITADEL should block further authenticated requests when the configured amount is used.
+      #        # If you not only want to block authenticated requests but also authentication itself, consider using the system APIs SetLimits method.
+      #        Limit: false
+      #        # Notifications are emitted by ZITADEL when certain quota percentages are reached
+      #        Notifications:
+      #            # Percent defines the relative amount of used units, after which a notification should be emitted.
+      #          - Percent: 100
+      #            # Repeat defines, whether a notification should be emitted each time when a multitude of the configured Percent is used.
+      #            Repeat: true
+      #            # CallURL is called when a relative amount of the quota is used.
+      #            CallURL: "https://httpbin.org/post"
 
-# AuditLogRetention limits the number of events that can be queried via the events API by their age.
-# A value of "0s" means that all events are available.
-# If an audit log retention is set using an instance limit, it will overwrite the system default.
+      # AuditLogRetention limits the number of events that can be queried via the events API by their age.
+      # A value of "0s" means that all events are available.
+      # If an audit log retention is set using an instance limit, it will overwrite the system default.
 AuditLogRetention: 0s # ZITADEL_AUDITLOGRETENTION
 
 # The ServicePing are periodic reports of analytics data and the usage of ZITADEL.

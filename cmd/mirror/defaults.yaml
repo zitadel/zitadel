@@ -41,20 +41,21 @@ Instrumentation:
       BatchDuration: 1m # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_BATCHDURATION
       # Project ID for Google Cloud Trace exporter
       GoogleProjectID: "" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_GOOGLEPROJECTID
-  
+
   # Structured logging can print logs on standard error and/or export them using OTEL.
   Log:
     # Log lines lower than this level are not emitted.
     Level: "INFO" # ZITADEL_INSTRUMENTATION_LOG_LEVEL
     # Streams enable logging for specific parts of the application.
-    Streams: # ZITADEL_INSTRUMENTATION_LOG_STREAMS (comma separated list)
+    Streams:
+      # ZITADEL_INSTRUMENTATION_LOG_STREAMS (comma separated list)
       - runtime # General runtime logs, such as startup and shutdown messages.
       - ready # Logs related to readiness and health checks. (zitadel ready command)
       - request # Logs for incoming API and HTTP requests.
       - event_handler # Logs for event handling in projections.
       - queue # Logs for the job queue processing.
       # - event_pusher # Logs for event pushing to the database. Warning: contains sensitive information.
-    # Mask replaces sensitive information with Value in logs matched by Key
+      # Mask replaces sensitive information with Value in logs matched by Key
     Mask:
       # Keys are the attribute keys to be masked in logs.
       # Keys are unqualified attribute names and apply to all attributes with the specified name,
@@ -64,10 +65,12 @@ Instrumentation:
       # group are masked and the structure of the group is preserved.
       # When the key matches a non-group attribute whose value is a nested object/array
       # (e.g. added via slog.Any), the entire value is replaced with Value and its structure is not preserved.
-      Keys: # ZITADEL_INSTRUMENTATION_LOG_MASK_KEYS (comma separated list)
+      Keys:
+        # ZITADEL_INSTRUMENTATION_LOG_MASK_KEYS (comma separated list)
         # - "first_name"
         # - "last_name"
-      # Value is the string that replaces the original value of masked attributes.
+        # Value is the string that replaces the original value of masked attributes.
+
       Value: "****" # ZITADEL_INSTRUMENTATION_LOG_MASK_VALUE
     # Enable printing structured logs to standard error in the specified format.
     # When disabled, the legacy Log configuration is used.
@@ -78,7 +81,7 @@ Instrumentation:
     #   - "json": Logs are printed on StdErr as JSON objects
     #   - "gcp": JSON formatted logs compatible with Google Cloud Platform logging.
     #   - "gcp_error_reporting": JSON formatted logs compatible with Google Cloud Platform Error Reporting.
-    Format: "disabled" # ZITADEL_INSTRUMENTATION_LOG_STDERR
+    Format: "disabled" # ZITADEL_INSTRUMENTATION_LOG_FORMAT
     # Adds the source file and line number where the log line was emitted.
     # Not to be confused with the source of an error.
     AddSource: true # ZITADEL_INSTRUMENTATION_LOG_ADDSOURCE
@@ -152,7 +155,8 @@ Source:
         Mode: # ZITADEL_SOURCE_POSTGRES_USER_SSL_MODE
         RootCert: # ZITADEL_SOURCE_POSTGRES_USER_SSL_ROOTCERT
         Cert: # ZITADEL_SOURCE_POSTGRES_USER_SSL_CERT
-        Key: # ZITADEL_SOURCE_POSTGRES_USER_SSL_KEY
+        Key:
+          # ZITADEL_SOURCE_POSTGRES_USER_SSL_KEY
 
 Destination:
   postgres:
@@ -188,7 +192,7 @@ Projections:
   RequeueEvery: 0s
   ConcurrentInstances: 7 # ZITADEL_PROJECTIONS_CONCURRENTINSTANCES
   EventBulkLimit: 1000 # ZITADEL_PROJECTIONS_EVENTBULKLIMIT
-  Customizations: 
+  Customizations:
     notifications:
       MaxFailureCount: 1
 
