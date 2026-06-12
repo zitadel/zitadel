@@ -181,18 +181,20 @@ No implementation exists: no group-grant domain model, events, projections, comm
 - [x] `createGroupServiceClient` added to `packages/zitadel-client/src/v2.ts` (`feat(client): export group service client`); `@zitadel/proto` generates group v2 TS modules and `@zitadel/client` builds clean
 - [ ] Regenerate TS proto outputs (`pnpm nx run @zitadel/proto:generate`) and rebuild `@zitadel/client` if affected
 
-### 7. Console UI (#10093 — not started)
+### 7. Console UI (#10093 — implemented; browser verification pending)
 
-Nothing exists under `console/src`: no route, page, module, service, or sidenav entry. Only unrelated matches (project-role display groups, form groups).
+Implemented in `feat(console): manage user groups` (Angular build green; **not yet verified in a running browser against a live instance — must be clicked through before closing #10093**):
 
-- [ ] User Groups section in the organization context with permissions-aware navigation and route guards (`group.read/write/delete`, `group.user.*`)
-- [ ] Group list: name, description, **user count**, dates, search/sort/pagination, empty state, permission-aware actions (pattern: `pages/grants` + `modules/user-grants`)
-- [ ] Create/edit flows with uniqueness validation, required name, optional (clearable) description, API error handling
-- [ ] Delete flow with confirmation and messaging about membership/authorization consequences
-- [ ] Group detail + membership management: list members, search humans and machine users, bulk add/remove, surface partial-failure semantics per final API contract
-- [ ] Wire `@zitadel/proto` group v2 service into console gRPC services; sidenav entry in `sidenav.component.ts`
-- [ ] If §1 stays in scope: group project-role and administrator-role management screens
-- [ ] English copy + localization keys, propagated per repo translation workflow
+- [x] `/groups` route (lazy `pages/groups/groups.module`, `authGuard` + `roleGuard` with `group.read`) and nav entry gated by `cnslHasRole` (`nav.component.html`)
+- [x] Group list: name, description, user count, creation date, empty state, refresh; create gated by `group.create`, delete by `group.delete` (`groups.component.*`)
+- [x] Create/edit dialog (required name, optional description; API errors surfaced via toast) (`group-dialog/`)
+- [x] Delete flow with `WarnDialogComponent` confirmation including membership consequences copy
+- [x] Members dialog: list members (display name + login name), add via `cnsl-search-user-autocomplete` (humans + machines, multi-select), remove per member (`group-members-dialog/`)
+- [x] `GroupService` wrapper + `GrpcService.group` Connect client wired on the v2 transport (`services/group.service.ts`, `services/grpc.service.ts`)
+- [x] English i18n keys (`MENU.GROUPS` + `GROUPS.*` section in `en.json`); other locales follow the repo translation workflow
+- [ ] Browser walkthrough of the golden path (create → add members → rename → remove member → delete) against a running instance
+- [ ] Sort/pagination on the list (current list is unpaginated like the actions-two targets table; revisit if orgs have many groups)
+- [ ] Phase A: group project-role and administrator-role management screens (after group authorizations land)
 
 ### 8. Documentation (deferred in PR #10455)
 
