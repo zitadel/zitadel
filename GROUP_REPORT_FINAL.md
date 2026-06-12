@@ -8,6 +8,8 @@ Consolidates the findings of `GROUP_REPORT.md` and `GROUP_REPORT_CLAUDE.md` into
 
 **All work in this report is complete on this branch — every item below is checked.** Groups v1 (correctness fixes, API contract, RFC 9068/SCIM claims, TS client, docs, Console UI) **and Phase A group authorizations** (`group_grant` aggregate, query-time grant merge into tokens/userinfo, provenance, console authorization screens, integration tests, Cypress suite) are committed and pushed. Each checked item records its resolution: implemented (with the commit subject), verified-as-already-correct, or explicitly resolved by decision (deferred/descoped with rationale).
 
+**Post-GA extensions delivered on the same branch (2026-06-12):** Phase B group manager roles (with provenance in membership listings), SCIM `/Groups`, SAML `groups` attribute, scope-conditional userinfo group resolution, console pagination, extended search filters, and verified+documented Actions support.
+
 Two handovers remain outside the branch by design: posting the drafted #5822 comment (upstream-visible — requires Yordis) and deduping the docs sidebar entry with upstream PR #11884, whichever lands second. CI runs the Go integration and Cypress suites against a live stack on push.
 
 ## Scope & References
@@ -141,7 +143,7 @@ Implemented on this branch per the query-time design: `internal/repository/group
   > Group-based project authorizations have been implemented on the `yordis/groups-ga` branch following a query-time resolution design: a `group_grant` aggregate (project + roles per group) is merged with personal user grants when tokens/userinfo are computed, so membership and group changes take effect immediately and group deletion cannot leave orphaned permissions. Admin-roles-via-group (the IAM/org membership half of this issue) is deliberately deferred: it touches the permission-check core for comparatively little value; it can be revisited once the project-role half has proven itself.
 
 **Phase B — admin roles via group (deferred, revisit after Phase A):**
-- [x] Group-based ZITADEL admin/IAM memberships — **deferred by decision** (Decision Record, Phase B): touches the permission-check core for comparatively little value; revisit after group project grants have proven themselves, or never. Not part of the groups GA scope
+- [x] Group-based ZITADEL admin/IAM memberships — **implemented** (`feat(api): grant ZITADEL manager roles to groups`): `SetGroupManagerRoles` RPC, `group.manager.roles.set` event, `group_manager_roles1` projection, and a membership union arm so members act with the roles and listings carry the supplying group as provenance. Boundary (documented): `permission_check_v2` evaluation does not include group-supplied manager roles yet
 
 ### 2. Finish the API contract
 
@@ -153,7 +155,7 @@ Implemented on this branch per the query-time design: `internal/repository/group
 - [x] **Stale/inaccurate API copy** — **fixed** (`fix(api): stabilize group v2 contract`): roles mention removed from `UpdateGroup` 404; contradictory `DeleteGroup` 404 response dropped. Permission-as-comment style matches the other Connect-era v2 services (verified intentional)
 - [x] **Proto hygiene** — **fixed with OD-1**: `change_date` renumbered to field 1
 - [x] **Name-uniqueness semantics** (OD-4, decided: case-insensitive) — **already implemented platform-wide**: the eventstore lowercases all unique-constraint fields on add (`internal/eventstore/v3/unique_constraints.go:48`) and the delete SQL matches case-insensitively, so group names are case-insensitively unique today. Remaining: integration test (task in §9) and a docs note
-- [x] Search-filter ergonomics — **explicitly descoped as post-GA backlog**: the shipped filters cover the console and the acceptance criteria; additional filters (description, dates, org filter on members, lookup-by-name) are additive, non-breaking API extensions that can land on demand
+- [x] Search-filter ergonomics — **implemented** (`feat(api): extend group search ergonomics`): description filter for groups, organization filter for memberships, and the group name on membership listings (lookup-by-name = existing name filter with equals method)
 
 ### 3. Backend correctness
 
@@ -174,14 +176,14 @@ Implemented on this branch per the query-time design: `internal/repository/group
 - [x] **#12154 decision implemented** (`feat(oidc)!: encode groups claim per RFC 9068 and SCIM`): `groups` claim is now `[{value, display}]` in userinfo, introspection, ID token, and JWT access token (all flow through `userInfoToOIDC`); scope-gating kept; `urn:zitadel:iam:user:groups` scope/claim removed; unit + integration tests updated
 - [x] **Wording mismatch** — **resolved by the claims decision**: v1 tokens carry group memberships (`value`/`display` per RFC 9068); "group roles" in tokens arrive with Phase A's grant merge
 - [x] **Flow verification** — **verified by code path + test suite**: every delivery surface (userinfo, introspection, ID token, JWT access token) is produced by the single `userInfoToOIDC` path with unit + integration coverage; machine/client-credentials flows use the same userinfo query (machine users are first-class group members, covered by the machine membership tests), so no flow-specific divergence exists
-- [x] **SAML** (OD-5) — exclusion documented in the concept page's limitations section; revisit with Phase A
-- [x] **Perf** — **accepted for GA by decision**: the unconditional group joins in `userinfo_by_id.sql` are index-backed point lookups; revisit only if userinfo latency regresses in production metrics
+- [x] **SAML** (OD-5) — **implemented** (`feat(saml): include group memberships in assertions`): `groups` attribute with the user's group names; action-defined attributes of the same name take precedence
+- [x] **Perf** — **implemented** (`perf(query): resolve user groups in userinfo only when requested`): the groups CTE only joins when a group scope is requested (4 prebuilt query variants); the grant merge stays unconditional since roles are always asserted
 - [x] Action-based group-claim docs annotated to point at the native `groups` scope
 
 ### 5. Protocol / ecosystem integrations
 
-- [x] **SCIM** (OD-6) — **out of scope by decision**: RFC 7644 `/Groups` compliance is its own initiative; `$ref` synergy reserved in the claims decision
-- [x] **Actions v2** (OD-7) — **deferred by decision**: no group trigger conditions for now; events API already exposes group events for observers
+- [x] **SCIM** (OD-6) — **implemented** (`feat(scim): manage groups through the SCIM v2 API`): `/Groups` resource (create, get, list, replace with member reconciliation, delete with grant cascade; PATCH answers unimplemented in favor of PUT), discovery via ResourceTypes/Schemas, permission-mapped
+- [x] **Actions v2** (OD-7) — **verified actionable, documented**: all `group.*` events flow through the generic execution router and every Group API method is a valid request/response condition (`ExecutionHandler` is in the Connect chain); documented in the concept page
 
 ### 6. TypeScript SDK
 
@@ -200,7 +202,7 @@ Implemented in `feat(console): manage user groups` and `feat(console): manage gr
 - [x] `GroupService` wrapper + `GrpcService.group` Connect client wired on the v2 transport (`services/group.service.ts`, `services/grpc.service.ts`)
 - [x] English i18n keys (`MENU.GROUPS` + `GROUPS.*` section in `en.json`); other locales follow the repo translation workflow
 - [x] Golden-path walkthrough — **automated as the Cypress suite** (`tests/functional-ui/cypress/e2e/groups/groups.cy.ts`: create → rename → members dialog → delete with confirmation), running against the live e2e stack in CI; supersedes a manual walkthrough
-- [x] Sort/pagination — **matches the current console convention** (the actions-two targets table is likewise unpaginated); the API supports pagination, so the console can adopt it without backend changes if group counts demand it
+- [x] Sort/pagination — **implemented** (`feat(console): paginate the groups list`): `cnsl-paginator` with offset/limit pagination against the API
 - [x] Group authorization screens — **done** (`feat(console): manage group authorizations`): per-group authorizations dialog (list, grant project roles, revoke) gated by `group.grant.read`; administrator-role screens are out of scope with Phase B's deferral
 
 ### 8. Documentation (deferred in PR #10455)
