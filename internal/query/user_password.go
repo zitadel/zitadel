@@ -72,10 +72,18 @@ func (wm *HumanPasswordReadModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
+			wm.Code = nil
+			wm.CodeCreationDate = time.Time{}
+			wm.CodeExpiry = 0
+			wm.PasswordCheckFailedCount = 0
 			wm.EncodedHash = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 			wm.SecretChangeRequired = e.ChangeRequired
 			wm.UserState = domain.UserStateActive
 		case *user.HumanRegisteredEvent:
+			wm.Code = nil
+			wm.CodeCreationDate = time.Time{}
+			wm.CodeExpiry = 0
+			wm.PasswordCheckFailedCount = 0
 			wm.EncodedHash = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 			wm.SecretChangeRequired = e.ChangeRequired
 			wm.UserState = domain.UserStateActive

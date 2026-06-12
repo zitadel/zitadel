@@ -157,7 +157,7 @@ var (
 	}
 	command2ArrayCodec = &pgtype.Type{
 		Codec: &pgtype.ArrayCodec{
-			ElementType: commandType,
+			ElementType: command2Type,
 		},
 	}
 )
