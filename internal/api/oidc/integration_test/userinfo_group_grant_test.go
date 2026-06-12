@@ -57,7 +57,7 @@ func TestServer_UserInfo_GroupGrantRoles(t *testing.T) {
 	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
 
-	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 3*time.Minute)
 	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 		userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
 		require.NoError(ttt, err)

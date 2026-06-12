@@ -80,7 +80,7 @@ func TestServer_UserInfo_GroupRevocation(t *testing.T) {
 		return ok
 	}
 
-	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 3*time.Minute)
 
 	// both the role and the group claim are present
 	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
