@@ -31,7 +31,7 @@ metadata as (
 		and instance_id = $2
 	) r
 ),
--- get all user grants, needed for the orgs query
+-- get all user grants, merged with the grants of the user's groups, needed for the orgs query
 user_grants as (
 	select id, grant_id, state, creation_date, change_date, sequence, user_id, roles, resource_owner, project_id
 	from projections.user_grants5
@@ -41,6 +41,17 @@ user_grants as (
     and state = 1
 	{{ if . -}}
 	and resource_owner = any($4)
+	{{- end }}
+	union all
+	select gg.id, gg.grant_id, gg.state, gg.creation_date, gg.change_date, gg.sequence, gu.user_id, gg.roles, gg.resource_owner, gg.project_id
+	from projections.group_grants1 gg
+	join projections.group_users1 gu on gu.group_id = gg.group_id and gu.instance_id = gg.instance_id
+	where gu.user_id = $1
+	and gg.instance_id = $2
+	and gg.project_id = any($3)
+	and gg.state = 1
+	{{ if . -}}
+	and gg.resource_owner = any($4)
 	{{- end }}
 ),
 -- filter all orgs we are interested in.

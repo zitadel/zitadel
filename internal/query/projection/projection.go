@@ -99,6 +99,7 @@ var (
 
 	GroupProjection      *handler.Handler
 	GroupUsersProjection *handler.Handler
+	GroupGrantProjection *handler.Handler
 )
 
 type projection interface {
@@ -206,6 +207,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 
 	GroupProjection = newGroupProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["groups"]))
 	GroupUsersProjection = newGroupUsersProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["group_users"]))
+	GroupGrantProjection = newGroupGrantProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["group_grants"]))
 
 	RelationalTablesProjection = newRelationalTablesProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["relational_tables"]))
 
@@ -392,6 +394,7 @@ func newProjectionsList() {
 		OrganizationSettingsProjection,
 		GroupProjection,
 		GroupUsersProjection,
+		GroupGrantProjection,
 
 		RelationalTablesProjection,
 	}

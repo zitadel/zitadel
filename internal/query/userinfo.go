@@ -26,6 +26,7 @@ var oidcUserInfoTriggerHandlers = sync.OnceValue(func() []*handler.Handler {
 		projection.UserProjection,
 		projection.UserMetadataProjection,
 		projection.UserGrantProjection,
+		projection.GroupGrantProjection,
 		projection.OrgProjection,
 		projection.ProjectProjection,
 	}
