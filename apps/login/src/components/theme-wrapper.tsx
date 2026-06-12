@@ -27,7 +27,13 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
     const STYLE_ID = "zitadel-custom-font";
 
     if (branding?.fontUrl) {
-      const fontSrc = branding.fontUrl;
+      let fontSrc: string;
+      try {
+        fontSrc = new URL(branding.fontUrl).href;
+      } catch {
+        // Malformed URL — skip custom font
+        return;
+      }
 
       let styleEl = document.getElementById(STYLE_ID) as HTMLStyleElement | null;
       if (!styleEl) {
@@ -35,6 +41,11 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
         styleEl.id = STYLE_ID;
         document.head.appendChild(styleEl);
       }
+      // Capture the current font-family (Lato from next/font) before overriding,
+      // so it serves as fallback if the custom font fails to load.
+      const existingFont =
+        getComputedStyle(document.documentElement).fontFamily || "sans-serif";
+      const fontStack = `'ZitadelCustomFont', ${existingFont}`;
 
       styleEl.textContent = `
         @font-face {
@@ -45,9 +56,9 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
         }
       `;
 
-      document.documentElement.style.setProperty("--zitadel-font-family", "'ZitadelCustomFont', sans-serif");
+      document.documentElement.style.setProperty("--zitadel-font-family", fontStack);
       // Inline style overrides the class-based Lato from next/font
-      document.documentElement.style.setProperty("font-family", "'ZitadelCustomFont', sans-serif");
+      document.documentElement.style.setProperty("font-family", fontStack);
     } else {
       // No custom font — remove injected style and let Lato class take over
       const existing = document.getElementById(STYLE_ID);
