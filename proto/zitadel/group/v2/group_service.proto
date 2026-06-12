@@ -399,6 +399,23 @@ service GroupService {
       }
     };
   }
+
+  // Set Group Manager Roles
+  //
+  // Sets the ZITADEL manager roles (e.g. ORG_OWNER_VIEWER) every member of the group
+  // receives for the group's organization. An empty role list removes them.
+  // The roles resolve when permissions are evaluated: adding or removing users from the
+  // group immediately changes their effective manager roles.
+  //
+  // Required permissions:
+  //   - org.member.write
+  rpc SetGroupManagerRoles(SetGroupManagerRolesRequest) returns (SetGroupManagerRolesResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
 }
 
 message CreateGroupRequest {
@@ -763,4 +780,35 @@ message ListGroupGrantsResponse {
 
   // Contains the total number of group grants matching the query and the applied limit.
   zitadel.filter.v2.PaginationResponse pagination = 2;
+}
+
+message SetGroupManagerRolesRequest {
+  // ID of the group.
+  string group_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
+
+  // Manager roles every member of the group receives for the group's organization.
+  // An empty list removes previously set roles.
+  repeated string roles = 2 [
+    (validate.rules).repeated = {items: {string: {min_len: 1, max_len: 200}}},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"ORG_OWNER_VIEWER\"]";
+    }
+  ];
+}
+
+message SetGroupManagerRolesResponse {
+  // ChangeDate is the timestamp of the change.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-08-11T15:00:00.051Z\"";
+    }
+  ];
 }

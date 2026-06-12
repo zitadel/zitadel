@@ -10,6 +10,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -33,6 +34,15 @@ type Membership struct {
 	IAM          *IAMMembership
 	Project      *ProjectMembership
 	ProjectGrant *ProjectGrantMembership
+
+	// Group is set when the membership is supplied by a group (provenance)
+	Group *GroupMembershipSource
+}
+
+// GroupMembershipSource names the group that supplies a membership
+type GroupMembershipSource struct {
+	GroupID string
+	Name    string
 }
 
 type OrgMembership struct {
@@ -230,6 +240,53 @@ var (
 		name:  projection.ProjectGrantColumnGrantedOrgID,
 		table: membershipAlias,
 	}
+	membershipGroupID = Column{
+		name:  "member_group_id",
+		table: membershipAlias,
+	}
+
+	groupManagerMembersTable = table{
+		name:          projection.GroupUsersProjectionTable,
+		alias:         "members",
+		instanceIDCol: projection.GroupUsersColumnInstanceID,
+	}
+	groupManagerRolesTable = table{
+		name:          projection.GroupManagerRolesProjectionTable,
+		alias:         "managers",
+		instanceIDCol: projection.GroupManagerRolesInstanceID,
+	}
+	groupManagerMemberUserID = Column{
+		name:  projection.GroupUsersColumnUserID,
+		table: groupManagerMembersTable,
+	}
+	groupManagerMemberGroupID = Column{
+		name:  projection.GroupUsersColumnGroupID,
+		table: groupManagerMembersTable,
+	}
+	groupManagerRolesGroupID = Column{
+		name:  projection.GroupManagerRolesGroupID,
+		table: groupManagerRolesTable,
+	}
+	groupManagerRolesRoles = Column{
+		name:  projection.GroupManagerRolesRoles,
+		table: groupManagerRolesTable,
+	}
+	groupManagerRolesCreationDate = Column{
+		name:  projection.GroupManagerRolesCreationDate,
+		table: groupManagerRolesTable,
+	}
+	groupManagerRolesChangeDate = Column{
+		name:  projection.GroupManagerRolesChangeDate,
+		table: groupManagerRolesTable,
+	}
+	groupManagerRolesSequence = Column{
+		name:  projection.GroupManagerRolesSequence,
+		table: groupManagerRolesTable,
+	}
+	groupManagerRolesResourceOwner = Column{
+		name:  projection.GroupManagerRolesResourceOwner,
+		table: groupManagerRolesTable,
+	}
 )
 
 func getMembershipFromQuery(ctx context.Context, queries *MembershipSearchQuery, permissionV2 bool) (string, []interface{}) {
@@ -237,8 +294,9 @@ func getMembershipFromQuery(ctx context.Context, queries *MembershipSearchQuery,
 	iamMembers, iamMembersArgs := prepareIAMMember(ctx, queries, permissionV2)
 	projectMembers, projectMembersArgs := prepareProjectMember(ctx, queries, permissionV2)
 	projectGrantMembers, projectGrantMembersArgs := prepareProjectGrantMember(ctx, queries, permissionV2)
+	groupManagerMembers, groupManagerMembersArgs := prepareGroupManagerMember(ctx, queries, permissionV2)
 	args := make([]interface{}, 0)
-	args = append(append(append(append(args, orgMembersArgs...), iamMembersArgs...), projectMembersArgs...), projectGrantMembersArgs...)
+	args = append(append(append(append(append(args, orgMembersArgs...), iamMembersArgs...), projectMembersArgs...), projectGrantMembersArgs...), groupManagerMembersArgs...)
 
 	return "(" +
 			orgMembers +
@@ -248,6 +306,8 @@ func getMembershipFromQuery(ctx context.Context, queries *MembershipSearchQuery,
 			projectMembers +
 			" UNION ALL " +
 			projectGrantMembers +
+			" UNION ALL " +
+			groupManagerMembers +
 			") AS " + membershipAlias.identifier(),
 		args
 }
@@ -269,12 +329,15 @@ func prepareMembershipsQuery(ctx context.Context, queries *MembershipSearchQuery
 			ProjectColumnName.identifier(),
 			OrgColumnName.identifier(),
 			InstanceColumnName.identifier(),
+			membershipGroupID.identifier(),
+			GroupColumnName.identifier(),
 			countColumn.identifier(),
 		).From(query).
 			LeftJoin(join(ProjectColumnID, membershipProjectID)).
 			LeftJoin(join(OrgColumnID, membershipOrgID)).
 			LeftJoin(join(ProjectGrantColumnGrantID, membershipGrantID) + " AND " + membershipProjectID.identifier() + " = " + ProjectGrantColumnProjectID.identifier()).
 			LeftJoin(join(InstanceColumnID, membershipInstanceID)).
+			LeftJoin(join(GroupColumnID, membershipGroupID)).
 			PlaceholderFormat(sq.Dollar),
 		args,
 		func(rows *sql.Rows) (*Memberships, error) {
@@ -292,6 +355,8 @@ func prepareMembershipsQuery(ctx context.Context, queries *MembershipSearchQuery
 					projectName  = sql.NullString{}
 					orgName      = sql.NullString{}
 					instanceName = sql.NullString{}
+					groupID      = sql.NullString{}
+					groupName    = sql.NullString{}
 				)
 
 				err := rows.Scan(
@@ -309,6 +374,8 @@ func prepareMembershipsQuery(ctx context.Context, queries *MembershipSearchQuery
 					&projectName,
 					&orgName,
 					&instanceName,
+					&groupID,
+					&groupName,
 					&count,
 				)
 
@@ -316,6 +383,12 @@ func prepareMembershipsQuery(ctx context.Context, queries *MembershipSearchQuery
 					return nil, err
 				}
 
+				if groupID.Valid {
+					membership.Group = &GroupMembershipSource{
+						GroupID: groupID.String,
+						Name:    groupName.String,
+					}
+				}
 				if orgID.Valid {
 					membership.Org = &OrgMembership{
 						OrgID: orgID.String,
@@ -369,6 +442,7 @@ func prepareOrgMember(ctx context.Context, query *MembershipSearchQuery, permiss
 		"NULL::TEXT AS "+membershipIAMID.name,
 		"NULL::TEXT AS "+membershipProjectID.name,
 		"NULL::TEXT AS "+membershipGrantID.name,
+		"NULL::TEXT AS "+membershipGroupID.name,
 	).From(orgMemberTable.identifier())
 	builder = administratorOrgPermissionCheckV2(ctx, builder, permissionV2)
 
@@ -393,6 +467,7 @@ func prepareIAMMember(ctx context.Context, query *MembershipSearchQuery, permiss
 		InstanceMemberIAMID.identifier(),
 		"NULL::TEXT AS "+membershipProjectID.name,
 		"NULL::TEXT AS "+membershipGrantID.name,
+		"NULL::TEXT AS "+membershipGroupID.name,
 	).From(instanceMemberTable.identifier())
 	builder = administratorInstancePermissionCheckV2(ctx, builder, permissionV2)
 
@@ -417,6 +492,7 @@ func prepareProjectMember(ctx context.Context, query *MembershipSearchQuery, per
 		"NULL::TEXT AS "+membershipIAMID.name,
 		ProjectMemberProjectID.identifier(),
 		"NULL::TEXT AS "+membershipGrantID.name,
+		"NULL::TEXT AS "+membershipGroupID.name,
 	).From(projectMemberTable.identifier())
 	builder = administratorProjectPermissionCheckV2(ctx, builder, permissionV2)
 
@@ -442,11 +518,56 @@ func prepareProjectGrantMember(ctx context.Context, query *MembershipSearchQuery
 		"NULL::TEXT AS "+membershipIAMID.name,
 		ProjectGrantMemberProjectID.identifier(),
 		ProjectGrantMemberGrantID.identifier(),
+		"NULL::TEXT AS "+membershipGroupID.name,
 	).From(projectGrantMemberTable.identifier())
 	builder = administratorProjectGrantPermissionCheckV2(ctx, builder, permissionV2)
 
 	for _, q := range query.Queries {
 		if q.Col().table.name == membershipAlias.name || q.Col().table.name == projectMemberTable.name || q.Col().table.name == projectGrantMemberTable.name {
+			builder = q.toQuery(builder)
+		}
+	}
+	return builder.MustSql()
+}
+
+// prepareGroupManagerMember resolves the manager roles every member of a group
+// receives for the group's organization. The roles surface as organization
+// memberships, with the supplying group as provenance.
+func prepareGroupManagerMember(ctx context.Context, query *MembershipSearchQuery, permissionV2 bool) (string, []interface{}) {
+	builder := sq.Select(
+		groupManagerMemberUserID.identifier(),
+		groupManagerRolesRoles.identifier(),
+		groupManagerRolesCreationDate.identifier(),
+		groupManagerRolesChangeDate.identifier(),
+		groupManagerRolesSequence.identifier(),
+		groupManagerRolesResourceOwner.identifier(),
+		groupManagerRolesTable.InstanceIDIdentifier(),
+		groupManagerRolesResourceOwner.identifier()+" AS "+membershipOrgID.name,
+		"NULL::TEXT AS "+membershipIAMID.name,
+		"NULL::TEXT AS "+membershipProjectID.name,
+		"NULL::TEXT AS "+membershipGrantID.name,
+		groupManagerMemberGroupID.identifier()+" AS "+membershipGroupID.name,
+	).From(groupManagerMembersTable.identifier()).
+		JoinClause("JOIN " + groupManagerRolesTable.identifier() +
+			" ON " + groupManagerMemberGroupID.identifier() + " = " + groupManagerRolesGroupID.identifier() +
+			" AND " + groupManagerMembersTable.InstanceIDIdentifier() + " = " + groupManagerRolesTable.InstanceIDIdentifier())
+	if permissionV2 {
+		join, args := PermissionClause(
+			ctx,
+			groupManagerRolesResourceOwner,
+			domain.PermissionOrgMemberRead,
+			OwnedRowsPermissionOption(groupManagerMemberUserID),
+		)
+		builder = builder.JoinClause(join, args...)
+	}
+
+	for _, q := range query.Queries {
+		// only push down filters on columns that exist on the joined tables
+		if q.Col().table.name != membershipAlias.name {
+			continue
+		}
+		switch q.Col().name {
+		case projection.MemberUserIDCol, projection.MemberResourceOwner, projection.MemberCreationDate:
 			builder = q.toQuery(builder)
 		}
 	}

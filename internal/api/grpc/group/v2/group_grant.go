@@ -53,6 +53,18 @@ func (s *Server) DeleteGroupGrant(ctx context.Context, req *connect.Request[grou
 	}), nil
 }
 
+// SetGroupManagerRoles sets the ZITADEL manager roles every member of the group
+// receives for the group's organization
+func (s *Server) SetGroupManagerRoles(ctx context.Context, req *connect.Request[group_v2.SetGroupManagerRolesRequest]) (*connect.Response[group_v2.SetGroupManagerRolesResponse], error) {
+	details, err := s.command.SetGroupManagerRoles(ctx, req.Msg.GetGroupId(), req.Msg.GetRoles())
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&group_v2.SetGroupManagerRolesResponse{
+		ChangeDate: timestamppb.New(details.EventDate),
+	}), nil
+}
+
 // ListGroupGrants returns the group grants matching the search criteria
 func (s *Server) ListGroupGrants(ctx context.Context, req *connect.Request[group_v2.ListGroupGrantsRequest]) (*connect.Response[group_v2.ListGroupGrantsResponse], error) {
 	queries, err := listGroupGrantsRequestToModel(req.Msg, s.systemDefaults)

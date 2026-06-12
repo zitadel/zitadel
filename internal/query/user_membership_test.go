@@ -16,78 +16,8 @@ import (
 
 var (
 	membershipsStmt = regexp.QuoteMeta(
-		"SELECT members.user_id" +
-			", members.roles" +
-			", members.creation_date" +
-			", members.change_date" +
-			", members.sequence" +
-			", members.resource_owner" +
-			", members.org_id" +
-			", members.id" +
-			", members.project_id" +
-			", members.grant_id" +
-			", projections.project_grants4.granted_org_id" +
-			", projections.projects4.name" +
-			", projections.orgs1.name" +
-			", projections.instances.name" +
-			", COUNT(*) OVER ()" +
-			" FROM (" +
-			"SELECT members.user_id" +
-			", members.roles" +
-			", members.creation_date" +
-			", members.change_date" +
-			", members.sequence" +
-			", members.resource_owner" +
-			", members.instance_id" +
-			", members.org_id" +
-			", NULL::TEXT AS id" +
-			", NULL::TEXT AS project_id" +
-			", NULL::TEXT AS grant_id" +
-			" FROM projections.org_members4 AS members" +
-			" UNION ALL " +
-			"SELECT members.user_id" +
-			", members.roles" +
-			", members.creation_date" +
-			", members.change_date" +
-			", members.sequence" +
-			", members.resource_owner" +
-			", members.instance_id" +
-			", NULL::TEXT AS org_id" +
-			", members.id" +
-			", NULL::TEXT AS project_id" +
-			", NULL::TEXT AS grant_id" +
-			" FROM projections.instance_members4 AS members" +
-			" UNION ALL " +
-			"SELECT members.user_id" +
-			", members.roles" +
-			", members.creation_date" +
-			", members.change_date" +
-			", members.sequence" +
-			", members.resource_owner" +
-			", members.instance_id" +
-			", NULL::TEXT AS org_id" +
-			", NULL::TEXT AS id" +
-			", members.project_id" +
-			", NULL::TEXT AS grant_id" +
-			" FROM projections.project_members4 AS members" +
-			" UNION ALL " +
-			"SELECT members.user_id" +
-			", members.roles" +
-			", members.creation_date" +
-			", members.change_date" +
-			", members.sequence" +
-			", members.resource_owner" +
-			", members.instance_id" +
-			", NULL::TEXT AS org_id" +
-			", NULL::TEXT AS id" +
-			", members.project_id" +
-			", members.grant_id" +
-			" FROM projections.project_grant_members4 AS members" +
-			") AS members" +
-			" LEFT JOIN projections.projects4 ON members.project_id = projections.projects4.id AND members.instance_id = projections.projects4.instance_id" +
-			" LEFT JOIN projections.orgs1 ON members.org_id = projections.orgs1.id AND members.instance_id = projections.orgs1.instance_id" +
-			" LEFT JOIN projections.project_grants4 ON members.grant_id = projections.project_grants4.grant_id AND members.instance_id = projections.project_grants4.instance_id AND members.project_id = projections.project_grants4.project_id" +
-			" LEFT JOIN projections.instances ON members.instance_id = projections.instances.id")
+		"SELECT members.user_id, members.roles, members.creation_date, members.change_date, members.sequence, members.resource_owner, members.org_id, members.id, members.project_id, members.grant_id, projections.project_grants4.granted_org_id, projections.projects4.name, projections.orgs1.name, projections.instances.name, members.member_group_id, projections.groups1.name, COUNT(*) OVER () FROM (SELECT members.user_id, members.roles, members.creation_date, members.change_date, members.sequence, members.resource_owner, members.instance_id, members.org_id, NULL::TEXT AS id, NULL::TEXT AS project_id, NULL::TEXT AS grant_id, NULL::TEXT AS member_group_id FROM projections.org_members4 AS members UNION ALL SELECT members.user_id, members.roles, members.creation_date, members.change_date, members.sequence, members.resource_owner, members.instance_id, NULL::TEXT AS org_id, members.id, NULL::TEXT AS project_id, NULL::TEXT AS grant_id, NULL::TEXT AS member_group_id FROM projections.instance_members4 AS members UNION ALL SELECT members.user_id, members.roles, members.creation_date, members.change_date, members.sequence, members.resource_owner, members.instance_id, NULL::TEXT AS org_id, NULL::TEXT AS id, members.project_id, NULL::TEXT AS grant_id, NULL::TEXT AS member_group_id FROM projections.project_members4 AS members UNION ALL SELECT members.user_id, members.roles, members.creation_date, members.change_date, members.sequence, members.resource_owner, members.instance_id, NULL::TEXT AS org_id, NULL::TEXT AS id, members.project_id, members.grant_id, NULL::TEXT AS member_group_id FROM projections.project_grant_members4 AS members UNION ALL SELECT members.user_id, managers.roles, managers.creation_date, managers.change_date, managers.sequence, managers.resource_owner, managers.instance_id, managers.resource_owner AS org_id, NULL::TEXT AS id, NULL::TEXT AS project_id, NULL::TEXT AS grant_id, members.group_id AS member_group_id FROM projections.group_users1 AS members JOIN projections.group_manager_roles1 AS managers ON members.group_id = managers.group_id AND members.instance_id = managers.instance_id) AS members LEFT JOIN projections.projects4 ON members.project_id = projections.projects4.id AND members.instance_id = projections.projects4.instance_id LEFT JOIN projections.orgs1 ON members.org_id = projections.orgs1.id AND members.instance_id = projections.orgs1.instance_id LEFT JOIN projections.project_grants4 ON members.grant_id = projections.project_grants4.grant_id AND members.instance_id = projections.project_grants4.instance_id AND members.project_id = projections.project_grants4.project_id LEFT JOIN projections.instances ON members.instance_id = projections.instances.id LEFT JOIN projections.groups1 ON members.member_group_id = projections.groups1.id AND members.instance_id = projections.groups1.instance_id")
+
 	membershipCols = []string{
 		"user_id",
 		"roles",
@@ -103,6 +33,8 @@ var (
 		"name", //project name
 		"name", //org name
 		"name", // instance name
+		"member_group_id",
+		"name", // group name
 		"count",
 	}
 )
@@ -153,6 +85,8 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							"org-name",
 							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -197,6 +131,8 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							"instance",
+							nil,
+							nil,
 						},
 					},
 				),
@@ -241,6 +177,8 @@ func Test_MembershipPrepares(t *testing.T) {
 							"project-name",
 							nil,
 							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -283,6 +221,8 @@ func Test_MembershipPrepares(t *testing.T) {
 							"grant-id",
 							"granted-org-id",
 							"project-name",
+							nil,
+							nil,
 							nil,
 							nil,
 						},
@@ -334,6 +274,8 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							"org-name",
 							nil,
+							nil,
+							nil,
 						},
 						{
 							"user-id",
@@ -350,6 +292,8 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							"instance",
+							nil,
+							nil,
 						},
 						{
 							"user-id",
@@ -364,6 +308,8 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							"project-name",
+							nil,
+							nil,
 							nil,
 							nil,
 						},
@@ -380,6 +326,8 @@ func Test_MembershipPrepares(t *testing.T) {
 							"grant-id",
 							"granted-org-id",
 							"project-name",
+							nil,
+							nil,
 							nil,
 							nil,
 						},
