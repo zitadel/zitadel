@@ -1,5 +1,7 @@
 import { Context } from 'support/commands';
 import { ensureGroupDoesntExist, ensureGroupExists } from '../../support/api/groups';
+import { ensureProjectExists, ensureRoleExists } from '../../support/api/projects';
+import { ensureHumanUserExists } from '../../support/api/users';
 
 describe('groups', () => {
   beforeEach(() => {
@@ -49,9 +51,13 @@ describe('groups', () => {
   });
 
   describe('manage members', () => {
-    beforeEach('ensure the group exists', () => {
+    const testMemberUsername = 'e2egroupmemberuser';
+
+    beforeEach('ensure the group and the user exist', () => {
       cy.get<Context>('@ctx').then((ctx) => {
+        ensureGroupDoesntExist(ctx.api, testGroupNameMembers);
         ensureGroupExists(ctx.api, testGroupNameMembers);
+        ensureHumanUserExists(ctx.api, testMemberUsername);
         cy.visit('/groups');
       });
     });
@@ -59,6 +65,62 @@ describe('groups', () => {
     it('should show the members dialog', () => {
       cy.contains('tr', testGroupNameMembers).find('[data-e2e="group-members-button"]').click({ force: true });
       cy.get('cnsl-search-user-autocomplete');
+    });
+
+    it('should add a member through the autocomplete and update the user count', () => {
+      cy.contains('tr', testGroupNameMembers).find('[data-e2e="group-members-button"]').click({ force: true });
+      cy.get('[data-e2e="add-member-input"]').type(testMemberUsername);
+      cy.get('[data-e2e="user-option"]').first().click();
+      cy.get('[data-e2e="group-members-add"]').click();
+      cy.shouldConfirmSuccess();
+      cy.contains('.member-row', testMemberUsername);
+
+      cy.get('mat-dialog-actions button').click();
+      cy.contains('tr', testGroupNameMembers).should('contain', '1');
+    });
+
+    it('should remove a member', () => {
+      cy.contains('tr', testGroupNameMembers).find('[data-e2e="group-members-button"]').click({ force: true });
+      cy.get('[data-e2e="add-member-input"]').type(testMemberUsername);
+      cy.get('[data-e2e="user-option"]').first().click();
+      cy.get('[data-e2e="group-members-add"]').click();
+      cy.shouldConfirmSuccess();
+      cy.contains('.member-row', testMemberUsername).find('[data-e2e="group-member-remove"]').click();
+      cy.shouldConfirmSuccess();
+      cy.contains('.member-row', testMemberUsername).should('not.exist');
+    });
+  });
+
+  describe('manage grants', () => {
+    const testGroupNameGrants = 'e2egroupgrants';
+    const testProjectName = 'e2egroupgrantproject';
+    const testRoleKey = 'e2egroupgrantrole';
+
+    beforeEach('ensure the group, project, and role exist', () => {
+      cy.get<Context>('@ctx').then((ctx) => {
+        ensureGroupDoesntExist(ctx.api, testGroupNameGrants);
+        ensureGroupExists(ctx.api, testGroupNameGrants);
+        ensureProjectExists(ctx.api, testProjectName).then((projectId) => {
+          ensureRoleExists(ctx.api, projectId, testRoleKey);
+          cy.wrap(projectId).as('projectId');
+        });
+        cy.visit('/groups');
+      });
+    });
+
+    it('should create and revoke a group grant', () => {
+      cy.get<number>('@projectId').then((projectId) => {
+        cy.contains('tr', testGroupNameGrants).find('[data-e2e="group-grants-button"]').click({ force: true });
+        cy.get('[data-e2e="group-grant-project-input"]').type(`${projectId}`);
+        cy.get('[data-e2e="group-grant-roles-input"]').type(testRoleKey);
+        cy.get('[data-e2e="group-grant-save"]').click();
+        cy.shouldConfirmSuccess();
+        cy.contains('.grant-row', `${projectId}`).should('contain', testRoleKey);
+
+        cy.contains('.grant-row', `${projectId}`).find('[data-e2e="group-grant-remove"]').click();
+        cy.shouldConfirmSuccess();
+        cy.contains('.grant-row', `${projectId}`).should('not.exist');
+      });
     });
   });
 

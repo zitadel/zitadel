@@ -40,6 +40,16 @@ function searchGroup(api: API, name: string): Cypress.Chainable<any | null> {
     });
 }
 
+function awaitGroupSearch(api: API, name: string, expectFound: boolean, trials = 20): Cypress.Chainable<any | null> {
+  return searchGroup(api, name).then((group) => {
+    if (!!group === expectFound) {
+      return cy.wrap(group);
+    }
+    expect(trials, `group ${name} ${expectFound ? 'visible' : 'gone'} in projection`).to.be.greaterThan(0);
+    return cy.wait(500).then(() => awaitGroupSearch(api, name, expectFound, trials - 1));
+  });
+}
+
 export function ensureGroupExists(api: API, name: string): Cypress.Chainable<string> {
   return searchGroup(api, name).then((group) => {
     if (group) {
@@ -56,7 +66,10 @@ export function ensureGroupExists(api: API, name: string): Cypress.Chainable<str
             name: name,
           },
         })
-        .then((res) => res.body.id),
+        .then((res) => {
+          const id = res.body.id;
+          return awaitGroupSearch(api, name, true).then(() => id);
+        }),
     );
   });
 }
@@ -73,6 +86,7 @@ export function ensureGroupDoesntExist(api: API, name: string): Cypress.Chainabl
         headers: requestHeaders(api),
         body: { id: group.id },
       })
+      .then(() => awaitGroupSearch(api, name, false))
       .then(() => null);
   });
 }

@@ -4,7 +4,13 @@
   <div class="add-members">
     <cnsl-search-user-autocomplete [target]="UserTarget.SELF" (selectionChanged)="selectionChanged($event)">
     </cnsl-search-user-autocomplete>
-    <button mat-raised-button color="primary" [disabled]="!usersToAdd.length" (click)="addUsers()">
+    <button
+      mat-raised-button
+      color="primary"
+      data-e2e="group-members-add"
+      [disabled]="!usersToAdd.length"
+      (click)="addUsers()"
+    >
       {{ 'GROUPS.MEMBERS.ADD' | translate }}
     </button>
   </div>
@@ -19,6 +25,7 @@
         mat-icon-button
         color="warn"
         matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+        data-e2e="group-member-remove"
         (click)="removeUser(member)"
       >
         <i class="las la-trash"></i>
