@@ -65,7 +65,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "231965491734773762",
 			},
-			mock:    mockQueryErr(regexp.QuoteMeta(oidcUserInfoQuery), sql.ErrConnDone, "231965491734773762", "instanceID", database.TextArray[string](nil)),
+			mock:    mockQueryErr(regexp.QuoteMeta(oidcUserInfoQueries[0][1]), sql.ErrConnDone, "231965491734773762", "instanceID", database.TextArray[string](nil)),
 			wantErr: sql.ErrConnDone,
 		},
 		{
@@ -73,7 +73,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "231965491734773762",
 			},
-			mock:    mockQuery(regexp.QuoteMeta(oidcUserInfoQuery), []string{"json_build_object"}, []driver.Value{testdataUserInfoNotFound}, "231965491734773762", "instanceID", database.TextArray[string](nil)),
+			mock:    mockQuery(regexp.QuoteMeta(oidcUserInfoQueries[0][1]), []string{"json_build_object"}, []driver.Value{testdataUserInfoNotFound}, "231965491734773762", "instanceID", database.TextArray[string](nil)),
 			wantErr: zerrors.ThrowNotFound(nil, "QUERY-ahs4S", "Errors.User.NotFound"),
 		},
 		{
@@ -81,7 +81,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "231965491734773762",
 			},
-			mock: mockQuery(regexp.QuoteMeta(oidcUserInfoQuery), []string{"json_build_object"}, []driver.Value{testdataUserInfoHumanNoMD}, "231965491734773762", "instanceID", database.TextArray[string](nil)),
+			mock: mockQuery(regexp.QuoteMeta(oidcUserInfoQueries[0][1]), []string{"json_build_object"}, []driver.Value{testdataUserInfoHumanNoMD}, "231965491734773762", "instanceID", database.TextArray[string](nil)),
 			want: &OIDCUserInfo{
 				User: &User{
 					ID:                 "231965491734773762",
@@ -120,7 +120,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "231965491734773762",
 			},
-			mock: mockQuery(regexp.QuoteMeta(oidcUserInfoQuery), []string{"json_build_object"}, []driver.Value{testdataUserInfoHuman}, "231965491734773762", "instanceID", database.TextArray[string](nil)),
+			mock: mockQuery(regexp.QuoteMeta(oidcUserInfoQueries[0][1]), []string{"json_build_object"}, []driver.Value{testdataUserInfoHuman}, "231965491734773762", "instanceID", database.TextArray[string](nil)),
 			want: &OIDCUserInfo{
 				User: &User{
 					ID:                 "231965491734773762",
@@ -177,7 +177,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 				userID:       "231965491734773762",
 				roleAudience: []string{"236645808328409090", "240762134579904514"},
 			},
-			mock: mockQuery(regexp.QuoteMeta(oidcUserInfoQuery),
+			mock: mockQuery(regexp.QuoteMeta(oidcUserInfoQueries[0][1]),
 				[]string{"json_build_object"},
 				[]driver.Value{testdataUserInfoHumanGrants},
 				"231965491734773762", "instanceID", database.TextArray[string]{"236645808328409090", "240762134579904514"},
@@ -279,7 +279,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 				roleAudience: []string{"236645808328409090", "240762134579904514"},
 				roleOrgIDs:   []string{"231848297847848962"},
 			},
-			mock: mockQuery(regexp.QuoteMeta(oidcUserInfoWithRoleOrgIDsQuery),
+			mock: mockQuery(regexp.QuoteMeta(oidcUserInfoQueries[1][1]),
 				[]string{"json_build_object"},
 				[]driver.Value{testdataUserInfoHumanGrants},
 				"231965491734773762", "instanceID",
@@ -381,7 +381,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "240707570677841922",
 			},
-			mock: mockQuery(regexp.QuoteMeta(oidcUserInfoQuery), []string{"json_build_object"}, []driver.Value{testdataUserInfoMachine}, "240707570677841922", "instanceID", database.TextArray[string](nil)),
+			mock: mockQuery(regexp.QuoteMeta(oidcUserInfoQueries[0][1]), []string{"json_build_object"}, []driver.Value{testdataUserInfoMachine}, "240707570677841922", "instanceID", database.TextArray[string](nil)),
 			want: &OIDCUserInfo{
 				User: &User{
 					ID:                 "240707570677841922",
@@ -434,7 +434,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 				}
 				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
 
-				got, err := q.GetOIDCUserInfo(ctx, tt.args.userID, tt.args.roleAudience, tt.args.roleOrgIDs...)
+				got, err := q.GetOIDCUserInfo(ctx, tt.args.userID, tt.args.roleAudience, true, tt.args.roleOrgIDs...)
 				require.ErrorIs(t, err, tt.wantErr)
 				assert.Equal(t, tt.want, got)
 			})

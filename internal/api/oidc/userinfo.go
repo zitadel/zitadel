@@ -103,7 +103,8 @@ func (s *Server) userInfo(
 
 			roleAudience, requestedRoles = prepareRoles(ctx, scope, projectID, projectRoleAssertion, currentProjectOnly)
 			roleOrgIDs := domain.RoleOrgIDsFromScope(scope)
-			qu, err = s.query.GetOIDCUserInfo(ctx, userID, roleAudience, roleOrgIDs...)
+			withGroups := slices.Contains(scope, ScopeUserGroups)
+			qu, err = s.query.GetOIDCUserInfo(ctx, userID, roleAudience, withGroups, roleOrgIDs...)
 			if err != nil {
 				return
 			}

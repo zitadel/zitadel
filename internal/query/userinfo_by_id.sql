@@ -39,7 +39,7 @@ user_grants as (
 	and instance_id = $2
 	and project_id = any($3)
     and state = 1
-	{{ if . -}}
+	{{ if .RoleOrgIDs -}}
 	and resource_owner = any($4)
 	{{- end }}
 	union all
@@ -50,7 +50,7 @@ user_grants as (
 	and gg.instance_id = $2
 	and gg.project_id = any($3)
 	and gg.state = 1
-	{{ if . -}}
+	{{ if .RoleOrgIDs -}}
 	and gg.resource_owner = any($4)
 	{{- end }}
 ),
@@ -73,7 +73,8 @@ user_org as (
 		join usr u on o.id = u.resource_owner
 	) r
 ),
--- find the user's groups
+{{ if .Groups -}}
+-- find the user's groups, only when a group scope is requested
 user_groups as (
     select json_agg(row_to_json(r)) as user_groups from (
         select g.id, g.name
@@ -85,6 +86,7 @@ user_groups as (
         )
         r
 ),
+{{- end }}
 -- join user grants to orgs, projects and user
 grants as (
 	select json_agg(row_to_json(r)) as grants from (
@@ -110,6 +112,8 @@ select json_build_object(
 	),
 	'org', (select organization from user_org),
 	'metadata', (select metadata from metadata),
-	'user_grants', (select grants from grants),
-    'user_groups', (select user_groups from user_groups)
+	'user_grants', (select grants from grants)
+	{{ if .Groups -}}
+	, 'user_groups', (select user_groups from user_groups)
+	{{- end }}
 );
