@@ -77,6 +77,13 @@ all group events (`group.added`, `group.changed`, `group.removed`, `group.users.
 Group API method (e.g. `/zitadel.group.v2.GroupService/CreateGroup`) can be used as a
 request or response condition.
 
+Groups can also receive **ZITADEL manager roles** for their organization (e.g. `ORG_OWNER_VIEWER`):
+every member of the group acts with these roles, resolved when permissions are evaluated.
+Setting an empty role list removes them. Managing group manager roles requires the permission
+to manage organization members (`org.member.write`).
+
 ## Current Limitations
 
-- ZITADEL manager roles (IAM/organization memberships) cannot be granted to a group; only project roles can.
+- Group-supplied manager roles resolve through the membership queries used by the console and the
+  legacy permission path; API permission checks evaluated with the `permission_check_v2` feature flag
+  do not include group-supplied manager roles yet.
