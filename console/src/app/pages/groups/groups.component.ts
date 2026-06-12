@@ -8,6 +8,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { BehaviorSubject, combineLatest, defer, firstValueFrom, lastValueFrom, Observable, of, ReplaySubject, shareReplay } from 'rxjs';
 import { catchError, filter, map, startWith, switchMap, tap } from 'rxjs/operators';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GroupService } from 'src/app/services/group.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -36,7 +37,13 @@ export class GroupsComponent {
     private readonly toast: ToastService,
     private readonly dialog: MatDialog,
     private readonly destroyRef: DestroyRef,
+    breadcrumbService: BreadcrumbService,
   ) {
+    const bread: Breadcrumb = {
+      type: BreadcrumbType.ORG,
+      routerLink: ['/org'],
+    };
+    breadcrumbService.setBreadcrumb([bread]);
     this.orgId$ = this.getOrgId$();
     this.groups$ = this.getGroups$();
   }

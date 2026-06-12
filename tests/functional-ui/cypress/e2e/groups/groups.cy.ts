@@ -22,6 +22,10 @@ describe('groups', () => {
       });
     });
 
+    it('should show the navigation on a direct load', () => {
+      cy.get('#mainnav').should('be.visible');
+    });
+
     it('should add a group', () => {
       cy.get('[data-e2e="create-group-button"]').click({ force: true });
       cy.get('[data-e2e="group-name-input"]').should('be.enabled').type(testGroupNameCreate);
