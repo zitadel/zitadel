@@ -52,29 +52,25 @@
               >
                 <i class="las la-users"></i>
               </button>
-              <ng-template cnslHasRole [hasRole]="['group.grant.read']">
-                <button
-                  actions
-                  matTooltip="{{ 'GROUPS.GRANTS.TITLE' | translate }}"
-                  data-e2e="group-grants-button"
-                  (click)="$event.stopPropagation(); openGrantsDialog(row)"
-                  mat-icon-button
-                >
-                  <i class="las la-shield-alt"></i>
-                </button>
-              </ng-template>
-              <ng-template cnslHasRole [hasRole]="['group.delete']">
-                <button
-                  actions
-                  matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
-                  color="warn"
-                  data-e2e="delete-group-button"
-                  (click)="$event.stopPropagation(); deleteGroup(row)"
-                  mat-icon-button
-                >
-                  <i class="las la-trash"></i>
-                </button>
-              </ng-template>
+              <button
+                actions
+                matTooltip="{{ 'GROUPS.GRANTS.TITLE' | translate }}"
+                data-e2e="group-grants-button"
+                (click)="$event.stopPropagation(); openGrantsDialog(row)"
+                mat-icon-button
+              >
+                <i class="las la-shield-alt"></i>
+              </button>
+              <button
+                actions
+                matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+                color="warn"
+                data-e2e="delete-group-button"
+                (click)="$event.stopPropagation(); deleteGroup(row)"
+                mat-icon-button
+              >
+                <i class="las la-trash"></i>
+              </button>
             </cnsl-table-actions>
           </td>
         </ng-container>
