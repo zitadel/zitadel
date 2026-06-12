@@ -997,6 +997,50 @@ func TestServer_ListGroupUsers(t *testing.T) {
 			},
 		},
 		{
+			name: "machine user in group, ok",
+			args: args{
+				ctx: iamOwnerCtx,
+				dep: func(req *group_v2.ListGroupUsersRequest, resp *group_v2.ListGroupUsersResponse) {
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+					groupResp := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.GroupName())
+					machineResp := instance.CreateUserTypeMachine(iamOwnerCtx, orgResp.GetOrganizationId())
+					addUsersResp := instance.AddUsersToGroup(iamOwnerCtx, t, groupResp.GetId(), []string{machineResp.GetId()})
+
+					machineUser, err := instance.Client.UserV2.GetUserByID(iamOwnerCtx, &user.GetUserByIDRequest{UserId: machineResp.GetId()})
+					require.NoError(t, err)
+
+					req.Filters[0].Filter = &group_v2.GroupUsersSearchFilter_GroupIds{
+						GroupIds: &filter.InIDsFilter{
+							Ids: []string{groupResp.GetId()},
+						},
+					}
+					resp.GroupUsers[0] = &group_v2.GroupUser{
+						GroupId:        groupResp.GetId(),
+						OrganizationId: orgResp.GetOrganizationId(),
+						User: &authorization.User{
+							Id:                 machineUser.User.GetUserId(),
+							OrganizationId:     machineUser.User.Details.ResourceOwner,
+							PreferredLoginName: machineUser.User.GetPreferredLoginName(),
+							DisplayName:        "machine",
+						},
+						CreationDate: addUsersResp.GetChangeDate(),
+					}
+				},
+				req: &group_v2.ListGroupUsersRequest{
+					Filters: []*group_v2.GroupUsersSearchFilter{{}},
+				},
+			},
+			want: &group_v2.ListGroupUsersResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  1,
+					AppliedLimit: 100,
+				},
+				GroupUsers: []*group_v2.GroupUser{
+					{},
+				},
+			},
+		},
+		{
 			name: "instance owner, no matching results, ok",
 			args: args{
 				ctx: iamOwnerCtx,

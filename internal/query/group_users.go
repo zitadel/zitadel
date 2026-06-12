@@ -133,6 +133,7 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 			GroupUsersColumnGroupID.identifier(),
 			GroupUsersColumnUserID.identifier(),
 			HumanDisplayNameCol.identifier(),
+			MachineNameCol.identifier(),
 			LoginNameNameCol.identifier(),
 			GroupUsersColumnResourceOwner.identifier(),
 			HumanAvatarURLCol.identifier(),
@@ -141,6 +142,7 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 			countColumn.identifier(),
 		).From(groupUsersTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, GroupUsersColumnUserID)).
+			LeftJoin(join(MachineUserIDCol, GroupUsersColumnUserID)).
 			LeftJoin(join(LoginNameUserIDCol, GroupUsersColumnUserID)).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
@@ -153,6 +155,7 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 
 				var (
 					displayName        sql.NullString
+					machineName        sql.NullString
 					avatarURL          sql.NullString
 					preferredLoginName sql.NullString
 				)
@@ -161,6 +164,7 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 					&g.GroupID,
 					&g.UserID,
 					&displayName,
+					&machineName,
 					&preferredLoginName,
 					&g.ResourceOwner,
 					&avatarURL,
@@ -172,7 +176,11 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 					return nil, err
 				}
 
-				g.DisplayName = displayName.String
+				if displayName.Valid {
+					g.DisplayName = displayName.String
+				} else {
+					g.DisplayName = machineName.String
+				}
 				g.AvatarUrl = avatarURL.String
 				g.PreferredLoginName = preferredLoginName.String
 				groupUsers = append(groupUsers, g)

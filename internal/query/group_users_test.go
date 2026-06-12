@@ -17,6 +17,7 @@ var (
 		"SELECT projections.group_users1.group_id" +
 			", projections.group_users1.user_id" +
 			", projections.users14_humans.display_name" +
+			", projections.users14_machines.name" +
 			", projections.login_names3.login_name" +
 			", projections.group_users1.resource_owner" +
 			", projections.users14_humans.avatar_key" +
@@ -25,6 +26,7 @@ var (
 			", COUNT(*) OVER ()" +
 			" FROM projections.group_users1" +
 			" LEFT JOIN projections.users14_humans ON projections.group_users1.user_id = projections.users14_humans.user_id AND projections.group_users1.instance_id = projections.users14_humans.instance_id" +
+			" LEFT JOIN projections.users14_machines ON projections.group_users1.user_id = projections.users14_machines.user_id AND projections.group_users1.instance_id = projections.users14_machines.instance_id" +
 			" LEFT JOIN projections.login_names3 ON projections.group_users1.user_id = projections.login_names3.user_id AND projections.group_users1.instance_id = projections.login_names3.instance_id" +
 			" WHERE projections.login_names3.is_primary = $1")
 
@@ -32,6 +34,7 @@ var (
 		"group_id",
 		"user_id",
 		"display_name",
+		"machine_name",
 		"login_name",
 		"resource_owner",
 		"avatar_key",
@@ -77,6 +80,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 							"group-id",
 							"user-id",
 							"display-name",
+							nil,
 							"login-name",
 							"resource-owner",
 							"avatar-key",
@@ -105,6 +109,46 @@ func Test_GroupUsersPrepares(t *testing.T) {
 			},
 		},
 		{
+			name:    "prepareGroupUsersQuery machine user, display name from machine name",
+			prepare: prepareGroupUsersQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					groupUsersStmt,
+					groupUsersColumns,
+					[][]driver.Value{
+						{
+							"group-id",
+							"machine-user-id",
+							nil,
+							"machine-name",
+							"login-name",
+							"resource-owner",
+							nil,
+							testNow,
+							1,
+						},
+					},
+				),
+			},
+			object: &GroupUsers{
+				SearchResponse: SearchResponse{
+					Count: 1,
+				},
+				GroupUsers: []*GroupUser{
+					{
+						GroupID:            "group-id",
+						UserID:             "machine-user-id",
+						ResourceOwner:      "resource-owner",
+						CreationDate:       testNow,
+						Sequence:           1,
+						PreferredLoginName: "login-name",
+						DisplayName:        "machine-name",
+						AvatarUrl:          "",
+					},
+				},
+			},
+		},
+		{
 			name:    "prepareGroupUsersQuery with multiple results",
 			prepare: prepareGroupUsersQuery,
 			want: want{
@@ -116,6 +160,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 							"group-id-1",
 							"user-id-1",
 							"display-name-1",
+							nil,
 							"login-name-1",
 							"resource-owner",
 							"avatar-key",
@@ -126,6 +171,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 							"group-id-1",
 							"user-id-2",
 							"display-name-2",
+							nil,
 							"login-name-2",
 							"resource-owner",
 							"avatar-key",
