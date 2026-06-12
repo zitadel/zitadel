@@ -435,7 +435,8 @@
     "TOS": "Conditions de service",
     "OPENSHORTCUTSTOOLTIP": "Tapez ? pour afficher les raccourcis clavier",
     "SETTINGS": "Paramètres",
-    "CUSTOMERPORTAL": "Portail Client"
+    "CUSTOMERPORTAL": "Portail Client",
+    "GROUPS": "Groups"
   },
   "QUICKSTART": {
     "TITLE": "Intégrer Zitadel dans votre application",
@@ -2843,5 +2844,52 @@
       "DESCRIPTION": "Vous pouvez voir ici les derniers événements qui ont généré un changement d'utilisateur."
     }
   },
-  "INSTANCEID": "ID de l'instance"
+  "INSTANCEID": "ID de l'instance",
+  "GROUPS": {
+    "TITLE": "User Groups",
+    "DESCRIPTION": "Organize the users of your organization into groups.",
+    "TABLE": {
+      "NAME": "Name",
+      "DESCRIPTION": "Description",
+      "USERCOUNT": "Users",
+      "CREATIONDATE": "Created",
+      "EMPTY": "No groups found"
+    },
+    "DIALOG": {
+      "NAME": "Name",
+      "DESCRIPTION": "Description",
+      "CREATE": {
+        "TITLE": "Create Group"
+      },
+      "UPDATE": {
+        "TITLE": "Update Group"
+      },
+      "DELETE": {
+        "TITLE": "Delete Group",
+        "DESCRIPTION": "You are about to delete this group. Its members will lose the membership. Are you sure?"
+      }
+    },
+    "MEMBERS": {
+      "TITLE": "Members",
+      "ADD": "Add",
+      "EMPTY": "This group has no members yet"
+    },
+    "TOAST": {
+      "CREATED": "Group created",
+      "UPDATED": "Group updated",
+      "DELETED": "Group deleted",
+      "MEMBERSADDED": "Users added to group",
+      "MEMBERREMOVED": "User removed from group",
+      "GRANTADDED": "Group authorization created",
+      "GRANTREMOVED": "Group authorization removed"
+    },
+    "GRANTS": {
+      "TITLE": "Authorizations",
+      "DESCRIPTION": "Grant project roles to all members of this group. Removing a grant immediately revokes the derived roles.",
+      "PROJECTID": "Project ID",
+      "ROLEKEYS": "Role keys (comma-separated)",
+      "ADD": "Grant",
+      "EMPTY": "This group has no authorizations yet"
+    }
+  }
 }
