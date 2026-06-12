@@ -105,7 +105,6 @@ func (wm *HumanWebAuthNWriteModel) Reduce() error {
 		case *user.HumanWebAuthNRemovedEvent:
 			wm.State = domain.MFAStateRemoved
 		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent, *user.UserRemovedEvent:
-			wm.WebauthNTokenID = ""
 			wm.Challenge = ""
 			wm.KeyID = nil
 			wm.PublicKey = nil
@@ -568,7 +567,6 @@ func (wm *HumanPasswordlessInitCodeWriteModel) Reduce() error {
 		case *user.HumanPasswordlessInitCodeCheckSucceededEvent:
 			wm.State = domain.PasswordlessInitCodeStateRemoved
 		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent, *user.UserRemovedEvent:
-			wm.CodeID = ""
 			wm.Attempts = 0
 			wm.CryptoCode = nil
 			wm.CodeCreationDate = time.Time{}

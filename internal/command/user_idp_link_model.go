@@ -71,12 +71,9 @@ func (wm *UserIDPLinkWriteModel) Reduce() error {
 		case *user.UserIDPLinkCascadeRemovedEvent:
 			wm.State = domain.UserIDPLinkStateRemoved
 		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent:
-			wm.IDPConfigID = ""
 			wm.DisplayName = ""
-			wm.ExternalUserID = ""
 			wm.State = domain.UserIDPLinkStateUnspecified
 		case *user.UserRemovedEvent:
-			wm.ExternalUserID = ""
 			wm.DisplayName = ""
 			wm.State = domain.UserIDPLinkStateRemoved
 		}
