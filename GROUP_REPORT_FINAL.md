@@ -164,7 +164,7 @@ No implementation exists: no group-grant domain model, events, projections, comm
 
 ### 4. Token & claim behavior
 
-- [ ] **Implement #12154 decision** (see Decision Record): re-encode the `groups` claim per RFC 9068/RFC 7643 (`[{value, display}]`) in JWT access tokens, userinfo, and ID token; keep scope-gating; deprecate `urn:zitadel:iam:user:groups` before GA
+- [x] **#12154 decision implemented** (`feat(oidc)!: encode groups claim per RFC 9068 and SCIM`): `groups` claim is now `[{value, display}]` in userinfo, introspection, ID token, and JWT access token (all flow through `userInfoToOIDC`); scope-gating kept; `urn:zitadel:iam:user:groups` scope/claim removed; unit + integration tests updated
 - [ ] **Wording mismatch**: #9702 says "group roles" in tokens; the implementation emits group names / ID+name objects — reconcile spec vs implementation (ties into §1 merge work)
 - [ ] **Flow verification**: confirm the claims appear (or are deliberately absent) in ID tokens, JWT access tokens, and userinfo across auth-code, refresh, machine/client-credentials flows; decide bearer-token vs JWT delivery; add integration tests per chosen behavior
 - [ ] **SAML** (OD-5, decided: excluded from v1): document the exclusion; revisit with Phase A when group-derived roles exist
