@@ -12,6 +12,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { GroupDialogComponent } from './group-dialog/group-dialog.component';
+import { GroupGrantsDialogComponent } from './group-grants-dialog/group-grants-dialog.component';
 import { GroupMembersDialogComponent } from './group-members-dialog/group-members-dialog.component';
 
 @Component({
@@ -114,6 +115,13 @@ export class GroupsComponent {
           this.refresh$.next(true);
         }
       });
+  }
+
+  protected openGrantsDialog(group: Group): void {
+    this.dialog.open<GroupGrantsDialogComponent, { group: Group }>(GroupGrantsDialogComponent, {
+      width: '550px',
+      data: { group },
+    });
   }
 
   protected async deleteGroup(group: Group): Promise<void> {

@@ -2908,7 +2908,17 @@
       "UPDATED": "Group updated",
       "DELETED": "Group deleted",
       "MEMBERSADDED": "Users added to group",
-      "MEMBERREMOVED": "User removed from group"
+      "MEMBERREMOVED": "User removed from group",
+      "GRANTADDED": "Group authorization created",
+      "GRANTREMOVED": "Group authorization removed"
+    },
+    "GRANTS": {
+      "TITLE": "Authorizations",
+      "DESCRIPTION": "Grant project roles to all members of this group. Removing a grant immediately revokes the derived roles.",
+      "PROJECTID": "Project ID",
+      "ROLEKEYS": "Role keys (comma-separated)",
+      "ADD": "Grant",
+      "EMPTY": "This group has no authorizations yet"
     }
   }
 }

@@ -3,18 +3,26 @@ import { MessageInitShape } from '@bufbuild/protobuf';
 import {
   AddUsersToGroupRequestSchema,
   AddUsersToGroupResponse,
+  CreateGroupGrantRequestSchema,
+  CreateGroupGrantResponse,
   CreateGroupRequestSchema,
   CreateGroupResponse,
+  DeleteGroupGrantRequestSchema,
+  DeleteGroupGrantResponse,
   DeleteGroupRequestSchema,
   DeleteGroupResponse,
   GetGroupRequestSchema,
   GetGroupResponse,
+  ListGroupGrantsRequestSchema,
+  ListGroupGrantsResponse,
   ListGroupsRequestSchema,
   ListGroupsResponse,
   ListGroupUsersRequestSchema,
   ListGroupUsersResponse,
   RemoveUsersFromGroupRequestSchema,
   RemoveUsersFromGroupResponse,
+  UpdateGroupGrantRequestSchema,
+  UpdateGroupGrantResponse,
   UpdateGroupRequestSchema,
   UpdateGroupResponse,
 } from '@zitadel/proto/zitadel/group/v2/group_service_pb';
@@ -59,5 +67,21 @@ export class GroupService {
     req: MessageInitShape<typeof RemoveUsersFromGroupRequestSchema>,
   ): Promise<RemoveUsersFromGroupResponse> {
     return this.grpcService.group.removeUsersFromGroup(req);
+  }
+
+  public createGroupGrant(req: MessageInitShape<typeof CreateGroupGrantRequestSchema>): Promise<CreateGroupGrantResponse> {
+    return this.grpcService.group.createGroupGrant(req);
+  }
+
+  public updateGroupGrant(req: MessageInitShape<typeof UpdateGroupGrantRequestSchema>): Promise<UpdateGroupGrantResponse> {
+    return this.grpcService.group.updateGroupGrant(req);
+  }
+
+  public deleteGroupGrant(req: MessageInitShape<typeof DeleteGroupGrantRequestSchema>): Promise<DeleteGroupGrantResponse> {
+    return this.grpcService.group.deleteGroupGrant(req);
+  }
+
+  public listGroupGrants(req: MessageInitShape<typeof ListGroupGrantsRequestSchema>): Promise<ListGroupGrantsResponse> {
+    return this.grpcService.group.listGroupGrants(req);
   }
 }
