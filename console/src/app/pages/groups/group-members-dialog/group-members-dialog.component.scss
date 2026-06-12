@@ -1,0 +1,34 @@
+.add-members {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  cnsl-search-user-autocomplete {
+    flex: 1;
+  }
+}
+
+.members-list {
+  margin-top: 1rem;
+
+  .member-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.25rem 0;
+
+    .member-info {
+      display: flex;
+      flex-direction: column;
+
+      .display-name {
+        font-weight: 500;
+      }
+    }
+
+    &.empty {
+      justify-content: center;
+      padding: 1rem 0;
+    }
+  }
+}

@@ -1,0 +1,84 @@
+<div class="max-width-container">
+  <div class="groups-header">
+    <h1>{{ 'GROUPS.TITLE' | translate }}</h1>
+    <p class="cnsl-secondary-text">{{ 'GROUPS.DESCRIPTION' | translate }}</p>
+  </div>
+
+  <cnsl-refresh-table (refreshed)="refresh$.next(true)" [loading]="(groups$ | async) === null">
+    <div actions>
+      <ng-template cnslHasRole [hasRole]="['group.create']">
+        <button color="primary" mat-raised-button (click)="openGroupDialog()">
+          <div class="cnsl-action-button">
+            <mat-icon class="icon">add</mat-icon>
+            <span>{{ 'ACTIONS.NEW' | translate }}</span>
+          </div>
+        </button>
+      </ng-template>
+    </div>
+    <div class="table-wrapper">
+      <table mat-table class="table" aria-label="user groups" [dataSource]="(groups$ | async) ?? []">
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>{{ 'GROUPS.TABLE.NAME' | translate }}</th>
+          <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef>{{ 'GROUPS.TABLE.DESCRIPTION' | translate }}</th>
+          <td mat-cell *matCellDef="let row">{{ row.description }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="userCount">
+          <th mat-header-cell *matHeaderCellDef>{{ 'GROUPS.TABLE.USERCOUNT' | translate }}</th>
+          <td mat-cell *matCellDef="let row">{{ row.userCount }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="creationDate">
+          <th mat-header-cell *matHeaderCellDef>{{ 'GROUPS.TABLE.CREATIONDATE' | translate }}</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="no-break">{{ row.creationDate | timestampToDate | localizedDate: 'regular' }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions" stickyEnd>
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let row">
+            <cnsl-table-actions>
+              <button
+                actions
+                matTooltip="{{ 'GROUPS.MEMBERS.TITLE' | translate }}"
+                (click)="$event.stopPropagation(); openMembersDialog(row)"
+                mat-icon-button
+              >
+                <i class="las la-users"></i>
+              </button>
+              <ng-template cnslHasRole [hasRole]="['group.delete']">
+                <button
+                  actions
+                  matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+                  color="warn"
+                  (click)="$event.stopPropagation(); deleteGroup(row)"
+                  mat-icon-button
+                >
+                  <i class="las la-trash"></i>
+                </button>
+              </ng-template>
+            </cnsl-table-actions>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['name', 'description', 'userCount', 'creationDate', 'actions']"></tr>
+        <tr
+          class="highlight pointer"
+          (click)="openGroupDialog(row)"
+          mat-row
+          *matRowDef="let row; columns: ['name', 'description', 'userCount', 'creationDate', 'actions']"
+        ></tr>
+      </table>
+
+      <div *ngIf="((groups$ | async) ?? []).length === 0" class="no-content-row">
+        <i class="las la-exclamation"></i>
+        <span>{{ 'GROUPS.TABLE.EMPTY' | translate }}</span>
+      </div>
+    </div>
+  </cnsl-refresh-table>
+</div>
