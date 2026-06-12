@@ -75,7 +75,7 @@ describe('groups', () => {
       cy.shouldConfirmSuccess();
       cy.contains('.member-row', testMemberUsername);
 
-      cy.get('mat-dialog-actions button').click();
+      cy.get('[mat-dialog-actions] button').first().click();
       cy.contains('tr', testGroupNameMembers).should('contain', '1');
     });
 

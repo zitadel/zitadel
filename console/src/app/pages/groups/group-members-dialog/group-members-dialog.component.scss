@@ -1,10 +1,9 @@
-.add-members {
+.action {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  justify-content: space-between;
 
-  cnsl-search-user-autocomplete {
-    flex: 1;
+  .ok-button {
+    margin-left: 0.5rem;
   }
 }
 
