@@ -3,11 +3,14 @@ package command
 import (
 	"context"
 	"slices"
+	"strings"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	repo "github.com/zitadel/zitadel/internal/repository/group"
+	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddUsersToGroup(ctx context.Context, groupID string, userIDs []string) (_ *domain.ObjectDetails, err error) {
@@ -69,13 +72,9 @@ func (c *Commands) addUsersToGroup(ctx context.Context, group *GroupWriteModel) 
 		return writeModelToObjectDetails(&group.WriteModel), nil
 	}
 
-	// precondition: check whether the users exist
-	for _, userID := range userIDsToAdd {
-		// check whether the user exists in the same organization as the group
-		_, err := c.checkUserExists(ctx, userID, group.ResourceOwner)
-		if err != nil {
-			return nil, err
-		}
+	// precondition: check that all users exist in the same organization as the group
+	if err := c.checkUsersExist(ctx, userIDsToAdd, group.ResourceOwner); err != nil {
+		return nil, err
 	}
 
 	// add users to the group
@@ -87,6 +86,80 @@ func (c *Commands) addUsersToGroup(ctx context.Context, group *GroupWriteModel) 
 			userIDsToAdd,
 		),
 	)
+}
+
+// checkUsersExist verifies with a single eventstore query that every user exists
+// in the given organization, reporting all missing user IDs at once instead of
+// failing on the first one
+func (c *Commands) checkUsersExist(ctx context.Context, userIDs []string, resourceOwner string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	wm := newUsersExistenceWriteModel(userIDs, resourceOwner)
+	if err = c.eventstore.FilterToQueryReducer(ctx, wm); err != nil {
+		return err
+	}
+	missing := wm.missingUserIDs()
+	if len(missing) > 0 {
+		return zerrors.ThrowPreconditionFailedf(nil, "CMDGRP-5jLqXz", "Errors.User.NotFound: %s", strings.Join(missing, ", "))
+	}
+	return nil
+}
+
+// usersExistenceWriteModel replays the lifecycle events of multiple users
+// to verify their existence in a single eventstore query
+type usersExistenceWriteModel struct {
+	eventstore.WriteModel
+
+	userIDs  []string
+	existing map[string]bool
+}
+
+func newUsersExistenceWriteModel(userIDs []string, resourceOwner string) *usersExistenceWriteModel {
+	return &usersExistenceWriteModel{
+		WriteModel: eventstore.WriteModel{ResourceOwner: resourceOwner},
+		userIDs:    userIDs,
+		existing:   make(map[string]bool, len(userIDs)),
+	}
+}
+
+func (wm *usersExistenceWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		OrderAsc().
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(wm.userIDs...).
+		EventTypes(
+			user.UserV1AddedType,
+			user.UserV1RegisteredType,
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
+			user.UserRemovedType,
+		).Builder()
+}
+
+func (wm *usersExistenceWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch event.(type) {
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent:
+			wm.existing[event.Aggregate().ID] = true
+		case *user.UserRemovedEvent:
+			wm.existing[event.Aggregate().ID] = false
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *usersExistenceWriteModel) missingUserIDs() []string {
+	missing := make([]string, 0, len(wm.userIDs))
+	for _, userID := range wm.userIDs {
+		if !wm.existing[userID] {
+			missing = append(missing, userID)
+		}
+	}
+	return missing
 }
 
 // getUserIDsToAdd returns the userIDs that are not already in the group

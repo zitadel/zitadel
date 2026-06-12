@@ -302,9 +302,10 @@ service GroupService {
   // Add Users
   //
   // Adds one or more users to a group.
-  // The users should be in the same organization as the group.
-  // The request will not fail if some of the users could not be added to the group,
-  // and a list of failed user IDs is available in the response.
+  // The users must exist in the same organization as the group.
+  // The request is all-or-nothing: if any of the users does not exist, no users are added
+  // and the error message lists all missing user IDs.
+  // Users that are already in the group are ignored, so the request can safely be retried.
   //
   // Required permissions:
   //   - group.user.write
@@ -532,7 +533,7 @@ message AddUsersToGroupRequest {
 
 message AddUsersToGroupResponse {
   // ChangeDate is the timestamp when the users are added.
-  google.protobuf.Timestamp change_date = 2 [
+  google.protobuf.Timestamp change_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-08-11T15:00:00.051Z\"";
     }

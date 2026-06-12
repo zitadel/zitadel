@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -95,6 +96,65 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 			args: args{
 				groupID: "group1",
 				userIDs: []string{"user1", "user2"},
+			},
+			wantErr: zerrors.IsPreconditionFailed,
+		},
+		{
+			name: "multiple users not found, all missing users reported, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							addNewGroupEvent("group1", "org1"),
+						),
+					),
+					expectFilter( // users existence check: only user2 exists
+						eventFromEventPusher(
+							addNewUserEvent("user2", "org1"),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				groupID: "group1",
+				userIDs: []string{"user1", "user2", "user3"},
+			},
+			wantErr: func(err error) bool {
+				return zerrors.IsPreconditionFailed(err) &&
+					strings.Contains(err.Error(), "user1") &&
+					strings.Contains(err.Error(), "user3") &&
+					!strings.Contains(err.Error(), "user2")
+			},
+		},
+		{
+			name: "user removed from organization, not found, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							addNewGroupEvent("group1", "org1"),
+						),
+					),
+					expectFilter( // users existence check: user1 was removed
+						eventFromEventPusher(
+							addNewUserEvent("user1", "org1"),
+						),
+						eventFromEventPusher(
+							user.NewUserRemovedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								nil,
+								false,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				groupID: "group1",
+				userIDs: []string{"user1"},
 			},
 			wantErr: zerrors.IsPreconditionFailed,
 		},
@@ -198,12 +258,10 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 							addNewGroupEvent("group1", "org1"),
 						),
 					),
-					expectFilter( // to get the user write model for user1
+					expectFilter( // users existence check
 						eventFromEventPusher(
 							addNewUserEvent("user1", "org1"),
 						),
-					),
-					expectFilter( // to get the user write model for user2
 						eventFromEventPusher(
 							addNewUserEvent("user2", "org1"),
 						),
@@ -235,12 +293,10 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 							addNewGroupEvent("group1", "org1"),
 						),
 					),
-					expectFilter( // to get the user write model for user1
+					expectFilter( // users existence check
 						eventFromEventPusher(
 							addNewUserEvent("user1", "org1"),
 						),
-					),
-					expectFilter( // to get the user write model for user2
 						eventFromEventPusher(
 							addNewUserEvent("user2", "org1"),
 						),
