@@ -34,8 +34,6 @@ const (
 	ClaimActionLogFormat            = "urn:zitadel:iam:action:%s:log"
 	ScopeUserGroups                 = "groups"
 	ClaimUserGroups                 = ScopeUserGroups
-	ScopeCustomUserGroups           = "urn:zitadel:iam:user:groups"
-	ClaimCustomUserGroups           = ScopeCustomUserGroups
 )
 
 // GetClientByClientID implements the op.Storage interface to retrieve an OIDC client by its ID.
