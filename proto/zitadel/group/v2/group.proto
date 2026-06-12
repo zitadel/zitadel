@@ -5,7 +5,6 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
 import "zitadel/filter/v2/filter.proto";
-import "zitadel/authorization/v2beta/authorization.proto";
 
 package zitadel.group.v2;
 
@@ -62,6 +61,20 @@ message Group {
   ];
 }
 
+// User represents a user that is member of a group.
+message User {
+  // ID represents the ID of the user.
+  string id = 1;
+  // PreferredLoginName represents the preferred login name of the user.
+  string preferred_login_name = 2;
+  // DisplayName represents the public display name of the user.
+  string display_name = 3;
+  // AvatarURL is the URL to the user's public avatar image.
+  string avatar_url = 4;
+  // The organization the user belongs to.
+  string organization_id = 5;
+}
+
 message GroupUser {
   // GroupID is the unique identifier of the user group.
   string group_id = 1 [
@@ -78,7 +91,7 @@ message GroupUser {
   ];
 
   // User represents the user in the user group.
-  zitadel.authorization.v2beta.User user = 3;
+  User user = 3;
 
   // CreationDate is the timestamp when the user was added to the group.
   google.protobuf.Timestamp creation_date = 4 [

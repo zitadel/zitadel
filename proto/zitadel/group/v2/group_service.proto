@@ -250,7 +250,7 @@ service GroupService {
       responses: {
         key: "404";
         value: {
-          description: "The user group or one of the roles do not exist.";
+          description: "The user group does not exist.";
           schema: {
             json_schema: {
               ref: "#/definitions/rpcStatus";
@@ -283,17 +283,6 @@ service GroupService {
         key: "200";
         value: {
           description: "The user group was deleted successfully.";
-        };
-      };
-      responses: {
-        key: "404";
-        value: {
-          description: "The user group not found.";
-          schema: {
-            json_schema: {
-              ref: "#/definitions/rpcStatus";
-            };
-          };
         };
       };
     };
@@ -470,11 +459,10 @@ message UpdateGroupRequest {
   ];
 
   // Optionally, provide a new description of the group that could help others identify its purpose.
-  // If omitted, the description will be unchanged.
+  // If omitted, the description will be unchanged; an empty value clears the description.
   optional string description = 3 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
+    (validate.rules).string = {max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
       max_length: 200;
       example: "\"This is an example group\"";
     }

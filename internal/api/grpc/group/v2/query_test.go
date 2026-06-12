@@ -14,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	authorization "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 )
@@ -516,7 +515,7 @@ func Test_GroupUsersToPb(t *testing.T) {
 				{
 					GroupId:        "group1",
 					OrganizationId: "org1",
-					User: &authorization.User{
+					User: &group_v2.User{
 						Id:                 "user1",
 						DisplayName:        "user1",
 						PreferredLoginName: "user1",
@@ -528,7 +527,7 @@ func Test_GroupUsersToPb(t *testing.T) {
 				{
 					GroupId:        "group1",
 					OrganizationId: "org1",
-					User: &authorization.User{
+					User: &group_v2.User{
 						Id:                 "user2",
 						DisplayName:        "user2",
 						PreferredLoginName: "user2",
@@ -540,7 +539,7 @@ func Test_GroupUsersToPb(t *testing.T) {
 				{
 					GroupId:        "group2",
 					OrganizationId: "org1",
-					User: &authorization.User{
+					User: &group_v2.User{
 						Id:                 "user1",
 						DisplayName:        "user1",
 						PreferredLoginName: "user1",

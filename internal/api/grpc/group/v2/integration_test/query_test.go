@@ -13,7 +13,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	authorization "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
@@ -962,7 +961,7 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        groupID,
 						OrganizationId: instance.DefaultOrg.GetId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 user0.User.GetUserId(),
 							OrganizationId:     user0.User.Details.ResourceOwner,
 							PreferredLoginName: user0.User.GetPreferredLoginName(),
@@ -973,7 +972,7 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					resp.GroupUsers[1] = &group_v2.GroupUser{
 						GroupId:        groupID,
 						OrganizationId: instance.DefaultOrg.GetId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 user1.User.GetUserId(),
 							OrganizationId:     instance.DefaultOrg.GetId(),
 							PreferredLoginName: user1.User.GetPreferredLoginName(),
@@ -1017,7 +1016,7 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        groupResp.GetId(),
 						OrganizationId: orgResp.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 machineUser.User.GetUserId(),
 							OrganizationId:     machineUser.User.Details.ResourceOwner,
 							PreferredLoginName: machineUser.User.GetPreferredLoginName(),
@@ -1084,7 +1083,7 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        group1,
 						OrganizationId: orgResp.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group1User0.User.GetUserId(),
 							OrganizationId:     group1User0.User.Details.ResourceOwner,
 							PreferredLoginName: group1User0.User.GetPreferredLoginName(),
@@ -1095,7 +1094,7 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					resp.GroupUsers[1] = &group_v2.GroupUser{
 						GroupId:        group1,
 						OrganizationId: orgResp.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group1User1.User.GetUserId(),
 							OrganizationId:     group1User1.User.Details.ResourceOwner,
 							PreferredLoginName: group1User1.User.GetPreferredLoginName(),
@@ -1106,7 +1105,7 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					resp.GroupUsers[2] = &group_v2.GroupUser{
 						GroupId:        group0,
 						OrganizationId: orgResp.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group0User0.User.GetUserId(),
 							OrganizationId:     group0User0.User.Details.ResourceOwner,
 							PreferredLoginName: group0User0.User.GetPreferredLoginName(),
@@ -1117,7 +1116,7 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					resp.GroupUsers[3] = &group_v2.GroupUser{
 						GroupId:        group0,
 						OrganizationId: orgResp.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group0User1.User.GetUserId(),
 							OrganizationId:     group0User1.User.Details.ResourceOwner,
 							PreferredLoginName: group0User1.User.GetPreferredLoginName(),
@@ -1164,7 +1163,7 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        group1,
 						OrganizationId: org1.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group1User1.User.GetUserId(),
 							OrganizationId:     group1User1.User.Details.ResourceOwner,
 							PreferredLoginName: group1User1.User.GetPreferredLoginName(),
@@ -1175,7 +1174,7 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					resp.GroupUsers[1] = &group_v2.GroupUser{
 						GroupId:        group0,
 						OrganizationId: org0.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group0User0.User.GetUserId(),
 							OrganizationId:     group0User0.User.Details.ResourceOwner,
 							PreferredLoginName: group0User0.User.GetPreferredLoginName(),
@@ -1329,7 +1328,7 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        groupID,
 						OrganizationId: instancePermissionV2.DefaultOrg.GetId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 user0.User.GetUserId(),
 							OrganizationId:     user0.User.Details.ResourceOwner,
 							PreferredLoginName: user0.User.GetPreferredLoginName(),
@@ -1340,7 +1339,7 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 					resp.GroupUsers[1] = &group_v2.GroupUser{
 						GroupId:        groupID,
 						OrganizationId: instancePermissionV2.DefaultOrg.GetId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 user1.User.GetUserId(),
 							OrganizationId:     instancePermissionV2.DefaultOrg.GetId(),
 							PreferredLoginName: user1.User.GetPreferredLoginName(),
@@ -1407,7 +1406,7 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        group1,
 						OrganizationId: orgResp.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group1User0.User.GetUserId(),
 							OrganizationId:     group1User0.User.Details.ResourceOwner,
 							PreferredLoginName: group1User0.User.GetPreferredLoginName(),
@@ -1418,7 +1417,7 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 					resp.GroupUsers[1] = &group_v2.GroupUser{
 						GroupId:        group1,
 						OrganizationId: orgResp.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group1User1.User.GetUserId(),
 							OrganizationId:     group1User1.User.Details.ResourceOwner,
 							PreferredLoginName: group1User1.User.GetPreferredLoginName(),
@@ -1429,7 +1428,7 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 					resp.GroupUsers[2] = &group_v2.GroupUser{
 						GroupId:        group0,
 						OrganizationId: orgResp.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group0User0.User.GetUserId(),
 							OrganizationId:     group0User0.User.Details.ResourceOwner,
 							PreferredLoginName: group0User0.User.GetPreferredLoginName(),
@@ -1440,7 +1439,7 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 					resp.GroupUsers[3] = &group_v2.GroupUser{
 						GroupId:        group0,
 						OrganizationId: orgResp.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group0User1.User.GetUserId(),
 							OrganizationId:     group0User1.User.Details.ResourceOwner,
 							PreferredLoginName: group0User1.User.GetPreferredLoginName(),
@@ -1486,7 +1485,7 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        group0,
 						OrganizationId: instancePermissionV2.DefaultOrg.GetId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group0User0.User.GetUserId(),
 							OrganizationId:     group0User0.User.Details.ResourceOwner,
 							PreferredLoginName: group0User0.User.GetPreferredLoginName(),
