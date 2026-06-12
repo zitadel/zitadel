@@ -62,11 +62,6 @@ func (g *groupUsersProjection) Reducers() []handler.AggregateReducer {
 					Event:  group.GroupUsersRemovedEventType,
 					Reduce: g.reduceGroupUsersRemoved,
 				},
-			},
-		},
-		{
-			Aggregate: group.AggregateType,
-			EventReducers: []handler.EventReducer{
 				{
 					Event:  group.GroupRemovedEventType,
 					Reduce: g.reduceGroupRemoved,
@@ -102,14 +97,22 @@ func (g *groupUsersProjection) reduceGroupUsersAdded(event eventstore.Event) (*h
 
 	stmts := make([]func(eventstore.Event) handler.Exec, 0, len(e.UserIDs))
 	for _, userID := range e.UserIDs {
-		stmts = append(stmts, handler.AddCreateStatement(
+		// upsert instead of insert so that duplicate `group.users.added` events,
+		// possible under concurrent requests, cannot fail the whole statement
+		// and drop the remaining users of the batch from the projection
+		stmts = append(stmts, handler.AddUpsertStatement(
+			[]handler.Column{
+				handler.NewCol(GroupUsersColumnInstanceID, nil),
+				handler.NewCol(GroupUsersColumnGroupID, nil),
+				handler.NewCol(GroupUsersColumnUserID, nil),
+			},
 			[]handler.Column{
 				handler.NewCol(GroupUsersColumnGroupID, e.Aggregate().ID),
 				handler.NewCol(GroupUsersColumnUserID, userID),
 				handler.NewCol(GroupUsersColumnResourceOwner, e.Aggregate().ResourceOwner),
 				handler.NewCol(GroupUsersColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(GroupUsersColumnSequence, e.Sequence()),
-				handler.NewCol(GroupUsersColumnCreationDate, e.CreationDate()),
+				handler.NewCol(GroupUsersColumnCreationDate, handler.OnlySetValueOnInsert(GroupUsersProjectionTable, e.CreationDate())),
 			},
 		))
 	}

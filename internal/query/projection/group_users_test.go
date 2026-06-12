@@ -42,7 +42,7 @@ func Test_GroupUsersReduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.group_users1 (group_id, user_id, resource_owner, instance_id, sequence, creation_date) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.group_users1 (group_id, user_id, resource_owner, instance_id, sequence, creation_date) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (instance_id, group_id, user_id) DO UPDATE SET (resource_owner, sequence, creation_date) = (EXCLUDED.resource_owner, EXCLUDED.sequence, projections.group_users1.creation_date)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"user-id-1",
@@ -53,7 +53,7 @@ func Test_GroupUsersReduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.group_users1 (group_id, user_id, resource_owner, instance_id, sequence, creation_date) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.group_users1 (group_id, user_id, resource_owner, instance_id, sequence, creation_date) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (instance_id, group_id, user_id) DO UPDATE SET (resource_owner, sequence, creation_date) = (EXCLUDED.resource_owner, EXCLUDED.sequence, projections.group_users1.creation_date)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"user-id-2",
@@ -64,7 +64,7 @@ func Test_GroupUsersReduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.group_users1 (group_id, user_id, resource_owner, instance_id, sequence, creation_date) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.group_users1 (group_id, user_id, resource_owner, instance_id, sequence, creation_date) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (instance_id, group_id, user_id) DO UPDATE SET (resource_owner, sequence, creation_date) = (EXCLUDED.resource_owner, EXCLUDED.sequence, projections.group_users1.creation_date)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"user-id-3",
