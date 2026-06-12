@@ -160,3 +160,80 @@ enum GroupUserFieldName {
   GROUP_USER_FIELD_NAME_GROUP_ID = 2;
   GROUP_USER_FIELD_NAME_CREATION_DATE = 3;
 }
+
+// GroupGrant authorizes all members of a group for a project with the given roles.
+message GroupGrant {
+  // Unique identifier of the group grant.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\""
+    }
+  ];
+
+  // ID of the group the grant authorizes.
+  string group_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\""
+    }
+  ];
+
+  // Name of the group the grant authorizes, for provenance in listings.
+  string group_name = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"Support Group\"";
+    }
+  ];
+
+  // The ID of the organization the group belongs to.
+  string organization_id = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629098906488334\""
+    }
+  ];
+
+  // ID of the project the roles belong to.
+  string project_id = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629098906488334\""
+    }
+  ];
+
+  // ID of the project grant when the project is granted to the group's organization.
+  string project_grant_id = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629098906488334\""
+    }
+  ];
+
+  // Keys of the granted roles.
+  repeated string role_keys = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"admin\",\"user\"]";
+    }
+  ];
+
+  // Timestamp when the group grant was created.
+  google.protobuf.Timestamp creation_date = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+
+  // Timestamp when the group grant was last changed.
+  google.protobuf.Timestamp change_date = 9 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message GroupGrantsSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+
+    // Search for grants of the given groups.
+    zitadel.filter.v2.InIDsFilter group_ids = 1;
+    // Search for grants of a project.
+    zitadel.filter.v2.IDFilter project_id = 2;
+  }
+}
