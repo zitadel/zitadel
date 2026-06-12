@@ -1105,7 +1105,8 @@ func TestServer_ListGroupUsers(t *testing.T) {
 				ctx: iamOwnerCtx,
 				dep: func(req *group_v2.ListGroupUsersRequest, resp *group_v2.ListGroupUsersResponse) {
 					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
-					groupResp := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.GroupName())
+					groupName := integration.GroupName()
+					groupResp := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName)
 					machineResp := instance.CreateUserTypeMachine(iamOwnerCtx, orgResp.GetOrganizationId())
 					addUsersResp := instance.AddUsersToGroup(iamOwnerCtx, t, groupResp.GetId(), []string{machineResp.GetId()})
 
@@ -1119,6 +1120,7 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					}
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        groupResp.GetId(),
+						GroupName:      groupName,
 						OrganizationId: orgResp.GetOrganizationId(),
 						User: &group_v2.User{
 							Id:                 machineUser.User.GetUserId(),
