@@ -117,7 +117,11 @@ func (q *Queries) searchGroupUsers(ctx context.Context, queries *GroupUsersSearc
 			GroupUsersColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		},
 	}
-	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
+	// unique tiebreaker keeps pagination stable when sorting values collide,
+	// e.g. members added in one batch sharing the same creation date
+	stmt, args, err := queries.toQuery(query).
+		OrderBy(GroupUsersColumnGroupID.identifier(), GroupUsersColumnUserID.identifier()).
+		Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-TTlfF6", "Errors.Query.InvalidRequest")
 	}

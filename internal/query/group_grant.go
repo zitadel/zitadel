@@ -127,7 +127,10 @@ func (q *Queries) searchGroupGrants(ctx context.Context, queries *GroupGrantsSea
 	eq := sq.Eq{
 		GroupGrantColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
+	// unique tiebreaker keeps pagination stable when sorting values collide
+	stmt, args, err := queries.toQuery(query).
+		OrderBy(GroupGrantColumnID.identifier()).
+		Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-gG4kVx", "Errors.Query.InvalidRequest")
 	}

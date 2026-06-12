@@ -220,7 +220,10 @@ func (q *Queries) searchGroups(ctx context.Context, queries *GroupSearchQuery, p
 	eq := sq.Eq{
 		GroupColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
+	// unique tiebreaker keeps pagination stable when sorting values collide
+	stmt, args, err := queries.toQuery(query).
+		OrderBy(GroupColumnID.identifier()).
+		Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-FpBnrv", "Errors.Query.InvalidRequest")
 	}
