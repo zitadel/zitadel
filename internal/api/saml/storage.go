@@ -221,6 +221,11 @@ func (p *Storage) SetUserinfoWithUserID(ctx context.Context, applicationID strin
 		return err
 	}
 
+	customAttributes, err = p.appendUserGroupsAttribute(ctx, userID, customAttributes)
+	if err != nil {
+		return err
+	}
+
 	setUserinfo(user, userinfo, attributes, customAttributes)
 
 	// trigger activity log for authentication for user
@@ -491,6 +496,34 @@ func (p *Storage) getGrants(ctx context.Context, userID, applicationID string) (
 			activeQuery,
 		},
 	}, true, nil)
+}
+
+// appendUserGroupsAttribute adds the names of the user's groups as a "groups" attribute.
+// An attribute of the same name set by an action takes precedence.
+func (p *Storage) appendUserGroupsAttribute(ctx context.Context, userID string, customAttributes map[string]*customAttribute) (map[string]*customAttribute, error) {
+	if _, ok := customAttributes["groups"]; ok {
+		return customAttributes, nil
+	}
+	userIDQuery, err := query.NewGroupUsersUserIDsSearchQuery([]string{userID})
+	if err != nil {
+		return nil, err
+	}
+	memberships, err := p.query.SearchGroupUsers(ctx, &query.GroupUsersSearchQuery{
+		Queries: []query.SearchQuery{userIDQuery},
+	}, nil)
+	if err != nil {
+		return nil, err
+	}
+	if len(memberships.GroupUsers) == 0 {
+		return customAttributes, nil
+	}
+	groupNames := make([]string, 0, len(memberships.GroupUsers))
+	for _, membership := range memberships.GroupUsers {
+		if membership.GroupName != "" {
+			groupNames = append(groupNames, membership.GroupName)
+		}
+	}
+	return appendCustomAttribute(customAttributes, "groups", "urn:oasis:names:tc:SAML:2.0:attrname-format:basic", groupNames), nil
 }
 
 type customAttribute struct {
