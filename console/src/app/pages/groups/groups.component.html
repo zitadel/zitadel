@@ -7,7 +7,7 @@
   <cnsl-refresh-table (refreshed)="refresh$.next(true)" [loading]="(groups$ | async) === null">
     <div actions>
       <ng-template cnslHasRole [hasRole]="['group.create']">
-        <button color="primary" mat-raised-button (click)="openGroupDialog()">
+        <button color="primary" mat-raised-button data-e2e="create-group-button" (click)="openGroupDialog()">
           <div class="cnsl-action-button">
             <mat-icon class="icon">add</mat-icon>
             <span>{{ 'ACTIONS.NEW' | translate }}</span>
@@ -46,6 +46,7 @@
               <button
                 actions
                 matTooltip="{{ 'GROUPS.MEMBERS.TITLE' | translate }}"
+                data-e2e="group-members-button"
                 (click)="$event.stopPropagation(); openMembersDialog(row)"
                 mat-icon-button
               >
@@ -56,6 +57,7 @@
                   actions
                   matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
                   color="warn"
+                  data-e2e="delete-group-button"
                   (click)="$event.stopPropagation(); deleteGroup(row)"
                   mat-icon-button
                 >
