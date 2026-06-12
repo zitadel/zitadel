@@ -41,7 +41,7 @@ func (wm *MachineKeyWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
-		case *user.UserRemovedEvent:
+		default:
 			wm.WriteModel.AppendEvents(e)
 		}
 	}
@@ -51,12 +51,10 @@ func (wm *MachineKeyWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent, *user.HumanRegisteredEvent:
-			wm.KeyID = ""
 			wm.KeyType = domain.AuthNKeyTypeNONE
 			wm.ExpirationDate = time.Time{}
 			wm.State = domain.MachineKeyStateUnspecified
 		case *user.MachineAddedEvent:
-			wm.KeyID = ""
 			wm.KeyType = domain.AuthNKeyTypeNONE
 			wm.ExpirationDate = time.Time{}
 			wm.State = domain.MachineKeyStateUnspecified
@@ -68,7 +66,6 @@ func (wm *MachineKeyWriteModel) Reduce() error {
 		case *user.MachineKeyRemovedEvent:
 			wm.State = domain.MachineKeyStateRemoved
 		case *user.UserRemovedEvent:
-			wm.KeyID = ""
 			wm.KeyType = domain.AuthNKeyTypeNONE
 			wm.ExpirationDate = time.Time{}
 			wm.State = domain.MachineKeyStateRemoved

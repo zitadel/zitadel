@@ -50,7 +50,7 @@ func (wm *UserIDPLinkWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
-		case *user.UserRemovedEvent:
+		default:
 			wm.WriteModel.AppendEvents(e)
 		}
 	}

@@ -49,6 +49,8 @@ func (wm *HumanPhoneWriteModel) Reduce() error {
 
 			if wm.Phone != "" {
 				wm.State = domain.PhoneStateActive
+			} else {
+				wm.State = domain.PhoneStateUnspecified
 			}
 			wm.UserState = domain.UserStateActive
 		case *user.HumanRegisteredEvent:
@@ -62,6 +64,8 @@ func (wm *HumanPhoneWriteModel) Reduce() error {
 
 			if wm.Phone != "" {
 				wm.State = domain.PhoneStateActive
+			} else {
+				wm.State = domain.PhoneStateUnspecified
 			}
 			wm.UserState = domain.UserStateActive
 		case *user.MachineAddedEvent:

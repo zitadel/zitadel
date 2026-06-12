@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/action"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 type ActionWriteModel struct {
@@ -136,7 +137,6 @@ func (wm *ActionExistsModel) Reduce() error {
 		case *action.AddedEvent:
 			wm.checkedIDs = append(wm.checkedIDs, e.Aggregate().ID)
 		case *action.RemovedEvent:
-			// TODO
 			for i := len(wm.checkedIDs) - 1; i >= 0; i-- {
 				if wm.checkedIDs[i] == e.Aggregate().ID {
 					wm.checkedIDs[i] = wm.checkedIDs[len(wm.checkedIDs)-1]
@@ -145,6 +145,8 @@ func (wm *ActionExistsModel) Reduce() error {
 					break
 				}
 			}
+		case *org.OrgAddedEvent, *org.OrgRemovedEvent:
+			wm.checkedIDs = nil
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -156,8 +158,10 @@ func (wm *ActionExistsModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(action.AggregateType).
 		AggregateIDs(wm.actionIDs...).
-		EventTypes(action.AddedEventType,
-			action.RemovedEventType).
+		EventTypes(action.AddedEventType, action.RemovedEventType).
+		Or().
+		AggregateTypes(org.AggregateType).
+		EventTypes(org.OrgAddedEventType, org.OrgRemovedEventType).
 		Builder()
 }
 
@@ -179,6 +183,8 @@ func NewActionsListByOrgModel(resourceOwner string) *ActionsListByOrgModel {
 func (wm *ActionsListByOrgModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
+		case *org.OrgAddedEvent, *org.OrgRemovedEvent:
+			wm.Actions = make(map[string]*ActionWriteModel)
 		case *action.AddedEvent:
 			wm.Actions[e.Aggregate().ID] = &ActionWriteModel{
 				WriteModel: eventstore.WriteModel{
@@ -193,7 +199,6 @@ func (wm *ActionsListByOrgModel) Reduce() error {
 		case *action.ReactivatedEvent:
 			wm.Actions[e.Aggregate().ID].State = domain.ActionStateActive
 		case *action.RemovedEvent:
-			// TODO
 			delete(wm.Actions, e.Aggregate().ID)
 		}
 	}
@@ -204,10 +209,13 @@ func (wm *ActionsListByOrgModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
-		AggregateTypes(action.AggregateType).
+		AggregateTypes(action.AggregateType, org.AggregateType).
 		EventTypes(action.AddedEventType,
 			action.DeactivatedEventType,
 			action.ReactivatedEventType,
-			action.RemovedEventType).
+			action.RemovedEventType,
+			org.OrgAddedEventType,
+			org.OrgRemovedEventType,
+		).
 		Builder()
 }
