@@ -104,11 +104,9 @@ func (wm *ProjectGrantWriteModel) Reduce() error {
 			wm.State = domain.ProjectGrantStateRemoved
 		case *project.ProjectRemovedEvent:
 			wm.State = domain.ProjectGrantStateRemoved
-			wm.GrantedOrgID = ""
 			wm.RoleKeys = nil
 		case *project.ProjectAddedEvent:
 			wm.State = domain.ProjectGrantStateUnspecified
-			wm.GrantedOrgID = ""
 			wm.RoleKeys = nil
 		}
 	}
