@@ -178,7 +178,7 @@ No implementation exists: no group-grant domain model, events, projections, comm
 
 ### 6. TypeScript SDK
 
-- [ ] Add `createGroupServiceClient` to `packages/zitadel-client/src/v2.ts` — every other v2 service is exported; group is missing
+- [x] `createGroupServiceClient` added to `packages/zitadel-client/src/v2.ts` (`feat(client): export group service client`); `@zitadel/proto` generates group v2 TS modules and `@zitadel/client` builds clean
 - [ ] Regenerate TS proto outputs (`pnpm nx run @zitadel/proto:generate`) and rebuild `@zitadel/client` if affected
 
 ### 7. Console UI (#10093 — not started)
@@ -197,17 +197,18 @@ Nothing exists under `console/src`: no route, page, module, service, or sidenav 
 ### 8. Documentation (deferred in PR #10455)
 
 - [ ] Regenerate API reference so `/reference/api/group` resolves; sidebar entry (`apps/docs/lib/sidebar-data.ts`) — **already in flight upstream as PR #11884 (@mffap)**; track/review rather than duplicate
-- [ ] Concept page: what a Group is in ZITADEL's data model (`apps/docs/content/concepts/structure/`)
-- [ ] Console how-to guide for managing user groups; API examples for all 8 RPCs
-- [ ] Document `groups` / `urn:zitadel:iam:user:groups` scopes and exact claim shapes (userinfo, ID token, JWT access token) in `apps/docs/content/apis/openidoauth/claims.mdx` and scopes docs
-- [ ] Update or retire action-based group-claim guidance (`guides/integrate/actions/migrate-from-v1.mdx`)
-- [ ] If §1 is deferred: document that group membership is not yet an authorization mechanism
-- [ ] Update roadmap (`apps/docs/content/product/roadmap.mdx`) at GA
+- [x] Concept page added: `apps/docs/content/concepts/structure/groups.mdx` (structure, permissions, claim encoding, limitations) + sidebar entry (`docs: document user groups, groups scope and claim`)
+- [ ] Console how-to guide — blocked on the console UI (§7); API usage is covered in the concept page
+- [x] `groups` scope and claim documented in `scopes.mdx` and `claims.mdx` (standard table + RFC 9068/SCIM footnote); the removed `urn:zitadel:iam:user:groups` variant is intentionally undocumented
+- [x] Action-based group-claim guidance annotated to point at the native `groups` scope (`guides/integrate/actions/migrate-from-v1.mdx`)
+- [x] Concept page documents that group membership is not yet an authorization mechanism and that SAML attributes are excluded (OD-5)
+- [ ] Update roadmap (`apps/docs/content/product/roadmap.mdx`) at GA — when the release is cut
+- Note: `pnpm nx run @zitadel/docs:check-types` fails in this environment on a pre-existing generated-bundle truncation (`.source/server.ts` cut at ~3757 lines, also on clean main) — docs gates must be validated in CI
 
 ### 9. Testing
 
 - [ ] Functional-UI (Cypress) suite for groups (`tests/functional-ui/cypress/e2e/` has no `groups/`) — required once Console UI exists
-- [ ] `GetGroup` permission-V2 integration test (only `ListGroups_WithPermissionV2` exists)
+- [x] `GetGroup` permission-V2 integration test added, plus case-insensitive duplicate-name create test and machine-user membership coverage (`test(group): cover permission v2 GetGroup and case-insensitive names`)
 - [ ] Machine-user membership tests; duplicate-ID idempotency tests; name-case-sensitivity tests
 - [ ] Regression coverage for user-deletion cleanup through all delete paths (auth, management, user v2/v2beta, SCIM)
 - [ ] Integration tests for group authorizations and token merge once §1 lands

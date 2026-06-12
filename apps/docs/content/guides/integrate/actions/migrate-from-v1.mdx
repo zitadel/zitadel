@@ -81,7 +81,7 @@ We provide a collection of [ready-to-deploy Cloudflare Worker examples](https://
 |-------------------|------------------|---------------|---------|
 | Add custom token claims | Function (`preaccesstoken`) | Before access token generated | [custom-claims](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/CUSTOM-CLAIMS.md) |
 | Map roles to permissions | Function (`preaccesstoken`) | Before access token generated | [authorization](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/AUTHORIZATION.md) |
-| Add "groups" claim from roles | Function (`preaccesstoken`/`preuserinfo`) | Before token/userinfo generated | [groups-claim](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/GROUPS-CLAIM.md) |
+| Add "groups" claim from roles | Function (`preaccesstoken`/`preuserinfo`) | Before token/userinfo generated | [groups-claim](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/GROUPS-CLAIM.md). For memberships of [user groups](/concepts/structure/groups), use the native `groups` scope instead — no action required |
 | Block login | Function (`preuserinfo`) + `interruptOnError: true` | Before userinfo generated | [block-login](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/BLOCK-LOGIN.md) |
 | Track last login time | Function (`preuserinfo`) | Before userinfo generated | [set-user-metadata](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/SET-USER-METADATA.md) |
 | Add custom SAML attributes | Function (`presamlresponse`) | Before SAML response sent | [saml-attributes](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/SAML-ATTRIBUTES.md) |
