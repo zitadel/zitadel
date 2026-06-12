@@ -15,7 +15,7 @@ CREATE TABLE system.assets (
     resource_owner TEXT,
     name TEXT,
     content_type TEXT,
-    hash TEXT GENERATED ALWAYS AS (md5(data)) STORED,
+    hash TEXT GENERATED ALWAYS AS (encode(sha256(data), 'hex')) STORED,
     data BYTEA,
     updated_at TIMESTAMPTZ,
 
