@@ -52,8 +52,27 @@ type Config struct {
 	Cache              middleware.CacheConfig
 	AssetCache         middleware.CacheConfig
 
+	// PasswordEncryption enables application-layer AES-GCM encryption of the
+	// password field before form submission. When enabled, the browser encrypts
+	// the password using the auth-request ID as the key-derivation input
+	// (PBKDF2-SHA256), and the server decrypts it before credential verification.
+	//
+	// This satisfies regulatory requirements (e.g. VAPT findings) in deployments
+	// where middleware or logging infrastructure may record POST body content
+	// despite TLS being present at the transport layer. It is opt-in and disabled
+	// by default; standard TLS-only deployments do not need it.
+	PasswordEncryption PasswordEncryptionConfig
+
 	// LoginV2
 	DefaultPaths *DefaultPaths
+}
+
+// PasswordEncryptionConfig controls application-layer password encryption for
+// the login UI password form.
+type PasswordEncryptionConfig struct {
+	// Enabled activates client-side AES-GCM encryption of the password field
+	// before form submission and server-side decryption before verification.
+	Enabled bool
 }
 
 type DefaultPaths struct {

@@ -404,9 +404,10 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, transl
 		OrgName:                l.getOrgName(authReq),
 		PrimaryDomain:          l.getOrgPrimaryDomain(r, authReq),
 		DisplayLoginNameSuffix: l.isDisplayLoginNameSuffix(authReq),
-		AuthReqID:              getRequestID(authReq, r),
-		CSRF:                   csrf.TemplateField(r),
-		Nonce:                  http_mw.GetNonce(r),
+		AuthReqID:                 getRequestID(authReq, r),
+		CSRF:                      csrf.TemplateField(r),
+		Nonce:                     http_mw.GetNonce(r),
+		PasswordEncryptionEnabled: l.config.PasswordEncryption.Enabled,
 	}
 	var privacyPolicy *domain.PrivacyPolicy
 	if authReq != nil {
@@ -662,6 +663,9 @@ type baseData struct {
 	IDPProviders           []*domain.IDPProvider
 	LabelPolicy            *domain.LabelPolicy
 	LoginTexts             []*domain.CustomLoginText
+	// PasswordEncryptionEnabled signals templates to activate client-side
+	// AES-GCM password encryption before form submission.
+	PasswordEncryptionEnabled bool
 }
 
 type errorData struct {
