@@ -80,6 +80,46 @@ export const LANGS: Lang[] = [
     name: "Svenska",
     code: "sv",
   },
+  {
+    name: "বাংলা",
+    code: "bn",
+  },
+  {
+    name: "Dansk",
+    code: "da",
+  },
+  {
+    name: "فارسی",
+    code: "fa",
+  },
+  {
+    name: "Suomi",
+    code: "fi",
+  },
+  {
+    name: "עברית",
+    code: "he",
+  },
+  {
+    name: "हिन्दी",
+    code: "hi",
+  },
+  {
+    name: "Bahasa Melayu",
+    code: "ms",
+  },
+  {
+    name: "Norsk",
+    code: "no",
+  },
+  {
+    name: "ไทย",
+    code: "th",
+  },
+  {
+    name: "Tiếng Việt",
+    code: "vi",
+  },
 ];
 
 export const LANGUAGE_COOKIE_NAME = "NEXT_LOCALE";
