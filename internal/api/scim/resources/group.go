@@ -73,9 +73,28 @@ func (h *GroupsHandler) NewResource() *ScimGroup {
 	return new(ScimGroup)
 }
 
+// validateMemberTypes makes the flat group model explicit: RFC 7643 allows
+// members of type "Group" (nested groups), which ZITADEL does not support.
+// Rejecting them loudly beats silently misreading a group ID as a user ID.
+func validateMemberTypes(members []*ScimGroupMember) error {
+	for _, member := range members {
+		switch member.Type {
+		case "", "User":
+		case "Group":
+			return zerrors.ThrowInvalidArgument(nil, "SCIM-GRP6n", "Nested groups are not supported, members must be of type User")
+		default:
+			return zerrors.ThrowInvalidArgumentf(nil, "SCIM-GRP7t", "Invalid member type %q, supported values: User", member.Type)
+		}
+	}
+	return nil
+}
+
 func (h *GroupsHandler) Create(ctx context.Context, group *ScimGroup) (*ScimGroup, error) {
 	if group.DisplayName == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "SCIM-GRP1m", "Errors.Group.Invalid")
+	}
+	if err := validateMemberTypes(group.Members); err != nil {
+		return nil, err
 	}
 	details, err := h.command.CreateGroup(ctx, &command.CreateGroup{
 		ObjectRoot: models.ObjectRoot{
@@ -103,6 +122,9 @@ func (h *GroupsHandler) Create(ctx context.Context, group *ScimGroup) (*ScimGrou
 func (h *GroupsHandler) Replace(ctx context.Context, id string, group *ScimGroup) (*ScimGroup, error) {
 	if group.DisplayName == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "SCIM-GRP2r", "Errors.Group.Invalid")
+	}
+	if err := validateMemberTypes(group.Members); err != nil {
+		return nil, err
 	}
 	existing, err := h.getOrgGroup(ctx, id)
 	if err != nil {
