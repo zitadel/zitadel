@@ -120,7 +120,7 @@ export async function getHostedLoginTranslation({
         {},
       )
       .then((resp) => {
-        return resp.translations ? resp.translations : undefined;
+        return resp.translations ? { translations: resp.translations, etag: resp.etag } : undefined;
       });
   };
 
