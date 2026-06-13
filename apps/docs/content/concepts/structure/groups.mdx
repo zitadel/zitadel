@@ -13,6 +13,10 @@ to receive a user's group memberships in tokens.
 - A group has a **name** and an optional **description**.
 - Group names are unique inside their organization. Uniqueness is case-insensitive: `Admins` and `admins` are considered the same name.
 - Both **human users** and **machine users** can be members of a group, as long as they belong to the same organization as the group.
+- **Groups are flat**: a group cannot be a member of another group, and every membership is direct.
+  [SCIM (RFC 7643)](https://www.rfc-editor.org/rfc/rfc7643) allows nested groups (members of type `Group`)
+  and distinguishes `direct` from `indirect` memberships — ZITADEL rejects `Group` members explicitly
+  and reports all memberships as `direct`, so the behavior is unambiguous for provisioning tools.
 - Deleting a user removes them from all groups. Deleting an organization removes all of its groups.
 
 ## Managing Groups
@@ -57,6 +61,8 @@ with values encoded according to [SCIM (RFC 7643)](https://www.rfc-editor.org/rf
 
 `value` contains the stable group ID, `display` the group name.
 Use `value` for stable references in your application, since group names can change.
+The optional `type` sub-attribute (`direct`/`indirect` per RFC 7643) is omitted from claims:
+groups are flat, so every membership is direct.
 
 For SAML applications, the user's group names are included as a `groups` attribute in the assertion.
 An action that sets a `groups` attribute takes precedence over the built-in attribute.
