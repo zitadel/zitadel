@@ -13,15 +13,14 @@ export default getRequestConfig(async () => {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  let allowedLanguages = LANGS.map((l) => l.code);
+  // Accept every bundled UI locale during negotiation, independent of the
+  // instance's allowedLanguages (see src/app/(login)/layout.tsx). The instance
+  // default language is still read from the backend below.
+  const allowedLanguages = LANGS.map((l) => l.code);
   let defaultLanguage = fallback;
 
   try {
     const settings = await getAllowedLanguages({ serviceConfig });
-    if (settings.allowedLanguages?.length) {
-      const localLanguageCodes = LANGS.map((l) => l.code);
-      allowedLanguages = settings.allowedLanguages.filter((l) => localLanguageCodes.includes(l));
-    }
     if (settings.defaultLanguage) {
       defaultLanguage = settings.defaultLanguage;
     }
