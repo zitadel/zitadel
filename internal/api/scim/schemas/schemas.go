@@ -109,6 +109,7 @@ type SchemaAttributeMutability string
 const (
 	SchemaAttributeMutabilityReadWrite SchemaAttributeMutability = "readWrite"
 	SchemaAttributeMutabilityWriteOnly SchemaAttributeMutability = "writeOnly"
+	SchemaAttributeMutabilityReadOnly  SchemaAttributeMutability = "readOnly"
 )
 
 type SchemaAttributeReturned string
