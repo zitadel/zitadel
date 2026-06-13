@@ -13,16 +13,24 @@
   .member-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     padding: 0.25rem 0;
 
-    .member-info {
+    .avatar {
+      margin-right: 0.5rem;
+    }
+
+    .user-name-column {
       display: flex;
       flex-direction: column;
+      justify-content: center;
 
-      .display-name {
-        font-weight: 500;
+      .smaller {
+        font-size: 13px;
       }
+    }
+
+    .fill-space {
+      flex: 1;
     }
 
     &.empty {

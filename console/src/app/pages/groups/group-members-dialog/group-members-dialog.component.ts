@@ -6,6 +6,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { Group, GroupUser } from '@zitadel/proto/zitadel/group/v2/group_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
+import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 import { SearchUserAutocompleteModule } from 'src/app/modules/search-user-autocomplete/search-user-autocomplete.module';
 import { UserTarget } from 'src/app/modules/search-user-autocomplete/search-user-autocomplete.component';
 import { GroupService } from 'src/app/services/group.service';
@@ -15,7 +16,15 @@ import { ToastService } from 'src/app/services/toast.service';
   selector: 'cnsl-group-members-dialog',
   templateUrl: './group-members-dialog.component.html',
   styleUrls: ['./group-members-dialog.component.scss'],
-  imports: [CommonModule, MatButtonModule, MatDialogModule, MatTooltipModule, TranslateModule, SearchUserAutocompleteModule],
+  imports: [
+    AvatarModule,
+    CommonModule,
+    MatButtonModule,
+    MatDialogModule,
+    MatTooltipModule,
+    TranslateModule,
+    SearchUserAutocompleteModule,
+  ],
 })
 export class GroupMembersDialogComponent {
   protected readonly members = signal<GroupUser[]>([]);

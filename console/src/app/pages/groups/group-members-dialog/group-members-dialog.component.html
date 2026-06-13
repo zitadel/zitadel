@@ -6,18 +6,28 @@
 
   <div class="members-list" *ngIf="!loading()">
     <div class="member-row" *ngFor="let member of members()">
-      <div class="member-info">
-        <span class="display-name">{{ member.user?.displayName }}</span>
-        <span class="cnsl-secondary-text">{{ member.user?.preferredLoginName }}</span>
+      <cnsl-avatar
+        class="avatar"
+        [name]="member.user?.displayName || ''"
+        [avatarUrl]="member.user?.avatarUrl || ''"
+        [forColor]="member.user?.preferredLoginName || ''"
+        [size]="32"
+      >
+      </cnsl-avatar>
+      <div class="user-name-column">
+        <span>{{ member.user?.displayName }}</span>
+        <span class="smaller cnsl-secondary-text">{{ member.user?.preferredLoginName }}</span>
       </div>
+      <span class="fill-space"></span>
       <button
+        class="member-rm-btn"
         mat-icon-button
         color="warn"
         matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
         data-e2e="group-member-remove"
         (click)="removeUser(member)"
       >
-        <i class="las la-trash"></i>
+        <i class="las la-minus-circle"></i>
       </button>
     </div>
     <div class="member-row empty" *ngIf="members().length === 0">
