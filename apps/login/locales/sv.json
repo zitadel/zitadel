@@ -1,0 +1,461 @@
+{
+  "common": {
+    "back": "Tillbaka",
+    "title": "Logga in med Zitadel"
+  },
+  "accounts": {
+    "title": "Konton",
+    "description": "Välj det konto du vill använda.",
+    "addAnother": "Lägg till ett annat konto",
+    "noResults": "Inga konton hittades",
+    "verified": "verifierad",
+    "expired": "utgången"
+  },
+  "logout": {
+    "title": "Logga ut",
+    "description": "Klicka på ett konto för att avsluta sessionen",
+    "noResults": "Inga konton hittades",
+    "clear": "Avsluta session",
+    "verifiedAt": "Senast aktiv: {time}",
+    "success": {
+      "title": "Utloggning lyckades",
+      "description": "Du har loggats ut."
+    }
+  },
+  "loginname": {
+    "title": "Välkommen tillbaka!",
+    "description": "Ange dina inloggningsuppgifter.",
+    "register": "Registrera ny användare",
+    "submit": "Fortsätt",
+    "labels": {
+      "loginname": "Login-namn",
+      "username": "Användarnamn",
+      "usernameOrPhoneNumber": "Användarnamn eller telefonnummer",
+      "usernameOrEmail": "Användarnamn eller e-post"
+    },
+    "required": {
+      "loginName": "Detta fält är obligatoriskt"
+    },
+    "errors": {
+      "internalError": "Ett internt fel inträffade",
+      "couldNotGetLoginSettings": "Kunde inte hämta inloggningsinställningar",
+      "couldNotSearchUsers": "Kunde inte söka efter användare",
+      "couldNotGetDomain": "Kunde inte hämta domän",
+      "couldNotGetHost": "Kunde inte hämta värd",
+      "couldNotStartIDPFlow": "Kunde inte starta IDP-flödet",
+      "moreThanOneUserFound": "Fler än en användare hittades. Ange en unik identifierare.",
+      "userNotFound": "Användaren hittades inte i systemet",
+      "couldNotCreateSession": "Kunde inte skapa session för användaren",
+      "initialUserNotSupported": "Initial användare stöds inte",
+      "localAuthenticationNotAllowed": "Lokal autentisering är inte tillåten! Kontakta din administratör för mer information.",
+      "passkeysNotAllowed": "Passkeys är inte tillåtna! Kontakta din administratör för mer information.",
+      "couldNotFindIdentityProvider": "Kunde inte hitta identitetsleverantör.",
+      "userNotActive": "Användaren är inte aktiv. Kontakta din administratör för mer information."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Ett fel inträffade",
+      "multipleUsersFound": "Flera användare hittades",
+      "userNotFound": "Användaren hittades inte i systemet"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "Lösenord",
+      "description": "Ange ditt lösenord.",
+      "resetPassword": "Återställ lösenord",
+      "submit": "Fortsätt",
+      "labels": {
+        "password": "Lösenord"
+      },
+      "required": {
+        "password": "Detta fält är obligatoriskt"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "Kunde inte verifiera lösenordet",
+        "couldNotResetPassword": "Kunde inte återställa lösenordet"
+      },
+      "info": {
+        "passwordResetSent": "Lösenordet återställdes. Kontrollera din e-post"
+      }
+    },
+    "set": {
+      "title": "Ange lösenord",
+      "description": "Ange lösenordet för ditt konto",
+      "codeSent": "En ny kod har skickats till din e-postadress.",
+      "noCodeReceived": "Fick du ingen kod?",
+      "resend": "Skicka koden igen",
+      "submit": "Fortsätt",
+      "labels": {
+        "code": "Kod",
+        "newPassword": "Nytt lösenord",
+        "confirmPassword": "Bekräfta lösenord"
+      },
+      "required": {
+        "code": "Detta fält är obligatoriskt",
+        "newPassword": "Du måste ange ett lösenord!",
+        "confirmPassword": "Detta fält är obligatoriskt"
+      },
+      "errors": {
+        "couldNotSetPassword": "Kunde inte ange lösenordet",
+        "couldNotResetPassword": "Kunde inte återställa lösenordet",
+        "couldNotVerifyPassword": "Kunde inte verifiera lösenordet"
+      }
+    },
+    "change": {
+      "title": "Ändra lösenord",
+      "description": "Ange lösenordet för ditt konto",
+      "submit": "Fortsätt",
+      "labels": {
+        "currentPassword": "Nuvarande lösenord",
+        "newPassword": "Nytt lösenord",
+        "confirmPassword": "Bekräfta lösenord"
+      },
+      "required": {
+        "currentPassword": "Du måste ange ditt nuvarande lösenord!",
+        "newPassword": "Du måste ange ett nytt lösenord!",
+        "confirmPassword": "Detta fält är obligatoriskt"
+      },
+      "errors": {
+        "currentPasswordInvalid": "Nuvarande lösenord är felaktigt.",
+        "couldNotChangePassword": "Kunde inte ändra lösenordet",
+        "couldNotVerifyPassword": "Kunde inte verifiera lösenordet",
+        "unknownError": "Okänt fel"
+      }
+    },
+    "complexity": {
+      "length": "Måste vara minst {minLength} tecken långt.",
+      "hasSymbol": "Måste innehålla ett specialtecken.",
+      "hasNumber": "Måste innehålla en siffra.",
+      "hasUppercase": "Måste innehålla en stor bokstav.",
+      "hasLowercase": "Måste innehålla en liten bokstav.",
+      "equals": "Lösenordsbekräftelsen stämmer.",
+      "matches": "Stämmer",
+      "doesNotMatch": "Stämmer inte"
+    },
+    "errors": {
+      "noHostFound": "Ingen värd hittades",
+      "couldNotSendResetLink": "Kunde inte skicka länk för återställning av lösenord",
+      "couldNotCreateSessionForUser": "Kunde inte skapa session för användaren",
+      "couldNotVerifyPassword": "Kunde inte verifiera lösenordet",
+      "failedToAuthenticate": "Autentiseringen misslyckades. Du har gjort {failedAttempts} av {maxPasswordAttempts} lösenordsförsök.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Autentiseringen misslyckades.",
+      "accountLockedContactAdmin": " Kontakta din administratör för att låsa upp ditt konto",
+      "userNotFound": "Användaren hittades inte i systemet",
+      "initialUserNotSupported": "Initial användare stöds inte",
+      "userInitialStateNotSupported": "Användarens initiala tillstånd stöds inte",
+      "codeOrVerificationRequired": "Du måste ange en kod eller ha en giltig användarverifieringskontroll",
+      "verificationRequired": "Användarverifieringskontroll måste genomföras",
+      "couldNotLoadSession": "Kunde inte ladda sessionen",
+      "couldNotLoadAuthMethods": "Kunde inte ladda autentiseringsmetoder",
+      "failedPrecondition": "Förutsättning ej uppfylld",
+      "sessionNotValid": "Sessionen är inte giltig",
+      "passwordVerificationMissing": "Lösenordsverifiering saknas.",
+      "passwordVerificationTooOld": "Lösenordsverifieringen är för gammal. Verifiera ditt lösenord igen."
+    }
+  },
+  "idp": {
+    "title": "Logga in med SSO",
+    "description": "Välj en av följande leverantörer för att logga in",
+    "orSignInWith": "eller logga in med",
+    "signInWithApple": "Logga in med Apple",
+    "signInWithGoogle": "Logga in med Google",
+    "signInWithAzureAD": "Logga in med AzureAD",
+    "signInWithGithub": "Logga in med GitHub",
+    "signInWithGitlab": "Logga in med GitLab",
+    "loginError": {
+      "title": "Inloggning misslyckades",
+      "description": "Ett fel inträffade vid inloggningsförsöket."
+    },
+    "linkingError": {
+      "title": "Kontolänkning misslyckades",
+      "description": "Ett fel inträffade när ditt konto skulle länkas."
+    },
+    "completeRegister": {
+      "title": "Komplettera dina uppgifter",
+      "description": "Du måste slutföra din registrering genom att ange din e-postadress och ditt namn."
+    },
+    "accountNotFound": {
+      "title": "Kontot hittades inte",
+      "description": "Vi kunde inte hitta ett konto kopplat till dina inloggningsuppgifter hos identitetsleverantören.",
+      "info": "Inget befintligt konto hittades. Logga in med ett befintligt konto eller kontakta din administratör för hjälp.",
+      "backToLogin": "Tillbaka till inloggningen"
+    },
+    "registrationFailed": {
+      "title": "Registrering ej tillgänglig",
+      "description": "Vi kunde inte slutföra registreringsprocessen.",
+      "info": "Det gick inte att fastställa organisationen för registreringen. Kontakta din administratör för hjälp.",
+      "backToLogin": "Tillbaka till inloggningen"
+    },
+    "processing": {
+      "message": "Bearbetar autentisering...",
+      "noRedirect": "Ingen omdirigering eller fel returnerades från servern",
+      "unexpectedError": "Ett oväntat fel inträffade"
+    },
+    "errors": {
+      "missingParameters": "Obligatoriska parametrar saknas",
+      "missingIdpInfo": "IDP-information saknas",
+      "idpNotFound": "Identitetsleverantören hittades inte",
+      "linkingNotAllowed": "Länkning är inte tillåten för denna identitetsleverantör",
+      "linkingFailed": "Kunde inte länka identitetsleverantören till kontot",
+      "autoLinkingFailed": "Kunde inte länka kontot automatiskt",
+      "userCreationFailed": "Kunde inte skapa användarkonto",
+      "orgResolutionFailed": "Kunde inte fastställa organisationen för registreringen",
+      "sessionCreationFailed": "Kunde inte skapa session eller fastställa omdirigering",
+      "unknownError": "Ett okänt fel inträffade"
+    }
+  },
+  "ldap": {
+    "title": "LDAP-inloggning",
+    "description": "Ange dina LDAP-uppgifter.",
+    "submit": "Fortsätt",
+    "labels": {
+      "username": "Användarnamn",
+      "password": "Lösenord"
+    },
+    "required": {
+      "username": "Detta fält är obligatoriskt",
+      "password": "Detta fält är obligatoriskt"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "Verifiera din identitet",
+      "description": "Välj en av följande faktorer.",
+      "noResults": "Inga andra faktorer tillgängliga att konfigurera."
+    },
+    "set": {
+      "title": "Konfigurera tvåfaktor",
+      "description": "Välj en av följande andra faktorer.",
+      "skip": "Hoppa över"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "Verifiera tvåfaktor",
+      "totpDescription": "Ange koden från din autentiseringsapp.",
+      "smsDescription": "Ange koden du fick via SMS.",
+      "emailDescription": "Ange koden du fick via e-post.",
+      "noCodeReceived": "Fick du ingen kod?",
+      "resendCode": "Skicka koden igen",
+      "submit": "Fortsätt",
+      "labels": {
+        "code": "Kod"
+      },
+      "required": {
+        "code": "Detta fält är obligatoriskt"
+      }
+    },
+    "set": {
+      "title": "Konfigurera tvåfaktor",
+      "totpDescription": "Skanna QR-koden med din autentiseringsapp.",
+      "smsDescription": "Ange ditt telefonnummer för att få en kod via SMS.",
+      "emailDescription": "Ange din e-postadress för att få en kod via e-post.",
+      "totpRegisterDescription": "Skanna QR-koden eller navigera till URL:en manuellt.",
+      "submit": "Fortsätt",
+      "labels": {
+        "code": "Kod"
+      },
+      "required": {
+        "code": "Detta fält är obligatoriskt"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Autentisera med en passkey",
+      "description": "Din enhet kommer att be om ditt fingeravtryck, ansikte eller skärmlås",
+      "usePassword": "Använd lösenord",
+      "submit": "Fortsätt",
+      "errors": {
+        "couldNotRequestChallenge": "Kunde inte begära passkey-utmaning",
+        "couldNotVerifyPasskey": "Kunde inte verifiera passkey",
+        "noResponseReceived": "Passkey-verifieringen misslyckades - inget svar mottogs",
+        "noRedirectProvided": "Passkey-verifieringen slutfördes men ingen omdirigering angavs",
+        "couldNotRetrievePasskey": "Ett fel inträffade när passkey skulle hämtas",
+        "verificationCancelled": "Passkey-verifieringen avbröts",
+        "verificationFailed": "Ett fel inträffade under passkey-verifieringen",
+        "couldNotFindSession": "Kunde inte hitta sessionen",
+        "couldNotUpdateSession": "Kunde inte uppdatera sessionen",
+        "userNotFound": "Användaren hittades inte i systemet",
+        "couldNotDetermineRedirect": "Kunde inte fastställa omdirigerings-URL efter passkey-verifieringen"
+      }
+    },
+    "set": {
+      "title": "Konfigurera en passkey",
+      "description": "Din enhet kommer att be om ditt fingeravtryck, ansikte eller skärmlås",
+      "info": {
+        "description": "En passkey är en autentiseringsmetod på en enhet, till exempel ditt fingeravtryck, Apple FaceID eller liknande. ",
+        "link": "Passkey-autentisering"
+      },
+      "skip": "Hoppa över",
+      "submit": "Fortsätt"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "Verifiera tvåfaktor",
+      "description": "Verifiera ditt konto med din enhet."
+    },
+    "set": {
+      "title": "Konfigurera tvåfaktor",
+      "description": "Konfigurera en enhet som en andra faktor.",
+      "submit": "Fortsätt"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "Lösenord"
+    },
+    "disabled": {
+      "title": "Registrering inaktiverad",
+      "description": "Registreringen är inaktiverad. Kontakta din administratör."
+    },
+    "missingdata": {
+      "title": "Data saknas",
+      "description": "Ange e-post, förnamn och efternamn för att registrera dig."
+    },
+    "title": "Registrera",
+    "description": "Skapa ditt Zitadel-konto.",
+    "noMethodAvailableWarning": "Ingen autentiseringsmetod tillgänglig. Kontakta din administratör.",
+    "selectMethod": "Välj den metod du vill autentisera med",
+    "agreeTo": "För att registrera dig måste du godkänna villkoren",
+    "termsOfService": "Användarvillkor",
+    "privacyPolicy": "Integritetspolicy",
+    "submit": "Fortsätt",
+    "password": {
+      "title": "Ange lösenord",
+      "description": "Ange lösenordet för ditt konto",
+      "submit": "Fortsätt",
+      "labels": {
+        "password": "Lösenord",
+        "confirmPassword": "Bekräfta lösenord"
+      },
+      "required": {
+        "password": "Du måste ange ett lösenord!",
+        "confirmPassword": "Detta fält är obligatoriskt"
+      }
+    },
+    "labels": {
+      "firstname": "Förnamn",
+      "lastname": "Efternamn",
+      "email": "E-post"
+    },
+    "required": {
+      "firstname": "Detta fält är obligatoriskt",
+      "lastname": "Detta fält är obligatoriskt",
+      "email": "Detta fält är obligatoriskt"
+    },
+    "errors": {
+      "couldNotCreateUser": "Kunde inte skapa användaren",
+      "couldNotCreateSession": "Kunde inte skapa sessionen",
+      "userNotFound": "Användaren hittades inte i systemet",
+      "couldNotLinkIDP": "Kunde inte länka IDP till användaren",
+      "couldNotRegisterUser": "Kunde inte registrera användaren"
+    }
+  },
+  "invite": {
+    "title": "Bjud in användare",
+    "description": "Ange e-postadressen och namnet på den användare du vill bjuda in.",
+    "info": "Användaren får ett e-postmeddelande med ytterligare instruktioner.",
+    "notAllowed": "Dina inställningar tillåter inte att du bjuder in användare.",
+    "submit": "Fortsätt",
+    "success": {
+      "title": "Användaren inbjuden",
+      "description": "E-postmeddelandet har skickats.",
+      "verified": "Användaren har bjudits in och har redan verifierat sin e-post.",
+      "notVerifiedYet": "Användaren har bjudits in. De får ett e-postmeddelande med ytterligare instruktioner.",
+      "submit": "Bjud in en annan användare"
+    }
+  },
+  "signedin": {
+    "title": "Välkommen {user}!",
+    "description": "Du är inloggad.",
+    "continue": "Fortsätt",
+    "error": {
+      "title": "Fel",
+      "description": "Ett fel inträffade vid inloggningsförsöket."
+    }
+  },
+  "verify": {
+    "userIdMissing": "Inget userId angavs!",
+    "successTitle": "Användaren verifierad",
+    "successDescription": "Användaren har verifierats.",
+    "successContinue": "Fortsätt",
+    "setupAuthenticator": "Konfigurera autentisering",
+    "verify": {
+      "title": "Verifiera användare",
+      "description": "Ange koden från verifieringsmejlet.",
+      "noCodeReceived": "Fick du ingen kod?",
+      "resendCode": "Skicka koden igen",
+      "codeSent": "En ny kod har just skickats till din e-postadress.",
+      "submit": "Fortsätt",
+      "labels": {
+        "code": "Kod"
+      },
+      "required": {
+        "code": "Detta fält är obligatoriskt"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "Kunde inte skicka e-postmeddelandet igen",
+      "couldNotVerifyUser": "Kunde inte verifiera användaren",
+      "couldNotVerifyInvite": "Kunde inte verifiera inbjudan",
+      "couldNotVerifyEmail": "Kunde inte verifiera e-postadressen",
+      "couldNotVerify": "Kunde inte verifiera",
+      "couldNotLoadUser": "Kunde inte ladda användaren",
+      "couldNotLoadAuthenticators": "Kunde inte ladda möjliga autentiseringsmetoder",
+      "couldNotCreateSession": "Kunde inte skapa sessionen",
+      "noHostFound": "Ingen värd hittades",
+      "userAlreadyVerified": "Användaren är redan verifierad!",
+      "couldNotResendInvite": "Kunde inte skicka inbjudan igen",
+      "inviteSendFailed": "Kunde inte skicka inbjudningsmejlet",
+      "emailSendFailed": "Kunde inte skicka verifieringsmejlet",
+      "contextMissing": "Ett fel inträffade. Försök igen."
+    }
+  },
+  "authenticator": {
+    "title": "Välj autentiseringsmetod",
+    "description": "Välj den metod du vill autentisera med",
+    "noMethodsAvailable": "Inga autentiseringsmetoder tillgängliga",
+    "allSetup": "Du har redan konfigurerat en autentisering!",
+    "linkWithIDP": "eller länka med en identitetsleverantör"
+  },
+  "device": {
+    "usercode": {
+      "title": "Enhetskod",
+      "description": "Ange koden som visas på din app eller enhet.",
+      "submit": "Fortsätt",
+      "labels": {
+        "code": "Kod"
+      },
+      "required": {
+        "code": "Detta fält är obligatoriskt"
+      }
+    },
+    "request": {
+      "title": "{appName} vill ansluta",
+      "description": "{appName} kommer att ha åtkomst till:",
+      "disclaimer": "Genom att klicka på Tillåt ger du {appName} och Zitadel rätt att använda din information i enlighet med deras respektive användarvillkor och integritetspolicyer. Du kan när som helst återkalla denna åtkomst.",
+      "submit": "Tillåt",
+      "deny": "Neka"
+    },
+    "scope": {
+      "openid": "Verifiera din identitet.",
+      "email": "Se din e-postadress.",
+      "profile": "Se din fullständiga profilinformation.",
+      "offline_access": "Tillåt offlineåtkomst till ditt konto."
+    }
+  },
+  "error": {
+    "noUserCode": "Ingen användarkod angavs!",
+    "noDeviceRequest": "Ingen enhetsförfrågan hittades.",
+    "unknownContext": "Kunde inte hämta användarens kontext. Se till att ange användarnamnet först eller ange ett loginName som searchParam.",
+    "sessionExpired": "Din nuvarande session har gått ut. Logga in igen.",
+    "failedLoading": "Kunde inte ladda data. Försök igen.",
+    "tryagain": "Försök igen",
+    "couldNotContinueSession": "Kunde inte fortsätta med sessionen - användarinformation saknas"
+  }
+}

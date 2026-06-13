@@ -60,6 +60,26 @@ export const LANGS: Lang[] = [
     name: "العربية",
     code: "ar",
   },
+  {
+    name: "Čeština",
+    code: "cs",
+  },
+  {
+    name: "Magyar",
+    code: "hu",
+  },
+  {
+    name: "Bahasa Indonesia",
+    code: "id",
+  },
+  {
+    name: "한국어",
+    code: "ko",
+  },
+  {
+    name: "Svenska",
+    code: "sv",
+  },
 ];
 
 export const LANGUAGE_COOKIE_NAME = "NEXT_LOCALE";
