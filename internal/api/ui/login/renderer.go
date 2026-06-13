@@ -663,9 +663,13 @@ type baseData struct {
 	IDPProviders           []*domain.IDPProvider
 	LabelPolicy            *domain.LabelPolicy
 	LoginTexts             []*domain.CustomLoginText
-	// PasswordEncryptionEnabled signals templates to activate client-side
-	// AES-GCM password encryption before form submission.
+	// PasswordEncryptionEnabled signals templates to load the client-side
+	// ECDH password encryption script.
 	PasswordEncryptionEnabled bool
+	// PasswordEncryptionPublicKey is the base64-encoded P-256 server ephemeral
+	// public key for this auth request, used by the client to perform ECDH.
+	// Set only when PasswordEncryptionEnabled is true.
+	PasswordEncryptionPublicKey string
 }
 
 type errorData struct {

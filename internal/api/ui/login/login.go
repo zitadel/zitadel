@@ -44,6 +44,7 @@ type Login struct {
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
 	caches              *Caches
+	encKeyStore         *passwordEncKeyStore
 }
 
 type Config struct {
@@ -52,27 +53,41 @@ type Config struct {
 	Cache              middleware.CacheConfig
 	AssetCache         middleware.CacheConfig
 
-	// PasswordEncryption enables application-layer AES-GCM encryption of the
-	// password field before form submission. When enabled, the browser encrypts
-	// the password using the auth-request ID as the key-derivation input
-	// (PBKDF2-SHA256), and the server decrypts it before credential verification.
-	//
-	// This satisfies regulatory requirements (e.g. VAPT findings) in deployments
-	// where middleware or logging infrastructure may record POST body content
-	// despite TLS being present at the transport layer. It is opt-in and disabled
-	// by default; standard TLS-only deployments do not need it.
+	// PasswordEncryption controls application-layer end-to-end encryption of
+	// the login form password field, addressing VAPT findings in regulated
+	// deployments where TLS terminates at a load balancer and POST body content
+	// may be captured by middleware logging before reaching the application.
+	// Disabled by default; standard TLS-only deployments do not require it.
 	PasswordEncryption PasswordEncryptionConfig
 
 	// LoginV2
 	DefaultPaths *DefaultPaths
 }
 
-// PasswordEncryptionConfig controls application-layer password encryption for
-// the login UI password form.
+// PasswordEncryptionConfig controls application-layer ECDH password encryption
+// for the login UI password form.
 type PasswordEncryptionConfig struct {
-	// Enabled activates client-side AES-GCM encryption of the password field
-	// before form submission and server-side decryption before verification.
+	// Enabled activates end-to-end password encryption for the login form.
+	//
+	// When enabled, the server generates an ephemeral P-256 ECDH keypair for
+	// each password page render and embeds the public key in the page. The
+	// browser generates its own ephemeral keypair, performs ECDH to derive a
+	// shared AES-256 key (via SHA-256 of the ECDH shared secret), and encrypts
+	// the password with AES-256-GCM before the POST is sent. The server
+	// retrieves the stored private key, performs ECDH, and decrypts the payload
+	// before calling VerifyPassword. The private key is deleted after first use.
+	//
+	// A captured POST body — containing only the client public key and
+	// ciphertext — is insufficient to decrypt; the server private key is
+	// required and is never transmitted.
 	Enabled bool
+
+	// AllowPlaintextFallback, when false (default), causes the server to reject
+	// password submissions that cannot be decrypted when Enabled is true. This
+	// is the correct posture for strict regulatory compliance. Set to true only
+	// during a transitional rollout period where some clients may not yet
+	// support the encryption JS (e.g. cached old page versions).
+	AllowPlaintextFallback bool
 }
 
 type DefaultPaths struct {
@@ -250,6 +265,7 @@ func CreateLogin(
 	)
 	login.renderer = CreateRenderer(HandlerPrefix, staticStorage, config.LanguageCookieName)
 	login.parser = form.NewParser()
+	login.encKeyStore = newPasswordEncKeyStore()
 
 	var err error
 	login.caches, err = startCaches(context.Background(), cacheConnectors, federateLogoutCache)

@@ -1,101 +1,136 @@
 // password_encrypt.js
-// Client-side AES-256-GCM password encryption for regulated deployments.
+// Client-side ECDH + AES-256-GCM password encryption for regulated deployments.
 //
-// Activated when the server sets PasswordEncryptionEnabled=true in config.
-// The password field value is replaced with an encrypted payload before the
-// form is submitted, so the plaintext password never appears in the POST body
-// as transmitted by the browser. The server decrypts it using the same
-// key-derivation parameters before passing the credential to VerifyPassword.
+// Activated when the server sets PasswordEncryption.Enabled=true in config.
+// The server generates an ephemeral P-256 ECDH keypair per password page render,
+// embeds the public key in the page, and stores the private key server-side.
+// This script generates its own ephemeral P-256 keypair, performs ECDH to derive
+// a shared AES-256 key, and encrypts the password before the POST body is sent.
 //
-// Payload format (dot-separated hex strings):
-//   hex(ciphertext) . hex(gcm_tag) . hex(iv) . hex(salt)
+// Security guarantee: the POST body contains only the client public key and
+// ciphertext. The server private key is never transmitted. A captured POST body
+// alone is insufficient to recover the plaintext password.
 //
-// Key derivation: PBKDF2-SHA-256, passphrase = authRequestID, 100 000 iterations, 256-bit key.
-// Cipher: AES-256-GCM with a 96-bit random IV and a 128-bit random salt.
+// Payload format (dot-separated):
+//   base64(clientUncompressedP256PubKey) . hex(ciphertext) . hex(gcm_tag) . hex(iv)
 //
-// Security notes:
-//   - The authRequestID is a server-issued opaque token unique per login attempt.
-//     Using it as the PBKDF2 passphrase binds the encrypted payload to the
-//     specific request and prevents replay across sessions.
-//   - This layer does not replace TLS; it addresses the specific VAPT finding
-//     that POST body content may be captured by intermediary logging
-//     infrastructure even in TLS-terminated deployments.
+// Key derivation: ECDH shared secret → SHA-256 → 256-bit AES-GCM key.
+// This matches the Web Crypto SubtleCrypto.deriveBits("ECDH") + SHA-256 digest path.
+//
+// Browser support: Web Crypto API (window.crypto.subtle) is available in all
+// modern browsers: Chrome 37+, Firefox 34+, Safari 11+, Edge 12+.
 
 (function () {
   "use strict";
 
-  var PBKDF2_ITERATIONS = 100000;
-  var AES_KEY_BITS = 256;
-  var SALT_BYTES = 16;
-  var IV_BYTES = 12;
+  const IV_BYTES = 12;
+  const GCM_TAG_BYTES = 16;
 
   function hexEncode(buffer) {
     return Array.from(new Uint8Array(buffer))
-      .map(function (b) { return b.toString(16).padStart(2, "0"); })
+      .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
   }
 
-  function deriveKey(passphrase, salt) {
-    var enc = new TextEncoder();
-    return crypto.subtle.importKey(
-      "raw",
-      enc.encode(passphrase),
-      { name: "PBKDF2" },
-      false,
-      ["deriveKey"]
-    ).then(function (baseKey) {
-      return crypto.subtle.deriveKey(
-        {
-          name: "PBKDF2",
-          salt: salt,
-          iterations: PBKDF2_ITERATIONS,
-          hash: "SHA-256",
-        },
-        baseKey,
-        { name: "AES-GCM", length: AES_KEY_BITS },
+  // Derive a 256-bit AES-GCM key from the ECDH shared secret via SHA-256.
+  function deriveAESKey(ecdhSharedSecret) {
+    return crypto.subtle.digest("SHA-256", ecdhSharedSecret).then((keyMaterial) =>
+      crypto.subtle.importKey(
+        "raw",
+        keyMaterial,
+        { name: "AES-GCM", length: 256 },
         false,
         ["encrypt"]
-      );
-    });
+      )
+    );
   }
 
-  function encryptPassword(password, authRequestID) {
-    var enc = new TextEncoder();
-    var salt = crypto.getRandomValues(new Uint8Array(SALT_BYTES));
-    var iv = crypto.getRandomValues(new Uint8Array(IV_BYTES));
+  function encryptPassword(password, serverPublicKeyBase64) {
+    const enc = new TextEncoder();
 
-    return deriveKey(authRequestID, salt).then(function (key) {
-      return crypto.subtle.encrypt(
-        { name: "AES-GCM", iv: iv, tagLength: 128 },
-        key,
-        enc.encode(password)
-      );
-    }).then(function (encrypted) {
-      // Web Crypto appends the 16-byte GCM tag to the ciphertext buffer.
-      var full = new Uint8Array(encrypted);
-      var ciphertext = full.slice(0, full.length - 16);
-      var tag = full.slice(full.length - 16);
-      return hexEncode(ciphertext) + "." + hexEncode(tag) + "." + hexEncode(iv) + "." + hexEncode(salt);
-    });
+    // Decode the server's ephemeral public key (raw uncompressed P-256 bytes).
+    const serverPubKeyBytes = Uint8Array.from(atob(serverPublicKeyBase64), (c) =>
+      c.charCodeAt(0)
+    );
+
+    // Import server public key.
+    const serverPubKeyPromise = crypto.subtle.importKey(
+      "raw",
+      serverPubKeyBytes,
+      { name: "ECDH", namedCurve: "P-256" },
+      false,
+      []
+    );
+
+    // Generate client ephemeral keypair.
+    const clientKeyPairPromise = crypto.subtle.generateKey(
+      { name: "ECDH", namedCurve: "P-256" },
+      true, // extractable — we need to send the public key to the server
+      ["deriveKey", "deriveBits"]
+    );
+
+    return Promise.all([serverPubKeyPromise, clientKeyPairPromise])
+      .then(([serverPubKey, clientKeyPair]) => {
+        // Perform ECDH: derive raw shared secret bits.
+        const ecdhBitsPromise = crypto.subtle.deriveBits(
+          { name: "ECDH", public: serverPubKey },
+          clientKeyPair.privateKey,
+          256
+        );
+
+        // Export client public key (raw uncompressed, 65 bytes for P-256).
+        const clientPubKeyPromise = crypto.subtle.exportKey(
+          "raw",
+          clientKeyPair.publicKey
+        );
+
+        return Promise.all([ecdhBitsPromise, clientPubKeyPromise]);
+      })
+      .then(([sharedSecret, clientPubKeyBytes]) => {
+        return deriveAESKey(sharedSecret).then((aesKey) => {
+          const iv = crypto.getRandomValues(new Uint8Array(IV_BYTES));
+
+          return crypto.subtle
+            .encrypt({ name: "AES-GCM", iv, tagLength: 128 }, aesKey, enc.encode(password))
+            .then((encrypted) => {
+              // Web Crypto appends the 16-byte GCM tag to the ciphertext buffer.
+              const full = new Uint8Array(encrypted);
+              const ciphertext = full.slice(0, -GCM_TAG_BYTES);
+              const tag = full.slice(-GCM_TAG_BYTES);
+
+              // Encode client public key as base64.
+              const clientPubKeyB64 = btoa(
+                String.fromCharCode(...new Uint8Array(clientPubKeyBytes))
+              );
+
+              return (
+                clientPubKeyB64 +
+                "." +
+                hexEncode(ciphertext) +
+                "." +
+                hexEncode(tag) +
+                "." +
+                hexEncode(iv)
+              );
+            });
+        });
+      });
   }
 
-  // Intercept form submission: encrypt the password field before the POST body
-  // is sent. The submit event is cancelled, encryption runs asynchronously,
-  // then the form is re-submitted programmatically once the field is replaced.
   function attachEncryptionToForm() {
-    var form = document.querySelector("form");
+    const form = document.querySelector("form");
     if (!form) { return; }
 
-    var passwordField = document.getElementById("password");
-    var authReqField = document.getElementById("authRequestID");
-    if (!passwordField || !authReqField) { return; }
+    const passwordField = document.getElementById("password");
+    // serverPubKey is embedded by the template as a data attribute on the form
+    // so it cannot be confused with authRequestID and requires no extra hidden field.
+    const serverPubKey = form.dataset.serverPubKey;
+    if (!passwordField || !serverPubKey) { return; }
 
-    // Guard: only attach once
     if (form.dataset.encryptAttached) { return; }
     form.dataset.encryptAttached = "1";
 
-    form.addEventListener("submit", function (event) {
-      // If already encrypted (re-submission after async), allow through
+    form.addEventListener("submit", (event) => {
       if (form.dataset.encrypted === "1") {
         form.dataset.encrypted = "";
         return;
@@ -103,24 +138,22 @@
 
       event.preventDefault();
 
-      var rawPassword = passwordField.value;
-      var authRequestID = authReqField.value;
-
-      if (!rawPassword || !authRequestID) {
+      const rawPassword = passwordField.value;
+      if (!rawPassword) {
         form.submit();
         return;
       }
 
-      encryptPassword(rawPassword, authRequestID)
-        .then(function (payload) {
+      encryptPassword(rawPassword, serverPubKey)
+        .then((payload) => {
           passwordField.value = payload;
           form.dataset.encrypted = "1";
           form.requestSubmit ? form.requestSubmit() : form.submit();
         })
-        .catch(function () {
-          // Encryption failed (e.g. unsupported browser) — submit plaintext.
-          // VerifyPassword will reject it if the server expects encrypted input,
-          // which is the correct failure mode (auth denied, no silent bypass).
+        .catch(() => {
+          // Encryption failed (e.g. key import error). Submit plaintext.
+          // If AllowPlaintextFallback=false server-side, this submission is
+          // rejected there. No silent bypass of the encryption requirement.
           form.submit();
         });
     });
