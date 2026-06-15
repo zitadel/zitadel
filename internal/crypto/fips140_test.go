@@ -1,7 +1,6 @@
 package crypto
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -178,5 +177,5 @@ func TestHashConfig_NewHasher_FIPSBcryptFails(t *testing.T) {
 	}
 	_, err := cfg.NewHasher()
 	require.Error(t, err)
-	assert.True(t, strings.Contains(err.Error(), "uncertified cryptographic state"))
+	assert.Contains(t, err.Error(), "uncertified cryptographic state")
 }
