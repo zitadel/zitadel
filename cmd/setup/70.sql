@@ -1,3 +1,20 @@
+-- represents an event to be created.
+DO $$ BEGIN
+    CREATE TYPE eventstore.command2 AS (
+        instance_id TEXT
+        , aggregate_type TEXT
+        , aggregate_id TEXT
+        , command_type TEXT
+        , revision INT2
+        , payload JSONB
+        , creator TEXT
+        , owner TEXT
+        , enforce_owner BOOLEAN
+    );
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
 DO $$ BEGIN
     CREATE TYPE eventstore.latest_command AS (
         instance_id TEXT
@@ -90,7 +107,7 @@ BEGIN
         , c.aggregate_type
         , c.aggregate_id
         , c.command_type AS event_type
-        , COALESCE(e.sequence, 0) + ROW_NUMBER() OVER (PARTITION BY c.instance_id, c.aggregate_type, c.aggregate_id ORDER BY c.in_tx_order) AS sequence
+        , COALESCE(e.sequence, 0) + ROW_NUMBER() OVER (PARTITION BY c.instance_id, c.aggregate_type, c.aggregate_id ORDER BY c.ordinality) AS sequence
         , c.revision
         , NOW() AS created_at
         , c.payload
@@ -100,12 +117,9 @@ BEGIN
             ELSE COALESCE(e.owner, c.owner)
         END AS owner
         , EXTRACT(EPOCH FROM NOW()) AS position
-        , c.in_tx_order
-    FROM (
-        SELECT c.*, CAST(ROW_NUMBER() OVER () AS INTEGER) AS in_tx_order
-        FROM UNNEST(commands) AS c
-    ) AS c
-    LEFT JOIN UNNEST(_latest_events) AS e
+        , c.ordinality::%s AS in_tx_order
+    FROM UNNEST(commands) WITH ORDINALITY AS c
+    LEFT JOIN unnest(_latest_events) AS e
         ON c.instance_id = e.instance_id
         AND c.aggregate_type = e.aggregate_type
         AND c.aggregate_id = e.aggregate_id
