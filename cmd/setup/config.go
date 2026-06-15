@@ -185,6 +185,7 @@ type Steps struct {
 	s67SyncMemberRoleFields                 *SyncMemberRoleFields
 	s68TargetAddPayloadTypeColumn           *TargetAddPayloadTypeColumn
 	s69CacheTablesLogged                    *CacheTablesLogged
+	s70AddEventStoreCommandEnforceOwner     *AddEventStoreCommandEnforceOwnerColumn
 	RelationalTables                        *TransactionalTables
 }
 
