@@ -28,6 +28,7 @@ type Provider struct {
 	issuer            string
 	jwtEndpoint       string
 	keysEndpoint      string
+	audience          string
 	isLinkingAllowed  bool
 	isCreationAllowed bool
 	isAutoCreation    bool
@@ -67,13 +68,14 @@ func WithAutoUpdate() ProviderOpts {
 }
 
 // New creates a JWT provider
-func New(name, issuer, jwtEndpoint, keysEndpoint, headerName string, encryptionAlg crypto.EncryptionAlgorithm, options ...ProviderOpts) (*Provider, error) {
+func New(name, issuer, jwtEndpoint, keysEndpoint, headerName, audience string, encryptionAlg crypto.EncryptionAlgorithm, options ...ProviderOpts) (*Provider, error) {
 	provider := &Provider{
 		name:          name,
 		issuer:        issuer,
 		jwtEndpoint:   jwtEndpoint,
 		keysEndpoint:  keysEndpoint,
 		headerName:    headerName,
+		audience:      audience,
 		encryptionAlg: encryptionAlg,
 	}
 	for _, option := range options {

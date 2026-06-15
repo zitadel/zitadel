@@ -41,6 +41,7 @@ type JWTProvider struct {
 	JWTEndpoint string
 	KeyEndpoint string
 	HeaderName  string
+	Audience    string
 	IDPOptions  idp.Options
 }
 

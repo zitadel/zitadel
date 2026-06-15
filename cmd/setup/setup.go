@@ -249,6 +249,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s68TargetAddPayloadTypeColumn = &TargetAddPayloadTypeColumn{dbClient: dbClient}
 	steps.s69CacheTablesLogged = &CacheTablesLogged{dbClient: dbClient}
 	steps.s70AddEventStoreCommandEnforceOwner = &AddEventStoreCommandEnforceOwnerColumn{dbClient: dbClient}
+	steps.s71JWTProvideAddAudienceColumn = &JWTProvideAddAudienceColumn{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	if err != nil {
@@ -368,6 +369,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s59SetupWebkeys, // this step needs commands.
 		steps.s66SessionRecoveryCodeCheckedAt,
 		steps.s68TargetAddPayloadTypeColumn,
+		steps.s71JWTProvideAddAudienceColumn,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {

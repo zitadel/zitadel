@@ -4280,7 +4280,8 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
 	"isAutoUpdate": true,
-	"autoLinkingOption": 1
+	"autoLinkingOption": 1,
+	"audience": "audience"
 }`),
 					), instance.JWTIDPAddedEventMapper),
 			},
@@ -4311,7 +4312,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name, audience) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -4319,6 +4320,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 								"jwt",
 								"keys",
 								"header",
+								"audience",
 							},
 						},
 					},
@@ -4342,7 +4344,8 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
 	"isAutoUpdate": true,
-	"autoLinkingOption": 1
+	"autoLinkingOption": 1,
+	"audience": "audience"
 }`),
 					), org.JWTIDPAddedEventMapper),
 			},
@@ -4373,7 +4376,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name, audience) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -4381,6 +4384,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 								"jwt",
 								"keys",
 								"header",
+								"audience",
 							},
 						},
 					},
@@ -4442,6 +4446,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 	"jwtEndpoint": "jwt",
 	"keysEndpoint": "keys",
 	"headerName": "header",
+	"audience": "audience",
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -4471,12 +4476,13 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates6_jwt SET (jwt_endpoint, keys_endpoint, header_name, issuer) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
+							expectedStmt: "UPDATE projections.idp_templates6_jwt SET (jwt_endpoint, keys_endpoint, header_name, issuer, audience) = ($1, $2, $3, $4, $5) WHERE (idp_id = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								"jwt",
 								"keys",
 								"header",
 								"issuer",
+								"audience",
 								"idp-id",
 								"instance-id",
 							},
