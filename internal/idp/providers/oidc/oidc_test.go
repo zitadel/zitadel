@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/h2non/gock"
@@ -88,7 +89,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 			a := assert.New(t)
 			r := require.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.userMapper, tt.fields.opts...)
+			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.userMapper, http.DefaultClient, tt.fields.opts...)
 			r.NoError(err)
 			provider.generateVerifier = func() string {
 				return "pkceOAuthVerifier"
@@ -208,7 +209,7 @@ func TestProvider_Options(t *testing.T) {
 			tt.fields.httpMock(tt.fields.issuer)
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.userMapper, tt.fields.opts...)
+			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.userMapper, http.DefaultClient, tt.fields.opts...)
 			require.NoError(t, err)
 
 			a.Equal(tt.want.name, provider.Name())

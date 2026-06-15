@@ -89,6 +89,7 @@ const (
 	JWTEndpointCol     = "jwt_endpoint"
 	JWTKeysEndpointCol = "keys_endpoint"
 	JWTHeaderNameCol   = "header_name"
+	JWTAudienceCol     = "audience"
 
 	AzureADIDCol           = "idp_id"
 	AzureADInstanceIDCol   = "instance_id"
@@ -258,6 +259,7 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			handler.NewColumn(JWTEndpointCol, handler.ColumnTypeText),
 			handler.NewColumn(JWTKeysEndpointCol, handler.ColumnTypeText),
 			handler.NewColumn(JWTHeaderNameCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(JWTAudienceCol, handler.ColumnTypeText, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(JWTInstanceIDCol, JWTIDCol),
 			IDPTemplateJWTSuffix,
@@ -1046,6 +1048,7 @@ func (p *idpTemplateProjection) reduceJWTIDPAdded(event eventstore.Event) (*hand
 				handler.NewCol(JWTEndpointCol, idpEvent.JWTEndpoint),
 				handler.NewCol(JWTKeysEndpointCol, idpEvent.KeysEndpoint),
 				handler.NewCol(JWTHeaderNameCol, idpEvent.HeaderName),
+				handler.NewCol(JWTAudienceCol, idpEvent.Audience),
 			},
 			handler.WithTableSuffix(IDPTemplateJWTSuffix),
 		),
@@ -2339,6 +2342,9 @@ func reduceJWTIDPChangedColumns(idpEvent idp.JWTIDPChangedEvent) []handler.Colum
 	}
 	if idpEvent.Issuer != nil {
 		jwtCols = append(jwtCols, handler.NewCol(JWTIssuerCol, *idpEvent.Issuer))
+	}
+	if idpEvent.Audience != nil {
+		jwtCols = append(jwtCols, handler.NewCol(JWTAudienceCol, *idpEvent.Audience))
 	}
 	return jwtCols
 }

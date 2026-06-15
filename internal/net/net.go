@@ -8,7 +8,7 @@ import (
 
 type IPLookupFunc func(string) ([]builtin_net.IP, error)
 
-// HostnameToIPList converts the input URL to a list [net.IP].
+// HostnameToIPList converts the input hostname to a list [net.IP].
 //
 // Returns an internal error if the lookup fails.
 // Returns an invalid argument if the lookup function is nil
