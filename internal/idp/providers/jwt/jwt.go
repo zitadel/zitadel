@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"net/http"
 	"net/url"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -34,6 +35,7 @@ type Provider struct {
 	isAutoCreation    bool
 	isAutoUpdate      bool
 	encryptionAlg     crypto.EncryptionAlgorithm
+	httpClient        *http.Client
 }
 
 type ProviderOpts func(provider *Provider)
@@ -68,7 +70,7 @@ func WithAutoUpdate() ProviderOpts {
 }
 
 // New creates a JWT provider
-func New(name, issuer, jwtEndpoint, keysEndpoint, headerName, audience string, encryptionAlg crypto.EncryptionAlgorithm, options ...ProviderOpts) (*Provider, error) {
+func New(name, issuer, jwtEndpoint, keysEndpoint, headerName, audience string, encryptionAlg crypto.EncryptionAlgorithm, httpClient *http.Client, options ...ProviderOpts) (*Provider, error) {
 	provider := &Provider{
 		name:          name,
 		issuer:        issuer,
@@ -77,6 +79,7 @@ func New(name, issuer, jwtEndpoint, keysEndpoint, headerName, audience string, e
 		headerName:    headerName,
 		audience:      audience,
 		encryptionAlg: encryptionAlg,
+		httpClient:    httpClient,
 	}
 	for _, option := range options {
 		option(provider)

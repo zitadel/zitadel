@@ -3,6 +3,7 @@ package jwt
 import (
 	"context"
 	"errors"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -114,6 +115,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				tt.fields.headerName,
 				tt.fields.audience,
 				tt.fields.encryptionAlg(t),
+				http.DefaultClient,
 			)
 			require.NoError(t, err)
 
@@ -221,6 +223,7 @@ func TestProvider_Options(t *testing.T) {
 				tt.fields.headerName,
 				tt.fields.audience,
 				tt.fields.encryptionAlg(t),
+				http.DefaultClient,
 				tt.fields.opts...,
 			)
 			require.NoError(t, err)

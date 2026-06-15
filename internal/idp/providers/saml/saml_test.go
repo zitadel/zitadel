@@ -3,6 +3,7 @@ package saml
 import (
 	"context"
 	"encoding/xml"
+	"net/http"
 	"net/url"
 	"testing"
 	"time"
@@ -107,6 +108,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				tt.fields.metadata,
 				tt.fields.certificate,
 				tt.fields.key,
+				http.DefaultClient,
 				tt.fields.options...,
 			)
 			require.NoError(t, err)
@@ -285,7 +287,7 @@ func TestProvider_Options(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.rootURL, tt.fields.metadata, tt.fields.certificate, tt.fields.key, tt.fields.options...)
+			provider, err := New(tt.fields.name, tt.fields.rootURL, tt.fields.metadata, tt.fields.certificate, tt.fields.key, http.DefaultClient, tt.fields.options...)
 			if tt.want.err {
 				require.Error(t, err)
 			} else {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"net/http"
 	"testing"
 	"time"
 
@@ -378,6 +379,7 @@ func TestSession_FetchUser(t *testing.T) {
 				tt.fields.headerName,
 				tt.fields.audience,
 				tt.fields.encryptionAlg(t),
+				http.DefaultClient,
 			)
 			require.NoError(t, err)
 
