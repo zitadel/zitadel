@@ -46,14 +46,7 @@ func latestSequences(ctx context.Context, tx database.Tx, commands []eventstore.
 }
 
 func searchSequenceByCommand(sequences []*latestSequence, command eventstore.Command) *latestSequence {
-	for _, sequence := range sequences {
-		if sequence.aggregate.Type == command.Aggregate().Type &&
-			sequence.aggregate.ID == command.Aggregate().ID &&
-			sequence.aggregate.InstanceID == command.Aggregate().InstanceID {
-			return sequence
-		}
-	}
-	return nil
+	return searchSequence(sequences, command.Aggregate().Type, command.Aggregate().ID, command.Aggregate().InstanceID)
 }
 
 func searchSequence(sequences []*latestSequence, aggregateType eventstore.AggregateType, aggregateID, instanceID string) *latestSequence {

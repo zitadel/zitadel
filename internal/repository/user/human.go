@@ -58,6 +58,8 @@ type HumanAddedEvent struct {
 	ChangeRequired bool                `json:"changeRequired,omitempty"`
 }
 
+func (*HumanAddedEvent) EnforceResourceOwner() {}
+
 func (e *HumanAddedEvent) Payload() interface{} {
 	return e
 }
@@ -164,6 +166,8 @@ type HumanRegisteredEvent struct {
 
 	UserAgentID string `json:"userAgentID,omitempty"`
 }
+
+func (*HumanRegisteredEvent) EnforceResourceOwner() {}
 
 func (e *HumanRegisteredEvent) Payload() interface{} {
 	return e

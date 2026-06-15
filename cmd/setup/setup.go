@@ -248,6 +248,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s67SyncMemberRoleFields = &SyncMemberRoleFields{dbClient: dbClient}
 	steps.s68TargetAddPayloadTypeColumn = &TargetAddPayloadTypeColumn{dbClient: dbClient}
 	steps.s69CacheTablesLogged = &CacheTablesLogged{dbClient: dbClient}
+	steps.s70AddEventStoreCommandEnforceOwner = &AddEventStoreCommandEnforceOwnerColumn{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	if err != nil {
@@ -257,6 +258,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	for _, step := range []migration.Migration{
 		steps.s14NewEventsTable,
 		steps.s40InitPushFunc,
+		steps.s70AddEventStoreCommandEnforceOwner,
 		steps.s1ProjectionTable,
 		steps.s2AssetsTable,
 		steps.s28AddFieldTable,
