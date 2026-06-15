@@ -157,6 +157,7 @@ type Steps struct {
 	s59SetupWebkeys                         *SetupWebkeys
 	s64ChangePushPosition                   *ChangePushPosition
 	s67SyncMemberRoleFields                 *SyncMemberRoleFields
+	s71JWTProvideAddAudienceColumn          *JWTProvideAddAudienceColumn
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

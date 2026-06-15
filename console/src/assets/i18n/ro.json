@@ -2359,7 +2359,8 @@
       "DESCRIPTION": "Introduceți datele pentru furnizorul de identitate JWT.",
       "HEADERNAME": "Nume antet",
       "JWTENDPOINT": "Punct final JWT",
-      "JWTKEYSENDPOINT": "Punct final chei JWT"
+      "JWTKEYSENDPOINT": "Punct final chei JWT",
+      "AUDIENCE": "Audiență"
     },
     "APPLE": {
       "TEAMID": "ID echipă",

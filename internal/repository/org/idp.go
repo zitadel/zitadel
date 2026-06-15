@@ -303,7 +303,8 @@ func NewJWTIDPAddedEvent(
 	issuer,
 	jwtEndpoint,
 	keysEndpoint,
-	headerName string,
+	headerName,
+	audience string,
 	options idp.Options,
 ) *JWTIDPAddedEvent {
 
@@ -320,6 +321,7 @@ func NewJWTIDPAddedEvent(
 			jwtEndpoint,
 			keysEndpoint,
 			headerName,
+			audience,
 			options,
 		),
 	}

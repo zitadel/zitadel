@@ -1072,6 +1072,7 @@ func (l *Login) jwtProvider(identityProvider *query.IDPTemplate) (*jwt.Provider,
 		identityProvider.JWTIDPTemplate.Endpoint,
 		identityProvider.JWTIDPTemplate.KeysEndpoint,
 		identityProvider.JWTIDPTemplate.HeaderName,
+		identityProvider.JWTIDPTemplate.Audience,
 		l.idpConfigAlg,
 	)
 }

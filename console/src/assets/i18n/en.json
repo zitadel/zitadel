@@ -2364,7 +2364,8 @@
       "DESCRIPTION": "Enter the data for JWT Identity Provider.",
       "HEADERNAME": "Header Name",
       "JWTENDPOINT": "JWT Endpoint",
-      "JWTKEYSENDPOINT": "JWT Keys Endpoint"
+      "JWTKEYSENDPOINT": "JWT Keys Endpoint",
+      "AUDIENCE": "Audience"
     },
     "APPLE": {
       "TEAMID": "Team ID",

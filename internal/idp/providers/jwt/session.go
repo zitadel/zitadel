@@ -100,6 +100,11 @@ func (s *Session) validateToken(ctx context.Context, token string) (*oidc.IDToke
 		return nil, fmt.Errorf("%w: %v", ErrInvalidToken, err)
 	}
 
+	if s.Provider.audience != "" {
+		if err = oidc.CheckAudience(claims, s.Provider.audience); err != nil {
+			return nil, fmt.Errorf("%w: %v", ErrInvalidToken, err)
+		}
+	}
 	return claims, nil
 }
 

@@ -54,6 +54,7 @@ var (
 		` projections.idp_templates6_jwt.jwt_endpoint,` +
 		` projections.idp_templates6_jwt.keys_endpoint,` +
 		` projections.idp_templates6_jwt.header_name,` +
+		` projections.idp_templates6_jwt.audience,` +
 		// azure
 		` projections.idp_templates6_azure.idp_id,` +
 		` projections.idp_templates6_azure.client_id,` +
@@ -184,6 +185,7 @@ var (
 		"jwt_endpoint",
 		"keys_endpoint",
 		"header_name",
+		"audience",
 		// azure
 		"idp_id",
 		"client_id",
@@ -301,6 +303,7 @@ var (
 		` projections.idp_templates6_jwt.jwt_endpoint,` +
 		` projections.idp_templates6_jwt.keys_endpoint,` +
 		` projections.idp_templates6_jwt.header_name,` +
+		` projections.idp_templates6_jwt.audience,` +
 		// azure
 		` projections.idp_templates6_azure.idp_id,` +
 		` projections.idp_templates6_azure.client_id,` +
@@ -432,6 +435,7 @@ var (
 		"jwt_endpoint",
 		"keys_endpoint",
 		"header_name",
+		"audience",
 		// azure
 		"idp_id",
 		"client_id",
@@ -584,6 +588,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// jwt
+						nil,
 						nil,
 						nil,
 						nil,
@@ -744,6 +749,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// azure
 						nil,
 						nil,
@@ -897,6 +903,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						"jwt",
 						"keys",
 						"header",
+						"audience",
 						// azure
 						nil,
 						nil,
@@ -999,6 +1006,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 					Endpoint:     "jwt",
 					KeysEndpoint: "keys",
 					HeaderName:   "header",
+					Audience:     "audience",
 				},
 			},
 		},
@@ -1043,6 +1051,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// jwt
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1198,6 +1207,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// azure
 						nil,
 						nil,
@@ -1343,6 +1353,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// jwt
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1499,6 +1510,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// azure
 						nil,
 						nil,
@@ -1644,6 +1656,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// jwt
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1799,6 +1812,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// jwt
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1975,6 +1989,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// azure
 						nil,
 						nil,
@@ -2122,6 +2137,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// jwt
+						nil,
 						nil,
 						nil,
 						nil,
@@ -2307,6 +2323,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// azure
 							nil,
 							nil,
@@ -2487,6 +2504,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// azure
 							nil,
 							nil,
@@ -2640,6 +2658,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// azure
 							nil,
 							nil,
@@ -2753,6 +2772,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							// jwt
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2876,6 +2896,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// azure
 							nil,
 							nil,
@@ -2989,6 +3010,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							// jwt
+							nil,
 							nil,
 							nil,
 							nil,
@@ -3112,6 +3134,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// azure
 							nil,
 							nil,
@@ -3230,6 +3253,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							"jwt",
 							"keys",
 							"header",
+							"audience",
 							// azure
 							nil,
 							nil,
@@ -3483,6 +3507,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							Endpoint:     "jwt",
 							KeysEndpoint: "keys",
 							HeaderName:   "header",
+							Audience:     "audience",
 						},
 					},
 				},

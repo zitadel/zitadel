@@ -424,6 +424,7 @@ type JWTIDPWriteModel struct {
 	JWTEndpoint  string
 	KeysEndpoint string
 	HeaderName   string
+	Audience     string
 	idp.Options
 
 	State domain.IDPState
@@ -459,6 +460,7 @@ func (wm *JWTIDPWriteModel) reduceAddedEvent(e *idp.JWTIDPAddedEvent) {
 	wm.JWTEndpoint = e.JWTEndpoint
 	wm.KeysEndpoint = e.KeysEndpoint
 	wm.HeaderName = e.HeaderName
+	wm.Audience = e.Audience
 	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
@@ -479,6 +481,9 @@ func (wm *JWTIDPWriteModel) reduceChangedEvent(e *idp.JWTIDPChangedEvent) {
 	if e.HeaderName != nil {
 		wm.HeaderName = *e.HeaderName
 	}
+	if e.Audience != nil {
+		wm.Audience = *e.Audience
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
@@ -487,7 +492,8 @@ func (wm *JWTIDPWriteModel) NewChanges(
 	issuer,
 	jwtEndpoint,
 	keysEndpoint,
-	headerName string,
+	headerName,
+	audience string,
 	options idp.Options,
 ) ([]idp.JWTIDPChanges, error) {
 	changes := make([]idp.JWTIDPChanges, 0)
@@ -505,6 +511,9 @@ func (wm *JWTIDPWriteModel) NewChanges(
 	}
 	if wm.HeaderName != headerName {
 		changes = append(changes, idp.ChangeJWTHeaderName(headerName))
+	}
+	if wm.Audience != audience {
+		changes = append(changes, idp.ChangeJWTAudience(audience))
 	}
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {
@@ -577,6 +586,7 @@ func (wm *JWTIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encrypt
 		wm.JWTEndpoint,
 		wm.KeysEndpoint,
 		wm.HeaderName,
+		wm.Audience,
 		idpAlg,
 		opts...,
 	)

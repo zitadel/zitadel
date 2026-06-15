@@ -6328,6 +6328,13 @@ message AddJWTProviderRequest {
     string keys_endpoint = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string header_name = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.idp.v1.Options provider_options = 6;
+    string audience = 7 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"my-audience\"";
+            description: "the expected audience in the JWT, if not provided the audience is not validated";
+        }
+    ];
 }
 
 message AddJWTProviderResponse {
@@ -6348,6 +6355,13 @@ message UpdateJWTProviderRequest {
     string keys_endpoint = 5 [(validate.rules).string = {max_len: 200}];
     string header_name = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.idp.v1.Options provider_options = 7;
+    string audience = 8 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"my-audience\"";
+            description: "the expected audience in the JWT, if not provided the audience is not validated";
+        }
+    ];
 }
 
 message UpdateJWTProviderResponse {

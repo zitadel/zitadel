@@ -2357,7 +2357,8 @@
       "DESCRIPTION": "Wprowadź dane dla dostawcy tożsamości JWT.",
       "HEADERNAME": "Nazwa nagłówka",
       "JWTENDPOINT": "Punkt końcowy JWT",
-      "JWTKEYSENDPOINT": "Punkt końcowy kluczy JWT"
+      "JWTKEYSENDPOINT": "Punkt końcowy kluczy JWT",
+      "AUDIENCE": "Odbiorca"
     },
     "TOAST": {
       "SAVED": "Zapisano pomyślnie.",

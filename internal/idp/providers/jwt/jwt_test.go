@@ -20,6 +20,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 		jwtEndpoint   string
 		keysEndpoint  string
 		headerName    string
+		audience      string
 		encryptionAlg func(t *testing.T) crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -43,6 +44,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				jwtEndpoint:  "https://auth.com/jwt",
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
+				audience:     "audience",
 				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
 					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 				},
@@ -64,6 +66,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				jwtEndpoint:  "https://auth.com/jwt",
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
+				audience:     "audience",
 				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
 					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 				},
@@ -83,6 +86,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				jwtEndpoint:  "https://auth.com/jwt",
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
+				audience:     "audience",
 				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
 					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 				},
@@ -108,6 +112,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				tt.fields.jwtEndpoint,
 				tt.fields.keysEndpoint,
 				tt.fields.headerName,
+				tt.fields.audience,
 				tt.fields.encryptionAlg(t),
 			)
 			require.NoError(t, err)
@@ -135,6 +140,7 @@ func TestProvider_Options(t *testing.T) {
 		jwtEndpoint   string
 		keysEndpoint  string
 		headerName    string
+		audience      string
 		encryptionAlg func(t *testing.T) crypto.EncryptionAlgorithm
 		opts          []ProviderOpts
 	}
@@ -159,6 +165,7 @@ func TestProvider_Options(t *testing.T) {
 				jwtEndpoint:  "https://auth.com/jwt",
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
+				audience:     "audience",
 				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
 					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 				},
@@ -181,6 +188,7 @@ func TestProvider_Options(t *testing.T) {
 				jwtEndpoint:  "https://auth.com/jwt",
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
+				audience:     "audience",
 				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
 					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 				},
@@ -211,6 +219,7 @@ func TestProvider_Options(t *testing.T) {
 				tt.fields.jwtEndpoint,
 				tt.fields.keysEndpoint,
 				tt.fields.headerName,
+				tt.fields.audience,
 				tt.fields.encryptionAlg(t),
 				tt.fields.opts...,
 			)

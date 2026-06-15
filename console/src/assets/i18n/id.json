@@ -2141,7 +2141,8 @@
       "DESCRIPTION": "Masukkan data Penyedia Identitas JWT.",
       "HEADERNAME": "Nama Tajuk",
       "JWTENDPOINT": "Titik Akhir JWT",
-      "JWTKEYSENDPOINT": "Titik Akhir Kunci JWT"
+      "JWTKEYSENDPOINT": "Titik Akhir Kunci JWT",
+      "AUDIENCE": "Audiens"
     },
     "APPLE": {
       "TEAMID": "ID tim",

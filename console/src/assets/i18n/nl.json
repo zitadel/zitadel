@@ -2361,7 +2361,8 @@
       "DESCRIPTION": "Voer de gegevens in voor JWT Identity Provider.",
       "HEADERNAME": "Header Naam",
       "JWTENDPOINT": "JWT Eindpunt",
-      "JWTKEYSENDPOINT": "JWT Sleutels Eindpunt"
+      "JWTKEYSENDPOINT": "JWT Sleutels Eindpunt",
+      "AUDIENCE": "Audience"
     },
     "APPLE": {
       "TEAMID": "Team ID",

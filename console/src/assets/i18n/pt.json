@@ -2353,7 +2353,8 @@
       "DESCRIPTION": "Insira os dados para o Provedor de Identidade JWT.",
       "HEADERNAME": "Nome do Cabeçalho",
       "JWTENDPOINT": "Endpoint JWT",
-      "JWTKEYSENDPOINT": "Endpoint de Chaves JWT"
+      "JWTKEYSENDPOINT": "Endpoint de Chaves JWT",
+      "AUDIENCE": "Audiência"
     },
     "TOAST": {
       "SAVED": "Salvo com sucesso.",

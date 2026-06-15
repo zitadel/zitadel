@@ -263,22 +263,24 @@ func updateGenericOIDCProviderToCommand(req *admin_pb.UpdateGenericOIDCProviderR
 
 func addJWTProviderToCommand(req *admin_pb.AddJWTProviderRequest) command.JWTProvider {
 	return command.JWTProvider{
-		Name:        req.Name,
-		Issuer:      req.Issuer,
-		JWTEndpoint: req.JwtEndpoint,
-		KeyEndpoint: req.KeysEndpoint,
-		HeaderName:  req.HeaderName,
+		Name:        req.GetName(),
+		Issuer:      req.GetIssuer(),
+		JWTEndpoint: req.GetJwtEndpoint(),
+		KeyEndpoint: req.GetKeysEndpoint(),
+		HeaderName:  req.GetHeaderName(),
+		Audience:    req.GetAudience(),
 		IDPOptions:  idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 
 func updateJWTProviderToCommand(req *admin_pb.UpdateJWTProviderRequest) command.JWTProvider {
 	return command.JWTProvider{
-		Name:        req.Name,
-		Issuer:      req.Issuer,
-		JWTEndpoint: req.JwtEndpoint,
-		KeyEndpoint: req.KeysEndpoint,
-		HeaderName:  req.HeaderName,
+		Name:        req.GetName(),
+		Issuer:      req.GetIssuer(),
+		JWTEndpoint: req.GetJwtEndpoint(),
+		KeyEndpoint: req.GetKeysEndpoint(),
+		HeaderName:  req.GetHeaderName(),
+		Audience:    req.GetAudience(),
 		IDPOptions:  idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }

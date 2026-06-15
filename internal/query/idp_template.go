@@ -82,6 +82,7 @@ type JWTIDPTemplate struct {
 	KeysEndpoint string
 	HeaderName   string
 	Endpoint     string
+	Audience     string
 }
 
 type AzureADIDPTemplate struct {
@@ -352,6 +353,10 @@ var (
 	}
 	JWTHeaderNameCol = Column{
 		name:  projection.JWTHeaderNameCol,
+		table: jwtIdpTemplateTable,
+	}
+	JWTAudienceCol = Column{
+		name:  projection.JWTAudienceCol,
 		table: jwtIdpTemplateTable,
 	}
 )
@@ -908,6 +913,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			JWTEndpointCol.identifier(),
 			JWTKeysEndpointCol.identifier(),
 			JWTHeaderNameCol.identifier(),
+			JWTAudienceCol.identifier(),
 			// azure
 			AzureADIDCol.identifier(),
 			AzureADClientIDCol.identifier(),
@@ -1028,6 +1034,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			jwtEndpoint := sql.NullString{}
 			jwtKeysEndpoint := sql.NullString{}
 			jwtHeaderName := sql.NullString{}
+			jwtAudience := sql.NullString{}
 
 			azureadID := sql.NullString{}
 			azureadClientID := sql.NullString{}
@@ -1146,6 +1153,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				&jwtEndpoint,
 				&jwtKeysEndpoint,
 				&jwtHeaderName,
+				&jwtAudience,
 				// azure
 				&azureadID,
 				&azureadClientID,
@@ -1265,6 +1273,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 					KeysEndpoint: jwtKeysEndpoint.String,
 					HeaderName:   jwtHeaderName.String,
 					Endpoint:     jwtEndpoint.String,
+					Audience:     jwtAudience.String,
 				}
 			}
 			if azureadID.Valid {
@@ -1420,6 +1429,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			JWTEndpointCol.identifier(),
 			JWTKeysEndpointCol.identifier(),
 			JWTHeaderNameCol.identifier(),
+			JWTAudienceCol.identifier(),
 			// azure
 			AzureADIDCol.identifier(),
 			AzureADClientIDCol.identifier(),
@@ -1545,6 +1555,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 				jwtEndpoint := sql.NullString{}
 				jwtKeysEndpoint := sql.NullString{}
 				jwtHeaderName := sql.NullString{}
+				jwtAudience := sql.NullString{}
 
 				azureadID := sql.NullString{}
 				azureadClientID := sql.NullString{}
@@ -1663,6 +1674,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					&jwtEndpoint,
 					&jwtKeysEndpoint,
 					&jwtHeaderName,
+					&jwtAudience,
 					// azure
 					&azureadID,
 					&azureadClientID,
@@ -1781,6 +1793,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 						KeysEndpoint: jwtKeysEndpoint.String,
 						HeaderName:   jwtHeaderName.String,
 						Endpoint:     jwtEndpoint.String,
+						Audience:     jwtAudience.String,
 					}
 				}
 				if azureadID.Valid {

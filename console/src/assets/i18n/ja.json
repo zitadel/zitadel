@@ -2361,7 +2361,8 @@
       "DESCRIPTION": "JWT Identity Providerの情報を入力する。",
       "HEADERNAME": "ヘッダー名",
       "JWTENDPOINT": "JWTエンドポイント",
-      "JWTKEYSENDPOINT": "JWTキーエンドポイント"
+      "JWTKEYSENDPOINT": "JWTキーエンドポイント",
+      "AUDIENCE": "オーディエンス"
     },
     "APPLE": {
       "TEAMID": "チームID",

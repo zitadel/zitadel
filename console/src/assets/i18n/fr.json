@@ -2358,7 +2358,8 @@
       "DESCRIPTION": "Entrez les données pour le fournisseur d'identité JWT.",
       "HEADERNAME": "Nom de l'en-tête",
       "JWTENDPOINT": "Point de terminaison JWT",
-      "JWTKEYSENDPOINT": "Point de terminaison des clés JWT"
+      "JWTKEYSENDPOINT": "Point de terminaison des clés JWT",
+      "AUDIENCE": "Audience"
     },
     "TOAST": {
       "SAVED": "Enregistré avec succès.",
