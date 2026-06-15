@@ -79,7 +79,9 @@ func (wm *ProjectRoleWriteModel) Reduce() error {
 			}
 		case *project.RoleRemovedEvent:
 			wm.State = domain.ProjectRoleStateRemoved
-		case *project.ProjectRemovedEvent, *project.ProjectAddedEvent:
+		case *project.ProjectAddedEvent:
+			wm.State = domain.ProjectRoleStateUnspecified
+		case *project.ProjectRemovedEvent:
 			wm.State = domain.ProjectRoleStateRemoved
 		}
 	}
