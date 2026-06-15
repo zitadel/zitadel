@@ -186,6 +186,7 @@ type Steps struct {
 	s68TargetAddPayloadTypeColumn           *TargetAddPayloadTypeColumn
 	s69CacheTablesLogged                    *CacheTablesLogged
 	s70AddEventStoreCommandEnforceOwner     *AddEventStoreCommandEnforceOwnerColumn
+	s71JWTProvideAddAudienceColumn          *JWTProvideAddAudienceColumn
 	RelationalTables                        *TransactionalTables
 }
 
