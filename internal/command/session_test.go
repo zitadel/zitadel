@@ -988,10 +988,6 @@ func TestCommands_updateSession(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-								"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
-						),
-						eventFromEventPusher(
 							idpintent.NewStartedEvent(context.Background(),
 								&idpintent.NewAggregate("id", "instance1").Aggregate,
 								nil,
@@ -1029,7 +1025,7 @@ func TestCommands_updateSession(t *testing.T) {
 							"userID", "org1", testNow, &language.Afrikaans),
 						session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							testNow),
-						idpintent.NewConsumedEvent(context.Background(), &idpintent.NewAggregate("intent", "instance1").Aggregate), // TODO(adlerhurst): previously it was the org id of the user, but that doesn't make sense, should be the instance id
+						idpintent.NewConsumedEvent(context.Background(), &idpintent.NewAggregate("intent", "instance1").Aggregate),
 						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							"tokenID"),
 					),
