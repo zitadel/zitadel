@@ -2,6 +2,7 @@
 
 import { handleServerActionResponse } from "@/lib/client-utils";
 import { registerUserAndLinkToIDP } from "@/lib/server/register";
+import { useRedirectLoading } from "@/lib/use-redirect-loading";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -61,7 +62,7 @@ export function RegisterFormIDPIncomplete({
   const t = useTranslations("register");
   const router = useRouter();
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, setLoading, startRedirectLoading } = useRedirectLoading();
   const [error, setError] = useState<string>("");
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
@@ -80,7 +81,7 @@ export function RegisterFormIDPIncomplete({
         idpIntent: idpIntent,
       });
 
-      handleServerActionResponse(response, router, setSamlData, setError);
+      handleServerActionResponse(response, router, setSamlData, setError, undefined, startRedirectLoading);
     } catch {
       setError("Could not register user");
     } finally {

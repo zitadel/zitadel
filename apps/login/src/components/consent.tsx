@@ -4,6 +4,7 @@ import { completeDeviceAuthorization } from "@/lib/server/device";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useRedirectLoading } from "@/lib/use-redirect-loading";
 import { useState } from "react";
 import { Alert } from "./alert";
 import { Button, ButtonVariants } from "./button";
@@ -22,7 +23,7 @@ export function ConsentScreen({
   appName?: string;
 }) {
   const t = useTranslations();
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, setLoading, startRedirectLoading } = useRedirectLoading();
   const [error, setError] = useState<string>("");
   const router = useRouter();
 
@@ -38,6 +39,7 @@ export function ConsentScreen({
       });
 
     if (response) {
+      startRedirectLoading();
       return router.push("/device");
     }
   }

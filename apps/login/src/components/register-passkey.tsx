@@ -2,6 +2,7 @@
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
 import { registerPasskeyLink, verifyPasskeyRegistration } from "@/lib/server/passkeys";
+import { useRedirectLoading } from "@/lib/use-redirect-loading";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -40,7 +41,7 @@ export function RegisterPasskey({
 
   const [error, setError] = useState<string>("");
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, setLoading, startRedirectLoading } = useRedirectLoading();
 
   const router = useRouter();
 
@@ -68,9 +69,10 @@ export function RegisterPasskey({
         params.set("loginName", loginName ?? initialLoginName ?? "");
       }
 
+      startRedirectLoading();
       router.push("/passkey?" + params);
     },
-    [organization, requestId, sessionId, userId, initialLoginName, router],
+    [organization, requestId, sessionId, userId, initialLoginName, router, startRedirectLoading],
   );
 
   async function submitVerify(
@@ -203,7 +205,6 @@ export function RegisterPasskey({
       submitRegisterAndContinue();
     }
   }, [code, submitRegisterAndContinue]);
-
   return (
     <form className="w-full">
       {error && (

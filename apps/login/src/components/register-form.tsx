@@ -6,6 +6,7 @@ import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/lega
 import { LoginSettings, PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useRedirectLoading } from "@/lib/use-redirect-loading";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
@@ -58,7 +59,7 @@ export function RegisterForm({
 
   const t = useTranslations("register");
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, setLoading, startRedirectLoading } = useRedirectLoading();
   const [selected, setSelected] = useState<AuthenticationMethod>(methods[0]);
   const [error, setError] = useState<string>("");
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
@@ -76,7 +77,7 @@ export function RegisterForm({
         requestId: requestId,
       });
 
-      handleServerActionResponse(response, router, setSamlData, setError);
+      handleServerActionResponse(response, router, setSamlData, setError, undefined, startRedirectLoading);
 
       return response;
     } catch {
@@ -99,6 +100,7 @@ export function RegisterForm({
 
     // redirect user to /register/password if password is chosen
     if (withPassword) {
+      startRedirectLoading();
       return router.push(`/register/password?` + new URLSearchParams(registerParams));
     } else {
       return submitAndRegister(value);

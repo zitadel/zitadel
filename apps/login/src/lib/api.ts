@@ -6,12 +6,23 @@ import { readFile } from "fs/promises";
 let keyToken: string | undefined;
 let loginClientKeyCache: string | undefined;
 
+function getRequiredEnv(name: keyof NodeJS.ProcessEnv): string {
+  const value = process.env[name];
+
+  if (!value) {
+    throw new Error(`${name} is not set`);
+  }
+
+  return value;
+}
+
 async function getTokenFromFile(): Promise<string> {
   if (keyToken) {
     return keyToken;
   }
 
-  keyToken = await readFile(process.env.SYSTEM_USER_PRIVATE_KEY_FILE, "binary");
+  const keyFile = getRequiredEnv("SYSTEM_USER_PRIVATE_KEY_FILE");
+  keyToken = await readFile(keyFile, "binary");
   return keyToken;
 }
 
@@ -25,13 +36,23 @@ async function getTokenFromFile(): Promise<string> {
  * @throws If the underlying token signing fails.
  */
 export async function systemAPIToken() {
+  const audience = getRequiredEnv("AUDIENCE");
+  const subject = getRequiredEnv("SYSTEM_USER_ID");
   const key = process.env.SYSTEM_USER_PRIVATE_KEY_FILE
     ? await getTokenFromFile()
-    : Buffer.from(process.env.SYSTEM_USER_PRIVATE_KEY, "base64").toString("utf-8");
+    : process.env.SYSTEM_USER_PRIVATE_KEY
+      ? Buffer.from(process.env.SYSTEM_USER_PRIVATE_KEY, "base64").toString("utf-8")
+      : undefined;
+
+  if (!key) {
+    throw new Error(
+      "Missing system API credentials: AUDIENCE, SYSTEM_USER_ID, and SYSTEM_USER_PRIVATE_KEY or SYSTEM_USER_PRIVATE_KEY_FILE",
+    );
+  }
 
   return newSystemToken({
-    audience: process.env.AUDIENCE,
-    subject: process.env.SYSTEM_USER_ID,
+    audience,
+    subject,
     key,
   });
 }

@@ -6,6 +6,7 @@ import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { initialSendVerification, resendVerification, sendVerification } from "@/lib/server/verify";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useRedirectLoading } from "@/lib/use-redirect-loading";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AutoSubmitForm } from "./auto-submit-form";
@@ -45,7 +46,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
   const [error, setError] = useState<string>("");
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, setLoading, startRedirectLoading } = useRedirectLoading();
 
   const initialSendDone = useRef(false);
   const [initialSendError, setInitialSendError] = useState<string>("");
@@ -116,7 +117,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
           requestId: requestId,
         });
 
-        handleServerActionResponse(response, router, setSamlData, setError);
+        handleServerActionResponse(response, router, setSamlData, setError, undefined, startRedirectLoading);
       } catch {
         setError(t("errors.couldNotVerifyUser"));
       } finally {

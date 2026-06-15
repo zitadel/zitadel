@@ -9,6 +9,7 @@ import { RequestChallengesSchema, UserVerificationRequirement } from "@zitadel/p
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useRedirectLoading } from "@/lib/use-redirect-loading";
 import { useEffect, useRef, useState } from "react";
 import { Alert } from "./alert";
 import { AutoSubmitForm } from "./auto-submit-form";
@@ -29,7 +30,7 @@ type Props = {
 
 export function LoginPasskey({ loginName, sessionId, requestId, altPassword, organization, login = true }: Props) {
   const [error, setError] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, setLoading, startRedirectLoading } = useRedirectLoading();
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const t = useTranslations("passkey");
@@ -120,7 +121,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
         requestId,
       });
 
-      const handled = handleServerActionResponse(response, router, setSamlData, setError);
+      const handled = handleServerActionResponse(response, router, setSamlData, setError, undefined, startRedirectLoading);
 
       if (!handled) {
         if (!response) {
@@ -217,6 +218,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
                 params.append("organization", organization);
               }
 
+              startRedirectLoading();
               return router.push(
                 "/password?" + params, // alt is set because password is requested as alternative auth method, so passkey prompt can be escaped
               );

@@ -37,6 +37,26 @@ async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameE
     resolvedSameSite = "lax";
   }
 
+  // Calculate maxAge based on the longest session expiration
+  let maxAge: number | undefined;
+  if (sessions.length > 0) {
+    const now = Date.now();
+    const maxExpirationTs = Math.max(...sessions.map((s) => (s.expirationTs ? Number(s.expirationTs) : 0)));
+
+    if (maxExpirationTs > 0) {
+      // Calculate maxAge in seconds
+      const maxAgeMs = maxExpirationTs - now;
+      if (maxAgeMs > 0) {
+        maxAge = Math.floor(maxAgeMs / 1000);
+      }
+    }
+  }
+
+  // If no sessions, remove the cookie explicitly
+  if (sessions.length === 0) {
+    maxAge = 0;
+  }
+
   return cookiesList.set({
     name: "sessions",
     value: JSON.stringify(sessions),
@@ -44,6 +64,7 @@ async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameE
     path: "/",
     sameSite: resolvedSameSite,
     secure: process.env.NODE_ENV === "production",
+    maxAge: maxAge ?? 30 * 24 * 60 * 60, // Default to 30 days if no valid expiration
   });
 }
 

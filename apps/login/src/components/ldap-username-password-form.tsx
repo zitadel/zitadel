@@ -3,6 +3,7 @@
 import { createNewSessionForLDAP } from "@/lib/server/idp";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useRedirectLoading } from "@/lib/use-redirect-loading";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert } from "./alert";
@@ -44,7 +45,7 @@ export function LDAPUsernamePasswordForm({
 
   const [error, setError] = useState<string>("");
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, setLoading, startRedirectLoading } = useRedirectLoading();
 
   const router = useRouter();
 
@@ -77,6 +78,7 @@ export function LDAPUsernamePasswordForm({
     }
 
     if (response && "redirect" in response && response.redirect) {
+      startRedirectLoading();
       return router.push(response.redirect);
     }
   }

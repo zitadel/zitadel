@@ -7,6 +7,7 @@ import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useRedirectLoading } from "@/lib/use-redirect-loading";
 import { QRCodeSVG } from "qrcode.react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -34,7 +35,7 @@ type Props = {
 };
 export function TotpRegister({ uri, loginName, sessionId, requestId, organization, checkAfter, loginSettings }: Props) {
   const [error, setError] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, setLoading, startRedirectLoading } = useRedirectLoading();
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
   const router = useRouter();
 
@@ -65,6 +66,7 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
             params.append("organization", organization);
           }
 
+          startRedirectLoading();
           return router.push(`/otp/time-based?` + params);
         } else {
           if (requestId && sessionId) {
@@ -77,7 +79,7 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
               loginSettings?.defaultRedirectUri,
             );
 
-            handleServerActionResponse(callbackResponse, router, setSamlData, setError);
+            handleServerActionResponse(callbackResponse, router, setSamlData, setError, undefined, startRedirectLoading);
           } else if (loginName) {
             const callbackResponse = await completeFlowOrGetUrl(
               {
@@ -87,7 +89,7 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
               loginSettings?.defaultRedirectUri,
             );
 
-            handleServerActionResponse(callbackResponse, router, setSamlData, setError);
+            handleServerActionResponse(callbackResponse, router, setSamlData, setError, undefined, startRedirectLoading);
           }
         }
       })
