@@ -92,17 +92,14 @@ func (s *Session) validateToken(ctx context.Context, token string) (*oidc.IDToke
 		return nil, fmt.Errorf("%w: invalid signature: %v", ErrInvalidToken, err)
 	}
 
-	if !claims.GetExpiration().IsZero() {
-		if err = oidc.CheckExpiration(claims, offset); err != nil {
-			return nil, fmt.Errorf("%w: expired: %v", ErrInvalidToken, err)
-		}
+	if err = oidc.CheckExpiration(claims, offset); err != nil {
+		return nil, fmt.Errorf("%w: expired: %v", ErrInvalidToken, err)
 	}
 
-	if !claims.GetIssuedAt().IsZero() {
-		if err = oidc.CheckIssuedAt(claims, maxAge, offset); err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrInvalidToken, err)
-		}
+	if err = oidc.CheckIssuedAt(claims, maxAge, offset); err != nil {
+		return nil, fmt.Errorf("%w: %v", ErrInvalidToken, err)
 	}
+
 	return claims, nil
 }
 
