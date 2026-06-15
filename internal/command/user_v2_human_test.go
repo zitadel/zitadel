@@ -2898,6 +2898,36 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 		},
 		{
+			name: "change human email return-code (self-management), not allowed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
+				tarpit:          expectTarpit(0),
+			},
+			args: args{
+				ctx:   authz.NewMockContext("instance1", "org1", "user1"),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Email: &Email{
+						Address:    "changed@example.com",
+						ReturnCode: true,
+					},
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+				},
+			},
+		},
+		{
 			name: "change human email verified, ok",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -3238,6 +3268,36 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					Phone: &Phone{
 						Number:   "+41791234567",
 						Verified: true,
+					},
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+				},
+			},
+		},
+		{
+			name: "change human phone return-code (self-management), not allowed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
+				tarpit:          expectTarpit(0),
+			},
+			args: args{
+				ctx:   authz.NewMockContext("instance1", "org1", "user1"),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Phone: &Phone{
+						Number:     "+41791234567",
+						ReturnCode: true,
 					},
 				},
 			},
