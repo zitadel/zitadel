@@ -53,8 +53,6 @@ func NewStartedEvent(
 	}
 }
 
-func (*StartedEvent) EnforceResourceOwner() {}
-
 func (e *StartedEvent) Payload() any {
 	return e
 }
