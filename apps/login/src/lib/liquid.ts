@@ -1,44 +1,13 @@
 import "server-only";
 import { Liquid } from "liquidjs";
-import sanitize from "sanitize-html";
+
+export { sanitizeLiquidOutput } from "./sanitize-liquid";
+import { sanitizeLiquidOutput } from "./sanitize-liquid";
 
 const engine = new Liquid({
   strictVariables: false, // Don't throw on missing variables
   strictFilters: false,
 });
-
-/**
- * Sanitize rendered Liquid output: allow structural HTML but block
- * scripts, styles, iframes, and all on* event handler attributes.
- */
-const SANITIZE_OPTIONS: sanitize.IOptions = {
-  allowedTags: sanitize.defaults.allowedTags.concat([
-    "header",
-    "footer",
-    "nav",
-    "section",
-    "article",
-    "aside",
-    "main",
-    "figure",
-    "figcaption",
-    "img",
-    "picture",
-    "source",
-  ]),
-  allowedAttributes: {
-    ...sanitize.defaults.allowedAttributes,
-    "*": ["class", "id", "style", "data-*"],
-    a: ["href", "target", "rel", "class", "id", "style"],
-    img: ["src", "alt", "width", "height", "class", "id", "style"],
-  },
-  // Explicitly disallow all script-related tags
-  disallowedTagsMode: "discard",
-};
-
-export function sanitizeLiquidOutput(html: string): string {
-  return sanitize(html, SANITIZE_OPTIONS);
-}
 
 // ---------------------------------------------------------------------------
 // Slot markers

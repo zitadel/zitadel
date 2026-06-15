@@ -47,7 +47,7 @@ describe("renderLiquidTemplate", () => {
     expect(result).toContain("<footer>Footer</footer>");
   });
 
-  it("renders data attributes for lang and theme", async () => {
+  it("strips arbitrary data-* attributes (only data-liquid-slot is allowed)", async () => {
     const template = '<div data-lang="{{ lang }}" data-theme="{{ theme }}">{{ content }}</div>';
     const result = await renderLiquidTemplate(template, {
       ...defaultVars(),
@@ -55,8 +55,10 @@ describe("renderLiquidTemplate", () => {
       lang: "de",
       theme: "dark",
     });
-    expect(result).toContain('data-lang="de"');
-    expect(result).toContain('data-theme="dark"');
+    // data-lang and data-theme are stripped — only data-liquid-slot is whitelisted
+    expect(result).not.toContain("data-lang");
+    expect(result).not.toContain("data-theme");
+    expect(result).toContain("test");
   });
 
   it("renders organization and instance_host variables", async () => {
@@ -167,6 +169,178 @@ describe("sanitizeLiquidOutput", () => {
     const result = sanitizeLiquidOutput(html);
     expect(result).toContain('data-liquid-slot="theme_switcher"');
     expect(result).toContain("display:flex");
+  });
+
+  // ---------------------------------------------------------------
+  // XSS attack vector tests
+  // ---------------------------------------------------------------
+
+  it("strips <script> tags", () => {
+    const result = sanitizeLiquidOutput('<div><script>alert("xss")</script></div>');
+    expect(result).not.toContain("<script");
+    expect(result).not.toContain("alert");
+  });
+
+  it("strips <script> tags with attributes", () => {
+    const result = sanitizeLiquidOutput(
+      '<div><script type="text/javascript" src="evil.js"></script></div>',
+    );
+    expect(result).not.toContain("<script");
+    expect(result).not.toContain("evil.js");
+  });
+
+  it("strips on* event handler attributes", () => {
+    const result = sanitizeLiquidOutput('<div onclick="alert(1)" onmouseover="hack()">test</div>');
+    expect(result).not.toContain("onclick");
+    expect(result).not.toContain("onmouseover");
+    expect(result).toContain("test");
+  });
+
+  it("strips javascript: URIs in href", () => {
+    const result = sanitizeLiquidOutput('<a href="javascript:alert(1)">click</a>');
+    expect(result).not.toContain("javascript:");
+    expect(result).toContain("click");
+  });
+
+  it("strips case-varied javascript: URIs", () => {
+    const result = sanitizeLiquidOutput('<a href="JAVASCRIPT:alert(1)">click</a>');
+    expect(result).not.toContain("JAVASCRIPT:");
+    expect(result).not.toContain("javascript:");
+  });
+
+  it("strips javascript: URIs with tab injection", () => {
+    const result = sanitizeLiquidOutput('<a href="java\tscript:alert(1)">click</a>');
+    expect(result).not.toContain("alert");
+  });
+
+  it("strips HTML entity encoded javascript: URIs", () => {
+    const result = sanitizeLiquidOutput('<a href="&#106;avascript:alert(1)">click</a>');
+    expect(result).not.toContain("alert");
+  });
+
+  it("strips data: URIs with scripts in href", () => {
+    const result = sanitizeLiquidOutput(
+      '<a href="data:text/html,<script>alert(1)</script>">click</a>',
+    );
+    expect(result).not.toContain("data:");
+    expect(result).not.toContain("alert");
+  });
+
+  it("strips <svg> tags and SVG-based XSS", () => {
+    const result = sanitizeLiquidOutput('<svg onload="alert(1)"><circle></circle></svg>');
+    expect(result).not.toContain("<svg");
+    expect(result).not.toContain("onload");
+    expect(result).not.toContain("alert");
+  });
+
+  it("strips <iframe> tags", () => {
+    const result = sanitizeLiquidOutput('<iframe src="https://evil.com"></iframe>');
+    expect(result).not.toContain("<iframe");
+    expect(result).not.toContain("evil.com");
+  });
+
+  it("strips <form> tags", () => {
+    const result = sanitizeLiquidOutput(
+      '<form action="https://evil.com"><input type="submit"></form>',
+    );
+    expect(result).not.toContain("<form");
+    expect(result).not.toContain("<input");
+    expect(result).not.toContain("evil.com");
+  });
+
+  it("strips <object> and <embed> tags", () => {
+    const result = sanitizeLiquidOutput(
+      '<object data="evil.swf"></object><embed src="evil.swf">',
+    );
+    expect(result).not.toContain("<object");
+    expect(result).not.toContain("<embed");
+    expect(result).not.toContain("evil.swf");
+  });
+
+  it("strips <meta> refresh redirect", () => {
+    const result = sanitizeLiquidOutput(
+      '<meta http-equiv="refresh" content="0;url=https://evil.com">',
+    );
+    expect(result).not.toContain("<meta");
+    expect(result).not.toContain("evil.com");
+  });
+
+  it("strips <base> tag", () => {
+    const result = sanitizeLiquidOutput('<base href="https://evil.com">');
+    expect(result).not.toContain("<base");
+    expect(result).not.toContain("evil.com");
+  });
+
+  it("strips <style> tags", () => {
+    const result = sanitizeLiquidOutput("<style>body { display: none; }</style><div>ok</div>");
+    expect(result).not.toContain("<style");
+    expect(result).not.toContain("display: none");
+  });
+
+  it("strips ontoggle event handlers", () => {
+    const result = sanitizeLiquidOutput(
+      '<details open ontoggle="alert(1)"><summary>X</summary></details>',
+    );
+    expect(result).not.toContain("ontoggle");
+    expect(result).not.toContain("alert");
+  });
+
+  it("neutralises math/mXSS mutation vectors", () => {
+    const result = sanitizeLiquidOutput(
+      '<math><mtext><table><mglyph><style><!--</style><img title="--></style><img src=1 onerror=alert(1)">',
+    );
+    expect(result).not.toContain("onerror");
+    expect(result).not.toContain("alert");
+  });
+
+  it("strips arbitrary data-* attributes but preserves data-liquid-slot", () => {
+    const html =
+      '<div data-liquid-slot="theme_switcher" data-custom="evil" data-foo="bar">ok</div>';
+    const result = sanitizeLiquidOutput(html);
+    expect(result).toContain('data-liquid-slot="theme_switcher"');
+    expect(result).not.toContain("data-custom");
+    expect(result).not.toContain("data-foo");
+    expect(result).toContain("ok");
+  });
+
+  it("allows safe href schemes (http, https, mailto, tel)", () => {
+    const result = sanitizeLiquidOutput(
+      '<a href="https://example.com">https</a>' +
+        '<a href="http://example.com">http</a>' +
+        '<a href="mailto:user@example.com">mail</a>' +
+        '<a href="tel:+1234567890">phone</a>',
+    );
+    expect(result).toContain('href="https://example.com"');
+    expect(result).toContain('href="http://example.com"');
+    expect(result).toContain('href="mailto:user@example.com"');
+    expect(result).toContain('href="tel:+1234567890"');
+  });
+
+  // ---------------------------------------------------------------
+  // End-to-end pipeline: template → render → sanitize → split
+  // ---------------------------------------------------------------
+
+  it("blocks scripts injected through Liquid template variables", async () => {
+    const template = "<div>{{ user_content }}</div>";
+    const result = await renderLiquidTemplate(template, {
+      ...defaultVars(),
+      user_content: '<img src=x onerror="alert(document.cookie)">',
+    });
+    expect(result).not.toContain("onerror");
+    expect(result).not.toContain("alert");
+  });
+
+  it("blocks script injection through splitAtContent pipeline", () => {
+    const raw = `<script>alert("before")</script>${CONTENT_SENTINEL}<script>alert("after")</script>`;
+    const { before, after } = splitAtContent(raw);
+    expect(before).not.toContain("<script");
+    expect(after).not.toContain("<script");
+  });
+
+  it("blocks javascript: URIs through splitAtContent pipeline", () => {
+    const raw = `<a href="javascript:alert(1)">evil</a>${CONTENT_SENTINEL}<footer>ok</footer>`;
+    const { before, after } = splitAtContent(raw);
+    expect(before).not.toContain("javascript:");
   });
 });
 

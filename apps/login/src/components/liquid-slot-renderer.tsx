@@ -2,6 +2,14 @@
 
 import { createPortal } from "react-dom";
 import { ReactNode, useEffect, useRef, useState } from "react";
+import { sanitizeLiquidOutput } from "@/lib/sanitize-liquid";
+
+/**
+ * Known slot names that the portal system recognises.
+ * Any `data-liquid-slot` value NOT in this set is silently ignored
+ * so a malicious template cannot create arbitrary portal mount points.
+ */
+const ALLOWED_SLOT_NAMES = new Set(["theme_switcher", "language_switcher"]);
 
 /**
  * Client component that renders sanitized HTML and mounts React components
@@ -9,12 +17,20 @@ import { ReactNode, useEffect, useRef, useState } from "react";
  *
  * How it works:
  * 1. The container div is initially rendered empty by React.
- * 2. On mount, `useEffect` sets `container.innerHTML` to inject the
- *    sanitized HTML.  Because React never "owns" these DOM nodes (no
- *    `dangerouslySetInnerHTML`), they persist across re‑renders.
+ * 2. On mount, `useEffect` re-sanitizes the html (defense-in-depth) and
+ *    sets `container.innerHTML`.  Because React never "owns" these DOM
+ *    nodes (no `dangerouslySetInnerHTML`), they persist across re‑renders.
  * 3. `querySelectorAll("[data-liquid-slot]")` finds the placeholder
- *    elements, and `createPortal` mounts the corresponding React
- *    components into them.
+ *    elements, filters against ALLOWED_SLOT_NAMES, and `createPortal`
+ *    mounts the corresponding React components into them.
+ *
+ * Security:
+ * - The `html` prop MUST have been sanitized by `sanitizeLiquidOutput`
+ *   before reaching this component (done in `splitAtContent`).
+ * - As defense-in-depth this component re-sanitizes the html before
+ *   injecting it via innerHTML.
+ * - Only known slot names are accepted; unknown `data-liquid-slot`
+ *   values are ignored.
  *
  * Why NOT dangerouslySetInnerHTML:
  * React treats content set via `dangerouslySetInnerHTML` as its own.
@@ -38,15 +54,18 @@ export function LiquidSlotRenderer({
     const container = containerRef.current;
     if (!container) return;
 
-    // Inject HTML manually so React does NOT manage these DOM nodes.
-    // They persist across re-renders, keeping portal targets valid.
-    container.innerHTML = html;
+    // Defense-in-depth: re-sanitize even though the caller already did.
+    // This ensures safety if the call-site ever changes or a new caller
+    // is introduced without proper sanitization.
+    container.innerHTML = sanitizeLiquidOutput(html);
 
-    // Find slot placeholder elements
+    // Find slot placeholder elements — only accept known slot names.
     const found: Array<[string, Element]> = [];
     container.querySelectorAll("[data-liquid-slot]").forEach((el) => {
       const name = el.getAttribute("data-liquid-slot");
-      if (name) found.push([name, el]);
+      if (name && ALLOWED_SLOT_NAMES.has(name)) {
+        found.push([name, el]);
+      }
     });
 
     slotRefs.current = found;
