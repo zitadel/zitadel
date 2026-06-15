@@ -11,6 +11,14 @@ import (
 // fipsPBKDF2MinIterations is the minimum PBKDF2 iteration count per NIST SP 800-132 §5.2.
 const fipsPBKDF2MinIterations uint32 = 1000
 
+// fips140Mode reports whether FIPS 140-3 application policies are enforced.
+// Defaults to crypto/fips140.Enabled; tests in this package may replace it.
+var fips140Mode = fips140.Enabled
+
+func fips140Enabled() bool {
+	return fips140Mode()
+}
+
 // IsFIPSCompliant reports whether the algorithm is approved for password
 // hashing/verification under FIPS 140-3 (NIST SP 800-132).
 func (n HashName) IsFIPSCompliant() bool {
@@ -54,7 +62,7 @@ func validateFIPSPBKDF2Hasher(c HasherConfig) error {
 }
 
 func (c *HashConfig) validateFIPS140() error {
-	if !fips140.Enabled() {
+	if !fips140Enabled() {
 		return nil
 	}
 

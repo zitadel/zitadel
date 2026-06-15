@@ -1,13 +1,19 @@
 package crypto
 
 import (
-	"crypto/fips140"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func withFIPS140Enabled(t *testing.T) {
+	t.Helper()
+	prev := fips140Mode
+	fips140Mode = func() bool { return true }
+	t.Cleanup(func() { fips140Mode = prev })
+}
 
 func TestHashName_IsFIPSCompliant(t *testing.T) {
 	tests := []struct {
@@ -123,9 +129,7 @@ func TestValidateFIPSPBKDF2Hasher(t *testing.T) {
 }
 
 func TestHashConfig_validateFIPS140(t *testing.T) {
-	if !fips140.Enabled() {
-		t.Skip("FIPS mode not enabled; run with GODEBUG=fips140=on on a GOFIPS140 build")
-	}
+	withFIPS140Enabled(t)
 
 	t.Run("bcrypt hasher fails", func(t *testing.T) {
 		cfg := &HashConfig{
@@ -161,9 +165,7 @@ func TestHashConfig_validateFIPS140(t *testing.T) {
 }
 
 func TestHashConfig_NewHasher_FIPSBcryptFails(t *testing.T) {
-	if !fips140.Enabled() {
-		t.Skip("FIPS mode not enabled; run with GODEBUG=fips140=on on a GOFIPS140 build")
-	}
+	withFIPS140Enabled(t)
 
 	cfg := &HashConfig{
 		Hasher: HasherConfig{
