@@ -13,12 +13,36 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-// GetActiveEmailConfig reads the iam SMTP provider config
-func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context) (*email.Config, error) {
+// GetActiveEmailConfig reads the SMTP provider config for the given org.
+// Uses org-level SMTP when available. When orgID is empty, uses instance-level
+// SMTP (backward compatibility). When orgID is set but org has no config,
+// behavior depends on OrgSMTPFallbackToInstance: if true, falls back to
+// instance-level; if false, returns an error.
+func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context, orgID string) (*email.Config, error) {
+	if orgID != "" {
+		config, err := n.OrgSMTPConfigActive(ctx, orgID)
+		if err == nil {
+			return n.smtpConfigToEmailConfig(config)
+		}
+		// Only fall back on "not found" — propagate real errors (DB failures, etc.)
+		if !zerrors.IsNotFound(err) {
+			return nil, err
+		}
+		if !n.OrgSMTPFallbackToInstance {
+			return nil, err
+		}
+		// fall through to instance-level
+	}
 	config, err := n.SMTPConfigActive(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
+	return n.smtpConfigToEmailConfig(config)
+}
+
+// smtpConfigToEmailConfig converts a query.SMTPConfig to an email.Config,
+// handling SMTP, HTTP webhook, and crypto decryption.
+func (n *NotificationQueries) smtpConfigToEmailConfig(config *query.SMTPConfig) (*email.Config, error) {
 	provider := &email.Provider{
 		ID:          config.ID,
 		Description: config.Description,
@@ -39,7 +63,7 @@ func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context) (*email.
 			},
 		}, nil
 	}
-	return nil, zerrors.ThrowNotFound(err, "QUERY-KPQleOckOV", "Errors.SMTPConfig.NotFound")
+	return nil, zerrors.ThrowNotFound(nil, "QUERY-KPQleOckOV", "Errors.SMTPConfig.NotFound")
 }
 
 func smtpToEmailConfig(qs *query.SMTP, provider *email.Provider, passCrypto crypto.EncryptionAlgorithm) (*email.Config, error) {

@@ -62,6 +62,7 @@ var (
 	InstanceProjection                  *handler.Handler
 	SecretGeneratorProjection           *handler.Handler
 	SMTPConfigProjection                *handler.Handler
+	OrgSMTPConfigProjection             *handler.Handler
 	SMSConfigProjection                 *handler.Handler
 	OIDCSettingsProjection              *handler.Handler
 	DebugNotificationProviderProjection *handler.Handler
@@ -173,6 +174,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	InstanceProjection = newInstanceProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances"]))
 	SecretGeneratorProjection = newSecretGeneratorProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["secret_generators"]))
 	SMTPConfigProjection = newSMTPConfigProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["smtp_configs"]))
+	OrgSMTPConfigProjection = newOrgSMTPConfigProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_smtp_configs"]))
 	SMSConfigProjection = newSMSConfigProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["sms_config"]))
 	OIDCSettingsProjection = newOIDCSettingsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["oidc_settings"]))
 	DebugNotificationProviderProjection = newDebugNotificationProviderProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["debug_notification_provider"]))
@@ -367,6 +369,7 @@ func newProjectionsList() {
 		InstanceProjection,
 		SecretGeneratorProjection,
 		SMTPConfigProjection,
+		OrgSMTPConfigProjection,
 		SMSConfigProjection,
 		OIDCSettingsProjection,
 		DebugNotificationProviderProjection,

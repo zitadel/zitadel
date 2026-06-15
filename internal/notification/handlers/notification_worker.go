@@ -79,11 +79,12 @@ func (w *NotificationWorker) Work(ctx context.Context, job *river.Job[*notificat
 }
 
 type WorkerConfig struct {
-	LegacyEnabled       bool
-	Workers             uint8
-	TransactionDuration time.Duration
-	MaxTtl              time.Duration
-	MaxAttempts         uint8
+	LegacyEnabled              bool
+	Workers                    uint8
+	TransactionDuration        time.Duration
+	MaxTtl                     time.Duration
+	MaxAttempts                uint8
+	OrgSMTPFallbackToInstance  bool
 }
 
 // nowFunc makes [time.Now] mockable
