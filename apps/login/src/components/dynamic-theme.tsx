@@ -100,10 +100,6 @@ export async function DynamicTheme({
   // (switcher placeholders survive sanitization as real elements)
   const { before, after } = splitAtContent(raw);
 
-  console.log("[liquid] raw length:", raw.length);
-  console.log("[liquid] before:", JSON.stringify(before));
-  console.log("[liquid] after:", JSON.stringify(after));
-
   return (
     <>
       {before && (
