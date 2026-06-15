@@ -87,7 +87,7 @@ func (s *Session) validateToken(ctx context.Context, token string) (*oidc.IDToke
 	}
 
 	logging.Debug("begin signature validation")
-	keySet := rp.NewRemoteKeySet(http.DefaultClient, s.Provider.keysEndpoint)
+	keySet := rp.NewRemoteKeySet(s.httpClient, s.keysEndpoint)
 	if err = oidc.CheckSignature(ctx, token, payload, claims, nil, keySet); err != nil {
 		return nil, fmt.Errorf("%w: invalid signature: %v", ErrInvalidToken, err)
 	}
@@ -100,6 +100,11 @@ func (s *Session) validateToken(ctx context.Context, token string) (*oidc.IDToke
 		return nil, fmt.Errorf("%w: %v", ErrInvalidToken, err)
 	}
 
+	if s.Provider.audience != "" {
+		if err = oidc.CheckAudience(claims, s.Provider.audience); err != nil {
+			return nil, fmt.Errorf("%w: %v", ErrInvalidToken, err)
+		}
+	}
 	return claims, nil
 }
 

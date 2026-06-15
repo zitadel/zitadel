@@ -170,6 +170,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		MaxRetries: config.Eventstore.MaxRetries,
 	}))
 
+	httpClient := config.HTTPClient.NewClient()
+
 	steps.s1ProjectionTable = &ProjectionTable{dbClient: dbClient.DB}
 	steps.s2AssetsTable = &AssetTable{dbClient: dbClient.DB}
 
@@ -187,6 +189,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.FirstInstance.externalSecure = config.ExternalSecure
 	steps.FirstInstance.externalPort = config.ExternalPort
 	steps.FirstInstance.defaultPaths = config.Login.DefaultPaths
+	steps.FirstInstance.httpClient = httpClient
+	steps.FirstInstance.denylist = config.HTTPClient.DenyList
 
 	steps.s5LastFailed = &LastFailed{dbClient: dbClient.DB}
 	steps.s6OwnerRemoveColumns = &OwnerRemoveColumns{dbClient: dbClient.DB}
@@ -249,6 +253,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s68TargetAddPayloadTypeColumn = &TargetAddPayloadTypeColumn{dbClient: dbClient}
 	steps.s69CacheTablesLogged = &CacheTablesLogged{dbClient: dbClient}
 	steps.s70AddEventStoreCommandEnforceOwner = &AddEventStoreCommandEnforceOwnerColumn{dbClient: dbClient}
+	steps.s71JWTProvideAddAudienceColumn = &JWTProvideAddAudienceColumn{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	if err != nil {
@@ -314,7 +319,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		}
 	}
 
-	commands, _, _, _ := startCommandsQueries(ctx, eventstoreClient, eventstoreV4, dbClient, masterKey, config)
+	commands, _, _, _ := startCommandsQueries(ctx, eventstoreClient, eventstoreV4, dbClient, masterKey, config, httpClient)
 	steps.s59SetupWebkeys = &SetupWebkeys{eventstore: eventstoreClient, commands: commands}
 
 	repeatableSteps := []migration.RepeatableMigration{
@@ -372,6 +377,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s59SetupWebkeys, // this step needs commands.
 		steps.s66SessionRecoveryCodeCheckedAt,
 		steps.s68TargetAddPayloadTypeColumn,
+		steps.s71JWTProvideAddAudienceColumn,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
@@ -452,6 +458,7 @@ func startCommandsQueries(
 	dbClient *database.DB,
 	masterKey string,
 	config *Config,
+	httpClient *http.Client,
 ) (
 	*command.Commands,
 	*query.Queries,
@@ -570,7 +577,7 @@ func startCommandsQueries(
 		keys.SAML,
 		keys.Target,
 		keys.OIDC,
-		&http.Client{},
+		httpClient,
 		permissionCheck,
 		sessionTokenVerifier,
 		config.OIDC.DefaultAccessTokenLifetime,
@@ -578,7 +585,7 @@ func startCommandsQueries(
 		config.OIDC.DefaultRefreshTokenIdleExpiration,
 		config.DefaultInstance.SecretGenerators,
 		config.Login.DefaultPaths,
-		config.Executions.DenyList,
+		config.HTTPClient.DenyList,
 	)
 	logging.OnError(ctx, err).Fatal("unable to start commands")
 
@@ -608,6 +615,7 @@ func startCommandsQueries(
 		keys.SMTP,
 		keys.SMS,
 		q,
+		httpClient,
 	)
 
 	return commands, queries, adminView, authView

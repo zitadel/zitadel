@@ -19,6 +19,7 @@ import (
 	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/cache/connector"
@@ -64,6 +65,7 @@ type Config struct {
 	WebAuthNName    string
 	Telemetry       *handlers.TelemetryPusherConfig
 	SystemAPIUsers  map[string]*authz.SystemAPIUser
+	HTTPClient      http.ClientConfig
 }
 
 type InitProjections struct {
@@ -113,6 +115,8 @@ func NewConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.Shu
 	}
 
 	id.Configure(config.Machine)
+
+	config.HTTPClient.MergeDeprecatedDenylists(nil, config.Executions.DenyList)
 
 	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.
 	config.DefaultInstance.RolePermissionMappings = config.InternalAuthZ.RolePermissionMappings
@@ -186,6 +190,7 @@ type Steps struct {
 	s68TargetAddPayloadTypeColumn           *TargetAddPayloadTypeColumn
 	s69CacheTablesLogged                    *CacheTablesLogged
 	s70AddEventStoreCommandEnforceOwner     *AddEventStoreCommandEnforceOwnerColumn
+	s71JWTProvideAddAudienceColumn          *JWTProvideAddAudienceColumn
 	RelationalTables                        *TransactionalTables
 }
 
