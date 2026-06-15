@@ -61,6 +61,7 @@ func newExecutionWorker(f fieldsWorker) *execution.Worker {
 		nil,
 		mockGetActiveSigningWebKey,
 		f.now,
+		http.DefaultClient,
 	)
 }
 

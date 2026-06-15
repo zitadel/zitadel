@@ -36,6 +36,7 @@ func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context) (*email.
 				Method:     http.MethodPost,
 				Headers:    nil,
 				SigningKey: config.HTTPConfig.SigningKey,
+				Client:     n.httpClient,
 			},
 		}, nil
 	}

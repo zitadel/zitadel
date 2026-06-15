@@ -1053,6 +1053,7 @@ func (l *Login) googleProvider(ctx context.Context, identityProvider *query.IDPT
 		secret,
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.GoogleIDPTemplate.Scopes,
+		l.httpClient,
 	)
 }
 
@@ -1079,6 +1080,7 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.OIDCIDPTemplate.Scopes,
 		openid.DefaultMapper,
+		l.httpClient,
 		opts...,
 	)
 }
@@ -1092,6 +1094,7 @@ func (l *Login) jwtProvider(identityProvider *query.IDPTemplate) (*jwt.Provider,
 		identityProvider.JWTIDPTemplate.HeaderName,
 		identityProvider.JWTIDPTemplate.Audience,
 		l.idpConfigAlg,
+		l.httpClient,
 	)
 }
 
@@ -1123,6 +1126,7 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 		func() idp.User {
 			return oauth.NewUserMapper(identityProvider.OAuthIDPTemplate.IDAttribute)
 		},
+		l.httpClient,
 		opts...,
 	)
 }
@@ -1176,6 +1180,7 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 		identityProvider.Metadata,
 		identityProvider.Certificate,
 		key,
+		l.httpClient,
 		opts...,
 	)
 }
@@ -1198,6 +1203,7 @@ func (l *Login) azureProvider(ctx context.Context, identityProvider *query.IDPTe
 		secret,
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.AzureADIDPTemplate.Scopes,
+		l.httpClient,
 		opts...,
 	)
 }
@@ -1212,6 +1218,7 @@ func (l *Login) githubProvider(ctx context.Context, identityProvider *query.IDPT
 		secret,
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.GitHubIDPTemplate.Scopes,
+		l.httpClient,
 	)
 }
 
@@ -1229,6 +1236,7 @@ func (l *Login) githubEnterpriseProvider(ctx context.Context, identityProvider *
 		identityProvider.GitHubEnterpriseIDPTemplate.TokenEndpoint,
 		identityProvider.GitHubEnterpriseIDPTemplate.UserEndpoint,
 		identityProvider.GitHubIDPTemplate.Scopes,
+		l.httpClient,
 	)
 }
 
@@ -1242,6 +1250,7 @@ func (l *Login) gitlabProvider(ctx context.Context, identityProvider *query.IDPT
 		secret,
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.GitLabIDPTemplate.Scopes,
+		l.httpClient,
 	)
 }
 
@@ -1257,6 +1266,7 @@ func (l *Login) gitlabSelfHostedProvider(ctx context.Context, identityProvider *
 		secret,
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.GitLabSelfHostedIDPTemplate.Scopes,
+		l.httpClient,
 	)
 }
 
@@ -1272,6 +1282,7 @@ func (l *Login) appleProvider(ctx context.Context, identityProvider *query.IDPTe
 		l.baseURL(ctx)+EndpointExternalLoginCallbackFormPost,
 		privateKey,
 		identityProvider.AppleIDPTemplate.Scopes,
+		l.httpClient,
 	)
 }
 
