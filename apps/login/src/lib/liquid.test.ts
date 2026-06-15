@@ -14,6 +14,7 @@ import {
   THEME_SWITCHER_PLACEHOLDER,
   LANGUAGE_SWITCHER_PLACEHOLDER,
   LiquidTemplateVars,
+  TranslationFn,
 } from "./liquid";
 
 // Helper to build default vars with slot markers
@@ -461,5 +462,100 @@ describe("DEFAULT_LIQUID_TEMPLATE", () => {
     expect(raw).toContain(CONTENT_SENTINEL);
     expect(raw).toContain('data-liquid-slot="theme_switcher"');
     expect(raw).toContain('data-liquid-slot="language_switcher"');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// {% t %} tag — translation support
+// ---------------------------------------------------------------------------
+
+describe("{% t %} tag", () => {
+  // Simple mock translation function
+  const mockT: TranslationFn = (key: string, values?: Record<string, unknown>) => {
+    const translations: Record<string, string> = {
+      "loginname.title": "Welcome back!",
+      "loginname.description": "Enter your login details.",
+      "signedin.title": values?.user ? `Welcome ${values.user}!` : "Welcome!",
+      "password.complexity.length": values?.minLength
+        ? `Must be at least ${values.minLength} characters long.`
+        : "Must be at least N characters long.",
+      "logout.verifiedAt": values?.time ? `Last active: ${values.time}` : "Last active: unknown",
+    };
+    const result = translations[key];
+    if (result === undefined) throw new Error(`Missing key: ${key}`);
+    return result;
+  };
+
+  function varsWithT(overrides?: Partial<LiquidTemplateVars>): LiquidTemplateVars {
+    return defaultVars({ __t: mockT, ...overrides });
+  }
+
+  it("resolves a simple translation key", async () => {
+    const template = '<h1>{% t "loginname.title" %}</h1>';
+    const result = await renderLiquidTemplateRaw(template, varsWithT());
+    expect(result).toBe("<h1>Welcome back!</h1>");
+  });
+
+  it("resolves a translation key with named parameters (ICU interpolation)", async () => {
+    const template = '{% t "signedin.title" user: "John" %}';
+    const result = await renderLiquidTemplateRaw(template, varsWithT());
+    expect(result).toBe("Welcome John!");
+  });
+
+  it("resolves a translation key with multiple named parameters", async () => {
+    const template = '{% t "logout.verifiedAt" time: "2 hours ago" %}';
+    const result = await renderLiquidTemplateRaw(template, varsWithT());
+    expect(result).toBe("Last active: 2 hours ago");
+  });
+
+  it("resolves parameters from Liquid variables", async () => {
+    const template = '{% t "signedin.title" user: username %}';
+    const result = await renderLiquidTemplateRaw(template, varsWithT({ username: "Alice" }));
+    expect(result).toBe("Welcome Alice!");
+  });
+
+  it("falls back to key when no __t function is provided", async () => {
+    const template = '{% t "loginname.title" %}';
+    const result = await renderLiquidTemplateRaw(template, defaultVars());
+    expect(result).toBe("loginname.title");
+  });
+
+  it("falls back to key when translation key is not found", async () => {
+    const template = '{% t "nonexistent.key" %}';
+    const result = await renderLiquidTemplateRaw(template, varsWithT());
+    expect(result).toBe("nonexistent.key");
+  });
+
+  it("works with deeply nested dot-separated keys", async () => {
+    const template = '{% t "password.complexity.length" minLength: "12" %}';
+    const result = await renderLiquidTemplateRaw(template, varsWithT());
+    expect(result).toBe("Must be at least 12 characters long.");
+  });
+
+  it("HTML-escapes translated output after sanitization", async () => {
+    const xssT: TranslationFn = () => '<script>alert("xss")</script>Translated';
+    const template = '{% t "any.key" %}';
+    const result = await renderLiquidTemplate(template, defaultVars({ __t: xssT }));
+    expect(result).not.toContain("<script>");
+    expect(result).toContain("Translated");
+  });
+
+  it("supports multiple t tags in a single template", async () => {
+    const template = '<h1>{% t "loginname.title" %}</h1><p>{% t "loginname.description" %}</p>';
+    const result = await renderLiquidTemplateRaw(template, varsWithT());
+    expect(result).toBe("<h1>Welcome back!</h1><p>Enter your login details.</p>");
+  });
+
+  it("works alongside regular Liquid variables", async () => {
+    const template = '<div lang="{{ lang }}">{% t "loginname.title" %}</div>';
+    const result = await renderLiquidTemplateRaw(template, varsWithT({ lang: "en" }));
+    expect(result).toBe('<div lang="en">Welcome back!</div>');
+  });
+
+  it("throws a parse error when key is not quoted", async () => {
+    const template = "{% t loginname.title %}";
+    const result = await renderLiquidTemplateRaw(template, varsWithT());
+    // renderLiquidTemplateRaw returns undefined on parse/render failure
+    expect(result).toBeUndefined();
   });
 });

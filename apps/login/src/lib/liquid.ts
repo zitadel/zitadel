@@ -1,12 +1,88 @@
 import "server-only";
-import { Liquid } from "liquidjs";
+import { Liquid, Tag, Context, TagToken, TopLevelToken, Hash } from "liquidjs";
 
 export { sanitizeLiquidOutput } from "./sanitize-liquid";
 import { sanitizeLiquidOutput } from "./sanitize-liquid";
 
+// ---------------------------------------------------------------------------
+// Translation function type
+//
+// Matches the signature returned by next-intl's `getTranslations()` without
+// a namespace: `t("namespace.key", { param: value })`.
+// ---------------------------------------------------------------------------
+
+/**
+ * A translation function that resolves a dotted key and optional interpolation
+ * values into a translated string. Matches next-intl's `getTranslations()`.
+ */
+export type TranslationFn = (key: string, values?: Record<string, unknown>) => string;
+
 const engine = new Liquid({
   strictVariables: false, // Don't throw on missing variables
   strictFilters: false,
+});
+
+// ---------------------------------------------------------------------------
+// Custom "t" tag — {% t "key" param: "value" %}
+//
+// Looks up a translation key via the `__t` function injected into the Liquid
+// context at render time. The key is a string literal (quoted).
+// Named parameters use Liquid's standard hash syntax (key: value) and are
+// forwarded as ICU interpolation values.
+//
+// Examples:
+//   {% t "loginname.title" %}
+//   {% t "signedin.title" user: "John" %}
+//   {% t "password.complexity.length" minLength: "8" %}
+//   {% t "signedin.title" user: username %}  ← variable reference
+// ---------------------------------------------------------------------------
+
+engine.registerTag("t", class TranslateTag extends Tag {
+  private key: string;
+  private hash: Hash;
+
+  constructor(tagToken: TagToken, remainTokens: TopLevelToken[], liquid: Liquid) {
+    super(tagToken, remainTokens, liquid);
+
+    const args = tagToken.args.trim();
+
+    // Extract the quoted key (first argument)
+    const keyMatch = args.match(/^(["'])(.+?)\1/);
+    if (!keyMatch) {
+      throw new Error(
+        `{% t %} tag requires a quoted translation key, e.g. {% t "loginname.title" %}. Got: ${args}`,
+      );
+    }
+    this.key = keyMatch[2];
+
+    // Parse remaining args as named hash parameters using Liquid's
+    // standard "key: value" syntax.
+    const remaining = args.slice(keyMatch[0].length).trim();
+    this.hash = new Hash(remaining);
+  }
+
+  *render(ctx: Context): Generator<unknown, string, unknown> {
+    // Access the translation function from the top-level Liquid scope.
+    // We use `ctx.environments` directly because `ctx.get(["__t"])` uses
+    // LiquidJS's property-path traversal which doesn't find `__t`.
+    const envs = ctx.environments as Record<string, unknown>;
+    const t = envs["__t"] as TranslationFn | undefined;
+    if (!t) {
+      // No translation function available — return the key as-is
+      return this.key;
+    }
+
+    // Resolve hash parameters (handles both literals and variable references)
+    const params = (yield this.hash.render(ctx)) as Record<string, unknown>;
+
+    try {
+      const hasParams = Object.keys(params).length > 0;
+      return t(this.key, hasParams ? params : undefined);
+    } catch {
+      // Translation key not found or format error — return the key
+      return this.key;
+    }
+  }
 });
 
 // ---------------------------------------------------------------------------
@@ -49,6 +125,8 @@ export interface LiquidTemplateVars {
   theme?: string;
   organization?: string;
   instance_host?: string;
+  /** Translation function injected into the context for the {% t %} tag. */
+  __t?: TranslationFn;
   [key: string]: unknown;
 }
 

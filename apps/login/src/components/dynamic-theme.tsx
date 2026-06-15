@@ -8,6 +8,7 @@ import {
   LANGUAGE_SWITCHER_PLACEHOLDER,
 } from "@/lib/liquid";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ReactNode } from "react";
 import { DynamicThemeClient } from "./dynamic-theme-client";
 import { LanguageSwitcherSlot } from "./language-switcher-slot";
@@ -52,6 +53,10 @@ function DefaultLayout({
  * The {{ theme_switcher }} and {{ language_switcher }} slots use element-based
  * placeholders that survive sanitization, then React portals mount the actual
  * components into them — preserving the template's HTML structure (flex, grid, etc.).
+ *
+ * **Translation support**: Templates can use `{% t "key" %}` or
+ * `{% t "key" param="value" %}` to output translated strings.
+ * The translations are resolved server-side via next-intl's `getTranslations()`.
  */
 export async function DynamicTheme({
   branding,
@@ -76,17 +81,29 @@ export async function DynamicTheme({
     language_switcher: <LanguageSwitcherSlot />,
   };
 
+  // Resolve locale and translation function for the {% t %} tag
+  const locale = await getLocale();
+  const t = await getTranslations();
+
   // Build Liquid variables:
   // - content uses a comment sentinel (split server-side for SSR)
   // - switcher slots use element placeholders (mounted via portals)
+  // - __t injects the translation function for the {% t %} tag
   const vars: LiquidTemplateVars = {
     content: CONTENT_SENTINEL,
     theme_switcher: THEME_SWITCHER_PLACEHOLDER,
     language_switcher: LANGUAGE_SWITCHER_PLACEHOLDER,
-    lang: "", // TODO: pass locale when available at this level
+    lang: locale,
     theme: "", // Resolved client-side by ThemeWrapper
     organization: "",
     instance_host: "",
+    __t: (key: string, values?: Record<string, unknown>) => {
+      try {
+        return values ? t(key as never, values as never) : t(key as never);
+      } catch {
+        return key;
+      }
+    },
   };
 
   const raw = await renderLiquidTemplateRaw(template, vars);
@@ -112,3 +129,4 @@ export async function DynamicTheme({
     </>
   );
 }
+
