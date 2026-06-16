@@ -62,14 +62,12 @@ describe("renderLiquidTemplate", () => {
     expect(result).toContain("test");
   });
 
-  it("renders organization and instance_host variables", async () => {
-    const template = "<span>{{ organization }} - {{ instance_host }}</span>";
+  it("renders instance_host variable", async () => {
+    const template = "<span>{{ instance_host }}</span>";
     const result = await renderLiquidTemplate(template, {
       ...defaultVars(),
-      organization: "org-123",
       instance_host: "my.zitadel.cloud",
     });
-    expect(result).toContain("org-123");
     expect(result).toContain("my.zitadel.cloud");
   });
 

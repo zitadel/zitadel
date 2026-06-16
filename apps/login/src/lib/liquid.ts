@@ -123,8 +123,6 @@ export interface LiquidTemplateVars {
   theme_switcher: string;
   language_switcher: string;
   lang?: string;
-  theme?: string;
-  organization?: string;
   instance_host?: string;
   /** Translation function injected into the context for the {% t %} tag. */
   __t?: TranslationFn;

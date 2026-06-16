@@ -7,11 +7,13 @@ import {
   splitAtContent,
   THEME_SWITCHER_PLACEHOLDER,
 } from "@/lib/liquid";
+import { getInstanceHost } from "@/lib/server/host";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 import { ReactNode } from "react";
 import { DynamicThemeClient } from "./dynamic-theme-client";
-import { LanguageSwitcherSlot } from "./language-switcher-slot";
+import { LanguageSwitcher } from "./language-switcher";
 import { LiquidSlotRenderer } from "./liquid-slot-renderer";
 import ThemeSwitch from "./theme-switch";
 
@@ -30,7 +32,7 @@ function DefaultLayout({
 }) {
   const footerSlot = (
     <div className="flex flex-row items-center justify-end space-x-4 py-4">
-      <LanguageSwitcherSlot />
+      <LanguageSwitcher />
       <ThemeSwitch />
     </div>
   );
@@ -55,7 +57,7 @@ function DefaultLayout({
  * components into them — preserving the template's HTML structure (flex, grid, etc.).
  *
  * **Translation support**: Templates can use `{% t "key" %}` or
- * `{% t "key" param="value" %}` to output translated strings.
+ * `{% t "key" param: "value" %}` to output translated strings.
  * The translations are resolved server-side via next-intl's `getTranslations()`.
  */
 export async function DynamicTheme({
@@ -77,11 +79,13 @@ export async function DynamicTheme({
   // Portal slots: React components mounted into placeholder elements
   const switcherSlots = {
     theme_switcher: <ThemeSwitch />,
-    language_switcher: <LanguageSwitcherSlot />,
+    language_switcher: <LanguageSwitcher />,
   };
 
-  // Resolve locale and translation function for the {% t %} tag
+  // Resolve locale, host, and translation function for template variables
   const locale = await getLocale();
+  const _headers = await headers();
+  const instanceHost = getInstanceHost(_headers) ?? "";
   const t = await getTranslations();
 
   // Build Liquid variables:
@@ -93,9 +97,7 @@ export async function DynamicTheme({
     theme_switcher: THEME_SWITCHER_PLACEHOLDER,
     language_switcher: LANGUAGE_SWITCHER_PLACEHOLDER,
     lang: locale,
-    theme: "", // Resolved client-side by ThemeWrapper
-    organization: "",
-    instance_host: "",
+    instance_host: instanceHost,
     __t: (key: string, values?: Record<string, unknown>) => {
       try {
         return values ? t(key as never, values as never) : t(key as never);
