@@ -1095,7 +1095,6 @@ HTTPClient:
     - "198.18.0.0/15"   # Benchmark/inter-network communication testing
     - "::/128"          # Unspecified IPv6 address
     - "::1/128"         # IPv6 loopback address
-    - "::ffff:0:0/96"   # IPv4-mapped IPv6 addresses (Prevents IPv6 encapsulation bypasses)
     - "fc00::/7"        # Unique local addresses / IPv6 equivalent to private IPv4 subnets
     - "fe80::/10"       # Link-local addresses / IPv6 equivalent to cloud metadata subnets
 
