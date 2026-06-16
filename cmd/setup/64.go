@@ -20,7 +20,7 @@ type ChangePushPosition struct {
 }
 
 func (mig *ChangePushPosition) Execute(ctx context.Context, _ eventstore.Event) error {
-	inTxOrderType, err := mig.inTxOrderType(ctx)
+	inTxOrderType, err := inTxOrderType(ctx, mig.dbClient)
 	if err != nil {
 		return err
 	}
@@ -33,8 +33,8 @@ func (mig *ChangePushPosition) String() string {
 	return "64_change_push_position"
 }
 
-func (mig *ChangePushPosition) inTxOrderType(ctx context.Context) (typeName string, err error) {
-	err = mig.dbClient.QueryRowContext(ctx, func(row *sql.Row) error {
+func inTxOrderType(ctx context.Context, client *database.DB) (typeName string, err error) {
+	err = client.QueryRowContext(ctx, func(row *sql.Row) error {
 		return row.Scan(&typeName)
 	}, `SELECT data_type FROM information_schema.columns WHERE table_schema = 'eventstore' AND table_name = 'events2' AND column_name = 'in_tx_order'`)
 	if err != nil {

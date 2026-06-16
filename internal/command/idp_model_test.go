@@ -377,7 +377,7 @@ func TestOAuthIDPWriteModel_ToProvider_WithPKCE(t *testing.T) {
 		UsePKCE:               true,
 	}
 
-	provider, err := wm.ToProvider("https://zitadel.example.com/idps/callback", plainTextEncryption{})
+	provider, err := wm.ToProvider("https://zitadel.example.com/idps/callback", plainTextEncryption{}, http.DefaultClient)
 	require.NoError(t, err)
 
 	assertProviderUsesPKCE(t, provider)
@@ -417,7 +417,7 @@ func TestOIDCIDPWriteModel_ToProvider_WithPKCE(t *testing.T) {
 		UsePKCE:      true,
 	}
 
-	provider, err := wm.ToProvider("https://zitadel.example.com/idps/callback", plainTextEncryption{})
+	provider, err := wm.ToProvider("https://zitadel.example.com/idps/callback", plainTextEncryption{}, http.DefaultClient)
 	require.NoError(t, err)
 	require.True(t, discoveryRequested.Load(), "expected OIDC discovery to be requested")
 
