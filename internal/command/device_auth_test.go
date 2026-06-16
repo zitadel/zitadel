@@ -937,6 +937,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 		ctx                  context.Context
 		deviceCode           string
 		backChannelLogoutURI string
+		clientID             string
 	}
 	tests := []struct {
 		name    string
@@ -955,6 +956,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 			args: args{
 				ctx,
 				"device1",
+				"",
 				"",
 			},
 			wantErr: io.ErrClosedPipe,
@@ -981,6 +983,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				ctx,
 				"123",
 				"",
+				"clientID",
 			},
 			wantErr: DeviceAuthStateError(domain.DeviceAuthStateInitiated),
 		},
@@ -994,6 +997,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 			args: args{
 				ctx,
 				"123",
+				"",
 				"",
 			},
 			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-ua1Vo", "Errors.DeviceAuth.NotFound"),
@@ -1024,6 +1028,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				ctx,
 				"123",
 				"",
+				"clientID",
 			},
 			wantErr: DeviceAuthStateError(domain.DeviceAuthStateExpired),
 		},
@@ -1056,6 +1061,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				ctx,
 				"123",
 				"",
+				"clientID",
 			},
 			wantErr: DeviceAuthStateError(domain.DeviceAuthStateExpired),
 		},
@@ -1088,6 +1094,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				ctx,
 				"123",
 				"",
+				"clientID",
 			},
 			wantErr: DeviceAuthStateError(domain.DeviceAuthStateDenied),
 		},
@@ -1126,6 +1133,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				ctx,
 				"123",
 				"",
+				"clientID",
 			},
 			wantErr: DeviceAuthStateError(domain.DeviceAuthStateDone),
 		},
@@ -1190,6 +1198,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				ctx,
 				"123",
 				"",
+				"clientID",
 			},
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "OIDCS-kj3g2", "Errors.User.NotActive"),
 		},
@@ -1270,6 +1279,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				ctx,
 				"123",
 				"",
+				"clientID",
 			},
 			want: &OIDCSession{
 				TokenID:           "V2_oidcSessionID-at_accessTokenID",
@@ -1377,6 +1387,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				}),
 				"123",
 				"backChannelLogoutURI",
+				"clientID",
 			},
 			want: &OIDCSession{
 				TokenID:           "V2_oidcSessionID-at_accessTokenID",
@@ -1478,6 +1489,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				ctx,
 				"123",
 				"",
+				"clientID",
 			},
 			want: &OIDCSession{
 				TokenID:           "V2_oidcSessionID-at_accessTokenID",
@@ -1511,7 +1523,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
 			}
-			got, err := c.CreateOIDCSessionFromDeviceAuth(tt.args.ctx, tt.args.deviceCode, tt.args.backChannelLogoutURI)
+			got, err := c.CreateOIDCSessionFromDeviceAuth(tt.args.ctx, tt.args.deviceCode, tt.args.backChannelLogoutURI, tt.args.clientID)
 			c.jobs.Wait()
 
 			require.ErrorIs(t, err, tt.wantErr)

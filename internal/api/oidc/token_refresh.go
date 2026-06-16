@@ -26,7 +26,7 @@ func (s *Server) RefreshToken(ctx context.Context, r *op.ClientRequest[oidc.Refr
 		return nil, zerrors.ThrowInternal(nil, "OIDC-ga0EP", "Error.Internal")
 	}
 
-	session, err := s.command.ExchangeOIDCSessionRefreshAndAccessToken(ctx, r.Data.RefreshToken, r.Data.Scopes, refreshTokenComplianceChecker())
+	session, err := s.command.ExchangeOIDCSessionRefreshAndAccessToken(ctx, r.Data.RefreshToken, r.Data.Scopes, client.client.ClientID, refreshTokenComplianceChecker())
 	if err == nil {
 		return response(s.accessTokenResponseFromSession(ctx, client, session, "", client.client.ProjectID, client.client.ProjectRoleAssertion, client.client.AccessTokenRoleAssertion, client.client.IDTokenRoleAssertion, client.client.IDTokenUserinfoAssertion))
 	} else if errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "OIDCS-JOI23", "Errors.OIDCSession.RefreshTokenInvalid")) {
@@ -86,7 +86,10 @@ func (s *Server) refreshTokenV1(ctx context.Context, client *Client, r *op.Clien
 
 // refreshTokenComplianceChecker validates that the requested scope is a subset of the original auth request scope.
 func refreshTokenComplianceChecker() command.RefreshTokenComplianceChecker {
-	return func(_ context.Context, model *command.OIDCSessionWriteModel, requestedScope []string) ([]string, error) {
+	return func(_ context.Context, model *command.OIDCSessionWriteModel, requestedScope []string, reqClientID string) ([]string, error) {
+		if model.ClientID != reqClientID {
+			return nil, oidc.ErrInvalidClient().WithDescription("client_id does not correspond to the client_id in the refresh token")
+		}
 		return validateRefreshTokenScopes(model.Scope, requestedScope)
 	}
 }
