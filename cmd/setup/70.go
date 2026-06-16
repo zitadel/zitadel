@@ -34,6 +34,7 @@ func (mig *AddEventStoreCommandEnforceOwnerColumn) Execute(ctx context.Context, 
 	// and having wrong plan of `eventstore.command2`-type
 	for _, conn := range mig.dbClient.Pool.AcquireAllIdle(ctx) {
 		logging.OnError(ctx, conn.Conn().Close(ctx)).Debug("failed to close idle connection")
+		conn.Release()
 	}
 	return nil
 }
