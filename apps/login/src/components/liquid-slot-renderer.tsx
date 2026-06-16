@@ -34,15 +34,16 @@ const ALLOWED_SLOT_NAMES = new Set(["theme_switcher", "language_switcher"]);
  *
  * Why NOT dangerouslySetInnerHTML:
  * React treats content set via `dangerouslySetInnerHTML` as its own.
- * When the component re‑renders (e.g. after `setReady(true)`), React
+ * When the component re‑renders (e.g. after state changes), React
  * re‑applies `dangerouslySetInnerHTML`, which destroys the DOM nodes
  * that `createPortal` targets — the portals end up attached to
  * orphaned, off‑document elements and nothing appears on screen.
  */
 export function LiquidSlotRenderer({ html, slots }: { html: string; slots: Record<string, ReactNode> }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const slotRefs = useRef<Array<[string, Element]>>([]);
-  const [ready, setReady] = useState(false);
+  // Store slot entries in state (not a ref) so that changes to the `html`
+  // prop always trigger a re-render and re-create the portals.
+  const [slotEntries, setSlotEntries] = useState<Array<[string, Element]>>([]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -62,12 +63,10 @@ export function LiquidSlotRenderer({ html, slots }: { html: string; slots: Recor
       }
     });
 
-    slotRefs.current = found;
-    setReady(found.length > 0);
+    setSlotEntries(found);
 
     return () => {
-      slotRefs.current = [];
-      setReady(false);
+      setSlotEntries([]);
     };
   }, [html]);
 
@@ -77,7 +76,7 @@ export function LiquidSlotRenderer({ html, slots }: { html: string; slots: Recor
           suppressHydrationWarning is set because the server renders this
           div empty while the client fills it via useEffect. */}
       <div ref={containerRef} suppressHydrationWarning />
-      {ready && slotRefs.current.map(([name, el]) => (slots[name] ? createPortal(slots[name], el, name) : null))}
+      {slotEntries.map(([name, el], index) => (slots[name] ? createPortal(slots[name], el, `${name}-${index}`) : null))}
     </>
   );
 }
