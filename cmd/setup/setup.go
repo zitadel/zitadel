@@ -263,7 +263,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	for _, step := range []migration.Migration{
 		steps.s14NewEventsTable,
 		steps.s40InitPushFunc,
-		steps.s70AddEventStoreCommandEnforceOwner,
 		steps.s1ProjectionTable,
 		steps.s2AssetsTable,
 		steps.s28AddFieldTable,
@@ -312,6 +311,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s65FixUserMetadata5Index,
 		steps.s67SyncMemberRoleFields,
 		steps.s69CacheTablesLogged,
+		steps.s70AddEventStoreCommandEnforceOwner,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
