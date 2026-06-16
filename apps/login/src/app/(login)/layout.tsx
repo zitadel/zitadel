@@ -2,7 +2,6 @@ import "@/styles/globals.scss";
 
 import { BackgroundWrapper } from "@/components/background-wrapper";
 import { LanguageProvider } from "@/components/language-provider";
-import { LanguagesProvider } from "@/components/languages-context";
 import { Skeleton } from "@/components/skeleton";
 import { ThemeProvider } from "@/components/theme-provider";
 import ThemeSwitch from "@/components/theme-switch";
@@ -64,16 +63,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 </BackgroundWrapper>
               }
             >
-              <LanguageProvider>
-                <LanguagesProvider languages={languages}>
-                  <BackgroundWrapper
-                    className={`bg-background-light-600 dark:bg-background-dark-600 relative flex min-h-screen flex-col justify-center`}
-                  >
-                    <div className="relative mx-auto w-full max-w-[1100px] py-8">
-                      <div>{children}</div>
-                    </div>
-                  </BackgroundWrapper>
-                </LanguagesProvider>
+              <LanguageProvider languages={languages}>
+                <BackgroundWrapper
+                  className={`bg-background-light-600 dark:bg-background-dark-600 relative flex min-h-screen flex-col justify-center`}
+                >
+                  <div className="relative mx-auto w-full max-w-[1100px] py-8">
+                    <div>{children}</div>
+                  </div>
+                </BackgroundWrapper>
               </LanguageProvider>
             </Suspense>
           </Tooltip.Provider>
