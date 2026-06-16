@@ -41,6 +41,7 @@ type JWTProvider struct {
 	JWTEndpoint string
 	KeyEndpoint string
 	HeaderName  string
+	Audience    string
 	IDPOptions  idp.Options
 }
 
@@ -135,6 +136,16 @@ type AppleProvider struct {
 	PrivateKey []byte
 	Scopes     []string
 	IDPOptions idp.Options
+}
+
+type ZitadelProvider struct {
+	Name              string
+	Issuer            string
+	ClientID          string
+	ClientSecret      string
+	Scopes            []string
+	IDPOptions        idp.Options
+	InstanceRolesInfo []idp.RolesInfo
 }
 
 // ExistsIDPOnOrgOrInstance query first org level IDPs and then instance level IDPs, no check if the IDP is active

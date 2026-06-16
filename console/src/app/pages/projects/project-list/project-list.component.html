@@ -158,7 +158,7 @@
           <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns"></tr>
         </table>
       </div>
-      @if ((loading$ | async) === false && !dataSource?.data?.length) {
+      @if ((loading$ | async) === false && !dataSource.data.length) {
         <div class="no-content-row">
           <i class="las la-exclamation"></i>
           <span>{{ 'PROJECT.TABLE.EMPTY' | translate }}</span>

@@ -13,8 +13,8 @@
 
   $list-background-color: map-get($background, 300);
   $card-background-color: map-get($background, cards);
-  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
-  $border-selected-color: if($is-dark-theme, #fff, #000);
+  $border-color: if(sass($is-dark-theme): rgba(#8795a1, 0.2) ; else: rgba(#8795a1, 0.2));
+  $border-selected-color: if(sass($is-dark-theme): #fff; else: #000);
 
   .framework-change-wrapper {
     .framework-card-wrapper {
@@ -36,7 +36,7 @@
         align-items: center;
         justify-content: center;
         width: fit-content;
-        // background-color: if($is-dark-theme, map-get($background, state), #e4e7e4);
+        // background-color: if(sass($is-dark-theme): map-get($background, state); else: #e4e7e4);
         // box-shadow: 0 0 3px #0000001a;
         border: 1px solid rgba(#8795a1, 0.2);
         padding: 0 0.5rem;
@@ -51,11 +51,11 @@
         }
 
         .dark-only {
-          display: if($is-dark-theme, block, none);
+          display: if(sass($is-dark-theme): block; else: none);
         }
 
         .light-only {
-          display: if($is-dark-theme, none, block);
+          display: if(sass($is-dark-theme): none; else: block);
         }
 
         span {

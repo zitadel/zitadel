@@ -16,9 +16,11 @@ import {
 } from "@/lib/zitadel";
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { SecondFactorType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("mfa");
@@ -110,6 +112,41 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   });
 
   const { valid } = sessionWithData ? isSessionValid(sessionWithData) : { valid: false };
+
+  if (force === "true" && valid && sessionWithData?.factors?.user?.loginName && loginSettings) {
+    const emailVerified = sessionWithData.emailVerified ?? false;
+    const phoneVerified = sessionWithData.phoneVerified ?? false;
+    const hasVisibleFactor = loginSettings.secondFactors.some((f) => {
+      switch (f) {
+        case SecondFactorType.OTP:
+        case SecondFactorType.U2F:
+          return true;
+        case SecondFactorType.OTP_EMAIL:
+          return emailVerified;
+        case SecondFactorType.OTP_SMS:
+          return phoneVerified;
+        default:
+          return false;
+      }
+    });
+
+    if (!hasVisibleFactor && !emailVerified && loginSettings.secondFactors.includes(SecondFactorType.OTP_EMAIL)) {
+      const verifyParams = new URLSearchParams({
+        loginName: sessionWithData.factors.user.loginName,
+        send: "true",
+      });
+      const org = organization ?? sessionWithData.factors.user.organizationId;
+
+      if (requestId) {
+        verifyParams.set("requestId", requestId);
+      }
+
+      if (org) {
+        verifyParams.set("organization", org as string);
+      }
+      redirect(`/verify?${verifyParams}`);
+    }
+  }
 
   return (
     <DynamicTheme branding={branding}>

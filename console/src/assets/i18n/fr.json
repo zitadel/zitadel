@@ -2363,7 +2363,8 @@
       "DESCRIPTION": "Entrez les données pour le fournisseur d'identité JWT.",
       "HEADERNAME": "Nom de l'en-tête",
       "JWTENDPOINT": "Point de terminaison JWT",
-      "JWTKEYSENDPOINT": "Point de terminaison des clés JWT"
+      "JWTKEYSENDPOINT": "Point de terminaison des clés JWT",
+      "AUDIENCE": "Audience"
     },
     "TOAST": {
       "SAVED": "Enregistré avec succès.",
@@ -2579,7 +2580,7 @@
       "TYPEREQUIRED": "Le type est obligatoire.",
       "TITLE": "Paramètres OIDC",
       "CLIENTID": "ID client",
-      "CLIENTSECRET": "Secret du client",
+      "CLIENTDETAILS": "Détails du client",
       "CLIENTSECRET_NOSECRET": "Avec le flux d'authentification que vous avez choisi, aucun secret n'est requis et n'est donc pas disponible.",
       "CLIENTSECRET_DESCRIPTION": "Conservez votre secret client dans un endroit sûr car il disparaîtra une fois la boîte de dialogue fermée.",
       "REGENERATESECRET": "Régénérer le secret du client",

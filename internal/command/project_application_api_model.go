@@ -123,7 +123,21 @@ func (wm *APIApplicationWriteModel) Reduce() error {
 		case *project.APIConfigSecretHashUpdatedEvent:
 			wm.HashedSecret = e.HashedSecret
 		case *project.ProjectRemovedEvent:
+			wm.AppName = ""
+			wm.ClientID = ""
+			wm.HashedSecret = ""
+			wm.ClientSecretString = ""
+			wm.AuthMethodType = domain.APIAuthMethodTypeBasic
+			wm.api = false
 			wm.State = domain.AppStateRemoved
+		case *project.ProjectAddedEvent:
+			wm.AppName = ""
+			wm.ClientID = ""
+			wm.HashedSecret = ""
+			wm.ClientSecretString = ""
+			wm.AuthMethodType = domain.APIAuthMethodTypeBasic
+			wm.api = false
+			wm.State = domain.AppStateUnspecified
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -149,6 +163,7 @@ func (wm *APIApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			project.ProjectAddedType,
 			project.ApplicationAddedType,
 			project.ApplicationChangedType,
 			project.ApplicationDeactivatedType,

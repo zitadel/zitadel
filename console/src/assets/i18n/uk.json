@@ -2370,7 +2370,8 @@
       "DESCRIPTION": "Введіть дані для JWT постачальника ідентичності.",
       "HEADERNAME": "Назва заголовка",
       "JWTENDPOINT": "JWT кінцева точка",
-      "JWTKEYSENDPOINT": "JWT кінцева точка ключів"
+      "JWTKEYSENDPOINT": "JWT кінцева точка ключів",
+      "AUDIENCE": "Аудиторія"
     },
     "APPLE": {
       "TEAMID": "ID команди",
@@ -2610,7 +2611,7 @@
       "TYPEREQUIRED": "Тип є обов'язковим.",
       "TITLE": "Конфігурація OIDC",
       "CLIENTID": "ID клієнта",
-      "CLIENTSECRET": "Секрет клієнта",
+      "CLIENTDETAILS": "Дані клієнта",
       "CLIENTSECRET_NOSECRET": "З вашим обраним потоком автентифікації секрет не потрібен і тому недоступний.",
       "CLIENTSECRET_DESCRIPTION": "Зберігайте секрет клієнта в безпечному місці, оскільки він зникне після закриття діалогу.",
       "REGENERATESECRET": "Регенерувати секрет клієнта",

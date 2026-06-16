@@ -3,7 +3,7 @@
   $primary-color: map-get($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
   $background: map-get($theme, background);
-  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+  $border-color: if(sass($is-dark-theme): rgba(#8795a1, 0.2) ; else: rgba(#8795a1, 0.2));
 
   .auth-method-radio-button-wrapper {
     display: flex;
@@ -29,7 +29,7 @@
       box-sizing: border-box;
 
       &:focus {
-        border: 1px solid if($is-dark-theme, white, black);
+        border: 1px solid if(sass($is-dark-theme): white; else: black);
       }
     }
 
@@ -39,7 +39,7 @@
       box-shadow: 0 0 6px rgb(0 0 0 / 10%);
 
       .cnsl-radio-header span {
-        color: if($is-dark-theme, white, white);
+        color: if(sass($is-dark-theme): white; else: white);
       }
     }
 
@@ -108,7 +108,7 @@
         span {
           margin: 2rem;
           font-size: 30px;
-          color: if($is-dark-theme, #00000050, #ffffff50);
+          color: if(sass($is-dark-theme): #00000050; else: #ffffff50);
         }
       }
 

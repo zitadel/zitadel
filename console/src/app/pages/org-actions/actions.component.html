@@ -50,7 +50,7 @@
             <div class="flow-type">
               <i class="type-icon las la-dot-circle"></i>
               <span>{{ flow.type?.name?.localizedMessage }}</span>
-              @if (flow.type && (flow.triggerActionsList?.length ?? 0) > 0) {
+              @if (flow.type && flow.triggerActionsList.length > 0) {
                 <button
                   matTooltip="{{ 'ACTIONS.CLEAR' | translate }}"
                   mat-icon-button
@@ -67,12 +67,16 @@
                   <mat-icon svgIcon="mdi_arrow_right_bottom" class="icon"></mat-icon>
                   <span>{{ trigger.triggerType?.name?.localizedMessage }}</span>
                   <span class="fill-space"></span>
-                  <button color="warn" mat-icon-button (click)="removeTriggerActionsList(i)">
+                  <button color="warn" mat-icon-button (click)="removeTriggerActionsList(flow, i)">
                     <i class="las la-trash"></i>
                   </button>
                 </div>
                 <span class="fill-space"></span>
-                <div class="flow-action-wrapper" cdkDropList (cdkDropListDropped)="drop(i, trigger.actionsList, $event)">
+                <div
+                  class="flow-action-wrapper"
+                  cdkDropList
+                  (cdkDropListDropped)="drop(flow, i, trigger.actionsList, $event)"
+                >
                   @for (action of trigger.actionsList; track action) {
                     <div cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".action-wrapper" class="flow-action">
                       <i class="las la-code"></i>

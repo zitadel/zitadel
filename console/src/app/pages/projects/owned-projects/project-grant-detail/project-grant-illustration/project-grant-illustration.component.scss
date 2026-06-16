@@ -1,9 +1,9 @@
 @mixin project-grant-illustration-theme($theme) {
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
-  $overlayColor: if($is-dark-theme, #ffffff10, #00000008);
-  $highlightedOverlayColor: if($is-dark-theme, #68c4cf14, #68c4cf14);
-  $borderColor: if($is-dark-theme, #ffffff20, #00000020);
+  $overlayColor: if(sass($is-dark-theme): #ffffff10; else: #00000008);
+  $highlightedOverlayColor: if(sass($is-dark-theme): #68c4cf14; else: #68c4cf14);
+  $borderColor: if(sass($is-dark-theme): #ffffff20; else: #00000020);
 
   .pgi {
     display: flex;

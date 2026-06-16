@@ -2363,7 +2363,8 @@
       "DESCRIPTION": "Zadejte data pro poskytovatele identity JWT.",
       "HEADERNAME": "Název hlavičky",
       "JWTENDPOINT": "JWT koncový bod",
-      "JWTKEYSENDPOINT": "Koncový bod klíčů JWT"
+      "JWTKEYSENDPOINT": "Koncový bod klíčů JWT",
+      "AUDIENCE": "Audience"
     },
     "APPLE": {
       "TEAMID": "ID týmu",
@@ -2587,7 +2588,7 @@
       "TYPEREQUIRED": "Typ je vyžadován.",
       "TITLE": "OIDC Konfigurace",
       "CLIENTID": "ID klienta",
-      "CLIENTSECRET": "Tajemství klienta",
+      "CLIENTDETAILS": "Podrobnosti klienta",
       "CLIENTSECRET_NOSECRET": "S vaším vybraným způsobem autentizace není požadováno žádné tajemství a proto není dostupné.",
       "CLIENTSECRET_DESCRIPTION": "Uchovávejte toto tajemství klienta na bezpečném místě, jakmile je dialog zavřen, nelze jej již znovu zobrazit.",
       "REGENERATESECRET": "Regenerovat tajemství klienta",

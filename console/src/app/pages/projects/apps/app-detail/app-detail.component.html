@@ -68,12 +68,12 @@
     </cnsl-info-section>
   }
 
-  @if (app && app.oidcConfig && app.oidcConfig.complianceProblemsList && app.oidcConfig.complianceProblemsList?.length) {
+  @if (app && app.oidcConfig && app.oidcConfig.complianceProblemsList && app.oidcConfig.complianceProblemsList.length) {
     <div class="compliance">
       <h2 class="compliance-title">{{ 'APP.COMPLIANCE' | translate }}</h2>
       <cnsl-info-section class="problem" [type]="InfoSectionType.ALERT">
         <ul style="margin: 0">
-          @for (problem of app.oidcConfig?.complianceProblemsList || []; track problem) {
+          @for (problem of app.oidcConfig.complianceProblemsList; track problem) {
             <li style="margin: 0 0 0.5rem 0">
               {{ problem.localizedMessage }}
             </li>
@@ -444,7 +444,7 @@
         @if (currentSetting.id === 'additional-origins') {
           <cnsl-card title=" {{ 'APP.ADDITIONALORIGINS' | translate }}">
             <p class="app-desc cnsl-secondary-text">{{ 'APP.ADDITIONALORIGINSDESC' | translate }}</p>
-            @if (additionalOriginsList && appType && appType?.value !== undefined) {
+            @if (additionalOriginsList && appType?.value !== undefined) {
               <cnsl-additional-origins
                 class="app-input"
                 [canWrite]="canWrite"
@@ -507,7 +507,7 @@
               description="{{ 'USER.MACHINE.KEYSDESC' | translate }}"
             >
               <cnsl-client-keys [projectId]="projectId" [appId]="app.id"></cnsl-client-keys>
-              @if (apiForm && app?.apiConfig) {
+              @if (apiForm && app.apiConfig) {
                 <div class="btn-container">
                   <button
                     class="submit-button"

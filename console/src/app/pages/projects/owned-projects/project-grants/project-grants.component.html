@@ -136,7 +136,7 @@
               <tr class="highlight" mat-row *matRowDef="let grant; columns: displayedColumns"></tr>
             </table>
           </div>
-          @if ((dataSource.loading$ | async) === false && !dataSource?.totalResult) {
+          @if ((dataSource.loading$ | async) === false && !dataSource.totalResult) {
             <div class="no-content-row">
               <i class="las la-exclamation"></i>
               <span>{{ 'PROJECT.GRANT.EMPTY' | translate }}</span>

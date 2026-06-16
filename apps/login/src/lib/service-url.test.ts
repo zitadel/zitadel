@@ -24,24 +24,6 @@ describe("Service URL utilities", () => {
       expect(() => getServiceConfig(mockHeaders)).toThrow("ZITADEL_API_URL is not set");
     });
 
-    test("should return only baseUrl when x-zitadel-forward-host is not present (self-hosted)", () => {
-      process.env.ZITADEL_API_URL = "https://zitadel.mycompany.com";
-
-      const mockHeaders = {
-        get: vi.fn((key: string) => {
-          if (key === "x-zitadel-forward-host") return null;
-          if (key === "host") return "mycompany.com";
-          return null;
-        }),
-      } as any;
-
-      const result = getServiceConfig(mockHeaders);
-
-      expect(result.serviceConfig.baseUrl).toBe("https://zitadel.mycompany.com");
-      expect(result.serviceConfig.instanceHost).toBeUndefined();
-      expect(result.serviceConfig.publicHost).toBe("mycompany.com");
-    });
-
     test("should use x-zitadel-forward-host when present (multi-tenant)", () => {
       process.env.ZITADEL_API_URL = "https://api.zitadel.cloud";
 

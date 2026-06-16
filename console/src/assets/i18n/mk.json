@@ -2359,7 +2359,8 @@
       "DESCRIPTION": "Внесете ги податоците за JWT IDP.",
       "HEADERNAME": "Име на хедер",
       "JWTENDPOINT": "JWT Крајна точка",
-      "JWTKEYSENDPOINT": "JWT Крајна точка за клучеви"
+      "JWTKEYSENDPOINT": "JWT Крајна точка за клучеви",
+      "AUDIENCE": "Аудиториум"
     },
     "TOAST": {
       "SAVED": "Успешно зачувано.",
@@ -2575,7 +2576,7 @@
       "TYPEREQUIRED": "Типот е задолжителен.",
       "TITLE": "OIDC Конфигурација",
       "CLIENTID": "Client Id",
-      "CLIENTSECRET": "Клиентска тајна",
+      "CLIENTDETAILS": "Детали за клиентот",
       "CLIENTSECRET_NOSECRET": "Со избраната метода за автентикација, не е потребна тајна и поради тоа не е достапна.",
       "CLIENTSECRET_DESCRIPTION": "Чувајте ја вашата клиентска тајна на безбедно место, бидејќи ќе исчезне откако ќе се затвори дијалогот.",
       "REGENERATESECRET": "Генерирај нова клиентска тајна",

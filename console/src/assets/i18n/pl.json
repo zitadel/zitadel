@@ -2362,7 +2362,8 @@
       "DESCRIPTION": "Wprowadź dane dla dostawcy tożsamości JWT.",
       "HEADERNAME": "Nazwa nagłówka",
       "JWTENDPOINT": "Punkt końcowy JWT",
-      "JWTKEYSENDPOINT": "Punkt końcowy kluczy JWT"
+      "JWTKEYSENDPOINT": "Punkt końcowy kluczy JWT",
+      "AUDIENCE": "Odbiorca"
     },
     "TOAST": {
       "SAVED": "Zapisano pomyślnie.",
@@ -2578,7 +2579,7 @@
       "TYPEREQUIRED": "Wymagany jest typ.",
       "TITLE": "Konfiguracja OIDC",
       "CLIENTID": "Identyfikator klienta",
-      "CLIENTSECRET": "Sekret klienta",
+      "CLIENTDETAILS": "Szczegóły klienta",
       "CLIENTSECRET_NOSECRET": "Wybrany przez Ciebie przepływ uwierzytelniania nie wymaga sekretu i dlatego nie jest dostępny.",
       "CLIENTSECRET_DESCRIPTION": "Trzymaj swój sekret klienta w bezpiecznym miejscu, ponieważ zniknie on po zamknięciu okna dialogowego.",
       "REGENERATESECRET": "Odtwórz sekret klienta",
