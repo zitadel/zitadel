@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"fmt"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -26,7 +27,13 @@ func (mig *AddEventStoreCommandEnforceOwnerColumn) Execute(ctx context.Context, 
 
 	stmt := fmt.Sprintf(addEventStoreCommandEnforceOwnerColumn, inTxOrderType)
 	_, err = mig.dbClient.ExecContext(ctx, stmt)
-	return err
+	if err != nil {
+		return err
+	}
+	for _, conn := range mig.dbClient.Pool.AcquireAllIdle(ctx) {
+		logging.OnError(ctx, conn.Conn().Close(ctx)).Debug("failed to close idle connection")
+	}
+	return nil
 }
 
 func (mig *AddEventStoreCommandEnforceOwnerColumn) String() string {
