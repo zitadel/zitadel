@@ -37,19 +37,14 @@ Field names follow the Go `slog` conventions.
 | `time` | string (RFC 3339) | Timestamp when the log record was created |
 | `level` | string | Log severity: `DEBUG`, `INFO`, `WARN`, or `ERROR` |
 | `msg` | string | Human-readable log message |
-| `stream` | string | Logical log stream category (e.g., `runtime`, `request`) |
-| `version` | string | ZITADEL build version |
+| `stream` | string | Logical log stream/category (for example, `request`) |
+| `version` | string | Logger/schema version for the structured log format |
 | `source` | object | Source file location where the log was emitted (when `AddSource: true`) |
 | `source.function` | string | Go function name |
 | `source.file` | string | Source file path |
 | `source.line` | number | Line number in the source file |
 
-When tracing is active and a span exists in the context, additional fields are injected:
-
-| Field | Type | Description |
-|---|---|---|
-| `TraceID` | string | OpenTelemetry trace identifier |
-| `SpanID` | string | OpenTelemetry span identifier |
+When tracing or request-scoped context is available, additional fields may be injected, such as trace and span identifiers (for example, `trace_id`, `span_id`) and the `request` field group.
 
 ### Request log fields
 
@@ -189,7 +184,7 @@ Instrumentation:
   "http_method": "POST",
   "path": "/oauth/v2/token",
   "status": 200,
-  "duration": "12.5ms"
+  "duration": 12500000
 }
 ```
 
