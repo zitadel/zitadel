@@ -1,19 +1,19 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock "server-only" so tests can import the module
 vi.mock("server-only", () => ({}));
 
 import {
-  renderLiquidTemplate,
-  renderLiquidTemplateRaw,
-  getEffectiveTemplate,
-  sanitizeLiquidOutput,
-  splitAtContent,
-  DEFAULT_LIQUID_TEMPLATE,
   CONTENT_SENTINEL,
-  THEME_SWITCHER_PLACEHOLDER,
+  DEFAULT_LIQUID_TEMPLATE,
+  getEffectiveTemplate,
   LANGUAGE_SWITCHER_PLACEHOLDER,
   LiquidTemplateVars,
+  renderLiquidTemplate,
+  renderLiquidTemplateRaw,
+  sanitizeLiquidOutput,
+  splitAtContent,
+  THEME_SWITCHER_PLACEHOLDER,
   TranslationFn,
 } from "./liquid";
 
@@ -183,9 +183,7 @@ describe("sanitizeLiquidOutput", () => {
   });
 
   it("strips <script> tags with attributes", () => {
-    const result = sanitizeLiquidOutput(
-      '<div><script type="text/javascript" src="evil.js"></script></div>',
-    );
+    const result = sanitizeLiquidOutput('<div><script type="text/javascript" src="evil.js"></script></div>');
     expect(result).not.toContain("<script");
     expect(result).not.toContain("evil.js");
   });
@@ -220,9 +218,7 @@ describe("sanitizeLiquidOutput", () => {
   });
 
   it("strips data: URIs with scripts in href", () => {
-    const result = sanitizeLiquidOutput(
-      '<a href="data:text/html,<script>alert(1)</script>">click</a>',
-    );
+    const result = sanitizeLiquidOutput('<a href="data:text/html,<script>alert(1)</script>">click</a>');
     expect(result).not.toContain("data:");
     expect(result).not.toContain("alert");
   });
@@ -241,27 +237,21 @@ describe("sanitizeLiquidOutput", () => {
   });
 
   it("strips <form> tags", () => {
-    const result = sanitizeLiquidOutput(
-      '<form action="https://evil.com"><input type="submit"></form>',
-    );
+    const result = sanitizeLiquidOutput('<form action="https://evil.com"><input type="submit"></form>');
     expect(result).not.toContain("<form");
     expect(result).not.toContain("<input");
     expect(result).not.toContain("evil.com");
   });
 
   it("strips <object> and <embed> tags", () => {
-    const result = sanitizeLiquidOutput(
-      '<object data="evil.swf"></object><embed src="evil.swf">',
-    );
+    const result = sanitizeLiquidOutput('<object data="evil.swf"></object><embed src="evil.swf">');
     expect(result).not.toContain("<object");
     expect(result).not.toContain("<embed");
     expect(result).not.toContain("evil.swf");
   });
 
   it("strips <meta> refresh redirect", () => {
-    const result = sanitizeLiquidOutput(
-      '<meta http-equiv="refresh" content="0;url=https://evil.com">',
-    );
+    const result = sanitizeLiquidOutput('<meta http-equiv="refresh" content="0;url=https://evil.com">');
     expect(result).not.toContain("<meta");
     expect(result).not.toContain("evil.com");
   });
@@ -279,9 +269,7 @@ describe("sanitizeLiquidOutput", () => {
   });
 
   it("strips ontoggle event handlers", () => {
-    const result = sanitizeLiquidOutput(
-      '<details open ontoggle="alert(1)"><summary>X</summary></details>',
-    );
+    const result = sanitizeLiquidOutput('<details open ontoggle="alert(1)"><summary>X</summary></details>');
     expect(result).not.toContain("ontoggle");
     expect(result).not.toContain("alert");
   });
@@ -295,8 +283,7 @@ describe("sanitizeLiquidOutput", () => {
   });
 
   it("strips arbitrary data-* attributes but preserves data-liquid-slot", () => {
-    const html =
-      '<div data-liquid-slot="theme_switcher" data-custom="evil" data-foo="bar">ok</div>';
+    const html = '<div data-liquid-slot="theme_switcher" data-custom="evil" data-foo="bar">ok</div>';
     const result = sanitizeLiquidOutput(html);
     expect(result).toContain('data-liquid-slot="theme_switcher"');
     expect(result).not.toContain("data-custom");

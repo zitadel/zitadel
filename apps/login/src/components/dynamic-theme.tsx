@@ -1,11 +1,11 @@
 import {
+  CONTENT_SENTINEL,
   getEffectiveTemplate,
+  LANGUAGE_SWITCHER_PLACEHOLDER,
+  LiquidTemplateVars,
   renderLiquidTemplateRaw,
   splitAtContent,
-  LiquidTemplateVars,
-  CONTENT_SENTINEL,
   THEME_SWITCHER_PLACEHOLDER,
-  LANGUAGE_SWITCHER_PLACEHOLDER,
 } from "@/lib/liquid";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -118,14 +118,9 @@ export async function DynamicTheme({
 
   return (
     <>
-      {before && (
-        <LiquidSlotRenderer html={before} slots={switcherSlots} />
-      )}
+      {before && <LiquidSlotRenderer html={before} slots={switcherSlots} />}
       <DynamicThemeClient branding={branding}>{children}</DynamicThemeClient>
-      {after && (
-        <LiquidSlotRenderer html={after} slots={switcherSlots} />
-      )}
+      {after && <LiquidSlotRenderer html={after} slots={switcherSlots} />}
     </>
   );
 }
-

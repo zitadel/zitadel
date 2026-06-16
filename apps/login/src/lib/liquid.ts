@@ -1,8 +1,8 @@
+import { Context, Hash, Liquid, Tag, TagToken, TopLevelToken } from "liquidjs";
 import "server-only";
-import { Liquid, Tag, Context, TagToken, TopLevelToken, Hash } from "liquidjs";
+import { sanitizeLiquidOutput } from "./sanitize-liquid";
 
 export { sanitizeLiquidOutput } from "./sanitize-liquid";
-import { sanitizeLiquidOutput } from "./sanitize-liquid";
 
 // ---------------------------------------------------------------------------
 // Translation function type
@@ -37,53 +37,54 @@ const engine = new Liquid({
 //   {% t "signedin.title" user: username %}  ← variable reference
 // ---------------------------------------------------------------------------
 
-engine.registerTag("t", class TranslateTag extends Tag {
-  private key: string;
-  private hash: Hash;
+engine.registerTag(
+  "t",
+  class TranslateTag extends Tag {
+    private key: string;
+    private hash: Hash;
 
-  constructor(tagToken: TagToken, remainTokens: TopLevelToken[], liquid: Liquid) {
-    super(tagToken, remainTokens, liquid);
+    constructor(tagToken: TagToken, remainTokens: TopLevelToken[], liquid: Liquid) {
+      super(tagToken, remainTokens, liquid);
 
-    const args = tagToken.args.trim();
+      const args = tagToken.args.trim();
 
-    // Extract the quoted key (first argument)
-    const keyMatch = args.match(/^(["'])(.+?)\1/);
-    if (!keyMatch) {
-      throw new Error(
-        `{% t %} tag requires a quoted translation key, e.g. {% t "loginname.title" %}. Got: ${args}`,
-      );
-    }
-    this.key = keyMatch[2];
+      // Extract the quoted key (first argument)
+      const keyMatch = args.match(/^(["'])(.+?)\1/);
+      if (!keyMatch) {
+        throw new Error(`{% t %} tag requires a quoted translation key, e.g. {% t "loginname.title" %}. Got: ${args}`);
+      }
+      this.key = keyMatch[2];
 
-    // Parse remaining args as named hash parameters using Liquid's
-    // standard "key: value" syntax.
-    const remaining = args.slice(keyMatch[0].length).trim();
-    this.hash = new Hash(remaining);
-  }
-
-  *render(ctx: Context): Generator<unknown, string, unknown> {
-    // Access the translation function from the top-level Liquid scope.
-    // We use `ctx.environments` directly because `ctx.get(["__t"])` uses
-    // LiquidJS's property-path traversal which doesn't find `__t`.
-    const envs = ctx.environments as Record<string, unknown>;
-    const t = envs["__t"] as TranslationFn | undefined;
-    if (!t) {
-      // No translation function available — return the key as-is
-      return this.key;
+      // Parse remaining args as named hash parameters using Liquid's
+      // standard "key: value" syntax.
+      const remaining = args.slice(keyMatch[0].length).trim();
+      this.hash = new Hash(remaining);
     }
 
-    // Resolve hash parameters (handles both literals and variable references)
-    const params = (yield this.hash.render(ctx)) as Record<string, unknown>;
+    *render(ctx: Context): Generator<unknown, string, unknown> {
+      // Access the translation function from the top-level Liquid scope.
+      // We use `ctx.environments` directly because `ctx.get(["__t"])` uses
+      // LiquidJS's property-path traversal which doesn't find `__t`.
+      const envs = ctx.environments as Record<string, unknown>;
+      const t = envs["__t"] as TranslationFn | undefined;
+      if (!t) {
+        // No translation function available — return the key as-is
+        return this.key;
+      }
 
-    try {
-      const hasParams = Object.keys(params).length > 0;
-      return t(this.key, hasParams ? params : undefined);
-    } catch {
-      // Translation key not found or format error — return the key
-      return this.key;
+      // Resolve hash parameters (handles both literals and variable references)
+      const params = (yield this.hash.render(ctx)) as Record<string, unknown>;
+
+      try {
+        const hasParams = Object.keys(params).length > 0;
+        return t(this.key, hasParams ? params : undefined);
+      } catch {
+        // Translation key not found or format error — return the key
+        return this.key;
+      }
     }
-  }
-});
+  },
+);
 
 // ---------------------------------------------------------------------------
 // Slot markers
@@ -139,10 +140,7 @@ export interface LiquidTemplateVars {
  * Returns the raw (unsanitized) output for further processing.
  * Returns undefined if rendering fails.
  */
-export async function renderLiquidTemplateRaw(
-  template: string,
-  vars: LiquidTemplateVars,
-): Promise<string | undefined> {
+export async function renderLiquidTemplateRaw(template: string, vars: LiquidTemplateVars): Promise<string | undefined> {
   try {
     return await engine.parseAndRender(template, vars);
   } catch (err) {
@@ -156,10 +154,7 @@ export async function renderLiquidTemplateRaw(
  * Sanitizes the output to prevent XSS.
  * Returns undefined if rendering fails.
  */
-export async function renderLiquidTemplate(
-  template: string,
-  vars: LiquidTemplateVars,
-): Promise<string | undefined> {
+export async function renderLiquidTemplate(template: string, vars: LiquidTemplateVars): Promise<string | undefined> {
   const raw = await renderLiquidTemplateRaw(template, vars);
   if (raw === undefined) return undefined;
   return sanitizeLiquidOutput(raw);

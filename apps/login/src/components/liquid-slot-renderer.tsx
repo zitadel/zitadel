@@ -1,8 +1,8 @@
 "use client";
 
-import { createPortal } from "react-dom";
-import { ReactNode, useEffect, useRef, useState } from "react";
 import { sanitizeLiquidOutput } from "@/lib/sanitize-liquid";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 /**
  * Known slot names that the portal system recognises.
@@ -39,13 +39,7 @@ const ALLOWED_SLOT_NAMES = new Set(["theme_switcher", "language_switcher"]);
  * that `createPortal` targets — the portals end up attached to
  * orphaned, off‑document elements and nothing appears on screen.
  */
-export function LiquidSlotRenderer({
-  html,
-  slots,
-}: {
-  html: string;
-  slots: Record<string, ReactNode>;
-}) {
+export function LiquidSlotRenderer({ html, slots }: { html: string; slots: Record<string, ReactNode> }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const slotRefs = useRef<Array<[string, Element]>>([]);
   const [ready, setReady] = useState(false);
@@ -83,10 +77,7 @@ export function LiquidSlotRenderer({
           suppressHydrationWarning is set because the server renders this
           div empty while the client fills it via useEffect. */}
       <div ref={containerRef} suppressHydrationWarning />
-      {ready &&
-        slotRefs.current.map(([name, el]) =>
-          slots[name] ? createPortal(slots[name], el, name) : null,
-        )}
+      {ready && slotRefs.current.map(([name, el]) => (slots[name] ? createPortal(slots[name], el, name) : null))}
     </>
   );
 }

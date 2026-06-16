@@ -1,7 +1,7 @@
 "use client";
 
-import { useLanguages } from "./languages-context";
 import { LanguageSwitcher } from "./language-switcher";
+import { useLanguages } from "./languages-context";
 
 /**
  * Thin client wrapper that reads languages from context and renders LanguageSwitcher.
