@@ -26,16 +26,14 @@ function getLanguageSwitcherCardAppearance(): string {
 export function LanguageSwitcher({ languages: languagesProp }: { languages?: Lang[] }) {
   const contextLanguages = useLanguages();
   const languages = languagesProp ?? contextLanguages;
+  const currentLocale = useLocale();
+  const [selected, setSelected] = useState(languages.find((l) => l.code === currentLocale) || languages[0]);
+  const router = useRouter();
 
   if (!languages.length) return null;
 
-  const currentLocale = useLocale();
   const switcherRoundness = getLanguageSwitcherRoundness();
   const cardAppearance = getLanguageSwitcherCardAppearance();
-
-  const [selected, setSelected] = useState(languages.find((l) => l.code === currentLocale) || languages[0]);
-
-  const router = useRouter();
 
   const handleChange = async (language: Lang) => {
     setSelected(language);

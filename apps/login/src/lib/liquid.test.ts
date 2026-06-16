@@ -325,7 +325,7 @@ describe("sanitizeLiquidOutput", () => {
 
   it("blocks javascript: URIs through splitAtContent pipeline", () => {
     const raw = `<a href="javascript:alert(1)">evil</a>${CONTENT_SENTINEL}<footer>ok</footer>`;
-    const { before, after } = splitAtContent(raw);
+    const { before, after: _after } = splitAtContent(raw);
     expect(before).not.toContain("javascript:");
   });
 });
