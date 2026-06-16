@@ -308,10 +308,10 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s62HTTPProviderAddSigningKey,
 		steps.s63AlterResourceCounts,
 		steps.s64ChangePushPosition,
-		steps.s70AddEventStoreCommandEnforceOwner,
 		steps.s65FixUserMetadata5Index,
 		steps.s67SyncMemberRoleFields,
 		steps.s69CacheTablesLogged,
+		steps.s70AddEventStoreCommandEnforceOwner,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
