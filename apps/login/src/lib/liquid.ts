@@ -180,9 +180,9 @@ export function getEffectiveTemplate(brandingTemplate?: string): string | undefi
 // ---------------------------------------------------------------------------
 
 /**
- * Split rendered template at the content sentinel. Returns the before/after
- * HTML parts (sanitized, with switcher placeholder elements preserved).
+ * Split rendered template at the content sentinel. Returns sanitized before/after HTML parts.
  *
+ * Important: because the parts render as siblings around the SSR login card, avoid wrapping {{ content }} with an element opened before and closed after it (e.g. <main>{{ content }}</main>).
  * If the content sentinel is not found, the entire output is returned as "before".
  */
 export function splitAtContent(raw: string): { before: string; after: string } {
