@@ -66,9 +66,8 @@ export async function DynamicTheme({
   branding?: BrandingSettings;
 }) {
   // Resolve template: LIQUID_TEMPLATE env var → branding.template → undefined
-  const template = getEffectiveTemplate(
-    (branding as Record<string, unknown> | undefined)?.template as string | undefined,
-  );
+  // TODO: wire branding-provided templates once BrandingSettings supports it.
+  const template = getEffectiveTemplate();
 
   // No custom template → render default React layout directly
   if (!template) {
