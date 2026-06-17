@@ -2,7 +2,6 @@ package crypto
 
 import (
 	"crypto/rand"
-	"errors"
 	"math/big"
 	"time"
 
@@ -144,7 +143,7 @@ func GenerateRandomString(length uint, chars []rune) (string, error) {
 		return "", nil
 	}
 	if len(chars) == 0 {
-		return "", errors.New("chars must not be empty")
+		return "", zerrors.ThrowInvalidArgument(nil, "CODE-aa1wf", "chars must not be empty")
 	}
 
 	str := make([]rune, length)
