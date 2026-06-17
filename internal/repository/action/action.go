@@ -40,6 +40,8 @@ type AddedEvent struct {
 	AllowedToFail bool          `json:"allowedToFail"`
 }
 
+func (*AddedEvent) EnforceResourceOwner() {}
+
 func (e *AddedEvent) Payload() interface{} {
 	return e
 }

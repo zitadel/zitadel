@@ -598,12 +598,9 @@ Executions:
   MaxTtl: 5m  # ZITADEL_EXECUTIONS_MAXTTL
   # List of domains and IPs that are not valid execution target's endpoints
   # Wildcard sub domains are currently unsupported
+
+  # Deprecated: use HTTPClient.DenyList instead. If both are set, this list will be merged into the HTTPClient.DenyList.
   DenyList: # ZITADEL_EXECUTIONS_DENYLIST (comma separated list)
-    - localhost
-    - "127.0.0.0/8"
-    - "::1"
-    - "0.0.0.0"
-    - "::"
 
 Auth:
   # See Projections.BulkLimit
@@ -893,6 +890,7 @@ SystemDefaults:
         MinP: 1 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MINP
         MaxP: 16 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MAXP
       PBKDF2:
+        # FIPS mode: MinRounds below 1000 (NIST SP 800-132) logs a startup warning; primary Hasher Rounds must be >= 1000.
         MinRounds: 1000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_PBKDF2_MINROUNDS
         MaxRounds: 10000000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_PBKDF2_MAXROUNDS
       Sha2:
@@ -969,6 +967,7 @@ SystemDefaults:
         MinP: 1 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MINP
         MaxP: 16 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MAXP
       PBKDF2:
+        # FIPS mode: MinRounds below 1000 (NIST SP 800-132) logs a startup warning; primary Hasher Rounds must be >= 1000.
         MinRounds: 1000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_PBKDF2_MINROUNDS
         MaxRounds: 10000000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_PBKDF2_MAXROUNDS
       Sha2:
@@ -1033,12 +1032,8 @@ SystemDefaults:
 Actions:
   HTTP:
     # Wildcard sub domains are currently unsupported
+    # Deprecated: use HTTPClient.DenyList instead. If both are set, this list will be merged into the HTTPClient.DenyList.
     DenyList: # ZITADEL_ACTIONS_HTTP_DENYLIST (comma separated list)
-      - localhost
-      - "127.0.0.0/8"
-      - "::1"
-      - "0.0.0.0"
-      - "::"
 
 LogStore:
   Access:
@@ -1071,6 +1066,37 @@ Eventstore:
   PushTimeout: 15s #ZITADEL_EVENTSTORE_PUSHTIMEOUT
   # Maximum amount of push retries in case of primary key violation on the sequence
   MaxRetries: 5 #ZITADEL_EVENTSTORE_MAXRETRIES
+
+HTTPClient:
+  # Sets the limit of the response body size in bytes, which will be processed by the HTTP client.
+  # If the response body exceeds this limit, the client will return an error.
+  # The default value is 20MB.
+  MaxBodySize: 20971520 # ZITADEL_HTTPCLIENT_MAXBODYSIZE
+  # Sets the timeout for the HTTP client.
+  Timeout: 30s # ZITADEL_HTTPCLIENT_TIMEOUT
+  # Sets the number of allowed redirects for the HTTP client.
+  MaxRedirects: 5 # ZITADEL_HTTPCLIENT_MAXREDIRECTS
+  # Specifies if the HTTP client should follow redirects from HTTPS to HTTP.
+  AllowHTTPSDowngrade: false # ZITADEL_HTTPCLIENT_ALLOWHTTPSDOWNGRADE
+  # Specifies the list of IP addresses or CIDR ranges that are not allowed to be called by the HTTP client.
+  # Note that hosts / domains are matched best-case and wildcards are not supported.
+  # CRITICAL SECURITY NOTE: Domain rules (like "localhost") protect application-layer string matches.
+  # Underneath, the network dialer relies exclusively on the CIDR ranges below to block resolved IPs and prevent DNS Rebinding.
+  # Do not remove the CIDR subnets even if a domain mapping exists.
+  DenyList: # ZITADEL_HTTPCLIENT_DENYLIST (comma separated list)
+    - localhost
+    - "0.0.0.0/8"       # Unspecified IPv4 address range / Local network routing trick protection
+    - "10.0.0.0/8"      # Class A private networks
+    - "100.64.0.0/10"   # Carrier-Grade NAT space
+    - "127.0.0.0/8"     # Loopback addresses (IPv4)
+    - "169.254.0.0/16"  # Link-local subnets (Covers Cloud Metadata Endpoints like AWS/GCP 169.254.169.254)
+    - "172.16.0.0/12"   # Class B private networks
+    - "192.168.0.0/16"  # Class C private networks
+    - "198.18.0.0/15"   # Benchmark/inter-network communication testing
+    - "::/128"          # Unspecified IPv6 address
+    - "::1/128"         # IPv6 loopback address
+    - "fc00::/7"        # Unique local addresses / IPv6 equivalent to private IPv4 subnets
+    - "fe80::/10"       # Link-local addresses / IPv6 equivalent to cloud metadata subnets
 
 # The DefaultInstance section defines the default values for each new virtual instance that is created.
 # Check out https://zitadel.com/docs/concepts/structure/instance#multiple-virtual-instances for more information about virtual instances.

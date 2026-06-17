@@ -133,6 +133,13 @@ message JWTConfig {
         "\"x-auth-token\"";
     }
   ];
+  // The audience is the expected audience in the JWT, if not configured, the audience is not validated.
+  string audience = 5 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"my-audience\"";
+    }
+  ];
 }
 
 message OAuthConfig {
