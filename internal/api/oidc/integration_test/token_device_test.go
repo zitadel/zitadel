@@ -127,7 +127,8 @@ func TestServer_DeviceAuth(t *testing.T) {
 }
 
 func TestServer_DeviceAuth_invalid_client(t *testing.T) {
-	project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
+	project, err := Instance.CreateProject(CTX)
+	require.NoError(t, err)
 	client, err := Instance.CreateOIDCClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, false, app.OIDCGrantType_OIDC_GRANT_TYPE_DEVICE_CODE)
 	require.NoError(t, err)
 
