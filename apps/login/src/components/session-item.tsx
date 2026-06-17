@@ -94,7 +94,7 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
           }}
           className="group border-divider-light bg-background-light-400 dark:bg-background-dark-400 flex flex-row items-center rounded-md border px-4 py-2 transition-all hover:shadow-lg dark:hover:bg-white/10"
         >
-          <div className="pr-4">
+          <div className="pe-4">
             <Avatar
               size="small"
               loginName={session.factors?.user?.loginName as string}
@@ -123,9 +123,9 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
           <span className="flex-grow"></span>
           <div className="relative flex flex-row items-center">
             {valid ? (
-              <div className="absolute right-6 mx-2 h-2 w-2 transform rounded-full bg-green-500 transition-all group-hover:right-6 sm:right-0"></div>
+              <div className="absolute end-6 mx-2 h-2 w-2 transform rounded-full bg-green-500 transition-all group-hover:end-6 sm:end-0"></div>
             ) : (
-              <div className="absolute right-6 mx-2 h-2 w-2 transform rounded-full bg-red-500 transition-all group-hover:right-6 sm:right-0"></div>
+              <div className="absolute end-6 mx-2 h-2 w-2 transform rounded-full bg-red-500 transition-all group-hover:end-6 sm:end-0"></div>
             )}
 
             <XCircleIcon

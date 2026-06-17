@@ -150,7 +150,7 @@ export function SetRegisterPasswordForm({
             onClick={handleSubmit(submitRegister)}
             data-testid="submit-button"
           >
-            {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="password.submit" namespace="register" />
+            {loading && <Spinner className="me-2 h-5 w-5" />} <Translated i18nKey="password.submit" namespace="register" />
           </Button>
         </div>
       </form>

@@ -31,8 +31,8 @@
 
     .spinner-w {
       top: 1rem;
-      left: 0;
-      right: 0;
+      inset-inline-start: 0;
+      inset-inline-end: 0;
       position: absolute;
       display: flex;
       justify-content: center;
@@ -78,7 +78,7 @@
             width: 36px;
             font-size: 1.2rem;
             line-height: 1rem;
-            margin-right: -0.5rem;
+            margin-inline-end: -0.5rem;
             visibility: hidden;
             opacity: 0.5;
             padding: 0;

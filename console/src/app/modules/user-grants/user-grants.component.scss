@@ -9,7 +9,7 @@
     .user-grant-type-button {
       border: none;
       background: none;
-      text-align: left;
+      text-align: start;
       padding: 0.75rem 0;
       opacity: 0.6;
       font-size: 15px;
@@ -17,7 +17,7 @@
       color: map-get($foreground, text);
 
       &:not(:last-child) {
-        margin-right: 1rem;
+        margin-inline-end: 1rem;
       }
 
       &:hover {
@@ -93,7 +93,7 @@ th {
 
 .filtername {
   flex: 1;
-  margin-right: 1rem;
+  margin-inline-end: 1rem;
 
   .filterinput {
     height: 36px;

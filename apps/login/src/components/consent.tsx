@@ -70,7 +70,7 @@ export function ConsentScreen({
         })}
       </ul>
 
-      <p className="ztdl-p text-left text-xs">
+      <p className="ztdl-p text-start text-xs">
         <Translated i18nKey="request.disclaimer" namespace="device" data={{ appName: appName }} />
       </p>
 
@@ -88,7 +88,7 @@ export function ConsentScreen({
           variant={ButtonVariants.Secondary}
           data-testid="deny-button"
         >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}
+          {loading && <Spinner className="me-2 h-5 w-5" />}
           <Translated i18nKey="device.request.deny" namespace="device" />
         </Button>
         <span className="flex-grow"></span>

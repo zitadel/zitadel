@@ -84,7 +84,7 @@
           padding: 0.5rem;
           border-radius: 50vw;
           flex-shrink: 0;
-          margin-right: 1rem;
+          margin-inline-end: 1rem;
           align-self: center;
 
           .inner {
@@ -117,7 +117,7 @@
       height: 1.5rem;
       visibility: hidden;
       position: absolute;
-      right: 0;
+      inset-inline-end: 0;
     }
 
     &:hover {

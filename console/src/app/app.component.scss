@@ -32,8 +32,8 @@
     .nav {
       position: sticky;
       top: 0;
-      right: 0;
-      left: 0;
+      inset-inline-end: 0;
+      inset-inline-start: 0;
       background-color: map-get($background, toolbar);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid map-get($foreground, divider);

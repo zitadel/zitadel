@@ -57,8 +57,8 @@ export const Boundary = ({
     >
       <div
         className={clsx("absolute -top-2 flex space-x-1 text-[9px] leading-4 tracking-widest uppercase", {
-          "left-3 lg:left-5": size === "small",
-          "left-4 lg:left-9": size === "default",
+          "start-3 lg:start-5": size === "small",
+          "start-4 lg:start-9": size === "default",
         })}
       >
         {labels.map((label) => {

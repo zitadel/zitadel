@@ -37,13 +37,13 @@
         border-radius: 50vw;
         height: 8px;
         max-width: 300px;
-        margin-right: 1rem;
+        margin-inline-end: 1rem;
       }
 
       .prog-desc {
         font-style: italic;
         font-size: 14px;
-        margin-right: 1rem;
+        margin-inline-end: 1rem;
       }
     }
 
@@ -60,9 +60,9 @@
         text-decoration: none;
         cursor: pointer;
         padding-top: 0;
-        padding-right: 0;
+        padding-inline-end: 0;
         padding-bottom: 0;
-        padding-left: 1rem;
+        padding-inline-start: 1rem;
         border-radius: 0.5rem;
         box-sizing: border-box;
         min-height: 166px;
@@ -72,7 +72,7 @@
           display: flex;
           flex-direction: column;
           height: 100%;
-          padding-right: 0.5rem;
+          padding-inline-end: 0.5rem;
 
           .action-content-row {
             display: flex;
@@ -86,7 +86,7 @@
               padding: 0.5rem;
               border-radius: 50vw;
               flex-shrink: 0;
-              margin-right: 1rem;
+              margin-inline-end: 1rem;
               margin-top: 1rem;
 
               .inner {
@@ -131,7 +131,7 @@
         .state-circle {
           position: absolute;
           top: 0;
-          left: 0;
+          inset-inline-start: 0;
           transform: translateX(-50%) translateY(-50%);
           flex-shrink: 0;
           display: flex;
@@ -140,7 +140,7 @@
           height: 1.5rem;
           width: 1.5rem;
           border-radius: 50vw;
-          margin-right: 1rem;
+          margin-inline-end: 1rem;
           background-color: if(sass($is-dark-theme): map-get($background, state) ; else: #e4e7e4);
           box-shadow: 0 0 3px #0000001a;
           border: 1px solid rgba(#8795a1, 0.2);
@@ -174,7 +174,7 @@
           color: map-get($primary, 400);
 
           .icon {
-            margin-left: 0rem;
+            margin-inline-start: 0rem;
           }
         }
 

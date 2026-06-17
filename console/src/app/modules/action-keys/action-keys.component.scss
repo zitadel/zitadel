@@ -9,8 +9,8 @@
 
   .action-keys-wrapper {
     display: inline-block;
-    padding-left: 0.5rem;
-    margin-right: -0.5rem;
+    padding-inline-start: 0.5rem;
+    margin-inline-end: -0.5rem;
 
     &.without-margin {
       padding: 0;
@@ -40,9 +40,9 @@
           position: absolute;
           z-index: -1;
           top: 0;
-          right: 0;
+          inset-inline-end: 0;
           bottom: 0;
-          left: 0;
+          inset-inline-start: 0;
           background: map-get($primary, default-contrast);
           opacity: 0.2;
           border-radius: 4px;
@@ -51,7 +51,7 @@
         .span {
           position: absolute;
           top: 50%;
-          left: 50%;
+          inset-inline-start: 50%;
           transform: translate(-50% -50%);
           opacity: 1;
         }

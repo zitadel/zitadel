@@ -162,7 +162,7 @@ export function RegisterFormIDPIncomplete({
             onClick={handleSubmit(submitAndRegister)}
             data-testid="submit-button"
           >
-            {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="submit" namespace="register" />
+            {loading && <Spinner className="me-2 h-5 w-5" />} <Translated i18nKey="submit" namespace="register" />
           </Button>
         </div>
       </form>

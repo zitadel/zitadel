@@ -24,7 +24,7 @@
       flex-direction: column;
 
       .info {
-        margin-left: calc(40px + 1rem);
+        margin-inline-start: calc(40px + 1rem);
       }
     }
 
@@ -48,7 +48,7 @@
       width: 40px;
       display: flex;
       align-items: center;
-      margin-right: 1rem;
+      margin-inline-end: 1rem;
 
       .sms,
       .email,
@@ -94,7 +94,7 @@
       align-items: center;
       border: 1px solid #ffffff20;
       border-radius: 0.5rem;
-      padding-left: 0.5rem;
+      padding-inline-start: 0.5rem;
       justify-content: space-between;
 
       .overflow-auto {
@@ -121,7 +121,7 @@
   justify-content: flex-end;
 
   .ok-button {
-    margin-left: 0.5rem;
+    margin-inline-start: 0.5rem;
   }
 
   button {

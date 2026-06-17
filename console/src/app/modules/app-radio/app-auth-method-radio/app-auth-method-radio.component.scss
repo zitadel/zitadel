@@ -57,17 +57,17 @@
       padding-bottom: 1rem;
 
       &.first {
-        margin-left: 0;
+        margin-inline-start: 0;
       }
 
       &.last {
-        margin-right: 0;
+        margin-inline-end: 0;
       }
 
       .recommended {
         position: absolute;
         bottom: 0;
-        left: 50%;
+        inset-inline-start: 50%;
         transform: translateY(50%) translateX(-50%);
         border-radius: 50vw;
         font-size: 11px;
@@ -90,14 +90,14 @@
         justify-content: center;
         flex-direction: column;
         background: rgb(80, 110, 110);
-        border-top-left-radius: 6px;
-        border-top-right-radius: 6px;
+        border-start-start-radius: 6px;
+        border-start-end-radius: 6px;
         position: relative;
 
         .current {
           position: absolute;
           bottom: 0.5rem;
-          left: 50%;
+          inset-inline-start: 50%;
           transform: translateX(-50%);
           display: block;
           color: #ffffff90;
@@ -153,11 +153,11 @@
           }
 
           .space {
-            margin-left: 0.5rem;
+            margin-inline-start: 0.5rem;
           }
 
           .row-entry {
-            margin-right: 1rem;
+            margin-inline-end: 1rem;
             overflow: hidden;
             text-overflow: ellipsis;
           }

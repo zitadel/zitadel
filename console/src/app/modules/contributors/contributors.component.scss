@@ -13,7 +13,7 @@
       border-radius: 50vw;
       padding: 6px 9px;
       background-color: map-get($background, contributor);
-      padding-left: 9px;
+      padding-inline-start: 9px;
       transition: all 0.2s ease;
 
       .contributor-img-list {
@@ -22,7 +22,7 @@
         align-items: center;
 
         &.padd-left {
-          padding-left: 1rem;
+          padding-inline-start: 1rem;
         }
 
         .spinner {
@@ -30,7 +30,7 @@
         }
 
         .add-img {
-          float: left;
+          float: inline-start;
           margin: 0 0 0 -8px;
 
           &.no-margin {
@@ -39,7 +39,7 @@
         }
 
         .contributor-avatar-circle {
-          float: left;
+          float: inline-start;
           margin: 0 8px 0 -15px;
           height: 32px;
           width: 32px;
@@ -72,7 +72,7 @@
         }
 
         .margin-neg {
-          margin-left: -1rem;
+          margin-inline-start: -1rem;
         }
       }
     }

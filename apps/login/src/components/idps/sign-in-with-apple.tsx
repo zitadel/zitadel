@@ -21,7 +21,7 @@ export const SignInWithApple = forwardRef<HTMLButtonElement, SignInWithIdentityP
         {children ? (
           children
         ) : (
-          <span className="ml-4">{name ? name : <Translated i18nKey="signInWithApple" namespace="idp" />}</span>
+          <span className="ms-4">{name ? name : <Translated i18nKey="signInWithApple" namespace="idp" />}</span>
         )}
       </BaseButton>
     );

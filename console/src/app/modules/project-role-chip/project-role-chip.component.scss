@@ -22,7 +22,7 @@
     justify-content: center;
     padding: 3px 1rem;
     margin: 3px 0;
-    margin-right: 0.5rem;
+    margin-inline-end: 0.5rem;
     border-radius: 50vw;
     border: 1px solid $border-color;
     box-sizing: border-box;
@@ -36,8 +36,8 @@
       align-items: center;
       justify-content: center;
       line-height: 1rem;
-      margin-left: 4px;
-      margin-right: -0.5rem;
+      margin-inline-start: 4px;
+      margin-inline-end: -0.5rem;
       padding: 0 !important;
 
       .mat-mdc-button-touch-target {

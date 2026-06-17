@@ -9,7 +9,7 @@ export const ExternalLink = ({ children, href }: { children: ReactNode; href: st
     >
       <div>{children}</div>
 
-      <ArrowRightIcon className="block w-4" />
+      <ArrowRightIcon className="block w-4 rtl:-scale-x-100" />
     </a>
   );
 };

@@ -49,7 +49,7 @@ export function SessionClearItem({ session, reload }: { session: Session; reload
       }}
       className="group border-divider-light bg-background-light-400 dark:bg-background-dark-400 flex flex-row items-center rounded-md border px-4 py-2 transition-all hover:shadow-lg dark:hover:bg-white/10"
     >
-      <div className="pr-4">
+      <div className="pe-4">
         <Avatar
           size="small"
           loginName={session.factors?.user?.loginName as string}
@@ -81,14 +81,14 @@ export function SessionClearItem({ session, reload }: { session: Session; reload
 
       <span className="flex-grow"></span>
       <div className="relative flex flex-row items-center">
-        <div className="text-warn-light-500 dark:text-warn-dark-500 mr-6 flex hidden items-center justify-center rounded-full bg-[#ff0000]/10 px-2 py-[2px] text-xs transition-all group-hover:block dark:bg-[#ff0000]/10">
+        <div className="text-warn-light-500 dark:text-warn-dark-500 me-6 flex hidden items-center justify-center rounded-full bg-[#ff0000]/10 px-2 py-[2px] text-xs transition-all group-hover:block dark:bg-[#ff0000]/10">
           <Translated i18nKey="clear" namespace="logout" />
         </div>
 
         {valid ? (
-          <div className="absolute right-0 mx-2 h-2 w-2 transform rounded-full bg-green-500 transition-all"></div>
+          <div className="absolute end-0 mx-2 h-2 w-2 transform rounded-full bg-green-500 transition-all"></div>
         ) : (
-          <div className="absolute right-0 mx-2 h-2 w-2 transform rounded-full bg-red-500 transition-all"></div>
+          <div className="absolute end-0 mx-2 h-2 w-2 transform rounded-full bg-red-500 transition-all"></div>
         )}
       </div>
     </button>

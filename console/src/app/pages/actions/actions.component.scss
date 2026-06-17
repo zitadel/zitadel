@@ -34,7 +34,7 @@ h1 {
       }
 
       i {
-        margin-left: 0.5rem;
+        margin-inline-start: 0.5rem;
       }
     }
 
@@ -57,7 +57,7 @@ h1 {
 
         .type-icon {
           color: $primary-color;
-          margin-right: 1rem;
+          margin-inline-end: 1rem;
         }
 
         .type-button-icon {
@@ -65,14 +65,14 @@ h1 {
         }
 
         > span {
-          margin-right: 1rem;
+          margin-inline-end: 1rem;
         }
 
         button[mat-icon-button] {
-          margin-right: 0;
+          margin-inline-end: 0;
 
           .type-button-icon {
-            margin-right: 0;
+            margin-inline-end: 0;
           }
         }
       }
@@ -89,7 +89,7 @@ h1 {
             display: flex;
             align-items: center;
             margin-bottom: 0.5rem;
-            padding-left: 7px;
+            padding-inline-start: 7px;
 
             .fill-space {
               flex: 1;
@@ -97,7 +97,7 @@ h1 {
           }
 
           .icon {
-            margin-right: 1rem;
+            margin-inline-end: 1rem;
             color: $primary-color;
           }
 
@@ -117,7 +117,7 @@ h1 {
               cursor: move;
 
               .flow-action-name {
-                margin-right: 1rem;
+                margin-inline-end: 1rem;
               }
 
               .fill-space {
@@ -125,12 +125,12 @@ h1 {
               }
 
               i {
-                margin-right: 0.5rem;
+                margin-inline-end: 0.5rem;
               }
             }
 
             .state {
-              margin-left: 1rem;
+              margin-inline-start: 1rem;
             }
           }
         }
@@ -140,7 +140,7 @@ h1 {
         position: absolute;
         top: 26px;
         bottom: 1.5rem;
-        left: 35px;
+        inset-inline-start: 35px;
         width: 2px;
         z-index: 0;
         background-color: $primary-color;
@@ -168,7 +168,7 @@ h1 {
         0 3px 14px 2px rgba(0, 0, 0, 0.12);
 
       i {
-        margin-right: 0.5rem;
+        margin-inline-end: 0.5rem;
       }
     }
 

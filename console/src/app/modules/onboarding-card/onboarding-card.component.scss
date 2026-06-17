@@ -24,8 +24,8 @@
 
     .spinner-w {
       top: 1rem;
-      left: 0;
-      right: 0;
+      inset-inline-start: 0;
+      inset-inline-end: 0;
       position: absolute;
       display: flex;
       justify-content: center;
@@ -69,7 +69,7 @@
           height: 1.5rem;
           width: 1.5rem;
           border-radius: 50vw;
-          margin-right: 1rem;
+          margin-inline-end: 1rem;
           background-color: if(sass($is-dark-theme): map-get($background, state) ; else: #e4e7e4);
           box-shadow: 0 0 3px #0000001a;
           border: 1px solid rgba(#8795a1, 0.2);

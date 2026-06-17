@@ -29,7 +29,7 @@
         align-items: center;
 
         .cnsl-link {
-          margin-right: 1rem;
+          margin-inline-end: 1rem;
           display: block;
           position: relative;
         }
@@ -41,7 +41,7 @@
 
             .cnsl-title {
               margin: 0;
-              margin-right: 0.5rem;
+              margin-inline-end: 0.5rem;
               font-size: 2rem;
             }
 
@@ -105,8 +105,8 @@
         }
 
         .icon {
-          margin-left: 0.25rem;
-          margin-right: -0.5rem;
+          margin-inline-start: 0.25rem;
+          margin-inline-end: -0.5rem;
         }
       }
 
@@ -123,7 +123,7 @@
 
         @media only screen and (min-width: 700px) {
           flex-basis: auto;
-          margin-left: 2rem;
+          margin-inline-start: 2rem;
         }
       }
     }

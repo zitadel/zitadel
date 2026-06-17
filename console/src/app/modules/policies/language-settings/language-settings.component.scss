@@ -30,7 +30,7 @@
 
     .save-button {
       display: block;
-      margin-left: 1rem;
+      margin-inline-start: 1rem;
     }
   }
 }
@@ -48,7 +48,7 @@
     margin-top: 1.5rem;
 
     .label {
-      margin-right: 1rem;
+      margin-inline-end: 1rem;
       flex: 1;
       white-space: nowrap;
     }
@@ -73,14 +73,14 @@
   .index {
     position: absolute;
     top: 4px;
-    left: 4px;
+    inset-inline-start: 4px;
     opacity: 0.5;
     font-size: 10px;
   }
 
   .locale {
     width: 35px;
-    margin-right: 1rem;
+    margin-inline-end: 1rem;
   }
 
   .lang {
@@ -107,6 +107,6 @@
   }
 
   .defaultlanglabel {
-    margin-left: 0.5rem;
+    margin-inline-start: 0.5rem;
   }
 }

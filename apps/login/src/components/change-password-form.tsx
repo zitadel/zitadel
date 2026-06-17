@@ -186,7 +186,7 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
             onClick={handleSubmit(submitChange)}
             data-testid="submit-button"
           >
-            {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="change.submit" namespace="password" />
+            {loading && <Spinner className="me-2 h-5 w-5" />} <Translated i18nKey="change.submit" namespace="password" />
           </Button>
         </div>
       </form>

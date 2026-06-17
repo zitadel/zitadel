@@ -20,7 +20,7 @@
     box-sizing: border-box;
 
     .add-user-row {
-      margin-left: -4px;
+      margin-inline-start: -4px;
     }
 
     .found-user-row {
@@ -107,7 +107,7 @@
 }
 
 .circle {
-  margin-right: 0.5rem;
+  margin-inline-end: 0.5rem;
 }
 
 input {

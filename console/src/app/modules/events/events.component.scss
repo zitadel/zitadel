@@ -43,7 +43,7 @@
       display: none;
       justify-content: center;
       align-items: center;
-      right: 0;
+      inset-inline-end: 0;
       top: 50%;
       transform: translateY(-50%);
 
@@ -66,12 +66,12 @@
     justify-content: space-between;
     position: relative;
     user-select: none;
-    margin-left: 1rem;
+    margin-inline-start: 1rem;
 
     .filter-count {
       font-size: 14px;
       color: $primary-color;
-      margin-left: 0.5rem;
+      margin-inline-start: 0.5rem;
     }
   }
 }

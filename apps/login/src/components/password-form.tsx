@@ -159,7 +159,7 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
             onClick={handleSubmit(submitPassword)}
             data-testid="submit-button"
           >
-            {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="verify.submit" namespace="password" />
+            {loading && <Spinner className="me-2 h-5 w-5" />} <Translated i18nKey="verify.submit" namespace="password" />
           </Button>
         </div>
       </form>

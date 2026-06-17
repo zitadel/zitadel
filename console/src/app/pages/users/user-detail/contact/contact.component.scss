@@ -15,7 +15,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 0.5rem;
-      padding-right: 0;
+      padding-inline-end: 0;
       border-bottom: 1px solid #ffffff20;
       flex-wrap: wrap;
 
@@ -47,7 +47,7 @@
 
           &.notverified {
             color: var(--warn);
-            margin-right: 1rem;
+            margin-inline-end: 1rem;
           }
         }
 
@@ -76,7 +76,7 @@
         cursor: pointer;
         word-wrap: none;
         white-space: nowrap;
-        margin-right: 1rem;
+        margin-inline-end: 1rem;
 
         &:hover {
           color: map-get($foreground, text);

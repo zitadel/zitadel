@@ -179,14 +179,14 @@ export function SetPasswordForm({
           {codeRequired && (
             <Alert type={AlertType.INFO}>
               <div className="flex flex-row">
-                <span className="mr-auto flex-1 text-left">
+                <span className="me-auto flex-1 text-start">
                   <Translated i18nKey="set.noCodeReceived" namespace="password" />
                 </span>
                 <button
                   aria-label="Resend OTP Code"
                   disabled={loading}
                   type="button"
-                  className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
+                  className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ms-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
                   onClick={() => {
                     resendCode();
                   }}
@@ -261,7 +261,7 @@ export function SetPasswordForm({
             onClick={handleSubmit(submitPassword)}
             data-testid="submit-button"
           >
-            {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="set.submit" namespace="password" />
+            {loading && <Spinner className="me-2 h-5 w-5" />} <Translated i18nKey="set.submit" namespace="password" />
           </Button>
         </div>
       </form>

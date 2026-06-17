@@ -32,7 +32,7 @@
 
   .size {
     transform: translateY(1px);
-    margin-right: 0.5rem;
+    margin-inline-end: 0.5rem;
   }
 
   button {
@@ -40,7 +40,7 @@
   }
 
   :last-child {
-    margin-right: 0;
+    margin-inline-end: 0;
   }
 
   .row {

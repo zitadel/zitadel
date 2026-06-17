@@ -56,9 +56,9 @@
       text-decoration: none;
       cursor: pointer;
       padding-top: 1rem;
-      padding-right: 1rem;
+      padding-inline-end: 1rem;
       padding-bottom: 1rem;
-      padding-left: 1rem;
+      padding-inline-start: 1rem;
       border-radius: 0.5rem;
       box-sizing: border-box;
       transition: box-shadow 0.1s ease-in;
@@ -68,7 +68,7 @@
       .coming-soon-label {
         position: absolute;
         top: 0;
-        right: 1rem;
+        inset-inline-end: 1rem;
         transform: translateY(-50%);
         width: fit-content;
       }
@@ -78,7 +78,7 @@
       }
 
       .idp-logo {
-        margin-right: 1rem;
+        margin-inline-end: 1rem;
         height: 36px;
         width: 36px;
 
@@ -96,7 +96,7 @@
       }
 
       .idp-icon {
-        margin-right: 1rem;
+        margin-inline-end: 1rem;
         display: flex;
         justify-content: center;
         align-items: center;

@@ -67,9 +67,9 @@ export function DynamicTheme({
 
                         {/* First child content (title, description) - only if we have left/right structure */}
                         {hasLeftRightStructure && (
-                          <div className="flex flex-col items-start space-y-4 text-left">
+                          <div className="flex flex-col items-start space-y-4 text-start">
                             {/* Apply larger styling to the content */}
-                            <div className="space-y-6 [&_h1]:text-left [&_h1]:text-4xl [&_h1]:leading-tight [&_h1]:text-gray-900 [&_h1]:lg:text-4xl [&_h1]:dark:text-white [&_p]:text-left [&_p]:leading-relaxed [&_p]:text-gray-700 [&_p]:dark:text-gray-300">
+                            <div className="space-y-6 [&_h1]:text-start [&_h1]:text-4xl [&_h1]:leading-tight [&_h1]:text-gray-900 [&_h1]:lg:text-4xl [&_h1]:dark:text-white [&_p]:text-start [&_p]:leading-relaxed [&_p]:text-gray-700 [&_p]:dark:text-gray-300">
                               {leftContent}
                             </div>
                           </div>

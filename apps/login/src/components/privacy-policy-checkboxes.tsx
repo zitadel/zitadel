@@ -49,7 +49,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="ml-1 h-5 w-5"
+                className="ms-1 h-5 w-5"
               >
                 <path
                   strokeLinecap="round"
@@ -64,7 +64,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
       {tosLink && (
         <div className="mt-4 flex items-center">
           <Checkbox
-            className="mr-4"
+            className="me-4"
             checked={acceptanceState.tosAccepted}
             value={"tos"}
             onChangeVal={(checked: boolean) => {
@@ -78,7 +78,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
             data-testid="tos-checkbox"
           />
 
-          <div className="mr-4 w-[28rem]">
+          <div className="me-4 w-[28rem]">
             <p className="text-text-light-500 dark:text-text-dark-500 text-sm">
               <Link href={tosLink} className="underline" target="_blank" data-testid="tos-link">
                 <Translated i18nKey="termsOfService" namespace="register" />
@@ -90,7 +90,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
       {privacyPolicyLink && (
         <div className="mt-4 flex items-center">
           <Checkbox
-            className="mr-4"
+            className="me-4"
             checked={acceptanceState.privacyPolicyAccepted}
             value={"privacypolicy"}
             onChangeVal={(checked: boolean) => {
@@ -104,7 +104,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
             data-testid="privacy-policy-checkbox"
           />
 
-          <div className="mr-4 w-[28rem]">
+          <div className="me-4 w-[28rem]">
             <p className="text-text-light-500 dark:text-text-dark-500 text-sm">
               <Link href={privacyPolicyLink} className="underline" target="_blank" data-testid="privacy-policy-link">
                 <Translated i18nKey="privacyPolicy" namespace="register" />

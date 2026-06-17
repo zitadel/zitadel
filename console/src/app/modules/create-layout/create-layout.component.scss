@@ -33,7 +33,7 @@
 
   .abort {
     font-size: 1.2rem;
-    margin-left: 1.5rem;
+    margin-inline-start: 1.5rem;
     text-transform: uppercase;
     font-size: 14px;
     opacity: 0.8;
@@ -41,7 +41,7 @@
   }
 
   .abort-2 {
-    margin-left: 2rem;
+    margin-inline-start: 2rem;
     white-space: nowrap;
     font-size: 12px;
     padding: 0.25rem 1rem;
@@ -51,5 +51,5 @@
 }
 
 .create-layout-content {
-  padding-left: 4.5rem;
+  padding-inline-start: 4.5rem;
 }

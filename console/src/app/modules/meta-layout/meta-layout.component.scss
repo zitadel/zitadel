@@ -9,7 +9,7 @@
     display: relative;
     width: 100%;
     padding-bottom: 2rem;
-    padding-right: 1rem;
+    padding-inline-end: 1rem;
     min-width: 0;
   }
 
@@ -24,7 +24,7 @@
       content: '';
       position: absolute;
       top: 0;
-      left: 0;
+      inset-inline-start: 0;
       height: 50%;
     }
   }

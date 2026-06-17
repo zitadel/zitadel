@@ -20,7 +20,7 @@
 
   button {
     &.left-button {
-      margin-right: 1rem;
+      margin-inline-end: 1rem;
     }
   }
 }
@@ -53,9 +53,9 @@
       text-decoration: none;
       cursor: pointer;
       padding-top: 0;
-      padding-right: 0;
+      padding-inline-end: 0;
       padding-bottom: 0;
-      padding-left: 1rem;
+      padding-inline-start: 1rem;
       border-radius: 0.5rem;
       box-sizing: border-box;
       min-height: 166px;
@@ -87,7 +87,7 @@
 
           .name {
             font-size: 1.2rem;
-            margin-right: 0.5rem;
+            margin-inline-end: 0.5rem;
           }
 
           .state-dot {
@@ -128,7 +128,7 @@
             width: 25px;
             border-radius: 50%;
             margin: 0;
-            margin-right: 1rem;
+            margin-inline-end: 1rem;
           }
         }
 
@@ -146,7 +146,7 @@
         user-select: none;
         position: absolute;
         bottom: 0;
-        right: 30px;
+        inset-inline-end: 30px;
         margin: 0;
         margin-bottom: 0.25rem;
 
@@ -160,7 +160,7 @@
         user-select: none;
         position: absolute;
         bottom: 0;
-        right: 0;
+        inset-inline-end: 0;
         margin: 0;
         margin-bottom: 0.25rem;
 

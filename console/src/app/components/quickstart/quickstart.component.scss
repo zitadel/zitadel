@@ -49,7 +49,7 @@
       overflow-x: hidden;
       box-sizing: border-box;
       max-width: 600px;
-      margin-left: auto;
+      margin-inline-start: auto;
 
       .quickstart-card {
         position: relative;
@@ -108,7 +108,7 @@
           color: map-get($primary, 400);
 
           .icon {
-            margin-left: 0rem;
+            margin-inline-start: 0rem;
           }
         }
 

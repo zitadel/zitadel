@@ -21,13 +21,13 @@ const neutral = "border-divider-light dark:border-divider-dark bg-black/5 text-g
 export function Alert({ children, type = AlertType.ALERT }: Props) {
   return (
     <div
-      className={clsx("flex scroll-px-40 flex-row items-center justify-center rounded-md border py-2 pr-2", {
+      className={clsx("flex scroll-px-40 flex-row items-center justify-center rounded-md border py-2 pe-2", {
         [yellow]: type === AlertType.ALERT,
         [neutral]: type === AlertType.INFO,
       })}
     >
-      {type === AlertType.ALERT && <ExclamationTriangleIcon className="mr-2 ml-2 h-5 w-5 flex-shrink-0" />}
-      {type === AlertType.INFO && <InformationCircleIcon className="mr-2 ml-2 h-5 w-5 flex-shrink-0" />}
+      {type === AlertType.ALERT && <ExclamationTriangleIcon className="me-2 ms-2 h-5 w-5 flex-shrink-0" />}
+      {type === AlertType.INFO && <InformationCircleIcon className="me-2 ms-2 h-5 w-5 flex-shrink-0" />}
       <span className="w-full text-sm">{children}</span>
     </div>
   );

@@ -6,12 +6,12 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { Skeleton } from "@/components/skeleton";
 import { ThemeProvider } from "@/components/theme-provider";
 import ThemeSwitch from "@/components/theme-switch";
-import { LANGS, getLanguage } from "@/lib/i18n";
+import { LANGS, getLanguage, isRtlLocale } from "@/lib/i18n";
 import { getServiceConfig } from "@/lib/service-url";
 import { getAllowedLanguages } from "@/lib/zitadel";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Lato } from "next/font/google";
 import { headers } from "next/headers";
 import React, { Suspense } from "react";
@@ -30,6 +30,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
+  const locale = await getLocale();
+  const dir = isRtlLocale(locale) ? "rtl" : "ltr";
+
   let languages = LANGS;
   try {
     const settings = await getAllowedLanguages({ serviceConfig });
@@ -43,7 +46,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <html className={`${lato.className}`} suppressHydrationWarning>
+    <html lang={locale} dir={dir} className={`${lato.className}`} suppressHydrationWarning>
       <head />
       <body>
         <ThemeProvider>

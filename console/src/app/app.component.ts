@@ -18,7 +18,7 @@ import { KeyboardShortcutsService } from './services/keyboard-shortcuts/keyboard
 import { ManagementService } from './services/mgmt.service';
 import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
-import { fallbackLanguage, supportedLanguages, supportedLanguagesRegexp } from './utils/language';
+import { fallbackLanguage, isRtlLanguage, supportedLanguages, supportedLanguagesRegexp } from './utils/language';
 import { PosthogService } from './services/posthog.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NewOrganizationService } from './services/new-organization.service';
@@ -244,6 +244,7 @@ export class AppComponent {
 
     this.translate.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((language: LangChangeEvent) => {
       this.document.documentElement.lang = language.lang;
+      this.document.documentElement.dir = isRtlLanguage(language.lang) ? 'rtl' : 'ltr';
     });
   }
 
@@ -292,6 +293,7 @@ export class AppComponent {
         : fallbackLang;
       this.translate.use(lang);
       this.document.documentElement.lang = lang;
+      this.document.documentElement.dir = isRtlLanguage(lang) ? 'rtl' : 'ltr';
     });
   }
 
