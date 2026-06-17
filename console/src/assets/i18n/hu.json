@@ -2364,7 +2364,8 @@
       "DESCRIPTION": "Add meg az adatokat a JWT azonosítószolgáltatóhoz.",
       "HEADERNAME": "Fejléc neve",
       "JWTENDPOINT": "JWT végpont",
-      "JWTKEYSENDPOINT": "JWT kulcsok végpont"
+      "JWTKEYSENDPOINT": "JWT kulcsok végpont",
+      "AUDIENCE": "Audience"
     },
     "APPLE": {
       "TEAMID": "Csapatazonosító",

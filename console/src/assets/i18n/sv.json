@@ -2370,7 +2370,8 @@
       "DESCRIPTION": "Ange data för JWT-identitetsleverantören.",
       "HEADERNAME": "Header-namn",
       "JWTENDPOINT": "JWT-slutpunkt",
-      "JWTKEYSENDPOINT": "JWT-nycklar slutpunkt"
+      "JWTKEYSENDPOINT": "JWT-nycklar slutpunkt",
+      "AUDIENCE": "Audience"
     },
     "APPLE": {
       "TEAMID": "Team-ID",
