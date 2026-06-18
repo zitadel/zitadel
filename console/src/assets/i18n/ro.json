@@ -2365,7 +2365,8 @@
       "DESCRIPTION": "Introduceți datele pentru furnizorul de identitate JWT.",
       "HEADERNAME": "Nume antet",
       "JWTENDPOINT": "Punct final JWT",
-      "JWTKEYSENDPOINT": "Punct final chei JWT"
+      "JWTKEYSENDPOINT": "Punct final chei JWT",
+      "AUDIENCE": "Audiență"
     },
     "APPLE": {
       "TEAMID": "ID echipă",
@@ -2601,7 +2602,7 @@
       "TYPEREQUIRED": "Tipul este necesar.",
       "TITLE": "Configurație OIDC",
       "CLIENTID": "ID client",
-      "CLIENTSECRET": "Secret client",
+      "CLIENTDETAILS": "Detalii client",
       "CLIENTSECRET_NOSECRET": "Cu fluxul de autentificare ales, nu este necesar niciun secret și, prin urmare, nu este disponibil.",
       "CLIENTSECRET_DESCRIPTION": "Păstrați secretul clientului într-un loc sigur, deoarece va dispărea odată ce dialogul este închis.",
       "REGENERATESECRET": "Regenerați secretul clientului",

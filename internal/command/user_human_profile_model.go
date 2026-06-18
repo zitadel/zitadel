@@ -71,7 +71,21 @@ func (wm *HumanProfileWriteModel) Reduce() error {
 				wm.Gender = *e.Gender
 			}
 		case *user.UserRemovedEvent:
+			wm.FirstName = ""
+			wm.LastName = ""
+			wm.NickName = ""
+			wm.DisplayName = ""
+			wm.PreferredLanguage = language.Und
+			wm.Gender = domain.GenderUnspecified
 			wm.UserState = domain.UserStateDeleted
+		case *user.MachineAddedEvent:
+			wm.FirstName = ""
+			wm.LastName = ""
+			wm.NickName = ""
+			wm.DisplayName = ""
+			wm.PreferredLanguage = language.Und
+			wm.Gender = domain.GenderUnspecified
+			wm.UserState = domain.UserStateUnspecified
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -83,8 +97,10 @@ func (wm *HumanProfileWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		EventTypes(user.HumanAddedType,
+		EventTypes(
+			user.HumanAddedType,
 			user.HumanRegisteredType,
+			user.MachineAddedEventType,
 			user.HumanProfileChangedType,
 			user.UserRemovedType,
 			user.UserV1AddedType,

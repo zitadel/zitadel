@@ -40,6 +40,17 @@ type Command interface {
 	Fields() []*FieldOperation
 }
 
+type EnforceResourceOwnerCommand interface {
+	Command
+	// EnforceResourceOwner indicates that the resource owner of the event does not respect the previous events and should be enforced by the eventstore.
+	EnforceResourceOwner()
+}
+
+func ShouldEnforceResourceOwner(cmd Command) bool {
+	_, ok := cmd.(EnforceResourceOwnerCommand)
+	return ok
+}
+
 // Event is a stored activity
 type Event interface {
 	action

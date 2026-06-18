@@ -124,3 +124,58 @@ func TestServer_DeviceAuth(t *testing.T) {
 		})
 	}
 }
+
+func TestServer_DeviceAuth_invalid_client(t *testing.T) {
+	project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
+	client, err := Instance.CreateOIDCClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, false, app.OIDCGrantType_OIDC_GRANT_TYPE_DEVICE_CODE)
+	require.NoError(t, err)
+
+	scope := []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail}
+
+	provider, err := rp.NewRelyingPartyOIDC(CTX, Instance.OIDCIssuer(), client.GetClientId(), "", "", scope)
+	require.NoError(t, err)
+
+	deviceAuthorization, err := rp.DeviceAuthorization(CTX, scope, provider, nil)
+	require.NoError(t, err)
+
+	relyingPartyDone := make(chan struct{})
+	go func() {
+		ctx, cancel := context.WithTimeout(CTX, 1*time.Minute)
+		defer func() {
+			cancel()
+			relyingPartyDone <- struct{}{}
+		}()
+
+		var req *oidc_pb.GetDeviceAuthorizationRequestResponse
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
+			req, err = Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTX, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+				UserCode: deviceAuthorization.UserCode,
+			})
+			assert.NoError(collectT, err)
+		}, retryDuration, tick)
+		sessionID, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
+		_, err = Instance.Client.OIDCv2.AuthorizeOrDenyDeviceAuthorization(CTXLOGIN, &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
+			DeviceAuthorizationId: req.GetDeviceAuthorizationRequest().GetId(),
+			Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
+				Session: &oidc_pb.Session{
+					SessionId:    sessionID,
+					SessionToken: sessionToken,
+				},
+			},
+		})
+		require.NoError(t, err)
+
+		otherClient, err := Instance.CreateOIDCClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, false, app.OIDCGrantType_OIDC_GRANT_TYPE_DEVICE_CODE)
+		require.NoError(t, err)
+
+		otherProvider, err := rp.NewRelyingPartyOIDC(CTX, Instance.OIDCIssuer(), otherClient.GetClientId(), "", "", scope)
+		require.NoError(t, err)
+		tokens, err := rp.DeviceAccessToken(ctx, deviceAuthorization.DeviceCode, time.Duration(deviceAuthorization.Interval)*time.Second, otherProvider)
+		require.ErrorIs(t, err, oidc.ErrInvalidClient())
+		require.ErrorContains(t, err, "client_id does not correspond to the client_id in the authorization request")
+		require.Nil(t, tokens)
+	}()
+
+	<-relyingPartyDone
+}

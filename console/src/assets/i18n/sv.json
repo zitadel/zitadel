@@ -2371,7 +2371,8 @@
       "DESCRIPTION": "Ange data för JWT-identitetsleverantören.",
       "HEADERNAME": "Header-namn",
       "JWTENDPOINT": "JWT-slutpunkt",
-      "JWTKEYSENDPOINT": "JWT-nycklar slutpunkt"
+      "JWTKEYSENDPOINT": "JWT-nycklar slutpunkt",
+      "AUDIENCE": "Audience"
     },
     "APPLE": {
       "TEAMID": "Team-ID",
@@ -2608,7 +2609,7 @@
       "TYPEREQUIRED": "Typen är obligatorisk.",
       "TITLE": "OIDC-konfiguration",
       "CLIENTID": "Klient-ID",
-      "CLIENTSECRET": "Klienthemlighet",
+      "CLIENTDETAILS": "Klientdetaljer",
       "CLIENTSECRET_NOSECRET": "Med ditt valda autentiseringsflöde krävs ingen hemlighet och är därför inte tillgänglig.",
       "CLIENTSECRET_DESCRIPTION": "Förvara din klienthemlighet på en säker plats eftersom den kommer att försvinna när dialogen stängs.",
       "REGENERATESECRET": "Återskapa klienthemlighet",

@@ -598,12 +598,9 @@ Executions:
   MaxTtl: 5m  # ZITADEL_EXECUTIONS_MAXTTL
   # List of domains and IPs that are not valid execution target's endpoints
   # Wildcard sub domains are currently unsupported
+
+  # Deprecated: use HTTPClient.DenyList instead. If both are set, this list will be merged into the HTTPClient.DenyList.
   DenyList: # ZITADEL_EXECUTIONS_DENYLIST (comma separated list)
-    - localhost
-    - "127.0.0.0/8"
-    - "::1"
-    - "0.0.0.0"
-    - "::"
 
 Auth:
   # See Projections.BulkLimit
@@ -859,7 +856,7 @@ SystemDefaults:
       # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2", "sha2"
       # Depending on the algorithm, different configuration options take effect.
       Algorithm: bcrypt # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
-      # Cost takes effect for the algorithms bcrypt and scrypt
+      # Cost takes effect for bcrypt (work factor) and scrypt (LN, log2 of N)
       Cost: 14 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_COST
       # Time takes effect for the algorithms argon2i and argon2id
       Time: 3 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_TIME
@@ -873,6 +870,40 @@ SystemDefaults:
       # Can be "sha1", "sha224", "sha256", "sha384" or "sha512" for pbkdf2
       # Can be "sha256" or "sha512" for sha2
       Hash: sha256 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_HASH
+    # Limits bound cost parameters of imported or pre-encoded password hashes.
+    Limits:
+      Bcrypt:
+        MinCost: 10 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_BCRYPT_MINCOST
+        MaxCost: 16 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_BCRYPT_MAXCOST
+      Argon2:
+        MinTime: 1 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_ARGON2_MINTIME
+        MaxTime: 10 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_ARGON2_MAXTIME
+        MinMemory: 8192 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_ARGON2_MINMEMORY
+        MaxMemory: 524288 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_ARGON2_MAXMEMORY
+        MinThreads: 1 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_ARGON2_MINTHREADS
+        MaxThreads: 16 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_ARGON2_MAXTHREADS
+      Scrypt:
+        MinLN: 14 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MINLN
+        MaxLN: 20 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MAXLN
+        MinR: 8 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MINR
+        MaxR: 32 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MAXR
+        MinP: 1 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MINP
+        MaxP: 16 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MAXP
+      PBKDF2:
+        # FIPS mode: MinRounds below 1000 (NIST SP 800-132) logs a startup warning; primary Hasher Rounds must be >= 1000.
+        MinRounds: 1000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_PBKDF2_MINROUNDS
+        MaxRounds: 10000000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_PBKDF2_MAXROUNDS
+      Sha2:
+        MinSha256Rounds: 1000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SHA2_MINSHA256ROUNDS
+        MaxSha256Rounds: 999999999 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SHA2_MAXSHA256ROUNDS
+        MinSha512Rounds: 1000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SHA2_MINSHA512ROUNDS
+        MaxSha512Rounds: 999999999 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SHA2_MAXSHA512ROUNDS
+      PHPass:
+        MinRounds: 7 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_PHPASS_MINROUNDS
+        MaxRounds: 31 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_PHPASS_MAXROUNDS
+      Drupal7:
+        MinIterations: 1000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_DRUPAL7_MINITERATIONS
+        MaxIterations: 500000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_DRUPAL7_MAXITERATIONS
 
     # Verifiers enable the possibility of verifying
     # passwords that are previously hashed using another
@@ -903,7 +934,7 @@ SystemDefaults:
       # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2"
       # Depending on the algorithm, different configuration options take effect.
       Algorithm: bcrypt # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_ALGORITHM
-      # Cost takes effect for the algorithms bcrypt and scrypt
+      # Cost takes effect for bcrypt (work factor) and scrypt (LN, log2 of N)
       Cost: 4 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_COST
       # Time takes effect for the algorithms argon2i and argon2id
       Time: 3 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_TIME
@@ -916,6 +947,40 @@ SystemDefaults:
       # Hash takes effect for the algorithm pbkdf2
       # Can be "sha1", "sha224", "sha256", "sha384" or "sha512"
       Hash: sha256 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_HASH
+    # Limits bound cost parameters of imported or pre-encoded secret hashes.
+    Limits:
+      Bcrypt:
+        MinCost: 4 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_BCRYPT_MINCOST
+        MaxCost: 16 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_BCRYPT_MAXCOST
+      Argon2:
+        MinTime: 1 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_ARGON2_MINTIME
+        MaxTime: 10 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_ARGON2_MAXTIME
+        MinMemory: 8192 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_ARGON2_MINMEMORY
+        MaxMemory: 524288 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_ARGON2_MAXMEMORY
+        MinThreads: 1 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_ARGON2_MINTHREADS
+        MaxThreads: 16 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_ARGON2_MAXTHREADS
+      Scrypt:
+        MinLN: 14 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MINLN
+        MaxLN: 20 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MAXLN
+        MinR: 8 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MINR
+        MaxR: 32 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MAXR
+        MinP: 1 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MINP
+        MaxP: 16 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MAXP
+      PBKDF2:
+        # FIPS mode: MinRounds below 1000 (NIST SP 800-132) logs a startup warning; primary Hasher Rounds must be >= 1000.
+        MinRounds: 1000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_PBKDF2_MINROUNDS
+        MaxRounds: 10000000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_PBKDF2_MAXROUNDS
+      Sha2:
+        MinSha256Rounds: 1000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SHA2_MINSHA256ROUNDS
+        MaxSha256Rounds: 999999999 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SHA2_MAXSHA256ROUNDS
+        MinSha512Rounds: 1000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SHA2_MINSHA512ROUNDS
+        MaxSha512Rounds: 999999999 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SHA2_MAXSHA512ROUNDS
+      PHPass:
+        MinRounds: 7 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_PHPASS_MINROUNDS
+        MaxRounds: 31 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_PHPASS_MAXROUNDS
+      Drupal7:
+        MinIterations: 1000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_DRUPAL7_MINITERATIONS
+        MaxIterations: 500000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_DRUPAL7_MAXITERATIONS
     Verifiers: # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_VERIFIERS
   Multifactors:
     OTP:
@@ -967,12 +1032,8 @@ SystemDefaults:
 Actions:
   HTTP:
     # Wildcard sub domains are currently unsupported
+    # Deprecated: use HTTPClient.DenyList instead. If both are set, this list will be merged into the HTTPClient.DenyList.
     DenyList: # ZITADEL_ACTIONS_HTTP_DENYLIST (comma separated list)
-      - localhost
-      - "127.0.0.0/8"
-      - "::1"
-      - "0.0.0.0"
-      - "::"
 
 LogStore:
   Access:
@@ -1005,6 +1066,37 @@ Eventstore:
   PushTimeout: 15s #ZITADEL_EVENTSTORE_PUSHTIMEOUT
   # Maximum amount of push retries in case of primary key violation on the sequence
   MaxRetries: 5 #ZITADEL_EVENTSTORE_MAXRETRIES
+
+HTTPClient:
+  # Sets the limit of the response body size in bytes, which will be processed by the HTTP client.
+  # If the response body exceeds this limit, the client will return an error.
+  # The default value is 20MB.
+  MaxBodySize: 20971520 # ZITADEL_HTTPCLIENT_MAXBODYSIZE
+  # Sets the timeout for the HTTP client.
+  Timeout: 30s # ZITADEL_HTTPCLIENT_TIMEOUT
+  # Sets the number of allowed redirects for the HTTP client.
+  MaxRedirects: 5 # ZITADEL_HTTPCLIENT_MAXREDIRECTS
+  # Specifies if the HTTP client should follow redirects from HTTPS to HTTP.
+  AllowHTTPSDowngrade: false # ZITADEL_HTTPCLIENT_ALLOWHTTPSDOWNGRADE
+  # Specifies the list of IP addresses or CIDR ranges that are not allowed to be called by the HTTP client.
+  # Note that hosts / domains are matched best-case and wildcards are not supported.
+  # CRITICAL SECURITY NOTE: Domain rules (like "localhost") protect application-layer string matches.
+  # Underneath, the network dialer relies exclusively on the CIDR ranges below to block resolved IPs and prevent DNS Rebinding.
+  # Do not remove the CIDR subnets even if a domain mapping exists.
+  DenyList: # ZITADEL_HTTPCLIENT_DENYLIST (comma separated list)
+    - localhost
+    - "0.0.0.0/8"       # Unspecified IPv4 address range / Local network routing trick protection
+    - "10.0.0.0/8"      # Class A private networks
+    - "100.64.0.0/10"   # Carrier-Grade NAT space
+    - "127.0.0.0/8"     # Loopback addresses (IPv4)
+    - "169.254.0.0/16"  # Link-local subnets (Covers Cloud Metadata Endpoints like AWS/GCP 169.254.169.254)
+    - "172.16.0.0/12"   # Class B private networks
+    - "192.168.0.0/16"  # Class C private networks
+    - "198.18.0.0/15"   # Benchmark/inter-network communication testing
+    - "::/128"          # Unspecified IPv6 address
+    - "::1/128"         # IPv6 loopback address
+    - "fc00::/7"        # Unique local addresses / IPv6 equivalent to private IPv4 subnets
+    - "fe80::/10"       # Link-local addresses / IPv6 equivalent to cloud metadata subnets
 
 # The DefaultInstance section defines the default values for each new virtual instance that is created.
 # Check out https://zitadel.com/docs/concepts/structure/instance#multiple-virtual-instances for more information about virtual instances.

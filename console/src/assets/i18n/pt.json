@@ -2359,7 +2359,8 @@
       "DESCRIPTION": "Insira os dados para o Provedor de Identidade JWT.",
       "HEADERNAME": "Nome do Cabeçalho",
       "JWTENDPOINT": "Endpoint JWT",
-      "JWTKEYSENDPOINT": "Endpoint de Chaves JWT"
+      "JWTKEYSENDPOINT": "Endpoint de Chaves JWT",
+      "AUDIENCE": "Audiência"
     },
     "TOAST": {
       "SAVED": "Salvo com sucesso.",
@@ -2575,7 +2576,7 @@
       "TYPEREQUIRED": "O tipo é obrigatório.",
       "TITLE": "Configuração OIDC",
       "CLIENTID": "ID do Cliente",
-      "CLIENTSECRET": "Segredo do Cliente",
+      "CLIENTDETAILS": "Detalhes do cliente",
       "CLIENTSECRET_NOSECRET": "Com o fluxo de autenticação escolhido, nenhum segredo é necessário e, portanto, não está disponível.",
       "CLIENTSECRET_DESCRIPTION": "Mantenha o segredo do cliente em um local seguro, pois ele desaparecerá assim que o diálogo for fechado.",
       "REGENERATESECRET": "Regenerar Segredo do Cliente",

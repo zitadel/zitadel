@@ -2370,7 +2370,8 @@
       "DESCRIPTION": "JWT Kimlik Sağlayıcısı için verileri girin.",
       "HEADERNAME": "Başlık Adı",
       "JWTENDPOINT": "JWT Uç Noktası",
-      "JWTKEYSENDPOINT": "JWT Anahtarları Uç Noktası"
+      "JWTKEYSENDPOINT": "JWT Anahtarları Uç Noktası",
+      "AUDIENCE": "Audience"
     },
     "APPLE": {
       "TEAMID": "Takım ID",
@@ -2608,7 +2609,7 @@
       "TYPEREQUIRED": "Tür gereklidir.",
       "TITLE": "OIDC Yapılandırması",
       "CLIENTID": "Client ID",
-      "CLIENTSECRET": "Client Secret",
+      "CLIENTDETAILS": "İstemci ayrıntıları",
       "CLIENTSECRET_NOSECRET": "Seçtiğiniz kimlik doğrulama akışıyla gizli anahtar gerekmez ve bu nedenle mevcut değildir.",
       "CLIENTSECRET_DESCRIPTION": "Dialog kapandığında kaybolacağı için client secret'ınızı güvenli bir yerde saklayın.",
       "REGENERATESECRET": "Client Secret'ı Yeniden Oluştur",

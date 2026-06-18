@@ -61,6 +61,15 @@ the format specified in [RFC7517](https://datatracker.ietf.org/doc/html/rfc7517)
 
 *Example: `https://issuer.test.internal/keys`*
 
+### Audience (optional)
+
+The expected audience (`aud` claim) in the JWT. If set, ZITADEL will validate that the JWT contains this audience.
+It's recommended to set this to ensure the JWT is intended to be used by ZITADEL.
+If the JWT contains multiple audiences, the configured audience must be one of them.
+If no audience is configured, ZITADEL will not validate the `aud` claim.
+
+*Example: `my-client`*
+
 ### JWT endpoint
 
 Where ZITADEL redirects users to retrieve the JWT.
@@ -145,7 +154,7 @@ You have an existing application which exists in an internal network which handl
 application is built using ZITADEL but the userbase of the existing application needs to be able to open the new
 application from within the existing one without creating a new account or having to sign in.
 
-- Existing application: `apps.test.com/existing/`
+- Existing application: `apps.test.com/existing/` (also used as audience)
 - Existing internal auth service: `issuer.test.internal`
 - New application: `new.test.com`
 - ZITADEL Login UI: `accounts.test.com`
@@ -163,6 +172,7 @@ application from within the existing one without creating a new account or havin
   - Keys endpoint: `issuer.test.internal/keys`
   - Header name: `x-custom-tkn`
   - Issuer: `issuer.test.internal`
+  - Audience: `apps.test.com/existing/`
 
 #### Result flow
 

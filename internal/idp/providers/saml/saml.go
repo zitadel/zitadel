@@ -8,6 +8,7 @@ import (
 	"crypto/x509"
 	"encoding/xml"
 	"io"
+	"net/http"
 	"net/url"
 	"time"
 
@@ -156,6 +157,7 @@ func New(
 	metadata []byte,
 	certificate []byte,
 	key []byte,
+	httpClient *http.Client,
 	options ...ProviderOpts,
 ) (*Provider, error) {
 	entityDescriptor, err := ParseMetadata(metadata)
@@ -180,6 +182,7 @@ func New(
 		Certificate: keyPair.Leaf,
 		IDPMetadata: entityDescriptor,
 		SignRequest: false,
+		HTTPClient:  httpClient,
 	}
 	provider := &Provider{
 		name:        name,

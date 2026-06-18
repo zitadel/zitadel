@@ -4,12 +4,9 @@ package instance_test
 
 import (
 	"context"
-	"fmt"
-	"slices"
 	"testing"
 	"time"
 
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
@@ -30,110 +27,70 @@ func TestGetInstance(t *testing.T) {
 	defer cancel()
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
-	instES := integration.NewInstance(ctxWithSysAuthZ)
-	instanceOwnerCtxES := instES.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
-	organizationOwnerCtxES := instES.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
-
-	// Relational
-	instRelational := integration.NewInstance(ctxWithSysAuthZ)
-	integration.EnsureInstanceFeature(t, ctxWithSysAuthZ, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
-	})
-	instanceOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
-	organizationOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
+	inst := integration.NewInstance(ctxWithSysAuthZ)
+	instanceOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
+	organizationOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
 
 	t.Cleanup(func() {
-		instES.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instES.ID()})
-		instRelational.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instRelational.ID()})
+		inst.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
 
-	type instAndCtx struct {
-		testType         string
-		inst             *integration.Instance
-		instanceOwnerCtx context.Context
-		orgOwnerCtx      context.Context
+	tt := []struct {
+		testName           string
+		inputContext       context.Context
+		inputInstanceID    string
+		expectedInstanceID string
+		expectedErrorMsg   string
+		expectedErrorCode  codes.Code
+	}{
+		{
+			testName:          "when unauthN context should return unauthN error",
+			inputContext:      context.Background(),
+			inputInstanceID:   inst.ID(),
+			expectedErrorCode: codes.Unauthenticated,
+			expectedErrorMsg:  "auth header missing",
+		},
+		{
+			testName:          "when unauthZ context should return unauthZ error",
+			inputContext:      organizationOwnerCtx,
+			inputInstanceID:   inst.ID(),
+			expectedErrorCode: codes.NotFound,
+			expectedErrorMsg:  "membership not found (AUTHZ-cdgFk)",
+		},
+		{
+			testName:           "when request succeeds should return matching instance (systemUser)",
+			inputContext:       ctxWithSysAuthZ,
+			inputInstanceID:    inst.ID(),
+			expectedInstanceID: inst.ID(),
+		},
+		{
+			testName:           "when request succeeds should return matching instance (own context)",
+			inputContext:       instanceOwnerCtx,
+			expectedInstanceID: inst.ID(),
+		},
+		{
+			testName:          "when instance not found should return not found error",
+			inputContext:      ctxWithSysAuthZ,
+			inputInstanceID:   "invalid",
+			expectedErrorCode: codes.NotFound,
+			expectedErrorMsg:  "Errors.Instance.NotFound (QUERY-n0wng)",
+		},
 	}
 
-	testedInstanceAndCtxs := []instAndCtx{
-		{testType: "eventstore", inst: instES, instanceOwnerCtx: instanceOwnerCtxES, orgOwnerCtx: organizationOwnerCtxES},
-		{testType: "relational", inst: instRelational, instanceOwnerCtx: instanceOwnerCtxRelational, orgOwnerCtx: organizationOwnerCtxRelational},
-	}
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			// Test
+			res, err := inst.Client.InstanceV2.GetInstance(tc.inputContext, &instance.GetInstanceRequest{InstanceId: tc.inputInstanceID})
 
-	for _, instWithCtx := range testedInstanceAndCtxs {
-		tt := []struct {
-			testName           string
-			inputContext       context.Context
-			inputInstanceID    string
-			expectedInstanceID string
-			expectedErrorMsg   string
-			expectedErrorCode  codes.Code
-		}{
-			{
-				testName:          "when unauthN context should return unauthN error",
-				inputContext:      context.Background(),
-				inputInstanceID:   instWithCtx.inst.ID(),
-				expectedErrorCode: codes.Unauthenticated,
-				expectedErrorMsg:  "auth header missing",
-			},
-			{
-				// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)
-				testName:          "when unauthZ context should return unauthZ error",
-				inputContext:      instWithCtx.orgOwnerCtx,
-				inputInstanceID:   instWithCtx.inst.ID(),
-				expectedErrorCode: codes.NotFound,
-				expectedErrorMsg:  "membership not found (AUTHZ-cdgFk)",
-			},
-			{
-				testName:           "when request succeeds should return matching instance (systemUser)",
-				inputContext:       ctxWithSysAuthZ,
-				inputInstanceID:    instWithCtx.inst.ID(),
-				expectedInstanceID: instWithCtx.inst.ID(),
-			},
-			{
-				// TODO(IAM-Marco): Decide if we should set the instance in context.
-				testName:           "when request succeeds should return matching instance (own context)",
-				inputContext:       instWithCtx.instanceOwnerCtx,
-				expectedInstanceID: instWithCtx.inst.ID(),
-			},
-			{
-				// TODO(IAM-Marco): This test won't reach the relational side due to an interceptor
-				// automatically changing the instance in context to an empty one.
-				// The interceptor will look for the instance matching the instance ID passed here.
-				// Since the instance doesn't exist, it will put an empty instance in context.
-				// But an empty instance has no feature flags enabled.
-				testName:          "when instance not found should return not found error",
-				inputContext:      ctxWithSysAuthZ,
-				inputInstanceID:   "invalid",
-				expectedErrorCode: codes.NotFound,
-				expectedErrorMsg:  "Errors.Instance.NotFound (QUERY-n0wng)",
-			},
-		}
+			// Verify
+			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
+			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
 
-		faultyTestCasesForRelational := []string{
-			// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)
-			"when unauthZ context should return unauthZ error",
-			// TODO(IAM-Marco): Decide if we should set the instance in context.
-			"when request succeeds should return matching instance (own context)",
-		}
-
-		for _, tc := range tt {
-			if instWithCtx.testType == "relational" && slices.Contains(faultyTestCasesForRelational, tc.testName) {
-				continue
+			if tc.expectedErrorMsg == "" {
+				require.NoError(t, err)
+				assert.Equal(t, tc.expectedInstanceID, res.GetInstance().GetId())
 			}
-			t.Run(fmt.Sprintf("%s - %s", instWithCtx.testType, tc.testName), func(t *testing.T) {
-				// Test
-				res, err := instWithCtx.inst.Client.InstanceV2.GetInstance(tc.inputContext, &instance.GetInstanceRequest{InstanceId: tc.inputInstanceID})
-
-				// Verify
-				assert.Equal(t, tc.expectedErrorCode, status.Code(err))
-				assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
-
-				if tc.expectedErrorMsg == "" {
-					require.NoError(t, err)
-					assert.Equal(t, tc.expectedInstanceID, res.GetInstance().GetId())
-				}
-			})
-		}
+		})
 	}
 }
 
@@ -165,8 +122,6 @@ func TestListInstances(t *testing.T) {
 
 	orgOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
 
-	relTableState := integration.RelationalTablesEnableMatrix(t, ctx, ctxWithSysAuthZ)
-
 	tt := []struct {
 		testName          string
 		inputRequest      *instance.ListInstancesRequest
@@ -185,7 +140,6 @@ func TestListInstances(t *testing.T) {
 			expectedErrorMsg:  "auth header missing",
 		},
 		{
-			// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)
 			testName: "when unauthZ context should return unauthZ error",
 			inputRequest: &instance.ListInstancesRequest{
 				Pagination: &filter.PaginationRequest{Offset: 0, Limit: 10},
@@ -221,32 +175,25 @@ func TestListInstances(t *testing.T) {
 		},
 	}
 
-	for _, stateCase := range relTableState {
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			// Test
+			res, err := inst.Client.InstanceV2.ListInstances(tc.inputContext, tc.inputRequest)
 
-		for _, tc := range tt {
-			// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)
-			if tc.testName == "when unauthZ context should return unauthZ error" && stateCase.Name == "when relational tables are enabled" {
-				continue
-			}
-			t.Run(fmt.Sprintf("%s - %s", stateCase.Name, tc.testName), func(t *testing.T) {
-				// Test
-				res, err := inst.Client.InstanceV2.ListInstances(tc.inputContext, tc.inputRequest)
+			// Verify
+			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
+			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
 
-				// Verify
-				assert.Equal(t, tc.expectedErrorCode, status.Code(err))
-				assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+			if tc.expectedErrorMsg == "" {
+				require.NotNil(t, res)
 
-				if tc.expectedErrorMsg == "" {
-					require.NotNil(t, res)
+				require.Len(t, res.GetInstances(), len(tc.expectedInstances))
 
-					require.Len(t, res.GetInstances(), len(tc.expectedInstances))
-
-					for i, ins := range res.GetInstances() {
-						assert.Equal(t, tc.expectedInstances[i], ins.GetId())
-					}
+				for i, ins := range res.GetInstances() {
+					assert.Equal(t, tc.expectedInstances[i], ins.GetId())
 				}
-			})
-		}
+			}
+		})
 	}
 }
 
@@ -259,149 +206,115 @@ func TestListCustomDomains(t *testing.T) {
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
 
-	// Eventstore objects
-	instES := integration.NewInstance(ctxWithSysAuthZ)
-	orgOwnerCtxES := instES.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
-	instanceOwnerCtxES := instES.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
-	d1ES, d2ES := "custom."+integration.DomainName(), "custom."+integration.DomainName()
-	_, err := instES.Client.InstanceV2.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{InstanceId: instES.ID(), CustomDomain: d1ES})
+	inst := integration.NewInstance(ctxWithSysAuthZ)
+	orgOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
+	instanceOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
+	d1, d2 := "custom."+integration.DomainName(), "custom."+integration.DomainName()
+	_, err := inst.Client.InstanceV2.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{InstanceId: inst.ID(), CustomDomain: d1})
 	require.Nil(t, err)
-	_, err = instES.Client.InstanceV2.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{InstanceId: instES.ID(), CustomDomain: d2ES})
-	require.Nil(t, err)
-
-	// Relational objects
-	instRelational := integration.NewInstance(ctxWithSysAuthZ)
-	integration.EnsureInstanceFeature(t, ctx, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
-	})
-	orgOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
-	instanceOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
-	d1Relational, d2Relational := "custom."+integration.DomainName(), "custom."+integration.DomainName()
-	_, err = instRelational.Client.InstanceV2.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{InstanceId: instRelational.ID(), CustomDomain: d1Relational})
-	require.Nil(t, err)
-	_, err = instRelational.Client.InstanceV2.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{InstanceId: instRelational.ID(), CustomDomain: d2Relational})
+	_, err = inst.Client.InstanceV2.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{InstanceId: inst.ID(), CustomDomain: d2})
 	require.Nil(t, err)
 
 	t.Cleanup(func() {
-		instES.Client.InstanceV2.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{InstanceId: instES.ID(), CustomDomain: d1ES})
-		instES.Client.InstanceV2.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{InstanceId: instES.ID(), CustomDomain: d2ES})
-		instES.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instES.ID()})
-
-		instRelational.Client.InstanceV2.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{InstanceId: instRelational.ID(), CustomDomain: d1Relational})
-		instRelational.Client.InstanceV2.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{InstanceId: instRelational.ID(), CustomDomain: d2Relational})
-		instRelational.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instRelational.ID()})
+		inst.Client.InstanceV2.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{InstanceId: inst.ID(), CustomDomain: d1})
+		inst.Client.InstanceV2.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{InstanceId: inst.ID(), CustomDomain: d2})
+		inst.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
 
-	testData := []struct {
-		testType        string
-		inst            *integration.Instance
-		sysOwnerCtx     context.Context
-		instOwnerCtx    context.Context
-		orgOwnerCtx     context.Context
-		expectedDomains []string
+	expectedDomains := []string{d1, d2}
+
+	tt := []struct {
+		testName          string
+		inputRequest      *instance.ListCustomDomainsRequest
+		inputContext      context.Context
+		expectedErrorMsg  string
+		expectedErrorCode codes.Code
+		expectedDomains   []string
 	}{
-		{testType: "eventstore", inst: instES, sysOwnerCtx: ctxWithSysAuthZ, instOwnerCtx: instanceOwnerCtxES, orgOwnerCtx: orgOwnerCtxES, expectedDomains: []string{d1ES, d2ES}},
-		{testType: "relational", inst: instRelational, sysOwnerCtx: ctxWithSysAuthZ, instOwnerCtx: instanceOwnerCtxRelational, orgOwnerCtx: orgOwnerCtxRelational, expectedDomains: []string{d1Relational, d2Relational}},
+		{
+			testName: "when invalid context should return unauthN error",
+			inputRequest: &instance.ListCustomDomainsRequest{
+				InstanceId: inst.ID(),
+				Pagination: &filter.PaginationRequest{Offset: 0, Limit: 10},
+			},
+			inputContext:      context.Background(),
+			expectedErrorCode: codes.Unauthenticated,
+			expectedErrorMsg:  "auth header missing",
+		},
+		{
+			testName: "when unauthZ context should return unauthZ error",
+			inputRequest: &instance.ListCustomDomainsRequest{
+				InstanceId:    inst.ID(),
+				Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
+				SortingColumn: instance.DomainFieldName_DOMAIN_FIELD_NAME_CREATION_DATE,
+				Filters: []*instance.CustomDomainFilter{
+					{
+						Filter: &instance.CustomDomainFilter_DomainFilter{
+							DomainFilter: &instance.DomainFilter{Domain: "custom", Method: object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS},
+						},
+					},
+				},
+			},
+			inputContext:      orgOwnerCtx,
+			expectedErrorCode: codes.NotFound,
+			expectedErrorMsg:  "membership not found (AUTHZ-cdgFk)",
+		},
+		{
+			testName: "when valid request with filter should return paginated response (systemUser)",
+			inputRequest: &instance.ListCustomDomainsRequest{
+				InstanceId:    inst.ID(),
+				Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
+				SortingColumn: instance.DomainFieldName_DOMAIN_FIELD_NAME_CREATION_DATE,
+				Filters: []*instance.CustomDomainFilter{
+					{
+						Filter: &instance.CustomDomainFilter_DomainFilter{
+							DomainFilter: &instance.DomainFilter{Domain: "custom", Method: object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS},
+						},
+					},
+				},
+			},
+			inputContext:    ctxWithSysAuthZ,
+			expectedDomains: expectedDomains,
+		},
+		{
+			testName: "when valid request with filter should return paginated response (own context)",
+			inputRequest: &instance.ListCustomDomainsRequest{
+				Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
+				SortingColumn: instance.DomainFieldName_DOMAIN_FIELD_NAME_CREATION_DATE,
+				Filters: []*instance.CustomDomainFilter{
+					{
+						Filter: &instance.CustomDomainFilter_DomainFilter{
+							DomainFilter: &instance.DomainFilter{Domain: "custom", Method: object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS},
+						},
+					},
+				},
+			},
+			inputContext:    instanceOwnerCtx,
+			expectedDomains: []string{expectedDomains[0]},
+		},
 	}
-	for _, td := range testData {
 
-		tt := []struct {
-			testName          string
-			inputRequest      *instance.ListCustomDomainsRequest
-			inputContext      context.Context
-			expectedErrorMsg  string
-			expectedErrorCode codes.Code
-			expectedDomains   []string
-		}{
-			{
-				testName: "when invalid context should return unauthN error",
-				inputRequest: &instance.ListCustomDomainsRequest{
-					InstanceId: td.inst.ID(),
-					Pagination: &filter.PaginationRequest{Offset: 0, Limit: 10},
-				},
-				inputContext:      context.Background(),
-				expectedErrorCode: codes.Unauthenticated,
-				expectedErrorMsg:  "auth header missing",
-			},
-			{
-				// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)
-				testName: "when unauthZ context should return unauthZ error",
-				inputRequest: &instance.ListCustomDomainsRequest{
-					InstanceId:    td.inst.ID(),
-					Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
-					SortingColumn: instance.DomainFieldName_DOMAIN_FIELD_NAME_CREATION_DATE,
-					Filters: []*instance.CustomDomainFilter{
-						{
-							Filter: &instance.CustomDomainFilter_DomainFilter{
-								DomainFilter: &instance.DomainFilter{Domain: "custom", Method: object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS},
-							},
-						},
-					},
-				},
-				inputContext:      td.orgOwnerCtx,
-				expectedErrorCode: codes.NotFound,
-				expectedErrorMsg:  "membership not found (AUTHZ-cdgFk)",
-			},
-			{
-				testName: "when valid request with filter should return paginated response (systemUser)",
-				inputRequest: &instance.ListCustomDomainsRequest{
-					InstanceId:    td.inst.ID(),
-					Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
-					SortingColumn: instance.DomainFieldName_DOMAIN_FIELD_NAME_CREATION_DATE,
-					Filters: []*instance.CustomDomainFilter{
-						{
-							Filter: &instance.CustomDomainFilter_DomainFilter{
-								DomainFilter: &instance.DomainFilter{Domain: "custom", Method: object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS},
-							},
-						},
-					},
-				},
-				inputContext:    td.sysOwnerCtx,
-				expectedDomains: td.expectedDomains,
-			},
-			{
-				testName: "when valid request with filter should return paginated response (own context)",
-				inputRequest: &instance.ListCustomDomainsRequest{
-					Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
-					SortingColumn: instance.DomainFieldName_DOMAIN_FIELD_NAME_CREATION_DATE,
-					Filters: []*instance.CustomDomainFilter{
-						{
-							Filter: &instance.CustomDomainFilter_DomainFilter{
-								DomainFilter: &instance.DomainFilter{Domain: "custom", Method: object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS},
-							},
-						},
-					},
-				},
-				inputContext:    td.instOwnerCtx,
-				expectedDomains: []string{td.expectedDomains[0]},
-			},
-		}
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, time.Minute)
+			require.EventuallyWithT(t, func(collect *assert.CollectT) {
+				// Test
+				res, err := inst.Client.InstanceV2.ListCustomDomains(tc.inputContext, tc.inputRequest)
 
-		for _, tc := range tt {
-			if tc.testName == "when unauthZ context should return unauthZ error" && td.testType == "relational" {
-				continue
-			}
-			t.Run(fmt.Sprintf("%s - %s", td.testType, tc.testName), func(t *testing.T) {
-				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, time.Minute)
-				require.EventuallyWithT(t, func(collect *assert.CollectT) {
-					// Test
-					res, err := td.inst.Client.InstanceV2.ListCustomDomains(tc.inputContext, tc.inputRequest)
+				// Verify
+				assert.Equal(collect, tc.expectedErrorCode, status.Code(err))
+				assert.Equal(collect, tc.expectedErrorMsg, status.Convert(err).Message())
 
-					// Verify
-					assert.Equal(collect, tc.expectedErrorCode, status.Code(err))
-					assert.Equal(collect, tc.expectedErrorMsg, status.Convert(err).Message())
-
-					if tc.expectedErrorMsg == "" {
-						domains := []string{}
-						for _, d := range res.GetDomains() {
-							domains = append(domains, d.GetDomain())
-						}
-
-						assert.Subset(collect, domains, tc.expectedDomains)
+				if tc.expectedErrorMsg == "" {
+					domains := []string{}
+					for _, d := range res.GetDomains() {
+						domains = append(domains, d.GetDomain())
 					}
-				}, retryDuration, tick)
-			})
-		}
+
+					assert.Subset(collect, domains, tc.expectedDomains)
+				}
+			}, retryDuration, tick)
+		})
 	}
 }
 
@@ -414,143 +327,108 @@ func TestListTrustedDomains(t *testing.T) {
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
 
-	// Eventstore objects
-	instES := integration.NewInstance(ctxWithSysAuthZ)
-	orgOwnerCtxES := instES.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
-	instanceOwnerCtxES := instES.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
-	d1ES, d2ES := "trusted."+integration.DomainName(), "trusted."+integration.DomainName()
-	_, err := instES.Client.InstanceV2.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: instES.ID(), TrustedDomain: d1ES})
+	inst := integration.NewInstance(ctxWithSysAuthZ)
+	orgOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
+	instanceOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
+	d1, d2 := "trusted."+integration.DomainName(), "trusted."+integration.DomainName()
+	_, err := inst.Client.InstanceV2.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: inst.ID(), TrustedDomain: d1})
 	require.Nil(t, err)
-	_, err = instES.Client.InstanceV2.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: instES.ID(), TrustedDomain: d2ES})
-	require.Nil(t, err)
-
-	// Relational objects
-	instRelational := integration.NewInstance(ctxWithSysAuthZ)
-	integration.EnsureInstanceFeature(t, ctx, instRelational, &feature.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)}, func(tCollect *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-		assert.True(tCollect, got.EnableRelationalTables.GetEnabled())
-	})
-	orgOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
-	instanceOwnerCtxRelational := instRelational.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
-	d1Relational, d2Relational := "trusted."+integration.DomainName(), "trusted."+integration.DomainName()
-	_, err = instRelational.Client.InstanceV2.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: instRelational.ID(), TrustedDomain: d1Relational})
-	require.Nil(t, err)
-	_, err = instRelational.Client.InstanceV2.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: instRelational.ID(), TrustedDomain: d2Relational})
+	_, err = inst.Client.InstanceV2.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: inst.ID(), TrustedDomain: d2})
 	require.Nil(t, err)
 
 	t.Cleanup(func() {
-		instES.Client.InstanceV2.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{InstanceId: instES.ID(), TrustedDomain: d1ES})
-		instES.Client.InstanceV2.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{InstanceId: instES.ID(), TrustedDomain: d2ES})
-		instES.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instES.ID()})
-
-		instRelational.Client.InstanceV2.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{InstanceId: instRelational.ID(), TrustedDomain: d1Relational})
-		instRelational.Client.InstanceV2.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{InstanceId: instRelational.ID(), TrustedDomain: d2Relational})
-		instRelational.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: instRelational.ID()})
+		inst.Client.InstanceV2.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{InstanceId: inst.ID(), TrustedDomain: d1})
+		inst.Client.InstanceV2.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{InstanceId: inst.ID(), TrustedDomain: d2})
+		inst.Client.InstanceV2.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
 
-	testData := []struct {
-		testType        string
-		inst            *integration.Instance
-		sysOwnerCtx     context.Context
-		instOwnerCtx    context.Context
-		orgOwnerCtx     context.Context
-		expectedDomains []string
+	expectedDomains := []string{d1, d2}
+
+	tt := []struct {
+		testName          string
+		inputRequest      *instance.ListTrustedDomainsRequest
+		inputContext      context.Context
+		expectedErrorMsg  string
+		expectedErrorCode codes.Code
+		expectedDomains   []string
 	}{
-		{testType: "eventstore", inst: instES, sysOwnerCtx: ctxWithSysAuthZ, instOwnerCtx: instanceOwnerCtxES, orgOwnerCtx: orgOwnerCtxES, expectedDomains: []string{d1ES, d2ES}},
-		{testType: "relational", inst: instRelational, sysOwnerCtx: ctxWithSysAuthZ, instOwnerCtx: instanceOwnerCtxRelational, orgOwnerCtx: orgOwnerCtxRelational, expectedDomains: []string{d1Relational, d2Relational}},
+		{
+			testName: "when invalid context should return unauthN error",
+			inputRequest: &instance.ListTrustedDomainsRequest{
+				InstanceId: inst.ID(),
+				Pagination: &filter.PaginationRequest{Offset: 0, Limit: 10},
+			},
+			inputContext:      context.Background(),
+			expectedErrorCode: codes.Unauthenticated,
+			expectedErrorMsg:  "auth header missing",
+		},
+		{
+			testName: "when unauthZ context should return unauthZ error",
+			inputRequest: &instance.ListTrustedDomainsRequest{
+				InstanceId: inst.ID(),
+				Pagination: &filter.PaginationRequest{Offset: 0, Limit: 10},
+			},
+			inputContext:      orgOwnerCtx,
+			expectedErrorCode: codes.NotFound,
+			expectedErrorMsg:  "membership not found (AUTHZ-cdgFk)",
+		},
+		{
+			testName: "when valid request with filter should return paginated response (systemUser)",
+			inputRequest: &instance.ListTrustedDomainsRequest{
+				InstanceId:    inst.ID(),
+				Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
+				SortingColumn: instance.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_CREATION_DATE,
+				Filters: []*instance.TrustedDomainFilter{
+					{
+						Filter: &instance.TrustedDomainFilter_DomainFilter{
+							DomainFilter: &instance.DomainFilter{Domain: "trusted", Method: object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS},
+						},
+					},
+				},
+			},
+			inputContext:    ctxWithSysAuthZ,
+			expectedDomains: expectedDomains,
+		},
+		{
+			testName: "when valid request with filter should return paginated response (own context)",
+			inputRequest: &instance.ListTrustedDomainsRequest{
+				Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
+				SortingColumn: instance.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_CREATION_DATE,
+				Filters: []*instance.TrustedDomainFilter{
+					{
+						Filter: &instance.TrustedDomainFilter_DomainFilter{
+							DomainFilter: &instance.DomainFilter{Domain: "trusted", Method: object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS},
+						},
+					},
+				},
+			},
+			inputContext:    instanceOwnerCtx,
+			expectedDomains: []string{expectedDomains[0]},
+		},
 	}
-	for _, td := range testData {
-		tt := []struct {
-			testName          string
-			inputRequest      *instance.ListTrustedDomainsRequest
-			inputContext      context.Context
-			expectedErrorMsg  string
-			expectedErrorCode codes.Code
-			expectedDomains   []string
-		}{
-			{
-				testName: "when invalid context should return unauthN error",
-				inputRequest: &instance.ListTrustedDomainsRequest{
-					InstanceId: td.inst.ID(),
-					Pagination: &filter.PaginationRequest{Offset: 0, Limit: 10},
-				},
-				inputContext:      context.Background(),
-				expectedErrorCode: codes.Unauthenticated,
-				expectedErrorMsg:  "auth header missing",
-			},
-			{
-				// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)
-				testName: "when unauthZ context should return unauthZ error",
-				inputRequest: &instance.ListTrustedDomainsRequest{
-					InstanceId: td.inst.ID(),
-					Pagination: &filter.PaginationRequest{Offset: 0, Limit: 10},
-				},
-				inputContext:      td.orgOwnerCtx,
-				expectedErrorCode: codes.NotFound,
-				expectedErrorMsg:  "membership not found (AUTHZ-cdgFk)",
-			},
-			{
-				testName: "when valid request with filter should return paginated response (systemUser)",
-				inputRequest: &instance.ListTrustedDomainsRequest{
-					InstanceId:    td.inst.ID(),
-					Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
-					SortingColumn: instance.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_CREATION_DATE,
-					Filters: []*instance.TrustedDomainFilter{
-						{
-							Filter: &instance.TrustedDomainFilter_DomainFilter{
-								DomainFilter: &instance.DomainFilter{Domain: "trusted", Method: object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS},
-							},
-						},
-					},
-				},
-				inputContext:    td.sysOwnerCtx,
-				expectedDomains: td.expectedDomains,
-			},
-			{
-				testName: "when valid request with filter should return paginated response (own context)",
-				inputRequest: &instance.ListTrustedDomainsRequest{
-					Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
-					SortingColumn: instance.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_CREATION_DATE,
-					Filters: []*instance.TrustedDomainFilter{
-						{
-							Filter: &instance.TrustedDomainFilter_DomainFilter{
-								DomainFilter: &instance.DomainFilter{Domain: "trusted", Method: object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS},
-							},
-						},
-					},
-				},
-				inputContext:    td.instOwnerCtx,
-				expectedDomains: []string{td.expectedDomains[0]},
-			},
-		}
 
-		for _, tc := range tt {
-			// TODO(IAM-Marco): Fix this test for relational case when permission checks are in place (see https://github.com/zitadel/zitadel/issues/10917)
-			if tc.testName == "when unauthZ context should return unauthZ error" && td.testType == "relational" {
-				continue
-			}
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, time.Minute)
+			require.EventuallyWithT(t, func(collect *assert.CollectT) {
+				// Test
+				res, err := inst.Client.InstanceV2.ListTrustedDomains(tc.inputContext, tc.inputRequest)
 
-			t.Run(fmt.Sprintf("%s - %s", td.testType, tc.testName), func(t *testing.T) {
-				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, time.Minute)
-				require.EventuallyWithT(t, func(collect *assert.CollectT) {
-					// Test
-					res, err := td.inst.Client.InstanceV2.ListTrustedDomains(tc.inputContext, tc.inputRequest)
+				// Verify
+				assert.Equal(collect, tc.expectedErrorCode, status.Code(err))
+				assert.Equal(collect, tc.expectedErrorMsg, status.Convert(err).Message())
 
-					// Verify
-					assert.Equal(collect, tc.expectedErrorCode, status.Code(err))
-					assert.Equal(collect, tc.expectedErrorMsg, status.Convert(err).Message())
+				if tc.expectedErrorMsg == "" {
+					require.NotNil(t, res)
 
-					if tc.expectedErrorMsg == "" {
-						require.NotNil(t, res)
-
-						domains := []string{}
-						for _, d := range res.GetTrustedDomain() {
-							domains = append(domains, d.GetDomain())
-						}
-
-						assert.Subset(collect, domains, tc.expectedDomains)
+					domains := []string{}
+					for _, d := range res.GetTrustedDomain() {
+						domains = append(domains, d.GetDomain())
 					}
-				}, retryDuration, tick)
-			})
-		}
+
+					assert.Subset(collect, domains, tc.expectedDomains)
+				}
+			}, retryDuration, tick)
+		})
 	}
 }

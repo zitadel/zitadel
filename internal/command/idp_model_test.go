@@ -1,12 +1,22 @@
 package command
 
 import (
+	"context"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	oidc_pkg "github.com/zitadel/oidc/v3/pkg/oidc"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	providers "github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -352,4 +362,93 @@ func TestCommands_AllIDPWriteModel(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestOAuthIDPWriteModel_ToProvider_WithPKCE(t *testing.T) {
+	wm := &OAuthIDPWriteModel{
+		Name:                  "OAuth",
+		ClientID:              "clientID",
+		ClientSecret:          &crypto.CryptoValue{Algorithm: "plain", Crypted: []byte("clientSecret"), KeyID: "keyID"},
+		AuthorizationEndpoint: "https://idp.example.com/authorize",
+		TokenEndpoint:         "https://idp.example.com/token",
+		UserEndpoint:          "https://idp.example.com/user",
+		Scopes:                []string{"user"},
+		IDAttribute:           "id",
+		UsePKCE:               true,
+	}
+
+	provider, err := wm.ToProvider("https://zitadel.example.com/idps/callback", plainTextEncryption{}, http.DefaultClient)
+	require.NoError(t, err)
+
+	assertProviderUsesPKCE(t, provider)
+}
+
+func TestOIDCIDPWriteModel_ToProvider_WithPKCE(t *testing.T) {
+	var (
+		issuer             string
+		discoveryRequested atomic.Bool
+	)
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != oidc_pkg.DiscoveryEndpoint {
+			http.NotFound(w, r)
+			return
+		}
+		discoveryRequested.Store(true)
+		w.Header().Set("Content-Type", "application/json")
+		// assert, not require: FailNow must not be called from the server's handler goroutine
+		assert.NoError(t, json.NewEncoder(w).Encode(&oidc_pkg.DiscoveryConfiguration{
+			Issuer:                issuer,
+			AuthorizationEndpoint: issuer + "/authorize",
+			TokenEndpoint:         issuer + "/token",
+			UserinfoEndpoint:      issuer + "/userinfo",
+		}))
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(handler))
+	t.Cleanup(server.Close)
+	issuer = server.URL
+
+	wm := &OIDCIDPWriteModel{
+		Name:         "OIDC",
+		Issuer:       issuer,
+		ClientID:     "clientID",
+		ClientSecret: &crypto.CryptoValue{Algorithm: "plain", Crypted: []byte("clientSecret"), KeyID: "keyID"},
+		Scopes:       []string{"openid"},
+		UsePKCE:      true,
+	}
+
+	provider, err := wm.ToProvider("https://zitadel.example.com/idps/callback", plainTextEncryption{}, http.DefaultClient)
+	require.NoError(t, err)
+	require.True(t, discoveryRequested.Load(), "expected OIDC discovery to be requested")
+
+	assertProviderUsesPKCE(t, provider)
+}
+
+func assertProviderUsesPKCE(t *testing.T, provider providers.Provider) {
+	t.Helper()
+
+	session, err := provider.BeginAuth(context.Background(), "state")
+	require.NoError(t, err)
+	auth, err := session.GetAuth(context.Background())
+	require.NoError(t, err)
+	redirect, ok := auth.(*providers.RedirectAuth)
+	require.True(t, ok)
+	authURL, err := url.Parse(redirect.RedirectURL)
+	require.NoError(t, err)
+
+	query := authURL.Query()
+	assert.NotEmpty(t, query.Get("code_challenge"))
+	assert.Equal(t, "S256", query.Get("code_challenge_method"))
+	assert.NotEmpty(t, session.PersistentParameters()[oauth.CodeVerifier])
+}
+
+type plainTextEncryption struct{}
+
+func (plainTextEncryption) Algorithm() string                               { return "plain" }
+func (plainTextEncryption) EncryptionKeyID() string                         { return "keyID" }
+func (plainTextEncryption) DecryptionKeyIDs() []string                      { return []string{"keyID"} }
+func (plainTextEncryption) Encrypt(value []byte) ([]byte, error)            { return value, nil }
+func (plainTextEncryption) Decrypt(hashed []byte, _ string) ([]byte, error) { return hashed, nil }
+func (plainTextEncryption) DecryptString(hashed []byte, _ string) (string, error) {
+	return string(hashed), nil
 }
