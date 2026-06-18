@@ -25,10 +25,10 @@ type GeneratorConfig struct {
 
 func (c *GeneratorConfig) Valid() error {
 	if c.Length < 1 {
-		return zerrors.ThrowInvalidArgument(nil, "CRYPTO-FVJ2x", "Errors.SecretGenerator.InvalidLength")
+		return zerrors.ThrowInvalidArgument(nil, "CRYPTO-FVJ2x", "Errors.InvalidArgument")
 	}
 	if !c.IncludeLowerLetters && !c.IncludeUpperLetters && !c.IncludeDigits && !c.IncludeSymbols {
-		return zerrors.ThrowInvalidArgument(nil, "CRYPTO-Ckl2s", "Errors.SecretGenerator.RequireAtLeastOneCharset")
+		return zerrors.ThrowInvalidArgument(nil, "CRYPTO-Ckl2s", "Errors.InvalidArgument")
 	}
 	return nil
 }

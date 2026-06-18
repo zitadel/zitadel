@@ -238,7 +238,7 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "CRYPTO-FVJ2x", "Errors.SecretGenerator.InvalidLength"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "CRYPTO-FVJ2x", "Errors.InvalidArgument"))
 				},
 			},
 		},
@@ -261,7 +261,7 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "CRYPTO-Ckl2s", "Errors.SecretGenerator.RequireAtLeastOneCharset"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "CRYPTO-Ckl2s", "Errors.InvalidArgument"))
 				},
 			},
 		},
