@@ -80,8 +80,8 @@ func (h *ChangeHuman) Validate(hasher *crypto.Hasher) (err error) {
 
 func (p *Password) Validate(hasher *crypto.Hasher) error {
 	if p.EncodedPasswordHash != "" {
-		if !hasher.EncodingSupported(p.EncodedPasswordHash) {
-			return zerrors.ThrowInvalidArgument(nil, "USER-oz74onzvqr", "Errors.User.Password.NotSupported")
+		if err := hasher.ValidateEncodedHash(p.EncodedPasswordHash); err != nil {
+			return err
 		}
 	}
 	if p.Password == "" && p.EncodedPasswordHash == "" {
@@ -302,7 +302,9 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg 
 
 	if human.Changed() {
 		// Changing metadata or setting email, resp. phone to verified is only allowed with user write permissions, but not for self-management.
-		requireWritePermission := metadataChanged || (human.Email != nil && human.Email.Verified) || (human.Phone != nil && human.Phone.Verified)
+		requireWritePermission := metadataChanged ||
+			(human.Email != nil && (human.Email.Verified || human.Email.ReturnCode)) ||
+			(human.Phone != nil && (human.Phone.Verified || human.Phone.ReturnCode))
 		if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID, !requireWritePermission); err != nil {
 			return err
 		}

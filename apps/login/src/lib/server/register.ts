@@ -2,16 +2,48 @@
 
 import { createSessionAndUpdateCookie, createSessionForIdpAndUpdateCookie } from "@/lib/server/cookie";
 import { addHumanUser, addIDPLink, getLoginSettings, getUserByID, listAuthenticationMethodTypes } from "@/lib/zitadel";
-import { create } from "@zitadel/client";
+import { Code, ConnectError, Duration, create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { ChecksJson, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { Checks, ChecksJson, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import crypto from "crypto";
 import { getTranslations } from "next-intl/server";
 import { cookies, headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
 import { getOrSetFingerprintId } from "../fingerprint";
+import { createLogger } from "../logger";
 import { getServiceConfig } from "../service-url";
 import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
+
+const logger = createLogger("register");
+
+const MAX_SESSION_RETRIES = 3;
+const RETRY_DELAYS_MS = [500, 1000, 2000];
+
+/**
+ * After user creation, backend projections (users, login_names) may not be updated yet.
+ * This helper retries createSessionAndUpdateCookie on NotFound errors with increasing delays.
+ */
+async function createSessionWithRetry(command: { checks: Checks; requestId: string | undefined; lifetime?: Duration }) {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < MAX_SESSION_RETRIES; attempt++) {
+    try {
+      return await createSessionAndUpdateCookie(command);
+    } catch (error) {
+      lastError = error;
+      const isNotFound = error instanceof ConnectError && error.code === Code.NotFound;
+      const isLastAttempt = attempt + 1 >= MAX_SESSION_RETRIES;
+      if (!isNotFound || isLastAttempt) {
+        throw error;
+      }
+      const delay = RETRY_DELAYS_MS[attempt] ?? 2000;
+      logger.warn(
+        `Session creation failed with NotFound (attempt ${attempt + 1}/${MAX_SESSION_RETRIES}), retrying in ${delay}ms...`,
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  throw lastError;
+}
 
 type RegisterUserCommand = {
   email: string;
@@ -74,7 +106,7 @@ export async function registerUser(
 
   const checks = create(ChecksSchema, checkPayload);
 
-  const result = await createSessionAndUpdateCookie({
+  const result = await createSessionWithRetry({
     checks,
     requestId: command.requestId,
     lifetime: command.password ? loginSettings?.passwordCheckLifetime : undefined,

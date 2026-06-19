@@ -2366,7 +2366,8 @@
       "DESCRIPTION": "JWT ID 제공자에 필요한 데이터를 입력하세요.",
       "HEADERNAME": "헤더 이름",
       "JWTENDPOINT": "JWT 엔드포인트",
-      "JWTKEYSENDPOINT": "JWT 키 엔드포인트"
+      "JWTKEYSENDPOINT": "JWT 키 엔드포인트",
+      "AUDIENCE": "청중"
     },
     "APPLE": {
       "TEAMID": "팀 ID",

@@ -2469,7 +2469,8 @@
       "DESCRIPTION": "Введите данные JWT для поставщика идентификационных данных .",
       "HEADERNAME": "Название заголовка",
       "JWTENDPOINT": "Конечная точка JWT",
-      "JWTKEYSENDPOINT": "Конечная точка ключей JWT"
+      "JWTKEYSENDPOINT": "Конечная точка ключей JWT",
+      "AUDIENCE": "Аудитория"
     },
     "APPLE": {
       "TEAMID": "Идентификатор команды",
