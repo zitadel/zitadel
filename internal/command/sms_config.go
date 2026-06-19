@@ -170,6 +170,11 @@ func (c *Commands) AddSMSConfigHTTP(ctx context.Context, config *AddSMSHTTP) (er
 			return err
 		}
 	}
+
+	if err := c.validateNotificationWebhookEndpoint(config.Endpoint); err != nil {
+		return err
+	}
+
 	smsConfigWriteModel, err := c.getSMSConfig(ctx, config.ResourceOwner, config.ID)
 	if err != nil {
 		return err
@@ -217,6 +222,13 @@ func (c *Commands) ChangeSMSConfigHTTP(ctx context.Context, config *ChangeSMSHTT
 	if config.ID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-phyb2e4Kll", "Errors.IDMissing")
 	}
+
+	if config.Endpoint != nil {
+		if err := c.validateNotificationWebhookEndpoint(*config.Endpoint); err != nil {
+			return err
+		}
+	}
+
 	smsConfigWriteModel, err := c.getSMSConfig(ctx, config.ResourceOwner, config.ID)
 	if err != nil {
 		return err

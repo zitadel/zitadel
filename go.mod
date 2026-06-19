@@ -2,7 +2,7 @@ module github.com/zitadel/zitadel
 
 go 1.25.0
 
-toolchain go1.25.8
+toolchain go1.25.11
 
 require (
 	cloud.google.com/go/profiler v0.6.0
@@ -101,7 +101,7 @@ require (
 	github.com/zitadel/exifremove v0.1.0
 	github.com/zitadel/logging v0.7.0
 	github.com/zitadel/oidc/v3 v3.47.5
-	github.com/zitadel/passwap v0.11.0
+	github.com/zitadel/passwap v0.12.1
 	github.com/zitadel/saml v0.4.1
 	github.com/zitadel/schema v1.3.2
 	github.com/zitadel/sloggcp v0.6.0

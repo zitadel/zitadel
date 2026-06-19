@@ -940,6 +940,7 @@ func (c *Commands) prepareAddInstanceJWTProvider(a *instance.Aggregate, writeMod
 					provider.JWTEndpoint,
 					provider.KeyEndpoint,
 					provider.HeaderName,
+					provider.Audience,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -988,6 +989,7 @@ func (c *Commands) prepareUpdateInstanceJWTProvider(a *instance.Aggregate, write
 				provider.JWTEndpoint,
 				provider.KeyEndpoint,
 				provider.HeaderName,
+				provider.Audience,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {

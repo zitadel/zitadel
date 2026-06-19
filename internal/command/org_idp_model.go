@@ -276,7 +276,8 @@ func (wm *OrgJWTIDPWriteModel) NewChangedEvent(
 	issuer,
 	jwtEndpoint,
 	keysEndpoint,
-	headerName string,
+	headerName,
+	audience string,
 	options idp.Options,
 ) (*org.JWTIDPChangedEvent, error) {
 
@@ -286,6 +287,7 @@ func (wm *OrgJWTIDPWriteModel) NewChangedEvent(
 		jwtEndpoint,
 		keysEndpoint,
 		headerName,
+		audience,
 		options,
 	)
 	if err != nil || len(changes) == 0 {
