@@ -42,6 +42,41 @@ func addNewGroupGrantPreConditionEvents(groupID, projectID, orgID string, roleKe
 	return events
 }
 
+func addNewGroupGrantCrossOrgPreConditionEvents(groupID, projectID, projectOrgID, groupOrgID, grantID string, grantRoleKeys []string) []eventstore.Event {
+	events := []eventstore.Event{
+		eventFromEventPusher(addNewGroupEvent(groupID, groupOrgID)),
+		eventFromEventPusher(
+			project.NewProjectAddedEvent(context.Background(),
+				&project.NewAggregate(projectID, projectOrgID).Aggregate,
+				"project",
+				false,
+				false,
+				false,
+				domain.PrivateLabelingSettingUnspecified,
+			),
+		),
+	}
+	for _, roleKey := range grantRoleKeys {
+		events = append(events, eventFromEventPusher(
+			project.NewRoleAddedEvent(context.Background(),
+				&project.NewAggregate(projectID, projectOrgID).Aggregate,
+				roleKey,
+				roleKey,
+				"",
+			),
+		))
+	}
+	events = append(events, eventFromEventPusher(
+		project.NewGrantAddedEvent(context.Background(),
+			&project.NewAggregate(projectID, projectOrgID).Aggregate,
+			grantID,
+			groupOrgID,
+			grantRoleKeys,
+		),
+	))
+	return events
+}
+
 func addNewGroupGrantAddedEvent(grantID, groupID, projectID, orgID string, roleKeys []string) *groupgrant.GroupGrantAddedEvent {
 	return groupgrant.NewGroupGrantAddedEvent(context.Background(),
 		&groupgrant.NewAggregate(grantID, orgID).Aggregate,
@@ -174,6 +209,196 @@ func TestCommands_AddGroupGrant(t *testing.T) {
 				ID:            "grant1",
 				ResourceOwner: "org1",
 			},
+		},
+		{
+			name: "cross-org project grant added, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(addNewGroupEvent("group1", "org1")),
+					),
+					expectFilter(
+						addNewGroupGrantCrossOrgPreConditionEvents("group1", "project1", "org2", "org1", "projectgrant1", []string{"role1"})...,
+					),
+					expectPush(
+						groupgrant.NewGroupGrantAddedEvent(context.Background(),
+							&groupgrant.NewAggregate("grant1", "org1").Aggregate,
+							"group1",
+							"project1",
+							"projectgrant1",
+							[]string{"role1"},
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "grant1"),
+			},
+			args: args{
+				ctx: context.Background(),
+				grant: &AddGroupGrant{
+					GroupID:        "group1",
+					ProjectID:      "project1",
+					ProjectGrantID: "projectgrant1",
+					RoleKeys:       []string{"role1"},
+				},
+			},
+			want: &domain.ObjectDetails{
+				ID:            "grant1",
+				ResourceOwner: "org1",
+			},
+		},
+		{
+			name: "cross-org project without grant, precondition error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(addNewGroupEvent("group1", "org1")),
+					),
+					expectFilter(
+						eventFromEventPusher(addNewGroupEvent("group1", "org1")),
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org2").Aggregate,
+								"project",
+								false,
+								false,
+								false,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org2").Aggregate,
+								"role1",
+								"role1",
+								"",
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx: context.Background(),
+				grant: &AddGroupGrant{
+					GroupID:        "group1",
+					ProjectID:      "project1",
+					ProjectGrantID: "projectgrant1",
+					RoleKeys:       []string{"role1"},
+				},
+			},
+			wantErr: zerrors.IsPreconditionFailed,
+		},
+		{
+			name: "cross-org grant missing requested role, precondition error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(addNewGroupEvent("group1", "org1")),
+					),
+					expectFilter(
+						addNewGroupGrantCrossOrgPreConditionEvents("group1", "project1", "org2", "org1", "projectgrant1", []string{"role1"})...,
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx: context.Background(),
+				grant: &AddGroupGrant{
+					GroupID:        "group1",
+					ProjectID:      "project1",
+					ProjectGrantID: "projectgrant1",
+					RoleKeys:       []string{"role2"},
+				},
+			},
+			wantErr: zerrors.IsPreconditionFailed,
+		},
+		{
+			name: "cross-org grant changed roles, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(addNewGroupEvent("group1", "org1")),
+					),
+					expectFilter(
+						append(
+							addNewGroupGrantCrossOrgPreConditionEvents("group1", "project1", "org2", "org1", "projectgrant1", []string{"role1"}),
+							eventFromEventPusher(
+								project.NewRoleAddedEvent(context.Background(),
+									&project.NewAggregate("project1", "org2").Aggregate,
+									"role2",
+									"role2",
+									"",
+								),
+							),
+							eventFromEventPusher(
+								project.NewGrantChangedEvent(context.Background(),
+									&project.NewAggregate("project1", "org2").Aggregate,
+									"projectgrant1",
+									[]string{"role1", "role2"},
+								),
+							),
+						)...,
+					),
+					expectPush(
+						groupgrant.NewGroupGrantAddedEvent(context.Background(),
+							&groupgrant.NewAggregate("grant1", "org1").Aggregate,
+							"group1",
+							"project1",
+							"projectgrant1",
+							[]string{"role2"},
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "grant1"),
+			},
+			args: args{
+				ctx: context.Background(),
+				grant: &AddGroupGrant{
+					GroupID:        "group1",
+					ProjectID:      "project1",
+					ProjectGrantID: "projectgrant1",
+					RoleKeys:       []string{"role2"},
+				},
+			},
+			want: &domain.ObjectDetails{
+				ID:            "grant1",
+				ResourceOwner: "org1",
+			},
+		},
+		{
+			name: "cross-org grant removed, precondition error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(addNewGroupEvent("group1", "org1")),
+					),
+					expectFilter(
+						append(
+							addNewGroupGrantCrossOrgPreConditionEvents("group1", "project1", "org2", "org1", "projectgrant1", []string{"role1"}),
+							eventFromEventPusher(
+								project.NewGrantRemovedEvent(context.Background(),
+									&project.NewAggregate("project1", "org2").Aggregate,
+									"projectgrant1",
+									"org1",
+								),
+							),
+						)...,
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx: context.Background(),
+				grant: &AddGroupGrant{
+					GroupID:        "group1",
+					ProjectID:      "project1",
+					ProjectGrantID: "projectgrant1",
+					RoleKeys:       []string{"role1"},
+				},
+			},
+			wantErr: zerrors.IsPreconditionFailed,
 		},
 	}
 	for _, tt := range tests {
