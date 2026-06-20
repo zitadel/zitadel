@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/group"
+	"github.com/zitadel/zitadel/internal/repository/groupgrant"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -708,8 +709,9 @@ func TestCommands_DeleteGroup(t *testing.T) {
 		checkPermission domain.PermissionCheck
 	}
 	type args struct {
-		ctx     context.Context
-		groupID string
+		ctx               context.Context
+		groupID           string
+		cascadingGrantIDs []string
 	}
 	tests := []struct {
 		name    string
@@ -834,6 +836,140 @@ func TestCommands_DeleteGroup(t *testing.T) {
 				ResourceOwner: "org1",
 			},
 		},
+		{
+			name: "delete group with cascading grants, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							group.NewGroupAddedEvent(context.Background(),
+								&group.NewAggregate("1234", "org1").Aggregate,
+								"group1",
+								"group1 description",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							addNewGroupGrantAddedEvent("grant1", "1234", "project1", "org1", []string{"role1"}),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							addNewGroupGrantAddedEvent("grant2", "1234", "project2", "org1", []string{"role2"}),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(
+							group.NewGroupRemovedEvent(context.Background(),
+								&group.NewAggregate("1234", "org1").Aggregate,
+								"group1",
+							),
+						),
+						eventFromEventPusher(
+							groupgrant.NewGroupGrantCascadeRemovedEvent(context.Background(),
+								&groupgrant.NewAggregate("grant1", "org1").Aggregate,
+								"1234",
+								"project1",
+								"",
+							),
+						),
+						eventFromEventPusher(
+							groupgrant.NewGroupGrantCascadeRemovedEvent(context.Background(),
+								&groupgrant.NewAggregate("grant2", "org1").Aggregate,
+								"1234",
+								"project2",
+								"",
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:               context.Background(),
+				groupID:           "1234",
+				cascadingGrantIDs: []string{"grant1", "grant2"},
+			},
+			want: &domain.ObjectDetails{
+				ID:            "1234",
+				ResourceOwner: "org1",
+			},
+		},
+		{
+			name: "cascading grant not found, skipped, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							group.NewGroupAddedEvent(context.Background(),
+								&group.NewAggregate("1234", "org1").Aggregate,
+								"group1",
+								"group1 description",
+							),
+						),
+					),
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							addNewGroupGrantAddedEvent("grant2", "1234", "project2", "org1", []string{"role2"}),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(
+							group.NewGroupRemovedEvent(context.Background(),
+								&group.NewAggregate("1234", "org1").Aggregate,
+								"group1",
+							),
+						),
+						eventFromEventPusher(
+							groupgrant.NewGroupGrantCascadeRemovedEvent(context.Background(),
+								&groupgrant.NewAggregate("grant2", "org1").Aggregate,
+								"1234",
+								"project2",
+								"",
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:               context.Background(),
+				groupID:           "1234",
+				cascadingGrantIDs: []string{"missing", "grant2"},
+			},
+			want: &domain.ObjectDetails{
+				ID:            "1234",
+				ResourceOwner: "org1",
+			},
+		},
+		{
+			name: "failed to load cascading grant, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							group.NewGroupAddedEvent(context.Background(),
+								&group.NewAggregate("1234", "org1").Aggregate,
+								"group1",
+								"group1 description",
+							),
+						),
+					),
+					expectFilterError(filterErr),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:               context.Background(),
+				groupID:           "1234",
+				cascadingGrantIDs: []string{"grant1"},
+			},
+			wantErr: func(err error) bool {
+				return errors.Is(err, filterErr)
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -844,7 +980,7 @@ func TestCommands_DeleteGroup(t *testing.T) {
 				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := c.DeleteGroup(tt.args.ctx, tt.args.groupID)
+			got, err := c.DeleteGroup(tt.args.ctx, tt.args.groupID, tt.args.cascadingGrantIDs...)
 			if tt.wantErr == nil {
 				require.NoError(t, err)
 				require.NotEmpty(t, got.ID)
