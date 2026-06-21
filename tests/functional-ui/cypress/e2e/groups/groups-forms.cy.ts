@@ -37,6 +37,21 @@ describe('groups — form-level client validation', () => {
       cy.get('@createGroup.all').should('have.length', 0);
     });
 
+    it('rejects a whitespace-only name without firing the API', () => {
+      cy.get('[data-e2e="group-name-input"]').type('   ');
+      cy.get('[data-e2e="group-dialog-save"]').should('be.disabled').click({ force: true });
+      cy.wait(500);
+      cy.get('@createGroup.all').should('have.length', 0);
+    });
+
+    it('fires exactly one create request even on a double-click', () => {
+      cy.get('[data-e2e="group-name-input"]').type(name);
+      cy.get('[data-e2e="group-dialog-save"]').dblclick();
+      cy.wait('@createGroup').its('response.statusCode').should('be.oneOf', [200, 201]);
+      cy.wait(500);
+      cy.get('@createGroup.all').should('have.length', 1);
+    });
+
     it('disables save when the name exceeds 200 characters', () => {
       const tooLong = 'a'.repeat(201);
       cy.get('[data-e2e="group-name-input"]').invoke('val', tooLong).trigger('input');
@@ -86,6 +101,13 @@ describe('groups — form-level client validation', () => {
     it('preloads the name and disables save when the name is cleared', () => {
       cy.get('[data-e2e="group-name-input"]').should('have.value', name);
       cy.get('[data-e2e="group-name-input"]').clear();
+      cy.get('[data-e2e="group-dialog-save"]').should('be.disabled');
+      cy.wait(500);
+      cy.get('@updateGroup.all').should('have.length', 0);
+    });
+
+    it('keeps save disabled until the form is dirty', () => {
+      cy.get('[data-e2e="group-name-input"]').should('have.value', name);
       cy.get('[data-e2e="group-dialog-save"]').should('be.disabled');
       cy.wait(500);
       cy.get('@updateGroup.all').should('have.length', 0);
