@@ -152,6 +152,43 @@ func TestServer_Introspect(t *testing.T) {
 	}
 }
 
+func TestServer_Introspect_Groups(t *testing.T) {
+	project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
+	api, err := Instance.CreateAPIClientBasic(CTX, project.GetId())
+	require.NoError(t, err)
+	app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
+	require.NoError(t, err)
+	resourceServer, err := Instance.CreateResourceServerClientCredentials(CTX, api.GetClientId(), api.GetClientSecret())
+	require.NoError(t, err)
+
+	groupName1, groupName2 := integration.GroupName(), integration.GroupName()
+	group1 := Instance.CreateGroup(CTXIAM, t, Instance.DefaultOrg.GetId(), groupName1)
+	group2 := Instance.CreateGroup(CTXIAM, t, Instance.DefaultOrg.GetId(), groupName2)
+	Instance.AddUsersToGroup(CTXIAM, t, group1.GetId(), []string{User.GetUserId()})
+	Instance.AddUsersToGroup(CTXIAM, t, group2.GetId(), []string{User.GetUserId()})
+	t.Cleanup(func() {
+		// the User is shared in this package; other tests assert its exact memberships
+		Instance.RemoveUsersFromGroup(CTXIAM, t, group1.GetId(), []string{User.GetUserId()})
+		Instance.RemoveUsersFromGroup(CTXIAM, t, group2.GetId(), []string{User.GetUserId()})
+	})
+
+	scope := []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess, oidc_api.ScopeUserGroups}
+	tokens := getTokens(t, app.GetClientId(), scope)
+
+	introspection, err := rs.Introspect[*oidc.IntrospectionResponse](context.Background(), resourceServer, tokens.AccessToken)
+	require.NoError(t, err)
+	require.True(t, introspection.Active)
+	require.NotNil(t, introspection.Claims)
+
+	// groups claim encoding per RFC 9068 / SCIM (RFC 7643 section 4.1.2),
+	// matching the userinfo response so SetUserInfo wiring is asserted end-to-end
+	expected := []map[string]interface{}{
+		{"value": group1.GetId(), "display": groupName1},
+		{"value": group2.GetId(), "display": groupName2},
+	}
+	assert.Subset(t, introspection.Claims[oidc_api.ClaimUserGroups], expected)
+}
+
 func TestServer_Introspect_invalid_auth_invalid_token(t *testing.T) {
 	// ensure that when an invalid authentication and token is sent, the authentication error is returned
 	// https://github.com/zitadel/zitadel/pull/8133
