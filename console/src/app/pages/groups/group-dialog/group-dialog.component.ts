@@ -6,7 +6,10 @@ import { MessageInitShape } from '@bufbuild/protobuf';
 import { TranslateModule } from '@ngx-translate/core';
 import { Group } from '@zitadel/proto/zitadel/group/v2/group_pb';
 import { CreateGroupRequestSchema, UpdateGroupRequestSchema } from '@zitadel/proto/zitadel/group/v2/group_service_pb';
-import { maxLengthValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
+import {
+  maxLengthValidator,
+  trimmedRequiredValidator,
+} from 'src/app/modules/form-field/validators/validators';
 
 const GROUP_NAME_MAX_LENGTH = 200;
 const GROUP_DESCRIPTION_MAX_LENGTH = 200;
@@ -43,7 +46,7 @@ export class GroupDialogComponent {
     return this.fb.group({
       name: new FormControl<string>('', {
         nonNullable: true,
-        validators: [requiredValidator, maxLengthValidator(GROUP_NAME_MAX_LENGTH)],
+        validators: [trimmedRequiredValidator, maxLengthValidator(GROUP_NAME_MAX_LENGTH)],
       }),
       description: new FormControl<string>('', {
         nonNullable: true,

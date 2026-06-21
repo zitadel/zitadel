@@ -19,7 +19,13 @@
     <button mat-stroked-button type="button" (click)="dialogRef.close()">
       {{ 'ACTIONS.CANCEL' | translate }}
     </button>
-    <button mat-raised-button color="primary" type="submit" data-e2e="group-dialog-save" [disabled]="groupForm.invalid">
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      data-e2e="group-dialog-save"
+      [disabled]="groupForm.invalid || groupForm.pristine"
+    >
       {{ 'ACTIONS.SAVE' | translate }}
     </button>
   </mat-dialog-actions>
