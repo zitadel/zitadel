@@ -219,6 +219,51 @@ func TestServer_UpdateGroupGrant(t *testing.T) {
 	})
 }
 
+// TestServer_CreateGroupGrant_CrossOrgProjectGrant proves a group in the granted org
+// receives roles through a project grant without the caller naming the grant ID.
+func TestServer_CreateGroupGrant_CrossOrgProjectGrant(t *testing.T) {
+	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+
+	ownerOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+	grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+	projectID := createProjectWithRole(iamOwnerCtx, t, ownerOrg.GetOrganizationId(), "role1")
+	instance.CreateProjectGrant(iamOwnerCtx, t, projectID, grantedOrg.GetOrganizationId(), "role1")
+
+	groupResp := instance.CreateGroup(iamOwnerCtx, t, grantedOrg.GetOrganizationId(), integration.GroupName())
+
+	grantResp, err := instance.Client.GroupV2.CreateGroupGrant(iamOwnerCtx, &group_v2.CreateGroupGrantRequest{
+		GroupId:   groupResp.GetId(),
+		ProjectId: projectID,
+		RoleKeys:  []string{"role1"},
+	})
+	require.NoError(t, err)
+	assert.NotEmpty(t, grantResp.GetId())
+
+	listReq := &group_v2.ListGroupGrantsRequest{
+		Filters: []*group_v2.GroupGrantsSearchFilter{
+			{
+				Filter: &group_v2.GroupGrantsSearchFilter_GroupIds{
+					GroupIds: &filter.InIDsFilter{Ids: []string{groupResp.GetId()}},
+				},
+			},
+		},
+	}
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCtx, time.Minute)
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		got, err := instance.Client.GroupV2.ListGroupGrants(iamOwnerCtx, listReq)
+		require.NoError(ttt, err)
+		require.Len(ttt, got.GetGroupGrants(), 1)
+		grant := got.GetGroupGrants()[0]
+		assert.Equal(ttt, grantResp.GetId(), grant.GetId())
+		assert.Equal(ttt, groupResp.GetId(), grant.GetGroupId())
+		assert.Equal(ttt, grantedOrg.GetOrganizationId(), grant.GetOrganizationId(), "grant is owned by the granted org")
+		assert.Equal(ttt, projectID, grant.GetProjectId())
+		assert.NotEmpty(ttt, grant.GetProjectGrantId(), "auto-resolved project grant id must be populated")
+		assert.Equal(ttt, []string{"role1"}, grant.GetRoleKeys())
+	}, retryDuration, tick, "timeout waiting for cross-org group grant to project")
+}
+
 func TestServer_DeleteGroupGrant(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
