@@ -386,6 +386,59 @@ func Test_MembershipPrepares(t *testing.T) {
 			},
 		},
 		{
+			// A row from the group-manager union leg populates BOTH org_id
+			// (from managers.resource_owner) AND member_group_id (from
+			// members.group_id). The scan must surface the supplying group
+			// as Membership.Group with the right ID and name. A column-order
+			// regression in the Scan call would leave Group nil for every
+			// group-derived membership.
+			name:    "prepareMembershipsQuery group-supplied org member, Group provenance is populated",
+			prepare: prepareMembershipWrapper(),
+			want: want{
+				sqlExpectations: mockQueries(
+					membershipsStmt,
+					membershipCols,
+					[][]driver.Value{
+						{
+							"user-id",
+							database.TextArray[string]{"ORG_OWNER"},
+							testNow,
+							testNow,
+							uint64(20211202),
+							"ro",
+							"org-id",
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							"org-name",
+							nil,
+							"group-id",
+							"group-name",
+						},
+					},
+				),
+			},
+			object: &Memberships{
+				SearchResponse: SearchResponse{
+					Count: 1,
+				},
+				Memberships: []*Membership{
+					{
+						UserID:        "user-id",
+						Roles:         database.TextArray[string]{"ORG_OWNER"},
+						CreationDate:  testNow,
+						ChangeDate:    testNow,
+						Sequence:      20211202,
+						ResourceOwner: "ro",
+						Org:           &OrgMembership{OrgID: "org-id", Name: "org-name"},
+						Group:         &GroupMembershipSource{GroupID: "group-id", Name: "group-name"},
+					},
+				},
+			},
+		},
+		{
 			name:    "prepareMembershipsQuery sql err",
 			prepare: prepareMembershipWrapper(),
 			want: want{
