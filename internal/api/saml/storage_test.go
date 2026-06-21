@@ -1,12 +1,33 @@
 package saml
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/query"
 )
+
+// TestAppendUserGroupsAttribute_ActionTakesPrecedence locks down the conflict
+// guard: when a SAML action has already set a "groups" custom attribute, the
+// storage must return early without overwriting it. p.query is left nil so a
+// regressed guard panics loudly instead of silently double-emitting.
+func TestAppendUserGroupsAttribute_ActionTakesPrecedence(t *testing.T) {
+	p := &Storage{}
+	existing := map[string]*customAttribute{
+		"groups": {nameFormat: "action-fmt", attributeValue: []string{"action-only"}},
+		"other":  {nameFormat: "fmt", attributeValue: []string{"value"}},
+	}
+
+	got, err := p.appendUserGroupsAttribute(context.Background(), "user1", existing)
+	require.NoError(t, err)
+	require.Contains(t, got, "groups")
+	assert.Equal(t, "action-fmt", got["groups"].nameFormat)
+	assert.Equal(t, []string{"action-only"}, got["groups"].attributeValue)
+	assert.Contains(t, got, "other", "unrelated attributes must be preserved")
+}
 
 func TestAppendGroupNamesAttribute(t *testing.T) {
 	const expectedFormat = "urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
