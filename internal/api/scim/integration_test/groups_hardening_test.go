@@ -70,6 +70,43 @@ func TestGroups_patchUnsupported(t *testing.T) {
 	assert.Equal(t, "SCIM-GRP3p", scimErr.ZitadelDetail.ID)
 }
 
+// TestGroups_replaceUnknownMember proves a PUT referencing a user ID that
+// does not exist surfaces as a SCIM error and leaves the group untouched —
+// no dangling membership, no silent success.
+func TestGroups_replaceUnknownMember(t *testing.T) {
+	orgID := Instance.DefaultOrg.GetId()
+	groupName := integration.GroupName()
+	groupID := createScimGroup(t, orgID, groupName)
+
+	// Replace reads the group from the projection; wait for it to appear
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		_, err := Instance.Client.SCIM.Groups.Get(CTX, orgID, groupID)
+		require.NoError(ttt, err)
+	}, retryDuration, tick, "timeout waiting for group projection")
+
+	const unknownUserID = "00000000000000000000"
+	_, err := Instance.Client.SCIM.Groups.Replace(CTX, orgID, groupID, []byte(fmt.Sprintf(`{
+		"schemas": ["urn:ietf:params:scim:schemas:core:2.0:Group"],
+		"displayName": %q,
+		"members": [{"value": %q}]
+	}`, groupName, unknownUserID)))
+	require.Error(t, err)
+	scimErr := new(scim.ScimError)
+	require.ErrorAs(t, err, &scimErr)
+	assert.Equal(t, "400", scimErr.Status)
+	require.NotNil(t, scimErr.ZitadelDetail)
+	assert.Contains(t, scimErr.ZitadelDetail.Message, "Errors.User.NotFound")
+
+	// the group must still exist with no members
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		group, err := Instance.Client.SCIM.Groups.Get(CTX, orgID, groupID)
+		require.NoError(ttt, err)
+		assert.Equal(ttt, groupName, group.DisplayName)
+		assert.Empty(ttt, group.Members, "no membership must be created on a failed PUT")
+	}, retryDuration, tick, "timeout asserting group is unchanged")
+}
+
 // TestGroups_listPagination proves count/startIndex paging returns every
 // group exactly once with a stable total.
 func TestGroups_listPagination(t *testing.T) {
