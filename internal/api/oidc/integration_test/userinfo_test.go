@@ -76,6 +76,11 @@ func TestServer_UserInfo(t *testing.T) {
 				func(t *testing.T, ui *oidc.UserInfo) {
 					assertNoReservedScopes(t, ui.Claims)
 				},
+				func(t *testing.T, ui *oidc.UserInfo) {
+					// groups is not a ZITADEL-prefixed claim, so assertNoReservedScopes
+					// would not catch a leak. Assert it explicitly for a known group member.
+					assert.NotContains(t, ui.Claims, oidc_api.ClaimUserGroups, "groups claim must be absent without the groups scope")
+				},
 			},
 		},
 		{
