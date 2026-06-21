@@ -536,6 +536,22 @@ func Test_userInfoToOIDC(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "human group member, scope omitted, groups claim absent",
+			args: args{
+				user:  humanUserInfo,
+				scope: []string{ScopeUserMetaData},
+			},
+			want: &oidc.UserInfo{
+				Subject: "human1",
+				Claims: map[string]any{
+					ClaimUserMetaData: map[string]string{
+						"key1": base64.RawURLEncoding.EncodeToString([]byte{1, 2, 3}),
+						"key2": base64.RawURLEncoding.EncodeToString([]byte{4, 5, 6}),
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
