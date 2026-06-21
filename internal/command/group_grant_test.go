@@ -561,6 +561,24 @@ func TestCommands_RemoveGroupGrant(t *testing.T) {
 			},
 		},
 		{
+			name: "missing permission, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							addNewGroupGrantAddedEvent("grant1", "group1", "project1", "org1", []string{"role1"}),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:     context.Background(),
+				grantID: "grant1",
+			},
+			wantErr: zerrors.IsPermissionDenied,
+		},
+		{
 			name: "group grant removed, ok",
 			fields: fields{
 				eventstore: expectEventstore(
