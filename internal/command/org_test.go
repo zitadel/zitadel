@@ -1433,6 +1433,48 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 			},
 			res: res{},
 		},
+		{
+			// OrgGroupNames is the last lookup before push; a regression that
+			// swallowed its error (e.g., logging-and-continuing) would let the
+			// org be removed without releasing group name uniqueness constraints,
+			// blocking future re-creation of groups with the same names.
+			name: "group names lookup fails, error propagates and no push",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(), // zitadel project check
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org"),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilterOrganizationSettings("org1", false, false),
+					expectFilter(), // OrgUsers
+					expectFilter(), // OrgDomains
+					expectFilter(), // OrgUserIDPLinks
+					expectFilter(), // OrgSamlEntityIDs
+					expectFilterError(zerrors.ThrowInternal(nil, "TEST-grp-er", "group names filter failed")),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{
+				err: zerrors.IsInternal,
+			},
+		},
 
 		{
 			name: "remove org (with permission check)",
