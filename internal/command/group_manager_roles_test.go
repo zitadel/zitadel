@@ -19,6 +19,10 @@ func TestCommands_SetGroupManagerRoles(t *testing.T) {
 	zitadelRoles := []authz.RoleMapping{
 		{Role: "ORG_OWNER"},
 		{Role: "ORG_OWNER_VIEWER"},
+		// IAM_OWNER is intentionally a known, valid system role here. The
+		// command must still reject it because group manager roles are
+		// scoped to the org level by domain.OrgRolePrefix.
+		{Role: domain.RoleIAMOwner},
 	}
 
 	type fields struct {
@@ -57,6 +61,22 @@ func TestCommands_SetGroupManagerRoles(t *testing.T) {
 				ctx:     context.Background(),
 				groupID: "group1",
 				roles:   []string{"NOT_A_ROLE"},
+			},
+			wantErr: zerrors.IsErrorInvalidArgument,
+		},
+		{
+			// IAM_OWNER is in the zitadelRoles registry but lacks the ORG_
+			// prefix. The command must reject it before reaching the
+			// eventstore — without the prefix guard the role would escalate
+			// every group member to an instance-wide IAM_OWNER.
+			name: "IAM_OWNER role rejected, invalid argument error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:     context.Background(),
+				groupID: "group1",
+				roles:   []string{domain.RoleIAMOwner},
 			},
 			wantErr: zerrors.IsErrorInvalidArgument,
 		},
