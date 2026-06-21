@@ -107,6 +107,51 @@ func TestGroups_replaceUnknownMember(t *testing.T) {
 	}, retryDuration, tick, "timeout asserting group is unchanged")
 }
 
+// TestGroups_replaceMemberAlreadyPresent proves a PUT listing a member that
+// is already in the group is a no-op: no error, no duplicate membership in
+// the projection — the replaceMembers set diff must filter it out.
+func TestGroups_replaceMemberAlreadyPresent(t *testing.T) {
+	orgID := Instance.DefaultOrg.GetId()
+	user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
+	groupName := integration.GroupName()
+
+	created, err := Instance.Client.SCIM.Groups.Create(CTX, orgID, []byte(fmt.Sprintf(`{
+		"schemas": ["urn:ietf:params:scim:schemas:core:2.0:Group"],
+		"displayName": %q,
+		"members": [{"value": %q}]
+	}`, groupName, user.GetUserId())))
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		_ = Instance.Client.SCIM.Groups.Delete(CTX, orgID, created.ID)
+	})
+
+	// replaceMembers reads existingIDs from the projection; wait for it
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		group, err := Instance.Client.SCIM.Groups.Get(CTX, orgID, created.ID)
+		require.NoError(ttt, err)
+		require.Len(ttt, group.Members, 1)
+	}, retryDuration, tick, "timeout waiting for initial membership projection")
+
+	// PUT with the same single member — the set diff must produce no work
+	_, err = Instance.Client.SCIM.Groups.Replace(CTX, orgID, created.ID, []byte(fmt.Sprintf(`{
+		"schemas": ["urn:ietf:params:scim:schemas:core:2.0:Group"],
+		"displayName": %q,
+		"members": [{"value": %q}]
+	}`, groupName, user.GetUserId())))
+	require.NoError(t, err)
+
+	// the projection must still report exactly one member, the same user;
+	// even after the projection has had time to apply any stray event
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		group, err := Instance.Client.SCIM.Groups.Get(CTX, orgID, created.ID)
+		require.NoError(ttt, err)
+		assert.Equal(ttt, groupName, group.DisplayName)
+		require.Len(ttt, group.Members, 1, "Replace with an already-present member must not duplicate")
+		assert.Equal(ttt, user.GetUserId(), group.Members[0].Value)
+	}, retryDuration, tick, "timeout asserting idempotent PUT")
+}
+
 // TestGroups_listPagination proves count/startIndex paging returns every
 // group exactly once with a stable total.
 func TestGroups_listPagination(t *testing.T) {
