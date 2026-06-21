@@ -455,6 +455,25 @@ func TestCommands_ChangeGroupGrant(t *testing.T) {
 			wantErr: zerrors.IsNotFound,
 		},
 		{
+			name: "missing permission, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							addNewGroupGrantAddedEvent("grant1", "group1", "project1", "org1", []string{"role1"}),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:      context.Background(),
+				grantID:  "grant1",
+				roleKeys: []string{"role1", "role2"},
+			},
+			wantErr: zerrors.IsPermissionDenied,
+		},
+		{
 			name: "roles unchanged, no events pushed, ok",
 			fields: fields{
 				eventstore: expectEventstore(
