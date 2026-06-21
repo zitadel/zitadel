@@ -49,7 +49,7 @@ describe('groups — members (API + event log)', () => {
 
                   listGroupUsers(ctx.api, groupId).should((users) => {
                     expect(users, 'all three users present').to.have.length(3);
-                    const ids = users.map((u: any) => u.userId);
+                    const ids = users.map((u: any) => u.user?.id);
                     expect(ids).to.include.members([idA, idB, idC]);
                   });
                 });
