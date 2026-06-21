@@ -514,16 +514,22 @@ func (p *Storage) appendUserGroupsAttribute(ctx context.Context, userID string, 
 	if err != nil {
 		return nil, err
 	}
-	if len(memberships.GroupUsers) == 0 {
-		return customAttributes, nil
+	return appendGroupNamesAttribute(customAttributes, memberships.GroupUsers), nil
+}
+
+// appendGroupNamesAttribute appends the user's group names as a "groups" SAML attribute.
+// Empty group names are filtered: a left-joined group row that has been removed scans as "".
+func appendGroupNamesAttribute(customAttributes map[string]*customAttribute, memberships []*query.GroupUser) map[string]*customAttribute {
+	if len(memberships) == 0 {
+		return customAttributes
 	}
-	groupNames := make([]string, 0, len(memberships.GroupUsers))
-	for _, membership := range memberships.GroupUsers {
+	groupNames := make([]string, 0, len(memberships))
+	for _, membership := range memberships {
 		if membership.GroupName != "" {
 			groupNames = append(groupNames, membership.GroupName)
 		}
 	}
-	return appendCustomAttribute(customAttributes, "groups", "urn:oasis:names:tc:SAML:2.0:attrname-format:basic", groupNames), nil
+	return appendCustomAttribute(customAttributes, "groups", "urn:oasis:names:tc:SAML:2.0:attrname-format:basic", groupNames)
 }
 
 type customAttribute struct {
