@@ -110,6 +110,30 @@ func expectFilterError(err error) expect {
 	}
 }
 
+// expectFilterScoped is an expectFilter that additionally asserts the
+// SearchQueryBuilder's ResourceOwner. Use this to lock down org-scoping
+// contracts that the eventstore relies on for cross-org isolation — the
+// default expectFilter accepts any query, so a regression that drops
+// the scope would not be detected.
+func expectFilterScoped(t *testing.T, resourceOwner string, events ...eventstore.Event) expect {
+	return func(m *mock.MockRepository) {
+		m.MockQuerier.EXPECT().FilterToReducer(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
+			func(_ context.Context, qb *eventstore.SearchQueryBuilder, reduce eventstore.Reducer) error {
+				t.Helper()
+				if got := qb.GetResourceOwner(); got != resourceOwner {
+					t.Errorf("filter not scoped to resource owner: want %q, got %q", resourceOwner, got)
+				}
+				for _, event := range events {
+					if err := reduce(event); err != nil {
+						return err
+					}
+				}
+				return nil
+			},
+		)
+	}
+}
+
 func expectFilterOrgDomainNotFound() expect {
 	return func(m *mock.MockRepository) {
 		m.ExpectFilterNoEventsNoError()
