@@ -574,6 +574,43 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 	}
 }
 
+func TestCommands_removeUserFromGroups(t *testing.T) {
+	t.Parallel()
+
+	const (
+		userID = "user1"
+		orgID  = "org1"
+	)
+
+	tests := []struct {
+		name     string
+		groupIDs []string
+	}{
+		{name: "no groups, no events", groupIDs: nil},
+		{name: "single group, single event", groupIDs: []string{"group1"}},
+		{name: "multiple groups, one event per group, in order", groupIDs: []string{"group1", "group2", "group3"}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			c := &Commands{}
+			events, err := c.removeUserFromGroups(context.Background(), userID, tt.groupIDs, orgID)
+			require.NoError(t, err)
+			require.Len(t, events, len(tt.groupIDs))
+
+			for i, ev := range events {
+				removed, ok := ev.(*group.GroupUsersRemovedEvent)
+				require.Truef(t, ok, "event %d is %T, want *group.GroupUsersRemovedEvent", i, ev)
+				require.Equal(t, group.GroupUsersRemovedEventType, removed.EventType)
+				require.Equal(t, tt.groupIDs[i], removed.Aggregate().ID)
+				require.Equal(t, orgID, removed.Aggregate().ResourceOwner)
+				require.Equal(t, []string{userID}, removed.UserIDs)
+			}
+		})
+	}
+}
+
 func addNewGroupUsersAddedEvent(groupID, orgID string, userIds []string) *group.GroupUsersAddedEvent {
 	return group.NewGroupUsersAddedEvent(context.Background(),
 		&group.NewAggregate(groupID, orgID).Aggregate,
