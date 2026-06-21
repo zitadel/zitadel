@@ -2879,8 +2879,8 @@
       "DELETED": "Group deleted",
       "MEMBERSADDED": "Users added to group",
       "MEMBERREMOVED": "User removed from group",
-      "GRANTADDED": "Group authorization created",
-      "GRANTREMOVED": "Group authorization removed"
+      "GRANTADDED": "Gruppenberechtigung erstellt",
+      "GRANTREMOVED": "Gruppenberechtigung entfernt"
     },
     "GRANTS": {
       "TITLE": "Authorizations",
