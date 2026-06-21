@@ -41,6 +41,20 @@ func TestAppendGroupNamesAttribute(t *testing.T) {
 		assert.Contains(t, got, "other")
 	})
 
+	t.Run("empty memberships slice keeps groups key absent", func(t *testing.T) {
+		// The guard is `len(memberships) == 0`, not `memberships == nil`. A
+		// regression to a nil check would let an empty slice slip through,
+		// emitting a bare <saml:Attribute Name="groups"/> with no values into
+		// the assertion. This case locks the len() semantics so the SAML
+		// response stays the same for both nil and []*query.GroupUser{}.
+		existing := map[string]*customAttribute{
+			"other": {nameFormat: "fmt", attributeValue: []string{"value"}},
+		}
+		got := appendGroupNamesAttribute(existing, []*query.GroupUser{})
+		assert.NotContains(t, got, "groups", "non-nil empty slice must also leave the groups key absent")
+		assert.Contains(t, got, "other")
+	})
+
 	t.Run("multiple memberships all appended", func(t *testing.T) {
 		memberships := []*query.GroupUser{
 			{GroupID: "g1", GroupName: "engineering"},
