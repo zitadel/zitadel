@@ -464,6 +464,168 @@ func Test_GroupUsersFieldNameToSortingColumn(t *testing.T) {
 	}
 }
 
+func Test_ListGroupGrantsRequestToModel(t *testing.T) {
+	t.Parallel()
+	groupIDsSearchQuery, err := query.NewGroupGrantGroupIDsSearchQuery([]string{"group1", "group2"})
+	require.NoError(t, err)
+
+	projectIDSearchQuery, err := query.NewGroupGrantProjectIDSearchQuery("project1")
+	require.NoError(t, err)
+
+	tests := []struct {
+		name          string
+		maxQueryLimit uint64
+		req           *group_v2.ListGroupGrantsRequest
+		wantResp      *query.GroupGrantsSearchQuery
+		wantErr       error
+	}{
+		{
+			name:          "max query limit exceeded",
+			maxQueryLimit: 1,
+			req: &group_v2.ListGroupGrantsRequest{
+				Pagination: &filter.PaginationRequest{
+					Limit: 5,
+				},
+				Filters: []*group_v2.GroupGrantsSearchFilter{
+					{
+						Filter: &group_v2.GroupGrantsSearchFilter_GroupIds{
+							GroupIds: &filter.InIDsFilter{
+								Ids: []string{"group1", "group2"},
+							},
+						},
+					},
+				},
+			},
+			wantErr: zerrors.ThrowInvalidArgumentf(errors.New("given: 5, allowed: 1"), "QUERY-4M0fs", "Errors.Query.LimitExceeded"),
+		},
+		{
+			name: "valid request, list of group IDs, ok",
+			req: &group_v2.ListGroupGrantsRequest{
+				Filters: []*group_v2.GroupGrantsSearchFilter{
+					{
+						Filter: &group_v2.GroupGrantsSearchFilter_GroupIds{
+							GroupIds: &filter.InIDsFilter{
+								Ids: []string{"group1", "group2"},
+							},
+						},
+					},
+				},
+			},
+			wantResp: &query.GroupGrantsSearchQuery{
+				SearchRequest: query.SearchRequest{
+					Offset:        0,
+					Limit:         0,
+					SortingColumn: query.GroupGrantColumnCreationDate,
+				},
+				Queries: []query.SearchQuery{groupIDsSearchQuery},
+			},
+		},
+		{
+			name: "valid request, project ID, ok",
+			req: &group_v2.ListGroupGrantsRequest{
+				Filters: []*group_v2.GroupGrantsSearchFilter{
+					{
+						Filter: &group_v2.GroupGrantsSearchFilter_ProjectId{
+							ProjectId: &filter.IDFilter{
+								Id: "project1",
+							},
+						},
+					},
+				},
+			},
+			wantResp: &query.GroupGrantsSearchQuery{
+				SearchRequest: query.SearchRequest{
+					Offset:        0,
+					Limit:         0,
+					SortingColumn: query.GroupGrantColumnCreationDate,
+				},
+				Queries: []query.SearchQuery{projectIDSearchQuery},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			sysDefaults := systemdefaults.SystemDefaults{MaxQueryLimit: tt.maxQueryLimit}
+			got, err := listGroupGrantsRequestToModel(tt.req, sysDefaults)
+			if tt.wantErr != nil {
+				assert.Equal(t, tt.wantErr, err)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.wantResp, got)
+		})
+	}
+}
+
+func Test_GroupGrantsSearchFiltersToQuery(t *testing.T) {
+	t.Parallel()
+	groupIDsSearchQuery, err := query.NewGroupGrantGroupIDsSearchQuery([]string{"group1", "group2"})
+	require.NoError(t, err)
+
+	projectIDSearchQuery, err := query.NewGroupGrantProjectIDSearchQuery("project1")
+	require.NoError(t, err)
+
+	tests := []struct {
+		name    string
+		filters []*group_v2.GroupGrantsSearchFilter
+		want    []query.SearchQuery
+		wantErr error
+	}{
+		{
+			name:    "empty",
+			filters: []*group_v2.GroupGrantsSearchFilter{},
+			want:    []query.SearchQuery{},
+		},
+		{
+			name: "all filters",
+			filters: []*group_v2.GroupGrantsSearchFilter{
+				{
+					Filter: &group_v2.GroupGrantsSearchFilter_GroupIds{
+						GroupIds: &filter.InIDsFilter{
+							Ids: []string{"group1", "group2"},
+						},
+					},
+				},
+				{
+					Filter: &group_v2.GroupGrantsSearchFilter_ProjectId{
+						ProjectId: &filter.IDFilter{
+							Id: "project1",
+						},
+					},
+				},
+			},
+			want: []query.SearchQuery{
+				groupIDsSearchQuery,
+				projectIDSearchQuery,
+			},
+		},
+		{
+			// An unset oneof falls through the switch's default arm. The mapper
+			// must surface this as InvalidArgument instead of returning a
+			// half-empty query that silently matches every grant.
+			name: "unknown filter returns error",
+			filters: []*group_v2.GroupGrantsSearchFilter{
+				{Filter: nil},
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "GRPC-x4Fmq2", "List.Query.Invalid"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			got, err := groupGrantsSearchFiltersToQuery(tt.filters)
+			if tt.wantErr != nil {
+				assert.Equal(t, tt.wantErr, err)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
 func Test_GroupUsersToPb(t *testing.T) {
 	t.Parallel()
 	timeNow := time.Now().UTC()
