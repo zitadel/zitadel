@@ -141,6 +141,84 @@ func TestServer_ListGroupGrants(t *testing.T) {
 	}, retryDuration, tick, "timeout waiting for expected result")
 }
 
+func TestServer_UpdateGroupGrant(t *testing.T) {
+	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+	groupResp := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.GroupName())
+	projectID := createProjectWithRole(iamOwnerCtx, t, orgResp.GetOrganizationId(), "role1")
+	instance.AddProjectRole(iamOwnerCtx, t, projectID, "role2", "role2", "")
+
+	grantResp, err := instance.Client.GroupV2.CreateGroupGrant(iamOwnerCtx, &group_v2.CreateGroupGrantRequest{
+		GroupId:   groupResp.GetId(),
+		ProjectId: projectID,
+		RoleKeys:  []string{"role1"},
+	})
+	require.NoError(t, err)
+
+	t.Run("unauthenticated, error", func(t *testing.T) {
+		_, err := instance.Client.GroupV2.UpdateGroupGrant(context.Background(), &group_v2.UpdateGroupGrantRequest{
+			Id:       grantResp.GetId(),
+			RoleKeys: []string{"role1"},
+		})
+		require.Error(t, err)
+		assert.Equal(t, codes.Unauthenticated, status.Code(err))
+	})
+
+	t.Run("grant not found, error", func(t *testing.T) {
+		_, err := instance.Client.GroupV2.UpdateGroupGrant(iamOwnerCtx, &group_v2.UpdateGroupGrantRequest{
+			Id:       "does-not-exist",
+			RoleKeys: []string{"role1"},
+		})
+		require.Error(t, err)
+		assert.Equal(t, codes.NotFound, status.Code(err))
+	})
+
+	t.Run("role does not exist, error", func(t *testing.T) {
+		_, err := instance.Client.GroupV2.UpdateGroupGrant(iamOwnerCtx, &group_v2.UpdateGroupGrantRequest{
+			Id:       grantResp.GetId(),
+			RoleKeys: []string{"role1", "does-not-exist"},
+		})
+		require.Error(t, err)
+		assert.Equal(t, codes.FailedPrecondition, status.Code(err))
+	})
+
+	t.Run("roles unchanged, idempotent ok", func(t *testing.T) {
+		resp, err := instance.Client.GroupV2.UpdateGroupGrant(iamOwnerCtx, &group_v2.UpdateGroupGrantRequest{
+			Id:       grantResp.GetId(),
+			RoleKeys: []string{"role1"},
+		})
+		require.NoError(t, err)
+		assert.NotNil(t, resp.GetChangeDate())
+	})
+
+	t.Run("roles changed, ok", func(t *testing.T) {
+		resp, err := instance.Client.GroupV2.UpdateGroupGrant(iamOwnerCtx, &group_v2.UpdateGroupGrantRequest{
+			Id:       grantResp.GetId(),
+			RoleKeys: []string{"role1", "role2"},
+		})
+		require.NoError(t, err)
+		assert.NotNil(t, resp.GetChangeDate())
+
+		listReq := &group_v2.ListGroupGrantsRequest{
+			Filters: []*group_v2.GroupGrantsSearchFilter{
+				{
+					Filter: &group_v2.GroupGrantsSearchFilter_GroupIds{
+						GroupIds: &filter.InIDsFilter{Ids: []string{groupResp.GetId()}},
+					},
+				},
+			},
+		}
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCtx, time.Minute)
+		require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+			got, err := instance.Client.GroupV2.ListGroupGrants(iamOwnerCtx, listReq)
+			require.NoError(ttt, err)
+			require.Len(ttt, got.GetGroupGrants(), 1)
+			assert.ElementsMatch(ttt, []string{"role1", "role2"}, got.GetGroupGrants()[0].GetRoleKeys())
+		}, retryDuration, tick, "timeout waiting for updated roles to project")
+	})
+}
+
 func TestServer_DeleteGroupGrant(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
