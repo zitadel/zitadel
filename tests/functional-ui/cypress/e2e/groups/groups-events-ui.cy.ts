@@ -40,10 +40,13 @@ describe('groups — admin events log surfaces group actions', () => {
               cy.visit('/instance?id=events');
               cy.get('[data-e2e="open-filter-button"]').click();
               cy.get('mat-checkbox#aggregateFilterSet').click();
+              cy.get('mat-select#aggregateTypesList').click();
+              cy.contains('mat-option', /^\s*group\s*$/i, { timeout: 10000 }).click();
+              cy.get('body').type('{esc}');
               cy.get('input#aggregateId').type(groupId);
               cy.get('[data-e2e="filter-finish-button"]').click();
 
-              cy.get('[data-e2e="event-type-cell"]').should('have.length.gte', 3);
+              cy.get('[data-e2e="event-type-cell"]', { timeout: 20000 }).should('have.length.gte', 3);
             });
           });
         });

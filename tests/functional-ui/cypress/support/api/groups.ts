@@ -180,7 +180,7 @@ export function listGroupUsers(api: API, groupId: string): Cypress.Chainable<any
       url: groupService('ListGroupUsers'),
       headers: requestHeaders(api),
       body: {
-        filters: [{ groupIdFilter: { groupId } }],
+        filters: [{ groupIds: { ids: [groupId] } }],
       },
     })
     .then((res) => res.body.groupUsers ?? []);
@@ -243,10 +243,25 @@ export function listGroupGrants(api: API, groupId: string): Cypress.Chainable<an
       url: groupService('ListGroupGrants'),
       headers: requestHeaders(api),
       body: {
-        filters: [{ groupIdFilter: { groupId } }],
+        filters: [{ groupIds: { ids: [groupId] } }],
       },
     })
     .then((res) => res.body.groupGrants ?? []);
+}
+
+export function awaitGroupGrantsCount(
+  api: API,
+  groupId: string,
+  expected: number,
+  trials = 20,
+): Cypress.Chainable<any[]> {
+  return listGroupGrants(api, groupId).then((grants) => {
+    if (grants.length === expected) {
+      return cy.wrap(grants);
+    }
+    expect(trials, `group ${groupId} grant projection count == ${expected}`).to.be.greaterThan(0);
+    return cy.wait(500).then(() => awaitGroupGrantsCount(api, groupId, expected, trials - 1));
+  });
 }
 
 export function setGroupManagerRoles(

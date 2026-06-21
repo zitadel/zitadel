@@ -111,21 +111,18 @@ describe('groups — form-level client validation', () => {
       cy.contains('tr', groupName).find('[data-e2e="group-grants-button"]').click({ force: true });
     });
 
-    it('disables save when project id is empty', () => {
+    it('disables save until both project id and roles are filled', () => {
       cy.get('[data-e2e="group-grant-save"]').should('be.disabled');
-      cy.get<number>('@projectId').then((projectId) => {
-        cy.get('[data-e2e="group-grant-roles-input"]').type(roleKey);
-      });
-      cy.get('[data-e2e="group-grant-save"]').should('be.disabled');
-      cy.wait(500);
-      cy.get('@createGrant.all').should('have.length', 0);
-    });
 
-    it('disables save when role keys are empty', () => {
+      cy.get('[data-e2e="group-grant-roles-input"]').clear().type(roleKey);
+      cy.get('[data-e2e="group-grant-save"]').should('be.disabled');
+
+      cy.get('[data-e2e="group-grant-roles-input"]').clear();
       cy.get<number>('@projectId').then((projectId) => {
-        cy.get('[data-e2e="group-grant-project-input"]').type(`${projectId}`);
+        cy.get('[data-e2e="group-grant-project-input"]').clear().type(`${projectId}`);
       });
       cy.get('[data-e2e="group-grant-save"]').should('be.disabled');
+
       cy.wait(500);
       cy.get('@createGrant.all').should('have.length', 0);
     });

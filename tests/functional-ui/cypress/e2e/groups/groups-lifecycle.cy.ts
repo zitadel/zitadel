@@ -1,5 +1,6 @@
 import { Context } from 'support/commands';
 import {
+  awaitGroupGrantsCount,
   createGroup,
   deleteGroup,
   ensureGroupDoesntExist,
@@ -98,6 +99,7 @@ describe('groups — lifecycle (API + event log)', () => {
                 createGroupGrant(ctx.api, { groupId, projectId: projectB, roleKeys: [roleKey] }).then((resB) => {
                   const grantB = resB.body.id;
 
+                  awaitGroupGrantsCount(ctx.api, groupId, 2);
                   deleteGroup(ctx.api, groupId).then(() => {
                     assertGroupEvents(ctx.api, groupId, [
                       GroupEventTypes.Added,
