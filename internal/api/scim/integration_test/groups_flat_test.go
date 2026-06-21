@@ -86,6 +86,41 @@ func TestGroups_nestedGroupsRejected(t *testing.T) {
 	})
 }
 
+// TestUsers_groupsAttribute_followsRename proves the SCIM projection join keeps
+// User.groups[].display in sync with the group's current display name.
+func TestUsers_groupsAttribute_followsRename(t *testing.T) {
+	orgID := Instance.DefaultOrg.GetId()
+	originalName := integration.GroupName()
+	renamedName := integration.GroupName()
+	groupID := createScimGroup(t, orgID, originalName)
+	user := Instance.CreateHumanUserVerified(CTX, orgID, integration.Email(), integration.Phone())
+	Instance.AddUsersToGroup(CTX, t, groupID, []string{user.GetUserId()})
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		fetched, err := Instance.Client.SCIM.Users.Get(CTX, orgID, user.GetUserId())
+		require.NoError(ttt, err)
+		require.Len(ttt, fetched.Groups, 1)
+		assert.Equal(ttt, originalName, fetched.Groups[0].Display)
+	}, retryDuration, tick, "timeout waiting for original display name on user")
+
+	// rename via PUT, keeping the user as a member so the join stays
+	_, err := Instance.Client.SCIM.Groups.Replace(CTX, orgID, groupID, []byte(fmt.Sprintf(`{
+		"schemas": ["urn:ietf:params:scim:schemas:core:2.0:Group"],
+		"displayName": %q,
+		"members": [{"value": %q, "type": "User"}]
+	}`, renamedName, user.GetUserId())))
+	require.NoError(t, err)
+
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		fetched, err := Instance.Client.SCIM.Users.Get(CTX, orgID, user.GetUserId())
+		require.NoError(ttt, err)
+		require.Len(ttt, fetched.Groups, 1)
+		assert.Equal(ttt, groupID, fetched.Groups[0].Value)
+		assert.Equal(ttt, renamedName, fetched.Groups[0].Display, "display must follow group rename")
+	}, retryDuration, tick, "timeout waiting for renamed display name on user")
+}
+
 // TestUsers_groupsAttribute proves User resources expose the read-only groups
 // attribute of RFC 7643 section 4.1.2, with all memberships marked direct.
 func TestUsers_groupsAttribute(t *testing.T) {
