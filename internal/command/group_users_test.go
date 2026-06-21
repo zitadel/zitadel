@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -125,6 +126,34 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 					strings.Contains(err.Error(), "user1") &&
 					strings.Contains(err.Error(), "user3") &&
 					!strings.Contains(err.Error(), "user2")
+			},
+		},
+		{
+			// The eventstore filters by ResourceOwner, so a user that exists
+			// only in another organization produces no events for a query
+			// scoped to the group's org. Surface the same precondition error
+			// as a genuinely missing user. The query-shape contract that
+			// enforces this scoping is locked down by
+			// Test_usersExistenceWriteModel_QueryFiltersByResourceOwner.
+			name: "user from different org treated as not found, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							addNewGroupEvent("group1", "org1"),
+						),
+					),
+					expectFilter(), // user1 exists in org2; scoped to org1 the filter is empty
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				groupID: "group1",
+				userIDs: []string{"user1"},
+			},
+			wantErr: func(err error) bool {
+				return zerrors.IsPreconditionFailed(err) &&
+					strings.Contains(err.Error(), "user1")
 			},
 		},
 		{
@@ -609,6 +638,28 @@ func TestCommands_removeUserFromGroups(t *testing.T) {
 			}
 		})
 	}
+}
+
+// Test_usersExistenceWriteModel_QueryFiltersByResourceOwner pins the
+// cross-org isolation contract of AddUsersToGroup: checkUsersExist must
+// scope its eventstore query to the group's ResourceOwner, otherwise a
+// user that exists in any other organization would be treated as
+// "exists" and AddUsersToGroup would silently admit cross-org members.
+func Test_usersExistenceWriteModel_QueryFiltersByResourceOwner(t *testing.T) {
+	t.Parallel()
+
+	const groupOrg = "org1"
+	userIDs := []string{"user1", "user2"}
+
+	qb := newUsersExistenceWriteModel(userIDs, groupOrg).Query()
+
+	assert.Equal(t, groupOrg, qb.GetResourceOwner(),
+		"query must be scoped to the group's organization so the eventstore filters out users from other orgs")
+
+	queries := qb.GetQueries()
+	require.Len(t, queries, 1, "expected exactly one inner query for the user aggregate")
+	assert.ElementsMatch(t, userIDs, queries[0].GetAggregateIDs(),
+		"query must target only the requested user aggregate IDs")
 }
 
 func addNewGroupUsersAddedEvent(groupID, orgID string, userIds []string) *group.GroupUsersAddedEvent {
