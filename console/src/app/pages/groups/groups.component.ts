@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, signal } from '@angular
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageInitShape } from '@bufbuild/protobuf';
-import { Group } from '@zitadel/proto/zitadel/group/v2/group_pb';
+import { FieldName, Group } from '@zitadel/proto/zitadel/group/v2/group_pb';
 import { CreateGroupRequestSchema, UpdateGroupRequestSchema } from '@zitadel/proto/zitadel/group/v2/group_service_pb';
 import { PageEvent } from '@angular/material/paginator';
 import { BehaviorSubject, combineLatest, defer, firstValueFrom, lastValueFrom, Observable, of, ReplaySubject, shareReplay } from 'rxjs';
@@ -68,8 +68,9 @@ export class GroupsComponent {
               pagination: {
                 offset: BigInt(page.pageIndex * page.pageSize),
                 limit: page.pageSize,
-                asc: true,
+                asc: false,
               },
+              sortingColumn: FieldName.CREATION_DATE,
             }),
           ),
         ),
