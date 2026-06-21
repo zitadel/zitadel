@@ -212,6 +212,84 @@ func TestGroups_listFilterUnsupported(t *testing.T) {
 	assert.Equal(t, "501", scimErr.Status)
 }
 
+// TestGroups_crossOrgIsolation proves a SCIM caller authenticated against
+// org-A cannot read, replace, or delete a group owned by org-B even when
+// the caller has group permissions on org-A. Locks down the ResourceOwner
+// guard in getOrgGroup — without it, any caller with group.read on any
+// org could fetch groups across the instance by ID.
+func TestGroups_crossOrgIsolation(t *testing.T) {
+	iamOwnerCtx := Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+
+	// group in the secondary org, created with elevated rights
+	otherOrgID := SecondaryOrganization.OrganizationId
+	otherGroupName := integration.GroupName()
+	otherGroup, err := Instance.Client.SCIM.Groups.Create(iamOwnerCtx, otherOrgID, []byte(fmt.Sprintf(`{
+		"schemas": ["urn:ietf:params:scim:schemas:core:2.0:Group"],
+		"displayName": %q
+	}`, otherGroupName)))
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		_ = Instance.Client.SCIM.Groups.Delete(iamOwnerCtx, otherOrgID, otherGroup.ID)
+	})
+
+	// wait until the group is queryable in the secondary org
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		_, err := Instance.Client.SCIM.Groups.Get(iamOwnerCtx, otherOrgID, otherGroup.ID)
+		require.NoError(ttt, err)
+	}, retryDuration, tick, "timeout waiting for secondary-org group projection")
+
+	// CTX is org-owner of the default org. Routing the request through the
+	// default org's SCIM endpoint passes authz (the caller has group perms
+	// there), so the ResourceOwner check in getOrgGroup is the only thing
+	// that prevents the secondary-org group from being returned.
+	defaultOrgID := Instance.DefaultOrg.GetId()
+
+	// Pinning the ZitadelDetail.ID to "SCIM-GRP5o" ties each assertion to the
+	// guard in getOrgGroup specifically. Without the pin, PUT/DELETE pass even
+	// when the guard is dropped, because command-layer permission checks also
+	// fail with 404 — masking the real regression.
+	const getOrgGroupErrorID = "SCIM-GRP5o"
+
+	t.Run("GET cross-org group returns 404", func(t *testing.T) {
+		_, err := Instance.Client.SCIM.Groups.Get(CTX, defaultOrgID, otherGroup.ID)
+		require.Error(t, err)
+		scimErr := new(scim.ScimError)
+		require.ErrorAs(t, err, &scimErr)
+		assert.Equal(t, "404", scimErr.Status)
+		require.NotNil(t, scimErr.ZitadelDetail)
+		assert.Equal(t, getOrgGroupErrorID, scimErr.ZitadelDetail.ID)
+	})
+
+	t.Run("PUT cross-org group returns 404", func(t *testing.T) {
+		_, err := Instance.Client.SCIM.Groups.Replace(CTX, defaultOrgID, otherGroup.ID, []byte(fmt.Sprintf(`{
+			"schemas": ["urn:ietf:params:scim:schemas:core:2.0:Group"],
+			"displayName": %q
+		}`, integration.GroupName())))
+		require.Error(t, err)
+		scimErr := new(scim.ScimError)
+		require.ErrorAs(t, err, &scimErr)
+		assert.Equal(t, "404", scimErr.Status)
+		require.NotNil(t, scimErr.ZitadelDetail)
+		assert.Equal(t, getOrgGroupErrorID, scimErr.ZitadelDetail.ID)
+	})
+
+	t.Run("DELETE cross-org group returns 404 and leaves group intact", func(t *testing.T) {
+		err := Instance.Client.SCIM.Groups.Delete(CTX, defaultOrgID, otherGroup.ID)
+		require.Error(t, err)
+		scimErr := new(scim.ScimError)
+		require.ErrorAs(t, err, &scimErr)
+		assert.Equal(t, "404", scimErr.Status)
+		require.NotNil(t, scimErr.ZitadelDetail)
+		assert.Equal(t, getOrgGroupErrorID, scimErr.ZitadelDetail.ID)
+
+		// group must still exist in the secondary org with its original name
+		got, err := Instance.Client.SCIM.Groups.Get(iamOwnerCtx, otherOrgID, otherGroup.ID)
+		require.NoError(t, err)
+		assert.Equal(t, otherGroupName, got.DisplayName)
+	})
+}
+
 // TestGroups_bulk proves groups participate in the /Bulk endpoint:
 // create via bulkId, then delete by the returned location.
 func TestGroups_bulk(t *testing.T) {
