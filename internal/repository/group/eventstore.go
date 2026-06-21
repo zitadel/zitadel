@@ -6,7 +6,7 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, GroupAddedEventType, eventstore.GenericEventMapper[GroupAddedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, GroupChangedEventType, eventstore.GenericEventMapper[GroupChangedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, GroupRemovedEventType, eventstore.GenericEventMapper[GroupRemovedEvent])
-	eventstore.RegisterFilterEventMapper(AggregateType, GroupUsersAddedEventType, eventstore.GenericEventMapper[GroupUsersAddedEvent])
-	eventstore.RegisterFilterEventMapper(AggregateType, GroupUsersRemovedEventType, eventstore.GenericEventMapper[GroupUsersRemovedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, GroupUserAddedEventType, eventstore.GenericEventMapper[GroupUserAddedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, GroupUserRemovedEventType, eventstore.GenericEventMapper[GroupUserRemovedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, GroupManagerRolesSetEventType, GroupManagerRolesSetEventMapper)
 }

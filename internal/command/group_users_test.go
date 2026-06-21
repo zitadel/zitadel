@@ -172,10 +172,7 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 						eventFromEventPusher(addNewUserEvent("user1", "org1")),
 					),
 					expectPush(
-						group.NewGroupUsersAddedEvent(context.Background(),
-							&group.NewAggregate("group1", "org1").Aggregate,
-							[]string{"user1"},
-						),
+						newGroupUserAddedEvent("group1", "org1", "user1"),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -229,7 +226,7 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 							addNewGroupEvent("group1", "org1"),
 						),
 						eventFromEventPusher(
-							addNewGroupUsersAddedEvent("group1", "org1", []string{"user1"}),
+							newGroupUserAddedEvent("group1", "org1", "user1"),
 						),
 					),
 					expectFilter( // to get the user write model to check if user1 exists
@@ -238,10 +235,7 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 						),
 					),
 					expectPush(
-						group.NewGroupUsersAddedEvent(context.Background(),
-							&group.NewAggregate("group1", "org1").Aggregate,
-							[]string{"user2"},
-						),
+						newGroupUserAddedEvent("group1", "org1", "user2"),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -263,9 +257,8 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 						eventFromEventPusher(
 							addNewGroupEvent("group1", "org1"),
 						),
-						eventFromEventPusher(
-							addNewGroupUsersAddedEvent("group1", "org1", []string{"user1", "user2"}),
-						),
+						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user1")),
+						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user2")),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -295,10 +288,7 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 					),
 					expectPushFailed(
 						pushErr,
-						group.NewGroupUsersAddedEvent(context.Background(),
-							&group.NewAggregate("group1", "org1").Aggregate,
-							[]string{"user1"},
-						),
+						newGroupUserAddedEvent("group1", "org1", "user1"),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -329,10 +319,8 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 						),
 					),
 					expectPush(
-						group.NewGroupUsersAddedEvent(context.Background(),
-							&group.NewAggregate("group1", "org1").Aggregate,
-							[]string{"user1", "user2"},
-						),
+						newGroupUserAddedEvent("group1", "org1", "user1"),
+						newGroupUserAddedEvent("group1", "org1", "user2"),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -364,10 +352,8 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 						),
 					),
 					expectPush(
-						group.NewGroupUsersAddedEvent(context.Background(),
-							&group.NewAggregate("group1", "org1").Aggregate,
-							[]string{"user1", "user2"},
-						),
+						newGroupUserAddedEvent("group1", "org1", "user1"),
+						newGroupUserAddedEvent("group1", "org1", "user2"),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -482,15 +468,12 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 						eventFromEventPusher(
 							addNewGroupEvent("group1", "org1"),
 						),
-						eventFromEventPusher(
-							addNewGroupUsersAddedEvent("group1", "org1", []string{"user1", "user2"}),
-						),
+						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user1")),
+						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user2")),
 					),
 					expectPush(
-						group.NewGroupUsersRemovedEvent(context.Background(),
-							&group.NewAggregate("group1", "org1").Aggregate,
-							[]string{"user1", "user2"},
-						),
+						newGroupUserRemovedEvent("group1", "org1", "user1"),
+						newGroupUserRemovedEvent("group1", "org1", "user2"),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -512,15 +495,12 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 						eventFromEventPusher(
 							addNewGroupEvent("group1", "org1"),
 						),
-						eventFromEventPusher(
-							addNewGroupUsersAddedEvent("group1", "org1", []string{"user1", "user2"}),
-						),
+						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user1")),
+						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user2")),
 					),
 					expectPush(
-						group.NewGroupUsersRemovedEvent(context.Background(),
-							&group.NewAggregate("group1", "org1").Aggregate,
-							[]string{"user1", "user2"},
-						),
+						newGroupUserRemovedEvent("group1", "org1", "user1"),
+						newGroupUserRemovedEvent("group1", "org1", "user2"),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -542,15 +522,11 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 						eventFromEventPusher(
 							addNewGroupEvent("group1", "org1"),
 						),
-						eventFromEventPusher(
-							addNewGroupUsersAddedEvent("group1", "org1", []string{"user1", "user2"}),
-						),
+						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user1")),
+						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user2")),
 					),
 					expectPush(
-						group.NewGroupUsersRemovedEvent(context.Background(),
-							&group.NewAggregate("group1", "org1").Aggregate,
-							[]string{"user2"},
-						),
+						newGroupUserRemovedEvent("group1", "org1", "user2"),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -572,9 +548,8 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 						eventFromEventPusher(
 							addNewGroupEvent("group1", "org1"),
 						),
-						eventFromEventPusher(
-							addNewGroupUsersAddedEvent("group1", "org1", []string{"user1", "user2"}),
-						),
+						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user1")),
+						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user2")),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -596,16 +571,12 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 						eventFromEventPusher(
 							addNewGroupEvent("group1", "org1"),
 						),
-						eventFromEventPusher(
-							addNewGroupUsersAddedEvent("group1", "org1", []string{"user1", "user2"}),
-						),
+						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user1")),
+						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user2")),
 					),
 					expectPushFailed(
 						pushErr,
-						group.NewGroupUsersRemovedEvent(context.Background(),
-							&group.NewAggregate("group1", "org1").Aggregate,
-							[]string{"user1"},
-						),
+						newGroupUserRemovedEvent("group1", "org1", "user1"),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -662,21 +633,28 @@ func TestCommands_removeUserFromGroups(t *testing.T) {
 			require.Len(t, events, len(tt.groupIDs))
 
 			for i, ev := range events {
-				removed, ok := ev.(*group.GroupUsersRemovedEvent)
-				require.Truef(t, ok, "event %d is %T, want *group.GroupUsersRemovedEvent", i, ev)
-				require.Equal(t, group.GroupUsersRemovedEventType, removed.EventType)
+				removed, ok := ev.(*group.GroupUserRemovedEvent)
+				require.Truef(t, ok, "event %d is %T, want *group.GroupUserRemovedEvent", i, ev)
+				require.Equal(t, group.GroupUserRemovedEventType, removed.EventType)
 				require.Equal(t, tt.groupIDs[i], removed.Aggregate().ID)
 				require.Equal(t, orgID, removed.Aggregate().ResourceOwner)
-				require.Equal(t, []string{userID}, removed.UserIDs)
+				require.Equal(t, userID, removed.UserID)
 			}
 		})
 	}
 }
 
-func addNewGroupUsersAddedEvent(groupID, orgID string, userIds []string) *group.GroupUsersAddedEvent {
-	return group.NewGroupUsersAddedEvent(context.Background(),
+func newGroupUserAddedEvent(groupID, orgID, userID string) *group.GroupUserAddedEvent {
+	return group.NewGroupUserAddedEvent(context.Background(),
 		&group.NewAggregate(groupID, orgID).Aggregate,
-		userIds,
+		userID,
+	)
+}
+
+func newGroupUserRemovedEvent(groupID, orgID, userID string) *group.GroupUserRemovedEvent {
+	return group.NewGroupUserRemovedEvent(context.Background(),
+		&group.NewAggregate(groupID, orgID).Aggregate,
+		userID,
 	)
 }
 

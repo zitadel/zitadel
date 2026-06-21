@@ -55,14 +55,15 @@ func (c *Commands) RemoveUsersFromGroup(ctx context.Context, groupID string, use
 		return writeModelToObjectDetails(&group.WriteModel), nil
 	}
 
-	// remove users from the group
-	return c.pushAppendAndReduceDetails(ctx,
-		group,
-		repo.NewGroupUsersRemovedEvent(
-			ctx,
-			GroupAggregateFromWriteModel(ctx, &group.WriteModel),
-			userIDsToRemove,
-		))
+	// remove users from the group; emit one event per (group, user) pair so
+	// each membership has its own creation / destruction record and the
+	// eventstore unique constraint releases for that pair specifically
+	groupAggregate := GroupAggregateFromWriteModel(ctx, &group.WriteModel)
+	events := make([]eventstore.Command, 0, len(userIDsToRemove))
+	for _, userID := range userIDsToRemove {
+		events = append(events, repo.NewGroupUserRemovedEvent(ctx, groupAggregate, userID))
+	}
+	return c.pushAppendAndReduceDetails(ctx, group, events...)
 }
 
 func (c *Commands) addUsersToGroup(ctx context.Context, group *GroupWriteModel) (*domain.ObjectDetails, error) {
@@ -77,15 +78,15 @@ func (c *Commands) addUsersToGroup(ctx context.Context, group *GroupWriteModel) 
 		return nil, err
 	}
 
-	// add users to the group
-	return c.pushAppendAndReduceDetails(ctx,
-		group,
-		repo.NewGroupUsersAddedEvent(
-			ctx,
-			GroupAggregateFromWriteModel(ctx, &group.WriteModel),
-			userIDsToAdd,
-		),
-	)
+	// add users to the group; emit one event per (group, user) pair so the
+	// eventstore can register a unique constraint per membership, matching
+	// the pattern used by org / project / IAM MemberAddedEvent
+	groupAggregate := GroupAggregateFromWriteModel(ctx, &group.WriteModel)
+	events := make([]eventstore.Command, 0, len(userIDsToAdd))
+	for _, userID := range userIDsToAdd {
+		events = append(events, repo.NewGroupUserAddedEvent(ctx, groupAggregate, userID))
+	}
+	return c.pushAppendAndReduceDetails(ctx, group, events...)
 }
 
 // checkUsersExist verifies with a single eventstore query that every user exists
@@ -193,10 +194,10 @@ func (c *Commands) removeUserFromGroups(ctx context.Context, userID string, grou
 	for _, groupID := range groupIDs {
 		events = append(
 			events,
-			repo.NewGroupUsersRemovedEvent(
+			repo.NewGroupUserRemovedEvent(
 				ctx,
 				&repo.NewAggregate(groupID, resourceOwner).Aggregate,
-				[]string{userID},
+				userID,
 			),
 		)
 	}
