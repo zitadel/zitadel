@@ -1,13 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, Inject, signal } from '@angular/core';
-import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { Group, GroupGrant } from '@zitadel/proto/zitadel/group/v2/group_pb';
-import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
-import { InputModule } from 'src/app/modules/input/input.module';
+import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
+import { ProjectRolesTableModule } from 'src/app/modules/project-roles-table/project-roles-table.module';
+import { SearchProjectAutocompleteModule } from 'src/app/modules/search-project-autocomplete/search-project-autocomplete.module';
+import { GrantedProject, Project } from 'src/app/proto/generated/zitadel/project_pb';
 import { GroupService } from 'src/app/services/group.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -20,32 +21,25 @@ import { ToastService } from 'src/app/services/toast.service';
     MatButtonModule,
     MatDialogModule,
     MatTooltipModule,
-    ReactiveFormsModule,
     TranslateModule,
-    InputModule,
+    SearchProjectAutocompleteModule,
+    ProjectRolesTableModule,
   ],
 })
 export class GroupGrantsDialogComponent {
   protected readonly grants = signal<GroupGrant[]>([]);
   protected readonly loading = signal(true);
-  protected readonly grantForm: ReturnType<typeof this.buildGrantForm>;
+  protected readonly selectedProjectId = signal<string>('');
+  protected readonly selectedGrantId = signal<string>('');
+  protected selectedRoleKeys: string[] = [];
 
   constructor(
     public dialogRef: MatDialogRef<GroupGrantsDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public readonly data: { group: Group },
-    private readonly fb: FormBuilder,
     private readonly groupService: GroupService,
     private readonly toast: ToastService,
   ) {
-    this.grantForm = this.buildGrantForm();
     this.loadGrants().then();
-  }
-
-  private buildGrantForm() {
-    return this.fb.group({
-      projectId: new FormControl<string>('', { nonNullable: true, validators: [requiredValidator] }),
-      roleKeys: new FormControl<string>('', { nonNullable: true, validators: [requiredValidator] }),
-    });
   }
 
   private async loadGrants(): Promise<void> {
@@ -62,22 +56,41 @@ export class GroupGrantsDialogComponent {
     }
   }
 
+  protected selectProject(project: Project.AsObject | GrantedProject.AsObject, type: ProjectType): void {
+    if (type === ProjectType.PROJECTTYPE_OWNED) {
+      this.selectedProjectId.set((project as Project.AsObject).id);
+      this.selectedGrantId.set('');
+    } else {
+      const granted = project as GrantedProject.AsObject;
+      this.selectedProjectId.set(granted.projectId);
+      this.selectedGrantId.set(granted.grantId);
+    }
+    this.selectedRoleKeys = [];
+  }
+
+  protected selectRoles(roleKeys: string[]): void {
+    this.selectedRoleKeys = roleKeys;
+  }
+
+  protected get canSave(): boolean {
+    return !!this.selectedProjectId() && this.selectedRoleKeys.length > 0;
+  }
+
   protected async addGrant(): Promise<void> {
-    if (this.grantForm.invalid) {
+    if (!this.canSave) {
       return;
     }
-    const { projectId, roleKeys } = this.grantForm.getRawValue();
     try {
       await this.groupService.createGroupGrant({
         groupId: this.data.group.id,
-        projectId: projectId.trim(),
-        roleKeys: roleKeys
-          .split(',')
-          .map((key) => key.trim())
-          .filter(Boolean),
+        projectId: this.selectedProjectId(),
+        projectGrantId: this.selectedGrantId() || undefined,
+        roleKeys: this.selectedRoleKeys,
       });
       this.toast.showInfo('GROUPS.TOAST.GRANTADDED', true);
-      this.grantForm.reset();
+      this.selectedProjectId.set('');
+      this.selectedGrantId.set('');
+      this.selectedRoleKeys = [];
       await new Promise((res) => setTimeout(res, 1000));
       await this.loadGrants();
     } catch (error) {

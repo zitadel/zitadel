@@ -140,7 +140,8 @@ export class GroupsComponent {
 
   protected openGrantsDialog(group: Group): void {
     this.dialog.open<GroupGrantsDialogComponent, { group: Group }>(GroupGrantsDialogComponent, {
-      width: '550px',
+      width: '800px',
+      maxWidth: '95vw',
       data: { group },
     });
   }

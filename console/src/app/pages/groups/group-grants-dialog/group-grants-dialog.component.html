@@ -3,25 +3,42 @@
 <mat-dialog-content>
   <p class="cnsl-secondary-text">{{ 'GROUPS.GRANTS.DESCRIPTION' | translate }}</p>
 
-  <form class="add-grant" [formGroup]="grantForm" (ngSubmit)="addGrant()">
-    <cnsl-form-field class="grant-field">
-      <cnsl-label>{{ 'GROUPS.GRANTS.PROJECTID' | translate }}</cnsl-label>
-      <input cnslInput formControlName="projectId" data-e2e="group-grant-project-input" />
-    </cnsl-form-field>
-    <cnsl-form-field class="grant-field">
-      <cnsl-label>{{ 'GROUPS.GRANTS.ROLEKEYS' | translate }}</cnsl-label>
-      <input cnslInput formControlName="roleKeys" data-e2e="group-grant-roles-input" />
-    </cnsl-form-field>
-    <button
-      mat-raised-button
-      color="primary"
-      type="submit"
-      data-e2e="group-grant-save"
-      [disabled]="grantForm.invalid"
+  <div class="add-grant" data-e2e="group-grant-add-form">
+    <h3>{{ 'GROUPS.GRANTS.PROJECTID' | translate }}</h3>
+    <cnsl-search-project-autocomplete
+      class="block"
+      data-e2e="group-grant-project-autocomplete"
+      (selectionChanged)="selectProject($event.project, $event.type)"
     >
-      {{ 'GROUPS.GRANTS.ADD' | translate }}
-    </button>
-  </form>
+    </cnsl-search-project-autocomplete>
+
+    @if (selectedProjectId()) {
+      <h3>{{ 'GROUPS.GRANTS.ROLEKEYS' | translate }}</h3>
+      <cnsl-project-roles-table
+        data-e2e="group-grant-roles-table"
+        [displayedColumns]="['select', 'key', 'displayname', 'group']"
+        [projectId]="selectedProjectId()"
+        [grantId]="selectedGrantId()"
+        [actionsVisible]="false"
+        [showSelectionActionButton]="false"
+        (changedSelection)="selectRoles($event)"
+      >
+      </cnsl-project-roles-table>
+    }
+
+    <div class="add-grant-actions">
+      <button
+        mat-raised-button
+        color="primary"
+        type="button"
+        data-e2e="group-grant-save"
+        [disabled]="!canSave"
+        (click)="addGrant()"
+      >
+        {{ 'GROUPS.GRANTS.ADD' | translate }}
+      </button>
+    </div>
+  </div>
 
   <div class="grants-list" *ngIf="!loading()">
     <div class="grant-row" *ngFor="let grant of grants()">
