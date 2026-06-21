@@ -152,6 +152,13 @@ func TestGroupGrantProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			// CONTRACT: the cleanup is scoped only by group_id + instance_id,
+			// never by resource_owner. A group ID is unique per instance, and
+			// a cross-org project grant may store rows whose resource_owner is
+			// a different organization than the group's owner. Adding a
+			// resource_owner predicate would orphan those rows on group
+			// removal. testEvent sets ResourceOwner = "ro-id"; the absence of
+			// "ro-id" in expectedArgs is the lock-down.
 			name: "reduceGroupRemoved",
 			args: args{
 				event: getEvent(
