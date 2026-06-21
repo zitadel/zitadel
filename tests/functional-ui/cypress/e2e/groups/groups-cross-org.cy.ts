@@ -9,7 +9,7 @@ import {
 } from '../../support/api/groups';
 import { ensureOrgExists } from '../../support/api/orgs';
 import { ensureHumanUserExists, ensureHumanUserExistsInOrg } from '../../support/api/users';
-import { ensureProjectExists, ensureRoleExists } from '../../support/api/projects';
+import { ensureProjectExists } from '../../support/api/projects';
 import {
   assertNoGroupEventsAppendedSince,
   GroupEventTypes,
@@ -92,7 +92,6 @@ describe('groups — cross-org invariants', () => {
         ensureGroupDoesntExist(ctx.api, groupName);
         cy.get<string>('@foreignOrgId').then((foreignOrgId) => {
           ensureProjectExists(ctx.api, foreignProjectName, foreignOrgId).then((foreignProjectId) => {
-            ensureRoleExists(ctx.api, foreignProjectId, foreignRoleKey);
             cy.wrap(foreignProjectId).as('foreignProjectId');
           });
         });
