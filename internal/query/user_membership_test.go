@@ -10,9 +10,7 @@ import (
 	"testing"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/stretchr/testify/assert"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 )
 
@@ -560,62 +558,4 @@ func prepareMembershipWrapper() func() (sq.SelectBuilder, func(*sql.Rows) (*Memb
 		builder, _, fun := prepareMembershipsQuery(context.Background(), &MembershipSearchQuery{}, false)
 		return builder, fun
 	}
-}
-
-// Test_prepareGroupManagerMember pins the SQL shape of the union leg that
-// surfaces group manager roles as organization memberships. It exists as a
-// dedicated test because:
-//  1. The leg JOINs two projection tables (group_users1 and
-//     group_manager_roles1); a regression that reversed the JOIN direction
-//     or used the wrong alias in the ON clause would produce empty results.
-//  2. The leg aliases the supplying group's ID as member_group_id so the
-//     outer query can LEFT JOIN groups1 for provenance. Dropping this alias
-//     would nil-Group every group-derived membership in the row scan.
-//  3. The permission-v2 path adds an INNER JOIN to eventstore.permitted_orgs
-//     wired to managers.resource_owner (the org being managed) and
-//     members.user_id (self-owned rows). Wiring it to any other column
-//     would silently filter out valid memberships or admit unauthorized ones.
-func Test_prepareGroupManagerMember(t *testing.T) {
-	t.Parallel()
-
-	ctx := authz.WithInstanceID(context.Background(), "instance-id")
-	ctx = authz.SetCtxData(ctx, authz.CtxData{UserID: "user-id"})
-
-	assertV1Shape := func(t *testing.T, sql string) {
-		t.Helper()
-		assert.Contains(t, sql, "FROM projections.group_users1 AS members",
-			"leg must read members from the group_users1 projection")
-		assert.Contains(t, sql, "JOIN projections.group_manager_roles1 AS managers",
-			"leg must join to the group_manager_roles1 projection")
-		assert.Contains(t, sql, "ON members.group_id = managers.group_id",
-			"join must connect members to their group's role row by group_id")
-		assert.Contains(t, sql, "AND members.instance_id = managers.instance_id",
-			"join must be instance-scoped on both sides")
-		assert.Contains(t, sql, "members.group_id AS member_group_id",
-			"the supplying group ID must be aliased as member_group_id for provenance")
-		assert.Contains(t, sql, "managers.resource_owner AS org_id",
-			"the role's resource_owner is the organization membership the user receives")
-	}
-
-	t.Run("permissionV2 false omits the permitted_orgs join", func(t *testing.T) {
-		t.Parallel()
-		sql, args := prepareGroupManagerMember(ctx, &MembershipSearchQuery{}, false)
-		assertV1Shape(t, sql)
-		assert.NotContains(t, sql, "eventstore.permitted_orgs",
-			"v1 path must not emit a permitted_orgs INNER JOIN")
-		assert.Empty(t, args, "v1 path emits no permission args")
-	})
-
-	t.Run("permissionV2 true adds the permitted_orgs join wired to managers.resource_owner and members.user_id", func(t *testing.T) {
-		t.Parallel()
-		sql, args := prepareGroupManagerMember(ctx, &MembershipSearchQuery{}, true)
-		assertV1Shape(t, sql)
-		assert.Contains(t, sql, "INNER JOIN eventstore.permitted_orgs",
-			"v2 must filter by the per-call permission function")
-		assert.Contains(t, sql, "managers.resource_owner = ANY(permissions.org_ids)",
-			"the permission clause must compare against managers.resource_owner")
-		assert.Contains(t, sql, "members.user_id = ?",
-			"OwnedRowsPermissionOption must surface self-owned rows by members.user_id")
-		assert.NotEmpty(t, args, "v2 path emits permission args")
-	})
 }

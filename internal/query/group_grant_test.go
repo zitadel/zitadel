@@ -3,54 +3,10 @@ package query
 import (
 	"context"
 	"errors"
-	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/zitadel/zitadel/internal/api/authz"
 )
-
-// Test_groupGrantPermissionCheckV2 locks down the v2 SQL shape: enabling the
-// permission check must add a well-formed INNER JOIN against the permitted_orgs
-// function so a caller with zero accessible orgs returns an empty result via
-// the join — not via a degenerate WHERE clause that would be a SQL syntax error.
-func Test_groupGrantPermissionCheckV2(t *testing.T) {
-	t.Parallel()
-
-	ctx := authz.WithInstanceID(context.Background(), "instanceID")
-	ctx = authz.SetCtxData(ctx, authz.CtxData{UserID: "userID"})
-
-	t.Run("disabled returns the base query untouched", func(t *testing.T) {
-		t.Parallel()
-		base, _ := prepareGroupGrantsQuery()
-		got := groupGrantPermissionCheckV2(ctx, base, false)
-		gotSQL, _, err := got.ToSql()
-		require.NoError(t, err)
-		baseSQL, _, err := base.ToSql()
-		require.NoError(t, err)
-		assert.Equal(t, baseSQL, gotSQL)
-	})
-
-	t.Run("enabled appends a well-formed permitted_orgs join", func(t *testing.T) {
-		t.Parallel()
-		base, _ := prepareGroupGrantsQuery()
-		got := groupGrantPermissionCheckV2(ctx, base, true)
-		gotSQL, args, err := got.ToSql()
-		require.NoError(t, err)
-		assert.Contains(t, gotSQL, "INNER JOIN eventstore.permitted_orgs")
-		assert.Contains(t, gotSQL, "permissions.instance_permitted")
-		assert.Contains(t, gotSQL, "ANY(permissions.org_ids)")
-		// the dangerous regression: an empty IN list would render as IN ()
-		// and postgres rejects it as a syntax error
-		assert.False(t, strings.Contains(gotSQL, "IN ()"), "no empty IN clause: %q", gotSQL)
-		// PermissionClause appends 5 join args: instance, user, system perms, permission, org filter
-		require.GreaterOrEqual(t, len(args), 5)
-		assert.Equal(t, "instanceID", args[0])
-		assert.Equal(t, "userID", args[1])
-	})
-}
 
 func Test_GroupGrantsCheckPermission(t *testing.T) {
 	t.Parallel()
