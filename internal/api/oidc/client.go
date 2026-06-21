@@ -32,8 +32,27 @@ const (
 	ClaimResourceOwnerName          = ScopeResourceOwner + ":name"
 	ClaimResourceOwnerPrimaryDomain = ScopeResourceOwner + ":primary_domain"
 	ClaimActionLogFormat            = "urn:zitadel:iam:action:%s:log"
-	ScopeUserGroups                 = "groups"
-	ClaimUserGroups                 = ScopeUserGroups
+
+	// ScopeUserGroups requests the standard "groups" claim recommended by
+	// RFC 9068 §2.2.3.1 (JWT Profile for OAuth 2.0 Access Tokens) for
+	// surfacing group membership in a JWT access token. Each entry uses the
+	// SCIM Core Schema "groups" attribute shape from RFC 7643 §4.1.2:
+	//
+	//   {"groups": [{"value": "<group id>", "display": "<group name>"}]}
+	//
+	// Other IdPs emit `groups` as a flat array of strings; we follow the
+	// SCIM-aligned object shape because it carries both the stable ID and a
+	// human-readable name, and because it's the structure RFC 9068 explicitly
+	// cites. The pre-GA custom scope `urn:zitadel:iam:user:groups` was
+	// removed in favor of this standards-tracked surface so consumers can
+	// use off-the-shelf SCIM tooling instead of zitadel-specific parsing.
+	//
+	// References:
+	//   - RFC 9068 §2.2.3.1: https://www.rfc-editor.org/rfc/rfc9068.html#section-2.2.3.1
+	//   - RFC 7643 §4.1.2:   https://www.rfc-editor.org/rfc/rfc7643#section-4.1.2
+	//   - Community ask:     https://github.com/zitadel/zitadel/issues/12154
+	ScopeUserGroups = "groups"
+	ClaimUserGroups = ScopeUserGroups
 )
 
 // GetClientByClientID implements the op.Storage interface to retrieve an OIDC client by its ID.
