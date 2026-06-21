@@ -115,8 +115,12 @@ describe('groups', () => {
     it('should create and revoke a group grant', () => {
       cy.get<number>('@projectId').then((projectId) => {
         cy.contains('tr', testGroupNameGrants).find('[data-e2e="group-grants-button"]').click({ force: true });
-        cy.get('[data-e2e="group-grant-project-input"]').type(`${projectId}`);
-        cy.get('[data-e2e="group-grant-roles-input"]').type(testRoleKey);
+
+        cy.get('[data-e2e="group-grant-project-autocomplete"] input').click();
+        cy.contains('mat-option', testProjectName, { timeout: 10000 }).click();
+        cy.contains('[data-e2e="group-grant-roles-table"] tr', testRoleKey)
+          .find('mat-checkbox')
+          .click();
         cy.get('[data-e2e="group-grant-save"]').click();
         cy.shouldConfirmSuccess();
         cy.contains('.grant-row', `${projectId}`).should('contain', testRoleKey);

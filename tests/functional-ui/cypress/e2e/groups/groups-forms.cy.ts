@@ -133,17 +133,21 @@ describe('groups — form-level client validation', () => {
       cy.contains('tr', groupName).find('[data-e2e="group-grants-button"]').click({ force: true });
     });
 
-    it('disables save until both project id and roles are filled', () => {
+    it('disables save until a project is selected and at least one role is checked', () => {
       cy.get('[data-e2e="group-grant-save"]').should('be.disabled');
 
-      cy.get('[data-e2e="group-grant-roles-input"]').clear().type(roleKey);
+      cy.get('[data-e2e="group-grant-roles-table"]').should('not.exist');
+
+      cy.get('[data-e2e="group-grant-project-autocomplete"] input').click();
+      cy.contains('mat-option', projectName, { timeout: 10000 }).click();
+
+      cy.get('[data-e2e="group-grant-roles-table"]').should('be.visible');
       cy.get('[data-e2e="group-grant-save"]').should('be.disabled');
 
-      cy.get('[data-e2e="group-grant-roles-input"]').clear();
-      cy.get<number>('@projectId').then((projectId) => {
-        cy.get('[data-e2e="group-grant-project-input"]').clear().type(`${projectId}`);
-      });
-      cy.get('[data-e2e="group-grant-save"]').should('be.disabled');
+      cy.contains('[data-e2e="group-grant-roles-table"] tr', roleKey)
+        .find('mat-checkbox')
+        .click();
+      cy.get('[data-e2e="group-grant-save"]').should('be.enabled');
 
       cy.wait(500);
       cy.get('@createGrant.all').should('have.length', 0);
