@@ -190,6 +190,15 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		return nil, err
 	}
 
+	return c.pushOIDCApplication(ctx, addedApplication, oidcApp, appID)
+}
+
+// pushOIDCApplication writes the application-added and oidc-config-added events for a new
+// OIDC application onto the project aggregate. Authorization must already have been
+// performed by the caller: either through an app.write permission check (see
+// addOIDCApplicationWithID) or, for dynamic client registration, through the feature flag
+// and registration mode (see AddDynamicOIDCClient).
+func (c *Commands) pushOIDCApplication(ctx context.Context, addedApplication *OIDCApplicationWriteModel, oidcApp *domain.OIDCApp, appID string) (_ *domain.OIDCApp, err error) {
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
 
 	oidcApp.AppID = appID
