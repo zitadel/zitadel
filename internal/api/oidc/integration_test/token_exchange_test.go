@@ -248,22 +248,14 @@ func TestServer_TokenExchange(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "EXCHANGE: alternate scope for refresh token",
+			name: "EXCHANGE: alternate scope for refresh token is rejected when not subset of subject scopes",
 			args: args{
 				SubjectToken:       noPermPAT,
 				SubjectTokenType:   oidc.AccessTokenType,
 				RequestedTokenType: oidc.AccessTokenType,
 				Scopes:             []string{oidc.ScopeOpenID, oidc.ScopeOfflineAccess, "profile"},
 			},
-			want: result{
-				issuedTokenType:    oidc.AccessTokenType,
-				tokenType:          oidc.BearerToken,
-				expiresIn:          43100,
-				scopes:             []string{oidc.ScopeOpenID, oidc.ScopeOfflineAccess, "profile"},
-				verifyAccessToken:  accessTokenVerifier(ctx, resourceServer, serviceUserID, ""),
-				verifyIDToken:      idTokenVerifier(ctx, relyingParty, serviceUserID, ""),
-				verifyRefreshToken: refreshTokenVerifier(ctx, relyingParty, "", ""),
-			},
+			wantErr: true,
 		},
 		{
 			name: "EXCHANGE: access token, requested token type not supported error",
@@ -320,6 +312,57 @@ func TestServer_TokenExchange(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestServer_TokenExchange_GHSA_vrh8_c9cm_wh8v(t *testing.T) {
+	instance := integration.NewInstance(CTX)
+	ctx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+
+	t.Run("SECURITY: client should not exchange access tokens of other clients", func(t *testing.T) {
+		// Create two separate token-exchange clients (different projects).
+		clientA, keyDataA, err := instance.CreateOIDCTokenExchangeClient(ctx, t)
+		require.NoError(t, err)
+		signerA, err := rp.SignerFromKeyFile(keyDataA)()
+		require.NoError(t, err)
+		exchangerA, err := tokenexchange.NewTokenExchangerJWTProfile(ctx, instance.OIDCIssuer(), clientA.GetClientId(), signerA)
+		require.NoError(t, err)
+
+		clientB, keyDataB, err := instance.CreateOIDCTokenExchangeClient(ctx, t)
+		require.NoError(t, err)
+		signerB, err := rp.SignerFromKeyFile(keyDataB)()
+		require.NoError(t, err)
+		exchangerB, err := tokenexchange.NewTokenExchangerJWTProfile(ctx, instance.OIDCIssuer(), clientB.GetClientId(), signerB)
+		require.NoError(t, err)
+
+		// Mint a valid access token for clientA to use as subject_token.
+		_, servicePAT := createMachineUserPATWithMembership(ctx, t, instance)
+		source, err := tokenexchange.ExchangeToken(ctx, exchangerA, servicePAT, oidc.AccessTokenType, "", "", nil, nil, []string{oidc.ScopeOpenID}, oidc.AccessTokenType)
+		require.NoError(t, err)
+
+		// RFC 8693 requires that the exchanged token belongs to the requesting client.
+		_, err = tokenexchange.ExchangeToken(ctx, exchangerB, source.AccessToken, oidc.AccessTokenType, "", "", nil, nil, nil, oidc.AccessTokenType)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "subject_token invalid")
+	})
+
+	t.Run("SECURITY: requested scopes must be subset of subject token scopes", func(t *testing.T) {
+		clientA, keyDataA, err := instance.CreateOIDCTokenExchangeClient(ctx, t)
+		require.NoError(t, err)
+		signerA, err := rp.SignerFromKeyFile(keyDataA)()
+		require.NoError(t, err)
+		exchangerA, err := tokenexchange.NewTokenExchangerJWTProfile(ctx, instance.OIDCIssuer(), clientA.GetClientId(), signerA)
+		require.NoError(t, err)
+
+		_, servicePAT := createMachineUserPATWithMembership(ctx, t, instance)
+		limited, err := tokenexchange.ExchangeToken(ctx, exchangerA, servicePAT, oidc.AccessTokenType, "", "", nil, nil, nil, oidc.AccessTokenType)
+		require.NoError(t, err)
+		assert.NotContains(t, limited.Scopes, oidc.ScopeOfflineAccess)
+
+		// Asking for offline_access escalates beyond the subject token's scope set and must fail.
+		_, err = tokenexchange.ExchangeToken(ctx, exchangerA, limited.AccessToken, oidc.AccessTokenType, "", "", nil, nil, []string{oidc.ScopeOpenID, oidc.ScopeOfflineAccess}, oidc.AccessTokenType)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "invalid_scope")
+	})
 }
 
 func TestServer_TokenExchangeImpersonation(t *testing.T) {
@@ -499,23 +542,22 @@ func TestServer_TokenExchangeImpersonation(t *testing.T) {
 			},
 		},
 		{
-			name: "ORG IMPERSONATION: subject: access token, actor: access token, with refresh token, success",
+			name: "ORG IMPERSONATION: subject: access token, actor: access token, reduced scopes success",
 			args: args{
 				SubjectToken:       teResp.AccessToken,
 				SubjectTokenType:   oidc.AccessTokenType,
 				RequestedTokenType: oidc.AccessTokenType,
 				ActorToken:         orgImpersonatorPAT,
 				ActorTokenType:     oidc.AccessTokenType,
-				Scopes:             []string{oidc.ScopeOpenID, oidc.ScopeOfflineAccess},
+				Scopes:             []string{oidc.ScopeOpenID},
 			},
 			want: result{
-				issuedTokenType:    oidc.AccessTokenType,
-				tokenType:          oidc.BearerToken,
-				expiresIn:          43100,
-				scopes:             []string{oidc.ScopeOpenID, oidc.ScopeOfflineAccess},
-				verifyAccessToken:  accessTokenVerifier(ctx, resourceServer, serviceUserID, orgUserID),
-				verifyIDToken:      idTokenVerifier(ctx, relyingParty, serviceUserID, orgUserID),
-				verifyRefreshToken: refreshTokenVerifier(ctx, relyingParty, serviceUserID, orgUserID),
+				issuedTokenType:   oidc.AccessTokenType,
+				tokenType:         oidc.BearerToken,
+				expiresIn:         43100,
+				scopes:            oidc.SpaceDelimitedArray{oidc.ScopeOpenID},
+				verifyAccessToken: accessTokenVerifier(ctx, resourceServer, serviceUserID, orgUserID),
+				verifyIDToken:     idTokenVerifier(ctx, relyingParty, serviceUserID, orgUserID),
 			},
 		},
 	}
