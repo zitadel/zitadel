@@ -239,6 +239,9 @@ func NewServer(
 		op.WithSetRouter(func(r chi.Router) {
 			r.HandleFunc(server.Endpoints().Authorization.Relative()+authCallbackPathSuffix, server.authorizeCallbackHandler)
 			r.Method(http.MethodPost, server.registrationEndpoint.Relative(), http.HandlerFunc(server.dynamicClientRegistration))
+			r.Method(http.MethodGet, server.registrationEndpoint.Relative()+"/{client_id}", http.HandlerFunc(server.getDynamicClientRegistration))
+			r.Method(http.MethodPut, server.registrationEndpoint.Relative()+"/{client_id}", http.HandlerFunc(server.updateDynamicClientRegistration))
+			r.Method(http.MethodDelete, server.registrationEndpoint.Relative()+"/{client_id}", http.HandlerFunc(server.deleteDynamicClientRegistration))
 		}),
 	)
 
