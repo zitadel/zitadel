@@ -185,11 +185,14 @@ func validateTokenExchangeScopes(client *Client, requestedScopes, subjectScopes,
 	})
 
 	if len(requestedScopes) == 0 {
-		return op.ValidateAuthReqScopes(client, actorScopes)
+		requestedScopes = subjectScopes
+	}
+	if len(requestedScopes) == 0 {
+		requestedScopes = actorScopes
 	}
 
 	for _, scope := range requestedScopes {
-		if !slices.Contains(subjectScopes, scope) || !slices.Contains(actorScopes, scope) {
+		if !slices.Contains(subjectScopes, scope) && !slices.Contains(actorScopes, scope) {
 			return nil, oidc.ErrInvalidScope().WithDescription("scope %q not found in subject or actor token", scope)
 		}
 	}
