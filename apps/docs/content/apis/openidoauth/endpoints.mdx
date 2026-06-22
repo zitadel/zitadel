@@ -658,6 +658,35 @@ You could also combine caching with a risk-based on-demand refresh when a critic
 Without caching you will call this endpoint on each request.
 This might result in being rate limited for a large number of requests that come from the same backend.
 
+## registration_endpoint
+
+`${CUSTOM_DOMAIN}/oauth/v2/register`
+
+The registration_endpoint implements [OAuth 2.0 Dynamic Client Registration (RFC 7591)](https://datatracker.ietf.org/doc/html/rfc7591).
+It lets clients register themselves as OIDC applications at runtime, which is required for example by [Model Context Protocol (MCP)](/guides/integrate/dynamic-client-registration) clients.
+
+<Callout type="warn">
+The endpoint is disabled by default. It is only served and advertised as `registration_endpoint` in the [discovery document](#openid-connect-1-0-discovery)
+when the `oidc_dynamic_client_registration` instance [feature](/guides/integrate/dynamic-client-registration#enable-the-feature) is enabled.
+</Callout>
+
+A successful registration returns `HTTP 201` with the `client_id` (and, for confidential clients, the `client_secret`) that can immediately be used for the authorization code flow.
+
+```bash
+curl --request POST \
+  --url ${CUSTOM_DOMAIN}/oauth/v2/register \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "client_name": "My MCP Client",
+    "redirect_uris": ["https://client.example.com/callback"],
+    "grant_types": ["authorization_code", "refresh_token"],
+    "response_types": ["code"],
+    "token_endpoint_auth_method": "none"
+  }'
+```
+
+See the [Dynamic Client Registration guide](/guides/integrate/dynamic-client-registration) for the supported metadata, the available registration modes and the current limitations.
+
 ## OAuth 2.0 metadata
 
 **ZITADEL** does not yet provide a OAuth 2.0 Metadata endpoint but instead provides a [OpenID Connect Discovery Endpoint](https://openid.net/specs/openid-connect-discovery-1_0.html).
