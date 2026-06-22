@@ -3,6 +3,7 @@ package oidc
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strings"
 	"time"
@@ -38,6 +39,11 @@ func (s *Server) dynamicClientRegistration(w http.ResponseWriter, r *http.Reques
 
 	var req clientRegistrationRequest
 	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, registrationMaxBodyBytes)).Decode(&req); err != nil {
+		var maxBytesErr *http.MaxBytesError
+		if errors.As(err, &maxBytesErr) {
+			s.writeRegistrationJSON(ctx, w, http.StatusRequestEntityTooLarge, newRegistrationError(registrationErrorInvalidClientMetadata, "the request body is too large"))
+			return
+		}
 		s.writeRegistrationError(ctx, w, newRegistrationError(registrationErrorInvalidClientMetadata, "the request body could not be parsed"))
 		return
 	}
@@ -68,6 +74,13 @@ func (s *Server) dynamicClientRegistration(w http.ResponseWriter, r *http.Reques
 // RFC 7591 §3 initial access token and the client is homed in the token's organization.
 // Without a token, open registration must be enabled and the client is homed in the
 // instance's default organization.
+//
+// Note on the trust model (open question on #9810): in token mode any valid access token is
+// currently accepted and the registered client is scoped to that token's organization, so a
+// caller can only ever create clients in its own organization. Whether registration should
+// additionally require a dedicated permission or scope is left for maintainer input, as it
+// is tied to the open vs. token-gated discussion. The whole endpoint stays behind the
+// feature flag and the access interceptor's rate limiting.
 func (s *Server) dynamicClientRegistrationResourceOwner(ctx context.Context, r *http.Request) (string, error) {
 	if token := bearerToken(r); token != "" {
 		accessToken, err := s.verifyAccessToken(ctx, token)
@@ -83,25 +96,18 @@ func (s *Server) dynamicClientRegistrationResourceOwner(ctx context.Context, r *
 }
 
 // ensureDCRProject returns the dedicated project that holds dynamically registered clients
-// for the organization, creating it on first use. Concurrent creations are resolved
-// through the per-organization uniqueness of the project name.
+// for the organization, creating it on first use. The common case (the project already
+// exists) is served from the projection; the creation and the concurrent-creation race are
+// delegated to the command, which resolves them strongly consistently from the eventstore.
 func (s *Server) ensureDCRProject(ctx context.Context, resourceOwner string) (string, error) {
-	projectID, err := s.dcrProjectID(ctx, resourceOwner)
+	projectID, err := s.dcrProjectIDFromProjection(ctx, resourceOwner)
 	if err != nil || projectID != "" {
 		return projectID, err
 	}
-	projectID, err = s.command.AddDCRProject(ctx, resourceOwner)
-	if err == nil {
-		return projectID, nil
-	}
-	if zerrors.IsErrorAlreadyExists(err) {
-		// A concurrent registration created the project first; look it up again.
-		return s.dcrProjectID(ctx, resourceOwner)
-	}
-	return "", err
+	return s.command.EnsureDCRProject(ctx, resourceOwner)
 }
 
-func (s *Server) dcrProjectID(ctx context.Context, resourceOwner string) (string, error) {
+func (s *Server) dcrProjectIDFromProjection(ctx context.Context, resourceOwner string) (string, error) {
 	nameQuery, err := query.NewProjectNameSearchQuery(query.TextEquals, command.DCRProjectName)
 	if err != nil {
 		return "", err
@@ -146,7 +152,7 @@ func (s *Server) writeRegistrationError(ctx context.Context, w http.ResponseWrit
 }
 
 func (s *Server) writeRegistrationUnauthorized(ctx context.Context, w http.ResponseWriter) {
-	w.Header().Set("WWW-Authenticate", "Bearer")
+	w.Header().Set("WWW-Authenticate", `Bearer error="invalid_token"`)
 	s.writeRegistrationJSON(ctx, w, http.StatusUnauthorized, newRegistrationError("invalid_token", "a valid access token is required to register a client"))
 }
 
@@ -230,7 +236,11 @@ func (req *clientRegistrationRequest) toOIDCApp() (*domain.OIDCApp, *registratio
 		return nil, newRegistrationError(registrationErrorInvalidClientMetadata, "jwks and jwks_uri are not supported")
 	}
 
-	authMethod, regErr := registrationAuthMethodToDomain(req.TokenEndpointAuthMethod)
+	applicationType, regErr := registrationApplicationTypeToDomain(req.ApplicationType)
+	if regErr != nil {
+		return nil, regErr
+	}
+	authMethod, regErr := registrationAuthMethodToDomain(req.TokenEndpointAuthMethod, applicationType)
 	if regErr != nil {
 		return nil, regErr
 	}
@@ -239,10 +249,6 @@ func (req *clientRegistrationRequest) toOIDCApp() (*domain.OIDCApp, *registratio
 		return nil, regErr
 	}
 	responseTypes, regErr := registrationResponseTypesToDomain(req.ResponseTypes)
-	if regErr != nil {
-		return nil, regErr
-	}
-	applicationType, regErr := registrationApplicationTypeToDomain(req.ApplicationType)
 	if regErr != nil {
 		return nil, regErr
 	}
@@ -274,23 +280,29 @@ func (req *clientRegistrationRequest) toOIDCApp() (*domain.OIDCApp, *registratio
 }
 
 // registrationComplianceError maps a domain compliance failure to the matching RFC 7591
-// error. Grant/response combination problems are client metadata errors, everything else
-// (redirect URI scheme and application type constraints) is reported as an invalid
-// redirect URI. The internal compliance keys are not exposed to the client.
+// error. Auth-method and grant/response combination problems are client metadata errors;
+// redirect URI scheme problems are reported as an invalid redirect URI. The internal
+// compliance keys (see internal/domain/application_oidc.go) are not exposed to the client.
 func registrationComplianceError(compliance *domain.Compliance) *registrationError {
 	for _, problem := range compliance.Problems {
-		switch problem {
-		case "Application.OIDC.V1.GrantType", "Application.OIDC.V1.NotAllCombinationsAreAllowed":
-			return newRegistrationError(registrationErrorInvalidClientMetadata, "the requested grant and response type combination is not supported")
+		if strings.Contains(problem, "AuthMethodType") || strings.Contains(problem, "GrantType") || strings.Contains(problem, "Combinations") {
+			return newRegistrationError(registrationErrorInvalidClientMetadata, "the requested client metadata is not supported")
 		}
 	}
 	return newRegistrationError(registrationErrorInvalidRedirectURI, "one or more redirect_uris are invalid for the requested application type")
 }
 
-func registrationAuthMethodToDomain(method string) (domain.OIDCAuthMethodType, *registrationError) {
+func registrationAuthMethodToDomain(method string, applicationType domain.OIDCApplicationType) (domain.OIDCAuthMethodType, *registrationError) {
 	switch method {
-	case "", "client_secret_basic":
-		// RFC 7591 §2: client_secret_basic is the default.
+	case "":
+		// Default the auth method to the application type. Native and user-agent
+		// applications must be public (none); web applications default to
+		// client_secret_basic per RFC 7591 §2.
+		if applicationType == domain.OIDCApplicationTypeNative || applicationType == domain.OIDCApplicationTypeUserAgent {
+			return domain.OIDCAuthMethodTypeNone, nil
+		}
+		return domain.OIDCAuthMethodTypeBasic, nil
+	case "client_secret_basic":
 		return domain.OIDCAuthMethodTypeBasic, nil
 	case "client_secret_post":
 		return domain.OIDCAuthMethodTypePost, nil

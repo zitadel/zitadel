@@ -245,8 +245,11 @@ func NewServer(
 	return server, nil
 }
 
-// authCallbackPathSuffix mirrors the unexported suffix used by op.RegisterLegacyServer
-// to register the authorize callback handler under the authorization endpoint.
+// authCallbackPathSuffix mirrors the unexported suffix used by op.RegisterLegacyServer to
+// register the authorize callback handler under the authorization endpoint.
+// Keep in sync with github.com/zitadel/oidc/v3/pkg/op (authCallbackPathSuffix). The
+// existing authorization-flow integration tests exercise this route and would fail if the
+// library changed the suffix.
 const authCallbackPathSuffix = "/callback"
 
 // registrationEndpoint builds the dynamic client registration endpoint, optionally
