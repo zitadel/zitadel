@@ -191,6 +191,7 @@ type Steps struct {
 	s69CacheTablesLogged                    *CacheTablesLogged
 	s70AddEventStoreCommandEnforceOwner     *AddEventStoreCommandEnforceOwnerColumn
 	s71JWTProvideAddAudienceColumn          *JWTProvideAddAudienceColumn
+	s72Apps7OIDCConfigsAddRegistrationToken *Apps7OIDCConfigsAddRegistrationToken
 	RelationalTables                        *TransactionalTables
 }
 

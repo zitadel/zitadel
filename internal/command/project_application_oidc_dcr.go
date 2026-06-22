@@ -173,7 +173,110 @@ func (c *Commands) AddDynamicOIDCClient(ctx context.Context, projectID, resource
 		return nil, err
 	}
 
-	return c.pushOIDCApplication(ctx, addedApplication, oidcApp, appID)
+	// Persist the registration access token (RFC 7592 §3) atomically with the application,
+	// so a registered client can always be managed and never ends up without a token.
+	projectAgg := ProjectAggregateFromWriteModelWithCTX(ctx, &addedApplication.WriteModel)
+	registrationTokenEvent, registrationToken, err := c.newOIDCRegistrationTokenEvent(ctx, projectAgg, appID)
+	if err != nil {
+		return nil, err
+	}
+
+	registered, err := c.pushOIDCApplication(ctx, addedApplication, oidcApp, appID, registrationTokenEvent)
+	if err != nil {
+		return nil, err
+	}
+	registered.RegistrationAccessToken = registrationToken
+	return registered, nil
+}
+
+// UpdateDynamicOIDCClient applies an RFC 7592 update to a dynamically registered client and
+// rotates its registration access token in the same push. Unlike UpdateOIDCApplication it does
+// not perform an app.write permission check: the caller is authorized through the registration
+// access token (see VerifyDynamicClientRegistrationToken). The returned application carries the
+// new registration access token, which the client must use from then on. Updating metadata to
+// the values it already has is not an error: the token is rotated and the current state is
+// returned, as RFC 7592 expects a successful read-back from an update.
+func (c *Commands) UpdateDynamicOIDCClient(ctx context.Context, oidcApp *domain.OIDCApp, resourceOwner string) (_ *domain.OIDCApp, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if oidcApp == nil || !oidcApp.IsValid() || oidcApp.AppID == "" || oidcApp.AggregateID == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Aef8a", "Errors.Project.App.OIDCConfigInvalid")
+	}
+
+	existingOIDC, err := c.getOIDCAppWriteModel(ctx, oidcApp.AggregateID, oidcApp.AppID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if existingOIDC.State == domain.AppStateUnspecified || existingOIDC.State == domain.AppStateRemoved {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Voo8i", "Errors.Project.App.NotExisting")
+	}
+	if !existingOIDC.IsOIDC() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Geph9", "Errors.Project.App.IsNotOIDC")
+	}
+	if err = c.eventstore.FilterToQueryReducer(ctx, existingOIDC); err != nil {
+		return nil, err
+	}
+
+	changedEvent, hasChanged, err := c.oidcApplicationChangeEvent(ctx, existingOIDC, oidcApp)
+	if err != nil {
+		return nil, err
+	}
+
+	projectAgg := ProjectAggregateFromWriteModelWithCTX(ctx, &existingOIDC.WriteModel)
+	rotationEvent, registrationToken, err := c.newOIDCRegistrationTokenEvent(ctx, projectAgg, oidcApp.AppID)
+	if err != nil {
+		return nil, err
+	}
+
+	events := make([]eventstore.Command, 0, 2)
+	if hasChanged {
+		events = append(events, changedEvent)
+	}
+	events = append(events, rotationEvent)
+
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	if err = AppendAndReduce(existingOIDC, pushedEvents...); err != nil {
+		return nil, err
+	}
+
+	result := oidcWriteModelToOIDCConfig(existingOIDC)
+	result.FillCompliance()
+	result.RegistrationAccessToken = registrationToken
+	return result, nil
+}
+
+// RemoveDynamicOIDCClient deletes a dynamically registered client (RFC 7592 §2.3). Unlike
+// RemoveApplication it does not perform an app.delete permission check: the caller is
+// authorized through the registration access token. Removing the application also invalidates
+// its registration access token.
+func (c *Commands) RemoveDynamicOIDCClient(ctx context.Context, projectID, appID, resourceOwner string) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if projectID == "" || appID == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Eiv0u", "Errors.IDMissing")
+	}
+	existingApp, err := c.getApplicationWriteModel(ctx, projectID, appID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if existingApp.State == domain.AppStateUnspecified || existingApp.State == domain.AppStateRemoved {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Quu7n", "Errors.Project.App.NotExisting")
+	}
+
+	projectAgg := ProjectAggregateFromWriteModelWithCTX(ctx, &existingApp.WriteModel)
+	pushedEvents, err := c.eventstore.Push(ctx, project.NewApplicationRemovedEvent(ctx, projectAgg, appID, existingApp.Name, ""))
+	if err != nil {
+		return nil, err
+	}
+	if err = AppendAndReduce(existingApp, pushedEvents...); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingApp.WriteModel), nil
 }
 
 // dynamicOIDCClientName builds a per-project unique application name for a dynamically
@@ -185,4 +288,94 @@ func dynamicOIDCClientName(requestedName, appID string) string {
 		return "DCR Client " + appID
 	}
 	return requestedName + " (" + appID + ")"
+}
+
+// newOIDCRegistrationTokenEvent generates a fresh registration access token secret for the
+// application, returning the event that persists its hash and the plain secret to hand back
+// to the client. Like a client secret, only the hash is ever stored; the plain secret leaves
+// the server exactly once. The caller is responsible for pushing the event.
+func (c *Commands) newOIDCRegistrationTokenEvent(ctx context.Context, projectAgg *eventstore.Aggregate, appID string) (eventstore.Command, string, error) {
+	encodedHash, plain, err := c.newHashedSecret(ctx, c.eventstore.Filter) //nolint:staticcheck
+	if err != nil {
+		return nil, "", err
+	}
+	return project.NewOIDCConfigRegistrationTokenChangedEvent(ctx, projectAgg, appID, encodedHash), plain, nil
+}
+
+// VerifyDynamicClientRegistrationToken checks a presented registration access token secret
+// (RFC 7592 §3) against the stored hash of the application's current token. It returns an
+// unauthenticated error when no token is set or the secret does not match, so the management
+// endpoints can answer with 401. The hash is read strongly consistently from the eventstore;
+// the management endpoints serve the common case from the projection and only fall back here,
+// most importantly for a token that was just rotated and is not projected yet.
+func (c *Commands) VerifyDynamicClientRegistrationToken(ctx context.Context, projectID, appID, resourceOwner, secret string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if projectID == "" || appID == "" || secret == "" {
+		return zerrors.ThrowUnauthenticated(nil, "COMMAND-Ohj6e", "Errors.Token.Invalid")
+	}
+	wm := newOIDCRegistrationTokenWriteModel(projectID, appID, resourceOwner)
+	if err = c.eventstore.FilterToQueryReducer(ctx, wm); err != nil {
+		return err
+	}
+	if wm.hashedToken == "" {
+		return zerrors.ThrowUnauthenticated(nil, "COMMAND-Eereu", "Errors.Token.Invalid")
+	}
+	// The registration access token is short lived (it is rotated on every update), so an
+	// outdated hash is not persisted back; the updated hash from Verify is intentionally
+	// ignored.
+	if _, err = c.secretHasher.Verify(wm.hashedToken, secret); err != nil {
+		return zerrors.ThrowUnauthenticated(err, "COMMAND-Ush2a", "Errors.Token.Invalid")
+	}
+	return nil
+}
+
+// oidcRegistrationTokenWriteModel resolves the current registration access token hash of an
+// application from the eventstore. It tracks the latest token-changed event and clears the
+// hash when the application is removed.
+type oidcRegistrationTokenWriteModel struct {
+	eventstore.WriteModel
+	appID       string
+	hashedToken string
+}
+
+func newOIDCRegistrationTokenWriteModel(projectID, appID, resourceOwner string) *oidcRegistrationTokenWriteModel {
+	return &oidcRegistrationTokenWriteModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID:   projectID,
+			ResourceOwner: resourceOwner,
+		},
+		appID: appID,
+	}
+}
+
+func (wm *oidcRegistrationTokenWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *project.OIDCConfigRegistrationTokenChangedEvent:
+			if e.AppID == wm.appID {
+				wm.hashedToken = e.HashedToken
+			}
+		case *project.ApplicationRemovedEvent:
+			if e.AppID == wm.appID {
+				wm.hashedToken = ""
+			}
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *oidcRegistrationTokenWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AwaitOpenTransactions().
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(project.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			project.OIDCConfigRegistrationTokenChangedType,
+			project.ApplicationRemovedType,
+		).
+		Builder()
 }

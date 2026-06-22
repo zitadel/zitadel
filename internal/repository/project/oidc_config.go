@@ -15,6 +15,8 @@ const (
 	OIDCConfigChangedType           = applicationEventTypePrefix + "config.oidc.changed"
 	OIDCConfigSecretChangedType     = applicationEventTypePrefix + "config.oidc.secret.changed"
 	OIDCConfigSecretHashUpdatedType = applicationEventTypePrefix + "config.oidc.secret.updated"
+
+	OIDCConfigRegistrationTokenChangedType = applicationEventTypePrefix + "config.oidc.registration_token.changed"
 )
 
 type OIDCConfigAddedEvent struct {
@@ -491,5 +493,47 @@ func (e *OIDCConfigSecretHashUpdatedEvent) Payload() interface{} {
 }
 
 func (e *OIDCConfigSecretHashUpdatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+// OIDCConfigRegistrationTokenChangedEvent stores the hash of the registration access token
+// (RFC 7592 §3) of a dynamically registered OIDC client. The token authenticates the read,
+// update and delete operations on the client's registration. As with a client secret only the
+// hash is persisted (and projected); the token itself is returned to the client once and never
+// stored in clear text. The event is written on registration and again whenever the token is
+// rotated (on update).
+type OIDCConfigRegistrationTokenChangedEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+
+	AppID       string `json:"appId"`
+	HashedToken string `json:"hashedToken,omitempty"`
+}
+
+func NewOIDCConfigRegistrationTokenChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	appID string,
+	hashedToken string,
+) *OIDCConfigRegistrationTokenChangedEvent {
+	return &OIDCConfigRegistrationTokenChangedEvent{
+		BaseEvent: eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			OIDCConfigRegistrationTokenChangedType,
+		),
+		AppID:       appID,
+		HashedToken: hashedToken,
+	}
+}
+
+func (e *OIDCConfigRegistrationTokenChangedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+	e.BaseEvent = b
+}
+
+func (e *OIDCConfigRegistrationTokenChangedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *OIDCConfigRegistrationTokenChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
