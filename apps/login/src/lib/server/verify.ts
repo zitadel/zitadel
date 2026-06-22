@@ -23,9 +23,9 @@ import { cookies, headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
 import { getOrSetFingerprintId } from "../fingerprint";
+import { checkMFAFactors } from "../mfa-helper";
 import { getServiceConfig } from "../service-url";
 import { loadMostRecentSession } from "../session";
-import { checkMFAFactors } from "../mfa-helper";
 import { createSessionAndUpdateCookie } from "./cookie";
 import { getPublicHostWithProtocol } from "./host";
 

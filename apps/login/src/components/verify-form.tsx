@@ -49,7 +49,6 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
 
   const [loading, setLoading] = useState<boolean>(false);
 
-
   async function resendCode() {
     setError("");
     setLoading(true);

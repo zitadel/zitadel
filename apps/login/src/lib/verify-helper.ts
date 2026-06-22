@@ -8,7 +8,6 @@ import { cookies } from "next/headers";
 import { getFingerprintIdCookie } from "./fingerprint";
 import { trySendVerification } from "./server/verify";
 
-
 export function checkPasswordChangeRequired(
   expirySettings: PasswordExpirySettings | undefined,
   session: Session,
