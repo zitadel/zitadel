@@ -696,6 +696,16 @@ OIDC:
     MaxTtl: 5m  # ZITADEL_OIDC_BACKCHANNELLOGOUT_MAXTTL
     # Lifetime of the token used to notify clients through OIDC back-channel logout.
     TokenLifetime: 15m # ZITADEL_OIDC_BACKCHANNELLOGOUT_TOKENLIFETIME
+  # OAuth 2.0 Dynamic Client Registration (RFC 7591). The registration endpoint is only
+  # served and advertised when the oidc_dynamic_client_registration instance feature is
+  # enabled, regardless of the settings below.
+  DynamicClientRegistration:
+    # Allow clients to register without an initial access token (open registration), as
+    # required by the Model Context Protocol (MCP) flow. Such clients are homed in a
+    # dedicated, auto-provisioned project in the instance's default organization. When
+    # disabled, registration requires a valid access token and the client is homed in the
+    # token's organization.
+    AllowUnauthenticated: false # ZITADEL_OIDC_DYNAMICCLIENTREGISTRATION_ALLOWUNAUTHENTICATED
 
 SAML:
   DefaultLoginURLV2: "/ui/v2/login/login?samlRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2

@@ -5,9 +5,64 @@ import (
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+// DCRProjectName is the name of the dedicated project that holds clients created through
+// OAuth 2.0 Dynamic Client Registration (RFC 7591). It is auto-provisioned per
+// organization on the first registration.
+const DCRProjectName = "ZITADEL DCR"
+
+// AddDCRProject creates the dedicated project for dynamically registered OIDC clients in
+// the given organization. Like AddDynamicOIDCClient it does not perform a permission
+// check, because the provisioning is authorized at the registration endpoint through the
+// feature flag and the configured registration mode. The per-organization uniqueness of
+// the project name guards against duplicates created by concurrent registrations: a racing
+// push fails with an already-exists error, which the caller resolves by looking the
+// project up again.
+func (c *Commands) AddDCRProject(ctx context.Context, resourceOwner string) (_ string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if resourceOwner == "" {
+		return "", zerrors.ThrowInvalidArgument(nil, "COMMAND-Oht9a", "Errors.ResourceOwnerMissing")
+	}
+	projectID, err := c.idGenerator.Next()
+	if err != nil {
+		return "", err
+	}
+	wm, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
+	if err != nil {
+		return "", err
+	}
+	events := []eventstore.Command{
+		project.NewProjectAddedEvent(
+			ctx,
+			ProjectAggregateFromWriteModelWithCTX(ctx, &wm.WriteModel),
+			DCRProjectName,
+			false,
+			false,
+			false,
+			domain.PrivateLabelingSettingUnspecified,
+		),
+	}
+	postCommit, err := c.projectCreatedMilestone(ctx, &events)
+	if err != nil {
+		return "", err
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	if err != nil {
+		return "", err
+	}
+	postCommit(ctx)
+	if err = AppendAndReduce(wm, pushedEvents...); err != nil {
+		return "", err
+	}
+	return projectID, nil
+}
 
 // AddDynamicOIDCClient registers a new OIDC application through OAuth 2.0 Dynamic Client
 // Registration (RFC 7591). It reuses the regular OIDC application persistence

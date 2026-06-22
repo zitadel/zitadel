@@ -19,6 +19,47 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+func TestCommandSide_AddDCRProject(t *testing.T) {
+	t.Parallel()
+
+	t.Run("missing resource owner, invalid argument", func(t *testing.T) {
+		t.Parallel()
+		c := &Commands{
+			eventstore:      expectEventstore()(t),
+			checkPermission: newMockPermissionCheckNotAllowed(),
+		}
+		_, err := c.AddDCRProject(authz.WithInstanceID(context.Background(), "instanceID"), "")
+		assert.True(t, zerrors.IsErrorInvalidArgument(err))
+	})
+
+	t.Run("project created without permission check", func(t *testing.T) {
+		t.Parallel()
+		c := &Commands{
+			eventstore: expectEventstore(
+				expectFilter(),
+				expectPush(
+					project.NewProjectAddedEvent(
+						context.Background(),
+						&project.NewAggregate("project1", "org1").Aggregate,
+						DCRProjectName,
+						false,
+						false,
+						false,
+						domain.PrivateLabelingSettingUnspecified,
+					),
+				),
+			)(t),
+			idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "project1"),
+			// Provisioning the DCR project must not depend on project.create.
+			checkPermission: newMockPermissionCheckNotAllowed(),
+		}
+		c.setMilestonesCompletedForTest("instanceID")
+		projectID, err := c.AddDCRProject(authz.WithInstanceID(context.Background(), "instanceID"), "org1")
+		assert.NoError(t, err)
+		assert.Equal(t, "project1", projectID)
+	})
+}
+
 func TestCommandSide_AddDynamicOIDCClient(t *testing.T) {
 	t.Parallel()
 
