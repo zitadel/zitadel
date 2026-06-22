@@ -103,8 +103,8 @@ describe("processIDPCallback", () => {
         email: "test@example.com",
         verification: {
           case: "isVerified",
-          value: true
-        }
+          value: true,
+        },
       },
     },
     updateHumanUser: {
@@ -118,8 +118,8 @@ describe("processIDPCallback", () => {
         email: "test@example.com",
         verification: {
           case: "isVerified",
-          value: true
-        }
+          value: true,
+        },
       },
     },
   };

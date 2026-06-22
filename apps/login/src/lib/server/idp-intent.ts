@@ -359,7 +359,8 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
   if (options?.autoLinking) {
     let foundUser;
     const email = addHumanUser?.email?.email;
-    const emailVerified = addHumanUser?.email?.verification?.case === "isVerified" && addHumanUser?.email?.verification?.value;
+    const emailVerified =
+      addHumanUser?.email?.verification?.case === "isVerified" && addHumanUser?.email?.verification?.value;
 
     if (options.autoLinking === AutoLinkingOption.EMAIL && email && emailVerified) {
       foundUser = await listUsers({ serviceConfig, email, organizationId: organization }).then((response) => {
@@ -469,9 +470,7 @@ async function handleAutoCreation(ctx: IDPHandlerContext): Promise<IDPHandlerRes
 
     // Check if required profile fields are present
     if (!addHumanUser.profile?.givenName || !addHumanUser.profile?.familyName) {
-      logger.info(
-        "Missing required profile fields (givenName or familyName), redirecting to complete registration",
-      );
+      logger.info("Missing required profile fields (givenName or familyName), redirecting to complete registration");
 
       if (!idpInformation!.userId) {
         logger.error("IDP intent missing userId, cannot redirect to complete registration");
