@@ -469,8 +469,8 @@ async function handleAutoCreation(ctx: IDPHandlerContext): Promise<IDPHandlerRes
 
     // Check if required profile fields are present
     if (!addHumanUser.profile?.givenName || !addHumanUser.profile?.familyName) {
-      console.log(
-        "[IDP Process] Missing required profile fields (givenName or familyName), redirecting to complete registration",
+      logger.info(
+        "Missing required profile fields (givenName or familyName), redirecting to complete registration",
       );
 
       if (!idpInformation!.userId) {
