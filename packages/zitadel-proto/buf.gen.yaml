@@ -2,22 +2,22 @@ version: v2
 managed:
   enabled: true
 plugins:
-  - remote: buf.build/bufbuild/es:v2.11.0
+  - local: protoc-gen-es
     out: es
     include_imports: true
     opt:
       - target=js
       - json_types=true
       - import_extension=js
-  - remote: buf.build/bufbuild/es:v2.11.0
+  - local: protoc-gen-es
     out: cjs
     include_imports: true
     opt:
       - target=js
       - json_types=true
       - import_extension=js
-      - js_import_style=legacy_commonjs 
-  - remote: buf.build/bufbuild/es:v2.11.0
+      - js_import_style=legacy_commonjs
+  - local: protoc-gen-es
     out: types
     include_imports: true
     opt:

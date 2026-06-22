@@ -22,7 +22,6 @@ CREATE TABLE zitadel.sessions (
 
     , PRIMARY KEY (instance_id, id)
     , FOREIGN KEY (instance_id) REFERENCES zitadel.instances(id)
---     , FOREIGN KEY (instance_id, user_id) REFERENCES zitadel.users(instance_id, id) ON DELETE CASCADE
     , FOREIGN KEY (instance_id, user_agent_id) REFERENCES zitadel.session_user_agents(instance_id, fingerprint_id) ON DELETE SET NULL (user_agent_id)
 );
 
@@ -34,9 +33,15 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER set_expiration
-    BEFORE INSERT OR UPDATE OF lifetime ON zitadel.sessions
+CREATE TRIGGER set_expiration_on_update
+    BEFORE UPDATE OF lifetime ON zitadel.sessions
     FOR EACH ROW
+EXECUTE FUNCTION zitadel.update_expiration();
+
+CREATE TRIGGER set_expiration_on_insert
+    BEFORE INSERT ON zitadel.sessions
+    FOR EACH ROW
+    WHEN (NEW.lifetime <> '0'::interval)
 EXECUTE FUNCTION zitadel.update_expiration();
 
 CREATE TYPE zitadel.session_factor_type AS ENUM (

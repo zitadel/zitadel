@@ -1,6 +1,7 @@
 "use server";
 
 import { addSessionToCookie, updateSessionCookie } from "@/lib/cookies";
+import { createLogger } from "@/lib/logger";
 import {
   createSessionForUserIdAndIdpIntent,
   createSessionFromChecksAndChallenges,
@@ -15,6 +16,8 @@ import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
 import { getServiceConfig } from "../service-url";
+
+const logger = createLogger("cookie");
 
 type CustomCookieData = {
   id: string;
@@ -52,7 +55,7 @@ export async function createSessionAndUpdateCookie(command: {
   let sessionLifetime = command.lifetime;
 
   if (!sessionLifetime || !sessionLifetime.seconds) {
-    console.warn("No session lifetime provided, using default of 24 hours.");
+    logger.warn("No session lifetime provided, using default of 24 hours");
 
     sessionLifetime = {
       seconds: BigInt(24 * 60 * 60), // 24 hours
@@ -98,11 +101,11 @@ export async function createSessionAndUpdateCookie(command: {
 
         return { session: response.session as Session, sessionCookie, challenges: createdSession.challenges };
       } else {
-        throw "could not get session or session does not have loginName";
+        throw new Error("could not get session or session does not have loginName");
       }
     });
   } else {
-    throw "Could not create session";
+    throw new Error("Could not create session");
   }
 }
 
@@ -126,7 +129,7 @@ export async function createSessionForIdpAndUpdateCookie({
   let sessionLifetime = lifetime;
 
   if (!sessionLifetime || !sessionLifetime.seconds) {
-    console.warn("No IDP session lifetime provided, using default of 24 hours.");
+    logger.warn("No IDP session lifetime provided, using default of 24 hours");
 
     sessionLifetime = {
       seconds: BigInt(24 * 60 * 60), // 24 hours
@@ -140,7 +143,7 @@ export async function createSessionForIdpAndUpdateCookie({
     idpIntent,
     lifetime: sessionLifetime,
   }).catch((error: ErrorDetail | CredentialsCheckError) => {
-    console.error("Could not set session", error);
+    logger.error("Could not set session", { error });
     if ("failedAttempts" in error && error.failedAttempts) {
       throw {
         error: `Failed to authenticate: You had ${error.failedAttempts} password attempts.`,
@@ -151,7 +154,7 @@ export async function createSessionForIdpAndUpdateCookie({
   });
 
   if (!createdSession) {
-    throw "Could not create session";
+    throw new Error("Could not create session");
   }
 
   const { session } = await getSession({
@@ -161,7 +164,7 @@ export async function createSessionForIdpAndUpdateCookie({
   });
 
   if (!session || !session.factors?.user?.loginName) {
-    throw "Could not retrieve session";
+    throw new Error("Could not retrieve session");
   }
 
   const sessionCookie: CustomCookieData = {
@@ -232,7 +235,7 @@ export async function setSessionAndUpdateCookie(command: {
         return getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token }).then(
           async (response) => {
             if (!response?.session || !response.session.factors?.user?.loginName) {
-              throw "could not get session or session does not have loginName";
+              throw new Error("could not get session or session does not have loginName");
             }
 
             const { session } = response;
@@ -264,7 +267,7 @@ export async function setSessionAndUpdateCookie(command: {
           },
         );
       } else {
-        throw "Session not be set";
+        throw new Error("Session could not be set");
       }
     })
     .catch(passwordAttemptsHandler);

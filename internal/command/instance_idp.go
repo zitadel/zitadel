@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/idp/providers/apple"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -939,6 +940,7 @@ func (c *Commands) prepareAddInstanceJWTProvider(a *instance.Aggregate, writeMod
 					provider.JWTEndpoint,
 					provider.KeyEndpoint,
 					provider.HeaderName,
+					provider.Audience,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -987,6 +989,7 @@ func (c *Commands) prepareUpdateInstanceJWTProvider(a *instance.Aggregate, write
 				provider.JWTEndpoint,
 				provider.KeyEndpoint,
 				provider.HeaderName,
+				provider.Audience,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {
@@ -1668,6 +1671,9 @@ func (c *Commands) prepareAddInstanceAppleProvider(a *instance.Aggregate, writeM
 		if len(provider.PrivateKey) == 0 {
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-GVD4n", "Errors.IDP.PrivateKeyMissing")
 		}
+		if _, err := apple.BytesToPrivateKey(provider.PrivateKey); err != nil {
+			return nil, zerrors.ThrowInvalidArgument(err, "INST-Fk38d", "Errors.IDP.InvalidPrivateKey")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -1712,6 +1718,11 @@ func (c *Commands) prepareUpdateInstanceAppleProvider(a *instance.Aggregate, wri
 		}
 		if provider.KeyID = strings.TrimSpace(provider.KeyID); provider.KeyID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-Gh4z2", "Errors.IDP.KeyIDMissing")
+		}
+		if len(provider.PrivateKey) > 0 {
+			if _, err := apple.BytesToPrivateKey(provider.PrivateKey); err != nil {
+				return nil, zerrors.ThrowInvalidArgument(err, "INST-eWSDf", "Errors.IDP.InvalidPrivateKey")
+			}
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
@@ -1927,4 +1938,90 @@ func (c *Commands) prepareDeleteInstanceProvider(a *instance.Aggregate, id strin
 			return []eventstore.Command{instance.NewIDPRemovedEvent(ctx, &a.Aggregate, id)}, nil
 		}, nil
 	}
+}
+
+func (c *Commands) AddInstanceZitadelProvider(ctx context.Context, provider ZitadelProvider) (string, *domain.ObjectDetails, error) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceAgg := instance.NewAggregate(instanceID)
+	id, err := c.idGenerator.Next()
+	if err != nil {
+		return "", nil, err
+	}
+
+	err = c.validateInstanceZitadelProvider(&provider)
+	if err != nil {
+		return "", nil, err
+	}
+
+	writeModel := NewInstanceZitadelIDPWriteModel(instanceID, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceZitadelProvider(instanceAgg, writeModel, provider)) //nolint:staticcheck
+	if err != nil {
+		return "", nil, err
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return "", nil, err
+	}
+	return id, pushedEventsToObjectDetails(pushedEvents), nil
+}
+
+func (c *Commands) prepareAddInstanceZitadelProvider(a *instance.Aggregate, writeModel *InstanceZitadelIDPWriteModel, provider ZitadelProvider) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
+			if err != nil {
+				return nil, err
+			}
+			return []eventstore.Command{
+				instance.NewZitadelIDPAddedEvent(
+					ctx,
+					&a.Aggregate,
+					writeModel.ID,
+					provider.Name,
+					provider.Issuer,
+					provider.ClientID,
+					secret,
+					provider.Scopes,
+					provider.IDPOptions,
+					provider.InstanceRolesInfo,
+				),
+			}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) validateInstanceZitadelProvider(provider *ZitadelProvider) error {
+	if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+		return zerrors.ThrowInvalidArgument(nil, "INST-Sgtj5", "Errors.Invalid.Argument")
+	}
+	if provider.Issuer = strings.TrimSpace(provider.Issuer); provider.Issuer == "" {
+		return zerrors.ThrowInvalidArgument(nil, "INST-Hz6zj", "Errors.Invalid.Argument")
+	}
+	if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+		return zerrors.ThrowInvalidArgument(nil, "INST-fb5jm", "Errors.Invalid.Argument")
+	}
+	if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
+		return zerrors.ThrowInvalidArgument(nil, "INST-Sfdf4", "Errors.Invalid.Argument")
+	}
+
+	for i := range provider.InstanceRolesInfo {
+		provider.InstanceRolesInfo[i].OrganizationID = strings.TrimSpace(provider.InstanceRolesInfo[i].OrganizationID)
+		if provider.InstanceRolesInfo[i].OrganizationID == "" {
+			return zerrors.ThrowInvalidArgument(nil, "INST-9uEJaM", "Errors.Invalid.Argument")
+		}
+		provider.InstanceRolesInfo[i].OrganizationDomain = strings.TrimSpace(provider.InstanceRolesInfo[i].OrganizationDomain)
+		if provider.InstanceRolesInfo[i].OrganizationDomain == "" {
+			return zerrors.ThrowInvalidArgument(nil, "INST-y4Ib4D", "Errors.Invalid.Argument")
+		}
+	}
+
+	return nil
 }

@@ -3,7 +3,6 @@ package command
 import (
 	"bytes"
 	"context"
-	"encoding/base64"
 	"fmt"
 	"time"
 
@@ -408,14 +407,14 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionCommands, m
 }
 
 // checkSessionWritePermission will check that the caller is granted the "session.write" permission on the resource owner of the authenticated user.
-// In case the user is not set, and the userResourceOwner is not set (also the case for the session creation),
+// In case the user is not set, and the userOrganizationID is not set (also the case for the session creation),
 // it will check permission on the instance.
 func (c *Commands) checkSessionWritePermission(ctx context.Context, model *SessionWriteModel) error {
-	userResourceOwner, err := c.sessionUserResourceOwner(ctx, model)
+	userOrganizationID, err := c.sessionUserResourceOwner(ctx, model)
 	if err != nil {
 		return err
 	}
-	return c.checkPermission(ctx, domain.PermissionSessionWrite, userResourceOwner, model.UserID)
+	return c.checkPermission(ctx, domain.PermissionSessionWrite, userOrganizationID, model.UserID)
 }
 
 // checkSessionTerminationPermission will check that the provided sessionToken is correct or
@@ -451,17 +450,17 @@ func (c *Commands) sessionUserResourceOwner(ctx context.Context, model *SessionW
 	return r.resourceOwner, nil
 }
 
-func sessionTokenCreator(idGenerator id.Generator, sessionAlg crypto.EncryptionAlgorithm) func(sessionID string) (id string, token string, err error) {
+func sessionTokenCreator(idGenerator id.Generator, sessionAlg crypto.AuthAlgorithm) func(sessionID string) (id string, token string, err error) {
 	return func(sessionID string) (id string, token string, err error) {
 		id, err = idGenerator.Next()
 		if err != nil {
 			return "", "", err
 		}
-		encrypted, err := sessionAlg.Encrypt([]byte(fmt.Sprintf(authz.SessionTokenFormat, sessionID, id)))
+		token, err = sessionAlg.EncryptToken(fmt.Sprintf(authz.SessionTokenFormat, sessionID, id))
 		if err != nil {
 			return "", "", err
 		}
-		return id, base64.RawURLEncoding.EncodeToString(encrypted), nil
+		return id, token, nil
 	}
 }
 

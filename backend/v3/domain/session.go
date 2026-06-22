@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Session struct {
@@ -21,6 +22,10 @@ type Session struct {
 	Challenges SessionChallenges  `json:"challenges,omitempty"`
 	Metadata   []*SessionMetadata `json:"metadata,omitempty"`
 	UserAgent  *SessionUserAgent  `json:"userAgent,omitempty"`
+
+	UserOrganizationID     *string `json:"organizationId,omitempty" db:"organization_id"`
+	UserDisplayName        *string `json:"display_name" db:"display_name"`
+	UserPreferredLoginName string
 }
 
 //go:generate mockgen -typed -package domainmock -destination ./mock/session.mock.go . SessionRepository
@@ -42,7 +47,17 @@ type SessionRepository interface {
 	// The condition must include at least the instanceID of the session to update.
 	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
 	// Delete removes sessions based on the given condition.
-	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error)
+	// An additional permission condition can be provided to check if the session can be deleted, for example by checking the token id or user id.
+	// The primary condition is used to select the session(s) to be deleted, while the permission condition can be used to verify that the session(s) meet certain criteria before deletion
+	// respectively to return an error if the criteria are not met. In case no session matches the primary condition and a permission condition is provided,
+	// the method will return a permission denied error, as the session(s) that should be deleted do not meet the criteria defined in the permission condition.
+	// The method returns the number of deleted rows / session(s) and the latest deletion timestamp of the deleted session in case of a single deleted session.
+	// In case the session was previously deleted, the method returns 0 and the previous deletion timestamp.
+	// If multiple sessions are deleted, the method returns the number of deleted sessions and no timestamp, as it cannot be determined which session's deletion timestamp to return.
+	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, time.Time, error)
+	// LoadUserData loads user data associated to the given session.
+	// If called, the [Session.UserOrganizationID], [Session.UserDisplayName] and [Session.UserPreferredLoginName] fields will be populated on future calls to [SessionRepository.Get] or [SessionRepository.List].
+	LoadUserData() SessionRepository
 }
 
 // sessionColumns define all the columns of the session table.
@@ -77,6 +92,8 @@ type sessionConditions interface {
 	UserAgentIDCondition(userAgentID string) database.Condition
 	// UserIDCondition returns an equal filter on the user id field.
 	UserIDCondition(userID string) database.Condition
+	// TokenIDCondition returns an equal filter on the token id field.
+	TokenIDCondition(tokenID string) database.Condition
 	// CreatorIDCondition returns an equal filter on the creator id field.
 	CreatorIDCondition(creatorID string) database.Condition
 	// ExpirationCondition returns a filter on the expiration field.
@@ -114,3 +131,32 @@ type sessionChanges interface {
 	// SetMetadata adds or updates the metadata of the session.
 	SetMetadata(metadata []*SessionMetadata) database.Change
 }
+
+var (
+	// SlugSessionNotFound is a slug used whenever a session is not found by the requested id.
+	SlugSessionNotFound = NewSlug("session", "not_found")
+
+	// SlugSessionUserChange is a slug used when trying to change the user of an already authenticated session, which is not allowed.
+	SlugSessionUserChange = NewSlug("session", "user_change")
+
+	// SlugSessionTokenInvalid is a slug used when the provided session token is invalid, either because it is malformed, expired or does not match the session.
+	SlugSessionTokenInvalid = NewSlug("session", "token_invalid")
+)
+
+var (
+	// ErrSessionNotFound is an error that can be returned when a session with the requested id was not found.
+	ErrSessionNotFound = func(err error, id string) error {
+		return zerrors.CreateZitadelError(zerrors.KindNotFound, err, string(SlugSessionNotFound), "session was not found", 1).
+			WithDetails(zerrors.ErrorDetailsMap{"id": id})
+	}
+
+	// ErrSessionUserChange is an error that can be returned when trying to change the user of an already authenticated session, which is not allowed.
+	ErrSessionUserChange = func() error {
+		return zerrors.CreateZitadelError(zerrors.KindInvalidArgument, nil, string(SlugSessionUserChange), "session was already authenticated with another user, you cannot change it to a different one", 1)
+	}
+
+	// ErrSessionTokenInvalid is an error that can be returned whenever the provided (session) token is invalid for the intended session.
+	ErrSessionTokenInvalid = func(err error) error {
+		return zerrors.CreateZitadelError(zerrors.KindPermissionDenied, err, string(SlugSessionTokenInvalid), "The provided session token is invalid: either the token is malformed, expired or does not match the session", 1)
+	}
+)

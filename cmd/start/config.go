@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/actions"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/saml"
@@ -30,6 +31,7 @@ import (
 	"github.com/zitadel/zitadel/internal/config/network"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/execution"
@@ -86,6 +88,7 @@ type Config struct {
 	Quotas              *QuotasConfig
 	Telemetry           *handlers.TelemetryPusherConfig
 	ServicePing         *serviceping.Config
+	HTTPClient          *http.ClientConfig
 }
 
 type QuotasConfig struct {
@@ -120,9 +123,12 @@ func NewConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.Shu
 	}
 
 	id.Configure(config.Machine)
+
+	var actionsDenylist []denylist.AddressChecker
 	if config.Actions != nil {
-		actions.SetHTTPConfig(&config.Actions.HTTP)
+		actionsDenylist = config.Actions.HTTP.DenyList
 	}
+	config.HTTPClient.MergeDeprecatedDenylists(actionsDenylist, config.Executions.DenyList)
 
 	err = config.SystemDefaults.Validate()
 	if err != nil {
@@ -146,6 +152,7 @@ func readConfig(v *viper.Viper) (*Config, error) {
 			hooks.MapHTTPHeaderStringDecode,
 			database.DecodeHook(false),
 			actions.HTTPConfigDecodeHook,
+			denylist.DenyListDecodeHook,
 			hook.EnumHookFunc(authz.MemberTypeString),
 			hooks.MapTypeStringDecode[domain.Feature, any],
 			hooks.SliceTypeStringDecode[*command.SetQuota],

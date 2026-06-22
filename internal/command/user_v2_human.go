@@ -80,8 +80,8 @@ func (h *ChangeHuman) Validate(hasher *crypto.Hasher) (err error) {
 
 func (p *Password) Validate(hasher *crypto.Hasher) error {
 	if p.EncodedPasswordHash != "" {
-		if !hasher.EncodingSupported(p.EncodedPasswordHash) {
-			return zerrors.ThrowInvalidArgument(nil, "USER-oz74onzvqr", "Errors.User.Password.NotSupported")
+		if err := hasher.ValidateEncodedHash(p.EncodedPasswordHash); err != nil {
+			return err
 		}
 	}
 	if p.Password == "" && p.EncodedPasswordHash == "" {
@@ -118,14 +118,14 @@ func (h *ChangeHuman) Changed() bool {
 	return false
 }
 
-func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human *AddHuman, allowInitMail bool, alg crypto.EncryptionAlgorithm) (err error) {
-	if resourceOwner == "" {
+func (c *Commands) AddUserHuman(ctx context.Context, organizationID string, human *AddHuman, allowInitMail bool, alg crypto.EncryptionAlgorithm) (err error) {
+	if organizationID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMA-095xh8fll1", "Errors.Internal")
 	}
 	if human.Details == nil {
 		human.Details = &domain.ObjectDetails{}
 	}
-	human.Details.ResourceOwner = resourceOwner
+	human.Details.ResourceOwner = organizationID
 	if err := human.Validate(c.userPasswordHasher); err != nil {
 		return err
 	}
@@ -136,11 +136,15 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 			return err
 		}
 	}
-	// check for permission to create user on resourceOwner
+	// check for permission to create user on organizationID
 	if !human.Register {
-		if err := c.checkPermissionUpdateUser(ctx, resourceOwner, human.ID, true); err != nil {
+		if err := c.checkPermissionUpdateUser(ctx, organizationID, human.ID, true); err != nil {
 			return err
 		}
+	}
+	err = c.checkOrgExists(ctx, organizationID)
+	if err != nil {
+		return err
 	}
 	// only check if user is already existing
 	existingHuman, err := c.userExistsWriteModel(
@@ -154,18 +158,18 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-7yiox1isql", "Errors.User.AlreadyExisting")
 	}
 	// add resourceowner for the events with the aggregate
-	existingHuman.ResourceOwner = resourceOwner
+	existingHuman.ResourceOwner = organizationID
 
-	domainPolicy, err := c.domainPolicyWriteModel(ctx, resourceOwner)
+	domainPolicy, err := c.domainPolicyWriteModel(ctx, organizationID)
 	if err != nil {
 		return err
 	}
 
-	if err = c.userValidateDomain(ctx, resourceOwner, human.Username, domainPolicy.UserLoginMustBeDomain); err != nil {
+	if err = c.userValidateDomain(ctx, organizationID, human.Username, domainPolicy.UserLoginMustBeDomain); err != nil {
 		return err
 	}
 
-	organizationScopedUsername, err := c.checkOrganizationScopedUsernames(ctx, resourceOwner)
+	organizationScopedUsername, err := c.checkOrganizationScopedUsernames(ctx, organizationID)
 	if err != nil {
 		return err
 	}
@@ -297,7 +301,11 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg 
 	}
 
 	if human.Changed() {
-		if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID, !metadataChanged); err != nil {
+		// Changing metadata or setting email, resp. phone to verified is only allowed with user write permissions, but not for self-management.
+		requireWritePermission := metadataChanged ||
+			(human.Email != nil && (human.Email.Verified || human.Email.ReturnCode)) ||
+			(human.Phone != nil && (human.Phone.Verified || human.Phone.ReturnCode))
+		if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID, !requireWritePermission); err != nil {
 			return err
 		}
 	}
@@ -335,13 +343,12 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg 
 		}
 	}
 
-	for _, md := range human.Metadata {
-		cmd, err := c.setUserMetadata(ctx, userAgg, md)
+	if len(human.Metadata) > 0 {
+		metadataCmds, err := c.createMetadataEvents(ctx, human.Metadata, existingHuman.Metadata, userAgg)
 		if err != nil {
 			return err
 		}
-
-		cmds = append(cmds, cmd)
+		cmds = append(cmds, metadataCmds...)
 	}
 
 	for _, mdKey := range human.MetadataKeysToRemove {

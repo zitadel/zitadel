@@ -39,7 +39,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           title: "Key Concepts",
           slug: "concepts",
           description:
-            "This part of our documentation contains ZITADEL specific or general concepts required to understand the system or our guides.",
+            "Learn about ZITADEL's core architecture and terminology. This section covers identity management concepts, multi-tenancy, and technical structures essential for understanding our platform.",
         },
         items: [
           "concepts/structure/instance",
@@ -74,7 +74,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           title: "Example Applications",
           slug: "/examples/introduction",
           description:
-            "Practical examples showing how to integrate ZITADEL authentication and secure APIs across different application types and frameworks.",
+            "Discover practical quickstart guides and example applications for ZITADEL. We provide step-by-step instructions for popular frameworks like React, Angular, Vue, Next.js, and more.",
         },
         items: [
           {
@@ -85,17 +85,17 @@ export const guidesSidebar: readonly SidebarItem[] = [
               title: "Frontend (SPA) Quickstart Guides",
               slug: "/examples/introduction/frontend",
               description:
-                "Quickstart guides for integrating ZITADEL authentication into frontend single-page applications.",
+                "Step-by-step instructions for integrating ZITADEL authentication into your frontend single-page applications. Includes guides for React, Angular, Vue, and vanilla JS.",
             },
             items: [
+              "sdk-examples/angular",
+              "sdk-examples/react",
               {
                 type: "link",
                 label: "Vanilla-JS",
                 href: "https://github.com/zitadel/zitadel-vanilla-js",
               },
-              "examples/login/react",
-              "examples/login/angular",
-              "examples/login/vue",
+              "sdk-examples/vue",
             ],
           },
           {
@@ -106,7 +106,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
               title: "Mobile & Native Quickstart Guides",
               slug: "/examples/introduction/mobile",
               description:
-                "Quickstart guides for integrating ZITADEL authentication into Mobile & Native applications.",
+                "Quickstart guides for integrating ZITADEL authentication into mobile and native applications. Learn how to secure your mobile apps with our Flutter and .NET guides.",
             },
             items: [
               "examples/login/flutter",
@@ -120,11 +120,23 @@ export const guidesSidebar: readonly SidebarItem[] = [
               title: "Full-Stack / SSR Quickstart Guides",
               slug: "/examples/introduction/fullstack",
               description:
-                "Quickstart guides for integrating ZITADEL authentication into Full-Stack / SSR applications.",
+                "Integrate ZITADEL with your full-stack and server-side rendered (SSR) applications. Follow our guides for Next.js, B2B scenarios, and other modern web frameworks.",
             },
             items: [
-              "examples/login/nextjs",
+              "sdk-examples/astro",
+              "sdk-examples/dotnet",
+              "sdk-examples/expressjs",
+              "sdk-examples/flask",
+              "sdk-examples/fastapi",
+              "sdk-examples/fastify",
+              "sdk-examples/laravel",
+              "sdk-examples/nestjs",
+              "sdk-examples/nextjs",
               "examples/login/nextjs-b2b",
+              "sdk-examples/nuxtjs",
+              "sdk-examples/qwik",
+              "sdk-examples/solidstart",
+              "sdk-examples/sveltekit",
             ],
           },
           {
@@ -135,13 +147,13 @@ export const guidesSidebar: readonly SidebarItem[] = [
               title: "Web App (Server-Side) Quickstart Guides",
               slug: "/examples/introduction/webapp",
               description:
-                "Quickstart guides for integrating ZITADEL authentication into Web App (Server-Side) applications.",
+                "Step-by-step guides for integrating ZITADEL into traditional server-side web applications. Learn how to secure Java Spring, PHP Symfony, Django, and Go apps.",
             },
             items: [
-              "examples/login/symfony",
-              "examples/login/java-spring",
-              "examples/login/python-django",
-              "examples/login/go"
+              "sdk-examples/django",
+              "examples/login/go",
+              "sdk-examples/symfony",
+              "sdk-examples/spring",
             ],
           },
           {
@@ -152,15 +164,14 @@ export const guidesSidebar: readonly SidebarItem[] = [
               title: "APIs / Backend Quickstart Guides",
               slug: "/examples/introduction/backend",
               description:
-                "Quickstart guides for integrating ZITADEL authentication into APIs / Backend Services.",
+                "Learn how to secure your APIs and backend services using ZITADEL. Includes examples for Node.js, Python, Go, Java, and NestJS to implement robust authentication.",
             },
             items: [
               "examples/secure-api/go",
               "examples/secure-api/java-spring",
-              "examples/secure-api/python-django",
-              "examples/secure-api/python-flask",
               "examples/secure-api/nodejs-nestjs",
               "examples/secure-api/pylon",
+              "examples/secure-api/python-django",
             ],
           },
         ],
@@ -181,6 +192,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "guides/solution-scenarios/saas",
           "guides/solution-scenarios/b2c",
           "guides/solution-scenarios/frontend-calling-backend-API",
+          "guides/solution-scenarios/guest-auth",
           {
             type: "category",
             label: "Machine-to-Machine (M2M)",
@@ -244,7 +256,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           title: "Authenticate users with OpenID Connect (OIDC)",
           slug: "guides/integrate/login/oidc",
           description:
-            "This guide explains how to utilize ZITADEL for user authentication within your applications using OpenID Connect (OIDC). Here, we offer comprehensive guidance on seamlessly integrating ZITADEL's authentication features, ensuring both security and user experience excellence. Throughout this documentation, we'll cover the setup process for ZITADEL authentication, including the recommended OIDC flows tailored to different application types. Additionally, we'll provide clear instructions on securely signing out or logging out users from your application, ensuring data security and user privacy. With our guidance, you'll be equipped to leverage ZITADEL's authentication capabilities effectively, enhancing your application's security posture while delivering a seamless login experience for your users.",
+            "Comprehensive guide to user authentication in ZITADEL using OpenID Connect (OIDC), including recommended flows and session management.",
         },
         items: [
           "guides/integrate/login/oidc/oauth-recommended-flows",
@@ -281,48 +293,43 @@ export const guidesSidebar: readonly SidebarItem[] = [
       },
       {
         type: "category",
-        label: "SDKs",
+        label: "SDKs & Integrations",
         items: [
           "sdk-examples/introduction",
           {
             type: "category",
-            label: "Frontend (SPA)",
-            items: [
-              "sdk-examples/react",
-              "sdk-examples/angular",
-              "sdk-examples/vue",
-            ],
-          },
-          {
-            type: "category",
-            label: "Mobile & Native",
+            label: "Frontend & Mobile (OIDC/PKCE)",
             items: [
               {
                 type: "link",
-                label: "Dart / Flutter",
-                href: "https://github.com/smartive/zitadel-dart",
+                label: "Angular",
+                href: "/docs/sdk-examples/oidc-libraries"
               },
+              "sdk-examples/go",
               {
                 type: "link",
                 label: ".NET (MAUI/Xamarin)",
                 href: "https://github.com/smartive/zitadel-net",
               },
-            ],
-          },
-          {
-            type: "category",
-            label: "Full-Stack / SSR",
-            items: [
-              "sdk-examples/nextjs",
-              "sdk-examples/nuxtjs",
-              "sdk-examples/sveltekit",
-              "sdk-examples/qwik",
-              "sdk-examples/solidstart",
-              "sdk-examples/astro",
               {
                 type: "link",
                 label: "NextAuth",
                 href: "https://next-auth.js.org/providers/zitadel",
+              },
+              {
+                type: "link",
+                label: "React",
+                href: "https://github.com/zitadel/zitadel-react",
+              },
+              {
+                type: "link",
+                label: "Vue",
+                href: "https://github.com/zitadel/zitadel-vue",
+              },
+              {
+                type: "link",
+                label: "Other",
+                href: "/docs/sdk-examples/oidc-libraries"
               },
             ],
           },
@@ -331,80 +338,52 @@ export const guidesSidebar: readonly SidebarItem[] = [
             label: "Backend & API",
             items: [
               {
-                type: "category",
-                label: "Node.js",
-                items: [
-                  "sdk-examples/client-libraries/node",
-                  "sdk-examples/expressjs",
-                  "sdk-examples/fastify",
-                  "sdk-examples/hono",
-                  "sdk-examples/nestjs",
-                  {
-                    type: "link",
-                    label: "Passport.js",
-                    href: "https://github.com/buehler/node-passport-zitadel",
-                  },
-                  {
-                    type: "link",
-                    label: "Node.js (Community)",
-                    href: "https://www.npmjs.com/package/@zitadel/node",
-                  },
-                ],
+                type: "link",
+                label: ".NET (MAUI/Xamarin)",
+                href: "https://github.com/smartive/zitadel-net",
+              },
+              "sdk-examples/go",
+              {
+                type: "link",
+                label: "Passport.js",
+                href: "https://github.com/buehler/node-passport-zitadel",
+              },
+            ],
+          },
+          {
+            type: "category",
+            label: "Management API Clients",
+            items: [
+              {
+                type: "link",
+                label: "Dart / Flutter",
+                href: "https://github.com/smartive/zitadel-dart",
               },
               {
-                type: "category",
-                label: "Python",
-                items: [
-                  "sdk-examples/client-libraries/python",
-                  "sdk-examples/flask",
-                  "sdk-examples/django",
-                  "sdk-examples/fastapi",
-                ],
+                type: "link",
+                label: "Elixir",
+                href: "https://github.com/maennchen/zitadel_api",
               },
+              "sdk-examples/go",
+              "sdk-examples/client-libraries/java",
               {
-                type: "category",
-                label: "Go",
-                items: ["sdk-examples/go"],
+                type: "link",
+                label: ".NET (MAUI/Xamarin)",
+                href: "https://github.com/smartive/zitadel-net",
               },
+              "sdk-examples/client-libraries/node",
               {
-                type: "category",
-                label: "Java",
-                items: [
-                  "sdk-examples/java",
-                  "sdk-examples/spring",
-                  "sdk-examples/client-libraries/java",
-                ],
+                type: "link",
+                label: "Node.js (Community)",
+                href: "https://github.com/smartive/zitadel-node",
               },
+              "sdk-examples/client-libraries/php",
+              "sdk-examples/client-libraries/python",
+              "sdk-examples/client-libraries/ruby",
               {
-                type: "category",
-                label: "PHP",
-                items: [
-                  "sdk-examples/symfony",
-                  "sdk-examples/laravel",
-                  "sdk-examples/client-libraries/php",
-                ],
-              },
-              {
-                type: "category",
-                label: "Other Languages",
-                items: [
-                  "sdk-examples/client-libraries/ruby",
-                  {
-                    type: "link",
-                    label: "Elixir",
-                    href: "https://github.com/maennchen/zitadel_api",
-                  },
-                  {
-                    type: "link",
-                    label: "Rust",
-                    href: "https://github.com/smartive/zitadel-rust",
-                  },
-                  {
-                    type: "link",
-                    label: "Pylon",
-                    href: "https://github.com/getcronit/pylon",
-                  },
-                ],
+                type: "link",
+                label: "Rust",
+                href: "https://github.com/smartive/zitadel-rust",
               },
             ],
           },
@@ -444,7 +423,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
               title: "Integrate ZITADEL with your Favorite Services",
               slug: "/guides/integrate/services",
               description:
-                "With the guides in this section you will learn how to integrate ZITADEL with your services.",
+                "Step-by-step guides for integrating ZITADEL with popular services and tools including Google Workspace, AWS, Atlassian, Cloudflare, GitLab, and many other software solutions.",
             },
             items: [
               "guides/integrate/services/google-workspace",
@@ -518,7 +497,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           title: "Build your own Login UI",
           slug: "/guides/integrate/login-ui",
           description:
-            "In the following guides you will learn how to create your own login UI with our APIs. The different scenarios like username/password, external identity provider, etc. will be shown.",
+            "Create a completely customized login experience using the ZITADEL Session and OIDC APIs. Learn how to handle username/password, MFA, passkeys, and external identity providers.",
         },
         collapsed: true,
         items: [
@@ -713,25 +692,6 @@ export const guidesSidebar: readonly SidebarItem[] = [
       "guides/manage/cloud/egress",
       {
         type: "category",
-        label: "Customer Portal",
-        collapsed: true,
-        link: {
-          type: "generated-index",
-          title: "Overview",
-          slug: "guides/manage/cloud/overview",
-          description:
-            "Our customer portal is used to manage all your ZITADEL instances. You can also manage your subscriptions, billing, newsletters and support requests.",
-        },
-        items: [
-          "guides/manage/cloud/start",
-          "guides/manage/cloud/instances",
-          "guides/manage/cloud/settings",
-          "guides/manage/cloud/billing",
-          "guides/manage/cloud/users",
-        ],
-      },
-      {
-        type: "category",
         label: "Self-Hosted",
         items: [
           "self-hosting/deploy/overview",
@@ -748,7 +708,6 @@ export const guidesSidebar: readonly SidebarItem[] = [
               id: "self-hosting/deploy/kubernetes/index",
             },
             items: [
-              "self-hosting/deploy/kubernetes/installation",
               "self-hosting/deploy/kubernetes/configuration",
               "self-hosting/deploy/kubernetes/ingress",
               "self-hosting/deploy/kubernetes/database",
@@ -768,6 +727,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
                 label: "Production & Operations",
                 collapsed: false,
                 items: [
+                  "self-hosting/manage/requirements",
                   "self-hosting/manage/production",
                   "self-hosting/manage/productionchecklist",
                   "self-hosting/manage/usage_control",
@@ -852,6 +812,8 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "self-hosting/manage/cache",
         ],
       },
+
+      "guides/manage/production-checklist",
     ],
   },
   {
@@ -978,8 +940,8 @@ export const apisSidebar: readonly SidebarItem[] = [
           { type: "category", label: "Instance", items: ["reference/api/instance"] },
           { type: "category", label: "Project", items: ["reference/api/project"] },
           { type: "category", label: "Application", items: ["reference/api/application"] },
-          { type: "category", label: "Authorizations", items: ["reference/api/authorization"] },
-          { type: "category", label: "Internal Permissions", items: ["reference/api/internal_permission"] },
+          { type: "category", label: "Role Assignment", items: ["reference/api/authorization"] },
+          { type: "category", label: "ZITADEL Internal Permissions", items: ["reference/api/internal_permission"] },
         ],
       },
       {
@@ -1026,6 +988,10 @@ export const apisSidebar: readonly SidebarItem[] = [
   {
     type: "category",
     label: "Benchmarks",
+    link: {
+      type: "doc",
+      id: "apis/benchmarks/index",
+    },
     items: [
       {
         type: "category",
@@ -1092,7 +1058,7 @@ export const legalSidebar: readonly SidebarItem[] = [
           title: "Service description",
           slug: "/legal/service-description",
           description:
-            "Description of services and service levels for ZITADEL Cloud and Enterprise subscriptions.",
+            "Detailed description of services, service levels (SLA), and support commitments for ZITADEL Cloud and Enterprise subscriptions to ensure transparency and reliability.",
         },
         items: [
           {
@@ -1115,7 +1081,7 @@ export const legalSidebar: readonly SidebarItem[] = [
           title: "Policies",
           slug: "/legal/policies",
           description:
-            "Policies and guidelines in addition to our terms of services.",
+            "Find all policy documents and guidelines for ZITADEL services, including our privacy policy, acceptable use policy, and other legal frameworks that govern our platform.",
         },
         items: [
           {

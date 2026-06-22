@@ -208,8 +208,15 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	}))
 
 	new_domain.SetLegacyEventstore(eventstoreClient)
+	new_domain.SetSystemConfig(config.SystemDefaults)
+	new_domain.SetIDPEncryptionAlgorithm(keys.IDPConfig)
+	new_domain.SetMFAEncryptionAlgorithm(keys.OTP)
+	new_domain.SetOTPSMSSecretGeneratorConfig(config.DefaultInstance.SecretGenerators.OTPSMS)
+	new_domain.SetOTPEmailSecretGeneratorConfig(config.DefaultInstance.SecretGenerators.OTPEmail)
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
+	sessionTokenDecryptor := internal_authz.SessionTokenDecryptor(keys.OIDC)
+	new_domain.SetSessionTokenDecryptor(sessionTokenDecryptor)
 	cacheConnectors, err := connector.StartConnectors(config.Caches, dbClient)
 	if err != nil {
 		return fmt.Errorf("unable to start caches: %w", err)
@@ -262,6 +269,11 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		DisplayName:    config.WebAuthNName,
 		ExternalSecure: config.ExternalSecure,
 	}
+
+	new_domain.SetWebAuthNConfig(webAuthNConfig)
+
+	httpClient := config.HTTPClient.NewClient()
+
 	commands, err := command.StartCommands(ctx,
 		eventstoreClient,
 		cacheConnectors,
@@ -278,10 +290,10 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.SMS,
 		keys.User,
 		keys.DomainVerification,
-		keys.OIDC,
 		keys.SAML,
 		keys.Target,
-		&http.Client{},
+		keys.OIDC,
+		httpClient,
 		permissionCheck,
 		sessionTokenVerifier,
 		config.OIDC.DefaultAccessTokenLifetime,
@@ -289,6 +301,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		config.OIDC.DefaultRefreshTokenIdleExpiration,
 		config.DefaultInstance.SecretGenerators,
 		config.Login.DefaultPaths,
+		config.HTTPClient.DenyList,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
@@ -334,12 +347,14 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.SMTP,
 		keys.SMS,
 		q,
+		httpClient,
 	)
 	notification.Start(ctx)
 
 	execution.Register(
 		ctx,
 		config.Executions,
+		httpClient,
 		q,
 		keys.Target,
 		queries.GetActiveSigningWebKey,
@@ -379,6 +394,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys,
 		permissionCheck,
 		cacheConnectors,
+		httpClient,
 	)
 	if err != nil {
 		return err
@@ -424,6 +440,7 @@ func startAPIs(
 	keys *encryption.EncryptionKeys,
 	permissionCheck domain.PermissionCheck,
 	cacheConnectors connector.Connectors,
+	httpClient *http.Client,
 ) (*api.API, error) {
 	repo := struct {
 		authz_repo.Repository
@@ -433,8 +450,11 @@ func startAPIs(
 		queries,
 	}
 	oidcPrefixes := []string{"/.well-known/openid-configuration", "/oidc/v1", "/oauth/v2"}
-	// always set the origin in the context if available in the http headers, no matter for what protocol
-	router.Use(middleware.WithOrigin(config.ExternalSecure, config.HTTP1HostHeader, config.HTTP2HostHeader, config.InstanceHostHeaders, config.PublicHostHeaders))
+	router.Use(
+		middleware.FallbackRecoverHandler(),
+		// always set the origin in the context if available in the http headers, no matter for what protocol
+		middleware.WithOrigin(config.ExternalSecure, config.HTTP1HostHeader, config.HTTP2HostHeader, config.InstanceHostHeaders, config.PublicHostHeaders),
+	)
 	systemTokenVerifier, err := internal_authz.StartSystemTokenVerifierFromConfig(http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
 	if err != nil {
 		return nil, err
@@ -478,6 +498,7 @@ func startAPIs(
 		keys.Target,
 		translator,
 		config.Instrumentation.Trace.TrustRemoteSpans,
+		httpClient,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error creating api %w", err)
@@ -660,13 +681,29 @@ func startAPIs(
 		config.Log.Slog(),
 		config.SystemDefaults.SecretHasher,
 		federatedLogoutsCache,
+		httpClient,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start oidc provider: %w", err)
 	}
 	apis.RegisterHandlerPrefixes(oidcServer, oidcPrefixes...)
 
-	samlProvider, err := saml.NewProvider(config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, keys.Target, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor, limitingAccessInterceptor)
+	samlProvider, err := saml.NewProvider(
+		config.SAML,
+		config.ExternalSecure,
+		commands,
+		queries,
+		authRepo,
+		keys.OIDC,
+		keys.SAML,
+		keys.Target,
+		eventstore,
+		dbClient,
+		instanceInterceptor.Handler,
+		userAgentInterceptor,
+		limitingAccessInterceptor,
+		httpClient,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start saml provider: %w", err)
 	}
@@ -682,7 +719,7 @@ func startAPIs(
 			&config.SCIM,
 			translator,
 			instanceInterceptor.HandlerFuncWithError,
-			middleware.AuthorizationInterceptor(verifier, config.SystemAuthZ, config.InternalAuthZ).HandlerFuncWithError))
+			middleware.AuthorizationInterceptor(verifier, config.SystemAuthZ, config.InternalAuthZ).HandlerFuncWithError(schemas.HandlerPrefix)))
 
 	c, err := console.Start(config.Console, config.ExternalSecure, oidcServer.IssuerFromRequest, middleware.CallDurationHandler, instanceInterceptor.Handler, limitingAccessInterceptor, config.CustomerPortal)
 	if err != nil {
@@ -711,6 +748,7 @@ func startAPIs(
 		keys.CSRFCookieKey,
 		cacheConnectors,
 		federatedLogoutsCache,
+		httpClient,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start login: %w", err)

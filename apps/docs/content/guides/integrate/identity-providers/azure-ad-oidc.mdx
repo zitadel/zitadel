@@ -1,5 +1,6 @@
 ---
-title: Configure Entra ID as an Identity Provider in ZITADEL
+title: Set up Entra ID as an Identity Provider in ZITADEL
+description: "Configure Microsoft Entra ID (formerly Azure AD) as an OIDC identity provider for enterprise Single Sign-On."
 sidebar_label: Entra ID
 ---
 
@@ -47,11 +48,11 @@ Generate a new client secret to authenticate your user.
 
 ![](../../../../public/img/guides/azure_client_secret.png)
 
-### Token configuration
+### Token settings
 
 To allow ZITADEL to get the information from the authenticating user you have to configure what kind of optional claims should be returned in the token.
 
-1. Click on Token configuration in the side menu
+1. Click on Token settings in the side menu
 2. Click on "+ Add optional claim"
 3. Add email, family_name (last name of the user), given_name (first name of the user) and preferred_username to the id token
 
@@ -67,7 +68,7 @@ To be able to get all the information that ZITADEL needs, you have to configure 
 
 ![](../../../../public/img/guides/azure_api_permissions.png)
 
-## ZITADEL Configuration
+## ZITADEL Setup
 
 Go back [to the Microsoft provider template you opened before in ZITADEL](#open-the-microsoft-identity-provider-template).
 Add the [client ID and secret created before on your Entra ID application](#add-client-secret).
@@ -89,7 +90,7 @@ In this case, configure "Accounts in any organizational directory and personal M
 - Organizations: Choose organization if you have Entra ID Tenants and no personal accounts. (You have configured either "Accounts in this organization" or "Accounts in any organizational directory" on your Azure APP)
 - Consumers: Choose this if you want to allow public accounts. (In your Entra ID App you have configured "Personal Microsoft accounts only")
 
-**Tenant ID**: If you have selected *Tenant ID* as *Tenant Type*, you have to enter the *Directory (Tenant) ID* into the *Tenant ID* field, copied previously from the Azure App configuration.
+**Tenant ID**: If you have selected *Tenant ID* as *Tenant Type*, you have to enter the *Directory (Tenant) ID* into the *Tenant ID* field, copied previously from the Azure App settings.
 
 <GeneralConfigDescription components={props.components}  provider_account="Microsoft account" />
 

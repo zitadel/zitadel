@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -18,9 +19,13 @@ import (
 var _ domain.SessionRepository = (*session)(nil)
 
 type session struct {
-	factorRepo    sessionFactor
-	metadataRepo  sessionMetadata
-	userAgentRepo sessionUserAgent
+	factorRepo     sessionFactor
+	metadataRepo   sessionMetadata
+	userAgentRepo  sessionUserAgent
+	userRepo       user
+	loginNamesRepo userLoginName
+	// shouldLoadUser loads a part of the user data (display name, organization ID and login names)
+	shouldLoadUser bool
 }
 
 func (s session) qualifiedTableName() string {
@@ -77,6 +82,9 @@ SELECT
 			, 'headers', session_user_agents.headers
 		)
 	END as user_agent
+	, users.organization_id 
+	, jsonb_agg(DISTINCT jsonb_build_object('loginName', login_names.login_name, 'isPreferred', login_names.is_preferred)) FILTER (WHERE login_names.user_id IS NOT NULL) AS login_names
+	, users.display_name
 	FROM zitadel.sessions`
 
 // Get implements [domain.SessionRepository].
@@ -85,6 +93,8 @@ func (s session) Get(ctx context.Context, client database.QueryExecutor, opts ..
 		s.joinFactors(),
 		s.joinMetadata(),
 		s.joinUserAgent(),
+		s.joinUser(),
+		s.joinLoginNames(),
 		database.WithGroupBy(
 			s.InstanceIDColumn(),
 			s.IDColumn(),
@@ -92,6 +102,8 @@ func (s session) Get(ctx context.Context, client database.QueryExecutor, opts ..
 			s.userAgentRepo.descriptionColumn(),
 			s.userAgentRepo.ipColumn(),
 			s.userAgentRepo.headersColumn(),
+			s.userRepo.organizationIDColumn(),
+			s.userRepo.Human().DisplayNameColumn(),
 		),
 	)
 
@@ -117,6 +129,8 @@ func (s session) List(ctx context.Context, client database.QueryExecutor, opts .
 		s.joinFactors(),
 		s.joinMetadata(),
 		s.joinUserAgent(),
+		s.joinUser(),
+		s.joinLoginNames(),
 		database.WithGroupBy(
 			s.InstanceIDColumn(),
 			s.IDColumn(),
@@ -124,6 +138,8 @@ func (s session) List(ctx context.Context, client database.QueryExecutor, opts .
 			s.userAgentRepo.descriptionColumn(),
 			s.userAgentRepo.ipColumn(),
 			s.userAgentRepo.headersColumn(),
+			s.userRepo.organizationIDColumn(),
+			s.userRepo.Human().DisplayNameColumn(),
 		),
 	)
 
@@ -176,7 +192,9 @@ func (s session) Create(ctx context.Context, client database.QueryExecutor, sess
 		)
 		fingerprintID = session.UserAgent.FingerprintID
 	}
-	builder.WriteString(`INSERT INTO ` + s.qualifiedTableName() + ` (instance_id, id, lifetime, creator_id, user_agent_id, created_at, updated_at) VALUES ( `)
+	builder.WriteString(`INSERT INTO `)
+	builder.WriteString(s.qualifiedTableName())
+	builder.WriteString(` (instance_id, id, lifetime, creator_id, user_agent_id, created_at, updated_at) VALUES ( `)
 	builder.WriteArgs(session.InstanceID, session.ID, session.Lifetime, session.CreatorID, fingerprintID, createdAt, updatedAt)
 	builder.WriteString(` ) RETURNING created_at, updated_at`)
 	return client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&session.CreatedAt, &session.UpdatedAt)
@@ -226,14 +244,45 @@ func sessionCTE(change database.Change, i, j int, builder *database.StatementBui
 }
 
 // Delete implements [domain.SessionRepository].
-func (s session) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition) (int64, error) {
+func (s session) Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, time.Time, error) {
 	if !condition.IsRestrictingColumn(s.InstanceIDColumn()) {
-		return 0, database.NewMissingConditionError(s.InstanceIDColumn())
+		return 0, time.Time{}, database.NewMissingConditionError(s.InstanceIDColumn())
 	}
 	var builder database.StatementBuilder
-	builder.WriteString("DELETE FROM zitadel.sessions")
+	builder.WriteString("WITH gatekeeper AS (SELECT count(*) as total_found, MAX(sessions.deleted_at) as deleted_at FROM (SELECT instance_id, user_id, token_id, now() as deleted_at FROM zitadel.sessions")
 	writeCondition(&builder, condition)
-	return client.Exec(ctx, builder.String(), builder.Args()...)
+	// In case the deletion is intended for a specific session,
+	// we'll also include already deleted session to check the permission against,
+	// and to return the deleted_at timestamp from the previous deletion in case the session was already deleted.
+	if condition.IsRestrictingColumn(s.IDColumn()) {
+		builder.WriteString(" UNION ALL SELECT instance_id, user_id, token_id, deleted_at FROM zitadel.archived_sessions as sessions")
+		writeCondition(&builder, condition)
+	}
+	// join the users table to get the user's organization, which will be needed for checking the permission
+	builder.WriteString(") as sessions")
+	if permissionCondition != nil {
+		builder.WriteString(" LEFT JOIN zitadel.users ON users.instance_id = sessions.instance_id AND users.id = sessions.user_id HAVING (bool_and(")
+		permissionCondition.Write(&builder)
+		builder.WriteString(") AND count(*) > 0) or zitadel.throw_not_permitted()") //TODO: change throw_not_permitted to actual permission check
+	}
+	builder.WriteString("), execution AS (DELETE FROM zitadel.sessions")
+	writeCondition(&builder, condition)
+	builder.WriteString(" and exists (SELECT 1 FROM gatekeeper) RETURNING 1 AS rows_affected) SELECT (CASE WHEN gatekeeper.total_found = 1 THEN gatekeeper.deleted_at END) as deleted_at, (SELECT count(*) FROM execution) as rows_affected FROM gatekeeper")
+	var deletedAt database.Null[time.Time]
+	var deletedSessions int64
+	if err := client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&deletedAt, &deletedSessions); err != nil {
+		// If the criteria did not match any session, ignore the error since the user would have had the permission to delete the session,
+		if errors.Is(err, new(database.NoRowFoundError)) {
+			return 0, time.Time{}, nil
+		}
+		return 0, time.Time{}, err
+	}
+	return deletedSessions, deletedAt.V, nil
+}
+
+// LoadUserData implements [domain.SessionRepository].
+func (s session) LoadUserData() domain.SessionRepository {
+	return &session{shouldLoadUser: true}
 }
 
 // -------------------------------------------------------------
@@ -425,6 +474,11 @@ func (s session) UserIDCondition(userID string) database.Condition {
 	return database.NewTextCondition(s.UserIDColumn(), database.TextOperationEqual, userID)
 }
 
+// TokenIDCondition implements [domain.sessionConditions].
+func (s session) TokenIDCondition(tokenID string) database.Condition {
+	return database.NewTextCondition(s.TokenIDColumn(), database.TextOperationEqual, tokenID)
+}
+
 // CreatorIDCondition implements [domain.sessionConditions].
 func (s session) CreatorIDCondition(creatorID string) database.Condition {
 	return database.NewTextCondition(s.CreatorIDColumn(), database.TextOperationEqual, creatorID)
@@ -547,13 +601,14 @@ func (s session) UpdatedAtColumn() database.Column {
 
 type rawSession struct {
 	*domain.Session
-	TokenID    *string                           `json:"tokenID" db:"token_id"`
-	Lifetime   *time.Duration                    `json:"lifetime" db:"lifetime"`
-	Expiration *time.Time                        `json:"expiration" db:"expiration"`
-	UserID     *string                           `json:"userID" db:"user_id"`
-	CreatorID  *string                           `json:"creatorID" db:"creator_id"`
-	Factors    JSONArray[rawFactor]              `json:"factors,omitempty" db:"factors"`
-	Metadata   JSONArray[domain.SessionMetadata] `json:"metadata,omitempty" db:"metadata"`
+	TokenID    *string                            `json:"tokenID" db:"token_id"`
+	Lifetime   *time.Duration                     `json:"lifetime" db:"lifetime"`
+	Expiration *time.Time                         `json:"expiration" db:"expiration"`
+	UserID     *string                            `json:"userID" db:"user_id"`
+	CreatorID  *string                            `json:"creatorID" db:"creator_id"`
+	Factors    JSONArray[*rawFactor]              `json:"factors,omitempty" db:"factors"`
+	Metadata   JSONArray[*domain.SessionMetadata] `json:"metadata,omitempty" db:"metadata"`
+	LoginNames JSONArray[*domain.LoginName]       `json:"login_names,omitempty" db:"login_names"`
 }
 
 func scanSession(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Session, error) {
@@ -597,6 +652,13 @@ func rawSessionToDomain(raw *rawSession) (*domain.Session, error) {
 	raw.Session.Expiration = gu.Value(raw.Expiration)
 	raw.Session.UserID = gu.Value(raw.UserID)
 	raw.Session.CreatorID = gu.Value(raw.CreatorID)
+
+	for _, ln := range raw.LoginNames {
+		if ln.IsPreferred {
+			raw.UserPreferredLoginName = ln.LoginName
+			break
+		}
+	}
 
 	for _, factor := range raw.Factors {
 		f, ch, err := factor.ToDomain()
@@ -650,6 +712,36 @@ func (s session) joinMetadata() database.QueryOption {
 	)
 	return database.WithLeftJoin(
 		s.metadataRepo.qualifiedTableName(),
+		database.And(columns...),
+	)
+}
+
+func (s session) joinUser() database.QueryOption {
+	columns := make([]database.Condition, 2, 3)
+	columns[0] = database.NewColumnCondition(s.InstanceIDColumn(), s.userRepo.InstanceIDColumn())
+	columns[1] = database.NewColumnCondition(s.UserIDColumn(), s.userRepo.IDColumn())
+
+	if !s.shouldLoadUser {
+		columns = append(columns, database.IsNull(s.userRepo.IDColumn()))
+	}
+
+	return database.WithLeftJoin(
+		s.userRepo.qualifiedTableName(),
+		database.And(columns...),
+	)
+}
+
+func (s session) joinLoginNames() database.QueryOption {
+	columns := make([]database.Condition, 2, 3)
+	columns[0] = database.NewColumnCondition(s.InstanceIDColumn(), s.loginNamesRepo.instanceIDColumn())
+	columns[1] = database.NewColumnCondition(s.UserIDColumn(), s.loginNamesRepo.userIDColumn())
+
+	if !s.shouldLoadUser {
+		columns = append(columns, database.IsNull(s.loginNamesRepo.loginNameColumn()))
+	}
+
+	return database.WithLeftJoin(
+		s.loginNamesRepo.qualifiedTableName(),
 		database.And(columns...),
 	)
 }

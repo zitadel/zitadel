@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
@@ -66,6 +67,7 @@ type Storage struct {
 	defaultLoginURL   string
 	defaultLoginURLv2 string
 	contextToIssuer   func(context.Context) string
+	httpClient        *http.Client
 }
 
 func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*serviceprovider.ServiceProvider, error) {
@@ -380,7 +382,7 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 			apiFields,
 			action.Script,
 			action.Name,
-			append(actions.ActionToOptions(action), actions.WithHTTP(actionCtx))...,
+			append(actions.ActionToOptions(action), actions.WithHTTP(actionCtx, p.httpClient))...,
 		)
 		cancel()
 		if err != nil {
@@ -401,7 +403,7 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 		UserGrants: userGrants.UserGrants,
 	}
 
-	resp, err := execution.CallTargets(ctx, executionTargets, info, p.targetEncAlg, p.query.GetActiveSigningWebKey)
+	resp, err := execution.CallTargets(ctx, executionTargets, info, p.targetEncAlg, p.query.GetActiveSigningWebKey, p.httpClient)
 	if err != nil {
 		return nil, err
 	}

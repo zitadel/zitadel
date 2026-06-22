@@ -1,5 +1,6 @@
 ---
 title: Claims in ZITADEL
+description: "Standard OIDC and custom claims issued by ZITADEL in ID tokens, access tokens, and via the Userinfo endpoint."
 sidebar_label: Claims
 ---
 
@@ -86,21 +87,15 @@ Multiple examples of Actions that result in custom claims can be found in our [M
 
 ### Static values as custom claim
 
-```javascript reference
-https://github.com/zitadel/actions/blob/de69b56f6d0463817953b59a52ffd6afc6a366fb/examples/add_claim.js#L9-L11
-```
+<GithubCodeBlock url="https://github.com/zitadel/actions/blob/de69b56f6d0463817953b59a52ffd6afc6a366fb/examples/add_claim.js#L9-L11" />
 
 ### Metadata as custom claim
 
-```javascript reference
-https://github.com/zitadel/actions/blob/main/examples/add_metadata.js#L9-L15
-```
+<GithubCodeBlock url="https://github.com/zitadel/actions/blob/main/examples/add_metadata.js#L9-L15" />
 
 ### Format roles claims
 
-```javascript reference
-https://github.com/zitadel/actions/blob/main/examples/custom_roles.js#L20-L33
-```
+<GithubCodeBlock url="https://github.com/zitadel/actions/blob/main/examples/custom_roles.js#L20-L33" />
 
 ## Reserved Claims
 
@@ -109,10 +104,10 @@ ZITADEL reserves some claims to assert certain data. Please check out the [reser
 | Claims                                            | Example                                                                                                  | Description                                                                                                                                                                                                                                   |
 |:--------------------------------------------------|:---------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | urn:zitadel:iam:action:\{actionname}:log          | `{"urn:zitadel:iam:action:appendCustomClaims:log": ["test log", "another test log"]}`                    | This claim is set during Actions as a log, e.g. if two custom claims with the same keys are set.                                                                                                                                              |
-| urn:zitadel:iam:org:domain:primary:\{domainname}  | `{"urn:zitadel:iam:org:domain:primary": "acme.ch"}`                                                      | This claim represents the primary domain of the organization the user belongs to.                                                                                                                                                             |
+| urn:zitadel:iam:org:domain:primary:\{domainname}  | `{"urn:zitadel:iam:org:domain:primary": "acme.ch"}`                                                      | This claim represents the Organization Domain the user belongs to.                                                                                                                                                             |
 | urn:zitadel:iam:org:project:roles                 | `{"urn:zitadel:iam:org:project:roles": [ {"user": {"id1": "acme.zitade.ch", "id2": "caos.ch"} } ] }`     | When roles are asserted, ZITADEL does this by providing the `id` and `primaryDomain` below the role. This gives you the option to check in which organization a user has the role on the current project (where your application belongs to). |
 | urn:zitadel:iam:org:project:\{projectid}:roles    | `{"urn:zitadel:iam:org:project:id3:roles": [ {"user": {"id1": "acme.zitade.ch", "id2": "caos.ch"} } ] }` | When roles are asserted, ZITADEL does this by providing the `id` and `primaryDomain` below the role. This gives you the option to check in which organization a user has the role on a specific project.                                      |
 | urn:zitadel:iam:user:metadata                     | `{"urn:zitadel:iam:user:metadata": [ {"key": "VmFsdWU=" } ] }`                                           | The metadata claim will include all metadata of a user. The values are base64 encoded.                                                                                                                                                        |
 | urn:zitadel:iam:user:resourceowner:id             | `{"urn:zitadel:iam:user:resourceowner:id": "orgid"}`                                                     | This claim represents the user's organization ID.                                                                                                                                                                                             |
 | urn:zitadel:iam:user:resourceowner:name           | `{"urn:zitadel:iam:user:resourceowner:name": "ACME"}`                                                    | This claim represents the user's organization's name.                                                                                                                                                                                         |
-| urn:zitadel:iam:user:resourceowner:primary_domain | `{"urn:zitadel:iam:user:resourceowner:primary_domain": "acme.ch"}`                                       | This claim represents the user's organization's primary domain.                                                                                                                                                                               |
+| urn:zitadel:iam:user:resourceowner:primary_domain | `{"urn:zitadel:iam:user:resourceowner:primary_domain": "acme.ch"}`                                       | This claim represents the user's Organization Domain.                                                                                                                                                                               |

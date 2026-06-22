@@ -30,6 +30,7 @@ const (
 	IDPTemplateLDAPTable             = IDPTemplateTable + "_" + IDPTemplateLDAPSuffix
 	IDPTemplateAppleTable            = IDPTemplateTable + "_" + IDPTemplateAppleSuffix
 	IDPTemplateSAMLTable             = IDPTemplateTable + "_" + IDPTemplateSAMLSuffix
+	IDPTemplateZitadelTable          = IDPTemplateTable + "_" + IDPTemplateZitadelSuffix
 
 	IDPTemplateOAuthSuffix            = "oauth2"
 	IDPTemplateOIDCSuffix             = "oidc"
@@ -43,6 +44,7 @@ const (
 	IDPTemplateLDAPSuffix             = "ldap2"
 	IDPTemplateAppleSuffix            = "apple"
 	IDPTemplateSAMLSuffix             = "saml"
+	IDPTemplateZitadelSuffix          = "zitadel"
 
 	IDPTemplateIDCol                = "id"
 	IDPTemplateCreationDateCol      = "creation_date"
@@ -87,6 +89,7 @@ const (
 	JWTEndpointCol     = "jwt_endpoint"
 	JWTKeysEndpointCol = "keys_endpoint"
 	JWTHeaderNameCol   = "header_name"
+	JWTAudienceCol     = "audience"
 
 	AzureADIDCol           = "idp_id"
 	AzureADInstanceIDCol   = "instance_id"
@@ -175,6 +178,14 @@ const (
 	SAMLNameIDFormatCol               = "name_id_format"
 	SAMLTransientMappingAttributeName = "transient_mapping_attribute_name"
 	SAMLFederatedLogoutEnabled        = "federated_logout_enabled"
+
+	ZitadelIDCol                = "idp_id"
+	ZitadelInstanceIDCol        = "instance_id"
+	ZitadelIssuerCol            = "issuer"
+	ZitadelClientIDCol          = "client_id"
+	ZitadelClientSecretCol      = "client_secret"
+	ZitadelScopesCol            = "scopes"
+	ZitadelInstanceRolesInfoCol = "instance_roles_info"
 )
 
 type idpTemplateProjection struct{}
@@ -248,6 +259,7 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			handler.NewColumn(JWTEndpointCol, handler.ColumnTypeText),
 			handler.NewColumn(JWTKeysEndpointCol, handler.ColumnTypeText),
 			handler.NewColumn(JWTHeaderNameCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(JWTAudienceCol, handler.ColumnTypeText, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(JWTInstanceIDCol, JWTIDCol),
 			IDPTemplateJWTSuffix,
@@ -386,6 +398,19 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			IDPTemplateSAMLSuffix,
 			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(ZitadelIDCol, handler.ColumnTypeText),
+			handler.NewColumn(ZitadelInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(ZitadelIssuerCol, handler.ColumnTypeText),
+			handler.NewColumn(ZitadelClientIDCol, handler.ColumnTypeText),
+			handler.NewColumn(ZitadelClientSecretCol, handler.ColumnTypeJSONB),
+			handler.NewColumn(ZitadelScopesCol, handler.ColumnTypeTextArray, handler.Nullable()),
+			handler.NewColumn(ZitadelInstanceRolesInfoCol, handler.ColumnTypeJSONB, handler.Nullable()),
+		},
+			handler.NewPrimaryKey(ZitadelInstanceIDCol, ZitadelIDCol),
+			IDPTemplateZitadelSuffix,
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
+		),
 	)
 }
 
@@ -521,6 +546,10 @@ func (p *idpTemplateProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.SAMLIDPChangedEventType,
 					Reduce: p.reduceSAMLIDPChanged,
+				},
+				{
+					Event:  instance.ZitadelIDPAddedEventType,
+					Reduce: p.reduceZitadelIDPAdded,
 				},
 				{
 					Event:  instance.IDPConfigRemovedEventType,
@@ -666,6 +695,10 @@ func (p *idpTemplateProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  org.SAMLIDPChangedEventType,
 					Reduce: p.reduceSAMLIDPChanged,
+				},
+				{
+					Event:  org.ZitadelIDPAddedEventType,
+					Reduce: p.reduceZitadelIDPAdded,
 				},
 				{
 					Event:  org.IDPConfigRemovedEventType,
@@ -1015,6 +1048,7 @@ func (p *idpTemplateProjection) reduceJWTIDPAdded(event eventstore.Event) (*hand
 				handler.NewCol(JWTEndpointCol, idpEvent.JWTEndpoint),
 				handler.NewCol(JWTKeysEndpointCol, idpEvent.KeysEndpoint),
 				handler.NewCol(JWTHeaderNameCol, idpEvent.HeaderName),
+				handler.NewCol(JWTAudienceCol, idpEvent.Audience),
 			},
 			handler.WithTableSuffix(IDPTemplateJWTSuffix),
 		),
@@ -2309,6 +2343,9 @@ func reduceJWTIDPChangedColumns(idpEvent idp.JWTIDPChangedEvent) []handler.Colum
 	if idpEvent.Issuer != nil {
 		jwtCols = append(jwtCols, handler.NewCol(JWTIssuerCol, *idpEvent.Issuer))
 	}
+	if idpEvent.Audience != nil {
+		jwtCols = append(jwtCols, handler.NewCol(JWTAudienceCol, *idpEvent.Audience))
+	}
 	return jwtCols
 }
 
@@ -2538,4 +2575,58 @@ func reduceSAMLIDPChangedColumns(idpEvent idp.SAMLIDPChangedEvent) []handler.Col
 		SAMLCols = append(SAMLCols, handler.NewCol(SAMLFederatedLogoutEnabled, *idpEvent.FederatedLogoutEnabled))
 	}
 	return SAMLCols
+}
+
+func (p *idpTemplateProjection) reduceZitadelIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.ZitadelIDPAddedEvent
+	var idpOwnerType domain.IdentityProviderType
+	switch e := event.(type) {
+	case *instance.ZitadelIDPAddedEvent:
+		idpEvent = e.ZitadelIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeSystem
+	case *org.ZitadelIDPAddedEvent:
+		idpEvent = e.ZitadelIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeOrg
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ZCpH41", "reduce.wrong.event.type %v", []eventstore.EventType{instance.ZitadelIDPAddedEventType, org.ZitadelIDPAddedEventType})
+	}
+
+	zitadelIDPCols := []handler.Column{
+		handler.NewCol(ZitadelIDCol, idpEvent.ID),
+		handler.NewCol(ZitadelInstanceIDCol, idpEvent.Aggregate().InstanceID),
+		handler.NewCol(ZitadelIssuerCol, idpEvent.Issuer),
+		handler.NewCol(ZitadelClientIDCol, idpEvent.ClientID),
+		handler.NewCol(ZitadelClientSecretCol, idpEvent.ClientSecret),
+		handler.NewCol(ZitadelScopesCol, database.TextArray[string](idpEvent.Scopes)),
+	}
+	if len(idpEvent.InstanceRolesInfo) > 0 {
+		zitadelIDPCols = append(zitadelIDPCols, handler.NewJSONCol(ZitadelInstanceRolesInfoCol, idpEvent.InstanceRolesInfo))
+	}
+
+	return handler.NewMultiStatement(
+		&idpEvent,
+		handler.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
+				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeZitadel),
+				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
+				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
+			},
+		),
+		handler.AddCreateStatement(
+			zitadelIDPCols,
+			handler.WithTableSuffix(IDPTemplateZitadelSuffix),
+		),
+	), nil
 }

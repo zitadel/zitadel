@@ -59,7 +59,7 @@ func (g *GroupWriteModel) Reduce() error {
 	for _, event := range g.Events {
 		switch e := event.(type) {
 		case *group.GroupAddedEvent:
-			g.AggregateID = e.ID
+			g.AggregateID = e.Aggregate().ID
 			g.Name = e.Name
 			g.Description = e.Description
 			g.State = domain.GroupStateActive
@@ -71,6 +71,10 @@ func (g *GroupWriteModel) Reduce() error {
 				g.Description = *e.Description
 			}
 		case *group.GroupRemovedEvent:
+			g.Name = ""
+			g.Description = ""
+			g.UserIDs = nil
+			g.existingUserIDs = make(map[string]struct{})
 			g.State = domain.GroupStateRemoved
 		case *group.GroupUsersAddedEvent:
 			for _, userID := range e.UserIDs {

@@ -19,6 +19,7 @@ import (
 	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/cache/connector"
@@ -26,6 +27,7 @@ import (
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/execution"
@@ -63,6 +65,7 @@ type Config struct {
 	WebAuthNName    string
 	Telemetry       *handlers.TelemetryPusherConfig
 	SystemAPIUsers  map[string]*authz.SystemAPIUser
+	HTTPClient      http.ClientConfig
 }
 
 type InitProjections struct {
@@ -81,6 +84,7 @@ func NewConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.Shu
 			hooks.MapTypeStringDecode[string, *authz.SystemAPIUser],
 			hooks.MapHTTPHeaderStringDecode,
 			database.DecodeHook(false),
+			denylist.DenyListDecodeHook,
 			actions.HTTPConfigDecodeHook,
 			hook.EnumHookFunc(authz.MemberTypeString),
 			hook.Base64ToBytesHookFunc(),
@@ -102,7 +106,7 @@ func NewConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.Shu
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to start instrumentation: %w", err)
 	}
-	cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamReady))
+	cmd.SetContext(logging.NewCtx(cmd.Context(), logging.StreamRuntime))
 
 	err = config.Log.SetLogger()
 	if err != nil {
@@ -111,6 +115,8 @@ func NewConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.Shu
 	}
 
 	id.Configure(config.Machine)
+
+	config.HTTPClient.MergeDeprecatedDenylists(nil, config.Executions.DenyList)
 
 	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.
 	config.DefaultInstance.RolePermissionMappings = config.InternalAuthZ.RolePermissionMappings
@@ -183,6 +189,9 @@ type Steps struct {
 	s67SyncMemberRoleFields                 *SyncMemberRoleFields
 	s68TargetAddPayloadTypeColumn           *TargetAddPayloadTypeColumn
 	s69CacheTablesLogged                    *CacheTablesLogged
+	s70AddEventStoreCommandEnforceOwner     *AddEventStoreCommandEnforceOwnerColumn
+	s71JWTProvideAddAudienceColumn          *JWTProvideAddAudienceColumn
+	RelationalTables                        *TransactionalTables
 }
 
 func NewSteps(ctx context.Context, v *viper.Viper) (*Steps, error) {

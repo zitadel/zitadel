@@ -1,235 +1,182 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { GenericContainer, type StartedTestContainer, Network, Wait } from "testcontainers";
+import {
+  GenericContainer,
+  type StartedTestContainer,
+  Network,
+  Wait,
+} from "testcontainers";
 import type { StartedNetwork } from "testcontainers";
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
-import * as esbuild from "esbuild";
 import { generateCertificates } from "./utils/tls.ts";
 
 const TEST_DIR = path.dirname(new URL(import.meta.url).pathname);
-const OUTPUT_DIR = path.join(TEST_DIR, "output");
-const CERTS_DIR = path.join(OUTPUT_DIR, "certs");
 const LOGIN_APP_DIR = path.join(TEST_DIR, "../..");
 
-async function bundleMockServer(): Promise<string> {
-  const bundleDir = path.join(OUTPUT_DIR, "bundle");
-  fs.mkdirSync(bundleDir, { recursive: true });
-
-  const outfile = path.join(bundleDir, "mock-server.js");
-  await esbuild.build({
-    entryPoints: [path.join(TEST_DIR, "mock-server.ts")],
-    bundle: true,
-    platform: "node",
-    target: "node22",
-    outfile,
-    format: "cjs",
-  });
-
-  return outfile;
-}
-
-function readCapturedRequests(): Array<{ method: string; url: string; tlsConnected: boolean }> {
-  const filePath = path.join(OUTPUT_DIR, "requests.json");
-  if (!fs.existsSync(filePath)) {
-    return [];
-  }
-  return JSON.parse(fs.readFileSync(filePath, "utf-8"));
-}
+const SMOCKER_MOCK_PORT = 443;
+const SMOCKER_ADMIN_PORT = 8081;
 
 /**
  * Integration tests for custom CA certificate support in the login application.
  *
- * These tests verify that the Dockerfile correctly configures Node.js to trust custom
- * Certificate Authorities via the SSL_CERT_FILE environment variable and the
- * NODE_OPTIONS=--use-openssl-ca flag. This is essential for deployments where the
- * ZITADEL API is served behind a TLS-terminating proxy using internal or self-signed
- * certificates.
+ * These tests verify that the Dockerfile correctly configures Node.js to trust
+ * custom Certificate Authorities via SSL_CERT_FILE, SSL_CERT_DIR, and the
+ * load-ssl-cert-dir.cjs preload script.
  *
- * The test suite spins up a mock TLS server with a self-signed certificate inside a
- * Docker network. The login application container connects to this mock server, and
- * the tests verify that TLS connections succeed when the custom CA is mounted and
- * fail when it is not. The mock server records all incoming requests to a shared
- * volume, allowing the tests to verify that TLS handshakes completed successfully.
+ * OpenSSL (used by Node with --use-openssl-ca) only reads certs from
+ * SSL_CERT_DIR when they have hashed filenames (e.g. "9d66eef0.0").  Go's
+ * crypto/x509 reads any file.  The preload script bridges this gap so that
+ * operators get the same behaviour with both the Go backend and the login
+ * container.
  *
- * The Docker network ensures container-to-container communication uses internal DNS
- * resolution, avoiding port conflicts on the host machine and ensuring reliable
- * execution in CI environments.
+ * We use Smocker as a TLS server whose certificate is signed by a test CA
+ * that is NOT in the system trust store.  Each test block configures the
+ * login container differently and asserts whether the TLS handshake to
+ * Smocker succeeds or fails — verifying actual trust-store behaviour, not
+ * just environment variable values.
  */
+const LOGIN_IMAGE_TAG = `zitadel-login-test:${process.env.GITHUB_SHA || "local"}`;
+
+async function testTlsConnection(
+  container: StartedTestContainer,
+  url: string,
+): Promise<{ exitCode: number; output: string }> {
+  return container.exec([
+    "node",
+    "-e",
+    `fetch('${url}').then(() => process.exit(0)).catch(() => process.exit(1))`,
+  ]);
+}
+
 describe("Custom CA Certificate Integration", () => {
-  let certs: ReturnType<typeof generateCertificates>;
   let network: StartedNetwork;
   let mockServer: StartedTestContainer;
-  let mockServerBundle: string;
-  let loginImage: GenericContainer;
+  let certsDir: string;
 
   beforeAll(async () => {
-    if (fs.existsSync(OUTPUT_DIR)) {
-      fs.rmSync(OUTPUT_DIR, { recursive: true });
-    }
-    fs.mkdirSync(CERTS_DIR, { recursive: true });
+    certsDir = fs.mkdtempSync(path.join(os.tmpdir(), "ca-test-certs-"));
 
-    certs = generateCertificates();
-
-    fs.writeFileSync(path.join(CERTS_DIR, "ca.crt"), certs.ca.cert);
-    fs.writeFileSync(path.join(CERTS_DIR, "server.key"), certs.server.key);
-    fs.writeFileSync(path.join(CERTS_DIR, "server.crt"), certs.server.cert);
-
-    mockServerBundle = await bundleMockServer();
+    const certs = generateCertificates();
+    fs.writeFileSync(path.join(certsDir, "ca.crt"), certs.ca.cert);
+    fs.writeFileSync(path.join(certsDir, "server.key"), certs.server.key);
+    fs.writeFileSync(path.join(certsDir, "server.crt"), certs.server.cert);
 
     network = await new Network().start();
 
-    mockServer = await new GenericContainer("node:22-alpine")
+    mockServer = await new GenericContainer("ghcr.io/smocker-dev/smocker")
       .withNetwork(network)
       .withNetworkAliases("mock-zitadel")
-      .withCopyFilesToContainer([
-        { source: mockServerBundle, target: "/app/server.js" },
-        { source: path.join(CERTS_DIR, "server.key"), target: "/certs/server.key" },
-        { source: path.join(CERTS_DIR, "server.crt"), target: "/certs/server.crt" },
-      ])
-      .withBindMounts([{ source: OUTPUT_DIR, target: "/output" }])
-      .withCommand(["node", "/app/server.js"])
-      .withExposedPorts(443)
-      .withWaitStrategy(Wait.forLogMessage("Mock TLS server listening"))
+      .withBindMounts([{ source: certsDir, target: "/certs", mode: "ro" }])
+      .withEnvironment({
+        SMOCKER_MOCK_SERVER_LISTEN_PORT: "443",
+        SMOCKER_CONFIG_LISTEN_PORT: "8081",
+        SMOCKER_TLS_ENABLE: "true",
+        SMOCKER_TLS_CERT_FILE: "/certs/server.crt",
+        SMOCKER_TLS_PRIVATE_KEY_FILE: "/certs/server.key",
+      })
+      .withExposedPorts(SMOCKER_MOCK_PORT, SMOCKER_ADMIN_PORT)
+      .withStartupTimeout(120_000)
+      .withWaitStrategy(Wait.forLogMessage(/Starting mock server/))
       .start();
 
-    loginImage = await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build();
-  });
+    try {
+      await GenericContainer.fromDockerfile(LOGIN_APP_DIR).build(LOGIN_IMAGE_TAG);
+    } catch (err) {
+      throw new Error(`Failed to build login Docker image: ${err instanceof Error ? err.message : err}`);
+    }
+  }, 180_000);
 
   afterAll(async () => {
-    await mockServer?.stop();
-    await network?.stop();
+    await mockServer?.stop().catch(() => {});
+    await network?.stop().catch(() => {});
   });
 
-  describe("when custom CA certificate is provided", () => {
+  describe("when custom CA is provided via SSL_CERT_FILE", () => {
     let container: StartedTestContainer;
-    let appUrl: string;
 
     beforeAll(async () => {
-      if (fs.existsSync(path.join(OUTPUT_DIR, "requests.json"))) {
-        fs.unlinkSync(path.join(OUTPUT_DIR, "requests.json"));
-      }
-
-      container = await loginImage
+      container = await new GenericContainer(LOGIN_IMAGE_TAG)
         .withNetwork(network)
         .withExposedPorts(3000)
         .withEnvironment({
-          ZITADEL_API_URL: "https://mock-zitadel",
-          ZITADEL_SERVICE_USER_TOKEN: "test-token",
           SSL_CERT_FILE: "/etc/ssl/certs/custom-ca.crt",
         })
         .withCopyFilesToContainer([
           {
-            source: path.join(CERTS_DIR, "ca.crt"),
+            source: path.join(certsDir, "ca.crt"),
             target: "/etc/ssl/certs/custom-ca.crt",
           },
         ])
+        .withStartupTimeout(180_000)
         .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
         .start();
-
-      appUrl = `http://${container.getHost()}:${container.getMappedPort(3000)}`;
-
-      await fetch(`${appUrl}/ui/v2/login/loginname`, { redirect: "manual" });
-
-      for (let i = 0; i < 30; i++) {
-        const requests = readCapturedRequests();
-        if (requests.length > 0) break;
-        await new Promise((r) => setTimeout(r, 1000));
-      }
-    });
+    }, 180_000);
 
     afterAll(async () => {
-      await container?.stop();
+      await container?.stop().catch(() => {});
     });
 
-    it("connects to mock server over TLS", () => {
-      const requests = readCapturedRequests();
-      expect(requests.length).toBeGreaterThan(0);
+    it("can establish TLS connection to server with custom CA", async () => {
+      const result = await testTlsConnection(container, "https://mock-zitadel/");
+      expect(result.exitCode).toBe(0);
+    });
+  });
+
+  describe("when custom CA is provided via SSL_CERT_DIR (non-hashed filename)", () => {
+    let container: StartedTestContainer;
+    let customCaDir: string;
+
+    beforeAll(async () => {
+      customCaDir = fs.mkdtempSync(path.join(os.tmpdir(), "ca-dir-test-"));
+      fs.writeFileSync(path.join(customCaDir, "corp-root.crt"), fs.readFileSync(path.join(certsDir, "ca.crt")));
+
+      container = await new GenericContainer(LOGIN_IMAGE_TAG)
+        .withNetwork(network)
+        .withExposedPorts(3000)
+        .withEnvironment({
+          SSL_CERT_DIR: "/custom-certs",
+        })
+        .withCopyFilesToContainer([
+          {
+            source: path.join(customCaDir, "corp-root.crt"),
+            target: "/custom-certs/corp-root.crt",
+          },
+        ])
+        .withStartupTimeout(180_000)
+        .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
+        .start();
+    }, 180_000);
+
+    afterAll(async () => {
+      await container?.stop().catch(() => {});
     });
 
-    it("marks requests as TLS connected", () => {
-      const requests = readCapturedRequests();
-      const tlsRequests = requests.filter((r) => r.tlsConnected === true);
-      expect(tlsRequests.length).toBeGreaterThan(0);
-    });
-
-    it("returns 200 from healthy endpoint", async () => {
-      const response = await fetch(`${appUrl}/ui/v2/login/healthy`);
-      expect(response.status).toBe(200);
-    });
-
-    it("serves the login page", async () => {
-      const response = await fetch(`${appUrl}/ui/v2/login/loginname`, { redirect: "manual" });
-      expect([200, 302, 303, 307, 308]).toContain(response.status);
-    });
-
-    it("has NODE_OPTIONS set with --use-openssl-ca", async () => {
-      const result = await container.exec(["printenv", "NODE_OPTIONS"]);
-      expect(result.output.trim()).toContain("--use-openssl-ca");
-    });
-
-    it("has SSL_CERT_FILE pointing to custom CA", async () => {
-      const result = await container.exec(["printenv", "SSL_CERT_FILE"]);
-      expect(result.output.trim()).toBe("/etc/ssl/certs/custom-ca.crt");
-    });
-
-    it("has CA certificate accessible in container", async () => {
-      const result = await container.exec([
-        "sh",
-        "-c",
-        "test -f /etc/ssl/certs/custom-ca.crt && echo exists",
-      ]);
-      expect(result.output.trim()).toContain("exists");
+    it("can establish TLS connection with non-hashed cert in SSL_CERT_DIR", async () => {
+      const result = await testTlsConnection(container, "https://mock-zitadel/");
+      expect(result.exitCode).toBe(0);
     });
   });
 
   describe("when custom CA certificate is not provided", () => {
     let container: StartedTestContainer;
-    let appUrl: string;
-    let requestsBefore: number;
 
     beforeAll(async () => {
-      requestsBefore = readCapturedRequests().length;
-
-      container = await loginImage
+      container = await new GenericContainer(LOGIN_IMAGE_TAG)
         .withNetwork(network)
         .withExposedPorts(3000)
-        .withEnvironment({
-          ZITADEL_API_URL: "https://mock-zitadel",
-          ZITADEL_SERVICE_USER_TOKEN: "test-token",
-        })
+        .withStartupTimeout(180_000)
         .withWaitStrategy(Wait.forHttp("/ui/v2/login/healthy", 3000))
         .start();
-
-      appUrl = `http://${container.getHost()}:${container.getMappedPort(3000)}`;
-
-      await fetch(`${appUrl}/ui/v2/login/loginname`, { redirect: "manual" });
-
-      for (let i = 0; i < 10; i++) {
-        await new Promise((r) => setTimeout(r, 500));
-      }
-    });
+    }, 180_000);
 
     afterAll(async () => {
-      await container?.stop();
+      await container?.stop().catch(() => {});
     });
 
-    it("uses system CA store by default", async () => {
-      const result = await container.exec(["printenv", "SSL_CERT_FILE"]);
-      expect(result.output.trim()).toBe("/etc/ssl/certs/ca-certificates.crt");
-    });
-
-    it("does not have custom CA certificate mounted", async () => {
-      const result = await container.exec([
-        "sh",
-        "-c",
-        "test -f /etc/ssl/certs/custom-ca.crt && echo exists || echo missing",
-      ]);
-      expect(result.output.trim()).toContain("missing");
-    });
-
-    it("cannot establish TLS connection to mock server", () => {
-      const requestsAfter = readCapturedRequests().length;
-      expect(requestsAfter).toBe(requestsBefore);
+    it("cannot establish TLS connection without custom CA", async () => {
+      const result = await testTlsConnection(container, "https://mock-zitadel/");
+      expect(result.exitCode).not.toBe(0);
     });
   });
 });

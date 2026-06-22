@@ -1,5 +1,6 @@
 "use server";
 
+import { createLogger } from "@/lib/logger";
 import {
   createPasskeyRegistrationLink,
   getLoginSettings,
@@ -16,16 +17,18 @@ import {
   RegisterPasskeyResponse,
   VerifyPasskeyRegistrationRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
-import { getTranslations } from "next-intl/server";
+import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById } from "../cookies";
 import { getServiceConfig } from "../service-url";
 import { checkEmailVerification, checkUserVerification } from "../verify-helper";
+import { createSessionAndUpdateCookie } from "./cookie";
 import { getPublicHost } from "./host";
 import { updateOrCreateSession } from "./session";
-import { completeFlowOrGetUrl } from "../client";
-import { createSessionAndUpdateCookie } from "./cookie";
+
+const logger = createLogger("passkeys");
 
 type VerifyPasskeyCommand = {
   passkeyId: string;
@@ -48,10 +51,11 @@ function isSessionValid(session: Partial<Session>): {
 } {
   const validPassword = session?.factors?.password?.verifiedAt;
   const validPasskey = session?.factors?.webAuthN?.verifiedAt;
+  const validIDP = session?.factors?.intent?.verifiedAt;
   const stillValid = session.expirationDate ? timestampDate(session.expirationDate) > new Date() : true;
 
-  const verifiedAt = validPassword || validPasskey;
-  const valid = !!((validPassword || validPasskey) && stillValid);
+  const verifiedAt = validPassword || validPasskey || validIDP;
+  const valid = !!((validPassword || validPasskey || validIDP) && stillValid);
 
   return { valid, verifiedAt };
 }
@@ -103,7 +107,7 @@ export async function registerPasskeyLink(
       // check if a verification was done earlier
       const hasValidUserVerificationCheck = await checkUserVerification(currentUserId);
 
-      console.log("hasValidUserVerificationCheck", hasValidUserVerificationCheck);
+      logger.info("hasValidUserVerificationCheck", { hasValidUserVerificationCheck });
       if (!hasValidUserVerificationCheck) {
         return { error: "User Verification Check has to be done" };
       }
@@ -295,7 +299,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   try {
     userResponse = await getUserByID({ serviceConfig, userId });
   } catch (error) {
-    console.error("Error fetching user by ID:", error);
+    logger.error("Error fetching user by ID:", { error });
     return { error: t("verify.errors.couldNotGetUser") };
   }
 

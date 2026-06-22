@@ -236,7 +236,7 @@ type {{.Name}} interface {
 
 func RegisterRoutes(router *mux.Router, s {{.Name}}) {
 
-	router.Use(s.AuthInterceptor().Handler)
+	router.Use(s.AuthInterceptor().Handler(HandlerPrefix))
 
 	{{ range $service := .Services}}
 	{{ range $method := .Methods}}
@@ -253,6 +253,7 @@ func RegisterRoutes(router *mux.Router, s {{.Name}}) {
 
 const docsTmpl = `---
 title: zitadel/assets
+description: "Learn how to upload and manage instance, organization, or user assets such as logos and avatars using ZITADEL's AssetsService API endpoints. Full reference and examples included."
 ---
 
 {/*

@@ -435,6 +435,8 @@ func TestServer_AuthorizationReduces(t *testing.T) {
 }
 
 func createAndEnsureAuthorization(t *testing.T, instanceID, orgID, userID, projectID string, roles []string, retryDuration time.Duration, tick time.Duration) *authorization_v2.CreateAuthorizationResponse {
+	t.Helper()
+
 	// create authorization
 	createdAuthorization, err := AuthorizationClient.CreateAuthorization(CTX, &authorization_v2.CreateAuthorizationRequest{
 		UserId:         userID,
@@ -454,11 +456,13 @@ func createAndEnsureAuthorization(t *testing.T, instanceID, orgID, userID, proje
 		assert.Equal(collect, domain.AuthorizationStateActive, az.State)
 		assert.Equal(collect, createdAuthorization.GetCreationDate().AsTime().UTC(), az.CreatedAt.UTC())
 		assert.Equal(collect, createdAuthorization.GetCreationDate().AsTime().UTC(), az.UpdatedAt.UTC())
-	}, retryDuration, tick, "authorization not found within %v: %v", retryDuration, err)
+	}, retryDuration, tick, "authorization %q not found within %v: %v", createdAuthorization.Id, retryDuration, err)
 	return createdAuthorization
 }
 
 func prepareProjectAndProjectRoles(t *testing.T, orgID string, roles []string) string {
+	t.Helper()
+
 	project, err := ProjectClient.CreateProject(CTX, &project_v2beta.CreateProjectRequest{
 		OrganizationId: orgID,
 		Name:           integration.ProjectName(),
@@ -477,7 +481,7 @@ func prepareProjectAndProjectRoles(t *testing.T, orgID string, roles []string) s
 			projectRepo.PrimaryKeyCondition(Instance.ID(), project.Id),
 		))
 		require.NoError(collect, err)
-	}, retryDuration, tick, "project not found")
+	}, retryDuration, tick, "project %q not found within %v: %v", project.Id, retryDuration, err)
 
 	for _, role := range roles {
 		_, err = ProjectClient.AddProjectRole(CTX, &project_v2beta.AddProjectRoleRequest{

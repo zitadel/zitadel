@@ -83,7 +83,7 @@
     "set": {
       "title": "Ustaw hasło",
       "description": "Ustaw hasło dla swojego konta",
-      "codeSent": "Kod został wysłany na twój adres e-mail.",
+      "codeSent": "Nowy kod został wysłany na Twój adres e-mail.",
       "noCodeReceived": "Nie otrzymałeś kodu?",
       "resend": "Wyślij kod ponownie",
       "submit": "Kontynuuj",
@@ -108,14 +108,17 @@
       "description": "Ustaw nowe hasło dla swojego konta",
       "submit": "Kontynuuj",
       "labels": {
+        "currentPassword": "Aktualne hasło",
         "newPassword": "Nowe hasło",
         "confirmPassword": "Potwierdź nowe hasło"
       },
       "required": {
+        "currentPassword": "Musisz podać aktualne hasło!",
         "newPassword": "Musisz podać nowe hasło!",
         "confirmPassword": "To pole jest wymagane"
       },
       "errors": {
+        "currentPasswordInvalid": "Aktualne hasło jest nieprawidłowe.",
         "couldNotChangePassword": "Nie można zmienić hasła",
         "couldNotVerifyPassword": "Nie można zweryfikować hasła",
         "unknownError": "Nieznany błąd"
@@ -380,6 +383,7 @@
     "userIdMissing": "Nie podano identyfikatora użytkownika!",
     "successTitle": "Weryfikacja zakończona",
     "successDescription": "Użytkownik został pomyślnie zweryfikowany.",
+    "successContinue": "Kontynuuj",
     "setupAuthenticator": "Skonfiguruj uwierzytelnianie",
     "verify": {
       "title": "Zweryfikuj użytkownika",

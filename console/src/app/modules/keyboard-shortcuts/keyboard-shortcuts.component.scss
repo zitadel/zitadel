@@ -104,7 +104,7 @@
     }
 
     .keyboard-shortcuts-group {
-      $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+      $border-color: if(sass($is-dark-theme): rgba(#8795a1, 0.2) ; else: rgba(#8795a1, 0.2));
       border: 1px solid $border-color;
       background-color: $card-background-color;
 
@@ -128,7 +128,7 @@
 
     .keyboard-shortcuts-action-key {
       .keyboard-shortcuts-key-overlay {
-        background: if($is-dark-theme, #fff, #000);
+        background: if(sass($is-dark-theme): #fff; else: #000);
       }
     }
   }

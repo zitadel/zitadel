@@ -11,13 +11,7 @@ import { Avatar } from "./avatar";
 import { isSessionValid } from "./session-item";
 import { Translated } from "./translated";
 
-export function SessionClearItem({
-  session,
-  reload,
-}: {
-  session: Session;
-  reload: () => void;
-}) {
+export function SessionClearItem({ session, reload }: { session: Session; reload: () => void }) {
   const currentLocale = useLocale();
   moment.locale(currentLocale === "zh" ? "zh-cn" : currentLocale);
 
@@ -53,7 +47,7 @@ export function SessionClearItem({
           reload();
         });
       }}
-      className="group flex flex-row items-center rounded-md border border-divider-light bg-background-light-400 px-4 py-2 transition-all hover:shadow-lg dark:bg-background-dark-400 dark:hover:bg-white/10"
+      className="group border-divider-light bg-background-light-400 dark:bg-background-dark-400 flex flex-row items-center rounded-md border px-4 py-2 transition-all hover:shadow-lg dark:hover:bg-white/10"
     >
       <div className="pr-4">
         <Avatar
@@ -65,11 +59,9 @@ export function SessionClearItem({
 
       <div className="flex flex-col items-start overflow-hidden">
         <span className="">{session.factors?.user?.displayName}</span>
-        <span className="text-ellipsis text-xs opacity-80">
-          {session.factors?.user?.loginName}
-        </span>
+        <span className="text-xs text-ellipsis opacity-80">{session.factors?.user?.loginName}</span>
         {valid ? (
-          <span className="text-ellipsis text-xs opacity-80">
+          <span className="text-xs text-ellipsis opacity-80">
             {verifiedAt && (
               <Translated
                 i18nKey="verifiedAt"
@@ -80,10 +72,8 @@ export function SessionClearItem({
           </span>
         ) : (
           verifiedAt && (
-            <span className="text-ellipsis text-xs opacity-80">
-              expired{" "}
-              {session.expirationDate &&
-                moment(timestampDate(session.expirationDate)).fromNow()}
+            <span className="text-xs text-ellipsis opacity-80">
+              expired {session.expirationDate && moment(timestampDate(session.expirationDate)).fromNow()}
             </span>
           )
         )}
@@ -91,7 +81,7 @@ export function SessionClearItem({
 
       <span className="flex-grow"></span>
       <div className="relative flex flex-row items-center">
-        <div className="mr-6 flex hidden items-center justify-center rounded-full bg-[#ff0000]/10 px-2 py-[2px] text-xs text-warn-light-500 transition-all group-hover:block dark:bg-[#ff0000]/10 dark:text-warn-dark-500">
+        <div className="text-warn-light-500 dark:text-warn-dark-500 mr-6 flex hidden items-center justify-center rounded-full bg-[#ff0000]/10 px-2 py-[2px] text-xs transition-all group-hover:block dark:bg-[#ff0000]/10">
           <Translated i18nKey="clear" namespace="logout" />
         </div>
 

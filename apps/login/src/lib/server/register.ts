@@ -2,16 +2,48 @@
 
 import { createSessionAndUpdateCookie, createSessionForIdpAndUpdateCookie } from "@/lib/server/cookie";
 import { addHumanUser, addIDPLink, getLoginSettings, getUserByID, listAuthenticationMethodTypes } from "@/lib/zitadel";
-import { create } from "@zitadel/client";
+import { Code, ConnectError, Duration, create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { ChecksJson, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { cookies, headers } from "next/headers";
+import { Checks, ChecksJson, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import crypto from "crypto";
 import { getTranslations } from "next-intl/server";
+import { cookies, headers } from "next/headers";
+import { completeFlowOrGetUrl } from "../client";
+import { getOrSetFingerprintId } from "../fingerprint";
+import { createLogger } from "../logger";
 import { getServiceConfig } from "../service-url";
 import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
-import { getOrSetFingerprintId } from "../fingerprint";
-import crypto from "crypto";
-import { completeFlowOrGetUrl } from "../client";
+
+const logger = createLogger("register");
+
+const MAX_SESSION_RETRIES = 3;
+const RETRY_DELAYS_MS = [500, 1000, 2000];
+
+/**
+ * After user creation, backend projections (users, login_names) may not be updated yet.
+ * This helper retries createSessionAndUpdateCookie on NotFound errors with increasing delays.
+ */
+async function createSessionWithRetry(command: { checks: Checks; requestId: string | undefined; lifetime?: Duration }) {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < MAX_SESSION_RETRIES; attempt++) {
+    try {
+      return await createSessionAndUpdateCookie(command);
+    } catch (error) {
+      lastError = error;
+      const isNotFound = error instanceof ConnectError && error.code === Code.NotFound;
+      const isLastAttempt = attempt + 1 >= MAX_SESSION_RETRIES;
+      if (!isNotFound || isLastAttempt) {
+        throw error;
+      }
+      const delay = RETRY_DELAYS_MS[attempt] ?? 2000;
+      logger.warn(
+        `Session creation failed with NotFound (attempt ${attempt + 1}/${MAX_SESSION_RETRIES}), retrying in ${delay}ms...`,
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  throw lastError;
+}
 
 type RegisterUserCommand = {
   email: string;
@@ -34,6 +66,20 @@ export async function registerUser(
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
+
+  if (!loginSettings) {
+    return { error: t("errors.couldNotGetLoginSettings") };
+  }
+
+  if (!loginSettings.allowRegister) {
+    return { error: t("errors.registerNotAllowed") };
+  }
+
+  if (command.password && !loginSettings.allowLocalAuthentication) {
+    return { error: t("errors.localAuthenticationNotAllowed") };
+  }
+
   const addResponse = await addHumanUser({
     serviceConfig,
     email: command.email,
@@ -46,8 +92,6 @@ export async function registerUser(
   if (!addResponse) {
     return { error: t("errors.couldNotCreateUser") };
   }
-
-  const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
 
   let checkPayload: any = {
     user: { search: { case: "userId", value: addResponse.userId } },
@@ -62,7 +106,7 @@ export async function registerUser(
 
   const checks = create(ChecksSchema, checkPayload);
 
-  const result = await createSessionAndUpdateCookie({
+  const result = await createSessionWithRetry({
     checks,
     requestId: command.requestId,
     lifetime: command.password ? loginSettings?.passwordCheckLifetime : undefined,
@@ -163,6 +207,16 @@ export async function registerUserAndLinkToIDP(
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
+
+  if (!loginSettings) {
+    return { error: t("errors.couldNotGetLoginSettings") };
+  }
+
+  if (!loginSettings.allowRegister) {
+    return { error: t("errors.registerNotAllowed") };
+  }
+
   const addUserResponse = await addHumanUser({
     serviceConfig,
     email: command.email,
@@ -170,12 +224,6 @@ export async function registerUserAndLinkToIDP(
     lastName: command.lastName,
     organization: command.organization,
   });
-
-  if (!addUserResponse) {
-    return { error: t("errors.couldNotCreateUser") };
-  }
-
-  const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
 
   const idpLink = await addIDPLink({
     serviceConfig,

@@ -702,7 +702,7 @@
     "USERNAME": "Användarnamn",
     "ORGNAME": "Organisationsnamn",
     "ORGID": "Organisations ID",
-    "PRIMARYDOMAIN": "Primär domän",
+    "PRIMARYDOMAIN": "Organisationsdomän",
     "PROJECTNAME": "Projektnamn",
     "RESOURCEOWNER": "Resursägare",
     "METHODS": {
@@ -1044,7 +1044,7 @@
       "MINLENGTHERROR": "Måste vara minst {{value}} tecken långt.",
       "MAXLENGTHERROR": "Måste vara mindre än {{value}} tecken."
     },
-    "ID": "ID",
+    "ID": "Användar-ID",
     "EMAIL": "E-post",
     "PHONE": "Telefonnummer",
     "PHONEEMPTY": "Inget telefonnummer definierat",
@@ -1374,7 +1374,7 @@
   "ORG": {
     "PAGES": {
       "NAME": "Namn",
-      "ID": "ID",
+      "ID": "Organisations-ID",
       "CREATIONDATE": "Skapelsedatum",
       "DATECHANGED": "Ändrad",
       "FILTER": "Filter",
@@ -1420,7 +1420,7 @@
       },
       "DOWNLOAD_FILE": "Ladda ner fil",
       "SELECTORGTOOLTIP": "Välj denna organisation.",
-      "PRIMARYDOMAIN": "Primär domän",
+      "PRIMARYDOMAIN": "Organisationsdomän",
       "STATE": "Status",
       "USEPASSWORD": "Ange initialt lösenord",
       "USEPASSWORDDESC": "Användaren behöver inte ange lösenordet under initialiseringen."
@@ -1431,9 +1431,9 @@
     },
     "DOMAINS": {
       "NEW": "Lägg till domän",
-      "TITLE": "Verifierade domäner",
+      "TITLE": "Organisationsdomän",
       "DESCRIPTION": "Konfigurera dina organisationsdomäner. Denna domän kan användas för domänupptäckt och användarnamnssuffix.",
-      "SETPRIMARY": "Ange som primär",
+      "SETPRIMARY": "Organisationsdomän",
       "DELETE": {
         "TITLE": "Radera domän",
         "DESCRIPTION": "Du är på väg att radera en av dina domäner."
@@ -1461,7 +1461,7 @@
       "MEMBERADDED": "Administratör tillagd.",
       "MEMBERREMOVED": "Administratör borttagen.",
       "MEMBERCHANGED": "Administratör ändrad.",
-      "SETPRIMARY": "Primär domän inställd.",
+      "SETPRIMARY": "Organisationsdomänen har ställts in.",
       "DELETED": "Organisation raderad framgångsrikt",
       "DEFAULTORGNOTFOUND": "Standardorganisationen hittades inte",
       "ORG_WAS_DELETED": "Organisationen har raderats."
@@ -1503,7 +1503,7 @@
       "NOTIFICATIONS_DESC": "SMTP- och SMS-inställningar",
       "MESSAGETEXTS": "Meddelandetexter",
       "IDP": "Identitetsleverantörer",
-      "VERIFIED_DOMAINS": "Verifierade domäner",
+      "VERIFIED_DOMAINS": "Organisationsdomän",
       "DOMAIN": "Domäninställningar",
       "LOGINTEXTS": "Inloggningsgränssnittstexter",
       "BRANDING": "Varumärke",
@@ -2018,7 +2018,8 @@
           "DESCRIPTION": "Vill du verkligen radera ditt projekt?",
           "TYPENAME": "Skriv namnet på projektet för att radera det permanent."
         }
-      }
+      },
+      "ID": "Projekt-ID"
     },
     "SETTINGS": {
       "TITLE": "Inställningar",
@@ -2300,7 +2301,7 @@
     "ADD": "Lägg till identitetsleverantör",
     "TYPE": "Typ",
     "OWNER": "Ägare",
-    "ID": "ID",
+    "ID": "ID för identitetsleverantör",
     "NAME": "Namn",
     "AUTHORIZATIONENDPOINT": "Auktoriseringsslutpunkt",
     "TOKENENDPOINT": "Token-slutpunkt",
@@ -2369,7 +2370,8 @@
       "DESCRIPTION": "Ange data för JWT-identitetsleverantören.",
       "HEADERNAME": "Header-namn",
       "JWTENDPOINT": "JWT-slutpunkt",
-      "JWTKEYSENDPOINT": "JWT-nycklar slutpunkt"
+      "JWTKEYSENDPOINT": "JWT-nycklar slutpunkt",
+      "AUDIENCE": "Audience"
     },
     "APPLE": {
       "TEAMID": "Team-ID",
@@ -2524,7 +2526,7 @@
     "TOKEN": "Token-inställningar",
     "PAGES": {
       "TITLE": "Applikation",
-      "ID": "ID",
+      "ID": "Applikations-ID",
       "DESCRIPTION": "Här kan du redigera dina applikationsdata och dess konfiguration.",
       "CREATE": "Skapa applikation",
       "CREATE_SELECT_PROJECT": "Välj ditt projekt först",
@@ -2606,7 +2608,7 @@
       "TYPEREQUIRED": "Typen är obligatorisk.",
       "TITLE": "OIDC-konfiguration",
       "CLIENTID": "Klient-ID",
-      "CLIENTSECRET": "Klienthemlighet",
+      "CLIENTDETAILS": "Klientdetaljer",
       "CLIENTSECRET_NOSECRET": "Med ditt valda autentiseringsflöde krävs ingen hemlighet och är därför inte tillgänglig.",
       "CLIENTSECRET_DESCRIPTION": "Förvara din klienthemlighet på en säker plats eftersom den kommer att försvinna när dialogen stängs.",
       "REGENERATESECRET": "Återskapa klienthemlighet",
@@ -2868,5 +2870,6 @@
       "TITLE": "Aktivitet",
       "DESCRIPTION": "Här kan du se de senaste händelserna som har genererat en användarförändring."
     }
-  }
+  },
+  "INSTANCEID": "Instans-ID"
 }

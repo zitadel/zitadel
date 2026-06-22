@@ -95,11 +95,12 @@ func (c *Commands) GetProvider(ctx context.Context, idpID string, idpCallback st
 		return nil, err
 	}
 	if writeModel.IDPType != domain.IDPTypeSAML {
-		return writeModel.ToProvider(idpCallback, c.idpConfigEncryption)
+		return writeModel.ToProvider(idpCallback, c.idpConfigEncryption, c.httpClient)
 	}
 	return writeModel.ToSAMLProvider(
 		samlRootURL,
 		c.idpConfigEncryption,
+		c.httpClient,
 		func(ctx context.Context, intentID string) (*samlsp.TrackedRequest, error) {
 			intent, err := c.GetActiveIntent(ctx, intentID)
 			if err != nil {
@@ -170,7 +171,7 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 	if err != nil {
 		return "", err
 	}
-	accessToken, idToken, err := tokensForSucceededIDPIntent(idpSession, c.idpConfigEncryption)
+	accessToken, refreshToken, idToken, err := tokensForSucceededIDPIntent(idpSession, c.idpConfigEncryption)
 	if err != nil {
 		return "", err
 	}
@@ -186,6 +187,7 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 		idpUser.GetPreferredUsername(),
 		userID,
 		accessToken,
+		refreshToken,
 		idToken,
 		idpSession.ExpiresAt(),
 	)
@@ -295,8 +297,9 @@ func (c *Commands) GetIntentWriteModel(ctx context.Context, id, resourceOwner st
 	return writeModel, err
 }
 
-// tokensForSucceededIDPIntent extracts the oidc.Tokens if available (and encrypts the access_token) for the succeeded event payload
-func tokensForSucceededIDPIntent(session idp.Session, encryptionAlg crypto.EncryptionAlgorithm) (*crypto.CryptoValue, string, error) {
+// tokensForSucceededIDPIntent extracts the oidc.Tokens if available for the succeeded event payload.
+// It also encrypts the access token and refresh token (if set).
+func tokensForSucceededIDPIntent(session idp.Session, encryptionAlg crypto.EncryptionAlgorithm) (*crypto.CryptoValue, *crypto.CryptoValue, string, error) {
 	var tokens *oidc.Tokens[*oidc.IDTokenClaims]
 	switch s := session.(type) {
 	case *oauth.Session:
@@ -312,11 +315,25 @@ func tokensForSucceededIDPIntent(session idp.Session, encryptionAlg crypto.Encry
 	case *apple.Session:
 		tokens = s.Tokens
 	default:
-		return nil, "", nil
+		return nil, nil, "", nil
+	}
+	if tokens == nil {
+		return nil, nil, "", nil
 	}
 	if tokens.Token == nil || tokens.AccessToken == "" {
-		return nil, tokens.IDToken, nil
+		return nil, nil, tokens.IDToken, nil
 	}
 	accessToken, err := crypto.Encrypt([]byte(tokens.AccessToken), encryptionAlg)
-	return accessToken, tokens.IDToken, err
+	if err != nil {
+		return nil, nil, tokens.IDToken, err
+	}
+	var refreshToken *crypto.CryptoValue
+	if tokens.RefreshToken != "" {
+		refreshToken, err = crypto.Encrypt([]byte(tokens.RefreshToken), encryptionAlg)
+		if err != nil {
+			return nil, nil, tokens.IDToken, err
+		}
+	}
+
+	return accessToken, refreshToken, tokens.IDToken, nil
 }

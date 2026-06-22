@@ -158,8 +158,12 @@ func eventFromEventPusherWithInstanceID(instanceID string, event eventstore.Comm
 }
 
 func eventFromEventPusherWithCreationDateNow(event eventstore.Command) *repository.Event {
+	return eventFromEventPusherWithCreationDate(event, time.Now())
+}
+
+func eventFromEventPusherWithCreationDate(event eventstore.Command, creationDate time.Time) *repository.Event {
 	e := eventFromEventPusher(event)
-	e.CreationDate = time.Now()
+	e.CreationDate = creationDate
 	return e
 }
 
@@ -287,6 +291,14 @@ type plainHasher struct {
 
 func (h plainHasher) Hash(password string) (string, error) {
 	return strings.Join([]string{"", "plain", h.x, password}, "$"), nil
+}
+
+func (h plainHasher) Validate(encoded string) (verifier.Result, error) {
+	nodes := strings.Split(encoded, "$")
+	if len(nodes) != 4 || nodes[1] != "plain" {
+		return verifier.Skip, nil
+	}
+	return verifier.OK, nil
 }
 
 func (h plainHasher) Verify(encoded, password string) (verifier.Result, error) {

@@ -83,7 +83,7 @@ type OPStorage struct {
 	defaultIdTokenLifetime            time.Duration
 	defaultRefreshTokenIdleExpiration time.Duration
 	defaultRefreshTokenExpiration     time.Duration
-	encAlg                            crypto.EncryptionAlgorithm
+	authAlg                           crypto.AuthAlgorithm
 	assetAPIPrefix                    func(ctx context.Context) string
 	contextToIssuer                   func(context.Context) string
 	federateLogoutCache               cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout]
@@ -118,7 +118,7 @@ func NewServer(
 	command *command.Commands,
 	query *query.Queries,
 	repo repository.Repository,
-	encryptionAlg crypto.EncryptionAlgorithm,
+	authAlg crypto.AuthAlgorithm,
 	targetEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	cryptoKey []byte,
 	es *eventstore.Eventstore,
@@ -127,17 +127,30 @@ func NewServer(
 	fallbackLogger *slog.Logger,
 	hashConfig crypto.HashConfig,
 	federatedLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
+	httpClient *http.Client,
 ) (*Server, error) {
 	opConfig, err := createOPConfig(config, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
-	storage := newStorage(config, command, query, repo, encryptionAlg, es, ContextToIssuer, federatedLogoutCache)
+	storage := newStorage(config, command, query, repo, authAlg, es, ContextToIssuer, federatedLogoutCache)
 	keyCache := newPublicKeyCache(ctx, config.PublicKeyCacheMaxAge, queryKeyFunc(query))
 	accessTokenKeySet := newOidcKeySet(keyCache, withKeyExpiryCheck(true))
 	idTokenHintKeySet := newOidcKeySet(keyCache)
 
-	var options []op.Option
+	alg := op.NewAES256GCMCrypto(opConfig.CryptoKey, "")
+	if authAlg.LegacyTokenEnabled() {
+		alg = op.NewCompositeCrypto(
+			alg,
+			[]op.Decrypter{
+				alg,
+				op.NewAESCrypto(opConfig.CryptoKey),
+			},
+		)
+	}
+	options := []op.Option{
+		op.WithCrypto(alg),
+	}
 	if !externalSecure {
 		options = append(options, op.WithAllowInsecure())
 	}
@@ -173,19 +186,23 @@ func NewServer(
 		jwksCacheControlMaxAge:     config.JWKSCacheControlMaxAge,
 		fallbackLogger:             fallbackLogger,
 		hasher:                     hasher,
-		encAlg:                     encryptionAlg,
+		encAlg:                     authAlg,
 		targetEncryptionAlgorithm:  targetEncryptionAlgorithm,
-		opCrypto:                   op.NewAESCrypto(opConfig.CryptoKey),
+		opCrypto:                   alg,
 		assetAPIPrefix:             assets.AssetAPI(),
+		httpClient:                 httpClient,
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 	server.Handler = op.RegisterLegacyServer(server,
 		server.authorizeCallbackHandler,
 		op.WithFallbackLogger(fallbackLogger),
 		op.WithHTTPMiddleware(
+			middleware.CallDurationHandler,
+			middleware.RequestDetailsHandler(),
 			middleware.MetricsHandler(metricTypes),
 			middleware.TraceHandler(),
 			middleware.LogHandler("oidc"),
+			middleware.RecoverHandler(writeRecoverError),
 			middleware.NoCacheInterceptor().Handler,
 			instanceHandler,
 			userAgentCookie,
@@ -244,7 +261,7 @@ func newStorage(
 	command *command.Commands,
 	query *query.Queries,
 	repo repository.Repository,
-	encAlg crypto.EncryptionAlgorithm,
+	authAlg crypto.AuthAlgorithm,
 	es *eventstore.Eventstore,
 	contextToIssuer func(context.Context) string,
 	federateLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
@@ -261,7 +278,7 @@ func newStorage(
 		defaultIdTokenLifetime:            config.DefaultIdTokenLifetime,
 		defaultRefreshTokenIdleExpiration: config.DefaultRefreshTokenIdleExpiration,
 		defaultRefreshTokenExpiration:     config.DefaultRefreshTokenExpiration,
-		encAlg:                            encAlg,
+		authAlg:                           authAlg,
 		assetAPIPrefix:                    assets.AssetAPI(),
 		contextToIssuer:                   contextToIssuer,
 		federateLogoutCache:               federateLogoutCache,

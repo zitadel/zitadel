@@ -2,12 +2,11 @@
 title: Download the docker compose example configuration.
 ---
 
-import CodeBlock from '@/components/docusaurus/code-block';
-
-import DockerComposeSource from "./docker-compose.yaml"
-import ExampleZITADELConfigSource from "./example-zitadel-config.yaml"
-import ExampleZITADELSecretsSource from "./example-zitadel-secrets.yaml"
-import ExampleZITADELInitStepsSource from "./example-zitadel-init-steps.yaml"
+import DockerComposeYaml from './docker-compose.yaml';
+import ExampleZitadelConfig from './example-zitadel-config.yaml';
+import ExampleZitadelSecrets from './example-zitadel-secrets.yaml';
+import ExampleZitadelInitSteps from './example-zitadel-init-steps.yaml';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 
 The docker compose example mounts the example zitadel configuration files to the ZITADEL container.
 
@@ -15,36 +14,36 @@ By executing the commands below, you will download the following files:
 
 <details>
     <summary>docker-compose.yaml</summary>
-    <CodeBlock  language="yaml">{DockerComposeSource}</CodeBlock>
+    <DynamicCodeBlock lang="yaml" code={DockerComposeYaml} />
 </details>
 
 <details>
     <summary>example-zitadel-config.yaml</summary>
-    <CodeBlock  language="yaml">{ExampleZITADELConfigSource}</CodeBlock>
+    <DynamicCodeBlock lang="yaml" code={ExampleZitadelConfig} />
 </details>
 
 <details>
     <summary>example-zitadel-secrets.yaml</summary>
-    <CodeBlock  language="yaml">{ExampleZITADELSecretsSource}</CodeBlock>
+    <DynamicCodeBlock lang="yaml" code={ExampleZitadelSecrets} />
 </details>
 
 <details>
     <summary>example-zitadel-init-steps.yaml</summary>
-    <CodeBlock  language="yaml">{ExampleZITADELInitStepsSource}</CodeBlock>
+    <DynamicCodeBlock lang="yaml" code={ExampleZitadelInitSteps} />
 </details>
 
 ```bash
 # Download the docker compose example configuration.
-wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/self-hosting/manage/configure/docker-compose.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/apps/docs/content/self-hosting/manage/configure/docker-compose.yaml
 
 # Download and adjust the example configuration file containing standard configuration.
-wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/self-hosting/manage/configure/example-zitadel-config.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/apps/docs/content/self-hosting/manage/configure/example-zitadel-config.yaml
 
 # Download and adjust the example configuration file containing secret configuration.
-wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/self-hosting/manage/configure/example-zitadel-secrets.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/apps/docs/content/self-hosting/manage/configure/example-zitadel-secrets.yaml
 
 # Download and adjust the example configuration file containing database initialization configuration.
-wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/self-hosting/manage/configure/example-zitadel-init-steps.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/apps/docs/content/self-hosting/manage/configure/example-zitadel-init-steps.yaml
 
 # A single ZITADEL instance always needs the same 32 bytes long masterkey
 # Generate one to a file if you haven't done so already and pass it as environment variable

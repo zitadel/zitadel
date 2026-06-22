@@ -26,11 +26,15 @@ import { createAdminServiceClient, createAuthServiceClient, createManagementServ
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
 import { createClientFor } from '@zitadel/client';
 
-import { WebKeyService } from '@zitadel/proto/zitadel/webkey/v2beta/webkey_service_pb';
 import { ActionService } from '@zitadel/proto/zitadel/action/v2/action_service_pb';
+import { ApplicationService } from '@zitadel/proto/zitadel/application/v2/application_service_pb';
+import { AuthorizationService } from '@zitadel/proto/zitadel/authorization/v2/authorization_service_pb';
+import { WebKeyService } from '@zitadel/proto/zitadel/webkey/v2/webkey_service_pb';
 
 const createWebKeyServiceClient = createClientFor(WebKeyService);
 const createActionServiceClient = createClientFor(ActionService);
+const createAuthorizationServiceClient = createClientFor(AuthorizationService);
+const createApplicationServiceClient = createClientFor(ApplicationService);
 
 @Injectable({
   providedIn: 'root',
@@ -49,6 +53,8 @@ export class GrpcService {
   public webKey!: ReturnType<typeof createWebKeyServiceClient>;
   public organizationNew!: ReturnType<typeof createOrganizationServiceClient>;
   public adminNew!: ReturnType<typeof createAdminServiceClient>;
+  public authorization!: ReturnType<typeof createAuthorizationServiceClient>;
+  public application!: ReturnType<typeof createApplicationServiceClient>;
 
   public assets!: void;
 
@@ -108,6 +114,8 @@ export class GrpcService {
         this.webKey = createWebKeyServiceClient(transport);
         this.organizationNew = createOrganizationServiceClient(transport);
         this.adminNew = createAdminServiceClient(transportOldAPIs);
+        this.authorization = createAuthorizationServiceClient(transport);
+        this.application = createApplicationServiceClient(transport);
 
         const authConfig: AuthConfig = {
           scope: 'openid profile email',

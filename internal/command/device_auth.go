@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -15,7 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, userCode string, expires time.Time, scopes, audience []string, needRefreshToken bool) (*domain.ObjectDetails, error) {
+func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, userCode, orgID string, expires time.Time, scopes, audience []string, needRefreshToken bool) (*domain.ObjectDetails, error) {
 	aggr := deviceauth.NewAggregate(deviceCode, authz.GetInstance(ctx).InstanceID())
 	model := NewDeviceAuthWriteModel(deviceCode, aggr.ResourceOwner)
 
@@ -29,6 +30,7 @@ func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, user
 		scopes,
 		audience,
 		needRefreshToken,
+		orgID,
 	))
 	if err != nil {
 		return nil, err
@@ -61,6 +63,9 @@ func (c *Commands) ApproveDeviceAuth(
 	}
 	if model.State != domain.DeviceAuthStateInitiated {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-GEJL3", "Errors.DeviceAuth.AlreadyHandled")
+	}
+	if model.OrganizationID != "" && model.OrganizationID != userOrgID {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-3tgws", "Errors.User.NotAllowedOrg")
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewApprovedEvent(ctx, model.aggregate, userID, userOrgID, authMethods, authTime, preferredLanguage, userAgent, sessionID))
 	if err != nil {
@@ -104,6 +109,9 @@ func (c *Commands) ApproveDeviceAuthWithSession(
 	}
 	if err := c.sessionTokenVerifier(ctx, sessionToken, sessionWriteModel.AggregateID, sessionWriteModel.TokenID); err != nil {
 		return nil, err
+	}
+	if model.OrganizationID != "" && model.OrganizationID != sessionWriteModel.UserResourceOwner {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-D2j34", "Errors.User.NotAllowedOrg")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewApprovedEvent(
@@ -177,13 +185,17 @@ func (e DeviceAuthStateError) Error() string {
 // As devices can poll at various intervals, an explicit state takes precedence over expiry.
 // This is to prevent cases where users might approve or deny the authorization on time, but the next poll
 // happens after expiry.
-func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCode, backChannelLogoutURI string) (_ *OIDCSession, err error) {
+func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCode, backChannelLogoutURI, clientID string) (_ *OIDCSession, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	deviceAuthModel, err := c.getDeviceAuthWriteModelByDeviceCode(ctx, deviceCode)
 	if err != nil {
 		return nil, err
+	}
+
+	if deviceAuthModel.ClientID != clientID {
+		return nil, oidc.ErrInvalidClient().WithDescription("client_id does not correspond to the client_id in the authorization request")
 	}
 
 	switch deviceAuthModel.State {

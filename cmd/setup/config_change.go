@@ -60,6 +60,7 @@ func (mig *externalConfigChange) Execute(ctx context.Context, _ eventstore.Event
 		0,
 		nil,
 		&login.DefaultPaths{},
+		nil,
 	)
 
 	if err != nil {

@@ -1,21 +1,21 @@
 "use client";
 
+import { handleServerActionResponse } from "@/lib/client-utils";
 import { resetPassword, sendPassword } from "@/lib/server/password";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
+import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
-import { handleServerActionResponse } from "@/lib/client";
-import { AutoSubmitForm } from "./auto-submit-form";
 
 type Inputs = {
   password: string;
@@ -112,17 +112,18 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
     <>
       {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
-        <div className={`${error && "transform-gpu animate-shake"}`}>
+        <div className={`${error && "animate-shake transform-gpu"}`}>
           <TextInput
             type="password"
             autoComplete="password"
+            autoFocus
             {...register("password", { required: t("verify.required.password") })}
             label={t("verify.labels.password")}
             data-testid="password-text-input"
           />
           {!loginSettings?.hidePasswordReset && (
             <button
-              className="text-sm transition-all hover:text-primary-light-500 dark:hover:text-primary-dark-500"
+              className="hover:text-primary-light-500 dark:hover:text-primary-dark-500 text-sm transition-all"
               onClick={() => resetPasswordAndContinue()}
               type="button"
               disabled={loading}

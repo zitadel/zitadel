@@ -1,6 +1,7 @@
 ---
 title: ZITADEL Production Setup
-sidebar_lable: Production Setup
+description: "Configure self-hosted ZITADEL for production, including high availability, networking, monitoring, and logging best practices."
+sidebar_label: Production Setup
 ---
 
 As soon as you successfully deployed ZITADEL as a proof of concept using one of our [deployment guides](/self-hosting/deploy/overview),
@@ -18,7 +19,7 @@ you should also consider using separate jobs with `zitadel init` and `zitadel se
 so your workload containers just have to execute `zitadel start`.
 Read more about separating the init and setup phases on the [Updating and Scaling page](/self-hosting/manage/updating_scaling).
 
-## Configuration
+## Setup
 
 Read [on the configure page](/self-hosting/manage/configure) about the available options you have to configure ZITADEL.
 Prefer passing .yaml files to the ZITADEL binary instead of environment variables.
@@ -124,19 +125,28 @@ please create an issue in our [github repository](https://github.com/zitadel/zit
 
 Depending on your environment, you maybe would want to tweak some settings about how ZITADEL interacts with the database in the database section of your ZITADEL configuration. Read more about your [database configuration options](/self-hosting/manage/database).
 
+Set the database connection via environment variable:
+
+```bash
+export ZITADEL_DATABASE_POSTGRES_DSN=postgresql://zitadel:password@localhost:5432/zitadel?sslmode=disable
+export ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS=10
+export ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS=5
+export ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME=30m
+export ZITADEL_DATABASE_POSTGRES_MAXCONNIDLETIME=5m
+```
+
+Or in a configuration file:
+
 ```yaml
 Database:
   postgres:
-    Host: localhost
-    Port: 5432
-    Database: zitadel
+    DSN: postgresql://zitadel:password@localhost:5432/zitadel?sslmode=disable
     //highlight-start
     MaxOpenConns: 10
     MaxIdleConns: 5
     MaxConnLifetime: 30m
     MaxConnIdleTime: 5m
     //highlight-end
-    Options: ""
 ```
 
 You also might want to configure how [projections](/concepts/eventstore/implementation#projections) are computed. These are the default values:
@@ -197,7 +207,7 @@ please refer to the corresponding docs [for PostgreSQL](https://www.postgresql.o
 
 - You can configure instance defaults in the DefaultInstance section.
   If you plan to eventually create [multiple virtual instances](/concepts/structure/instance#multiple-virtual-instances), these defaults take effect.
-  Also, these configurations apply to the first instance, that ZITADEL automatically creates for you.
+  Also, these settings apply to the first instance, that ZITADEL automatically creates for you.
   Especially the following properties are of special interest for your production setup.
 
 ```yaml
@@ -207,9 +217,9 @@ DefaultInstance:
     IdTokenLifetime: 12h
     RefreshTokenIdleExpiration: 720h #30d
     RefreshTokenExpiration: 2160h #90d
-  # this configuration sets the default email configuration
+  # this sets the default email settings
   SMTPConfiguration:
-    # configuration of the host
+    # settings of the host
     SMTP:
       #for example smtp.mailtrap.io:2525
       Host:

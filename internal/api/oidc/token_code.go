@@ -27,7 +27,7 @@ func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.Acce
 		return nil, zerrors.ThrowInternal(nil, "OIDC-Ae2ph", "Error.Internal")
 	}
 
-	plainCode, err := s.decryptCode(ctx, r.Data.Code)
+	plainCode, err := s.encAlg.DecryptToken(r.Data.Code)
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "OIDC-ahLi2", "Errors.User.Code.Invalid")
 	}
@@ -60,6 +60,10 @@ func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.A
 	authReq, err := s.getAuthRequestV1ByCode(ctx, code)
 	if err != nil {
 		return nil, err
+	}
+
+	if authReq.GetClientID() != client.client.ClientID {
+		return nil, oidc.ErrInvalidClient().WithDescription("client_id does not correspond to the client_id in the authorization request")
 	}
 
 	if challenge := authReq.GetCodeChallenge(); challenge != nil || client.AuthMethod() == oidc.AuthMethodNone {
@@ -121,6 +125,9 @@ func (s *Server) getAuthRequestV1ByID(ctx context.Context, id string) (*AuthRequ
 
 func codeExchangeComplianceChecker(client *Client, req *oidc.AccessTokenRequest) command.AuthRequestComplianceChecker {
 	return func(ctx context.Context, authReq *command.AuthRequestWriteModel) error {
+		if authReq.ClientID != client.client.ClientID {
+			return oidc.ErrInvalidClient().WithDescription("client_id does not correspond to the client_id in the authorization request")
+		}
 		if authReq.CodeChallenge != nil || client.AuthMethod() == oidc.AuthMethodNone {
 			err := op.AuthorizeCodeChallenge(req.CodeVerifier, CodeChallengeToOIDC(authReq.CodeChallenge))
 			if err != nil {

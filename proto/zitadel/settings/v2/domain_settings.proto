@@ -12,8 +12,8 @@ message DomainSettings {
   // This ensures that the login name is unique across the instance.
   bool login_name_includes_domain = 1;
 
-  // If enabled, organization domains must be verified (through an DNS or HTTP challenge) upon creation.
-  // If disabled, organization domains will be created as already verified automatically.
+  // If enabled, Organization Domains must be verified (through an DNS or HTTP challenge) upon creation.
+  // If disabled, Organization Domains will be created as already verified automatically.
   bool require_org_domain_verification = 2;
 
   // If enabled, the SMTP sender address domain must match Custom Domain on the instance.

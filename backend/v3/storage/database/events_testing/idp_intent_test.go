@@ -2,7 +2,7 @@
 
 package events_test
 
-// TODO(adlerhurst): Uncomment once users table is created and FK can be enforced
+// The tests of this file fail because we would need to mock an ldap, OIDC and Oauth server.
 
 // import (
 // 	"net"

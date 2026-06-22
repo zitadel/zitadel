@@ -83,7 +83,7 @@
     "set": {
       "title": "Set Password",
       "description": "Set the password for your account",
-      "codeSent": "A code has been sent to your email address.",
+      "codeSent": "A new code has been sent to your email address.",
       "noCodeReceived": "Didn't receive a code?",
       "resend": "Resend code",
       "submit": "Continue",
@@ -108,14 +108,17 @@
       "description": "Set the password for your account",
       "submit": "Continue",
       "labels": {
+        "currentPassword": "Current Password",
         "newPassword": "New Password",
         "confirmPassword": "Confirm Password"
       },
       "required": {
+        "currentPassword": "You have to provide your current password!",
         "newPassword": "You have to provide a new password!",
         "confirmPassword": "This field is required"
       },
       "errors": {
+        "currentPasswordInvalid": "Current password is incorrect.",
         "couldNotChangePassword": "Could not change password",
         "couldNotVerifyPassword": "Could not verify password",
         "unknownError": "Unknown error"
@@ -380,13 +383,14 @@
     "userIdMissing": "No userId provided!",
     "successTitle": "User verified",
     "successDescription": "The user has been verified successfully.",
+    "successContinue": "Continue",
     "setupAuthenticator": "Setup authenticator",
     "verify": {
       "title": "Verify user",
       "description": "Enter the Code provided in the verification email.",
       "noCodeReceived": "Didn't receive a code?",
       "resendCode": "Resend code",
-      "codeSent": "A code has just been sent to your email address.",
+      "codeSent": "A new code has just been sent to your email address.",
       "submit": "Continue",
       "labels": {
         "code": "Code"

@@ -81,9 +81,7 @@ func DecodeConfig(input any) (database.Connector, error) {
 		if err = decoder.Decode(c); err != nil {
 			return nil, err
 		}
-		return &Config{
-			Config: &pgxpool.Config{},
-		}, nil
+		return connector, nil
 	}
 	return nil, errors.New("invalid configuration")
 }

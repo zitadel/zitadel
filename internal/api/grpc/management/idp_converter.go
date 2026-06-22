@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
@@ -257,22 +258,24 @@ func updateGenericOIDCProviderToCommand(req *mgmt_pb.UpdateGenericOIDCProviderRe
 
 func addJWTProviderToCommand(req *mgmt_pb.AddJWTProviderRequest) command.JWTProvider {
 	return command.JWTProvider{
-		Name:        req.Name,
-		Issuer:      req.Issuer,
-		JWTEndpoint: req.JwtEndpoint,
-		KeyEndpoint: req.KeysEndpoint,
-		HeaderName:  req.HeaderName,
+		Name:        req.GetName(),
+		Issuer:      req.GetIssuer(),
+		JWTEndpoint: req.GetJwtEndpoint(),
+		KeyEndpoint: req.GetKeysEndpoint(),
+		HeaderName:  req.GetHeaderName(),
+		Audience:    req.GetAudience(),
 		IDPOptions:  idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 
 func updateJWTProviderToCommand(req *mgmt_pb.UpdateJWTProviderRequest) command.JWTProvider {
 	return command.JWTProvider{
-		Name:        req.Name,
-		Issuer:      req.Issuer,
-		JWTEndpoint: req.JwtEndpoint,
-		KeyEndpoint: req.KeysEndpoint,
-		HeaderName:  req.HeaderName,
+		Name:        req.GetName(),
+		Issuer:      req.GetIssuer(),
+		JWTEndpoint: req.GetJwtEndpoint(),
+		KeyEndpoint: req.GetKeysEndpoint(),
+		HeaderName:  req.GetHeaderName(),
+		Audience:    req.GetAudience(),
 		IDPOptions:  idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -536,5 +539,25 @@ func signatureAlgorithmToCommand(signatureAlgorithm idp_pb.SAMLSignatureAlgorith
 		return dsig.RSASHA512SignatureMethod
 	default:
 		return ""
+	}
+}
+
+func addZitadelProviderToCommand(req *mgmt_pb.AddZitadelProviderRequest) command.ZitadelProvider {
+	instanceRolesInfo := make([]idp.RolesInfo, 0, len(req.InstanceRolesInfo))
+	for _, info := range req.InstanceRolesInfo {
+		instanceRolesInfo = append(instanceRolesInfo, idp.RolesInfo{
+			OrganizationID:     info.OrganizationId,
+			OrganizationDomain: info.OrganizationDomain,
+		})
+	}
+
+	return command.ZitadelProvider{
+		Name:              req.Name,
+		Issuer:            req.Issuer,
+		ClientID:          req.ClientId,
+		ClientSecret:      req.ClientSecret,
+		Scopes:            req.Scopes,
+		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+		InstanceRolesInfo: instanceRolesInfo,
 	}
 }

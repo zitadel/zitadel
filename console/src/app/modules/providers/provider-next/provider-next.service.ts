@@ -80,16 +80,31 @@ export class ProviderNextService {
     );
   }
 
-  callbackUrls(): Observable<CopyUrl[]> {
+  callbackUrls(formPost: boolean = false): Observable<CopyUrl[]> {
     return this.env.env.pipe(
       map((env) => [
         {
           label: 'Login V1 Callback URL',
-          url: `${env.issuer}/ui/login/login/externalidp/callback`,
+          url: `${env.issuer}/ui/login/login/externalidp/callback${formPost ? '/form' : ''}`,
         },
         {
           label: 'Login V2 Callback URL',
           url: `${env.issuer}/idps/callback`,
+        },
+      ]),
+    );
+  }
+
+  jwtCallbackUrls(): Observable<CopyUrl[]> {
+    return this.env.env.pipe(
+      map((env) => [
+        {
+          label: 'Login V1 Callback URL',
+          url: `${env.issuer}/ui/login/idps/jwt`,
+        },
+        {
+          label: 'Login V2 Callback URL',
+          url: `${env.issuer}/idps/jwt`,
         },
       ]),
     );

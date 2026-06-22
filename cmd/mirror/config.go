@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/id"
 )
@@ -100,6 +101,7 @@ func newConfig(v *viper.Viper, config any) error {
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook(true),
 			actions.HTTPConfigDecodeHook,
+			denylist.DenyListDecodeHook,
 			hook.EnumHookFunc(internal_authz.MemberTypeString),
 			mapstructure.TextUnmarshallerHookFunc(),
 		)),

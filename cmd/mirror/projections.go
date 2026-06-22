@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"net/http"
 	"sync"
 	"time"
 
@@ -22,6 +21,7 @@ import (
 	admin_handler "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing/handler"
 	admin_view "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing/view"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
@@ -108,6 +108,7 @@ type ProjectionsConfig struct {
 	WebAuthNName    string
 	DefaultInstance command.InstanceSetup
 	AssetStorage    static_config.AssetStorageConfig
+	HTTPClient      http.ClientConfig
 }
 
 func migrateProjectionsFlags(cmd *cobra.Command) {
@@ -186,6 +187,9 @@ func projections(
 		DisplayName:    config.WebAuthNName,
 		ExternalSecure: config.ExternalSecure,
 	}
+
+	httpClient := config.HTTPClient.NewClient()
+
 	commands, err := command.StartCommands(ctx,
 		es,
 		cacheConnectors,
@@ -202,10 +206,10 @@ func projections(
 		keys.SMS,
 		keys.User,
 		keys.DomainVerification,
-		keys.OIDC,
 		keys.SAML,
 		keys.Target,
-		&http.Client{},
+		keys.OIDC,
+		httpClient,
 		func(ctx context.Context, permission, orgID, resourceID string) (err error) {
 			return internal_authz.CheckPermission(ctx, authZRepo, config.SystemAuthZ.RolePermissionMappings, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 		},
@@ -215,6 +219,7 @@ func projections(
 		config.OIDC.DefaultRefreshTokenIdleExpiration,
 		config.DefaultInstance.SecretGenerators,
 		config.Login.DefaultPaths,
+		config.HTTPClient.DenyList,
 	)
 	logging.OnError(ctx, err).Fatal("unable to start commands")
 
@@ -244,6 +249,7 @@ func projections(
 		keys.SMTP,
 		keys.SMS,
 		nil,
+		httpClient,
 	)
 
 	config.Auth.Spooler.Client = client

@@ -87,19 +87,21 @@ func (s *Session) validateToken(ctx context.Context, token string) (*oidc.IDToke
 	}
 
 	logging.Debug("begin signature validation")
-	keySet := rp.NewRemoteKeySet(http.DefaultClient, s.Provider.keysEndpoint)
+	keySet := rp.NewRemoteKeySet(s.httpClient, s.keysEndpoint)
 	if err = oidc.CheckSignature(ctx, token, payload, claims, nil, keySet); err != nil {
 		return nil, fmt.Errorf("%w: invalid signature: %v", ErrInvalidToken, err)
 	}
 
-	if !claims.GetExpiration().IsZero() {
-		if err = oidc.CheckExpiration(claims, offset); err != nil {
-			return nil, fmt.Errorf("%w: expired: %v", ErrInvalidToken, err)
-		}
+	if err = oidc.CheckExpiration(claims, offset); err != nil {
+		return nil, fmt.Errorf("%w: expired: %v", ErrInvalidToken, err)
 	}
 
-	if !claims.GetIssuedAt().IsZero() {
-		if err = oidc.CheckIssuedAt(claims, maxAge, offset); err != nil {
+	if err = oidc.CheckIssuedAt(claims, maxAge, offset); err != nil {
+		return nil, fmt.Errorf("%w: %v", ErrInvalidToken, err)
+	}
+
+	if s.Provider.audience != "" {
+		if err = oidc.CheckAudience(claims, s.Provider.audience); err != nil {
 			return nil, fmt.Errorf("%w: %v", ErrInvalidToken, err)
 		}
 	}
@@ -153,7 +155,7 @@ func (u *User) GetPhone() domain.PhoneNumber {
 }
 
 func (u *User) IsPhoneVerified() bool {
-	return u.PhoneNumberVerified
+	return bool(u.PhoneNumberVerified)
 }
 
 func (u *User) GetPreferredLanguage() language.Tag {

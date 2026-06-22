@@ -202,9 +202,11 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *connec
 		return nil, err
 	}
 	if idpIntent.UserId == "" {
-		idpIntent.AddHumanUser = idpUserToAddHumanUser(idpUser, idpIntent.IdpInformation.IdpId)
+		idpIntent.AddHumanUser = idpUserToAddHumanUser(idpUser, idpIntent.IdpInformation.IdpId) //nolint:staticcheck
+		idpIntent.UserAction = idpUserToCreateUser(idpUser, idpIntent.IdpInformation.IdpId)
 	} else {
-		idpIntent.UpdateHumanUser = idpUserToUpdateHumanUser(intent.UserID, idpUser)
+		idpIntent.UpdateHumanUser = idpUserToUpdateHumanUser(intent.UserID, idpUser) //nolint:staticcheck
+		idpIntent.UserAction = idpUserToUpdateUser(intent.UserID, idpUser)
 	}
 	return connect.NewResponse(idpIntent), nil
 }
@@ -250,7 +252,7 @@ func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.Encr
 	information.Details = intentToDetailsPb(intent)
 	// OAuth / OIDC
 	if intent.IDPIDToken != "" || intent.IDPAccessToken != nil {
-		information.IdpInformation.Access, err = idpOAuthTokensToPb(intent.IDPIDToken, intent.IDPAccessToken, alg)
+		information.IdpInformation.Access, err = idpOAuthTokensToPb(intent.IDPIDToken, intent.IDPAccessToken, intent.IDPRefreshToken, alg)
 		if err != nil {
 			return nil, err
 		}
@@ -274,7 +276,7 @@ func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.Encr
 	return information, nil
 }
 
-func idpOAuthTokensToPb(idpIDToken string, idpAccessToken *crypto.CryptoValue, alg crypto.EncryptionAlgorithm) (_ *user.IDPInformation_Oauth, err error) {
+func idpOAuthTokensToPb(idpIDToken string, idpAccessToken, idpRefreshToken *crypto.CryptoValue, alg crypto.EncryptionAlgorithm) (_ *user.IDPInformation_Oauth, err error) {
 	var idToken *string
 	if idpIDToken != "" {
 		idToken = &idpIDToken
@@ -286,10 +288,19 @@ func idpOAuthTokensToPb(idpIDToken string, idpAccessToken *crypto.CryptoValue, a
 			return nil, err
 		}
 	}
+	var refreshToken *string
+	if idpRefreshToken != nil {
+		decryptedRefreshToken, err := crypto.DecryptString(idpRefreshToken, alg)
+		if err != nil {
+			return nil, err
+		}
+		refreshToken = &decryptedRefreshToken
+	}
 	return &user.IDPInformation_Oauth{
 		Oauth: &user.IDPOAuthAccessInformation{
-			AccessToken: accessToken,
-			IdToken:     idToken,
+			AccessToken:  accessToken,
+			RefreshToken: refreshToken,
+			IdToken:      idToken,
 		},
 	}, nil
 }
@@ -419,4 +430,106 @@ func idpUserToUpdateHumanUser(userID string, idpUser idp.User) *user.UpdateHuman
 		}
 	}
 	return updateHumanUser
+}
+
+func idpUserToCreateUser(idpUser idp.User, idpID string) *user.RetrieveIdentityProviderIntentResponse_CreateUser {
+	createUser := &user.CreateUserRequest{
+		UserType: &user.CreateUserRequest_Human_{
+			Human: &user.CreateUserRequest_Human{
+				Profile: &user.SetHumanProfile{
+					GivenName:  idpUser.GetFirstName(),
+					FamilyName: idpUser.GetLastName(),
+				},
+				Email: &user.SetHumanEmail{
+					Email:        string(idpUser.GetEmail()),
+					Verification: &user.SetHumanEmail_SendCode{},
+				},
+				IdpLinks: []*user.IDPLink{
+					{
+						IdpId:    idpID,
+						UserId:   idpUser.GetID(),
+						UserName: idpUser.GetPreferredUsername(),
+					},
+				},
+			},
+		},
+	}
+	if username := idpUser.GetPreferredUsername(); username != "" {
+		createUser.Username = &username
+	}
+	if nickName := idpUser.GetNickname(); nickName != "" {
+		createUser.GetHuman().GetProfile().NickName = &nickName
+	}
+	if displayName := idpUser.GetDisplayName(); displayName != "" {
+		createUser.GetHuman().GetProfile().DisplayName = &displayName
+	}
+	if lang := idpUser.GetPreferredLanguage().String(); lang != "" {
+		createUser.GetHuman().GetProfile().PreferredLanguage = &lang
+	}
+	if isEmailVerified := idpUser.IsEmailVerified(); isEmailVerified {
+		createUser.GetHuman().GetEmail().Verification = &user.SetHumanEmail_IsVerified{IsVerified: isEmailVerified}
+	}
+	if phone := idpUser.GetPhone(); phone != "" {
+		createUser.GetHuman().Phone = &user.SetHumanPhone{
+			Phone:        string(phone),
+			Verification: &user.SetHumanPhone_SendCode{},
+		}
+		if isPhoneVerified := idpUser.IsPhoneVerified(); isPhoneVerified {
+			createUser.GetHuman().GetPhone().Verification = &user.SetHumanPhone_IsVerified{IsVerified: isPhoneVerified}
+		}
+	}
+	return &user.RetrieveIdentityProviderIntentResponse_CreateUser{
+		CreateUser: createUser,
+	}
+}
+
+func idpUserToUpdateUser(userID string, idpUser idp.User) *user.RetrieveIdentityProviderIntentResponse_UpdateUser {
+	updateUser := &user.UpdateUserRequest{
+		UserId: userID,
+		UserType: &user.UpdateUserRequest_Human_{
+			Human: &user.UpdateUserRequest_Human{
+				Profile: &user.UpdateUserRequest_Human_Profile{},
+			},
+		},
+	}
+	if username := idpUser.GetPreferredUsername(); username != "" {
+		updateUser.Username = &username
+	}
+	if firstName := idpUser.GetFirstName(); firstName != "" {
+		updateUser.GetHuman().GetProfile().GivenName = &firstName
+	}
+	if lastName := idpUser.GetLastName(); lastName != "" {
+		updateUser.GetHuman().GetProfile().FamilyName = &lastName
+	}
+	if nickName := idpUser.GetNickname(); nickName != "" {
+		updateUser.GetHuman().GetProfile().NickName = &nickName
+	}
+	if displayName := idpUser.GetDisplayName(); displayName != "" {
+		updateUser.GetHuman().GetProfile().DisplayName = &displayName
+	}
+	if lang := idpUser.GetPreferredLanguage().String(); lang != "" {
+		updateUser.GetHuman().GetProfile().PreferredLanguage = &lang
+	}
+	if email := string(idpUser.GetEmail()); email != "" {
+		updateUser.GetHuman().Email = &user.SetHumanEmail{
+			Email:        email,
+			Verification: &user.SetHumanEmail_SendCode{},
+		}
+		if isEmailVerified := idpUser.IsEmailVerified(); isEmailVerified {
+			updateUser.GetHuman().GetEmail().Verification = &user.SetHumanEmail_IsVerified{IsVerified: isEmailVerified}
+		}
+	}
+	if phone := string(idpUser.GetPhone()); phone != "" {
+		updateUser.GetHuman().Phone = &user.SetHumanPhone{
+			Phone:        phone,
+			Verification: &user.SetHumanPhone_SendCode{},
+		}
+		if isPhoneVerified := idpUser.IsPhoneVerified(); isPhoneVerified {
+			updateUser.GetHuman().GetPhone().Verification = &user.SetHumanPhone_IsVerified{IsVerified: isPhoneVerified}
+		}
+	}
+
+	return &user.RetrieveIdentityProviderIntentResponse_UpdateUser{
+		UpdateUser: updateUser,
+	}
 }

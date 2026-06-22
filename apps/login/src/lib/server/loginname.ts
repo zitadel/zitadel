@@ -1,5 +1,7 @@
 "use server";
 
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
+import { createLogger } from "@/lib/logger";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
@@ -24,6 +26,8 @@ import {
 } from "../zitadel";
 import { createSessionAndUpdateCookie } from "./cookie";
 import { getPublicHost } from "./host";
+
+const logger = createLogger("loginname");
 
 export type SendLoginnameCommand = {
   loginName: string;
@@ -60,17 +64,17 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   // Safety check: ensure searchResult is defined
   if (!searchResult) {
-    console.error("searchUsers returned undefined or null");
+    logger.error("searchUsers returned undefined or null");
     return { error: t("errors.couldNotSearchUsers") };
   }
 
   if ("error" in searchResult && searchResult.error) {
-    console.log("searchUsers returned error, returning early:", searchResult.error);
+    logger.debug("searchUsers returned error, returning early", { error: searchResult.error });
     return searchResult;
   }
 
   if (!("result" in searchResult)) {
-    console.log("searchUsers has no result field");
+    logger.debug("searchUsers has no result field");
     return { error: t("errors.couldNotSearchUsers") };
   }
 
@@ -80,12 +84,12 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   const users = potentialUsers ?? [];
 
   if (users.length === 0) {
-    console.log("No users found, will proceed with org discovery");
+    logger.debug("No users found, will proceed with org discovery");
   }
 
   const preventUserEnumeration = (organization: string | undefined) => {
     if (command.ignoreUnknownUsernames) {
-      console.log("ignoreUnknownUsernames is true, redirecting to password");
+      logger.debug("ignoreUnknownUsernames is true, redirecting to password");
       const paramsPasswordDefault = new URLSearchParams({
         loginName: command.loginName,
       });
@@ -100,6 +104,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       return { redirect: "/password?" + paramsPasswordDefault };
     }
+
     return { error: t("errors.userNotFound") };
   };
 
@@ -115,7 +120,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     // If no IDP links exist for the user (or no userId provided), try to get active IDPs from the organization
     if (identityProviders.length === 0) {
       const activeIdps = await getActiveIdentityProviders({ serviceConfig, orgId: organization }).then((resp) => {
-        return resp.identityProviders;
+        return resp.identityProviders.filter((idp) => idp.options?.isAutoCreation || idp.options?.isCreationAllowed);
       });
 
       // If exactly one active IDP exists in the organization, redirect to it
@@ -228,7 +233,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   };
 
   if (users.length > 1) {
-    console.log("multiple users found, returning error");
+    logger.debug("multiple users found, returning error");
     if (loginSettingsByContext?.ignoreUnknownUsernames) {
       return preventUserEnumeration(command.organization);
     }
@@ -250,11 +255,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         return preventUserEnumeration(command.organization);
       }
     } else if (userLoginSettings?.disableLoginWithEmail) {
-      if (user.preferredLoginName !== concatLoginname || humanUser?.phone?.phone !== command.loginName) {
+      if (user.preferredLoginName !== concatLoginname && humanUser?.phone?.phone !== command.loginName) {
         return preventUserEnumeration(command.organization);
       }
     } else if (userLoginSettings?.disableLoginWithPhone) {
-      if (user.preferredLoginName !== concatLoginname || humanUser?.email?.email !== command.loginName) {
+      if (user.preferredLoginName !== concatLoginname && humanUser?.email?.email !== command.loginName) {
         return preventUserEnumeration(command.organization);
       }
     }
@@ -269,7 +274,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         checks,
         requestId: command.requestId,
       }).catch((error) => {
-        if (error?.rawMessage === "Errors.User.NotActive (SESSION-Gj4ko)") {
+        if (isClassifiedError(error) && error.message?.includes("Errors.User.NotActive")) {
           return { error: t("errors.userNotActive") };
         }
         throw error;
@@ -320,13 +325,29 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       userId: session?.factors?.user?.id ?? userId,
     });
 
-    // always resend invite if user has no auth method set
-    if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
-      console.log("humanUser.email?.isVerified", humanUser?.email?.isVerified);
+    const hasPrimaryMethod =
+      methods.authMethodTypes?.some(
+        (m: AuthenticationMethodType) =>
+          m === AuthenticationMethodType.PASSWORD ||
+          m === AuthenticationMethodType.PASSKEY ||
+          m === AuthenticationMethodType.IDP,
+      ) ?? false;
+
+    // always resend invite or setup email if user has no primary auth method set
+    if (!hasPrimaryMethod) {
+      logger.debug("humanUser.email?.isVerified", {
+        isVerified: humanUser?.email?.isVerified,
+      });
+
+      // If the user's email is not verified, they likely already have a code from the
+      // initial verification email. Auto-sending a new one here invalidates their existing code
+      // and causes confusion. Only auto-send (`send=true`) if the email is already verified.
+      const shouldSend = humanUser?.email?.isVerified === true;
+
       const params = new URLSearchParams({
         loginName: (session?.factors?.user?.loginName ?? user.preferredLoginName) as string,
-        send: "true", // set this to true to request a new code immediately
-        invite: humanUser?.email?.isVerified ? "false" : "true", // sendInviteEmailCode results in an error if user is already initialized
+        send: shouldSend ? "true" : "false",
+        invite: "true", // always send invite code if user has no primary auth method
       });
 
       if (command.requestId) {
@@ -360,29 +381,28 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             };
           }
 
-          const paramsPassword = new URLSearchParams({
-            loginName: command.ignoreUnknownUsernames
-              ? command.loginName
-              : (session?.factors?.user?.loginName ?? user.preferredLoginName),
-          });
+          {
+            const paramsPassword = new URLSearchParams({
+              loginName: command.ignoreUnknownUsernames
+                ? command.loginName
+                : (session?.factors?.user?.loginName ?? user.preferredLoginName),
+            });
 
-          if (organization) {
-            paramsPassword.append("organization", organization);
+            if (organization) {
+              paramsPassword.append("organization", organization);
+            }
+
+            if (command.requestId) {
+              paramsPassword.append("requestId", command.requestId);
+            }
+
+            return {
+              redirect: "/password?" + paramsPassword,
+            };
           }
-
-          if (command.requestId) {
-            paramsPassword.append("requestId", command.requestId);
-          }
-
-          return {
-            redirect: "/password?" + paramsPassword,
-          };
 
         case AuthenticationMethodType.PASSKEY: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
-          if (
-            userLoginSettings?.passkeysType === PasskeysType.NOT_ALLOWED ||
-            !userLoginSettings?.allowLocalAuthentication
-          ) {
+          if (userLoginSettings?.passkeysType === PasskeysType.NOT_ALLOWED || !userLoginSettings?.allowLocalAuthentication) {
             if (command.ignoreUnknownUsernames) {
               return preventUserEnumeration(command.organization);
             }
@@ -391,22 +411,24 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             };
           }
 
-          const paramsPasskey = new URLSearchParams({
-            loginName: command.ignoreUnknownUsernames
-              ? command.loginName
-              : (session?.factors?.user?.loginName ?? user.preferredLoginName),
-          });
-          if (command.requestId) {
-            paramsPasskey.append("requestId", command.requestId);
+          {
+            const paramsPasskey = new URLSearchParams({
+              loginName: command.ignoreUnknownUsernames
+                ? command.loginName
+                : (session?.factors?.user?.loginName ?? user.preferredLoginName),
+            });
+            if (command.requestId) {
+              paramsPasskey.append("requestId", command.requestId);
+            }
+
+            if (organization) {
+              paramsPasskey.append("organization", organization);
+            }
+
+            return { redirect: "/passkey?" + paramsPasskey };
           }
 
-          if (organization) {
-            paramsPasskey.append("organization", organization);
-          }
-
-          return { redirect: "/passkey?" + paramsPasskey };
-
-        case AuthenticationMethodType.IDP:
+        case AuthenticationMethodType.IDP: {
           const resp = await redirectUserToIDP(userId, organization);
 
           if (resp?.error) {
@@ -414,6 +436,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           }
 
           return resp;
+        }
       }
     } else {
       // prefer passkey in favor of other methods
@@ -473,7 +496,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
   }
 
-  console.log("user not found (0 potential users), checking registration options");
+  logger.debug("User not found (0 potential users), checking registration options");
 
   // user not found, perform organization discovery if no org context provided
   let discoveredOrganization = command.organization;
@@ -490,7 +513,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     const matched = ORG_SUFFIX_REGEX.exec(command.loginName);
     const suffix = matched?.[1] ?? "";
 
-    // this just returns orgs where the suffix is set as primary domain
+    // this just returns orgs where the suffix is set as the Organization Domain
     const orgs = await getOrgsByDomain({ serviceConfig, domain: suffix });
 
     const orgToCheckForDiscovery = orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
@@ -499,33 +522,33 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const orgLoginSettings = await getLoginSettings({ serviceConfig, organization: orgToCheckForDiscovery });
 
       if (orgLoginSettings?.allowDomainDiscovery) {
-        console.log("org discovery successful, using org:", orgToCheckForDiscovery);
+        logger.debug("Org discovery successful", { organization: orgToCheckForDiscovery });
         discoveredOrganization = orgToCheckForDiscovery;
         // Use the discovered organization's login settings for subsequent checks
         effectiveLoginSettings = orgLoginSettings;
       } else {
-        console.log("org does not allow domain discovery");
+        logger.debug("Org does not allow domain discovery");
       }
     } else {
-      console.log("no single org found for discovery");
+      logger.debug("No single org found for discovery");
     }
   }
 
-  // user not found, check if register is enabled on instance / organization context
-  if (effectiveLoginSettings?.allowRegister && !effectiveLoginSettings?.allowLocalAuthentication) {
-    console.log("redirecting to IDP (register allowed, password not allowed)");
+  // user not found, check if IDPs are available when local auth is not allowed
+  if (!effectiveLoginSettings?.allowLocalAuthentication) {
+    logger.debug("redirecting to IDP (register allowed, password not allowed)");
     const resp = await redirectUserToIDP(undefined, discoveredOrganization);
     if (resp) {
       return resp;
     }
-    console.log("IDP redirect failed, returning user not found");
+    logger.debug("IDP redirect failed, returning user not found");
 
     return preventUserEnumeration(discoveredOrganization);
   } else if (effectiveLoginSettings?.allowRegister && effectiveLoginSettings?.allowLocalAuthentication) {
-    console.log("register and password both allowed");
+    logger.debug("register and password both allowed");
     // do not register user if ignoreUnknownUsernames is set
     if (discoveredOrganization && !effectiveLoginSettings?.ignoreUnknownUsernames) {
-      console.log("redirecting to registration page with org:", discoveredOrganization);
+      logger.debug("Redirecting to registration page", { organization: discoveredOrganization });
       const params = new URLSearchParams({ organization: discoveredOrganization });
 
       if (command.requestId) {
@@ -538,7 +561,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       return { redirect: "/register?" + params };
     } else {
-      console.log("not redirecting to register:", {
+      logger.debug("Not redirecting to register", {
         hasDiscoveredOrg: !!discoveredOrganization,
         ignoreUnknownUsernames: effectiveLoginSettings?.ignoreUnknownUsernames,
       });

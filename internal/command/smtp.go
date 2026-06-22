@@ -3,11 +3,13 @@ package command
 import (
 	"context"
 	"net"
+	"net/url"
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
@@ -304,6 +306,10 @@ func (c *Commands) AddSMTPConfigHTTP(ctx context.Context, config *AddSMTPConfigH
 		}
 	}
 
+	if err := c.validateNotificationWebhookEndpoint(config.Endpoint); err != nil {
+		return err
+	}
+
 	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, config.ResourceOwner, config.ID, "")
 	if err != nil {
 		return err
@@ -347,6 +353,10 @@ func (c *Commands) ChangeSMTPConfigHTTP(ctx context.Context, config *ChangeSMTPC
 	}
 	if config.ID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-2MHkV8ObWo", "Errors.IDMissing")
+	}
+
+	if err := c.validateNotificationWebhookEndpoint(config.Endpoint); err != nil {
+		return err
 	}
 
 	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, config.ResourceOwner, config.ID, "")
@@ -696,6 +706,20 @@ func (c *Commands) prepareAddAndActivateSMTPConfig(a *instance.Aggregate, descri
 			}, nil
 		}, nil
 	}
+}
+
+func (c *Commands) validateNotificationWebhookEndpoint(endpoint string) error {
+	if endpoint == "" {
+		return nil
+	}
+	uri, err := url.Parse(endpoint)
+	if err != nil {
+		return zerrors.ThrowInvalidArgument(err, "COMMAND-Sz84nFo3aK", "Errors.Invalid.Argument")
+	}
+	if err := denylist.IsURLBlocked(c.denyList, uri, c.ipLookupFunction); err != nil {
+		return zerrors.ThrowInvalidArgument(err, "COMMAND-Uf0294nKls", "Errors.NotificationProvider.Blocked.Endpoint")
+	}
+	return nil
 }
 
 func getSMTPConfigWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, id, domain string) (_ *IAMSMTPConfigWriteModel, err error) {

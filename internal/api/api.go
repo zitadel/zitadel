@@ -57,6 +57,7 @@ type API struct {
 	targetEncryptionAlgorithm crypto.EncryptionAlgorithm
 	translator                *i18n.Translator
 	connectOTELInterceptor    *otelconnect.Interceptor
+	httpClient                *http.Client
 }
 
 func (a *API) ListGrpcServices() []string {
@@ -111,6 +112,7 @@ func New(
 	targetEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	translator *i18n.Translator,
 	trustRemoteSpans bool,
+	httpClient *http.Client,
 ) (_ *API, err error) {
 	api := &API{
 		port:                      port,
@@ -126,9 +128,10 @@ func New(
 		connectServices:           make(map[string][]string),
 		targetEncryptionAlgorithm: targetEncryptionAlgorithm,
 		translator:                translator,
+		httpClient:                httpClient,
 	}
 
-	api.grpcServer = server.CreateServer(api.verifier, systemAuthz, authZ, queries, externalDomain, tlsConfig, accessInterceptor.AccessService(), targetEncryptionAlgorithm, api.translator)
+	api.grpcServer = server.CreateServer(api.verifier, systemAuthz, authZ, queries, externalDomain, tlsConfig, accessInterceptor.AccessService(), targetEncryptionAlgorithm, api.translator, httpClient)
 	api.grpcGateway, err = server.CreateGateway(ctx, port, hostHeaders, accessInterceptor, tlsConfig)
 	if err != nil {
 		return nil, err
@@ -208,6 +211,7 @@ func (a *API) RegisterService(ctx context.Context, srv server.Server) error {
 func (a *API) registerConnectServer(service server.ConnectServer) {
 	prefix, handler := service.RegisterConnectServer(
 		connect_middleware.CallDurationHandler(),
+		connect_middleware.RequestDetailsHandler(),
 		a.connectOTELInterceptor,
 		connect_middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
 		connect_middleware.LogHandler(grpc_api.Probes...),
@@ -219,7 +223,7 @@ func (a *API) registerConnectServer(service server.ConnectServer) {
 		connect_middleware.AuthorizationInterceptor(a.verifier, a.systemAuthZ, a.authConfig),
 		connect_middleware.TranslationHandler(),
 		connect_middleware.QuotaExhaustedInterceptor(a.accessInterceptor.AccessService(), system_pb.SystemService_ServiceDesc.ServiceName),
-		connect_middleware.ExecutionHandler(a.targetEncryptionAlgorithm, a.queries.GetActiveSigningWebKey),
+		connect_middleware.ExecutionHandler(a.targetEncryptionAlgorithm, a.queries.GetActiveSigningWebKey, a.httpClient),
 		connect_middleware.ValidationHandler(),
 		connect_middleware.ServiceHandler(),
 		connect_middleware.ActivityInterceptor(),

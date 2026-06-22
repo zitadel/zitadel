@@ -8,6 +8,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"math/big"
+	"net"
 	"net/http"
 	"slices"
 	"strconv"
@@ -18,15 +19,18 @@ import (
 	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/logging"
 
+	new_domain "github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
+	internal_net "github.com/zitadel/zitadel/internal/net"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -76,6 +80,7 @@ type Commands struct {
 	webauthnConfig          *webauthn_helper.Config
 	keySize                 int
 	keyAlgorithm            crypto.EncryptionAlgorithm
+	authAlgorithm           crypto.AuthAlgorithm
 	certificateAlgorithm    crypto.EncryptionAlgorithm
 	certKeySize             int
 	privateKeyLifetime      time.Duration
@@ -101,7 +106,9 @@ type Commands struct {
 	// so the query and cache overhead can be completely eliminated.
 	milestonesCompleted sync.Map
 
-	loginPaths LoginPaths
+	loginPaths       LoginPaths
+	ipLookupFunction internal_net.IPLookupFunc
+	denyList         []denylist.AddressChecker
 }
 
 //go:generate mockgen -package command -destination ./mock_login_paths.go . LoginPaths
@@ -123,13 +130,15 @@ func StartCommands(
 	externalDomain string,
 	externalSecure bool,
 	externalPort uint16,
-	idpConfigEncryption, otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, oidcEncryption, samlEncryption, targetEncryption crypto.EncryptionAlgorithm,
+	idpConfigEncryption, otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, samlEncryption, targetEncryption crypto.EncryptionAlgorithm,
+	oidcEncryption crypto.AuthEncryptionAlgorithm,
 	httpClient *http.Client,
 	permissionCheck domain.PermissionCheck,
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
 	defaultAccessTokenLifetime, defaultRefreshTokenLifetime, defaultRefreshTokenIdleLifetime time.Duration,
 	defaultSecretGenerators *SecretGenerators,
 	loginPaths LoginPaths,
+	denyList []denylist.AddressChecker,
 ) (repo *Commands, err error) {
 	if externalDomain == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
@@ -146,10 +155,14 @@ func StartCommands(
 	if err != nil {
 		return nil, fmt.Errorf("password hasher: %w", err)
 	}
+
+	new_domain.SetPasswordHasher(userPasswordHasher)
+
 	caches, err := startCaches(ctx, cacheConnectors)
 	if err != nil {
 		return nil, fmt.Errorf("caches: %w", err)
 	}
+	ipLookupFunction := net.LookupIP
 	repo = &Commands{
 		eventstore:                      es,
 		static:                          staticStore,
@@ -177,6 +190,7 @@ func StartCommands(
 		domainVerificationGenerator:     crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, domainVerificationEncryption),
 		domainVerificationValidator:     api_http.ValidateDomain,
 		keyAlgorithm:                    oidcEncryption,
+		authAlgorithm:                   oidcEncryption,
 		certificateAlgorithm:            samlEncryption,
 		webauthnConfig:                  webAuthN,
 		httpClient:                      httpClient,
@@ -215,9 +229,11 @@ func StartCommands(
 				WithHyphen: defaults.Multifactors.RecoveryCodes.WithHyphen,
 			},
 		},
-		GenerateDomain: domain.NewGeneratedInstanceDomain,
-		caches:         caches,
-		loginPaths:     loginPaths,
+		GenerateDomain:   domain.NewGeneratedInstanceDomain,
+		caches:           caches,
+		loginPaths:       loginPaths,
+		ipLookupFunction: ipLookupFunction,
+		denyList:         denyList,
 	}
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {

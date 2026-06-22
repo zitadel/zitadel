@@ -164,7 +164,7 @@ func (wm *OAuthIDPWriteModel) NewChanges(
 	return changes, nil
 }
 
-func (wm *OAuthIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+func (wm *OAuthIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, httpClient *http.Client) (providers.Provider, error) {
 	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
 	if err != nil {
 		return nil, err
@@ -179,7 +179,10 @@ func (wm *OAuthIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encry
 		RedirectURL: callbackURL,
 		Scopes:      wm.Scopes,
 	}
-	opts := make([]oauth.ProviderOpts, 0, 4)
+	opts := make([]oauth.ProviderOpts, 0, 5)
+	if wm.UsePKCE {
+		opts = append(opts, oauth.WithRelyingPartyOption(rp.WithPKCE(nil)))
+	}
 	if wm.IsCreationAllowed {
 		opts = append(opts, oauth.WithCreationAllowed())
 	}
@@ -199,6 +202,7 @@ func (wm *OAuthIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encry
 		func() providers.User {
 			return oauth.NewUserMapper(wm.IDAttribute)
 		},
+		httpClient,
 		opts...,
 	)
 }
@@ -377,15 +381,18 @@ func (wm *OIDCIDPWriteModel) reduceOIDCConfigChangedEvent(e *idpconfig.OIDCConfi
 	}
 }
 
-func (wm *OIDCIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+func (wm *OIDCIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, httpClient *http.Client) (providers.Provider, error) {
 	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]oidc.ProviderOpts, 1, 6)
+	opts := make([]oidc.ProviderOpts, 1, 7)
 	opts[0] = oidc.WithSelectAccount()
 	if wm.IsIDTokenMapping {
 		opts = append(opts, oidc.WithIDTokenMapping())
+	}
+	if wm.UsePKCE {
+		opts = append(opts, oidc.WithRelyingPartyOption(rp.WithPKCE(nil)))
 	}
 	if wm.IsCreationAllowed {
 		opts = append(opts, oidc.WithCreationAllowed())
@@ -407,6 +414,7 @@ func (wm *OIDCIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 		callbackURL,
 		wm.Scopes,
 		oidc.DefaultMapper,
+		httpClient,
 		opts...,
 	)
 }
@@ -424,6 +432,7 @@ type JWTIDPWriteModel struct {
 	JWTEndpoint  string
 	KeysEndpoint string
 	HeaderName   string
+	Audience     string
 	idp.Options
 
 	State domain.IDPState
@@ -459,6 +468,7 @@ func (wm *JWTIDPWriteModel) reduceAddedEvent(e *idp.JWTIDPAddedEvent) {
 	wm.JWTEndpoint = e.JWTEndpoint
 	wm.KeysEndpoint = e.KeysEndpoint
 	wm.HeaderName = e.HeaderName
+	wm.Audience = e.Audience
 	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
@@ -479,6 +489,9 @@ func (wm *JWTIDPWriteModel) reduceChangedEvent(e *idp.JWTIDPChangedEvent) {
 	if e.HeaderName != nil {
 		wm.HeaderName = *e.HeaderName
 	}
+	if e.Audience != nil {
+		wm.Audience = *e.Audience
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
@@ -487,7 +500,8 @@ func (wm *JWTIDPWriteModel) NewChanges(
 	issuer,
 	jwtEndpoint,
 	keysEndpoint,
-	headerName string,
+	headerName,
+	audience string,
 	options idp.Options,
 ) ([]idp.JWTIDPChanges, error) {
 	changes := make([]idp.JWTIDPChanges, 0)
@@ -505,6 +519,9 @@ func (wm *JWTIDPWriteModel) NewChanges(
 	}
 	if wm.HeaderName != headerName {
 		changes = append(changes, idp.ChangeJWTHeaderName(headerName))
+	}
+	if wm.Audience != audience {
+		changes = append(changes, idp.ChangeJWTAudience(audience))
 	}
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {
@@ -557,7 +574,7 @@ func (wm *JWTIDPWriteModel) reduceJWTConfigChangedEvent(e *idpconfig.JWTConfigCh
 	}
 }
 
-func (wm *JWTIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+func (wm *JWTIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, httpClient *http.Client) (providers.Provider, error) {
 	opts := make([]jwt.ProviderOpts, 0)
 	if wm.IsCreationAllowed {
 		opts = append(opts, jwt.WithCreationAllowed())
@@ -577,7 +594,9 @@ func (wm *JWTIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encrypt
 		wm.JWTEndpoint,
 		wm.KeysEndpoint,
 		wm.HeaderName,
+		wm.Audience,
 		idpAlg,
+		httpClient,
 		opts...,
 	)
 }
@@ -692,7 +711,7 @@ func (wm *AzureADIDPWriteModel) NewChanges(
 	}
 	return changes, nil
 }
-func (wm *AzureADIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+func (wm *AzureADIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, httpClient *http.Client) (providers.Provider, error) {
 	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
 	if err != nil {
 		return nil, err
@@ -726,6 +745,7 @@ func (wm *AzureADIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Enc
 		secret,
 		callbackURL,
 		wm.Scopes,
+		httpClient,
 		opts...,
 	)
 }
@@ -820,7 +840,7 @@ func (wm *GitHubIDPWriteModel) NewChanges(
 	}
 	return changes, nil
 }
-func (wm *GitHubIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+func (wm *GitHubIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, httpClient *http.Client) (providers.Provider, error) {
 	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
 	if err != nil {
 		return nil, err
@@ -843,6 +863,7 @@ func (wm *GitHubIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encr
 		secret,
 		callbackURL,
 		wm.Scopes,
+		httpClient,
 		oauthOpts...,
 	)
 }
@@ -964,7 +985,7 @@ func (wm *GitHubEnterpriseIDPWriteModel) NewChanges(
 	return changes, nil
 }
 
-func (wm *GitHubEnterpriseIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+func (wm *GitHubEnterpriseIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, httpClient *http.Client) (providers.Provider, error) {
 	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
 	if err != nil {
 		return nil, err
@@ -991,6 +1012,7 @@ func (wm *GitHubEnterpriseIDPWriteModel) ToProvider(callbackURL string, idpAlg c
 		wm.TokenEndpoint,
 		wm.UserEndpoint,
 		wm.Scopes,
+		httpClient,
 		oauthOpts...,
 	)
 }
@@ -1086,7 +1108,7 @@ func (wm *GitLabIDPWriteModel) NewChanges(
 	return changes, nil
 }
 
-func (wm *GitLabIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+func (wm *GitLabIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, httpClient *http.Client) (providers.Provider, error) {
 	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
 	if err != nil {
 		return nil, err
@@ -1109,6 +1131,7 @@ func (wm *GitLabIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encr
 		secret,
 		callbackURL,
 		wm.Scopes,
+		httpClient,
 		opts...,
 	)
 }
@@ -1212,7 +1235,7 @@ func (wm *GitLabSelfHostedIDPWriteModel) NewChanges(
 	return changes, nil
 }
 
-func (wm *GitLabSelfHostedIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+func (wm *GitLabSelfHostedIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, httpClient *http.Client) (providers.Provider, error) {
 	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
 	if err != nil {
 		return nil, err
@@ -1237,6 +1260,7 @@ func (wm *GitLabSelfHostedIDPWriteModel) ToProvider(callbackURL string, idpAlg c
 		secret,
 		callbackURL,
 		wm.Scopes,
+		httpClient,
 		opts...,
 	)
 }
@@ -1334,7 +1358,7 @@ func (wm *GoogleIDPWriteModel) NewChanges(
 	return changes, nil
 }
 
-func (wm *GoogleIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+func (wm *GoogleIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, httpClient *http.Client) (providers.Provider, error) {
 	errorHandler := func(w http.ResponseWriter, r *http.Request, errorType string, errorDesc string, state string) {
 		logging.Errorf("token exchanged failed: %s - %s (state: %s)", errorType, errorType, state)
 		rp.DefaultErrorHandler(w, r, errorType, errorDesc, state)
@@ -1362,6 +1386,7 @@ func (wm *GoogleIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encr
 		secret,
 		callbackURL,
 		wm.Scopes,
+		httpClient,
 		opts...,
 	)
 }
@@ -1536,7 +1561,7 @@ func (wm *LDAPIDPWriteModel) NewChanges(
 	return changes, nil
 }
 
-func (wm *LDAPIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+func (wm *LDAPIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, httpClient *http.Client) (providers.Provider, error) {
 	password, err := crypto.DecryptString(wm.BindPassword, idpAlg)
 	if err != nil {
 		return nil, err
@@ -1715,7 +1740,7 @@ func (wm *AppleIDPWriteModel) NewChanges(
 	return changes, nil
 }
 
-func (wm *AppleIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+func (wm *AppleIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, httpClient *http.Client) (providers.Provider, error) {
 	privateKey, err := crypto.Decrypt(wm.PrivateKey, idpAlg)
 	if err != nil {
 		return nil, err
@@ -1740,6 +1765,7 @@ func (wm *AppleIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encry
 		callbackURL,
 		privateKey,
 		wm.Scopes,
+		httpClient,
 		opts...,
 	)
 }
@@ -1886,7 +1912,13 @@ func (wm *SAMLIDPWriteModel) NewChanges(
 	return changes, nil
 }
 
-func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, getRequest requesttracker.GetRequest, addRequest requesttracker.AddRequest) (providers.Provider, error) {
+func (wm *SAMLIDPWriteModel) ToProvider(
+	callbackURL string,
+	idpAlg crypto.EncryptionAlgorithm,
+	httpClient *http.Client,
+	getRequest requesttracker.GetRequest,
+	addRequest requesttracker.AddRequest,
+) (providers.Provider, error) {
 	key, err := crypto.Decrypt(wm.Key, idpAlg)
 	if err != nil {
 		return nil, err
@@ -1933,6 +1965,7 @@ func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 		wm.Metadata,
 		wm.Certificate,
 		key,
+		httpClient,
 		opts...,
 	)
 }
@@ -2186,13 +2219,13 @@ func (wm *IDPTypeWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 type IDP interface {
 	eventstore.QueryReducer
-	ToProvider(string, crypto.EncryptionAlgorithm) (providers.Provider, error)
+	ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, httpClient *http.Client) (providers.Provider, error)
 	GetProviderOptions() idp.Options
 }
 
 type SAMLIDP interface {
 	eventstore.QueryReducer
-	ToProvider(string, crypto.EncryptionAlgorithm, requesttracker.GetRequest, requesttracker.AddRequest) (providers.Provider, error)
+	ToProvider(string, crypto.EncryptionAlgorithm, *http.Client, requesttracker.GetRequest, requesttracker.AddRequest) (providers.Provider, error)
 	GetProviderOptions() idp.Options
 }
 
@@ -2302,11 +2335,15 @@ func (wm *AllIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 	wm.samlModel.AppendEvents(events...)
 }
 
-func (wm *AllIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+func (wm *AllIDPWriteModel) ToProvider(
+	callbackURL string,
+	idpAlg crypto.EncryptionAlgorithm,
+	httpClient *http.Client,
+) (providers.Provider, error) {
 	if wm.model == nil {
 		return nil, zerrors.ThrowInternal(nil, "COMMAND-afvf0gc9sa", "ErrorsIDPConfig.NotExisting")
 	}
-	return wm.model.ToProvider(callbackURL, idpAlg)
+	return wm.model.ToProvider(callbackURL, idpAlg, httpClient)
 }
 
 func (wm *AllIDPWriteModel) GetProviderOptions() idp.Options {
@@ -2316,9 +2353,64 @@ func (wm *AllIDPWriteModel) GetProviderOptions() idp.Options {
 	return wm.samlModel.GetProviderOptions()
 }
 
-func (wm *AllIDPWriteModel) ToSAMLProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, getRequest requesttracker.GetRequest, addRequest requesttracker.AddRequest) (providers.Provider, error) {
+func (wm *AllIDPWriteModel) ToSAMLProvider(
+	callbackURL string,
+	idpAlg crypto.EncryptionAlgorithm,
+	httpClient *http.Client,
+	getRequest requesttracker.GetRequest,
+	addRequest requesttracker.AddRequest,
+) (providers.Provider, error) {
 	if wm.samlModel == nil {
 		return nil, zerrors.ThrowInternal(nil, "COMMAND-csi30hdscv", "ErrorsIDPConfig.NotExisting")
 	}
-	return wm.samlModel.ToProvider(callbackURL, idpAlg, getRequest, addRequest)
+	return wm.samlModel.ToProvider(
+		callbackURL,
+		idpAlg,
+		httpClient,
+		getRequest,
+		addRequest,
+	)
+}
+
+type ZitadelIDPWriteModel struct {
+	eventstore.WriteModel
+
+	Name         string
+	ID           string
+	Issuer       string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       []string
+	idp.Options
+	InstanceRolesInfo []idp.RolesInfo
+
+	State domain.IDPState
+}
+
+func (wm *ZitadelIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.ZitadelIDPAddedEvent:
+			wm.reduceAddedEvent(e)
+		case *idp.ZitadelIDPChangedEvent:
+			// todo (@grvijayan): to please the linter for now
+			wm.reduceChangedEvent(e)
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *ZitadelIDPWriteModel) reduceAddedEvent(e *idp.ZitadelIDPAddedEvent) {
+	wm.Name = e.Name
+	wm.Issuer = e.Issuer
+	wm.ClientID = e.ClientID
+	wm.ClientSecret = e.ClientSecret
+	wm.Scopes = e.Scopes
+	wm.Options = e.Options
+	wm.InstanceRolesInfo = e.InstanceRolesInfo
+	wm.State = domain.IDPStateActive
+}
+
+func (wm *ZitadelIDPWriteModel) reduceChangedEvent(e *idp.ZitadelIDPChangedEvent) {
+	// todo (@grvijayan): will be implemented along with UpdateZitadelProvider changes
 }

@@ -40,7 +40,7 @@ func (l *Login) runPostExternalAuthenticationActions(
 		// so let's do a workaround and resourceOwnerOfUserIDPLink if there would be a IDP link
 		resourceOwner, err = l.resourceOwnerOfUserIDPLink(ctx, authRequest.SelectedIDPConfigID, user.ExternalUserID)
 		logging.WithFields("authReq", authRequest.ID, "idpID", authRequest.SelectedIDPConfigID).OnError(err).
-			Warn("could not determine resource owner for runPostExternalAuthenticationActions, fall back to default org id")
+			Warn("could not determine Organization ID for runPostExternalAuthenticationActions, fall back to default org id")
 	}
 	// fallback to default org id
 	if resourceOwner == "" {
@@ -152,7 +152,7 @@ func (l *Login) runPostExternalAuthenticationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx, l.httpClient), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -226,7 +226,7 @@ func (l *Login) runPostInternalAuthenticationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx, l.httpClient), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -346,7 +346,7 @@ func (l *Login) runPreCreationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx, l.httpClient), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -423,7 +423,7 @@ func (l *Login) runPostCreationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx, l.httpClient), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {

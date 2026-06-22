@@ -9,34 +9,36 @@
     <p class="sub cnsl-secondary-text max-width-description">
       {{ 'DESCRIPTIONS.ROLE_ASSIGNMENTS.DESCRIPTION' | translate }}
     </p>
-    <cnsl-user-grants
-      *ngIf="grantContext === UserGrantContext.NONE"
-      [displayedColumns]="[
-        'select',
-        'user',
-        'org',
-        'projectId',
-        'type',
-        'creationDate',
-        'changeDate',
-        'state',
-        'roleNamesList',
-        'actions',
-      ]"
-      [disableWrite]="(['user.grant.write$'] | hasRole | async) === false"
-      [disableDelete]="(['user.grant.delete$'] | hasRole | async) === false"
-      [refreshOnPreviousRoutes]="['/grant-create']"
-    >
-    </cnsl-user-grants>
+    @if (grantContext === UserGrantContext.NONE) {
+      <cnsl-user-grants
+        [displayedColumns]="[
+          'select',
+          'user',
+          'org',
+          'projectId',
+          'type',
+          'creationDate',
+          'changeDate',
+          'state',
+          'roleNamesList',
+          'actions',
+        ]"
+        [disableWrite]="(['user.grant.write$'] | hasRole | async) === false"
+        [disableDelete]="(['user.grant.delete$'] | hasRole | async) === false"
+        [refreshOnPreviousRoutes]="['/grant-create']"
+      >
+      </cnsl-user-grants>
+    }
 
-    <cnsl-user-grants
-      *ngIf="grantContext === UserGrantContext.OWNED_PROJECT"
-      [context]="UserGrantContext.OWNED_PROJECT"
-      [projectId]="projectId"
-      [refreshOnPreviousRoutes]="['/grant-create/project/' + projectId]"
-      [disableWrite]="(['user.grant.write$', 'user.grant.write:' + projectId] | hasRole | async) === false"
-      [disableDelete]="(['user.grant.delete$', 'user.grant.delete:' + projectId] | hasRole | async) === false"
-    >
-    </cnsl-user-grants>
+    @if (grantContext === UserGrantContext.OWNED_PROJECT) {
+      <cnsl-user-grants
+        [context]="UserGrantContext.OWNED_PROJECT"
+        [projectId]="projectId"
+        [refreshOnPreviousRoutes]="['/grant-create/project/' + projectId]"
+        [disableWrite]="(['user.grant.write$', 'user.grant.write:' + projectId] | hasRole | async) === false"
+        [disableDelete]="(['user.grant.delete$', 'user.grant.delete:' + projectId] | hasRole | async) === false"
+      >
+      </cnsl-user-grants>
+    }
   </div>
 </div>

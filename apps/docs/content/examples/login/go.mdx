@@ -1,5 +1,6 @@
 ---
-title: ZITADEL with Go
+title: Go Web Application Login with ZITADEL
+description: "Integrate ZITADEL for user login and profile retrieval in Go web applications."
 sidebar_label: Go
 ---
 
@@ -17,7 +18,7 @@ By the end of this guide, your application will have login functionality and wil
 
 ## Set up application
 
-Before we begin developing our application, we need to perform a few configuration steps in the ZITADEL Console.
+Before we begin developing our application, we need to perform a few setup steps in the ZITADEL Console.
 You'll need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
 Select the **Web** application type and continue.
 
@@ -60,9 +61,7 @@ go get -u github.com/zitadel/zitadel-go/v3
 
 Create a new go file with the content below. This will create an application with a home and profile page.
 
-```go reference
-https://github.com/zitadel/zitadel-go/blob/next/example/app/app.go
-```
+<GithubCodeBlock url="https://github.com/zitadel/zitadel-go/blob/next/example/app/app.go" />
 
 This will basically set up everything. So let's look at some parts of the code.
 
@@ -107,17 +106,13 @@ Now create two HTML files in the new `templates` folder and copy the content of 
 
 The home page will display a short welcome message and allow the user to manually start the login process.
 
-```go reference
-https://github.com/zitadel/zitadel-go/blob/next/example/app/templates/home.html
-```
+<GithubCodeBlock url="https://github.com/zitadel/zitadel-go/blob/next/example/app/templates/home.html" />
 
 **profile.html**
 
 The profile page will display the Userinfo from the authentication context and allow the user to logout.
 
-```go reference
-https://github.com/zitadel/zitadel-go/blob/next/example/app/templates/profile.html
-```
+<GithubCodeBlock url="https://github.com/zitadel/zitadel-go/blob/next/example/app/templates/profile.html" />
 
 ### Start your application
 
@@ -152,4 +147,4 @@ Congratulations! You have successfully integrated your Go application with ZITAD
 
 If you get stuck, consider checking out our [example](https://github.com/zitadel/zitadel-go) application.
 This application includes all the functionalities mentioned in this quickstart.
-You can directly start it with your own configuration. If you face issues, contact us or raise an issue on [GitHub](https://github.com/zitadel/zitadel-go/issues).
+You can directly start it with your own settings. If you face issues, contact us or raise an issue on [GitHub](https://github.com/zitadel/zitadel-go/issues).

@@ -132,6 +132,7 @@ func CreateGatewayWithPrefix(
 			client_middleware.UnaryActivityClientInterceptor(),
 		),
 		grpc.WithStatsHandler(client_middleware.DefaultTracingClient()),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(MaxSendMsgSize)),
 	}
 	connection, err := dial(ctx, port, opts)
 	if err != nil {
@@ -159,6 +160,7 @@ func CreateGateway(
 				client_middleware.UnaryActivityClientInterceptor(),
 			),
 			grpc.WithStatsHandler(client_middleware.DefaultTracingClient()),
+			grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(MaxSendMsgSize)),
 		})
 	if err != nil {
 		return nil, err
@@ -207,6 +209,7 @@ func addInterceptors(
 	accessInterceptor *http_mw.AccessInterceptor,
 ) http.Handler {
 	handler = http_mw.CallDurationHandler(handler)
+	handler = http_mw.RequestDetailsHandler()(handler)
 	handler = http_mw.CORSInterceptor(handler)
 	handler = http_mw.RobotsTagHandler(handler)
 	handler = http_mw.DefaultTraceHandler(handler)

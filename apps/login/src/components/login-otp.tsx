@@ -1,22 +1,23 @@
 "use client";
 
-import { handleServerActionResponse, completeFlowOrGetUrl } from "@/lib/client";
+import { completeFlowOrGetUrl } from "@/lib/client";
+import { handleServerActionResponse } from "@/lib/client-utils";
 import { updateOrCreateSession } from "@/lib/server/session";
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
+import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
-import { useTranslations } from "next-intl";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
-import { AutoSubmitForm } from "./auto-submit-form";
 
 // either loginName or sessionId must be provided
 type Props = {
@@ -222,7 +223,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
                 aria-label="Resend OTP Code"
                 disabled={loading}
                 type="button"
-                className="ml-4 cursor-pointer text-primary-light-500 hover:text-primary-light-400 disabled:cursor-default disabled:text-gray-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 dark:disabled:text-gray-700"
+                className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
                 onClick={async () => {
                   setLoading(true);
                   const response = await updateSessionForOTPChallenge();
@@ -241,6 +242,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
         <div className="mt-4">
           <TextInput
             type="text"
+            autoFocus
             {...register("code", { required: t("verify.required.code") })}
             label={t("verify.labels.code")}
             autoComplete="one-time-code"

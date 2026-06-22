@@ -1,7 +1,7 @@
-import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
-import { processIDPCallback } from "./idp-intent";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import crypto from "crypto";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { processIDPCallback } from "./idp-intent";
 
 // Mock all the dependencies
 vi.mock("next/headers", () => ({
@@ -101,6 +101,10 @@ describe("processIDPCallback", () => {
       },
       email: {
         email: "test@example.com",
+        verification: {
+          case: "isVerified",
+          value: true
+        }
       },
     },
     updateHumanUser: {
@@ -112,6 +116,10 @@ describe("processIDPCallback", () => {
       },
       email: {
         email: "test@example.com",
+        verification: {
+          case: "isVerified",
+          value: true
+        }
       },
     },
   };
@@ -130,7 +138,7 @@ describe("processIDPCallback", () => {
   };
 
   beforeEach(async () => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
 
     // Import mocked modules
     const { headers } = await import("next/headers");
@@ -1052,7 +1060,7 @@ describe("validateIDPLinkingPermissions", () => {
   let validateIDPLinkingPermissions: any;
 
   beforeEach(async () => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
 
     // Import mocked modules
     const { getLoginSettings, getActiveIdentityProviders } = await import("../zitadel");

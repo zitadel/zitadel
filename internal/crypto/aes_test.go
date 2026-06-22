@@ -2,6 +2,7 @@ package crypto
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"testing"
 	"unicode/utf8"
@@ -33,6 +34,18 @@ func (*mockKeyStorage) CreateKeys(context.Context, ...*Key) error {
 
 func newTestAESCrypto(t testing.TB) *AESCrypto {
 	keyConfig := &KeyConfig{
+		EncryptionKeyID:  "keyID",
+		DecryptionKeyIDs: []string{"keyID"},
+	}
+	keys := Keys{"keyID": "ThisKeyNeedsToHave32Characters!!"}
+	aesCrypto, err := NewAESCrypto(keyConfig, &mockKeyStorage{keys: keys})
+	require.NoError(t, err)
+	return aesCrypto
+}
+
+func newTestAESCryptoLegacyToken(t testing.TB) *AESCrypto {
+	keyConfig := &KeyConfig{
+		LegacyToken:      true,
 		EncryptionKeyID:  "keyID",
 		DecryptionKeyIDs: []string{"keyID"},
 	}
@@ -106,4 +119,123 @@ func FuzzAESCrypto_DecryptString(f *testing.F) {
 		require.NoError(t, err)
 		assert.True(t, utf8.ValidString(got), "result is not valid UTF-8")
 	})
+}
+
+func TestAESCrypto_EncryptToken(t *testing.T) {
+	tests := []struct {
+		name       string
+		config     *KeyConfig
+		keyStorage KeyStorage
+		value      string
+		want       bool
+		wantErr    error
+	}{
+		{
+			name: "ok",
+			config: &KeyConfig{
+				EncryptionKeyID:  "keyID",
+				DecryptionKeyIDs: []string{"keyID"},
+			},
+			keyStorage: &mockKeyStorage{keys: Keys{"keyID": "ThisKeyNeedsToHave32Characters!!"}},
+			value:      "SecretData",
+			want:       true,
+			wantErr:    nil,
+		},
+		{
+			name: "empty key error",
+			config: &KeyConfig{
+				EncryptionKeyID:  "keyID",
+				DecryptionKeyIDs: []string{"keyID"},
+			},
+			keyStorage: &mockKeyStorage{keys: Keys{"keyID": ""}},
+			value:      "SecretData",
+			want:       false,
+			wantErr:    zerrors.ThrowInternal(nil, "CRYPTO-Woox3", "Errors.Internal"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			a, err := NewAESCrypto(tt.config, tt.keyStorage)
+			require.NoError(t, err)
+			got, gotErr := a.EncryptToken(tt.value)
+			require.ErrorIs(t, gotErr, tt.wantErr)
+			if tt.want {
+				assert.NotEmpty(t, got, "expected non-empty result")
+			}
+		})
+	}
+}
+
+func TestAESCrypto_DecryptToken(t *testing.T) {
+	tests := []struct {
+		name    string
+		crypto  func(testing.TB) *AESCrypto
+		payload func(*testing.T) string
+		want    string
+		wantErr error
+	}{
+		{
+			name:   "ok",
+			crypto: newTestAESCrypto,
+			payload: func(t *testing.T) string {
+				a := newTestAESCrypto(t)
+				crypted, err := a.EncryptToken("SecretData")
+				require.NoError(t, err)
+				return crypted
+			},
+			want:    "SecretData",
+			wantErr: nil,
+		},
+		{
+			name:   "malformed encrypted value",
+			crypto: newTestAESCrypto,
+			payload: func(t *testing.T) string {
+				return "malformed"
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "CRYPT-ha6Oh", "malformed encrypted value"),
+		},
+		{
+			name:   "invalid value",
+			crypto: newTestAESCrypto,
+			payload: func(t *testing.T) string {
+				return "eyJhbGciOiJBMjU2R0NNS1ciLCJlbmMiOiJBMjU2R0NNIiwiaXYiOiJfcUNRelpoVDF4bjJfUjJiIiwia2lkIjoia2V5SUQiLCJ0YWciOiJlcm1EV1oySE5mOGctMHRJa29zdHpRIn0.zGWGOxwPI8iq-ZSwmAqc1Ps8tltCp-g815nj7jY_m9Q.U_tpQDuz8SzrDEAD._YzsLNPi2BrmWA.G0I-gIfkWy6DNhqXPD_EXg"
+			},
+			wantErr: zerrors.ThrowUnauthenticated(nil, "CRYPT-OhN2u", "failed to decrypt value"),
+		},
+		{
+			name:   "legacy decrypt",
+			crypto: newTestAESCryptoLegacyToken,
+			payload: func(t *testing.T) string {
+				a := newTestAESCryptoLegacyToken(t)
+				encrypted, err := a.Encrypt([]byte("SecretData"))
+				require.NoError(t, err)
+				return base64.RawURLEncoding.EncodeToString(encrypted)
+			},
+			want: "SecretData",
+		},
+		{
+			name:   "legacy invalid base64",
+			crypto: newTestAESCryptoLegacyToken,
+			payload: func(t *testing.T) string {
+				return "invalid_base64"
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "CRYPT-ha6Oh", "malformed encrypted value"),
+		},
+		{
+			name:   "legacy invalid token",
+			crypto: newTestAESCryptoLegacyToken,
+			payload: func(t *testing.T) string {
+				return "DEADBEEFDEADBEEFDEADBEEF"
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "CRYPT-ohGh6", "non-UTF-8 in decrypted string"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			a := tt.crypto(t)
+			got, gotErr := a.DecryptToken(tt.payload(t))
+			require.ErrorIs(t, gotErr, tt.wantErr)
+			assert.Equal(t, tt.want, got)
+		})
+	}
 }

@@ -425,8 +425,9 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 				IdpInformation: &user.IDPInformation{
 					Access: &user.IDPInformation_Oauth{
 						Oauth: &user.IDPOAuthAccessInformation{
-							AccessToken: "accessToken",
-							IdToken:     gu.Ptr("idToken"),
+							AccessToken:  "accessToken",
+							RefreshToken: gu.Ptr("refreshToken"),
+							IdToken:      gu.Ptr("idToken"),
 						},
 					},
 					IdpId:    oauthIdpID,
@@ -454,6 +455,23 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
 					},
 				},
+				UserAction: &user.RetrieveIdentityProviderIntentResponse_CreateUser{
+					CreateUser: &user.CreateUserRequest{
+						UserType: &user.CreateUserRequest_Human_{
+							Human: &user.CreateUserRequest_Human{
+								Profile: &user.SetHumanProfile{
+									PreferredLanguage: gu.Ptr("und"),
+								},
+								IdpLinks: []*user.IDPLink{
+									{IdpId: oauthIdpID, UserId: "id"},
+								},
+								Email: &user.SetHumanEmail{
+									Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
+								},
+							},
+						},
+					},
+				},
 			},
 			wantErr: false,
 		},
@@ -476,8 +494,9 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 				IdpInformation: &user.IDPInformation{
 					Access: &user.IDPInformation_Oauth{
 						Oauth: &user.IDPOAuthAccessInformation{
-							AccessToken: "accessToken",
-							IdToken:     gu.Ptr("idToken"),
+							AccessToken:  "accessToken",
+							RefreshToken: gu.Ptr("refreshToken"),
+							IdToken:      gu.Ptr("idToken"),
 						},
 					},
 					IdpId:    oauthIdpID,
@@ -498,6 +517,18 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 					UserId: "user",
 					Profile: &user.SetHumanProfile{
 						PreferredLanguage: gu.Ptr("und"),
+					},
+				},
+				UserAction: &user.RetrieveIdentityProviderIntentResponse_UpdateUser{
+					UpdateUser: &user.UpdateUserRequest{
+						UserId: "user",
+						UserType: &user.UpdateUserRequest_Human_{
+							Human: &user.UpdateUserRequest_Human{
+								Profile: &user.UpdateUserRequest_Human_Profile{
+									PreferredLanguage: gu.Ptr("und"),
+								},
+							},
+						},
 					},
 				},
 			},
@@ -543,8 +574,9 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 				IdpInformation: &user.IDPInformation{
 					Access: &user.IDPInformation_Oauth{
 						Oauth: &user.IDPOAuthAccessInformation{
-							AccessToken: "accessToken",
-							IdToken:     gu.Ptr("idToken"),
+							AccessToken:  "accessToken",
+							RefreshToken: gu.Ptr("refreshToken"),
+							IdToken:      gu.Ptr("idToken"),
 						},
 					},
 					IdpId:    azureIdpID,
@@ -579,6 +611,28 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
 					},
 				},
+				UserAction: &user.RetrieveIdentityProviderIntentResponse_CreateUser{
+					CreateUser: &user.CreateUserRequest{
+						Username: gu.Ptr("username"),
+						UserType: &user.CreateUserRequest_Human_{
+							Human: &user.CreateUserRequest_Human{
+								Profile: &user.SetHumanProfile{
+									PreferredLanguage: gu.Ptr("und"),
+									GivenName:         "firstname",
+									FamilyName:        "lastname",
+									DisplayName:       gu.Ptr("displayname"),
+								},
+								IdpLinks: []*user.IDPLink{
+									{IdpId: azureIdpID, UserId: "id", UserName: "username"},
+								},
+								Email: &user.SetHumanEmail{
+									Email:        "email@email.com",
+									Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
+								},
+							},
+						},
+					},
+				},
 			},
 			wantErr: false,
 		},
@@ -601,8 +655,9 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 				IdpInformation: &user.IDPInformation{
 					Access: &user.IDPInformation_Oauth{
 						Oauth: &user.IDPOAuthAccessInformation{
-							AccessToken: "accessToken",
-							IdToken:     gu.Ptr("idToken"),
+							AccessToken:  "accessToken",
+							RefreshToken: gu.Ptr("refreshToken"),
+							IdToken:      gu.Ptr("idToken"),
 						},
 					},
 					IdpId:    azureIdpID,
@@ -635,6 +690,26 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
 					},
 				},
+				UserAction: &user.RetrieveIdentityProviderIntentResponse_UpdateUser{
+					UpdateUser: &user.UpdateUserRequest{
+						Username: gu.Ptr("username"),
+						UserId:   "user",
+						UserType: &user.UpdateUserRequest_Human_{
+							Human: &user.UpdateUserRequest_Human{
+								Profile: &user.UpdateUserRequest_Human_Profile{
+									PreferredLanguage: gu.Ptr("und"),
+									GivenName:         gu.Ptr("firstname"),
+									FamilyName:        gu.Ptr("lastname"),
+									DisplayName:       gu.Ptr("displayname"),
+								},
+								Email: &user.SetHumanEmail{
+									Email:        "email@email.com",
+									Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
+								},
+							},
+						},
+					},
+				},
 			},
 			wantErr: false,
 		},
@@ -657,8 +732,9 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 				IdpInformation: &user.IDPInformation{
 					Access: &user.IDPInformation_Oauth{
 						Oauth: &user.IDPOAuthAccessInformation{
-							AccessToken: "accessToken",
-							IdToken:     gu.Ptr("idToken"),
+							AccessToken:  "accessToken",
+							RefreshToken: gu.Ptr("refreshToken"),
+							IdToken:      gu.Ptr("idToken"),
 						},
 					},
 					IdpId:    oidcIdpID,
@@ -685,6 +761,24 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
 					},
 				},
+				UserAction: &user.RetrieveIdentityProviderIntentResponse_CreateUser{
+					CreateUser: &user.CreateUserRequest{
+						Username: gu.Ptr("username"),
+						UserType: &user.CreateUserRequest_Human_{
+							Human: &user.CreateUserRequest_Human{
+								Profile: &user.SetHumanProfile{
+									PreferredLanguage: gu.Ptr("und"),
+								},
+								IdpLinks: []*user.IDPLink{
+									{IdpId: oidcIdpID, UserId: "id", UserName: "username"},
+								},
+								Email: &user.SetHumanEmail{
+									Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
+								},
+							},
+						},
+					},
+				},
 			},
 			wantErr: false,
 		},
@@ -707,8 +801,9 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 				IdpInformation: &user.IDPInformation{
 					Access: &user.IDPInformation_Oauth{
 						Oauth: &user.IDPOAuthAccessInformation{
-							AccessToken: "accessToken",
-							IdToken:     gu.Ptr("idToken"),
+							AccessToken:  "accessToken",
+							RefreshToken: gu.Ptr("refreshToken"),
+							IdToken:      gu.Ptr("idToken"),
 						},
 					},
 					IdpId:    oidcIdpID,
@@ -728,6 +823,19 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 					UserId:   "user",
 					Profile: &user.SetHumanProfile{
 						PreferredLanguage: gu.Ptr("und"),
+					},
+				},
+				UserAction: &user.RetrieveIdentityProviderIntentResponse_UpdateUser{
+					UpdateUser: &user.UpdateUserRequest{
+						Username: gu.Ptr("username"),
+						UserId:   "user",
+						UserType: &user.UpdateUserRequest_Human_{
+							Human: &user.UpdateUserRequest_Human{
+								Profile: &user.UpdateUserRequest_Human_Profile{
+									PreferredLanguage: gu.Ptr("und"),
+								},
+							},
+						},
 					},
 				},
 			},
@@ -787,6 +895,24 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
 					},
 				},
+				UserAction: &user.RetrieveIdentityProviderIntentResponse_CreateUser{
+					CreateUser: &user.CreateUserRequest{
+						Username: gu.Ptr("username"),
+						UserType: &user.CreateUserRequest_Human_{
+							Human: &user.CreateUserRequest_Human{
+								Profile: &user.SetHumanProfile{
+									PreferredLanguage: gu.Ptr("en"),
+								},
+								IdpLinks: []*user.IDPLink{
+									{IdpId: ldapIdpID, UserId: "id", UserName: "username"},
+								},
+								Email: &user.SetHumanEmail{
+									Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
+								},
+							},
+						},
+					},
+				},
 			},
 			wantErr: false,
 		},
@@ -840,6 +966,19 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 						PreferredLanguage: gu.Ptr("en"),
 					},
 				},
+				UserAction: &user.RetrieveIdentityProviderIntentResponse_UpdateUser{
+					UpdateUser: &user.UpdateUserRequest{
+						Username: gu.Ptr("username"),
+						UserId:   "user",
+						UserType: &user.UpdateUserRequest_Human_{
+							Human: &user.UpdateUserRequest_Human{
+								Profile: &user.UpdateUserRequest_Human_Profile{
+									PreferredLanguage: gu.Ptr("en"),
+								},
+							},
+						},
+					},
+				},
 			},
 			wantErr: false,
 		},
@@ -889,6 +1028,23 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
 					},
 				},
+				UserAction: &user.RetrieveIdentityProviderIntentResponse_CreateUser{
+					CreateUser: &user.CreateUserRequest{
+						UserType: &user.CreateUserRequest_Human_{
+							Human: &user.CreateUserRequest_Human{
+								Profile: &user.SetHumanProfile{
+									PreferredLanguage: gu.Ptr("und"),
+								},
+								IdpLinks: []*user.IDPLink{
+									{IdpId: samlIdpID, UserId: "id"},
+								},
+								Email: &user.SetHumanEmail{
+									Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
+								},
+							},
+						},
+					},
+				},
 			},
 			wantErr: false,
 		},
@@ -932,6 +1088,18 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 					UserId: "user",
 					Profile: &user.SetHumanProfile{
 						PreferredLanguage: gu.Ptr("und"),
+					},
+				},
+				UserAction: &user.RetrieveIdentityProviderIntentResponse_UpdateUser{
+					UpdateUser: &user.UpdateUserRequest{
+						UserId: "user",
+						UserType: &user.UpdateUserRequest_Human_{
+							Human: &user.UpdateUserRequest_Human{
+								Profile: &user.UpdateUserRequest_Human_Profile{
+									PreferredLanguage: gu.Ptr("und"),
+								},
+							},
+						},
 					},
 				},
 			},
@@ -980,6 +1148,23 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
 					},
 				},
+				UserAction: &user.RetrieveIdentityProviderIntentResponse_CreateUser{
+					CreateUser: &user.CreateUserRequest{
+						UserType: &user.CreateUserRequest_Human_{
+							Human: &user.CreateUserRequest_Human{
+								Profile: &user.SetHumanProfile{
+									PreferredLanguage: gu.Ptr("und"),
+								},
+								IdpLinks: []*user.IDPLink{
+									{IdpId: jwtIdPID, UserId: "id"},
+								},
+								Email: &user.SetHumanEmail{
+									Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
+								},
+							},
+						},
+					},
+				},
 			},
 			wantErr: false,
 		},
@@ -1020,6 +1205,18 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 					UserId: "user",
 					Profile: &user.SetHumanProfile{
 						PreferredLanguage: gu.Ptr("und"),
+					},
+				},
+				UserAction: &user.RetrieveIdentityProviderIntentResponse_UpdateUser{
+					UpdateUser: &user.UpdateUserRequest{
+						UserId: "user",
+						UserType: &user.UpdateUserRequest_Human_{
+							Human: &user.UpdateUserRequest_Human{
+								Profile: &user.UpdateUserRequest_Human_Profile{
+									PreferredLanguage: gu.Ptr("und"),
+								},
+							},
+						},
 					},
 				},
 			},

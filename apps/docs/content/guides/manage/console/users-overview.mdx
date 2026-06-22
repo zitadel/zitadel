@@ -1,5 +1,6 @@
 ---
 title: Users
+description: "Manage users, authentication methods, and identity providers in the ZITADEL Console."
 sidebar_label: Users
 sidebar_position: 3
 ---
@@ -23,6 +24,12 @@ Users represent actual people who log in via an interactive interface (e.g., a l
 Read more on how to [login users with ZITADEL](/guides/integrate/login/login-users).
 
 ### Service Accounts
+
+<TerminologyUpdate
+    newTerm="Service Accounts"
+    oldTerms={["Service User", "Machine Users", "Technical Account"]}
+/>
+
 Service accounts represent machines, backend services, or IoT devices requiring non-interactive access.
 * **Profile:** Only has a name, description, and username.
 * **Authentication:** Authenticates via **JWT Profile** or **Personal Access Tokens (PAT)**. Both methods support expiration settings.
@@ -47,7 +54,7 @@ A user with an administrator role is not just an end-user of your application bu
 
 ### Uniqueness of Users
 * **Scope:** Users exist strictly within **one** [Organization](./organizations-overview). It is currently not possible to move users between organizations.
-* **Identifier:** User accounts are uniquely identified by their `id` or their `loginname` combined with the `organization domain` (e.g., `road.runner@acme.zitadel.local`).
+* **Identifier:** User accounts are uniquely identified by their `id` or their `loginname` combined with the `Organization Domain` (e.g., `road.runner@acme.zitadel.local`).
 * **Emails:** You can reuse the same email address for different user accounts across organizations.
 
 ### Structuring User Pools

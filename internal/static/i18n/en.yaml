@@ -5,6 +5,7 @@ Errors:
   IDMissing: "ID missing"
   ResourceOwnerMissing: "Resource Owner Organisation missing"
   RemoveFailed: "Could not be removed"
+  PermissionDenied: "Permission denied"
   ProjectionName:
     Invalid: "Invalid projection name"
   Assets:
@@ -132,6 +133,8 @@ Errors:
         CouldNotGenerate: "Secret could not be generated"
     PAT:
       NotFound: "Personal Access Token not found"
+    Metadata:
+      Conflicting: "Metadata must not be set on both the user and human fields"
     NotHuman: "The User must be personal"
     NotMachine: "The User must be technical"
     WrongType: "Not allowed for this user type"
@@ -180,6 +183,7 @@ Errors:
       Passwordless:
         NotExisting: "Passkey does not exist"
       RecoveryCodes:
+        Empty: "Recovery code is empty"
         InvalidCode: "Invalid recovery code provided"
         MaxCountExceeded: "Maximum number of recovery codes exceeded"
         NotReady: "Recovery codes are not ready for use"
@@ -196,10 +200,6 @@ Errors:
     RefreshToken:
       Invalid: "Refresh Token is invalid"
       NotFound: "Refresh Token not found"
-  Instance:
-    NotFound: "Instance not found"
-    AlreadyExists: "Instance already exists"
-    NotChanged: "Instance not changed"
   Org:
     AlreadyExists: "Organisation's name or id already taken"
     Invalid: "Organisation is invalid"
@@ -223,7 +223,7 @@ Errors:
     DomainVerificationHTTPNotFound: "The file containing the challenge was not found in the expected URL. Check that you've uploaded the file in the right place with read permissions"
     DomainVerificationHTTPNoMatch: "The file containing the challenge has been found in the expected URL but it doesn't contain the right token text. Check its content"
     DomainVerificationTimeout: "There was a timeout querying the DNS server"
-    PrimaryDomainNotDeletable: "Primary domain must not be deleted"
+    PrimaryDomainNotDeletable: "Organization Domain must not be deleted"
     DomainNotFound: "Domain not found"
     MemberIDMissing: "Member ID missing"
     MemberNotFound: "Organisation member not found"
@@ -239,12 +239,6 @@ Errors:
       AlreadyExists: "Domain already exists"
       InvalidCharacter: "Only alphanumeric characters, . and - are allowed for a domain"
       EmptyString: "Invalid non numeric and alphabetical characters were replaced with empty spaces and resulting domain is an empty string"
-    IDP:
-      InvalidSearchQuery: "Invalid search query"
-      ClientIDMissing: "ClientID missing"
-      TeamIDMissing: "TeamID missing"
-      KeyIDMissing: "KeyID missing"
-      PrivateKeyMissing: "Private Key missing"
     LoginPolicy:
       NotFound: "Login Policy not found"
       Invalid: "Login Policy is invalid"
@@ -346,6 +340,8 @@ Errors:
       NotActive: "Project Grant is not active"
       NotInactive: "Project Grant is not inactive"
   Instance:
+    AlreadyExists: "Instance already exists"
+    NotChanged: "Instance not changed"
     NotFound: "Instance not found. Make sure you got the domain right. Check out https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Roles have not been changed"
@@ -518,6 +514,8 @@ Errors:
       StorageFailed: "Storing action execution log to database failed"
       ScanFailed: "Querying usage for action execution seconds failed"
   Session:
+    IDMissing: "Session ID missing"
+    NotFound: "Session not found"
     NotExisting: "Session does not exist"
     Terminated: "Session already terminated"
     Expired: "Session has expired"
@@ -614,6 +612,13 @@ Errors:
     Duplicate: "Web key ID not unique"
     NoActive: "No active web key found"
     NotFound: "Web key not found"
+  IDP:
+    InvalidSearchQuery: "Invalid search query"
+    ClientIDMissing: "ClientID missing"
+    TeamIDMissing: "TeamID missing"
+    KeyIDMissing: "KeyID missing"
+    PrivateKeyMissing: "Private Key missing"
+    InvalidPrivateKey: "Invalid Private Key format"
 
 AggregateTypes:
   action: "Action"
@@ -897,7 +902,7 @@ EventTypes:
       verified: "Domain verified"
       removed: "Domain removed"
       primary:
-        set: "Primary domain set"
+        set: "Organization Domain set"
       reserved: "Domain reserved"
       released: "Domain released"
     name:

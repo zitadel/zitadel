@@ -23,6 +23,10 @@ import (
 	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
+const (
+	MaxSendMsgSize = 10 * 1024 * 1024 // 10MiB, global value required for exports.
+)
+
 type Server interface {
 	AppName() string
 	MethodPrefix() string
@@ -64,12 +68,14 @@ func CreateServer(
 	accessSvc *logstore.Service[*record.AccessLog],
 	targetEncAlg crypto.EncryptionAlgorithm,
 	translator *i18n.Translator,
+	httpClient *http.Client,
 ) *grpc.Server {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeTotalCount, metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode}
 	serverOptions := []grpc.ServerOption{
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
 				middleware.CallDurationHandler(),
+				middleware.RequestDetailsHandler(),
 				middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
 				middleware.LogHandler(grpc_api.Probes...),
 				middleware.NoCacheInterceptor(),
@@ -80,13 +86,14 @@ func CreateServer(
 				middleware.AuthorizationInterceptor(verifier, systemAuthz, authConfig),
 				middleware.TranslationHandler(),
 				middleware.QuotaExhaustedInterceptor(accessSvc, system_pb.SystemService_ServiceDesc.ServiceName),
-				middleware.ExecutionHandler(targetEncAlg, queries.GetActiveSigningWebKey),
+				middleware.ExecutionHandler(targetEncAlg, queries.GetActiveSigningWebKey, httpClient),
 				middleware.ValidationHandler(),
 				middleware.ServiceHandler(),
 				middleware.ActivityInterceptor(),
 			),
 		),
 		grpc.StatsHandler(middleware.DefaultTracingServer()),
+		grpc.MaxSendMsgSize(MaxSendMsgSize),
 	}
 	if tlsConfig != nil {
 		serverOptions = append(serverOptions, grpc.Creds(credentials.NewTLS(tlsConfig)))

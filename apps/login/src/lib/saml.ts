@@ -1,7 +1,9 @@
+import { isSafeRedirectUri } from "@/lib/client-utils";
 import { Cookie } from "@/lib/cookies";
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { createResponse, getLoginSettings, ServiceConfig } from "@/lib/zitadel";
-import { create } from "@zitadel/client";
+import { Code, create } from "@zitadel/client";
 import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { isSessionValid } from "./session";
@@ -89,14 +91,16 @@ export async function loginWithSAMLAndSession({
         // handle already handled gracefully as these could come up if old emails with requestId are used (reset password, register emails etc.)
         console.error(error);
 
-        if (error && typeof error === "object" && "code" in error && error?.code === 9) {
+        if (isClassifiedError(error) && error.code === Code.FailedPrecondition) {
           const loginSettings = await getLoginSettings({
             serviceConfig,
             organization: selectedSession.factors?.user?.organizationId,
           });
 
-          if (loginSettings?.defaultRedirectUri) {
+          if (loginSettings?.defaultRedirectUri && isSafeRedirectUri(loginSettings.defaultRedirectUri)) {
             return { redirect: loginSettings.defaultRedirectUri };
+          } else if (loginSettings?.defaultRedirectUri) {
+            console.warn("loginWithSAMLAndSession: Unsafe defaultRedirectUri prevented:", loginSettings.defaultRedirectUri);
           }
 
           const signedinUrl = "/signedin";

@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"strings"
 	"time"
@@ -193,11 +192,11 @@ func (c *Commands) CreateOIDCSession(ctx context.Context,
 	return session, nil
 }
 
-type RefreshTokenComplianceChecker func(ctx context.Context, wm *OIDCSessionWriteModel, requestedScope []string) (scope []string, err error)
+type RefreshTokenComplianceChecker func(ctx context.Context, wm *OIDCSessionWriteModel, requestedScope []string, reqClientID string) (scope []string, err error)
 
 // ExchangeOIDCSessionRefreshAndAccessToken updates an existing OIDC Session, creates a new access and refresh token.
 // It returns the access token id and expiration and the new refresh token.
-func (c *Commands) ExchangeOIDCSessionRefreshAndAccessToken(ctx context.Context, refreshToken string, scope []string, complianceCheck RefreshTokenComplianceChecker) (_ *OIDCSession, err error) {
+func (c *Commands) ExchangeOIDCSessionRefreshAndAccessToken(ctx context.Context, refreshToken string, scope []string, reqClientID string, complianceCheck RefreshTokenComplianceChecker) (_ *OIDCSession, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -205,7 +204,7 @@ func (c *Commands) ExchangeOIDCSessionRefreshAndAccessToken(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	scope, err = complianceCheck(ctx, cmd.oidcSessionWriteModel, scope)
+	scope, err = complianceCheck(ctx, cmd.oidcSessionWriteModel, scope, reqClientID)
 	if err != nil {
 		return nil, err
 	}
@@ -314,7 +313,7 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, userID, resource
 	return &OIDCSessionEvents{
 		commands:                 c,
 		idGenerator:              c.idGenerator,
-		encryptionAlg:            c.keyAlgorithm,
+		authAlg:                  c.authAlgorithm,
 		events:                   pending,
 		oidcSessionWriteModel:    NewOIDCSessionWriteModel(sessionID, resourceOwner),
 		userStateModel:           userStateModel,
@@ -325,11 +324,7 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, userID, resource
 }
 
 func (c *Commands) decryptRefreshToken(refreshToken string) (sessionID, refreshTokenID string, err error) {
-	decoded, err := base64.RawURLEncoding.DecodeString(refreshToken)
-	if err != nil {
-		return "", "", zerrors.ThrowInvalidArgument(err, "OIDCS-Cux9a", "Errors.User.RefreshToken.Invalid")
-	}
-	decrypted, err := c.keyAlgorithm.DecryptString(decoded, c.keyAlgorithm.EncryptionKeyID())
+	decrypted, err := c.authAlgorithm.DecryptToken(refreshToken)
 	if err != nil {
 		return "", "", zerrors.ThrowInvalidArgument(err, "OIDCS-Jei0i", "Errors.User.RefreshToken.Invalid")
 	}
@@ -372,7 +367,7 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken 
 	return &OIDCSessionEvents{
 		commands:                 c,
 		idGenerator:              c.idGenerator,
-		encryptionAlg:            c.keyAlgorithm,
+		authAlg:                  c.authAlgorithm,
 		oidcSessionWriteModel:    sessionWriteModel,
 		accessTokenLifetime:      accessTokenLifetime,
 		refreshTokenLifeTime:     refreshTokenLifeTime,
@@ -383,7 +378,7 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken 
 type OIDCSessionEvents struct {
 	commands              *Commands
 	idGenerator           id.Generator
-	encryptionAlg         crypto.EncryptionAlgorithm
+	authAlg               crypto.AuthAlgorithm
 	events                []eventstore.Command
 	oidcSessionWriteModel *OIDCSessionWriteModel
 	userStateModel        *UserV2WriteModel
@@ -502,11 +497,11 @@ func (c *OIDCSessionEvents) generateRefreshToken(userID string) (refreshTokenID,
 		return "", "", err
 	}
 	refreshTokenID = RefreshTokenPrefix + refreshTokenID
-	token, err := c.encryptionAlg.Encrypt([]byte(fmt.Sprintf(oidcTokenFormat, c.oidcSessionWriteModel.OIDCRefreshTokenID(refreshTokenID), userID)))
+	token, err := c.authAlg.EncryptToken(fmt.Sprintf(oidcTokenFormat, c.oidcSessionWriteModel.OIDCRefreshTokenID(refreshTokenID), userID))
 	if err != nil {
 		return "", "", err
 	}
-	return refreshTokenID, base64.RawURLEncoding.EncodeToString(token), nil
+	return refreshTokenID, token, nil
 }
 
 func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (*OIDCSession, error) {

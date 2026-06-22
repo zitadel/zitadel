@@ -38,6 +38,7 @@ const (
 	SAMLIDPAddedEventType               eventstore.EventType = "org.idp.saml.added"
 	SAMLIDPChangedEventType             eventstore.EventType = "org.idp.saml.changed"
 	IDPRemovedEventType                 eventstore.EventType = "org.idp.removed"
+	ZitadelIDPAddedEventType            eventstore.EventType = "org.idp.zitadel.added"
 )
 
 type OAuthIDPAddedEvent struct {
@@ -303,7 +304,8 @@ func NewJWTIDPAddedEvent(
 	issuer,
 	jwtEndpoint,
 	keysEndpoint,
-	headerName string,
+	headerName,
+	audience string,
 	options idp.Options,
 ) *JWTIDPAddedEvent {
 
@@ -320,6 +322,7 @@ func NewJWTIDPAddedEvent(
 			jwtEndpoint,
 			keysEndpoint,
 			headerName,
+			audience,
 			options,
 		),
 	}
@@ -1128,4 +1131,43 @@ func IDPRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 
 	return &IDPRemovedEvent{RemovedEvent: *e.(*idp.RemovedEvent)}, nil
+}
+
+type ZitadelIDPAddedEvent struct {
+	idp.ZitadelIDPAddedEvent
+}
+
+func NewZitadelIDPAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	issuer,
+	clientID string,
+	clientSecret *crypto.CryptoValue,
+	scopes []string,
+	options idp.Options,
+	instanceRolesInfo []idp.RolesInfo,
+) *ZitadelIDPAddedEvent {
+	return &ZitadelIDPAddedEvent{
+		ZitadelIDPAddedEvent: *idp.NewZitadelIDPAddedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				ZitadelIDPAddedEventType,
+			),
+			id,
+			name,
+			issuer,
+			clientID,
+			clientSecret,
+			scopes,
+			options,
+			instanceRolesInfo,
+		),
+	}
+}
+
+func (e *ZitadelIDPAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
 }

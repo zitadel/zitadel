@@ -21,6 +21,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/execution"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 )
@@ -74,6 +75,8 @@ func newMockContextInfoResponse(fullMethod, request, response string) *ContextIn
 }
 
 func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
+	deniedIPs := []denylist.AddressChecker{denylist.NewHostChecker("127.0.0.1")}
+
 	type target struct {
 		reqBody             execution.ContextInfo
 		sleep               time.Duration
@@ -89,9 +92,10 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 		fullMethod             string
 		req                    connect.AnyRequest
 		getActiveSigningWebKey execution.GetActiveSigningWebKey
+		deniedIPs              []denylist.AddressChecker
 	}
 	type res struct {
-		want    interface{}
+		want    any
 		wantErr bool
 	}
 	tests := []struct {
@@ -284,6 +288,37 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			},
 			res{
 				want: newMockContentRequest("content1"),
+			},
+		},
+		{
+			"when target endpoint is in deny list should return error",
+			args{
+				ctx:        context.Background(),
+				fullMethod: "/service/method",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
+						TargetID:         "target",
+						TargetType:       target_domain.TargetTypeCall,
+						Timeout:          time.Minute,
+						InterruptOnError: true,
+						Endpoint:         "127.0.0.1",
+					},
+				},
+				targets: []target{
+					{
+						reqBody:             newMockContextInfoRequest("/service/method", "content"),
+						respBody:            newMockContentResponse("content1"),
+						sleep:               0,
+						statusCode:          http.StatusOK,
+						requestVerification: validateJSONPayload,
+					},
+				},
+				req:       newMockContentRequest("content"),
+				deniedIPs: deniedIPs,
+			},
+			res{
+				wantErr: true,
 			},
 		},
 		{
@@ -631,6 +666,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				tt.args.req,
 				nil,
 				tt.args.getActiveSigningWebKey,
+				&http.Client{Transport: denylist.NewHTTPTransport(tt.args.deniedIPs)},
 			)
 
 			if tt.res.wantErr {
@@ -736,6 +772,7 @@ func validateJWEPayload(t *testing.T) func(expected, sent []byte) bool {
 }
 
 func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
+	deniedIPs := []denylist.AddressChecker{denylist.NewHostChecker("127.0.0.1")}
 	type target struct {
 		reqBody    execution.ContextInfo
 		sleep      time.Duration
@@ -750,6 +787,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 		fullMethod       string
 		req              connect.AnyRequest
 		resp             connect.AnyResponse
+		deniedIPs        []denylist.AddressChecker
 	}
 	type res struct {
 		want    interface{}
@@ -844,6 +882,37 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 				want: newMockContentResponse("response1"),
 			},
 		},
+		{
+			"when target endpoint is in deny list should return error",
+			args{
+				ctx:        context.Background(),
+				fullMethod: "/service/method",
+				executionTargets: []target_domain.Target{
+					{
+						ExecutionID:      "response./zitadel.session.v2.SessionService/SetSession",
+						TargetID:         "target",
+						TargetType:       target_domain.TargetTypeCall,
+						Timeout:          time.Minute,
+						InterruptOnError: true,
+						Endpoint:         "127.0.0.1",
+					},
+				},
+				targets: []target{
+					{
+						reqBody:    newMockContextInfoResponse("/service/method", "request", "response"),
+						respBody:   newMockContentResponse("response1"),
+						sleep:      0,
+						statusCode: http.StatusOK,
+					},
+				},
+				req:       newMockContentRequest("request"),
+				resp:      newMockContentResponse("response"),
+				deniedIPs: deniedIPs,
+			},
+			res{
+				wantErr: true,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -869,6 +938,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 				tt.args.resp,
 				nil,
 				mockGetActiveSigningWebKey(),
+				&http.Client{Transport: denylist.NewHTTPTransport(tt.args.deniedIPs)},
 			)
 
 			if tt.res.wantErr {

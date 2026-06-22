@@ -195,6 +195,13 @@ message JWTConfig {
             description: "the name of the header where the JWT is sent in, default is authorization";
         }
     ];
+    string audience = 5 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"my-audience\"";
+            description: "the expected audience in the JWT, if not provided the audience is not validated";
+        }
+    ];
 }
 
 message IDPIDQuery {
@@ -608,6 +615,23 @@ message AppleConfig {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"name\", \"email\"]";
             description: "the scopes requested by Zitadel during the request to Apple";
+        }
+    ];
+}
+
+message InstanceRolesInfo {
+    string organization_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            description: "the id of the organization";
+        }
+    ];
+    string organization_domain = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"example-org.com\"";
+            description: "the domain of the organization";
         }
     ];
 }

@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { PrivacyPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
+import { Component } from '@angular/core';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { faXTwitter } from '@fortawesome/free-brands-svg-icons';
 

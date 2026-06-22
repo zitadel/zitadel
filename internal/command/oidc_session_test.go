@@ -138,6 +138,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								gu.Ptr("hintUserID"),
 								true,
 								"issuer",
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -183,6 +184,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								gu.Ptr("hintUserID"),
 								true,
 								"issuer",
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -236,6 +238,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								gu.Ptr("hintUserID"),
 								true,
 								"issuer",
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -334,6 +337,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								gu.Ptr("hintUserID"),
 								true,
 								"issuer",
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -436,7 +440,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 						Header:        http.Header{"foo": []string{"bar"}},
 					},
 					Reason:       domain.TokenReasonAuthRequest,
-					RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID-rt_refreshTokenID:userID
+					RefreshToken: "V2_oidcSessionID-rt_refreshTokenID:userID",
 				},
 				state: "state",
 			},
@@ -468,6 +472,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								gu.Ptr("hintUserID"),
 								true,
 								"issuer",
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -579,7 +584,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 						Header:        http.Header{"foo": []string{"bar"}},
 					},
 					Reason:       domain.TokenReasonAuthRequest,
-					RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID-rt_refreshTokenID:userID
+					RefreshToken: "V2_oidcSessionID-rt_refreshTokenID:userID",
 				},
 				state: "state",
 			},
@@ -611,6 +616,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								gu.Ptr("hintUserID"),
 								false,
 								"issuer",
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -715,6 +721,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 				defaultRefreshTokenLifetime:     tt.fields.defaultRefreshTokenLifetime,
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
+				authAlgorithm:                   &mockAuthCrypto{},
 			}
 			c.setMilestonesCompletedForTest("instanceID")
 			gotSession, gotState, err := c.CreateOIDCSessionFromAuthRequest(tt.args.ctx, tt.args.authRequestID, tt.args.complianceCheck, tt.args.needRefreshToken, tt.args.backChannelLogoutURI)
@@ -1131,7 +1138,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 					UserID: "user2",
 					Issuer: "foo.com",
 				},
-				RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID-rt_refreshTokenID:userID
+				RefreshToken: "V2_oidcSessionID-rt_refreshTokenID:userID",
 			},
 		},
 		{
@@ -1604,6 +1611,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
 				checkPermission:                 tt.fields.checkPermission,
+				authAlgorithm:                   &mockAuthCrypto{},
 			}
 			c.setMilestonesCompletedForTest("instanceID")
 			got, err := c.CreateOIDCSession(tt.args.ctx,
@@ -1636,9 +1644,12 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 }
 
 func mockRefreshTokenComplianceChecker(returnErr error) RefreshTokenComplianceChecker {
-	return func(_ context.Context, wm *OIDCSessionWriteModel, scope []string) ([]string, error) {
+	return func(_ context.Context, wm *OIDCSessionWriteModel, scope []string, clientID string) ([]string, error) {
 		if returnErr != nil {
 			return nil, returnErr
+		}
+		if wm.ClientID != clientID {
+			return nil, zerrors.ThrowInvalidArgument(nil, "test", "invalid clientID")
 		}
 		if len(scope) > 0 {
 			return scope, nil
@@ -1660,6 +1671,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 		ctx             context.Context
 		refreshToken    string
 		scope           []string
+		reqClientID     string
 		complianceCheck RefreshTokenComplianceChecker
 	}
 	type res struct {
@@ -1697,7 +1709,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			},
 			args{
 				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				refreshToken:    "V2_oidcSessionID-rt_refreshTokenID:userID", //V2_oidcSessionID:rt_refreshTokenID:userID
 				complianceCheck: mockRefreshTokenComplianceChecker(nil),
 			},
 			res{
@@ -1726,7 +1738,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			},
 			args{
 				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				refreshToken:    "V2_oidcSessionID-rt_refreshTokenID:userID", //V2_oidcSessionID:rt_refreshTokenID:userID
 				complianceCheck: mockRefreshTokenComplianceChecker(nil),
 			},
 			res{
@@ -1759,7 +1771,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			},
 			args{
 				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				refreshToken:    "V2_oidcSessionID-rt_refreshTokenID:userID", //V2_oidcSessionID:rt_refreshTokenID:userID
 				complianceCheck: mockRefreshTokenComplianceChecker(nil),
 			},
 			res{
@@ -1815,12 +1827,64 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			},
 			args{
 				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				refreshToken:    "V2_oidcSessionID-rt_refreshTokenID:userID", //V2_oidcSessionID:rt_refreshTokenID:userID
 				scope:           []string{"openid", "offline_access"},
 				complianceCheck: mockRefreshTokenComplianceChecker(nil),
 			},
 			res{
 				err: zerrors.ThrowPreconditionFailed(nil, "OIDCS-J39h2", "Errors.User.NotActive"),
+			},
+		},
+		{
+			"refresh with an invalid client id fails",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusherWithCreationDateNow(
+							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"userID", "org1", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
+								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
+						),
+					),
+					expectFilter(
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Afrikaans,
+							domain.GenderUnspecified,
+							"email",
+							false,
+						),
+					),
+					expectFilter(),
+				),
+				idGenerator:  mock.NewIDGeneratorExpectIDs(t),
+				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args{
+				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
+				refreshToken:    "V2_oidcSessionID-rt_refreshTokenID:userID", //V2_oidcSessionID:rt_refreshTokenID:userID
+				scope:           []string{"openid", "offline_access"},
+				reqClientID:     "differentClientID",
+				complianceCheck: mockRefreshTokenComplianceChecker(nil),
+			},
+			res{
+				err: zerrors.ThrowInvalidArgument(nil, "test", "invalid clientID"),
 			},
 		},
 		{
@@ -1875,8 +1939,9 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			},
 			args{
 				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				refreshToken:    "V2_oidcSessionID-rt_refreshTokenID:userID", //V2_oidcSessionID:rt_refreshTokenID:userID
 				scope:           []string{"openid", "offline_access"},
+				reqClientID:     "clientID",
 				complianceCheck: mockRefreshTokenComplianceChecker(nil),
 			},
 			res{
@@ -1886,7 +1951,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 					ClientID:          "clientID",
 					UserID:            "userID",
 					Audience:          []string{"audience"},
-					RefreshToken:      "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDI6dXNlcklE", // V2_oidcSessionID-rt_refreshTokenID2:userID%
+					RefreshToken:      "V2_oidcSessionID-rt_refreshTokenID2:userID", // V2_oidcSessionID-rt_refreshTokenID2:userID%
 					Expiration:        time.Time{}.Add(time.Hour),
 					Scope:             []string{"openid", "profile", "offline_access"},
 					AuthMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
@@ -1908,8 +1973,9 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 				defaultRefreshTokenLifetime:     tt.fields.defaultRefreshTokenLifetime,
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
+				authAlgorithm:                   &mockAuthCrypto{},
 			}
-			got, err := c.ExchangeOIDCSessionRefreshAndAccessToken(tt.args.ctx, tt.args.refreshToken, tt.args.scope, tt.args.complianceCheck)
+			got, err := c.ExchangeOIDCSessionRefreshAndAccessToken(tt.args.ctx, tt.args.refreshToken, tt.args.scope, tt.args.reqClientID, tt.args.complianceCheck)
 			require.ErrorIs(t, err, tt.res.err)
 			if got != nil {
 				assert.WithinRange(t, got.AuthTime, tt.res.session.AuthTime.Add(-time.Second), tt.res.session.AuthTime.Add(time.Second))

@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
 import { App, AppState } from 'src/app/proto/generated/zitadel/app_pb';
-import { IDP, IDPState } from 'src/app/proto/generated/zitadel/idp_pb';
 import { InstanceDetail, State } from 'src/app/proto/generated/zitadel/instance_pb';
 import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
@@ -23,7 +22,6 @@ export class InfoRowComponent {
   @Input() public org!: Org.AsObject | OrgV2 | OrgV1;
   @Input() public instance!: InstanceDetail.AsObject;
   @Input() public app!: App.AsObject;
-  @Input() public idp!: IDP.AsObject;
   @Input() public project!: Project.AsObject;
   @Input() public grantedProject!: GrantedProject.AsObject;
   @Input() public loginPolicy?: LoginPolicy.AsObject | LoginPolicyV2;
@@ -32,7 +30,6 @@ export class InfoRowComponent {
   public State = State;
   public OrgState = OrgState;
   public AppState = AppState;
-  public IDPState = IDPState;
   public ProjectState = ProjectState;
   public ProjectGrantState = ProjectGrantState;
 

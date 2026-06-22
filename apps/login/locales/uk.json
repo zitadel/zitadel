@@ -83,7 +83,7 @@
     "set": {
       "title": "Встановити пароль",
       "description": "Встановіть пароль для свого облікового запису",
-      "codeSent": "Код було надіслано на вашу електронну адресу.",
+      "codeSent": "Новий код надіслано на вашу електронну адресу.",
       "noCodeReceived": "Не отримали код?",
       "resend": "Надіслати код повторно",
       "submit": "Продовжити",
@@ -108,14 +108,17 @@
       "description": "Встановіть пароль для свого облікового запису",
       "submit": "Продовжити",
       "labels": {
+        "currentPassword": "Поточний пароль",
         "newPassword": "Новий пароль",
         "confirmPassword": "Підтвердити пароль"
       },
       "required": {
+        "currentPassword": "Ви повинні вказати поточний пароль!",
         "newPassword": "Ви повинні вказати новий пароль!",
         "confirmPassword": "Це поле обов'язкове"
       },
       "errors": {
+        "currentPasswordInvalid": "Поточний пароль невірний.",
         "couldNotChangePassword": "Не вдалося змінити пароль",
         "couldNotVerifyPassword": "Не вдалося перевірити пароль",
         "unknownError": "Невідома помилка"
@@ -380,6 +383,7 @@
     "userIdMissing": "userId не надано!",
     "successTitle": "Користувача підтверджено",
     "successDescription": "Користувача успішно підтверджено.",
+    "successContinue": "Продовжити",
     "setupAuthenticator": "Налаштувати автентифікатор",
     "verify": {
       "title": "Підтвердити користувача",

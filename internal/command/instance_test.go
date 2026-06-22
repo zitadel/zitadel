@@ -365,19 +365,28 @@ func instanceElementsConfig() *SecretGenerators {
 	}
 }
 
-func setupInstanceFilters(instanceID, orgID, projectID, appID, domain string) []expect {
+func setupInstanceFilters(instanceID, orgID, projectID, appID, domain string, trustedDomains []string) []expect {
 	return slices.Concat(
 		setupInstanceElementsFilters(instanceID),
 		orgFilters(orgID, true, true, true),
 		generatedDomainFilters(instanceID, orgID, projectID, appID, domain),
+		generatedTrustedDomainsFilters(trustedDomains),
 	)
 }
 
-func setupInstanceEvents(ctx context.Context, instanceID, orgID, projectID, appID, instanceName, orgName string, defaultLanguage language.Tag, domain string, externalSecure bool) []eventstore.Command {
+func setupInstanceEvents(
+	ctx context.Context,
+	instanceID, orgID, projectID, appID, instanceName, orgName string,
+	defaultLanguage language.Tag,
+	domain string,
+	externalSecure bool,
+	trustedDomains []string,
+) []eventstore.Command {
 	return slices.Concat(
 		setupInstanceElementsEvents(ctx, instanceID, instanceName, defaultLanguage),
 		orgEvents(ctx, instanceID, orgID, orgName, projectID, domain, externalSecure, true, true, true),
 		generatedDomainEvents(ctx, instanceID, orgID, projectID, appID, domain),
+		generatedTrustedDomainEvents(ctx, instanceID, trustedDomains),
 		instanceCreatedMilestoneEvent(ctx, instanceID),
 	)
 }
@@ -391,6 +400,7 @@ func setupInstanceConfig() *InstanceSetup {
 		LoginClient: instanceSetupLoginClientConfig(),
 	}
 	conf.CustomDomain = ""
+	conf.TrustedDomains = []string{"trusted-domain.com", "another-trusted-domain.com"}
 	return conf
 }
 
@@ -407,6 +417,14 @@ func generatedDomainEvents(ctx context.Context, instanceID, orgID, projectID, ap
 		changed,
 		instance.NewDomainPrimarySetEvent(ctx, &instanceAgg.Aggregate, defaultDomain),
 	}
+}
+
+func generatedTrustedDomainEvents(ctx context.Context, instanceID string, trustedDomains []string) []eventstore.Command {
+	commands := make([]eventstore.Command, len(trustedDomains))
+	for i, trustedDomain := range trustedDomains {
+		commands[i] = instance.NewTrustedDomainAddedEvent(ctx, &instance.NewAggregate(instanceID).Aggregate, trustedDomain)
+	}
+	return commands
 }
 
 func instanceCreatedMilestoneEvent(ctx context.Context, instanceID string) []eventstore.Command {
@@ -461,6 +479,14 @@ func generatedDomainFilters(instanceID, orgID, projectID, appID, generatedDomain
 			}(),
 		),
 	}
+}
+
+func generatedTrustedDomainsFilters(trustedDomains []string) []expect {
+	filters := make([]expect, len(trustedDomains))
+	for i := range trustedDomains {
+		filters[i] = expectFilter()
+	}
+	return filters
 }
 
 func humanFilters(orgID string) []expect {
@@ -1027,6 +1053,7 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 				zitadelRoles:       tt.fields.roles,
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				keyAlgorithm:       tt.fields.keyAlgorithm,
+				authAlgorithm:      &mockAuthCrypto{},
 			}
 			validations := make([]preparation.Validation, 0)
 			owner, pat, mk, loginClientPat, err := setupAdmins(r, &validations, tt.args.instanceAgg, tt.args.orgAgg, tt.args.machine, tt.args.human, tt.args.loginClient)
@@ -1197,6 +1224,7 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 				zitadelRoles:       tt.fields.roles,
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				keyAlgorithm:       tt.fields.keyAlgorithm,
+				authAlgorithm:      &mockAuthCrypto{},
 			}
 			validations := make([]preparation.Validation, 0)
 			pat, mk, loginClientPat, err := setupDefaultOrg(tt.args.ctx, r, &validations, tt.args.instanceAgg, tt.args.orgName, tt.args.machine, tt.args.human, tt.args.loginClient, tt.args.ids)
@@ -1324,7 +1352,7 @@ func TestCommandSide_setUpInstance(t *testing.T) {
 			fields: fields{
 				eventstore: expectEventstore(
 					slices.Concat(
-						setupInstanceFilters("INSTANCE", "ORG", "PROJECT", "console-id", "DOMAIN"),
+						setupInstanceFilters("INSTANCE", "ORG", "PROJECT", "console-id", "DOMAIN", []string{"trusted-domain.com", "another-trusted-domain.com"}),
 						[]expect{
 							expectPush(
 								setupInstanceEvents(context.Background(),
@@ -1337,6 +1365,7 @@ func TestCommandSide_setUpInstance(t *testing.T) {
 									language.English,
 									"DOMAIN",
 									false,
+									[]string{"trusted-domain.com", "another-trusted-domain.com"},
 								)...,
 							),
 						},
@@ -1368,6 +1397,7 @@ func TestCommandSide_setUpInstance(t *testing.T) {
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				keyAlgorithm:       tt.fields.keyAlgorithm,
 				GenerateDomain:     tt.fields.generateDomain,
+				authAlgorithm:      &mockAuthCrypto{},
 			}
 
 			validations, pat, mk, loginClientPat, err := setUpInstance(tt.args.ctx, r, tt.args.setup)

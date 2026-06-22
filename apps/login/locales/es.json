@@ -83,7 +83,7 @@
     "set": {
       "title": "Establecer Contraseña",
       "description": "Establece la contraseña para tu cuenta",
-      "codeSent": "Se ha enviado un código a su correo electrónico.",
+      "codeSent": "Se ha enviado un nuevo código a su dirección de correo electrónico.",
       "noCodeReceived": "¿No recibiste un código?",
       "resend": "Reenviar código",
       "submit": "Continuar",
@@ -108,14 +108,17 @@
       "description": "Establece la contraseña para tu cuenta",
       "submit": "Continuar",
       "labels": {
+        "currentPassword": "Contraseña actual",
         "newPassword": "Nueva contraseña",
         "confirmPassword": "Confirmar contraseña"
       },
       "required": {
+        "currentPassword": "¡Debes proporcionar tu contraseña actual!",
         "newPassword": "¡Debes proporcionar una nueva contraseña!",
         "confirmPassword": "Este campo es obligatorio"
       },
       "errors": {
+        "currentPasswordInvalid": "La contraseña actual es incorrecta.",
         "couldNotChangePassword": "No se pudo cambiar la contraseña",
         "couldNotVerifyPassword": "No se pudo verificar la contraseña",
         "unknownError": "Error desconocido"
@@ -380,6 +383,7 @@
     "userIdMissing": "¡No se proporcionó userId!",
     "successTitle": "Usuario verificado",
     "successDescription": "El usuario ha sido verificado con éxito.",
+    "successContinue": "Continuar",
     "setupAuthenticator": "Configurar autenticador",
     "verify": {
       "title": "Verificar usuario",

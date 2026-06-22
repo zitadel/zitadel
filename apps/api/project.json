@@ -4,9 +4,10 @@
     "projectType": "application",
     "namedInputs": {
         "sources": [
+            "{workspaceRoot}/cmd/defaults.yaml",
+            "{workspaceRoot}/cmd/defaults_fips.yaml",
             "{workspaceRoot}/cmd/**/*.go",
             "{workspaceRoot}/internal/**/*.go",
-            "{workspaceRoot}/backend/**/*.go",
             "{workspaceRoot}/proto/**/*.go",
             "{workspaceRoot}/pkg/**/*.go",
             "{workspaceRoot}/main.go",
@@ -23,6 +24,9 @@
         "pack": [
             {
                 "env": "VERSION"
+            },
+            {
+                "env": "ZITADEL_GOFIPS140"
             },
             "runtime"
         ]
@@ -66,6 +70,7 @@
                 "generate",
                 "build-console"
             ],
+            "cache": true,
             "command": "bash -c 'CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.local -ldflags=\"-s -w\"'",
             "inputs": [
                 {
@@ -83,6 +88,35 @@
                 "{workspaceRoot}/.artifacts/bin/*/*/zitadel.local"
             ]
         },
+        "build-linux": {
+            "description": "Compiles the Go-based API backend into a Linux executable binary for Docker packaging.",
+            "dependsOn": [
+                "generate",
+                "build-console"
+            ],
+            "cache": true,
+            "command": "bash -c 'CGO_ENABLED=0 GOOS=linux go build -o .artifacts/bin/linux/$(go env GOARCH)/zitadel.local -ldflags=\"-s -w\"'",
+            "inputs": [
+                {
+                    "runtime": "go env GOARCH"
+                },
+                "runtime",
+                {
+                    "dependentTasksOutputFiles": "internal/api/ui/console/static/**/*"
+                }
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/bin/linux/*/zitadel.local"
+            ]
+        },
+        "pack": {
+            "description": "Builds a local Docker image for the ZITADEL API (zitadel/zitadel:local). Requires Docker daemon.",
+            "dependsOn": [
+                "build-linux"
+            ],
+            "command": "bash -c 'docker build --build-arg TARGETPLATFORM=linux/$(go env GOARCH) --build-arg BINARY=zitadel.local -f apps/api/Dockerfile -t zitadel/zitadel:local .'",
+            "cache": false
+        },
         "generate": {
             "description": "Generates the code needed to start a full-featured API: gRPC and OpenAPI stubs, static files for the embedded login v1, asset routes and documentation.",
             "dependsOn": [
@@ -94,7 +128,7 @@
         "lint-install": {
             "description": "Installs golangci-lint binary for linting. Using go install is not recommended in the official docs, because this can produce non-deterministic results.",
             "cache": true,
-            "command": "curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b .artifacts/bin/$(go env GOOS)/$(go env GOARCH) v2.5.0",
+            "command": "curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b .artifacts/bin/$(go env GOOS)/$(go env GOARCH) v2.11.3",
             "inputs": [
                 {
                     "runtime": "go env GOOS"
@@ -133,6 +167,7 @@
             "dependsOn": [
                 "generate"
             ],
+            "cache": true,
             "command": "go test -race -coverprofile=profile.api.test-unit.cov -coverpkg=./internal/...,./backend/...  ./...",
             "inputs": [
                 "sources",
@@ -148,7 +183,7 @@
                 "generate"
             ],
             "command": "go build -cover -race -tags integration -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test main.go",
-            "cache": true,
+            "cache": false,
             "inputs": [
                 {
                     "runtime": "go env GOOS"
@@ -204,8 +239,8 @@
                 },
                 "commands": [
                     "wait-on --verbose --interval 2000 --simultaneous 1 --timeout 30m \"${ZITADEL_API_URL}/debug/ready\"",
-                    "bash -c 'go test -race -count 1 -tags integration -timeout 60m -parallel 1 $(go list -tags integration ./... | grep -e \"integration_test\" -e \"events_testing\")'",
-                    "go tool covdata textfmt -i=$GOCOVERDIR -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/...,github.com/zitadel/zitadel/backend/... -o profile.api.test-integration.cov",
+                    "bash -c 'go test -race -count 1 -tags integration -timeout 60m -parallel 1 $(go list -tags integration ./... | grep -e \"integration_test\")'",
+                    "go tool covdata textfmt -i=$GOCOVERDIR -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/... -o profile.api.test-integration.cov",
                     "nx run @zitadel/api:test-integration-stop"
                 ]
             },
@@ -249,19 +284,18 @@
             "executor": "nx:run-commands",
             "options": {
                 "commands": [
-                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/daixiang0/gci@v0.11.2",
-                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/dmarkham/enumer@v1.5.11",
-                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install go.uber.org/mock/mockgen@v0.4.0",
-                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install golang.org/x/tools/cmd/stringer@v0.36.0",
-                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/rakyll/statik@v0.1.7",
-                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/bufbuild/buf/cmd/buf@v1.45.0",
-                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.1",
-                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1",
-                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.22.0",
-                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.22.0",
-                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/envoyproxy/protoc-gen-validate@v1.1.0",
-                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.18.1",
-                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.1",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/daixiang0/gci@v0.14.0",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/dmarkham/enumer@v1.6.3",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install go.uber.org/mock/mockgen@v0.6.0",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install golang.org/x/tools/cmd/stringer@v0.43.0",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/rakyll/statik@v0.1.8",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/bufbuild/buf/cmd/buf@v1.67.0",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.11",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.6.1",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.28.0",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.28.0",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/envoyproxy/protoc-gen-validate@v1.3.3",
+                    "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.19.1",
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-authoption",
                     "GOBIN=${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install ./internal/protoc/protoc-gen-zitadel"
                 ]
@@ -387,7 +421,7 @@
                 "parallel": false,
                 "commands": [
                     "mkdir -p .artifacts/pack .artifacts/bin/$GOOS/$GOARCH",
-                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_VERSION}\"'",
+                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $GOOS-$GOARCH (GOFIPS140=${ZITADEL_GOFIPS140:-off})...\"; CGO_ENABLED=0 GOFIPS140=${ZITADEL_GOFIPS140:-off} go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_VERSION}\"'",
                     "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; FOLDER=\"zitadel-$GOOS-$GOARCH\"; mkdir -p \".artifacts/pack/$FOLDER\"; cp README.md LICENSE \".artifacts/bin/$GOOS/$GOARCH/zitadel$EXT\" \".artifacts/pack/$FOLDER/\"; tar -czvf \".artifacts/pack/$FOLDER.tar.gz\" -C .artifacts/pack \"$FOLDER\"; rm -rf \".artifacts/pack/$FOLDER\"'"
                 ]
             }

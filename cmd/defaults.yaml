@@ -8,6 +8,7 @@ Instrumentation:
     Exporter:
       # The following exporter types are supported:
       # "none": Disables trace exporting
+      # "auto": Delegates to standard OTEL env vars (OTEL_TRACES_EXPORTER, OTEL_EXPORTER_OTLP_ENDPOINT)
       # "stdOut": Exports traces to standard output
       # "stdErr": Exports traces to standard error
       # "grpc": Exports traces using the OTEL gRPC exporter (recommended)
@@ -26,6 +27,7 @@ Instrumentation:
     Exporter:
       # The following exporter types are supported:
       # "none": Disables metric exporting
+      # "auto": Delegates to standard OTEL env vars (OTEL_METRICS_EXPORTER, OTEL_EXPORTER_OTLP_ENDPOINT)
       # "stdOut": Exports metrics to standard output
       # "stdErr": Exports metrics to standard error
       # "grpc": Exports metrics using the OTEL gRPC exporter (recommended)
@@ -49,6 +51,7 @@ Instrumentation:
     # Streams enable logging for specific parts of the application.
     Streams: # ZITADEL_INSTRUMENTATION_LOG_STREAMS (comma separated list)
       - runtime # General runtime logs, such as startup and shutdown messages.
+      - ready # Logs related to readiness and health checks. (zitadel ready command)
       - request # Logs for incoming API and HTTP requests.
       - event_handler # Logs for event handling in projections.
       - queue # Logs for the job queue processing.
@@ -59,8 +62,10 @@ Instrumentation:
       # Keys are unqualified attribute names and apply to all attributes with the specified name,
       # regardless of their position in the attribute hierarchy.
       # Eg. "some_key" matches "some_key" and "parent.some_key" etc.
-      # If the matched log attribute is a nested object or array,
-      # the entire structure is replaced with the specified Value.
+      # When the key matches a group of attributes (e.g. slog.Group), all attribute values in the
+      # group are masked and the structure of the group is preserved.
+      # When the key matches a non-group attribute whose value is a nested object/array
+      # (e.g. added via slog.Any), the entire value is replaced with Value and its structure is not preserved.
       Keys: # ZITADEL_INSTRUMENTATION_LOG_MASK_KEYS (comma separated list)
         # - "first_name"
         # - "last_name"
@@ -88,6 +93,7 @@ Instrumentation:
     Exporter:
       # The following exporter types are supported:
       #   - "none": Disables OTEL log exporter
+      #   - "auto": Delegates to standard OTEL env vars (OTEL_LOGS_EXPORTER, OTEL_EXPORTER_OTLP_ENDPOINT)
       #   - "stdOut": Exports OTEL logs to standard output
       #   - "stdErr": Exports OTEL logs to standard error
       #   - "grpc": Exports OTEL logs using the OTEL gRPC exporter (recommended)
@@ -97,7 +103,7 @@ Instrumentation:
       Endpoint: "" # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_ENDPOINT
       # Disable TLS for grpc and http exporters
       Insecure: false # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_INSECURE
-      # Interval at which metrics are exported
+      # Interval at which logs are batched for export
       BatchDuration: 1s # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_BATCHDURATION
   Profile:
     Exporter:
@@ -228,6 +234,16 @@ WebAuthNName: ZITADEL # ZITADEL_WEBAUTHNNAME
 Database:
   # Postgres is the default database of ZITADEL
   postgres:
+    # DSN is a full PostgreSQL connection URL (see
+    # https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING).
+    # When set, individual connection fields (Host, Port, Database, User, Admin,
+    # Options) are ignored.
+    # Format: postgresql://user:password@host:port/dbname?sslmode=disable
+    # Note: In DSN mode, zitadel init cannot use the Admin connection to create
+    # a separate target database/user. The DB and user from the DSN must already
+    # exist and have sufficient privileges, or the DSN must directly point to
+    # the final ZITADEL database.
+    DSN: "" # ZITADEL_DATABASE_POSTGRES_DSN
     Host: localhost # ZITADEL_DATABASE_POSTGRES_HOST
     Port: 5432 # ZITADEL_DATABASE_POSTGRES_PORT
     Database: zitadel # ZITADEL_DATABASE_POSTGRES_DATABASE
@@ -283,6 +299,15 @@ Caches:
         TimeOut: 30s
     Redis:
       Enabled: false
+      # URL is a full Redis connection URL (see
+      # https://redis.io/docs/latest/develop/tools/cli/#host-port-password-and-database).
+      # When set, individual connection fields
+      # (Addr, Username, Password, Network, EnableTLS) are ignored.
+      # Pool, timeout, retry, and circuit breaker settings can still be used as overlays.
+      # Format: redis://user:password@host:port/db or rediss://... for TLS.
+      # Note: ZITADEL ignores the `/db` path when selecting Redis databases; DBs are chosen
+      # internally via DBOffset + purpose. Use `/0` in the URL to avoid confusion.
+      URL: "" # ZITADEL_CACHES_CONNECTORS_REDIS_URL
       # The network type, either tcp or unix.
       # Default is tcp.
       # Network string
@@ -406,7 +431,7 @@ Caches:
       AddSource: true
       Formatter:
         Format: text
-  # Organization cache, gettable by primary domain or ID.
+  # Organization cache, gettable by Organization Domain or ID.
   Organization:
     Connector: ""
     MaxAge: 1h
@@ -571,6 +596,11 @@ Executions:
   TransactionDuration: 10s # ZITADEL_EXECUTIONS_TRANSACTIONDURATION
   # Automatically cancel the notification if it cannot be handled within a specific time
   MaxTtl: 5m  # ZITADEL_EXECUTIONS_MAXTTL
+  # List of domains and IPs that are not valid execution target's endpoints
+  # Wildcard sub domains are currently unsupported
+
+  # Deprecated: use HTTPClient.DenyList instead. If both are set, this list will be merged into the HTTPClient.DenyList.
+  DenyList: # ZITADEL_EXECUTIONS_DENYLIST (comma separated list)
 
 Auth:
   # See Projections.BulkLimit
@@ -741,6 +771,17 @@ EncryptionKeys:
     EncryptionKeyID: "idpConfigKey" # ZITADEL_ENCRYPTIONKEYS_IDPCONFIG_ENCRYPTIONKEYID
     DecryptionKeyIDs: # ZITADEL_ENCRYPTIONKEYS_IDPCONFIG_DECRYPTIONKEYIDS (comma separated list)
   OIDC:
+    # Accept opaque tokens (access, session, refresh tokens, PATs etc) created by older ZITADEL versions.
+    # Legacy tokens are vulnerable to certain crypto attacks,
+    # so this should only be enabled during a migration and disabled afterwards.
+    # After upgrading ZITADEL, new values will use authenticated encryption.
+    # When this option is enabled tokens emitted from before the upgrade will still be accepted until they expire,
+    # allowing gradual rollout of new tokens.
+    # This allows upgrading ZITADEL without forcing logout of all users (and invalidating all PATs)
+    # This option should be disabled as soon as all tokens have been replaced and PATs rotated.
+    # Note: older versions of ZITADEL aren't able to verify newer tokens.
+    # Downgrading ZITADEL will always logout all users that obtained a token after the upgrade.
+    LegacyToken: true # ZITADEL_ENCRYPTIONKEYS_OIDC_LEGACYTOKEN
     EncryptionKeyID: "oidcKey" # ZITADEL_ENCRYPTIONKEYS_OIDC_ENCRYPTIONKEYID
     DecryptionKeyIDs: # ZITADEL_ENCRYPTIONKEYS_OIDC_DECRYPTIONKEYIDS (comma separated list)
   SAML:
@@ -778,7 +819,9 @@ SystemAPIUsers:
 # # Add keys for authentication of the systemAPI here:
 # # you can specify any name for the user, but they will have to match the `issuer` and `sub` claim in the JWT:
 # - superuser:
-#     Path: /path/to/superuser/ey.pem  # you can provide the key either by reference with the path
+#     # you can provide the key either by reference with the path. The data in this file has to either be a public RSA
+#     # key or a public X.509 certificate
+#     Path: /path/to/superuser/key.pem
 #     Memberships:
 #       # MemberType System allows the user to access all APIs for all instances or organizations
 #       - MemberType: System
@@ -796,7 +839,7 @@ SystemAPIUsers:
 #         AggregateID: "123456789012345678"
 # - superuser2:
 #     # If no memberships are specified, the user has a membership of type System with the role "SYSTEM_OWNER"
-#     KeyData: <base64 encoded key>     # or you can directly embed it as base64 encoded value
+#     KeyData: <base64 encoded key>     # or you can directly embed it as base64 encoded value or X.509 certificate contents
 # Configure the SystemAPIUsers by environment variable using JSON notation:
 # ZITADEL_SYSTEMAPIUSERS='{"systemuser":{"Path":"/path/to/superuser/key.pem"},"systemuser2":{"KeyData":"<base64 encoded key>"}}'
 
@@ -813,7 +856,7 @@ SystemDefaults:
       # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2", "sha2"
       # Depending on the algorithm, different configuration options take effect.
       Algorithm: bcrypt # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
-      # Cost takes effect for the algorithms bcrypt and scrypt
+      # Cost takes effect for bcrypt (work factor) and scrypt (LN, log2 of N)
       Cost: 14 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_COST
       # Time takes effect for the algorithms argon2i and argon2id
       Time: 3 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_TIME
@@ -827,6 +870,40 @@ SystemDefaults:
       # Can be "sha1", "sha224", "sha256", "sha384" or "sha512" for pbkdf2
       # Can be "sha256" or "sha512" for sha2
       Hash: sha256 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_HASH
+    # Limits bound cost parameters of imported or pre-encoded password hashes.
+    Limits:
+      Bcrypt:
+        MinCost: 10 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_BCRYPT_MINCOST
+        MaxCost: 16 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_BCRYPT_MAXCOST
+      Argon2:
+        MinTime: 1 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_ARGON2_MINTIME
+        MaxTime: 10 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_ARGON2_MAXTIME
+        MinMemory: 8192 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_ARGON2_MINMEMORY
+        MaxMemory: 524288 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_ARGON2_MAXMEMORY
+        MinThreads: 1 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_ARGON2_MINTHREADS
+        MaxThreads: 16 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_ARGON2_MAXTHREADS
+      Scrypt:
+        MinLN: 14 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MINLN
+        MaxLN: 20 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MAXLN
+        MinR: 8 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MINR
+        MaxR: 32 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MAXR
+        MinP: 1 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MINP
+        MaxP: 16 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MAXP
+      PBKDF2:
+        # FIPS mode: MinRounds below 1000 (NIST SP 800-132) logs a startup warning; primary Hasher Rounds must be >= 1000.
+        MinRounds: 1000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_PBKDF2_MINROUNDS
+        MaxRounds: 10000000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_PBKDF2_MAXROUNDS
+      Sha2:
+        MinSha256Rounds: 1000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SHA2_MINSHA256ROUNDS
+        MaxSha256Rounds: 999999999 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SHA2_MAXSHA256ROUNDS
+        MinSha512Rounds: 1000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SHA2_MINSHA512ROUNDS
+        MaxSha512Rounds: 999999999 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SHA2_MAXSHA512ROUNDS
+      PHPass:
+        MinRounds: 7 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_PHPASS_MINROUNDS
+        MaxRounds: 31 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_PHPASS_MAXROUNDS
+      Drupal7:
+        MinIterations: 1000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_DRUPAL7_MINITERATIONS
+        MaxIterations: 500000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_DRUPAL7_MAXITERATIONS
 
     # Verifiers enable the possibility of verifying
     # passwords that are previously hashed using another
@@ -857,7 +934,7 @@ SystemDefaults:
       # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2"
       # Depending on the algorithm, different configuration options take effect.
       Algorithm: bcrypt # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_ALGORITHM
-      # Cost takes effect for the algorithms bcrypt and scrypt
+      # Cost takes effect for bcrypt (work factor) and scrypt (LN, log2 of N)
       Cost: 4 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_COST
       # Time takes effect for the algorithms argon2i and argon2id
       Time: 3 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_TIME
@@ -870,6 +947,40 @@ SystemDefaults:
       # Hash takes effect for the algorithm pbkdf2
       # Can be "sha1", "sha224", "sha256", "sha384" or "sha512"
       Hash: sha256 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_HASH
+    # Limits bound cost parameters of imported or pre-encoded secret hashes.
+    Limits:
+      Bcrypt:
+        MinCost: 4 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_BCRYPT_MINCOST
+        MaxCost: 16 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_BCRYPT_MAXCOST
+      Argon2:
+        MinTime: 1 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_ARGON2_MINTIME
+        MaxTime: 10 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_ARGON2_MAXTIME
+        MinMemory: 8192 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_ARGON2_MINMEMORY
+        MaxMemory: 524288 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_ARGON2_MAXMEMORY
+        MinThreads: 1 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_ARGON2_MINTHREADS
+        MaxThreads: 16 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_ARGON2_MAXTHREADS
+      Scrypt:
+        MinLN: 14 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MINLN
+        MaxLN: 20 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MAXLN
+        MinR: 8 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MINR
+        MaxR: 32 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MAXR
+        MinP: 1 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MINP
+        MaxP: 16 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MAXP
+      PBKDF2:
+        # FIPS mode: MinRounds below 1000 (NIST SP 800-132) logs a startup warning; primary Hasher Rounds must be >= 1000.
+        MinRounds: 1000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_PBKDF2_MINROUNDS
+        MaxRounds: 10000000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_PBKDF2_MAXROUNDS
+      Sha2:
+        MinSha256Rounds: 1000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SHA2_MINSHA256ROUNDS
+        MaxSha256Rounds: 999999999 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SHA2_MAXSHA256ROUNDS
+        MinSha512Rounds: 1000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SHA2_MINSHA512ROUNDS
+        MaxSha512Rounds: 999999999 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SHA2_MAXSHA512ROUNDS
+      PHPass:
+        MinRounds: 7 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_PHPASS_MINROUNDS
+        MaxRounds: 31 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_PHPASS_MAXROUNDS
+      Drupal7:
+        MinIterations: 1000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_DRUPAL7_MINITERATIONS
+        MaxIterations: 500000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_DRUPAL7_MAXITERATIONS
     Verifiers: # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_VERIFIERS
   Multifactors:
     OTP:
@@ -921,12 +1032,8 @@ SystemDefaults:
 Actions:
   HTTP:
     # Wildcard sub domains are currently unsupported
+    # Deprecated: use HTTPClient.DenyList instead. If both are set, this list will be merged into the HTTPClient.DenyList.
     DenyList: # ZITADEL_ACTIONS_HTTP_DENYLIST (comma separated list)
-      - localhost
-      - "127.0.0.0/8"
-      - "::1"
-      - "0.0.0.0"
-      - "::"
 
 LogStore:
   Access:
@@ -960,6 +1067,37 @@ Eventstore:
   # Maximum amount of push retries in case of primary key violation on the sequence
   MaxRetries: 5 #ZITADEL_EVENTSTORE_MAXRETRIES
 
+HTTPClient:
+  # Sets the limit of the response body size in bytes, which will be processed by the HTTP client.
+  # If the response body exceeds this limit, the client will return an error.
+  # The default value is 20MB.
+  MaxBodySize: 20971520 # ZITADEL_HTTPCLIENT_MAXBODYSIZE
+  # Sets the timeout for the HTTP client.
+  Timeout: 30s # ZITADEL_HTTPCLIENT_TIMEOUT
+  # Sets the number of allowed redirects for the HTTP client.
+  MaxRedirects: 5 # ZITADEL_HTTPCLIENT_MAXREDIRECTS
+  # Specifies if the HTTP client should follow redirects from HTTPS to HTTP.
+  AllowHTTPSDowngrade: false # ZITADEL_HTTPCLIENT_ALLOWHTTPSDOWNGRADE
+  # Specifies the list of IP addresses or CIDR ranges that are not allowed to be called by the HTTP client.
+  # Note that hosts / domains are matched best-case and wildcards are not supported.
+  # CRITICAL SECURITY NOTE: Domain rules (like "localhost") protect application-layer string matches.
+  # Underneath, the network dialer relies exclusively on the CIDR ranges below to block resolved IPs and prevent DNS Rebinding.
+  # Do not remove the CIDR subnets even if a domain mapping exists.
+  DenyList: # ZITADEL_HTTPCLIENT_DENYLIST (comma separated list)
+    - localhost
+    - "0.0.0.0/8"       # Unspecified IPv4 address range / Local network routing trick protection
+    - "10.0.0.0/8"      # Class A private networks
+    - "100.64.0.0/10"   # Carrier-Grade NAT space
+    - "127.0.0.0/8"     # Loopback addresses (IPv4)
+    - "169.254.0.0/16"  # Link-local subnets (Covers Cloud Metadata Endpoints like AWS/GCP 169.254.169.254)
+    - "172.16.0.0/12"   # Class B private networks
+    - "192.168.0.0/16"  # Class C private networks
+    - "198.18.0.0/15"   # Benchmark/inter-network communication testing
+    - "::/128"          # Unspecified IPv6 address
+    - "::1/128"         # IPv6 loopback address
+    - "fc00::/7"        # Unique local addresses / IPv6 equivalent to private IPv4 subnets
+    - "fe80::/10"       # Link-local addresses / IPv6 equivalent to cloud metadata subnets
+
 # The DefaultInstance section defines the default values for each new virtual instance that is created.
 # Check out https://zitadel.com/docs/concepts/structure/instance#multiple-virtual-instances for more information about virtual instances.
 # For the initial setup, the default values are used to create the first instance.
@@ -974,7 +1112,7 @@ DefaultInstance:
     # If DefaultInstance.Org.Machine.Machine is defined, a service account is created with the IAM_OWNER role.
     Human:
       # In case that UserLoginMustBeDomain is false (default) and if you don't overwrite the username with an email,
-      # it will be suffixed by the org domain (org-name + domain from config).
+      # it will be suffixed by the Organization Domain (org-name + domain from config).
       # for example zitadel-admin in org `My Org` on domain.tld -> zitadel-admin@my-org.domain.tld
       UserName: zitadel-admin # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_USERNAME
       FirstName: ZITADEL # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_FIRSTNAME
@@ -1288,7 +1426,6 @@ DefaultInstance:
   Features:
     LoginDefaultOrg: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINDEFAULTORG
     UserSchema: # ZITADEL_DEFAULTINSTANCE_FEATURES_USERSCHEMA
-    TokenExchange: # ZITADEL_DEFAULTINSTANCE_FEATURES_TOKENEXCHANGE
     ImprovedPerformance: # ZITADEL_DEFAULTINSTANCE_FEATURES_IMPROVEDPERFORMANCE
     # https://github.com/zitadel/zitadel/blob/main/internal/feature/feature.go#L64-L68
     #   - 1 # OrgByID
@@ -1323,7 +1460,7 @@ DefaultInstance:
     # - en
     # - de
   Quotas:
-    # Items take a slice of quota configurations, whereas, for each unit type and instance, one or zero quotas may exist.
+    # Items take a slice of quota settings, whereas, for each unit type and instance, one or zero quotas may exist.
     # The following unit types are supported
 
     # "requests.all.authenticated"
