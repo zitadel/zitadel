@@ -1,13 +1,167 @@
 package oidc
 
 import (
+	"context"
 	"encoding/json"
+	"net/http"
 	"strings"
+	"time"
 
 	"github.com/muhlemmer/gu"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+// registrationMaxBodyBytes bounds the size of a dynamic client registration request body.
+const registrationMaxBodyBytes = 100 * 1024
+
+// dynamicClientRegistration handles POST requests to the OAuth 2.0 Dynamic Client
+// Registration endpoint (RFC 7591). The route is always mounted; it only registers
+// clients when the oidc_dynamic_client_registration feature is enabled for the instance,
+// otherwise it behaves as if the endpoint did not exist.
+func (s *Server) dynamicClientRegistration(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	if !authz.GetFeatures(ctx).OIDCDynamicClientRegistration {
+		http.NotFound(w, r)
+		return
+	}
+
+	resourceOwner, err := s.dynamicClientRegistrationResourceOwner(ctx, r)
+	if err != nil {
+		s.writeRegistrationUnauthorized(ctx, w)
+		return
+	}
+
+	var req clientRegistrationRequest
+	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, registrationMaxBodyBytes)).Decode(&req); err != nil {
+		s.writeRegistrationError(ctx, w, newRegistrationError(registrationErrorInvalidClientMetadata, "the request body could not be parsed"))
+		return
+	}
+
+	app, regErr := req.toOIDCApp()
+	if regErr != nil {
+		s.writeRegistrationError(ctx, w, regErr)
+		return
+	}
+
+	projectID, err := s.ensureDCRProject(ctx, resourceOwner)
+	if err != nil {
+		s.writeRegistrationServerError(ctx, w, err)
+		return
+	}
+
+	registered, err := s.command.AddDynamicOIDCClient(ctx, projectID, resourceOwner, app)
+	if err != nil {
+		s.writeRegistrationCommandError(ctx, w, err)
+		return
+	}
+
+	s.writeRegistrationJSON(ctx, w, http.StatusCreated, newClientRegistrationResponse(registered, req.ClientName, time.Now().Unix()))
+}
+
+// dynamicClientRegistrationResourceOwner authorizes the registration and returns the
+// organization the client is homed in. When an access token is presented it is used as the
+// RFC 7591 §3 initial access token and the client is homed in the token's organization.
+// Without a token, open registration must be enabled and the client is homed in the
+// instance's default organization.
+func (s *Server) dynamicClientRegistrationResourceOwner(ctx context.Context, r *http.Request) (string, error) {
+	if token := bearerToken(r); token != "" {
+		accessToken, err := s.verifyAccessToken(ctx, token)
+		if err != nil {
+			return "", err
+		}
+		return accessToken.resourceOwner, nil
+	}
+	if !s.dynamicClientRegistrationConfig.AllowUnauthenticated {
+		return "", zerrors.ThrowUnauthenticated(nil, "OIDC-Eich8", "Errors.Token.Invalid")
+	}
+	return authz.GetInstance(ctx).DefaultOrganisationID(), nil
+}
+
+// ensureDCRProject returns the dedicated project that holds dynamically registered clients
+// for the organization, creating it on first use. Concurrent creations are resolved
+// through the per-organization uniqueness of the project name.
+func (s *Server) ensureDCRProject(ctx context.Context, resourceOwner string) (string, error) {
+	projectID, err := s.dcrProjectID(ctx, resourceOwner)
+	if err != nil || projectID != "" {
+		return projectID, err
+	}
+	projectID, err = s.command.AddDCRProject(ctx, resourceOwner)
+	if err == nil {
+		return projectID, nil
+	}
+	if zerrors.IsErrorAlreadyExists(err) {
+		// A concurrent registration created the project first; look it up again.
+		return s.dcrProjectID(ctx, resourceOwner)
+	}
+	return "", err
+}
+
+func (s *Server) dcrProjectID(ctx context.Context, resourceOwner string) (string, error) {
+	nameQuery, err := query.NewProjectNameSearchQuery(query.TextEquals, command.DCRProjectName)
+	if err != nil {
+		return "", err
+	}
+	ownerQuery, err := query.NewProjectResourceOwnerSearchQuery(resourceOwner)
+	if err != nil {
+		return "", err
+	}
+	// No permission check: access to the registration endpoint is the authorization
+	// boundary for dynamic client registration.
+	projects, err := s.query.SearchProjects(ctx, &query.ProjectSearchQueries{Queries: []query.SearchQuery{nameQuery, ownerQuery}}, nil)
+	if err != nil {
+		return "", err
+	}
+	if len(projects.Projects) == 0 {
+		return "", nil
+	}
+	return projects.Projects[0].ID, nil
+}
+
+func bearerToken(r *http.Request) string {
+	auth := r.Header.Get("Authorization")
+	scheme, token, found := strings.Cut(auth, " ")
+	if !found || !strings.EqualFold(scheme, "Bearer") {
+		return ""
+	}
+	return strings.TrimSpace(token)
+}
+
+func (s *Server) writeRegistrationJSON(ctx context.Context, w http.ResponseWriter, status int, body any) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "no-store")
+	w.Header().Set("Pragma", "no-cache")
+	w.WriteHeader(status)
+	if err := json.NewEncoder(w).Encode(body); err != nil {
+		s.getLogger(ctx).ErrorContext(ctx, "dynamic client registration: encode response", "err", err)
+	}
+}
+
+func (s *Server) writeRegistrationError(ctx context.Context, w http.ResponseWriter, regErr *registrationError) {
+	s.writeRegistrationJSON(ctx, w, http.StatusBadRequest, regErr)
+}
+
+func (s *Server) writeRegistrationUnauthorized(ctx context.Context, w http.ResponseWriter) {
+	w.Header().Set("WWW-Authenticate", "Bearer")
+	s.writeRegistrationJSON(ctx, w, http.StatusUnauthorized, newRegistrationError("invalid_token", "a valid access token is required to register a client"))
+}
+
+func (s *Server) writeRegistrationServerError(ctx context.Context, w http.ResponseWriter, err error) {
+	s.getLogger(ctx).ErrorContext(ctx, "dynamic client registration", "err", err)
+	s.writeRegistrationJSON(ctx, w, http.StatusInternalServerError, newRegistrationError("server_error", "the client could not be registered"))
+}
+
+func (s *Server) writeRegistrationCommandError(ctx context.Context, w http.ResponseWriter, err error) {
+	if zerrors.IsErrorInvalidArgument(err) {
+		s.writeRegistrationError(ctx, w, newRegistrationError(registrationErrorInvalidClientMetadata, "the requested client metadata is not supported"))
+		return
+	}
+	s.writeRegistrationServerError(ctx, w, err)
+}
 
 // OAuth 2.0 Dynamic Client Registration error codes as defined in RFC 7591 §3.2.2.
 const (

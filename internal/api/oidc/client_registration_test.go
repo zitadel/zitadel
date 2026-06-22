@@ -1,6 +1,8 @@
 package oidc
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/muhlemmer/gu"
@@ -145,6 +147,34 @@ func Test_normalizeResponseType(t *testing.T) {
 		t.Run(tt.in, func(t *testing.T) {
 			t.Parallel()
 			assert.Equal(t, tt.want, normalizeResponseType(tt.in))
+		})
+	}
+}
+
+func Test_bearerToken(t *testing.T) {
+	t.Parallel()
+	newRequest := func(authorization string) *http.Request {
+		r := httptest.NewRequest(http.MethodPost, "/oauth/v2/register", nil)
+		if authorization != "" {
+			r.Header.Set("Authorization", authorization)
+		}
+		return r
+	}
+	tests := []struct {
+		name          string
+		authorization string
+		want          string
+	}{
+		{"no header", "", ""},
+		{"bearer token", "Bearer abc123", "abc123"},
+		{"case insensitive scheme", "bearer abc123", "abc123"},
+		{"basic auth ignored", "Basic dXNlcjpwYXNz", ""},
+		{"trims spaces", "Bearer   abc123  ", "abc123"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, tt.want, bearerToken(newRequest(tt.authorization)))
 		})
 	}
 }
