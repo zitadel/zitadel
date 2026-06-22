@@ -11,6 +11,10 @@ themselves as OIDC applications at runtime, instead of being created upfront in 
 This is required by clients that self-register before any user context exists, most notably
 [Model Context Protocol (MCP)](https://modelcontextprotocol.io) clients such as Claude Desktop, claude.ai and the MCP SDKs.
 
+A registered client can later read, update and delete its own registration through the
+[OAuth 2.0 Dynamic Client Registration Management Protocol (RFC 7592)](https://datatracker.ietf.org/doc/html/rfc7592),
+using the registration access token it receives at registration. See [Manage a registration](#manage-a-registration).
+
 <Callout type="warn">
 Dynamic client registration is disabled by default and is currently behind a feature flag. Only enable it if you
 understand the trade-offs described in [Registration modes](#registration-modes) below.
@@ -74,6 +78,8 @@ A successful registration returns `HTTP 201` with the client information respons
 {
   "client_id": "340396026519785524",
   "client_id_issued_at": 1718000000,
+  "registration_access_token": "kFqx...redacted...",
+  "registration_client_uri": "https://${CUSTOM_DOMAIN}/oauth/v2/register/340396026519785524",
   "client_name": "My MCP Client",
   "redirect_uris": ["https://client.example.com/callback"],
   "grant_types": ["authorization_code", "refresh_token"],
@@ -88,6 +94,10 @@ also contains a `client_secret` and `client_secret_expires_at` (`0`, secrets do 
 The returned `client_id` can be used immediately to start an
 [authorization code flow](/guides/integrate/login/oidc/login-users). Public clients (`token_endpoint_auth_method` of
 `none`) must use [PKCE](https://datatracker.ietf.org/doc/html/rfc7636).
+
+The `registration_access_token` and `registration_client_uri` let the client manage its own registration afterwards, see
+[Manage a registration](#manage-a-registration). Store the registration access token securely: it is only returned at
+registration and when the registration is updated, and it is never stored in clear text on the server.
 
 ## Supported metadata
 
@@ -104,10 +114,70 @@ The returned `client_id` can be used immediately to start an
 Errors are returned as defined in [RFC 7591 §3.2.2](https://datatracker.ietf.org/doc/html/rfc7591#section-3.2.2),
 for example `invalid_redirect_uri` or `invalid_client_metadata`, with HTTP status `400`.
 
+## Manage a registration
+
+ZITADEL implements the [OAuth 2.0 Dynamic Client Registration Management Protocol (RFC 7592)](https://datatracker.ietf.org/doc/html/rfc7592).
+A registered client manages itself at the client configuration endpoint returned as `registration_client_uri`
+(`${CUSTOM_DOMAIN}/oauth/v2/register/{client_id}`), authenticating with the `registration_access_token` from the
+registration response. The endpoints share the `oidc_dynamic_client_registration` feature flag, so they are only served
+when the feature is enabled.
+
+The registration access token is bound to a single client. Send it as an `Authorization: Bearer` header. A missing or
+invalid token is rejected with `401 Unauthorized`; once a client has been deleted its endpoint returns `404 Not Found`.
+
+### Read
+
+```bash
+curl --request GET \
+  --url ${CUSTOM_DOMAIN}/oauth/v2/register/340396026519785524 \
+  --header 'Authorization: Bearer <registration_access_token>'
+```
+
+Returns `HTTP 200` with the current client information response. The `client_secret` is never returned, as it is not
+stored in clear text.
+
+### Update
+
+Send the full set of client metadata; it replaces the stored metadata. The same validation and defaulting as
+registration applies.
+
+```bash
+curl --request PUT \
+  --url ${CUSTOM_DOMAIN}/oauth/v2/register/340396026519785524 \
+  --header 'Authorization: Bearer <registration_access_token>' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "redirect_uris": ["https://client.example.com/callback", "https://client.example.com/callback2"],
+    "token_endpoint_auth_method": "none"
+  }'
+```
+
+Returns `HTTP 200` with the updated registration. An update rotates the registration access token: the response contains
+a new `registration_access_token`, so the client must replace its stored token with the new value. Every update rotates
+the token, including an update that does not change any metadata. The new token works immediately; the previous token is
+invalidated through the eventually consistent projection, so it may keep working for a brief moment after the update.
+
+### Delete
+
+```bash
+curl --request DELETE \
+  --url ${CUSTOM_DOMAIN}/oauth/v2/register/340396026519785524 \
+  --header 'Authorization: Bearer <registration_access_token>'
+```
+
+Returns `HTTP 204 No Content` and removes the client.
+
 ## Limitations
 
-This first version intentionally keeps a small scope:
+This version intentionally keeps a small scope:
 
 - Free-form metadata such as `logo_uri`, `client_uri` or `contacts` is accepted but not persisted.
 - The `private_key_jwt` authentication method and the `jwks`/`jwks_uri` members are rejected with `invalid_client_metadata`.
-- Reading, updating and deleting a registration ([RFC 7592](https://datatracker.ietf.org/doc/html/rfc7592)) is not yet supported.
+- A registration access token is invalidated by rotating it (through an update) or by deleting the client; there is no
+  separate per-token revocation endpoint.
+- The read and update responses return the current metadata but not `client_name` or `client_id_issued_at` (not
+  persisted in this version), and never return `client_secret` (only its hash is stored).
+- Changing `token_endpoint_auth_method` to a confidential method (`client_secret_basic` or `client_secret_post`) through
+  an update does not issue a `client_secret`; register a new confidential client instead.
+- A client whose application, project or organization is deactivated (not deleted) returns `404` from the management
+  endpoints until it is reactivated.

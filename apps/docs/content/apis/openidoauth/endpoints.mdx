@@ -685,7 +685,12 @@ curl --request POST \
   }'
 ```
 
-See the [Dynamic Client Registration guide](/guides/integrate/dynamic-client-registration) for the supported metadata, the available registration modes and the current limitations.
+A successful registration also returns a `registration_access_token` and a `registration_client_uri`
+(`${CUSTOM_DOMAIN}/oauth/v2/register/{client_id}`). They let the client read, update and delete its own registration
+through [OAuth 2.0 Dynamic Client Registration Management (RFC 7592)](https://datatracker.ietf.org/doc/html/rfc7592),
+behind the same feature flag.
+
+See the [Dynamic Client Registration guide](/guides/integrate/dynamic-client-registration) for the supported metadata, the available registration modes, managing a registration and the current limitations.
 
 ## OAuth 2.0 metadata
 
