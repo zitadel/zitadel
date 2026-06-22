@@ -66,6 +66,7 @@ func (m *SystemFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemLoginVersion,
 			feature_v2.SystemPermissionCheckV2,
 			feature_v2.SystemEnableRelationalTables,
+			feature_v2.SystemOIDCDynamicClientRegistration,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -97,6 +98,9 @@ func reduceSystemFeature(features *SystemFeatures, key feature.Key, value any) {
 	case feature.KeyEnableRelationalTables:
 		v := value.(bool)
 		features.EnableRelationalTables = &v
+	case feature.KeyOIDCDynamicClientRegistration:
+		v := value.(bool)
+		features.OIDCDynamicClientRegistration = &v
 	}
 }
 
@@ -110,6 +114,7 @@ func (wm *SystemFeaturesWriteModel) setCommands(ctx context.Context, f *SystemFe
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginV2, f.LoginV2, feature_v2.SystemLoginVersion)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.PermissionCheckV2, f.PermissionCheckV2, feature_v2.SystemPermissionCheckV2)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.EnableRelationalTables, f.EnableRelationalTables, feature_v2.SystemEnableRelationalTables)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.OIDCDynamicClientRegistration, f.OIDCDynamicClientRegistration, feature_v2.SystemOIDCDynamicClientRegistration)
 	return cmds
 }
 

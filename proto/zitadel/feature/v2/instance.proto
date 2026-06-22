@@ -94,6 +94,13 @@ message SetInstanceFeaturesRequest{
       description: "If this is enabled Zitadel will use the relational tables instead of the projections as the main source to store the data. Regardless of the flag state, both the relational table and the projections are kept up to date. Currently the flag has no effect.";
     }
   ];
+
+  optional bool oidc_dynamic_client_registration = 17 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled, the OAuth 2.0 Dynamic Client Registration endpoint (RFC 7591) is served under /oauth/v2/register and advertised as registration_endpoint in the discovery document. The endpoint stays disabled by default.";
+    }
+  ];
 }
 
 message SetInstanceFeaturesResponse {
@@ -194,6 +201,13 @@ message GetInstanceFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "If this is enabled Zitadel will use the relational tables instead of the projections as the main source to store the data. Regardless of the flag state, both the relational table and the projections are kept up to date. Currently the flag has no effect.";
+    }
+  ];
+
+  FeatureFlag oidc_dynamic_client_registration = 18 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled, the OAuth 2.0 Dynamic Client Registration endpoint (RFC 7591) is served under /oauth/v2/register and advertised as registration_endpoint in the discovery document. The endpoint stays disabled by default.";
     }
   ];
 }

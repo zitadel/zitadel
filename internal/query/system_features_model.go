@@ -62,6 +62,7 @@ func (m *SystemFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemLoginVersion,
 			feature_v2.SystemPermissionCheckV2,
 			feature_v2.SystemEnableRelationalTables,
+			feature_v2.SystemOIDCDynamicClientRegistration,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -93,6 +94,8 @@ func reduceSystemFeatureSet[T any](features *SystemFeatures, event *feature_v2.S
 		features.PermissionCheckV2.set(level, event.Value)
 	case feature.KeyEnableRelationalTables:
 		features.EnableRelationalTables.set(level, event.Value)
+	case feature.KeyOIDCDynamicClientRegistration:
+		features.OIDCDynamicClientRegistration.set(level, event.Value)
 	}
 	return nil
 }
