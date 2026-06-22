@@ -2362,7 +2362,8 @@
       "DESCRIPTION": "Geben Sie die Daten JWT Identitätsanbieter ein. ",
       "HEADERNAME": "Header Name",
       "JWTENDPOINT": "JWT Endpoint",
-      "JWTKEYSENDPOINT": "JWT Keys Endpoint"
+      "JWTKEYSENDPOINT": "JWT Keys Endpoint",
+      "AUDIENCE": "Audience"
     },
     "TOAST": {
       "SAVED": "Erfolgreich gespeichert.",

@@ -89,6 +89,7 @@ func (t *telemetryPusher) pushMilestone(ctx context.Context, e *milestone.Reache
 				CallURL: endpoint,
 				Method:  http.MethodPost,
 				Headers: t.cfg.Headers,
+				Client:  t.queries.httpClient,
 			},
 			t.channels,
 			&struct {

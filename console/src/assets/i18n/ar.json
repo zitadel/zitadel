@@ -2360,7 +2360,8 @@
       "DESCRIPTION": "أدخل البيانات لمزود هوية JWT.",
       "HEADERNAME": "اسم الرأس",
       "JWTENDPOINT": "نقطة نهاية JWT",
-      "JWTKEYSENDPOINT": "نقطة نهاية مفاتيح JWT"
+      "JWTKEYSENDPOINT": "نقطة نهاية مفاتيح JWT",
+      "AUDIENCE": "الجمهور"
     },
     "APPLE": {
       "TEAMID": "معرف الفريق",

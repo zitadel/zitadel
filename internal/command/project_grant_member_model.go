@@ -75,7 +75,11 @@ func (wm *ProjectGrantMemberWriteModel) Reduce() error {
 		case *project.GrantMemberCascadeRemovedEvent:
 			wm.State = domain.MemberStateRemoved
 		case *project.GrantRemovedEvent, *project.ProjectRemovedEvent:
+			wm.Roles = nil
 			wm.State = domain.MemberStateRemoved
+		case *project.ProjectAddedEvent:
+			wm.Roles = nil
+			wm.State = domain.MemberStateUnspecified
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -88,6 +92,7 @@ func (wm *ProjectGrantMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			project.ProjectAddedType,
 			project.GrantMemberAddedType,
 			project.GrantMemberChangedType,
 			project.GrantMemberRemovedType,

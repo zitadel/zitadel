@@ -2369,7 +2369,8 @@
       "DESCRIPTION": "JWT Kimlik Sağlayıcısı için verileri girin.",
       "HEADERNAME": "Başlık Adı",
       "JWTENDPOINT": "JWT Uç Noktası",
-      "JWTKEYSENDPOINT": "JWT Anahtarları Uç Noktası"
+      "JWTKEYSENDPOINT": "JWT Anahtarları Uç Noktası",
+      "AUDIENCE": "Audience"
     },
     "APPLE": {
       "TEAMID": "Takım ID",
