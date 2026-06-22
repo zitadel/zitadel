@@ -499,6 +499,7 @@ describe("checkEmailVerified", () => {
     expect(result).toEqual({
       redirect: expect.stringContaining("/verify"),
     });
+    expect(result?.redirect).toContain("codeSent=true");
   });
 
   it("should not redirect if email is verified", async () => {
@@ -558,6 +559,7 @@ describe("checkEmailVerified", () => {
     expect(result).toEqual({
       redirect: expect.stringContaining("/verify"),
     });
+    expect(result?.redirect).toContain("codeSent=true");
   });
 });
 
@@ -591,6 +593,7 @@ describe("checkEmailVerification", () => {
     expect(result).toEqual({
       redirect: expect.stringContaining("/verify"),
     });
+    expect(result?.redirect).toContain("codeSent=true");
   });
 
   it("should not redirect if EMAIL_VERIFICATION is not true", async () => {

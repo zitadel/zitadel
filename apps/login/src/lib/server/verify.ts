@@ -25,7 +25,7 @@ import { getSessionCookieByLoginName } from "../cookies";
 import { getOrSetFingerprintId } from "../fingerprint";
 import { getServiceConfig } from "../service-url";
 import { loadMostRecentSession } from "../session";
-import { checkMFAFactors } from "../verify-helper";
+import { checkMFAFactors } from "../mfa-helper";
 import { createSessionAndUpdateCookie } from "./cookie";
 import { getPublicHostWithProtocol } from "./host";
 
