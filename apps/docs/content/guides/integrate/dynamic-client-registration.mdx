@@ -6,7 +6,7 @@ sidebar_label: Dynamic Client Registration
 
 ZITADEL implements [OAuth 2.0 Dynamic Client Registration (RFC 7591)](https://datatracker.ietf.org/doc/html/rfc7591).
 It exposes a [`registration_endpoint`](/apis/openidoauth/endpoints#registration_endpoint) that lets clients register
-themselves as OIDC applications at runtime, instead of being created upfront in the Console or through the management API.
+themselves as OIDC applications at runtime, instead of being created upfront in the Management Console or through the management API.
 
 This is required by clients that self-register before any user context exists, most notably
 [Model Context Protocol (MCP)](https://modelcontextprotocol.io) clients such as Claude Desktop, claude.ai and the MCP SDKs.
@@ -42,6 +42,10 @@ runtime configuration. Both are only active once the feature flag above is enabl
 | --- | --- | --- | --- |
 | Initial access token (default) | `OIDC.DynamicClientRegistration.AllowUnauthenticated = false` | A valid access token must be sent as `Authorization: Bearer` header (RFC 7591 §3 initial access token). | The token's organization. |
 | Open registration | `OIDC.DynamicClientRegistration.AllowUnauthenticated = true` | None. Required for the MCP flow. | The instance's default organization. |
+
+Whenever an `Authorization: Bearer` header is present it is treated as an initial access token, even with open
+registration enabled. An invalid or expired token is rejected with `401 Unauthorized`; the request does not fall back to
+anonymous registration.
 
 In both modes the registered clients are stored in a dedicated, auto-provisioned project named `ZITADEL DCR` in the
 respective organization, so they do not interfere with your other projects. When open registration is enabled, protect
@@ -89,8 +93,8 @@ The returned `client_id` can be used immediately to start an
 
 | Member | Notes |
 | --- | --- |
-| `redirect_uris` | Required. Validated against the same rules as applications created in the Console. |
-| `token_endpoint_auth_method` | `client_secret_basic` (default), `client_secret_post` or `none`. |
+| `redirect_uris` | Required. Validated against the same rules as applications created in the Management Console. |
+| `token_endpoint_auth_method` | `client_secret_basic`, `client_secret_post` or `none`. Defaults to `none` for native applications and `client_secret_basic` for web applications. |
 | `grant_types` | Defaults to `["authorization_code"]`. `refresh_token`, `implicit`, `urn:ietf:params:oauth:grant-type:device_code` and `urn:ietf:params:oauth:grant-type:token-exchange` are supported. |
 | `response_types` | Defaults to `["code"]`. `id_token` and `id_token token` are supported. |
 | `application_type` | `web` (default) or `native`. |

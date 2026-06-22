@@ -87,7 +87,6 @@ message SetSystemFeaturesRequest{
       description: "If this is enabled, the OAuth 2.0 Dynamic Client Registration endpoint (RFC 7591) is served under /oauth/v2/register and advertised as registration_endpoint in the discovery document. The endpoint stays disabled by default.";
     }
   ];
-
 }
 
 message SetSystemFeaturesResponse {
