@@ -19,8 +19,20 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func TestCommandSide_AddDCRProject(t *testing.T) {
+func TestCommandSide_EnsureDCRProject(t *testing.T) {
 	t.Parallel()
+
+	dcrProjectAdded := func(projectID string) eventstore.Event {
+		return eventFromEventPusher(project.NewProjectAddedEvent(
+			context.Background(),
+			&project.NewAggregate(projectID, "org1").Aggregate,
+			DCRProjectName,
+			false,
+			false,
+			false,
+			domain.PrivateLabelingSettingUnspecified,
+		))
+	}
 
 	t.Run("missing resource owner, invalid argument", func(t *testing.T) {
 		t.Parallel()
@@ -28,15 +40,29 @@ func TestCommandSide_AddDCRProject(t *testing.T) {
 			eventstore:      expectEventstore()(t),
 			checkPermission: newMockPermissionCheckNotAllowed(),
 		}
-		_, err := c.AddDCRProject(authz.WithInstanceID(context.Background(), "instanceID"), "")
+		_, err := c.EnsureDCRProject(authz.WithInstanceID(context.Background(), "instanceID"), "")
 		assert.True(t, zerrors.IsErrorInvalidArgument(err))
 	})
 
-	t.Run("project created without permission check", func(t *testing.T) {
+	t.Run("existing project resolved from the eventstore", func(t *testing.T) {
 		t.Parallel()
 		c := &Commands{
 			eventstore: expectEventstore(
-				expectFilter(),
+				expectFilter(dcrProjectAdded("existing")),
+			)(t),
+			checkPermission: newMockPermissionCheckNotAllowed(),
+		}
+		projectID, err := c.EnsureDCRProject(authz.WithInstanceID(context.Background(), "instanceID"), "org1")
+		assert.NoError(t, err)
+		assert.Equal(t, "existing", projectID)
+	})
+
+	t.Run("project created when none exists, without permission check", func(t *testing.T) {
+		t.Parallel()
+		c := &Commands{
+			eventstore: expectEventstore(
+				expectFilter(), // lookup: no DCR project yet
+				expectFilter(), // project write model for the new id
 				expectPush(
 					project.NewProjectAddedEvent(
 						context.Background(),
@@ -54,9 +80,38 @@ func TestCommandSide_AddDCRProject(t *testing.T) {
 			checkPermission: newMockPermissionCheckNotAllowed(),
 		}
 		c.setMilestonesCompletedForTest("instanceID")
-		projectID, err := c.AddDCRProject(authz.WithInstanceID(context.Background(), "instanceID"), "org1")
+		projectID, err := c.EnsureDCRProject(authz.WithInstanceID(context.Background(), "instanceID"), "org1")
 		assert.NoError(t, err)
 		assert.Equal(t, "project1", projectID)
+	})
+
+	t.Run("concurrent creation resolves the winner from the eventstore", func(t *testing.T) {
+		t.Parallel()
+		c := &Commands{
+			eventstore: expectEventstore(
+				expectFilter(), // lookup: no DCR project yet
+				expectFilter(), // project write model for the new id
+				expectPushFailed(
+					zerrors.ThrowAlreadyExists(nil, "id", "project name already taken"),
+					project.NewProjectAddedEvent(
+						context.Background(),
+						&project.NewAggregate("project1", "org1").Aggregate,
+						DCRProjectName,
+						false,
+						false,
+						false,
+						domain.PrivateLabelingSettingUnspecified,
+					),
+				),
+				expectFilter(dcrProjectAdded("winner")), // re-resolve: the racing winner
+			)(t),
+			idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "project1"),
+			checkPermission: newMockPermissionCheckNotAllowed(),
+		}
+		c.setMilestonesCompletedForTest("instanceID")
+		projectID, err := c.EnsureDCRProject(authz.WithInstanceID(context.Background(), "instanceID"), "org1")
+		assert.NoError(t, err)
+		assert.Equal(t, "winner", projectID)
 	})
 }
 

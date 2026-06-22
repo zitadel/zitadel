@@ -9,7 +9,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func Test_clientRegistrationRequest_toOIDCApp(t *testing.T) {
@@ -58,6 +60,47 @@ func Test_clientRegistrationRequest_toOIDCApp(t *testing.T) {
 				OIDCVersion:            gu.Ptr(domain.OIDCVersionV1),
 				AccessTokenType:        gu.Ptr(domain.OIDCTokenTypeBearer),
 			},
+		},
+		{
+			name: "native application without auth method defaults to public client",
+			req: &clientRegistrationRequest{
+				RedirectURIs:    []string{"https://app.example.com/callback"},
+				ApplicationType: "native",
+			},
+			want: &domain.OIDCApp{
+				RedirectUris:    []string{"https://app.example.com/callback"},
+				ResponseTypes:   []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+				GrantTypes:      []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+				ApplicationType: gu.Ptr(domain.OIDCApplicationTypeNative),
+				AuthMethodType:  gu.Ptr(domain.OIDCAuthMethodTypeNone),
+				OIDCVersion:     gu.Ptr(domain.OIDCVersionV1),
+				AccessTokenType: gu.Ptr(domain.OIDCTokenTypeBearer),
+			},
+		},
+		{
+			name: "native application with custom scheme redirect",
+			req: &clientRegistrationRequest{
+				RedirectURIs:    []string{"com.example.app:/callback"},
+				ApplicationType: "native",
+			},
+			want: &domain.OIDCApp{
+				RedirectUris:    []string{"com.example.app:/callback"},
+				ResponseTypes:   []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+				GrantTypes:      []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+				ApplicationType: gu.Ptr(domain.OIDCApplicationTypeNative),
+				AuthMethodType:  gu.Ptr(domain.OIDCAuthMethodTypeNone),
+				OIDCVersion:     gu.Ptr(domain.OIDCVersionV1),
+				AccessTokenType: gu.Ptr(domain.OIDCTokenTypeBearer),
+			},
+		},
+		{
+			name: "native application with confidential auth method rejected as client metadata",
+			req: &clientRegistrationRequest{
+				RedirectURIs:            []string{"https://app.example.com/callback"},
+				ApplicationType:         "native",
+				TokenEndpointAuthMethod: "client_secret_basic",
+			},
+			wantErr: registrationErrorInvalidClientMetadata,
 		},
 		{
 			name: "client_secret_post auth method mapped",
@@ -182,6 +225,27 @@ func Test_normalizeResponseType(t *testing.T) {
 			assert.Equal(t, tt.want, normalizeResponseType(tt.in))
 		})
 	}
+}
+
+func Test_Server_dynamicClientRegistrationResourceOwner_withoutToken(t *testing.T) {
+	t.Parallel()
+	request := httptest.NewRequest(http.MethodPost, "/oauth/v2/register", nil)
+
+	t.Run("no token and open registration disabled is unauthenticated", func(t *testing.T) {
+		t.Parallel()
+		s := &Server{dynamicClientRegistrationConfig: DynamicClientRegistrationConfig{AllowUnauthenticated: false}}
+		_, err := s.dynamicClientRegistrationResourceOwner(authz.NewMockContext("instance", "org", ""), request)
+		require.Error(t, err)
+		assert.True(t, zerrors.IsUnauthenticated(err))
+	})
+
+	t.Run("no token and open registration enabled uses the default organization", func(t *testing.T) {
+		t.Parallel()
+		s := &Server{dynamicClientRegistrationConfig: DynamicClientRegistrationConfig{AllowUnauthenticated: true}}
+		resourceOwner, err := s.dynamicClientRegistrationResourceOwner(authz.NewMockContext("instance", "default-org", ""), request)
+		require.NoError(t, err)
+		assert.Equal(t, "default-org", resourceOwner)
+	})
 }
 
 func Test_bearerToken(t *testing.T) {

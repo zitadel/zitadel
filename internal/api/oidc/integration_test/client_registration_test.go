@@ -79,6 +79,15 @@ func TestServer_DynamicClientRegistration(t *testing.T) {
 		tokens, err := exchangeTokens(t, Instance, clientID, code, redirectURI)
 		require.NoError(t, err)
 		assert.NotEmpty(t, tokens.AccessToken)
+
+		// Token (initial access token) mode: presenting a valid access token registers a
+		// client in the token's organization, even with open registration enabled.
+		tokenStatus, tokenBody := registerDynamicClient(t, issuer, tokens.AccessToken, map[string]any{
+			"client_name":   "integration token-mode client",
+			"redirect_uris": []string{redirectURI},
+		})
+		require.Equal(t, http.StatusCreated, tokenStatus)
+		assert.NotEmpty(t, tokenBody["client_id"])
 	})
 
 	t.Run("confidential client returns a secret", func(t *testing.T) {
@@ -99,6 +108,16 @@ func TestServer_DynamicClientRegistration(t *testing.T) {
 		})
 		assert.Equal(t, http.StatusBadRequest, status)
 		assert.Equal(t, "invalid_redirect_uri", body["error"])
+	})
+
+	t.Run("malformed request body is rejected", func(t *testing.T) {
+		req, err := http.NewRequest(http.MethodPost, issuer+"/oauth/v2/register", bytes.NewReader([]byte("{not valid json")))
+		require.NoError(t, err)
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := http.DefaultClient.Do(req)
+		require.NoError(t, err)
+		defer resp.Body.Close()
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 	})
 
 	t.Run("missing redirect uri is rejected", func(t *testing.T) {
