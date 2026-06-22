@@ -43,6 +43,10 @@ vi.mock("./host", () => ({
   getPublicHost: vi.fn(),
 }));
 
+vi.mock("./verify", () => ({
+  trySendVerification: vi.fn(() => Promise.resolve(false)),
+}));
+
 // this returns the key itself that can be checked not the translated value
 vi.mock("next-intl/server", () => ({
   getTranslations: vi.fn(() => (key: string) => key),
@@ -198,7 +202,7 @@ describe("sendLoginname", () => {
       mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
     });
 
-    test("should redirect to verify with send=false when user has no authentication methods and email is unverified", async () => {
+    test("should redirect to verify without codeSent when user has no authentication methods and email is unverified", async () => {
       mockListAuthenticationMethodTypes.mockResolvedValue({ authMethodTypes: [] });
 
       const result = await sendLoginname({
@@ -214,7 +218,7 @@ describe("sendLoginname", () => {
       expect((result as any).redirect).toContain("requestId=req123");
     });
 
-    test("should redirect to verify with send=true when user has no authentication methods and email is already verified", async () => {
+    test("should redirect to verify when user has no authentication methods and email is already verified", async () => {
       const verifiedEmailUser = {
         ...mockUser,
         type: { case: "human", value: { email: { email: "user@example.com", isVerified: true } } },

@@ -311,31 +311,42 @@ export async function sendInviteEmailCode(command: SendEmailCommand) {
   return createInviteCode({ serviceConfig, userId: command.userId, urlTemplate: command.urlTemplate });
 }
 
-type InitialSendVerificationCommand = {
+type TrySendVerificationCommand = {
   userId: string;
   isInvite: boolean;
   requestId?: string;
 };
 
-export async function initialSendVerification(command: InitialSendVerificationCommand) {
-  const _headers = await headers();
-  const { serviceConfig } = getServiceConfig(_headers);
-  const hostWithProtocol = await getPublicHostWithProtocol(_headers);
+/**
+ * Attempts to send an initial verification email/invite code.
+ * Returns `true` if sent successfully, `false` on error (swallowed and logged).
+ */
+export async function trySendVerification(command: TrySendVerificationCommand): Promise<boolean> {
+  try {
+    const _headers = await headers();
+    const { serviceConfig } = getServiceConfig(_headers);
+    const hostWithProtocol = await getPublicHostWithProtocol(_headers);
 
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-  const urlTemplate = buildVerificationUrlTemplate(hostWithProtocol, basePath, command.isInvite, command.requestId);
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+    const urlTemplate = buildVerificationUrlTemplate(hostWithProtocol, basePath, command.isInvite, command.requestId);
 
-  if (command.isInvite) {
-    return createInviteCode({
-      serviceConfig,
-      userId: command.userId,
-      urlTemplate,
-    });
-  } else {
-    return zitadelSendEmailCode({
-      serviceConfig,
-      userId: command.userId,
-      urlTemplate,
-    });
+    if (command.isInvite) {
+      await createInviteCode({
+        serviceConfig,
+        userId: command.userId,
+        urlTemplate,
+      });
+    } else {
+      await zitadelSendEmailCode({
+        serviceConfig,
+        userId: command.userId,
+        urlTemplate,
+      });
+    }
+
+    return true;
+  } catch (err) {
+    logger.error("Failed to send initial verification email", { error: err });
+    return false;
   }
 }

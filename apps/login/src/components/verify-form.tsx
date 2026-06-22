@@ -49,11 +49,9 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [initialSendError, setInitialSendError] = useState<string>("");
 
   async function resendCode() {
     setError("");
-    setInitialSendError("");
     setLoading(true);
 
     // do not send code for dummy userid that is set to prevent user enumeration
@@ -94,7 +92,6 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
   const fcn = useCallback(
     async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
       setError("");
-      setInitialSendError("");
       setLoading(true);
 
       try {
@@ -127,7 +124,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
   return (
     <>
       {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
-      {codeSent && !initialSendError && (
+      {codeSent && (
         <div className="w-full py-4">
           <Alert type={AlertType.INFO}>
             <Translated i18nKey="verify.codeSent" namespace="verify" />
@@ -165,9 +162,9 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
           />
         </div>
 
-        {(error || initialSendError) && (
+        {error && (
           <div className="py-4" data-testid="error">
-            <Alert>{error || initialSendError}</Alert>
+            <Alert>{error}</Alert>
           </div>
         )}
 

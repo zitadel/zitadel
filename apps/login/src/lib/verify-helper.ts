@@ -8,11 +8,9 @@ import crypto from "crypto";
 import moment from "moment";
 import { cookies } from "next/headers";
 import { getFingerprintIdCookie } from "./fingerprint";
-import { createLogger } from "./logger";
-import { initialSendVerification } from "./server/verify";
+import { trySendVerification } from "./server/verify";
 import { getUserByID, ServiceConfig } from "./zitadel";
 
-const logger = createLogger("verify-helper");
 
 export function checkPasswordChangeRequired(
   expirySettings: PasswordExpirySettings | undefined,
@@ -53,18 +51,11 @@ export async function checkEmailVerified(
   requestId?: string,
 ) {
   if (!humanUser?.email?.isVerified) {
-    let codeSent = false;
-    await initialSendVerification({
+    const codeSent = await trySendVerification({
       userId: session.factors?.user?.id as string,
       isInvite: false,
       requestId,
-    })
-      .then(() => {
-        codeSent = true;
-      })
-      .catch((err) => {
-        logger.error("Failed to send initial verification email", { error: err });
-      });
+    });
 
     const paramsVerify = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
@@ -94,18 +85,11 @@ export async function checkEmailVerification(
   requestId?: string,
 ) {
   if (!humanUser?.email?.isVerified && process.env.EMAIL_VERIFICATION === "true") {
-    let codeSent = false;
-    await initialSendVerification({
+    const codeSent = await trySendVerification({
       userId: session.factors?.user?.id as string,
       isInvite: false,
       requestId,
-    })
-      .then(() => {
-        codeSent = true;
-      })
-      .catch((err) => {
-        logger.error("Failed to send initial verification email", { error: err });
-      });
+    });
 
     const params = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,

@@ -26,7 +26,7 @@ import {
 } from "../zitadel";
 import { createSessionAndUpdateCookie } from "./cookie";
 import { getPublicHost } from "./host";
-import { initialSendVerification } from "./verify";
+import { trySendVerification } from "./verify";
 
 const logger = createLogger("loginname");
 
@@ -345,20 +345,13 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       // and causes confusion. Only auto-send if the email is already verified.
       const shouldSend = humanUser?.email?.isVerified === true;
 
-      let codeSent = false;
-      if (shouldSend) {
-        await initialSendVerification({
-          userId: session?.factors?.user?.id ?? user.userId,
-          isInvite: true,
-          requestId: command.requestId,
-        })
-          .then(() => {
-            codeSent = true;
+      const codeSent = shouldSend
+        ? await trySendVerification({
+            userId: session?.factors?.user?.id ?? user.userId,
+            isInvite: true,
+            requestId: command.requestId,
           })
-          .catch((err: any) => {
-            logger.error("Failed to send initial verification email during loginname", { error: err });
-          });
-      }
+        : false;
 
       const params = new URLSearchParams({
         loginName: (session?.factors?.user?.loginName ?? user.preferredLoginName) as string,

@@ -14,7 +14,7 @@ import {
 } from "./verify-helper";
 
 vi.mock("./server/verify", () => ({
-  initialSendVerification: vi.fn(() => Promise.resolve()),
+  trySendVerification: vi.fn(() => Promise.resolve(true)),
 }));
 
 // Mock function to create timestamps - following the same pattern as session.test.ts
@@ -525,7 +525,6 @@ describe("checkEmailVerified", () => {
     expect(result?.redirect).toContain("userId=user-123");
   });
 
-  // removed send=true test
 
   it("should include organization in redirect", async () => {
     const humanUser: any = {
@@ -622,7 +621,6 @@ describe("checkEmailVerification", () => {
     expect(result).toBeUndefined();
   });
 
-  // removed send=true test
 
   it("should include organization in redirect", async () => {
     process.env.EMAIL_VERIFICATION = "true";
