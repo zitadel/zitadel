@@ -16,21 +16,34 @@ import (
 // organization on the first registration.
 const DCRProjectName = "ZITADEL DCR"
 
-// AddDCRProject creates the dedicated project for dynamically registered OIDC clients in
-// the given organization. Like AddDynamicOIDCClient it does not perform a permission
-// check, because the provisioning is authorized at the registration endpoint through the
-// feature flag and the configured registration mode. The per-organization uniqueness of
-// the project name guards against duplicates created by concurrent registrations: a racing
-// push fails with an already-exists error, which the caller resolves by looking the
-// project up again.
-func (c *Commands) AddDCRProject(ctx context.Context, resourceOwner string) (_ string, err error) {
+// EnsureDCRProject returns the dedicated project that holds dynamically registered OIDC
+// clients in the given organization, creating it on first use. Like AddDynamicOIDCClient it
+// does not perform a permission check, because the provisioning is authorized at the
+// registration endpoint through the feature flag and the configured registration mode.
+//
+// Both the existence check and the recovery from a concurrent creation read from the
+// eventstore, so that several clients self-registering into the same organization at the
+// same time converge on a single project: the per-organization uniqueness of the project
+// name lets exactly one push win, and the racing callers resolve the winner's id strongly
+// consistently. Resolving from the projection instead would be eventually consistent and
+// could still report no project in that race.
+func (c *Commands) EnsureDCRProject(ctx context.Context, resourceOwner string) (_ string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if resourceOwner == "" {
 		return "", zerrors.ThrowInvalidArgument(nil, "COMMAND-Oht9a", "Errors.ResourceOwnerMissing")
 	}
-	projectID, err := c.idGenerator.Next()
+
+	projectID, err := c.dcrProjectID(ctx, resourceOwner)
+	if err != nil {
+		return "", err
+	}
+	if projectID != "" {
+		return projectID, nil
+	}
+
+	projectID, err = c.idGenerator.Next()
 	if err != nil {
 		return "", err
 	}
@@ -55,6 +68,10 @@ func (c *Commands) AddDCRProject(ctx context.Context, resourceOwner string) (_ s
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
+		if zerrors.IsErrorAlreadyExists(err) {
+			// A concurrent registration created the project first; resolve the winner.
+			return c.dcrProjectID(ctx, resourceOwner)
+		}
 		return "", err
 	}
 	postCommit(ctx)
@@ -62,6 +79,55 @@ func (c *Commands) AddDCRProject(ctx context.Context, resourceOwner string) (_ s
 		return "", err
 	}
 	return projectID, nil
+}
+
+// dcrProjectID resolves the id of an organization's dedicated DCR project from the
+// eventstore (strongly consistent). It returns an empty string when the project does not
+// exist yet.
+func (c *Commands) dcrProjectID(ctx context.Context, resourceOwner string) (string, error) {
+	wm := newDCRProjectWriteModel(resourceOwner)
+	if err := c.eventstore.FilterToQueryReducer(ctx, wm); err != nil {
+		return "", err
+	}
+	return wm.projectID, nil
+}
+
+// dcrProjectWriteModel resolves the dedicated DCR project of an organization by its name.
+type dcrProjectWriteModel struct {
+	eventstore.WriteModel
+	projectID string
+}
+
+func newDCRProjectWriteModel(resourceOwner string) *dcrProjectWriteModel {
+	return &dcrProjectWriteModel{
+		WriteModel: eventstore.WriteModel{ResourceOwner: resourceOwner},
+	}
+}
+
+func (wm *dcrProjectWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *project.ProjectAddedEvent:
+			if e.Name == DCRProjectName {
+				wm.projectID = e.Aggregate().ID
+			}
+		case *project.ProjectRemovedEvent:
+			if e.Aggregate().ID == wm.projectID {
+				wm.projectID = ""
+			}
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *dcrProjectWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AwaitOpenTransactions().
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(project.AggregateType).
+		EventTypes(project.ProjectAddedType, project.ProjectRemovedType).
+		Builder()
 }
 
 // AddDynamicOIDCClient registers a new OIDC application through OAuth 2.0 Dynamic Client
