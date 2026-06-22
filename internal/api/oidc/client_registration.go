@@ -190,7 +190,7 @@ func newRegistrationError(errorType, description string) *registrationError {
 // clientRegistrationRequest holds the client metadata of an OAuth 2.0 Dynamic Client
 // Registration request (RFC 7591 §2, extended by OpenID Connect Dynamic Client
 // Registration 1.0 §2). Only the members relevant for a ZITADEL OIDC application are
-// interpreted. Free-form metadata (client_uri, logo_uri, contacts, …) is accepted but
+// interpreted. Free-form metadata (client_uri, logo_uri, contacts, etc.) is accepted but
 // not persisted in this version. Members that imply unsupported behaviour (jwks/jwks_uri,
 // private_key_jwt) are rejected explicitly.
 type clientRegistrationRequest struct {

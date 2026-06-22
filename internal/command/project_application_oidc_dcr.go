@@ -74,7 +74,7 @@ func (c *Commands) AddDCRProject(ctx context.Context, resourceOwner string) (_ s
 // client registration is authorized at the registration endpoint through the
 // oidc_dynamic_client_registration feature flag and the configured registration mode (open
 // or initial access token). The caller is responsible for providing the target project
-// (see the registration endpoint's EnsureDCRProject helper) and the owning organization.
+// (see the registration endpoint's ensureDCRProject helper) and the owning organization.
 func (c *Commands) AddDynamicOIDCClient(ctx context.Context, projectID, resourceOwner string, oidcApp *domain.OIDCApp) (_ *domain.OIDCApp, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
