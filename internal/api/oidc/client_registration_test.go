@@ -60,6 +60,39 @@ func Test_clientRegistrationRequest_toOIDCApp(t *testing.T) {
 			},
 		},
 		{
+			name: "client_secret_post auth method mapped",
+			req: &clientRegistrationRequest{
+				RedirectURIs:            []string{"https://app.example.com/callback"},
+				TokenEndpointAuthMethod: "client_secret_post",
+			},
+			want: &domain.OIDCApp{
+				RedirectUris:    []string{"https://app.example.com/callback"},
+				ResponseTypes:   []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+				GrantTypes:      []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+				ApplicationType: gu.Ptr(domain.OIDCApplicationTypeWeb),
+				AuthMethodType:  gu.Ptr(domain.OIDCAuthMethodTypePost),
+				OIDCVersion:     gu.Ptr(domain.OIDCVersionV1),
+				AccessTokenType: gu.Ptr(domain.OIDCTokenTypeBearer),
+			},
+		},
+		{
+			name: "native loopback http redirect allowed",
+			req: &clientRegistrationRequest{
+				RedirectURIs:            []string{"http://127.0.0.1:8080/callback"},
+				ApplicationType:         "native",
+				TokenEndpointAuthMethod: "none",
+			},
+			want: &domain.OIDCApp{
+				RedirectUris:    []string{"http://127.0.0.1:8080/callback"},
+				ResponseTypes:   []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+				GrantTypes:      []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+				ApplicationType: gu.Ptr(domain.OIDCApplicationTypeNative),
+				AuthMethodType:  gu.Ptr(domain.OIDCAuthMethodTypeNone),
+				OIDCVersion:     gu.Ptr(domain.OIDCVersionV1),
+				AccessTokenType: gu.Ptr(domain.OIDCTokenTypeBearer),
+			},
+		},
+		{
 			name: "jwks_uri rejected",
 			req: &clientRegistrationRequest{
 				RedirectURIs: []string{"https://app.example.com/callback"},
