@@ -1441,6 +1441,7 @@ DefaultInstance:
     PermissionCheckV2: # ZITADEL_DEFAULTINSTANCE_FEATURES_PERMISSIONCHECKV2
     ConsoleUseV2UserApi: true # ZITADEL_DEFAULTINSTANCE_FEATURES_CONSOLEUSEV2USERAPI
     EnableRelationalTables: # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLERELATIONALTABLES
+    OIDCDynamicClientRegistration: # ZITADEL_DEFAULTINSTANCE_FEATURES_OIDCDYNAMICCLIENTREGISTRATION
 
   Limits:
     # AuditLogRetention limits the number of events that can be queried via the events API by their age.

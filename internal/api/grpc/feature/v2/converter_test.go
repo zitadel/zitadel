@@ -29,8 +29,9 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 			Required: true,
 			BaseUri:  gu.Ptr("https://login.com"),
 		},
-		EnableRelationalTables: gu.Ptr(true),
-		PermissionCheckV2:      gu.Ptr(true),
+		EnableRelationalTables:        gu.Ptr(true),
+		PermissionCheckV2:             gu.Ptr(true),
+		OidcDynamicClientRegistration: gu.Ptr(true),
 	}
 	want := &command.SystemFeatures{
 		LoginDefaultOrg:                gu.Ptr(true),
@@ -41,8 +42,9 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 			Required: true,
 			BaseURI:  &url.URL{Scheme: "https", Host: "login.com"},
 		},
-		EnableRelationalTables: gu.Ptr(true),
-		PermissionCheckV2:      gu.Ptr(true),
+		EnableRelationalTables:        gu.Ptr(true),
+		PermissionCheckV2:             gu.Ptr(true),
+		OIDCDynamicClientRegistration: gu.Ptr(true),
 	}
 
 	// Test
@@ -94,6 +96,10 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Level: feature.LevelSystem,
 			Value: true,
 		},
+		OIDCDynamicClientRegistration: query.FeatureSource[bool]{
+			Level: feature.LevelSystem,
+			Value: true,
+		},
 	}
 	want := &feature_pb.GetSystemFeaturesResponse{
 		Details: &object.Details{
@@ -138,6 +144,10 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
+		OidcDynamicClientRegistration: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
+		},
 	}
 
 	// Test
@@ -160,9 +170,10 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 			Required: true,
 			BaseUri:  gu.Ptr("https://login.com"),
 		},
-		ConsoleUseV2UserApi:    gu.Ptr(true),
-		PermissionCheckV2:      gu.Ptr(false),
-		EnableRelationalTables: gu.Ptr(true),
+		ConsoleUseV2UserApi:           gu.Ptr(true),
+		PermissionCheckV2:             gu.Ptr(false),
+		EnableRelationalTables:        gu.Ptr(true),
+		OidcDynamicClientRegistration: gu.Ptr(true),
 	}
 	want := &command.InstanceFeatures{
 		LoginDefaultOrg:                gu.Ptr(true),
@@ -177,6 +188,7 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		ManagementConsoleUseV2UserApi: gu.Ptr(true),
 		PermissionCheckV2:             gu.Ptr(false),
 		EnableRelationalTables:        gu.Ptr(true),
+		OIDCDynamicClientRegistration: gu.Ptr(true),
 	}
 
 	// Test
@@ -231,6 +243,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Level: feature.LevelInstance,
 			Value: true,
 		},
+		OIDCDynamicClientRegistration: query.FeatureSource[bool]{
+			Level: feature.LevelInstance,
+			Value: true,
+		},
 	}
 	want := &feature_pb.GetInstanceFeaturesResponse{
 		Details: &object.Details{
@@ -280,6 +296,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},
 		EnableRelationalTables: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_INSTANCE,
+		},
+		OidcDynamicClientRegistration: &feature_pb.FeatureFlag{
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},
