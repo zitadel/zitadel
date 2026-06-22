@@ -128,6 +128,8 @@ SystemDefaults:
 OIDC:
   DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
   DefaultLogoutURLV2: "/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
+  DynamicClientRegistration:
+    AllowUnauthenticated: true # exercised by the dynamic client registration integration tests
 
 SAML:
   DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2
