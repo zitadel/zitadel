@@ -473,11 +473,17 @@ async function handleAutoCreation(ctx: IDPHandlerContext): Promise<IDPHandlerRes
         "[IDP Process] Missing required profile fields (givenName or familyName), redirecting to complete registration",
       );
 
+      if (!idpInformation!.userId) {
+        logger.error("IDP intent missing userId, cannot redirect to complete registration");
+        const params = buildRedirectParams();
+        return { redirect: `/idp/${provider}/failure?${params}&error=missing_idp_user_info` };
+      }
+
       const params = buildRedirectParams(
         {
           organization: orgToRegisterOn,
           idpId: idpInformation!.idpId,
-          idpUserId: idpInformation!.userId || "",
+          idpUserId: idpInformation!.userId,
           idpUserName: idpInformation!.userName || "",
           // User data for pre-filling form
           givenName: addHumanUser.profile?.givenName || "",
@@ -563,11 +569,17 @@ async function handleManualCreation(ctx: IDPHandlerContext): Promise<IDPHandlerR
     // Store user data for manual registration form
     // Note: includeToken=true because the session hasn't been created yet
     // The token will be needed when registerUserAndLinkToIDP creates the session
+    if (!idpInformation!.userId) {
+      logger.error("IDP intent missing userId, cannot redirect to complete registration");
+      const params = buildRedirectParams();
+      return { redirect: `/idp/${provider}/failure?${params}&error=missing_idp_user_info` };
+    }
+
     const params = buildRedirectParams(
       {
         organization: orgToRegisterOn,
         idpId: idpInformation!.idpId,
-        idpUserId: idpInformation!.userId || "",
+        idpUserId: idpInformation!.userId,
         idpUserName: idpInformation!.userName || "",
         // User data for pre-filling form
         givenName: addHumanUser.profile?.givenName || "",
