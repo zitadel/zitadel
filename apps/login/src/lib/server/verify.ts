@@ -344,9 +344,10 @@ export async function trySendVerification(command: TrySendVerificationCommand): 
       });
     }
 
+    logger.info("Verification email sent successfully", { userId: command.userId, isInvite: command.isInvite });
     return true;
   } catch (err) {
-    logger.error("Failed to send initial verification email", { error: err });
+    logger.error("Failed to send verification email", { userId: command.userId, isInvite: command.isInvite, error: err });
     return false;
   }
 }
