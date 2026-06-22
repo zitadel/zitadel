@@ -198,7 +198,11 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 // performed by the caller: either through an app.write permission check (see
 // addOIDCApplicationWithID) or, for dynamic client registration, through the feature flag
 // and registration mode (see AddDynamicOIDCClient).
-func (c *Commands) pushOIDCApplication(ctx context.Context, addedApplication *OIDCApplicationWriteModel, oidcApp *domain.OIDCApp, appID string) (_ *domain.OIDCApp, err error) {
+//
+// extraEvents are appended to the same push, so callers can persist additional state about
+// the application atomically with its creation (dynamic client registration uses this to
+// store the registration access token hash).
+func (c *Commands) pushOIDCApplication(ctx context.Context, addedApplication *OIDCApplicationWriteModel, oidcApp *domain.OIDCApp, appID string, extraEvents ...eventstore.Command) (_ *domain.OIDCApp, err error) {
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
 
 	oidcApp.AppID = appID
@@ -248,6 +252,8 @@ func (c *Commands) pushOIDCApplication(ctx context.Context, addedApplication *OI
 		gu.Value(oidcApp.LoginVersion),
 		strings.TrimSpace(gu.Value(oidcApp.LoginBaseURI)),
 	))
+
+	events = append(events, extraEvents...)
 
 	addedApplication.AppID = oidcApp.AppID
 	postCommit, err := c.applicationCreatedMilestone(ctx, &events)
@@ -305,12 +311,40 @@ func (c *Commands) UpdateOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 		return nil, err
 	}
 
-	projectAgg := ProjectAggregateFromWriteModel(&existingOIDC.WriteModel)
+	changedEvent, hasChanged, err := c.oidcApplicationChangeEvent(ctx, existingOIDC, oidc)
+	if err != nil {
+		return nil, err
+	}
+	if !hasChanged {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-1m88i", "Errors.NoChangesFound")
+	}
+
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingOIDC, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+
+	result := oidcWriteModelToOIDCConfig(existingOIDC)
+	result.FillCompliance()
+	return result, nil
+}
+
+// oidcApplicationChangeEvent builds the oidc-config-changed event that brings an existing
+// OIDC application to the desired state. It assumes the existing write model has been loaded
+// and reduced and that authorization has already been performed by the caller (an app.write
+// permission check for UpdateOIDCApplication, the registration access token for
+// UpdateDynamicOIDCClient). It reports whether anything actually changed.
+func (c *Commands) oidcApplicationChangeEvent(ctx context.Context, existingOIDC *OIDCApplicationWriteModel, oidc *domain.OIDCApp) (*project_repo.OIDCConfigChangedEvent, bool, error) {
+	projectAgg := ProjectAggregateFromWriteModelWithCTX(ctx, &existingOIDC.WriteModel)
 	var backChannelLogout, loginBaseURI *string
 	if oidc.BackChannelLogoutURI != nil {
 		bcl, err := c.validateBackchannelLogoutURI(oidc)
 		if err != nil {
-			return nil, err
+			return nil, false, err
 		}
 		backChannelLogout = gu.Ptr(bcl)
 	}
@@ -319,7 +353,7 @@ func (c *Commands) UpdateOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 		loginBaseURI = gu.Ptr(strings.TrimSpace(*oidc.LoginBaseURI))
 	}
 
-	changedEvent, hasChanged, err := existingOIDC.NewChangedEvent(
+	return existingOIDC.NewChangedEvent(
 		ctx,
 		projectAgg,
 		oidc.AppID,
@@ -342,25 +376,6 @@ func (c *Commands) UpdateOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 		oidc.LoginVersion,
 		loginBaseURI,
 	)
-	if err != nil {
-		return nil, err
-	}
-	if !hasChanged {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-1m88i", "Errors.NoChangesFound")
-	}
-
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(existingOIDC, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-
-	result := oidcWriteModelToOIDCConfig(existingOIDC)
-	result.FillCompliance()
-	return result, nil
 }
 
 // Deprecated: use [ChangeApplicationSecret], which supports both OIDC and API applications.
