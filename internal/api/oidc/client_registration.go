@@ -33,7 +33,13 @@ func (s *Server) dynamicClientRegistration(w http.ResponseWriter, r *http.Reques
 
 	resourceOwner, err := s.dynamicClientRegistrationResourceOwner(ctx, r)
 	if err != nil {
-		s.writeRegistrationUnauthorized(ctx, w)
+		// Only missing/invalid credentials are a 401; unexpected errors (e.g. a failed
+		// token lookup) must not be masked as invalid_token.
+		if zerrors.IsUnauthenticated(err) || zerrors.IsPermissionDenied(err) {
+			s.writeRegistrationUnauthorized(ctx, w)
+			return
+		}
+		s.writeRegistrationServerError(ctx, w, err)
 		return
 	}
 
@@ -176,7 +182,8 @@ const (
 )
 
 // registrationError is an OAuth 2.0 Dynamic Client Registration error response
-// (RFC 7591 §3.2.2). It is always returned with HTTP status 400.
+// (RFC 7591 §3.2.2). Invalid client metadata is returned with HTTP status 400; the same
+// shape is reused for the 401 (invalid_token) and 500 (server_error) responses.
 type registrationError struct {
 	ErrorType        string `json:"error"`
 	ErrorDescription string `json:"error_description,omitempty"`
