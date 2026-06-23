@@ -687,6 +687,21 @@ curl --request POST \
 
 See the [Dynamic Client Registration guide](/guides/integrate/dynamic-client-registration) for the supported metadata, the available registration modes and the current limitations.
 
+## Client ID Metadata Document
+
+A [Client ID Metadata Document (CIMD)](/guides/integrate/client-id-metadata-document) lets a client use an HTTPS URL
+that serves its metadata directly as its `client_id`, without registering ahead of time. There is no dedicated endpoint:
+the `client_id` itself is the URL of the document.
+
+<Callout type="warn">
+This is disabled by default. When the `oidc_client_id_metadata_document` instance
+[feature](/guides/integrate/client-id-metadata-document#enable-the-feature) is enabled, the discovery document advertises
+`client_id_metadata_document_supported: true` and a `client_id` that is an HTTPS URL is resolved as a metadata document.
+</Callout>
+
+See the [Client ID Metadata Document guide](/guides/integrate/client-id-metadata-document) for the document format, the
+origin match requirement and the security model.
+
 ## OAuth 2.0 metadata
 
 **ZITADEL** does not yet provide a OAuth 2.0 Metadata endpoint but instead provides a [OpenID Connect Discovery Endpoint](https://openid.net/specs/openid-connect-discovery-1_0.html).
