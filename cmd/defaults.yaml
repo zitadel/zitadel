@@ -461,6 +461,18 @@ Caches:
       AddSource: true
       Formatter:
         Format: text
+  # Client ID Metadata Documents are fetched, validated and cached when a client_id is an
+  # HTTPS URL and the oidc_client_id_metadata_document feature is enabled. MaxAge caps the
+  # document lifetime regardless of the Cache-Control or Expires header it is served with.
+  ClientIDMetadataDocuments:
+    Connector: "postgres"
+    MaxAge: 15m
+    LastUseAge: 10m
+    Log:
+      Level: error
+      AddSource: true
+      Formatter:
+        Format: text
 
 Machine:
   # Cloud-hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.

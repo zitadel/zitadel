@@ -103,6 +103,7 @@ type OPStorage struct {
 	assetAPIPrefix                    func(ctx context.Context) string
 	contextToIssuer                   func(context.Context) string
 	federateLogoutCache               cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout]
+	clientIDMetadataResolver          *clientIDMetadataResolver
 }
 
 // Provider is used to overload certain [op.Provider] methods
@@ -143,13 +144,15 @@ func NewServer(
 	fallbackLogger *slog.Logger,
 	hashConfig crypto.HashConfig,
 	federatedLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
+	clientIDMetadataDocumentCache cache.Cache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry],
 	httpClient *http.Client,
 ) (*Server, error) {
 	opConfig, err := createOPConfig(config, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
-	storage := newStorage(config, command, query, repo, authAlg, es, ContextToIssuer, federatedLogoutCache)
+	clientIDMetadataResolver := newClientIDMetadataResolver(httpClient, clientIDMetadataDocumentCache, config.DefaultAccessTokenLifetime, config.DefaultIdTokenLifetime)
+	storage := newStorage(config, command, query, repo, authAlg, es, ContextToIssuer, federatedLogoutCache, clientIDMetadataResolver)
 	keyCache := newPublicKeyCache(ctx, config.PublicKeyCacheMaxAge, queryKeyFunc(query))
 	accessTokenKeySet := newOidcKeySet(keyCache, withKeyExpiryCheck(true))
 	idTokenHintKeySet := newOidcKeySet(keyCache)
@@ -209,6 +212,7 @@ func NewServer(
 		httpClient:                      httpClient,
 		registrationEndpoint:            registrationEndpoint(config.CustomEndpoints),
 		dynamicClientRegistrationConfig: config.DynamicClientRegistration,
+		clientIDMetadataResolver:        clientIDMetadataResolver,
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 
@@ -312,6 +316,7 @@ func newStorage(
 	es *eventstore.Eventstore,
 	contextToIssuer func(context.Context) string,
 	federateLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
+	clientIDMetadataResolver *clientIDMetadataResolver,
 ) *OPStorage {
 	return &OPStorage{
 		repo:                              repo,
@@ -329,6 +334,7 @@ func newStorage(
 		assetAPIPrefix:                    assets.AssetAPI(),
 		contextToIssuer:                   contextToIssuer,
 		federateLogoutCache:               federateLogoutCache,
+		clientIDMetadataResolver:          clientIDMetadataResolver,
 	}
 }
 

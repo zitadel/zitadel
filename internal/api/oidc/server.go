@@ -48,6 +48,7 @@ type Server struct {
 
 	registrationEndpoint            *op.Endpoint
 	dynamicClientRegistrationConfig DynamicClientRegistrationConfig
+	clientIDMetadataResolver        *clientIDMetadataResolver
 }
 
 // defaultRegistrationEndpoint is the path of the OAuth 2.0 Dynamic Client Registration

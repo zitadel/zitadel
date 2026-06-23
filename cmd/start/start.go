@@ -642,6 +642,11 @@ func startAPIs(
 		return nil, err
 	}
 
+	clientIDMetadataDocumentsCache, err := oidc.StartClientIDMetadataDocumentCache(ctx, cacheConnectors.Config.ClientIDMetadataDocuments, cacheConnectors)
+	if err != nil {
+		return nil, err
+	}
+
 	apis.RegisterHandlerOnPrefix(idp.HandlerPrefix, idp.NewHandler(commands, queries, keys.IDPConfig, instanceInterceptor.Handler, federatedLogoutsCache))
 
 	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator(), config.ExternalSecure, login.EndpointResources, login.EndpointExternalLoginCallbackFormPost, login.EndpointSAMLACS)
@@ -681,6 +686,7 @@ func startAPIs(
 		config.Log.Slog(),
 		config.SystemDefaults.SecretHasher,
 		federatedLogoutsCache,
+		clientIDMetadataDocumentsCache,
 		httpClient,
 	)
 	if err != nil {
