@@ -78,7 +78,6 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 
 func (m *InstanceFeaturesReadModel) reduceReset() {
 	m.instance.EnableRelationalTables = FeatureSource[bool]{}
-	m.instance.OIDCDynamicClientRegistration = FeatureSource[bool]{}
 	if m.populateFromSystem() {
 		return
 	}
@@ -95,6 +94,7 @@ func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
 	m.instance.ImprovedPerformance = m.system.ImprovedPerformance
 	m.instance.OIDCSingleV1SessionTermination = m.system.OIDCSingleV1SessionTermination
 	m.instance.LoginV2 = m.system.LoginV2
+	m.instance.OIDCDynamicClientRegistration = m.system.OIDCDynamicClientRegistration
 	return true
 }
 
