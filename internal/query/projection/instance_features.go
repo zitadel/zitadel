@@ -104,6 +104,10 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 				Event:  feature_v2.InstanceOIDCDynamicClientRegistration,
 				Reduce: reduceInstanceSetFeature[bool],
 			},
+			{
+				Event:  feature_v2.InstanceOIDCClientIDMetadataDocument,
+				Reduce: reduceInstanceSetFeature[bool],
+			},
 		},
 	}}
 }

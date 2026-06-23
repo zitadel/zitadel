@@ -26,6 +26,7 @@ const (
 	KeyConsoleUseV2UserApi            Key = 15
 	KeyEnableRelationalTables         Key = 16
 	KeyOIDCDynamicClientRegistration  Key = 17
+	KeyOIDCClientIDMetadataDocument   Key = 18
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level
@@ -53,6 +54,7 @@ type Features struct {
 	ConsoleUseV2UserApi            bool                      `json:"console_use_v2_user_api,omitempty"`
 	EnableRelationalTables         bool                      `json:"enable_relational_tables,omitempty"`
 	OIDCDynamicClientRegistration  bool                      `json:"oidc_dynamic_client_registration,omitempty"`
+	OIDCClientIDMetadataDocument   bool                      `json:"oidc_client_id_metadata_document,omitempty"`
 }
 
 /* Note: do not generate the stringer or enumer for this type, is it breaks existing events */

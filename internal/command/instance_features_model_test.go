@@ -119,6 +119,15 @@ func Test_reduceInstanceFeature(t *testing.T) {
 			},
 			expected: &InstanceFeatures{OIDCDynamicClientRegistration: gu.Ptr(true)},
 		},
+		{
+			name: "oidc client id metadata document",
+			args: args{
+				features: &InstanceFeatures{},
+				key:      feature.KeyOIDCClientIDMetadataDocument,
+				value:    true,
+			},
+			expected: &InstanceFeatures{OIDCClientIDMetadataDocument: gu.Ptr(true)},
+		},
 	}
 
 	for _, tc := range tt {

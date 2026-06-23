@@ -26,6 +26,7 @@ func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) (*command
 		PermissionCheckV2:              req.PermissionCheckV2,
 		EnableRelationalTables:         req.EnableRelationalTables,
 		OIDCDynamicClientRegistration:  req.OidcDynamicClientRegistration,
+		OIDCClientIDMetadataDocument:   req.OidcClientIdMetadataDocument,
 	}, nil
 }
 
@@ -48,6 +49,7 @@ func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesRe
 		PermissionCheckV2:             featureSourceToFlagPb(&f.PermissionCheckV2),
 		EnableRelationalTables:        featureSourceToFlagPb(&f.EnableRelationalTables),
 		OidcDynamicClientRegistration: featureSourceToFlagPb(&f.OIDCDynamicClientRegistration),
+		OidcClientIdMetadataDocument:  featureSourceToFlagPb(&f.OIDCClientIDMetadataDocument),
 	}
 }
 
@@ -67,6 +69,7 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) (*com
 		ManagementConsoleUseV2UserApi:  req.ConsoleUseV2UserApi,
 		EnableRelationalTables:         req.EnableRelationalTables,
 		OIDCDynamicClientRegistration:  req.OidcDynamicClientRegistration,
+		OIDCClientIDMetadataDocument:   req.OidcClientIdMetadataDocument,
 	}, nil
 }
 
@@ -91,6 +94,7 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		ConsoleUseV2UserApi:           featureSourceToFlagPb(&f.ManagementConsoleUseV2UserApi),
 		EnableRelationalTables:        featureSourceToFlagPb(&f.EnableRelationalTables),
 		OidcDynamicClientRegistration: featureSourceToFlagPb(&f.OIDCDynamicClientRegistration),
+		OidcClientIdMetadataDocument:  featureSourceToFlagPb(&f.OIDCClientIDMetadataDocument),
 	}
 }
 

@@ -76,6 +76,7 @@ func (m *InstanceFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceManagementConsoleUseV2UserApi,
 			feature_v2.InstanceEnableRelationalTables,
 			feature_v2.InstanceOIDCDynamicClientRegistration,
+			feature_v2.InstanceOIDCClientIDMetadataDocument,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -117,6 +118,9 @@ func reduceInstanceFeature(features *InstanceFeatures, key feature.Key, value an
 	case feature.KeyOIDCDynamicClientRegistration:
 		v := value.(bool)
 		features.OIDCDynamicClientRegistration = &v
+	case feature.KeyOIDCClientIDMetadataDocument:
+		v := value.(bool)
+		features.OIDCClientIDMetadataDocument = &v
 	}
 }
 
@@ -133,5 +137,6 @@ func (wm *InstanceFeaturesWriteModel) setCommands(ctx context.Context, f *Instan
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.ManagementConsoleUseV2UserApi, f.ManagementConsoleUseV2UserApi, feature_v2.InstanceManagementConsoleUseV2UserApi)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.EnableRelationalTables, f.EnableRelationalTables, feature_v2.InstanceEnableRelationalTables)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.OIDCDynamicClientRegistration, f.OIDCDynamicClientRegistration, feature_v2.InstanceOIDCDynamicClientRegistration)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.OIDCClientIDMetadataDocument, f.OIDCClientIDMetadataDocument, feature_v2.InstanceOIDCClientIDMetadataDocument)
 	return cmds
 }

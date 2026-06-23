@@ -18,6 +18,7 @@ type SystemFeatures struct {
 	PermissionCheckV2              *bool
 	EnableRelationalTables         *bool
 	OIDCDynamicClientRegistration  *bool
+	OIDCClientIDMetadataDocument   *bool
 }
 
 func (m *SystemFeatures) isEmpty() bool {
@@ -29,7 +30,8 @@ func (m *SystemFeatures) isEmpty() bool {
 		m.LoginV2 == nil &&
 		m.PermissionCheckV2 == nil &&
 		m.EnableRelationalTables == nil &&
-		m.OIDCDynamicClientRegistration == nil)
+		m.OIDCDynamicClientRegistration == nil &&
+		m.OIDCClientIDMetadataDocument == nil)
 }
 
 func (c *Commands) SetSystemFeatures(ctx context.Context, f *SystemFeatures) (*domain.ObjectDetails, error) {

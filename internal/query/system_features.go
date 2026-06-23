@@ -28,6 +28,7 @@ type SystemFeatures struct {
 	PermissionCheckV2              FeatureSource[bool]
 	EnableRelationalTables         FeatureSource[bool]
 	OIDCDynamicClientRegistration  FeatureSource[bool]
+	OIDCClientIDMetadataDocument   FeatureSource[bool]
 }
 
 func (q *Queries) GetSystemFeatures(ctx context.Context) (_ *SystemFeatures, err error) {

@@ -101,6 +101,13 @@ message SetInstanceFeaturesRequest{
       description: "If this is enabled, the OAuth 2.0 Dynamic Client Registration endpoint (RFC 7591) is served under /oauth/v2/register and advertised as registration_endpoint in the discovery document. The endpoint stays disabled by default.";
     }
   ];
+
+  optional bool oidc_client_id_metadata_document = 18 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled, a client_id that is an HTTPS URL is resolved as a Client ID Metadata Document (CIMD): the document is fetched, validated and the client is treated as an ephemeral public client without a database entry. The feature is advertised as client_id_metadata_document_supported in the discovery document and stays disabled by default.";
+    }
+  ];
 }
 
 message SetInstanceFeaturesResponse {
@@ -208,6 +215,13 @@ message GetInstanceFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "If this is enabled, the OAuth 2.0 Dynamic Client Registration endpoint (RFC 7591) is served under /oauth/v2/register and advertised as registration_endpoint in the discovery document. The endpoint stays disabled by default.";
+    }
+  ];
+
+  FeatureFlag oidc_client_id_metadata_document = 19 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled, a client_id that is an HTTPS URL is resolved as a Client ID Metadata Document (CIMD): the document is fetched, validated and the client is treated as an ephemeral public client without a database entry. The feature is advertised as client_id_metadata_document_supported in the discovery document and stays disabled by default.";
     }
   ];
 }

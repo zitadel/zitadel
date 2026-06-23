@@ -19,6 +19,7 @@ type InstanceFeatures struct {
 	ManagementConsoleUseV2UserApi  FeatureSource[bool]
 	EnableRelationalTables         FeatureSource[bool]
 	OIDCDynamicClientRegistration  FeatureSource[bool]
+	OIDCClientIDMetadataDocument   FeatureSource[bool]
 }
 
 func (q *Queries) GetInstanceFeatures(ctx context.Context, cascade bool) (_ *InstanceFeatures, err error) {

@@ -15,6 +15,7 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, SystemPermissionCheckV2, eventstore.GenericEventMapper[SetEvent[bool]])
 	eventstore.RegisterFilterEventMapper(AggregateType, SystemEnableRelationalTables, eventstore.GenericEventMapper[SetEvent[bool]])
 	eventstore.RegisterFilterEventMapper(AggregateType, SystemOIDCDynamicClientRegistration, eventstore.GenericEventMapper[SetEvent[bool]])
+	eventstore.RegisterFilterEventMapper(AggregateType, SystemOIDCClientIDMetadataDocument, eventstore.GenericEventMapper[SetEvent[bool]])
 
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceResetEventType, eventstore.GenericEventMapper[ResetEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceLoginDefaultOrgEventType, eventstore.GenericEventMapper[SetEvent[bool]])
@@ -27,4 +28,5 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceManagementConsoleUseV2UserApi, eventstore.GenericEventMapper[SetEvent[bool]])
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceEnableRelationalTables, eventstore.GenericEventMapper[SetEvent[bool]])
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceOIDCDynamicClientRegistration, eventstore.GenericEventMapper[SetEvent[bool]])
+	eventstore.RegisterFilterEventMapper(AggregateType, InstanceOIDCClientIDMetadataDocument, eventstore.GenericEventMapper[SetEvent[bool]])
 }
