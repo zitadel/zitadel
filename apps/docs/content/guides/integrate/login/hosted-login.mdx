@@ -156,7 +156,7 @@ For the first implementation we have excluded the following features:
 
 - **Create Users:** The new TypeScript Login app is built with the session and the user V2 API, the users V2 API does have some differences to the v1 API, so make sure you create users through the new API.
 - **External IDPs:** If you want to use external identity provider login, such as Login with Google or Apple. You can follow our existing setup guides, just make sure to use the following redirect url: `${CUSTOM_DOMAIN}/idps/callback`
-- **Passkey/U2F:** Those authentication methods are bound to a domain. As your new login runs on a different domain than the previous login, existing passkey authentication (fingerprint, face id, etc.) can’t be used. Also when they are managed through the management console of ZITADEL, they are added on a different domain.
+- **Passkey/U2F:** Those authentication methods are bound to a domain. As your new login runs on a different domain than the previous login, existing passkey authentication (fingerprint, face id, etc.) can't be used. Also when they are managed through the management console of ZITADEL, they are added on a different domain.
   <br />
   *Note: If you run the login on a subdomain of your current instance, this problem
   can be avoided. E.g myinstance.zitadel.cloud and login.myinstance.zitadel.cloud*
@@ -192,7 +192,7 @@ You can also activate the v2 login for your apps, so users are redirected to `/u
         1. [Create a service account](/guides/integrate/service-accounts/personal-access-token#create-a-service-account-with-a-pat) with a PAT in your instance
         2. Give the user IAM_LOGIN_CLIENT Permissions in the default settings (CUSTOM_DOMAIN/ui/console/instance?id=organizations)
         Note: [Zitadel Administrator Guide](/guides/manage/console/administrators)
-        3. Deploy login to Vercel: You can do so by directly clicking the [“Deploy” button](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#login-deploy) in our [repository](https://github.com/zitadel/zitadel)
+        3. Deploy login to Vercel: You can do so by directly clicking the ["Deploy" button](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#login-deploy) in our [repository](https://github.com/zitadel/zitadel)
         4. If you have used the deploy button in the steps before, you will automatically be asked for this step. Enter the environment variables in Vercel
            - PAT
            - ZITADEL_API_URL (Example: https://my-domain.zitadel.cloud, no trailing slash)
@@ -208,3 +208,18 @@ You can also activate the v2 login for your apps, so users are redirected to `/u
 
     </Tab>
 </Tabs>
+
+### Understanding the "Use new login UI" checkbox
+
+The **"Use new login UI"** checkbox and **"Custom base URL for the new Login UI"** field work together to control which login version your application uses:
+
+#### When the checkbox matters
+
+The checkbox is only relevant when the instance-level Login V2 feature flag is **disabled**. In this scenario:
+
+- **Checkbox unchecked**: Your application uses Login V1 (`/ui/login`)
+- **Checkbox checked**: Your application uses Login V2 (`/ui/v2/login`)
+
+This allows you to opt specific applications into Login V2 while keeping other applications on V1.
+
+#### When the checkbox has
