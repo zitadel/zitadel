@@ -5,7 +5,7 @@ sidebar_label: Dynamic Client Registration
 ---
 
 ZITADEL implements [OAuth 2.0 Dynamic Client Registration (RFC 7591)](https://datatracker.ietf.org/doc/html/rfc7591).
-It exposes a [`registration_endpoint`](/apis/openidoauth/endpoints#registration_endpoint) that lets clients register
+It exposes a [`registration_endpoint`](/apis/openidoauth/endpoints#registration-endpoint) that lets clients register
 themselves as OIDC applications at runtime, instead of being created upfront in the Management Console or through the management API.
 
 This is required by clients that self-register before any user context exists, most notably
@@ -19,7 +19,7 @@ understand the trade-offs described in [Registration modes](#registration-modes)
 ## Enable the feature
 
 The endpoint is only served and advertised as `registration_endpoint` in the
-[discovery document](/apis/openidoauth/endpoints#openid-connect-1-0-discovery) when the
+[discovery document](/apis/openidoauth/endpoints#openid-connect-10-discovery) when the
 `oidc_dynamic_client_registration` instance feature is enabled.
 
 Enable it through the [feature API](/apis/resources/feature_service_v2/feature-service-set-instance-features):
