@@ -134,7 +134,34 @@ func (s *Server) Discovery(ctx context.Context, r *op.Request[struct{}]) (_ *op.
 	if len(allowedLanguages) == 0 {
 		allowedLanguages = i18n.SupportedLanguages()
 	}
-	return op.NewResponse(s.createDiscoveryConfig(ctx, allowedLanguages)), nil
+	return op.NewResponse(s.discoveryConfig(ctx, allowedLanguages)), nil
+}
+
+// discoveryConfig returns the discovery document, advertising client_id_metadata_document_
+// supported when the CIMD feature is enabled for the instance.
+//
+// This is the single swap point for the CIMD discovery metadata: the field is added through a
+// local wrapper because github.com/zitadel/oidc does not carry it yet (see zitadel/oidc#904
+// and zitadel/oidc#905). Once that field is released and the go.mod is bumped, the wrapper can
+// be dropped and the field set directly in createDiscoveryConfig. The wrapper stays correct in
+// the meantime: an embedded struct field loses to an outer field of the same JSON name, so the
+// later cleanup is purely cosmetic.
+func (s *Server) discoveryConfig(ctx context.Context, supportedUILocales oidc.Locales) any {
+	config := s.createDiscoveryConfig(ctx, supportedUILocales)
+	if !authz.GetFeatures(ctx).OIDCClientIDMetadataDocument {
+		return config
+	}
+	return &discoveryConfiguration{
+		DiscoveryConfiguration:            config,
+		ClientIDMetadataDocumentSupported: true,
+	}
+}
+
+// discoveryConfiguration extends the library discovery document with the
+// client_id_metadata_document_supported metadata. See discoveryConfig for the removal plan.
+type discoveryConfiguration struct {
+	*oidc.DiscoveryConfiguration
+	ClientIDMetadataDocumentSupported bool `json:"client_id_metadata_document_supported,omitempty"`
 }
 
 func (s *Server) VerifyAuthRequest(ctx context.Context, r *op.Request[oidc.AuthRequest]) (_ *op.ClientRequest[oidc.AuthRequest], err error) {
