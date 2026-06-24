@@ -2,7 +2,6 @@ package resources
 
 import (
 	"context"
-	"slices"
 	"strconv"
 
 	"github.com/muhlemmer/gu"
@@ -232,24 +231,24 @@ func (h *GroupsHandler) replaceMembers(ctx context.Context, groupID string, memb
 	if err != nil {
 		return err
 	}
-	existingIDs := make([]string, len(existingMembers))
-	for i, member := range existingMembers {
-		existingIDs[i] = member.UserID
+	existingSet := make(map[string]struct{}, len(existingMembers))
+	for _, member := range existingMembers {
+		existingSet[member.UserID] = struct{}{}
 	}
-	requestedIDs := make([]string, len(members))
-	for i, member := range members {
-		requestedIDs[i] = member.Value
+	requestedSet := make(map[string]struct{}, len(members))
+	for _, member := range members {
+		requestedSet[member.Value] = struct{}{}
 	}
 
-	toAdd := make([]string, 0, len(requestedIDs))
-	for _, id := range requestedIDs {
-		if !slices.Contains(existingIDs, id) {
+	toAdd := make([]string, 0, len(requestedSet))
+	for id := range requestedSet {
+		if _, ok := existingSet[id]; !ok {
 			toAdd = append(toAdd, id)
 		}
 	}
-	toRemove := make([]string, 0, len(existingIDs))
-	for _, id := range existingIDs {
-		if !slices.Contains(requestedIDs, id) {
+	toRemove := make([]string, 0, len(existingSet))
+	for id := range existingSet {
+		if _, ok := requestedSet[id]; !ok {
 			toRemove = append(toRemove, id)
 		}
 	}
