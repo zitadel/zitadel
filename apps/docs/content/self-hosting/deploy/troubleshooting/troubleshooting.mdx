@@ -30,6 +30,25 @@ If the container exits with code 1 and the logs show a database migration error,
 - Log messages like `role "zitadel" already exists` or `database "zitadel" already exists` during `start-from-init` re-runs are **expected and harmless** — the init phase skips those steps.
 - If the container still fails after a version upgrade, check whether the version you are upgrading to lists any known migration issues in the [release notes](https://github.com/zitadel/zitadel/releases).
 
+<Callout type="caution">
+**Known blocker for instances with legacy passkey or U2F credentials (v2 → v3/v4 upgrades)**
+
+If your instance has historical `user.human.passwordless.token.added` or `user.human.mfa.u2f.token.added` events written by an older ZITADEL version, the `relational_tables` projection will fail during `zitadel setup` with a constraint error on `relying_party_id`. These events were written with an empty Relying Party ID (RPID), which violates a NOT NULL / non-empty constraint added in v3+. Because the eventstore is append-only, the events cannot be removed.
+
+You can check whether your instance is affected before upgrading:
+
+```sql
+SELECT COUNT(*) FROM eventstore.events2
+WHERE event_type IN (
+  'user.human.passwordless.token.added',
+  'user.human.mfa.u2f.token.added'
+)
+AND COALESCE(payload->>'rpID', '') = '';
+```
+
+If this returns **0**, your instance is not affected. If it returns a non-zero count, **do not upgrade** until [issue #12105](https://github.com/zitadel/zitadel/issues/12105) is resolved and included in a release.
+</Callout>
+
 ## Instance settings (FIRSTINSTANCE / DEFAULTINSTANCE) not taking effect after restart
 
 Environment variables prefixed with `ZITADEL_FIRSTINSTANCE_` and `ZITADEL_DEFAULTINSTANCE_` are only applied during the **initial creation** of a ZITADEL instance.
