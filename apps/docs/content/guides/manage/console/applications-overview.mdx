@@ -126,7 +126,7 @@ Development mode allows the use of glob patterns in Redirect URIs for flexibilit
 | `[class]`     | Matches any single character against a class of characters (e.g., `[a-z]`). |
 | `{alt1,...}`  | Matches a sequence if one of the comma-separated alternatives matches.      |
 
-<Callout type="note">
+<Callout type="info">
 Double stars (`**`) should appear surrounded by path separators (e.g., `/**/`). A pattern like `path/to/**.txt` is invalid; use `path/to/**/*.txt`.
 </Callout>
 
@@ -145,7 +145,7 @@ After creating an application, you can modify its settings.
 * **Auth Method:** You can switch authentication methods (e.g., from Basic to Private Key JWT) via the toggle or dropdowns.
 * **OIDC Compliance:** The Management Console checks if your settings are OIDC compliant and shows tasks for completion if anything is missing.
 
-<Callout type="caution">
+<Callout type="warn">
 You **cannot** change the Application Type (e.g., from Web to Native) after creation. You must delete and recreate the application.
 </Callout>
 
@@ -163,7 +163,7 @@ The **Use new login UI** checkbox and **Custom base URL for the new Login UI** f
 
 * **Custom Base URL:** This field is used when you're running a self-hosted Login UI at a different domain (e.g., `https://login.acme.com`). If you leave this field empty, ZITADEL redirects to its built-in `/ui/v2/login` endpoint.
 
-<Callout type="note">
+<Callout type="info">
 If the instance-level Login V2 feature flag is already enabled, all applications use Login V2 by default, and the checkbox has no effect. The feature flag takes precedence over per-application settings.
 </Callout>
 
