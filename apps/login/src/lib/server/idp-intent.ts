@@ -359,7 +359,8 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
   if (options?.autoLinking) {
     let foundUser;
     const email = addHumanUser?.email?.email;
-    const emailVerified = addHumanUser?.email?.verification?.case === "isVerified" && addHumanUser?.email?.verification?.value;
+    const emailVerified =
+      addHumanUser?.email?.verification?.case === "isVerified" && addHumanUser?.email?.verification?.value;
 
     if (options.autoLinking === AutoLinkingOption.EMAIL && email && emailVerified) {
       foundUser = await listUsers({ serviceConfig, email, organizationId: organization }).then((response) => {
