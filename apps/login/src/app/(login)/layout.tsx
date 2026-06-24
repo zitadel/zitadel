@@ -33,7 +33,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   let languages = LANGS;
   try {
     const settings = await getAllowedLanguages({ serviceConfig });
-    if (settings.allowedLanguages?.length) {
+    if (settings?.allowedLanguages?.length) {
       languages = settings.allowedLanguages
         .filter((code) => LANGS.find((l) => l.code === code))
         .map((code) => getLanguage(code));

@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { FlowInitiationParams, handleOIDCFlowInitiation } from "./flow-initiation";
+import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 
 vi.mock("@/lib/cookies", () => ({
   getLanguageCookie: vi.fn(),
@@ -177,5 +178,54 @@ describe("handleOIDCFlowInitiation — locale / cookie handling", () => {
 
       expect(mockSetLanguageCookie).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe("handleOIDCFlowInitiation — IDP scoped routing", () => {
+  let mockGetAuthRequest: ReturnType<typeof vi.fn>;
+  let mockGetActiveIdentityProviders: ReturnType<typeof vi.fn>;
+  let mockConstructUrl: ReturnType<typeof vi.fn>;
+  let mockStartIdentityProviderFlow: ReturnType<typeof vi.fn>;
+  let mockIdpTypeToSlug: ReturnType<typeof vi.fn>;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+
+    const zitadel = await import("@/lib/zitadel");
+    const serviceUrl = await import("@/lib/service-url");
+    const idp = await import("@/lib/idp");
+
+    mockGetAuthRequest = vi.mocked(zitadel.getAuthRequest);
+    mockGetActiveIdentityProviders = vi.mocked(zitadel.getActiveIdentityProviders);
+    mockConstructUrl = vi.mocked(serviceUrl.constructUrl);
+    mockStartIdentityProviderFlow = vi.mocked(zitadel.startIdentityProviderFlow);
+    mockIdpTypeToSlug = vi.mocked(idp.idpTypeToSlug);
+
+    mockConstructUrl.mockImplementation((_req: any, path: string) => {
+      return new URL(`https://example.com${path}`);
+    });
+  });
+
+  test("should redirect to the LDAP page for the selected LDAP IDP even when it is not the first active provider", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: ["urn:zitadel:iam:org:idp:id:ldap-idp"],
+        prompt: [],
+      },
+    });
+    mockGetActiveIdentityProviders.mockResolvedValue({
+      identityProviders: [
+        { id: "oidc-idp", type: IdentityProviderType.OIDC },
+        { id: "ldap-idp", type: IdentityProviderType.LDAP },
+      ],
+    });
+
+    const response = await handleOIDCFlowInitiation(makeBaseParams());
+
+    expect(response.headers.get("location")).toBe("https://example.com/ldap?requestId=oidc_abc123");
+    expect(mockStartIdentityProviderFlow).not.toHaveBeenCalled();
+    expect(mockIdpTypeToSlug).not.toHaveBeenCalled();
   });
 });

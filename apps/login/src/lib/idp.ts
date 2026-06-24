@@ -57,6 +57,9 @@ export function idpTypeToIdentityProviderType(idpType: IDPType): IdentityProvide
     case IDPType.IDP_TYPE_AZURE_AD:
       return IdentityProviderType.AZURE_AD;
 
+    case IDPType.IDP_TYPE_LDAP:
+      return IdentityProviderType.LDAP;
+
     case IDPType.IDP_TYPE_SAML:
       return IdentityProviderType.SAML;
 
