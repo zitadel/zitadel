@@ -155,6 +155,37 @@ You **cannot** change the Application Type (e.g., from Web to Native) after crea
   width="800px"
 />
 
+### Use New Login UI
+
+The **Use new login UI** checkbox and **Custom base URL for the new Login UI** field control which login interface your application uses:
+
+* **Checkbox Behavior:** This checkbox only has an effect when the instance-level Login V2 feature flag is **disabled**. When the instance-wide feature is off, checking this box enables Login V2 specifically for this application while other applications continue using Login V1.
+
+* **Custom Base URL:** This field is used when you're running a self-hosted Login UI at a different domain (e.g., `https://login.acme.com`). If you leave this field empty, ZITADEL redirects to its built-in `/ui/v2/login` endpoint.
+
+<Callout type="note">
+If the instance-level Login V2 feature flag is already enabled, all applications use Login V2 by default, and the checkbox has no effect. The feature flag takes precedence over per-application settings.
+</Callout>
+
+**Configuration Steps:**
+
+1. **Per-Application Login V2 (when instance flag is off):**
+   - Check the **Use new login UI** checkbox in your application settings
+   - Optionally enter a custom base URL if using a self-hosted Login UI
+   - This enables Login V2 only for this specific application
+
+2. **Self-Hosted Login UI:**
+   - Deploy your Login UI to a custom domain
+   - Enter the full base URL (e.g., `https://login.acme.com`) in the **Custom base URL** field
+   - Ensure your Login UI is properly configured with the required environment variables and service account permissions
+
+3. **Instance-Wide Login V2:**
+   - Enable the Login V2 feature flag at the instance level (in Default Settings → Features)
+   - When enabled, all applications use Login V2 regardless of individual application settings
+   - The custom base URL field still applies if you want to use a self-hosted Login UI
+
+For detailed setup instructions for self-hosted Login UI, see [Connect your Self-Hosted Login UI to ZITADEL](https://zitadel.com/docs/self-hosting/manage/login-client) and [Hosted Login UI: Authenticate Your Users](https://zitadel.com/docs/guides/integrate/login/hosted-login).
+
 ### Token Settings
 
 In the **Token Settings** section, you can customize the tokens issued for this application:
