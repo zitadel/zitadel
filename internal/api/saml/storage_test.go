@@ -82,15 +82,17 @@ func TestAppendGroupNamesAttribute(t *testing.T) {
 		assert.Equal(t, []string{"ops"}, groups.attributeValue)
 	})
 
-	t.Run("all-empty names yield empty attribute value", func(t *testing.T) {
+	t.Run("all-empty names keep groups key absent", func(t *testing.T) {
+		// Memberships of since-deleted groups left-join as GroupName="". When
+		// every entry is empty, no values would be emitted; sending a bare
+		// <saml:Attribute Name="groups"/> with zero values is worse than not
+		// sending the attribute at all, so the key must be absent.
 		memberships := []*query.GroupUser{
 			{GroupID: "g1", GroupName: ""},
 			{GroupID: "g2", GroupName: ""},
 		}
 		got := appendGroupNamesAttribute(nil, memberships)
 
-		groups, ok := got["groups"]
-		assert.True(t, ok, "memberships > 0 always emits the groups attribute key")
-		assert.Empty(t, groups.attributeValue)
+		assert.NotContains(t, got, "groups", "all-empty names must not emit the groups attribute")
 	})
 }

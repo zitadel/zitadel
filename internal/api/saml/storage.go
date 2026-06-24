@@ -529,6 +529,9 @@ func appendGroupNamesAttribute(customAttributes map[string]*customAttribute, mem
 			groupNames = append(groupNames, membership.GroupName)
 		}
 	}
+	if len(groupNames) == 0 {
+		return customAttributes
+	}
 	return appendCustomAttribute(customAttributes, "groups", "urn:oasis:names:tc:SAML:2.0:attrname-format:basic", groupNames)
 }
 
