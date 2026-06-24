@@ -567,7 +567,11 @@ func prepareGroupManagerMember(ctx context.Context, query *MembershipSearchQuery
 			continue
 		}
 		switch q.Col().name {
-		case projection.MemberUserIDCol, projection.MemberResourceOwner, projection.MemberCreationDate:
+		case projection.MemberUserIDCol,
+			projection.MemberResourceOwner,
+			projection.MemberCreationDate,
+			projection.MemberChangeDate,
+			projection.MemberInstanceID:
 			builder = q.toQuery(builder)
 		}
 	}
