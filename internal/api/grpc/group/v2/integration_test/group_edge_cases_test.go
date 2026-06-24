@@ -151,6 +151,69 @@ func TestServer_DeleteUser_removesMemberships(t *testing.T) {
 	}, retryDuration, tick, "timeout waiting for membership cleanup")
 }
 
+// TestServer_DeleteGroup_concurrentGrant proves that adding a grant while
+// the same group is being deleted converges: the group disappears and no
+// grant rows survive against a removed group_id.
+func TestServer_DeleteGroup_concurrentGrant(t *testing.T) {
+	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+	orgID := orgResp.GetOrganizationId()
+	group := instance.CreateGroup(iamOwnerCtx, t, orgID, integration.GroupName())
+	projectID := createProjectWithRole(iamOwnerCtx, t, orgID, "role1")
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+	var grantErr, deleteErr error
+	go func() {
+		defer wg.Done()
+		_, grantErr = instance.Client.GroupV2.CreateGroupGrant(iamOwnerCtx, &group_v2.CreateGroupGrantRequest{
+			GroupId:   group.GetId(),
+			ProjectId: projectID,
+			RoleKeys:  []string{"role1"},
+		})
+	}()
+	go func() {
+		defer wg.Done()
+		_, deleteErr = instance.Client.GroupV2.DeleteGroup(iamOwnerCtx, &group_v2.DeleteGroupRequest{
+			Id: group.GetId(),
+		})
+	}()
+	wg.Wait()
+
+	// either order is legal; the deletion must always succeed; the grant
+	// either lands cleanly or fails because the group is already gone
+	require.NoError(t, deleteErr, "delete group")
+	if grantErr != nil {
+		require.Equal(t, codes.FailedPrecondition, status.Code(grantErr), "unexpected grant error: %v", grantErr)
+	}
+
+	// the projection must converge: the group is removed and no orphan
+	// grants remain that reference it
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 3*time.Minute)
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		resp, err := instance.Client.GroupV2.ListGroups(iamOwnerCtx, &group_v2.ListGroupsRequest{
+			Filters: []*group_v2.GroupsSearchFilter{{
+				Filter: &group_v2.GroupsSearchFilter_GroupIds{
+					GroupIds: &filter.InIDsFilter{Ids: []string{group.GetId()}},
+				},
+			}},
+		})
+		require.NoError(ttt, err)
+		assert.Empty(ttt, resp.GetGroups(), "the deleted group must disappear")
+
+		grantResp, err := instance.Client.GroupV2.ListGroupGrants(iamOwnerCtx, &group_v2.ListGroupGrantsRequest{
+			Filters: []*group_v2.GroupGrantsSearchFilter{{
+				Filter: &group_v2.GroupGrantsSearchFilter_GroupIds{
+					GroupIds: &filter.InIDsFilter{Ids: []string{group.GetId()}},
+				},
+			}},
+		})
+		require.NoError(ttt, err)
+		assert.Empty(ttt, grantResp.GetGroupGrants(), "grants must not survive a removed group")
+	}, retryDuration, tick, "timeout waiting for convergence")
+}
+
 // TestServer_DeleteOrganization_withGroups proves an organization with groups,
 // members, and grants can be removed without leaving group state behind.
 func TestServer_DeleteOrganization_withGroups(t *testing.T) {
