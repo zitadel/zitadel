@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/group"
@@ -48,7 +47,7 @@ func TestGroupGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.group_grants1 (id, resource_owner, instance_id, creation_date, change_date, sequence, group_id, project_id, grant_id, roles, state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+							expectedStmt: "INSERT INTO projections.group_grants1 (id, resource_owner, instance_id, creation_date, change_date, sequence, group_id, project_id, grant_id, roles) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"ro-id",
@@ -60,7 +59,6 @@ func TestGroupGrantProjection_reduces(t *testing.T) {
 								"project-id",
 								"project-grant-id",
 								database.TextArray[string]{"role1", "role2"},
-								domain.GroupGrantStateActive,
 							},
 						},
 					},

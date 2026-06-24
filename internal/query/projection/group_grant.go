@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -23,7 +22,6 @@ const (
 	GroupGrantCreationDate  = "creation_date"
 	GroupGrantChangeDate    = "change_date"
 	GroupGrantSequence      = "sequence"
-	GroupGrantState         = "state"
 	GroupGrantResourceOwner = "resource_owner"
 	GroupGrantInstanceID    = "instance_id"
 	GroupGrantGroupID       = "group_id"
@@ -49,7 +47,6 @@ func (*groupGrantProjection) Init() *old_handler.Check {
 			handler.NewColumn(GroupGrantCreationDate, handler.ColumnTypeTimestamp),
 			handler.NewColumn(GroupGrantChangeDate, handler.ColumnTypeTimestamp),
 			handler.NewColumn(GroupGrantSequence, handler.ColumnTypeInt64),
-			handler.NewColumn(GroupGrantState, handler.ColumnTypeEnum),
 			handler.NewColumn(GroupGrantResourceOwner, handler.ColumnTypeText),
 			handler.NewColumn(GroupGrantInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(GroupGrantGroupID, handler.ColumnTypeText),
@@ -59,6 +56,7 @@ func (*groupGrantProjection) Init() *old_handler.Check {
 		},
 			handler.NewPrimaryKey(GroupGrantInstanceID, GroupGrantID),
 			handler.WithIndex(handler.NewIndex("group_id", []string{GroupGrantGroupID})),
+			handler.WithIndex(handler.NewIndex("project_id", []string{GroupGrantProjectID})),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{GroupGrantResourceOwner})),
 		),
 	)
@@ -161,7 +159,6 @@ func (p *groupGrantProjection) reduceAdded(event eventstore.Event) (*handler.Sta
 			handler.NewCol(GroupGrantProjectID, e.ProjectID),
 			handler.NewCol(GroupGrantGrantID, e.ProjectGrantID),
 			handler.NewCol(GroupGrantRoles, database.TextArray[string](e.RoleKeys)),
-			handler.NewCol(GroupGrantState, domain.GroupGrantStateActive),
 		},
 	), nil
 }

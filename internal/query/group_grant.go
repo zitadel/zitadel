@@ -37,10 +37,6 @@ var (
 		name:  projection.GroupGrantSequence,
 		table: groupGrantsTable,
 	}
-	GroupGrantColumnState = Column{
-		name:  projection.GroupGrantState,
-		table: groupGrantsTable,
-	}
 	GroupGrantColumnResourceOwner = Column{
 		name:  projection.GroupGrantResourceOwner,
 		table: groupGrantsTable,
