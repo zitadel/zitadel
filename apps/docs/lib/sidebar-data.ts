@@ -933,6 +933,7 @@ export const apisSidebar: readonly SidebarItem[] = [
           { type: "category", label: "SAML", items: ["reference/api/saml"] },
           { type: "category", label: "Settings", items: ["reference/api/settings"] },
           { type: "category", label: "Feature", items: ["reference/api/feature"] },
+          { type: "category", label: "Group", items: ["reference/api/group"] },
           { type: "category", label: "Organization", items: ["reference/api/org"] },
           { type: "category", label: "Identity Provider", items: ["reference/api/idp"] },
           { type: "category", label: "Web Key", items: ["reference/api/webkey"] },
