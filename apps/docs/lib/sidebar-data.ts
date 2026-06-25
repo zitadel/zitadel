@@ -794,7 +794,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
                       type: "doc",
                       id: "self-hosting/manage/cli/overview",
                     },
-                    items: ["self-hosting/manage/cli/mirror"],
+                    items: ["self-hosting/manage/cli/mirror", "self-hosting/manage/cli/management-api"],
                   },
                 ],
               },
