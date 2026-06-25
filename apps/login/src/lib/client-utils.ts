@@ -19,7 +19,14 @@ export function handleServerActionResponse(
 
   if ("redirect" in response && response.redirect) {
     if (isSafeRedirectUri(response.redirect)) {
-      router.push(response.redirect);
+      if (typeof window !== "undefined" && isExternalUrl(response.redirect)) {
+        // External/custom-protocol URLs: use window.location for full navigation.
+        // router.push() would trigger an RSC prefetch fetch() that gets blocked
+        // by CSP connect-src 'self' for non-same-origin URLs.
+        window.location.href = response.redirect;
+      } else {
+        router.push(response.redirect);
+      }
       return true;
     } else {
       console.warn("handleServerActionResponse: Blocked unsafe redirect URI:", response.redirect);
@@ -39,6 +46,17 @@ export function handleServerActionResponse(
   }
 
   return false;
+}
+
+/**
+ * Returns true if the URL is external (absolute URL or custom protocol).
+ * Relative paths (starting with "/" but not "//") are considered internal.
+ */
+function isExternalUrl(url: string): boolean {
+  if (url.startsWith("/") && !url.startsWith("//")) {
+    return false;
+  }
+  return true;
 }
 
 const SANITIZE_BLANK = "about:blank";
