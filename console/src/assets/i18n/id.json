@@ -1535,6 +1535,7 @@
       "DEFAULT_SAVED": "Bahasa Default disimpan",
       "ALLOWED_SAVED": "Bahasa yang Diizinkan disimpan",
       "OPTIONS": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1780,6 +1781,7 @@
       "LANGUAGES_NOT_ALLOWED": "Tidak diperbolehkan:",
       "LANGUAGE": "Bahasa",
       "LANGUAGES": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -2768,6 +2770,7 @@
     "3": "Lainnya"
   },
   "LANGUAGES": {
+    "da": "Dansk",
     "de": "Deutsch",
     "en": "English",
     "es": "Español",

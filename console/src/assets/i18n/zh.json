@@ -1538,6 +1538,7 @@
       "DEFAULT_SAVED": "默认语言已保存",
       "ALLOWED_SAVED": "允许的语言已保存",
       "OPTIONS": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1786,6 +1787,7 @@
       "LANGUAGES_NOT_ALLOWED": "不允许：",
       "LANGUAGE": "语言",
       "LANGUAGES": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -2777,6 +2779,7 @@
     "3": "其他"
   },
   "LANGUAGES": {
+    "da": "Dansk",
     "de": "Deutsch",
     "en": "English",
     "es": "Español",

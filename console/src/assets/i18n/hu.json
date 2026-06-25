@@ -1535,6 +1535,7 @@
       "DEFAULT_SAVED": "Alapértelmezett nyelv mentve",
       "ALLOWED_SAVED": "Engedélyezett nyelvek mentve",
       "OPTIONS": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1781,6 +1782,7 @@
       "LANGUAGES_NOT_ALLOWED": "Nem engedélyezett:",
       "LANGUAGE": "Nyelv",
       "LANGUAGES": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -2768,6 +2770,7 @@
     "3": "Egyéb"
   },
   "LANGUAGES": {
+    "da": "Dansk",
     "de": "Deutsch",
     "en": "English",
     "es": "Español",

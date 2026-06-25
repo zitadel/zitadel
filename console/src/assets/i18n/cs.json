@@ -1535,6 +1535,7 @@
       "DEFAULT_SAVED": "Výchozí jazyk byl úspěšně nastaven.",
       "ALLOWED_SAVED": "Povolené jazyky byly úspěšně nastaveny.",
       "OPTIONS": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1783,6 +1784,7 @@
       "LANGUAGES_NOT_ALLOWED": "Nepovolené jazyky:",
       "LANGUAGE": "Jazyk",
       "LANGUAGES": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -2753,6 +2755,7 @@
     "3": "Jiné"
   },
   "LANGUAGES": {
+    "da": "Dansk",
     "de": "Deutsch",
     "en": "English",
     "es": "Español",

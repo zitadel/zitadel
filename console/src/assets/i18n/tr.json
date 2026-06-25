@@ -1538,6 +1538,7 @@
       "DEFAULT_SAVED": "Varsayılan Dil kaydedildi",
       "ALLOWED_SAVED": "İzin Verilen Diller kaydedildi",
       "OPTIONS": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1786,6 +1787,7 @@
       "LANGUAGES_NOT_ALLOWED": "İzin verilmeyen:",
       "LANGUAGE": "Dil",
       "LANGUAGES": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -2773,6 +2775,7 @@
     "3": "Diğer"
   },
   "LANGUAGES": {
+    "da": "Dansk",
     "de": "Deutsch",
     "en": "English",
     "es": "Español",

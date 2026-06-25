@@ -1539,6 +1539,7 @@
       "DEFAULT_SAVED": "Мова за замовчуванням збережена",
       "ALLOWED_SAVED": "Дозволені мови збережені",
       "OPTIONS": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1787,6 +1788,7 @@
       "LANGUAGES_NOT_ALLOWED": "Не дозволено:",
       "LANGUAGE": "Мова",
       "LANGUAGES": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -2776,6 +2778,7 @@
     "3": "Інша"
   },
   "LANGUAGES": {
+    "da": "Dansk",
     "de": "Deutsch",
     "en": "English",
     "es": "Español",
