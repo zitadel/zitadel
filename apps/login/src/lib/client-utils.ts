@@ -23,7 +23,9 @@ export function handleServerActionResponse(
         // External/custom-protocol URLs: use window.location for full navigation.
         // router.push() would trigger an RSC prefetch fetch() that gets blocked
         // by CSP connect-src 'self' for non-same-origin URLs.
-        window.location.href = response.redirect;
+        // CodeQL: This is safe — the URL is validated by isSafeRedirectUri above,
+        // which blocks javascript:, data:, file:, blob:, and about: schemes.
+        window.location.href = response.redirect; // lgtm[js/client-side-unvalidated-url-redirection]
       } else {
         router.push(response.redirect);
       }
@@ -52,7 +54,7 @@ export function handleServerActionResponse(
  * Returns true if the URL is external (absolute URL or custom protocol).
  * Relative paths (starting with "/" but not "//") are considered internal.
  */
-function isExternalUrl(url: string): boolean {
+export function isExternalUrl(url: string): boolean {
   if (url.startsWith("/") && !url.startsWith("//")) {
     return false;
   }
