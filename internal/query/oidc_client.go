@@ -87,7 +87,9 @@ func (q *Queries) ActiveOIDCClientByID(ctx context.Context, clientID string, get
 	loginV2 := instance.Features().LoginV2
 	if loginV2.Required {
 		client.LoginVersion = domain.LoginVersion2
-		client.LoginBaseURI = (*URL)(loginV2.BaseURI)
+		if client.LoginBaseURI == nil || (*url.URL)(client.LoginBaseURI).String() == "" {
+			client.LoginBaseURI = (*URL)(loginV2.BaseURI)
+		}
 	}
 	if instance.ManagementConsoleClientID() == clientID {
 		client.RedirectURIs = append(client.RedirectURIs, http_util.DomainContext(ctx).Origin()+path.RedirectPath)
