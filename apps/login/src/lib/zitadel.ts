@@ -1340,6 +1340,7 @@ export interface ServiceConfig {
   baseUrl: string;
   instanceHost?: string; // only for multi-tenant
   publicHost?: string; // only for multi-tenant
+  forwardedFor?: string; // original client IP from reverse proxy
 }
 
 /**
@@ -1365,6 +1366,9 @@ export function createServerTransport(token: string, serviceConfig: ServiceConfi
     }
     if (serviceConfig.publicHost) {
       req.header.set("x-zitadel-public-host", serviceConfig.publicHost);
+    }
+    if (serviceConfig.forwardedFor) {
+      req.header.set("x-forwarded-for", serviceConfig.forwardedFor);
     }
 
     // Apply headers from CUSTOM_REQUEST_HEADERS environment variable
