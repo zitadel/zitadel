@@ -61,6 +61,12 @@ To change instance-level settings on a running installation:
 **Login V2**: Starting with ZITADEL v4, the Login V2 UI is enabled by default for new installations.
 If you are running an existing installation and want to enable it, follow the [Login Client guide](/self-hosting/manage/login-client).
 
+## Login V2 is slow with large user databases
+
+If login via Login V2 takes over a minute on instances with 5 million or more users, this is a known issue caused by the `login_names` view generating a subquery that can bypass database indexes.
+
+**Workaround:** Switch back to Login V1, which is fully supported and unaffected. See [Hosted Login V2 limitations](/guides/integrate/login/hosted-login#limitations) for details and track progress on [GitHub](https://github.com/zitadel/zitadel/pull/10475).
+
 ## ZITADEL service becomes unhealthy without visible error messages
 
 If the `zitadel` container shows as `unhealthy` but the log output does not reveal an obvious error:

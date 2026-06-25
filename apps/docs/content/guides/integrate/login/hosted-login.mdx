@@ -152,6 +152,12 @@ For the first implementation we have excluded the following features:
   - As passkey and u2f is bound to a domain, it is important to notice, that setting up the authentication possibility in the ZITADEL management console (Self-service), will not work if the login runs on a different domain
 - Custom Login Texts
 
+<Callout type="caution" title="Login V2 performance at scale (5M+ users)">
+Login V2 has a known performance issue on instances with large user databases. The `login_names` view used internally generates a subquery that can bypass indexes, causing login requests to take over a minute on databases with 5 million or more users.
+
+If you are running at this scale, **use Login V1** until the issue is resolved. Login V1 remains fully supported. Track progress on [GitHub](https://github.com/zitadel/zitadel/pull/10475).
+</Callout>
+
 ### Important Changes
 
 - **Create Users:** The new TypeScript Login app is built with the session and the user V2 API, the users V2 API does have some differences to the v1 API, so make sure you create users through the new API.
