@@ -359,8 +359,10 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
   if (options?.autoLinking) {
     let foundUser;
     const email = addHumanUser?.email?.email;
+    const emailVerified =
+      addHumanUser?.email?.verification?.case === "isVerified" && addHumanUser?.email?.verification?.value;
 
-    if (options.autoLinking === AutoLinkingOption.EMAIL && email) {
+    if (options.autoLinking === AutoLinkingOption.EMAIL && email && emailVerified) {
       foundUser = await listUsers({ serviceConfig, email, organizationId: organization }).then((response) => {
         return response.result ? response.result[0] : null;
       });
@@ -368,15 +370,6 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
       foundUser = await listUsers({
         serviceConfig,
         userName: idpInformation!.userName,
-        organizationId: organization,
-      }).then((response) => {
-        return response.result ? response.result[0] : null;
-      });
-    } else {
-      foundUser = await listUsers({
-        serviceConfig,
-        userName: idpInformation!.userName,
-        email,
         organizationId: organization,
       }).then((response) => {
         return response.result ? response.result[0] : null;
