@@ -188,6 +188,12 @@ You can also activate the v2 login for your apps, so users are redirected to `/u
 
         1. Enable the new login on your application settings. Leave the field **Custom base URL for the new Login UI** empty to use the default. With these settings, Zitadel will automatically redirect you to the new login if you call the old one.
         ![](../../../../public/img/guides/integrate/login/login-v2-app-config.png)
+
+        <Callout type="info" title="How the checkbox and Custom base URL work">
+        - **Use new Login UI checkbox:** This is a per-app override. It only has a visible effect when the instance-level Login V2 feature flag is **off** — it opts that specific app into V2 while other apps remain on V1. If the instance flag is already on (the default in v4+), the checkbox has no effect because all apps already use V2.
+        - **Custom base URL field:** Only set this if you are self-hosting the login UI at a custom domain (e.g. `https://login.acme.com`). Leave it empty to use the built-in `/ui/v2/login`.
+        </Callout>
+
         2. Enable the [loginV2 feature](/reference/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures) on the instance. Leave the base URI empty to use the default. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://your-zitadel-instance.zitadel.cloud/ui/v2/login)
 
     </Tab>
