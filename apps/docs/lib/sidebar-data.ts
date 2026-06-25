@@ -582,6 +582,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
     items: [
       "guides/manage/user/reg-create-user",
       "guides/manage/terraform-provider",
+      "guides/manage/pulumi-provider",
       {
         type: "category",
         label: "Identity Providers",
