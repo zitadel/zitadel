@@ -2216,6 +2216,21 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 			},
 		},
 		{
+			"unknown oidc_session",
+			fields{
+				eventstore:   expectEventstore(expectFilter()),
+				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instanceID"),
+				token:    "V2_missingSession-at_accessTokenID",
+				clientID: "clientID",
+			},
+			res{
+				err: nil,
+			},
+		},
+		{
 			"refresh_token inactive",
 			fields{
 				eventstore: expectEventstore(

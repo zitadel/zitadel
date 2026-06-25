@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/admin"
 	"github.com/zitadel/zitadel/cmd/build"
+	"github.com/zitadel/zitadel/cmd/eventstore"
 	"github.com/zitadel/zitadel/cmd/initialise"
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/mirror"
@@ -57,6 +58,7 @@ func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server
 
 	cmd.AddCommand(
 		admin.New(), //is now deprecated, remove later on
+		eventstore.New(),
 		initialise.New(),
 		setup.New(),
 		start.New(server),
