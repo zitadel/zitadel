@@ -195,6 +195,9 @@ func (wm *OAuthIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encry
 	if wm.IsAutoUpdate {
 		opts = append(opts, oauth.WithAutoUpdate())
 	}
+	if wm.UsePKCE {
+		opts = append(opts, oauth.WithRelyingPartyOption(rp.WithPKCE(nil)))
+	}
 	return oauth.New(
 		config,
 		wm.Name,
@@ -405,6 +408,9 @@ func (wm *OIDCIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 	}
 	if wm.IsAutoUpdate {
 		opts = append(opts, oidc.WithAutoUpdate())
+	}
+	if wm.UsePKCE {
+		opts = append(opts, oidc.WithRelyingPartyOption(rp.WithPKCE(nil)))
 	}
 	return oidc.New(
 		wm.Name,
