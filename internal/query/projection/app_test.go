@@ -863,6 +863,46 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "project reduceOIDCConfigRegistrationTokenChanged",
+			args: args{
+				event: getEvent(
+					testEvent(
+						project.OIDCConfigRegistrationTokenChangedType,
+						project.AggregateType,
+						[]byte(`{
+						"appId": "app-id",
+						"hashedToken": "token-hash"
+			}`),
+					), eventstore.GenericEventMapper[project.OIDCConfigRegistrationTokenChangedEvent]),
+			},
+			reduce: (&appProjection{}).reduceOIDCConfigRegistrationTokenChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.apps7_oidc_configs SET registration_token = $1 WHERE (app_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"token-hash",
+								"app-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.apps7 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"app-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "project reduceOIDCConfigSecretHashUpdated",
 			args: args{
 				event: getEvent(
