@@ -112,8 +112,8 @@ export function RegisterFormIDPIncomplete({
           <div className="grid grid-cols-2 gap-4">
             <div className="">
               <TextInput
-                type="firstname"
-                autoComplete="firstname"
+                type="text"
+                autoComplete="given-name"
                 autoFocus={!!idpUserName}
                 required
                 {...register("firstname", { required: t("required.firstname") })}
@@ -124,8 +124,8 @@ export function RegisterFormIDPIncomplete({
             </div>
             <div className="">
               <TextInput
-                type="lastname"
-                autoComplete="lastname"
+                type="text"
+                autoComplete="family-name"
                 required
                 {...register("lastname", { required: t("required.lastname") })}
                 label={t("labels.lastname")}
