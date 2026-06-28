@@ -2371,7 +2371,8 @@
       "DESCRIPTION": "Въведете данните за JWT Identity Provider.",
       "HEADERNAME": "Име на заглавката",
       "JWTENDPOINT": "Крайна точка на JWT",
-      "JWTKEYSENDPOINT": "Крайна точка на JWT ключове"
+      "JWTKEYSENDPOINT": "Крайна точка на JWT ключове",
+      "AUDIENCE": "Аудитория"
     },
     "APPLE": {
       "TEAMID": "Team ID",

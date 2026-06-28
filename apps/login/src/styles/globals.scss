@@ -1,5 +1,5 @@
 // https://github.com/tailwindlabs/tailwindcss/discussions/16173
-@import "tailwindcss";
+@use "tailwindcss";
 @config "../../tailwind.config.mjs";
 
 @layer base {

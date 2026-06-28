@@ -911,6 +911,7 @@ func (c *Commands) prepareAddOrgJWTProvider(a *org.Aggregate, writeModel *OrgJWT
 					provider.JWTEndpoint,
 					provider.KeyEndpoint,
 					provider.HeaderName,
+					provider.Audience,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -959,6 +960,7 @@ func (c *Commands) prepareUpdateOrgJWTProvider(a *org.Aggregate, writeModel *Org
 				provider.JWTEndpoint,
 				provider.KeyEndpoint,
 				provider.HeaderName,
+				provider.Audience,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {
