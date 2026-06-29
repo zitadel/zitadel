@@ -27,4 +27,8 @@ var (
 		name:  projection.LoginNameInstanceIDCol,
 		table: loginNameTable,
 	}
+	LoginNameResourceOwnerCol = Column{
+		name:  projection.LoginNameResourceOwnerCol,
+		table: loginNameTable,
+	}
 )

@@ -22,11 +22,12 @@ const (
 	LoginNamePolicyProjectionTable = LoginNameProjectionTable + "_" + loginNamePolicySuffix
 	LoginNameDomainProjectionTable = LoginNameProjectionTable + "_" + loginNameDomainSuffix
 
-	LoginNameCol           = "login_name"
-	LoginNameUserCol       = "user_id"
-	LoginNameIsPrimaryCol  = "is_primary"
-	LoginNameInstanceIDCol = "instance_id"
-	LoginNameLowerCol      = "login_name_lower"
+	LoginNameCol              = "login_name"
+	LoginNameUserCol          = "user_id"
+	LoginNameIsPrimaryCol     = "is_primary"
+	LoginNameInstanceIDCol    = "instance_id"
+	LoginNameLowerCol         = "login_name_lower"
+	LoginNameResourceOwnerCol = "resource_owner"
 
 	usersAlias         = "users"
 	policyCustomAlias  = "policy_custom"
