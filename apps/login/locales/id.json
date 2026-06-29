@@ -1,0 +1,461 @@
+{
+  "common": {
+    "back": "Kembali",
+    "title": "Masuk dengan Zitadel"
+  },
+  "accounts": {
+    "title": "Akun",
+    "description": "Pilih akun yang ingin Anda gunakan.",
+    "addAnother": "Tambahkan akun lain",
+    "noResults": "Tidak ada akun yang ditemukan",
+    "verified": "terverifikasi",
+    "expired": "kedaluwarsa"
+  },
+  "logout": {
+    "title": "Keluar",
+    "description": "Klik sebuah akun untuk mengakhiri sesi",
+    "noResults": "Tidak ada akun yang ditemukan",
+    "clear": "Akhiri Sesi",
+    "verifiedAt": "Terakhir aktif: {time}",
+    "success": {
+      "title": "Berhasil keluar",
+      "description": "Anda telah berhasil keluar."
+    }
+  },
+  "loginname": {
+    "title": "Selamat datang kembali!",
+    "description": "Masukkan detail masuk Anda.",
+    "register": "Daftarkan pengguna baru",
+    "submit": "Lanjutkan",
+    "labels": {
+      "loginname": "Nama Masuk",
+      "username": "Nama Pengguna",
+      "usernameOrPhoneNumber": "Nama pengguna atau nomor telepon",
+      "usernameOrEmail": "Nama pengguna atau email"
+    },
+    "required": {
+      "loginName": "Kolom ini wajib diisi"
+    },
+    "errors": {
+      "internalError": "Terjadi kesalahan internal",
+      "couldNotGetLoginSettings": "Tidak dapat memperoleh pengaturan masuk",
+      "couldNotSearchUsers": "Tidak dapat mencari pengguna",
+      "couldNotGetDomain": "Tidak dapat memperoleh domain",
+      "couldNotGetHost": "Tidak dapat memperoleh host",
+      "couldNotStartIDPFlow": "Tidak dapat memulai alur IDP",
+      "moreThanOneUserFound": "Lebih dari satu pengguna ditemukan. Berikan pengenal yang unik.",
+      "userNotFound": "Pengguna tidak ditemukan dalam sistem",
+      "couldNotCreateSession": "Tidak dapat membuat sesi untuk pengguna",
+      "initialUserNotSupported": "Pengguna Awal tidak didukung",
+      "localAuthenticationNotAllowed": "Autentikasi lokal tidak diizinkan! Hubungi administrator Anda untuk informasi lebih lanjut.",
+      "passkeysNotAllowed": "Passkey tidak diizinkan! Hubungi administrator Anda untuk informasi lebih lanjut.",
+      "couldNotFindIdentityProvider": "Tidak dapat menemukan penyedia identitas.",
+      "userNotActive": "Pengguna tidak aktif. Hubungi administrator Anda untuk informasi lebih lanjut."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Terjadi kesalahan",
+      "multipleUsersFound": "Beberapa pengguna ditemukan",
+      "userNotFound": "Pengguna tidak ditemukan dalam sistem"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "Kata Sandi",
+      "description": "Masukkan kata sandi Anda.",
+      "resetPassword": "Atur Ulang Kata Sandi",
+      "submit": "Lanjutkan",
+      "labels": {
+        "password": "Kata Sandi"
+      },
+      "required": {
+        "password": "Kolom ini wajib diisi"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "Tidak dapat memverifikasi kata sandi",
+        "couldNotResetPassword": "Tidak dapat mengatur ulang kata sandi"
+      },
+      "info": {
+        "passwordResetSent": "Kata sandi telah diatur ulang. Silakan periksa email Anda"
+      }
+    },
+    "set": {
+      "title": "Atur Kata Sandi",
+      "description": "Atur kata sandi untuk akun Anda",
+      "codeSent": "Kode baru telah dikirim ke alamat email Anda.",
+      "noCodeReceived": "Tidak menerima kode?",
+      "resend": "Kirim ulang kode",
+      "submit": "Lanjutkan",
+      "labels": {
+        "code": "Kode",
+        "newPassword": "Kata Sandi Baru",
+        "confirmPassword": "Konfirmasi Kata Sandi"
+      },
+      "required": {
+        "code": "Kolom ini wajib diisi",
+        "newPassword": "Anda harus memberikan kata sandi!",
+        "confirmPassword": "Kolom ini wajib diisi"
+      },
+      "errors": {
+        "couldNotSetPassword": "Tidak dapat mengatur kata sandi",
+        "couldNotResetPassword": "Tidak dapat mengatur ulang kata sandi",
+        "couldNotVerifyPassword": "Tidak dapat memverifikasi kata sandi"
+      }
+    },
+    "change": {
+      "title": "Ubah Kata Sandi",
+      "description": "Atur kata sandi untuk akun Anda",
+      "submit": "Lanjutkan",
+      "labels": {
+        "currentPassword": "Kata Sandi Saat Ini",
+        "newPassword": "Kata Sandi Baru",
+        "confirmPassword": "Konfirmasi Kata Sandi"
+      },
+      "required": {
+        "currentPassword": "Anda harus memberikan kata sandi Anda saat ini!",
+        "newPassword": "Anda harus memberikan kata sandi baru!",
+        "confirmPassword": "Kolom ini wajib diisi"
+      },
+      "errors": {
+        "currentPasswordInvalid": "Kata sandi saat ini tidak benar.",
+        "couldNotChangePassword": "Tidak dapat mengubah kata sandi",
+        "couldNotVerifyPassword": "Tidak dapat memverifikasi kata sandi",
+        "unknownError": "Kesalahan tidak diketahui"
+      }
+    },
+    "complexity": {
+      "length": "Panjang minimal harus {minLength} karakter.",
+      "hasSymbol": "Harus menyertakan simbol.",
+      "hasNumber": "Harus menyertakan angka.",
+      "hasUppercase": "Harus menyertakan huruf besar.",
+      "hasLowercase": "Harus menyertakan huruf kecil.",
+      "equals": "Konfirmasi kata sandi cocok.",
+      "matches": "Cocok",
+      "doesNotMatch": "Tidak cocok"
+    },
+    "errors": {
+      "noHostFound": "Host tidak ditemukan",
+      "couldNotSendResetLink": "Tidak dapat mengirim Tautan Atur Ulang Kata Sandi",
+      "couldNotCreateSessionForUser": "Tidak dapat membuat sesi untuk pengguna",
+      "couldNotVerifyPassword": "Tidak dapat memverifikasi kata sandi",
+      "failedToAuthenticate": "Gagal mengautentikasi. Anda telah mencoba {failedAttempts} dari {maxPasswordAttempts} percobaan kata sandi.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Gagal mengautentikasi.",
+      "accountLockedContactAdmin": " Hubungi administrator Anda untuk membuka kunci akun Anda",
+      "userNotFound": "Pengguna tidak ditemukan dalam sistem",
+      "initialUserNotSupported": "Pengguna Awal tidak didukung",
+      "userInitialStateNotSupported": "Status Awal Pengguna tidak didukung",
+      "codeOrVerificationRequired": "Anda harus memberikan kode atau memiliki Pemeriksaan Verifikasi Pengguna yang valid",
+      "verificationRequired": "Pemeriksaan Verifikasi Pengguna harus dilakukan",
+      "couldNotLoadSession": "Tidak dapat memuat sesi",
+      "couldNotLoadAuthMethods": "Tidak dapat memuat metode autentikasi",
+      "failedPrecondition": "Prasyarat gagal",
+      "sessionNotValid": "Sesi tidak valid",
+      "passwordVerificationMissing": "Verifikasi kata sandi tidak ada.",
+      "passwordVerificationTooOld": "Verifikasi kata sandi sudah terlalu lama. Silakan verifikasi kata sandi Anda kembali."
+    }
+  },
+  "idp": {
+    "title": "Masuk dengan SSO",
+    "description": "Pilih salah satu penyedia berikut untuk masuk",
+    "orSignInWith": "atau masuk dengan",
+    "signInWithApple": "Masuk dengan Apple",
+    "signInWithGoogle": "Masuk dengan Google",
+    "signInWithAzureAD": "Masuk dengan AzureAD",
+    "signInWithGithub": "Masuk dengan GitHub",
+    "signInWithGitlab": "Masuk dengan GitLab",
+    "loginError": {
+      "title": "Gagal masuk",
+      "description": "Terjadi kesalahan saat mencoba masuk."
+    },
+    "linkingError": {
+      "title": "Gagal menautkan akun",
+      "description": "Terjadi kesalahan saat mencoba menautkan akun Anda."
+    },
+    "completeRegister": {
+      "title": "Lengkapi data Anda",
+      "description": "Anda perlu melengkapi pendaftaran Anda dengan memberikan alamat email dan nama Anda."
+    },
+    "accountNotFound": {
+      "title": "Akun Tidak Ditemukan",
+      "description": "Kami tidak dapat menemukan akun yang terkait dengan kredensial penyedia identitas Anda.",
+      "info": "Tidak ada akun yang ada ditemukan. Silakan masuk dengan akun yang ada atau hubungi administrator Anda untuk bantuan.",
+      "backToLogin": "Kembali ke Halaman Masuk"
+    },
+    "registrationFailed": {
+      "title": "Pendaftaran Tidak Tersedia",
+      "description": "Kami tidak dapat menyelesaikan proses pendaftaran.",
+      "info": "Tidak dapat menentukan organisasi untuk pendaftaran. Silakan hubungi administrator Anda untuk bantuan.",
+      "backToLogin": "Kembali ke Halaman Masuk"
+    },
+    "processing": {
+      "message": "Memproses autentikasi...",
+      "noRedirect": "Tidak ada pengalihan atau kesalahan yang dikembalikan dari server",
+      "unexpectedError": "Terjadi kesalahan yang tidak terduga"
+    },
+    "errors": {
+      "missingParameters": "Parameter yang diperlukan tidak ada",
+      "missingIdpInfo": "Informasi IDP tidak ada",
+      "idpNotFound": "Penyedia identitas tidak ditemukan",
+      "linkingNotAllowed": "Penautan tidak diizinkan untuk penyedia identitas ini",
+      "linkingFailed": "Gagal menautkan penyedia identitas ke akun",
+      "autoLinkingFailed": "Gagal menautkan akun secara otomatis",
+      "userCreationFailed": "Gagal membuat akun pengguna",
+      "orgResolutionFailed": "Tidak dapat menentukan organisasi untuk pendaftaran",
+      "sessionCreationFailed": "Tidak dapat membuat sesi atau menentukan pengalihan",
+      "unknownError": "Terjadi kesalahan yang tidak diketahui"
+    }
+  },
+  "ldap": {
+    "title": "Masuk dengan LDAP",
+    "description": "Masukkan kredensial LDAP Anda.",
+    "submit": "Lanjutkan",
+    "labels": {
+      "username": "Nama Pengguna",
+      "password": "Kata Sandi"
+    },
+    "required": {
+      "username": "Kolom ini wajib diisi",
+      "password": "Kolom ini wajib diisi"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "Verifikasi identitas Anda",
+      "description": "Pilih salah satu faktor berikut.",
+      "noResults": "Tidak ada faktor kedua yang tersedia untuk disiapkan."
+    },
+    "set": {
+      "title": "Siapkan 2 Faktor",
+      "description": "Pilih salah satu faktor kedua berikut.",
+      "skip": "Lewati"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "Verifikasi 2 Faktor",
+      "totpDescription": "Masukkan kode dari aplikasi autentikator Anda.",
+      "smsDescription": "Masukkan kode yang Anda terima melalui SMS.",
+      "emailDescription": "Masukkan kode yang Anda terima melalui email.",
+      "noCodeReceived": "Tidak menerima kode?",
+      "resendCode": "Kirim ulang kode",
+      "submit": "Lanjutkan",
+      "labels": {
+        "code": "Kode"
+      },
+      "required": {
+        "code": "Kolom ini wajib diisi"
+      }
+    },
+    "set": {
+      "title": "Siapkan 2 Faktor",
+      "totpDescription": "Pindai kode QR dengan aplikasi autentikator Anda.",
+      "smsDescription": "Masukkan nomor telepon Anda untuk menerima kode melalui SMS.",
+      "emailDescription": "Masukkan alamat email Anda untuk menerima kode melalui email.",
+      "totpRegisterDescription": "Pindai kode QR atau buka URL secara manual.",
+      "submit": "Lanjutkan",
+      "labels": {
+        "code": "Kode"
+      },
+      "required": {
+        "code": "Kolom ini wajib diisi"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Autentikasi dengan passkey",
+      "description": "Perangkat Anda akan meminta sidik jari, wajah, atau kunci layar Anda",
+      "usePassword": "Gunakan kata sandi",
+      "submit": "Lanjutkan",
+      "errors": {
+        "couldNotRequestChallenge": "Tidak dapat meminta tantangan passkey",
+        "couldNotVerifyPasskey": "Tidak dapat memverifikasi passkey",
+        "noResponseReceived": "Verifikasi passkey gagal - tidak ada respons yang diterima",
+        "noRedirectProvided": "Verifikasi passkey selesai tetapi tidak ada pengalihan yang diberikan",
+        "couldNotRetrievePasskey": "Terjadi kesalahan saat mengambil passkey",
+        "verificationCancelled": "Verifikasi passkey dibatalkan",
+        "verificationFailed": "Terjadi kesalahan selama verifikasi passkey",
+        "couldNotFindSession": "Tidak dapat menemukan sesi",
+        "couldNotUpdateSession": "Tidak dapat memperbarui sesi",
+        "userNotFound": "Pengguna tidak ditemukan dalam sistem",
+        "couldNotDetermineRedirect": "Tidak dapat menentukan URL pengalihan setelah verifikasi passkey"
+      }
+    },
+    "set": {
+      "title": "Siapkan passkey",
+      "description": "Perangkat Anda akan meminta sidik jari, wajah, atau kunci layar Anda",
+      "info": {
+        "description": "Passkey adalah metode autentikasi pada sebuah perangkat seperti sidik jari Anda, Apple FaceID, atau yang serupa. ",
+        "link": "Autentikasi Passkey"
+      },
+      "skip": "Lewati",
+      "submit": "Lanjutkan"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "Verifikasi 2 Faktor",
+      "description": "Verifikasi akun Anda dengan perangkat Anda."
+    },
+    "set": {
+      "title": "Siapkan 2 Faktor",
+      "description": "Siapkan sebuah perangkat sebagai faktor kedua.",
+      "submit": "Lanjutkan"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "Kata Sandi"
+    },
+    "disabled": {
+      "title": "Pendaftaran dinonaktifkan",
+      "description": "Pendaftaran dinonaktifkan. Silakan hubungi administrator Anda."
+    },
+    "missingdata": {
+      "title": "Data tidak lengkap",
+      "description": "Berikan email, nama depan, dan nama belakang untuk mendaftar."
+    },
+    "title": "Daftar",
+    "description": "Buat akun Zitadel Anda.",
+    "noMethodAvailableWarning": "Tidak ada metode autentikasi yang tersedia. Silakan hubungi administrator Anda.",
+    "selectMethod": "Pilih metode yang ingin Anda gunakan untuk autentikasi",
+    "agreeTo": "Untuk mendaftar, Anda harus menyetujui syarat dan ketentuan",
+    "termsOfService": "Ketentuan Layanan",
+    "privacyPolicy": "Kebijakan Privasi",
+    "submit": "Lanjutkan",
+    "password": {
+      "title": "Atur Kata Sandi",
+      "description": "Atur kata sandi untuk akun Anda",
+      "submit": "Lanjutkan",
+      "labels": {
+        "password": "Kata Sandi",
+        "confirmPassword": "Konfirmasi Kata Sandi"
+      },
+      "required": {
+        "password": "Anda harus memberikan kata sandi!",
+        "confirmPassword": "Kolom ini wajib diisi"
+      }
+    },
+    "labels": {
+      "firstname": "Nama depan",
+      "lastname": "Nama belakang",
+      "email": "Email"
+    },
+    "required": {
+      "firstname": "Kolom ini wajib diisi",
+      "lastname": "Kolom ini wajib diisi",
+      "email": "Kolom ini wajib diisi"
+    },
+    "errors": {
+      "couldNotCreateUser": "Tidak dapat membuat pengguna",
+      "couldNotCreateSession": "Tidak dapat membuat sesi",
+      "userNotFound": "Pengguna tidak ditemukan dalam sistem",
+      "couldNotLinkIDP": "Tidak dapat menautkan IDP ke pengguna",
+      "couldNotRegisterUser": "Tidak dapat mendaftarkan pengguna"
+    }
+  },
+  "invite": {
+    "title": "Undang Pengguna",
+    "description": "Berikan alamat email dan nama pengguna yang ingin Anda undang.",
+    "info": "Pengguna akan menerima email dengan instruksi lebih lanjut.",
+    "notAllowed": "Pengaturan Anda tidak mengizinkan Anda untuk mengundang pengguna.",
+    "submit": "Lanjutkan",
+    "success": {
+      "title": "Pengguna diundang",
+      "description": "Email telah berhasil dikirim.",
+      "verified": "Pengguna telah diundang dan telah memverifikasi emailnya.",
+      "notVerifiedYet": "Pengguna telah diundang. Mereka akan menerima email dengan instruksi lebih lanjut.",
+      "submit": "Undang pengguna lain"
+    }
+  },
+  "signedin": {
+    "title": "Selamat datang {user}!",
+    "description": "Anda telah masuk.",
+    "continue": "Lanjutkan",
+    "error": {
+      "title": "Kesalahan",
+      "description": "Terjadi kesalahan saat mencoba masuk."
+    }
+  },
+  "verify": {
+    "userIdMissing": "Tidak ada userId yang diberikan!",
+    "successTitle": "Pengguna terverifikasi",
+    "successDescription": "Pengguna telah berhasil diverifikasi.",
+    "successContinue": "Lanjutkan",
+    "setupAuthenticator": "Siapkan autentikator",
+    "verify": {
+      "title": "Verifikasi pengguna",
+      "description": "Masukkan Kode yang diberikan dalam email verifikasi.",
+      "noCodeReceived": "Tidak menerima kode?",
+      "resendCode": "Kirim ulang kode",
+      "codeSent": "Kode baru baru saja dikirim ke alamat email Anda.",
+      "submit": "Lanjutkan",
+      "labels": {
+        "code": "Kode"
+      },
+      "required": {
+        "code": "Kolom ini wajib diisi"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "Tidak dapat mengirim ulang email",
+      "couldNotVerifyUser": "Tidak dapat memverifikasi pengguna",
+      "couldNotVerifyInvite": "Tidak dapat memverifikasi undangan",
+      "couldNotVerifyEmail": "Tidak dapat memverifikasi email",
+      "couldNotVerify": "Tidak dapat memverifikasi",
+      "couldNotLoadUser": "Tidak dapat memuat pengguna",
+      "couldNotLoadAuthenticators": "Tidak dapat memuat autentikator yang memungkinkan",
+      "couldNotCreateSession": "Tidak dapat membuat sesi",
+      "noHostFound": "Host tidak ditemukan",
+      "userAlreadyVerified": "Pengguna sudah terverifikasi!",
+      "couldNotResendInvite": "Tidak dapat mengirim ulang undangan",
+      "inviteSendFailed": "Gagal mengirim email undangan",
+      "emailSendFailed": "Gagal mengirim email verifikasi",
+      "contextMissing": "Terjadi kesalahan. Silakan coba lagi."
+    }
+  },
+  "authenticator": {
+    "title": "Pilih metode autentikasi",
+    "description": "Pilih metode yang ingin Anda gunakan untuk autentikasi",
+    "noMethodsAvailable": "Tidak ada metode autentikasi yang tersedia",
+    "allSetup": "Anda telah menyiapkan sebuah autentikator!",
+    "linkWithIDP": "atau tautkan dengan Penyedia Identitas"
+  },
+  "device": {
+    "usercode": {
+      "title": "Kode perangkat",
+      "description": "Masukkan kode yang ditampilkan pada aplikasi atau perangkat Anda.",
+      "submit": "Lanjutkan",
+      "labels": {
+        "code": "Kode"
+      },
+      "required": {
+        "code": "Kolom ini wajib diisi"
+      }
+    },
+    "request": {
+      "title": "{appName} ingin terhubung",
+      "description": "{appName} akan memiliki akses ke:",
+      "disclaimer": "Dengan mengklik Izinkan, Anda mengizinkan {appName} dan Zitadel untuk menggunakan informasi Anda sesuai dengan ketentuan layanan dan kebijakan privasi masing-masing. Anda dapat mencabut akses ini kapan saja.",
+      "submit": "Izinkan",
+      "deny": "Tolak"
+    },
+    "scope": {
+      "openid": "Verifikasi identitas Anda.",
+      "email": "Lihat alamat email Anda.",
+      "profile": "Lihat seluruh informasi profil Anda.",
+      "offline_access": "Izinkan akses offline ke akun Anda."
+    }
+  },
+  "error": {
+    "noUserCode": "Tidak ada kode pengguna yang diberikan!",
+    "noDeviceRequest": "Tidak ada permintaan perangkat yang ditemukan.",
+    "unknownContext": "Tidak dapat memperoleh konteks pengguna. Pastikan untuk memasukkan nama pengguna terlebih dahulu atau berikan loginName sebagai searchParam.",
+    "sessionExpired": "Sesi Anda saat ini telah kedaluwarsa. Silakan masuk kembali.",
+    "failedLoading": "Gagal memuat data. Silakan coba lagi.",
+    "tryagain": "Coba Lagi",
+    "couldNotContinueSession": "Tidak dapat melanjutkan dengan sesi - informasi pengguna tidak ada"
+  }
+}

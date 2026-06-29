@@ -1,0 +1,461 @@
+{
+  "common": {
+    "back": "Kembali",
+    "title": "Log masuk dengan Zitadel"
+  },
+  "accounts": {
+    "title": "Akaun",
+    "description": "Pilih akaun yang anda ingin gunakan.",
+    "addAnother": "Tambah akaun lain",
+    "noResults": "Tiada akaun ditemui",
+    "verified": "disahkan",
+    "expired": "tamat tempoh"
+  },
+  "logout": {
+    "title": "Log keluar",
+    "description": "Klik akaun untuk menamatkan sesi",
+    "noResults": "Tiada akaun ditemui",
+    "clear": "Tamatkan Sesi",
+    "verifiedAt": "Terakhir aktif: {time}",
+    "success": {
+      "title": "Log keluar berjaya",
+      "description": "Anda telah berjaya log keluar."
+    }
+  },
+  "loginname": {
+    "title": "Selamat kembali!",
+    "description": "Masukkan butiran log masuk anda.",
+    "register": "Daftar pengguna baharu",
+    "submit": "Teruskan",
+    "labels": {
+      "loginname": "Nama log masuk",
+      "username": "Nama pengguna",
+      "usernameOrPhoneNumber": "Nama pengguna atau nombor telefon",
+      "usernameOrEmail": "Nama pengguna atau e-mel"
+    },
+    "required": {
+      "loginName": "Medan ini diperlukan"
+    },
+    "errors": {
+      "internalError": "Ralat dalaman telah berlaku",
+      "couldNotGetLoginSettings": "Tidak dapat memperoleh tetapan log masuk",
+      "couldNotSearchUsers": "Tidak dapat mencari pengguna",
+      "couldNotGetDomain": "Tidak dapat memperoleh domain",
+      "couldNotGetHost": "Tidak dapat memperoleh hos",
+      "couldNotStartIDPFlow": "Tidak dapat memulakan aliran IDP",
+      "moreThanOneUserFound": "Lebih daripada seorang pengguna ditemui. Berikan pengecam yang unik.",
+      "userNotFound": "Pengguna tidak ditemui dalam sistem",
+      "couldNotCreateSession": "Tidak dapat mencipta sesi untuk pengguna",
+      "initialUserNotSupported": "Pengguna Awal tidak disokong",
+      "localAuthenticationNotAllowed": "Pengesahan tempatan tidak dibenarkan! Hubungi pentadbir anda untuk maklumat lanjut.",
+      "passkeysNotAllowed": "Passkey tidak dibenarkan! Hubungi pentadbir anda untuk maklumat lanjut.",
+      "couldNotFindIdentityProvider": "Tidak dapat menemui penyedia identiti.",
+      "userNotActive": "Pengguna tidak aktif. Hubungi pentadbir anda untuk maklumat lanjut."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Ralat telah berlaku",
+      "multipleUsersFound": "Beberapa pengguna ditemui",
+      "userNotFound": "Pengguna tidak ditemui dalam sistem"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "Kata laluan",
+      "description": "Masukkan kata laluan anda.",
+      "resetPassword": "Set Semula Kata Laluan",
+      "submit": "Teruskan",
+      "labels": {
+        "password": "Kata laluan"
+      },
+      "required": {
+        "password": "Medan ini diperlukan"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "Tidak dapat mengesahkan kata laluan",
+        "couldNotResetPassword": "Tidak dapat menetapkan semula kata laluan"
+      },
+      "info": {
+        "passwordResetSent": "Kata laluan telah ditetapkan semula. Sila semak e-mel anda"
+      }
+    },
+    "set": {
+      "title": "Tetapkan Kata Laluan",
+      "description": "Tetapkan kata laluan untuk akaun anda",
+      "codeSent": "Kod baharu telah dihantar ke alamat e-mel anda.",
+      "noCodeReceived": "Tidak menerima kod?",
+      "resend": "Hantar semula kod",
+      "submit": "Teruskan",
+      "labels": {
+        "code": "Kod",
+        "newPassword": "Kata Laluan Baharu",
+        "confirmPassword": "Sahkan Kata Laluan"
+      },
+      "required": {
+        "code": "Medan ini diperlukan",
+        "newPassword": "Anda mesti memberikan kata laluan!",
+        "confirmPassword": "Medan ini diperlukan"
+      },
+      "errors": {
+        "couldNotSetPassword": "Tidak dapat menetapkan kata laluan",
+        "couldNotResetPassword": "Tidak dapat menetapkan semula kata laluan",
+        "couldNotVerifyPassword": "Tidak dapat mengesahkan kata laluan"
+      }
+    },
+    "change": {
+      "title": "Tukar Kata Laluan",
+      "description": "Tetapkan kata laluan untuk akaun anda",
+      "submit": "Teruskan",
+      "labels": {
+        "currentPassword": "Kata Laluan Semasa",
+        "newPassword": "Kata Laluan Baharu",
+        "confirmPassword": "Sahkan Kata Laluan"
+      },
+      "required": {
+        "currentPassword": "Anda mesti memberikan kata laluan semasa anda!",
+        "newPassword": "Anda mesti memberikan kata laluan baharu!",
+        "confirmPassword": "Medan ini diperlukan"
+      },
+      "errors": {
+        "currentPasswordInvalid": "Kata laluan semasa tidak betul.",
+        "couldNotChangePassword": "Tidak dapat menukar kata laluan",
+        "couldNotVerifyPassword": "Tidak dapat mengesahkan kata laluan",
+        "unknownError": "Ralat tidak diketahui"
+      }
+    },
+    "complexity": {
+      "length": "Mestilah sekurang-kurangnya {minLength} aksara panjang.",
+      "hasSymbol": "Mesti mengandungi simbol.",
+      "hasNumber": "Mesti mengandungi nombor.",
+      "hasUppercase": "Mesti mengandungi huruf besar.",
+      "hasLowercase": "Mesti mengandungi huruf kecil.",
+      "equals": "Pengesahan kata laluan sepadan.",
+      "matches": "Sepadan",
+      "doesNotMatch": "Tidak sepadan"
+    },
+    "errors": {
+      "noHostFound": "Tiada hos ditemui",
+      "couldNotSendResetLink": "Tidak dapat menghantar Pautan Set Semula Kata Laluan",
+      "couldNotCreateSessionForUser": "Tidak dapat mencipta sesi untuk pengguna",
+      "couldNotVerifyPassword": "Tidak dapat mengesahkan kata laluan",
+      "failedToAuthenticate": "Gagal mengesahkan. Anda telah menggunakan {failedAttempts} daripada {maxPasswordAttempts} percubaan kata laluan.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Gagal mengesahkan.",
+      "accountLockedContactAdmin": " Hubungi pentadbir anda untuk membuka kunci akaun anda",
+      "userNotFound": "Pengguna tidak ditemui dalam sistem",
+      "initialUserNotSupported": "Pengguna Awal tidak disokong",
+      "userInitialStateNotSupported": "Keadaan Awal Pengguna tidak disokong",
+      "codeOrVerificationRequired": "Anda mesti memberikan kod atau mempunyai Pemeriksaan Pengesahan Pengguna yang sah",
+      "verificationRequired": "Pemeriksaan Pengesahan Pengguna mesti dilakukan",
+      "couldNotLoadSession": "Tidak dapat memuatkan sesi",
+      "couldNotLoadAuthMethods": "Tidak dapat memuatkan kaedah pengesahan",
+      "failedPrecondition": "Prasyarat gagal",
+      "sessionNotValid": "Sesi tidak sah",
+      "passwordVerificationMissing": "Pengesahan kata laluan tiada.",
+      "passwordVerificationTooOld": "Pengesahan kata laluan terlalu lama. Sila sahkan kata laluan anda sekali lagi."
+    }
+  },
+  "idp": {
+    "title": "Log masuk dengan SSO",
+    "description": "Pilih salah satu penyedia berikut untuk log masuk",
+    "orSignInWith": "atau log masuk dengan",
+    "signInWithApple": "Log masuk dengan Apple",
+    "signInWithGoogle": "Log masuk dengan Google",
+    "signInWithAzureAD": "Log masuk dengan AzureAD",
+    "signInWithGithub": "Log masuk dengan GitHub",
+    "signInWithGitlab": "Log masuk dengan GitLab",
+    "loginError": {
+      "title": "Log masuk gagal",
+      "description": "Ralat telah berlaku semasa cuba log masuk."
+    },
+    "linkingError": {
+      "title": "Pemautan akaun gagal",
+      "description": "Ralat telah berlaku semasa cuba memautkan akaun anda."
+    },
+    "completeRegister": {
+      "title": "Lengkapkan data anda",
+      "description": "Anda perlu melengkapkan pendaftaran anda dengan memberikan alamat e-mel dan nama anda."
+    },
+    "accountNotFound": {
+      "title": "Akaun Tidak Ditemui",
+      "description": "Kami tidak dapat menemui akaun yang dikaitkan dengan kelayakan penyedia identiti anda.",
+      "info": "Tiada akaun sedia ada ditemui. Sila log masuk dengan akaun sedia ada atau hubungi pentadbir anda untuk bantuan.",
+      "backToLogin": "Kembali ke Log Masuk"
+    },
+    "registrationFailed": {
+      "title": "Pendaftaran Tidak Tersedia",
+      "description": "Kami tidak dapat melengkapkan proses pendaftaran.",
+      "info": "Tidak dapat menentukan organisasi untuk pendaftaran. Sila hubungi pentadbir anda untuk bantuan.",
+      "backToLogin": "Kembali ke Log Masuk"
+    },
+    "processing": {
+      "message": "Memproses pengesahan...",
+      "noRedirect": "Tiada ubah hala atau ralat dikembalikan daripada pelayan",
+      "unexpectedError": "Ralat yang tidak dijangka telah berlaku"
+    },
+    "errors": {
+      "missingParameters": "Parameter yang diperlukan tiada",
+      "missingIdpInfo": "Maklumat IDP tiada",
+      "idpNotFound": "Penyedia identiti tidak ditemui",
+      "linkingNotAllowed": "Pemautan tidak dibenarkan untuk penyedia identiti ini",
+      "linkingFailed": "Gagal memautkan penyedia identiti ke akaun",
+      "autoLinkingFailed": "Gagal memautkan akaun secara automatik",
+      "userCreationFailed": "Gagal mencipta akaun pengguna",
+      "orgResolutionFailed": "Tidak dapat menentukan organisasi untuk pendaftaran",
+      "sessionCreationFailed": "Tidak dapat mencipta sesi atau menentukan ubah hala",
+      "unknownError": "Ralat yang tidak diketahui telah berlaku"
+    }
+  },
+  "ldap": {
+    "title": "Log Masuk LDAP",
+    "description": "Masukkan kelayakan LDAP anda.",
+    "submit": "Teruskan",
+    "labels": {
+      "username": "Nama pengguna",
+      "password": "Kata laluan"
+    },
+    "required": {
+      "username": "Medan ini diperlukan",
+      "password": "Medan ini diperlukan"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "Sahkan identiti anda",
+      "description": "Pilih salah satu faktor berikut.",
+      "noResults": "Tiada faktor kedua tersedia untuk persediaan."
+    },
+    "set": {
+      "title": "Sediakan 2-Faktor",
+      "description": "Pilih salah satu faktor kedua berikut.",
+      "skip": "Langkau"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "Sahkan 2-Faktor",
+      "totpDescription": "Masukkan kod daripada aplikasi pengesah anda.",
+      "smsDescription": "Masukkan kod yang anda terima melalui SMS.",
+      "emailDescription": "Masukkan kod yang anda terima melalui e-mel.",
+      "noCodeReceived": "Tidak menerima kod?",
+      "resendCode": "Hantar semula kod",
+      "submit": "Teruskan",
+      "labels": {
+        "code": "Kod"
+      },
+      "required": {
+        "code": "Medan ini diperlukan"
+      }
+    },
+    "set": {
+      "title": "Sediakan 2-Faktor",
+      "totpDescription": "Imbas kod QR dengan aplikasi pengesah anda.",
+      "smsDescription": "Masukkan nombor telefon anda untuk menerima kod melalui SMS.",
+      "emailDescription": "Masukkan alamat e-mel anda untuk menerima kod melalui e-mel.",
+      "totpRegisterDescription": "Imbas Kod QR atau navigasi ke URL secara manual.",
+      "submit": "Teruskan",
+      "labels": {
+        "code": "Kod"
+      },
+      "required": {
+        "code": "Medan ini diperlukan"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Sahkan dengan passkey",
+      "description": "Peranti anda akan meminta cap jari, wajah, atau kunci skrin anda",
+      "usePassword": "Gunakan kata laluan",
+      "submit": "Teruskan",
+      "errors": {
+        "couldNotRequestChallenge": "Tidak dapat meminta cabaran passkey",
+        "couldNotVerifyPasskey": "Tidak dapat mengesahkan passkey",
+        "noResponseReceived": "Pengesahan passkey gagal - tiada respons diterima",
+        "noRedirectProvided": "Pengesahan passkey selesai tetapi tiada ubah hala disediakan",
+        "couldNotRetrievePasskey": "Ralat telah berlaku semasa mendapatkan passkey",
+        "verificationCancelled": "Pengesahan passkey telah dibatalkan",
+        "verificationFailed": "Ralat telah berlaku semasa pengesahan passkey",
+        "couldNotFindSession": "Tidak dapat menemui sesi",
+        "couldNotUpdateSession": "Tidak dapat mengemas kini sesi",
+        "userNotFound": "Pengguna tidak ditemui dalam sistem",
+        "couldNotDetermineRedirect": "Tidak dapat menentukan URL ubah hala selepas pengesahan passkey"
+      }
+    },
+    "set": {
+      "title": "Sediakan passkey",
+      "description": "Peranti anda akan meminta cap jari, wajah, atau kunci skrin anda",
+      "info": {
+        "description": "Passkey ialah kaedah pengesahan pada peranti seperti cap jari anda, Apple FaceID atau yang serupa. ",
+        "link": "Pengesahan Passkey"
+      },
+      "skip": "Langkau",
+      "submit": "Teruskan"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "Sahkan 2-Faktor",
+      "description": "Sahkan akaun anda dengan peranti anda."
+    },
+    "set": {
+      "title": "Sediakan 2-Faktor",
+      "description": "Sediakan peranti sebagai faktor kedua.",
+      "submit": "Teruskan"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "Kata laluan"
+    },
+    "disabled": {
+      "title": "Pendaftaran dilumpuhkan",
+      "description": "Pendaftaran telah dilumpuhkan. Sila hubungi pentadbir anda."
+    },
+    "missingdata": {
+      "title": "Data tiada",
+      "description": "Berikan e-mel, nama pertama dan nama akhir untuk mendaftar."
+    },
+    "title": "Daftar",
+    "description": "Cipta akaun Zitadel anda.",
+    "noMethodAvailableWarning": "Tiada kaedah pengesahan tersedia. Sila hubungi pentadbir anda.",
+    "selectMethod": "Pilih kaedah yang anda ingin gunakan untuk mengesahkan",
+    "agreeTo": "Untuk mendaftar anda mesti bersetuju dengan terma dan syarat",
+    "termsOfService": "Terma Perkhidmatan",
+    "privacyPolicy": "Dasar Privasi",
+    "submit": "Teruskan",
+    "password": {
+      "title": "Tetapkan Kata Laluan",
+      "description": "Tetapkan kata laluan untuk akaun anda",
+      "submit": "Teruskan",
+      "labels": {
+        "password": "Kata laluan",
+        "confirmPassword": "Sahkan Kata Laluan"
+      },
+      "required": {
+        "password": "Anda mesti memberikan kata laluan!",
+        "confirmPassword": "Medan ini diperlukan"
+      }
+    },
+    "labels": {
+      "firstname": "Nama pertama",
+      "lastname": "Nama akhir",
+      "email": "E-mel"
+    },
+    "required": {
+      "firstname": "Medan ini diperlukan",
+      "lastname": "Medan ini diperlukan",
+      "email": "Medan ini diperlukan"
+    },
+    "errors": {
+      "couldNotCreateUser": "Tidak dapat mencipta pengguna",
+      "couldNotCreateSession": "Tidak dapat mencipta sesi",
+      "userNotFound": "Pengguna tidak ditemui dalam sistem",
+      "couldNotLinkIDP": "Tidak dapat memautkan IDP kepada pengguna",
+      "couldNotRegisterUser": "Tidak dapat mendaftar pengguna"
+    }
+  },
+  "invite": {
+    "title": "Jemput Pengguna",
+    "description": "Berikan alamat e-mel dan nama pengguna yang anda ingin jemput.",
+    "info": "Pengguna akan menerima e-mel dengan arahan lanjut.",
+    "notAllowed": "Tetapan anda tidak membenarkan anda menjemput pengguna.",
+    "submit": "Teruskan",
+    "success": {
+      "title": "Pengguna dijemput",
+      "description": "E-mel telah berjaya dihantar.",
+      "verified": "Pengguna telah dijemput dan telah pun mengesahkan e-melnya.",
+      "notVerifiedYet": "Pengguna telah dijemput. Mereka akan menerima e-mel dengan arahan lanjut.",
+      "submit": "Jemput pengguna lain"
+    }
+  },
+  "signedin": {
+    "title": "Selamat datang {user}!",
+    "description": "Anda telah log masuk.",
+    "continue": "Teruskan",
+    "error": {
+      "title": "Ralat",
+      "description": "Ralat telah berlaku semasa cuba log masuk."
+    }
+  },
+  "verify": {
+    "userIdMissing": "Tiada userId disediakan!",
+    "successTitle": "Pengguna disahkan",
+    "successDescription": "Pengguna telah berjaya disahkan.",
+    "successContinue": "Teruskan",
+    "setupAuthenticator": "Sediakan pengesah",
+    "verify": {
+      "title": "Sahkan pengguna",
+      "description": "Masukkan Kod yang disediakan dalam e-mel pengesahan.",
+      "noCodeReceived": "Tidak menerima kod?",
+      "resendCode": "Hantar semula kod",
+      "codeSent": "Kod baharu baru sahaja dihantar ke alamat e-mel anda.",
+      "submit": "Teruskan",
+      "labels": {
+        "code": "Kod"
+      },
+      "required": {
+        "code": "Medan ini diperlukan"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "Tidak dapat menghantar semula e-mel",
+      "couldNotVerifyUser": "Tidak dapat mengesahkan pengguna",
+      "couldNotVerifyInvite": "Tidak dapat mengesahkan jemputan",
+      "couldNotVerifyEmail": "Tidak dapat mengesahkan e-mel",
+      "couldNotVerify": "Tidak dapat mengesahkan",
+      "couldNotLoadUser": "Tidak dapat memuatkan pengguna",
+      "couldNotLoadAuthenticators": "Tidak dapat memuatkan pengesah yang mungkin",
+      "couldNotCreateSession": "Tidak dapat mencipta sesi",
+      "noHostFound": "Tiada hos ditemui",
+      "userAlreadyVerified": "Pengguna telah pun disahkan!",
+      "couldNotResendInvite": "Tidak dapat menghantar semula jemputan",
+      "inviteSendFailed": "Gagal menghantar e-mel jemputan",
+      "emailSendFailed": "Gagal menghantar e-mel pengesahan",
+      "contextMissing": "Ralat telah berlaku. Sila cuba lagi."
+    }
+  },
+  "authenticator": {
+    "title": "Pilih kaedah pengesahan",
+    "description": "Pilih kaedah yang anda ingin gunakan untuk mengesahkan",
+    "noMethodsAvailable": "Tiada kaedah pengesahan tersedia",
+    "allSetup": "Anda telah pun menyediakan pengesah!",
+    "linkWithIDP": "atau pautkan dengan Penyedia Identiti"
+  },
+  "device": {
+    "usercode": {
+      "title": "Kod peranti",
+      "description": "Masukkan kod yang dipaparkan pada aplikasi atau peranti anda.",
+      "submit": "Teruskan",
+      "labels": {
+        "code": "Kod"
+      },
+      "required": {
+        "code": "Medan ini diperlukan"
+      }
+    },
+    "request": {
+      "title": "{appName} ingin menyambung",
+      "description": "{appName} akan mempunyai akses kepada:",
+      "disclaimer": "Dengan mengklik Benarkan, anda membenarkan {appName} dan Zitadel menggunakan maklumat anda mengikut terma perkhidmatan dan dasar privasi masing-masing. Anda boleh membatalkan akses ini pada bila-bila masa.",
+      "submit": "Benarkan",
+      "deny": "Tolak"
+    },
+    "scope": {
+      "openid": "Sahkan identiti anda.",
+      "email": "Lihat alamat e-mel anda.",
+      "profile": "Lihat maklumat profil penuh anda.",
+      "offline_access": "Benarkan akses luar talian ke akaun anda."
+    }
+  },
+  "error": {
+    "noUserCode": "Tiada kod pengguna disediakan!",
+    "noDeviceRequest": "Tiada permintaan peranti ditemui.",
+    "unknownContext": "Tidak dapat memperoleh konteks pengguna. Pastikan anda memasukkan nama pengguna terlebih dahulu atau berikan loginName sebagai searchParam.",
+    "sessionExpired": "Sesi semasa anda telah tamat tempoh. Sila log masuk semula.",
+    "failedLoading": "Gagal memuatkan data. Sila cuba lagi.",
+    "tryagain": "Cuba Lagi",
+    "couldNotContinueSession": "Tidak dapat meneruskan sesi - maklumat pengguna tiada"
+  }
+}
