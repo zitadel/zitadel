@@ -209,7 +209,9 @@
         "PREVIOUS_TABLE": {
           "TITLE": "Předchozí webové klíče",
           "DESCRIPTION": "Toto jsou vaše předchozí webové klíče, které již nejsou aktivní.",
-          "DEACTIVATED_ON": "Deaktivováno dne"
+          "DEACTIVATED_ON": "Deaktivováno dne",
+          "DELETE_TITLE": "Smazat předchozí webový klíč",
+          "DELETE_DESCRIPTION": "Odstranění tohoto předchozího webového klíče zneplatní všechny tokeny, které jím byly podepsány. Tuto akci nelze vrátit zpět."
         }
       },
       "MESSAGE_TEXTS": {
