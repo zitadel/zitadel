@@ -1551,7 +1551,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "ar": "العربية"
+        "ar": "العربية",
+        "nb": "Norsk bokmål"
       }
     },
     "SMTP": {
@@ -1798,7 +1799,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "ar": "العربية"
+        "ar": "العربية",
+        "nb": "Norsk bokmål"
       },
       "KEYS": {
         "emailVerificationDoneText": "تم التحقق من البريد الإلكتروني",
@@ -2784,7 +2786,8 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "ar": "العربية"
+    "ar": "العربية",
+    "nb": "Norsk bokmål"
   },
   "MEMBER": {
     "ADD": "إضافة مسؤول النظام",
