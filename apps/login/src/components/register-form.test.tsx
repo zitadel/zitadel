@@ -29,4 +29,10 @@ describe("RegisterForm", () => {
     const { getByTestId } = render(<RegisterForm legal={defaultLegal} organization="org-1" idpCount={0} />);
     expect(getByTestId("firstname-text-input")).toHaveFocus();
   });
+
+  test("should set standard name autofill tokens on the name inputs", () => {
+    const { getByTestId } = render(<RegisterForm legal={defaultLegal} organization="org-1" idpCount={0} />);
+    expect(getByTestId("firstname-text-input")).toHaveAttribute("autocomplete", "given-name");
+    expect(getByTestId("lastname-text-input")).toHaveAttribute("autocomplete", "family-name");
+  });
 });
