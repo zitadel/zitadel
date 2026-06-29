@@ -803,13 +803,17 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 	if err != nil {
 		return nil, err
 	}
+	resourceOwnerQuery, err := NewColumnComparisonQuery(LoginNameResourceOwnerCol, UserResourceOwnerCol, ColumnEquals)
+	if err != nil {
+		return nil, err
+	}
 	// text query to select data from the linked sub select
 	loginNameQuery, err := NewTextQuery(LoginNameNameCol, value, comparison)
 	if err != nil {
 		return nil, err
 	}
 	// full definition of the sub select
-	subSelect, err := NewSubSelect(LoginNameUserIDCol, []SearchQuery{instanceQuery, userIDQuery, loginNameQuery})
+	subSelect, err := NewSubSelect(LoginNameUserIDCol, []SearchQuery{instanceQuery, userIDQuery, resourceOwnerQuery, loginNameQuery})
 	if err != nil {
 		return nil, err
 	}

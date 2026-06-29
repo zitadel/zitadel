@@ -4,7 +4,7 @@ import "github.com/zitadel/zitadel/internal/query/projection"
 
 var (
 	loginNameTable = table{
-		name:          projection.LoginNameProjectionTable,
+		name:          "projections.login_names4",
 		instanceIDCol: projection.LoginNameUserInstanceIDCol,
 	}
 	LoginNameUserIDCol = Column{
@@ -21,6 +21,10 @@ var (
 	}
 	LoginNameInstanceIDCol = Column{
 		name:  projection.LoginNameInstanceIDCol,
+		table: loginNameTable,
+	}
+	LoginNameResourceOwnerCol = Column{
+		name:  "resource_owner",
 		table: loginNameTable,
 	}
 )
