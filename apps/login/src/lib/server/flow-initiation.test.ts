@@ -242,6 +242,31 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     expect(location).not.toContain("/accounts");
   });
 
+  test("should include submit=true when loginHint is set and org scope filters out all sessions", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: ["urn:zitadel:iam:org:id:111111"],
+        prompt: [],
+        loginHint: "user@example.com",
+      },
+    });
+
+    const res = await handleOIDCFlowInitiation(
+      makeBaseParams({
+        sessions: [otherOrgSession] as any,
+        sessionCookies: [{ id: "session-other", token: "tok" }],
+      }),
+    );
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toContain("/loginname");
+    expect(location).toContain("loginName=user%40example.com");
+    expect(location).toContain("submit=true");
+    expect(location).not.toContain("/accounts");
+  });
+
   test("should redirect to /accounts when org-eligible sessions exist but none are valid (default prompt)", async () => {
     mockGetAuthRequest.mockResolvedValue({
       authRequest: {
