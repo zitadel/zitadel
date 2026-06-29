@@ -551,7 +551,11 @@ func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, p
 		}
 		queries = append(queries, usernameQuery)
 	case domain.AutoLinkingOptionEmail:
-		// Email will always be checked against verified email addresses.
+		// When checking for email matches, we need to make sure that both (the one from the IdP and the one in Zitadel)
+		// are verified to prevent potential account takeovers.
+		if !externalUser.IsEmailVerified {
+			return false, nil
+		}
 		emailQuery, err := query.NewUserVerifiedEmailSearchQuery(string(externalUser.Email))
 		if err != nil {
 			return false, nil

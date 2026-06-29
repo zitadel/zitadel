@@ -16,8 +16,14 @@ export function handleServerActionResponse(
   }
 
   if ("redirect" in response && response.redirect) {
-    router.push(response.redirect);
-    return true;
+    if (isSafeRedirectUri(response.redirect)) {
+      router.push(response.redirect);
+      return true;
+    } else {
+      console.warn("handleServerActionResponse: Blocked unsafe redirect URI:", response.redirect);
+      setError("Unsafe redirect URI was blocked");
+      return true;
+    }
   }
 
   if ("samlData" in response && response.samlData) {
