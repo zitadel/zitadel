@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
-import { defer, EMPTY, Observable, of, shareReplay, Subject, switchMap, take } from 'rxjs';
+import { defer, EMPTY, firstValueFrom, lastValueFrom, Observable, of, shareReplay, Subject, switchMap } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { InfoDialogComponent, InfoDialogData, InfoDialogResult } from 'src/app/modules/info-dialog/info-dialog.component';
@@ -183,42 +183,40 @@ export class AuthUserDetailComponent implements OnInit {
     });
   }
 
-  protected changeUsername(user: User): void {
+  protected async changeUsername(user: User) {
     const data = {
-      confirmKey: 'ACTIONS.CHANGE' as const,
-      cancelKey: 'ACTIONS.CANCEL' as const,
-      labelKey: 'ACTIONS.NEWVALUE' as const,
-      titleKey: 'USER.PROFILE.CHANGEUSERNAME_TITLE' as const,
-      descriptionKey: 'USER.PROFILE.CHANGEUSERNAME_DESC' as const,
+      confirmKey: 'ACTIONS.CHANGE',
+      cancelKey: 'ACTIONS.CANCEL',
+      labelKey: 'ACTIONS.NEWVALUE',
+      titleKey: 'USER.PROFILE.CHANGEUSERNAME_TITLE',
+      descriptionKey: 'USER.PROFILE.CHANGEUSERNAME_DESC',
       value: user.username,
-    };
-    const dialogRef = this.dialog.open<EditDialogComponent, typeof data, EditDialogResult>(EditDialogComponent, {
+      type: EditDialogType.GENERIC,
+    } as const satisfies EditDialogData;
+
+    const dialogRef = this.dialog.open<EditDialogComponent, EditDialogData, EditDialogResult>(EditDialogComponent, {
       data,
       width: '400px',
     });
 
-    dialogRef
-      .afterClosed()
-      .pipe(
-        map((value) => value?.value),
-        filter(Boolean),
-        filter((value) => user.username != value),
-        switchMap((username) => this.userService.updateUser({ userId: user.userId, username })),
-      )
-      .subscribe({
-        next: () => {
-          this.toast.showInfo('USER.TOAST.USERNAMECHANGED', true);
-          this.invalidateUser().then();
-        },
-        error: (error) => {
-          this.toast.showError(error);
-        },
-      });
+    const { value: username } = (await lastValueFrom(dialogRef.afterClosed())) ?? {};
+    if (!username || user.username === username) {
+      // no changes made
+      return;
+    }
+
+    try {
+      await this.userService.updateUser({ userId: user.userId, username });
+      this.toast.showInfo('USER.TOAST.USERNAMECHANGED', true);
+      await this.invalidateUser();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  public saveProfile(user: User, profile: HumanProfile): void {
-    this.userService
-      .updateUser({
+  public async saveProfile(user: User, profile: HumanProfile) {
+    try {
+      await this.userService.updateUser({
         userId: user.userId,
         profile: {
           givenName: profile.givenName,
@@ -228,30 +226,26 @@ export class AuthUserDetailComponent implements OnInit {
           preferredLanguage: profile.preferredLanguage,
           gender: profile.gender,
         },
-      })
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.SAVED', true);
-        this.invalidateUser().then();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
       });
+      this.toast.showInfo('USER.TOAST.SAVED', true);
+      await this.invalidateUser();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  public enteredPhoneCode(code: string): void {
-    this.newAuthService
-      .verifyMyPhone(code)
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.PHONESAVED', true);
-        this.invalidateUser().then();
-        this.promptSetupforSMSOTP();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+  public async enteredPhoneCode(code: string) {
+    try {
+      await this.newAuthService.verifyMyPhone(code);
+      this.toast.showInfo('USER.TOAST.PHONESAVED', true);
+      await this.invalidateUser();
+      await this.promptSetupforSMSOTP();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  public promptSetupforSMSOTP(): void {
+  public async promptSetupforSMSOTP() {
     const dialogRef = this.dialog.open<InfoDialogComponent, InfoDialogData, InfoDialogResult>(InfoDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.CONTINUE',
@@ -262,71 +256,63 @@ export class AuthUserDetailComponent implements OnInit {
       width: '400px',
     });
 
-    dialogRef
-      .afterClosed()
-      .pipe(
-        filter(Boolean),
-        switchMap(() => this.newAuthService.addMyAuthFactorOTPSMS()),
-        switchMap(() => this.translate.get('USER.MFA.OTPSMSSUCCESS').pipe(take(1))),
-      )
-      .subscribe({
-        next: (msg) => this.toast.showInfo(msg),
-        error: (err) => this.toast.showError(err),
-      });
+    const confirmed = await lastValueFrom(dialogRef.afterClosed());
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await this.newAuthService.addMyAuthFactorOTPSMS();
+      this.toast.showInfo('USER.MFA.OTPSMSSUCCESS', true);
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
   public changedLanguage(language: string): void {
     this.translate.use(language);
   }
 
-  public resendEmailVerification(user: User): void {
-    this.newMgmtService
-      .resendHumanEmailVerification(user.userId)
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
-        this.invalidateUser().then();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
-  }
-
-  public resendPhoneVerification(user: User): void {
-    this.newMgmtService
-      .resendHumanPhoneVerification(user.userId)
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
-        this.invalidateUser().then();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
-  }
-
-  public deletePhone(user: User): void {
-    this.userService
-      .removePhone(user.userId)
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
-        this.invalidateUser().then();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
-  }
-
-  public openEditDialog(user: UserWithHumanType, type: EditDialogType): void {
-    switch (type) {
-      case EditDialogType.PHONE:
-        this.openEditPhoneDialog(user);
-        return;
-      case EditDialogType.EMAIL:
-        this.openEditEmailDialog(user);
-        return;
+  public async resendEmailVerification(user: User) {
+    try {
+      await this.newMgmtService.resendHumanEmailVerification(user.userId);
+      this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
+      await this.invalidateUser();
+    } catch (error) {
+      this.toast.showError(error);
     }
   }
 
-  private openEditEmailDialog(user: UserWithHumanType) {
+  public async resendPhoneVerification(user: User) {
+    try {
+      await this.newMgmtService.resendHumanPhoneVerification(user.userId);
+      this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
+      await this.invalidateUser();
+    } catch (error) {
+      this.toast.showError(error);
+    }
+  }
+
+  public async deletePhone(user: User) {
+    try {
+      await this.userService.removePhone(user.userId);
+      this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
+      await this.invalidateUser();
+    } catch (error) {
+      this.toast.showError(error);
+    }
+  }
+
+  public async openEditDialog(user: UserWithHumanType, type: EditDialogType) {
+    switch (type) {
+      case EditDialogType.PHONE:
+        return this.openEditPhoneDialog(user);
+      case EditDialogType.EMAIL:
+        return this.openEditEmailDialog(user);
+    }
+  }
+
+  private async openEditEmailDialog(user: UserWithHumanType) {
     const data: EditDialogData = {
       confirmKey: 'ACTIONS.SAVE',
       cancelKey: 'ACTIONS.CANCEL',
@@ -335,35 +321,32 @@ export class AuthUserDetailComponent implements OnInit {
       descriptionKey: 'USER.LOGINMETHODS.EMAIL.EDITDESC',
       value: user.type.value?.email?.email,
       type: EditDialogType.EMAIL,
-    } as const;
+    } as const satisfies EditDialogData;
 
     const dialogRefEmail = this.dialog.open<EditDialogComponent, EditDialogData, EditDialogResult>(EditDialogComponent, {
       data,
       width: '400px',
     });
 
-    dialogRefEmail
-      .afterClosed()
-      .pipe(
-        filter((resp): resp is Required<EditDialogResult> => !!resp?.value),
-        switchMap(({ value, isVerified }) =>
-          this.userService.setEmail({
-            userId: user.userId,
-            email: value,
-            verification: isVerified ? { case: 'isVerified', value: isVerified } : { case: undefined },
-          }),
-        ),
-      )
-      .subscribe({
-        next: () => {
-          this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
-          this.invalidateUser().then();
-        },
-        error: (error) => this.toast.showError(error),
+    const { value, isVerified } = (await lastValueFrom(dialogRefEmail.afterClosed())) ?? {};
+    if (!value) {
+      return;
+    }
+
+    try {
+      await this.userService.setEmail({
+        userId: user.userId,
+        email: value,
+        verification: isVerified ? { case: 'isVerified', value: isVerified } : { case: undefined },
       });
+      this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
+      await this.invalidateUser();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  private openEditPhoneDialog(user: UserWithHumanType) {
+  private async openEditPhoneDialog(user: UserWithHumanType) {
     const data = {
       confirmKey: 'ACTIONS.SAVE',
       cancelKey: 'ACTIONS.CANCEL',
@@ -372,32 +355,30 @@ export class AuthUserDetailComponent implements OnInit {
       descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
       value: user.type.value.phone?.phone,
       type: EditDialogType.PHONE,
-      validator: Validators.compose([phoneValidator, requiredValidator]),
-    };
-    const dialogRefPhone = this.dialog.open<EditDialogComponent, typeof data, { value: string; isVerified: boolean }>(
-      EditDialogComponent,
-      { data, width: '400px' },
-    );
+      validator: Validators.compose([phoneValidator, requiredValidator]) ?? undefined,
+    } as const satisfies EditDialogData;
 
-    dialogRefPhone
-      .afterClosed()
-      .pipe(
-        map((resp) => formatPhone(resp?.value)),
-        filter(Boolean),
-        switchMap(({ phone }) => this.userService.setPhone({ userId: user.userId, phone })),
-      )
-      .subscribe({
-        next: () => {
-          this.toast.showInfo('USER.TOAST.PHONESAVED', true);
-          this.invalidateUser().then();
-        },
-        error: (error) => {
-          this.toast.showError(error);
-        },
-      });
+    const dialogRefPhone = this.dialog.open<EditDialogComponent, EditDialogData, EditDialogResult>(EditDialogComponent, {
+      data,
+      width: '400px',
+    });
+
+    const { value } = (await lastValueFrom(dialogRefPhone.afterClosed())) ?? {};
+    const formatted = formatPhone(value);
+    if (!formatted) {
+      return;
+    }
+
+    try {
+      await this.userService.setPhone({ userId: user.userId, phone: formatted.phone });
+      this.toast.showInfo('USER.TOAST.PHONESAVED', true);
+      await this.invalidateUser();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  public deleteUser(user: User): void {
+  public async deleteUser(user: User) {
     const data = {
       confirmKey: 'USER.DIALOG.DELETE_BTN',
       cancelKey: 'ACTIONS.CANCEL',
@@ -410,29 +391,28 @@ export class AuthUserDetailComponent implements OnInit {
       width: '400px',
     });
 
-    dialogRef
-      .afterClosed()
-      .pipe(
-        filter(Boolean),
-        switchMap(() => this.userService.deleteUser(user.userId)),
-      )
-      .subscribe({
-        next: () => {
-          this.toast.showInfo('USER.PAGES.DELETEACCOUNT_SUCCESS', true);
-          this.auth.signout();
-        },
-        error: (error) => this.toast.showError(error),
-      });
+    const confirmed = await lastValueFrom(dialogRef.afterClosed());
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await this.userService.deleteUser(user.userId);
+      this.toast.showInfo('USER.PAGES.DELETEACCOUNT_SUCCESS', true);
+      this.auth.signout();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  public editMetadata(user: User, metadata: Metadata[]): void {
+  public async editMetadata(user: User, metadata: Metadata[]) {
     const setFcn = (key: string, value: string) =>
       this.newMgmtService.setUserMetadata({
         key,
         value: Buffer.from(value),
         id: user.userId,
       });
-    const removeFcn = (key: string): Promise<any> => this.newMgmtService.removeUserMetadata({ key, id: user.userId });
+    const removeFcn = (key: string) => this.newMgmtService.removeUserMetadata({ key, id: user.userId });
 
     const dialogRef = this.dialog.open<MetadataDialogComponent, MetadataDialogData>(MetadataDialogComponent, {
       data: {
@@ -442,15 +422,9 @@ export class AuthUserDetailComponent implements OnInit {
       },
     });
 
-    dialogRef
-      .afterClosed()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.refreshMetadata$.next(true);
-      });
+    await lastValueFrom(dialogRef.afterClosed());
+    this.refreshMetadata$.next(true);
   }
-
-  protected readonly query = query;
 
   public humanUser(user: User | undefined): UserWithHumanType | undefined {
     if (user?.type.case === 'human') {
