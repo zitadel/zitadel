@@ -197,6 +197,8 @@ export function SetPasswordForm({
               </div>
             </Alert>
           )}
+          {loginName && <input type="hidden" name="loginName" autoComplete="username" value={loginName} />}
+
           {codeRequired && (
             <div>
               <TextInput

@@ -56,4 +56,22 @@ describe("SetPasswordForm", () => {
     );
     expect(getByTestId("password-set-text-input")).toHaveFocus();
   });
+
+  test("should render a hidden username field before the password input so managers save the right account", () => {
+    const { container, getByTestId } = render(
+      <SetPasswordForm
+        passwordComplexitySettings={defaultComplexitySettings}
+        loginName="test@example.com"
+        userId="user-1"
+        codeRequired={false}
+      />,
+    );
+
+    const username = container.querySelector('input[autocomplete="username"]');
+    expect(username).not.toBeNull();
+    expect(username).toHaveValue("test@example.com");
+
+    const password = getByTestId("password-set-text-input");
+    expect(username!.compareDocumentPosition(password) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
 });
