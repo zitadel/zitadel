@@ -26,6 +26,7 @@ const (
 	LoginNameUserCol       = "user_id"
 	LoginNameIsPrimaryCol  = "is_primary"
 	LoginNameInstanceIDCol = "instance_id"
+	LoginNameLowerCol      = "login_name_lower"
 
 	usersAlias         = "users"
 	policyCustomAlias  = "policy_custom"

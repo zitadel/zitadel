@@ -804,7 +804,12 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 		return nil, err
 	}
 	// text query to select data from the linked sub select
-	loginNameQuery, err := NewTextQuery(LoginNameNameCol, value, comparison)
+	var loginNameQuery SearchQuery
+	if comparison == TextEqualsIgnoreCase {
+		loginNameQuery, err = NewTextQuery(LoginNameNameLowerCol, strings.ToLower(value), TextEquals)
+	} else {
+		loginNameQuery, err = NewTextQuery(LoginNameNameCol, value, comparison)
+	}
 	if err != nil {
 		return nil, err
 	}
