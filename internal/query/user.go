@@ -834,7 +834,7 @@ var joinLoginNames = `LEFT JOIN LATERAL (` +
 	` ARRAY_AGG(ln.login_name ORDER BY ln.login_name) AS login_names,` +
 	` MAX(CASE WHEN ln.is_primary THEN ln.login_name ELSE NULL END) AS preferred_login_name` +
 	` FROM` +
-	` projections.login_names3 AS ln` +
+	` projections.login_names4 AS ln` +
 	` WHERE` +
 	` ln.user_id = ` + UserIDCol.identifier() +
 	` AND ln.instance_id = ` + UserInstanceIDCol.identifier() +

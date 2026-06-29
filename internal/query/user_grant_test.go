@@ -34,7 +34,7 @@ var (
 			", projections.users14_humans.email" +
 			", projections.users14_humans.display_name" +
 			", projections.users14_humans.avatar_key" +
-			", projections.login_names3.login_name" +
+			", projections.login_names4.login_name" +
 			", projections.user_grants5.resource_owner" +
 			", projections.orgs1.name" +
 			", projections.orgs1.primary_domain" +
@@ -52,9 +52,9 @@ var (
 			" LEFT JOIN projections.orgs1 AS user_orgs ON projections.users14.resource_owner = user_orgs.id AND projections.users14.instance_id = user_orgs.instance_id" +
 			" LEFT JOIN projections.project_grants4 ON projections.user_grants5.grant_id = projections.project_grants4.grant_id AND projections.user_grants5.instance_id = projections.project_grants4.instance_id AND projections.project_grants4.project_id = projections.user_grants5.project_id" +
 			" LEFT JOIN projections.orgs1 AS granted_orgs ON projections.project_grants4.granted_org_id = granted_orgs.id AND projections.project_grants4.instance_id = granted_orgs.instance_id" +
-			" LEFT JOIN projections.login_names3 ON projections.user_grants5.user_id = projections.login_names3.user_id AND projections.user_grants5.instance_id = projections.login_names3.instance_id" +
+			" LEFT JOIN projections.login_names4 ON projections.user_grants5.user_id = projections.login_names4.user_id AND projections.user_grants5.instance_id = projections.login_names4.instance_id" +
 			" LEFT JOIN LATERAL (SELECT JSON_AGG( JSON_BUILD_OBJECT( 'role_key', pr.role_key, 'display_name', pr.display_name, 'group_name', pr.group_name ) ) as role_information FROM projections.project_roles4 pr WHERE pr.instance_id = projections.user_grants5.instance_id AND pr.project_id = projections.user_grants5.project_id AND pr.role_key = ANY(projections.user_grants5.roles)) as roles ON true " +
-			" WHERE projections.login_names3.is_primary = $1")
+			" WHERE projections.login_names4.is_primary = $1")
 	userGrantCols = []string{
 		"id",
 		"creation_date",
@@ -106,7 +106,7 @@ var (
 			", projections.users14_humans.email" +
 			", projections.users14_humans.display_name" +
 			", projections.users14_humans.avatar_key" +
-			", projections.login_names3.login_name" +
+			", projections.login_names4.login_name" +
 			", projections.user_grants5.resource_owner" +
 			", projections.orgs1.name" +
 			", projections.orgs1.primary_domain" +
@@ -125,9 +125,9 @@ var (
 			" LEFT JOIN projections.orgs1 AS user_orgs ON projections.users14.resource_owner = user_orgs.id AND projections.users14.instance_id = user_orgs.instance_id" +
 			" LEFT JOIN projections.project_grants4 ON projections.user_grants5.grant_id = projections.project_grants4.grant_id AND projections.user_grants5.instance_id = projections.project_grants4.instance_id AND projections.project_grants4.project_id = projections.user_grants5.project_id" +
 			" LEFT JOIN projections.orgs1 AS granted_orgs ON projections.project_grants4.granted_org_id = granted_orgs.id AND projections.project_grants4.instance_id = granted_orgs.instance_id" +
-			" LEFT JOIN projections.login_names3 ON projections.user_grants5.user_id = projections.login_names3.user_id AND projections.user_grants5.instance_id = projections.login_names3.instance_id" +
+			" LEFT JOIN projections.login_names4 ON projections.user_grants5.user_id = projections.login_names4.user_id AND projections.user_grants5.instance_id = projections.login_names4.instance_id" +
 			" LEFT JOIN LATERAL (SELECT JSON_AGG( JSON_BUILD_OBJECT( 'role_key', pr.role_key, 'display_name', pr.display_name, 'group_name', pr.group_name ) ) as role_information FROM projections.project_roles4 pr WHERE pr.instance_id = projections.user_grants5.instance_id AND pr.project_id = projections.user_grants5.project_id AND pr.role_key = ANY(projections.user_grants5.roles)) as roles ON true " +
-			" WHERE projections.login_names3.is_primary = $1")
+			" WHERE projections.login_names4.is_primary = $1")
 	userGrantsCols = append(
 		userGrantCols,
 		"count",

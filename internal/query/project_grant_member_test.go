@@ -21,7 +21,7 @@ var (
 		", members.user_resource_owner" +
 		", members.user_id" +
 		", members.roles" +
-		", projections.login_names3.login_name" +
+		", projections.login_names4.login_name" +
 		", projections.users14_humans.email" +
 		", projections.users14_humans.first_name" +
 		", projections.users14_humans.last_name" +
@@ -40,14 +40,14 @@ var (
 		"LEFT JOIN projections.users14 " +
 		"ON members.user_id = projections.users14.id " +
 		"AND members.instance_id = projections.users14.instance_id " +
-		"LEFT JOIN projections.login_names3 " +
-		"ON members.user_id = projections.login_names3.user_id " +
-		"AND members.instance_id = projections.login_names3.instance_id " +
+		"LEFT JOIN projections.login_names4 " +
+		"ON members.user_id = projections.login_names4.user_id " +
+		"AND members.instance_id = projections.login_names4.instance_id " +
 		"LEFT JOIN projections.project_grants4 " +
 		"ON members.grant_id = projections.project_grants4.grant_id " +
 		"AND members.instance_id = projections.project_grants4.instance_id " +
 		"AND members.project_id = projections.project_grants4.project_id " +
-		"WHERE projections.login_names3.is_primary = $1")
+		"WHERE projections.login_names4.is_primary = $1")
 	projectGrantMembersColumns = []string{
 		"creation_date",
 		"change_date",
