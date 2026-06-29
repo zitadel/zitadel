@@ -91,6 +91,7 @@ const gotoLoginname = ({
 
   if (loginHint) {
     loginNameUrl.searchParams.set("loginName", loginHint);
+    loginNameUrl.searchParams.set("submit", "true");
   }
   if (organization) {
     loginNameUrl.searchParams.set("organization", organization);
