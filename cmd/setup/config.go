@@ -191,6 +191,7 @@ type Steps struct {
 	s69CacheTablesLogged                    *CacheTablesLogged
 	s70AddEventStoreCommandEnforceOwner     *AddEventStoreCommandEnforceOwnerColumn
 	s71JWTProvideAddAudienceColumn          *JWTProvideAddAudienceColumn
+	s72AddColumnsToLoginNamesView           *AddColumnsToLoginNamesView
 }
 
 func NewSteps(ctx context.Context, v *viper.Viper) (*Steps, error) {
