@@ -56,27 +56,7 @@ The benefits of integrating ZITADEL for managing external IdPs are multiple:
 
 - **Session creation and access granting**: After the account is created or linked and the profile is set, the application grants access by creating a session for the user based on their authenticated identity.
 
-## Troubleshooting SSO and SAML login issues
 
-When troubleshooting SSO and SAML login issues, ZITADEL provides several tools to help you diagnose problems:
-
-### Accessing audit logs and events
-
-ZITADEL Cloud users can access audit logs through the [audit trail](/concepts/features/audit-trail) and [Events API](/guides/integrate/zitadel-apis/event-api). While runtime/server logs are not available on ZITADEL Cloud, you can:
-
-- Access the Console from your instance settings and check for **Events** and **Failed Events**
-- Use the Events API to retrieve login failure events and other authentication-related events
-- Filter events by type, user, organization, or time period to narrow down issues
-
-### Common SAML login errors
-
-If you encounter errors like "Neither creation nor linking is allowed" during SAML login, this typically means your IdP settings have all account creation and linking options disabled. To resolve this:
-
-- Enable **Account linking allowed** in your IdP settings if users already exist in your organization
-- Configure the appropriate linking option (such as "check for existing Email") for automatic account linking
-- Ensure at least one of the account creation or linking options is enabled for the IdP to function
-
-For more details on configuring these settings, see the [Key settings on the templates](#key-settings-on-the-templates) section.
 
 ## Setting up external identity providers in ZITADEL
 
