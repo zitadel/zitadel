@@ -1,0 +1,45 @@
+---
+title: Authenticate users with SAML
+sidebar_label: SAML
+---
+
+This guide explains how to authenticate users with SAML in ZITADEL and how to troubleshoot common issues.
+
+## Overview
+
+ZITADEL supports SAML 2.0 for integrating external identity providers. When users authenticate through a SAML IdP, ZITADEL receives a SAML response containing user attributes that can be used to create or link user accounts.
+
+## Troubleshooting SAML SSO
+
+### Viewing SAML logs and events
+
+When troubleshooting SAML SSO login attempts, you can access authentication events through ZITADEL's audit trail:
+
+1. **Console Event Viewer**: Navigate to your instance settings and select the **Events** tab to view all events, including failed authentication attempts
+2. **Events API**: Use the [Events API](https://zitadel.com/docs/guides/integrate/zitadel-apis/event-api) to programmatically query authentication events
+3. **Failed Events**: Check the **Failed Events** section in the Console to identify login failures
+
+Note: On ZITADEL Cloud, you don't have access to runtime/server logs, but the audit trail and Events API provide comprehensive event data for troubleshooting.
+
+### Common SAML authentication errors
+
+**"Neither creation of linking is allowed"**
+
+This error occurs when your IdP settings don't allow ZITADEL to create new accounts or link to existing ones. To resolve:
+
+1. Go to your IdP provider settings in ZITADEL
+2. Enable **Account linking allowed** if users already exist in your organization
+3. Select **Check for existing Email** as the linking option
+4. Ensure at least one of these options is enabled:
+   - **Automatic creation** (for new users)
+   - **Account linking allowed** (for existing users)
+
+### Attribute mapping issues
+
+If users exist in ZITADEL but auto-linking fails, verify that:
+
+- The SAML response includes the required attributes (email, firstName, lastName)
+- The **Account linking allowed** setting is enabled in your IdP configuration
+- The linking criteria (email or username) matches between the IdP and ZITADEL
+
+For more information on account linking, see [Account linking](https://zitadel.com/docs/concepts/features/account-linking).
