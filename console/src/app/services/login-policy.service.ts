@@ -23,10 +23,10 @@ export class LoginPolicyService {
   ): Observable<any> {
     const isAdmin = service instanceof AdminService;
     if (isAdmin) {
-      service.addIDPToLoginPolicy(id);
+      return from(service.addIDPToLoginPolicy(id));
     }
 
-    if (!isAdmin && owner !== IDPOwnerType.IDP_OWNER_TYPE_SYSTEM && owner !== IDPOwnerType.IDP_OWNER_TYPE_ORG) {
+    if (owner !== IDPOwnerType.IDP_OWNER_TYPE_SYSTEM && owner !== IDPOwnerType.IDP_OWNER_TYPE_ORG) {
       throw new Error('Must specify owner for management service');
     }
 
