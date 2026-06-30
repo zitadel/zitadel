@@ -1,4 +1,5 @@
 import { getValidLocaleFromUILocales } from "@/lib/auth-utils";
+import { isSafeRedirectUri } from "@/lib/client-utils";
 import { getLanguageCookie, setLanguageCookie } from "@/lib/cookies";
 
 import { shouldUILocalesOverrideCookie } from "@/lib/i18n";
@@ -360,6 +361,10 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         }),
       });
 
+      if (!isSafeRedirectUri(callbackUrl)) {
+        logger.warn("Blocked unsafe OIDC callback URL (prompt=none)", { callbackUrl });
+        return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+      }
       const callbackResponse = NextResponse.redirect(callbackUrl);
       setCSPHeaders(callbackResponse, serviceConfig, securitySettings);
       return callbackResponse;
@@ -412,6 +417,10 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           }),
         });
         if (callbackUrl) {
+          if (!isSafeRedirectUri(callbackUrl)) {
+            logger.warn("Blocked unsafe OIDC callback URL", { callbackUrl });
+            return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+          }
           return NextResponse.redirect(callbackUrl);
         } else {
           logger.info("could not create callback, redirect user to choose other account");
@@ -511,8 +520,16 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
     });
 
     if (url && binding.case === "redirect") {
+      if (!isSafeRedirectUri(url)) {
+        logger.warn("Blocked unsafe SAML redirect URL", { url });
+        return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+      }
       return NextResponse.redirect(url);
     } else if (url && binding.case === "post") {
+      if (!isSafeRedirectUri(url)) {
+        logger.warn("Blocked unsafe SAML post URL", { url });
+        return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+      }
       const html = `
         <html>
           <body onload="document.forms[0].submit()">
