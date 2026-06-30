@@ -809,7 +809,7 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 	}
 	// text query to select data from the linked sub select
 	var loginNameQuery SearchQuery
-		loginNameQuery, err = NewTextQuery(LoginNameNameCol, value, comparison)
+	loginNameQuery, err = NewTextQuery(LoginNameNameCol, value, comparison)
 	if comparison == TextEqualsIgnoreCase {
 		loginNameQuery, err = NewTextQuery(LoginNameNameLowerCol, strings.ToLower(value), TextEquals)
 	}
