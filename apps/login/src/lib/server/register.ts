@@ -88,7 +88,7 @@ export async function registerUser(
     password: command.password ? command.password : undefined,
     organization: command.organization,
   }).catch((error) => {
-    logger.error("Failed to create user", { error, email: command.email });
+    logger.error("Failed to create user", { error });
     return null;
   });
 
@@ -114,7 +114,7 @@ export async function registerUser(
     requestId: command.requestId,
     lifetime: command.password ? loginSettings?.passwordCheckLifetime : undefined,
   }).catch((error) => {
-    logger.error("Failed to create session after user creation", { error, userId: addResponse.userId });
+    logger.error("Failed to create session after user creation", { error });
     return null;
   });
 
@@ -152,7 +152,7 @@ export async function registerUser(
     return { redirect: "/passkey/set?" + params };
   } else {
     const userResponse = await getUserByID({ serviceConfig, userId: session?.factors?.user?.id }).catch((error) => {
-      logger.error("Failed to get user after session creation", { error, userId: session?.factors?.user?.id });
+      logger.error("Failed to get user after session creation", { error });
       return null;
     });
 
