@@ -152,7 +152,7 @@ export async function registerUser(
 
     const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
 
-    const emailVerificationCheck = checkEmailVerification(
+    const emailVerificationCheck = await checkEmailVerification(
       session,
       humanUser,
       session.factors.user.organizationId,
