@@ -70,6 +70,8 @@ type InitColumn struct {
 	nullable      bool
 	defaultValue  interface{}
 	deleteCascade string
+	generated     string
+	isStored      bool
 }
 
 type ColumnOption func(*InitColumn)
@@ -102,6 +104,13 @@ func Default(value interface{}) ColumnOption {
 func DeleteCascade(column string) ColumnOption {
 	return func(c *InitColumn) {
 		c.deleteCascade = column
+	}
+}
+
+func Generated(stmt string, isStored bool) ColumnOption {
+	return func(c *InitColumn) {
+		c.generated = stmt
+		c.isStored = isStored
 	}
 }
 
@@ -380,6 +389,12 @@ func createColumnsStatement(cols []*InitColumn, tableName string) string {
 		}
 		if col.defaultValue != nil {
 			column += " DEFAULT " + defaultValue(col.defaultValue)
+		}
+		if col.generated != "" {
+			column += " GENERATED ALWAYS AS (" + col.generated + ")"
+			if col.isStored {
+				column += " STORED"
+			}
 		}
 		if len(col.deleteCascade) != 0 {
 			column += fmt.Sprintf(" REFERENCES %s (%s) ON DELETE CASCADE", tableName, col.deleteCascade)

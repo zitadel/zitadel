@@ -209,6 +209,7 @@ func Projections() []projection {
 func Init(ctx context.Context) error {
 	for _, p := range projections {
 		if err := p.Init(ctx); err != nil {
+			logging.WithError(err).WithField("projection", p.ProjectionName()).Error("failed to initialize projection")
 			return err
 		}
 	}
