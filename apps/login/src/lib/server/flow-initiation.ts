@@ -461,6 +461,10 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
       }
       return NextResponse.redirect(url);
     } else if (url && binding.case === "post") {
+      if (!isSafeRedirectUri(url)) {
+        logger.warn("Blocked unsafe SAML post URL", { url });
+        return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+      }
       const html = `
         <html>
           <body onload="document.forms[0].submit()">

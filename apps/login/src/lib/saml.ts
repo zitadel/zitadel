@@ -79,6 +79,10 @@ export async function loginWithSAMLAndSession({
           }
           return { redirect: url };
         } else if (url && binding.case === "post") {
+          if (!isSafeRedirectUri(url)) {
+            console.warn("loginWithSAMLAndSession: Blocked unsafe SAML post URL:", url);
+            return { error: "Unsafe redirect URI was blocked" };
+          }
           return {
             samlData: {
               url,
