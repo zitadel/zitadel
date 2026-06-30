@@ -7,6 +7,14 @@ import {
   CreateInviteCodeResponse,
   CreatePasskeyRegistrationLinkRequestSchema,
   CreatePasskeyRegistrationLinkResponse,
+  RegisterPasskeyRequestSchema,
+  RegisterPasskeyResponse,
+  VerifyPasskeyRegistrationRequestSchema,
+  VerifyPasskeyRegistrationResponse,
+  RegisterU2FRequestSchema,
+  RegisterU2FResponse,
+  VerifyU2FRegistrationRequestSchema,
+  VerifyU2FRegistrationResponse,
   DeactivateUserRequestSchema,
   DeactivateUserResponse,
   DeleteUserRequestSchema,
@@ -177,6 +185,26 @@ export class UserService {
     req: MessageInitShape<typeof CreatePasskeyRegistrationLinkRequestSchema>,
   ): Promise<CreatePasskeyRegistrationLinkResponse> {
     return this.grpcService.userNew.createPasskeyRegistrationLink(create(CreatePasskeyRegistrationLinkRequestSchema, req));
+  }
+
+  public registerPasskey(req: MessageInitShape<typeof RegisterPasskeyRequestSchema>): Promise<RegisterPasskeyResponse> {
+    return this.grpcService.userNew.registerPasskey(create(RegisterPasskeyRequestSchema, req));
+  }
+
+  public verifyPasskeyRegistration(
+    req: MessageInitShape<typeof VerifyPasskeyRegistrationRequestSchema>,
+  ): Promise<VerifyPasskeyRegistrationResponse> {
+    return this.grpcService.userNew.verifyPasskeyRegistration(create(VerifyPasskeyRegistrationRequestSchema, req));
+  }
+
+  public registerU2F(req: MessageInitShape<typeof RegisterU2FRequestSchema>): Promise<RegisterU2FResponse> {
+    return this.grpcService.userNew.registerU2F(create(RegisterU2FRequestSchema, req));
+  }
+
+  public verifyU2FRegistration(
+    req: MessageInitShape<typeof VerifyU2FRegistrationRequestSchema>,
+  ): Promise<VerifyU2FRegistrationResponse> {
+    return this.grpcService.userNew.verifyU2FRegistration(create(VerifyU2FRegistrationRequestSchema, req));
   }
 
   public removePhone(userId: string): Promise<RemovePhoneResponse> {

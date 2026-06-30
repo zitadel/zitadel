@@ -16,6 +16,13 @@ export interface Environment {
   posthog_token?: string;
   posthog_url?: string;
   exhausted?: boolean;
+  // WebAuthn Relying Party ID used when registering passkeys / U2F security keys via the v2
+  // UserService. Must match the RP ID the login app uses (sso-login's MS_WEBAUTHN_RPID), otherwise
+  // credentials registered here fail at login. Falls back to window.location.hostname when unset.
+  webauthn_rp_id?: string;
+  // Base URL of the v2 login app (sso-login). Used to build the passkey registration link encoded
+  // in the QR code. Falls back to window.location.origin when unset.
+  login_v2_base_url?: string;
 }
 
 interface WellKnown {

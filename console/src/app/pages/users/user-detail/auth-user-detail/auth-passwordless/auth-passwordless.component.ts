@@ -8,8 +8,9 @@ import { AuthFactorState, WebAuthNToken } from 'src/app/proto/generated/zitadel/
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { EnvironmentService } from 'src/app/services/environment.service';
+import { UserService } from 'src/app/services/user.service';
 import { _base64ToArrayBuffer } from '../../u2f-util';
-import { U2FComponentDestination } from '../dialog-u2f/dialog-u2f.component';
 import { DialogPasswordlessComponent } from './dialog-passwordless/dialog-passwordless.component';
 
 export interface WebAuthNOptions {
@@ -40,11 +41,24 @@ export class AuthPasswordlessComponent implements OnInit, OnDestroy {
   public AuthFactorState: any = AuthFactorState;
   public error: string = '';
 
+  // WebAuthn Relying Party ID and login app base URL, resolved from the runtime environment
+  // (falling back to the current host/origin). The RP ID must match the login app's so that
+  // passkeys registered here can be used at login.
+  private rpId: string = window.location.hostname;
+
   constructor(
     private service: GrpcAuthService,
+    private userService: UserService,
+    private envService: EnvironmentService,
     private toast: ToastService,
     private dialog: MatDialog,
-  ) {}
+  ) {
+    this.envService.env.subscribe((env) => {
+      if (env.webauthn_rp_id) {
+        this.rpId = env.webauthn_rp_id;
+      }
+    });
+  }
 
   public ngOnInit(): void {
     this.getPasswordless();
@@ -54,41 +68,56 @@ export class AuthPasswordlessComponent implements OnInit, OnDestroy {
     this.loadingSubject.complete();
   }
 
-  public addPasswordless(): void {
-    this.service.addMyPasswordless().then(
-      (resp) => {
-        if (resp.key) {
-          const credOptions: CredentialCreationOptions = JSON.parse(atob(resp.key.publicKey as string));
+  public async addPasswordless(): Promise<void> {
+    const userId = this.userService.userId();
+    if (!userId) {
+      this.toast.showError('USER.PASSWORDLESS.U2F_ERROR', false, true);
+      return;
+    }
 
-          if (credOptions.publicKey?.challenge) {
-            credOptions.publicKey.challenge = _base64ToArrayBuffer(credOptions.publicKey.challenge as any);
-            credOptions.publicKey.user.id = _base64ToArrayBuffer(credOptions.publicKey.user.id as any);
-            if (credOptions.publicKey.excludeCredentials) {
-              credOptions.publicKey.excludeCredentials.map((cred) => {
-                cred.id = _base64ToArrayBuffer(cred.id as any);
-                return cred;
-              });
-            }
-            const dialogRef = this.dialog.open(DialogPasswordlessComponent, {
-              width: '400px',
-              data: {
-                credOptions,
-                type: U2FComponentDestination.PASSWORDLESS,
-              },
-            });
+    try {
+      // 1. obtain a registration code, 2. start the passkey registration with our RP ID
+      const link = await this.userService.createPasskeyRegistrationLink({
+        userId,
+        medium: { case: 'returnCode', value: {} },
+      });
+      const resp = await this.userService.registerPasskey({
+        userId,
+        code: link.code,
+        domain: this.rpId,
+      });
 
-            dialogRef.afterClosed().subscribe(() => {
-              setTimeout(() => {
-                this.getPasswordless();
-              }, 1000);
-            });
-          }
-        }
-      },
-      (error) => {
-        this.toast.showError(error);
-      },
-    );
+      const credOptions = resp.publicKeyCredentialCreationOptions as unknown as CredentialCreationOptions;
+      if (!credOptions?.publicKey?.challenge) {
+        this.toast.showError('USER.PASSWORDLESS.U2F_ERROR', false, true);
+        return;
+      }
+
+      credOptions.publicKey.challenge = _base64ToArrayBuffer(credOptions.publicKey.challenge as any);
+      credOptions.publicKey.user.id = _base64ToArrayBuffer(credOptions.publicKey.user.id as any);
+      if (credOptions.publicKey.excludeCredentials) {
+        credOptions.publicKey.excludeCredentials.map((cred) => {
+          cred.id = _base64ToArrayBuffer(cred.id as any);
+          return cred;
+        });
+      }
+
+      const dialogRef = this.dialog.open(DialogPasswordlessComponent, {
+        width: '400px',
+        data: {
+          credOptions,
+          passkeyId: resp.passkeyId,
+        },
+      });
+
+      dialogRef.afterClosed().subscribe(() => {
+        setTimeout(() => {
+          this.getPasswordless();
+        }, 1000);
+      });
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
   public getPasswordless(): void {

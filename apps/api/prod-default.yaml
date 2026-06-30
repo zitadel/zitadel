@@ -24,3 +24,5 @@ FirstInstance:
         Name: Automatically Initialized instance admin Client
       Pat.ExpirationDate: 2099-01-01T00:00:00Z
 DefaultInstance.Features.LoginV2.BaseURI: http://localhost:3000/ui/v2/login
+Console:
+  WebauthnRPID: https://sso.dev.mobilesentrix.com

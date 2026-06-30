@@ -3,14 +3,10 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
 
-import { GrpcAuthService } from '../../../../../../services/grpc-auth.service';
+import { EnvironmentService } from '../../../../../../services/environment.service';
 import { ToastService } from '../../../../../../services/toast.service';
+import { UserService } from '../../../../../../services/user.service';
 import { _arrayBufferToBase64 } from '../../u2f_util';
-
-export enum U2FComponentDestination {
-  MFA = 'mfa',
-  PASSWORDLESS = 'passwordless',
-}
 
 @Component({
   selector: 'cnsl-dialog-passwordless',
@@ -19,7 +15,6 @@ export enum U2FComponentDestination {
   standalone: false,
 })
 export class DialogPasswordlessComponent {
-  private type!: U2FComponentDestination;
   public name: string = '';
   public error: string = '';
   public loading: boolean = false;
@@ -28,14 +23,21 @@ export class DialogPasswordlessComponent {
   public showQR: boolean = false;
   public qrcodeLink: string = '';
 
+  private loginBaseUrl: string = window.location.origin;
+
   constructor(
     public dialogRef: MatDialogRef<DialogPasswordlessComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { credOptions: any; type: U2FComponentDestination },
-    private service: GrpcAuthService,
+    @Inject(MAT_DIALOG_DATA) public data: { credOptions: any; passkeyId: string },
+    private userService: UserService,
+    private envService: EnvironmentService,
     private translate: TranslateService,
     private toast: ToastService,
   ) {
-    this.type = data.type;
+    this.envService.env.subscribe((env) => {
+      if (env.login_v2_base_url) {
+        this.loginBaseUrl = env.login_v2_base_url;
+      }
+    });
   }
 
   public closeDialog(): void {
@@ -45,8 +47,15 @@ export class DialogPasswordlessComponent {
   public closeDialogWithCode(): void {
     this.error = '';
     this.loading = true;
+
+    const userId = this.userService.userId();
+    if (!userId) {
+      this.loading = false;
+      this.toast.showError('USER.PASSWORDLESS.U2F_ERROR', false, true);
+      return;
+    }
+
     if (this.name && this.data.credOptions.publicKey) {
-      // this.data.credOptions.publicKey.rp.id = 'localhost';
       navigator.credentials
         .create(this.data.credOptions)
         .then((resp) => {
@@ -60,7 +69,9 @@ export class DialogPasswordlessComponent {
             const clientDataJSON = (resp as any).response.clientDataJSON;
             const rawId = (resp as any).rawId;
 
-            const data = JSON.stringify({
+            // v2 expects the credential as a structured object (google.protobuf.Struct), not a
+            // base64-encoded JSON string like the old v1 API.
+            const publicKeyCredential = {
               id: resp.id,
               rawId: _arrayBufferToBase64(rawId),
               type: resp.type,
@@ -68,48 +79,33 @@ export class DialogPasswordlessComponent {
                 attestationObject: _arrayBufferToBase64(attestationObject),
                 clientDataJSON: _arrayBufferToBase64(clientDataJSON),
               },
-            });
+            };
 
-            const base64 = btoa(data);
-            if (this.type === U2FComponentDestination.MFA) {
-              this.service
-                .verifyMyMultiFactorU2F(base64, this.name)
-                .then(() => {
-                  this.translate
-                    .get('USER.MFA.U2F_SUCCESS')
-                    .pipe(take(1))
-                    .subscribe((msg) => {
-                      this.toast.showInfo(msg);
-                    });
-                  this.dialogRef.close(true);
-                  this.loading = false;
-                })
-                .catch((error) => {
-                  this.loading = false;
-                  this.toast.showError(error);
-                });
-            } else if (this.type === U2FComponentDestination.PASSWORDLESS) {
-              this.service
-                .verifyMyPasswordless(base64, this.name)
-                .then(() => {
-                  this.translate
-                    .get('USER.PASSWORDLESS.U2F_SUCCESS')
-                    .pipe(take(1))
-                    .subscribe((msg) => {
-                      this.toast.showInfo(msg);
-                    });
-                  this.dialogRef.close(true);
-                  this.loading = false;
-                })
-                .catch((error) => {
-                  this.loading = false;
-                  this.toast.showError(error);
-                });
-            }
+            this.userService
+              .verifyPasskeyRegistration({
+                userId,
+                passkeyId: this.data.passkeyId,
+                publicKeyCredential,
+                passkeyName: this.name,
+              })
+              .then(() => {
+                this.translate
+                  .get('USER.PASSWORDLESS.U2F_SUCCESS')
+                  .pipe(take(1))
+                  .subscribe((msg) => {
+                    this.toast.showInfo(msg);
+                  });
+                this.dialogRef.close(true);
+                this.loading = false;
+              })
+              .catch((error) => {
+                this.loading = false;
+                this.toast.showError(error);
+              });
           } else {
             this.loading = false;
             this.translate
-              .get('USER.MFA.U2F_ERROR')
+              .get('USER.PASSWORDLESS.U2F_ERROR')
               .pipe(take(1))
               .subscribe((msg) => {
                 this.toast.showInfo(msg);
@@ -126,8 +122,17 @@ export class DialogPasswordlessComponent {
   }
 
   public sendMyPasswordlessLink(): void {
-    this.service
-      .sendMyPasswordlessLink()
+    const userId = this.userService.userId();
+    if (!userId) {
+      this.toast.showError('USER.PASSWORDLESS.U2F_ERROR', false, true);
+      return;
+    }
+
+    this.userService
+      .createPasskeyRegistrationLink({
+        userId,
+        medium: { case: 'sendLink', value: {} },
+      })
       .then(() => {
         this.toast.showInfo('USER.TOAST.PASSWORDLESSREGISTRATIONSENT', true);
         this.showSent = true;
@@ -138,12 +143,31 @@ export class DialogPasswordlessComponent {
   }
 
   public addMyPasswordlessLink(): void {
-    this.service
-      .addMyPasswordlessLink()
-      .then((resp) => {
-        this.showQR = true;
+    const userId = this.userService.userId();
+    if (!userId) {
+      this.toast.showError('USER.PASSWORDLESS.U2F_ERROR', false, true);
+      return;
+    }
 
-        this.qrcodeLink = resp.link;
+    this.userService
+      .createPasskeyRegistrationLink({
+        userId,
+        medium: { case: 'returnCode', value: {} },
+      })
+      .then((resp) => {
+        if (!resp.code) {
+          this.toast.showError('USER.PASSWORDLESS.U2F_ERROR', false, true);
+          return;
+        }
+
+        const params = new URLSearchParams({
+          userId,
+          code: resp.code.code,
+          codeId: resp.code.id,
+        });
+
+        this.showQR = true;
+        this.qrcodeLink = `${this.loginBaseUrl}/passkey/set?${params.toString()}`;
       })
       .catch((error) => {
         this.toast.showError(error);

@@ -28,7 +28,11 @@ type Config struct {
 	ShortCache            middleware.CacheConfig
 	LongCache             middleware.CacheConfig
 	InstanceManagementURL string
-	PostHog               struct {
+	// WebauthnRPID is the WebAuthn Relying Party ID exposed to the console via environment.json.
+	// It must match the RP ID the login app uses, otherwise passkeys/security keys registered in
+	// the console fail at login. When empty the console falls back to window.location.hostname.
+	WebauthnRPID string
+	PostHog      struct {
 		Token string
 		URL   string
 	}
@@ -131,7 +135,7 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 			return
 		}
 		limited := limitingAccessInterceptor.Limit(w, r)
-		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ManagementConsoleClientID(), customerPortal, instanceMgmtURL, config.PostHog.URL, config.PostHog.Token, limited)
+		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ManagementConsoleClientID(), customerPortal, instanceMgmtURL, config.PostHog.URL, config.PostHog.Token, config.WebauthnRPID, limited)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("unable to marshal env for the management console: %v", err), http.StatusInternalServerError)
 			return
@@ -174,7 +178,7 @@ func csp(posthogURL string) *middleware.CSP {
 	return &csp
 }
 
-func createEnvironmentJSON(api, issuer, clientID, customerPortal, instanceMgmtUrl, postHogURL, postHogToken string, exhausted bool) ([]byte, error) {
+func createEnvironmentJSON(api, issuer, clientID, customerPortal, instanceMgmtUrl, postHogURL, postHogToken, webauthnRPID string, exhausted bool) ([]byte, error) {
 	environment := struct {
 		API                   string `json:"api,omitempty"`
 		Issuer                string `json:"issuer,omitempty"`
@@ -183,6 +187,7 @@ func createEnvironmentJSON(api, issuer, clientID, customerPortal, instanceMgmtUr
 		InstanceManagementURL string `json:"instance_management_url,omitempty"`
 		PostHogURL            string `json:"posthog_url,omitempty"`
 		PostHogToken          string `json:"posthog_token,omitempty"`
+		WebauthnRPID          string `json:"webauthn_rp_id,omitempty"`
 		Exhausted             bool   `json:"exhausted,omitempty"`
 	}{
 		API:                   api,
@@ -192,6 +197,7 @@ func createEnvironmentJSON(api, issuer, clientID, customerPortal, instanceMgmtUr
 		InstanceManagementURL: instanceMgmtUrl,
 		PostHogURL:            postHogURL,
 		PostHogToken:          postHogToken,
+		WebauthnRPID:          webauthnRPID,
 		Exhausted:             exhausted,
 	}
 	return json.Marshal(environment)
