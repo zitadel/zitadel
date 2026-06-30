@@ -38,8 +38,14 @@ export function handleServerActionResponse(
   }
 
   if ("samlData" in response && response.samlData) {
-    setSamlData(response.samlData);
-    return true;
+    if (isSafeRedirectUri(response.samlData.url)) {
+      setSamlData(response.samlData);
+      return true;
+    } else {
+      console.warn("handleServerActionResponse: Blocked unsafe SAML post URL:", response.samlData.url);
+      setError("Unsafe redirect URI was blocked");
+      return true;
+    }
   }
 
   if ("error" in response && response.error) {
