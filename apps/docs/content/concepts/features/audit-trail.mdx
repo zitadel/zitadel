@@ -50,6 +50,16 @@ Since everything that is available in Management Console can also be called with
 
 Access to the API is possible with a [Service Account](/guides/integrate/service-accounts/authenticate-service-accounts), allowing you to integrate the events with your own business logic.
 
+### Troubleshooting SSO and SAML login issues
+
+When troubleshooting SSO and SAML authentication issues, you can use ZITADEL's audit trail to investigate login failures:
+
+- **Failed Events**: Check the Console's Events view for failed authentication events. These events contain details about why a login attempt failed.
+- **Event filtering**: Filter events by event type (such as login failures), user, organization, or time period to locate specific issues.
+- **SAML-specific debugging**: While error messages may include identifiers like "LOGIN-3kl44", these are not directly searchable in the Events API. Instead, look for associated login failure events that occurred around the same time to understand the root cause.
+
+For ZITADEL Cloud users, runtime/server logs are not available, but the audit trail and Events API provide comprehensive information for troubleshooting authentication issues.
+
 ## Using logs in external systems
 
 You can use the events from the audit log in external systems such as a SOC/SIEM solution.
