@@ -511,6 +511,8 @@ describe("sendLoginname", () => {
         allowLocalAuthentication: true,
         ignoreUnknownUsernames: false,
       });
+      // No active IDPs — so the new IDP-before-register check falls through to register
+      mockGetActiveIdentityProviders.mockResolvedValue({ identityProviders: [] });
 
       const result = await sendLoginname({
         loginName: "user@example.com",
@@ -523,6 +525,31 @@ describe("sendLoginname", () => {
       expect(result?.redirect).toContain("organization=org123");
       expect(result?.redirect).toContain("requestId=req123");
       expect(result?.redirect).toContain("email=user%40example.com");
+    });
+
+    test("should redirect to IDP instead of register when both register and password allowed but single auto-creation IDP exists (issue #12021)", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowRegister: true,
+        allowLocalAuthentication: true,
+        ignoreUnknownUsernames: false,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp123", type: "OIDC", options: { isAutoCreation: true } }],
+      });
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+        organization: "org123",
+        requestId: "req123",
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.redirect).toBe("https://idp.example.com/auth");
+      expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        orgId: "org123",
+      });
     });
 
     test("should redirect to password when ignoreUnknownUsernames is true", async () => {
@@ -731,6 +758,8 @@ describe("sendLoginname", () => {
         allowLocalAuthentication: true,
         ignoreUnknownUsernames: false,
       });
+      // No active IDPs — so the new IDP-before-register check falls through to register
+      mockGetActiveIdentityProviders.mockResolvedValue({ identityProviders: [] });
 
       const result = await sendLoginname({
         loginName: "user@example.com",

@@ -560,6 +560,17 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     logger.debug("register and password both allowed");
     // do not register user if ignoreUnknownUsernames is set
     if (discoveredOrganization && !effectiveLoginSettings?.ignoreUnknownUsernames) {
+      // Check if there's a single active IdP with auto-creation before redirecting to register.
+      // If the org has an external IdP configured for auto-creation, prefer it over registration (issue #12021).
+      const idpResp = await redirectUserToIDP(undefined, discoveredOrganization);
+      if (idpResp && "redirect" in idpResp && idpResp.redirect) {
+        logger.debug("Redirecting to IDP instead of register page", { organization: discoveredOrganization });
+        return idpResp;
+      }
+      if (idpResp && "samlData" in idpResp) {
+        return idpResp;
+      }
+
       logger.debug("Redirecting to registration page", { organization: discoveredOrganization });
       const params = new URLSearchParams({ organization: discoveredOrganization });
 

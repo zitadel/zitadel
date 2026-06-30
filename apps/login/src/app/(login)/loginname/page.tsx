@@ -2,12 +2,14 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { Translated } from "@/components/translated";
 import { UsernameForm } from "@/components/username-form";
+import { sendLoginname } from "@/lib/server/loginname";
 import { getServiceConfig } from "@/lib/service-url";
 import { getActiveIdentityProviders, getBrandingSettings, getDefaultOrg, getLoginSettings } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("loginname");
@@ -35,6 +37,25 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   }
 
   const loginSettings = await getLoginSettings({ serviceConfig, organization: organization ?? defaultOrganization });
+
+  // Handle server-side auto-submit when submit=true and loginName is provided.
+  // This ensures sendLoginname() is called even when allowLocalAuthentication is false,
+  // which is critical for IDP redirect via domain discovery (issue #12021).
+  if (submit && loginName) {
+    const res = await sendLoginname({
+      loginName,
+      organization,
+      defaultOrganization,
+      requestId,
+      suffix,
+      ignoreUnknownUsernames: loginSettings?.ignoreUnknownUsernames,
+    });
+
+    if (res && "redirect" in res && res.redirect) {
+      redirect(res.redirect);
+    }
+    // If sendLoginname returned an error or no redirect, fall through to render the page
+  }
 
   const identityProviders = await getActiveIdentityProviders({
     serviceConfig,
