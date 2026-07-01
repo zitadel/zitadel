@@ -1,0 +1,376 @@
+---
+title: Instrumentation
+description: "Configure ZITADEL's instrumentation for structured logging, distributed tracing, metrics, and profiling using OpenTelemetry exporters."
+---
+
+ZITADEL uses [OpenTelemetry](https://opentelemetry.io/) (OTel) to instrument its runtime.
+All telemetry signals — **logging**, **tracing**, **metrics**, and **profiling** — are configured under the `Instrumentation` key in the runtime configuration.
+
+## Concepts
+
+### Signals
+
+ZITADEL emits four types of telemetry signals:
+
+| Signal | Purpose | Data examples |
+|---|---|---|
+| **Logging** | Structured log lines emitted during request processing and background work | Request details, errors, event processing status |
+| **Tracing** | Distributed traces that follow a request across internal components | Span trees with timing, status, and attributes |
+| **Metrics** | Numeric measurements of system and application behavior over time | Request counts, latencies, Go runtime stats |
+| **Profiling** | CPU and memory profiles for performance analysis | CPU flame graphs, heap allocations |
+
+### Exporters
+
+Every signal uses an **Exporter** to deliver data to an external backend.
+All exporters follow the same configuration structure:
+
+```yaml
+Exporter:
+  Type: "none"         # Selects the export method
+  Endpoint: ""         # Backend address (for grpc and http types)
+  Insecure: false      # Disable TLS (for grpc and http types)
+  BatchDuration: 1s    # Interval for batching before export
+  GoogleProjectID: ""  # Google Cloud project (for google type)
+```
+
+The `Type` field selects which exporter is active.
+Only one exporter type can be active per signal.
+The available types vary by signal and are listed in the sections below.
+
+### Service name
+
+The `ServiceName` is added to all exported telemetry.
+It identifies this ZITADEL instance in your observability backend:
+
+```yaml
+Instrumentation:
+  ServiceName: "zitadel" # ZITADEL_INSTRUMENTATION_SERVICENAME
+```
+
+## Logging
+
+Structured logging replaces the legacy `Log` and `LogStore` configuration sections.
+Logs are written to standard error and can optionally be exported via OpenTelemetry.
+
+### Log level
+
+Set the minimum severity for emitted log lines:
+
+```yaml
+Instrumentation:
+  Log:
+    Level: "INFO" # ZITADEL_INSTRUMENTATION_LOG_LEVEL
+```
+
+Supported levels: `DEBUG`, `INFO`, `WARN`, `ERROR`.
+
+### Streams
+
+Streams control which parts of the application emit logs.
+Enable only the streams you need to reduce noise:
+
+```yaml
+Instrumentation:
+  Log:
+    Streams:
+      - runtime        # Startup, shutdown, and general runtime messages
+      - ready          # Readiness and health check results (zitadel ready command)
+      - request        # Incoming API and HTTP requests
+      - event_handler  # Event handling in projections
+      - queue          # Job queue processing
+      #- event_pusher  # Event pushing to the database (Warning: contains sensitive data)
+```
+
+Set via environment variable as a comma-separated list: `ZITADEL_INSTRUMENTATION_LOG_STREAMS=runtime,ready,request`.
+
+### Output format
+
+Choose how log lines are printed to standard error:
+
+```yaml
+Instrumentation:
+  Log:
+    Format: "json" # ZITADEL_INSTRUMENTATION_LOG_FORMAT
+```
+
+| Format | Description |
+|---|---|
+| `disabled` | No structured log output on stderr. Falls back to the legacy `Log` configuration if present. |
+| `text` | Human-readable text format |
+| `json` | JSON objects, one per line |
+| `gcp` | JSON formatted for Google Cloud Logging |
+| `gcp_error_reporting` | JSON formatted for Google Cloud Error Reporting |
+
+### Error details
+
+Configure additional context for logged errors:
+
+```yaml
+Instrumentation:
+  Log:
+    AddSource: true   # Include source file and line where the log was emitted
+    Errors:
+      ReportLocation: true   # Include source file, line, and function of the error
+      StackTrace: false      # Include full stack traces
+```
+
+### Masking sensitive data
+
+Mask specific attribute keys in log output to prevent leaking sensitive information:
+
+```yaml
+Instrumentation:
+  Log:
+    Mask:
+      Keys:
+        - "first_name"
+        - "last_name"
+      Value: "****"    # Replacement string
+```
+
+Keys are unqualified — `"first_name"` matches `first_name` at any nesting level.
+When the key matches a group of attributes, all values in the group are masked and the structure is preserved.
+
+### Log exporter
+
+In addition to printing to stderr, logs can be exported via OpenTelemetry:
+
+```yaml
+Instrumentation:
+  Log:
+    Exporter:
+      Type: "none" # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_TYPE
+```
+
+| Type | Description |
+|---|---|
+| `none` | Disabled (default) |
+| `stdOut` | Exports OTEL log records to standard output |
+| `stdErr` | Exports OTEL log records to standard error |
+| `grpc` | Exports via the OTEL gRPC protocol (recommended) |
+| `http` | Exports via the OTEL HTTP protocol |
+
+For `grpc` and `http`, set the collector endpoint:
+
+```yaml
+Instrumentation:
+  Log:
+    Exporter:
+      Type: "grpc"
+      Endpoint: "otelcol.monitoring.svc:4317"
+      Insecure: false
+      BatchDuration: 1s
+```
+
+For details on log fields and structure, see the [Log Structure](/self-hosting/manage/log-structure) page.
+
+## Tracing
+
+Distributed tracing captures the path of requests through ZITADEL's internal components.
+Traces are essential for diagnosing latency and understanding request flow.
+
+### Sampling
+
+The `Fraction` controls what percentage of requests are traced.
+`1.0` traces every request; `0.1` traces 10%:
+
+```yaml
+Instrumentation:
+  Trace:
+    Fraction: 1.0 # ZITADEL_INSTRUMENTATION_TRACE_FRACTION
+```
+
+### Remote span trust
+
+By default, ZITADEL ignores incoming trace context from upstream services.
+Enable `TrustRemoteSpans` only in controlled environments where you trust callers to provide valid trace context:
+
+```yaml
+Instrumentation:
+  Trace:
+    TrustRemoteSpans: false # ZITADEL_INSTRUMENTATION_TRACE_TRUSTREMOTESPANS
+```
+
+### Trace exporter
+
+```yaml
+Instrumentation:
+  Trace:
+    Exporter:
+      Type: "none" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_TYPE
+```
+
+| Type | Description |
+|---|---|
+| `none` | Disabled (default) |
+| `stdOut` | Exports traces to standard output |
+| `stdErr` | Exports traces to standard error |
+| `grpc` | Exports via the OTEL gRPC protocol (recommended) |
+| `http` | Exports via the OTEL HTTP protocol |
+| `google` | Exports to Google Cloud Trace (requires `GoogleProjectID`) |
+
+Example with a gRPC OTEL collector:
+
+```yaml
+Instrumentation:
+  Trace:
+    Fraction: 1.0
+    Exporter:
+      Type: "grpc"
+      Endpoint: "otelcol.monitoring.svc:4317"
+      Insecure: false
+      BatchDuration: 1s
+```
+
+Example with Google Cloud Trace:
+
+```yaml
+Instrumentation:
+  Trace:
+    Fraction: 0.5
+    Exporter:
+      Type: "google"
+      GoogleProjectID: "my-gcp-project"
+```
+
+## Metrics
+
+ZITADEL instruments metrics using OpenTelemetry.
+Metrics include Go runtime statistics, HTTP/gRPC server measurements, and ZITADEL-specific counters.
+
+### Metrics exporter
+
+```yaml
+Instrumentation:
+  Metric:
+    Exporter:
+      Type: "none" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_TYPE
+```
+
+| Type | Description |
+|---|---|
+| `none` | Disabled (default) |
+| `stdOut` | Exports metrics to standard output |
+| `stdErr` | Exports metrics to standard error |
+| `grpc` | Exports via the OTEL gRPC protocol (recommended for push-based collection) |
+| `http` | Exports via the OTEL HTTP protocol |
+| `google` | Exports to Google Cloud Monitoring (requires `GoogleProjectID`) |
+| `prometheus` | Exposes metrics on the `/debug/metrics` HTTP endpoint for Prometheus to scrape |
+
+### Prometheus scraping
+
+To expose the `/debug/metrics` endpoint for Prometheus, set the metric exporter to `prometheus`:
+
+```yaml
+Instrumentation:
+  Metric:
+    Exporter:
+      Type: "prometheus"
+```
+
+See the [Prometheus](/self-hosting/manage/metrics/prometheus) page for scraping setup.
+
+### Push-based collection
+
+To push metrics to an OpenTelemetry collector:
+
+```yaml
+Instrumentation:
+  Metric:
+    Exporter:
+      Type: "grpc"
+      Endpoint: "otelcol.monitoring.svc:4317"
+      Insecure: false
+      BatchDuration: 1m
+```
+
+<Callout>
+The legacy top-level `Metrics` configuration key still enables the `/debug/metrics` endpoint with `Type: otel`.
+It is deprecated and will be removed in a future release.
+Use `Instrumentation.Metric.Exporter.Type: "prometheus"` instead.
+</Callout>
+
+## Profiling
+
+Profiling captures CPU and memory usage data for performance analysis.
+
+### Profile exporter
+
+```yaml
+Instrumentation:
+  Profile:
+    Exporter:
+      Type: "none" # ZITADEL_INSTRUMENTATION_PROFILE_TYPE
+```
+
+| Type | Description |
+|---|---|
+| `none` | Disabled (default) |
+| `google` | Exports profiling data to Google Cloud Profiler (requires `GoogleProjectID`) |
+
+Example:
+
+```yaml
+Instrumentation:
+  Profile:
+    Exporter:
+      Type: "google"
+      GoogleProjectID: "my-gcp-project"
+```
+
+## Migration from legacy configuration
+
+The following top-level configuration keys are **deprecated** and will be removed in a future release:
+
+| Deprecated key | Replacement |
+|---|---|
+| `Log` | `Instrumentation.Log` |
+| `LogStore` | `Instrumentation.Log` (streams replace Access/Execution log store) |
+| `Tracing` | `Instrumentation.Trace` |
+| `Metrics` | `Instrumentation.Metric` |
+| `Profiler` | `Instrumentation.Profile` |
+
+If you have customized the legacy `Log` configuration, set `Instrumentation.Log.Format` to one of the supported formats (`text`, `json`, `gcp`, `gcp_error_reporting`) before upgrading.
+When `Format` is set to `disabled`, the system falls back to the legacy `Log` configuration.
+
+## Full example
+
+```yaml
+Instrumentation:
+  ServiceName: "zitadel"
+  Trace:
+    Fraction: 1.0
+    TrustRemoteSpans: false
+    Exporter:
+      Type: "grpc"
+      Endpoint: "otelcol.monitoring.svc:4317"
+      Insecure: false
+      BatchDuration: 1s
+  Metric:
+    Exporter:
+      Type: "prometheus"
+  Log:
+    Level: "INFO"
+    Streams:
+      - runtime
+      - ready
+      - request
+      - event_handler
+      - queue
+    Mask:
+      Keys: []
+      Value: "****"
+    Format: "json"
+    AddSource: true
+    Errors:
+      ReportLocation: true
+      StackTrace: false
+    Exporter:
+      Type: "grpc"
+      Endpoint: "otelcol.monitoring.svc:4317"
+      Insecure: false
+      BatchDuration: 1s
+  Profile:
+    Exporter:
+      Type: "none"
+```

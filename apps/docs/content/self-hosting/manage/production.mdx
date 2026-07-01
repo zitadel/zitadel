@@ -37,55 +37,70 @@ Also, not all configuration options are available as environment variables.
 
 ## Monitoring
 
-By default, [**metrics**](/apis/observability/metrics) are exposed at /debug/metrics in OpenTelemetry (otel) format.
+ZITADEL supports [**metrics**](/apis/observability/metrics), **tracing**, **logging**, and **profiling** through a unified [instrumentation configuration](/self-hosting/manage/instrumentation).
 
-Also, you can enable **tracing** in the ZITADEL configuration.
+Enable Prometheus-compatible metrics scraping:
 
 ```yaml
-Tracing:
-  # Choose one in "otel", "google", "log" and "none"
-  Type: google
-  Fraction: 1
-  MetricPrefix: zitadel
+Instrumentation:
+  Metric:
+    Exporter:
+      Type: "prometheus"
 ```
+
+Enable distributed tracing via an OpenTelemetry collector:
+
+```yaml
+Instrumentation:
+  Trace:
+    Fraction: 1.0
+    Exporter:
+      Type: "grpc"
+      Endpoint: "otelcol.monitoring.svc:4317"
+```
+
+See the [Instrumentation](/self-hosting/manage/instrumentation) page for the full configuration reference including all exporter types.
 
 ## Logging
 
 ZITADEL follows the principles that guide cloud-native and twelve factor applications.
 Logs are a stream of time-ordered events collected from all running processes.
 
-[ZITADEL is configurable](#default-zitadel-logging-config) to write the following events to the standard output:
-
-- Runtime Logs: Define the log level and record format in the `Log` configuration section.
-- Access Logs: Enable logging all HTTP and gRPC responses from the ZITADEL binary by setting `LogStore.Access.Stdout.Enabled` to true.
-- Actions Execution Logs: Actions can emit custom logs at different levels. For example, a log record can be emitted each time a user is created or authenticated. If you don't want to have these logs in STDOUT, you can disable this by setting `LogStore.Execution.Stdout.Enabled` to true.
-
-### Default ZITADEL Logging Config
+ZITADEL writes structured logs to standard error.
+Configure the log level, output format, and which subsystems emit logs:
 
 ```yaml
-Log:
-  Level: info # ZITADEL_LOG_LEVEL
-  Formatter:
-    Format: text # ZITADEL_LOG_FORMATTER_FORMAT
-
-LogStore:
-  Access:
-    Stdout:
-      # If enabled, all access logs are printed to the binary's standard output
-      Enabled: false # ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED
-  Execution:
-    Stdout:
-      # If enabled, all execution logs are printed to the binary's standard output
-      Enabled: true # ZITADEL_LOGSTORE_EXECUTION_STDOUT_ENABLED
-
+Instrumentation:
+  Log:
+    Level: "INFO"
+    Format: "json"       # "text", "json", "gcp", or "gcp_error_reporting"
+    Streams:
+      - runtime          # Startup, shutdown messages
+      - ready            # Readiness and health checks
+      - request          # Incoming API/HTTP requests
+      - event_handler    # Event handling in projections
+      - queue            # Job queue processing
 ```
+
+Logs can also be exported to an OpenTelemetry backend in parallel:
+
+```yaml
+Instrumentation:
+  Log:
+    Exporter:
+      Type: "grpc"
+      Endpoint: "otelcol.monitoring.svc:4317"
+```
+
+For details on log fields and output structure, see [Log Structure](/self-hosting/manage/log-structure).
+For the full logging configuration including masking and error options, see [Instrumentation](/self-hosting/manage/instrumentation).
 
 ### Why ZITADEL does not write logs to files
 
-Log file management should not be in each business apps responsibility.
+Log file management should not be in each business app's responsibility.
 Instead, your execution environment should provide tooling for managing logs in a generic way.
 This includes tasks like rotating files, routing, collecting, archiving and cleaning-up.
-For example, systemd has journald and kubernetes has fluentd and fluentbit.
+For example, systemd has journald and Kubernetes has Fluent Bit and Fluentd.
 
 ## Telemetry
 

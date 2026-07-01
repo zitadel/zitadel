@@ -6,33 +6,54 @@ sidebar_label: Observability
 
 
 
-This guide covers how to collect traces, metrics, and logs from the Zitadel and Login containers.
+This guide covers how to collect traces, metrics, and logs from the ZITADEL and Login containers.
+For the full configuration reference, see [Instrumentation](/self-hosting/manage/instrumentation).
 
-## Zitadel Container
+## ZITADEL Container
 
 ### Traces
 
-Zitadel can push traces to an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) using the [OTLP protocol](https://opentelemetry.io/docs/specs/otlp/) over gRPC:
+ZITADEL can push traces to an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) using the [OTLP protocol](https://opentelemetry.io/docs/specs/otlp/) over gRPC:
 
 ```yaml
 env:
-  - name: ZITADEL_TRACING_TYPE
-    value: "otel"
-  - name: ZITADEL_TRACING_ENDPOINT
+  - name: ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_TYPE
+    value: "grpc"
+  - name: ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_ENDPOINT
     value: "otelcol-opentelemetry-collector.monitoring.svc.cluster.local:4317"
-  - name: ZITADEL_TRACING_SERVICENAME
+  - name: ZITADEL_INSTRUMENTATION_TRACE_FRACTION
+    value: "1.0"
+  - name: ZITADEL_INSTRUMENTATION_SERVICENAME
     value: "zitadel"
 ```
 
-The `ZITADEL_TRACING_ENDPOINT` should point to your OpenTelemetry Collector's gRPC receiver, typically listening on port 4317. The collector can then forward traces to your preferred backend such as [Jaeger](https://www.jaegertracing.io/), [Grafana Tempo](https://grafana.com/oss/tempo/), or [OpenObserve](https://openobserve.ai/).
+The `ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_ENDPOINT` should point to your OpenTelemetry Collector's gRPC receiver, typically listening on port 4317. The collector can then forward traces to your preferred backend such as [Jaeger](https://www.jaegertracing.io/), [Grafana Tempo](https://grafana.com/oss/tempo/), or [OpenObserve](https://openobserve.ai/).
 
 You can deploy an OpenTelemetry Collector in your cluster using the [OpenTelemetry Operator](https://github.com/open-telemetry/opentelemetry-operator) or the [OpenTelemetry Collector Helm chart](https://github.com/open-telemetry/opentelemetry-helm-charts/tree/main/charts/opentelemetry-collector).
 
 ### Metrics
 
-Zitadel exposes [Prometheus](https://prometheus.io/) metrics at `/debug/metrics`. Metrics must be scraped by Prometheus. Pushing metrics is not supported.
+ZITADEL can expose [Prometheus](https://prometheus.io/) metrics at `/debug/metrics` or push them to an OpenTelemetry Collector.
 
-Enable the metrics endpoint:
+To enable Prometheus scraping:
+
+```yaml
+env:
+  - name: ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_TYPE
+    value: "prometheus"
+```
+
+To push metrics to an OpenTelemetry Collector instead:
+
+```yaml
+env:
+  - name: ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_TYPE
+    value: "grpc"
+  - name: ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_ENDPOINT
+    value: "otelcol-opentelemetry-collector.monitoring.svc.cluster.local:4317"
+```
+
+When using Prometheus scraping, enable the Helm chart ServiceMonitor:
 
 ```yaml
 metrics:
@@ -41,7 +62,7 @@ metrics:
     enabled: false
 ```
 
-Set `serviceMonitor.enabled` to `true` if you are using the [Prometheus Operator](https://prometheus-operator.dev/). This creates a [ServiceMonitor](https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.ServiceMonitor) resource that configures Prometheus to scrape the Zitadel pods automatically.
+Set `serviceMonitor.enabled` to `true` if you are using the [Prometheus Operator](https://prometheus-operator.dev/). This creates a [ServiceMonitor](https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.ServiceMonitor) resource that configures Prometheus to scrape the ZITADEL pods automatically.
 
 For standard Prometheus without the Operator, add scrape annotations to the pods:
 
@@ -56,15 +77,37 @@ Your Prometheus configuration must include a [scrape job](https://prometheus.io/
 
 ### Logs
 
-Zitadel writes structured JSON logs to stdout. Logs must be collected by a log collector running in your cluster. Pushing logs is not supported.
+ZITADEL writes structured logs to stderr. Choose a format and log level:
 
-Common log collectors include:
+```yaml
+env:
+  - name: ZITADEL_INSTRUMENTATION_LOG_FORMAT
+    value: "json"
+  - name: ZITADEL_INSTRUMENTATION_LOG_LEVEL
+    value: "INFO"
+  - name: ZITADEL_INSTRUMENTATION_LOG_STREAMS
+    value: "runtime,ready,request,event_handler,queue"
+```
+
+Logs can additionally be exported to an OpenTelemetry Collector:
+
+```yaml
+env:
+  - name: ZITADEL_INSTRUMENTATION_LOG_EXPORTER_TYPE
+    value: "grpc"
+  - name: ZITADEL_INSTRUMENTATION_LOG_EXPORTER_ENDPOINT
+    value: "otelcol-opentelemetry-collector.monitoring.svc.cluster.local:4317"
+```
+
+Logs must be collected by a log collector running in your cluster. Common log collectors include:
 - [Fluent Bit](https://fluentbit.io/) — Lightweight log processor and forwarder
 - [Vector](https://vector.dev/) — High-performance observability data pipeline
 - [Fluentd](https://www.fluentd.org/) — Unified logging layer
 - [Promtail](https://grafana.com/docs/loki/latest/clients/promtail/) — Log collector for Grafana Loki
 
-Configure your log collector to tail container logs from the Zitadel pods and forward them to your preferred backend such as [Grafana Loki](https://grafana.com/oss/loki/), [Elasticsearch](https://www.elastic.co/elasticsearch/), or [OpenObserve](https://openobserve.ai/).
+Configure your log collector to tail container logs from the ZITADEL pods and forward them to your preferred backend such as [Grafana Loki](https://grafana.com/oss/loki/), [Elasticsearch](https://www.elastic.co/elasticsearch/), or [OpenObserve](https://openobserve.ai/).
+
+For details on log fields and structure, see [Log Structure](/self-hosting/manage/log-structure).
 
 ## Login Container
 

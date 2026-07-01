@@ -47,13 +47,17 @@ ZITADEL does **not** require a specific metrics backend. Any system capable of s
 
 ## Settings
 
-Metrics are enabled by default in standard ZITADEL deployments.
+To expose the `/debug/metrics` endpoint, configure the metric exporter in the `Instrumentation` section of your runtime configuration:
 
-If metrics were explicitly disabled in your configuration, re-enable them before proceeding. The default configuration is defined in the project's `defaults.yaml` file:
+```yaml
+Instrumentation:
+  Metric:
+    Exporter:
+      Type: "prometheus"
+```
 
-- https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml
-
-Refer to the configuration documentation for details on enabling or adjusting metrics behavior.
+Alternatively, metrics can be pushed to an OpenTelemetry collector using `grpc` or `http` exporter types.
+See the [Instrumentation](/self-hosting/manage/instrumentation#metrics) page for the full list of supported exporter types and configuration options.
 
 ## Next steps
 

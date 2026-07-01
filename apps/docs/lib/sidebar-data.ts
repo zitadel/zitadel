@@ -768,6 +768,8 @@ export const guidesSidebar: readonly SidebarItem[] = [
                 label: "Observability",
                 collapsed: true,
                 items: [
+                  "self-hosting/manage/instrumentation",
+                  "self-hosting/manage/log-structure",
                   "self-hosting/manage/service_ping",
                   {
                     type: "category",

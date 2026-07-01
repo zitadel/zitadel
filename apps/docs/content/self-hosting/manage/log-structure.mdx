@@ -1,0 +1,211 @@
+---
+title: Log Structure
+description: "Understand the structured log output of ZITADEL, including log fields, streams, formats, and sensitive data masking."
+---
+
+When structured logging is enabled via `Instrumentation.Log.Format`, ZITADEL writes structured log records to standard error.
+This page describes the fields, formats, and conventions used in the log output.
+
+## Enabling structured logs
+
+Set the `Format` field to one of the supported formats to activate structured logging:
+
+```yaml
+Instrumentation:
+  Log:
+    Format: "json" # or "text", "gcp", "gcp_error_reporting"
+```
+
+When `Format` is `disabled` (the default), ZITADEL falls back to the legacy `Log` configuration.
+
+## Log formats
+
+| Format | Output | Best for |
+|---|---|---|
+| `text` | Human-readable key=value pairs on stderr | Local development, manual debugging |
+| `json` | JSON objects, one per line | Machine parsing, log aggregation pipelines |
+| `gcp` | JSON with Google Cloud Logging fields (`severity`, `message`, `logging.googleapis.com/sourceLocation`) | Google Cloud Logging integration |
+| `gcp_error_reporting` | JSON with Google Cloud Error Reporting fields (`@type`, `serviceContext`) | Google Cloud Error Reporting integration |
+
+## Common log fields
+
+Every structured log record contains the following fields.
+Field names follow the Go `slog` conventions.
+
+| Field | Type | Description |
+|---|---|---|
+| `time` | string (RFC 3339) | Timestamp when the log record was created |
+| `level` | string | Log severity: `DEBUG`, `INFO`, `WARN`, or `ERROR` |
+| `msg` | string | Human-readable log message |
+| `stream` | string | Logical log stream/category (for example, `request`) |
+| `version` | string | Logger/schema version for the structured log format |
+| `source` | object | Source file location where the log was emitted (when `AddSource: true`) |
+| `source.function` | string | Go function name |
+| `source.file` | string | Source file path |
+| `source.line` | number | Line number in the source file |
+
+When tracing or request-scoped context is available, additional fields may be injected, such as trace and span identifiers (for example, `trace_id`, `span_id`) and the `request` field group.
+
+### Request log fields
+
+Log records in the `request` stream include additional fields for HTTP, gRPC, and Connect requests.
+
+**Top-level request attributes** (emitted directly by the log interceptors):
+
+| Field | Type | Description |
+|---|---|---|
+| `protocol` | string | `http`, `grpc`, or `connect` |
+| `service` | string | Name of the service handling the request |
+| `http_method` | string | HTTP method (e.g., `GET`, `POST`). gRPC always uses `POST`. |
+| `path` | string | Request path (HTTP) or gRPC/Connect method path |
+| `status` | number | HTTP status code (HTTP protocol only) |
+| `code` | number | gRPC or Connect status code (gRPC and Connect protocols only) |
+| `duration` | duration | Request processing time (Go duration format) |
+
+**Request details group** (injected from request context):
+
+| Field | Type | Description |
+|---|---|---|
+| `request.id` | string | Unique request identifier |
+| `request.instance_host` | string | Instance host that received the request |
+| `request.public_host` | string | Public host header (when set, e.g., by login v2) |
+| `request.instance_id` | string | ZITADEL instance that handled the request |
+| `request.user_id` | string | Authenticated user ID (when available) |
+
+### Error fields
+
+When an error is logged, additional fields are grouped under the `err` key to provide diagnostic context:
+
+| Field | Type | Description |
+|---|---|---|
+| `err.kind` | string | Classification of the error (e.g., `NotFound`, `PermissionDenied`) |
+| `err.message` | string | Error message |
+| `err.id` | string | ZITADEL error identifier (e.g., `USER-Gsj9q`) |
+| `err.parent` | any | Parent error, if the error wraps another |
+| `err.reportLocation` | object | Source location where the error was created (when `ReportLocation: true`) |
+| `err.reportLocation.file` | string | Source file |
+| `err.reportLocation.line` | number | Line number |
+| `err.reportLocation.function` | string | Function name |
+| `err.stackTrace` | string | Full stack trace (when `StackTrace: true`) |
+
+### Event handler fields
+
+Log records in the `event_handler` stream include fields about projection processing:
+
+| Field | Type | Description |
+|---|---|---|
+| `handler` | string | Name of the event handler / projection |
+| `event_type` | string | Type of event being processed |
+| `aggregate_type` | string | Aggregate type of the event |
+| `aggregate_id` | string | Aggregate ID of the event |
+| `sequence` | number | Event sequence number |
+
+## Streams
+
+Streams control which subsystems emit log records.
+Each stream produces logs for a specific area of the application:
+
+| Stream | Description | Typical use |
+|---|---|---|
+| `runtime` | Startup, shutdown, and general lifecycle messages | Always useful; confirms ZITADEL started correctly |
+| `ready` | Readiness and health check results | Health monitoring; used by the `zitadel ready` command |
+| `request` | Incoming API and HTTP requests with response status | Access logging, traffic analysis, debugging request flows |
+| `event_handler` | Event processing in projections | Debugging projection delays or failures |
+| `queue` | Job queue processing | Monitoring background job execution |
+| `event_pusher` | Event pushing to the database | Deep debugging only — **contains sensitive data** |
+
+<Callout type="warn">
+The `event_pusher` stream outputs data that may contain personally identifiable information (PII).
+Only enable it in controlled debugging scenarios, never in production.
+</Callout>
+
+Configure streams via YAML or as a comma-separated environment variable:
+
+```yaml
+Instrumentation:
+  Log:
+    Streams:
+      - runtime
+      - request
+```
+
+```bash
+ZITADEL_INSTRUMENTATION_LOG_STREAMS=runtime,request
+```
+
+## Masking sensitive data
+
+The masking configuration replaces attribute values matching specified keys.
+This prevents sensitive data from appearing in logs or exported telemetry:
+
+```yaml
+Instrumentation:
+  Log:
+    Mask:
+      Keys:
+        - "first_name"
+        - "last_name"
+        - "email"
+      Value: "****"
+```
+
+**How key matching works:**
+
+- Keys are unqualified and match at any nesting depth.
+  For example, `"email"` matches both `email` and `user.email`.
+- When the key matches a **group** (nested object), all values in the group are masked but the structure is preserved.
+- When the key matches a **non-group value** that contains a nested object or array, the entire value is replaced with the mask string.
+
+## Example log output
+
+### JSON format
+
+```json
+{
+  "time": "2025-01-15T10:30:45.123Z",
+  "level": "INFO",
+  "msg": "request served",
+  "stream": "request",
+  "version": "3.0.0",
+  "source": {
+    "function": "github.com/zitadel/zitadel/internal/api/http/middleware.LogHandler.func1.1",
+    "file": "internal/api/http/middleware/log_interceptor.go",
+    "line": 28
+  },
+  "TraceID": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+  "SpanID": "a1b2c3d4e5f6a1b2",
+  "request": {
+    "id": "cv6l5m5g5ekg00a0v3fg",
+    "instance_host": "my-instance.zitadel.cloud",
+    "instance_id": "123456789012345678"
+  },
+  "protocol": "http",
+  "service": "OIDC",
+  "http_method": "POST",
+  "path": "/oauth/v2/token",
+  "status": 200,
+  "duration": 12500000
+}
+```
+
+### Text format
+
+```
+time=2025-01-15T10:30:45.123Z level=INFO msg="request served" stream=request version=3.0.0 source.file=internal/api/http/middleware/log_interceptor.go source.line=28 request.id=cv6l5m5g5ekg00a0v3fg request.instance_host=my-instance.zitadel.cloud request.instance_id=123456789012345678 protocol=http service=OIDC http_method=POST path=/oauth/v2/token status=200 duration=12.5ms
+```
+
+## OTEL log export
+
+In addition to printing logs to stderr, ZITADEL can export log records to an OpenTelemetry backend.
+This is configured separately from the stderr format and can run in parallel:
+
+```yaml
+Instrumentation:
+  Log:
+    Format: "json"        # Print to stderr
+    Exporter:
+      Type: "grpc"        # Also export via OTEL
+      Endpoint: "otelcol.monitoring.svc:4317"
+```
+
+See the [Instrumentation](/self-hosting/manage/instrumentation) page for full exporter configuration.

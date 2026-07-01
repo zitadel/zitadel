@@ -18,7 +18,7 @@ This page shows platform-agnostic ways to scrape ZITADEL metrics using:
 
 - You have a running ZITADEL instance reachable from your monitoring stack.
 - You know the base URL and port to reach ZITADEL (e.g., `http://zitadel.zitadel.svc:8080` in Kubernetes or `http://localhost:8080` locally).
-- Metrics are enabled in your runtime [configuration](https://zitadel.com/docs/self-hosting/manage/configure) (they are enabled by default in standard setups). If you explicitly disabled metrics in your configuration, re-enable them before proceeding. The (default) configuration is located in the [defaults.yaml](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml).
+- The metric exporter is set to `prometheus` in your [Instrumentation](/self-hosting/manage/instrumentation#metrics) configuration. If you explicitly disabled metrics in your configuration, re-enable them before proceeding.
 
 ## Option A — Kubernetes (annotation-based autodiscovery)
 
