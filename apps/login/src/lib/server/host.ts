@@ -8,6 +8,10 @@ import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/he
  * @throws Error if no host is found
  */
 export function getInstanceHost(headers: ReadonlyHeaders): string | null {
+  // Fix for zitadel/zitadel#12302: honor an explicit ZITADEL_INSTANCE_HOST override so a
+  // remote/Cloud instance served on a different domain (Vercel self-host) resolves correctly.
+  const instanceHostOverride = process.env.ZITADEL_INSTANCE_HOST?.trim();
+  if (instanceHostOverride) return instanceHostOverride;
   // use standard proxy headers (x-forwarded-host → host) for both multi-tenant and self-hosted, do not use x-zitadel-instance-host
   const instanceHost =
     headers.get("x-zitadel-instance-host") || headers.get("x-zitadel-forward-host") || headers.get("host");
