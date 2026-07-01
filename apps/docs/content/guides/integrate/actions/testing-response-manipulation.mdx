@@ -292,6 +292,23 @@ the [Sent information Response](./usage#sent-information-response) payload descr
 }
 ```
 
+## Debugging claim mapping issues with external IdPs
+
+The same `RetrieveIdentityProviderIntent` webhook is useful for diagnosing auto-user-creation failures caused by unexpected or missing claims from an external IdP.
+
+A common symptom is an error like:
+
+```
+invalid AddHumanUserRequest.Profile: embedded message failed validation |
+caused by: invalid SetHumanProfile.GivenName: value length must be between 1 and 200 runes, inclusive
+```
+
+This means ZITADEL received an empty value for `givenName` during auto-creation. The IdP may be sending the claim under a different key than ZITADEL expects (e.g. `Givenname`, `firstname`, or a provider-specific claim name).
+
+**To inspect the raw claims ZITADEL receives from your IdP**, point the execution at a logging endpoint (such as [Webhook.site](./webhook-site-setup)) instead of a manipulation handler. Trigger a login with the external IdP and look at the `rawInformation` field in the payload — this contains the unmodified claims exactly as ZITADEL received them.
+
+Compare the claim keys in `rawInformation` against what ZITADEL maps to standard profile fields. If the IdP uses a non-standard key, you can remap it in the same webhook by setting `addHumanUser.profile.givenName` from the correct source field before returning the response.
+
 ## Conclusion
 
 You have successfully set up a target and execution to manipulate API responses in your ZITADEL instance.
