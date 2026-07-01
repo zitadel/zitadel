@@ -531,6 +531,7 @@ func startCommandsQueries(
 		0,   // not needed for projections
 		nil, // not needed for projections
 		false,
+		config.DefaultInstance.SecretGenerators.ToMap(),
 	)
 	logging.OnError(ctx, err).Fatal("unable to start queries")
 
