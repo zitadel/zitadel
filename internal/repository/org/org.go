@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -282,6 +283,7 @@ type OrgRemovedEvent struct {
 	domains                     []string
 	externalIDPs                []*domain.UserIDPLink
 	samlEntityIDs               []string
+	groupNames                  []string
 }
 
 func (e *OrgRemovedEvent) Payload() interface{} {
@@ -304,6 +306,9 @@ func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	for _, entityID := range e.samlEntityIDs {
 		constraints = append(constraints, project.NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID))
 	}
+	for _, groupName := range e.groupNames {
+		constraints = append(constraints, group.NewRemoveGroupNameUniqueConstraint(groupName, e.Aggregate().ID))
+	}
 	return constraints
 }
 
@@ -314,7 +319,7 @@ func (e *OrgRemovedEvent) Fields() []*eventstore.FieldOperation {
 	}
 }
 
-func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string, usernames []string, organizationScopedUsernames bool, domains []string, externalIDPs []*domain.UserIDPLink, samlEntityIDs []string) *OrgRemovedEvent {
+func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string, usernames []string, organizationScopedUsernames bool, domains []string, externalIDPs []*domain.UserIDPLink, samlEntityIDs []string, groupNames []string) *OrgRemovedEvent {
 	return &OrgRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -327,6 +332,7 @@ func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, na
 		externalIDPs:                externalIDPs,
 		samlEntityIDs:               samlEntityIDs,
 		organizationScopedUsernames: organizationScopedUsernames,
+		groupNames:                  groupNames,
 	}
 }
 

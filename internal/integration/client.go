@@ -1416,3 +1416,12 @@ func (i *Instance) AddUsersToGroup(ctx context.Context, t *testing.T, groupID st
 	require.NoError(t, err)
 	return resp
 }
+
+func (i *Instance) RemoveUsersFromGroup(ctx context.Context, t *testing.T, groupID string, userIDs []string) *group_v2.RemoveUsersFromGroupResponse {
+	resp, err := i.Client.GroupV2.RemoveUsersFromGroup(ctx, &group_v2.RemoveUsersFromGroupRequest{
+		Id:      groupID,
+		UserIds: userIDs,
+	})
+	require.NoError(t, err)
+	return resp
+}

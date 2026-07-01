@@ -192,3 +192,11 @@ func (c *Commands) checkPermissionAddUserToGroup(ctx context.Context, resourceOw
 func (c *Commands) checkPermissionRemoveUserFromGroup(ctx context.Context, resourceOwner, groupID string) error {
 	return c.newPermissionCheck(ctx, domain.PermissionGroupUserDelete, group.AggregateType)(resourceOwner, groupID)
 }
+
+func (c *Commands) checkPermissionWriteGroupGrant(ctx context.Context, resourceOwner, groupID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionGroupGrantWrite, group.AggregateType)(resourceOwner, groupID)
+}
+
+func (c *Commands) checkPermissionDeleteGroupGrant(ctx context.Context, resourceOwner, groupID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionGroupGrantDelete, group.AggregateType)(resourceOwner, groupID)
+}

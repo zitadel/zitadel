@@ -31,7 +31,7 @@ metadata as (
 		and instance_id = $2
 	) r
 ),
--- get all user grants, needed for the orgs query
+-- get all user grants, merged with the grants of the user's groups, needed for the orgs query
 user_grants as (
 	select id, grant_id, state, creation_date, change_date, sequence, user_id, roles, resource_owner, project_id
 	from projections.user_grants5
@@ -39,8 +39,22 @@ user_grants as (
 	and instance_id = $2
 	and project_id = any($3)
     and state = 1
-	{{ if . -}}
+	{{ if .RoleOrgIDs -}}
 	and resource_owner = any($4)
+	{{- end }}
+	union all
+	-- group grants resolve at query time through the user's memberships:
+	-- removing a member, a grant, or the group itself instantly stops the
+	-- derived roles without any cleanup events
+	select gg.id, gg.grant_id, gg.state, gg.creation_date, gg.change_date, gg.sequence, gu.user_id, gg.roles, gg.resource_owner, gg.project_id
+	from projections.group_grants1 gg
+	join projections.group_users1 gu on gu.group_id = gg.group_id and gu.instance_id = gg.instance_id
+	where gu.user_id = $1
+	and gg.instance_id = $2
+	and gg.project_id = any($3)
+	and gg.state = 1
+	{{ if .RoleOrgIDs -}}
+	and gg.resource_owner = any($4)
 	{{- end }}
 ),
 -- filter all orgs we are interested in.
@@ -62,7 +76,8 @@ user_org as (
 		join usr u on o.id = u.resource_owner
 	) r
 ),
--- find the user's groups
+{{ if .Groups -}}
+-- find the user's groups, only when a group scope is requested
 user_groups as (
     select json_agg(row_to_json(r)) as user_groups from (
         select g.id, g.name
@@ -74,6 +89,7 @@ user_groups as (
         )
         r
 ),
+{{- end }}
 -- join user grants to orgs, projects and user
 grants as (
 	select json_agg(row_to_json(r)) as grants from (
@@ -99,6 +115,8 @@ select json_build_object(
 	),
 	'org', (select organization from user_org),
 	'metadata', (select metadata from metadata),
-	'user_grants', (select grants from grants),
-    'user_groups', (select user_groups from user_groups)
+	'user_grants', (select grants from grants)
+	{{ if .Groups -}}
+	, 'user_groups', (select user_groups from user_groups)
+	{{- end }}
 );

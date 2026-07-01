@@ -81,6 +81,16 @@ func (cmd *DeleteOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]ev
 	// 	samlEntityIDs = append(samlEntityIDs, ei.ID)
 	// }
 
+	groupNames := []string{}
+	// groupRepo := opts.groupRepo(opts.DB())
+	// groups, err := groupRepo.List(ctx, database.WithCondition(opts.organizationRepo(opts.DB()).IDCondition(d.ID)))
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// for _, g := range groups {
+	// 	groupNames = append(groupNames, g.Name)
+	// }
+
 	return []eventstore.Command{
 		org.NewOrgRemovedEvent(
 			ctx,
@@ -91,6 +101,7 @@ func (cmd *DeleteOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]ev
 			domainNames,
 			externalIDPLinks,
 			samlEntityIDs,
+			groupNames,
 		),
 	}, nil
 }

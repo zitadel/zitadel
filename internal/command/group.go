@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	repo "github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -131,8 +132,10 @@ func (c *Commands) UpdateGroup(ctx context.Context, groupUpdate *UpdateGroup) (d
 	return writeModelToObjectDetails(&existingGroup.WriteModel), nil
 }
 
-// DeleteGroup deletes a user group from an organization
-func (c *Commands) DeleteGroup(ctx context.Context, groupID string) (details *domain.ObjectDetails, err error) {
+// DeleteGroup deletes a user group from an organization.
+// Grants of the group, provided as cascadingGrantIDs, are cascade removed
+// so their unique constraints are released.
+func (c *Commands) DeleteGroup(ctx context.Context, groupID string, cascadingGrantIDs ...string) (details *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -148,12 +151,21 @@ func (c *Commands) DeleteGroup(ctx context.Context, groupID string) (details *do
 		return nil, err
 	}
 
-	err = c.pushAppendAndReduce(ctx,
-		existingGroup,
+	events := []eventstore.Command{
 		repo.NewGroupRemovedEvent(ctx,
 			GroupAggregateFromWriteModel(ctx, &existingGroup.WriteModel),
 			existingGroup.Name,
-		))
+		),
+	}
+	if len(cascadingGrantIDs) > 0 {
+		cascadeEvents, err := c.removeGroupGrantsFromGroup(ctx, cascadingGrantIDs)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, cascadeEvents...)
+	}
+
+	err = c.pushAppendAndReduce(ctx, existingGroup, events...)
 	if err != nil {
 		return nil, err
 	}

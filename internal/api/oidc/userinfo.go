@@ -103,7 +103,8 @@ func (s *Server) userInfo(
 
 			roleAudience, requestedRoles = prepareRoles(ctx, scope, projectID, projectRoleAssertion, currentProjectOnly)
 			roleOrgIDs := domain.RoleOrgIDsFromScope(scope)
-			qu, err = s.query.GetOIDCUserInfo(ctx, userID, roleAudience, roleOrgIDs...)
+			withGroups := slices.Contains(scope, ScopeUserGroups)
+			qu, err = s.query.GetOIDCUserInfo(ctx, userID, roleAudience, withGroups, roleOrgIDs...)
 			if err != nil {
 				return
 			}
@@ -190,8 +191,6 @@ func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []st
 			setUserInfoMetadata(user.Metadata, out)
 		case ScopeResourceOwner:
 			setUserInfoOrgClaims(user, out)
-		case ScopeCustomUserGroups:
-			setUserInfoCustomUserGroups(user.UserGroups, out)
 		case ScopeUserGroups:
 			setUserInfoUserGroups(user.UserGroups, out)
 		default:
@@ -291,20 +290,23 @@ func setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
 	}
 }
 
-func setUserInfoCustomUserGroups(userGroups []query.UserInfoUserGroup, out *oidc.UserInfo) {
-	if len(userGroups) == 0 {
-		return
-	}
-	out.AppendClaims(ClaimCustomUserGroups, userGroups)
+// userGroupClaim is the group membership representation defined by RFC 9068 for
+// the "groups" claim, with values encoded according to SCIM (RFC 7643, section 4.1.2)
+type userGroupClaim struct {
+	Value   string `json:"value"`
+	Display string `json:"display"`
 }
 
 func setUserInfoUserGroups(userGroups []query.UserInfoUserGroup, out *oidc.UserInfo) {
 	if len(userGroups) == 0 {
 		return
 	}
-	groups := make([]string, len(userGroups))
+	groups := make([]userGroupClaim, len(userGroups))
 	for i, userGroup := range userGroups {
-		groups[i] = userGroup.Name
+		groups[i] = userGroupClaim{
+			Value:   userGroup.ID,
+			Display: userGroup.Name,
+		}
 	}
 	out.AppendClaims(ClaimUserGroups, groups)
 }

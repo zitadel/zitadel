@@ -221,6 +221,11 @@ func (p *Storage) SetUserinfoWithUserID(ctx context.Context, applicationID strin
 		return err
 	}
 
+	customAttributes, err = p.appendUserGroupsAttribute(ctx, userID, customAttributes)
+	if err != nil {
+		return err
+	}
+
 	setUserinfo(user, userinfo, attributes, customAttributes)
 
 	// trigger activity log for authentication for user
@@ -491,6 +496,43 @@ func (p *Storage) getGrants(ctx context.Context, userID, applicationID string) (
 			activeQuery,
 		},
 	}, true, nil)
+}
+
+// appendUserGroupsAttribute adds the names of the user's groups as a "groups" attribute.
+// An attribute of the same name set by an action takes precedence.
+func (p *Storage) appendUserGroupsAttribute(ctx context.Context, userID string, customAttributes map[string]*customAttribute) (map[string]*customAttribute, error) {
+	if _, ok := customAttributes["groups"]; ok {
+		return customAttributes, nil
+	}
+	userIDQuery, err := query.NewGroupUsersUserIDsSearchQuery([]string{userID})
+	if err != nil {
+		return nil, err
+	}
+	memberships, err := p.query.SearchGroupUsers(ctx, &query.GroupUsersSearchQuery{
+		Queries: []query.SearchQuery{userIDQuery},
+	}, nil)
+	if err != nil {
+		return nil, err
+	}
+	return appendGroupNamesAttribute(customAttributes, memberships.GroupUsers), nil
+}
+
+// appendGroupNamesAttribute appends the user's group names as a "groups" SAML attribute.
+// Empty group names are filtered: a left-joined group row that has been removed scans as "".
+func appendGroupNamesAttribute(customAttributes map[string]*customAttribute, memberships []*query.GroupUser) map[string]*customAttribute {
+	if len(memberships) == 0 {
+		return customAttributes
+	}
+	groupNames := make([]string, 0, len(memberships))
+	for _, membership := range memberships {
+		if membership.GroupName != "" {
+			groupNames = append(groupNames, membership.GroupName)
+		}
+	}
+	if len(groupNames) == 0 {
+		return customAttributes
+	}
+	return appendCustomAttribute(customAttributes, "groups", "urn:oasis:names:tc:SAML:2.0:attrname-format:basic", groupNames)
 }
 
 type customAttribute struct {
