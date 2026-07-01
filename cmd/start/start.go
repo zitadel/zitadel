@@ -248,6 +248,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		config.AuditLogRetention,
 		config.SystemAPIUsers,
 		true,
+		config.DefaultInstance.SecretGenerators.ToMap(),
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
