@@ -1477,6 +1477,14 @@ func TestServer_TestInstanceSecretGeneratorSettingsReduces(t *testing.T) {
 			assert.Equal(collect, false, *setting.OTPEmail.IncludeUpperLetters)
 			assert.Equal(collect, true, *setting.OTPEmail.IncludeDigits)
 			assert.Equal(collect, false, *setting.OTPEmail.IncludeSymbols)
+
+			// InviteCode
+			assert.Equal(collect, uint(6), *setting.InviteCode.Length)
+			assert.Equal(collect, 72*time.Hour, *setting.InviteCode.Expiry)
+			assert.Equal(collect, false, *setting.InviteCode.IncludeLowerLetters)
+			assert.Equal(collect, true, *setting.InviteCode.IncludeUpperLetters)
+			assert.Equal(collect, true, *setting.InviteCode.IncludeDigits)
+			assert.Equal(collect, false, *setting.InviteCode.IncludeSymbols)
 		}, retryDuration, tick)
 	})
 

@@ -23,6 +23,16 @@ type GeneratorConfig struct {
 	IncludeSymbols      bool
 }
 
+func (c *GeneratorConfig) Valid() error {
+	if c.Length < 1 {
+		return zerrors.ThrowInvalidArgument(nil, "CRYPTO-FVJ2x", "Errors.InvalidArgument")
+	}
+	if !c.IncludeLowerLetters && !c.IncludeUpperLetters && !c.IncludeDigits && !c.IncludeSymbols {
+		return zerrors.ThrowInvalidArgument(nil, "CRYPTO-Ckl2s", "Errors.InvalidArgument")
+	}
+	return nil
+}
+
 //go:generate mockgen -source code.go -destination ./code_mock.go -package crypto
 
 type Generator interface {
