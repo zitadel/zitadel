@@ -106,11 +106,7 @@ export function assertGroupEvents(api: API, groupId: string, expected: string[])
   });
 }
 
-export function assertGroupEventsContain(
-  api: API,
-  groupId: string,
-  expected: string[],
-): Cypress.Chainable<string[]> {
+export function assertGroupEventsContain(api: API, groupId: string, expected: string[]): Cypress.Chainable<string[]> {
   return awaitGroupEventTypes(api, groupId, (types) => expected.every((t) => types.includes(t))).then((types) => {
     for (const t of expected) {
       expect(types, `expected group ${groupId} to contain event ${t}`).to.include(t);

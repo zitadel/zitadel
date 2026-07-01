@@ -1,9 +1,5 @@
 import { Context } from 'support/commands';
-import {
-  ensureGroupDoesntExist,
-  ensureGroupExists,
-  setGroupManagerRoles,
-} from '../../support/api/groups';
+import { ensureGroupDoesntExist, ensureGroupExists, setGroupManagerRoles } from '../../support/api/groups';
 import {
   assertGroupEvents,
   assertGroupEventsContain,
@@ -33,10 +29,7 @@ describe('groups — manager roles (API + event log)', () => {
       cy.get<Context>('@ctx').then((ctx) => {
         ensureGroupExists(ctx.api, groupName).then((groupId) => {
           setGroupManagerRoles(ctx.api, groupId, [VALID_ROLE]).then(() => {
-            assertGroupEvents(ctx.api, groupId, [
-              GroupEventTypes.Added,
-              GroupEventTypes.ManagerRolesSet,
-            ]);
+            assertGroupEvents(ctx.api, groupId, [GroupEventTypes.Added, GroupEventTypes.ManagerRolesSet]);
           });
         });
       });
@@ -140,12 +133,10 @@ describe('groups — manager roles (API + event log)', () => {
         ensureGroupExists(ctx.api, groupName).then((groupId) => {
           listGroupEventTypes(ctx.api, groupId).then((before) => {
             const baseline = before.length;
-            setGroupManagerRoles(ctx.api, groupId, ['NOT_ORG_PREFIXED'], { failOnStatusCode: false }).then(
-              (res) => {
-                expect(res.status, 'API rejected the call').to.be.gte(400);
-                assertNoGroupEventsAppendedSince(ctx.api, groupId, baseline);
-              },
-            );
+            setGroupManagerRoles(ctx.api, groupId, ['NOT_ORG_PREFIXED'], { failOnStatusCode: false }).then((res) => {
+              expect(res.status, 'API rejected the call').to.be.gte(400);
+              assertNoGroupEventsAppendedSince(ctx.api, groupId, baseline);
+            });
           });
         });
       });
@@ -156,12 +147,10 @@ describe('groups — manager roles (API + event log)', () => {
         ensureGroupExists(ctx.api, groupName).then((groupId) => {
           listGroupEventTypes(ctx.api, groupId).then((before) => {
             const baseline = before.length;
-            setGroupManagerRoles(ctx.api, groupId, ['ORG_NONEXISTENT_ROLE'], { failOnStatusCode: false }).then(
-              (res) => {
-                expect(res.status, 'API rejected the call').to.be.gte(400);
-                assertNoGroupEventsAppendedSince(ctx.api, groupId, baseline);
-              },
-            );
+            setGroupManagerRoles(ctx.api, groupId, ['ORG_NONEXISTENT_ROLE'], { failOnStatusCode: false }).then((res) => {
+              expect(res.status, 'API rejected the call').to.be.gte(400);
+              assertNoGroupEventsAppendedSince(ctx.api, groupId, baseline);
+            });
           });
         });
       });

@@ -1,8 +1,5 @@
 import { Context } from 'support/commands';
-import {
-  ensureGroupDoesntExist,
-  ensureGroupExists,
-} from '../../support/api/groups';
+import { ensureGroupDoesntExist, ensureGroupExists } from '../../support/api/groups';
 import { ensureProjectExists, ensureRoleExists } from '../../support/api/projects';
 
 const backendUrl = Cypress.env('BACKEND_URL');
@@ -71,7 +68,9 @@ describe('groups — form-level client validation', () => {
 
     it('cancel discards changes and fires no request', () => {
       cy.get('[data-e2e="group-name-input"]').type(name);
-      cy.get('button[mat-stroked-button]').contains(/cancel|abbrechen/i).click({ force: true });
+      cy.get('button[mat-stroked-button]')
+        .contains(/cancel|abbrechen/i)
+        .click({ force: true });
       cy.wait(500);
       cy.get('@createGroup.all').should('have.length', 0);
     });
@@ -144,9 +143,7 @@ describe('groups — form-level client validation', () => {
       cy.get('[data-e2e="group-grant-roles-table"]').should('be.visible');
       cy.get('[data-e2e="group-grant-save"]').should('be.disabled');
 
-      cy.contains('[data-e2e="group-grant-roles-table"] tr', roleKey)
-        .find('mat-checkbox')
-        .click();
+      cy.contains('[data-e2e="group-grant-roles-table"] tr', roleKey).find('mat-checkbox').click();
       cy.get('[data-e2e="group-grant-save"]').should('be.enabled');
 
       cy.wait(500);
@@ -168,7 +165,9 @@ describe('groups — form-level client validation', () => {
 
     it('cancelling the confirm dialog fires no delete request', () => {
       cy.contains('tr', name).find('[data-e2e="delete-group-button"]').click({ force: true });
-      cy.get('button').contains(/cancel|abbrechen/i).click({ force: true });
+      cy.get('button')
+        .contains(/cancel|abbrechen/i)
+        .click({ force: true });
       cy.wait(500);
       cy.get('@deleteGroup.all').should('have.length', 0);
       cy.contains('tr', name).should('exist');

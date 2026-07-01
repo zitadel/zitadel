@@ -7,11 +7,7 @@ import {
   removeUsersFromGroup,
 } from '../../support/api/groups';
 import { ensureHumanUserExists, ensureUserDoesntExist } from '../../support/api/users';
-import {
-  assertGroupEvents,
-  assertGroupEventsContain,
-  GroupEventTypes,
-} from '../../support/api/events';
+import { assertGroupEvents, assertGroupEventsContain, GroupEventTypes } from '../../support/api/events';
 
 describe('groups — members (API + event log)', () => {
   beforeEach(() => {
@@ -128,10 +124,7 @@ describe('groups — members (API + event log)', () => {
               addUsersToGroup(ctx.api, groupId, [idA]).then(() => {
                 removeUsersFromGroup(ctx.api, groupId, [idB]).then(() => {
                   cy.wait(1000).then(() => {
-                    assertGroupEvents(ctx.api, groupId, [
-                      GroupEventTypes.Added,
-                      GroupEventTypes.UserAdded,
-                    ]);
+                    assertGroupEvents(ctx.api, groupId, [GroupEventTypes.Added, GroupEventTypes.UserAdded]);
                   });
                 });
               });

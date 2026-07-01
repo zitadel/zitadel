@@ -249,12 +249,7 @@ export function listGroupGrants(api: API, groupId: string): Cypress.Chainable<an
     .then((res) => res.body.groupGrants ?? []);
 }
 
-export function awaitGroupGrantsCount(
-  api: API,
-  groupId: string,
-  expected: number,
-  trials = 20,
-): Cypress.Chainable<any[]> {
+export function awaitGroupGrantsCount(api: API, groupId: string, expected: number, trials = 20): Cypress.Chainable<any[]> {
   return listGroupGrants(api, groupId).then((grants) => {
     if (grants.length === expected) {
       return cy.wrap(grants);
@@ -279,11 +274,7 @@ export function setGroupManagerRoles(
   });
 }
 
-export function ensureGroupGrantDoesntExist(
-  api: API,
-  groupId: string,
-  projectId: string,
-): Cypress.Chainable<null> {
+export function ensureGroupGrantDoesntExist(api: API, groupId: string, projectId: string): Cypress.Chainable<null> {
   return listGroupGrants(api, groupId).then((grants) => {
     const match = grants.find((g) => g.projectId === projectId);
     if (!match) {
@@ -293,11 +284,7 @@ export function ensureGroupGrantDoesntExist(
   });
 }
 
-export function assertGroupAggregateScopedToOrg(
-  api: API,
-  groupId: string,
-  expectedOrgId: string,
-): Cypress.Chainable<any> {
+export function assertGroupAggregateScopedToOrg(api: API, groupId: string, expectedOrgId: string): Cypress.Chainable<any> {
   return getGroup(api, groupId).then((g) => {
     expect(g, `group ${groupId} resolvable`).to.not.be.null;
     expect(g.organizationId, `group ${groupId} scoped to org`).to.equal(expectedOrgId);
@@ -312,11 +299,7 @@ export function assertNoOrphanGrants(api: API, groupId: string): Cypress.Chainab
   });
 }
 
-export function assertMembershipCount(
-  api: API,
-  groupId: string,
-  expected: number,
-): Cypress.Chainable<any[]> {
+export function assertMembershipCount(api: API, groupId: string, expected: number): Cypress.Chainable<any[]> {
   return listGroupUsers(api, groupId).then((users) => {
     expect(users.length, `group ${groupId} membership count`).to.equal(expected);
     return cy.wrap(users);

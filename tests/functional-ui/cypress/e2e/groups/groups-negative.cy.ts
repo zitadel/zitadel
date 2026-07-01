@@ -14,11 +14,7 @@ import {
 } from '../../support/api/groups';
 import { ensureHumanUserExists } from '../../support/api/users';
 import { ensureProjectExists, ensureRoleExists } from '../../support/api/projects';
-import {
-  assertNoGroupEventsAppendedSince,
-  listGroupEventTypes,
-  listGrantEventTypes,
-} from '../../support/api/events';
+import { assertNoGroupEventsAppendedSince, listGroupEventTypes, listGrantEventTypes } from '../../support/api/events';
 
 describe('groups — negative paths (no event must be appended)', () => {
   beforeEach(() => {

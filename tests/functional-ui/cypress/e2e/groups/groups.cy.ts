@@ -118,9 +118,7 @@ describe('groups', () => {
 
         cy.get('[data-e2e="group-grant-project-autocomplete"] input').click();
         cy.contains('mat-option', testProjectName, { timeout: 10000 }).click();
-        cy.contains('[data-e2e="group-grant-roles-table"] tr', testRoleKey)
-          .find('mat-checkbox')
-          .click();
+        cy.contains('[data-e2e="group-grant-roles-table"] tr', testRoleKey).find('mat-checkbox').click();
         cy.get('[data-e2e="group-grant-save"]').click();
         cy.shouldConfirmSuccess();
         cy.contains('.grant-row', `${projectId}`).should('contain', testRoleKey);

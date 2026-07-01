@@ -40,10 +40,7 @@ describe('groups — grants (API + event log)', () => {
               const grantId = res.body.id;
 
               updateGroupGrant(ctx.api, grantId, [roleA, roleB]).then(() => {
-                assertGrantEvents(ctx.api, grantId, [
-                  GroupEventTypes.GrantAdded,
-                  GroupEventTypes.GrantChanged,
-                ]);
+                assertGrantEvents(ctx.api, grantId, [GroupEventTypes.GrantAdded, GroupEventTypes.GrantChanged]);
 
                 listGroupGrants(ctx.api, groupId).should((grants) => {
                   const match = grants.find((g) => g.id === grantId);
@@ -99,15 +96,15 @@ describe('groups — grants (API + event log)', () => {
               const grantId = res.body.id;
 
               deleteGroupGrant(ctx.api, grantId).then(() => {
-                assertGrantEvents(ctx.api, grantId, [
-                  GroupEventTypes.GrantAdded,
-                  GroupEventTypes.GrantRemoved,
-                ]);
+                assertGrantEvents(ctx.api, grantId, [GroupEventTypes.GrantAdded, GroupEventTypes.GrantRemoved]);
 
                 assertGroupEvents(ctx.api, groupId, [GroupEventTypes.Added]);
 
                 listGroupGrants(ctx.api, groupId).should((grants) => {
-                  expect(grants.find((g) => g.id === grantId), 'grant gone').to.be.undefined;
+                  expect(
+                    grants.find((g) => g.id === grantId),
+                    'grant gone',
+                  ).to.be.undefined;
                 });
               });
             });

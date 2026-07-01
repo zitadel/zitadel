@@ -5,7 +5,17 @@ import { MessageInitShape } from '@bufbuild/protobuf';
 import { FieldName, Group } from '@zitadel/proto/zitadel/group/v2/group_pb';
 import { CreateGroupRequestSchema, UpdateGroupRequestSchema } from '@zitadel/proto/zitadel/group/v2/group_service_pb';
 import { PageEvent } from '@angular/material/paginator';
-import { BehaviorSubject, combineLatest, defer, firstValueFrom, lastValueFrom, Observable, of, ReplaySubject, shareReplay } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  defer,
+  firstValueFrom,
+  lastValueFrom,
+  Observable,
+  of,
+  ReplaySubject,
+  shareReplay,
+} from 'rxjs';
 import { catchError, filter, map, startWith, switchMap, tap } from 'rxjs/operators';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';

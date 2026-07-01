@@ -10,11 +10,7 @@ import {
 import { ensureOrgExists } from '../../support/api/orgs';
 import { ensureHumanUserExists, ensureHumanUserExistsInOrg } from '../../support/api/users';
 import { ensureProjectExists } from '../../support/api/projects';
-import {
-  assertNoGroupEventsAppendedSince,
-  GroupEventTypes,
-  listGroupEventTypes,
-} from '../../support/api/events';
+import { assertNoGroupEventsAppendedSince, GroupEventTypes, listGroupEventTypes } from '../../support/api/events';
 
 const foreignOrgName = 'e2eforeignorg-groups';
 

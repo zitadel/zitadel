@@ -12,11 +12,7 @@ import {
   defaultOrgId,
 } from '../../support/api/groups';
 import { ensureProjectExists, ensureRoleExists } from '../../support/api/projects';
-import {
-  assertGrantEvents,
-  assertGroupEvents,
-  GroupEventTypes,
-} from '../../support/api/events';
+import { assertGrantEvents, assertGroupEvents, GroupEventTypes } from '../../support/api/events';
 
 describe('groups — lifecycle (API + event log)', () => {
   beforeEach(() => {
@@ -101,19 +97,10 @@ describe('groups — lifecycle (API + event log)', () => {
 
                   awaitGroupGrantsCount(ctx.api, groupId, 2);
                   deleteGroup(ctx.api, groupId).then(() => {
-                    assertGroupEvents(ctx.api, groupId, [
-                      GroupEventTypes.Added,
-                      GroupEventTypes.Removed,
-                    ]);
+                    assertGroupEvents(ctx.api, groupId, [GroupEventTypes.Added, GroupEventTypes.Removed]);
 
-                    assertGrantEvents(ctx.api, grantA, [
-                      'group.grant.added',
-                      GroupEventTypes.GrantCascadeRemoved,
-                    ]);
-                    assertGrantEvents(ctx.api, grantB, [
-                      'group.grant.added',
-                      GroupEventTypes.GrantCascadeRemoved,
-                    ]);
+                    assertGrantEvents(ctx.api, grantA, ['group.grant.added', GroupEventTypes.GrantCascadeRemoved]);
+                    assertGrantEvents(ctx.api, grantB, ['group.grant.added', GroupEventTypes.GrantCascadeRemoved]);
 
                     listGroupGrants(ctx.api, groupId).should((grants) => {
                       expect(grants, 'no grants remain after cascade').to.have.length(0);
