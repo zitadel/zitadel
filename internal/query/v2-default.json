@@ -3671,5 +3671,338 @@
       "failedLoading": "فشل تحميل البيانات. يرجى المحاولة مرة أخرى.",
       "tryagain": "حاول مرة أخرى"
     }
+  },
+  "hu": {
+    "common": {
+      "back": "Vissza",
+      "title": "Bejelentkezés a Zitadel-lel"
+    },
+    "accounts": {
+      "title": "Fiókok",
+      "description": "Válaszd ki a használni kívánt fiókot.",
+      "addAnother": "Másik fiók hozzáadása",
+      "noResults": "Nem található fiók",
+      "verified": "ellenőrizve",
+      "expired": "lejárt"
+    },
+    "logout": {
+      "title": "Kijelentkezés",
+      "description": "Kattints egy fiókra a munkamenet befejezéséhez",
+      "noResults": "Nem található fiók",
+      "clear": "Munkamenet befejezése",
+      "verifiedAt": "Utoljára aktív: {time}",
+      "success": {
+        "title": "Sikeres kijelentkezés",
+        "description": "Sikeresen kijelentkeztél."
+      }
+    },
+    "loginname": {
+      "title": "Üdvözlünk újra!",
+      "description": "Add meg a bejelentkezési adataidat.",
+      "register": "Új felhasználó regisztrálása",
+      "submit": "Tovább",
+      "labels": {
+        "loginname": "Bejelentkezési név",
+        "username": "Felhasználónév",
+        "usernameOrPhoneNumber": "Felhasználónév vagy telefonszám",
+        "usernameOrEmail": "Felhasználónév vagy e-mail cím"
+      },
+      "required": {
+        "loginName": "Ez a mező kötelező"
+      }
+    },
+    "password": {
+      "verify": {
+        "title": "Jelszó",
+        "description": "Add meg a jelszavad.",
+        "resetPassword": "Jelszó visszaállítása",
+        "submit": "Tovább",
+        "labels": {
+          "password": "Jelszó"
+        },
+        "required": {
+          "password": "Ez a mező kötelező"
+        }
+      },
+      "set": {
+        "title": "Jelszó beállítása",
+        "description": "Állítsd be a fiókod jelszavát",
+        "codeSent": "Elküldtük a kódot az e-mail címedre.",
+        "noCodeReceived": "Nem kaptál kódot?",
+        "resend": "Kód újraküldése",
+        "submit": "Tovább",
+        "labels": {
+          "code": "Kód",
+          "newPassword": "Új jelszó",
+          "confirmPassword": "Jelszó megerősítése"
+        },
+        "required": {
+          "code": "Ez a mező kötelező",
+          "newPassword": "Adj meg egy jelszót!",
+          "confirmPassword": "Ez a mező kötelező"
+        }
+      },
+      "change": {
+        "title": "Jelszó módosítása",
+        "description": "Állítsd be a fiókod jelszavát",
+        "submit": "Tovább",
+        "labels": {
+          "newPassword": "Új jelszó",
+          "confirmPassword": "Jelszó megerősítése"
+        },
+        "required": {
+          "newPassword": "Add meg az új jelszavadat!",
+          "confirmPassword": "Ez a mező kötelező"
+        }
+      }
+    },
+    "idp": {
+      "title": "Bejelentkezés SSO-val",
+      "description": "Válaszd ki az egyik szolgáltatót a bejelentkezéshez",
+      "orSignInWith": "vagy jelentkezz be ezzel",
+      "signInWithApple": "Bejelentkezés Apple-lel",
+      "signInWithGoogle": "Bejelentkezés Google-lel",
+      "signInWithAzureAD": "Bejelentkezés AzureAD-vel",
+      "signInWithGithub": "Bejelentkezés GitHubbal",
+      "signInWithGitlab": "Bejelentkezés GitLabbal",
+      "loginSuccess": {
+        "title": "Sikeres bejelentkezés",
+        "description": "Sikeresen bejelentkeztél!"
+      },
+      "linkingSuccess": {
+        "title": "Fiók összekapcsolva",
+        "description": "Sikeresen összekapcsoltad a fiókodat!"
+      },
+      "registerSuccess": {
+        "title": "Sikeres regisztráció",
+        "description": "Sikeresen regisztráltál!"
+      },
+      "loginError": {
+        "title": "Sikertelen bejelentkezés",
+        "description": "Hiba történt a bejelentkezés során."
+      },
+      "linkingError": {
+        "title": "Sikertelen fiókösszekapcsolás",
+        "description": "Hiba történt a fiókod összekapcsolása során."
+      },
+      "completeRegister": {
+        "title": "Add meg az adataidat",
+        "description": "A regisztráció befejezéséhez add meg az e-mail címedet és a nevedet."
+      }
+    },
+    "ldap": {
+      "title": "LDAP bejelentkezés",
+      "description": "Add meg az LDAP hitelesítő adataidat.",
+      "submit": "Tovább",
+      "labels": {
+        "username": "Felhasználónév",
+        "password": "Jelszó"
+      },
+      "required": {
+        "username": "Ez a mező kötelező",
+        "password": "Ez a mező kötelező"
+      }
+    },
+    "mfa": {
+      "verify": {
+        "title": "Igazold a személyazonosságodat",
+        "description": "Válaszd ki az alábbi hitelesítési módok egyikét.",
+        "noResults": "Nincs beállítható hitelesítési mód."
+      },
+      "set": {
+        "title": "Kétlépcsős azonosítás beállítása",
+        "description": "Válaszd ki az alábbi hitelesítési módok egyikét.",
+        "skip": "Kihagyás"
+      }
+    },
+    "otp": {
+      "verify": {
+        "title": "Kétlépcsős azonosítás igazolása",
+        "totpDescription": "Add meg a hitelesítő alkalmazásodban megjelenő kódot.",
+        "smsDescription": "Add meg az SMS-ben kapott kódot.",
+        "emailDescription": "Add meg az e-mailben kapott kódot.",
+        "noCodeReceived": "Nem kaptál kódot?",
+        "resendCode": "Kód újraküldése",
+        "submit": "Tovább",
+        "labels": {
+          "code": "Kód"
+        },
+        "required": {
+          "code": "Ez a mező kötelező"
+        }
+      },
+      "set": {
+        "title": "Kétlépcsős azonosítás beállítása",
+        "totpDescription": "Olvasd be a QR-kódot a hitelesítő alkalmazásoddal.",
+        "smsDescription": "Add meg a telefonszámodat, hogy SMS-ben elküldhessük az ellenőrző kódot.",
+        "emailDescription": "Add meg az e-mail címedet, hogy e-mailben elküldhessük az ellenőrző kódot.",
+        "totpRegisterDescription": "Olvasd be a QR-kódot, vagy navigálj az URL-re manuálisan.",
+        "submit": "Tovább",
+        "labels": {
+          "code": "Kód"
+        },
+        "required": {
+          "code": "Ez a mező kötelező"
+        }
+      }
+    },
+    "passkey": {
+      "verify": {
+        "title": "Hitelesítés jelkulccsal (Passkey)",
+        "description": "A készüléked az ujjlenyomatodat, arcodat vagy a képernyőzárat fogja kérni",
+        "usePassword": "Jelszó használata",
+        "submit": "Tovább"
+      },
+      "set": {
+        "title": "Jelkulcs beállítása",
+        "description": "A készüléked az ujjlenyomatodat, arcodat vagy a képernyőzárat fogja kérni",
+        "info": {
+          "description": "A jelkulcs egy olyan hitelesítési módszer, amely az eszközödön használható, például ujjlenyomattal, Apple Face ID-val vagy más hasonló megoldással.",
+          "link": "Jelkulcsos hitelesítés"
+        },
+        "skip": "Kihagyás",
+        "submit": "Tovább"
+      }
+    },
+    "u2f": {
+      "verify": {
+        "title": "Kétlépcsős azonosítás igazolása",
+        "description": "Igazold a fiókodat a készülékeddel."
+      },
+      "set": {
+        "title": "Kétlépcsős azonosítás beállítása",
+        "description": "Állíts be egy készüléket második hitelesítési módként.",
+        "submit": "Tovább"
+      }
+    },
+    "register": {
+      "methods": {
+        "passkey": "Jelkulcs",
+        "password": "Jelszó"
+      },
+      "disabled": {
+        "title": "A regisztráció letiltva",
+        "description": "A regisztráció le van tiltva. Fordulj a rendszergazdához."
+      },
+      "missingdata": {
+        "title": "Hiányzó adatok",
+        "description": "A regisztrációhoz add meg az e-mail címedet, keresztneved és vezetékneved."
+      },
+      "title": "Regisztráció",
+      "description": "Hozd létre a Zitadel fiókodat.",
+      "noMethodAvailableWarning": "Nincs elérhető hitelesítési módszer. Fordulj a rendszergazdához.",
+      "selectMethod": "Válaszd ki, milyen módszerrel szeretnél hitelesíteni",
+      "agreeTo": "A regisztrációhoz el kell fogadnod a felhasználási feltételeket",
+      "termsOfService": "Felhasználási feltételek",
+      "privacyPolicy": "Adatvédelmi irányelvek",
+      "submit": "Tovább",
+      "password": {
+        "title": "Jelszó beállítása",
+        "description": "Állítsd be a fiókod jelszavát",
+        "submit": "Tovább",
+        "labels": {
+          "password": "Jelszó",
+          "confirmPassword": "Jelszó megerősítése"
+        },
+        "required": {
+          "password": "Adj meg egy jelszót!",
+          "confirmPassword": "Ez a mező kötelező"
+        }
+      },
+      "labels": {
+        "firstname": "Keresztnév",
+        "lastname": "Vezetéknév",
+        "email": "E-mail cím"
+      },
+      "required": {
+        "firstname": "Ez a mező kötelező",
+        "lastname": "Ez a mező kötelező",
+        "email": "Ez a mező kötelező"
+      }
+    },
+    "invite": {
+      "title": "Felhasználó meghívása",
+      "description": "Add meg a meghívni kívánt felhasználó e-mail címét és nevét.",
+      "info": "A felhasználó e-mailben kapja meg a további teendőket.",
+      "notAllowed": "A beállításaid nem teszik lehetővé felhasználók meghívását.",
+      "submit": "Tovább",
+      "success": {
+        "title": "Felhasználó meghívva",
+        "description": "Az e-mail sikeresen elküldve.",
+        "verified": "A felhasználót meghívtuk, és már ellenőrizte az e-mail címét.",
+        "notVerifiedYet": "A felhasználót meghívtuk. E-mailben kapja meg a további teendőket.",
+        "submit": "Másik felhasználó meghívása"
+      }
+    },
+    "signedin": {
+      "title": "Üdvözlünk, {user}!",
+      "description": "Sikeresen bejelentkeztél.",
+      "continue": "Tovább",
+      "error": {
+        "title": "Hiba",
+        "description": "Hiba történt a bejelentkezés során."
+      }
+    },
+    "verify": {
+      "userIdMissing": "Nincs megadva felhasználói azonosító!",
+      "successTitle": "Felhasználó ellenőrizve",
+      "successDescription": "A felhasználó ellenőrzése sikeresen megtörtént.",
+      "setupAuthenticator": "Hitelesítő beállítása",
+      "verify": {
+        "title": "Felhasználó ellenőrzése",
+        "description": "Add meg az ellenőrző e-mailben kapott kódot.",
+        "noCodeReceived": "Nem kaptál kódot?",
+        "resendCode": "Kód újraküldése",
+        "codeSent": "Új kódot küldtünk az e-mail címedre.",
+        "submit": "Tovább",
+        "labels": {
+          "code": "Kód"
+        },
+        "required": {
+          "code": "Ez a mező kötelező"
+        }
+      }
+    },
+    "authenticator": {
+      "title": "Válassz hitelesítési módszert",
+      "description": "Válaszd ki, milyen módszerrel szeretnél hitelesíteni",
+      "noMethodsAvailable": "Nincs elérhető hitelesítési módszer",
+      "allSetup": "Már beállítottál egy hitelesítőt!",
+      "linkWithIDP": "vagy kapcsold össze egy azonosítószolgáltatóval"
+    },
+    "device": {
+      "usercode": {
+        "title": "Eszközkód",
+        "description": "Add meg az alkalmazásodban vagy eszközödön megjelenő kódot.",
+        "submit": "Tovább",
+        "labels": {
+          "code": "Kód"
+        },
+        "required": {
+          "code": "Ez a mező kötelező"
+        }
+      },
+      "request": {
+        "title": "A(z) {appName} kapcsolódni szeretne",
+        "description": "A(z) {appName} hozzáférést kap a következőkhöz:",
+        "disclaimer": "Az Engedélyezés gombra kattintva engedélyezed, hogy a(z) {appName} és a Zitadel a saját felhasználási feltételeik és adatvédelmi irányelveik szerint használja az adataidat. Ezt a hozzáférést bármikor visszavonhatod.",
+        "submit": "Engedélyezés",
+        "deny": "Elutasítás"
+      },
+      "scope": {
+        "openid": "A személyazonosságod igazolása.",
+        "email": "Az e-mail címed megtekintése.",
+        "profile": "A teljes profilinformációd megtekintése.",
+        "offline_access": "Offline hozzáférés engedélyezése a fiókodhoz."
+      }
+    },
+    "error": {
+      "noUserCode": "Nincs megadva felhasználói kód!",
+      "noDeviceRequest": "Nem található eszközkérés.",
+      "unknownContext": "Nem sikerült meghatározni a felhasználó kontextusát. Győződj meg róla, hogy előbb megadtad a felhasználónevet, vagy add meg a bejelentkezési nevet keresési paraméterként.",
+      "sessionExpired": "A munkameneted lejárt. Kérjük, jelentkezz be újra.",
+      "failedLoading": "Nem sikerült betölteni az adatokat. Kérjük, próbáld újra.",
+      "tryagain": "Próbáld újra"
+    }
   }
 }
