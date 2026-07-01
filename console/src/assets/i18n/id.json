@@ -1613,7 +1613,8 @@
         "5": "Inisialisasi Passkey",
         "6": "Rahasia Aplikasi",
         "7": "OTP - SMS",
-        "8": "OTP - Email"
+        "8": "OTP - Email",
+        "9": "Kode Undangan"
       },
       "EXPIRY": "Kedaluwarsa (dalam menit)",
       "INCLUDEDIGITS": "Sertakan Angka",
