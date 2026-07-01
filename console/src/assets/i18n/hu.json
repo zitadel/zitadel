@@ -1612,7 +1612,8 @@
         "5": "Passkey inicializálás",
         "6": "Alkalmazás titok",
         "7": "OTP - SMS",
-        "8": "OTP - Email"
+        "8": "OTP - Email",
+        "9": "Meghívókód"
       },
       "EXPIRY": "Lejárat (percben)",
       "INCLUDEDIGITS": "Számok bevonása",

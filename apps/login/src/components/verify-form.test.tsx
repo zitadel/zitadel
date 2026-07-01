@@ -3,7 +3,9 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { VerifyForm } from "./verify-form";
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  usePathname: () => "/verify",
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 vi.mock("next-intl", () => ({

@@ -1456,6 +1456,9 @@ func (s secretGeneratorSettings) SetSettingFields(value domain.SecretGeneratorSe
 	if value.OTPEmail != nil {
 		changes = append(changes, s.SetOTPEmail(*value.OTPEmail))
 	}
+	if value.InviteCode != nil {
+		changes = append(changes, s.SetInviteCode(*value.InviteCode))
+	}
 	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
 }
 
@@ -1493,6 +1496,10 @@ func (s secretGeneratorSettings) SetOTPSMS(value domain.OTPSMSAttributes) db_jso
 
 func (s secretGeneratorSettings) SetOTPEmail(value domain.OTPEmailAttributes) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"otpEmail"}, value)
+}
+
+func (s secretGeneratorSettings) SetInviteCode(value domain.InviteCodeAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"inviteCode"}, value)
 }
 
 func SecretGeneratorSettingsRepository() domain.SecretGeneratorSettingsRepository {

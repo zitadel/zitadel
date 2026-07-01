@@ -476,6 +476,7 @@ type SecretGeneratorSettingsAttributes struct {
 	DomainVerification       *DomainVerificationAttributes       `json:"domainVerification,omitempty"`
 	OTPSMS                   *OTPSMSAttributes                   `json:"otpSms,omitempty"`
 	OTPEmail                 *OTPEmailAttributes                 `json:"otpEmail,omitempty"`
+	InviteCode               *InviteCodeAttributes               `json:"inviteCode,omitempty"`
 }
 
 type ClientSecretAttributes struct {
@@ -511,6 +512,10 @@ type OTPSMSAttributes struct {
 }
 
 type OTPEmailAttributes struct {
+	SecretGeneratorAttrsWithExpiry
+}
+
+type InviteCodeAttributes struct {
 	SecretGeneratorAttrsWithExpiry
 }
 

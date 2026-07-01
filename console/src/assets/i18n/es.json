@@ -1615,7 +1615,8 @@
         "5": "Inicialización de llave de acceso",
         "6": "Secreto de aplicación",
         "7": "One Time Password (OTP) - SMS",
-        "8": "One Time Password (OTP) - email"
+        "8": "One Time Password (OTP) - email",
+        "9": "Código de invitación"
       },
       "EXPIRY": "Caducidad (en minutos)",
       "INCLUDEDIGITS": "Incluir números",

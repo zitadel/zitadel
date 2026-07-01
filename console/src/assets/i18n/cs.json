@@ -1614,7 +1614,8 @@
         "5": "Inicializace Passkey",
         "6": "Tajemství pomocí aplikace",
         "7": "OTP - SMS",
-        "8": "OTP - E-mail"
+        "8": "OTP - E-mail",
+        "9": "Kód pozvánky"
       },
       "EXPIRY": "Expirace (v minutách)",
       "INCLUDEDIGITS": "Zahrnout čísla",

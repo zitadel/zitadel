@@ -1618,7 +1618,8 @@
         "5": "Passkey-initiering",
         "6": "Applikations-hemlighet",
         "7": "OTP - SMS",
-        "8": "OTP - E-post"
+        "8": "OTP - E-post",
+        "9": "Inbjudningskod"
       },
       "EXPIRY": "Utgång (på minuter)",
       "INCLUDEDIGITS": "Inkludera siffror",

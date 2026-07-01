@@ -1614,7 +1614,8 @@
         "5": "Inizializzazione passkey",
         "6": "Segreto dell'applicazione",
         "7": "OTP - SMS",
-        "8": "OTP - Email"
+        "8": "OTP - Email",
+        "9": "Codice di invito"
       },
       "EXPIRY": "Scadenza (in minuti)",
       "INCLUDEDIGITS": "Contiene numeri",
