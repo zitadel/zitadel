@@ -1460,9 +1460,6 @@ func (wm *LDAPIDPWriteModel) reduceChangedEvent(e *idp.LDAPIDPChangedEvent) {
 	if e.Name != nil {
 		wm.Name = *e.Name
 	}
-	if e.Name != nil {
-		wm.Name = *e.Name
-	}
 	if e.Servers != nil {
 		wm.Servers = e.Servers
 	}
@@ -1491,7 +1488,7 @@ func (wm *LDAPIDPWriteModel) reduceChangedEvent(e *idp.LDAPIDPChangedEvent) {
 		wm.Timeout = *e.Timeout
 	}
 	if e.RootCA != nil {
-    	wm.RootCA = e.RootCA
+		wm.RootCA = e.RootCA
 	}
 	wm.LDAPAttributes.ReduceChanges(e.LDAPAttributeChanges)
 	wm.Options.ReduceChanges(e.OptionChanges)
