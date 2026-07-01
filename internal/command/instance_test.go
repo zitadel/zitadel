@@ -331,6 +331,7 @@ func instanceElementsFilters() []expect {
 		expectFilter(),
 		expectFilter(),
 		expectFilter(),
+		expectFilter(),
 	}
 }
 
@@ -348,6 +349,7 @@ func instanceElementsEvents(ctx context.Context, instanceID, instanceName string
 		instance.NewSecretGeneratorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecretGeneratorTypeVerifyDomain, 32, 0, true, true, true, false),
 		instance.NewSecretGeneratorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecretGeneratorTypeOTPSMS, 8, 5*time.Minute, false, false, true, false),
 		instance.NewSecretGeneratorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecretGeneratorTypeOTPEmail, 8, 5*time.Minute, false, false, true, false),
+		instance.NewSecretGeneratorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecretGeneratorTypeInviteCode, 6, 72*time.Hour, false, true, true, false),
 	}
 }
 
@@ -362,6 +364,7 @@ func instanceElementsConfig() *SecretGenerators {
 		DomainVerification:       &crypto.GeneratorConfig{Length: 32, IncludeLowerLetters: true, IncludeUpperLetters: true, IncludeDigits: true},
 		OTPSMS:                   &crypto.GeneratorConfig{Length: 8, Expiry: 5 * time.Minute, IncludeDigits: true},
 		OTPEmail:                 &crypto.GeneratorConfig{Length: 8, Expiry: 5 * time.Minute, IncludeDigits: true},
+		InviteCode:               &crypto.GeneratorConfig{Length: 6, Expiry: 72 * time.Hour, IncludeUpperLetters: true, IncludeDigits: true},
 	}
 }
 

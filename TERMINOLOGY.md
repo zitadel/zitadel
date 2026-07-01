@@ -73,6 +73,7 @@ All user-facing wording in docs, UI, and API descriptions must follow this table
 | Password changed | Past-tense wording for password change notification | Password change | Password changed | replace | UI notifications |
 | Object descriptions | All resource descriptions must use end-user language | internal / technical wording | clear end-user language | replace | UI + Docs |
 | Complement Token | Flow type for actions executed during token creation. In UI use "Complement Token"; in API use `flowType = 2` (CustomiseToken). Docs must not show PreUserinfoCreation=3 for this type. | Compliment Token, CustomiseToken, CustomizeToken | Complement Token | replace | Everywhere |
+| Invite Code | One-time code used to invite a user to set up authentication (secret generator and user-invite flows) | Invitation Code, Invitation code | Invite Code | replace | UI + Docs |
 
 ## Governance
 
