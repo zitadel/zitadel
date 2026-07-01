@@ -216,6 +216,10 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
     const registerUrl = constructUrl(request, "/register");
     registerUrl.searchParams.set("requestId", requestId);
 
+    if (authRequest.loginHint) {
+      registerUrl.searchParams.set("email", authRequest.loginHint);
+    }
+
     if (organization) {
       registerUrl.searchParams.set("organization", organization);
     }
