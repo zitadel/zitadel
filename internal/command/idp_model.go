@@ -1490,6 +1490,9 @@ func (wm *LDAPIDPWriteModel) reduceChangedEvent(e *idp.LDAPIDPChangedEvent) {
 	if e.Timeout != nil {
 		wm.Timeout = *e.Timeout
 	}
+	if e.RootCA != nil {
+    	wm.RootCA = e.RootCA
+	}
 	wm.LDAPAttributes.ReduceChanges(e.LDAPAttributeChanges)
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
