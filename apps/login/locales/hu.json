@@ -1,7 +1,7 @@
 {
   "common": {
     "back": "Vissza",
-    "title": "Bejelentkezés a Zitadellel"
+    "title": "Bejelentkezés a Zitadel-lel"
   },
   "accounts": {
     "title": "Fiókok",
@@ -48,7 +48,7 @@
       "couldNotCreateSession": "Nem sikerült munkamenetet létrehozni a felhasználóhoz",
       "initialUserNotSupported": "A kezdeti felhasználó nem támogatott",
       "localAuthenticationNotAllowed": "A helyi hitelesítés nem engedélyezett! További információért fordulj a rendszergazdához.",
-      "passkeysNotAllowed": "A jelszókulcsok nem engedélyezettek! További információért fordulj a rendszergazdához.",
+      "passkeysNotAllowed": "A jelkulcsok nem engedélyezettek! További információért fordulj a rendszergazdához.",
       "couldNotFindIdentityProvider": "Nem található azonosítószolgáltató.",
       "userNotActive": "A felhasználó nem aktív. További információért fordulj a rendszergazdához."
     }
@@ -83,7 +83,7 @@
     "set": {
       "title": "Jelszó beállítása",
       "description": "Állítsd be a fiókod jelszavát",
-      "codeSent": "Az új kódot elküldtük az email címedre.",
+      "codeSent": "Az új kódot elküldtük az e-mail címedre.",
       "noCodeReceived": "Nem kaptál kódot?",
       "resend": "Kód újraküldése",
       "submit": "Tovább",
@@ -274,7 +274,7 @@
         "noResponseReceived": "A jelkulcs ellenőrzése sikertelen - nem érkezett válasz",
         "noRedirectProvided": "A jelkulcs ellenőrzése befejeződött, de nem érkezett átirányítás",
         "couldNotRetrievePasskey": "Hiba történt a jelkulcs lekérése közben",
-        "verificationCancelled": "A jelkulcs ellenőrzését megszakadt",
+        "verificationCancelled": "A jelkulcs ellenőrzése megszakadt",
         "verificationFailed": "Hiba történt a jelkulcs ellenőrzése közben",
         "couldNotFindSession": "Nem található munkamenet",
         "couldNotUpdateSession": "Nem sikerült frissíteni a munkamenetet",
