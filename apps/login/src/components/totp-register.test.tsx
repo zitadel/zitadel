@@ -1,4 +1,5 @@
-import { cleanup, render } from "@testing-library/react";
+import { verifyTOTP } from "@/lib/server/verify";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { TotpRegister } from "./totp-register";
 
@@ -29,5 +30,19 @@ describe("TotpRegister", () => {
   test("should autofocus the code input on mount", () => {
     const { getByTestId } = render(<TotpRegister uri="otpauth://totp/test" secret="SECRET" />);
     expect(getByTestId("code-text-input")).toHaveFocus();
+  });
+
+  test("should show the error returned by verifyTOTP when code verification fails", async () => {
+    vi.mocked(verifyTOTP).mockResolvedValue({ error: "The code is invalid. Please try again." });
+
+    const { getByTestId, findByText } = render(
+      <TotpRegister uri="otpauth://totp/test" secret="SECRET" loginName="user@example.com" />,
+    );
+
+    fireEvent.input(getByTestId("code-text-input"), { target: { value: "123456" } });
+    await waitFor(() => expect(getByTestId("submit-button")).toBeEnabled());
+    fireEvent.click(getByTestId("submit-button"));
+
+    expect(await findByText("The code is invalid. Please try again.")).toBeInTheDocument();
   });
 });

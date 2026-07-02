@@ -405,6 +405,8 @@
       "couldNotVerifyInvite": "Nie udało się zweryfikować zaproszenia",
       "couldNotVerifyEmail": "Nie udało się zweryfikować adresu e-mail",
       "couldNotVerify": "Nie udało się zweryfikować",
+      "couldNotVerifyTOTP": "Nie udało się zweryfikować kodu",
+      "invalidCode": "Kod jest nieprawidłowy. Spróbuj ponownie.",
       "couldNotLoadUser": "Nie udało się załadować użytkownika",
       "couldNotLoadAuthenticators": "Nie udało się wczytać dostępnych metod uwierzytelniania",
       "couldNotCreateSession": "Nie udało się utworzyć sesji",

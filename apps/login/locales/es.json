@@ -405,6 +405,8 @@
       "couldNotVerifyInvite": "No se pudo verificar la invitación",
       "couldNotVerifyEmail": "No se pudo verificar el correo electrónico",
       "couldNotVerify": "No se pudo verificar",
+      "couldNotVerifyTOTP": "No se pudo verificar el código",
+      "invalidCode": "El código no es válido. Inténtelo de nuevo.",
       "couldNotLoadUser": "No se pudo cargar al usuario",
       "couldNotLoadAuthenticators": "No se pudieron cargar los autenticadores posibles",
       "couldNotCreateSession": "No se pudo crear la sesión",
