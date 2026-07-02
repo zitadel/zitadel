@@ -405,6 +405,8 @@
       "couldNotVerifyInvite": "Не вдалося підтвердити запрошення",
       "couldNotVerifyEmail": "Не вдалося підтвердити електронну пошту",
       "couldNotVerify": "Не вдалося підтвердити",
+      "couldNotVerifyTOTP": "Не вдалося підтвердити код",
+      "invalidCode": "Невірний код. Будь ласка, спробуйте ще раз.",
       "couldNotLoadUser": "Не вдалося завантажити користувача",
       "couldNotLoadAuthenticators": "Не вдалося завантажити можливі автентифікатори",
       "couldNotCreateSession": "Не вдалося створити сеанс",

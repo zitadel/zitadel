@@ -373,6 +373,8 @@
       "couldNotVerifyInvite": "Impossible de vérifier l'invitation",
       "couldNotVerifyEmail": "Impossible de vérifier l'e-mail",
       "couldNotVerify": "Impossible de vérifier",
+      "couldNotVerifyTOTP": "Impossible de vérifier le code",
+      "invalidCode": "Le code est invalide. Veuillez réessayer.",
       "couldNotLoadUser": "Impossible de charger l'utilisateur",
       "couldNotLoadAuthenticators": "Impossible de charger les authentificateurs disponibles",
       "couldNotCreateSession": "Impossible de créer la session",

@@ -1,5 +1,6 @@
 "use server";
 
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/logger";
 import {
   createInviteCode,
@@ -14,6 +15,7 @@ import {
 } from "@/lib/zitadel";
 import crypto from "crypto";
 
+import { Code } from "@connectrpc/connect";
 import { create } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -32,6 +34,7 @@ import { getPublicHostWithProtocol } from "./host";
 const logger = createLogger("verify");
 
 export async function verifyTOTP(code: string, loginName?: string, organization?: string) {
+  const t = await getTranslations("verify");
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
@@ -43,9 +46,21 @@ export async function verifyTOTP(code: string, loginName?: string, organization?
     },
   }).then((session) => {
     if (session?.factors?.user?.id) {
-      return verifyTOTPRegistration({ serviceConfig, code, userId: session.factors.user.id });
+      return verifyTOTPRegistration({ serviceConfig, code, userId: session.factors.user.id }).catch((error) => {
+        if (isClassifiedError(error) && error.isUserError) {
+          logger.warn("Could not verify TOTP registration (client error)", {
+            grpcCode: error.code,
+            httpStatus: error.httpStatus,
+          });
+          return {
+            error: error.code === Code.InvalidArgument ? t("errors.invalidCode") : t("errors.couldNotVerifyTOTP"),
+          };
+        }
+        logger.error("Could not verify TOTP registration", { error });
+        return { error: t("errors.couldNotVerifyTOTP") };
+      });
     } else {
-      throw Error("No user id found in session.");
+      return { error: t("errors.couldNotVerify") };
     }
   });
 }

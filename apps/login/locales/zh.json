@@ -405,6 +405,8 @@
       "couldNotVerifyInvite": "无法验证邀请",
       "couldNotVerifyEmail": "无法验证邮箱",
       "couldNotVerify": "无法验证",
+      "couldNotVerifyTOTP": "无法验证验证码",
+      "invalidCode": "验证码无效。请重试。",
       "couldNotLoadUser": "无法加载用户",
       "couldNotLoadAuthenticators": "无法加载可用的身份验证器",
       "couldNotCreateSession": "无法创建会话",

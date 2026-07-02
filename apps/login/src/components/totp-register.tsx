@@ -50,7 +50,12 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
   async function continueWithCode(values: Inputs) {
     setLoading(true);
     return verifyTOTP(values.code, loginName, organization)
-      .then(async () => {
+      .then(async (response) => {
+        if (response && "error" in response && response.error) {
+          setError(response.error);
+          return;
+        }
+
         // if attribute is set, validate MFA after it is setup, otherwise proceed as usual (when mfa is enforced to login)
         if (checkAfter) {
           const params = new URLSearchParams({});
