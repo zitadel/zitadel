@@ -34,7 +34,7 @@
     "fumadocs-mdx": "14.3.2",
     "fumadocs-openapi": "10.8.2",
     "fumadocs-ui": "16.8.10",
-    "js-yaml": "^4.1.1",
+    "js-yaml": "^4.2.0",
     "lucide-react": "^0.577.0",
     "mixpanel-browser": "^2.78.0",
     "next": "16.2.6",

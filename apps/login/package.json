@@ -55,7 +55,7 @@
     "react-hook-form": "^7.75.0",
     "server-only": "^0.0.1",
     "tinycolor2": "^1.6.0",
-    "uuid": "^14.0.0",
+    "uuid": "^14.0.1",
     "winston": "^3.19.0"
   },
   "devDependencies": {
@@ -87,7 +87,7 @@
     "concurrently": "^9.2.1",
     "dotenv-cli": "^11.0.0",
     "env-cmd": "^11.0.0",
-    "esbuild": "^0.28.0",
+    "esbuild": "^0.28.1",
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
