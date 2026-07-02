@@ -25,6 +25,8 @@ func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) (*command
 		LoginV2:                        loginV2,
 		PermissionCheckV2:              req.PermissionCheckV2,
 		EnableRelationalTables:         req.EnableRelationalTables,
+		OIDCDynamicClientRegistration:  req.OidcDynamicClientRegistration,
+		OIDCClientIDMetadataDocument:   req.OidcClientIdMetadataDocument,
 	}, nil
 }
 
@@ -43,9 +45,11 @@ func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesRe
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
-		LoginV2:                loginV2ToLoginV2FlagPb(f.LoginV2),
-		PermissionCheckV2:      featureSourceToFlagPb(&f.PermissionCheckV2),
-		EnableRelationalTables: featureSourceToFlagPb(&f.EnableRelationalTables),
+		LoginV2:                       loginV2ToLoginV2FlagPb(f.LoginV2),
+		PermissionCheckV2:             featureSourceToFlagPb(&f.PermissionCheckV2),
+		EnableRelationalTables:        featureSourceToFlagPb(&f.EnableRelationalTables),
+		OidcDynamicClientRegistration: featureSourceToFlagPb(&f.OIDCDynamicClientRegistration),
+		OidcClientIdMetadataDocument:  featureSourceToFlagPb(&f.OIDCClientIDMetadataDocument),
 	}
 }
 
@@ -64,6 +68,8 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) (*com
 		PermissionCheckV2:              req.PermissionCheckV2,
 		ManagementConsoleUseV2UserApi:  req.ConsoleUseV2UserApi,
 		EnableRelationalTables:         req.EnableRelationalTables,
+		OIDCDynamicClientRegistration:  req.OidcDynamicClientRegistration,
+		OIDCClientIDMetadataDocument:   req.OidcClientIdMetadataDocument,
 	}, nil
 }
 
@@ -83,10 +89,12 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
-		LoginV2:                loginV2ToLoginV2FlagPb(f.LoginV2),
-		PermissionCheckV2:      featureSourceToFlagPb(&f.PermissionCheckV2),
-		ConsoleUseV2UserApi:    featureSourceToFlagPb(&f.ManagementConsoleUseV2UserApi),
-		EnableRelationalTables: featureSourceToFlagPb(&f.EnableRelationalTables),
+		LoginV2:                       loginV2ToLoginV2FlagPb(f.LoginV2),
+		PermissionCheckV2:             featureSourceToFlagPb(&f.PermissionCheckV2),
+		ConsoleUseV2UserApi:           featureSourceToFlagPb(&f.ManagementConsoleUseV2UserApi),
+		EnableRelationalTables:        featureSourceToFlagPb(&f.EnableRelationalTables),
+		OidcDynamicClientRegistration: featureSourceToFlagPb(&f.OIDCDynamicClientRegistration),
+		OidcClientIdMetadataDocument:  featureSourceToFlagPb(&f.OIDCClientIDMetadataDocument),
 	}
 }
 

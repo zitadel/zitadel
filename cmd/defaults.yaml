@@ -461,6 +461,18 @@ Caches:
       AddSource: true
       Formatter:
         Format: text
+  # Client ID Metadata Documents are fetched, validated and cached when a client_id is an
+  # HTTPS URL and the oidc_client_id_metadata_document feature is enabled. MaxAge caps the
+  # document lifetime regardless of the Cache-Control or Expires header it is served with.
+  ClientIDMetadataDocuments:
+    Connector: "postgres"
+    MaxAge: 15m
+    LastUseAge: 10m
+    Log:
+      Level: error
+      AddSource: true
+      Formatter:
+        Format: text
 
 Machine:
   # Cloud-hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.
@@ -696,6 +708,16 @@ OIDC:
     MaxTtl: 5m  # ZITADEL_OIDC_BACKCHANNELLOGOUT_MAXTTL
     # Lifetime of the token used to notify clients through OIDC back-channel logout.
     TokenLifetime: 15m # ZITADEL_OIDC_BACKCHANNELLOGOUT_TOKENLIFETIME
+  # OAuth 2.0 Dynamic Client Registration (RFC 7591). The registration endpoint is only
+  # served and advertised when the oidc_dynamic_client_registration instance feature is
+  # enabled, regardless of the settings below.
+  DynamicClientRegistration:
+    # Allow clients to register without an initial access token (open registration), as
+    # required by the Model Context Protocol (MCP) flow. Such clients are homed in a
+    # dedicated, auto-provisioned project in the instance's default organization. When
+    # disabled, registration requires a valid access token and the client is homed in the
+    # token's organization.
+    AllowUnauthenticated: false # ZITADEL_OIDC_DYNAMICCLIENTREGISTRATION_ALLOWUNAUTHENTICATED
 
 SAML:
   DefaultLoginURLV2: "/ui/v2/login/login?samlRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2
@@ -1441,6 +1463,7 @@ DefaultInstance:
     PermissionCheckV2: # ZITADEL_DEFAULTINSTANCE_FEATURES_PERMISSIONCHECKV2
     ConsoleUseV2UserApi: true # ZITADEL_DEFAULTINSTANCE_FEATURES_CONSOLEUSEV2USERAPI
     EnableRelationalTables: # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLERELATIONALTABLES
+    OIDCDynamicClientRegistration: # ZITADEL_DEFAULTINSTANCE_FEATURES_OIDCDYNAMICCLIENTREGISTRATION
 
   Limits:
     # AuditLogRetention limits the number of events that can be queried via the events API by their age.
