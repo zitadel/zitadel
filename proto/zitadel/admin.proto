@@ -7424,6 +7424,8 @@ message UpdateZitadelProviderRequest {
     ];
     zitadel.idp.v1.Options provider_options = 7;
 
+    // Optionally specify the details (organization_id, organization_domain) related to instance roles.
+    // It is used to determine if a user should be assigned instance administrator roles after authenticating with the provider.
     repeated zitadel.idp.v1.InstanceRolesInfo instance_roles_info = 8 [(validate.rules).repeated = {max_items: 20}];
 }
 

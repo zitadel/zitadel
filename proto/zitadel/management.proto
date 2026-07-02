@@ -8189,7 +8189,7 @@ service ManagementService {
         };
     }
 
-    // Change an existing Zitadel identity provider on the instance
+    // Change an existing Zitadel identity provider in the organization
     rpc UpdateZitadelProvider(UpdateZitadelProviderRequest) returns (UpdateZitadelProviderResponse) {
         option (google.api.http) = {
             put: "/idps/zitadel/{id}"
@@ -14182,6 +14182,8 @@ message UpdateZitadelProviderRequest {
     ];
     zitadel.idp.v1.Options provider_options = 7;
 
+    // Optionally specify the details (organization_id, organization_domain) related to instance roles.
+    // It is used to determine if a user should be assigned instance administrator roles after authenticating with the provider.
     repeated zitadel.idp.v1.InstanceRolesInfo instance_roles_info = 8 [(validate.rules).repeated = {max_items: 20}];
 }
 
