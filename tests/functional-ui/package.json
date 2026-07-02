@@ -14,6 +14,6 @@
     "jsonwebtoken": "^9.0.3",
     "prettier": "^3.8.3",
     "typescript": "^5.9.3",
-    "uuid": "^14.0.0"
+    "uuid": "^14.0.1"
   }
 }
