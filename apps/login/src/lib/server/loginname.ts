@@ -553,10 +553,12 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   // Fixes: https://github.com/zitadel/zitadel/issues/12021
   // Fixes: https://github.com/zitadel/zitadel/issues/12023
   //
-  // NOTE: When ignoreUnknownUsernames is enabled, this IDP redirect could
-  // allow an attacker to distinguish existing users (→ /password) from
-  // non-existing users (→ IDP redirect). To prevent this, the condition
-  // could be extended with: && !effectiveLoginSettings?.ignoreUnknownUsernames
+  // NOTE: When ignoreUnknownUsernames is enabled (on the context org), this
+  // IDP redirect could allow an attacker to distinguish existing users
+  // (→ /password) from non-existing users (→ IDP redirect). To prevent this,
+  // the condition could be extended with: && !command.ignoreUnknownUsernames
+  // (using command, not effectiveLoginSettings, because the enumeration
+  // protection must come from the context org, not the discovered org).
   // The trade-off is that legitimate new users would not get the automatic
   // IDP redirect and would need to use the IDP buttons on the login page.
   if (!effectiveLoginSettings?.allowLocalAuthentication || discoveredOrganization) {
