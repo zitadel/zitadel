@@ -876,7 +876,6 @@ export const guidesSidebar: readonly SidebarItem[] = [
             label: "Changelog",
             href: "https://zitadel.com/changelog",
           },
-          "product/release-cycle",
         ],
       },
       {
