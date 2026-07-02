@@ -1,4 +1,5 @@
 import { getValidLocaleFromUILocales } from "@/lib/auth-utils";
+import { isSafeRedirectUri } from "@/lib/client-utils";
 import { getLanguageCookie, setLanguageCookie } from "@/lib/cookies";
 
 import { shouldUILocalesOverrideCookie } from "@/lib/i18n";
@@ -77,6 +78,47 @@ const gotoAccounts = ({
 
   return NextResponse.redirect(accountsUrl);
 };
+
+const gotoLoginname = ({
+  request,
+  requestId,
+  loginHint,
+  organization,
+  suffix,
+}: {
+  request: NextRequest;
+  requestId: string;
+  loginHint?: string;
+  organization?: string;
+  suffix?: string;
+}): NextResponse<unknown> => {
+  const loginNameUrl = constructUrl(request, "/loginname");
+  loginNameUrl.searchParams.set("requestId", requestId);
+
+  if (loginHint) {
+    loginNameUrl.searchParams.set("loginName", loginHint);
+    loginNameUrl.searchParams.set("submit", "true");
+  }
+  if (organization) {
+    loginNameUrl.searchParams.set("organization", organization);
+  }
+  if (suffix) {
+    loginNameUrl.searchParams.set("suffix", suffix);
+  }
+
+  return NextResponse.redirect(loginNameUrl);
+};
+
+/**
+ * Filter sessions by organization, matching the same logic used in
+ * the accounts page and findValidSession.
+ */
+function getEligibleSessions(sessions: Session[], organization?: string): Session[] {
+  if (!organization) {
+    return sessions;
+  }
+  return sessions.filter((s) => s.factors?.user?.organizationId === organization);
+}
 
 export interface FlowInitiationParams {
   serviceConfig: ServiceConfig;
@@ -229,7 +271,20 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
   // use existing session and hydrate it for oidc
   if (authRequest && sessions.length) {
+    // Pre-filter sessions by organization so we don't show an empty accounts
+    // page when the org scope excludes all existing browser sessions.
+    const eligibleSessions = getEligibleSessions(sessions, organization);
+
     if (authRequest.prompt.includes(Prompt.SELECT_ACCOUNT)) {
+      if (eligibleSessions.length === 0) {
+        return gotoLoginname({
+          request,
+          requestId: `oidc_${authRequest.id}`,
+          loginHint: authRequest.loginHint,
+          organization,
+          suffix,
+        });
+      }
       return gotoAccounts({
         request,
         requestId: `oidc_${authRequest.id}`,
@@ -312,6 +367,10 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         }),
       });
 
+      if (!isSafeRedirectUri(callbackUrl)) {
+        logger.warn("Blocked unsafe OIDC callback URL (prompt=none)", { callbackUrl });
+        return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+      }
       const callbackResponse = NextResponse.redirect(callbackUrl);
       setCSPHeaders(callbackResponse, serviceConfig, securitySettings);
       return callbackResponse;
@@ -319,6 +378,17 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       let selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
 
       if (!selectedSession || !selectedSession.id) {
+        // If no sessions are eligible for this organization, go directly to
+        // loginname instead of showing an empty accounts page.
+        if (eligibleSessions.length === 0) {
+          return gotoLoginname({
+            request,
+            requestId: `oidc_${authRequest.id}`,
+            loginHint: authRequest.loginHint,
+            organization,
+            suffix,
+          });
+        }
         return gotoAccounts({
           request,
           requestId: `oidc_${authRequest.id}`,
@@ -355,6 +425,10 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           }),
         });
         if (callbackUrl) {
+          if (!isSafeRedirectUri(callbackUrl)) {
+            logger.warn("Blocked unsafe OIDC callback URL", { callbackUrl });
+            return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+          }
           return NextResponse.redirect(callbackUrl);
         } else {
           logger.info("could not create callback, redirect user to choose other account");
@@ -385,11 +459,11 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
     }
 
     if (organization) {
-      loginNameUrl.searchParams.append("organization", organization);
+      loginNameUrl.searchParams.set("organization", organization);
     }
 
     if (orgDomain) {
-      loginNameUrl.searchParams.append("orgDomain", orgDomain);
+      loginNameUrl.searchParams.set("orgDomain", orgDomain);
     }
 
     return NextResponse.redirect(loginNameUrl);
@@ -456,8 +530,16 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
     });
 
     if (url && binding.case === "redirect") {
+      if (!isSafeRedirectUri(url)) {
+        logger.warn("Blocked unsafe SAML redirect URL", { url });
+        return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+      }
       return NextResponse.redirect(url);
     } else if (url && binding.case === "post") {
+      if (!isSafeRedirectUri(url)) {
+        logger.warn("Blocked unsafe SAML post URL", { url });
+        return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+      }
       const html = `
         <html>
           <body onload="document.forms[0].submit()">
