@@ -2461,10 +2461,10 @@ func (wm *ZitadelIDPWriteModel) NewChanges(
 	if wm.Issuer != issuer {
 		changes = append(changes, idp.ChangeZitadelIDPIssuer(issuer))
 	}
-	if !slices.Equal(wm.Scopes, scopes) {
+	if scopes != nil && !slices.Equal(wm.Scopes, scopes) {
 		changes = append(changes, idp.ChangeZitadelIDPScopes(scopes))
 	}
-	if !slices.Equal(wm.InstanceRolesInfo, info) {
+	if info != nil && !slices.Equal(wm.InstanceRolesInfo, info) {
 		changes = append(changes, idp.ChangeZitadelIDPInstanceRolesInfo(info))
 	}
 	opts := wm.Options.Changes(options)

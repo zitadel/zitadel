@@ -2073,11 +2073,10 @@ func (c *Commands) validateInstanceZitadelProvider(provider *ZitadelProvider, cr
 	if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "INST-fb5jm", "Errors.Invalid.Argument")
 	}
-	// validate that the client secret is not empty for IDP creation as it is optional for update
-	if create {
-		if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
-			return zerrors.ThrowInvalidArgument(nil, "INST-Sfdf4", "Errors.Invalid.Argument")
-		}
+	// client_secret is required on creation, but optional on update
+	provider.ClientSecret = strings.TrimSpace(provider.ClientSecret)
+	if create && provider.ClientSecret == "" {
+		return zerrors.ThrowInvalidArgument(nil, "INST-Sfdf4", "Errors.Invalid.Argument")
 	}
 
 	for i := range provider.InstanceRolesInfo {
