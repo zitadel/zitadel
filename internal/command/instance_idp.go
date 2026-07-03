@@ -2006,7 +2006,7 @@ func (c *Commands) UpdateInstanceZitadelProvider(ctx context.Context, id string,
 		return nil, err
 	}
 	writeModel := NewInstanceZitadelIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceZitadelProvider(instanceAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceZitadelProvider(instanceAgg, writeModel, provider)) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}

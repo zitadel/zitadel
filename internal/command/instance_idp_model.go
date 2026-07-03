@@ -1087,7 +1087,7 @@ func (wm *InstanceZitadelIDPWriteModel) NewChangedEvent(
 	info []idp.RolesInfo,
 ) (*instance.ZitadelIDPChangedEvent, error) {
 
-	changes, err := wm.ZitadelIDPWriteModel.NewChanges(
+	changes, err := wm.NewChanges(
 		name,
 		issuer,
 		clientID,

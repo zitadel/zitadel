@@ -365,6 +365,29 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "update with scopes unset, ok",
+			args: args{
+				ctx: AdminCTX,
+				req: &admin_pb.UpdateZitadelProviderRequest{
+					Id:       existingProvider.GetId(),
+					Name:     "Zitadel Support IdP updated again",
+					Issuer:   "acme.example.com",
+					ClientId: "test-client",
+					Scopes:   nil,
+					ProviderOptions: &idp_pb.Options{
+						IsCreationAllowed: true,
+						IsAutoCreation:    false,
+					},
+					InstanceRolesInfo: nil,
+				},
+			},
+			wantResponse: &admin_pb.UpdateZitadelProviderResponse{
+				Details: &object_pb.ObjectDetails{
+					ResourceOwner: Instance.Instance.Id,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -384,6 +407,8 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 			assert.NotNil(t, got)
 			assert.WithinRange(t, got.GetDetails().GetChangeDate().AsTime(), before, after)
 			assert.Equal(t, tt.wantResponse.GetDetails().GetResourceOwner(), got.GetDetails().GetResourceOwner())
+
+			// todo: check if the update was actually applied by fetching the provider and checking its fields when the functionality is implemented
 		})
 	}
 }

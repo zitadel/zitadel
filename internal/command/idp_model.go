@@ -2429,7 +2429,7 @@ func (wm *ZitadelIDPWriteModel) reduceChangedEvent(e *idp.ZitadelIDPChangedEvent
 	if e.InstanceRolesInfo != nil {
 		wm.InstanceRolesInfo = *e.InstanceRolesInfo
 	}
-	wm.Options.ReduceChanges(e.OptionChanges)
+	wm.ReduceChanges(e.OptionChanges)
 }
 
 func (wm *ZitadelIDPWriteModel) NewChanges(
@@ -2467,7 +2467,7 @@ func (wm *ZitadelIDPWriteModel) NewChanges(
 	if info != nil && !slices.Equal(wm.InstanceRolesInfo, info) {
 		changes = append(changes, idp.ChangeZitadelIDPInstanceRolesInfo(info))
 	}
-	opts := wm.Options.Changes(options)
+	opts := wm.Changes(options)
 	if !opts.IsZero() {
 		changes = append(changes, idp.ChangeZitadelIDPOptions(opts))
 	}
