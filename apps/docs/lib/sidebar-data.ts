@@ -861,15 +861,9 @@ export const guidesSidebar: readonly SidebarItem[] = [
     collapsed: true,
     items: [
       {
-        type: "category",
-        label: "Product Features",
-        items: [
-          {
-            type: "doc",
-            id: "product/roadmap",
-            label: "Roadmap",
-          },
-        ],
+        type: "doc",
+        id: "product/roadmap",
+        label: "Roadmap",
       },
       {
         type: "category",
