@@ -1058,6 +1058,8 @@ func (wm *InstanceZitadelIDPWriteModel) AppendEvents(events ...eventstore.Event)
 		switch e := event.(type) {
 		case *instance.ZitadelIDPAddedEvent:
 			wm.ZitadelIDPWriteModel.AppendEvents(&e.ZitadelIDPAddedEvent)
+		case *instance.ZitadelIDPChangedEvent:
+			wm.ZitadelIDPWriteModel.AppendEvents(&e.ZitadelIDPChangedEvent)
 		default:
 			wm.ZitadelIDPWriteModel.AppendEvents(e)
 		}
