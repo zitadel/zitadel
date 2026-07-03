@@ -16,6 +16,7 @@ ZITADEL supports the usage of scopes as way of requesting information from the i
 | address        | Optional scope to request the address of the subject                           |
 | phone          | Optional scope to request the phone of the subject                             |
 | offline_access | Optional scope to request a refresh_token (only possible when using code flow) |
+| groups         | Optional scope to request the [group](/concepts/structure/groups) memberships of the subject. The `groups` claim is encoded according to RFC 9068 / SCIM as objects with `value` (group ID) and `display` (group name) |
 
 ## Reserved Scopes
 

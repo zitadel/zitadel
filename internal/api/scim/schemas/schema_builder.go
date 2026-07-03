@@ -23,6 +23,7 @@ type fieldSchemaInfo struct {
 	Required  bool
 	CaseExact bool
 	Unique    bool
+	ReadOnly  bool
 }
 
 var (
@@ -103,6 +104,10 @@ func buildAttribute(field reflect.StructField) *SchemaAttribute {
 		attribute.Uniqueness = SchemaAttributeUniquenessServer
 	}
 
+	if info.ReadOnly {
+		attribute.Mutability = SchemaAttributeMutabilityReadOnly
+	}
+
 	return attribute
 }
 
@@ -162,6 +167,7 @@ func getFieldSchemaInfo(field reflect.StructField) *fieldSchemaInfo {
 		Required:  slices.Contains(tagOptions, "required"),
 		CaseExact: !slices.Contains(tagOptions, "caseInsensitive"),
 		Unique:    slices.Contains(tagOptions, "unique"),
+		ReadOnly:  slices.Contains(tagOptions, "readOnly"),
 	}
 }
 

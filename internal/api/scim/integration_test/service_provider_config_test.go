@@ -115,8 +115,8 @@ func assertJsonEqual(t *testing.T, expected, actual []byte) {
 	t.Helper()
 
 	// replace dynamic data json
-	expectedJson := strings.Replace(string(expected), "{domain}", Instance.Domain, 1)
-	expectedJson = strings.Replace(expectedJson, "{orgId}", Instance.DefaultOrg.Id, 1)
+	expectedJson := strings.ReplaceAll(string(expected), "{domain}", Instance.Domain)
+	expectedJson = strings.ReplaceAll(expectedJson, "{orgId}", Instance.DefaultOrg.Id)
 	assert.Equal(t, normalizeJson(t, []byte(expectedJson)), normalizeJson(t, actual))
 }
 

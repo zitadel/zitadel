@@ -435,7 +435,8 @@
     "TOS": "이용 약관",
     "OPENSHORTCUTSTOOLTIP": "키보드 단축키 표시하려면 ? 입력",
     "SETTINGS": "설정",
-    "CUSTOMERPORTAL": "고객 포털"
+    "CUSTOMERPORTAL": "고객 포털",
+    "GROUPS": "Groups"
   },
   "QUICKSTART": {
     "TITLE": "애플리케이션에 Zitadel 통합",
@@ -2865,5 +2866,52 @@
       "DESCRIPTION": "사용자 변경을 유발한 최신 이벤트를 볼 수 있습니다."
     }
   },
-  "INSTANCEID": "인스턴스 ID"
+  "INSTANCEID": "인스턴스 ID",
+  "GROUPS": {
+    "TITLE": "User Groups",
+    "DESCRIPTION": "Organize the users of your organization into groups.",
+    "TABLE": {
+      "NAME": "Name",
+      "DESCRIPTION": "Description",
+      "USERCOUNT": "Users",
+      "CREATIONDATE": "Created",
+      "EMPTY": "No groups found"
+    },
+    "DIALOG": {
+      "NAME": "Name",
+      "DESCRIPTION": "Description",
+      "CREATE": {
+        "TITLE": "Create Group"
+      },
+      "UPDATE": {
+        "TITLE": "Update Group"
+      },
+      "DELETE": {
+        "TITLE": "Delete Group",
+        "DESCRIPTION": "You are about to delete this group. Its members will lose the membership. Are you sure?"
+      }
+    },
+    "MEMBERS": {
+      "TITLE": "Members",
+      "ADD": "Add",
+      "EMPTY": "This group has no members yet"
+    },
+    "TOAST": {
+      "CREATED": "Group created",
+      "UPDATED": "Group updated",
+      "DELETED": "Group deleted",
+      "MEMBERSADDED": "Users added to group",
+      "MEMBERREMOVED": "User removed from group",
+      "GRANTADDED": "Group authorization created",
+      "GRANTREMOVED": "Group authorization removed"
+    },
+    "GRANTS": {
+      "TITLE": "Authorizations",
+      "DESCRIPTION": "Grant project roles to all members of this group. Removing a grant immediately revokes the derived roles.",
+      "PROJECTID": "Project ID",
+      "ROLEKEYS": "Role keys (comma-separated)",
+      "ADD": "Grant",
+      "EMPTY": "This group has no authorizations yet"
+    }
+  }
 }

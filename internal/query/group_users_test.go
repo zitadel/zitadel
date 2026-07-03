@@ -15,8 +15,10 @@ import (
 var (
 	groupUsersStmt = regexp.QuoteMeta(
 		"SELECT projections.group_users1.group_id" +
+			", projections.groups1.name" +
 			", projections.group_users1.user_id" +
 			", projections.users14_humans.display_name" +
+			", projections.users14_machines.name" +
 			", projections.login_names3.login_name" +
 			", projections.group_users1.resource_owner" +
 			", projections.users14_humans.avatar_key" +
@@ -24,14 +26,18 @@ var (
 			", projections.group_users1.sequence" +
 			", COUNT(*) OVER ()" +
 			" FROM projections.group_users1" +
+			" LEFT JOIN projections.groups1 ON projections.group_users1.group_id = projections.groups1.id AND projections.group_users1.instance_id = projections.groups1.instance_id" +
 			" LEFT JOIN projections.users14_humans ON projections.group_users1.user_id = projections.users14_humans.user_id AND projections.group_users1.instance_id = projections.users14_humans.instance_id" +
+			" LEFT JOIN projections.users14_machines ON projections.group_users1.user_id = projections.users14_machines.user_id AND projections.group_users1.instance_id = projections.users14_machines.instance_id" +
 			" LEFT JOIN projections.login_names3 ON projections.group_users1.user_id = projections.login_names3.user_id AND projections.group_users1.instance_id = projections.login_names3.instance_id" +
 			" WHERE projections.login_names3.is_primary = $1")
 
 	groupUsersColumns = []string{
 		"group_id",
+		"group_name",
 		"user_id",
 		"display_name",
+		"machine_name",
 		"login_name",
 		"resource_owner",
 		"avatar_key",
@@ -75,8 +81,10 @@ func Test_GroupUsersPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"group-id",
+							"test-group",
 							"user-id",
 							"display-name",
+							nil,
 							"login-name",
 							"resource-owner",
 							"avatar-key",
@@ -93,6 +101,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 				GroupUsers: []*GroupUser{
 					{
 						GroupID:            "group-id",
+						GroupName:          "test-group",
 						UserID:             "user-id",
 						ResourceOwner:      "resource-owner",
 						CreationDate:       testNow,
@@ -100,6 +109,48 @@ func Test_GroupUsersPrepares(t *testing.T) {
 						PreferredLoginName: "login-name",
 						DisplayName:        "display-name",
 						AvatarUrl:          "avatar-key",
+					},
+				},
+			},
+		},
+		{
+			name:    "prepareGroupUsersQuery machine user, display name from machine name",
+			prepare: prepareGroupUsersQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					groupUsersStmt,
+					groupUsersColumns,
+					[][]driver.Value{
+						{
+							"group-id",
+							"test-group",
+							"machine-user-id",
+							nil,
+							"machine-name",
+							"login-name",
+							"resource-owner",
+							nil,
+							testNow,
+							1,
+						},
+					},
+				),
+			},
+			object: &GroupUsers{
+				SearchResponse: SearchResponse{
+					Count: 1,
+				},
+				GroupUsers: []*GroupUser{
+					{
+						GroupID:            "group-id",
+						GroupName:          "test-group",
+						UserID:             "machine-user-id",
+						ResourceOwner:      "resource-owner",
+						CreationDate:       testNow,
+						Sequence:           1,
+						PreferredLoginName: "login-name",
+						DisplayName:        "machine-name",
+						AvatarUrl:          "",
 					},
 				},
 			},
@@ -114,8 +165,10 @@ func Test_GroupUsersPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"group-id-1",
+							"test-group",
 							"user-id-1",
 							"display-name-1",
+							nil,
 							"login-name-1",
 							"resource-owner",
 							"avatar-key",
@@ -124,8 +177,10 @@ func Test_GroupUsersPrepares(t *testing.T) {
 						},
 						{
 							"group-id-1",
+							"test-group",
 							"user-id-2",
 							"display-name-2",
+							nil,
 							"login-name-2",
 							"resource-owner",
 							"avatar-key",
@@ -142,6 +197,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 				GroupUsers: []*GroupUser{
 					{
 						GroupID:            "group-id-1",
+						GroupName:          "test-group",
 						UserID:             "user-id-1",
 						ResourceOwner:      "resource-owner",
 						CreationDate:       testNow,
@@ -152,6 +208,7 @@ func Test_GroupUsersPrepares(t *testing.T) {
 					},
 					{
 						GroupID:            "group-id-1",
+						GroupName:          "test-group",
 						UserID:             "user-id-2",
 						ResourceOwner:      "resource-owner",
 						CreationDate:       testNow,

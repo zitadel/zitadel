@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -604,7 +605,11 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate, permissionCheck Organizati
 			if err != nil {
 				return nil, err
 			}
-			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, usernames, domainPolicy.UserLoginMustBeDomain || organizationScopedUsername, domains, links, entityIds)}, nil
+			groupNames, err := OrgGroupNames(ctx, filter, a.ID)
+			if err != nil {
+				return nil, err
+			}
+			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, usernames, domainPolicy.UserLoginMustBeDomain || organizationScopedUsername, domains, links, entityIds, groupNames)}, nil
 		}, nil
 	}
 }
@@ -729,6 +734,42 @@ func OrgDomains(ctx context.Context, filter preparation.FilterToQueryReducer, or
 				}
 			}
 		}
+	}
+	return names, nil
+}
+
+// OrgGroupNames returns the names of all existing groups of the organization,
+// so their unique name constraints can be released when the organization is removed
+func OrgGroupNames(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) ([]string, error) {
+	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(orgID).
+		OrderAsc().
+		AddQuery().
+		AggregateTypes(group.AggregateType).
+		EventTypes(
+			group.GroupAddedEventType,
+			group.GroupChangedEventType,
+			group.GroupRemovedEventType,
+		).Builder())
+	if err != nil {
+		return nil, err
+	}
+	namesByGroupID := make(map[string]string)
+	for _, event := range events {
+		switch eventTyped := event.(type) {
+		case *group.GroupAddedEvent:
+			namesByGroupID[eventTyped.Aggregate().ID] = eventTyped.Name
+		case *group.GroupChangedEvent:
+			if eventTyped.Name != nil {
+				namesByGroupID[eventTyped.Aggregate().ID] = *eventTyped.Name
+			}
+		case *group.GroupRemovedEvent:
+			delete(namesByGroupID, eventTyped.Aggregate().ID)
+		}
+	}
+	names := make([]string, 0, len(namesByGroupID))
+	for _, name := range namesByGroupID {
+		names = append(names, name)
 	}
 	return names, nil
 }

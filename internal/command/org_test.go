@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -1272,10 +1273,11 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 					expectFilter(),
 					expectFilter(),
 					expectFilter(),
+					expectFilter(),
 					expectPushFailed(
 						zerrors.ThrowInternal(nil, "id", "message"),
 						org.NewOrgRemovedEvent(
-							context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{},
+							context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{}, []string{},
 						),
 					),
 				),
@@ -1315,9 +1317,10 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 					expectFilter(),
 					expectFilter(),
 					expectFilter(),
+					expectFilter(),
 					expectPush(
 						org.NewOrgRemovedEvent(
-							context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{},
+							context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{}, []string{},
 						),
 					),
 				),
@@ -1401,6 +1404,17 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project2", "org1").Aggregate, "app2", "entity2", []byte{}, "", domain.LoginVersionUnspecified, ""),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							group.NewGroupAddedEvent(context.Background(), &group.NewAggregate("group1", "org1").Aggregate, "group one", "group description"),
+						),
+						eventFromEventPusher(
+							group.NewGroupAddedEvent(context.Background(), &group.NewAggregate("group2", "org1").Aggregate, "group two", "group description"),
+						),
+						eventFromEventPusher(
+							group.NewGroupRemovedEvent(context.Background(), &group.NewAggregate("group2", "org1").Aggregate, "group two"),
+						),
+					),
 					expectPush(
 						org.NewOrgRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org",
 							[]string{"user1", "user2"},
@@ -1408,6 +1422,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 							[]string{"domain1", "domain2"},
 							[]*domain.UserIDPLink{{IDPConfigID: "config1", ExternalUserID: "id1", DisplayName: "display1"}, {IDPConfigID: "config2", ExternalUserID: "id2", DisplayName: "display2"}},
 							[]string{"entity1", "entity2"},
+							[]string{"group one"},
 						),
 					),
 				),
@@ -1417,6 +1432,48 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{},
+		},
+		{
+			// OrgGroupNames is the last lookup before push; a regression that
+			// swallowed its error (e.g., logging-and-continuing) would let the
+			// org be removed without releasing group name uniqueness constraints,
+			// blocking future re-creation of groups with the same names.
+			name: "group names lookup fails, error propagates and no push",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(), // zitadel project check
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org"),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilterOrganizationSettings("org1", false, false),
+					expectFilter(), // OrgUsers
+					expectFilter(), // OrgDomains
+					expectFilter(), // OrgUserIDPLinks
+					expectFilter(), // OrgSamlEntityIDs
+					expectFilterError(zerrors.ThrowInternal(nil, "TEST-grp-er", "group names filter failed")),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{
+				err: zerrors.IsInternal,
+			},
 		},
 
 		{
@@ -1446,9 +1503,10 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 					expectFilter(),
 					expectFilter(),
 					expectFilter(),
+					expectFilter(),
 					expectPush(
 						org.NewOrgRemovedEvent(
-							context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{},
+							context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{}, []string{},
 						),
 					),
 				),
@@ -1769,7 +1827,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 						),
 						org.NewOrgRemovedEvent(
 							context.Background(), &org.NewAggregate("custom-org-ID").Aggregate,
-							"Org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{}),
+							"Org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{}, []string{}),
 					),
 					expectPush(
 						eventFromEventPusher(org.NewOrgAddedEvent(context.Background(),

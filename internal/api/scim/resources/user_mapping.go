@@ -251,7 +251,7 @@ func (h *UsersHandler) mapChangeCommandToScimUser(ctx context.Context, user *Sci
 	}
 }
 
-func (h *UsersHandler) mapToScimUsers(ctx context.Context, users []*query.User, md map[string]map[metadata.ScopedKey][]byte) []*ScimUser {
+func (h *UsersHandler) mapToScimUsers(ctx context.Context, users []*query.User, md map[string]map[metadata.ScopedKey][]byte, groups map[string][]*query.GroupUser) []*ScimUser {
 	result := make([]*ScimUser, len(users))
 	for i, user := range users {
 		userMetadata, ok := md[user.ID]
@@ -259,13 +259,13 @@ func (h *UsersHandler) mapToScimUsers(ctx context.Context, users []*query.User, 
 			userMetadata = make(map[metadata.ScopedKey][]byte)
 		}
 
-		result[i] = h.mapToScimUser(ctx, user, userMetadata)
+		result[i] = h.mapToScimUser(ctx, user, userMetadata, groups[user.ID])
 	}
 
 	return result
 }
 
-func (h *UsersHandler) mapToScimUser(ctx context.Context, user *query.User, md map[metadata.ScopedKey][]byte) *ScimUser {
+func (h *UsersHandler) mapToScimUser(ctx context.Context, user *query.User, md map[metadata.ScopedKey][]byte, groups []*query.GroupUser) *ScimUser {
 	scimUser := &ScimUser{
 		Resource:          h.buildResourceForQuery(ctx, user),
 		ID:                user.ID,
@@ -297,6 +297,16 @@ func (h *UsersHandler) mapToScimUser(ctx context.Context, user *query.User, md m
 				Primary: true,
 			},
 		}
+	}
+
+	for _, group := range groups {
+		scimUser.Groups = append(scimUser.Groups, &ScimUserGroup{
+			Value:   group.GroupID,
+			Display: group.GroupName,
+			// flat groups: every membership is direct (RFC 7643 section 4.1.2)
+			Type: "direct",
+			Ref:  schemas.BuildLocationForResource(ctx, schemas.GroupsResourceType, group.GroupID),
+		})
 	}
 
 	h.mapAndValidateMetadata(ctx, scimUser, md)
