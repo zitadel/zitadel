@@ -84,13 +84,13 @@ const gotoLoginname = ({
   requestId,
   loginHint,
   organization,
-  suffix,
+  orgDomain,
 }: {
   request: NextRequest;
   requestId: string;
   loginHint?: string;
   organization?: string;
-  suffix?: string;
+  orgDomain?: string;
 }): NextResponse<unknown> => {
   const loginNameUrl = constructUrl(request, "/loginname");
   loginNameUrl.searchParams.set("requestId", requestId);
@@ -102,8 +102,8 @@ const gotoLoginname = ({
   if (organization) {
     loginNameUrl.searchParams.set("organization", organization);
   }
-  if (suffix) {
-    loginNameUrl.searchParams.set("suffix", suffix);
+  if (orgDomain) {
+    loginNameUrl.searchParams.set("orgDomain", orgDomain);
   }
 
   return NextResponse.redirect(loginNameUrl);
@@ -282,7 +282,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           requestId: `oidc_${authRequest.id}`,
           loginHint: authRequest.loginHint,
           organization,
-          suffix,
+          orgDomain,
         });
       }
       return gotoAccounts({
@@ -386,7 +386,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
             requestId: `oidc_${authRequest.id}`,
             loginHint: authRequest.loginHint,
             organization,
-            suffix,
+            orgDomain,
           });
         }
         return gotoAccounts({
