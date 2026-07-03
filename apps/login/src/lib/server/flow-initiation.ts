@@ -57,10 +57,12 @@ const gotoAccounts = ({
   request,
   requestId,
   organization,
+  orgDomain,
 }: {
   request: NextRequest;
   requestId: string;
   organization?: string;
+  orgDomain?: string;
 }): NextResponse<unknown> => {
   const accountsUrl = constructUrl(request, "/accounts");
 
@@ -69,6 +71,9 @@ const gotoAccounts = ({
   }
   if (organization) {
     accountsUrl.searchParams.set("organization", organization);
+  }
+  if (orgDomain) {
+    accountsUrl.searchParams.set("orgDomain", orgDomain);
   }
 
   return NextResponse.redirect(accountsUrl);
@@ -79,13 +84,13 @@ const gotoLoginname = ({
   requestId,
   loginHint,
   organization,
-  suffix,
+  orgDomain,
 }: {
   request: NextRequest;
   requestId: string;
   loginHint?: string;
   organization?: string;
-  suffix?: string;
+  orgDomain?: string;
 }): NextResponse<unknown> => {
   const loginNameUrl = constructUrl(request, "/loginname");
   loginNameUrl.searchParams.set("requestId", requestId);
@@ -97,8 +102,8 @@ const gotoLoginname = ({
   if (organization) {
     loginNameUrl.searchParams.set("organization", organization);
   }
-  if (suffix) {
-    loginNameUrl.searchParams.set("suffix", suffix);
+  if (orgDomain) {
+    loginNameUrl.searchParams.set("orgDomain", orgDomain);
   }
 
   return NextResponse.redirect(loginNameUrl);
@@ -140,7 +145,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
   }
 
   let organization = "";
-  let suffix = "";
+  let orgDomain = "";
   let idpId = "";
 
   if (authRequest?.scope) {
@@ -155,15 +160,15 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
       if (orgDomainScope) {
         const matched = ORG_DOMAIN_SCOPE_REGEX.exec(orgDomainScope);
-        const orgDomain = matched?.[1] ?? "";
+        const scopeDomain = matched?.[1] ?? "";
 
-        logger.info("Extracted org domain:", { orgDomain });
-        if (orgDomain) {
-          const orgs = await getOrgsByDomain({ serviceConfig, domain: orgDomain });
+        logger.info("Extracted org domain:", { orgDomain: scopeDomain });
+        if (scopeDomain) {
+          const orgs = await getOrgsByDomain({ serviceConfig, domain: scopeDomain });
 
           if (orgs.result && orgs.result.length === 1) {
             organization = orgs.result[0].id ?? "";
-            suffix = orgDomain;
+            orgDomain = scopeDomain;
           }
         }
       }
@@ -275,13 +280,14 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           requestId,
           loginHint: authRequest.loginHint,
           organization,
-          suffix,
+          orgDomain,
         });
       }
       return gotoAccounts({
         request,
         requestId,
         organization,
+        orgDomain,
       });
     } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
       if (authRequest.loginHint) {
@@ -315,8 +321,8 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       if (organization) {
         loginNameUrl.searchParams.set("organization", organization);
       }
-      if (suffix) {
-        loginNameUrl.searchParams.set("suffix", suffix);
+      if (orgDomain) {
+        loginNameUrl.searchParams.set("orgDomain", orgDomain);
       }
       return NextResponse.redirect(loginNameUrl);
     } else if (authRequest.prompt.includes(Prompt.NONE)) {
@@ -378,13 +384,14 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
             requestId,
             loginHint: authRequest.loginHint,
             organization,
-            suffix,
+            orgDomain,
           });
         }
         return gotoAccounts({
           request,
           requestId,
           organization,
+          orgDomain,
         });
       }
 
@@ -395,6 +402,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           request,
           requestId,
           organization,
+          orgDomain,
         });
       }
 
@@ -425,6 +433,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           return gotoAccounts({
             request,
             organization,
+            orgDomain,
             requestId,
           });
         }
@@ -434,6 +443,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           request,
           requestId,
           organization,
+          orgDomain,
         });
       }
     }
@@ -450,8 +460,8 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       loginNameUrl.searchParams.set("organization", organization);
     }
 
-    if (suffix) {
-      loginNameUrl.searchParams.set("suffix", suffix);
+    if (orgDomain) {
+      loginNameUrl.searchParams.set("orgDomain", orgDomain);
     }
 
     return NextResponse.redirect(loginNameUrl);
