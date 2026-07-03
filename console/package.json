@@ -4,12 +4,13 @@
   "scripts": {
     "ng": "ng",
     "dev": "wait-on  --verbose --interval 2000 --simultaneous 1 --timeout 30m ${ENVIRONMENT_JSON_URL} && node prebuild.development.js && ng serve --host=${DEVCONTAINER_LISTEN_HOST:-127.0.0.1}",
-    "build": "ng build --configuration production --base-href=/ui/console/",
+    "prebuild": "mkdir -p src/assets/docs/img && cp -r ../apps/docs/public/img/tech src/assets/docs/img/",
+    "build": "pnpm run prebuild && ng build --configuration production --base-href=/ui/console/",
     "lint-check-ng": "eslint .",
     "lint-check-prettier": "prettier --check src",
     "lint-fix": "prettier --write src",
     "generate": "pnpm exec buf generate ../proto --include-imports --include-wkt",
-    "clean": "rm -rf dist .angular node_modules src/app/proto/generated"
+    "clean": "rm -rf dist .angular node_modules src/app/proto/generated src/assets/docs"
   },
   "private": true,
   "dependencies": {
