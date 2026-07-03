@@ -63,8 +63,8 @@ type ZitadelIDPChangedEvent struct {
 	Issuer            *string             `json:"issuer,omitempty"`
 	ClientID          *string             `json:"clientId,omitempty"`
 	ClientSecret      *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	Scopes            *[]string            `json:"scopes,omitempty"`
-	InstanceRolesInfo *[]RolesInfo         `json:"instanceRolesInfo,omitempty"`
+	Scopes            *[]string           `json:"scopes,omitempty"`
+	InstanceRolesInfo *[]RolesInfo        `json:"instanceRolesInfo,omitempty"`
 	OptionChanges
 }
 
