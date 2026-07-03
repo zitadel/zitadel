@@ -355,3 +355,103 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     expect(location).toContain("/loginname");
   });
 });
+
+describe("handleOIDCFlowInitiation — Prompt.LOGIN + loginHint requestId prefix", () => {
+  let mockGetAuthRequest: ReturnType<typeof vi.fn>;
+  let mockConstructUrl: ReturnType<typeof vi.fn>;
+  let mockSendLoginname: ReturnType<typeof vi.fn>;
+
+  const existingSession = {
+    id: "session-1",
+    factors: { user: { id: "user1", organizationId: "org1", loginName: "user@example.com" } },
+  };
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.unstubAllEnvs();
+
+    const zitadel = await import("@/lib/zitadel");
+    const serviceUrl = await import("@/lib/service-url");
+    const authUtils = await import("@/lib/auth-utils");
+    const loginname = await import("@/lib/server/loginname");
+
+    mockGetAuthRequest = vi.mocked(zitadel.getAuthRequest);
+    mockConstructUrl = vi.mocked(serviceUrl.constructUrl);
+    mockSendLoginname = vi.mocked(loginname.sendLoginname);
+    vi.mocked(authUtils.getValidLocaleFromUILocales).mockReturnValue(null);
+
+    mockConstructUrl.mockImplementation((_req: any, path: string) => {
+      return new URL(`https://example.com${path}`);
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  test("should pass requestId with oidc_ prefix to sendLoginname (not authRequest.id)", async () => {
+    const { Prompt } = await import("@zitadel/proto/zitadel/oidc/v2/authorization_pb");
+
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: [],
+        prompt: [Prompt.LOGIN],
+        loginHint: "user@example.com",
+      },
+    });
+
+    mockSendLoginname.mockResolvedValue({
+      redirect: "/password?loginName=user%40example.com",
+    });
+
+    await handleOIDCFlowInitiation(
+      makeBaseParams({
+        requestId: "oidc_abc123",
+        sessions: [existingSession] as any,
+        sessionCookies: [{ id: "session-1", token: "tok" }],
+      }),
+    );
+
+    expect(mockSendLoginname).toHaveBeenCalledWith(
+      expect.objectContaining({
+        loginName: "user@example.com",
+        requestId: "oidc_abc123",
+      }),
+    );
+  });
+
+  test("should NOT pass raw authRequest.id without oidc_ prefix to sendLoginname", async () => {
+    const { Prompt } = await import("@zitadel/proto/zitadel/oidc/v2/authorization_pb");
+
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: [],
+        prompt: [Prompt.LOGIN],
+        loginHint: "user@example.com",
+      },
+    });
+
+    mockSendLoginname.mockResolvedValue({
+      redirect: "/password?loginName=user%40example.com",
+    });
+
+    await handleOIDCFlowInitiation(
+      makeBaseParams({
+        requestId: "oidc_abc123",
+        sessions: [existingSession] as any,
+        sessionCookies: [{ id: "session-1", token: "tok" }],
+      }),
+    );
+
+    // Ensure the raw authRequest.id is NOT what's passed
+    expect(mockSendLoginname).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        requestId: "abc123",
+      }),
+    );
+  });
+});
