@@ -568,3 +568,22 @@ func addZitadelProviderToCommand(req *admin_pb.AddZitadelProviderRequest) comman
 		InstanceRolesInfo: instanceRolesInfo,
 	}
 }
+
+func updateZitadelProviderToCommand(req *admin_pb.UpdateZitadelProviderRequest) command.ZitadelProvider {
+	instanceRolesInfo := make([]idp.RolesInfo, 0, len(req.InstanceRolesInfo))
+	for _, info := range req.InstanceRolesInfo {
+		instanceRolesInfo = append(instanceRolesInfo, idp.RolesInfo{
+			OrganizationID:     info.OrganizationId,
+			OrganizationDomain: info.OrganizationDomain,
+		})
+	}
+	return command.ZitadelProvider{
+		Name:              req.Name,
+		Issuer:            req.Issuer,
+		ClientID:          req.ClientId,
+		ClientSecret:      req.ClientSecret,
+		Scopes:            req.Scopes,
+		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+		InstanceRolesInfo: instanceRolesInfo,
+	}
+}

@@ -1948,7 +1948,7 @@ func (c *Commands) AddInstanceZitadelProvider(ctx context.Context, provider Zita
 		return "", nil, err
 	}
 
-	err = c.validateInstanceZitadelProvider(&provider)
+	err = c.validateInstanceZitadelProvider(&provider, true)
 	if err != nil {
 		return "", nil, err
 	}
@@ -1998,7 +1998,72 @@ func (c *Commands) prepareAddInstanceZitadelProvider(a *instance.Aggregate, writ
 	}
 }
 
-func (c *Commands) validateInstanceZitadelProvider(provider *ZitadelProvider) error {
+func (c *Commands) UpdateInstanceZitadelProvider(ctx context.Context, id string, provider ZitadelProvider) (*domain.ObjectDetails, error) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceAgg := instance.NewAggregate(instanceID)
+	err := c.validateInstanceZitadelProvider(&provider, false)
+	if err != nil {
+		return nil, err
+	}
+	writeModel := NewInstanceZitadelIDPWriteModel(instanceID, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceZitadelProvider(instanceAgg, writeModel, provider))
+	if err != nil {
+		return nil, err
+	}
+	if len(cmds) == 0 {
+		// no change, so return directly
+		return &domain.ObjectDetails{
+			Sequence:      writeModel.ProcessedSequence,
+			EventDate:     writeModel.ChangeDate,
+			ResourceOwner: writeModel.ResourceOwner,
+		}, nil
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return pushedEventsToObjectDetails(pushedEvents), nil
+}
+
+func (c *Commands) prepareUpdateInstanceZitadelProvider(a *instance.Aggregate, writeModel *InstanceZitadelIDPWriteModel, provider ZitadelProvider) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
+			return nil, zerrors.ThrowInvalidArgument(nil, "INST-3pxLbA", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if !writeModel.State.Exists() {
+				return nil, zerrors.ThrowNotFound(nil, "INST-Bg281", "Errors.IDPConfig.NotExisting")
+			}
+			event, err := writeModel.NewChangedEvent(
+				ctx,
+				&a.Aggregate,
+				writeModel.ID,
+				provider.Name,
+				provider.Issuer,
+				provider.ClientID,
+				provider.ClientSecret,
+				c.idpConfigEncryption,
+				provider.Scopes,
+				provider.IDPOptions,
+				provider.InstanceRolesInfo,
+			)
+			if err != nil || event == nil {
+				return nil, err
+			}
+			return []eventstore.Command{event}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) validateInstanceZitadelProvider(provider *ZitadelProvider, create bool) error {
 	if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 		return zerrors.ThrowInvalidArgument(nil, "INST-Sgtj5", "Errors.Invalid.Argument")
 	}
@@ -2008,8 +2073,11 @@ func (c *Commands) validateInstanceZitadelProvider(provider *ZitadelProvider) er
 	if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "INST-fb5jm", "Errors.Invalid.Argument")
 	}
-	if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
-		return zerrors.ThrowInvalidArgument(nil, "INST-Sfdf4", "Errors.Invalid.Argument")
+	// validate that the client secret is not empty for IDP creation as it is optional for update
+	if create {
+		if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
+			return zerrors.ThrowInvalidArgument(nil, "INST-Sfdf4", "Errors.Invalid.Argument")
+		}
 	}
 
 	for i := range provider.InstanceRolesInfo {

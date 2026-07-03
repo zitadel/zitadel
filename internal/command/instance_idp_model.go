@@ -1076,3 +1076,29 @@ func (wm *InstanceZitadelIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventData(map[string]interface{}{"id": wm.ID}).
 		Builder()
 }
+
+func (wm *InstanceZitadelIDPWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id, name, issuer, clientID, clientSecretString string,
+	secretCrypto crypto.EncryptionAlgorithm,
+	scopes []string,
+	options idp.Options,
+	info []idp.RolesInfo,
+) (*instance.ZitadelIDPChangedEvent, error) {
+
+	changes, err := wm.ZitadelIDPWriteModel.NewChanges(
+		name,
+		issuer,
+		clientID,
+		clientSecretString,
+		secretCrypto,
+		scopes,
+		options,
+		info,
+	)
+	if err != nil || len(changes) == 0 {
+		return nil, err
+	}
+	return instance.NewZitadelIDPChangedEvent(ctx, aggregate, id, changes), nil
+}

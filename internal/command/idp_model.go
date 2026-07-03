@@ -2393,7 +2393,6 @@ func (wm *ZitadelIDPWriteModel) Reduce() error {
 		case *idp.ZitadelIDPAddedEvent:
 			wm.reduceAddedEvent(e)
 		case *idp.ZitadelIDPChangedEvent:
-			// todo (@grvijayan): to please the linter for now
 			wm.reduceChangedEvent(e)
 		}
 	}
@@ -2412,5 +2411,65 @@ func (wm *ZitadelIDPWriteModel) reduceAddedEvent(e *idp.ZitadelIDPAddedEvent) {
 }
 
 func (wm *ZitadelIDPWriteModel) reduceChangedEvent(e *idp.ZitadelIDPChangedEvent) {
-	// todo (@grvijayan): will be implemented along with UpdateZitadelProvider changes
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
+	}
+	if e.ClientSecret != nil {
+		wm.ClientSecret = e.ClientSecret
+	}
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.Issuer != nil {
+		wm.Issuer = *e.Issuer
+	}
+	if e.Scopes != nil {
+		wm.Scopes = *e.Scopes
+	}
+	if e.InstanceRolesInfo != nil {
+		wm.InstanceRolesInfo = *e.InstanceRolesInfo
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *ZitadelIDPWriteModel) NewChanges(
+	name,
+	issuer,
+	clientID,
+	clientSecretString string,
+	secretCrypto crypto.EncryptionAlgorithm,
+	scopes []string,
+	options idp.Options,
+	info []idp.RolesInfo,
+) ([]idp.ZitadelIDPChanges, error) {
+	changes := make([]idp.ZitadelIDPChanges, 0)
+	var clientSecret *crypto.CryptoValue
+	var err error
+	if clientSecretString != "" {
+		clientSecret, err = crypto.Crypt([]byte(clientSecretString), secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeZitadelIDPClientSecret(clientSecret))
+	}
+	if wm.ClientID != clientID {
+		changes = append(changes, idp.ChangeZitadelIDPClientID(clientID))
+	}
+	if wm.Name != name {
+		changes = append(changes, idp.ChangeZitadelIDPName(name))
+	}
+	if wm.Issuer != issuer {
+		changes = append(changes, idp.ChangeZitadelIDPIssuer(issuer))
+	}
+	if !slices.Equal(wm.Scopes, scopes) {
+		changes = append(changes, idp.ChangeZitadelIDPScopes(scopes))
+	}
+	if !slices.Equal(wm.InstanceRolesInfo, info) {
+		changes = append(changes, idp.ChangeZitadelIDPInstanceRolesInfo(info))
+	}
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeZitadelIDPOptions(opts))
+	}
+	return changes, nil
 }
