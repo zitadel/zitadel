@@ -187,9 +187,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
         if (identityProviderType === IdentityProviderType.LDAP) {
           const ldapUrl = constructUrl(request, "/ldap");
-          if (authRequest.id) {
-            ldapUrl.searchParams.set("requestId", `oidc_${authRequest.id}`);
-          }
+          ldapUrl.searchParams.set("requestId", requestId);
           if (organization) {
             ldapUrl.searchParams.set("organization", organization);
           }
@@ -274,7 +272,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       if (eligibleSessions.length === 0) {
         return gotoLoginname({
           request,
-          requestId: `oidc_${authRequest.id}`,
+          requestId,
           loginHint: authRequest.loginHint,
           organization,
           suffix,
@@ -282,7 +280,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       }
       return gotoAccounts({
         request,
-        requestId: `oidc_${authRequest.id}`,
+        requestId,
         organization,
       });
     } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
@@ -290,7 +288,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         try {
           let command: SendLoginnameCommand = {
             loginName: authRequest.loginHint,
-            requestId: authRequest.id,
+            requestId: requestId,
           };
 
           if (organization) {
@@ -377,7 +375,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         if (eligibleSessions.length === 0) {
           return gotoLoginname({
             request,
-            requestId: `oidc_${authRequest.id}`,
+            requestId,
             loginHint: authRequest.loginHint,
             organization,
             suffix,
@@ -385,7 +383,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         }
         return gotoAccounts({
           request,
-          requestId: `oidc_${authRequest.id}`,
+          requestId,
           organization,
         });
       }
@@ -395,7 +393,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       if (!cookie || !cookie.id || !cookie.token) {
         return gotoAccounts({
           request,
-          requestId: `oidc_${authRequest.id}`,
+          requestId,
           organization,
         });
       }
