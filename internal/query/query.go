@@ -45,6 +45,7 @@ type Queries struct {
 	zitadelRoles                        []authz.RoleMapping
 	multifactors                        domain.MultifactorConfigs
 	defaultAuditLogRetention            time.Duration
+	defaultSecretGenerators             map[domain.SecretGeneratorType]*crypto.GeneratorConfig
 }
 
 func StartQueries(
@@ -62,6 +63,7 @@ func StartQueries(
 	defaultAuditLogRetention time.Duration,
 	systemAPIUsers map[string]*authz.SystemAPIUser,
 	startProjections bool,
+	secretGeneratorDefaults map[domain.SecretGeneratorType]*crypto.GeneratorConfig,
 ) (repo *Queries, err error) {
 	repo = &Queries{
 		eventstore:                          es,
@@ -84,6 +86,7 @@ func StartQueries(
 			},
 		},
 		defaultAuditLogRetention: defaultAuditLogRetention,
+		defaultSecretGenerators:  secretGeneratorDefaults,
 	}
 
 	repo.checkPermission = permissionCheck(repo)

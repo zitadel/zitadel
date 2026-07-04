@@ -861,11 +861,9 @@ export const guidesSidebar: readonly SidebarItem[] = [
     collapsed: true,
     items: [
       {
-        type: "category",
-        label: "Product Features",
-        items: [
-          "product/roadmap",
-        ],
+        type: "doc",
+        id: "product/roadmap",
+        label: "Roadmap",
       },
       {
         type: "category",
@@ -876,7 +874,6 @@ export const guidesSidebar: readonly SidebarItem[] = [
             label: "Changelog",
             href: "https://zitadel.com/changelog",
           },
-          "product/release-cycle",
         ],
       },
       {
