@@ -1613,7 +1613,8 @@
         "5": "Passkey Initialisatie",
         "6": "Applicatie Secret",
         "7": "OTP - SMS",
-        "8": "OTP - Email"
+        "8": "OTP - Email",
+        "9": "Uitnodigingscode"
       },
       "EXPIRY": "Vervaldatum (in minuten)",
       "INCLUDEDIGITS": "Inclusief Nummers",
@@ -2366,7 +2367,8 @@
       "DESCRIPTION": "Voer de gegevens in voor JWT Identity Provider.",
       "HEADERNAME": "Header Naam",
       "JWTENDPOINT": "JWT Eindpunt",
-      "JWTKEYSENDPOINT": "JWT Sleutels Eindpunt"
+      "JWTKEYSENDPOINT": "JWT Sleutels Eindpunt",
+      "AUDIENCE": "Audience"
     },
     "APPLE": {
       "TEAMID": "Team ID",

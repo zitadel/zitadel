@@ -26,6 +26,7 @@ import {
 } from "../zitadel";
 import { createSessionAndUpdateCookie } from "./cookie";
 import { getPublicHost } from "./host";
+import { trySendVerification } from "./verify";
 
 const logger = createLogger("loginname");
 
@@ -341,14 +342,25 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       // If the user's email is not verified, they likely already have a code from the
       // initial verification email. Auto-sending a new one here invalidates their existing code
-      // and causes confusion. Only auto-send (`send=true`) if the email is already verified.
+      // and causes confusion. Only auto-send if the email is already verified.
       const shouldSend = humanUser?.email?.isVerified === true;
+
+      const codeSent = shouldSend
+        ? await trySendVerification({
+            userId: session?.factors?.user?.id ?? user.userId,
+            isInvite: true,
+            requestId: command.requestId,
+          })
+        : false;
 
       const params = new URLSearchParams({
         loginName: (session?.factors?.user?.loginName ?? user.preferredLoginName) as string,
-        send: shouldSend ? "true" : "false",
         invite: "true", // always send invite code if user has no primary auth method
       });
+
+      if (codeSent) {
+        params.append("codeSent", "true");
+      }
 
       if (command.requestId) {
         params.append("requestId", command.requestId);

@@ -1613,7 +1613,8 @@
         "5": "Inizializzazione passkey",
         "6": "Segreto dell'applicazione",
         "7": "OTP - SMS",
-        "8": "OTP - Email"
+        "8": "OTP - Email",
+        "9": "Codice di invito"
       },
       "EXPIRY": "Scadenza (in minuti)",
       "INCLUDEDIGITS": "Contiene numeri",
@@ -2363,7 +2364,8 @@
       "DESCRIPTION": "Inserisci i dati per il JWT Identity Provider.",
       "HEADERNAME": "Header Name",
       "JWTENDPOINT": "JWT Endpoint",
-      "JWTKEYSENDPOINT": "JWT Keys Endpoint"
+      "JWTKEYSENDPOINT": "JWT Keys Endpoint",
+      "AUDIENCE": "Audience"
     },
     "TOAST": {
       "SAVED": "Salvato con successo.",

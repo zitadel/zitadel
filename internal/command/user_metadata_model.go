@@ -31,6 +31,8 @@ func (wm *UserMetadataWriteModel) AppendEvents(events ...eventstore.Event) {
 			wm.MetadataWriteModel.AppendEvents(&e.RemovedEvent)
 		case *user.MetadataRemovedAllEvent:
 			wm.MetadataWriteModel.AppendEvents(&e.RemovedAllEvent)
+		default:
+			wm.MetadataWriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -42,6 +44,10 @@ func (wm *UserMetadataWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.MetadataWriteModel.AggregateID).
 		AggregateTypes(user.AggregateType).
 		EventTypes(
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
+			user.UserRemovedType,
 			user.MetadataSetType,
 			user.MetadataRemovedType,
 			user.MetadataRemovedAllType).
@@ -73,6 +79,8 @@ func (wm *UserMetadataListWriteModel) AppendEvents(events ...eventstore.Event) {
 			wm.MetadataListWriteModel.AppendEvents(&e.RemovedEvent)
 		case *user.MetadataRemovedAllEvent:
 			wm.MetadataListWriteModel.AppendEvents(&e.RemovedAllEvent)
+		default:
+			wm.MetadataListWriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -88,6 +96,10 @@ func (wm *UserMetadataListWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.MetadataListWriteModel.AggregateID).
 		AggregateTypes(user.AggregateType).
 		EventTypes(
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
+			user.UserRemovedType,
 			user.MetadataSetType,
 			user.MetadataRemovedType,
 			user.MetadataRemovedAllType).
@@ -117,6 +129,8 @@ func (wm *UserMetadataByOrgListWriteModel) AppendEvents(events ...eventstore.Eve
 			wm.WriteModel.AppendEvents(&e.RemovedEvent)
 		case *user.MetadataRemovedAllEvent:
 			wm.WriteModel.AppendEvents(&e.RemovedAllEvent)
+		default:
+			wm.WriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -136,7 +150,7 @@ func (wm *UserMetadataByOrgListWriteModel) Reduce() error {
 			if val, ok := wm.UserMetadata[e.Aggregate().ID]; ok {
 				delete(val, e.Key)
 			}
-		case *metadata.RemovedAllEvent:
+		case *metadata.RemovedAllEvent, *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent, *user.UserRemovedEvent:
 			delete(wm.UserMetadata, e.Aggregate().ID)
 		}
 	}
@@ -149,6 +163,10 @@ func (wm *UserMetadataByOrgListWriteModel) Query() *eventstore.SearchQueryBuilde
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		EventTypes(
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
+			user.UserRemovedType,
 			user.MetadataSetType,
 			user.MetadataRemovedType,
 			user.MetadataRemovedAllType).

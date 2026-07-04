@@ -22,10 +22,12 @@ const (
 	LoginNamePolicyProjectionTable = LoginNameProjectionTable + "_" + loginNamePolicySuffix
 	LoginNameDomainProjectionTable = LoginNameProjectionTable + "_" + loginNameDomainSuffix
 
-	LoginNameCol           = "login_name"
-	LoginNameUserCol       = "user_id"
-	LoginNameIsPrimaryCol  = "is_primary"
-	LoginNameInstanceIDCol = "instance_id"
+	LoginNameCol              = "login_name"
+	LoginNameUserCol          = "user_id"
+	LoginNameIsPrimaryCol     = "is_primary"
+	LoginNameInstanceIDCol    = "instance_id"
+	LoginNameLowerCol         = "login_name_lower"
+	LoginNameResourceOwnerCol = "resource_owner"
 
 	usersAlias         = "users"
 	policyCustomAlias  = "policy_custom"
@@ -76,8 +78,7 @@ func (*loginNameProjection) Init() *old_handler.Check {
 			[]*handler.InitColumn{
 				handler.NewColumn(LoginNameUserIDCol, handler.ColumnTypeText),
 				handler.NewColumn(LoginNameUserUserNameCol, handler.ColumnTypeText),
-				// TODO: implement computed columns
-				// handler.NewComputedColumn(loginNameUserUserNameLowerCol, handler.ColumnTypeText),
+				handler.NewColumn(loginNameUserUserNameLowerCol, handler.ColumnTypeText, handler.Generated("lower("+LoginNameUserUserNameCol+")", true)),
 				handler.NewColumn(LoginNameUserResourceOwnerCol, handler.ColumnTypeText),
 				handler.NewColumn(LoginNameUserInstanceIDCol, handler.ColumnTypeText),
 			},
@@ -93,33 +94,30 @@ func (*loginNameProjection) Init() *old_handler.Check {
 					),
 				),
 			),
-			// TODO: uncomment the following line when login_names4 will be created
-			// handler.WithIndex(
-			// 	handler.NewIndex("search", []string{LoginNameUserInstanceIDCol, loginNameUserUserNameLowerCol},
-			// 		handler.WithInclude(LoginNameUserResourceOwnerCol),
-			// 	),
-			// ),
+			handler.WithIndex(
+				handler.NewIndex("search", []string{LoginNameUserInstanceIDCol, loginNameUserUserNameLowerCol},
+					handler.WithInclude(LoginNameUserResourceOwnerCol),
+				),
+			),
 		),
 		handler.NewSuffixedTable(
 			[]*handler.InitColumn{
 				handler.NewColumn(LoginNameDomainNameCol, handler.ColumnTypeText),
-				// TODO: implement computed columns
-				// handler.NewComputedColumn(loginNameDomainNameLowerCol, handler.ColumnTypeText),
+				handler.NewColumn(loginNameDomainNameLowerCol, handler.ColumnTypeText, handler.Generated("lower("+LoginNameDomainNameCol+")", true)),
 				handler.NewColumn(LoginNameDomainIsPrimaryCol, handler.ColumnTypeBool, handler.Default(false)),
 				handler.NewColumn(LoginNameDomainResourceOwnerCol, handler.ColumnTypeText),
 				handler.NewColumn(LoginNameDomainInstanceIDCol, handler.ColumnTypeText),
 			},
 			handler.NewPrimaryKey(LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol, LoginNameDomainNameCol),
 			loginNameDomainSuffix,
-			// TODO: uncomment the following line when login_names4 will be created
-			// handler.WithIndex(
-			// 	handler.NewIndex("search", []string{LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol, loginNameDomainNameLowerCol}),
-			// ),
-			// handler.WithIndex(
-			// 	handler.NewIndex("search_result", []string{LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol},
-			// 		handler.WithInclude(LoginNameDomainIsPrimaryCol),
-			// 	),
-			// ),
+			handler.WithIndex(
+				handler.NewIndex("search", []string{LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol, loginNameDomainNameLowerCol}),
+			),
+			handler.WithIndex(
+				handler.NewIndex("search_result", []string{LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol},
+					handler.WithInclude(LoginNameDomainIsPrimaryCol),
+				),
+			),
 		),
 		handler.NewSuffixedTable(
 			[]*handler.InitColumn{

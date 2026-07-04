@@ -1617,7 +1617,8 @@
         "5": "Passkey-initiering",
         "6": "Applikations-hemlighet",
         "7": "OTP - SMS",
-        "8": "OTP - E-post"
+        "8": "OTP - E-post",
+        "9": "Inbjudningskod"
       },
       "EXPIRY": "Utgång (på minuter)",
       "INCLUDEDIGITS": "Inkludera siffror",
@@ -2370,7 +2371,8 @@
       "DESCRIPTION": "Ange data för JWT-identitetsleverantören.",
       "HEADERNAME": "Header-namn",
       "JWTENDPOINT": "JWT-slutpunkt",
-      "JWTKEYSENDPOINT": "JWT-nycklar slutpunkt"
+      "JWTKEYSENDPOINT": "JWT-nycklar slutpunkt",
+      "AUDIENCE": "Audience"
     },
     "APPLE": {
       "TEAMID": "Team-ID",
