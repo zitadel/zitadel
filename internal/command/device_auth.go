@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -184,13 +185,17 @@ func (e DeviceAuthStateError) Error() string {
 // As devices can poll at various intervals, an explicit state takes precedence over expiry.
 // This is to prevent cases where users might approve or deny the authorization on time, but the next poll
 // happens after expiry.
-func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCode, backChannelLogoutURI string) (_ *OIDCSession, err error) {
+func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCode, backChannelLogoutURI, clientID string) (_ *OIDCSession, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	deviceAuthModel, err := c.getDeviceAuthWriteModelByDeviceCode(ctx, deviceCode)
 	if err != nil {
 		return nil, err
+	}
+
+	if deviceAuthModel.ClientID != clientID {
+		return nil, oidc.ErrInvalidClient().WithDescription("client_id does not correspond to the client_id in the authorization request")
 	}
 
 	switch deviceAuthModel.State {

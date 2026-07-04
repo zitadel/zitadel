@@ -25,6 +25,8 @@ type MachineAddedEvent struct {
 	AccessTokenType domain.OIDCTokenType `json:"accessTokenType,omitempty"`
 }
 
+func (*MachineAddedEvent) EnforceResourceOwner() {}
+
 func (e *MachineAddedEvent) Payload() interface{} {
 	return e
 }

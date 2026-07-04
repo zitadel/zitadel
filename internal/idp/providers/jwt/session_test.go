@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"net/http"
 	"testing"
 	"time"
 
@@ -27,6 +28,7 @@ func TestSession_FetchUser(t *testing.T) {
 		jwtEndpoint   string
 		keysEndpoint  string
 		headerName    string
+		audience      string
 		encryptionAlg func(t *testing.T) crypto.EncryptionAlgorithm
 		httpMock      func(issuer string)
 		authURL       string
@@ -60,6 +62,7 @@ func TestSession_FetchUser(t *testing.T) {
 				jwtEndpoint:  "https://auth.com/jwt",
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
+				audience:     "",
 				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
 					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 				},
@@ -83,6 +86,7 @@ func TestSession_FetchUser(t *testing.T) {
 				jwtEndpoint:  "https://auth.com/jwt",
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
+				audience:     "",
 				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
 					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 				},
@@ -105,7 +109,36 @@ func TestSession_FetchUser(t *testing.T) {
 			},
 		},
 		{
-			name: "successful fetch",
+			name: "invalid token (audience)",
+			fields: fields{
+				issuer:       "https://jwt.com",
+				jwtEndpoint:  "https://auth.com/jwt",
+				keysEndpoint: "https://jwt.com/keys",
+				headerName:   "jwt-header",
+				audience:     "audience",
+				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
+					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
+				},
+				httpMock: func(issuer string) {
+					gock.New(issuer).
+						Get("/keys").
+						Reply(200).
+						JSON(keys(t))
+				},
+				authURL: "https://auth.com/jwt?authRequestID=testState",
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+					Token:   &oauth2.Token{},
+					IDToken: "invalidToken",
+				},
+			},
+			want: want{
+				err: func(err error) bool {
+					return errors.Is(err, ErrInvalidToken)
+				},
+			},
+		},
+		{
+			name: "invalid token (expired)",
 			fields: fields{
 				issuer:       "https://jwt.com",
 				jwtEndpoint:  "https://auth.com/jwt",
@@ -123,7 +156,173 @@ func TestSession_FetchUser(t *testing.T) {
 				authURL: "https://auth.com/jwt?authRequestID=testState",
 				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 					Token:   &oauth2.Token{},
-					IDToken: idToken(t, "https://jwt.com"),
+					IDToken: idToken(t, "https://jwt.com", time.Now().Add(-time.Minute), 0),
+					IDTokenClaims: &oidc.IDTokenClaims{
+						TokenClaims: oidc.TokenClaims{
+							Subject: "sub",
+						},
+						UserInfoProfile: oidc.UserInfoProfile{
+							Picture:           "picture",
+							Name:              "firstname lastname",
+							GivenName:         "firstname",
+							FamilyName:        "lastname",
+							Nickname:          "nickname",
+							PreferredUsername: "username",
+							Profile:           "profile",
+							Locale:            oidc.NewLocale(language.English),
+						},
+						UserInfoEmail: oidc.UserInfoEmail{
+							Email:         "email",
+							EmailVerified: oidc.Bool(true),
+						},
+						UserInfoPhone: oidc.UserInfoPhone{
+							PhoneNumber:         "phone",
+							PhoneNumberVerified: true,
+						},
+					},
+				},
+			},
+			want: want{
+				err: func(err error) bool {
+					return errors.Is(err, ErrInvalidToken)
+				},
+			},
+		},
+		{
+			name: "invalid token (issuedAt in the future)",
+			fields: fields{
+				issuer:       "https://jwt.com",
+				jwtEndpoint:  "https://auth.com/jwt",
+				keysEndpoint: "https://jwt.com/keys",
+				headerName:   "jwt-header",
+				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
+					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
+				},
+				httpMock: func(issuer string) {
+					gock.New(issuer).
+						Get("/keys").
+						Reply(200).
+						JSON(keys(t))
+				},
+				authURL: "https://auth.com/jwt?authRequestID=testState",
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+					Token: &oauth2.Token{},
+					// skew is used to determine the iat (among other claims). Using a negative value will actually add it to the iat claim.
+					IDToken: idToken(t, "https://jwt.com", time.Now().Add(time.Hour), -time.Minute),
+					IDTokenClaims: &oidc.IDTokenClaims{
+						TokenClaims: oidc.TokenClaims{
+							Subject: "sub",
+						},
+						UserInfoProfile: oidc.UserInfoProfile{
+							Picture:           "picture",
+							Name:              "firstname lastname",
+							GivenName:         "firstname",
+							FamilyName:        "lastname",
+							Nickname:          "nickname",
+							PreferredUsername: "username",
+							Profile:           "profile",
+							Locale:            oidc.NewLocale(language.English),
+						},
+						UserInfoEmail: oidc.UserInfoEmail{
+							Email:         "email",
+							EmailVerified: oidc.Bool(true),
+						},
+						UserInfoPhone: oidc.UserInfoPhone{
+							PhoneNumber:         "phone",
+							PhoneNumberVerified: true,
+						},
+					},
+				},
+			},
+			want: want{
+				err: func(err error) bool {
+					return errors.Is(err, ErrInvalidToken)
+				},
+			},
+		},
+		{
+			name: "successful fetch",
+			fields: fields{
+				issuer:       "https://jwt.com",
+				jwtEndpoint:  "https://auth.com/jwt",
+				keysEndpoint: "https://jwt.com/keys",
+				headerName:   "jwt-header",
+				audience:     "clientID",
+				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
+					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
+				},
+				httpMock: func(issuer string) {
+					gock.New(issuer).
+						Get("/keys").
+						Reply(200).
+						JSON(keys(t))
+				},
+				authURL: "https://auth.com/jwt?authRequestID=testState",
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+					Token:   &oauth2.Token{},
+					IDToken: idToken(t, "https://jwt.com", time.Now().Add(time.Hour), 0),
+					IDTokenClaims: &oidc.IDTokenClaims{
+						TokenClaims: oidc.TokenClaims{
+							Subject: "sub",
+						},
+						UserInfoProfile: oidc.UserInfoProfile{
+							Picture:           "picture",
+							Name:              "firstname lastname",
+							GivenName:         "firstname",
+							FamilyName:        "lastname",
+							Nickname:          "nickname",
+							PreferredUsername: "username",
+							Profile:           "profile",
+							Locale:            oidc.NewLocale(language.English),
+						},
+						UserInfoEmail: oidc.UserInfoEmail{
+							Email:         "email",
+							EmailVerified: oidc.Bool(true),
+						},
+						UserInfoPhone: oidc.UserInfoPhone{
+							PhoneNumber:         "phone",
+							PhoneNumberVerified: true,
+						},
+					},
+				},
+			},
+			want: want{
+				id:                "sub",
+				firstName:         "firstname",
+				lastName:          "lastname",
+				displayName:       "firstname lastname",
+				nickName:          "nickname",
+				preferredUsername: "username",
+				email:             "email",
+				isEmailVerified:   true,
+				phone:             "phone",
+				isPhoneVerified:   true,
+				preferredLanguage: language.English,
+				avatarURL:         "picture",
+				profile:           "profile",
+			},
+		},
+		{
+			name: "successful fetch (no audience check)",
+			fields: fields{
+				issuer:       "https://jwt.com",
+				jwtEndpoint:  "https://auth.com/jwt",
+				keysEndpoint: "https://jwt.com/keys",
+				headerName:   "jwt-header",
+				audience:     "",
+				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
+					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
+				},
+				httpMock: func(issuer string) {
+					gock.New(issuer).
+						Get("/keys").
+						Reply(200).
+						JSON(keys(t))
+				},
+				authURL: "https://auth.com/jwt?authRequestID=testState",
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+					Token:   &oauth2.Token{},
+					IDToken: idToken(t, "https://jwt.com", time.Now().Add(time.Hour), 0),
 					IDTokenClaims: &oidc.IDTokenClaims{
 						TokenClaims: oidc.TokenClaims{
 							Subject: "sub",
@@ -178,7 +377,9 @@ func TestSession_FetchUser(t *testing.T) {
 				tt.fields.jwtEndpoint,
 				tt.fields.keysEndpoint,
 				tt.fields.headerName,
+				tt.fields.audience,
 				tt.fields.encryptionAlg(t),
+				http.DefaultClient,
 			)
 			require.NoError(t, err)
 
@@ -212,18 +413,18 @@ func TestSession_FetchUser(t *testing.T) {
 	}
 }
 
-func idToken(t *testing.T, issuer string) string {
+func idToken(t *testing.T, issuer string, expiration time.Time, skew time.Duration) string {
 	claims := oidc.NewIDTokenClaims(
 		issuer,
 		"sub",
 		[]string{"clientID"},
-		time.Now().Add(1*time.Hour),
-		time.Now().Add(-1*time.Minute),
+		expiration,
+		time.Now().Add(-1*time.Hour),
 		"",
 		"",
 		nil,
 		"clientID",
-		0,
+		skew,
 	)
 	claims.UserInfoProfile = oidc.UserInfoProfile{
 		GivenName:         "firstname",

@@ -66,6 +66,11 @@ func (wm *ProjectWriteModel) Reduce() error {
 			}
 			wm.State = domain.ProjectStateActive
 		case *project.ProjectRemovedEvent:
+			wm.Name = ""
+			wm.ProjectRoleAssertion = false
+			wm.ProjectRoleCheck = false
+			wm.HasProjectCheck = false
+			wm.PrivateLabelingSetting = domain.PrivateLabelingSettingUnspecified
 			wm.State = domain.ProjectStateRemoved
 		}
 	}

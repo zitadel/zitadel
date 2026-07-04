@@ -23,6 +23,7 @@
     "*": "prettier --write --ignore-unknown"
   },
   "dependencies": {
+    "@braintree/sanitize-url": "^7.1.2",
     "@connectrpc/connect": "^2.1.1",
     "@connectrpc/connect-node": "^2.1.1",
     "@headlessui/react": "^2.2.10",
