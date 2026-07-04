@@ -61,7 +61,16 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     suffix: command.suffix,
   };
 
-  const searchResult = await searchUsers(searchUsersRequest);
+  let searchResult = await searchUsers(searchUsersRequest);
+
+  // Freshly provisioned users (first login right after purchase) may not have reached the
+  // eventual-consistent user search projection yet ("Benutzer im System nicht gefunden"
+  // ~90s after checkout, incident 2026-07-04). One short retry closes that window without
+  // noticeably slowing down the genuine miss case.
+  if (searchResult && "result" in searchResult && (searchResult.result ?? []).length === 0) {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    searchResult = await searchUsers(searchUsersRequest);
+  }
 
   // Safety check: ensure searchResult is defined
   if (!searchResult) {
