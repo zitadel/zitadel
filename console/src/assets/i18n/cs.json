@@ -1613,7 +1613,8 @@
         "5": "Inicializace Passkey",
         "6": "Tajemství pomocí aplikace",
         "7": "OTP - SMS",
-        "8": "OTP - E-mail"
+        "8": "OTP - E-mail",
+        "9": "Kód pozvánky"
       },
       "EXPIRY": "Expirace (v minutách)",
       "INCLUDEDIGITS": "Zahrnout čísla",
@@ -2363,7 +2364,8 @@
       "DESCRIPTION": "Zadejte data pro poskytovatele identity JWT.",
       "HEADERNAME": "Název hlavičky",
       "JWTENDPOINT": "JWT koncový bod",
-      "JWTKEYSENDPOINT": "Koncový bod klíčů JWT"
+      "JWTKEYSENDPOINT": "Koncový bod klíčů JWT",
+      "AUDIENCE": "Audience"
     },
     "APPLE": {
       "TEAMID": "ID týmu",

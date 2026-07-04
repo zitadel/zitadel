@@ -188,4 +188,52 @@ describe("loginWithOIDCAndSession", () => {
 
     expect(result).toEqual({ error: "Unknown error occurred" });
   });
+
+  it("should reject javascript: defaultRedirectUri in FailedPrecondition path (XSS prevention)", async () => {
+    const { ConnectError } = await import("@zitadel/client");
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
+    vi.mocked(zitadelModule.createCallback).mockRejectedValue(new ConnectError("already handled", 9));
+    vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+      defaultRedirectUri: "javascript:alert(document.cookie)",
+    } as any);
+
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: mockSessions,
+      sessionCookies: mockCookies,
+    });
+
+    // Should NOT redirect to the javascript: URI — must fall back to /signedin
+    expect(result).toHaveProperty("redirect");
+    if ("redirect" in result) {
+      expect(result.redirect).not.toContain("javascript:");
+      expect(result.redirect).toContain("/signedin");
+    }
+  });
+
+  it("should reject data: defaultRedirectUri in FailedPrecondition path (XSS prevention)", async () => {
+    const { ConnectError } = await import("@zitadel/client");
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
+    vi.mocked(zitadelModule.createCallback).mockRejectedValue(new ConnectError("already handled", 9));
+    vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+      defaultRedirectUri: "data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==",
+    } as any);
+
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: mockSessions,
+      sessionCookies: mockCookies,
+    });
+
+    // Should NOT redirect to the data: URI — must fall back to /signedin
+    expect(result).toHaveProperty("redirect");
+    if ("redirect" in result) {
+      expect(result.redirect).not.toContain("data:");
+      expect(result.redirect).toContain("/signedin");
+    }
+  });
 });

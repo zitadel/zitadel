@@ -529,6 +529,7 @@ func jwtConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.JWTIDP
 			Issuer:       template.Issuer,
 			KeysEndpoint: template.KeysEndpoint,
 			HeaderName:   template.HeaderName,
+			Audience:     template.Audience,
 		},
 	}
 }

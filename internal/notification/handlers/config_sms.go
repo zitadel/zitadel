@@ -49,6 +49,7 @@ func (n *NotificationQueries) GetActiveSMSConfig(ctx context.Context) (*sms.Conf
 				Method:     http.MethodPost,
 				Headers:    nil,
 				SigningKey: config.HTTPConfig.SigningKey,
+				Client:     n.httpClient,
 			},
 		}, nil
 	}

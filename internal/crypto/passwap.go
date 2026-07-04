@@ -217,6 +217,9 @@ func (l Drupal7LimitsConfig) validationOpts() *drupal7.ValidationOpts {
 }
 
 func (c *HashConfig) NewHasher() (*Hasher, error) {
+	if err := c.validateFIPS140(); err != nil {
+		return nil, err
+	}
 	verifiers, vPrefixes, err := c.buildVerifiers()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "CRYPT-sahW9", "password hash config invalid")

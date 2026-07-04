@@ -1613,7 +1613,8 @@
         "5": "パスキーの初期設定",
         "6": "アプリケーションのシークレット",
         "7": "OTP - SMS",
-        "8": "OTP - 電子メール"
+        "8": "OTP - 電子メール",
+        "9": "招待コード"
       },
       "EXPIRY": "有効期限 (分単位)",
       "INCLUDEDIGITS": "数字を含める",
@@ -2366,7 +2367,8 @@
       "DESCRIPTION": "JWT Identity Providerの情報を入力する。",
       "HEADERNAME": "ヘッダー名",
       "JWTENDPOINT": "JWTエンドポイント",
-      "JWTKEYSENDPOINT": "JWTキーエンドポイント"
+      "JWTKEYSENDPOINT": "JWTキーエンドポイント",
+      "AUDIENCE": "オーディエンス"
     },
     "APPLE": {
       "TEAMID": "チームID",
