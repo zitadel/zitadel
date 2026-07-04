@@ -70,8 +70,8 @@ export const SignInWithGeneric = forwardRef<HTMLButtonElement, SignInWithIdentit
     const icon = brandIcon(name);
 
     // Recognised brand: mirror the native branded buttons (Google/GitHub). The
-    // icon row sets the button height (so no name-only "h-[50px] pl-20" default
-    // is wanted here), and the visible name is the accessible label — the glyph
+    // icon row sets the button height (so no name-only "h-[50px]" default is
+    // wanted here), and the visible name is the accessible label — the glyph
     // is therefore decorative (aria-hidden, no role/title) to avoid the screen
     // reader announcing the provider name twice.
     if (icon) {
@@ -95,10 +95,10 @@ export const SignInWithGeneric = forwardRef<HTMLButtonElement, SignInWithIdentit
       );
     }
 
-    // Unknown provider: unchanged upstream name-only button.
+    // Unknown provider: upstream name-only button with centred text (#12211).
     return (
-      <BaseButton {...restProps} ref={ref} className={className ?? "h-[50px] pl-20"}>
-        {children ? children : <span>{name}</span>}
+      <BaseButton {...restProps} ref={ref} className={className ?? "h-[50px]"}>
+        {children ? children : <span className="w-full text-center">{name}</span>}
       </BaseButton>
     );
   },

@@ -107,6 +107,11 @@ func (s *Server) verifyExchangeToken(ctx context.Context, client *Client, token 
 		if err != nil {
 			return nil, zerrors.ThrowPermissionDenied(err, "OIDC-Osh3t", "Errors.TokenExchange.Token.Invalid")
 		}
+		if !token.isPAT {
+			if err = validateIntrospectionAudience(token.audience, client.GetID(), client.client.ProjectID); err != nil {
+				return nil, zerrors.ThrowPermissionDenied(err, "OIDC-zi9Y0", "Errors.TokenExchange.Token.Invalid")
+			}
+		}
 		if token.isPAT {
 			if err = s.assertClientScopesForPAT(ctx, token, client.GetID(), client.client.ProjectID); err != nil {
 				return nil, err
@@ -175,16 +180,21 @@ func (s *Server) jwtProfileUserCheck(ctx context.Context, resourceOwner *string,
 
 func validateTokenExchangeScopes(client *Client, requestedScopes, subjectScopes, actorScopes []string) ([]string, error) {
 	// Scope always has 1 empty string if the space delimited array was an empty string.
-	scopes := slices.DeleteFunc(requestedScopes, func(s string) bool {
+	requestedScopes = slices.DeleteFunc(requestedScopes, func(s string) bool {
 		return s == ""
 	})
-	if len(scopes) == 0 {
-		scopes = subjectScopes
+
+	if len(requestedScopes) == 0 {
+		return op.ValidateAuthReqScopes(client, actorScopes)
 	}
-	if len(scopes) == 0 {
-		scopes = actorScopes
+
+	for _, scope := range requestedScopes {
+		if !slices.Contains(subjectScopes, scope) || !slices.Contains(actorScopes, scope) {
+			return nil, oidc.ErrInvalidScope().WithDescription("scope %q not found in subject or actor token", scope)
+		}
 	}
-	return op.ValidateAuthReqScopes(client, scopes)
+
+	return op.ValidateAuthReqScopes(client, requestedScopes)
 }
 
 func validateTokenExchangeAudience(requestedAudience, subjectAudience, actorAudience []string) ([]string, error) {
