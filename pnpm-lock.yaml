@@ -207,7 +207,7 @@ importers:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@4.3.0)
       tsx:
-        specifier: ^4.22.5
+        specifier: ^4.21.0
         version: 4.22.5
       typescript:
         specifier: ^5.9.3
