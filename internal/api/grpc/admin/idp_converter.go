@@ -550,14 +550,6 @@ func signatureAlgorithmToCommand(signatureAlgorithm idp_pb.SAMLSignatureAlgorith
 }
 
 func addZitadelProviderToCommand(req *admin_pb.AddZitadelProviderRequest) command.ZitadelProvider {
-	instanceRolesInfo := make([]idp.RolesInfo, 0, len(req.InstanceRolesInfo))
-	for _, info := range req.InstanceRolesInfo {
-		instanceRolesInfo = append(instanceRolesInfo, idp.RolesInfo{
-			OrganizationID:     info.OrganizationId,
-			OrganizationDomain: info.OrganizationDomain,
-		})
-	}
-
 	return command.ZitadelProvider{
 		Name:              req.Name,
 		Issuer:            req.Issuer,
@@ -565,6 +557,32 @@ func addZitadelProviderToCommand(req *admin_pb.AddZitadelProviderRequest) comman
 		ClientSecret:      req.ClientSecret,
 		Scopes:            req.Scopes,
 		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
-		InstanceRolesInfo: instanceRolesInfo,
+		InstanceRolesInfo: instanceRolesInfoToCommand(req.InstanceRolesInfo),
 	}
+}
+
+func updateZitadelProviderToCommand(req *admin_pb.UpdateZitadelProviderRequest) command.ZitadelProvider {
+	return command.ZitadelProvider{
+		Name:              req.Name,
+		Issuer:            req.Issuer,
+		ClientID:          req.ClientId,
+		ClientSecret:      req.ClientSecret,
+		Scopes:            req.Scopes,
+		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+		InstanceRolesInfo: instanceRolesInfoToCommand(req.InstanceRolesInfo),
+	}
+}
+
+func instanceRolesInfoToCommand(reqInstanceRolesInfo []*idp_pb.InstanceRolesInfo) []idp.RolesInfo {
+	if reqInstanceRolesInfo == nil {
+		return nil
+	}
+	instanceRolesInfo := make([]idp.RolesInfo, 0, len(reqInstanceRolesInfo))
+	for _, info := range reqInstanceRolesInfo {
+		instanceRolesInfo = append(instanceRolesInfo, idp.RolesInfo{
+			OrganizationID:     info.OrganizationId,
+			OrganizationDomain: info.OrganizationDomain,
+		})
+	}
+	return instanceRolesInfo
 }

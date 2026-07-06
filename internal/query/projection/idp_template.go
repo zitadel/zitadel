@@ -552,6 +552,10 @@ func (p *idpTemplateProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceZitadelIDPAdded,
 				},
 				{
+					Event:  instance.ZitadelIDPChangedEventType,
+					Reduce: p.reduceZitadelIDPChanged,
+				},
+				{
 					Event:  instance.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,
 				},
@@ -2629,4 +2633,63 @@ func (p *idpTemplateProjection) reduceZitadelIDPAdded(event eventstore.Event) (*
 			handler.WithTableSuffix(IDPTemplateZitadelSuffix),
 		),
 	), nil
+}
+
+func (p *idpTemplateProjection) reduceZitadelIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.ZitadelIDPChangedEvent
+	switch e := event.(type) {
+	case *instance.ZitadelIDPChangedEvent:
+		idpEvent = e.ZitadelIDPChangedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qjMUfi", "reduce.wrong.event.type %v", []eventstore.EventType{instance.ZitadelIDPChangedEventType})
+	}
+
+	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
+	ops = append(ops,
+		handler.AddUpdateStatement(
+			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+	)
+	zitadelIDPChangedColumns := reduceZitadelIDPChangedColumns(idpEvent)
+	if len(zitadelIDPChangedColumns) > 0 {
+		ops = append(ops,
+			handler.AddUpdateStatement(
+				zitadelIDPChangedColumns,
+				[]handler.Condition{
+					handler.NewCond(ZitadelIDCol, idpEvent.ID),
+					handler.NewCond(ZitadelInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				},
+				handler.WithTableSuffix(IDPTemplateZitadelSuffix),
+			),
+		)
+	}
+
+	return handler.NewMultiStatement(
+		&idpEvent,
+		ops...,
+	), nil
+}
+
+func reduceZitadelIDPChangedColumns(idpEvent idp.ZitadelIDPChangedEvent) []handler.Column {
+	zitadelCols := make([]handler.Column, 0, 5)
+	if idpEvent.ClientID != nil {
+		zitadelCols = append(zitadelCols, handler.NewCol(ZitadelClientIDCol, *idpEvent.ClientID))
+	}
+	if idpEvent.ClientSecret != nil {
+		zitadelCols = append(zitadelCols, handler.NewCol(ZitadelClientSecretCol, *idpEvent.ClientSecret))
+	}
+	if idpEvent.Issuer != nil {
+		zitadelCols = append(zitadelCols, handler.NewCol(ZitadelIssuerCol, *idpEvent.Issuer))
+	}
+	if idpEvent.Scopes != nil {
+		zitadelCols = append(zitadelCols, handler.NewCol(ZitadelScopesCol, database.TextArray[string](*idpEvent.Scopes)))
+	}
+	if idpEvent.InstanceRolesInfo != nil {
+		zitadelCols = append(zitadelCols, handler.NewJSONCol(ZitadelInstanceRolesInfoCol, *idpEvent.InstanceRolesInfo))
+	}
+	return zitadelCols
 }

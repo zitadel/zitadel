@@ -225,3 +225,186 @@ func Test_AddZitadelProvider(t *testing.T) {
 		})
 	}
 }
+
+func Test_UpdateZitadelProvider(t *testing.T) {
+	existingProvider, err := Instance.Client.Admin.AddZitadelProvider(AdminCTX, &admin_pb.AddZitadelProviderRequest{
+		Name:         "Zitadel Support IdP",
+		Issuer:       "zitadel.example.com",
+		ClientId:     "test-client",
+		ClientSecret: "test-secret",
+		Scopes:       []string{"email", "profile"},
+		ProviderOptions: &idp_pb.Options{
+			IsCreationAllowed: true,
+		},
+		InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
+			{
+				OrganizationId:     "org1",
+				OrganizationDomain: "org1.com",
+			},
+		},
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, existingProvider.GetId())
+
+	type args struct {
+		ctx context.Context
+		req *admin_pb.UpdateZitadelProviderRequest
+	}
+	tests := []struct {
+		name         string
+		args         args
+		wantErr      error
+		wantResponse *admin_pb.UpdateZitadelProviderResponse
+	}{
+		{
+			name: "no permissions, error",
+			args: args{
+				ctx: Instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
+				req: &admin_pb.UpdateZitadelProviderRequest{
+					Id:           existingProvider.GetId(),
+					Issuer:       "zitadel.example.com",
+					ClientId:     "test-client",
+					ClientSecret: "test-secret",
+					Scopes:       []string{"email", "profile"},
+					ProviderOptions: &idp_pb.Options{
+						IsCreationAllowed: true,
+					},
+				},
+			},
+			wantErr: status.Error(codes.NotFound, "membership not found (AUTHZ-cdgFk)"),
+		},
+		{
+			name: "insufficient permissions, error",
+			args: args{
+				ctx: Instance.WithAuthorizationToken(CTX, integration.UserTypeLogin),
+				req: &admin_pb.UpdateZitadelProviderRequest{
+					Id:     existingProvider.GetId(),
+					Issuer: "acme.example.com",
+					Scopes: []string{"email", "profile"},
+					ProviderOptions: &idp_pb.Options{
+						IsCreationAllowed: true,
+						IsAutoCreation:    false,
+					},
+				},
+			},
+			wantErr: status.Error(codes.PermissionDenied, "No matching permissions found (AUTH-5mWD2)"),
+		},
+		{
+			name: "missing required field: id",
+			args: args{
+				ctx: AdminCTX,
+				req: &admin_pb.UpdateZitadelProviderRequest{},
+			},
+			wantErr: status.Error(codes.InvalidArgument, "invalid UpdateZitadelProviderRequest.Id: value length must be between 1 and 200 runes, inclusive"),
+		},
+		{
+			name: "missing required field: name",
+			args: args{
+				ctx: AdminCTX,
+				req: &admin_pb.UpdateZitadelProviderRequest{
+					Id: existingProvider.GetId(),
+				},
+			},
+			wantErr: status.Error(codes.InvalidArgument, "invalid UpdateZitadelProviderRequest.Name: value length must be between 1 and 200 runes, inclusive"),
+		},
+		{
+			name: "missing required field: issuer",
+			args: args{
+				ctx: AdminCTX,
+				req: &admin_pb.UpdateZitadelProviderRequest{
+					Id:   existingProvider.GetId(),
+					Name: "Zitadel Support IdP updated",
+				},
+			},
+			wantErr: status.Error(codes.InvalidArgument, "invalid UpdateZitadelProviderRequest.Issuer: value length must be between 1 and 200 runes, inclusive"),
+		},
+		{
+			name: "missing required field: client_id",
+			args: args{
+				ctx: AdminCTX,
+				req: &admin_pb.UpdateZitadelProviderRequest{
+					Id:     existingProvider.GetId(),
+					Name:   "Zitadel Support IdP updated",
+					Issuer: "acme.example.com",
+				},
+			},
+			wantErr: status.Error(codes.InvalidArgument, "invalid UpdateZitadelProviderRequest.ClientId: value length must be between 1 and 200 runes, inclusive"),
+		},
+		{
+			name: "update, ok",
+			args: args{
+				ctx: AdminCTX,
+				req: &admin_pb.UpdateZitadelProviderRequest{
+					Id:       existingProvider.GetId(),
+					Name:     "Zitadel Support IdP updated",
+					Issuer:   "acme.example.com",
+					ClientId: "test-client",
+					Scopes:   []string{"email", "profile", "openid", "offline_access"},
+					ProviderOptions: &idp_pb.Options{
+						IsCreationAllowed: true,
+						IsAutoCreation:    false,
+					},
+					InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
+						{
+							OrganizationId:     "org1",
+							OrganizationDomain: "org1.com",
+						},
+						{
+							OrganizationId:     "org2",
+							OrganizationDomain: "org2.com",
+						},
+					},
+				},
+			},
+			wantResponse: &admin_pb.UpdateZitadelProviderResponse{
+				Details: &object_pb.ObjectDetails{
+					ResourceOwner: Instance.Instance.Id,
+				},
+			},
+		},
+		{
+			name: "update with scopes unset, ok",
+			args: args{
+				ctx: AdminCTX,
+				req: &admin_pb.UpdateZitadelProviderRequest{
+					Id:       existingProvider.GetId(),
+					Name:     "Zitadel Support IdP updated again",
+					Issuer:   "acme.example.com",
+					ClientId: "test-client",
+					Scopes:   nil,
+					ProviderOptions: &idp_pb.Options{
+						IsCreationAllowed: true,
+						IsAutoCreation:    false,
+					},
+					InstanceRolesInfo: nil,
+				},
+			},
+			wantResponse: &admin_pb.UpdateZitadelProviderResponse{
+				Details: &object_pb.ObjectDetails{
+					ResourceOwner: Instance.Instance.Id,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			before := time.Now()
+			got, err := Client.UpdateZitadelProvider(tt.args.ctx, tt.args.req)
+			after := time.Now()
+			if tt.wantErr != nil {
+				require.Error(t, err)
+				grpcStatus, ok := status.FromError(err)
+				require.True(t, ok)
+				assert.Equal(t, status.Code(tt.wantErr), grpcStatus.Code())
+				assert.Equal(t, status.Convert(tt.wantErr).Message(), grpcStatus.Message())
+				return
+			}
+			require.NoError(t, err)
+			assert.NotNil(t, got)
+			assert.WithinRange(t, got.GetDetails().GetChangeDate().AsTime(), before, after)
+			assert.Equal(t, tt.wantResponse.GetDetails().GetResourceOwner(), got.GetDetails().GetResourceOwner())
+
+			// todo: check if the update was actually applied by fetching the provider and checking its fields when the functionality is implemented
+		})
+	}
+}
