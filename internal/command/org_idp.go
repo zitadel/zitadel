@@ -811,7 +811,7 @@ func (c *Commands) prepareMigrateOrgOIDCToAzureADProvider(a *org.Aggregate, writ
 				return nil, err
 			}
 			if !writeModel.State.Exists() {
-				return nil, zerrors.ThrowNotFound(nil, "ORG-Dg239201", "Errors.Instance.IDPConfig.NotExisting")
+				return nil, zerrors.ThrowNotFound(nil, "ORG-Dg239201", "Errors.Org.IDPConfig.NotExisting")
 			}
 			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
 			if err != nil {
@@ -853,7 +853,7 @@ func (c *Commands) prepareMigrateOrgOIDCToGoogleProvider(a *org.Aggregate, write
 				return nil, err
 			}
 			if !writeModel.State.Exists() {
-				return nil, zerrors.ThrowNotFound(nil, "ORG-x09981", "Errors.Instance.IDPConfig.NotExisting")
+				return nil, zerrors.ThrowNotFound(nil, "ORG-x09981", "Errors.Org.IDPConfig.NotExisting")
 			}
 			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
 			if err != nil {

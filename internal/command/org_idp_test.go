@@ -6414,7 +6414,7 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "INST-Bg281", "Errors.IDPConfig.NotExisting"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "ORG-Bg281", "Errors.Org.IDPConfig.NotExisting"))
 				},
 			},
 		},
