@@ -4808,6 +4808,179 @@ func TestIDPTemplateProjection_reducesZitadel(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "instance reduceZitadelIDPChanged minimal",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.ZitadelIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"isCreationAllowed": true,
+	"clientId": "id"
+}`),
+					), eventstore.GenericEventMapper[instance.ZitadelIDPChangedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateMinimalStmt,
+							expectedArgs: []interface{}{
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates6_zitadel SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"id",
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceZitadelIDPChanged",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.ZitadelIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"issuer": "issuer",
+	"clientId": "client_id",
+	"clientSecret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"instanceRolesInfo": [{
+        "organizationId": "org3",
+        "organizationDomain": "org3.com"
+    }],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
+}`),
+					), eventstore.GenericEventMapper[instance.ZitadelIDPChangedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateStmt,
+							expectedArgs: []interface{}{
+								"name",
+								true,
+								true,
+								true,
+								true,
+								domain.AutoLinkingOptionUsername,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates6_zitadel SET (client_id, client_secret, issuer, scopes, instance_roles_info) = ($1, $2, $3, $4, $5) WHERE (idp_id = $6) AND (instance_id = $7)",
+							expectedArgs: []interface{}{
+								"client_id",
+								anyArg{},
+								"issuer",
+								database.TextArray[string]{"profile"},
+								[]byte(`[{"organizationId":"org3","organizationDomain":"org3.com"}]`),
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceZitadelIDPChanged - unset scopes and instance roles info",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.ZitadelIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"issuer": "issuer",
+	"clientId": "client_id",
+	"clientSecret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": [],
+	"instanceRolesInfo": [],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
+}`),
+					), eventstore.GenericEventMapper[instance.ZitadelIDPChangedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateStmt,
+							expectedArgs: []interface{}{
+								"name",
+								true,
+								true,
+								true,
+								true,
+								domain.AutoLinkingOptionUsername,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates6_zitadel SET (client_id, client_secret, issuer, scopes, instance_roles_info) = ($1, $2, $3, $4, $5) WHERE (idp_id = $6) AND (instance_id = $7)",
+							expectedArgs: []interface{}{
+								"client_id",
+								anyArg{},
+								"issuer",
+								database.TextArray[string]{},
+								[]byte(`[]`),
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
