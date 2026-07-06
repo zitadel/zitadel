@@ -83,7 +83,7 @@ This creates a `users.json` file containing all user data, including the Firebas
 You need to map Firebase fields to ZITADEL's schema. Here's a sample transformation:
 
 **Firebase Export Sample:**
-```
+```json
 {
   "users": [
     {
@@ -100,7 +100,7 @@ You need to map Firebase fields to ZITADEL's schema. Here's a sample transformat
 ```
 
 **ZITADEL Import Format:**
-```
+```js
 {
   "dataOrgs": {
     "orgs": [
@@ -253,7 +253,7 @@ Set a migration deadline (e.g., 90 days). After this period:
 3. **Notify inactive users** that they need to reset their password
 
 ### 6.4. Sample Backend Implementation (Pseudocode)
-```
+```js
 async function handleLogin(email, password) {
   // Check if user exists in ZITADEL
   const zitadelUser = await checkZitadelUser(email);
