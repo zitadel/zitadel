@@ -471,7 +471,7 @@ func (s *Server) AddZitadelProvider(ctx context.Context, req *mgmt_pb.AddZitadel
 }
 
 func (s *Server) UpdateZitadelProvider(ctx context.Context, req *mgmt_pb.UpdateZitadelProviderRequest) (*mgmt_pb.UpdateZitadelProviderResponse, error) {
-	details, err := s.command.UpdateInstanceZitadelProvider(ctx, req.Id, updateZitadelProviderToCommand(req))
+	details, err := s.command.UpdateOrgZitadelProvider(ctx, req.Id, authz.GetCtxData(ctx).OrgID, updateZitadelProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}

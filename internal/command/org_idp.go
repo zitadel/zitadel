@@ -2044,11 +2044,10 @@ func (c *Commands) validateOrgZitadelProvider(provider *ZitadelProvider, create 
 	if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "ORG-feyb3A", "Errors.Invalid.Argument")
 	}
+	// client_secret is required on creation, but optional on update
 	provider.ClientSecret = strings.TrimSpace(provider.ClientSecret)
-	if create {
-		if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
-			return zerrors.ThrowInvalidArgument(nil, "ORG-DxaSb9", "Errors.Invalid.Argument")
-		}
+	if create && provider.ClientSecret == "" {
+		return zerrors.ThrowInvalidArgument(nil, "ORG-DxaSb9", "Errors.Invalid.Argument")
 	}
 	// todo: review InstanceRolesInfo for an org IDP
 	for i := range provider.InstanceRolesInfo {

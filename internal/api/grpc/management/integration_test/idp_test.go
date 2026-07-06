@@ -364,7 +364,7 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 			},
 			wantResponse: &mgmt_pb.UpdateZitadelProviderResponse{
 				Details: &object_pb.ObjectDetails{
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -377,7 +377,7 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 					Name:     "Zitadel Support IdP updated again",
 					Issuer:   "acme.example.com",
 					ClientId: "test-client",
-					Scopes:   nil,
+					Scopes:   []string{},
 					ProviderOptions: &idp_pb.Options{
 						IsCreationAllowed: true,
 						IsAutoCreation:    false,
@@ -387,7 +387,7 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 			},
 			wantResponse: &mgmt_pb.UpdateZitadelProviderResponse{
 				Details: &object_pb.ObjectDetails{
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
