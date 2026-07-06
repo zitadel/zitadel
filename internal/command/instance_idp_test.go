@@ -6299,7 +6299,6 @@ func TestCommands_UpdateInstanceZitadelProvider(t *testing.T) {
 		provider ZitadelProvider
 	}
 	type res struct {
-		id   string
 		want *domain.ObjectDetails
 		err  func(error) bool
 	}

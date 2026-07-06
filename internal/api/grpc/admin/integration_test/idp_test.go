@@ -19,7 +19,6 @@ import (
 )
 
 func Test_AddZitadelProvider(t *testing.T) {
-	t.Parallel()
 	type args struct {
 		ctx context.Context
 		req *admin_pb.AddZitadelProviderRequest
@@ -207,7 +206,6 @@ func Test_AddZitadelProvider(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			before := time.Now()
 			got, err := Client.AddZitadelProvider(tt.args.ctx, tt.args.req)
 			after := time.Now()
@@ -229,7 +227,6 @@ func Test_AddZitadelProvider(t *testing.T) {
 }
 
 func Test_UpdateZitadelProvider(t *testing.T) {
-	t.Parallel()
 	existingProvider, err := Instance.Client.Admin.AddZitadelProvider(AdminCTX, &admin_pb.AddZitadelProviderRequest{
 		Name:         "Zitadel Support IdP",
 		Issuer:       "zitadel.example.com",
@@ -391,7 +388,6 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			before := time.Now()
 			got, err := Client.UpdateZitadelProvider(tt.args.ctx, tt.args.req)
 			after := time.Now()
