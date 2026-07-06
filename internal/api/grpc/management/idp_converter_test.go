@@ -233,7 +233,6 @@ func Test_addZitadelProviderToCommand(t *testing.T) {
 					IsLinkingAllowed:  false,
 					IsAutoUpdate:      true,
 				},
-				InstanceRolesInfo: []idp.RolesInfo{},
 			},
 		},
 		{
