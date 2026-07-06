@@ -2011,7 +2011,7 @@ func (c *Commands) prepareUpdateOrgZitadelProvider(a *org.Aggregate, writeModel 
 				return nil, err
 			}
 			if !writeModel.State.Exists() {
-				return nil, zerrors.ThrowNotFound(nil, "ORG-Bg281", "Errors.IDPConfig.NotExisting")
+				return nil, zerrors.ThrowNotFound(nil, "ORG-Bg281", "Errors.Org.IDPConfig.NotExisting")
 			}
 			event, err := writeModel.NewChangedEvent(
 				ctx,

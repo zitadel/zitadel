@@ -705,6 +705,10 @@ func (p *idpTemplateProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceZitadelIDPAdded,
 				},
 				{
+					Event:  org.ZitadelIDPChangedEventType,
+					Reduce: p.reduceZitadelIDPChanged,
+				},
+				{
 					Event:  org.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,
 				},
