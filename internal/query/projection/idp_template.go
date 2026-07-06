@@ -2640,8 +2640,10 @@ func (p *idpTemplateProjection) reduceZitadelIDPChanged(event eventstore.Event) 
 	switch e := event.(type) {
 	case *instance.ZitadelIDPChangedEvent:
 		idpEvent = e.ZitadelIDPChangedEvent
+	case *org.ZitadelIDPChangedEvent:
+		idpEvent = e.ZitadelIDPChangedEvent
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qjMUfi", "reduce.wrong.event.type %v", []eventstore.EventType{instance.ZitadelIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qjMUfi", "reduce.wrong.event.type %v", []eventstore.EventType{instance.ZitadelIDPChangedEventType, org.ZitadelIDPChangedEventType})
 	}
 
 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)

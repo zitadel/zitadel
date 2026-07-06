@@ -469,3 +469,13 @@ func (s *Server) AddZitadelProvider(ctx context.Context, req *mgmt_pb.AddZitadel
 		Details: object_pb.DomainToAddDetailsPb(details),
 	}, nil
 }
+
+func (s *Server) UpdateZitadelProvider(ctx context.Context, req *mgmt_pb.UpdateZitadelProviderRequest) (*mgmt_pb.UpdateZitadelProviderResponse, error) {
+	details, err := s.command.UpdateInstanceZitadelProvider(ctx, req.Id, updateZitadelProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateZitadelProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
