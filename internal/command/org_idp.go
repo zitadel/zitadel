@@ -811,7 +811,7 @@ func (c *Commands) prepareMigrateOrgOIDCToAzureADProvider(a *org.Aggregate, writ
 				return nil, err
 			}
 			if !writeModel.State.Exists() {
-				return nil, zerrors.ThrowNotFound(nil, "INST-Dg239201", "Errors.Instance.IDPConfig.NotExisting")
+				return nil, zerrors.ThrowNotFound(nil, "ORG-Dg239201", "Errors.Instance.IDPConfig.NotExisting")
 			}
 			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
 			if err != nil {
@@ -853,7 +853,7 @@ func (c *Commands) prepareMigrateOrgOIDCToGoogleProvider(a *org.Aggregate, write
 				return nil, err
 			}
 			if !writeModel.State.Exists() {
-				return nil, zerrors.ThrowNotFound(nil, "INST-x09981", "Errors.Instance.IDPConfig.NotExisting")
+				return nil, zerrors.ThrowNotFound(nil, "ORG-x09981", "Errors.Instance.IDPConfig.NotExisting")
 			}
 			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
 			if err != nil {
@@ -1977,7 +1977,7 @@ func (c *Commands) UpdateOrgZitadelProvider(ctx context.Context, id string, reso
 	}
 	writeModel := NewZitadelOrgIDPWriteModel(resourceOwner, id)
 	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgZitadelProvider(orgAgg, writeModel, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgZitadelProvider(orgAgg, writeModel, provider)) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
@@ -1999,7 +1999,7 @@ func (c *Commands) UpdateOrgZitadelProvider(ctx context.Context, id string, reso
 func (c *Commands) prepareUpdateOrgZitadelProvider(a *org.Aggregate, writeModel *OrgZitadelIDPWriteModel, provider ZitadelProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "INST-3pxLbA", "Errors.Invalid.Argument")
+			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-3pxLbA", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
@@ -2011,7 +2011,7 @@ func (c *Commands) prepareUpdateOrgZitadelProvider(a *org.Aggregate, writeModel 
 				return nil, err
 			}
 			if !writeModel.State.Exists() {
-				return nil, zerrors.ThrowNotFound(nil, "INST-Bg281", "Errors.IDPConfig.NotExisting")
+				return nil, zerrors.ThrowNotFound(nil, "ORG-Bg281", "Errors.IDPConfig.NotExisting")
 			}
 			event, err := writeModel.NewChangedEvent(
 				ctx,
@@ -2049,7 +2049,6 @@ func (c *Commands) validateOrgZitadelProvider(provider *ZitadelProvider, create 
 	if create && provider.ClientSecret == "" {
 		return zerrors.ThrowInvalidArgument(nil, "ORG-DxaSb9", "Errors.Invalid.Argument")
 	}
-	// todo: review InstanceRolesInfo for an org IDP
 	for i := range provider.InstanceRolesInfo {
 		provider.InstanceRolesInfo[i].OrganizationID = strings.TrimSpace(provider.InstanceRolesInfo[i].OrganizationID)
 		if provider.InstanceRolesInfo[i].OrganizationID == "" {
