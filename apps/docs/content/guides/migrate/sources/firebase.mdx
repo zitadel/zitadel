@@ -83,6 +83,7 @@ This creates a `users.json` file containing all user data, including the Firebas
 You need to map Firebase fields to ZITADEL's schema. Here's a sample transformation:
 
 **Firebase Export Sample:**
+```
 {
   "users": [
     {
@@ -96,8 +97,10 @@ You need to map Firebase fields to ZITADEL's schema. Here's a sample transformat
     }
   ]
 }
+```
 
 **ZITADEL Import Format:**
+```
 {
   "dataOrgs": {
     "orgs": [
@@ -125,6 +128,7 @@ You need to map Firebase fields to ZITADEL's schema. Here's a sample transformat
   },
   "timeout": "5m0s"
 }
+```
 
 **Key Mapping:**
 - `localId` → `userId`
@@ -152,10 +156,12 @@ There are two recommended authentication methods:
 
 Use the [Admin API – Import Data](/reference/api/admin/zitadel.admin.v1.AdminService.ImportData) endpoint:
 
+```
 curl --location 'https://${CUSTOM_DOMAIN}/admin/v1/import' \
 --header 'Content-Type: application/json' \
 --header 'Authorization: Bearer <access-token>' \
 --data @importBody.json
+```
 
 ### 5.5. Notify Users
 
@@ -198,6 +204,7 @@ Your backend must intercept login requests and capture the plain-text password d
 
 When a user attempts to login, verify their credentials against Firebase using the REST API:
 
+```
 curl --location 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=[WEB_API_KEY]' \
 --header 'Content-Type: application/json' \
 --data '{
@@ -205,6 +212,7 @@ curl --location 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPa
   "password": "user-password",
   "returnSecureToken": true
 }'
+```
 
 **Response Handling:**
 - **200 OK** – Credentials are valid, proceed to Step 3
@@ -214,6 +222,7 @@ curl --location 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPa
 
 If Firebase validates the credentials, immediately create the user in ZITADEL using the plain-text password (ZITADEL will hash it using its native algorithm):
 
+```
 curl --location 'https://${CUSTOM_DOMAIN}/management/v1/users/human/_import' \
 --header 'Content-Type: application/json' \
 --header 'Authorization: Bearer <access-token>' \
@@ -229,6 +238,7 @@ curl --location 'https://${CUSTOM_DOMAIN}/management/v1/users/human/_import' \
   },
   "password": "user-password"
 }'
+```
 
 #### Step 4: Allow Login
 
@@ -243,7 +253,7 @@ Set a migration deadline (e.g., 90 days). After this period:
 3. **Notify inactive users** that they need to reset their password
 
 ### 6.4. Sample Backend Implementation (Pseudocode)
-
+```
 async function handleLogin(email, password) {
   // Check if user exists in ZITADEL
   const zitadelUser = await checkZitadelUser(email);
@@ -267,7 +277,7 @@ async function handleLogin(email, password) {
   // Invalid credentials
   throw new Error('Invalid email or password');
 }
-
+```
 ---
 
 ## 7. Testing the Migration
@@ -289,6 +299,7 @@ async function handleLogin(email, password) {
 
 Check that user data was imported correctly:
 
+```
 curl --location 'https://${CUSTOM_DOMAIN}/management/v1/users/human/_search' \
 --header 'Authorization: Bearer <access-token>' \
 --header 'Content-Type: application/json' \
@@ -298,6 +309,7 @@ curl --location 'https://${CUSTOM_DOMAIN}/management/v1/users/human/_search' \
     "limit": 100
   }
 }'
+```
 
 ### 7.3. Troubleshooting
 
@@ -321,6 +333,7 @@ You can verify that users were imported by calling the **events endpoint** and c
 
 Example request:
 
+```
 curl --location 'https://${CUSTOM_DOMAIN}/admin/v1/events/_search' \
 --header 'Authorization: Bearer <token>' \
 --header 'Content-Type: application/json' \
@@ -331,6 +344,7 @@ curl --location 'https://${CUSTOM_DOMAIN}/admin/v1/events/_search' \
     "user.human.added"
   ]
 }'
+```
 
 ---
 
