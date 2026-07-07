@@ -179,9 +179,10 @@ This approach migrates users transparently during their first login after migrat
 
 ### 6.1. Architecture Overview
 
+```text
     User Login Attempt
            ↓
-    Your Backend (Proxy)
+       Backend (Proxy)
            ↓
        Check ZITADEL
            ↓
@@ -192,6 +193,7 @@ This approach migrates users transparently during their first login after migrat
     Valid? → Yes → Create user in ZITADEL → Allow login
            ↓ No
        Reject login
+```
 
 ### 6.2. Implementation Steps
 
