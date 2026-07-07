@@ -58,11 +58,13 @@ See: [Managing Organizations in ZITADEL](https://zitadel.com/docs/guides/manage/
 
 Install the Firebase CLI to export user data:
 
+```
 npm install -g firebase-tools
 
 Authenticate with your Firebase project:
 
 firebase login
+```
 
 ---
 
@@ -74,7 +76,9 @@ This approach imports all users at once but requires them to set a new password 
 
 Export your Firebase users to a JSON file:
 
+```
 firebase auth:export users.json --format=json --project YOUR_PROJECT_ID
+```
 
 This creates a `users.json` file containing all user data, including the Firebase password hashes (which we will discard).
 
@@ -100,7 +104,7 @@ You need to map Firebase fields to ZITADEL's schema. Here's a sample transformat
 ```
 
 **ZITADEL Import Format:**
-```js
+```json
 {
   "dataOrgs": {
     "orgs": [
