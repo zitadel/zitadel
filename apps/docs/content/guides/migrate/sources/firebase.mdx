@@ -179,19 +179,19 @@ This approach migrates users transparently during their first login after migrat
 
 ### 6.1. Architecture Overview
 
-User Login Attempt
-       ↓
-Your Backend (Proxy)
-       ↓
-   Check ZITADEL
-       ↓
-   User exists? → Yes → Allow login
-       ↓ No
-   Verify with Firebase Auth REST API
-       ↓
-   Valid? → Yes → Create user in ZITADEL → Allow login
-       ↓ No
-   Reject login
+    User Login Attempt
+           ↓
+    Your Backend (Proxy)
+           ↓
+       Check ZITADEL
+           ↓
+    User exists? → Yes → Allow login
+           ↓ No
+    Verify with Firebase Auth REST API
+           ↓
+    Valid? → Yes → Create user in ZITADEL → Allow login
+           ↓ No
+       Reject login
 
 ### 6.2. Implementation Steps
 
