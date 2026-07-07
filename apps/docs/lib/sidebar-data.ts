@@ -571,6 +571,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "guides/migrate/sources/zitadel",
           "guides/migrate/sources/auth0",
           "guides/migrate/sources/keycloak",
+          "guides/migrate/sources/firebase",
         ],
       },
     ],
