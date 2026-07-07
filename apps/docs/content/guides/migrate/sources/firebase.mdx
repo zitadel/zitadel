@@ -134,7 +134,7 @@ You need to map Firebase fields to ZITADEL's schema. Here's a sample transformat
 - `localId` → `userId`
 - `email` → `email.email` and `userName`
 - `emailVerified` → `email.isEmailVerified`
-- `displayName` → `profile.firstName` and `profile.lastName` (split as needed)
+- `displayName` → `profile.firstName` and `profile.lastName` (both are required; if you can't split, set `firstName` to the full display name, set a placeholder `lastName` like `"-"`, and optionally set `profile.displayName` to the full name as well)
 - **Omit** `hashedPassword` object entirely
 - **Include** `"passwordChangeRequired": true` to trigger password reset
 
