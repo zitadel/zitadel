@@ -352,32 +352,7 @@ curl --location 'https://${CUSTOM_DOMAIN}/admin/v1/events/_search' \
 
 ---
 
-## 8. Q&A and Further Resources
-
-**Q:** Why can't Firebase password hashes be imported directly?
-**A:** Firebase uses a proprietary scrypt variant with project-specific keys that ZITADEL cannot verify. Standard password hashing algorithms are not compatible with Firebase's custom implementation.
-
-**Q:** Which migration strategy should I choose?
-**A:** 
-- Choose **Strategy 1** if you have a smaller user base, can afford a maintenance window, or prefer a simpler implementation.
-- Choose **Strategy 2** if you need zero-downtime migration, have a large active user base, or want to provide a seamless user experience.
-
-**Q:** How long should the JIT migration grace period be?
-**A:** Typically 30-90 days is sufficient for most active users to login and be migrated. Analyze your user login patterns to determine the optimal duration.
-
-**Q:** What happens to users who don't login during the JIT grace period?
-**A:** After the grace period ends, migrate remaining users using Strategy 1 (Bulk Import + Password Reset). These users will need to reset their password on their next login.
-
-**Q:** What is the maximum number of users that can be imported in a single batch?
-**A:** There is no hard limit on the number of users. However, there is a **timeout**.
-For **ZITADEL Cloud deployments**, the timeout is **5 minutes**, which typically allows for importing around **5,000 users per batch**.
-
-**Q:** Can I combine both strategies?
-**A:** Yes! You can start with JIT migration for active users and then use bulk import for remaining inactive users after the grace period.
-
----
-
-## 9. Additional Resources
+## 8. Additional Resources
 
 - [ZITADEL Admin API Documentation](/reference/api/admin/zitadel.admin.v1.AdminService.ImportData)
 - [Firebase Authentication REST API](https://firebase.google.com/docs/reference/rest/auth)
