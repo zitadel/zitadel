@@ -7,6 +7,8 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this issue.
+
+        **To help us better prioritize your requests**, if you have an active subscription, please navigate to the ZITADEL Customer Portal to [link your GitHub account to your Cloud account](https://zitadel.com/admin/support).
   - type: checkboxes
     id: preflight
     attributes:
