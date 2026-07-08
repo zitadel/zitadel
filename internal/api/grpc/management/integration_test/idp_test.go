@@ -436,6 +436,12 @@ func Test_DeleteZitadelProvider(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, existingProvider.GetId())
+	t.Cleanup(func() {
+		_, err := Client.DeleteProvider(OrgCTX, &mgmt_pb.DeleteProviderRequest{Id: existingProvider.GetId()})
+		if err != nil && status.Code(err) != codes.NotFound {
+			require.NoError(t, err)
+		}
+	})
 
 	tests := []struct {
 		name         string
