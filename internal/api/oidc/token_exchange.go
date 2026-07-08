@@ -201,10 +201,11 @@ func validateTokenExchangeScopes(
 	return validateUnionTokenExchangeScopes(client, requestedScopes, subjectScopes, actorScopes)
 }
 
-// validateUnionTokenExchangeScopes applies when the subject token carries scopes.
-// This covers standard exchange (actor == subject) and actor path with access/ID
-// subject tokens. It does not apply to scope-less subjects (user_id, id_token).
-//
+// validateUnionTokenExchangeScopes applies when the requested scopes must be a subset
+// of the scopes present on the subject and/or actor tokens (union).
+// This covers standard exchange (actor == subject) and actor-path exchanges with
+// access/JWT subject tokens. Actor-path exchanges with scope-less subjects
+// (user_id, id_token) use validateImpersonationTokenExchangeScopes instead.
 // Rule: every scope must be present on the subject or actor token (union).
 // For standard exchange both lists are identical, so this is effectively
 // "subset of subject token only".
