@@ -7,11 +7,11 @@ import (
 	"testing"
 	"time"
 
-	"google.golang.org/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
