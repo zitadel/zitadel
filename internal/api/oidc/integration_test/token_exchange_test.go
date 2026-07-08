@@ -19,8 +19,11 @@ import (
 	"google.golang.org/grpc/status"
 
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/pkg/grpc/app"
+	"github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 func setImpersonationPolicy(t *testing.T, instance *integration.Instance, value bool) {
@@ -516,6 +519,67 @@ func TestServer_TokenExchangeImpersonation(t *testing.T) {
 			},
 		},
 		{
+			name: "IMPERSONATION: subject: userID, actor: access token, openid only, success",
+			args: args{
+				SubjectToken:       userResp.GetUserId(),
+				SubjectTokenType:   oidc_api.UserIDTokenType,
+				RequestedTokenType: oidc.AccessTokenType,
+				ActorToken:         orgImpersonatorPAT,
+				ActorTokenType:     oidc.AccessTokenType,
+				Scopes:             []string{oidc.ScopeOpenID},
+			},
+			want: result{
+				issuedTokenType:   oidc.AccessTokenType,
+				tokenType:         oidc.BearerToken,
+				expiresIn:         43100,
+				scopes:            oidc.SpaceDelimitedArray{oidc.ScopeOpenID},
+				verifyAccessToken: accessTokenVerifier(ctx, resourceServer, userResp.GetUserId(), orgUserID),
+			},
+		},
+		{
+			name: "IMPERSONATION: subject: userID, actor: access token, offline_access not on actor, rejected",
+			args: args{
+				SubjectToken:       userResp.GetUserId(),
+				SubjectTokenType:   oidc_api.UserIDTokenType,
+				RequestedTokenType: oidc.AccessTokenType,
+				ActorToken:         orgImpersonatorPAT,
+				ActorTokenType:     oidc.AccessTokenType,
+				Scopes:             []string{oidc.ScopeOpenID, oidc.ScopeOfflineAccess},
+			},
+			wantErr: true,
+		},
+		{
+			name: "IMPERSONATION: subject: ID token, actor: access token, email scope not on actor, success",
+			args: args{
+				SubjectToken:       teResp.IDToken,
+				SubjectTokenType:   oidc.IDTokenType,
+				RequestedTokenType: oidc.AccessTokenType,
+				ActorToken:         orgImpersonatorPAT,
+				ActorTokenType:     oidc.AccessTokenType,
+				Scopes:             []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail},
+			},
+			want: result{
+				issuedTokenType:   oidc.AccessTokenType,
+				tokenType:         oidc.BearerToken,
+				expiresIn:         43100,
+				scopes:            oidc.SpaceDelimitedArray{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail},
+				verifyAccessToken: accessTokenVerifier(ctx, resourceServer, serviceUserID, orgUserID),
+				verifyIDToken:     idTokenVerifier(ctx, relyingParty, serviceUserID, orgUserID),
+			},
+		},
+		{
+			name: "IMPERSONATION: subject: access token, actor: access token, email not on input tokens, rejected",
+			args: args{
+				SubjectToken:       teResp.AccessToken,
+				SubjectTokenType:   oidc.AccessTokenType,
+				RequestedTokenType: oidc.AccessTokenType,
+				ActorToken:         orgImpersonatorPAT,
+				ActorTokenType:     oidc.AccessTokenType,
+				Scopes:             []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail},
+			},
+			wantErr: true,
+		},
+		{
 			name: "ORG IMPERSONATION: subject: access token, actor: access token, success",
 			args: args{
 				SubjectToken:       teResp.AccessToken,
@@ -622,6 +686,52 @@ func TestServer_TokenExchangeImpersonation(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestServer_TokenExchangeImpersonationClientCredentialsActor(t *testing.T) {
+	instance := integration.NewInstance(CTX)
+	ctx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	userResp := instance.CreateHumanUser(ctx)
+
+	setImpersonationPolicy(t, instance, true)
+
+	project := instance.CreateProject(ctx, t, "", integration.ProjectName(), false, false)
+	client, keyData, err := instance.CreateOIDCWebClientJWT(ctx, "", "", project.GetId(),
+		app.OIDCGrantType_OIDC_GRANT_TYPE_TOKEN_EXCHANGE,
+		app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE,
+		app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN,
+	)
+	require.NoError(t, err)
+	signer, err := rp.SignerFromKeyFile(keyData)()
+	require.NoError(t, err)
+	exchanger, err := tokenexchange.NewTokenExchangerJWTProfile(ctx, instance.OIDCIssuer(), client.GetClientId(), signer)
+	require.NoError(t, err)
+	resourceServer, err := instance.CreateResourceServerJWTProfile(ctx, keyData)
+	require.NoError(t, err)
+
+	impersonatorUser := instance.CreateMachineUser(ctx)
+	_, err = instance.Client.Mgmt.AddOrgMember(ctx, &management.AddOrgMemberRequest{
+		UserId: impersonatorUser.GetUserId(),
+		Roles:  []string{"ORG_ADMIN_IMPERSONATOR"},
+	})
+	require.NoError(t, err)
+	secret, err := instance.Client.Mgmt.GenerateMachineSecret(ctx, &management.GenerateMachineSecretRequest{
+		UserId: impersonatorUser.GetUserId(),
+	})
+	require.NoError(t, err)
+
+	audScope := domain.ProjectIDScope + project.GetId() + domain.AudSuffix
+	actorScopes := []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc_api.ScopeProjectsRoles, audScope}
+	credentialsProvider, err := rp.NewRelyingPartyOIDC(ctx, instance.OIDCIssuer(), secret.GetClientId(), secret.GetClientSecret(), "", actorScopes)
+	require.NoError(t, err)
+	actorTokens, err := rp.ClientCredentials(ctx, credentialsProvider, nil)
+	require.NoError(t, err)
+
+	step2Scopes := []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc_api.ScopeProjectsRoles, audScope}
+	got, err := tokenexchange.ExchangeToken(ctx, exchanger, userResp.GetUserId(), oidc_api.UserIDTokenType, actorTokens.AccessToken, oidc.AccessTokenType, nil, nil, step2Scopes, oidc.AccessTokenType)
+	require.NoError(t, err)
+	assert.Equal(t, oidc.SpaceDelimitedArray(step2Scopes), got.Scopes)
+	accessTokenVerifier(ctx, resourceServer, userResp.GetUserId(), impersonatorUser.GetUserId())(t, got.AccessToken)
 }
 
 // This test tries to call the zitadel API with an impersonated token,
