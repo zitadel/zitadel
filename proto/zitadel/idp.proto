@@ -543,7 +543,7 @@ message ZitadelConfig {
     repeated string scopes = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"openid\", \"profile\", \"email\"]";
-            description: "the scopes requested by Zitadel during the request on the identity provider";
+            description: "the scopes requested by Zitadel during the request to the identity provider";
         }
     ];
     repeated zitadel.idp.v1.InstanceRolesInfo instance_roles_info = 4 [
