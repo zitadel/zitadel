@@ -283,6 +283,8 @@ Errors:
     LabelPolicy:
       NotFound: "プライベートラベルポリシーが見つかりません"
       NotChanged: "プライベートラベルポリシーが変更されていません"
+    IDPConfig:
+      NotExisting: "IDプロバイダーの構成は存在しません"
   Project:
     ProjectIDMissing: "プロジェクトIDがありません"
     AlreadyExists: "プロジェクトはすでに組織に存在しています"
