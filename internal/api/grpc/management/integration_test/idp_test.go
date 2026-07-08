@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
@@ -450,28 +451,9 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// create a new provider per subtest
-			existingProvider, err := Instance.Client.Mgmt.AddZitadelProvider(OrgCTX, &mgmt_pb.AddZitadelProviderRequest{
-				Name:         "Zitadel Support IdP",
-				Issuer:       "zitadel.example.com",
-				ClientId:     "test-client",
-				ClientSecret: "test-secret",
-				Scopes:       []string{"email", "profile"},
-				ProviderOptions: &idp_pb.Options{
-					IsCreationAllowed: true,
-				},
-				InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-					{
-						OrganizationId:     "org1",
-						OrganizationDomain: "org1.com",
-					},
-				},
-			})
-			require.NoError(t, err)
-			require.NotEmpty(t, existingProvider.GetId())
-
-			// build request using this provider ID
-			tt.args.req.Id = existingProvider.GetId()
+			// create a new provider per subtest and set the ID in the request
+			zitadelProvider := addZitadelProvider(t, OrgCTX, integration.IDPName())
+			tt.args.req.Id = zitadelProvider.Id
 
 			before := time.Now()
 			updateResp, err := Client.UpdateZitadelProvider(tt.args.ctx, tt.args.req)
@@ -490,43 +472,30 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 			assert.Equal(t, tt.wantResponse.GetDetails().GetResourceOwner(), updateResp.GetDetails().GetResourceOwner())
 
 			// get provider by ID and assert that the updated provider matches the expected values
-			getResp, err := Client.GetProviderByID(OrgCTX, &mgmt_pb.GetProviderByIDRequest{Id: existingProvider.GetId()})
+			getResp, err := Client.GetProviderByID(OrgCTX, &mgmt_pb.GetProviderByIDRequest{Id: zitadelProvider.Id})
 			require.NoError(t, err)
 			assert.Equal(t, updateResp.GetDetails().GetChangeDate().AsTime(), getResp.GetIdp().GetDetails().GetChangeDate().AsTime())
-			tt.wantUpdatedProvider.Id = existingProvider.GetId()
+			tt.wantUpdatedProvider.Id = zitadelProvider.Id
 			assertProvider(t, tt.wantUpdatedProvider, getResp.GetIdp())
 		})
 	}
 }
 
-func assertProvider(t *testing.T, expected, actual *idp_pb.Provider) {
-	assert.Equal(t, expected.GetId(), actual.GetId())
-	assert.Equal(t, expected.GetState(), actual.GetState())
-	assert.Equal(t, expected.GetName(), actual.GetName())
-	assert.Equal(t, expected.GetOwner(), actual.GetOwner())
-	assert.Equal(t, expected.GetType(), actual.GetType())
-	assert.Equal(t, expected.GetConfig(), actual.GetConfig())
+func Test_UpdateZitadelProvider_MissingID(t *testing.T) {
+	_ = addZitadelProvider(t, OrgCTX, integration.IDPName())
+	// Attempt to update the provider without specifying the ID
+	updateResp, err := Client.UpdateZitadelProvider(OrgCTX, &mgmt_pb.UpdateZitadelProviderRequest{})
+	require.Error(t, err)
+	grpcStatus, ok := status.FromError(err)
+	require.True(t, ok)
+	assert.Equal(t, codes.InvalidArgument, grpcStatus.Code())
+	assert.Equal(t, "invalid UpdateZitadelProviderRequest.Id: value length must be between 1 and 200 runes, inclusive", grpcStatus.Message())
+	require.Nil(t, updateResp)
 }
 
 func Test_GetProviderByID(t *testing.T) {
-	existingProvider, err := Instance.Client.Mgmt.AddZitadelProvider(OrgCTX, &mgmt_pb.AddZitadelProviderRequest{
-		Name:         "Zitadel Support IdP",
-		Issuer:       "zitadel.example.com",
-		ClientId:     "test-client",
-		ClientSecret: "test-secret",
-		Scopes:       []string{"email", "profile"},
-		ProviderOptions: &idp_pb.Options{
-			IsCreationAllowed: true,
-		},
-		InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-			{
-				OrganizationId:     "org1",
-				OrganizationDomain: "org1.com",
-			},
-		},
-	})
-	require.NoError(t, err)
-	require.NotEmpty(t, existingProvider.GetId())
+	name := integration.IDPName()
+	existingProvider := addZitadelProvider(t, OrgCTX, name)
 
 	tests := []struct {
 		name     string
@@ -574,7 +543,7 @@ func Test_GetProviderByID(t *testing.T) {
 				Idp: &idp_pb.Provider{
 					Id:    existingProvider.GetId(),
 					State: idp_pb.IDPState_IDP_STATE_ACTIVE,
-					Name:  "Zitadel Support IdP",
+					Name:  name,
 					Owner: idp_pb.IDPOwnerType_IDP_OWNER_TYPE_ORG,
 					Type:  idp_pb.ProviderType_PROVIDER_TYPE_ZITADEL,
 					Config: &idp_pb.ProviderConfig{
@@ -624,31 +593,10 @@ func Test_ListProviders(t *testing.T) {
 	require.NotEmpty(t, org.GetOrganizationId())
 	orgCtx := integration.SetOrgID(IAMOwnerCTX, org.GetOrganizationId())
 
-	provider1, err := Instance.Client.Mgmt.AddZitadelProvider(orgCtx, &mgmt_pb.AddZitadelProviderRequest{
-		Name:         "Zitadel Ext IDP 1",
-		Issuer:       "zitadel.example.com",
-		ClientId:     "test-client",
-		ClientSecret: "test-secret",
-		Scopes:       []string{"email", "profile"},
-		ProviderOptions: &idp_pb.Options{
-			IsCreationAllowed: true,
-		},
-	})
-	require.NoError(t, err)
-	require.NotEmpty(t, provider1.GetId())
-
-	provider2, err := Instance.Client.Mgmt.AddZitadelProvider(orgCtx, &mgmt_pb.AddZitadelProviderRequest{
-		Name:         "Zitadel Ext IDP 2",
-		Issuer:       "zitadel.example.com",
-		ClientId:     "test-client-2",
-		ClientSecret: "test-secret-2",
-		Scopes:       []string{"email", "profile"},
-		ProviderOptions: &idp_pb.Options{
-			IsCreationAllowed: true,
-		},
-	})
-	require.NoError(t, err)
-	require.NotEmpty(t, provider2.GetId())
+	provider1Name := integration.IDPName()
+	provider1 := addZitadelProvider(t, orgCtx, provider1Name)
+	provider2Name := integration.IDPName()
+	provider2 := addZitadelProvider(t, orgCtx, provider2Name)
 
 	tests := []struct {
 		name     string
@@ -664,7 +612,7 @@ func Test_ListProviders(t *testing.T) {
 			wantErr: status.Error(codes.NotFound, "membership not found (AUTHZ-cdgFk)"),
 		},
 		{
-			name:    "insufficient permissions", // no org.idp.read permissions set
+			name:    "insufficient permissions", // no iam.idp.read permissions set
 			ctx:     integration.WithSystemUserWithNoPermissionsAuthorization(CTX),
 			req:     &mgmt_pb.ListProvidersRequest{},
 			wantErr: status.Error(codes.PermissionDenied, "No matching permissions found (AUTH-5mWD2)"),
@@ -699,7 +647,7 @@ func Test_ListProviders(t *testing.T) {
 							ResourceOwner: provider2.GetDetails().GetResourceOwner(),
 						},
 						State: idp_pb.IDPState_IDP_STATE_ACTIVE,
-						Name:  "Zitadel Ext IDP 2",
+						Name:  provider2Name,
 						Owner: idp_pb.IDPOwnerType_IDP_OWNER_TYPE_ORG,
 						Type:  idp_pb.ProviderType_PROVIDER_TYPE_ZITADEL,
 						Config: &idp_pb.ProviderConfig{
@@ -709,8 +657,14 @@ func Test_ListProviders(t *testing.T) {
 							Config: &idp_pb.ProviderConfig_Zitadel{
 								Zitadel: &idp_pb.ZitadelConfig{
 									Issuer:   "zitadel.example.com",
-									ClientId: "test-client-2",
+									ClientId: "test-client",
 									Scopes:   []string{"email", "profile"},
+									InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
+										{
+											OrganizationId:     "org1",
+											OrganizationDomain: "org1.com",
+										},
+									},
 								},
 							},
 						},
@@ -729,7 +683,7 @@ func Test_ListProviders(t *testing.T) {
 					{
 						Query: &mgmt_pb.ProviderQuery_IdpNameQuery{
 							IdpNameQuery: &idp_pb.IDPNameQuery{
-								Name: "Zitadel Ext IDP 1",
+								Name: provider1Name,
 							},
 						},
 					},
@@ -748,7 +702,7 @@ func Test_ListProviders(t *testing.T) {
 							ResourceOwner: provider1.GetDetails().GetResourceOwner(),
 						},
 						State: idp_pb.IDPState_IDP_STATE_ACTIVE,
-						Name:  "Zitadel Ext IDP 1",
+						Name:  provider1Name,
 						Owner: idp_pb.IDPOwnerType_IDP_OWNER_TYPE_ORG,
 						Type:  idp_pb.ProviderType_PROVIDER_TYPE_ZITADEL,
 						Config: &idp_pb.ProviderConfig{
@@ -760,6 +714,12 @@ func Test_ListProviders(t *testing.T) {
 									Issuer:   "zitadel.example.com",
 									ClientId: "test-client",
 									Scopes:   []string{"email", "profile"},
+									InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
+										{
+											OrganizationId:     "org1",
+											OrganizationDomain: "org1.com",
+										},
+									},
 								},
 							},
 						},
@@ -788,7 +748,7 @@ func Test_ListProviders(t *testing.T) {
 							ResourceOwner: provider1.GetDetails().GetResourceOwner(),
 						},
 						State: idp_pb.IDPState_IDP_STATE_ACTIVE,
-						Name:  "Zitadel Ext IDP 1",
+						Name:  provider1Name,
 						Owner: idp_pb.IDPOwnerType_IDP_OWNER_TYPE_ORG,
 						Type:  idp_pb.ProviderType_PROVIDER_TYPE_ZITADEL,
 						Config: &idp_pb.ProviderConfig{
@@ -800,6 +760,12 @@ func Test_ListProviders(t *testing.T) {
 									Issuer:   "zitadel.example.com",
 									ClientId: "test-client",
 									Scopes:   []string{"email", "profile"},
+									InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
+										{
+											OrganizationId:     "org1",
+											OrganizationDomain: "org1.com",
+										},
+									},
 								},
 							},
 						},
@@ -812,7 +778,7 @@ func Test_ListProviders(t *testing.T) {
 							ResourceOwner: provider2.GetDetails().GetResourceOwner(),
 						},
 						State: idp_pb.IDPState_IDP_STATE_ACTIVE,
-						Name:  "Zitadel Ext IDP 2",
+						Name:  provider2Name,
 						Owner: idp_pb.IDPOwnerType_IDP_OWNER_TYPE_ORG,
 						Type:  idp_pb.ProviderType_PROVIDER_TYPE_ZITADEL,
 						Config: &idp_pb.ProviderConfig{
@@ -822,8 +788,14 @@ func Test_ListProviders(t *testing.T) {
 							Config: &idp_pb.ProviderConfig_Zitadel{
 								Zitadel: &idp_pb.ZitadelConfig{
 									Issuer:   "zitadel.example.com",
-									ClientId: "test-client-2",
+									ClientId: "test-client",
 									Scopes:   []string{"email", "profile"},
+									InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
+										{
+											OrganizationId:     "org1",
+											OrganizationDomain: "org1.com",
+										},
+									},
 								},
 							},
 						},
@@ -853,4 +825,36 @@ func Test_ListProviders(t *testing.T) {
 			}
 		})
 	}
+}
+
+func addZitadelProvider(t *testing.T, ctx context.Context, name string) *mgmt_pb.AddZitadelProviderResponse {
+	t.Helper()
+	existingProvider, err := Instance.Client.Mgmt.AddZitadelProvider(ctx, &mgmt_pb.AddZitadelProviderRequest{
+		Name:         name,
+		Issuer:       "zitadel.example.com",
+		ClientId:     "test-client",
+		ClientSecret: "test-secret",
+		Scopes:       []string{"email", "profile"},
+		ProviderOptions: &idp_pb.Options{
+			IsCreationAllowed: true,
+		},
+		InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
+			{
+				OrganizationId:     "org1",
+				OrganizationDomain: "org1.com",
+			},
+		},
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, existingProvider.GetId())
+	return existingProvider
+}
+
+func assertProvider(t *testing.T, expected, actual *idp_pb.Provider) {
+	assert.Equal(t, expected.GetId(), actual.GetId())
+	assert.Equal(t, expected.GetState(), actual.GetState())
+	assert.Equal(t, expected.GetName(), actual.GetName())
+	assert.Equal(t, expected.GetOwner(), actual.GetOwner())
+	assert.Equal(t, expected.GetType(), actual.GetType())
+	assert.True(t, proto.Equal(expected.GetConfig(), actual.GetConfig()), "expected: %v, actual: %v", expected.GetConfig(), actual.GetConfig())
 }
