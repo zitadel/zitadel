@@ -497,6 +497,25 @@ func TestServer_TokenExchangeImpersonation(t *testing.T) {
 			},
 		},
 		{
+			name: "IMPERSONATION: subject: userID, actor: access token, email scope not on actor, success",
+			args: args{
+				SubjectToken:       userResp.GetUserId(),
+				SubjectTokenType:   oidc_api.UserIDTokenType,
+				RequestedTokenType: oidc.AccessTokenType,
+				ActorToken:         orgImpersonatorPAT,
+				ActorTokenType:     oidc.AccessTokenType,
+				Scopes:             []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail},
+			},
+			want: result{
+				issuedTokenType:   oidc.AccessTokenType,
+				tokenType:         oidc.BearerToken,
+				expiresIn:         43100,
+				scopes:            oidc.SpaceDelimitedArray{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail},
+				verifyAccessToken: accessTokenVerifier(ctx, resourceServer, userResp.GetUserId(), orgUserID),
+				verifyIDToken:     idTokenVerifier(ctx, relyingParty, userResp.GetUserId(), orgUserID),
+			},
+		},
+		{
 			name: "ORG IMPERSONATION: subject: access token, actor: access token, success",
 			args: args{
 				SubjectToken:       teResp.AccessToken,
