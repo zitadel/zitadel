@@ -228,6 +228,10 @@ func Test_AddZitadelProvider(t *testing.T) {
 			assert.NotEmpty(t, got.GetId())
 			assert.WithinRange(t, got.GetDetails().GetCreationDate().AsTime(), before, after)
 			assert.Equal(t, tt.wantResponse.GetDetails().GetResourceOwner(), got.GetDetails().GetResourceOwner())
+			t.Cleanup(func() {
+				_, err := Client.DeleteProvider(OrgCTX, &mgmt_pb.DeleteProviderRequest{Id: got.GetId()})
+				require.NoError(t, err)
+			})
 		})
 	}
 }
@@ -251,6 +255,10 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, existingProvider.GetId())
+	t.Cleanup(func() {
+		_, err := Client.DeleteProvider(OrgCTX, &mgmt_pb.DeleteProviderRequest{Id: existingProvider.GetId()})
+		require.NoError(t, err)
+	})
 
 	type args struct {
 		ctx context.Context
@@ -411,6 +419,76 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 			assert.Equal(t, tt.wantResponse.GetDetails().GetResourceOwner(), got.GetDetails().GetResourceOwner())
 
 			// todo: check if the update was actually applied by fetching the provider and checking its fields when the functionality is implemented
+		})
+	}
+}
+
+func Test_DeleteZitadelProvider(t *testing.T) {
+	existingProvider, err := Instance.Client.Mgmt.AddZitadelProvider(OrgCTX, &mgmt_pb.AddZitadelProviderRequest{
+		Name:         "Zitadel Support IdP",
+		Issuer:       "zitadel.example.com",
+		ClientId:     "test-client",
+		ClientSecret: "test-secret",
+		Scopes:       []string{"email", "profile"},
+		ProviderOptions: &idp_pb.Options{
+			IsCreationAllowed: true,
+		},
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, existingProvider.GetId())
+
+	tests := []struct {
+		name         string
+		ctx          context.Context
+		req          *mgmt_pb.DeleteProviderRequest
+		wantResponse *mgmt_pb.DeleteProviderResponse
+		wantErr      error
+	}{
+		{
+			name:    "no permissions, error",
+			ctx:     Instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
+			req:     &mgmt_pb.DeleteProviderRequest{Id: "idp-id"},
+			wantErr: status.Error(codes.NotFound, "membership not found (AUTHZ-cdgFk)"),
+		},
+		{
+			name:    "insufficient permissions, error", // no iam.idp.write permission
+			ctx:     integration.WithSystemUserWithNoPermissionsAuthorization(CTX),
+			req:     &mgmt_pb.DeleteProviderRequest{Id: "idp-id"},
+			wantErr: status.Error(codes.PermissionDenied, "No matching permissions found (AUTH-5mWD2)"),
+		},
+		{
+			name:    "not found, error",
+			ctx:     OrgCTX,
+			req:     &mgmt_pb.DeleteProviderRequest{Id: "idp-id"},
+			wantErr: status.Error(codes.NotFound, "Identity Provider Configuration doesn't exist (ORG-Se3tg)"),
+		},
+		{
+			name: "delete, ok",
+			ctx:  OrgCTX,
+			req:  &mgmt_pb.DeleteProviderRequest{Id: existingProvider.GetId()},
+			wantResponse: &mgmt_pb.DeleteProviderResponse{
+				Details: &object_pb.ObjectDetails{
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.DeleteProvider(tt.ctx, tt.req)
+			after := time.Now()
+			if tt.wantErr != nil {
+				require.Error(t, err)
+				grpcStatus, ok := status.FromError(err)
+				require.True(t, ok)
+				assert.Equal(t, status.Code(tt.wantErr), grpcStatus.Code())
+				assert.Equal(t, status.Convert(tt.wantErr).Message(), grpcStatus.Message())
+				return
+			}
+			require.NoError(t, err)
+			assert.NotNil(t, got)
+			assert.Equal(t, tt.wantResponse.GetDetails().GetResourceOwner(), got.GetDetails().GetResourceOwner())
+			assert.WithinRange(t, got.GetDetails().GetChangeDate().AsTime(), existingProvider.GetDetails().GetCreationDate().AsTime(), after)
 		})
 	}
 }

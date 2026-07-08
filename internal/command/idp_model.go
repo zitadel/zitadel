@@ -2014,6 +2014,8 @@ func (wm *IDPRemoveWriteModel) Reduce() error {
 			wm.reduceAdded(e.ConfigID)
 		case *idpconfig.IDPConfigRemovedEvent:
 			wm.reduceRemoved(e.ConfigID)
+		case *idp.ZitadelIDPAddedEvent:
+			wm.reduceAdded(e.ID)
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -2126,6 +2128,10 @@ func (wm *IDPTypeWriteModel) Reduce() error {
 			wm.reduceRemoved(e.ConfigID)
 		case *org.IDPConfigRemovedEvent:
 			wm.reduceRemoved(e.ConfigID)
+		case *instance.ZitadelIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeZitadel, e.Aggregate())
+		case *org.ZitadelIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeZitadel, e.Aggregate())
 		}
 	}
 	return wm.WriteModel.Reduce()
