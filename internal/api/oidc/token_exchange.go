@@ -78,7 +78,10 @@ func (s *Server) tokenExchange(ctx context.Context, r *op.ClientRequest[oidc.Tok
 	if err != nil {
 		return nil, err
 	}
-	scopes, err := validateTokenExchangeScopes(client, r.Data.Scopes, subjectToken.scopes, actorToken.scopes, actorPath)
+	// user_id and id_token subjects cannot carry scopes; on the actor path they use
+	// impersonation scope rules instead of requiring every scope on subject ∪ actor.
+	scopelessActorPath := actorPath && (subjectToken.tokenType == UserIDTokenType || subjectToken.tokenType == oidc.IDTokenType)
+	scopes, err := validateTokenExchangeScopes(client, r.Data.Scopes, subjectToken.scopes, actorToken.scopes, scopelessActorPath)
 	if err != nil {
 		return nil, err
 	}
@@ -181,25 +184,20 @@ func (s *Server) jwtProfileUserCheck(ctx context.Context, resourceOwner *string,
 	})
 }
 
-// validateTokenExchangeScopes routes scope validation by whether the subject
-// token carries scopes. Scope-less subjects (user_id, id_token) use relaxed
-// rules for subject-data scopes; all other cases require ⊆ subject ∪ actor.
+// validateTokenExchangeScopes routes scope validation by subject token type.
+// scopelessActorPath is true for user_id and id_token subjects on the actor path;
+// those use relaxed rules for subject-data scopes. All other cases require ⊆ subject ∪ actor.
 func validateTokenExchangeScopes(
 	client *Client,
 	requestedScopes, subjectScopes, actorScopes []string,
-	actorPath bool,
+	scopelessActorPath bool,
 ) ([]string, error) {
 	requestedScopes = normalizeRequestedScopes(requestedScopes)
 
-	// Impersonation with scope-less subject: the actor token authorizes the request;
-	// subject-data scopes (email, profile, …) are resolved from the impersonated user
-	// at mint time and must not be limited to what the actor token already carries.
-	if actorPath && len(subjectScopes) == 0 {
+	if scopelessActorPath {
 		return validateImpersonationTokenExchangeScopes(client, requestedScopes, subjectScopes, actorScopes)
 	}
 
-	// Standard exchange (actor == subject) and actor path with access/ID subject:
-	// requested scopes must already exist on an input token.
 	return validateUnionTokenExchangeScopes(client, requestedScopes, subjectScopes, actorScopes)
 }
 
@@ -277,7 +275,7 @@ func scopeInUnion(scope string, subjectScopes, actorScopes []string) bool {
 // may do (audiences, refresh, roles), not which user claims to embed.
 func isTokenExchangeAuthorizationScope(scope string) bool {
 	switch scope {
-	case oidc.ScopeOfflineAccess, ScopeProjectsRoles, ClaimProjectRoles:
+	case oidc.ScopeOfflineAccess, ScopeProjectsRoles:
 		return true
 	}
 	if strings.HasPrefix(scope, ScopeProjectRolePrefix) {

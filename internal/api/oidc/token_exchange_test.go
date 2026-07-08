@@ -79,7 +79,14 @@ func Test_validateTokenExchangeScopes(t *testing.T) {
 		subjectScopes := []string{oidc.ScopeOpenID, oidc.ScopeProfile}
 		_, err := validateTokenExchangeScopes(client,
 			[]string{oidc.ScopeEmail},
-			subjectScopes, actorScopes, true)
+			subjectScopes, actorScopes, false)
+		require.Error(t, err)
+	})
+
+	t.Run("actor path with JWT subject and empty scopes uses exchange validator", func(t *testing.T) {
+		_, err := validateTokenExchangeScopes(client,
+			[]string{oidc.ScopeEmail},
+			nil, actorScopes, false)
 		require.Error(t, err)
 	})
 }
