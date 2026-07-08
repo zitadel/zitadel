@@ -359,7 +359,8 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
   if (options?.autoLinking) {
     let foundUser;
     const email = addHumanUser?.email?.email;
-    const emailVerified = addHumanUser?.email?.verification?.case === "isVerified" && addHumanUser?.email?.verification?.value;
+    const emailVerified =
+      addHumanUser?.email?.verification?.case === "isVerified" && addHumanUser?.email?.verification?.value;
 
     if (options.autoLinking === AutoLinkingOption.EMAIL && email && emailVerified) {
       foundUser = await listUsers({ serviceConfig, email, organizationId: organization }).then((response) => {
@@ -451,7 +452,7 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
  */
 async function handleAutoCreation(ctx: IDPHandlerContext): Promise<IDPHandlerResult> {
   const { options, intent, serviceConfig, buildRedirectParams, t } = ctx;
-  const { addHumanUser } = intent;
+  const { addHumanUser, idpInformation } = intent;
   const { organization, provider } = ctx.params;
 
   if (options?.isAutoCreation && addHumanUser) {
@@ -465,6 +466,32 @@ async function handleAutoCreation(ctx: IDPHandlerContext): Promise<IDPHandlerRes
       logger.error("Could not determine organization for auto-creation (no default org available)");
       const params = buildRedirectParams();
       return { redirect: `/idp/${provider}/failure?${params}&error=no_organization_context` };
+    }
+
+    // Check if required profile fields are present
+    if (!addHumanUser.profile?.givenName || !addHumanUser.profile?.familyName) {
+      logger.info("Missing required profile fields (givenName or familyName), redirecting to complete registration");
+
+      if (!idpInformation!.userId) {
+        logger.error("IDP intent missing userId, cannot redirect to complete registration");
+        const params = buildRedirectParams();
+        return { redirect: `/idp/${provider}/failure?${params}&error=missing_idp_user_info` };
+      }
+
+      const params = buildRedirectParams(
+        {
+          organization: orgToRegisterOn,
+          idpId: idpInformation!.idpId,
+          idpUserId: idpInformation!.userId,
+          idpUserName: idpInformation!.userName || "",
+          // User data for pre-filling form
+          givenName: addHumanUser.profile?.givenName || "",
+          familyName: addHumanUser.profile?.familyName || "",
+          email: addHumanUser.email?.email || "",
+        },
+        true,
+      );
+      return { redirect: `/idp/${provider}/complete-registration?${params}` };
     }
 
     const organizationSchema = create(OrganizationSchema, {
@@ -541,11 +568,17 @@ async function handleManualCreation(ctx: IDPHandlerContext): Promise<IDPHandlerR
     // Store user data for manual registration form
     // Note: includeToken=true because the session hasn't been created yet
     // The token will be needed when registerUserAndLinkToIDP creates the session
+    if (!idpInformation!.userId) {
+      logger.error("IDP intent missing userId, cannot redirect to complete registration");
+      const params = buildRedirectParams();
+      return { redirect: `/idp/${provider}/failure?${params}&error=missing_idp_user_info` };
+    }
+
     const params = buildRedirectParams(
       {
         organization: orgToRegisterOn,
         idpId: idpInformation!.idpId,
-        idpUserId: idpInformation!.userId || "",
+        idpUserId: idpInformation!.userId,
         idpUserName: idpInformation!.userName || "",
         // User data for pre-filling form
         givenName: addHumanUser.profile?.givenName || "",

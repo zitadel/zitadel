@@ -587,6 +587,8 @@ export type ListUsersCommand = WithServiceConfig<{
   organizationId?: string;
 }>;
 
+const userLookupQuery = { limit: 2 };
+
 export async function listUsers({ serviceConfig, loginName, userName, phone, email, organizationId }: ListUsersCommand) {
   const queries: SearchQuery[] = [];
 
@@ -672,7 +674,7 @@ export async function listUsers({ serviceConfig, loginName, userName, phone, ema
 
   const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceConfig);
 
-  return userService.listUsers({ queries });
+  return userService.listUsers({ query: userLookupQuery, queries });
 }
 
 export type SearchUsersCommand = WithServiceConfig<{
@@ -755,7 +757,7 @@ export async function searchUsers({
 
   const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceConfig);
 
-  const loginNameResult = await userService.listUsers({ queries });
+  const loginNameResult = await userService.listUsers({ query: userLookupQuery, queries });
 
   if (!loginNameResult || !loginNameResult.details) {
     return { error: t("errors.errorOccured") };
@@ -817,6 +819,7 @@ export async function searchUsers({
   }
 
   const emailOrPhoneResult = await userService.listUsers({
+    query: userLookupQuery,
     queries: emailAndPhoneQueries,
   });
 

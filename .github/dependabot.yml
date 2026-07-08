@@ -16,7 +16,7 @@ updates:
     interval: weekly
     time: "02:00"
   labels:
-   - "npm"
+   - "javascript"
    - "dependencies"
   open-pull-requests-limit: 10
   commit-message:
@@ -49,7 +49,7 @@ updates:
     interval: weekly
     time: "02:00"
   labels:
-   - "gomod"
+   - "go"
    - "dependencies"
   open-pull-requests-limit: 10
   commit-message:
@@ -101,6 +101,6 @@ updates:
     prefix: chore
     include: scope
   labels:
-    - "npm"
+    - "javascript"
     - "dependencies"
-    - "documentation"
+    - "area/docs"

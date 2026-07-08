@@ -163,6 +163,22 @@ type SecretGenerators struct {
 	SigningKey               *crypto.GeneratorConfig
 }
 
+func (s *SecretGenerators) ToMap() map[domain.SecretGeneratorType]*crypto.GeneratorConfig {
+	return map[domain.SecretGeneratorType]*crypto.GeneratorConfig{
+		domain.SecretGeneratorTypeInitCode:             s.InitializeUserCode,
+		domain.SecretGeneratorTypeVerifyEmailCode:      s.EmailVerificationCode,
+		domain.SecretGeneratorTypeVerifyPhoneCode:      s.PhoneVerificationCode,
+		domain.SecretGeneratorTypeVerifyDomain:         s.DomainVerification,
+		domain.SecretGeneratorTypePasswordResetCode:    s.PasswordVerificationCode,
+		domain.SecretGeneratorTypePasswordlessInitCode: s.PasswordlessInitCode,
+		domain.SecretGeneratorTypeAppSecret:            s.ClientSecret,
+		domain.SecretGeneratorTypeOTPSMS:               s.OTPSMS,
+		domain.SecretGeneratorTypeOTPEmail:             s.OTPEmail,
+		domain.SecretGeneratorTypeInviteCode:           s.InviteCode,
+		domain.SecretGeneratorTypeSigningKey:           s.SigningKey,
+	}
+}
+
 type ZitadelConfig struct {
 	instanceID             string
 	orgID                  string
@@ -326,6 +342,7 @@ func setupInstanceElements(instanceAgg *instance.Aggregate, setup *InstanceSetup
 		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyDomain, setup.SecretGenerators.DomainVerification),
 		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeOTPSMS, setup.SecretGenerators.OTPSMS),
 		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeOTPEmail, setup.SecretGenerators.OTPEmail),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeInviteCode, setup.SecretGenerators.InviteCode),
 
 		prepareAddDefaultPasswordComplexityPolicy(
 			instanceAgg,

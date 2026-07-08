@@ -6,6 +6,11 @@ SELECT
     END AS login_name
     , COALESCE(d.is_primary, TRUE) AS is_primary
     , u.instance_id
+    , u.resource_owner
+    , CASE
+            WHEN p.must_be_domain THEN CONCAT(u.user_name_lower, '@', d.name_lower)
+            ELSE u.user_name_lower
+    END AS login_name_lower
 FROM
     projections.login_names3_users AS u
 LEFT JOIN LATERAL (
