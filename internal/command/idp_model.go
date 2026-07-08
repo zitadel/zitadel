@@ -2183,6 +2183,7 @@ func (wm *IDPTypeWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.SAMLIDPAddedEventType,
 			instance.OIDCIDPMigratedAzureADEventType,
 			instance.OIDCIDPMigratedGoogleEventType,
+			instance.ZitadelIDPAddedEventType,
 			instance.IDPRemovedEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).
@@ -2203,6 +2204,7 @@ func (wm *IDPTypeWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.SAMLIDPAddedEventType,
 			org.OIDCIDPMigratedAzureADEventType,
 			org.OIDCIDPMigratedGoogleEventType,
+			org.ZitadelIDPAddedEventType,
 			org.IDPRemovedEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).
