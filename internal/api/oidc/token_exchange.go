@@ -58,6 +58,9 @@ func (s *Server) tokenExchange(ctx context.Context, r *op.ClientRequest[oidc.Tok
 	}
 
 	actorToken := subjectToken // see [createExchangeTokens] comment.
+	// actorPath: a separate actor_token was verified (impersonation/delegation).
+	// Standard exchange leaves actorToken == subjectToken; this branch runs for
+	// user_id/JWT subjects or when the client sends actor_token explicitly.
 	actorPath := false
 	if subjectToken.tokenType == UserIDTokenType || subjectToken.tokenType == oidc.JWTTokenType || r.Data.ActorToken != "" {
 		actorPath = true
@@ -78,8 +81,11 @@ func (s *Server) tokenExchange(ctx context.Context, r *op.ClientRequest[oidc.Tok
 	if err != nil {
 		return nil, err
 	}
-	// user_id and id_token subjects cannot carry scopes; on the actor path they use
-	// impersonation scope rules instead of requiring every scope on subject ∪ actor.
+	// scopelessActorPath: actorPath with a subject that cannot carry scopes
+	// (user_id or id_token). Subject-data scopes (email, profile, …) are taken
+	// from the impersonated user at mint time; only authorization scopes must
+	// appear on subject_token ∪ actor_token. Access/JWT subjects always use
+	// union validation even when their scope claim is empty.
 	scopelessActorPath := actorPath && (subjectToken.tokenType == UserIDTokenType || subjectToken.tokenType == oidc.IDTokenType)
 	scopes, err := validateTokenExchangeScopes(client, r.Data.Scopes, subjectToken.scopes, actorToken.scopes, scopelessActorPath)
 	if err != nil {
@@ -184,9 +190,9 @@ func (s *Server) jwtProfileUserCheck(ctx context.Context, resourceOwner *string,
 	})
 }
 
-// validateTokenExchangeScopes routes scope validation by subject token type.
-// scopelessActorPath is true for user_id and id_token subjects on the actor path;
-// those use relaxed rules for subject-data scopes. All other cases require ⊆ subject ∪ actor.
+// validateTokenExchangeScopes picks the scope rule set for this exchange.
+// scopelessActorPath selects impersonation rules (user_id/id_token subjects
+// on the actor path); otherwise every requested scope must ⊆ subject ∪ actor.
 func validateTokenExchangeScopes(
 	client *Client,
 	requestedScopes, subjectScopes, actorScopes []string,
