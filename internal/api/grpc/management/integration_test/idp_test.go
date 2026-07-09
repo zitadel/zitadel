@@ -452,7 +452,7 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// create a new provider per subtest and set the ID in the request
-			zitadelProvider := addZitadelProvider(t, OrgCTX, integration.IDPName())
+			zitadelProvider := Instance.AddOrgZitadelProvider(OrgCTX, integration.IDPName())
 			tt.args.req.Id = zitadelProvider.Id
 
 			before := time.Now()
@@ -482,7 +482,7 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 }
 
 func Test_UpdateZitadelProvider_MissingID(t *testing.T) {
-	_ = addZitadelProvider(t, OrgCTX, integration.IDPName())
+	_ = Instance.AddOrgZitadelProvider(OrgCTX, integration.IDPName())
 	// Attempt to update the provider without specifying the ID
 	updateResp, err := Client.UpdateZitadelProvider(OrgCTX, &mgmt_pb.UpdateZitadelProviderRequest{})
 	require.Error(t, err)
@@ -495,7 +495,7 @@ func Test_UpdateZitadelProvider_MissingID(t *testing.T) {
 
 func Test_GetProviderByID(t *testing.T) {
 	name := integration.IDPName()
-	existingProvider := addZitadelProvider(t, OrgCTX, name)
+	existingProvider := Instance.AddOrgZitadelProvider(OrgCTX, name)
 
 	tests := []struct {
 		name     string
@@ -594,9 +594,9 @@ func Test_ListProviders(t *testing.T) {
 	orgCtx := integration.SetOrgID(IAMOwnerCTX, org.GetOrganizationId())
 
 	provider1Name := integration.IDPName()
-	provider1 := addZitadelProvider(t, orgCtx, provider1Name)
+	provider1 := Instance.AddOrgZitadelProvider(orgCtx, provider1Name)
 	provider2Name := integration.IDPName()
-	provider2 := addZitadelProvider(t, orgCtx, provider2Name)
+	provider2 := Instance.AddOrgZitadelProvider(orgCtx, provider2Name)
 
 	tests := []struct {
 		name     string
@@ -825,29 +825,6 @@ func Test_ListProviders(t *testing.T) {
 			}
 		})
 	}
-}
-
-func addZitadelProvider(t *testing.T, ctx context.Context, name string) *mgmt_pb.AddZitadelProviderResponse {
-	t.Helper()
-	existingProvider, err := Instance.Client.Mgmt.AddZitadelProvider(ctx, &mgmt_pb.AddZitadelProviderRequest{
-		Name:         name,
-		Issuer:       "zitadel.example.com",
-		ClientId:     "test-client",
-		ClientSecret: "test-secret",
-		Scopes:       []string{"email", "profile"},
-		ProviderOptions: &idp_pb.Options{
-			IsCreationAllowed: true,
-		},
-		InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-			{
-				OrganizationId:     "org1",
-				OrganizationDomain: "org1.com",
-			},
-		},
-	})
-	require.NoError(t, err)
-	require.NotEmpty(t, existingProvider.GetId())
-	return existingProvider
 }
 
 func assertProvider(t *testing.T, expected, actual *idp_pb.Provider) {
