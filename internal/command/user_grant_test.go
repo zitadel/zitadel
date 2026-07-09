@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -3206,6 +3207,77 @@ func TestCommandSide_BulkRemoveUserGrant(t *testing.T) {
 			if tt.res.err != nil && !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
 			}
+		})
+	}
+}
+
+// PoC for GHSA-v859-c572-qh5p
+// Each case asserts the CORRECT post-removal RoleKeys;
+// against faulty implementations these assertions fail.
+func TestCommandSide_removeRoleFromUserGrant(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name             string
+		existingRoleKeys []string
+		roleKeysToRemove map[string]bool
+		want             []string
+	}{
+		{
+			name:             "advisory scenario, remove two adjacent leading roles",
+			existingRoleKeys: []string{"admin", "viewer", "editor"},
+			roleKeysToRemove: map[string]bool{"admin": true, "viewer": true},
+			want:             []string{"editor"},
+		},
+		{
+			name:             "remove first two of four",
+			existingRoleKeys: []string{"a", "b", "c", "d"},
+			roleKeysToRemove: map[string]bool{"a": true, "b": true},
+			want:             []string{"c", "d"},
+		},
+		{
+			name:             "remove two adjacent middle roles",
+			existingRoleKeys: []string{"a", "b", "c", "d"},
+			roleKeysToRemove: map[string]bool{"b": true, "c": true},
+			want:             []string{"a", "d"},
+		},
+		{
+			name:             "remove two non-adjacent roles",
+			existingRoleKeys: []string{"a", "b", "c", "d"},
+			roleKeysToRemove: map[string]bool{"a": true, "c": true},
+			want:             []string{"b", "d"},
+		},
+		{
+			name:             "remove all roles",
+			existingRoleKeys: []string{"x", "y", "z"},
+			roleKeysToRemove: map[string]bool{"x": true, "y": true, "z": true},
+			want:             []string{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			r := &Commands{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							usergrant.NewUserGrantAddedEvent(t.Context(),
+								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+								"user1",
+								"project1",
+								"",
+								tt.existingRoleKeys,
+							),
+						),
+					),
+				)(t),
+			}
+
+			cmd, err := r.removeRoleFromUserGrant(t.Context(), "usergrant1", tt.roleKeysToRemove, true)
+			require.NoError(t, err)
+
+			event, ok := cmd.(*usergrant.UserGrantCascadeChangedEvent)
+			require.True(t, ok, "expected *usergrant.UserGrantCascadeChangedEvent, got %T", cmd)
+			assert.Equal(t, tt.want, event.RoleKeys)
 		})
 	}
 }

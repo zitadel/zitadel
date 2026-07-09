@@ -111,7 +111,7 @@ func (c *Commands) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGr
 	return userGrantWriteModelToUserGrant(existingUserGrant), nil
 }
 
-func (c *Commands) removeRoleFromUserGrant(ctx context.Context, userGrantID string, roleKeys []string, cascade bool) (_ eventstore.Command, err error) {
+func (c *Commands) removeRoleFromUserGrant(ctx context.Context, userGrantID string, roleKeysToRemove map[string]bool, cascade bool) (_ eventstore.Command, err error) {
 	existingUserGrant, err := c.userGrantWriteModelByID(ctx, userGrantID, "")
 	if err != nil {
 		return nil, err
@@ -119,21 +119,16 @@ func (c *Commands) removeRoleFromUserGrant(ctx context.Context, userGrantID stri
 	if existingUserGrant.State == domain.UserGrantStateUnspecified || existingUserGrant.State == domain.UserGrantStateRemoved {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.UserGrant.NotFound")
 	}
-	keyExists := false
-	for i, key := range existingUserGrant.RoleKeys {
-		for _, roleKey := range roleKeys {
-			if key == roleKey {
-				keyExists = true
-				copy(existingUserGrant.RoleKeys[i:], existingUserGrant.RoleKeys[i+1:])
-				existingUserGrant.RoleKeys[len(existingUserGrant.RoleKeys)-1] = ""
-				existingUserGrant.RoleKeys = existingUserGrant.RoleKeys[:len(existingUserGrant.RoleKeys)-1]
-				continue
-			}
-		}
-	}
-	if !keyExists {
+
+	beforeLen := len(existingUserGrant.RoleKeys)
+	existingUserGrant.RoleKeys = slices.DeleteFunc(existingUserGrant.RoleKeys, func(role string) bool {
+		return roleKeysToRemove[role]
+	})
+
+	if beforeLen == len(existingUserGrant.RoleKeys) {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5m8g9", "Errors.UserGrant.RoleKeyNotFound")
 	}
+
 	changedUserGrant := NewUserGrantWriteModel(userGrantID, existingUserGrant.ResourceOwner)
 	userGrantAgg := UserGrantAggregateFromWriteModel(&changedUserGrant.WriteModel)
 

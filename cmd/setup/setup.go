@@ -255,6 +255,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s70AddEventStoreCommandEnforceOwner = &AddEventStoreCommandEnforceOwnerColumn{dbClient: dbClient}
 	steps.s71JWTProvideAddAudienceColumn = &JWTProvideAddAudienceColumn{dbClient: dbClient}
 	steps.s72AddColumnsToLoginNamesView = &AddColumnsToLoginNamesView{dbClient: dbClient}
+	steps.s73FixUserGrantRoles = &FixUserGrantRoles{eventstore: eventstoreClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	if err != nil {
@@ -376,6 +377,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s68TargetAddPayloadTypeColumn,
 		steps.s71JWTProvideAddAudienceColumn,
 		steps.s72AddColumnsToLoginNamesView,
+		steps.s73FixUserGrantRoles,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {

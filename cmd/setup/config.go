@@ -192,6 +192,7 @@ type Steps struct {
 	s70AddEventStoreCommandEnforceOwner     *AddEventStoreCommandEnforceOwnerColumn
 	s71JWTProvideAddAudienceColumn          *JWTProvideAddAudienceColumn
 	s72AddColumnsToLoginNamesView           *AddColumnsToLoginNamesView
+	s73FixUserGrantRoles                    *FixUserGrantRoles
 }
 
 func NewSteps(ctx context.Context, v *viper.Viper) (*Steps, error) {
