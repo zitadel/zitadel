@@ -1,6 +1,6 @@
 ---
 title: Zitadel Roadmap
-description: "The next generation of Zitadel — strategic platform investments, capabilities, and timelines."
+description: "The next iteration of Zitadel — strategic platform investments, capabilities, and timelines."
 sidebar_label: Roadmap
 ---
 
@@ -8,15 +8,25 @@ Identity has changed significantly since Zitadel was first built.
 
 Over the last few years, we've worked with customers operating everything from modern SaaS applications to large enterprise platforms serving millions of users. As those customers have grown, we've seen the same platform take on increasingly complex identity challenges—from enterprise federation and global deployments to machine identities and AI agents.
 
-The next generation of Zitadel is built so our customers can continue solving tomorrow's identity challenges on the same platform they choose today. That requires a more flexible foundation—one that supports new identity models, web-scale deployments, and emerging identity patterns without accumulating complexity over time.
+The next iteration of Zitadel is built so our customers can continue solving tomorrow's identity challenges on the same platform they choose today. That requires a more flexible foundation—one that supports new identity models, web-scale deployments, and emerging identity patterns without accumulating complexity over time.
 
 The roadmap below outlines the strategic platform investments we're making over the coming releases and the customer capabilities they unlock.
 
-*This roadmap reflects our current strategic direction rather than a fixed release plan. As we continue validating the next generation of Zitadel with customers and the community, priorities and sequencing may evolve.*
+*This roadmap reflects our current strategic direction rather than a fixed release plan. As we continue validating the next iteration of Zitadel with customers and the community, priorities and sequencing may evolve.*
+
+**What this means for existing customers**
+
+The next iteration of Zitadel is an evolution of the platform, not a replacement.
+
+Existing V4 deployments remain fully supported while we introduce the next iteration incrementally. Zitadel V4 will continue to be supported for at least 12 months, with security updates, critical customer issues, and targeted improvements continuing throughout this period.
+
+Many of the capabilities our customers have been asking for require architectural changes that go beyond incremental improvements to the current platform. Those capabilities will therefore be introduced as part of the next iteration of Zitadel, while V4 continues to receive security updates, bug fixes, and targeted improvements where appropriate.
+
+As new platform capabilities become available, we'll provide migration tooling and guidance so teams can adopt them incrementally rather than through a disruptive migration. Our goal is to make adoption predictable and low risk, whether you're running Zitadel Cloud or self-hosting your own deployment.
 
 ## **Strategic Roadmap**
 
-The next generation of Zitadel will be delivered incrementally, with each investment building on the foundations established by the previous one. The roadmap below outlines the major platform capabilities we're investing in and our current target horizon for each.
+The next iteration of Zitadel will be delivered incrementally, with each investment building on the foundations established by the previous one. The roadmap below outlines the major platform capabilities we're investing in and our current target horizon for each.
 
 | Strategic investment | Key capabilities | Timeline |
 | :---- | :---- | :---- |
@@ -31,9 +41,9 @@ The next generation of Zitadel will be delivered incrementally, with each invest
 
 Every application models identity differently, and those requirements continue to evolve over time. As products grow, new user types emerge, registration flows become more sophisticated, and different applications require different identity models.
 
-The next generation of Zitadel introduces a more flexible foundation for modelling identity. User schemas become the source of truth for identity, while composable authentication components and identity-as-code make authentication feel like a natural part of your application development workflow.
+The next iteration of Zitadel introduces a more flexible foundation for modelling identity. User schemas become the source of truth for identity, while composable authentication components and identity-as-code make authentication feel like a natural part of your application development workflow.
 
-### **Strategic Investments**
+**Strategic investments**
 
 * User Schemas  
 * Identity-as-code  
@@ -41,7 +51,7 @@ The next generation of Zitadel introduces a more flexible foundation for modelli
 * Live development preview  
 * Versioned identity configuration
 
-### **Customer Outcomes**
+**Customer outcomes**
 
 * Authentication adapts to your application.  
 * Identity models evolve without disruptive migrations.  
@@ -51,16 +61,16 @@ The next generation of Zitadel introduces a more flexible foundation for modelli
 
 Enterprise identity becomes increasingly complex as products grow. Every new customer brings different identity providers, organisation-specific requirements, compliance needs, and operational expectations. Over time, those differences can turn into multiple configuration models, overlapping policies, and an increasing number of special cases.
 
-The next generation of Zitadel simplifies that foundation. By moving towards a more unified platform model, we're making enterprise identity easier to operate while building the foundations required for web-scale deployments.
+The next iteration of Zitadel simplifies that foundation. By moving towards a more unified platform model, we're making enterprise identity easier to operate while building the foundations required for web-scale deployments.
 
-### **Strategic Investments**
+**Strategic investments**
 
 * Unified identity model  
 * Unified configuration  
 * Web-scale architecture  
 * Regional deployment foundations
 
-### **Customer Outcomes**
+**Customer outcomes**
 
 * Onboard enterprise customers without accumulating operational complexity.  
 * Scale from your first enterprise customer to global deployments on the same platform.  
@@ -70,9 +80,9 @@ The next generation of Zitadel simplifies that foundation. By moving towards a m
 
 Identity is no longer limited to human users and traditional service accounts. AI agents are increasingly authenticating, accessing APIs, performing delegated actions, and interacting with enterprise systems on behalf of users.
 
-The next generation of Zitadel treats AI agents as first-class identities. Rather than adapting existing human identity models to new use cases, we're building identity, delegation, and lifecycle management around the way AI agents actually operate.
+The next iteration of Zitadel treats AI agents as first-class identities. Rather than adapting existing human identity models to new use cases, we're building identity, delegation, and lifecycle management around the way AI agents actually operate.
 
-### **Strategic Investments**
+**Strategic investments**
 
 * Agent identities  
 * Delegated authority  
@@ -80,7 +90,7 @@ The next generation of Zitadel treats AI agents as first-class identities. Rathe
 * Scoped permissions  
 * Agent-to-agent interactions
 
-### **Customer Outcomes**
+**Customer outcomes**
 
 * Govern AI agents with the same confidence as human identities.  
 * Secure delegated actions without introducing new trust models.  
@@ -90,9 +100,9 @@ The next generation of Zitadel treats AI agents as first-class identities. Rathe
 
 As organisations adopt more distributed identity models, understanding who did what—and under whose authority—becomes significantly more difficult. A single request may involve a human user, an AI agent, delegated authority, enterprise federation, and multiple systems before it reaches your application.
 
-The next generation of Zitadel brings that visibility closer to the identity layer itself. By connecting authentication, authorization, sessions, delegation, and identity activity, we're building a more complete view of identity across your systems.
+The next iteration of Zitadel brings that visibility closer to the identity layer itself. By connecting authentication, authorization, sessions, delegation, and identity activity, we're building a more complete view of identity across your systems.
 
-### **Strategic Investments**
+**Strategic investments**
 
 * Identity observability  
 * End-to-end identity context  
@@ -100,27 +110,19 @@ The next generation of Zitadel brings that visibility closer to the identity lay
 * Delegation tracking  
 * Identity intelligence
 
-### **Customer Outcomes**
+**Customer outcomes**
 
 * Understand who performed an action, through which identity, and under whose authority.  
 * Investigate identity-related incidents more quickly with complete identity context.  
 * Improve governance, security, and operational visibility across human, machine, and AI identities.
 
-## **Supporting Existing Customers**
+## **Migration and Adoption**
 
-The next generation of Zitadel is designed as an evolution of the platform, not a replacement.
+We'll communicate end-of-support timelines for V2 and V3 well in advance, together with migration guidance, to help customers plan their adoption with confidence. During the transition, community contributions remain an important part of Zitadel. If you're maintaining a V4 deployment and would like to contribute fixes or improvements, we'll continue reviewing and working with contributors wherever those changes align with the long-term direction of the platform.
 
-While much of our engineering investment is focused on the next generation of Zitadel, we're committed to supporting existing customers throughout the transition.
+Before starting a larger contribution, we encourage you to open a GitHub issue first. This helps us validate the approach, share any relevant roadmap context, and ensure the work aligns with the direction of the platform.
 
-Zitadel V4 will continue to be supported for at least 12 months, previous versions will be sunsetted in due course, and we will communicate the timelines shortly. During this period, we'll prioritise security updates, critical customer issues, and high-impact improvements while introducing the next generation incrementally. We'll share the end-of-support timelines for earlier major versions, together with migration guidance, in the coming months.
-
-Community contributions remain an important part of Zitadel. If you're maintaining a V4 deployment and would like to contribute fixes or improvements, we'll continue reviewing and working with contributors wherever those changes align with the long-term direction of the platform. Before starting a larger contribution, we encourage you to open a GitHub issue first. This helps us validate the approach, share any relevant roadmap context, and ensure the work aligns with the direction of the platform.
-
-As new platform capabilities become available, we'll provide migration tooling and guidance so teams can adopt them incrementally rather than through a disruptive migration.
-
-Our goal is to make adoption predictable and low risk, whether you're running Zitadel Cloud or self-hosting your own deployment.
-
-### **Strategic Investments**
+**Strategic investments**
 
 * Incremental migration  
 * Compatibility guidance  
@@ -128,7 +130,7 @@ Our goal is to make adoption predictable and low risk, whether you're running Zi
 * Cloud & self-hosted alignment  
 * Long-term platform stability
 
-### **Customer Outcomes**
+**Customer outcomes**
 
 * Adopt new platform capabilities without disrupting existing deployments.  
 * Plan migration based on your own priorities and timelines.  
