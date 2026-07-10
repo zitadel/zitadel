@@ -101,7 +101,7 @@ Help shape the future of Zitadel:
 
 Make Zitadel more popular and give it a ⭐
 
-Follow [@zitadel](https://twitter.com/zitadel) on twitter
+Follow [@zitadel](https://x.com/zitadel) on X (formerly Twitter)
 
 [Contribute](#how-to-contribute)
 
