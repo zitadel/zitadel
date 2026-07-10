@@ -752,6 +752,48 @@ func (i *Instance) AddOrgGenericOAuthProvider(ctx context.Context, name string) 
 	return resp
 }
 
+func (i *Instance) AddZitadelProvider(ctx context.Context, name string) *admin.AddZitadelProviderResponse {
+	resp, err := i.Client.Admin.AddZitadelProvider(ctx, &admin.AddZitadelProviderRequest{
+		Name:         name,
+		Issuer:       "zitadel.example.com",
+		ClientId:     "test-client",
+		ClientSecret: "test-secret",
+		Scopes:       []string{"email", "profile"},
+		ProviderOptions: &idp.Options{
+			IsCreationAllowed: true,
+		},
+		InstanceRolesInfo: []*idp.InstanceRolesInfo{
+			{
+				OrganizationId:     "org1",
+				OrganizationDomain: "org1.com",
+			},
+		},
+	})
+	logging.OnError(err).Panic("create zitadel idp")
+	return resp
+}
+
+func (i *Instance) AddOrgZitadelProvider(ctx context.Context, name string) *mgmt.AddZitadelProviderResponse {
+	resp, err := i.Client.Mgmt.AddZitadelProvider(ctx, &mgmt.AddZitadelProviderRequest{
+		Name:         name,
+		Issuer:       "zitadel.example.com",
+		ClientId:     "test-client",
+		ClientSecret: "test-secret",
+		Scopes:       []string{"email", "profile"},
+		ProviderOptions: &idp.Options{
+			IsCreationAllowed: true,
+		},
+		InstanceRolesInfo: []*idp.InstanceRolesInfo{
+			{
+				OrganizationId:     "org1",
+				OrganizationDomain: "org1.com",
+			},
+		},
+	})
+	logging.OnError(err).Panic("create org zitadel idp")
+	return resp
+}
+
 func (i *Instance) AddGenericOIDCProvider(ctx context.Context, name string) *admin.AddGenericOIDCProviderResponse {
 	resp, err := i.Client.Admin.AddGenericOIDCProvider(ctx, &admin.AddGenericOIDCProviderRequest{
 		Name:         name,
