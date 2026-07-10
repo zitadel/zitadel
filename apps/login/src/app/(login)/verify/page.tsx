@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
 
-  const { userId, loginName, code, organization, requestId, invite, send } = searchParams;
+  const { userId, loginName, code, organization, requestId, invite } = searchParams;
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
@@ -33,8 +33,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   let human: HumanUser | undefined;
   let id: string | undefined;
   let loginSettings: LoginSettings | undefined;
-
-  const doSend = send === "true";
 
   const autoSubmitCode = process.env.NEXT_PUBLIC_AUTO_SUBMIT_CODE === "true";
 
@@ -162,7 +160,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
             isInvite={invite === "true"}
             requestId={requestId}
             submit={autoSubmitCode}
-            doSend={doSend}
           />
         )}
       </div>

@@ -154,14 +154,14 @@ The Login Policy defines how the login process should look like and which authen
 
 ### Default Redirect URI
 
-The Default Redirect URI will be used, if a user calls the login page directly.
-More specifically, typically an application will initiate login with an auth request.
-The auth request contains a client-id and a redirect uri, that must match the settings in ZITADEL.
-If there is no [auth request](https://zitadel.com/playgrounds/oidc), users will be redirected to the Default Redirect URI, which is by default `https://${CUSTOM_DOMAIN}/ui/console/`
+The Default Redirect URI will be used when the context of the auth request is lost or when a user accesses the login page directly without an OIDC flow.
 
-Reasons why ZITADEL doesn't have a redirect URI:
+Typically, an application will initiate login with an auth request that contains a client-id and a redirect uri that must match the settings in ZITADEL. However, if there is no [auth request](https://zitadel.com/playgrounds/oidc) context, users will be redirected to the Default Redirect URI, which is by default `https://${CUSTOM_DOMAIN}/ui/console/`
+
+Common scenarios where the auth request context is lost:
 
 - The login has not been called with an OIDC authorize request
+- The user bookmarked the login page and accesses it directly
 - The user landed on the login through an email link, e.g. Password Reset, Initialize User
 
 We recommend setting your own default redirect URI, if you do not want end users to access ZITADEL Management Console.
@@ -394,6 +394,7 @@ The following secrets can be specified:
 - Application secrets
 - One Time Password (OTP) - SMS
 - One Time Password (OTP) - Email
+- Invite Code
 
 <img
   src="/docs/img/guides/console/secretappearance.png"
