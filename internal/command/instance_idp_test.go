@@ -6424,6 +6424,8 @@ func TestCommands_UpdateInstanceZitadelProvider(t *testing.T) {
 									KeyID:      "id",
 									Crypted:    []byte("newSecret"),
 								}),
+								idp.ChangeZitadelIDPInstanceRolesInfo(nil),
+								idp.ChangeZitadelIDPScopes(nil),
 							},
 						),
 					),
@@ -6489,6 +6491,17 @@ func TestCommands_UpdateInstanceZitadelProvider(t *testing.T) {
 					Name:     "name",
 					Issuer:   "issuer",
 					ClientID: "clientID",
+					Scopes:   []string{openid.ScopeOpenID, openid.ScopeEmail},
+					InstanceRolesInfo: []idp.RolesInfo{
+						{
+							OrganizationID:     "org1",
+							OrganizationDomain: "example-org1.com",
+						},
+						{
+							OrganizationID:     "org2",
+							OrganizationDomain: "example-org2.com",
+						},
+					},
 				},
 			},
 			res: res{
@@ -6756,7 +6769,7 @@ func TestCommands_UpdateInstanceZitadelProvider(t *testing.T) {
 					Issuer:       "new issuer",
 					ClientID:     "clientID2",
 					ClientSecret: "newSecret",
-					Scopes:       nil,
+					Scopes:       []string{openid.ScopeOpenID, openid.ScopeEmail},
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,

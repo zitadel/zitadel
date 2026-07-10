@@ -202,6 +202,102 @@ func TestServer_GetIDPByID(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		{
+			name: "idp by ID, instance, Zitadel provider, ok",
+			args: args{
+				IamCTX,
+				&idp.GetIDPByIDRequest{},
+				func(ctx context.Context, request *idp.GetIDPByIDRequest) *idpAttr {
+					name := integration.IDPName()
+					resp := Instance.AddZitadelProvider(ctx, name)
+					request.Id = resp.Id
+					return &idpAttr{
+						resp.GetId(),
+						name,
+						&object.Details{
+							Sequence:      resp.Details.Sequence,
+							CreationDate:  resp.Details.CreationDate,
+							ChangeDate:    resp.Details.ChangeDate,
+							ResourceOwner: resp.Details.ResourceOwner,
+						}}
+				},
+			},
+			want: &idp.GetIDPByIDResponse{
+				Idp: &idp.IDP{
+					Details: &object.Details{
+						ChangeDate: timestamppb.Now(),
+					},
+					State: idp.IDPState_IDP_STATE_ACTIVE,
+					Type:  idp.IDPType_IDP_TYPE_ZITADEL,
+					Config: &idp.IDPConfig{
+						Config: &idp.IDPConfig_Zitadel{
+							Zitadel: &idp.ZitadelConfig{
+								ClientId: "test-client",
+								Issuer:   "zitadel.example.com",
+								Scopes:   []string{"email", "profile"},
+								InstanceRolesInfo: []*idp.InstanceRolesInfo{
+									{
+										OrganizationId:     "org1",
+										OrganizationDomain: "org1.com",
+									},
+								},
+							},
+						},
+						Options: &idp.Options{
+							IsCreationAllowed: true,
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "idp by ID, org, Zitadel provider, ok",
+			args: args{
+				CTX,
+				&idp.GetIDPByIDRequest{},
+				func(ctx context.Context, request *idp.GetIDPByIDRequest) *idpAttr {
+					name := integration.IDPName()
+					resp := Instance.AddOrgZitadelProvider(ctx, name)
+					request.Id = resp.Id
+					return &idpAttr{
+						resp.GetId(),
+						name,
+						&object.Details{
+							Sequence:      resp.Details.Sequence,
+							CreationDate:  resp.Details.CreationDate,
+							ChangeDate:    resp.Details.ChangeDate,
+							ResourceOwner: resp.Details.ResourceOwner,
+						}}
+				},
+			},
+			want: &idp.GetIDPByIDResponse{
+				Idp: &idp.IDP{
+					Details: &object.Details{
+						ChangeDate: timestamppb.Now(),
+					},
+					State: idp.IDPState_IDP_STATE_ACTIVE,
+					Type:  idp.IDPType_IDP_TYPE_ZITADEL,
+					Config: &idp.IDPConfig{
+						Config: &idp.IDPConfig_Zitadel{
+							Zitadel: &idp.ZitadelConfig{
+								ClientId: "test-client",
+								Issuer:   "zitadel.example.com",
+								Scopes:   []string{"email", "profile"},
+								InstanceRolesInfo: []*idp.InstanceRolesInfo{
+									{
+										OrganizationId:     "org1",
+										OrganizationDomain: "org1.com",
+									},
+								},
+							},
+						},
+						Options: &idp.Options{
+							IsCreationAllowed: true,
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
