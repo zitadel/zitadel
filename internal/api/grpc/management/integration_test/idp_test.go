@@ -835,10 +835,16 @@ func Test_ListProviders(t *testing.T) {
 			require.NoError(t, err)
 			assert.NotNil(t, got)
 			assert.Equal(t, tt.wantResp.GetDetails().GetTotalResult(), got.GetDetails().GetTotalResult())
-			for i, want := range tt.wantResp.GetResult() {
-				assert.Equal(t, want.GetDetails().GetCreationDate().AsTime(), got.GetResult()[i].GetDetails().GetCreationDate().AsTime())
-				assert.Equal(t, org.GetOrganizationId(), got.GetResult()[i].GetDetails().GetResourceOwner())
-				assertProvider(t, want, got.GetResult()[i])
+			gotByID := make(map[string]*idp_pb.Provider)
+			for _, p := range got.GetResult() {
+				gotByID[p.GetId()] = p
+			}
+			for _, want := range tt.wantResp.GetResult() {
+				actual, ok := gotByID[want.GetId()]
+				require.True(t, ok, "expected provider %s not found in results", want.GetId())
+				assert.Equal(t, want.GetDetails().GetCreationDate().AsTime(), actual.GetDetails().GetCreationDate().AsTime())
+				assert.Equal(t, org.GetOrganizationId(), actual.GetDetails().GetResourceOwner())
+				assertProvider(t, want, actual)
 			}
 		})
 	}
