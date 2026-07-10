@@ -490,7 +490,11 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 }
 
 func Test_UpdateZitadelProvider_MissingID(t *testing.T) {
-	_ = Instance.AddOrgZitadelProvider(OrgCTX, integration.IDPName())
+	existingProvider := Instance.AddOrgZitadelProvider(OrgCTX, integration.IDPName())
+	t.Cleanup(func() {
+		_, err := Client.DeleteProvider(OrgCTX, &mgmt_pb.DeleteProviderRequest{Id: existingProvider.GetId()})
+		require.NoError(t, err)
+	})
 	// Attempt to update the provider without specifying the ID
 	updateResp, err := Client.UpdateZitadelProvider(OrgCTX, &mgmt_pb.UpdateZitadelProviderRequest{})
 	require.Error(t, err)
@@ -605,7 +609,12 @@ func Test_ListProviders(t *testing.T) {
 	provider1 := Instance.AddOrgZitadelProvider(orgCtx, provider1Name)
 	provider2Name := integration.IDPName()
 	provider2 := Instance.AddOrgZitadelProvider(orgCtx, provider2Name)
-
+	t.Cleanup(func() {
+		_, err := Client.DeleteProvider(orgCtx, &mgmt_pb.DeleteProviderRequest{Id: provider1.GetId()})
+		require.NoError(t, err)
+		_, err = Client.DeleteProvider(orgCtx, &mgmt_pb.DeleteProviderRequest{Id: provider2.GetId()})
+		require.NoError(t, err)
+	})
 	tests := []struct {
 		name     string
 		ctx      context.Context
@@ -836,18 +845,7 @@ func Test_ListProviders(t *testing.T) {
 }
 
 func Test_DeleteZitadelProvider(t *testing.T) {
-	existingProvider, err := Instance.Client.Mgmt.AddZitadelProvider(OrgCTX, &mgmt_pb.AddZitadelProviderRequest{
-		Name:         "Zitadel Support IdP",
-		Issuer:       "zitadel.example.com",
-		ClientId:     "test-client",
-		ClientSecret: "test-secret",
-		Scopes:       []string{"email", "profile"},
-		ProviderOptions: &idp_pb.Options{
-			IsCreationAllowed: true,
-		},
-	})
-	require.NoError(t, err)
-	require.NotEmpty(t, existingProvider.GetId())
+	existingProvider := Instance.AddOrgZitadelProvider(OrgCTX, integration.IDPName())
 	t.Cleanup(func() {
 		_, err := Client.DeleteProvider(OrgCTX, &mgmt_pb.DeleteProviderRequest{Id: existingProvider.GetId()})
 		if err != nil && status.Code(err) != codes.NotFound {

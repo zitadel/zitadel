@@ -452,7 +452,11 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 }
 
 func Test_UpdateZitadelProvider_MissingID(t *testing.T) {
-	_ = Instance.AddZitadelProvider(AdminCTX, integration.IDPName())
+	existingProvider := Instance.AddZitadelProvider(AdminCTX, integration.IDPName())
+	t.Cleanup(func() {
+		_, err := Client.DeleteProvider(AdminCTX, &admin_pb.DeleteProviderRequest{Id: existingProvider.GetId()})
+		require.NoError(t, err)
+	})
 	// Attempt to update the provider without specifying the ID
 	updateResp, err := Client.UpdateZitadelProvider(AdminCTX, &admin_pb.UpdateZitadelProviderRequest{})
 	require.Error(t, err)
@@ -466,6 +470,10 @@ func Test_UpdateZitadelProvider_MissingID(t *testing.T) {
 func Test_GetProviderByID(t *testing.T) {
 	providerName := integration.IDPName()
 	existingProvider := Instance.AddZitadelProvider(AdminCTX, providerName)
+	t.Cleanup(func() {
+		_, err := Client.DeleteProvider(AdminCTX, &admin_pb.DeleteProviderRequest{Id: existingProvider.GetId()})
+		require.NoError(t, err)
+	})
 
 	tests := []struct {
 		name     string
@@ -564,6 +572,12 @@ func Test_ListProviders(t *testing.T) {
 
 	provider2Name := integration.IDPName()
 	provider2 := Instance.AddZitadelProvider(AdminCTX, provider2Name)
+	t.Cleanup(func() {
+		_, err := Client.DeleteProvider(AdminCTX, &admin_pb.DeleteProviderRequest{Id: provider1.GetId()})
+		require.NoError(t, err)
+		_, err = Client.DeleteProvider(AdminCTX, &admin_pb.DeleteProviderRequest{Id: provider2.GetId()})
+		require.NoError(t, err)
+	})
 
 	tests := []struct {
 		name     string
@@ -583,6 +597,82 @@ func Test_ListProviders(t *testing.T) {
 			ctx:     integration.WithSystemUserWithNoPermissionsAuthorization(CTX),
 			req:     &admin_pb.ListProvidersRequest{},
 			wantErr: status.Error(codes.PermissionDenied, "No matching permissions found (AUTH-5mWD2)"),
+		},
+		{
+			name: "list all providers",
+			ctx:  AdminCTX,
+			req: &admin_pb.ListProvidersRequest{
+				Query: &object_pb.ListQuery{
+					Asc: true,
+				},
+			},
+			wantResp: &admin_pb.ListProvidersResponse{
+				Details: &object_pb.ListDetails{
+					TotalResult: 2,
+				},
+				Result: []*idp_pb.Provider{
+					{
+						Id: provider1.GetId(),
+						Details: &object_pb.ObjectDetails{
+							CreationDate:  provider1.GetDetails().GetCreationDate(),
+							ChangeDate:    provider1.GetDetails().GetChangeDate(),
+							ResourceOwner: provider1.GetDetails().GetResourceOwner(),
+						},
+						State: idp_pb.IDPState_IDP_STATE_ACTIVE,
+						Name:  provider1Name,
+						Owner: idp_pb.IDPOwnerType_IDP_OWNER_TYPE_SYSTEM,
+						Type:  idp_pb.ProviderType_PROVIDER_TYPE_ZITADEL,
+						Config: &idp_pb.ProviderConfig{
+							Options: &idp_pb.Options{
+								IsCreationAllowed: true,
+							},
+							Config: &idp_pb.ProviderConfig_Zitadel{
+								Zitadel: &idp_pb.ZitadelConfig{
+									Issuer:   "zitadel.example.com",
+									ClientId: "test-client",
+									Scopes:   []string{"email", "profile"},
+									InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
+										{
+											OrganizationId:     "org1",
+											OrganizationDomain: "org1.com",
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						Id: provider2.GetId(),
+						Details: &object_pb.ObjectDetails{
+							CreationDate:  provider2.GetDetails().GetCreationDate(),
+							ChangeDate:    provider2.GetDetails().GetChangeDate(),
+							ResourceOwner: provider2.GetDetails().GetResourceOwner(),
+						},
+						State: idp_pb.IDPState_IDP_STATE_ACTIVE,
+						Name:  provider2Name,
+						Owner: idp_pb.IDPOwnerType_IDP_OWNER_TYPE_SYSTEM,
+						Type:  idp_pb.ProviderType_PROVIDER_TYPE_ZITADEL,
+						Config: &idp_pb.ProviderConfig{
+							Options: &idp_pb.Options{
+								IsCreationAllowed: true,
+							},
+							Config: &idp_pb.ProviderConfig_Zitadel{
+								Zitadel: &idp_pb.ZitadelConfig{
+									Issuer:   "zitadel.example.com",
+									ClientId: "test-client",
+									Scopes:   []string{"email", "profile"},
+									InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
+										{
+											OrganizationId:     "org1",
+											OrganizationDomain: "org1.com",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
 			name: "list by id",
@@ -719,18 +809,7 @@ func Test_ListProviders(t *testing.T) {
 }
 
 func Test_DeleteZitadelProvider(t *testing.T) {
-	existingProvider, err := Instance.Client.Admin.AddZitadelProvider(AdminCTX, &admin_pb.AddZitadelProviderRequest{
-		Name:         "Zitadel Support IdP",
-		Issuer:       "zitadel.example.com",
-		ClientId:     "test-client",
-		ClientSecret: "test-secret",
-		Scopes:       []string{"email", "profile"},
-		ProviderOptions: &idp_pb.Options{
-			IsCreationAllowed: true,
-		},
-	})
-	require.NoError(t, err)
-	require.NotEmpty(t, existingProvider.GetId())
+	existingProvider := Instance.AddZitadelProvider(AdminCTX, integration.IDPName())
 	t.Cleanup(func() {
 		_, err := Client.DeleteProvider(AdminCTX, &admin_pb.DeleteProviderRequest{Id: existingProvider.GetId()})
 		if err != nil && status.Code(err) != codes.NotFound {
