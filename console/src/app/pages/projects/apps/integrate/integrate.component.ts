@@ -35,7 +35,7 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
 
   public OIDCAppType: any = OIDCAppType;
   public requestRedirectValuesSubject$: Subject<void> = new Subject();
-  public frameworks: Framework[] = frameworkDefinition.map((f) => {
+  public frameworks: Framework[] = frameworkDefinition.filter((f) => f.id && OIDC_CONFIGURATIONS[f.id]).map((f) => {
     return {
       ...f,
       fragment: '',
