@@ -270,6 +270,7 @@ RegistrationUser:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Thai: ไทย
   GenderLabel: Стать
   Female: Жіноча
   Male: Чоловіча
@@ -317,6 +318,7 @@ ExternalRegistrationUserOverview:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Thai: ไทย
   TosAndPrivacyLabel: Умови та положення
   TosConfirm: Я приймаю
   TosLinkText: умови використання
@@ -398,6 +400,7 @@ ExternalNotFound:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Thai: ไทย
 
 DeviceAuth:
   Title: Авторизація пристрою

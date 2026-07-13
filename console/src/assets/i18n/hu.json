@@ -1556,7 +1556,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "th": "ไทย"
       }
     },
     "SMTP": {
@@ -1803,7 +1804,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "th": "ไทย"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail ellenőrzés kész",
@@ -2790,7 +2792,8 @@
     "ro": "Română",
     "tr": "Türkçe",
     "uk": "Українська",
-    "ar": "العربية"
+    "ar": "العربية",
+    "th": "ไทย"
   },
   "MEMBER": {
     "ADD": "Hozzáadás egy adminisztrátort",

@@ -270,6 +270,7 @@ RegistrationUser:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Thai: ไทย
   GenderLabel: Kön
   Female: Man
   Male: Kvinna
@@ -317,6 +318,7 @@ ExternalRegistrationUserOverview:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Thai: ไทย
   TosAndPrivacyLabel: Användarvillkor
   TosConfirm: Jag accepterar
   TosLinkText: Användarvillkoren
@@ -398,6 +400,7 @@ ExternalNotFound:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Thai: ไทย
 DeviceAuth:
   Title: Tillgång från hårdvaruenhet
   UserCode:
