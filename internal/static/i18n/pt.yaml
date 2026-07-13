@@ -281,6 +281,8 @@ Errors:
     LabelPolicy:
       NotFound: "Política de Rótulo Privado não encontrada"
       NotChanged: "Política de Rótulo Privado não foi alterada"
+    IDPConfig:
+      NotExisting: "A Configuração do Provedor de Identidade não existe"
   Project:
     ProjectIDMissing: "ID do Projeto ausente"
     AlreadyExists: "Projeto já existe na organização"
