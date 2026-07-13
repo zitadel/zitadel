@@ -283,6 +283,8 @@ Errors:
     LabelPolicy:
       NotFound: "Özel Etiket Politikası bulunamadı"
       NotChanged: "Özel Etiket Politikası değişmedi"
+    IDPConfig:
+      NotExisting: "Kimlik Sağlayıcısı Yapılandırması mevcut değil"
   Project:
     ProjectIDMissing: "Proje Id eksik"
     AlreadyExists: "Proje organizasyonda zaten mevcut"

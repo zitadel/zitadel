@@ -283,6 +283,8 @@ Errors:
     LabelPolicy:
       NotFound: "Politica de etichete private nu a fost găsită"
       NotChanged: "Politica de etichete private nu a fost schimbată"
+    IDPConfig:
+      NotExisting: "Configurația furnizorului de identitate nu există"
   Project:
     ProjectIDMissing: "ID-ul proiectului lipsește"
     AlreadyExists: "Proiectul există deja în organizație"

@@ -282,6 +282,8 @@ Errors:
     LabelPolicy:
       NotFound: "Privé Label Beleid niet gevonden"
       NotChanged: "Privé Label Beleid is niet veranderd"
+    IDPConfig:
+      NotExisting: "Identiteitsprovider-configuratie bestaat niet"
   Project:
     ProjectIDMissing: "Project ID ontbreekt"
     AlreadyExists: "Project bestaat al op organisatie"
