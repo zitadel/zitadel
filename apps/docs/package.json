@@ -34,7 +34,7 @@
     "fumadocs-mdx": "14.3.2",
     "fumadocs-openapi": "10.8.2",
     "fumadocs-ui": "16.8.10",
-    "js-yaml": "^4.1.1",
+    "js-yaml": "^4.2.0",
     "lucide-react": "^0.577.0",
     "mixpanel-browser": "^2.78.0",
     "next": "16.2.6",
@@ -72,7 +72,7 @@
     "semver": "^7.8.0",
     "tailwindcss": "^4.3.0",
     "tailwindcss-animate": "^1.0.7",
-    "tsx": "^4.21.0",
+    "tsx": "4.21.0",
     "typescript": "^5.9.3",
     "yaml-loader": "^0.9.0"
   }

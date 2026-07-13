@@ -282,6 +282,8 @@ Errors:
     LabelPolicy:
       NotFound: "Nie znaleziono polityki marki własnej"
       NotChanged: "Polityka dotycząca marek własnych nie została zmieniona"
+    IDPConfig:
+      NotExisting: "Konfiguracja dostawcy tożsamości nie istnieje"
   Project:
     ProjectIDMissing: "Identyfikator projektu brak"
     AlreadyExists: "Projekt już istnieje w organizacji"
