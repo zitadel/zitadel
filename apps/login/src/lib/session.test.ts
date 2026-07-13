@@ -16,7 +16,8 @@
 import { timestampDate } from "@zitadel/client";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { isSessionValid } from "./session";
+import * as cookiesModule from "./cookies";
+import { isSessionValid, loadMostRecentSession } from "./session";
 import * as verifyHelperModule from "./verify-helper";
 import * as zitadelModule from "./zitadel";
 
@@ -28,6 +29,11 @@ vi.mock("./zitadel", () => ({
   listAuthenticationMethodTypes: vi.fn(),
   getLoginSettings: vi.fn(),
   getUserByID: vi.fn(),
+  getSession: vi.fn(),
+}));
+
+vi.mock("./cookies", () => ({
+  getMostRecentCookieWithLoginname: vi.fn(),
 }));
 
 vi.mock("./verify-helper", () => ({
@@ -1445,5 +1451,54 @@ describe("isSessionValid", () => {
       // All should return same result
       expect(results.every((r) => r === true)).toBe(true);
     });
+  });
+});
+
+describe("loadMostRecentSession", () => {
+  const serviceConfig = { baseUrl: "https://zitadel-abc123.zitadel.cloud" };
+  const sessionParams = { loginName: "test@example.com", organization: "test-org-id" };
+  const cookie = { id: "session-id", token: "session-token", loginName: "test@example.com", organization: "test-org-id" };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  test("returns undefined without calling getSession when no cookie is found", async () => {
+    vi.mocked(cookiesModule.getMostRecentCookieWithLoginname).mockResolvedValue(undefined as any);
+
+    const result = await loadMostRecentSession({ serviceConfig, sessionParams });
+
+    expect(result).toBeUndefined();
+    expect(zitadelModule.getSession).not.toHaveBeenCalled();
+  });
+
+  test("returns the session when getSession succeeds", async () => {
+    const session = { id: "session-id", factors: { user: { id: "user-id" } } };
+    vi.mocked(cookiesModule.getMostRecentCookieWithLoginname).mockResolvedValue(cookie as any);
+    vi.mocked(zitadelModule.getSession).mockResolvedValue({ session } as any);
+
+    const result = await loadMostRecentSession({ serviceConfig, sessionParams });
+
+    expect(result).toBe(session);
+    expect(zitadelModule.getSession).toHaveBeenCalledWith({
+      serviceConfig,
+      sessionId: cookie.id,
+      sessionToken: cookie.token,
+    });
+  });
+
+  test("returns undefined instead of throwing when getSession rejects (stale cookie)", async () => {
+    // The `sessions` cookie can outlive the server-side session, so getSession may
+    // throw `not_found`. loadMostRecentSession must swallow this and return undefined
+    // so callers fall back gracefully instead of crashing the page render.
+    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.mocked(cookiesModule.getMostRecentCookieWithLoginname).mockResolvedValue(cookie as any);
+    vi.mocked(zitadelModule.getSession).mockRejectedValue(new Error("Session does not exist (QUERY-SFeaa)"));
+
+    const result = await loadMostRecentSession({ serviceConfig, sessionParams });
+
+    expect(result).toBeUndefined();
+    expect(consoleSpy).toHaveBeenCalledWith("[Session] Could not load most recent session", expect.any(Error));
+    consoleSpy.mockRestore();
   });
 });
