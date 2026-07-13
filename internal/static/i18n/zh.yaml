@@ -283,6 +283,8 @@ Errors:
     LabelPolicy:
       NotFound: "不存在私人政策"
       NotChanged: "私人政策不改变"
+    IDPConfig:
+      NotExisting: "身份提供者配置不存在"
   Project:
     ProjectIDMissing: "P缺少项目 ID"
     AlreadyExists: "项目以存在于组织中"
