@@ -282,6 +282,8 @@ Errors:
     LabelPolicy:
       NotFound: "A Private Label Policy nem található"
       NotChanged: "A Private Label Policy nem lett megváltoztatva"
+    IDPConfig:
+      NotExisting: "Az identitásszolgáltató konfiguráció nem létezik"
   Project:
     ProjectIDMissing: "Hiányzó Project Id"
     AlreadyExists: "A projekt már létezik a szervezetben"
