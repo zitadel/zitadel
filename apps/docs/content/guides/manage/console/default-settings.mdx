@@ -201,7 +201,7 @@ Or you can enable the "Force MFA for local authenticated users", which will enfo
 The issuer name shown in authenticator apps (e.g. Google Authenticator, Authy) when users register TOTP defaults to **ZITADEL**. It is not derived from your domain or instance name.
 
 - **Self-hosted:** Set the environment variable `ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_OTP_ISSUER=YourName`. Note that setting this via Helm values (`SystemDefaults.Multifactors.Issuer`) does **not** work — the raw environment variable must be used directly.
-- **ZITADEL Cloud:** The TOTP issuer name is not currently configurable. You can follow and upvote [this discussion](https://github.com/zitadel/zitadel/discussions/5453) to track progress.
+- **ZITADEL Cloud:** The TOTP issuer name is not currently configurable.
 </Callout>
 
 ### Login Lifetimes
