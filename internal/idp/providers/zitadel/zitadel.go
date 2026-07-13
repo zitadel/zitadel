@@ -20,9 +20,9 @@ type Provider struct {
 	*oidc.Provider
 }
 
-func New(issuer, cientID, clientSecret, redirectURI string, scopes []string, httpClient *http.Client, options ...oidc.ProviderOpts) (*Provider, error) {
+func New(issuer, clientID, clientSecret, redirectURI string, scopes []string, httpClient *http.Client, options ...oidc.ProviderOpts) (*Provider, error) {
 	options = append(options, oidc.WithRelyingPartyOption(rp.WithPKCE(nil)))
-	provider, err := oidc.New(name, issuer, cientID, clientSecret, redirectURI, scopes, oidc.DefaultMapper, httpClient, options...)
+	provider, err := oidc.New(name, issuer, clientID, clientSecret, redirectURI, scopes, oidc.DefaultMapper, httpClient, options...)
 	if err != nil {
 		return nil, err
 	}
