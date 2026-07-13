@@ -3674,335 +3674,335 @@
   },
   "th": {
     "common": {
-      "back": "Back",
-      "title": "Login with Zitadel"
+      "back": "ย้อนกลับ",
+      "title": "เข้าสู่ระบบด้วย Zitadel"
     },
     "accounts": {
-      "title": "Accounts",
-      "description": "Select the account you want to use.",
-      "addAnother": "Add another account",
-      "noResults": "No accounts found",
-      "verified": "verified",
-      "expired": "expired"
+      "title": "บัญชี",
+      "description": "เลือกบัญชีที่คุณต้องการใช้",
+      "addAnother": "เพิ่มบัญชีอื่น",
+      "noResults": "ไม่พบบัญชี",
+      "verified": "ยืนยันแล้ว",
+      "expired": "หมดอายุแล้ว"
     },
     "logout": {
-      "title": "Logout",
-      "description": "Click an account to end the session",
-      "noResults": "No accounts found",
-      "clear": "End Session",
-      "verifiedAt": "Last active: {time}",
+      "title": "ออกจากระบบ",
+      "description": "คลิกที่บัญชีเพื่อสิ้นสุดเซสชัน",
+      "noResults": "ไม่พบบัญชี",
+      "clear": "สิ้นสุดเซสชัน",
+      "verifiedAt": "ใช้งานล่าสุด: {time}",
       "success": {
-        "title": "Logout successful",
-        "description": "You have successfully logged out."
+        "title": "ออกจากระบบสำเร็จ",
+        "description": "คุณได้ออกจากระบบเรียบร้อยแล้ว"
       }
     },
     "loginname": {
-      "title": "Welcome back!",
-      "description": "Enter your login details.",
-      "register": "Register new user",
-      "submit": "Continue",
+      "title": "ยินดีต้อนรับกลับมา!",
+      "description": "กรอกรายละเอียดการเข้าสู่ระบบของคุณ",
+      "register": "ลงทะเบียนผู้ใช้ใหม่",
+      "submit": "ดำเนินการต่อ",
       "labels": {
-        "loginname": "Loginname",
-        "username": "Username",
-        "usernameOrPhoneNumber": "Username or phone number",
-        "usernameOrEmail": "Username or email"
+        "loginname": "ชื่อสำหรับเข้าสู่ระบบ",
+        "username": "ชื่อผู้ใช้",
+        "usernameOrPhoneNumber": "ชื่อผู้ใช้หรือหมายเลขโทรศัพท์",
+        "usernameOrEmail": "ชื่อผู้ใช้หรืออีเมล"
       },
       "required": {
-        "loginName": "This field is required"
+        "loginName": "จำเป็นต้องกรอกช่องนี้"
       }
     },
     "password": {
       "verify": {
-        "title": "Password",
-        "description": "Enter your password.",
-        "resetPassword": "Reset Password",
-        "submit": "Continue",
+        "title": "รหัสผ่าน",
+        "description": "กรอกรหัสผ่านของคุณ",
+        "resetPassword": "รีเซ็ตรหัสผ่าน",
+        "submit": "ดำเนินการต่อ",
         "labels": {
-          "password": "Password"
+          "password": "รหัสผ่าน"
         },
         "required": {
-          "password": "This field is required"
+          "password": "จำเป็นต้องกรอกช่องนี้"
         }
       },
       "set": {
-        "title": "Set Password",
-        "description": "Set the password for your account",
-        "codeSent": "A code has been sent to your email address.",
-        "noCodeReceived": "Didn't receive a code?",
-        "resend": "Resend code",
-        "submit": "Continue",
+        "title": "ตั้งรหัสผ่าน",
+        "description": "ตั้งรหัสผ่านสำหรับบัญชีของคุณ",
+        "codeSent": "ได้ส่งรหัสไปยังที่อยู่อีเมลของคุณแล้ว",
+        "noCodeReceived": "ไม่ได้รับรหัสใช่ไหม?",
+        "resend": "ส่งรหัสอีกครั้ง",
+        "submit": "ดำเนินการต่อ",
         "labels": {
-          "code": "Code",
-          "newPassword": "New Password",
-          "confirmPassword": "Confirm Password"
+          "code": "รหัส",
+          "newPassword": "รหัสผ่านใหม่",
+          "confirmPassword": "ยืนยันรหัสผ่าน"
         },
         "required": {
-          "code": "This field is required",
-          "newPassword": "You have to provide a password!",
-          "confirmPassword": "This field is required"
+          "code": "จำเป็นต้องกรอกช่องนี้",
+          "newPassword": "คุณต้องระบุรหัสผ่าน!",
+          "confirmPassword": "จำเป็นต้องกรอกช่องนี้"
         }
       },
       "change": {
-        "title": "Change Password",
-        "description": "Set the password for your account",
-        "submit": "Continue",
+        "title": "เปลี่ยนรหัสผ่าน",
+        "description": "ตั้งรหัสผ่านสำหรับบัญชีของคุณ",
+        "submit": "ดำเนินการต่อ",
         "labels": {
-          "newPassword": "New Password",
-          "confirmPassword": "Confirm Password"
+          "newPassword": "รหัสผ่านใหม่",
+          "confirmPassword": "ยืนยันรหัสผ่าน"
         },
         "required": {
-          "newPassword": "You have to provide a new password!",
-          "confirmPassword": "This field is required"
+          "newPassword": "คุณต้องระบุรหัสผ่านใหม่!",
+          "confirmPassword": "จำเป็นต้องกรอกช่องนี้"
         }
       }
     },
     "idp": {
-      "title": "Sign in with SSO",
-      "description": "Select one of the following providers to sign in",
-      "orSignInWith": "or sign in with",
-      "signInWithApple": "Sign in with Apple",
-      "signInWithGoogle": "Sign in with Google",
-      "signInWithAzureAD": "Sign in with AzureAD",
-      "signInWithGithub": "Sign in with GitHub",
-      "signInWithGitlab": "Sign in with GitLab",
+      "title": "ลงชื่อเข้าใช้ด้วย SSO",
+      "description": "เลือกผู้ให้บริการรายใดรายหนึ่งต่อไปนี้เพื่อลงชื่อเข้าใช้",
+      "orSignInWith": "หรือลงชื่อเข้าใช้ด้วย",
+      "signInWithApple": "ลงชื่อเข้าใช้ด้วย Apple",
+      "signInWithGoogle": "ลงชื่อเข้าใช้ด้วย Google",
+      "signInWithAzureAD": "ลงชื่อเข้าใช้ด้วย AzureAD",
+      "signInWithGithub": "ลงชื่อเข้าใช้ด้วย GitHub",
+      "signInWithGitlab": "ลงชื่อเข้าใช้ด้วย GitLab",
       "loginSuccess": {
-        "title": "Login successful",
-        "description": "You have successfully been loggedIn!"
+        "title": "เข้าสู่ระบบสำเร็จ",
+        "description": "คุณได้เข้าสู่ระบบเรียบร้อยแล้ว!"
       },
       "linkingSuccess": {
-        "title": "Account linked",
-        "description": "You have successfully linked your account!"
+        "title": "เชื่อมโยงบัญชีแล้ว",
+        "description": "คุณได้เชื่อมโยงบัญชีของคุณเรียบร้อยแล้ว!"
       },
       "registerSuccess": {
-        "title": "Registration successful",
-        "description": "You have successfully registered!"
+        "title": "ลงทะเบียนสำเร็จ",
+        "description": "คุณได้ลงทะเบียนเรียบร้อยแล้ว!"
       },
       "loginError": {
-        "title": "Login failed",
-        "description": "An error occurred while trying to login."
+        "title": "เข้าสู่ระบบไม่สำเร็จ",
+        "description": "เกิดข้อผิดพลาดขณะพยายามเข้าสู่ระบบ"
       },
       "linkingError": {
-        "title": "Account linking failed",
-        "description": "An error occurred while trying to link your account."
+        "title": "การเชื่อมโยงบัญชีไม่สำเร็จ",
+        "description": "เกิดข้อผิดพลาดขณะพยายามเชื่อมโยงบัญชีของคุณ"
       },
       "completeRegister": {
-        "title": "Complete your data",
-        "description": "You need to complete your registration by providing your email address and name."
+        "title": "กรอกข้อมูลของคุณให้ครบถ้วน",
+        "description": "คุณต้องกรอกข้อมูลการลงทะเบียนให้ครบถ้วนโดยระบุที่อยู่อีเมลและชื่อของคุณ"
       }
     },
     "ldap": {
-      "title": "LDAP Login",
-      "description": "Enter your LDAP credentials.",
-      "submit": "Continue",
+      "title": "เข้าสู่ระบบด้วย LDAP",
+      "description": "กรอกข้อมูลรับรอง LDAP ของคุณ",
+      "submit": "ดำเนินการต่อ",
       "labels": {
-        "username": "Username",
-        "password": "Password"
+        "username": "ชื่อผู้ใช้",
+        "password": "รหัสผ่าน"
       },
       "required": {
-        "username": "This field is required",
-        "password": "This field is required"
+        "username": "จำเป็นต้องกรอกช่องนี้",
+        "password": "จำเป็นต้องกรอกช่องนี้"
       }
     },
     "mfa": {
       "verify": {
-        "title": "Verify your identity",
-        "description": "Choose one of the following factors.",
-        "noResults": "No second factors available to setup."
+        "title": "ยืนยันตัวตนของคุณ",
+        "description": "เลือกปัจจัยใดปัจจัยหนึ่งต่อไปนี้",
+        "noResults": "ไม่มีปัจจัยที่สองให้ตั้งค่า"
       },
       "set": {
-        "title": "Set up 2-Factor",
-        "description": "Choose one of the following second factors.",
-        "skip": "Skip"
+        "title": "ตั้งค่าการยืนยันตัวตนแบบ 2 ปัจจัย",
+        "description": "เลือกปัจจัยที่สองปัจจัยใดปัจจัยหนึ่งต่อไปนี้",
+        "skip": "ข้าม"
       }
     },
     "otp": {
       "verify": {
-        "title": "Verify 2-Factor",
-        "totpDescription": "Enter the code from your authenticator app.",
-        "smsDescription": "Enter the code you received via SMS.",
-        "emailDescription": "Enter the code you received via email.",
-        "noCodeReceived": "Didn't receive a code?",
-        "resendCode": "Resend code",
-        "submit": "Continue",
+        "title": "ยืนยันการยืนยันตัวตนแบบ 2 ปัจจัย",
+        "totpDescription": "กรอกรหัสจากแอปยืนยันตัวตนของคุณ",
+        "smsDescription": "กรอกรหัสที่คุณได้รับทาง SMS",
+        "emailDescription": "กรอกรหัสที่คุณได้รับทางอีเมล",
+        "noCodeReceived": "ไม่ได้รับรหัสใช่ไหม?",
+        "resendCode": "ส่งรหัสอีกครั้ง",
+        "submit": "ดำเนินการต่อ",
         "labels": {
-          "code": "Code"
+          "code": "รหัส"
         },
         "required": {
-          "code": "This field is required"
+          "code": "จำเป็นต้องกรอกช่องนี้"
         }
       },
       "set": {
-        "title": "Set up 2-Factor",
-        "totpDescription": "Scan the QR code with your authenticator app.",
-        "smsDescription": "Enter your phone number to receive a code via SMS.",
-        "emailDescription": "Enter your email address to receive a code via email.",
-        "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
-        "submit": "Continue",
+        "title": "ตั้งค่าการยืนยันตัวตนแบบ 2 ปัจจัย",
+        "totpDescription": "สแกน QR code ด้วยแอปยืนยันตัวตนของคุณ",
+        "smsDescription": "กรอกหมายเลขโทรศัพท์ของคุณเพื่อรับรหัสทาง SMS",
+        "emailDescription": "กรอกที่อยู่อีเมลของคุณเพื่อรับรหัสทางอีเมล",
+        "totpRegisterDescription": "สแกน QR Code หรือไปยัง URL ด้วยตนเอง",
+        "submit": "ดำเนินการต่อ",
         "labels": {
-          "code": "Code"
+          "code": "รหัส"
         },
         "required": {
-          "code": "This field is required"
+          "code": "จำเป็นต้องกรอกช่องนี้"
         }
       }
     },
     "passkey": {
       "verify": {
-        "title": "Authenticate with a passkey",
-        "description": "Your device will ask for your fingerprint, face, or screen lock",
-        "usePassword": "Use password",
-        "submit": "Continue"
+        "title": "ยืนยันตัวตนด้วยพาสคีย์",
+        "description": "อุปกรณ์ของคุณจะขอลายนิ้วมือ ใบหน้า หรือการล็อกหน้าจอของคุณ",
+        "usePassword": "ใช้รหัสผ่าน",
+        "submit": "ดำเนินการต่อ"
       },
       "set": {
-        "title": "Setup a passkey",
-        "description": "Your device will ask for your fingerprint, face, or screen lock",
+        "title": "ตั้งค่าพาสคีย์",
+        "description": "อุปกรณ์ของคุณจะขอลายนิ้วมือ ใบหน้า หรือการล็อกหน้าจอของคุณ",
         "info": {
-          "description": "A passkey is an authentication method on a device like your fingerprint, Apple FaceID or similar. ",
-          "link": "passkey Authentication"
+          "description": "พาสคีย์เป็นวิธีการยืนยันตัวตนบนอุปกรณ์ เช่น ลายนิ้วมือ Apple FaceID หรือวิธีที่คล้ายกัน ",
+          "link": "การยืนยันตัวตนด้วยพาสคีย์"
         },
-        "skip": "Skip",
-        "submit": "Continue"
+        "skip": "ข้าม",
+        "submit": "ดำเนินการต่อ"
       }
     },
     "u2f": {
       "verify": {
-        "title": "Verify 2-Factor",
-        "description": "Verify your account with your device."
+        "title": "ยืนยันการยืนยันตัวตนแบบ 2 ปัจจัย",
+        "description": "ยืนยันบัญชีของคุณด้วยอุปกรณ์ของคุณ"
       },
       "set": {
-        "title": "Set up 2-Factor",
-        "description": "Set up a device as a second factor.",
-        "submit": "Continue"
+        "title": "ตั้งค่าการยืนยันตัวตนแบบ 2 ปัจจัย",
+        "description": "ตั้งค่าอุปกรณ์เป็นปัจจัยที่สอง",
+        "submit": "ดำเนินการต่อ"
       }
     },
     "register": {
       "methods": {
-        "passkey": "Passkey",
-        "password": "Password"
+        "passkey": "พาสคีย์",
+        "password": "รหัสผ่าน"
       },
       "disabled": {
-        "title": "Registration disabled",
-        "description": "The registration is disabled. Please contact your administrator."
+        "title": "การลงทะเบียนถูกปิดใช้งาน",
+        "description": "การลงทะเบียนถูกปิดใช้งาน กรุณาติดต่อผู้ดูแลระบบของคุณ"
       },
       "missingdata": {
-        "title": "Missing data",
-        "description": "Provide email, first and last name to register."
+        "title": "ข้อมูลไม่ครบถ้วน",
+        "description": "ระบุอีเมล ชื่อ และนามสกุลเพื่อลงทะเบียน"
       },
-      "title": "Register",
-      "description": "Create your Zitadel account.",
-      "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
-      "selectMethod": "Select the method you would like to authenticate",
-      "agreeTo": "To register you must agree to the terms and conditions",
-      "termsOfService": "Terms of Service",
-      "privacyPolicy": "Privacy Policy",
-      "submit": "Continue",
+      "title": "ลงทะเบียน",
+      "description": "สร้างบัญชี Zitadel ของคุณ",
+      "noMethodAvailableWarning": "ไม่มีวิธีการยืนยันตัวตนที่ใช้ได้ กรุณาติดต่อผู้ดูแลระบบของคุณ",
+      "selectMethod": "เลือกวิธีที่คุณต้องการใช้ยืนยันตัวตน",
+      "agreeTo": "เพื่อลงทะเบียน คุณต้องยอมรับข้อกำหนดและเงื่อนไข",
+      "termsOfService": "ข้อกำหนดในการให้บริการ",
+      "privacyPolicy": "นโยบายความเป็นส่วนตัว",
+      "submit": "ดำเนินการต่อ",
       "password": {
-        "title": "Set Password",
-        "description": "Set the password for your account",
-        "submit": "Continue",
+        "title": "ตั้งรหัสผ่าน",
+        "description": "ตั้งรหัสผ่านสำหรับบัญชีของคุณ",
+        "submit": "ดำเนินการต่อ",
         "labels": {
-          "password": "Password",
-          "confirmPassword": "Confirm Password"
+          "password": "รหัสผ่าน",
+          "confirmPassword": "ยืนยันรหัสผ่าน"
         },
         "required": {
-          "password": "You have to provide a password!",
-          "confirmPassword": "This field is required"
+          "password": "คุณต้องระบุรหัสผ่าน!",
+          "confirmPassword": "จำเป็นต้องกรอกช่องนี้"
         }
       },
       "labels": {
-        "firstname": "First name",
-        "lastname": "Last name",
-        "email": "E-mail"
+        "firstname": "ชื่อจริง",
+        "lastname": "นามสกุล",
+        "email": "อีเมล"
       },
       "required": {
-        "firstname": "This field is required",
-        "lastname": "This field is required",
-        "email": "This field is required"
+        "firstname": "จำเป็นต้องกรอกช่องนี้",
+        "lastname": "จำเป็นต้องกรอกช่องนี้",
+        "email": "จำเป็นต้องกรอกช่องนี้"
       }
     },
     "invite": {
-      "title": "Invite User",
-      "description": "Provide the email address and the name of the user you want to invite.",
-      "info": "The user will receive an email with further instructions.",
-      "notAllowed": "Your settings do not allow you to invite users.",
-      "submit": "Continue",
+      "title": "เชิญผู้ใช้",
+      "description": "ระบุที่อยู่อีเมลและชื่อของผู้ใช้ที่คุณต้องการเชิญ",
+      "info": "ผู้ใช้จะได้รับอีเมลพร้อมคำแนะนำเพิ่มเติม",
+      "notAllowed": "การตั้งค่าของคุณไม่อนุญาตให้คุณเชิญผู้ใช้",
+      "submit": "ดำเนินการต่อ",
       "success": {
-        "title": "User invited",
-        "description": "The email has successfully been sent.",
-        "verified": "The user has been invited and has already verified his email.",
-        "notVerifiedYet": "The user has been invited. They will receive an email with further instructions.",
-        "submit": "Invite another user"
+        "title": "เชิญผู้ใช้แล้ว",
+        "description": "ส่งอีเมลเรียบร้อยแล้ว",
+        "verified": "ผู้ใช้ได้รับคำเชิญและยืนยันอีเมลเรียบร้อยแล้ว",
+        "notVerifiedYet": "ผู้ใช้ได้รับคำเชิญแล้ว พวกเขาจะได้รับอีเมลพร้อมคำแนะนำเพิ่มเติม",
+        "submit": "เชิญผู้ใช้อีกคน"
       }
     },
     "signedin": {
-      "title": "Welcome {user}!",
-      "description": "You are signed in.",
-      "continue": "Continue",
+      "title": "ยินดีต้อนรับ {user}!",
+      "description": "คุณลงชื่อเข้าใช้แล้ว",
+      "continue": "ดำเนินการต่อ",
       "error": {
-        "title": "Error",
-        "description": "An error occurred while trying to sign in."
+        "title": "ข้อผิดพลาด",
+        "description": "เกิดข้อผิดพลาดขณะพยายามลงชื่อเข้าใช้"
       }
     },
     "verify": {
-      "userIdMissing": "No userId provided!",
-      "successTitle": "User verified",
-      "successDescription": "The user has been verified successfully.",
-      "setupAuthenticator": "Setup authenticator",
+      "userIdMissing": "ไม่ได้ระบุ userId!",
+      "successTitle": "ยืนยันผู้ใช้แล้ว",
+      "successDescription": "ยืนยันผู้ใช้เรียบร้อยแล้ว",
+      "setupAuthenticator": "ตั้งค่าตัวยืนยันตัวตน",
       "verify": {
-        "title": "Verify user",
-        "description": "Enter the Code provided in the verification email.",
-        "noCodeReceived": "Didn't receive a code?",
-        "resendCode": "Resend code",
-        "codeSent": "A code has just been sent to your email address.",
-        "submit": "Continue",
+        "title": "ยืนยันผู้ใช้",
+        "description": "กรอกรหัสที่ระบุไว้ในอีเมลยืนยัน",
+        "noCodeReceived": "ไม่ได้รับรหัสใช่ไหม?",
+        "resendCode": "ส่งรหัสอีกครั้ง",
+        "codeSent": "เพิ่งส่งรหัสไปยังที่อยู่อีเมลของคุณแล้ว",
+        "submit": "ดำเนินการต่อ",
         "labels": {
-          "code": "Code"
+          "code": "รหัส"
         },
         "required": {
-          "code": "This field is required"
+          "code": "จำเป็นต้องกรอกช่องนี้"
         }
       }
     },
     "authenticator": {
-      "title": "Choose authentication method",
-      "description": "Select the method you would like to authenticate",
-      "noMethodsAvailable": "No authentication methods available",
-      "allSetup": "You have already setup an authenticator!",
-      "linkWithIDP": "or link with an Identity Provider"
+      "title": "เลือกวิธีการยืนยันตัวตน",
+      "description": "เลือกวิธีที่คุณต้องการใช้ยืนยันตัวตน",
+      "noMethodsAvailable": "ไม่มีวิธีการยืนยันตัวตนที่ใช้ได้",
+      "allSetup": "คุณตั้งค่าตัวยืนยันตัวตนไว้แล้ว!",
+      "linkWithIDP": "หรือเชื่อมโยงกับผู้ให้บริการข้อมูลประจำตัว"
     },
     "device": {
       "usercode": {
-        "title": "Device code",
-        "description": "Enter the code displayed on your app or device.",
-        "submit": "Continue",
+        "title": "รหัสอุปกรณ์",
+        "description": "กรอกรหัสที่แสดงบนแอปหรืออุปกรณ์ของคุณ",
+        "submit": "ดำเนินการต่อ",
         "labels": {
-          "code": "Code"
+          "code": "รหัส"
         },
         "required": {
-          "code": "This field is required"
+          "code": "จำเป็นต้องกรอกช่องนี้"
         }
       },
       "request": {
-        "title": "{appName} would like to connect",
-        "description": "{appName} will have access to:",
-        "disclaimer": "By clicking Allow, you allow {appName} and Zitadel to use your information in accordance with their respective terms of service and privacy policies. You can revoke this access at any time.",
-        "submit": "Allow",
-        "deny": "Deny"
+        "title": "{appName} ต้องการเชื่อมต่อ",
+        "description": "{appName} จะสามารถเข้าถึง:",
+        "disclaimer": "เมื่อคลิกอนุญาต คุณอนุญาตให้ {appName} และ Zitadel ใช้ข้อมูลของคุณตามข้อกำหนดในการให้บริการและนโยบายความเป็นส่วนตัวของแต่ละฝ่าย คุณสามารถเพิกถอนการเข้าถึงนี้ได้ทุกเมื่อ",
+        "submit": "อนุญาต",
+        "deny": "ปฏิเสธ"
       },
       "scope": {
-        "openid": "Verify your identity.",
-        "email": "View your email address.",
-        "profile": "View your full profile information.",
-        "offline_access": "Allow offline access to your account."
+        "openid": "ยืนยันตัวตนของคุณ",
+        "email": "ดูที่อยู่อีเมลของคุณ",
+        "profile": "ดูข้อมูลโปรไฟล์ทั้งหมดของคุณ",
+        "offline_access": "อนุญาตการเข้าถึงบัญชีของคุณแบบออฟไลน์"
       }
     },
     "error": {
-      "noUserCode": "No user code provided!",
-      "noDeviceRequest": "No device request found.",
-      "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam.",
-      "sessionExpired": "Your current session has expired. Please login again.",
-      "failedLoading": "Failed to load data. Please try again.",
-      "tryagain": "Try Again"
+      "noUserCode": "ไม่ได้ระบุรหัสผู้ใช้!",
+      "noDeviceRequest": "ไม่พบคำขออุปกรณ์",
+      "unknownContext": "ไม่สามารถระบุบริบทของผู้ใช้ได้ กรุณากรอกชื่อผู้ใช้ก่อน หรือระบุ loginName เป็น searchParam",
+      "sessionExpired": "เซสชันปัจจุบันของคุณหมดอายุแล้ว กรุณาเข้าสู่ระบบอีกครั้ง",
+      "failedLoading": "โหลดข้อมูลไม่สำเร็จ กรุณาลองอีกครั้ง",
+      "tryagain": "ลองอีกครั้ง"
     }
   }
 }

@@ -1,461 +1,461 @@
 {
   "common": {
-    "back": "Back",
-    "title": "Login with Zitadel"
+    "back": "ย้อนกลับ",
+    "title": "เข้าสู่ระบบด้วย Zitadel"
   },
   "accounts": {
-    "title": "Accounts",
-    "description": "Select the account you want to use.",
-    "addAnother": "Add another account",
-    "noResults": "No accounts found",
-    "verified": "verified",
-    "expired": "expired"
+    "title": "บัญชี",
+    "description": "เลือกบัญชีที่คุณต้องการใช้",
+    "addAnother": "เพิ่มบัญชีอื่น",
+    "noResults": "ไม่พบบัญชี",
+    "verified": "ยืนยันแล้ว",
+    "expired": "หมดอายุ"
   },
   "logout": {
-    "title": "Logout",
-    "description": "Click an account to end the session",
-    "noResults": "No accounts found",
-    "clear": "End Session",
-    "verifiedAt": "Last active: {time}",
+    "title": "ออกจากระบบ",
+    "description": "คลิกบัญชีเพื่อสิ้นสุดเซสชัน",
+    "noResults": "ไม่พบบัญชี",
+    "clear": "สิ้นสุดเซสชัน",
+    "verifiedAt": "ใช้งานล่าสุด: {time}",
     "success": {
-      "title": "Logout successful",
-      "description": "You have successfully logged out."
+      "title": "ออกจากระบบสำเร็จ",
+      "description": "คุณได้ออกจากระบบเรียบร้อยแล้ว"
     }
   },
   "loginname": {
-    "title": "Welcome back!",
-    "description": "Enter your login details.",
-    "register": "Register new user",
-    "submit": "Continue",
+    "title": "ยินดีต้อนรับกลับมา!",
+    "description": "กรอกรายละเอียดสำหรับเข้าสู่ระบบของคุณ",
+    "register": "ลงทะเบียนผู้ใช้ใหม่",
+    "submit": "ดำเนินการต่อ",
     "labels": {
-      "loginname": "Loginname",
-      "username": "Username",
-      "usernameOrPhoneNumber": "Username or phone number",
-      "usernameOrEmail": "Username or email"
+      "loginname": "ชื่อสำหรับเข้าสู่ระบบ",
+      "username": "ชื่อผู้ใช้",
+      "usernameOrPhoneNumber": "ชื่อผู้ใช้หรือหมายเลขโทรศัพท์",
+      "usernameOrEmail": "ชื่อผู้ใช้หรืออีเมล"
     },
     "required": {
-      "loginName": "This field is required"
+      "loginName": "จำเป็นต้องกรอกข้อมูลในช่องนี้"
     },
     "errors": {
-      "internalError": "An internal error occurred",
-      "couldNotGetLoginSettings": "Could not get login settings",
-      "couldNotSearchUsers": "Could not search users",
-      "couldNotGetDomain": "Could not get domain",
-      "couldNotGetHost": "Could not get host",
-      "couldNotStartIDPFlow": "Could not start IDP flow",
-      "moreThanOneUserFound": "More than one user found. Provide a unique identifier.",
-      "userNotFound": "User not found in the system",
-      "couldNotCreateSession": "Could not create session for user",
-      "initialUserNotSupported": "Initial User not supported",
-      "localAuthenticationNotAllowed": "Local authentication is not allowed! Contact your administrator for more information.",
-      "passkeysNotAllowed": "Passkeys not allowed! Contact your administrator for more information.",
-      "couldNotFindIdentityProvider": "Could not find identity provider.",
-      "userNotActive": "User is not active. Contact your administrator for more information."
+      "internalError": "เกิดข้อผิดพลาดภายในระบบ",
+      "couldNotGetLoginSettings": "ไม่สามารถรับการตั้งค่าการเข้าสู่ระบบได้",
+      "couldNotSearchUsers": "ไม่สามารถค้นหาผู้ใช้ได้",
+      "couldNotGetDomain": "ไม่สามารถรับโดเมนได้",
+      "couldNotGetHost": "ไม่สามารถรับโฮสต์ได้",
+      "couldNotStartIDPFlow": "ไม่สามารถเริ่มต้นกระบวนการ IDP ได้",
+      "moreThanOneUserFound": "พบผู้ใช้มากกว่าหนึ่งราย โปรดระบุตัวระบุที่ไม่ซ้ำกัน",
+      "userNotFound": "ไม่พบผู้ใช้ในระบบ",
+      "couldNotCreateSession": "ไม่สามารถสร้างเซสชันสำหรับผู้ใช้ได้",
+      "initialUserNotSupported": "ไม่รองรับผู้ใช้เริ่มต้น",
+      "localAuthenticationNotAllowed": "ไม่อนุญาตให้ใช้การยืนยันตัวตนภายในเครื่อง! โปรดติดต่อผู้ดูแลระบบของคุณเพื่อขอข้อมูลเพิ่มเติม",
+      "passkeysNotAllowed": "ไม่อนุญาตให้ใช้พาสคีย์! โปรดติดต่อผู้ดูแลระบบของคุณเพื่อขอข้อมูลเพิ่มเติม",
+      "couldNotFindIdentityProvider": "ไม่พบผู้ให้บริการข้อมูลประจำตัว",
+      "userNotActive": "ผู้ใช้ไม่ได้ใช้งานอยู่ โปรดติดต่อผู้ดูแลระบบของคุณเพื่อขอข้อมูลเพิ่มเติม"
     }
   },
   "zitadel": {
     "errors": {
-      "errorOccured": "An error occurred",
-      "multipleUsersFound": "Multiple users found",
-      "userNotFound": "User not found in the system"
+      "errorOccured": "เกิดข้อผิดพลาด",
+      "multipleUsersFound": "พบผู้ใช้หลายราย",
+      "userNotFound": "ไม่พบผู้ใช้ในระบบ"
     }
   },
   "password": {
     "verify": {
-      "title": "Password",
-      "description": "Enter your password.",
-      "resetPassword": "Reset Password",
-      "submit": "Continue",
+      "title": "รหัสผ่าน",
+      "description": "กรอกรหัสผ่านของคุณ",
+      "resetPassword": "รีเซ็ตรหัสผ่าน",
+      "submit": "ดำเนินการต่อ",
       "labels": {
-        "password": "Password"
+        "password": "รหัสผ่าน"
       },
       "required": {
-        "password": "This field is required"
+        "password": "จำเป็นต้องกรอกข้อมูลในช่องนี้"
       },
       "errors": {
-        "couldNotVerifyPassword": "Could not verify password",
-        "couldNotResetPassword": "Could not reset password"
+        "couldNotVerifyPassword": "ไม่สามารถยืนยันรหัสผ่านได้",
+        "couldNotResetPassword": "ไม่สามารถรีเซ็ตรหัสผ่านได้"
       },
       "info": {
-        "passwordResetSent": "Password was reset. Please check your email"
+        "passwordResetSent": "รีเซ็ตรหัสผ่านแล้ว โปรดตรวจสอบอีเมลของคุณ"
       }
     },
     "set": {
-      "title": "Set Password",
-      "description": "Set the password for your account",
-      "codeSent": "A new code has been sent to your email address.",
-      "noCodeReceived": "Didn't receive a code?",
-      "resend": "Resend code",
-      "submit": "Continue",
+      "title": "ตั้งรหัสผ่าน",
+      "description": "ตั้งรหัสผ่านสำหรับบัญชีของคุณ",
+      "codeSent": "ได้ส่งรหัสใหม่ไปยังที่อยู่อีเมลของคุณแล้ว",
+      "noCodeReceived": "ไม่ได้รับรหัสใช่ไหม?",
+      "resend": "ส่งรหัสอีกครั้ง",
+      "submit": "ดำเนินการต่อ",
       "labels": {
-        "code": "Code",
-        "newPassword": "New Password",
-        "confirmPassword": "Confirm Password"
+        "code": "รหัส",
+        "newPassword": "รหัสผ่านใหม่",
+        "confirmPassword": "ยืนยันรหัสผ่าน"
       },
       "required": {
-        "code": "This field is required",
-        "newPassword": "You have to provide a password!",
-        "confirmPassword": "This field is required"
+        "code": "จำเป็นต้องกรอกข้อมูลในช่องนี้",
+        "newPassword": "คุณต้องระบุรหัสผ่าน!",
+        "confirmPassword": "จำเป็นต้องกรอกข้อมูลในช่องนี้"
       },
       "errors": {
-        "couldNotSetPassword": "Could not set password",
-        "couldNotResetPassword": "Could not reset password",
-        "couldNotVerifyPassword": "Could not verify password"
+        "couldNotSetPassword": "ไม่สามารถตั้งรหัสผ่านได้",
+        "couldNotResetPassword": "ไม่สามารถรีเซ็ตรหัสผ่านได้",
+        "couldNotVerifyPassword": "ไม่สามารถยืนยันรหัสผ่านได้"
       }
     },
     "change": {
-      "title": "Change Password",
-      "description": "Set the password for your account",
-      "submit": "Continue",
+      "title": "เปลี่ยนรหัสผ่าน",
+      "description": "ตั้งรหัสผ่านสำหรับบัญชีของคุณ",
+      "submit": "ดำเนินการต่อ",
       "labels": {
-        "currentPassword": "Current Password",
-        "newPassword": "New Password",
-        "confirmPassword": "Confirm Password"
+        "currentPassword": "รหัสผ่านปัจจุบัน",
+        "newPassword": "รหัสผ่านใหม่",
+        "confirmPassword": "ยืนยันรหัสผ่าน"
       },
       "required": {
-        "currentPassword": "You have to provide your current password!",
-        "newPassword": "You have to provide a new password!",
-        "confirmPassword": "This field is required"
+        "currentPassword": "คุณต้องระบุรหัสผ่านปัจจุบันของคุณ!",
+        "newPassword": "คุณต้องระบุรหัสผ่านใหม่!",
+        "confirmPassword": "จำเป็นต้องกรอกข้อมูลในช่องนี้"
       },
       "errors": {
-        "currentPasswordInvalid": "Current password is incorrect.",
-        "couldNotChangePassword": "Could not change password",
-        "couldNotVerifyPassword": "Could not verify password",
-        "unknownError": "Unknown error"
+        "currentPasswordInvalid": "รหัสผ่านปัจจุบันไม่ถูกต้อง",
+        "couldNotChangePassword": "ไม่สามารถเปลี่ยนรหัสผ่านได้",
+        "couldNotVerifyPassword": "ไม่สามารถยืนยันรหัสผ่านได้",
+        "unknownError": "ข้อผิดพลาดที่ไม่รู้จัก"
       }
     },
     "complexity": {
-      "length": "Must be at least {minLength} characters long.",
-      "hasSymbol": "Must include a symbol.",
-      "hasNumber": "Must include a number.",
-      "hasUppercase": "Must include an uppercase letter.",
-      "hasLowercase": "Must include a lowercase letter.",
-      "equals": "Password confirmation matched.",
-      "matches": "Matches",
-      "doesNotMatch": "Doesn't match"
+      "length": "ต้องมีความยาวอย่างน้อย {minLength} ตัวอักษร",
+      "hasSymbol": "ต้องมีสัญลักษณ์",
+      "hasNumber": "ต้องมีตัวเลข",
+      "hasUppercase": "ต้องมีตัวอักษรพิมพ์ใหญ่",
+      "hasLowercase": "ต้องมีตัวอักษรพิมพ์เล็ก",
+      "equals": "การยืนยันรหัสผ่านตรงกัน",
+      "matches": "ตรงกัน",
+      "doesNotMatch": "ไม่ตรงกัน"
     },
     "errors": {
-      "noHostFound": "No host found",
-      "couldNotSendResetLink": "Could not send Password Reset Link",
-      "couldNotCreateSessionForUser": "Could not create session for user",
-      "couldNotVerifyPassword": "Could not verify password",
-      "failedToAuthenticate": "Failed to authenticate. You had {failedAttempts} of {maxPasswordAttempts} password attempts.{lockoutMessage}",
-      "failedToAuthenticateNoLimit": "Failed to authenticate.",
-      "accountLockedContactAdmin": " Contact your administrator to unlock your account",
-      "userNotFound": "User not found in the system",
-      "initialUserNotSupported": "Initial User not supported",
-      "userInitialStateNotSupported": "User Initial State is not supported",
-      "codeOrVerificationRequired": "You have to provide a code or have a valid User Verification Check",
-      "verificationRequired": "User Verification Check has to be done",
-      "couldNotLoadSession": "Could not load session",
-      "couldNotLoadAuthMethods": "Could not load auth methods",
-      "failedPrecondition": "Failed precondition",
-      "sessionNotValid": "Session is not valid",
-      "passwordVerificationMissing": "Password verification is missing.",
-      "passwordVerificationTooOld": "Password verification is too old. Please verify your password again."
+      "noHostFound": "ไม่พบโฮสต์",
+      "couldNotSendResetLink": "ไม่สามารถส่งลิงก์รีเซ็ตรหัสผ่านได้",
+      "couldNotCreateSessionForUser": "ไม่สามารถสร้างเซสชันสำหรับผู้ใช้ได้",
+      "couldNotVerifyPassword": "ไม่สามารถยืนยันรหัสผ่านได้",
+      "failedToAuthenticate": "การยืนยันตัวตนล้มเหลว คุณใช้ความพยายามในการกรอกรหัสผ่านไปแล้ว {failedAttempts} จาก {maxPasswordAttempts} ครั้ง{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "การยืนยันตัวตนล้มเหลว",
+      "accountLockedContactAdmin": " โปรดติดต่อผู้ดูแลระบบของคุณเพื่อปลดล็อกบัญชีของคุณ",
+      "userNotFound": "ไม่พบผู้ใช้ในระบบ",
+      "initialUserNotSupported": "ไม่รองรับผู้ใช้เริ่มต้น",
+      "userInitialStateNotSupported": "ไม่รองรับสถานะเริ่มต้นของผู้ใช้",
+      "codeOrVerificationRequired": "คุณต้องระบุรหัสหรือผ่านการตรวจสอบการยืนยันตัวตนผู้ใช้ที่ถูกต้อง",
+      "verificationRequired": "ต้องดำเนินการตรวจสอบการยืนยันตัวตนผู้ใช้",
+      "couldNotLoadSession": "ไม่สามารถโหลดเซสชันได้",
+      "couldNotLoadAuthMethods": "ไม่สามารถโหลดวิธีการยืนยันตัวตนได้",
+      "failedPrecondition": "เงื่อนไขเบื้องต้นล้มเหลว",
+      "sessionNotValid": "เซสชันไม่ถูกต้อง",
+      "passwordVerificationMissing": "ไม่มีการยืนยันรหัสผ่าน",
+      "passwordVerificationTooOld": "การยืนยันรหัสผ่านเก่าเกินไป โปรดยืนยันรหัสผ่านของคุณอีกครั้ง"
     }
   },
   "idp": {
-    "title": "Sign in with SSO",
-    "description": "Select one of the following providers to sign in",
-    "orSignInWith": "or sign in with",
-    "signInWithApple": "Sign in with Apple",
-    "signInWithGoogle": "Sign in with Google",
-    "signInWithAzureAD": "Sign in with AzureAD",
-    "signInWithGithub": "Sign in with GitHub",
-    "signInWithGitlab": "Sign in with GitLab",
+    "title": "ลงชื่อเข้าใช้ด้วย SSO",
+    "description": "เลือกผู้ให้บริการรายใดรายหนึ่งต่อไปนี้เพื่อลงชื่อเข้าใช้",
+    "orSignInWith": "หรือลงชื่อเข้าใช้ด้วย",
+    "signInWithApple": "ลงชื่อเข้าใช้ด้วย Apple",
+    "signInWithGoogle": "ลงชื่อเข้าใช้ด้วย Google",
+    "signInWithAzureAD": "ลงชื่อเข้าใช้ด้วย AzureAD",
+    "signInWithGithub": "ลงชื่อเข้าใช้ด้วย GitHub",
+    "signInWithGitlab": "ลงชื่อเข้าใช้ด้วย GitLab",
     "loginError": {
-      "title": "Login failed",
-      "description": "An error occurred while trying to login."
+      "title": "การเข้าสู่ระบบล้มเหลว",
+      "description": "เกิดข้อผิดพลาดขณะพยายามเข้าสู่ระบบ"
     },
     "linkingError": {
-      "title": "Account linking failed",
-      "description": "An error occurred while trying to link your account."
+      "title": "การเชื่อมโยงบัญชีล้มเหลว",
+      "description": "เกิดข้อผิดพลาดขณะพยายามเชื่อมโยงบัญชีของคุณ"
     },
     "completeRegister": {
-      "title": "Complete your data",
-      "description": "You need to complete your registration by providing your email address and name."
+      "title": "กรอกข้อมูลของคุณให้ครบถ้วน",
+      "description": "คุณต้องกรอกข้อมูลการลงทะเบียนให้ครบถ้วนโดยระบุที่อยู่อีเมลและชื่อของคุณ"
     },
     "accountNotFound": {
-      "title": "Account Not Found",
-      "description": "We couldn't find an account associated with your identity provider credentials.",
-      "info": "No existing account was found. Please sign in with an existing account or contact your administrator for assistance.",
-      "backToLogin": "Back to Login"
+      "title": "ไม่พบบัญชี",
+      "description": "เราไม่พบบัญชีที่เชื่อมโยงกับข้อมูลรับรองจากผู้ให้บริการข้อมูลประจำตัวของคุณ",
+      "info": "ไม่พบบัญชีที่มีอยู่ โปรดลงชื่อเข้าใช้ด้วยบัญชีที่มีอยู่หรือติดต่อผู้ดูแลระบบของคุณเพื่อขอความช่วยเหลือ",
+      "backToLogin": "กลับไปที่การเข้าสู่ระบบ"
     },
     "registrationFailed": {
-      "title": "Registration Not Available",
-      "description": "We couldn't complete the registration process.",
-      "info": "Unable to determine the organization for registration. Please contact your administrator for assistance.",
-      "backToLogin": "Back to Login"
+      "title": "ไม่สามารถลงทะเบียนได้",
+      "description": "เราไม่สามารถดำเนินกระบวนการลงทะเบียนให้เสร็จสมบูรณ์ได้",
+      "info": "ไม่สามารถระบุองค์กรสำหรับการลงทะเบียนได้ โปรดติดต่อผู้ดูแลระบบของคุณเพื่อขอความช่วยเหลือ",
+      "backToLogin": "กลับไปที่การเข้าสู่ระบบ"
     },
     "processing": {
-      "message": "Processing authentication...",
-      "noRedirect": "No redirect or error returned from server",
-      "unexpectedError": "An unexpected error occurred"
+      "message": "กำลังดำเนินการยืนยันตัวตน...",
+      "noRedirect": "ไม่มีการเปลี่ยนเส้นทางหรือข้อผิดพลาดที่ส่งกลับมาจากเซิร์ฟเวอร์",
+      "unexpectedError": "เกิดข้อผิดพลาดที่ไม่คาดคิด"
     },
     "errors": {
-      "missingParameters": "Missing required parameters",
-      "missingIdpInfo": "IDP information missing",
-      "idpNotFound": "Identity provider not found",
-      "linkingNotAllowed": "Linking is not allowed for this identity provider",
-      "linkingFailed": "Failed to link identity provider to account",
-      "autoLinkingFailed": "Failed to automatically link account",
-      "userCreationFailed": "Failed to create user account",
-      "orgResolutionFailed": "Could not determine organization for registration",
-      "sessionCreationFailed": "Could not create session or determine redirect",
-      "unknownError": "An unknown error occurred"
+      "missingParameters": "ขาดพารามิเตอร์ที่จำเป็น",
+      "missingIdpInfo": "ขาดข้อมูล IDP",
+      "idpNotFound": "ไม่พบผู้ให้บริการข้อมูลประจำตัว",
+      "linkingNotAllowed": "ไม่อนุญาตให้เชื่อมโยงกับผู้ให้บริการข้อมูลประจำตัวนี้",
+      "linkingFailed": "ไม่สามารถเชื่อมโยงผู้ให้บริการข้อมูลประจำตัวกับบัญชีได้",
+      "autoLinkingFailed": "ไม่สามารถเชื่อมโยงบัญชีโดยอัตโนมัติได้",
+      "userCreationFailed": "ไม่สามารถสร้างบัญชีผู้ใช้ได้",
+      "orgResolutionFailed": "ไม่สามารถระบุองค์กรสำหรับการลงทะเบียนได้",
+      "sessionCreationFailed": "ไม่สามารถสร้างเซสชันหรือระบุการเปลี่ยนเส้นทางได้",
+      "unknownError": "เกิดข้อผิดพลาดที่ไม่รู้จัก"
     }
   },
   "ldap": {
-    "title": "LDAP Login",
-    "description": "Enter your LDAP credentials.",
-    "submit": "Continue",
+    "title": "เข้าสู่ระบบด้วย LDAP",
+    "description": "กรอกข้อมูลรับรอง LDAP ของคุณ",
+    "submit": "ดำเนินการต่อ",
     "labels": {
-      "username": "Username",
-      "password": "Password"
+      "username": "ชื่อผู้ใช้",
+      "password": "รหัสผ่าน"
     },
     "required": {
-      "username": "This field is required",
-      "password": "This field is required"
+      "username": "จำเป็นต้องกรอกข้อมูลในช่องนี้",
+      "password": "จำเป็นต้องกรอกข้อมูลในช่องนี้"
     }
   },
   "mfa": {
     "verify": {
-      "title": "Verify your identity",
-      "description": "Choose one of the following factors.",
-      "noResults": "No second factors available to setup."
+      "title": "ยืนยันตัวตนของคุณ",
+      "description": "เลือกปัจจัยรายการใดรายการหนึ่งต่อไปนี้",
+      "noResults": "ไม่มีปัจจัยที่สองให้ตั้งค่า"
     },
     "set": {
-      "title": "Set up 2-Factor",
-      "description": "Choose one of the following second factors.",
-      "skip": "Skip"
+      "title": "ตั้งค่าการยืนยันตัวตนแบบ 2 ปัจจัย",
+      "description": "เลือกปัจจัยที่สองรายการใดรายการหนึ่งต่อไปนี้",
+      "skip": "ข้าม"
     }
   },
   "otp": {
     "verify": {
-      "title": "Verify 2-Factor",
-      "totpDescription": "Enter the code from your authenticator app.",
-      "smsDescription": "Enter the code you received via SMS.",
-      "emailDescription": "Enter the code you received via email.",
-      "noCodeReceived": "Didn't receive a code?",
-      "resendCode": "Resend code",
-      "submit": "Continue",
+      "title": "ยืนยันการยืนยันตัวตนแบบ 2 ปัจจัย",
+      "totpDescription": "กรอกรหัสจากแอปยืนยันตัวตนของคุณ",
+      "smsDescription": "กรอกรหัสที่คุณได้รับผ่าน SMS",
+      "emailDescription": "กรอกรหัสที่คุณได้รับผ่านอีเมล",
+      "noCodeReceived": "ไม่ได้รับรหัสใช่ไหม?",
+      "resendCode": "ส่งรหัสอีกครั้ง",
+      "submit": "ดำเนินการต่อ",
       "labels": {
-        "code": "Code"
+        "code": "รหัส"
       },
       "required": {
-        "code": "This field is required"
+        "code": "จำเป็นต้องกรอกข้อมูลในช่องนี้"
       }
     },
     "set": {
-      "title": "Set up 2-Factor",
-      "totpDescription": "Scan the QR code with your authenticator app.",
-      "smsDescription": "Enter your phone number to receive a code via SMS.",
-      "emailDescription": "Enter your email address to receive a code via email.",
-      "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
-      "submit": "Continue",
+      "title": "ตั้งค่าการยืนยันตัวตนแบบ 2 ปัจจัย",
+      "totpDescription": "สแกน QR code ด้วยแอปยืนยันตัวตนของคุณ",
+      "smsDescription": "กรอกหมายเลขโทรศัพท์ของคุณเพื่อรับรหัสผ่าน SMS",
+      "emailDescription": "กรอกที่อยู่อีเมลของคุณเพื่อรับรหัสผ่านอีเมล",
+      "totpRegisterDescription": "สแกน QR Code หรือไปที่ URL ด้วยตนเอง",
+      "submit": "ดำเนินการต่อ",
       "labels": {
-        "code": "Code"
+        "code": "รหัส"
       },
       "required": {
-        "code": "This field is required"
+        "code": "จำเป็นต้องกรอกข้อมูลในช่องนี้"
       }
     }
   },
   "passkey": {
     "verify": {
-      "title": "Authenticate with a passkey",
-      "description": "Your device will ask for your fingerprint, face, or screen lock",
-      "usePassword": "Use password",
-      "submit": "Continue",
+      "title": "ยืนยันตัวตนด้วยพาสคีย์",
+      "description": "อุปกรณ์ของคุณจะขอลายนิ้วมือ ใบหน้า หรือการล็อกหน้าจอของคุณ",
+      "usePassword": "ใช้รหัสผ่าน",
+      "submit": "ดำเนินการต่อ",
       "errors": {
-        "couldNotRequestChallenge": "Could not request passkey challenge",
-        "couldNotVerifyPasskey": "Could not verify passkey",
-        "noResponseReceived": "Passkey verification failed - no response received",
-        "noRedirectProvided": "Passkey verification completed but no redirect was provided",
-        "couldNotRetrievePasskey": "An error occurred while retrieving passkey",
-        "verificationCancelled": "Passkey verification was cancelled",
-        "verificationFailed": "An error occurred during passkey verification",
-        "couldNotFindSession": "Could not find session",
-        "couldNotUpdateSession": "Could not update session",
-        "userNotFound": "User not found in the system",
-        "couldNotDetermineRedirect": "Could not determine redirect URL after passkey verification"
+        "couldNotRequestChallenge": "ไม่สามารถขอ challenge ของพาสคีย์ได้",
+        "couldNotVerifyPasskey": "ไม่สามารถยืนยันพาสคีย์ได้",
+        "noResponseReceived": "การยืนยันพาสคีย์ล้มเหลว - ไม่ได้รับการตอบสนอง",
+        "noRedirectProvided": "การยืนยันพาสคีย์เสร็จสมบูรณ์แต่ไม่มีการเปลี่ยนเส้นทาง",
+        "couldNotRetrievePasskey": "เกิดข้อผิดพลาดขณะเรียกดูพาสคีย์",
+        "verificationCancelled": "การยืนยันพาสคีย์ถูกยกเลิก",
+        "verificationFailed": "เกิดข้อผิดพลาดระหว่างการยืนยันพาสคีย์",
+        "couldNotFindSession": "ไม่พบเซสชัน",
+        "couldNotUpdateSession": "ไม่สามารถอัปเดตเซสชันได้",
+        "userNotFound": "ไม่พบผู้ใช้ในระบบ",
+        "couldNotDetermineRedirect": "ไม่สามารถระบุ URL การเปลี่ยนเส้นทางหลังจากการยืนยันพาสคีย์ได้"
       }
     },
     "set": {
-      "title": "Setup a passkey",
-      "description": "Your device will ask for your fingerprint, face, or screen lock",
+      "title": "ตั้งค่าพาสคีย์",
+      "description": "อุปกรณ์ของคุณจะขอลายนิ้วมือ ใบหน้า หรือการล็อกหน้าจอของคุณ",
       "info": {
-        "description": "A passkey is an authentication method on a device like your fingerprint, Apple FaceID or similar. ",
-        "link": "Passkey Authentication"
+        "description": "พาสคีย์เป็นวิธีการยืนยันตัวตนบนอุปกรณ์ เช่น ลายนิ้วมือ Apple FaceID หรือวิธีที่คล้ายกัน ",
+        "link": "การยืนยันตัวตนด้วยพาสคีย์"
       },
-      "skip": "Skip",
-      "submit": "Continue"
+      "skip": "ข้าม",
+      "submit": "ดำเนินการต่อ"
     }
   },
   "u2f": {
     "verify": {
-      "title": "Verify 2-Factor",
-      "description": "Verify your account with your device."
+      "title": "ยืนยันการยืนยันตัวตนแบบ 2 ปัจจัย",
+      "description": "ยืนยันบัญชีของคุณด้วยอุปกรณ์ของคุณ"
     },
     "set": {
-      "title": "Set up 2-Factor",
-      "description": "Set up a device as a second factor.",
-      "submit": "Continue"
+      "title": "ตั้งค่าการยืนยันตัวตนแบบ 2 ปัจจัย",
+      "description": "ตั้งค่าอุปกรณ์เป็นปัจจัยที่สอง",
+      "submit": "ดำเนินการต่อ"
     }
   },
   "register": {
     "methods": {
-      "passkey": "Passkey",
-      "password": "Password"
+      "passkey": "พาสคีย์",
+      "password": "รหัสผ่าน"
     },
     "disabled": {
-      "title": "Registration disabled",
-      "description": "The registration is disabled. Please contact your administrator."
+      "title": "ปิดการลงทะเบียน",
+      "description": "การลงทะเบียนถูกปิดใช้งาน โปรดติดต่อผู้ดูแลระบบของคุณ"
     },
     "missingdata": {
-      "title": "Missing data",
-      "description": "Provide email, first and last name to register."
+      "title": "ข้อมูลไม่ครบถ้วน",
+      "description": "ระบุอีเมล ชื่อ และนามสกุลเพื่อลงทะเบียน"
     },
-    "title": "Register",
-    "description": "Create your Zitadel account.",
-    "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
-    "selectMethod": "Select the method you would like to authenticate",
-    "agreeTo": "To register you must agree to the terms and conditions",
-    "termsOfService": "Terms of Service",
-    "privacyPolicy": "Privacy Policy",
-    "submit": "Continue",
+    "title": "ลงทะเบียน",
+    "description": "สร้างบัญชี Zitadel ของคุณ",
+    "noMethodAvailableWarning": "ไม่มีวิธีการยืนยันตัวตนให้ใช้งาน โปรดติดต่อผู้ดูแลระบบของคุณ",
+    "selectMethod": "เลือกวิธีการที่คุณต้องการใช้ยืนยันตัวตน",
+    "agreeTo": "ในการลงทะเบียน คุณต้องยอมรับข้อกำหนดและเงื่อนไข",
+    "termsOfService": "ข้อกำหนดในการให้บริการ",
+    "privacyPolicy": "นโยบายความเป็นส่วนตัว",
+    "submit": "ดำเนินการต่อ",
     "password": {
-      "title": "Set Password",
-      "description": "Set the password for your account",
-      "submit": "Continue",
+      "title": "ตั้งรหัสผ่าน",
+      "description": "ตั้งรหัสผ่านสำหรับบัญชีของคุณ",
+      "submit": "ดำเนินการต่อ",
       "labels": {
-        "password": "Password",
-        "confirmPassword": "Confirm Password"
+        "password": "รหัสผ่าน",
+        "confirmPassword": "ยืนยันรหัสผ่าน"
       },
       "required": {
-        "password": "You have to provide a password!",
-        "confirmPassword": "This field is required"
+        "password": "คุณต้องระบุรหัสผ่าน!",
+        "confirmPassword": "จำเป็นต้องกรอกข้อมูลในช่องนี้"
       }
     },
     "labels": {
-      "firstname": "First name",
-      "lastname": "Last name",
-      "email": "E-mail"
+      "firstname": "ชื่อ",
+      "lastname": "นามสกุล",
+      "email": "อีเมล"
     },
     "required": {
-      "firstname": "This field is required",
-      "lastname": "This field is required",
-      "email": "This field is required"
+      "firstname": "จำเป็นต้องกรอกข้อมูลในช่องนี้",
+      "lastname": "จำเป็นต้องกรอกข้อมูลในช่องนี้",
+      "email": "จำเป็นต้องกรอกข้อมูลในช่องนี้"
     },
     "errors": {
-      "couldNotCreateUser": "Could not create user",
-      "couldNotCreateSession": "Could not create session",
-      "userNotFound": "User not found in the system",
-      "couldNotLinkIDP": "Could not link IDP to user",
-      "couldNotRegisterUser": "Could not register user"
+      "couldNotCreateUser": "ไม่สามารถสร้างผู้ใช้ได้",
+      "couldNotCreateSession": "ไม่สามารถสร้างเซสชันได้",
+      "userNotFound": "ไม่พบผู้ใช้ในระบบ",
+      "couldNotLinkIDP": "ไม่สามารถเชื่อมโยง IDP กับผู้ใช้ได้",
+      "couldNotRegisterUser": "ไม่สามารถลงทะเบียนผู้ใช้ได้"
     }
   },
   "invite": {
-    "title": "Invite User",
-    "description": "Provide the email address and the name of the user you want to invite.",
-    "info": "The user will receive an email with further instructions.",
-    "notAllowed": "Your settings do not allow you to invite users.",
-    "submit": "Continue",
+    "title": "เชิญผู้ใช้",
+    "description": "ระบุที่อยู่อีเมลและชื่อของผู้ใช้ที่คุณต้องการเชิญ",
+    "info": "ผู้ใช้จะได้รับอีเมลพร้อมคำแนะนำเพิ่มเติม",
+    "notAllowed": "การตั้งค่าของคุณไม่อนุญาตให้คุณเชิญผู้ใช้",
+    "submit": "ดำเนินการต่อ",
     "success": {
-      "title": "User invited",
-      "description": "The email has successfully been sent.",
-      "verified": "The user has been invited and has already verified his email.",
-      "notVerifiedYet": "The user has been invited. They will receive an email with further instructions.",
-      "submit": "Invite another user"
+      "title": "เชิญผู้ใช้แล้ว",
+      "description": "ส่งอีเมลเรียบร้อยแล้ว",
+      "verified": "ผู้ใช้ได้รับเชิญและได้ยืนยันอีเมลของเขาแล้ว",
+      "notVerifiedYet": "ผู้ใช้ได้รับเชิญแล้ว พวกเขาจะได้รับอีเมลพร้อมคำแนะนำเพิ่มเติม",
+      "submit": "เชิญผู้ใช้อีกคน"
     }
   },
   "signedin": {
-    "title": "Welcome {user}!",
-    "description": "You are signed in.",
-    "continue": "Continue",
+    "title": "ยินดีต้อนรับ {user}!",
+    "description": "คุณได้ลงชื่อเข้าใช้แล้ว",
+    "continue": "ดำเนินการต่อ",
     "error": {
-      "title": "Error",
-      "description": "An error occurred while trying to sign in."
+      "title": "ข้อผิดพลาด",
+      "description": "เกิดข้อผิดพลาดขณะพยายามลงชื่อเข้าใช้"
     }
   },
   "verify": {
-    "userIdMissing": "No userId provided!",
-    "successTitle": "User verified",
-    "successDescription": "The user has been verified successfully.",
-    "successContinue": "Continue",
-    "setupAuthenticator": "Setup authenticator",
+    "userIdMissing": "ไม่ได้ระบุ userId!",
+    "successTitle": "ยืนยันผู้ใช้แล้ว",
+    "successDescription": "ยืนยันผู้ใช้เรียบร้อยแล้ว",
+    "successContinue": "ดำเนินการต่อ",
+    "setupAuthenticator": "ตั้งค่าเครื่องมือยืนยันตัวตน",
     "verify": {
-      "title": "Verify user",
-      "description": "Enter the Code provided in the verification email.",
-      "noCodeReceived": "Didn't receive a code?",
-      "resendCode": "Resend code",
-      "codeSent": "A new code has just been sent to your email address.",
-      "submit": "Continue",
+      "title": "ยืนยันผู้ใช้",
+      "description": "กรอกรหัสที่ระบุไว้ในอีเมลยืนยัน",
+      "noCodeReceived": "ไม่ได้รับรหัสใช่ไหม?",
+      "resendCode": "ส่งรหัสอีกครั้ง",
+      "codeSent": "เพิ่งส่งรหัสใหม่ไปยังที่อยู่อีเมลของคุณแล้ว",
+      "submit": "ดำเนินการต่อ",
       "labels": {
-        "code": "Code"
+        "code": "รหัส"
       },
       "required": {
-        "code": "This field is required"
+        "code": "จำเป็นต้องกรอกข้อมูลในช่องนี้"
       }
     },
     "errors": {
-      "couldNotResendEmail": "Could not resend email",
-      "couldNotVerifyUser": "Could not verify user",
-      "couldNotVerifyInvite": "Could not verify invite",
-      "couldNotVerifyEmail": "Could not verify email",
-      "couldNotVerify": "Could not verify",
-      "couldNotLoadUser": "Could not load user",
-      "couldNotLoadAuthenticators": "Could not load possible authenticators",
-      "couldNotCreateSession": "Could not create session",
-      "noHostFound": "No host found",
-      "userAlreadyVerified": "User is already verified!",
-      "couldNotResendInvite": "Could not resend invite",
-      "inviteSendFailed": "Failed to send invitation email",
-      "emailSendFailed": "Failed to send verification email",
-      "contextMissing": "An error occurred. Please try again."
+      "couldNotResendEmail": "ไม่สามารถส่งอีเมลอีกครั้งได้",
+      "couldNotVerifyUser": "ไม่สามารถยืนยันผู้ใช้ได้",
+      "couldNotVerifyInvite": "ไม่สามารถยืนยันคำเชิญได้",
+      "couldNotVerifyEmail": "ไม่สามารถยืนยันอีเมลได้",
+      "couldNotVerify": "ไม่สามารถยืนยันได้",
+      "couldNotLoadUser": "ไม่สามารถโหลดผู้ใช้ได้",
+      "couldNotLoadAuthenticators": "ไม่สามารถโหลดเครื่องมือยืนยันตัวตนที่เป็นไปได้",
+      "couldNotCreateSession": "ไม่สามารถสร้างเซสชันได้",
+      "noHostFound": "ไม่พบโฮสต์",
+      "userAlreadyVerified": "ผู้ใช้ได้รับการยืนยันแล้ว!",
+      "couldNotResendInvite": "ไม่สามารถส่งคำเชิญอีกครั้งได้",
+      "inviteSendFailed": "ไม่สามารถส่งอีเมลคำเชิญได้",
+      "emailSendFailed": "ไม่สามารถส่งอีเมลยืนยันได้",
+      "contextMissing": "เกิดข้อผิดพลาด โปรดลองอีกครั้ง"
     }
   },
   "authenticator": {
-    "title": "Choose authentication method",
-    "description": "Select the method you would like to authenticate",
-    "noMethodsAvailable": "No authentication methods available",
-    "allSetup": "You have already setup an authenticator!",
-    "linkWithIDP": "or link with an Identity Provider"
+    "title": "เลือกวิธีการยืนยันตัวตน",
+    "description": "เลือกวิธีการที่คุณต้องการใช้ยืนยันตัวตน",
+    "noMethodsAvailable": "ไม่มีวิธีการยืนยันตัวตนให้ใช้งาน",
+    "allSetup": "คุณได้ตั้งค่าเครื่องมือยืนยันตัวตนไว้แล้ว!",
+    "linkWithIDP": "หรือเชื่อมโยงกับผู้ให้บริการข้อมูลประจำตัว"
   },
   "device": {
     "usercode": {
-      "title": "Device code",
-      "description": "Enter the code displayed on your app or device.",
-      "submit": "Continue",
+      "title": "รหัสอุปกรณ์",
+      "description": "กรอกรหัสที่แสดงบนแอปหรืออุปกรณ์ของคุณ",
+      "submit": "ดำเนินการต่อ",
       "labels": {
-        "code": "Code"
+        "code": "รหัส"
       },
       "required": {
-        "code": "This field is required"
+        "code": "จำเป็นต้องกรอกข้อมูลในช่องนี้"
       }
     },
     "request": {
-      "title": "{appName} would like to connect",
-      "description": "{appName} will have access to:",
-      "disclaimer": "By clicking Allow, you allow {appName} and Zitadel to use your information in accordance with their respective terms of service and privacy policies. You can revoke this access at any time.",
-      "submit": "Allow",
-      "deny": "Deny"
+      "title": "{appName} ต้องการเชื่อมต่อ",
+      "description": "{appName} จะสามารถเข้าถึง:",
+      "disclaimer": "การคลิกอนุญาต หมายความว่าคุณอนุญาตให้ {appName} และ Zitadel ใช้ข้อมูลของคุณตามข้อกำหนดในการให้บริการและนโยบายความเป็นส่วนตัวของแต่ละฝ่าย คุณสามารถเพิกถอนการเข้าถึงนี้ได้ทุกเมื่อ",
+      "submit": "อนุญาต",
+      "deny": "ปฏิเสธ"
     },
     "scope": {
-      "openid": "Verify your identity.",
-      "email": "View your email address.",
-      "profile": "View your full profile information.",
-      "offline_access": "Allow offline access to your account."
+      "openid": "ยืนยันตัวตนของคุณ",
+      "email": "ดูที่อยู่อีเมลของคุณ",
+      "profile": "ดูข้อมูลโปรไฟล์ทั้งหมดของคุณ",
+      "offline_access": "อนุญาตให้เข้าถึงบัญชีของคุณแบบออฟไลน์"
     }
   },
   "error": {
-    "noUserCode": "No user code provided!",
-    "noDeviceRequest": "No device request found.",
-    "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam.",
-    "sessionExpired": "Your current session has expired. Please login again.",
-    "failedLoading": "Failed to load data. Please try again.",
-    "tryagain": "Try Again",
-    "couldNotContinueSession": "Could not continue with session - missing user information"
+    "noUserCode": "ไม่ได้ระบุรหัสผู้ใช้!",
+    "noDeviceRequest": "ไม่พบคำขออุปกรณ์",
+    "unknownContext": "ไม่สามารถรับบริบทของผู้ใช้ได้ โปรดกรอกชื่อผู้ใช้ก่อนหรือระบุ loginName เป็น searchParam",
+    "sessionExpired": "เซสชันปัจจุบันของคุณหมดอายุแล้ว โปรดเข้าสู่ระบบอีกครั้ง",
+    "failedLoading": "ไม่สามารถโหลดข้อมูลได้ โปรดลองอีกครั้ง",
+    "tryagain": "ลองอีกครั้ง",
+    "couldNotContinueSession": "ไม่สามารถดำเนินการต่อกับเซสชันได้ - ขาดข้อมูลผู้ใช้"
   }
 }

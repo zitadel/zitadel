@@ -1,68 +1,68 @@
 InitCode:
-  Title: Initialize User
-  PreHeader: Initialize User
-  Subject: Initialize User
-  Greeting: Hello {{.DisplayName}},
-  Text: This user was created. Use the username {{.PreferredLoginName}} to login. Please click the button below to finish the initialization process. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.
-  ButtonText: Finish initialization
+  Title: เริ่มต้นใช้งานผู้ใช้
+  PreHeader: เริ่มต้นใช้งานผู้ใช้
+  Subject: เริ่มต้นใช้งานผู้ใช้
+  Greeting: สวัสดี {{.DisplayName}},
+  Text: ผู้ใช้นี้ถูกสร้างขึ้นแล้ว ใช้ชื่อผู้ใช้ {{.PreferredLoginName}} เพื่อเข้าสู่ระบบ โปรดคลิกปุ่มด้านล่างเพื่อดำเนินการเริ่มต้นใช้งานให้เสร็จสมบูรณ์ (รหัส {{.Code}}) หากคุณไม่ได้ร้องขออีเมลนี้ โปรดเพิกเฉย
+  ButtonText: เสร็จสิ้นการเริ่มต้นใช้งาน
 PasswordReset:
-  Title: Reset password
-  PreHeader: Reset password
-  Subject: Reset password
-  Greeting: Hello {{.DisplayName}},
-  Text: We received a password reset request. Please use the button below to reset your password. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.
-  ButtonText: Reset password
+  Title: รีเซ็ตรหัสผ่าน
+  PreHeader: รีเซ็ตรหัสผ่าน
+  Subject: รีเซ็ตรหัสผ่าน
+  Greeting: สวัสดี {{.DisplayName}},
+  Text: เราได้รับคำขอรีเซ็ตรหัสผ่าน โปรดใช้ปุ่มด้านล่างเพื่อรีเซ็ตรหัสผ่านของคุณ (รหัส {{.Code}}) หากคุณไม่ได้ร้องขออีเมลนี้ โปรดเพิกเฉย
+  ButtonText: รีเซ็ตรหัสผ่าน
 VerifyEmail:
-  Title: Verify email
-  PreHeader: Verify email
-  Subject: Verify email
-  Greeting: Hello {{.DisplayName}},
-  Text: A new email has been added. Please use the button below to verify your email. (Code {{.Code}}) If you didn't add a new email, please ignore this email.
-  ButtonText: Verify email
+  Title: ยืนยันอีเมล
+  PreHeader: ยืนยันอีเมล
+  Subject: ยืนยันอีเมล
+  Greeting: สวัสดี {{.DisplayName}},
+  Text: มีการเพิ่มอีเมลใหม่ โปรดใช้ปุ่มด้านล่างเพื่อยืนยันอีเมลของคุณ (รหัส {{.Code}}) หากคุณไม่ได้เพิ่มอีเมลใหม่ โปรดเพิกเฉยต่ออีเมลนี้
+  ButtonText: ยืนยันอีเมล
 VerifyPhone:
-  Title: Verify phone
-  PreHeader: Verify phone
-  Subject: Verify phone
-  Greeting: Hello {{.DisplayName}},
-  Text: A new phone number has been added. Please use the following code to verify it {{.Code}}
-  ButtonText: Verify phone
+  Title: ยืนยันโทรศัพท์
+  PreHeader: ยืนยันโทรศัพท์
+  Subject: ยืนยันโทรศัพท์
+  Greeting: สวัสดี {{.DisplayName}},
+  Text: มีการเพิ่มหมายเลขโทรศัพท์ใหม่ โปรดใช้รหัสต่อไปนี้เพื่อยืนยัน {{.Code}}
+  ButtonText: ยืนยันโทรศัพท์
 VerifyEmailOTP:
-  Title: Verify OTP
-  PreHeader: Verify OTP
-  Subject: Verify OTP
-  Greeting: Hello {{.DisplayName}},
-  Text: Please use the OTP {{.OTP}} to authenticate within the next five minutes or click the "Authenticate" button.
-  ButtonText: Authenticate
+  Title: ยืนยัน OTP
+  PreHeader: ยืนยัน OTP
+  Subject: ยืนยัน OTP
+  Greeting: สวัสดี {{.DisplayName}},
+  Text: โปรดใช้ OTP {{.OTP}} เพื่อยืนยันตัวตนภายในห้านาทีข้างหน้า หรือคลิกปุ่ม "ยืนยันตัวตน"
+  ButtonText: ยืนยันตัวตน
 VerifySMSOTP:
   Text: >-
-    {{.OTP}} is your OTP for {{ .Domain }}. Use it within the next {{.Expiry}}.
-    
+    {{.OTP}} คือ OTP ของคุณสำหรับ {{ .Domain }} ใช้ภายใน {{.Expiry}} ข้างหน้า
+
     @{{.Domain}} #{{.OTP}}
 DomainClaimed:
-  Title: Domain has been claimed
-  PreHeader: Change email / username
-  Subject: Domain has been claimed
-  Greeting: Hello {{.DisplayName}},
-  Text: The domain {{.Domain}} has been claimed by an organization. Your current user {{.Username}} is not part of this organization. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.
-  ButtonText: Login
+  Title: โดเมนถูกอ้างสิทธิ์แล้ว
+  PreHeader: เปลี่ยนอีเมล / ชื่อผู้ใช้
+  Subject: โดเมนถูกอ้างสิทธิ์แล้ว
+  Greeting: สวัสดี {{.DisplayName}},
+  Text: โดเมน {{.Domain}} ถูกอ้างสิทธิ์โดยองค์กรหนึ่งแล้ว ผู้ใช้ปัจจุบันของคุณ {{.Username}} ไม่ได้เป็นส่วนหนึ่งขององค์กรนี้ ดังนั้นคุณจะต้องเปลี่ยนอีเมลเมื่อเข้าสู่ระบบ เราได้สร้างชื่อผู้ใช้ชั่วคราว ({{.TempUsername}}) สำหรับการเข้าสู่ระบบนี้
+  ButtonText: เข้าสู่ระบบ
 PasswordlessRegistration:
-  Title: Add Passkey Login
-  PreHeader: Add Passkey Login
-  Subject: Add Passkey Login
-  Greeting: Hello {{.DisplayName}},
-  Text: We received a request to add a token for passkey login. Please use the button below to add your token or device for passkey login.
-  ButtonText: Add Passkey Login
+  Title: เพิ่มการเข้าสู่ระบบด้วยพาสคีย์
+  PreHeader: เพิ่มการเข้าสู่ระบบด้วยพาสคีย์
+  Subject: เพิ่มการเข้าสู่ระบบด้วยพาสคีย์
+  Greeting: สวัสดี {{.DisplayName}},
+  Text: เราได้รับคำขอเพิ่มโทเคนสำหรับการเข้าสู่ระบบด้วยพาสคีย์ โปรดใช้ปุ่มด้านล่างเพื่อเพิ่มโทเคนหรืออุปกรณ์ของคุณสำหรับการเข้าสู่ระบบด้วยพาสคีย์
+  ButtonText: เพิ่มการเข้าสู่ระบบด้วยพาสคีย์
 PasswordChange:
-  Title: Password of user has changed
-  PreHeader: Change password
-  Subject: Password of user has changed
-  Greeting: Hello {{.DisplayName}},
-  Text: The password of your user has changed. If this change was not done by you, please be advised to immediately reset your password.
-  ButtonText: Login
+  Title: รหัสผ่านของผู้ใช้มีการเปลี่ยนแปลง
+  PreHeader: เปลี่ยนรหัสผ่าน
+  Subject: รหัสผ่านของผู้ใช้มีการเปลี่ยนแปลง
+  Greeting: สวัสดี {{.DisplayName}},
+  Text: รหัสผ่านของผู้ใช้ของคุณมีการเปลี่ยนแปลง หากการเปลี่ยนแปลงนี้ไม่ได้ดำเนินการโดยคุณ โปรดรีเซ็ตรหัสผ่านของคุณทันที
+  ButtonText: เข้าสู่ระบบ
 InviteUser:
-  Title: Invitation to {{.ApplicationName}}
-  PreHeader: Invitation to {{.ApplicationName}}
-  Subject: Invitation to {{.ApplicationName}}
-  Greeting: Hello {{.DisplayName}},
-  Text: Your user has been invited to {{.ApplicationName}}. Please click the button below to finish the invite process. If you didn't ask for this mail, please ignore it.
-  ButtonText: Accept invite
+  Title: คำเชิญเข้าสู่ {{.ApplicationName}}
+  PreHeader: คำเชิญเข้าสู่ {{.ApplicationName}}
+  Subject: คำเชิญเข้าสู่ {{.ApplicationName}}
+  Greeting: สวัสดี {{.DisplayName}},
+  Text: ผู้ใช้ของคุณได้รับคำเชิญเข้าสู่ {{.ApplicationName}} โปรดคลิกปุ่มด้านล่างเพื่อดำเนินการตามคำเชิญให้เสร็จสมบูรณ์ หากคุณไม่ได้ร้องขออีเมลนี้ โปรดเพิกเฉย
+  ButtonText: ยอมรับคำเชิญ
