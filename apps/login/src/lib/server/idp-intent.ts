@@ -5,8 +5,8 @@ import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification"
 import { createLogger } from "@/lib/logger";
 import { getServiceConfig } from "@/lib/service-url";
 import {
-  addHuman,
   addIDPLink,
+  createUser,
   getActiveIdentityProviders,
   getDefaultOrg,
   getIDPByID,
@@ -17,15 +17,17 @@ import {
   listUsers,
   retrieveIDPIntent,
   ServiceConfig,
-  updateHuman,
+  updateUser,
 } from "@/lib/zitadel";
 import { Code, create } from "@zitadel/client";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
-import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
+import { SetHumanEmail } from "@zitadel/proto/zitadel/user/v2/email_pb";
+import { SetHumanProfile } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import {
-  AddHumanUserRequest,
-  AddHumanUserRequestSchema,
-  UpdateHumanUserRequestSchema,
+  CreateUserRequest,
+  CreateUserRequestSchema,
+  UpdateUserRequest,
+  UpdateUserRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import crypto from "crypto";
 import { getTranslations } from "next-intl/server";
@@ -37,19 +39,155 @@ const logger = createLogger("idp-intent");
 
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
+type IDPIntentResult = Awaited<ReturnType<typeof retrieveIDPIntent>>;
+
+/**
+ * Flattened view of the "create user" information contained in an IDP intent response,
+ * used for reads (organization resolution, required-field checks and form pre-filling).
+ */
+interface ResolvedCreateUser {
+  username?: string;
+  profile?: SetHumanProfile;
+  email?: SetHumanEmail;
+}
+
+/**
+ * Reads the "create user" information from an IDP intent response.
+ *
+ * Prefers the new `user_action.create_user` oneof (CreateUserRequest, which supports metadata).
+ * Falls back to the deprecated `add_human_user` field so that responses from older API versions
+ * keep working during the transition.
+ */
+function resolveCreateUser(intent: IDPIntentResult): ResolvedCreateUser | undefined {
+  if (intent.userAction?.case === "createUser") {
+    const request = intent.userAction.value;
+    const human = request.userType?.case === "human" ? request.userType.value : undefined;
+    return {
+      username: request.username,
+      profile: human?.profile,
+      email: human?.email,
+    };
+  }
+
+  // Fallback: deprecated add_human_user (does not support the new top-level metadata).
+  if (intent.addHumanUser) {
+    return {
+      username: intent.addHumanUser.username,
+      profile: intent.addHumanUser.profile,
+      email: intent.addHumanUser.email,
+    };
+  }
+
+  return undefined;
+}
+
+/**
+ * Builds the request for the non-deprecated CreateUser endpoint from an IDP intent response.
+ *
+ * Prefers the new `user_action.create_user` oneof: the action's request is passed through as-is
+ * and only the resolved organization is injected. Falls back to mapping the deprecated
+ * `add_human_user` (flat) fields into the new nested shape for older API responses.
+ */
+function buildCreateUserRequest(intent: IDPIntentResult, organizationId: string): CreateUserRequest | undefined {
+  if (intent.userAction?.case === "createUser") {
+    return create(CreateUserRequestSchema, {
+      ...intent.userAction.value,
+      organizationId,
+    });
+  }
+
+  // Fallback: map the deprecated flat add_human_user payload into the CreateUserRequest shape.
+  if (intent.addHumanUser) {
+    const add = intent.addHumanUser;
+    return create(CreateUserRequestSchema, {
+      organizationId,
+      username: add.username,
+      userType: {
+        case: "human",
+        value: {
+          profile: add.profile,
+          email: add.email,
+          phone: add.phone,
+          idpLinks: add.idpLinks,
+        },
+      },
+      // SetMetadataEntry and Metadata share the same {key, value} shape; map explicitly.
+      metadata: add.metadata?.map((entry) => ({ key: entry.key, value: entry.value })),
+    });
+  }
+
+  return undefined;
+}
+
+/**
+ * Builds the request for the non-deprecated UpdateUser endpoint from an IDP intent response.
+ *
+ * Prefers the new `user_action.update_user` oneof (UpdateUserRequest, which supports metadata).
+ * Falls back to the deprecated `update_human_user` field for older API responses.
+ *
+ * Note: we intentionally sync only profile, email, phone and metadata here (not the username) to
+ * preserve the existing auto-update behaviour and avoid invalidating sessions on every login.
+ */
+function buildUpdateUserRequest(intent: IDPIntentResult, userId: string): UpdateUserRequest | undefined {
+  if (intent.userAction?.case === "updateUser") {
+    const request = intent.userAction.value;
+    const human = request.userType?.case === "human" ? request.userType.value : undefined;
+    return create(UpdateUserRequestSchema, {
+      userId,
+      userType: {
+        case: "human",
+        value: {
+          profile: human?.profile,
+          email: human?.email,
+          phone: human?.phone,
+        },
+      },
+      metadata: request.metadata,
+    });
+  }
+
+  // Fallback: deprecated update_human_user (has no metadata support).
+  if (intent.updateHumanUser) {
+    const update = intent.updateHumanUser;
+    return create(UpdateUserRequestSchema, {
+      userId,
+      userType: {
+        case: "human",
+        value: {
+          // The deprecated profile is a SetHumanProfile; map it to the Update profile shape.
+          profile: update.profile
+            ? {
+                givenName: update.profile.givenName,
+                familyName: update.profile.familyName,
+                nickName: update.profile.nickName,
+                displayName: update.profile.displayName,
+                preferredLanguage: update.profile.preferredLanguage,
+                gender: update.profile.gender,
+              }
+            : undefined,
+          email: update.email,
+          phone: update.phone,
+        },
+      },
+    });
+  }
+
+  return undefined;
+}
+
 async function resolveOrganizationForUser({
   organization,
-  addHumanUser,
+  createUserData,
   serviceConfig,
 }: {
   organization?: string;
-  addHumanUser?: AddHumanUserRequest;
+  createUserData?: ResolvedCreateUser;
   serviceConfig: ServiceConfig;
 }): Promise<string | undefined> {
   if (organization) return organization;
 
-  if (addHumanUser?.username && ORG_SUFFIX_REGEX.test(addHumanUser.username)) {
-    const matched = ORG_SUFFIX_REGEX.exec(addHumanUser.username);
+  if (createUserData?.username && ORG_SUFFIX_REGEX.test(createUserData.username)) {
+    const matched = ORG_SUFFIX_REGEX.exec(createUserData.username);
     const suffix = matched?.[1] ?? "";
 
     const orgs = await getOrgsByDomain({ serviceConfig, domain: suffix });
@@ -103,7 +241,6 @@ export async function validateIDPLinkingPermissions({
   return true;
 }
 
-type IDPIntentResult = Awaited<ReturnType<typeof retrieveIDPIntent>>;
 type IDPConfig = Awaited<ReturnType<typeof getIDPByID>>;
 
 interface IDPHandlerContext {
@@ -292,23 +429,17 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
  */
 async function handleUserExists(ctx: IDPHandlerContext): Promise<IDPHandlerResult> {
   const { sessionId } = ctx.params;
-  const { userId, updateHumanUser } = ctx.intent;
+  const { userId } = ctx.intent;
   const { options, serviceConfig, t } = ctx;
 
   if (userId && !sessionId) {
-    // Auto-update user if enabled
-    if (options?.isAutoUpdate && updateHumanUser) {
+    // Auto-update user if enabled. Uses the non-deprecated UpdateUser endpoint so that
+    // metadata provided by the action response is applied in the same request.
+    const updateUserRequest = options?.isAutoUpdate ? buildUpdateUserRequest(ctx.intent, userId) : undefined;
+    if (updateUserRequest) {
       try {
         logger.debug("Auto-updating user profile");
-        await updateHuman({
-          serviceConfig,
-          request: create(UpdateHumanUserRequestSchema, {
-            userId,
-            profile: updateHumanUser.profile,
-            email: updateHumanUser.email,
-            phone: updateHumanUser.phone,
-          }),
-        });
+        await updateUser({ serviceConfig, request: updateUserRequest });
       } catch (error) {
         logger.warn("Failed to auto-update user", { error });
         // Continue with login even if update fails
@@ -353,14 +484,15 @@ async function handleUserExists(ctx: IDPHandlerContext): Promise<IDPHandlerResul
  */
 async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResult> {
   const { options, intent, serviceConfig, buildRedirectParams, t } = ctx;
-  const { addHumanUser, idpInformation } = intent;
+  const { idpInformation } = intent;
+  const createUserData = resolveCreateUser(intent);
   const { organization, provider } = ctx.params;
 
   if (options?.autoLinking) {
     let foundUser;
-    const email = addHumanUser?.email?.email;
+    const email = createUserData?.email?.email;
     const emailVerified =
-      addHumanUser?.email?.verification?.case === "isVerified" && addHumanUser?.email?.verification?.value;
+      createUserData?.email?.verification?.case === "isVerified" && createUserData?.email?.verification?.value;
 
     if (options.autoLinking === AutoLinkingOption.EMAIL && email && emailVerified) {
       foundUser = await listUsers({ serviceConfig, email, organizationId: organization }).then((response) => {
@@ -452,13 +584,14 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
  */
 async function handleAutoCreation(ctx: IDPHandlerContext): Promise<IDPHandlerResult> {
   const { options, intent, serviceConfig, buildRedirectParams, t } = ctx;
-  const { addHumanUser, idpInformation } = intent;
+  const { idpInformation } = intent;
+  const createUserData = resolveCreateUser(intent);
   const { organization, provider } = ctx.params;
 
-  if (options?.isAutoCreation && addHumanUser) {
+  if (options?.isAutoCreation && createUserData) {
     const orgToRegisterOn = await resolveOrganizationForUser({
       organization,
-      addHumanUser,
+      createUserData,
       serviceConfig,
     });
 
@@ -469,7 +602,7 @@ async function handleAutoCreation(ctx: IDPHandlerContext): Promise<IDPHandlerRes
     }
 
     // Check if required profile fields are present
-    if (!addHumanUser.profile?.givenName || !addHumanUser.profile?.familyName) {
+    if (!createUserData.profile?.givenName || !createUserData.profile?.familyName) {
       logger.info("Missing required profile fields (givenName or familyName), redirecting to complete registration");
 
       if (!idpInformation!.userId) {
@@ -485,31 +618,30 @@ async function handleAutoCreation(ctx: IDPHandlerContext): Promise<IDPHandlerRes
           idpUserId: idpInformation!.userId,
           idpUserName: idpInformation!.userName || "",
           // User data for pre-filling form
-          givenName: addHumanUser.profile?.givenName || "",
-          familyName: addHumanUser.profile?.familyName || "",
-          email: addHumanUser.email?.email || "",
+          givenName: createUserData.profile?.givenName || "",
+          familyName: createUserData.profile?.familyName || "",
+          email: createUserData.email?.email || "",
         },
         true,
       );
       return { redirect: `/idp/${provider}/complete-registration?${params}` };
     }
 
-    const organizationSchema = create(OrganizationSchema, {
-      org: { case: "orgId", value: orgToRegisterOn },
-    });
+    const createUserRequest = buildCreateUserRequest(intent, orgToRegisterOn);
 
-    const addHumanUserWithOrganization = create(AddHumanUserRequestSchema, {
-      ...addHumanUser,
-      organization: organizationSchema,
-    });
+    if (!createUserRequest) {
+      logger.error("Could not build create user request from intent");
+      const params = buildRedirectParams();
+      return { redirect: `/idp/${provider}/failure?${params}&error=user_creation_failed` };
+    }
 
     try {
-      const newUser = await addHuman({ serviceConfig, request: addHumanUserWithOrganization });
+      const newUser = await createUser({ serviceConfig, request: createUserRequest });
       logger.info("User auto-created successfully, creating session");
 
       // Create session for newly created user
       const sessionResult = await createNewSessionFromIdpIntent({
-        userId: newUser.userId,
+        userId: newUser.id,
         idpIntent: {
           idpIntentId: ctx.params.id,
           idpIntentToken: ctx.params.token,
@@ -549,13 +681,14 @@ async function handleAutoCreation(ctx: IDPHandlerContext): Promise<IDPHandlerRes
  */
 async function handleManualCreation(ctx: IDPHandlerContext): Promise<IDPHandlerResult> {
   const { options, intent, serviceConfig, buildRedirectParams } = ctx;
-  const { addHumanUser, idpInformation } = intent;
+  const { idpInformation } = intent;
+  const createUserData = resolveCreateUser(intent);
   const { organization, provider } = ctx.params;
 
-  if (options?.isCreationAllowed && addHumanUser) {
+  if (options?.isCreationAllowed && createUserData) {
     const orgToRegisterOn = await resolveOrganizationForUser({
       organization,
-      addHumanUser,
+      createUserData,
       serviceConfig,
     });
 
@@ -581,9 +714,9 @@ async function handleManualCreation(ctx: IDPHandlerContext): Promise<IDPHandlerR
         idpUserId: idpInformation!.userId,
         idpUserName: idpInformation!.userName || "",
         // User data for pre-filling form
-        givenName: addHumanUser.profile?.givenName || "",
-        familyName: addHumanUser.profile?.familyName || "",
-        email: addHumanUser.email?.email || "",
+        givenName: createUserData.profile?.givenName || "",
+        familyName: createUserData.profile?.familyName || "",
+        email: createUserData.email?.email || "",
       },
       true,
     ); // includeToken=true

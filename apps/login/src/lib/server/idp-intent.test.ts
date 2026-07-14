@@ -29,10 +29,10 @@ vi.mock("../service-url", () => ({
 vi.mock("../zitadel", () => ({
   retrieveIDPIntent: vi.fn(),
   getIDPByID: vi.fn(),
-  updateHuman: vi.fn(),
+  updateUser: vi.fn(),
   addIDPLink: vi.fn(),
   listUsers: vi.fn(),
-  addHuman: vi.fn(),
+  createUser: vi.fn(),
   getLoginSettings: vi.fn(),
   getOrgsByDomain: vi.fn(),
   getActiveIdentityProviders: vi.fn(),
@@ -63,10 +63,10 @@ describe("processIDPCallback", () => {
   let mockGetServiceUrlFromHeaders: any;
   let mockRetrieveIDPIntent: any;
   let mockGetIDPByID: any;
-  let mockUpdateHuman: any;
+  let mockUpdateUser: any;
   let mockAddIDPLink: any;
   let mockListUsers: any;
-  let mockAddHuman: any;
+  let mockCreateUser: any;
   let mockGetLoginSettings: any;
   let mockGetOrgsByDomain: any;
   let mockGetActiveIdentityProviders: any;
@@ -146,10 +146,10 @@ describe("processIDPCallback", () => {
     const {
       retrieveIDPIntent,
       getIDPByID,
-      updateHuman,
+      updateUser,
       addIDPLink,
       listUsers,
-      addHuman,
+      createUser,
       getLoginSettings,
       getOrgsByDomain,
       getActiveIdentityProviders,
@@ -166,10 +166,10 @@ describe("processIDPCallback", () => {
     mockGetServiceUrlFromHeaders = vi.mocked(getServiceConfig);
     mockRetrieveIDPIntent = vi.mocked(retrieveIDPIntent);
     mockGetIDPByID = vi.mocked(getIDPByID);
-    mockUpdateHuman = vi.mocked(updateHuman);
+    mockUpdateUser = vi.mocked(updateUser);
     mockAddIDPLink = vi.mocked(addIDPLink);
     mockListUsers = vi.mocked(listUsers);
-    mockAddHuman = vi.mocked(addHuman);
+    mockCreateUser = vi.mocked(createUser);
     mockGetLoginSettings = vi.mocked(getLoginSettings);
     mockGetOrgsByDomain = vi.mocked(getOrgsByDomain);
     mockGetActiveIdentityProviders = vi.mocked(getActiveIdentityProviders);
@@ -324,12 +324,71 @@ describe("processIDPCallback", () => {
 
       await processIDPCallback(defaultParams);
 
-      expect(mockUpdateHuman).toHaveBeenCalledWith({
+      // Falls back to the deprecated update_human_user and maps it into the new UpdateUser shape.
+      expect(mockUpdateUser).toHaveBeenCalledWith({
         serviceConfig: { baseUrl: "https://api.example.com" },
         request: expect.objectContaining({
           userId: "user123",
-          profile: defaultIntent.updateHumanUser.profile,
-          email: defaultIntent.updateHumanUser.email,
+          userType: expect.objectContaining({
+            case: "human",
+            value: expect.objectContaining({
+              profile: expect.objectContaining({
+                givenName: "Test",
+                familyName: "User 1",
+              }),
+              email: defaultIntent.updateHumanUser.email,
+            }),
+          }),
+        }),
+      });
+    });
+
+    test("should auto-update user from the new update_user action including metadata", async () => {
+      const metadata = [{ key: "role", value: new Uint8Array([1, 2, 3]) }];
+      mockRetrieveIDPIntent.mockResolvedValue({
+        ...defaultIntent,
+        // New user_action oneof: takes precedence over the deprecated update_human_user field.
+        addHumanUser: undefined,
+        updateHumanUser: undefined,
+        userAction: {
+          case: "updateUser",
+          value: {
+            userId: "user123",
+            userType: {
+              case: "human",
+              value: {
+                profile: { givenName: "Test", familyName: "User 1" },
+                email: { email: "test@example.com" },
+              },
+            },
+            metadata,
+          },
+        },
+      });
+      mockGetIDPByID.mockResolvedValue({
+        ...defaultIdp,
+        config: {
+          options: {
+            ...defaultIdp.config.options,
+            isAutoUpdate: true,
+          },
+        },
+      });
+
+      await processIDPCallback(defaultParams);
+
+      expect(mockUpdateUser).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        request: expect.objectContaining({
+          userId: "user123",
+          userType: expect.objectContaining({
+            case: "human",
+            value: expect.objectContaining({
+              profile: { givenName: "Test", familyName: "User 1" },
+              email: { email: "test@example.com" },
+            }),
+          }),
+          metadata,
         }),
       });
     });
@@ -344,7 +403,7 @@ describe("processIDPCallback", () => {
           },
         },
       });
-      mockUpdateHuman.mockRejectedValue(new Error("Update failed"));
+      mockUpdateUser.mockRejectedValue(new Error("Update failed"));
 
       const result = await processIDPCallback(defaultParams);
 
@@ -616,20 +675,24 @@ describe("processIDPCallback", () => {
     });
 
     test("should auto-create user and create session", async () => {
-      mockAddHuman.mockResolvedValue({
-        userId: "newuser123",
+      mockCreateUser.mockResolvedValue({
+        id: "newuser123",
       });
 
       const result = await processIDPCallback(defaultParams);
 
-      expect(mockAddHuman).toHaveBeenCalledWith({
+      // Falls back to the deprecated add_human_user and maps it into the new CreateUser shape.
+      expect(mockCreateUser).toHaveBeenCalledWith({
         serviceConfig: { baseUrl: "https://api.example.com" },
         request: expect.objectContaining({
+          organizationId: "org123",
           username: "testuser",
-          profile: defaultIntent.addHumanUser.profile,
-          email: defaultIntent.addHumanUser.email,
-          organization: expect.objectContaining({
-            org: { case: "orgId", value: "org123" },
+          userType: expect.objectContaining({
+            case: "human",
+            value: expect.objectContaining({
+              profile: defaultIntent.addHumanUser.profile,
+              email: defaultIntent.addHumanUser.email,
+            }),
           }),
         }),
       });
@@ -642,6 +705,53 @@ describe("processIDPCallback", () => {
         requestId: "req123",
         organization: "org123",
       });
+      expect(result.redirect).toBe("https://app.example.com/success");
+    });
+
+    test("should auto-create user from the new create_user action including metadata", async () => {
+      const metadata = [{ key: "role", value: new Uint8Array([1, 2, 3]) }];
+      mockRetrieveIDPIntent.mockResolvedValue({
+        ...defaultIntent,
+        userId: undefined,
+        // New user_action oneof: takes precedence over the deprecated add_human_user field.
+        addHumanUser: undefined,
+        updateHumanUser: undefined,
+        userAction: {
+          case: "createUser",
+          value: {
+            username: "testuser",
+            userType: {
+              case: "human",
+              value: {
+                profile: { givenName: "Test", familyName: "User" },
+                email: { email: "test@example.com" },
+                idpLinks: [{ idpId: "idp123", userId: "ext123", userName: "testuser" }],
+              },
+            },
+            metadata,
+          },
+        },
+      });
+      mockCreateUser.mockResolvedValue({ id: "newuser123" });
+
+      const result = await processIDPCallback(defaultParams);
+
+      // The action's request is passed through and only the resolved organization is injected.
+      expect(mockCreateUser).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        request: expect.objectContaining({
+          organizationId: "org123",
+          username: "testuser",
+          userType: expect.objectContaining({
+            case: "human",
+            value: expect.objectContaining({
+              idpLinks: [{ idpId: "idp123", userId: "ext123", userName: "testuser" }],
+            }),
+          }),
+          metadata,
+        }),
+      });
+      expect(mockCreateNewSessionFromIdpIntent).toHaveBeenCalledWith(expect.objectContaining({ userId: "newuser123" }));
       expect(result.redirect).toBe("https://app.example.com/success");
     });
 
@@ -660,7 +770,7 @@ describe("processIDPCallback", () => {
       mockGetLoginSettings.mockResolvedValue({
         allowDomainDiscovery: true,
       });
-      mockAddHuman.mockResolvedValue({ userId: "newuser123" });
+      mockCreateUser.mockResolvedValue({ id: "newuser123" });
 
       await processIDPCallback({
         ...defaultParams,
@@ -671,19 +781,17 @@ describe("processIDPCallback", () => {
         serviceConfig: { baseUrl: "https://api.example.com" },
         domain: "example.com",
       });
-      expect(mockAddHuman).toHaveBeenCalledWith({
+      expect(mockCreateUser).toHaveBeenCalledWith({
         serviceConfig: { baseUrl: "https://api.example.com" },
         request: expect.objectContaining({
-          organization: expect.objectContaining({
-            org: { case: "orgId", value: "org-from-domain" },
-          }),
+          organizationId: "org-from-domain",
         }),
       });
     });
 
     test("should fallback to default organization when not resolved", async () => {
       mockGetDefaultOrg.mockResolvedValue({ id: "default-org" });
-      mockAddHuman.mockResolvedValue({ userId: "newuser123" });
+      mockCreateUser.mockResolvedValue({ id: "newuser123" });
 
       await processIDPCallback({
         ...defaultParams,
@@ -693,12 +801,10 @@ describe("processIDPCallback", () => {
       expect(mockGetDefaultOrg).toHaveBeenCalledWith({
         serviceConfig: { baseUrl: "https://api.example.com" },
       });
-      expect(mockAddHuman).toHaveBeenCalledWith({
+      expect(mockCreateUser).toHaveBeenCalledWith({
         serviceConfig: { baseUrl: "https://api.example.com" },
         request: expect.objectContaining({
-          organization: expect.objectContaining({
-            org: { case: "orgId", value: "default-org" },
-          }),
+          organizationId: "default-org",
         }),
       });
     });
@@ -712,13 +818,13 @@ describe("processIDPCallback", () => {
       });
 
       expect(mockGetDefaultOrg).toHaveBeenCalled();
-      expect(mockAddHuman).not.toHaveBeenCalled();
+      expect(mockCreateUser).not.toHaveBeenCalled();
       expect(result.redirect).toContain("/idp/google/failure");
       expect(result.redirect).toContain("error=no_organization_context");
     });
 
     test("should return error redirect when user creation fails", async () => {
-      mockAddHuman.mockRejectedValue(new Error("Creation failed"));
+      mockCreateUser.mockRejectedValue(new Error("Creation failed"));
 
       const result = await processIDPCallback(defaultParams);
 
@@ -727,7 +833,7 @@ describe("processIDPCallback", () => {
     });
 
     test("should return error when session creation fails after user creation", async () => {
-      mockAddHuman.mockResolvedValue({ userId: "newuser123" });
+      mockCreateUser.mockResolvedValue({ id: "newuser123" });
       mockCreateNewSessionFromIdpIntent.mockResolvedValue({
         error: "Session error",
       });
@@ -753,7 +859,7 @@ describe("processIDPCallback", () => {
 
       const result = await processIDPCallback(defaultParams);
 
-      expect(mockAddHuman).not.toHaveBeenCalled();
+      expect(mockCreateUser).not.toHaveBeenCalled();
       expect(result.redirect).toContain("/idp/google/complete-registration");
       expect(result.redirect).toContain("id=intent123");
       expect(result.redirect).toContain("token=token123");
@@ -777,7 +883,7 @@ describe("processIDPCallback", () => {
 
       const result = await processIDPCallback(defaultParams);
 
-      expect(mockAddHuman).not.toHaveBeenCalled();
+      expect(mockCreateUser).not.toHaveBeenCalled();
       expect(result.redirect).toContain("/idp/google/complete-registration");
       expect(result.redirect).toContain("id=intent123");
       expect(result.redirect).toContain("token=token123");
@@ -801,7 +907,7 @@ describe("processIDPCallback", () => {
 
       const result = await processIDPCallback(defaultParams);
 
-      expect(mockAddHuman).not.toHaveBeenCalled();
+      expect(mockCreateUser).not.toHaveBeenCalled();
       expect(result.redirect).toContain("/idp/google/complete-registration");
       expect(result.redirect).toContain("id=intent123");
       expect(result.redirect).toContain("token=token123");
@@ -820,7 +926,7 @@ describe("processIDPCallback", () => {
 
       const result = await processIDPCallback(defaultParams);
 
-      expect(mockAddHuman).not.toHaveBeenCalled();
+      expect(mockCreateUser).not.toHaveBeenCalled();
       expect(result.redirect).toContain("/idp/google/complete-registration");
       expect(result.redirect).toContain("id=intent123");
       expect(result.redirect).toContain("token=token123");
@@ -847,7 +953,7 @@ describe("processIDPCallback", () => {
       });
 
       expect(mockGetDefaultOrg).toHaveBeenCalled();
-      expect(mockAddHuman).not.toHaveBeenCalled();
+      expect(mockCreateUser).not.toHaveBeenCalled();
       expect(result.redirect).toContain("/idp/google/complete-registration");
       expect(result.redirect).toContain("organization=default-org");
     });
@@ -1009,7 +1115,7 @@ describe("processIDPCallback", () => {
 
       // Should link, not create
       expect(mockAddIDPLink).toHaveBeenCalled();
-      expect(mockAddHuman).not.toHaveBeenCalled();
+      expect(mockCreateUser).not.toHaveBeenCalled();
     });
 
     test("should prioritize auto-creation over manual creation", async () => {
@@ -1027,12 +1133,12 @@ describe("processIDPCallback", () => {
           },
         },
       });
-      mockAddHuman.mockResolvedValue({ userId: "newuser123" });
+      mockCreateUser.mockResolvedValue({ id: "newuser123" });
 
       const result = await processIDPCallback(defaultParams);
 
       // Should auto-create, not redirect to manual form
-      expect(mockAddHuman).toHaveBeenCalled();
+      expect(mockCreateUser).toHaveBeenCalled();
       expect(result.redirect).toBe("https://app.example.com/success");
       expect(result.redirect).not.toContain("complete-registration");
     });
