@@ -3,7 +3,7 @@ InitCode:
   PreHeader: "User initialisieren"
   Subject: "User initialisieren"
   Greeting: "Hallo {{.DisplayName}},"
-  Text: "Dieser Benutzer wurde soeben erstellt. Mit dem Benutzernamen <br><strong>{{.PreferredLoginName}}</strong><br> kannst du dich anmelden. Nutze den unten stehenden Button, um die Initialisierung abzuschliessen <br>(Code <strong>{{.Code}}</strong>).<br> Falls du dieses E-Mail nicht angefordert hast, kannst du sie einfach ignorieren."
+  Text: "Dieser Benutzer wurde soeben erstellt. Mit dem Benutzernamen {{.PreferredLoginName}} kannst du dich anmelden. Nutze den unten stehenden Button, um die Initialisierung abzuschliessen. (Code {{.Code}}) Falls du dieses E-Mail nicht angefordert hast, kannst du sie einfach ignorieren."
   ButtonText: "Initialisierung abschliessen"
 PasswordReset:
   Title: "Passwort zurücksetzen"
