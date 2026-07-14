@@ -289,6 +289,35 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     expect(location).toContain("/accounts");
   });
 
+  test("should redirect to prefilled /loginname when loginHint matches no session but an unrelated session exists (default prompt)", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: [],
+        prompt: [],
+        loginHint: "user@example.com",
+      },
+    });
+
+    // An unrelated session is present (so eligibleSessions is non-empty), but
+    // findValidSession filtered by the hint returns nothing.
+    mockFindValidSession.mockResolvedValue(null);
+
+    const res = await handleOIDCFlowInitiation(
+      makeBaseParams({
+        sessions: [otherOrgSession] as any,
+        sessionCookies: [{ id: "session-other", token: "tok" }],
+      }),
+    );
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toContain("/loginname");
+    expect(location).toContain("loginName=user%40example.com");
+    expect(location).toContain("submit=true");
+    expect(location).not.toContain("/accounts");
+  });
+
   test("should redirect to /loginname when org scope filters out all sessions (SELECT_ACCOUNT prompt)", async () => {
     const { Prompt } = await import("@zitadel/proto/zitadel/oidc/v2/authorization_pb");
 

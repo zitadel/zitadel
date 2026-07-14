@@ -376,9 +376,10 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       let selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
 
       if (!selectedSession || !selectedSession.id) {
-        // If no sessions are eligible for this organization, go directly to
-        // loginname instead of showing an empty accounts page.
-        if (eligibleSessions.length === 0) {
+        // Go to the prefilled loginname (not the account picker) when a login_hint is set
+        // but matches no session, or when no session is eligible for this org. In both cases
+        // the picker would only list accounts that are not the requested user.
+        if (authRequest.loginHint || eligibleSessions.length === 0) {
           return gotoLoginname({
             request,
             requestId,
