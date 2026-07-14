@@ -1,0 +1,461 @@
+{
+  "common": {
+    "back": "Takaisin",
+    "title": "Kirjaudu sisään Zitadelilla"
+  },
+  "accounts": {
+    "title": "Tilit",
+    "description": "Valitse tili, jota haluat käyttää.",
+    "addAnother": "Lisää toinen tili",
+    "noResults": "Tilejä ei löytynyt",
+    "verified": "vahvistettu",
+    "expired": "vanhentunut"
+  },
+  "logout": {
+    "title": "Kirjaudu ulos",
+    "description": "Lopeta istunto napsauttamalla tiliä",
+    "noResults": "Tilejä ei löytynyt",
+    "clear": "Lopeta istunto",
+    "verifiedAt": "Viimeksi aktiivinen: {time}",
+    "success": {
+      "title": "Uloskirjautuminen onnistui",
+      "description": "Olet kirjautunut ulos onnistuneesti."
+    }
+  },
+  "loginname": {
+    "title": "Tervetuloa takaisin!",
+    "description": "Anna kirjautumistietosi.",
+    "register": "Rekisteröi uusi käyttäjä",
+    "submit": "Jatka",
+    "labels": {
+      "loginname": "Kirjautumisnimi",
+      "username": "Käyttäjänimi",
+      "usernameOrPhoneNumber": "Käyttäjänimi tai puhelinnumero",
+      "usernameOrEmail": "Käyttäjänimi tai sähköposti"
+    },
+    "required": {
+      "loginName": "Tämä kenttä on pakollinen"
+    },
+    "errors": {
+      "internalError": "Tapahtui sisäinen virhe",
+      "couldNotGetLoginSettings": "Kirjautumisasetuksia ei voitu hakea",
+      "couldNotSearchUsers": "Käyttäjiä ei voitu hakea",
+      "couldNotGetDomain": "Verkkotunnusta ei voitu hakea",
+      "couldNotGetHost": "Isäntää ei voitu hakea",
+      "couldNotStartIDPFlow": "IDP-prosessia ei voitu käynnistää",
+      "moreThanOneUserFound": "Löytyi useampi kuin yksi käyttäjä. Anna yksilöivä tunniste.",
+      "userNotFound": "Käyttäjää ei löytynyt järjestelmästä",
+      "couldNotCreateSession": "Käyttäjälle ei voitu luoda istuntoa",
+      "initialUserNotSupported": "Aloituskäyttäjää ei tueta",
+      "localAuthenticationNotAllowed": "Paikallinen todennus ei ole sallittu! Ota yhteyttä järjestelmänvalvojaasi saadaksesi lisätietoja.",
+      "passkeysNotAllowed": "Passkey-avaimet eivät ole sallittuja! Ota yhteyttä järjestelmänvalvojaasi saadaksesi lisätietoja.",
+      "couldNotFindIdentityProvider": "Identiteetintarjoajaa ei löytynyt.",
+      "userNotActive": "Käyttäjä ei ole aktiivinen. Ota yhteyttä järjestelmänvalvojaasi saadaksesi lisätietoja."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Tapahtui virhe",
+      "multipleUsersFound": "Löytyi useita käyttäjiä",
+      "userNotFound": "Käyttäjää ei löytynyt järjestelmästä"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "Salasana",
+      "description": "Anna salasanasi.",
+      "resetPassword": "Nollaa salasana",
+      "submit": "Jatka",
+      "labels": {
+        "password": "Salasana"
+      },
+      "required": {
+        "password": "Tämä kenttä on pakollinen"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "Salasanaa ei voitu vahvistaa",
+        "couldNotResetPassword": "Salasanaa ei voitu nollata"
+      },
+      "info": {
+        "passwordResetSent": "Salasana nollattiin. Tarkista sähköpostisi"
+      }
+    },
+    "set": {
+      "title": "Aseta salasana",
+      "description": "Aseta tilisi salasana",
+      "codeSent": "Uusi koodi on lähetetty sähköpostiosoitteeseesi.",
+      "noCodeReceived": "Etkö saanut koodia?",
+      "resend": "Lähetä koodi uudelleen",
+      "submit": "Jatka",
+      "labels": {
+        "code": "Koodi",
+        "newPassword": "Uusi salasana",
+        "confirmPassword": "Vahvista salasana"
+      },
+      "required": {
+        "code": "Tämä kenttä on pakollinen",
+        "newPassword": "Sinun on annettava salasana!",
+        "confirmPassword": "Tämä kenttä on pakollinen"
+      },
+      "errors": {
+        "couldNotSetPassword": "Salasanaa ei voitu asettaa",
+        "couldNotResetPassword": "Salasanaa ei voitu nollata",
+        "couldNotVerifyPassword": "Salasanaa ei voitu vahvistaa"
+      }
+    },
+    "change": {
+      "title": "Vaihda salasana",
+      "description": "Aseta tilisi salasana",
+      "submit": "Jatka",
+      "labels": {
+        "currentPassword": "Nykyinen salasana",
+        "newPassword": "Uusi salasana",
+        "confirmPassword": "Vahvista salasana"
+      },
+      "required": {
+        "currentPassword": "Sinun on annettava nykyinen salasanasi!",
+        "newPassword": "Sinun on annettava uusi salasana!",
+        "confirmPassword": "Tämä kenttä on pakollinen"
+      },
+      "errors": {
+        "currentPasswordInvalid": "Nykyinen salasana on virheellinen.",
+        "couldNotChangePassword": "Salasanaa ei voitu vaihtaa",
+        "couldNotVerifyPassword": "Salasanaa ei voitu vahvistaa",
+        "unknownError": "Tuntematon virhe"
+      }
+    },
+    "complexity": {
+      "length": "Pituuden on oltava vähintään {minLength} merkkiä.",
+      "hasSymbol": "On sisällettävä erikoismerkki.",
+      "hasNumber": "On sisällettävä numero.",
+      "hasUppercase": "On sisällettävä iso kirjain.",
+      "hasLowercase": "On sisällettävä pieni kirjain.",
+      "equals": "Salasanan vahvistus täsmäsi.",
+      "matches": "Täsmää",
+      "doesNotMatch": "Ei täsmää"
+    },
+    "errors": {
+      "noHostFound": "Isäntää ei löytynyt",
+      "couldNotSendResetLink": "Salasanan nollauslinkkiä ei voitu lähettää",
+      "couldNotCreateSessionForUser": "Käyttäjälle ei voitu luoda istuntoa",
+      "couldNotVerifyPassword": "Salasanaa ei voitu vahvistaa",
+      "failedToAuthenticate": "Todennus epäonnistui. Käytit {failedAttempts}/{maxPasswordAttempts} salasanayrityksestä.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Todennus epäonnistui.",
+      "accountLockedContactAdmin": " Ota yhteyttä järjestelmänvalvojaasi avataksesi tilisi lukituksen",
+      "userNotFound": "Käyttäjää ei löytynyt järjestelmästä",
+      "initialUserNotSupported": "Aloituskäyttäjää ei tueta",
+      "userInitialStateNotSupported": "Käyttäjän aloitustilaa ei tueta",
+      "codeOrVerificationRequired": "Sinun on annettava koodi tai sinulla on oltava voimassa oleva käyttäjän vahvistustarkistus",
+      "verificationRequired": "Käyttäjän vahvistustarkistus on suoritettava",
+      "couldNotLoadSession": "Istuntoa ei voitu ladata",
+      "couldNotLoadAuthMethods": "Todennusmenetelmiä ei voitu ladata",
+      "failedPrecondition": "Esiehto ei täyttynyt",
+      "sessionNotValid": "Istunto ei ole voimassa",
+      "passwordVerificationMissing": "Salasanan vahvistus puuttuu.",
+      "passwordVerificationTooOld": "Salasanan vahvistus on liian vanha. Vahvista salasanasi uudelleen."
+    }
+  },
+  "idp": {
+    "title": "Kirjaudu sisään SSO:lla",
+    "description": "Valitse jokin seuraavista tarjoajista kirjautuaksesi sisään",
+    "orSignInWith": "tai kirjaudu sisään tavalla",
+    "signInWithApple": "Kirjaudu sisään Apple-tunnuksella",
+    "signInWithGoogle": "Kirjaudu sisään Google-tunnuksella",
+    "signInWithAzureAD": "Kirjaudu sisään AzureAD-tunnuksella",
+    "signInWithGithub": "Kirjaudu sisään GitHub-tunnuksella",
+    "signInWithGitlab": "Kirjaudu sisään GitLab-tunnuksella",
+    "loginError": {
+      "title": "Kirjautuminen epäonnistui",
+      "description": "Kirjautumisen aikana tapahtui virhe."
+    },
+    "linkingError": {
+      "title": "Tilin linkittäminen epäonnistui",
+      "description": "Tilisi linkittämisen aikana tapahtui virhe."
+    },
+    "completeRegister": {
+      "title": "Täydennä tietosi",
+      "description": "Sinun on viimeisteltävä rekisteröitymisesi antamalla sähköpostiosoitteesi ja nimesi."
+    },
+    "accountNotFound": {
+      "title": "Tiliä ei löytynyt",
+      "description": "Identiteetintarjoajasi tunnuksiin liittyvää tiliä ei löytynyt.",
+      "info": "Olemassa olevaa tiliä ei löytynyt. Kirjaudu sisään olemassa olevalla tilillä tai ota yhteyttä järjestelmänvalvojaasi saadaksesi apua.",
+      "backToLogin": "Takaisin kirjautumiseen"
+    },
+    "registrationFailed": {
+      "title": "Rekisteröityminen ei ole käytettävissä",
+      "description": "Rekisteröitymisprosessia ei voitu suorittaa loppuun.",
+      "info": "Rekisteröitymisen organisaatiota ei voitu määrittää. Ota yhteyttä järjestelmänvalvojaasi saadaksesi apua.",
+      "backToLogin": "Takaisin kirjautumiseen"
+    },
+    "processing": {
+      "message": "Todennusta käsitellään...",
+      "noRedirect": "Palvelin ei palauttanut uudelleenohjausta tai virhettä",
+      "unexpectedError": "Tapahtui odottamaton virhe"
+    },
+    "errors": {
+      "missingParameters": "Pakollisia parametreja puuttuu",
+      "missingIdpInfo": "IDP-tiedot puuttuvat",
+      "idpNotFound": "Identiteetintarjoajaa ei löytynyt",
+      "linkingNotAllowed": "Linkittäminen ei ole sallittua tälle identiteetintarjoajalle",
+      "linkingFailed": "Identiteetintarjoajan linkittäminen tiliin epäonnistui",
+      "autoLinkingFailed": "Tilin automaattinen linkittäminen epäonnistui",
+      "userCreationFailed": "Käyttäjätilin luominen epäonnistui",
+      "orgResolutionFailed": "Rekisteröitymisen organisaatiota ei voitu määrittää",
+      "sessionCreationFailed": "Istuntoa ei voitu luoda tai uudelleenohjausta määrittää",
+      "unknownError": "Tapahtui tuntematon virhe"
+    }
+  },
+  "ldap": {
+    "title": "LDAP-kirjautuminen",
+    "description": "Anna LDAP-tunnuksesi.",
+    "submit": "Jatka",
+    "labels": {
+      "username": "Käyttäjänimi",
+      "password": "Salasana"
+    },
+    "required": {
+      "username": "Tämä kenttä on pakollinen",
+      "password": "Tämä kenttä on pakollinen"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "Vahvista henkilöllisyytesi",
+      "description": "Valitse jokin seuraavista tekijöistä.",
+      "noResults": "Asennettavia toissijaisia tekijöitä ei ole käytettävissä."
+    },
+    "set": {
+      "title": "Määritä kaksivaiheinen todennus",
+      "description": "Valitse jokin seuraavista toissijaisista tekijöistä.",
+      "skip": "Ohita"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "Vahvista kaksivaiheinen todennus",
+      "totpDescription": "Anna koodi todennussovelluksestasi.",
+      "smsDescription": "Anna tekstiviestillä saamasi koodi.",
+      "emailDescription": "Anna sähköpostitse saamasi koodi.",
+      "noCodeReceived": "Etkö saanut koodia?",
+      "resendCode": "Lähetä koodi uudelleen",
+      "submit": "Jatka",
+      "labels": {
+        "code": "Koodi"
+      },
+      "required": {
+        "code": "Tämä kenttä on pakollinen"
+      }
+    },
+    "set": {
+      "title": "Määritä kaksivaiheinen todennus",
+      "totpDescription": "Skannaa QR-koodi todennussovelluksellasi.",
+      "smsDescription": "Anna puhelinnumerosi saadaksesi koodin tekstiviestillä.",
+      "emailDescription": "Anna sähköpostiosoitteesi saadaksesi koodin sähköpostitse.",
+      "totpRegisterDescription": "Skannaa QR-koodi tai siirry URL-osoitteeseen manuaalisesti.",
+      "submit": "Jatka",
+      "labels": {
+        "code": "Koodi"
+      },
+      "required": {
+        "code": "Tämä kenttä on pakollinen"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Todenna Passkey-avaimella",
+      "description": "Laitteesi pyytää sormenjälkeäsi, kasvojasi tai näytön lukitusta",
+      "usePassword": "Käytä salasanaa",
+      "submit": "Jatka",
+      "errors": {
+        "couldNotRequestChallenge": "Passkey-haastetta ei voitu pyytää",
+        "couldNotVerifyPasskey": "Passkey-avainta ei voitu vahvistaa",
+        "noResponseReceived": "Passkey-vahvistus epäonnistui - vastausta ei saatu",
+        "noRedirectProvided": "Passkey-vahvistus suoritettiin, mutta uudelleenohjausta ei annettu",
+        "couldNotRetrievePasskey": "Passkey-avaimen haun aikana tapahtui virhe",
+        "verificationCancelled": "Passkey-vahvistus peruutettiin",
+        "verificationFailed": "Passkey-vahvistuksen aikana tapahtui virhe",
+        "couldNotFindSession": "Istuntoa ei löytynyt",
+        "couldNotUpdateSession": "Istuntoa ei voitu päivittää",
+        "userNotFound": "Käyttäjää ei löytynyt järjestelmästä",
+        "couldNotDetermineRedirect": "Uudelleenohjauksen URL-osoitetta ei voitu määrittää Passkey-vahvistuksen jälkeen"
+      }
+    },
+    "set": {
+      "title": "Määritä Passkey-avain",
+      "description": "Laitteesi pyytää sormenjälkeäsi, kasvojasi tai näytön lukitusta",
+      "info": {
+        "description": "Passkey on laitteella toimiva todennusmenetelmä, kuten sormenjälkesi, Apple FaceID tai vastaava. ",
+        "link": "Passkey-todennus"
+      },
+      "skip": "Ohita",
+      "submit": "Jatka"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "Vahvista kaksivaiheinen todennus",
+      "description": "Vahvista tilisi laitteellasi."
+    },
+    "set": {
+      "title": "Määritä kaksivaiheinen todennus",
+      "description": "Määritä laite toissijaiseksi tekijäksi.",
+      "submit": "Jatka"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "Salasana"
+    },
+    "disabled": {
+      "title": "Rekisteröityminen poistettu käytöstä",
+      "description": "Rekisteröityminen on poistettu käytöstä. Ota yhteyttä järjestelmänvalvojaasi."
+    },
+    "missingdata": {
+      "title": "Puuttuvat tiedot",
+      "description": "Anna sähköposti, etunimi ja sukunimi rekisteröityäksesi."
+    },
+    "title": "Rekisteröidy",
+    "description": "Luo Zitadel-tilisi.",
+    "noMethodAvailableWarning": "Todennusmenetelmää ei ole käytettävissä. Ota yhteyttä järjestelmänvalvojaasi.",
+    "selectMethod": "Valitse menetelmä, jolla haluat todentaa",
+    "agreeTo": "Rekisteröityäksesi sinun on hyväksyttävä käyttöehdot",
+    "termsOfService": "Käyttöehdot",
+    "privacyPolicy": "Tietosuojakäytäntö",
+    "submit": "Jatka",
+    "password": {
+      "title": "Aseta salasana",
+      "description": "Aseta tilisi salasana",
+      "submit": "Jatka",
+      "labels": {
+        "password": "Salasana",
+        "confirmPassword": "Vahvista salasana"
+      },
+      "required": {
+        "password": "Sinun on annettava salasana!",
+        "confirmPassword": "Tämä kenttä on pakollinen"
+      }
+    },
+    "labels": {
+      "firstname": "Etunimi",
+      "lastname": "Sukunimi",
+      "email": "Sähköposti"
+    },
+    "required": {
+      "firstname": "Tämä kenttä on pakollinen",
+      "lastname": "Tämä kenttä on pakollinen",
+      "email": "Tämä kenttä on pakollinen"
+    },
+    "errors": {
+      "couldNotCreateUser": "Käyttäjää ei voitu luoda",
+      "couldNotCreateSession": "Istuntoa ei voitu luoda",
+      "userNotFound": "Käyttäjää ei löytynyt järjestelmästä",
+      "couldNotLinkIDP": "IDP:tä ei voitu linkittää käyttäjään",
+      "couldNotRegisterUser": "Käyttäjää ei voitu rekisteröidä"
+    }
+  },
+  "invite": {
+    "title": "Kutsu käyttäjä",
+    "description": "Anna kutsuttavan käyttäjän sähköpostiosoite ja nimi.",
+    "info": "Käyttäjä saa sähköpostin, jossa on lisäohjeet.",
+    "notAllowed": "Asetuksesi eivät salli sinun kutsua käyttäjiä.",
+    "submit": "Jatka",
+    "success": {
+      "title": "Käyttäjä kutsuttu",
+      "description": "Sähköposti on lähetetty onnistuneesti.",
+      "verified": "Käyttäjä on kutsuttu ja on jo vahvistanut sähköpostinsa.",
+      "notVerifiedYet": "Käyttäjä on kutsuttu. He saavat sähköpostin, jossa on lisäohjeet.",
+      "submit": "Kutsu toinen käyttäjä"
+    }
+  },
+  "signedin": {
+    "title": "Tervetuloa {user}!",
+    "description": "Olet kirjautunut sisään.",
+    "continue": "Jatka",
+    "error": {
+      "title": "Virhe",
+      "description": "Sisäänkirjautumisen aikana tapahtui virhe."
+    }
+  },
+  "verify": {
+    "userIdMissing": "Käyttäjätunnusta ei annettu!",
+    "successTitle": "Käyttäjä vahvistettu",
+    "successDescription": "Käyttäjä on vahvistettu onnistuneesti.",
+    "successContinue": "Jatka",
+    "setupAuthenticator": "Määritä todennin",
+    "verify": {
+      "title": "Vahvista käyttäjä",
+      "description": "Anna vahvistussähköpostissa annettu koodi.",
+      "noCodeReceived": "Etkö saanut koodia?",
+      "resendCode": "Lähetä koodi uudelleen",
+      "codeSent": "Uusi koodi on juuri lähetetty sähköpostiosoitteeseesi.",
+      "submit": "Jatka",
+      "labels": {
+        "code": "Koodi"
+      },
+      "required": {
+        "code": "Tämä kenttä on pakollinen"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "Sähköpostia ei voitu lähettää uudelleen",
+      "couldNotVerifyUser": "Käyttäjää ei voitu vahvistaa",
+      "couldNotVerifyInvite": "Kutsua ei voitu vahvistaa",
+      "couldNotVerifyEmail": "Sähköpostia ei voitu vahvistaa",
+      "couldNotVerify": "Vahvistus ei onnistunut",
+      "couldNotLoadUser": "Käyttäjää ei voitu ladata",
+      "couldNotLoadAuthenticators": "Mahdollisia todentimia ei voitu ladata",
+      "couldNotCreateSession": "Istuntoa ei voitu luoda",
+      "noHostFound": "Isäntää ei löytynyt",
+      "userAlreadyVerified": "Käyttäjä on jo vahvistettu!",
+      "couldNotResendInvite": "Kutsua ei voitu lähettää uudelleen",
+      "inviteSendFailed": "Kutsusähköpostin lähettäminen epäonnistui",
+      "emailSendFailed": "Vahvistussähköpostin lähettäminen epäonnistui",
+      "contextMissing": "Tapahtui virhe. Yritä uudelleen."
+    }
+  },
+  "authenticator": {
+    "title": "Valitse todennusmenetelmä",
+    "description": "Valitse menetelmä, jolla haluat todentaa",
+    "noMethodsAvailable": "Todennusmenetelmiä ei ole käytettävissä",
+    "allSetup": "Olet jo määrittänyt todentimen!",
+    "linkWithIDP": "tai linkitä identiteetintarjoajan kanssa"
+  },
+  "device": {
+    "usercode": {
+      "title": "Laitekoodi",
+      "description": "Anna sovelluksessasi tai laitteessasi näkyvä koodi.",
+      "submit": "Jatka",
+      "labels": {
+        "code": "Koodi"
+      },
+      "required": {
+        "code": "Tämä kenttä on pakollinen"
+      }
+    },
+    "request": {
+      "title": "{appName} haluaa muodostaa yhteyden",
+      "description": "{appName} saa pääsyn seuraaviin:",
+      "disclaimer": "Napsauttamalla Salli annat sovellukselle {appName} ja Zitadelille luvan käyttää tietojasi niiden kulloistenkin käyttöehtojen ja tietosuojakäytäntöjen mukaisesti. Voit peruuttaa tämän pääsyn milloin tahansa.",
+      "submit": "Salli",
+      "deny": "Estä"
+    },
+    "scope": {
+      "openid": "Vahvista henkilöllisyytesi.",
+      "email": "Näe sähköpostiosoitteesi.",
+      "profile": "Näe täydelliset profiilitietosi.",
+      "offline_access": "Salli offline-pääsy tiliisi."
+    }
+  },
+  "error": {
+    "noUserCode": "Käyttäjäkoodia ei annettu!",
+    "noDeviceRequest": "Laitepyyntöä ei löytynyt.",
+    "unknownContext": "Käyttäjän kontekstia ei voitu hakea. Varmista, että annat ensin käyttäjänimen tai annat loginName-arvon hakuparametrina.",
+    "sessionExpired": "Nykyinen istuntosi on vanhentunut. Kirjaudu sisään uudelleen.",
+    "failedLoading": "Tietojen lataaminen epäonnistui. Yritä uudelleen.",
+    "tryagain": "Yritä uudelleen",
+    "couldNotContinueSession": "Istuntoa ei voitu jatkaa - käyttäjätiedot puuttuvat"
+  }
+}

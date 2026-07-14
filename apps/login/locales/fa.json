@@ -1,0 +1,461 @@
+{
+  "common": {
+    "back": "بازگشت",
+    "title": "ورود با Zitadel"
+  },
+  "accounts": {
+    "title": "حساب‌ها",
+    "description": "حسابی را که می‌خواهید استفاده کنید انتخاب نمایید.",
+    "addAnother": "افزودن حساب دیگر",
+    "noResults": "هیچ حسابی یافت نشد",
+    "verified": "تأیید شده",
+    "expired": "منقضی شده"
+  },
+  "logout": {
+    "title": "خروج",
+    "description": "برای پایان دادن به نشست، روی یک حساب کلیک کنید",
+    "noResults": "هیچ حسابی یافت نشد",
+    "clear": "پایان نشست",
+    "verifiedAt": "آخرین فعالیت: {time}",
+    "success": {
+      "title": "خروج با موفقیت انجام شد",
+      "description": "شما با موفقیت از سیستم خارج شدید."
+    }
+  },
+  "loginname": {
+    "title": "خوش آمدید!",
+    "description": "اطلاعات ورود خود را وارد کنید.",
+    "register": "ثبت‌نام کاربر جدید",
+    "submit": "ادامه",
+    "labels": {
+      "loginname": "نام ورود",
+      "username": "نام کاربری",
+      "usernameOrPhoneNumber": "نام کاربری یا شماره تلفن",
+      "usernameOrEmail": "نام کاربری یا ایمیل"
+    },
+    "required": {
+      "loginName": "این فیلد الزامی است"
+    },
+    "errors": {
+      "internalError": "خطای داخلی رخ داد",
+      "couldNotGetLoginSettings": "دریافت تنظیمات ورود امکان‌پذیر نبود",
+      "couldNotSearchUsers": "جستجوی کاربران امکان‌پذیر نبود",
+      "couldNotGetDomain": "دریافت دامنه امکان‌پذیر نبود",
+      "couldNotGetHost": "دریافت میزبان امکان‌پذیر نبود",
+      "couldNotStartIDPFlow": "شروع جریان IDP امکان‌پذیر نبود",
+      "moreThanOneUserFound": "بیش از یک کاربر یافت شد. لطفاً یک شناسه یکتا ارائه دهید.",
+      "userNotFound": "کاربر در سیستم یافت نشد",
+      "couldNotCreateSession": "ایجاد نشست برای کاربر امکان‌پذیر نبود",
+      "initialUserNotSupported": "کاربر اولیه پشتیبانی نمی‌شود",
+      "localAuthenticationNotAllowed": "احراز هویت محلی مجاز نیست! برای اطلاعات بیشتر با مدیر خود تماس بگیرید.",
+      "passkeysNotAllowed": "Passkeys مجاز نیستند! برای اطلاعات بیشتر با مدیر خود تماس بگیرید.",
+      "couldNotFindIdentityProvider": "ارائه‌دهنده هویت یافت نشد.",
+      "userNotActive": "کاربر فعال نیست. برای اطلاعات بیشتر با مدیر خود تماس بگیرید."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "خطایی رخ داد",
+      "multipleUsersFound": "چندین کاربر یافت شد",
+      "userNotFound": "کاربر در سیستم یافت نشد"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "رمز عبور",
+      "description": "رمز عبور خود را وارد کنید.",
+      "resetPassword": "بازنشانی رمز عبور",
+      "submit": "ادامه",
+      "labels": {
+        "password": "رمز عبور"
+      },
+      "required": {
+        "password": "این فیلد الزامی است"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "تأیید رمز عبور امکان‌پذیر نبود",
+        "couldNotResetPassword": "بازنشانی رمز عبور امکان‌پذیر نبود"
+      },
+      "info": {
+        "passwordResetSent": "رمز عبور بازنشانی شد. لطفاً ایمیل خود را بررسی کنید"
+      }
+    },
+    "set": {
+      "title": "تنظیم رمز عبور",
+      "description": "رمز عبور حساب خود را تنظیم کنید",
+      "codeSent": "کد جدیدی به آدرس ایمیل شما ارسال شد.",
+      "noCodeReceived": "کدی دریافت نکردید؟",
+      "resend": "ارسال مجدد کد",
+      "submit": "ادامه",
+      "labels": {
+        "code": "کد",
+        "newPassword": "رمز عبور جدید",
+        "confirmPassword": "تأیید رمز عبور"
+      },
+      "required": {
+        "code": "این فیلد الزامی است",
+        "newPassword": "شما باید یک رمز عبور وارد کنید!",
+        "confirmPassword": "این فیلد الزامی است"
+      },
+      "errors": {
+        "couldNotSetPassword": "تنظیم رمز عبور امکان‌پذیر نبود",
+        "couldNotResetPassword": "بازنشانی رمز عبور امکان‌پذیر نبود",
+        "couldNotVerifyPassword": "تأیید رمز عبور امکان‌پذیر نبود"
+      }
+    },
+    "change": {
+      "title": "تغییر رمز عبور",
+      "description": "رمز عبور حساب خود را تنظیم کنید",
+      "submit": "ادامه",
+      "labels": {
+        "currentPassword": "رمز عبور فعلی",
+        "newPassword": "رمز عبور جدید",
+        "confirmPassword": "تأیید رمز عبور"
+      },
+      "required": {
+        "currentPassword": "شما باید رمز عبور فعلی خود را وارد کنید!",
+        "newPassword": "شما باید یک رمز عبور جدید وارد کنید!",
+        "confirmPassword": "این فیلد الزامی است"
+      },
+      "errors": {
+        "currentPasswordInvalid": "رمز عبور فعلی نادرست است.",
+        "couldNotChangePassword": "تغییر رمز عبور امکان‌پذیر نبود",
+        "couldNotVerifyPassword": "تأیید رمز عبور امکان‌پذیر نبود",
+        "unknownError": "خطای ناشناخته"
+      }
+    },
+    "complexity": {
+      "length": "باید حداقل {minLength} کاراکتر طول داشته باشد.",
+      "hasSymbol": "باید شامل یک نماد باشد.",
+      "hasNumber": "باید شامل یک عدد باشد.",
+      "hasUppercase": "باید شامل یک حرف بزرگ باشد.",
+      "hasLowercase": "باید شامل یک حرف کوچک باشد.",
+      "equals": "تأیید رمز عبور مطابقت داشت.",
+      "matches": "مطابقت دارد",
+      "doesNotMatch": "مطابقت ندارد"
+    },
+    "errors": {
+      "noHostFound": "هیچ میزبانی یافت نشد",
+      "couldNotSendResetLink": "ارسال لینک بازنشانی رمز عبور امکان‌پذیر نبود",
+      "couldNotCreateSessionForUser": "ایجاد نشست برای کاربر امکان‌پذیر نبود",
+      "couldNotVerifyPassword": "تأیید رمز عبور امکان‌پذیر نبود",
+      "failedToAuthenticate": "احراز هویت ناموفق بود. شما {failedAttempts} از {maxPasswordAttempts} تلاش برای رمز عبور را استفاده کرده‌اید.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "احراز هویت ناموفق بود.",
+      "accountLockedContactAdmin": " برای باز کردن قفل حساب خود با مدیر تماس بگیرید",
+      "userNotFound": "کاربر در سیستم یافت نشد",
+      "initialUserNotSupported": "کاربر اولیه پشتیبانی نمی‌شود",
+      "userInitialStateNotSupported": "وضعیت اولیه کاربر پشتیبانی نمی‌شود",
+      "codeOrVerificationRequired": "شما باید یک کد وارد کنید یا یک بررسی معتبر تأیید کاربر داشته باشید",
+      "verificationRequired": "بررسی تأیید کاربر باید انجام شود",
+      "couldNotLoadSession": "بارگذاری نشست امکان‌پذیر نبود",
+      "couldNotLoadAuthMethods": "بارگذاری روش‌های احراز هویت امکان‌پذیر نبود",
+      "failedPrecondition": "پیش‌شرط برآورده نشد",
+      "sessionNotValid": "نشست معتبر نیست",
+      "passwordVerificationMissing": "تأیید رمز عبور موجود نیست.",
+      "passwordVerificationTooOld": "تأیید رمز عبور بیش از حد قدیمی است. لطفاً دوباره رمز عبور خود را تأیید کنید."
+    }
+  },
+  "idp": {
+    "title": "ورود با SSO",
+    "description": "یکی از ارائه‌دهندگان زیر را برای ورود انتخاب کنید",
+    "orSignInWith": "یا ورود با",
+    "signInWithApple": "ورود با Apple",
+    "signInWithGoogle": "ورود با Google",
+    "signInWithAzureAD": "ورود با AzureAD",
+    "signInWithGithub": "ورود با GitHub",
+    "signInWithGitlab": "ورود با GitLab",
+    "loginError": {
+      "title": "ورود ناموفق بود",
+      "description": "هنگام تلاش برای ورود خطایی رخ داد."
+    },
+    "linkingError": {
+      "title": "پیوند دادن حساب ناموفق بود",
+      "description": "هنگام تلاش برای پیوند دادن حساب شما خطایی رخ داد."
+    },
+    "completeRegister": {
+      "title": "تکمیل اطلاعات خود",
+      "description": "شما باید ثبت‌نام خود را با ارائه آدرس ایمیل و نام خود تکمیل کنید."
+    },
+    "accountNotFound": {
+      "title": "حساب یافت نشد",
+      "description": "ما نتوانستیم حسابی مرتبط با اطلاعات کاربری ارائه‌دهنده هویت شما پیدا کنیم.",
+      "info": "هیچ حساب موجودی یافت نشد. لطفاً با یک حساب موجود وارد شوید یا برای دریافت کمک با مدیر خود تماس بگیرید.",
+      "backToLogin": "بازگشت به ورود"
+    },
+    "registrationFailed": {
+      "title": "ثبت‌نام در دسترس نیست",
+      "description": "ما نتوانستیم فرآیند ثبت‌نام را تکمیل کنیم.",
+      "info": "تعیین سازمان برای ثبت‌نام امکان‌پذیر نبود. لطفاً برای دریافت کمک با مدیر خود تماس بگیرید.",
+      "backToLogin": "بازگشت به ورود"
+    },
+    "processing": {
+      "message": "در حال پردازش احراز هویت...",
+      "noRedirect": "هیچ تغییر مسیر یا خطایی از سرور بازگردانده نشد",
+      "unexpectedError": "خطای غیرمنتظره‌ای رخ داد"
+    },
+    "errors": {
+      "missingParameters": "پارامترهای الزامی موجود نیستند",
+      "missingIdpInfo": "اطلاعات IDP موجود نیست",
+      "idpNotFound": "ارائه‌دهنده هویت یافت نشد",
+      "linkingNotAllowed": "پیوند دادن برای این ارائه‌دهنده هویت مجاز نیست",
+      "linkingFailed": "پیوند دادن ارائه‌دهنده هویت به حساب ناموفق بود",
+      "autoLinkingFailed": "پیوند دادن خودکار حساب ناموفق بود",
+      "userCreationFailed": "ایجاد حساب کاربری ناموفق بود",
+      "orgResolutionFailed": "تعیین سازمان برای ثبت‌نام امکان‌پذیر نبود",
+      "sessionCreationFailed": "ایجاد نشست یا تعیین تغییر مسیر امکان‌پذیر نبود",
+      "unknownError": "خطای ناشناخته‌ای رخ داد"
+    }
+  },
+  "ldap": {
+    "title": "ورود با LDAP",
+    "description": "اطلاعات کاربری LDAP خود را وارد کنید.",
+    "submit": "ادامه",
+    "labels": {
+      "username": "نام کاربری",
+      "password": "رمز عبور"
+    },
+    "required": {
+      "username": "این فیلد الزامی است",
+      "password": "این فیلد الزامی است"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "هویت خود را تأیید کنید",
+      "description": "یکی از فاکتورهای زیر را انتخاب کنید.",
+      "noResults": "هیچ فاکتور دومی برای راه‌اندازی در دسترس نیست."
+    },
+    "set": {
+      "title": "راه‌اندازی احراز هویت دو مرحله‌ای",
+      "description": "یکی از فاکتورهای دوم زیر را انتخاب کنید.",
+      "skip": "رد کردن"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "تأیید احراز هویت دو مرحله‌ای",
+      "totpDescription": "کد را از برنامه احراز هویت خود وارد کنید.",
+      "smsDescription": "کدی را که از طریق پیامک دریافت کرده‌اید وارد کنید.",
+      "emailDescription": "کدی را که از طریق ایمیل دریافت کرده‌اید وارد کنید.",
+      "noCodeReceived": "کدی دریافت نکردید؟",
+      "resendCode": "ارسال مجدد کد",
+      "submit": "ادامه",
+      "labels": {
+        "code": "کد"
+      },
+      "required": {
+        "code": "این فیلد الزامی است"
+      }
+    },
+    "set": {
+      "title": "راه‌اندازی احراز هویت دو مرحله‌ای",
+      "totpDescription": "کد QR را با برنامه احراز هویت خود اسکن کنید.",
+      "smsDescription": "شماره تلفن خود را وارد کنید تا کدی از طریق پیامک دریافت کنید.",
+      "emailDescription": "آدرس ایمیل خود را وارد کنید تا کدی از طریق ایمیل دریافت کنید.",
+      "totpRegisterDescription": "کد QR را اسکن کنید یا به‌صورت دستی به آدرس URL بروید.",
+      "submit": "ادامه",
+      "labels": {
+        "code": "کد"
+      },
+      "required": {
+        "code": "این فیلد الزامی است"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "احراز هویت با یک Passkey",
+      "description": "دستگاه شما اثر انگشت، چهره یا قفل صفحه شما را درخواست خواهد کرد",
+      "usePassword": "استفاده از رمز عبور",
+      "submit": "ادامه",
+      "errors": {
+        "couldNotRequestChallenge": "درخواست چالش passkey امکان‌پذیر نبود",
+        "couldNotVerifyPasskey": "تأیید passkey امکان‌پذیر نبود",
+        "noResponseReceived": "تأیید passkey ناموفق بود - هیچ پاسخی دریافت نشد",
+        "noRedirectProvided": "تأیید passkey تکمیل شد اما هیچ تغییر مسیری ارائه نشد",
+        "couldNotRetrievePasskey": "هنگام بازیابی passkey خطایی رخ داد",
+        "verificationCancelled": "تأیید passkey لغو شد",
+        "verificationFailed": "هنگام تأیید passkey خطایی رخ داد",
+        "couldNotFindSession": "نشست یافت نشد",
+        "couldNotUpdateSession": "به‌روزرسانی نشست امکان‌پذیر نبود",
+        "userNotFound": "کاربر در سیستم یافت نشد",
+        "couldNotDetermineRedirect": "تعیین آدرس URL تغییر مسیر پس از تأیید passkey امکان‌پذیر نبود"
+      }
+    },
+    "set": {
+      "title": "راه‌اندازی یک passkey",
+      "description": "دستگاه شما اثر انگشت، چهره یا قفل صفحه شما را درخواست خواهد کرد",
+      "info": {
+        "description": "یک passkey روشی برای احراز هویت روی یک دستگاه است، مانند اثر انگشت شما، Apple FaceID یا موارد مشابه. ",
+        "link": "احراز هویت با Passkey"
+      },
+      "skip": "رد کردن",
+      "submit": "ادامه"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "تأیید احراز هویت دو مرحله‌ای",
+      "description": "حساب خود را با دستگاه خود تأیید کنید."
+    },
+    "set": {
+      "title": "راه‌اندازی احراز هویت دو مرحله‌ای",
+      "description": "یک دستگاه را به‌عنوان فاکتور دوم راه‌اندازی کنید.",
+      "submit": "ادامه"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "رمز عبور"
+    },
+    "disabled": {
+      "title": "ثبت‌نام غیرفعال است",
+      "description": "ثبت‌نام غیرفعال است. لطفاً با مدیر خود تماس بگیرید."
+    },
+    "missingdata": {
+      "title": "اطلاعات ناقص",
+      "description": "برای ثبت‌نام ایمیل، نام و نام خانوادگی را وارد کنید."
+    },
+    "title": "ثبت‌نام",
+    "description": "حساب Zitadel خود را ایجاد کنید.",
+    "noMethodAvailableWarning": "هیچ روش احراز هویتی در دسترس نیست. لطفاً با مدیر خود تماس بگیرید.",
+    "selectMethod": "روشی را که می‌خواهید با آن احراز هویت کنید انتخاب نمایید",
+    "agreeTo": "برای ثبت‌نام باید با شرایط و ضوابط موافقت کنید",
+    "termsOfService": "شرایط استفاده از خدمات",
+    "privacyPolicy": "سیاست حفظ حریم خصوصی",
+    "submit": "ادامه",
+    "password": {
+      "title": "تنظیم رمز عبور",
+      "description": "رمز عبور حساب خود را تنظیم کنید",
+      "submit": "ادامه",
+      "labels": {
+        "password": "رمز عبور",
+        "confirmPassword": "تأیید رمز عبور"
+      },
+      "required": {
+        "password": "شما باید یک رمز عبور وارد کنید!",
+        "confirmPassword": "این فیلد الزامی است"
+      }
+    },
+    "labels": {
+      "firstname": "نام",
+      "lastname": "نام خانوادگی",
+      "email": "ایمیل"
+    },
+    "required": {
+      "firstname": "این فیلد الزامی است",
+      "lastname": "این فیلد الزامی است",
+      "email": "این فیلد الزامی است"
+    },
+    "errors": {
+      "couldNotCreateUser": "ایجاد کاربر امکان‌پذیر نبود",
+      "couldNotCreateSession": "ایجاد نشست امکان‌پذیر نبود",
+      "userNotFound": "کاربر در سیستم یافت نشد",
+      "couldNotLinkIDP": "پیوند دادن IDP به کاربر امکان‌پذیر نبود",
+      "couldNotRegisterUser": "ثبت‌نام کاربر امکان‌پذیر نبود"
+    }
+  },
+  "invite": {
+    "title": "دعوت کاربر",
+    "description": "آدرس ایمیل و نام کاربری را که می‌خواهید دعوت کنید وارد نمایید.",
+    "info": "کاربر یک ایمیل با دستورالعمل‌های بیشتر دریافت خواهد کرد.",
+    "notAllowed": "تنظیمات شما به شما اجازه دعوت کاربران را نمی‌دهد.",
+    "submit": "ادامه",
+    "success": {
+      "title": "کاربر دعوت شد",
+      "description": "ایمیل با موفقیت ارسال شد.",
+      "verified": "کاربر دعوت شده و ایمیل خود را قبلاً تأیید کرده است.",
+      "notVerifiedYet": "کاربر دعوت شد. او یک ایمیل با دستورالعمل‌های بیشتر دریافت خواهد کرد.",
+      "submit": "دعوت کاربر دیگر"
+    }
+  },
+  "signedin": {
+    "title": "خوش آمدید {user}!",
+    "description": "شما وارد شده‌اید.",
+    "continue": "ادامه",
+    "error": {
+      "title": "خطا",
+      "description": "هنگام تلاش برای ورود خطایی رخ داد."
+    }
+  },
+  "verify": {
+    "userIdMissing": "هیچ userId ارائه نشد!",
+    "successTitle": "کاربر تأیید شد",
+    "successDescription": "کاربر با موفقیت تأیید شد.",
+    "successContinue": "ادامه",
+    "setupAuthenticator": "راه‌اندازی احراز هویت",
+    "verify": {
+      "title": "تأیید کاربر",
+      "description": "کد ارائه‌شده در ایمیل تأیید را وارد کنید.",
+      "noCodeReceived": "کدی دریافت نکردید؟",
+      "resendCode": "ارسال مجدد کد",
+      "codeSent": "کد جدیدی هم‌اکنون به آدرس ایمیل شما ارسال شد.",
+      "submit": "ادامه",
+      "labels": {
+        "code": "کد"
+      },
+      "required": {
+        "code": "این فیلد الزامی است"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "ارسال مجدد ایمیل امکان‌پذیر نبود",
+      "couldNotVerifyUser": "تأیید کاربر امکان‌پذیر نبود",
+      "couldNotVerifyInvite": "تأیید دعوت امکان‌پذیر نبود",
+      "couldNotVerifyEmail": "تأیید ایمیل امکان‌پذیر نبود",
+      "couldNotVerify": "تأیید امکان‌پذیر نبود",
+      "couldNotLoadUser": "بارگذاری کاربر امکان‌پذیر نبود",
+      "couldNotLoadAuthenticators": "بارگذاری احراز هویت‌کننده‌های ممکن امکان‌پذیر نبود",
+      "couldNotCreateSession": "ایجاد نشست امکان‌پذیر نبود",
+      "noHostFound": "هیچ میزبانی یافت نشد",
+      "userAlreadyVerified": "کاربر قبلاً تأیید شده است!",
+      "couldNotResendInvite": "ارسال مجدد دعوت امکان‌پذیر نبود",
+      "inviteSendFailed": "ارسال ایمیل دعوت ناموفق بود",
+      "emailSendFailed": "ارسال ایمیل تأیید ناموفق بود",
+      "contextMissing": "خطایی رخ داد. لطفاً دوباره تلاش کنید."
+    }
+  },
+  "authenticator": {
+    "title": "انتخاب روش احراز هویت",
+    "description": "روشی را که می‌خواهید با آن احراز هویت کنید انتخاب نمایید",
+    "noMethodsAvailable": "هیچ روش احراز هویتی در دسترس نیست",
+    "allSetup": "شما قبلاً یک احراز هویت‌کننده راه‌اندازی کرده‌اید!",
+    "linkWithIDP": "یا پیوند با یک ارائه‌دهنده هویت"
+  },
+  "device": {
+    "usercode": {
+      "title": "کد دستگاه",
+      "description": "کد نمایش‌داده‌شده روی برنامه یا دستگاه خود را وارد کنید.",
+      "submit": "ادامه",
+      "labels": {
+        "code": "کد"
+      },
+      "required": {
+        "code": "این فیلد الزامی است"
+      }
+    },
+    "request": {
+      "title": "{appName} می‌خواهد متصل شود",
+      "description": "{appName} به موارد زیر دسترسی خواهد داشت:",
+      "disclaimer": "با کلیک روی «اجازه دادن»، شما به {appName} و Zitadel اجازه می‌دهید که از اطلاعات شما مطابق با شرایط استفاده از خدمات و سیاست‌های حفظ حریم خصوصی مربوطه‌شان استفاده کنند. شما می‌توانید این دسترسی را در هر زمان لغو کنید.",
+      "submit": "اجازه دادن",
+      "deny": "رد کردن"
+    },
+    "scope": {
+      "openid": "هویت خود را تأیید کنید.",
+      "email": "مشاهده آدرس ایمیل شما.",
+      "profile": "مشاهده اطلاعات کامل نمایه شما.",
+      "offline_access": "اجازه دسترسی آفلاین به حساب شما."
+    }
+  },
+  "error": {
+    "noUserCode": "هیچ کد کاربری ارائه نشد!",
+    "noDeviceRequest": "هیچ درخواست دستگاهی یافت نشد.",
+    "unknownContext": "دریافت زمینه کاربر امکان‌پذیر نبود. مطمئن شوید که ابتدا نام کاربری را وارد می‌کنید یا یک loginName به‌عنوان searchParam ارائه می‌دهید.",
+    "sessionExpired": "نشست فعلی شما منقضی شده است. لطفاً دوباره وارد شوید.",
+    "failedLoading": "بارگذاری داده‌ها ناموفق بود. لطفاً دوباره تلاش کنید.",
+    "tryagain": "تلاش مجدد",
+    "couldNotContinueSession": "ادامه نشست امکان‌پذیر نبود - اطلاعات کاربر موجود نیست"
+  }
+}
