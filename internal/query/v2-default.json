@@ -3709,12 +3709,35 @@
       },
       "required": {
         "loginName": "Ez a mező kötelező"
+      },
+      "errors": {
+        "internalError": "Belső hiba történt",
+        "couldNotGetLoginSettings": "Nem sikerült lekérni a bejelentkezési beállításokat",
+        "couldNotSearchUsers": "Nem sikerült keresni a felhasználók között",
+        "couldNotGetDomain": "Nem sikerült lekérni a domaint",
+        "couldNotGetHost": "Nem sikerült lekérni a kiszolgálót (hostot)",
+        "couldNotStartIDPFlow": "Nem sikerült elindítani az IDP folyamatát",
+        "moreThanOneUserFound": "Több felhasználót találtunk. Adj meg egy egyedi azonosítót.",
+        "userNotFound": "A felhasználó nem található a rendszerben",
+        "couldNotCreateSession": "Nem sikerült munkamenetet létrehozni a felhasználóhoz",
+        "initialUserNotSupported": "A kezdeti felhasználó nem támogatott",
+        "localAuthenticationNotAllowed": "A helyi hitelesítés nem engedélyezett! További információért fordulj a rendszergazdához.",
+        "passkeysNotAllowed": "A jelkulcsok nem engedélyezettek! További információért fordulj a rendszergazdához.",
+        "couldNotFindIdentityProvider": "Nem található azonosítószolgáltató.",
+        "userNotActive": "A felhasználó nem aktív. További információért fordulj a rendszergazdához."
+      }
+    },
+    "zitadel": {
+      "errors": {
+        "errorOccured": "Hiba történt",
+        "multipleUsersFound": "Több felhasználó is található",
+        "userNotFound": "A felhasználó nem található a rendszerben"
       }
     },
     "password": {
       "verify": {
         "title": "Jelszó",
-        "description": "Add meg a jelszavad.",
+        "description": "Add meg a jelszavadat.",
         "resetPassword": "Jelszó visszaállítása",
         "submit": "Tovább",
         "labels": {
@@ -3722,12 +3745,19 @@
         },
         "required": {
           "password": "Ez a mező kötelező"
+        },
+        "errors": {
+          "couldNotVerifyPassword": "Nem sikerült ellenőrizni a jelszót",
+          "couldNotResetPassword": "Nem sikerült visszaállítani a jelszót"
+        },
+        "info": {
+          "passwordResetSent": "A jelszó-visszaállító linket elküldtük. Ellenőrizd az e-mail fiókodat."
         }
       },
       "set": {
         "title": "Jelszó beállítása",
         "description": "Állítsd be a fiókod jelszavát",
-        "codeSent": "Elküldtük a kódot az e-mail címedre.",
+        "codeSent": "Az új kódot elküldtük az e-mail címedre.",
         "noCodeReceived": "Nem kaptál kódot?",
         "resend": "Kód újraküldése",
         "submit": "Tovább",
@@ -3740,6 +3770,11 @@
           "code": "Ez a mező kötelező",
           "newPassword": "Adj meg egy jelszót!",
           "confirmPassword": "Ez a mező kötelező"
+        },
+        "errors": {
+          "couldNotSetPassword": "Nem sikerült beállítani a jelszót",
+          "couldNotResetPassword": "Nem sikerült visszaállítani a jelszót",
+          "couldNotVerifyPassword": "Nem sikerült ellenőrizni a jelszót"
         }
       },
       "change": {
@@ -3747,13 +3782,51 @@
         "description": "Állítsd be a fiókod jelszavát",
         "submit": "Tovább",
         "labels": {
+          "currentPassword": "Jelenlegi jelszó",
           "newPassword": "Új jelszó",
           "confirmPassword": "Jelszó megerősítése"
         },
         "required": {
+          "currentPassword": "Add meg a jelenlegi jelszavadat!",
           "newPassword": "Add meg az új jelszavadat!",
           "confirmPassword": "Ez a mező kötelező"
+        },
+        "errors": {
+          "currentPasswordInvalid": "A jelenlegi jelszó helytelen.",
+          "couldNotChangePassword": "Nem sikerült módosítani a jelszót",
+          "couldNotVerifyPassword": "Nem sikerült ellenőrizni a jelszót",
+          "unknownError": "Ismeretlen hiba"
         }
+      },
+      "complexity": {
+        "length": "Legalább {minLength} karakter hosszúnak kell lennie.",
+        "hasSymbol": "Tartalmaznia kell egy szimbólumot.",
+        "hasNumber": "Tartalmaznia kell egy számot.",
+        "hasUppercase": "Tartalmaznia kell egy nagybetűt.",
+        "hasLowercase": "Tartalmaznia kell egy kisbetűt.",
+        "equals": "A jelszavak megegyeznek.",
+        "matches": "Egyezik",
+        "doesNotMatch": "Nem egyezik"
+      },
+      "errors": {
+        "noHostFound": "Nem található kiszolgáló (host)",
+        "couldNotSendResetLink": "Nem sikerült elküldeni a jelszó visszaállító linket",
+        "couldNotCreateSessionForUser": "Nem sikerült munkamenetet létrehozni a felhasználóhoz",
+        "couldNotVerifyPassword": "Nem sikerült ellenőrizni a jelszót",
+        "failedToAuthenticate": "Sikertelen hitelesítés. Eddig {failedAttempts} sikertelen jelszópróbálkozása volt a megengedett {maxPasswordAttempts} próbálkozásból. {lockoutMessage}",
+        "failedToAuthenticateNoLimit": "A hitelesítés sikertelen.",
+        "accountLockedContactAdmin": " A fiókod feloldásához fordulj a rendszergazdához",
+        "userNotFound": "A felhasználó nem található a rendszerben",
+        "initialUserNotSupported": "A kezdeti felhasználó nem támogatott",
+        "userInitialStateNotSupported": "A felhasználó kezdeti állapota nem támogatott",
+        "codeOrVerificationRequired": "Meg kell adnod egy ellenőrző kódot, vagy érvényes felhasználó-ellenőrzéssel kell rendelkezned",
+        "verificationRequired": "El kell végezni a felhasználói ellenőrzést",
+        "couldNotLoadSession": "Nem sikerült betölteni a munkamenetet",
+        "couldNotLoadAuthMethods": "Nem sikerült betölteni a hitelesítési módszereket",
+        "failedPrecondition": "Az előfeltétel nem teljesült",
+        "sessionNotValid": "A munkamenet nem érvényes",
+        "passwordVerificationMissing": "A jelszó hitelesítés hiányzik.",
+        "passwordVerificationTooOld": "A jelszó hitelesítés túl régi. Kérjük, erősítsd meg újra a jelszavadat."
       }
     },
     "idp": {
@@ -3765,18 +3838,6 @@
       "signInWithAzureAD": "Bejelentkezés AzureAD-vel",
       "signInWithGithub": "Bejelentkezés GitHubbal",
       "signInWithGitlab": "Bejelentkezés GitLabbal",
-      "loginSuccess": {
-        "title": "Sikeres bejelentkezés",
-        "description": "Sikeresen bejelentkeztél!"
-      },
-      "linkingSuccess": {
-        "title": "Fiók összekapcsolva",
-        "description": "Sikeresen összekapcsoltad a fiókodat!"
-      },
-      "registerSuccess": {
-        "title": "Sikeres regisztráció",
-        "description": "Sikeresen regisztráltál!"
-      },
       "loginError": {
         "title": "Sikertelen bejelentkezés",
         "description": "Hiba történt a bejelentkezés során."
@@ -3788,6 +3849,35 @@
       "completeRegister": {
         "title": "Add meg az adataidat",
         "description": "A regisztráció befejezéséhez add meg az e-mail címedet és a nevedet."
+      },
+      "accountNotFound": {
+        "title": "A fiók nem található",
+        "description": "Nem találtunk fiókot, amely az azonosítószolgáltatód hitelesítő adataihoz kapcsolódna.",
+        "info": "Nem található összekapcsolt fiók. Jelentkezz be egy már létező fiókkal, vagy fordulj segítségért a rendszergazdához.",
+        "backToLogin": "Vissza a bejelentkezéshez"
+      },
+      "registrationFailed": {
+        "title": "A regisztráció nem elérhető",
+        "description": "Nem sikerült befejezni a regisztrációs folyamatot.",
+        "info": "Nem sikerült meghatározni a szervezetet a regisztrációhoz. Fordulj segítségért a rendszergazdához.",
+        "backToLogin": "Vissza a bejelentkezéshez"
+      },
+      "processing": {
+        "message": "Hitelesítés folyamatban...",
+        "noRedirect": "A szerver nem adott vissza sem átirányítást, sem hibaüzenetet",
+        "unexpectedError": "Váratlan hiba történt"
+      },
+      "errors": {
+        "missingParameters": "Hiányzó kötelező paraméterek",
+        "missingIdpInfo": "Hiányoznak az azonosítószolgáltató (IDP) adatai",
+        "idpNotFound": "Az azonosítószolgáltató nem található",
+        "linkingNotAllowed": "Az összekapcsolás nem engedélyezett ennél az azonosítószolgáltatónál",
+        "linkingFailed": "Nem sikerült összekapcsolni az azonosítószolgáltatót a fiókkal",
+        "autoLinkingFailed": "Nem sikerült automatikusan összekapcsolni a fiókot",
+        "userCreationFailed": "Nem sikerült létrehozni a felhasználói fiókot",
+        "orgResolutionFailed": "Nem sikerült meghatározni a szervezetet a regisztrációhoz",
+        "sessionCreationFailed": "Nem sikerült létrehozni a munkamenetet vagy meghatározni az átirányítási címet",
+        "unknownError": "Ismeretlen hiba történt"
       }
     },
     "ldap": {
@@ -3851,7 +3941,20 @@
         "title": "Hitelesítés jelkulccsal (Passkey)",
         "description": "A készüléked az ujjlenyomatodat, arcodat vagy a képernyőzárat fogja kérni",
         "usePassword": "Jelszó használata",
-        "submit": "Tovább"
+        "submit": "Tovább",
+        "errors": {
+          "couldNotRequestChallenge": "Nem sikerült elindítani a jelkulcsos azonosítást",
+          "couldNotVerifyPasskey": "Nem sikerült ellenőrizni a jelkulcsot",
+          "noResponseReceived": "A jelkulcs ellenőrzése sikertelen - nem érkezett válasz",
+          "noRedirectProvided": "A jelkulcs ellenőrzése befejeződött, de nem érkezett átirányítás",
+          "couldNotRetrievePasskey": "Hiba történt a jelkulcs lekérése közben",
+          "verificationCancelled": "A jelkulcs ellenőrzése megszakadt",
+          "verificationFailed": "Hiba történt a jelkulcs ellenőrzése közben",
+          "couldNotFindSession": "Nem található munkamenet",
+          "couldNotUpdateSession": "Nem sikerült frissíteni a munkamenetet",
+          "userNotFound": "A felhasználó nem található a rendszerben",
+          "couldNotDetermineRedirect": "Nem sikerült meghatározni az átirányítási címet a jelkulcs ellenőrzése után"
+        }
       },
       "set": {
         "title": "Jelkulcs beállítása",
@@ -3918,6 +4021,13 @@
         "firstname": "Ez a mező kötelező",
         "lastname": "Ez a mező kötelező",
         "email": "Ez a mező kötelező"
+      },
+      "errors": {
+        "couldNotCreateUser": "Nem sikerült létrehozni a felhasználót",
+        "couldNotCreateSession": "Nem sikerült létrehozni a munkamenetet",
+        "userNotFound": "A felhasználó nem található a rendszerben",
+        "couldNotLinkIDP": "Nem sikerült összekapcsolni az azonosítószolgáltatót a felhasználóval",
+        "couldNotRegisterUser": "Nem sikerült regisztrálni a felhasználót"
       }
     },
     "invite": {
@@ -3947,6 +4057,7 @@
       "userIdMissing": "Nincs megadva felhasználói azonosító!",
       "successTitle": "Felhasználó ellenőrizve",
       "successDescription": "A felhasználó ellenőrzése sikeresen megtörtént.",
+      "successContinue": "Tovább",
       "setupAuthenticator": "Hitelesítő beállítása",
       "verify": {
         "title": "Felhasználó ellenőrzése",
@@ -3961,6 +4072,22 @@
         "required": {
           "code": "Ez a mező kötelező"
         }
+      },
+      "errors": {
+        "couldNotResendEmail": "Nem sikerült újraküldeni az e-mailt",
+        "couldNotVerifyUser": "Nem sikerült ellenőrizni a felhasználót",
+        "couldNotVerifyInvite": "Nem sikerült ellenőrizni a meghívást",
+        "couldNotVerifyEmail": "Nem sikerült ellenőrizni az e-mail címet",
+        "couldNotVerify": "Nem sikerült ellenőrizni",
+        "couldNotLoadUser": "Nem sikerült betölteni a felhasználót",
+        "couldNotLoadAuthenticators": "Nem sikerült betölteni a lehetséges hitelesítőket",
+        "couldNotCreateSession": "Nem sikerült létrehozni a munkamenetet",
+        "noHostFound": "Nem található kiszolgáló (host)",
+        "userAlreadyVerified": "A felhasználót már ellenőriztük!",
+        "couldNotResendInvite": "Nem sikerült újraküldeni a meghívást",
+        "inviteSendFailed": "Nem sikerült elküldeni a meghívó e-mailt",
+        "emailSendFailed": "Nem sikerült elküldeni az ellenőrző e-mailt",
+        "contextMissing": "Hiba történt. Kérjük, próbáld újra."
       }
     },
     "authenticator": {
@@ -4002,7 +4129,8 @@
       "unknownContext": "Nem sikerült meghatározni a felhasználó kontextusát. Győződj meg róla, hogy előbb megadtad a felhasználónevet, vagy add meg a bejelentkezési nevet keresési paraméterként.",
       "sessionExpired": "A munkameneted lejárt. Kérjük, jelentkezz be újra.",
       "failedLoading": "Nem sikerült betölteni az adatokat. Kérjük, próbáld újra.",
-      "tryagain": "Próbáld újra"
+      "tryagain": "Próbáld újra",
+      "couldNotContinueSession": "Nem sikerült folytatni a munkamenetet - hiányzó felhasználói információk"
     }
   }
 }
