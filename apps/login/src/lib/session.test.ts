@@ -13,6 +13,7 @@
  * - Edge cases like sessions without expiration date
  */
 
+import { Code, ConnectError } from "@connectrpc/connect";
 import { timestampDate } from "@zitadel/client";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
@@ -1487,18 +1488,43 @@ describe("loadMostRecentSession", () => {
     });
   });
 
-  test("returns undefined instead of throwing when getSession rejects (stale cookie)", async () => {
-    // The `sessions` cookie can outlive the server-side session, so getSession may
-    // throw `not_found`. loadMostRecentSession must swallow this and return undefined
-    // so callers fall back gracefully instead of crashing the page render.
+  test("returns undefined instead of throwing when getSession rejects with NotFound (stale cookie)", async () => {
+    // The `sessions` cookie can outlive the server-side session, so getSession may reject with
+    // a NotFound ConnectError. loadMostRecentSession must treat that the same as no session.
     const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const notFound = new ConnectError("Session does not exist (QUERY-SFeaa)", Code.NotFound);
     vi.mocked(cookiesModule.getMostRecentCookieWithLoginname).mockResolvedValue(cookie as any);
-    vi.mocked(zitadelModule.getSession).mockRejectedValue(new Error("Session does not exist (QUERY-SFeaa)"));
+    vi.mocked(zitadelModule.getSession).mockRejectedValue(notFound);
 
     const result = await loadMostRecentSession({ serviceConfig, sessionParams });
 
     expect(result).toBeUndefined();
-    expect(consoleSpy).toHaveBeenCalledWith("[Session] Could not load most recent session", expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith("[Session] Could not load most recent session", notFound);
+    consoleSpy.mockRestore();
+  });
+
+  test("re-throws non-NotFound ConnectErrors (real failures must propagate)", async () => {
+    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const unavailable = new ConnectError("backend unavailable", Code.Unavailable);
+    vi.mocked(cookiesModule.getMostRecentCookieWithLoginname).mockResolvedValue(cookie as any);
+    vi.mocked(zitadelModule.getSession).mockRejectedValue(unavailable);
+
+    await expect(loadMostRecentSession({ serviceConfig, sessionParams })).rejects.toBe(unavailable);
+    expect(consoleSpy).not.toHaveBeenCalled();
+    consoleSpy.mockRestore();
+  });
+
+  test("re-throws non-ConnectError rejections (only coded NotFound is treated as no session)", async () => {
+    // The guard is `instanceof ConnectError && code === NotFound`; anything that is not a
+    // ConnectError (e.g. an unexpected runtime error) must not be mistaken for a stale
+    // cookie and must propagate.
+    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const unexpected = new Error("boom");
+    vi.mocked(cookiesModule.getMostRecentCookieWithLoginname).mockResolvedValue(cookie as any);
+    vi.mocked(zitadelModule.getSession).mockRejectedValue(unexpected);
+
+    await expect(loadMostRecentSession({ serviceConfig, sessionParams })).rejects.toBe(unexpected);
+    expect(consoleSpy).not.toHaveBeenCalled();
     consoleSpy.mockRestore();
   });
 });
