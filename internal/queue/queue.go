@@ -128,7 +128,7 @@ func (q *Queue) Insert(ctx context.Context, args river.JobArgs, opts ...InsertOp
 //
 // Opts are applied to each job before sending them to river.
 func (q *Queue) InsertManyFastTx(ctx context.Context, tx *sql.Tx, args []river.JobArgs, opts ...InsertOpt) error {
-	if q == nil {
+	if q == nil || q.client == nil {
 		logging.Info(ctx, "skip inserting many jobs because queue is not set")
 		return nil
 	}
