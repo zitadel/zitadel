@@ -21,6 +21,7 @@ type Provider struct {
 }
 
 func New(issuer, clientID, clientSecret, redirectURI string, scopes []string, httpClient *http.Client, options ...oidc.ProviderOpts) (*Provider, error) {
+	// PKCE is used by default
 	options = append(options, oidc.WithRelyingPartyOption(rp.WithPKCE(nil)))
 	provider, err := oidc.New(name, issuer, clientID, clientSecret, redirectURI, scopes, oidc.DefaultMapper, httpClient, options...)
 	if err != nil {
