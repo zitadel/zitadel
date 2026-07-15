@@ -744,6 +744,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
                   "self-hosting/manage/tls_modes",
                   "self-hosting/manage/http2",
                   "self-hosting/manage/login-client",
+                  "self-hosting/manage/adopt-login-v2",
                 ],
               },
               {
@@ -809,6 +810,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
         label: "Scaling & Performance",
         items: [
           "self-hosting/manage/updating_scaling",
+          "self-hosting/manage/upgrade-v3-to-v4",
           "self-hosting/manage/database/database",
           "self-hosting/manage/cache",
         ],
