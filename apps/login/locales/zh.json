@@ -9,7 +9,8 @@
     "addAnother": "添加另一个账户",
     "noResults": "未找到账户",
     "verified": "已验证",
-    "expired": "已过期"
+    "expired": "已过期",
+    "reauthRequired": "请重新登录以继续"
   },
   "logout": {
     "title": "注销",
