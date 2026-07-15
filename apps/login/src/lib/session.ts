@@ -29,9 +29,26 @@ export async function loadMostRecentSession({
     return undefined;
   }
 
-  return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then(
-    (resp: GetSessionResponse) => resp.session,
-  );
+  return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token })
+    .then((resp: GetSessionResponse) => resp.session)
+    .catch(async (error) => {
+      const { Code, ConnectError } = await import("@connectrpc/connect");
+      const isNotFound = error instanceof ConnectError && error.code === Code.NotFound;
+
+      // The `sessions` cookie has no maxAge, so it can outlive the server-side session
+      // and reference one the session projection no longer holds — e.g. the user logged out, an
+      // admin/API terminated the session, or the user/org/instance was removed. In that
+      // case getSession throws `not_found`. Treat it like the no-cookie case above and
+      // return undefined instead of letting the error crash the caller's render. Every
+      // call site already handles an undefined session — either with a graceful fallback
+      // or by throwing its own explicit "no session" error.
+      if (isNotFound) {
+        console.warn("[Session] Could not load most recent session", error);
+        return undefined;
+      }
+
+      throw error;
+    });
 }
 
 /**
