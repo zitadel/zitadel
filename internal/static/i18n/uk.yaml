@@ -277,6 +277,8 @@ Errors:
     LabelPolicy:
       NotFound: "Політика приватного бренду не знайдена"
       NotChanged: "Політика приватного бренду не була змінена"
+    IDPConfig:
+      NotExisting: "Конфігурація провайдера ідентичності не існує"
   Project:
     ProjectIDMissing: "Відсутній ідентифікатор проекту"
     AlreadyExists: "Проект вже існує в організації"

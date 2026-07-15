@@ -281,6 +281,8 @@ Errors:
     LabelPolicy:
       NotFound: "Приватната политика за ознаките не е пронајдена"
       NotChanged: "Приватната политика за ознаките не е променета"
+    IDPConfig:
+      NotExisting: "Конфигурацијата на IDP не постои"
   Project:
     ProjectIDMissing: "Недостасува ID на проектот"
     AlreadyExists: "Проектот веќе постои во организацијата"
