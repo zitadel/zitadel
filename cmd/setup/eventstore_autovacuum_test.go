@@ -55,6 +55,44 @@ func Test_eventstoreAutovacuum_Execute(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "enabled, vacuum threshold at minimum boundary fails",
+			fields: fields{
+				Enabled:               true,
+				VacuumInsertThreshold: minAutovacuumThreshold,
+				AnalyzeThreshold:      50000,
+			},
+			expects: func(sqlmock.Sqlmock) {},
+			wantErr: true,
+		},
+		{
+			name: "enabled, analyze threshold at minimum boundary fails",
+			fields: fields{
+				Enabled:               true,
+				VacuumInsertThreshold: 50000,
+				AnalyzeThreshold:      minAutovacuumThreshold,
+			},
+			expects: func(sqlmock.Sqlmock) {},
+			wantErr: true,
+		},
+		{
+			name: "enabled, thresholds just above minimum succeed",
+			fields: fields{
+				Enabled:               true,
+				VacuumInsertThreshold: minAutovacuumThreshold + 1,
+				AnalyzeThreshold:      minAutovacuumThreshold + 1,
+			},
+			expects: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec(regexp.QuoteMeta(`ALTER TABLE eventstore.events2 SET (
+	autovacuum_vacuum_scale_factor = 0.0,
+	autovacuum_analyze_scale_factor = 0.0,
+	autovacuum_vacuum_insert_scale_factor = 0.0,
+	autovacuum_vacuum_insert_threshold = 10001,
+	autovacuum_analyze_threshold = 10001,
+	autovacuum_vacuum_threshold = 10001
+)`)).WillReturnResult(sqlmock.NewResult(0, 0))
+			},
+		},
+		{
 			name: "disabled, resets to defaults",
 			fields: fields{
 				Enabled: false,

@@ -35,8 +35,10 @@ type AutovacuumConfig struct {
 	Enabled bool
 	// VacuumInsertThreshold is the number of inserted rows that triggers an insert-only
 	// autovacuum run, regardless of table size. It is also applied as autovacuum_vacuum_threshold.
+	// Must be greater than 10000 to avoid thrashing the database with constant autovacuum activity.
 	VacuumInsertThreshold uint32
 	// AnalyzeThreshold is the number of changed rows that triggers an
-	// autoanalyze run, regardless of table size.
+	// autoanalyze run, regardless of table size. Must be greater than 10000
+	// to avoid thrashing the database with constant autoanalyze activity.
 	AnalyzeThreshold uint32
 }

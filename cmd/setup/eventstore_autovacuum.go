@@ -30,10 +30,17 @@ const eventstoreAutovacuumResetStmt = `ALTER TABLE eventstore.events2 RESET (
 	autovacuum_vacuum_threshold
 )`
 
+// minAutovacuumThreshold guards against configuring vacuum/analyze runs so
+// frequently that they thrash the database with constant autovacuum activity.
+const minAutovacuumThreshold = 10000
+
 func (mig *eventstoreAutovacuum) Execute(ctx context.Context, _ eventstore.Event) error {
 	if !mig.Enabled {
 		_, err := mig.dbClient.ExecContext(ctx, eventstoreAutovacuumResetStmt)
 		return err
+	}
+	if mig.VacuumInsertThreshold <= minAutovacuumThreshold || mig.AnalyzeThreshold <= minAutovacuumThreshold {
+		return fmt.Errorf("%s: VacuumInsertThreshold and AnalyzeThreshold must be greater than %d", mig, minAutovacuumThreshold)
 	}
 
 	// autovacuum_vacuum_threshold covers rows changed by updates and deletes. events2 is
