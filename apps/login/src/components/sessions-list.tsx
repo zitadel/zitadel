@@ -1,5 +1,6 @@
 "use client";
 
+import { SessionReuseResult } from "@/lib/session-reuse";
 import { timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { useState } from "react";
@@ -10,9 +11,10 @@ import { Translated } from "./translated";
 type Props = {
   sessions: Session[];
   requestId?: string;
+  reuseBySessionId?: Record<string, SessionReuseResult>;
 };
 
-export function SessionsList({ sessions, requestId }: Props) {
+export function SessionsList({ sessions, requestId, reuseBySessionId }: Props) {
   const [list, setList] = useState<Session[]>(sessions);
   return sessions ? (
     <div className="flex flex-col space-y-2">
@@ -30,6 +32,7 @@ export function SessionsList({ sessions, requestId }: Props) {
             <SessionItem
               session={session}
               requestId={requestId}
+              reuse={session.id ? reuseBySessionId?.[session.id] : undefined}
               reload={() => {
                 setList(list.filter((s) => s.id !== session.id));
               }}

@@ -3,7 +3,8 @@ import { SessionsList } from "@/components/sessions-list";
 import { Translated } from "@/components/translated";
 import { getAllSessionCookieIds } from "@/lib/cookies";
 import { getServiceConfig } from "@/lib/service-url";
-import { getBrandingSettings, getDefaultOrg, listSessions, ServiceConfig } from "@/lib/zitadel";
+import { checkSessionReuse, SessionReuseResult } from "@/lib/session-reuse";
+import { getBrandingSettings, getDefaultOrg, getLoginSettings, listSessions, ServiceConfig } from "@/lib/zitadel";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
@@ -60,6 +61,26 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization });
 
+  // Determine, for the sessions we are about to offer, whether they can actually
+  // be reused to complete the current authentication request. This mirrors a
+  // subset of the backend login-policy gating so we don't present an account
+  // that dead-ends when selected (see issue #11805). We only evaluate the
+  // auth-method gate when the target organization is pinned in the request -
+  // otherwise the governing login policy is ambiguous and the server-side
+  // graceful fallback handles it.
+  const loginSettings = organization ? await getLoginSettings({ serviceConfig, organization }) : undefined;
+
+  const reuseBySessionId: Record<string, SessionReuseResult> = {};
+  for (const session of sessions) {
+    if (session.id) {
+      reuseBySessionId[session.id] = checkSessionReuse({
+        session,
+        targetOrganization: organization,
+        loginSettings,
+      });
+    }
+  }
+
   const params = new URLSearchParams();
 
   if (requestId) {
@@ -87,7 +108,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
       <div className="w-full">
         <div className="flex w-full flex-col space-y-2">
-          <SessionsList sessions={sessions} requestId={requestId} />
+          <SessionsList sessions={sessions} requestId={requestId} reuseBySessionId={reuseBySessionId} />
           <Link href={`/loginname?` + params}>
             <div className="flex flex-row items-center rounded-md px-4 py-3 transition-all hover:bg-black/10 dark:hover:bg-white/10">
               <div className="mr-4 flex h-8 w-8 flex-row items-center justify-center rounded-full bg-black/5 dark:bg-white/5">

@@ -3,6 +3,7 @@
 import { handleServerActionResponse } from "@/lib/client-utils";
 import { sendLoginname } from "@/lib/server/loginname";
 import { clearSession, continueWithSession, ContinueWithSessionCommand } from "@/lib/server/session";
+import { SessionReuseResult } from "@/lib/session-reuse";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { Timestamp, timestampDate } from "@zitadel/client";
@@ -32,9 +33,25 @@ export function isSessionValid(session: Partial<Session>): {
   return { valid, verifiedAt };
 }
 
-export function SessionItem({ session, reload, requestId }: { session: Session; reload: () => void; requestId?: string }) {
+export function SessionItem({
+  session,
+  reload,
+  requestId,
+  reuse,
+}: {
+  session: Session;
+  reload: () => void;
+  requestId?: string;
+  reuse?: SessionReuseResult;
+}) {
   const currentLocale = useLocale();
   moment.locale(currentLocale === "zh" ? "zh-cn" : currentLocale);
+
+  // A session can't be reused for the current request when its login policy no
+  // longer matches (e.g. the target organization enforces a different auth
+  // policy). Such a session is not blocked - selecting it just makes a roundtrip
+  // through re-authentication (sendLoginname) instead of continuing directly.
+  const policyMismatch = reuse ? !reuse.reusable : false;
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -55,6 +72,12 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
   }
 
   const { valid, verifiedAt } = isSessionValid(session);
+
+  // Green dot: ready to be reused directly. Blue dot: usable, but selecting it
+  // requires a re-authentication roundtrip (session expired or its auth method
+  // no longer satisfies the target org's login policy).
+  const reusable = valid && !policyMismatch;
+
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +93,7 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
             disabled={loading}
             onClick={async () => {
               setError(null);
-              if (valid && session?.factors?.user) {
+              if (reusable && session?.factors?.user) {
                 setLoading(true);
                 try {
                   const sessionPayload: ContinueWithSessionCommand = session;
@@ -116,27 +139,24 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
             <div className="flex flex-col items-start overflow-hidden">
               <span className="">{session.factors?.user?.displayName}</span>
               <span className="text-xs text-ellipsis opacity-80">{session.factors?.user?.loginName}</span>
-              {valid ? (
+              {reusable ? (
                 <span className="text-xs text-ellipsis opacity-80">
                   <Translated i18nKey="verified" namespace="accounts" />{" "}
                   {verifiedAt && moment(timestampDate(verifiedAt)).fromNow()}
                 </span>
               ) : (
-                verifiedAt && (
-                  <span className="text-xs text-ellipsis opacity-80">
-                    <Translated i18nKey="expired" namespace="accounts" />{" "}
-                    {session.expirationDate && moment(timestampDate(session.expirationDate)).fromNow()}
-                  </span>
-                )
+                <span className="text-xs text-ellipsis opacity-80">
+                  <Translated i18nKey="reauthRequired" namespace="accounts" />
+                </span>
               )}
             </div>
 
             <span className="flex-grow"></span>
             <div className="relative flex flex-row items-center">
-              {valid ? (
+              {reusable ? (
                 <div className="absolute right-6 mx-2 h-2 w-2 transform rounded-full bg-green-500 transition-all group-hover:right-6 sm:right-0"></div>
               ) : (
-                <div className="absolute right-6 mx-2 h-2 w-2 transform rounded-full bg-red-500 transition-all group-hover:right-6 sm:right-0"></div>
+                <div className="absolute right-6 mx-2 h-2 w-2 transform rounded-full bg-blue-500 transition-all group-hover:right-6 sm:right-0"></div>
               )}
 
               <XCircleIcon
