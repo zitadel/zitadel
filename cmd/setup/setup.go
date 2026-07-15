@@ -354,6 +354,12 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		&RiverMigrateRepeatable{
 			client: dbClient,
 		},
+		&eventstoreAutovacuum{
+			dbClient:              dbClient,
+			Enabled:               config.Eventstore.Autovacuum.Enabled,
+			VacuumInsertThreshold: config.Eventstore.Autovacuum.VacuumInsertThreshold,
+			AnalyzeThreshold:      config.Eventstore.Autovacuum.AnalyzeThreshold,
+		},
 	}
 	repeatableSteps = append(repeatableSteps, triggerSteps(dbClient)...)
 

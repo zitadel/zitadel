@@ -1066,6 +1066,22 @@ Eventstore:
   PushTimeout: 15s #ZITADEL_EVENTSTORE_PUSHTIMEOUT
   # Maximum amount of push retries in case of primary key violation on the sequence
   MaxRetries: 5 #ZITADEL_EVENTSTORE_MAXRETRIES
+  # Autovacuum tunes PostgreSQL's autovacuum and autoanalyze behavior of the
+  # eventstore.events2 table. As the table grows, PostgreSQL's default,
+  # percentage-based scale factors delay vacuum and analyze runs more and
+  # more, which can degrade read performance on large instances. Enabling
+  # this replaces the scale factors with static thresholds, so vacuum and
+  # analyze keep running at a predictable cadence regardless of table size.
+  # Settings are (re-)applied to the table as a repeatable step during `zitadel setup`.
+  Autovacuum:
+    # If enabled, the thresholds below are applied to the eventstore.events2 table
+    # and the default, percentage-based autovacuum scale factors are disabled.
+    # If disabled, the table is reset to the cluster's default autovacuum settings.
+    Enabled: false # ZITADEL_EVENTSTORE_AUTOVACUUM_ENABLED
+    # Number of inserted or updated rows that triggers an autovacuum run, regardless of table size.
+    VacuumInsertThreshold: 50000 # ZITADEL_EVENTSTORE_AUTOVACUUM_VACUUMINSERTTHRESHOLD
+    # Number of changed rows that triggers an autoanalyze run, regardless of table size.
+    AnalyzeThreshold: 50000 # ZITADEL_EVENTSTORE_AUTOVACUUM_ANALYZETHRESHOLD
 
 HTTPClient:
   # Sets the limit of the response body size in bytes, which will be processed by the HTTP client.
