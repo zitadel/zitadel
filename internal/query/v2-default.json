@@ -36,6 +36,29 @@
       },
       "required": {
         "loginName": "Dieses Feld ist erforderlich"
+      },
+      "errors": {
+        "internalError": "Ein interner Fehler ist aufgetreten",
+        "couldNotGetLoginSettings": "Anmeldeeinstellungen konnten nicht abgerufen werden",
+        "couldNotSearchUsers": "Benutzer konnten nicht durchsucht werden",
+        "couldNotGetDomain": "Domain konnte nicht abgerufen werden",
+        "couldNotGetHost": "Host konnte nicht abgerufen werden",
+        "couldNotStartIDPFlow": "IDP-Ablauf konnte nicht gestartet werden",
+        "moreThanOneUserFound": "Mehr als ein Benutzer gefunden. Bitte geben Sie einen eindeutigen Identifikator an.",
+        "userNotFound": "Benutzer im System nicht gefunden",
+        "couldNotCreateSession": "Sitzung für Benutzer konnte nicht erstellt werden",
+        "initialUserNotSupported": "Initialer Benutzer wird nicht unterstützt",
+        "localAuthenticationNotAllowed": "Lokale Authentifizierung nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+        "passkeysNotAllowed": "Passkeys nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+        "couldNotFindIdentityProvider": "Identitätsanbieter konnte nicht gefunden werden.",
+        "userNotActive": "Das Benutzerkonto ist inaktiv. Wenden Sie sich für weitere Informationen an Ihren Administrator."
+      }
+    },
+    "zitadel": {
+      "errors": {
+        "errorOccured": "Ein Fehler ist aufgetreten",
+        "multipleUsersFound": "Mehrere Benutzer gefunden",
+        "userNotFound": "Benutzer im System nicht gefunden"
       }
     },
     "password": {
@@ -49,12 +72,19 @@
         },
         "required": {
           "password": "Dieses Feld ist erforderlich"
+        },
+        "errors": {
+          "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
+          "couldNotResetPassword": "Passwort konnte nicht zurückgesetzt werden"
+        },
+        "info": {
+          "passwordResetSent": "Passwort wurde zurückgesetzt. Bitte prüfen Sie Ihre E-Mails"
         }
       },
       "set": {
         "title": "Passwort festlegen",
         "description": "Legen Sie das Passwort für Ihr Konto fest",
-        "codeSent": "Ein Code wurde an Ihre E-Mail-Adresse gesendet.",
+        "codeSent": "Ein neuer Code wurde an Ihre E-Mail-Adresse gesendet.",
         "noCodeReceived": "Keinen Code erhalten?",
         "resend": "Erneut senden",
         "submit": "Weiter",
@@ -67,6 +97,11 @@
           "code": "Dieses Feld ist erforderlich",
           "newPassword": "Bitte geben Sie ein Passwort ein!",
           "confirmPassword": "Dieses Feld ist erforderlich"
+        },
+        "errors": {
+          "couldNotSetPassword": "Passwort konnte nicht gesetzt werden",
+          "couldNotResetPassword": "Passwort konnte nicht zurückgesetzt werden",
+          "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden"
         }
       },
       "change": {
@@ -74,13 +109,51 @@
         "description": "Legen Sie das Passwort für Ihr Konto fest",
         "submit": "Weiter",
         "labels": {
+          "currentPassword": "Aktuelles Passwort",
           "newPassword": "Neues Passwort",
           "confirmPassword": "Neues Passwort wiederholen"
         },
         "required": {
+          "currentPassword": "Bitte geben Sie Ihr aktuelles Passwort ein!",
           "newPassword": "Bitte geben Sie ein neues Passwort ein!",
           "confirmPassword": "Dieses Feld ist erforderlich"
+        },
+        "errors": {
+          "currentPasswordInvalid": "Das aktuelle Passwort ist falsch.",
+          "couldNotChangePassword": "Passwort konnte nicht geändert werden",
+          "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
+          "unknownError": "Unbekannter Fehler"
         }
+      },
+      "complexity": {
+        "length": "Muss mindestens {minLength} Zeichen lang sein.",
+        "hasSymbol": "Muss ein Symbol enthalten.",
+        "hasNumber": "Muss eine Zahl enthalten.",
+        "hasUppercase": "Muss einen Großbuchstaben enthalten.",
+        "hasLowercase": "Muss einen Kleinbuchstaben enthalten.",
+        "equals": "Passwortbestätigung stimmt überein.",
+        "matches": "Stimmt überein",
+        "doesNotMatch": "Stimmt nicht überein"
+      },
+      "errors": {
+        "noHostFound": "Kein Host gefunden",
+        "couldNotSendResetLink": "Passwort-Zurücksetzungslink konnte nicht gesendet werden",
+        "couldNotCreateSessionForUser": "Sitzung für Benutzer konnte nicht erstellt werden",
+        "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
+        "failedToAuthenticate": "Authentifizierung fehlgeschlagen. Sie haben {failedAttempts} von {maxPasswordAttempts} Passwortversuchen.{lockoutMessage}",
+        "failedToAuthenticateNoLimit": "Authentifizierung fehlgeschlagen.",
+        "accountLockedContactAdmin": " Kontaktieren Sie Ihren Administrator, um Ihr Konto zu entsperren",
+        "userNotFound": "Benutzer nicht im System gefunden",
+        "initialUserNotSupported": "Initialbenutzer wird nicht unterstützt",
+        "userInitialStateNotSupported": "Anfangszustand des Benutzers wird nicht unterstützt",
+        "codeOrVerificationRequired": "Sie müssen einen Code angeben oder eine gültige Benutzerverifizierung durchführen",
+        "verificationRequired": "Die Benutzerverifizierung muss durchgeführt werden",
+        "couldNotLoadSession": "Sitzung konnte nicht geladen werden",
+        "couldNotLoadAuthMethods": "Authentifizierungsmethoden konnten nicht geladen werden",
+        "failedPrecondition": "Vorbedingung fehlgeschlagen",
+        "sessionNotValid": "Sitzung ist nicht gültig",
+        "passwordVerificationMissing": "Passwort-Verifizierung fehlt.",
+        "passwordVerificationTooOld": "Passwort-Verifizierung ist zu alt. Bitte verifizieren Sie Ihr Passwort erneut."
       }
     },
     "idp": {
@@ -92,18 +165,6 @@
       "signInWithAzureAD": "Mit AzureAD anmelden",
       "signInWithGithub": "Mit GitHub anmelden",
       "signInWithGitlab": "Mit GitLab anmelden",
-      "loginSuccess": {
-        "title": "Anmeldung erfolgreich",
-        "description": "Sie haben sich erfolgreich angemeldet!"
-      },
-      "linkingSuccess": {
-        "title": "Konto verknüpft",
-        "description": "Sie haben Ihr Konto erfolgreich verknüpft!"
-      },
-      "registerSuccess": {
-        "title": "Registrierung erfolgreich",
-        "description": "Sie haben sich erfolgreich registriert!"
-      },
       "loginError": {
         "title": "Anmeldung fehlgeschlagen",
         "description": "Beim Anmelden ist ein Fehler aufgetreten."
@@ -115,6 +176,35 @@
       "completeRegister": {
         "title": "Registrierung abschließen",
         "description": "Bitte vervollständige die Registrierung, um dein Konto zu erstellen."
+      },
+      "accountNotFound": {
+        "title": "Konto nicht gefunden",
+        "description": "Wir konnten kein Konto finden, das mit Ihren Identitätsanbieter-Anmeldedaten verknüpft ist.",
+        "info": "Es wurde kein bestehendes Konto gefunden. Bitte melden Sie sich mit einem bestehenden Konto an oder wenden Sie sich an Ihren Administrator.",
+        "backToLogin": "Zurück zur Anmeldung"
+      },
+      "registrationFailed": {
+        "title": "Registrierung nicht verfügbar",
+        "description": "Wir konnten den Registrierungsprozess nicht abschließen.",
+        "info": "Die Organisation für die Registrierung konnte nicht ermittelt werden. Bitte wenden Sie sich an Ihren Administrator.",
+        "backToLogin": "Zurück zur Anmeldung"
+      },
+      "processing": {
+        "message": "Authentifizierung wird verarbeitet...",
+        "noRedirect": "Keine Weiterleitung oder Fehler vom Server erhalten",
+        "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
+      },
+      "errors": {
+        "missingParameters": "Erforderliche Parameter fehlen",
+        "missingIdpInfo": "IDP-Informationen fehlen",
+        "idpNotFound": "Identitätsanbieter nicht gefunden",
+        "linkingNotAllowed": "Verknüpfung ist für diesen Identitätsanbieter nicht erlaubt",
+        "linkingFailed": "Verknüpfung des Identitätsanbieters zum Konto fehlgeschlagen",
+        "autoLinkingFailed": "Automatische Verknüpfung des Kontos fehlgeschlagen",
+        "userCreationFailed": "Erstellen des Benutzerkontos fehlgeschlagen",
+        "orgResolutionFailed": "Organisation für Registrierung konnte nicht ermittelt werden",
+        "sessionCreationFailed": "Sitzung konnte nicht erstellt oder Weiterleitung konnte nicht ermittelt werden",
+        "unknownError": "Ein unbekannter Fehler ist aufgetreten"
       }
     },
     "ldap": {
@@ -178,14 +268,27 @@
         "title": "Mit einem Passkey authentifizieren",
         "description": "Ihr Gerät wird nach Ihrem Fingerabdruck, Gesicht oder Bildschirmsperre fragen",
         "usePassword": "Passwort verwenden",
-        "submit": "Weiter"
+        "submit": "Weiter",
+        "errors": {
+          "couldNotRequestChallenge": "Passkey-Challenge konnte nicht angefordert werden",
+          "couldNotVerifyPasskey": "Passkey konnte nicht verifiziert werden",
+          "noResponseReceived": "Passkey-Verifizierung fehlgeschlagen - keine Antwort erhalten",
+          "noRedirectProvided": "Passkey-Verifizierung abgeschlossen, aber keine Weiterleitung bereitgestellt",
+          "couldNotRetrievePasskey": "Fehler beim Abrufen des Passkeys",
+          "verificationCancelled": "Passkey-Verifizierung wurde abgebrochen",
+          "verificationFailed": "Fehler bei der Passkey-Verifizierung",
+          "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
+          "couldNotUpdateSession": "Sitzung konnte nicht aktualisiert werden",
+          "userNotFound": "Benutzer nicht im System gefunden",
+          "couldNotDetermineRedirect": "Weiterleitungs-URL nach Passkey-Verifizierung konnte nicht ermittelt werden"
+        }
       },
       "set": {
         "title": "Passkey einrichten",
         "description": "Ihr Gerät wird nach Ihrem Fingerabdruck, Gesicht oder Bildschirmsperre fragen",
         "info": {
           "description": "Ein Passkey ist eine Authentifizierungsmethode auf einem Gerät wie Ihr Fingerabdruck, Apple FaceID oder ähnliches.",
-          "link": "Passwortlose Authentifizierung"
+          "link": "Passkey-Authentifizierung"
         },
         "skip": "Überspringen",
         "submit": "Weiter"
@@ -245,6 +348,13 @@
         "firstname": "Dieses Feld ist erforderlich",
         "lastname": "Dieses Feld ist erforderlich",
         "email": "Dieses Feld ist erforderlich"
+      },
+      "errors": {
+        "couldNotCreateUser": "Benutzer konnte nicht erstellt werden",
+        "couldNotCreateSession": "Sitzung konnte nicht erstellt werden",
+        "userNotFound": "Benutzer nicht im System gefunden",
+        "couldNotLinkIDP": "IDP konnte nicht mit dem Benutzer verknüpft werden",
+        "couldNotRegisterUser": "Benutzer konnte nicht registriert werden"
       }
     },
     "invite": {
@@ -274,6 +384,7 @@
       "userIdMissing": "Keine Benutzer-ID angegeben!",
       "successTitle": "Benutzer verifiziert",
       "successDescription": "Der Benutzer wurde erfolgreich verifiziert.",
+      "successContinue": "Weiter",
       "setupAuthenticator": "Authentifikator einrichten",
       "verify": {
         "title": "Benutzer verifizieren",
@@ -288,6 +399,22 @@
         "required": {
           "code": "Dieses Feld ist erforderlich"
         }
+      },
+      "errors": {
+        "couldNotResendEmail": "E-Mail konnte nicht erneut gesendet werden",
+        "couldNotVerifyUser": "Benutzer konnte nicht verifiziert werden",
+        "couldNotVerifyInvite": "Einladung konnte nicht verifiziert werden",
+        "couldNotVerifyEmail": "E-Mail konnte nicht verifiziert werden",
+        "couldNotVerify": "Konnte nicht verifizieren",
+        "couldNotLoadUser": "Benutzer konnte nicht geladen werden",
+        "couldNotLoadAuthenticators": "Mögliche Authentifikatoren konnten nicht geladen werden",
+        "couldNotCreateSession": "Sitzung konnte nicht erstellt werden",
+        "noHostFound": "Kein Host gefunden",
+        "userAlreadyVerified": "Benutzer ist bereits verifiziert!",
+        "couldNotResendInvite": "Einladung konnte nicht erneut gesendet werden",
+        "inviteSendFailed": "Einladungs-E-Mail konnte nicht gesendet werden",
+        "emailSendFailed": "Verifizierungs-E-Mail konnte nicht gesendet werden",
+        "contextMissing": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
       }
     },
     "authenticator": {
@@ -311,8 +438,8 @@
       },
       "request": {
         "title": "{appName} möchte eine Verbindung herstellen:",
-        "disclaimer": "{appName} hat Zugriff auf:",
         "description": "Durch Klicken auf Zulassen erlauben Sie {appName} und Zitadel, Ihre Informationen gemäß ihren jeweiligen Nutzungsbedingungen und Datenschutzrichtlinien zu verwenden. Sie können diesen Zugriff jederzeit widerrufen.",
+        "disclaimer": "{appName} hat Zugriff auf:",
         "submit": "Zulassen",
         "deny": "Ablehnen"
       },
@@ -329,7 +456,8 @@
       "unknownContext": "Der Kontext des Benutzers konnte nicht ermittelt werden. Stellen Sie sicher, dass Sie zuerst den Benutzernamen eingeben oder einen loginName als Suchparameter angeben.",
       "sessionExpired": "Ihre aktuelle Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
       "failedLoading": "Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
-      "tryagain": "Erneut versuchen"
+      "tryagain": "Erneut versuchen",
+      "couldNotContinueSession": "Sitzung konnte nicht fortgesetzt werden - fehlende Benutzerinformationen"
     }
   },
   "en": {
@@ -369,6 +497,29 @@
       },
       "required": {
         "loginName": "This field is required"
+      },
+      "errors": {
+        "internalError": "An internal error occurred",
+        "couldNotGetLoginSettings": "Could not get login settings",
+        "couldNotSearchUsers": "Could not search users",
+        "couldNotGetDomain": "Could not get domain",
+        "couldNotGetHost": "Could not get host",
+        "couldNotStartIDPFlow": "Could not start IDP flow",
+        "moreThanOneUserFound": "More than one user found. Provide a unique identifier.",
+        "userNotFound": "User not found in the system",
+        "couldNotCreateSession": "Could not create session for user",
+        "initialUserNotSupported": "Initial User not supported",
+        "localAuthenticationNotAllowed": "Local authentication is not allowed! Contact your administrator for more information.",
+        "passkeysNotAllowed": "Passkeys not allowed! Contact your administrator for more information.",
+        "couldNotFindIdentityProvider": "Could not find identity provider.",
+        "userNotActive": "User is not active. Contact your administrator for more information."
+      }
+    },
+    "zitadel": {
+      "errors": {
+        "errorOccured": "An error occurred",
+        "multipleUsersFound": "Multiple users found",
+        "userNotFound": "User not found in the system"
       }
     },
     "password": {
@@ -382,12 +533,19 @@
         },
         "required": {
           "password": "This field is required"
+        },
+        "errors": {
+          "couldNotVerifyPassword": "Could not verify password",
+          "couldNotResetPassword": "Could not reset password"
+        },
+        "info": {
+          "passwordResetSent": "Password was reset. Please check your email"
         }
       },
       "set": {
         "title": "Set Password",
         "description": "Set the password for your account",
-        "codeSent": "A code has been sent to your email address.",
+        "codeSent": "A new code has been sent to your email address.",
         "noCodeReceived": "Didn't receive a code?",
         "resend": "Resend code",
         "submit": "Continue",
@@ -400,6 +558,11 @@
           "code": "This field is required",
           "newPassword": "You have to provide a password!",
           "confirmPassword": "This field is required"
+        },
+        "errors": {
+          "couldNotSetPassword": "Could not set password",
+          "couldNotResetPassword": "Could not reset password",
+          "couldNotVerifyPassword": "Could not verify password"
         }
       },
       "change": {
@@ -407,13 +570,51 @@
         "description": "Set the password for your account",
         "submit": "Continue",
         "labels": {
+          "currentPassword": "Current Password",
           "newPassword": "New Password",
           "confirmPassword": "Confirm Password"
         },
         "required": {
+          "currentPassword": "You have to provide your current password!",
           "newPassword": "You have to provide a new password!",
           "confirmPassword": "This field is required"
+        },
+        "errors": {
+          "currentPasswordInvalid": "Current password is incorrect.",
+          "couldNotChangePassword": "Could not change password",
+          "couldNotVerifyPassword": "Could not verify password",
+          "unknownError": "Unknown error"
         }
+      },
+      "complexity": {
+        "length": "Must be at least {minLength} characters long.",
+        "hasSymbol": "Must include a symbol.",
+        "hasNumber": "Must include a number.",
+        "hasUppercase": "Must include an uppercase letter.",
+        "hasLowercase": "Must include a lowercase letter.",
+        "equals": "Password confirmation matched.",
+        "matches": "Matches",
+        "doesNotMatch": "Doesn't match"
+      },
+      "errors": {
+        "noHostFound": "No host found",
+        "couldNotSendResetLink": "Could not send Password Reset Link",
+        "couldNotCreateSessionForUser": "Could not create session for user",
+        "couldNotVerifyPassword": "Could not verify password",
+        "failedToAuthenticate": "Failed to authenticate. You had {failedAttempts} of {maxPasswordAttempts} password attempts.{lockoutMessage}",
+        "failedToAuthenticateNoLimit": "Failed to authenticate.",
+        "accountLockedContactAdmin": " Contact your administrator to unlock your account",
+        "userNotFound": "User not found in the system",
+        "initialUserNotSupported": "Initial User not supported",
+        "userInitialStateNotSupported": "User Initial State is not supported",
+        "codeOrVerificationRequired": "You have to provide a code or have a valid User Verification Check",
+        "verificationRequired": "User Verification Check has to be done",
+        "couldNotLoadSession": "Could not load session",
+        "couldNotLoadAuthMethods": "Could not load auth methods",
+        "failedPrecondition": "Failed precondition",
+        "sessionNotValid": "Session is not valid",
+        "passwordVerificationMissing": "Password verification is missing.",
+        "passwordVerificationTooOld": "Password verification is too old. Please verify your password again."
       }
     },
     "idp": {
@@ -425,18 +626,6 @@
       "signInWithAzureAD": "Sign in with AzureAD",
       "signInWithGithub": "Sign in with GitHub",
       "signInWithGitlab": "Sign in with GitLab",
-      "loginSuccess": {
-        "title": "Login successful",
-        "description": "You have successfully been loggedIn!"
-      },
-      "linkingSuccess": {
-        "title": "Account linked",
-        "description": "You have successfully linked your account!"
-      },
-      "registerSuccess": {
-        "title": "Registration successful",
-        "description": "You have successfully registered!"
-      },
       "loginError": {
         "title": "Login failed",
         "description": "An error occurred while trying to login."
@@ -448,6 +637,35 @@
       "completeRegister": {
         "title": "Complete your data",
         "description": "You need to complete your registration by providing your email address and name."
+      },
+      "accountNotFound": {
+        "title": "Account Not Found",
+        "description": "We couldn't find an account associated with your identity provider credentials.",
+        "info": "No existing account was found. Please sign in with an existing account or contact your administrator for assistance.",
+        "backToLogin": "Back to Login"
+      },
+      "registrationFailed": {
+        "title": "Registration Not Available",
+        "description": "We couldn't complete the registration process.",
+        "info": "Unable to determine the organization for registration. Please contact your administrator for assistance.",
+        "backToLogin": "Back to Login"
+      },
+      "processing": {
+        "message": "Processing authentication...",
+        "noRedirect": "No redirect or error returned from server",
+        "unexpectedError": "An unexpected error occurred"
+      },
+      "errors": {
+        "missingParameters": "Missing required parameters",
+        "missingIdpInfo": "IDP information missing",
+        "idpNotFound": "Identity provider not found",
+        "linkingNotAllowed": "Linking is not allowed for this identity provider",
+        "linkingFailed": "Failed to link identity provider to account",
+        "autoLinkingFailed": "Failed to automatically link account",
+        "userCreationFailed": "Failed to create user account",
+        "orgResolutionFailed": "Could not determine organization for registration",
+        "sessionCreationFailed": "Could not create session or determine redirect",
+        "unknownError": "An unknown error occurred"
       }
     },
     "ldap": {
@@ -511,14 +729,27 @@
         "title": "Authenticate with a passkey",
         "description": "Your device will ask for your fingerprint, face, or screen lock",
         "usePassword": "Use password",
-        "submit": "Continue"
+        "submit": "Continue",
+        "errors": {
+          "couldNotRequestChallenge": "Could not request passkey challenge",
+          "couldNotVerifyPasskey": "Could not verify passkey",
+          "noResponseReceived": "Passkey verification failed - no response received",
+          "noRedirectProvided": "Passkey verification completed but no redirect was provided",
+          "couldNotRetrievePasskey": "An error occurred while retrieving passkey",
+          "verificationCancelled": "Passkey verification was cancelled",
+          "verificationFailed": "An error occurred during passkey verification",
+          "couldNotFindSession": "Could not find session",
+          "couldNotUpdateSession": "Could not update session",
+          "userNotFound": "User not found in the system",
+          "couldNotDetermineRedirect": "Could not determine redirect URL after passkey verification"
+        }
       },
       "set": {
         "title": "Setup a passkey",
         "description": "Your device will ask for your fingerprint, face, or screen lock",
         "info": {
           "description": "A passkey is an authentication method on a device like your fingerprint, Apple FaceID or similar. ",
-          "link": "passkey Authentication"
+          "link": "Passkey Authentication"
         },
         "skip": "Skip",
         "submit": "Continue"
@@ -578,6 +809,13 @@
         "firstname": "This field is required",
         "lastname": "This field is required",
         "email": "This field is required"
+      },
+      "errors": {
+        "couldNotCreateUser": "Could not create user",
+        "couldNotCreateSession": "Could not create session",
+        "userNotFound": "User not found in the system",
+        "couldNotLinkIDP": "Could not link IDP to user",
+        "couldNotRegisterUser": "Could not register user"
       }
     },
     "invite": {
@@ -607,13 +845,14 @@
       "userIdMissing": "No userId provided!",
       "successTitle": "User verified",
       "successDescription": "The user has been verified successfully.",
+      "successContinue": "Continue",
       "setupAuthenticator": "Setup authenticator",
       "verify": {
         "title": "Verify user",
         "description": "Enter the Code provided in the verification email.",
         "noCodeReceived": "Didn't receive a code?",
         "resendCode": "Resend code",
-        "codeSent": "A code has just been sent to your email address.",
+        "codeSent": "A new code has just been sent to your email address.",
         "submit": "Continue",
         "labels": {
           "code": "Code"
@@ -621,6 +860,22 @@
         "required": {
           "code": "This field is required"
         }
+      },
+      "errors": {
+        "couldNotResendEmail": "Could not resend email",
+        "couldNotVerifyUser": "Could not verify user",
+        "couldNotVerifyInvite": "Could not verify invite",
+        "couldNotVerifyEmail": "Could not verify email",
+        "couldNotVerify": "Could not verify",
+        "couldNotLoadUser": "Could not load user",
+        "couldNotLoadAuthenticators": "Could not load possible authenticators",
+        "couldNotCreateSession": "Could not create session",
+        "noHostFound": "No host found",
+        "userAlreadyVerified": "User is already verified!",
+        "couldNotResendInvite": "Could not resend invite",
+        "inviteSendFailed": "Failed to send invitation email",
+        "emailSendFailed": "Failed to send verification email",
+        "contextMissing": "An error occurred. Please try again."
       }
     },
     "authenticator": {
@@ -662,7 +917,8 @@
       "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam.",
       "sessionExpired": "Your current session has expired. Please login again.",
       "failedLoading": "Failed to load data. Please try again.",
-      "tryagain": "Try Again"
+      "tryagain": "Try Again",
+      "couldNotContinueSession": "Could not continue with session - missing user information"
     }
   },
   "es": {
@@ -702,6 +958,29 @@
       },
       "required": {
         "loginName": "Este campo es obligatorio"
+      },
+      "errors": {
+        "internalError": "Se produjo un error interno",
+        "couldNotGetLoginSettings": "No se pudieron obtener los ajustes de inicio de sesión",
+        "couldNotSearchUsers": "No se pudieron buscar usuarios",
+        "couldNotGetDomain": "No se pudo obtener el dominio",
+        "couldNotGetHost": "No se pudo obtener el host",
+        "couldNotStartIDPFlow": "No se pudo iniciar el flujo de IDP",
+        "moreThanOneUserFound": "Se encontró más de un usuario. Proporcione un identificador único.",
+        "userNotFound": "Usuario no encontrado en el sistema",
+        "couldNotCreateSession": "No se pudo crear la sesión para el usuario",
+        "initialUserNotSupported": "Usuario inicial no admitido",
+        "localAuthenticationNotAllowed": "¡La autenticación local no está permitida! Contacte con su administrador para más información.",
+        "passkeysNotAllowed": "Las passkeys no están permitidas. Contacte con su administrador para más información.",
+        "couldNotFindIdentityProvider": "No se pudo encontrar el proveedor de identidad.",
+        "userNotActive": "El usuario no está activo. Contacte con su administrador para más información."
+      }
+    },
+    "zitadel": {
+      "errors": {
+        "errorOccured": "Ocurrió un error",
+        "multipleUsersFound": "Se encontraron varios usuarios",
+        "userNotFound": "Usuario no encontrado en el sistema"
       }
     },
     "password": {
@@ -715,12 +994,19 @@
         },
         "required": {
           "password": "Este campo es obligatorio"
+        },
+        "errors": {
+          "couldNotVerifyPassword": "No se pudo verificar la contraseña",
+          "couldNotResetPassword": "No se pudo restablecer la contraseña"
+        },
+        "info": {
+          "passwordResetSent": "Se restableció la contraseña. Por favor, revise su correo electrónico"
         }
       },
       "set": {
         "title": "Establecer Contraseña",
         "description": "Establece la contraseña para tu cuenta",
-        "codeSent": "Se ha enviado un código a su correo electrónico.",
+        "codeSent": "Se ha enviado un nuevo código a su dirección de correo electrónico.",
         "noCodeReceived": "¿No recibiste un código?",
         "resend": "Reenviar código",
         "submit": "Continuar",
@@ -733,6 +1019,11 @@
           "code": "Este campo es obligatorio",
           "newPassword": "¡Debes proporcionar una contraseña!",
           "confirmPassword": "Este campo es obligatorio"
+        },
+        "errors": {
+          "couldNotSetPassword": "No se pudo establecer la contraseña",
+          "couldNotResetPassword": "No se pudo restablecer la contraseña",
+          "couldNotVerifyPassword": "No se pudo verificar la contraseña"
         }
       },
       "change": {
@@ -740,13 +1031,51 @@
         "description": "Establece la contraseña para tu cuenta",
         "submit": "Continuar",
         "labels": {
+          "currentPassword": "Contraseña actual",
           "newPassword": "Nueva contraseña",
           "confirmPassword": "Confirmar contraseña"
         },
         "required": {
+          "currentPassword": "¡Debes proporcionar tu contraseña actual!",
           "newPassword": "¡Debes proporcionar una nueva contraseña!",
           "confirmPassword": "Este campo es obligatorio"
+        },
+        "errors": {
+          "currentPasswordInvalid": "La contraseña actual es incorrecta.",
+          "couldNotChangePassword": "No se pudo cambiar la contraseña",
+          "couldNotVerifyPassword": "No se pudo verificar la contraseña",
+          "unknownError": "Error desconocido"
         }
+      },
+      "complexity": {
+        "length": "Debe tener al menos {minLength} caracteres de longitud.",
+        "hasSymbol": "Debe incluir un símbolo.",
+        "hasNumber": "Debe incluir un número.",
+        "hasUppercase": "Debe incluir una letra mayúscula.",
+        "hasLowercase": "Debe incluir una letra minúscula.",
+        "equals": "La confirmación de la contraseña coincide.",
+        "matches": "Coincide",
+        "doesNotMatch": "No coincide"
+      },
+      "errors": {
+        "noHostFound": "No se encontró el host",
+        "couldNotSendResetLink": "No se pudo enviar el enlace de restablecimiento de contraseña",
+        "couldNotCreateSessionForUser": "No se pudo crear la sesión para el usuario",
+        "couldNotVerifyPassword": "No se pudo verificar la contraseña",
+        "failedToAuthenticate": "Error al autenticar. Tuvo {failedAttempts} de {maxPasswordAttempts} intentos de contraseña.{lockoutMessage}",
+        "failedToAuthenticateNoLimit": "Error al autenticar.",
+        "accountLockedContactAdmin": " Comuníquese con su administrador para desbloquear su cuenta",
+        "userNotFound": "Usuario no encontrado en el sistema",
+        "initialUserNotSupported": "Usuario inicial no compatible",
+        "userInitialStateNotSupported": "El estado inicial del usuario no es compatible",
+        "codeOrVerificationRequired": "Debe proporcionar un código o tener una verificación de usuario válida",
+        "verificationRequired": "Se debe realizar la verificación de usuario",
+        "couldNotLoadSession": "No se pudo cargar la sesión",
+        "couldNotLoadAuthMethods": "No se pudieron cargar los métodos de autenticación",
+        "failedPrecondition": "Precondición fallida",
+        "sessionNotValid": "La sesión no es válida",
+        "passwordVerificationMissing": "Falta la verificación de la contraseña.",
+        "passwordVerificationTooOld": "La verificación de la contraseña es demasiado antigua. Por favor, verifique su contraseña de nuevo."
       }
     },
     "idp": {
@@ -758,18 +1087,6 @@
       "signInWithAzureAD": "Iniciar sesión con AzureAD",
       "signInWithGithub": "Iniciar sesión con GitHub",
       "signInWithGitlab": "Iniciar sesión con GitLab",
-      "loginSuccess": {
-        "title": "Inicio de sesión exitoso",
-        "description": "¡Has iniciado sesión con éxito!"
-      },
-      "linkingSuccess": {
-        "title": "Cuenta vinculada",
-        "description": "¡Has vinculado tu cuenta con éxito!"
-      },
-      "registerSuccess": {
-        "title": "Registro exitoso",
-        "description": "¡Te has registrado con éxito!"
-      },
       "loginError": {
         "title": "Error de inicio de sesión",
         "description": "Ocurrió un error al intentar iniciar sesión."
@@ -781,6 +1098,35 @@
       "completeRegister": {
         "title": "Completar registro",
         "description": "Para completar el registro, debes establecer una contraseña."
+      },
+      "accountNotFound": {
+        "title": "Cuenta no encontrada",
+        "description": "No pudimos encontrar una cuenta asociada con tus credenciales del proveedor de identidad.",
+        "info": "No se encontró ninguna cuenta existente. Por favor, inicia sesión con una cuenta existente o contacta a tu administrador para obtener asistencia.",
+        "backToLogin": "Volver al inicio de sesión"
+      },
+      "registrationFailed": {
+        "title": "Registro no disponible",
+        "description": "No pudimos completar el proceso de registro.",
+        "info": "No se pudo determinar la organización para el registro. Por favor, contacta a tu administrador para obtener asistencia.",
+        "backToLogin": "Volver al inicio de sesión"
+      },
+      "processing": {
+        "message": "Procesando autenticación...",
+        "noRedirect": "No se recibió redirección ni error del servidor",
+        "unexpectedError": "Ocurrió un error inesperado"
+      },
+      "errors": {
+        "missingParameters": "Faltan parámetros requeridos",
+        "missingIdpInfo": "Falta información del IDP",
+        "idpNotFound": "Proveedor de identidad no encontrado",
+        "linkingNotAllowed": "La vinculación no está permitida para este proveedor de identidad",
+        "linkingFailed": "Error al vincular el proveedor de identidad con la cuenta",
+        "autoLinkingFailed": "Error al vincular automáticamente la cuenta",
+        "userCreationFailed": "Error al crear la cuenta de usuario",
+        "orgResolutionFailed": "No se pudo determinar la organización para el registro",
+        "sessionCreationFailed": "No se pudo crear la sesión o determinar la redirección",
+        "unknownError": "Ocurrió un error desconocido"
       }
     },
     "ldap": {
@@ -844,7 +1190,20 @@
         "title": "Autenticar con una clave de acceso",
         "description": "Tu dispositivo pedirá tu huella digital, rostro o bloqueo de pantalla",
         "usePassword": "Usar contraseña",
-        "submit": "Continuar"
+        "submit": "Continuar",
+        "errors": {
+          "couldNotRequestChallenge": "No se pudo solicitar el desafío de clave de acceso",
+          "couldNotVerifyPasskey": "No se pudo verificar la clave de acceso",
+          "noResponseReceived": "Verificación de clave de acceso fallida - no se recibió respuesta",
+          "noRedirectProvided": "Verificación de clave de acceso completada pero no se proporcionó redirección",
+          "couldNotRetrievePasskey": "Ocurrió un error al recuperar la clave de acceso",
+          "verificationCancelled": "La verificación de clave de acceso fue cancelada",
+          "verificationFailed": "Ocurrió un error durante la verificación de clave de acceso",
+          "couldNotFindSession": "No se pudo encontrar la sesión",
+          "couldNotUpdateSession": "No se pudo actualizar la sesión",
+          "userNotFound": "Usuario no encontrado en el sistema",
+          "couldNotDetermineRedirect": "No se pudo determinar la URL de redirección después de la verificación de clave de acceso"
+        }
       },
       "set": {
         "title": "Configurar una clave de acceso",
@@ -911,6 +1270,13 @@
         "firstname": "Este campo es obligatorio",
         "lastname": "Este campo es obligatorio",
         "email": "Este campo es obligatorio"
+      },
+      "errors": {
+        "couldNotCreateUser": "No se pudo crear el usuario",
+        "couldNotCreateSession": "No se pudo crear la sesión",
+        "userNotFound": "Usuario no encontrado en el sistema",
+        "couldNotLinkIDP": "No se pudo vincular el IdP al usuario",
+        "couldNotRegisterUser": "No se pudo registrar el usuario"
       }
     },
     "invite": {
@@ -940,6 +1306,7 @@
       "userIdMissing": "¡No se proporcionó userId!",
       "successTitle": "Usuario verificado",
       "successDescription": "El usuario ha sido verificado con éxito.",
+      "successContinue": "Continuar",
       "setupAuthenticator": "Configurar autenticador",
       "verify": {
         "title": "Verificar usuario",
@@ -954,6 +1321,22 @@
         "required": {
           "code": "Este campo es obligatorio"
         }
+      },
+      "errors": {
+        "couldNotResendEmail": "No se pudo reenviar el correo electrónico",
+        "couldNotVerifyUser": "No se pudo verificar al usuario",
+        "couldNotVerifyInvite": "No se pudo verificar la invitación",
+        "couldNotVerifyEmail": "No se pudo verificar el correo electrónico",
+        "couldNotVerify": "No se pudo verificar",
+        "couldNotLoadUser": "No se pudo cargar al usuario",
+        "couldNotLoadAuthenticators": "No se pudieron cargar los autenticadores posibles",
+        "couldNotCreateSession": "No se pudo crear la sesión",
+        "noHostFound": "No se encontró el host",
+        "userAlreadyVerified": "¡El usuario ya está verificado!",
+        "couldNotResendInvite": "No se pudo reenviar la invitación",
+        "inviteSendFailed": "No se pudo enviar el correo de invitación",
+        "emailSendFailed": "No se pudo enviar el correo electrónico de verificación",
+        "contextMissing": "Ocurrió un error. Por favor inténtelo de nuevo."
       }
     },
     "authenticator": {
@@ -995,7 +1378,8 @@
       "unknownContext": "No se pudo obtener el contexto del usuario. Asegúrate de ingresar primero el nombre de usuario o proporcionar un loginName como parámetro de búsqueda.",
       "sessionExpired": "Tu sesión actual ha expirado. Por favor, inicia sesión de nuevo.",
       "failedLoading": "No se pudieron cargar los datos. Por favor, inténtalo de nuevo.",
-      "tryagain": "Intentar de nuevo"
+      "tryagain": "Intentar de nuevo",
+      "couldNotContinueSession": "No se pudo continuar con la sesión - falta información del usuario"
     }
   },
   "it": {
@@ -1035,6 +1419,29 @@
       },
       "required": {
         "loginName": "Questo campo è obbligatorio"
+      },
+      "errors": {
+        "internalError": "Si è verificato un errore interno",
+        "couldNotGetLoginSettings": "Impossibile ottenere le impostazioni di accesso",
+        "couldNotSearchUsers": "Impossibile cercare gli utenti",
+        "couldNotGetDomain": "Impossibile ottenere il dominio",
+        "couldNotGetHost": "Impossibile ottenere l'host",
+        "couldNotStartIDPFlow": "Impossibile avviare il flusso IDP",
+        "moreThanOneUserFound": "È stato trovato più di un utente. Fornisci un identificatore univoco.",
+        "userNotFound": "Utente non trovato nel sistema",
+        "couldNotCreateSession": "Impossibile creare la sessione per l'utente",
+        "initialUserNotSupported": "Utente iniziale non supportato",
+        "localAuthenticationNotAllowed": "L'autenticazione locale non è consentita! Contatta il tuo amministratore per ulteriori informazioni.",
+        "passkeysNotAllowed": "Passkey non consentite! Contatta l'amministratore per maggiori informazioni.",
+        "couldNotFindIdentityProvider": "Impossibile trovare il provider di identità.",
+        "userNotActive": "L'utente non è attivo. Contatta l'amministratore per maggiori informazioni."
+      }
+    },
+    "zitadel": {
+      "errors": {
+        "errorOccured": "Si è verificato un errore",
+        "multipleUsersFound": "Trovati più utenti",
+        "userNotFound": "Utente non trovato nel sistema"
       }
     },
     "password": {
@@ -1048,12 +1455,19 @@
         },
         "required": {
           "password": "Questo campo è obbligatorio"
+        },
+        "errors": {
+          "couldNotVerifyPassword": "Impossibile verificare la password",
+          "couldNotResetPassword": "Impossibile reimpostare la password"
+        },
+        "info": {
+          "passwordResetSent": "La password è stata reimpostata. Controlla la tua e-mail"
         }
       },
       "set": {
         "title": "Imposta Password",
         "description": "Imposta la password per il tuo account",
-        "codeSent": "Un codice è stato inviato al tuo indirizzo email.",
+        "codeSent": "Un nuovo codice è stato inviato al tuo indirizzo email.",
         "noCodeReceived": "Non hai ricevuto un codice?",
         "resend": "Invia di nuovo",
         "submit": "Continua",
@@ -1066,6 +1480,11 @@
           "code": "Questo campo è obbligatorio",
           "newPassword": "Devi fornire una password!",
           "confirmPassword": "Questo campo è obbligatorio"
+        },
+        "errors": {
+          "couldNotSetPassword": "Impossibile impostare la password",
+          "couldNotResetPassword": "Impossibile reimpostare la password",
+          "couldNotVerifyPassword": "Impossibile verificare la password"
         }
       },
       "change": {
@@ -1073,13 +1492,51 @@
         "description": "Imposta la password per il tuo account",
         "submit": "Continua",
         "labels": {
+          "currentPassword": "Password attuale",
           "newPassword": "Nuova password",
           "confirmPassword": "Conferma password"
         },
         "required": {
+          "currentPassword": "Devi fornire la tua password attuale!",
           "newPassword": "Devi fornire una nuova password!",
           "confirmPassword": "Questo campo è obbligatorio"
+        },
+        "errors": {
+          "currentPasswordInvalid": "La password attuale non è corretta.",
+          "couldNotChangePassword": "Impossibile modificare la password",
+          "couldNotVerifyPassword": "Impossibile verificare la password",
+          "unknownError": "Errore sconosciuto"
         }
+      },
+      "complexity": {
+        "length": "Deve contenere almeno {minLength} caratteri.",
+        "hasSymbol": "Deve includere un simbolo.",
+        "hasNumber": "Deve includere un numero.",
+        "hasUppercase": "Deve includere una lettera maiuscola.",
+        "hasLowercase": "Deve includere una lettera minuscola.",
+        "equals": "La conferma della password corrisponde.",
+        "matches": "Corrisponde",
+        "doesNotMatch": "Non corrisponde"
+      },
+      "errors": {
+        "noHostFound": "Nessun host trovato",
+        "couldNotSendResetLink": "Impossibile inviare il link per il ripristino della password",
+        "couldNotCreateSessionForUser": "Impossibile creare una sessione per l'utente",
+        "couldNotVerifyPassword": "Impossibile verificare la password",
+        "failedToAuthenticate": "Autenticazione non riuscita. Hai effettuato {failedAttempts} di {maxPasswordAttempts} tentativi di password.{lockoutMessage}",
+        "failedToAuthenticateNoLimit": "Autenticazione non riuscita.",
+        "accountLockedContactAdmin": " Contatta l'amministratore per sbloccare il tuo account",
+        "userNotFound": "Utente non trovato nel sistema",
+        "initialUserNotSupported": "Utente iniziale non supportato",
+        "userInitialStateNotSupported": "Lo stato iniziale dell'utente non è supportato",
+        "codeOrVerificationRequired": "Devi fornire un codice o avere una verifica utente valida",
+        "verificationRequired": "È necessario effettuare la verifica utente",
+        "couldNotLoadSession": "Impossibile caricare la sessione",
+        "couldNotLoadAuthMethods": "Impossibile caricare i metodi di autenticazione",
+        "failedPrecondition": "Precondizione non soddisfatta",
+        "sessionNotValid": "La sessione non è valida",
+        "passwordVerificationMissing": "Manca la verifica della password.",
+        "passwordVerificationTooOld": "La verifica della password è troppo vecchia. Si prega di verificare nuovamente la password."
       }
     },
     "idp": {
@@ -1091,18 +1548,6 @@
       "signInWithAzureAD": "Accedi con AzureAD",
       "signInWithGithub": "Accedi con GitHub",
       "signInWithGitlab": "Accedi con GitLab",
-      "loginSuccess": {
-        "title": "Accesso riuscito",
-        "description": "Accesso effettuato con successo!"
-      },
-      "linkingSuccess": {
-        "title": "Account collegato",
-        "description": "Hai collegato con successo il tuo account!"
-      },
-      "registerSuccess": {
-        "title": "Registrazione riuscita",
-        "description": "Registrazione effettuata con successo!"
-      },
       "loginError": {
         "title": "Accesso fallito",
         "description": "Si è verificato un errore durante il tentativo di accesso."
@@ -1114,6 +1559,35 @@
       "completeRegister": {
         "title": "Completa la registrazione",
         "description": "Completa la registrazione del tuo account."
+      },
+      "accountNotFound": {
+        "title": "Account non trovato",
+        "description": "Non siamo riusciti a trovare un account associato alle tue credenziali del provider di identità.",
+        "info": "Nessun account esistente è stato trovato. Accedi con un account esistente o contatta il tuo amministratore per assistenza.",
+        "backToLogin": "Torna al login"
+      },
+      "registrationFailed": {
+        "title": "Registrazione non disponibile",
+        "description": "Non siamo riusciti a completare il processo di registrazione.",
+        "info": "Impossibile determinare l'organizzazione per la registrazione. Contatta il tuo amministratore per assistenza.",
+        "backToLogin": "Torna al login"
+      },
+      "processing": {
+        "message": "Elaborazione autenticazione in corso...",
+        "noRedirect": "Nessun reindirizzamento o errore ricevuto dal server",
+        "unexpectedError": "Si è verificato un errore imprevisto"
+      },
+      "errors": {
+        "missingParameters": "Parametri richiesti mancanti",
+        "missingIdpInfo": "Informazioni IDP mancanti",
+        "idpNotFound": "Provider di identità non trovato",
+        "linkingNotAllowed": "Il collegamento non è consentito per questo provider di identità",
+        "linkingFailed": "Collegamento del provider di identità all'account non riuscito",
+        "autoLinkingFailed": "Collegamento automatico dell'account non riuscito",
+        "userCreationFailed": "Creazione dell'account utente non riuscita",
+        "orgResolutionFailed": "Impossibile determinare l'organizzazione per la registrazione",
+        "sessionCreationFailed": "Impossibile creare la sessione o determinare il reindirizzamento",
+        "unknownError": "Si è verificato un errore sconosciuto"
       }
     },
     "ldap": {
@@ -1177,14 +1651,27 @@
         "title": "Autenticati con una passkey",
         "description": "Il tuo dispositivo chiederà la tua impronta digitale, il volto o il blocco schermo",
         "usePassword": "Usa password",
-        "submit": "Continua"
+        "submit": "Continua",
+        "errors": {
+          "couldNotRequestChallenge": "Impossibile richiedere la sfida passkey",
+          "couldNotVerifyPasskey": "Impossibile verificare la passkey",
+          "noResponseReceived": "Verifica passkey fallita - nessuna risposta ricevuta",
+          "noRedirectProvided": "Verifica passkey completata ma nessun reindirizzamento fornito",
+          "couldNotRetrievePasskey": "Si è verificato un errore durante il recupero della passkey",
+          "verificationCancelled": "La verifica della passkey è stata annullata",
+          "verificationFailed": "Si è verificato un errore durante la verifica della passkey",
+          "couldNotFindSession": "Impossibile trovare la sessione",
+          "couldNotUpdateSession": "Impossibile aggiornare la sessione",
+          "userNotFound": "Utente non trovato nel sistema",
+          "couldNotDetermineRedirect": "Impossibile determinare l'URL di reindirizzamento dopo la verifica passkey"
+        }
       },
       "set": {
         "title": "Configura una passkey",
         "description": "Il tuo dispositivo chiederà la tua impronta digitale, il volto o il blocco schermo",
         "info": {
           "description": "Una passkey è un metodo di autenticazione su un dispositivo come la tua impronta digitale, Apple FaceID o simili.",
-          "link": "Autenticazione senza password"
+          "link": "Autenticazione con Passkey"
         },
         "skip": "Salta",
         "submit": "Continua"
@@ -1244,6 +1731,13 @@
         "firstname": "Questo campo è obbligatorio",
         "lastname": "Questo campo è obbligatorio",
         "email": "Questo campo è obbligatorio"
+      },
+      "errors": {
+        "couldNotCreateUser": "Impossibile creare l'utente",
+        "couldNotCreateSession": "Impossibile creare la sessione",
+        "userNotFound": "Utente non trovato nel sistema",
+        "couldNotLinkIDP": "Impossibile collegare l'IDP all'utente",
+        "couldNotRegisterUser": "Impossibile registrare l'utente"
       }
     },
     "invite": {
@@ -1273,6 +1767,7 @@
       "userIdMissing": "Nessun userId fornito!",
       "successTitle": "Utente verificato",
       "successDescription": "L'utente è stato verificato con successo.",
+      "successContinue": "Continua",
       "setupAuthenticator": "Configura autenticatore",
       "verify": {
         "title": "Verifica utente",
@@ -1287,6 +1782,22 @@
         "required": {
           "code": "Questo campo è obbligatorio"
         }
+      },
+      "errors": {
+        "couldNotResendEmail": "Impossibile reinviare l'email",
+        "couldNotVerifyUser": "Impossibile verificare l'utente",
+        "couldNotVerifyInvite": "Impossibile verificare l'invito",
+        "couldNotVerifyEmail": "Impossibile verificare l'email",
+        "couldNotVerify": "Impossibile verificare",
+        "couldNotLoadUser": "Impossibile caricare l'utente",
+        "couldNotLoadAuthenticators": "Impossibile caricare gli autenticatori possibili",
+        "couldNotCreateSession": "Impossibile creare la sessione",
+        "noHostFound": "Nessun host trovato",
+        "userAlreadyVerified": "L'utente è già verificato!",
+        "couldNotResendInvite": "Impossibile reinviare l'invito",
+        "inviteSendFailed": "Impossibile inviare l'email di invito",
+        "emailSendFailed": "Impossibile inviare l'email di verifica",
+        "contextMissing": "Si è verificato un errore. Riprova."
       }
     },
     "authenticator": {
@@ -1328,7 +1839,8 @@
       "unknownContext": "Impossibile ottenere il contesto dell'utente. Assicurati di inserire prima il nome utente o di fornire un loginName come parametro di ricerca.",
       "sessionExpired": "La tua sessione attuale è scaduta. Effettua nuovamente l'accesso.",
       "failedLoading": "Impossibile caricare i dati. Riprova.",
-      "tryagain": "Riprova"
+      "tryagain": "Riprova",
+      "couldNotContinueSession": "Impossibile continuare con la sessione - informazioni utente mancanti"
     }
   },
   "nl": {
@@ -1352,7 +1864,7 @@
       "verifiedAt": "Laatst actief: {time}",
       "success": {
         "title": "Succesvol uitgelogd",
-        "description": "U bent succesvol uitgelogd."
+        "description": "Je bent succesvol uitgelogd."
       }
     },
     "loginname": {
@@ -1380,7 +1892,7 @@
         "userNotFound": "Gebruiker niet in het systeem gevonden",
         "couldNotCreateSession": "Kon sessie voor gebruiker niet aanmaken",
         "initialUserNotSupported": "Initiële gebruiker wordt niet ondersteund",
-        "usernamePasswordNotAllowed": "Gebruikersnaam en wachtwoord niet toegestaan! Neem contact op met jouw beheerder voor meer informatie.",
+        "localAuthenticationNotAllowed": "Lokale authenticatie is niet toegestaan! Neem contact op met uw beheerder voor meer informatie.",
         "passkeysNotAllowed": "Passkeys niet toegestaan! Neem contact op met jouw beheerder voor meer informatie.",
         "couldNotFindIdentityProvider": "Kon identiteitsprovider niet vinden.",
         "userNotActive": "Gebruiker is niet actief. Neem contact op met jouw beheerder voor meer informatie."
@@ -1416,7 +1928,7 @@
       "set": {
         "title": "Stel Wachtwoord in",
         "description": "Stel het wachtwoord voor jouw account in",
-        "codeSent": "Er is een code naar jouw e-mailadres verzonden.",
+        "codeSent": "Er is een nieuwe code naar uw e-mailadres verzonden.",
         "noCodeReceived": "Geen code ontvangen?",
         "resend": "Code opnieuw versturen",
         "submit": "Verder",
@@ -1441,14 +1953,17 @@
         "description": "Stel het wachtwoord voor jouw account in",
         "submit": "Verder",
         "labels": {
+          "currentPassword": "Huidig wachtwoord",
           "newPassword": "Nieuw wachtwoord",
           "confirmPassword": "Bevestig wachtwoord"
         },
         "required": {
+          "currentPassword": "Je moet je huidige wachtwoord opgeven!",
           "newPassword": "Je moet een nieuw wachtwoord opgeven!",
           "confirmPassword": "Dit veld is verplicht"
         },
         "errors": {
+          "currentPasswordInvalid": "Het huidige wachtwoord is onjuist.",
           "couldNotChangePassword": "Kon wachtwoord niet wijzigen",
           "couldNotVerifyPassword": "Kon wachtwoord niet verifiëren",
           "unknownError": "Onbekende fout"
@@ -1480,7 +1995,9 @@
         "couldNotLoadSession": "Kon sessie niet laden",
         "couldNotLoadAuthMethods": "Kon verificatiemethoden niet laden",
         "failedPrecondition": "Voorwaarde mislukt",
-        "sessionNotValid": "Sessie is niet geldig"
+        "sessionNotValid": "Sessie is niet geldig",
+        "passwordVerificationMissing": "Wachtwoordverificatie ontbreekt.",
+        "passwordVerificationTooOld": "Wachtwoordverificatie is te oud. Verifieer je wachtwoord opnieuw."
       }
     },
     "idp": {
@@ -1593,7 +2110,7 @@
     "passkey": {
       "verify": {
         "title": "Authenticeer met een passkey",
-        "description": "Uw apparaat vraagt om jouw vingerafdruk, gezicht of schermvergrendeling",
+        "description": "Jouw apparaat vraagt om jouw vingerafdruk, gezicht of schermvergrendeling",
         "usePassword": "Gebruik wachtwoord",
         "submit": "Doorgaan",
         "errors": {
@@ -1615,7 +2132,7 @@
         "description": "Uw apparaat vraagt om jouw vingerafdruk, gezicht of schermvergrendeling",
         "info": {
           "description": "Een passkey is een authenticatiemethode op een apparaat zoals jouw vingerafdruk, Apple FaceID of iets dergelijks. ",
-          "link": "Wachtwoordloze authenticatie"
+          "link": "Passkey authenticatie"
         },
         "skip": "Overslaan",
         "submit": "Doorgaan"
@@ -1711,6 +2228,7 @@
       "userIdMissing": "Geen gebruikers-ID opgegeven!",
       "successTitle": "Gebruiker geverifieerd",
       "successDescription": "De gebruiker is succesvol geverifieerd.",
+      "successContinue": "Doorgaan",
       "setupAuthenticator": "Authenticator instellen",
       "verify": {
         "title": "Gebruiker verifiëren",
@@ -1739,7 +2257,8 @@
         "userAlreadyVerified": "Gebruiker is al geverifieerd!",
         "couldNotResendInvite": "Kon uitnodiging niet opnieuw versturen",
         "inviteSendFailed": "Versturen van uitnodigingsmail mislukt",
-        "emailSendFailed": "Versturen van verificatie-e-mail mislukt"
+        "emailSendFailed": "Versturen van verificatie-e-mail mislukt",
+        "contextMissing": "Er is een fout opgetreden. Probeer het opnieuw."
       }
     },
     "authenticator": {
@@ -1822,6 +2341,29 @@
       },
       "required": {
         "loginName": "To pole jest wymagane"
+      },
+      "errors": {
+        "internalError": "Wystąpił błąd wewnętrzny",
+        "couldNotGetLoginSettings": "Nie udało się pobrać ustawień logowania",
+        "couldNotSearchUsers": "Nie udało się wyszukać użytkowników",
+        "couldNotGetDomain": "Nie udało się pobrać domeny",
+        "couldNotGetHost": "Nie udało się pobrać hosta",
+        "couldNotStartIDPFlow": "Nie udało się rozpocząć procesu IDP",
+        "moreThanOneUserFound": "Znaleziono więcej niż jednego użytkownika. Podaj unikalny identyfikator.",
+        "userNotFound": "Użytkownik nie został znaleziony w systemie",
+        "couldNotCreateSession": "Nie udało się utworzyć sesji dla użytkownika",
+        "initialUserNotSupported": "Użytkownik inicjalny nie jest obsługiwany",
+        "localAuthenticationNotAllowed": "Uwierzytelnianie lokalne nie jest dozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+        "passkeysNotAllowed": "Klucze dostępu są niedozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+        "couldNotFindIdentityProvider": "Nie udało się znaleźć dostawcy tożsamości.",
+        "userNotActive": "Użytkownik jest nieaktywny. Skontaktuj się z administratorem, aby uzyskać więcej informacji."
+      }
+    },
+    "zitadel": {
+      "errors": {
+        "errorOccured": "Wystąpił błąd",
+        "multipleUsersFound": "Znaleziono wielu użytkowników",
+        "userNotFound": "Użytkownik nie został znaleziony w systemie"
       }
     },
     "password": {
@@ -1835,12 +2377,19 @@
         },
         "required": {
           "password": "To pole jest wymagane"
+        },
+        "errors": {
+          "couldNotVerifyPassword": "Nie można zweryfikować hasła",
+          "couldNotResetPassword": "Nie można zresetować hasła"
+        },
+        "info": {
+          "passwordResetSent": "Hasło zostało zresetowane. Sprawdź swoją pocztę e-mail"
         }
       },
       "set": {
         "title": "Ustaw hasło",
         "description": "Ustaw hasło dla swojego konta",
-        "codeSent": "Kod został wysłany na twój adres e-mail.",
+        "codeSent": "Nowy kod został wysłany na Twój adres e-mail.",
         "noCodeReceived": "Nie otrzymałeś kodu?",
         "resend": "Wyślij kod ponownie",
         "submit": "Kontynuuj",
@@ -1853,6 +2402,11 @@
           "code": "To pole jest wymagane",
           "newPassword": "Musisz podać hasło!",
           "confirmPassword": "To pole jest wymagane"
+        },
+        "errors": {
+          "couldNotSetPassword": "Nie można ustawić hasła",
+          "couldNotResetPassword": "Nie można zresetować hasła",
+          "couldNotVerifyPassword": "Nie można zweryfikować hasła"
         }
       },
       "change": {
@@ -1860,13 +2414,51 @@
         "description": "Ustaw nowe hasło dla swojego konta",
         "submit": "Kontynuuj",
         "labels": {
+          "currentPassword": "Aktualne hasło",
           "newPassword": "Nowe hasło",
           "confirmPassword": "Potwierdź nowe hasło"
         },
         "required": {
+          "currentPassword": "Musisz podać aktualne hasło!",
           "newPassword": "Musisz podać nowe hasło!",
           "confirmPassword": "To pole jest wymagane"
+        },
+        "errors": {
+          "currentPasswordInvalid": "Aktualne hasło jest nieprawidłowe.",
+          "couldNotChangePassword": "Nie można zmienić hasła",
+          "couldNotVerifyPassword": "Nie można zweryfikować hasła",
+          "unknownError": "Nieznany błąd"
         }
+      },
+      "complexity": {
+        "length": "Musi zawierać co najmniej {minLength} znaków.",
+        "hasSymbol": "Musi zawierać symbol.",
+        "hasNumber": "Musi zawierać numer.",
+        "hasUppercase": "Musi zawierać dużą literę.",
+        "hasLowercase": "Musi zawierać małą literę.",
+        "equals": "Potwierdzenie hasła pasuje.",
+        "matches": "Pasuje",
+        "doesNotMatch": "Nie pasuje"
+      },
+      "errors": {
+        "noHostFound": "Nie znaleziono hosta",
+        "couldNotSendResetLink": "Nie można wysłać linku do resetowania hasła",
+        "couldNotCreateSessionForUser": "Nie można utworzyć sesji dla użytkownika",
+        "couldNotVerifyPassword": "Nie można zweryfikować hasła",
+        "failedToAuthenticate": "Uwierzytelnianie nie powiodło się. Wykorzystałeś {failedAttempts} z {maxPasswordAttempts} prób wprowadzenia hasła.{lockoutMessage}",
+        "failedToAuthenticateNoLimit": "Uwierzytelnianie nie powiodło się.",
+        "accountLockedContactAdmin": " Skontaktuj się z administratorem, aby odblokować konto",
+        "userNotFound": "Użytkownik nie został znaleziony w systemie",
+        "initialUserNotSupported": "Użytkownik początkowy nie jest obsługiwany",
+        "userInitialStateNotSupported": "Początkowy stan użytkownika nie jest obsługiwany",
+        "codeOrVerificationRequired": "Musisz podać kod lub mieć ważną weryfikację użytkownika",
+        "verificationRequired": "Wymagana jest weryfikacja użytkownika",
+        "couldNotLoadSession": "Nie można załadować sesji",
+        "couldNotLoadAuthMethods": "Nie można załadować metod uwierzytelniania",
+        "failedPrecondition": "Nie spełniono warunków wstępnych",
+        "sessionNotValid": "Sesja jest nieważna",
+        "passwordVerificationMissing": "Brak weryfikacji hasła.",
+        "passwordVerificationTooOld": "Weryfikacja hasła jest przestarzała. Proszę zweryfikować hasło ponownie."
       }
     },
     "idp": {
@@ -1878,18 +2470,6 @@
       "signInWithAzureAD": "Zaloguj się przez AzureAD",
       "signInWithGithub": "Zaloguj się przez GitHub",
       "signInWithGitlab": "Zaloguj się przez GitLab",
-      "loginSuccess": {
-        "title": "Logowanie udane",
-        "description": "Zostałeś pomyślnie zalogowany!"
-      },
-      "linkingSuccess": {
-        "title": "Konto powiązane",
-        "description": "Pomyślnie powiązałeś swoje konto!"
-      },
-      "registerSuccess": {
-        "title": "Rejestracja udana",
-        "description": "Pomyślnie się zarejestrowałeś!"
-      },
       "loginError": {
         "title": "Logowanie nieudane",
         "description": "Wystąpił błąd podczas próby logowania."
@@ -1901,6 +2481,35 @@
       "completeRegister": {
         "title": "Ukończ rejestrację",
         "description": "Ukończ rejestrację swojego konta."
+      },
+      "accountNotFound": {
+        "title": "Nie znaleziono konta",
+        "description": "Nie mogliśmy znaleźć konta powiązanego z danymi logowania Twojego dostawcy tożsamości.",
+        "info": "Nie znaleziono istniejącego konta. Zaloguj się przy użyciu istniejącego konta lub skontaktuj się z administratorem w celu uzyskania pomocy.",
+        "backToLogin": "Powrót do logowania"
+      },
+      "registrationFailed": {
+        "title": "Rejestracja niedostępna",
+        "description": "Nie mogliśmy ukończyć procesu rejestracji.",
+        "info": "Nie można określić organizacji do rejestracji. Skontaktuj się z administratorem w celu uzyskania pomocy.",
+        "backToLogin": "Powrót do logowania"
+      },
+      "processing": {
+        "message": "Przetwarzanie uwierzytelniania...",
+        "noRedirect": "Nie otrzymano przekierowania ani błędu z serwera",
+        "unexpectedError": "Wystąpił nieoczekiwany błąd"
+      },
+      "errors": {
+        "missingParameters": "Brakuje wymaganych parametrów",
+        "missingIdpInfo": "Brak informacji IDP",
+        "idpNotFound": "Dostawca tożsamości nie znaleziony",
+        "linkingNotAllowed": "Łączenie nie jest dozwolone dla tego dostawcy tożsamości",
+        "linkingFailed": "Nie udało się połączyć dostawcy tożsamości z kontem",
+        "autoLinkingFailed": "Nie udało się automatycznie połączyć konta",
+        "userCreationFailed": "Nie udało się utworzyć konta użytkownika",
+        "orgResolutionFailed": "Nie można określić organizacji do rejestracji",
+        "sessionCreationFailed": "Nie można utworzyć sesji lub określić przekierowania",
+        "unknownError": "Wystąpił nieznany błąd"
       }
     },
     "ldap": {
@@ -1964,14 +2573,27 @@
         "title": "Uwierzytelnij się za pomocą klucza dostępu",
         "description": "Twoje urządzenie poprosi o użycie odcisku palca, rozpoznawania twarzy lub blokady ekranu.",
         "usePassword": "Użyj hasła",
-        "submit": "Kontynuuj"
+        "submit": "Kontynuuj",
+        "errors": {
+          "couldNotRequestChallenge": "Nie można zażądać wyzwania klucza dostępu",
+          "couldNotVerifyPasskey": "Nie można zweryfikować klucza dostępu",
+          "noResponseReceived": "Weryfikacja klucza dostępu nie powiodła się - nie otrzymano odpowiedzi",
+          "noRedirectProvided": "Weryfikacja klucza dostępu zakończona, ale nie podano przekierowania",
+          "couldNotRetrievePasskey": "Wystąpił błąd podczas pobierania klucza dostępu",
+          "verificationCancelled": "Weryfikacja klucza dostępu została anulowana",
+          "verificationFailed": "Wystąpił błąd podczas weryfikacji klucza dostępu",
+          "couldNotFindSession": "Nie można znaleźć sesji",
+          "couldNotUpdateSession": "Nie można zaktualizować sesji",
+          "userNotFound": "Użytkownik nie znaleziony w systemie",
+          "couldNotDetermineRedirect": "Nie można określić adresu URL przekierowania po weryfikacji klucza dostępu"
+        }
       },
       "set": {
         "title": "Skonfiguruj klucz dostępu",
         "description": "Twoje urządzenie poprosi o użycie odcisku palca, rozpoznawania twarzy lub blokady ekranu.",
         "info": {
           "description": "Klucz dostępu to metoda uwierzytelniania na urządzeniu, wykorzystująca np. odcisk palca, Apple FaceID lub podobne rozwiązania.",
-          "link": "Uwierzytelnianie bez hasła"
+          "link": "Uwierzytelnianie kluczem dostępu"
         },
         "skip": "Pomiń",
         "submit": "Kontynuuj"
@@ -2031,6 +2653,13 @@
         "firstname": "To pole jest wymagane",
         "lastname": "To pole jest wymagane",
         "email": "To pole jest wymagane"
+      },
+      "errors": {
+        "couldNotCreateUser": "Nie udało się utworzyć użytkownika",
+        "couldNotCreateSession": "Nie udało się utworzyć sesji",
+        "userNotFound": "Nie znaleziono użytkownika w systemie",
+        "couldNotLinkIDP": "Nie udało się powiązać IDP z użytkownikiem",
+        "couldNotRegisterUser": "Nie udało się zarejestrować użytkownika"
       }
     },
     "invite": {
@@ -2060,6 +2689,7 @@
       "userIdMissing": "Nie podano identyfikatora użytkownika!",
       "successTitle": "Weryfikacja zakończona",
       "successDescription": "Użytkownik został pomyślnie zweryfikowany.",
+      "successContinue": "Kontynuuj",
       "setupAuthenticator": "Skonfiguruj uwierzytelnianie",
       "verify": {
         "title": "Zweryfikuj użytkownika",
@@ -2074,6 +2704,22 @@
         "required": {
           "code": "To pole jest wymagane"
         }
+      },
+      "errors": {
+        "couldNotResendEmail": "Nie udało się ponownie wysłać wiadomości e-mail",
+        "couldNotVerifyUser": "Nie udało się zweryfikować użytkownika",
+        "couldNotVerifyInvite": "Nie udało się zweryfikować zaproszenia",
+        "couldNotVerifyEmail": "Nie udało się zweryfikować adresu e-mail",
+        "couldNotVerify": "Nie udało się zweryfikować",
+        "couldNotLoadUser": "Nie udało się załadować użytkownika",
+        "couldNotLoadAuthenticators": "Nie udało się wczytać dostępnych metod uwierzytelniania",
+        "couldNotCreateSession": "Nie udało się utworzyć sesji",
+        "noHostFound": "Nie znaleziono hosta",
+        "userAlreadyVerified": "Użytkownik jest już zweryfikowany!",
+        "couldNotResendInvite": "Nie udało się ponownie wysłać zaproszenia",
+        "inviteSendFailed": "Nie udało się wysłać wiadomości e-mail z zaproszeniem",
+        "emailSendFailed": "Nie udało się wysłać wiadomości e-mail weryfikacyjnej",
+        "contextMissing": "Wystąpił błąd. Spróbuj ponownie."
       }
     },
     "authenticator": {
@@ -2115,7 +2761,8 @@
       "unknownContext": "Nie udało się pobrać kontekstu użytkownika. Upewnij się, że najpierw wprowadziłeś nazwę użytkownika lub podałeś login jako parametr wyszukiwania.",
       "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie.",
       "failedLoading": "Nie udało się załadować danych. Spróbuj ponownie.",
-      "tryagain": "Spróbuj ponownie"
+      "tryagain": "Spróbuj ponownie",
+      "couldNotContinueSession": "Nie udało się kontynuować sesji - brak informacji o użytkowniku"
     }
   },
   "ru": {
@@ -2155,6 +2802,29 @@
       },
       "required": {
         "loginName": "Это поле обязательно для заполнения"
+      },
+      "errors": {
+        "internalError": "Произошла внутренняя ошибка",
+        "couldNotGetLoginSettings": "Не удалось получить настройки входа",
+        "couldNotSearchUsers": "Не удалось выполнить поиск пользователей",
+        "couldNotGetDomain": "Не удалось получить домен",
+        "couldNotGetHost": "Не удалось получить хост",
+        "couldNotStartIDPFlow": "Не удалось запустить поток IDP",
+        "moreThanOneUserFound": "Найдено более одного пользователя. Укажите уникальный идентификатор.",
+        "userNotFound": "Пользователь не найден в системе",
+        "couldNotCreateSession": "Не удалось создать сессию для пользователя",
+        "initialUserNotSupported": "Начальный пользователь не поддерживается",
+        "localAuthenticationNotAllowed": "Локальная аутентификация запрещена! Обратитесь к администратору за дополнительной информацией.",
+        "passkeysNotAllowed": "Ключи доступа не разрешены! Обратитесь к администратору за дополнительной информацией.",
+        "couldNotFindIdentityProvider": "Не удалось найти поставщика удостоверений.",
+        "userNotActive": "Пользователь неактивен. Обратитесь к администратору за дополнительной информацией."
+      }
+    },
+    "zitadel": {
+      "errors": {
+        "errorOccured": "Произошла ошибка",
+        "multipleUsersFound": "Найдено несколько пользователей",
+        "userNotFound": "Пользователь не найден в системе"
       }
     },
     "password": {
@@ -2168,12 +2838,19 @@
         },
         "required": {
           "password": "Это поле обязательно для заполнения"
+        },
+        "errors": {
+          "couldNotVerifyPassword": "Не удалось проверить пароль",
+          "couldNotResetPassword": "Не удалось сбросить пароль"
+        },
+        "info": {
+          "passwordResetSent": "Пароль был сброшен. Пожалуйста, проверьте свою электронную почту"
         }
       },
       "set": {
         "title": "Установить пароль",
         "description": "Установите пароль для вашего аккаунта",
-        "codeSent": "Код отправлен на ваш адрес электронной почты.",
+        "codeSent": "Новый код был отправлен на ваш адрес электронной почты.",
         "noCodeReceived": "Не получили код?",
         "resend": "Отправить код повторно",
         "submit": "Продолжить",
@@ -2186,6 +2863,11 @@
           "code": "Это поле обязательно для заполнения",
           "newPassword": "Вы должны указать пароль!",
           "confirmPassword": "Это поле обязательно для заполнения"
+        },
+        "errors": {
+          "couldNotSetPassword": "Не удалось установить пароль",
+          "couldNotResetPassword": "Не удалось сбросить пароль",
+          "couldNotVerifyPassword": "Не удалось проверить пароль"
         }
       },
       "change": {
@@ -2193,13 +2875,51 @@
         "description": "Установите пароль для вашего аккаунта",
         "submit": "Продолжить",
         "labels": {
+          "currentPassword": "Текущий пароль",
           "newPassword": "Новый пароль",
           "confirmPassword": "Подтвердите пароль"
         },
         "required": {
+          "currentPassword": "Вы должны указать текущий пароль!",
           "newPassword": "Вы должны указать новый пароль!",
           "confirmPassword": "Это поле обязательно для заполнения"
+        },
+        "errors": {
+          "currentPasswordInvalid": "Текущий пароль неверен.",
+          "couldNotChangePassword": "Не удалось изменить пароль",
+          "couldNotVerifyPassword": "Не удалось проверить пароль",
+          "unknownError": "Неизвестная ошибка"
         }
+      },
+      "complexity": {
+        "length": "Минимум {minLength} символов.",
+        "hasSymbol": "Должен содержать специальный символ.",
+        "hasNumber": "Должен содержать цифру.",
+        "hasUppercase": "Должен содержать заглавную букву.",
+        "hasLowercase": "Должен содержать строчную букву.",
+        "equals": "Пароли должны совпадать.",
+        "matches": "Совпадает",
+        "doesNotMatch": "Не совпадает"
+      },
+      "errors": {
+        "noHostFound": "Хост не найден",
+        "couldNotSendResetLink": "Не удалось отправить ссылку для сброса пароля",
+        "couldNotCreateSessionForUser": "Не удалось создать сессию для пользователя",
+        "couldNotVerifyPassword": "Не удалось проверить пароль",
+        "failedToAuthenticate": "Не удалось пройти аутентификацию. У вас было {failedAttempts} из {maxPasswordAttempts} попыток ввода пароля.{lockoutMessage}",
+        "failedToAuthenticateNoLimit": "Не удалось пройти аутентификацию.",
+        "accountLockedContactAdmin": " Свяжитесь с администратором, чтобы разблокировать вашу учетную запись",
+        "userNotFound": "Пользователь не найден в системе",
+        "initialUserNotSupported": "Первичный пользователь не поддерживается",
+        "userInitialStateNotSupported": "Начальное состояние пользователя не поддерживается",
+        "codeOrVerificationRequired": "Вы должны предоставить код или иметь действительную проверку пользователя",
+        "verificationRequired": "Необходимо выполнить проверку пользователя",
+        "couldNotLoadSession": "Не удалось загрузить сессию",
+        "couldNotLoadAuthMethods": "Не удалось загрузить методы аутентификации",
+        "failedPrecondition": "Нарушено предварительное условие",
+        "sessionNotValid": "Сессия недействительна",
+        "passwordVerificationMissing": "Отсутствует проверка пароля.",
+        "passwordVerificationTooOld": "Проверка пароля устарела. Пожалуйста, подтвердите пароль еще раз."
       }
     },
     "idp": {
@@ -2211,18 +2931,6 @@
       "signInWithAzureAD": "Войти через AzureAD",
       "signInWithGithub": "Войти через GitHub",
       "signInWithGitlab": "Войти через GitLab",
-      "loginSuccess": {
-        "title": "Вход выполнен успешно",
-        "description": "Вы успешно вошли в систему!"
-      },
-      "linkingSuccess": {
-        "title": "Аккаунт привязан",
-        "description": "Аккаунт успешно привязан!"
-      },
-      "registerSuccess": {
-        "title": "Регистрация завершена",
-        "description": "Вы успешно зарегистрировались!"
-      },
       "loginError": {
         "title": "Ошибка входа",
         "description": "Произошла ошибка при попытке входа."
@@ -2234,6 +2942,35 @@
       "completeRegister": {
         "title": "Завершите регистрацию",
         "description": "Завершите регистрацию вашего аккаунта."
+      },
+      "accountNotFound": {
+        "title": "Аккаунт не найден",
+        "description": "Мы не смогли найти аккаунт, связанный с учетными данными вашего провайдера идентификации.",
+        "info": "Существующий аккаунт не найден. Пожалуйста, войдите с существующим аккаунтом или обратитесь к администратору за помощью.",
+        "backToLogin": "Вернуться к входу"
+      },
+      "registrationFailed": {
+        "title": "Регистрация недоступна",
+        "description": "Мы не смогли завершить процесс регистрации.",
+        "info": "Не удалось определить организацию для регистрации. Пожалуйста, обратитесь к администратору за помощью.",
+        "backToLogin": "Вернуться к входу"
+      },
+      "processing": {
+        "message": "Обработка аутентификации...",
+        "noRedirect": "Не получено перенаправления или ошибки от сервера",
+        "unexpectedError": "Произошла неожиданная ошибка"
+      },
+      "errors": {
+        "missingParameters": "Отсутствуют обязательные параметры",
+        "missingIdpInfo": "Отсутствует информация IDP",
+        "idpNotFound": "Провайдер идентификации не найден",
+        "linkingNotAllowed": "Связывание не разрешено для этого провайдера идентификации",
+        "linkingFailed": "Не удалось связать провайдера идентификации с учетной записью",
+        "autoLinkingFailed": "Не удалось автоматически связать учетную запись",
+        "userCreationFailed": "Не удалось создать учетную запись пользователя",
+        "orgResolutionFailed": "Не удалось определить организацию для регистрации",
+        "sessionCreationFailed": "Не удалось создать сеанс или определить перенаправление",
+        "unknownError": "Произошла неизвестная ошибка"
       }
     },
     "ldap": {
@@ -2297,14 +3034,27 @@
         "title": "Аутентификация с помощью пасскей",
         "description": "Устройство запросит отпечаток пальца, лицо или экранный замок",
         "usePassword": "Использовать пароль",
-        "submit": "Продолжить"
+        "submit": "Продолжить",
+        "errors": {
+          "couldNotRequestChallenge": "Не удалось запросить вызов пасскей",
+          "couldNotVerifyPasskey": "Не удалось проверить пасскей",
+          "noResponseReceived": "Проверка пасскей не удалась - ответ не получен",
+          "noRedirectProvided": "Проверка пасскей завершена, но перенаправление не предоставлено",
+          "couldNotRetrievePasskey": "Произошла ошибка при получении пасскей",
+          "verificationCancelled": "Проверка пасскей была отменена",
+          "verificationFailed": "Произошла ошибка при проверке пасскей",
+          "couldNotFindSession": "Не удалось найти сеанс",
+          "couldNotUpdateSession": "Не удалось обновить сеанс",
+          "userNotFound": "Пользователь не найден в системе",
+          "couldNotDetermineRedirect": "Не удалось определить URL перенаправления после проверки пасскей"
+        }
       },
       "set": {
         "title": "Настройка пасскей",
         "description": "Устройство запросит отпечаток пальца, лицо или экранный замок",
         "info": {
           "description": "Пасскей — метод аутентификации через устройство (отпечаток пальца, Apple FaceID и аналоги).",
-          "link": "Аутентификация без пароля"
+          "link": "Аутентификация по Пасскею"
         },
         "skip": "Пропустить",
         "submit": "Продолжить"
@@ -2364,6 +3114,13 @@
         "firstname": "Это поле обязательно для заполнения",
         "lastname": "Это поле обязательно для заполнения",
         "email": "Это поле обязательно для заполнения"
+      },
+      "errors": {
+        "couldNotCreateUser": "Не удалось создать пользователя",
+        "couldNotCreateSession": "Не удалось создать сессию",
+        "userNotFound": "Пользователь не найден в системе",
+        "couldNotLinkIDP": "Не удалось привязать IDP к пользователю",
+        "couldNotRegisterUser": "Не удалось зарегистрировать пользователя"
       }
     },
     "invite": {
@@ -2393,6 +3150,7 @@
       "userIdMissing": "Не указан userId!",
       "successTitle": "Пользователь подтверждён",
       "successDescription": "Пользователь успешно подтверждён.",
+      "successContinue": "Продолжить",
       "setupAuthenticator": "Настроить аутентификатор",
       "verify": {
         "title": "Подтверждение пользователя",
@@ -2407,6 +3165,22 @@
         "required": {
           "code": "Это поле обязательно для заполнения"
         }
+      },
+      "errors": {
+        "couldNotResendEmail": "Не удалось повторно отправить электронное письмо",
+        "couldNotVerifyUser": "Не удалось подтвердить пользователя",
+        "couldNotVerifyInvite": "Не удалось подтвердить приглашение",
+        "couldNotVerifyEmail": "Не удалось подтвердить электронную почту",
+        "couldNotVerify": "Не удалось подтвердить",
+        "couldNotLoadUser": "Не удалось загрузить пользователя",
+        "couldNotLoadAuthenticators": "Не удалось загрузить доступные средства аутентификации",
+        "couldNotCreateSession": "Не удалось создать сеанс",
+        "noHostFound": "Хост не найден",
+        "userAlreadyVerified": "Пользователь уже подтверждён!",
+        "couldNotResendInvite": "Не удалось повторно отправить приглашение",
+        "inviteSendFailed": "Не удалось отправить письмо с приглашением",
+        "emailSendFailed": "Не удалось отправить письмо с подтверждением",
+        "contextMissing": "Произошла ошибка. Пожалуйста, попробуйте еще раз."
       }
     },
     "authenticator": {
@@ -2448,7 +3222,8 @@
       "unknownContext": "Не удалось получить контекст пользователя. Укажите имя пользователя или loginName в параметрах поиска.",
       "sessionExpired": "Ваша сессия истекла. Войдите снова.",
       "failedLoading": "Ошибка загрузки данных. Попробуйте ещё раз.",
-      "tryagain": "Попробовать снова"
+      "tryagain": "Попробовать снова",
+      "couldNotContinueSession": "Не удалось продолжить сеанс - отсутствует информация о пользователе"
     }
   },
   "zh": {
@@ -2488,6 +3263,29 @@
       },
       "required": {
         "loginName": "此字段为必填项"
+      },
+      "errors": {
+        "internalError": "发生内部错误",
+        "couldNotGetLoginSettings": "无法获取登录设置",
+        "couldNotSearchUsers": "无法搜索用户",
+        "couldNotGetDomain": "无法获取域名",
+        "couldNotGetHost": "无法获取主机",
+        "couldNotStartIDPFlow": "无法启动身份提供者流程",
+        "moreThanOneUserFound": "找到多个用户。请提供唯一标识符。",
+        "userNotFound": "系统中未找到用户",
+        "couldNotCreateSession": "无法为用户创建会话",
+        "initialUserNotSupported": "不支持初始用户",
+        "localAuthenticationNotAllowed": "不允许本地身份验证！请联系您的管理员以获取更多信息。",
+        "passkeysNotAllowed": "不允许使用 Passkey！请联系管理员了解更多信息。",
+        "couldNotFindIdentityProvider": "找不到身份提供者。",
+        "userNotActive": "用户未激活。请联系管理员了解更多信息。"
+      }
+    },
+    "zitadel": {
+      "errors": {
+        "errorOccured": "发生错误",
+        "multipleUsersFound": "找到多个用户",
+        "userNotFound": "系统中未找到用户"
       }
     },
     "password": {
@@ -2501,12 +3299,19 @@
         },
         "required": {
           "password": "此字段为必填项"
+        },
+        "errors": {
+          "couldNotVerifyPassword": "无法验证密码",
+          "couldNotResetPassword": "无法重置密码"
+        },
+        "info": {
+          "passwordResetSent": "密码已重置。请检查您的电子邮件"
         }
       },
       "set": {
         "title": "设置密码",
         "description": "为您的账户设置密码",
-        "codeSent": "验证码已发送到您的邮箱。",
+        "codeSent": "新代码已发送到您的电子邮件地址。",
         "noCodeReceived": "没有收到验证码？",
         "resend": "重发验证码",
         "submit": "继续",
@@ -2519,6 +3324,11 @@
           "code": "此字段为必填项",
           "newPassword": "必须提供密码！",
           "confirmPassword": "此字段为必填项"
+        },
+        "errors": {
+          "couldNotSetPassword": "无法设置密码",
+          "couldNotResetPassword": "无法重置密码",
+          "couldNotVerifyPassword": "无法验证密码"
         }
       },
       "change": {
@@ -2526,13 +3336,51 @@
         "description": "为您的账户设置密码",
         "submit": "继续",
         "labels": {
+          "currentPassword": "当前密码",
           "newPassword": "新密码",
           "confirmPassword": "确认密码"
         },
         "required": {
+          "currentPassword": "必须提供当前密码！",
           "newPassword": "必须提供新密码！",
           "confirmPassword": "此字段为必填项"
+        },
+        "errors": {
+          "currentPasswordInvalid": "当前密码不正确。",
+          "couldNotChangePassword": "无法更改密码",
+          "couldNotVerifyPassword": "无法验证密码",
+          "unknownError": "未知错误"
         }
+      },
+      "complexity": {
+        "length": "必须至少有 {minLength} 个字符。",
+        "hasSymbol": "必须包含一个符号。",
+        "hasNumber": "必须包含一个数字。",
+        "hasUppercase": "必须包含一个大写字母。",
+        "hasLowercase": "必须包含一个小写字母。",
+        "equals": "密码确认匹配。",
+        "matches": "匹配",
+        "doesNotMatch": "不匹配"
+      },
+      "errors": {
+        "noHostFound": "未找到主机",
+        "couldNotSendResetLink": "无法发送密码重置链接",
+        "couldNotCreateSessionForUser": "无法为用户创建会话",
+        "couldNotVerifyPassword": "无法验证密码",
+        "failedToAuthenticate": "身份验证失败。您已尝试输入密码 {failedAttempts} 次，共允许 {maxPasswordAttempts} 次。{lockoutMessage}",
+        "failedToAuthenticateNoLimit": "身份验证失败。",
+        "accountLockedContactAdmin": " 请联系管理员以解锁您的账户",
+        "userNotFound": "系统中未找到用户",
+        "initialUserNotSupported": "不支持初始用户",
+        "userInitialStateNotSupported": "不支持用户初始状态",
+        "codeOrVerificationRequired": "您必须提供验证码或通过有效的用户验证",
+        "verificationRequired": "必须完成用户验证",
+        "couldNotLoadSession": "无法加载会话",
+        "couldNotLoadAuthMethods": "无法加载验证方法",
+        "failedPrecondition": "前置条件失败",
+        "sessionNotValid": "会话无效",
+        "passwordVerificationMissing": "缺少密码验证。",
+        "passwordVerificationTooOld": "密码验证已过期。请重新通过验证。"
       }
     },
     "idp": {
@@ -2544,18 +3392,6 @@
       "signInWithAzureAD": "用 AzureAD 登录",
       "signInWithGithub": "用 GitHub 登录",
       "signInWithGitlab": "用 GitLab 登录",
-      "loginSuccess": {
-        "title": "登录成功",
-        "description": "您已成功登录！"
-      },
-      "linkingSuccess": {
-        "title": "账户已链接",
-        "description": "您已成功链接您的账户！"
-      },
-      "registerSuccess": {
-        "title": "注册成功",
-        "description": "您已成功注册！"
-      },
       "loginError": {
         "title": "登录失败",
         "description": "登录时发生错误。"
@@ -2567,6 +3403,35 @@
       "completeRegister": {
         "title": "完成注册",
         "description": "完成您的账户注册。"
+      },
+      "accountNotFound": {
+        "title": "未找到账户",
+        "description": "我们无法找到与您的身份提供商凭据关联的账户。",
+        "info": "未找到现有账户。请使用现有账户登录或联系您的管理员寻求帮助。",
+        "backToLogin": "返回登录"
+      },
+      "registrationFailed": {
+        "title": "注册不可用",
+        "description": "我们无法完成注册过程。",
+        "info": "无法确定注册的组织。请联系您的管理员寻求帮助。",
+        "backToLogin": "返回登录"
+      },
+      "processing": {
+        "message": "正在处理身份验证...",
+        "noRedirect": "未从服务器收到重定向或错误",
+        "unexpectedError": "发生意外错误"
+      },
+      "errors": {
+        "missingParameters": "缺少必需参数",
+        "missingIdpInfo": "缺少身份提供商信息",
+        "idpNotFound": "未找到身份提供商",
+        "linkingNotAllowed": "此身份提供商不允许关联",
+        "linkingFailed": "无法将身份提供商关联到账户",
+        "autoLinkingFailed": "无法自动关联账户",
+        "userCreationFailed": "无法创建用户账户",
+        "orgResolutionFailed": "无法确定注册的组织",
+        "sessionCreationFailed": "无法创建会话或确定重定向",
+        "unknownError": "发生未知错误"
       }
     },
     "ldap": {
@@ -2630,14 +3495,27 @@
         "title": "使用密钥认证",
         "description": "您的设备将请求指纹、面部识别或屏幕锁",
         "usePassword": "使用密码",
-        "submit": "继续"
+        "submit": "继续",
+        "errors": {
+          "couldNotRequestChallenge": "无法请求密钥挑战",
+          "couldNotVerifyPasskey": "无法验证密钥",
+          "noResponseReceived": "密钥验证失败 - 未收到响应",
+          "noRedirectProvided": "密钥验证完成但未提供重定向",
+          "couldNotRetrievePasskey": "检索密钥时发生错误",
+          "verificationCancelled": "密钥验证已取消",
+          "verificationFailed": "密钥验证期间发生错误",
+          "couldNotFindSession": "找不到会话",
+          "couldNotUpdateSession": "无法更新会话",
+          "userNotFound": "系统中未找到用户",
+          "couldNotDetermineRedirect": "密钥验证后无法确定重定向URL"
+        }
       },
       "set": {
         "title": "设置密钥",
         "description": "您的设备将请求指纹、面部识别或屏幕锁",
         "info": {
           "description": "密钥是在设备上如指纹、Apple FaceID 或类似的认证方法。",
-          "link": "无密码认证"
+          "link": "密码密钥认证"
         },
         "skip": "跳过",
         "submit": "继续"
@@ -2697,6 +3575,13 @@
         "firstname": "此字段为必填项",
         "lastname": "此字段为必填项",
         "email": "此字段为必填项"
+      },
+      "errors": {
+        "couldNotCreateUser": "无法创建用户",
+        "couldNotCreateSession": "无法创建会话",
+        "userNotFound": "系统中未找到用户",
+        "couldNotLinkIDP": "无法将 IDP 关联到用户",
+        "couldNotRegisterUser": "无法注册用户"
       }
     },
     "invite": {
@@ -2726,6 +3611,7 @@
       "userIdMissing": "未提供用户 ID！",
       "successTitle": "用户已验证",
       "successDescription": "用户已成功验证。",
+      "successContinue": "继续",
       "setupAuthenticator": "设置认证器",
       "verify": {
         "title": "验证用户",
@@ -2740,6 +3626,22 @@
         "required": {
           "code": "此字段为必填项"
         }
+      },
+      "errors": {
+        "couldNotResendEmail": "无法重新发送邮件",
+        "couldNotVerifyUser": "无法验证用户",
+        "couldNotVerifyInvite": "无法验证邀请",
+        "couldNotVerifyEmail": "无法验证邮箱",
+        "couldNotVerify": "无法验证",
+        "couldNotLoadUser": "无法加载用户",
+        "couldNotLoadAuthenticators": "无法加载可用的身份验证器",
+        "couldNotCreateSession": "无法创建会话",
+        "noHostFound": "未找到主机",
+        "userAlreadyVerified": "用户已验证！",
+        "couldNotResendInvite": "无法重新发送邀请",
+        "inviteSendFailed": "发送邀请邮件失败",
+        "emailSendFailed": "发送验证邮件失败",
+        "contextMissing": "发生错误。请重试。"
       }
     },
     "authenticator": {
@@ -2781,132 +3683,314 @@
       "unknownContext": "无法获取用户的上下文。请先输入用户名或提供 loginName 作为搜索参数。",
       "sessionExpired": "当前会话已过期，请重新登录。",
       "failedLoading": "加载数据失败，请再试一次。",
-      "tryagain": "重试"
+      "tryagain": "重试",
+      "couldNotContinueSession": "无法继续会话 - 缺少用户信息"
     }
   },
   "tr": {
     "common": {
-      "back": "Geri"
+      "back": "Geri",
+      "title": "Zitadel ile Giriş"
     },
     "accounts": {
       "title": "Hesaplar",
       "description": "Kullanmak istediğiniz hesabı seçin.",
-      "addAnother": "Başka bir hesap ekle",
-      "noResults": "Hesap bulunamadı"
+      "addAnother": "Başka hesap ekle",
+      "noResults": "Hesap bulunamadı",
+      "verified": "doğrulandı",
+      "expired": "süresi doldu"
+    },
+    "logout": {
+      "title": "Çıkış",
+      "description": "Oturumu sonlandırmak için bir hesaba tıklayın",
+      "noResults": "Hesap bulunamadı",
+      "clear": "Oturumu Sonlandır",
+      "verifiedAt": "Son aktif: {time}",
+      "success": {
+        "title": "Çıkış başarılı",
+        "description": "Başarıyla çıkış yaptınız."
+      }
     },
     "loginname": {
       "title": "Tekrar hoş geldiniz!",
       "description": "Giriş bilgilerinizi girin.",
-      "register": "Yeni kullanıcı kaydet"
+      "register": "Yeni kullanıcı kaydet",
+      "submit": "Devam",
+      "labels": {
+        "loginname": "Kullanıcı adı",
+        "username": "Kullanıcı adı",
+        "usernameOrPhoneNumber": "Kullanıcı adı veya telefon numarası",
+        "usernameOrEmail": "Kullanıcı adı veya e-posta"
+      },
+      "required": {
+        "loginName": "Bu alan zorunludur"
+      },
+      "errors": {
+        "internalError": "Bir iç hata oluştu",
+        "couldNotGetLoginSettings": "Giriş ayarları alınamadı",
+        "couldNotSearchUsers": "Kullanıcılar aranamadı",
+        "couldNotGetDomain": "Alan adı alınamadı",
+        "couldNotGetHost": "Host alınamadı",
+        "couldNotStartIDPFlow": "IDP akışı başlatılamadı",
+        "moreThanOneUserFound": "Birden fazla kullanıcı bulundu. Benzersiz bir tanımlayıcı sağlayın.",
+        "userNotFound": "Kullanıcı sistemde bulunamadı",
+        "couldNotCreateSession": "Kullanıcı için oturum oluşturulamadı",
+        "initialUserNotSupported": "İlk kullanıcı desteklenmiyor",
+        "localAuthenticationNotAllowed": "Yerel kimlik doğrulamasına izin verilmiyor! Daha fazla bilgi için yöneticinize başvurun.",
+        "passkeysNotAllowed": "Passkey'ler izin verilmiyor! Daha fazla bilgi için yöneticinizle iletişime geçin.",
+        "couldNotFindIdentityProvider": "Kimlik sağlayıcı bulunamadı.",
+        "userNotActive": "Kullanıcı aktif değil. Daha fazla bilgi için yöneticinizle iletişime geçin."
+      }
+    },
+    "zitadel": {
+      "errors": {
+        "errorOccured": "Bir hata oluştu",
+        "multipleUsersFound": "Birden fazla kullanıcı bulundu",
+        "userNotFound": "Kullanıcı sistemde bulunamadı"
+      }
     },
     "password": {
       "verify": {
         "title": "Şifre",
         "description": "Şifrenizi girin.",
         "resetPassword": "Şifreyi Sıfırla",
-        "submit": "Devam Et"
+        "submit": "Devam",
+        "labels": {
+          "password": "Şifre"
+        },
+        "required": {
+          "password": "Bu alan zorunludur"
+        },
+        "errors": {
+          "couldNotVerifyPassword": "Şifre doğrulanamadı",
+          "couldNotResetPassword": "Şifre sıfırlanamadı"
+        },
+        "info": {
+          "passwordResetSent": "Şifre sıfırlandı. Lütfen e-postanızı kontrol edin"
+        }
       },
       "set": {
         "title": "Şifre Belirle",
         "description": "Hesabınız için şifre belirleyin",
-        "codeSent": "E-posta adresinize bir kod gönderildi.",
+        "codeSent": "E-posta adresinize yeni bir kod gönderildi.",
         "noCodeReceived": "Kod almadınız mı?",
         "resend": "Kodu tekrar gönder",
-        "submit": "Devam Et"
+        "submit": "Devam",
+        "labels": {
+          "code": "Kod",
+          "newPassword": "Yeni Şifre",
+          "confirmPassword": "Şifreyi Onayla"
+        },
+        "required": {
+          "code": "Bu alan zorunludur",
+          "newPassword": "Bir şifre sağlamalısınız!",
+          "confirmPassword": "Bu alan zorunludur"
+        },
+        "errors": {
+          "couldNotSetPassword": "Şifre belirlenemedi",
+          "couldNotResetPassword": "Şifre sıfırlanamadı",
+          "couldNotVerifyPassword": "Şifre doğrulanamadı"
+        }
       },
       "change": {
         "title": "Şifre Değiştir",
         "description": "Hesabınız için şifre belirleyin",
-        "submit": "Devam Et"
+        "submit": "Devam",
+        "labels": {
+          "currentPassword": "Mevcut Şifre",
+          "newPassword": "Yeni Şifre",
+          "confirmPassword": "Şifreyi Onayla"
+        },
+        "required": {
+          "currentPassword": "Mevcut şifrenizi girmelisiniz!",
+          "newPassword": "Yeni bir şifre sağlamalısınız!",
+          "confirmPassword": "Bu alan zorunludur"
+        },
+        "errors": {
+          "currentPasswordInvalid": "Mevcut şifre yanlış.",
+          "couldNotChangePassword": "Şifre değiştirilemedi",
+          "couldNotVerifyPassword": "Şifre doğrulanamadı",
+          "unknownError": "Bilinmeyen hata"
+        }
+      },
+      "complexity": {
+        "length": "En az {minLength} karakter uzunluğunda olmalıdır.",
+        "hasSymbol": "Bir sembol içermelidir.",
+        "hasNumber": "Bir sayı içermelidir.",
+        "hasUppercase": "Bir büyük harf içermelidir.",
+        "hasLowercase": "Bir küçük harf içermelidir.",
+        "equals": "Şifre onayı eşleşti.",
+        "matches": "Eşleşiyor",
+        "doesNotMatch": "Eşleşmiyor"
+      },
+      "errors": {
+        "noHostFound": "Host bulunamadı",
+        "couldNotSendResetLink": "Şifre Sıfırlama Bağlantısı gönderilemedi",
+        "couldNotCreateSessionForUser": "Kullanıcı için oturum oluşturulamadı",
+        "couldNotVerifyPassword": "Şifre doğrulanamadı",
+        "failedToAuthenticate": "Kimlik doğrulama başarısız. {maxPasswordAttempts} denemeden {failedAttempts} tanesini kullandınız.{lockoutMessage}",
+        "failedToAuthenticateNoLimit": "Kimlik doğrulama başarısız.",
+        "accountLockedContactAdmin": " Hesabınızın kilidini açmak için yöneticinizle iletişime geçin",
+        "userNotFound": "Kullanıcı sistemde bulunamadı",
+        "initialUserNotSupported": "İlk kullanıcı desteklenmiyor",
+        "userInitialStateNotSupported": "Kullanıcı İlk Durumu desteklenmiyor",
+        "codeOrVerificationRequired": "Bir kod sağlamalı veya geçerli bir Kullanıcı Doğrulama Kontrolüne sahip olmalısınız",
+        "verificationRequired": "Kullanıcı Doğrulama Kontrolü yapılmalıdır",
+        "couldNotLoadSession": "Oturum yüklenemedi",
+        "couldNotLoadAuthMethods": "Kimlik doğrulama yöntemleri yüklenemedi",
+        "failedPrecondition": "Ön koşul başarısız",
+        "sessionNotValid": "Oturum geçerli değil",
+        "passwordVerificationMissing": "Şifre doğrulaması eksik.",
+        "passwordVerificationTooOld": "Şifre doğrulaması çok eski. Lütfen şifrenizi tekrar doğrulayın."
       }
     },
     "idp": {
-      "title": "SSO ile giriş yap",
+      "title": "SSO ile Giriş",
       "description": "Giriş yapmak için aşağıdaki sağlayıcılardan birini seçin",
-      "signInWithApple": "Apple ile giriş yap",
-      "signInWithGoogle": "Google ile giriş yap",
-      "signInWithAzureAD": "AzureAD ile giriş yap",
-      "signInWithGithub": "GitHub ile giriş yap",
-      "signInWithGitlab": "GitLab ile giriş yap",
-      "loginSuccess": {
-        "title": "Giriş başarılı",
-        "description": "Başarıyla giriş yaptınız!"
-      },
-      "linkingSuccess": {
-        "title": "Hesap bağlandı",
-        "description": "Hesabınızı başarıyla bağladınız!"
-      },
-      "registerSuccess": {
-        "title": "Kayıt başarılı",
-        "description": "Başarıyla kayıt oldunuz!"
-      },
+      "orSignInWith": "veya şununla giriş yapın",
+      "signInWithApple": "Apple ile Giriş",
+      "signInWithGoogle": "Google ile Giriş",
+      "signInWithAzureAD": "AzureAD ile Giriş",
+      "signInWithGithub": "GitHub ile Giriş",
+      "signInWithGitlab": "GitLab ile Giriş",
       "loginError": {
         "title": "Giriş başarısız",
-        "description": "Giriş yapmaya çalışırken bir hata oluştu."
+        "description": "Giriş yapılmaya çalışılırken bir hata oluştu."
       },
       "linkingError": {
         "title": "Hesap bağlama başarısız",
-        "description": "Hesabınızı bağlamaya çalışırken bir hata oluştu."
+        "description": "Hesabınız bağlanmaya çalışılırken bir hata oluştu."
+      },
+      "completeRegister": {
+        "title": "Bilgilerinizi tamamlayın",
+        "description": "E-posta adresinizi ve adınızı sağlayarak kaydınızı tamamlamalısınız."
+      },
+      "accountNotFound": {
+        "title": "Hesap Bulunamadı",
+        "description": "Kimlik sağlayıcı bilgilerinizle ilişkili bir hesap bulamadık.",
+        "info": "Mevcut bir hesap bulunamadı. Lütfen mevcut bir hesapla giriş yapın veya yardım için yöneticinizle iletişime geçin.",
+        "backToLogin": "Girişe Dön"
+      },
+      "registrationFailed": {
+        "title": "Kayıt Kullanılamıyor",
+        "description": "Kayıt işlemini tamamlayamadık.",
+        "info": "Kayıt için organizasyon belirlenemedi. Lütfen yardım için yöneticinizle iletişime geçin.",
+        "backToLogin": "Girişe Dön"
+      },
+      "processing": {
+        "message": "Kimlik doğrulama işleniyor...",
+        "noRedirect": "Sunucudan yönlendirme veya hata dönmedi",
+        "unexpectedError": "Beklenmeyen bir hata oluştu"
+      },
+      "errors": {
+        "missingParameters": "Eksik gerekli parametreler",
+        "missingIdpInfo": "IDP bilgisi eksik",
+        "idpNotFound": "Kimlik sağlayıcı bulunamadı",
+        "linkingNotAllowed": "Bu kimlik sağlayıcı için bağlantıya izin verilmiyor",
+        "linkingFailed": "Kimlik sağlayıcı hesaba bağlanamadı",
+        "autoLinkingFailed": "Hesap otomatik olarak bağlanamadı",
+        "userCreationFailed": "Kullanıcı hesabı oluşturulamadı",
+        "orgResolutionFailed": "Kayıt için organizasyon belirlenemedi",
+        "sessionCreationFailed": "Oturum oluşturulamadı veya yönlendirme belirlenemedi",
+        "unknownError": "Bilinmeyen bir hata oluştu"
+      }
+    },
+    "ldap": {
+      "title": "LDAP Girişi",
+      "description": "LDAP bilgilerinizi girin.",
+      "submit": "Devam",
+      "labels": {
+        "username": "Kullanıcı adı",
+        "password": "Şifre"
+      },
+      "required": {
+        "username": "Bu alan zorunludur",
+        "password": "Bu alan zorunludur"
       }
     },
     "mfa": {
       "verify": {
         "title": "Kimliğinizi doğrulayın",
         "description": "Aşağıdaki faktörlerden birini seçin.",
-        "noResults": "Kurulum için kullanılabilir ikinci faktör yok."
+        "noResults": "Kurulum için ikinci faktör mevcut değil."
       },
       "set": {
-        "title": "2-Faktör kur",
+        "title": "2 Faktörlü Doğrulama Kur",
         "description": "Aşağıdaki ikinci faktörlerden birini seçin.",
         "skip": "Atla"
       }
     },
     "otp": {
       "verify": {
-        "title": "2-Faktör doğrula",
-        "totpDescription": "Kimlik doğrulayıcı uygulamanızdan kodu girin.",
+        "title": "2 Faktörlü Doğrulama",
+        "totpDescription": "Kimlik doğrulama uygulamanızdaki kodu girin.",
         "smsDescription": "SMS ile aldığınız kodu girin.",
         "emailDescription": "E-posta ile aldığınız kodu girin.",
         "noCodeReceived": "Kod almadınız mı?",
         "resendCode": "Kodu tekrar gönder",
-        "submit": "Devam Et"
+        "submit": "Devam",
+        "labels": {
+          "code": "Kod"
+        },
+        "required": {
+          "code": "Bu alan zorunludur"
+        }
       },
       "set": {
-        "title": "2-Faktör kur",
-        "totpDescription": "QR kodunu kimlik doğrulayıcı uygulamanızla tarayın.",
+        "title": "2 Faktörlü Doğrulama Kur",
+        "totpDescription": "QR kodunu kimlik doğrulama uygulamanızla tarayın.",
         "smsDescription": "SMS ile kod almak için telefon numaranızı girin.",
         "emailDescription": "E-posta ile kod almak için e-posta adresinizi girin.",
         "totpRegisterDescription": "QR Kodunu tarayın veya URL'ye manuel olarak gidin.",
-        "submit": "Devam Et"
+        "submit": "Devam",
+        "labels": {
+          "code": "Kod"
+        },
+        "required": {
+          "code": "Bu alan zorunludur"
+        }
       }
     },
     "passkey": {
       "verify": {
-        "title": "Passkey ile kimlik doğrula",
-        "description": "Cihazınız parmak izinizi, yüzünüzü veya ekran kilidinizi isteyecek",
+        "title": "Passkey ile kimlik doğrulama",
+        "description": "Cihazınız parmak izinizi, yüzünüzü veya ekran kilidinizi isteyecektir",
         "usePassword": "Şifre kullan",
-        "submit": "Devam Et"
+        "submit": "Devam",
+        "errors": {
+          "couldNotRequestChallenge": "Passkey meydan okuması istenemedi",
+          "couldNotVerifyPasskey": "Passkey doğrulanamadı",
+          "noResponseReceived": "Passkey doğrulaması başarısız - yanıt alınamadı",
+          "noRedirectProvided": "Passkey doğrulaması tamamlandı ancak yönlendirme sağlanmadı",
+          "couldNotRetrievePasskey": "Passkey alınırken bir hata oluştu",
+          "verificationCancelled": "Passkey doğrulaması iptal edildi",
+          "verificationFailed": "Passkey doğrulaması sırasında bir hata oluştu",
+          "couldNotFindSession": "Oturum bulunamadı",
+          "couldNotUpdateSession": "Oturum güncellenemedi",
+          "userNotFound": "Kullanıcı sistemde bulunamadı",
+          "couldNotDetermineRedirect": "Passkey doğrulamasından sonra yönlendirme URL'si belirlenemedi"
+        }
       },
       "set": {
         "title": "Passkey kur",
-        "description": "Cihazınız parmak izinizi, yüzünüzü veya ekran kilidinizi isteyecek",
+        "description": "Cihazınız parmak izinizi, yüzünüzü veya ekran kilidinizi isteyecektir",
         "info": {
-          "description": "Passkey, parmak iziniz, Apple FaceID veya benzeri gibi bir cihazda kimlik doğrulama yöntemidir.",
-          "link": "Şifresiz Kimlik Doğrulama"
+          "description": "Passkey, parmak izi, Apple FaceID veya benzeri gibi bir cihazdaki kimlik doğrulama yöntemidir. ",
+          "link": "Passkey ile Kimlik Doğrulama"
         },
         "skip": "Atla",
-        "submit": "Devam Et"
+        "submit": "Devam"
       }
     },
     "u2f": {
       "verify": {
-        "title": "2-Faktör doğrula",
-        "description": "Cihazınızla hesabınızı doğrulayın."
+        "title": "2 Faktörlü Doğrulama",
+        "description": "Hesabınızı cihazınızla doğrulayın."
       },
       "set": {
-        "title": "2-Faktör kur",
-        "description": "Bir cihazı ikinci faktör olarak kurun.",
-        "submit": "Devam Et"
+        "title": "2 Faktörlü Doğrulama Kur",
+        "description": "İkinci faktör olarak bir cihaz kurun.",
+        "submit": "Devam"
       }
     },
     "register": {
@@ -2922,71 +4006,128 @@
         "title": "Eksik veri",
         "description": "Kayıt olmak için e-posta, ad ve soyadı sağlayın."
       },
-      "title": "Kayıt Ol",
+      "title": "Kayıt",
       "description": "Zitadel hesabınızı oluşturun.",
-      "selectMethod": "Kimlik doğrulamak istediğiniz yöntemi seçin",
+      "noMethodAvailableWarning": "Kullanılabilir kimlik doğrulama yöntemi yok. Lütfen yöneticinizle iletişime geçin.",
+      "selectMethod": "Kimlik doğrulaması yapmak istediğiniz yöntemi seçin",
       "agreeTo": "Kayıt olmak için şartları ve koşulları kabul etmelisiniz",
       "termsOfService": "Hizmet Şartları",
       "privacyPolicy": "Gizlilik Politikası",
-      "submit": "Devam Et",
+      "submit": "Devam",
       "password": {
         "title": "Şifre Belirle",
         "description": "Hesabınız için şifre belirleyin",
-        "submit": "Devam Et"
+        "submit": "Devam",
+        "labels": {
+          "password": "Şifre",
+          "confirmPassword": "Şifreyi Onayla"
+        },
+        "required": {
+          "password": "Bir şifre sağlamalısınız!",
+          "confirmPassword": "Bu alan zorunludur"
+        }
+      },
+      "labels": {
+        "firstname": "Ad",
+        "lastname": "Soyad",
+        "email": "E-posta"
+      },
+      "required": {
+        "firstname": "Bu alan zorunludur",
+        "lastname": "Bu alan zorunludur",
+        "email": "Bu alan zorunludur"
+      },
+      "errors": {
+        "couldNotCreateUser": "Kullanıcı oluşturulamadı",
+        "couldNotCreateSession": "Oturum oluşturulamadı",
+        "userNotFound": "Kullanıcı sistemde bulunamadı",
+        "couldNotLinkIDP": "IDP kullanıcıya bağlanamadı",
+        "couldNotRegisterUser": "Kullanıcı kayıt edilemedi"
       }
     },
     "invite": {
       "title": "Kullanıcı Davet Et",
       "description": "Davet etmek istediğiniz kullanıcının e-posta adresini ve adını sağlayın.",
-      "info": "Kullanıcı daha fazla talimat içeren bir e-posta alacaktır.",
+      "info": "Kullanıcı, daha fazla talimat içeren bir e-posta alacaktır.",
       "notAllowed": "Ayarlarınız kullanıcı davet etmenize izin vermiyor.",
-      "submit": "Devam Et",
+      "submit": "Devam",
       "success": {
         "title": "Kullanıcı davet edildi",
         "description": "E-posta başarıyla gönderildi.",
         "verified": "Kullanıcı davet edildi ve e-postasını zaten doğruladı.",
-        "notVerifiedYet": "Kullanıcı davet edildi. Daha fazla talimat içeren bir e-posta alacaklar.",
-        "submit": "Başka bir kullanıcı davet et"
+        "notVerifiedYet": "Kullanıcı davet edildi. Daha fazla talimat içeren bir e-posta alacaktır.",
+        "submit": "Başka kullanıcı davet et"
       }
     },
     "signedin": {
-      "title": "Hoş geldiniz {user}!",
+      "title": "Hoş geldin {user}!",
       "description": "Giriş yaptınız.",
-      "continue": "Devam Et",
+      "continue": "Devam",
       "error": {
         "title": "Hata",
-        "description": "Giriş yapmaya çalışırken bir hata oluştu."
+        "description": "Giriş yapılmaya çalışılırken bir hata oluştu."
       }
     },
     "verify": {
       "userIdMissing": "userId sağlanmadı!",
-      "success": "Kullanıcı başarıyla doğrulandı.",
+      "successTitle": "Kullanıcı doğrulandı",
+      "successDescription": "Kullanıcı başarıyla doğrulandı.",
+      "successContinue": "Devam",
       "setupAuthenticator": "Kimlik doğrulayıcı kur",
       "verify": {
         "title": "Kullanıcıyı doğrula",
-        "description": "Doğrulama e-postasında sağlanan kodu girin.",
+        "description": "Doğrulama e-postasında sağlanan Kodu girin.",
         "noCodeReceived": "Kod almadınız mı?",
         "resendCode": "Kodu tekrar gönder",
-        "submit": "Devam Et"
+        "codeSent": "E-posta adresinize bir kod gönderildi.",
+        "submit": "Devam",
+        "labels": {
+          "code": "Kod"
+        },
+        "required": {
+          "code": "Bu alan zorunludur"
+        }
+      },
+      "errors": {
+        "couldNotResendEmail": "E-posta yeniden gönderilemedi",
+        "couldNotVerifyUser": "Kullanıcı doğrulanamadı",
+        "couldNotVerifyInvite": "Davet doğrulanamadı",
+        "couldNotVerifyEmail": "E-posta doğrulanamadı",
+        "couldNotVerify": "Doğrulanamadı",
+        "couldNotLoadUser": "Kullanıcı yüklenemedi",
+        "couldNotLoadAuthenticators": "Olası kimlik doğrulayıcılar yüklenemedi",
+        "couldNotCreateSession": "Oturum oluşturulamadı",
+        "noHostFound": "Host bulunamadı",
+        "userAlreadyVerified": "Kullanıcı zaten doğrulanmış!",
+        "couldNotResendInvite": "Davet yeniden gönderilemedi",
+        "inviteSendFailed": "Davet e-postası gönderilemedi",
+        "emailSendFailed": "Doğrulama e-postası gönderilemedi",
+        "contextMissing": "Bir hata oluştu. Lütfen tekrar deneyin."
       }
     },
     "authenticator": {
-      "title": "Kimlik doğrulama yöntemi seç",
-      "description": "Kimlik doğrulamak istediğiniz yöntemi seçin",
+      "title": "Kimlik doğrulama yöntemi seçin",
+      "description": "Kimlik doğrulaması yapmak istediğiniz yöntemi seçin",
       "noMethodsAvailable": "Kullanılabilir kimlik doğrulama yöntemi yok",
       "allSetup": "Zaten bir kimlik doğrulayıcı kurdunuz!",
-      "linkWithIDP": "veya bir Kimlik Sağlayıcısı ile bağla"
+      "linkWithIDP": "veya bir Kimlik Sağlayıcı ile bağlantı kurun"
     },
     "device": {
       "usercode": {
         "title": "Cihaz kodu",
         "description": "Uygulamanızda veya cihazınızda görüntülenen kodu girin.",
-        "submit": "Devam Et"
+        "submit": "Devam",
+        "labels": {
+          "code": "Kod"
+        },
+        "required": {
+          "code": "Bu alan zorunludur"
+        }
       },
       "request": {
         "title": "{appName} bağlanmak istiyor",
-        "description": "{appName} şunlara erişecek:",
-        "disclaimer": "İzin Ver'e tıklayarak, {appName} ve Zitadel'in bilgilerinizi kendi hizmet şartları ve gizlilik politikalarına uygun olarak kullanmasına izin verirsiniz. Bu erişimi istediğiniz zaman iptal edebilirsiniz.",
+        "description": "{appName} şunlara erişim sahibi olacak:",
+        "disclaimer": "İzin Ver'e tıklayarak, {appName} ve Zitadel'in bilgilerinizi kendi hizmet şartları ve gizlilik politikalarına uygun olarak kullanmasına izin vermiş olursunuz. Bu erişimi istediğiniz zaman iptal edebilirsiniz.",
         "submit": "İzin Ver",
         "deny": "Reddet"
       },
@@ -3000,10 +4141,11 @@
     "error": {
       "noUserCode": "Kullanıcı kodu sağlanmadı!",
       "noDeviceRequest": "Cihaz isteği bulunamadı.",
-      "unknownContext": "Kullanıcının bağlamı alınamadı. Önce kullanıcı adını girdiğinizden emin olun veya arama parametresi olarak bir loginName sağlayın.",
+      "unknownContext": "Kullanıcının bağlamı alınamadı. Önce kullanıcı adını girdiğinizden emin olun veya searchParam olarak bir loginName sağlayın.",
       "sessionExpired": "Mevcut oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.",
       "failedLoading": "Veri yüklenemedi. Lütfen tekrar deneyin.",
-      "tryagain": "Tekrar Dene"
+      "tryagain": "Tekrar Dene",
+      "couldNotContinueSession": "Oturuma devam edilemedi - kullanıcı bilgileri eksik"
     }
   },
   "uk": {
@@ -3043,6 +4185,29 @@
       },
       "required": {
         "loginName": "Це поле обов'язкове"
+      },
+      "errors": {
+        "internalError": "Сталася внутрішня помилка",
+        "couldNotGetLoginSettings": "Не вдалося отримати налаштування входу",
+        "couldNotSearchUsers": "Не вдалося знайти користувачів",
+        "couldNotGetDomain": "Не вдалося отримати домен",
+        "couldNotGetHost": "Не вдалося отримати хост",
+        "couldNotStartIDPFlow": "Не вдалося запустити потік IDP",
+        "moreThanOneUserFound": "Знайдено більше одного користувача. Вкажіть унікальний ідентифікатор.",
+        "userNotFound": "Користувача не знайдено в системі",
+        "couldNotCreateSession": "Не вдалося створити сеанс для користувача",
+        "initialUserNotSupported": "Початковий користувач не підтримується",
+        "localAuthenticationNotAllowed": "Локальна аутентифікація заборонена! Зверніться до адміністратора за додатковою інформацією.",
+        "passkeysNotAllowed": "Ключі доступу не дозволені! Зверніться до адміністратора для отримання додаткової інформації.",
+        "couldNotFindIdentityProvider": "Не вдалося знайти постачальника ідентичності.",
+        "userNotActive": "Користувач неактивний. Зверніться до адміністратора для отримання додаткової інформації."
+      }
+    },
+    "zitadel": {
+      "errors": {
+        "errorOccured": "Сталася помилка",
+        "multipleUsersFound": "Знайдено кількох користувачів",
+        "userNotFound": "Користувача не знайдено в системі"
       }
     },
     "password": {
@@ -3056,12 +4221,19 @@
         },
         "required": {
           "password": "Це поле обов'язкове"
+        },
+        "errors": {
+          "couldNotVerifyPassword": "Не вдалося перевірити пароль",
+          "couldNotResetPassword": "Не вдалося скинути пароль"
+        },
+        "info": {
+          "passwordResetSent": "Пароль було скинуто. Будь ласка, перевірте свою електронну пошту"
         }
       },
       "set": {
         "title": "Встановити пароль",
         "description": "Встановіть пароль для свого облікового запису",
-        "codeSent": "Код було надіслано на вашу електронну адресу.",
+        "codeSent": "Новий код надіслано на вашу електронну адресу.",
         "noCodeReceived": "Не отримали код?",
         "resend": "Надіслати код повторно",
         "submit": "Продовжити",
@@ -3074,6 +4246,11 @@
           "code": "Це поле обов'язкове",
           "newPassword": "Ви повинні вказати пароль!",
           "confirmPassword": "Це поле обов'язкове"
+        },
+        "errors": {
+          "couldNotSetPassword": "Не вдалося встановити пароль",
+          "couldNotResetPassword": "Не вдалося скинути пароль",
+          "couldNotVerifyPassword": "Не вдалося перевірити пароль"
         }
       },
       "change": {
@@ -3081,13 +4258,51 @@
         "description": "Встановіть пароль для свого облікового запису",
         "submit": "Продовжити",
         "labels": {
+          "currentPassword": "Поточний пароль",
           "newPassword": "Новий пароль",
           "confirmPassword": "Підтвердити пароль"
         },
         "required": {
+          "currentPassword": "Ви повинні вказати поточний пароль!",
           "newPassword": "Ви повинні вказати новий пароль!",
           "confirmPassword": "Це поле обов'язкове"
+        },
+        "errors": {
+          "currentPasswordInvalid": "Поточний пароль невірний.",
+          "couldNotChangePassword": "Не вдалося змінити пароль",
+          "couldNotVerifyPassword": "Не вдалося перевірити пароль",
+          "unknownError": "Невідома помилка"
         }
+      },
+      "complexity": {
+        "length": "Повинен містити щонайменше {minLength} символів.",
+        "hasSymbol": "Повинен містити символ.",
+        "hasNumber": "Повинен містити цифру.",
+        "hasUppercase": "Повинен містити велику літеру.",
+        "hasLowercase": "Повинен містити малу літеру.",
+        "equals": "Підтвердження пароля збігається.",
+        "matches": "Збігається",
+        "doesNotMatch": "Не збігається"
+      },
+      "errors": {
+        "noHostFound": "Хост не знайдено",
+        "couldNotSendResetLink": "Не вдалося надіслати посилання для скидання пароля",
+        "couldNotCreateSessionForUser": "Не вдалося створити сеанс для користувача",
+        "couldNotVerifyPassword": "Не вдалося перевірити пароль",
+        "failedToAuthenticate": "Не вдалося автентифікуватися. Ви використали {failedAttempts} з {maxPasswordAttempts} спроб введення пароля.{lockoutMessage}",
+        "failedToAuthenticateNoLimit": "Не вдалося автентифікуватися.",
+        "accountLockedContactAdmin": " Зверніться до адміністратора, щоб розблокувати свій обліковий запис",
+        "userNotFound": "Користувача не знайдено в системі",
+        "initialUserNotSupported": "Початковий користувач не підтримується",
+        "userInitialStateNotSupported": "Початковий стан користувача не підтримується",
+        "codeOrVerificationRequired": "Ви повинні надати код або мати дійсну перевірку користувача",
+        "verificationRequired": "Необхідно виконати перевірку користувача",
+        "couldNotLoadSession": "Не вдалося завантажити сеанс",
+        "couldNotLoadAuthMethods": "Не вдалося завантажити методи автентифікації",
+        "failedPrecondition": "Не виконано передумову",
+        "sessionNotValid": "Сеанс недійсний",
+        "passwordVerificationMissing": "Відсутня перевірка пароля.",
+        "passwordVerificationTooOld": "Перевірка пароля застаріла. Будь ласка, перевірте пароль ще раз."
       }
     },
     "idp": {
@@ -3099,18 +4314,6 @@
       "signInWithAzureAD": "Увійти через AzureAD",
       "signInWithGithub": "Увійти через GitHub",
       "signInWithGitlab": "Увійти через GitLab",
-      "loginSuccess": {
-        "title": "Вхід успішний",
-        "description": "Ви успішно увійшли в систему!"
-      },
-      "linkingSuccess": {
-        "title": "Обліковий запис прив'язано",
-        "description": "Ви успішно прив'язали свій обліковий запис!"
-      },
-      "registerSuccess": {
-        "title": "Реєстрація успішна",
-        "description": "Ви успішно зареєструвалися!"
-      },
       "loginError": {
         "title": "Помилка входу",
         "description": "Сталася помилка під час спроби входу."
@@ -3122,6 +4325,35 @@
       "completeRegister": {
         "title": "Заповніть свої дані",
         "description": "Вам потрібно завершити реєстрацію, вказавши свою електронну адресу та ім'я."
+      },
+      "accountNotFound": {
+        "title": "Обліковий запис не знайдено",
+        "description": "Ми не змогли знайти обліковий запис, пов'язаний з вашими обліковими даними постачальника ідентичності.",
+        "info": "Існуючий обліковий запис не знайдено. Будь ласка, увійдіть за допомогою існуючого облікового запису або зверніться до адміністратора за допомогою.",
+        "backToLogin": "Повернутися до входу"
+      },
+      "registrationFailed": {
+        "title": "Реєстрація недоступна",
+        "description": "Ми не змогли завершити процес реєстрації.",
+        "info": "Не вдалося визначити організацію для реєстрації. Будь ласка, зверніться до адміністратора за допомогою.",
+        "backToLogin": "Повернутися до входу"
+      },
+      "processing": {
+        "message": "Обробка автентифікації...",
+        "noRedirect": "Сервер не повернув перенаправлення або помилку",
+        "unexpectedError": "Сталася неочікувана помилка"
+      },
+      "errors": {
+        "missingParameters": "Відсутні обов'язкові параметри",
+        "missingIdpInfo": "Відсутня інформація IDP",
+        "idpNotFound": "Постачальника ідентичності не знайдено",
+        "linkingNotAllowed": "Прив'язка не дозволена для цього постачальника ідентичності",
+        "linkingFailed": "Не вдалося прив'язати постачальника ідентичності до облікового запису",
+        "autoLinkingFailed": "Не вдалося автоматично прив'язати обліковий запис",
+        "userCreationFailed": "Не вдалося створити обліковий запис користувача",
+        "orgResolutionFailed": "Не вдалося визначити організацію для реєстрації",
+        "sessionCreationFailed": "Не вдалося створити сеанс або визначити перенаправлення",
+        "unknownError": "Сталася невідома помилка"
       }
     },
     "ldap": {
@@ -3185,14 +4417,27 @@
         "title": "Автентифікація за допомогою ключа доступу",
         "description": "Ваш пристрій запитає відбиток пальця, обличчя або блокування екрана",
         "usePassword": "Використати пароль",
-        "submit": "Продовжити"
+        "submit": "Продовжити",
+        "errors": {
+          "couldNotRequestChallenge": "Не вдалося запросити виклик ключа доступу",
+          "couldNotVerifyPasskey": "Не вдалося перевірити ключ доступу",
+          "noResponseReceived": "Перевірка ключа доступу не вдалася - відповідь не отримано",
+          "noRedirectProvided": "Перевірка ключа доступу завершена, але перенаправлення не надано",
+          "couldNotRetrievePasskey": "Сталася помилка під час отримання ключа доступу",
+          "verificationCancelled": "Перевірку ключа доступу скасовано",
+          "verificationFailed": "Сталася помилка під час перевірки ключа доступу",
+          "couldNotFindSession": "Не вдалося знайти сеанс",
+          "couldNotUpdateSession": "Не вдалося оновити сеанс",
+          "userNotFound": "Користувача не знайдено в системі",
+          "couldNotDetermineRedirect": "Не вдалося визначити URL перенаправлення після перевірки ключа доступу"
+        }
       },
       "set": {
         "title": "Налаштувати ключ доступу",
         "description": "Ваш пристрій запитає відбиток пальця, обличчя або блокування екрана",
         "info": {
           "description": "Ключ доступу - це метод автентифікації на пристрої, такий як відбиток пальця, Apple FaceID або подібний. ",
-          "link": "Безпарольна автентифікація"
+          "link": "Автентифікація за допомогою ключа доступу"
         },
         "skip": "Пропустити",
         "submit": "Продовжити"
@@ -3252,6 +4497,13 @@
         "firstname": "Це поле обов'язкове",
         "lastname": "Це поле обов'язкове",
         "email": "Це поле обов'язкове"
+      },
+      "errors": {
+        "couldNotCreateUser": "Не вдалося створити користувача",
+        "couldNotCreateSession": "Не вдалося створити сеанс",
+        "userNotFound": "Користувача не знайдено в системі",
+        "couldNotLinkIDP": "Не вдалося прив'язати IDP до користувача",
+        "couldNotRegisterUser": "Не вдалося зареєструвати користувача"
       }
     },
     "invite": {
@@ -3281,6 +4533,7 @@
       "userIdMissing": "userId не надано!",
       "successTitle": "Користувача підтверджено",
       "successDescription": "Користувача успішно підтверджено.",
+      "successContinue": "Продовжити",
       "setupAuthenticator": "Налаштувати автентифікатор",
       "verify": {
         "title": "Підтвердити користувача",
@@ -3295,6 +4548,22 @@
         "required": {
           "code": "Це поле обов'язкове"
         }
+      },
+      "errors": {
+        "couldNotResendEmail": "Не вдалося повторно надіслати електронний лист",
+        "couldNotVerifyUser": "Не вдалося підтвердити користувача",
+        "couldNotVerifyInvite": "Не вдалося підтвердити запрошення",
+        "couldNotVerifyEmail": "Не вдалося підтвердити електронну пошту",
+        "couldNotVerify": "Не вдалося підтвердити",
+        "couldNotLoadUser": "Не вдалося завантажити користувача",
+        "couldNotLoadAuthenticators": "Не вдалося завантажити можливі автентифікатори",
+        "couldNotCreateSession": "Не вдалося створити сеанс",
+        "noHostFound": "Хост не знайдено",
+        "userAlreadyVerified": "Користувача вже підтверджено!",
+        "couldNotResendInvite": "Не вдалося повторно надіслати запрошення",
+        "inviteSendFailed": "Не вдалося надіслати лист-запрошення",
+        "emailSendFailed": "Не вдалося надіслати лист підтвердження",
+        "contextMissing": "Сталася помилка. Будь ласка, спробуйте ще раз."
       }
     },
     "authenticator": {
@@ -3336,7 +4605,8 @@
       "unknownContext": "Не вдалося отримати контекст користувача. Переконайтеся, що спочатку ввели ім'я користувача або вкажіть loginName як параметр пошуку.",
       "sessionExpired": "Ваш поточний сеанс закінчився. Будь ласка, увійдіть знову.",
       "failedLoading": "Не вдалося завантажити дані. Будь ласка, спробуйте ще раз.",
-      "tryagain": "Спробувати ще раз"
+      "tryagain": "Спробувати ще раз",
+      "couldNotContinueSession": "Не вдалося продовжити сеанс - відсутня інформація про користувача"
     }
   },
   "ar": {
@@ -3376,6 +4646,29 @@
       },
       "required": {
         "loginName": "هذا الحقل مطلوب"
+      },
+      "errors": {
+        "internalError": "حدث خطأ داخلي",
+        "couldNotGetLoginSettings": "تعذر الحصول على إعدادات تسجيل الدخول",
+        "couldNotSearchUsers": "تعذر البحث عن المستخدمين",
+        "couldNotGetDomain": "تعذر الحصول على النطاق",
+        "couldNotGetHost": "تعذر الحصول على المضيف",
+        "couldNotStartIDPFlow": "تعذر بدء تدفق مزود الهوية (IDP)",
+        "moreThanOneUserFound": "تم العثور على أكثر من مستخدم. يرجى تقديم معرف فريد.",
+        "userNotFound": "المستخدم غير موجود في النظام",
+        "couldNotCreateSession": "تعذر إنشاء جلسة للمستخدم",
+        "initialUserNotSupported": "المستخدم الأولي غير مدعوم",
+        "localAuthenticationNotAllowed": "المصادقة المحلية غير مسموح بها! اتصل بالمسؤول لمزيد من المعلومات.",
+        "passkeysNotAllowed": "مفاتيح المرور غير مسموح بها! اتصل بالمسؤول لمزيد من المعلومات.",
+        "couldNotFindIdentityProvider": "تعذر العثور على مزود الهوية.",
+        "userNotActive": "المستخدم غير نشط. اتصل بالمسؤول لمزيد من المعلومات."
+      }
+    },
+    "zitadel": {
+      "errors": {
+        "errorOccured": "حدث خطأ",
+        "multipleUsersFound": "تم العثور على مستخدمين متعددين",
+        "userNotFound": "المستخدم غير موجود في النظام"
       }
     },
     "password": {
@@ -3389,12 +4682,19 @@
         },
         "required": {
           "password": "هذا الحقل مطلوب"
+        },
+        "errors": {
+          "couldNotVerifyPassword": "تعذر التحقق من كلمة المرور",
+          "couldNotResetPassword": "تعذر إعادة تعيين كلمة المرور"
+        },
+        "info": {
+          "passwordResetSent": "تمت إعادة تعيين كلمة المرور. يرجى التحقق من بريدك الإلكتروني"
         }
       },
       "set": {
         "title": "تعيين كلمة المرور",
         "description": "تعيين كلمة المرور لحسابك",
-        "codeSent": "تم إرسال رمز إلى عنوان بريدك الإلكتروني.",
+        "codeSent": "تم إرسال رمز جديد إلى عنوان بريدك الإلكتروني.",
         "noCodeReceived": "لم تستلم رمزاً؟",
         "resend": "إعادة إرسال الرمز",
         "submit": "متابعة",
@@ -3407,6 +4707,11 @@
           "code": "هذا الحقل مطلوب",
           "newPassword": "عليك تقديم كلمة مرور!",
           "confirmPassword": "هذا الحقل مطلوب"
+        },
+        "errors": {
+          "couldNotSetPassword": "تعذر تعيين كلمة المرور",
+          "couldNotResetPassword": "تعذر إعادة تعيين كلمة المرور",
+          "couldNotVerifyPassword": "تعذر التحقق من كلمة المرور"
         }
       },
       "change": {
@@ -3414,13 +4719,51 @@
         "description": "تعيين كلمة المرور لحسابك",
         "submit": "متابعة",
         "labels": {
+          "currentPassword": "كلمة المرور الحالية",
           "newPassword": "كلمة المرور الجديدة",
           "confirmPassword": "تأكيد كلمة المرور"
         },
         "required": {
+          "currentPassword": "عليك تقديم كلمة المرور الحالية!",
           "newPassword": "عليك تقديم كلمة مرور جديدة!",
           "confirmPassword": "هذا الحقل مطلوب"
+        },
+        "errors": {
+          "currentPasswordInvalid": "كلمة المرور الحالية غير صحيحة.",
+          "couldNotChangePassword": "تعذر تغيير كلمة المرور",
+          "couldNotVerifyPassword": "تعذر التحقق من كلمة المرور",
+          "unknownError": "خطأ غير معروف"
         }
+      },
+      "complexity": {
+        "length": "يجب أن تكون على الأقل {minLength} حرفاً.",
+        "hasSymbol": "يجب أن تتضمن رمزاً.",
+        "hasNumber": "يجب أن تتضمن رقماً.",
+        "hasUppercase": "يجب أن تتضمن حرفاً كبيراً.",
+        "hasLowercase": "يجب أن تتضمن حرفاً صغيراً.",
+        "equals": "تأكيد كلمة المرور متطابق.",
+        "matches": "مطابق",
+        "doesNotMatch": "غير مطابق"
+      },
+      "errors": {
+        "noHostFound": "لم يتم العثور على مضيف",
+        "couldNotSendResetLink": "تعذر إرسال رابط إعادة تعيين كلمة المرور",
+        "couldNotCreateSessionForUser": "تعذر إنشاء جلسة للمستخدم",
+        "couldNotVerifyPassword": "تعذر التحقق من كلمة المرور",
+        "failedToAuthenticate": "فشلت المصادقة. لقد استهلكت {failedAttempts} من {maxPasswordAttempts} محاولة لكلمة المرور.{lockoutMessage}",
+        "failedToAuthenticateNoLimit": "فشلت المصادقة.",
+        "accountLockedContactAdmin": " اتصل بالمسؤول لفتح قفل حسابك",
+        "userNotFound": "المستخدم غير موجود في النظام",
+        "initialUserNotSupported": "المستخدم الأولي غير مدعوم",
+        "userInitialStateNotSupported": "حالة المستخدم الأولية غير مدعومة",
+        "codeOrVerificationRequired": "عليك تقديم رمز أو الحصول على فحص تحقق صالح للمستخدم",
+        "verificationRequired": "يجب إجراء فحص التحقق من المستخدم",
+        "couldNotLoadSession": "تعذر تحميل الجلسة",
+        "couldNotLoadAuthMethods": "تعذر تحميل طرق المصادقة",
+        "failedPrecondition": "فشل الشرط المسبق",
+        "sessionNotValid": "الجلسة غير صالحة",
+        "passwordVerificationMissing": "التحقق من كلمة المرور مفقود.",
+        "passwordVerificationTooOld": "التحقق من كلمة المرور قديم جدًا. يرجى التحقق من كلمة المرور مرة أخرى."
       }
     },
     "idp": {
@@ -3432,18 +4775,6 @@
       "signInWithAzureAD": "تسجيل الدخول باستخدام AzureAD",
       "signInWithGithub": "تسجيل الدخول باستخدام GitHub",
       "signInWithGitlab": "تسجيل الدخول باستخدام GitLab",
-      "loginSuccess": {
-        "title": "تم تسجيل الدخول بنجاح",
-        "description": "لقد تم تسجيل دخولك بنجاح!"
-      },
-      "linkingSuccess": {
-        "title": "الحساب مرتبط",
-        "description": "لقد ربطت حسابك بنجاح!"
-      },
-      "registerSuccess": {
-        "title": "تم التسجيل بنجاح",
-        "description": "لقد تم تسجيلك بنجاح!"
-      },
       "loginError": {
         "title": "فشل تسجيل الدخول",
         "description": "حدث خطأ أثناء محاولة تسجيل الدخول."
@@ -3455,6 +4786,35 @@
       "completeRegister": {
         "title": "أكمل بياناتك",
         "description": "تحتاج إلى إكمال تسجيلك من خلال توفير عنوان بريدك الإلكتروني واسمك."
+      },
+      "accountNotFound": {
+        "title": "الحساب غير موجود",
+        "description": "لم نتمكن من العثور على حساب مرتبط ببيانات اعتماد مزود الهوية الخاص بك.",
+        "info": "لم يتم العثور على حساب موجود. يرجى تسجيل الدخول بحساب موجود أو الاتصال بالمسؤول للحصول على المساعدة.",
+        "backToLogin": "العودة إلى تسجيل الدخول"
+      },
+      "registrationFailed": {
+        "title": "التسجيل غير متاح",
+        "description": "لم نتمكن من إكمال عملية التسجيل.",
+        "info": "تعذر تحديد المنظمة للتسجيل. يرجى الاتصال بالمسؤول للحصول على المساعدة.",
+        "backToLogin": "العودة إلى تسجيل الدخول"
+      },
+      "processing": {
+        "message": "جاري معالجة المصادقة...",
+        "noRedirect": "لم يتم إرجاع إعادة توجيه أو خطأ من الخادم",
+        "unexpectedError": "حدث خطأ غير متوقع"
+      },
+      "errors": {
+        "missingParameters": "معلمات مطلوبة مفقودة",
+        "missingIdpInfo": "معلومات IDP مفقودة",
+        "idpNotFound": "مزود الهوية غير موجود",
+        "linkingNotAllowed": "الربط غير مسموح به لمزود الهوية هذا",
+        "linkingFailed": "فشل ربط مزود الهوية بالحساب",
+        "autoLinkingFailed": "فشل ربط الحساب تلقائياً",
+        "userCreationFailed": "فشل إنشاء حساب المستخدم",
+        "orgResolutionFailed": "تعذر تحديد المنظمة للتسجيل",
+        "sessionCreationFailed": "تعذر إنشاء الجلسة أو تحديد إعادة التوجيه",
+        "unknownError": "حدث خطأ غير معروف"
       }
     },
     "ldap": {
@@ -3518,7 +4878,20 @@
         "title": "المصادقة باستخدام مفتاح مرور",
         "description": "سيطلب جهازك بصمة إصبعك، أو وجهك، أو قفل الشاشة",
         "usePassword": "استخدم كلمة المرور",
-        "submit": "متابعة"
+        "submit": "متابعة",
+        "errors": {
+          "couldNotRequestChallenge": "تعذر طلب تحدي مفتاح المرور",
+          "couldNotVerifyPasskey": "تعذر التحقق من مفتاح المرور",
+          "noResponseReceived": "فشل التحقق من مفتاح المرور - لم يتم استلام أي استجابة",
+          "noRedirectProvided": "اكتمل التحقق من مفتاح المرور ولكن لم يتم توفير إعادة توجيه",
+          "couldNotRetrievePasskey": "حدث خطأ أثناء استرداد مفتاح المرور",
+          "verificationCancelled": "تم إلغاء التحقق من مفتاح المرور",
+          "verificationFailed": "حدث خطأ أثناء التحقق من مفتاح المرور",
+          "couldNotFindSession": "تعذر العثور على الجلسة",
+          "couldNotUpdateSession": "تعذر تحديث الجلسة",
+          "userNotFound": "المستخدم غير موجود في النظام",
+          "couldNotDetermineRedirect": "تعذر تحديد عنوان URL لإعادة التوجيه بعد التحقق من مفتاح المرور"
+        }
       },
       "set": {
         "title": "إعداد مفتاح مرور",
@@ -3585,6 +4958,13 @@
         "firstname": "هذا الحقل مطلوب",
         "lastname": "هذا الحقل مطلوب",
         "email": "هذا الحقل مطلوب"
+      },
+      "errors": {
+        "couldNotCreateUser": "تعذر إنشاء المستخدم",
+        "couldNotCreateSession": "تعذر إنشاء الجلسة",
+        "userNotFound": "المستخدم غير موجود في النظام",
+        "couldNotLinkIDP": "تعذر ربط IDP بالمستخدم",
+        "couldNotRegisterUser": "تعذر تسجيل المستخدم"
       }
     },
     "invite": {
@@ -3614,6 +4994,7 @@
       "userIdMissing": "لم يتم تقديم userId!",
       "successTitle": "تم التحقق من المستخدم",
       "successDescription": "تم التحقق من المستخدم بنجاح.",
+      "successContinue": "متابعة",
       "setupAuthenticator": "إعداد المصادق",
       "verify": {
         "title": "التحقق من المستخدم",
@@ -3628,6 +5009,22 @@
         "required": {
           "code": "هذا الحقل مطلوب"
         }
+      },
+      "errors": {
+        "couldNotResendEmail": "تعذر إعادة إرسال البريد الإلكتروني",
+        "couldNotVerifyUser": "تعذر التحقق من المستخدم",
+        "couldNotVerifyInvite": "تعذر التحقق من الدعوة",
+        "couldNotVerifyEmail": "تعذر التحقق من البريد الإلكتروني",
+        "couldNotVerify": "تعذر التحقق",
+        "couldNotLoadUser": "تعذر تحميل المستخدم",
+        "couldNotLoadAuthenticators": "تعذر تحميل المصادقين المحتملين",
+        "couldNotCreateSession": "تعذر إنشاء الجلسة",
+        "noHostFound": "لم يتم العثور على مضيف",
+        "userAlreadyVerified": "تم التحقق من المستخدم بالفعل!",
+        "couldNotResendInvite": "تعذر إعادة إرسال الدعوة",
+        "inviteSendFailed": "فشل إرسال بريد الدعوة الإلكتروني",
+        "emailSendFailed": "فشل إرسال بريد التحقق الإلكتروني",
+        "contextMissing": "حدث خطأ. يرجى المحاولة مرة أخرى."
       }
     },
     "authenticator": {
@@ -3669,7 +5066,8 @@
       "unknownContext": "تعذر الحصول على سياق المستخدم. تأكد من إدخال اسم المستخدم أولاً أو تقديم loginName كمعلمة بحث.",
       "sessionExpired": "انتهت صلاحية جلستك الحالية. يرجى تسجيل الدخول مرة أخرى.",
       "failedLoading": "فشل تحميل البيانات. يرجى المحاولة مرة أخرى.",
-      "tryagain": "حاول مرة أخرى"
+      "tryagain": "حاول مرة أخرى",
+      "couldNotContinueSession": "تعذر المتابعة مع الجلسة - معلومات المستخدم مفقودة"
     }
   },
   "hu": {
@@ -4131,6 +5529,1389 @@
       "failedLoading": "Nem sikerült betölteni az adatokat. Kérjük, próbáld újra.",
       "tryagain": "Próbáld újra",
       "couldNotContinueSession": "Nem sikerült folytatni a munkamenetet - hiányzó felhasználói információk"
+    }
+  },
+  "fr": {
+    "common": {
+      "back": "Retour",
+      "title": "Connexion avec Zitadel"
+    },
+    "accounts": {
+      "title": "Comptes",
+      "description": "Choisissez le compte que vous souhaitez utiliser.",
+      "addAnother": "Ajouter un nouveau compte",
+      "noResults": "Pas de compte trouvé",
+      "verified": "vérifié",
+      "expired": "expiré"
+    },
+    "logout": {
+      "title": "Déconnexion",
+      "description": "Cliquez sur un compte pour terminer la session",
+      "noResults": "Pas de compte trouvé",
+      "clear": "Fin de session",
+      "verifiedAt": "Dernière connexion: {time}",
+      "success": {
+        "title": "Déconnexion réussie",
+        "description": "Vous vous êtes déconnecté avec succès."
+      }
+    },
+    "loginname": {
+      "title": "Bienvenue!",
+      "description": "Entrez vos données de connexion.",
+      "register": "Enregistrer un nouveau compte",
+      "submit": "Continuer",
+      "labels": {
+        "loginname": "Identifiant",
+        "username": "Nom d'utilisateur",
+        "usernameOrPhoneNumber": "Nom d'utilisateur ou numéro de téléphone",
+        "usernameOrEmail": "Nom d'utilisateur ou e-mail"
+      },
+      "required": {
+        "loginName": "Ce champ est requis"
+      },
+      "errors": {
+        "internalError": "Une erreur interne s'est produite",
+        "couldNotGetLoginSettings": "Impossible d'obtenir les paramètres de connexion",
+        "couldNotSearchUsers": "Impossible de rechercher des utilisateurs",
+        "couldNotGetDomain": "Impossible d'obtenir le domaine",
+        "couldNotGetHost": "Impossible d'obtenir l'hôte",
+        "couldNotStartIDPFlow": "Impossible de démarrer le flux IDP",
+        "moreThanOneUserFound": "Plus d'un utilisateur trouvé. Fournissez un identifiant unique.",
+        "userNotFound": "Utilisateur non trouvé dans le système",
+        "couldNotCreateSession": "Impossible de créer une session pour l'utilisateur",
+        "initialUserNotSupported": "Utilisateur initial non pris en charge",
+        "localAuthenticationNotAllowed": "L'authentification locale n'est pas autorisée ! Contactez votre administrateur pour plus d'informations.",
+        "passkeysNotAllowed": "Les clés d'accès ne sont pas autorisées ! Contactez votre administrateur pour plus d'informations.",
+        "couldNotFindIdentityProvider": "Impossible de trouver le fournisseur d'identité.",
+        "userNotActive": "L'utilisateur n'est pas actif. Contactez votre administrateur pour plus d'informations."
+      }
+    },
+    "zitadel": {
+      "errors": {
+        "errorOccured": "Une erreur s'est produite",
+        "multipleUsersFound": "Plusieurs utilisateurs trouvés",
+        "userNotFound": "Utilisateur non trouvé dans le système"
+      }
+    },
+    "password": {
+      "verify": {
+        "title": "Mot de passe",
+        "description": "Entrez votre mot de passe.",
+        "resetPassword": "Réinitialiser mot de passe",
+        "submit": "Continuer",
+        "labels": {
+          "password": "Mot de passe"
+        },
+        "required": {
+          "password": "Ce champ est requis"
+        },
+        "errors": {
+          "couldNotVerifyPassword": "Impossible de vérifier le mot de passe",
+          "couldNotResetPassword": "Impossible de réinitialiser le mot de passe"
+        },
+        "info": {
+          "passwordResetSent": "Le mot de passe a été réinitialisé. Veuillez vérifier vos e-mails."
+        }
+      },
+      "set": {
+        "title": "Définir le mot de passe",
+        "description": "Définissez le mot de passe de votre compte",
+        "codeSent": "Un nouveau code a été envoyé à votre adresse e-mail.",
+        "noCodeReceived": "Vous n'avez pas reçu de code ?",
+        "resend": "Renvoyer le code",
+        "submit": "Continuer",
+        "labels": {
+          "code": "Code",
+          "newPassword": "Nouveau mot de passe",
+          "confirmPassword": "Confirmez le mot de passe"
+        },
+        "required": {
+          "code": "Ce champ est requis",
+          "newPassword": "Vous devez fournir un mot de passe !",
+          "confirmPassword": "Ce champ est requis"
+        },
+        "errors": {
+          "couldNotSetPassword": "Impossible de définir le mot de passe",
+          "couldNotResetPassword": "Impossible de réinitialiser le mot de passe",
+          "couldNotVerifyPassword": "Impossible de vérifier le mot de passe"
+        }
+      },
+      "change": {
+        "title": "Changer le mot de passe",
+        "description": "Définissez le mot de passe de votre compte",
+        "submit": "Continuer",
+        "labels": {
+          "currentPassword": "Mot de passe actuel",
+          "newPassword": "Nouveau mot de passe",
+          "confirmPassword": "Confirmez le mot de passe"
+        },
+        "required": {
+          "currentPassword": "Vous devez fournir votre mot de passe actuel !",
+          "newPassword": "Vous devez fournir un nouveau mot de passe !",
+          "confirmPassword": "Ce champ est requis"
+        },
+        "errors": {
+          "currentPasswordInvalid": "Le mot de passe actuel est incorrect.",
+          "couldNotChangePassword": "Impossible de changer le mot de passe",
+          "couldNotVerifyPassword": "Impossible de vérifier le mot de passe",
+          "unknownError": "Erreur inconnue"
+        }
+      },
+      "complexity": {
+        "length": "Doit contenir au moins {minLength} caractères.",
+        "hasSymbol": "Doit inclure un symbole.",
+        "hasNumber": "Doit inclure un chiffre.",
+        "hasUppercase": "Doit inclure une lettre majuscule.",
+        "hasLowercase": "Doit inclure une lettre minuscule.",
+        "equals": "La confirmation du mot de passe correspond.",
+        "matches": "Correspond",
+        "doesNotMatch": "Ne correspond pas"
+      },
+      "errors": {
+        "noHostFound": "Aucun hôte trouvé",
+        "couldNotSendResetLink": "Impossible d'envoyer le lien de réinitialisation du mot de passe",
+        "couldNotCreateSessionForUser": "Impossible de créer une session pour l'utilisateur",
+        "couldNotVerifyPassword": "Impossible de vérifier le mot de passe",
+        "failedToAuthenticate": "Échec de l'authentification. Vous avez utilisé {failedAttempts} sur {maxPasswordAttempts} tentatives.{lockoutMessage}",
+        "failedToAuthenticateNoLimit": "Échec de l'authentification.",
+        "accountLockedContactAdmin": " Contactez votre administrateur pour déverrouiller votre compte",
+        "userNotFound": "Utilisateur non trouvé dans le système",
+        "initialUserNotSupported": "Utilisateur initial non pris en charge",
+        "userInitialStateNotSupported": "État initial de l'utilisateur non pris en charge",
+        "codeOrVerificationRequired": "Vous devez fournir un code ou avoir une vérification utilisateur valide",
+        "verificationRequired": "Une vérification utilisateur doit être effectuée",
+        "couldNotLoadSession": "Impossible de charger la session",
+        "couldNotLoadAuthMethods": "Impossible de charger les méthodes d'authentification",
+        "failedPrecondition": "Pré-condition non remplie",
+        "sessionNotValid": "La session n'est pas valide",
+        "passwordVerificationMissing": "La vérification du mot de passe est manquante.",
+        "passwordVerificationTooOld": "La vérification du mot de passe est trop ancienne. Veuillez vérifier à nouveau votre mot de passe."
+      }
+    },
+    "idp": {
+      "title": "Se connecter avec SSO",
+      "description": "Sélectionnez un des fournisseurs suivants pour vous connecter",
+      "orSignInWith": "ou connectez-vous avec",
+      "signInWithApple": "Se connecter avec Apple",
+      "signInWithGoogle": "Se connecter avec Google",
+      "signInWithAzureAD": "Se connecter avec AzureAD",
+      "signInWithGithub": "Se connecter avec GitHub",
+      "signInWithGitlab": "Se connecter avec GitLab",
+      "loginError": {
+        "title": "Échec de la connexion",
+        "description": "Une erreur est survenue lors de la tentative de connexion."
+      },
+      "linkingError": {
+        "title": "Échec de la liaison du compte",
+        "description": "Une erreur est survenue lors de la tentative de lier votre compte."
+      },
+      "completeRegister": {
+        "title": "Complétez vos informations",
+        "description": "Vous devez compléter votre inscription en fournissant votre adresse e-mail et votre nom."
+      },
+      "accountNotFound": {
+        "title": "Compte introuvable",
+        "description": "Nous n'avons pas trouvé de compte associé aux identifiants de votre fournisseur d'identité.",
+        "info": "Aucun compte existant n'a été trouvé. Veuillez vous connecter avec un compte existant ou contacter votre administrateur pour obtenir de l'aide.",
+        "backToLogin": "Retour à la connexion"
+      },
+      "registrationFailed": {
+        "title": "Inscription non disponible",
+        "description": "Nous n'avons pas pu terminer le processus d'inscription.",
+        "info": "Impossible de déterminer l'organisation pour l'inscription. Veuillez contacter votre administrateur pour obtenir de l'aide.",
+        "backToLogin": "Retour à la connexion"
+      },
+      "processing": {
+        "message": "Traitement de l'authentification...",
+        "noRedirect": "Aucune redirection ou erreur renvoyée par le serveur",
+        "unexpectedError": "Une erreur inattendue s'est produite"
+      },
+      "errors": {
+        "missingParameters": "Paramètres requis manquants",
+        "missingIdpInfo": "Informations du fournisseur d'identité manquantes",
+        "idpNotFound": "Fournisseur d'identité introuvable",
+        "linkingNotAllowed": "La liaison n'est pas autorisée pour ce fournisseur d'identité",
+        "linkingFailed": "Échec de la liaison du fournisseur d'identité au compte",
+        "autoLinkingFailed": "Échec de la liaison automatique du compte",
+        "userCreationFailed": "Échec de la création du compte utilisateur",
+        "orgResolutionFailed": "Impossible de déterminer l'organisation pour l'inscription",
+        "sessionCreationFailed": "Impossible de créer la session ou de déterminer la redirection",
+        "unknownError": "Une erreur inconnue s'est produite"
+      }
+    },
+    "ldap": {
+      "title": "Connexion LDAP",
+      "description": "Entrez vos identifiants LDAP.",
+      "submit": "Continuer",
+      "labels": {
+        "username": "Nom d'utilisateur",
+        "password": "Mot de passe"
+      },
+      "required": {
+        "username": "Ce champ est requis",
+        "password": "Ce champ est requis"
+      }
+    },
+    "mfa": {
+      "verify": {
+        "title": "Vérifiez votre identité",
+        "description": "Choisissez l'un des facteurs suivants.",
+        "noResults": "Aucun second facteur disponible à configurer."
+      },
+      "set": {
+        "title": "Configurer l'authentification à deux facteurs",
+        "description": "Choisissez l'un des seconds facteurs suivants.",
+        "skip": "Ignorer"
+      }
+    },
+    "otp": {
+      "verify": {
+        "title": "Vérification à deux facteurs",
+        "totpDescription": "Entrez le code de votre application d'authentification.",
+        "smsDescription": "Entrez le code reçu par SMS.",
+        "emailDescription": "Entrez le code reçu par e-mail.",
+        "noCodeReceived": "Vous n'avez pas reçu de code ?",
+        "resendCode": "Renvoyer le code",
+        "submit": "Continuer",
+        "labels": {
+          "code": "Code"
+        },
+        "required": {
+          "code": "Ce champ est requis"
+        }
+      },
+      "set": {
+        "title": "Configurer l'authentification à deux facteurs",
+        "totpDescription": "Scannez le QR code avec votre application d'authentification.",
+        "smsDescription": "Entrez votre numéro de téléphone pour recevoir un code par SMS.",
+        "emailDescription": "Entrez votre adresse e-mail pour recevoir un code par e-mail.",
+        "totpRegisterDescription": "Scannez le QR code ou saisissez l'URL manuellement.",
+        "submit": "Continuer",
+        "labels": {
+          "code": "Code"
+        },
+        "required": {
+          "code": "Ce champ est requis"
+        }
+      }
+    },
+    "passkey": {
+      "verify": {
+        "title": "S'authentifier avec une clé d'accès",
+        "description": "Votre appareil vous demandera votre empreinte digitale, votre visage ou votre verrouillage d'écran",
+        "usePassword": "Utiliser un mot de passe",
+        "submit": "Continuer",
+        "errors": {
+          "couldNotRequestChallenge": "Impossible de demander le défi de la clé d'accès",
+          "couldNotVerifyPasskey": "Impossible de vérifier la clé d'accès",
+          "noResponseReceived": "Échec de la vérification de la clé d'accès - aucune réponse reçue",
+          "noRedirectProvided": "La vérification de la clé d'accès est terminée mais aucune redirection n'a été fournie",
+          "couldNotRetrievePasskey": "Une erreur s'est produite lors de la récupération de la clé d'accès",
+          "verificationCancelled": "La vérification de la clé d'accès a été annulée",
+          "verificationFailed": "Une erreur s'est produite lors de la vérification de la clé d'accès",
+          "couldNotFindSession": "Session introuvable",
+          "couldNotUpdateSession": "Impossible de mettre à jour la session",
+          "userNotFound": "Utilisateur introuvable dans le système",
+          "couldNotDetermineRedirect": "Impossible de déterminer l'URL de redirection après la vérification de la clé d'accès"
+        }
+      },
+      "set": {
+        "title": "Configurer une clé d'accès",
+        "description": "Votre appareil vous demandera votre empreinte digitale, votre visage ou votre verrouillage d'écran",
+        "info": {
+          "description": "Une clé d'accès est une méthode d'authentification sur un appareil, comme votre empreinte digitale, Apple FaceID ou équivalent.",
+          "link": "Authentification par clé d'accès"
+        },
+        "skip": "Ignorer",
+        "submit": "Continuer"
+      }
+    },
+    "u2f": {
+      "verify": {
+        "title": "Vérification à deux facteurs",
+        "description": "Vérifiez votre compte avec votre appareil."
+      },
+      "set": {
+        "title": "Configurer la double authentification",
+        "description": "Configurez un appareil comme second facteur.",
+        "submit": "Continuer"
+      }
+    },
+    "register": {
+      "methods": {
+        "passkey": "Clé d'accès",
+        "password": "Mot de passe"
+      },
+      "disabled": {
+        "title": "Inscription désactivée",
+        "description": "L'inscription est désactivée. Veuillez contacter votre administrateur."
+      },
+      "missingdata": {
+        "title": "Données manquantes",
+        "description": "Fournissez un e-mail, un prénom et un nom pour vous inscrire."
+      },
+      "title": "S'inscrire",
+      "description": "Créez votre compte Zitadel.",
+      "noMethodAvailableWarning": "Aucune méthode d'authentification disponible. Veuillez contacter votre administrateur.",
+      "selectMethod": "Sélectionnez la méthode que vous souhaitez utiliser pour vous authentifier",
+      "agreeTo": "Pour vous inscrire, vous devez accepter les conditions d'utilisation",
+      "termsOfService": "Conditions d'utilisation",
+      "privacyPolicy": "Politique de confidentialité",
+      "submit": "Continuer",
+      "password": {
+        "title": "Définir un mot de passe",
+        "description": "Définissez le mot de passe de votre compte",
+        "submit": "Continuer",
+        "labels": {
+          "password": "Mot de passe",
+          "confirmPassword": "Confirmez le mot de passe"
+        },
+        "required": {
+          "password": "Vous devez fournir un mot de passe !",
+          "confirmPassword": "Ce champ est requis"
+        }
+      },
+      "labels": {
+        "firstname": "Prénom",
+        "lastname": "Nom",
+        "email": "E-mail"
+      },
+      "required": {
+        "firstname": "Ce champ est requis",
+        "lastname": "Ce champ est requis",
+        "email": "Ce champ est requis"
+      },
+      "errors": {
+        "couldNotCreateUser": "Impossible de créer l'utilisateur",
+        "couldNotCreateSession": "Impossible de créer la session",
+        "userNotFound": "Utilisateur non trouvé dans le système",
+        "couldNotLinkIDP": "Impossible de lier le fournisseur d'identité à l'utilisateur",
+        "couldNotRegisterUser": "Impossible d'inscrire l'utilisateur"
+      }
+    },
+    "invite": {
+      "title": "Inviter un utilisateur",
+      "description": "Fournissez l'adresse e-mail et le nom de l'utilisateur que vous souhaitez inviter.",
+      "info": "L'utilisateur recevra un e-mail avec de plus amples instructions.",
+      "notAllowed": "Vos paramètres ne vous permettent pas d'inviter des utilisateurs.",
+      "submit": "Continuer",
+      "success": {
+        "title": "Utilisateur invité",
+        "description": "L'e-mail a été envoyé avec succès.",
+        "verified": "L'utilisateur a été invité et a déjà vérifié son e-mail.",
+        "notVerifiedYet": "L'utilisateur a été invité. Il recevra un e-mail avec de plus amples instructions.",
+        "submit": "Inviter un autre utilisateur"
+      }
+    },
+    "signedin": {
+      "title": "Bienvenue {user} !",
+      "description": "Vous êtes connecté.",
+      "continue": "Continuer",
+      "error": {
+        "title": "Erreur",
+        "description": "Une erreur est survenue lors de la connexion."
+      }
+    },
+    "verify": {
+      "userIdMissing": "Aucun identifiant utilisateur fourni !",
+      "successTitle": "Utilisateur vérifié",
+      "successDescription": "L'utilisateur a été vérifié avec succès.",
+      "successContinue": "Continuer",
+      "setupAuthenticator": "Configurer l'authentificateur",
+      "verify": {
+        "title": "Vérifier l'utilisateur",
+        "description": "Entrez le code fourni dans l'e-mail de vérification.",
+        "noCodeReceived": "Vous n'avez pas reçu de code ?",
+        "resendCode": "Renvoyer le code",
+        "codeSent": "Un code vient d'être envoyé à votre adresse e-mail.",
+        "submit": "Continuer",
+        "labels": {
+          "code": "Code"
+        },
+        "required": {
+          "code": "Ce champ est requis"
+        }
+      },
+      "errors": {
+        "couldNotResendEmail": "Impossible de renvoyer l'e-mail",
+        "couldNotVerifyUser": "Impossible de vérifier l'utilisateur",
+        "couldNotVerifyInvite": "Impossible de vérifier l'invitation",
+        "couldNotVerifyEmail": "Impossible de vérifier l'e-mail",
+        "couldNotVerify": "Impossible de vérifier",
+        "couldNotLoadUser": "Impossible de charger l'utilisateur",
+        "couldNotLoadAuthenticators": "Impossible de charger les authentificateurs disponibles",
+        "couldNotCreateSession": "Impossible de créer la session",
+        "noHostFound": "Aucun hôte trouvé",
+        "userAlreadyVerified": "L'utilisateur est déjà vérifié !",
+        "couldNotResendInvite": "Impossible de renvoyer l'invitation",
+        "inviteSendFailed": "Échec de l'envoi de l'e-mail d'invitation",
+        "emailSendFailed": "Échec de l'envoi de l'e-mail de vérification",
+        "contextMissing": "Une erreur s'est produite. Veuillez réessayer."
+      }
+    },
+    "authenticator": {
+      "title": "Choisir la méthode d'authentification",
+      "description": "Sélectionnez la méthode que vous souhaitez utiliser pour vous authentifier",
+      "noMethodsAvailable": "Aucune méthode d'authentification disponible",
+      "allSetup": "Vous avez déjà configuré un authentificateur !",
+      "linkWithIDP": "ou lier avec un fournisseur d'identité"
+    },
+    "device": {
+      "usercode": {
+        "title": "Code de l'appareil",
+        "description": "Entrez le code affiché sur votre application ou appareil.",
+        "submit": "Continuer",
+        "labels": {
+          "code": "Code"
+        },
+        "required": {
+          "code": "Ce champ est requis"
+        }
+      },
+      "request": {
+        "title": "{appName} souhaite se connecter",
+        "description": "{appName} aura accès à :",
+        "disclaimer": "En cliquant sur Autoriser, vous permettez à {appName} et à Zitadel d'utiliser vos informations conformément à leurs conditions d'utilisation et politiques de confidentialité respectives. Vous pouvez révoquer cet accès à tout moment.",
+        "submit": "Autoriser",
+        "deny": "Refuser"
+      },
+      "scope": {
+        "openid": "Vérifiez votre identité.",
+        "email": "Afficher votre adresse e-mail.",
+        "profile": "Afficher les informations complètes de votre profil.",
+        "offline_access": "Autoriser l'accès hors ligne à votre compte."
+      }
+    },
+    "error": {
+      "noUserCode": "Aucun code utilisateur fourni !",
+      "noDeviceRequest": "Aucune demande d'appareil trouvée.",
+      "unknownContext": "Impossible d'obtenir le contexte de l'utilisateur. Assurez-vous d'abord de saisir le nom d'utilisateur ou de fournir un loginName comme paramètre de recherche.",
+      "sessionExpired": "Votre session actuelle a expiré. Veuillez vous reconnecter.",
+      "failedLoading": "Échec du chargement des données. Veuillez réessayer.",
+      "tryagain": "Réessayer",
+      "couldNotContinueSession": "Impossible de continuer la session - informations utilisateur manquantes"
+    }
+  },
+  "ja": {
+    "common": {
+      "back": "戻る",
+      "title": "Zitadelでログイン"
+    },
+    "accounts": {
+      "title": "アカウント",
+      "description": "使用するアカウントを選択してください。",
+      "addAnother": "別のアカウントを追加",
+      "noResults": "アカウントが見つかりません",
+      "verified": "認証済み",
+      "expired": "期限切れ"
+    },
+    "logout": {
+      "title": "ログアウト",
+      "description": "セッションを終了するアカウントをクリックしてください",
+      "noResults": "アカウントが見つかりません",
+      "clear": "セッション終了",
+      "verifiedAt": "最後のアクティブ: {time}",
+      "success": {
+        "title": "ログアウト完了",
+        "description": "正常にログアウトしました。"
+      }
+    },
+    "loginname": {
+      "title": "お帰りなさい！",
+      "description": "ログイン情報を入力してください。",
+      "register": "新規ユーザー登録",
+      "submit": "続行",
+      "labels": {
+        "loginname": "ログイン名",
+        "username": "ユーザー名",
+        "usernameOrPhoneNumber": "ユーザー名または電話番号",
+        "usernameOrEmail": "ユーザー名またはメールアドレス"
+      },
+      "required": {
+        "loginName": "必須項目です"
+      },
+      "errors": {
+        "internalError": "内部エラーが発生しました",
+        "couldNotGetLoginSettings": "ログイン設定を取得できませんでした",
+        "couldNotSearchUsers": "ユーザーを検索できませんでした",
+        "couldNotGetDomain": "ドメインを取得できませんでした",
+        "couldNotGetHost": "ホストを取得できませんでした",
+        "couldNotStartIDPFlow": "IDPフローを開始できませんでした",
+        "moreThanOneUserFound": "複数のユーザーが見つかりました。一意の識別子を指定してください。",
+        "userNotFound": "ユーザーがシステムに見つかりません",
+        "couldNotCreateSession": "ユーザーのセッションを作成できませんでした",
+        "initialUserNotSupported": "初期ユーザーはサポートされていません",
+        "localAuthenticationNotAllowed": "ローカル認証は許可されていません！ 詳細については管理者に問い合わせてください。",
+        "passkeysNotAllowed": "パスキーは許可されていません！詳細については管理者にお問い合わせください。",
+        "couldNotFindIdentityProvider": "IDプロバイダーが見つかりませんでした。",
+        "userNotActive": "ユーザーはアクティブではありません。詳細については管理者にお問い合わせください。"
+      }
+    },
+    "zitadel": {
+      "errors": {
+        "errorOccured": "エラーが発生しました",
+        "multipleUsersFound": "複数のユーザーが見つかりました",
+        "userNotFound": "ユーザーがシステムに見つかりません"
+      }
+    },
+    "password": {
+      "verify": {
+        "title": "パスワード",
+        "description": "パスワードを入力してください。",
+        "resetPassword": "パスワードをリセット",
+        "submit": "続行",
+        "labels": {
+          "password": "パスワード"
+        },
+        "required": {
+          "password": "必須項目です"
+        },
+        "errors": {
+          "couldNotVerifyPassword": "パスワードを確認できませんでした",
+          "couldNotResetPassword": "パスワードをリセットできませんでした"
+        },
+        "info": {
+          "passwordResetSent": "パスワードがリセットされました。メールを確認してください"
+        }
+      },
+      "set": {
+        "title": "パスワード設定",
+        "description": "アカウントのパスワードを設定してください",
+        "codeSent": "新しいコードがメールアドレスに送信されました。",
+        "noCodeReceived": "コードが届きませんか？",
+        "resend": "コードを再送信",
+        "submit": "続行",
+        "labels": {
+          "code": "コード",
+          "newPassword": "新しいパスワード",
+          "confirmPassword": "パスワード確認"
+        },
+        "required": {
+          "code": "必須項目です",
+          "newPassword": "パスワードを入力してください！",
+          "confirmPassword": "必須項目です"
+        },
+        "errors": {
+          "couldNotSetPassword": "パスワードを設定できませんでした",
+          "couldNotResetPassword": "パスワードをリセットできませんでした",
+          "couldNotVerifyPassword": "パスワードを確認できませんでした"
+        }
+      },
+      "change": {
+        "title": "パスワード変更",
+        "description": "アカウントのパスワードを設定してください",
+        "submit": "続行",
+        "labels": {
+          "currentPassword": "現在のパスワード",
+          "newPassword": "新しいパスワード",
+          "confirmPassword": "パスワード確認"
+        },
+        "required": {
+          "currentPassword": "現在のパスワードを入力してください！",
+          "newPassword": "新しいパスワードを入力してください！",
+          "confirmPassword": "必須項目です"
+        },
+        "errors": {
+          "currentPasswordInvalid": "現在のパスワードが正しくありません。",
+          "couldNotChangePassword": "パスワードを変更できませんでした",
+          "couldNotVerifyPassword": "パスワードを確認できませんでした",
+          "unknownError": "不明なエラー"
+        }
+      },
+      "complexity": {
+        "length": "{minLength} 文字以上である必要があります。",
+        "hasSymbol": "記号を含める必要があります。",
+        "hasNumber": "数字を含める必要があります。",
+        "hasUppercase": "大文字を含める必要があります。",
+        "hasLowercase": "小文字を含める必要があります。",
+        "equals": "パスワード確認が一致しました。",
+        "matches": "一致します",
+        "doesNotMatch": "一致しません"
+      },
+      "errors": {
+        "noHostFound": "ホストが見つかりません",
+        "couldNotSendResetLink": "パスワードリセットリンクを送信できませんでした",
+        "couldNotCreateSessionForUser": "ユーザーのセッションを作成できませんでした",
+        "couldNotVerifyPassword": "パスワードを確認できませんでした",
+        "failedToAuthenticate": "認証に失敗しました。パスワード試行回数 {maxPasswordAttempts} 回中 {failedAttempts} 回失敗しました。{lockoutMessage}",
+        "failedToAuthenticateNoLimit": "認証に失敗しました。",
+        "accountLockedContactAdmin": " アカウントのロックを解除するには管理者に連絡してください",
+        "userNotFound": "ユーザーがシステムに見つかりません",
+        "initialUserNotSupported": "初期ユーザーはサポートされていません",
+        "userInitialStateNotSupported": "ユーザーの初期状態はサポートされていません",
+        "codeOrVerificationRequired": "コードを提供するか、有効なユーザー確認チェックを行う必要があります",
+        "verificationRequired": "ユーザー確認チェックを行う必要があります",
+        "couldNotLoadSession": "セッションを読み込めませんでした",
+        "couldNotLoadAuthMethods": "認証方法を読み込めませんでした",
+        "failedPrecondition": "前提条件に失敗しました",
+        "sessionNotValid": "セッションが無効です",
+        "passwordVerificationMissing": "パスワード確認がありません。",
+        "passwordVerificationTooOld": "パスワード確認が古すぎます。もう一度パスワードを確認してください。"
+      }
+    },
+    "idp": {
+      "title": "SSOでサインイン",
+      "description": "以下のプロバイダーを選択してサインインしてください",
+      "orSignInWith": "または次でサインイン",
+      "signInWithApple": "Appleでサインイン",
+      "signInWithGoogle": "Googleでサインイン",
+      "signInWithAzureAD": "AzureADでサインイン",
+      "signInWithGithub": "GitHubでサインイン",
+      "signInWithGitlab": "GitLabでサインイン",
+      "loginError": {
+        "title": "ログイン失敗",
+        "description": "ログインの際にエラーが発生しました。"
+      },
+      "linkingError": {
+        "title": "アカウント連携失敗",
+        "description": "アカウント連携の際にエラーが発生しました。"
+      },
+      "completeRegister": {
+        "title": "データを完成させる",
+        "description": "メールアドレスと名前を入力して登録を完了してください。"
+      },
+      "accountNotFound": {
+        "title": "アカウントが見つかりません",
+        "description": "アイデンティティプロバイダの認証情報に関連付けられたアカウントが見つかりませんでした。",
+        "info": "既存のアカウントが見つかりませんでした。既存のアカウントでサインインするか、管理者にお問い合わせください。",
+        "backToLogin": "ログインに戻る"
+      },
+      "registrationFailed": {
+        "title": "登録が利用できません",
+        "description": "登録プロセスを完了できませんでした。",
+        "info": "登録する組織を特定できませんでした。管理者にお問い合わせください。",
+        "backToLogin": "ログインに戻る"
+      },
+      "processing": {
+        "message": "認証を処理しています...",
+        "noRedirect": "サーバーからリダイレクトまたはエラーが返されませんでした",
+        "unexpectedError": "予期しないエラーが発生しました"
+      },
+      "errors": {
+        "missingParameters": "必要なパラメータが不足しています",
+        "missingIdpInfo": "IDP情報が不足しています",
+        "idpNotFound": "アイデンティティプロバイダが見つかりません",
+        "linkingNotAllowed": "このアイデンティティプロバイダとの連携は許可されていません",
+        "linkingFailed": "アイデンティティプロバイダのアカウントへの連携に失敗しました",
+        "autoLinkingFailed": "アカウントの自動連携に失敗しました",
+        "userCreationFailed": "ユーザーアカウントの作成に失敗しました",
+        "orgResolutionFailed": "登録する組織を特定できませんでした",
+        "sessionCreationFailed": "セッションの作成またはリダイレクトの決定に失敗しました",
+        "unknownError": "不明なエラーが発生しました"
+      }
+    },
+    "ldap": {
+      "title": "LDAPログイン",
+      "description": "LDAP認証情報を入力してください。",
+      "submit": "続行",
+      "labels": {
+        "username": "ユーザー名",
+        "password": "パスワード"
+      },
+      "required": {
+        "username": "必須項目です",
+        "password": "必須項目です"
+      }
+    },
+    "mfa": {
+      "verify": {
+        "title": "本人確認",
+        "description": "以下の要素の中から一つを選択してください。",
+        "noResults": "設定可能な二要素認証がありません。"
+      },
+      "set": {
+        "title": "二要素認証の設定",
+        "description": "以下の二要素認証の中から一つを選択してください。",
+        "skip": "スキップ"
+      }
+    },
+    "otp": {
+      "verify": {
+        "title": "二要素認証",
+        "totpDescription": "認証アプリからコードを入力してください。",
+        "smsDescription": "SMSで受信したコードを入力してください。",
+        "emailDescription": "メールで受信したコードを入力してください。",
+        "noCodeReceived": "コードが届きませんか？",
+        "resendCode": "コードを再送信",
+        "submit": "続行",
+        "labels": {
+          "code": "コード"
+        },
+        "required": {
+          "code": "必須項目です"
+        }
+      },
+      "set": {
+        "title": "二要素認証の設定",
+        "totpDescription": "認証アプリでQRコードをスキャンしてください。",
+        "smsDescription": "SMSでコードを受信する電話番号を入力してください。",
+        "emailDescription": "メールでコードを受信するメールアドレスを入力してください。",
+        "totpRegisterDescription": "QRコードをスキャンするか、URLに手動でアクセスしてください。",
+        "submit": "続行",
+        "labels": {
+          "code": "コード"
+        },
+        "required": {
+          "code": "必須項目です"
+        }
+      }
+    },
+    "passkey": {
+      "verify": {
+        "title": "パスキーで認証",
+        "description": "デバイスが指紋、顔、または画面ロックの入力を求めます",
+        "usePassword": "パスワードを使用",
+        "submit": "続行",
+        "errors": {
+          "couldNotRequestChallenge": "パスキーチャレンジを要求できませんでした",
+          "couldNotVerifyPasskey": "パスキーを確認できませんでした",
+          "noResponseReceived": "パスキー確認に失敗しました - 応答がありません",
+          "noRedirectProvided": "パスキー確認は完了しましたが、リダイレクトが提供されませんでした",
+          "couldNotRetrievePasskey": "パスキーの取得中にエラーが発生しました",
+          "verificationCancelled": "パスキー確認がキャンセルされました",
+          "verificationFailed": "パスキー確認中にエラーが発生しました",
+          "couldNotFindSession": "セッションが見つかりませんでした",
+          "couldNotUpdateSession": "セッションを更新できませんでした",
+          "userNotFound": "ユーザーがシステムに見つかりません",
+          "couldNotDetermineRedirect": "パスキー確認後のリダイレクトURLを決定できませんでした"
+        }
+      },
+      "set": {
+        "title": "パスキーの設定",
+        "description": "デバイスが指紋、顔、または画面ロックの入力を求めます",
+        "info": {
+          "description": "パスキーは、指紋やApple FaceIDなどのデバイス上の認証方法です。",
+          "link": "パスキー認証"
+        },
+        "skip": "スキップ",
+        "submit": "続行"
+      }
+    },
+    "u2f": {
+      "verify": {
+        "title": "二要素認証",
+        "description": "デバイスでアカウントを確認してください。"
+      },
+      "set": {
+        "title": "二要素認証の設定",
+        "description": "デバイスを二要素認証として設定します。",
+        "submit": "続行"
+      }
+    },
+    "register": {
+      "methods": {
+        "passkey": "パスキー",
+        "password": "パスワード"
+      },
+      "disabled": {
+        "title": "登録が無効",
+        "description": "登録が無効になっています。管理者にお問い合わせください。"
+      },
+      "missingdata": {
+        "title": "データが不足",
+        "description": "登録するにはメールアドレス、姓、名を入力してください。"
+      },
+      "title": "登録",
+      "description": "Zitadelアカウントを作成します。",
+      "noMethodAvailableWarning": "使用可能な認証方法がありません。管理者にお問い合わせください。",
+      "selectMethod": "認証に使用する方法を選択してください",
+      "agreeTo": "登録するには利用規約に同意する必要があります",
+      "termsOfService": "利用規約",
+      "privacyPolicy": "プライバシーポリシー",
+      "submit": "続行",
+      "password": {
+        "title": "パスワード設定",
+        "description": "アカウントのパスワードを設定してください",
+        "submit": "続行",
+        "labels": {
+          "password": "パスワード",
+          "confirmPassword": "パスワード確認"
+        },
+        "required": {
+          "password": "パスワードを入力してください！",
+          "confirmPassword": "必須項目です"
+        }
+      },
+      "labels": {
+        "firstname": "名",
+        "lastname": "姓",
+        "email": "メールアドレス"
+      },
+      "required": {
+        "firstname": "必須項目です",
+        "lastname": "必須項目です",
+        "email": "必須項目です"
+      },
+      "errors": {
+        "couldNotCreateUser": "ユーザーを作成できませんでした",
+        "couldNotCreateSession": "セッションを作成できませんでした",
+        "userNotFound": "ユーザーがシステムに見つかりません",
+        "couldNotLinkIDP": "IDPをユーザーにリンクできませんでした",
+        "couldNotRegisterUser": "ユーザーを登録できませんでした"
+      }
+    },
+    "invite": {
+      "title": "ユーザー招待",
+      "description": "招待するユーザーのメールアドレスと名前を入力してください。",
+      "info": "ユーザーには詳細な手順が記載されたメールが送信されます。",
+      "notAllowed": "設定によりユーザーを招待できません。",
+      "submit": "続行",
+      "success": {
+        "title": "ユーザーを招待しました",
+        "description": "メールが正常に送信されました。",
+        "verified": "ユーザーが招待され、既にメールアドレスが確認済みです。",
+        "notVerifiedYet": "ユーザーが招待されました。詳細な手順が記載されたメールを受信します。",
+        "submit": "別のユーザーを招待"
+      }
+    },
+    "signedin": {
+      "title": "ようこそ {user}さん！",
+      "description": "サインインしました。",
+      "continue": "続行",
+      "error": {
+        "title": "エラー",
+        "description": "サインインの際にエラーが発生しました。"
+      }
+    },
+    "verify": {
+      "userIdMissing": "ユーザーIDが指定されていません！",
+      "successTitle": "ユーザー確認完了",
+      "successDescription": "ユーザーの確認が正常に完了しました。",
+      "successContinue": "続行",
+      "setupAuthenticator": "認証の設定",
+      "verify": {
+        "title": "ユーザー確認",
+        "description": "確認メールに記載されたコードを入力してください。",
+        "noCodeReceived": "コードが届きませんか？",
+        "resendCode": "コードを再送信",
+        "codeSent": "確認コードをメールアドレスに送信しました。",
+        "submit": "続行",
+        "labels": {
+          "code": "コード"
+        },
+        "required": {
+          "code": "必須項目です"
+        }
+      },
+      "errors": {
+        "couldNotResendEmail": "メールを再送信できませんでした",
+        "couldNotVerifyUser": "ユーザーを確認できませんでした",
+        "couldNotVerifyInvite": "招待を確認できませんでした",
+        "couldNotVerifyEmail": "メールアドレスを確認できませんでした",
+        "couldNotVerify": "確認できませんでした",
+        "couldNotLoadUser": "ユーザーを読み込めませんでした",
+        "couldNotLoadAuthenticators": "認証方法を読み込めませんでした",
+        "couldNotCreateSession": "セッションを作成できませんでした",
+        "noHostFound": "ホストが見つかりません",
+        "userAlreadyVerified": "ユーザーは既に確認済みです！",
+        "couldNotResendInvite": "招待を再送信できませんでした",
+        "inviteSendFailed": "招待メールの送信に失敗しました",
+        "emailSendFailed": "確認メールの送信に失敗しました",
+        "contextMissing": "エラーが発生しました。もう一度お試しください。"
+      }
+    },
+    "authenticator": {
+      "title": "認証方法を選択",
+      "description": "認証に使用する方法を選択してください",
+      "noMethodsAvailable": "使用可能な認証方法がありません",
+      "allSetup": "認証の設定は既に完了しています！",
+      "linkWithIDP": "またはIDプロバイダーと連携"
+    },
+    "device": {
+      "usercode": {
+        "title": "デバイスコード",
+        "description": "アプリまたはデバイスに表示されるコードを入力してください。",
+        "submit": "続行",
+        "labels": {
+          "code": "コード"
+        },
+        "required": {
+          "code": "必須項目です"
+        }
+      },
+      "request": {
+        "title": "{appName}が接続を要求しています",
+        "description": "{appName}は以下にアクセスします：",
+        "disclaimer": "「許可」をクリックすることで、{appName}とZitadelがそれぞれの利用規約およびプライバシーポリシーに従ってあなたの情報を使用することを許可します。このアクセスはいつでも取り消すことができます。",
+        "submit": "許可",
+        "deny": "拒否"
+      },
+      "scope": {
+        "openid": "本人確認を行います。",
+        "email": "メールアドレスを表示します。",
+        "profile": "すべてのプロフィール情報を表示します。",
+        "offline_access": "アカウントへのオフラインアクセスを許可します。"
+      }
+    },
+    "error": {
+      "noUserCode": "ユーザーコードが指定されていません！",
+      "noDeviceRequest": "デバイスリクエストが見つかりません。",
+      "unknownContext": "ユーザーのコンテキストを取得できませんでした。最初にユーザー名を入力するか、検索パラメータとしてloginNameを指定してください。",
+      "sessionExpired": "現在のセッションが期限切れです。再度ログインしてください。",
+      "failedLoading": "データの読み込みに失敗しました。再試行してください。",
+      "tryagain": "再試行",
+      "couldNotContinueSession": "セッションを継続できませんでした - ユーザー情報が不足しています"
+    }
+  },
+  "pt": {
+    "common": {
+      "back": "Voltar",
+      "title": "Entrar com Zitadel"
+    },
+    "accounts": {
+      "title": "Contas",
+      "description": "Selecione a conta que deseja utilizar.",
+      "addAnother": "Adicionar outra conta",
+      "noResults": "Nenhuma conta encontrada",
+      "verified": "verificado",
+      "expired": "expirado"
+    },
+    "logout": {
+      "title": "Sair",
+      "description": "Clique em uma conta para encerrar a sessão",
+      "noResults": "Nenhuma conta encontrada",
+      "clear": "Encerrar Sessão",
+      "verifiedAt": "Último acesso: {time}",
+      "success": {
+        "title": "Sessão encerrada",
+        "description": "Você saiu com sucesso."
+      }
+    },
+    "loginname": {
+      "title": "Bem-vindo de volta!",
+      "description": "Insira seus dados de acesso.",
+      "register": "Cadastrar novo usuário",
+      "submit": "Continuar",
+      "labels": {
+        "loginname": "Nome de usuário",
+        "username": "Usuário",
+        "usernameOrPhoneNumber": "Usuário ou número de telefone",
+        "usernameOrEmail": "Usuário ou e-mail"
+      },
+      "required": {
+        "loginName": "Este campo é obrigatório"
+      },
+      "errors": {
+        "internalError": "Ocorreu um erro interno",
+        "couldNotGetLoginSettings": "Não foi possível obter as configurações de login",
+        "couldNotSearchUsers": "Não foi possível pesquisar usuários",
+        "couldNotGetDomain": "Não foi possível obter o domínio",
+        "couldNotGetHost": "Não foi possível obter o host",
+        "couldNotStartIDPFlow": "Não foi possível iniciar o fluxo do provedor de identidade",
+        "moreThanOneUserFound": "Mais de um usuário encontrado. Forneça um identificador único.",
+        "userNotFound": "Usuário não encontrado no sistema",
+        "couldNotCreateSession": "Não foi possível criar sessão para o usuário",
+        "initialUserNotSupported": "Usuário inicial não suportado",
+        "localAuthenticationNotAllowed": "A autenticação local não é permitida! Entre em contato com o administrador para mais informações.",
+        "passkeysNotAllowed": "Chaves de acesso não são permitidas! Entre em contato com o administrador para mais informações.",
+        "couldNotFindIdentityProvider": "Não foi possível encontrar o provedor de identidade.",
+        "userNotActive": "O usuário não está ativo. Entre em contato com o administrador para mais informações."
+      }
+    },
+    "zitadel": {
+      "errors": {
+        "errorOccured": "Ocorreu um erro",
+        "multipleUsersFound": "Múltiplos usuários encontrados",
+        "userNotFound": "Usuário não encontrado no sistema"
+      }
+    },
+    "password": {
+      "verify": {
+        "title": "Senha",
+        "description": "Insira sua senha.",
+        "resetPassword": "Redefinir Senha",
+        "submit": "Continuar",
+        "labels": {
+          "password": "Senha"
+        },
+        "required": {
+          "password": "Este campo é obrigatório"
+        },
+        "errors": {
+          "couldNotVerifyPassword": "Não foi possível verificar a senha",
+          "couldNotResetPassword": "Não foi possível redefinir a senha"
+        },
+        "info": {
+          "passwordResetSent": "A senha foi redefinida. Por favor, verifique seu e-mail"
+        }
+      },
+      "set": {
+        "title": "Definir Senha",
+        "description": "Defina a senha da sua conta",
+        "codeSent": "Um código foi enviado para o seu e-mail.",
+        "noCodeReceived": "Não recebeu o código?",
+        "resend": "Reenviar código",
+        "submit": "Continuar",
+        "labels": {
+          "code": "Código",
+          "newPassword": "Nova Senha",
+          "confirmPassword": "Confirmar Senha"
+        },
+        "required": {
+          "code": "Este campo é obrigatório",
+          "newPassword": "Você precisa fornecer uma senha!",
+          "confirmPassword": "Este campo é obrigatório"
+        },
+        "errors": {
+          "couldNotSetPassword": "Não foi possível definir a senha",
+          "couldNotResetPassword": "Não foi possível redefinir a senha",
+          "couldNotVerifyPassword": "Não foi possível verificar a senha"
+        }
+      },
+      "change": {
+        "title": "Alterar Senha",
+        "description": "Defina a senha da sua conta",
+        "submit": "Continuar",
+        "labels": {
+          "currentPassword": "Senha Atual",
+          "newPassword": "Nova Senha",
+          "confirmPassword": "Confirmar Senha"
+        },
+        "required": {
+          "currentPassword": "Você precisa fornecer sua senha atual!",
+          "newPassword": "Você precisa fornecer uma nova senha!",
+          "confirmPassword": "Este campo é obrigatório"
+        },
+        "errors": {
+          "currentPasswordInvalid": "A senha atual está incorreta.",
+          "couldNotChangePassword": "Não foi possível alterar a senha",
+          "couldNotVerifyPassword": "Não foi possível verificar a senha",
+          "unknownError": "Erro desconhecido"
+        }
+      },
+      "complexity": {
+        "length": "Deve ter pelo menos {minLength} caracteres.",
+        "hasSymbol": "Deve incluir um símbolo.",
+        "hasNumber": "Deve incluir um número.",
+        "hasUppercase": "Deve incluir uma letra maiúscula.",
+        "hasLowercase": "Deve incluir uma letra minúscula.",
+        "equals": "A confirmação de senha coincide.",
+        "matches": "Coincide",
+        "doesNotMatch": "Não coincide"
+      },
+      "errors": {
+        "noHostFound": "Nenhum host encontrado",
+        "couldNotSendResetLink": "Não foi possível enviar o link de redefinição de senha",
+        "couldNotCreateSessionForUser": "Não foi possível criar sessão para o usuário",
+        "couldNotVerifyPassword": "Não foi possível verificar a senha",
+        "failedToAuthenticate": "Falha na autenticação. Você usou {failedAttempts} de {maxPasswordAttempts} tentativas de senha.{lockoutMessage}",
+        "failedToAuthenticateNoLimit": "Falha na autenticação.",
+        "accountLockedContactAdmin": " Entre em contato com o administrador para desbloquear sua conta",
+        "userNotFound": "Usuário não encontrado no sistema",
+        "initialUserNotSupported": "Usuário inicial não suportado",
+        "userInitialStateNotSupported": "Estado inicial do usuário não é suportado",
+        "codeOrVerificationRequired": "Você precisa fornecer um código ou ter uma verificação de usuário válida",
+        "verificationRequired": "A verificação do usuário precisa ser realizada",
+        "couldNotLoadSession": "Não foi possível carregar a sessão",
+        "couldNotLoadAuthMethods": "Não foi possível carregar os métodos de autenticação",
+        "failedPrecondition": "Pré-condição falhou",
+        "sessionNotValid": "A sessão não é válida",
+        "passwordVerificationMissing": "A verificação de senha está ausente.",
+        "passwordVerificationTooOld": "A verificação de senha expirou. Por favor, verifique sua senha novamente."
+      }
+    },
+    "idp": {
+      "title": "Entrar com SSO",
+      "description": "Selecione um dos provedores abaixo para entrar",
+      "orSignInWith": "ou entre com",
+      "signInWithApple": "Entrar com Apple",
+      "signInWithGoogle": "Entrar com Google",
+      "signInWithAzureAD": "Entrar com AzureAD",
+      "signInWithGithub": "Entrar com GitHub",
+      "signInWithGitlab": "Entrar com GitLab",
+      "loginError": {
+        "title": "Falha no login",
+        "description": "Ocorreu um erro ao tentar fazer login."
+      },
+      "linkingError": {
+        "title": "Falha na vinculação de conta",
+        "description": "Ocorreu um erro ao tentar vincular sua conta."
+      },
+      "completeRegister": {
+        "title": "Complete seus dados",
+        "description": "Você precisa completar seu cadastro fornecendo seu endereço de e-mail e nome."
+      },
+      "accountNotFound": {
+        "title": "Conta Não Encontrada",
+        "description": "Não encontramos uma conta associada às suas credenciais do provedor de identidade.",
+        "info": "Nenhuma conta existente foi encontrada. Por favor, entre com uma conta existente ou entre em contato com o administrador para assistência.",
+        "backToLogin": "Voltar ao Login"
+      },
+      "registrationFailed": {
+        "title": "Cadastro Indisponível",
+        "description": "Não foi possível completar o processo de cadastro.",
+        "info": "Não foi possível determinar a organização para o cadastro. Por favor, entre em contato com o administrador para assistência.",
+        "backToLogin": "Voltar ao Login"
+      },
+      "processing": {
+        "message": "Processando autenticação...",
+        "noRedirect": "Nenhum redirecionamento ou erro retornado pelo servidor",
+        "unexpectedError": "Ocorreu um erro inesperado"
+      },
+      "errors": {
+        "missingParameters": "Parâmetros obrigatórios ausentes",
+        "missingIdpInfo": "Informações do provedor de identidade ausentes",
+        "idpNotFound": "Provedor de identidade não encontrado",
+        "linkingNotAllowed": "A vinculação não é permitida para este provedor de identidade",
+        "linkingFailed": "Falha ao vincular o provedor de identidade à conta",
+        "autoLinkingFailed": "Falha ao vincular automaticamente a conta",
+        "userCreationFailed": "Falha ao criar conta de usuário",
+        "orgResolutionFailed": "Não foi possível determinar a organização para o cadastro",
+        "sessionCreationFailed": "Não foi possível criar sessão ou determinar redirecionamento",
+        "unknownError": "Ocorreu um erro desconhecido"
+      }
+    },
+    "ldap": {
+      "title": "Login LDAP",
+      "description": "Insira suas credenciais LDAP.",
+      "submit": "Continuar",
+      "labels": {
+        "username": "Usuário",
+        "password": "Senha"
+      },
+      "required": {
+        "username": "Este campo é obrigatório",
+        "password": "Este campo é obrigatório"
+      }
+    },
+    "mfa": {
+      "verify": {
+        "title": "Verifique sua identidade",
+        "description": "Escolha um dos fatores abaixo.",
+        "noResults": "Nenhum segundo fator disponível para configurar."
+      },
+      "set": {
+        "title": "Configurar 2º Fator",
+        "description": "Escolha um dos seguintes segundos fatores.",
+        "skip": "Pular"
+      }
+    },
+    "otp": {
+      "verify": {
+        "title": "Verificar 2º Fator",
+        "totpDescription": "Insira o código do seu aplicativo autenticador.",
+        "smsDescription": "Insira o código que você recebeu via SMS.",
+        "emailDescription": "Insira o código que você recebeu por e-mail.",
+        "noCodeReceived": "Não recebeu o código?",
+        "resendCode": "Reenviar código",
+        "submit": "Continuar",
+        "labels": {
+          "code": "Código"
+        },
+        "required": {
+          "code": "Este campo é obrigatório"
+        }
+      },
+      "set": {
+        "title": "Configurar 2º Fator",
+        "totpDescription": "Escaneie o QR Code com seu aplicativo autenticador.",
+        "smsDescription": "Insira seu número de telefone para receber um código via SMS.",
+        "emailDescription": "Insira seu endereço de e-mail para receber um código por e-mail.",
+        "totpRegisterDescription": "Escaneie o QR Code ou acesse a URL manualmente.",
+        "submit": "Continuar",
+        "labels": {
+          "code": "Código"
+        },
+        "required": {
+          "code": "Este campo é obrigatório"
+        }
+      }
+    },
+    "passkey": {
+      "verify": {
+        "title": "Autenticar com chave de acesso",
+        "description": "Seu dispositivo solicitará sua impressão digital, rosto ou bloqueio de tela",
+        "usePassword": "Usar senha",
+        "submit": "Continuar",
+        "errors": {
+          "couldNotRequestChallenge": "Não foi possível solicitar desafio da chave de acesso",
+          "couldNotVerifyPasskey": "Não foi possível verificar a chave de acesso",
+          "noResponseReceived": "Falha na verificação da chave de acesso - nenhuma resposta recebida",
+          "noRedirectProvided": "Verificação da chave de acesso concluída, mas nenhum redirecionamento foi fornecido",
+          "couldNotRetrievePasskey": "Ocorreu um erro ao recuperar a chave de acesso",
+          "verificationCancelled": "A verificação da chave de acesso foi cancelada",
+          "verificationFailed": "Ocorreu um erro durante a verificação da chave de acesso",
+          "couldNotFindSession": "Não foi possível encontrar a sessão",
+          "couldNotUpdateSession": "Não foi possível atualizar a sessão",
+          "userNotFound": "Usuário não encontrado no sistema",
+          "couldNotDetermineRedirect": "Não foi possível determinar a URL de redirecionamento após verificação da chave de acesso"
+        }
+      },
+      "set": {
+        "title": "Configurar chave de acesso",
+        "description": "Seu dispositivo solicitará sua impressão digital, rosto ou bloqueio de tela",
+        "info": {
+          "description": "Uma chave de acesso é um método de autenticação no seu dispositivo, como impressão digital, Apple FaceID ou similar. ",
+          "link": "Autenticação por Chave de Acesso"
+        },
+        "skip": "Pular",
+        "submit": "Continuar"
+      }
+    },
+    "u2f": {
+      "verify": {
+        "title": "Verificar 2º Fator",
+        "description": "Verifique sua conta com seu dispositivo."
+      },
+      "set": {
+        "title": "Configurar 2º Fator",
+        "description": "Configure um dispositivo como segundo fator.",
+        "submit": "Continuar"
+      }
+    },
+    "register": {
+      "methods": {
+        "passkey": "Chave de Acesso",
+        "password": "Senha"
+      },
+      "disabled": {
+        "title": "Cadastro desativado",
+        "description": "O cadastro está desativado. Por favor, entre em contato com o administrador."
+      },
+      "missingdata": {
+        "title": "Dados incompletos",
+        "description": "Forneça e-mail, nome e sobrenome para se cadastrar."
+      },
+      "title": "Cadastrar",
+      "description": "Crie sua conta Zitadel.",
+      "noMethodAvailableWarning": "Nenhum método de autenticação disponível. Por favor, entre em contato com o administrador.",
+      "selectMethod": "Selecione o método de autenticação desejado",
+      "agreeTo": "Para se cadastrar, você deve concordar com os termos e condições",
+      "termsOfService": "Termos de Serviço",
+      "privacyPolicy": "Política de Privacidade",
+      "submit": "Continuar",
+      "password": {
+        "title": "Definir Senha",
+        "description": "Defina a senha da sua conta",
+        "submit": "Continuar",
+        "labels": {
+          "password": "Senha",
+          "confirmPassword": "Confirmar Senha"
+        },
+        "required": {
+          "password": "Você precisa fornecer uma senha!",
+          "confirmPassword": "Este campo é obrigatório"
+        }
+      },
+      "labels": {
+        "firstname": "Nome",
+        "lastname": "Sobrenome",
+        "email": "E-mail"
+      },
+      "required": {
+        "firstname": "Este campo é obrigatório",
+        "lastname": "Este campo é obrigatório",
+        "email": "Este campo é obrigatório"
+      },
+      "errors": {
+        "couldNotCreateUser": "Não foi possível criar o usuário",
+        "couldNotCreateSession": "Não foi possível criar a sessão",
+        "userNotFound": "Usuário não encontrado no sistema",
+        "couldNotLinkIDP": "Não foi possível vincular o provedor de identidade ao usuário",
+        "couldNotRegisterUser": "Não foi possível cadastrar o usuário"
+      }
+    },
+    "invite": {
+      "title": "Convidar Usuário",
+      "description": "Forneça o endereço de e-mail e o nome do usuário que deseja convidar.",
+      "info": "O usuário receberá um e-mail com instruções.",
+      "notAllowed": "Suas configurações não permitem convidar usuários.",
+      "submit": "Continuar",
+      "success": {
+        "title": "Usuário convidado",
+        "description": "O e-mail foi enviado com sucesso.",
+        "verified": "O usuário foi convidado e já verificou seu e-mail.",
+        "notVerifiedYet": "O usuário foi convidado. Ele receberá um e-mail com instruções.",
+        "submit": "Convidar outro usuário"
+      }
+    },
+    "signedin": {
+      "title": "Bem-vindo, {user}!",
+      "description": "Você está conectado.",
+      "continue": "Continuar",
+      "error": {
+        "title": "Erro",
+        "description": "Ocorreu um erro ao tentar entrar."
+      }
+    },
+    "verify": {
+      "userIdMissing": "Nenhum ID de usuário fornecido!",
+      "successTitle": "Usuário verificado",
+      "successDescription": "O usuário foi verificado com sucesso.",
+      "successContinue": "Continuar",
+      "setupAuthenticator": "Configurar autenticador",
+      "verify": {
+        "title": "Verificar usuário",
+        "description": "Insira o código fornecido no e-mail de verificação.",
+        "noCodeReceived": "Não recebeu o código?",
+        "resendCode": "Reenviar código",
+        "codeSent": "Um código foi enviado para o seu endereço de e-mail.",
+        "submit": "Continuar",
+        "labels": {
+          "code": "Código"
+        },
+        "required": {
+          "code": "Este campo é obrigatório"
+        }
+      },
+      "errors": {
+        "couldNotResendEmail": "Não foi possível reenviar o e-mail",
+        "couldNotVerifyUser": "Não foi possível verificar o usuário",
+        "couldNotVerifyInvite": "Não foi possível verificar o convite",
+        "couldNotVerifyEmail": "Não foi possível verificar o e-mail",
+        "couldNotVerify": "Não foi possível verificar",
+        "couldNotLoadUser": "Não foi possível carregar o usuário",
+        "couldNotLoadAuthenticators": "Não foi possível carregar os autenticadores disponíveis",
+        "couldNotCreateSession": "Não foi possível criar a sessão",
+        "noHostFound": "Nenhum host encontrado",
+        "userAlreadyVerified": "O usuário já foi verificado!",
+        "couldNotResendInvite": "Não foi possível reenviar o convite",
+        "inviteSendFailed": "Falha ao enviar e-mail de convite",
+        "emailSendFailed": "Falha ao enviar e-mail de verificação",
+        "contextMissing": "Ocorreu um erro. Por favor, tente novamente."
+      }
+    },
+    "authenticator": {
+      "title": "Escolha o método de autenticação",
+      "description": "Selecione o método de autenticação desejado",
+      "noMethodsAvailable": "Nenhum método de autenticação disponível",
+      "allSetup": "Você já configurou um autenticador!",
+      "linkWithIDP": "ou vincule com um Provedor de Identidade"
+    },
+    "device": {
+      "usercode": {
+        "title": "Código do dispositivo",
+        "description": "Insira o código exibido no seu aplicativo ou dispositivo.",
+        "submit": "Continuar",
+        "labels": {
+          "code": "Código"
+        },
+        "required": {
+          "code": "Este campo é obrigatório"
+        }
+      },
+      "request": {
+        "title": "{appName} deseja se conectar",
+        "description": "{appName} terá acesso a:",
+        "disclaimer": "Ao clicar em Permitir, você autoriza {appName} e Zitadel a usar suas informações de acordo com seus respectivos termos de serviço e políticas de privacidade. Você pode revogar este acesso a qualquer momento.",
+        "submit": "Permitir",
+        "deny": "Negar"
+      },
+      "scope": {
+        "openid": "Verificar sua identidade.",
+        "email": "Ver seu endereço de e-mail.",
+        "profile": "Ver suas informações completas de perfil.",
+        "offline_access": "Permitir acesso offline à sua conta."
+      }
+    },
+    "error": {
+      "noUserCode": "Nenhum código de usuário fornecido!",
+      "noDeviceRequest": "Nenhuma solicitação de dispositivo encontrada.",
+      "unknownContext": "Não foi possível obter o contexto do usuário. Certifique-se de inserir o nome de usuário primeiro ou forneça um loginName como parâmetro de busca.",
+      "sessionExpired": "Sua sessão atual expirou. Por favor, faça login novamente.",
+      "failedLoading": "Falha ao carregar dados. Por favor, tente novamente.",
+      "tryagain": "Tentar Novamente",
+      "couldNotContinueSession": "Não foi possível continuar a sessão — informações do usuário ausentes"
     }
   }
 }
