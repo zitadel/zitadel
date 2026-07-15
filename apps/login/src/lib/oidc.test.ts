@@ -171,11 +171,14 @@ describe("loginWithOIDCAndSession", () => {
     }
   });
 
-  it("should return unknown error for non-code-9 errors", async () => {
+  it("should re-authenticate for non-code-9 errors when the session can't be reused", async () => {
     vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
     vi.mocked(zitadelModule.createCallback).mockRejectedValue({
       code: 13,
       message: "Internal error",
+    });
+    vi.mocked(loginnameModule.sendLoginname).mockResolvedValue({
+      redirect: "/password",
     });
 
     const result = await loginWithOIDCAndSession({
@@ -186,7 +189,33 @@ describe("loginWithOIDCAndSession", () => {
       sessionCookies: mockCookies,
     });
 
-    expect(result).toEqual({ error: "Unknown error occurred" });
+    expect(loginnameModule.sendLoginname).toHaveBeenCalledWith({
+      loginName: "test@example.com",
+      organization: "org-123",
+      requestId: `oidc_${mockAuthRequest}`,
+    });
+    expect(result).toEqual({ redirect: "/password" });
+  });
+
+  it("should return an actionable error when re-authentication is not possible", async () => {
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
+    vi.mocked(zitadelModule.createCallback).mockRejectedValue({
+      code: 13,
+      message: "Internal error",
+    });
+    vi.mocked(loginnameModule.sendLoginname).mockResolvedValue(undefined as any);
+
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: mockSessions,
+      sessionCookies: mockCookies,
+    });
+
+    expect(result).toEqual({
+      error: "This session can't be reused for this request. Please authenticate again.",
+    });
   });
 
   it("should reject javascript: defaultRedirectUri in FailedPrecondition path (XSS prevention)", async () => {
