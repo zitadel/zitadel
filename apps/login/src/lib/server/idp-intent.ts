@@ -131,15 +131,20 @@ function buildCreateUserRequest(intent: IDPIntentResult, organizationId: string)
 function buildUpdateUserRequest(intent: IDPIntentResult, userId: string): UpdateUserRequest | undefined {
   if (intent.userAction?.case === "updateUser") {
     const request = intent.userAction.value;
-    const human = request.userType?.case === "human" ? request.userType.value : undefined;
+    // UpdateUserRequest.userType is a oneof that also supports machine updates; only sync
+    // human updates here. Skip if the action didn't specify a human userType.
+    if (request.userType?.case !== "human") {
+      return undefined;
+    }
+    const human = request.userType.value;
     return create(UpdateUserRequestSchema, {
       userId,
       userType: {
         case: "human",
         value: {
-          profile: human?.profile,
-          email: human?.email,
-          phone: human?.phone,
+          profile: human.profile,
+          email: human.email,
+          phone: human.phone,
         },
       },
       metadata: request.metadata,
