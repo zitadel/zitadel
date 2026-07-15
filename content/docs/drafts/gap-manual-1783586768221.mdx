@@ -1,0 +1,104 @@
+---
+title: User Self-Deletion
+description: "Guide for enabling users to delete their own accounts in ZITADEL"
+sidebar_label: User Self-Deletion
+---
+
+ZITADEL does not currently provide a built-in self-service interface for users to delete their own accounts. However, you can implement this functionality using ZITADEL's APIs and Actions.
+
+## Implementation Approaches
+
+### Option 1: API-Based Deletion
+
+You can build a custom interface in your application that calls ZITADEL's Management API to delete a user account.
+
+**Requirements:**
+- A service account with appropriate permissions (`ORG_USER_MANAGER` or `ORG_OWNER` role)
+- Authentication of the user requesting deletion
+- API call to delete the user
+
+**Steps:**
+
+1. Authenticate the user in your application
+2. Verify the user's identity (e.g., require password confirmation or MFA)
+3. Use a service account to call the [Management API](https://zitadel.com/docs/apis/resources/mgmt/user-service-remove-user) to delete the user
+4. Handle the session termination and redirect
+
+### Option 2: Action-Based Workflow
+
+You can create a custom workflow using [ZITADEL Actions](https://zitadel.com/docs/guides/manage/console/actions-overview) to trigger account deletion based on specific events or user requests.
+
+**Example Action:**
+
+```js
+/**
+ * Trigger account deletion workflow
+ * 
+ * Flow: Custom trigger based on your implementation
+ * 
+ * @param ctx
+ * @param api
+ */
+function triggerAccountDeletion(ctx, api) {
+  // Log the deletion request
+  var logger = require("zitadel/log");
+  logger.log("Account deletion requested for user: " + ctx.v1.user.id);
+  
+  // Call external API to handle deletion workflow
+  var http = require('zitadel/http');
+  http.fetch('YOUR_DELETION_API_ENDPOINT', {
+    method: 'POST',
+    body: {
+      userId: ctx.v1.user.id,
+      userName: ctx.v1.user.userName,
+      timestamp: new Date().toISOString()
+    }
+  });
+}
+```
+
+### Option 3: External Webhook Integration
+
+Implement a deletion request system that:
+
+1. User submits a deletion request through your application
+2. Your application calls an external webhook or API
+3. The external system processes the request (with appropriate verification)
+4. The external system uses ZITADEL's Management API to delete the user
+
+## Important Considerations
+
+### Data Retention and Compliance
+
+- Ensure compliance with data protection regulations (GDPR, CCPA, etc.)
+- Consider implementing a grace period before permanent deletion
+- Maintain audit logs of deletion requests using ZITADEL's [audit trail](https://zitadel.com/docs/guides/integrate/external-audit-log)
+
+### Session Management
+
+After account deletion:
+- Terminate all active sessions
+- Revoke all tokens
+- Redirect the user appropriately
+
+### Verification Steps
+
+Before deletion, consider requiring:
+- Password re-authentication
+- MFA verification
+- Explicit confirmation (e.g., typing "DELETE" or account email)
+
+## API Reference
+
+To delete a user programmatically, use the Management API:
+
+- **Endpoint:** `POST /management/v1/users/{userId}`
+- **Required Role:** `ORG_USER_MANAGER` or `ORG_OWNER`
+- **Documentation:** [Management API - Remove User](https://zitadel.com/docs/apis/resources/mgmt/user-service-remove-user)
+
+## Related Resources
+
+- [ZITADEL Actions](https://zitadel.com/docs/guides/manage/console/actions-overview)
+- [Administrator Roles](https://zitadel.com/docs/guides/manage/console/administrators)
+- [Audit Trail](https://zitadel.com/docs/guides/integrate/external-audit-log)
+- [Self Service Features](https://zitadel.com/docs/concepts/features/selfservice)
