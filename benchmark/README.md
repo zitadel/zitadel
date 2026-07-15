@@ -7,7 +7,7 @@ This package contains code for benchmarking specific endpoints of the API using 
 * [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 * [k6](https://k6.io/docs/get-started/installation/)
 * [go](https://go.dev/doc/install)
-* [xk6](https://github.com/grafana/xk6#local-installation) (make sure `~/go/bin` is in you `${PATH}`)
+* [xk6](https://github.com/grafana/xk6#local-installation) (make sure `~/go/bin` is in your `${PATH}`)
 * running the API
 
 ## Structure
