@@ -93,6 +93,16 @@ echo "POSTGRES_ADMIN_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)" >>
 echo "POSTGRES_ZITADEL_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)" >> .env
 ```
 
+The commands above cover the masterkey and the database passwords. The **initial admin user** has a password too: it defaults to `Password1!` (login `zitadel-admin@zitadel.localhost`). To set your own before the first start, add it to `.env`:
+
+```dotenv
+ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD=MyInitialPassw0rd!
+```
+
+<Callout type="warn">
+The initial admin password must satisfy the default [password complexity policy](/guides/manage/console/default-settings#password-complexity): at least 8 characters, including an uppercase letter, a lowercase letter, a number, and a symbol. A password that doesn't meet these requirements causes the initial setup to fail with a password complexity error. Like all `ZITADEL_FIRSTINSTANCE_*` variables, it is only applied during the first start; change it later from the Console.
+</Callout>
+
 ### External URL settings
 
 These three settings **must match your public endpoint exactly**:
