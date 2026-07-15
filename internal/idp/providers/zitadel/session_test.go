@@ -2,6 +2,7 @@ package zitadel
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"testing"
@@ -39,6 +40,12 @@ func TestSession_FetchUser(t *testing.T) {
 		phone             string
 		isPhoneVerified   bool
 		preferredLanguage language.Tag
+		rawClaims         map[string]any
+	}
+	const rolesClaim = "urn:zitadel:iam:org:project:roles"
+	projectRoles := map[string]any{
+		"admin":  map[string]any{"orgID": "orgDomain"},
+		"viewer": map[string]any{"orgID": "orgDomain"},
 	}
 	tests := []struct {
 		name   string
@@ -136,6 +143,53 @@ func TestSession_FetchUser(t *testing.T) {
 				preferredLanguage: language.English,
 			},
 		},
+		{
+			name: "successful fetch with project roles",
+			fields: fields{
+				httpMock: func() {
+					discoveryMock(issuer)
+					info := userinfo()
+					info.AppendClaims(rolesClaim, projectRoles)
+					gock.New(issuer).
+						Get("/userinfo").
+						Reply(200).
+						JSON(info)
+				},
+				authURL: issuer + "/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
+				tokens: &openid.Tokens[*openid.IDTokenClaims]{
+					Token: &oauth2.Token{
+						AccessToken: "accessToken",
+						TokenType:   openid.BearerToken,
+					},
+					IDTokenClaims: openid.NewIDTokenClaims(
+						issuer,
+						"sub",
+						[]string{"clientID"},
+						time.Now().Add(1*time.Hour),
+						time.Now().Add(-1*time.Second),
+						"nonce",
+						"",
+						nil,
+						"clientID",
+						0,
+					),
+				},
+			},
+			want: want{
+				id:                "sub",
+				firstName:         "firstname",
+				lastName:          "lastname",
+				displayName:       "firstname lastname",
+				nickName:          "nickname",
+				preferredUsername: "username",
+				email:             "email",
+				isEmailVerified:   true,
+				phone:             "phone",
+				isPhoneVerified:   true,
+				preferredLanguage: language.English,
+				rawClaims:         map[string]any{rolesClaim: projectRoles},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -170,6 +224,19 @@ func TestSession_FetchUser(t *testing.T) {
 				a.Equal(domain.PhoneNumber(tt.want.phone), user.GetPhone())
 				a.Equal(tt.want.isPhoneVerified, user.IsPhoneVerified())
 				a.Equal(tt.want.preferredLanguage, user.GetPreferredLanguage())
+
+				if tt.want.rawClaims != nil {
+					oidcUser, ok := user.(*oidc.User)
+					require.True(t, ok)
+					raw, err := json.Marshal(oidcUser)
+					require.NoError(t, err)
+					var rawInfo map[string]any
+					require.NoError(t, json.Unmarshal(raw, &rawInfo))
+					for claim, value := range tt.want.rawClaims {
+						a.Equal(value, oidcUser.Claims[claim])
+						a.Contains(rawInfo, claim)
+					}
+				}
 			}
 		})
 	}
