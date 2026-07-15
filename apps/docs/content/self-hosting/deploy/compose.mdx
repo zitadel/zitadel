@@ -93,7 +93,7 @@ echo "POSTGRES_ADMIN_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)" >>
 echo "POSTGRES_ZITADEL_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)" >> .env
 ```
 
-The commands above cover the masterkey and the database passwords. The **initial admin user** has a password too: it defaults to `Password1!` (login `zitadel-admin@zitadel.localhost`). To set your own before the first start, add it to `.env`:
+The commands above cover the masterkey and the database passwords. The **initial admin user** (`zitadel-admin`) has a password too, defaulting to `Password1!`. To set your own before the first start, add it to `.env`:
 
 ```dotenv
 ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD=MyInitialPassw0rd!
