@@ -72,6 +72,8 @@ On **Helm chart ≥ v10** with **ZITADEL ≥ v4.14**:
 No login PAT is required for login↔API auth.
 Older `login-client` PAT secrets from chart v9 are unused after that switch and can be deleted.
 
+See the [Helm chart README](https://github.com/zitadel/zitadel-charts/blob/main/charts/zitadel/README.md) (Upgrade From V9 to V10) for chart-specific details.
+
 Manual equivalent: register a [System API user](/guides/integrate/zitadel-apis/access-zitadel-system-api) with `IAM_LOGIN_CLIENT` membership and configure the login env vars above.
 
 ## 3. Smoke-test (feature still off)

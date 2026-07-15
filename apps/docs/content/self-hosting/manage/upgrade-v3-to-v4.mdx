@@ -41,7 +41,7 @@ When you decide to move, see [Adopt Login V2 on an existing installation](/self-
 
 ## Helm
 
-Follow your chart’s upgrade notes for the ZITADEL app version.
+Follow the [Helm chart README](https://github.com/zitadel/zitadel-charts/blob/main/charts/zitadel/README.md) upgrade notes for the ZITADEL app version (for example chart v8 → v9 when moving to ZITADEL v4).
 
 Newer charts may deploy a Login V2 workload by default. That does **not** enable Login V2 for existing instances.
 If you are not adopting Login V2 yet, set `login.enabled: false` to omit the login Deployment.
