@@ -54,14 +54,32 @@ export default getRequestConfig(async () => {
 
   let translations: JsonObject | Record<string, never> = {};
   try {
-    const i18nJSON = await getHostedLoginTranslation({
+    const hosted = await getHostedLoginTranslation({
       serviceConfig,
       locale,
       organization: i18nOrganization,
     });
 
-    if (i18nJSON) {
-      translations = i18nJSON;
+    if (hosted?.translations) {
+      if (locale === defaultLanguage) {
+        translations = hosted.translations;
+      } else {
+        // The backend returns the instance default-language translation as a
+        // fallback when no custom hosted-login translation exists for `locale`.
+        // Merging that fallback would clobber the bundled locale file and render
+        // the UI in the default language. Compare the server-computed etag
+        // (order-independent content hash) rather than JSON.stringify — the
+        // translations come from a protobuf map whose key order is not stable
+        // across responses, so a string compare yields false negatives.
+        const defaultHosted = await getHostedLoginTranslation({
+          serviceConfig,
+          locale: defaultLanguage,
+          organization: i18nOrganization,
+        });
+        if (!defaultHosted || defaultHosted.etag !== hosted.etag) {
+          translations = hosted.translations;
+        }
+      }
     }
   } catch (error) {
     console.warn("Error fetching custom translations:", error);

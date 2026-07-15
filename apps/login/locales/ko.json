@@ -1,0 +1,461 @@
+{
+  "common": {
+    "back": "뒤로",
+    "title": "Zitadel로 로그인"
+  },
+  "accounts": {
+    "title": "계정",
+    "description": "사용할 계정을 선택하십시오.",
+    "addAnother": "다른 계정 추가",
+    "noResults": "계정을 찾을 수 없습니다",
+    "verified": "인증됨",
+    "expired": "만료됨"
+  },
+  "logout": {
+    "title": "로그아웃",
+    "description": "세션을 종료하려면 계정을 클릭하십시오",
+    "noResults": "계정을 찾을 수 없습니다",
+    "clear": "세션 종료",
+    "verifiedAt": "마지막 활동: {time}",
+    "success": {
+      "title": "로그아웃 성공",
+      "description": "성공적으로 로그아웃되었습니다."
+    }
+  },
+  "loginname": {
+    "title": "다시 오신 것을 환영합니다!",
+    "description": "로그인 정보를 입력하십시오.",
+    "register": "새 사용자 등록",
+    "submit": "계속",
+    "labels": {
+      "loginname": "로그인 이름",
+      "username": "사용자 이름",
+      "usernameOrPhoneNumber": "사용자 이름 또는 전화번호",
+      "usernameOrEmail": "사용자 이름 또는 이메일"
+    },
+    "required": {
+      "loginName": "이 필드는 필수입니다"
+    },
+    "errors": {
+      "internalError": "내부 오류가 발생했습니다",
+      "couldNotGetLoginSettings": "로그인 설정을 가져올 수 없습니다",
+      "couldNotSearchUsers": "사용자를 검색할 수 없습니다",
+      "couldNotGetDomain": "도메인을 가져올 수 없습니다",
+      "couldNotGetHost": "호스트를 가져올 수 없습니다",
+      "couldNotStartIDPFlow": "IDP 흐름을 시작할 수 없습니다",
+      "moreThanOneUserFound": "둘 이상의 사용자를 찾았습니다. 고유한 식별자를 입력하십시오.",
+      "userNotFound": "시스템에서 사용자를 찾을 수 없습니다",
+      "couldNotCreateSession": "사용자의 세션을 생성할 수 없습니다",
+      "initialUserNotSupported": "초기 사용자는 지원되지 않습니다",
+      "localAuthenticationNotAllowed": "로컬 인증이 허용되지 않습니다! 자세한 내용은 관리자에게 문의하십시오.",
+      "passkeysNotAllowed": "Passkey가 허용되지 않습니다! 자세한 내용은 관리자에게 문의하십시오.",
+      "couldNotFindIdentityProvider": "ID 제공자를 찾을 수 없습니다.",
+      "userNotActive": "사용자가 활성 상태가 아닙니다. 자세한 내용은 관리자에게 문의하십시오."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "오류가 발생했습니다",
+      "multipleUsersFound": "여러 사용자를 찾았습니다",
+      "userNotFound": "시스템에서 사용자를 찾을 수 없습니다"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "비밀번호",
+      "description": "비밀번호를 입력하십시오.",
+      "resetPassword": "비밀번호 재설정",
+      "submit": "계속",
+      "labels": {
+        "password": "비밀번호"
+      },
+      "required": {
+        "password": "이 필드는 필수입니다"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "비밀번호를 확인할 수 없습니다",
+        "couldNotResetPassword": "비밀번호를 재설정할 수 없습니다"
+      },
+      "info": {
+        "passwordResetSent": "비밀번호가 재설정되었습니다. 이메일을 확인하십시오"
+      }
+    },
+    "set": {
+      "title": "비밀번호 설정",
+      "description": "계정의 비밀번호를 설정하십시오",
+      "codeSent": "새 코드가 이메일 주소로 전송되었습니다.",
+      "noCodeReceived": "코드를 받지 못하셨습니까?",
+      "resend": "코드 재전송",
+      "submit": "계속",
+      "labels": {
+        "code": "코드",
+        "newPassword": "새 비밀번호",
+        "confirmPassword": "비밀번호 확인"
+      },
+      "required": {
+        "code": "이 필드는 필수입니다",
+        "newPassword": "비밀번호를 입력해야 합니다!",
+        "confirmPassword": "이 필드는 필수입니다"
+      },
+      "errors": {
+        "couldNotSetPassword": "비밀번호를 설정할 수 없습니다",
+        "couldNotResetPassword": "비밀번호를 재설정할 수 없습니다",
+        "couldNotVerifyPassword": "비밀번호를 확인할 수 없습니다"
+      }
+    },
+    "change": {
+      "title": "비밀번호 변경",
+      "description": "계정의 비밀번호를 설정하십시오",
+      "submit": "계속",
+      "labels": {
+        "currentPassword": "현재 비밀번호",
+        "newPassword": "새 비밀번호",
+        "confirmPassword": "비밀번호 확인"
+      },
+      "required": {
+        "currentPassword": "현재 비밀번호를 입력해야 합니다!",
+        "newPassword": "새 비밀번호를 입력해야 합니다!",
+        "confirmPassword": "이 필드는 필수입니다"
+      },
+      "errors": {
+        "currentPasswordInvalid": "현재 비밀번호가 올바르지 않습니다.",
+        "couldNotChangePassword": "비밀번호를 변경할 수 없습니다",
+        "couldNotVerifyPassword": "비밀번호를 확인할 수 없습니다",
+        "unknownError": "알 수 없는 오류"
+      }
+    },
+    "complexity": {
+      "length": "최소 {minLength}자 이상이어야 합니다.",
+      "hasSymbol": "기호를 포함해야 합니다.",
+      "hasNumber": "숫자를 포함해야 합니다.",
+      "hasUppercase": "대문자를 포함해야 합니다.",
+      "hasLowercase": "소문자를 포함해야 합니다.",
+      "equals": "비밀번호 확인이 일치합니다.",
+      "matches": "일치합니다",
+      "doesNotMatch": "일치하지 않습니다"
+    },
+    "errors": {
+      "noHostFound": "호스트를 찾을 수 없습니다",
+      "couldNotSendResetLink": "비밀번호 재설정 링크를 보낼 수 없습니다",
+      "couldNotCreateSessionForUser": "사용자의 세션을 생성할 수 없습니다",
+      "couldNotVerifyPassword": "비밀번호를 확인할 수 없습니다",
+      "failedToAuthenticate": "인증에 실패했습니다. {maxPasswordAttempts}회 중 {failedAttempts}회의 비밀번호 시도를 하셨습니다.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "인증에 실패했습니다.",
+      "accountLockedContactAdmin": " 계정 잠금을 해제하려면 관리자에게 문의하십시오",
+      "userNotFound": "시스템에서 사용자를 찾을 수 없습니다",
+      "initialUserNotSupported": "초기 사용자는 지원되지 않습니다",
+      "userInitialStateNotSupported": "사용자 초기 상태는 지원되지 않습니다",
+      "codeOrVerificationRequired": "코드를 입력하거나 유효한 사용자 인증 확인을 받아야 합니다",
+      "verificationRequired": "사용자 인증 확인을 완료해야 합니다",
+      "couldNotLoadSession": "세션을 불러올 수 없습니다",
+      "couldNotLoadAuthMethods": "인증 방법을 불러올 수 없습니다",
+      "failedPrecondition": "사전 조건이 충족되지 않았습니다",
+      "sessionNotValid": "세션이 유효하지 않습니다",
+      "passwordVerificationMissing": "비밀번호 인증이 누락되었습니다.",
+      "passwordVerificationTooOld": "비밀번호 인증이 너무 오래되었습니다. 비밀번호를 다시 인증하십시오."
+    }
+  },
+  "idp": {
+    "title": "SSO로 로그인",
+    "description": "로그인하려면 다음 제공자 중 하나를 선택하십시오",
+    "orSignInWith": "또는 다음으로 로그인",
+    "signInWithApple": "Apple로 로그인",
+    "signInWithGoogle": "Google로 로그인",
+    "signInWithAzureAD": "AzureAD로 로그인",
+    "signInWithGithub": "GitHub로 로그인",
+    "signInWithGitlab": "GitLab로 로그인",
+    "loginError": {
+      "title": "로그인 실패",
+      "description": "로그인을 시도하는 중 오류가 발생했습니다."
+    },
+    "linkingError": {
+      "title": "계정 연결 실패",
+      "description": "계정을 연결하는 중 오류가 발생했습니다."
+    },
+    "completeRegister": {
+      "title": "정보를 완성하십시오",
+      "description": "이메일 주소와 이름을 입력하여 등록을 완료해야 합니다."
+    },
+    "accountNotFound": {
+      "title": "계정을 찾을 수 없음",
+      "description": "ID 제공자 자격 증명과 연결된 계정을 찾을 수 없습니다.",
+      "info": "기존 계정을 찾을 수 없습니다. 기존 계정으로 로그인하거나 도움이 필요하면 관리자에게 문의하십시오.",
+      "backToLogin": "로그인으로 돌아가기"
+    },
+    "registrationFailed": {
+      "title": "등록을 사용할 수 없음",
+      "description": "등록 절차를 완료할 수 없습니다.",
+      "info": "등록을 위한 조직을 확인할 수 없습니다. 도움이 필요하면 관리자에게 문의하십시오.",
+      "backToLogin": "로그인으로 돌아가기"
+    },
+    "processing": {
+      "message": "인증을 처리하는 중...",
+      "noRedirect": "서버에서 리디렉션 또는 오류가 반환되지 않았습니다",
+      "unexpectedError": "예기치 않은 오류가 발생했습니다"
+    },
+    "errors": {
+      "missingParameters": "필수 매개변수가 없습니다",
+      "missingIdpInfo": "IDP 정보가 없습니다",
+      "idpNotFound": "ID 제공자를 찾을 수 없습니다",
+      "linkingNotAllowed": "이 ID 제공자에 대해서는 연결이 허용되지 않습니다",
+      "linkingFailed": "ID 제공자를 계정에 연결하지 못했습니다",
+      "autoLinkingFailed": "계정을 자동으로 연결하지 못했습니다",
+      "userCreationFailed": "사용자 계정을 생성하지 못했습니다",
+      "orgResolutionFailed": "등록을 위한 조직을 확인할 수 없습니다",
+      "sessionCreationFailed": "세션을 생성하거나 리디렉션을 확인할 수 없습니다",
+      "unknownError": "알 수 없는 오류가 발생했습니다"
+    }
+  },
+  "ldap": {
+    "title": "LDAP 로그인",
+    "description": "LDAP 자격 증명을 입력하십시오.",
+    "submit": "계속",
+    "labels": {
+      "username": "사용자 이름",
+      "password": "비밀번호"
+    },
+    "required": {
+      "username": "이 필드는 필수입니다",
+      "password": "이 필드는 필수입니다"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "본인 확인",
+      "description": "다음 요소 중 하나를 선택하십시오.",
+      "noResults": "설정할 수 있는 2차 인증 요소가 없습니다."
+    },
+    "set": {
+      "title": "2단계 인증 설정",
+      "description": "다음 2차 인증 요소 중 하나를 선택하십시오.",
+      "skip": "건너뛰기"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "2단계 인증 확인",
+      "totpDescription": "인증 앱의 코드를 입력하십시오.",
+      "smsDescription": "SMS로 받은 코드를 입력하십시오.",
+      "emailDescription": "이메일로 받은 코드를 입력하십시오.",
+      "noCodeReceived": "코드를 받지 못하셨습니까?",
+      "resendCode": "코드 재전송",
+      "submit": "계속",
+      "labels": {
+        "code": "코드"
+      },
+      "required": {
+        "code": "이 필드는 필수입니다"
+      }
+    },
+    "set": {
+      "title": "2단계 인증 설정",
+      "totpDescription": "인증 앱으로 QR 코드를 스캔하십시오.",
+      "smsDescription": "SMS로 코드를 받으려면 전화번호를 입력하십시오.",
+      "emailDescription": "이메일로 코드를 받으려면 이메일 주소를 입력하십시오.",
+      "totpRegisterDescription": "QR 코드를 스캔하거나 URL로 직접 이동하십시오.",
+      "submit": "계속",
+      "labels": {
+        "code": "코드"
+      },
+      "required": {
+        "code": "이 필드는 필수입니다"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Passkey로 인증",
+      "description": "장치에서 지문, 얼굴 또는 화면 잠금을 요청합니다",
+      "usePassword": "비밀번호 사용",
+      "submit": "계속",
+      "errors": {
+        "couldNotRequestChallenge": "Passkey 챌린지를 요청할 수 없습니다",
+        "couldNotVerifyPasskey": "Passkey를 확인할 수 없습니다",
+        "noResponseReceived": "Passkey 인증에 실패했습니다 - 응답을 받지 못했습니다",
+        "noRedirectProvided": "Passkey 인증이 완료되었지만 리디렉션이 제공되지 않았습니다",
+        "couldNotRetrievePasskey": "Passkey를 가져오는 중 오류가 발생했습니다",
+        "verificationCancelled": "Passkey 인증이 취소되었습니다",
+        "verificationFailed": "Passkey 인증 중 오류가 발생했습니다",
+        "couldNotFindSession": "세션을 찾을 수 없습니다",
+        "couldNotUpdateSession": "세션을 업데이트할 수 없습니다",
+        "userNotFound": "시스템에서 사용자를 찾을 수 없습니다",
+        "couldNotDetermineRedirect": "Passkey 인증 후 리디렉션 URL을 확인할 수 없습니다"
+      }
+    },
+    "set": {
+      "title": "Passkey 설정",
+      "description": "장치에서 지문, 얼굴 또는 화면 잠금을 요청합니다",
+      "info": {
+        "description": "Passkey는 지문, Apple FaceID 또는 이와 유사한 장치의 인증 방법입니다. ",
+        "link": "Passkey 인증"
+      },
+      "skip": "건너뛰기",
+      "submit": "계속"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "2단계 인증 확인",
+      "description": "장치로 계정을 인증하십시오."
+    },
+    "set": {
+      "title": "2단계 인증 설정",
+      "description": "장치를 2차 인증 요소로 설정하십시오.",
+      "submit": "계속"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "비밀번호"
+    },
+    "disabled": {
+      "title": "등록이 비활성화됨",
+      "description": "등록이 비활성화되어 있습니다. 관리자에게 문의하십시오."
+    },
+    "missingdata": {
+      "title": "누락된 데이터",
+      "description": "등록하려면 이메일, 이름 및 성을 입력하십시오."
+    },
+    "title": "등록",
+    "description": "Zitadel 계정을 생성하십시오.",
+    "noMethodAvailableWarning": "사용 가능한 인증 방법이 없습니다. 관리자에게 문의하십시오.",
+    "selectMethod": "인증할 방법을 선택하십시오",
+    "agreeTo": "등록하려면 이용 약관에 동의해야 합니다",
+    "termsOfService": "이용 약관",
+    "privacyPolicy": "개인정보처리방침",
+    "submit": "계속",
+    "password": {
+      "title": "비밀번호 설정",
+      "description": "계정의 비밀번호를 설정하십시오",
+      "submit": "계속",
+      "labels": {
+        "password": "비밀번호",
+        "confirmPassword": "비밀번호 확인"
+      },
+      "required": {
+        "password": "비밀번호를 입력해야 합니다!",
+        "confirmPassword": "이 필드는 필수입니다"
+      }
+    },
+    "labels": {
+      "firstname": "이름",
+      "lastname": "성",
+      "email": "이메일"
+    },
+    "required": {
+      "firstname": "이 필드는 필수입니다",
+      "lastname": "이 필드는 필수입니다",
+      "email": "이 필드는 필수입니다"
+    },
+    "errors": {
+      "couldNotCreateUser": "사용자를 생성할 수 없습니다",
+      "couldNotCreateSession": "세션을 생성할 수 없습니다",
+      "userNotFound": "시스템에서 사용자를 찾을 수 없습니다",
+      "couldNotLinkIDP": "IDP를 사용자에 연결할 수 없습니다",
+      "couldNotRegisterUser": "사용자를 등록할 수 없습니다"
+    }
+  },
+  "invite": {
+    "title": "사용자 초대",
+    "description": "초대할 사용자의 이메일 주소와 이름을 입력하십시오.",
+    "info": "사용자는 추가 안내가 포함된 이메일을 받게 됩니다.",
+    "notAllowed": "설정상 사용자를 초대할 수 없습니다.",
+    "submit": "계속",
+    "success": {
+      "title": "사용자 초대됨",
+      "description": "이메일이 성공적으로 전송되었습니다.",
+      "verified": "사용자가 초대되었으며 이미 이메일을 인증했습니다.",
+      "notVerifiedYet": "사용자가 초대되었습니다. 추가 안내가 포함된 이메일을 받게 됩니다.",
+      "submit": "다른 사용자 초대"
+    }
+  },
+  "signedin": {
+    "title": "{user}님, 환영합니다!",
+    "description": "로그인되었습니다.",
+    "continue": "계속",
+    "error": {
+      "title": "오류",
+      "description": "로그인을 시도하는 중 오류가 발생했습니다."
+    }
+  },
+  "verify": {
+    "userIdMissing": "userId가 제공되지 않았습니다!",
+    "successTitle": "사용자 인증됨",
+    "successDescription": "사용자가 성공적으로 인증되었습니다.",
+    "successContinue": "계속",
+    "setupAuthenticator": "인증 도구 설정",
+    "verify": {
+      "title": "사용자 인증",
+      "description": "인증 이메일에 제공된 코드를 입력하십시오.",
+      "noCodeReceived": "코드를 받지 못하셨습니까?",
+      "resendCode": "코드 재전송",
+      "codeSent": "새 코드가 방금 이메일 주소로 전송되었습니다.",
+      "submit": "계속",
+      "labels": {
+        "code": "코드"
+      },
+      "required": {
+        "code": "이 필드는 필수입니다"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "이메일을 다시 보낼 수 없습니다",
+      "couldNotVerifyUser": "사용자를 인증할 수 없습니다",
+      "couldNotVerifyInvite": "초대를 인증할 수 없습니다",
+      "couldNotVerifyEmail": "이메일을 인증할 수 없습니다",
+      "couldNotVerify": "인증할 수 없습니다",
+      "couldNotLoadUser": "사용자를 불러올 수 없습니다",
+      "couldNotLoadAuthenticators": "사용 가능한 인증 도구를 불러올 수 없습니다",
+      "couldNotCreateSession": "세션을 생성할 수 없습니다",
+      "noHostFound": "호스트를 찾을 수 없습니다",
+      "userAlreadyVerified": "사용자가 이미 인증되었습니다!",
+      "couldNotResendInvite": "초대를 다시 보낼 수 없습니다",
+      "inviteSendFailed": "초대 이메일을 보내지 못했습니다",
+      "emailSendFailed": "인증 이메일을 보내지 못했습니다",
+      "contextMissing": "오류가 발생했습니다. 다시 시도하십시오."
+    }
+  },
+  "authenticator": {
+    "title": "인증 방법 선택",
+    "description": "인증할 방법을 선택하십시오",
+    "noMethodsAvailable": "사용 가능한 인증 방법이 없습니다",
+    "allSetup": "이미 인증 도구를 설정했습니다!",
+    "linkWithIDP": "또는 ID 제공자와 연결"
+  },
+  "device": {
+    "usercode": {
+      "title": "기기 코드",
+      "description": "앱 또는 기기에 표시된 코드를 입력하십시오.",
+      "submit": "계속",
+      "labels": {
+        "code": "코드"
+      },
+      "required": {
+        "code": "이 필드는 필수입니다"
+      }
+    },
+    "request": {
+      "title": "{appName}이(가) 연결하려고 합니다",
+      "description": "{appName}이(가) 다음에 접근할 수 있습니다:",
+      "disclaimer": "허용을 클릭하면 {appName}과(와) Zitadel이 각자의 이용 약관 및 개인정보처리방침에 따라 귀하의 정보를 사용하도록 허용하게 됩니다. 이 접근 권한은 언제든지 취소할 수 있습니다.",
+      "submit": "허용",
+      "deny": "거부"
+    },
+    "scope": {
+      "openid": "본인 확인.",
+      "email": "이메일 주소 보기.",
+      "profile": "전체 프로필 정보 보기.",
+      "offline_access": "계정에 대한 오프라인 접근 허용."
+    }
+  },
+  "error": {
+    "noUserCode": "사용자 코드가 제공되지 않았습니다!",
+    "noDeviceRequest": "기기 요청을 찾을 수 없습니다.",
+    "unknownContext": "사용자의 컨텍스트를 가져올 수 없습니다. 먼저 사용자 이름을 입력하거나 loginName을 searchParam으로 제공하십시오.",
+    "sessionExpired": "현재 세션이 만료되었습니다. 다시 로그인하십시오.",
+    "failedLoading": "데이터를 불러오지 못했습니다. 다시 시도하십시오.",
+    "tryagain": "다시 시도",
+    "couldNotContinueSession": "세션을 계속할 수 없습니다 - 사용자 정보가 누락되었습니다"
+  }
+}
