@@ -226,15 +226,12 @@ func TestSession_FetchUser(t *testing.T) {
 				a.Equal(tt.want.preferredLanguage, user.GetPreferredLanguage())
 
 				if tt.want.rawClaims != nil {
-					oidcUser, ok := user.(*oidc.User)
-					require.True(t, ok)
-					raw, err := json.Marshal(oidcUser)
+					idpInfo, err := json.Marshal(user)
 					require.NoError(t, err)
 					var rawInfo map[string]any
-					require.NoError(t, json.Unmarshal(raw, &rawInfo))
+					require.NoError(t, json.Unmarshal(idpInfo, &rawInfo))
 					for claim, value := range tt.want.rawClaims {
-						a.Equal(value, oidcUser.Claims[claim])
-						a.Contains(rawInfo, claim)
+						a.Equal(value, rawInfo[claim])
 					}
 				}
 			}
