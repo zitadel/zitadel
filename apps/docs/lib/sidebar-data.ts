@@ -814,6 +814,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "self-hosting/manage/upgrade-v3-to-v4",
           "self-hosting/manage/database/database",
           "self-hosting/manage/cache",
+          "self-hosting/manage/tuning",
         ],
       },
 
