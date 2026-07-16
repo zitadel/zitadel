@@ -14,9 +14,9 @@ import (
 
 func Test_eventstoreAutovacuum_Execute(t *testing.T) {
 	type fields struct {
-		Enabled               bool
-		VacuumInsertThreshold uint32
-		AnalyzeThreshold      uint32
+		Enabled          bool
+		VacuumThreshold  uint32
+		AnalyzeThreshold uint32
 	}
 	tests := []struct {
 		name    string
@@ -27,9 +27,9 @@ func Test_eventstoreAutovacuum_Execute(t *testing.T) {
 		{
 			name: "enabled, sets thresholds",
 			fields: fields{
-				Enabled:               true,
-				VacuumInsertThreshold: 50000,
-				AnalyzeThreshold:      25000,
+				Enabled:          true,
+				VacuumThreshold:  50000,
+				AnalyzeThreshold: 25000,
 			},
 			expects: func(mock sqlmock.Sqlmock) {
 				mock.ExpectExec(regexp.QuoteMeta(`ALTER TABLE eventstore.events2 SET (
@@ -45,9 +45,9 @@ func Test_eventstoreAutovacuum_Execute(t *testing.T) {
 		{
 			name: "enabled, db error",
 			fields: fields{
-				Enabled:               true,
-				VacuumInsertThreshold: 50000,
-				AnalyzeThreshold:      50000,
+				Enabled:          true,
+				VacuumThreshold:  50000,
+				AnalyzeThreshold: 50000,
 			},
 			expects: func(mock sqlmock.Sqlmock) {
 				mock.ExpectExec(".*").WillReturnError(assert.AnError)
@@ -57,9 +57,9 @@ func Test_eventstoreAutovacuum_Execute(t *testing.T) {
 		{
 			name: "enabled, vacuum threshold at minimum boundary fails",
 			fields: fields{
-				Enabled:               true,
-				VacuumInsertThreshold: minAutovacuumThreshold,
-				AnalyzeThreshold:      50000,
+				Enabled:          true,
+				VacuumThreshold:  minAutovacuumThreshold,
+				AnalyzeThreshold: 50000,
 			},
 			expects: func(sqlmock.Sqlmock) {},
 			wantErr: true,
@@ -67,9 +67,9 @@ func Test_eventstoreAutovacuum_Execute(t *testing.T) {
 		{
 			name: "enabled, analyze threshold at minimum boundary fails",
 			fields: fields{
-				Enabled:               true,
-				VacuumInsertThreshold: 50000,
-				AnalyzeThreshold:      minAutovacuumThreshold,
+				Enabled:          true,
+				VacuumThreshold:  50000,
+				AnalyzeThreshold: minAutovacuumThreshold,
 			},
 			expects: func(sqlmock.Sqlmock) {},
 			wantErr: true,
@@ -77,9 +77,9 @@ func Test_eventstoreAutovacuum_Execute(t *testing.T) {
 		{
 			name: "enabled, thresholds just above minimum succeed",
 			fields: fields{
-				Enabled:               true,
-				VacuumInsertThreshold: minAutovacuumThreshold + 1,
-				AnalyzeThreshold:      minAutovacuumThreshold + 1,
+				Enabled:          true,
+				VacuumThreshold:  minAutovacuumThreshold + 1,
+				AnalyzeThreshold: minAutovacuumThreshold + 1,
 			},
 			expects: func(mock sqlmock.Sqlmock) {
 				mock.ExpectExec(regexp.QuoteMeta(`ALTER TABLE eventstore.events2 SET (
@@ -124,10 +124,10 @@ func Test_eventstoreAutovacuum_Execute(t *testing.T) {
 			tt.expects(mock)
 
 			mig := &eventstoreAutovacuum{
-				dbClient:              &database.DB{DB: db},
-				Enabled:               tt.fields.Enabled,
-				VacuumInsertThreshold: tt.fields.VacuumInsertThreshold,
-				AnalyzeThreshold:      tt.fields.AnalyzeThreshold,
+				dbClient:         &database.DB{DB: db},
+				Enabled:          tt.fields.Enabled,
+				VacuumThreshold:  tt.fields.VacuumThreshold,
+				AnalyzeThreshold: tt.fields.AnalyzeThreshold,
 			}
 			err = mig.Execute(context.Background(), nil)
 			if tt.wantErr {
@@ -141,9 +141,9 @@ func Test_eventstoreAutovacuum_Execute(t *testing.T) {
 
 func Test_eventstoreAutovacuum_Check(t *testing.T) {
 	type fields struct {
-		Enabled               bool
-		VacuumInsertThreshold uint32
-		AnalyzeThreshold      uint32
+		Enabled          bool
+		VacuumThreshold  uint32
+		AnalyzeThreshold uint32
 	}
 	tests := []struct {
 		name    string
@@ -154,9 +154,9 @@ func Test_eventstoreAutovacuum_Check(t *testing.T) {
 		{
 			name: "no previous run",
 			fields: fields{
-				Enabled:               true,
-				VacuumInsertThreshold: 50000,
-				AnalyzeThreshold:      50000,
+				Enabled:          true,
+				VacuumThreshold:  50000,
+				AnalyzeThreshold: 50000,
 			},
 			lastRun: nil,
 			want:    true,
@@ -164,56 +164,56 @@ func Test_eventstoreAutovacuum_Check(t *testing.T) {
 		{
 			name: "unchanged",
 			fields: fields{
-				Enabled:               true,
-				VacuumInsertThreshold: 50000,
-				AnalyzeThreshold:      25000,
+				Enabled:          true,
+				VacuumThreshold:  50000,
+				AnalyzeThreshold: 25000,
 			},
 			lastRun: map[string]any{
-				"enabled":               true,
-				"vacuumInsertThreshold": float64(50000),
-				"analyzeThreshold":      float64(25000),
+				"enabled":          true,
+				"vacuumThreshold":  float64(50000),
+				"analyzeThreshold": float64(25000),
 			},
 			want: false,
 		},
 		{
 			name: "enabled changed",
 			fields: fields{
-				Enabled:               false,
-				VacuumInsertThreshold: 50000,
-				AnalyzeThreshold:      50000,
+				Enabled:          false,
+				VacuumThreshold:  50000,
+				AnalyzeThreshold: 50000,
 			},
 			lastRun: map[string]any{
-				"enabled":               true,
-				"vacuumInsertThreshold": float64(50000),
-				"analyzeThreshold":      float64(50000),
+				"enabled":          true,
+				"vacuumThreshold":  float64(50000),
+				"analyzeThreshold": float64(50000),
 			},
 			want: true,
 		},
 		{
 			name: "vacuum threshold changed",
 			fields: fields{
-				Enabled:               true,
-				VacuumInsertThreshold: 60000,
-				AnalyzeThreshold:      50000,
+				Enabled:          true,
+				VacuumThreshold:  60000,
+				AnalyzeThreshold: 50000,
 			},
 			lastRun: map[string]any{
-				"enabled":               true,
-				"vacuumInsertThreshold": float64(50000),
-				"analyzeThreshold":      float64(50000),
+				"enabled":          true,
+				"vacuumThreshold":  float64(50000),
+				"analyzeThreshold": float64(50000),
 			},
 			want: true,
 		},
 		{
 			name: "analyze threshold changed",
 			fields: fields{
-				Enabled:               true,
-				VacuumInsertThreshold: 50000,
-				AnalyzeThreshold:      60000,
+				Enabled:          true,
+				VacuumThreshold:  50000,
+				AnalyzeThreshold: 60000,
 			},
 			lastRun: map[string]any{
-				"enabled":               true,
-				"vacuumInsertThreshold": float64(50000),
-				"analyzeThreshold":      float64(50000),
+				"enabled":          true,
+				"vacuumThreshold":  float64(50000),
+				"analyzeThreshold": float64(50000),
 			},
 			want: true,
 		},
@@ -221,9 +221,9 @@ func Test_eventstoreAutovacuum_Check(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mig := &eventstoreAutovacuum{
-				Enabled:               tt.fields.Enabled,
-				VacuumInsertThreshold: tt.fields.VacuumInsertThreshold,
-				AnalyzeThreshold:      tt.fields.AnalyzeThreshold,
+				Enabled:          tt.fields.Enabled,
+				VacuumThreshold:  tt.fields.VacuumThreshold,
+				AnalyzeThreshold: tt.fields.AnalyzeThreshold,
 			}
 			assert.Equal(t, tt.want, mig.Check(tt.lastRun))
 		})

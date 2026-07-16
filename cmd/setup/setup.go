@@ -355,10 +355,10 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 			client: dbClient,
 		},
 		&eventstoreAutovacuum{
-			dbClient:              dbClient,
-			Enabled:               config.Eventstore.Autovacuum.Enabled,
-			VacuumInsertThreshold: config.Eventstore.Autovacuum.VacuumInsertThreshold,
-			AnalyzeThreshold:      config.Eventstore.Autovacuum.AnalyzeThreshold,
+			dbClient:         dbClient,
+			Enabled:          config.Eventstore.Autovacuum.Enabled,
+			VacuumThreshold:  config.Eventstore.Autovacuum.VacuumThreshold,
+			AnalyzeThreshold: config.Eventstore.Autovacuum.AnalyzeThreshold,
 		},
 	}
 	repeatableSteps = append(repeatableSteps, triggerSteps(dbClient)...)

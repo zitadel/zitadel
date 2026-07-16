@@ -1078,9 +1078,9 @@ Eventstore:
     # and the default, percentage-based autovacuum scale factors are disabled.
     # If disabled, the table is reset to the cluster's default autovacuum settings.
     Enabled: false # ZITADEL_EVENTSTORE_AUTOVACUUM_ENABLED
-    # Number of inserted rows that triggers an insert-only autovacuum run, regardless of table size (also applied as autovacuum_vacuum_threshold).
+    # Number of modified rows that triggers an autovacuum run, regardless of table size (applied in both autovacuum_vacuum_threshold and autovacuum_vacuum_insert_threshold settings).
     # Must be greater than 10000.
-    VacuumInsertThreshold: 50000 # ZITADEL_EVENTSTORE_AUTOVACUUM_VACUUMINSERTTHRESHOLD
+    VacuumThreshold: 50000 # ZITADEL_EVENTSTORE_AUTOVACUUM_VACUUMTHRESHOLD
     # Number of changed rows that triggers an autoanalyze run, regardless of table size.
     # Must be greater than 10000.
     AnalyzeThreshold: 50000 # ZITADEL_EVENTSTORE_AUTOVACUUM_ANALYZETHRESHOLD

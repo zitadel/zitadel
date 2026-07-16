@@ -33,10 +33,11 @@ type AutovacuumConfig struct {
 	// the percentage-based autovacuum scale factors. When disabled, the table
 	// is reset to the cluster's default autovacuum settings.
 	Enabled bool
-	// VacuumInsertThreshold is the number of inserted rows that triggers an insert-only
-	// autovacuum run, regardless of table size. It is also applied as autovacuum_vacuum_threshold.
+	// VacuumThreshold is the number of modified rows that triggers an autovacuum run,
+	// regardless of table size (applied in both autovacuum_vacuum_threshold and
+	// autovacuum_vacuum_insert_threshold settings).
 	// Must be greater than 10000 to avoid thrashing the database with constant autovacuum activity.
-	VacuumInsertThreshold uint32
+	VacuumThreshold uint32
 	// AnalyzeThreshold is the number of changed rows that triggers an
 	// autoanalyze run, regardless of table size. Must be greater than 10000
 	// to avoid thrashing the database with constant autoanalyze activity.

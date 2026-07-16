@@ -16,9 +16,9 @@ import (
 type eventstoreAutovacuum struct {
 	dbClient *database.DB
 
-	Enabled               bool   `json:"enabled"`
-	VacuumInsertThreshold uint32 `json:"vacuumInsertThreshold"`
-	AnalyzeThreshold      uint32 `json:"analyzeThreshold"`
+	Enabled          bool   `json:"enabled"`
+	VacuumThreshold  uint32 `json:"vacuumThreshold"`
+	AnalyzeThreshold uint32 `json:"analyzeThreshold"`
 }
 
 const eventstoreAutovacuumResetStmt = `ALTER TABLE eventstore.events2 RESET (
@@ -39,13 +39,14 @@ func (mig *eventstoreAutovacuum) Execute(ctx context.Context, _ eventstore.Event
 		_, err := mig.dbClient.ExecContext(ctx, eventstoreAutovacuumResetStmt)
 		return err
 	}
-	if mig.VacuumInsertThreshold <= minAutovacuumThreshold || mig.AnalyzeThreshold <= minAutovacuumThreshold {
-		return fmt.Errorf("%s: VacuumInsertThreshold and AnalyzeThreshold must be greater than %d", mig, minAutovacuumThreshold)
+	if mig.VacuumThreshold <= minAutovacuumThreshold || mig.AnalyzeThreshold <= minAutovacuumThreshold {
+		return fmt.Errorf("%s: VacuumThreshold and AnalyzeThreshold must be greater than %d", mig, minAutovacuumThreshold)
 	}
 
-	// autovacuum_vacuum_threshold covers rows changed by updates and deletes. events2 is
-	// append-only, but it is set to VacuumInsertThreshold as well, so that a manual
-	// UPDATE/DELETE does not fall back to the effectively disabled default scale factor.
+	// autovacuum_vacuum_threshold covers rows changed by updates and deletes, while
+	// autovacuum_vacuum_insert_threshold only covers inserts. events2 is append-only, but
+	// VacuumThreshold is applied to both, so a manual UPDATE/DELETE does not fall back to
+	// the effectively disabled default scale factor.
 	stmt := fmt.Sprintf(`ALTER TABLE eventstore.events2 SET (
 	autovacuum_vacuum_scale_factor = 0.0,
 	autovacuum_analyze_scale_factor = 0.0,
@@ -53,7 +54,7 @@ func (mig *eventstoreAutovacuum) Execute(ctx context.Context, _ eventstore.Event
 	autovacuum_vacuum_insert_threshold = %d,
 	autovacuum_analyze_threshold = %d,
 	autovacuum_vacuum_threshold = %d
-)`, mig.VacuumInsertThreshold, mig.AnalyzeThreshold, mig.VacuumInsertThreshold)
+)`, mig.VacuumThreshold, mig.AnalyzeThreshold, mig.VacuumThreshold)
 	_, err := mig.dbClient.ExecContext(ctx, stmt)
 	return err
 }
@@ -65,10 +66,10 @@ func (mig *eventstoreAutovacuum) String() string {
 // Check implements [migration.RepeatableMigration].
 func (mig *eventstoreAutovacuum) Check(lastRun map[string]interface{}) bool {
 	enabled, _ := lastRun["enabled"].(bool)
-	vacuumInsertThreshold, _ := lastRun["vacuumInsertThreshold"].(float64)
+	vacuumThreshold, _ := lastRun["vacuumThreshold"].(float64)
 	analyzeThreshold, _ := lastRun["analyzeThreshold"].(float64)
 
 	return enabled != mig.Enabled ||
-		uint32(vacuumInsertThreshold) != mig.VacuumInsertThreshold ||
+		uint32(vacuumThreshold) != mig.VacuumThreshold ||
 		uint32(analyzeThreshold) != mig.AnalyzeThreshold
 }
