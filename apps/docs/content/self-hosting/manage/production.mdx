@@ -224,7 +224,7 @@ If you exclude non-essential services like log collection and metrics, you can r
 
 With [ZITADEL being event sourced](/concepts/eventstore/overview), a lot of the performance throughput depends on how the events table is accessed.
 The events table is an append-only table which will grow over the lifetime of a deployment.
-ZITADEL uses a [CQRS architecture](/concepts/architecture/software), which results in concurrent read and writes against this table.
+ZITADEL uses a [CQRS architecture](/concepts/architecture/software), which results in concurrent reads and writes against this table.
 The eventstore is used to make consistent real-time decisions when executing "Commands". (For example: is a user not locked just before creating a token)
 Projections store computed state of an object, which allows us to "Query" data more efficiently. (For example: finding a user by their email).
 Because projections depend on events being reduced by a spooler, they are eventually consistent and may fall behind the state in the eventstore.
@@ -319,7 +319,7 @@ This has major performance impact on ZITADEL: pushes will take longer and spoole
 resulting in larger eventual consistency gaps and higher resource consumption overall.
 
 PostgreSQL can [`ANALYZE`](https://www.postgresql.org/docs/current/sql-analyze.html) the table to rebuild those statistics,
-keeping the eventstore reads performant. PostgreSQL uses [routined vacuum](https://www.postgresql.org/docs/current/routine-vacuuming.html)
+keeping the eventstore reads performant. PostgreSQL uses [routine vacuuming](https://www.postgresql.org/docs/current/routine-vacuuming.html)
 jobs to automate analyzing of all tables.
 However, PostgreSQL defaults to a percentage-based row count for it to trigger the vacuum and analyze routines,
 with a default value of 10% for analyze routines.
@@ -338,8 +338,7 @@ However, case 3 will notice a significant slowdown of the eventstore.
 We found the tipping point lying between 2M-3M new rows inserted on a 250M row eventstore table.
 
 ZITADEL provides options to switch to static routine thresholds instead,
-solving the problem of the routing intervals going to infinite.
-
+solving the problem of the routine intervals going to infinity.
 - `Eventstore.Autovacuum.Enabled`: switches on the ZITADEL customization of threshold based routines.
   This option defaults to `false`, as enabling this with the wrong threshold value will have adverse effects on performance.
   Small systems don't need this as the ratio-based routines are actually better for small tables. 
