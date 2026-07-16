@@ -23,52 +23,42 @@ type UserV2InviteWriteModel struct {
 	CodeReturned    bool
 	EmailVerified   bool
 
-	// The auth methods currently set on the user. These are tracked as the
-	// current set (not a sticky flag) so that removing all auth methods
+	// authMethods holds the primary auth methods (password, passkeys, IDP links)
+	// the user currently has, keyed uniquely per method. It is tracked as the
+	// current set rather than a sticky flag, so that removing all auth methods
 	// re-enables the invite flow, mirroring what ListUserAuthMethodTypes reports.
-	hasPassword        bool
-	passwordlessTokens map[string]struct{}
-	idpLinks           map[string]struct{}
+	authMethods map[string]struct{}
 
 	UserState domain.UserState
+}
+
+func passwordAuthMethodKey() string {
+	return "password"
+}
+
+func idpAuthMethodKey(idpConfigID, externalUserID string) string {
+	return "idp:" + idpConfigID + ":" + externalUserID
+}
+
+func passkeyAuthMethodKey(tokenID string) string {
+	return "passkey:" + tokenID
 }
 
 // AuthMethodSet reports whether the user currently has at least one primary
 // auth method (password, passkey or IDP link) set up.
 func (wm *UserV2InviteWriteModel) AuthMethodSet() bool {
-	return wm.hasPassword || len(wm.passwordlessTokens) > 0 || len(wm.idpLinks) > 0
+	return len(wm.authMethods) > 0
 }
 
 func (wm *UserV2InviteWriteModel) CreationAllowed() bool {
 	return !wm.AuthMethodSet()
 }
 
-func (wm *UserV2InviteWriteModel) resetAuthMethods() {
-	wm.hasPassword = false
-	wm.passwordlessTokens = nil
-	wm.idpLinks = nil
-}
-
-func (wm *UserV2InviteWriteModel) addIDPLink(idpConfigID, externalUserID string) {
-	if wm.idpLinks == nil {
-		wm.idpLinks = make(map[string]struct{})
+func (wm *UserV2InviteWriteModel) addAuthMethod(key string) {
+	if wm.authMethods == nil {
+		wm.authMethods = make(map[string]struct{})
 	}
-	wm.idpLinks[idpConfigID+":"+externalUserID] = struct{}{}
-}
-
-func (wm *UserV2InviteWriteModel) removeIDPLink(idpConfigID, externalUserID string) {
-	delete(wm.idpLinks, idpConfigID+":"+externalUserID)
-}
-
-func (wm *UserV2InviteWriteModel) addPasswordlessToken(tokenID string) {
-	if wm.passwordlessTokens == nil {
-		wm.passwordlessTokens = make(map[string]struct{})
-	}
-	wm.passwordlessTokens[tokenID] = struct{}{}
-}
-
-func (wm *UserV2InviteWriteModel) removePasswordlessToken(tokenID string) {
-	delete(wm.passwordlessTokens, tokenID)
+	wm.authMethods[key] = struct{}{}
 }
 
 func newUserV2InviteWriteModel(userID, orgID string) *UserV2InviteWriteModel {
@@ -91,8 +81,10 @@ func (wm *UserV2InviteWriteModel) Reduce() error {
 			wm.CodeReturned = false
 			wm.EmailVerified = false
 			wm.UserState = domain.UserStateActive
-			wm.resetAuthMethods()
-			wm.hasPassword = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""
+			wm.authMethods = nil
+			if crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != "" {
+				wm.addAuthMethod(passwordAuthMethodKey())
+			}
 		case *user.HumanRegisteredEvent:
 			wm.EmptyInviteCode()
 			wm.ApplicationName = ""
@@ -101,8 +93,10 @@ func (wm *UserV2InviteWriteModel) Reduce() error {
 			wm.CodeReturned = false
 			wm.EmailVerified = false
 			wm.UserState = domain.UserStateActive
-			wm.resetAuthMethods()
-			wm.hasPassword = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""
+			wm.authMethods = nil
+			if crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != "" {
+				wm.addAuthMethod(passwordAuthMethodKey())
+			}
 		case *user.MachineAddedEvent:
 			wm.EmptyInviteCode()
 			wm.ApplicationName = ""
@@ -110,7 +104,7 @@ func (wm *UserV2InviteWriteModel) Reduce() error {
 			wm.URLTemplate = ""
 			wm.CodeReturned = false
 			wm.EmailVerified = false
-			wm.resetAuthMethods()
+			wm.authMethods = nil
 		case *user.HumanInviteCodeAddedEvent:
 			wm.SetInviteCode(e.Code, e.Expiry, e.CreationDate())
 			wm.URLTemplate = e.URLTemplate
@@ -145,20 +139,20 @@ func (wm *UserV2InviteWriteModel) Reduce() error {
 			wm.URLTemplate = ""
 			wm.CodeReturned = false
 			wm.EmailVerified = false
-			wm.resetAuthMethods()
+			wm.authMethods = nil
 			wm.UserState = domain.UserStateDeleted
 		case *user.HumanPasswordChangedEvent:
-			wm.hasPassword = true
+			wm.addAuthMethod(passwordAuthMethodKey())
 		case *user.UserIDPLinkAddedEvent:
-			wm.addIDPLink(e.IDPConfigID, e.ExternalUserID)
+			wm.addAuthMethod(idpAuthMethodKey(e.IDPConfigID, e.ExternalUserID))
 		case *user.UserIDPLinkRemovedEvent:
-			wm.removeIDPLink(e.IDPConfigID, e.ExternalUserID)
+			delete(wm.authMethods, idpAuthMethodKey(e.IDPConfigID, e.ExternalUserID))
 		case *user.UserIDPLinkCascadeRemovedEvent:
-			wm.removeIDPLink(e.IDPConfigID, e.ExternalUserID)
+			delete(wm.authMethods, idpAuthMethodKey(e.IDPConfigID, e.ExternalUserID))
 		case *user.HumanPasswordlessVerifiedEvent:
-			wm.addPasswordlessToken(e.WebAuthNTokenID)
+			wm.addAuthMethod(passkeyAuthMethodKey(e.WebAuthNTokenID))
 		case *user.HumanPasswordlessRemovedEvent:
-			wm.removePasswordlessToken(e.WebAuthNTokenID)
+			delete(wm.authMethods, passkeyAuthMethodKey(e.WebAuthNTokenID))
 		}
 	}
 	return wm.WriteModel.Reduce()
