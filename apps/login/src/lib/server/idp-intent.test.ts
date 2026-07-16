@@ -393,6 +393,74 @@ describe("processIDPCallback", () => {
       });
     });
 
+    test("should auto-update metadata even when the update_user action has no human userType", async () => {
+      const metadata = [{ key: "role", value: new Uint8Array([1, 2, 3]) }];
+      mockRetrieveIDPIntent.mockResolvedValue({
+        ...defaultIntent,
+        addHumanUser: undefined,
+        updateHumanUser: undefined,
+        // Metadata-only update: user_type is unset, only metadata is provided.
+        userAction: {
+          case: "updateUser",
+          value: {
+            userId: "user123",
+            userType: { case: undefined, value: undefined },
+            metadata,
+          },
+        },
+      });
+      mockGetIDPByID.mockResolvedValue({
+        ...defaultIdp,
+        config: {
+          options: {
+            ...defaultIdp.config.options,
+            isAutoUpdate: true,
+          },
+        },
+      });
+
+      await processIDPCallback(defaultParams);
+
+      // Metadata must still be applied, without forcing a human userType.
+      expect(mockUpdateUser).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        request: expect.objectContaining({
+          userId: "user123",
+          metadata,
+        }),
+      });
+      expect(mockUpdateUser.mock.calls[0][0].request.userType).toBeUndefined();
+    });
+
+    test("should skip auto-update when update_user action has neither human data nor metadata", async () => {
+      mockRetrieveIDPIntent.mockResolvedValue({
+        ...defaultIntent,
+        addHumanUser: undefined,
+        updateHumanUser: undefined,
+        userAction: {
+          case: "updateUser",
+          value: {
+            userId: "user123",
+            userType: { case: undefined, value: undefined },
+            metadata: [],
+          },
+        },
+      });
+      mockGetIDPByID.mockResolvedValue({
+        ...defaultIdp,
+        config: {
+          options: {
+            ...defaultIdp.config.options,
+            isAutoUpdate: true,
+          },
+        },
+      });
+
+      await processIDPCallback(defaultParams);
+
+      expect(mockUpdateUser).not.toHaveBeenCalled();
+    });
+
     test("should continue session creation even if auto-update fails", async () => {
       mockGetIDPByID.mockResolvedValue({
         ...defaultIdp,

@@ -131,22 +131,28 @@ function buildCreateUserRequest(intent: IDPIntentResult, organizationId: string)
 function buildUpdateUserRequest(intent: IDPIntentResult, userId: string): UpdateUserRequest | undefined {
   if (intent.userAction?.case === "updateUser") {
     const request = intent.userAction.value;
-    // UpdateUserRequest.userType is a oneof that also supports machine updates; only sync
-    // human updates here. Skip if the action didn't specify a human userType.
-    if (request.userType?.case !== "human") {
+    // UpdateUserRequest.user_type is optional and also supports machine updates. Only sync a
+    // human profile (IDP users are human); for any other case we still carry the metadata over,
+    // since metadata is a top-level field independent of the user type.
+    const human = request.userType?.case === "human" ? request.userType.value : undefined;
+
+    // Nothing to apply: neither human profile data nor metadata. Skip the update entirely.
+    if (!human && (request.metadata?.length ?? 0) === 0) {
       return undefined;
     }
-    const human = request.userType.value;
+
     return create(UpdateUserRequestSchema, {
       userId,
-      userType: {
-        case: "human",
-        value: {
-          profile: human.profile,
-          email: human.email,
-          phone: human.phone,
-        },
-      },
+      userType: human
+        ? {
+            case: "human",
+            value: {
+              profile: human.profile,
+              email: human.email,
+              phone: human.phone,
+            },
+          }
+        : undefined,
       metadata: request.metadata,
     });
   }
