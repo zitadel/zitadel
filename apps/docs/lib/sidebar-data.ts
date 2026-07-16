@@ -582,6 +582,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
     collapsed: true,
     items: [
       "guides/manage/user/reg-create-user",
+      "guides/manage/user/self-deletion",
       "guides/manage/terraform-provider",
       {
         type: "category",
