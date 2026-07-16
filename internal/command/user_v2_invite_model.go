@@ -27,21 +27,32 @@ type UserV2InviteWriteModel struct {
 	// the user currently has, keyed uniquely per method. It is tracked as the
 	// current set rather than a sticky flag, so that removing all auth methods
 	// re-enables the invite flow, mirroring what ListUserAuthMethodTypes reports.
-	authMethods map[string]struct{}
+	authMethods map[authMethodKey]struct{}
 
 	UserState domain.UserState
 }
 
-func passwordAuthMethodKey() string {
-	return "password"
+// authMethodKey uniquely identifies a single primary auth method within the
+// authMethods set.
+// ID components (e.g. an externalUserID supplied by an external IDP) cannot
+// collide across method instances regardless of their contents.
+type authMethodKey struct {
+	kind           string
+	idpConfigID    string
+	externalUserID string
+	passkeyTokenID string
 }
 
-func idpAuthMethodKey(idpConfigID, externalUserID string) string {
-	return "idp:" + idpConfigID + ":" + externalUserID
+func passwordAuthMethodKey() authMethodKey {
+	return authMethodKey{kind: "password"}
 }
 
-func passkeyAuthMethodKey(tokenID string) string {
-	return "passkey:" + tokenID
+func idpAuthMethodKey(idpConfigID, externalUserID string) authMethodKey {
+	return authMethodKey{kind: "idp", idpConfigID: idpConfigID, externalUserID: externalUserID}
+}
+
+func passkeyAuthMethodKey(tokenID string) authMethodKey {
+	return authMethodKey{kind: "passkey", passkeyTokenID: tokenID}
 }
 
 // AuthMethodSet reports whether the user currently has at least one primary
@@ -54,9 +65,9 @@ func (wm *UserV2InviteWriteModel) CreationAllowed() bool {
 	return !wm.AuthMethodSet()
 }
 
-func (wm *UserV2InviteWriteModel) addAuthMethod(key string) {
+func (wm *UserV2InviteWriteModel) addAuthMethod(key authMethodKey) {
 	if wm.authMethods == nil {
-		wm.authMethods = make(map[string]struct{})
+		wm.authMethods = make(map[authMethodKey]struct{})
 	}
 	wm.authMethods[key] = struct{}{}
 }
