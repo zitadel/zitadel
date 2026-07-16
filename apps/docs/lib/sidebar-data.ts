@@ -810,6 +810,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "self-hosting/manage/updating_scaling",
           "self-hosting/manage/database/database",
           "self-hosting/manage/cache",
+          "self-hosting/manage/tuning",
         ],
       },
 
