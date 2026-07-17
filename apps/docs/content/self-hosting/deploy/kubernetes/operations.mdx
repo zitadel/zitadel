@@ -34,6 +34,14 @@ Check the Helm release status:
 helm status my-zitadel
 ```
 
+### Upgrading to ZITADEL v4
+
+If you are moving from ZITADEL v3 to v4 (for example via a chart version that ships ZITADEL v4), follow [Upgrade from ZITADEL v3 to v4](/self-hosting/manage/upgrade-v3-to-v4) and technical advisory [A-10017](/support/advisory/a10017) for the recommended OIDC web key staging path.
+
+Newer charts may deploy a Login V2 workload by default. That does **not** enable Login V2 for existing instances. If you are not adopting Login V2 yet, set `login.enabled: false`. When you are ready to cut over, see [Adopt Login V2 on an existing installation](/self-hosting/manage/adopt-login-v2).
+
+For chart-specific breaking changes (for example chart v8 → v9 or v9 → v10), always check the [Helm chart README](https://github.com/zitadel/zitadel-charts/blob/main/charts/zitadel/README.md) upgrade notes as well.
+
 ## Scaling
 
 ### Manual Scaling

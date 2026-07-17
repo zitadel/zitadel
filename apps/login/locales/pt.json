@@ -383,6 +383,7 @@
     "userIdMissing": "Nenhum ID de usuário fornecido!",
     "successTitle": "Usuário verificado",
     "successDescription": "O usuário foi verificado com sucesso.",
+    "successContinue": "Continuar",
     "setupAuthenticator": "Configurar autenticador",
     "verify": {
       "title": "Verificar usuário",

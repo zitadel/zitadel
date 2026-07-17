@@ -80,43 +80,38 @@ export async function isSessionValid({
   // Use the existing shouldEnforceMFA function to determine if MFA is required
   const isMfaRequired = shouldEnforceMFA(session, loginSettings);
 
-  // Only enforce MFA validation if MFA is required by policy
-  if (isMfaRequired) {
-    const authMethodTypes = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id });
+  // Always check auth methods to see if the user has MFA factors configured
+  const authMethodTypes = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id });
 
-    const authMethods = authMethodTypes.authMethodTypes;
-    // Filter to only MFA methods (exclude PASSWORD and PASSKEY)
-    const mfaMethods = authMethods?.filter(
-      (method) =>
-        method === AuthenticationMethodType.TOTP ||
-        method === AuthenticationMethodType.OTP_EMAIL ||
-        method === AuthenticationMethodType.OTP_SMS ||
-        method === AuthenticationMethodType.U2F,
-    );
+  const authMethods = authMethodTypes.authMethodTypes;
+  // Filter to only MFA methods (exclude PASSWORD and PASSKEY)
+  const mfaMethods = authMethods?.filter(
+    (method) =>
+      method === AuthenticationMethodType.TOTP ||
+      method === AuthenticationMethodType.OTP_EMAIL ||
+      method === AuthenticationMethodType.OTP_SMS ||
+      method === AuthenticationMethodType.U2F,
+  );
 
-    if (mfaMethods && mfaMethods.length > 0) {
-      // Check if any of the configured MFA methods have been verified
-      const totpValid = mfaMethods.includes(AuthenticationMethodType.TOTP) && !!session.factors.totp?.verifiedAt;
-      const otpEmailValid =
-        mfaMethods.includes(AuthenticationMethodType.OTP_EMAIL) && !!session.factors.otpEmail?.verifiedAt;
-      const otpSmsValid = mfaMethods.includes(AuthenticationMethodType.OTP_SMS) && !!session.factors.otpSms?.verifiedAt;
-      const u2fValid = mfaMethods.includes(AuthenticationMethodType.U2F) && !!session.factors.webAuthN?.verifiedAt;
+  if (mfaMethods && mfaMethods.length > 0) {
+    // User has MFA methods configured — they must be verified regardless of policy
+    const totpValid = mfaMethods.includes(AuthenticationMethodType.TOTP) && !!session.factors.totp?.verifiedAt;
+    const otpEmailValid = mfaMethods.includes(AuthenticationMethodType.OTP_EMAIL) && !!session.factors.otpEmail?.verifiedAt;
+    const otpSmsValid = mfaMethods.includes(AuthenticationMethodType.OTP_SMS) && !!session.factors.otpSms?.verifiedAt;
+    const u2fValid = mfaMethods.includes(AuthenticationMethodType.U2F) && !!session.factors.webAuthN?.verifiedAt;
 
-      mfaValid = totpValid || otpEmailValid || otpSmsValid || u2fValid;
-    } else {
-      // No specific MFA methods configured, but MFA is forced - check for any verified MFA factors
-      // (excluding IDP which should be handled separately)
-      const otpEmail = session.factors.otpEmail?.verifiedAt;
-      const otpSms = session.factors.otpSms?.verifiedAt;
-      const totp = session.factors.totp?.verifiedAt;
-      const webAuthN = session.factors.webAuthN?.verifiedAt;
-      // Note: Removed IDP (session.factors.intent?.verifiedAt) as requested
+    mfaValid = totpValid || otpEmailValid || otpSmsValid || u2fValid;
+  } else if (isMfaRequired) {
+    // No MFA methods configured, but MFA is forced by policy — check for any verified MFA factors
+    const otpEmail = session.factors.otpEmail?.verifiedAt;
+    const otpSms = session.factors.otpSms?.verifiedAt;
+    const totp = session.factors.totp?.verifiedAt;
+    const webAuthN = session.factors.webAuthN?.verifiedAt;
 
-      mfaValid = !!(otpEmail || otpSms || totp || webAuthN);
-    }
+    mfaValid = !!(otpEmail || otpSms || totp || webAuthN);
   }
 
-  // If MFA is not required by policy, mfaValid remains true
+  // If user has no MFA methods and MFA is not required by policy, mfaValid remains true
 
   const stillValid = session.expirationDate ? timestampDate(session.expirationDate).getTime() > new Date().getTime() : true;
 
