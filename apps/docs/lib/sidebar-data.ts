@@ -582,6 +582,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
     collapsed: true,
     items: [
       "guides/manage/user/reg-create-user",
+      "guides/manage/user/self-deletion",
       "guides/manage/terraform-provider",
       {
         type: "category",
@@ -813,6 +814,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "self-hosting/manage/upgrade-v3-to-v4",
           "self-hosting/manage/database/database",
           "self-hosting/manage/cache",
+          "self-hosting/manage/tuning",
         ],
       },
 
