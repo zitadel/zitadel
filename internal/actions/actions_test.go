@@ -86,8 +86,7 @@ function testFunc() {}`,
 				opts: []Option{
 					// We need to pass the option to allow loading the module via require('zitadel/http') in the script.
 					// Otherwise, the loader will assume it's a file and fail.
-					// No client is needed here, because the module is not used.
-					WithHTTP(context.Background(), nil),
+					WithHTTP(context.Background()),
 				},
 			},
 			wantErr: func(err error) bool { return err == nil },
