@@ -561,7 +561,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   // protection must come from the context org, not the discovered org).
   // The trade-off is that legitimate new users would not get the automatic
   // IDP redirect and would need to use the IDP buttons on the login page.
-  if (!effectiveLoginSettings?.allowLocalAuthentication || discoveredOrganization) {
+if ((!effectiveLoginSettings?.allowLocalAuthentication || discoveredOrganization) && !command.ignoreUnknownUsernames) {
     const resp = await redirectUserToIDP(undefined, discoveredOrganization);
     if (resp) {
       logger.debug("Redirecting to IDP", { organization: discoveredOrganization });
