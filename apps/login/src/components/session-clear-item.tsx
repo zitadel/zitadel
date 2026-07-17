@@ -8,7 +8,7 @@ import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Avatar } from "./avatar";
-import { isSessionValid } from "./session-item";
+import { isSessionPrimaryFactorAndLifetimeValid } from "./session-item";
 import { Translated } from "./translated";
 
 export function SessionClearItem({ session, reload }: { session: Session; reload: () => void }) {
@@ -33,7 +33,7 @@ export function SessionClearItem({ session, reload }: { session: Session; reload
     return response;
   }
 
-  const { valid, verifiedAt } = isSessionValid(session);
+  const { valid, verifiedAt } = isSessionPrimaryFactorAndLifetimeValid(session);
 
   const [_error, setError] = useState<string | null>(null);
 
