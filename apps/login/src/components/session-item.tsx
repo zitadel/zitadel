@@ -17,7 +17,7 @@ import { AutoSubmitForm } from "./auto-submit-form";
 import { Avatar } from "./avatar";
 import { Translated } from "./translated";
 
-export function isSessionValid(session: Partial<Session>): {
+export function isSessionPrimaryFactorAndLifetimeValid(session: Partial<Session>): {
   valid: boolean;
   verifiedAt?: Timestamp;
 } {
@@ -71,7 +71,7 @@ export function SessionItem({
     return response;
   }
 
-  const { valid, verifiedAt } = isSessionValid(session);
+  const { valid, verifiedAt } = isSessionPrimaryFactorAndLifetimeValid(session);
 
   // Green dot: ready to be reused directly. Blue dot: usable, but selecting it
   // requires a re-authentication roundtrip (session expired or its auth method
