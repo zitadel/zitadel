@@ -872,17 +872,6 @@ export const guidesSidebar: readonly SidebarItem[] = [
       },
       {
         type: "category",
-        label: "Releases",
-        items: [
-          {
-            type: "link",
-            label: "Changelog",
-            href: "https://zitadel.com/changelog",
-          },
-        ],
-      },
-      {
-        type: "category",
         label: "Support Resources",
         items: [
           "support/troubleshooting",
