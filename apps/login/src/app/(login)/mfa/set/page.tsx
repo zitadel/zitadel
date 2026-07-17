@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("set.title") };
 }
 
-function isSessionValid(session: Partial<Session>): {
+function isSessionValidForMfaSet(session: Partial<Session>): {
   valid: boolean;
   verifiedAt?: Timestamp;
 } {
@@ -111,7 +111,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     organization: sessionWithData?.factors?.user?.organizationId,
   });
 
-  const { valid } = sessionWithData ? isSessionValid(sessionWithData) : { valid: false };
+  const { valid } = sessionWithData ? isSessionValidForMfaSet(sessionWithData) : { valid: false };
 
   if (force === "true" && valid && sessionWithData?.factors?.user?.loginName && loginSettings) {
     const emailVerified = sessionWithData.emailVerified ?? false;
