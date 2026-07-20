@@ -268,3 +268,24 @@ func TestGenerateRandomString_UsesOnlyProvidedChars(t *testing.T) {
 		}
 	}
 }
+
+func TestGenerateRandomString_EveryCharCanBeGenerated(t *testing.T) {
+	// Regression test: a previous implementation indexed the charset with
+	// modulo len(chars)-1, so the last rune (e.g. '9' in numeric codes) could
+	// never be generated. With a uniform distribution, the chance of any of
+	// the 10 runes missing in 1000 draws is below 1e-45, so this cannot flake.
+	chars := []rune("0123456789")
+	got, err := GenerateRandomString(1000, chars)
+	if err != nil {
+		t.Fatalf("GenerateRandomString() error = %v", err)
+	}
+	seen := make(map[rune]struct{}, len(chars))
+	for _, r := range got {
+		seen[r] = struct{}{}
+	}
+	for _, r := range chars {
+		if _, ok := seen[r]; !ok {
+			t.Errorf("GenerateRandomString() never produced rune %q", r)
+		}
+	}
+}
