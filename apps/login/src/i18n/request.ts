@@ -1,4 +1,4 @@
-import { LANGS, LANGUAGE_COOKIE_NAME, LANGUAGE_HEADER_NAME } from "@/lib/i18n";
+import { LANGS, LANGUAGE_COOKIE_NAME, LANGUAGE_HEADER_NAME, normalizeLanguageCode } from "@/lib/i18n";
 import { getServiceConfig } from "@/lib/service-url";
 import { getAllowedLanguages, getHostedLoginTranslation } from "@/lib/zitadel";
 import { JsonObject } from "@zitadel/client";
@@ -19,11 +19,11 @@ export default getRequestConfig(async () => {
   try {
     const settings = await getAllowedLanguages({ serviceConfig });
     if (settings.allowedLanguages?.length) {
-      const localLanguageCodes = LANGS.map((l) => l.code);
-      allowedLanguages = settings.allowedLanguages.filter((l) => localLanguageCodes.includes(l));
+      allowedLanguages = [...new Set(settings.allowedLanguages.map(normalizeLanguageCode).filter((language): language is string => !!language))];
     }
-    if (settings.defaultLanguage) {
-      defaultLanguage = settings.defaultLanguage;
+    const configuredDefaultLanguage = normalizeLanguageCode(settings.defaultLanguage);
+    if (configuredDefaultLanguage && allowedLanguages.includes(configuredDefaultLanguage)) {
+      defaultLanguage = configuredDefaultLanguage;
     }
   } catch (e) {
     console.warn("Failed to load global settings", e);
@@ -33,17 +33,17 @@ export default getRequestConfig(async () => {
 
   const languageHeader = await (await headers()).get(LANGUAGE_HEADER_NAME);
   if (languageHeader) {
-    // splits "en-US,en;q=0.9" to ["en", "US"] or ["en"]
-    const headerLocale = languageHeader.split(",")[0].split("-")[0];
-    if (allowedLanguages.includes(headerLocale)) {
+    const headerLocale = normalizeLanguageCode(languageHeader.split(",")[0]);
+    if (headerLocale && allowedLanguages.includes(headerLocale)) {
       locale = headerLocale;
     }
   }
 
   const languageCookie = cookiesList?.get(LANGUAGE_COOKIE_NAME);
+  const cookieLocale = normalizeLanguageCode(languageCookie?.value);
   if (languageCookie && languageCookie.value) {
-    if (allowedLanguages.includes(languageCookie.value)) {
-      locale = languageCookie.value;
+    if (cookieLocale && allowedLanguages.includes(cookieLocale)) {
+      locale = cookieLocale;
     } else {
       // If the cookie tells a language that is other than the supported ones, fall back to the default.
       locale = defaultLanguage;
