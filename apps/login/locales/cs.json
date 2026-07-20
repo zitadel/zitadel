@@ -1,0 +1,461 @@
+{
+  "common": {
+    "back": "Zpět",
+    "title": "Přihlášení přes ZITADEL"
+  },
+  "accounts": {
+    "title": "Účty",
+    "description": "Vyberte účet, který chcete použít.",
+    "addAnother": "Přidat další účet",
+    "noResults": "Nebyly nalezeny žádné účty",
+    "verified": "ověřeno",
+    "expired": "vypršelo"
+  },
+  "logout": {
+    "title": "Odhlášení",
+    "description": "Kliknutím na účet ukončíte relaci",
+    "noResults": "Nebyly nalezeny žádné účty",
+    "clear": "Ukončit relaci",
+    "verifiedAt": "Naposledy aktivní: {time}",
+    "success": {
+      "title": "Odhlášení proběhlo úspěšně",
+      "description": "Byli jste úspěšně odhlášeni."
+    }
+  },
+  "loginname": {
+    "title": "Vítejte zpět!",
+    "description": "Zadejte své přihlašovací údaje.",
+    "register": "Registrovat nového uživatele",
+    "submit": "Pokračovat",
+    "labels": {
+      "loginname": "Přihlašovací jméno",
+      "username": "Uživatelské jméno",
+      "usernameOrPhoneNumber": "Uživatelské jméno nebo telefonní číslo",
+      "usernameOrEmail": "Uživatelské jméno nebo e-mail"
+    },
+    "required": {
+      "loginName": "Toto pole je povinné"
+    },
+    "errors": {
+      "internalError": "Došlo k interní chybě",
+      "couldNotGetLoginSettings": "Nepodařilo se načíst nastavení přihlášení",
+      "couldNotSearchUsers": "Nepodařilo se vyhledat uživatele",
+      "couldNotGetDomain": "Nepodařilo se načíst doménu",
+      "couldNotGetHost": "Nepodařilo se načíst hostitele",
+      "couldNotStartIDPFlow": "Nepodařilo se spustit proces poskytovatele identity",
+      "moreThanOneUserFound": "Bylo nalezeno více uživatelů. Zadejte jedinečný identifikátor.",
+      "userNotFound": "Uživatel nebyl v systému nalezen",
+      "couldNotCreateSession": "Nepodařilo se vytvořit relaci uživatele",
+      "initialUserNotSupported": "Počáteční uživatel není podporován",
+      "localAuthenticationNotAllowed": "Místní ověřování není povoleno. Další informace vám poskytne správce.",
+      "passkeysNotAllowed": "Přístupové klíče nejsou povoleny. Další informace vám poskytne správce.",
+      "couldNotFindIdentityProvider": "Nepodařilo se najít poskytovatele identity.",
+      "userNotActive": "Uživatel není aktivní. Další informace vám poskytne správce."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Došlo k chybě",
+      "multipleUsersFound": "Bylo nalezeno více uživatelů",
+      "userNotFound": "Uživatel nebyl v systému nalezen"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "Heslo",
+      "description": "Zadejte své heslo.",
+      "resetPassword": "Obnovit heslo",
+      "submit": "Pokračovat",
+      "labels": {
+        "password": "Heslo"
+      },
+      "required": {
+        "password": "Toto pole je povinné"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "Nepodařilo se ověřit heslo",
+        "couldNotResetPassword": "Nepodařilo se obnovit heslo"
+      },
+      "info": {
+        "passwordResetSent": "Heslo bylo obnoveno. Zkontrolujte svůj e-mail."
+      }
+    },
+    "set": {
+      "title": "Nastavit heslo",
+      "description": "Nastavte heslo pro svůj účet",
+      "codeSent": "Na vaši e-mailovou adresu byl odeslán nový kód.",
+      "noCodeReceived": "Neobdrželi jste kód?",
+      "resend": "Odeslat kód znovu",
+      "submit": "Pokračovat",
+      "labels": {
+        "code": "Kód",
+        "newPassword": "Nové heslo",
+        "confirmPassword": "Potvrďte heslo"
+      },
+      "required": {
+        "code": "Toto pole je povinné",
+        "newPassword": "Musíte zadat heslo.",
+        "confirmPassword": "Toto pole je povinné"
+      },
+      "errors": {
+        "couldNotSetPassword": "Nepodařilo se nastavit heslo",
+        "couldNotResetPassword": "Nepodařilo se obnovit heslo",
+        "couldNotVerifyPassword": "Nepodařilo se ověřit heslo"
+      }
+    },
+    "change": {
+      "title": "Změnit heslo",
+      "description": "Nastavte heslo pro svůj účet",
+      "submit": "Pokračovat",
+      "labels": {
+        "currentPassword": "Aktuální heslo",
+        "newPassword": "Nové heslo",
+        "confirmPassword": "Potvrďte heslo"
+      },
+      "required": {
+        "currentPassword": "Musíte zadat aktuální heslo.",
+        "newPassword": "Musíte zadat nové heslo.",
+        "confirmPassword": "Toto pole je povinné"
+      },
+      "errors": {
+        "currentPasswordInvalid": "Aktuální heslo je nesprávné.",
+        "couldNotChangePassword": "Nepodařilo se změnit heslo",
+        "couldNotVerifyPassword": "Nepodařilo se ověřit heslo",
+        "unknownError": "Neznámá chyba"
+      }
+    },
+    "complexity": {
+      "length": "Musí mít alespoň {minLength} znaků.",
+      "hasSymbol": "Musí obsahovat symbol.",
+      "hasNumber": "Musí obsahovat číslo.",
+      "hasUppercase": "Musí obsahovat velké písmeno.",
+      "hasLowercase": "Musí obsahovat malé písmeno.",
+      "equals": "Potvrzení hesla se shoduje.",
+      "matches": "Shoduje se",
+      "doesNotMatch": "Neshoduje se"
+    },
+    "errors": {
+      "noHostFound": "Hostitel nebyl nalezen",
+      "couldNotSendResetLink": "Nepodařilo se odeslat odkaz pro obnovení hesla",
+      "couldNotCreateSessionForUser": "Nepodařilo se vytvořit relaci uživatele",
+      "couldNotVerifyPassword": "Nepodařilo se ověřit heslo",
+      "failedToAuthenticate": "Ověření se nezdařilo. Využili jste {failedAttempts} z {maxPasswordAttempts} pokusů o zadání hesla.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Ověření se nezdařilo.",
+      "accountLockedContactAdmin": " Chcete-li účet odemknout, obraťte se na správce.",
+      "userNotFound": "Uživatel nebyl v systému nalezen",
+      "initialUserNotSupported": "Počáteční uživatel není podporován",
+      "userInitialStateNotSupported": "Počáteční stav uživatele není podporován",
+      "codeOrVerificationRequired": "Musíte zadat kód nebo mít platné ověření uživatele",
+      "verificationRequired": "Je nutné provést ověření uživatele",
+      "couldNotLoadSession": "Nepodařilo se načíst relaci",
+      "couldNotLoadAuthMethods": "Nepodařilo se načíst metody ověřování",
+      "failedPrecondition": "Nebyla splněna podmínka",
+      "sessionNotValid": "Relace není platná",
+      "passwordVerificationMissing": "Chybí ověření hesla.",
+      "passwordVerificationTooOld": "Ověření hesla je příliš staré. Ověřte své heslo znovu."
+    }
+  },
+  "idp": {
+    "title": "Přihlásit se přes SSO",
+    "description": "Pro přihlášení vyberte jednoho z následujících poskytovatelů",
+    "orSignInWith": "nebo se přihlaste přes",
+    "signInWithApple": "Přihlásit se přes Apple",
+    "signInWithGoogle": "Přihlásit se přes Google",
+    "signInWithAzureAD": "Přihlásit se přes Azure AD",
+    "signInWithGithub": "Přihlásit se přes GitHub",
+    "signInWithGitlab": "Přihlásit se přes GitLab",
+    "loginError": {
+      "title": "Přihlášení se nezdařilo",
+      "description": "Při pokusu o přihlášení došlo k chybě."
+    },
+    "linkingError": {
+      "title": "Propojení účtů se nezdařilo",
+      "description": "Při pokusu o propojení účtu došlo k chybě."
+    },
+    "completeRegister": {
+      "title": "Doplňte své údaje",
+      "description": "Registraci dokončíte zadáním e-mailové adresy a jména."
+    },
+    "accountNotFound": {
+      "title": "Účet nebyl nalezen",
+      "description": "Nebyl nalezen účet přiřazený k údajům vašeho poskytovatele identity.",
+      "info": "Nebyl nalezen žádný existující účet. Přihlaste se pomocí existujícího účtu nebo požádejte o pomoc správce.",
+      "backToLogin": "Zpět na přihlášení"
+    },
+    "registrationFailed": {
+      "title": "Registrace není dostupná",
+      "description": "Proces registrace se nepodařilo dokončit.",
+      "info": "Nepodařilo se určit organizaci pro registraci. Požádejte o pomoc správce.",
+      "backToLogin": "Zpět na přihlášení"
+    },
+    "processing": {
+      "message": "Probíhá ověřování...",
+      "noRedirect": "Server nevrátil přesměrování ani chybu",
+      "unexpectedError": "Došlo k neočekávané chybě"
+    },
+    "errors": {
+      "missingParameters": "Chybí povinné parametry",
+      "missingIdpInfo": "Chybí informace o poskytovateli identity",
+      "idpNotFound": "Poskytovatel identity nebyl nalezen",
+      "linkingNotAllowed": "Propojení není pro tohoto poskytovatele identity povoleno",
+      "linkingFailed": "Nepodařilo se propojit poskytovatele identity s účtem",
+      "autoLinkingFailed": "Automatické propojení účtu se nezdařilo",
+      "userCreationFailed": "Nepodařilo se vytvořit uživatelský účet",
+      "orgResolutionFailed": "Nepodařilo se určit organizaci pro registraci",
+      "sessionCreationFailed": "Nepodařilo se vytvořit relaci nebo určit přesměrování",
+      "unknownError": "Došlo k neznámé chybě"
+    }
+  },
+  "ldap": {
+    "title": "Přihlášení LDAP",
+    "description": "Zadejte své přihlašovací údaje LDAP.",
+    "submit": "Pokračovat",
+    "labels": {
+      "username": "Uživatelské jméno",
+      "password": "Heslo"
+    },
+    "required": {
+      "username": "Toto pole je povinné",
+      "password": "Toto pole je povinné"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "Ověřte svou identitu",
+      "description": "Vyberte jeden z následujících faktorů.",
+      "noResults": "Nejsou k dispozici žádné druhé faktory k nastavení."
+    },
+    "set": {
+      "title": "Nastavit dvoufaktorové ověřování",
+      "description": "Vyberte jeden z následujících druhých faktorů.",
+      "skip": "Přeskočit"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "Ověřit dvoufaktorové ověřování",
+      "totpDescription": "Zadejte kód z ověřovací aplikace.",
+      "smsDescription": "Zadejte kód, který jste obdrželi prostřednictvím SMS.",
+      "emailDescription": "Zadejte kód, který jste obdrželi e-mailem.",
+      "noCodeReceived": "Neobdrželi jste kód?",
+      "resendCode": "Odeslat kód znovu",
+      "submit": "Pokračovat",
+      "labels": {
+        "code": "Kód"
+      },
+      "required": {
+        "code": "Toto pole je povinné"
+      }
+    },
+    "set": {
+      "title": "Nastavit dvoufaktorové ověřování",
+      "totpDescription": "Naskenujte QR kód pomocí ověřovací aplikace.",
+      "smsDescription": "Zadejte telefonní číslo, na které chcete obdržet kód prostřednictvím SMS.",
+      "emailDescription": "Zadejte e-mailovou adresu, na kterou chcete obdržet kód.",
+      "totpRegisterDescription": "Naskenujte QR kód nebo ručně otevřete adresu URL.",
+      "submit": "Pokračovat",
+      "labels": {
+        "code": "Kód"
+      },
+      "required": {
+        "code": "Toto pole je povinné"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Ověřit se přístupovým klíčem",
+      "description": "Zařízení vás vyzve k použití otisku prstu, rozpoznání obličeje nebo zámku obrazovky",
+      "usePassword": "Použít heslo",
+      "submit": "Pokračovat",
+      "errors": {
+        "couldNotRequestChallenge": "Nepodařilo se vyžádat výzvu pro přístupový klíč",
+        "couldNotVerifyPasskey": "Nepodařilo se ověřit přístupový klíč",
+        "noResponseReceived": "Ověření přístupového klíče se nezdařilo – nebyla přijata žádná odpověď",
+        "noRedirectProvided": "Ověření přístupového klíče bylo dokončeno, ale nebylo zadáno přesměrování",
+        "couldNotRetrievePasskey": "Při načítání přístupového klíče došlo k chybě",
+        "verificationCancelled": "Ověření přístupového klíče bylo zrušeno",
+        "verificationFailed": "Při ověřování přístupového klíče došlo k chybě",
+        "couldNotFindSession": "Relaci se nepodařilo najít",
+        "couldNotUpdateSession": "Relaci se nepodařilo aktualizovat",
+        "userNotFound": "Uživatel nebyl v systému nalezen",
+        "couldNotDetermineRedirect": "Po ověření přístupového klíče se nepodařilo určit adresu URL přesměrování"
+      }
+    },
+    "set": {
+      "title": "Nastavit přístupový klíč",
+      "description": "Zařízení vás vyzve k použití otisku prstu, rozpoznání obličeje nebo zámku obrazovky",
+      "info": {
+        "description": "Přístupový klíč je metoda ověřování v zařízení, například pomocí otisku prstu, Apple Face ID nebo podobné technologie.",
+        "link": "Ověření přístupovým klíčem"
+      },
+      "skip": "Přeskočit",
+      "submit": "Pokračovat"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "Ověřit dvoufaktorové ověřování",
+      "description": "Ověřte svůj účet pomocí zařízení."
+    },
+    "set": {
+      "title": "Nastavit dvoufaktorové ověřování",
+      "description": "Nastavte zařízení jako druhý faktor.",
+      "submit": "Pokračovat"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Přístupový klíč",
+      "password": "Heslo"
+    },
+    "disabled": {
+      "title": "Registrace je zakázána",
+      "description": "Registrace je zakázána. Obraťte se na správce."
+    },
+    "missingdata": {
+      "title": "Chybějící údaje",
+      "description": "Pro registraci zadejte e-mail, jméno a příjmení."
+    },
+    "title": "Registrovat se",
+    "description": "Vytvořte si účet ZITADEL.",
+    "noMethodAvailableWarning": "Není k dispozici žádná metoda ověřování. Obraťte se na správce.",
+    "selectMethod": "Vyberte metodu, kterou se chcete ověřit",
+    "agreeTo": "Pro registraci musíte souhlasit s podmínkami",
+    "termsOfService": "Podmínky používání",
+    "privacyPolicy": "Zásady ochrany osobních údajů",
+    "submit": "Pokračovat",
+    "password": {
+      "title": "Nastavit heslo",
+      "description": "Nastavte heslo pro svůj účet",
+      "submit": "Pokračovat",
+      "labels": {
+        "password": "Heslo",
+        "confirmPassword": "Potvrďte heslo"
+      },
+      "required": {
+        "password": "Musíte zadat heslo.",
+        "confirmPassword": "Toto pole je povinné"
+      }
+    },
+    "labels": {
+      "firstname": "Jméno",
+      "lastname": "Příjmení",
+      "email": "E-mail"
+    },
+    "required": {
+      "firstname": "Toto pole je povinné",
+      "lastname": "Toto pole je povinné",
+      "email": "Toto pole je povinné"
+    },
+    "errors": {
+      "couldNotCreateUser": "Nepodařilo se vytvořit uživatele",
+      "couldNotCreateSession": "Nepodařilo se vytvořit relaci",
+      "userNotFound": "Uživatel nebyl v systému nalezen",
+      "couldNotLinkIDP": "Nepodařilo se propojit poskytovatele identity s uživatelem",
+      "couldNotRegisterUser": "Nepodařilo se zaregistrovat uživatele"
+    }
+  },
+  "invite": {
+    "title": "Pozvat uživatele",
+    "description": "Zadejte e-mailovou adresu a jméno uživatele, kterého chcete pozvat.",
+    "info": "Uživatel obdrží e-mail s dalšími pokyny.",
+    "notAllowed": "Vaše nastavení neumožňuje zvát uživatele.",
+    "submit": "Pokračovat",
+    "success": {
+      "title": "Uživatel byl pozván",
+      "description": "E-mail byl úspěšně odeslán.",
+      "verified": "Uživatel byl pozván a svou e-mailovou adresu již ověřil.",
+      "notVerifiedYet": "Uživatel byl pozván. Obdrží e-mail s dalšími pokyny.",
+      "submit": "Pozvat dalšího uživatele"
+    }
+  },
+  "signedin": {
+    "title": "Vítejte, {user}!",
+    "description": "Jste přihlášeni.",
+    "continue": "Pokračovat",
+    "error": {
+      "title": "Chyba",
+      "description": "Při pokusu o přihlášení došlo k chybě."
+    }
+  },
+  "verify": {
+    "userIdMissing": "Nebyl zadán identifikátor uživatele.",
+    "successTitle": "Uživatel je ověřen",
+    "successDescription": "Uživatel byl úspěšně ověřen.",
+    "successContinue": "Pokračovat",
+    "setupAuthenticator": "Nastavit ověřovací aplikaci",
+    "verify": {
+      "title": "Ověřit uživatele",
+      "description": "Zadejte kód z ověřovacího e-mailu.",
+      "noCodeReceived": "Neobdrželi jste kód?",
+      "resendCode": "Odeslat kód znovu",
+      "codeSent": "Na vaši e-mailovou adresu byl právě odeslán nový kód.",
+      "submit": "Pokračovat",
+      "labels": {
+        "code": "Kód"
+      },
+      "required": {
+        "code": "Toto pole je povinné"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "E-mail se nepodařilo odeslat znovu",
+      "couldNotVerifyUser": "Uživatele se nepodařilo ověřit",
+      "couldNotVerifyInvite": "Pozvánku se nepodařilo ověřit",
+      "couldNotVerifyEmail": "E-mail se nepodařilo ověřit",
+      "couldNotVerify": "Ověření se nezdařilo",
+      "couldNotLoadUser": "Uživatele se nepodařilo načíst",
+      "couldNotLoadAuthenticators": "Nepodařilo se načíst dostupné možnosti ověření",
+      "couldNotCreateSession": "Nepodařilo se vytvořit relaci",
+      "noHostFound": "Hostitel nebyl nalezen",
+      "userAlreadyVerified": "Uživatel je již ověřen.",
+      "couldNotResendInvite": "Pozvánku se nepodařilo odeslat znovu",
+      "inviteSendFailed": "E-mail s pozvánkou se nepodařilo odeslat",
+      "emailSendFailed": "Ověřovací e-mail se nepodařilo odeslat",
+      "contextMissing": "Došlo k chybě. Zkuste to znovu."
+    }
+  },
+  "authenticator": {
+    "title": "Vyberte metodu ověřování",
+    "description": "Vyberte metodu, kterou se chcete ověřit",
+    "noMethodsAvailable": "Nejsou k dispozici žádné metody ověřování",
+    "allSetup": "Ověřovací metodu jste již nastavili.",
+    "linkWithIDP": "nebo propojit s poskytovatelem identity"
+  },
+  "device": {
+    "usercode": {
+      "title": "Kód zařízení",
+      "description": "Zadejte kód zobrazený v aplikaci nebo zařízení.",
+      "submit": "Pokračovat",
+      "labels": {
+        "code": "Kód"
+      },
+      "required": {
+        "code": "Toto pole je povinné"
+      }
+    },
+    "request": {
+      "title": "Aplikace {appName} se chce připojit",
+      "description": "Aplikace {appName} bude mít přístup k:",
+      "disclaimer": "Kliknutím na Povolit umožníte aplikaci {appName} a službě ZITADEL používat vaše údaje v souladu s jejich podmínkami používání a zásadami ochrany osobních údajů. Tento přístup můžete kdykoli odvolat.",
+      "submit": "Povolit",
+      "deny": "Zamítnout"
+    },
+    "scope": {
+      "openid": "Ověřit vaši identitu.",
+      "email": "Zobrazit vaši e-mailovou adresu.",
+      "profile": "Zobrazit úplné informace z vašeho profilu.",
+      "offline_access": "Povolit offline přístup k vašemu účtu."
+    }
+  },
+  "error": {
+    "noUserCode": "Nebyl zadán uživatelský kód.",
+    "noDeviceRequest": "Nebyl nalezen požadavek zařízení.",
+    "unknownContext": "Nepodařilo se získat kontext uživatele. Nejprve zadejte uživatelské jméno nebo poskytněte přihlašovací jméno jako parametr vyhledávání.",
+    "sessionExpired": "Platnost aktuální relace vypršela. Přihlaste se znovu.",
+    "failedLoading": "Data se nepodařilo načíst. Zkuste to znovu.",
+    "tryagain": "Zkusit znovu",
+    "couldNotContinueSession": "V relaci se nepodařilo pokračovat – chybí údaje o uživateli"
+  }
+}

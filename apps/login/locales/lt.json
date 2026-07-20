@@ -1,0 +1,461 @@
+{
+  "common": {
+    "back": "Atgal",
+    "title": "Prisijungimas per ZITADEL"
+  },
+  "accounts": {
+    "title": "Paskyros",
+    "description": "Pasirinkite paskyrą, kurią norite naudoti.",
+    "addAnother": "Pridėti kitą paskyrą",
+    "noResults": "Paskyrų nerasta",
+    "verified": "patvirtinta",
+    "expired": "nebegalioja"
+  },
+  "logout": {
+    "title": "Atsijungimas",
+    "description": "Spustelėkite paskyrą, kad užbaigtumėte seansą",
+    "noResults": "Paskyrų nerasta",
+    "clear": "Baigti seansą",
+    "verifiedAt": "Paskutinį kartą aktyvi: {time}",
+    "success": {
+      "title": "Atsijungta sėkmingai",
+      "description": "Sėkmingai atsijungėte."
+    }
+  },
+  "loginname": {
+    "title": "Sveiki sugrįžę!",
+    "description": "Įveskite prisijungimo duomenis.",
+    "register": "Registruoti naują naudotoją",
+    "submit": "Tęsti",
+    "labels": {
+      "loginname": "Prisijungimo vardas",
+      "username": "Naudotojo vardas",
+      "usernameOrPhoneNumber": "Naudotojo vardas arba telefono numeris",
+      "usernameOrEmail": "Naudotojo vardas arba el. paštas"
+    },
+    "required": {
+      "loginName": "Šis laukas yra privalomas"
+    },
+    "errors": {
+      "internalError": "Įvyko vidinė klaida",
+      "couldNotGetLoginSettings": "Nepavyko gauti prisijungimo nustatymų",
+      "couldNotSearchUsers": "Nepavyko ieškoti naudotojų",
+      "couldNotGetDomain": "Nepavyko gauti domeno",
+      "couldNotGetHost": "Nepavyko gauti serverio",
+      "couldNotStartIDPFlow": "Nepavyko pradėti tapatybės teikėjo proceso",
+      "moreThanOneUserFound": "Rastas daugiau nei vienas naudotojas. Nurodykite unikalų identifikatorių.",
+      "userNotFound": "Naudotojas sistemoje nerastas",
+      "couldNotCreateSession": "Nepavyko sukurti naudotojo seanso",
+      "initialUserNotSupported": "Pradinis naudotojas nepalaikomas",
+      "localAuthenticationNotAllowed": "Vietinis tapatybės patvirtinimas neleidžiamas. Daugiau informacijos suteiks administratorius.",
+      "passkeysNotAllowed": "Prieigos raktai neleidžiami. Daugiau informacijos suteiks administratorius.",
+      "couldNotFindIdentityProvider": "Nepavyko rasti tapatybės teikėjo.",
+      "userNotActive": "Naudotojas neaktyvus. Daugiau informacijos suteiks administratorius."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Įvyko klaida",
+      "multipleUsersFound": "Rasti keli naudotojai",
+      "userNotFound": "Naudotojas sistemoje nerastas"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "Slaptažodis",
+      "description": "Įveskite slaptažodį.",
+      "resetPassword": "Atkurti slaptažodį",
+      "submit": "Tęsti",
+      "labels": {
+        "password": "Slaptažodis"
+      },
+      "required": {
+        "password": "Šis laukas yra privalomas"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "Nepavyko patikrinti slaptažodžio",
+        "couldNotResetPassword": "Nepavyko atkurti slaptažodžio"
+      },
+      "info": {
+        "passwordResetSent": "Slaptažodis atkurtas. Patikrinkite el. paštą."
+      }
+    },
+    "set": {
+      "title": "Nustatyti slaptažodį",
+      "description": "Nustatykite savo paskyros slaptažodį",
+      "codeSent": "Naujas kodas išsiųstas jūsų el. pašto adresu.",
+      "noCodeReceived": "Negavote kodo?",
+      "resend": "Siųsti kodą dar kartą",
+      "submit": "Tęsti",
+      "labels": {
+        "code": "Kodas",
+        "newPassword": "Naujas slaptažodis",
+        "confirmPassword": "Patvirtinkite slaptažodį"
+      },
+      "required": {
+        "code": "Šis laukas yra privalomas",
+        "newPassword": "Turite įvesti slaptažodį.",
+        "confirmPassword": "Šis laukas yra privalomas"
+      },
+      "errors": {
+        "couldNotSetPassword": "Nepavyko nustatyti slaptažodžio",
+        "couldNotResetPassword": "Nepavyko atkurti slaptažodžio",
+        "couldNotVerifyPassword": "Nepavyko patikrinti slaptažodžio"
+      }
+    },
+    "change": {
+      "title": "Keisti slaptažodį",
+      "description": "Nustatykite savo paskyros slaptažodį",
+      "submit": "Tęsti",
+      "labels": {
+        "currentPassword": "Dabartinis slaptažodis",
+        "newPassword": "Naujas slaptažodis",
+        "confirmPassword": "Patvirtinkite slaptažodį"
+      },
+      "required": {
+        "currentPassword": "Turite įvesti dabartinį slaptažodį.",
+        "newPassword": "Turite įvesti naują slaptažodį.",
+        "confirmPassword": "Šis laukas yra privalomas"
+      },
+      "errors": {
+        "currentPasswordInvalid": "Dabartinis slaptažodis neteisingas.",
+        "couldNotChangePassword": "Nepavyko pakeisti slaptažodžio",
+        "couldNotVerifyPassword": "Nepavyko patikrinti slaptažodžio",
+        "unknownError": "Nežinoma klaida"
+      }
+    },
+    "complexity": {
+      "length": "Turi būti bent {minLength} simbolių ilgio.",
+      "hasSymbol": "Turi būti specialusis simbolis.",
+      "hasNumber": "Turi būti skaičius.",
+      "hasUppercase": "Turi būti didžioji raidė.",
+      "hasLowercase": "Turi būti mažoji raidė.",
+      "equals": "Slaptažodžiai sutampa.",
+      "matches": "Sutampa",
+      "doesNotMatch": "Nesutampa"
+    },
+    "errors": {
+      "noHostFound": "Serveris nerastas",
+      "couldNotSendResetLink": "Nepavyko išsiųsti slaptažodžio atkūrimo nuorodos",
+      "couldNotCreateSessionForUser": "Nepavyko sukurti naudotojo seanso",
+      "couldNotVerifyPassword": "Nepavyko patikrinti slaptažodžio",
+      "failedToAuthenticate": "Tapatybės patvirtinti nepavyko. Išnaudojote {failedAttempts} iš {maxPasswordAttempts} slaptažodžio bandymų.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Tapatybės patvirtinti nepavyko.",
+      "accountLockedContactAdmin": " Norėdami atrakinti paskyrą, kreipkitės į administratorių.",
+      "userNotFound": "Naudotojas sistemoje nerastas",
+      "initialUserNotSupported": "Pradinis naudotojas nepalaikomas",
+      "userInitialStateNotSupported": "Pradinė naudotojo būsena nepalaikoma",
+      "codeOrVerificationRequired": "Turite pateikti kodą arba turėti galiojantį naudotojo patvirtinimą",
+      "verificationRequired": "Būtina atlikti naudotojo patvirtinimą",
+      "couldNotLoadSession": "Nepavyko įkelti seanso",
+      "couldNotLoadAuthMethods": "Nepavyko įkelti tapatybės patvirtinimo metodų",
+      "failedPrecondition": "Neįvykdyta būtina sąlyga",
+      "sessionNotValid": "Seansas negalioja",
+      "passwordVerificationMissing": "Trūksta slaptažodžio patvirtinimo.",
+      "passwordVerificationTooOld": "Slaptažodžio patvirtinimas per senas. Patvirtinkite slaptažodį dar kartą."
+    }
+  },
+  "idp": {
+    "title": "Prisijungti per SSO",
+    "description": "Norėdami prisijungti, pasirinkite vieną iš šių teikėjų",
+    "orSignInWith": "arba prisijunkite per",
+    "signInWithApple": "Prisijungti per Apple",
+    "signInWithGoogle": "Prisijungti per Google",
+    "signInWithAzureAD": "Prisijungti per Azure AD",
+    "signInWithGithub": "Prisijungti per GitHub",
+    "signInWithGitlab": "Prisijungti per GitLab",
+    "loginError": {
+      "title": "Prisijungti nepavyko",
+      "description": "Bandant prisijungti įvyko klaida."
+    },
+    "linkingError": {
+      "title": "Paskyrų susiejimas nepavyko",
+      "description": "Bandant susieti paskyrą įvyko klaida."
+    },
+    "completeRegister": {
+      "title": "Užpildykite savo duomenis",
+      "description": "Norėdami užbaigti registraciją, nurodykite el. pašto adresą ir vardą."
+    },
+    "accountNotFound": {
+      "title": "Paskyra nerasta",
+      "description": "Nepavyko rasti paskyros, susietos su jūsų tapatybės teikėjo prisijungimo duomenimis.",
+      "info": "Esama paskyra nerasta. Prisijunkite naudodami esamą paskyrą arba kreipkitės pagalbos į administratorių.",
+      "backToLogin": "Grįžti į prisijungimą"
+    },
+    "registrationFailed": {
+      "title": "Registracija negalima",
+      "description": "Registracijos proceso užbaigti nepavyko.",
+      "info": "Nepavyko nustatyti registracijos organizacijos. Kreipkitės pagalbos į administratorių.",
+      "backToLogin": "Grįžti į prisijungimą"
+    },
+    "processing": {
+      "message": "Vykdomas tapatybės patvirtinimas...",
+      "noRedirect": "Serveris negrąžino nei peradresavimo, nei klaidos",
+      "unexpectedError": "Įvyko netikėta klaida"
+    },
+    "errors": {
+      "missingParameters": "Trūksta privalomų parametrų",
+      "missingIdpInfo": "Trūksta tapatybės teikėjo informacijos",
+      "idpNotFound": "Tapatybės teikėjas nerastas",
+      "linkingNotAllowed": "Šio tapatybės teikėjo paskyrų susiejimas neleidžiamas",
+      "linkingFailed": "Nepavyko susieti tapatybės teikėjo su paskyra",
+      "autoLinkingFailed": "Nepavyko automatiškai susieti paskyros",
+      "userCreationFailed": "Nepavyko sukurti naudotojo paskyros",
+      "orgResolutionFailed": "Nepavyko nustatyti registracijos organizacijos",
+      "sessionCreationFailed": "Nepavyko sukurti seanso arba nustatyti peradresavimo",
+      "unknownError": "Įvyko nežinoma klaida"
+    }
+  },
+  "ldap": {
+    "title": "Prisijungimas per LDAP",
+    "description": "Įveskite LDAP prisijungimo duomenis.",
+    "submit": "Tęsti",
+    "labels": {
+      "username": "Naudotojo vardas",
+      "password": "Slaptažodis"
+    },
+    "required": {
+      "username": "Šis laukas yra privalomas",
+      "password": "Šis laukas yra privalomas"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "Patvirtinkite savo tapatybę",
+      "description": "Pasirinkite vieną iš šių veiksnių.",
+      "noResults": "Nėra antrųjų veiksnių, kuriuos būtų galima nustatyti."
+    },
+    "set": {
+      "title": "Nustatyti dviejų veiksnių patvirtinimą",
+      "description": "Pasirinkite vieną iš šių antrųjų veiksnių.",
+      "skip": "Praleisti"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "Patvirtinti dviejų veiksnių tapatybę",
+      "totpDescription": "Įveskite kodą iš autentifikavimo programėlės.",
+      "smsDescription": "Įveskite SMS žinute gautą kodą.",
+      "emailDescription": "Įveskite el. paštu gautą kodą.",
+      "noCodeReceived": "Negavote kodo?",
+      "resendCode": "Siųsti kodą dar kartą",
+      "submit": "Tęsti",
+      "labels": {
+        "code": "Kodas"
+      },
+      "required": {
+        "code": "Šis laukas yra privalomas"
+      }
+    },
+    "set": {
+      "title": "Nustatyti dviejų veiksnių patvirtinimą",
+      "totpDescription": "Nuskaitykite QR kodą autentifikavimo programėle.",
+      "smsDescription": "Įveskite telefono numerį, kuriuo norite gauti kodą SMS žinute.",
+      "emailDescription": "Įveskite el. pašto adresą, kuriuo norite gauti kodą.",
+      "totpRegisterDescription": "Nuskaitykite QR kodą arba rankiniu būdu atverkite URL.",
+      "submit": "Tęsti",
+      "labels": {
+        "code": "Kodas"
+      },
+      "required": {
+        "code": "Šis laukas yra privalomas"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Patvirtinti tapatybę prieigos raktu",
+      "description": "Įrenginys paprašys piršto atspaudo, veido atpažinimo arba ekrano užrakto",
+      "usePassword": "Naudoti slaptažodį",
+      "submit": "Tęsti",
+      "errors": {
+        "couldNotRequestChallenge": "Nepavyko gauti prieigos rakto užklausos",
+        "couldNotVerifyPasskey": "Nepavyko patikrinti prieigos rakto",
+        "noResponseReceived": "Prieigos rakto patvirtinimas nepavyko – atsakymas negautas",
+        "noRedirectProvided": "Prieigos rakto patvirtinimas baigtas, tačiau peradresavimas nepateiktas",
+        "couldNotRetrievePasskey": "Gaunant prieigos raktą įvyko klaida",
+        "verificationCancelled": "Prieigos rakto patvirtinimas atšauktas",
+        "verificationFailed": "Tikrinant prieigos raktą įvyko klaida",
+        "couldNotFindSession": "Nepavyko rasti seanso",
+        "couldNotUpdateSession": "Nepavyko atnaujinti seanso",
+        "userNotFound": "Naudotojas sistemoje nerastas",
+        "couldNotDetermineRedirect": "Po prieigos rakto patvirtinimo nepavyko nustatyti peradresavimo URL"
+      }
+    },
+    "set": {
+      "title": "Nustatyti prieigos raktą",
+      "description": "Įrenginys paprašys piršto atspaudo, veido atpažinimo arba ekrano užrakto",
+      "info": {
+        "description": "Prieigos raktas – tai tapatybės patvirtinimo būdas įrenginyje, naudojant piršto atspaudą, Apple Face ID ar panašią technologiją.",
+        "link": "Tapatybės patvirtinimas prieigos raktu"
+      },
+      "skip": "Praleisti",
+      "submit": "Tęsti"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "Patvirtinti dviejų veiksnių tapatybę",
+      "description": "Patvirtinkite paskyrą naudodami įrenginį."
+    },
+    "set": {
+      "title": "Nustatyti dviejų veiksnių patvirtinimą",
+      "description": "Nustatykite įrenginį kaip antrąjį veiksnį.",
+      "submit": "Tęsti"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Prieigos raktas",
+      "password": "Slaptažodis"
+    },
+    "disabled": {
+      "title": "Registracija išjungta",
+      "description": "Registracija išjungta. Kreipkitės į administratorių."
+    },
+    "missingdata": {
+      "title": "Trūksta duomenų",
+      "description": "Norėdami užsiregistruoti, nurodykite el. paštą, vardą ir pavardę."
+    },
+    "title": "Registruotis",
+    "description": "Sukurkite ZITADEL paskyrą.",
+    "noMethodAvailableWarning": "Nėra galimo tapatybės patvirtinimo metodo. Kreipkitės į administratorių.",
+    "selectMethod": "Pasirinkite tapatybės patvirtinimo metodą",
+    "agreeTo": "Norėdami registruotis, turite sutikti su taisyklėmis ir sąlygomis",
+    "termsOfService": "Naudojimo sąlygos",
+    "privacyPolicy": "Privatumo politika",
+    "submit": "Tęsti",
+    "password": {
+      "title": "Nustatyti slaptažodį",
+      "description": "Nustatykite savo paskyros slaptažodį",
+      "submit": "Tęsti",
+      "labels": {
+        "password": "Slaptažodis",
+        "confirmPassword": "Patvirtinkite slaptažodį"
+      },
+      "required": {
+        "password": "Turite įvesti slaptažodį.",
+        "confirmPassword": "Šis laukas yra privalomas"
+      }
+    },
+    "labels": {
+      "firstname": "Vardas",
+      "lastname": "Pavardė",
+      "email": "El. paštas"
+    },
+    "required": {
+      "firstname": "Šis laukas yra privalomas",
+      "lastname": "Šis laukas yra privalomas",
+      "email": "Šis laukas yra privalomas"
+    },
+    "errors": {
+      "couldNotCreateUser": "Nepavyko sukurti naudotojo",
+      "couldNotCreateSession": "Nepavyko sukurti seanso",
+      "userNotFound": "Naudotojas sistemoje nerastas",
+      "couldNotLinkIDP": "Nepavyko susieti tapatybės teikėjo su naudotoju",
+      "couldNotRegisterUser": "Nepavyko užregistruoti naudotojo"
+    }
+  },
+  "invite": {
+    "title": "Pakviesti naudotoją",
+    "description": "Nurodykite kviečiamo naudotojo el. pašto adresą ir vardą.",
+    "info": "Naudotojas gaus el. laišką su tolesniais nurodymais.",
+    "notAllowed": "Jūsų nustatymai neleidžia kviesti naudotojų.",
+    "submit": "Tęsti",
+    "success": {
+      "title": "Naudotojas pakviestas",
+      "description": "El. laiškas sėkmingai išsiųstas.",
+      "verified": "Naudotojas pakviestas ir jau patvirtino savo el. pašto adresą.",
+      "notVerifiedYet": "Naudotojas pakviestas. Jis gaus el. laišką su tolesniais nurodymais.",
+      "submit": "Pakviesti kitą naudotoją"
+    }
+  },
+  "signedin": {
+    "title": "Sveiki, {user}!",
+    "description": "Esate prisijungę.",
+    "continue": "Tęsti",
+    "error": {
+      "title": "Klaida",
+      "description": "Bandant prisijungti įvyko klaida."
+    }
+  },
+  "verify": {
+    "userIdMissing": "Nenurodytas naudotojo identifikatorius.",
+    "successTitle": "Naudotojas patvirtintas",
+    "successDescription": "Naudotojas sėkmingai patvirtintas.",
+    "successContinue": "Tęsti",
+    "setupAuthenticator": "Nustatyti autentifikavimo programėlę",
+    "verify": {
+      "title": "Patvirtinti naudotoją",
+      "description": "Įveskite patvirtinimo el. laiške pateiktą kodą.",
+      "noCodeReceived": "Negavote kodo?",
+      "resendCode": "Siųsti kodą dar kartą",
+      "codeSent": "Naujas kodas ką tik išsiųstas jūsų el. pašto adresu.",
+      "submit": "Tęsti",
+      "labels": {
+        "code": "Kodas"
+      },
+      "required": {
+        "code": "Šis laukas yra privalomas"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "Nepavyko pakartotinai išsiųsti el. laiško",
+      "couldNotVerifyUser": "Nepavyko patvirtinti naudotojo",
+      "couldNotVerifyInvite": "Nepavyko patvirtinti kvietimo",
+      "couldNotVerifyEmail": "Nepavyko patvirtinti el. pašto",
+      "couldNotVerify": "Nepavyko patvirtinti",
+      "couldNotLoadUser": "Nepavyko įkelti naudotojo",
+      "couldNotLoadAuthenticators": "Nepavyko įkelti galimų tapatybės patvirtinimo priemonių",
+      "couldNotCreateSession": "Nepavyko sukurti seanso",
+      "noHostFound": "Serveris nerastas",
+      "userAlreadyVerified": "Naudotojas jau patvirtintas.",
+      "couldNotResendInvite": "Nepavyko pakartotinai išsiųsti kvietimo",
+      "inviteSendFailed": "Nepavyko išsiųsti kvietimo el. laiško",
+      "emailSendFailed": "Nepavyko išsiųsti patvirtinimo el. laiško",
+      "contextMissing": "Įvyko klaida. Bandykite dar kartą."
+    }
+  },
+  "authenticator": {
+    "title": "Pasirinkite tapatybės patvirtinimo metodą",
+    "description": "Pasirinkite tapatybės patvirtinimo metodą",
+    "noMethodsAvailable": "Nėra galimų tapatybės patvirtinimo metodų",
+    "allSetup": "Tapatybės patvirtinimo priemonę jau nustatėte.",
+    "linkWithIDP": "arba susieti su tapatybės teikėju"
+  },
+  "device": {
+    "usercode": {
+      "title": "Įrenginio kodas",
+      "description": "Įveskite programėlėje arba įrenginyje rodomą kodą.",
+      "submit": "Tęsti",
+      "labels": {
+        "code": "Kodas"
+      },
+      "required": {
+        "code": "Šis laukas yra privalomas"
+      }
+    },
+    "request": {
+      "title": "Programa {appName} nori prisijungti",
+      "description": "Programa {appName} turės prieigą prie:",
+      "disclaimer": "Spustelėdami Leisti, leidžiate programai {appName} ir ZITADEL naudoti jūsų informaciją pagal jų naudojimo sąlygas ir privatumo politiką. Šią prieigą galite bet kada atšaukti.",
+      "submit": "Leisti",
+      "deny": "Atmesti"
+    },
+    "scope": {
+      "openid": "Patvirtinti jūsų tapatybę.",
+      "email": "Peržiūrėti jūsų el. pašto adresą.",
+      "profile": "Peržiūrėti visą jūsų profilio informaciją.",
+      "offline_access": "Leisti naudotis paskyra neprisijungus."
+    }
+  },
+  "error": {
+    "noUserCode": "Nenurodytas naudotojo kodas.",
+    "noDeviceRequest": "Įrenginio užklausa nerasta.",
+    "unknownContext": "Nepavyko gauti naudotojo konteksto. Pirmiausia įveskite naudotojo vardą arba pateikite prisijungimo vardą kaip paieškos parametrą.",
+    "sessionExpired": "Dabartinis seansas baigėsi. Prisijunkite dar kartą.",
+    "failedLoading": "Nepavyko įkelti duomenų. Bandykite dar kartą.",
+    "tryagain": "Bandyti dar kartą",
+    "couldNotContinueSession": "Nepavyko tęsti seanso – trūksta naudotojo informacijos"
+  }
+}
