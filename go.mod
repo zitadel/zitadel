@@ -43,6 +43,7 @@ require (
 	github.com/goccy/go-json v0.10.6
 	github.com/golang/protobuf v1.5.4
 	github.com/google/go-cmp v0.7.0
+	github.com/google/jsonschema-go v0.4.2
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/csrf v1.7.2
 	github.com/gorilla/mux v1.8.1
