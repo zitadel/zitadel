@@ -1559,7 +1559,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "sl": "Slovenščina"
       }
     },
     "SMTP": {
@@ -1808,7 +1809,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "sl": "Slovenščina"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -2799,7 +2801,8 @@
     "ro": "Română",
     "tr": "Türkçe",
     "uk": "Українська",
-    "ar": "العربية"
+    "ar": "العربية",
+    "sl": "Slovenščina"
   },
   "MEMBER": {
     "ADD": "添加管理员",
