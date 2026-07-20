@@ -16,16 +16,18 @@ type SystemFeatures struct {
 	OIDCSingleV1SessionTermination *bool
 	LoginV2                        *feature.LoginV2
 	PermissionCheckV2              *bool
+	EnableRelationalTables         *bool
 }
 
 func (m *SystemFeatures) isEmpty() bool {
-	return m.LoginDefaultOrg == nil &&
+	return m == nil || (m.LoginDefaultOrg == nil &&
 		m.UserSchema == nil &&
 		// nil check to allow unset improvements
 		m.ImprovedPerformance == nil &&
 		m.OIDCSingleV1SessionTermination == nil &&
 		m.LoginV2 == nil &&
-		m.PermissionCheckV2 == nil
+		m.PermissionCheckV2 == nil &&
+		m.EnableRelationalTables == nil)
 }
 
 func (c *Commands) SetSystemFeatures(ctx context.Context, f *SystemFeatures) (*domain.ObjectDetails, error) {

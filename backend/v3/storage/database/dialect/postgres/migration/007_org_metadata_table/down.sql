@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS zitadel.organization_metadata;

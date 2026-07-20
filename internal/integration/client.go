@@ -36,6 +36,7 @@ import (
 	authorization_v2beta "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
+	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
 	instance_v2 "github.com/zitadel/zitadel/pkg/grpc/instance/v2"
@@ -101,6 +102,7 @@ type Client struct {
 	InternalPermissionV2     internal_permission_v2.InternalPermissionServiceClient
 	AuthorizationV2Beta      authorization_v2beta.AuthorizationServiceClient //nolint:staticcheck // deprecated, but still used in tests
 	AuthorizationV2          authorization_v2.AuthorizationServiceClient
+	GroupV2                  group_v2.GroupServiceClient
 }
 
 func NewDefaultClient(ctx context.Context) (*Client, error) {
@@ -150,6 +152,7 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		InternalPermissionV2:     internal_permission_v2.NewInternalPermissionServiceClient(cc),
 		AuthorizationV2Beta:      authorization_v2beta.NewAuthorizationServiceClient(cc),
 		AuthorizationV2:          authorization_v2.NewAuthorizationServiceClient(cc),
+		GroupV2:                  group_v2.NewGroupServiceClient(cc),
 	}
 	return client, client.pollHealth(ctx)
 }
@@ -444,6 +447,27 @@ func (i *Instance) CreateOrganizationWithUserID(ctx context.Context, name, userI
 	return resp
 }
 
+func (i *Instance) SetOrganizationSettings(ctx context.Context, t *testing.T, orgID string, organizationScopedUsernames bool) *settings_v2beta.SetOrganizationSettingsResponse {
+	resp, err := i.Client.SettingsV2beta.SetOrganizationSettings(ctx,
+		&settings_v2beta.SetOrganizationSettingsRequest{
+			OrganizationId:              orgID,
+			OrganizationScopedUsernames: gu.Ptr(organizationScopedUsernames),
+		},
+	)
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) DeleteOrganizationSettings(ctx context.Context, t *testing.T, orgID string) *settings_v2beta.DeleteOrganizationSettingsResponse {
+	resp, err := i.Client.SettingsV2beta.DeleteOrganizationSettings(ctx,
+		&settings_v2beta.DeleteOrganizationSettingsRequest{
+			OrganizationId: orgID,
+		},
+	)
+	require.NoError(t, err)
+	return resp
+}
+
 func (i *Instance) CreateHumanUserVerified(ctx context.Context, org, email, phone string) *user_v2.AddHumanUserResponse {
 	resp, err := i.Client.UserV2.AddHumanUser(ctx, &user_v2.AddHumanUserRequest{
 		Organization: &object.Organization{
@@ -725,6 +749,48 @@ func (i *Instance) AddOrgGenericOAuthProvider(ctx context.Context, name string) 
 		},
 	})
 	logging.OnError(err).Panic("create generic OAuth idp")
+	return resp
+}
+
+func (i *Instance) AddZitadelProvider(ctx context.Context, name string) *admin.AddZitadelProviderResponse {
+	resp, err := i.Client.Admin.AddZitadelProvider(ctx, &admin.AddZitadelProviderRequest{
+		Name:         name,
+		Issuer:       "zitadel.example.com",
+		ClientId:     "test-client",
+		ClientSecret: "test-secret",
+		Scopes:       []string{"email", "profile"},
+		ProviderOptions: &idp.Options{
+			IsCreationAllowed: true,
+		},
+		InstanceRolesInfo: []*idp.InstanceRolesInfo{
+			{
+				OrganizationId:     "org1",
+				OrganizationDomain: "org1.com",
+			},
+		},
+	})
+	logging.OnError(err).Panic("create zitadel idp")
+	return resp
+}
+
+func (i *Instance) AddOrgZitadelProvider(ctx context.Context, name string) *mgmt.AddZitadelProviderResponse {
+	resp, err := i.Client.Mgmt.AddZitadelProvider(ctx, &mgmt.AddZitadelProviderRequest{
+		Name:         name,
+		Issuer:       "zitadel.example.com",
+		ClientId:     "test-client",
+		ClientSecret: "test-secret",
+		Scopes:       []string{"email", "profile"},
+		ProviderOptions: &idp.Options{
+			IsCreationAllowed: true,
+		},
+		InstanceRolesInfo: []*idp.InstanceRolesInfo{
+			{
+				OrganizationId:     "org1",
+				OrganizationDomain: "org1.com",
+			},
+		},
+	})
+	logging.OnError(err).Panic("create org zitadel idp")
 	return resp
 }
 
@@ -1365,4 +1431,30 @@ func (i *Instance) ActivateSchemaUser(ctx context.Context, orgID string, userID 
 	})
 	logging.OnError(err).Fatal("reactivate user")
 	return user
+}
+
+func (i *Instance) CreateGroup(ctx context.Context, t *testing.T, orgID, name string) *group_v2.CreateGroupResponse {
+	resp, err := i.Client.GroupV2.CreateGroup(ctx, &group_v2.CreateGroupRequest{
+		OrganizationId: orgID,
+		Name:           name,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) DeleteGroup(ctx context.Context, t *testing.T, id string) *group_v2.DeleteGroupResponse {
+	resp, err := i.Client.GroupV2.DeleteGroup(ctx, &group_v2.DeleteGroupRequest{
+		Id: id,
+	})
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) AddUsersToGroup(ctx context.Context, t *testing.T, groupID string, userIDs []string) *group_v2.AddUsersToGroupResponse {
+	resp, err := i.Client.GroupV2.AddUsersToGroup(ctx, &group_v2.AddUsersToGroupRequest{
+		Id:      groupID,
+		UserIds: userIDs,
+	})
+	require.NoError(t, err)
+	return resp
 }

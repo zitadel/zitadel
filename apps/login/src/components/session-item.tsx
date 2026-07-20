@@ -15,7 +15,7 @@ import { AutoSubmitForm } from "./auto-submit-form";
 import { Avatar } from "./avatar";
 import { Translated } from "./translated";
 
-export function isSessionValid(session: Partial<Session>): {
+export function isSessionPrimaryFactorAndLifetimeValid(session: Partial<Session>): {
   valid: boolean;
   verifiedAt?: Timestamp;
 } {
@@ -53,7 +53,7 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
     return response;
   }
 
-  const { valid, verifiedAt } = isSessionValid(session);
+  const { valid, verifiedAt } = isSessionPrimaryFactorAndLifetimeValid(session);
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const [_error, setError] = useState<string | null>(null);

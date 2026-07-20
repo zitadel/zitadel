@@ -31,8 +31,8 @@ const (
 type HumanAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserName              string `json:"userName"`
-	userLoginMustBeDomain bool
+	UserName          string `json:"userName"`
+	orgScopedUsername bool
 
 	FirstName         string        `json:"firstName,omitempty"`
 	LastName          string        `json:"lastName,omitempty"`
@@ -65,7 +65,7 @@ func (e *HumanAddedEvent) Payload() interface{} {
 }
 
 func (e *HumanAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain)}
+	return []*eventstore.UniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.orgScopedUsername)}
 }
 
 func (e *HumanAddedEvent) AddAddressData(
@@ -108,7 +108,7 @@ func NewHumanAddedEvent(
 	preferredLanguage language.Tag,
 	gender domain.Gender,
 	emailAddress domain.EmailAddress,
-	userLoginMustBeDomain bool,
+	orgScopedUsername bool,
 ) *HumanAddedEvent {
 	return &HumanAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -116,15 +116,15 @@ func NewHumanAddedEvent(
 			aggregate,
 			HumanAddedType,
 		),
-		UserName:              userName,
-		FirstName:             firstName,
-		LastName:              lastName,
-		NickName:              nickName,
-		DisplayName:           displayName,
-		PreferredLanguage:     preferredLanguage,
-		Gender:                gender,
-		EmailAddress:          emailAddress,
-		userLoginMustBeDomain: userLoginMustBeDomain,
+		UserName:          userName,
+		FirstName:         firstName,
+		LastName:          lastName,
+		NickName:          nickName,
+		DisplayName:       displayName,
+		PreferredLanguage: preferredLanguage,
+		Gender:            gender,
+		EmailAddress:      emailAddress,
+		orgScopedUsername: orgScopedUsername,
 	}
 }
 
@@ -141,22 +141,24 @@ func HumanAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 }
 
 type HumanRegisteredEvent struct {
-	eventstore.BaseEvent  `json:"-"`
-	UserName              string `json:"userName"`
-	userLoginMustBeDomain bool
-	FirstName             string              `json:"firstName,omitempty"`
-	LastName              string              `json:"lastName,omitempty"`
-	NickName              string              `json:"nickName,omitempty"`
-	DisplayName           string              `json:"displayName,omitempty"`
-	PreferredLanguage     language.Tag        `json:"preferredLanguage,omitempty"`
-	Gender                domain.Gender       `json:"gender,omitempty"`
-	EmailAddress          domain.EmailAddress `json:"email,omitempty"`
-	PhoneNumber           domain.PhoneNumber  `json:"phone,omitempty"`
-	Country               string              `json:"country,omitempty"`
-	Locality              string              `json:"locality,omitempty"`
-	PostalCode            string              `json:"postalCode,omitempty"`
-	Region                string              `json:"region,omitempty"`
-	StreetAddress         string              `json:"streetAddress,omitempty"`
+	eventstore.BaseEvent `json:"-"`
+
+	UserName          string `json:"userName"`
+	orgScopedUsername bool
+
+	FirstName         string              `json:"firstName,omitempty"`
+	LastName          string              `json:"lastName,omitempty"`
+	NickName          string              `json:"nickName,omitempty"`
+	DisplayName       string              `json:"displayName,omitempty"`
+	PreferredLanguage language.Tag        `json:"preferredLanguage,omitempty"`
+	Gender            domain.Gender       `json:"gender,omitempty"`
+	EmailAddress      domain.EmailAddress `json:"email,omitempty"`
+	PhoneNumber       domain.PhoneNumber  `json:"phone,omitempty"`
+	Country           string              `json:"country,omitempty"`
+	Locality          string              `json:"locality,omitempty"`
+	PostalCode        string              `json:"postalCode,omitempty"`
+	Region            string              `json:"region,omitempty"`
+	StreetAddress     string              `json:"streetAddress,omitempty"`
 
 	// New events only use EncodedHash. However, the secret field
 	// is preserved to handle events older than the switch to Passwap.
@@ -174,7 +176,7 @@ func (e *HumanRegisteredEvent) Payload() interface{} {
 }
 
 func (e *HumanRegisteredEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain)}
+	return []*eventstore.UniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.orgScopedUsername)}
 }
 
 func (e *HumanRegisteredEvent) AddAddressData(
@@ -217,7 +219,7 @@ func NewHumanRegisteredEvent(
 	preferredLanguage language.Tag,
 	gender domain.Gender,
 	emailAddress domain.EmailAddress,
-	userLoginMustBeDomain bool,
+	orgScopedUsername bool,
 	userAgentID string,
 ) *HumanRegisteredEvent {
 	return &HumanRegisteredEvent{
@@ -226,16 +228,16 @@ func NewHumanRegisteredEvent(
 			aggregate,
 			HumanRegisteredType,
 		),
-		UserName:              userName,
-		FirstName:             firstName,
-		LastName:              lastName,
-		NickName:              nickName,
-		DisplayName:           displayName,
-		PreferredLanguage:     preferredLanguage,
-		Gender:                gender,
-		EmailAddress:          emailAddress,
-		userLoginMustBeDomain: userLoginMustBeDomain,
-		UserAgentID:           userAgentID,
+		UserName:          userName,
+		FirstName:         firstName,
+		LastName:          lastName,
+		NickName:          nickName,
+		DisplayName:       displayName,
+		PreferredLanguage: preferredLanguage,
+		Gender:            gender,
+		EmailAddress:      emailAddress,
+		orgScopedUsername: orgScopedUsername,
+		UserAgentID:       userAgentID,
 	}
 }
 

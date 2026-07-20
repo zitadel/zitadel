@@ -458,3 +458,24 @@ func (s *Server) DeleteProvider(ctx context.Context, req *mgmt_pb.DeleteProvider
 		Details: object_pb.DomainToChangeDetailsPb(details),
 	}, nil
 }
+
+func (s *Server) AddZitadelProvider(ctx context.Context, req *mgmt_pb.AddZitadelProviderRequest) (*mgmt_pb.AddZitadelProviderResponse, error) {
+	id, details, err := s.command.AddOrgZitadelProvider(ctx, authz.GetCtxData(ctx).OrgID, addZitadelProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddZitadelProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateZitadelProvider(ctx context.Context, req *mgmt_pb.UpdateZitadelProviderRequest) (*mgmt_pb.UpdateZitadelProviderResponse, error) {
+	details, err := s.command.UpdateOrgZitadelProvider(ctx, req.Id, authz.GetCtxData(ctx).OrgID, updateZitadelProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateZitadelProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}

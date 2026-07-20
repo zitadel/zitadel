@@ -1010,6 +1010,8 @@ func (wm *OrgIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) {
 			wm.IDPRemoveWriteModel.AppendEvents(&e.IDPConfigAddedEvent)
 		case *org.IDPConfigRemovedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.IDPConfigRemovedEvent)
+		case *org.ZitadelIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.ZitadelIDPAddedEvent)
 		default:
 			wm.IDPRemoveWriteModel.AppendEvents(e)
 		}
@@ -1035,6 +1037,7 @@ func (wm *OrgIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.LDAPIDPAddedEventType,
 			org.AppleIDPAddedEventType,
 			org.SAMLIDPAddedEventType,
+			org.ZitadelIDPAddedEventType,
 			org.IDPRemovedEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).
@@ -1047,4 +1050,72 @@ func (wm *OrgIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 		).
 		EventData(map[string]interface{}{"idpConfigId": wm.ID}).
 		Builder()
+}
+
+type OrgZitadelIDPWriteModel struct {
+	ZitadelIDPWriteModel
+}
+
+func NewZitadelOrgIDPWriteModel(orgID, id string) *OrgZitadelIDPWriteModel {
+	return &OrgZitadelIDPWriteModel{
+		ZitadelIDPWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
+			},
+			ID: id,
+		},
+	}
+}
+
+func (wm *OrgZitadelIDPWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *org.ZitadelIDPAddedEvent:
+			wm.ZitadelIDPWriteModel.AppendEvents(&e.ZitadelIDPAddedEvent)
+		case *org.ZitadelIDPChangedEvent:
+			wm.ZitadelIDPWriteModel.AppendEvents(&e.ZitadelIDPChangedEvent)
+		default:
+			wm.ZitadelIDPWriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *OrgZitadelIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			org.ZitadelIDPAddedEventType,
+		).
+		EventData(map[string]interface{}{"id": wm.ID}).
+		Builder()
+}
+
+func (wm *OrgZitadelIDPWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id, name, issuer, clientID, clientSecretString string,
+	secretCrypto crypto.EncryptionAlgorithm,
+	scopes []string,
+	options idp.Options,
+	info []idp.RolesInfo,
+) (*org.ZitadelIDPChangedEvent, error) {
+
+	changes, err := wm.NewChanges(
+		name,
+		issuer,
+		clientID,
+		clientSecretString,
+		secretCrypto,
+		scopes,
+		options,
+		info,
+	)
+	if err != nil || len(changes) == 0 {
+		return nil, err
+	}
+	return org.NewZitadelIDPChangedEvent(ctx, aggregate, id, changes), nil
 }

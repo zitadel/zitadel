@@ -1,0 +1,43 @@
+package domain
+
+import (
+	"context"
+)
+
+// transactionInvoker ensures that [InvokeOpts].DB() returns a [database.Transaction].
+// if a new transaction is started, it will be committed or rolled back after the [Executor] execution.
+type transactionInvoker struct {
+	invoker
+}
+
+// NewTransactionInvoker creates a new [transactionInvoker].
+func NewTransactionInvoker(next Invoker) *transactionInvoker {
+	return &transactionInvoker{
+		invoker: invoker{next: next},
+	}
+}
+
+// Transactional is implemented by [Commander]s and [Querier]s wishing to access the DB inside a transaction.
+//
+// It is NOT recommended to use this when non-DB operation inside a transaction take time (e.g. password hash verification).
+// In that case, it is advisable to manually manage the transaction by type asserting [database.Beginner] on db.DB()
+//
+//go:generate mockgen -destination=mock/transactional.mock.go -package=domainmock . Transactional
+type Transactional interface {
+	RequiresTransaction()
+}
+
+// Invoke implements [Invoker].
+func (i *transactionInvoker) Invoke(ctx context.Context, executor Executor, opts *InvokeOpts) (err error) {
+	if _, ok := executor.(Transactional); !ok {
+		return i.execute(ctx, executor, opts)
+	}
+
+	close, err := i.ensureTx(ctx, opts)
+	if err != nil {
+		return err
+	}
+	defer func() { err = close(err) }()
+
+	return i.execute(ctx, executor, opts)
+}

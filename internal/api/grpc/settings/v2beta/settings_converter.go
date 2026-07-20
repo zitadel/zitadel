@@ -219,8 +219,9 @@ func idpTypeToPb(idpType domain.IDPType) settings.IdentityProviderType {
 	case domain.IDPTypeSAML:
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_SAML
 	case domain.IDPTypeApple:
-		// Handle all remaining cases so the linter succeeds
-		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_UNSPECIFIED
+		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_APPLE
+	case domain.IDPTypeZitadel:
+		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_ZITADEL
 	default:
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_UNSPECIFIED
 	}
@@ -241,5 +242,12 @@ func securitySettingsToCommand(req *settings.SetSecuritySettingsRequest) *comman
 		EnableIframeEmbedding: req.GetEmbeddedIframe().GetEnabled(),
 		AllowedOrigins:        req.GetEmbeddedIframe().GetAllowedOrigins(),
 		EnableImpersonation:   req.GetEnableImpersonation(),
+	}
+}
+
+func organizationSettingsToCommand(req *settings.SetOrganizationSettingsRequest) *command.SetOrganizationSettings {
+	return &command.SetOrganizationSettings{
+		OrganizationID:              req.OrganizationId,
+		OrganizationScopedUsernames: req.OrganizationScopedUsernames,
 	}
 }

@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -127,7 +128,7 @@ func (c *Commands) userStateWriteModel(ctx context.Context, userID string) (writ
 	return writeModel, nil
 }
 
-func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner string, cascadingUserMemberships []*CascadingMembership, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner string, cascadingUserMemberships []*CascadingMembership, cascadingGrantIDs, cascadingGroupIDs []string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-vaipl7s13l", "Errors.User.UserIDMissing")
 	}
@@ -145,8 +146,13 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-l40ykb3xh2", "Errors.Org.DomainPolicy.NotExisting")
 	}
+	organizationScopedUsername, err := c.checkOrganizationScopedUsernames(ctx, existingUser.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+
 	var events []eventstore.Command
-	events = append(events, user.NewUserRemovedEvent(ctx, &existingUser.Aggregate().Aggregate, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain))
+	events = append(events, user.NewUserRemovedEvent(ctx, &existingUser.Aggregate().Aggregate, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain || organizationScopedUsername))
 
 	for _, grantID := range cascadingGrantIDs {
 		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true, true, nil)
@@ -163,6 +169,15 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 			return nil, err
 		}
 		events = append(events, membershipEvents...)
+	}
+
+	// remove user from user groups
+	if len(cascadingGroupIDs) > 0 {
+		groupUserEvents, err := c.removeUserFromGroups(ctx, userID, cascadingGroupIDs, resourceOwner)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, groupUserEvents...)
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, events...)

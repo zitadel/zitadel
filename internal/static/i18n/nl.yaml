@@ -282,6 +282,8 @@ Errors:
     LabelPolicy:
       NotFound: "Privé Label Beleid niet gevonden"
       NotChanged: "Privé Label Beleid is niet veranderd"
+    IDPConfig:
+      NotExisting: "Identiteitsprovider-configuratie bestaat niet"
   Project:
     ProjectIDMissing: "Project ID ontbreekt"
     AlreadyExists: "Project bestaat al op organisatie"
@@ -324,7 +326,6 @@ Errors:
       APIAuthMethodNoSecret: "Gekozen API Auth Methode vereist geen geheim"
       AuthMethodNoPrivateKeyJWT: "Gekozen Auth Methode vereist geen sleutel"
       ClientSecretInvalid: "Client Geheim is ongeldig"
-      ClientSecretNotSet: "Client geheim is niet ingesteld"
       Key:
         AlreadyExisting: "Applicatie sleutel bestaat al"
         NotFound: "Applicatie sleutel niet gevonden"

@@ -6,7 +6,7 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { Skeleton } from "@/components/skeleton";
 import { ThemeProvider } from "@/components/theme-provider";
 import ThemeSwitch from "@/components/theme-switch";
-import { LANGS, getLanguage, normalizeLanguageCode } from "@/lib/i18n";
+import { LANGS, getLanguage } from "@/lib/i18n";
 import { getServiceConfig } from "@/lib/service-url";
 import { getAllowedLanguages } from "@/lib/zitadel";
 import * as Tooltip from "@radix-ui/react-tooltip";
@@ -35,9 +35,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     const settings = await getAllowedLanguages({ serviceConfig });
     if (settings.allowedLanguages?.length) {
       languages = settings.allowedLanguages
-        .map(normalizeLanguageCode)
-        .filter((code): code is string => !!code)
-        .filter((code, index, values) => values.indexOf(code) === index)
+        .filter((code) => LANGS.find((l) => l.code === code))
         .map((code) => getLanguage(code));
     }
   } catch (e) {

@@ -119,7 +119,7 @@ func (c *Commands) removeRoleFromUserGrant(ctx context.Context, userGrantID stri
 	if existingUserGrant.State == domain.UserGrantStateUnspecified || existingUserGrant.State == domain.UserGrantStateRemoved {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.UserGrant.NotFound")
 	}
-
+	
 	beforeLen := len(existingUserGrant.RoleKeys)
 	existingUserGrant.RoleKeys = slices.DeleteFunc(existingUserGrant.RoleKeys, func(role string) bool {
 		return roleKeysToRemove[role]

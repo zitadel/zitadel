@@ -26,7 +26,9 @@ import (
 	"golang.org/x/net/http2/h2c"
 	"golang.org/x/text/language"
 
+	new_domain "github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
+	v3_postgres "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/cmd/key"
@@ -46,6 +48,7 @@ import (
 	authorization_v2beta "github.com/zitadel/zitadel/internal/api/grpc/authorization/v2beta"
 	feature_v2 "github.com/zitadel/zitadel/internal/api/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/internal/api/grpc/feature/v2beta"
+	group_v2 "github.com/zitadel/zitadel/internal/api/grpc/group/v2"
 	idp_v2 "github.com/zitadel/zitadel/internal/api/grpc/idp/v2"
 	instance_v2 "github.com/zitadel/zitadel/internal/api/grpc/instance/v2"
 	instance_v2beta "github.com/zitadel/zitadel/internal/api/grpc/instance/v2beta"
@@ -179,6 +182,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	if err != nil {
 		return fmt.Errorf("cannot start DB client for queries: %w", err)
 	}
+	new_domain.SetPool(v3_postgres.PGxPool(dbClient.Pool))
 
 	keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterKey)
 	if err != nil {
@@ -203,7 +207,16 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		MaxRetries: config.Eventstore.MaxRetries,
 	}))
 
+	new_domain.SetLegacyEventstore(eventstoreClient)
+	new_domain.SetSystemConfig(config.SystemDefaults)
+	new_domain.SetIDPEncryptionAlgorithm(keys.IDPConfig)
+	new_domain.SetMFAEncryptionAlgorithm(keys.OTP)
+	new_domain.SetOTPSMSSecretGeneratorConfig(config.DefaultInstance.SecretGenerators.OTPSMS)
+	new_domain.SetOTPEmailSecretGeneratorConfig(config.DefaultInstance.SecretGenerators.OTPEmail)
+
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
+	sessionTokenDecryptor := internal_authz.SessionTokenDecryptor(keys.OIDC)
+	new_domain.SetSessionTokenDecryptor(sessionTokenDecryptor)
 	cacheConnectors, err := connector.StartConnectors(config.Caches, dbClient)
 	if err != nil {
 		return fmt.Errorf("unable to start caches: %w", err)
@@ -257,6 +270,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		DisplayName:    config.WebAuthNName,
 		ExternalSecure: config.ExternalSecure,
 	}
+
+	new_domain.SetWebAuthNConfig(webAuthNConfig)
 
 	httpClient := config.HTTPClient.NewClient()
 
@@ -533,7 +548,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, session_v2beta.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, settings_v2beta.CreateServer(commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, settings_v2beta.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, org_v2beta.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
@@ -545,7 +560,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, session_v2.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, settings_v2.CreateServer(commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, settings_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, org_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
@@ -600,6 +615,9 @@ func startAPIs(
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, application.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, group_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 

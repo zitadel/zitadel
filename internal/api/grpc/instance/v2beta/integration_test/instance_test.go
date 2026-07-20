@@ -20,7 +20,7 @@ func TestDeleteInstace(t *testing.T) {
 	t.Parallel()
 
 	// Given
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
@@ -32,12 +32,13 @@ func TestDeleteInstace(t *testing.T) {
 	})
 
 	tt := []struct {
-		testName           string
-		inputRequest       *instance.DeleteInstanceRequest
-		inputContext       context.Context
-		expectedErrorMsg   string
-		expectedErrorCode  codes.Code
-		expectedInstanceID string
+		testName             string
+		inputRequest         *instance.DeleteInstanceRequest
+		inputContext         context.Context
+		expectedErrorMsg     string
+		expectedErrorCode    codes.Code
+		expectedInstanceID   string
+		expectsNullTimestamp bool
 	}{
 		{
 			testName: "when invalid context should return unauthN error",
@@ -49,13 +50,12 @@ func TestDeleteInstace(t *testing.T) {
 			expectedErrorMsg:  "auth header missing",
 		},
 		{
-			testName: "when invalid input should return invalid argument error",
+			testName: "when instance not found should return no error",
 			inputRequest: &instance.DeleteInstanceRequest{
 				InstanceId: inst.ID() + "invalid",
 			},
-			inputContext:      ctxWithSysAuthZ,
-			expectedErrorCode: codes.NotFound,
-			expectedErrorMsg:  "Instance not found. Make sure you got the domain right. Check out https://zitadel.com/docs/apis/introduction#domains (COMMA-AE3GS)",
+			inputContext:         ctxWithSysAuthZ,
+			expectsNullTimestamp: true,
 		},
 		{
 			testName: "when delete succeeds should return deletion date",
@@ -66,7 +66,6 @@ func TestDeleteInstace(t *testing.T) {
 			expectedInstanceID: inst.ID(),
 		},
 	}
-
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			// Test
@@ -74,10 +73,10 @@ func TestDeleteInstace(t *testing.T) {
 
 			// Verify
 			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
-			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+			assert.Contains(t, status.Convert(err).Message(), tc.expectedErrorMsg)
 			if tc.expectedErrorMsg == "" {
 				require.NotNil(t, res)
-				require.NotEmpty(t, res.GetDeletionDate())
+				require.Equal(t, tc.expectsNullTimestamp, res.GetDeletionDate() == nil)
 			}
 		})
 	}
@@ -93,7 +92,7 @@ func TestUpdateInstace(t *testing.T) {
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
 
 	inst := integration.NewInstance(ctxWithSysAuthZ)
-	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+	orgOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
 
 	t.Cleanup(func() {
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})

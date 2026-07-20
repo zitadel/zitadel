@@ -422,6 +422,7 @@ func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, reso
 
 func (c *Commands) ChangeOrg(ctx context.Context, organizationID, name string, permissionCheck OrganizationPermissionCheck) (*domain.ObjectDetails, error) {
 	name = strings.TrimSpace(name)
+	organizationID = strings.TrimSpace(organizationID)
 	if organizationID == "" || name == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "EVENT-Mf9sd", "Errors.Org.Invalid")
 	}
@@ -522,7 +523,8 @@ func (c *Commands) ReactivateOrg(ctx context.Context, organizationID string, per
 func (c *Commands) RemoveOrg(ctx context.Context, id string, permissionCheck OrganizationPermissionCheck, mustExist bool) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(id)
 
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveOrg(orgAgg, permissionCheck, mustExist)) //nolint:staticcheck
+	//nolint:staticcheck
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveOrg(orgAgg, permissionCheck, mustExist))
 	if err != nil {
 		return nil, err
 	}
@@ -576,10 +578,16 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate, permissionCheck Organizati
 				return nil, nil
 			}
 
-			domainPolicy, err := c.domainPolicyWriteModel(ctx, a.ID)
+			domainPolicy, err := domainPolicyWriteModel(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err
 			}
+
+			organizationScopedUsername, err := checkOrganizationScopedUsernames(ctx, filter, a.ID, nil)
+			if err != nil {
+				return nil, err
+			}
+
 			usernames, err := OrgUsers(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err
@@ -596,7 +604,7 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate, permissionCheck Organizati
 			if err != nil {
 				return nil, err
 			}
-			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, usernames, domainPolicy.UserLoginMustBeDomain, domains, links, entityIds)}, nil
+			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, usernames, domainPolicy.UserLoginMustBeDomain || organizationScopedUsername, domains, links, entityIds)}, nil
 		}, nil
 	}
 }

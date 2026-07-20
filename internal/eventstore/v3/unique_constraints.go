@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -25,7 +25,7 @@ var (
 	addConstraintStmt string
 )
 
-func handleUniqueConstraints(ctx context.Context, tx database.Tx, commands []eventstore.Command) (err error) {
+func handleUniqueConstraints(ctx context.Context, tx database.Transaction, commands []eventstore.Command) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -62,7 +62,7 @@ func handleUniqueConstraints(ctx context.Context, tx database.Tx, commands []eve
 	}
 
 	if len(deletePlaceholders) > 0 {
-		_, err := tx.ExecContext(ctx, fmt.Sprintf(deleteConstraintStmt, strings.Join(deletePlaceholders, " OR ")), deleteArgs...)
+		_, err := tx.Exec(ctx, fmt.Sprintf(deleteConstraintStmt, strings.Join(deletePlaceholders, " OR ")), deleteArgs...)
 		if err != nil {
 			logging.WithError(err).Warn("delete unique constraint failed")
 			errMessage := "Errors.Internal"
@@ -73,7 +73,7 @@ func handleUniqueConstraints(ctx context.Context, tx database.Tx, commands []eve
 		}
 	}
 	if len(addPlaceholders) > 0 {
-		_, err := tx.ExecContext(ctx, fmt.Sprintf(addConstraintStmt, strings.Join(addPlaceholders, ", ")), addArgs...)
+		_, err := tx.Exec(ctx, fmt.Sprintf(addConstraintStmt, strings.Join(addPlaceholders, ", ")), addArgs...)
 		if err != nil {
 			logging.WithError(err).Warn("add unique constraint failed")
 			errMessage := "Errors.Internal"

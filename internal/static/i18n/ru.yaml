@@ -276,6 +276,8 @@ Errors:
     LabelPolicy:
       NotFound: "Политика частных торговых марок не найдена"
       NotChanged: "Политика использования частных торговых марок не изменилась."
+    IDPConfig:
+      NotExisting: "Конфигурация поставщика идентификационных данных не существует"
   Project:
     ProjectIDMissing: "ID Проекта отсутствует"
     AlreadyExists: "Проект уже существует в организации"
@@ -318,7 +320,6 @@ Errors:
       APIAuthMethodNoSecret: "Выбранный метод аутентификации API не требует ключа"
       AuthMethodNoPrivateKeyJWT: "Выбранный метод аутентификации не требует ключа"
       ClientSecretInvalid: "Клиентский ключ недействителен"
-      ClientSecretNotSet: "Секрет клиента не установлен"
       Key:
         AlreadyExisting: "Ключ приложения уже существует"
         NotFound: "Ключ приложения не найден"

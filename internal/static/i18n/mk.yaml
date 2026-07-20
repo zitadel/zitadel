@@ -281,6 +281,8 @@ Errors:
     LabelPolicy:
       NotFound: "Приватната политика за ознаките не е пронајдена"
       NotChanged: "Приватната политика за ознаките не е променета"
+    IDPConfig:
+      NotExisting: "Конфигурацијата на IDP не постои"
   Project:
     ProjectIDMissing: "Недостасува ID на проектот"
     AlreadyExists: "Проектот веќе постои во организацијата"
@@ -323,7 +325,6 @@ Errors:
       APIAuthMethodNoSecret: "Избраниот API метод за автентикација не бара таен клуч"
       AuthMethodNoPrivateKeyJWT: "Избраниот метод за автентикација не бара приватен клуч"
       ClientSecretInvalid: "Клиентскиот таен клуч е невалиден"
-      ClientSecretNotSet: "Тајната на клиентот не е поставена"
       Key:
         AlreadyExisting: "Клучот за апликацијата веќе постои"
         NotFound: "Клучот за апликацијата не е пронајден"

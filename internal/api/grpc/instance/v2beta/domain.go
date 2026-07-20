@@ -6,10 +6,16 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	instancev2 "github.com/zitadel/zitadel/backend/v3/api/instance/v2"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 )
 
 func (s *Server) AddCustomDomain(ctx context.Context, req *connect.Request[instance.AddCustomDomainRequest]) (*connect.Response[instance.AddCustomDomainResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.AddCustomDomainBeta(ctx, req)
+	}
+
 	details, err := s.command.AddInstanceDomain(ctx, req.Msg.GetDomain())
 	if err != nil {
 		return nil, err
@@ -20,16 +26,30 @@ func (s *Server) AddCustomDomain(ctx context.Context, req *connect.Request[insta
 }
 
 func (s *Server) RemoveCustomDomain(ctx context.Context, req *connect.Request[instance.RemoveCustomDomainRequest]) (*connect.Response[instance.RemoveCustomDomainResponse], error) {
-	details, err := s.command.RemoveInstanceDomain(ctx, req.Msg.GetDomain())
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.RemoveCustomDomainBeta(ctx, req)
+	}
+
+	details, err := s.command.RemoveInstanceDomain(ctx, req.Msg.GetDomain(), false)
 	if err != nil {
 		return nil, err
 	}
+
+	var deletionDate *timestamppb.Timestamp
+	if details != nil {
+		deletionDate = timestamppb.New(details.EventDate)
+	}
+
 	return connect.NewResponse(&instance.RemoveCustomDomainResponse{
-		DeletionDate: timestamppb.New(details.EventDate),
+		DeletionDate: deletionDate,
 	}), nil
 }
 
 func (s *Server) AddTrustedDomain(ctx context.Context, req *connect.Request[instance.AddTrustedDomainRequest]) (*connect.Response[instance.AddTrustedDomainResponse], error) {
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.AddTrustedDomainBeta(ctx, req)
+	}
+
 	details, err := s.command.AddTrustedDomain(ctx, req.Msg.GetDomain())
 	if err != nil {
 		return nil, err
@@ -40,12 +60,20 @@ func (s *Server) AddTrustedDomain(ctx context.Context, req *connect.Request[inst
 }
 
 func (s *Server) RemoveTrustedDomain(ctx context.Context, req *connect.Request[instance.RemoveTrustedDomainRequest]) (*connect.Response[instance.RemoveTrustedDomainResponse], error) {
-	details, err := s.command.RemoveTrustedDomain(ctx, req.Msg.GetDomain())
+	if authz.GetFeatures(ctx).EnableRelationalTables {
+		return instancev2.RemoveTrustedDomainBeta(ctx, req)
+	}
+	details, err := s.command.RemoveTrustedDomain(ctx, req.Msg.GetDomain(), false)
 	if err != nil {
 		return nil, err
 	}
 
+	var deletionDate *timestamppb.Timestamp
+	if details != nil {
+		deletionDate = timestamppb.New(details.EventDate)
+	}
+
 	return connect.NewResponse(&instance.RemoveTrustedDomainResponse{
-		DeletionDate: timestamppb.New(details.EventDate),
+		DeletionDate: deletionDate,
 	}), nil
 }

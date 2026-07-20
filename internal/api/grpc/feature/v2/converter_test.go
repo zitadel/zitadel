@@ -18,6 +18,8 @@ import (
 )
 
 func Test_systemFeaturesToCommand(t *testing.T) {
+	t.Parallel()
+	// Given
 	arg := &feature_pb.SetSystemFeaturesRequest{
 		LoginDefaultOrg:                gu.Ptr(true),
 		UserSchema:                     gu.Ptr(true),
@@ -27,6 +29,8 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 			Required: true,
 			BaseUri:  gu.Ptr("https://login.com"),
 		},
+		EnableRelationalTables: gu.Ptr(true),
+		PermissionCheckV2:      gu.Ptr(true),
 	}
 	want := &command.SystemFeatures{
 		LoginDefaultOrg:                gu.Ptr(true),
@@ -37,13 +41,22 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 			Required: true,
 			BaseURI:  &url.URL{Scheme: "https", Host: "login.com"},
 		},
+		EnableRelationalTables: gu.Ptr(true),
+		PermissionCheckV2:      gu.Ptr(true),
 	}
+
+	// Test
 	got, err := systemFeaturesToCommand(arg)
+
+	// Verify
 	assert.Equal(t, want, got)
 	assert.NoError(t, err)
 }
 
 func Test_systemFeaturesToPb(t *testing.T) {
+	t.Parallel()
+
+	// Given
 	arg := &query.SystemFeatures{
 		Details: &domain.ObjectDetails{
 			Sequence:      22,
@@ -74,6 +87,10 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			},
 		},
 		PermissionCheckV2: query.FeatureSource[bool]{
+			Level: feature.LevelSystem,
+			Value: true,
+		},
+		EnableRelationalTables: query.FeatureSource[bool]{
 			Level: feature.LevelSystem,
 			Value: true,
 		},
@@ -117,12 +134,22 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
+		EnableRelationalTables: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
+		},
 	}
+
+	// Test
 	got := systemFeaturesToPb(arg)
+
+	// Verify
 	assert.Equal(t, want, got)
 }
 
 func Test_instanceFeaturesToCommand(t *testing.T) {
+	t.Parallel()
+	// Given
 	arg := &feature_pb.SetInstanceFeaturesRequest{
 		LoginDefaultOrg:                gu.Ptr(true),
 		UserSchema:                     gu.Ptr(true),
@@ -133,7 +160,9 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 			Required: true,
 			BaseUri:  gu.Ptr("https://login.com"),
 		},
-		ConsoleUseV2UserApi: gu.Ptr(true),
+		ConsoleUseV2UserApi:    gu.Ptr(true),
+		PermissionCheckV2:      gu.Ptr(false),
+		EnableRelationalTables: gu.Ptr(true),
 	}
 	want := &command.InstanceFeatures{
 		LoginDefaultOrg:                gu.Ptr(true),
@@ -146,13 +175,21 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 			BaseURI:  &url.URL{Scheme: "https", Host: "login.com"},
 		},
 		ManagementConsoleUseV2UserApi: gu.Ptr(true),
+		PermissionCheckV2:             gu.Ptr(false),
+		EnableRelationalTables:        gu.Ptr(true),
 	}
+
+	// Test
 	got, err := instanceFeaturesToCommand(arg)
+
+	// Verify
 	assert.Equal(t, want, got)
 	assert.NoError(t, err)
 }
 
 func Test_instanceFeaturesToPb(t *testing.T) {
+	t.Parallel()
+
 	arg := &query.InstanceFeatures{
 		Details: &domain.ObjectDetails{
 			Sequence:      22,
@@ -187,6 +224,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Value: true,
 		},
 		ManagementConsoleUseV2UserApi: query.FeatureSource[bool]{
+			Level: feature.LevelInstance,
+			Value: true,
+		},
+		EnableRelationalTables: query.FeatureSource[bool]{
 			Level: feature.LevelInstance,
 			Value: true,
 		},
@@ -235,6 +276,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},
 		ConsoleUseV2UserApi: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_INSTANCE,
+		},
+		EnableRelationalTables: &feature_pb.FeatureFlag{
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},

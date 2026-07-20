@@ -1066,6 +1066,24 @@ Eventstore:
   PushTimeout: 15s #ZITADEL_EVENTSTORE_PUSHTIMEOUT
   # Maximum amount of push retries in case of primary key violation on the sequence
   MaxRetries: 5 #ZITADEL_EVENTSTORE_MAXRETRIES
+  # Autovacuum tunes PostgreSQL's autovacuum and autoanalyze behavior of the
+  # eventstore.events2 table. As the table grows, PostgreSQL's default,
+  # percentage-based scale factors delay vacuum and analyze runs more and
+  # more, which can degrade read performance on large instances. Enabling
+  # this replaces the scale factors with static thresholds, so vacuum and
+  # analyze keep running at a predictable cadence regardless of table size.
+  # Settings are (re-)applied to the table as a repeatable step during `zitadel setup`.
+  Autovacuum:
+    # If enabled, the thresholds below are applied to the eventstore.events2 table
+    # and the default, percentage-based autovacuum scale factors are disabled.
+    # If disabled, the table is reset to the cluster's default autovacuum settings.
+    Enabled: false # ZITADEL_EVENTSTORE_AUTOVACUUM_ENABLED
+    # Number of modified rows that triggers an autovacuum run, regardless of table size (applied in both autovacuum_vacuum_threshold and autovacuum_vacuum_insert_threshold settings).
+    # Must be greater than 10000.
+    VacuumThreshold: 50000 # ZITADEL_EVENTSTORE_AUTOVACUUM_VACUUMTHRESHOLD
+    # Number of changed rows that triggers an autoanalyze run, regardless of table size.
+    # Must be greater than 10000.
+    AnalyzeThreshold: 50000 # ZITADEL_EVENTSTORE_AUTOVACUUM_ANALYZETHRESHOLD
 
 HTTPClient:
   # Sets the limit of the response body size in bytes, which will be processed by the HTTP client.
@@ -1440,6 +1458,7 @@ DefaultInstance:
       BaseURI: # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI
     PermissionCheckV2: # ZITADEL_DEFAULTINSTANCE_FEATURES_PERMISSIONCHECKV2
     ConsoleUseV2UserApi: true # ZITADEL_DEFAULTINSTANCE_FEATURES_CONSOLEUSEV2USERAPI
+    EnableRelationalTables: # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLERELATIONALTABLES
 
   Limits:
     # AuditLogRetention limits the number of events that can be queried via the events API by their age.
@@ -1668,6 +1687,13 @@ InternalAuthZ:
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
+        - "group.user.write"
+        - "group.user.read"
+        - "group.user.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -1704,6 +1730,8 @@ InternalAuthZ:
         - "action.execution.read"
         - "userschema.read"
         - "session.read"
+        - "group.read"
+        - "group.user.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"
@@ -1763,6 +1791,13 @@ InternalAuthZ:
         - "project.grant.member.delete"
         - "session.read"
         - "session.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
+        - "group.user.write"
+        - "group.user.read"
+        - "group.user.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -1791,6 +1826,8 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "session.read"
         - "session.delete"
+        - "group.read"
+        - "group.user.read"
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
         - "admin.impersonation"
@@ -1855,6 +1892,13 @@ InternalAuthZ:
         - "project.grant.member.delete"
         - "session.read"
         - "session.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
+        - "group.user.write"
+        - "group.user.read"
+        - "group.user.delete"
     - Role: "IAM_LOGIN_CLIENT"
       Permissions:
         - "iam.read"
@@ -1893,6 +1937,8 @@ InternalAuthZ:
         - "session.link"
         - "session.delete"
         - "userschema.read"
+        - "group.read"
+        - "group.user.read"
     - Role: "ORG_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -1912,6 +1958,8 @@ InternalAuthZ:
         - "project.role.read"
         - "session.read"
         - "session.delete"
+        - "group.read"
+        - "group.user.read"
     - Role: "ORG_OWNER_VIEWER"
       Permissions:
         - "org.read"
@@ -1933,6 +1981,8 @@ InternalAuthZ:
         - "project.grant.read"
         - "project.grant.member.read"
         - "project.grant.user.grant.read"
+        - "group.read"
+        - "group.user.read"
     - Role: "ORG_SETTINGS_MANAGER"
       Permissions:
         - "org.read"
@@ -1963,6 +2013,8 @@ InternalAuthZ:
         - "project.app.read"
         - "project.grant.read"
         - "project.grant.member.read"
+        - "group.read"
+        - "group.user.read"
     - Role: "ORG_PROJECT_PERMISSION_EDITOR"
       Permissions:
         - "org.read"
@@ -2228,6 +2280,13 @@ SystemAuthZ:
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
+        - "group.user.write"
+        - "group.user.read"
+        - "group.user.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -2264,6 +2323,8 @@ SystemAuthZ:
         - "action.execution.read"
         - "userschema.read"
         - "session.read"
+        - "group.read"
+        - "group.user.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"
@@ -2323,6 +2384,13 @@ SystemAuthZ:
         - "project.grant.member.delete"
         - "session.read"
         - "session.delete"
+        - "group.create"
+        - "group.write"
+        - "group.read"
+        - "group.delete"
+        - "group.user.write"
+        - "group.user.read"
+        - "group.user.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -2351,6 +2419,8 @@ SystemAuthZ:
         - "project.grant.member.read"
         - "session.read"
         - "session.delete"
+        - "group.read"
+        - "group.user.read"
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
         - "admin.impersonation"
@@ -2396,6 +2466,8 @@ SystemAuthZ:
         - "session.link"
         - "session.delete"
         - "userschema.read"
+        - "group.read"
+        - "group.user.read"
 
 # If a new projection is introduced it will be prefilled during the setup process (if enabled)
 # This can prevent serving outdated data after a version upgrade, but might require a longer setup / upgrade process:

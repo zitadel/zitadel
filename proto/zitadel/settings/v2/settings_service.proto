@@ -19,6 +19,9 @@ import "google/protobuf/struct.proto";
 import "zitadel/settings/v2/settings.proto";
 import "google/protobuf/timestamp.proto";
 import "zitadel/filter/v2/filter.proto";
+import "zitadel/settings/v2/organization_settings.proto";
+import "zitadel/settings/v2/link_settings.proto";
+import "zitadel/settings/v2/effective_settings.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
 
@@ -328,7 +331,11 @@ service SettingsService {
   //
   // Required permissions:
   //   - `policy.read`
+  //
+  // Deprecated: use GetLinkSettings instead
   rpc GetLegalAndSupportSettings (GetLegalAndSupportSettingsRequest) returns (GetLegalAndSupportSettingsResponse) {
+    option deprecated = true;
+
     option (google.api.http) = {
       get: "/v2/settings/legal_support"
     };
@@ -340,6 +347,7 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true,
       responses: {
         key: "200"
         value: {
@@ -418,6 +426,99 @@ service SettingsService {
     };
   }
 
+  // Set Organization Settings
+  //
+  // Sets the settings specific to an organization.
+  // Organization scopes usernames defines that the usernames have to be unique in the organization scope,
+  // can only be changed if the usernames of the users are unique in the scope.
+  //
+  // Required permissions:
+  //   - `iam.policy.write`
+  rpc SetOrganizationSettings(SetOrganizationSettingsRequest) returns (SetOrganizationSettingsResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The translations was successfully set.";
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      post: "/v2/settings/organization";
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Delete Organization Settings
+  //
+  // Delete the settings specific to an organization.
+  //
+  // Required permissions:
+  //   - `iam.policy.delete`
+  rpc DeleteOrganizationSettings(DeleteOrganizationSettingsRequest) returns (DeleteOrganizationSettingsResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The translations was successfully set.";
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      delete: "/v2/settings/organization";
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // List Organization Settings
+  //
+  // Returns a list of organization settings.
+  //
+  // Required permission:
+  //   - `iam.policy.read`
+  //   - `org.policy.read`
+  rpc ListOrganizationSettings(ListOrganizationSettingsRequest) returns (ListOrganizationSettingsResponse) {
+    option (google.api.http) = {
+      post: "/v2/settings/organization/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all project grants matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+        };
+      };
+    };
+  }
+
   // Get Hosted Login Translation
   //
   // Returns the translations in the requested locale for the hosted login.
@@ -477,6 +578,63 @@ service SettingsService {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "iam.policy.write"
+      }
+    };
+  }
+
+  // Get Link settings
+  //
+  // Returns the effective links for the requested scope.
+  // Source is tracked for the list as a whole — the entire list
+  // is either inherited or overridden, never partially merged.
+  rpc GetLinkSettings(GetLinkSettingsRequest) returns (GetLinkSettingsResponse){
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.read"
+      }
+    };
+  }
+
+  // Set Link settings
+  //
+  // Replaces the entire link list at the requested scope.
+  // This is a full replacement, not a merge — omitted links are removed.
+  //
+  // To add a link, include the full list with the new link appended.
+  // To remove a link, include the full list without it.
+  rpc SetLinkSettings(SetLinkSettingsRequest) returns (SetLinkSettingsResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.write"
+      }
+    };
+  }
+
+  // Reset link settings
+  //
+  // Removes all link overrides at the requested scope.
+  // The scope falls back to its parent's values.
+  //
+  // Unlike other settings, there is no per-field reset — links are
+  // managed as a list, so reset always clears the entire list.
+  rpc ResetLinkSettings(ResetLinkSettingsRequest) returns (ResetLinkSettingsResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.write"
+      }
+    };
+  }
+
+  // Get effective settings
+  //
+  // Gets all settings which are requested in the request.
+  // The settings values are resolved using the hierarchical model.
+  // Only the resolved settings are returned, without the source
+  // which describes from which hierarchical level they came.
+  rpc GetEffectiveSettings(GetEffectiveSettingsRequest) returns (GetEffectiveSettingsResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.read"
       }
     };
   }
@@ -547,6 +705,7 @@ message GetDomainSettingsResponse {
   zitadel.settings.v2.DomainSettings settings = 2;
 }
 
+// Deprecated: use GetLinkSettings instead
 message GetLegalAndSupportSettingsRequest {
   // Specify the context for which the legal and support settings should be returned.
   // This can be the instance or an organization.
@@ -555,6 +714,7 @@ message GetLegalAndSupportSettingsRequest {
   zitadel.object.v2.RequestContext ctx = 1;
 }
 
+// Deprecated: use GetLinkSettings instead
 message GetLegalAndSupportSettingsResponse {
   zitadel.object.v2.Details details = 1;
   zitadel.settings.v2.LegalAndSupportSettings settings = 2;
@@ -650,6 +810,64 @@ message SetSecuritySettingsRequest{
 
 message SetSecuritySettingsResponse{
   zitadel.object.v2.Details details = 1;
+}
+
+
+message SetOrganizationSettingsRequest {
+  // Organization ID in which this settings are set.
+  string organization_id = 1;
+
+  // Force the usernames in the organization to be unique,
+  // only possible to set if the existing users already have unique usernames in the organization context.
+  optional bool organization_scoped_usernames = 2;
+}
+
+message SetOrganizationSettingsResponse {
+  // The timestamp of the set of the organization settings.
+  google.protobuf.Timestamp set_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message DeleteOrganizationSettingsRequest {
+  // Organization ID in which this settings are set.
+  string organization_id = 1;
+}
+
+message DeleteOrganizationSettingsResponse {
+  // The timestamp of the deletion of the organization settings.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message ListOrganizationSettingsRequest{
+  // List limitations and ordering.
+  optional zitadel.filter.v2.PaginationRequest pagination = 1;
+
+  // The field the result is sorted by. The default is the creation date.
+  // Beware that if you change this, your result pagination might be inconsistent.
+  optional OrganizationSettingsFieldName sorting_column = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"ORGANIZATION_SETTINGS_FIELD_NAME_CREATION_DATE\""
+    }
+  ];
+
+  // Define the criteria to query for.
+  repeated OrganizationSettingsSearchFilter filters = 4;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"pagination\":{\"offset\":0,\"limit\":0,\"asc\":true},\"sortingColumn\":\"ORGANIZATION_SETTINGS_FIELD_NAME_CREATION_DATE\",\"filters\":[{\"inOrganizationIdsFilter\":{\"ids\":[\"28746028909593987\"]}}]}";
+  };
+}
+
+message ListOrganizationSettingsResponse {
+  zitadel.filter.v2.PaginationResponse pagination = 1;
+  repeated OrganizationSettings organization_settings = 2;
 }
 
 message GetHostedLoginTranslationRequest {

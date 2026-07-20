@@ -282,6 +282,8 @@ Errors:
     LabelPolicy:
       NotFound: "Etichettatura privata non trovata"
       NotChanged: "Private Labelling non è stata cambiata"
+    IDPConfig:
+      NotExisting: "La configurazione del IDP non esiste"
   Project:
     ProjectIDMissing: "ID del progetto mancante"
     AlreadyExists: "Il progetto è già stato creato nell'organizzazione"
@@ -324,7 +326,6 @@ Errors:
       APIAuthMethodNoSecret: "Il metodo di autorizzazione API scelto non richiede un segreto"
       AuthMethodNoPrivateKeyJWT: "Il metodo di autorizzazione scelto non richiede una chiave"
       ClientSecretInvalid: "Il segreto del cliente non è valido"
-      ClientSecretNotSet: "Le secret client n'est pas défini"
       Key:
         AlreadyExisting: "Chiave di applicazione già esistente"
         NotFound: "Chiave di applicazione non trovata"

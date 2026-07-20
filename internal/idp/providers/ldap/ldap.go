@@ -245,6 +245,7 @@ func (p *Provider) IsAutoUpdate() bool {
 	return p.isAutoUpdate
 }
 
+// Do not remove, used in [Session.FetchUser] @ fetch_user.go
 func (p *Provider) getNecessaryAttributes() []string {
 	attributes := []string{p.userBase}
 	if p.idAttribute != "" {

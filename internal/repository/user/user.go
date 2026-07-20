@@ -26,9 +26,9 @@ const (
 	UserUserNameChangedType   = userEventTypePrefix + "username.changed"
 )
 
-func NewAddUsernameUniqueConstraint(userName, resourceOwner string, userLoginMustBeDomain bool) *eventstore.UniqueConstraint {
+func NewAddUsernameUniqueConstraint(userName, resourceOwner string, orgScopedUsername bool) *eventstore.UniqueConstraint {
 	uniqueUserName := userName
-	if userLoginMustBeDomain {
+	if orgScopedUsername {
 		uniqueUserName = userName + resourceOwner
 	}
 	return eventstore.NewAddEventUniqueConstraint(
@@ -37,14 +37,26 @@ func NewAddUsernameUniqueConstraint(userName, resourceOwner string, userLoginMus
 		"Errors.User.AlreadyExists")
 }
 
-func NewRemoveUsernameUniqueConstraint(userName, resourceOwner string, userLoginMustBeDomain bool) *eventstore.UniqueConstraint {
+func NewRemoveUsernameUniqueConstraint(userName, resourceOwner string, orgScopedUsername bool) *eventstore.UniqueConstraint {
 	uniqueUserName := userName
-	if userLoginMustBeDomain {
+	if orgScopedUsername {
 		uniqueUserName = userName + resourceOwner
 	}
 	return eventstore.NewRemoveUniqueConstraint(
 		UniqueUsername,
 		uniqueUserName)
+}
+
+func NewUsernameUniqueConstraints(usernameChanges []string, resourceOwner string, orgScopedUsername, oldOrgScopedUsername bool) []*eventstore.UniqueConstraint {
+	if len(usernameChanges) == 0 || oldOrgScopedUsername == orgScopedUsername {
+		return []*eventstore.UniqueConstraint{}
+	}
+	changes := make([]*eventstore.UniqueConstraint, len(usernameChanges)*2)
+	for i, username := range usernameChanges {
+		changes[i*2] = NewRemoveUsernameUniqueConstraint(username, resourceOwner, oldOrgScopedUsername)
+		changes[i*2+1] = NewAddUsernameUniqueConstraint(username, resourceOwner, orgScopedUsername)
+	}
+	return changes
 }
 
 type UserLockedEvent struct {
@@ -164,7 +176,7 @@ type UserRemovedEvent struct {
 
 	userName          string
 	externalIDPs      []*domain.UserIDPLink
-	loginMustBeDomain bool
+	orgScopedUsername bool
 }
 
 func (e *UserRemovedEvent) Payload() interface{} {
@@ -174,7 +186,7 @@ func (e *UserRemovedEvent) Payload() interface{} {
 func (e *UserRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	events := make([]*eventstore.UniqueConstraint, 0)
 	if e.userName != "" {
-		events = append(events, NewRemoveUsernameUniqueConstraint(e.userName, e.Aggregate().ResourceOwner, e.loginMustBeDomain))
+		events = append(events, NewRemoveUsernameUniqueConstraint(e.userName, e.Aggregate().ResourceOwner, e.orgScopedUsername))
 	}
 	for _, idp := range e.externalIDPs {
 		events = append(events, NewRemoveUserIDPLinkUniqueConstraint(idp.IDPConfigID, idp.ExternalUserID))
@@ -187,7 +199,7 @@ func NewUserRemovedEvent(
 	aggregate *eventstore.Aggregate,
 	userName string,
 	externalIDPs []*domain.UserIDPLink,
-	userLoginMustBeDomain bool,
+	orgScopedUsername bool,
 ) *UserRemovedEvent {
 	return &UserRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -197,7 +209,7 @@ func NewUserRemovedEvent(
 		),
 		userName:          userName,
 		externalIDPs:      externalIDPs,
-		loginMustBeDomain: userLoginMustBeDomain,
+		orgScopedUsername: orgScopedUsername,
 	}
 }
 
@@ -359,11 +371,11 @@ func UserTokenRemovedEventMapper(event eventstore.Event) (eventstore.Event, erro
 type DomainClaimedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserName              string `json:"userName"`
-	URLTemplate           string `json:"urlTemplate,omitempty"`
-	TriggeredAtOrigin     string `json:"triggerOrigin,omitempty"`
-	oldUserName           string
-	userLoginMustBeDomain bool
+	UserName          string `json:"userName"`
+	URLTemplate       string `json:"urlTemplate,omitempty"`
+	TriggeredAtOrigin string `json:"triggerOrigin,omitempty"`
+	oldUserName       string
+	orgScopedUsername bool
 }
 
 func (e *DomainClaimedEvent) Payload() interface{} {
@@ -372,8 +384,8 @@ func (e *DomainClaimedEvent) Payload() interface{} {
 
 func (e *DomainClaimedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{
-		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
-		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
+		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, e.orgScopedUsername),
+		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.orgScopedUsername),
 	}
 }
 
@@ -386,7 +398,7 @@ func NewDomainClaimedEvent(
 	aggregate *eventstore.Aggregate,
 	userName,
 	oldUserName string,
-	userLoginMustBeDomain bool,
+	orgScopedUsername bool,
 	urlTemplate string,
 ) *DomainClaimedEvent {
 	return &DomainClaimedEvent{
@@ -395,11 +407,11 @@ func NewDomainClaimedEvent(
 			aggregate,
 			UserDomainClaimedType,
 		),
-		UserName:              userName,
+		UserName:          userName,
 		URLTemplate:       urlTemplate,
-		oldUserName:           oldUserName,
-		userLoginMustBeDomain: userLoginMustBeDomain,
-		TriggeredAtOrigin:     http.DomainContext(ctx).Origin(),
+		oldUserName:       oldUserName,
+		orgScopedUsername: orgScopedUsername,
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }
 
@@ -449,10 +461,11 @@ func DomainClaimedSentEventMapper(event eventstore.Event) (eventstore.Event, err
 type UsernameChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserName                 string `json:"userName"`
-	oldUserName              string
-	userLoginMustBeDomain    bool
-	oldUserLoginMustBeDomain bool
+	UserName                    string `json:"userName"`
+	oldUserName                 string
+	userLoginMustBeDomain       bool
+	oldUserLoginMustBeDomain    bool
+	organizationScopedUsernames bool
 }
 
 func (e *UsernameChangedEvent) Payload() interface{} {
@@ -460,9 +473,20 @@ func (e *UsernameChangedEvent) Payload() interface{} {
 }
 
 func (e *UsernameChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	newSetting := e.userLoginMustBeDomain || e.organizationScopedUsernames
+	oldSetting := e.oldUserLoginMustBeDomain || e.organizationScopedUsernames
+
+	// changes only necessary if username changed or setting for usernames changed
+	// if user login must be domain is set, there is a possibility that the username changes
+	// organization scoped usernames are included here so that the unique constraint only gets changed if necessary
+	if e.oldUserName == e.UserName &&
+		newSetting == oldSetting {
+		return []*eventstore.UniqueConstraint{}
+	}
+
 	return []*eventstore.UniqueConstraint{
-		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, e.oldUserLoginMustBeDomain),
-		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
+		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, oldSetting),
+		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, newSetting),
 	}
 }
 
@@ -472,6 +496,7 @@ func NewUsernameChangedEvent(
 	oldUserName,
 	newUserName string,
 	userLoginMustBeDomain bool,
+	organizationScopedUsernames bool,
 	opts ...UsernameChangedEventOption,
 ) *UsernameChangedEvent {
 	event := &UsernameChangedEvent{
@@ -480,10 +505,11 @@ func NewUsernameChangedEvent(
 			aggregate,
 			UserUserNameChangedType,
 		),
-		UserName:                 newUserName,
-		oldUserName:              oldUserName,
-		userLoginMustBeDomain:    userLoginMustBeDomain,
-		oldUserLoginMustBeDomain: userLoginMustBeDomain,
+		UserName:                    newUserName,
+		oldUserName:                 oldUserName,
+		userLoginMustBeDomain:       userLoginMustBeDomain,
+		oldUserLoginMustBeDomain:    userLoginMustBeDomain,
+		organizationScopedUsernames: organizationScopedUsernames,
 	}
 	for _, opt := range opts {
 		opt(event)
@@ -495,9 +521,9 @@ type UsernameChangedEventOption func(*UsernameChangedEvent)
 
 // UsernameChangedEventWithPolicyChange signals that the change occurs because of / during a domain policy change
 // (will ensure the unique constraint change is handled correctly)
-func UsernameChangedEventWithPolicyChange() UsernameChangedEventOption {
+func UsernameChangedEventWithPolicyChange(oldUserLoginMustBeDomain bool) UsernameChangedEventOption {
 	return func(e *UsernameChangedEvent) {
-		e.oldUserLoginMustBeDomain = !e.userLoginMustBeDomain
+		e.oldUserLoginMustBeDomain = oldUserLoginMustBeDomain
 	}
 }
 

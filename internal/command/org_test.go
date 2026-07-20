@@ -1267,6 +1267,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(),
 					expectFilter(),
 					expectFilter(),
@@ -1309,6 +1310,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(),
 					expectFilter(),
 					expectFilter(),
@@ -1349,6 +1351,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1439,6 +1442,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 						),
 					),
 					expectFilter(),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(),
 					expectFilter(),
 					expectFilter(),
@@ -1620,6 +1624,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(), // org member check
 					expectFilter(
 						eventFromEventPusher(
@@ -1987,6 +1992,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(),
 					expectFilter(),
 					expectFilter(), // org member check
@@ -2101,7 +2107,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 			name: "no permission, error",
 			fields: fields{
 				eventstore:   expectEventstore(),
-				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "orgID"),
+				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id"),
 				newCode:      mockEncryptedCode("userinit", time.Hour),
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},

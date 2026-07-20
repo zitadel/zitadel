@@ -332,6 +332,10 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 			ExternalSecure: config.ExternalSecure,
 			defaults:       config.SystemDefaults,
 		},
+		&TransactionalTables{
+			dbClient:             dbClient,
+			ShouldRecreateSchema: steps.RelationalTables.ShouldRecreateSchema,
+		},
 		&projectionTables{
 			es:      eventstoreClient,
 			Version: build.Version(),
@@ -349,6 +353,12 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		},
 		&RiverMigrateRepeatable{
 			client: dbClient,
+		},
+		&eventstoreAutovacuum{
+			dbClient:         dbClient,
+			Enabled:          config.Eventstore.Autovacuum.Enabled,
+			VacuumThreshold:  config.Eventstore.Autovacuum.VacuumThreshold,
+			AnalyzeThreshold: config.Eventstore.Autovacuum.AnalyzeThreshold,
 		},
 	}
 	repeatableSteps = append(repeatableSteps, triggerSteps(dbClient)...)

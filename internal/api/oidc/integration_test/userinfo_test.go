@@ -30,6 +30,13 @@ func TestServer_UserInfo(t *testing.T) {
 	clientID, projectID := createClient(t, Instance)
 	addProjectRolesGrants(t, User.GetUserId(), projectID, roleFoo, roleBar)
 
+	// create user groups
+	group1 := Instance.CreateGroup(CTXIAM, t, Instance.DefaultOrg.GetId(), "group1")
+	group2 := Instance.CreateGroup(CTXIAM, t, Instance.DefaultOrg.GetId(), "group2")
+	// add the user to groups
+	Instance.AddUsersToGroup(CTXIAM, t, group1.GetId(), []string{User.GetUserId()})
+	Instance.AddUsersToGroup(CTXIAM, t, group2.GetId(), []string{User.GetUserId()})
+
 	tests := []struct {
 		name       string
 		prepare    func(t *testing.T, clientID string, scope []string) *oidc.Tokens[*oidc.IDTokenClaims]
@@ -151,6 +158,39 @@ func TestServer_UserInfo(t *testing.T) {
 					assert.Equal(t, user.ID, ui.Subject)
 					assert.NotEmpty(t, ui.Claims[oidc_api.ClaimResourceOwnerName])
 					assert.NotEmpty(t, ui.Claims[oidc_api.ClaimResourceOwnerPrimaryDomain])
+				},
+			},
+		},
+		{
+			name:    "custom group scope",
+			prepare: getTokens,
+			scope: []string{oidc.ScopeProfile, oidc.ScopeOpenID, oidc.ScopeEmail, oidc.ScopeOfflineAccess,
+				oidc_api.ScopeCustomUserGroups},
+			assertions: []func(*testing.T, *oidc.UserInfo){
+				assertUserinfo,
+				func(t *testing.T, info *oidc.UserInfo) {
+					expectedUserGroups := []map[string]interface{}{
+						{"id": group1.GetId(), "name": "group1"},
+						{"id": group2.GetId(), "name": "group2"},
+					}
+					userGroupsClaim := info.Claims[oidc_api.ClaimCustomUserGroups]
+					require.Len(t, userGroupsClaim, len(expectedUserGroups))
+					assert.ElementsMatch(t, expectedUserGroups, userGroupsClaim)
+				},
+			},
+		},
+		{
+			name:    "group scope",
+			prepare: getTokens,
+			scope: []string{oidc.ScopeProfile, oidc.ScopeOpenID, oidc.ScopeEmail, oidc.ScopeOfflineAccess,
+				oidc_api.ScopeUserGroups},
+			assertions: []func(*testing.T, *oidc.UserInfo){
+				assertUserinfo,
+				func(t *testing.T, info *oidc.UserInfo) {
+					expectedUserGroups := []string{"group1", "group2"}
+					userGroupsClaim := info.Claims[oidc_api.ClaimUserGroups]
+					require.Len(t, userGroupsClaim, len(expectedUserGroups))
+					assert.ElementsMatch(t, expectedUserGroups, userGroupsClaim)
 				},
 			},
 		},

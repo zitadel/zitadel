@@ -1,0 +1,162 @@
+package domain
+
+import (
+	"context"
+	"time"
+
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/internal/zerrors"
+)
+
+type Session struct {
+	InstanceID string             `json:"instanceId,omitempty" db:"instance_id"`
+	ID         string             `json:"id,omitempty" db:"id"`
+	TokenID    string             `json:"tokenId,omitempty" db:"token_id"`
+	Lifetime   time.Duration      `json:"lifetime,omitempty" db:"lifetime"`
+	Expiration time.Time          `json:"expiration,omitzero" db:"expiration"`
+	UserID     string             `json:"userId,omitempty" db:"user_id"`
+	CreatorID  string             `json:"creatorId,omitempty" db:"creator_id"`
+	CreatedAt  time.Time          `json:"createdAt,omitzero" db:"created_at"`
+	UpdatedAt  time.Time          `json:"updatedAt,omitzero" db:"updated_at"`
+	Factors    SessionFactors     `json:"factors,omitempty"`
+	Challenges SessionChallenges  `json:"challenges,omitempty"`
+	Metadata   []*SessionMetadata `json:"metadata,omitempty"`
+	UserAgent  *SessionUserAgent  `json:"userAgent,omitempty"`
+
+	UserOrganizationID     *string `json:"organizationId,omitempty" db:"organization_id"`
+	UserDisplayName        *string `json:"display_name" db:"display_name"`
+	UserPreferredLoginName string
+}
+
+//go:generate mockgen -typed -package domainmock -destination ./mock/session.mock.go . SessionRepository
+
+type SessionRepository interface {
+	Repository
+
+	sessionColumns
+	sessionConditions
+	sessionChanges
+
+	// Get returns a session based on the given condition.
+	Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*Session, error)
+	// List returns a list of sessions based on the given condition.
+	List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*Session, error)
+	// Create creates a new session.
+	Create(ctx context.Context, client database.QueryExecutor, user *Session) error
+	// Update one or more existing sessions.
+	// The condition must include at least the instanceID of the session to update.
+	Update(ctx context.Context, client database.QueryExecutor, condition database.Condition, changes ...database.Change) (int64, error)
+	// Delete removes sessions based on the given condition.
+	// An additional permission condition can be provided to check if the session can be deleted, for example by checking the token id or user id.
+	// The primary condition is used to select the session(s) to be deleted, while the permission condition can be used to verify that the session(s) meet certain criteria before deletion
+	// respectively to return an error if the criteria are not met. In case no session matches the primary condition and a permission condition is provided,
+	// the method will return a permission denied error, as the session(s) that should be deleted do not meet the criteria defined in the permission condition.
+	// The method returns the number of deleted rows / session(s) and the latest deletion timestamp of the deleted session in case of a single deleted session.
+	// In case the session was previously deleted, the method returns 0 and the previous deletion timestamp.
+	// If multiple sessions are deleted, the method returns the number of deleted sessions and no timestamp, as it cannot be determined which session's deletion timestamp to return.
+	Delete(ctx context.Context, client database.QueryExecutor, condition database.Condition, permissionCondition database.Condition) (int64, time.Time, error)
+	// LoadUserData loads user data associated to the given session.
+	// If called, the [Session.UserOrganizationID], [Session.UserDisplayName] and [Session.UserPreferredLoginName] fields will be populated on future calls to [SessionRepository.Get] or [SessionRepository.List].
+	LoadUserData() SessionRepository
+}
+
+// sessionColumns define all the columns of the session table.
+type sessionColumns interface {
+	// InstanceIDColumn returns the column for the instance id field.
+	InstanceIDColumn() database.Column
+	// IDColumn returns the column for the id field.
+	IDColumn() database.Column
+	// TokenIDColumn returns the column for the token id field.
+	TokenIDColumn() database.Column
+	// LifetimeColumn returns the column for the lifetime field.
+	LifetimeColumn() database.Column
+	// ExpirationColumn returns the column for the expiration field.
+	ExpirationColumn() database.Column
+	// UserIDColumn returns the column for the user id field.
+	UserIDColumn() database.Column
+	// CreatedAtColumn returns the column for the created at field.
+	CreatedAtColumn() database.Column
+	// UpdatedAtColumn returns the column for the updated at field.
+	UpdatedAtColumn() database.Column
+}
+
+// sessionConditions define all the conditions for the session table.
+type sessionConditions interface {
+	// PrimaryKeyCondition returns a filter on the primary key fields.
+	PrimaryKeyCondition(instanceID, sessionID string) database.Condition
+	// InstanceIDCondition returns an equal filter on the instance id field.
+	InstanceIDCondition(instanceID string) database.Condition
+	// IDCondition returns an equal filter on the id field.
+	IDCondition(sessionID string) database.Condition
+	// UserAgentIDCondition returns an equal filter on the user agent ID field.
+	UserAgentIDCondition(userAgentID string) database.Condition
+	// UserIDCondition returns an equal filter on the user id field.
+	UserIDCondition(userID string) database.Condition
+	// TokenIDCondition returns an equal filter on the token id field.
+	TokenIDCondition(tokenID string) database.Condition
+	// CreatorIDCondition returns an equal filter on the creator id field.
+	CreatorIDCondition(creatorID string) database.Condition
+	// ExpirationCondition returns a filter on the expiration field.
+	ExpirationCondition(op database.NumberOperation, expiration time.Time) database.Condition
+	// CreatedAtCondition returns a filter on the created at field.
+	CreatedAtCondition(op database.NumberOperation, createdAt time.Time) database.Condition
+	// UpdatedAtCondition returns a filter on the updated at field.
+	UpdatedAtCondition(op database.NumberOperation, updatedAt time.Time) database.Condition
+	// ExistsFactor returns a filter on the session's factors.
+	ExistsFactor(condition database.Condition) database.Condition
+	// FactorConditions returns the conditions for the factors fields.
+	FactorConditions() SessionFactorConditions
+	// ExistsMetadata returns a filter on the session's metadata.
+	ExistsMetadata(condition database.Condition) database.Condition
+	// MetadataConditions returns the conditions for the metadata fields.
+	MetadataConditions() SessionMetadataConditions
+}
+
+type sessionChanges interface {
+	// SetUpdatedAt sets the updated at column.
+	// Only use this when reducing events,
+	// during regular updates the DB sets this column automatically.
+	SetUpdatedAt(updatedAt time.Time) database.Change
+	// SetToken sets the token id field of the session.
+	SetToken(token string) database.Change
+	// SetLifetime sets the lifetime field of the session and will update the computed expiration field.
+	SetLifetime(lifetime time.Duration) database.Change
+
+	// SetChallenge adds or updates the challenge of the corresponding type.
+	SetChallenge(challenge SessionChallenge) database.Change
+	// SetFactor adds or updates the factor of the corresponding type.
+	SetFactor(factor SessionFactor) database.Change
+	// ClearFactor resets the factor's verification.
+	ClearFactor(factor SessionFactorType) database.Change
+	// SetMetadata adds or updates the metadata of the session.
+	SetMetadata(metadata []*SessionMetadata) database.Change
+}
+
+var (
+	// SlugSessionNotFound is a slug used whenever a session is not found by the requested id.
+	SlugSessionNotFound = NewSlug("session", "not_found")
+
+	// SlugSessionUserChange is a slug used when trying to change the user of an already authenticated session, which is not allowed.
+	SlugSessionUserChange = NewSlug("session", "user_change")
+
+	// SlugSessionTokenInvalid is a slug used when the provided session token is invalid, either because it is malformed, expired or does not match the session.
+	SlugSessionTokenInvalid = NewSlug("session", "token_invalid")
+)
+
+var (
+	// ErrSessionNotFound is an error that can be returned when a session with the requested id was not found.
+	ErrSessionNotFound = func(err error, id string) error {
+		return zerrors.CreateZitadelError(zerrors.KindNotFound, err, string(SlugSessionNotFound), "session was not found", 1).
+			WithDetails(zerrors.ErrorDetailsMap{"id": id})
+	}
+
+	// ErrSessionUserChange is an error that can be returned when trying to change the user of an already authenticated session, which is not allowed.
+	ErrSessionUserChange = func() error {
+		return zerrors.CreateZitadelError(zerrors.KindInvalidArgument, nil, string(SlugSessionUserChange), "session was already authenticated with another user, you cannot change it to a different one", 1)
+	}
+
+	// ErrSessionTokenInvalid is an error that can be returned whenever the provided (session) token is invalid for the intended session.
+	ErrSessionTokenInvalid = func(err error) error {
+		return zerrors.CreateZitadelError(zerrors.KindPermissionDenied, err, string(SlugSessionTokenInvalid), "The provided session token is invalid: either the token is malformed, expired or does not match the session", 1)
+	}
+)

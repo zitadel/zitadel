@@ -4,7 +4,6 @@ package instance_test
 
 import (
 	"context"
-	"slices"
 	"testing"
 	"time"
 
@@ -14,6 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
@@ -28,7 +28,7 @@ func TestGetInstance(t *testing.T) {
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
 	inst := integration.NewInstance(ctxWithSysAuthZ)
-	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+	orgOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
 
 	t.Cleanup(func() {
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
@@ -86,26 +86,24 @@ func TestListInstances(t *testing.T) {
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
 
-	instances := make([]*integration.Instance, 2)
+	instances := make([]*integration.Instance, 5)
 	inst := integration.NewInstance(ctxWithSysAuthZ)
 	inst2 := integration.NewInstance(ctxWithSysAuthZ)
-	instances[0], instances[1] = inst, inst2
+	inst3 := integration.NewInstance(ctxWithSysAuthZ)
+	inst4 := integration.NewInstance(ctxWithSysAuthZ)
+	inst5 := integration.NewInstance(ctxWithSysAuthZ)
+	instances[0], instances[1], instances[2], instances[3], instances[4] = inst, inst2, inst3, inst4, inst5
 
 	t.Cleanup(func() {
+		inst.Client.FeatureV2.ResetInstanceFeatures(ctxWithSysAuthZ, &feature.ResetInstanceFeaturesRequest{})
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
-		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst2.ID()})
+		inst2.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst2.ID()})
+		inst3.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst3.ID()})
+		inst4.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst4.ID()})
+		inst5.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst5.ID()})
 	})
 
-	// Sort in descending order
-	slices.SortFunc(instances, func(i1, i2 *integration.Instance) int {
-		res := i1.Instance.Details.CreationDate.AsTime().Compare(i2.Instance.Details.CreationDate.AsTime())
-		if res == 0 {
-			return res
-		}
-		return -res
-	})
-
-	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+	orgOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
 
 	tt := []struct {
 		testName          string
@@ -136,20 +134,27 @@ func TestListInstances(t *testing.T) {
 		{
 			testName: "when valid request with filter should return paginated response",
 			inputRequest: &instance.ListInstancesRequest{
-				Pagination:    &filter.PaginationRequest{Offset: 0, Limit: 10},
+				Pagination:    &filter.PaginationRequest{Offset: 1, Limit: 3},
 				SortingColumn: instance.FieldName_FIELD_NAME_CREATION_DATE.Enum(),
 				Queries: []*instance.Query{
 					{
 						Query: &instance.Query_IdQuery{
 							IdQuery: &instance.IdsQuery{
-								Ids: []string{inst.ID(), inst2.ID()},
+								Ids: []string{inst.ID(), inst2.ID(), inst3.ID(), inst4.ID(), inst5.ID()},
+							},
+						},
+					},
+					{
+						Query: &instance.Query_DomainQuery{
+							DomainQuery: &instance.DomainsQuery{
+								Domains: []string{inst4.Domain, inst3.Domain, inst2.Domain, inst.Domain},
 							},
 						},
 					},
 				},
 			},
 			inputContext:      ctxWithSysAuthZ,
-			expectedInstances: []string{inst2.ID(), inst.ID()},
+			expectedInstances: []string{inst3.ID(), inst2.ID(), inst.ID()},
 		},
 	}
 
@@ -183,11 +188,10 @@ func TestListCustomDomains(t *testing.T) {
 	defer cancel()
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
-	inst := integration.NewInstance(ctxWithSysAuthZ)
 
+	inst := integration.NewInstance(ctxWithSysAuthZ)
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
 	d1, d2 := "custom."+integration.DomainName(), "custom."+integration.DomainName()
-
 	_, err := inst.Client.InstanceV2Beta.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{InstanceId: inst.ID(), Domain: d1})
 	require.Nil(t, err)
 	_, err = inst.Client.InstanceV2Beta.AddCustomDomain(ctxWithSysAuthZ, &instance.AddCustomDomainRequest{InstanceId: inst.ID(), Domain: d2})
@@ -198,6 +202,8 @@ func TestListCustomDomains(t *testing.T) {
 		inst.Client.InstanceV2Beta.RemoveCustomDomain(ctxWithSysAuthZ, &instance.RemoveCustomDomainRequest{InstanceId: inst.ID(), Domain: d2})
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
+
+	expectedDomains := []string{d1, d2}
 
 	tt := []struct {
 		testName          string
@@ -215,7 +221,8 @@ func TestListCustomDomains(t *testing.T) {
 			},
 			inputContext:      context.Background(),
 			expectedErrorCode: codes.Unauthenticated,
-			expectedErrorMsg:  "auth header missing"},
+			expectedErrorMsg:  "auth header missing",
+		},
 		{
 			testName: "when unauthZ context should return unauthZ error",
 			inputRequest: &instance.ListCustomDomainsRequest{
@@ -249,7 +256,7 @@ func TestListCustomDomains(t *testing.T) {
 				},
 			},
 			inputContext:    ctxWithSysAuthZ,
-			expectedDomains: []string{d1, d2},
+			expectedDomains: expectedDomains,
 		},
 	}
 
@@ -285,11 +292,10 @@ func TestListTrustedDomains(t *testing.T) {
 	defer cancel()
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
-	inst := integration.NewInstance(ctxWithSysAuthZ)
 
+	inst := integration.NewInstance(ctxWithSysAuthZ)
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
 	d1, d2 := "trusted."+integration.DomainName(), "trusted."+integration.DomainName()
-
 	_, err := inst.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: inst.ID(), Domain: d1})
 	require.Nil(t, err)
 	_, err = inst.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: inst.ID(), Domain: d2})
@@ -300,6 +306,8 @@ func TestListTrustedDomains(t *testing.T) {
 		inst.Client.InstanceV2Beta.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{InstanceId: inst.ID(), Domain: d2})
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
 	})
+
+	expectedDomains := []string{d1, d2}
 
 	tt := []struct {
 		testName          string
@@ -344,7 +352,7 @@ func TestListTrustedDomains(t *testing.T) {
 				},
 			},
 			inputContext:    ctxWithSysAuthZ,
-			expectedDomains: []string{d1, d2},
+			expectedDomains: expectedDomains,
 		},
 	}
 

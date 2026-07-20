@@ -5,6 +5,7 @@ Errors:
   IDMissing: "ID missing"
   ResourceOwnerMissing: "Resource Owner Organisation missing"
   RemoveFailed: "Could not be removed"
+  PermissionDenied: "Permission denied"
   ProjectionName:
     Invalid: "Invalid projection name"
   Assets:
@@ -182,6 +183,7 @@ Errors:
       Passwordless:
         NotExisting: "Passkey does not exist"
       RecoveryCodes:
+        Empty: "Recovery code is empty"
         InvalidCode: "Invalid recovery code provided"
         MaxCountExceeded: "Maximum number of recovery codes exceeded"
         NotReady: "Recovery codes are not ready for use"
@@ -198,10 +200,6 @@ Errors:
     RefreshToken:
       Invalid: "Refresh Token is invalid"
       NotFound: "Refresh Token not found"
-  Instance:
-    NotFound: "Instance not found"
-    AlreadyExists: "Instance already exists"
-    NotChanged: "Instance not changed"
   Org:
     AlreadyExists: "Organisation's name or id already taken"
     Invalid: "Organisation is invalid"
@@ -287,6 +285,8 @@ Errors:
     LabelPolicy:
       NotFound: "Private Label Policy not found"
       NotChanged: "Private Label Policy has not been changed"
+    IDPConfig:
+      NotExisting: "Identity Provider Configuration doesn't exist"
   Project:
     ProjectIDMissing: "Project Id missing"
     AlreadyExists: "Project already exists on organization"
@@ -329,7 +329,6 @@ Errors:
       APIAuthMethodNoSecret: "Chosen API Auth Method does not require a secret"
       AuthMethodNoPrivateKeyJWT: "Chosen Auth Method does not require a key"
       ClientSecretInvalid: "Client Secret is invalid"
-      ClientSecretNotSet: "Client Secret is not set"
       Key:
         AlreadyExisting: "Application key already existing"
         NotFound: "Application key not found"
@@ -343,6 +342,8 @@ Errors:
       NotActive: "Project Grant is not active"
       NotInactive: "Project Grant is not inactive"
   Instance:
+    AlreadyExists: "Instance already exists"
+    NotChanged: "Instance not changed"
     NotFound: "Instance not found. Make sure you got the domain right. Check out https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Roles have not been changed"
@@ -515,6 +516,8 @@ Errors:
       StorageFailed: "Storing action execution log to database failed"
       ScanFailed: "Querying usage for action execution seconds failed"
   Session:
+    IDMissing: "Session ID missing"
+    NotFound: "Session not found"
     NotExisting: "Session does not exist"
     Terminated: "Session already terminated"
     Expired: "Session has expired"

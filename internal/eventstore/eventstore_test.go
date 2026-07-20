@@ -11,6 +11,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/shopspring/decimal"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/service"
 	"github.com/zitadel/zitadel/internal/database"
@@ -348,7 +349,7 @@ func (repo *testPusher) Health(ctx context.Context) error {
 	return nil
 }
 
-func (repo *testPusher) Push(_ context.Context, _ database.ContextQueryExecuter, commands ...Command) (events []Event, err error) {
+func (repo *testPusher) Push(_ context.Context, _ new_db.QueryExecutor, commands ...Command) (events []Event, err error) {
 	if len(repo.errs) != 0 {
 		err, repo.errs = repo.errs[0], repo.errs[1:]
 		return nil, err

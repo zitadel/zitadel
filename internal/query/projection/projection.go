@@ -87,12 +87,18 @@ var (
 	WebKeyProjection                    *handler.Handler
 	DebugEventsProjection               *handler.Handler
 	HostedLoginTranslationProjection    *handler.Handler
+	OrganizationSettingsProjection      *handler.Handler
+
+	RelationalTablesProjection *handler.Handler
 
 	ProjectGrantFields      *handler.FieldHandler
 	OrgDomainVerifiedFields *handler.FieldHandler
 	InstanceDomainFields    *handler.FieldHandler
 	MembershipFields        *handler.FieldHandler
 	PermissionFields        *handler.FieldHandler
+
+	GroupProjection      *handler.Handler
+	GroupUsersProjection *handler.Handler
 )
 
 type projection interface {
@@ -189,6 +195,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	WebKeyProjection = newWebKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["web_keys"]))
 	DebugEventsProjection = newDebugEventsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["debug_events"]))
 	HostedLoginTranslationProjection = newHostedLoginTranslationProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["hosted_login_translation"]))
+	OrganizationSettingsProjection = newOrganizationSettingsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organization_settings"]))
 
 	ProjectGrantFields = newFillProjectGrantFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsProjectGrant]))
 	OrgDomainVerifiedFields = newFillOrgDomainVerifiedFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsOrgDomainVerified]))
@@ -196,6 +203,11 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	MembershipFields = newFillMembershipFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsMemberships]))
 	PermissionFields = newFillPermissionFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsPermission]))
 	// Don't forget to add the new field handler to [ProjectInstanceFields]
+
+	GroupProjection = newGroupProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["groups"]))
+	GroupUsersProjection = newGroupUsersProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["group_users"]))
+
+	RelationalTablesProjection = newRelationalTablesProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["relational_tables"]))
 
 	newProjectionsList()
 	newFieldsList()
@@ -378,5 +390,10 @@ func newProjectionsList() {
 		WebKeyProjection,
 		DebugEventsProjection,
 		HostedLoginTranslationProjection,
+		OrganizationSettingsProjection,
+		GroupProjection,
+		GroupUsersProjection,
+
+		RelationalTablesProjection,
 	}
 }

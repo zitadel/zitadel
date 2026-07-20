@@ -282,6 +282,8 @@ Errors:
     LabelPolicy:
       NotFound: "Правилата за лични етикети не са намерени"
       NotChanged: "Политиката на частния етикет не е променена"
+    IDPConfig:
+      NotExisting: "Конфигурацията на доставчик на самоличност не съществува"
   Project:
     ProjectIDMissing: "Липсва ID на проекта"
     AlreadyExists: "Проектът вече съществува в организацията"
@@ -324,7 +326,6 @@ Errors:
       APIAuthMethodNoSecret: "Избраният API Auth Method не изисква тайна"
       AuthMethodNoPrivateKeyJWT: "Избраният метод за удостоверяване не изисква ключ"
       ClientSecretInvalid: "Тайната на клиента е невалидна"
-      ClientSecretNotSet: "Тайната на клиента не е зададена"
       Key:
         AlreadyExisting: "Вече съществува ключ за приложение"
         NotFound: "Ключът на приложението не е намерен"

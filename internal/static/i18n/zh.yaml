@@ -283,6 +283,8 @@ Errors:
     LabelPolicy:
       NotFound: "不存在私人政策"
       NotChanged: "私人政策不改变"
+    IDPConfig:
+      NotExisting: "身份提供者配置不存在"
   Project:
     ProjectIDMissing: "P缺少项目 ID"
     AlreadyExists: "项目以存在于组织中"
@@ -325,7 +327,6 @@ Errors:
       APIAuthMethodNoSecret: "选择的 API 身份验证方法不需要秘钥"
       AuthMethodNoPrivateKeyJWT: "选择的身份验证方法不需要 Key"
       ClientSecretInvalid: "Client Secret 无效"
-      ClientSecretNotSet: "未设置客户端密码"
       Key:
         AlreadyExisting: "已经存在的应用钥匙"
         NotFound: "未找到应用钥匙"

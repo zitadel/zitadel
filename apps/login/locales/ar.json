@@ -48,7 +48,6 @@
       "couldNotCreateSession": "تعذر إنشاء جلسة للمستخدم",
       "initialUserNotSupported": "المستخدم الأولي غير مدعوم",
       "localAuthenticationNotAllowed": "المصادقة المحلية غير مسموح بها! اتصل بالمسؤول لمزيد من المعلومات.",
-      "usernamePasswordNotAllowed": "اسم المستخدم وكلمة المرور غير مسموح بهما! اتصل بالمسؤول لمزيد من المعلومات.",
       "passkeysNotAllowed": "مفاتيح المرور غير مسموح بها! اتصل بالمسؤول لمزيد من المعلومات.",
       "couldNotFindIdentityProvider": "تعذر العثور على مزود الهوية.",
       "userNotActive": "المستخدم غير نشط. اتصل بالمسؤول لمزيد من المعلومات."
@@ -151,7 +150,9 @@
       "couldNotLoadSession": "تعذر تحميل الجلسة",
       "couldNotLoadAuthMethods": "تعذر تحميل طرق المصادقة",
       "failedPrecondition": "فشل الشرط المسبق",
-      "sessionNotValid": "الجلسة غير صالحة"
+      "sessionNotValid": "الجلسة غير صالحة",
+      "passwordVerificationMissing": "التحقق من كلمة المرور مفقود.",
+      "passwordVerificationTooOld": "التحقق من كلمة المرور قديم جدًا. يرجى التحقق من كلمة المرور مرة أخرى."
     }
   },
   "idp": {
@@ -411,7 +412,8 @@
       "userAlreadyVerified": "تم التحقق من المستخدم بالفعل!",
       "couldNotResendInvite": "تعذر إعادة إرسال الدعوة",
       "inviteSendFailed": "فشل إرسال بريد الدعوة الإلكتروني",
-      "emailSendFailed": "فشل إرسال بريد التحقق الإلكتروني"
+      "emailSendFailed": "فشل إرسال بريد التحقق الإلكتروني",
+      "contextMissing": "حدث خطأ. يرجى المحاولة مرة أخرى."
     }
   },
   "authenticator": {

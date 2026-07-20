@@ -70,7 +70,7 @@ func (s *Server) AddInstanceTrustedDomain(ctx context.Context, req *admin_pb.Add
 }
 
 func (s *Server) RemoveInstanceTrustedDomain(ctx context.Context, req *admin_pb.RemoveInstanceTrustedDomainRequest) (*admin_pb.RemoveInstanceTrustedDomainResponse, error) {
-	details, err := s.command.RemoveTrustedDomain(ctx, req.Domain)
+	details, err := s.command.RemoveTrustedDomain(ctx, req.Domain, true)
 	if err != nil {
 		return nil, err
 	}

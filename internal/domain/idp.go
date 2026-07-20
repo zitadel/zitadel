@@ -38,6 +38,7 @@ const (
 	IDPTypeGoogle
 	IDPTypeApple
 	IDPTypeSAML
+	IDPTypeZitadel
 )
 
 func (t IDPType) GetCSSClass() string {
@@ -85,6 +86,8 @@ func (t IDPType) DisplayName() string {
 		return "Google"
 	case IDPTypeApple:
 		return "Apple"
+	case IDPTypeZitadel:
+		return "ZITADEL"
 	case IDPTypeUnspecified,
 		IDPTypeOIDC,
 		IDPTypeJWT,

@@ -466,3 +466,24 @@ func (s *Server) DeleteProvider(ctx context.Context, req *admin_pb.DeleteProvide
 		Details: object_pb.DomainToChangeDetailsPb(details),
 	}, nil
 }
+
+func (s *Server) AddZitadelProvider(ctx context.Context, req *admin_pb.AddZitadelProviderRequest) (*admin_pb.AddZitadelProviderResponse, error) {
+	id, details, err := s.command.AddInstanceZitadelProvider(ctx, addZitadelProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddZitadelProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateZitadelProvider(ctx context.Context, req *admin_pb.UpdateZitadelProviderRequest) (*admin_pb.UpdateZitadelProviderResponse, error) {
+	details, err := s.command.UpdateInstanceZitadelProvider(ctx, req.Id, updateZitadelProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateZitadelProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}

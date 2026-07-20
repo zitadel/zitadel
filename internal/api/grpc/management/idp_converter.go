@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
@@ -539,4 +540,42 @@ func signatureAlgorithmToCommand(signatureAlgorithm idp_pb.SAMLSignatureAlgorith
 	default:
 		return ""
 	}
+}
+
+func addZitadelProviderToCommand(req *mgmt_pb.AddZitadelProviderRequest) command.ZitadelProvider {
+	return command.ZitadelProvider{
+		Name:              req.Name,
+		Issuer:            req.Issuer,
+		ClientID:          req.ClientId,
+		ClientSecret:      req.ClientSecret,
+		Scopes:            req.Scopes,
+		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+		InstanceRolesInfo: instanceRolesInfoToCommand(req.InstanceRolesInfo),
+	}
+}
+
+func updateZitadelProviderToCommand(req *mgmt_pb.UpdateZitadelProviderRequest) command.ZitadelProvider {
+	return command.ZitadelProvider{
+		Name:              req.Name,
+		Issuer:            req.Issuer,
+		ClientID:          req.ClientId,
+		ClientSecret:      req.ClientSecret,
+		Scopes:            req.Scopes,
+		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+		InstanceRolesInfo: instanceRolesInfoToCommand(req.InstanceRolesInfo),
+	}
+}
+
+func instanceRolesInfoToCommand(reqInstanceRolesInfo []*idp_pb.InstanceRolesInfo) []idp.RolesInfo {
+	if reqInstanceRolesInfo == nil {
+		return nil
+	}
+	instanceRolesInfo := make([]idp.RolesInfo, 0, len(reqInstanceRolesInfo))
+	for _, info := range reqInstanceRolesInfo {
+		instanceRolesInfo = append(instanceRolesInfo, idp.RolesInfo{
+			OrganizationID:     info.OrganizationId,
+			OrganizationDomain: info.OrganizationDomain,
+		})
+	}
+	return instanceRolesInfo
 }

@@ -139,7 +139,8 @@ func (c *Commands) AddOrgDomain(ctx context.Context, orgID, domain string, claim
 	defer func() { span.EndWithError(err) }()
 
 	orgAgg := org.NewAggregate(orgID)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgDomain(orgAgg, domain, claimedUserIDs, permissionCheck)) //nolint:staticcheck
+	//nolint:staticcheck
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgDomain(orgAgg, domain, claimedUserIDs, permissionCheck))
 	if err != nil {
 		return nil, err
 	}
@@ -354,27 +355,27 @@ func (c *Commands) changeDefaultDomain(ctx context.Context, orgID, newName strin
 	isPrimary := defaultDomain == orgDomains.PrimaryDomain
 	orgAgg := OrgAggregateFromWriteModel(&orgDomains.WriteModel)
 	for _, orgDomain := range orgDomains.Domains {
-		if orgDomain.State == domain.OrgDomainStateActive {
-			if orgDomain.Domain == defaultDomain {
-				newDefaultDomain, err := domain.NewIAMDomainName(newName, iamDomain)
-				if err != nil {
-					return nil, err
-				}
-				// rename of organization resulting in no change in the domain
-				if newDefaultDomain == defaultDomain {
-					return nil, nil
-				}
-				events := []eventstore.Command{
-					org.NewDomainAddedEvent(ctx, orgAgg, newDefaultDomain),
-					org.NewDomainVerifiedEvent(ctx, orgAgg, newDefaultDomain),
-				}
-				if isPrimary {
-					events = append(events, org.NewDomainPrimarySetEvent(ctx, orgAgg, newDefaultDomain))
-				}
-				events = append(events, org.NewDomainRemovedEvent(ctx, orgAgg, orgDomain.Domain, orgDomain.Verified))
-				return events, nil
-			}
+		if orgDomain.State != domain.OrgDomainStateActive || orgDomain.Domain != defaultDomain {
+			continue
 		}
+
+		newDefaultDomain, err := domain.NewIAMDomainName(newName, iamDomain)
+		if err != nil {
+			return nil, err
+		}
+		// rename of organization resulting in no change in the domain
+		if newDefaultDomain == defaultDomain {
+			return nil, nil
+		}
+		events := []eventstore.Command{
+			org.NewDomainAddedEvent(ctx, orgAgg, newDefaultDomain),
+			org.NewDomainVerifiedEvent(ctx, orgAgg, newDefaultDomain),
+		}
+		if isPrimary {
+			events = append(events, org.NewDomainPrimarySetEvent(ctx, orgAgg, newDefaultDomain))
+		}
+		events = append(events, org.NewDomainRemovedEvent(ctx, orgAgg, orgDomain.Domain, orgDomain.Verified))
+		return events, nil
 	}
 	return nil, nil
 }

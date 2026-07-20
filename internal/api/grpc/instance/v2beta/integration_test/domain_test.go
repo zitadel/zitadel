@@ -27,7 +27,7 @@ func TestAddCustomDomain(t *testing.T) {
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
 
 	inst := integration.NewInstance(ctxWithSysAuthZ)
-	iamOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeIAMOwner)
+	iamOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
 
 	t.Cleanup(func() {
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
@@ -68,7 +68,7 @@ func TestAddCustomDomain(t *testing.T) {
 			},
 			inputContext:      ctxWithSysAuthZ,
 			expectedErrorCode: codes.InvalidArgument,
-			expectedErrorMsg:  "Errors.Invalid.Argument (INST-28nlD)",
+			expectedErrorMsg:  "Errors.Invalid.Argument",
 		},
 		{
 			testName: "when valid request should return successful response",
@@ -93,7 +93,7 @@ func TestAddCustomDomain(t *testing.T) {
 
 			// Verify
 			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
-			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+			assert.Contains(t, status.Convert(err).Message(), tc.expectedErrorMsg)
 
 			if tc.expectedErrorMsg == "" {
 				assert.NotNil(t, res)
@@ -107,12 +107,12 @@ func TestRemoveCustomDomain(t *testing.T) {
 	t.Parallel()
 
 	// Given
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+	ctx, cancel := context.WithTimeout(t.Context(), 15*time.Minute)
 	defer cancel()
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
 	inst := integration.NewInstance(ctxWithSysAuthZ)
-	iamOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeIAMOwner)
+	iamOwnerCtx := inst.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
 
 	customDomain := integration.DomainName()
 
@@ -159,7 +159,7 @@ func TestRemoveCustomDomain(t *testing.T) {
 			},
 			inputContext:      ctxWithSysAuthZ,
 			expectedErrorCode: codes.InvalidArgument,
-			expectedErrorMsg:  "Errors.Invalid.Argument (INST-39nls)",
+			expectedErrorMsg:  "Errors.Invalid.Argument",
 		},
 		{
 			testName: "when valid request should return successful response",
@@ -178,7 +178,7 @@ func TestRemoveCustomDomain(t *testing.T) {
 
 			// Verify
 			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
-			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+			assert.Contains(t, status.Convert(err).Message(), tc.expectedErrorMsg)
 
 			if tc.expectedErrorMsg == "" {
 				assert.NotNil(t, res)
@@ -196,8 +196,10 @@ func TestAddTrustedDomain(t *testing.T) {
 	defer cancel()
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
+
 	inst := integration.NewInstance(ctxWithSysAuthZ)
 	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
+	d1 := "trusted" + integration.DomainName()
 
 	t.Cleanup(func() {
 		inst.Client.InstanceV2Beta.DeleteInstance(ctxWithSysAuthZ, &instance.DeleteInstanceRequest{InstanceId: inst.ID()})
@@ -214,7 +216,7 @@ func TestAddTrustedDomain(t *testing.T) {
 			testName: "when invalid context should return unauthN error",
 			inputRequest: &instance.AddTrustedDomainRequest{
 				InstanceId: inst.ID(),
-				Domain:     "trusted1",
+				Domain:     d1,
 			},
 			inputContext:      context.Background(),
 			expectedErrorCode: codes.Unauthenticated,
@@ -224,7 +226,7 @@ func TestAddTrustedDomain(t *testing.T) {
 			testName: "when unauthZ context should return unauthZ error",
 			inputRequest: &instance.AddTrustedDomainRequest{
 				InstanceId: inst.ID(),
-				Domain:     "trusted1",
+				Domain:     d1,
 			},
 			inputContext:      orgOwnerCtx,
 			expectedErrorCode: codes.PermissionDenied,
@@ -238,13 +240,13 @@ func TestAddTrustedDomain(t *testing.T) {
 			},
 			inputContext:      ctxWithSysAuthZ,
 			expectedErrorCode: codes.InvalidArgument,
-			expectedErrorMsg:  "Errors.Invalid.Argument (COMMA-Stk21)",
+			expectedErrorMsg:  "Errors.Invalid.Argument",
 		},
 		{
 			testName: "when valid request should return successful response",
 			inputRequest: &instance.AddTrustedDomainRequest{
 				InstanceId: inst.ID(),
-				Domain:     " " + integration.DomainName(),
+				Domain:     " " + d1,
 			},
 			inputContext: ctxWithSysAuthZ,
 		},
@@ -252,18 +254,12 @@ func TestAddTrustedDomain(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
-			t.Cleanup(func() {
-				if tc.expectedErrorMsg == "" {
-					inst.Client.InstanceV2Beta.RemoveTrustedDomain(ctxWithSysAuthZ, &instance.RemoveTrustedDomainRequest{Domain: strings.TrimSpace(tc.inputRequest.Domain)})
-				}
-			})
-
 			// Test
 			res, err := inst.Client.InstanceV2Beta.AddTrustedDomain(tc.inputContext, tc.inputRequest)
 
 			// Verify
 			assert.Equal(t, tc.expectedErrorCode, status.Code(err))
-			assert.Equal(t, tc.expectedErrorMsg, status.Convert(err).Message())
+			assert.Contains(t, status.Convert(err).Message(), tc.expectedErrorMsg)
 
 			if tc.expectedErrorMsg == "" {
 				assert.NotNil(t, res)
@@ -281,11 +277,10 @@ func TestRemoveTrustedDomain(t *testing.T) {
 	defer cancel()
 
 	ctxWithSysAuthZ := integration.WithSystemAuthorization(ctx)
+
 	inst := integration.NewInstance(ctxWithSysAuthZ)
-	orgOwnerCtx := inst.WithAuthorization(context.Background(), integration.UserTypeOrgOwner)
-
+	orgOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner)
 	trustedDomain := integration.DomainName()
-
 	_, err := inst.Client.InstanceV2Beta.AddTrustedDomain(ctxWithSysAuthZ, &instance.AddTrustedDomainRequest{InstanceId: inst.ID(), Domain: trustedDomain})
 	require.Nil(t, err)
 

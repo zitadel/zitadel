@@ -27,7 +27,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 	noOfOrgs := 3
 	orgs, orgsName, orgsDomain := createOrgs(listOrgIAmOwnerCtx, t, listOrgClient, noOfOrgs)
 
-	// deactivat org[1]
+	// deactivate org[1]
 	_, err := listOrgClient.DeactivateOrganization(listOrgIAmOwnerCtx, &org.DeactivateOrganizationRequest{
 		OrganizationId: orgs[1].OrganizationId,
 	})

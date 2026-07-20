@@ -15,6 +15,7 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/database"
 	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/database/postgres"
@@ -646,7 +647,7 @@ func Test_query_events_with_postgres(t *testing.T) {
 
 			pusher := new_es.NewEventstore(dbClient)
 			// setup initial data for query
-			if _, err := pusher.Push(context.Background(), dbClient.DB, tt.fields.existingEvents...); err != nil {
+			if _, err := pusher.Push(context.Background(), new_sql.SQLPool(dbClient.DB), tt.fields.existingEvents...); err != nil {
 				t.Errorf("error in setup = %v", err)
 				return
 			}

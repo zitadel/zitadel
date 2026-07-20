@@ -282,6 +282,8 @@ Errors:
     LabelPolicy:
       NotFound: "Private Label Policy konnte nicht gefunden"
       NotChanged: "Private Label Policy wurde nicht verändert"
+    IDPConfig:
+      NotExisting: "Identitätsprovider Konfiguration existiert nicht"
   Project:
     ProjectIDMissing: "Project ID fehlt"
     AlreadyExists: "Project existiert bereits auf der Organisation"
@@ -324,7 +326,6 @@ Errors:
       APIAuthMethodNoSecret: "Gewählte API Auth Method benötigt kein Secret"
       AuthMethodNoPrivateKeyJWT: "Gewählte Auth Method benötigt keinen Key"
       ClientSecretInvalid: "Client Secret ist ungültig"
-      ClientSecretNotSet: "Das Client-Geheimnis ist nicht festgelegt"
       Key:
         AlreadyExisting: "Applikationsschlüssel existiert bereits"
         NotFound: "Applikationsschlüssel nicht gefunden"

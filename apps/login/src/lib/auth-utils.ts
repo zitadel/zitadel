@@ -1,4 +1,4 @@
-import { LANGS, normalizeLanguageCode } from "@/lib/i18n";
+import { LANGS } from "@/lib/i18n";
 
 /**
  * Authentication utility functions that don't require server actions
@@ -35,8 +35,8 @@ export function getValidLocaleFromUILocales(uiLocales: string[] | undefined): st
     // e.g., de-CH and de-AT both become just de
     // zh-Hans-CN (Simplified) and zh-Hant-TW (Traditional) both become zh
     // As of time of writing, this is expected behaviour, since there is only one translation for all languages
-    const languageCode = normalizeLanguageCode(normalized);
-    if (languageCode) {
+    const languageCode = normalized.split("-")[0];
+    if (isValidLanguage(languageCode)) {
       return languageCode;
     }
   }

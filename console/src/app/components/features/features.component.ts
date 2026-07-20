@@ -34,6 +34,7 @@ const FEATURE_KEYS = [
   'oidcSingleV1SessionTermination',
   'permissionCheckV2',
   'userSchema',
+  'enableRelationalTables',
 ] as const;
 
 export type ToggleState = { source: Source; enabled: boolean };
