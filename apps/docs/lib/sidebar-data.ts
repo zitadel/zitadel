@@ -774,6 +774,16 @@ export const guidesSidebar: readonly SidebarItem[] = [
                   "self-hosting/manage/service_ping",
                   {
                     type: "category",
+                    label: "Instrumentation",
+                    collapsed: true,
+                    link: {
+                      type: "doc",
+                      id: "self-hosting/manage/instrumentation/overview",
+                    },
+                    items: ["self-hosting/manage/instrumentation/log-fields"],
+                  },
+                  {
+                    type: "category",
                     label: "Metrics",
                     collapsed: true,
                     link: {
