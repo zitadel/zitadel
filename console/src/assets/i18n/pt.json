@@ -1557,7 +1557,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "th": "ไทย"
       }
     },
     "SMTP": {
@@ -1806,7 +1807,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "th": "ไทย"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificação de email concluída",
@@ -2762,7 +2764,8 @@
     "ro": "Română",
     "tr": "Türkçe",
     "uk": "Українська",
-    "ar": "العربية"
+    "ar": "العربية",
+    "th": "ไทย"
   },
   "MEMBER": {
     "ADD": "Adicionar um Administrador",

@@ -1,0 +1,541 @@
+Login:
+  Title: ยินดีต้อนรับกลับมา!
+  Description: กรอกรายละเอียดการเข้าสู่ระบบของคุณ
+  TitleLinking: เข้าสู่ระบบเพื่อเชื่อมโยงผู้ใช้
+  DescriptionLinking: กรอกรายละเอียดการเข้าสู่ระบบของคุณเพื่อเชื่อมโยงผู้ใช้ภายนอกของคุณ
+  LoginNameLabel: ชื่อสำหรับเข้าสู่ระบบ
+  UsernamePlaceHolder: ชื่อผู้ใช้
+  LoginnamePlaceHolder: username@domain
+  ExternalUserDescription: เข้าสู่ระบบด้วยผู้ใช้ภายนอก
+  MustBeMemberOfOrg: ผู้ใช้ต้องเป็นสมาชิกขององค์กร {{.OrgName}}
+  RegisterButtonText: ลงทะเบียน
+  NextButtonText: ถัดไป
+
+LDAP:
+  Title: เข้าสู่ระบบ
+  Description: กรอกรายละเอียดการเข้าสู่ระบบของคุณ
+  LoginNameLabel: ชื่อสำหรับเข้าสู่ระบบ
+  PasswordLabel: รหัสผ่าน
+  NextButtonText: ถัดไป
+
+SelectAccount:
+  Title: เลือกบัญชี
+  Description: ใช้บัญชีของคุณ
+  TitleLinking: เลือกบัญชีเพื่อเชื่อมโยงผู้ใช้
+  DescriptionLinking: เลือกบัญชีของคุณเพื่อเชื่อมโยงกับผู้ใช้ภายนอกของคุณ
+  OtherUser: ผู้ใช้อื่น
+  SessionState0: ใช้งานอยู่
+  SessionState1: ออกจากระบบแล้ว
+  MustBeMemberOfOrg: ผู้ใช้ต้องเป็นสมาชิกขององค์กร {{.OrgName}}
+
+Password:
+  Title: รหัสผ่าน
+  Description: กรอกรายละเอียดการเข้าสู่ระบบของคุณ
+  PasswordLabel: รหัสผ่าน
+  MinLength: ต้องมีอย่างน้อย
+  MinLengthp2: ตัวอักษร
+  MaxLength: ต้องมีความยาวน้อยกว่า 70 ตัวอักษร
+  HasUppercase: ต้องมีตัวอักษรพิมพ์ใหญ่
+  HasLowercase: ต้องมีตัวอักษรพิมพ์เล็ก
+  HasNumber: ต้องมีตัวเลข
+  HasSymbol: ต้องมีสัญลักษณ์
+  Confirmation: การยืนยันรหัสผ่านตรงกัน
+  ResetLinkText: รีเซ็ตรหัสผ่าน
+  BackButtonText: ย้อนกลับ
+  NextButtonText: ถัดไป
+
+UsernameChange:
+  Title: เปลี่ยนชื่อผู้ใช้
+  Description: ตั้งชื่อผู้ใช้ใหม่ของคุณ
+  UsernameLabel: ชื่อผู้ใช้
+  CancelButtonText: ยกเลิก
+  NextButtonText: ถัดไป
+
+UsernameChangeDone:
+  Title: เปลี่ยนชื่อผู้ใช้แล้ว
+  Description: เปลี่ยนชื่อผู้ใช้ของคุณสำเร็จแล้ว
+  NextButtonText: ถัดไป
+
+InitPassword:
+  Title: ตั้งรหัสผ่าน
+  Description: คุณได้รับรหัสซึ่งคุณต้องกรอกในแบบฟอร์มด้านล่างเพื่อตั้งรหัสผ่านใหม่ของคุณ
+  CodeLabel: รหัส
+  NewPasswordLabel: รหัสผ่านใหม่
+  NewPasswordConfirmLabel: ยืนยันรหัสผ่าน
+  ResendButtonText: ส่งรหัสอีกครั้ง
+  NextButtonText: ถัดไป
+
+InitPasswordDone:
+  Title: ตั้งรหัสผ่านแล้ว
+  Description: ตั้งรหัสผ่านสำเร็จแล้ว
+  NextButtonText: ถัดไป
+  CancelButtonText: ยกเลิก
+
+InitUser:
+  Title: เปิดใช้งานผู้ใช้
+  Description: ยืนยันอีเมลของคุณด้วยรหัสด้านล่างและตั้งรหัสผ่านของคุณ
+  CodeLabel: รหัส
+  NewPasswordLabel: รหัสผ่านใหม่
+  NewPasswordConfirm: ยืนยันรหัสผ่าน
+  NextButtonText: ถัดไป
+  ResendButtonText: ส่งรหัสอีกครั้ง
+
+InitUserDone:
+  Title: เปิดใช้งานผู้ใช้แล้ว
+  Description: ยืนยันอีเมลและตั้งรหัสผ่านสำเร็จแล้ว
+  NextButtonText: ถัดไป
+  CancelButtonText: ยกเลิก
+
+InviteUser:
+  Title: เปิดใช้งานผู้ใช้
+  Description: ยืนยันอีเมลของคุณด้วยรหัสด้านล่างและตั้งรหัสผ่านของคุณ
+  CodeLabel: รหัส
+  NewPasswordLabel: รหัสผ่านใหม่
+  NewPasswordConfirm: ยืนยันรหัสผ่าน
+  NextButtonText: ถัดไป
+  ResendButtonText: ส่งรหัสอีกครั้ง
+
+InitMFAPrompt:
+  Title: การตั้งค่าการยืนยันตัวตนแบบ 2 ปัจจัย
+  Description: การยืนยันตัวตนแบบ 2 ปัจจัยช่วยเพิ่มความปลอดภัยให้กับบัญชีผู้ใช้ของคุณ ซึ่งช่วยให้มั่นใจได้ว่ามีเพียงคุณเท่านั้นที่เข้าถึงบัญชีของคุณได้
+  Provider0: แอปยืนยันตัวตน (เช่น Google/Microsoft Authenticator, Authy)
+  Provider1: ขึ้นอยู่กับอุปกรณ์ (เช่น FaceID, Windows Hello, ลายนิ้วมือ)
+  Provider3: OTP ทาง SMS
+  Provider4: OTP ทางอีเมล
+  NextButtonText: ถัดไป
+  SkipButtonText: ข้าม
+
+InitMFAOTP:
+  Title: การยืนยันตัวตนแบบ 2 ปัจจัย
+  Description: สร้างการยืนยันตัวตนแบบ 2 ปัจจัยของคุณ ดาวน์โหลดแอปยืนยันตัวตนหากคุณยังไม่มี
+  OTPDescription: สแกนรหัสด้วยแอปยืนยันตัวตนของคุณ (เช่น Google/Microsoft Authenticator, Authy) หรือคัดลอกซีเคร็ตแล้วกรอกรหัสที่สร้างขึ้นด้านล่าง
+  SecretLabel: ซีเคร็ต
+  CodeLabel: รหัส
+  NextButtonText: ถัดไป
+  CancelButtonText: ยกเลิก
+
+InitMFAOTPSMS:
+  Title: การยืนยันตัวตนแบบ 2 ปัจจัย
+  DescriptionPhone: สร้างการยืนยันตัวตนแบบ 2 ปัจจัยของคุณ กรอกหมายเลขโทรศัพท์ของคุณเพื่อยืนยัน
+  DescriptionCode: สร้างการยืนยันตัวตนแบบ 2 ปัจจัยของคุณ กรอกรหัสที่ได้รับเพื่อยืนยันหมายเลขโทรศัพท์ของคุณ
+  CountryCodeLabel: ประเทศ
+  PhoneLabel: โทรศัพท์
+  CodeLabel: รหัส
+  EditButtonText: แก้ไข
+  ResendButtonText: ส่งรหัสอีกครั้ง
+  NextButtonText: ถัดไป
+
+InitMFAU2F:
+  Title: เพิ่มคีย์ความปลอดภัย
+  Description: คีย์ความปลอดภัยเป็นวิธีการยืนยันที่สามารถติดตั้งอยู่ในโทรศัพท์ของคุณ ใช้ผ่าน Bluetooth หรือเสียบเข้ากับพอร์ต USB ของคอมพิวเตอร์โดยตรง
+  TokenNameLabel: ชื่อของคีย์ความปลอดภัย / อุปกรณ์
+  NotSupported: เบราว์เซอร์ของคุณไม่รองรับ WebAuthN โปรดตรวจสอบให้แน่ใจว่าเป็นเวอร์ชันล่าสุดหรือใช้เบราว์เซอร์อื่น (เช่น Chrome, Safari, Firefox)
+  RegisterTokenButtonText: เพิ่มคีย์ความปลอดภัย
+  ErrorRetry: ลองอีกครั้ง สร้างคำท้าทายใหม่ หรือเลือกวิธีอื่น
+
+InitMFADone:
+  Title: ยืนยันตัวตนแบบ 2 ปัจจัยแล้ว
+  Description: เยี่ยมมาก! คุณเพิ่งตั้งค่าการยืนยันตัวตนแบบ 2 ปัจจัยสำเร็จและทำให้บัญชีของคุณปลอดภัยยิ่งขึ้น จะต้องกรอกปัจจัยนี้ในการเข้าสู่ระบบทุกครั้ง
+  NextButtonText: ถัดไป
+  CancelButtonText: ยกเลิก
+
+MFAProvider:
+  Provider0: แอปยืนยันตัวตน (เช่น Google/Microsoft Authenticator, Authy)
+  Provider1: ขึ้นอยู่กับอุปกรณ์ (เช่น FaceID, Windows Hello, ลายนิ้วมือ)
+  Provider3: OTP ทาง SMS
+  Provider4: OTP ทางอีเมล
+  ChooseOther: หรือเลือกตัวเลือกอื่น
+
+VerifyMFAOTP:
+  Title: ยืนยันการยืนยันตัวตนแบบ 2 ปัจจัย
+  Description: ยืนยันปัจจัยที่สองของคุณ
+  CodeLabel: รหัส
+  NextButtonText: ถัดไป
+
+VerifyOTP:
+  Title: ยืนยันการยืนยันตัวตนแบบ 2 ปัจจัย
+  Description: ยืนยันปัจจัยที่สองของคุณ
+  CodeLabel: รหัส
+  ResendButtonText: ส่งรหัสอีกครั้ง
+  NextButtonText: ถัดไป
+
+VerifyMFAU2F:
+  Title: การยืนยันตัวตนแบบ 2 ปัจจัย
+  Description: ยืนยันตัวตนแบบ 2 ปัจจัยของคุณด้วยอุปกรณ์ที่ลงทะเบียนไว้ (เช่น FaceID, Windows Hello, ลายนิ้วมือ)
+  NotSupported: เบราว์เซอร์ของคุณไม่รองรับ WebAuthN โปรดตรวจสอบให้แน่ใจว่าคุณใช้เวอร์ชันล่าสุดหรือเปลี่ยนไปใช้เบราว์เซอร์ที่รองรับ (Chrome, Safari, Firefox)
+  ErrorRetry: ลองอีกครั้ง สร้างคำขอใหม่ หรือเลือกวิธีอื่น
+  ValidateTokenButtonText: ยืนยันการยืนยันตัวตนแบบ 2 ปัจจัย
+
+Passwordless:
+  Title: เข้าสู่ระบบแบบไม่ใช้รหัสผ่าน
+  Description: เข้าสู่ระบบด้วยวิธีการยืนยันตัวตนที่อุปกรณ์ของคุณมีให้ เช่น FaceID, Windows Hello หรือลายนิ้วมือ
+  NotSupported: เบราว์เซอร์ของคุณไม่รองรับ WebAuthN โปรดตรวจสอบให้แน่ใจว่าเป็นเวอร์ชันล่าสุดหรือใช้เบราว์เซอร์อื่น (เช่น Chrome, Safari, Firefox)
+  ErrorRetry: ลองอีกครั้ง สร้างคำท้าทายใหม่ หรือเลือกวิธีอื่น
+  LoginWithPwButtonText: เข้าสู่ระบบด้วยรหัสผ่าน
+  ValidateTokenButtonText: เข้าสู่ระบบแบบไม่ใช้รหัสผ่าน
+
+PasswordlessPrompt:
+  Title: การตั้งค่าแบบไม่ใช้รหัสผ่าน
+  Description: คุณต้องการตั้งค่าการเข้าสู่ระบบแบบไม่ใช้รหัสผ่านหรือไม่? (วิธีการยืนยันตัวตนของอุปกรณ์ของคุณ เช่น FaceID, Windows Hello หรือลายนิ้วมือ)
+  DescriptionInit: คุณต้องตั้งค่าการเข้าสู่ระบบแบบไม่ใช้รหัสผ่าน ใช้ลิงก์ที่คุณได้รับเพื่อลงทะเบียนอุปกรณ์ของคุณ
+  PasswordlessButtonText: ใช้แบบไม่ใช้รหัสผ่าน
+  NextButtonText: ถัดไป
+  SkipButtonText: ข้าม
+
+PasswordlessRegistration:
+  Title: การตั้งค่าแบบไม่ใช้รหัสผ่าน
+  Description: เพิ่มการยืนยันตัวตนของคุณโดยการระบุชื่อ (เช่น MyMobilePhone, MacBook เป็นต้น) แล้วคลิกปุ่ม 'ลงทะเบียนแบบไม่ใช้รหัสผ่าน' ด้านล่าง
+  TokenNameLabel: ชื่อของอุปกรณ์
+  NotSupported: เบราว์เซอร์ของคุณไม่รองรับ WebAuthN โปรดตรวจสอบให้แน่ใจว่าเป็นเวอร์ชันล่าสุดหรือใช้เบราว์เซอร์อื่น (เช่น Chrome, Safari, Firefox)
+  RegisterTokenButtonText: ลงทะเบียนแบบไม่ใช้รหัสผ่าน
+  ErrorRetry: ลองอีกครั้ง สร้างคำท้าทายใหม่ หรือเลือกวิธีอื่น
+
+PasswordlessRegistrationDone:
+  Title: ตั้งค่าแบบไม่ใช้รหัสผ่านแล้ว
+  Description: เพิ่มอุปกรณ์สำหรับการใช้งานแบบไม่ใช้รหัสผ่านสำเร็จแล้ว
+  DescriptionClose: คุณสามารถปิดหน้าต่างนี้ได้แล้ว
+  NextButtonText: ถัดไป
+  CancelButtonText: ยกเลิก
+
+PasswordChange:
+  Title: เปลี่ยนรหัสผ่าน
+  Description: เปลี่ยนรหัสผ่านของคุณ กรอกรหัสผ่านเก่าและรหัสผ่านใหม่ของคุณ
+  ExpiredDescription: รหัสผ่านของคุณหมดอายุแล้วและต้องเปลี่ยน กรอกรหัสผ่านเก่าและรหัสผ่านใหม่ของคุณ
+  OldPasswordLabel: รหัสผ่านเก่า
+  NewPasswordLabel: รหัสผ่านใหม่
+  NewPasswordConfirmLabel: การยืนยันรหัสผ่าน
+  CancelButtonText: ยกเลิก
+  NextButtonText: ถัดไป
+  Footer: ส่วนท้าย
+
+PasswordChangeDone:
+  Title: เปลี่ยนรหัสผ่าน
+  Description: เปลี่ยนรหัสผ่านของคุณสำเร็จแล้ว
+  NextButtonText: ถัดไป
+
+PasswordResetDone:
+  Title: ส่งลิงก์รีเซ็ตรหัสผ่านแล้ว
+  Description: ตรวจสอบอีเมลของคุณเพื่อรีเซ็ตรหัสผ่านของคุณ
+  NextButtonText: ถัดไป
+
+EmailVerification:
+  Title: การยืนยันอีเมล
+  Description: เราได้ส่งอีเมลให้คุณเพื่อยืนยันที่อยู่ของคุณ โปรดกรอกรหัสในแบบฟอร์มด้านล่าง
+  CodeLabel: รหัส
+  NextButtonText: ถัดไป
+  ResendButtonText: ส่งรหัสอีกครั้ง
+
+EmailVerificationDone:
+  Title: การยืนยันอีเมล
+  Description: ยืนยันที่อยู่อีเมลของคุณสำเร็จแล้ว
+  NextButtonText: ถัดไป
+  CancelButtonText: ยกเลิก
+  LoginButtonText: เข้าสู่ระบบ
+
+RegisterOption:
+  Title: ตัวเลือกการลงทะเบียน
+  Description: เลือกวิธีที่คุณต้องการลงทะเบียน
+  RegisterUsernamePasswordButtonText: ด้วยชื่อผู้ใช้และรหัสผ่าน
+  ExternalLoginDescription: หรือลงทะเบียนด้วยผู้ใช้ภายนอก
+  LoginButtonText: เข้าสู่ระบบ
+
+RegistrationUser:
+  Title: การลงทะเบียน
+  Description: กรอกข้อมูลผู้ใช้ของคุณ ที่อยู่อีเมลของคุณจะถูกใช้เป็นชื่อสำหรับเข้าสู่ระบบ
+  DescriptionOrgRegister: กรอกข้อมูลผู้ใช้ของคุณ
+  EmailLabel: อีเมล
+  UsernameLabel: ชื่อผู้ใช้
+  FirstnameLabel: ชื่อ
+  LastnameLabel: นามสกุล
+  LanguageLabel: ภาษา
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Thai: ไทย
+  GenderLabel: เพศ
+  Female: หญิง
+  Male: ชาย
+  Diverse: หลากหลาย / X
+  PasswordLabel: รหัสผ่าน
+  PasswordConfirmLabel: การยืนยันรหัสผ่าน
+  TosAndPrivacyLabel: ข้อกำหนดและเงื่อนไข
+  TosConfirm: ฉันยอมรับ
+  TosLinkText: ข้อกำหนดการให้บริการ
+  PrivacyConfirm: ฉันยอมรับ
+  PrivacyLinkText: นโยบายความเป็นส่วนตัว
+  ExternalLogin: หรือลงทะเบียนด้วยผู้ใช้ภายนอก
+  BackButtonText: เข้าสู่ระบบ
+  NextButtonText: ถัดไป
+
+ExternalRegistrationUserOverview:
+  Title: การลงทะเบียนผู้ใช้ภายนอก
+  Description: เราได้นำรายละเอียดผู้ใช้ของคุณมาจากผู้ให้บริการที่เลือกไว้ คุณสามารถเปลี่ยนแปลงหรือกรอกให้สมบูรณ์ได้แล้ว
+  EmailLabel: อีเมล
+  UsernameLabel: ชื่อผู้ใช้
+  FirstnameLabel: ชื่อ
+  LastnameLabel: นามสกุล
+  NicknameLabel: ชื่อเล่น
+  PhoneLabel: หมายเลขโทรศัพท์
+  LanguageLabel: ภาษา
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Thai: ไทย
+  TosAndPrivacyLabel: ข้อกำหนดและเงื่อนไข
+  TosConfirm: ฉันยอมรับ
+  TosLinkText: ข้อกำหนดการให้บริการ
+  PrivacyConfirm: ฉันยอมรับ
+  PrivacyLinkText: นโยบายความเป็นส่วนตัว
+  ExternalLogin: หรือลงทะเบียนด้วยผู้ใช้ภายนอก
+  BackButtonText: ย้อนกลับ
+  NextButtonText: บันทึก
+
+RegistrationOrg:
+  Title: การลงทะเบียนองค์กร
+  Description: กรอกชื่อองค์กรและข้อมูลผู้ใช้ของคุณ
+  OrgNameLabel: ชื่อองค์กร
+  EmailLabel: อีเมล
+  UsernameLabel: ชื่อผู้ใช้
+  FirstnameLabel: ชื่อ
+  LastnameLabel: นามสกุล
+  PasswordLabel: รหัสผ่าน
+  PasswordConfirmLabel: การยืนยันรหัสผ่าน
+  TosAndPrivacyLabel: ข้อกำหนดและเงื่อนไข
+  TosConfirm: ฉันยอมรับ
+  TosLinkText: ข้อกำหนดการให้บริการ
+  PrivacyConfirm: ฉันยอมรับ
+  PrivacyLinkText: นโยบายความเป็นส่วนตัว
+  SaveButtonText: สร้างองค์กร
+
+LoginSuccess:
+  Title: เข้าสู่ระบบสำเร็จ
+  AutoRedirectDescription: คุณจะถูกนำกลับไปยังแอปพลิเคชันของคุณโดยอัตโนมัติ หากไม่เป็นเช่นนั้น ให้คลิกปุ่มด้านล่าง คุณสามารถปิดหน้าต่างได้หลังจากนั้น
+  RedirectedDescription: คุณสามารถปิดหน้าต่างนี้ได้แล้ว
+  NextButtonText: ถัดไป
+
+LogoutDone:
+  Title: ออกจากระบบแล้ว
+  Description: คุณออกจากระบบสำเร็จแล้ว
+  LoginButtonText: เข้าสู่ระบบ
+
+LinkingUserPrompt:
+  Title: พบผู้ใช้ที่มีอยู่
+  Description: "คุณต้องการเชื่อมโยงบัญชีที่มีอยู่ของคุณหรือไม่:"
+  LinkButtonText: เชื่อมโยง
+  OtherButtonText: ตัวเลือกอื่น
+
+LinkingUsersDone:
+  Title: การเชื่อมโยงผู้ใช้
+  Description: เชื่อมโยงผู้ใช้แล้ว
+  CancelButtonText: ยกเลิก
+  NextButtonText: ถัดไป
+
+ExternalNotFound:
+  Title: ไม่พบผู้ใช้ภายนอก
+  Description: ไม่พบผู้ใช้ภายนอก คุณต้องการเชื่อมโยงผู้ใช้ของคุณหรือลงทะเบียนผู้ใช้ใหม่โดยอัตโนมัติหรือไม่?
+  LinkButtonText: เชื่อมโยง
+  AutoRegisterButtonText: ลงทะเบียน
+  TosAndPrivacyLabel: ข้อกำหนดและเงื่อนไข
+  TosConfirm: ฉันยอมรับ
+  TosLinkText: ข้อกำหนดการให้บริการ
+  PrivacyConfirm: ฉันยอมรับ
+  PrivacyLinkText: นโยบายความเป็นส่วนตัว
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Thai: ไทย
+DeviceAuth:
+  Title: การให้สิทธิ์อุปกรณ์
+  UserCode:
+    Label: รหัสผู้ใช้
+    Description: กรอกรหัสผู้ใช้ที่แสดงบนอุปกรณ์
+    ButtonNext: ถัดไป
+  Action:
+    Description: ให้สิทธิ์การเข้าถึงอุปกรณ์
+    GrantDevice: คุณกำลังจะให้สิทธิ์อุปกรณ์
+    AccessToScopes: เข้าถึงขอบเขตต่อไปนี้
+    Button:
+      Allow: อนุญาต
+      Deny: ปฏิเสธ
+  Done:
+    Description: เสร็จสิ้น
+    Approved: อนุมัติการให้สิทธิ์อุปกรณ์แล้ว คุณสามารถกลับไปที่อุปกรณ์ได้แล้ว
+    Denied: ปฏิเสธการให้สิทธิ์อุปกรณ์แล้ว คุณสามารถกลับไปที่อุปกรณ์ได้แล้ว
+
+Footer:
+  PoweredBy: ขับเคลื่อนโดย
+  Tos: ข้อกำหนดการให้บริการ
+  PrivacyPolicy: นโยบายความเป็นส่วนตัว
+  Help: ความช่วยเหลือ
+  SupportEmail: อีเมลฝ่ายสนับสนุน
+
+SignIn: ลงชื่อเข้าใช้ด้วย {{.Provider}}
+
+Errors:
+  Internal: เกิดข้อผิดพลาดภายใน
+  AuthRequest:
+    NotFound: ไม่พบคำขอการยืนยันตัวตน
+    UserAgentNotCorresponding: User Agent ไม่ตรงกัน
+    UserAgentNotFound: ไม่พบ User Agent ID
+    TokenNotFound: ไม่พบโทเคน
+    RequestTypeNotSupported: ไม่รองรับประเภทคำขอ
+    MissingParameters: พารามิเตอร์ที่จำเป็นขาดหายไป
+  User:
+    NotFound: ไม่พบผู้ใช้
+    AlreadyExists: มีผู้ใช้นี้อยู่แล้ว
+    Inactive: ผู้ใช้ไม่ได้ใช้งาน
+    NotFoundOnOrg: ไม่พบผู้ใช้ในองค์กรที่เลือก
+    NotAllowedOrg: ผู้ใช้ไม่ได้เป็นสมาชิกขององค์กรที่กำหนด
+    NotMatchingUserID: ผู้ใช้และผู้ใช้ในคำขอการยืนยันตัวตนไม่ตรงกัน
+    UserIDMissing: UserID ว่างเปล่า
+    Invalid: ข้อมูลผู้ใช้ไม่ถูกต้อง
+    DomainNotAllowedAsUsername: โดเมนถูกจองไว้แล้วและไม่สามารถใช้ได้
+    NotAllowedToLink: ผู้ใช้ไม่ได้รับอนุญาตให้เชื่อมโยงกับผู้ให้บริการการเข้าสู่ระบบภายนอก
+    Profile:
+      NotFound: ไม่พบโปรไฟล์
+      NotChanged: ไม่ได้เปลี่ยนแปลงโปรไฟล์
+      Empty: โปรไฟล์ว่างเปล่า
+      FirstNameEmpty: ชื่อในโปรไฟล์ว่างเปล่า
+      LastNameEmpty: นามสกุลในโปรไฟล์ว่างเปล่า
+      IDMissing: ID โปรไฟล์ขาดหายไป
+    Email:
+      NotFound: ไม่พบอีเมล
+      Invalid: อีเมลไม่ถูกต้อง
+      AlreadyVerified: อีเมลได้รับการยืนยันแล้ว
+      NotChanged: ไม่ได้เปลี่ยนแปลงอีเมล
+      Empty: อีเมลว่างเปล่า
+      IDMissing: ID อีเมลขาดหายไป
+    Phone:
+      NotFound: ไม่พบโทรศัพท์
+      Invalid: โทรศัพท์ไม่ถูกต้อง
+      AlreadyVerified: โทรศัพท์ได้รับการยืนยันแล้ว
+      Empty: โทรศัพท์ว่างเปล่า
+      NotChanged: ไม่ได้เปลี่ยนแปลงโทรศัพท์
+    Address:
+      NotFound: ไม่พบที่อยู่
+      NotChanged: ไม่ได้เปลี่ยนแปลงที่อยู่
+    Username:
+      AlreadyExists: ชื่อผู้ใช้ถูกใช้ไปแล้ว
+      Reserved: ชื่อผู้ใช้ถูกใช้ไปแล้ว
+      Empty: ชื่อผู้ใช้ว่างเปล่า
+    Password:
+      ConfirmationWrong: การยืนยันรหัสผ่านไม่ถูกต้อง
+      Empty: รหัสผ่านว่างเปล่า
+      Invalid: รหัสผ่านไม่ถูกต้อง
+      InvalidAndLocked: รหัสผ่านไม่ถูกต้องและผู้ใช้ถูกล็อก โปรดติดต่อผู้ดูแลระบบของคุณ
+      NotChanged: รหัสผ่านใหม่ต้องไม่เหมือนกับรหัสผ่านปัจจุบันของคุณ
+    UsernameOrPassword:
+      Invalid: ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง
+    PasswordComplexityPolicy:
+      NotFound: ไม่พบนโยบายรหัสผ่าน
+      MinLength: รหัสผ่านสั้นเกินไป
+      HasLower: รหัสผ่านต้องมีตัวอักษรพิมพ์เล็ก
+      HasUpper: รหัสผ่านต้องมีตัวอักษรพิมพ์ใหญ่
+      HasNumber: รหัสผ่านต้องมีตัวเลข
+      HasSymbol: รหัสผ่านต้องมีสัญลักษณ์
+    Code:
+      Expired: รหัสหมดอายุแล้ว
+      Invalid: รหัสไม่ถูกต้อง
+      Empty: รหัสว่างเปล่า
+      CryptoCodeNil: รหัสการเข้ารหัสเป็นค่าว่าง
+      NotFound: ไม่พบรหัส
+      GeneratorAlgNotSupported: ไม่รองรับอัลกอริทึมของตัวสร้าง
+    EmailVerify:
+      UserIDEmpty: UserID ว่างเปล่า
+    ExternalData:
+      CouldNotRead: ไม่สามารถอ่านข้อมูลภายนอกได้อย่างถูกต้อง
+    MFA:
+      NoProviders: ไม่มีผู้ให้บริการการยืนยันตัวตนแบบหลายปัจจัยที่ใช้งานได้
+      OTP:
+        AlreadyReady: มีการตั้งค่า OTP แบบหลายปัจจัย (OneTimePassword) อยู่แล้ว
+        NotExisting: OTP แบบหลายปัจจัย (OneTimePassword) ไม่มีอยู่
+        InvalidCode: รหัสไม่ถูกต้อง
+        NotReady: OTP แบบหลายปัจจัย (OneTimePassword) ยังไม่พร้อม
+    Locked: ผู้ใช้ถูกล็อก
+    SomethingWentWrong: มีบางอย่างผิดพลาด
+    NotActive: ผู้ใช้ไม่ได้ใช้งานอยู่
+    ExternalIDP:
+      IDPTypeNotImplemented: ยังไม่ได้ใช้งานประเภท IDP นี้
+      NotAllowed: ไม่อนุญาตผู้ให้บริการการเข้าสู่ระบบภายนอก
+      IDPConfigIDEmpty: Identity Provider ID ว่างเปล่า
+      ExternalUserIDEmpty: External User ID ว่างเปล่า
+      UserDisplayNameEmpty: ชื่อที่แสดงของผู้ใช้ว่างเปล่า
+      NoExternalUserData: ไม่ได้รับข้อมูลผู้ใช้ภายนอก
+      CreationNotAllowed: ไม่อนุญาตให้สร้างผู้ใช้ใหม่ในผู้ให้บริการนี้
+      LinkingNotAllowed: ไม่อนุญาตให้เชื่อมโยงผู้ใช้ในผู้ให้บริการนี้
+      NoOptionAllowed: ไม่อนุญาตทั้งการสร้างและการเชื่อมโยงในผู้ให้บริการนี้ โปรดติดต่อผู้ดูแลระบบของคุณ
+      LoginFailedSwitchLocal: |
+        การเข้าสู่ระบบที่ External IDP ล้มเหลว กำลังกลับไปใช้การเข้าสู่ระบบภายในเครื่อง
+
+        รายละเอียดข้อผิดพลาด: {{.Details}}
+    GrantRequired: ไม่สามารถเข้าสู่ระบบได้ ผู้ใช้จำเป็นต้องมีการให้สิทธิ์อย่างน้อยหนึ่งรายการบนแอปพลิเคชัน โปรดติดต่อผู้ดูแลระบบของคุณ
+    ProjectRequired: ไม่สามารถเข้าสู่ระบบได้ องค์กรของผู้ใช้ต้องได้รับการให้สิทธิ์เข้าถึงโปรเจกต์ โปรดติดต่อผู้ดูแลระบบของคุณ
+  IdentityProvider:
+    InvalidConfig: การกำหนดค่า Identity Provider ไม่ถูกต้อง
+  IAM:
+    LockoutPolicy:
+      NotExisting: ไม่มีนโยบายการล็อก
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: ไม่อนุญาตให้ลงทะเบียน
+  DeviceAuth:
+    NotExisting: รหัสผู้ใช้ไม่มีอยู่
+
+optional: (ไม่บังคับ)

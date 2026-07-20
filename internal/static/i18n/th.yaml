@@ -1,0 +1,1420 @@
+Errors:
+  Internal: "เกิดข้อผิดพลาดภายในระบบ"
+  NoChangesFound: "ไม่มีการเปลี่ยนแปลง"
+  OriginNotAllowed: "ไม่อนุญาต \"Origin\" นี้"
+  IDMissing: "ไม่มี ID"
+  ResourceOwnerMissing: "ไม่มีองค์กรเจ้าของทรัพยากร"
+  RemoveFailed: "ไม่สามารถนำออกได้"
+  PermissionDenied: "ไม่มีสิทธิ์เข้าถึง"
+  ProjectionName:
+    Invalid: "ชื่อ projection ไม่ถูกต้อง"
+  Assets:
+    EmptyKey: "คีย์ของแอสเซทว่างเปล่า"
+    Store:
+      NotInitialized: "ยังไม่ได้เริ่มต้นที่จัดเก็บแอสเซท"
+      NotConfigured: "ยังไม่ได้กำหนดค่าที่จัดเก็บแอสเซท"
+    Bucket:
+      Internal: "เกิดข้อผิดพลาดภายในขณะสร้าง bucket"
+      AlreadyExists: "มี bucket นี้อยู่แล้ว"
+      CreateFailed: "ไม่สามารถสร้าง bucket ได้"
+      ListFailed: "ไม่สามารถอ่าน bucket ได้"
+      RemoveFailed: "ไม่สามารถลบ bucket ได้"
+      SetPublicFailed: "ไม่สามารถตั้งค่า bucket เป็นสาธารณะได้"
+    Object:
+      PutFailed: "ไม่สามารถสร้างออบเจกต์ได้"
+      GetFailed: "ไม่สามารถอ่านออบเจกต์ได้"
+      NotFound: "ไม่พบออบเจกต์"
+      PresignedTokenFailed: "ไม่สามารถสร้างโทเคนที่ลงนามได้"
+      ListFailed: "ไม่สามารถอ่านรายการออบเจกต์ได้"
+      RemoveFailed: "ไม่สามารถนำออบเจกต์ออกได้"
+  Limit:
+    ExceedsDefault: "ค่าจำกัดเกินค่าจำกัดเริ่มต้น"
+  Limits:
+    NotFound: "ไม่พบค่าจำกัด"
+    NoneSpecified: "ไม่ได้ระบุค่าจำกัด"
+    Instance:
+      Blocked: "อินสแตนซ์ถูกบล็อก"
+  Restrictions:
+    NoneSpecified: "ไม่ได้ระบุข้อจำกัด"
+    DefaultLanguageMustBeAllowed: "ต้องอนุญาตภาษาเริ่มต้น"
+  Language:
+    NotParsed: "ไม่สามารถแยกวิเคราะห์ภาษาได้"
+    NotSupported: "ไม่รองรับภาษานี้"
+    NotAllowed: "ไม่อนุญาตภาษานี้"
+    Undefined: "ไม่ได้กำหนดภาษา"
+    Duplicate: "มีภาษาซ้ำกัน"
+  OIDCSettings:
+    NotFound: "ไม่พบการกำหนดค่า OIDC"
+    AlreadyExists: "มีการกำหนดค่า OIDC อยู่แล้ว"
+  SecretGenerator:
+    AlreadyExists: "มีตัวสร้างซีเคร็ตอยู่แล้ว"
+    TypeMissing: "ไม่มีประเภทของตัวสร้างซีเคร็ต"
+    NotFound: "ไม่พบตัวสร้างซีเคร็ต"
+  SMSConfig:
+    NotFound: "ไม่พบการกำหนดค่า SMS"
+    AlreadyActive: "การกำหนดค่า SMS ใช้งานอยู่แล้ว"
+    AlreadyDeactivated: "การกำหนดค่า SMS ถูกปิดใช้งานอยู่แล้ว"
+    NotExternalVerification: "การกำหนดค่า SMS ไม่รองรับการยืนยันด้วยรหัส"
+  SMTP:
+    NotEmailMessage: "ข้อความไม่ใช่ EmailMessage"
+    RequiredAttributes: "ต้องกำหนดหัวเรื่อง ผู้รับ และเนื้อหา แต่บางส่วนหรือทั้งหมดว่างเปล่า"
+    CouldNotSplit: "ไม่สามารถแยกโฮสต์และพอร์ตสำหรับเชื่อมต่อ smtp ได้"
+    CouldNotDial: "ไม่สามารถติดต่อกับเซิร์ฟเวอร์ SMTP ได้ ตรวจสอบพอร์ตและปัญหาไฟร์วอลล์..."
+    CouldNotDialTLS: "ไม่สามารถติดต่อกับเซิร์ฟเวอร์ SMTP โดยใช้ TLS ได้ ตรวจสอบพอร์ตและปัญหาไฟร์วอลล์..."
+    CouldNotCreateClient: "ไม่สามารถสร้างไคลเอนต์ smtp ได้"
+    CouldNotStartTLS: "ไม่สามารถเริ่ม tls ได้"
+    CouldNotAuth: "ไม่สามารถเพิ่มการยืนยันตัวตน smtp ได้ ตรวจสอบว่าชื่อผู้ใช้และรหัสผ่านของคุณถูกต้อง หากถูกต้องแล้ว ผู้ให้บริการของคุณอาจต้องการวิธีการยืนยันตัวตนที่ Zitadel ไม่รองรับ"
+    CouldNotSetSender: "ไม่สามารถตั้งค่าผู้ส่งได้"
+    CouldNotSetRecipient: "ไม่สามารถตั้งค่าผู้รับได้"
+  SMTPConfig:
+    TestPassword: "ไม่พบรหัสผ่านสำหรับทดสอบ"
+    NotFound: "ไม่พบการกำหนดค่า SMTP"
+    AlreadyExists: "มีการกำหนดค่า SMTP อยู่แล้ว"
+    AlreadyDeactivated: "การกำหนดค่า SMTP ถูกปิดใช้งานอยู่แล้ว"
+    SenderAdressNotCustomDomain: "ต้องกำหนดที่อยู่ผู้ส่งเป็นโดเมนที่กำหนดเองบนอินสแตนซ์"
+    TestEmailNotFound: "ไม่พบที่อยู่อีเมลสำหรับทดสอบ"
+  Notification:
+    NoDomain: "ไม่พบโดเมนสำหรับข้อความ"
+  User:
+    NotFound: "ไม่พบผู้ใช้"
+    AlreadyExists: "มีผู้ใช้นี้อยู่แล้ว"
+    NotFoundOnOrg: "ไม่พบผู้ใช้ในองค์กรที่เลือก"
+    NotAllowedOrg: "ผู้ใช้ไม่ได้เป็นสมาชิกขององค์กรที่กำหนด"
+    UserIDMissing: "ไม่มี ID ผู้ใช้"
+    UserIDWrong: "ผู้ใช้ในคำขอไม่ตรงกับผู้ใช้ที่ยืนยันตัวตนแล้ว"
+    DomainPolicyNil: "นโยบายขององค์กรว่างเปล่า"
+    EmailAsUsernameNotAllowed: "ไม่อนุญาตให้ใช้อีเมลเป็นชื่อผู้ใช้"
+    Invalid: "ข้อมูลผู้ใช้ไม่ถูกต้อง"
+    DomainNotAllowedAsUsername: "โดเมนถูกสงวนไว้แล้วและไม่สามารถใช้งานได้"
+    AlreadyInactive: "ผู้ใช้ไม่ได้ใช้งานอยู่แล้ว"
+    NotInactive: "ผู้ใช้ยังใช้งานอยู่"
+    CantDeactivateInitial: "ผู้ใช้ที่มีสถานะเริ่มต้นสามารถลบได้เท่านั้น ไม่สามารถปิดใช้งานได้"
+    ShouldBeActiveOrInitial: "ผู้ใช้ไม่ได้อยู่ในสถานะใช้งานหรือเริ่มต้น"
+    AlreadyInitialised: "ผู้ใช้ถูกเริ่มต้นแล้ว"
+    NotInitialised: "ผู้ใช้ยังไม่ได้ถูกเริ่มต้น"
+    NotLocked: "ผู้ใช้ไม่ได้ถูกล็อก"
+    NoChanges: "ไม่พบการเปลี่ยนแปลง"
+    InitCodeNotFound: "ไม่พบรหัสเริ่มต้น"
+    UsernameNotChanged: "ชื่อผู้ใช้ไม่มีการเปลี่ยนแปลง"
+    InvalidURLTemplate: "เทมเพลต URL ไม่ถูกต้อง"
+    Locked: "ผู้ใช้ถูกล็อก"
+    Profile:
+      NotFound: "ไม่พบโปรไฟล์"
+      NotChanged: "โปรไฟล์ไม่มีการเปลี่ยนแปลง"
+      Empty: "โปรไฟล์ว่างเปล่า"
+      FirstNameEmpty: "ชื่อในโปรไฟล์ว่างเปล่า"
+      LastNameEmpty: "นามสกุลในโปรไฟล์ว่างเปล่า"
+      IDMissing: "ไม่มี ID โปรไฟล์"
+    Email:
+      NotFound: "ไม่พบอีเมล"
+      Invalid: "อีเมลไม่ถูกต้อง"
+      AlreadyVerified: "อีเมลได้รับการยืนยันแล้ว"
+      NotChanged: "อีเมลไม่มีการเปลี่ยนแปลง"
+      Empty: "อีเมลว่างเปล่า"
+      IDMissing: "ไม่มี ID อีเมล"
+    Phone:
+      NotFound: "ไม่พบหมายเลขโทรศัพท์"
+      Invalid: "หมายเลขโทรศัพท์ไม่ถูกต้อง"
+      AlreadyVerified: "หมายเลขโทรศัพท์ได้รับการยืนยันแล้ว"
+      Empty: "หมายเลขโทรศัพท์ว่างเปล่า"
+      NotChanged: "หมายเลขโทรศัพท์ไม่มีการเปลี่ยนแปลง"
+      VerifyingRemovalIsNotSupported: "ไม่รองรับการยืนยันการนำหมายเลขโทรศัพท์ออก"
+    Address:
+      NotFound: "ไม่พบที่อยู่"
+      NotChanged: "ที่อยู่ไม่มีการเปลี่ยนแปลง"
+    Machine:
+      Key:
+        NotFound: "ไม่พบคีย์ของเครื่อง"
+        AlreadyExisting: "มีคีย์ของเครื่องอยู่แล้ว"
+        Invalid: "คีย์สาธารณะไม่ใช่คีย์สาธารณะ RSA ที่ถูกต้องในรูปแบบ PKIX ที่เข้ารหัสด้วย PEM"
+      Secret:
+        NotExisting: "ไม่มีซีเคร็ต"
+        Invalid: "ซีเคร็ตไม่ถูกต้อง"
+        CouldNotGenerate: "ไม่สามารถสร้างซีเคร็ตได้"
+    PAT:
+      NotFound: "ไม่พบโทเคนการเข้าถึงส่วนบุคคล"
+    Metadata:
+      Conflicting: "ต้องไม่กำหนดข้อมูลเมตาทั้งในฟิลด์ผู้ใช้และฟิลด์บุคคลพร้อมกัน"
+    NotHuman: "ผู้ใช้ต้องเป็นบุคคล"
+    NotMachine: "ผู้ใช้ต้องเป็นแบบเทคนิค"
+    WrongType: "ไม่อนุญาตสำหรับผู้ใช้ประเภทนี้"
+    NotAllowedToLink: "ผู้ใช้ไม่ได้รับอนุญาตให้เชื่อมโยงกับผู้ให้บริการเข้าสู่ระบบภายนอก"
+    Username:
+      AlreadyExists: "ชื่อผู้ใช้นี้ถูกใช้แล้ว"
+      Reserved: "ชื่อผู้ใช้นี้ถูกใช้แล้ว"
+      Empty: "ชื่อผู้ใช้ว่างเปล่า"
+    Code:
+      Empty: "รหัสว่างเปล่า"
+      NotFound: "ไม่พบรหัส"
+      Expired: "รหัสหมดอายุแล้ว"
+      GeneratorAlgNotSupported: "อัลกอริทึมตัวสร้างที่ไม่รองรับ"
+      Invalid: "รหัสไม่ถูกต้อง"
+    Password:
+      NotFound: "ไม่พบรหัสผ่าน"
+      Empty: "รหัสผ่านว่างเปล่า"
+      Invalid: "รหัสผ่านไม่ถูกต้อง"
+      NotSet: "ผู้ใช้ยังไม่ได้ตั้งรหัสผ่าน"
+      NotChanged: "รหัสผ่านใหม่ต้องไม่เหมือนกับรหัสผ่านปัจจุบันของคุณ"
+      NotSupported: "ไม่รองรับการเข้ารหัสแฮชของรหัสผ่าน ดูรายละเอียดได้ที่ https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"
+    PasswordComplexityPolicy:
+      NotFound: "ไม่พบนโยบายรหัสผ่าน"
+      MinLength: "รหัสผ่านสั้นเกินไป"
+      MinLengthNotAllowed: "ความยาวขั้นต่ำที่กำหนดไม่ได้รับอนุญาต"
+      HasLower: "รหัสผ่านต้องมีตัวพิมพ์เล็ก"
+      HasUpper: "รหัสผ่านต้องมีตัวพิมพ์ใหญ่"
+      HasNumber: "รหัสผ่านต้องมีตัวเลข"
+      HasSymbol: "รหัสผ่านต้องมีสัญลักษณ์"
+    ExternalIDP:
+      Invalid: "IDP ภายนอกไม่ถูกต้อง"
+      IDPConfigNotExisting: "ผู้ให้บริการ IDP ไม่ถูกต้องสำหรับองค์กรนี้"
+      NotAllowed: "ไม่อนุญาต IDP ภายนอก"
+      MinimumExternalIDPNeeded: "ต้องเพิ่ม IDP อย่างน้อยหนึ่งรายการ"
+      AlreadyExists: "IDP ภายนอกนี้ถูกใช้แล้ว"
+      NotFound: "ไม่พบ IDP ภายนอก"
+      LoginFailed: "การเข้าสู่ระบบผ่าน IDP ภายนอกล้มเหลว"
+    MFA:
+      OTP:
+        AlreadyReady: "ตั้งค่า OTP แบบหลายปัจจัย (OneTimePassword) ไว้แล้ว"
+        NotExisting: "ไม่มี OTP แบบหลายปัจจัย (OneTimePassword)"
+        NotReady: "OTP แบบหลายปัจจัย (OneTimePassword) ยังไม่พร้อม"
+        InvalidCode: "รหัสไม่ถูกต้อง"
+      U2F:
+        NotExisting: "ไม่มี U2F"
+      Passwordless:
+        NotExisting: "ไม่มีพาสคีย์"
+      RecoveryCodes:
+        Empty: "รหัสกู้คืนว่างเปล่า"
+        InvalidCode: "รหัสกู้คืนที่ระบุไม่ถูกต้อง"
+        MaxCountExceeded: "เกินจำนวนรหัสกู้คืนสูงสุด"
+        NotReady: "รหัสกู้คืนยังไม่พร้อมใช้งาน"
+        ConfigInvalid: "การกำหนดค่ารหัสกู้คืนไม่ถูกต้อง"
+    WebAuthN:
+      NotFound: "ไม่พบโทเคน WebAuthN"
+      BeginRegisterFailed: "การเริ่มลงทะเบียน WebAuthN ล้มเหลว"
+      MarshalError: "เกิดข้อผิดพลาดขณะ marshal ข้อมูล"
+      ErrorOnParseCredential: "เกิดข้อผิดพลาดขณะแยกวิเคราะห์ข้อมูลข้อมูลประจำตัว"
+      CreateCredentialFailed: "เกิดข้อผิดพลาดขณะสร้างข้อมูลประจำตัว"
+      BeginLoginFailed: "การเริ่มเข้าสู่ระบบ WebAuthN ล้มเหลว"
+      ValidateLoginFailed: "เกิดข้อผิดพลาดขณะตรวจสอบข้อมูลประจำตัวสำหรับเข้าสู่ระบบ"
+      CloneWarning: "ข้อมูลประจำตัวอาจถูกโคลน"
+    RefreshToken:
+      Invalid: "Refresh Token ไม่ถูกต้อง"
+      NotFound: "ไม่พบ Refresh Token"
+  Org:
+    AlreadyExists: "ชื่อหรือ id ขององค์กรถูกใช้แล้ว"
+    Invalid: "องค์กรไม่ถูกต้อง"
+    AlreadyDeactivated: "องค์กรถูกปิดใช้งานอยู่แล้ว"
+    AlreadyActive: "องค์กรใช้งานอยู่แล้ว"
+    Empty: "องค์กรว่างเปล่า"
+    NotFound: "ไม่พบองค์กร"
+    NotChanged: "องค์กรไม่มีการเปลี่ยนแปลง"
+    DefaultOrgNotDeletable: "ห้ามลบองค์กรเริ่มต้น"
+    ZitadelOrgNotDeletable: "ห้ามลบองค์กรที่มีโปรเจกต์ Zitadel"
+    InvalidDomain: "โดเมนไม่ถูกต้อง"
+    DomainMissing: "ไม่มีโดเมน"
+    DomainNotOnOrg: "ไม่มีโดเมนนี้ในองค์กร"
+    DomainNotVerified: "โดเมนยังไม่ได้รับการยืนยัน"
+    DomainAlreadyVerified: "โดเมนได้รับการยืนยันแล้ว"
+    DomainVerificationTypeInvalid: "ประเภทการยืนยันโดเมนไม่ถูกต้อง"
+    DomainVerificationMissing: "ยังไม่ได้เริ่มการยืนยันโดเมน"
+    DomainVerificationFailed: "การยืนยันโดเมนล้มเหลว"
+    DomainVerificationTXTNotFound: "ไม่พบระเบียน TXT _zitadel-challenge สำหรับโดเมนของคุณ ตรวจสอบว่าคุณได้เพิ่มลงในเซิร์ฟเวอร์ DNS ของคุณแล้ว หรือรอจนกว่าระเบียนใหม่จะเผยแพร่"
+    DomainVerificationTXTNoMatch: "พบระเบียน TXT _zitadel-challenge สำหรับโดเมนของคุณ แต่ไม่มีข้อความโทเคนที่ถูกต้อง ตรวจสอบว่าคุณได้เพิ่มโทเคนที่ถูกต้องลงในเซิร์ฟเวอร์ DNS ของคุณแล้ว หรือรอจนกว่าระเบียนใหม่จะเผยแพร่"
+    DomainVerificationHTTPNotFound: "ไม่พบไฟล์ที่มี challenge ใน URL ที่คาดไว้ ตรวจสอบว่าคุณได้อัปโหลดไฟล์ไว้ในตำแหน่งที่ถูกต้องพร้อมสิทธิ์การอ่าน"
+    DomainVerificationHTTPNoMatch: "พบไฟล์ที่มี challenge ใน URL ที่คาดไว้ แต่ไม่มีข้อความโทเคนที่ถูกต้อง ตรวจสอบเนื้อหาของไฟล์"
+    DomainVerificationTimeout: "หมดเวลาขณะสอบถามเซิร์ฟเวอร์ DNS"
+    PrimaryDomainNotDeletable: "ห้ามลบโดเมนขององค์กร"
+    DomainNotFound: "ไม่พบโดเมน"
+    MemberIDMissing: "ไม่มี ID สมาชิก"
+    MemberNotFound: "ไม่พบสมาชิกขององค์กร"
+    InvalidMember: "สมาชิกขององค์กรไม่ถูกต้อง"
+    UserIDMissing: "ไม่มี ID ผู้ใช้"
+    PolicyAlreadyExists: "มีนโยบายอยู่แล้ว"
+    PolicyNotExisting: "ไม่มีนโยบาย"
+    IdpInvalid: "การกำหนดค่า IDP ไม่ถูกต้อง"
+    IdpNotExisting: "ไม่มีการกำหนดค่า IDP"
+    OIDCConfigInvalid: "การกำหนดค่า OIDC IDP ไม่ถูกต้อง"
+    IdpIsNotOIDC: "การกำหนดค่า IDP ไม่ใช่ประเภท oidc"
+    Domain:
+      AlreadyExists: "มีโดเมนอยู่แล้ว"
+      InvalidCharacter: "อนุญาตเฉพาะตัวอักษรและตัวเลข . และ - สำหรับโดเมนเท่านั้น"
+      EmptyString: "อักขระที่ไม่ใช่ตัวเลขและตัวอักษรที่ไม่ถูกต้องถูกแทนที่ด้วยช่องว่าง และโดเมนที่ได้เป็นสตริงว่างเปล่า"
+    LoginPolicy:
+      NotFound: "ไม่พบนโยบายการเข้าสู่ระบบ"
+      Invalid: "นโยบายการเข้าสู่ระบบไม่ถูกต้อง"
+      RedirectURIInvalid: "Redirect URI เริ่มต้นไม่ถูกต้อง"
+      NotExisting: "ไม่มีนโยบายการเข้าสู่ระบบ"
+      AlreadyExists: "มีนโยบายการเข้าสู่ระบบอยู่แล้ว"
+      IdpProviderAlreadyExisting: "มีผู้ให้บริการข้อมูลประจำตัวอยู่แล้ว"
+      IdpProviderNotExisting: "ไม่มีผู้ให้บริการข้อมูลประจำตัว"
+      RegistrationNotAllowed: "ไม่อนุญาตให้ลงทะเบียน"
+      UsernamePasswordNotAllowed: "ไม่อนุญาตให้เข้าสู่ระบบด้วยชื่อผู้ใช้ / รหัสผ่าน"
+      MFA:
+        AlreadyExists: "มีหลายปัจจัยอยู่แล้ว"
+        NotExisting: "ไม่มีหลายปัจจัย"
+        Unspecified: "หลายปัจจัยไม่ถูกต้อง"
+    MailTemplate:
+      NotFound: "ไม่พบเทมเพลตอีเมลเริ่มต้น"
+      NotChanged: "เทมเพลตอีเมลเริ่มต้นไม่มีการเปลี่ยนแปลง"
+      AlreadyExists: "มีเทมเพลตอีเมลเริ่มต้นอยู่แล้ว"
+      Invalid: "เทมเพลตอีเมลเริ่มต้นไม่ถูกต้อง"
+    CustomMessageText:
+      NotFound: "ไม่พบข้อความเริ่มต้น"
+      NotChanged: "ข้อความเริ่มต้นไม่มีการเปลี่ยนแปลง"
+      AlreadyExists: "มีข้อความเริ่มต้นอยู่แล้ว"
+      Invalid: "ข้อความเริ่มต้นไม่ถูกต้อง"
+    PasswordComplexityPolicy:
+      NotFound: "ไม่พบนโยบายความซับซ้อนของรหัสผ่าน"
+      Empty: "นโยบายความซับซ้อนของรหัสผ่านว่างเปล่า"
+      NotExisting: "ไม่มีนโยบายความซับซ้อนของรหัสผ่าน"
+      AlreadyExists: "มีนโยบายความซับซ้อนของรหัสผ่านอยู่แล้ว"
+    PasswordLockoutPolicy:
+      NotFound: "ไม่พบนโยบายการล็อกรหัสผ่าน"
+      Empty: "นโยบายการล็อกรหัสผ่านว่างเปล่า"
+      NotExisting: "ไม่มีนโยบายการล็อกรหัสผ่าน"
+      AlreadyExists: "มีนโยบายการล็อกรหัสผ่านอยู่แล้ว"
+    PasswordAgePolicy:
+      NotFound: "ไม่พบนโยบายอายุรหัสผ่าน"
+      Empty: "นโยบายอายุรหัสผ่านว่างเปล่า"
+      NotExisting: "ไม่มีนโยบายอายุรหัสผ่าน"
+      AlreadyExists: "มีนโยบายอายุรหัสผ่านอยู่แล้ว"
+    NotificationPolicy:
+      NotFound: "ไม่พบนโยบายการแจ้งเตือน"
+      NotChanged: "นโยบายการแจ้งเตือนไม่มีการเปลี่ยนแปลง"
+      AlreadyExists: "มีนโยบายการแจ้งเตือนอยู่แล้ว"
+    LabelPolicy:
+      NotFound: "ไม่พบนโยบายฉลากส่วนตัว"
+      NotChanged: "นโยบายฉลากส่วนตัวไม่มีการเปลี่ยนแปลง"
+  Project:
+    ProjectIDMissing: "ไม่มี Project Id"
+    AlreadyExists: "มีโปรเจกต์นี้อยู่ในองค์กรแล้ว"
+    OrgNotExisting: "ไม่มีองค์กร"
+    UserNotExisting: "ไม่มีผู้ใช้"
+    CouldNotGenerateClientSecret: "ไม่สามารถสร้าง client secret ได้"
+    Invalid: "โปรเจกต์ไม่ถูกต้อง"
+    NotActive: "โปรเจกต์ไม่ได้ใช้งานอยู่"
+    NotInactive: "โปรเจกต์ไม่ได้ถูกปิดใช้งาน"
+    NotFound: "ไม่พบโปรเจกต์"
+    UserIDMissing: "ไม่มี ID ผู้ใช้"
+    Member:
+      NotFound: "ไม่พบสมาชิกของโปรเจกต์"
+      Invalid: "สมาชิกของโปรเจกต์ไม่ถูกต้อง"
+      AlreadyExists: "มีสมาชิกของโปรเจกต์อยู่แล้ว"
+      NotExisting: "ไม่มีสมาชิกของโปรเจกต์"
+    MinimumOneRoleNeeded: "ต้องเพิ่มบทบาทอย่างน้อยหนึ่งรายการ"
+    Role:
+      AlreadyExists: "มีบทบาทอยู่แล้ว"
+      Invalid: "บทบาทไม่ถูกต้อง"
+      NotExisting: "ไม่มีบทบาท"
+    IDMissing: "ไม่มี ID"
+    App:
+      AlreadyExists: "มีแอปพลิเคชันอยู่แล้ว"
+      NotFound: "ไม่พบแอปพลิเคชัน"
+      Invalid: "แอปพลิเคชันไม่ถูกต้อง"
+      NotExisting: "ไม่มีแอปพลิเคชัน"
+      NotActive: "แอปพลิเคชันไม่ได้ใช้งานอยู่"
+      NotInactive: "แอปพลิเคชันไม่ได้ถูกปิดใช้งาน"
+      OIDCConfigInvalid: "การกำหนดค่า OIDC ไม่ถูกต้อง"
+      APIConfigInvalid: "การกำหนดค่า API ไม่ถูกต้อง"
+      SAMLConfigInvalid: "การกำหนดค่า SAML ไม่ถูกต้อง"
+      IsNotOIDC: "แอปพลิเคชันไม่ใช่ประเภท OIDC"
+      IsNotAPI: "แอปพลิเคชันไม่ใช่ประเภท API"
+      IsNotSAML: "แอปพลิเคชันไม่ใช่ประเภท SAML"
+      SAMLMetadataMissing: "ไม่มีข้อมูลเมตา SAML"
+      SAMLMetadataFormat: "เกิดข้อผิดพลาดรูปแบบข้อมูลเมตา SAML"
+      SAMLEntityIDAlreadyExisting: "มี SAML EntityID อยู่แล้ว"
+      OIDCAuthMethodNoSecret: "วิธีการยืนยันตัวตน OIDC ที่เลือกไม่ต้องการซีเคร็ต"
+      APIAuthMethodNoSecret: "วิธีการยืนยันตัวตน API ที่เลือกไม่ต้องการซีเคร็ต"
+      AuthMethodNoPrivateKeyJWT: "วิธีการยืนยันตัวตนที่เลือกไม่ต้องการคีย์"
+      ClientSecretInvalid: "Client Secret ไม่ถูกต้อง"
+      Key:
+        AlreadyExisting: "มีคีย์ของแอปพลิเคชันอยู่แล้ว"
+        NotFound: "ไม่พบคีย์ของแอปพลิเคชัน"
+    RequiredFieldsMissing: "ไม่มีฟิลด์ที่จำเป็นบางรายการ"
+    Grant:
+      AlreadyExists: "มี Project Grant อยู่แล้ว"
+      NotFound: "ไม่พบ Project Grant"
+      Invalid: "Project Grant ไม่ถูกต้อง"
+      NotExisting: "ไม่มี Project Grant"
+      HasNotExistingRole: "มีบทบาทหนึ่งที่ไม่มีอยู่ในโปรเจกต์"
+      NotActive: "Project Grant ไม่ได้ใช้งานอยู่"
+      NotInactive: "Project Grant ไม่ได้ถูกปิดใช้งาน"
+  Instance:
+    AlreadyExists: "มีอินสแตนซ์อยู่แล้ว"
+    NotChanged: "อินสแตนซ์ไม่มีการเปลี่ยนแปลง"
+    NotFound: "ไม่พบอินสแตนซ์ ตรวจสอบว่าโดเมนของคุณถูกต้อง ดูรายละเอียดได้ที่ https://zitadel.com/docs/apis/introduction#domains"
+    Member:
+      RolesNotChanged: "บทบาทไม่มีการเปลี่ยนแปลง"
+    MemberInvalid: "สมาชิกไม่ถูกต้อง"
+    MemberAlreadyExisting: "มีสมาชิกอยู่แล้ว"
+    MemberNotExisting: "ไม่มีสมาชิก"
+    IDMissing: "ไม่มี Id"
+    IdpInvalid: "การกำหนดค่า IDP ไม่ถูกต้อง"
+    IdpNotExisting: "ไม่มีการกำหนดค่า IDP"
+    OIDCConfigInvalid: "การกำหนดค่า OIDC IDP ไม่ถูกต้อง"
+    IdpIsNotOIDC: "การกำหนดค่า IDP ไม่ใช่ประเภท oidc"
+    LoginPolicyInvalid: "นโยบายการเข้าสู่ระบบไม่ถูกต้อง"
+    LoginPolicyNotExisting: "ไม่มีนโยบายการเข้าสู่ระบบ"
+    IdpProviderInvalid: "ผู้ให้บริการข้อมูลประจำตัวไม่ถูกต้อง"
+    LoginPolicy:
+      NotFound: "ไม่พบนโยบายการเข้าสู่ระบบเริ่มต้น"
+      NotChanged: "นโยบายการเข้าสู่ระบบเริ่มต้นไม่มีการเปลี่ยนแปลง"
+      NotExisting: "ไม่มีนโยบายการเข้าสู่ระบบเริ่มต้น"
+      AlreadyExists: "มีนโยบายการเข้าสู่ระบบเริ่มต้นอยู่แล้ว"
+      RedirectURIInvalid: "Redirect URI เริ่มต้นไม่ถูกต้อง"
+      MFA:
+        AlreadyExists: "มีหลายปัจจัยอยู่แล้ว"
+        NotExisting: "ไม่มีหลายปัจจัย"
+        Unspecified: "หลายปัจจัยไม่ถูกต้อง"
+      IDP:
+        AlreadyExists: "มีผู้ให้บริการข้อมูลประจำตัวอยู่แล้ว"
+        NotExisting: "ไม่มีผู้ให้บริการข้อมูลประจำตัว"
+        Invalid: "ผู้ให้บริการข้อมูลประจำตัวไม่ถูกต้อง"
+      IDPConfig:
+        AlreadyExists: "มีการกำหนดค่าผู้ให้บริการข้อมูลประจำตัวอยู่แล้ว"
+        NotInactive: "การกำหนดค่าผู้ให้บริการข้อมูลประจำตัวไม่ได้ถูกปิดใช้งาน"
+        NotActive: "การกำหนดค่าผู้ให้บริการข้อมูลประจำตัวไม่ได้ใช้งานอยู่"
+    LabelPolicy:
+      NotFound: "ไม่พบนโยบายฉลากส่วนตัวเริ่มต้น"
+      NotChanged: "นโยบายฉลากส่วนตัวเริ่มต้นไม่มีการเปลี่ยนแปลง"
+    MailTemplate:
+      NotFound: "ไม่พบเทมเพลตอีเมลเริ่มต้น"
+      NotChanged: "เทมเพลตอีเมลเริ่มต้นไม่มีการเปลี่ยนแปลง"
+      AlreadyExists: "มีเทมเพลตอีเมลเริ่มต้นอยู่แล้ว"
+      Invalid: "เทมเพลตอีเมลเริ่มต้นไม่ถูกต้อง"
+    CustomMessageText:
+      NotFound: "ไม่พบข้อความเริ่มต้น"
+      NotChanged: "ข้อความเริ่มต้นไม่มีการเปลี่ยนแปลง"
+      AlreadyExists: "มีข้อความเริ่มต้นอยู่แล้ว"
+      Invalid: "ข้อความเริ่มต้นไม่ถูกต้อง"
+    PasswordComplexityPolicy:
+      NotFound: "ไม่พบนโยบายความซับซ้อนของรหัสผ่านเริ่มต้น"
+      NotExisting: "ไม่มีนโยบายความซับซ้อนของรหัสผ่านเริ่มต้น"
+      AlreadyExists: "มีนโยบายความซับซ้อนของรหัสผ่านเริ่มต้นอยู่แล้ว"
+      Empty: "นโยบายความซับซ้อนของรหัสผ่านเริ่มต้นว่างเปล่า"
+      NotChanged: "นโยบายความซับซ้อนของรหัสผ่านเริ่มต้นไม่มีการเปลี่ยนแปลง"
+    PasswordAgePolicy:
+      NotFound: "ไม่พบนโยบายอายุรหัสผ่านเริ่มต้น"
+      NotExisting: "ไม่มีนโยบายอายุรหัสผ่านเริ่มต้น"
+      AlreadyExists: "มีนโยบายอายุรหัสผ่านเริ่มต้นอยู่แล้ว"
+      Empty: "นโยบายอายุรหัสผ่านเริ่มต้นว่างเปล่า"
+      NotChanged: "นโยบายอายุรหัสผ่านเริ่มต้นไม่มีการเปลี่ยนแปลง"
+    PasswordLockoutPolicy:
+      NotFound: "ไม่พบนโยบายการล็อกรหัสผ่านเริ่มต้น"
+      NotExisting: "ไม่มีนโยบายการล็อกรหัสผ่านเริ่มต้น"
+      AlreadyExists: "มีนโยบายการล็อกรหัสผ่านเริ่มต้นอยู่แล้ว"
+      Empty: "นโยบายการล็อกรหัสผ่านเริ่มต้นว่างเปล่า"
+      NotChanged: "นโยบายการล็อกรหัสผ่านเริ่มต้นไม่มีการเปลี่ยนแปลง"
+    DomainPolicy:
+      NotFound: "ไม่พบนโยบายโดเมนขององค์กร"
+      Empty: "นโยบายโดเมนขององค์กรว่างเปล่า"
+      NotExisting: "ไม่มีนโยบายโดเมนขององค์กร"
+      AlreadyExists: "มีนโยบายโดเมนขององค์กรอยู่แล้ว"
+      NotChanged: "นโยบายโดเมนขององค์กรไม่มีการเปลี่ยนแปลง"
+    NotificationPolicy:
+      NotFound: "ไม่พบนโยบายการแจ้งเตือนเริ่มต้น"
+      NotChanged: "นโยบายการแจ้งเตือนเริ่มต้นไม่มีการเปลี่ยนแปลง"
+      AlreadyExists: "มีนโยบายการแจ้งเตือนเริ่มต้นอยู่แล้ว"
+  Policy:
+    AlreadyExists: "มีนโยบายอยู่แล้ว"
+    Label:
+      Invalid:
+        PrimaryColor: "สีหลักไม่ใช่ค่าสี Hex ที่ถูกต้อง"
+        BackgroundColor: "สีพื้นหลังไม่ใช่ค่าสี Hex ที่ถูกต้อง"
+        WarnColor: "สีเตือนไม่ใช่ค่าสี Hex ที่ถูกต้อง"
+        FontColor: "สีตัวอักษรไม่ใช่ค่าสี Hex ที่ถูกต้อง"
+        PrimaryColorDark: "สีหลัก (โหมดมืด) ไม่ใช่ค่าสี Hex ที่ถูกต้อง"
+        BackgroundColorDark: "สีพื้นหลัง (โหมดมืด) ไม่ใช่ค่าสี Hex ที่ถูกต้อง"
+        WarnColorDark: "สีเตือน (โหมดมืด) ไม่ใช่ค่าสี Hex ที่ถูกต้อง"
+        FontColorDark: "สีตัวอักษร (โหมดมืด) ไม่ใช่ค่าสี Hex ที่ถูกต้อง"
+  UserGrant:
+    AlreadyExists: "มีการให้สิทธิ์ผู้ใช้อยู่แล้ว"
+    NotFound: "ไม่พบการให้สิทธิ์ผู้ใช้"
+    Invalid: "การให้สิทธิ์ผู้ใช้ไม่ถูกต้อง"
+    NotChanged: "การให้สิทธิ์ผู้ใช้ไม่มีการเปลี่ยนแปลง"
+    IDMissing: "ไม่มี Id"
+    NoPermissionForProject: "ผู้ใช้ไม่มีสิทธิ์ในโปรเจกต์นี้"
+    RoleKeyNotFound: "ไม่พบบทบาท"
+  Member:
+    AlreadyExists: "มีสมาชิกอยู่แล้ว"
+  IDPConfig:
+    AlreadyExists: "มีการกำหนดค่า IDP ที่ใช้ชื่อนี้อยู่แล้ว"
+    NotExisting: "ไม่มีการกำหนดค่าผู้ให้บริการข้อมูลประจำตัว"
+  Changes:
+    NotFound: "ไม่พบประวัติ"
+    AuditRetention: "ประวัติอยู่นอกช่วงการเก็บรักษาบันทึกการตรวจสอบ"
+  Token:
+    NotFound: "ไม่พบโทเคน"
+    Invalid: "โทเคนไม่ถูกต้อง"
+  UserSession:
+    NotFound: "ไม่พบเซสชันผู้ใช้"
+  Key:
+    NotFound: "ไม่พบคีย์"
+    ExpireBeforeNow: "วันหมดอายุอยู่ในอดีต"
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: "หลายปัจจัยถูกกำหนดให้จำเป็น แต่ไม่ได้กำหนดค่าผู้ให้บริการที่เป็นไปได้ไว้ กรุณาติดต่อผู้ดูแลระบบของคุณ"
+  Step:
+    Started:
+      AlreadyExists: "มีขั้นตอนที่เริ่มแล้วอยู่แล้ว"
+    Done:
+      AlreadyExists: "มีขั้นตอนที่เสร็จสิ้นแล้วอยู่แล้ว"
+  CustomText:
+    AlreadyExists: "มีข้อความที่กำหนดเองอยู่แล้ว"
+    Invalid: "ข้อความที่กำหนดเองไม่ถูกต้อง"
+    NotFound: "ไม่พบข้อความที่กำหนดเอง"
+  TranslationFile:
+    ReadError: "เกิดข้อผิดพลาดขณะอ่านไฟล์การแปล"
+    MergeError: "ไม่สามารถรวมไฟล์การแปลกับการแปลที่กำหนดเองได้"
+    NotFound: "ไม่มีไฟล์การแปล"
+  Metadata:
+    NotFound: "ไม่พบข้อมูลเมตา"
+    NoData: "รายการข้อมูลเมตาว่างเปล่า"
+    Invalid: "ข้อมูลเมตาไม่ถูกต้อง"
+    KeyNotExisting: "ไม่มีคีย์อย่างน้อยหนึ่งรายการ"
+  Action:
+    Invalid: "การดำเนินการไม่ถูกต้อง"
+    NotFound: "ไม่พบการดำเนินการ"
+    NotActive: "การดำเนินการไม่ได้ใช้งานอยู่"
+    NotInactive: "การดำเนินการไม่ได้ถูกปิดใช้งาน"
+    MaxAllowed: "ไม่อนุญาตให้มีการดำเนินการที่ใช้งานอยู่เพิ่มเติม"
+    NotEnabled: "ยังไม่ได้เปิดใช้งานฟีเจอร์ \"Action\""
+  Flow:
+    FlowTypeMissing: "ไม่มี FlowType"
+    Empty: "โฟลว์ว่างเปล่าอยู่แล้ว"
+    WrongTriggerType: "TriggerType ไม่ถูกต้อง"
+    NoChanges: "ไม่มีการเปลี่ยนแปลง"
+    ActionIDsNotExist: "ไม่มี ActionIDs"
+  Query:
+    CloseRows: "ไม่สามารถทำคำสั่ง SQL ให้เสร็จสิ้นได้"
+    SQLStatement: "ไม่สามารถสร้างคำสั่ง SQL ได้"
+    InvalidRequest: "คำขอไม่ถูกต้อง"
+    TooManyNestingLevels: "ระดับการซ้อนคำสั่งค้นหามากเกินไป (สูงสุด 20)"
+    LimitExceeded: "เกินค่าจำกัด"
+  Quota:
+    AlreadyExists: "มีโควตาสำหรับหน่วยนี้อยู่แล้ว"
+    NotFound: "ไม่พบโควตาสำหรับหน่วยนี้"
+    Invalid:
+      CallURL: "URL เรียกใช้โควตาไม่ถูกต้อง"
+      Percent: "เปอร์เซ็นต์โควตาต่ำกว่า 1"
+      Unimplemented: "ยังไม่ได้จัดทำโควตาสำหรับหน่วยนี้"
+      Amount: "จำนวนโควตาต่ำกว่า 1"
+      ResetInterval: "ช่วงการรีเซ็ตโควตาสั้นกว่าหนึ่งนาที"
+      Noop: "โควตาไม่จำกัดที่ไม่มีการแจ้งเตือนไม่มีผลใดๆ"
+    Access:
+      Exhausted: "โควตาสำหรับคำขอที่ยืนยันตัวตนแล้วถูกใช้จนหมด"
+    Execution:
+      Exhausted: "โควตาสำหรับวินาทีการดำเนินการถูกใช้จนหมด"
+  LogStore:
+    Access:
+      StorageFailed: "การจัดเก็บบันทึกการเข้าถึงลงในฐานข้อมูลล้มเหลว"
+      ScanFailed: "การสอบถามการใช้งานสำหรับคำขอที่ยืนยันตัวตนแล้วล้มเหลว"
+    Execution:
+      StorageFailed: "การจัดเก็บบันทึกการดำเนินการลงในฐานข้อมูลล้มเหลว"
+      ScanFailed: "การสอบถามการใช้งานสำหรับวินาทีการดำเนินการล้มเหลว"
+  Session:
+    IDMissing: "ไม่มี ID เซสชัน"
+    NotFound: "ไม่พบเซสชัน"
+    NotExisting: "ไม่มีเซสชัน"
+    Terminated: "เซสชันถูกยุติแล้ว"
+    Expired: "เซสชันหมดอายุแล้ว"
+    PositiveLifetime: "อายุของเซสชันต้องไม่น้อยกว่า 0"
+    Token:
+      Invalid: "โทเคนของเซสชันไม่ถูกต้อง"
+    WebAuthN:
+      NoChallenge: "เซสชันไม่มี challenge ของ WebAuthN"
+  Intent:
+    IDPMissing: "ไม่มี IDP ID ในคำขอ"
+    IDPInvalid: "IDP ไม่ถูกต้องสำหรับคำขอ"
+    ResponseInvalid: "การตอบกลับของ IDP ไม่ถูกต้อง"
+    MissingSingleMappingAttribute: "การตอบกลับของ IDP ไม่มีแอตทริบิวต์การแมป หรือมีค่ามากกว่าหนึ่งค่า"
+    SuccessURLMissing: "ไม่มี Success URL ในคำขอ"
+    FailureURLMissing: "ไม่มี Failure URL ในคำขอ"
+    StateMissing: "ไม่มีพารามิเตอร์ State ในคำขอ"
+    NotStarted: "Intent ยังไม่ได้เริ่มหรือถูกยุติไปแล้ว"
+    NotSucceeded: "Intent ยังไม่สำเร็จ"
+    Expired: "Intent หมดอายุแล้ว"
+    TokenCreationFailed: "การสร้างโทเคนล้มเหลว"
+    InvalidToken: "โทเคน Intent ไม่ถูกต้อง"
+    OtherUser: "Intent มีไว้สำหรับผู้ใช้อื่น"
+  AuthRequest:
+    AlreadyExists: "มี Auth Request อยู่แล้ว"
+    NotExisting: "ไม่มี Auth Request"
+    WrongLoginClient: "Auth Request ถูกสร้างโดยแอปพลิเคชันเข้าสู่ระบบอื่น"
+    AlreadyHandled: "Auth Request ได้รับการจัดการแล้ว"
+  OIDCSession:
+    RefreshTokenInvalid: "Refresh Token ไม่ถูกต้อง"
+    Token:
+      Invalid: "โทเคนไม่ถูกต้อง"
+      Expired: "โทเคนหมดอายุแล้ว"
+    InvalidClient: "โทเคนไม่ได้ออกให้สำหรับแอปพลิเคชันนี้"
+  SAMLRequest:
+    AlreadyExists: "มี SAMLRequest อยู่แล้ว"
+    NotExisting: "ไม่มี SAMLRequest"
+    WrongLoginClient: "SAMLRequest ถูกสร้างโดยแอปพลิเคชันเข้าสู่ระบบอื่น"
+    AlreadyHandled: "SAMLRequest ได้รับการจัดการแล้ว"
+  SAMLSession:
+    InvalidClient: "SAMLResponse ไม่ได้ออกให้สำหรับแอปพลิเคชันนี้"
+  DeviceAuth:
+    NotFound: "ไม่มีคำขอการให้สิทธิ์อุปกรณ์"
+    AlreadyHandled: "คำขอการให้สิทธิ์อุปกรณ์ได้รับการจัดการแล้ว"
+  Feature:
+    NotExisting: "ไม่มีฟีเจอร์"
+    TypeNotSupported: "ไม่รองรับประเภทฟีเจอร์"
+    InvalidValue: "ค่าไม่ถูกต้องสำหรับฟีเจอร์นี้"
+  Target:
+    Invalid: "เป้าหมายไม่ถูกต้อง"
+    NoTimeout: "เป้าหมายไม่มีการหมดเวลา"
+    InvalidURL: "เป้าหมายมี URL ที่ไม่ถูกต้อง"
+    NotFound: "ไม่พบเป้าหมาย"
+    InvalidExpirationDate: "วันหมดอายุของคีย์ต้องอยู่ในอนาคต"
+    PublicKeyExpired: "คีย์สาธารณะของเป้าหมายหมดอายุแล้ว"
+    PublicKeyActive: "ไม่สามารถลบคีย์สาธารณะของเป้าหมายที่ใช้งานอยู่ได้"
+    InvalidPublicKey: "คีย์สาธารณะไม่ถูกต้อง ต้องเป็นคีย์สาธารณะ RSA หรือ ECDSA ที่เข้ารหัสด้วย PEM ในรูปแบบ PKCS#8"
+  Execution:
+    ConditionInvalid: "เงื่อนไขการดำเนินการไม่ถูกต้อง"
+    Invalid: "การดำเนินการไม่ถูกต้อง"
+    NotFound: "ไม่พบการดำเนินการ"
+    IncludeNotFound: "ไม่พบ Include"
+    NoTargets: "ไม่ได้กำหนดเป้าหมาย"
+    Failed: "การดำเนินการล้มเหลว"
+    ResponseIsNotValidJSON: "การตอบกลับไม่ใช่ JSON ที่ถูกต้อง"
+    MissingEncryptionKey: "ไม่พบคีย์การเข้ารหัสสำหรับเป้าหมาย"
+  UserSchema:
+    NotEnabled: "ยังไม่ได้เปิดใช้งานฟีเจอร์ \"User Schema\""
+    Type:
+      Missing: "ไม่มีประเภทของ User Schema"
+      AlreadyExists: "มีประเภทของ User Schema อยู่แล้ว"
+    Authenticator:
+      Invalid: "ประเภทตัวยืนยันตัวตนไม่ถูกต้อง"
+    NotActive: "User Schema ไม่ได้ใช้งานอยู่"
+    NotInactive: "User Schema ไม่ได้ถูกปิดใช้งาน"
+    NotExists: "ไม่มี User Schema"
+    ID:
+      Missing: "ไม่มี ID ของ User Schema"
+    Invalid: "User Schema ไม่ถูกต้อง"
+    Data:
+      Invalid: "ข้อมูลไม่ถูกต้องสำหรับ User Schema"
+  TokenExchange:
+    Token:
+      Missing: "ไม่มีโทเคน"
+      Invalid: "โทเคนไม่ถูกต้อง"
+      TypeMissing: "ไม่มีประเภทของโทเคน"
+      TypeNotAllowed: "ไม่อนุญาตประเภทของโทเคน"
+      TypeNotSupported: "ไม่รองรับประเภทของโทเคน"
+      NotForAPI: "ไม่อนุญาตให้ใช้โทเคนที่สวมสิทธิ์กับ API"
+    Impersonation:
+      PolicyDisabled: "การสวมสิทธิ์ถูกปิดใช้งานในนโยบายความปลอดภัยของอินสแตนซ์"
+  WebKey:
+    ActiveDelete: "ไม่สามารถลบ web key ที่ใช้งานอยู่ได้"
+    Config: "การกำหนดค่า web key ไม่ถูกต้อง"
+    Duplicate: "web key ID ไม่ซ้ำกัน"
+    NoActive: "ไม่พบ web key ที่ใช้งานอยู่"
+    NotFound: "ไม่พบ web key"
+  IDP:
+    InvalidSearchQuery: "คำค้นหาไม่ถูกต้อง"
+    ClientIDMissing: "ไม่มี ClientID"
+    TeamIDMissing: "ไม่มี TeamID"
+    KeyIDMissing: "ไม่มี KeyID"
+    PrivateKeyMissing: "ไม่มี Private Key"
+    InvalidPrivateKey: "รูปแบบ Private Key ไม่ถูกต้อง"
+
+AggregateTypes:
+  action: "การดำเนินการ"
+  instance: "อินสแตนซ์"
+  key_pair: "คู่คีย์"
+  org: "องค์กร"
+  project: "โปรเจกต์"
+  user: "ผู้ใช้"
+  usergrant: "การให้สิทธิ์ผู้ใช้"
+  quota: "โควตา"
+  feature: "ฟีเจอร์"
+  target: "เป้าหมาย"
+  execution: "การดำเนินการ"
+  user_schema: "User Schema"
+  auth_request: "Auth Request"
+  device_auth: "Device Auth"
+  idpintent: "IDP Intent"
+  limits: "ค่าจำกัด"
+  milestone: "Milestone"
+  oidc_session: "OIDC Session"
+  restrictions: "ข้อจำกัด"
+  system: "ระบบ"
+  session: "เซสชัน"
+  web_key: "Web Key"
+  saml_request: "SAML Request"
+  saml_session: "SAML Session"
+EventTypes:
+  execution:
+    set: "กำหนดการดำเนินการแล้ว"
+    removed: "ลบการดำเนินการแล้ว"
+  target:
+    added: "สร้างเป้าหมายแล้ว"
+    changed: "เปลี่ยนแปลงเป้าหมายแล้ว"
+    removed: "ลบเป้าหมายแล้ว"
+  user:
+    added: "เพิ่มผู้ใช้แล้ว"
+    selfregistered: "ผู้ใช้ลงทะเบียนด้วยตนเอง"
+    initialization:
+      code:
+        added: "สร้างรหัสเริ่มต้นแล้ว"
+        sent: "ส่งรหัสเริ่มต้นแล้ว"
+      check:
+        succeeded: "การตรวจสอบเริ่มต้นสำเร็จ"
+        failed: "การตรวจสอบเริ่มต้นล้มเหลว"
+    token:
+      added: "สร้าง Access Token แล้ว"
+      v2.added: "สร้าง Access Token แล้ว"
+      removed: "นำ Access Token ออกแล้ว"
+    impersonated: "สวมสิทธิ์ผู้ใช้แล้ว"
+    username:
+      reserved: "สงวนชื่อผู้ใช้แล้ว"
+      released: "ปล่อยชื่อผู้ใช้แล้ว"
+      changed: "เปลี่ยนชื่อผู้ใช้แล้ว"
+    email:
+      reserved: "สงวนที่อยู่อีเมลแล้ว"
+      released: "ปล่อยที่อยู่อีเมลแล้ว"
+      changed: "เปลี่ยนที่อยู่อีเมลแล้ว"
+      verified: "ยืนยันที่อยู่อีเมลแล้ว"
+      verification:
+        failed: "การยืนยันที่อยู่อีเมลล้มเหลว"
+      code:
+        added: "สร้างรหัสยืนยันที่อยู่อีเมลแล้ว"
+        sent: "ส่งรหัสยืนยันที่อยู่อีเมลแล้ว"
+    machine:
+      added: "เพิ่มผู้ใช้แบบเทคนิคแล้ว"
+      changed: "เปลี่ยนแปลงผู้ใช้แบบเทคนิคแล้ว"
+      key:
+        added: "เพิ่มคีย์แล้ว"
+        removed: "นำคีย์ออกแล้ว"
+      secret:
+        set: "กำหนดซีเคร็ตแล้ว"
+        updated: "อัปเดตแฮชของซีเคร็ตแล้ว"
+        removed: "นำซีเคร็ตออกแล้ว"
+        check:
+          succeeded: "การตรวจสอบซีเคร็ตสำเร็จ"
+          failed: "การตรวจสอบซีเคร็ตล้มเหลว"
+    human:
+      added: "เพิ่มบุคคลแล้ว"
+      selfregistered: "บุคคลลงทะเบียนด้วยตนเอง"
+      avatar:
+        added: "เพิ่มอวาตาร์แล้ว"
+        removed: "นำอวาตาร์ออกแล้ว"
+      initialization:
+        code:
+          added: "สร้างรหัสเริ่มต้นแล้ว"
+          sent: "ส่งรหัสเริ่มต้นแล้ว"
+        check:
+          succeeded: "การตรวจสอบเริ่มต้นสำเร็จ"
+          failed: "การตรวจสอบเริ่มต้นล้มเหลว"
+      invite:
+        code:
+          added: "สร้างรหัสเชิญแล้ว"
+          sent: "ส่งรหัสเชิญแล้ว"
+        check:
+          succeeded: "การตรวจสอบคำเชิญสำเร็จ"
+          failed: "การตรวจสอบคำเชิญล้มเหลว"
+      username:
+        reserved: "สงวนชื่อผู้ใช้แล้ว"
+        released: "ปล่อยชื่อผู้ใช้แล้ว"
+      email:
+        changed: "เปลี่ยนที่อยู่อีเมลแล้ว"
+        verified: "ยืนยันที่อยู่อีเมลแล้ว"
+        verification:
+          failed: "การยืนยันที่อยู่อีเมลล้มเหลว"
+        code:
+          added: "สร้างรหัสยืนยันที่อยู่อีเมลแล้ว"
+          sent: "ส่งรหัสยืนยันที่อยู่อีเมลแล้ว"
+      password:
+        changed: "เปลี่ยนรหัสผ่านแล้ว"
+        code:
+          added: "สร้างรหัสสำหรับรหัสผ่านแล้ว"
+          sent: "ส่งรหัสสำหรับรหัสผ่านแล้ว"
+        check:
+          succeeded: "การตรวจสอบรหัสผ่านสำเร็จ"
+          failed: "การตรวจสอบรหัสผ่านล้มเหลว"
+        change:
+          sent: "ส่งการเปลี่ยนรหัสผ่านแล้ว"
+        hash:
+          updated: "อัปเดตแฮชของรหัสผ่านแล้ว"
+      externallogin:
+        check:
+          succeeded: "การเข้าสู่ระบบภายนอกสำเร็จ"
+      externalidp:
+        added: "เพิ่ม IDP ภายนอกแล้ว"
+        removed: "นำ IDP ภายนอกออกแล้ว"
+        cascade:
+          removed: "นำ IDP ภายนอกออกแบบต่อเนื่องแล้ว"
+        id:
+          migrated: "ย้าย External UserID ของ IDP แล้ว"
+      phone:
+        changed: "เปลี่ยนหมายเลขโทรศัพท์แล้ว"
+        verified: "ยืนยันหมายเลขโทรศัพท์แล้ว"
+        verification:
+          failed: "การยืนยันหมายเลขโทรศัพท์ล้มเหลว"
+        code:
+          added: "สร้างรหัสสำหรับหมายเลขโทรศัพท์แล้ว"
+          sent: "ส่งรหัสสำหรับหมายเลขโทรศัพท์แล้ว"
+        removed: "นำหมายเลขโทรศัพท์ออกแล้ว"
+      profile:
+        changed: "เปลี่ยนแปลงโปรไฟล์ผู้ใช้แล้ว"
+      address:
+        changed: "เปลี่ยนแปลงที่อยู่ผู้ใช้แล้ว"
+      mfa:
+        otp:
+          added: "เพิ่ม OTP แบบหลายปัจจัยแล้ว"
+          verified: "ยืนยัน OTP แบบหลายปัจจัยแล้ว"
+          removed: "นำ OTP แบบหลายปัจจัยออกแล้ว"
+          check:
+            succeeded: "การตรวจสอบ OTP แบบหลายปัจจัยสำเร็จ"
+            failed: "การตรวจสอบ OTP แบบหลายปัจจัยล้มเหลว"
+          sms:
+            added: "เพิ่ม OTP SMS แบบหลายปัจจัยแล้ว"
+            removed: "นำ OTP SMS แบบหลายปัจจัยออกแล้ว"
+            code:
+              added: "เพิ่มรหัส OTP SMS แบบหลายปัจจัยแล้ว"
+              sent: "ส่งรหัส OTP SMS แบบหลายปัจจัยแล้ว"
+            check:
+              succeeded: "การตรวจสอบ OTP SMS แบบหลายปัจจัยสำเร็จ"
+              failed: "การตรวจสอบ OTP SMS แบบหลายปัจจัยล้มเหลว"
+          email:
+            added: "เพิ่ม OTP Email แบบหลายปัจจัยแล้ว"
+            removed: "นำ OTP Email แบบหลายปัจจัยออกแล้ว"
+            code:
+              added: "เพิ่มรหัส OTP Email แบบหลายปัจจัยแล้ว"
+              sent: "ส่งรหัส OTP Email แบบหลายปัจจัยแล้ว"
+            check:
+              succeeded: "การตรวจสอบ OTP Email แบบหลายปัจจัยสำเร็จ"
+              failed: "การตรวจสอบ OTP Email แบบหลายปัจจัยล้มเหลว"
+        u2f:
+          token:
+            added: "เพิ่มโทเคน U2F แบบหลายปัจจัยแล้ว"
+            verified: "ยืนยันโทเคน U2F แบบหลายปัจจัยแล้ว"
+            removed: "นำโทเคน U2F แบบหลายปัจจัยออกแล้ว"
+            begin:
+              login: "เริ่มการตรวจสอบ U2F แบบหลายปัจจัยแล้ว"
+            check:
+              succeeded: "การตรวจสอบ U2F แบบหลายปัจจัยสำเร็จ"
+              failed: "การตรวจสอบ U2F แบบหลายปัจจัยล้มเหลว"
+            signcount:
+              changed: "เช็กซัมของโทเคน U2F แบบหลายปัจจัยมีการเปลี่ยนแปลง"
+        init:
+          skipped: "ข้ามการเริ่มต้นหลายปัจจัยแล้ว"
+      passwordless:
+        token:
+          added: "เพิ่มโทเคนสำหรับเข้าสู่ระบบด้วยพาสคีย์แล้ว"
+          verified: "ยืนยันโทเคนสำหรับเข้าสู่ระบบด้วยพาสคีย์แล้ว"
+          removed: "นำโทเคนสำหรับเข้าสู่ระบบด้วยพาสคีย์ออกแล้ว"
+          begin:
+            login: "เริ่มการตรวจสอบการเข้าสู่ระบบด้วยพาสคีย์แล้ว"
+          check:
+            succeeded: "การตรวจสอบการเข้าสู่ระบบด้วยพาสคีย์สำเร็จ"
+            failed: "การตรวจสอบการเข้าสู่ระบบด้วยพาสคีย์ล้มเหลว"
+          signcount:
+            changed: "เช็กซัมของโทเคนเข้าสู่ระบบด้วยพาสคีย์มีการเปลี่ยนแปลง"
+        initialization:
+          code:
+            added: "เพิ่มรหัสเริ่มต้นพาสคีย์แล้ว"
+            sent: "ส่งรหัสเริ่มต้นพาสคีย์แล้ว"
+            requested: "ขอรหัสเริ่มต้นพาสคีย์แล้ว"
+            check:
+              succeeded: "ตรวจสอบรหัสเริ่มต้นพาสคีย์สำเร็จแล้ว"
+              failed: "การตรวจสอบรหัสเริ่มต้นพาสคีย์ล้มเหลว"
+      signed:
+        out: "ผู้ใช้ออกจากระบบแล้ว"
+      refresh:
+        token:
+          added: "สร้าง Refresh Token แล้ว"
+          renewed: "ต่ออายุ Refresh Token แล้ว"
+          removed: "นำ Refresh Token ออกแล้ว"
+    locked: "ล็อกผู้ใช้แล้ว"
+    unlocked: "ปลดล็อกผู้ใช้แล้ว"
+    deactivated: "ปิดใช้งานผู้ใช้แล้ว"
+    reactivated: "เปิดใช้งานผู้ใช้อีกครั้งแล้ว"
+    removed: "นำผู้ใช้ออกแล้ว"
+    password:
+      changed: "เปลี่ยนรหัสผ่านแล้ว"
+      code:
+        added: "สร้างรหัสสำหรับรหัสผ่านแล้ว"
+        sent: "ส่งรหัสสำหรับรหัสผ่านแล้ว"
+      check:
+        succeeded: "การตรวจสอบรหัสผ่านสำเร็จ"
+        failed: "การตรวจสอบรหัสผ่านล้มเหลว"
+    phone:
+      changed: "เปลี่ยนหมายเลขโทรศัพท์แล้ว"
+      verified: "ยืนยันหมายเลขโทรศัพท์แล้ว"
+      verification:
+        failed: "การยืนยันหมายเลขโทรศัพท์ล้มเหลว"
+      code:
+        added: "สร้างรหัสสำหรับหมายเลขโทรศัพท์แล้ว"
+        sent: "ส่งรหัสสำหรับหมายเลขโทรศัพท์แล้ว"
+    profile:
+      changed: "เปลี่ยนแปลงโปรไฟล์ผู้ใช้แล้ว"
+    address:
+      changed: "เปลี่ยนแปลงที่อยู่ผู้ใช้แล้ว"
+    mfa:
+      otp:
+        added: "เพิ่ม OTP แบบหลายปัจจัยแล้ว"
+        verified: "ยืนยัน OTP แบบหลายปัจจัยแล้ว"
+        removed: "นำ OTP แบบหลายปัจจัยออกแล้ว"
+        check:
+          succeeded: "การตรวจสอบ OTP แบบหลายปัจจัยสำเร็จ"
+          failed: "การตรวจสอบ OTP แบบหลายปัจจัยล้มเหลว"
+        init:
+          skipped: "ข้ามการเริ่มต้น OTP แบบหลายปัจจัยแล้ว"
+      init:
+        skipped: "ข้ามการเริ่มต้นหลายปัจจัยแล้ว"
+    signed:
+      out: "ผู้ใช้ออกจากระบบแล้ว"
+    grant:
+      added: "เพิ่มการให้สิทธิ์แล้ว"
+      changed: "เปลี่ยนแปลงการให้สิทธิ์แล้ว"
+      removed: "นำการให้สิทธิ์ออกแล้ว"
+      deactivated: "ปิดใช้งานการให้สิทธิ์แล้ว"
+      reactivated: "เปิดใช้งานการให้สิทธิ์อีกครั้งแล้ว"
+      reserved: "สงวนการให้สิทธิ์แล้ว"
+      released: "ปล่อยการให้สิทธิ์แล้ว"
+      cascade:
+        removed: "นำการให้สิทธิ์ออกแล้ว"
+        changed: "เปลี่ยนแปลงการให้สิทธิ์แล้ว"
+    metadata:
+      set: "กำหนดข้อมูลเมตาของผู้ใช้แล้ว"
+      removed: "นำข้อมูลเมตาของผู้ใช้ออกแล้ว"
+      removed.all: "นำข้อมูลเมตาของผู้ใช้ทั้งหมดออกแล้ว"
+    domain:
+      claimed: "อ้างสิทธิ์โดเมนแล้ว"
+      claimed.sent: "ส่งการแจ้งเตือนการอ้างสิทธิ์โดเมนแล้ว"
+    pat:
+      added: "เพิ่มโทเคนการเข้าถึงส่วนบุคคลแล้ว"
+      removed: "นำโทเคนการเข้าถึงส่วนบุคคลออกแล้ว"
+  org:
+    added: "เพิ่มองค์กรแล้ว"
+    changed: "เปลี่ยนแปลงองค์กรแล้ว"
+    deactivated: "ปิดใช้งานองค์กรแล้ว"
+    reactivated: "เปิดใช้งานองค์กรอีกครั้งแล้ว"
+    removed: "นำองค์กรออกแล้ว"
+    domain:
+      added: "เพิ่มโดเมนแล้ว"
+      verification:
+        added: "เพิ่มการยืนยันโดเมนแล้ว"
+        failed: "การยืนยันโดเมนล้มเหลว"
+      verified: "ยืนยันโดเมนแล้ว"
+      removed: "นำโดเมนออกแล้ว"
+      primary:
+        set: "กำหนดโดเมนขององค์กรแล้ว"
+      reserved: "สงวนโดเมนแล้ว"
+      released: "ปล่อยโดเมนแล้ว"
+    name:
+      reserved: "สงวนชื่อองค์กรแล้ว"
+      released: "ปล่อยชื่อองค์กรแล้ว"
+    member:
+      added: "เพิ่มสมาชิกขององค์กรแล้ว"
+      changed: "เปลี่ยนแปลงสมาชิกขององค์กรแล้ว"
+      removed: "นำสมาชิกขององค์กรออกแล้ว"
+      cascade:
+        removed: "นำสมาชิกขององค์กรออกแบบต่อเนื่องแล้ว"
+    iam:
+      policy:
+        added: "เพิ่มนโยบายระบบแล้ว"
+        changed: "เปลี่ยนแปลงนโยบายระบบแล้ว"
+        removed: "นำนโยบายระบบออกแล้ว"
+    idp:
+      config:
+        added: "เพิ่มการกำหนดค่า IDP แล้ว"
+        changed: "เปลี่ยนแปลงการกำหนดค่า IDP แล้ว"
+        removed: "นำการกำหนดค่า IDP ออกแล้ว"
+        deactivated: "ปิดใช้งานการกำหนดค่า IDP แล้ว"
+        reactivated: "เปิดใช้งานการกำหนดค่า IDP อีกครั้งแล้ว"
+      oidc:
+        config:
+          added: "เพิ่มการกำหนดค่า OIDC IDP แล้ว"
+          changed: "เปลี่ยนแปลงการกำหนดค่า OIDC IDP แล้ว"
+      saml:
+        config:
+          added: "เพิ่มการกำหนดค่า SAML IDP แล้ว"
+          changed: "เปลี่ยนแปลงการกำหนดค่า SAML IDP แล้ว"
+      jwt:
+        config:
+          added: "เพิ่มการกำหนดค่า JWT IDP แล้ว"
+          changed: "เปลี่ยนแปลงการกำหนดค่า JWT IDP แล้ว"
+    customtext:
+      set: "กำหนดข้อความที่กำหนดเองแล้ว"
+      removed: "นำข้อความที่กำหนดเองออกแล้ว"
+      template:
+        removed: "นำเทมเพลตข้อความที่กำหนดเองออกแล้ว"
+    policy:
+      login:
+        added: "เพิ่มนโยบายการเข้าสู่ระบบแล้ว"
+        changed: "เปลี่ยนแปลงนโยบายการเข้าสู่ระบบแล้ว"
+        removed: "นำนโยบายการเข้าสู่ระบบออกแล้ว"
+        idpprovider:
+          added: "เพิ่มผู้ให้บริการข้อมูลประจำตัวลงในนโยบายการเข้าสู่ระบบแล้ว"
+          removed: "นำผู้ให้บริการข้อมูลประจำตัวออกจากนโยบายการเข้าสู่ระบบแล้ว"
+          cascade:
+            removed: "นำผู้ให้บริการข้อมูลประจำตัวออกจากนโยบายการเข้าสู่ระบบแบบต่อเนื่องแล้ว"
+        secondfactor:
+          added: "เพิ่มปัจจัยที่สองลงในนโยบายการเข้าสู่ระบบแล้ว"
+          removed: "นำปัจจัยที่สองออกจากนโยบายการเข้าสู่ระบบแล้ว"
+        multifactor:
+          added: "เพิ่มหลายปัจจัยลงในนโยบายการเข้าสู่ระบบแล้ว"
+          removed: "นำหลายปัจจัยออกจากนโยบายการเข้าสู่ระบบแล้ว"
+      password:
+        complexity:
+          added: "เพิ่มนโยบายความซับซ้อนของรหัสผ่านแล้ว"
+          changed: "เปลี่ยนแปลงนโยบายความซับซ้อนของรหัสผ่านแล้ว"
+          removed: "นำนโยบายความซับซ้อนของรหัสผ่านออกแล้ว"
+        age:
+          added: "เพิ่มนโยบายอายุรหัสผ่านแล้ว"
+          changed: "เปลี่ยนแปลงนโยบายอายุรหัสผ่านแล้ว"
+          removed: "นำนโยบายอายุรหัสผ่านออกแล้ว"
+        lockout:
+          added: "เพิ่มนโยบายการล็อกรหัสผ่านแล้ว"
+          changed: "เปลี่ยนแปลงนโยบายการล็อกรหัสผ่านแล้ว"
+          removed: "นำนโยบายการล็อกรหัสผ่านออกแล้ว"
+      label:
+        added: "เพิ่มนโยบายฉลากแล้ว"
+        changed: "เปลี่ยนแปลงนโยบายฉลากแล้ว"
+        activated: "เปิดใช้งานนโยบายฉลากแล้ว"
+        removed: "นำนโยบายฉลากออกแล้ว"
+        logo:
+          added: "เพิ่มโลโก้ลงในนโยบายฉลากแล้ว"
+          removed: "นำโลโก้ออกจากนโยบายฉลากแล้ว"
+          dark:
+            added: "เพิ่มโลโก้ (โหมดมืด) ลงในนโยบายฉลากแล้ว"
+            removed: "นำโลโก้ (โหมดมืด) ออกจากนโยบายฉลากแล้ว"
+        icon:
+          added: "เพิ่มไอคอนลงในนโยบายฉลากแล้ว"
+          removed: "นำไอคอนออกจากนโยบายฉลากแล้ว"
+          dark:
+            added: "เพิ่มไอคอน (โหมดมืด) ลงในนโยบายฉลากแล้ว"
+            removed: "นำไอคอน (โหมดมืด) ออกจากนโยบายฉลากแล้ว"
+        font:
+          added: "เพิ่มฟอนต์ลงในนโยบายฉลากแล้ว"
+          removed: "นำฟอนต์ออกจากนโยบายฉลากแล้ว"
+        assets:
+          removed: "นำแอสเซทออกจากนโยบายฉลากแล้ว"
+      privacy:
+        added: "เพิ่มนโยบายความเป็นส่วนตัวและข้อกำหนดการใช้งานแล้ว"
+        changed: "เปลี่ยนแปลงนโยบายความเป็นส่วนตัวและข้อกำหนดการใช้งานแล้ว"
+        removed: "นำนโยบายความเป็นส่วนตัวและข้อกำหนดการใช้งานออกแล้ว"
+      domain:
+        added: "เพิ่มนโยบายโดเมนแล้ว"
+        changed: "เปลี่ยนแปลงนโยบายโดเมนแล้ว"
+        removed: "นำนโยบายโดเมนออกแล้ว"
+      lockout:
+        added: "เพิ่มนโยบายการล็อกแล้ว"
+        changed: "เปลี่ยนแปลงนโยบายการล็อกแล้ว"
+        removed: "นำนโยบายการล็อกออกแล้ว"
+      notification:
+        added: "เพิ่มนโยบายการแจ้งเตือนแล้ว"
+        changed: "เปลี่ยนแปลงนโยบายการแจ้งเตือนแล้ว"
+        removed: "นำนโยบายการแจ้งเตือนออกแล้ว"
+    flow:
+      trigger_actions:
+        set: "กำหนดการดำเนินการแล้ว"
+        cascade:
+          removed: "นำการดำเนินการออกแบบต่อเนื่องแล้ว"
+        removed: "นำการดำเนินการออกแล้ว"
+      cleared: "ล้างโฟลว์แล้ว"
+    mail:
+      template:
+        added: "เพิ่มเทมเพลตอีเมลแล้ว"
+        changed: "เปลี่ยนแปลงเทมเพลตอีเมลแล้ว"
+        removed: "นำเทมเพลตอีเมลออกแล้ว"
+      text:
+        added: "เพิ่มข้อความอีเมลแล้ว"
+        changed: "เปลี่ยนแปลงข้อความอีเมลแล้ว"
+        removed: "นำข้อความอีเมลออกแล้ว"
+    metadata:
+      removed: "นำข้อมูลเมตาออกแล้ว"
+      removed.all: "นำข้อมูลเมตาทั้งหมดออกแล้ว"
+      set: "กำหนดข้อมูลเมตาแล้ว"
+  project:
+    added: "เพิ่มโปรเจกต์แล้ว"
+    changed: "เปลี่ยนแปลงโปรเจกต์แล้ว"
+    deactivated: "ปิดใช้งานโปรเจกต์แล้ว"
+    reactivated: "เปิดใช้งานโปรเจกต์อีกครั้งแล้ว"
+    removed: "นำโปรเจกต์ออกแล้ว"
+    member:
+      added: "เพิ่มสมาชิกของโปรเจกต์แล้ว"
+      changed: "เปลี่ยนแปลงสมาชิกของโปรเจกต์แล้ว"
+      removed: "นำสมาชิกของโปรเจกต์ออกแล้ว"
+      cascade:
+        removed: "นำสมาชิกของโปรเจกต์ออกแบบต่อเนื่องแล้ว"
+    role:
+      added: "เพิ่มบทบาทของโปรเจกต์แล้ว"
+      changed: "เปลี่ยนแปลงบทบาทของโปรเจกต์แล้ว"
+      removed: "นำบทบาทของโปรเจกต์ออกแล้ว"
+    grant:
+      added: "เพิ่มสิทธิ์การจัดการแล้ว"
+      changed: "เปลี่ยนแปลงสิทธิ์การจัดการแล้ว"
+      removed: "นำสิทธิ์การจัดการออกแล้ว"
+      deactivated: "ปิดใช้งานสิทธิ์การจัดการแล้ว"
+      reactivated: "เปิดใช้งานสิทธิ์การจัดการอีกครั้งแล้ว"
+      cascade:
+        changed: "เปลี่ยนแปลงสิทธิ์การจัดการแล้ว"
+      member:
+        added: "เพิ่มสมาชิกสิทธิ์การจัดการแล้ว"
+        changed: "เปลี่ยนแปลงสมาชิกสิทธิ์การจัดการแล้ว"
+        removed: "นำสมาชิกสิทธิ์การจัดการออกแล้ว"
+        cascade:
+          removed: "นำสิทธิ์การจัดการออกแบบต่อเนื่องแล้ว"
+    application:
+      added: "เพิ่มแอปพลิเคชันแล้ว"
+      changed: "เปลี่ยนแปลงแอปพลิเคชันแล้ว"
+      removed: "นำแอปพลิเคชันออกแล้ว"
+      deactivated: "ปิดใช้งานแอปพลิเคชันแล้ว"
+      reactivated: "เปิดใช้งานแอปพลิเคชันอีกครั้งแล้ว"
+      oidc:
+        secret:
+          check:
+            succeeded: "การตรวจสอบ OIDC Client Secret สำเร็จ"
+            failed: "การตรวจสอบ OIDC Client Secret ล้มเหลว"
+        key:
+          added: "เพิ่มคีย์ของแอปพลิเคชัน OIDC แล้ว"
+          removed: "นำคีย์ของแอปพลิเคชัน OIDC ออกแล้ว"
+      api:
+        secret:
+          check:
+            succeeded: "การตรวจสอบซีเคร็ต API สำเร็จ"
+            failed: "การตรวจสอบซีเคร็ต API ล้มเหลว"
+        key:
+          added: "เพิ่มคีย์ของแอปพลิเคชันแล้ว"
+          removed: "นำคีย์ของแอปพลิเคชันออกแล้ว"
+      config:
+        saml:
+          added: "เพิ่มการกำหนดค่า SAML แล้ว"
+          changed: "เปลี่ยนแปลงการกำหนดค่า SAML แล้ว"
+        oidc:
+          added: "เพิ่มการกำหนดค่า OIDC แล้ว"
+          changed: "เปลี่ยนแปลงการกำหนดค่า OIDC แล้ว"
+          secret:
+            changed: "เปลี่ยนแปลงซีเคร็ต OIDC แล้ว"
+            updated: "อัปเดตแฮชของซีเคร็ต OIDC แล้ว"
+        api:
+          added: "เพิ่มการกำหนดค่า API แล้ว"
+          changed: "เปลี่ยนแปลงการกำหนดค่า API แล้ว"
+          secret:
+            changed: "เปลี่ยนแปลงซีเคร็ต API แล้ว"
+            updated: "อัปเดตแฮชของซีเคร็ต API แล้ว"
+  policy:
+    password:
+      complexity:
+        added: "เพิ่มนโยบายความซับซ้อนของรหัสผ่านแล้ว"
+        changed: "เปลี่ยนแปลงนโยบายความซับซ้อนของรหัสผ่านแล้ว"
+      age:
+        added: "เพิ่มนโยบายอายุรหัสผ่านแล้ว"
+        changed: "เปลี่ยนแปลงนโยบายอายุรหัสผ่านแล้ว"
+      lockout:
+        added: "เพิ่มนโยบายการล็อกรหัสผ่านแล้ว"
+        changed: "เปลี่ยนแปลงนโยบายการล็อกรหัสผ่านแล้ว"
+  iam:
+    setup:
+      started: "เริ่มการตั้งค่า Zitadel แล้ว"
+      done: "การตั้งค่า Zitadel เสร็จสิ้น"
+    global:
+      org:
+        set: "กำหนดองค์กรส่วนกลางแล้ว"
+    project:
+      iam:
+        set: "กำหนดโปรเจกต์ Zitadel แล้ว"
+    member:
+      added: "เพิ่มสมาชิก Zitadel แล้ว"
+      changed: "เปลี่ยนแปลงสมาชิก Zitadel แล้ว"
+      removed: "นำสมาชิก Zitadel ออกแล้ว"
+      cascade:
+        removed: "นำสมาชิก Zitadel ออกแบบต่อเนื่องแล้ว"
+    idp:
+      config:
+        added: "เพิ่มการกำหนดค่า IDP แล้ว"
+        changed: "เปลี่ยนแปลงการกำหนดค่า IDP แล้ว"
+        removed: "นำการกำหนดค่า IDP ออกแล้ว"
+        deactivated: "ปิดใช้งานการกำหนดค่า IDP แล้ว"
+        reactivated: "เปิดใช้งานการกำหนดค่า IDP อีกครั้งแล้ว"
+      oidc:
+        config:
+          added: "เพิ่มการกำหนดค่า OIDC IDP แล้ว"
+          changed: "เปลี่ยนแปลงการกำหนดค่า OIDC IDP แล้ว"
+      saml:
+        config:
+          added: "เพิ่มการกำหนดค่า SAML IDP แล้ว"
+          changed: "เปลี่ยนแปลงการกำหนดค่า SAML IDP แล้ว"
+      jwt:
+        config:
+          added: "เพิ่มการกำหนดค่า JWT ให้ผู้ให้บริการข้อมูลประจำตัวแล้ว"
+          changed: "นำการกำหนดค่า JWT ออกจากผู้ให้บริการข้อมูลประจำตัวแล้ว"
+    customtext:
+      set: "กำหนดข้อความแล้ว"
+      removed: "นำข้อความออกแล้ว"
+    policy:
+      login:
+        added: "เพิ่มนโยบายการเข้าสู่ระบบเริ่มต้นแล้ว"
+        changed: "เปลี่ยนแปลงนโยบายการเข้าสู่ระบบเริ่มต้นแล้ว"
+        idpprovider:
+          added: "เพิ่มผู้ให้บริการข้อมูลประจำตัวลงในนโยบายการเข้าสู่ระบบเริ่มต้นแล้ว"
+          removed: "นำผู้ให้บริการข้อมูลประจำตัวออกจากนโยบายการเข้าสู่ระบบเริ่มต้นแล้ว"
+      label:
+        added: "เพิ่มนโยบายฉลากแล้ว"
+        changed: "เปลี่ยนแปลงนโยบายฉลากแล้ว"
+        activated: "เปิดใช้งานนโยบายฉลากแล้ว"
+        logo:
+          added: "เพิ่มโลโก้ลงในนโยบายฉลากแล้ว"
+          removed: "นำโลโก้ออกจากนโยบายฉลากแล้ว"
+          dark:
+            added: "เพิ่มโลโก้ (โหมดมืด) ลงในนโยบายฉลากแล้ว"
+            removed: "นำโลโก้ (โหมดมืด) ออกจากนโยบายฉลากแล้ว"
+        icon:
+          added: "เพิ่มไอคอนลงในนโยบายฉลากแล้ว"
+          removed: "นำไอคอนออกจากนโยบายฉลากแล้ว"
+          dark:
+            added: "เพิ่มไอคอน (โหมดมืด) ลงในนโยบายฉลากแล้ว"
+            removed: "นำไอคอน (โหมดมืด) ออกจากนโยบายฉลากแล้ว"
+        font:
+          added: "เพิ่มฟอนต์ลงในนโยบายฉลากแล้ว"
+          removed: "นำฟอนต์ออกจากนโยบายฉลากแล้ว"
+        assets:
+          removed: "นำแอสเซทออกจากนโยบายฉลากแล้ว"
+    default:
+      language:
+        set: "กำหนดภาษาเริ่มต้นแล้ว"
+    oidc:
+      settings:
+        added: "เพิ่มการกำหนดค่า OIDC แล้ว"
+        changed: "เปลี่ยนแปลงการกำหนดค่า OIDC แล้ว"
+        removed: "นำการกำหนดค่า OIDC ออกแล้ว"
+    secret:
+      generator:
+        added: "เพิ่มตัวสร้างซีเคร็ตแล้ว"
+        changed: "เปลี่ยนแปลงตัวสร้างซีเคร็ตแล้ว"
+        removed: "นำตัวสร้างซีเคร็ตออกแล้ว"
+    smtp:
+      config:
+        added: "เพิ่มการกำหนดค่า SMTP แล้ว"
+        changed: "เปลี่ยนแปลงการกำหนดค่า SMTP แล้ว"
+        activated: "เปิดใช้งานการกำหนดค่า SMTP แล้ว"
+        deactivated: "ปิดใช้งานการกำหนดค่า SMTP แล้ว"
+        removed: "นำการกำหนดค่า SMTP ออกแล้ว"
+        password:
+          changed: "เปลี่ยนแปลงซีเคร็ตของการกำหนดค่า SMTP แล้ว"
+    sms:
+      config:
+        twilio:
+          added: "เพิ่มผู้ให้บริการ SMS Twilio แล้ว"
+          changed: "เปลี่ยนแปลงผู้ให้บริการ SMS Twilio แล้ว"
+          token:
+            changed: "เปลี่ยนแปลงโทเคนผู้ให้บริการ SMS Twilio แล้ว"
+          removed: "นำผู้ให้บริการ SMS Twilio ออกแล้ว"
+          activated: "เปิดใช้งานผู้ให้บริการ SMS Twilio แล้ว"
+          deactivated: "ปิดใช้งานผู้ให้บริการ SMS Twilio แล้ว"
+  key_pair:
+    added: "เพิ่มคู่คีย์แล้ว"
+    certificate:
+      added: "เพิ่มใบรับรองแล้ว"
+  action:
+    added: "เพิ่มการดำเนินการแล้ว"
+    changed: "เปลี่ยนแปลงการดำเนินการแล้ว"
+    deactivated: "ปิดใช้งานการดำเนินการแล้ว"
+    reactivated: "เปิดใช้งานการดำเนินการอีกครั้งแล้ว"
+    removed: "นำการดำเนินการออกแล้ว"
+  instance:
+    added: "เพิ่มอินสแตนซ์แล้ว"
+    changed: "เปลี่ยนแปลงอินสแตนซ์แล้ว"
+    customtext:
+      removed: "นำข้อความที่กำหนดเองออกแล้ว"
+      set: "กำหนดข้อความที่กำหนดเองแล้ว"
+      template:
+        removed: "นำเทมเพลตของข้อความที่กำหนดเองออกแล้ว"
+    default:
+      language:
+        set: "กำหนดภาษาเริ่มต้นแล้ว"
+      org:
+        set: "กำหนดองค์กรเริ่มต้นแล้ว"
+    domain:
+      added: "เพิ่มโดเมนแล้ว"
+      primary:
+        set: "กำหนดโดเมนหลักแล้ว"
+      removed: "นำโดเมนออกแล้ว"
+    iam:
+      console:
+        set: "กำหนดแอปพลิเคชัน Zitadel Management Console แล้ว"
+      project:
+        set: "กำหนดโปรเจกต์ Zitadel แล้ว"
+    mail:
+      template:
+        added: "เพิ่มเทมเพลตอีเมลแล้ว"
+        changed: "เปลี่ยนแปลงเทมเพลตอีเมลแล้ว"
+      text:
+        added: "เพิ่มข้อความอีเมลแล้ว"
+        changed: "เปลี่ยนแปลงข้อความอีเมลแล้ว"
+    member:
+      added: "เพิ่มสมาชิกอินสแตนซ์แล้ว"
+      changed: "เปลี่ยนแปลงสมาชิกอินสแตนซ์แล้ว"
+      removed: "นำสมาชิกอินสแตนซ์ออกแล้ว"
+      cascade:
+        removed: "นำสมาชิกอินสแตนซ์ออกแบบต่อเนื่องแล้ว"
+    notification:
+      provider:
+        debug:
+          fileadded: "เพิ่มผู้ให้บริการการแจ้งเตือนแบบดีบักไฟล์แล้ว"
+          filechanged: "เปลี่ยนแปลงผู้ให้บริการการแจ้งเตือนแบบดีบักไฟล์แล้ว"
+          fileremoved: "นำผู้ให้บริการการแจ้งเตือนแบบดีบักไฟล์ออกแล้ว"
+          logadded: "เพิ่มผู้ให้บริการการแจ้งเตือนแบบดีบักบันทึกแล้ว"
+          logchanged: "เปลี่ยนแปลงผู้ให้บริการการแจ้งเตือนแบบดีบักบันทึกแล้ว"
+          logremoved: "นำผู้ให้บริการการแจ้งเตือนแบบดีบักบันทึกออกแล้ว"
+    oidc:
+      settings:
+        added: "เพิ่มการตั้งค่า OIDC แล้ว"
+        changed: "เปลี่ยนแปลงการตั้งค่า OIDC แล้ว"
+    policy:
+      domain:
+        added: "เพิ่มนโยบายโดเมนแล้ว"
+        changed: "เปลี่ยนแปลงนโยบายโดเมนแล้ว"
+      label:
+        activated: "เปิดใช้งานนโยบายฉลากแล้ว"
+        added: "เพิ่มนโยบายฉลากแล้ว"
+        assets:
+          removed: "นำแอสเซทออกจากนโยบายฉลากแล้ว"
+        changed: "เปลี่ยนแปลงนโยบายฉลากแล้ว"
+        font:
+          added: "เพิ่มฟอนต์ลงในนโยบายฉลากแล้ว"
+          removed: "นำฟอนต์ออกจากนโยบายฉลากแล้ว"
+        icon:
+          added: "เพิ่มไอคอนลงในนโยบายฉลากแล้ว"
+          removed: "นำไอคอนออกจากนโยบายฉลากแล้ว"
+          dark:
+            added: "เพิ่มไอคอนลงในนโยบายฉลากโหมดมืดแล้ว"
+            removed: "นำไอคอนออกจากนโยบายฉลากโหมดมืดแล้ว"
+        logo:
+          added: "เพิ่มโลโก้ลงในนโยบายฉลากแล้ว"
+          removed: "นำโลโก้ออกจากนโยบายฉลากแล้ว"
+          dark:
+            added: "เพิ่มโลโก้ลงในนโยบายฉลากโหมดมืดแล้ว"
+            removed: "นำโลโก้ออกจากนโยบายฉลากโหมดมืดแล้ว"
+      lockout:
+        added: "เพิ่มนโยบายการล็อกแล้ว"
+        changed: "เปลี่ยนแปลงนโยบายการล็อกแล้ว"
+      login:
+        added: "เพิ่มนโยบายการเข้าสู่ระบบแล้ว"
+        changed: "เปลี่ยนแปลงนโยบายการเข้าสู่ระบบแล้ว"
+        idpprovider:
+          added: "เพิ่มผู้ให้บริการข้อมูลประจำตัวลงในนโยบายการเข้าสู่ระบบแล้ว"
+          cascade:
+            removed: "นำผู้ให้บริการข้อมูลประจำตัวออกจากนโยบายการเข้าสู่ระบบแบบต่อเนื่องแล้ว"
+          removed: "นำผู้ให้บริการข้อมูลประจำตัวออกจากนโยบายการเข้าสู่ระบบแล้ว"
+        multifactor:
+          added: "เพิ่มหลายปัจจัยลงในนโยบายการเข้าสู่ระบบแล้ว"
+          removed: "นำหลายปัจจัยออกจากนโยบายการเข้าสู่ระบบแล้ว"
+        secondfactor:
+          added: "เพิ่มปัจจัยที่สองลงในนโยบายการเข้าสู่ระบบแล้ว"
+          removed: "นำปัจจัยที่สองออกจากนโยบายการเข้าสู่ระบบแล้ว"
+      password:
+        age:
+          added: "เพิ่มนโยบายอายุรหัสผ่านแล้ว"
+          changed: "เปลี่ยนแปลงนโยบายอายุรหัสผ่านแล้ว"
+        complexity:
+          added: "เพิ่มนโยบายความซับซ้อนของรหัสผ่านแล้ว"
+          changed: "นำนโยบายความซับซ้อนของรหัสผ่านออกแล้ว"
+      privacy:
+        added: "เพิ่มนโยบายความเป็นส่วนตัวแล้ว"
+        changed: "เปลี่ยนแปลงนโยบายความเป็นส่วนตัวแล้ว"
+      security:
+        set: "กำหนดนโยบายความปลอดภัยแล้ว"
+    removed: "นำอินสแตนซ์ออกแล้ว"
+    secret:
+      generator:
+        added: "เพิ่มตัวสร้างซีเคร็ตแล้ว"
+        changed: "เปลี่ยนแปลงตัวสร้างซีเคร็ตแล้ว"
+        removed: "นำตัวสร้างซีเคร็ตออกแล้ว"
+    sms:
+      configtwilio:
+        activated: "เปิดใช้งานการกำหนดค่า SMS Twilio แล้ว"
+        added: "เพิ่มการกำหนดค่า SMS Twilio แล้ว"
+        changed: "เปลี่ยนแปลงการกำหนดค่า SMS Twilio แล้ว"
+        deactivated: "ปิดใช้งานการกำหนดค่า SMS Twilio แล้ว"
+        removed: "นำการกำหนดค่า SMS Twilio ออกแล้ว"
+        token:
+          changed: "เปลี่ยนแปลงโทเคนของการกำหนดค่า SMS Twilio แล้ว"
+    smtp:
+      config:
+        added: "เพิ่มการกำหนดค่า SMTP แล้ว"
+        changed: "เปลี่ยนแปลงการกำหนดค่า SMTP แล้ว"
+        activated: "เปิดใช้งานการกำหนดค่า SMTP แล้ว"
+        deactivated: "ปิดใช้งานการกำหนดค่า SMTP แล้ว"
+        password:
+          changed: "เปลี่ยนแปลงรหัสผ่านของการกำหนดค่า SMTP แล้ว"
+        removed: "นำการกำหนดค่า SMTP ออกแล้ว"
+  user_schema:
+    created: "สร้าง User Schema แล้ว"
+    updated: "อัปเดต User Schema แล้ว"
+    deactivated: "ปิดใช้งาน User Schema แล้ว"
+    reactivated: "เปิดใช้งาน User Schema อีกครั้งแล้ว"
+    deleted: "ลบ User Schema แล้ว"
+    user:
+      created: "สร้างผู้ใช้แล้ว"
+      updated: "อัปเดตผู้ใช้แล้ว"
+      deleted: "ลบผู้ใช้แล้ว"
+      email:
+        updated: "เปลี่ยนที่อยู่อีเมลแล้ว"
+        verified: "ยืนยันที่อยู่อีเมลแล้ว"
+        verification:
+          failed: "การยืนยันที่อยู่อีเมลล้มเหลว"
+        code:
+          added: "สร้างรหัสยืนยันที่อยู่อีเมลแล้ว"
+          sent: "ส่งรหัสยืนยันที่อยู่อีเมลแล้ว"
+      phone:
+        updated: "เปลี่ยนหมายเลขโทรศัพท์แล้ว"
+        verified: "ยืนยันหมายเลขโทรศัพท์แล้ว"
+        verification:
+          failed: "การยืนยันหมายเลขโทรศัพท์ล้มเหลว"
+        code:
+          added: "สร้างรหัสยืนยันหมายเลขโทรศัพท์แล้ว"
+          sent: "ส่งรหัสยืนยันหมายเลขโทรศัพท์แล้ว"
+  web_key:
+    added: "เพิ่ม Web Key แล้ว"
+    activated: "เปิดใช้งาน Web Key แล้ว"
+    deactivated: "ปิดใช้งาน Web Key แล้ว"
+    removed: "นำ Web Key ออกแล้ว"
+Application:
+  OIDC:
+    UnsupportedVersion: "ไม่รองรับเวอร์ชัน OIDC ของคุณ"
+    V1:
+      NotCompliant: "การกำหนดค่าของคุณไม่เป็นไปตามมาตรฐานและแตกต่างจากมาตรฐาน OIDC 1.0"
+      NoRedirectUris: "ต้องลงทะเบียน redirect uri อย่างน้อยหนึ่งรายการ"
+      NotAllCombinationsAreAllowed: "การกำหนดค่าเป็นไปตามมาตรฐาน แต่ไม่อนุญาตทุกชุดที่เป็นไปได้"
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: "Grant type \"code\" อนุญาต http redirect uri เฉพาะสำหรับ apptype \"web\" เท่านั้น"
+          CustomOnlyForNative: "Grant type \"code\" อนุญาต custom redirect uri เฉพาะสำหรับ apptype \"native\" เท่านั้น (เช่น appname:// )"
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: "Grant type implicit ไม่อนุญาต custom redirect uri"
+          HttpNotAllowed: "Grant type implicit ไม่อนุญาต http redirect uri"
+          HttpLocalhostOnlyForNative: "Http://localhost redirect uri อนุญาตเฉพาะสำหรับแอปพลิเคชัน native เท่านั้น"
+      Native:
+        AuthMethodType:
+          NotNone: "แอปพลิเคชัน native ควรมี authmethodtype เป็น none"
+        RedirectUris:
+          MustBeHttpLocalhost: "Redirect URI ต้องขึ้นต้นด้วยโปรโตคอลของคุณเอง http://127.0.0.1, http://[::1] หรือ http://localhost"
+      UserAgent:
+        AuthMethodType:
+          NotNone: "แอปพลิเคชัน user agent ควรมี authmethodtype เป็น none"
+      GrantType:
+        Refresh:
+          NoAuthCode: "Refresh Token อนุญาตเฉพาะเมื่อใช้ร่วมกับ Authorization Code เท่านั้น"
+Action:
+  Flow:
+    Type:
+      Unspecified: "ไม่ระบุ"
+      ExternalAuthentication: "การยืนยันตัวตนภายนอก"
+      CustomiseToken: "เสริมโทเคน"
+      InternalAuthentication: "การยืนยันตัวตนภายใน"
+      CustomizeSAMLResponse: "เสริม SAMLResponse"
+  TriggerType:
+    Unspecified: "ไม่ระบุ"
+    PostAuthentication: "หลังการยืนยันตัวตน"
+    PreCreation: "ก่อนการสร้าง"
+    PostCreation: "หลังการสร้าง"
+    PreUserinfoCreation: "ก่อนการสร้าง Userinfo"
+    PreAccessTokenCreation: "ก่อนการสร้าง access token"
+    PreSAMLResponseCreation: "ก่อนการสร้าง SAMLResponse"
