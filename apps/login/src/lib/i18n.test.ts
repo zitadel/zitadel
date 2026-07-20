@@ -1,18 +1,22 @@
-import sk from "../../locales/sk.json";
-import en from "../../locales/en.json";
 import { describe, expect, it } from "vitest";
+import en from "../../locales/en.json";
+import sk from "../../locales/sk.json";
 import { LANGS, getLanguage, normalizeLanguageCode } from "./i18n";
 
 function flatten(value: unknown, path = ""): Map<string, string> {
   if (typeof value === "string") return new Map([[path, value]]);
-  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Expected a message object at " + (path || "root"));
+  if (!value || typeof value !== "object" || Array.isArray(value))
+    throw new Error("Expected a message object at " + (path || "root"));
   return Object.entries(value).reduce((messages, [key, nestedValue]) => {
-    for (const [nestedPath, message] of flatten(nestedValue, path ? path + "." + key : key)) messages.set(nestedPath, message);
+    for (const [nestedPath, message] of flatten(nestedValue, path ? path + "." + key : key))
+      messages.set(nestedPath, message);
     return messages;
   }, new Map<string, string>());
 }
 
-function placeholders(message: string): string[] { return [...message.matchAll(/\\{([^}]+)\\}/g)].map((match) => match[1]).sort(); }
+function placeholders(message: string): string[] {
+  return [...message.matchAll(/\\{([^}]+)\\}/g)].map((match) => match[1]).sort();
+}
 
 describe("Login V2 Slovak locale", () => {
   it("registers sk with its Slovak display name", () => {
