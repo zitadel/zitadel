@@ -23,6 +23,9 @@ func TestCommandSide_AddInstanceMember(t *testing.T) {
 	}
 	type args struct {
 		member *AddInstanceMember
+		// nilPermissionCheck passes a nil permission check to AddInstanceMember,
+		// which skips the permission check (as the login v1 does).
+		nilPermissionCheck bool
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -254,6 +257,57 @@ func TestCommandSide_AddInstanceMember(t *testing.T) {
 				err: zerrors.IsPermissionDenied,
 			},
 		},
+		{
+			name: "nil permission check, skips check",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+					),
+					expectFilter(),
+					expectPush(
+						instance.NewMemberAddedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"user1",
+							[]string{"IAM_OWNER"}...,
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: "IAM_OWNER",
+					},
+				},
+			},
+			args: args{
+				member: &AddInstanceMember{
+					InstanceID: "INSTANCE",
+					UserID:     "user1",
+					Roles:      []string{"IAM_OWNER"},
+				},
+				nilPermissionCheck: true,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -262,7 +316,11 @@ func TestCommandSide_AddInstanceMember(t *testing.T) {
 				zitadelRoles:    tt.fields.zitadelRoles,
 				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := r.AddInstanceMember(context.Background(), tt.args.member)
+			var permissionCheck InstanceMemberPermissionCheck
+			if !tt.args.nilPermissionCheck {
+				permissionCheck = r.NewPermissionCheckInstanceMemberWrite(context.Background())
+			}
+			got, err := r.AddInstanceMember(context.Background(), tt.args.member, permissionCheck)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

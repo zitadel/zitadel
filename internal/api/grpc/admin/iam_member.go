@@ -34,7 +34,7 @@ func (s *Server) ListIAMMembers(ctx context.Context, req *admin_pb.ListIAMMember
 }
 
 func (s *Server) AddIAMMember(ctx context.Context, req *admin_pb.AddIAMMemberRequest) (*admin_pb.AddIAMMemberResponse, error) {
-	member, err := s.command.AddInstanceMember(ctx, AddIAMMemberToCommand(req, authz.GetInstance(ctx).InstanceID()))
+	member, err := s.command.AddInstanceMember(ctx, AddIAMMemberToCommand(req, authz.GetInstance(ctx).InstanceID()), s.command.NewPermissionCheckInstanceMemberWrite(ctx))
 	if err != nil {
 		return nil, err
 	}

@@ -75,10 +75,13 @@ type AddInstanceMember struct {
 	Roles      []string
 }
 
-func (c *Commands) AddInstanceMember(ctx context.Context, member *AddInstanceMember) (*domain.ObjectDetails, error) {
+// AddInstanceMember adds a user as a member of the instance with the given roles.
+func (c *Commands) AddInstanceMember(ctx context.Context, member *AddInstanceMember, permissionCheck InstanceMemberPermissionCheck) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(member.InstanceID)
-	if err := c.checkPermissionUpdateInstanceMember(ctx, member.InstanceID); err != nil {
-		return nil, err
+	if permissionCheck != nil {
+		if err := permissionCheck(member.InstanceID); err != nil {
+			return nil, err
+		}
 	}
 	//nolint:staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddInstanceMemberCommand(instanceAgg, member.UserID, member.Roles...))

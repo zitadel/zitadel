@@ -110,6 +110,15 @@ func (c *Commands) checkPermissionDeleteApp(ctx context.Context, resourceOwner, 
 	return c.newPermissionCheck(ctx, domain.PermissionProjectAppDelete, project.AggregateType)(resourceOwner, appID)
 }
 
+// InstanceMemberPermissionCheck authorizes writing an instance membership.
+type InstanceMemberPermissionCheck func(instanceID string) error
+
+func (c *Commands) NewPermissionCheckInstanceMemberWrite(ctx context.Context) InstanceMemberPermissionCheck {
+	return func(instanceID string) error {
+		return c.checkPermissionUpdateInstanceMember(ctx, instanceID)
+	}
+}
+
 func (c *Commands) checkPermissionUpdateInstanceMember(ctx context.Context, instanceID string) error {
 	return c.newPermissionCheck(ctx, domain.PermissionInstanceMemberWrite, instance.AggregateType)(instanceID, instanceID)
 }
