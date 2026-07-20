@@ -250,8 +250,14 @@ export async function getAllowedLanguages({ serviceConfig }: WithServiceConfig) 
     const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
 
     return settingsService.getGeneralSettings({}, {}).then((resp) => {
+      const allowedLanguages =
+          resp.allowedLanguages.length > 0 &&
+          !resp.allowedLanguages.includes("sk")
+              ? [...resp.allowedLanguages, "sk"]
+              : resp.allowedLanguages;
+
       return {
-        allowedLanguages: resp.allowedLanguages,
+        allowedLanguages,
         defaultLanguage: resp.defaultLanguage,
       };
     });
