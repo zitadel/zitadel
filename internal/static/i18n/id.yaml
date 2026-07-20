@@ -282,6 +282,8 @@ Errors:
     LabelPolicy:
       NotFound: "Kebijakan Label Pribadi tidak ditemukan"
       NotChanged: "Kebijakan Label Pribadi belum diubah"
+    IDPConfig:
+      NotExisting: "Konfigurasi Penyedia Identitas tidak ada"
   Project:
     ProjectIDMissing: "Id Proyek tidak ada"
     AlreadyExists: "Proyek sudah ada di organisasi"

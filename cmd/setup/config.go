@@ -191,6 +191,8 @@ type Steps struct {
 	s69CacheTablesLogged                    *CacheTablesLogged
 	s70AddEventStoreCommandEnforceOwner     *AddEventStoreCommandEnforceOwnerColumn
 	s71JWTProvideAddAudienceColumn          *JWTProvideAddAudienceColumn
+	s72AddColumnsToLoginNamesView           *AddColumnsToLoginNamesView
+	s73FixUserGrantRoles                    *FixUserGrantRoles
 	RelationalTables                        *TransactionalTables
 }
 

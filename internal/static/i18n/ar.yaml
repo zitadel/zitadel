@@ -283,6 +283,8 @@ Errors:
     LabelPolicy:
       NotFound: "سياسة العلامة الخاصة غير موجودة"
       NotChanged: "سياسة العلامة الخاصة لم تتغير"
+    IDPConfig:
+      NotExisting: "تكوين مزود الهوية غير موجود"
   Project:
     ProjectIDMissing: "معرف المشروع مفقود"
     AlreadyExists: "المشروع موجود بالفعل في المنظمة"

@@ -26,6 +26,7 @@ import {
 } from "../zitadel";
 import { createSessionAndUpdateCookie } from "./cookie";
 import { getPublicHost } from "./host";
+import { trySendVerification } from "./verify";
 
 const logger = createLogger("loginname");
 
@@ -341,14 +342,25 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       // If the user's email is not verified, they likely already have a code from the
       // initial verification email. Auto-sending a new one here invalidates their existing code
-      // and causes confusion. Only auto-send (`send=true`) if the email is already verified.
+      // and causes confusion. Only auto-send if the email is already verified.
       const shouldSend = humanUser?.email?.isVerified === true;
+
+      const codeSent = shouldSend
+        ? await trySendVerification({
+            userId: session?.factors?.user?.id ?? user.userId,
+            isInvite: true,
+            requestId: command.requestId,
+          })
+        : false;
 
       const params = new URLSearchParams({
         loginName: (session?.factors?.user?.loginName ?? user.preferredLoginName) as string,
-        send: shouldSend ? "true" : "false",
         invite: "true", // always send invite code if user has no primary auth method
       });
+
+      if (codeSent) {
+        params.append("codeSent", "true");
+      }
 
       if (command.requestId) {
         params.append("requestId", command.requestId);
@@ -533,18 +545,29 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       logger.debug("No single org found for discovery");
     }
   }
+  // When a user is not found, try to redirect to an external IdP if:
+  // - local authentication is disabled, OR
+  // - domain discovery resolved an organization (regardless of allowRegister)
+  // Registration policy (allowRegister) controls local account creation only
+  // and must not prevent authentication via an external IdP.
+  // Fixes: https://github.com/zitadel/zitadel/issues/12021
+  // Fixes: https://github.com/zitadel/zitadel/issues/12023
 
-  // user not found, check if IDPs are available when local auth is not allowed
-  if (!effectiveLoginSettings?.allowLocalAuthentication) {
-    logger.debug("redirecting to IDP (register allowed, password not allowed)");
+  if ((!effectiveLoginSettings?.allowLocalAuthentication || discoveredOrganization) && !command.ignoreUnknownUsernames) {
     const resp = await redirectUserToIDP(undefined, discoveredOrganization);
     if (resp) {
+      logger.debug("Redirecting to IDP", { organization: discoveredOrganization });
       return resp;
     }
-    logger.debug("IDP redirect failed, returning user not found");
 
-    return preventUserEnumeration(discoveredOrganization);
-  } else if (effectiveLoginSettings?.allowRegister && effectiveLoginSettings?.allowLocalAuthentication) {
+    // If local auth is disabled, there is no fallback — return error
+    if (!effectiveLoginSettings?.allowLocalAuthentication) {
+      logger.debug("IDP redirect failed and local auth not allowed, returning user not found");
+      return preventUserEnumeration(discoveredOrganization);
+    }
+  }
+
+  if (effectiveLoginSettings?.allowRegister && effectiveLoginSettings?.allowLocalAuthentication) {
     logger.debug("register and password both allowed");
     // do not register user if ignoreUnknownUsernames is set
     if (discoveredOrganization && !effectiveLoginSettings?.ignoreUnknownUsernames) {

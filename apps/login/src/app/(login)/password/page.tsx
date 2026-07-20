@@ -33,19 +33,13 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   }
 
   // also allow no session to be found (ignoreUnkownUsername)
-  let sessionFactors;
-  try {
-    sessionFactors = await loadMostRecentSession({
-      serviceConfig,
-      sessionParams: {
-        loginName,
-        organization,
-      },
-    });
-  } catch (error) {
-    // ignore error to continue to show the password form
-    console.warn(error);
-  }
+  const sessionFactors = await loadMostRecentSession({
+    serviceConfig,
+    sessionParams: {
+      loginName,
+      organization,
+    },
+  });
 
   const branding = await getBrandingSettings({
     serviceConfig,

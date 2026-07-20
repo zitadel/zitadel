@@ -19,12 +19,14 @@ import { SendInviteCodeSchema } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import {
   AddHumanUserRequest,
   AddHumanUserRequestSchema,
+  CreateUserRequest,
   ResendEmailCodeRequest,
   ResendEmailCodeRequestSchema,
   SendEmailCodeRequestSchema,
   SetPasswordRequest,
   SetPasswordRequestSchema,
   UpdateHumanUserRequest,
+  UpdateUserRequest,
   UserService,
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
@@ -485,6 +487,22 @@ export async function updateHuman({
   return userService.updateHumanUser(request);
 }
 
+// createUser calls the non-deprecated CreateUser endpoint, which supports user metadata
+// (unlike the deprecated addHumanUser/AddHumanUserRequest flow).
+export async function createUser({ serviceConfig, request }: WithServiceConfig<{ request: CreateUserRequest }>) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceConfig);
+
+  return userService.createUser(request);
+}
+
+// updateUser calls the non-deprecated UpdateUser endpoint, which supports updating user
+// metadata in the same request (unlike the deprecated updateHuman/UpdateHumanUserRequest flow).
+export async function updateUser({ serviceConfig, request }: WithServiceConfig<{ request: UpdateUserRequest }>) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceConfig);
+
+  return userService.updateUser(request);
+}
+
 export async function verifyTOTPRegistration({
   serviceConfig,
   code,
@@ -587,6 +605,8 @@ export type ListUsersCommand = WithServiceConfig<{
   organizationId?: string;
 }>;
 
+const userLookupQuery = { limit: 2 };
+
 export async function listUsers({ serviceConfig, loginName, userName, phone, email, organizationId }: ListUsersCommand) {
   const queries: SearchQuery[] = [];
 
@@ -672,7 +692,7 @@ export async function listUsers({ serviceConfig, loginName, userName, phone, ema
 
   const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceConfig);
 
-  return userService.listUsers({ queries });
+  return userService.listUsers({ query: userLookupQuery, queries });
 }
 
 export type SearchUsersCommand = WithServiceConfig<{
@@ -755,7 +775,7 @@ export async function searchUsers({
 
   const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceConfig);
 
-  const loginNameResult = await userService.listUsers({ queries });
+  const loginNameResult = await userService.listUsers({ query: userLookupQuery, queries });
 
   if (!loginNameResult || !loginNameResult.details) {
     return { error: t("errors.errorOccured") };
@@ -817,6 +837,7 @@ export async function searchUsers({
   }
 
   const emailOrPhoneResult = await userService.listUsers({
+    query: userLookupQuery,
     queries: emailAndPhoneQueries,
   });
 

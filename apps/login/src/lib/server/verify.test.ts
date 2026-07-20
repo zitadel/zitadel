@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { initialSendVerification, sendVerification } from "./verify";
+import { sendVerification, trySendVerification } from "./verify";
 
 import {
   createInviteCode,
@@ -219,7 +219,7 @@ describe("sendVerification", () => {
   });
 });
 
-describe("initialSendVerification", () => {
+describe("trySendVerification", () => {
   let mockSendEmailCode: any;
   let mockCreateInviteCode: any;
   let originalBasePath: string | undefined;
@@ -243,12 +243,13 @@ describe("initialSendVerification", () => {
     }
   });
 
-  test("should call sendEmailCode with correct URL template for non-invite", async () => {
-    await initialSendVerification({
+  test("should call sendEmailCode with correct URL template for non-invite and return true", async () => {
+    const result = await trySendVerification({
       userId: "user-1",
       isInvite: false,
     });
 
+    expect(result).toBe(true);
     expect(mockSendEmailCode).toHaveBeenCalledWith({
       serviceConfig: {},
       userId: "user-1",
@@ -257,12 +258,13 @@ describe("initialSendVerification", () => {
     expect(mockCreateInviteCode).not.toHaveBeenCalled();
   });
 
-  test("should call createInviteCode with correct URL template for invite", async () => {
-    await initialSendVerification({
+  test("should call createInviteCode with correct URL template for invite and return true", async () => {
+    const result = await trySendVerification({
       userId: "user-1",
       isInvite: true,
     });
 
+    expect(result).toBe(true);
     expect(mockCreateInviteCode).toHaveBeenCalledWith({
       serviceConfig: {},
       userId: "user-1",
@@ -273,12 +275,13 @@ describe("initialSendVerification", () => {
   });
 
   test("should include URL-encoded requestId in URL template", async () => {
-    await initialSendVerification({
+    const result = await trySendVerification({
       userId: "user-1",
       isInvite: false,
       requestId: "req-123",
     });
 
+    expect(result).toBe(true);
     expect(mockSendEmailCode).toHaveBeenCalledWith({
       serviceConfig: {},
       userId: "user-1",
@@ -288,12 +291,13 @@ describe("initialSendVerification", () => {
   });
 
   test("should URL-encode special characters in requestId", async () => {
-    await initialSendVerification({
+    const result = await trySendVerification({
       userId: "user-1",
       isInvite: false,
       requestId: "req&id=injected",
     });
 
+    expect(result).toBe(true);
     expect(mockSendEmailCode).toHaveBeenCalledWith({
       serviceConfig: {},
       userId: "user-1",
@@ -303,17 +307,40 @@ describe("initialSendVerification", () => {
   });
 
   test("should include invite=true and requestId for invite with requestId", async () => {
-    await initialSendVerification({
+    const result = await trySendVerification({
       userId: "user-1",
       isInvite: true,
       requestId: "req-456",
     });
 
+    expect(result).toBe(true);
     expect(mockCreateInviteCode).toHaveBeenCalledWith({
       serviceConfig: {},
       userId: "user-1",
       urlTemplate:
         "https://example.com/ui/v2/login/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true&requestId=req-456",
     });
+  });
+
+  test("should return false when sendEmailCode fails", async () => {
+    mockSendEmailCode.mockRejectedValue(new Error("Network error"));
+
+    const result = await trySendVerification({
+      userId: "user-1",
+      isInvite: false,
+    });
+
+    expect(result).toBe(false);
+  });
+
+  test("should return false when createInviteCode fails", async () => {
+    mockCreateInviteCode.mockRejectedValue(new Error("Already invited"));
+
+    const result = await trySendVerification({
+      userId: "user-1",
+      isInvite: true,
+    });
+
+    expect(result).toBe(false);
   });
 });

@@ -3,6 +3,7 @@ package oidc
 import (
 	"context"
 	"slices"
+	"strings"
 	"time"
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -57,7 +58,12 @@ func (s *Server) tokenExchange(ctx context.Context, r *op.ClientRequest[oidc.Tok
 	}
 
 	actorToken := subjectToken // see [createExchangeTokens] comment.
+	// actorPath: a separate actor_token was verified (impersonation/delegation).
+	// Standard exchange leaves actorToken == subjectToken; this branch runs for
+	// user_id/JWT subjects or when the client sends actor_token explicitly.
+	actorPath := false
 	if subjectToken.tokenType == UserIDTokenType || subjectToken.tokenType == oidc.JWTTokenType || r.Data.ActorToken != "" {
+		actorPath = true
 		if !authz.GetInstance(ctx).EnableImpersonation() {
 			return nil, zerrors.ThrowPermissionDenied(nil, "OIDC-Fae5w", "Errors.TokenExchange.Impersonation.PolicyDisabled")
 		}
@@ -75,7 +81,13 @@ func (s *Server) tokenExchange(ctx context.Context, r *op.ClientRequest[oidc.Tok
 	if err != nil {
 		return nil, err
 	}
-	scopes, err := validateTokenExchangeScopes(client, r.Data.Scopes, subjectToken.scopes, actorToken.scopes)
+	// scopelessActorPath: actorPath with a subject that cannot carry scopes
+	// (user_id or id_token). Subject-data scopes (email, profile, …) are taken
+	// from the impersonated user at mint time; only authorization scopes must
+	// appear on subject_token ∪ actor_token. Access/JWT subjects always use
+	// union validation even when their scope claim is empty.
+	scopelessActorPath := actorPath && (subjectToken.tokenType == UserIDTokenType || subjectToken.tokenType == oidc.IDTokenType)
+	scopes, err := validateTokenExchangeScopes(client, r.Data.Scopes, subjectToken.scopes, actorToken.scopes, scopelessActorPath)
 	if err != nil {
 		return nil, err
 	}
@@ -106,6 +118,11 @@ func (s *Server) verifyExchangeToken(ctx context.Context, client *Client, token 
 		token, err := s.verifyAccessToken(ctx, token)
 		if err != nil {
 			return nil, zerrors.ThrowPermissionDenied(err, "OIDC-Osh3t", "Errors.TokenExchange.Token.Invalid")
+		}
+		if !token.isPAT {
+			if err = validateIntrospectionAudience(token.audience, client.GetID(), client.client.ProjectID); err != nil {
+				return nil, zerrors.ThrowPermissionDenied(err, "OIDC-zi9Y0", "Errors.TokenExchange.Token.Invalid")
+			}
 		}
 		if token.isPAT {
 			if err = s.assertClientScopesForPAT(ctx, token, client.GetID(), client.client.ProjectID); err != nil {
@@ -173,18 +190,120 @@ func (s *Server) jwtProfileUserCheck(ctx context.Context, resourceOwner *string,
 	})
 }
 
-func validateTokenExchangeScopes(client *Client, requestedScopes, subjectScopes, actorScopes []string) ([]string, error) {
-	// Scope always has 1 empty string if the space delimited array was an empty string.
-	scopes := slices.DeleteFunc(requestedScopes, func(s string) bool {
+// validateTokenExchangeScopes picks the scope rule set for this exchange.
+// scopelessActorPath selects impersonation rules (user_id/id_token subjects
+// on the actor path); otherwise every requested scope must ⊆ subject ∪ actor.
+func validateTokenExchangeScopes(
+	client *Client,
+	requestedScopes, subjectScopes, actorScopes []string,
+	scopelessActorPath bool,
+) ([]string, error) {
+	requestedScopes = normalizeRequestedScopes(requestedScopes)
+
+	if scopelessActorPath {
+		return validateImpersonationTokenExchangeScopes(client, requestedScopes, subjectScopes, actorScopes)
+	}
+
+	return validateUnionTokenExchangeScopes(client, requestedScopes, subjectScopes, actorScopes)
+}
+
+// validateUnionTokenExchangeScopes applies when the requested scopes must be a subset
+// of the scopes present on the subject and/or actor tokens (union).
+// This covers standard exchange (actor == subject) and actor-path exchanges with
+// access/JWT subject tokens. Actor-path exchanges with scope-less subjects
+// (user_id, id_token) use validateImpersonationTokenExchangeScopes instead.
+// Rule: every scope must be present on the subject or actor token (union).
+// For standard exchange both lists are identical, so this is effectively
+// "subset of subject token only".
+func validateUnionTokenExchangeScopes(
+	client *Client,
+	requestedScopes, subjectScopes, actorScopes []string,
+) ([]string, error) {
+	if len(requestedScopes) == 0 {
+		requestedScopes = subjectScopes
+	}
+	if len(requestedScopes) == 0 {
+		requestedScopes = actorScopes
+	}
+
+	for _, scope := range requestedScopes {
+		if !scopeInUnion(scope, subjectScopes, actorScopes) {
+			return nil, oidc.ErrInvalidScope().
+				WithDescription("scope %q not found in subject or actor token", scope)
+		}
+	}
+
+	return op.ValidateAuthReqScopes(client, requestedScopes)
+}
+
+// validateImpersonationTokenExchangeScopes applies when the subject token
+// cannot carry scopes (user_id, id_token). The actor token authorizes the
+// request; impersonation permission is checked later in CreateOIDCSession.
+//
+// Two scope classes:
+//   - authorization scopes: privilege/audience/roles — must be on input tokens
+//   - subject-data scopes: user claims (email, profile, …) — client allowlist only
+func validateImpersonationTokenExchangeScopes(
+	client *Client,
+	requestedScopes, subjectScopes, actorScopes []string,
+) ([]string, error) {
+	// Subject has no scopes to inherit; fall back to actor.
+	if len(requestedScopes) == 0 {
+		requestedScopes = actorScopes
+	}
+
+	for _, scope := range requestedScopes {
+		// Prevent privilege escalation: offline_access, audiences, roles, etc.
+		// must still come from subject or actor token.
+		if isTokenExchangeAuthorizationScope(scope) && !scopeInUnion(scope, subjectScopes, actorScopes) {
+			return nil, oidc.ErrInvalidScope().
+				WithDescription("scope %q not found in subject or actor token", scope)
+		}
+
+		// Subject-data scopes (openid, profile, email, urn:zitadel:iam:user:*, …)
+		// skip the union check — validated by client allowlist below.
+	}
+
+	return op.ValidateAuthReqScopes(client, requestedScopes)
+}
+
+func normalizeRequestedScopes(scopes []string) []string {
+	// Space-delimited empty scope produces a single "" entry.
+	return slices.DeleteFunc(scopes, func(s string) bool {
 		return s == ""
 	})
-	if len(scopes) == 0 {
-		scopes = subjectScopes
+}
+
+func scopeInUnion(scope string, subjectScopes, actorScopes []string) bool {
+	return slices.Contains(subjectScopes, scope) || slices.Contains(actorScopes, scope)
+}
+
+// isTokenExchangeAuthorizationScope identifies scopes that control what a token
+// may do (audiences, refresh, roles), not which user claims to embed.
+func isTokenExchangeAuthorizationScope(scope string) bool {
+	switch scope {
+	case oidc.ScopeOfflineAccess, ScopeProjectsRoles:
+		return true
 	}
-	if len(scopes) == 0 {
-		scopes = actorScopes
+	if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
+		return true // urn:zitadel:iam:org:project:role:*
 	}
-	return op.ValidateAuthReqScopes(client, scopes)
+	if strings.HasPrefix(scope, domain.ProjectIDScope) {
+		return true // urn:zitadel:iam:org:project:id:*:aud
+	}
+	if strings.HasPrefix(scope, domain.OrgIDScope) {
+		return true
+	}
+	if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
+		return true
+	}
+	if strings.HasPrefix(scope, domain.OrgRoleIDScope) {
+		return true
+	}
+	if strings.HasPrefix(scope, domain.SelectIDPScope) {
+		return true
+	}
+	return false
 }
 
 func validateTokenExchangeAudience(requestedAudience, subjectAudience, actorAudience []string) ([]string, error) {

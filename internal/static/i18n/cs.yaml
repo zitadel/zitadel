@@ -282,6 +282,8 @@ Errors:
     LabelPolicy:
       NotFound: "Politika privátních štítků nenalezena"
       NotChanged: "Politika privátních štítků nebyla změněna"
+    IDPConfig:
+      NotExisting: "Konfigurace poskytovatele identity neexistuje"
   Project:
     ProjectIDMissing: "Chybí ID projektu"
     AlreadyExists: "Projekt již v organizaci existuje"
