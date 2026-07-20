@@ -1,6 +1,6 @@
-import { LANGS, LANGUAGE_COOKIE_NAME, LANGUAGE_HEADER_NAME } from "@/lib/i18n";
+import { LANGS, LANGUAGE_COOKIE_NAME, LANGUAGE_HEADER_NAME, normalizeLanguageCode } from "@/lib/i18n";
 import { getServiceConfig } from "@/lib/service-url";
-import { getAllowedLanguages, getHostedLoginTranslation } from "@/lib/zitadel";
+import { getHostedLoginTranslation } from "@/lib/zitadel";
 import { JsonObject } from "@zitadel/client";
 import deepmerge from "deepmerge";
 import { getRequestConfig } from "next-intl/server";
@@ -8,42 +8,28 @@ import { cookies, headers } from "next/headers";
 
 export default getRequestConfig(async () => {
   const fallback = "en";
+  const defaultLanguage = "sk";
   const cookiesList = await cookies();
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  let allowedLanguages = LANGS.map((l) => l.code);
-  let defaultLanguage = fallback;
-
-  try {
-    const settings = await getAllowedLanguages({ serviceConfig });
-    if (settings.allowedLanguages?.length) {
-      const localLanguageCodes = LANGS.map((l) => l.code);
-      allowedLanguages = settings.allowedLanguages.filter((l) => localLanguageCodes.includes(l));
-    }
-    if (settings.defaultLanguage) {
-      defaultLanguage = settings.defaultLanguage;
-    }
-  } catch (e) {
-    console.warn("Failed to load global settings", e);
-  }
-
-  let locale: string = defaultLanguage;
+  const allowedLanguages = LANGS.map((language) => language.code);
+  let locale = defaultLanguage;
 
   const languageHeader = await (await headers()).get(LANGUAGE_HEADER_NAME);
   if (languageHeader) {
-    // splits "en-US,en;q=0.9" to ["en", "US"] or ["en"]
-    const headerLocale = languageHeader.split(",")[0].split("-")[0];
-    if (allowedLanguages.includes(headerLocale)) {
+    const headerLocale = normalizeLanguageCode(languageHeader.split(",")[0]);
+    if (headerLocale && allowedLanguages.includes(headerLocale)) {
       locale = headerLocale;
     }
   }
 
   const languageCookie = cookiesList?.get(LANGUAGE_COOKIE_NAME);
-  if (languageCookie && languageCookie.value) {
-    if (allowedLanguages.includes(languageCookie.value)) {
-      locale = languageCookie.value;
+  const cookieLocale = normalizeLanguageCode(languageCookie?.value);
+  if (cookieLocale) {
+    if (allowedLanguages.includes(cookieLocale)) {
+      locale = cookieLocale;
     } else {
       // If the cookie tells a language that is other than the supported ones, fall back to the default.
       locale = defaultLanguage;
@@ -83,8 +69,10 @@ export default getRequestConfig(async () => {
 
   const fallbackMessages = (await import(`../../locales/${fallback}.json`)).default;
 
+  const messageLayers = [fallbackMessages, customMessages, localeMessages];
+
   return {
     locale,
-    messages: deepmerge.all([fallbackMessages, localeMessages, customMessages]) as Record<string, string>,
+    messages: deepmerge.all(messageLayers) as Record<string, string>,
   };
 });

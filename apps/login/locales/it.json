@@ -1,7 +1,7 @@
 {
   "common": {
     "back": "Indietro",
-    "title": "Accedi con Zitadel"
+    "title": "Accedi con ZITADEL"
   },
   "accounts": {
     "title": "Account",
@@ -13,9 +13,9 @@
   },
   "logout": {
     "title": "Esci",
-    "description": "Seleziona l'account che desideri uscire",
+    "description": "Seleziona un account per terminare la sessione",
     "noResults": "Nessun account trovato",
-    "clear": "Elimina sessione",
+    "clear": "Termina sessione",
     "verifiedAt": "Ultima attività: {time}",
     "success": {
       "title": "Uscita riuscita",
@@ -207,7 +207,7 @@
     }
   },
   "ldap": {
-    "title": "Accedi con LDAP",
+    "title": "Accesso LDAP",
     "description": "Inserisci le tue credenziali LDAP.",
     "submit": "Continua",
     "labels": {
@@ -287,7 +287,7 @@
       "description": "Il tuo dispositivo chiederà la tua impronta digitale, il volto o il blocco schermo",
       "info": {
         "description": "Una passkey è un metodo di autenticazione su un dispositivo come la tua impronta digitale, Apple FaceID o simili.",
-        "link": "Autenticazione con Passkey"
+        "link": "Autenticazione con chiave di accesso"
       },
       "skip": "Salta",
       "submit": "Continua"
@@ -306,11 +306,11 @@
   },
   "register": {
     "methods": {
-      "passkey": "Passkey",
+      "passkey": "Chiave di accesso",
       "password": "Password"
     },
     "disabled": {
-      "title": "Registration disabled",
+      "title": "Registrazione disabilitata",
       "description": "Registrazione disabilitata. Contatta l'amministratore di sistema per assistenza."
     },
     "missingdata": {
@@ -318,7 +318,7 @@
       "description": "Inserisci i tuoi dati per registrarti."
     },
     "title": "Registrati",
-    "description": "Crea il tuo account Zitadel.",
+    "description": "Crea il tuo account ZITADEL.",
     "noMethodAvailableWarning": "Nessun metodo di autenticazione disponibile. Contatta l'amministratore di sistema per assistenza.",
     "selectMethod": "Seleziona il metodo con cui desideri autenticarti",
     "agreeTo": "Per registrarti devi accettare i termini e le condizioni",
@@ -426,7 +426,7 @@
   "device": {
     "usercode": {
       "title": "Codice dispositivo",
-      "description": "Inserisci il codice.",
+      "description": "Inserisci il codice visualizzato nell'app o sul dispositivo.",
       "submit": "Continua",
       "labels": {
         "code": "Codice"
@@ -438,7 +438,7 @@
     "request": {
       "title": "{appName} desidera connettersi:",
       "description": "{appName} avrà accesso a:",
-      "disclaimer": "Cliccando su Consenti, autorizzi {appName} e Zitadel a utilizzare le tue informazioni in conformità con i rispettivi termini di servizio e politiche sulla privacy. Puoi revocare questo accesso in qualsiasi momento.",
+      "disclaimer": "Cliccando su Consenti, autorizzi {appName} e ZITADEL a utilizzare le tue informazioni in conformità con i rispettivi termini di servizio e le rispettive informative sulla privacy. Puoi revocare questo accesso in qualsiasi momento.",
       "submit": "Consenti",
       "deny": "Nega"
     },

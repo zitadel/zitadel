@@ -1,7 +1,7 @@
 {
   "common": {
     "back": "Vissza",
-    "title": "Bejelentkezés a Zitadel-lel"
+    "title": "Bejelentkezés a ZITADEL-lel"
   },
   "accounts": {
     "title": "Fiókok",
@@ -318,7 +318,7 @@
       "description": "A regisztrációhoz add meg az e-mail címedet, keresztneved és vezetékneved."
     },
     "title": "Regisztráció",
-    "description": "Hozd létre a Zitadel fiókodat.",
+    "description": "Hozd létre a ZITADEL-fiókodat.",
     "noMethodAvailableWarning": "Nincs elérhető hitelesítési módszer. Fordulj a rendszergazdához.",
     "selectMethod": "Válaszd ki, milyen módszerrel szeretnél hitelesíteni",
     "agreeTo": "A regisztrációhoz el kell fogadnod a felhasználási feltételeket",
@@ -438,7 +438,7 @@
     "request": {
       "title": "A(z) {appName} kapcsolódni szeretne",
       "description": "A(z) {appName} hozzáférést kap a következőkhöz:",
-      "disclaimer": "Az Engedélyezés gombra kattintva engedélyezed, hogy a(z) {appName} és a Zitadel a saját felhasználási feltételeik és adatvédelmi irányelveik szerint használja az adataidat. Ezt a hozzáférést bármikor visszavonhatod.",
+      "disclaimer": "Az Engedélyezés gombra kattintva engedélyezed, hogy a(z) {appName} és a ZITADEL a saját felhasználási feltételeik és adatvédelmi irányelveik szerint használja az adataidat. Ezt a hozzáférést bármikor visszavonhatod.",
       "submit": "Engedélyezés",
       "deny": "Elutasítás"
     },

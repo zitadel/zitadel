@@ -1,7 +1,7 @@
 {
   "common": {
     "back": "Back",
-    "title": "Login with Zitadel"
+    "title": "Login with ZITADEL"
   },
   "accounts": {
     "title": "Accounts",
@@ -28,7 +28,7 @@
     "register": "Register new user",
     "submit": "Continue",
     "labels": {
-      "loginname": "Loginname",
+      "loginname": "Login name",
       "username": "Username",
       "usernameOrPhoneNumber": "Username or phone number",
       "usernameOrEmail": "Username or email"
@@ -89,8 +89,8 @@
       "submit": "Continue",
       "labels": {
         "code": "Code",
-        "newPassword": "New Password",
-        "confirmPassword": "Confirm Password"
+        "newPassword": "New password",
+        "confirmPassword": "Confirm password"
       },
       "required": {
         "code": "This field is required",
@@ -108,9 +108,9 @@
       "description": "Set the password for your account",
       "submit": "Continue",
       "labels": {
-        "currentPassword": "Current Password",
-        "newPassword": "New Password",
-        "confirmPassword": "Confirm Password"
+        "currentPassword": "Current password",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm password"
       },
       "required": {
         "currentPassword": "You have to provide your current password!",
@@ -318,7 +318,7 @@
       "description": "Provide email, first and last name to register."
     },
     "title": "Register",
-    "description": "Create your Zitadel account.",
+    "description": "Create your ZITADEL account.",
     "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
     "selectMethod": "Select the method you would like to authenticate",
     "agreeTo": "To register you must agree to the terms and conditions",
@@ -380,7 +380,7 @@
     }
   },
   "verify": {
-    "userIdMissing": "No userId provided!",
+    "userIdMissing": "No user ID provided!",
     "successTitle": "User verified",
     "successDescription": "The user has been verified successfully.",
     "successContinue": "Continue",
@@ -438,7 +438,7 @@
     "request": {
       "title": "{appName} would like to connect",
       "description": "{appName} will have access to:",
-      "disclaimer": "By clicking Allow, you allow {appName} and Zitadel to use your information in accordance with their respective terms of service and privacy policies. You can revoke this access at any time.",
+      "disclaimer": "By clicking Allow, you allow {appName} and ZITADEL to use your information in accordance with their respective terms of service and privacy policies. You can revoke this access at any time.",
       "submit": "Allow",
       "deny": "Deny"
     },

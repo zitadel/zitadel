@@ -1,6 +1,8 @@
 "use client";
 
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { Logo } from "@/components/logo";
+import { LANGS } from "@/lib/i18n";
 import { useResponsiveLayout } from "@/lib/theme-hooks";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import React, { Children, ReactNode } from "react";
@@ -84,6 +86,9 @@ export function DynamicTheme({
                       </div>
                     </div>
                   </div>
+                  <div className="mt-6 flex justify-end">
+                    <LanguageSwitcher languages={LANGS} />
+                  </div>
                 </Card>
               </div>
             );
@@ -123,7 +128,9 @@ export function DynamicTheme({
                       <div className="w-full">{actualChildren}</div>
                     )}
 
-                    <div className="flex flex-row justify-between"></div>
+                    <div className="mt-6 flex w-full justify-end">
+                      <LanguageSwitcher languages={LANGS} />
+                    </div>
                   </div>
                 </Card>
               </div>

@@ -1,7 +1,7 @@
 {
   "common": {
     "back": "Späť",
-    "title": "Prihlásenie cez Zitadel"
+    "title": "Prihlásenie cez ZITADEL"
   },
   "accounts": {
     "title": "Účty",
@@ -38,26 +38,26 @@
     },
     "errors": {
       "internalError": "Vyskytla sa interná chyba",
-      "couldNotGetLoginSettings": "Could not get login settings",
-      "couldNotSearchUsers": "Could not search users",
-      "couldNotGetDomain": "Could not get domain",
-      "couldNotGetHost": "Could not get host",
-      "couldNotStartIDPFlow": "Could not start IDP flow",
-      "moreThanOneUserFound": "More than one user found. Provide a unique identifier.",
-      "userNotFound": "User not found in the system",
-      "couldNotCreateSession": "Could not create session for user",
-      "initialUserNotSupported": "Initial User not supported",
-      "localAuthenticationNotAllowed": "Local authentication is not allowed! Contact your administrator for more information.",
-      "passkeysNotAllowed": "Passkeys not allowed! Contact your administrator for more information.",
-      "couldNotFindIdentityProvider": "Could not find identity provider.",
-      "userNotActive": "User is not active. Contact your administrator for more information."
+      "couldNotGetLoginSettings": "Nepodarilo sa načítať nastavenia prihlásenia",
+      "couldNotSearchUsers": "Nepodarilo sa vyhľadať používateľov",
+      "couldNotGetDomain": "Nepodarilo sa načítať doménu",
+      "couldNotGetHost": "Nepodarilo sa načítať hostiteľa",
+      "couldNotStartIDPFlow": "Nepodarilo sa spustiť tok poskytovateľa identity",
+      "moreThanOneUserFound": "Našlo sa viac používateľov. Zadajte jedinečný identifikátor.",
+      "userNotFound": "Používateľ sa v systéme nenašiel",
+      "couldNotCreateSession": "Nepodarilo sa vytvoriť reláciu používateľa",
+      "initialUserNotSupported": "Počiatočný používateľ nie je podporovaný",
+      "localAuthenticationNotAllowed": "Lokálne overovanie nie je povolené. Ďalšie informácie vám poskytne správca.",
+      "passkeysNotAllowed": "Prístupové kľúče nie sú povolené. Ďalšie informácie vám poskytne správca.",
+      "couldNotFindIdentityProvider": "Nepodarilo sa nájsť poskytovateľa identity.",
+      "userNotActive": "Používateľ nie je aktívny. Ďalšie informácie vám poskytne správca."
     }
   },
   "zitadel": {
     "errors": {
-      "errorOccured": "An error occurred",
-      "multipleUsersFound": "Multiple users found",
-      "userNotFound": "User not found in the system"
+      "errorOccured": "Vyskytla sa chyba",
+      "multipleUsersFound": "Našlo sa viac používateľov",
+      "userNotFound": "Používateľ sa v systéme nenašiel"
     }
   },
   "password": {
@@ -73,17 +73,17 @@
         "password": "Toto pole je povinné"
       },
       "errors": {
-        "couldNotVerifyPassword": "Could not verify password",
-        "couldNotResetPassword": "Could not reset password"
+        "couldNotVerifyPassword": "Nepodarilo sa overiť heslo",
+        "couldNotResetPassword": "Nepodarilo sa obnoviť heslo"
       },
       "info": {
-        "passwordResetSent": "Password was reset. Please check your email"
+        "passwordResetSent": "Heslo bolo obnovené. Skontrolujte si e-mail."
       }
     },
     "set": {
       "title": "Nastaviť heslo",
-      "description": "Set the password for your account",
-      "codeSent": "A new code has been sent to your email address.",
+      "description": "Nastavte heslo pre svoj účet",
+      "codeSent": "Na vašu e-mailovú adresu bol odoslaný nový kód.",
       "noCodeReceived": "Neprišiel vám kód?",
       "resend": "Poslať kód znova",
       "submit": "Pokračovať",
@@ -94,18 +94,18 @@
       },
       "required": {
         "code": "Toto pole je povinné",
-        "newPassword": "You have to provide a password!",
+        "newPassword": "Musíte zadať heslo.",
         "confirmPassword": "Toto pole je povinné"
       },
       "errors": {
-        "couldNotSetPassword": "Could not set password",
-        "couldNotResetPassword": "Could not reset password",
-        "couldNotVerifyPassword": "Could not verify password"
+        "couldNotSetPassword": "Nepodarilo sa nastaviť heslo",
+        "couldNotResetPassword": "Nepodarilo sa obnoviť heslo",
+        "couldNotVerifyPassword": "Nepodarilo sa overiť heslo"
       }
     },
     "change": {
       "title": "Zmeniť heslo",
-      "description": "Set the password for your account",
+      "description": "Nastavte heslo pre svoj účet",
       "submit": "Pokračovať",
       "labels": {
         "currentPassword": "Aktuálne heslo",
@@ -113,102 +113,102 @@
         "confirmPassword": "Potvrďte heslo"
       },
       "required": {
-        "currentPassword": "You have to provide your current password!",
-        "newPassword": "You have to provide a new password!",
+        "currentPassword": "Musíte zadať aktuálne heslo.",
+        "newPassword": "Musíte zadať nové heslo.",
         "confirmPassword": "Toto pole je povinné"
       },
       "errors": {
-        "currentPasswordInvalid": "Current password is incorrect.",
-        "couldNotChangePassword": "Could not change password",
-        "couldNotVerifyPassword": "Could not verify password",
-        "unknownError": "Unknown error"
+        "currentPasswordInvalid": "Aktuálne heslo je nesprávne.",
+        "couldNotChangePassword": "Nepodarilo sa zmeniť heslo",
+        "couldNotVerifyPassword": "Nepodarilo sa overiť heslo",
+        "unknownError": "Neznáma chyba"
       }
     },
     "complexity": {
-      "length": "Must be at least {minLength} characters long.",
-      "hasSymbol": "Must include a symbol.",
-      "hasNumber": "Must include a number.",
-      "hasUppercase": "Must include an uppercase letter.",
-      "hasLowercase": "Must include a lowercase letter.",
-      "equals": "Password confirmation matched.",
-      "matches": "Matches",
-      "doesNotMatch": "Doesn't match"
+      "length": "Musí mať aspoň {minLength} znakov.",
+      "hasSymbol": "Musí obsahovať symbol.",
+      "hasNumber": "Musí obsahovať číslo.",
+      "hasUppercase": "Musí obsahovať veľké písmeno.",
+      "hasLowercase": "Musí obsahovať malé písmeno.",
+      "equals": "Potvrdenie hesla sa zhoduje.",
+      "matches": "Zhoduje sa",
+      "doesNotMatch": "Nezhoduje sa"
     },
     "errors": {
-      "noHostFound": "No host found",
-      "couldNotSendResetLink": "Could not send Password Reset Link",
-      "couldNotCreateSessionForUser": "Could not create session for user",
-      "couldNotVerifyPassword": "Could not verify password",
-      "failedToAuthenticate": "Failed to authenticate. You had {failedAttempts} of {maxPasswordAttempts} password attempts.{lockoutMessage}",
-      "failedToAuthenticateNoLimit": "Failed to authenticate.",
-      "accountLockedContactAdmin": " Contact your administrator to unlock your account",
-      "userNotFound": "User not found in the system",
-      "initialUserNotSupported": "Initial User not supported",
-      "userInitialStateNotSupported": "User Initial State is not supported",
-      "codeOrVerificationRequired": "You have to provide a code or have a valid User Verification Check",
-      "verificationRequired": "User Verification Check has to be done",
-      "couldNotLoadSession": "Could not load session",
-      "couldNotLoadAuthMethods": "Could not load auth methods",
-      "failedPrecondition": "Failed precondition",
-      "sessionNotValid": "Session is not valid",
-      "passwordVerificationMissing": "Password verification is missing.",
-      "passwordVerificationTooOld": "Password verification is too old. Please verify your password again."
+      "noHostFound": "Nenašiel sa hostiteľ",
+      "couldNotSendResetLink": "Nepodarilo sa odoslať odkaz na obnovenie hesla",
+      "couldNotCreateSessionForUser": "Nepodarilo sa vytvoriť reláciu používateľa",
+      "couldNotVerifyPassword": "Nepodarilo sa overiť heslo",
+      "failedToAuthenticate": "Overenie sa nepodarilo. Využili ste {failedAttempts} z {maxPasswordAttempts} pokusov o zadanie hesla.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Overenie sa nepodarilo.",
+      "accountLockedContactAdmin": " Ak chcete účet odomknúť, obráťte sa na správcu.",
+      "userNotFound": "Používateľ sa v systéme nenašiel",
+      "initialUserNotSupported": "Počiatočný používateľ nie je podporovaný",
+      "userInitialStateNotSupported": "Počiatočný stav používateľa nie je podporovaný",
+      "codeOrVerificationRequired": "Musíte zadať kód alebo mať platné overenie používateľa",
+      "verificationRequired": "Je potrebné vykonať overenie používateľa",
+      "couldNotLoadSession": "Nepodarilo sa načítať reláciu",
+      "couldNotLoadAuthMethods": "Nepodarilo sa načítať metódy overovania",
+      "failedPrecondition": "Nebola splnená podmienka",
+      "sessionNotValid": "Relácia nie je platná",
+      "passwordVerificationMissing": "Chýba overenie hesla.",
+      "passwordVerificationTooOld": "Overenie hesla je príliš staré. Overte svoje heslo znova."
     }
   },
   "idp": {
     "title": "Prihlásiť sa cez SSO",
-    "description": "Select one of the following providers to sign in",
+    "description": "Ak sa chcete prihlásiť, vyberte jedného z nasledujúcich poskytovateľov",
     "orSignInWith": "alebo sa prihláste cez",
-    "signInWithApple": "Sign in with Apple",
-    "signInWithGoogle": "Sign in with Google",
-    "signInWithAzureAD": "Sign in with AzureAD",
-    "signInWithGithub": "Sign in with GitHub",
-    "signInWithGitlab": "Sign in with GitLab",
+    "signInWithApple": "Prihlásiť sa cez Apple",
+    "signInWithGoogle": "Prihlásiť sa cez Google",
+    "signInWithAzureAD": "Prihlásiť sa cez Azure AD",
+    "signInWithGithub": "Prihlásiť sa cez GitHub",
+    "signInWithGitlab": "Prihlásiť sa cez GitLab",
     "loginError": {
       "title": "Prihlásenie sa nepodarilo",
-      "description": "An error occurred while trying to login."
+      "description": "Pri pokuse o prihlásenie sa vyskytla chyba."
     },
     "linkingError": {
-      "title": "Account linking failed",
-      "description": "An error occurred while trying to link your account."
+      "title": "Prepojenie účtov sa nepodarilo",
+      "description": "Pri pokuse o prepojenie účtu sa vyskytla chyba."
     },
     "completeRegister": {
-      "title": "Complete your data",
-      "description": "You need to complete your registration by providing your email address and name."
+      "title": "Doplňte svoje údaje",
+      "description": "Registráciu dokončíte zadaním e-mailovej adresy a mena."
     },
     "accountNotFound": {
-      "title": "Account Not Found",
-      "description": "We couldn't find an account associated with your identity provider credentials.",
-      "info": "No existing account was found. Please sign in with an existing account or contact your administrator for assistance.",
-      "backToLogin": "Back to Login"
+      "title": "Účet sa nenašiel",
+      "description": "Nenašiel sa účet priradený k údajom vášho poskytovateľa identity.",
+      "info": "Nenašiel sa žiadny existujúci účet. Prihláste sa pomocou existujúceho účtu alebo požiadajte o pomoc správcu.",
+      "backToLogin": "Späť na prihlásenie"
     },
     "registrationFailed": {
-      "title": "Registration Not Available",
-      "description": "We couldn't complete the registration process.",
-      "info": "Unable to determine the organization for registration. Please contact your administrator for assistance.",
-      "backToLogin": "Back to Login"
+      "title": "Registrácia nie je dostupná",
+      "description": "Proces registrácie sa nepodarilo dokončiť.",
+      "info": "Nepodarilo sa určiť organizáciu pre registráciu. Požiadajte o pomoc správcu.",
+      "backToLogin": "Späť na prihlásenie"
     },
     "processing": {
-      "message": "Processing authentication...",
-      "noRedirect": "No redirect or error returned from server",
-      "unexpectedError": "An unexpected error occurred"
+      "message": "Spracúva sa overenie...",
+      "noRedirect": "Server nevrátil presmerovanie ani chybu",
+      "unexpectedError": "Vyskytla sa neočakávaná chyba"
     },
     "errors": {
-      "missingParameters": "Missing required parameters",
-      "missingIdpInfo": "IDP information missing",
-      "idpNotFound": "Identity provider not found",
-      "linkingNotAllowed": "Linking is not allowed for this identity provider",
-      "linkingFailed": "Failed to link identity provider to account",
-      "autoLinkingFailed": "Failed to automatically link account",
-      "userCreationFailed": "Failed to create user account",
-      "orgResolutionFailed": "Could not determine organization for registration",
-      "sessionCreationFailed": "Could not create session or determine redirect",
-      "unknownError": "An unknown error occurred"
+      "missingParameters": "Chýbajú povinné parametre",
+      "missingIdpInfo": "Chýbajú informácie o poskytovateľovi identity",
+      "idpNotFound": "Poskytovateľ identity sa nenašiel",
+      "linkingNotAllowed": "Prepojenie nie je pre tohto poskytovateľa identity povolené",
+      "linkingFailed": "Nepodarilo sa prepojiť poskytovateľa identity s účtom",
+      "autoLinkingFailed": "Automatické prepojenie účtu sa nepodarilo",
+      "userCreationFailed": "Nepodarilo sa vytvoriť používateľský účet",
+      "orgResolutionFailed": "Nepodarilo sa určiť organizáciu pre registráciu",
+      "sessionCreationFailed": "Nepodarilo sa vytvoriť reláciu alebo určiť presmerovanie",
+      "unknownError": "Vyskytla sa neznáma chyba"
     }
   },
   "ldap": {
     "title": "Prihlásenie LDAP",
-    "description": "Enter your LDAP credentials.",
+    "description": "Zadajte svoje prihlasovacie údaje LDAP.",
     "submit": "Pokračovať",
     "labels": {
       "username": "Používateľské meno",
@@ -222,21 +222,21 @@
   "mfa": {
     "verify": {
       "title": "Overte svoju identitu",
-      "description": "Choose one of the following factors.",
-      "noResults": "No second factors available to setup."
+      "description": "Vyberte jeden z nasledujúcich faktorov.",
+      "noResults": "Nie sú k dispozícii žiadne druhé faktory na nastavenie."
     },
     "set": {
-      "title": "Set up 2-Factor",
-      "description": "Choose one of the following second factors.",
+      "title": "Nastaviť dvojfaktorové overenie",
+      "description": "Vyberte jeden z nasledujúcich druhých faktorov.",
       "skip": "Preskočiť"
     }
   },
   "otp": {
     "verify": {
-      "title": "Verify 2-Factor",
-      "totpDescription": "Enter the code from your authenticator app.",
-      "smsDescription": "Enter the code you received via SMS.",
-      "emailDescription": "Enter the code you received via email.",
+      "title": "Overte dvojfaktorové overenie",
+      "totpDescription": "Zadajte kód z aplikácie na overovanie.",
+      "smsDescription": "Zadajte kód, ktorý ste dostali v správe SMS.",
+      "emailDescription": "Zadajte kód, ktorý ste dostali e-mailom.",
       "noCodeReceived": "Neprišiel vám kód?",
       "resendCode": "Poslať kód znova",
       "submit": "Pokračovať",
@@ -248,11 +248,11 @@
       }
     },
     "set": {
-      "title": "Set up 2-Factor",
-      "totpDescription": "Scan the QR code with your authenticator app.",
-      "smsDescription": "Enter your phone number to receive a code via SMS.",
-      "emailDescription": "Enter your email address to receive a code via email.",
-      "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
+      "title": "Nastaviť dvojfaktorové overenie",
+      "totpDescription": "Naskenujte QR kód pomocou aplikácie na overovanie.",
+      "smsDescription": "Zadajte telefónne číslo, na ktoré chcete dostať kód SMS.",
+      "emailDescription": "Zadajte e-mailovú adresu, na ktorú chcete dostať kód.",
+      "totpRegisterDescription": "Naskenujte QR kód alebo manuálne otvorte adresu URL.",
       "submit": "Pokračovať",
       "labels": {
         "code": "Kód"
@@ -265,29 +265,29 @@
   "passkey": {
     "verify": {
       "title": "Overte sa prístupovým kľúčom",
-      "description": "Your device will ask for your fingerprint, face, or screen lock",
+      "description": "Zariadenie vás vyzve na použitie odtlačku prsta, tváre alebo zámku obrazovky",
       "usePassword": "Použiť heslo",
       "submit": "Pokračovať",
       "errors": {
-        "couldNotRequestChallenge": "Could not request passkey challenge",
-        "couldNotVerifyPasskey": "Could not verify passkey",
-        "noResponseReceived": "Passkey verification failed - no response received",
-        "noRedirectProvided": "Passkey verification completed but no redirect was provided",
-        "couldNotRetrievePasskey": "An error occurred while retrieving passkey",
-        "verificationCancelled": "Passkey verification was cancelled",
-        "verificationFailed": "An error occurred during passkey verification",
-        "couldNotFindSession": "Could not find session",
-        "couldNotUpdateSession": "Could not update session",
-        "userNotFound": "User not found in the system",
-        "couldNotDetermineRedirect": "Could not determine redirect URL after passkey verification"
+        "couldNotRequestChallenge": "Nepodarilo sa vyžiadať výzvu pre prístupový kľúč",
+        "couldNotVerifyPasskey": "Nepodarilo sa overiť prístupový kľúč",
+        "noResponseReceived": "Overenie prístupového kľúča sa nepodarilo – neprišla žiadna odpoveď",
+        "noRedirectProvided": "Overenie prístupového kľúča bolo dokončené, ale nebolo zadané presmerovanie",
+        "couldNotRetrievePasskey": "Pri načítavaní prístupového kľúča sa vyskytla chyba",
+        "verificationCancelled": "Overenie prístupového kľúča bolo zrušené",
+        "verificationFailed": "Pri overovaní prístupového kľúča sa vyskytla chyba",
+        "couldNotFindSession": "Nepodarilo sa nájsť reláciu",
+        "couldNotUpdateSession": "Nepodarilo sa aktualizovať reláciu",
+        "userNotFound": "Používateľ sa v systéme nenašiel",
+        "couldNotDetermineRedirect": "Po overení prístupového kľúča sa nepodarilo určiť adresu URL presmerovania"
       }
     },
     "set": {
       "title": "Nastaviť prístupový kľúč",
-      "description": "Your device will ask for your fingerprint, face, or screen lock",
+      "description": "Zariadenie vás vyzve na použitie odtlačku prsta, tváre alebo zámku obrazovky",
       "info": {
-        "description": "A passkey is an authentication method on a device like your fingerprint, Apple FaceID or similar. ",
-        "link": "Passkey Authentication"
+        "description": "Prístupový kľúč je metóda overovania v zariadení, napríklad pomocou odtlačku prsta, Apple Face ID alebo podobnej technológie.",
+        "link": "Overenie prístupovým kľúčom"
       },
       "skip": "Preskočiť",
       "submit": "Pokračovať"
@@ -295,12 +295,12 @@
   },
   "u2f": {
     "verify": {
-      "title": "Verify 2-Factor",
-      "description": "Verify your account with your device."
+      "title": "Overte dvojfaktorové overenie",
+      "description": "Overte svoj účet pomocou zariadenia."
     },
     "set": {
-      "title": "Set up 2-Factor",
-      "description": "Set up a device as a second factor.",
+      "title": "Nastaviť dvojfaktorové overenie",
+      "description": "Nastavte zariadenie ako druhý faktor.",
       "submit": "Pokračovať"
     }
   },
@@ -311,30 +311,30 @@
     },
     "disabled": {
       "title": "Registrácia je zakázaná",
-      "description": "The registration is disabled. Please contact your administrator."
+      "description": "Registrácia je zakázaná. Obráťte sa na správcu."
     },
     "missingdata": {
-      "title": "Missing data",
-      "description": "Provide email, first and last name to register."
+      "title": "Chýbajúce údaje",
+      "description": "Na registráciu zadajte e-mail, meno a priezvisko."
     },
     "title": "Zaregistrovať sa",
-    "description": "Create your Zitadel account.",
-    "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
-    "selectMethod": "Select the method you would like to authenticate",
-    "agreeTo": "To register you must agree to the terms and conditions",
-    "termsOfService": "Terms of Service",
-    "privacyPolicy": "Privacy Policy",
+    "description": "Vytvorte si účet ZITADEL.",
+    "noMethodAvailableWarning": "Nie je k dispozícii žiadna metóda overenia. Obráťte sa na správcu.",
+    "selectMethod": "Vyberte metódu, ktorou sa chcete overiť",
+    "agreeTo": "Na registráciu musíte súhlasiť s podmienkami",
+    "termsOfService": "Podmienky používania",
+    "privacyPolicy": "Zásady ochrany osobných údajov",
     "submit": "Pokračovať",
     "password": {
       "title": "Nastaviť heslo",
-      "description": "Set the password for your account",
+      "description": "Nastavte heslo pre svoj účet",
       "submit": "Pokračovať",
       "labels": {
         "password": "Heslo",
         "confirmPassword": "Potvrďte heslo"
       },
       "required": {
-        "password": "You have to provide a password!",
+        "password": "Musíte zadať heslo.",
         "confirmPassword": "Toto pole je povinné"
       }
     },
@@ -349,25 +349,25 @@
       "email": "Toto pole je povinné"
     },
     "errors": {
-      "couldNotCreateUser": "Could not create user",
-      "couldNotCreateSession": "Could not create session",
-      "userNotFound": "User not found in the system",
-      "couldNotLinkIDP": "Could not link IDP to user",
-      "couldNotRegisterUser": "Could not register user"
+      "couldNotCreateUser": "Nepodarilo sa vytvoriť používateľa",
+      "couldNotCreateSession": "Nepodarilo sa vytvoriť reláciu",
+      "userNotFound": "Používateľ sa v systéme nenašiel",
+      "couldNotLinkIDP": "Nepodarilo sa prepojiť poskytovateľa identity s používateľom",
+      "couldNotRegisterUser": "Nepodarilo sa zaregistrovať používateľa"
     }
   },
   "invite": {
     "title": "Pozvať používateľa",
-    "description": "Provide the email address and the name of the user you want to invite.",
-    "info": "The user will receive an email with further instructions.",
-    "notAllowed": "Your settings do not allow you to invite users.",
+    "description": "Zadajte e-mailovú adresu a meno používateľa, ktorého chcete pozvať.",
+    "info": "Používateľ dostane e-mail s ďalšími pokynmi.",
+    "notAllowed": "Vaše nastavenia neumožňujú pozývať používateľov.",
     "submit": "Pokračovať",
     "success": {
-      "title": "User invited",
-      "description": "The email has successfully been sent.",
-      "verified": "The user has been invited and has already verified his email.",
-      "notVerifiedYet": "The user has been invited. They will receive an email with further instructions.",
-      "submit": "Invite another user"
+      "title": "Používateľ bol pozvaný",
+      "description": "E-mail bol úspešne odoslaný.",
+      "verified": "Používateľ bol pozvaný a svoju e-mailovú adresu už overil.",
+      "notVerifiedYet": "Používateľ bol pozvaný. Dostane e-mail s ďalšími pokynmi.",
+      "submit": "Pozvať ďalšieho používateľa"
     }
   },
   "signedin": {
@@ -376,21 +376,21 @@
     "continue": "Pokračovať",
     "error": {
       "title": "Chyba",
-      "description": "An error occurred while trying to sign in."
+      "description": "Pri pokuse o prihlásenie sa vyskytla chyba."
     }
   },
   "verify": {
-    "userIdMissing": "No userId provided!",
+    "userIdMissing": "Chýba identifikátor používateľa.",
     "successTitle": "Používateľ je overený",
-    "successDescription": "The user has been verified successfully.",
+    "successDescription": "Používateľ bol úspešne overený.",
     "successContinue": "Pokračovať",
     "setupAuthenticator": "Nastaviť autentifikátor",
     "verify": {
-      "title": "Verify user",
-      "description": "Enter the Code provided in the verification email.",
+      "title": "Overte používateľa",
+      "description": "Zadajte kód z e-mailu na overenie.",
       "noCodeReceived": "Neprišiel vám kód?",
       "resendCode": "Poslať kód znova",
-      "codeSent": "A new code has just been sent to your email address.",
+      "codeSent": "Na vašu e-mailovú adresu bol práve odoslaný nový kód.",
       "submit": "Pokračovať",
       "labels": {
         "code": "Kód"
@@ -400,33 +400,33 @@
       }
     },
     "errors": {
-      "couldNotResendEmail": "Could not resend email",
-      "couldNotVerifyUser": "Could not verify user",
-      "couldNotVerifyInvite": "Could not verify invite",
-      "couldNotVerifyEmail": "Could not verify email",
-      "couldNotVerify": "Could not verify",
-      "couldNotLoadUser": "Could not load user",
-      "couldNotLoadAuthenticators": "Could not load possible authenticators",
-      "couldNotCreateSession": "Could not create session",
-      "noHostFound": "No host found",
-      "userAlreadyVerified": "User is already verified!",
-      "couldNotResendInvite": "Could not resend invite",
-      "inviteSendFailed": "Failed to send invitation email",
-      "emailSendFailed": "Failed to send verification email",
-      "contextMissing": "An error occurred. Please try again."
+      "couldNotResendEmail": "E-mail sa nepodarilo odoslať znova",
+      "couldNotVerifyUser": "Používateľa sa nepodarilo overiť",
+      "couldNotVerifyInvite": "Pozvánku sa nepodarilo overiť",
+      "couldNotVerifyEmail": "E-mail sa nepodarilo overiť",
+      "couldNotVerify": "Overenie sa nepodarilo",
+      "couldNotLoadUser": "Používateľa sa nepodarilo načítať",
+      "couldNotLoadAuthenticators": "Nepodarilo sa načítať dostupné možnosti overenia",
+      "couldNotCreateSession": "Nepodarilo sa vytvoriť reláciu",
+      "noHostFound": "Nenašiel sa hostiteľ",
+      "userAlreadyVerified": "Používateľ je už overený.",
+      "couldNotResendInvite": "Pozvánku sa nepodarilo odoslať znova",
+      "inviteSendFailed": "E-mail s pozvánkou sa nepodarilo odoslať",
+      "emailSendFailed": "Overovací e-mail sa nepodarilo odoslať",
+      "contextMissing": "Vyskytla sa chyba. Skúste to znova."
     }
   },
   "authenticator": {
-    "title": "Choose authentication method",
-    "description": "Select the method you would like to authenticate",
-    "noMethodsAvailable": "No authentication methods available",
-    "allSetup": "You have already setup an authenticator!",
-    "linkWithIDP": "or link with an Identity Provider"
+    "title": "Vyberte metódu overenia",
+    "description": "Vyberte metódu, ktorou sa chcete overiť",
+    "noMethodsAvailable": "Nie sú k dispozícii žiadne metódy overenia",
+    "allSetup": "Metódu overovania ste už nastavili.",
+    "linkWithIDP": "alebo prepojiť s poskytovateľom identity"
   },
   "device": {
     "usercode": {
       "title": "Kód zariadenia",
-      "description": "Enter the code displayed on your app or device.",
+      "description": "Zadajte kód zobrazený v aplikácii alebo zariadení.",
       "submit": "Pokračovať",
       "labels": {
         "code": "Kód"
@@ -436,26 +436,26 @@
       }
     },
     "request": {
-      "title": "{appName} would like to connect",
-      "description": "{appName} will have access to:",
-      "disclaimer": "By clicking Allow, you allow {appName} and Zitadel to use your information in accordance with their respective terms of service and privacy policies. You can revoke this access at any time.",
+      "title": "Aplikácia {appName} sa chce pripojiť",
+      "description": "Aplikácia {appName} bude mať prístup k:",
+      "disclaimer": "Kliknutím na Povoliť umožníte aplikácii {appName} a službe ZITADEL používať vaše údaje v súlade s ich podmienkami používania a zásadami ochrany osobných údajov. Tento prístup môžete kedykoľvek odvolať.",
       "submit": "Povoliť",
       "deny": "Zamietnuť"
     },
     "scope": {
-      "openid": "Verify your identity.",
-      "email": "View your email address.",
-      "profile": "View your full profile information.",
-      "offline_access": "Allow offline access to your account."
+      "openid": "Overiť vašu identitu.",
+      "email": "Zobraziť vašu e-mailovú adresu.",
+      "profile": "Zobraziť úplné informácie vo vašom profile.",
+      "offline_access": "Povoliť offline prístup k vášmu účtu."
     }
   },
   "error": {
-    "noUserCode": "No user code provided!",
-    "noDeviceRequest": "No device request found.",
-    "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam.",
+    "noUserCode": "Nezadali ste používateľský kód.",
+    "noDeviceRequest": "Nenašla sa žiadosť zariadenia.",
+    "unknownContext": "Nepodarilo sa získať kontext používateľa. Najprv zadajte používateľské meno alebo poskytnite prihlasovacie meno ako parameter vyhľadávania.",
     "sessionExpired": "Platnosť vašej aktuálnej relácie vypršala. Prihláste sa znova.",
     "failedLoading": "Nepodarilo sa načítať údaje. Skúste to znova.",
     "tryagain": "Skúsiť znova",
-    "couldNotContinueSession": "Could not continue with session - missing user information"
+    "couldNotContinueSession": "V relácii sa nepodarilo pokračovať – chýbajú údaje o používateľovi."
   }
 }

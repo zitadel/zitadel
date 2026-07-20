@@ -1,7 +1,7 @@
 {
   "common": {
     "back": "Powrót",
-    "title": "Zaloguj się za pomocą Zitadel"
+    "title": "Logowanie przez ZITADEL"
   },
   "accounts": {
     "title": "Konta",
@@ -318,7 +318,7 @@
       "description": "Podaj e-mail, imię i nazwisko, aby się zarejestrować."
     },
     "title": "Rejestracja",
-    "description": "Utwórz konto Zitadel.",
+    "description": "Utwórz konto ZITADEL.",
     "noMethodAvailableWarning": "Brak dostępnych metod uwierzytelniania. Skontaktuj się z administratorem.",
     "selectMethod": "Wybierz metodę uwierzytelniania, której chcesz użyć",
     "agreeTo": "Aby się zarejestrować, musisz zaakceptować warunki korzystania",
@@ -438,7 +438,7 @@
     "request": {
       "title": "{appName} chce się połączyć:",
       "description": "{appName} będzie miało dostęp do:",
-      "disclaimer": "Klikając Zezwól, pozwalasz tej aplikacji i Zitadel na korzystanie z Twoich informacji zgodnie z ich odpowiednimi warunkami użytkowania i politykami prywatności. Możesz cofnąć ten dostęp w dowolnym momencie.",
+      "disclaimer": "Klikając Zezwól, pozwalasz aplikacji {appName} i usłudze ZITADEL korzystać z Twoich informacji zgodnie z ich warunkami użytkowania i politykami prywatności. Możesz cofnąć ten dostęp w dowolnym momencie.",
       "submit": "Zezwól",
       "deny": "Odmów"
     },

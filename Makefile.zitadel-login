@@ -1,0 +1,70 @@
+SHELL := /bin/bash
+.SHELLFLAGS := -eu -o pipefail -c
+
+PROJECT_ROOT ?= $(CURDIR)
+
+REGISTRY      ?= registry.sentrymo.eu
+IMAGE_NAME    ?= sentrymo-zitadel-login
+LOCAL_IMAGE   ?= zitadel/zitadel-login:local
+TAG_PREFIX    ?= main-sk
+GIT_SHA       := $(shell git -C "$(PROJECT_ROOT)" rev-parse --short=12 HEAD)
+TAG           ?= $(TAG_PREFIX)-$(GIT_SHA)
+#REMOTE_IMAGE  := $(REGISTRY)/$(IMAGE_NAME):$(TAG)
+REMOTE_IMAGE  := $(REGISTRY)/$(IMAGE_NAME):latest
+
+.PHONY: help info check build pack release
+
+help:
+	@printf '%s\n' \
+	  'Použitie:' \
+	  '  make -f Makefile.zitadel-login build' \
+	  '  make -f Makefile.zitadel-login pack' \
+	  '  make -f Makefile.zitadel-login release' \
+	  '' \
+	  'Voliteľné premenné:' \
+	  '  TAG=<tag>                Vlastný immutable tag' \
+	  '  REGISTRY=<registry>      Predvolené: registry.sentrymo.eu' \
+	  '  IMAGE_NAME=<name>        Predvolené: sentrymo-zitadel-login' \
+	  '' \
+	  'Príklad:' \
+	  '  make -f Makefile.zitadel-login release TAG=main-sk-test-1'
+
+info:
+	@printf 'Lokálny image:  %s\n' "$(LOCAL_IMAGE)"
+	@printf 'Cieľový image:  %s\n' "$(REMOTE_IMAGE)"
+	@printf 'Git SHA:        %s\n' "$(GIT_SHA)"
+
+check:
+	@command -v pnpm >/dev/null || { echo 'Chýba pnpm.' >&2; exit 1; }
+	@command -v docker >/dev/null || { echo 'Chýba docker.' >&2; exit 1; }
+	@docker info >/dev/null 2>&1 || { echo 'Docker daemon nie je dostupný.' >&2; exit 1; }
+
+build: check
+	@cd "$(PROJECT_ROOT)" && \
+	  pnpm nx run @zitadel/login:build --skip-nx-cache
+
+pack: check
+	@cd "$(PROJECT_ROOT)" && \
+	  pnpm nx run @zitadel/login:pack --skip-nx-cache
+	@docker image inspect "$(LOCAL_IMAGE)" >/dev/null
+	@echo "Lokálny image je pripravený: $(LOCAL_IMAGE)"
+
+release: check
+	@cd "$(PROJECT_ROOT)" && \
+	  echo '==> Build a Docker pack' && \
+	  pnpm nx run @zitadel/login:pack --skip-nx-cache && \
+	  docker image inspect "$(LOCAL_IMAGE)" >/dev/null && \
+	  docker tag "$(LOCAL_IMAGE)" "$(REMOTE_IMAGE)" && \
+	  echo && \
+	  echo 'Pripravené na push:' && \
+	  echo "  $(REMOTE_IMAGE)" && \
+	  echo && \
+	  read -r -p 'Pre potvrdenie napíš PUSH: ' answer && \
+	  if [[ "$$answer" != 'PUSH' ]]; then \
+	    echo 'Push bol zrušený. Image ostal vytvorený lokálne.'; \
+	    exit 0; \
+	  fi && \
+	  docker push "$(REMOTE_IMAGE)" && \
+	  echo && \
+	  echo 'Hotovo. Do Compose nastav:' && \
+	  echo "  image: $(REMOTE_IMAGE)"

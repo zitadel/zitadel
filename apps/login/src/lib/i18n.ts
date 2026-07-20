@@ -4,74 +4,26 @@ export interface Lang {
 }
 
 export const LANGS: Lang[] = [
-  {
-    name: "English",
-    code: "en",
-  },
-  {
-    name: "Deutsch",
-    code: "de",
-  },
-  {
-    name: "Italiano",
-    code: "it",
-  },
-  {
-    name: "Español",
-    code: "es",
-  },
-  {
-    name: "Français",
-    code: "fr",
-  },
-  {
-    name: "Nederlands",
-    code: "nl",
-  },
-  {
-    name: "Polski",
-    code: "pl",
-  },
-  {
-    name: "Slovenčina",
-    code: "sk",
-  },
-  {
-    name: "Português",
-    code: "pt",
-  },
-  {
-    name: "简体中文",
-    code: "zh",
-  },
-  {
-    name: "Русский",
-    code: "ru",
-  },
-  {
-    name: "Magyar",
-    code: "hu",
-  },
-  {
-    name: "Türkçe",
-    code: "tr",
-  },
-  {
-    name: "日本語",
-    code: "ja",
-  },
-  {
-    name: "Українська",
-    code: "uk",
-  },
-  {
-    name: "العربية",
-    code: "ar",
-  },
+  { name: "Čeština", code: "cs" },
+  { name: "Deutsch", code: "de" },
+  { name: "English", code: "en" },
+  { name: "Magyar", code: "hu" },
+  { name: "Italiano", code: "it" },
+  { name: "Lietuvių", code: "lt" },
+  { name: "Polski", code: "pl" },
+  { name: "Slovenčina", code: "sk" },
+  { name: "Українська", code: "uk" },
 ];
 
 export const LANGUAGE_COOKIE_NAME = "NEXT_LOCALE";
 export const LANGUAGE_HEADER_NAME = "accept-language";
+
+export function normalizeLanguageCode(code: string | undefined): string | undefined {
+  const normalized = code?.trim().toLowerCase();
+  if (!normalized) return undefined;
+  const language = normalized.split("-")[0];
+  return LANGS.some((lang) => lang.code === language) ? language : undefined;
+}
 
 export function shouldUILocalesOverrideCookie(): boolean {
   return process.env.ZITADEL_UI_LOCALES_OVERRIDE_COOKIE === "true";
