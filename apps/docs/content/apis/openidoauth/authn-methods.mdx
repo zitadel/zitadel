@@ -6,7 +6,7 @@ sidebar_label: Authentication Methods
 
 ## Client Secret Basic
 
-When using `client_secret_basic` on token or introspection endpoints, provide an`Authorization` header with a Basic auth value in the following form:
+When using `client_secret_basic` on token or introspection endpoints, provide an `Authorization` header with a Basic auth value in the following form:
 
 ```markdown
 Authorization: "Basic " + base64( formUrlEncode(client_id) + ":" + formUrlEncode(client_secret) )
@@ -49,7 +49,7 @@ JWT
 |:------|:-----------------------------|:----------------------------------------------------------------------------------------------------------------|
 | aud   | `"https://${CUSTOM_DOMAIN}"` | String or Array of intended audiences MUST include ZITADEL's issuing domain                                     |
 | exp   | `1605183582`                 | Unix timestamp of the expiry                                                                                    |
-| iat   | `1605179982`                 | Unix timestamp of the creation singing time of the JWT, MUST NOT be older than 1h                               |
+| iat   | `1605179982`                 | Unix timestamp of the creation signing time of the JWT, MUST NOT be older than 1h                               |
 | iss   | `"78366401571920522@acme"`   | String which represents the requesting party (owner of the key), normally the `clientID` from the json key file |
 | sub   | `"78366401571920522@acme"`   | The subject ID of the application, normally the `clientID` from the json key file                               |
 
