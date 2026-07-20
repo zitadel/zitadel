@@ -1,9 +1,11 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SessionsList } from "@/components/sessions-list";
 import { Translated } from "@/components/translated";
-import { getAllSessionCookieIds } from "@/lib/cookies";
+import { getAllSessions } from "@/lib/cookies";
 import { getServiceConfig } from "@/lib/service-url";
 import { getBrandingSettings, getDefaultOrg, listSessions, ServiceConfig } from "@/lib/zitadel";
+import { create } from "@zitadel/client";
+import { Session, SessionSchema } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
@@ -18,24 +20,54 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 async function loadSessions({ serviceConfig, organization }: { serviceConfig: ServiceConfig; organization?: string }) {
-  const cookieIds = await getAllSessionCookieIds();
+  const sessionCookies = await getAllSessions();
 
-  if (cookieIds && cookieIds.length) {
-    const response = await listSessions({
-      serviceConfig,
-      ids: cookieIds.filter((id) => !!id) as string[],
-    });
-
-    let sessions = response?.sessions ?? [];
-    if (organization) {
-      sessions = sessions.filter((s) => s.factors?.user?.organizationId === organization);
-    }
-
-    return sessions;
-  } else {
+  if (!sessionCookies || !sessionCookies.length) {
     console.info("No session cookie found.");
     return [];
   }
+
+  const ids = sessionCookies.map((s) => s.id).filter((id) => !!id) as string[];
+  let liveSessions: Session[] = [];
+  if (ids.length) {
+    try {
+      const response = await listSessions({ serviceConfig, ids });
+      liveSessions = response?.sessions ?? [];
+    } catch (error) {
+      // listSessions can fail for stale/expired session IDs still in cookies,
+      // API errors, etc. Fall back to cookie-derived accounts below instead of
+      // rendering an empty / broken accounts page (see #12252).
+      console.error("Failed to load sessions from API, falling back to cookie", error);
+      liveSessions = [];
+    }
+  }
+
+  // For cookie entries whose server-side session no longer exists (e.g. after
+  // RP-initiated logout terminated the session, see #12252 / #12209),
+  // synthesize an invalid Session so the account stays selectable. The existing
+  // SessionItem re-login path continues the flow when the user picks it.
+  const liveIds = new Set(liveSessions.map((s) => s.id));
+  const synthesized: Session[] = sessionCookies
+    .filter((c) => !!c.id && !!c.loginName && !liveIds.has(c.id))
+    .map((c) =>
+      create(SessionSchema, {
+        id: c.id,
+        factors: {
+          user: {
+            loginName: c.loginName,
+            displayName: c.loginName,
+            organizationId: c.organization ?? "",
+          },
+        },
+      }),
+    );
+
+  let sessions = [...liveSessions, ...synthesized];
+  if (organization) {
+    sessions = sessions.filter((s) => s.factors?.user?.organizationId === organization);
+  }
+
+  return sessions;
 }
 
 export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {

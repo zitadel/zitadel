@@ -233,7 +233,7 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     const res = await handleOIDCFlowInitiation(
       makeBaseParams({
         sessions: [otherOrgSession] as any,
-        sessionCookies: [{ id: "session-other", token: "tok" }],
+        sessionCookies: [{ id: "session-other", token: "tok", loginName: "", creationTs: "", expirationTs: "", changeTs: "" }],
       }),
     );
 
@@ -256,7 +256,7 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     const res = await handleOIDCFlowInitiation(
       makeBaseParams({
         sessions: [otherOrgSession] as any,
-        sessionCookies: [{ id: "session-other", token: "tok" }],
+        sessionCookies: [{ id: "session-other", token: "tok", loginName: "", creationTs: "", expirationTs: "", changeTs: "" }],
       }),
     );
 
@@ -281,7 +281,7 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     const res = await handleOIDCFlowInitiation(
       makeBaseParams({
         sessions: [orgSession] as any,
-        sessionCookies: [{ id: "session-org", token: "tok" }],
+        sessionCookies: [{ id: "session-org", token: "tok", loginName: "", creationTs: "", expirationTs: "", changeTs: "" }],
       }),
     );
 
@@ -305,7 +305,7 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     const res = await handleOIDCFlowInitiation(
       makeBaseParams({
         sessions: [otherOrgSession] as any,
-        sessionCookies: [{ id: "session-other", token: "tok" }],
+        sessionCookies: [{ id: "session-other", token: "tok", loginName: "", creationTs: "", expirationTs: "", changeTs: "" }],
       }),
     );
 
@@ -330,7 +330,7 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     const res = await handleOIDCFlowInitiation(
       makeBaseParams({
         sessions: [orgSession] as any,
-        sessionCookies: [{ id: "session-org", token: "tok" }],
+        sessionCookies: [{ id: "session-org", token: "tok", loginName: "", creationTs: "", expirationTs: "", changeTs: "" }],
       }),
     );
 
@@ -410,7 +410,7 @@ describe("handleOIDCFlowInitiation — Prompt.LOGIN + loginHint requestId prefix
       makeBaseParams({
         requestId: "oidc_abc123",
         sessions: [existingSession] as any,
-        sessionCookies: [{ id: "session-1", token: "tok" }],
+        sessionCookies: [{ id: "session-1", token: "tok", loginName: "", creationTs: "", expirationTs: "", changeTs: "" }],
       }),
     );
 
@@ -443,7 +443,7 @@ describe("handleOIDCFlowInitiation — Prompt.LOGIN + loginHint requestId prefix
       makeBaseParams({
         requestId: "oidc_abc123",
         sessions: [existingSession] as any,
-        sessionCookies: [{ id: "session-1", token: "tok" }],
+        sessionCookies: [{ id: "session-1", token: "tok", loginName: "", creationTs: "", expirationTs: "", changeTs: "" }],
       }),
     );
 

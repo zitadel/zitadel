@@ -300,14 +300,26 @@ export async function clearSession(options: ClearSessionOptions) {
     return;
   }
 
-  const deleteResponse = await deleteSession({
-    serviceConfig,
-    sessionId: sessionCookie.id,
-    sessionToken: sessionCookie.token,
-  });
-
   const securitySettings = await getSecuritySettings({ serviceConfig });
   const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;
+
+  let deleteResponse;
+  try {
+    deleteResponse = await deleteSession({
+      serviceConfig,
+      sessionId: sessionCookie.id,
+      sessionToken: sessionCookie.token,
+    });
+  } catch (error) {
+    // The server-side session may already be gone (e.g. RP-initiated logout
+    // terminated it, see #12252). Prune the cookie entry anyway so the account
+    // card is removed from the selection screen.
+    logger.warn("clearSession: deleteSession failed, pruning cookie entry anyway", {
+      sessionId: sessionCookie.id,
+      error,
+    });
+    return removeSessionFromCookie({ session: sessionCookie, iFrameEnabled });
+  }
 
   if (!deleteResponse) {
     throw new Error("Could not delete session");
