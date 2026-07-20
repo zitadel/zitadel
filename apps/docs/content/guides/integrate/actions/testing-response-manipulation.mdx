@@ -105,9 +105,17 @@ func call(w http.ResponseWriter, req *http.Request) {
 	// build the response from the received response
 	resp := request.Response
 	// manipulate the received response to send back as response
-	if resp != nil && resp.AddHumanUser != nil {
-		// manipulate the response
-		resp.AddHumanUser.Metadata = append(resp.AddHumanUser.Metadata, &user.SetMetadataEntry{Key: "organization", Value: []byte("company")})
+	if resp != nil {
+		// On the first login the user does not exist yet, so the response contains a CreateUser
+		// action. On subsequent logins the user already exists and the response contains an
+		// UpdateUser action instead. Both support setting user metadata directly.
+		metadata := &user.Metadata{Key: "organization", Value: []byte("company")}
+		if createUser := resp.GetCreateUser(); createUser != nil {
+			createUser.Metadata = append(createUser.Metadata, metadata)
+		}
+		if updateUser := resp.GetUpdateUser(); updateUser != nil {
+			updateUser.Metadata = append(updateUser.Metadata, metadata)
+		}
 	}
 
 	// marshal the response into json
@@ -189,6 +197,14 @@ curl -L -X PUT 'https://${CUSTOM_DOMAIN}/v2/actions/executions' \
 
 Now that you have set up the target and execution, you can test it by using a login-flow in the typescript login with an external IDP.
 
+<Callout>
+When the user logs in for the first time and does not exist yet, the response contains a `createUser` object (matching the [Create User](/reference/api/user/zitadel.user.v2.UserService.CreateUser) request).
+When the user already exists, the response instead contains an `updateUser` object (matching the [Update User](/reference/api/user/zitadel.user.v2.UserService.UpdateUser) request).
+Both allow setting user `metadata` directly in the same response.
+
+The previously used `addHumanUser` and `updateHumanUser` objects are deprecated and replaced by `createUser` and `updateUser` respectively.
+</Callout>
+
 ```json
 {
   "details": {
@@ -218,20 +234,22 @@ Now that you have set up the target and execution, you can test it by using a lo
       }
     }
   },
-  "addHumanUser": {
-    "idpLinks": [
-      {"idpId": "218528353504723201", "userId": "218528353504723202", "userName": "test-user@localhost"}
-    ],
+  "createUser": {
     "username": "test-user@localhost",
-    "profile": {
-      "givenName": "Test",
-      "familyName": "User",
-      "displayName": "Test User",
-      "preferredLanguage": "de"
-    },
-    "email": {
-      "email": "test-user@zitadel.ch",
-      "isVerified": true
+    "human": {
+      "idpLinks": [
+        {"idpId": "218528353504723201", "userId": "218528353504723202", "userName": "test-user@localhost"}
+      ],
+      "profile": {
+        "givenName": "Test",
+        "familyName": "User",
+        "displayName": "Test User",
+        "preferredLanguage": "de"
+      },
+      "email": {
+        "email": "test-user@zitadel.ch",
+        "isVerified": true
+      }
     },
     "metadata": []
   }
@@ -270,20 +288,22 @@ the [Sent information Response](./usage#sent-information-response) payload descr
       }
     }
   },
-  "addHumanUser": {
-    "idpLinks": [
-      {"idpId": "218528353504723201", "userId": "218528353504723202", "userName": "test-user@localhost"}
-    ],
+  "createUser": {
     "username": "test-user@localhost",
-    "profile": {
-      "givenName": "Test",
-      "familyName": "User",
-      "displayName": "Test User",
-      "preferredLanguage": "de"
-    },
-    "email": {
-      "email": "test-user@zitadel.ch",
-      "isVerified": true
+    "human": {
+      "idpLinks": [
+        {"idpId": "218528353504723201", "userId": "218528353504723202", "userName": "test-user@localhost"}
+      ],
+      "profile": {
+        "givenName": "Test",
+        "familyName": "User",
+        "displayName": "Test User",
+        "preferredLanguage": "de"
+      },
+      "email": {
+        "email": "test-user@zitadel.ch",
+        "isVerified": true
+      }
     },
     "metadata": [
       {"key": "organization", "value": "Y29tcGFueQ=="}
@@ -291,6 +311,23 @@ the [Sent information Response](./usage#sent-information-response) payload descr
   }
 }
 ```
+
+## Debugging claim mapping issues with external IdPs
+
+The same `RetrieveIdentityProviderIntent` webhook is useful for diagnosing auto-user-creation failures caused by unexpected or missing claims from an external IdP.
+
+A common symptom is an error like:
+
+```
+invalid CreateUserRequest.Human.Profile: embedded message failed validation |
+caused by: invalid SetHumanProfile.GivenName: value length must be between 1 and 200 runes, inclusive
+```
+
+This means ZITADEL received an empty value for `givenName` during auto-creation. The IdP may be sending the claim under a different key than ZITADEL expects (e.g. `Givenname`, `firstname`, or a provider-specific claim name).
+
+**To inspect the raw claims ZITADEL receives from your IdP**, point the execution at a logging endpoint (such as [Webhook.site](./webhook-site-setup)) instead of a manipulation handler. Trigger a login with the external IdP and look at the `rawInformation` field in the payload — this contains the unmodified claims exactly as ZITADEL received them.
+
+Compare the claim keys in `rawInformation` against what ZITADEL maps to standard profile fields. If the IdP uses a non-standard key, you can remap it in the same webhook by setting `createUser.human.profile.givenName` from the correct source field before returning the response.
 
 ## Conclusion
 
