@@ -48,6 +48,9 @@ const (
 	queryRelayState            = "RelayState"
 	queryMethod                = "method"
 	tmplExternalNotFoundOption = "externalnotfoundoption"
+	// zitadelProjectRolesClaim is the token claim a ZITADEL provider uses to convey
+	// a user's project roles ({role: {orgID: orgDomain}}).
+	zitadelProjectRolesClaim = "urn:zitadel:iam:org:project:roles"
 )
 
 var (
@@ -887,36 +890,6 @@ func (l *Login) grantSupportUserInstanceMembership(r *http.Request, provider *qu
 	return nil
 }
 
-// supportUserInstanceMembershipRequired checks whether a newly created external user
-// must be granted the IAM_OWNER_VIEWER instance membership.
-func supportUserInstanceMembershipRequired(provider *query.IDPTemplate, externalUser *domain.ExternalUser) bool {
-	// only a ZITADEL provider conveys support-user project roles
-	if provider.Type != domain.IDPTypeZitadel || provider.ZitadelIDPTemplate == nil {
-		return false
-	}
-	// a user without the support role in the claim is not a support user and needs no membership
-	claimOrgs, ok := externalUser.ProjectRoles[domain.RoleIAMOwnerViewer]
-	if !ok || len(claimOrgs) == 0 {
-		return false
-	}
-	// a claim org must be the same as a configured organization (ID and domain)
-	return claimMatchesConfiguredOrg(claimOrgs, provider.ZitadelIDPTemplate)
-}
-
-// claimMatchesConfiguredOrg reports whether any organization from the roles claim
-// (orgID → orgDomain) exactly matches an organization (by ID and domain)
-// configured in the ZITADEL IDP's InstanceRolesInfo.
-func claimMatchesConfiguredOrg(claimOrgs map[string]string, zitadelTemplate *query.ZitadelIDPTemplate) bool {
-	for orgID, orgDomain := range claimOrgs {
-		for _, configured := range zitadelTemplate.InstanceRolesInfo {
-			if configured.OrganizationID == orgID && configured.OrganizationDomain == orgDomain {
-				return true
-			}
-		}
-	}
-	return false
-}
-
 // updateExternalUser will update the existing user (email, phone, profile) with data provided by the IDP
 func (l *Login) updateExternalUser(ctx context.Context, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) error {
 	user, err := l.query.GetUserByID(ctx, true, authReq.UserID)
@@ -1478,41 +1451,6 @@ func mapIDPUserToExternalUser(user idp.User, id string) *domain.ExternalUser {
 	}
 }
 
-// zitadelProjectRolesClaim is the token claim a ZITADEL provider uses to convey
-// a user's project roles ({role: {orgID: orgDomain}}).
-const zitadelProjectRolesClaim = "urn:zitadel:iam:org:project:roles"
-
-// projectRolesFromIDPUser extracts the ZITADEL project-roles claim from an IDP
-// user's OIDC userinfo and returns it as a map {role: {orgID: orgDomain}}.
-// It returns nil when the user is not an OIDC user or the claim is absent or malformed.
-func projectRolesFromIDPUser(user idp.User) map[string]map[string]string {
-	oidcUser, ok := user.(*openid.User)
-	if !ok || oidcUser.UserInfo == nil {
-		return nil
-	}
-	rawRoles, ok := oidcUser.Claims[zitadelProjectRolesClaim].(map[string]any)
-	if !ok {
-		return nil
-	}
-	roles := make(map[string]map[string]string, len(rawRoles))
-	for role, rawOrgs := range rawRoles {
-		orgs, ok := rawOrgs.(map[string]any)
-		if !ok {
-			continue
-		}
-		orgMap := make(map[string]string, len(orgs))
-		for orgID, rawDomain := range orgs {
-			domainName, _ := rawDomain.(string)
-			orgMap[orgID] = domainName
-		}
-		roles[role] = orgMap
-	}
-	if len(roles) == 0 {
-		return nil
-	}
-	return roles
-}
-
 func mapExternalUserToLoginUser(externalUser *domain.ExternalUser, mustBeDomain bool) (*domain.Human, *domain.UserIDPLink, []*domain.Metadata) {
 	username := externalUser.PreferredUsername
 	if mustBeDomain {
@@ -1547,16 +1485,6 @@ func mapExternalUserToLoginUser(externalUser *domain.ExternalUser, mustBeDomain 
 		DisplayName:    externalUser.PreferredUsername,
 	}
 	return human, externalIDP, externalUser.Metadatas
-}
-
-// preserveProjectRoles carries the ZITADEL project roles captured at authentication
-// onto the form-mapped external user. The "external user not found" form only submits profile fields.
-// The roles claim is restored from the most recent linking user stored on the auth request.
-func preserveProjectRoles(user *domain.ExternalUser, linkingUsers []*domain.ExternalUser) {
-	if user == nil || len(linkingUsers) == 0 {
-		return
-	}
-	user.ProjectRoles = linkingUsers[len(linkingUsers)-1].ProjectRoles
 }
 
 func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOptionFormData) *domain.ExternalUser {
@@ -1770,4 +1698,75 @@ func WrapIdPError(err error) *IdPError {
 		id = zErr.ID
 	}
 	return &IdPError{err: zerrors.CreateZitadelError(zerrors.KindPreconditionFailed, err, id, "Errors.User.ExternalIDP.LoginFailedSwitchLocal", 1)}
+}
+
+// supportUserInstanceMembershipRequired checks whether a newly created external user
+// must be granted the IAM_OWNER_VIEWER instance membership.
+func supportUserInstanceMembershipRequired(provider *query.IDPTemplate, externalUser *domain.ExternalUser) bool {
+	// only a ZITADEL provider conveys support-user project roles
+	if provider.Type != domain.IDPTypeZitadel || provider.ZitadelIDPTemplate == nil {
+		return false
+	}
+	// a user without the support role in the claim is not a support user and needs no membership
+	claimOrgs, ok := externalUser.ProjectRoles[domain.RoleIAMOwnerViewer]
+	if !ok || len(claimOrgs) == 0 {
+		return false
+	}
+	// a claim org must be the same as a configured organization (ID and domain)
+	return claimMatchesConfiguredOrg(claimOrgs, provider.ZitadelIDPTemplate)
+}
+
+// claimMatchesConfiguredOrg reports whether any organization from the roles claim
+// (orgID → orgDomain) exactly matches an organization (by ID and domain)
+// configured in the ZITADEL IDP's InstanceRolesInfo.
+func claimMatchesConfiguredOrg(claimOrgs map[string]string, zitadelTemplate *query.ZitadelIDPTemplate) bool {
+	for orgID, orgDomain := range claimOrgs {
+		for _, configured := range zitadelTemplate.InstanceRolesInfo {
+			if configured.OrganizationID == orgID && configured.OrganizationDomain == orgDomain {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// projectRolesFromIDPUser extracts the ZITADEL project-roles claim from an IDP
+// user's OIDC userinfo and returns it as a map {role: {orgID: orgDomain}}.
+// It returns nil when the user is not an OIDC user or the claim is absent or malformed.
+func projectRolesFromIDPUser(user idp.User) map[string]map[string]string {
+	oidcUser, ok := user.(*openid.User)
+	if !ok || oidcUser.UserInfo == nil {
+		return nil
+	}
+	rawRoles, ok := oidcUser.Claims[zitadelProjectRolesClaim].(map[string]any)
+	if !ok {
+		return nil
+	}
+	roles := make(map[string]map[string]string, len(rawRoles))
+	for role, rawOrgs := range rawRoles {
+		orgs, ok := rawOrgs.(map[string]any)
+		if !ok {
+			continue
+		}
+		orgMap := make(map[string]string, len(orgs))
+		for orgID, rawDomain := range orgs {
+			domainName, _ := rawDomain.(string)
+			orgMap[orgID] = domainName
+		}
+		roles[role] = orgMap
+	}
+	if len(roles) == 0 {
+		return nil
+	}
+	return roles
+}
+
+// preserveProjectRoles carries the ZITADEL project roles captured at authentication
+// onto the form-mapped external user. The "external user not found" form only submits profile fields.
+// The roles claim is restored from the most recent linking user stored on the auth request.
+func preserveProjectRoles(user *domain.ExternalUser, linkingUsers []*domain.ExternalUser) {
+	if user == nil || len(linkingUsers) == 0 {
+		return
+	}
+	user.ProjectRoles = linkingUsers[len(linkingUsers)-1].ProjectRoles
 }
