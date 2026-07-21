@@ -890,6 +890,36 @@ func (l *Login) grantSupportUserInstanceMembership(r *http.Request, provider *qu
 	return nil
 }
 
+// supportUserInstanceMembershipRequired checks whether a newly created external user
+// must be granted the IAM_OWNER_VIEWER instance membership.
+func supportUserInstanceMembershipRequired(provider *query.IDPTemplate, externalUser *domain.ExternalUser) bool {
+	// only a ZITADEL provider conveys support-user project roles
+	if provider.Type != domain.IDPTypeZitadel || provider.ZitadelIDPTemplate == nil {
+		return false
+	}
+	// a user without the support role in the claim is not a support user and needs no membership
+	claimOrgs, ok := externalUser.ProjectRoles[domain.RoleIAMOwnerViewer]
+	if !ok || len(claimOrgs) == 0 {
+		return false
+	}
+	// a claim org must be the same as a configured organization (ID and domain)
+	return claimMatchesConfiguredOrg(claimOrgs, provider.ZitadelIDPTemplate)
+}
+
+// claimMatchesConfiguredOrg reports whether any organization from the roles claim
+// (orgID → orgDomain) exactly matches an organization (by ID and domain)
+// configured in the ZITADEL IDP's InstanceRolesInfo.
+func claimMatchesConfiguredOrg(claimOrgs map[string]string, zitadelTemplate *query.ZitadelIDPTemplate) bool {
+	for orgID, orgDomain := range claimOrgs {
+		for _, configured := range zitadelTemplate.InstanceRolesInfo {
+			if configured.OrganizationID == orgID && configured.OrganizationDomain == orgDomain {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // updateExternalUser will update the existing user (email, phone, profile) with data provided by the IDP
 func (l *Login) updateExternalUser(ctx context.Context, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) error {
 	user, err := l.query.GetUserByID(ctx, true, authReq.UserID)
@@ -1698,36 +1728,6 @@ func WrapIdPError(err error) *IdPError {
 		id = zErr.ID
 	}
 	return &IdPError{err: zerrors.CreateZitadelError(zerrors.KindPreconditionFailed, err, id, "Errors.User.ExternalIDP.LoginFailedSwitchLocal", 1)}
-}
-
-// supportUserInstanceMembershipRequired checks whether a newly created external user
-// must be granted the IAM_OWNER_VIEWER instance membership.
-func supportUserInstanceMembershipRequired(provider *query.IDPTemplate, externalUser *domain.ExternalUser) bool {
-	// only a ZITADEL provider conveys support-user project roles
-	if provider.Type != domain.IDPTypeZitadel || provider.ZitadelIDPTemplate == nil {
-		return false
-	}
-	// a user without the support role in the claim is not a support user and needs no membership
-	claimOrgs, ok := externalUser.ProjectRoles[domain.RoleIAMOwnerViewer]
-	if !ok || len(claimOrgs) == 0 {
-		return false
-	}
-	// a claim org must be the same as a configured organization (ID and domain)
-	return claimMatchesConfiguredOrg(claimOrgs, provider.ZitadelIDPTemplate)
-}
-
-// claimMatchesConfiguredOrg reports whether any organization from the roles claim
-// (orgID → orgDomain) exactly matches an organization (by ID and domain)
-// configured in the ZITADEL IDP's InstanceRolesInfo.
-func claimMatchesConfiguredOrg(claimOrgs map[string]string, zitadelTemplate *query.ZitadelIDPTemplate) bool {
-	for orgID, orgDomain := range claimOrgs {
-		for _, configured := range zitadelTemplate.InstanceRolesInfo {
-			if configured.OrganizationID == orgID && configured.OrganizationDomain == orgDomain {
-				return true
-			}
-		}
-	}
-	return false
 }
 
 // projectRolesFromIDPUser extracts the ZITADEL project-roles claim from an IDP
