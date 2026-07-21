@@ -235,25 +235,8 @@ export async function getSessionCookieByLoginName<T>({
  * @returns Session Cookies
  */
 export async function getAllSessionCookieIds<T>(cleanup: boolean = false): Promise<string[]> {
-  const cookiesList = await cookies();
-  const stringifiedCookie = cookiesList.get("sessions");
-
-  if (!stringifiedCookie?.value) {
-    return [];
-  }
-
-  const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie.value);
-
-  if (cleanup) {
-    const now = new Date();
-    return sessions
-      .filter((session) =>
-        session.expirationTs ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now : true,
-      )
-      .map((session) => session.id);
-  }
-
-  return sessions.map((session) => session.id);
+  const sessions = await getAllSessions<T>(cleanup);
+  return sessions.map(({ id }) => id);
 }
 
 /**

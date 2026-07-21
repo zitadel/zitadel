@@ -4,10 +4,10 @@ import { Translated } from "@/components/translated";
 import { getAllSessions } from "@/lib/cookies";
 import { getServiceConfig } from "@/lib/service-url";
 import { getBrandingSettings, getDefaultOrg, listSessions, ServiceConfig } from "@/lib/zitadel";
-import { create } from "@zitadel/client";
-import { Session, SessionSchema } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
+import { create } from "@zitadel/client";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { Session, SessionSchema } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 // import { getLocale } from "next-intl/server";
@@ -35,17 +35,12 @@ async function loadSessions({ serviceConfig, organization }: { serviceConfig: Se
       liveSessions = response?.sessions ?? [];
     } catch (error) {
       // listSessions can fail for stale/expired session IDs still in cookies,
-      // API errors, etc. Fall back to cookie-derived accounts below instead of
-      // rendering an empty / broken accounts page (see #12252).
       console.error("Failed to load sessions from API, falling back to cookie", error);
-      liveSessions = [];
     }
   }
 
-  // For cookie entries whose server-side session no longer exists (e.g. after
-  // RP-initiated logout terminated the session, see #12252 / #12209),
-  // synthesize an invalid Session so the account stays selectable. The existing
-  // SessionItem re-login path continues the flow when the user picks it.
+  // For cookie entries whose server-side session no longer exists
+  // synthesize an invalid Session so the account stays selectable
   const liveIds = new Set(liveSessions.map((s) => s.id));
   const synthesized: Session[] = sessionCookies
     .filter((c) => !!c.id && !!c.loginName && !liveIds.has(c.id))

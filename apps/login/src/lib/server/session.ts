@@ -311,9 +311,8 @@ export async function clearSession(options: ClearSessionOptions) {
       sessionToken: sessionCookie.token,
     });
   } catch (error) {
-    // The server-side session may already be gone (e.g. RP-initiated logout
-    // terminated it, see #12252). Prune the cookie entry anyway so the account
-    // card is removed from the selection screen.
+    // The server-side session may already be gone.
+    // Prune the cookie entry anyway so the account card is removed from the selection screen.
     logger.warn("clearSession: deleteSession failed, pruning cookie entry anyway", {
       sessionId: sessionCookie.id,
       error,

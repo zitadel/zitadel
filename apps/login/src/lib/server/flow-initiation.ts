@@ -123,19 +123,12 @@ function getEligibleSessions(sessions: Session[], organization?: string): Sessio
 /**
  * Whether the `sessions` cookie references any previous account for the given
  * organization (or for any org when `organization` is unset).
- *
- * After RP-initiated logout the server-side sessions are terminated but the
- * `sessions` cookie still lists the previously signed-in accounts (see #12209).
- * Login V1 keeps these selectable; Login V2 must do the same by rendering
- * account selection from the cookie when there are no live sessions (#12252).
  */
 function hasCookieAccount(sessionCookies: Cookie[], organization?: string): boolean {
   if (!sessionCookies || sessionCookies.length === 0) {
     return false;
   }
-  return sessionCookies.some(
-    (c) => !!c.loginName && (!organization || c.organization === organization),
-  );
+  return sessionCookies.some((c) => !!c.loginName && (!organization || c.organization === organization));
 }
 
 export interface FlowInitiationParams {
@@ -293,10 +286,8 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
     if (authRequest.prompt.includes(Prompt.SELECT_ACCOUNT)) {
       if (eligibleSessions.length === 0) {
-        // No live session is eligible. If the sessions cookie still references
-        // a previous account (e.g. after RP-initiated logout, #12252), keep
-        // account selection so the user can pick it instead of landing on the
-        // loginname screen.
+        // No live session is eligible. If the session cookie still references
+        // a previous account, keep account selection so the user can pick it
         if (!hasCookieAccount(sessionCookies, organization)) {
           return gotoLoginname({
             request,
@@ -400,10 +391,6 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       let selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
 
       if (!selectedSession || !selectedSession.id) {
-        // No live session is eligible. If the sessions cookie still references a
-        // previous account (e.g. after RP-initiated logout, #12252), show
-        // account selection from the cookie instead of sending the user to the
-        // loginname screen.
         if (eligibleSessions.length === 0 && !hasCookieAccount(sessionCookies, organization)) {
           return gotoLoginname({
             request,
