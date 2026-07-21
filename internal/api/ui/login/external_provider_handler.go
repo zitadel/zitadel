@@ -886,7 +886,7 @@ func (l *Login) grantSupportUserInstanceMembership(r *http.Request, provider *qu
 		UserID:     authReq.UserID,
 		Roles:      []string{domain.RoleIAMOwnerViewer},
 	}
-	_, err := l.command.AddInstanceMember(setContext(r.Context(), ""), member, nil)
+	_, err := l.command.AddInstanceMemberFromLogin(setContext(r.Context(), ""), member)
 	if err != nil && !zerrors.IsErrorAlreadyExists(err) {
 		return err
 	}

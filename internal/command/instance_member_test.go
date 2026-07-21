@@ -23,9 +23,6 @@ func TestCommandSide_AddInstanceMember(t *testing.T) {
 	}
 	type args struct {
 		member *AddInstanceMember
-		// nilPermissionCheck passes a nil permission check to AddInstanceMember,
-		// which skips the permission check (as the login v1 does).
-		nilPermissionCheck bool
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -257,8 +254,49 @@ func TestCommandSide_AddInstanceMember(t *testing.T) {
 				err: zerrors.IsPermissionDenied,
 			},
 		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore:      tt.fields.eventstore(t),
+				zitadelRoles:    tt.fields.zitadelRoles,
+				checkPermission: tt.fields.checkPermission,
+			}
+			got, err := r.AddInstanceMember(context.Background(), tt.args.member)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assertObjectDetails(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_AddInstanceMemberFromLogin(t *testing.T) {
+	type fields struct {
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		zitadelRoles    []authz.RoleMapping
+		checkPermission domain.PermissionCheck
+	}
+	type args struct {
+		member *AddInstanceMember
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
 		{
-			name: "nil permission check, skips check",
+			name: "member add, bypasses permission check",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -300,7 +338,6 @@ func TestCommandSide_AddInstanceMember(t *testing.T) {
 					UserID:     "user1",
 					Roles:      []string{"IAM_OWNER"},
 				},
-				nilPermissionCheck: true,
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -316,11 +353,7 @@ func TestCommandSide_AddInstanceMember(t *testing.T) {
 				zitadelRoles:    tt.fields.zitadelRoles,
 				checkPermission: tt.fields.checkPermission,
 			}
-			var permissionCheck InstanceMemberPermissionCheck
-			if !tt.args.nilPermissionCheck {
-				permissionCheck = r.NewPermissionCheckInstanceMemberWrite(context.Background())
-			}
-			got, err := r.AddInstanceMember(context.Background(), tt.args.member, permissionCheck)
+			got, err := r.AddInstanceMemberFromLogin(context.Background(), tt.args.member)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

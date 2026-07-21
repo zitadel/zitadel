@@ -18,7 +18,7 @@ func (s *Server) CreateAdministrator(ctx context.Context, req *connect.Request[i
 	switch resource := req.Msg.GetResource().GetResource().(type) {
 	case *internal_permission.ResourceType_Instance:
 		if resource.Instance {
-			member, err := s.command.AddInstanceMember(ctx, createAdministratorInstanceToCommand(authz.GetInstance(ctx).InstanceID(), req.Msg.UserId, req.Msg.Roles), s.command.NewPermissionCheckInstanceMemberWrite(ctx))
+			member, err := s.command.AddInstanceMember(ctx, createAdministratorInstanceToCommand(authz.GetInstance(ctx).InstanceID(), req.Msg.UserId, req.Msg.Roles))
 			if err != nil {
 				return nil, err
 			}

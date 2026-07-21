@@ -76,13 +76,25 @@ type AddInstanceMember struct {
 }
 
 // AddInstanceMember adds a user as a member of the instance with the given roles.
-func (c *Commands) AddInstanceMember(ctx context.Context, member *AddInstanceMember, permissionCheck InstanceMemberPermissionCheck) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(member.InstanceID)
-	if permissionCheck != nil {
-		if err := permissionCheck(member.InstanceID); err != nil {
-			return nil, err
-		}
+func (c *Commands) AddInstanceMember(ctx context.Context, member *AddInstanceMember) (*domain.ObjectDetails, error) {
+	if err := c.checkPermissionUpdateInstanceMember(ctx, member.InstanceID); err != nil {
+		return nil, err
 	}
+	return c.addInstanceMember(ctx, member)
+}
+
+// AddInstanceMemberFromLogin grants an instance membership during the login v1 ZITADEL-IdP flow.
+// It intentionally bypasses the standard instance-member permission check.
+// Authorization is established by the validated `urn:zitadel:iam:org:project:roles` token claim
+// and the configured InstanceRolesInfo for the Zitadel provider.
+// Do not use it for any user-initiated API path.
+func (c *Commands) AddInstanceMemberFromLogin(ctx context.Context, member *AddInstanceMember) (*domain.ObjectDetails, error) {
+	return c.addInstanceMember(ctx, member)
+}
+
+// addInstanceMember performs the write without any permission check.
+func (c *Commands) addInstanceMember(ctx context.Context, member *AddInstanceMember) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(member.InstanceID)
 	//nolint:staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddInstanceMemberCommand(instanceAgg, member.UserID, member.Roles...))
 	if err != nil {
