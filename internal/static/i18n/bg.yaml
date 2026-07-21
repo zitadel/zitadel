@@ -282,6 +282,8 @@ Errors:
     LabelPolicy:
       NotFound: "Правилата за лични етикети не са намерени"
       NotChanged: "Политиката на частния етикет не е променена"
+    IDPConfig:
+      NotExisting: "Конфигурацията на доставчик на самоличност не съществува"
   Project:
     ProjectIDMissing: "Липсва ID на проекта"
     AlreadyExists: "Проектът вече съществува в организацията"
