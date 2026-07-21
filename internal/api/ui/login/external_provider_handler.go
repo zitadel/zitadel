@@ -812,6 +812,10 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 		return
 	}
 	linkingUser := mapExternalNotFoundOptionFormDataToLoginUser(data)
+	// the form only carries the editable profile fields, so preserve the ZITADEL project
+	// roles captured at authentication (stored on the linking user) to keep the
+	// support-user instance membership grant working on the manual creation path.
+	preserveProjectRoles(linkingUser, authReq.LinkingUsers)
 	l.registerExternalUser(w, r, idpTemplate, authReq, linkingUser)
 }
 
@@ -1537,6 +1541,16 @@ func mapExternalUserToLoginUser(externalUser *domain.ExternalUser, mustBeDomain 
 		DisplayName:    externalUser.PreferredUsername,
 	}
 	return human, externalIDP, externalUser.Metadatas
+}
+
+// preserveProjectRoles carries the ZITADEL project roles captured at authentication
+// onto the form-mapped external user. The "external user not found" form only submits profile fields.
+// The roles claim is restored from the most recent linking user stored on the auth request.
+func preserveProjectRoles(user *domain.ExternalUser, linkingUsers []*domain.ExternalUser) {
+	if user == nil || len(linkingUsers) == 0 {
+		return
+	}
+	user.ProjectRoles = linkingUsers[len(linkingUsers)-1].ProjectRoles
 }
 
 func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOptionFormData) *domain.ExternalUser {

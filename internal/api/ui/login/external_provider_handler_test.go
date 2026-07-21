@@ -443,3 +443,51 @@ func Test_claimMatchesConfiguredOrg(t *testing.T) {
 		})
 	}
 }
+
+func Test_preserveProjectRoles(t *testing.T) {
+	roles := map[string]map[string]string{
+		"IAM_OWNER_VIEWER": {"orgID1": "org1.example.com"},
+	}
+	tests := []struct {
+		name         string
+		user         *domain.ExternalUser
+		linkingUsers []*domain.ExternalUser
+		want         map[string]map[string]string
+	}{
+		{
+			// the form-mapped user has no roles claim; it must be restored from the linking user
+			name:         "roles copied from the single linking user",
+			user:         &domain.ExternalUser{},
+			linkingUsers: []*domain.ExternalUser{{ProjectRoles: roles}},
+			want:         roles,
+		},
+		{
+			// linking users accumulate on account-linking flows; the most recent one is mapped
+			name: "roles copied from the most recent linking user",
+			user: &domain.ExternalUser{},
+			linkingUsers: []*domain.ExternalUser{
+				{ProjectRoles: map[string]map[string]string{"OTHER_ROLE": {"orgIDx": "orgx.example.com"}}},
+				{ProjectRoles: roles},
+			},
+			want: roles,
+		},
+		{
+			name:         "no linking users, nil",
+			user:         &domain.ExternalUser{},
+			linkingUsers: nil,
+			want:         nil,
+		},
+		{
+			name:         "last linking user without roles, nil",
+			user:         &domain.ExternalUser{},
+			linkingUsers: []*domain.ExternalUser{{ProjectRoles: roles}, {}},
+			want:         nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			preserveProjectRoles(tt.user, tt.linkingUsers)
+			assert.Equal(t, tt.want, tt.user.ProjectRoles)
+		})
+	}
+}
