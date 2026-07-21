@@ -872,17 +872,7 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, pro
 // and their `urn:zitadel:iam:org:project:roles` claim carries that role for an
 // organization configured in the IDP's InstanceRolesInfo.
 func (l *Login) grantSupportUserInstanceMembership(r *http.Request, provider *query.IDPTemplate, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) error {
-	// only a ZITADEL provider conveys support-user project roles
-	if provider.Type != domain.IDPTypeZitadel || provider.ZitadelIDPTemplate == nil {
-		return nil
-	}
-	// a user without the support role in the claim is not a support user and needs no membership
-	claimOrgs, ok := externalUser.ProjectRoles[domain.RoleIAMOwnerViewer]
-	if !ok || len(claimOrgs) == 0 {
-		return nil
-	}
-	// a claim org must be the same as a configured organization (ID and domain)
-	if !claimMatchesConfiguredOrg(claimOrgs, provider.ZitadelIDPTemplate) {
+	if !supportUserInstanceMembershipRequired(provider, externalUser) {
 		return nil
 	}
 	member := &command.AddInstanceMember{
@@ -895,6 +885,22 @@ func (l *Login) grantSupportUserInstanceMembership(r *http.Request, provider *qu
 		return err
 	}
 	return nil
+}
+
+// supportUserInstanceMembershipRequired checks whether a newly created external user
+// must be granted the IAM_OWNER_VIEWER instance membership.
+func supportUserInstanceMembershipRequired(provider *query.IDPTemplate, externalUser *domain.ExternalUser) bool {
+	// only a ZITADEL provider conveys support-user project roles
+	if provider.Type != domain.IDPTypeZitadel || provider.ZitadelIDPTemplate == nil {
+		return false
+	}
+	// a user without the support role in the claim is not a support user and needs no membership
+	claimOrgs, ok := externalUser.ProjectRoles[domain.RoleIAMOwnerViewer]
+	if !ok || len(claimOrgs) == 0 {
+		return false
+	}
+	// a claim org must be the same as a configured organization (ID and domain)
+	return claimMatchesConfiguredOrg(claimOrgs, provider.ZitadelIDPTemplate)
 }
 
 // claimMatchesConfiguredOrg reports whether any organization from the roles claim
