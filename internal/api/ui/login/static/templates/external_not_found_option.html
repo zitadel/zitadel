@@ -64,6 +64,8 @@
                 <label class="lgn-label" for="languages">{{t "ExternalRegistrationUserOverview.LanguageLabel"}}</label>
                 <select id="languages" name="language">
                     <option value=""></option>
+                    <option value="da" id="da" {{if (selectedLanguage "da")}} selected {{end}}>{{t "ExternalNotFound.Danish"}}
+                    </option>
                     <option value="de" id="de" {{if (selectedLanguage "de")}} selected {{end}}>{{t "ExternalNotFound.German"}}
                     </option>
                     <option value="en" id="en" {{if (selectedLanguage "en")}} selected {{end}}>{{t "ExternalNotFound.English"}}
