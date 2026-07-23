@@ -74,6 +74,26 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 			},
 		},
 		{
+			name: "oidc dynamic client registration cascaded from system",
+			eventstore: expectEventstore(
+				expectFilter(eventFromEventPusher(feature_v2.NewSetEvent(
+					context.Background(), aggregate,
+					feature_v2.SystemOIDCDynamicClientRegistration, true,
+				))),
+				expectFilter(),
+			),
+			args: args{true},
+			want: &InstanceFeatures{
+				Details: &domain.ObjectDetails{
+					ResourceOwner: "instance1",
+				},
+				OIDCDynamicClientRegistration: FeatureSource[bool]{
+					Level: feature.LevelSystem,
+					Value: true,
+				},
+			},
+		},
+		{
 			name: "all features set",
 			eventstore: expectEventstore(
 				expectFilter(eventFromEventPusher(feature_v2.NewSetEvent(

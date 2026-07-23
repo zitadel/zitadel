@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
@@ -44,6 +45,20 @@ type Config struct {
 	PublicKeyCacheMaxAge              time.Duration
 	DefaultBackChannelLogoutLifetime  time.Duration
 	BackChannelLogout                 handlers.BackChannelLogoutWorkerConfig
+	DynamicClientRegistration         DynamicClientRegistrationConfig
+}
+
+// DynamicClientRegistrationConfig configures the OAuth 2.0 Dynamic Client Registration
+// endpoint (RFC 7591). The endpoint is only served and advertised when the
+// oidc_dynamic_client_registration instance feature is enabled.
+type DynamicClientRegistrationConfig struct {
+	// AllowUnauthenticated enables open registration, where clients may register
+	// without an initial access token, as required by the Model Context Protocol (MCP)
+	// flow. Registered clients are homed in a dedicated, auto-provisioned project in the
+	// instance's default organization. When disabled (the default), registration
+	// requires a valid access token (RFC 7591 §3 initial access token) and the client is
+	// homed in the token's organization.
+	AllowUnauthenticated bool
 }
 
 // BackChannelLogoutConfig returns the BackChannelLogoutWorkerConfig and takes the deprecated TokenLifetime into account.
@@ -64,6 +79,7 @@ type EndpointConfig struct {
 	EndSession    *Endpoint
 	Keys          *Endpoint
 	DeviceAuth    *Endpoint
+	Registration  *Endpoint
 }
 
 type Endpoint struct {
@@ -173,28 +189,37 @@ func NewServer(
 			accessTokenKeySet: accessTokenKeySet,
 			idTokenHintKeySet: idTokenHintKeySet,
 		}, endpoints(config.CustomEndpoints)),
-		repo:                       repo,
-		query:                      query,
-		command:                    command,
-		accessTokenKeySet:          accessTokenKeySet,
-		idTokenHintKeySet:          idTokenHintKeySet,
-		defaultLoginURL:            fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
-		defaultLoginURLV2:          config.DefaultLoginURLV2,
-		defaultLogoutURLV2:         config.DefaultLogoutURLV2,
-		defaultAccessTokenLifetime: config.DefaultAccessTokenLifetime,
-		defaultIdTokenLifetime:     config.DefaultIdTokenLifetime,
-		jwksCacheControlMaxAge:     config.JWKSCacheControlMaxAge,
-		fallbackLogger:             fallbackLogger,
-		hasher:                     hasher,
-		encAlg:                     authAlg,
-		targetEncryptionAlgorithm:  targetEncryptionAlgorithm,
-		opCrypto:                   alg,
-		assetAPIPrefix:             assets.AssetAPI(),
-		httpClient:                 httpClient,
+		repo:                            repo,
+		query:                           query,
+		command:                         command,
+		accessTokenKeySet:               accessTokenKeySet,
+		idTokenHintKeySet:               idTokenHintKeySet,
+		defaultLoginURL:                 fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
+		defaultLoginURLV2:               config.DefaultLoginURLV2,
+		defaultLogoutURLV2:              config.DefaultLogoutURLV2,
+		defaultAccessTokenLifetime:      config.DefaultAccessTokenLifetime,
+		defaultIdTokenLifetime:          config.DefaultIdTokenLifetime,
+		jwksCacheControlMaxAge:          config.JWKSCacheControlMaxAge,
+		fallbackLogger:                  fallbackLogger,
+		hasher:                          hasher,
+		encAlg:                          authAlg,
+		targetEncryptionAlgorithm:       targetEncryptionAlgorithm,
+		opCrypto:                        alg,
+		assetAPIPrefix:                  assets.AssetAPI(),
+		httpClient:                      httpClient,
+		registrationEndpoint:            registrationEndpoint(config.CustomEndpoints),
+		dynamicClientRegistrationConfig: config.DynamicClientRegistration,
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
-	server.Handler = op.RegisterLegacyServer(server,
-		server.authorizeCallbackHandler,
+
+	// We register the routes via op.RegisterServer (instead of op.RegisterLegacyServer)
+	// so that the dynamic client registration route can be added through the same
+	// WithSetRouter hook as the authorize callback. op.RegisterLegacyServer appends its
+	// own WithHTTPMiddleware after the caller options, which would violate chi's
+	// "all middlewares before routes" rule once we add a route via WithSetRouter.
+	// This mirrors op.RegisterLegacyServer; op.NewIssuerInterceptor reproduces the issuer
+	// middleware it would otherwise add.
+	server.Handler = op.RegisterServer(server, server.Endpoints(),
 		op.WithFallbackLogger(fallbackLogger),
 		op.WithHTTPMiddleware(
 			middleware.CallDurationHandler,
@@ -209,9 +234,31 @@ func NewServer(
 			http_utils.CopyHeadersToContext,
 			accessHandler.HandleWithPublicAuthPathPrefixes(publicAuthPathPrefixes(config.CustomEndpoints)),
 			middleware.ActivityHandler,
-		))
+		),
+		op.WithHTTPMiddleware(op.NewIssuerInterceptor(server.IssuerFromRequest).Handler),
+		op.WithSetRouter(func(r chi.Router) {
+			r.HandleFunc(server.Endpoints().Authorization.Relative()+authCallbackPathSuffix, server.authorizeCallbackHandler)
+			r.Method(http.MethodPost, server.registrationEndpoint.Relative(), http.HandlerFunc(server.dynamicClientRegistration))
+		}),
+	)
 
 	return server, nil
+}
+
+// authCallbackPathSuffix mirrors the unexported suffix used by op.RegisterLegacyServer to
+// register the authorize callback handler under the authorization endpoint.
+// Keep in sync with github.com/zitadel/oidc/v3/pkg/op (authCallbackPathSuffix). The
+// existing authorization-flow integration tests exercise this route and would fail if the
+// library changed the suffix.
+const authCallbackPathSuffix = "/callback"
+
+// registrationEndpoint builds the dynamic client registration endpoint, optionally
+// overridden through the custom endpoint configuration.
+func registrationEndpoint(endpointConfig *EndpointConfig) *op.Endpoint {
+	if endpointConfig != nil && endpointConfig.Registration != nil {
+		return op.NewEndpointWithURL(endpointConfig.Registration.Path, endpointConfig.Registration.URL)
+	}
+	return op.NewEndpoint(defaultRegistrationEndpoint)
 }
 
 func ContextToIssuer(ctx context.Context) string {

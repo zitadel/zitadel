@@ -45,7 +45,15 @@ type Server struct {
 
 	assetAPIPrefix func(ctx context.Context) string
 	httpClient     *http.Client
+
+	registrationEndpoint            *op.Endpoint
+	dynamicClientRegistrationConfig DynamicClientRegistrationConfig
 }
+
+// defaultRegistrationEndpoint is the path of the OAuth 2.0 Dynamic Client Registration
+// endpoint (RFC 7591). It is served under the same /oauth/v2 prefix as the other OAuth
+// endpoints and can be overridden through the custom endpoint configuration.
+const defaultRegistrationEndpoint = "/oauth/v2/register"
 
 func endpoints(endpointConfig *EndpointConfig) op.Endpoints {
 	// some defaults. The new Server will disable endpoints that are nil.
@@ -176,8 +184,16 @@ func (s *Server) EndSession(ctx context.Context, r *op.Request[oidc.EndSessionRe
 func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales oidc.Locales) *oidc.DiscoveryConfiguration {
 	issuer := op.IssuerFromContext(ctx)
 
+	// The registration endpoint is only advertised when the dynamic client registration
+	// feature is enabled for the instance.
+	var registrationEndpoint string
+	if authz.GetFeatures(ctx).OIDCDynamicClientRegistration {
+		registrationEndpoint = s.registrationEndpoint.Absolute(issuer)
+	}
+
 	return &oidc.DiscoveryConfiguration{
 		Issuer:                      issuer,
+		RegistrationEndpoint:        registrationEndpoint,
 		AuthorizationEndpoint:       s.Endpoints().Authorization.Absolute(issuer),
 		TokenEndpoint:               s.Endpoints().Token.Absolute(issuer),
 		IntrospectionEndpoint:       s.Endpoints().Introspection.Absolute(issuer),
