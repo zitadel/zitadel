@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/redis/go-redis/v9/maintnotifications"
 )
 
 type Config struct {
@@ -205,6 +206,7 @@ func optionsFromURL(c Config) (*redis.Options, error) {
 		opts.IdentitySuffix = c.IdentitySuffix
 	}
 
+	opts.MaintNotificationsConfig = &maintnotifications.Config{Mode: maintnotifications.ModeDisabled}
 	opts.Limiter = newLimiter(c.CircuitBreaker, c.MaxActiveConns)
 
 	return opts, nil
@@ -212,30 +214,31 @@ func optionsFromURL(c Config) (*redis.Options, error) {
 
 func optionsFromConfig(c Config) *redis.Options {
 	opts := &redis.Options{
-		Network:               c.Network,
-		Addr:                  c.Addr,
-		ClientName:            c.ClientName,
-		Protocol:              3,
-		Username:              c.Username,
-		Password:              c.Password,
-		MaxRetries:            c.MaxRetries,
-		MinRetryBackoff:       c.MinRetryBackoff,
-		MaxRetryBackoff:       c.MaxRetryBackoff,
-		DialTimeout:           c.DialTimeout,
-		ReadTimeout:           c.ReadTimeout,
-		WriteTimeout:          c.WriteTimeout,
-		ContextTimeoutEnabled: true,
-		PoolFIFO:              c.PoolFIFO,
-		PoolSize:              c.PoolSize,
-		PoolTimeout:           c.PoolTimeout,
-		MinIdleConns:          c.MinIdleConns,
-		MaxIdleConns:          c.MaxIdleConns,
-		MaxActiveConns:        c.MaxActiveConns,
-		ConnMaxIdleTime:       c.ConnMaxIdleTime,
-		ConnMaxLifetime:       c.ConnMaxLifetime,
-		DisableIndentity:      c.DisableIndentity,
-		IdentitySuffix:        c.IdentitySuffix,
-		Limiter:               newLimiter(c.CircuitBreaker, c.MaxActiveConns),
+		Network:                  c.Network,
+		Addr:                     c.Addr,
+		ClientName:               c.ClientName,
+		Protocol:                 3,
+		Username:                 c.Username,
+		Password:                 c.Password,
+		MaxRetries:               c.MaxRetries,
+		MinRetryBackoff:          c.MinRetryBackoff,
+		MaxRetryBackoff:          c.MaxRetryBackoff,
+		DialTimeout:              c.DialTimeout,
+		ReadTimeout:              c.ReadTimeout,
+		WriteTimeout:             c.WriteTimeout,
+		ContextTimeoutEnabled:    true,
+		PoolFIFO:                 c.PoolFIFO,
+		PoolSize:                 c.PoolSize,
+		PoolTimeout:              c.PoolTimeout,
+		MinIdleConns:             c.MinIdleConns,
+		MaxIdleConns:             c.MaxIdleConns,
+		MaxActiveConns:           c.MaxActiveConns,
+		ConnMaxIdleTime:          c.ConnMaxIdleTime,
+		ConnMaxLifetime:          c.ConnMaxLifetime,
+		DisableIndentity:         c.DisableIndentity,
+		IdentitySuffix:           c.IdentitySuffix,
+		MaintNotificationsConfig: &maintnotifications.Config{Mode: maintnotifications.ModeDisabled},
+		Limiter:                  newLimiter(c.CircuitBreaker, c.MaxActiveConns),
 	}
 	if c.EnableTLS {
 		opts.TLSConfig = new(tls.Config)
