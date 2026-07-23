@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/domain/federatedlogout"
@@ -36,6 +37,7 @@ import (
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml/requesttracker"
+	"github.com/zitadel/zitadel/internal/idp/providers/zitadel"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -46,6 +48,9 @@ const (
 	queryRelayState            = "RelayState"
 	queryMethod                = "method"
 	tmplExternalNotFoundOption = "externalnotfoundoption"
+	// zitadelProjectRolesClaim is the token claim a ZITADEL provider uses to convey
+	// a user's project roles ({role: {orgID: orgDomain}}).
+	zitadelProjectRolesClaim = "urn:zitadel:iam:org:project:roles"
 )
 
 var (
@@ -190,6 +195,8 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		provider, err = l.ldapProvider(r.Context(), identityProvider)
 	case domain.IDPTypeSAML:
 		provider, err = l.samlProvider(r.Context(), identityProvider)
+	case domain.IDPTypeZitadel:
+		provider, err = l.zitadelProvider(r.Context(), identityProvider)
 	case domain.IDPTypeUnspecified:
 		fallthrough
 	default:
@@ -368,6 +375,13 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
+	case domain.IDPTypeZitadel:
+		provider, err := l.zitadelProvider(r.Context(), identityProvider)
+		if err != nil {
+			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		session = openid.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeJWT,
 		domain.IDPTypeLDAP,
 		domain.IDPTypeUnspecified:
@@ -459,6 +473,10 @@ func (l *Login) handleExternalUserAuthenticated(
 	callback func(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest),
 ) {
 	externalUser := mapIDPUserToExternalUser(user, provider.ID)
+	// a ZITADEL provider may convey support-user project roles, which are carried through to user creation
+	if provider.Type == domain.IDPTypeZitadel {
+		externalUser.ProjectRoles = projectRolesFromIDPUser(user)
+	}
 	// ensure the linked IDP is added to the login policy
 	if err := l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, provider.ID, authReq.AgentID, authReq.SelectedIDPConfigArgs); err != nil {
 		l.renderError(w, r, authReq, err)
@@ -515,6 +533,13 @@ func (l *Login) handleExternalUserAuthenticated(
 			l.renderError(w, r, authReq, err)
 			return
 		}
+	}
+	// (re)assign the support-user instance membership for an existing user
+	// so that the role assignment remains idempotent
+	// in case user creation succeeded but role assignment failed in a previous request.
+	if err = l.grantSupportUserInstanceMembership(r, provider, authReq, externalUser); err != nil && !userLinked {
+		l.renderError(w, r, authReq, err)
+		return
 	}
 	callback(w, r, authReq)
 }
@@ -653,12 +678,12 @@ func (l *Login) createOrLinkUser(w http.ResponseWriter, r *http.Request, authReq
 			return
 		}
 	}
-	l.autoCreateExternalUser(w, r, authReq)
+	l.autoCreateExternalUser(w, r, provider, authReq)
 	return false
 }
 
 // autoCreateExternalUser takes the externalUser and creates it automatically (without user interaction)
-func (l *Login) autoCreateExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
+func (l *Login) autoCreateExternalUser(w http.ResponseWriter, r *http.Request, provider *query.IDPTemplate, authReq *domain.AuthRequest) {
 	if len(authReq.LinkingUsers) == 0 {
 		l.renderError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "LOGIN-asfg3", "Errors.ExternalIDP.NoExternalUserData"))
 		return
@@ -667,7 +692,7 @@ func (l *Login) autoCreateExternalUser(w http.ResponseWriter, r *http.Request, a
 	// TODO (LS): how do we get multiple and why do we use the last of them (taken as is)?
 	linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
 
-	l.registerExternalUser(w, r, authReq, linkingUser)
+	l.registerExternalUser(w, r, provider, authReq, linkingUser)
 }
 
 // renderExternalNotFoundOption renders a page, where the user is able to edit the IDP data,
@@ -790,14 +815,18 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 		return
 	}
 	linkingUser := mapExternalNotFoundOptionFormDataToLoginUser(data)
-	l.registerExternalUser(w, r, authReq, linkingUser)
+	// the form only carries the editable profile fields, so preserve the ZITADEL project
+	// roles captured at authentication (stored on the linking user) to keep the
+	// support-user instance membership grant working on the manual creation path.
+	preserveProjectRoles(linkingUser, authReq.LinkingUsers)
+	l.registerExternalUser(w, r, idpTemplate, authReq, linkingUser)
 }
 
 // registerExternalUser creates an externalUser with the provided data
 // incl. execution of pre and post creation actions
 //
 // it is called from either the [autoCreateExternalUser] or [handleExternalNotFoundOptionCheck]
-func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) {
+func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, provider *query.IDPTemplate, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) {
 	resourceOwner := determineResourceOwner(r.Context(), authReq)
 
 	orgIamPolicy, err := l.getOrgDomainPolicy(r, resourceOwner)
@@ -833,7 +862,62 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	// a ZITADEL provider may grant a support user an instance membership based on the roles present in its token claim.
+	if err = l.grantSupportUserInstanceMembership(r, provider, authReq, externalUser); err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
 	l.renderNextStep(w, r, authReq)
+}
+
+// grantSupportUserInstanceMembership grants the IAM_OWNER_VIEWER instance membership
+// to a freshly created external user when they authenticated via a ZITADEL provider
+// and their `urn:zitadel:iam:org:project:roles` claim carries that role for an
+// organization configured in the IDP's InstanceRolesInfo.
+func (l *Login) grantSupportUserInstanceMembership(r *http.Request, provider *query.IDPTemplate, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) error {
+	if !supportUserInstanceMembershipRequired(provider, externalUser) {
+		return nil
+	}
+	member := &command.AddInstanceMember{
+		InstanceID: authz.GetInstance(r.Context()).InstanceID(),
+		UserID:     authReq.UserID,
+		Roles:      []string{domain.RoleIAMOwnerViewer},
+	}
+	_, err := l.command.AddInstanceMemberFromLogin(setContext(r.Context(), ""), member)
+	if err != nil && !zerrors.IsErrorAlreadyExists(err) {
+		return err
+	}
+	return nil
+}
+
+// supportUserInstanceMembershipRequired checks whether a newly created external user
+// must be granted the IAM_OWNER_VIEWER instance membership.
+func supportUserInstanceMembershipRequired(provider *query.IDPTemplate, externalUser *domain.ExternalUser) bool {
+	// only a ZITADEL provider conveys support-user project roles
+	if provider.Type != domain.IDPTypeZitadel || provider.ZitadelIDPTemplate == nil {
+		return false
+	}
+	// a user without the support role in the claim is not a support user and needs no membership
+	claimOrgs, ok := externalUser.ProjectRoles[domain.RoleIAMOwnerViewer]
+	if !ok || len(claimOrgs) == 0 {
+		return false
+	}
+	// a claim org must be the same as a configured organization (ID and domain)
+	return claimMatchesConfiguredOrg(claimOrgs, provider.ZitadelIDPTemplate)
+}
+
+// claimMatchesConfiguredOrg reports whether any organization from the roles claim
+// (orgID → orgDomain) exactly matches an organization (by ID and domain)
+// configured in the ZITADEL IDP's InstanceRolesInfo.
+func claimMatchesConfiguredOrg(claimOrgs map[string]string, zitadelTemplate *query.ZitadelIDPTemplate) bool {
+	for orgID, orgDomain := range claimOrgs {
+		for _, configured := range zitadelTemplate.InstanceRolesInfo {
+			if configured.OrganizationID == orgID && configured.OrganizationDomain == orgDomain {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // updateExternalUser will update the existing user (email, phone, profile) with data provided by the IDP
@@ -1290,6 +1374,22 @@ func (l *Login) appleProvider(ctx context.Context, identityProvider *query.IDPTe
 	)
 }
 
+func (l *Login) zitadelProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*zitadel.Provider, error) {
+	secret, err := crypto.DecryptString(identityProvider.ZitadelIDPTemplate.ClientSecret, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	return zitadel.New(
+		identityProvider.ZitadelIDPTemplate.Issuer,
+		identityProvider.ZitadelIDPTemplate.ClientID,
+		secret,
+		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		identityProvider.ZitadelIDPTemplate.Scopes,
+		l.httpClient,
+		openid.WithSelectAccount(),
+	)
+}
+
 func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserGrant, resourceOwner string) error {
 	if len(userGrants) == 0 {
 		return nil
@@ -1628,4 +1728,45 @@ func WrapIdPError(err error) *IdPError {
 		id = zErr.ID
 	}
 	return &IdPError{err: zerrors.CreateZitadelError(zerrors.KindPreconditionFailed, err, id, "Errors.User.ExternalIDP.LoginFailedSwitchLocal", 1)}
+}
+
+// projectRolesFromIDPUser extracts the ZITADEL project-roles claim from an IDP
+// user's OIDC userinfo and returns it as a map {role: {orgID: orgDomain}}.
+// It returns nil when the user is not an OIDC user or the claim is absent or malformed.
+func projectRolesFromIDPUser(user idp.User) map[string]map[string]string {
+	oidcUser, ok := user.(*openid.User)
+	if !ok || oidcUser.UserInfo == nil {
+		return nil
+	}
+	rawRoles, ok := oidcUser.Claims[zitadelProjectRolesClaim].(map[string]any)
+	if !ok {
+		return nil
+	}
+	roles := make(map[string]map[string]string, len(rawRoles))
+	for role, rawOrgs := range rawRoles {
+		orgs, ok := rawOrgs.(map[string]any)
+		if !ok {
+			continue
+		}
+		orgMap := make(map[string]string, len(orgs))
+		for orgID, rawDomain := range orgs {
+			domainName, _ := rawDomain.(string)
+			orgMap[orgID] = domainName
+		}
+		roles[role] = orgMap
+	}
+	if len(roles) == 0 {
+		return nil
+	}
+	return roles
+}
+
+// preserveProjectRoles carries the ZITADEL project roles captured at authentication
+// onto the form-mapped external user. The "external user not found" form only submits profile fields.
+// The roles claim is restored from the most recent linking user stored on the auth request.
+func preserveProjectRoles(user *domain.ExternalUser, linkingUsers []*domain.ExternalUser) {
+	if user == nil || len(linkingUsers) == 0 {
+		return
+	}
+	user.ProjectRoles = linkingUsers[len(linkingUsers)-1].ProjectRoles
 }
