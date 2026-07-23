@@ -9,7 +9,8 @@
     "addAnother": "Add another account",
     "noResults": "No accounts found",
     "verified": "verified",
-    "expired": "expired"
+    "expired": "expired",
+    "reauthRequired": "Sign in again to continue"
   },
   "logout": {
     "title": "Logout",

@@ -9,7 +9,8 @@
     "addAnother": "Agregar otra cuenta",
     "noResults": "No se encontraron cuentas",
     "verified": "verificado",
-    "expired": "expirado"
+    "expired": "expirado",
+    "reauthRequired": "Inicie sesión de nuevo para continuar"
   },
   "logout": {
     "title": "Cerrar sesión",

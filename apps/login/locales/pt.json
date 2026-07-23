@@ -9,7 +9,8 @@
     "addAnother": "Adicionar outra conta",
     "noResults": "Nenhuma conta encontrada",
     "verified": "verificado",
-    "expired": "expirado"
+    "expired": "expirado",
+    "reauthRequired": "Inicie sessão novamente para continuar"
   },
   "logout": {
     "title": "Sair",

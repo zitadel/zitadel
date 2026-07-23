@@ -9,7 +9,8 @@
     "addAnother": "Ajouter un nouveau compte",
     "noResults": "Pas de compte trouvé",
     "verified": "vérifié",
-    "expired": "expiré"
+    "expired": "expiré",
+    "reauthRequired": "Reconnectez-vous pour continuer"
   },
   "logout": {
     "title": "Déconnexion",
