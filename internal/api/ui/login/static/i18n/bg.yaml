@@ -264,6 +264,7 @@ RegistrationUser:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Hindi: हिन्दी
   Ukrainian: Українська
   Arabic: العربية
   GenderLabel: Пол
@@ -310,6 +311,7 @@ ExternalRegistrationUserOverview:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Hindi: हिन्दी
   Ukrainian: Українська
   Arabic: العربية
   TosAndPrivacyLabel: Правила и условия
@@ -385,6 +387,7 @@ ExternalNotFound:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Hindi: हिन्दी
   Ukrainian: Українська
   Arabic: العربية
 DeviceAuth:
