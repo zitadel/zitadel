@@ -793,8 +793,31 @@ func NewUserPreferredLoginNameSearchQuery(value string, comparison TextCompariso
 	return NewTextQuery(userPreferredLoginNameCol, value, comparison)
 }
 
+//go:embed user_login_name_exists.sql
+var userLoginNameExistsQuery string
+
+//go:embed user_login_name_exists_case_sensitive.sql
+var userLoginNameExistsCaseSensitiveQuery string
+
+// NewUserLoginNameExistsQuery filters users by login name.
+//
+// Equals / EqualsIgnoreCase use an index-friendly subquery against
+// login_names3_users.user_name(_lower) (and domain when must_be_domain),
+// instead of filtering the login_names3 view's computed login_name(_lower).
+// The latter cannot use indexes and becomes a full scan / correlated nested
+// loop over all users in the instance.
+//
+// Other comparison methods keep the view-based correlated subselect.
 func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	// linking queries for the sub select
+	switch comparison {
+	case TextEquals, TextEqualsIgnoreCase:
+		return newLoginNameExistsQuery(value, comparison == TextEqualsIgnoreCase)
+	default:
+		return newLoginNameExistsViewQuery(value, comparison)
+	}
+}
+
+func newLoginNameExistsViewQuery(value string, comparison TextComparison) (SearchQuery, error) {
 	instanceQuery, err := NewColumnComparisonQuery(LoginNameInstanceIDCol, UserInstanceIDCol, ColumnEquals)
 	if err != nil {
 		return nil, err
@@ -807,26 +830,119 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 	if err != nil {
 		return nil, err
 	}
-	// text query to select data from the linked sub select
-	var loginNameQuery SearchQuery
-	loginNameQuery, err = NewTextQuery(LoginNameNameCol, value, comparison)
-	if comparison == TextEqualsIgnoreCase {
-		loginNameQuery, err = NewTextQuery(LoginNameNameLowerCol, strings.ToLower(value), TextEquals)
-	}
+	loginNameQuery, err := NewTextQuery(LoginNameNameCol, value, comparison)
 	if err != nil {
 		return nil, err
 	}
-	// full definition of the sub select
 	subSelect, err := NewSubSelect(LoginNameUserIDCol, []SearchQuery{instanceQuery, userIDQuery, resourceOwnerQuery, loginNameQuery})
 	if err != nil {
 		return nil, err
 	}
-	// "WHERE * IN (*)" query with subquery as list-data provider
 	return NewListQuery(
 		UserIDCol,
 		subSelect,
 		ListIn,
 	)
+}
+
+type loginNameExistsQuery struct {
+	instanceID string
+	username   string
+	domain     string
+	loginName  string
+	ignoreCase bool
+}
+
+func newLoginNameExistsQuery(value string, ignoreCase bool) (*loginNameExistsQuery, error) {
+	if ignoreCase {
+		value = strings.ToLower(value)
+	}
+	username := value
+	var domainSuffix string
+	domainIndex := strings.LastIndex(value, "@")
+	// split between the last @ (ignore trailing @)
+	if domainIndex > 0 && domainIndex != len(value)-1 {
+		domainSuffix = value[domainIndex+1:]
+		username = value[:domainIndex]
+	}
+	return &loginNameExistsQuery{
+		username:   username,
+		domain:     domainSuffix,
+		loginName:  value,
+		ignoreCase: ignoreCase,
+	}, nil
+}
+
+func (q *loginNameExistsQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (q *loginNameExistsQuery) Col() Column {
+	return UserIDCol
+}
+
+func (q *loginNameExistsQuery) comp() sq.Sqlizer {
+	subQuery := userLoginNameExistsQuery
+	if !q.ignoreCase {
+		subQuery = userLoginNameExistsCaseSensitiveQuery
+	}
+	return sq.Expr(
+		UserIDCol.identifier()+" IN ("+subQuery+")",
+		q.instanceID,
+		q.instanceID,
+		q.domain,
+		q.instanceID,
+		q.username,
+		q.loginName,
+		q.username,
+		q.domain,
+		q.loginName,
+	)
+}
+
+func (q *UserSearchQueries) hasMetadataFilter() bool {
+	return searchQueriesHaveMetadataFilter(q.Queries)
+}
+
+func searchQueriesHaveMetadataFilter(queries []SearchQuery) bool {
+	for _, qry := range queries {
+		if searchQueryHasMetadataFilter(qry) {
+			return true
+		}
+	}
+	return false
+}
+
+func searchQueryHasMetadataFilter(qry SearchQuery) bool {
+	switch v := qry.(type) {
+	case *OrQuery:
+		return searchQueriesHaveMetadataFilter(v.queries)
+	case *AndQuery:
+		return searchQueriesHaveMetadataFilter(v.queries)
+	case *NotQuery:
+		return searchQueryHasMetadataFilter(v.query)
+	default:
+		return qry.Col().table.name == userMetadataTable.name
+	}
+}
+
+func (q *UserSearchQueries) setLoginNameExistsInstanceID(instanceID string) {
+	setLoginNameExistsInstanceID(q.Queries, instanceID)
+}
+
+func setLoginNameExistsInstanceID(queries []SearchQuery, instanceID string) {
+	for _, qry := range queries {
+		switch v := qry.(type) {
+		case *loginNameExistsQuery:
+			v.instanceID = instanceID
+		case *OrQuery:
+			setLoginNameExistsInstanceID(v.queries, instanceID)
+		case *AndQuery:
+			setLoginNameExistsInstanceID(v.queries, instanceID)
+		case *NotQuery:
+			setLoginNameExistsInstanceID([]SearchQuery{v.query}, instanceID)
+		}
+	}
 }
 
 func triggerUserProjections(ctx context.Context) {
@@ -1257,13 +1373,19 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 }
 
 // prepareUsersQuery creates the select query for searching users and returns a matching scan function.
-// Permissions, filters and sorting are applied in a `SELECT FROM` distinct sub-select.
+// Permissions, filters and sorting are applied in a `SELECT FROM` sub-select.
 // The count over window function and limit are applied in the outer query.
 // It is not possible to pass more filters to the returned query, as they need to be applied in the sub-select.
+//
+// The metadata JOIN and DISTINCT are only applied when a metadata filter is present, to avoid
+// multiplying rows (and forcing DISTINCT) for common ListUsers paths such as login-name lookup.
 func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 	if q.SortingColumn.isZero() {
 		q.SortingColumn = UserIDCol
 	}
+
+	q.setLoginNameExistsInstanceID(authz.GetInstance(ctx).InstanceID())
+	needsMetadataJoin := q.hasMetadataFilter()
 
 	// start building the sub-select
 	query := sq.Select(
@@ -1298,13 +1420,16 @@ func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionChe
 		MachineSecretCol.identifier(),
 		MachineAccessTokenTypeCol.identifier(),
 		q.SortingColumn.orderBy()).
-		Distinct().
 		From(userTable.identifier()).
 		LeftJoin(join(HumanUserIDCol, UserIDCol)).
 		LeftJoin(join(MachineUserIDCol, UserIDCol)).
-		LeftJoin(join(UserMetadataUserIDCol, UserIDCol)).
 		JoinClause(joinLoginNames).
 		Where(sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()})
+
+	if needsMetadataJoin {
+		query = query.Distinct().
+			LeftJoin(join(UserMetadataUserIDCol, UserIDCol))
+	}
 
 	query = userPermissionCheckV2(ctx, query, permissionCheckV2, q.Queries)
 	// apply requested filters
