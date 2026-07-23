@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -171,4 +172,13 @@ func (c *Commands) emailWriteModel(ctx context.Context, userID, resourceOwner st
 		return nil, err
 	}
 	return writeModel, nil
+}
+
+// emailCodeVerifierFromConfig mirrors phoneCodeVerifierFromConfig for the email
+// channel. Returns (nil, nil) today — no email provider supports external code
+// verification — so the verify path falls back to the local-crypto check.
+// Present as a parity stub so future external email verifiers can be resolved
+// by GeneratorID without changing HumanCheckOTPEmail.
+func (c *Commands) emailCodeVerifierFromConfig(_ context.Context, _ string) (senders.CodeGenerator, error) {
+	return nil, nil
 }
