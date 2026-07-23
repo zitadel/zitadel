@@ -239,6 +239,7 @@ Errors:
     LoginPolicy:
       NotFound: "Inloggningspolicyn hittades inte"
       Invalid: "Inloggningspolicyn är ogiltig"
+      NotChanged: "Inloggningspolicyn har inte ändrats"
       RedirectURIInvalid: "Standard-Redirect URI är ogiltig"
       NotExisting: "Inloggningspolicyn finns inte"
       AlreadyExists: "Inloggningspolicyn finns redan"
@@ -535,6 +536,7 @@ Errors:
     TokenCreationFailed: "Token-skapande misslyckades"
     InvalidToken: "Avsiktstoken är ogiltig"
     OtherUser: "Avsikten är avsedd för en annan användare"
+    Invalid: "Avsikten är ogiltig"
   AuthRequest:
     AlreadyExists: "Autentiseringsbegäran finns redan"
     NotExisting: "Autentiseringsbegäran existerar inte"
@@ -741,6 +743,8 @@ EventTypes:
       externalidp:
         added: "Extern IDP tillagd"
         removed: "Extern IDP borttagen"
+        username:
+          changed: "Användarnamn för extern IDP ändrades"
         cascade:
           removed: "Extern IDP kaskadborttagen"
         id:

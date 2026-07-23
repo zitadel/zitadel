@@ -242,6 +242,7 @@ Errors:
     LoginPolicy:
       NotFound: "Login Policy not found"
       Invalid: "Login Policy is invalid"
+      NotChanged: "Login Policy not changed"
       RedirectURIInvalid: "Default Redirect URI is invalid"
       NotExisting: "Login Policy not existing"
       AlreadyExists: "Login Policy already exists"
@@ -540,6 +541,7 @@ Errors:
     TokenCreationFailed: "Token creation failed"
     InvalidToken: "Intent Token is invalid"
     OtherUser: "Intent meant for another user"
+    Invalid: "Intent is invalid"
   AuthRequest:
     AlreadyExists: "Auth Request already exists"
     NotExisting: "Auth Request does not exist"
@@ -746,6 +748,8 @@ EventTypes:
       externalidp:
         added: "External IDP added"
         removed: "External IDP removed"
+        username:
+          changed: "External IDP username changed"
         cascade:
           removed: "External IDP cascade removed"
         id:
