@@ -37,4 +37,10 @@ describe("RegisterFormIDPIncomplete", () => {
     const { getByTestId } = render(<RegisterFormIDPIncomplete {...defaultProps} idpUserName="existing-user" />);
     expect(getByTestId("firstname-text-input")).toHaveFocus();
   });
+
+  test("should set standard name autofill tokens on the name inputs", () => {
+    const { getByTestId } = render(<RegisterFormIDPIncomplete {...defaultProps} idpUserName="existing-user" />);
+    expect(getByTestId("firstname-text-input")).toHaveAttribute("autocomplete", "given-name");
+    expect(getByTestId("lastname-text-input")).toHaveAttribute("autocomplete", "family-name");
+  });
 });

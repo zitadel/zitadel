@@ -210,6 +210,8 @@ export function SetPasswordForm({
               />
             </div>
           )}
+          {loginName && <input type="hidden" name="loginName" autoComplete="username" value={loginName} />}
+
           <div>
             <TextInput
               type="password"
