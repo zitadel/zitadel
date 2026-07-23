@@ -31,27 +31,27 @@ Note that the resources will be migrated without the event stream. This means th
 
 ## Authorization
 
-You need a PAT from a service account with instance Owner permissions in both the source and target system.
+You need a PAT from a service account in both the source and target systems. The source system is used only for the read-only export call, so it needs the read-only "Instance Owner Viewer" role, while the target system writes data on import and needs the "Instance Owner" role.
 
 ### Source system
 
 1. Go to your default organization
-2. Create a service account "import_user" with Access Token Type "Bearer"
+2. Create a service account "export_user" with Access Token Type "Bearer"
 3. Create a [personal access token](/guides/integrate/service-accounts/personal-access-token)
 4. Go to the Default settings
-5. Add the import_user as [manager](/guides/manage/console/administrators) with the role "instance Owner"
+5. Add the export_user as [administrator](/guides/manage/console/administrators) with the role "Instance Owner Viewer"
 
 Save the PAT to the environment variable `PAT_EXPORT_TOKEN` and the source domain as `ZITADEL_EXPORT_DOMAIN` to run the following scripts.
 
 ### Target system
 
 1. Go to your default organization
-2. Create a service account "export_user" with Access Token Type "Bearer"
+2. Create a service account "import_user" with Access Token Type "Bearer"
 3. Create a [personal access token](/guides/integrate/service-accounts/personal-access-token)
 4. Go to the Default settings
-5. Add the export_user as [manager](/guides/manage/console/administrators) with the role "instance Owner"
+5. Add the import_user as [administrator](/guides/manage/console/administrators) with the role "Instance Owner"
 
-Save the PAT to the environment variable `PAT_IMPORT_TOKEN` and the source domain as `ZITADEL_IMPORT_DOMAIN` to run the following scripts.
+Save the PAT to the environment variable `PAT_IMPORT_TOKEN` and the target domain as `ZITADEL_IMPORT_DOMAIN` to run the following scripts.
 
 <Callout title="Clean-up">
 You should let the PAT expire as soon as possible.
