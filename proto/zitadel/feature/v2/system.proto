@@ -81,6 +81,19 @@ message SetSystemFeaturesRequest{
     }
   ];
 
+  optional bool oidc_dynamic_client_registration = 14 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled, the OAuth 2.0 Dynamic Client Registration endpoint (RFC 7591) is served under /oauth/v2/register and advertised as registration_endpoint in the discovery document. The endpoint stays disabled by default.";
+    }
+  ];
+
+  optional bool oidc_client_id_metadata_document = 15 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled, a client_id that is an HTTPS URL is resolved as a Client ID Metadata Document (CIMD): the document is fetched, validated and the client is treated as an ephemeral public client without a database entry. The feature is advertised as client_id_metadata_document_supported in the discovery document and stays disabled by default.";
+    }
+  ];
 }
 
 message SetSystemFeaturesResponse {
@@ -160,6 +173,20 @@ message GetSystemFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "If this is enabled Zitadel will use the relational tables instead of the projections as the main source to store the data. Regardless of the flag state, both the relational table and the projections are kept up to date. Currently the flag has no effect.";
+    }
+  ];
+
+  FeatureFlag oidc_dynamic_client_registration = 15 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled, the OAuth 2.0 Dynamic Client Registration endpoint (RFC 7591) is served under /oauth/v2/register and advertised as registration_endpoint in the discovery document. The endpoint stays disabled by default.";
+    }
+  ];
+
+  FeatureFlag oidc_client_id_metadata_document = 16 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled, a client_id that is an HTTPS URL is resolved as a Client ID Metadata Document (CIMD): the document is fetched, validated and the client is treated as an ephemeral public client without a database entry. The feature is advertised as client_id_metadata_document_supported in the discovery document and stays disabled by default.";
     }
   ];
 }

@@ -1,0 +1,90 @@
+---
+title: Client ID Metadata Document
+description: "Let clients use an HTTPS URL that serves their metadata as their client_id, without registering ahead of time, for example for Model Context Protocol (MCP) clients."
+sidebar_label: Client ID Metadata Document
+---
+
+A Client ID Metadata Document (CIMD) lets a client use an HTTPS URL as its `client_id`. The URL serves a document of
+client metadata, in the same shape as an [RFC 7591](https://datatracker.ietf.org/doc/html/rfc7591) registration request.
+When a client authorizes with such a `client_id`, ZITADEL fetches the document, validates it and treats the client as an
+ephemeral public client, without creating any database entry.
+
+This is the stateless counterpart to [Dynamic Client Registration](/guides/integrate/dynamic-client-registration): there
+is nothing to register and nothing to clean up, which makes it well suited to ecosystems with many short-lived clients
+such as [Model Context Protocol (MCP)](https://modelcontextprotocol.io).
+
+<Callout type="warn">
+Client ID Metadata Documents are disabled by default and are currently behind a feature flag. ZITADEL fetches the
+document from a URL the client controls, so only enable it once you understand the security model described below.
+</Callout>
+
+## Enable the feature
+
+A `client_id` that is an HTTPS URL is only resolved as a metadata document when the `oidc_client_id_metadata_document`
+instance feature is enabled. This is a separate flag from
+[`oidc_dynamic_client_registration`](/guides/integrate/dynamic-client-registration#enable-the-feature), because fetching
+client-controlled URLs has a different security profile and must be enabled deliberately.
+
+Enable it through the [feature API](/apis/resources/feature_service_v2/feature-service-set-instance-features):
+
+```bash
+curl --request PUT \
+  --url ${CUSTOM_DOMAIN}/v2/features/instance \
+  --header 'Authorization: Bearer <token of an IAM_OWNER>' \
+  --header 'Content-Type: application/json' \
+  --data '{ "oidcClientIdMetadataDocument": true }'
+```
+
+When enabled, the [discovery document](/apis/openidoauth/endpoints#openid-connect-1-0-discovery) advertises
+`client_id_metadata_document_supported: true`.
+
+<Callout type="info">
+CIMD clients always use the v2 login, so the instance must have a v2 login configured
+(`OIDC.DefaultLoginURLV2`, or a per-client login base URI). Without it the authorization request
+cannot be routed to a login UI.
+</Callout>
+
+## Document format
+
+Serve a JSON document at the URL you want to use as the `client_id`. It uses the same members as a
+[Dynamic Client Registration request](/guides/integrate/dynamic-client-registration#supported-metadata):
+
+```json
+{
+  "client_name": "My MCP Client",
+  "redirect_uris": ["https://client.example.com/callback"],
+  "grant_types": ["authorization_code", "refresh_token"],
+  "response_types": ["code"],
+  "token_endpoint_auth_method": "none"
+}
+```
+
+A client then starts an [authorization code flow](/guides/integrate/login/oidc/login-users) with the document URL as its
+`client_id`, for example `https://client.example.com/oauth/metadata`. Because the resolved client is public, it must use
+[PKCE](https://datatracker.ietf.org/doc/html/rfc7636).
+
+## Security model
+
+The document is fetched and validated on every cache miss. The validation is strict, because the document is served by a
+host the client controls:
+
+- **HTTPS only.** The `client_id` must be an absolute `https` URL. Plain `http` URLs are treated as regular client ids
+  and are not resolved as documents.
+- **Origin match.** Every `redirect_uri` must share the exact origin (scheme, host and port) of the `client_id` URL. A
+  document can therefore only authorize redirects back to the host that serves it. Redirect URIs with a different origin
+  are dropped; if none remain the request is rejected with `invalid_client`.
+- **Public clients only.** `token_endpoint_auth_method` must be `none` (or omitted). A confidential method is rejected,
+  as a public URL cannot safely be tied to a client secret. The `jwks` and `jwks_uri` members are rejected as well.
+- **SSRF protection.** The document is fetched through ZITADEL's hardened HTTP client. Its operator denylist blocks
+  loopback, private, link-local and cloud-metadata addresses at dial time (see `HTTPClient.DenyList`), the fetch uses a
+  short timeout and the response body is bounded.
+- **Caching.** A resolved document is cached per instance, honoring its `Cache-Control` and `Expires` headers up to a
+  capped maximum. A `no-store` or `no-cache` response is never cached.
+
+Resolved clients have no project, no client secret and never run in dev mode, so no redirect URI wildcards are allowed.
+
+## Limitations
+
+- Software statements (a signed JWT of the metadata) are not yet validated.
+- Free-form metadata such as `logo_uri`, `client_uri` or `contacts` is accepted but not persisted.
+- Resolved clients use the v2 login.

@@ -22,6 +22,8 @@ type InstanceFeatures struct {
 	PermissionCheckV2              *bool
 	ManagementConsoleUseV2UserApi  *bool `mapstructure:"ConsoleUseV2UserApi"` // for backwards compatibility we need to change this back to the old config name
 	EnableRelationalTables         *bool
+	OIDCDynamicClientRegistration  *bool
+	OIDCClientIDMetadataDocument   *bool
 }
 
 func (m *InstanceFeatures) isEmpty() bool {
@@ -34,7 +36,9 @@ func (m *InstanceFeatures) isEmpty() bool {
 		m.LoginV2 == nil &&
 		m.PermissionCheckV2 == nil &&
 		m.ManagementConsoleUseV2UserApi == nil &&
-		m.EnableRelationalTables == nil)
+		m.EnableRelationalTables == nil &&
+		m.OIDCDynamicClientRegistration == nil &&
+		m.OIDCClientIDMetadataDocument == nil)
 }
 
 func (c *Commands) SetInstanceFeatures(ctx context.Context, f *InstanceFeatures) (*domain.ObjectDetails, error) {

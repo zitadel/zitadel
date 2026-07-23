@@ -110,6 +110,24 @@ func Test_reduceInstanceFeature(t *testing.T) {
 			},
 			expected: &InstanceFeatures{EnableRelationalTables: gu.Ptr(true)},
 		},
+		{
+			name: "oidc dynamic client registration",
+			args: args{
+				features: &InstanceFeatures{},
+				key:      feature.KeyOIDCDynamicClientRegistration,
+				value:    true,
+			},
+			expected: &InstanceFeatures{OIDCDynamicClientRegistration: gu.Ptr(true)},
+		},
+		{
+			name: "oidc client id metadata document",
+			args: args{
+				features: &InstanceFeatures{},
+				key:      feature.KeyOIDCClientIDMetadataDocument,
+				value:    true,
+			},
+			expected: &InstanceFeatures{OIDCClientIDMetadataDocument: gu.Ptr(true)},
+		},
 	}
 
 	for _, tc := range tt {

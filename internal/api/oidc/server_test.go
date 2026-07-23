@@ -8,6 +8,9 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/feature"
 )
 
 func TestServer_createDiscoveryConfig(t *testing.T) {
@@ -118,6 +121,45 @@ func TestServer_createDiscoveryConfig(t *testing.T) {
 				signingKeyAlgorithm: tt.fields.signingKeyAlgorithm,
 			}
 			assert.Equalf(t, tt.want, s.createDiscoveryConfig(tt.args.ctx, tt.args.supportedUILocales), "createDiscoveryConfig(%v)", tt.args.ctx)
+		})
+	}
+}
+
+func TestServer_createDiscoveryConfig_registrationEndpoint(t *testing.T) {
+	s := &Server{
+		LegacyServer: op.NewLegacyServer(
+			func() *op.Provider {
+				//nolint:staticcheck
+				provider, _ := op.NewForwardedOpenIDProvider("path", &op.Config{}, nil)
+				return provider
+			}(),
+			op.Endpoints{Authorization: op.NewEndpoint("auth")},
+		),
+		registrationEndpoint: op.NewEndpoint("register"),
+	}
+	tests := []struct {
+		name string
+		ctx  context.Context
+		want string
+	}{
+		{
+			name: "feature disabled, endpoint not advertised",
+			ctx:  op.ContextWithIssuer(context.Background(), "https://issuer.com"),
+			want: "",
+		},
+		{
+			name: "feature enabled, endpoint advertised",
+			ctx: op.ContextWithIssuer(
+				authz.WithFeatures(context.Background(), feature.Features{OIDCDynamicClientRegistration: true}),
+				"https://issuer.com",
+			),
+			want: "https://issuer.com/register",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := s.createDiscoveryConfig(tt.ctx, nil)
+			assert.Equal(t, tt.want, got.RegistrationEndpoint)
 		})
 	}
 }
