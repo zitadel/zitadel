@@ -405,6 +405,8 @@
       "couldNotVerifyInvite": "Kon uitnodiging niet verifiëren",
       "couldNotVerifyEmail": "Kon e-mail niet verifiëren",
       "couldNotVerify": "Kon niet verifiëren",
+      "couldNotVerifyTOTP": "Kon de code niet verifiëren",
+      "invalidCode": "De code is ongeldig. Probeer het opnieuw.",
       "couldNotLoadUser": "Kon gebruiker niet laden",
       "couldNotLoadAuthenticators": "Kon mogelijke authenticators niet laden",
       "couldNotCreateSession": "Kon sessie niet aanmaken",

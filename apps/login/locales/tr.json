@@ -405,6 +405,8 @@
       "couldNotVerifyInvite": "Davet doğrulanamadı",
       "couldNotVerifyEmail": "E-posta doğrulanamadı",
       "couldNotVerify": "Doğrulanamadı",
+      "couldNotVerifyTOTP": "Kod doğrulanamadı",
+      "invalidCode": "Kod geçersiz. Lütfen tekrar deneyin.",
       "couldNotLoadUser": "Kullanıcı yüklenemedi",
       "couldNotLoadAuthenticators": "Olası kimlik doğrulayıcılar yüklenemedi",
       "couldNotCreateSession": "Oturum oluşturulamadı",
