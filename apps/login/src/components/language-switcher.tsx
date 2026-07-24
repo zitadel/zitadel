@@ -9,6 +9,7 @@ import clsx from "clsx";
 import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useLanguages } from "./languages-context";
 
 // Helper function to get language switcher roundness from theme
 function getLanguageSwitcherRoundness(): string {
@@ -22,14 +23,17 @@ function getLanguageSwitcherCardAppearance(): string {
   return appearance?.card || "bg-black/5 dark:bg-white/5"; // Fallback to current styling
 }
 
-export function LanguageSwitcher({ languages }: { languages: Lang[] }) {
+export function LanguageSwitcher({ languages: languagesProp }: { languages?: Lang[] }) {
+  const contextLanguages = useLanguages();
+  const languages = languagesProp ?? contextLanguages;
   const currentLocale = useLocale();
+  const [selected, setSelected] = useState(languages.find((l) => l.code === currentLocale) || languages[0]);
+  const router = useRouter();
+
+  if (!languages.length) return null;
+
   const switcherRoundness = getLanguageSwitcherRoundness();
   const cardAppearance = getLanguageSwitcherCardAppearance();
-
-  const [selected, setSelected] = useState(languages.find((l) => l.code === currentLocale) || languages[0]);
-
-  const router = useRouter();
 
   const handleChange = async (language: Lang) => {
     setSelected(language);
