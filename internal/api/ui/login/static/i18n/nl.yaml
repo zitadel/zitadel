@@ -270,6 +270,7 @@ RegistrationUser:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: Vietnamees
   GenderLabel: Geslacht
   Female: Vrouw
   Male: Man
@@ -284,7 +285,6 @@ RegistrationUser:
   ExternalLogin: of registreer met een externe gebruiker
   BackButtonText: Inloggen
   NextButtonText: Volgende
-
 ExternalRegistrationUserOverview:
   Title: Externe Gebruiker Registratie
   Description: We hebben uw gebruikersgegevens van de geselecteerde provider overgenomen. U kunt ze nu wijzigen of aanvullen.
@@ -317,6 +317,7 @@ ExternalRegistrationUserOverview:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: Vietnamees
   TosAndPrivacyLabel: Algemene voorwaarden
   TosConfirm: Ik accepteer de
   TosLinkText: AV
@@ -325,7 +326,6 @@ ExternalRegistrationUserOverview:
   ExternalLogin: of registreer met een externe gebruiker
   BackButtonText: Terug
   NextButtonText: Opslaan
-
 RegistrationOrg:
   Title: Organisatie Registratie
   Description: Voer uw organisatienaam en gebruikersgegevens in.
@@ -398,6 +398,7 @@ ExternalNotFound:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: Vietnamees
 DeviceAuth:
   Title: Apparaat Autorisatie
   UserCode:

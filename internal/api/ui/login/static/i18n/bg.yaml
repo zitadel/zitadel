@@ -266,6 +266,7 @@ RegistrationUser:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: виетнамски
   GenderLabel: Пол
   Female: Женски пол
   Male: Мъжки
@@ -387,6 +388,7 @@ ExternalNotFound:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: виетнамски
 DeviceAuth:
   Title: Упълномощаване на устройството
   UserCode:

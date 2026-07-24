@@ -270,6 +270,7 @@ RegistrationUser:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: виетнамски
   GenderLabel: Пол
   Female: Женски
   Male: Машки
@@ -284,7 +285,6 @@ RegistrationUser:
   ExternalLogin: или регистрирајте се со надворешен корисник
   BackButtonText: најава
   NextButtonText: следно
-
 ExternalRegistrationUserOverview:
   Title: Регистрација на надворешен корисник
   Description: Ги преземаме вашите податоци за корисник од избраниот провајдер. Сега можете да ги промените или дополните.
@@ -317,6 +317,7 @@ ExternalRegistrationUserOverview:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: виетнамски
   TosAndPrivacyLabel: Правила и услови
   TosConfirm: Се согласувам со
   TosLinkText: правилата за користење
@@ -325,7 +326,6 @@ ExternalRegistrationUserOverview:
   ExternalLogin: или регистрирајте се со надворешен корисник
   BackButtonText: назад
   NextButtonText: зачувај
-
 RegistrationOrg:
   Title: Регистрација на организација
   Description: Внесете го името и податоците на вашата организација.
@@ -398,7 +398,7 @@ ExternalNotFound:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
-
+  Vietnamese: виетнамски
 DeviceAuth:
   Title: Овластување преку уред
   UserCode:

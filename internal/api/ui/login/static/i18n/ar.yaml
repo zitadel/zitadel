@@ -268,6 +268,7 @@ RegistrationUser:
   Romanian: Română
   Turkish: Türkçe
   Arabic: العربية
+  Vietnamese: الفيتنامية
   GenderLabel: الجنس
   Female: أنثى
   Male: ذكر
@@ -282,7 +283,6 @@ RegistrationUser:
   ExternalLogin: أو سجل بمستخدم خارجي
   BackButtonText: تسجيل الدخول
   NextButtonText: التالي
-
 ExternalRegistrationUserOverview:
   Title: تسجيل مستخدم خارجي
   Description: لقد أخذنا تفاصيل المستخدم الخاصة بك من المزود المحدد. يمكنك الآن تغييرها أو إكمالها.
@@ -314,6 +314,7 @@ ExternalRegistrationUserOverview:
   Romanian: Română
   Turkish: Türkçe
   Arabic: العربية
+  Vietnamese: الفيتنامية
   TosAndPrivacyLabel: الشروط والأحكام
   TosConfirm: أنا أقبل
   TosLinkText: شروط الخدمة
@@ -322,7 +323,6 @@ ExternalRegistrationUserOverview:
   ExternalLogin: أو سجل بمستخدم خارجي
   BackButtonText: رجوع
   NextButtonText: حفظ
-
 RegistrationOrg:
   Title: تسجيل المنظمة
   Description: أدخل اسم المنظمة وبيانات المستخدم.
@@ -394,6 +394,7 @@ ExternalNotFound:
   Romanian: Română
   Turkish: Türkçe
   Arabic: العربية
+  Vietnamese: الفيتنامية
 DeviceAuth:
   Title: تفويض الجهاز
   UserCode:
