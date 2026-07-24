@@ -95,9 +95,9 @@ const gotoLoginname = ({
   const loginNameUrl = constructUrl(request, "/loginname");
   loginNameUrl.searchParams.set("requestId", requestId);
 
+  // Prefill only, no auto-submit: see resolveLoginHint.
   if (loginHint) {
     loginNameUrl.searchParams.set("loginName", loginHint);
-    loginNameUrl.searchParams.set("submit", "true");
   }
   if (organization) {
     loginNameUrl.searchParams.set("organization", organization);
@@ -107,6 +107,46 @@ const gotoLoginname = ({
   }
 
   return NextResponse.redirect(loginNameUrl);
+};
+
+/**
+ * Resolve a login_hint server-side to a redirect straight to the next step
+ * (e.g. /password), skipping the /loginname screen entirely. Returns null when
+ * the hint can't be resolved (unknown/ambiguous user, transient error), in
+ * which case callers fall back to the prefilled /loginname screen.
+ */
+const resolveLoginHint = async ({
+  request,
+  requestId,
+  loginHint,
+  organization,
+}: {
+  request: NextRequest;
+  requestId: string;
+  loginHint: string;
+  organization?: string;
+}): Promise<NextResponse<unknown> | null> => {
+  try {
+    let command: SendLoginnameCommand = {
+      loginName: loginHint,
+      requestId,
+    };
+
+    if (organization) {
+      command = { ...command, organization };
+    }
+
+    const res = await sendLoginname(command);
+
+    if (res && "redirect" in res && res.redirect) {
+      const absoluteUrl = constructUrl(request, res.redirect);
+      return NextResponse.redirect(absoluteUrl.toString());
+    }
+  } catch (error) {
+    logger.error("Failed to resolve login_hint via sendLoginname:", { error });
+  }
+
+  return null;
 };
 
 /**
@@ -291,24 +331,15 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       });
     } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
       if (authRequest.loginHint) {
-        try {
-          let command: SendLoginnameCommand = {
-            loginName: authRequest.loginHint,
-            requestId: requestId,
-          };
+        const hintResponse = await resolveLoginHint({
+          request,
+          requestId,
+          loginHint: authRequest.loginHint,
+          organization,
+        });
 
-          if (organization) {
-            command = { ...command, organization };
-          }
-
-          const res = await sendLoginname(command);
-
-          if (res && "redirect" in res && res?.redirect) {
-            const absoluteUrl = constructUrl(request, res.redirect);
-            return NextResponse.redirect(absoluteUrl.toString());
-          }
-        } catch (error) {
-          logger.error("Failed to execute sendLoginname:", { error });
+        if (hintResponse) {
+          return hintResponse;
         }
       }
 
@@ -376,9 +407,23 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       let selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
 
       if (!selectedSession || !selectedSession.id) {
-        // If no sessions are eligible for this organization, go directly to
-        // loginname instead of showing an empty accounts page.
-        if (eligibleSessions.length === 0) {
+        // login_hint matches no session: resolve it straight to the next step.
+        if (authRequest.loginHint) {
+          const hintResponse = await resolveLoginHint({
+            request,
+            requestId,
+            loginHint: authRequest.loginHint,
+            organization,
+          });
+
+          if (hintResponse) {
+            return hintResponse;
+          }
+        }
+
+        // Prefill loginname (not the account picker) for an unresolved hint or when
+        // no session is eligible: the picker would only list non-matching accounts.
+        if (authRequest.loginHint || eligibleSessions.length === 0) {
           return gotoLoginname({
             request,
             requestId,
@@ -448,12 +493,26 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       }
     }
   } else {
+    // No session: resolve a login_hint straight to the next step if we can.
+    if (authRequest?.loginHint) {
+      const hintResponse = await resolveLoginHint({
+        request,
+        requestId,
+        loginHint: authRequest.loginHint,
+        organization,
+      });
+
+      if (hintResponse) {
+        return hintResponse;
+      }
+    }
+
     const loginNameUrl = constructUrl(request, "/loginname");
     loginNameUrl.searchParams.set("requestId", requestId);
 
+    // Prefill only, no auto-submit: see resolveLoginHint.
     if (authRequest?.loginHint) {
       loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
-      loginNameUrl.searchParams.set("submit", "true");
     }
 
     if (organization) {
