@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { glob } from 'glob';
-import { join, dirname, resolve } from 'path';
+import { join, dirname, resolve, basename } from 'path';
 import { spawn, spawnSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
@@ -15,8 +15,8 @@ const PNPM_COMMAND = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
 
 async function run() {
   if (!fs.existsSync(VERSIONS_FILE)) {
-      console.error('versions.json not found. Run fetch-docs.mjs first.');
-      process.exit(1);
+    console.error('versions.json not found. Run fetch-docs.mjs first.');
+    process.exit(1);
   }
 
   const versions = JSON.parse(fs.readFileSync(VERSIONS_FILE, 'utf8'));
@@ -50,7 +50,7 @@ async function run() {
 
     return run;
   };
-  
+
   const limit = pLimit(2);
 
   await Promise.all(versions.map(v => limit(async () => {
@@ -58,138 +58,171 @@ async function run() {
 
     const label = v.param;
     const outputPath = resolve(join(OPENAPI_DIR, label));
-      
+
     console.log(`\n--- Generating OpenAPI specs for ${label} ---`);
-      
+
     fs.rmSync(outputPath, { recursive: true, force: true });
     fs.mkdirSync(outputPath, { recursive: true });
 
     // Determine buf input based on refType
     let bufInput;
     if (v.refType === 'local') {
-        // Point to local proto directory (repo root/proto)
-        bufInput = PROTO_DIR; 
+      // Point to local proto directory (repo root/proto)
+      bufInput = PROTO_DIR;
     } else {
-        const refPart = v.refType === 'branch' ? `branch=${v.ref}` : `tag=${v.ref}`;
-        bufInput = `${REPO_URL}#${refPart},subdir=proto`;
+      const refPart = v.refType === 'branch' ? `branch=${v.ref}` : `tag=${v.ref}`;
+      bufInput = `${REPO_URL}#${refPart},subdir=proto`;
     }
-      
+
     console.log(`Using input for ${label}: ${bufInput}`);
 
 
     // Use spawn (async) instead of spawnSync to avoid blocking the event loop
     // eslint-disable-next-line no-async-promise-executor
     await new Promise(async (resolvePromise, rejectPromise) => {
-        // Dynamic discovery of excluded paths
-        const getExcludedPaths = async () => {
-             const patterns = ['**/v3alpha', '**/v2beta'];
-             const excluded = new Set();
-             
-             if (v.refType === 'local') {
-                 // For local, use glob against PROTO_DIR
-                 // patterns are relative to PROTO_DIR, but glob needs to search inside PROTO_DIR
-                 // The result of glob will be paths relative to PROTO_DIR if cwd is PROTO_DIR
-                 try {
-                    const files = await glob(patterns, { cwd: PROTO_DIR, nodir: false });
-                    // We only want directories that contain v3alpha, or files?
-                    // buf --exclude-path expects directories or files.
-                    // If we found directories ending in v3alpha, usage is fine.
-                    // glob '**/v3alpha' matches directories or files ending in v3alpha.
-                    // Ensure we pass absolute paths for local input to avoid CWD resolution issues
-                    files.forEach(f => excluded.add(resolve(PROTO_DIR, f)));
-                 } catch (e) {
-                     console.warn('Failed to glob excluded paths locally', e);
-                 }
-             } else {
-                 // For remote (tag/branch), use git ls-tree
-                 // We need to run git ls-tree -r <ref> --name-only
-                 // and filter for lines matching /v3alpha/
-                 // We run this in ROOT_DIR (where .git presumably is available via parent)
-                 // The paths returned by git ls-tree are relative to repo root.
-                 // buf input is relative to 'proto' subdir.
-                 // So we need to strip 'proto/' prefix.
-                 try {
-                     const ref = v.ref;
-                     const gitCmd = spawnSync('git', ['ls-tree', '-r', '--name-only', ref], { cwd: ROOT_DIR, encoding: 'utf-8' });
-                     if (gitCmd.error) throw gitCmd.error;
-                     const files = gitCmd.stdout.split('\n');
-                     files.forEach(f => {
-                         if ((f.includes('v3alpha') || f.includes('v2beta')) && f.startsWith('proto/')) {
-                             // strip 'proto/' (6 chars) and take the directory
-                             const relPath = f.substring(6);
-                             const dirPath = dirname(relPath);
-                             if (dirPath.includes('v3alpha') || dirPath.includes('v2beta')) {
-                                excluded.add(dirPath);
-                             } else {
-                                excluded.add(relPath);
-                             }
-                         }
-                     });
-                 } catch (e) {
-                     console.warn(`Failed to list tree for ${v.param}`, e);
-                 }
-             }
-             return Array.from(excluded);
-        };
+      // Dynamic discovery of excluded paths
+      const getExcludedPaths = async () => {
+        const patterns = ['**/v3alpha', '**/v2beta'];
+        const excluded = new Set();
 
-        const excludedPaths = await getExcludedPaths();
-        if (excludedPaths.length > 0) {
-            console.log(`Excluding ${excludedPaths.length} paths matching v3alpha or v2beta`);
-        }
-
-        const args = [
-          'exec', 'buf', 'generate',
-          bufInput,
-          '--template', templatePath,
-          '--output', outputPath
-        ];
-
-        // Add excluded paths
-        for (const excludedPath of excludedPaths) {
-          args.push('--exclude-path', excludedPath);
-        }
-
-        // Run from the workspace root so pnpm resolves the repo-pinned Buf binary.
-        const child = spawn(PNPM_COMMAND, args, {
-          cwd: WORKSPACE_ROOT,
-          stdio: 'inherit',
-          env: process.env
-        });
-
-        child.on('close', (code, signal) => {
-          if (code !== 0) {
-            let reason;
-            if (code === null && signal) {
-              reason = `terminated by signal ${signal}`;
-            } else if (typeof code === 'number') {
-              reason = `exit code ${code}`;
-            } else {
-              reason = 'process terminated for an unknown reason';
-            }
-
-            rejectPromise(new Error(`Failed to generate OpenAPI for ${label} (${reason})`));
-          } else {
-            console.log(`Successfully generated OpenAPI for ${label}`);
-                
-            // Post-generation cleanup: delete any missed v2beta/v3alpha files
-            try {
-              const generatedFiles = glob.sync('**/*', { cwd: outputPath, absolute: true, nodir: false });
-              generatedFiles.forEach(f => {
-                if (f.includes('v2beta') || f.includes('v3alpha')) {
-                  fs.rmSync(f, { recursive: true, force: true });
-                }
-              });
-            } catch (e) {
-              console.warn(`Failed to clean up OpenAPI specs for ${label}`, e);
-            }
-                
-            resolvePromise();
+        if (v.refType === 'local') {
+          // For local, use glob against PROTO_DIR
+          // patterns are relative to PROTO_DIR, but glob needs to search inside PROTO_DIR
+          // The result of glob will be paths relative to PROTO_DIR if cwd is PROTO_DIR
+          try {
+            const files = await glob(patterns, { cwd: PROTO_DIR, nodir: false });
+            // We only want directories that contain v3alpha, or files?
+            // buf --exclude-path expects directories or files.
+            // If we found directories ending in v3alpha, usage is fine.
+            // glob '**/v3alpha' matches directories or files ending in v3alpha.
+            // Ensure we pass absolute paths for local input to avoid CWD resolution issues
+            files.forEach(f => excluded.add(resolve(PROTO_DIR, f)));
+          } catch (e) {
+            console.warn('Failed to glob excluded paths locally', e);
           }
-        });
-          
-        child.on('error', (err) => {
-          rejectPromise(err);
-        });
+        } else {
+          // For remote (tag/branch), use git ls-tree
+          // We need to run git ls-tree -r <ref> --name-only
+          // and filter for lines matching /v3alpha/
+          // We run this in ROOT_DIR (where .git presumably is available via parent)
+          // The paths returned by git ls-tree are relative to repo root.
+          // buf input is relative to 'proto' subdir.
+          // So we need to strip 'proto/' prefix.
+          try {
+            const ref = v.ref;
+            const gitCmd = spawnSync('git', ['ls-tree', '-r', '--name-only', ref], { cwd: ROOT_DIR, encoding: 'utf-8' });
+            if (gitCmd.error) throw gitCmd.error;
+            const files = gitCmd.stdout.split('\n');
+            files.forEach(f => {
+              if ((f.includes('v3alpha') || f.includes('v2beta')) && f.startsWith('proto/')) {
+                // strip 'proto/' (6 chars) and take the directory
+                const relPath = f.substring(6);
+                const dirPath = dirname(relPath);
+                if (dirPath.includes('v3alpha') || dirPath.includes('v2beta')) {
+                  excluded.add(dirPath);
+                } else {
+                  excluded.add(relPath);
+                }
+              }
+            });
+          } catch (e) {
+            console.warn(`Failed to list tree for ${v.param}`, e);
+          }
+        }
+        return Array.from(excluded);
+      };
+
+      const excludedPaths = await getExcludedPaths();
+      if (excludedPaths.length > 0) {
+        console.log(`Excluding ${excludedPaths.length} paths matching v3alpha or v2beta`);
+      }
+
+      const args = [
+        'exec', 'buf', 'generate',
+        bufInput,
+        '--template', templatePath,
+        '--output', outputPath
+      ];
+
+      // Add excluded paths
+      for (const excludedPath of excludedPaths) {
+        args.push('--exclude-path', excludedPath);
+      }
+
+      // Run from the workspace root so pnpm resolves the repo-pinned Buf binary.
+      const child = spawn(PNPM_COMMAND, args, {
+        cwd: WORKSPACE_ROOT,
+        stdio: 'inherit',
+        env: process.env
+      });
+
+      child.on('close', (code, signal) => {
+        if (code !== 0) {
+          let reason;
+          if (code === null && signal) {
+            reason = `terminated by signal ${signal}`;
+          } else if (typeof code === 'number') {
+            reason = `exit code ${code}`;
+          } else {
+            reason = 'process terminated for an unknown reason';
+          }
+
+          rejectPromise(new Error(`Failed to generate OpenAPI for ${label} (${reason})`));
+        } else {
+          console.log(`Successfully generated OpenAPI for ${label}`);
+
+          // Post-generation cleanup: delete any missed v2beta/v3alpha files
+          try {
+            const generatedFiles = glob.sync('**/*', { cwd: outputPath, absolute: true, nodir: false });
+            generatedFiles.forEach(f => {
+              if (f.includes('v2beta') || f.includes('v3alpha')) {
+                fs.rmSync(f, { recursive: true, force: true });
+              }
+            });
+          } catch (e) {
+            console.warn(`Failed to clean up OpenAPI specs for ${label}`, e);
+          }
+
+          // --- START: EXTRACT BASE PATHS FROM .PROTO FILES ---
+          try {
+            const basePaths = {};
+            if (v.refType === 'local') {
+              const protoFiles = glob.sync('**/*.proto', { cwd: PROTO_DIR, nodir: true });
+              for (const file of protoFiles) {
+                const content = fs.readFileSync(join(PROTO_DIR, file), 'utf8');
+                const match = content.match(/base_path:\s*"([^"]+)"/);
+                if (match) {
+                  basePaths[basename(file, '.proto')] = match[1];
+                }
+              }
+            } else {
+              // Extremely fast extraction directly from the git tree
+              const gitGrep = spawnSync('git', ['grep', '-E', 'base_path:', v.ref, '--', 'proto/'], { cwd: ROOT_DIR, encoding: 'utf-8' });
+              if (!gitGrep.error && gitGrep.stdout) {
+                const lines = gitGrep.stdout.split('\n');
+                for (const line of lines) {
+                  // Match format: ref:proto/.../admin.proto: base_path: "/admin/v1";
+                  const match = line.match(/\/([^/]+)\.proto:.*base_path:\s*"([^"]+)"/);
+                  if (match) {
+                    basePaths[match[1]] = match[2];
+                  }
+                }
+              }
+            }
+            // Save the map so the next script can apply it
+            fs.writeFileSync(join(outputPath, 'base_paths.json'), JSON.stringify(basePaths, null, 2));
+            console.log(`Extracted base paths from .proto files for ${label}`);
+          } catch (e) {
+            console.warn(`Failed to extract base paths for ${label}`, e);
+          }
+
+          resolvePromise();
+        }
+      });
+
+      child.on('error', (err) => {
+        rejectPromise(err);
+      });
     });
   })));
 }
