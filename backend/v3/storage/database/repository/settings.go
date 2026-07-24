@@ -1300,104 +1300,62 @@ func (s notificationSettings) Get(ctx context.Context, client database.QueryExec
 }
 
 // -------------------------------------------------------------
-// legal and support
+// links
 // -------------------------------------------------------------
-type legalAndSupportSettings struct {
+type linksSettings struct {
 	settings
 }
 
-func (s legalAndSupportSettings) SetSettingFields(value domain.LegalAndSupportSettingsAttributes) database.Change {
+func (s linksSettings) SetSettingFields(value domain.LinksSettingsAttributes) database.Change {
 	changes := make([]db_json.JsonUpdate, 0)
-	if value.TOSLink != nil {
-		changes = append(changes, s.SetTOSLink(*value.TOSLink))
-	}
-	if value.PrivacyPolicyLink != nil {
-		changes = append(changes, s.SetPrivacyPolicyLink(*value.PrivacyPolicyLink))
-	}
-	if value.HelpLink != nil {
-		changes = append(changes, s.SetHelpLink(*value.HelpLink))
-	}
-	if value.SupportEmail != nil {
-		changes = append(changes, s.SetSupportEmail(*value.SupportEmail))
-	}
-	if value.DocsLink != nil {
-		changes = append(changes, s.SetDocsLink(*value.DocsLink))
-	}
-	if value.CustomLink != nil {
-		changes = append(changes, s.SetCustomLink(*value.CustomLink))
-	}
-	if value.CustomLinkText != nil {
-		changes = append(changes, s.SetCustomLinkText(*value.CustomLinkText))
+	if value.Links != nil {
+		changes = append(changes, s.SetLinks(value.Links))
 	}
 	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
 }
 
-func (s legalAndSupportSettings) SetTOSLink(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"tosLink"}, value)
+func (s linksSettings) SetLinks(value []domain.Link) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"links"}, value)
 }
 
-func (s legalAndSupportSettings) SetPrivacyPolicyLink(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"privacyPolicyLink"}, value)
-}
-
-func (s legalAndSupportSettings) SetHelpLink(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"helpLink"}, value)
-}
-
-func (s legalAndSupportSettings) SetSupportEmail(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"supportEmail"}, value)
-}
-
-func (s legalAndSupportSettings) SetDocsLink(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"docsLink"}, value)
-}
-
-func (s legalAndSupportSettings) SetCustomLink(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"customLink"}, value)
-}
-
-func (s legalAndSupportSettings) SetCustomLinkText(value string) db_json.JsonUpdate {
-	return db_json.NewFieldChange([]string{"customLinkText"}, value)
-}
-
-func LegalAndSupportSettingsRepository() domain.LegalAndSupportSettingsRepository {
-	return &legalAndSupportSettings{
+func LinksSettingsRepository() domain.LinksSettingsRepository {
+	return &linksSettings{
 		settings{},
 	}
 }
 
-var _ domain.LegalAndSupportSettingsRepository = (*legalAndSupportSettings)(nil)
+var _ domain.LinksSettingsRepository = (*linksSettings)(nil)
 
-func (s legalAndSupportSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.LegalAndSupportSettings) (err error) {
+func (s linksSettings) Set(ctx context.Context, client database.QueryExecutor, settings *domain.LinksSettings) (err error) {
 	if settings == nil {
 		return database.ErrInvalidChangeTarget
 	}
 
-	settings.Type = domain.SettingTypeLegalAndSupport
+	settings.Type = domain.SettingTypeLinks
 	settings.State = domain.SettingStateActive
 
-	settingsJSON, err := json.Marshal(settings.LegalAndSupportSettingsAttributes)
+	settingsJSON, err := json.Marshal(settings.LinksSettingsAttributes)
 	if err != nil {
 		return err
 	}
 	settings.Settings.Settings = settingsJSON
-	if err := s.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.LegalAndSupportSettingsAttributes)); err != nil {
+	if err := s.set(ctx, client, &settings.Settings, s.SetSettingFields(settings.LinksSettingsAttributes)); err != nil {
 		return err
 	}
 	settings.Settings.Settings = nil
 	return nil
 }
 
-func (s legalAndSupportSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.LegalAndSupportSettings, error) {
+func (s linksSettings) List(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) ([]*domain.LinksSettings, error) {
 	settings, err := s.list(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	list := make([]*domain.LegalAndSupportSettings, len(settings))
+	list := make([]*domain.LinksSettings, len(settings))
 	for i := range settings {
-		list[i] = &domain.LegalAndSupportSettings{Settings: *settings[i]}
-		if err := json.Unmarshal(list[i].Settings.Settings, &list[i].LegalAndSupportSettingsAttributes); err != nil {
+		list[i] = &domain.LinksSettings{Settings: *settings[i]}
+		if err := json.Unmarshal(list[i].Settings.Settings, &list[i].LinksSettingsAttributes); err != nil {
 			return nil, err
 		}
 		list[i].Settings.Settings = nil
@@ -1405,14 +1363,14 @@ func (s legalAndSupportSettings) List(ctx context.Context, client database.Query
 	return list, nil
 }
 
-func (s legalAndSupportSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.LegalAndSupportSettings, error) {
+func (s linksSettings) Get(ctx context.Context, client database.QueryExecutor, opts ...database.QueryOption) (*domain.LinksSettings, error) {
 	settings, err := s.get(ctx, client, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	item := &domain.LegalAndSupportSettings{Settings: *settings}
-	if err = json.Unmarshal(item.Settings.Settings, &item.LegalAndSupportSettingsAttributes); err != nil {
+	item := &domain.LinksSettings{Settings: *settings}
+	if err = json.Unmarshal(item.Settings.Settings, &item.LinksSettingsAttributes); err != nil {
 		return nil, err
 	}
 	item.Settings.Settings = nil

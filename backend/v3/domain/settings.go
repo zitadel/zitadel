@@ -22,7 +22,7 @@ const (
 	SettingTypeSecurity
 	SettingTypeOrganization
 	SettingTypeNotification
-	SettingTypeLegalAndSupport
+	SettingTypeLinks
 	SettingTypeSecretGenerator
 )
 
@@ -408,37 +408,52 @@ type NotificationSettingsRepository interface {
 	notificationSettingsJSONChanges
 }
 
-type legalAndSupportSettingsJSONChanges interface {
-	SetSettingFields(value LegalAndSupportSettingsAttributes) database.Change
+type linksSettingsJSONChanges interface {
+	SetSettingFields(value LinksSettingsAttributes) database.Change
 
-	SetTOSLink(value string) db_json.JsonUpdate
-	SetPrivacyPolicyLink(value string) db_json.JsonUpdate
-	SetHelpLink(value string) db_json.JsonUpdate
-	SetSupportEmail(value string) db_json.JsonUpdate
-	SetDocsLink(value string) db_json.JsonUpdate
-	SetCustomLink(value string) db_json.JsonUpdate
-	SetCustomLinkText(value string) db_json.JsonUpdate
+	SetLinks(value []Link) db_json.JsonUpdate
 }
 
-type LegalAndSupportSettings struct {
+type LinksSettings struct {
 	Settings
-	LegalAndSupportSettingsAttributes
+	LinksSettingsAttributes
 }
 
-type LegalAndSupportSettingsAttributes struct {
-	TOSLink           *string `json:"tosLink,omitempty"`
-	PrivacyPolicyLink *string `json:"privacyPolicyLink,omitempty"`
-	HelpLink          *string `json:"helpLink,omitempty"`
-	SupportEmail      *string `json:"supportEmail,omitempty"`
-	DocsLink          *string `json:"docsLink,omitempty"`
-	CustomLink        *string `json:"customLink,omitempty"`
-	CustomLinkText    *string `json:"customLinkText,omitempty"`
+type LinksSettingsAttributes struct {
+	Links []Link `json:"links"`
 }
 
-//go:generate mockgen -typed -package domainmock -destination ./mock/legal_and_support_settings.mock.go . LegalAndSupportSettingsRepository
-type LegalAndSupportSettingsRepository interface {
-	settingsRepository[LegalAndSupportSettings]
-	legalAndSupportSettingsJSONChanges
+type LinkType int32
+
+const (
+	LinkTypeUnspecified LinkType = iota
+	LinkTypeTermsOfService
+	LinkTypePrivacyPolicy
+	LinkTypeHelp
+	LinkTypeSupport
+	LinkTypeDocs
+	LinkTypeCustom
+)
+
+type LinkTarget int32
+
+const (
+	LinkTargetUnspecified LinkTarget = iota
+	LinkTargetSelf
+	LinkTargetBlank
+)
+
+type Link struct {
+	Type           LinkType   `json:"type"`
+	URL            *string    `json:"url,omitempty"`
+	Target         LinkTarget `json:"target"`
+	TranslationKey *string    `json:"translationKey,omitempty"`
+}
+
+//go:generate mockgen -typed -package domainmock -destination ./mock/links_settings.mock.go . LinksSettingsRepository
+type LinksSettingsRepository interface {
+	settingsRepository[LinksSettings]
+	linksSettingsJSONChanges
 }
 
 type SecretGeneratorSettings struct {
