@@ -893,6 +893,13 @@ func (l *Login) grantSupportUserInstanceMembership(r *http.Request, provider *qu
 // supportUserInstanceMembershipRequired checks whether a newly created external user
 // must be granted the IAM_OWNER_VIEWER instance membership.
 func supportUserInstanceMembershipRequired(provider *query.IDPTemplate, externalUser *domain.ExternalUser) bool {
+	// instance-wide role grants may only originate from an instance-scoped IDP.
+	// An organization-scoped provider must never confer instance membership, even if
+	// its InstanceRolesInfo is somehow populated (e.g. stale data): honoring it would
+	// let an org owner escalate themselves to instance-level roles.
+	if provider.OwnerType != domain.IdentityProviderTypeSystem {
+		return false
+	}
 	// only a ZITADEL provider conveys support-user project roles
 	if provider.Type != domain.IDPTypeZitadel || provider.ZitadelIDPTemplate == nil {
 		return false

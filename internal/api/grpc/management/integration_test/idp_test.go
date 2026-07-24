@@ -109,7 +109,7 @@ func Test_AddZitadelProvider(t *testing.T) {
 			),
 		},
 		{
-			name: "missing org ID in instance roles info",
+			name: "valid request",
 			args: args{
 				ctx: OrgCTX,
 				req: &mgmt_pb.AddZitadelProviderRequest{
@@ -120,87 +120,6 @@ func Test_AddZitadelProvider(t *testing.T) {
 					Scopes:       []string{"email", "profile"},
 					ProviderOptions: &idp_pb.Options{
 						IsCreationAllowed: true,
-					},
-					InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-						{
-							OrganizationId: "",
-						},
-					},
-				},
-			},
-			wantErr: status.Error(
-				codes.InvalidArgument,
-				"invalid AddZitadelProviderRequest.InstanceRolesInfo[0]: embedded message failed validation | caused by: invalid InstanceRolesInfo.OrganizationId: value length must be between 1 and 200 runes, inclusive",
-			),
-		},
-		{
-			name: "missing org domain in instance roles info",
-			args: args{
-				ctx: OrgCTX,
-				req: &mgmt_pb.AddZitadelProviderRequest{
-					Name:         "Zitadel Support IdP",
-					Issuer:       "zitadel.example.com",
-					ClientId:     "test-client",
-					ClientSecret: "test-secret",
-					Scopes:       []string{"email", "profile"},
-					ProviderOptions: &idp_pb.Options{
-						IsCreationAllowed: true,
-					},
-					InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-						{
-							OrganizationId:     "org1",
-							OrganizationDomain: "org1.com",
-						},
-						{
-							OrganizationId: "org2",
-						},
-					},
-				},
-			},
-			wantErr: status.Error(
-				codes.InvalidArgument,
-				"invalid AddZitadelProviderRequest.InstanceRolesInfo[1]: embedded message failed validation | caused by: invalid InstanceRolesInfo.OrganizationDomain: value length must be between 1 and 200 runes, inclusive",
-			),
-		},
-		{
-			name: "valid request without instance roles info",
-			args: args{
-				ctx: OrgCTX,
-				req: &mgmt_pb.AddZitadelProviderRequest{
-					Name:         "Zitadel Support IdP",
-					Issuer:       "zitadel.example.com",
-					ClientId:     "test-client",
-					ClientSecret: "test-secret",
-					Scopes:       []string{"email", "profile"},
-					ProviderOptions: &idp_pb.Options{
-						IsCreationAllowed: true,
-					},
-				},
-			},
-			wantResponse: &mgmt_pb.AddZitadelProviderResponse{
-				Details: &object_pb.ObjectDetails{
-					ResourceOwner: Instance.DefaultOrg.Id,
-				},
-			},
-		},
-		{
-			name: "valid request with instance roles info",
-			args: args{
-				ctx: OrgCTX,
-				req: &mgmt_pb.AddZitadelProviderRequest{
-					Name:         "Zitadel Support IdP",
-					Issuer:       "zitadel.example.com",
-					ClientId:     "test-client",
-					ClientSecret: "test-secret",
-					Scopes:       []string{"email", "profile"},
-					ProviderOptions: &idp_pb.Options{
-						IsCreationAllowed: true,
-					},
-					InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-						{
-							OrganizationId:     "org1",
-							OrganizationDomain: "org1.com",
-						},
 					},
 				},
 			},
@@ -318,16 +237,6 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 					Issuer:   "acme.example.com",
 					ClientId: "test-client",
 					Scopes:   []string{"email", "profile", "openid", "offline_access"},
-					InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-						{
-							OrganizationId:     "org1",
-							OrganizationDomain: "org1.com",
-						},
-						{
-							OrganizationId:     "org2",
-							OrganizationDomain: "org2.com",
-						},
-					},
 				},
 			},
 			wantResponse: &mgmt_pb.UpdateZitadelProviderResponse{
@@ -347,16 +256,6 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 							Issuer:   "acme.example.com",
 							ClientId: "test-client",
 							Scopes:   []string{"email", "profile", "openid", "offline_access"},
-							InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-								{
-									OrganizationId:     "org1",
-									OrganizationDomain: "org1.com",
-								},
-								{
-									OrganizationId:     "org2",
-									OrganizationDomain: "org2.com",
-								},
-							},
 						},
 					},
 				},
@@ -373,12 +272,6 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 					Scopes:   []string{}, // scopes unset -> will be updated by the API
 					ProviderOptions: &idp_pb.Options{
 						IsAutoCreation: true,
-					},
-					InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-						{
-							OrganizationId:     "org3",
-							OrganizationDomain: "org3.com",
-						},
 					},
 				},
 			},
@@ -401,52 +294,6 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 							Issuer:   "acme.example.com",
 							ClientId: "test-client",
 							Scopes:   nil, // unset scopes
-							InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-								{
-									OrganizationId:     "org3",
-									OrganizationDomain: "org3.com",
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "update with instance roles info not set, ok",
-			args: args{
-				ctx: OrgCTX,
-				req: &mgmt_pb.UpdateZitadelProviderRequest{
-					Name:     "Zitadel Support IdP updated 2",
-					Issuer:   "acme.example.com",
-					ClientId: "test-client",
-					Scopes:   []string{"email", "openid"},
-					ProviderOptions: &idp_pb.Options{
-						IsCreationAllowed: true,
-					},
-					InstanceRolesInfo: nil, // instance roles info isn't set -> will be unset by the API
-				},
-			},
-			wantResponse: &mgmt_pb.UpdateZitadelProviderResponse{
-				Details: &object_pb.ObjectDetails{
-					ResourceOwner: Instance.DefaultOrg.Id,
-				},
-			},
-			wantUpdatedProvider: &idp_pb.Provider{
-				State: idp_pb.IDPState_IDP_STATE_ACTIVE,
-				Name:  "Zitadel Support IdP updated 2",
-				Owner: idp_pb.IDPOwnerType_IDP_OWNER_TYPE_ORG,
-				Type:  idp_pb.ProviderType_PROVIDER_TYPE_ZITADEL,
-				Config: &idp_pb.ProviderConfig{
-					Options: &idp_pb.Options{
-						IsCreationAllowed: true,
-					},
-					Config: &idp_pb.ProviderConfig_Zitadel{
-						Zitadel: &idp_pb.ZitadelConfig{
-							Issuer:            "acme.example.com",
-							ClientId:          "test-client",
-							Scopes:            []string{"email", "openid"},
-							InstanceRolesInfo: nil, // instance roles info isn't set
 						},
 					},
 				},
@@ -567,12 +414,6 @@ func Test_GetProviderByID(t *testing.T) {
 								Issuer:   "zitadel.example.com",
 								ClientId: "test-client",
 								Scopes:   []string{"email", "profile"},
-								InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-									{
-										OrganizationId:     "org1",
-										OrganizationDomain: "org1.com",
-									},
-								},
 							},
 						},
 					},
@@ -676,12 +517,6 @@ func Test_ListProviders(t *testing.T) {
 									Issuer:   "zitadel.example.com",
 									ClientId: "test-client",
 									Scopes:   []string{"email", "profile"},
-									InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-										{
-											OrganizationId:     "org1",
-											OrganizationDomain: "org1.com",
-										},
-									},
 								},
 							},
 						},
@@ -731,12 +566,6 @@ func Test_ListProviders(t *testing.T) {
 									Issuer:   "zitadel.example.com",
 									ClientId: "test-client",
 									Scopes:   []string{"email", "profile"},
-									InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-										{
-											OrganizationId:     "org1",
-											OrganizationDomain: "org1.com",
-										},
-									},
 								},
 							},
 						},
@@ -777,12 +606,6 @@ func Test_ListProviders(t *testing.T) {
 									Issuer:   "zitadel.example.com",
 									ClientId: "test-client",
 									Scopes:   []string{"email", "profile"},
-									InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-										{
-											OrganizationId:     "org1",
-											OrganizationDomain: "org1.com",
-										},
-									},
 								},
 							},
 						},
@@ -807,12 +630,6 @@ func Test_ListProviders(t *testing.T) {
 									Issuer:   "zitadel.example.com",
 									ClientId: "test-client",
 									Scopes:   []string{"email", "profile"},
-									InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-										{
-											OrganizationId:     "org1",
-											OrganizationDomain: "org1.com",
-										},
-									},
 								},
 							},
 						},

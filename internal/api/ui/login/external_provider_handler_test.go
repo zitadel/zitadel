@@ -506,10 +506,16 @@ func Test_supportUserInstanceMembershipRequired(t *testing.T) {
 		want         bool
 	}{
 		{
-			name:         "zitadel provider, support role claim, matching org",
-			provider:     &query.IDPTemplate{Type: domain.IDPTypeZitadel, ZitadelIDPTemplate: configured},
+			name:         "instance zitadel provider, support role claim, matching org",
+			provider:     &query.IDPTemplate{OwnerType: domain.IdentityProviderTypeSystem, Type: domain.IDPTypeZitadel, ZitadelIDPTemplate: configured},
 			externalUser: &domain.ExternalUser{ProjectRoles: supportClaim},
 			want:         true,
+		},
+		{
+			name:         "org-scoped zitadel provider, matching org, skipped",
+			provider:     &query.IDPTemplate{OwnerType: domain.IdentityProviderTypeOrg, Type: domain.IDPTypeZitadel, ZitadelIDPTemplate: configured},
+			externalUser: &domain.ExternalUser{ProjectRoles: supportClaim},
+			want:         false,
 		},
 		{
 			name:         "non-zitadel provider, skipped",
