@@ -1272,10 +1272,11 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 					expectFilter(),
 					expectFilter(),
 					expectFilter(),
+					expectFilter(),
 					expectPushFailed(
 						zerrors.ThrowInternal(nil, "id", "message"),
 						org.NewOrgRemovedEvent(
-							context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{},
+							context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{}, []string{},
 						),
 					),
 				),
@@ -1315,9 +1316,10 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 					expectFilter(),
 					expectFilter(),
 					expectFilter(),
+					expectFilter(),
 					expectPush(
 						org.NewOrgRemovedEvent(
-							context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{},
+							context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{}, []string{},
 						),
 					),
 				),
@@ -1401,6 +1403,14 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project2", "org1").Aggregate, "app2", "entity2", []byte{}, "", domain.LoginVersionUnspecified, ""),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(), &project.NewAggregate("project1", "org1").Aggregate, "project1", false, false, false, domain.PrivateLabelingSettingUnspecified),
+						),
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(), &project.NewAggregate("project2", "org1").Aggregate, "project2", false, false, false, domain.PrivateLabelingSettingUnspecified),
+						),
+					),
 					expectPush(
 						org.NewOrgRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org",
 							[]string{"user1", "user2"},
@@ -1408,6 +1418,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 							[]string{"domain1", "domain2"},
 							[]*domain.UserIDPLink{{IDPConfigID: "config1", ExternalUserID: "id1", DisplayName: "display1"}, {IDPConfigID: "config2", ExternalUserID: "id2", DisplayName: "display2"}},
 							[]string{"entity1", "entity2"},
+							[]string{"project1", "project2"},
 						),
 					),
 				),
@@ -1446,9 +1457,10 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 					expectFilter(),
 					expectFilter(),
 					expectFilter(),
+					expectFilter(),
 					expectPush(
 						org.NewOrgRemovedEvent(
-							context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{},
+							context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{}, []string{},
 						),
 					),
 				),
@@ -1769,7 +1781,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 						),
 						org.NewOrgRemovedEvent(
 							context.Background(), &org.NewAggregate("custom-org-ID").Aggregate,
-							"Org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{}),
+							"Org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{}, []string{}),
 					),
 					expectPush(
 						eventFromEventPusher(org.NewOrgAddedEvent(context.Background(),
