@@ -2632,7 +2632,7 @@
       "ACCESSTOKENROLEASSERTION": "Ajouter les rôles des utilisateurs au jeton d'accès",
       "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Si cette option est sélectionnée, les rôles demandés de l'utilisateur authentifié sont ajoutés au jeton d'accès.",
       "IDTOKENROLEASSERTION": "Rôles de l'utilisateur dans le jeton d'identification",
-      "IDTOKENROLEASSERTION_DESCRIPTION": "Si sélectionné, les rôles demandés à l'utilisateur authentifié sont ajoutés au jeton d'identification. Assurez-vous d'activer le paramètre de projet 'Attribuer des rôles d'utilisateur pendant l'authentification' ou de le demander via une portée personnalisée.",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "Si cette option est sélectionnée, les rôles demandés à l'utilisateur authentifié sont ajoutés au jeton d'identification. Assurez-vous d'activer le paramètre de projet 'Affirmer les rôles lors de l'authentification' ou de le demander via une portée personnalisée.",
       "IDTOKENUSERINFOASSERTION": "Informations sur l'utilisateur dans le jeton d'identification",
       "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permet aux applications de récupérer le profil, l'e-mail, le téléphone et l'adresse à partir du jeton d'identification.",
       "CLOCKSKEW": "Permet aux applications de gérer le décalage d'horloge de l'OP et de l'application. La durée (0-5s) sera ajoutée à la réclamation exp et soustraite de iats, auth_time et nbf.",
