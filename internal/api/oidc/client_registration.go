@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -21,25 +22,30 @@ import (
 const registrationMaxBodyBytes = 100 * 1024
 
 // dynamicClientRegistration handles POST requests to the OAuth 2.0 Dynamic Client
-// Registration endpoint (RFC 7591). The route is always mounted; it only registers
-// clients when the oidc_dynamic_client_registration feature is enabled for the instance,
+// Registration endpoint (RFC 7591). The route is always mounted; it only registers clients
+// when dynamic client registration is enabled in the instance's security settings,
 // otherwise it behaves as if the endpoint did not exist.
 func (s *Server) dynamicClientRegistration(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	if !authz.GetFeatures(ctx).OIDCDynamicClientRegistration {
+	if !authz.GetInstance(ctx).EnableDynamicClientRegistration() {
 		http.NotFound(w, r)
 		return
 	}
 
-	resourceOwner, err := s.dynamicClientRegistrationResourceOwner(ctx, r)
+	ctx, resourceOwner, err := s.dynamicClientRegistrationResourceOwner(ctx, r)
 	if err != nil {
+		switch {
+		// The caller authenticated but is not allowed to register clients: RFC 6750 §3.1
+		// insufficient_scope, rather than pretending the token itself is invalid.
+		case errors.Is(err, errRegistrationForbidden):
+			s.writeRegistrationForbidden(ctx, w)
 		// Only missing/invalid credentials are a 401; unexpected errors (e.g. a failed
 		// token lookup) must not be masked as invalid_token.
-		if zerrors.IsUnauthenticated(err) || zerrors.IsPermissionDenied(err) {
+		case zerrors.IsUnauthenticated(err), zerrors.IsPermissionDenied(err):
 			s.writeRegistrationUnauthorized(ctx, w)
-			return
+		default:
+			s.writeRegistrationServerError(ctx, w, err)
 		}
-		s.writeRegistrationServerError(ctx, w, err)
 		return
 	}
 
@@ -76,30 +82,53 @@ func (s *Server) dynamicClientRegistration(w http.ResponseWriter, r *http.Reques
 }
 
 // dynamicClientRegistrationResourceOwner authorizes the registration and returns the
-// organization the client is homed in. When an access token is presented it is used as the
-// RFC 7591 §3 initial access token and the client is homed in the token's organization.
-// Without a token, open registration must be enabled and the client is homed in the
-// instance's default organization.
+// organization the client is homed in.
 //
-// Note on the trust model (open question on #9810): in token mode any valid access token is
-// currently accepted and the registered client is scoped to that token's organization, so a
-// caller can only ever create clients in its own organization. Whether registration should
-// additionally require a dedicated permission or scope is left for maintainer input, as it
-// is tied to the open vs. token-gated discussion. The whole endpoint stays behind the
-// feature flag and the access interceptor's rate limiting.
-func (s *Server) dynamicClientRegistrationResourceOwner(ctx context.Context, r *http.Request) (string, error) {
-	if token := bearerToken(r); token != "" {
-		accessToken, err := s.verifyAccessToken(ctx, token)
-		if err != nil {
-			return "", err
+// In token mode (the default) the caller presents an access token, the client is homed in
+// the token's organization and the token's user must hold the org-scoped
+// project.app.register_dynamic permission there. That permission is deliberately not
+// project.app.write: a service user can be allowed to self-register clients — through the
+// dedicated ORG_DYNAMIC_CLIENT_REGISTRAR role — without gaining write access to existing
+// applications.
+//
+// In open mode (allow_unauthenticated in the instance's security settings) no token is
+// required and no permission is checked, as required by the Model Context Protocol flow.
+// Those clients are homed in the instance's default organization.
+//
+// The check runs before any state is created, so it also gates the auto-provisioning of the
+// organization's dedicated DCR project.
+func (s *Server) dynamicClientRegistrationResourceOwner(ctx context.Context, r *http.Request) (context.Context, string, error) {
+	token := bearerToken(r)
+	if token == "" {
+		if !authz.GetInstance(ctx).AllowUnauthenticatedDynamicClientRegistration() {
+			return ctx, "", zerrors.ThrowUnauthenticated(nil, "OIDC-Eich8", "Errors.Token.Invalid")
 		}
-		return accessToken.resourceOwner, nil
+		return ctx, authz.GetInstance(ctx).DefaultOrganisationID(), nil
 	}
-	if !s.dynamicClientRegistrationConfig.AllowUnauthenticated {
-		return "", zerrors.ThrowUnauthenticated(nil, "OIDC-Eich8", "Errors.Token.Invalid")
+
+	accessToken, err := s.verifyAccessToken(ctx, token)
+	if err != nil {
+		return ctx, "", err
 	}
-	return authz.GetInstance(ctx).DefaultOrganisationID(), nil
+	// The permission check resolves the caller's memberships from the context, which the
+	// OIDC endpoints do not populate: unlike the gRPC APIs they are not behind the
+	// authorization interceptor. Derive it from the verified token, as the token exchange
+	// does for the impersonating actor.
+	ctx = authz.SetCtxData(ctx, authz.CtxData{
+		UserID: accessToken.userID,
+		OrgID:  accessToken.resourceOwner,
+	})
+	if err := s.command.CheckPermissionRegisterDynamicClient(ctx, accessToken.resourceOwner); err != nil {
+		// verifyAccessToken also reports invalid tokens as permission denied, so mark the
+		// authorization failure explicitly to keep 401 and 403 apart.
+		return ctx, "", fmt.Errorf("%w: %w", errRegistrationForbidden, err)
+	}
+	return ctx, accessToken.resourceOwner, nil
 }
+
+// errRegistrationForbidden marks a caller that presented a valid access token but does not
+// hold the project.app.register_dynamic permission in the token's organization.
+var errRegistrationForbidden = errors.New("dynamic client registration not permitted")
 
 // ensureDCRProject returns the dedicated project that holds dynamically registered clients
 // for the organization, creating it on first use. The common case (the project already
@@ -160,6 +189,11 @@ func (s *Server) writeRegistrationError(ctx context.Context, w http.ResponseWrit
 func (s *Server) writeRegistrationUnauthorized(ctx context.Context, w http.ResponseWriter) {
 	w.Header().Set("WWW-Authenticate", `Bearer error="invalid_token"`)
 	s.writeRegistrationJSON(ctx, w, http.StatusUnauthorized, newRegistrationError("invalid_token", "a valid access token is required to register a client"))
+}
+
+func (s *Server) writeRegistrationForbidden(ctx context.Context, w http.ResponseWriter) {
+	w.Header().Set("WWW-Authenticate", `Bearer error="insufficient_scope"`)
+	s.writeRegistrationJSON(ctx, w, http.StatusForbidden, newRegistrationError("insufficient_scope", "the access token is not allowed to register clients"))
 }
 
 func (s *Server) writeRegistrationServerError(ctx context.Context, w http.ResponseWriter, err error) {

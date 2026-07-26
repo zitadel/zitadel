@@ -18,8 +18,9 @@ const DCRProjectName = "ZITADEL DCR"
 
 // EnsureDCRProject returns the dedicated project that holds dynamically registered OIDC
 // clients in the given organization, creating it on first use. Like AddDynamicOIDCClient it
-// does not perform a permission check, because the provisioning is authorized at the
-// registration endpoint through the feature flag and the configured registration mode.
+// does not perform its own permission check: the registration endpoint authorizes the whole
+// request up front, through the instance's security settings and, in token mode,
+// CheckPermissionRegisterDynamicClient.
 //
 // Both the existence check and the recovery from a concurrent creation read from the
 // eventstore, so that several clients self-registering into the same organization at the
@@ -136,11 +137,15 @@ func (wm *dcrProjectWriteModel) Query() *eventstore.SearchQueryBuilder {
 // dynamically registered client is an ordinary OIDC app and the whole token, authorization
 // and introspection flow keeps working unchanged.
 //
-// Unlike AddOIDCApplication it does NOT perform an app.write permission check: dynamic
-// client registration is authorized at the registration endpoint through the
-// oidc_dynamic_client_registration feature flag and the configured registration mode (open
-// or initial access token). The caller is responsible for providing the target project
-// (see the registration endpoint's ensureDCRProject helper) and the owning organization.
+// Unlike AddOIDCApplication it does NOT perform an app.write permission check. Dynamic
+// client registration is authorized once at the registration endpoint, before any state is
+// created: the instance's security settings decide whether the endpoint is served at all
+// and whether unauthenticated registration is allowed, and token mode additionally requires
+// the org-scoped project.app.register_dynamic permission (see
+// CheckPermissionRegisterDynamicClient). Requiring app.write here instead would mean every
+// self-registering client needs write access to the organization's existing applications.
+// The caller is responsible for providing the target project (see the registration
+// endpoint's ensureDCRProject helper) and the owning organization.
 func (c *Commands) AddDynamicOIDCClient(ctx context.Context, projectID, resourceOwner string, oidcApp *domain.OIDCApp) (_ *domain.OIDCApp, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

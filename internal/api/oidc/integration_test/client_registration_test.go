@@ -11,30 +11,21 @@ import (
 	"testing"
 	"time"
 
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 )
 
 // TestServer_DynamicClientRegistration covers the OAuth 2.0 Dynamic Client Registration
-// endpoint (RFC 7591) with the feature enabled and open registration allowed (the
-// integration server sets OIDC.DynamicClientRegistration.AllowUnauthenticated).
+// endpoint (RFC 7591) in open mode, where no access token is required.
 func TestServer_DynamicClientRegistration(t *testing.T) {
-	integration.EnsureInstanceFeature(t, CTX, Instance,
-		&feature.SetInstanceFeaturesRequest{
-			OidcDynamicClientRegistration: gu.Ptr(true),
-		},
-		func(tt *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-			assert.True(tt, got.GetOidcDynamicClientRegistration().GetEnabled())
-		},
-	)
-
 	issuer := Instance.OIDCIssuer()
+	enableDynamicClientRegistration(t, CTXIAM, Instance, true)
 
 	t.Run("discovery advertises the registration endpoint", func(t *testing.T) {
 		discovery := fetchDiscovery(t, issuer)
@@ -129,7 +120,57 @@ func TestServer_DynamicClientRegistration(t *testing.T) {
 	})
 }
 
-// TestServer_DynamicClientRegistration_disabled verifies that without the feature the
+// TestServer_DynamicClientRegistration_tokenMode covers the default mode, where a caller
+// must present an access token whose user holds project.app.register_dynamic in the token's
+// organization.
+func TestServer_DynamicClientRegistration_tokenMode(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	instance := integration.NewInstance(ctx)
+	iamCTX := instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+	issuer := instance.OIDCIssuer()
+
+	enableDynamicClientRegistration(t, iamCTX, instance, false)
+
+	metadata := map[string]any{
+		"client_name":                "token mode client",
+		"redirect_uris":              []string{redirectURI},
+		"token_endpoint_auth_method": "none",
+	}
+
+	t.Run("without a token registration is unauthorized", func(t *testing.T) {
+		status, body := registerDynamicClient(t, issuer, "", metadata)
+		assert.Equal(t, http.StatusUnauthorized, status)
+		assert.Equal(t, "invalid_token", body["error"])
+	})
+
+	t.Run("a token without the permission is forbidden", func(t *testing.T) {
+		_, pat, err := instance.CreateMachineUserPATWithMembership(iamCTX)
+		require.NoError(t, err)
+
+		status, body := registerDynamicClient(t, issuer, pat, metadata)
+		assert.Equal(t, http.StatusForbidden, status)
+		assert.Equal(t, "insufficient_scope", body["error"])
+	})
+
+	// The dedicated least-privilege role carries project.app.register_dynamic and nothing
+	// else, so it is enough on its own to register a client.
+	t.Run("a token with ORG_DYNAMIC_CLIENT_REGISTRAR may register", func(t *testing.T) {
+		_, pat, err := instance.CreateMachineUserPATWithMembership(iamCTX, domain.RoleOrgDynamicClientRegistrar)
+		require.NoError(t, err)
+
+		var body map[string]any
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		require.EventuallyWithT(t, func(tt *assert.CollectT) {
+			var status int
+			status, body = registerDynamicClient(t, issuer, pat, metadata)
+			assert.Equal(tt, http.StatusCreated, status)
+		}, retryDuration, tick, "membership not effective for registration")
+		assert.NotEmpty(t, body["client_id"])
+	})
+}
+
+// TestServer_DynamicClientRegistration_disabled verifies that with the setting off the
 // endpoint is neither advertised nor served.
 func TestServer_DynamicClientRegistration_disabled(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
@@ -144,6 +185,35 @@ func TestServer_DynamicClientRegistration_disabled(t *testing.T) {
 		"redirect_uris": []string{redirectURI},
 	})
 	assert.Equal(t, http.StatusNotFound, status)
+}
+
+// enableDynamicClientRegistration turns the endpoint on through the instance's security
+// settings and waits until the change is observable, i.e. until the projection behind the
+// cached instance has caught up and discovery advertises the endpoint.
+func enableDynamicClientRegistration(t *testing.T, ctx context.Context, instance *integration.Instance, allowUnauthenticated bool) {
+	t.Helper()
+	_, err := instance.Client.SettingsV2.SetSecuritySettings(ctx, &settings.SetSecuritySettingsRequest{
+		DynamicClientRegistration: &settings.DynamicClientRegistrationSettings{
+			Enabled:              true,
+			AllowUnauthenticated: allowUnauthenticated,
+		},
+	})
+	require.NoError(t, err)
+
+	issuer := instance.OIDCIssuer()
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		resp, err := http.Get(issuer + "/.well-known/openid-configuration")
+		if !assert.NoError(tt, err) {
+			return
+		}
+		defer resp.Body.Close()
+		var discovery oidc.DiscoveryConfiguration
+		if !assert.NoError(tt, json.NewDecoder(resp.Body).Decode(&discovery)) {
+			return
+		}
+		assert.Equal(tt, issuer+"/oauth/v2/register", discovery.RegistrationEndpoint)
+	}, retryDuration, tick, "registration endpoint not advertised")
 }
 
 func registerDynamicClient(t testing.TB, issuer, accessToken string, metadata map[string]any) (int, map[string]any) {

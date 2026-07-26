@@ -233,16 +233,18 @@ func Test_Server_dynamicClientRegistrationResourceOwner_withoutToken(t *testing.
 
 	t.Run("no token and open registration disabled is unauthenticated", func(t *testing.T) {
 		t.Parallel()
-		s := &Server{dynamicClientRegistrationConfig: DynamicClientRegistrationConfig{AllowUnauthenticated: false}}
-		_, err := s.dynamicClientRegistrationResourceOwner(authz.NewMockContext("instance", "org", ""), request)
+		s := &Server{}
+		ctx := authz.NewMockContext("instance", "org", "", authz.WithMockDynamicClientRegistration(true, false))
+		_, _, err := s.dynamicClientRegistrationResourceOwner(ctx, request)
 		require.Error(t, err)
 		assert.True(t, zerrors.IsUnauthenticated(err))
 	})
 
 	t.Run("no token and open registration enabled uses the default organization", func(t *testing.T) {
 		t.Parallel()
-		s := &Server{dynamicClientRegistrationConfig: DynamicClientRegistrationConfig{AllowUnauthenticated: true}}
-		resourceOwner, err := s.dynamicClientRegistrationResourceOwner(authz.NewMockContext("instance", "default-org", ""), request)
+		s := &Server{}
+		ctx := authz.NewMockContext("instance", "default-org", "", authz.WithMockDynamicClientRegistration(true, true))
+		_, resourceOwner, err := s.dynamicClientRegistrationResourceOwner(ctx, request)
 		require.NoError(t, err)
 		assert.Equal(t, "default-org", resourceOwner)
 	})

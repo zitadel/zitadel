@@ -10,7 +10,6 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/feature"
 )
 
 func TestServer_createDiscoveryConfig(t *testing.T) {
@@ -143,14 +142,14 @@ func TestServer_createDiscoveryConfig_registrationEndpoint(t *testing.T) {
 		want string
 	}{
 		{
-			name: "feature disabled, endpoint not advertised",
+			name: "setting disabled, endpoint not advertised",
 			ctx:  op.ContextWithIssuer(context.Background(), "https://issuer.com"),
 			want: "",
 		},
 		{
-			name: "feature enabled, endpoint advertised",
+			name: "setting enabled, endpoint advertised",
 			ctx: op.ContextWithIssuer(
-				authz.WithFeatures(context.Background(), feature.Features{OIDCDynamicClientRegistration: true}),
+				authz.NewMockContext("instance", "org", "", authz.WithMockDynamicClientRegistration(true, false)),
 				"https://issuer.com",
 			),
 			want: "https://issuer.com/register",

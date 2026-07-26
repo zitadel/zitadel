@@ -45,20 +45,6 @@ type Config struct {
 	PublicKeyCacheMaxAge              time.Duration
 	DefaultBackChannelLogoutLifetime  time.Duration
 	BackChannelLogout                 handlers.BackChannelLogoutWorkerConfig
-	DynamicClientRegistration         DynamicClientRegistrationConfig
-}
-
-// DynamicClientRegistrationConfig configures the OAuth 2.0 Dynamic Client Registration
-// endpoint (RFC 7591). The endpoint is only served and advertised when the
-// oidc_dynamic_client_registration instance feature is enabled.
-type DynamicClientRegistrationConfig struct {
-	// AllowUnauthenticated enables open registration, where clients may register
-	// without an initial access token, as required by the Model Context Protocol (MCP)
-	// flow. Registered clients are homed in a dedicated, auto-provisioned project in the
-	// instance's default organization. When disabled (the default), registration
-	// requires a valid access token (RFC 7591 §3 initial access token) and the client is
-	// homed in the token's organization.
-	AllowUnauthenticated bool
 }
 
 // BackChannelLogoutConfig returns the BackChannelLogoutWorkerConfig and takes the deprecated TokenLifetime into account.
@@ -189,26 +175,25 @@ func NewServer(
 			accessTokenKeySet: accessTokenKeySet,
 			idTokenHintKeySet: idTokenHintKeySet,
 		}, endpoints(config.CustomEndpoints)),
-		repo:                            repo,
-		query:                           query,
-		command:                         command,
-		accessTokenKeySet:               accessTokenKeySet,
-		idTokenHintKeySet:               idTokenHintKeySet,
-		defaultLoginURL:                 fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
-		defaultLoginURLV2:               config.DefaultLoginURLV2,
-		defaultLogoutURLV2:              config.DefaultLogoutURLV2,
-		defaultAccessTokenLifetime:      config.DefaultAccessTokenLifetime,
-		defaultIdTokenLifetime:          config.DefaultIdTokenLifetime,
-		jwksCacheControlMaxAge:          config.JWKSCacheControlMaxAge,
-		fallbackLogger:                  fallbackLogger,
-		hasher:                          hasher,
-		encAlg:                          authAlg,
-		targetEncryptionAlgorithm:       targetEncryptionAlgorithm,
-		opCrypto:                        alg,
-		assetAPIPrefix:                  assets.AssetAPI(),
-		httpClient:                      httpClient,
-		registrationEndpoint:            registrationEndpoint(config.CustomEndpoints),
-		dynamicClientRegistrationConfig: config.DynamicClientRegistration,
+		repo:                       repo,
+		query:                      query,
+		command:                    command,
+		accessTokenKeySet:          accessTokenKeySet,
+		idTokenHintKeySet:          idTokenHintKeySet,
+		defaultLoginURL:            fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
+		defaultLoginURLV2:          config.DefaultLoginURLV2,
+		defaultLogoutURLV2:         config.DefaultLogoutURLV2,
+		defaultAccessTokenLifetime: config.DefaultAccessTokenLifetime,
+		defaultIdTokenLifetime:     config.DefaultIdTokenLifetime,
+		jwksCacheControlMaxAge:     config.JWKSCacheControlMaxAge,
+		fallbackLogger:             fallbackLogger,
+		hasher:                     hasher,
+		encAlg:                     authAlg,
+		targetEncryptionAlgorithm:  targetEncryptionAlgorithm,
+		opCrypto:                   alg,
+		assetAPIPrefix:             assets.AssetAPI(),
+		httpClient:                 httpClient,
+		registrationEndpoint:       registrationEndpoint(config.CustomEndpoints),
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 
