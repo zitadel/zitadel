@@ -190,6 +190,50 @@ func Test_clientRegistrationRequest_toOIDCApp(t *testing.T) {
 			},
 			wantErr: registrationErrorInvalidRedirectURI,
 		},
+		{
+			// Cursor and other native MCP hosts speak RFC 7591, which has no
+			// application_type, so they omit it and send a custom scheme.
+			name: "custom scheme redirect without application_type infers native",
+			req: &clientRegistrationRequest{
+				RedirectURIs: []string{"cursor://anysphere.cursor-retrieval/oauth/callback"},
+			},
+			want: &domain.OIDCApp{
+				RedirectUris:    []string{"cursor://anysphere.cursor-retrieval/oauth/callback"},
+				ResponseTypes:   []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+				GrantTypes:      []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+				ApplicationType: gu.Ptr(domain.OIDCApplicationTypeNative),
+				AuthMethodType:  gu.Ptr(domain.OIDCAuthMethodTypeNone),
+				OIDCVersion:     gu.Ptr(domain.OIDCVersionV1),
+				AccessTokenType: gu.Ptr(domain.OIDCTokenTypeBearer),
+			},
+		},
+		{
+			// The inference must not widen anything else: an http loopback redirect stays
+			// a web application, exactly as before, and keeps its confidential default.
+			name: "loopback redirect without application_type stays web",
+			req: &clientRegistrationRequest{
+				RedirectURIs: []string{"http://localhost:8080/callback"},
+			},
+			want: &domain.OIDCApp{
+				RedirectUris:    []string{"http://localhost:8080/callback"},
+				ResponseTypes:   []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+				GrantTypes:      []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+				ApplicationType: gu.Ptr(domain.OIDCApplicationTypeWeb),
+				AuthMethodType:  gu.Ptr(domain.OIDCAuthMethodTypeBasic),
+				OIDCVersion:     gu.Ptr(domain.OIDCVersionV1),
+				AccessTokenType: gu.Ptr(domain.OIDCTokenTypeBearer),
+			},
+		},
+		{
+			// Inference only fills an absent member: a client that asks for a confidential
+			// auth method with a custom scheme is a genuine conflict, reported as such.
+			name: "custom scheme with confidential auth method rejected as client metadata",
+			req: &clientRegistrationRequest{
+				RedirectURIs:            []string{"myapp://callback"},
+				TokenEndpointAuthMethod: "client_secret_basic",
+			},
+			wantErr: registrationErrorInvalidClientMetadata,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

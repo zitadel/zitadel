@@ -277,7 +277,12 @@ func (req *clientRegistrationRequest) toOIDCApp() (*domain.OIDCApp, *registratio
 		return nil, newRegistrationError(registrationErrorInvalidClientMetadata, "jwks and jwks_uri are not supported")
 	}
 
-	applicationType, regErr := registrationApplicationTypeToDomain(req.ApplicationType)
+	redirectURIs := trimSpaceSlice(req.RedirectURIs)
+	if len(redirectURIs) == 0 {
+		return nil, newRegistrationError(registrationErrorInvalidRedirectURI, "at least one redirect_uri is required")
+	}
+
+	applicationType, regErr := registrationApplicationTypeToDomain(req.ApplicationType, redirectURIs)
 	if regErr != nil {
 		return nil, regErr
 	}
@@ -292,11 +297,6 @@ func (req *clientRegistrationRequest) toOIDCApp() (*domain.OIDCApp, *registratio
 	responseTypes, regErr := registrationResponseTypesToDomain(req.ResponseTypes)
 	if regErr != nil {
 		return nil, regErr
-	}
-
-	redirectURIs := trimSpaceSlice(req.RedirectURIs)
-	if len(redirectURIs) == 0 {
-		return nil, newRegistrationError(registrationErrorInvalidRedirectURI, "at least one redirect_uri is required")
 	}
 
 	app := &domain.OIDCApp{
@@ -427,10 +427,24 @@ func normalizeResponseType(responseType string) string {
 	}
 }
 
-func registrationApplicationTypeToDomain(applicationType string) (domain.OIDCApplicationType, *registrationError) {
+// registrationApplicationTypeToDomain resolves the application type of a registration
+// request. An explicit application_type is always honoured; it is only inferred when the
+// member is absent.
+//
+// OpenID Connect Dynamic Client Registration 1.0 §2 defaults to web, but application_type is
+// an OpenID Connect member: clients that only implement RFC 7591, which does not define it,
+// omit it. Native hosts doing so (Cursor and other MCP clients) register custom-scheme
+// redirect URIs, which ZITADEL reserves for native applications, so the web default would
+// reject them for a redirect URI that is in fact valid for what they are. Infer native in
+// exactly that case; everything that is accepted today keeps its current type.
+func registrationApplicationTypeToDomain(applicationType string, redirectURIs []string) (domain.OIDCApplicationType, *registrationError) {
 	switch applicationType {
-	case "", "web":
-		// OpenID Connect Dynamic Client Registration 1.0 §2: web is the default.
+	case "":
+		if domain.OIDCRedirectURIsRequireNative(redirectURIs) {
+			return domain.OIDCApplicationTypeNative, nil
+		}
+		return domain.OIDCApplicationTypeWeb, nil
+	case "web":
 		return domain.OIDCApplicationTypeWeb, nil
 	case "native":
 		return domain.OIDCApplicationTypeNative, nil
