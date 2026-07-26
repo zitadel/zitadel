@@ -667,7 +667,8 @@ It lets clients register themselves as OIDC applications at runtime, which is re
 
 <Callout type="warn">
 The endpoint is disabled by default. It is only served and advertised as `registration_endpoint` in the [discovery document](#openid-connect-10-discovery)
-when the `oidc_dynamic_client_registration` instance [feature](/guides/integrate/dynamic-client-registration#enable-the-feature) is enabled.
+when it is [enabled](/guides/integrate/dynamic-client-registration#enable-dynamic-client-registration) in the instance's security settings.
+By default it additionally requires an access token whose user holds the `project.app.register_dynamic` permission.
 </Callout>
 
 A successful registration returns `HTTP 201` with the `client_id` (and, for confidential clients, the `client_secret`) that can immediately be used for the authorization code flow.

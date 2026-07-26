@@ -12,40 +12,48 @@ This is required by clients that self-register before any user context exists, m
 [Model Context Protocol (MCP)](https://modelcontextprotocol.io) clients such as Claude Desktop, claude.ai and the MCP SDKs.
 
 <Callout type="warn">
-Dynamic client registration is disabled by default and is currently behind a feature flag. Only enable it if you
-understand the trade-offs described in [Registration modes](#registration-modes) below.
+Dynamic client registration is disabled by default. Only enable it if you understand the trade-offs described in
+[Registration modes](#registration-modes) below.
 </Callout>
 
-## Enable the feature
+## Enable dynamic client registration
 
 The endpoint is only served and advertised as `registration_endpoint` in the
-[discovery document](/apis/openidoauth/endpoints#openid-connect-10-discovery) when the
-`oidc_dynamic_client_registration` instance feature is enabled.
+[discovery document](/apis/openidoauth/endpoints#openid-connect-10-discovery) when it is enabled in the instance's
+security settings.
 
-Enable it through the [feature API](/apis/resources/feature_service_v2/feature-service-set-instance-features):
+Enable it through the [settings API](/apis/resources/settings_service_v2/settings-service-set-security-settings):
 
 ```bash
 curl --request PUT \
-  --url ${CUSTOM_DOMAIN}/v2/features/instance \
+  --url ${CUSTOM_DOMAIN}/v2/settings/security \
   --header 'Authorization: Bearer <token of an IAM_OWNER>' \
   --header 'Content-Type: application/json' \
-  --data '{ "oidcDynamicClientRegistration": true }'
+  --data '{ "dynamicClientRegistration": { "enabled": true } }'
 ```
 
 ## Registration modes
 
 The flow that MCP clients follow expects an open, unauthenticated registration endpoint, because the client registers
 before any user has authenticated. As this is a sensitive capability, ZITADEL supports two modes, selected through the
-runtime configuration. Both are only active once the feature flag above is enabled.
+same security settings. Both require `enabled` above.
 
-| Mode | Configuration | Authentication | Organization of the registered client |
+| Mode | Setting | Authorization | Organization of the registered client |
 | --- | --- | --- | --- |
-| Initial access token (default) | `OIDC.DynamicClientRegistration.AllowUnauthenticated = false` | A valid access token must be sent as `Authorization: Bearer` header (RFC 7591 §3 initial access token). | The token's organization. |
-| Open registration | `OIDC.DynamicClientRegistration.AllowUnauthenticated = true` | None. Required for the MCP flow. | The instance's default organization. |
+| Token (default) | `dynamicClientRegistration.allowUnauthenticated = false` | An access token must be sent as `Authorization: Bearer` header, and its user must hold the `project.app.register_dynamic` permission in the token's organization. | The token's organization. |
+| Open registration | `dynamicClientRegistration.allowUnauthenticated = true` | None. Required for the MCP flow. | The instance's default organization. |
 
-Whenever an `Authorization: Bearer` header is present it is treated as an initial access token, even with open
-registration enabled. An invalid or expired token is rejected with `401 Unauthorized`; the request does not fall back to
-anonymous registration.
+### Who may register in token mode
+
+The `project.app.register_dynamic` permission is granted by default to `ORG_OWNER`, `IAM_OWNER` and `IAM_ORG_MANAGER`.
+
+For service users that should do nothing but register clients, assign the dedicated
+[`ORG_DYNAMIC_CLIENT_REGISTRAR`](/guides/manage/console/administrators) role instead. It carries this single permission,
+so such a user can self-register clients without gaining write access to your existing applications.
+
+Whenever an `Authorization: Bearer` header is present it is treated as a registration token, even with open registration
+enabled. An invalid or expired token is rejected with `401 Unauthorized` and a valid token without the permission with
+`403 Forbidden`; neither falls back to anonymous registration.
 
 In both modes the registered clients are stored in a dedicated, auto-provisioned project named `ZITADEL DCR` in the
 respective organization, so they do not interfere with your other projects. When open registration is enabled, protect
@@ -101,8 +109,10 @@ The returned `client_id` can be used immediately to start an
 | `client_name` | Optional, human-readable name. |
 | `post_logout_redirect_uris` | Optional. |
 
-Errors are returned as defined in [RFC 7591 §3.2.2](https://datatracker.ietf.org/doc/html/rfc7591#section-3.2.2),
-for example `invalid_redirect_uri` or `invalid_client_metadata`, with HTTP status `400`.
+Metadata errors are returned as defined in [RFC 7591 §3.2.2](https://datatracker.ietf.org/doc/html/rfc7591#section-3.2.2),
+for example `invalid_redirect_uri` or `invalid_client_metadata`, with HTTP status `400`. Authorization failures use the
+[RFC 6750 §3.1](https://datatracker.ietf.org/doc/html/rfc6750#section-3.1) codes `invalid_token` (`401`) and
+`insufficient_scope` (`403`).
 
 ## Limitations
 
