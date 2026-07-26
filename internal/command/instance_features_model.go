@@ -75,7 +75,6 @@ func (m *InstanceFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstancePermissionCheckV2,
 			feature_v2.InstanceManagementConsoleUseV2UserApi,
 			feature_v2.InstanceEnableRelationalTables,
-			feature_v2.InstanceOIDCDynamicClientRegistration,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -114,9 +113,6 @@ func reduceInstanceFeature(features *InstanceFeatures, key feature.Key, value an
 	case feature.KeyEnableRelationalTables:
 		v := value.(bool)
 		features.EnableRelationalTables = &v
-	case feature.KeyOIDCDynamicClientRegistration:
-		v := value.(bool)
-		features.OIDCDynamicClientRegistration = &v
 	}
 }
 
@@ -132,6 +128,5 @@ func (wm *InstanceFeaturesWriteModel) setCommands(ctx context.Context, f *Instan
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.PermissionCheckV2, f.PermissionCheckV2, feature_v2.InstancePermissionCheckV2)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.ManagementConsoleUseV2UserApi, f.ManagementConsoleUseV2UserApi, feature_v2.InstanceManagementConsoleUseV2UserApi)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.EnableRelationalTables, f.EnableRelationalTables, feature_v2.InstanceEnableRelationalTables)
-	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.OIDCDynamicClientRegistration, f.OIDCDynamicClientRegistration, feature_v2.InstanceOIDCDynamicClientRegistration)
 	return cmds
 }

@@ -19,7 +19,6 @@ var (
 	SystemLoginVersion                            = setEventTypeFromFeature(feature.LevelSystem, feature.KeyLoginV2)
 	SystemPermissionCheckV2                       = setEventTypeFromFeature(feature.LevelSystem, feature.KeyPermissionCheckV2)
 	SystemEnableRelationalTables                  = setEventTypeFromFeature(feature.LevelSystem, feature.KeyEnableRelationalTables)
-	SystemOIDCDynamicClientRegistration           = setEventTypeFromFeature(feature.LevelSystem, feature.KeyOIDCDynamicClientRegistration)
 
 	InstanceResetEventType                          = resetEventTypeFromFeature(feature.LevelInstance)
 	InstanceLoginDefaultOrgEventType                = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLoginDefaultOrg)
@@ -31,7 +30,6 @@ var (
 	InstancePermissionCheckV2                       = setEventTypeFromFeature(feature.LevelInstance, feature.KeyPermissionCheckV2)
 	InstanceManagementConsoleUseV2UserApi           = setEventTypeFromFeature(feature.LevelInstance, feature.KeyConsoleUseV2UserApi)
 	InstanceEnableRelationalTables                  = setEventTypeFromFeature(feature.LevelInstance, feature.KeyEnableRelationalTables)
-	InstanceOIDCDynamicClientRegistration           = setEventTypeFromFeature(feature.LevelInstance, feature.KeyOIDCDynamicClientRegistration)
 )
 
 const (

@@ -72,10 +72,6 @@ func (*systemFeatureProjection) Reducers() []handler.AggregateReducer {
 				Event:  feature_v2.SystemPermissionCheckV2,
 				Reduce: reduceSystemSetFeature[bool],
 			},
-			{
-				Event:  feature_v2.SystemOIDCDynamicClientRegistration,
-				Reduce: reduceSystemSetFeature[bool],
-			},
 		},
 	}}
 }

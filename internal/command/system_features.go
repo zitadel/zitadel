@@ -17,7 +17,6 @@ type SystemFeatures struct {
 	LoginV2                        *feature.LoginV2
 	PermissionCheckV2              *bool
 	EnableRelationalTables         *bool
-	OIDCDynamicClientRegistration  *bool
 }
 
 func (m *SystemFeatures) isEmpty() bool {
@@ -28,8 +27,7 @@ func (m *SystemFeatures) isEmpty() bool {
 		m.OIDCSingleV1SessionTermination == nil &&
 		m.LoginV2 == nil &&
 		m.PermissionCheckV2 == nil &&
-		m.EnableRelationalTables == nil &&
-		m.OIDCDynamicClientRegistration == nil)
+		m.EnableRelationalTables == nil)
 }
 
 func (c *Commands) SetSystemFeatures(ctx context.Context, f *SystemFeatures) (*domain.ObjectDetails, error) {
