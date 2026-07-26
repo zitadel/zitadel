@@ -335,6 +335,9 @@ type SecuritySettingsAttributes struct {
 	EnableIframeEmbedding *bool    `json:"enableIframeEmbedding,omitempty"`
 	AllowedOrigins        []string `json:"allowedOrigins,omitempty"`
 	EnableImpersonation   *bool    `json:"enableImpersonation,omitempty"`
+
+	EnableDynamicClientRegistration               *bool `json:"enableDynamicClientRegistration,omitempty"`
+	AllowUnauthenticatedDynamicClientRegistration *bool `json:"allowUnauthenticatedDynamicClientRegistration,omitempty"`
 }
 
 //go:generate mockgen -typed -package domainmock -destination ./mock/security_settings.mock.go . SecuritySettingsRepository
