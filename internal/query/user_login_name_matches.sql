@@ -1,4 +1,4 @@
-SELECT u.id
+SELECT u.id AS user_id
 FROM projections.login_names3_users u
 LEFT JOIN LATERAL (
     SELECT p.must_be_domain
