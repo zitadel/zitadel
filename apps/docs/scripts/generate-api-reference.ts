@@ -34,18 +34,6 @@ async function generateVersionApiDocs(version: string) {
   console.log(`Generating API docs for version: ${version} -> ${outputRoot}`);
   mkdirSync(outputRoot, { recursive: true });
 
-  // --- START: READ DYNAMIC BASE PATHS ---
-  const basePathsPath = join(sourceRoot, 'base_paths.json');
-  let basePaths: Record<string, string> = {};
-  if (existsSync(basePathsPath)) {
-    try {
-      basePaths = JSON.parse(readFileSync(basePathsPath, 'utf8'));
-    } catch (e) {
-      console.warn(`Failed to parse base_paths.json for ${version}`);
-    }
-  }
-  // --- END: READ DYNAMIC BASE PATHS ---
-
   const specs = await glob('**/*.openapi.json', { cwd: sourceRoot });
   const services: string[] = [];
 
@@ -55,26 +43,6 @@ async function generateVersionApiDocs(version: string) {
     const doc = JSON.parse(content) as any;
 
     if (!doc.paths || Object.keys(doc.paths).length === 0) continue;
-
-    // --- START: DYNAMICALLY APPLY BASE PATH ---
-    let modified = false;
-    const fileBaseName = basename(specPath, '.openapi.json');
-    const prefix = basePaths[fileBaseName];
-
-    if (prefix) {
-      const newPaths: Record<string, any> = {};
-      for (const [route, operations] of Object.entries(doc.paths)) {
-        const newRoute = route.startsWith(prefix) ? route : `${prefix}${route}`;
-        newPaths[newRoute] = operations;
-      }
-      doc.paths = newPaths;
-      modified = true;
-    }
-
-    if (modified) {
-      writeFileSync(fullPath, JSON.stringify(doc, null, 2), 'utf8');
-    }
-    // --- END: DYNAMICALLY APPLY BASE PATH ---
 
     let service = basename(specPath, '.openapi.json');
     if (service.endsWith('_service')) {
