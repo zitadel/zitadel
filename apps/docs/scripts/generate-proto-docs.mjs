@@ -26,21 +26,25 @@ function applyV1PathPrefixes(outputPath) {
   for (const [service, prefix] of Object.entries(V1_PATH_PREFIXES)) {
     const files = glob.sync(`**/${service}.openapi.json`, { cwd: outputPath, absolute: true, nodir: true });
     for (const file of files) {
-      const doc = JSON.parse(fs.readFileSync(file, 'utf8'));
-      if (!doc.paths || Object.keys(doc.paths).length === 0) continue;
+      try {
+        const doc = JSON.parse(fs.readFileSync(file, 'utf8'));
+        if (!doc.paths || Object.keys(doc.paths).length === 0) continue;
 
-      const newPaths = {};
-      let changed = false;
-      for (const [route, operations] of Object.entries(doc.paths)) {
-        const newRoute = route.startsWith(prefix) ? route : `${prefix}${route}`;
-        if (newRoute !== route) changed = true;
-        newPaths[newRoute] = operations;
+        const newPaths = {};
+        let changed = false;
+        for (const [route, operations] of Object.entries(doc.paths)) {
+          const newRoute = route.startsWith(prefix) ? route : `${prefix}${route}`;
+          if (newRoute !== route) changed = true;
+          newPaths[newRoute] = operations;
+        }
+        if (!changed) continue;
+
+        doc.paths = newPaths;
+        fs.writeFileSync(file, JSON.stringify(doc, null, 2));
+        console.log(`Applied ${prefix} to ${basename(file)}`);
+      } catch (e) {
+        console.warn(`Failed to apply ${prefix} to ${basename(file)}`, e);
       }
-      if (!changed) continue;
-
-      doc.paths = newPaths;
-      fs.writeFileSync(file, JSON.stringify(doc, null, 2));
-      console.log(`Applied ${prefix} to ${basename(file)}`);
     }
   }
 }
