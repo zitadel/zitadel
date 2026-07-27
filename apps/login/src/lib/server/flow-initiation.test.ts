@@ -32,6 +32,7 @@ vi.mock("@/lib/zitadel", () => ({
   createResponse: vi.fn(),
   getActiveIdentityProviders: vi.fn(),
   getAuthRequest: vi.fn(),
+  getLoginSettings: vi.fn(),
   getOrgsByDomain: vi.fn(),
   getSAMLRequest: vi.fn(),
   getSecuritySettings: vi.fn(),
@@ -185,6 +186,7 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
   let mockConstructUrl: ReturnType<typeof vi.fn>;
   let mockFindValidSession: ReturnType<typeof vi.fn>;
   let mockSendLoginname: ReturnType<typeof vi.fn>;
+  let mockGetLoginSettings: ReturnType<typeof vi.fn>;
 
   const orgSession = {
     id: "session-org",
@@ -209,6 +211,8 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     mockConstructUrl = vi.mocked(serviceUrl.constructUrl);
     mockFindValidSession = vi.mocked(session.findValidSession);
     mockSendLoginname = vi.mocked(loginname.sendLoginname);
+    mockGetLoginSettings = vi.mocked(zitadel.getLoginSettings);
+    mockGetLoginSettings.mockResolvedValue(undefined);
     vi.mocked(authUtils.getValidLocaleFromUILocales).mockReturnValue(null);
 
     mockConstructUrl.mockImplementation((_req: any, path: string) => {
@@ -492,6 +496,38 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     expect(location).toContain("/loginname");
     expect(location).toContain("loginName=user%40example.com");
     expect(location).not.toContain("submit=true");
+  });
+
+  test("should forward ignoreUnknownUsernames from login settings when resolving loginHint", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: [],
+        prompt: [],
+        loginHint: "unknown@example.com",
+      },
+    });
+
+    // Org has enumeration protection enabled: sendLoginname must receive the
+    // flag so an unknown hint still redirects to the (fake) /password step.
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
+    mockSendLoginname.mockResolvedValue({
+      redirect: "/password?loginName=unknown%40example.com",
+    });
+
+    const res = await handleOIDCFlowInitiation(makeBaseParams({ sessions: [] }));
+
+    expect(mockSendLoginname).toHaveBeenCalledWith(
+      expect.objectContaining({
+        loginName: "unknown@example.com",
+        ignoreUnknownUsernames: true,
+      }),
+    );
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toContain("/password");
+    expect(location).not.toContain("/loginname");
   });
 });
 

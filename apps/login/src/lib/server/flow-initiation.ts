@@ -5,7 +5,7 @@ import { getLanguageCookie, setLanguageCookie } from "@/lib/cookies";
 import { shouldUILocalesOverrideCookie } from "@/lib/i18n";
 import { idpTypeToSlug } from "@/lib/idp";
 import { createLogger } from "@/lib/logger";
-import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
+import { sendLoginname } from "@/lib/server/loginname";
 import { constructUrl } from "@/lib/service-url";
 import { findValidSession } from "@/lib/session";
 import {
@@ -13,6 +13,7 @@ import {
   createResponse,
   getActiveIdentityProviders,
   getAuthRequest,
+  getLoginSettings,
   getOrgsByDomain,
   getSAMLRequest,
   getSecuritySettings,
@@ -112,35 +113,46 @@ const gotoLoginname = ({
 /**
  * Resolve a login_hint server-side to a redirect straight to the next step
  * (e.g. /password), skipping the /loginname screen entirely. Returns null when
- * the hint can't be resolved (unknown/ambiguous user, transient error), in
- * which case callers fall back to the prefilled /loginname screen.
+ * there is no hint or it can't be resolved (unknown/ambiguous user, transient
+ * error), in which case callers fall back to the prefilled /loginname screen.
  */
 const resolveLoginHint = async ({
+  serviceConfig,
   request,
   requestId,
   loginHint,
   organization,
 }: {
+  serviceConfig: ServiceConfig;
   request: NextRequest;
   requestId: string;
-  loginHint: string;
+  loginHint?: string;
   organization?: string;
 }): Promise<NextResponse<unknown> | null> => {
+  if (!loginHint) {
+    return null;
+  }
+
   try {
-    let command: SendLoginnameCommand = {
+    // Mirror the client-side loginname form: forward ignoreUnknownUsernames so
+    // an unknown hint redirects to the (fake) /password step like a known one,
+    // instead of falling back to /loginname and disclosing that the user does
+    // not exist. getLoginSettings is TTL-cached, so this adds no extra RPC.
+    const loginSettings = await getLoginSettings({ serviceConfig, organization: organization || undefined });
+
+    const res = await sendLoginname({
       loginName: loginHint,
       requestId,
-    };
-
-    if (organization) {
-      command = { ...command, organization };
-    }
-
-    const res = await sendLoginname(command);
+      organization: organization || undefined,
+      ignoreUnknownUsernames: loginSettings?.ignoreUnknownUsernames,
+    });
 
     if (res && "redirect" in res && res.redirect) {
-      const absoluteUrl = constructUrl(request, res.redirect);
-      return NextResponse.redirect(absoluteUrl.toString());
+      return NextResponse.redirect(constructUrl(request, res.redirect));
+    }
+
+    if (res && "error" in res && res.error) {
+      logger.debug("login_hint could not be resolved, falling back to /loginname", { error: res.error });
     }
   } catch (error) {
     logger.error("Failed to resolve login_hint via sendLoginname:", { error });
@@ -330,32 +342,25 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         orgDomain,
       });
     } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
-      if (authRequest.loginHint) {
-        const hintResponse = await resolveLoginHint({
-          request,
-          requestId,
-          loginHint: authRequest.loginHint,
-          organization,
-        });
+      const hintResponse = await resolveLoginHint({
+        serviceConfig,
+        request,
+        requestId,
+        loginHint: authRequest.loginHint,
+        organization,
+      });
 
-        if (hintResponse) {
-          return hintResponse;
-        }
+      if (hintResponse) {
+        return hintResponse;
       }
 
-      const loginNameUrl = constructUrl(request, "/loginname");
-      loginNameUrl.searchParams.set("requestId", requestId);
-
-      if (authRequest.loginHint) {
-        loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
-      }
-      if (organization) {
-        loginNameUrl.searchParams.set("organization", organization);
-      }
-      if (orgDomain) {
-        loginNameUrl.searchParams.set("orgDomain", orgDomain);
-      }
-      return NextResponse.redirect(loginNameUrl);
+      return gotoLoginname({
+        request,
+        requestId,
+        loginHint: authRequest.loginHint,
+        organization,
+        orgDomain,
+      });
     } else if (authRequest.prompt.includes(Prompt.NONE)) {
       let securitySettings: SecuritySettings | undefined;
       try {
@@ -408,17 +413,16 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
       if (!selectedSession || !selectedSession.id) {
         // login_hint matches no session: resolve it straight to the next step.
-        if (authRequest.loginHint) {
-          const hintResponse = await resolveLoginHint({
-            request,
-            requestId,
-            loginHint: authRequest.loginHint,
-            organization,
-          });
+        const hintResponse = await resolveLoginHint({
+          serviceConfig,
+          request,
+          requestId,
+          loginHint: authRequest.loginHint,
+          organization,
+        });
 
-          if (hintResponse) {
-            return hintResponse;
-          }
+        if (hintResponse) {
+          return hintResponse;
         }
 
         // Prefill loginname (not the account picker) for an unresolved hint or when
@@ -494,36 +498,25 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
     }
   } else {
     // No session: resolve a login_hint straight to the next step if we can.
-    if (authRequest?.loginHint) {
-      const hintResponse = await resolveLoginHint({
-        request,
-        requestId,
-        loginHint: authRequest.loginHint,
-        organization,
-      });
+    const hintResponse = await resolveLoginHint({
+      serviceConfig,
+      request,
+      requestId,
+      loginHint: authRequest?.loginHint,
+      organization,
+    });
 
-      if (hintResponse) {
-        return hintResponse;
-      }
+    if (hintResponse) {
+      return hintResponse;
     }
 
-    const loginNameUrl = constructUrl(request, "/loginname");
-    loginNameUrl.searchParams.set("requestId", requestId);
-
-    // Prefill only, no auto-submit: see resolveLoginHint.
-    if (authRequest?.loginHint) {
-      loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
-    }
-
-    if (organization) {
-      loginNameUrl.searchParams.set("organization", organization);
-    }
-
-    if (orgDomain) {
-      loginNameUrl.searchParams.set("orgDomain", orgDomain);
-    }
-
-    return NextResponse.redirect(loginNameUrl);
+    return gotoLoginname({
+      request,
+      requestId,
+      loginHint: authRequest?.loginHint,
+      organization,
+      orgDomain,
+    });
   }
 }
 
