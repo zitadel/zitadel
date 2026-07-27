@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
+	"slices"
 	"strings"
 	"time"
 
@@ -968,12 +969,7 @@ func (q *UserSearchQueries) hasMetadataFilter() bool {
 }
 
 func searchQueriesHaveMetadataFilter(queries []SearchQuery) bool {
-	for _, qry := range queries {
-		if searchQueryHasMetadataFilter(qry) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(queries, searchQueryHasMetadataFilter)
 }
 
 func searchQueryHasMetadataFilter(qry SearchQuery) bool {
