@@ -800,14 +800,8 @@ var userLoginNameMatchesQuery string
 var userLoginNameMatchesCaseSensitiveQuery string
 
 // NewUserLoginNameExistsQuery filters users by login name.
-//
-// Equals / EqualsIgnoreCase return a planner marker that prepareUsersQuery
-// rewrites into an indexed join against login_names3_users.user_name(_lower).
-// Filtering the login_names3 view's computed login_name(_lower) cannot use
-// indexes and becomes a full scan / correlated nested loop over all users.
-//
-// Other comparison methods keep the view-based correlated subselect.
-// Markers left inside OrQuery / NotQuery fall back to that view path.
+// Equals / EqualsIgnoreCase use a planner marker rewritten in prepareUsersQuery
+// into an indexed join on login_names3_users. Other comparisons use the view.
 func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (SearchQuery, error) {
 	switch comparison {
 	case TextEquals, TextEqualsIgnoreCase:
@@ -849,9 +843,9 @@ func newLoginNameExistsViewQuery(value string, comparison TextComparison) (Searc
 	)
 }
 
-// loginNameEqualsFilter is a planner marker for login-name equality.
-// prepareUsersQuery extracts it and joins an indexed matches subquery.
-// If left unextracted (e.g. inside OrQuery), it falls back to the view path.
+// loginNameEqualsFilter marks a login-name equality filter for prepareUsersQuery
+// to rewrite as an indexed join. Unextracted markers (e.g. inside OrQuery) fall
+// back to the view-based exists query.
 type loginNameEqualsFilter struct {
 	username   string
 	domain     string
@@ -864,9 +858,9 @@ func newLoginNameEqualsFilter(value string, ignoreCase bool) (*loginNameEqualsFi
 		value = strings.ToLower(value)
 	}
 	username := value
-	var domainSuffix string
 	domainIndex := strings.LastIndex(value, "@")
-	// split between the last @ (ignore trailing @)
+	var domainSuffix string
+	// split between the last @ (so ignore it if the login name ends with it)
 	if domainIndex > 0 && domainIndex != len(value)-1 {
 		domainSuffix = value[domainIndex+1:]
 		username = value[:domainIndex]
@@ -887,15 +881,8 @@ func (q *loginNameEqualsFilter) comparison() TextComparison {
 }
 
 func (q *loginNameEqualsFilter) fallback() SearchQuery {
-	fallback, err := newLoginNameExistsViewQuery(q.loginName, q.comparison())
-	if err != nil {
-		// Unreachable for TextEquals / TextEqualsIgnoreCase; keep a valid SearchQuery.
-		list, listErr := NewListQuery(UserIDCol, []string{""}, ListIn)
-		if listErr != nil {
-			return &textQuery{Column: UserIDCol, Text: "", Compare: TextEquals}
-		}
-		return list
-	}
+	// Equals / EqualsIgnoreCase construction cannot fail for valid columns.
+	fallback, _ := newLoginNameExistsViewQuery(q.loginName, q.comparison())
 	return fallback
 }
 
@@ -936,8 +923,8 @@ func (q *loginNameEqualsFilter) joinMatches(instanceID string) sq.Sqlizer {
 	)
 }
 
-// extractLoginNameEqualsFilter peels a single safe login-name equals marker out of
-// top-level / AndQuery filters. Markers inside OrQuery or NotQuery are left alone.
+// extractLoginNameEqualsFilter extracts one login-name equals marker from
+// top-level or AndQuery filters. Markers inside OrQuery / NotQuery are kept.
 func extractLoginNameEqualsFilter(queries []SearchQuery) (filter *loginNameEqualsFilter, remaining []SearchQuery, ok bool) {
 	remaining = make([]SearchQuery, 0, len(queries))
 	var found *loginNameEqualsFilter
@@ -959,21 +946,13 @@ func extractLoginNameEqualsFilter(queries []SearchQuery) (filter *loginNameEqual
 				return nil, queries, false
 			}
 			found = inner
-			if len(rest) == 0 {
-				continue
-			}
 			if len(rest) == 1 {
 				remaining = append(remaining, rest[0])
-				continue
+			} else if len(rest) > 1 {
+				andQuery, _ := NewAndQuery(rest...)
+				remaining = append(remaining, andQuery)
 			}
-			andQuery, err := NewAndQuery(rest...)
-			if err != nil {
-				remaining = append(remaining, rest...)
-				continue
-			}
-			remaining = append(remaining, andQuery)
 		default:
-			// OrQuery / NotQuery / other filters: never extract from OR/NOT trees.
 			remaining = append(remaining, qry)
 		}
 	}
@@ -1442,11 +1421,8 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 // The count over window function and limit are applied in the outer query.
 // It is not possible to pass more filters to the returned query, as they need to be applied in the sub-select.
 //
-// The metadata JOIN and DISTINCT are only applied when a metadata filter is present, to avoid
-// multiplying rows (and forcing DISTINCT) for common ListUsers paths such as login-name lookup.
-//
-// Login-name equals filters are rewritten by the planner into an indexed join against
-// login_names3_users when they appear in a safe (non-OR / non-NOT) position.
+// Metadata JOIN and DISTINCT are only applied when a metadata filter is present.
+// Login-name equals markers are rewritten into an indexed join when extractable.
 func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 	if q.SortingColumn.isZero() {
 		q.SortingColumn = UserIDCol
@@ -1509,7 +1485,6 @@ func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionChe
 	}
 
 	query = userPermissionCheckV2(ctx, query, permissionCheckV2, filters)
-	// apply requested filters (login-name equals already applied via join when extracted)
 	for _, filter := range filters {
 		query = filter.toQuery(query)
 	}
