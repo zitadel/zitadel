@@ -804,12 +804,10 @@ var userLoginNameMatchesCaseSensitiveQuery string
 // Equals / EqualsIgnoreCase use a planner marker rewritten in prepareUsersQuery
 // into an indexed join on login_names3_users. Other comparisons use the view.
 func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	switch comparison {
-	case TextEquals, TextEqualsIgnoreCase:
+	if comparison == TextEquals || comparison == TextEqualsIgnoreCase {
 		return newLoginNameEqualsFilter(value, comparison == TextEqualsIgnoreCase)
-	default:
-		return newLoginNameExistsViewQuery(value, comparison)
 	}
+	return newLoginNameExistsViewQuery(value, comparison)
 }
 
 func newLoginNameExistsViewQuery(value string, comparison TextComparison) (SearchQuery, error) {
