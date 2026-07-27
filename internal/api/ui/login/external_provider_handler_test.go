@@ -358,7 +358,7 @@ func Test_projectRolesFromIDPUser(t *testing.T) {
 			},
 		},
 		{
-			"invalid org domain empty",
+			"non-string org domain is skipped",
 			openid.NewUser(&oidc.UserInfo{Claims: map[string]any{
 				zitadelProjectRolesClaim: map[string]any{
 					"IAM_OWNER_VIEWER": map[string]any{
@@ -366,8 +366,20 @@ func Test_projectRolesFromIDPUser(t *testing.T) {
 					},
 				}},
 			}),
+			nil,
+		},
+		{
+			"role keeps only orgs with string domains",
+			openid.NewUser(&oidc.UserInfo{Claims: map[string]any{
+				zitadelProjectRolesClaim: map[string]any{
+					"IAM_OWNER_VIEWER": map[string]any{
+						"orgID1": "org1.example.com",
+						"orgID2": 55,
+					},
+				}},
+			}),
 			map[string]map[string]string{
-				"IAM_OWNER_VIEWER": {"orgID1": ""},
+				"IAM_OWNER_VIEWER": {"orgID1": "org1.example.com"},
 			},
 		},
 	}

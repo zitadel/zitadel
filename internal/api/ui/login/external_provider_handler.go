@@ -1757,8 +1757,15 @@ func projectRolesFromIDPUser(user idp.User) map[string]map[string]string {
 		}
 		orgMap := make(map[string]string, len(orgs))
 		for orgID, rawDomain := range orgs {
-			domainName, _ := rawDomain.(string)
+			// skip entries whose domain is not a string.
+			domainName, ok := rawDomain.(string)
+			if !ok {
+				continue
+			}
 			orgMap[orgID] = domainName
+		}
+		if len(orgMap) == 0 {
+			continue
 		}
 		roles[role] = orgMap
 	}

@@ -14127,6 +14127,11 @@ message AddZitadelProviderRequest {
         }
     ];
     zitadel.idp.v1.Options provider_options = 6;
+
+    // field 7 previously held instance_roles_info, which was removed as it allowed
+    // org-scoped providers to grant instance-wide role memberships on login.
+    reserved 7;
+    reserved "instance_roles_info";
 }
 
 message AddZitadelProviderResponse {
@@ -14177,6 +14182,11 @@ message UpdateZitadelProviderRequest {
         }
     ];
     zitadel.idp.v1.Options provider_options = 7;
+
+    // field 8 previously held instance_roles_info, which was removed as it allowed
+    // org-scoped providers to grant instance-wide role memberships on login.
+    reserved 8;
+    reserved "instance_roles_info";
 }
 
 message UpdateZitadelProviderResponse {
