@@ -537,10 +537,14 @@ func (l *Login) handleExternalUserAuthenticated(
 	// (re)assign the support-user instance membership for an existing user
 	// so that the role assignment remains idempotent
 	// in case user creation succeeded but role assignment failed in a previous request.
-	if err = l.grantSupportUserInstanceMembership(r, provider, authReq, externalUser); err != nil && !userLinked {
+	err = l.grantSupportUserInstanceMembership(r, provider, authReq, externalUser)
+	if err != nil && !userLinked {
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	// if a user was just linked we don't render further errors (see above),
+	// but a failed support-membership grant must still be observable, so logging it.
+	logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to grant support user instance membership")
 	callback(w, r, authReq)
 }
 
