@@ -3,9 +3,13 @@ import { check } from 'k6';
 import { Config } from '../config';
 import { loginByUsernamePassword } from '../login_ui';
 import { createOrg, Org, removeOrg } from '../org';
-import { createHuman, Human, listUsers, User } from '../user';
+import { mapPool } from '../pool';
+import { createHuman, listUsers, User } from '../user';
 
 const userAmount = parseInt(__ENV.USER_AMOUNT) || 2500;
+// Unbounded Promise.all over large USER_AMOUNT exhausts ephemeral ports
+// (dial tcp ... can't assign requested address). Keep a modest in-flight cap.
+const setupConcurrency = parseInt(__ENV.SETUP_CONCURRENCY) || 50;
 
 type SetupData = {
   tokens: { accessToken?: string };
@@ -20,17 +24,19 @@ export async function setup(): Promise<SetupData> {
   const org = await createOrg(tokens.accessToken!);
   console.info(`setup: org (${org.organizationId}) created`);
 
-  const users: Human[] = [];
-  await Promise.all(
-    Array.from({ length: userAmount }, async (_, i) => {
+  const progressEvery = Math.max(1, Math.floor(userAmount / 100));
+  const users = await mapPool(
+    Array.from({ length: userAmount }, (_, i) => i),
+    setupConcurrency,
+    async (i) => {
       const user = await createHuman(`zitizen-${i}`, org, tokens.accessToken!);
-      users.push(user);
-      if (i % 10 === 0) {
-        console.log(`setup: ${i} of ${userAmount} users setup`);
+      if (i % progressEvery === 0 || i === userAmount - 1) {
+        console.log(`setup: ${i + 1} of ${userAmount} users setup`);
       }
-    }),
+      return user;
+    },
   );
-  console.info(`setup: ${users.length} users created`);
+  console.info(`setup: ${users.length} users created (concurrency=${setupConcurrency})`);
 
   const targetLoginName = users[0].loginNames[0];
   console.info(`setup: target login name ${targetLoginName}`);

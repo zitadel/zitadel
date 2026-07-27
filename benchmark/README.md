@@ -24,6 +24,7 @@ The use cases under tests are defined in `src/use_cases`. The implementation of 
 - `ADMIN_LOGIN_NAME`: Loginanme of a human user with `IAM_OWNER`-role
 - `ADMIN_PASSWORD`: password of the human user
 - `USER_AMOUNT`: Number of users created during setup for list-users benchmarks (default is `2500`)
+- `SETUP_CONCURRENCY`: Max in-flight user-create requests during list-users setup (default is `50`). Large `USER_AMOUNT` with unbounded parallelism can exhaust ephemeral ports (`can't assign requested address`).
 
 To setup the tests we use the credentials of management console and log in using an admin. The user must be able to create organizations and all resources inside organizations.
 
@@ -76,7 +77,7 @@ Before you run the tests you need an initialized user. The tests don't implement
   setup: creates for half of the VUS a human user and a machine for the other half, adds 3 metadata to each user
   test: calls the list users endpoint and filters by a metadata value
 - `make users_by_login_name`  
-  setup: creates `USER_AMOUNT` human users (default `2500`) in a new org  
+  setup: creates `USER_AMOUNT` human users (default `2500`) in a new org, with `SETUP_CONCURRENCY` parallel creates (default `50`)  
   test: calls ListUsers the same way as login v2 (`loginNameQuery` with `EQUALS_IGNORE_CASE`, `organizationIdQuery`, `limit: 2`)  
   note: to reproduce multi-second latency on the old query plan, use a large dataset, e.g. `USER_AMOUNT=100000 VUS=10 DURATION=60s`
 - `make verify_all_user_grants_exists`  
