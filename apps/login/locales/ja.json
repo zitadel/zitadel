@@ -398,6 +398,8 @@
       "couldNotVerifyInvite": "招待を確認できませんでした",
       "couldNotVerifyEmail": "メールアドレスを確認できませんでした",
       "couldNotVerify": "確認できませんでした",
+      "couldNotVerifyTOTP": "コードを確認できませんでした",
+      "invalidCode": "コードが無効です。もう一度お試しください。",
       "couldNotLoadUser": "ユーザーを読み込めませんでした",
       "couldNotLoadAuthenticators": "認証方法を読み込めませんでした",
       "couldNotCreateSession": "セッションを作成できませんでした",

@@ -405,6 +405,8 @@
       "couldNotVerifyInvite": "تعذر التحقق من الدعوة",
       "couldNotVerifyEmail": "تعذر التحقق من البريد الإلكتروني",
       "couldNotVerify": "تعذر التحقق",
+      "couldNotVerifyTOTP": "تعذر التحقق من الرمز",
+      "invalidCode": "الرمز غير صالح. يرجى المحاولة مرة أخرى.",
       "couldNotLoadUser": "تعذر تحميل المستخدم",
       "couldNotLoadAuthenticators": "تعذر تحميل المصادقين المحتملين",
       "couldNotCreateSession": "تعذر إنشاء الجلسة",
