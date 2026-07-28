@@ -974,6 +974,11 @@ export const apisSidebar: readonly SidebarItem[] = [
     id: "apis/statuscodes",
   },
   {
+    type: "doc",
+    label: "Error Reference",
+    id: "apis/errors",
+  },
+  {
     type: "link",
     label: "Rate Limits (Cloud)",
     href: "/legal/policies/rate-limit-policy",
