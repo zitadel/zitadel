@@ -874,18 +874,18 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, pro
 	l.renderNextStep(w, r, authReq)
 }
 
-// ensureSupportUserInstanceMembership makes sure an external user holds the IAM_OWNER_VIEWER
-// instance membership when they authenticated via a ZITADEL provider and their
-// `urn:zitadel:iam:org:project:roles` claim carries that role for an organization
-// configured in the IDP's InstanceRolesInfo.
+// ensureSupportUserInstanceMembership makes sure an external user holds the instance member
+// roles conveyed by their `urn:zitadel:iam:org:project:roles` claim when they authenticated
+// via a ZITADEL provider.
 func (l *Login) ensureSupportUserInstanceMembership(r *http.Request, provider *query.IDPTemplate, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) error {
-	if !supportUserInstanceMembershipRequired(provider, externalUser) {
+	roles := supportUserInstanceRoles(provider, externalUser)
+	if len(roles) == 0 {
 		return nil
 	}
 	member := &command.AddInstanceMember{
 		InstanceID: authz.GetInstance(r.Context()).InstanceID(),
 		UserID:     authReq.UserID,
-		Roles:      []string{domain.RoleIAMOwnerViewer},
+		Roles:      roles,
 	}
 	_, err := l.command.EnsureInstanceMemberRolesFromLogin(setContext(r.Context(), ""), member)
 	if err != nil && !zerrors.IsErrorAlreadyExists(err) {
@@ -894,27 +894,37 @@ func (l *Login) ensureSupportUserInstanceMembership(r *http.Request, provider *q
 	return nil
 }
 
-// supportUserInstanceMembershipRequired checks whether a newly created external user
-// must be granted the IAM_OWNER_VIEWER instance membership.
-func supportUserInstanceMembershipRequired(provider *query.IDPTemplate, externalUser *domain.ExternalUser) bool {
+// supportUserInstanceRoles returns the instance member roles an external user must hold,
+// derived from the IAM roles of their ZITADEL project roles claim. Only roles claimed for an
+// organization configured in the IDP's InstanceRolesInfo are returned so that the set of
+// organizations able to confer instance roles stays under the control of the instance admins.
+func supportUserInstanceRoles(provider *query.IDPTemplate, externalUser *domain.ExternalUser) []string {
 	// instance-wide role grants may only originate from an instance-scoped IDP.
 	// An organization-scoped provider must never confer instance membership, even if
 	// its InstanceRolesInfo is somehow populated (e.g. stale data): honoring it would
 	// let an org owner escalate themselves to instance-level roles.
 	if provider.OwnerType != domain.IdentityProviderTypeSystem {
-		return false
+		return nil
 	}
 	// only a ZITADEL provider conveys support-user project roles
 	if provider.Type != domain.IDPTypeZitadel || provider.ZitadelIDPTemplate == nil {
-		return false
+		return nil
 	}
-	// a user without the support role in the claim is not a support user and needs no membership
-	claimOrgs, ok := externalUser.ProjectRoles[domain.RoleIAMOwnerViewer]
-	if !ok || len(claimOrgs) == 0 {
-		return false
+	var roles []string
+	for role, claimOrgs := range externalUser.ProjectRoles {
+		// only an IAM role can be conferred by an instance membership
+		if !strings.HasPrefix(role, domain.IAMRolePrefix) {
+			continue
+		}
+		// a claim org must be the same as a configured organization (ID and domain)
+		if !claimMatchesConfiguredOrg(claimOrgs, provider.ZitadelIDPTemplate) {
+			continue
+		}
+		roles = append(roles, role)
 	}
-	// a claim org must be the same as a configured organization (ID and domain)
-	return claimMatchesConfiguredOrg(claimOrgs, provider.ZitadelIDPTemplate)
+	// the claim is a map, so sort to keep the resulting role set deterministic
+	slices.Sort(roles)
+	return roles
 }
 
 // claimMatchesConfiguredOrg reports whether any organization from the roles claim

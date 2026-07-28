@@ -93,23 +93,28 @@ func (c *Commands) AddInstanceMember(ctx context.Context, member *AddInstanceMem
 // and the configured InstanceRolesInfo for the Zitadel provider.
 // Do not use it for any user-initiated API path.
 func (c *Commands) EnsureInstanceMemberRolesFromLogin(ctx context.Context, member *AddInstanceMember) (*domain.ObjectDetails, error) {
-	if member.InstanceID == "" || member.UserID == "" || len(member.Roles) == 0 {
+	if member.InstanceID == "" || member.UserID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "INSTA-Ee7ai", "Errors.Instance.MemberInvalid")
+	}
+	granted := configuredRolesOnly(member.Roles, c.zitadelRoles)
+	if len(granted) == 0 {
+		return nil, zerrors.ThrowInvalidArgument(nil, "INSTA-oo0Ai", "Errors.Instance.MemberInvalid")
 	}
 	existingMember, err := c.instanceMemberWriteModelByID(ctx, member.InstanceID, member.UserID)
 	if err != nil {
 		return nil, err
 	}
 	if !existingMember.State.Exists() {
-		return c.addInstanceMember(ctx, member)
+		return c.addInstanceMember(ctx, &AddInstanceMember{
+			InstanceID: member.InstanceID,
+			UserID:     member.UserID,
+			Roles:      granted,
+		})
 	}
-	// the roles are merged so that roles granted elsewhere are retained
-	roles := missingRolesAdded(existingMember.Roles, member.Roles)
+	// the roles are merged so that roles granted elsewhere are retained.
+	roles := missingRolesAdded(existingMember.Roles, granted)
 	if len(roles) == len(existingMember.Roles) {
 		return writeModelToObjectDetails(&existingMember.WriteModel), nil
-	}
-	if len(domain.CheckForInvalidRoles(roles, domain.IAMRolePrefix, c.zitadelRoles)) > 0 {
-		return nil, zerrors.ThrowInvalidArgument(nil, "INSTA-oo0Ai", "Errors.Instance.MemberInvalid")
 	}
 	pushedEvents, err := c.eventstore.Push(ctx,
 		instance.NewMemberChangedEvent(ctx,
@@ -125,6 +130,16 @@ func (c *Commands) EnsureInstanceMemberRolesFromLogin(ctx context.Context, membe
 		return nil, err
 	}
 	return writeModelToObjectDetails(&existingMember.WriteModel), nil
+}
+
+// configuredRolesOnly returns the subset of roles that are configured as instance roles.
+// The roles of a ZITADEL provider's claim originate from an external
+// instance, whose role set may differ, so unknown roles are dropped.
+func configuredRolesOnly(roles []string, zitadelRoles []authz.RoleMapping) []string {
+	invalid := domain.CheckForInvalidRoles(roles, domain.IAMRolePrefix, zitadelRoles)
+	return slices.DeleteFunc(slices.Clone(roles), func(role string) bool {
+		return slices.Contains(invalid, role)
+	})
 }
 
 // missingRolesAdded returns the existing roles with new roles to be added that are not already

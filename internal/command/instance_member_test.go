@@ -444,19 +444,9 @@ func TestCommandSide_EnsureInstanceMemberRolesFromLogin(t *testing.T) {
 			},
 		},
 		{
-			name: "member existing, role not configured on instance, invalid argument error",
+			name: "no role configured on instance, invalid argument error",
 			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewMemberAddedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								"user1",
-								[]string{"IAM_OWNER"}...,
-							),
-						),
-					),
-				),
+				eventstore:      expectEventstore(),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 				zitadelRoles: []authz.RoleMapping{
 					{
@@ -473,6 +463,50 @@ func TestCommandSide_EnsureInstanceMemberRolesFromLogin(t *testing.T) {
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "role not configured on instance, dropped from the granted roles",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewMemberAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"user1",
+								[]string{"IAM_LOGIN_CLIENT"}...,
+							),
+						),
+					),
+					expectPush(
+						instance.NewMemberChangedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"user1",
+							[]string{"IAM_LOGIN_CLIENT", "IAM_OWNER_VIEWER"}...,
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: "IAM_LOGIN_CLIENT",
+					},
+					{
+						Role: "IAM_OWNER_VIEWER",
+					},
+				},
+			},
+			args: args{
+				member: &AddInstanceMember{
+					InstanceID: "INSTANCE",
+					UserID:     "user1",
+					Roles:      []string{"IAM_OWNER_VIEWER", "IAM_ROLE_OF_OTHER_INSTANCE"},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
 			},
 		},
 	}

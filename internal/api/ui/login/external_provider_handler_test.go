@@ -504,7 +504,7 @@ func Test_preserveProjectRoles(t *testing.T) {
 	}
 }
 
-func Test_supportUserInstanceMembershipRequired(t *testing.T) {
+func Test_supportUserInstanceRoles(t *testing.T) {
 	configured := &query.ZitadelIDPTemplate{
 		InstanceRolesInfo: []provideridp.RolesInfo{{OrganizationID: "orgID1", OrganizationDomain: "org1.example.com"}},
 	}
@@ -515,60 +515,87 @@ func Test_supportUserInstanceMembershipRequired(t *testing.T) {
 		name         string
 		provider     *query.IDPTemplate
 		externalUser *domain.ExternalUser
-		want         bool
+		want         []string
 	}{
 		{
 			name:         "instance zitadel provider, support role claim, matching org",
 			provider:     &query.IDPTemplate{OwnerType: domain.IdentityProviderTypeSystem, Type: domain.IDPTypeZitadel, ZitadelIDPTemplate: configured},
 			externalUser: &domain.ExternalUser{ProjectRoles: supportClaim},
-			want:         true,
+			want:         []string{domain.RoleIAMOwnerViewer},
+		},
+		{
+			name:     "multiple IAM roles claimed, all returned sorted",
+			provider: &query.IDPTemplate{Type: domain.IDPTypeZitadel, ZitadelIDPTemplate: configured},
+			externalUser: &domain.ExternalUser{ProjectRoles: map[string]map[string]string{
+				domain.RoleIAMOwnerViewer: {"orgID1": "org1.example.com"},
+				domain.RoleIAMOwner:       {"orgID1": "org1.example.com"},
+			}},
+			want: []string{domain.RoleIAMOwner, domain.RoleIAMOwnerViewer},
+		},
+		{
+			name:     "only the roles of a configured org are returned",
+			provider: &query.IDPTemplate{Type: domain.IDPTypeZitadel, ZitadelIDPTemplate: configured},
+			externalUser: &domain.ExternalUser{ProjectRoles: map[string]map[string]string{
+				domain.RoleIAMOwnerViewer: {"orgID1": "org1.example.com"},
+				domain.RoleIAMOwner:       {"orgID2": "org2.example.com"},
+			}},
+			want: []string{domain.RoleIAMOwnerViewer},
+		},
+		{
+			name:     "non-IAM roles are not returned",
+			provider: &query.IDPTemplate{Type: domain.IDPTypeZitadel, ZitadelIDPTemplate: configured},
+			externalUser: &domain.ExternalUser{ProjectRoles: map[string]map[string]string{
+				domain.RoleIAMOwnerViewer: {"orgID1": "org1.example.com"},
+				domain.RoleOrgOwner:       {"orgID1": "org1.example.com"},
+			}},
+			want: []string{domain.RoleIAMOwnerViewer},
 		},
 		{
 			name:         "org-scoped zitadel provider, matching org, skipped",
 			provider:     &query.IDPTemplate{OwnerType: domain.IdentityProviderTypeOrg, Type: domain.IDPTypeZitadel, ZitadelIDPTemplate: configured},
 			externalUser: &domain.ExternalUser{ProjectRoles: supportClaim},
-			want:         false,
+			want:         nil,
 		},
 		{
 			name:         "non-zitadel provider, skipped",
 			provider:     &query.IDPTemplate{Type: domain.IDPTypeOIDC, ZitadelIDPTemplate: configured},
 			externalUser: &domain.ExternalUser{ProjectRoles: supportClaim},
-			want:         false,
+			want:         nil,
 		},
 		{
 			name:         "zitadel type but no zitadel template, skipped",
 			provider:     &query.IDPTemplate{Type: domain.IDPTypeZitadel},
 			externalUser: &domain.ExternalUser{ProjectRoles: supportClaim},
-			want:         false,
+			want:         nil,
 		},
 		{
 			name:         "no roles claim at all, skipped",
 			provider:     &query.IDPTemplate{Type: domain.IDPTypeZitadel, ZitadelIDPTemplate: configured},
 			externalUser: &domain.ExternalUser{},
-			want:         false,
+			want:         nil,
 		},
 		{
-			name:         "roles claim without the support role, skipped",
+			name:         "roles claim without an IAM role, skipped",
 			provider:     &query.IDPTemplate{Type: domain.IDPTypeZitadel, ZitadelIDPTemplate: configured},
 			externalUser: &domain.ExternalUser{ProjectRoles: map[string]map[string]string{"OTHER_ROLE": {"orgID1": "org1.example.com"}}},
-			want:         false,
+			want:         nil,
 		},
 		{
 			name:         "support role present but empty org set, skipped",
 			provider:     &query.IDPTemplate{Type: domain.IDPTypeZitadel, ZitadelIDPTemplate: configured},
 			externalUser: &domain.ExternalUser{ProjectRoles: map[string]map[string]string{domain.RoleIAMOwnerViewer: {}}},
-			want:         false,
+			want:         nil,
 		},
 		{
 			name:         "support role claim for a non-configured org, skipped",
 			provider:     &query.IDPTemplate{Type: domain.IDPTypeZitadel, ZitadelIDPTemplate: configured},
 			externalUser: &domain.ExternalUser{ProjectRoles: map[string]map[string]string{domain.RoleIAMOwnerViewer: {"orgID1": "evil.example.com"}}},
-			want:         false,
+			want:         nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, supportUserInstanceMembershipRequired(tt.provider, tt.externalUser))
+			assert.Equal(t, tt.want, supportUserInstanceRoles(tt.provider, tt.externalUser))
 		})
 	}
 }
