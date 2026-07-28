@@ -3,6 +3,7 @@ import path, { join, dirname, resolve } from 'path';
 import { spawn, execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import semver from 'semver';
+import { LATEST_VERSION_LABEL } from '../lib/version-preference.mjs';
 import { Readable } from 'stream';
 
 const FALLBACK_VERSION = 'v4.10.0';
@@ -520,7 +521,7 @@ async function run() {
   const versionsJson = [
     {
       param: 'latest',
-      label: localVer.isUnreleased ? `${localVer.label} (Unreleased)` : `${localVer.label} (Latest)`,
+      label: LATEST_VERSION_LABEL,
       url: '/docs',
       ref: 'local',
       refType: 'local'
