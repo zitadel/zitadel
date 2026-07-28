@@ -74,6 +74,10 @@ users_by_metadata_key: ensure_modules bundle
 users_by_metadata_value: ensure_modules bundle
 	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/users_by_metadata_value.js --vus ${VUS} --duration ${DURATION} --out csv=output/users_by_metadata_${DATE}.csv
 
+.PHONY: users_by_login_name
+users_by_login_name: ensure_modules bundle
+	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/users_by_login_name.js --vus ${VUS} --duration ${DURATION} --out csv=output/users_by_login_name_${DATE}.csv
+
 .PHONY: lint
 lint:
 	npm i

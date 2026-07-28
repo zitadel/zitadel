@@ -325,7 +325,26 @@ export function setUserMetadata(metadata: Metadata[], userId: string, accessToke
 }
 
 export type ListUsersRequest = {
+  query?: {
+    limit?: number;
+    offset?: number;
+  };
   queries: {
+    loginNameQuery?: {
+      loginName: string;
+      method:
+        | 'TEXT_QUERY_METHOD_EQUALS'
+        | 'TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE'
+        | 'TEXT_QUERY_METHOD_STARTS_WITH'
+        | 'TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE'
+        | 'TEXT_QUERY_METHOD_CONTAINS'
+        | 'TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE'
+        | 'TEXT_QUERY_METHOD_ENDS_WITH'
+        | 'TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE';
+    };
+    organizationIdQuery?: {
+      organizationId: string;
+    };
     metadataKeyFilter?: {
       key: string;
       method: 'TEXT_FILTER_METHOD_EQUALS' | 'TEXT_FILTER_METHOD_CONTAINS' | 'TEXT_FILTER_METHOD_CONTAINS_IGNORE_CASE';
@@ -341,6 +360,7 @@ export type ListUsersResult = {
   details: {
     totalResult: number;
   };
+  result?: unknown[];
 };
 
 const listUsersTrend = new Trend('list_users_duration', true);
