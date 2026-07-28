@@ -83,13 +83,60 @@ func (c *Commands) AddInstanceMember(ctx context.Context, member *AddInstanceMem
 	return c.addInstanceMember(ctx, member)
 }
 
-// AddInstanceMemberFromLogin grants an instance membership during the login v1 ZITADEL-IdP flow.
+// EnsureInstanceMemberRolesFromLogin makes sure the user holds the given instance member roles
+// during the login v1 ZITADEL-IdP flow.
+// It adds the membership if the user is not a member yet and otherwise adds the missing roles
+// to the existing membership. Roles the user already holds are never removed.
+//
 // It intentionally bypasses the standard instance-member permission check.
 // Authorization is established by the validated `urn:zitadel:iam:org:project:roles` token claim
 // and the configured InstanceRolesInfo for the Zitadel provider.
 // Do not use it for any user-initiated API path.
-func (c *Commands) AddInstanceMemberFromLogin(ctx context.Context, member *AddInstanceMember) (*domain.ObjectDetails, error) {
-	return c.addInstanceMember(ctx, member)
+func (c *Commands) EnsureInstanceMemberRolesFromLogin(ctx context.Context, member *AddInstanceMember) (*domain.ObjectDetails, error) {
+	if member.InstanceID == "" || member.UserID == "" || len(member.Roles) == 0 {
+		return nil, zerrors.ThrowInvalidArgument(nil, "INSTA-Ee7ai", "Errors.Instance.MemberInvalid")
+	}
+	existingMember, err := c.instanceMemberWriteModelByID(ctx, member.InstanceID, member.UserID)
+	if err != nil {
+		return nil, err
+	}
+	if !existingMember.State.Exists() {
+		return c.addInstanceMember(ctx, member)
+	}
+	// the roles are merged so that roles granted elsewhere are retained
+	roles := missingRolesAdded(existingMember.Roles, member.Roles)
+	if len(roles) == len(existingMember.Roles) {
+		return writeModelToObjectDetails(&existingMember.WriteModel), nil
+	}
+	if len(domain.CheckForInvalidRoles(roles, domain.IAMRolePrefix, c.zitadelRoles)) > 0 {
+		return nil, zerrors.ThrowInvalidArgument(nil, "INSTA-oo0Ai", "Errors.Instance.MemberInvalid")
+	}
+	pushedEvents, err := c.eventstore.Push(ctx,
+		instance.NewMemberChangedEvent(ctx,
+			InstanceAggregateFromWriteModel(&existingMember.WriteModel),
+			member.UserID,
+			roles...,
+		),
+	)
+	if err != nil {
+		return nil, err
+	}
+	if err = AppendAndReduce(existingMember, pushedEvents...); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingMember.WriteModel), nil
+}
+
+// missingRolesAdded returns the existing roles with new roles to be added that are not already
+// present, preserving the order of the existing roles.
+func missingRolesAdded(existing, add []string) []string {
+	roles := slices.Clone(existing)
+	for _, role := range add {
+		if !slices.Contains(roles, role) {
+			roles = append(roles, role)
+		}
+	}
+	return roles
 }
 
 // addInstanceMember performs the write without any permission check.

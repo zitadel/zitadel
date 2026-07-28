@@ -276,7 +276,7 @@ func TestCommandSide_AddInstanceMember(t *testing.T) {
 	}
 }
 
-func TestCommandSide_AddInstanceMemberFromLogin(t *testing.T) {
+func TestCommandSide_EnsureInstanceMemberRolesFromLogin(t *testing.T) {
 	type fields struct {
 		eventstore      func(t *testing.T) *eventstore.Eventstore
 		zitadelRoles    []authz.RoleMapping
@@ -296,9 +296,26 @@ func TestCommandSide_AddInstanceMemberFromLogin(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "member add, bypasses permission check",
+			name: "no roles, invalid argument error",
+			fields: fields{
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				member: &AddInstanceMember{
+					InstanceID: "INSTANCE",
+					UserID:     "user1",
+				},
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "member not existing, added, bypasses permission check",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
@@ -321,7 +338,122 @@ func TestCommandSide_AddInstanceMemberFromLogin(t *testing.T) {
 						instance.NewMemberAddedEvent(context.Background(),
 							&instance.NewAggregate("INSTANCE").Aggregate,
 							"user1",
-							[]string{"IAM_OWNER"}...,
+							[]string{"IAM_OWNER_VIEWER"}...,
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: "IAM_OWNER_VIEWER",
+					},
+				},
+			},
+			args: args{
+				member: &AddInstanceMember{
+					InstanceID: "INSTANCE",
+					UserID:     "user1",
+					Roles:      []string{"IAM_OWNER_VIEWER"},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "member existing without the role, role added",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewMemberAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"user1",
+								[]string{"IAM_LOGIN_CLIENT"}...,
+							),
+						),
+					),
+					expectPush(
+						instance.NewMemberChangedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"user1",
+							[]string{"IAM_LOGIN_CLIENT", "IAM_OWNER_VIEWER"}...,
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: "IAM_LOGIN_CLIENT",
+					},
+					{
+						Role: "IAM_OWNER_VIEWER",
+					},
+				},
+			},
+			args: args{
+				member: &AddInstanceMember{
+					InstanceID: "INSTANCE",
+					UserID:     "user1",
+					Roles:      []string{"IAM_OWNER_VIEWER"},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "member existing with the role, no push",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewMemberAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"user1",
+								[]string{"IAM_OWNER", "IAM_OWNER_VIEWER"}...,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: "IAM_OWNER",
+					},
+					{
+						Role: "IAM_OWNER_VIEWER",
+					},
+				},
+			},
+			args: args{
+				member: &AddInstanceMember{
+					InstanceID: "INSTANCE",
+					UserID:     "user1",
+					Roles:      []string{"IAM_OWNER_VIEWER"},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "member existing, role not configured on instance, invalid argument error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewMemberAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"user1",
+								[]string{"IAM_OWNER"}...,
+							),
 						),
 					),
 				),
@@ -336,13 +468,11 @@ func TestCommandSide_AddInstanceMemberFromLogin(t *testing.T) {
 				member: &AddInstanceMember{
 					InstanceID: "INSTANCE",
 					UserID:     "user1",
-					Roles:      []string{"IAM_OWNER"},
+					Roles:      []string{"IAM_OWNER_VIEWER"},
 				},
 			},
 			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "INSTANCE",
-				},
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 	}
@@ -353,7 +483,7 @@ func TestCommandSide_AddInstanceMemberFromLogin(t *testing.T) {
 				zitadelRoles:    tt.fields.zitadelRoles,
 				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := r.AddInstanceMemberFromLogin(context.Background(), tt.args.member)
+			got, err := r.EnsureInstanceMemberRolesFromLogin(context.Background(), tt.args.member)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

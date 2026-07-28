@@ -537,7 +537,7 @@ func (l *Login) handleExternalUserAuthenticated(
 	// (re)assign the support-user instance membership for an existing user
 	// so that the role assignment remains idempotent
 	// in case user creation succeeded but role assignment failed in a previous request.
-	err = l.grantSupportUserInstanceMembership(r, provider, authReq, externalUser)
+	err = l.ensureSupportUserInstanceMembership(r, provider, authReq, externalUser)
 	if err != nil && !userLinked {
 		l.renderError(w, r, authReq, err)
 		return
@@ -867,18 +867,18 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, pro
 		return
 	}
 	// a ZITADEL provider may grant a support user an instance membership based on the roles present in its token claim.
-	if err = l.grantSupportUserInstanceMembership(r, provider, authReq, externalUser); err != nil {
+	if err = l.ensureSupportUserInstanceMembership(r, provider, authReq, externalUser); err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
 	l.renderNextStep(w, r, authReq)
 }
 
-// grantSupportUserInstanceMembership grants the IAM_OWNER_VIEWER instance membership
-// to a freshly created external user when they authenticated via a ZITADEL provider
-// and their `urn:zitadel:iam:org:project:roles` claim carries that role for an
-// organization configured in the IDP's InstanceRolesInfo.
-func (l *Login) grantSupportUserInstanceMembership(r *http.Request, provider *query.IDPTemplate, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) error {
+// ensureSupportUserInstanceMembership makes sure an external user holds the IAM_OWNER_VIEWER
+// instance membership when they authenticated via a ZITADEL provider and their
+// `urn:zitadel:iam:org:project:roles` claim carries that role for an organization
+// configured in the IDP's InstanceRolesInfo.
+func (l *Login) ensureSupportUserInstanceMembership(r *http.Request, provider *query.IDPTemplate, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) error {
 	if !supportUserInstanceMembershipRequired(provider, externalUser) {
 		return nil
 	}
@@ -887,7 +887,7 @@ func (l *Login) grantSupportUserInstanceMembership(r *http.Request, provider *qu
 		UserID:     authReq.UserID,
 		Roles:      []string{domain.RoleIAMOwnerViewer},
 	}
-	_, err := l.command.AddInstanceMemberFromLogin(setContext(r.Context(), ""), member)
+	_, err := l.command.EnsureInstanceMemberRolesFromLogin(setContext(r.Context(), ""), member)
 	if err != nil && !zerrors.IsErrorAlreadyExists(err) {
 		return err
 	}
