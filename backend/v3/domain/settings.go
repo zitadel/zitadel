@@ -324,6 +324,8 @@ type securitySettingsJSONChanges interface {
 	SetEnableIframeEmbedding(value bool) db_json.JsonUpdate
 	SetAllowedOrigins(values []string) db_json.JsonUpdate
 	SetEnableImpersonation(value bool) db_json.JsonUpdate
+	SetEnableDynamicClientRegistration(value bool) db_json.JsonUpdate
+	SetAllowUnauthenticatedDynamicClientRegistration(value bool) db_json.JsonUpdate
 }
 
 type SecuritySettings struct {
