@@ -1,6 +1,6 @@
 import { getValidLocaleFromUILocales } from "@/lib/auth-utils";
 import { isSafeRedirectUri } from "@/lib/client-utils";
-import { getLanguageCookie, setLanguageCookie } from "@/lib/cookies";
+import { getLanguageCookie, setLanguageCookie, type Cookie } from "@/lib/cookies";
 
 import { shouldUILocalesOverrideCookie } from "@/lib/i18n";
 import { idpTypeToSlug } from "@/lib/idp";
@@ -120,11 +120,22 @@ function getEligibleSessions(sessions: Session[], organization?: string): Sessio
   return sessions.filter((s) => s.factors?.user?.organizationId === organization);
 }
 
+/**
+ * Whether the `sessions` cookie references any previous account for the given
+ * organization (or for any org when `organization` is unset).
+ */
+function hasCookieAccount(sessionCookies: Cookie[], organization?: string): boolean {
+  if (!sessionCookies || sessionCookies.length === 0) {
+    return false;
+  }
+  return sessionCookies.some((c) => !!c.loginName && (!organization || c.organization === organization));
+}
+
 export interface FlowInitiationParams {
   serviceConfig: ServiceConfig;
   requestId: string;
   sessions: Session[];
-  sessionCookies: any[];
+  sessionCookies: Cookie[];
   request: NextRequest;
 }
 
@@ -275,13 +286,17 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
     if (authRequest.prompt.includes(Prompt.SELECT_ACCOUNT)) {
       if (eligibleSessions.length === 0) {
-        return gotoLoginname({
-          request,
-          requestId,
-          loginHint: authRequest.loginHint,
-          organization,
-          orgDomain,
-        });
+        // No live session is eligible. If the session cookie still references
+        // a previous account, keep account selection so the user can pick it
+        if (!hasCookieAccount(sessionCookies, organization)) {
+          return gotoLoginname({
+            request,
+            requestId,
+            loginHint: authRequest.loginHint,
+            organization,
+            orgDomain,
+          });
+        }
       }
       return gotoAccounts({
         request,
@@ -376,9 +391,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       let selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
 
       if (!selectedSession || !selectedSession.id) {
-        // If no sessions are eligible for this organization, go directly to
-        // loginname instead of showing an empty accounts page.
-        if (eligibleSessions.length === 0) {
+        if (eligibleSessions.length === 0 && !hasCookieAccount(sessionCookies, organization)) {
           return gotoLoginname({
             request,
             requestId,
@@ -448,6 +461,18 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       }
     }
   } else {
+    // No live sessions were resolved. If the sessions cookie still references a
+    // previous account and the RP did not pass a login_hint, show account
+    // selection (mirrors Login V1 behavior after RP-initiated logout, #12252).
+    if (!authRequest?.loginHint && hasCookieAccount(sessionCookies, organization)) {
+      return gotoAccounts({
+        request,
+        requestId,
+        organization,
+        orgDomain,
+      });
+    }
+
     const loginNameUrl = constructUrl(request, "/loginname");
     loginNameUrl.searchParams.set("requestId", requestId);
 
