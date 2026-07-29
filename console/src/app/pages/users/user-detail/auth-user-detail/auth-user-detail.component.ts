@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
-import { defer, EMPTY, firstValueFrom, lastValueFrom, Observable, of, shareReplay, Subject, switchMap } from 'rxjs';
+import { defer, EMPTY, lastValueFrom, Observable, of, shareReplay, Subject, switchMap } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { InfoDialogComponent, InfoDialogData, InfoDialogResult } from 'src/app/modules/info-dialog/info-dialog.component';
@@ -32,7 +32,6 @@ import { NewMgmtService } from 'src/app/services/new-mgmt.service';
 import { Metadata } from '@zitadel/proto/zitadel/metadata_pb';
 import { UserService } from 'src/app/services/user.service';
 import { LoginPolicy } from '@zitadel/proto/zitadel/policy_pb';
-import { query } from '@angular/animations';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 
 type MetadataQuery =
