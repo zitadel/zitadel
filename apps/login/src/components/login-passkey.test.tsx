@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { LoginPasskey } from "./login-passkey";
@@ -436,6 +436,82 @@ describe("LoginPasskey Component", () => {
 
       // Should still only be called once
       expect(mockUpdateSession).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("Overlapping ceremony prevention (#12495)", () => {
+    const challengeResponse = () => ({
+      challenges: {
+        webAuthN: {
+          publicKeyCredentialRequestOptions: {
+            publicKey: {
+              challenge: new Uint8Array([1, 2, 3]),
+              allowCredentials: [{ id: new Uint8Array([4, 5, 6]), type: "public-key" }],
+            },
+          },
+        },
+      },
+    });
+
+    test("keeps the submit button disabled while a passkey ceremony is in flight", async () => {
+      mockUpdateSession.mockResolvedValue(challengeResponse());
+      // Never resolve the WebAuthn request: the ceremony stays in flight.
+      mockCredentialsGet.mockReturnValue(new Promise(() => {}));
+
+      renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+
+      await waitFor(() => {
+        expect(mockCredentialsGet).toHaveBeenCalled();
+      });
+
+      // While the authenticator prompt is open the button must stay disabled, so a
+      // click cannot start a second, overlapping ceremony — the root cause of #12495.
+      await waitFor(() => {
+        expect(screen.getByTestId("submit-button")).toBeDisabled();
+      });
+    });
+
+    test("passes an AbortSignal to navigator.credentials.get", async () => {
+      mockUpdateSession.mockResolvedValue(challengeResponse());
+      mockCredentialsGet.mockResolvedValue(null);
+
+      renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+
+      await waitFor(() => {
+        expect(mockCredentialsGet).toHaveBeenCalledWith(expect.objectContaining({ signal: expect.any(AbortSignal) }));
+      });
+    });
+
+    test("does not surface a verification error when the ceremony is aborted", async () => {
+      let resolveChallenge: (value: unknown) => void = () => {};
+      mockUpdateSession.mockReturnValue(
+        new Promise((resolve) => {
+          resolveChallenge = resolve;
+        }),
+      );
+      const abortError = new Error("The operation was aborted.");
+      (abortError as any).name = "AbortError";
+      mockCredentialsGet.mockRejectedValue(abortError);
+
+      renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+
+      // Ceremony started: the button is disabled while the challenge request is in flight.
+      await waitFor(() => {
+        expect(screen.getByTestId("submit-button")).toBeDisabled();
+      });
+
+      await act(async () => {
+        resolveChallenge(challengeResponse());
+      });
+
+      // Ceremony settled (get() rejected with AbortError): the button is re-enabled...
+      await waitFor(() => {
+        expect(screen.getByTestId("submit-button")).not.toBeDisabled();
+      });
+
+      // ...and the abort is swallowed, not shown as the Firefox "verificationFailed"
+      // that the overlapping-request race used to produce.
+      expect(screen.queryByText("An error occurred during passkey verification")).not.toBeInTheDocument();
     });
   });
 });
