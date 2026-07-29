@@ -158,6 +158,13 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
         signal,
       })
       .then((assertedCredential: any) => {
+        // Ignore a result that resolved after this ceremony was superseded or unmounted:
+        // an aborted get() can still resolve if the authenticator already completed, and
+        // we must not submit an assertion for a ceremony we abandoned (mirrors the
+        // post-challenge guard in startPasskeyLogin).
+        if (signal?.aborted) {
+          return;
+        }
         if (!assertedCredential) {
           setError(t("verify.errors.couldNotRetrievePasskey"));
           return;

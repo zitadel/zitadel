@@ -533,5 +533,45 @@ describe("LoginPasskey Component", () => {
         expect(screen.getByText("An error occurred during passkey verification")).toBeInTheDocument();
       });
     });
+
+    test("does not submit an assertion when the request resolves after being aborted", async () => {
+      mockUpdateSession.mockResolvedValue(challengeResponse());
+      let resolveGet: (value: unknown) => void = () => {};
+      let capturedSignal: AbortSignal | undefined;
+      mockCredentialsGet.mockImplementation((options: any) => {
+        capturedSignal = options?.signal;
+        return new Promise((resolve) => {
+          resolveGet = resolve;
+        });
+      });
+      mockSendPasskey.mockResolvedValue({ redirect: "/success" });
+
+      const { unmount } = renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+      await waitFor(() => {
+        expect(mockCredentialsGet).toHaveBeenCalled();
+      });
+
+      // Unmount aborts the ceremony...
+      unmount();
+      expect(capturedSignal?.aborted).toBe(true);
+
+      // ...and only then does the authenticator result arrive. An aborted get() can still
+      // resolve, but the abandoned ceremony must not submit its assertion.
+      await act(async () => {
+        resolveGet({
+          id: "credential-id",
+          rawId: new ArrayBuffer(8),
+          type: "public-key",
+          response: {
+            authenticatorData: new ArrayBuffer(8),
+            clientDataJSON: new ArrayBuffer(8),
+            signature: new ArrayBuffer(8),
+            userHandle: new ArrayBuffer(8),
+          },
+        });
+      });
+
+      expect(mockSendPasskey).not.toHaveBeenCalled();
+    });
   });
 });
