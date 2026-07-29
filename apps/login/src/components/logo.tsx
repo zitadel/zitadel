@@ -12,8 +12,7 @@ type Props = {
 
 export function Logo({ lightSrc, darkSrc, maxHeight }: Props) {
   const { logoMaxHeight } = getThemeConfig();
-  const cap = maxHeight ?? logoMaxHeight;
-
+  const cap = Number.isFinite(maxHeight) && maxHeight > 0 ? maxHeight : logoMaxHeight;
   // Constrain both axes instead of forcing fixed dimensions: the intrinsic
   // aspect ratio of the uploaded asset is preserved, so wide wordmarks use the
   // available width while tall marks stay within the height budget. Uploaded
