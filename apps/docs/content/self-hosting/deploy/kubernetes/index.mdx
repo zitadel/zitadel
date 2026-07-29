@@ -8,12 +8,12 @@ This guide takes you from zero to a running ZITADEL instance on Kubernetes and t
 
 ## Stage 1 — Quickstart
 
-The ZITADEL chart ships with an optional PostgreSQL subchart so a single `helm install` deploys the database alongside ZITADEL. You still need an ingress controller running in your cluster.
+The ZITADEL chart ships with an optional PostgreSQL subchart so a single `helm install` deploys the database alongside ZITADEL. You still need a routing controller running in your cluster to expose the service.
 
 ### Prerequisites
 
 - A Kubernetes cluster (1.30+)
-- An ingress controller (e.g. Traefik, NGINX)
+- An Ingress controller (e.g., Traefik, NGINX) **OR** a Gateway API controller
 - [kubectl](https://kubernetes.io/docs/tasks/tools/)
 - [Helm](https://helm.sh/docs/intro/install/) 3.x or 4.x
 
@@ -31,7 +31,7 @@ mkdir zitadel-helm && cd zitadel-helm &&
 curl -fsSLO https://raw.githubusercontent.com/zitadel/zitadel-charts/main/examples/0-quickstart/quickstart-values.yaml
 ```
 
-Edit `quickstart-values.yaml` before installing. For a local k3d or k3s cluster, these values usually work as-is:
+Edit `quickstart-values.yaml` before installing. For a local k3d or k3s cluster, these standard Ingress values usually work as-is:
 
 ```yaml
 zitadel:
@@ -47,7 +47,7 @@ login:
     className: traefik
 ```
 
-If you are using a different ingress controller, replace both `className` values with that controller's IngressClass name.
+If you are using a different ingress controller, replace both `className` values with that controller's IngressClass name. 
 
 ```bash
 helm repo add zitadel https://charts.zitadel.com &&
@@ -66,8 +66,8 @@ Once ZITADEL has been initialized with a masterkey, it **cannot be changed** wit
 </Callout>
 
 <Callout type="info">
-The stack runs: your ingress controller → **ZITADEL API** (Go) + **ZITADEL Login** (Next.js) → **PostgreSQL** (bundled).
-See [HTTP/2](/self-hosting/manage/http2) for requirements on how the ingress controller must forward traffic to ZITADEL pods.
+The stack runs: your ingress/gateway controller → **ZITADEL API** (Go) + **ZITADEL Login** (Next.js) → **PostgreSQL** (bundled).
+See [HTTP/2](/self-hosting/manage/http2) for requirements on how traffic must be forwarded to ZITADEL pods via h2c.
 </Callout>
 
 ### Swap out components
@@ -76,16 +76,16 @@ The bundled PostgreSQL subchart is for quickstart use only. You can replace it i
 
 | Component | How to replace |
 |-----------|---------------|
-| **Database** | Set `postgresql.enabled: false` and configure `ZITADEL_DATABASE_POSTGRES_DSN` pointing to your own PostgreSQL. Use the `postgres` maintenance database so ZITADEL can create its own database during initialization |
-| **Ingress controller** | Update `ingress.className` (and `login.ingress.className`) to match your controller's IngressClass |
-| **Caching** | Add Redis by configuring `zitadel.configmapConfig.Caches` (see [Caching](/self-hosting/deploy/kubernetes/caching)) |
+| **Database** | Set `postgresql.enabled: false` and configure `ZITADEL_DATABASE_POSTGRES_DSN` pointing to your own PostgreSQL. Use the `postgres` maintenance database so ZITADEL can create its own database during initialization. |
+| **Routing / Ingress** | Update `ingress.className` to match your controller, or disable the Helm ingress (`ingress.enabled: false`) to manage your own Gateway API `HTTPRoute` resources. |
+| **Caching** | Add Redis by configuring `zitadel.configmapConfig.Caches` (see [Caching](/self-hosting/deploy/kubernetes/caching)). |
 
 ## Stage 2 — Production Cluster
 
 For production you need:
 
 - A Kubernetes cluster (1.30+)
-- An ingress controller (Traefik, NGINX, or cloud-native)
+- A routing solution: Ingress controller (Traefik, NGINX) or a Gateway API implementation
 - A domain with DNS configured
 - TLS certificates (via cert-manager, ACME, or manually)
 - PostgreSQL 14+ (managed service or in-cluster)
@@ -96,7 +96,7 @@ For production you need:
 </Callout>
 
 <Callout type="warn">
-The ZITADEL management console [requires end-to-end HTTP/2 support](/self-hosting/manage/http2). Ensure your ingress controller is configured to forward HTTP/2 (h2c) traffic to ZITADEL pods.
+The ZITADEL management console [requires end-to-end HTTP/2 support](/self-hosting/manage/http2). Ensure your routing controller is configured to forward HTTP/2 (h2c) traffic to ZITADEL pods.
 </Callout>
 
 ### Create secrets
@@ -113,7 +113,7 @@ kubectl create secret generic zitadel-db-credentials \
 
 ### Configure values
 
-Save the following as `values.yaml`. Replace `zitadel.example.com` with your domain:
+Save the base configuration below as `values.yaml`. Replace `zitadel.example.com` with your domain:
 
 ```yaml
 replicaCount: 2
@@ -140,6 +140,20 @@ zitadel:
           Password: "YourSecurePassword123!"
           PasswordChangeRequired: true
 
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+```
+
+### Exposing ZITADEL (Choose your routing method)
+
+ZITADEL can be exposed using standard Kubernetes **Ingress** or the newer **Gateway API**. Choose the method that matches your cluster's architecture.
+
+#### Option A: Using Standard Ingress (e.g., Traefik)
+
+Append the following routing block to your `values.yaml` to have Helm automatically generate standard `Ingress` objects:
+
+```yaml
 ingress:
   enabled: true
   className: traefik
@@ -174,11 +188,43 @@ login:
       - secretName: zitadel-tls
         hosts:
           - zitadel.example.com
-
-podDisruptionBudget:
-  enabled: true
-  minAvailable: 1
 ```
+
+#### Option B: Using Gateway API
+
+If your cluster utilizes the Kubernetes Gateway API, disable the Helm chart's built-in ingress generation by ensuring both `ingress.enabled: false` and `login.ingress.enabled: false` are set (which is the default). 
+
+After deploying the Helm chart, apply an `HTTPRoute` resource to route traffic to the ZITADEL services via your `Gateway`:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: zitadel-route
+  namespace: zitadel
+spec:
+  parentRefs:
+    - name: your-cluster-gateway
+      namespace: gateway-system
+  hostnames:
+    - "zitadel.example.com"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /ui/v2/login
+      backendRefs:
+        - name: zitadel-login
+          port: 8080
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: zitadel
+          port: 8080
+```
+*(Note: Ensure your Gateway controller supports h2c/HTTP2 backend connections).*
 
 ### Install
 
@@ -213,7 +259,7 @@ Review the [Production Checklist](/self-hosting/manage/productionchecklist) befo
 | Guide | Description |
 |-------|-------------|
 | [Configuration](/self-hosting/deploy/kubernetes/configuration) | All configmap and secret options, autoscaling, security contexts |
-| [Ingress](/self-hosting/deploy/kubernetes/ingress) | Traefik, NGINX, and cloud-native ingress setup |
+| [Routing](/self-hosting/deploy/kubernetes/ingress) | Ingress, Gateway API, and cloud-native setup |
 | [Database](/self-hosting/deploy/kubernetes/database) | PostgreSQL TLS modes, credentials, and connection pooling |
 | [Operations](/self-hosting/deploy/kubernetes/operations) | Upgrades, manual and automatic scaling, resource limits |
 | [Caching](/self-hosting/deploy/kubernetes/caching) | Redis/Valkey caching configuration |

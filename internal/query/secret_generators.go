@@ -139,8 +139,29 @@ func (q *Queries) SecretGeneratorByType(ctx context.Context, generatorType domai
 		generator, err = scan(row)
 		return err
 	}, query, args...)
-	logging.OnError(err).WithField("type", generatorType).WithField("instance_id", instanceID).Error("secret generator by type")
-	return generator, err
+	if err == nil {
+		return generator, nil
+	}
+	if !errors.Is(err, sql.ErrNoRows) {
+		logging.OnError(err).WithField("type", generatorType).WithField("instance_id", instanceID).Error("secret generator by type")
+		return nil, err
+	}
+	// if the config was not (yet) stored on the database, fall back to the system / runtime config
+	defaultConfig, ok := q.defaultSecretGenerators[generatorType]
+	if !ok {
+		return nil, err // return the initial not found error
+	}
+	return &SecretGenerator{
+		AggregateID:         instanceID,
+		ResourceOwner:       instanceID,
+		GeneratorType:       generatorType,
+		Length:              defaultConfig.Length,
+		Expiry:              defaultConfig.Expiry,
+		IncludeLowerLetters: defaultConfig.IncludeLowerLetters,
+		IncludeUpperLetters: defaultConfig.IncludeUpperLetters,
+		IncludeDigits:       defaultConfig.IncludeDigits,
+		IncludeSymbols:      defaultConfig.IncludeSymbols,
+	}, nil
 }
 
 func (q *Queries) SearchSecretGenerators(ctx context.Context, queries *SecretGeneratorSearchQueries) (secretGenerators *SecretGenerators, err error) {

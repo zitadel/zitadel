@@ -75,9 +75,7 @@ func newMockContextInfoResponse(fullMethod, request, response string) *ContextIn
 }
 
 func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
-	deniedLocalhost, err := denylist.NewHostChecker("127.0.0.1")
-	require.NoError(t, err)
-	deniedIPs := []denylist.AddressChecker{deniedLocalhost}
+	deniedIPs := []denylist.AddressChecker{denylist.NewHostChecker("127.0.0.1")}
 
 	type target struct {
 		reqBody             execution.ContextInfo
@@ -668,7 +666,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				tt.args.req,
 				nil,
 				tt.args.getActiveSigningWebKey,
-				tt.args.deniedIPs,
+				&http.Client{Transport: denylist.NewHTTPTransport(tt.args.deniedIPs)},
 			)
 
 			if tt.res.wantErr {
@@ -774,9 +772,7 @@ func validateJWEPayload(t *testing.T) func(expected, sent []byte) bool {
 }
 
 func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
-	deniedLocalhost, err := denylist.NewHostChecker("127.0.0.1")
-	require.NoError(t, err)
-	deniedIPs := []denylist.AddressChecker{deniedLocalhost}
+	deniedIPs := []denylist.AddressChecker{denylist.NewHostChecker("127.0.0.1")}
 	type target struct {
 		reqBody    execution.ContextInfo
 		sleep      time.Duration
@@ -942,7 +938,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 				tt.args.resp,
 				nil,
 				mockGetActiveSigningWebKey(),
-				tt.args.deniedIPs,
+				&http.Client{Transport: denylist.NewHTTPTransport(tt.args.deniedIPs)},
 			)
 
 			if tt.res.wantErr {

@@ -439,6 +439,7 @@ func newBackChannelLogoutWorker(queries Queries, commands Commands, es *eventsto
 			nil,
 			nil,
 			nil,
+			nil,
 		),
 		eventstore: es,
 		queue:      queue,

@@ -1616,7 +1616,8 @@
         "5": "Passkey 初始化",
         "6": "应用密钥",
         "7": "OTP - SMS",
-        "8": "OTP - 电子邮件"
+        "8": "OTP - 电子邮件",
+        "9": "邀请码"
       },
       "EXPIRY": "过期时间 (以分钟为单位)",
       "INCLUDEDIGITS": "包含数字",
@@ -2374,7 +2375,8 @@
       "DESCRIPTION": "输入 JWT 身份提供者的数据。",
       "HEADERNAME": "请求头名称",
       "JWTENDPOINT": "JWT 端点",
-      "JWTKEYSENDPOINT": "JWT Keys 端点"
+      "JWTKEYSENDPOINT": "JWT Keys 端点",
+      "AUDIENCE": "受众"
     },
     "APPLE": {
       "TEAMID": "Team ID",

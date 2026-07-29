@@ -2,7 +2,7 @@ module github.com/zitadel/zitadel
 
 go 1.25.0
 
-toolchain go1.25.8
+toolchain go1.25.11
 
 require (
 	cloud.google.com/go/profiler v0.6.0
@@ -101,7 +101,7 @@ require (
 	github.com/zitadel/exifremove v0.1.0
 	github.com/zitadel/logging v0.7.0
 	github.com/zitadel/oidc/v3 v3.47.5
-	github.com/zitadel/passwap v0.11.0
+	github.com/zitadel/passwap v0.12.1
 	github.com/zitadel/saml v0.4.1
 	github.com/zitadel/schema v1.3.2
 	github.com/zitadel/sloggcp v0.6.0
@@ -127,16 +127,16 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.43.0
 	go.opentelemetry.io/otel/trace v1.43.0
 	go.uber.org/mock v0.6.0
-	golang.org/x/crypto v0.50.0
+	golang.org/x/crypto v0.54.0
 	golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f
-	golang.org/x/net v0.53.0
+	golang.org/x/net v0.57.0
 	golang.org/x/oauth2 v0.36.0
-	golang.org/x/sync v0.20.0
-	golang.org/x/sys v0.43.0
-	golang.org/x/text v0.36.0
+	golang.org/x/sync v0.22.0
+	golang.org/x/sys v0.47.0
+	golang.org/x/text v0.40.0
 	google.golang.org/api v0.276.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260420184626-e10c466a9529
-	google.golang.org/grpc v1.80.0
+	google.golang.org/grpc v1.82.1
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/headzoo/surf.v1 v1.0.1
 	sigs.k8s.io/yaml v1.6.0
@@ -152,7 +152,7 @@ require (
 	cloud.google.com/go/monitoring v1.27.0 // indirect
 	cloud.google.com/go/trace v1.14.0 // indirect
 	filippo.io/edwards25519 v1.2.0 // indirect
-	github.com/Azure/go-ntlmssp v0.1.0 // indirect
+	github.com/Azure/go-ntlmssp v0.1.1 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.32.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.56.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
@@ -268,7 +268,7 @@ require (
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	google.golang.org/genproto v0.0.0-20260420184626-e10c466a9529 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260420184626-e10c466a9529 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260720211330-0afa2a65878a // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	nhooyr.io/websocket v1.8.17 // indirect

@@ -40,9 +40,6 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     sessionFactors = await loadMostRecentSession({
       serviceConfig,
       sessionParams: { loginName, organization },
-    }).catch(() => {
-      // ignore error
-      return undefined;
     });
   }
 

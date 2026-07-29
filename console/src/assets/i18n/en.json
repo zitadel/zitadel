@@ -1618,7 +1618,8 @@
         "5": "Passkey Initialization",
         "6": "Application Secret",
         "7": "OTP - SMS",
-        "8": "OTP - Email"
+        "8": "OTP - Email",
+        "9": "Invite Code"
       },
       "EXPIRY": "Expiration (in minutes)",
       "INCLUDEDIGITS": "Include Numbers",
@@ -2371,7 +2372,8 @@
       "DESCRIPTION": "Enter the data for JWT Identity Provider.",
       "HEADERNAME": "Header Name",
       "JWTENDPOINT": "JWT Endpoint",
-      "JWTKEYSENDPOINT": "JWT Keys Endpoint"
+      "JWTKEYSENDPOINT": "JWT Keys Endpoint",
+      "AUDIENCE": "Audience"
     },
     "APPLE": {
       "TEAMID": "Team ID",

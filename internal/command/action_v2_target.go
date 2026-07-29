@@ -41,7 +41,7 @@ func (a *AddTarget) isValid(inputDenyList []denylist.AddressChecker, lookupFunc 
 		return zerrors.ThrowInvalidArgument(err, "COMMAND-1r2k6qo6wg", "Errors.Target.InvalidURL")
 	}
 
-	if err := denylist.IsHostBlocked(inputDenyList, parsedURL, lookupFunc); err != nil {
+	if err := denylist.IsURLBlocked(inputDenyList, parsedURL, lookupFunc); err != nil {
 		return zerrors.ThrowInvalidArgument(err, "COMMAND-NcJUKo", "Errors.Target.DeniedURL")
 	}
 
@@ -53,7 +53,7 @@ func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner 
 		return time.Time{}, zerrors.ThrowInvalidArgument(nil, "COMMAND-brml926e2d", "Errors.IDMissing")
 	}
 
-	if err := add.isValid(c.ActionsV2DenyList, c.IPLookupFunction); err != nil {
+	if err := add.isValid(c.denyList, c.ipLookupFunction); err != nil {
 		return time.Time{}, err
 	}
 
@@ -124,7 +124,7 @@ func (a *ChangeTarget) isValid(inputDenyList []denylist.AddressChecker, lookupFu
 		if err != nil || *a.Endpoint == "" {
 			return zerrors.ThrowInvalidArgument(err, "COMMAND-jsbaera7b6", "Errors.Target.InvalidURL")
 		}
-		if err := denylist.IsHostBlocked(inputDenyList, parsedURL, lookupFunc); err != nil {
+		if err := denylist.IsURLBlocked(inputDenyList, parsedURL, lookupFunc); err != nil {
 			return zerrors.ThrowInvalidArgument(err, "COMMAND-jKbbu2", "Errors.Target.DeniedURL")
 		}
 	}
@@ -136,7 +136,7 @@ func (c *Commands) ChangeTarget(ctx context.Context, change *ChangeTarget, resou
 	if resourceOwner == "" {
 		return time.Time{}, zerrors.ThrowInvalidArgument(nil, "COMMAND-zqibgg0wwh", "Errors.IDMissing")
 	}
-	if err := change.isValid(c.ActionsV2DenyList, c.IPLookupFunction); err != nil {
+	if err := change.isValid(c.denyList, c.ipLookupFunction); err != nil {
 		return time.Time{}, err
 	}
 	existing, err := c.getTargetWriteModelByID(ctx, change.AggregateID, resourceOwner)

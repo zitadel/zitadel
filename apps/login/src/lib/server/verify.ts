@@ -23,10 +23,11 @@ import { cookies, headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
 import { getOrSetFingerprintId } from "../fingerprint";
+import { checkMFAFactors } from "../mfa-helper";
 import { getServiceConfig } from "../service-url";
 import { loadMostRecentSession } from "../session";
-import { checkMFAFactors } from "../verify-helper";
 import { createSessionAndUpdateCookie } from "./cookie";
+import { getEnrollmentAuthorizationError } from "./enrollment-guard";
 import { getPublicHostWithProtocol } from "./host";
 
 const logger = createLogger("verify");
@@ -41,8 +42,19 @@ export async function verifyTOTP(code: string, loginName?: string, organization?
       loginName,
       organization,
     },
-  }).then((session) => {
+  }).then(async (session) => {
     if (session?.factors?.user?.id) {
+      // Enrollment must be authorized: a bare identify-only session must not be able to
+      // activate a TOTP factor on the account (GHSA-45f2-5q3r-xgg6).
+      const enrollmentError = await getEnrollmentAuthorizationError({
+        serviceConfig,
+        session,
+        userId: session.factors.user.id,
+      });
+      if (enrollmentError) {
+        return { error: enrollmentError };
+      }
+
       return verifyTOTPRegistration({ serviceConfig, code, userId: session.factors.user.id });
     } else {
       throw Error("No user id found in session.");
@@ -311,31 +323,43 @@ export async function sendInviteEmailCode(command: SendEmailCommand) {
   return createInviteCode({ serviceConfig, userId: command.userId, urlTemplate: command.urlTemplate });
 }
 
-type InitialSendVerificationCommand = {
+type TrySendVerificationCommand = {
   userId: string;
   isInvite: boolean;
   requestId?: string;
 };
 
-export async function initialSendVerification(command: InitialSendVerificationCommand) {
-  const _headers = await headers();
-  const { serviceConfig } = getServiceConfig(_headers);
-  const hostWithProtocol = await getPublicHostWithProtocol(_headers);
+/**
+ * Attempts to send an initial verification email/invite code.
+ * Returns `true` if sent successfully, `false` on error (swallowed and logged).
+ */
+export async function trySendVerification(command: TrySendVerificationCommand): Promise<boolean> {
+  try {
+    const _headers = await headers();
+    const { serviceConfig } = getServiceConfig(_headers);
+    const hostWithProtocol = await getPublicHostWithProtocol(_headers);
 
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-  const urlTemplate = buildVerificationUrlTemplate(hostWithProtocol, basePath, command.isInvite, command.requestId);
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+    const urlTemplate = buildVerificationUrlTemplate(hostWithProtocol, basePath, command.isInvite, command.requestId);
 
-  if (command.isInvite) {
-    return createInviteCode({
-      serviceConfig,
-      userId: command.userId,
-      urlTemplate,
-    });
-  } else {
-    return zitadelSendEmailCode({
-      serviceConfig,
-      userId: command.userId,
-      urlTemplate,
-    });
+    if (command.isInvite) {
+      await createInviteCode({
+        serviceConfig,
+        userId: command.userId,
+        urlTemplate,
+      });
+    } else {
+      await zitadelSendEmailCode({
+        serviceConfig,
+        userId: command.userId,
+        urlTemplate,
+      });
+    }
+
+    logger.info("Verification email sent successfully", { userId: command.userId, isInvite: command.isInvite });
+    return true;
+  } catch (err) {
+    logger.error("Failed to send verification email", { userId: command.userId, isInvite: command.isInvite, error: err });
+    return false;
   }
 }

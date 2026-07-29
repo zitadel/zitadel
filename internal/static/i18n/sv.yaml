@@ -282,6 +282,8 @@ Errors:
     LabelPolicy:
       NotFound: "Privat etikettpolicy hittades inte"
       NotChanged: "Privat etikettpolicy har inte ändrats"
+    IDPConfig:
+      NotExisting: "Identitetsleverantörskonfigurationen existerar inte"
   Project:
     ProjectIDMissing: "Projekt-ID saknas"
     AlreadyExists: "Projekt finns redan på organisationen"

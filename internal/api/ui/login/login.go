@@ -44,6 +44,7 @@ type Login struct {
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
 	caches              *Caches
+	httpClient          *http.Client
 }
 
 type Config struct {
@@ -198,6 +199,7 @@ func CreateLogin(
 	csrfCookieKey []byte,
 	cacheConnectors connector.Connectors,
 	federateLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
+	httpClient *http.Client,
 ) (*Login, error) {
 	login := &Login{
 		oidcAuthCallbackURL: oidcAuthCallbackURL,
@@ -210,6 +212,7 @@ func CreateLogin(
 		authRepo:            authRepo,
 		idpConfigAlg:        idpConfigAlg,
 		userCodeAlg:         userCodeAlg,
+		httpClient:          httpClient,
 	}
 	csrfInterceptor := createCSRFInterceptor(config.CSRFCookieName, csrfCookieKey, externalSecure, login.csrfErrorHandler())
 	cacheInterceptor := createCacheInterceptor(config.Cache.MaxAge, config.Cache.SharedMaxAge, assetCache)

@@ -99,7 +99,7 @@ export function IdpProcessHandler({
       {loading && (
         <div className="flex flex-col items-center space-y-4">
           <Spinner className="h-8 w-8" />
-          <p className="text-sm text-gray-600">{t("processing.message")}</p>
+          <p className="text-sm text-gray-700 dark:text-gray-300">{t("processing.message")}</p>
         </div>
       )}
       {error && (

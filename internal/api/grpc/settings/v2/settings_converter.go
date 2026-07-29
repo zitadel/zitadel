@@ -232,6 +232,8 @@ func idpTypeToPb(idpType domain.IDPType) settings.IdentityProviderType {
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_APPLE
 	case domain.IDPTypeSAML:
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_SAML
+	case domain.IDPTypeZitadel:
+		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_ZITADEL
 	default:
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_UNSPECIFIED
 	}

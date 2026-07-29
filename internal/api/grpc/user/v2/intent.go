@@ -27,6 +27,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
+	"github.com/zitadel/zitadel/internal/idp/providers/zitadel"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2"
@@ -180,6 +181,8 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *connec
 	case *oauth.Provider:
 		idpUser, err = unmarshalRawIdpUser(intent.IDPUser, p.User())
 	case *oidc.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
+	case *zitadel.Provider:
 		idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
 	case *jwt.Provider:
 		idpUser, err = unmarshalIdpUser(intent.IDPUser, jwt.InitUser())

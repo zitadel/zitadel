@@ -3,6 +3,7 @@ package gitlab
 import (
 	"context"
 	"errors"
+	"net/http"
 	"testing"
 	"time"
 
@@ -166,7 +167,7 @@ func TestProvider_FetchUser(t *testing.T) {
 
 			// call the real discovery endpoint
 			gock.New(issuer).Get(openid.DiscoveryEndpoint).EnableNetworking()
-			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.options...)
+			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, http.DefaultClient, tt.fields.options...)
 			require.NoError(t, err)
 
 			session := &oidc.Session{

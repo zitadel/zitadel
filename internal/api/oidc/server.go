@@ -44,6 +44,7 @@ type Server struct {
 	opCrypto                  op.Crypto
 
 	assetAPIPrefix func(ctx context.Context) string
+	httpClient     *http.Client
 }
 
 func endpoints(endpointConfig *EndpointConfig) op.Endpoints {

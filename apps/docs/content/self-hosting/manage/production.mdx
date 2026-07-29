@@ -149,51 +149,13 @@ Database:
     //highlight-end
 ```
 
-You also might want to configure how [projections](/concepts/eventstore/implementation#projections) are computed. These are the default values:
-
-```yaml
-# The Projections section defines the behavior for the scheduled and synchronous events projections.
-Projections:
-  # Time interval between scheduled projections
-  RequeueEvery: 60s
-  # Time between retried database statements resulting from projected events
-  RetryFailedAfter: 1s
-  # Retried execution number of database statements resulting from projected events
-  MaxFailureCount: 5
-  # Number of concurrent projection routines. Values of 0 and below are overwritten to 1
-  ConcurrentInstances: 1
-  # Limit of returned events per query
-  BulkLimit: 200
-  # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
-  # from HandleActiveInstances duration in the past until the projections current time
-  # Defaults to twice the RequeueEvery duration
-  HandleActiveInstances: 120s
-  # In the Customizations section, all settings from above can be overwritten for each specific projection
-  Customizations:
-    Projects:
-      BulkLimit: 2000
-    # The Notifications projection is used for sending emails and SMS to users
-    Notifications:
-      # As notification projections don't result in database statements, retries don't have an effect
-      MaxFailureCount: 0
-    # The NotificationsQuotas projection is used for calling quota webhooks
-    NotificationsQuotas:
-      # Delivery guarantee requirements are probably higher for quota webhooks
-      # Defaults to 45 days
-      HandleActiveInstances: 1080h
-      # As quota notification projections don't result in database statements, retries don't have an effect
-      MaxFailureCount: 0
-      # Quota notifications are not so time critical. Setting RequeueEvery every five minutes doesn't annoy the db too much.
-      RequeueEvery: 300s
-```
-
 ### Manage your data
 
 When designing your backup strategy,
 it is worth knowing that
 [ZITADEL is event sourced](/concepts/eventstore/overview).
 That means, ZITADEL itself is able to recompute its
-whole state from the records in the table eventstore.events.
+whole state from the records in the table `eventstore.events2`.
 The timestamp of your last record in the events table
 defines up to which point in time ZITADEL can restore its state.
 

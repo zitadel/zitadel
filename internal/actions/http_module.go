@@ -5,22 +5,19 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"net"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/dop251/goja"
 	"github.com/zitadel/logging"
-
-	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func WithHTTP(ctx context.Context) Option {
+func WithHTTP(ctx context.Context, client *http.Client) Option {
 	return func(c *runConfig) {
 		c.modules["zitadel/http"] = func(runtime *goja.Runtime, module *goja.Object) {
-			requireHTTP(ctx, &http.Client{Transport: &transport{lookup: net.LookupIP}}, runtime, module)
+			requireHTTP(ctx, client, runtime, module)
 		}
 	}
 }
@@ -169,19 +166,4 @@ func parseHeaders(headers *goja.Object) http.Header {
 		}
 	}
 	return h
-}
-
-type transport struct {
-	lookup func(string) ([]net.IP, error)
-}
-
-func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
-	if httpConfig == nil || len(httpConfig.DenyList) == 0 {
-		return http.DefaultTransport.RoundTrip(req)
-	}
-
-	if err := denylist.IsHostBlocked(httpConfig.DenyList, req.URL, t.lookup); err != nil {
-		return nil, zerrors.ThrowInvalidArgument(err, "ACTIO-N72d0", "host is denied")
-	}
-	return http.DefaultTransport.RoundTrip(req)
 }

@@ -179,3 +179,279 @@ describe("handleOIDCFlowInitiation — locale / cookie handling", () => {
     });
   });
 });
+
+describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
+  let mockGetAuthRequest: ReturnType<typeof vi.fn>;
+  let mockConstructUrl: ReturnType<typeof vi.fn>;
+  let mockFindValidSession: ReturnType<typeof vi.fn>;
+
+  const orgSession = {
+    id: "session-org",
+    factors: { user: { id: "user1", organizationId: "111111", loginName: "user@org.com" } },
+  };
+  const otherOrgSession = {
+    id: "session-other",
+    factors: { user: { id: "user2", organizationId: "999999", loginName: "user@other.com" } },
+  };
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.unstubAllEnvs();
+
+    const zitadel = await import("@/lib/zitadel");
+    const serviceUrl = await import("@/lib/service-url");
+    const session = await import("@/lib/session");
+    const authUtils = await import("@/lib/auth-utils");
+
+    mockGetAuthRequest = vi.mocked(zitadel.getAuthRequest);
+    mockConstructUrl = vi.mocked(serviceUrl.constructUrl);
+    mockFindValidSession = vi.mocked(session.findValidSession);
+    vi.mocked(authUtils.getValidLocaleFromUILocales).mockReturnValue(null);
+
+    mockConstructUrl.mockImplementation((_req: any, path: string) => {
+      return new URL(`https://example.com${path}`);
+    });
+
+    mockFindValidSession.mockResolvedValue(null);
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  test("should redirect to /loginname when org scope filters out all sessions (default prompt)", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: ["urn:zitadel:iam:org:id:111111"],
+        prompt: [],
+        loginHint: undefined,
+      },
+    });
+
+    const res = await handleOIDCFlowInitiation(
+      makeBaseParams({
+        sessions: [otherOrgSession] as any,
+        sessionCookies: [{ id: "session-other", token: "tok" }],
+      }),
+    );
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toContain("/loginname");
+    expect(location).not.toContain("/accounts");
+  });
+
+  test("should include submit=true when loginHint is set and org scope filters out all sessions", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: ["urn:zitadel:iam:org:id:111111"],
+        prompt: [],
+        loginHint: "user@example.com",
+      },
+    });
+
+    const res = await handleOIDCFlowInitiation(
+      makeBaseParams({
+        sessions: [otherOrgSession] as any,
+        sessionCookies: [{ id: "session-other", token: "tok" }],
+      }),
+    );
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toContain("/loginname");
+    expect(location).toContain("loginName=user%40example.com");
+    expect(location).toContain("submit=true");
+    expect(location).not.toContain("/accounts");
+  });
+
+  test("should redirect to /accounts when org-eligible sessions exist but none are valid (default prompt)", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: ["urn:zitadel:iam:org:id:111111"],
+        prompt: [],
+        loginHint: undefined,
+      },
+    });
+
+    const res = await handleOIDCFlowInitiation(
+      makeBaseParams({
+        sessions: [orgSession] as any,
+        sessionCookies: [{ id: "session-org", token: "tok" }],
+      }),
+    );
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toContain("/accounts");
+  });
+
+  test("should redirect to /loginname when org scope filters out all sessions (SELECT_ACCOUNT prompt)", async () => {
+    const { Prompt } = await import("@zitadel/proto/zitadel/oidc/v2/authorization_pb");
+
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: ["urn:zitadel:iam:org:id:111111"],
+        prompt: [Prompt.SELECT_ACCOUNT],
+        loginHint: undefined,
+      },
+    });
+
+    const res = await handleOIDCFlowInitiation(
+      makeBaseParams({
+        sessions: [otherOrgSession] as any,
+        sessionCookies: [{ id: "session-other", token: "tok" }],
+      }),
+    );
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toContain("/loginname");
+    expect(location).not.toContain("/accounts");
+  });
+
+  test("should redirect to /accounts when org-eligible sessions exist (SELECT_ACCOUNT prompt)", async () => {
+    const { Prompt } = await import("@zitadel/proto/zitadel/oidc/v2/authorization_pb");
+
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: ["urn:zitadel:iam:org:id:111111"],
+        prompt: [Prompt.SELECT_ACCOUNT],
+        loginHint: undefined,
+      },
+    });
+
+    const res = await handleOIDCFlowInitiation(
+      makeBaseParams({
+        sessions: [orgSession] as any,
+        sessionCookies: [{ id: "session-org", token: "tok" }],
+      }),
+    );
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toContain("/accounts");
+  });
+
+  test("should redirect to /loginname when no org scope and no sessions", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: [],
+        prompt: [],
+        loginHint: undefined,
+      },
+    });
+
+    const res = await handleOIDCFlowInitiation(makeBaseParams({ sessions: [] }));
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toContain("/loginname");
+  });
+});
+
+describe("handleOIDCFlowInitiation — Prompt.LOGIN + loginHint requestId prefix", () => {
+  let mockGetAuthRequest: ReturnType<typeof vi.fn>;
+  let mockConstructUrl: ReturnType<typeof vi.fn>;
+  let mockSendLoginname: ReturnType<typeof vi.fn>;
+
+  const existingSession = {
+    id: "session-1",
+    factors: { user: { id: "user1", organizationId: "org1", loginName: "user@example.com" } },
+  };
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.unstubAllEnvs();
+
+    const zitadel = await import("@/lib/zitadel");
+    const serviceUrl = await import("@/lib/service-url");
+    const authUtils = await import("@/lib/auth-utils");
+    const loginname = await import("@/lib/server/loginname");
+
+    mockGetAuthRequest = vi.mocked(zitadel.getAuthRequest);
+    mockConstructUrl = vi.mocked(serviceUrl.constructUrl);
+    mockSendLoginname = vi.mocked(loginname.sendLoginname);
+    vi.mocked(authUtils.getValidLocaleFromUILocales).mockReturnValue(null);
+
+    mockConstructUrl.mockImplementation((_req: any, path: string) => {
+      return new URL(`https://example.com${path}`);
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  test("should pass requestId with oidc_ prefix to sendLoginname (not authRequest.id)", async () => {
+    const { Prompt } = await import("@zitadel/proto/zitadel/oidc/v2/authorization_pb");
+
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: [],
+        prompt: [Prompt.LOGIN],
+        loginHint: "user@example.com",
+      },
+    });
+
+    mockSendLoginname.mockResolvedValue({
+      redirect: "/password?loginName=user%40example.com",
+    });
+
+    await handleOIDCFlowInitiation(
+      makeBaseParams({
+        requestId: "oidc_abc123",
+        sessions: [existingSession] as any,
+        sessionCookies: [{ id: "session-1", token: "tok" }],
+      }),
+    );
+
+    expect(mockSendLoginname).toHaveBeenCalledWith(
+      expect.objectContaining({
+        loginName: "user@example.com",
+        requestId: "oidc_abc123",
+      }),
+    );
+  });
+
+  test("should NOT pass raw authRequest.id without oidc_ prefix to sendLoginname", async () => {
+    const { Prompt } = await import("@zitadel/proto/zitadel/oidc/v2/authorization_pb");
+
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: [],
+        prompt: [Prompt.LOGIN],
+        loginHint: "user@example.com",
+      },
+    });
+
+    mockSendLoginname.mockResolvedValue({
+      redirect: "/password?loginName=user%40example.com",
+    });
+
+    await handleOIDCFlowInitiation(
+      makeBaseParams({
+        requestId: "oidc_abc123",
+        sessions: [existingSession] as any,
+        sessionCookies: [{ id: "session-1", token: "tok" }],
+      }),
+    );
+
+    // Ensure the raw authRequest.id is NOT what's passed
+    expect(mockSendLoginname).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        requestId: "abc123",
+      }),
+    );
+  });
+});

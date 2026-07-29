@@ -95,11 +95,12 @@ func (c *Commands) GetProvider(ctx context.Context, idpID string, idpCallback st
 		return nil, err
 	}
 	if writeModel.IDPType != domain.IDPTypeSAML {
-		return writeModel.ToProvider(idpCallback, c.idpConfigEncryption)
+		return writeModel.ToProvider(idpCallback, c.idpConfigEncryption, c.httpClient)
 	}
 	return writeModel.ToSAMLProvider(
 		samlRootURL,
 		c.idpConfigEncryption,
+		c.httpClient,
 		func(ctx context.Context, intentID string) (*samlsp.TrackedRequest, error) {
 			intent, err := c.GetActiveIntent(ctx, intentID)
 			if err != nil {
