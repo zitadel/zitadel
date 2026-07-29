@@ -52,7 +52,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/app"
-	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
@@ -83,21 +82,11 @@ var csrfTokenRegex = regexp.MustCompile(`name="gorilla\.csrf\.Token"[^>]*value="
 func TestExternalNotFoundOption_ForgedRegistration_IsRejected(t *testing.T) {
 	// --- Server setup (all via gRPC as the IAM owner) -------------------------------------------
 
-	// Force Login V1. Three things select V1 at auth-request creation (internal/api/oidc/auth_request.go):
-	// (a) the instance feature LoginV2.Required must be false, (b) the OIDC app's login version must be
-	// unspecified/V1, and (c) the authorize request must NOT carry the x-zitadel-login-client header.
-	// We pin (a) here explicitly so the test does not depend on the instance default.
-	integration.EnsureInstanceFeature(t, CTX, Instance,
-		&feature.SetInstanceFeaturesRequest{LoginV2: &feature.LoginV2{Required: false}},
-		func(tt *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
-			assert.False(tt, got.GetLoginV2().GetRequired())
-		},
-	)
-
 	// A project + OIDC app. loginVersion is left nil (unspecified => V1). The redirect URI only has to
 	// be registered; the attack never actually redeems a code there.
 	redirectURI := "http://localhost:9999/callback"
-	project := Instance.CreateProject(CTX, t, Instance.DefaultOrg.GetId(), integration.RandString(10), false, false)
+	project, err := Instance.CreateProject(CTX)
+	require.NoError(t, err)
 	oidcApp, err := Instance.CreateOIDCClient(CTX, redirectURI, "", project.GetId(),
 		app.OIDCAppType_OIDC_APP_TYPE_WEB, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, true)
 	require.NoError(t, err)
