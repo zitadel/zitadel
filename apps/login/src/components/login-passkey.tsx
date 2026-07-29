@@ -29,7 +29,9 @@ type Props = {
 
 export function LoginPasskey({ loginName, sessionId, requestId, altPassword, organization, login = true }: Props) {
   const [error, setError] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  // Start busy: the ceremony is auto-started in the mount effect below, so the submit
+  // button must be disabled from first paint — a click cannot precede that effect.
+  const [loading, setLoading] = useState<boolean>(true);
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const t = useTranslations("passkey");
