@@ -228,6 +228,11 @@ func (c *Commands) setPasswordCommand(ctx context.Context, agg *eventstore.Aggre
 			encodedPassword = newEncodedPassword
 		}
 	}
+	if encodedPassword != "" {
+		if err := c.userPasswordHasher.ValidateEncodedHash(encodedPassword); err != nil {
+			return nil, err
+		}
+	}
 	// If password is provided, let's check if is compliant with the policy.
 	// If only a encodedPassword is passed, we can skip this.
 	if password != "" {

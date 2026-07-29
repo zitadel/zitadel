@@ -148,7 +148,8 @@ func (c *Commands) changeUserEmailWithGeneratorEvents(ctx context.Context, userI
 	if err != nil {
 		return nil, err
 	}
-	if err = c.checkPermissionUpdateUser(ctx, cmd.aggregate.ResourceOwner, userID, true); err != nil {
+	allowSelfManagement := !returnCode
+	if err = c.checkPermissionUpdateUser(ctx, cmd.aggregate.ResourceOwner, userID, allowSelfManagement); err != nil {
 		return nil, err
 	}
 	if err = cmd.Change(ctx, domain.EmailAddress(email)); err != nil {
@@ -170,7 +171,8 @@ func (c *Commands) sendUserEmailCodeWithGeneratorEvents(ctx context.Context, use
 	if err != nil {
 		return nil, err
 	}
-	if err = c.checkPermissionUpdateUser(ctx, cmd.aggregate.ResourceOwner, userID, true); err != nil {
+	allowSelfManagement := !returnCode
+	if err = c.checkPermissionUpdateUser(ctx, cmd.aggregate.ResourceOwner, userID, allowSelfManagement); err != nil {
 		return nil, err
 	}
 	if existingCheck && cmd.model.Code == nil {

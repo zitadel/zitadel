@@ -5134,6 +5134,9 @@ func createDefaultSecretGeneratorSettingsAttributes() domain.SecretGeneratorSett
 		OTPEmail: &domain.OTPEmailAttributes{
 			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(thirtyMinutes),
 		},
+		InviteCode: &domain.InviteCodeAttributes{
+			SecretGeneratorAttrsWithExpiry: createDefaultSecretGeneratorAttrsWithExpiry(oneDay * 3),
+		},
 	}
 }
 
@@ -5145,4 +5148,33 @@ func createSecretGeneratorSettings(instanceID string, organizationID *string) *d
 		},
 		SecretGeneratorSettingsAttributes: createDefaultSecretGeneratorSettingsAttributes(),
 	}
+}
+
+func TestSecretGeneratorSettingsInviteCodeRoundTrip(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	instanceID := createInstance(t, tx)
+	repo := repository.SecretGeneratorSettingsRepository()
+
+	want := createSecretGeneratorSettings(instanceID, nil)
+	require.NotNil(t, want.InviteCode)
+
+	err := repo.Set(t.Context(), tx, want)
+	require.NoError(t, err)
+
+	got, err := repo.Get(t.Context(), tx, database.WithCondition(
+		repo.UniqueCondition(instanceID, nil, domain.SettingTypeSecretGenerator, domain.SettingStateActive),
+	))
+	require.NoError(t, err)
+	require.NotNil(t, got.InviteCode)
+	assert.EqualExportedValues(t, want.InviteCode, got.InviteCode)
+
+	list, err := repo.List(t.Context(), tx, database.WithCondition(
+		repo.InstanceIDCondition(instanceID),
+	))
+	require.NoError(t, err)
+	require.Len(t, list, 1)
+	require.NotNil(t, list[0].InviteCode)
+	assert.EqualExportedValues(t, want.InviteCode, list[0].InviteCode)
 }

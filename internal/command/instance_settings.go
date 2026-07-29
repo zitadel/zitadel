@@ -35,8 +35,8 @@ func prepareAddSecretGeneratorConfig(a *instance.Aggregate, typ domain.SecretGen
 		if !typ.Valid() {
 			return nil, zerrors.ThrowInvalidArgument(nil, "V2-FGqVj", "Errors.InvalidArgument")
 		}
-		if config.Length < 1 {
-			return nil, zerrors.ThrowInvalidArgument(nil, "V2-jEqCt", "Errors.InvalidArgument")
+		if err := config.Valid(); err != nil {
+			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewInstanceSecretGeneratorConfigWriteModel(ctx, typ)
@@ -71,8 +71,11 @@ func prepareAddSecretGeneratorConfig(a *instance.Aggregate, typ domain.SecretGen
 }
 
 func (c *Commands) ChangeSecretGeneratorConfig(ctx context.Context, generatorType domain.SecretGeneratorType, config *crypto.GeneratorConfig) (*domain.ObjectDetails, error) {
-	if generatorType == domain.SecretGeneratorTypeUnspecified {
+	if !generatorType.Valid() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-33k9f", "Errors.SecretGenerator.TypeMissing")
+	}
+	if err := config.Valid(); err != nil {
+		return nil, err
 	}
 
 	generatorWriteModel, err := c.getSecretConfig(ctx, generatorType)

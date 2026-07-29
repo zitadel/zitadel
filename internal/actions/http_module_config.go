@@ -8,12 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/denylist"
 )
 
-func SetHTTPConfig(config *HTTPConfig) {
-	httpConfig = config
-}
-
-var httpConfig *HTTPConfig
-
 type HTTPConfig struct {
 	DenyList []denylist.AddressChecker
 }

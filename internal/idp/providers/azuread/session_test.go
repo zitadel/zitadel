@@ -244,7 +244,7 @@ func TestSession_FetchUser(t *testing.T) {
 			tt.fields.httpMock()
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.options...)
+			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, http.DefaultClient, tt.fields.options...)
 			require.NoError(t, err)
 
 			session := &Session{
@@ -395,7 +395,7 @@ func TestSession_RetrievePreviousID(t *testing.T) {
 			tt.fields.httpMock()
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes)
+			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, http.DefaultClient)
 			require.NoError(t, err)
 			session := &Session{
 				Provider: provider,

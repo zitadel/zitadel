@@ -1,0 +1,364 @@
+---
+title: Migrate from Firebase to ZITADEL
+description: "Migrate users from Firebase Authentication to ZITADEL using bulk import or just-in-time migration strategies."
+sidebar_label: From Firebase
+---
+
+## 1. Introduction
+
+This guide will walk you through the steps to migrate users from **Firebase Authentication** to **ZITADEL**. Due to Firebase's proprietary password hashing algorithm, you'll need to choose between two migration strategies based on your requirements.
+
+**What you'll learn with this guide**
+- Understanding Firebase's password hash incompatibility
+- Two migration strategies: Bulk Import with Password Reset and Just-In-Time (JIT) Migration
+- How to export user data from Firebase
+- Performing the user import via ZITADEL's API
+- Testing and validating the migration
+
+---
+
+## 2. Understanding the Password Hash Challenge
+
+### 2.1. The Blocker: Incompatible Password Hashes
+
+Firebase uses a **proprietary, modified scrypt algorithm** that requires project-specific keys (salt separator, signer key, and rounds). This custom format is not compatible with standard password hashing algorithms.
+
+**Key Points:**
+- ZITADEL supports standard hashing algorithms (bcrypt, argon2, PBKDF2, etc.)
+- ZITADEL does not have a verifier for Firebase's custom scrypt format
+- **Result:** Firebase password hashes cannot be directly imported and must be discarded
+
+This limitation means you must choose one of two migration strategies outlined below.
+
+---
+
+## 3. Migration Strategy Overview
+
+You have two options for migrating your Firebase users to ZITADEL:
+
+| Strategy | User Experience | Complexity | Best For |
+|----------|----------------|------------|----------|
+| **Bulk Import + Password Reset** | Users must reset password on first login | Low | Smaller user bases, planned maintenance windows |
+| **Just-In-Time (JIT) Migration** | Seamless, transparent migration | Medium | Larger user bases, zero-downtime requirements |
+
+---
+
+## 4. Prerequisites
+
+### 4.1. Create a ZITADEL Instance and Organization
+
+You'll need a target organization in ZITADEL to import your users. You can create a new organization or use an existing one.
+
+If you don't have a ZITADEL instance, you can [sign up for free here](https://zitadel.com) to create a new one for you.
+See: [Managing Organizations in ZITADEL](https://zitadel.com/docs/guides/manage/console/organizations-overview).
+
+> **Note:** Copy your Organization ID since you will use the id in the later steps.
+
+### 4.2. Install Firebase CLI (for export)
+
+Install the Firebase CLI to export user data:
+
+```
+npm install -g firebase-tools
+
+Authenticate with your Firebase project:
+
+firebase login
+```
+
+---
+
+## 5. Strategy 1: Bulk Import & Password Reset (Standard)
+
+This approach imports all users at once but requires them to set a new password on their first login.
+
+### 5.1. Export Users from Firebase
+
+Export your Firebase users to a JSON file:
+
+```
+firebase auth:export users.json --format=json --project YOUR_PROJECT_ID
+```
+
+This creates a `users.json` file containing all user data, including the Firebase password hashes (which we will discard).
+
+### 5.2. Transform Firebase Data to ZITADEL Format
+
+You need to map Firebase fields to ZITADEL's schema. Here's a sample transformation:
+
+**Firebase Export Sample:**
+```json
+{
+  "users": [
+    {
+      "localId": "firebase-user-123",
+      "email": "user@example.com",
+      "emailVerified": true,
+      "displayName": "John Doe",
+      "createdAt": "1609459200000",
+      "passwordHash": "...",
+      "salt": "..."
+    }
+  ]
+}
+```
+
+**ZITADEL Import Format:**
+```json
+{
+  "dataOrgs": {
+    "orgs": [
+      {
+        "orgId": "<your-org-id>",
+        "humanUsers": [
+          {
+            "userId": "firebase-user-123",
+            "user": {
+              "userName": "user@example.com",
+              "profile": {
+                "firstName": "John",
+                "lastName": "Doe"
+              },
+              "email": {
+                "email": "user@example.com",
+                "isEmailVerified": true
+              },
+              "passwordChangeRequired": true
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "timeout": "5m0s"
+}
+```
+
+**Key Mapping:**
+- `localId` → `userId`
+- `email` → `email.email` and `userName`
+- `emailVerified` → `email.isEmailVerified`
+- `displayName` → `profile.firstName` and `profile.lastName` (both are required; if you can't split, set `firstName` to the full display name, set a placeholder `lastName` like `"-"`, and optionally set `profile.displayName` to the full name as well)
+- **Omit** `hashedPassword` object entirely
+- **Include** `"passwordChangeRequired": true` to trigger password reset
+
+### 5.3. Obtain Access Token for API Access
+
+To call the ZITADEL Admin API, you need to authenticate using a **Service Account** with the `IAM_OWNER` Manager permissions.
+
+There are two recommended authentication methods:
+
+- **Client Credentials Flow**
+  [Learn how to authenticate with client credentials.](https://zitadel.com/docs/guides/integrate/service-accounts/client-credentials)
+
+- **Personal Access Token (PAT)**
+  [Learn how to create and use a PAT.](https://zitadel.com/docs/guides/integrate/service-accounts/authenticate-service-accounts#personal-access-token)
+
+**Reference:** [Service Accounts & API Authentication](https://zitadel.com/docs/guides/integrate/service-accounts/authenticate-service-accounts#authentication-methods)
+
+### 5.4. Import Users into ZITADEL
+
+Use the [Admin API – Import Data](/reference/api/admin/zitadel.admin.v1.AdminService.ImportData) endpoint:
+
+```
+curl --location 'https://${CUSTOM_DOMAIN}/admin/v1/import' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer <access-token>' \
+--data @importBody.json
+```
+
+### 5.5. Notify Users
+
+Send an email to your users informing them that they need to reset their password on their next login. ZITADEL will automatically prompt them to create a new password when `passwordChangeRequired` is set to `true`.
+
+---
+
+## 6. Strategy 2: Just-In-Time (JIT) Migration (Seamless)
+
+This approach migrates users transparently during their first login after migration begins, providing a seamless experience.
+
+### 6.1. Architecture Overview
+
+```text
+    User Login Attempt
+           ↓
+       Backend (Proxy)
+           ↓
+       Check ZITADEL
+           ↓
+    User exists? → Yes → Allow login
+           ↓ No
+    Verify with Firebase Auth REST API
+           ↓
+    Valid? → Yes → Create user in ZITADEL → Allow login
+           ↓ No
+       Reject login
+```
+
+### 6.2. Implementation Steps
+
+#### Step 1: Set Up Login Interception
+
+Your backend must intercept login requests and capture the plain-text password during the grace period.
+
+**Security Requirements:**
+- **HTTPS only** – Never transmit passwords over unencrypted connections
+- **Do not log plain-text passwords** – Handle credentials in memory only
+- **Limit grace period** – Set a reasonable migration window (e.g., 30-90 days)
+
+#### Step 2: Verify Credentials with Firebase
+
+When a user attempts to login, verify their credentials against Firebase using the REST API:
+
+```
+curl --location 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=[WEB_API_KEY]' \
+--header 'Content-Type: application/json' \
+--data '{
+  "email": "user@example.com",
+  "password": "user-password",
+  "returnSecureToken": true
+}'
+```
+
+**Response Handling:**
+- **200 OK** – Credentials are valid, proceed to Step 3
+- **400 Bad Request** – Invalid credentials or user doesn't exist in Firebase
+
+#### Step 3: Create User in ZITADEL
+
+If Firebase validates the credentials, immediately create the user in ZITADEL using the plain-text password (ZITADEL will hash it using its native algorithm):
+
+```
+curl --location 'https://${CUSTOM_DOMAIN}/management/v1/users/human/_import' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer <access-token>' \
+--data '{
+  "userName": "user@example.com",
+  "profile": {
+    "firstName": "John",
+    "lastName": "Doe"
+  },
+  "email": {
+    "email": "user@example.com",
+    "isEmailVerified": true
+  },
+  "password": "user-password"
+}'
+```
+
+#### Step 4: Allow Login
+
+Once the user is created in ZITADEL, allow the login to proceed. Future logins will authenticate directly against ZITADEL.
+
+### 6.3. Handle the Grace Period
+
+Set a migration deadline (e.g., 90 days). After this period:
+
+1. **Disable Firebase Authentication** for your application
+2. **Migrate remaining inactive users** using Strategy 1 (Bulk Import + Password Reset)
+3. **Notify inactive users** that they need to reset their password
+
+### 6.4. Sample Backend Implementation (Pseudocode)
+```js
+async function handleLogin(email, password) {
+  // Check if user exists in ZITADEL
+  const zitadelUser = await checkZitadelUser(email);
+  
+  if (zitadelUser) {
+    // User already migrated, authenticate with ZITADEL
+    return authenticateWithZitadel(email, password);
+  }
+  
+  // User not in ZITADEL, verify with Firebase
+  const firebaseValid = await verifyWithFirebase(email, password);
+  
+  if (firebaseValid) {
+    // Create user in ZITADEL with plain-text password
+    await createZitadelUser(email, password, firebaseValid.profile);
+    
+    // Authenticate with ZITADEL
+    return authenticateWithZitadel(email, password);
+  }
+  
+  // Invalid credentials
+  throw new Error('Invalid email or password');
+}
+```
+---
+
+## 7. Testing the Migration
+
+### 7.1. Test User Login
+
+**For Strategy 1 (Bulk Import):**
+- Attempt to login with an imported user
+- Verify that the password reset flow is triggered
+- Complete the password reset and confirm successful login
+
+**For Strategy 2 (JIT Migration):**
+- Attempt to login with a Firebase user that hasn't been migrated yet
+- Verify that the login succeeds seamlessly
+- Check that the user now exists in ZITADEL
+- Attempt a second login to confirm authentication happens directly with ZITADEL
+
+### 7.2. Verify User Data
+
+Check that user data was imported correctly:
+
+```
+curl --location 'https://${CUSTOM_DOMAIN}/management/v1/users/human/_search' \
+--header 'Authorization: Bearer <access-token>' \
+--header 'Content-Type: application/json' \
+--data '{
+  "query": {
+    "offset": "0",
+    "limit": 100
+  }
+}'
+```
+
+### 7.3. Troubleshooting
+
+**Common issues:**
+
+- **Strategy 1:**
+  - Users not receiving password reset emails (check email configuration)
+  - Import API timeout (reduce batch size)
+  - Malformed JSON (validate against ZITADEL schema)
+
+- **Strategy 2:**
+  - Firebase API authentication errors (verify Web API Key)
+  - HTTPS certificate issues (ensure valid SSL/TLS)
+  - User creation failures (check ZITADEL service account permissions)
+
+#### Where to check logs and get help
+
+You can verify that users were imported by calling the **events endpoint** and checking for the following event type:
+
+"user.human.added"
+
+Example request:
+
+```
+curl --location 'https://${CUSTOM_DOMAIN}/admin/v1/events/_search' \
+--header 'Authorization: Bearer <token>' \
+--header 'Content-Type: application/json' \
+--data '{
+  "asc": true,
+  "limit": 1000,
+  "event_types": [
+    "user.human.added"
+  ]
+}'
+```
+
+---
+
+## 8. Additional Resources
+
+- [ZITADEL Admin API Documentation](/reference/api/admin/zitadel.admin.v1.AdminService.ImportData)
+- [Firebase Authentication REST API](https://firebase.google.com/docs/reference/rest/auth)
+- [Managing Organizations in ZITADEL](https://zitadel.com/docs/guides/manage/console/organizations-overview)
+- [Service Accounts & API Authentication](https://zitadel.com/docs/guides/integrate/service-accounts/authenticate-service-accounts)
+- [Just-in-time Migration Overview](https://zitadel.com/docs/guides/migrate/introduction#just-in-time-migration)
+- [Just-in-time Migration Example](https://github.com/zitadel/actions/blob/main/actions-v2-cloudflare-workers/JIT-USERS-MIGRATION.md)

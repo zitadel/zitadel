@@ -47,6 +47,8 @@ type ProjectAddedEvent struct {
 	PrivateLabelingSetting domain.PrivateLabelingSetting `json:"privateLabelingSetting,omitempty"`
 }
 
+func (*ProjectAddedEvent) EnforceResourceOwner() {}
+
 func (e *ProjectAddedEvent) Payload() interface{} {
 	return e
 }

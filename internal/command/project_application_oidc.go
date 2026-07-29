@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"net/url"
 	"strings"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	project_repo "github.com/zitadel/zitadel/internal/repository/project"
@@ -207,6 +209,12 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 	if err != nil {
 		return nil, err
 	}
+
+	backchannelLogoutURI, err := c.validateBackchannelLogoutURI(oidcApp)
+	if err != nil {
+		return nil, err
+	}
+
 	events = append(events, project_repo.NewOIDCConfigAddedEvent(ctx,
 		projectAgg,
 		gu.Value(oidcApp.OIDCVersion),
@@ -227,7 +235,7 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		gu.Value(oidcApp.ClockSkew),
 		trimStringSliceWhiteSpaces(oidcApp.AdditionalOrigins),
 		gu.Value(oidcApp.SkipNativeAppSuccessPage),
-		strings.TrimSpace(gu.Value(oidcApp.BackChannelLogoutURI)),
+		backchannelLogoutURI,
 		gu.Value(oidcApp.LoginVersion),
 		strings.TrimSpace(gu.Value(oidcApp.LoginBaseURI)),
 	))
@@ -250,6 +258,20 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 	result.ClientSecretString = plain
 	result.FillCompliance()
 	return result, nil
+}
+
+func (c *Commands) validateBackchannelLogoutURI(oidcApp *domain.OIDCApp) (string, error) {
+	backchannelLogoutURL := strings.TrimSpace(gu.Value(oidcApp.BackChannelLogoutURI))
+	if backchannelLogoutURL != "" {
+		url, err := url.Parse(backchannelLogoutURL)
+		if err != nil {
+			return "", zerrors.ThrowInvalidArgument(err, "PROJECT-iZL2Ac", "Errors.Project.App.Invalid.BackchannelLogoutURL")
+		}
+		if err := denylist.IsURLBlocked(c.denyList, url, c.ipLookupFunction); err != nil {
+			return "", zerrors.ThrowInvalidArgument(err, "PROJECT-msNebo", "Errors.Project.App.Blocked.BackchannelLogoutURL")
+		}
+	}
+	return backchannelLogoutURL, nil
 }
 
 func (c *Commands) UpdateOIDCApplication(ctx context.Context, oidc *domain.OIDCApp, resourceOwner string) (*domain.OIDCApp, error) {
@@ -277,7 +299,11 @@ func (c *Commands) UpdateOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 	projectAgg := ProjectAggregateFromWriteModel(&existingOIDC.WriteModel)
 	var backChannelLogout, loginBaseURI *string
 	if oidc.BackChannelLogoutURI != nil {
-		backChannelLogout = gu.Ptr(strings.TrimSpace(*oidc.BackChannelLogoutURI))
+		bcl, err := c.validateBackchannelLogoutURI(oidc)
+		if err != nil {
+			return nil, err
+		}
+		backChannelLogout = gu.Ptr(bcl)
 	}
 
 	if oidc.LoginBaseURI != nil {

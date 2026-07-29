@@ -77,6 +77,7 @@ LogStore:
       Enabled: true
 
 Executions:
+  # Deprecated: use HTTPClient.DenyList
   DenyList: # ZITADEL_EXECUTIONS_DENYLIST (comma separated list)
 
 Projections:
@@ -130,3 +131,6 @@ OIDC:
 
 SAML:
   DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2
+
+HTTPClient:
+  DenyList:

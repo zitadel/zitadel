@@ -43,6 +43,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   const requestId = searchParams?.requestId;
   const organization = searchParams?.organization;
+  const orgDomain = searchParams?.orgDomain;
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
@@ -67,6 +68,10 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   if (organization) {
     params.append("organization", organization);
+  }
+
+  if (orgDomain) {
+    params.append("orgDomain", orgDomain);
   }
 
   return (

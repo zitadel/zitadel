@@ -19,6 +19,7 @@ export class SecretGeneratorComponent {
     SecretGeneratorType.SECRET_GENERATOR_TYPE_APP_SECRET,
     SecretGeneratorType.SECRET_GENERATOR_TYPE_OTP_SMS,
     SecretGeneratorType.SECRET_GENERATOR_TYPE_OTP_EMAIL,
+    SecretGeneratorType.SECRET_GENERATOR_TYPE_INVITE_CODE,
   ];
 
   constructor() {}

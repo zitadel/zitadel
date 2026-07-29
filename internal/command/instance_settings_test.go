@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -219,6 +220,52 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 			},
 		},
 		{
+			name: "secret generator config invalid (length), invalid error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				generator: &crypto.GeneratorConfig{
+					Length:              0,
+					Expiry:              2 * time.Hour,
+					IncludeLowerLetters: true,
+					IncludeUpperLetters: true,
+					IncludeDigits:       true,
+					IncludeSymbols:      true,
+				},
+				generatorType: domain.SecretGeneratorTypeInitCode,
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "CRYPTO-FVJ2x", "Errors.InvalidArgument"))
+				},
+			},
+		},
+		{
+			name: "secret generator config invalid (charset), invalid error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				generator: &crypto.GeneratorConfig{
+					Length:              8,
+					Expiry:              2 * time.Hour,
+					IncludeLowerLetters: false,
+					IncludeUpperLetters: false,
+					IncludeDigits:       false,
+					IncludeSymbols:      false,
+				},
+				generatorType: domain.SecretGeneratorTypeInitCode,
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "CRYPTO-Ckl2s", "Errors.InvalidArgument"))
+				},
+			},
+		},
+		{
 			name: "generator removed, new added ok",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -332,15 +379,21 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 						),
 					),
 					expectPush(
-						newSecretGeneratorChangedEvent(context.Background(),
-							domain.SecretGeneratorTypeInitCode,
-							8,
-							time.Hour*2,
-							false,
-							false,
-							false,
-							false,
-						),
+						func() *instance.SecretGeneratorChangedEvent {
+							changes := []instance.SecretGeneratorChanges{
+								instance.ChangeSecretGeneratorLength(8),
+								instance.ChangeSecretGeneratorExpiry(2 * time.Hour),
+								instance.ChangeSecretGeneratorIncludeUpperLetters(false),
+								instance.ChangeSecretGeneratorIncludeDigits(false),
+								instance.ChangeSecretGeneratorIncludeSymbols(false),
+							}
+							event, _ := instance.NewSecretGeneratorChangeEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								domain.SecretGeneratorTypeInitCode,
+								changes,
+							)
+							return event
+						}(),
 					),
 				),
 			},
@@ -349,7 +402,7 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 				generator: &crypto.GeneratorConfig{
 					Length:              8,
 					Expiry:              2 * time.Hour,
-					IncludeLowerLetters: false,
+					IncludeLowerLetters: true,
 					IncludeUpperLetters: false,
 					IncludeDigits:       false,
 					IncludeSymbols:      false,
@@ -522,21 +575,4 @@ func TestCommandSide_RemoveSecretGenerator(t *testing.T) {
 			}
 		})
 	}
-}
-
-func newSecretGeneratorChangedEvent(ctx context.Context, generatorType domain.SecretGeneratorType, length uint, expiry time.Duration, lowerCase, upperCase, digits, symbols bool) *instance.SecretGeneratorChangedEvent {
-	changes := []instance.SecretGeneratorChanges{
-		instance.ChangeSecretGeneratorLength(length),
-		instance.ChangeSecretGeneratorExpiry(expiry),
-		instance.ChangeSecretGeneratorIncludeLowerLetters(lowerCase),
-		instance.ChangeSecretGeneratorIncludeUpperLetters(upperCase),
-		instance.ChangeSecretGeneratorIncludeDigits(digits),
-		instance.ChangeSecretGeneratorIncludeSymbols(symbols),
-	}
-	event, _ := instance.NewSecretGeneratorChangeEvent(ctx,
-		&instance.NewAggregate("INSTANCE").Aggregate,
-		generatorType,
-		changes,
-	)
-	return event
 }

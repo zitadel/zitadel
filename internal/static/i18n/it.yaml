@@ -282,6 +282,8 @@ Errors:
     LabelPolicy:
       NotFound: "Etichettatura privata non trovata"
       NotChanged: "Private Labelling non è stata cambiata"
+    IDPConfig:
+      NotExisting: "La configurazione del IDP non esiste"
   Project:
     ProjectIDMissing: "ID del progetto mancante"
     AlreadyExists: "Il progetto è già stato creato nell'organizzazione"

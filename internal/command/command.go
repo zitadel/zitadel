@@ -106,9 +106,9 @@ type Commands struct {
 	// so the query and cache overhead can be completely eliminated.
 	milestonesCompleted sync.Map
 
-	loginPaths        LoginPaths
-	ActionsV2DenyList []denylist.AddressChecker
-	IPLookupFunction  internal_net.IPLookupFunc
+	loginPaths       LoginPaths
+	ipLookupFunction internal_net.IPLookupFunc
+	denyList         []denylist.AddressChecker
 }
 
 //go:generate mockgen -package command -destination ./mock_login_paths.go . LoginPaths
@@ -138,7 +138,7 @@ func StartCommands(
 	defaultAccessTokenLifetime, defaultRefreshTokenLifetime, defaultRefreshTokenIdleLifetime time.Duration,
 	defaultSecretGenerators *SecretGenerators,
 	loginPaths LoginPaths,
-	actionsDeniedHostList []denylist.AddressChecker,
+	denyList []denylist.AddressChecker,
 ) (repo *Commands, err error) {
 	if externalDomain == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
@@ -162,32 +162,35 @@ func StartCommands(
 	if err != nil {
 		return nil, fmt.Errorf("caches: %w", err)
 	}
+	ipLookupFunction := net.LookupIP
 	repo = &Commands{
-		eventstore:                      es,
-		static:                          staticStore,
-		idGenerator:                     idGenerator,
-		zitadelRoles:                    zitadelRoles,
-		externalDomain:                  externalDomain,
-		externalSecure:                  externalSecure,
-		externalPort:                    externalPort,
-		keySize:                         defaults.KeyConfig.Size,
-		certKeySize:                     defaults.KeyConfig.CertificateSize,
-		privateKeyLifetime:              defaults.KeyConfig.PrivateKeyLifetime,
-		publicKeyLifetime:               defaults.KeyConfig.PublicKeyLifetime,
-		certificateLifetime:             defaults.KeyConfig.CertificateLifetime,
-		maxIdPIntentLifetime:            defaults.MaxIdPIntentLifetime,
-		idpConfigEncryption:             idpConfigEncryption,
-		smtpEncryption:                  smtpEncryption,
-		smsEncryption:                   smsEncryption,
-		userEncryption:                  userEncryption,
-		targetEncryption:                targetEncryption,
-		userPasswordHasher:              userPasswordHasher,
-		secretHasher:                    secretHasher,
-		machineKeySize:                  int(defaults.SecretGenerators.MachineKeySize),
-		applicationKeySize:              int(defaults.SecretGenerators.ApplicationKeySize),
-		domainVerificationAlg:           domainVerificationEncryption,
-		domainVerificationGenerator:     crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, domainVerificationEncryption),
-		domainVerificationValidator:     api_http.ValidateDomain,
+		eventstore:                  es,
+		static:                      staticStore,
+		idGenerator:                 idGenerator,
+		zitadelRoles:                zitadelRoles,
+		externalDomain:              externalDomain,
+		externalSecure:              externalSecure,
+		externalPort:                externalPort,
+		keySize:                     defaults.KeyConfig.Size,
+		certKeySize:                 defaults.KeyConfig.CertificateSize,
+		privateKeyLifetime:          defaults.KeyConfig.PrivateKeyLifetime,
+		publicKeyLifetime:           defaults.KeyConfig.PublicKeyLifetime,
+		certificateLifetime:         defaults.KeyConfig.CertificateLifetime,
+		maxIdPIntentLifetime:        defaults.MaxIdPIntentLifetime,
+		idpConfigEncryption:         idpConfigEncryption,
+		smtpEncryption:              smtpEncryption,
+		smsEncryption:               smsEncryption,
+		userEncryption:              userEncryption,
+		targetEncryption:            targetEncryption,
+		userPasswordHasher:          userPasswordHasher,
+		secretHasher:                secretHasher,
+		machineKeySize:              int(defaults.SecretGenerators.MachineKeySize),
+		applicationKeySize:          int(defaults.SecretGenerators.ApplicationKeySize),
+		domainVerificationAlg:       domainVerificationEncryption,
+		domainVerificationGenerator: crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, domainVerificationEncryption),
+		domainVerificationValidator: func(domain, token, verifier string, checkType api_http.CheckType) error {
+			return api_http.ValidateDomain(domain, token, verifier, checkType, httpClient)
+		},
 		keyAlgorithm:                    oidcEncryption,
 		authAlgorithm:                   oidcEncryption,
 		certificateAlgorithm:            samlEncryption,
@@ -228,11 +231,11 @@ func StartCommands(
 				WithHyphen: defaults.Multifactors.RecoveryCodes.WithHyphen,
 			},
 		},
-		GenerateDomain:    domain.NewGeneratedInstanceDomain,
-		caches:            caches,
-		loginPaths:        loginPaths,
-		ActionsV2DenyList: actionsDeniedHostList,
-		IPLookupFunction:  net.LookupIP,
+		GenerateDomain:   domain.NewGeneratedInstanceDomain,
+		caches:           caches,
+		loginPaths:       loginPaths,
+		ipLookupFunction: ipLookupFunction,
+		denyList:         denyList,
 	}
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {

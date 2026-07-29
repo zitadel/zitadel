@@ -51,9 +51,7 @@ In my external system for example Splunk I want to be able to get an information
 
 1. Define an action that logs successful and failed login to your stdout.
    Make sure the name of the action is the same as of the function in the script.
-   ```ts reference
-   https://github.com/zitadel/actions/blob/main/examples/post_auth_log.js
-   ```
+   <GithubCodeBlock url="https://github.com/zitadel/actions/blob/main/examples/post_auth_log.js" />
 2. Add the action to the following Flows and Triggers
    - Flow: Internal Authentication - Trigger: Post Authentication
    - Flow: External Authentication - Trigger: Post Authentication
@@ -71,9 +69,7 @@ You want to send a request to an endpoint each time after an authentication (suc
 1. Define an action that calls API endpoint.
    Make sure the name of the action is the same as of the function in the script.
    Example how to call an API endpoint:
-   ```ts reference
-   https://github.com/zitadel/actions/blob/main/examples/make_api_call.js
-   ```
+   <GithubCodeBlock url="https://github.com/zitadel/actions/blob/main/examples/make_api_call.js" />
 2. Add the action to the following flows and triggers
    - Flow: Internal Authentication - Trigger: Post Authentication
    - Flow: External Authentication - Trigger: Post Authentication

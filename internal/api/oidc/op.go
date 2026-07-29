@@ -127,6 +127,7 @@ func NewServer(
 	fallbackLogger *slog.Logger,
 	hashConfig crypto.HashConfig,
 	federatedLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
+	httpClient *http.Client,
 ) (*Server, error) {
 	opConfig, err := createOPConfig(config, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
@@ -189,6 +190,7 @@ func NewServer(
 		targetEncryptionAlgorithm:  targetEncryptionAlgorithm,
 		opCrypto:                   alg,
 		assetAPIPrefix:             assets.AssetAPI(),
+		httpClient:                 httpClient,
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 	server.Handler = op.RegisterLegacyServer(server,

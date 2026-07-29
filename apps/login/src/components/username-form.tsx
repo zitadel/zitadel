@@ -26,6 +26,7 @@ type Props = {
   organization?: string;
   defaultOrganization?: string;
   suffix?: string;
+  hideSuffix?: boolean;
   submit: boolean;
   allowRegister: boolean;
 };
@@ -36,6 +37,7 @@ export function UsernameForm({
   organization,
   defaultOrganization,
   suffix,
+  hideSuffix,
   loginSettings,
   submit,
   allowRegister,
@@ -111,7 +113,7 @@ export function UsernameForm({
             {...register("loginName", { required: t("required.loginName") })}
             label={inputLabel}
             data-testid="username-text-input"
-            suffix={suffix}
+            suffix={hideSuffix ? undefined : suffix}
           />
           {allowRegister && (
             <button
