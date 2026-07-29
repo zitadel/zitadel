@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { LoginPasskey } from "./login-passkey";
@@ -458,7 +458,7 @@ describe("LoginPasskey Component", () => {
       // Never resolve the WebAuthn request: the ceremony stays in flight.
       mockCredentialsGet.mockReturnValue(new Promise(() => {}));
 
-      renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+      const { container } = renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
 
       await waitFor(() => {
         expect(mockCredentialsGet).toHaveBeenCalled();
@@ -467,7 +467,7 @@ describe("LoginPasskey Component", () => {
       // While the authenticator prompt is open the button must stay disabled, so a
       // click cannot start a second, overlapping ceremony — the root cause of #12495.
       await waitFor(() => {
-        expect(screen.getByTestId("submit-button")).toBeDisabled();
+        expect(within(container).getByTestId("submit-button")).toBeDisabled();
       });
     });
 
@@ -493,11 +493,11 @@ describe("LoginPasskey Component", () => {
       (abortError as any).name = "AbortError";
       mockCredentialsGet.mockRejectedValue(abortError);
 
-      renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+      const { container } = renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
 
       // Ceremony started: the button is disabled while the challenge request is in flight.
       await waitFor(() => {
-        expect(screen.getByTestId("submit-button")).toBeDisabled();
+        expect(within(container).getByTestId("submit-button")).toBeDisabled();
       });
 
       await act(async () => {
@@ -506,12 +506,12 @@ describe("LoginPasskey Component", () => {
 
       // Ceremony settled (get() rejected with AbortError): the button is re-enabled...
       await waitFor(() => {
-        expect(screen.getByTestId("submit-button")).not.toBeDisabled();
+        expect(within(container).getByTestId("submit-button")).not.toBeDisabled();
       });
 
       // ...and the abort is swallowed, not shown as the Firefox "verificationFailed"
       // that the overlapping-request race used to produce.
-      expect(screen.queryByText("An error occurred during passkey verification")).not.toBeInTheDocument();
+      expect(within(container).queryByText("An error occurred during passkey verification")).not.toBeInTheDocument();
     });
   });
 });
