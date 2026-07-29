@@ -1,4 +1,4 @@
-import { getThemeConfig } from "@/lib/theme";
+import { getThemeConfig, parsePixelValue } from "@/lib/theme";
 
 type Props = {
   darkSrc?: string;
@@ -12,7 +12,11 @@ type Props = {
 
 export function Logo({ lightSrc, darkSrc, maxHeight }: Props) {
   const { logoMaxHeight } = getThemeConfig();
-  const cap = Number.isFinite(maxHeight) && maxHeight > 0 ? maxHeight : logoMaxHeight;
+  // Validate the override the same way as the env-derived value: a non-finite or
+  // non-positive cap would otherwise emit an invalid max-height that the browser
+  // drops, leaving the logo unconstrained.
+  const cap = parsePixelValue(maxHeight, logoMaxHeight);
+
   // Constrain both axes instead of forcing fixed dimensions: the intrinsic
   // aspect ratio of the uploaded asset is preserved, so wide wordmarks use the
   // available width while tall marks stay within the height budget. Uploaded

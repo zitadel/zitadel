@@ -46,9 +46,11 @@ export const DEFAULT_THEME: ThemeConfig = {
   logoMaxHeight: 80,
 };
 
-// Parse a positive pixel value from an environment variable, ignoring
-// anything that isn't a finite number greater than zero.
-function parsePixelValue(raw: string | undefined, fallback: number): number {
+// Parse a positive pixel value from an environment variable or a caller-supplied
+// override, ignoring anything that isn't a finite number greater than zero.
+// Falsy input (undefined, empty string, 0, NaN) falls back, as do Infinity and
+// negative numbers.
+export function parsePixelValue(raw: string | number | undefined, fallback: number): number {
   if (!raw) {
     return fallback;
   }
