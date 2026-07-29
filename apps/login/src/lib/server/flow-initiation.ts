@@ -13,7 +13,6 @@ import {
   createResponse,
   getActiveIdentityProviders,
   getAuthRequest,
-  getLoginSettings,
   getOrgsByDomain,
   getSAMLRequest,
   getSecuritySettings,
@@ -134,17 +133,14 @@ const resolveLoginHint = async ({
   }
 
   try {
-    // Mirror the client-side loginname form: forward ignoreUnknownUsernames so
-    // an unknown hint redirects to the (fake) /password step like a known one,
-    // instead of falling back to /loginname and disclosing that the user does
-    // not exist. getLoginSettings is TTL-cached, so this adds no extra RPC.
-    const loginSettings = await getLoginSettings({ serviceConfig, organization: organization || undefined });
-
+    // sendLoginname derives enumeration protection (ignoreUnknownUsernames) from the
+    // same organization context server-side, so an unknown hint redirects to the
+    // (fake) /password step like a known one instead of falling back to /loginname
+    // and disclosing that the user does not exist.
     const res = await sendLoginname({
       loginName: loginHint,
       requestId,
       organization: organization || undefined,
-      ignoreUnknownUsernames: loginSettings?.ignoreUnknownUsernames,
     });
 
     if (res && "redirect" in res && res.redirect) {

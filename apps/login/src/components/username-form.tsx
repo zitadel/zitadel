@@ -68,7 +68,6 @@ export function UsernameForm({
           defaultOrganization,
           requestId,
           suffix,
-          ignoreUnknownUsernames: loginSettings?.ignoreUnknownUsernames,
         });
 
         handleServerActionResponse(res, router, setSamlData, setError);

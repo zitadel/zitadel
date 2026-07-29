@@ -36,7 +36,6 @@ export type SendLoginnameCommand = {
   organization?: string;
   defaultOrganization?: string;
   suffix?: string;
-  ignoreUnknownUsernames?: boolean;
 };
 
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
@@ -52,6 +51,13 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   if (!loginSettingsByContext) {
     return { error: t("errors.couldNotGetLoginSettings") };
   }
+
+  // Single source of truth for enumeration protection, derived server-side from the
+  // request-context login settings (sendLoginname is a public server action, so a
+  // client-supplied flag must not be trusted). This is the same context the
+  // /loginname form and the /password page resolve, keeping session creation, the
+  // redirect loginName and the page's "unknown context" suppression consistent.
+  const ignoreUnknownUsernames = !!loginSettingsByContext.ignoreUnknownUsernames;
 
   let searchUsersRequest: SearchUsersCommand = {
     serviceConfig,
@@ -89,7 +95,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   }
 
   const preventUserEnumeration = (organization: string | undefined) => {
-    if (command.ignoreUnknownUsernames) {
+    if (ignoreUnknownUsernames) {
       logger.debug("ignoreUnknownUsernames is true, redirecting to password");
       const paramsPasswordDefault = new URLSearchParams({
         loginName: command.loginName,
@@ -235,7 +241,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   if (users.length > 1) {
     logger.debug("multiple users found, returning error");
-    if (loginSettingsByContext?.ignoreUnknownUsernames) {
+    if (ignoreUnknownUsernames) {
       return preventUserEnumeration(command.organization);
     }
     return { error: t("errors.moreThanOneUserFound") };
@@ -244,13 +250,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     const userId = users[0].userId;
 
     const userLoginSettings = await getLoginSettings({ serviceConfig, organization: user.details?.resourceOwner });
-
-    // Whether enumeration protection applies to this request. The caller's context
-    // settings (loginname form / login_hint resolution) take precedence so that the
-    // decision matches what the next page (/password, /passkey) will resolve and use
-    // to suppress its "unknown context" error. Falls back to the user's org settings
-    // when the caller did not forward the flag.
-    const ignoreUnknownUsernames = command.ignoreUnknownUsernames ?? userLoginSettings?.ignoreUnknownUsernames;
 
     // compare with the concatenated suffix when set
     const concatLoginname = command.suffix ? `${command.loginName}@${command.suffix}` : command.loginName;
