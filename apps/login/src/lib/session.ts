@@ -1,4 +1,4 @@
-import { timestampDate } from "@zitadel/client";
+import { Timestamp, timestampDate } from "@zitadel/client";
 import { AuthRequest } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { SAMLRequest } from "@zitadel/proto/zitadel/saml/v2/authorization_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
@@ -52,6 +52,39 @@ export async function loadMostRecentSession({
 }
 
 /**
+ * A session proves genuine (primary) authentication when a primary factor — password,
+ * passkey/WebAuthn or IDP intent — has been verified and the session has not expired.
+ *
+ * A WebAuthn factor only counts as a *primary* factor when it was user-verified
+ * (`userVerified` true, i.e. passwordless login). A presence-only WebAuthn assertion is a
+ * second-factor (U2F) check and must NOT be treated as primary authentication — mirroring
+ * how `mfa-helper` distinguishes "authenticated with passkey" from a 2FA WebAuthn check.
+ *
+ * This is the shared gate behind both the credential-enrollment guard
+ * (`getEnrollmentAuthorizationError`) and the MFA-setup page, so an "identify-only"
+ * session (only `factors.user` set, produced by submitting a login name) is never enough
+ * to attach a new authenticator (GHSA-45f2-5q3r-xgg6).
+ */
+export function hasVerifiedPrimaryFactor(session: Partial<Session>): {
+  valid: boolean;
+  verifiedAt?: Timestamp;
+} {
+  const validPassword = session?.factors?.password?.verifiedAt;
+  const validPasskey =
+    session?.factors?.webAuthN?.verifiedAt && !!session?.factors?.webAuthN?.userVerified
+      ? session?.factors?.webAuthN?.verifiedAt
+      : undefined;
+  const validIDP = session?.factors?.intent?.verifiedAt;
+
+  const stillValid = session.expirationDate ? timestampDate(session.expirationDate) > new Date() : true;
+
+  const verifiedAt = validPassword || validPasskey || validIDP;
+  const valid = !!(verifiedAt && stillValid);
+
+  return { valid, verifiedAt };
+}
+
+/**
  * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
  * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
  **/
@@ -80,43 +113,38 @@ export async function isSessionValid({
   // Use the existing shouldEnforceMFA function to determine if MFA is required
   const isMfaRequired = shouldEnforceMFA(session, loginSettings);
 
-  // Only enforce MFA validation if MFA is required by policy
-  if (isMfaRequired) {
-    const authMethodTypes = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id });
+  // Always check auth methods to see if the user has MFA factors configured
+  const authMethodTypes = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id });
 
-    const authMethods = authMethodTypes.authMethodTypes;
-    // Filter to only MFA methods (exclude PASSWORD and PASSKEY)
-    const mfaMethods = authMethods?.filter(
-      (method) =>
-        method === AuthenticationMethodType.TOTP ||
-        method === AuthenticationMethodType.OTP_EMAIL ||
-        method === AuthenticationMethodType.OTP_SMS ||
-        method === AuthenticationMethodType.U2F,
-    );
+  const authMethods = authMethodTypes.authMethodTypes;
+  // Filter to only MFA methods (exclude PASSWORD and PASSKEY)
+  const mfaMethods = authMethods?.filter(
+    (method) =>
+      method === AuthenticationMethodType.TOTP ||
+      method === AuthenticationMethodType.OTP_EMAIL ||
+      method === AuthenticationMethodType.OTP_SMS ||
+      method === AuthenticationMethodType.U2F,
+  );
 
-    if (mfaMethods && mfaMethods.length > 0) {
-      // Check if any of the configured MFA methods have been verified
-      const totpValid = mfaMethods.includes(AuthenticationMethodType.TOTP) && !!session.factors.totp?.verifiedAt;
-      const otpEmailValid =
-        mfaMethods.includes(AuthenticationMethodType.OTP_EMAIL) && !!session.factors.otpEmail?.verifiedAt;
-      const otpSmsValid = mfaMethods.includes(AuthenticationMethodType.OTP_SMS) && !!session.factors.otpSms?.verifiedAt;
-      const u2fValid = mfaMethods.includes(AuthenticationMethodType.U2F) && !!session.factors.webAuthN?.verifiedAt;
+  if (mfaMethods && mfaMethods.length > 0) {
+    // User has MFA methods configured — they must be verified regardless of policy
+    const totpValid = mfaMethods.includes(AuthenticationMethodType.TOTP) && !!session.factors.totp?.verifiedAt;
+    const otpEmailValid = mfaMethods.includes(AuthenticationMethodType.OTP_EMAIL) && !!session.factors.otpEmail?.verifiedAt;
+    const otpSmsValid = mfaMethods.includes(AuthenticationMethodType.OTP_SMS) && !!session.factors.otpSms?.verifiedAt;
+    const u2fValid = mfaMethods.includes(AuthenticationMethodType.U2F) && !!session.factors.webAuthN?.verifiedAt;
 
-      mfaValid = totpValid || otpEmailValid || otpSmsValid || u2fValid;
-    } else {
-      // No specific MFA methods configured, but MFA is forced - check for any verified MFA factors
-      // (excluding IDP which should be handled separately)
-      const otpEmail = session.factors.otpEmail?.verifiedAt;
-      const otpSms = session.factors.otpSms?.verifiedAt;
-      const totp = session.factors.totp?.verifiedAt;
-      const webAuthN = session.factors.webAuthN?.verifiedAt;
-      // Note: Removed IDP (session.factors.intent?.verifiedAt) as requested
+    mfaValid = totpValid || otpEmailValid || otpSmsValid || u2fValid;
+  } else if (isMfaRequired) {
+    // No MFA methods configured, but MFA is forced by policy — check for any verified MFA factors
+    const otpEmail = session.factors.otpEmail?.verifiedAt;
+    const otpSms = session.factors.otpSms?.verifiedAt;
+    const totp = session.factors.totp?.verifiedAt;
+    const webAuthN = session.factors.webAuthN?.verifiedAt;
 
-      mfaValid = !!(otpEmail || otpSms || totp || webAuthN);
-    }
+    mfaValid = !!(otpEmail || otpSms || totp || webAuthN);
   }
 
-  // If MFA is not required by policy, mfaValid remains true
+  // If user has no MFA methods and MFA is not required by policy, mfaValid remains true
 
   const stillValid = session.expirationDate ? timestampDate(session.expirationDate).getTime() > new Date().getTime() : true;
 

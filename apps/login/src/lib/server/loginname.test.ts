@@ -120,6 +120,8 @@ describe("sendLoginname", () => {
     });
     // Default: org discovery returns empty result
     mockGetOrgsByDomain.mockResolvedValue({ result: [] });
+    // Default: no active identity providers
+    mockGetActiveIdentityProviders.mockResolvedValue({ identityProviders: [] });
   });
 
   afterEach(() => {
@@ -586,6 +588,121 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user@example.com",
+      });
+
+      expect(result).toEqual({ error: "errors.userNotFound" });
+    });
+
+    test("should redirect to IDP when allowRegister: false, allowLocalAuthentication: true and discovered org has single active IDP", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowRegister: false,
+        allowLocalAuthentication: true,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp123", type: "OIDC", options: { isAutoCreation: true } }],
+      });
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+        organization: "org123",
+      });
+
+      expect(result).toEqual({ redirect: "https://idp.example.com/auth" });
+    });
+
+    test("should redirect to IDP via domain discovery when allowRegister: false, allowLocalAuthentication: true", async () => {
+      mockGetLoginSettings
+        .mockResolvedValueOnce({
+          allowRegister: false,
+          allowLocalAuthentication: true,
+        })
+        .mockResolvedValueOnce({
+          allowDomainDiscovery: true,
+          allowRegister: false,
+          allowLocalAuthentication: true,
+        });
+
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [{ id: "discovered-org-789", name: "Company Org" }],
+      });
+
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp456", type: "OIDC", options: { isAutoCreation: true } }],
+      });
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://company-idp.example.com/auth" });
+
+      const result = await sendLoginname({
+        loginName: "user@company.com",
+        requestId: "req123",
+      });
+
+      expect(result).toEqual({ redirect: "https://company-idp.example.com/auth" });
+
+      expect(mockGetOrgsByDomain).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        domain: "company.com",
+      });
+
+      expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        orgId: "discovered-org-789",
+      });
+    });
+
+    test("should redirect to IDP when allowRegister: true, allowLocalAuthentication: true and discovered org has single active IDP", async () => {
+      mockGetLoginSettings
+        .mockResolvedValueOnce({
+          allowRegister: true,
+          allowLocalAuthentication: true,
+          ignoreUnknownUsernames: false,
+        })
+        .mockResolvedValueOnce({
+          allowDomainDiscovery: true,
+          allowRegister: true,
+          allowLocalAuthentication: true,
+          ignoreUnknownUsernames: false,
+        });
+
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [{ id: "discovered-org-101", name: "Example Org" }],
+      });
+
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp789", type: "OIDC", options: { isAutoCreation: true } }],
+      });
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://example-idp.example.com/auth" });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+        requestId: "req123",
+      });
+
+      expect(result).toEqual({ redirect: "https://example-idp.example.com/auth" });
+    });
+
+    test("should return error when allowRegister: false, allowLocalAuthentication: true, discovered org but no active IDP", async () => {
+      mockGetLoginSettings
+        .mockResolvedValueOnce({
+          allowRegister: false,
+          allowLocalAuthentication: true,
+        })
+        .mockResolvedValueOnce({
+          allowDomainDiscovery: true,
+          allowRegister: false,
+          allowLocalAuthentication: true,
+        });
+
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [{ id: "discovered-org-empty", name: "No IDP Org" }],
+      });
+
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [],
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@noidp.com",
       });
 
       expect(result).toEqual({ error: "errors.userNotFound" });

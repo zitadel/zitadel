@@ -6168,66 +6168,6 @@ func TestCommandSide_AddOrgZitadelIDP(t *testing.T) {
 			},
 		},
 		{
-			name: "ok",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(),
-					expectPush(
-						org.NewZitadelIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
-							"id1",
-							"name",
-							"issuer",
-							"clientID",
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("clientSecret"),
-							},
-							nil,
-							idp.Options{},
-							[]idp.RolesInfo{
-								{
-									OrganizationID:     "org1",
-									OrganizationDomain: "example-org1.com",
-								},
-								{
-									OrganizationID:     "org2",
-									OrganizationDomain: "example-org2.com",
-								},
-							},
-						),
-					),
-				),
-				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			},
-			args: args{
-				ctx:           context.Background(),
-				resourceOwner: "org1",
-				provider: ZitadelProvider{
-					Name:         "name",
-					Issuer:       "issuer",
-					ClientID:     "clientID",
-					ClientSecret: "clientSecret",
-					InstanceRolesInfo: []idp.RolesInfo{
-						{
-							OrganizationID:     "org1",
-							OrganizationDomain: "example-org1.com",
-						},
-						{
-							OrganizationID:     "org2",
-							OrganizationDomain: "example-org2.com",
-						},
-					},
-				},
-			},
-			res: res{
-				id:   "id1",
-				want: &domain.ObjectDetails{ResourceOwner: "org1"},
-			},
-		},
-		{
 			name: "ok all set",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -6251,16 +6191,7 @@ func TestCommandSide_AddOrgZitadelIDP(t *testing.T) {
 								IsAutoCreation:    true,
 								IsAutoUpdate:      true,
 							},
-							[]idp.RolesInfo{
-								{
-									OrganizationID:     "org1",
-									OrganizationDomain: "example-org1.com",
-								},
-								{
-									OrganizationID:     "org2",
-									OrganizationDomain: "example-org2.com",
-								},
-							},
+							nil,
 						),
 					),
 				),
@@ -6282,21 +6213,39 @@ func TestCommandSide_AddOrgZitadelIDP(t *testing.T) {
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
 					},
-					InstanceRolesInfo: []idp.RolesInfo{
-						{
-							OrganizationID:     "org1",
-							OrganizationDomain: "example-org1.com",
-						},
-						{
-							OrganizationID:     "org2",
-							OrganizationDomain: "example-org2.com",
-						},
-					},
 				},
 			},
 			res: res{
 				id:   "id1",
 				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+		{
+			name: "instance roles info not allowed",
+			fields: fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: ZitadelProvider{
+					Name:         "name",
+					Issuer:       "issuer",
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+					InstanceRolesInfo: []idp.RolesInfo{
+						{
+							OrganizationID:     "org1",
+							OrganizationDomain: "example-org1.com",
+						},
+					},
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-ImOVF3", "Errors.Invalid.Argument"))
+				},
 			},
 		},
 	}
@@ -6504,16 +6453,7 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 								},
 								[]string{openid.ScopeOpenID, openid.ScopeEmail},
 								idp.Options{},
-								[]idp.RolesInfo{
-									{
-										OrganizationID:     "org1",
-										OrganizationDomain: "example-org1.com",
-									},
-									{
-										OrganizationID:     "org2",
-										OrganizationDomain: "example-org2.com",
-									},
-								},
+								nil,
 							),
 						),
 					),
@@ -6527,20 +6467,36 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 					Issuer:   "issuer",
 					ClientID: "clientID",
 					Scopes:   []string{openid.ScopeOpenID, openid.ScopeEmail},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+		{
+			name: "instance roles info not allowed",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				id:            "idp-id",
+				resourceOwner: "org1",
+				provider: ZitadelProvider{
+					Name:     "name",
+					Issuer:   "issuer",
+					ClientID: "clientID",
 					InstanceRolesInfo: []idp.RolesInfo{
 						{
 							OrganizationID:     "org1",
 							OrganizationDomain: "example-org1.com",
 						},
-						{
-							OrganizationID:     "org2",
-							OrganizationDomain: "example-org2.com",
-						},
 					},
 				},
 			},
 			res: res{
-				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-ImOVF3", "Errors.Invalid.Argument"))
+				},
 			},
 		},
 		{
@@ -6562,12 +6518,7 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 								},
 								[]string{openid.ScopeOpenID, openid.ScopeEmail},
 								idp.Options{},
-								[]idp.RolesInfo{
-									{
-										OrganizationID:     "org1",
-										OrganizationDomain: "example-org1.com",
-									},
-								},
+								nil,
 							)),
 					),
 					expectPush(
@@ -6592,16 +6543,6 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 										IsAutoCreation:    &t,
 										IsAutoUpdate:      &t,
 									}),
-									idp.ChangeZitadelIDPInstanceRolesInfo([]idp.RolesInfo{
-										{
-											OrganizationID:     "org1",
-											OrganizationDomain: "example-org1.com",
-										},
-										{
-											OrganizationID:     "org2",
-											OrganizationDomain: "example-org2.com",
-										},
-									}),
 								},
 							)
 							return event
@@ -6624,16 +6565,6 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 						IsLinkingAllowed:  true,
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
-					},
-					InstanceRolesInfo: []idp.RolesInfo{
-						{
-							OrganizationID:     "org1",
-							OrganizationDomain: "example-org1.com",
-						},
-						{
-							OrganizationID:     "org2",
-							OrganizationDomain: "example-org2.com",
-						},
 					},
 				},
 			},
@@ -6660,12 +6591,7 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 								},
 								[]string{openid.ScopeOpenID, openid.ScopeEmail},
 								idp.Options{},
-								[]idp.RolesInfo{
-									{
-										OrganizationID:     "org1",
-										OrganizationDomain: "example-org1.com",
-									},
-								},
+								nil,
 							)),
 					),
 					expectPush(
@@ -6690,16 +6616,6 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 										IsAutoCreation:    &t,
 										IsAutoUpdate:      &t,
 									}),
-									idp.ChangeZitadelIDPInstanceRolesInfo([]idp.RolesInfo{
-										{
-											OrganizationID:     "org1",
-											OrganizationDomain: "example-org1.com",
-										},
-										{
-											OrganizationID:     "org2",
-											OrganizationDomain: "example-org2.com",
-										},
-									}),
 								},
 							)
 							return event
@@ -6722,16 +6638,6 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 						IsLinkingAllowed:  true,
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
-					},
-					InstanceRolesInfo: []idp.RolesInfo{
-						{
-							OrganizationID:     "org1",
-							OrganizationDomain: "example-org1.com",
-						},
-						{
-							OrganizationID:     "org2",
-							OrganizationDomain: "example-org2.com",
-						},
 					},
 				},
 			},

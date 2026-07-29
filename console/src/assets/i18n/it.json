@@ -1040,7 +1040,7 @@
       "SET": "Imposta nuova password",
       "RESENDNOTIFICATION": "Invia email per la reimpostazione",
       "REQUIRED": "Mancano alcuni campi obbligatori.",
-      "MINLENGTHERROR": "Deve essere lunga almeno {{valore}} caratteri.",
+      "MINLENGTHERROR": "Deve essere lunga almeno {{value}} caratteri.",
       "MAXLENGTHERROR": "Deve contenere meno di {{value}} caratteri"
     },
     "ID": "ID utente",

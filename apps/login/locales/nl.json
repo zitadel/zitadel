@@ -150,7 +150,9 @@
       "couldNotLoadSession": "Kon sessie niet laden",
       "couldNotLoadAuthMethods": "Kon verificatiemethoden niet laden",
       "failedPrecondition": "Voorwaarde mislukt",
-      "sessionNotValid": "Sessie is niet geldig"
+      "sessionNotValid": "Sessie is niet geldig",
+      "passwordVerificationMissing": "Wachtwoordverificatie ontbreekt.",
+      "passwordVerificationTooOld": "Wachtwoordverificatie is te oud. Verifieer je wachtwoord opnieuw."
     }
   },
   "idp": {
@@ -410,7 +412,8 @@
       "userAlreadyVerified": "Gebruiker is al geverifieerd!",
       "couldNotResendInvite": "Kon uitnodiging niet opnieuw versturen",
       "inviteSendFailed": "Versturen van uitnodigingsmail mislukt",
-      "emailSendFailed": "Versturen van verificatie-e-mail mislukt"
+      "emailSendFailed": "Versturen van verificatie-e-mail mislukt",
+      "contextMissing": "Er is een fout opgetreden. Probeer het opnieuw."
     }
   },
   "authenticator": {
