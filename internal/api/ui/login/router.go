@@ -22,7 +22,6 @@ const (
 	EndpointLDAPCallback                  = "/login/ldap/callback"
 	EndpointPasswordlessLogin             = "/login/passwordless"
 	EndpointPasswordlessRegistration      = "/login/passwordless/init"
-	EndpointPasswordlessPrompt            = "/login/passwordless/prompt"
 	EndpointLoginName                     = "/loginname"
 	EndpointUserSelection                 = "/userselection"
 	EndpointChangeUsername                = "/username/change"
@@ -86,7 +85,6 @@ func CreateRouter(login *Login, interceptors ...mux.MiddlewareFunc) *mux.Router 
 	router.HandleFunc(EndpointPasswordlessLogin, login.handlePasswordlessVerification).Methods(http.MethodPost)
 	router.HandleFunc(EndpointPasswordlessRegistration, login.handlePasswordlessRegistration).Methods(http.MethodGet)
 	router.HandleFunc(EndpointPasswordlessRegistration, login.handlePasswordlessRegistrationCheck).Methods(http.MethodPost)
-	router.HandleFunc(EndpointPasswordlessPrompt, login.handlePasswordlessPrompt).Methods(http.MethodPost)
 	router.HandleFunc(EndpointLoginName, login.handleLoginName).Methods(http.MethodGet)
 	router.HandleFunc(EndpointLoginName, login.handleLoginNameCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointUserSelection, login.handleSelectUser).Methods(http.MethodPost)
