@@ -105,12 +105,26 @@ func newDCRProjectWriteModel(resourceOwner string) *dcrProjectWriteModel {
 	}
 }
 
+// Reduce resolves the project by its current name. Renames are followed in both directions:
+// a project renamed away from DCRProjectName is dropped, and one renamed onto it is picked
+// up. Ignoring ProjectChanged would leave this write model pointing at a project that no
+// longer carries the name, and disagreeing with the name-based projection query the
+// registration endpoint uses first.
 func (wm *dcrProjectWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *project.ProjectAddedEvent:
 			if e.Name == DCRProjectName {
 				wm.projectID = e.Aggregate().ID
+			}
+		case *project.ProjectChangeEvent:
+			if e.Name == nil {
+				continue
+			}
+			if *e.Name == DCRProjectName {
+				wm.projectID = e.Aggregate().ID
+			} else if e.Aggregate().ID == wm.projectID {
+				wm.projectID = ""
 			}
 		case *project.ProjectRemovedEvent:
 			if e.Aggregate().ID == wm.projectID {
@@ -127,7 +141,7 @@ func (wm *dcrProjectWriteModel) Query() *eventstore.SearchQueryBuilder {
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
 		AggregateTypes(project.AggregateType).
-		EventTypes(project.ProjectAddedType, project.ProjectRemovedType).
+		EventTypes(project.ProjectAddedType, project.ProjectChangedType, project.ProjectRemovedType).
 		Builder()
 }
 

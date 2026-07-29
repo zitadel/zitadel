@@ -121,3 +121,8 @@ This first version intentionally keeps a small scope:
 - Free-form metadata such as `logo_uri`, `client_uri` or `contacts` is accepted but not persisted.
 - The `private_key_jwt` authentication method and the `jwks`/`jwks_uri` members are rejected with `invalid_client_metadata`.
 - Reading, updating and deleting a registration ([RFC 7592](https://datatracker.ietf.org/doc/html/rfc7592)) is not yet supported.
+- Dynamically registered clients share the audience of the `ZITADEL DCR` project. A JWT access token issued to one of
+  them carries every client ID registered in that project, plus the project ID, in its `aud` claim. The `resource`
+  parameter ([RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707)) is accepted on the authorization code flow but
+  ignored, so it does not narrow `aud`. Do not rely on `aud` alone to tell one dynamically registered client from
+  another; validate the `client_id` or `azp` claim instead.

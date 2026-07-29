@@ -219,8 +219,8 @@ func NewServer(
 			http_utils.CopyHeadersToContext,
 			accessHandler.HandleWithPublicAuthPathPrefixes(publicAuthPathPrefixes(config.CustomEndpoints)),
 			middleware.ActivityHandler,
+			op.NewIssuerInterceptor(server.IssuerFromRequest).Handler,
 		),
-		op.WithHTTPMiddleware(op.NewIssuerInterceptor(server.IssuerFromRequest).Handler),
 		op.WithSetRouter(func(r chi.Router) {
 			r.HandleFunc(server.Endpoints().Authorization.Relative()+authCallbackPathSuffix, server.authorizeCallbackHandler)
 			r.Method(http.MethodPost, server.registrationEndpoint.Relative(), http.HandlerFunc(server.dynamicClientRegistration))
@@ -239,11 +239,15 @@ const authCallbackPathSuffix = "/callback"
 
 // registrationEndpoint builds the dynamic client registration endpoint, optionally
 // overridden through the custom endpoint configuration.
+// registrationEndpoint resolves the OAuth 2.0 Dynamic Client Registration endpoint
+// (RFC 7591). The path is configured in defaults.yaml like the other OIDC endpoints, so it
+// can be overridden by environment variable; the literal below is only the fallback for a
+// Server constructed without endpoint configuration.
 func registrationEndpoint(endpointConfig *EndpointConfig) *op.Endpoint {
 	if endpointConfig != nil && endpointConfig.Registration != nil {
 		return op.NewEndpointWithURL(endpointConfig.Registration.Path, endpointConfig.Registration.URL)
 	}
-	return op.NewEndpoint(defaultRegistrationEndpoint)
+	return op.NewEndpoint("/oauth/v2/register")
 }
 
 func ContextToIssuer(ctx context.Context) string {

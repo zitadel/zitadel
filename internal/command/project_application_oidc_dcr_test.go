@@ -8,6 +8,7 @@ import (
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -405,6 +406,90 @@ func TestCommandSide_AddDynamicOIDCClient(t *testing.T) {
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.want, got)
 			}
+		})
+	}
+}
+
+func Test_dcrProjectWriteModel_Reduce(t *testing.T) {
+	t.Parallel()
+
+	aggregate := func(projectID string) *eventstore.Aggregate {
+		return &project.NewAggregate(projectID, "org1").Aggregate
+	}
+	// The write model type-switches on the repository events, so feed it the typed events
+	// directly rather than the raw ones eventFromEventPusher builds for the mock eventstore.
+	added := func(projectID, name string) eventstore.Event {
+		return project.NewProjectAddedEvent(
+			context.Background(), aggregate(projectID), name,
+			false, false, false, domain.PrivateLabelingSettingUnspecified,
+		)
+	}
+	renamed := func(projectID, oldName, newName string) eventstore.Event {
+		return project.NewProjectChangeEvent(
+			context.Background(), aggregate(projectID), oldName,
+			[]project.ProjectChanges{project.ChangeName(newName)},
+		)
+	}
+	removed := func(projectID string) eventstore.Event {
+		return project.NewProjectRemovedEvent(
+			context.Background(), aggregate(projectID), DCRProjectName, nil,
+		)
+	}
+
+	tests := []struct {
+		name   string
+		events []eventstore.Event
+		want   string
+	}{
+		{
+			name:   "no events, no project",
+			events: nil,
+			want:   "",
+		},
+		{
+			name:   "dcr project added",
+			events: []eventstore.Event{added("p1", DCRProjectName)},
+			want:   "p1",
+		},
+		{
+			name:   "unrelated project ignored",
+			events: []eventstore.Event{added("p1", "Some Other Project")},
+			want:   "",
+		},
+		{
+			// Without reducing ProjectChanged the write model would still return p1, while
+			// the name-based projection query no longer finds it.
+			name:   "renamed away from the dcr name is dropped",
+			events: []eventstore.Event{added("p1", DCRProjectName), renamed("p1", DCRProjectName, "Renamed")},
+			want:   "",
+		},
+		{
+			name:   "renamed onto the dcr name is picked up",
+			events: []eventstore.Event{added("p1", "Some Other Project"), renamed("p1", "Some Other Project", DCRProjectName)},
+			want:   "p1",
+		},
+		{
+			name: "rename of an unrelated project does not clear the dcr project",
+			events: []eventstore.Event{
+				added("p1", DCRProjectName),
+				added("p2", "Some Other Project"),
+				renamed("p2", "Some Other Project", "Still Something Else"),
+			},
+			want: "p1",
+		},
+		{
+			name:   "removed dcr project is dropped",
+			events: []eventstore.Event{added("p1", DCRProjectName), removed("p1")},
+			want:   "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			wm := newDCRProjectWriteModel("org1")
+			wm.AppendEvents(tt.events...)
+			require.NoError(t, wm.Reduce())
+			assert.Equal(t, tt.want, wm.projectID)
 		})
 	}
 }

@@ -49,11 +49,6 @@ type Server struct {
 	registrationEndpoint *op.Endpoint
 }
 
-// defaultRegistrationEndpoint is the path of the OAuth 2.0 Dynamic Client Registration
-// endpoint (RFC 7591). It is served under the same /oauth/v2 prefix as the other OAuth
-// endpoints and can be overridden through the custom endpoint configuration.
-const defaultRegistrationEndpoint = "/oauth/v2/register"
-
 func endpoints(endpointConfig *EndpointConfig) op.Endpoints {
 	// some defaults. The new Server will disable endpoints that are nil.
 	endpoints := op.Endpoints{
