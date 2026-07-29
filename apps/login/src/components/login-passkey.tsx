@@ -181,9 +181,10 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
         return submitLogin(data);
       })
       .catch((error) => {
-        // A superseded or unmounted ceremony rejects with AbortError — that is
-        // expected (we aborted it), not a verification failure to surface.
-        if (error?.name === "AbortError") {
+        // A superseded or unmounted ceremony rejects with AbortError once we abort its
+        // signal — that is expected, not a verification failure. An AbortError that we
+        // did not cause is unexpected, so let it fall through and surface an error.
+        if (error?.name === "AbortError" && signal?.aborted) {
           return;
         }
         // Handle passkey cancellation or errors
