@@ -852,11 +852,11 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 	}
 	linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
 	externalUser := mapExternalNotFoundOptionFormDataToLoginUser(data, linkingUser)
-  // the form only carries the editable profile fields, so preserve the ZITADEL project
+	// the form only carries the editable profile fields, so preserve the ZITADEL project
 	// roles captured at authentication (stored on the linking user) to keep the
 	// support-user instance membership grant working on the manual creation path.
 	preserveProjectRoles(externalUser, authReq.LinkingUsers)
-  l.registerExternalUser(w, r, authReq, externalUser)
+	l.registerExternalUser(w, r, idpTemplate, authReq, externalUser)
 }
 
 // registerExternalUser creates an externalUser with the provided data
