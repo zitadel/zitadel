@@ -71,14 +71,17 @@ func TestServer_DynamicClientRegistration(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotEmpty(t, tokens.AccessToken)
 
-		// Token (initial access token) mode: presenting a valid access token registers a
-		// client in the token's organization, even with open registration enabled.
+		// An Authorization header is always treated as a registration token, even with open
+		// registration enabled: the request must not fall back to anonymous registration.
+		// This token belongs to an ordinary user without project.app.register_dynamic, so
+		// it is rejected rather than silently registering a client.
 		tokenStatus, tokenBody := registerDynamicClient(t, issuer, tokens.AccessToken, map[string]any{
 			"client_name":   "integration token-mode client",
 			"redirect_uris": []string{redirectURI},
 		})
-		require.Equal(t, http.StatusCreated, tokenStatus)
-		assert.NotEmpty(t, tokenBody["client_id"])
+		require.Equal(t, http.StatusForbidden, tokenStatus)
+		assert.Equal(t, "insufficient_scope", tokenBody["error"])
+		assert.Empty(t, tokenBody["client_id"])
 	})
 
 	t.Run("confidential client returns a secret", func(t *testing.T) {
