@@ -30,7 +30,6 @@ jobs:
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       NX_CLOUD_ACCESS_TOKEN_READONLY: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
-      BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
 
   pack:
     uses: ./.github/workflows/pack.yml
