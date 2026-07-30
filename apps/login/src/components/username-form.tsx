@@ -78,7 +78,7 @@ export function UsernameForm({
         setLoading(false);
       }
     },
-    [defaultOrganization, requestId, suffix, loginSettings, router, t],
+    [defaultOrganization, requestId, suffix, router, t],
   );
 
   useEffect(() => {

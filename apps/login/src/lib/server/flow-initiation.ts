@@ -116,13 +116,11 @@ const gotoLoginname = ({
  * error), in which case callers fall back to the prefilled /loginname screen.
  */
 const resolveLoginHint = async ({
-  serviceConfig,
   request,
   requestId,
   loginHint,
   organization,
 }: {
-  serviceConfig: ServiceConfig;
   request: NextRequest;
   requestId: string;
   loginHint?: string;
@@ -339,7 +337,6 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       });
     } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
       const hintResponse = await resolveLoginHint({
-        serviceConfig,
         request,
         requestId,
         loginHint: authRequest.loginHint,
@@ -410,7 +407,6 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       if (!selectedSession || !selectedSession.id) {
         // login_hint matches no session: resolve it straight to the next step.
         const hintResponse = await resolveLoginHint({
-          serviceConfig,
           request,
           requestId,
           loginHint: authRequest.loginHint,
@@ -495,7 +491,6 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
   } else {
     // No session: resolve a login_hint straight to the next step if we can.
     const hintResponse = await resolveLoginHint({
-      serviceConfig,
       request,
       requestId,
       loginHint: authRequest?.loginHint,

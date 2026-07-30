@@ -5,7 +5,7 @@ import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getLoginSettings, getPasswordComplexitySettings } from "@/lib/zitadel";
+import { getBrandingSettings, getPasswordComplexitySettings } from "@/lib/zitadel";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -35,11 +35,6 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const branding = await getBrandingSettings({ serviceConfig, organization });
 
   const passwordComplexity = await getPasswordComplexitySettings({
-    serviceConfig,
-    organization: sessionFactors?.factors?.user?.organizationId,
-  });
-
-  const loginSettings = await getLoginSettings({
     serviceConfig,
     organization: sessionFactors?.factors?.user?.organizationId,
   });
