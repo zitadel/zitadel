@@ -54,9 +54,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   // Single source of truth for enumeration protection, derived server-side from the
   // request-context login settings (sendLoginname is a public server action, so a
-  // client-supplied flag must not be trusted). This is the same context the
-  // /loginname form and the /password page resolve, keeping session creation, the
-  // redirect loginName and the page's "unknown context" suppression consistent.
+  // client-supplied flag must not be trusted). It gates session creation and the
+  // loginName exposed in redirect URLs, keeping known and unknown users
+  // indistinguishable while protection applies.
   const ignoreUnknownUsernames = !!loginSettingsByContext.ignoreUnknownUsernames;
 
   let searchUsersRequest: SearchUsersCommand = {
