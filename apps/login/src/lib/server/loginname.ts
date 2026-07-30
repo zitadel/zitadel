@@ -301,6 +301,14 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       return { error: t("errors.couldNotCreateSession") };
     }
 
+    // LoginName to expose in redirect URLs: while enumeration protection applies,
+    // echo the raw input so known and unknown users stay indistinguishable; otherwise
+    // use the session's loginName so the next page can match the session cookie
+    // (falling back to the user's preferred login name).
+    const redirectLoginName = ignoreUnknownUsernames
+      ? command.loginName
+      : (session?.factors?.user?.loginName ?? user.preferredLoginName);
+
     // TODO: check if handling of userstate INITIAL is needed
     if (user.state === UserState.INITIAL) {
       if (ignoreUnknownUsernames) {
@@ -404,7 +412,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
           {
             const paramsPassword = new URLSearchParams({
-              loginName: session?.factors?.user?.loginName ?? command.loginName,
+              loginName: redirectLoginName,
             });
 
             if (organization) {
@@ -432,7 +440,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
           {
             const paramsPasskey = new URLSearchParams({
-              loginName: session?.factors?.user?.loginName ?? command.loginName,
+              loginName: redirectLoginName,
             });
             if (command.requestId) {
               paramsPasskey.append("requestId", command.requestId);
@@ -463,7 +471,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         userLoginSettings?.allowLocalAuthentication
       ) {
         const passkeyParams = new URLSearchParams({
-          loginName: session?.factors?.user?.loginName ?? command.loginName,
+          loginName: redirectLoginName,
           altPassword: `${methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD) && userLoginSettings?.allowLocalAuthentication}`, // show alternative password option only if allowed
         });
 
@@ -491,7 +499,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
         // user has no passkey setup and login settings allow passwords
         const paramsPasswordDefault = new URLSearchParams({
-          loginName: session?.factors?.user?.loginName ?? command.loginName,
+          loginName: redirectLoginName,
         });
 
         if (command.requestId) {
