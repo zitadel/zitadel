@@ -12,6 +12,11 @@
       "{projectRoot}/**/*"
     ]
   },
+  "plugins": [
+    {
+      "plugin": "@zitadel/install-proto/plugin"
+    }
+  ],
   "targetDefaults": {
     "nx:run-commands": {
       "options": {
@@ -23,9 +28,8 @@
     },
     "generate": {
       "cache": true,
-      "inputs": [
-        "default"
-      ]
+      "inputs": ["default"],
+      "dependsOn": ["install-proto"]
     },
     "build": {
       "cache": true,
