@@ -54,8 +54,10 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           <Translated i18nKey="change.description" namespace="password" />
         </p>
 
-        {/* show error only if usernames should be shown to be unknown */}
-        {(!sessionFactors || !loginName) && !loginSettings?.ignoreUnknownUsernames && (
+        {/* Only warn when there is no loginName to continue with; a failed session
+            lookup is reported by the form gate below (failedLoading), and under
+            enumeration protection no session may exist by design. */}
+        {!loginName && (
           <div className="py-4">
             <Alert>
               <Translated i18nKey="unknownContext" namespace="error" />
