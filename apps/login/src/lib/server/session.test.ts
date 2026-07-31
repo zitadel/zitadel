@@ -1,5 +1,5 @@
+import { setSessionAndUpdateCookie } from "@/lib/server/cookie";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { setSessionAndUpdateCookie } from "./cookie";
 import { updateOrCreateSession } from "./session";
 
 vi.mock("next/headers", () => ({
