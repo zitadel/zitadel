@@ -940,4 +940,72 @@ describe("cookies", () => {
       ).resolves.toBeUndefined();
     });
   });
+
+  describe("sessions cookie lifetime", () => {
+    const NOW = 1700000000000;
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(NOW);
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    const sessionExpiringIn = (id: string, ms: number): Cookie => ({
+      id,
+      token: `token-${id}`,
+      loginName: "user@example.com",
+      organization: "org-1",
+      creationTs: `${NOW}`,
+      expirationTs: `${NOW + ms}`,
+      changeTs: `${NOW}`,
+    });
+
+    it("should set maxAge from the session expiration so the cookie survives a browser restart", async () => {
+      mockCookies.get.mockReturnValue(undefined);
+
+      await addSessionToCookie({ session: sessionExpiringIn("session-1", 30 * 24 * 60 * 60 * 1000) });
+
+      expect(mockCookies.set).toHaveBeenCalledWith(expect.objectContaining({ maxAge: 30 * 24 * 60 * 60 }));
+    });
+
+    it("should set maxAge from the session that expires last", async () => {
+      const shortSession = sessionExpiringIn("session-1", 60 * 60 * 1000);
+      const longSession = sessionExpiringIn("session-2", 30 * 24 * 60 * 60 * 1000);
+
+      mockCookies.get.mockReturnValue({ value: JSON.stringify([shortSession]) });
+
+      await addSessionToCookie({ session: longSession });
+
+      expect(mockCookies.set).toHaveBeenCalledWith(expect.objectContaining({ maxAge: 30 * 24 * 60 * 60 }));
+    });
+
+    it("should expire the cookie when the last session is removed", async () => {
+      const session = sessionExpiringIn("session-1", 30 * 24 * 60 * 60 * 1000);
+
+      mockCookies.get.mockReturnValue({ value: JSON.stringify([session]) });
+
+      await removeSessionFromCookie({ session });
+
+      expect(mockCookies.set).toHaveBeenCalledWith(expect.objectContaining({ value: "[]", maxAge: 0 }));
+    });
+
+    it("should not set a negative maxAge", async () => {
+      mockCookies.get.mockReturnValue(undefined);
+
+      await addSessionToCookie({ session: sessionExpiringIn("session-1", -1000) });
+
+      expect(mockCookies.set).toHaveBeenCalledWith(expect.objectContaining({ maxAge: 0 }));
+    });
+
+    it("should omit maxAge when no session carries an expiration", async () => {
+      mockCookies.get.mockReturnValue(undefined);
+
+      await addSessionToCookie({ session: { ...sessionExpiringIn("session-1", 0), expirationTs: "" } });
+
+      expect(mockCookies.set).toHaveBeenCalledWith(expect.not.objectContaining({ maxAge: expect.anything() }));
+    });
+  });
 });

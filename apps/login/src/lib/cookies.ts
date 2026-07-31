@@ -23,6 +23,25 @@ export type Cookie = {
 
 type SessionCookie<T> = Cookie & T;
 
+// Derive the cookie lifetime from the session that expires last. Without an explicit maxAge the
+// browser treats "sessions" as a session cookie and drops it on restart, which forces a new login
+// even though the session itself is still valid for the configured check lifetime.
+// Returns undefined when no session carries an expiration, so those keep the previous behaviour.
+function sessionCookieMaxAge<T>(sessions: SessionCookie<T>[]): number | undefined {
+  // No sessions left: expire the cookie instead of leaving an empty one behind.
+  if (sessions.length === 0) {
+    return 0;
+  }
+
+  const expirations = sessions.map((session) => Number(session.expirationTs)).filter((ts) => Number.isFinite(ts) && ts > 0);
+
+  if (expirations.length === 0) {
+    return undefined;
+  }
+
+  return Math.max(0, Math.floor((Math.max(...expirations) - Date.now()) / 1000));
+}
+
 async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameEnabled: boolean = false) {
   const cookiesList = await cookies();
 
@@ -37,6 +56,8 @@ async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameE
     resolvedSameSite = "lax";
   }
 
+  const maxAge = sessionCookieMaxAge(sessions);
+
   return cookiesList.set({
     name: "sessions",
     value: JSON.stringify(sessions),
@@ -44,6 +65,7 @@ async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameE
     path: "/",
     sameSite: resolvedSameSite,
     secure: process.env.NODE_ENV === "production",
+    ...(maxAge !== undefined && { maxAge }),
   });
 }
 

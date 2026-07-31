@@ -243,7 +243,9 @@ export async function setSessionAndUpdateCookie(command: {
               id: sessionCookie.id,
               token: updatedSession.sessionToken,
               creationTs: sessionCookie.creationTs,
-              expirationTs: sessionCookie.expirationTs,
+              // the session lifetime is recalculated on every update, so take the expiration from
+              // the session we just read back instead of carrying the stale one forward
+              expirationTs: session.expirationDate ? `${timestampMs(session.expirationDate)}` : sessionCookie.expirationTs,
               // just overwrite the changeDate with the new one
               changeTs: updatedSession.details?.changeDate ? `${timestampMs(updatedSession.details.changeDate)}` : "",
               loginName: session.factors?.user?.loginName ?? "",
