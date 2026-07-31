@@ -173,6 +173,18 @@ func (c *Commands) CheckPermissionOrganizationDelete(ctx context.Context, organi
 	return c.newPermissionCheck(ctx, domain.PermissionOrganizationDelete, org.AggregateType)(organizationID, organizationID)
 }
 
+// CheckPermissionRegisterDynamicClient authorizes token-gated OAuth 2.0 Dynamic Client
+// Registration (RFC 7591) in the given organization. It is org-scoped and deliberately
+// distinct from project.app.write, so a service user can be granted the ability to
+// self-register clients without gaining write access to existing applications.
+//
+// It is called once by the registration endpoint before any state is created, so that it
+// also gates the auto-provisioning of the organization's dedicated DCR project. Open
+// registration does not require the permission; see the endpoint for the mode selection.
+func (c *Commands) CheckPermissionRegisterDynamicClient(ctx context.Context, organizationID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionProjectAppRegisterDynamic, org.AggregateType)(organizationID, organizationID)
+}
+
 func (c *Commands) checkPermissionCreateGroup(ctx context.Context, resourceOwner, groupID string) error {
 	return c.newPermissionCheck(ctx, domain.PermissionGroupCreate, group.AggregateType)(resourceOwner, groupID)
 }
