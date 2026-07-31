@@ -1,0 +1,35 @@
+{
+  "AddHumanUser": {
+    "handler": "internal/api/grpc/user/v2/user.go:19",
+    "errors": [
+      { "id": "DOMAIN-oGh5e", "file": "internal/domain/url_template.go", "line": 17, "reasoning": "Handler converter addUserRequestEmailToCommand calls domain.RenderConfirmURLTemplate on the email's url_template (SendCode verification) before AddUserHuman is even invoked; template fails to parse." },
+      { "id": "DOMAIN-ieYa7", "file": "internal/domain/url_template.go", "line": 20, "reasoning": "Same RenderConfirmURLTemplate call as above; template parses but fails to execute against the confirm-URL data." },
+      { "id": "COMMA-095xh8fll1", "file": "internal/command/user_v2_human.go", "line": 123, "reasoning": "AddUserHuman's first guard: organizationID (from authz ctx data) is empty." },
+      { "id": "V2-zzad3", "file": "internal/command/user_human.go", "line": 99, "reasoning": "AddHuman.Validate (called from AddUserHuman) rejects an empty/whitespace-only username." },
+      { "id": "USER-UCej2", "file": "internal/command/user_human.go", "line": 103, "reasoning": "AddHuman.Validate rejects an empty/whitespace-only first name." },
+      { "id": "USER-4hB7d", "file": "internal/command/user_human.go", "line": 106, "reasoning": "AddHuman.Validate rejects an empty/whitespace-only last name." },
+      { "id": "EMAIL-spblu", "file": "internal/domain/human_email.go", "line": 21, "reasoning": "AddHuman.Validate calls Email.Validate -> EmailAddress.Validate; empty email address." },
+      { "id": "EMAIL-599BI", "file": "internal/domain/human_email.go", "line": 25, "reasoning": "Same EmailAddress.Validate path; email fails net/mail.ParseAddress." },
+      { "id": "EMAIL-599GV", "file": "internal/domain/human_email.go", "line": 28, "reasoning": "Same EmailAddress.Validate path; parsed address includes a display name (e.g. \"Foo <a@b.c>\"), which is rejected." },
+      { "id": "PHONE-so0wa", "file": "internal/domain/human_phone.go", "line": 34, "reasoning": "AddHuman.Validate normalizes h.Phone.Number via PhoneNumber.Normalize when non-empty; libphonenumber.Parse fails on an invalid phone number." },
+      { "id": "USER-Drght", "file": "internal/command/user_human.go", "line": 136, "reasoning": "AddHuman.Validate loops over human.Metadata calling AddMetadataEntry.Valid; a metadata entry has an empty/whitespace key." },
+      { "id": "USER-Dbgth", "file": "internal/command/user_human.go", "line": 139, "reasoning": "Same metadata validation loop; a metadata entry has an empty value." },
+      { "id": "CRYPT-2xK7d", "file": "internal/crypto/passwap.go", "line": 61, "reasoning": "Reached from AddHuman.Validate (EncodedPasswordHash set) and from addHumanCommandPassword (EncodedPasswordHash branch); Hasher.ValidateEncodedHash finds no verifier for the hash prefix." },
+      { "id": "CRYPT-5uV9n", "file": "internal/crypto/passwap.go", "line": 65, "reasoning": "Same ValidateEncodedHash call sites; hash's cost parameters are outside configured bounds." },
+      { "id": "CRYPT-r8Qm2", "file": "internal/crypto/passwap.go", "line": 67, "reasoning": "Same ValidateEncodedHash call sites; generic encoded-hash validation failure fallback." },
+      { "id": "COMMAND-7yiox1isql", "file": "internal/command/user_v2_human.go", "line": 158, "reasoning": "After userExistsWriteModel query, AddUserHuman finds a user already exists for the (possibly caller-supplied) user ID." },
+      { "id": "USER-Ggk9n", "file": "internal/command/user_domain_policy.go", "line": 45, "reasoning": "Commands.domainPolicyWriteModel (called by AddUserHuman) finds neither an active org-level nor instance-level domain policy; internal misconfiguration." },
+      { "id": "COMMAND-SFd21", "file": "internal/command/user_human.go", "line": 401, "reasoning": "userValidateDomain, called by AddUserHuman with the org's domain policy, rejects a username whose '@domain' suffix is a verified domain belonging to a different org (domain claim protection)." },
+      { "id": "USER-uQ96e", "file": "internal/command/user_password_complexity_policy.go", "line": 20, "reasoning": "addHumanCommandPassword -> humanValidatePassword -> passwordComplexityPolicyWriteModel finds neither a custom org policy nor a default instance policy configured; internal misconfiguration, only reached when human.Password is set." },
+      { "id": "COMMA-HuJf6", "file": "internal/command/policy_password_complexity_model.go", "line": 65, "reasoning": "PasswordComplexityPolicyWriteModel.Validate, invoked when human.Password is set; password shorter than policy MinLength." },
+      { "id": "COMMA-co3Xw", "file": "internal/command/policy_password_complexity_model.go", "line": 69, "reasoning": "Same complexity Validate; policy requires a lowercase char and password has none." },
+      { "id": "COMMA-VoaRj", "file": "internal/command/policy_password_complexity_model.go", "line": 73, "reasoning": "Same complexity Validate; policy requires an uppercase char and password has none." },
+      { "id": "COMMA-ZBv4H", "file": "internal/command/policy_password_complexity_model.go", "line": 77, "reasoning": "Same complexity Validate; policy requires a digit and password has none." },
+      { "id": "COMMA-ZDLwA", "file": "internal/command/policy_password_complexity_model.go", "line": 81, "reasoning": "Same complexity Validate; policy requires a symbol and password has none." },
+      { "id": "COMMAND-QXPGs", "file": "internal/command/org.go", "line": 356, "reasoning": "AddUserHuman calls checkOrgExists(organizationID); the org write model shows no existing/active org state." },
+      { "id": "COMMAND-39nf2", "file": "internal/command/user_human.go", "line": 320, "reasoning": "addUserHumanCommands loops human.Links and calls addLink; ExistsIDPOnOrgOrInstance returns false (or errors) for a supplied idp_id, meaning the IDP link target doesn't exist on the org or instance." },
+      { "id": "CRYPT-03ltQd", "file": "internal/crypto/crypto.go", "line": 87, "reasoning": "addUserHumanCommands, when human.TOTPSecret is set, calls crypto.Encrypt(secret, c.multifactors.OTP.CryptoMFA); throws if the configured OTP encryption algorithm is nil." },
+      { "id": "CRYPT-qCD0JB", "file": "internal/crypto/crypto.go", "line": 91, "reasoning": "Same crypto.Encrypt call for the TOTP secret; underlying alg.Encrypt operation fails." }
+    ]
+  }
+}

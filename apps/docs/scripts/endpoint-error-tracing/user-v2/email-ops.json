@@ -1,0 +1,30 @@
+{
+  "SetEmail": {
+    "handler": "internal/api/grpc/user/v2/email.go:15",
+    "errors": [
+      { "id": "DOMAIN-oGh5e", "file": "internal/domain/url_template.go", "line": 17, "reasoning": "SendCode variant renders the caller-supplied url_template (via ChangeUserEmailURLTemplate before the code is generated); malformed Go template syntax fails to parse." },
+      { "id": "DOMAIN-ieYa7", "file": "internal/domain/url_template.go", "line": 20, "reasoning": "Same SendCode url_template render step; template parses but errors while executing (e.g. references an undefined field)." },
+      { "id": "COMMAND-0Gzs3", "file": "internal/command/user_v2_email.go", "line": 232, "reasoning": "NewUserEmailEvents, called by all four SetEmail verification branches, rejects an empty user_id in the request." },
+      { "id": "COMMAND-ieJ2e", "file": "internal/command/user_v2_email.go", "line": 240, "reasoning": "The loaded email write model has no events (or the user is deleted), i.e. user_id does not reference an existing user." },
+      { "id": "COMMAND-uz0Uu", "file": "internal/command/user_v2_email.go", "line": 243, "reasoning": "Target user is still in UserStateInitial (registration not completed), so its email cannot be set yet." },
+      { "id": "EMAIL-spblu", "file": "internal/domain/human_email.go", "line": 21, "reasoning": "cmd.Change (invoked by every SetEmail branch) rejects an empty email field in the request." },
+      { "id": "EMAIL-599BI", "file": "internal/domain/human_email.go", "line": 25, "reasoning": "cmd.Change parses the requested email with net/mail.ParseAddress; a malformed address string fails." },
+      { "id": "EMAIL-599GV", "file": "internal/domain/human_email.go", "line": 28, "reasoning": "cmd.Change rejects an email value that includes a display name portion (e.g. \"Name <a@b.com>\") instead of a bare address." },
+      { "id": "COMMAND-Uch5e", "file": "internal/command/user_v2_email.go", "line": 260, "reasoning": "cmd.Change finds the requested email identical to the user's current email, so there is nothing to change." },
+      { "id": "AUTH-rKLWEH", "file": "internal/api/authz/permissions.go", "line": 30, "reasoning": "checkPermissionUpdateUser/checkPermission ultimately call authz.CheckPermission; triggers if the request context carries no authenticated ctxData (only reached for the ReturnCode/IsVerified branches, or SendCode/plain SetEmail when acting on someone other than the caller, since self-service on one's own email skips the check)." },
+      { "id": "AUTHZ-cdgFk", "file": "internal/api/authz/permissions.go", "line": 46, "reasoning": "authz.CheckPermission finds the caller has zero memberships/roles at all on the instance or organization." },
+      { "id": "AUTH-AWfge", "file": "internal/api/authz/permissions.go", "line": 60, "reasoning": "Caller has memberships but none grant the user.write permission needed to change the target's email (always checked for ReturnCode/IsVerified; checked for SendCode/plain SetEmail only when the target is not the caller)." },
+      { "id": "AUTH-Swrgg2", "file": "internal/api/authz/permissions.go", "line": 75, "reasoning": "Caller holds user.write, but only scoped to a resource/org other than the target user's resource owner." }
+    ]
+  },
+  "VerifyEmail": {
+    "handler": "internal/api/grpc/user/v2/email.go:98",
+    "errors": [
+      { "id": "COMMAND-0Gzs3", "file": "internal/command/user_v2_email.go", "line": 232, "reasoning": "verifyUserEmailWithGenerator's call to NewUserEmailEvents rejects an empty user_id in the request." },
+      { "id": "COMMAND-ieJ2e", "file": "internal/command/user_v2_email.go", "line": 240, "reasoning": "The loaded email write model has no events (or the user is deleted), i.e. user_id does not reference an existing user." },
+      { "id": "COMMAND-uz0Uu", "file": "internal/command/user_v2_email.go", "line": 243, "reasoning": "Target user is still in UserStateInitial (registration not completed)." },
+      { "id": "COMMAND-Fia4a", "file": "internal/command/user_v2_email.go", "line": 300, "reasoning": "cmd.VerifyCode rejects an empty verification_code field in the request." },
+      { "id": "COMMAND-eis9R", "file": "internal/command/user_v2_email.go", "line": 310, "reasoning": "crypto.VerifyCode failed (wrong code, expired code, or no code was ever generated for this user); cmd.VerifyCode discards the specific crypto-layer error, records a HumanEmailVerificationFailedEvent, and always surfaces this generic invalid-code error to the caller." }
+    ]
+  }
+}

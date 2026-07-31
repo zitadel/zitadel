@@ -1,0 +1,229 @@
+{
+  "UpdateHumanUser": {
+    "handler": "internal/api/grpc/user/v2/user.go:121",
+    "errors": [
+      {
+        "id": "DOMAIN-oGh5e",
+        "file": "internal/domain/url_template.go",
+        "line": 17,
+        "reasoning": "updateHumanUserRequestToChangeHuman -> setHumanEmailToEmail renders req.Email.SendCode.UrlTemplate via RenderConfirmURLTemplate; fires if the supplied template string fails to parse."
+      },
+      {
+        "id": "DOMAIN-ieYa7",
+        "file": "internal/domain/url_template.go",
+        "line": 20,
+        "reasoning": "Same setHumanEmailToEmail template test-render; fires if the parsed template fails to execute against the placeholder data."
+      },
+      {
+        "id": "COMMAND-3klek4sbns",
+        "file": "internal/command/user_v2_human.go",
+        "line": 88,
+        "reasoning": "ChangeUserHuman calls human.Validate() first, which runs Password.Validate(); thrown if a Password sub-message is set but both Password and HashedPassword are empty."
+      },
+      {
+        "id": "CRYPT-2xK7d",
+        "file": "internal/crypto/passwap.go",
+        "line": 61,
+        "reasoning": "Password.Validate() calls hasher.ValidateEncodedHash on a supplied HashedPassword; thrown if no configured passwap verifier recognizes the hash's encoding/prefix."
+      },
+      {
+        "id": "CRYPT-5uV9n",
+        "file": "internal/crypto/passwap.go",
+        "line": 65,
+        "reasoning": "Same ValidateEncodedHash call; thrown when the hash parses but its cost parameters are outside configured bounds."
+      },
+      {
+        "id": "CRYPT-r8Qm2",
+        "file": "internal/crypto/passwap.go",
+        "line": 67,
+        "reasoning": "Same ValidateEncodedHash call; generic fallback for any other hash validation error."
+      },
+      {
+        "id": "EMAIL-599BI",
+        "file": "internal/domain/human_email.go",
+        "line": 25,
+        "reasoning": "ChangeHuman.Validate() calls Email.Validate() -> EmailAddress.Validate() when Email.Address is non-empty; thrown if net/mail cannot parse the address."
+      },
+      {
+        "id": "EMAIL-599GV",
+        "file": "internal/domain/human_email.go",
+        "line": 28,
+        "reasoning": "Same EmailAddress.Validate(); thrown if the parsed address includes a display name (e.g. \"Name <a@b.c>\"), which is rejected."
+      },
+      {
+        "id": "PHONE-so0wa",
+        "file": "internal/domain/human_phone.go",
+        "line": 34,
+        "reasoning": "ChangeHuman.Validate() calls Phone.Validate() -> PhoneNumber.Normalize() when a phone number is set; thrown if libphonenumber cannot parse the given number."
+      },
+      {
+        "id": "COMMAND-ugjs0upun6",
+        "file": "internal/command/user_v2_human.go",
+        "line": 566,
+        "reasoning": "ChangeUserHuman loads the target via UserHumanWriteModel; thrown if the write model shows the user does not exist (deleted or never existed)."
+      },
+      {
+        "id": "COMMAND-ulBlS",
+        "file": "internal/command/permission_checks.go",
+        "line": 24,
+        "reasoning": "ChangeUserHuman calls checkPermissionUpdateUser -> newPermissionCheck whenever human.Changed(); thrown if the aggregateID (userID) passed to the permission check is empty."
+      },
+      {
+        "id": "COMMAND-4g3xq",
+        "file": "internal/command/permission_checks.go",
+        "line": 37,
+        "reasoning": "Same newPermissionCheck path; thrown if the resource owner cannot be resolved (lookup on the resource-owner model returns none) for the permission check."
+      },
+      {
+        "id": "AUTH-rKLWEH",
+        "file": "internal/api/authz/permissions.go",
+        "line": 30,
+        "reasoning": "checkPermissionUpdateUser's injected permission checker calls authz.CheckPermission -> getUserPermissions; thrown if the request context carries no auth data."
+      },
+      {
+        "id": "AUTHZ-cdgFk",
+        "file": "internal/api/authz/permissions.go",
+        "line": 46,
+        "reasoning": "Same getUserPermissions path; thrown when the caller has zero memberships (org- or instance-scoped) to evaluate for user.write."
+      },
+      {
+        "id": "AUTH-AWfge",
+        "file": "internal/api/authz/permissions.go",
+        "line": 60,
+        "reasoning": "checkUserResourcePermissions; thrown when the caller's memberships yield no permissions matching user.write, so the update is denied."
+      },
+      {
+        "id": "AUTH-Swrgg2",
+        "file": "internal/api/authz/permissions.go",
+        "line": 75,
+        "reasoning": "Same checkUserResourcePermissions; thrown when the caller has some user.write permissions but none global or scoped to this specific target userID."
+      },
+      {
+        "id": "COMMAND-79pv6e1q62",
+        "file": "internal/command/user_v2_username.go",
+        "line": 19,
+        "reasoning": "When req.Username differs from the current one, changeUsername loads the domain policy; wraps a failure from domainPolicyWriteModel into this precondition-failed error."
+      },
+      {
+        "id": "USER-Ggk9n",
+        "file": "internal/command/user_domain_policy.go",
+        "line": 45,
+        "reasoning": "changeUsername's call to c.domainPolicyWriteModel throws this internal error if neither an org-level nor an instance-level domain policy write model exists (data inconsistency), which changeUsername then wraps as COMMAND-79pv6e1q62."
+      },
+      {
+        "id": "COMMAND-SFd21",
+        "file": "internal/command/user_human.go",
+        "line": 401,
+        "reasoning": "changeUsername -> userValidateDomain; thrown if the new username's domain part is a verified org domain belonging to a different org than the user's resource owner."
+      },
+      {
+        "id": "COMMAND-M9dse",
+        "file": "internal/command/user_human_password.go",
+        "line": 219,
+        "reasoning": "When req.Password is set, changeUserPassword -> setPasswordCommand checks the (already-existing) user's state; thrown if the user is still in the Initial (not-yet-initialized) state."
+      },
+      {
+        "id": "COMMAND-JLK35",
+        "file": "internal/command/user_human_password.go",
+        "line": 420,
+        "reasoning": "When req.Password.CurrentPassword is set, changeUserPassword -> checkCurrentPassword -> verifyPasswordWithLockoutPolicy; thrown if the user's state is Locked."
+      },
+      {
+        "id": "COMMAND-3nJ4t",
+        "file": "internal/command/user_human_password.go",
+        "line": 423,
+        "reasoning": "Same verifyPasswordWithLockoutPolicy call (current-password flow); thrown if the target user has no password hash set yet, so there is nothing to verify against."
+      },
+      {
+        "id": "COMMAND-SFA3t",
+        "file": "internal/command/user_human_password.go",
+        "line": 442,
+        "reasoning": "Same verifyPasswordWithLockoutPolicy; after the verify attempt it re-checks state and throws this if the user became Locked (e.g. concurrent failed attempts) before this check completed."
+      },
+      {
+        "id": "COMMAND-3M0fs",
+        "file": "internal/command/user_human_password.go",
+        "line": 24,
+        "reasoning": "checkCurrentPassword's verify closure calls convertPasswapErr on a mismatch between the supplied CurrentPassword and the stored hash; ErrPasswordInvalid wraps that as this error."
+      },
+      {
+        "id": "COMMAND-Aesh5",
+        "file": "internal/command/user_human_password.go",
+        "line": 27,
+        "reasoning": "Same convertPasswapErr path; thrown if passwap reports the new password is identical to the current one (no-op change)."
+      },
+      {
+        "id": "COMMAND-CahN2",
+        "file": "internal/command/user_human_password.go",
+        "line": 505,
+        "reasoning": "Same convertPasswapErr; generic internal-error fallback for any other passwap verify/update failure during the current-password check."
+      },
+      {
+        "id": "COMMAND-2M9fs",
+        "file": "internal/command/user_human.go",
+        "line": 808,
+        "reasoning": "When req.Password.VerificationCode is set (no SMS provider configured), changeUserPassword -> setPasswordWithVerifyCode -> verifyCode; thrown if no crypto code was ever generated to verify against."
+      },
+      {
+        "id": "COMMAND-M0g95",
+        "file": "internal/command/user_human.go",
+        "line": 817,
+        "reasoning": "Same verifyCode; thrown if a code provider ID is present but no external code-verifier resolver was configured."
+      },
+      {
+        "id": "CODE-QvUQ4P",
+        "file": "internal/crypto/code.go",
+        "line": 146,
+        "reasoning": "verifyCode -> crypto.VerifyCode; thrown if the password verification code's expiry has passed."
+      },
+      {
+        "id": "CRYPT-aqrFV",
+        "file": "internal/crypto/code.go",
+        "line": 173,
+        "reasoning": "crypto.VerifyCode -> verifyEncryptedCode; thrown if the stored encrypted code value is nil (no code was ever set)."
+      },
+      {
+        "id": "CODE-woT0xc",
+        "file": "internal/crypto/code.go",
+        "line": 181,
+        "reasoning": "Same verifyEncryptedCode; thrown if the decrypted stored code does not match the VerificationCode supplied in the request."
+      },
+      {
+        "id": "INSTANCE-M0gsf",
+        "file": "internal/command/instance_policy_password_complexity.go",
+        "line": 102,
+        "reasoning": "When req.Password.Password (plain) is set and the org has no active password complexity policy, checkPasswordComplexity -> getDefaultPasswordComplexityPolicy; thrown if the instance-level default policy write model doesn't exist either."
+      },
+      {
+        "id": "DOMAIN-HuJf6",
+        "file": "internal/domain/policy_password_complexity.go",
+        "line": 38,
+        "reasoning": "checkPasswordComplexity -> policy.Check(newPassword); thrown if the new plain password is shorter than the configured MinLength."
+      },
+      {
+        "id": "DOMAIN-co3Xw",
+        "file": "internal/domain/policy_password_complexity.go",
+        "line": 42,
+        "reasoning": "Same policy.Check; thrown if the policy requires a lowercase letter and the new password has none."
+      },
+      {
+        "id": "DOMAIN-VoaRj",
+        "file": "internal/domain/policy_password_complexity.go",
+        "line": 46,
+        "reasoning": "Same policy.Check; thrown if the policy requires an uppercase letter and the new password has none."
+      },
+      {
+        "id": "DOMAIN-ZBv4H",
+        "file": "internal/domain/policy_password_complexity.go",
+        "line": 50,
+        "reasoning": "Same policy.Check; thrown if the policy requires a digit and the new password has none."
+      },
+      {
+        "id": "DOMAIN-ZDLwA",
+        "file": "internal/domain/policy_password_complexity.go",
+        "line": 54,
+        "reasoning": "Same policy.Check; thrown if the policy requires a symbol and the new password has none."
+      }
+    ]
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "GetUserByID": {
+    "handler": "internal/api/grpc/user/v2/user_query.go:14",
+    "errors": [
+      {
+        "id": "QUERY-Dfbg2",
+        "file": "internal/query/user.go",
+        "line": 1044,
+        "reasoning": "GetUserByIDWithResourceOwner's scanUser returns this when the SQL row scan finds no matching row (or count != 1) for the given userId, i.e. the requested user does not exist."
+      },
+      {
+        "id": "QUERY-Bgah2",
+        "file": "internal/query/user.go",
+        "line": 1046,
+        "reasoning": "scanUser returns this for any non-ErrNoRows scan failure while reading the single user row looked up by GetUserByID."
+      },
+      {
+        "id": "AUTH-rKLWEH",
+        "file": "internal/api/authz/permissions.go",
+        "line": 30,
+        "reasoning": "userCheckPermission invokes the injected permissionCheck (domain.PermissionUserRead) whenever the caller is requesting a user other than themselves; getUserPermissions throws this if the request context has no auth/ctx data."
+      },
+      {
+        "id": "AUTHZ-cdgFk",
+        "file": "internal/api/authz/permissions.go",
+        "line": 46,
+        "reasoning": "Reached from the same permission check path when the caller has no memberships at all (org or instance-wide) to evaluate for the user.read permission on the target user."
+      },
+      {
+        "id": "AUTH-AWfge",
+        "file": "internal/api/authz/permissions.go",
+        "line": 60,
+        "reasoning": "checkUserResourcePermissions throws this when the caller's memberships yield zero permissions matching user.read, denying access to the requested user's data."
+      },
+      {
+        "id": "AUTH-Swrgg2",
+        "file": "internal/api/authz/permissions.go",
+        "line": 75,
+        "reasoning": "Thrown when the caller has some user.read permissions but none that are global or scoped to this specific target userId (resourceID)."
+      }
+    ]
+  },
+  "DeleteUser": {
+    "handler": "internal/api/grpc/user/v2/user.go:186",
+    "errors": [
+      {
+        "id": "QUERY-wXnQR",
+        "file": "internal/query/user_grant.go",
+        "line": 374,
+        "reasoning": "removeUserDependencies calls query.UserGrants to look up the target user's grants for cascading removal; this fires if building the SQL statement for that user-grants lookup fails."
+      },
+      {
+        "id": "QUERY-T84X9",
+        "file": "internal/query/user_membership.go",
+        "line": 160,
+        "reasoning": "removeUserDependencies calls s.query.Memberships to gather the user's org/project/instance memberships to cascade-remove; fires if the SQL statement build for that membership search fails."
+      },
+      {
+        "id": "QUERY-TTlfF6",
+        "file": "internal/query/group_users.go",
+        "line": 117,
+        "reasoning": "getGroupsByUserID calls SearchGroupUsers to find groups the user belongs to (for cascading removal); fires if the group-users search query construction fails."
+      },
+      {
+        "id": "QUERY-M5O50l",
+        "file": "internal/query/group_users.go",
+        "line": 125,
+        "reasoning": "Same getGroupsByUserID -> SearchGroupUsers call; fires on a DB/query execution error while fetching the user's group memberships."
+      },
+      {
+        "id": "COMMAND-vaipl7s13l",
+        "file": "internal/command/user_v2.go",
+        "line": 133,
+        "reasoning": "RemoveUserV2's first check: thrown if the userId on the DeleteUser request is empty."
+      },
+      {
+        "id": "COMMAND-bd4ir1mblj",
+        "file": "internal/command/user_v2.go",
+        "line": 140,
+        "reasoning": "Thrown when the loaded userRemoveWriteModel shows the user does not exist (already removed or never existed), i.e. deleting a non-existent user."
+      },
+      {
+        "id": "AUTH-rKLWEH",
+        "file": "internal/api/authz/permissions.go",
+        "line": 30,
+        "reasoning": "checkPermissionDeleteUser -> newPermissionCheck calls c.checkPermission (user.delete) on the target user's resource owner; fails with this if the caller's context/auth data is missing."
+      },
+      {
+        "id": "AUTHZ-cdgFk",
+        "file": "internal/api/authz/permissions.go",
+        "line": 46,
+        "reasoning": "Same permission-check path for user.delete (and the user.delete.self fallback for self-deletion); thrown if the caller has no memberships to derive permissions from."
+      },
+      {
+        "id": "AUTH-AWfge",
+        "file": "internal/api/authz/permissions.go",
+        "line": 60,
+        "reasoning": "Thrown when the caller lacks any permission matching user.delete (or user.delete.self when deleting themselves) needed to remove this user."
+      },
+      {
+        "id": "AUTH-Swrgg2",
+        "file": "internal/api/authz/permissions.go",
+        "line": 75,
+        "reasoning": "Thrown when the caller has user.delete-family permissions but none scoped globally or to this specific target userId."
+      },
+      {
+        "id": "COMMAND-l40ykb3xh2",
+        "file": "internal/command/user_v2.go",
+        "line": 147,
+        "reasoning": "RemoveUserV2 wraps any error from loading the org's (or instance's) domain policy while deciding org-scoped-username handling for the UserRemovedEvent, surfacing it as a precondition failure."
+      },
+      {
+        "id": "USER-Ggk9n",
+        "file": "internal/command/user_domain_policy.go",
+        "line": 45,
+        "reasoning": "Underlying cause wrapped by COMMAND-l40ykb3xh2: (c *Commands) domainPolicyWriteModel throws this if neither the organization nor the instance has an existing domain policy, which should not normally happen but is the actual reachable Throw site."
+      }
+    ]
+  },
+  "LockUser": {
+    "handler": "internal/api/grpc/user/v2/user.go:137",
+    "errors": [
+      {
+        "id": "COMMAND-agz3eczifm",
+        "file": "internal/command/user_v2.go",
+        "line": 17,
+        "reasoning": "LockUserV2's first check: thrown if the userId on the LockUser request is empty."
+      },
+      {
+        "id": "COMMAND-450yxuqrh1",
+        "file": "internal/command/user_v2.go",
+        "line": 25,
+        "reasoning": "Thrown when the loaded user state write model shows the user does not exist (deleted or never existed)."
+      },
+      {
+        "id": "COMMAND-lgws8wtsqf",
+        "file": "internal/command/user_v2.go",
+        "line": 28,
+        "reasoning": "Thrown when the user exists but is in a state other than Active or Initial (e.g. already locked or inactive), since only those states can be locked."
+      },
+      {
+        "id": "AUTH-rKLWEH",
+        "file": "internal/api/authz/permissions.go",
+        "line": 30,
+        "reasoning": "checkPermissionUpdateUser -> newPermissionCheck calls c.checkPermission (user.write) on the target user's resource owner; fails with this if the caller's context/auth data is missing."
+      },
+      {
+        "id": "AUTHZ-cdgFk",
+        "file": "internal/api/authz/permissions.go",
+        "line": 46,
+        "reasoning": "Same user.write permission-check path; thrown if the caller has no memberships at all to derive permissions from."
+      },
+      {
+        "id": "AUTH-AWfge",
+        "file": "internal/api/authz/permissions.go",
+        "line": 60,
+        "reasoning": "Thrown when the caller lacks any permission matching user.write needed to lock this user."
+      },
+      {
+        "id": "AUTH-Swrgg2",
+        "file": "internal/api/authz/permissions.go",
+        "line": 75,
+        "reasoning": "Thrown when the caller has some user.write permissions but none scoped globally or to this specific target userId."
+      }
+    ]
+  }
+}

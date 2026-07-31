@@ -32,7 +32,7 @@ Every error ID is listed below, organized three levels deep — outward to inwar
 
 1. **Subsystem** — the part of the backend that throws it (broadest: 8 groups)
 2. **gRPC code** — the kind of failure: Not Found, Invalid Argument, Permission Denied, and so on
-3. **Cause** — one entry per distinct underlying message. IDs that mean exactly the same thing (a validation check reused verbatim at several call sites) are merged into a single entry instead of repeated
+3. **Cause** — one entry per distinct underlying message. IDs that mean exactly the same thing (the same validation check copied word-for-word into several call sites) are merged into a single entry instead of repeated
 
 That shape follows how the errors actually break down: there are only 8 subsystems and about a dozen gRPC codes, but roughly 1,150 genuinely distinct causes behind the ~3,200 individual IDs. **Use the search box** below to jump straight to an ID or a phrase — it matches across IDs, messages, and explanations, so it's usually faster than browsing the tree if you already have an ID or error text in hand.
 
