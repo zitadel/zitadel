@@ -86,7 +86,7 @@ jobs:
             check_and_swap "$ISSUE_NUMBER"
           else
             echo "Full daily sweep of all '$CLOSE_LABEL' issues..."
-            ISSUES=$(gh issue list --repo "$REPO" --search "is:open label:\"$CLOSE_LABEL\"" --limit 1000 --json number --jq '.[].number')
+            ISSUES=$(gh api "search/issues" --paginate -f q="repo:$REPO is:open type:issue label:\"$CLOSE_LABEL\"" --jq '.items[].number')
             if [[ -z "$ISSUES" ]]; then
               echo "No $CLOSE_LABEL issues found."
               exit 0
