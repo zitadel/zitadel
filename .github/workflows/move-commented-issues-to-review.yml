@@ -87,6 +87,10 @@ jobs:
           else
             echo "Full daily sweep of all '$CLOSE_LABEL' issues..."
             ISSUES=$(gh issue list --repo "$REPO" --search "is:open label:\"$CLOSE_LABEL\"" --limit 1000 --json number --jq '.[].number')
+            ISSUE_COUNT=$(echo "$ISSUES" | wc -w | tr -d ' ')
+            if [[ "$ISSUE_COUNT" -ge 1000 ]]; then
+              echo "Warning: reached the 1000 issue cap for label '$CLOSE_LABEL'; there may be additional issues not processed."
+            fi
             if [[ -z "$ISSUES" ]]; then
               echo "No $CLOSE_LABEL issues found."
               exit 0
