@@ -330,7 +330,7 @@ function humanizeI18nKey(key: string): string {
   return words.length > 0 ? `The ${words.toLowerCase()}` : 'This condition';
 }
 
-function mechanicalWhy(kind: string, message: string, messageType: 'i18n' | 'literal'): {
+function mechanicalWhy(kind: string, message: string, messageType: 'i18n' | 'literal', i18nResolved: boolean): {
   why: string;
   whySource: ErrorCluster['whySource'];
 } {
@@ -340,7 +340,12 @@ function mechanicalWhy(kind: string, message: string, messageType: 'i18n' | 'lit
       whySource: 'defensive-guard-template',
     };
   }
-  if (messageType === 'i18n') {
+  // Only decompose while `message` is still the raw dotted key (unresolved).
+  // Once resolveI18n() has replaced it with the actual translated English
+  // sentence, decomposing that sentence as if it were a key produces mangled
+  // prose (e.g. "Errors.Internal" -> "An internal error occurred" fed back
+  // through humanizeI18nKey reads as "the an internal error occurred").
+  if (messageType === 'i18n' && !i18nResolved) {
     const subject = humanizeI18nKey(message);
     const verb = KIND_WHY_VERB[kind];
     return {
@@ -382,14 +387,28 @@ function main() {
   // Cluster by (subsystem, kind, trimmed message).
   const clusterMap = new Map<
     string,
-    { subsystem: string; kind: string; message: string; messageType: 'i18n' | 'literal'; entries: RawEntry[] }
+    {
+      subsystem: string;
+      kind: string;
+      message: string;
+      messageType: 'i18n' | 'literal';
+      i18nResolved: boolean;
+      entries: RawEntry[];
+    }
   >();
   for (const e of rawEntries) {
     const subsystem = subsystemForPath(e.file);
     const message = e.message.trim();
     const key = `${subsystem}|${e.kind}|${message}`;
     if (!clusterMap.has(key)) {
-      clusterMap.set(key, { subsystem, kind: e.kind, message, messageType: e.messageType, entries: [] });
+      clusterMap.set(key, {
+        subsystem,
+        kind: e.kind,
+        message,
+        messageType: e.messageType,
+        i18nResolved: e.i18nResolved ?? false,
+        entries: [],
+      });
     }
     clusterMap.get(key)!.entries.push(e);
   }
@@ -446,18 +465,21 @@ function main() {
     if (collidesWith.length > 0) totalCollisions++;
 
     const override = overrides.get(key);
-    const mech = mechanicalWhy(c.kind, c.message, c.messageType);
+    const mech = mechanicalWhy(c.kind, c.message, c.messageType, c.i18nResolved);
     const why = override?.why ?? mech.why;
     const whySource: ErrorCluster['whySource'] = override ? 'curated' : mech.whySource;
 
     const status = GRPC_STATUS[c.kind];
     const repId = ids[0].id;
+    // The server always appends " (ID)" to the top-level message (see
+    // internal/api/grpc/gerrors/zitadel_errors.go: msg := key; msg += " (" + id + ")").
+    // The nested details[].message is the plain text without that suffix.
     const example: ExampleResponse = {
       httpStatus: status.httpStatus,
       grpcCode: status.code,
       body: {
         code: status.code,
-        message: c.message,
+        message: `${c.message} (${repId})`,
         details: [{ '@type': 'type.googleapis.com/zitadel.v1.ErrorDetail', id: repId, message: c.message }],
       },
     };

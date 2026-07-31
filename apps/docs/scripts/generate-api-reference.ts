@@ -4,6 +4,7 @@ import { writeFileSync, mkdirSync, readdirSync, lstatSync, readFileSync, existsS
 import path, { join, dirname, basename } from 'path';
 import { fileURLToPath } from 'url';
 import { glob } from 'glob';
+import { execSync } from 'child_process';
 
 // Suppress "Generated: ..." logs to avoid Vercel log limits
 const originalLog = console.log;
@@ -327,6 +328,8 @@ async function run() {
 
   if (runAll || onlyFix) {
     await fixAllGeneratedLinks();
+    console.log('Post-processing: Appending traced endpoint error responses...');
+    execSync('pnpm exec tsx scripts/generate-endpoint-errors.ts', { cwd: ROOT_DIR, stdio: 'inherit' });
   }
 }
 

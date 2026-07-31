@@ -1,0 +1,23 @@
+{
+  "RegisterPasskey": {
+    "handler": "internal/api/grpc/user/v2/passkey.go:17",
+    "errors": [
+      { "id": "USERv2-Dohr6", "file": "internal/api/grpc/user/v2/passkey.go", "line": 50, "reasoning": "Response conversion fails to unmarshal the WebAuthn PublicKeyCredentialCreationOptions JSON into a structpb.Struct." },
+      { "id": "COMMAND-Eeb2a", "file": "internal/command/user_v2_passkey.go", "line": 53, "reasoning": "When the request includes a code (code-based unauthenticated registration), the passkey init code is expired, wrong, or not in Active state." },
+      { "id": "COMMAND-Mv9sd", "file": "internal/command/user_human_webauthn.go", "line": 37, "reasoning": "getHumanPasswordlessTokens finds the target user's write-model state is Deleted when loading existing passwordless tokens before registration." },
+      { "id": "COMMAND-3M0od", "file": "internal/command/user_human_webauthn.go", "line": 142, "reasoning": "addHumanWebAuthN is called with an empty userID (request UserId field unset)." },
+      { "id": "COMMAND-M9dsd", "file": "internal/command/user_human.go", "line": 27, "reasoning": "getHuman (called from addHumanWebAuthN) finds the target user does not exist / is not in an 'exists' state." },
+      { "id": "COMMAND-ulBlS", "file": "internal/command/permission_checks.go", "line": 24, "reasoning": "checkPermissionUpdateUserCredentials falls through to newPermissionCheck with an empty aggregateID (target userID) when not self-registering." },
+      { "id": "COMMAND-4g3xq", "file": "internal/command/permission_checks.go", "line": 37, "reasoning": "Permission check cannot resolve a resourceOwner for the target user aggregate (still empty after filtering)." },
+      { "id": "AUTH-rKLWEH", "file": "internal/api/authz/permissions.go", "line": 30, "reasoning": "Underlying authz.CheckPermission call (reached when registering a passkey for a user other than the caller) finds context auth data missing." },
+      { "id": "AUTHZ-cdgFk", "file": "internal/api/authz/permissions.go", "line": 46, "reasoning": "Caller has no memberships at all when permission is checked for registering another user's passkey." },
+      { "id": "AUTH-AWfge", "file": "internal/api/authz/permissions.go", "line": 60, "reasoning": "Caller lacks the user.credential.write permission needed to register a passkey for another user." },
+      { "id": "AUTH-Swrgg2", "file": "internal/api/authz/permissions.go", "line": 75, "reasoning": "Caller has the permission but not scoped to this specific target user's resource ID." },
+      { "id": "COMMAND-4M9sf", "file": "internal/command/org.go", "line": 325, "reasoning": "getOrg (via addHumanWebAuthN, to build login name/policy) finds the user's resource-owner org does not exist." },
+      { "id": "USER-Ggk9n", "file": "internal/command/user_domain_policy.go", "line": 45, "reasoning": "domainPolicyWriteModel finds neither an org-level nor instance-level domain policy exists when building the account/login name for WebAuthn registration." },
+      { "id": "WEBAU-bM8sd", "file": "internal/webauthn/webauthn.go", "line": 82, "reasoning": "The go-webauthn library's BeginRegistration call fails while building the passkey credential-creation challenge." },
+      { "id": "WEBAU-D7cus", "file": "internal/webauthn/webauthn.go", "line": 86, "reasoning": "JSON marshaling of the generated credential creation options fails." },
+      { "id": "WEBAU-UX9ta", "file": "internal/webauthn/webauthn.go", "line": 232, "reasoning": "serverFromContext fails to construct the go-webauthn server (invalid RPID/origin/domain configuration) before beginning registration." }
+    ]
+  }
+}
