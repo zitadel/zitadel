@@ -73,6 +73,12 @@ type externalIDPCallbackData struct {
 	State string `schema:"state"`
 	Code  string `schema:"code"`
 
+	// Error and ErrorDescription are the OAuth2/OIDC error response parameters the IDP may return on
+	// the callback (e.g. when the user cancels consent). They are used for logging/handling the failure;
+	// they are not IDP-authenticated and are not trusted to drive any security decision.
+	Error            string `schema:"error"`
+	ErrorDescription string `schema:"error_description"`
+
 	RelayState string `schema:"RelayState"`
 	Method     string `schema:"Method"`
 
@@ -292,6 +298,23 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.State, userAgentID)
 	if err != nil {
 		l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
+		return
+	}
+	// The IDP may return an OAuth2/OIDC error response (error/error_description) on the callback, e.g.
+	// when the user cancels consent. Handle it explicitly so it is logged with context instead of
+	// surfacing later as an opaque code-exchange failure. We then route it through the normal failure
+	// path, which - like any external-auth failure - falls back to local auth when the login policy
+	// allows it. (Note: this error signal is not IDP-authenticated, but treating it as a security
+	// boundary adds no protection: an attacker can force the same fallback with a garbage code, and the
+	// downgrade only ever affects their own auth request.)
+	if data.Error != "" {
+		logging.WithFields(
+			"instance", authz.GetInstance(r.Context()).InstanceID(),
+			"idpConfigID", authReq.SelectedIDPConfigID,
+			"error", data.Error,
+			"errorDescription", data.ErrorDescription,
+		).Info("external authentication returned an error on callback")
+		l.externalAuthCallbackFailed(w, r, authReq, nil, nil, zerrors.ThrowInvalidArgument(nil, "LOGIN-Ni2gs", "Errors.User.ExternalIDP.LoginFailedSwitchLocal"))
 		return
 	}
 	identityProvider, err := l.getIDPByID(r, authReq.SelectedIDPConfigID)
@@ -818,12 +841,22 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, zerrors.ThrowPreconditionFailed(nil, "LOGIN-dsfd3", "Errors.ExternalIDP.CreationNotAllowed"))
 		return
 	}
-	linkingUser := mapExternalNotFoundOptionFormDataToLoginUser(data)
+	// This page is only ever reached after a genuine IDP callback populated authReq.LinkingUsers
+	// (via SetLinkingUser, gated by a real session.FetchUser). If it is empty, the request did not
+	// originate from a verified external authentication and must be rejected - otherwise the external
+	// identity would be taken solely from attacker-controlled POST fields (GHSA-738m-7888-jfv8).
+	// This mirrors the guard in autoCreateExternalUser.
+	if len(authReq.LinkingUsers) == 0 {
+		l.renderError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "LOGIN-Dju3f", "Errors.ExternalIDP.NoExternalUserData"))
+		return
+	}
+	linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
+	externalUser := mapExternalNotFoundOptionFormDataToLoginUser(data, linkingUser)
 	// the form only carries the editable profile fields, so preserve the ZITADEL project
 	// roles captured at authentication (stored on the linking user) to keep the
 	// support-user instance membership grant working on the manual creation path.
-	preserveProjectRoles(linkingUser, authReq.LinkingUsers)
-	l.registerExternalUser(w, r, idpTemplate, authReq, linkingUser)
+	preserveProjectRoles(externalUser, authReq.LinkingUsers)
+	l.registerExternalUser(w, r, idpTemplate, authReq, externalUser)
 }
 
 // registerExternalUser creates an externalUser with the provided data
@@ -1538,12 +1571,20 @@ func mapExternalUserToLoginUser(externalUser *domain.ExternalUser, mustBeDomain 
 	return human, externalIDP, externalUser.Metadatas
 }
 
-func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOptionFormData) *domain.ExternalUser {
-	isEmailVerified := formData.ExternalEmailVerified && formData.Email == formData.ExternalEmail
-	isPhoneVerified := formData.ExternalPhoneVerified && formData.Phone == formData.ExternalPhone
+// mapExternalNotFoundOptionFormDataToLoginUser builds the externalUser to be created from the
+// submitted "external account not found" page. The identity and verification of that user must
+// originate from the genuine, protocol-verified IDP callback (carried in linkingUser), never from
+// the request body: the external-* form fields are only echoed back for display and are fully
+// attacker-controlled. We therefore take IDPConfigID/ExternalUserID from linkingUser, and only keep
+// the email/phone "verified" flag when the (user-editable) form value still matches what the IDP
+// actually returned. The remaining fields (name, nickname, language, and the possibly-edited
+// email/phone) are legitimately editable on this page and are taken from the form.
+func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOptionFormData, linkingUser *domain.ExternalUser) *domain.ExternalUser {
+	isEmailVerified := linkingUser.IsEmailVerified && formData.Email == linkingUser.Email
+	isPhoneVerified := linkingUser.IsPhoneVerified && formData.Phone == linkingUser.Phone
 	return &domain.ExternalUser{
-		IDPConfigID:       formData.ExternalIDPConfigID,
-		ExternalUserID:    formData.ExternalIDPExtUserID,
+		IDPConfigID:       linkingUser.IDPConfigID,
+		ExternalUserID:    linkingUser.ExternalUserID,
 		PreferredUsername: formData.Username,
 		DisplayName:       string(formData.Email),
 		FirstName:         formData.Firstname,

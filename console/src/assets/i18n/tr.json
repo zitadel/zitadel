@@ -664,6 +664,7 @@
     "ORG_USER_PERMISSION_EDITOR": "Rol atamalarını yönetme izni var",
     "ORG_PROJECT_PERMISSION_EDITOR": "Proje yetkilerini yönetme iznine sahiptir",
     "ORG_PROJECT_CREATOR": "Kendi projelerini ve altyapı ayarlarını oluşturma iznine sahiptir",
+    "ORG_DYNAMIC_CLIENT_REGISTRAR": "OAuth 2.0 istemcilerini dinamik olarak kaydetme iznine sahiptir",
     "ORG_ADMIN_IMPERSONATOR": "Organizasyondan admin ve son kullanıcıların kimliğine bürünme iznine sahiptir",
     "ORG_END_USER_IMPERSONATOR": "Organizasyondan son kullanıcıların kimliğine bürünme iznine sahiptir",
     "ORG_USER_SELF_MANAGER": "Kendi kullanıcısını yönetme iznine sahiptir",

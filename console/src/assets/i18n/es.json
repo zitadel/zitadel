@@ -664,6 +664,7 @@
     "ORG_USER_PERMISSION_EDITOR": "Tiene permiso para gestionar asignaciones de roles",
     "ORG_PROJECT_PERMISSION_EDITOR": "Tiene permiso para gestionar concesiones de proyecto",
     "ORG_PROJECT_CREATOR": "Tiene permiso para crear sus propios proyectos y ajustes subyacentes",
+    "ORG_DYNAMIC_CLIENT_REGISTRAR": "Tiene permiso para registrar dinámicamente clientes OAuth 2.0",
     "ORG_ADMIN_IMPERSONATOR": "Tiene permiso para hacerse pasar por administradores y usuarios finales de la organización",
     "ORG_END_USER_IMPERSONATOR": "Tiene permiso para hacerse pasar por usuarios finales de la organización",
     "ORG_USER_SELF_MANAGER": "Tiene permiso para gestionar su propio usuario",

@@ -246,6 +246,10 @@ func securityPolicyToSettingsPb(policy *query.SecurityPolicy) *settings.Security
 			AllowedOrigins: policy.AllowedOrigins,
 		},
 		EnableImpersonation: policy.EnableImpersonation,
+		DynamicClientRegistration: &settings.DynamicClientRegistrationSettings{
+			Enabled:              policy.EnableDynamicClientRegistration,
+			AllowUnauthenticated: policy.AllowUnauthenticatedDynamicClientRegistration,
+		},
 	}
 }
 
@@ -254,6 +258,9 @@ func securitySettingsToCommand(req *settings.SetSecuritySettingsRequest) *comman
 		EnableIframeEmbedding: req.GetEmbeddedIframe().GetEnabled(),
 		AllowedOrigins:        req.GetEmbeddedIframe().GetAllowedOrigins(),
 		EnableImpersonation:   req.GetEnableImpersonation(),
+
+		EnableDynamicClientRegistration:               req.GetDynamicClientRegistration().GetEnabled(),
+		AllowUnauthenticatedDynamicClientRegistration: req.GetDynamicClientRegistration().GetAllowUnauthenticated(),
 	}
 }
 
