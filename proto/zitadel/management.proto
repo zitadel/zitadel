@@ -14128,9 +14128,10 @@ message AddZitadelProviderRequest {
     ];
     zitadel.idp.v1.Options provider_options = 6;
 
-    // Optionally specify the details (organization_id, organization_domain) related to instance roles.
-    // It is used to determine if a user should be assigned instance administrator roles after authenticating with the provider.
-    repeated zitadel.idp.v1.InstanceRolesInfo instance_roles_info = 7 [(validate.rules).repeated = {max_items: 20}];
+    // field 7 previously held instance_roles_info, which was removed as it allowed
+    // org-scoped providers to grant instance-wide role memberships on login.
+    reserved 7;
+    reserved "instance_roles_info";
 }
 
 message AddZitadelProviderResponse {
@@ -14182,9 +14183,10 @@ message UpdateZitadelProviderRequest {
     ];
     zitadel.idp.v1.Options provider_options = 7;
 
-    // Optionally specify the details (organization_id, organization_domain) related to instance roles.
-    // It is used to determine if a user should be assigned instance administrator roles after authenticating with the provider.
-    repeated zitadel.idp.v1.InstanceRolesInfo instance_roles_info = 8 [(validate.rules).repeated = {max_items: 20}];
+    // field 8 previously held instance_roles_info, which was removed as it allowed
+    // org-scoped providers to grant instance-wide role memberships on login.
+    reserved 8;
+    reserved "instance_roles_info";
 }
 
 message UpdateZitadelProviderResponse {

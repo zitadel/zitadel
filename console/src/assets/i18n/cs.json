@@ -664,6 +664,7 @@
     "ORG_USER_PERMISSION_EDITOR": "Má oprávnění spravovat přiřazení rolí",
     "ORG_PROJECT_PERMISSION_EDITOR": "Má oprávnění spravovat pověření projektu",
     "ORG_PROJECT_CREATOR": "Má oprávnění vytvářet své vlastní projekty a podřízená nastavení",
+    "ORG_DYNAMIC_CLIENT_REGISTRAR": "Má oprávnění dynamicky registrovat klienty OAuth 2.0",
     "ORG_ADMIN_IMPERSONATOR": "Má oprávnění vydávat se za správce a koncové uživatele z organizace",
     "ORG_END_USER_IMPERSONATOR": "Má oprávnění vydávat se za koncové uživatele z organizace",
     "ORG_USER_SELF_MANAGER": "Má oprávnění spravovat svůj vlastní uživatelský účet",

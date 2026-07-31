@@ -32,6 +32,7 @@ vi.mock("@/lib/zitadel", () => ({
   createResponse: vi.fn(),
   getActiveIdentityProviders: vi.fn(),
   getAuthRequest: vi.fn(),
+  getLoginSettings: vi.fn(),
   getOrgsByDomain: vi.fn(),
   getSAMLRequest: vi.fn(),
   getSecuritySettings: vi.fn(),
@@ -184,6 +185,8 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
   let mockGetAuthRequest: ReturnType<typeof vi.fn>;
   let mockConstructUrl: ReturnType<typeof vi.fn>;
   let mockFindValidSession: ReturnType<typeof vi.fn>;
+  let mockSendLoginname: ReturnType<typeof vi.fn>;
+  let mockGetLoginSettings: ReturnType<typeof vi.fn>;
 
   const orgSession = {
     id: "session-org",
@@ -202,10 +205,14 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     const serviceUrl = await import("@/lib/service-url");
     const session = await import("@/lib/session");
     const authUtils = await import("@/lib/auth-utils");
+    const loginname = await import("@/lib/server/loginname");
 
     mockGetAuthRequest = vi.mocked(zitadel.getAuthRequest);
     mockConstructUrl = vi.mocked(serviceUrl.constructUrl);
     mockFindValidSession = vi.mocked(session.findValidSession);
+    mockSendLoginname = vi.mocked(loginname.sendLoginname);
+    mockGetLoginSettings = vi.mocked(zitadel.getLoginSettings);
+    mockGetLoginSettings.mockResolvedValue(undefined);
     vi.mocked(authUtils.getValidLocaleFromUILocales).mockReturnValue(null);
 
     mockConstructUrl.mockImplementation((_req: any, path: string) => {
@@ -213,6 +220,9 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     });
 
     mockFindValidSession.mockResolvedValue(null);
+    // Default: hint cannot be resolved to a redirect, exercising the prefilled
+    // /loginname fallback. Individual tests override this to assert the happy path.
+    mockSendLoginname.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -242,7 +252,7 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     expect(location).not.toContain("/accounts");
   });
 
-  test("should include submit=true when loginHint is set and org scope filters out all sessions", async () => {
+  test("should resolve loginHint server-side (straight to next step) when org scope filters out all sessions", async () => {
     mockGetAuthRequest.mockResolvedValue({
       authRequest: {
         id: "abc123",
@@ -252,6 +262,36 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
         loginHint: "user@example.com",
       },
     });
+
+    mockSendLoginname.mockResolvedValue({
+      redirect: "/password?loginName=user%40example.com",
+    });
+
+    const res = await handleOIDCFlowInitiation(
+      makeBaseParams({
+        sessions: [otherOrgSession] as any,
+        sessionCookies: [{ id: "session-other", token: "tok" }],
+      }),
+    );
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toContain("/password");
+    expect(location).not.toContain("/loginname");
+    expect(location).not.toContain("/accounts");
+  });
+
+  test("should prefill /loginname WITHOUT submit=true when loginHint cannot be resolved and org scope filters out all sessions", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: ["urn:zitadel:iam:org:id:111111"],
+        prompt: [],
+        loginHint: "user@example.com",
+      },
+    });
+
+    // mockSendLoginname resolves to undefined (default) → fallback path.
 
     const res = await handleOIDCFlowInitiation(
       makeBaseParams({
@@ -263,7 +303,7 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     const location = res.headers.get("location") ?? "";
     expect(location).toContain("/loginname");
     expect(location).toContain("loginName=user%40example.com");
-    expect(location).toContain("submit=true");
+    expect(location).not.toContain("submit=true");
     expect(location).not.toContain("/accounts");
   });
 
@@ -287,6 +327,66 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
 
     const location = res.headers.get("location") ?? "";
     expect(location).toContain("/accounts");
+  });
+
+  test("should resolve loginHint server-side when it matches no session but an unrelated session exists (default prompt)", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: [],
+        prompt: [],
+        loginHint: "user@example.com",
+      },
+    });
+
+    // An unrelated session is present (so eligibleSessions is non-empty), but
+    // findValidSession filtered by the hint returns nothing.
+    mockFindValidSession.mockResolvedValue(null);
+
+    mockSendLoginname.mockResolvedValue({
+      redirect: "/password?loginName=user%40example.com",
+    });
+
+    const res = await handleOIDCFlowInitiation(
+      makeBaseParams({
+        sessions: [otherOrgSession] as any,
+        sessionCookies: [{ id: "session-other", token: "tok" }],
+      }),
+    );
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toContain("/password");
+    expect(location).not.toContain("/loginname");
+    expect(location).not.toContain("/accounts");
+  });
+
+  test("should fall back to prefilled /loginname (no submit) when loginHint cannot be resolved and an unrelated session exists (default prompt)", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: [],
+        prompt: [],
+        loginHint: "user@example.com",
+      },
+    });
+
+    mockFindValidSession.mockResolvedValue(null);
+    // mockSendLoginname resolves to undefined (default) → fallback path.
+
+    const res = await handleOIDCFlowInitiation(
+      makeBaseParams({
+        sessions: [otherOrgSession] as any,
+        sessionCookies: [{ id: "session-other", token: "tok" }],
+      }),
+    );
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toContain("/loginname");
+    expect(location).toContain("loginName=user%40example.com");
+    expect(location).not.toContain("submit=true");
+    expect(location).not.toContain("/accounts");
   });
 
   test("should redirect to /loginname when org scope filters out all sessions (SELECT_ACCOUNT prompt)", async () => {
@@ -353,6 +453,81 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
 
     const location = res.headers.get("location") ?? "";
     expect(location).toContain("/loginname");
+  });
+
+  test("should resolve loginHint server-side when there are no sessions (default prompt)", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: [],
+        prompt: [],
+        loginHint: "user@example.com",
+      },
+    });
+
+    mockSendLoginname.mockResolvedValue({
+      redirect: "/password?loginName=user%40example.com",
+    });
+
+    const res = await handleOIDCFlowInitiation(makeBaseParams({ sessions: [] }));
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toContain("/password");
+    expect(location).not.toContain("/loginname");
+  });
+
+  test("should prefill /loginname WITHOUT submit=true when there are no sessions and loginHint cannot be resolved", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: [],
+        prompt: [],
+        loginHint: "user@example.com",
+      },
+    });
+
+    // mockSendLoginname resolves to undefined (default) → fallback path.
+
+    const res = await handleOIDCFlowInitiation(makeBaseParams({ sessions: [] }));
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toContain("/loginname");
+    expect(location).toContain("loginName=user%40example.com");
+    expect(location).not.toContain("submit=true");
+  });
+
+  test("should forward ignoreUnknownUsernames from login settings when resolving loginHint", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: [],
+        prompt: [],
+        loginHint: "unknown@example.com",
+      },
+    });
+
+    // Org has enumeration protection enabled: sendLoginname must receive the
+    // flag so an unknown hint still redirects to the (fake) /password step.
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
+    mockSendLoginname.mockResolvedValue({
+      redirect: "/password?loginName=unknown%40example.com",
+    });
+
+    const res = await handleOIDCFlowInitiation(makeBaseParams({ sessions: [] }));
+
+    expect(mockSendLoginname).toHaveBeenCalledWith(
+      expect.objectContaining({
+        loginName: "unknown@example.com",
+        ignoreUnknownUsernames: true,
+      }),
+    );
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toContain("/password");
+    expect(location).not.toContain("/loginname");
   });
 });
 

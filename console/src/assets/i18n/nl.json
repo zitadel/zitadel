@@ -664,6 +664,7 @@
     "ORG_USER_PERMISSION_EDITOR": "Heeft toestemming om roltoewijzingen te beheren",
     "ORG_PROJECT_PERMISSION_EDITOR": "Heeft toestemming om projecttoegang te beheren",
     "ORG_PROJECT_CREATOR": "Heeft toestemming om zijn eigen projecten en onderliggende instellingen aan te maken",
+    "ORG_DYNAMIC_CLIENT_REGISTRAR": "Heeft toestemming om OAuth 2.0-clients dynamisch te registreren",
     "ORG_ADMIN_IMPERSONATOR": "Heeft toestemming om de beheerder en eindgebruikers van de organisatie na te bootsen",
     "ORG_END_USER_IMPERSONATOR": "Heeft toestemming om eindgebruikers van de organisatie na te bootsen",
     "ORG_USER_SELF_MANAGER": "Heeft toestemming om zijn eigen gebruiker te beheren",
