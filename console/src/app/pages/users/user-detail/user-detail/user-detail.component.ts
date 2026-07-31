@@ -37,6 +37,7 @@ import {
   combineLatestWith,
   defer,
   EMPTY,
+  lastValueFrom,
   mergeWith,
   Observable,
   ObservedValueOf,
@@ -232,8 +233,8 @@ export class UserDetailComponent implements OnInit {
       .subscribe((setting) => this.currentSetting$.set(setting));
   }
 
-  public changeUsername(user: UserV2): void {
-    const dialogRef = this.dialog.open(EditDialogComponent, {
+  public async changeUsername(user: UserV2) {
+    const dialogRef = this.dialog.open<EditDialogComponent, EditDialogData, EditDialogResult>(EditDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.CHANGE',
         cancelKey: 'ACTIONS.CANCEL',
@@ -241,99 +242,83 @@ export class UserDetailComponent implements OnInit {
         titleKey: 'USER.PROFILE.CHANGEUSERNAME_TITLE',
         descriptionKey: 'USER.PROFILE.CHANGEUSERNAME_DESC',
         value: user.username,
+        type: EditDialogType.GENERIC,
       },
       width: '400px',
     });
 
-    dialogRef
-      .afterClosed()
-      .pipe(
-        map(({ value }: { value?: string }) => value),
-        filter(Boolean),
-        filter((value) => user.username != value),
-        switchMap((username) => this.userService.updateUser({ userId: user.userId, username })),
-      )
-      .subscribe({
-        next: () => {
-          this.toast.showInfo('USER.TOAST.USERNAMECHANGED', true);
-          this.refreshChanges$.emit();
-        },
-        error: (error) => {
-          this.toast.showError(error);
-        },
-      });
-  }
+    const { value: username } = (await lastValueFrom(dialogRef.afterClosed())) ?? {};
+    if (!username || user.username === username) {
+      // no changes made
+      return;
+    }
 
-  public unlockUser(user: UserV2): void {
-    this.userService
-      .unlockUser(user.userId)
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.UNLOCKED', true);
-        this.refreshChanges$.emit();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
-  }
-
-  public generateMachineSecret(user: UserV2): void {
-    this.newMgmtService
-      .generateMachineSecret(user.userId)
-      .then((resp) => {
-        this.toast.showInfo('USER.TOAST.SECRETGENERATED', true);
-        this.dialog.open(MachineSecretDialogComponent, {
-          data: {
-            clientId: resp.clientId,
-            clientSecret: resp.clientSecret,
-          },
-          width: '400px',
-        });
-        this.refreshChanges$.emit();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
-  }
-
-  public removeMachineSecret(user: UserV2): void {
-    this.newMgmtService
-      .removeMachineSecret(user.userId)
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.SECRETREMOVED', true);
-        this.refreshChanges$.emit();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
-  }
-
-  public changeState(user: UserV2, newState: UserState): void {
-    if (newState === UserState.ACTIVE) {
-      this.userService
-        .reactivateUser(user.userId)
-        .then(() => {
-          this.toast.showInfo('USER.TOAST.REACTIVATED', true);
-          this.refreshChanges$.emit();
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
-    } else if (newState === UserState.INACTIVE) {
-      this.userService
-        .deactivateUser(user.userId)
-        .then(() => {
-          this.toast.showInfo('USER.TOAST.DEACTIVATED', true);
-          this.refreshChanges$.emit();
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
+    try {
+      await this.userService.updateUser({ userId: user.userId, username });
+      this.toast.showInfo('USER.TOAST.USERNAMECHANGED', true);
+      this.refreshChanges$.emit();
+    } catch (error) {
+      this.toast.showError(error);
     }
   }
 
-  public saveProfile(user: UserV2, profile: HumanProfile): void {
-    this.userService
-      .updateUser({
+  public async unlockUser(user: UserV2) {
+    try {
+      await this.userService.unlockUser(user.userId);
+      this.toast.showInfo('USER.TOAST.UNLOCKED', true);
+      this.refreshChanges$.emit();
+    } catch (error) {
+      this.toast.showError(error);
+    }
+  }
+
+  public async generateMachineSecret(user: UserV2) {
+    try {
+      const resp = await this.newMgmtService.generateMachineSecret(user.userId);
+      this.toast.showInfo('USER.TOAST.SECRETGENERATED', true);
+      this.dialog.open(MachineSecretDialogComponent, {
+        data: {
+          clientId: resp.clientId,
+          clientSecret: resp.clientSecret,
+        },
+        width: '400px',
+      });
+      this.refreshChanges$.emit();
+    } catch (error) {
+      this.toast.showError(error);
+    }
+  }
+
+  public async removeMachineSecret(user: UserV2) {
+    try {
+      await this.newMgmtService.removeMachineSecret(user.userId);
+      this.toast.showInfo('USER.TOAST.SECRETREMOVED', true);
+      this.refreshChanges$.emit();
+    } catch (error) {
+      this.toast.showError(error);
+    }
+  }
+
+  public async changeState(user: UserV2, newState: UserState) {
+    try {
+      if (newState === UserState.ACTIVE) {
+        await this.userService.reactivateUser(user.userId);
+        this.toast.showInfo('USER.TOAST.REACTIVATED', true);
+      } else if (newState === UserState.INACTIVE) {
+        await this.userService.deactivateUser(user.userId);
+        this.toast.showInfo('USER.TOAST.DEACTIVATED', true);
+      } else {
+        return;
+      }
+      this.refreshChanges$.emit();
+    } catch (error) {
+      this.toast.showError(error);
+    }
+  }
+
+  public async saveProfile(user: UserV2, profile: HumanProfile) {
+    try {
+      await this.userService.updateUser({
         userId: user.userId,
         profile: {
           givenName: profile.givenName,
@@ -343,89 +328,77 @@ export class UserDetailComponent implements OnInit {
           preferredLanguage: profile.preferredLanguage,
           gender: profile.gender,
         },
-      })
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.SAVED', true);
-        this.refreshChanges$.emit();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
       });
+      this.toast.showInfo('USER.TOAST.SAVED', true);
+      this.refreshChanges$.emit();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  public saveMachine(user: UserV2, form: ObservedValueOf<DetailFormMachineComponent['submitData']>): void {
-    this.newMgmtService
-      .updateMachine({
+  public async saveMachine(user: UserV2, form: ObservedValueOf<DetailFormMachineComponent['submitData']>) {
+    try {
+      await this.newMgmtService.updateMachine({
         userId: user.userId,
         name: form.name,
         description: form.description,
         accessTokenType: form.accessTokenType,
-      })
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.SAVED', true);
-        this.refreshChanges$.emit();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
       });
+      this.toast.showInfo('USER.TOAST.SAVED', true);
+      this.refreshChanges$.emit();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  public resendEmailVerification(user: UserV2): void {
-    this.newMgmtService
-      .resendHumanEmailVerification(user.userId)
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
-        this.refreshChanges$.emit();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+  public async resendEmailVerification(user: UserV2) {
+    try {
+      await this.newMgmtService.resendHumanEmailVerification(user.userId);
+      this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
+      this.refreshChanges$.emit();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  public resendPhoneVerification(user: UserV2): void {
-    this.newMgmtService
-      .resendHumanPhoneVerification(user.userId)
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
-        this.refreshChanges$.emit();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+  public async resendPhoneVerification(user: UserV2) {
+    try {
+      await this.newMgmtService.resendHumanPhoneVerification(user.userId);
+      this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
+      this.refreshChanges$.emit();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  public deletePhone(user: UserV2): void {
-    this.userService
-      .removePhone(user.userId)
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
-        this.refreshChanges$.emit();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+  public async deletePhone(user: UserV2) {
+    try {
+      await this.userService.removePhone(user.userId);
+      this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
+      this.refreshChanges$.emit();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
   public navigateBack(): void {
     this._location.back();
   }
 
-  public sendSetPasswordNotification(user: UserV2): void {
-    this.newMgmtService
-      .sendHumanResetPasswordNotification({
+  public async sendSetPasswordNotification(user: UserV2) {
+    try {
+      await this.newMgmtService.sendHumanResetPasswordNotification({
         userId: user.userId,
         type: SendHumanResetPasswordNotificationRequest_Type.EMAIL,
-      })
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.PASSWORDNOTIFICATIONSENT', true);
-        this.refreshChanges$.emit();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
       });
+      this.toast.showInfo('USER.TOAST.PASSWORDNOTIFICATIONSENT', true);
+      this.refreshChanges$.emit();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  public deleteUser(user: UserV2): void {
+  public async deleteUser(user: UserV2) {
     const data = {
       confirmKey: 'ACTIONS.DELETE',
       cancelKey: 'ACTIONS.CANCEL',
@@ -438,26 +411,25 @@ export class UserDetailComponent implements OnInit {
       width: '400px',
     });
 
-    dialogRef
-      .afterClosed()
-      .pipe(
-        filter(Boolean),
-        switchMap(() => this.userService.deleteUser(user.userId)),
-      )
-      .subscribe({
-        next: () => {
-          const params: Params = {
-            deferredReload: true,
-            type: user.type.case === 'human' ? 'humans' : 'machines',
-          };
-          this.router.navigate(['/users'], { queryParams: params }).then();
-          this.toast.showInfo('USER.TOAST.DELETED', true);
-        },
-        error: (error) => this.toast.showError(error),
-      });
+    const confirmed = await lastValueFrom(dialogRef.afterClosed());
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await this.userService.deleteUser(user.userId);
+      const params: Params = {
+        deferredReload: true,
+        type: user.type.case === 'human' ? 'humans' : 'machines',
+      };
+      this.router.navigate(['/users'], { queryParams: params }).then();
+      this.toast.showInfo('USER.TOAST.DELETED', true);
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  public resendInitEmail(user: UserV2): void {
+  public async resendInitEmail(user: UserV2) {
     const dialogRef = this.dialog.open<ResendEmailDialogComponent, ResendEmailDialogData, ResendEmailDialogResult>(
       ResendEmailDialogComponent,
       {
@@ -468,34 +440,33 @@ export class UserDetailComponent implements OnInit {
       },
     );
 
-    dialogRef
-      .afterClosed()
-      .pipe(
-        filter((resp): resp is { send: true; email: string } => !!resp?.send && !!user.userId),
-        switchMap(({ email }) => this.newMgmtService.resendHumanInitialization(user.userId, email)),
-      )
-      .subscribe({
-        next: () => {
-          this.toast.showInfo('USER.TOAST.INITEMAILSENT', true);
-          this.refreshChanges$.emit();
-        },
-        error: (error) => this.toast.showError(error),
-      });
+    const resp = (await lastValueFrom(dialogRef.afterClosed())) ?? { send: false as const };
+    if (!resp.send) {
+      return;
+    }
+
+    try {
+      await this.newMgmtService.resendHumanInitialization(user.userId, resp.email);
+      this.toast.showInfo('USER.TOAST.INITEMAILSENT', true);
+      this.refreshChanges$.emit();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  public openEditDialog(user: UserWithHumanType, type: EditDialogType): void {
+  public async openEditDialog(user: UserWithHumanType, type: EditDialogType) {
     switch (type) {
       case EditDialogType.PHONE:
-        this.openEditPhoneDialog(user);
+        await this.openEditPhoneDialog(user);
         return;
       case EditDialogType.EMAIL:
-        this.openEditEmailDialog(user);
+        await this.openEditEmailDialog(user);
         return;
     }
   }
 
-  private openEditEmailDialog(user: UserWithHumanType) {
-    const data: EditDialogData = {
+  private async openEditEmailDialog(user: UserWithHumanType) {
+    const data = {
       confirmKey: 'ACTIONS.SAVE',
       cancelKey: 'ACTIONS.CANCEL',
       labelKey: 'ACTIONS.NEWVALUE',
@@ -505,40 +476,38 @@ export class UserDetailComponent implements OnInit {
       isVerifiedTextDescKey: 'USER.LOGINMETHODS.EMAIL.ISVERIFIEDDESC',
       value: user.type.value?.email?.email,
       type: EditDialogType.EMAIL,
-    } as const;
+    } as const satisfies EditDialogData;
 
     const dialogRefEmail = this.dialog.open<EditDialogComponent, EditDialogData, EditDialogResult>(EditDialogComponent, {
       data,
       width: '400px',
     });
 
-    dialogRefEmail
-      .afterClosed()
-      .pipe(
-        filter((resp): resp is Required<EditDialogResult> => !!resp?.value),
-        switchMap(({ value, isVerified }) =>
-          this.userService.setEmail({
-            userId: user.userId,
-            email: value,
-            verification: isVerified ? { case: 'isVerified', value: isVerified } : { case: undefined },
-          }),
-        ),
-        switchMap(() => {
-          this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
-          this.refreshChanges$.emit();
-          if (user.state !== UserState.INITIAL) {
-            return EMPTY;
-          }
-          return this.userService.resendInviteCode(user.userId);
-        }),
-      )
-      .subscribe({
-        next: () => this.toast.showInfo('USER.TOAST.INITEMAILSENT', true),
-        error: (error) => this.toast.showError(error),
+    const { value, isVerified } = (await lastValueFrom(dialogRefEmail.afterClosed())) ?? { isVerified: false };
+    if (!value) {
+      return;
+    }
+
+    try {
+      await this.userService.updateUser({
+        userId: user.userId,
+        email: {
+          email: value,
+          verification: { case: 'isVerified', value: isVerified },
+        },
       });
+      this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
+      this.refreshChanges$.emit();
+      if (user.state === UserState.INITIAL) {
+        await this.userService.resendInviteCode(user.userId);
+        this.toast.showInfo('USER.TOAST.INITEMAILSENT', true);
+      }
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  private openEditPhoneDialog(user: UserWithHumanType) {
+  private async openEditPhoneDialog(user: UserWithHumanType) {
     const data = {
       confirmKey: 'ACTIONS.SAVE',
       cancelKey: 'ACTIONS.CANCEL',
@@ -547,29 +516,27 @@ export class UserDetailComponent implements OnInit {
       descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
       value: user.type.value.phone?.phone,
       type: EditDialogType.PHONE,
-      validator: Validators.compose([phoneValidator, requiredValidator]),
-    };
-    const dialogRefPhone = this.dialog.open<EditDialogComponent, typeof data, { value: string; isVerified: boolean }>(
-      EditDialogComponent,
-      { data, width: '400px' },
-    );
+      validator: Validators.compose([phoneValidator, requiredValidator]) ?? undefined,
+    } as const satisfies EditDialogData;
 
-    dialogRefPhone
-      .afterClosed()
-      .pipe(
-        map((resp) => formatPhone(resp?.value)),
-        filter(Boolean),
-        switchMap(({ phone }) => this.userService.setPhone({ userId: user.userId, phone })),
-      )
-      .subscribe({
-        next: () => {
-          this.toast.showInfo('USER.TOAST.PHONESAVED', true);
-          this.refreshChanges$.emit();
-        },
-        error: (error) => {
-          this.toast.showError(error);
-        },
-      });
+    const dialogRefPhone = this.dialog.open<EditDialogComponent, EditDialogData, EditDialogResult>(EditDialogComponent, {
+      data,
+      width: '400px',
+    });
+
+    const { value } = (await lastValueFrom(dialogRefPhone.afterClosed())) ?? {};
+    const formatted = formatPhone(value);
+    if (!formatted) {
+      return;
+    }
+
+    try {
+      await this.userService.setPhone({ userId: user.userId, phone: formatted.phone });
+      this.toast.showInfo('USER.TOAST.PHONESAVED', true);
+      this.refreshChanges$.emit();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
   private getMetadataById(userId: string): Observable<MetadataQuery> {
@@ -580,7 +547,7 @@ export class UserDetailComponent implements OnInit {
     );
   }
 
-  public editMetadata(user: UserV2, metadata: Metadata[]): void {
+  public async editMetadata(user: UserV2, metadata: Metadata[]) {
     const setFcn = (key: string, value: string) =>
       this.newMgmtService.setUserMetadata({
         key,
@@ -597,12 +564,8 @@ export class UserDetailComponent implements OnInit {
       },
     });
 
-    dialogRef
-      .afterClosed()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.refreshMetadata$.next(true);
-      });
+    await lastValueFrom(dialogRef.afterClosed());
+    this.refreshMetadata$.next(true);
   }
 
   public humanUser(user: UserV2): UserWithHumanType | undefined {
