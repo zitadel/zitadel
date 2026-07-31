@@ -415,8 +415,12 @@ service SettingsService {
   //   - `iam.policy.write`
   rpc SetSecuritySettings(SetSecuritySettingsRequest) returns (SetSecuritySettingsResponse) {
     option (google.api.http) = {
-      put: "/v2/policies/security";
-      body: "*"
+      put: "/v2/settings/security";
+      body: "*";
+      additional_bindings {
+        put: "/v2/policies/security";
+        body: "*";
+      }
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
