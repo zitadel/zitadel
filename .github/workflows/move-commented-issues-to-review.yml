@@ -48,7 +48,7 @@ jobs:
             local NUM="$1"
 
             LABEL_EVENT=$(CLOSE_LABEL="$CLOSE_LABEL" gh api "repos/$REPO/issues/$NUM/events" --paginate \
-              --jq '[.[] | select(.event=="labeled" and ((.label.name // "") | ascii_downcase) == (env.CLOSE_LABEL | ascii_downcase))] | first | .created_at')
+              --jq '[.[] | select(.event=="labeled" and ((.label.name // "") | ascii_downcase) == (env.CLOSE_LABEL | ascii_downcase))] | sort_by(.created_at) | first | .created_at')
 
             if [[ -z "$LABEL_EVENT" || "$LABEL_EVENT" == "null" ]]; then
               echo "#$NUM: couldn't find a labeling event, skipping"
