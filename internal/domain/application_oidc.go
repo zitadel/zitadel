@@ -379,6 +379,15 @@ func containsCustom(uris []string) bool {
 	return false
 }
 
+// OIDCRedirectURIsRequireNative reports whether the given redirect URIs can only be
+// compliant for a native application, because they use a custom scheme. It lets a caller
+// that has to infer the application type (see the dynamic client registration endpoint)
+// stay in agreement with CheckRedirectUrisCode and CheckRedirectUrisImplicitAndCode, which
+// reserve custom schemes for native applications.
+func OIDCRedirectURIsRequireNative(redirectURIs []string) bool {
+	return containsCustom(redirectURIs)
+}
+
 // onlyLocalhostIsHttp returns true if:
 //
 //   - input string slice is empty

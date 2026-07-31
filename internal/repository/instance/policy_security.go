@@ -21,6 +21,13 @@ type SecurityPolicySetEvent struct {
 	EnableIframeEmbedding *bool     `json:"enable_iframe_embedding,omitempty"`
 	AllowedOrigins        *[]string `json:"allowedOrigins,omitempty"`
 	EnableImpersonation   *bool     `json:"enable_impersonation,omitempty"`
+
+	// EnableDynamicClientRegistration serves and advertises the OAuth 2.0 Dynamic Client
+	// Registration endpoint (RFC 7591).
+	EnableDynamicClientRegistration *bool `json:"enable_dynamic_client_registration,omitempty"`
+	// AllowUnauthenticatedDynamicClientRegistration additionally allows registration
+	// without an access token. It only has an effect if EnableDynamicClientRegistration.
+	AllowUnauthenticatedDynamicClientRegistration *bool `json:"allow_unauthenticated_dynamic_client_registration,omitempty"`
 }
 
 func NewSecurityPolicySetEvent(
@@ -64,6 +71,18 @@ func ChangeSecurityPolicyAllowedOrigins(allowedOrigins []string) func(event *Sec
 func ChangeSecurityPolicyEnableImpersonation(enabled bool) func(event *SecurityPolicySetEvent) {
 	return func(e *SecurityPolicySetEvent) {
 		e.EnableImpersonation = &enabled
+	}
+}
+
+func ChangeSecurityPolicyEnableDynamicClientRegistration(enabled bool) func(event *SecurityPolicySetEvent) {
+	return func(e *SecurityPolicySetEvent) {
+		e.EnableDynamicClientRegistration = &enabled
+	}
+}
+
+func ChangeSecurityPolicyAllowUnauthenticatedDynamicClientRegistration(allow bool) func(event *SecurityPolicySetEvent) {
+	return func(e *SecurityPolicySetEvent) {
+		e.AllowUnauthenticatedDynamicClientRegistration = &allow
 	}
 }
 
