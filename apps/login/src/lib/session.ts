@@ -1,4 +1,4 @@
-import { timestampDate } from "@zitadel/client";
+import { Timestamp, timestampDate } from "@zitadel/client";
 import { AuthRequest } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { SAMLRequest } from "@zitadel/proto/zitadel/saml/v2/authorization_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
@@ -49,6 +49,39 @@ export async function loadMostRecentSession({
 
       throw error;
     });
+}
+
+/**
+ * A session proves genuine (primary) authentication when a primary factor — password,
+ * passkey/WebAuthn or IDP intent — has been verified and the session has not expired.
+ *
+ * A WebAuthn factor only counts as a *primary* factor when it was user-verified
+ * (`userVerified` true, i.e. passwordless login). A presence-only WebAuthn assertion is a
+ * second-factor (U2F) check and must NOT be treated as primary authentication — mirroring
+ * how `mfa-helper` distinguishes "authenticated with passkey" from a 2FA WebAuthn check.
+ *
+ * This is the shared gate behind both the credential-enrollment guard
+ * (`getEnrollmentAuthorizationError`) and the MFA-setup page, so an "identify-only"
+ * session (only `factors.user` set, produced by submitting a login name) is never enough
+ * to attach a new authenticator (GHSA-45f2-5q3r-xgg6).
+ */
+export function hasVerifiedPrimaryFactor(session: Partial<Session>): {
+  valid: boolean;
+  verifiedAt?: Timestamp;
+} {
+  const validPassword = session?.factors?.password?.verifiedAt;
+  const validPasskey =
+    session?.factors?.webAuthN?.verifiedAt && !!session?.factors?.webAuthN?.userVerified
+      ? session?.factors?.webAuthN?.verifiedAt
+      : undefined;
+  const validIDP = session?.factors?.intent?.verifiedAt;
+
+  const stillValid = session.expirationDate ? timestampDate(session.expirationDate) > new Date() : true;
+
+  const verifiedAt = validPassword || validPasskey || validIDP;
+  const valid = !!(verifiedAt && stillValid);
+
+  return { valid, verifiedAt };
 }
 
 /**

@@ -48,7 +48,7 @@ jobs:
             local NUM="$1"
 
             LABEL_EVENT=$(CLOSE_LABEL="$CLOSE_LABEL" gh api "repos/$REPO/issues/$NUM/events" --paginate \
-              --jq '[.[] | select(.event=="labeled" and ((.label.name // "") | ascii_downcase) == (env.CLOSE_LABEL | ascii_downcase))] | first | .created_at')
+              --jq '[.[] | select(.event=="labeled" and ((.label.name // "") | ascii_downcase) == (env.CLOSE_LABEL | ascii_downcase))] | sort_by(.created_at) | first | .created_at')
 
             if [[ -z "$LABEL_EVENT" || "$LABEL_EVENT" == "null" ]]; then
               echo "#$NUM: couldn't find a labeling event, skipping"
@@ -86,7 +86,11 @@ jobs:
             check_and_swap "$ISSUE_NUMBER"
           else
             echo "Full daily sweep of all '$CLOSE_LABEL' issues..."
-            ISSUES=$(gh api "search/issues" --paginate -f q="repo:$REPO is:open type:issue label:\"$CLOSE_LABEL\"" --jq '.items[].number')
+            ISSUES=$(gh issue list --repo "$REPO" --search "is:open label:\"$CLOSE_LABEL\"" --limit 1000 --json number --jq '.[].number')
+            ISSUE_COUNT=$(echo "$ISSUES" | wc -w | tr -d ' ')
+            if [[ "$ISSUE_COUNT" -ge 1000 ]]; then
+              echo "Warning: reached the 1000 issue cap for label '$CLOSE_LABEL'; there may be additional issues not processed."
+            fi
             if [[ -z "$ISSUES" ]]; then
               echo "No $CLOSE_LABEL issues found."
               exit 0

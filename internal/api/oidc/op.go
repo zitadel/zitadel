@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
@@ -64,6 +65,7 @@ type EndpointConfig struct {
 	EndSession    *Endpoint
 	Keys          *Endpoint
 	DeviceAuth    *Endpoint
+	Registration  *Endpoint
 }
 
 type Endpoint struct {
@@ -191,10 +193,18 @@ func NewServer(
 		opCrypto:                   alg,
 		assetAPIPrefix:             assets.AssetAPI(),
 		httpClient:                 httpClient,
+		registrationEndpoint:       registrationEndpoint(config.CustomEndpoints),
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
-	server.Handler = op.RegisterLegacyServer(server,
-		server.authorizeCallbackHandler,
+
+	// We register the routes via op.RegisterServer (instead of op.RegisterLegacyServer)
+	// so that the dynamic client registration route can be added through the same
+	// WithSetRouter hook as the authorize callback. op.RegisterLegacyServer appends its
+	// own WithHTTPMiddleware after the caller options, which would violate chi's
+	// "all middlewares before routes" rule once we add a route via WithSetRouter.
+	// This mirrors op.RegisterLegacyServer; op.NewIssuerInterceptor reproduces the issuer
+	// middleware it would otherwise add.
+	server.Handler = op.RegisterServer(server, server.Endpoints(),
 		op.WithFallbackLogger(fallbackLogger),
 		op.WithHTTPMiddleware(
 			middleware.CallDurationHandler,
@@ -209,9 +219,35 @@ func NewServer(
 			http_utils.CopyHeadersToContext,
 			accessHandler.HandleWithPublicAuthPathPrefixes(publicAuthPathPrefixes(config.CustomEndpoints)),
 			middleware.ActivityHandler,
-		))
+			op.NewIssuerInterceptor(server.IssuerFromRequest).Handler,
+		),
+		op.WithSetRouter(func(r chi.Router) {
+			r.HandleFunc(server.Endpoints().Authorization.Relative()+authCallbackPathSuffix, server.authorizeCallbackHandler)
+			r.Method(http.MethodPost, server.registrationEndpoint.Relative(), http.HandlerFunc(server.dynamicClientRegistration))
+		}),
+	)
 
 	return server, nil
+}
+
+// authCallbackPathSuffix mirrors the unexported suffix used by op.RegisterLegacyServer to
+// register the authorize callback handler under the authorization endpoint.
+// Keep in sync with github.com/zitadel/oidc/v3/pkg/op (authCallbackPathSuffix). The
+// existing authorization-flow integration tests exercise this route and would fail if the
+// library changed the suffix.
+const authCallbackPathSuffix = "/callback"
+
+// registrationEndpoint builds the dynamic client registration endpoint, optionally
+// overridden through the custom endpoint configuration.
+// registrationEndpoint resolves the OAuth 2.0 Dynamic Client Registration endpoint
+// (RFC 7591). The path is configured in defaults.yaml like the other OIDC endpoints, so it
+// can be overridden by environment variable; the literal below is only the fallback for a
+// Server constructed without endpoint configuration.
+func registrationEndpoint(endpointConfig *EndpointConfig) *op.Endpoint {
+	if endpointConfig != nil && endpointConfig.Registration != nil {
+		return op.NewEndpointWithURL(endpointConfig.Registration.Path, endpointConfig.Registration.URL)
+	}
+	return op.NewEndpoint("/oauth/v2/register")
 }
 
 func ContextToIssuer(ctx context.Context) string {

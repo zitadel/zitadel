@@ -806,6 +806,10 @@ message SetSecuritySettingsRequest{
   // If enabled, users are allowed to impersonate other users.
   // The impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well".
   bool enable_impersonation = 2;
+
+  // DynamicClientRegistrationSettings defines if OAuth 2.0 clients may register
+  // themselves at runtime (RFC 7591) and whether they may do so without a token.
+  DynamicClientRegistrationSettings dynamic_client_registration = 3;
 }
 
 message SetSecuritySettingsResponse{
