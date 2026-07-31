@@ -992,7 +992,7 @@ describe("cookies", () => {
       expect(mockCookies.set).toHaveBeenCalledWith(expect.objectContaining({ value: "[]", maxAge: 0 }));
     });
 
-    it("should not set a negative maxAge", async () => {
+    it("should expire the cookie when every session has expired, without a negative maxAge", async () => {
       mockCookies.get.mockReturnValue(undefined);
 
       await addSessionToCookie({ session: sessionExpiringIn("session-1", -1000) });
@@ -1004,6 +1004,18 @@ describe("cookies", () => {
       mockCookies.get.mockReturnValue(undefined);
 
       await addSessionToCookie({ session: { ...sessionExpiringIn("session-1", 0), expirationTs: "" } });
+
+      expect(mockCookies.set).toHaveBeenCalledWith(expect.not.objectContaining({ maxAge: expect.anything() }));
+    });
+
+    it("should not let an expired session expire the cookie of a session without an expiration", async () => {
+      const withoutExpiration = { ...sessionExpiringIn("session-1", 0), expirationTs: "" };
+      // a different loginName, so this is a second session rather than a replacement
+      const expired = { ...sessionExpiringIn("session-2", -1000), loginName: "other@example.com" };
+
+      mockCookies.get.mockReturnValue({ value: JSON.stringify([withoutExpiration]) });
+
+      await addSessionToCookie({ session: expired });
 
       expect(mockCookies.set).toHaveBeenCalledWith(expect.not.objectContaining({ maxAge: expect.anything() }));
     });
