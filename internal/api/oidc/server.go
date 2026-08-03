@@ -46,7 +46,8 @@ type Server struct {
 	assetAPIPrefix func(ctx context.Context) string
 	httpClient     *http.Client
 
-	registrationEndpoint *op.Endpoint
+	registrationEndpoint     *op.Endpoint
+	clientIDMetadataResolver *clientIDMetadataResolver
 }
 
 func endpoints(endpointConfig *EndpointConfig) op.Endpoints {

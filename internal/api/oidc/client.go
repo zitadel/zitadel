@@ -47,6 +47,13 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Cl
 		err = oidcError(ctx, err)
 		span.EndWithError(err)
 	}()
+	if clientIDMetadataDocumentEnabled(ctx, id) {
+		client, err := o.clientIDMetadataResolver.ResolveClient(ctx, authz.GetInstance(ctx).InstanceID(), id)
+		if err != nil {
+			return nil, err
+		}
+		return ClientFromBusiness(client, o.defaultLoginURL, o.defaultLoginURLV2), nil
+	}
 	client, err := o.query.ActiveOIDCClientByID(ctx, id, false)
 	if err != nil {
 		return nil, err
@@ -197,6 +204,15 @@ func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCreden
 	clientID, assertion, err := clientIDFromCredentials(ctx, r.Data)
 	if err != nil {
 		return nil, err
+	}
+	if clientIDMetadataDocumentEnabled(ctx, clientID) {
+		client, err := s.clientIDMetadataResolver.ResolveClient(ctx, authz.GetInstance(ctx).InstanceID(), clientID)
+		if err != nil {
+			return nil, err
+		}
+		// CIMD clients are public (auth method none); there is no client secret or
+		// assertion to verify.
+		return ClientFromBusiness(client, s.defaultLoginURL, s.defaultLoginURLV2), nil
 	}
 	client, err := s.query.ActiveOIDCClientByID(ctx, clientID, assertion)
 	if zerrors.IsNotFound(err) {
