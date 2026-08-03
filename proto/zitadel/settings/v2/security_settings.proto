@@ -18,6 +18,10 @@ message SecuritySettings {
   // DynamicClientRegistrationSettings defines if OAuth 2.0 clients may register
   // themselves at runtime (RFC 7591) and whether they may do so without a token.
   DynamicClientRegistrationSettings dynamic_client_registration = 3;
+
+  // ClientIDMetadataDocumentSettings defines if a client_id that is an HTTPS URL is
+  // resolved as a Client ID Metadata Document instead of being looked up in the database.
+  ClientIDMetadataDocumentSettings client_id_metadata_document = 4;
 }
 
 message DynamicClientRegistrationSettings {
@@ -34,6 +38,18 @@ message DynamicClientRegistrationSettings {
   // `project.app.register_dynamic` permission in the token's organization, and the
   // client is homed in that organization.
   bool allow_unauthenticated = 2;
+}
+
+message ClientIDMetadataDocumentSettings {
+  // Enabled states if a client_id that is an absolute HTTPS URL is resolved as a Client ID
+  // Metadata Document, and advertised as `client_id_metadata_document_supported` in the
+  // discovery document. When disabled, such a client_id is looked up in the database like
+  // any other and therefore rejected as an unknown client.
+  //
+  // Enabling this makes ZITADEL fetch client-controlled URLs from the public authorization
+  // and token endpoints. The fetch goes through the SSRF-safe HTTP client and every
+  // redirect_uri must share the origin of the client_id URL.
+  bool enabled = 1;
 }
 
 message EmbeddedIframeSettings{

@@ -468,6 +468,7 @@ type authzInstance struct {
 	CSP                    csp                        `json:"csp,omitempty"`
 	Impersonation          bool                       `json:"impersonation,omitempty"`
 	DCR                    dcr                        `json:"dcr,omitempty"`
+	CIMD                   bool                       `json:"cimd,omitempty"`
 	IsBlocked              *bool                      `json:"is_blocked,omitempty"`
 	LogRetention           *time.Duration             `json:"log_retention,omitempty"`
 	Feature                feature.Features           `json:"feature,omitempty"`
@@ -535,6 +536,10 @@ func (i *authzInstance) AllowUnauthenticatedDynamicClientRegistration() bool {
 	return i.DCR.Enabled && i.DCR.AllowUnauthenticated
 }
 
+func (i *authzInstance) EnableClientIDMetadataDocument() bool {
+	return i.CIMD
+}
+
 func (i *authzInstance) Block() *bool {
 	return i.IsBlocked
 }
@@ -585,6 +590,7 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			enableImpersonation   sql.NullBool
 			enableDCR             sql.NullBool
 			allowUnauthDCR        sql.NullBool
+			enableCIMD            sql.NullBool
 			auditLogRetention     database.NullDuration
 			block                 sql.NullBool
 			features              []byte
@@ -603,6 +609,7 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			&enableImpersonation,
 			&enableDCR,
 			&allowUnauthDCR,
+			&enableCIMD,
 			&auditLogRetention,
 			&block,
 			&features,
@@ -628,6 +635,7 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 		instance.Impersonation = enableImpersonation.Bool
 		instance.DCR.Enabled = enableDCR.Bool
 		instance.DCR.AllowUnauthenticated = allowUnauthDCR.Bool
+		instance.CIMD = enableCIMD.Bool
 		if len(features) > 0 {
 			if err = json.Unmarshal(features, &instance.Feature); err != nil {
 				return zerrors.ThrowInternal(err, "QUERY-Po8ki", "Errors.Internal")

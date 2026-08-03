@@ -326,6 +326,7 @@ type securitySettingsJSONChanges interface {
 	SetEnableImpersonation(value bool) db_json.JsonUpdate
 	SetEnableDynamicClientRegistration(value bool) db_json.JsonUpdate
 	SetAllowUnauthenticatedDynamicClientRegistration(value bool) db_json.JsonUpdate
+	SetEnableClientIDMetadataDocument(value bool) db_json.JsonUpdate
 }
 
 type SecuritySettings struct {
@@ -340,6 +341,8 @@ type SecuritySettingsAttributes struct {
 
 	EnableDynamicClientRegistration               *bool `json:"enableDynamicClientRegistration,omitempty"`
 	AllowUnauthenticatedDynamicClientRegistration *bool `json:"allowUnauthenticatedDynamicClientRegistration,omitempty"`
+
+	EnableClientIDMetadataDocument *bool `json:"enableClientIdMetadataDocument,omitempty"`
 }
 
 //go:generate mockgen -typed -package domainmock -destination ./mock/security_settings.mock.go . SecuritySettingsRepository
