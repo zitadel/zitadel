@@ -20,11 +20,12 @@ type CachesConfig struct {
 		Postgres pg.Config
 		Redis    redis.Config
 	}
-	Instance         *cache.Config
-	Milestones       *cache.Config
-	Organization     *cache.Config
-	IdPFormCallbacks *cache.Config
-	FederatedLogouts *cache.Config
+	Instance                  *cache.Config
+	Milestones                *cache.Config
+	Organization              *cache.Config
+	IdPFormCallbacks          *cache.Config
+	FederatedLogouts          *cache.Config
+	ClientIDMetadataDocuments *cache.Config
 }
 
 type Connectors struct {
