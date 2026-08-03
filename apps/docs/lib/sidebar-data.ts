@@ -411,6 +411,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
         ]
       },
       "guides/integrate/back-channel-logout",
+      "guides/integrate/client-id-metadata-document",
       {
         type: "category",
         label: "External Integrations",
