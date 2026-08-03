@@ -187,8 +187,12 @@ func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales o
 	}
 
 	return &oidc.DiscoveryConfiguration{
-		Issuer:                      issuer,
-		RegistrationEndpoint:        registrationEndpoint,
+		Issuer:               issuer,
+		RegistrationEndpoint: registrationEndpoint,
+		// Client ID Metadata Documents are only advertised when they are enabled in the
+		// instance's security settings.
+		ClientIDMetadataDocumentSupported: authz.GetInstance(ctx).EnableClientIDMetadataDocument(),
+
 		AuthorizationEndpoint:       s.Endpoints().Authorization.Absolute(issuer),
 		TokenEndpoint:               s.Endpoints().Token.Absolute(issuer),
 		IntrospectionEndpoint:       s.Endpoints().Introspection.Absolute(issuer),
