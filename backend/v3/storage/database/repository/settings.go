@@ -983,6 +983,9 @@ func (s securitySettings) SetSettingFields(value domain.SecuritySettingsAttribut
 	if value.AllowUnauthenticatedDynamicClientRegistration != nil {
 		changes = append(changes, s.SetAllowUnauthenticatedDynamicClientRegistration(*value.AllowUnauthenticatedDynamicClientRegistration))
 	}
+	if value.EnableClientIDMetadataDocument != nil {
+		changes = append(changes, s.SetEnableClientIDMetadataDocument(*value.EnableClientIDMetadataDocument))
+	}
 	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
 }
 
@@ -1004,6 +1007,10 @@ func (securitySettings) SetEnableDynamicClientRegistration(value bool) db_json.J
 
 func (securitySettings) SetAllowUnauthenticatedDynamicClientRegistration(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"allowUnauthenticatedDynamicClientRegistration"}, value)
+}
+
+func (securitySettings) SetEnableClientIDMetadataDocument(value bool) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"enableClientIdMetadataDocument"}, value)
 }
 
 func SecuritySettingsRepository() domain.SecuritySettingsRepository {
