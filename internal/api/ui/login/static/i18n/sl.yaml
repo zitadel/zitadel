@@ -523,7 +523,7 @@ Errors:
       NoOptionAllowed: Pri tem ponudniku ni dovoljeno niti ustvarjanje niti povezovanje. Obrnite se na svojega skrbnika.
       LoginFailedSwitchLocal: |
         Prijava pri zunanjem IDP ni uspela. Vračanje na lokalno prijavo.
-
+                
         Podrobnosti napake: {{.Details}}
     GrantRequired: Prijava ni mogoča. Uporabnik mora imeti vsaj eno pooblastilo na aplikaciji. Obrnite se na svojega skrbnika.
     ProjectRequired: Prijava ni mogoča. Organizacija uporabnika mora biti pooblaščena za projekt. Obrnite se na svojega skrbnika.

@@ -36,7 +36,7 @@ VerifyEmailOTP:
 VerifySMSOTP:
   Text: >-
     {{.OTP}} je vaš OTP za {{ .Domain }}. Uporabite ga v naslednjih {{.Expiry}}.
-
+    
     @{{.Domain}} #{{.OTP}}
 DomainClaimed:
   Title: Domena je bila prevzeta

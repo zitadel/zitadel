@@ -285,6 +285,8 @@ Errors:
     LabelPolicy:
       NotFound: "Politika zasebne oznake ni bila najdena"
       NotChanged: "Politika zasebne oznake ni bila spremenjena"
+    IDPConfig:
+      NotExisting: "Konfiguracija ponudnika identitete ne obstaja"
   Project:
     ProjectIDMissing: "ID projekta manjka"
     AlreadyExists: "Projekt že obstaja v organizaciji"

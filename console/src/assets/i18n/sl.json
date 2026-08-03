@@ -665,6 +665,7 @@
     "ORG_USER_PERMISSION_EDITOR": "Ima dovoljenje za upravljanje dodelitev vlog",
     "ORG_PROJECT_PERMISSION_EDITOR": "Ima dovoljenje za upravljanje podelitev projektov",
     "ORG_PROJECT_CREATOR": "Ima dovoljenje za ustvarjanje lastnih projektov in pripadajočih nastavitev",
+    "ORG_DYNAMIC_CLIENT_REGISTRAR": "Ima dovoljenje za dinamično registracijo odjemalcev OAuth 2.0",
     "ORG_ADMIN_IMPERSONATOR": "Ima dovoljenje za poosebljanje administratorjev in končnih uporabnikov iz organizacije",
     "ORG_END_USER_IMPERSONATOR": "Ima dovoljenje za poosebljanje končnih uporabnikov iz organizacije",
     "ORG_USER_SELF_MANAGER": "Ima dovoljenje za upravljanje lastnega uporabniškega računa",
@@ -2373,7 +2374,8 @@
       "DESCRIPTION": "Vnesite podatke za ponudnika identitete JWT.",
       "HEADERNAME": "Ime glave",
       "JWTENDPOINT": "Končna točka JWT",
-      "JWTKEYSENDPOINT": "Končna točka ključev JWT"
+      "JWTKEYSENDPOINT": "Končna točka ključev JWT",
+      "AUDIENCE": "Ciljno občinstvo"
     },
     "APPLE": {
       "TEAMID": "ID ekipe",
@@ -2611,7 +2613,7 @@
       "TYPEREQUIRED": "Vrsta je obvezna.",
       "TITLE": "Nastavitve OIDC",
       "CLIENTID": "ID odjemalca",
-      "CLIENTSECRET": "Skrivnost odjemalca",
+      "CLIENTDETAILS": "Podrobnosti odjemalca",
       "CLIENTSECRET_NOSECRET": "Z vašim izbranim tokom avtentikacije skrivnost ni potrebna in zato ni na voljo.",
       "CLIENTSECRET_DESCRIPTION": "Shranite skrivnost odjemalca na varno mesto, saj po zaprtju tega pogovornega okna ne bo več vidna.",
       "REGENERATESECRET": "Ponovno generiraj skrivnost odjemalca",
