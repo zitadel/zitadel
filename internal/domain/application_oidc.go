@@ -20,11 +20,16 @@ const (
 type OIDCApp struct {
 	models.ObjectRoot
 
-	AppID                    string
-	AppName                  string
-	ClientID                 string
-	EncodedHash              string
-	ClientSecretString       string
+	AppID              string
+	AppName            string
+	ClientID           string
+	EncodedHash        string
+	ClientSecretString string
+	// RegistrationAccessToken is the plain registration access token (RFC 7592 §3) of a
+	// dynamically registered client. It is only populated transiently on registration and
+	// rotation so the registration endpoint can return it to the client; it is never
+	// persisted (only its hash is, see project.OIDCConfigRegistrationTokenChangedEvent).
+	RegistrationAccessToken  string
 	RedirectUris             []string
 	ResponseTypes            []OIDCResponseType
 	GrantTypes               []OIDCGrantType

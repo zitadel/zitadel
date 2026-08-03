@@ -61,6 +61,7 @@ const (
 	AppOIDCConfigColumnBackChannelLogoutURI     = "back_channel_logout_uri"
 	AppOIDCConfigColumnLoginVersion             = "login_version"
 	AppOIDCConfigColumnLoginBaseURI             = "login_base_uri"
+	AppOIDCConfigColumnRegistrationToken        = "registration_token"
 
 	appSAMLTableSuffix              = "saml_configs"
 	AppSAMLConfigColumnAppID        = "app_id"
@@ -133,6 +134,7 @@ func (*appProjection) Init() *old_handler.Check {
 			handler.NewColumn(AppOIDCConfigColumnBackChannelLogoutURI, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(AppOIDCConfigColumnLoginVersion, handler.ColumnTypeEnum, handler.Nullable()),
 			handler.NewColumn(AppOIDCConfigColumnLoginBaseURI, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(AppOIDCConfigColumnRegistrationToken, handler.ColumnTypeText, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(AppOIDCConfigColumnInstanceID, AppOIDCConfigColumnAppID),
 			appOIDCTableSuffix,
@@ -216,6 +218,10 @@ func (p *appProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  project.OIDCConfigSecretHashUpdatedType,
 					Reduce: p.reduceOIDCConfigSecretHashUpdated,
+				},
+				{
+					Event:  project.OIDCConfigRegistrationTokenChangedType,
+					Reduce: p.reduceOIDCConfigRegistrationTokenChanged,
 				},
 				{
 					Event:  project.SAMLConfigAddedType,
@@ -628,6 +634,36 @@ func (p *appProjection) reduceOIDCConfigSecretChanged(event eventstore.Event) (*
 		handler.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(AppOIDCConfigColumnClientSecret, crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)),
+			},
+			[]handler.Condition{
+				handler.NewCond(AppOIDCConfigColumnAppID, e.AppID),
+				handler.NewCond(AppOIDCConfigColumnInstanceID, e.Aggregate().InstanceID),
+			},
+			handler.WithTableSuffix(appOIDCTableSuffix),
+		),
+		handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
+				handler.NewCol(AppColumnSequence, e.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(AppColumnID, e.AppID),
+				handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
+			},
+		),
+	), nil
+}
+
+func (p *appProjection) reduceOIDCConfigRegistrationTokenChanged(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*project.OIDCConfigRegistrationTokenChangedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Eem6u", "reduce.wrong.event.type %s", project.OIDCConfigRegistrationTokenChangedType)
+	}
+	return handler.NewMultiStatement(
+		e,
+		handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(AppOIDCConfigColumnRegistrationToken, e.HashedToken),
 			},
 			[]handler.Condition{
 				handler.NewCond(AppOIDCConfigColumnAppID, e.AppID),
