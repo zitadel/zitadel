@@ -17,6 +17,8 @@ type SecurityPolicy struct {
 
 	EnableDynamicClientRegistration               bool
 	AllowUnauthenticatedDynamicClientRegistration bool
+
+	EnableClientIDMetadataDocument bool
 }
 
 func (c *Commands) SetSecurityPolicy(ctx context.Context, policy *SecurityPolicy) (*domain.ObjectDetails, error) {

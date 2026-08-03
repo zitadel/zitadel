@@ -28,6 +28,10 @@ type SecurityPolicySetEvent struct {
 	// AllowUnauthenticatedDynamicClientRegistration additionally allows registration
 	// without an access token. It only has an effect if EnableDynamicClientRegistration.
 	AllowUnauthenticatedDynamicClientRegistration *bool `json:"allow_unauthenticated_dynamic_client_registration,omitempty"`
+
+	// EnableClientIDMetadataDocument resolves a client_id that is an absolute HTTPS URL as a
+	// Client ID Metadata Document instead of looking it up in the database.
+	EnableClientIDMetadataDocument *bool `json:"enable_client_id_metadata_document,omitempty"`
 }
 
 func NewSecurityPolicySetEvent(
@@ -83,6 +87,12 @@ func ChangeSecurityPolicyEnableDynamicClientRegistration(enabled bool) func(even
 func ChangeSecurityPolicyAllowUnauthenticatedDynamicClientRegistration(allow bool) func(event *SecurityPolicySetEvent) {
 	return func(e *SecurityPolicySetEvent) {
 		e.AllowUnauthenticatedDynamicClientRegistration = &allow
+	}
+}
+
+func ChangeSecurityPolicyEnableClientIDMetadataDocument(enabled bool) func(event *SecurityPolicySetEvent) {
+	return func(e *SecurityPolicySetEvent) {
+		e.EnableClientIDMetadataDocument = &enabled
 	}
 }
 

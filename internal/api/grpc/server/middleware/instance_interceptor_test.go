@@ -317,6 +317,10 @@ func (m *mockInstance) AllowUnauthenticatedDynamicClientRegistration() bool {
 	return false
 }
 
+func (m *mockInstance) EnableClientIDMetadataDocument() bool {
+	return false
+}
+
 func (m *mockInstance) Features() feature.Features {
 	return feature.Features{}
 }

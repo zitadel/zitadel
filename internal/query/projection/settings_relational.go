@@ -1388,6 +1388,8 @@ func (p *relationalTablesProjection) reduceSecurityPolicySet(event eventstore.Ev
 
 				EnableDynamicClientRegistration:               policyEvent.EnableDynamicClientRegistration,
 				AllowUnauthenticatedDynamicClientRegistration: policyEvent.AllowUnauthenticatedDynamicClientRegistration,
+
+				EnableClientIDMetadataDocument: policyEvent.EnableClientIDMetadataDocument,
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)

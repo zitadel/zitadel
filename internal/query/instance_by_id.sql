@@ -60,6 +60,7 @@ select
 	s.enable_impersonation,
 	s.enable_dynamic_client_registration,
 	s.allow_unauthenticated_dynamic_client_registration,
+	s.enable_client_id_metadata_document,
     l.audit_log_retention,
     l.block,
 	f.features,

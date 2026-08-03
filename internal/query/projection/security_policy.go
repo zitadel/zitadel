@@ -22,6 +22,8 @@ const (
 
 	SecurityPolicyColumnEnableDynamicClientRegistration               = "enable_dynamic_client_registration"
 	SecurityPolicyColumnAllowUnauthenticatedDynamicClientRegistration = "allow_unauthenticated_dynamic_client_registration"
+
+	SecurityPolicyColumnEnableClientIDMetadataDocument = "enable_client_id_metadata_document"
 )
 
 type securityPolicyProjection struct{}
@@ -46,6 +48,7 @@ func (*securityPolicyProjection) Init() *old_handler.Check {
 			handler.NewColumn(SecurityPolicyColumnEnableImpersonation, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(SecurityPolicyColumnEnableDynamicClientRegistration, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(SecurityPolicyColumnAllowUnauthenticatedDynamicClientRegistration, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(SecurityPolicyColumnEnableClientIDMetadataDocument, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(SecurityPolicyColumnInstanceID),
 		),
@@ -97,6 +100,9 @@ func (p *securityPolicyProjection) reduceSecurityPolicySet(event eventstore.Even
 	}
 	if e.AllowUnauthenticatedDynamicClientRegistration != nil {
 		changes = append(changes, handler.NewCol(SecurityPolicyColumnAllowUnauthenticatedDynamicClientRegistration, e.AllowUnauthenticatedDynamicClientRegistration))
+	}
+	if e.EnableClientIDMetadataDocument != nil {
+		changes = append(changes, handler.NewCol(SecurityPolicyColumnEnableClientIDMetadataDocument, e.EnableClientIDMetadataDocument))
 	}
 	return handler.NewUpsertStatement(
 		e,

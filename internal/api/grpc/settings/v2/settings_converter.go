@@ -250,6 +250,9 @@ func securityPolicyToSettingsPb(policy *query.SecurityPolicy) *settings.Security
 			Enabled:              policy.EnableDynamicClientRegistration,
 			AllowUnauthenticated: policy.AllowUnauthenticatedDynamicClientRegistration,
 		},
+		ClientIdMetadataDocument: &settings.ClientIDMetadataDocumentSettings{
+			Enabled: policy.EnableClientIDMetadataDocument,
+		},
 	}
 }
 
@@ -261,6 +264,8 @@ func securitySettingsToCommand(req *settings.SetSecuritySettingsRequest) *comman
 
 		EnableDynamicClientRegistration:               req.GetDynamicClientRegistration().GetEnabled(),
 		AllowUnauthenticatedDynamicClientRegistration: req.GetDynamicClientRegistration().GetAllowUnauthenticated(),
+
+		EnableClientIDMetadataDocument: req.GetClientIdMetadataDocument().GetEnabled(),
 	}
 }
 

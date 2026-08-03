@@ -29,6 +29,12 @@ func WithMockDynamicClientRegistration(enabled, allowUnauthenticated bool) MockC
 	}
 }
 
+func WithMockClientIDMetadataDocument(enabled bool) MockContextInstanceOpts {
+	return func(i *instance) {
+		i.enableCIMD = enabled
+	}
+}
+
 func WithMockProjectID(projectID string) MockContextInstanceOpts {
 	return func(i *instance) {
 		i.projectID = projectID

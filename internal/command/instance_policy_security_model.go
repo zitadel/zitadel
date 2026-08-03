@@ -44,6 +44,9 @@ func (wm *InstanceSecurityPolicyWriteModel) Reduce() error {
 			if e.AllowUnauthenticatedDynamicClientRegistration != nil {
 				wm.AllowUnauthenticatedDynamicClientRegistration = *e.AllowUnauthenticatedDynamicClientRegistration
 			}
+			if e.EnableClientIDMetadataDocument != nil {
+				wm.EnableClientIDMetadataDocument = *e.EnableClientIDMetadataDocument
+			}
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -65,7 +68,7 @@ func (wm *InstanceSecurityPolicyWriteModel) NewSetEvent(
 	aggregate *eventstore.Aggregate,
 	policy *SecurityPolicy,
 ) (*instance.SecurityPolicySetEvent, error) {
-	changes := make([]instance.SecurityPolicyChanges, 0, 5)
+	changes := make([]instance.SecurityPolicyChanges, 0, 6)
 	var err error
 
 	if wm.EnableIframeEmbedding != policy.EnableIframeEmbedding {
@@ -82,6 +85,9 @@ func (wm *InstanceSecurityPolicyWriteModel) NewSetEvent(
 	}
 	if wm.AllowUnauthenticatedDynamicClientRegistration != policy.AllowUnauthenticatedDynamicClientRegistration {
 		changes = append(changes, instance.ChangeSecurityPolicyAllowUnauthenticatedDynamicClientRegistration(policy.AllowUnauthenticatedDynamicClientRegistration))
+	}
+	if wm.EnableClientIDMetadataDocument != policy.EnableClientIDMetadataDocument {
+		changes = append(changes, instance.ChangeSecurityPolicyEnableClientIDMetadataDocument(policy.EnableClientIDMetadataDocument))
 	}
 	changeEvent, err := instance.NewSecurityPolicySetEvent(ctx, aggregate, changes)
 	if err != nil {
