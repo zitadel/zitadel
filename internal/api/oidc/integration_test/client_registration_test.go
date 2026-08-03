@@ -14,6 +14,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
@@ -193,6 +195,12 @@ func TestServer_DynamicClientRegistration_disabled(t *testing.T) {
 // enableDynamicClientRegistration turns the endpoint on through the instance's security
 // settings and waits until the change is observable, i.e. until the projection behind the
 // cached instance has caught up and discovery advertises the endpoint.
+//
+// It is safe to call more than once on the same instance. The security settings are instance
+// wide and several tests here share an instance, so the requested values may already be in
+// place from an earlier test. ZITADEL answers a write that changes nothing with a failed
+// precondition ("Errors.NoChangesFound"), which for this helper means the desired state is
+// already reached rather than a failure.
 func enableDynamicClientRegistration(t *testing.T, ctx context.Context, instance *integration.Instance, allowUnauthenticated bool) {
 	t.Helper()
 	_, err := instance.Client.SettingsV2.SetSecuritySettings(ctx, &settings.SetSecuritySettingsRequest{
@@ -201,7 +209,9 @@ func enableDynamicClientRegistration(t *testing.T, ctx context.Context, instance
 			AllowUnauthenticated: allowUnauthenticated,
 		},
 	})
-	require.NoError(t, err)
+	if status.Code(err) != codes.FailedPrecondition {
+		require.NoError(t, err)
+	}
 
 	issuer := instance.OIDCIssuer()
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
