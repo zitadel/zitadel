@@ -13,7 +13,6 @@ import {
   createResponse,
   getActiveIdentityProviders,
   getAuthRequest,
-  getLoginSettings,
   getOrgsByDomain,
   getSAMLRequest,
   getSecuritySettings,
@@ -117,13 +116,11 @@ const gotoLoginname = ({
  * error), in which case callers fall back to the prefilled /loginname screen.
  */
 const resolveLoginHint = async ({
-  serviceConfig,
   request,
   requestId,
   loginHint,
   organization,
 }: {
-  serviceConfig: ServiceConfig;
   request: NextRequest;
   requestId: string;
   loginHint?: string;
@@ -134,17 +131,14 @@ const resolveLoginHint = async ({
   }
 
   try {
-    // Mirror the client-side loginname form: forward ignoreUnknownUsernames so
-    // an unknown hint redirects to the (fake) /password step like a known one,
-    // instead of falling back to /loginname and disclosing that the user does
-    // not exist. getLoginSettings is TTL-cached, so this adds no extra RPC.
-    const loginSettings = await getLoginSettings({ serviceConfig, organization: organization || undefined });
-
+    // sendLoginname derives enumeration protection (ignoreUnknownUsernames) from the
+    // same organization context server-side, so an unknown hint redirects to the
+    // (fake) /password step like a known one instead of falling back to /loginname
+    // and disclosing that the user does not exist.
     const res = await sendLoginname({
       loginName: loginHint,
       requestId,
       organization: organization || undefined,
-      ignoreUnknownUsernames: loginSettings?.ignoreUnknownUsernames,
     });
 
     if (res && "redirect" in res && res.redirect) {
@@ -343,7 +337,6 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       });
     } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
       const hintResponse = await resolveLoginHint({
-        serviceConfig,
         request,
         requestId,
         loginHint: authRequest.loginHint,
@@ -414,7 +407,6 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       if (!selectedSession || !selectedSession.id) {
         // login_hint matches no session: resolve it straight to the next step.
         const hintResponse = await resolveLoginHint({
-          serviceConfig,
           request,
           requestId,
           loginHint: authRequest.loginHint,
@@ -499,7 +491,6 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
   } else {
     // No session: resolve a login_hint straight to the next step if we can.
     const hintResponse = await resolveLoginHint({
-      serviceConfig,
       request,
       requestId,
       loginHint: authRequest?.loginHint,
