@@ -6,6 +6,8 @@
   "scripts": {
     "generate:index-pages": "tsx scripts/generate-index-pages.ts",
     "generate:error-reference": "tsx scripts/generate-error-reference.ts",
+    "generate:endpoint-trace": "tsx scripts/trace-endpoint-errors.ts",
+    "generate:endpoint-trace:category": "tsx scripts/trace-category-cli.ts",
     "fetch:remote-content": "node scripts/fetch-remote-content.mjs",
     "generate:proto-docs": "node scripts/generate-proto-docs.mjs",
     "generate:api-reference": "node scripts/generate-api-reference.ts --only-generate",

@@ -15,25 +15,63 @@
 // (standalone, like generate-error-reference.ts — not wired into the docs
 // build's `generate` chain; re-run manually after adding more traced output)
 //
-// ── Extending this to a new service ─────────────────────────────────────
-// 1. Add one entry to SERVICES below: the service's full proto package name
-//    (matches the generated MDX filename prefix, e.g. `<service>.<Op>.mdx`),
-//    its content directory, its .proto file, and a fresh subdirectory under
-//    endpoint-error-tracing/ for that service's traced output. That's the
-//    only code change needed — everything past this point already reads
-//    generically from whatever's in SERVICES.
-// 2. For each operation you want covered, trace its errors: open its gRPC/
-//    Connect handler (internal/api/grpc/<service>/...), follow every call
-//    into the command/query layer and shared helpers, and note every
-//    zerrors.Throw*(...) site actually reachable from that specific
-//    operation (not just every throw in the files it happens to touch).
-//    Write the result as { "<OperationId>": { "handler": "file:line",
-//    "errors": [{ "id", "file", "line", "reasoning" }] } } into that
-//    service's tracing subdirectory (one file per operation or batched,
-//    either works — this script merges every *.json file it finds there).
-// 3. Re-run this script. It resolves each traced (id, file, line) against
-//    the existing error catalog for the why-text and example response, so
-//    no explanation needs to be hand-written twice.
+// ── The standard: what a v2 service needs for this to pick it up ────────
+// discoverServices() below scans proto/zitadel/*/v2/*_service.proto and
+// derives everything by reading source — nothing is hand-typed, so there is
+// no service-name string anyone can get wrong (see discoverServices()'s own
+// comment for why that matters). But that scan only works if a service
+// follows the same layout every existing v2 service already follows. This is
+// the exact, complete contract — not a summary of it:
+//
+// 1. Proto file at `proto/zitadel/<category>/v2/<anything>_service.proto`
+//    (must end in `_service.proto` — that's how a real service is told apart
+//    from a message-only file like metadata.proto, which has none). Must
+//    contain `package zitadel.<category>.v2;` and `service <Name> { ... }`.
+//    Each RPC declared as `rpc <OperationId>(...)`. This is already standard
+//    ZITADEL proto style — nothing new to learn to satisfy it.
+// 2. Go handlers in package `internal/api/grpc/<category>/v2` — any file(s),
+//    the tracer scans the whole package. For each RPC you want covered,
+//    there must be a method (any receiver, but `*Server` by convention)
+//    named EXACTLY the RPC's name, e.g. `rpc CreateSession(...)` needs a
+//    `func (s *Server) CreateSession(...)` somewhere in that package.
+// 3. Docs content dir `apps/docs/content/reference/api/<category>/` must
+//    exist with the generated per-operation MDX files already in it. This
+//    comes from the normal docs generation pipeline once the proto is wired
+//    into it the same way every other service is — not something to
+//    hand-create.
+// 4. The <category> path segment (the directory name right after
+//    proto/zitadel/, internal/api/grpc/, and content/reference/api/) must be
+//    IDENTICAL across all three. This is the one rule with no error message
+//    if you get it wrong — a mismatch just makes the service quietly not
+//    appear. Run `pnpm generate:endpoint-trace:category` and check the
+//    "not fully wired up yet" section it prints (via
+//    listUnwiredProtoServices() below) if a category you expect is missing;
+//    it names exactly which of #2/#3 it can't find.
+// 5. (Optional, cosmetic only) A `description: "..."` inside the proto's own
+//    openapiv2_swagger info block, before the `service` line, shows in the
+//    category picker. No description there just means the CLI shows none —
+//    never invented.
+//
+// None of this is new process to adopt — it's already how every existing v2
+// service in this repo is laid out. The contract only exists so tooling can
+// rely on it holding, not to add extra steps to writing a new API.
+//
+// To actually trace a category's operations once it satisfies the above:
+// 1. Run `go run ./internal/tools/errortrace --proto <service>.proto` (see
+//    internal/tools/errortrace/main.go) to compute every zerrors.Throw*(...)
+//    site reachable from each RPC's handler — mechanical, no manual code
+//    reading required. It writes { "<OperationId>": { "handler": "file:line",
+//    "errors": [{ "id", "file", "line", "reasoning" }] } }; drop that into
+//    the service's tracing subdirectory (this script merges every *.json
+//    file it finds there — one file per operation or batched, either works).
+//    `pnpm generate:endpoint-trace:category` does this step for you, for a
+//    whole category at once, picked from a menu.
+// 2. Re-run this script (or let the CLI above do it). It resolves each
+//    traced (id, file, line) against the existing error catalog for the
+//    why-text and example response — if a newly-added error ID shows up as
+//    "unmatched", the catalog is stale: re-run `pnpm generate:error-reference`
+//    first, since that's what scans internal/**/*.go for every
+//    zerrors.Throw*() site in the first place.
 // ─────────────────────────────────────────────────────────────────────────
 
 import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync } from 'fs';
@@ -45,16 +83,119 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const DOCS_ROOT = join(__dirname, '..');
 const REPO_ROOT = join(DOCS_ROOT, '../..');
 const DATA_OUT = join(DOCS_ROOT, 'components/EndpointErrors/data.json');
+const PROTO_ZITADEL_ROOT = join(REPO_ROOT, 'proto/zitadel');
 
-const SERVICES = [
-  {
-    service: 'zitadel.user.v2.UserService',
-    contentDir: join(DOCS_ROOT, 'content/reference/api/user'),
-    protoFile: join(REPO_ROOT, 'proto/zitadel/user/v2/user_service.proto'),
-    tracingDir: join(__dirname, 'endpoint-error-tracing/user-v2'),
-  },
-  // Add more services here — see "Extending this to a new service" above.
-];
+export interface ServiceConfig {
+  service: string; // full proto package + service name, e.g. 'zitadel.org.v2.OrganizationService'
+  category: string; // proto/docs directory segment, e.g. 'org'
+  description?: string; // from the proto's own openapiv2_swagger info block, if it has one — never invented
+  rpcNames: string[]; // declaration order, straight from the .proto file
+  contentDir: string;
+  protoFile: string;
+  tracingDir: string;
+  goPackageDir: string;
+}
+
+interface Candidate extends ServiceConfig {
+  contentDirExists: boolean;
+  goPackageDirExists: boolean;
+}
+
+// Reads every proto/zitadel/*/v2/*_service.proto file and derives everything
+// discoverServices()/listUnwiredProtoServices() need, regardless of whether
+// its docs/Go side is wired up yet — the two public functions below just
+// filter this differently. Kept as one shared scan so "is this category
+// wired up" and "what's it missing" can never disagree with each other.
+function scanCandidates(): Candidate[] {
+  if (!existsSync(PROTO_ZITADEL_ROOT)) return [];
+  const categories = readdirSync(PROTO_ZITADEL_ROOT, { withFileTypes: true })
+    .filter((e) => e.isDirectory())
+    .map((e) => e.name)
+    .sort();
+
+  const candidates: Candidate[] = [];
+  for (const category of categories) {
+    const v2Dir = join(PROTO_ZITADEL_ROOT, category, 'v2');
+    if (!existsSync(v2Dir)) continue;
+    const serviceFileName = readdirSync(v2Dir).find((f) => f.endsWith('_service.proto'));
+    if (!serviceFileName) continue; // message-only dirs (metadata, filter, object, error, ...) — not a service
+
+    const protoFile = join(v2Dir, serviceFileName);
+    const text = readFileSync(protoFile, 'utf8');
+
+    const serviceIdx = text.search(/\bservice\s+\w+\s*\{/);
+    if (serviceIdx === -1) continue;
+    const serviceName = text.slice(serviceIdx).match(/\bservice\s+(\w+)\s*\{/)?.[1];
+    if (!serviceName) continue;
+
+    const protoPackage = text.match(/\bpackage\s+([\w.]+)\s*;/)?.[1] ?? `zitadel.${category}.v2`;
+    // Only search before the `service` keyword — same region parseDeclaredResponses
+    // reads the swagger defaults from — so a per-RPC/per-field description
+    // declared later in the file is never mistaken for the service's own.
+    const description = text
+      .slice(0, serviceIdx)
+      .match(/\bdescription:\s*"((?:[^"\\]|\\.)*)"/)?.[1]
+      .replace(/\\"/g, '"')
+      .replace(/\\n/g, ' ')
+      .trim();
+    const rpcNames = [...text.matchAll(/\brpc\s+(\w+)\s*\(/g)].map((m) => m[1]);
+
+    const contentDir = join(DOCS_ROOT, 'content/reference/api', category);
+    const goPackageDir = join(REPO_ROOT, 'internal/api/grpc', category, 'v2');
+
+    candidates.push({
+      service: `${protoPackage}.${serviceName}`,
+      category,
+      description,
+      rpcNames,
+      contentDir,
+      protoFile,
+      tracingDir: join(__dirname, 'endpoint-error-tracing', `${category}-v2`),
+      goPackageDir,
+      contentDirExists: existsSync(contentDir),
+      goPackageDirExists: existsSync(goPackageDir),
+    });
+  }
+  return candidates;
+}
+
+// Discovers every v2 API service that's fully wired up (proto + docs content
+// dir + Go handler package all exist), by reading source directly instead of
+// a hand-typed list. This exists because a hand-typed SERVICES array is
+// exactly how a real bug happened: an entry once read
+// `service: 'zitadel.org.v2.OrgService'` — a guess — when the .proto file
+// actually declares `service OrganizationService`. Reading the name from the
+// source it's declared in makes that whole class of mistake impossible,
+// rather than just "be more careful next time."
+export function discoverServices(): ServiceConfig[] {
+  return scanCandidates().filter((c) => c.contentDirExists && c.goPackageDirExists);
+}
+
+// The other half of discoverServices(): proto services that exist but aren't
+// fully wired up yet, with exactly what's missing — rule #4 in the "standard"
+// comment above is the one with no error message if violated (a <category>
+// segment mismatch just makes a service silently not appear), so this makes
+// that failure mode visible instead of silent. trace-category-cli.ts prints
+// this below the main menu.
+export function listUnwiredProtoServices(): { category: string; service: string; protoFile: string; missing: string[] }[] {
+  return scanCandidates()
+    .filter((c) => !c.contentDirExists || !c.goPackageDirExists)
+    .map((c) => ({
+      category: c.category,
+      service: c.service,
+      protoFile: c.protoFile,
+      missing: [
+        !c.contentDirExists && `docs content dir (${relativeToRepo(c.contentDir)})`,
+        !c.goPackageDirExists && `Go handler package (${relativeToRepo(c.goPackageDir)})`,
+      ].filter((x): x is string => Boolean(x)),
+    }));
+}
+
+function relativeToRepo(absPath: string): string {
+  return absPath.startsWith(REPO_ROOT + '/') ? absPath.slice(REPO_ROOT.length + 1) : absPath;
+}
+
+const SERVICES = discoverServices();
 
 const STATUS_TEXT: Record<number, string> = Object.fromEntries(Object.values(GRPC_STATUS).map((s) => [s.httpStatus, s.httpText]));
 
@@ -223,4 +364,9 @@ function main() {
   console.log(`[endpoint-errors] ${opsUpdated} operation page(s) updated, ${matched} sites matched, ${unmatched} unmatched`);
 }
 
-main();
+// Only run the merge when this file is executed directly (`tsx
+// generate-endpoint-errors.ts`) — not when another script imports
+// discoverServices() from it (trace-endpoint-errors.ts, trace-category-cli.ts),
+// which would otherwise silently trigger a full merge run as a side effect
+// of just wanting the service list.
+if (import.meta.url === `file://${process.argv[1]}`) main();
