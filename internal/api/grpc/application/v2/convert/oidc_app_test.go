@@ -66,6 +66,14 @@ func TestCreateOIDCAppRequestToDomain(t *testing.T) {
 				LoginVersion: &application.LoginVersion{Version: &application.LoginVersion_LoginV2{LoginV2: &application.LoginV2{
 					BaseUri: gu.Ptr("https://login"),
 				}}},
+				Ios: &application.IOSAppLinkConfig{
+					TeamId:   "TEAMID",
+					BundleId: "com.example.app",
+				},
+				Android: &application.AndroidAppLinkConfig{
+					PackageName:            "com.example.app",
+					Sha256CertFingerprints: []string{"AA:BB:CC"},
+				},
 			},
 			expectedModel: &domain.OIDCApp{
 				ObjectRoot:               models.ObjectRoot{AggregateID: "project1"},
@@ -89,6 +97,10 @@ func TestCreateOIDCAppRequestToDomain(t *testing.T) {
 				BackChannelLogoutURI:     gu.Ptr("https://backchannel"),
 				LoginVersion:             gu.Ptr(domain.LoginVersion2),
 				LoginBaseURI:             gu.Ptr("https://login"),
+				IOSTeamID:                gu.Ptr("TEAMID"),
+				IOSBundleID:              gu.Ptr("com.example.app"),
+				AndroidPackageName:       gu.Ptr("com.example.app"),
+				AndroidSHA256CertFingerprints: []string{"AA:BB:CC"},
 			},
 		},
 	}
@@ -180,6 +192,71 @@ func TestUpdateOIDCAppConfigRequestToDomain(t *testing.T) {
 				BackChannelLogoutURI:     gu.Ptr("https://backchannel"),
 				LoginVersion:             gu.Ptr(domain.LoginVersion2),
 				LoginBaseURI:             gu.Ptr("https://login"),
+			},
+		},
+		{
+			testName:  "omit app links leaves nil",
+			appID:     "app1",
+			projectID: "proj1",
+			req:       &application.UpdateOIDCApplicationConfigurationRequest{},
+			expectedModel: &domain.OIDCApp{
+				ObjectRoot:     models.ObjectRoot{AggregateID: "proj1"},
+				AppID:          "app1",
+				ResponseTypes:  []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+				GrantTypes:     []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+				ClockSkew:      gu.Ptr(time.Duration(0)),
+				LoginVersion:   gu.Ptr(domain.LoginVersionUnspecified),
+				LoginBaseURI:   gu.Ptr(""),
+			},
+		},
+		{
+			testName:  "set app links",
+			appID:     "app1",
+			projectID: "proj1",
+			req: &application.UpdateOIDCApplicationConfigurationRequest{
+				Ios: &application.IOSAppLinkConfig{
+					TeamId:   "TEAMID",
+					BundleId: "com.example.app",
+				},
+				Android: &application.AndroidAppLinkConfig{
+					PackageName:            "com.example.app",
+					Sha256CertFingerprints: []string{"AA:BB:CC"},
+				},
+			},
+			expectedModel: &domain.OIDCApp{
+				ObjectRoot:                    models.ObjectRoot{AggregateID: "proj1"},
+				AppID:                         "app1",
+				ResponseTypes:                 []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+				GrantTypes:                    []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+				ClockSkew:                     gu.Ptr(time.Duration(0)),
+				LoginVersion:                  gu.Ptr(domain.LoginVersionUnspecified),
+				LoginBaseURI:                  gu.Ptr(""),
+				IOSTeamID:                     gu.Ptr("TEAMID"),
+				IOSBundleID:                   gu.Ptr("com.example.app"),
+				AndroidPackageName:            gu.Ptr("com.example.app"),
+				AndroidSHA256CertFingerprints: []string{"AA:BB:CC"},
+			},
+		},
+		{
+			testName:  "clear app links with empty messages",
+			appID:     "app1",
+			projectID: "proj1",
+			req: &application.UpdateOIDCApplicationConfigurationRequest{
+				Ios:     &application.IOSAppLinkConfig{},
+				Android: &application.AndroidAppLinkConfig{},
+			},
+			expectedModel: &domain.OIDCApp{
+				ObjectRoot:                    models.ObjectRoot{AggregateID: "proj1"},
+				AppID:                         "app1",
+				ResponseTypes:                 []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+				GrantTypes:                    []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+				ClockSkew:                     gu.Ptr(time.Duration(0)),
+				LoginVersion:                  gu.Ptr(domain.LoginVersionUnspecified),
+				LoginBaseURI:                  gu.Ptr(""),
+				IOSTeamID:                     gu.Ptr(""),
+				IOSBundleID:                   gu.Ptr(""),
+				AndroidPackageName:            gu.Ptr(""),
+				AndroidSHA256CertFingerprints: []string{},
 			},
 		},
 	}
@@ -473,6 +550,10 @@ func TestAppOIDCConfigToPb(t *testing.T) {
 				BackChannelLogoutURI:     "https://example.com/backchannel",
 				LoginVersion:             domain.LoginVersion2,
 				LoginBaseURI:             gu.Ptr("https://login.example.com"),
+				IOSTeamID:                "TEAMID",
+				IOSBundleID:              "com.example.app",
+				AndroidPackageName:       "com.example.app",
+				AndroidSHA256CertFingerprints: []string{"AA:BB:CC"},
 			},
 			expected: &application.Application_OidcConfiguration{
 				OidcConfiguration: &application.OIDCConfiguration{
@@ -505,6 +586,14 @@ func TestAppOIDCConfigToPb(t *testing.T) {
 								BaseUri: gu.Ptr("https://login.example.com"),
 							},
 						},
+					},
+					Ios: &application.IOSAppLinkConfig{
+						TeamId:   "TEAMID",
+						BundleId: "com.example.app",
+					},
+					Android: &application.AndroidAppLinkConfig{
+						PackageName:            "com.example.app",
+						Sha256CertFingerprints: []string{"AA:BB:CC"},
 					},
 				},
 			},

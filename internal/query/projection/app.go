@@ -61,6 +61,10 @@ const (
 	AppOIDCConfigColumnBackChannelLogoutURI     = "back_channel_logout_uri"
 	AppOIDCConfigColumnLoginVersion             = "login_version"
 	AppOIDCConfigColumnLoginBaseURI             = "login_base_uri"
+	AppOIDCConfigColumnIOSTeamID                = "ios_team_id"
+	AppOIDCConfigColumnIOSBundleID              = "ios_bundle_id"
+	AppOIDCConfigColumnAndroidPackageName       = "android_package_name"
+	AppOIDCConfigColumnAndroidSHA256CertFingerprints = "android_sha256_cert_fingerprints"
 	AppOIDCConfigColumnRegistrationToken        = "registration_token"
 
 	appSAMLTableSuffix              = "saml_configs"
@@ -134,6 +138,10 @@ func (*appProjection) Init() *old_handler.Check {
 			handler.NewColumn(AppOIDCConfigColumnBackChannelLogoutURI, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(AppOIDCConfigColumnLoginVersion, handler.ColumnTypeEnum, handler.Nullable()),
 			handler.NewColumn(AppOIDCConfigColumnLoginBaseURI, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(AppOIDCConfigColumnIOSTeamID, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(AppOIDCConfigColumnIOSBundleID, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(AppOIDCConfigColumnAndroidPackageName, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(AppOIDCConfigColumnAndroidSHA256CertFingerprints, handler.ColumnTypeTextArray, handler.Nullable()),
 			handler.NewColumn(AppOIDCConfigColumnRegistrationToken, handler.ColumnTypeText, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(AppOIDCConfigColumnInstanceID, AppOIDCConfigColumnAppID),
@@ -519,6 +527,10 @@ func (p *appProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCol(AppOIDCConfigColumnBackChannelLogoutURI, e.BackChannelLogoutURI),
 				handler.NewCol(AppOIDCConfigColumnLoginVersion, e.LoginVersion),
 				handler.NewCol(AppOIDCConfigColumnLoginBaseURI, e.LoginBaseURI),
+				handler.NewCol(AppOIDCConfigColumnIOSTeamID, e.IOSTeamID),
+				handler.NewCol(AppOIDCConfigColumnIOSBundleID, e.IOSBundleID),
+				handler.NewCol(AppOIDCConfigColumnAndroidPackageName, e.AndroidPackageName),
+				handler.NewCol(AppOIDCConfigColumnAndroidSHA256CertFingerprints, database.TextArray[string](e.AndroidSHA256CertFingerprints)),
 			},
 			handler.WithTableSuffix(appOIDCTableSuffix),
 		),
@@ -595,6 +607,18 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 	}
 	if e.LoginBaseURI != nil {
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnLoginBaseURI, *e.LoginBaseURI))
+	}
+	if e.IOSTeamID != nil {
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnIOSTeamID, *e.IOSTeamID))
+	}
+	if e.IOSBundleID != nil {
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnIOSBundleID, *e.IOSBundleID))
+	}
+	if e.AndroidPackageName != nil {
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAndroidPackageName, *e.AndroidPackageName))
+	}
+	if e.AndroidSHA256CertFingerprints != nil {
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAndroidSHA256CertFingerprints, database.TextArray[string](*e.AndroidSHA256CertFingerprints)))
 	}
 
 	if len(cols) == 0 {
