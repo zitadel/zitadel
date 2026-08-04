@@ -52,6 +52,10 @@ func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.O
 		BackChannelLogoutURI:     gu.Ptr(writeModel.BackChannelLogoutURI),
 		LoginVersion:             gu.Ptr(writeModel.LoginVersion),
 		LoginBaseURI:             gu.Ptr(writeModel.LoginBaseURI),
+		IOSTeamID:                gu.Ptr(writeModel.IOSTeamID),
+		IOSBundleID:              gu.Ptr(writeModel.IOSBundleID),
+		AndroidPackageName:       gu.Ptr(writeModel.AndroidPackageName),
+		AndroidSHA256CertFingerprints: writeModel.AndroidSHA256CertFingerprints,
 	}
 }
 

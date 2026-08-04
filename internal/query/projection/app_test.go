@@ -770,6 +770,52 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "project reduceOIDCConfigChanged app links",
+			args: args{
+				event: getEvent(
+					testEvent(
+						project.OIDCConfigChangedType,
+						project.AggregateType,
+						[]byte(`{
+                        "appId": "app-id",
+						"iosTeamId": "TEAMID",
+						"iosBundleId": "com.example.app",
+						"androidPackageName": "com.example.app",
+						"androidSha256CertFingerprints": ["AA:BB:CC"]
+		}`),
+					), project.OIDCConfigChangedEventMapper),
+			},
+			reduce: (&appProjection{}).reduceOIDCConfigChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.apps7_oidc_configs SET (ios_team_id, ios_bundle_id, android_package_name, android_sha256_cert_fingerprints) = ($1, $2, $3, $4) WHERE (app_id = $5) AND (instance_id = $6)",
+							expectedArgs: []interface{}{
+								"TEAMID",
+								"com.example.app",
+								"com.example.app",
+								database.TextArray[string]{"AA:BB:CC"},
+								"app-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.apps7 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"app-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "project reduceOIDCConfigChanged noop",
 			args: args{
 				event: getEvent(
