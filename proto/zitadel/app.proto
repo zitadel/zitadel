@@ -179,6 +179,46 @@ message OIDCConfig {
             description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
         }
     ];
+    IOSAppLinkConfig ios = 23 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "iOS Associated Domains / passkey trust config. Served in apple-app-site-association as webcredentials.apps entry \"{team_id}.{bundle_id}\" (Apple's full App ID).";
+        }
+    ];
+    AndroidAppLinkConfig android = 24 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Android Digital Asset Links / passkey trust config. Served in assetlinks.json for delegate_permission/common.get_login_creds.";
+        }
+    ];
+}
+
+message IOSAppLinkConfig {
+    string team_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ABCDE12345\"";
+            description: "Apple Team ID (App ID prefix), e.g. ABCDE12345. Combined with bundle_id as TEAMID.BUNDLEID in AASA webcredentials.apps. Not the full Apple App ID by itself.";
+        }
+    ];
+    string bundle_id = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"com.example.app\"";
+            description: "iOS Bundle ID (CFBundleIdentifier), e.g. com.example.app. Combined with team_id for AASA webcredentials.apps. Do not paste TEAMID.bundle.id here.";
+        }
+    ];
+}
+
+message AndroidAppLinkConfig {
+    string package_name = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"com.example.app\"";
+            description: "Android package name (applicationId). Used in assetlinks.json target.package_name.";
+        }
+    ];
+    repeated string sha256_cert_fingerprints = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99\"]";
+            description: "SHA-256 signing certificate fingerprints for Digital Asset Links (passkey / get_login_creds). Include debug and release as needed. Colons optional.";
+        }
+    ];
 }
 
 enum OIDCResponseType {

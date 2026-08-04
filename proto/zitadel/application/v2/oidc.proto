@@ -157,4 +157,37 @@ message OIDCConfiguration {
   // hosted on any other domain.
   // If unset, the login UI is chosen by the instance default.
   LoginVersion login_version = 21;
+
+  // IOS is iOS Associated Domains / passkey trust config.
+  // Served in apple-app-site-association as webcredentials.apps entry
+  // "{team_id}.{bundle_id}" (Apple's full App ID = Team ID prefix + Bundle ID).
+  IOSAppLinkConfig ios = 22;
+
+  // Android is Android Digital Asset Links / passkey trust config.
+  // Served in assetlinks.json for delegate_permission/common.get_login_creds.
+  AndroidAppLinkConfig android = 23;
+}
+
+// IOSAppLinkConfig is iOS Associated Domains / passkey trust config.
+// Served in apple-app-site-association as webcredentials.apps entry
+// "{team_id}.{bundle_id}" (Apple's full App ID = Team ID prefix + Bundle ID).
+message IOSAppLinkConfig {
+  // TeamID is the Apple Developer Team ID (10-character alphanumeric), e.g. ABCDE12345.
+  // From Apple Developer account membership — not the Bundle ID.
+  string team_id = 1;
+
+  // BundleID is the Xcode / CFBundleIdentifier, e.g. com.example.app.
+  // Not the full Apple App ID; do not include the Team ID prefix here.
+  string bundle_id = 2;
+}
+
+// AndroidAppLinkConfig is Android Digital Asset Links / passkey trust config.
+// Served in assetlinks.json for delegate_permission/common.get_login_creds.
+message AndroidAppLinkConfig {
+  // PackageName is the Android applicationId / package name from the app manifest.
+  string package_name = 1;
+
+  // SHA256CertFingerprints are signing certificate fingerprints (with or without colons).
+  // Include debug and release fingerprints as needed.
+  repeated string sha256_cert_fingerprints = 2;
 }
