@@ -164,6 +164,7 @@
     "signInWithAzureAD": "用 AzureAD 登录",
     "signInWithGithub": "用 GitHub 登录",
     "signInWithGitlab": "用 GitLab 登录",
+    "signInWithZitadel": "用 Zitadel 登录",
     "loginError": {
       "title": "登录失败",
       "description": "登录时发生错误。"
