@@ -537,7 +537,6 @@ describe("sendLoginname", () => {
         loginName: "user@example.com",
         requestId: "req123",
         organization: "org123",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).toBeDefined();
@@ -874,7 +873,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user@example.com",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).not.toEqual({ error: "errors.userNotFound" });
@@ -899,7 +897,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user@example.com",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).not.toEqual({ error: "errors.userNotFound" });
@@ -989,7 +986,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user@example.com",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).not.toEqual({ error: "errors.moreThanOneUserFound" });
@@ -1020,7 +1016,7 @@ describe("sendLoginname", () => {
         rawMessage: "Errors.User.NotActive (SESSION-Gj4ko)",
       });
 
-      const result = await sendLoginname({ loginName: "user1", ignoreUnknownUsernames: true });
+      const result = await sendLoginname({ loginName: "user1" });
 
       expect(result).toEqual({ redirect: "/password?loginName=user1" });
       // With ignoreUnknownUsernames: true, we skip session creation, so this mock is NOT called
@@ -1046,7 +1042,7 @@ describe("sendLoginname", () => {
         authMethodTypes: [AuthenticationMethodType.PASSWORD],
       });
 
-      const result = await sendLoginname({ loginName: "user1", ignoreUnknownUsernames: true });
+      const result = await sendLoginname({ loginName: "user1" });
 
       expect(result).toEqual({ redirect: "/password?loginName=user1" });
       expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
@@ -1086,7 +1082,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user@example.com",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).not.toEqual({ error: "errors.localAuthenticationNotAllowed" });
@@ -1126,7 +1121,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user@example.com",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).not.toEqual({ error: "errors.passkeysNotAllowed" });
@@ -1239,7 +1233,6 @@ describe("sendLoginname", () => {
       // INPUT login name is just "user"
       const result = await sendLoginname({
         loginName: "user",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).toHaveProperty("redirect");
@@ -1281,7 +1274,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).toHaveProperty("redirect");
@@ -1323,7 +1315,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).toHaveProperty("redirect");
@@ -1371,7 +1362,6 @@ describe("sendLoginname", () => {
       const result = await sendLoginname({
         loginName: "input-name",
         organization: "context-org", // Context has ignore=true
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).toHaveProperty("redirect");
@@ -1419,7 +1409,6 @@ describe("sendLoginname", () => {
       const result = await sendLoginname({
         loginName: "input-name",
         organization: "context-org", // Context has ignore=false
-        ignoreUnknownUsernames: false,
       });
 
       expect(result).toHaveProperty("redirect");
