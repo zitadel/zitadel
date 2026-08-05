@@ -415,6 +415,8 @@ func providerTypeToPb(idpType domain.IDPType) idp_pb.ProviderType {
 		return idp_pb.ProviderType_PROVIDER_TYPE_APPLE
 	case domain.IDPTypeSAML:
 		return idp_pb.ProviderType_PROVIDER_TYPE_SAML
+	case domain.IDPTypeZitadel:
+		return idp_pb.ProviderType_PROVIDER_TYPE_ZITADEL
 	case domain.IDPTypeUnspecified:
 		return idp_pb.ProviderType_PROVIDER_TYPE_UNSPECIFIED
 	default:
@@ -478,6 +480,10 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 	}
 	if config.SAMLIDPTemplate != nil {
 		samlConfigToPb(providerConfig, config.SAMLIDPTemplate)
+		return providerConfig
+	}
+	if config.ZitadelIDPTemplate != nil {
+		zitadelConfigToPb(providerConfig, config.ZitadelIDPTemplate)
 		return providerConfig
 	}
 	return providerConfig
@@ -673,6 +679,24 @@ func samlConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.SAMLI
 			NameIdFormat:                  nameIDFormat,
 			TransientMappingAttributeName: gu.Ptr(template.TransientMappingAttributeName),
 			FederatedLogoutEnabled:        gu.Ptr(template.FederatedLogoutEnabled),
+		},
+	}
+}
+
+func zitadelConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.ZitadelIDPTemplate) {
+	instanceRolesInfo := make([]*idp_pb.InstanceRolesInfo, 0, len(template.InstanceRolesInfo))
+	for _, role := range template.InstanceRolesInfo {
+		instanceRolesInfo = append(instanceRolesInfo, &idp_pb.InstanceRolesInfo{
+			OrganizationDomain: role.OrganizationDomain,
+			OrganizationId:     role.OrganizationID,
+		})
+	}
+	providerConfig.Config = &idp_pb.ProviderConfig_Zitadel{
+		Zitadel: &idp_pb.ZitadelConfig{
+			ClientId:          template.ClientID,
+			Issuer:            template.Issuer,
+			Scopes:            template.Scopes,
+			InstanceRolesInfo: instanceRolesInfo,
 		},
 	}
 }

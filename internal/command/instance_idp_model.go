@@ -998,6 +998,8 @@ func (wm *InstanceIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) 
 			wm.IDPRemoveWriteModel.AppendEvents(&e.IDPConfigAddedEvent)
 		case *instance.IDPConfigRemovedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.IDPConfigRemovedEvent)
+		case *instance.ZitadelIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.ZitadelIDPAddedEvent)
 		default:
 			wm.IDPRemoveWriteModel.AppendEvents(e)
 		}
@@ -1023,6 +1025,7 @@ func (wm *InstanceIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.LDAPIDPAddedEventType,
 			instance.AppleIDPAddedEventType,
 			instance.SAMLIDPAddedEventType,
+			instance.ZitadelIDPAddedEventType,
 			instance.IDPRemovedEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).
@@ -1058,6 +1061,8 @@ func (wm *InstanceZitadelIDPWriteModel) AppendEvents(events ...eventstore.Event)
 		switch e := event.(type) {
 		case *instance.ZitadelIDPAddedEvent:
 			wm.ZitadelIDPWriteModel.AppendEvents(&e.ZitadelIDPAddedEvent)
+		case *instance.ZitadelIDPChangedEvent:
+			wm.ZitadelIDPWriteModel.AppendEvents(&e.ZitadelIDPChangedEvent)
 		default:
 			wm.ZitadelIDPWriteModel.AppendEvents(e)
 		}
@@ -1075,4 +1080,30 @@ func (wm *InstanceZitadelIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).
 		Builder()
+}
+
+func (wm *InstanceZitadelIDPWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id, name, issuer, clientID, clientSecretString string,
+	secretCrypto crypto.EncryptionAlgorithm,
+	scopes []string,
+	options idp.Options,
+	info []idp.RolesInfo,
+) (*instance.ZitadelIDPChangedEvent, error) {
+
+	changes, err := wm.NewChanges(
+		name,
+		issuer,
+		clientID,
+		clientSecretString,
+		secretCrypto,
+		scopes,
+		options,
+		info,
+	)
+	if err != nil || len(changes) == 0 {
+		return nil, err
+	}
+	return instance.NewZitadelIDPChangedEvent(ctx, aggregate, id, changes), nil
 }

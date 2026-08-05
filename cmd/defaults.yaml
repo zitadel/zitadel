@@ -669,6 +669,10 @@ OIDC:
       Path: /oauth/v2/keys # ZITADEL_OIDC_CUSTOMENDPOINTS_KEYS_PATH
     DeviceAuth:
       Path: /oauth/v2/device_authorization # ZITADEL_OIDC_CUSTOMENDPOINTS_DEVICEAUTH_PATH
+    # OAuth 2.0 Dynamic Client Registration (RFC 7591). The endpoint is only served and
+    # advertised when it is enabled in the instance's security settings.
+    Registration:
+      Path: /oauth/v2/register # ZITADEL_OIDC_CUSTOMENDPOINTS_REGISTRATION_PATH
   DeviceAuth:
     Lifetime: 5m # ZITADEL_OIDC_DEVICEAUTH_LIFETIME
     PollInterval: 5s # ZITADEL_OIDC_DEVICEAUTH_POLLINTERVAL
@@ -1066,6 +1070,24 @@ Eventstore:
   PushTimeout: 15s #ZITADEL_EVENTSTORE_PUSHTIMEOUT
   # Maximum amount of push retries in case of primary key violation on the sequence
   MaxRetries: 5 #ZITADEL_EVENTSTORE_MAXRETRIES
+  # Autovacuum tunes PostgreSQL's autovacuum and autoanalyze behavior of the
+  # eventstore.events2 table. As the table grows, PostgreSQL's default,
+  # percentage-based scale factors delay vacuum and analyze runs more and
+  # more, which can degrade read performance on large instances. Enabling
+  # this replaces the scale factors with static thresholds, so vacuum and
+  # analyze keep running at a predictable cadence regardless of table size.
+  # Settings are (re-)applied to the table as a repeatable step during `zitadel setup`.
+  Autovacuum:
+    # If enabled, the thresholds below are applied to the eventstore.events2 table
+    # and the default, percentage-based autovacuum scale factors are disabled.
+    # If disabled, the table is reset to the cluster's default autovacuum settings.
+    Enabled: false # ZITADEL_EVENTSTORE_AUTOVACUUM_ENABLED
+    # Number of modified rows that triggers an autovacuum run, regardless of table size (applied in both autovacuum_vacuum_threshold and autovacuum_vacuum_insert_threshold settings).
+    # Must be greater than 10000.
+    VacuumThreshold: 50000 # ZITADEL_EVENTSTORE_AUTOVACUUM_VACUUMTHRESHOLD
+    # Number of changed rows that triggers an autoanalyze run, regardless of table size.
+    # Must be greater than 10000.
+    AnalyzeThreshold: 50000 # ZITADEL_EVENTSTORE_AUTOVACUUM_ANALYZETHRESHOLD
 
 HTTPClient:
   # Sets the limit of the response body size in bytes, which will be processed by the HTTP client.
@@ -1212,12 +1234,12 @@ DefaultInstance:
       IncludeDigits: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPEMAIL_INCLUDEDIGITS
       IncludeSymbols: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPEMAIL_INCLUDESYMBOLS
     InviteCode:
-      Length: 6 # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_LENGTH
-      Expiry: "72h" # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_EXPIRY
-      IncludeLowerLetters: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDELOWERLETTERS
-      IncludeUpperLetters: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDEUPPERLETTERS
-      IncludeDigits: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDEDIGITS
-      IncludeSymbols: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDESYMBOLS
+      Length: 6 # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INVITECODE_LENGTH
+      Expiry: "72h" # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INVITECODE_EXPIRY
+      IncludeLowerLetters: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INVITECODE_INCLUDELOWERLETTERS
+      IncludeUpperLetters: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INVITECODE_INCLUDEUPPERLETTERS
+      IncludeDigits: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INVITECODE_INCLUDEDIGITS
+      IncludeSymbols: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INVITECODE_INCLUDESYMBOLS
     SigningKey:
       Length: 36 # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_SIGNINGKEY_LENGTH
       IncludeLowerLetters: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_SIGNINGKEY_INCLUDELOWERLETTERS
@@ -1649,6 +1671,7 @@ InternalAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.app.delete"
         - "project.grant.read"
         - "project.grant.write"
@@ -1764,6 +1787,7 @@ InternalAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.app.delete"
         - "project.grant.read"
         - "project.grant.write"
@@ -1866,6 +1890,7 @@ InternalAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.grant.read"
         - "project.grant.write"
         - "project.grant.delete"
@@ -2021,6 +2046,9 @@ InternalAuthZ:
         - "policy.read"
         - "project.read:self"
         - "project.create"
+    - Role: "ORG_DYNAMIC_CLIENT_REGISTRAR"
+      Permissions:
+        - "project.app.register_dynamic"
     - Role: "ORG_ADMIN_IMPERSONATOR"
       Permissions:
         - "admin.impersonation"
@@ -2242,6 +2270,7 @@ SystemAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.app.delete"
         - "project.grant.read"
         - "project.grant.write"
@@ -2357,6 +2386,7 @@ SystemAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.app.delete"
         - "project.grant.read"
         - "project.grant.write"

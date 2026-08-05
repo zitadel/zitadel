@@ -14,7 +14,7 @@ Caching is an experimental beta feature. See the [Caches](/self-hosting/manage/c
 
 Zitadel supports Redis or any Redis-compatible store (for example, Valkey) in standalone mode. Sentinel and Redis Cluster are not supported because the cache connector expects a single endpoint and does not implement cluster routing or sentinel failover logic.
 
-<Callout type="note">
+<Callout type="info">
 Zitadel supports server-auth TLS (`rediss://` scheme) but does not support client certificates/mTLS for cache connections.
 </Callout>
 
