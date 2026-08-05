@@ -2706,6 +2706,7 @@
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Пропустите страницу успеха после входа в систему для этого собственного приложения.",
       "APPLINKSSECTION": "Ссылки нативных приложений",
       "APPLINKSDESC": "Настройте ассоциацию iOS и Android, чтобы этот инстанс мог отдавать trust-файлы passkey для ваших нативных приложений.",
+      "APPLINKSWELLKNOWN": "После сохранения эта конфигурация отдаётся по живым конечным точкам <a href='{{aasaUrl}}' title='Apple App Site Association' target='_blank'>apple-app-site-association</a> и <a href='{{assetlinksUrl}}' title='Digital Asset Links' target='_blank'>assetlinks.json</a>.",
       "IOSTITLE": "iOS",
       "IOSDESC": "Отдаётся в apple-app-site-association как запись webcredentials TEAMID.BUNDLEID.",
       "TEAMID": "Team ID",

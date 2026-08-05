@@ -2602,6 +2602,7 @@
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Přeskočit stránku úspěchu po přihlášení pro tuto nativní aplikaci.",
       "APPLINKSSECTION": "Odkazy pro nativní aplikace",
       "APPLINKSDESC": "Nakonfigurujte asociaci iOS a Android, aby tato instance mohla poskytovat trust soubory pro passkeys vašich nativních aplikací.",
+      "APPLINKSWELLKNOWN": "Po uložení je tato konfigurace dostupná na živých endpointech <a href='{{aasaUrl}}' title='Apple App Site Association' target='_blank'>apple-app-site-association</a> a <a href='{{assetlinksUrl}}' title='Digital Asset Links' target='_blank'>assetlinks.json</a>.",
       "IOSTITLE": "iOS",
       "IOSDESC": "Poskytováno v apple-app-site-association jako webcredentials položka TEAMID.BUNDLEID.",
       "TEAMID": "Team ID",

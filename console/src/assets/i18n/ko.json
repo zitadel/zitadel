@@ -2618,6 +2618,7 @@
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "네이티브 앱 로그인 후 성공 페이지를 건너뜁니다.",
       "APPLINKSSECTION": "네이티브 앱 링크",
       "APPLINKSDESC": "이 인스턴스가 네이티브 앱용 패스키 신뢰 파일을 제공할 수 있도록 iOS 및 Android 연결을 구성합니다.",
+      "APPLINKSWELLKNOWN": "저장 후 이 구성은 라이브 <a href='{{aasaUrl}}' title='Apple App Site Association' target='_blank'>apple-app-site-association</a> 및 <a href='{{assetlinksUrl}}' title='Digital Asset Links' target='_blank'>assetlinks.json</a> 엔드포인트에서 제공됩니다.",
       "IOSTITLE": "iOS",
       "IOSDESC": "apple-app-site-association의 webcredentials 항목 TEAMID.BUNDLEID로 제공됩니다.",
       "TEAMID": "팀 ID",

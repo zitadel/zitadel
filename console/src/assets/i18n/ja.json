@@ -2619,6 +2619,7 @@
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "このネイティブアプリのログイン後に成功ページをスキップする",
       "APPLINKSSECTION": "ネイティブアプリリンク",
       "APPLINKSDESC": "このインスタンスがネイティブアプリ向けのパスキー信頼ファイルを提供できるよう、iOS / Android の関連付けを設定します。",
+      "APPLINKSWELLKNOWN": "保存後、この設定はライブの <a href='{{aasaUrl}}' title='Apple App Site Association' target='_blank'>apple-app-site-association</a> および <a href='{{assetlinksUrl}}' title='Digital Asset Links' target='_blank'>assetlinks.json</a> エンドポイントで提供されます。",
       "IOSTITLE": "iOS",
       "IOSDESC": "apple-app-site-association の webcredentials エントリ TEAMID.BUNDLEID として提供されます。",
       "TEAMID": "チーム ID",

@@ -2622,6 +2622,7 @@
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Hagyd ki a sikeroldalt a bejelentkezés után ennél a helyi alkalmazásnál.",
       "APPLINKSSECTION": "Natív alkalmazáshivatkozások",
       "APPLINKSDESC": "Állítsa be az iOS és Android társítást, hogy ez a példány passkey trust fájlokat szolgálhasson ki a natív alkalmazásaihoz.",
+      "APPLINKSWELLKNOWN": "Mentés után ez a konfiguráció az élő <a href='{{aasaUrl}}' title='Apple App Site Association' target='_blank'>apple-app-site-association</a> és <a href='{{assetlinksUrl}}' title='Digital Asset Links' target='_blank'>assetlinks.json</a> végpontokon érhető el.",
       "IOSTITLE": "iOS",
       "IOSDESC": "Az apple-app-site-association fájlban webcredentials bejegyzésként jelenik meg: TEAMID.BUNDLEID.",
       "TEAMID": "Team ID",

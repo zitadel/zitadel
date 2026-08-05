@@ -2621,6 +2621,7 @@
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Hoppa över framgångssidan efter en inloggning för denna inhemska app.",
       "APPLINKSSECTION": "Länkar för inbyggda appar",
       "APPLINKSDESC": "Konfigurera iOS- och Android-association så att den här instansen kan servera passkey-trustfiler för dina inbyggda appar.",
+      "APPLINKSWELLKNOWN": "Efter sparande serveras den här konfigurationen på de live-endpoints <a href='{{aasaUrl}}' title='Apple App Site Association' target='_blank'>apple-app-site-association</a> och <a href='{{assetlinksUrl}}' title='Digital Asset Links' target='_blank'>assetlinks.json</a>.",
       "IOSTITLE": "iOS",
       "IOSDESC": "Serveras i apple-app-site-association som webcredentials-posten TEAMID.BUNDLEID.",
       "TEAMID": "Team-ID",

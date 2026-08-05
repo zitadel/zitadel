@@ -2612,6 +2612,7 @@
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "تخطي صفحة النجاح بعد تسجيل الدخول لهذا التطبيق الأصلي.",
       "APPLINKSSECTION": "روابط التطبيقات الأصلية",
       "APPLINKSDESC": "قم بتهيئة ارتباط iOS وAndroid حتى تتمكن هذه المثيلة من تقديم ملفات الثقة بـ Passkey لتطبيقاتك الأصلية.",
+      "APPLINKSWELLKNOWN": "بعد الحفظ، تُقدَّم هذه التهيئة عبر نقطتي النهاية الحيتين <a href='{{aasaUrl}}' title='Apple App Site Association' target='_blank'>apple-app-site-association</a> و<a href='{{assetlinksUrl}}' title='Digital Asset Links' target='_blank'>assetlinks.json</a>.",
       "IOSTITLE": "iOS",
       "IOSDESC": "تُقدَّم في apple-app-site-association كمدخل webcredentials بالصيغة TEAMID.BUNDLEID.",
       "TEAMID": "معرّف الفريق",

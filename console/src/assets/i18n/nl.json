@@ -2612,6 +2612,7 @@
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Sla de succespagina na een login voor deze native app over.",
       "APPLINKSSECTION": "Native app-koppelingen",
       "APPLINKSDESC": "Configureer iOS- en Android-associatie zodat deze instance passkey-trustbestanden voor uw native apps kan serveren.",
+      "APPLINKSWELLKNOWN": "Na opslaan wordt deze configuratie geserveerd op de live endpoints <a href='{{aasaUrl}}' title='Apple App Site Association' target='_blank'>apple-app-site-association</a> en <a href='{{assetlinksUrl}}' title='Digital Asset Links' target='_blank'>assetlinks.json</a>.",
       "IOSTITLE": "iOS",
       "IOSDESC": "Wordt geserveerd in apple-app-site-association als webcredentials-vermelding TEAMID.BUNDLEID.",
       "TEAMID": "Team-ID",

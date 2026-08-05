@@ -2593,6 +2593,7 @@
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Pomiń stronę sukcesu po zalogowaniu dla tej Natywny aplikację",
       "APPLINKSSECTION": "Łącza aplikacji natywnych",
       "APPLINKSDESC": "Skonfiguruj powiązanie iOS i Android, aby ta instancja mogła serwować pliki zaufania passkey dla Twoich aplikacji natywnych.",
+      "APPLINKSWELLKNOWN": "Po zapisaniu ta konfiguracja jest dostępna pod żywymi endpointami <a href='{{aasaUrl}}' title='Apple App Site Association' target='_blank'>apple-app-site-association</a> oraz <a href='{{assetlinksUrl}}' title='Digital Asset Links' target='_blank'>assetlinks.json</a>.",
       "IOSTITLE": "iOS",
       "IOSDESC": "Serwowane w apple-app-site-association jako wpis webcredentials TEAMID.BUNDLEID.",
       "TEAMID": "Team ID",

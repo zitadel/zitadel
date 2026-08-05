@@ -2626,6 +2626,7 @@
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "登录后跳过本机应用的成功页面",
       "APPLINKSSECTION": "原生应用关联",
       "APPLINKSDESC": "配置 iOS 和 Android 关联，使此实例能够为您的原生应用提供通行密钥信任文件。",
+      "APPLINKSWELLKNOWN": "保存后，此配置将通过实时 <a href='{{aasaUrl}}' title='Apple App Site Association' target='_blank'>apple-app-site-association</a> 和 <a href='{{assetlinksUrl}}' title='Digital Asset Links' target='_blank'>assetlinks.json</a> 端点提供。",
       "IOSTITLE": "iOS",
       "IOSDESC": "在 apple-app-site-association 中作为 webcredentials 条目 TEAMID.BUNDLEID 提供。",
       "TEAMID": "团队 ID",

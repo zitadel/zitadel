@@ -2593,6 +2593,7 @@
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Erfolgseite nach dem Login für diese Native Applikation überspringen.",
       "APPLINKSSECTION": "Native App Links",
       "APPLINKSDESC": "Konfigurieren Sie iOS- und Android-Zuordnungen, damit diese Instanz Passkey-Trust-Dateien für Ihre nativen Apps bereitstellen kann.",
+      "APPLINKSWELLKNOWN": "Nach dem Speichern wird diese Konfiguration unter den Live-Endpunkten <a href='{{aasaUrl}}' title='Apple App Site Association' target='_blank'>apple-app-site-association</a> und <a href='{{assetlinksUrl}}' title='Digital Asset Links' target='_blank'>assetlinks.json</a> ausgeliefert.",
       "IOSTITLE": "iOS",
       "IOSDESC": "Wird in apple-app-site-association als webcredentials-Eintrag TEAMID.BUNDLEID ausgeliefert.",
       "TEAMID": "Team-ID",

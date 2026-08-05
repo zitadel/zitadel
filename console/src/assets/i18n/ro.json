@@ -2614,6 +2614,7 @@
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Omiteți pagina de succes după o conectare pentru această aplicație nativă.",
       "APPLINKSSECTION": "Linkuri pentru aplicații native",
       "APPLINKSDESC": "Configurați asocierea iOS și Android pentru ca această instanță să poată servi fișierele de încredere passkey pentru aplicațiile dvs. native.",
+      "APPLINKSWELLKNOWN": "După salvare, această configurație este servită la endpointurile live <a href='{{aasaUrl}}' title='Apple App Site Association' target='_blank'>apple-app-site-association</a> și <a href='{{assetlinksUrl}}' title='Digital Asset Links' target='_blank'>assetlinks.json</a>.",
       "IOSTITLE": "iOS",
       "IOSDESC": "Servit în apple-app-site-association ca intrare webcredentials TEAMID.BUNDLEID.",
       "TEAMID": "Team ID",

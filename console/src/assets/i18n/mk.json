@@ -2590,6 +2590,7 @@
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Прескокнете ја страницата за успешна најава за оваа нативна апликација.",
       "APPLINKSSECTION": "Врски за нативни апликации",
       "APPLINKSDESC": "Конфигурирајте асоцијација за iOS и Android за оваа инстанца да може да доставува trust датотеки за passkeys на вашите нативни апликации.",
+      "APPLINKSWELLKNOWN": "По зачувување, оваа конфигурација се доставува на живите крајни точки <a href='{{aasaUrl}}' title='Apple App Site Association' target='_blank'>apple-app-site-association</a> и <a href='{{assetlinksUrl}}' title='Digital Asset Links' target='_blank'>assetlinks.json</a>.",
       "IOSTITLE": "iOS",
       "IOSDESC": "Се доставува во apple-app-site-association како webcredentials запис TEAMID.BUNDLEID.",
       "TEAMID": "Team ID",

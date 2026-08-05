@@ -2616,6 +2616,7 @@
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Lewati halaman sukses setelah login untuk aplikasi asli ini.",
       "APPLINKSSECTION": "Tautan Aplikasi Native",
       "APPLINKSDESC": "Konfigurasikan asosiasi iOS dan Android agar instance ini dapat menyajikan file kepercayaan passkey untuk aplikasi native Anda.",
+      "APPLINKSWELLKNOWN": "Setelah disimpan, konfigurasi ini disajikan di endpoint langsung <a href='{{aasaUrl}}' title='Apple App Site Association' target='_blank'>apple-app-site-association</a> dan <a href='{{assetlinksUrl}}' title='Digital Asset Links' target='_blank'>assetlinks.json</a>.",
       "IOSTITLE": "iOS",
       "IOSDESC": "Disajikan di apple-app-site-association sebagai entri webcredentials TEAMID.BUNDLEID.",
       "TEAMID": "Team ID",

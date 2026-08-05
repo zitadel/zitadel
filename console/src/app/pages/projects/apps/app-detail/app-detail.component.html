@@ -466,6 +466,31 @@
         @if (currentSetting.id === 'native-app-links' && oidcForm && app?.oidcConfig) {
           <cnsl-card title="{{ 'APP.OIDC.APPLINKSSECTION' | translate }}">
             <p class="app-desc cnsl-secondary-text">{{ 'APP.OIDC.APPLINKSDESC' | translate }}</p>
+            @if (issuer$ | async; as issuer) {
+              <cnsl-info-section>
+                <div
+                  class="link"
+                  [innerHtml]="
+                    'APP.OIDC.APPLINKSWELLKNOWN'
+                      | translate
+                        : {
+                            aasaUrl: issuer + '/.well-known/apple-app-site-association',
+                            assetlinksUrl: issuer + '/.well-known/assetlinks.json',
+                          }
+                  "
+                ></div>
+              </cnsl-info-section>
+              <cnsl-copy-row
+                labelMinWidth="220px"
+                label="apple-app-site-association"
+                [value]="issuer + '/.well-known/apple-app-site-association'"
+              ></cnsl-copy-row>
+              <cnsl-copy-row
+                labelMinWidth="220px"
+                label="assetlinks.json"
+                [value]="issuer + '/.well-known/assetlinks.json'"
+              ></cnsl-copy-row>
+            }
             <form [formGroup]="oidcForm" (ngSubmit)="saveOIDCApp()">
               <h3 class="title">{{ 'APP.OIDC.IOSTITLE' | translate }}</h3>
               <cnsl-info-section class="full-width app-desc">
@@ -494,9 +519,14 @@
                   <cnsl-label>{{ 'APP.OIDC.PACKAGENAME' | translate }}</cnsl-label>
                   <input cnslInput formControlName="androidPackageName" autocomplete="off" />
                 </cnsl-form-field>
-                <cnsl-form-field class="app-formfield full-width">
+                <cnsl-form-field class="app-formfield full-width fingerprints-field">
                   <cnsl-label>{{ 'APP.OIDC.FINGERPRINTS' | translate }}</cnsl-label>
-                  <textarea cnslInput formControlName="androidSha256CertFingerprints" rows="4"></textarea>
+                  <textarea
+                    cnslInput
+                    class="fingerprints-input"
+                    formControlName="androidSha256CertFingerprints"
+                    rows="10"
+                  ></textarea>
                 </cnsl-form-field>
               </div>
               <cnsl-info-section class="full-width app-desc">
