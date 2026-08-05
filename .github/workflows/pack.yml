@@ -155,13 +155,13 @@ jobs:
           INPUTS_IMAGE_NAME_GITHUB_API: ${{ inputs.image_name_github_api }}
           INPUTS_IMAGE_NAME_GOOGLE_API: ${{ inputs.image_name_google_api }}
         run: |
-          if [ ""$MATRIX_PUSH_GHCR"" = "true" ]; then
+          if [ "$MATRIX_PUSH_GHCR" = "true" ]; then
             {
-              echo ""$INPUTS_IMAGE_NAME_GITHUB_API""
-              echo ""$INPUTS_IMAGE_NAME_GOOGLE_API""
+              echo "$INPUTS_IMAGE_NAME_GITHUB_API"
+              echo "$INPUTS_IMAGE_NAME_GOOGLE_API"
             } > api-images.txt
           else
-            echo ""$INPUTS_IMAGE_NAME_GOOGLE_API"" > api-images.txt
+            echo "$INPUTS_IMAGE_NAME_GOOGLE_API" > api-images.txt
           fi
           echo "list<<EOF" >> "$GITHUB_OUTPUT"
           cat api-images.txt >> "$GITHUB_OUTPUT"
