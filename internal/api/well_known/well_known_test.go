@@ -1,10 +1,16 @@
 package well_known
 
 import (
+	"context"
+	"net/http"
+	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/query"
 )
 
@@ -72,34 +78,42 @@ func TestBuildAssetLinks(t *testing.T) {
 			want: []assetLink{},
 		},
 		{
-			name: "aggregates entries",
+			name: "aggregates and normalizes fingerprints",
 			configs: []*query.OIDCAppLinkConfig{
 				{
 					IOSTeamID:                     "TEAM",
 					IOSBundleID:                   "com.ios",
 					AndroidPackageName:            "com.one",
-					AndroidSHA256CertFingerprints: []string{"AA:BB"},
+					AndroidSHA256CertFingerprints: []string{"aabbccddeeff00112233445566778899aabbccddeeff00112233445566778899"},
 				},
 				{
-					AndroidPackageName:            "com.two",
-					AndroidSHA256CertFingerprints: []string{"CC:DD", "EE:FF"},
+					AndroidPackageName: "com.two",
+					AndroidSHA256CertFingerprints: []string{
+						"CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB",
+						"ee ff 00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff 00 11 22 33 44 55 66 77 88 99 aa bb cc dd",
+					},
 				},
 			},
 			want: []assetLink{
 				{
 					Relation: []string{"delegate_permission/common.get_login_creds"},
 					Target: assetLinkTarget{
-						Namespace:              "android_app",
-						PackageName:            "com.one",
-						SHA256CertFingerprints: []string{"AA:BB"},
+						Namespace:   "android_app",
+						PackageName: "com.one",
+						SHA256CertFingerprints: []string{
+							"AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+						},
 					},
 				},
 				{
 					Relation: []string{"delegate_permission/common.get_login_creds"},
 					Target: assetLinkTarget{
-						Namespace:              "android_app",
-						PackageName:            "com.two",
-						SHA256CertFingerprints: []string{"CC:DD", "EE:FF"},
+						Namespace:   "android_app",
+						PackageName: "com.two",
+						SHA256CertFingerprints: []string{
+							"CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB",
+							"EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD",
+						},
 					},
 				},
 			},
@@ -110,6 +124,90 @@ func TestBuildAssetLinks(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			assert.Equal(t, tc.want, buildAssetLinks(tc.configs))
+		})
+	}
+}
+
+func TestNormalizeSHA256Fingerprint(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		name string
+		in   string
+		want string
+	}{
+		{
+			name: "already canonical",
+			in:   "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+			want: "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+		},
+		{
+			name: "lowercase without separators",
+			in:   "aabbccddeeff00112233445566778899aabbccddeeff00112233445566778899",
+			want: "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+		},
+		{
+			name: "mixed case with spaces",
+			in:   "aa bb cc dd ee ff 00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF 00 11 22 33 44 55 66 77 88 99",
+			want: "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+		},
+		{
+			name: "invalid length uppercased",
+			in:   "aa:bb",
+			want: "AA:BB",
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, tc.want, normalizeSHA256Fingerprint(tc.in))
+		})
+	}
+}
+
+type stubAppLinkQuerier struct {
+	configs []*query.OIDCAppLinkConfig
+	err     error
+}
+
+func (s stubAppLinkQuerier) SearchOIDCAppLinkConfigs(_ context.Context) ([]*query.OIDCAppLinkConfig, error) {
+	return s.configs, s.err
+}
+
+func TestHandlerCacheControl(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		name       string
+		maxAge     time.Duration
+		wantHeader string
+	}{
+		{
+			name:       "default max-age",
+			maxAge:     5 * time.Minute,
+			wantHeader: "public, max-age=300",
+		},
+		{
+			name:       "no-store when zero",
+			maxAge:     0,
+			wantHeader: "no-store",
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			h := NewHandler(stubAppLinkQuerier{}, Config{AppLinksCacheControlMaxAge: tc.maxAge})
+
+			for _, path := range []string{AppleAppSiteAssociationPath, AssetLinksPath} {
+				req := httptest.NewRequest(http.MethodGet, path, nil)
+				rec := httptest.NewRecorder()
+				h.ServeHTTP(rec, req)
+				require.Equal(t, http.StatusOK, rec.Code)
+				assert.Equal(t, tc.wantHeader, rec.Header().Get(http_util.CacheControl), path)
+				assert.NotContains(t, rec.Header().Get(http_util.CacheControl), "stale-while-revalidate")
+			}
 		})
 	}
 }

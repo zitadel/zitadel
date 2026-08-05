@@ -134,6 +134,7 @@ func assertEventuallyJSON(t *testing.T, url string, want any) {
 			return
 		}
 		assert.Contains(ct, resp.Header.Get("Content-Type"), "application/json")
+		assert.Equal(ct, "public, max-age=300", resp.Header.Get("Cache-Control"))
 
 		body, err := io.ReadAll(resp.Body)
 		if !assert.NoError(ct, err) {
