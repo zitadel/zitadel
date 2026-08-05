@@ -2,12 +2,13 @@ package well_known
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
 	"time"
-	"unicode"
 
 	"github.com/zitadel/logging"
 
@@ -157,31 +158,20 @@ func normalizeSHA256Fingerprints(fps []string) []string {
 }
 
 func normalizeSHA256Fingerprint(fp string) string {
-	cleaned := make([]byte, 0, 64)
-	for _, r := range fp {
-		switch {
-		case r == ':' || unicode.IsSpace(r):
-			continue
-		case r >= 'a' && r <= 'f':
-			cleaned = append(cleaned, byte(r-32))
-		case (r >= '0' && r <= '9') || (r >= 'A' && r <= 'F'):
-			cleaned = append(cleaned, byte(r))
-		default:
-			return strings.ToUpper(strings.TrimSpace(fp))
-		}
+	if strings.Contains(fp, ":") {
+		return strings.ToUpper(fp) // already 32 valid pairs per API validation; only case may vary
 	}
-	if len(cleaned) != 64 {
-		return strings.ToUpper(strings.TrimSpace(fp))
+	raw, err := hex.DecodeString(fp) // guaranteed 64 hex chars
+	if err != nil || len(raw) != sha256.Size {
+		logging.WithFields("fingerprint", fp).WithError(err).
+			Warn("stored android sha256 fingerprint is not canonical hex; serving as-is")
+		return strings.ToUpper(fp)
 	}
-	var b strings.Builder
-	b.Grow(95) // 64 hex chars + 31 colons
-	for i := 0; i < 64; i += 2 {
-		if i > 0 {
-			b.WriteByte(':')
-		}
-		b.Write(cleaned[i : i+2])
+	parts := make([]string, len(raw))
+	for i, b := range raw {
+		parts[i] = fmt.Sprintf("%02X", b)
 	}
-	return b.String()
+	return strings.Join(parts, ":")
 }
 
 func (h *Handler) writeJSON(w http.ResponseWriter, v any) {

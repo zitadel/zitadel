@@ -89,8 +89,8 @@ func TestBuildAssetLinks(t *testing.T) {
 				{
 					AndroidPackageName: "com.two",
 					AndroidSHA256CertFingerprints: []string{
-						"CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB",
-						"ee ff 00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff 00 11 22 33 44 55 66 77 88 99 aa bb cc dd",
+						"cc:dd:ee:ff:00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33:44:55:66:77:88:99:aa:bb",
+						"eeff00112233445566778899aabbccddeeff00112233445566778899aabbccdd",
 					},
 				},
 			},
@@ -142,17 +142,22 @@ func TestNormalizeSHA256Fingerprint(t *testing.T) {
 			want: "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
 		},
 		{
+			name: "lowercase with colons",
+			in:   "aa:bb:cc:dd:ee:ff:00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33:44:55:66:77:88:99",
+			want: "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+		},
+		{
 			name: "lowercase without separators",
 			in:   "aabbccddeeff00112233445566778899aabbccddeeff00112233445566778899",
 			want: "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
 		},
 		{
-			name: "mixed case with spaces",
-			in:   "aa bb cc dd ee ff 00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF 00 11 22 33 44 55 66 77 88 99",
-			want: "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+			name: "invalid continuous hex uppercased",
+			in:   "aabb",
+			want: "AABB",
 		},
 		{
-			name: "invalid length uppercased",
+			name: "colon form uppercased without reparse",
 			in:   "aa:bb",
 			want: "AA:BB",
 		},
