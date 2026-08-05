@@ -58,11 +58,28 @@ func VerifyUser(username, password string) func(context.Context, *database.DB) e
 			logging.Info(ctx, "config.database.postgres.user.username is same as config.database.postgres.admin.username, skipping create user", "username", username)
 			return nil
 		}
-		logging.Info(ctx, "verify user", "username", username)
-		if password != "" {
-			createUserStmt += " WITH PASSWORD '" + password + "'"
+
+		// Check if the role already exists in the catalog before attempting CREATE USER.
+		// This avoids PostgreSQL logging the full CREATE USER statement (including the
+		// plaintext password) when the role already exists on re-deploy / re-init.
+		var exists bool
+		err = db.QueryRowContext(ctx, func(r *sql.Row) error {
+			return r.Scan(&exists)
+		}, "SELECT EXISTS(SELECT 1 FROM pg_roles WHERE rolname = $1)", username)
+		if err != nil {
+			return fmt.Errorf("unable to check if user exists: %w", err)
+		}
+		if exists {
+			logging.Info(ctx, "user already exists, skipping creation", "username", username)
+			return nil
 		}
 
-		return exec(ctx, db, fmt.Sprintf(createUserStmt, username), []string{roleAlreadyExistsCode})
+		logging.Info(ctx, "verify user", "username", username)
+		stmt := createUserStmt
+		if password != "" {
+			stmt += " WITH PASSWORD '" + password + "'"
+		}
+
+		return exec(ctx, db, fmt.Sprintf(stmt, username), []string{roleAlreadyExistsCode})
 	}
 }
