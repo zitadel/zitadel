@@ -1,0 +1,1418 @@
+Errors:
+  Internal: "S'ha produït un error intern"
+  NoChangesFound: "Sense canvis"
+  OriginNotAllowed: "Aquest \"Origen\" no està permès"
+  IDMissing: "Falta l'ID"
+  ResourceOwnerMissing: "Falta el propietari del recurs de l'organització"
+  RemoveFailed: "No s'ha pogut eliminar"
+  ProjectionName:
+    Invalid: "Nom de projecte no vàlid"
+  Assets:
+    EmptyKey: "La clau de l'actiu està buida"
+    Store:
+      NotInitialized: "Emmagatzematge d'actius no inicialitzat"
+      NotConfigured: "Emmagatzematge d'actius no configurat"
+    Bucket:
+      Internal: "Error intern en crear el bucket"
+      AlreadyExists: "El bucket ja existeix"
+      CreateFailed: "El bucket no s'ha creat"
+      ListFailed: "No s'han pogut llegir els buckets"
+      RemoveFailed: "El bucket no s'ha esborrat"
+      SetPublicFailed: "No he pogut posar el bucket com a públic"
+    Object:
+      PutFailed: "Objecte no creat"
+      GetFailed: "L'objecte no s'ha pogut llegir"
+      NotFound: "L'objecte no s'ha pogut trobar"
+      PresignedTokenFailed: "El token signat no s'ha pogut crear"
+      ListFailed: "La llista d'objectes no s'ha pogut llegir"
+      RemoveFailed: "L'objecte no s'ha pogut eliminar"
+  Limit:
+    ExceedsDefault: "El límit excedeix el límit per defecte"
+  Limits:
+    NotFound: "Límit no trobat"
+    NoneSpecified: "No s'han especificat límits"
+    Instance:
+      Blocked: "La instància està bloquejada"
+  Restrictions:
+    NoneSpecified: "No s'han especificat restriccions"
+    DefaultLanguageMustBeAllowed: "L'idioma per defecte ha d'estar permès"
+  Language:
+    NotParsed: "No he pogut analitzar l'idioma"
+    NotSupported: "L'idioma no està suportat"
+    NotAllowed: "L'idioma no està permès"
+    Undefined: "L'idioma no està definit"
+    Duplicate: "Idiomes duplicats"
+  OIDCSettings:
+    NotFound: "Configuració OIDC no trobada"
+    AlreadyExists: "La configuració OIDC ja existeix"
+  SecretGenerator:
+    AlreadyExists: "El generador del secret ja existeix"
+    TypeMissing: "Falta el tipus de generador del secret"
+    NotFound: "El generador del secret no s'ha trobat"
+  SMSConfig:
+    NotFound: "configuració SMS no trobada"
+    AlreadyActive: "la configuració SMS ja està activa"
+    AlreadyDeactivated: "la configuració SMS ja està desactivada"
+  SMTP:
+    NotEmailMessage: "el missatge no és EmailMessage"
+    RequiredAttributes: "Cal configurar l'assumpte, els destinataris i el contingut, però alguns o tots estan buits."
+    CouldNotSplit: "No s'ha pogut dividir l'amfitrió i el port per connectar-se a SMTP"
+    CouldNotDial: "No s'ha pogut contactar amb el servidor SMTP, comprova el port, problemes amb el tallafoc..."
+    CouldNotDialTLS: "No s'ha pogut contactar amb el servidor SMTP fent servir TLS, comprova el port, problemes amb el tallafoc..."
+    CouldNotCreateClient: "no s'ha pogut crear el client smtp"
+    CouldNotStartTLS: "no s'ha pogut iniciar TLS"
+    CouldNotAuth: "no s'ha pogut afegir l'autenticació smtp, comprova si tant el teu usuari com la teva contrasenya són correctes, si són correctes potser el teu proveïdor requereix un mètode d'autenticació no admès per Zitadel"
+    CouldNotSetSender: "no s'ha pogut configurar el remitent"
+    CouldNotSetRecipient: "No s'ha pogut establir el destinatari"
+  SMTPConfig:
+    TestPassword: "Contrasenya per a la prova no trobada"
+    NotFound: "configuració SMTP no trobada"
+    AlreadyExists: "la configuració SMTP ja existeix"
+    AlreadyDeactivated: "la configuració SMTP ja està desactivada"
+    SenderAdressNotCustomDomain: "L'adreça del remitent s'ha de configurar com un domini personalitzat a la instància."
+    TestEmailNotFound: "Adreça de correu electrònic per a la prova no trobada"
+  Notification:
+    NoDomain: "No s'ha trobat el domini per al missatge"
+  User:
+    NotFound: "L'usuari no s'ha pogut trobar"
+    AlreadyExists: "L'usuari ja existeix"
+    NotFoundOnOrg: "L'usuari no s'ha pogut trobar a l'organització escollida"
+    NotAllowedOrg: "L'usuari no és membre de l'organització requerida"
+    UserIDMissing: "Falta l'ID d'usuari"
+    UserIDWrong: "Sol·licitud d'usuari no igual a l'usuari autenticat"
+    DomainPolicyNil: "Falta la política de l'organització"
+    EmailAsUsernameNotAllowed: "L'adreça de correu electrònic no es permet com a nom d'usuari"
+    Invalid: "Les dades d'usuari no són vàlides"
+    DomainNotAllowedAsUsername: "El domini ja està reservat i no s'ha pogut fer servir"
+    AlreadyInactive: "L'usuari ja està inactiu"
+    NotInactive: "L'usuari no està inactiu"
+    CantDeactivateInitial: "Un usuari amb estat inicial només es pot esborrar però no desactivar"
+    ShouldBeActiveOrInitial: "L'usuari no està actiu ni en l'estat inicial"
+    AlreadyInitialised: "L'usuari ja està inicialitzat"
+    NotInitialised: "L'usuari encara no està inicialitzat"
+    NotLocked: "L'usuari no està bloquejat"
+    NoChanges: "No s'han trobat canvis"
+    InitCodeNotFound: "Codi d'inicialització no trobat"
+    UsernameNotChanged: "El nom d'usuari no ha canviat"
+    InvalidURLTemplate: "La plantilla URL no és vàlida"
+    Locked: "L'usuari està bloquejat"
+    Profile:
+      NotFound: "Perfil no trobat"
+      NotChanged: "El perfil no ha canviat"
+      Empty: "El perfil està buit"
+      FirstNameEmpty: "El nom en el perfil està buit"
+      LastNameEmpty: "Els cognoms en el perfil estan buits"
+      IDMissing: "Falta l'ID del perfil"
+    Email:
+      NotFound: "Correu electrònic no trobat"
+      Invalid: "El correu electrònic no és vàlid"
+      AlreadyVerified: "El correu electrònic ja està verificat"
+      NotChanged: "El correu electrònic no ha canviat"
+      Empty: "El correu electrònic no està buit"
+      IDMissing: "Falta l'ID del correu electrònic"
+    Phone:
+      NotFound: "Telèfon no trobat"
+      Invalid: "El telèfon no és vàlid"
+      AlreadyVerified: "El telèfon ja s'ha verificat"
+      Empty: "El telèfon està buit"
+      NotChanged: "El telèfon no ha canviat"
+      VerifyingRemovalIsNotSupported: "La verificació d'eliminació no està suportada"
+    Address:
+      NotFound: "Adreça no trobada"
+      NotChanged: "L'adreça no ha canviat"
+    Machine:
+      Key:
+        NotFound: "Clau de màquina no trobada"
+        AlreadyExisting: "La clau de màquina ja existeix"
+        Invalid: "La clau pública no és una clau pública RSA vàlida en format PKIX amb codificació PEM"
+      Secret:
+        NotExisting: "El secret no existeix"
+        Invalid: "El secret no és vàlid"
+        CouldNotGenerate: "No s'ha pogut generar el secret"
+    PAT:
+      NotFound: "Token d'accés personal no trobat"
+    Metadata:
+      Conflicting: "Les metadades no s'han de definir simultàniament als camps [user] i [human]"
+    NotHuman: "L'usuari ha de ser personal"
+    NotMachine: "L'usuari ha de ser tècnic"
+    WrongType: "Tipus d'usuari no permès"
+    NotAllowedToLink: "L'usuari no està autoritzat a vincular-se amb un proveïdor d'inici de sessió extern"
+    Username:
+      AlreadyExists: "L'usuari ja existeix"
+      Reserved: "El nom d'usuari ja està en ús"
+      Empty: "El nom d'usuari està buit"
+    Code:
+      Empty: "El codi està buit"
+      NotFound: "Codi no trobat"
+      Expired: "El codi ha caducat"
+      GeneratorAlgNotSupported: "Algoritme generador no suportat"
+      Invalid: "El codi no és vàlid"
+    Password:
+      NotFound: "Contrasenya no trobada"
+      Empty: "La contrasenya està buida"
+      Invalid: "La contrasenya no és vàlida"
+      NotSet: "L'usuari no ha establert cap contrasenya"
+      NotChanged: "La nova contrasenya no pot coincidir amb la contrasenya actual"
+      NotSupported: "No s'admet la codificació hash de contrasenya. Consulta https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"
+    PasswordComplexityPolicy:
+      NotFound: "Política de contrasenyes no trobada"
+      MinLength: "La contrasenya és massa curta"
+      MinLengthNotAllowed: "La longitud mínima proporcionada no està permesa"
+      HasLower: "La contrasenya ha de contenir lletres minúscules"
+      HasUpper: "La contrasenya ha de contenir lletres majúscules"
+      HasNumber: "La contrasenya ha de contenir números"
+      HasSymbol: "La contrasenya ha de contenir símbols"
+    ExternalIDP:
+      Invalid: "IDP extern no vàlid"
+      IDPConfigNotExisting: "Proveïdor IDP no vàlid per a aquesta organització"
+      NotAllowed: "IDP extern no permès"
+      MinimumExternalIDPNeeded: "Cal afegir com a mínim un IDP"
+      AlreadyExists: "L'IDP extern ja està en ús"
+      NotFound: "IDP no trobat"
+      LoginFailed: "Error d'inici de sessió a l'IDP extern"
+    MFA:
+      OTP:
+        AlreadyReady: "El multifactor OTP (OneTimePassword) ja està configurat"
+        NotExisting: "El multifactor OTP (OneTimePassword) no existeix"
+        NotReady: "El multifactor OTP (OneTimePassword) no està a punt"
+        InvalidCode: "Codi no vàlid"
+      U2F:
+        NotExisting: "U2F no existeix"
+      Passwordless:
+        NotExisting: "No existeix l'inici sense contrasenya"
+      RecoveryCodes:
+        InvalidCode: "S'ha proporcionat un codi de recuperació no vàlid"
+        MaxCountExceeded: "S'ha excedit el nombre màxim de codis de recuperació"
+        NotReady: "Els codis de recuperació no estan a punt per fer-se servir"
+        ConfigInvalid: "La configuració de codis de recuperació no és vàlida"
+    WebAuthN:
+      NotFound: "No s'ha pogut trobar cap token WebAuthN"
+      BeginRegisterFailed: "L'inici del registre WebAuthN ha fallat"
+      MarshalError: "Error en la presentació de les dades"
+      ErrorOnParseCredential: "Error en analitzar les dades de les credencials"
+      CreateCredentialFailed: "Error en crear les credencials"
+      BeginLoginFailed: "L'inici de sessió amb WebAuthN ha fallat"
+      ValidateLoginFailed: "Error en validar les credencials d'inici de sessió"
+      CloneWarning: "Les credencials podrien clonar-se"
+    RefreshToken:
+      Invalid: "El token de refresc no és vàlid"
+      NotFound: "No s'ha trobat el token de refresc"
+  Org:
+    AlreadyExists: "El nom o l'ID de l'organització ja està en ús"
+    Invalid: "El nom de l'organització no és vàlid"
+    AlreadyDeactivated: "L'organització ja està desactivada"
+    AlreadyActive: "L'organització ja està activada"
+    Empty: "L'organització està buida"
+    NotFound: "Organització no trobada"
+    NotChanged: "L'organització no ha canviat"
+    DefaultOrgNotDeletable: "L'organització per defecte no s'ha d'esborrar"
+    ZitadelOrgNotDeletable: "L'organització que conté el projecte Zitadel no s'ha d'esborrar"
+    InvalidDomain: "Domini no vàlid"
+    DomainMissing: "Falta el domini"
+    DomainNotOnOrg: "El domini no existeix a l'organització"
+    DomainNotVerified: "El domini no està verificat"
+    DomainAlreadyVerified: "El domini ja està verificat"
+    DomainVerificationTypeInvalid: "El tipus de verificació del domini no és vàlid"
+    DomainVerificationMissing: "La verificació del domini no ha començat"
+    DomainVerificationFailed: "La verificació del domini ha fallat"
+    DomainVerificationTXTNotFound: "No s'ha trobat el registre TXT _zitadel-challenge per al teu domini. Comprova que l'hagis afegit al teu servidor DNS o espera fins que es propagui el nou registre"
+    DomainVerificationTXTNoMatch: "S'ha trobat el registre TXT _zitadel-challenge per al teu domini, però no conté el text del token correcte. Comprova que hagis afegit el token correcte al teu servidor DNS o espera fins que es propagui el nou registre"
+    DomainVerificationHTTPNotFound: "El fitxer que conté el desafiament no s'ha trobat a la URL esperada. Comprova que hagis pujat el fitxer al lloc correcte amb permisos de lectura."
+    DomainVerificationHTTPNoMatch: "El fitxer que conté el desafiament s'ha trobat a la URL esperada, però no conté el text del token correcte. Consulta'n el contingut"
+    DomainVerificationTimeout: "S'ha superat el temps d'espera en consultar el servidor DNS."
+    PrimaryDomainNotDeletable: "El domini de l'organització no s'ha d'esborrar"
+    DomainNotFound: "Domini no trobat"
+    MemberIDMissing: "Falta l'ID del membre"
+    MemberNotFound: "Membre de l'organització no trobat"
+    InvalidMember: "El membre de l'organització no és vàlid"
+    UserIDMissing: "Falta l'ID d'usuari"
+    PolicyAlreadyExists: "La política ja existeix"
+    PolicyNotExisting: "La política no existeix"
+    IdpInvalid: "La configuració IDP no és vàlida"
+    IdpNotExisting: "La configuració IDP no existeix"
+    OIDCConfigInvalid: "La configuració OIDC IDP no és vàlida"
+    IdpIsNotOIDC: "La configuració IDP no és del tipus OIDC"
+    Domain:
+      AlreadyExists: "El domini ja existeix"
+      InvalidCharacter: "Només es permeten caràcters alfanumèrics, . i - per a un domini"
+      EmptyString: "Els caràcters alfabètics i no numèrics no vàlids s'han substituït per espais buits i el domini resultant és una cadena buida"
+    LoginPolicy:
+      NotFound: "Política d'inici de sessió no trobada"
+      Invalid: "La política d'inici de sessió no és vàlida"
+      RedirectURIInvalid: "La URI de redirecció per defecte no és vàlida"
+      NotExisting: "La política d'inici de sessió no existeix"
+      AlreadyExists: "La política d'inici de sessió ja existeix"
+      IdpProviderAlreadyExisting: "El proveïdor d'identitat (IDP) ja existeix"
+      IdpProviderNotExisting: "El proveïdor d'identitat (IDP) no existeix"
+      RegistrationNotAllowed: "El registre no està permès"
+      UsernamePasswordNotAllowed: "L'inici de sessió amb nom d'usuari / contrasenya no està permès"
+      MFA:
+        AlreadyExists: "El multifactor ja existeix"
+        NotExisting: "El multifactor no existeix"
+        Unspecified: "Multifactor no vàlid"
+    MailTemplate:
+      NotFound: "Plantilla de correu per defecte no trobada"
+      NotChanged: "La plantilla de correu per defecte no ha canviat"
+      AlreadyExists: "La plantilla de correu per defecte ja existeix"
+      Invalid: "La plantilla de correu per defecte no és vàlida"
+    CustomMessageText:
+      NotFound: "Text de missatge per defecte no trobat"
+      NotChanged: "El text de missatge per defecte no ha canviat"
+      AlreadyExists: "El text de missatge per defecte ja existeix"
+      Invalid: "El text de missatge per defecte no és vàlid"
+    PasswordComplexityPolicy:
+      NotFound: "Política de complexitat de la contrasenya no trobada"
+      Empty: "La política de complexitat de la contrasenya està buida"
+      NotExisting: "La política de complexitat de la contrasenya no existeix"
+      AlreadyExists: "La política de complexitat de la contrasenya ja existeix"
+    PasswordLockoutPolicy:
+      NotFound: "Política de bloqueig de la contrasenya no trobada"
+      Empty: "La política de bloqueig de la contrasenya està buida"
+      NotExisting: "La política de bloqueig de la contrasenya no existeix"
+      AlreadyExists: "La política de bloqueig de la contrasenya ja existeix"
+    PasswordAgePolicy:
+      NotFound: "Política d'antiguitat de la contrasenya no trobada"
+      Empty: "La política d'antiguitat de la contrasenya està buida"
+      NotExisting: "La política d'antiguitat de la contrasenya no existeix"
+      AlreadyExists: "La política d'antiguitat de la contrasenya ja existeix"
+    NotificationPolicy:
+      NotFound: "Política de notificació no trobada"
+      NotChanged: "La política de notificació no ha canviat"
+      AlreadyExists: "La política de notificació ja existeix"
+    LabelPolicy:
+      NotFound: "Política d'etiqueta privada no trobada"
+      NotChanged: "La política d'etiqueta privada no ha canviat"
+    IDPConfig:
+      NotExisting: "La configuració de proveïdor d'identitat (IDP) no existeix"
+  Project:
+    ProjectIDMissing: "Falta l'Id del projecte"
+    AlreadyExists: "El projecte ja existeix a l'organització"
+    OrgNotExisting: "L'organització no existeix"
+    UserNotExisting: "L'usuari no existeix"
+    CouldNotGenerateClientSecret: "No s'ha pogut generar el secret del client"
+    Invalid: "El projecte no és vàlid"
+    NotActive: "El projecte no està actiu"
+    NotInactive: "El projecte no està desactivat"
+    NotFound: "No s'ha trobat el projecte"
+    UserIDMissing: "Falta l'ID d'usuari"
+    Member:
+      NotFound: "Membre del projecte no trobat"
+      Invalid: "El membre del projecte no és vàlid"
+      AlreadyExists: "El membre del projecte ja existeix"
+      NotExisting: "El membre del projecte no existeix"
+    MinimumOneRoleNeeded: "Com a mínim s'ha d'afegir un rol"
+    Role:
+      AlreadyExists: "El rol ja existeix"
+      Invalid: "El rol no és vàlid"
+      NotExisting: "El rol no existeix"
+    IDMissing: "Falta l'ID"
+    App:
+      AlreadyExists: "L'aplicació ja existeix"
+      NotFound: "Aplicació no trobada"
+      Invalid: "Aplicació no vàlida"
+      NotExisting: "L'aplicació no existeix"
+      NotActive: "L'aplicació no està activa"
+      NotInactive: "L'aplicació no està inactiva"
+      OIDCConfigInvalid: "La configuració OIDC no és vàlida"
+      APIConfigInvalid: "La configuració API no és vàlida"
+      SAMLConfigInvalid: "La configuració SAML no és vàlida"
+      IsNotOIDC: "L'aplicació no és del tipus OIDC"
+      IsNotAPI: "L'aplicació no és del tipus API"
+      IsNotSAML: "L'aplicació no és del tipus SAML"
+      SAMLMetadataMissing: "Falten metadades SAML"
+      SAMLMetadataFormat: "Error en el format de les metadades SAML"
+      SAMLEntityIDAlreadyExisting: "SAML EntityID ja existeix"
+      OIDCAuthMethodNoSecret: "El mètode d'autenticació OIDC escollit no requereix un secret"
+      APIAuthMethodNoSecret: "El mètode d'autenticació d'API escollit no requereix un secret"
+      AuthMethodNoPrivateKeyJWT: "El mètode d'autenticació escollit no requereix una clau"
+      ClientSecretInvalid: "El secret del client no és vàlid"
+      Key:
+        AlreadyExisting: "La clau de l'aplicació ja existeix"
+        NotFound: "Clau de l'aplicació no trobada"
+    RequiredFieldsMissing: "Falten alguns camps requerits"
+    Grant:
+      AlreadyExists: "La concessió del projecte ja existeix"
+      NotFound: "Concessió del projecte no trobada"
+      Invalid: "La concessió del projecte no és vàlida"
+      NotExisting: "La concessió del projecte no existeix"
+      HasNotExistingRole: "Un rol no existeix en el projecte"
+      NotActive: "La concessió del projecte no està activa"
+      NotInactive: "La concessió del projecte no està inactiva"
+  Instance:
+    AlreadyExists: "La instància ja existeix"
+    NotChanged: "La instància no ha canviat"
+    NotFound: "Instància no trobada. Assegura't que tens el domini correcte. Consulta https://zitadel.com/docs/apis/introduction#domains"
+    Member:
+      RolesNotChanged: "Els rols no han canviat"
+    MemberInvalid: "El membre no és vàlid"
+    MemberAlreadyExisting: "El membre ja existeix"
+    MemberNotExisting: "El membre no existeix"
+    IDMissing: "Falta l'Id"
+    IdpInvalid: "La configuració IDP no és vàlida"
+    IdpNotExisting: "La configuració IDP no existeix"
+    OIDCConfigInvalid: "La configuració OIDC IDP no és vàlida"
+    IdpIsNotOIDC: "La configuració IDP no és del tipus OIDC"
+    LoginPolicyInvalid: "La política d'inici de sessió no és vàlida"
+    LoginPolicyNotExisting: "La política d'inici de sessió no existeix"
+    IdpProviderInvalid: "El proveïdor d'identitat no és vàlid"
+    LoginPolicy:
+      NotFound: "Política d'inici de sessió per defecte no trobada"
+      NotChanged: "La política d'inici de sessió per defecte no ha canviat"
+      NotExisting: "La política d'inici de sessió per defecte no existeix"
+      AlreadyExists: "La política d'inici de sessió per defecte ja existeix"
+      RedirectURIInvalid: "L'URI de redirecció no és vàlida"
+      MFA:
+        AlreadyExists: "El Multifactor ja existeix"
+        NotExisting: "El Multifactor no existeix"
+        Unspecified: "El Multifactor no és vàlid"
+      IDP:
+        AlreadyExists: "El proveïdor d'identitat ja existeix"
+        NotExisting: "El proveïdor d'identitat no existeix"
+        Invalid: "El proveïdor d'identitat no és vàlid"
+      IDPConfig:
+        AlreadyExists: "La configuració del proveïdor d'identitat ja existeix"
+        NotInactive: "La configuració del proveïdor d'identitat no està inactiva"
+        NotActive: "La configuració del proveïdor d'identitat no està activa"
+    LabelPolicy:
+      NotFound: "Política d'etiqueta de privacitat per defecte no trobada"
+      NotChanged: "Política d'etiqueta de privacitat per defecte no ha canviat"
+    MailTemplate:
+      NotFound: "Plantilla de correu per defecte no trobada"
+      NotChanged: "La plantilla de correu per defecte no ha canviat"
+      AlreadyExists: "La plantilla de correu per defecte ja existeix"
+      Invalid: "La plantilla de correu per defecte no és vàlida"
+    CustomMessageText:
+      NotFound: "Text del missatge per defecte no trobat"
+      NotChanged: "El text del missatge per defecte no ha canviat"
+      AlreadyExists: "El text del missatge per defecte ja existeix"
+      Invalid: "El text del missatge per defecte no és vàlid"
+    PasswordComplexityPolicy:
+      NotFound: "Política de complexitat de contrasenya per defecte no trobada"
+      NotExisting: "La política de complexitat de contrasenya per defecte no existeix"
+      AlreadyExists: "La política de complexitat de contrasenya per defecte ja existeix"
+      Empty: "La política de complexitat de contrasenya per defecte està buida"
+      NotChanged: "La política de complexitat de contrasenya per defecte no ha canviat"
+    PasswordAgePolicy:
+      NotFound: "Política d'antiguitat de contrasenya per defecte no trobada"
+      NotExisting: "La política d'antiguitat de contrasenya per defecte no existeix"
+      AlreadyExists: "La política d'antiguitat de contrasenya per defecte ja existeix"
+      Empty: "La política d'antiguitat de contrasenya per defecte està buida"
+      NotChanged: "La política d'antiguitat de contrasenya per defecte no ha canviat"
+    PasswordLockoutPolicy:
+      NotFound: "Política de bloqueig de contrasenya per defecte no trobada"
+      NotExisting: "La política de bloqueig de contrasenya per defecte no existeix"
+      AlreadyExists: "La política de bloqueig de contrasenya per defecte ja existeix"
+      Empty: "La política de bloqueig de contrasenya per defecte està buida"
+      NotChanged: "La política de bloqueig de contrasenya per defecte no ha canviat"
+    DomainPolicy:
+      NotFound: "Política d'IAM de l'organització no trobada"
+      Empty: "La política d'IAM de l'organització està buida"
+      NotExisting: "La política d'IAM de l'organització no existeix"
+      AlreadyExists: "La política d'IAM de l'organització ja existeix"
+      NotChanged: "La política d'IAM de l'organització no ha canviat"
+    NotificationPolicy:
+      NotFound: "Política de notificació per defecte no trobada"
+      NotChanged: "La política de notificació per defecte no ha canviat"
+      AlreadyExists: "La política de notificació per defecte ja existeix"
+  Policy:
+    AlreadyExists: "La política ja existeix"
+    Label:
+      Invalid:
+        PrimaryColor: "El color primari no és un valor de codi hex vàlid"
+        BackgroundColor: "El color de fons no és un valor de codi hex vàlid"
+        WarnColor: "El color d'advertiment no és un valor de codi hex vàlid"
+        FontColor: "El color de la font no és un valor de codi hex vàlid"
+        PrimaryColorDark: "El color primari (mode fosc) no és un valor de codi hex vàlid"
+        BackgroundColorDark: "El color de fons (mode fosc) no és un valor de codi hex vàlid"
+        WarnColorDark: "El color d'advertiment (mode fosc) no és un valor de codi hex vàlid"
+        FontColorDark: "El color de la font (mode fosc) no és un valor de codi hex vàlid"
+  UserGrant:
+    AlreadyExists: "La concessió d'usuari ja existeix"
+    NotFound: "Concessió d'usuari no trobada"
+    Invalid: "La concessió d'usuari no és vàlida"
+    NotChanged: "La concessió d'usuari no ha canviat"
+    IDMissing: "Falta l'Id"
+    NoPermissionForProject: "L'usuari no té permisos en aquest projecte"
+    RoleKeyNotFound: "Rol no trobat"
+  Member:
+    AlreadyExists: "El membre ja existeix"
+  IDPConfig:
+    AlreadyExists: "Ja existeix una configuració IDP amb aquest nom"
+    NotExisting: "La configuració de proveïdor d'identitat (IDP) no existeix"
+  Changes:
+    NotFound: "No s'ha trobat historial"
+    AuditRetention: "L'historial està fora de la retenció del registre d'auditoria"
+  Token:
+    NotFound: "Token no trobat"
+    Invalid: "Token no vàlid"
+  UserSession:
+    NotFound: "UserSession no trobada"
+  Key:
+    NotFound: "Clau no trobada"
+    ExpireBeforeNow: "La data de caducitat és al passat"
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: "El multifactor està configurat com a requerit, però no hi ha proveïdors possibles configurats. Si us plau, contacta amb l'administrador del sistema."
+  Step:
+    Started:
+      AlreadyExists: "El pas iniciat ja existeix"
+    Done:
+      AlreadyExists: "El pas fet ja existeix"
+  CustomText:
+    AlreadyExists: "El text personalitzat ja existeix"
+    Invalid: "El text personalitzat no és vàlid"
+    NotFound: "Text personalitzat no trobat"
+  TranslationFile:
+    ReadError: "Error en llegir el fitxer de traduccions"
+    MergeError: "El fitxer de traduccions no s'ha pogut fusionar amb les traduccions personalitzades"
+    NotFound: "El fitxer de traduccions no existeix"
+  Metadata:
+    NotFound: "Metadades no trobades"
+    NoData: "La llista de metadades està buida"
+    Invalid: "Les metadades no són vàlides"
+    KeyNotExisting: "Una o més claus no existeixen"
+  Action:
+    Invalid: "L'acció no és vàlida"
+    NotFound: "Acció no trobada"
+    NotActive: "L'acció no està activa"
+    NotInactive: "L'acció no està inactiva"
+    MaxAllowed: "No es permeten accions actives addicionals"
+    NotEnabled: "La funció \"Acció\" no està habilitada"
+  Flow:
+    FlowTypeMissing: "Falta el tipus de flux"
+    Empty: "El flux ja està buit"
+    WrongTriggerType: "El tipus d'activador no és vàlid"
+    NoChanges: "Sense canvis"
+    ActionIDsNotExist: "No existeixen IDs d'accions"
+  Query:
+    CloseRows: "La sentència SQL no s'ha pogut finalitzar"
+    SQLStatement: "La sentència SQL no s'ha pogut crear"
+    InvalidRequest: "La sol·licitud no és vàlida"
+    TooManyNestingLevels: "Massa nivells d'imbricació de consultes (màxim 20)"
+    LimitExceeded: "S'ha superat el límit de resultats"
+  Quota:
+    AlreadyExists: "La quota ja existeix per a aquesta unitat"
+    NotFound: "Quota no trobada per a aquesta unitat"
+    Invalid:
+      CallURL: "La URL de petició de quota no és vàlida"
+      Percent: "El percentatge de quota és menor que un"
+      Unimplemented: "Les quotes no s'han implementat per a aquesta unitat"
+      Amount: "La quantitat de quota és menor que un"
+      ResetInterval: "L'interval de restabliment de la quota és menor que un minut"
+      Noop: "Una quota il·limitada sense notificacions no té efecte"
+    Access:
+      Exhausted: "S'ha superat la quota per a sol·licituds no autenticades"
+    Execution:
+      Exhausted: "S'ha superat la quota de segons d'execució"
+  LogStore:
+    Access:
+      StorageFailed: "Ha fallat l'emmagatzematge del registre d'accés a la base de dades"
+      ScanFailed: "La consulta d'ús de les peticions autenticades ha fallat"
+    Execution:
+      StorageFailed: "Ha fallat l'emmagatzematge del registre d'execució d'accions a la base de dades"
+      ScanFailed: "La consulta d'ús dels segons d'execució d'accions ha fallat"
+  Session:
+    NotExisting: "La sessió no existeix"
+    Terminated: "La sessió ja ha finalitzat"
+    Expired: "La sessió ha expirat"
+    PositiveLifetime: "La durada de la sessió no ha de ser inferior a 0"
+    Token:
+      Invalid: "L'identificador de sessió no és vàlid"
+    WebAuthN:
+      NoChallenge: "Sessió sense desafiament WebAuthN"
+  Intent:
+    IDPMissing: "Falta IDP a la sol·licitud"
+    IDPInvalid: "IDP no vàlid per a la sol·licitud"
+    ResponseInvalid: "La resposta de l'IDP no és vàlida"
+    MissingSingleMappingAttribute: "No conté l'atribut d'assignació o té més d'un valor"
+    SuccessURLMissing: "Falta la URL d'èxit a la sol·licitud"
+    FailureURLMissing: "Falta la URL d'error a la sol·licitud"
+    StateMissing: "Falta un paràmetre d'estat a la sol·licitud"
+    NotStarted: "La intenció no s'ha iniciat o ja ha finalitzat"
+    NotSucceeded: "Intent fallit"
+    Expired: "La intenció ha expirat"
+    TokenCreationFailed: "Error en la creació del token"
+    InvalidToken: "El token de la intenció no és vàlid"
+    OtherUser: "Destinat a un altre usuari"
+  AuthRequest:
+    AlreadyExists: "Auth Request ja existeix"
+    NotExisting: "Auth Request no existeix"
+    WrongLoginClient: "Auth Request creat per un altre client d'inici de sessió"
+    AlreadyHandled: "Auth Request ja s'ha processat"
+  OIDCSession:
+    RefreshTokenInvalid: "El token de refresc no és vàlid"
+    Token:
+      Invalid: "El token no és vàlid"
+      Expired: "El token ha caducat"
+    InvalidClient: "El token no s'ha emès per a aquest client"
+  SAMLRequest:
+    AlreadyExists: "SAMLRequest ja existeix"
+    NotExisting: "SAMLRequest no existeix"
+    WrongLoginClient: "SAMLRequest creat per un altre client d'inici de sessió"
+    AlreadyHandled: "SAMLRequest ja s'ha processat"
+  SAMLSession:
+    InvalidClient: "SAMLResponse no s'ha emès per a aquest client"
+  DeviceAuth:
+    NotFound: "La sol·licitud d'autorització del dispositiu no existeix"
+    AlreadyHandled: "La sol·licitud d'autorització del dispositiu ja s'ha processat"
+  Feature:
+    NotExisting: "La característica no existeix"
+    TypeNotSupported: "El tipus de característica no és compatible"
+    InvalidValue: "Valor no vàlid per a aquesta característica"
+  Target:
+    Invalid: "L'objectiu no és vàlid"
+    NoTimeout: "L'objectiu no té temps d'espera"
+    InvalidURL: "L'objectiu té una URL no vàlida"
+    NotFound: "L'objectiu no s'ha trobat"
+    InvalidExpirationDate: "La data d'expiració de la clau ha de ser en el futur"
+    PublicKeyExpired: "La clau pública del destí ha expirat"
+    PublicKeyActive: "No es pot eliminar una clau pública activa del destí"
+    InvalidPublicKey: "La clau pública no és vàlida. Ha de ser una clau pública RSA o ECDSA codificada en PEM en format PKCS#8"
+  Execution:
+    ConditionInvalid: "La condició d'execució no és vàlida"
+    Invalid: "L'execució no és vàlida"
+    NotFound: "Execució no trobada"
+    IncludeNotFound: "Inclusió no trobada"
+    NoTargets: "No hi ha objectius definits"
+    Failed: "Execució fallida"
+    ResponseIsNotValidJSON: "La resposta no és un JSON vàlid"
+    MissingEncryptionKey: "Falta la clau de xifratge per a l'execució"
+  UserSchema:
+    NotEnabled: "La funció \"Esquema d'usuari\" no està habilitada"
+    Type:
+      Missing: "Falta el tipus d'esquema d'usuari"
+      AlreadyExists: "El tipus d'esquema d'usuari ja existeix"
+    Authenticator:
+      Invalid: "Tipus d'autenticador no vàlid"
+    NotActive: "Esquema d'usuari no actiu"
+    NotInactive: "Esquema d'usuari no inactiu"
+    NotExists: "L'esquema d'usuari no existeix"
+    ID:
+      Missing: "Falta l'ID de l'esquema d'usuari"
+    Invalid: "Esquema d'usuari no vàlid"
+    Data:
+      Invalid: "Dades no vàlides per a l'esquema d'usuari"
+  TokenExchange:
+    Token:
+      Missing: "Falta el token"
+      Invalid: "El token no és vàlid"
+      TypeMissing: "Falta el tipus de token"
+      TypeNotAllowed: "El tipus de token no està permès"
+      TypeNotSupported: "El tipus de token no és compatible"
+      NotForAPI: "Tokens suplantats no permesos per a API"
+    Impersonation:
+      PolicyDisabled: "La suplantació està desactivada a la política de seguretat de la instància."
+  WebKey:
+    ActiveDelete: "No es pot eliminar la clau web activa"
+    Config: "Configuració de clau web no vàlida"
+    Duplicate: "ID de clau web no únic"
+    NoActive: "No s'ha trobat cap clau web activa"
+    NotFound: "Clau web no trobada"
+  IDP:
+    InvalidSearchQuery: "Consulta de cerca no vàlida"
+    ClientIDMissing: "Falta ClientID"
+    TeamIDMissing: "Falta TeamID"
+    KeyIDMissing: "Falta KeyID"
+    PrivateKeyMissing: "Falta la clau privada"
+    InvalidPrivateKey: "Format de clau privada no vàlid"
+
+AggregateTypes:
+  action: "Acció"
+  instance: "Instància"
+  key_pair: "Parell de claus"
+  org: "Organització"
+  project: "Projecte"
+  user: "Usuari"
+  usergrant: "Concessió d'usuari"
+  quota: "Quota"
+  feature: "Característica"
+  target: "Objectiu"
+  execution: "Execució"
+  user_schema: "Esquema d'usuari"
+  auth_request: "Sol·licitud d'autenticació"
+  device_auth: "Autenticació de dispositiu"
+  idpintent: "Intent d'IDP"
+  limits: "Límits"
+  milestone: "Fita"
+  oidc_session: "Sessió OIDC"
+  restrictions: "Restriccions"
+  system: "Sistema"
+  session: "Sessió"
+  web_key: "Clau web"
+  saml_request: "Sol·licitud SAML"
+  saml_session: "Sessió SAML"
+EventTypes:
+  execution:
+    set: "Conjunt d'execució"
+    removed: "Execució eliminada"
+  target:
+    added: "Objectiu creat"
+    changed: "Objectiu canviat"
+    removed: "Objectiu eliminat"
+  user:
+    added: "Usuari afegit"
+    selfregistered: "L'usuari s'ha registrat ell mateix"
+    initialization:
+      code:
+        added: "Codi d'inicialització generat"
+        sent: "Codi d'inicialització enviat"
+      check:
+        succeeded: "Comprovació d'inicialització realitzada amb èxit"
+        failed: "La comprovació d'inicialització ha fallat"
+    token:
+      added: "Token d'accés creat"
+      v2.added: "Token d'accés creat"
+      removed: "Token d'accés eliminat"
+    impersonated: "Usuari suplantat"
+    username:
+      reserved: "Nom d'usuari reservat"
+      released: "Nom d'usuari alliberat"
+      changed: "Nom d'usuari canviat"
+    email:
+      reserved: "Adreça de correu electrònic reservada"
+      released: "Adreça de correu electrònic alliberada"
+      changed: "Adreça de correu electrònic modificada"
+      verified: "Adreça de correu electrònic verificada"
+      verification:
+        failed: "Error en la verificació de l'adreça de correu electrònic"
+      code:
+        added: "Codi de verificació d'adreça de correu electrònic generat"
+        sent: "Codi de verificació d'adreça de correu electrònic enviat"
+    machine:
+      added: "Usuari tècnic afegit"
+      changed: "Usuari tècnic modificat"
+      key:
+        added: "Clau afegida"
+        removed: "Clau eliminada"
+      secret:
+        set: "Secret establert"
+        updated: "Hash del secret actualitzat"
+        removed: "Secret eliminat"
+        check:
+          succeeded: "Comprovació del secret correcta"
+          failed: "Error en la comprovació del secret"
+    human:
+      added: "Persona afegida"
+      selfregistered: "Persona registrada per ella mateixa"
+      avatar:
+        added: "Avatar afegit"
+        removed: "Avatar eliminat"
+      initialization:
+        code:
+          added: "Codi d'inicialització generat"
+          sent: "Codi d'inicialització enviat"
+        check:
+          succeeded: "Comprovació d'inicialització correcta"
+          failed: "Comprovació d'inicialització fallida"
+      invite:
+        code:
+          added: "Codi d'invitació generat"
+          sent: "Codi d'invitació enviat"
+        check:
+          succeeded: "Comprovació d'invitació correcta"
+          failed: "Comprovació d'invitació fallida"
+      username:
+        reserved: "Nom d'usuari reservat"
+        released: "Nom d'usuari alliberat"
+      email:
+        changed: "Adreça de correu electrònic modificada"
+        verified: "Adreça de correu electrònic verificada"
+        verification:
+          failed: "Ha fallat la verificació de l'adreça de correu electrònic"
+        code:
+          added: "Codi de verificació de l'adreça de correu electrònic generat"
+          sent: "Codi de verificació de l'adreça de correu electrònic enviat"
+      password:
+        changed: "Contrasenya canviada"
+        code:
+          added: "Codi de contrasenya generat"
+          sent: "Codi de contrasenya enviat"
+        check:
+          succeeded: "Comprovació de contrasenya correcta"
+          failed: "Comprovació de contrasenya fallida"
+        change:
+          sent: "Canvi de contrasenya enviat"
+        hash:
+          updated: "Hash de contrasenya actualitzat"
+      externallogin:
+        check:
+          succeeded: "Inici de sessió extern correcte"
+      externalidp:
+        added: "IDP extern afegit"
+        removed: "IDP extern eliminat"
+        cascade:
+          removed: "IDP extern eliminat en cascada"
+        id:
+          migrated: "S'ha migrat l'ID d'usuari extern de l'IDP"
+      phone:
+        changed: "Número de telèfon modificat"
+        verified: "Número de telèfon verificat"
+        verification:
+          failed: "Verificació de número de telèfon fallida"
+        code:
+          added: "Codi de número de telèfon generat"
+          sent: "Codi de número de telèfon enviat"
+        removed: "Número de telèfon eliminat"
+      profile:
+        changed: "Perfil d'usuari modificat"
+      address:
+        changed: "Adreça d'usuari modificada"
+      mfa:
+        otp:
+          added: "Multifactor OTP afegit"
+          verified: "Multifactor OTP verificat"
+          removed: "Multifactor OTP eliminat"
+          check:
+            succeeded: "Comprovació de Multifactor OTP correcta"
+            failed: "Comprovació de Multifactor OTP fallida"
+          sms:
+            added: "Multifactor OTP SMS afegit"
+            removed: "Multifactor OTP SMS eliminat"
+            code:
+              added: "Codi Multifactor OTP SMS afegit"
+              sent: "Codi Multifactor OTP SMS enviat"
+            check:
+              succeeded: "Comprovació Multifactor OTP SMS correcta"
+              failed: "Comprovació Multifactor OTP SMS fallida"
+          email:
+            added: "Multifactor OTP email afegit"
+            removed: "Multifactor OTP email eliminat"
+            code:
+              added: "Codi Multifactor OTP email afegit"
+              sent: "Codi Multifactor OTP email enviat"
+            check:
+              succeeded: "Comprovació Multifactor OTP email correcta"
+              failed: "Comprovació Multifactor OTP email fallida"
+        u2f:
+          token:
+            added: "Multifactor U2F Token afegit"
+            verified: "Multifactor U2F Token verificat"
+            removed: "Multifactor U2F Token eliminat"
+            begin:
+              login: "Comprovació Multifactor U2F iniciada"
+            check:
+              succeeded: "Comprovació Multifactor U2F correcta"
+              failed: "Comprovació Multifactor U2F fallida"
+            signcount:
+              changed: "El checksum del token Multifactor U2F Token s'ha modificat"
+        init:
+          skipped: "Inicialització Multifactor omesa"
+      passwordless:
+        token:
+          added: "Token per a inici de sessió sense contrasenya afegit"
+          verified: "Token per a inici de sessió sense contrasenya verificat"
+          removed: "Token per a inici de sessió sense contrasenya eliminat"
+          begin:
+            login: "Comprovació d'inici de sessió sense contrasenya iniciada"
+          check:
+            succeeded: "Comprovació d'inici de sessió sense contrasenya correcta"
+            failed: "Comprovació d'inici de sessió sense contrasenya fallida"
+          signcount:
+            changed: "El checksum del token d'inici de sessió sense contrasenya s'ha modificat"
+        initialization:
+          code:
+            added: "Codi d'inicialització d'inici sense contrasenya afegit"
+            sent: "Codi d'inicialització d'inici sense contrasenya enviat"
+            requested: "Sol·licitat codi d'inicialització d'inici sense contrasenya"
+            check:
+              succeeded: "Comprovació del codi d'inicialització d'inici sense contrasenya correcta"
+              failed: "Comprovació del codi d'inicialització d'inici sense contrasenya fallida"
+      signed:
+        out: "L'usuari ha tancat la sessió"
+      refresh:
+        token:
+          added: "Token de refresc creat"
+          renewed: "Token de refresc renovat"
+          removed: "Token de refresc eliminat"
+    locked: "Usuari bloquejat"
+    unlocked: "Usuari desbloquejat"
+    deactivated: "Usuari desactivat"
+    reactivated: "Usuari reactivat"
+    removed: "Usuari eliminat"
+    password:
+      changed: "Contrasenya modificada"
+      code:
+        added: "Codi de contrasenya generat"
+        sent: "Codi de contrasenya enviat"
+      check:
+        succeeded: "Comprovació de contrasenya correcta"
+        failed: "Comprovació de contrasenya fallida"
+    phone:
+      changed: "Número de telèfon modificat"
+      verified: "Número de telèfon verificat"
+      verification:
+        failed: "Verificació del número de telèfon fallida"
+      code:
+        added: "Codi del número de telèfon generat"
+        sent: "Codi del número de telèfon enviat"
+      removed: "Codi del número de telèfon eliminat"
+    profile:
+      changed: "Perfil d'usuari modificat"
+    address:
+      changed: "Adreça d'usuari modificada"
+    mfa:
+      otp:
+        added: "Multifactor OTP afegit"
+        verified: "Multifactor OTP verificat"
+        removed: "Multifactor OTP eliminat"
+        check:
+          succeeded: "Comprovació Multifactor OTP correcta"
+          failed: "Comprovació Multifactor OTP fallida"
+        init:
+          skipped: "Inicialització Multifactor OTP omesa"
+      init:
+        skipped: "Inicialització Multifactor omesa"
+    signed:
+      out: "L'usuari ha tancat la sessió"
+    grant:
+      added: "Autorització afegida"
+      changed: "Autorització modificada"
+      removed: "Autorització eliminada"
+      deactivated: "Autorització desactivada"
+      reactivated: "Autorització reactivada"
+      reserved: "Autorització reservada"
+      released: "Autorització alliberada"
+      cascade:
+        removed: "Autorització eliminada"
+        changed: "Autorització modificada"
+    metadata:
+      set: "Metadades d'usuari establertes"
+      removed: "Metadades d'usuari eliminades"
+      removed.all: "Totes les metadades d'usuari eliminades"
+    domain:
+      claimed: "Domini reclamat"
+      claimed.sent: "Notificació de reclamació de domini enviada"
+    pat:
+      added: "Token d'accés personal afegit"
+      removed: "Token d'accés personal eliminat"
+  org:
+    added: "Organització afegida"
+    changed: "Organització modificada"
+    deactivated: "Organització desactivada"
+    reactivated: "Organització reactivada"
+    removed: "Organització eliminada"
+    domain:
+      added: "Domini afegit"
+      verification:
+        added: "Verificació del domini afegida"
+        failed: "Verificació del domini fallida"
+      verified: "Domini verificat"
+      removed: "Domini eliminat"
+      primary:
+        set: "Domini de l'organització establert"
+      reserved: "Domini reservat"
+      released: "Domini alliberat"
+    name:
+      reserved: "Nom d'organització reservat"
+      released: "Nom d'organització alliberat"
+    member:
+      added: "Membre d'organització afegit"
+      changed: "Membre d'organització modificat"
+      removed: "Membre d'organització eliminat"
+      cascade:
+        removed: "Membre d'organització eliminat en cascada"
+    iam:
+      policy:
+        added: "Política de sistema afegida"
+        changed: "Política de sistema modificada"
+        removed: "Política de sistema eliminada"
+    idp:
+      config:
+        added: "Configuració IDP afegida"
+        changed: "Configuració IDP modificada"
+        removed: "Configuració IDP eliminada"
+        deactivated: "Configuració IDP desactivada"
+        reactivated: "Configuració IDP reactivada"
+      oidc:
+        config:
+          added: "Configuració OIDC IDP afegida"
+          changed: "Configuració OIDC IDP modificada"
+      saml:
+        config:
+          added: "Configuració SAML IDP afegida"
+          changed: "Configuració SAML IDP modificada"
+      jwt:
+        config:
+          added: "Configuració JWT IDP afegida"
+          changed: "Configuració JWT IDP modificada"
+    customtext:
+      set: "Text personalitzat establert"
+      removed: "Text personalitzat eliminat"
+      template:
+        removed: "Plantilla de text personalitzat eliminada"
+    policy:
+      login:
+        added: "Política d'inici de sessió afegida"
+        changed: "Política d'inici de sessió modificada"
+        removed: "Política d'inici de sessió eliminada"
+        idpprovider:
+          added: "Proveïdor d'identitat afegit a la política d'inici de sessió"
+          removed: "Proveïdor d'identitat eliminat de la política d'inici de sessió"
+          cascade:
+            removed: "Proveïdor d'identitat eliminat en cascada de la política d'inici de sessió"
+        secondfactor:
+          added: "Doble factor afegit a la política d'inici de sessió"
+          removed: "Doble factor eliminat de la política d'inici de sessió"
+        multifactor:
+          added: "Multi-factor afegit a la política d'inici de sessió"
+          removed: "Multi-factor eliminat de la política d'inici de sessió"
+      password:
+        complexity:
+          added: "Política de complexitat de la contrasenya afegida"
+          changed: "Política de complexitat de la contrasenya modificada"
+          removed: "Política de complexitat de la contrasenya eliminada"
+        age:
+          added: "Política d'antiguitat de contrasenya afegida"
+          changed: "Política d'antiguitat de contrasenya modificada"
+          removed: "Política d'antiguitat de contrasenya eliminada"
+        lockout:
+          added: "Política de bloqueig de contrasenya afegida"
+          changed: "Política de bloqueig de contrasenya modificada"
+          removed: "Política de bloqueig de contrasenya eliminada"
+      label:
+        added: "Política d'imatge de marca afegida"
+        changed: "Política d'imatge de marca modificada"
+        activated: "Política d'imatge de marca activada"
+        removed: "Política d'imatge de marca eliminada"
+        logo:
+          added: "Logo afegit a la política d'imatge de marca"
+          removed: "Logo eliminat de la política d'imatge de marca"
+          dark:
+            added: "Logo (mode fosc) afegit a la política d'imatge de marca"
+            removed: "Logo (mode fosc) eliminat de la política d'imatge de marca"
+        icon:
+          added: "Icona afegida a la política d'imatge de marca"
+          removed: "Icona eliminada de la política d'imatge de marca"
+          dark:
+            added: "Icona (mode fosc) afegida a la política d'imatge de marca"
+            removed: "Icona (mode fosc) eliminada de la política d'imatge de marca"
+        font:
+          added: "Tipus de lletra afegit a la política d'imatge de marca"
+          removed: "Tipus de lletra eliminat de la política d'imatge de marca"
+        assets:
+          removed: "Continguts eliminats de la política d'imatge de marca"
+      privacy:
+        added: "Política de privacitat i TDS afegits"
+        changed: "Política de privacitat i TDS modificats"
+        removed: "Política de privacitat i TDS eliminats"
+      domain:
+        added: "Política de domini afegida"
+        changed: "Política de domini modificada"
+        removed: "Política de domini eliminada"
+      lockout:
+        added: "Política de bloqueig afegida"
+        changed: "Política de bloqueig modificada"
+        removed: "Política de bloqueig eliminada"
+      notification:
+        added: "Política de notificació afegida"
+        changed: "Política de notificació modificada"
+        removed: "Política de notificació eliminada"
+    flow:
+      trigger_actions:
+        set: "Acció establerta"
+        cascade:
+          removed: "Accions eliminades en cascada"
+        removed: "Accions eliminades"
+      cleared: "S'ha netejat el flux"
+    mail:
+      template:
+        added: "Plantilla de correu electrònic afegida"
+        changed: "Plantilla de correu electrònic modificada"
+        removed: "Plantilla de correu electrònic eliminada"
+      text:
+        added: "Text de correu electrònic afegit"
+        changed: "Text de correu electrònic modificat"
+        removed: "Text de correu electrònic eliminat"
+    metadata:
+      removed: "Metadades eliminades"
+      removed.all: "S'han eliminat totes les metadades"
+      set: "Metadades establertes"
+  project:
+    added: "Projecte afegit"
+    changed: "Projecte modificat"
+    deactivated: "Projecte desactivat"
+    reactivated: "Projecte reactivat"
+    removed: "Projecte eliminat"
+    member:
+      added: "Membre del projecte afegit"
+      changed: "Membre del projecte modificat"
+      removed: "Membre del projecte eliminat"
+      cascade:
+        removed: "Membre del projecte eliminat en cascada"
+    role:
+      added: "Rol de projecte afegit"
+      changed: "Rol de projecte modificat"
+      removed: "Rol de projecte eliminat"
+    grant:
+      added: "Gestió d'accés afegida"
+      changed: "Gestió d'accés modificada"
+      removed: "Gestió d'accés eliminada"
+      deactivated: "Gestió d'accés desactivada"
+      reactivated: "Gestió d'accés reactivada"
+      cascade:
+        changed: "Gestió d'accés modificada en cascada"
+      member:
+        added: "Membre de gestió d'accés afegit"
+        changed: "Membre de gestió d'accés modificat"
+        removed: "Membre de gestió d'accés eliminat"
+        cascade:
+          removed: "Membre de gestió d'accés eliminat en cascada"
+    application:
+      added: "Aplicació afegida"
+      changed: "Aplicació modificada"
+      removed: "Aplicació eliminada"
+      deactivated: "Aplicació desactivada"
+      reactivated: "Aplicació reactivada"
+      oidc:
+        secret:
+          check:
+            succeeded: "Comprovació correcta del secret del client OIDC"
+            failed: "Comprovació fallida del secret del client OIDC"
+        key:
+          added: "OIDC App Key afegida"
+          removed: "OIDC App Key eliminada"
+      api:
+        secret:
+          check:
+            succeeded: "La verificació del secret d'API s'ha fet correctament"
+            failed: "Error en la comprovació del secret d'API"
+        key:
+          added: "Clau d'aplicació afegida"
+          removed: "Clau d'aplicació eliminada"
+      config:
+        saml:
+          added: "Configuració SAML afegida"
+          changed: "Configuració SAML modificada"
+        oidc:
+          added: "Configuració OIDC afegida"
+          changed: "Configuració OIDC modificada"
+          secret:
+            changed: "Secret OIDC modificat"
+            updated: "Hash del secret OIDC actualitzat"
+        api:
+          added: "Configuració API afegida"
+          changed: "Configuració API modificada"
+          secret:
+            changed: "Configuració de secret API modificada"
+            updated: "Hash del secret d'API actualitzat"
+  policy:
+    password:
+      complexity:
+        added: "Política de complexitat de contrasenya afegida"
+        changed: "Política de complexitat de contrasenya modificada"
+      age:
+        added: "Política d'antiguitat de contrasenya afegida"
+        changed: "Política d'antiguitat de contrasenya modificada"
+      lockout:
+        added: "Política de bloqueig de contrasenya afegida"
+        changed: "Política de bloqueig de contrasenya modificada"
+  iam:
+    setup:
+      started: "Configuració de Zitadel iniciada"
+      done: "Configuració de Zitadel finalitzada"
+    global:
+      org:
+        set: "Organització global configurada"
+    project:
+      iam:
+        set: "Projecte Zitadel configurat"
+    member:
+      added: "Membre de Zitadel afegit"
+      changed: "Membre de Zitadel modificat"
+      removed: "Membre de Zitadel eliminat"
+      cascade:
+        removed: "Membre de Zitadel eliminat en cascada"
+    idp:
+      config:
+        added: "Configuració IDP afegida"
+        changed: "Configuració IDP modificada"
+        removed: "Configuració IDP eliminada"
+        deactivated: "Configuració IDP desactivada"
+        reactivated: "Configuració IDP reactivada"
+      oidc:
+        config:
+          added: "Configuració OIDC d'IDP afegida"
+          changed: "Configuració OIDC d'IDP modificada"
+      saml:
+        config:
+          added: "Configuració SAML d'IDP afegida"
+          changed: "Configuració SAML d'IDP modificada"
+      jwt:
+        config:
+          added: "Configuració JWT d'IDP afegida"
+          changed: "Configuració JWT d'IDP modificada"
+    customtext:
+      set: "Text establert"
+      removed: "Text eliminat"
+    policy:
+      login:
+        added: "Política d'inici de sessió per defecte afegida"
+        changed: "Política d'inici de sessió per defecte modificada"
+        idpprovider:
+          added: "Proveïdor d'identitat afegit a la política d'inici de sessió per defecte"
+          removed: "Proveïdor d'identitat eliminat de la política d'inici de sessió per defecte"
+      label:
+        added: "Política d'imatge de marca afegida"
+        changed: "Política d'imatge de marca modificada"
+        activated: "Política d'imatge de marca activada"
+        logo:
+          added: "Logo afegit a la política d'imatge de marca"
+          removed: "Logo eliminat de la política d'imatge de marca"
+          dark:
+            added: "Logo (mode fosc) afegit a la política d'imatge de marca"
+            removed: "Logo (mode fosc) eliminat de la política d'imatge de marca"
+        icon:
+          added: "Icona afegida a la política d'imatge de marca"
+          removed: "Icona eliminada de la política d'imatge de marca"
+          dark:
+            added: "Icona (mode fosc) afegida a la política d'imatge de marca"
+            removed: "Icona (mode fosc) eliminada de la política d'imatge de marca"
+        font:
+          added: "Font afegida a la política d'imatge de marca"
+          removed: "Font eliminada de la política d'imatge de marca"
+        assets:
+          removed: "Continguts eliminats de la política d'imatge de marca"
+    default:
+      language:
+        set: "Idioma per defecte establert"
+    oidc:
+      settings:
+        added: "Configuració OIDC afegida"
+        changed: "Configuració OIDC modificada"
+        removed: "Configuració OIDC eliminada"
+    secret:
+      generator:
+        added: "Generador de secret afegit"
+        changed: "Generador de secret modificat"
+        removed: "Generador de secret eliminat"
+    smtp:
+      config:
+        added: "Configuració SMTP afegida"
+        changed: "Configuració SMTP modificada"
+        activated: "Configuració SMTP activada"
+        deactivated: "Configuració SMTP desactivada"
+        removed: "Configuració SMTP eliminada"
+        password:
+          changed: "Configuració de secret SMTP modificada"
+    sms:
+      config:
+        twilio:
+          added: "Proveïdor SMS Twilio afegit"
+          changed: "Proveïdor SMS Twilio modificat"
+          token:
+            changed: "Token de proveïdor SMS Twilio modificat"
+          removed: "Proveïdor SMS Twilio eliminat"
+          activated: "Proveïdor SMS Twilio activat"
+          deactivated: "Proveïdor SMS Twilio desactivat"
+  key_pair:
+    added: "Parell de claus afegit"
+    certificate:
+      added: "Certificat afegit"
+  action:
+    added: "Acció afegida"
+    changed: "Acció modificada"
+    deactivated: "Acció desactivada"
+    reactivated: "Acció reactivada"
+    removed: "Acció eliminada"
+  instance:
+    added: "Instància afegida"
+    changed: "Instància modificada"
+    customtext:
+      removed: "Text personalitzat eliminat"
+      set: "Text personalitzat establert"
+      template:
+        removed: "Plantilla de text personalitzat eliminada"
+    default:
+      language:
+        set: "S'ha establert l'idioma per defecte"
+      org:
+        set: "S'ha establert l'organització per defecte"
+    domain:
+      added: "Domini afegit"
+      primary:
+        set: "S'ha establert el domini primari"
+      removed: "Domini eliminat"
+    iam:
+      console:
+        set: "Aplicació de consola d'administració Zitadel configurada"
+      project:
+        set: "Projecte Zitadel configurat"
+    mail:
+      template:
+        added: "Plantilla de correu electrònic afegida"
+        changed: "Plantilla de correu electrònic modificada"
+      text:
+        added: "Text de correu electrònic afegit"
+        changed: "Text de correu electrònic modificat"
+    member:
+      added: "Membre d'instància afegit"
+      changed: "Membre d'instància modificat"
+      removed: "Membre d'instància eliminat"
+      cascade:
+        removed: "Membre d'instància eliminat en cascada"
+    notification:
+      provider:
+        debug:
+          fileadded: "Proveïdor de notificació de depuració de fitxer afegit"
+          filechanged: "Proveïdor de notificació de depuració de fitxer modificat"
+          fileremoved: "Proveïdor de notificació de depuració de fitxer eliminat"
+          logadded: "Proveïdor de notificació de depuració de log afegit"
+          logchanged: "Proveïdor de notificació de depuració de log modificat"
+          logremoved: "Proveïdor de notificació de depuració de log eliminat"
+    oidc:
+      settings:
+        added: "Configuració OIDC afegida"
+        changed: "Configuració OIDC modificada"
+    policy:
+      domain:
+        added: "Política de domini afegida"
+        changed: "Política de domini modificada"
+      label:
+        activated: "Política d'imatge de marca activada"
+        added: "Política d'imatge de marca afegida"
+        assets:
+          removed: "Contingut de la política d'imatge de marca eliminat"
+        changed: "Política d'imatge de marca modificada"
+        font:
+          added: "Font afegida a la política d'imatge de marca"
+          removed: "Font eliminada de la política d'imatge de marca"
+        icon:
+          added: "Icona afegida a la política d'imatge corporativa"
+          removed: "Icona eliminada de la política d'imatge corporativa"
+          dark:
+            added: "Icona (mode fosc) afegida a la política d'imatge corporativa"
+            removed: "Icona (mode fosc) eliminada de la política d'imatge corporativa"
+        logo:
+          added: "Logo afegit a la política d'imatge corporativa"
+          removed: "Logo eliminat de la política d'imatge corporativa"
+          dark:
+            added: "Logo (mode fosc) afegit a la política d'imatge corporativa"
+            removed: "Logo (mode fosc) eliminat de la política d'imatge corporativa"
+      lockout:
+        added: "Política de bloqueig afegida"
+        changed: "Política de bloqueig modificada"
+      login:
+        added: "Política d'inici de sessió afegida"
+        changed: "Política d'inici de sessió modificada"
+        idpprovider:
+          added: "Proveïdor d'identitat afegit a la política d'inici de sessió"
+          cascade:
+            removed: "Proveïdor d'identitat eliminat en cascada de la política d'inici de sessió"
+          removed: "Proveïdor d'identitat eliminat de la política d'inici de sessió"
+        multifactor:
+          added: "Multifactor afegit a la política d'inici de sessió"
+          removed: "Multifactor eliminat de la política d'inici de sessió"
+        secondfactor:
+          added: "Doble factor afegit a la política d'inici de sessió"
+          removed: "Doble factor eliminat de la política d'inici de sessió"
+      password:
+        age:
+          added: "Política d'antiguitat de contrasenya afegida"
+          changed: "Política d'antiguitat de contrasenya modificada"
+        complexity:
+          added: "Política de complexitat de contrasenya afegida"
+          changed: "Política de complexitat de contrasenya modificada"
+      privacy:
+        added: "Política de privacitat afegida"
+        changed: "Política de privacitat modificada"
+      security:
+        set: "Política de seguretat establerta"
+    removed: "Instància eliminada"
+    secret:
+      generator:
+        added: "Generador de secret afegit"
+        changed: "Generador de secret modificat"
+        removed: "Generador de secret eliminat"
+    sms:
+      configtwilio:
+        activated: "Configuració Twilio SMS activada"
+        added: "Configuració Twilio SMS afegida"
+        changed: "Configuració Twilio SMS modificada"
+        deactivated: "Configuració Twilio SMS desactivada"
+        removed: "Configuració Twilio SMS eliminada"
+        token:
+          changed: "Token de configuració Twilio SMS modificat"
+    smtp:
+      config:
+        added: "Configuració SMTP afegida"
+        changed: "Configuració SMTP modificada"
+        activated: "Configuració SMTP activada"
+        deactivated: "Configuració SMTP desactivada"
+        password:
+          changed: "Contrasenya de configuració SMTP modificada"
+        removed: "Configuració SMTP eliminada"
+  user_schema:
+    created: "Esquema d'usuari creat"
+    updated: "Esquema d'usuari actualitzat"
+    deactivated: "Esquema d'usuari desactivat"
+    reactivated: "Esquema d'usuari reactivat"
+    deleted: "Esquema d'usuari eliminat"
+    user:
+      created: "Usuari creat"
+      updated: "Usuari actualitzat"
+      deleted: "Usuari eliminat"
+      email:
+        updated: "Adreça de correu electrònic modificada"
+        verified: "Adreça de correu electrònic verificada"
+        verification:
+          failed: "Error en la verificació de l'adreça de correu electrònic"
+        code:
+          added: "Codi de verificació de l'adreça de correu electrònic generat"
+          sent: "Codi de verificació de l'adreça de correu electrònic enviat"
+      phone:
+        updated: "Número de telèfon modificat"
+        verified: "Número de telèfon verificat"
+        verification:
+          failed: "Error en la verificació del número de telèfon"
+        code:
+          added: "Codi de verificació del número de telèfon generat"
+          sent: "Codi de verificació del número de telèfon enviat"
+  web_key:
+    added: "Clau web afegida"
+    activated: "Clau web activada"
+    deactivated: "Clau web desactivada"
+    removed: "Clau web eliminada"
+Application:
+  OIDC:
+    UnsupportedVersion: "La teva versió d'OIDC no està suportada"
+    V1:
+      NotCompliant: "La teva configuració no compleix amb l'estàndard OIDC 1.0."
+      NoRedirectUris: "Com a mínim s'ha de registrar una URI de redirecció."
+      NotAllCombinationsAreAllowed: "La configuració compleix amb l'estàndard, però no totes les combinacions possibles estan permeses."
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: "El codi de tipus de concessió només permet URIs de redirecció http per al tipus d'aplicació web."
+          CustomOnlyForNative: "El codi de tipus de concessió només permet URIs de redirecció personalitzades per al tipus d'aplicació natiu (p. ex. appname:// )"
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: "El tipus de concessió implícit no permet URIs de redirecció personalitzades"
+          HttpNotAllowed: "El tipus de concessió implícit no permet URIs de redirecció http"
+          HttpLocalhostOnlyForNative: "La URI de redirecció http://localhost només es permet per a aplicacions natives."
+      Native:
+        AuthMethodType:
+          NotNone: "Les aplicacions natives haurien de tenir el tipus authmethodtype configurat a none."
+        RedirectUris:
+          MustBeHttpLocalhost: "Redirect URIs must begin with your own protocol, http://127.0.0.1, http://[::1] or http://localhost."
+      UserAgent:
+        AuthMethodType:
+          NotNone: "User agent app hauria de tenir el tipus authmethodtype configurat a none"
+      GrantType:
+        Refresh:
+          NoAuthCode: "El token de refresc només es permet en combinació amb el codi d'autorització."
+Action:
+  Flow:
+    Type:
+      Unspecified: "No especificat"
+      ExternalAuthentication: "Autenticació externa"
+      CustomiseToken: "Token complementari"
+      InternalAuthentication: "Autenticació interna"
+      CustomizeSAMLResponse: "SAMLResponse complementari"
+  TriggerType:
+    Unspecified: "No especificat"
+    PostAuthentication: "Post Autenticació"
+    PreCreation: "Pre Creació"
+    PostCreation: "Post Creació"
+    PreUserinfoCreation: "Pre creació d'Userinfo"
+    PreAccessTokenCreation: "Pre creació de token d'accés"
+    PreSAMLResponseCreation: "Creació prèvia de SAMLResponse"
