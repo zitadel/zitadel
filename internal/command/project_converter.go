@@ -52,11 +52,20 @@ func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.O
 		BackChannelLogoutURI:     gu.Ptr(writeModel.BackChannelLogoutURI),
 		LoginVersion:             gu.Ptr(writeModel.LoginVersion),
 		LoginBaseURI:             gu.Ptr(writeModel.LoginBaseURI),
-		IOSTeamID:                gu.Ptr(writeModel.IOSTeamID),
-		IOSBundleID:              gu.Ptr(writeModel.IOSBundleID),
-		AndroidPackageName:       gu.Ptr(writeModel.AndroidPackageName),
+		IOSTeamID:                emptyStringPtr(writeModel.IOSTeamID),
+		IOSBundleID:              emptyStringPtr(writeModel.IOSBundleID),
+		AndroidPackageName:       emptyStringPtr(writeModel.AndroidPackageName),
 		AndroidSHA256CertFingerprints: writeModel.AndroidSHA256CertFingerprints,
 	}
+}
+
+// emptyStringPtr returns nil for empty strings so unset app-link fields stay
+// distinguishable from explicitly set values in equality checks / APIs.
+func emptyStringPtr(s string) *string {
+	if s == "" {
+		return nil
+	}
+	return gu.Ptr(s)
 }
 
 func samlWriteModelToSAMLConfig(writeModel *SAMLApplicationWriteModel) *domain.SAMLApp {

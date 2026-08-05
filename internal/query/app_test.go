@@ -51,6 +51,10 @@ var (
 		` projections.apps7_oidc_configs.back_channel_logout_uri,` +
 		` projections.apps7_oidc_configs.login_version,` +
 		` projections.apps7_oidc_configs.login_base_uri,` +
+		` projections.apps7_oidc_configs.ios_team_id,` +
+		` projections.apps7_oidc_configs.ios_bundle_id,` +
+		` projections.apps7_oidc_configs.android_package_name,` +
+		` projections.apps7_oidc_configs.android_sha256_cert_fingerprints,` +
 		//saml config
 		` projections.apps7_saml_configs.app_id,` +
 		` projections.apps7_saml_configs.entity_id,` +
@@ -99,6 +103,10 @@ var (
 		` projections.apps7_oidc_configs.back_channel_logout_uri,` +
 		` projections.apps7_oidc_configs.login_version,` +
 		` projections.apps7_oidc_configs.login_base_uri,` +
+		` projections.apps7_oidc_configs.ios_team_id,` +
+		` projections.apps7_oidc_configs.ios_bundle_id,` +
+		` projections.apps7_oidc_configs.android_package_name,` +
+		` projections.apps7_oidc_configs.android_sha256_cert_fingerprints,` +
 		//saml config
 		` projections.apps7_saml_configs.app_id,` +
 		` projections.apps7_saml_configs.entity_id,` +
@@ -172,6 +180,10 @@ var (
 		"back_channel_logout_uri",
 		"login_version",
 		"login_base_uri",
+		"ios_team_id",
+		"ios_bundle_id",
+		"android_package_name",
+		"android_sha256_cert_fingerprints",
 		//saml config
 		"app_id",
 		"entity_id",
@@ -248,7 +260,11 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							nil,
 							nil,
 							nil,
@@ -319,7 +335,11 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							nil,
 							nil,
 							nil,
@@ -393,7 +413,11 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							"app-id",
 							"https://test.com/saml/metadata",
 							[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
@@ -469,7 +493,11 @@ func Test_AppsPrepare(t *testing.T) {
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
 							nil,
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							nil,
 							nil,
 							nil,
@@ -563,7 +591,11 @@ func Test_AppsPrepare(t *testing.T) {
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
 							nil,
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							nil,
 							nil,
 							nil,
@@ -657,7 +689,11 @@ func Test_AppsPrepare(t *testing.T) {
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
 							nil,
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							nil,
 							nil,
 							nil,
@@ -751,7 +787,11 @@ func Test_AppsPrepare(t *testing.T) {
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
 							nil,
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							nil,
 							nil,
 							nil,
@@ -845,7 +885,11 @@ func Test_AppsPrepare(t *testing.T) {
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
 							nil,
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							nil,
 							nil,
 							nil,
@@ -939,7 +983,11 @@ func Test_AppsPrepare(t *testing.T) {
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
 							nil,
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							nil,
 							nil,
 							nil,
@@ -1033,7 +1081,11 @@ func Test_AppsPrepare(t *testing.T) {
 							"back.channel.logout.ch",
 							domain.LoginVersion2,
 							"https://login.ch/",
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							nil,
 							nil,
 							nil,
@@ -1075,7 +1127,11 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							nil,
 							nil,
 							nil,
@@ -1117,7 +1173,11 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							"saml-app-id",
 							"https://test.com/saml/metadata",
 							[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
@@ -1302,7 +1362,11 @@ func Test_AppPrepare(t *testing.T) {
 						nil,
 						nil,
 						nil,
-						// saml config
+												nil,
+						nil,
+						nil,
+						nil,
+// saml config
 						nil,
 						nil,
 						nil,
@@ -1367,7 +1431,11 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							nil,
 							nil,
 							nil,
@@ -1437,7 +1505,11 @@ func Test_AppPrepare(t *testing.T) {
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
 							nil,
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							nil,
 							nil,
 							nil,
@@ -1526,7 +1598,11 @@ func Test_AppPrepare(t *testing.T) {
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
 							nil,
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							nil,
 							nil,
 							nil,
@@ -1615,7 +1691,11 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							"app-id",
 							"https://test.com/saml/metadata",
 							[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
@@ -1688,7 +1768,11 @@ func Test_AppPrepare(t *testing.T) {
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
 							nil,
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							nil,
 							nil,
 							nil,
@@ -1777,7 +1861,11 @@ func Test_AppPrepare(t *testing.T) {
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
 							nil,
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							nil,
 							nil,
 							nil,
@@ -1866,7 +1954,11 @@ func Test_AppPrepare(t *testing.T) {
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
 							nil,
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							nil,
 							nil,
 							nil,
@@ -1955,7 +2047,11 @@ func Test_AppPrepare(t *testing.T) {
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
 							nil,
-							// saml config
+														nil,
+							nil,
+							nil,
+							nil,
+// saml config
 							nil,
 							nil,
 							nil,
