@@ -39,9 +39,9 @@ func (q *Queries) SearchOIDCAppLinkConfigs(ctx context.Context) (configs []*OIDC
 			AppColumnState.identifier():                domain.AppStateActive,
 		},
 		sq.Or{
-			sq.Expr("COALESCE("+iosTeamIDCol+", '') <> ''"),
-			sq.Expr("COALESCE("+iosBundleIDCol+", '') <> ''"),
-			sq.Expr("COALESCE("+androidPackageCol+", '') <> ''"),
+			sq.Expr("COALESCE(" + iosTeamIDCol + ", '') <> ''"),
+			sq.Expr("COALESCE(" + iosBundleIDCol + ", '') <> ''"),
+			sq.Expr("COALESCE(" + androidPackageCol + ", '') <> ''"),
 		},
 	}).OrderBy(AppOIDCConfigColumnAppID.identifier()).ToSql()
 	if err != nil {
