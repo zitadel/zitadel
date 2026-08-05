@@ -1,7 +1,14 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
-import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import {
+  AbstractControl,
+  FormControl,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators,
+} from '@angular/forms';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -217,6 +224,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       loginV2: [{ value: false, disabled: true }],
       loginV2BaseURL: [{ value: '', disabled: true }],
       backChannelLogoutURI: [{ value: '', disabled: true }],
+      iosTeamId: [{ value: '', disabled: true }, [Validators.pattern(/^([A-Z0-9]{10})?$/)]],
+      iosBundleId: [{ value: '', disabled: true }, [Validators.maxLength(200)]],
+      androidPackageName: [{ value: '', disabled: true }, [Validators.maxLength(200)]],
+      androidSha256CertFingerprints: [{ value: '', disabled: true }],
     });
 
     this.oidcTokenForm = this.fb.group({
@@ -375,6 +386,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                   this.settingsList = [
                     { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
                     { id: 'token', i18nKey: 'APP.TOKEN' },
+                    { id: 'native-app-links', i18nKey: 'APP.OIDC.APPLINKSSECTION' },
                     { id: 'urls', i18nKey: 'APP.URLS' },
                   ];
                 } else {
@@ -383,6 +395,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                     { id: 'token', i18nKey: 'APP.TOKEN' },
                     { id: 'redirect-uris', i18nKey: 'APP.OIDC.REDIRECTSECTIONTITLE' },
                     { id: 'additional-origins', i18nKey: 'APP.ADDITIONALORIGINS' },
+                    { id: 'native-app-links', i18nKey: 'APP.OIDC.APPLINKSSECTION' },
                     { id: 'urls', i18nKey: 'APP.URLS' },
                   ];
                 }
@@ -465,6 +478,12 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               if (this.app.oidcConfig) {
                 this.oidcForm.patchValue(this.app.oidcConfig);
                 this.oidcTokenForm.patchValue(this.app.oidcConfig);
+                this.oidcForm.controls['iosTeamId'].setValue(this.app.oidcConfig.ios?.teamId ?? '');
+                this.oidcForm.controls['iosBundleId'].setValue(this.app.oidcConfig.ios?.bundleId ?? '');
+                this.oidcForm.controls['androidPackageName'].setValue(this.app.oidcConfig.android?.packageName ?? '');
+                this.oidcForm.controls['androidSha256CertFingerprints'].setValue(
+                  (this.app.oidcConfig.android?.sha256CertFingerprintsList ?? []).join('\n'),
+                );
               }
               if (this.app.apiConfig) {
                 this.apiForm.patchValue(this.app.apiConfig);
@@ -719,6 +738,14 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               postLogoutRedirectUris: this.normalizeOIDCListForUpdate(this.app.oidcConfig.postLogoutRedirectUrisList),
               developmentMode: this.app.oidcConfig.devMode,
               skipNativeAppSuccessPage: this.app.oidcConfig.skipNativeAppSuccessPage,
+              ios: {
+                teamId: (this.iosTeamId?.value ?? '').trim(),
+                bundleId: (this.iosBundleId?.value ?? '').trim(),
+              },
+              android: {
+                packageName: (this.androidPackageName?.value ?? '').trim(),
+                sha256CertFingerprints: this.parseAndroidFingerprints(this.androidSha256CertFingerprints?.value),
+              },
               ...(this.clockSkewSeconds?.value
                 ? {
                     clockSkew: {
@@ -752,6 +779,16 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   private normalizeOIDCListForUpdate(values: string[]): string[] {
     return values.length === 0 ? [''] : values;
+  }
+
+  private parseAndroidFingerprints(value: unknown): string[] {
+    if (typeof value !== 'string' || !value.trim()) {
+      return [];
+    }
+    return value
+      .split(/[\n,]+/)
+      .map((fp) => fp.trim())
+      .filter((fp) => fp.length > 0);
   }
 
   private toOIDCV2ResponseType(type: OIDCResponseType): OIDCV2ResponseType {
@@ -941,6 +978,22 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public get skipNativeAppSuccessPage(): FormControl<boolean> | null {
     return this.oidcForm.get('skipNativeAppSuccessPage') as FormControl<boolean>;
+  }
+
+  public get iosTeamId(): AbstractControl | null {
+    return this.oidcForm.get('iosTeamId');
+  }
+
+  public get iosBundleId(): AbstractControl | null {
+    return this.oidcForm.get('iosBundleId');
+  }
+
+  public get androidPackageName(): AbstractControl | null {
+    return this.oidcForm.get('androidPackageName');
+  }
+
+  public get androidSha256CertFingerprints(): AbstractControl | null {
+    return this.oidcForm.get('androidSha256CertFingerprints');
   }
 
   public get accessTokenType(): AbstractControl | null {
