@@ -20,27 +20,27 @@ import (
 
 type addOIDCApp struct {
 	AddApp
-	Version                     domain.OIDCVersion
-	RedirectUris                []string
-	ResponseTypes               []domain.OIDCResponseType
-	GrantTypes                  []domain.OIDCGrantType
-	ApplicationType             domain.OIDCApplicationType
-	AuthMethodType              domain.OIDCAuthMethodType
-	PostLogoutRedirectUris      []string
-	DevMode                     bool
-	AccessTokenType             domain.OIDCTokenType
-	AccessTokenRoleAssertion    bool
-	IDTokenRoleAssertion        bool
-	IDTokenUserinfoAssertion    bool
-	ClockSkew                   time.Duration
-	AdditionalOrigins           []string
-	SkipSuccessPageForNativeApp bool
-	BackChannelLogoutURI        string
-	LoginVersion                domain.LoginVersion
-	LoginBaseURI                string
-	IOSTeamID                   string
-	IOSBundleID                 string
-	AndroidPackageName          string
+	Version                       domain.OIDCVersion
+	RedirectUris                  []string
+	ResponseTypes                 []domain.OIDCResponseType
+	GrantTypes                    []domain.OIDCGrantType
+	ApplicationType               domain.OIDCApplicationType
+	AuthMethodType                domain.OIDCAuthMethodType
+	PostLogoutRedirectUris        []string
+	DevMode                       bool
+	AccessTokenType               domain.OIDCTokenType
+	AccessTokenRoleAssertion      bool
+	IDTokenRoleAssertion          bool
+	IDTokenUserinfoAssertion      bool
+	ClockSkew                     time.Duration
+	AdditionalOrigins             []string
+	SkipSuccessPageForNativeApp   bool
+	BackChannelLogoutURI          string
+	LoginVersion                  domain.LoginVersion
+	LoginBaseURI                  string
+	IOSTeamID                     string
+	IOSBundleID                   string
+	AndroidPackageName            string
 	AndroidSHA256CertFingerprints []string
 
 	ClientID          string

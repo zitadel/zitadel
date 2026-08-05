@@ -14,36 +14,36 @@ import (
 type OIDCApplicationWriteModel struct {
 	eventstore.WriteModel
 
-	AppID                    string
-	AppName                  string
-	ClientID                 string
-	HashedSecret             string
-	ClientSecretString       string
-	RedirectUris             []string
-	ResponseTypes            []domain.OIDCResponseType
-	GrantTypes               []domain.OIDCGrantType
-	ApplicationType          domain.OIDCApplicationType
-	AuthMethodType           domain.OIDCAuthMethodType
-	PostLogoutRedirectUris   []string
-	OIDCVersion              domain.OIDCVersion
-	Compliance               *domain.Compliance
-	DevMode                  bool
-	AccessTokenType          domain.OIDCTokenType
-	AccessTokenRoleAssertion bool
-	IDTokenRoleAssertion     bool
-	IDTokenUserinfoAssertion bool
-	ClockSkew                time.Duration
-	State                    domain.AppState
-	AdditionalOrigins        []string
-	SkipNativeAppSuccessPage bool
-	BackChannelLogoutURI     string
-	LoginVersion             domain.LoginVersion
-	LoginBaseURI             string
-	IOSTeamID                string
-	IOSBundleID              string
-	AndroidPackageName       string
+	AppID                         string
+	AppName                       string
+	ClientID                      string
+	HashedSecret                  string
+	ClientSecretString            string
+	RedirectUris                  []string
+	ResponseTypes                 []domain.OIDCResponseType
+	GrantTypes                    []domain.OIDCGrantType
+	ApplicationType               domain.OIDCApplicationType
+	AuthMethodType                domain.OIDCAuthMethodType
+	PostLogoutRedirectUris        []string
+	OIDCVersion                   domain.OIDCVersion
+	Compliance                    *domain.Compliance
+	DevMode                       bool
+	AccessTokenType               domain.OIDCTokenType
+	AccessTokenRoleAssertion      bool
+	IDTokenRoleAssertion          bool
+	IDTokenUserinfoAssertion      bool
+	ClockSkew                     time.Duration
+	State                         domain.AppState
+	AdditionalOrigins             []string
+	SkipNativeAppSuccessPage      bool
+	BackChannelLogoutURI          string
+	LoginVersion                  domain.LoginVersion
+	LoginBaseURI                  string
+	IOSTeamID                     string
+	IOSBundleID                   string
+	AndroidPackageName            string
 	AndroidSHA256CertFingerprints []string
-	oidc                     bool
+	oidc                          bool
 }
 
 func NewOIDCApplicationWriteModelWithAppID(projectID, appID, resourceOwner string) *OIDCApplicationWriteModel {

@@ -57,7 +57,7 @@ type OIDCApp struct {
 	IOSBundleID *string
 	// AndroidPackageName and AndroidSHA256CertFingerprints are Digital Asset Links /
 	// passkey trust fields. Package name is required when fingerprints are non-empty.
-	AndroidPackageName           *string
+	AndroidPackageName            *string
 	AndroidSHA256CertFingerprints []string
 
 	State AppState

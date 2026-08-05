@@ -32,27 +32,27 @@ type OIDCConfigAddedEvent struct {
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
 	HashedSecret string              `json:"hashedSecret,omitempty"`
 
-	RedirectUris             []string                   `json:"redirectUris,omitempty"`
-	ResponseTypes            []domain.OIDCResponseType  `json:"responseTypes,omitempty"`
-	GrantTypes               []domain.OIDCGrantType     `json:"grantTypes,omitempty"`
-	ApplicationType          domain.OIDCApplicationType `json:"applicationType,omitempty"`
-	AuthMethodType           domain.OIDCAuthMethodType  `json:"authMethodType,omitempty"`
-	PostLogoutRedirectUris   []string                   `json:"postLogoutRedirectUris,omitempty"`
-	DevMode                  bool                       `json:"devMode,omitempty"`
-	AccessTokenType          domain.OIDCTokenType       `json:"accessTokenType,omitempty"`
-	AccessTokenRoleAssertion bool                       `json:"accessTokenRoleAssertion,omitempty"`
-	IDTokenRoleAssertion     bool                       `json:"idTokenRoleAssertion,omitempty"`
-	IDTokenUserinfoAssertion bool                       `json:"idTokenUserinfoAssertion,omitempty"`
-	ClockSkew                time.Duration              `json:"clockSkew,omitempty"`
-	AdditionalOrigins        []string                   `json:"additionalOrigins,omitempty"`
-	SkipNativeAppSuccessPage bool                       `json:"skipNativeAppSuccessPage,omitempty"`
-	BackChannelLogoutURI     string                     `json:"backChannelLogoutURI,omitempty"`
-	LoginVersion             domain.LoginVersion        `json:"loginVersion,omitempty"`
-	LoginBaseURI             string                     `json:"loginBaseURI,omitempty"`
-	IOSTeamID                string                     `json:"iosTeamId,omitempty"`
-	IOSBundleID              string                     `json:"iosBundleId,omitempty"`
-	AndroidPackageName       string                     `json:"androidPackageName,omitempty"`
-	AndroidSHA256CertFingerprints []string              `json:"androidSha256CertFingerprints,omitempty"`
+	RedirectUris                  []string                   `json:"redirectUris,omitempty"`
+	ResponseTypes                 []domain.OIDCResponseType  `json:"responseTypes,omitempty"`
+	GrantTypes                    []domain.OIDCGrantType     `json:"grantTypes,omitempty"`
+	ApplicationType               domain.OIDCApplicationType `json:"applicationType,omitempty"`
+	AuthMethodType                domain.OIDCAuthMethodType  `json:"authMethodType,omitempty"`
+	PostLogoutRedirectUris        []string                   `json:"postLogoutRedirectUris,omitempty"`
+	DevMode                       bool                       `json:"devMode,omitempty"`
+	AccessTokenType               domain.OIDCTokenType       `json:"accessTokenType,omitempty"`
+	AccessTokenRoleAssertion      bool                       `json:"accessTokenRoleAssertion,omitempty"`
+	IDTokenRoleAssertion          bool                       `json:"idTokenRoleAssertion,omitempty"`
+	IDTokenUserinfoAssertion      bool                       `json:"idTokenUserinfoAssertion,omitempty"`
+	ClockSkew                     time.Duration              `json:"clockSkew,omitempty"`
+	AdditionalOrigins             []string                   `json:"additionalOrigins,omitempty"`
+	SkipNativeAppSuccessPage      bool                       `json:"skipNativeAppSuccessPage,omitempty"`
+	BackChannelLogoutURI          string                     `json:"backChannelLogoutURI,omitempty"`
+	LoginVersion                  domain.LoginVersion        `json:"loginVersion,omitempty"`
+	LoginBaseURI                  string                     `json:"loginBaseURI,omitempty"`
+	IOSTeamID                     string                     `json:"iosTeamId,omitempty"`
+	IOSBundleID                   string                     `json:"iosBundleId,omitempty"`
+	AndroidPackageName            string                     `json:"androidPackageName,omitempty"`
+	AndroidSHA256CertFingerprints []string                   `json:"androidSha256CertFingerprints,omitempty"`
 }
 
 func (e *OIDCConfigAddedEvent) Payload() interface{} {
@@ -248,29 +248,29 @@ func OIDCConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error
 type OIDCConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Version                  *domain.OIDCVersion         `json:"oidcVersion,omitempty"`
-	AppID                    string                      `json:"appId"`
-	RedirectUris             *[]string                   `json:"redirectUris,omitempty"`
-	ResponseTypes            *[]domain.OIDCResponseType  `json:"responseTypes,omitempty"`
-	GrantTypes               *[]domain.OIDCGrantType     `json:"grantTypes,omitempty"`
-	ApplicationType          *domain.OIDCApplicationType `json:"applicationType,omitempty"`
-	AuthMethodType           *domain.OIDCAuthMethodType  `json:"authMethodType,omitempty"`
-	PostLogoutRedirectUris   *[]string                   `json:"postLogoutRedirectUris,omitempty"`
-	DevMode                  *bool                       `json:"devMode,omitempty"`
-	AccessTokenType          *domain.OIDCTokenType       `json:"accessTokenType,omitempty"`
-	AccessTokenRoleAssertion *bool                       `json:"accessTokenRoleAssertion,omitempty"`
-	IDTokenRoleAssertion     *bool                       `json:"idTokenRoleAssertion,omitempty"`
-	IDTokenUserinfoAssertion *bool                       `json:"idTokenUserinfoAssertion,omitempty"`
-	ClockSkew                *time.Duration              `json:"clockSkew,omitempty"`
-	AdditionalOrigins        *[]string                   `json:"additionalOrigins,omitempty"`
-	SkipNativeAppSuccessPage *bool                       `json:"skipNativeAppSuccessPage,omitempty"`
-	BackChannelLogoutURI     *string                     `json:"backChannelLogoutURI,omitempty"`
-	LoginVersion             *domain.LoginVersion        `json:"loginVersion,omitempty"`
-	LoginBaseURI             *string                     `json:"loginBaseURI,omitempty"`
-	IOSTeamID                *string                     `json:"iosTeamId,omitempty"`
-	IOSBundleID              *string                     `json:"iosBundleId,omitempty"`
-	AndroidPackageName       *string                     `json:"androidPackageName,omitempty"`
-	AndroidSHA256CertFingerprints *[]string              `json:"androidSha256CertFingerprints,omitempty"`
+	Version                       *domain.OIDCVersion         `json:"oidcVersion,omitempty"`
+	AppID                         string                      `json:"appId"`
+	RedirectUris                  *[]string                   `json:"redirectUris,omitempty"`
+	ResponseTypes                 *[]domain.OIDCResponseType  `json:"responseTypes,omitempty"`
+	GrantTypes                    *[]domain.OIDCGrantType     `json:"grantTypes,omitempty"`
+	ApplicationType               *domain.OIDCApplicationType `json:"applicationType,omitempty"`
+	AuthMethodType                *domain.OIDCAuthMethodType  `json:"authMethodType,omitempty"`
+	PostLogoutRedirectUris        *[]string                   `json:"postLogoutRedirectUris,omitempty"`
+	DevMode                       *bool                       `json:"devMode,omitempty"`
+	AccessTokenType               *domain.OIDCTokenType       `json:"accessTokenType,omitempty"`
+	AccessTokenRoleAssertion      *bool                       `json:"accessTokenRoleAssertion,omitempty"`
+	IDTokenRoleAssertion          *bool                       `json:"idTokenRoleAssertion,omitempty"`
+	IDTokenUserinfoAssertion      *bool                       `json:"idTokenUserinfoAssertion,omitempty"`
+	ClockSkew                     *time.Duration              `json:"clockSkew,omitempty"`
+	AdditionalOrigins             *[]string                   `json:"additionalOrigins,omitempty"`
+	SkipNativeAppSuccessPage      *bool                       `json:"skipNativeAppSuccessPage,omitempty"`
+	BackChannelLogoutURI          *string                     `json:"backChannelLogoutURI,omitempty"`
+	LoginVersion                  *domain.LoginVersion        `json:"loginVersion,omitempty"`
+	LoginBaseURI                  *string                     `json:"loginBaseURI,omitempty"`
+	IOSTeamID                     *string                     `json:"iosTeamId,omitempty"`
+	IOSBundleID                   *string                     `json:"iosBundleId,omitempty"`
+	AndroidPackageName            *string                     `json:"androidPackageName,omitempty"`
+	AndroidSHA256CertFingerprints *[]string                   `json:"androidSha256CertFingerprints,omitempty"`
 }
 
 func (e *OIDCConfigChangedEvent) Payload() interface{} {
