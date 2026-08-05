@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -75,11 +76,19 @@ func VerifyUser(username, password string) func(context.Context, *database.DB) e
 		}
 
 		logging.Info(ctx, "verify user", "username", username)
-		stmt := createUserStmt
+		// Format the username first so the password is never part of a fmt format string
+		// (passwords may contain '%' which would be interpreted as format verbs).
+		stmt := fmt.Sprintf(createUserStmt, username)
 		if password != "" {
-			stmt += " WITH PASSWORD '" + password + "'"
+			stmt += " WITH PASSWORD " + quotePostgresLiteral(password)
 		}
 
-		return exec(ctx, db, fmt.Sprintf(stmt, username), []string{roleAlreadyExistsCode})
+		return exec(ctx, db, stmt, []string{roleAlreadyExistsCode})
 	}
+}
+
+// quotePostgresLiteral returns s as a single-quoted PostgreSQL string literal,
+// escaping embedded single quotes by doubling them.
+func quotePostgresLiteral(s string) string {
+	return "'" + strings.ReplaceAll(s, "'", "''") + "'"
 }

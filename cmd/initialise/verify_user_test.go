@@ -77,6 +77,23 @@ func Test_verifyUser(t *testing.T) {
 			targetErr: nil,
 		},
 		{
+			name: "correct with password containing percent and quote",
+			args: args{
+				db: prepareDB(t,
+					expectQuery("SELECT current_user", nil, []string{"current_user"}, [][]driver.Value{
+						{"postgres"},
+					}),
+					expectQuery("SELECT EXISTS(SELECT 1 FROM pg_roles WHERE rolname = $1)", nil, []string{"exists"}, [][]driver.Value{
+						{false},
+					}, "zitadel-user"),
+					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER \"zitadel-user\" WITH PASSWORD 'p%''ass'", nil),
+				),
+				username: "zitadel-user",
+				password: "p%'ass",
+			},
+			targetErr: nil,
+		},
+		{
 			name: "already exists in catalog, skip creation",
 			args: args{
 				db: prepareDB(t,
