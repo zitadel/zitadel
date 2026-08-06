@@ -123,7 +123,7 @@ func TestBuildAssetLinks(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			assert.Equal(t, tc.want, buildAssetLinks(tc.configs))
+			assert.Equal(t, tc.want, buildAssetLinks(t.Context(), tc.configs))
 		})
 	}
 }
@@ -166,7 +166,7 @@ func TestNormalizeSHA256Fingerprint(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			assert.Equal(t, tc.want, normalizeSHA256Fingerprint(tc.in))
+			assert.Equal(t, tc.want, normalizeSHA256Fingerprint(t.Context(), tc.in))
 		})
 	}
 }

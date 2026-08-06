@@ -10,8 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zitadel/logging"
-
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/query"
 )
@@ -88,7 +87,7 @@ func (h *Handler) serveAppleAppSiteAssociation(w http.ResponseWriter, r *http.Re
 	}
 	configs, err := h.queries.SearchOIDCAppLinkConfigs(r.Context())
 	if err != nil {
-		logging.WithError(err).Error("unable to query OIDC app link configs for apple-app-site-association")
+		logging.Error(r.Context(), "unable to query OIDC app link configs for apple-app-site-association", "err", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -102,11 +101,11 @@ func (h *Handler) serveAssetLinks(w http.ResponseWriter, r *http.Request) {
 	}
 	configs, err := h.queries.SearchOIDCAppLinkConfigs(r.Context())
 	if err != nil {
-		logging.WithError(err).Error("unable to query OIDC app link configs for assetlinks.json")
+		logging.Error(r.Context(), "unable to query OIDC app link configs for assetlinks.json", "err", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	h.writeJSON(w, r, buildAssetLinks(configs))
+	h.writeJSON(w, r, buildAssetLinks(r.Context(), configs))
 }
 
 func buildAppleAppSiteAssociation(configs []*query.OIDCAppLinkConfig) appleAppSiteAssociation {
@@ -128,7 +127,7 @@ func buildAppleAppSiteAssociation(configs []*query.OIDCAppLinkConfig) appleAppSi
 	}
 }
 
-func buildAssetLinks(configs []*query.OIDCAppLinkConfig) []assetLink {
+func buildAssetLinks(ctx context.Context, configs []*query.OIDCAppLinkConfig) []assetLink {
 	links := make([]assetLink, 0)
 	for _, cfg := range configs {
 		if cfg.AndroidPackageName == "" || len(cfg.AndroidSHA256CertFingerprints) == 0 {
@@ -139,7 +138,7 @@ func buildAssetLinks(configs []*query.OIDCAppLinkConfig) []assetLink {
 			Target: assetLinkTarget{
 				Namespace:              "android_app",
 				PackageName:            cfg.AndroidPackageName,
-				SHA256CertFingerprints: normalizeSHA256Fingerprints(cfg.AndroidSHA256CertFingerprints),
+				SHA256CertFingerprints: normalizeSHA256Fingerprints(ctx, cfg.AndroidSHA256CertFingerprints),
 			},
 		})
 	}
@@ -149,22 +148,22 @@ func buildAssetLinks(configs []*query.OIDCAppLinkConfig) []assetLink {
 // normalizeSHA256Fingerprints returns colon-separated uppercase hex fingerprints
 // for assetlinks.json. Normalization is applied at serve time only so stored /
 // client state can keep the format clients sent.
-func normalizeSHA256Fingerprints(fps []string) []string {
+func normalizeSHA256Fingerprints(ctx context.Context, fps []string) []string {
 	out := make([]string, len(fps))
 	for i, fp := range fps {
-		out[i] = normalizeSHA256Fingerprint(fp)
+		out[i] = normalizeSHA256Fingerprint(ctx, fp)
 	}
 	return out
 }
 
-func normalizeSHA256Fingerprint(fp string) string {
+func normalizeSHA256Fingerprint(ctx context.Context, fp string) string {
 	if strings.Contains(fp, ":") {
 		return strings.ToUpper(fp) // already 32 valid pairs per API validation; only case may vary
 	}
 	raw, err := hex.DecodeString(fp) // guaranteed 64 hex chars
 	if err != nil || len(raw) != sha256.Size {
-		logging.WithFields("fingerprint", fp).WithError(err).
-			Warn("stored android sha256 fingerprint is not canonical hex; serving as-is")
+		logging.Warn(ctx, "stored android sha256 fingerprint is not canonical hex; serving as-is",
+			"fingerprint", fp, "err", err)
 		return strings.ToUpper(fp)
 	}
 	parts := make([]string, len(raw))
@@ -182,7 +181,7 @@ func (h *Handler) writeJSON(w http.ResponseWriter, r *http.Request, v any) {
 		return
 	}
 	if err := json.NewEncoder(w).Encode(v); err != nil {
-		logging.WithError(err).Error("unable to encode well-known response")
+		logging.Error(r.Context(), "unable to encode well-known response", "err", err)
 	}
 }
 
