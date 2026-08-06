@@ -31,7 +31,7 @@ var HandlerPrefixes = []string{
 type Config struct {
 	// AppLinksCacheControlMaxAge sets the Cache-Control max-age for
 	// apple-app-site-association and assetlinks.json responses.
-	// 0 sets Cache-Control: no-store.
+	// Non-positive values (including 0) set Cache-Control: no-store.
 	AppLinksCacheControlMaxAge time.Duration
 }
 
@@ -92,7 +92,7 @@ func (h *Handler) serveAppleAppSiteAssociation(w http.ResponseWriter, r *http.Re
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	h.writeJSON(w, buildAppleAppSiteAssociation(configs))
+	h.writeJSON(w, r, buildAppleAppSiteAssociation(configs))
 }
 
 func (h *Handler) serveAssetLinks(w http.ResponseWriter, r *http.Request) {
@@ -106,7 +106,7 @@ func (h *Handler) serveAssetLinks(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	h.writeJSON(w, buildAssetLinks(configs))
+	h.writeJSON(w, r, buildAssetLinks(configs))
 }
 
 func buildAppleAppSiteAssociation(configs []*query.OIDCAppLinkConfig) appleAppSiteAssociation {
@@ -174,17 +174,20 @@ func normalizeSHA256Fingerprint(fp string) string {
 	return strings.Join(parts, ":")
 }
 
-func (h *Handler) writeJSON(w http.ResponseWriter, v any) {
+func (h *Handler) writeJSON(w http.ResponseWriter, r *http.Request, v any) {
 	w.Header().Set("Content-Type", "application/json")
 	h.setCacheControl(w)
 	w.WriteHeader(http.StatusOK)
+	if r.Method == http.MethodHead {
+		return
+	}
 	if err := json.NewEncoder(w).Encode(v); err != nil {
 		logging.WithError(err).Error("unable to encode well-known response")
 	}
 }
 
 func (h *Handler) setCacheControl(w http.ResponseWriter) {
-	if h.cacheControlMaxAge == 0 {
+	if h.cacheControlMaxAge <= 0 {
 		w.Header().Set(http_util.CacheControl, "no-store")
 		return
 	}

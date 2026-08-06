@@ -198,6 +198,11 @@ func TestHandlerCacheControl(t *testing.T) {
 			maxAge:     0,
 			wantHeader: "no-store",
 		},
+		{
+			name:       "no-store when negative",
+			maxAge:     -time.Minute,
+			wantHeader: "no-store",
+		},
 	}
 
 	for _, tc := range tt {
@@ -213,6 +218,24 @@ func TestHandlerCacheControl(t *testing.T) {
 				assert.Equal(t, tc.wantHeader, rec.Header().Get(http_util.CacheControl), path)
 				assert.NotContains(t, rec.Header().Get(http_util.CacheControl), "stale-while-revalidate")
 			}
+		})
+	}
+}
+
+func TestHandlerHeadOmitsBody(t *testing.T) {
+	t.Parallel()
+
+	h := NewHandler(stubAppLinkQuerier{}, Config{AppLinksCacheControlMaxAge: 5 * time.Minute})
+	for _, path := range []string{AppleAppSiteAssociationPath, AssetLinksPath} {
+		t.Run(path, func(t *testing.T) {
+			t.Parallel()
+			req := httptest.NewRequest(http.MethodHead, path, nil)
+			rec := httptest.NewRecorder()
+			h.ServeHTTP(rec, req)
+			require.Equal(t, http.StatusOK, rec.Code)
+			assert.Equal(t, "application/json", rec.Header().Get("Content-Type"))
+			assert.Equal(t, "public, max-age=300", rec.Header().Get(http_util.CacheControl))
+			assert.Empty(t, rec.Body.Bytes())
 		})
 	}
 }
