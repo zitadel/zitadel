@@ -1393,7 +1393,7 @@ Application:
         AuthMethodType:
           NotNone: "Les aplicacions natives haurien de tenir el tipus authmethodtype configurat a none."
         RedirectUris:
-          MustBeHttpLocalhost: "Redirect URIs must begin with your own protocol, http://127.0.0.1, http://[::1] or http://localhost."
+          MustBeHttpLocalhost: "Les URI de redirecció han de començar amb el teu propi protocol, http://127.0.0.1, http://[::1] o http://localhost."
       UserAgent:
         AuthMethodType:
           NotNone: "User agent app hauria de tenir el tipus authmethodtype configurat a none"
