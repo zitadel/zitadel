@@ -108,7 +108,7 @@ Errors:
       Invalid: "El correu electrònic no és vàlid"
       AlreadyVerified: "El correu electrònic ja està verificat"
       NotChanged: "El correu electrònic no ha canviat"
-      Empty: "El correu electrònic no està buit"
+      Empty: "El correu electrònic està buit"
       IDMissing: "Falta l'ID del correu electrònic"
     Phone:
       NotFound: "Telèfon no trobat"
