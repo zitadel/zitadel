@@ -282,6 +282,8 @@ Errors:
     LabelPolicy:
       NotFound: "Private Label Policy konnte nicht gefunden"
       NotChanged: "Private Label Policy wurde nicht verändert"
+    IDPConfig:
+      NotExisting: "Identitätsprovider Konfiguration existiert nicht"
   Project:
     ProjectIDMissing: "Project ID fehlt"
     AlreadyExists: "Project existiert bereits auf der Organisation"

@@ -238,7 +238,7 @@ func TestProvider_FetchUser(t *testing.T) {
 			tt.fields.httpMock("https://oauth2.com")
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.config, tt.fields.name, tt.fields.userEndpoint, tt.fields.userMapper)
+			provider, err := New(tt.fields.config, tt.fields.name, tt.fields.userEndpoint, tt.fields.userMapper, http.DefaultClient)
 			require.NoError(t, err)
 
 			session := &Session{

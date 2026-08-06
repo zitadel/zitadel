@@ -54,255 +54,7 @@ var (
 		` projections.idp_templates6_jwt.jwt_endpoint,` +
 		` projections.idp_templates6_jwt.keys_endpoint,` +
 		` projections.idp_templates6_jwt.header_name,` +
-		// azure
-		` projections.idp_templates6_azure.idp_id,` +
-		` projections.idp_templates6_azure.client_id,` +
-		` projections.idp_templates6_azure.client_secret,` +
-		` projections.idp_templates6_azure.scopes,` +
-		` projections.idp_templates6_azure.tenant,` +
-		` projections.idp_templates6_azure.is_email_verified,` +
-		// github
-		` projections.idp_templates6_github.idp_id,` +
-		` projections.idp_templates6_github.client_id,` +
-		` projections.idp_templates6_github.client_secret,` +
-		` projections.idp_templates6_github.scopes,` +
-		// github enterprise
-		` projections.idp_templates6_github_enterprise.idp_id,` +
-		` projections.idp_templates6_github_enterprise.client_id,` +
-		` projections.idp_templates6_github_enterprise.client_secret,` +
-		` projections.idp_templates6_github_enterprise.authorization_endpoint,` +
-		` projections.idp_templates6_github_enterprise.token_endpoint,` +
-		` projections.idp_templates6_github_enterprise.user_endpoint,` +
-		` projections.idp_templates6_github_enterprise.scopes,` +
-		// gitlab
-		` projections.idp_templates6_gitlab.idp_id,` +
-		` projections.idp_templates6_gitlab.client_id,` +
-		` projections.idp_templates6_gitlab.client_secret,` +
-		` projections.idp_templates6_gitlab.scopes,` +
-		// gitlab self hosted
-		` projections.idp_templates6_gitlab_self_hosted.idp_id,` +
-		` projections.idp_templates6_gitlab_self_hosted.issuer,` +
-		` projections.idp_templates6_gitlab_self_hosted.client_id,` +
-		` projections.idp_templates6_gitlab_self_hosted.client_secret,` +
-		` projections.idp_templates6_gitlab_self_hosted.scopes,` +
-		// google
-		` projections.idp_templates6_google.idp_id,` +
-		` projections.idp_templates6_google.client_id,` +
-		` projections.idp_templates6_google.client_secret,` +
-		` projections.idp_templates6_google.scopes,` +
-		// saml
-		` projections.idp_templates6_saml.idp_id,` +
-		` projections.idp_templates6_saml.metadata,` +
-		` projections.idp_templates6_saml.key,` +
-		` projections.idp_templates6_saml.certificate,` +
-		` projections.idp_templates6_saml.binding,` +
-		` projections.idp_templates6_saml.with_signed_request,` +
-		` projections.idp_templates6_saml.signature_algorithm,` +
-		` projections.idp_templates6_saml.name_id_format,` +
-		` projections.idp_templates6_saml.transient_mapping_attribute_name,` +
-		` projections.idp_templates6_saml.federated_logout_enabled,` +
-		// ldap
-		` projections.idp_templates6_ldap2.idp_id,` +
-		` projections.idp_templates6_ldap2.servers,` +
-		` projections.idp_templates6_ldap2.start_tls,` +
-		` projections.idp_templates6_ldap2.base_dn,` +
-		` projections.idp_templates6_ldap2.bind_dn,` +
-		` projections.idp_templates6_ldap2.bind_password,` +
-		` projections.idp_templates6_ldap2.user_base,` +
-		` projections.idp_templates6_ldap2.user_object_classes,` +
-		` projections.idp_templates6_ldap2.user_filters,` +
-		` projections.idp_templates6_ldap2.timeout,` +
-		` projections.idp_templates6_ldap2.root_ca,` +
-		` projections.idp_templates6_ldap2.id_attribute,` +
-		` projections.idp_templates6_ldap2.first_name_attribute,` +
-		` projections.idp_templates6_ldap2.last_name_attribute,` +
-		` projections.idp_templates6_ldap2.display_name_attribute,` +
-		` projections.idp_templates6_ldap2.nick_name_attribute,` +
-		` projections.idp_templates6_ldap2.preferred_username_attribute,` +
-		` projections.idp_templates6_ldap2.email_attribute,` +
-		` projections.idp_templates6_ldap2.email_verified,` +
-		` projections.idp_templates6_ldap2.phone_attribute,` +
-		` projections.idp_templates6_ldap2.phone_verified_attribute,` +
-		` projections.idp_templates6_ldap2.preferred_language_attribute,` +
-		` projections.idp_templates6_ldap2.avatar_url_attribute,` +
-		` projections.idp_templates6_ldap2.profile_attribute,` +
-		// apple
-		` projections.idp_templates6_apple.idp_id,` +
-		` projections.idp_templates6_apple.client_id,` +
-		` projections.idp_templates6_apple.team_id,` +
-		` projections.idp_templates6_apple.key_id,` +
-		` projections.idp_templates6_apple.private_key,` +
-		` projections.idp_templates6_apple.scopes` +
-		` FROM projections.idp_templates6` +
-		` LEFT JOIN projections.idp_templates6_oauth2 ON projections.idp_templates6.id = projections.idp_templates6_oauth2.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_oauth2.instance_id` +
-		` LEFT JOIN projections.idp_templates6_oidc ON projections.idp_templates6.id = projections.idp_templates6_oidc.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_oidc.instance_id` +
-		` LEFT JOIN projections.idp_templates6_jwt ON projections.idp_templates6.id = projections.idp_templates6_jwt.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_jwt.instance_id` +
-		` LEFT JOIN projections.idp_templates6_azure ON projections.idp_templates6.id = projections.idp_templates6_azure.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_azure.instance_id` +
-		` LEFT JOIN projections.idp_templates6_github ON projections.idp_templates6.id = projections.idp_templates6_github.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_github.instance_id` +
-		` LEFT JOIN projections.idp_templates6_github_enterprise ON projections.idp_templates6.id = projections.idp_templates6_github_enterprise.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_github_enterprise.instance_id` +
-		` LEFT JOIN projections.idp_templates6_gitlab ON projections.idp_templates6.id = projections.idp_templates6_gitlab.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_gitlab.instance_id` +
-		` LEFT JOIN projections.idp_templates6_gitlab_self_hosted ON projections.idp_templates6.id = projections.idp_templates6_gitlab_self_hosted.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_gitlab_self_hosted.instance_id` +
-		` LEFT JOIN projections.idp_templates6_google ON projections.idp_templates6.id = projections.idp_templates6_google.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_google.instance_id` +
-		` LEFT JOIN projections.idp_templates6_saml ON projections.idp_templates6.id = projections.idp_templates6_saml.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_saml.instance_id` +
-		` LEFT JOIN projections.idp_templates6_ldap2 ON projections.idp_templates6.id = projections.idp_templates6_ldap2.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_ldap2.instance_id` +
-		` LEFT JOIN projections.idp_templates6_apple ON projections.idp_templates6.id = projections.idp_templates6_apple.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_apple.instance_id`
-	idpTemplateCols = []string{
-		"id",
-		"resource_owner",
-		"creation_date",
-		"change_date",
-		"sequence",
-		"state",
-		"name",
-		"type",
-		"owner_type",
-		"is_creation_allowed",
-		"is_linking_allowed",
-		"is_auto_creation",
-		"is_auto_update",
-		"auto_linking",
-		// oauth config
-		"idp_id",
-		"client_id",
-		"client_secret",
-		"authorization_endpoint",
-		"token_endpoint",
-		"user_endpoint",
-		"scopes",
-		"id_attribute",
-		"use_pkce",
-		// oidc config
-		"id_id",
-		"issuer",
-		"client_id",
-		"client_secret",
-		"scopes",
-		"id_token_mapping",
-		"use_pkce",
-		// jwt
-		"idp_id",
-		"issuer",
-		"jwt_endpoint",
-		"keys_endpoint",
-		"header_name",
-		// azure
-		"idp_id",
-		"client_id",
-		"client_secret",
-		"scopes",
-		"tenant",
-		"is_email_verified",
-		// github config
-		"idp_id",
-		"client_id",
-		"client_secret",
-		"scopes",
-		// github enterprise config
-		"idp_id",
-		"client_id",
-		"client_secret",
-		"authorization_endpoint",
-		"token_endpoint",
-		"user_endpoint",
-		"scopes",
-		// gitlab config
-		"idp_id",
-		"client_id",
-		"client_secret",
-		"scopes",
-		// gitlab self hosted config
-		"idp_id",
-		"issuer",
-		"client_id",
-		"client_secret",
-		"scopes",
-		// google config
-		"idp_id",
-		"client_id",
-		"client_secret",
-		"scopes",
-		// saml config
-		"idp_id",
-		"metadata",
-		"key",
-		"certificate",
-		"binding",
-		"with_signed_request",
-		"signature_algorithm",
-		"name_id_format",
-		"transient_mapping_attribute_name",
-		"federated_logout_enabled",
-		// ldap config
-		"idp_id",
-		"servers",
-		"start_tls",
-		"base_dn",
-		"bind_dn",
-		"bind_password",
-		"user_base",
-		"user_object_classes",
-		"user_filters",
-		"timeout",
-		"root_ca",
-		"id_attribute",
-		"first_name_attribute",
-		"last_name_attribute",
-		"display_name_attribute",
-		"nick_name_attribute",
-		"preferred_username_attribute",
-		"email_attribute",
-		"email_verified",
-		"phone_attribute",
-		"phone_verified_attribute",
-		"preferred_language_attribute",
-		"avatar_url_attribute",
-		"profile_attribute",
-		// apple config
-		"idp_id",
-		"client_id",
-		"team_id",
-		"key_id",
-		"private_key",
-		"scopes",
-	}
-	idpTemplatesQuery = `SELECT projections.idp_templates6.id,` +
-		` projections.idp_templates6.resource_owner,` +
-		` projections.idp_templates6.creation_date,` +
-		` projections.idp_templates6.change_date,` +
-		` projections.idp_templates6.sequence,` +
-		` projections.idp_templates6.state,` +
-		` projections.idp_templates6.name,` +
-		` projections.idp_templates6.type,` +
-		` projections.idp_templates6.owner_type,` +
-		` projections.idp_templates6.is_creation_allowed,` +
-		` projections.idp_templates6.is_linking_allowed,` +
-		` projections.idp_templates6.is_auto_creation,` +
-		` projections.idp_templates6.is_auto_update,` +
-		` projections.idp_templates6.auto_linking,` +
-		// oauth
-		` projections.idp_templates6_oauth2.idp_id,` +
-		` projections.idp_templates6_oauth2.client_id,` +
-		` projections.idp_templates6_oauth2.client_secret,` +
-		` projections.idp_templates6_oauth2.authorization_endpoint,` +
-		` projections.idp_templates6_oauth2.token_endpoint,` +
-		` projections.idp_templates6_oauth2.user_endpoint,` +
-		` projections.idp_templates6_oauth2.scopes,` +
-		` projections.idp_templates6_oauth2.id_attribute,` +
-		` projections.idp_templates6_oauth2.use_pkce,` +
-		// oidc
-		` projections.idp_templates6_oidc.idp_id,` +
-		` projections.idp_templates6_oidc.issuer,` +
-		` projections.idp_templates6_oidc.client_id,` +
-		` projections.idp_templates6_oidc.client_secret,` +
-		` projections.idp_templates6_oidc.scopes,` +
-		` projections.idp_templates6_oidc.id_token_mapping,` +
-		` projections.idp_templates6_oidc.use_pkce,` +
-		// jwt
-		` projections.idp_templates6_jwt.idp_id,` +
-		` projections.idp_templates6_jwt.issuer,` +
-		` projections.idp_templates6_jwt.jwt_endpoint,` +
-		` projections.idp_templates6_jwt.keys_endpoint,` +
-		` projections.idp_templates6_jwt.header_name,` +
+		` projections.idp_templates6_jwt.audience,` +
 		// azure
 		` projections.idp_templates6_azure.idp_id,` +
 		` projections.idp_templates6_azure.client_id,` +
@@ -382,7 +134,13 @@ var (
 		` projections.idp_templates6_apple.key_id,` +
 		` projections.idp_templates6_apple.private_key,` +
 		` projections.idp_templates6_apple.scopes,` +
-		` COUNT(*) OVER ()` +
+		// zitadel
+		` projections.idp_templates6_zitadel.idp_id,` +
+		` projections.idp_templates6_zitadel.issuer,` +
+		` projections.idp_templates6_zitadel.client_id,` +
+		` projections.idp_templates6_zitadel.client_secret,` +
+		` projections.idp_templates6_zitadel.scopes,` +
+		` projections.idp_templates6_zitadel.instance_roles_info` +
 		` FROM projections.idp_templates6` +
 		` LEFT JOIN projections.idp_templates6_oauth2 ON projections.idp_templates6.id = projections.idp_templates6_oauth2.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_oauth2.instance_id` +
 		` LEFT JOIN projections.idp_templates6_oidc ON projections.idp_templates6.id = projections.idp_templates6_oidc.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_oidc.instance_id` +
@@ -395,8 +153,9 @@ var (
 		` LEFT JOIN projections.idp_templates6_google ON projections.idp_templates6.id = projections.idp_templates6_google.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_google.instance_id` +
 		` LEFT JOIN projections.idp_templates6_saml ON projections.idp_templates6.id = projections.idp_templates6_saml.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_saml.instance_id` +
 		` LEFT JOIN projections.idp_templates6_ldap2 ON projections.idp_templates6.id = projections.idp_templates6_ldap2.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_ldap2.instance_id` +
-		` LEFT JOIN projections.idp_templates6_apple ON projections.idp_templates6.id = projections.idp_templates6_apple.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_apple.instance_id`
-	idpTemplatesCols = []string{
+		` LEFT JOIN projections.idp_templates6_apple ON projections.idp_templates6.id = projections.idp_templates6_apple.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_apple.instance_id` +
+		` LEFT JOIN projections.idp_templates6_zitadel ON projections.idp_templates6.id = projections.idp_templates6_zitadel.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_zitadel.instance_id`
+	idpTemplateCols = []string{
 		"id",
 		"resource_owner",
 		"creation_date",
@@ -435,6 +194,7 @@ var (
 		"jwt_endpoint",
 		"keys_endpoint",
 		"header_name",
+		"audience",
 		// azure
 		"idp_id",
 		"client_id",
@@ -514,6 +274,281 @@ var (
 		"key_id",
 		"private_key",
 		"scopes",
+		// zitadel config
+		"idp_id",
+		"issuer",
+		"client_id",
+		"client_secret",
+		"scopes",
+		"instance_roles_info",
+	}
+	idpTemplatesQuery = `SELECT projections.idp_templates6.id,` +
+		` projections.idp_templates6.resource_owner,` +
+		` projections.idp_templates6.creation_date,` +
+		` projections.idp_templates6.change_date,` +
+		` projections.idp_templates6.sequence,` +
+		` projections.idp_templates6.state,` +
+		` projections.idp_templates6.name,` +
+		` projections.idp_templates6.type,` +
+		` projections.idp_templates6.owner_type,` +
+		` projections.idp_templates6.is_creation_allowed,` +
+		` projections.idp_templates6.is_linking_allowed,` +
+		` projections.idp_templates6.is_auto_creation,` +
+		` projections.idp_templates6.is_auto_update,` +
+		` projections.idp_templates6.auto_linking,` +
+		// oauth
+		` projections.idp_templates6_oauth2.idp_id,` +
+		` projections.idp_templates6_oauth2.client_id,` +
+		` projections.idp_templates6_oauth2.client_secret,` +
+		` projections.idp_templates6_oauth2.authorization_endpoint,` +
+		` projections.idp_templates6_oauth2.token_endpoint,` +
+		` projections.idp_templates6_oauth2.user_endpoint,` +
+		` projections.idp_templates6_oauth2.scopes,` +
+		` projections.idp_templates6_oauth2.id_attribute,` +
+		` projections.idp_templates6_oauth2.use_pkce,` +
+		// oidc
+		` projections.idp_templates6_oidc.idp_id,` +
+		` projections.idp_templates6_oidc.issuer,` +
+		` projections.idp_templates6_oidc.client_id,` +
+		` projections.idp_templates6_oidc.client_secret,` +
+		` projections.idp_templates6_oidc.scopes,` +
+		` projections.idp_templates6_oidc.id_token_mapping,` +
+		` projections.idp_templates6_oidc.use_pkce,` +
+		// jwt
+		` projections.idp_templates6_jwt.idp_id,` +
+		` projections.idp_templates6_jwt.issuer,` +
+		` projections.idp_templates6_jwt.jwt_endpoint,` +
+		` projections.idp_templates6_jwt.keys_endpoint,` +
+		` projections.idp_templates6_jwt.header_name,` +
+		` projections.idp_templates6_jwt.audience,` +
+		// azure
+		` projections.idp_templates6_azure.idp_id,` +
+		` projections.idp_templates6_azure.client_id,` +
+		` projections.idp_templates6_azure.client_secret,` +
+		` projections.idp_templates6_azure.scopes,` +
+		` projections.idp_templates6_azure.tenant,` +
+		` projections.idp_templates6_azure.is_email_verified,` +
+		// github
+		` projections.idp_templates6_github.idp_id,` +
+		` projections.idp_templates6_github.client_id,` +
+		` projections.idp_templates6_github.client_secret,` +
+		` projections.idp_templates6_github.scopes,` +
+		// github enterprise
+		` projections.idp_templates6_github_enterprise.idp_id,` +
+		` projections.idp_templates6_github_enterprise.client_id,` +
+		` projections.idp_templates6_github_enterprise.client_secret,` +
+		` projections.idp_templates6_github_enterprise.authorization_endpoint,` +
+		` projections.idp_templates6_github_enterprise.token_endpoint,` +
+		` projections.idp_templates6_github_enterprise.user_endpoint,` +
+		` projections.idp_templates6_github_enterprise.scopes,` +
+		// gitlab
+		` projections.idp_templates6_gitlab.idp_id,` +
+		` projections.idp_templates6_gitlab.client_id,` +
+		` projections.idp_templates6_gitlab.client_secret,` +
+		` projections.idp_templates6_gitlab.scopes,` +
+		// gitlab self hosted
+		` projections.idp_templates6_gitlab_self_hosted.idp_id,` +
+		` projections.idp_templates6_gitlab_self_hosted.issuer,` +
+		` projections.idp_templates6_gitlab_self_hosted.client_id,` +
+		` projections.idp_templates6_gitlab_self_hosted.client_secret,` +
+		` projections.idp_templates6_gitlab_self_hosted.scopes,` +
+		// google
+		` projections.idp_templates6_google.idp_id,` +
+		` projections.idp_templates6_google.client_id,` +
+		` projections.idp_templates6_google.client_secret,` +
+		` projections.idp_templates6_google.scopes,` +
+		// saml
+		` projections.idp_templates6_saml.idp_id,` +
+		` projections.idp_templates6_saml.metadata,` +
+		` projections.idp_templates6_saml.key,` +
+		` projections.idp_templates6_saml.certificate,` +
+		` projections.idp_templates6_saml.binding,` +
+		` projections.idp_templates6_saml.with_signed_request,` +
+		` projections.idp_templates6_saml.signature_algorithm,` +
+		` projections.idp_templates6_saml.name_id_format,` +
+		` projections.idp_templates6_saml.transient_mapping_attribute_name,` +
+		` projections.idp_templates6_saml.federated_logout_enabled,` +
+		// ldap
+		` projections.idp_templates6_ldap2.idp_id,` +
+		` projections.idp_templates6_ldap2.servers,` +
+		` projections.idp_templates6_ldap2.start_tls,` +
+		` projections.idp_templates6_ldap2.base_dn,` +
+		` projections.idp_templates6_ldap2.bind_dn,` +
+		` projections.idp_templates6_ldap2.bind_password,` +
+		` projections.idp_templates6_ldap2.user_base,` +
+		` projections.idp_templates6_ldap2.user_object_classes,` +
+		` projections.idp_templates6_ldap2.user_filters,` +
+		` projections.idp_templates6_ldap2.timeout,` +
+		` projections.idp_templates6_ldap2.root_ca,` +
+		` projections.idp_templates6_ldap2.id_attribute,` +
+		` projections.idp_templates6_ldap2.first_name_attribute,` +
+		` projections.idp_templates6_ldap2.last_name_attribute,` +
+		` projections.idp_templates6_ldap2.display_name_attribute,` +
+		` projections.idp_templates6_ldap2.nick_name_attribute,` +
+		` projections.idp_templates6_ldap2.preferred_username_attribute,` +
+		` projections.idp_templates6_ldap2.email_attribute,` +
+		` projections.idp_templates6_ldap2.email_verified,` +
+		` projections.idp_templates6_ldap2.phone_attribute,` +
+		` projections.idp_templates6_ldap2.phone_verified_attribute,` +
+		` projections.idp_templates6_ldap2.preferred_language_attribute,` +
+		` projections.idp_templates6_ldap2.avatar_url_attribute,` +
+		` projections.idp_templates6_ldap2.profile_attribute,` +
+		// apple
+		` projections.idp_templates6_apple.idp_id,` +
+		` projections.idp_templates6_apple.client_id,` +
+		` projections.idp_templates6_apple.team_id,` +
+		` projections.idp_templates6_apple.key_id,` +
+		` projections.idp_templates6_apple.private_key,` +
+		` projections.idp_templates6_apple.scopes,` +
+		// zitadel
+		` projections.idp_templates6_zitadel.idp_id,` +
+		` projections.idp_templates6_zitadel.issuer,` +
+		` projections.idp_templates6_zitadel.client_id,` +
+		` projections.idp_templates6_zitadel.client_secret,` +
+		` projections.idp_templates6_zitadel.scopes,` +
+		` projections.idp_templates6_zitadel.instance_roles_info,` +
+		` COUNT(*) OVER ()` +
+		` FROM projections.idp_templates6` +
+		` LEFT JOIN projections.idp_templates6_oauth2 ON projections.idp_templates6.id = projections.idp_templates6_oauth2.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_oauth2.instance_id` +
+		` LEFT JOIN projections.idp_templates6_oidc ON projections.idp_templates6.id = projections.idp_templates6_oidc.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_oidc.instance_id` +
+		` LEFT JOIN projections.idp_templates6_jwt ON projections.idp_templates6.id = projections.idp_templates6_jwt.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_jwt.instance_id` +
+		` LEFT JOIN projections.idp_templates6_azure ON projections.idp_templates6.id = projections.idp_templates6_azure.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_azure.instance_id` +
+		` LEFT JOIN projections.idp_templates6_github ON projections.idp_templates6.id = projections.idp_templates6_github.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_github.instance_id` +
+		` LEFT JOIN projections.idp_templates6_github_enterprise ON projections.idp_templates6.id = projections.idp_templates6_github_enterprise.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_github_enterprise.instance_id` +
+		` LEFT JOIN projections.idp_templates6_gitlab ON projections.idp_templates6.id = projections.idp_templates6_gitlab.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_gitlab.instance_id` +
+		` LEFT JOIN projections.idp_templates6_gitlab_self_hosted ON projections.idp_templates6.id = projections.idp_templates6_gitlab_self_hosted.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_gitlab_self_hosted.instance_id` +
+		` LEFT JOIN projections.idp_templates6_google ON projections.idp_templates6.id = projections.idp_templates6_google.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_google.instance_id` +
+		` LEFT JOIN projections.idp_templates6_saml ON projections.idp_templates6.id = projections.idp_templates6_saml.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_saml.instance_id` +
+		` LEFT JOIN projections.idp_templates6_ldap2 ON projections.idp_templates6.id = projections.idp_templates6_ldap2.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_ldap2.instance_id` +
+		` LEFT JOIN projections.idp_templates6_apple ON projections.idp_templates6.id = projections.idp_templates6_apple.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_apple.instance_id` +
+		` LEFT JOIN projections.idp_templates6_zitadel ON projections.idp_templates6.id = projections.idp_templates6_zitadel.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_zitadel.instance_id`
+	idpTemplatesCols = []string{
+		"id",
+		"resource_owner",
+		"creation_date",
+		"change_date",
+		"sequence",
+		"state",
+		"name",
+		"type",
+		"owner_type",
+		"is_creation_allowed",
+		"is_linking_allowed",
+		"is_auto_creation",
+		"is_auto_update",
+		"auto_linking",
+		// oauth config
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"authorization_endpoint",
+		"token_endpoint",
+		"user_endpoint",
+		"scopes",
+		"id_attribute",
+		"use_pkce",
+		// oidc config
+		"id_id",
+		"issuer",
+		"client_id",
+		"client_secret",
+		"scopes",
+		"id_token_mapping",
+		"use_pkce",
+		// jwt
+		"idp_id",
+		"issuer",
+		"jwt_endpoint",
+		"keys_endpoint",
+		"header_name",
+		"audience",
+		// azure
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"scopes",
+		"tenant",
+		"is_email_verified",
+		// github config
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"scopes",
+		// github enterprise config
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"authorization_endpoint",
+		"token_endpoint",
+		"user_endpoint",
+		"scopes",
+		// gitlab config
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"scopes",
+		// gitlab self hosted config
+		"idp_id",
+		"issuer",
+		"client_id",
+		"client_secret",
+		"scopes",
+		// google config
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"scopes",
+		// saml config
+		"idp_id",
+		"metadata",
+		"key",
+		"certificate",
+		"binding",
+		"with_signed_request",
+		"signature_algorithm",
+		"name_id_format",
+		"transient_mapping_attribute_name",
+		"federated_logout_enabled",
+		// ldap config
+		"idp_id",
+		"servers",
+		"start_tls",
+		"base_dn",
+		"bind_dn",
+		"bind_password",
+		"user_base",
+		"user_object_classes",
+		"user_filters",
+		"timeout",
+		"root_ca",
+		"id_attribute",
+		"first_name_attribute",
+		"last_name_attribute",
+		"display_name_attribute",
+		"nick_name_attribute",
+		"preferred_username_attribute",
+		"email_attribute",
+		"email_verified",
+		"phone_attribute",
+		"phone_verified_attribute",
+		"preferred_language_attribute",
+		"avatar_url_attribute",
+		"profile_attribute",
+		// apple config
+		"idp_id",
+		"client_id",
+		"team_id",
+		"key_id",
+		"private_key",
+		"scopes",
+		// zitadel config
+		"idp_id",
+		"issuer",
+		"client_id",
+		"client_secret",
+		"scopes",
+		"instance_roles_info",
+		// count
 		"count",
 	}
 )
@@ -593,6 +628,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// azure
 						nil,
 						nil,
@@ -666,6 +702,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// apple
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// zitadel
 						nil,
 						nil,
 						nil,
@@ -749,6 +792,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// azure
 						nil,
 						nil,
@@ -822,6 +866,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// apple
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// zitadel
 						nil,
 						nil,
 						nil,
@@ -903,6 +954,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						"jwt",
 						"keys",
 						"header",
+						"audience",
 						// azure
 						nil,
 						nil,
@@ -982,6 +1034,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// zitadel
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -1006,6 +1065,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 					Endpoint:     "jwt",
 					KeysEndpoint: "keys",
 					HeaderName:   "header",
+					Audience:     "audience",
 				},
 			},
 		},
@@ -1050,6 +1110,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// jwt
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1128,6 +1189,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// apple
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// zitadel
 						nil,
 						nil,
 						nil,
@@ -1206,6 +1274,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// azure
 						nil,
 						nil,
@@ -1285,6 +1354,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// zitadel
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -1352,6 +1428,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// jwt
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1436,6 +1513,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// zitadel
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -1504,6 +1588,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// jwt
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1588,6 +1673,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// zitadel
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -1655,6 +1747,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// jwt
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1739,6 +1832,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// zitadel
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -1817,6 +1917,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// azure
 						nil,
 						nil,
@@ -1890,6 +1991,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						"avatar",
 						"profile",
 						// apple
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// zitadel
 						nil,
 						nil,
 						nil,
@@ -1989,6 +2097,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// azure
 						nil,
 						nil,
@@ -2068,6 +2177,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						"key_id",
 						nil,
 						database.TextArray[string]{"profile"},
+						// zitadel
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -2093,6 +2209,172 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 					KeyID:      "key_id",
 					PrivateKey: nil,
 					Scopes:     []string{"profile"},
+				},
+			},
+		},
+		{
+			name:    "prepareIDPTemplateByIDQuery zitadel idp",
+			prepare: prepareIDPTemplateByIDQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					regexp.QuoteMeta(idpTemplateQuery),
+					idpTemplateCols,
+					[]driver.Value{
+						"idp-id",
+						"ro",
+						testNow,
+						testNow,
+						uint64(20211109),
+						domain.IDPConfigStateActive,
+						"idp-name",
+						domain.IDPTypeZitadel,
+						domain.IdentityProviderTypeOrg,
+						true,
+						true,
+						true,
+						true,
+						domain.AutoLinkingOptionUsername,
+						// oauth
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// oidc
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// azure
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// github
+						nil,
+						nil,
+						nil,
+						nil,
+						// github enterprise
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab self hosted
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// google
+						nil,
+						nil,
+						nil,
+						nil,
+						// saml
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// ldap config
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// apple
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// zitadel
+						"idp-id",
+						"issuer",
+						"client_id",
+						nil,
+						database.TextArray[string]{"profile"},
+						[]byte(`[{"organizationId":"org1","organizationDomain":"org1.com"}]`),
+					},
+				),
+			},
+			object: &IDPTemplate{
+				CreationDate:      testNow,
+				ChangeDate:        testNow,
+				Sequence:          20211109,
+				ResourceOwner:     "ro",
+				ID:                "idp-id",
+				State:             domain.IDPStateActive,
+				Name:              "idp-name",
+				Type:              domain.IDPTypeZitadel,
+				OwnerType:         domain.IdentityProviderTypeOrg,
+				IsCreationAllowed: true,
+				IsLinkingAllowed:  true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       domain.AutoLinkingOptionUsername,
+				ZitadelIDPTemplate: &ZitadelIDPTemplate{
+					IDPID:        "idp-id",
+					Issuer:       "issuer",
+					ClientID:     "client_id",
+					ClientSecret: nil,
+					Scopes:       []string{"profile"},
+					InstanceRolesInfo: []idp.RolesInfo{
+						{
+							OrganizationID:     "org1",
+							OrganizationDomain: "org1.com",
+						},
+					},
 				},
 			},
 		},
@@ -2137,6 +2419,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// jwt
+						nil,
 						nil,
 						nil,
 						nil,
@@ -2215,6 +2498,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// apple
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// zitadel
 						nil,
 						nil,
 						nil,
@@ -2323,6 +2613,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// azure
 							nil,
 							nil,
@@ -2396,6 +2687,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							"avatar",
 							"profile",
 							// apple
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// zitadel
 							nil,
 							nil,
 							nil,
@@ -2504,6 +2802,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// azure
 							nil,
 							nil,
@@ -2583,6 +2882,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// zitadel
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -2653,6 +2959,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							// jwt
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2737,6 +3044,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// zitadel
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 						{
 							"idp-id-saml",
@@ -2772,6 +3086,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							// jwt
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2856,6 +3171,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// zitadel
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 						{
 							"idp-id-google",
@@ -2891,6 +3213,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							// jwt
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2969,6 +3292,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							// apple
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// zitadel
 							nil,
 							nil,
 							nil,
@@ -3015,6 +3345,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// azure
 							nil,
 							nil,
@@ -3088,6 +3419,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							// apple
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// zitadel
 							nil,
 							nil,
 							nil,
@@ -3134,6 +3472,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// azure
 							nil,
 							nil,
@@ -3207,6 +3546,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							// apple
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// zitadel
 							nil,
 							nil,
 							nil,
@@ -3253,6 +3599,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							"jwt",
 							"keys",
 							"header",
+							"audience",
 							// azure
 							nil,
 							nil,
@@ -3332,13 +3679,147 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// zitadel
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+						},
+						{
+							"idp-id-zitadel",
+							"ro",
+							testNow,
+							testNow,
+							uint64(20211109),
+							domain.IDPConfigStateActive,
+							"idp-name",
+							domain.IDPTypeZitadel,
+							domain.IdentityProviderTypeOrg,
+							true,
+							true,
+							true,
+							true,
+							domain.AutoLinkingOptionUsername,
+							// oauth
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// oidc
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// jwt
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// azure
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// github
+							nil,
+							nil,
+							nil,
+							nil,
+							// github enterprise
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// gitlab
+							nil,
+							nil,
+							nil,
+							nil,
+							// gitlab self hosted
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// google
+							nil,
+							nil,
+							nil,
+							nil,
+							// saml
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// ldap config
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// apple
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// zitadel
+							"idp-id-zitadel",
+							"issuer",
+							"client_id",
+							nil,
+							database.TextArray[string]{"profile"},
+							[]byte(`[{"organizationId":"org1","organizationDomain":"org1.com"}]`),
 						},
 					},
 				),
 			},
 			object: &IDPTemplates{
 				SearchResponse: SearchResponse{
-					Count: 6,
+					Count: 7,
 				},
 				Templates: []*IDPTemplate{
 					{
@@ -3434,7 +3915,6 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							Scopes:       []string{"profile"},
 						},
 					},
-
 					{
 						CreationDate:      testNow,
 						ChangeDate:        testNow,
@@ -3508,6 +3988,36 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							Endpoint:     "jwt",
 							KeysEndpoint: "keys",
 							HeaderName:   "header",
+							Audience:     "audience",
+						},
+					},
+					{
+						CreationDate:      testNow,
+						ChangeDate:        testNow,
+						Sequence:          20211109,
+						ResourceOwner:     "ro",
+						ID:                "idp-id-zitadel",
+						State:             domain.IDPStateActive,
+						Name:              "idp-name",
+						Type:              domain.IDPTypeZitadel,
+						OwnerType:         domain.IdentityProviderTypeOrg,
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+						AutoLinking:       domain.AutoLinkingOptionUsername,
+						ZitadelIDPTemplate: &ZitadelIDPTemplate{
+							IDPID:        "idp-id-zitadel",
+							Issuer:       "issuer",
+							ClientID:     "client_id",
+							ClientSecret: nil,
+							Scopes:       []string{"profile"},
+							InstanceRolesInfo: []idp.RolesInfo{
+								{
+									OrganizationID:     "org1",
+									OrganizationDomain: "org1.com",
+								},
+							},
 						},
 					},
 				},

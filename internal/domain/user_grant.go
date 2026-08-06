@@ -1,6 +1,10 @@
 package domain
 
-import es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+import (
+	"slices"
+
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+)
 
 type UserGrant struct {
 	es_models.ObjectRoot
@@ -27,7 +31,7 @@ func (u *UserGrant) IsValid() bool {
 
 func (g *UserGrant) HasInvalidRoles(validRoles []string) bool {
 	for _, roleKey := range g.RoleKeys {
-		if !containsRoleKey(roleKey, validRoles) {
+		if !slices.Contains(validRoles, roleKey) {
 			return true
 		}
 	}

@@ -664,6 +664,7 @@
     "ORG_USER_PERMISSION_EDITOR": "A le droit de gérer les attributions de rôles",
     "ORG_PROJECT_PERMISSION_EDITOR": "A le droit d'octroyer des droits aux projets",
     "ORG_PROJECT_CREATOR": "A le droit de créer ses propres projets et leurs paramètres sous-jacents.",
+    "ORG_DYNAMIC_CLIENT_REGISTRAR": "A le droit d'enregistrer dynamiquement des clients OAuth 2.0",
     "ORG_ADMIN_IMPERSONATOR": "A l'autorisation de se faire passer pour l'administrateur et les utilisateurs finaux de l'organisation",
     "ORG_END_USER_IMPERSONATOR": "Est autorisé à usurper l'identité des utilisateurs finaux de l'organisation",
     "ORG_USER_SELF_MANAGER": "A le droit de gérer ses propres utilisateurs",
@@ -1613,7 +1614,8 @@
         "5": "Initialisation de clé d'accès",
         "6": "Secret de l'application",
         "7": "OTP - SMS",
-        "8": "OTP - e-mail"
+        "8": "OTP - e-mail",
+        "9": "Code d'invitation"
       },
       "EXPIRY": "Expiration (en minutes)",
       "INCLUDEDIGITS": "Inclure les chiffres",
@@ -2363,7 +2365,8 @@
       "DESCRIPTION": "Entrez les données pour le fournisseur d'identité JWT.",
       "HEADERNAME": "Nom de l'en-tête",
       "JWTENDPOINT": "Point de terminaison JWT",
-      "JWTKEYSENDPOINT": "Point de terminaison des clés JWT"
+      "JWTKEYSENDPOINT": "Point de terminaison des clés JWT",
+      "AUDIENCE": "Audience"
     },
     "TOAST": {
       "SAVED": "Enregistré avec succès.",

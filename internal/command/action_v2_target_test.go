@@ -8,7 +8,6 @@ import (
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/denylist"
@@ -23,8 +22,7 @@ import (
 )
 
 func TestCommands_AddTarget(t *testing.T) {
-	localhostAddrChecker, err := denylist.NewHostChecker("localhost")
-	require.NoError(t, err)
+	localhostAddrChecker := denylist.NewHostChecker("localhost")
 
 	type fields struct {
 		eventstore                  func(t *testing.T) *eventstore.Eventstore
@@ -305,7 +303,7 @@ func TestCommands_AddTarget(t *testing.T) {
 				idGenerator:                 tt.fields.idGenerator,
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
-				ActionsV2DenyList:           tt.fields.denyList,
+				denyList:                    tt.fields.denyList,
 			}
 			_, err := c.AddTarget(tt.args.ctx, tt.args.add, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -322,8 +320,7 @@ func TestCommands_AddTarget(t *testing.T) {
 }
 
 func TestCommands_ChangeTarget(t *testing.T) {
-	localhostAddrChecker, err := denylist.NewHostChecker("localhost")
-	require.NoError(t, err)
+	localhostAddrChecker := denylist.NewHostChecker("localhost")
 
 	type fields struct {
 		eventstore                  func(t *testing.T) *eventstore.Eventstore
@@ -647,8 +644,8 @@ func TestCommands_ChangeTarget(t *testing.T) {
 				eventstore:                  tt.fields.eventstore(t),
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
-				ActionsV2DenyList:           tt.fields.denyList,
-				IPLookupFunction:            tt.fields.lookupFunc,
+				denyList:                    tt.fields.denyList,
+				ipLookupFunction:            tt.fields.lookupFunc,
 			}
 			_, err := c.ChangeTarget(tt.args.ctx, tt.args.change, tt.args.resourceOwner)
 			if tt.res.err == nil {

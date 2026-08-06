@@ -50,7 +50,7 @@ func (wm *UserIDPLinkWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
-		case *user.UserRemovedEvent:
+		default:
 			wm.WriteModel.AppendEvents(e)
 		}
 	}
@@ -70,7 +70,11 @@ func (wm *UserIDPLinkWriteModel) Reduce() error {
 			wm.State = domain.UserIDPLinkStateRemoved
 		case *user.UserIDPLinkCascadeRemovedEvent:
 			wm.State = domain.UserIDPLinkStateRemoved
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent:
+			wm.DisplayName = ""
+			wm.State = domain.UserIDPLinkStateUnspecified
 		case *user.UserRemovedEvent:
+			wm.DisplayName = ""
 			wm.State = domain.UserIDPLinkStateRemoved
 		}
 	}
@@ -83,7 +87,11 @@ func (wm *UserIDPLinkWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		EventTypes(user.UserIDPLinkAddedType,
+		EventTypes(
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
+			user.UserIDPLinkAddedType,
 			user.UserIDPExternalIDMigratedType,
 			user.UserIDPLinkRemovedType,
 			user.UserIDPLinkCascadeRemovedType,

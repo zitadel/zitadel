@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"net/url"
 	"strings"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	project_repo "github.com/zitadel/zitadel/internal/repository/project"
@@ -188,6 +190,19 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		return nil, err
 	}
 
+	return c.pushOIDCApplication(ctx, addedApplication, oidcApp, appID)
+}
+
+// pushOIDCApplication writes the application-added and oidc-config-added events for a new
+// OIDC application onto the project aggregate. Authorization must already have been
+// performed by the caller: either through an app.write permission check (see
+// addOIDCApplicationWithID) or, for dynamic client registration, at the registration endpoint
+// through the instance's security settings and registration mode (see AddDynamicOIDCClient).
+//
+// extraEvents are appended to the same push, so callers can persist additional state about
+// the application atomically with its creation (dynamic client registration uses this to
+// store the registration access token hash).
+func (c *Commands) pushOIDCApplication(ctx context.Context, addedApplication *OIDCApplicationWriteModel, oidcApp *domain.OIDCApp, appID string, extraEvents ...eventstore.Command) (_ *domain.OIDCApp, err error) {
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
 
 	oidcApp.AppID = appID
@@ -207,6 +222,12 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 	if err != nil {
 		return nil, err
 	}
+
+	backchannelLogoutURI, err := c.validateBackchannelLogoutURI(oidcApp)
+	if err != nil {
+		return nil, err
+	}
+
 	events = append(events, project_repo.NewOIDCConfigAddedEvent(ctx,
 		projectAgg,
 		gu.Value(oidcApp.OIDCVersion),
@@ -227,10 +248,12 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		gu.Value(oidcApp.ClockSkew),
 		trimStringSliceWhiteSpaces(oidcApp.AdditionalOrigins),
 		gu.Value(oidcApp.SkipNativeAppSuccessPage),
-		strings.TrimSpace(gu.Value(oidcApp.BackChannelLogoutURI)),
+		backchannelLogoutURI,
 		gu.Value(oidcApp.LoginVersion),
 		strings.TrimSpace(gu.Value(oidcApp.LoginBaseURI)),
 	))
+
+	events = append(events, extraEvents...)
 
 	addedApplication.AppID = oidcApp.AppID
 	postCommit, err := c.applicationCreatedMilestone(ctx, &events)
@@ -250,6 +273,20 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 	result.ClientSecretString = plain
 	result.FillCompliance()
 	return result, nil
+}
+
+func (c *Commands) validateBackchannelLogoutURI(oidcApp *domain.OIDCApp) (string, error) {
+	backchannelLogoutURL := strings.TrimSpace(gu.Value(oidcApp.BackChannelLogoutURI))
+	if backchannelLogoutURL != "" {
+		url, err := url.Parse(backchannelLogoutURL)
+		if err != nil {
+			return "", zerrors.ThrowInvalidArgument(err, "PROJECT-iZL2Ac", "Errors.Project.App.Invalid.BackchannelLogoutURL")
+		}
+		if err := denylist.IsURLBlocked(c.denyList, url, c.ipLookupFunction); err != nil {
+			return "", zerrors.ThrowInvalidArgument(err, "PROJECT-msNebo", "Errors.Project.App.Blocked.BackchannelLogoutURL")
+		}
+	}
+	return backchannelLogoutURL, nil
 }
 
 func (c *Commands) UpdateOIDCApplication(ctx context.Context, oidc *domain.OIDCApp, resourceOwner string) (*domain.OIDCApp, error) {
@@ -274,17 +311,49 @@ func (c *Commands) UpdateOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 		return nil, err
 	}
 
-	projectAgg := ProjectAggregateFromWriteModel(&existingOIDC.WriteModel)
+	changedEvent, hasChanged, err := c.oidcApplicationChangeEvent(ctx, existingOIDC, oidc)
+	if err != nil {
+		return nil, err
+	}
+	if !hasChanged {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-1m88i", "Errors.NoChangesFound")
+	}
+
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingOIDC, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+
+	result := oidcWriteModelToOIDCConfig(existingOIDC)
+	result.FillCompliance()
+	return result, nil
+}
+
+// oidcApplicationChangeEvent builds the oidc-config-changed event that brings an existing
+// OIDC application to the desired state. It assumes the existing write model has been loaded
+// and reduced and that authorization has already been performed by the caller (an app.write
+// permission check for UpdateOIDCApplication, the registration access token for
+// UpdateDynamicOIDCClient). It reports whether anything actually changed.
+func (c *Commands) oidcApplicationChangeEvent(ctx context.Context, existingOIDC *OIDCApplicationWriteModel, oidc *domain.OIDCApp) (*project_repo.OIDCConfigChangedEvent, bool, error) {
+	projectAgg := ProjectAggregateFromWriteModelWithCTX(ctx, &existingOIDC.WriteModel)
 	var backChannelLogout, loginBaseURI *string
 	if oidc.BackChannelLogoutURI != nil {
-		backChannelLogout = gu.Ptr(strings.TrimSpace(*oidc.BackChannelLogoutURI))
+		bcl, err := c.validateBackchannelLogoutURI(oidc)
+		if err != nil {
+			return nil, false, err
+		}
+		backChannelLogout = gu.Ptr(bcl)
 	}
 
 	if oidc.LoginBaseURI != nil {
 		loginBaseURI = gu.Ptr(strings.TrimSpace(*oidc.LoginBaseURI))
 	}
 
-	changedEvent, hasChanged, err := existingOIDC.NewChangedEvent(
+	return existingOIDC.NewChangedEvent(
 		ctx,
 		projectAgg,
 		oidc.AppID,
@@ -307,25 +376,6 @@ func (c *Commands) UpdateOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 		oidc.LoginVersion,
 		loginBaseURI,
 	)
-	if err != nil {
-		return nil, err
-	}
-	if !hasChanged {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-1m88i", "Errors.NoChangesFound")
-	}
-
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(existingOIDC, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-
-	result := oidcWriteModelToOIDCConfig(existingOIDC)
-	result.FillCompliance()
-	return result, nil
 }
 
 // Deprecated: use [ChangeApplicationSecret], which supports both OIDC and API applications.

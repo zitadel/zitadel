@@ -1613,7 +1613,8 @@
         "5": "패스키 초기화",
         "6": "애플리케이션 시크릿",
         "7": "OTP - SMS",
-        "8": "OTP - 이메일"
+        "8": "OTP - 이메일",
+        "9": "초대 코드"
       },
       "EXPIRY": "만료 시간 (분)",
       "INCLUDEDIGITS": "숫자 포함",
@@ -2366,7 +2367,8 @@
       "DESCRIPTION": "JWT ID 제공자에 필요한 데이터를 입력하세요.",
       "HEADERNAME": "헤더 이름",
       "JWTENDPOINT": "JWT 엔드포인트",
-      "JWTKEYSENDPOINT": "JWT 키 엔드포인트"
+      "JWTKEYSENDPOINT": "JWT 키 엔드포인트",
+      "AUDIENCE": "청중"
     },
     "APPLE": {
       "TEAMID": "팀 ID",

@@ -424,7 +424,7 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 			apiFields,
 			action.Script,
 			action.Name,
-			append(actions.ActionToOptions(action), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
+			append(actions.ActionToOptions(action), actions.WithHTTP(actionCtx, s.httpClient), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -461,7 +461,7 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 		UserGrants:   qu.UserGrants,
 	}
 
-	resp, err := execution.CallTargets(ctx, executionTargets, info, s.targetEncryptionAlgorithm, s.query.GetActiveSigningWebKey, s.command.ActionsV2DenyList)
+	resp, err := execution.CallTargets(ctx, executionTargets, info, s.targetEncryptionAlgorithm, s.query.GetActiveSigningWebKey, s.httpClient)
 	if err != nil {
 		return err
 	}

@@ -48,6 +48,7 @@ func NewProvider(
 	instanceHandler,
 	userAgentCookie func(http.Handler) http.Handler,
 	accessHandler *middleware.AccessInterceptor,
+	httpClient *http.Client,
 ) (*Provider, error) {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 
@@ -63,6 +64,7 @@ func NewProvider(
 		fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
 		conf.DefaultLoginURLV2,
 		ContextToIssuer,
+		httpClient,
 	)
 	if err != nil {
 		return nil, err
@@ -125,6 +127,7 @@ func newStorage(
 	defaultLoginURL string,
 	defaultLoginURLV2 string,
 	contextToIssuer func(context.Context) string,
+	actionHttpClient *http.Client,
 ) (*Storage, error) {
 	return &Storage{
 		encAlg:            encAlg,
@@ -138,6 +141,7 @@ func newStorage(
 		defaultLoginURL:   defaultLoginURL,
 		defaultLoginURLv2: defaultLoginURLV2,
 		contextToIssuer:   contextToIssuer,
+		httpClient:        actionHttpClient,
 	}, nil
 }
 

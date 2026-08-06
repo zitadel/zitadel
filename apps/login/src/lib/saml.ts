@@ -1,3 +1,4 @@
+import { isSafeRedirectUri } from "@/lib/client-utils";
 import { Cookie } from "@/lib/cookies";
 import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
@@ -72,8 +73,16 @@ export async function loginWithSAMLAndSession({
           }),
         });
         if (url && binding.case === "redirect") {
+          if (!isSafeRedirectUri(url)) {
+            console.warn("loginWithSAMLAndSession: Blocked unsafe SAML redirect URL:", url);
+            return { error: "Unsafe redirect URI was blocked" };
+          }
           return { redirect: url };
         } else if (url && binding.case === "post") {
+          if (!isSafeRedirectUri(url)) {
+            console.warn("loginWithSAMLAndSession: Blocked unsafe SAML post URL:", url);
+            return { error: "Unsafe redirect URI was blocked" };
+          }
           return {
             samlData: {
               url,
@@ -96,8 +105,10 @@ export async function loginWithSAMLAndSession({
             organization: selectedSession.factors?.user?.organizationId,
           });
 
-          if (loginSettings?.defaultRedirectUri) {
+          if (loginSettings?.defaultRedirectUri && isSafeRedirectUri(loginSettings.defaultRedirectUri)) {
             return { redirect: loginSettings.defaultRedirectUri };
+          } else if (loginSettings?.defaultRedirectUri) {
+            console.warn("loginWithSAMLAndSession: Unsafe defaultRedirectUri prevented:", loginSettings.defaultRedirectUri);
           }
 
           const signedinUrl = "/signedin";

@@ -664,6 +664,7 @@
     "ORG_USER_PERMISSION_EDITOR": "Tem permissão para gerenciar atribuições de funções",
     "ORG_PROJECT_PERMISSION_EDITOR": "Tem permissão para gerenciar concessões de projetos",
     "ORG_PROJECT_CREATOR": "Tem permissão para criar seus próprios projetos e configurações subjacentes",
+    "ORG_DYNAMIC_CLIENT_REGISTRAR": "Tem permissão para registrar dinamicamente clientes OAuth 2.0",
     "ORG_ADMIN_IMPERSONATOR": "Tem permissão para se passar por administradores e usuários finais da organização",
     "ORG_END_USER_IMPERSONATOR": "Tem permissão para se passar por usuários finais da organização",
     "ORG_USER_SELF_MANAGER": "Tem permissão para gerenciar seu próprio usuário",
@@ -1614,7 +1615,8 @@
         "5": "Inicialização passkey",
         "6": "Segredo do aplicativo",
         "7": "OTP - SMS",
-        "8": "OTP - e-mail"
+        "8": "OTP - e-mail",
+        "9": "Código de convite"
       },
       "EXPIRY": "Expiração (em minutos)",
       "INCLUDEDIGITS": "Incluir números",
@@ -2358,7 +2360,8 @@
       "DESCRIPTION": "Insira os dados para o Provedor de Identidade JWT.",
       "HEADERNAME": "Nome do Cabeçalho",
       "JWTENDPOINT": "Endpoint JWT",
-      "JWTKEYSENDPOINT": "Endpoint de Chaves JWT"
+      "JWTKEYSENDPOINT": "Endpoint de Chaves JWT",
+      "AUDIENCE": "Audiência"
     },
     "TOAST": {
       "SAVED": "Salvo com sucesso.",

@@ -27,6 +27,7 @@ type command struct {
 	Payload       Payload
 	Creator       string
 	Owner         string
+	EnforceOwner  bool
 }
 
 func (c *command) Aggregate() *eventstore.Aggregate {
@@ -106,6 +107,7 @@ func commandToEvent(cmd eventstore.Command) (_ eventstore.Event, err error) {
 		Payload:       payload,
 		Creator:       cmd.Creator(),
 		Owner:         cmd.Aggregate().ResourceOwner,
+		EnforceOwner:  eventstore.ShouldEnforceResourceOwner(cmd),
 	}
 
 	return &event{

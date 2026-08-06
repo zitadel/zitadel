@@ -38,6 +38,12 @@ func (wm *WriteModel) Reduce() error {
 		wm.ResourceOwner = latestEvent.Aggregate().ResourceOwner
 	}
 
+	for _, event := range wm.Events {
+		if _, ok := event.(EnforceResourceOwnerCommand); ok {
+			wm.ResourceOwner = event.Aggregate().ResourceOwner
+		}
+	}
+
 	if wm.InstanceID == "" {
 		wm.InstanceID = latestEvent.Aggregate().InstanceID
 	}

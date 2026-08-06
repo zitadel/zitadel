@@ -19,6 +19,7 @@ export function buildCSP(options: CSPOptions = {}): string {
 
   if (options.serviceUrl) {
     directives["img-src"] = [...directives["img-src"], options.serviceUrl];
+    directives["font-src"] = [...directives["font-src"], options.serviceUrl];
   }
 
   if (options.iframeOrigins && options.iframeOrigins.length > 0) {

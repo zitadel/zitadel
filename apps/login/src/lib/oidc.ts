@@ -1,3 +1,4 @@
+import { isSafeRedirectUri } from "@/lib/client-utils";
 import { Cookie } from "@/lib/cookies";
 import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
@@ -64,6 +65,10 @@ export async function loginWithOIDCAndSession({
           }),
         });
         if (callbackUrl) {
+          if (!isSafeRedirectUri(callbackUrl)) {
+            console.warn("loginWithOIDCAndSession: Blocked unsafe OIDC callback URL:", callbackUrl);
+            return { error: "Unsafe redirect URI was blocked" };
+          }
           return { redirect: callbackUrl };
         } else {
           return { error: "An error occurred!" };
@@ -77,8 +82,10 @@ export async function loginWithOIDCAndSession({
             organization: selectedSession.factors?.user?.organizationId,
           });
 
-          if (loginSettings?.defaultRedirectUri) {
+          if (loginSettings?.defaultRedirectUri && isSafeRedirectUri(loginSettings.defaultRedirectUri)) {
             return { redirect: loginSettings.defaultRedirectUri };
+          } else if (loginSettings?.defaultRedirectUri) {
+            console.warn("loginWithOIDCAndSession: Unsafe defaultRedirectUri prevented:", loginSettings.defaultRedirectUri);
           }
 
           const signedinUrl = "/signedin";

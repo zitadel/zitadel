@@ -1,10 +1,11 @@
 import { getValidLocaleFromUILocales } from "@/lib/auth-utils";
+import { isSafeRedirectUri } from "@/lib/client-utils";
 import { getLanguageCookie, setLanguageCookie } from "@/lib/cookies";
 
 import { shouldUILocalesOverrideCookie } from "@/lib/i18n";
 import { idpTypeToSlug } from "@/lib/idp";
 import { createLogger } from "@/lib/logger";
-import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
+import { sendLoginname } from "@/lib/server/loginname";
 import { constructUrl } from "@/lib/service-url";
 import { findValidSession } from "@/lib/session";
 import {
@@ -56,10 +57,12 @@ const gotoAccounts = ({
   request,
   requestId,
   organization,
+  orgDomain,
 }: {
   request: NextRequest;
   requestId: string;
   organization?: string;
+  orgDomain?: string;
 }): NextResponse<unknown> => {
   const accountsUrl = constructUrl(request, "/accounts");
 
@@ -69,9 +72,99 @@ const gotoAccounts = ({
   if (organization) {
     accountsUrl.searchParams.set("organization", organization);
   }
+  if (orgDomain) {
+    accountsUrl.searchParams.set("orgDomain", orgDomain);
+  }
 
   return NextResponse.redirect(accountsUrl);
 };
+
+const gotoLoginname = ({
+  request,
+  requestId,
+  loginHint,
+  organization,
+  orgDomain,
+}: {
+  request: NextRequest;
+  requestId: string;
+  loginHint?: string;
+  organization?: string;
+  orgDomain?: string;
+}): NextResponse<unknown> => {
+  const loginNameUrl = constructUrl(request, "/loginname");
+  loginNameUrl.searchParams.set("requestId", requestId);
+
+  // Prefill only, no auto-submit: see resolveLoginHint.
+  if (loginHint) {
+    loginNameUrl.searchParams.set("loginName", loginHint);
+  }
+  if (organization) {
+    loginNameUrl.searchParams.set("organization", organization);
+  }
+  if (orgDomain) {
+    loginNameUrl.searchParams.set("orgDomain", orgDomain);
+  }
+
+  return NextResponse.redirect(loginNameUrl);
+};
+
+/**
+ * Resolve a login_hint server-side to a redirect straight to the next step
+ * (e.g. /password), skipping the /loginname screen entirely. Returns null when
+ * there is no hint or it can't be resolved (unknown/ambiguous user, transient
+ * error), in which case callers fall back to the prefilled /loginname screen.
+ */
+const resolveLoginHint = async ({
+  request,
+  requestId,
+  loginHint,
+  organization,
+}: {
+  request: NextRequest;
+  requestId: string;
+  loginHint?: string;
+  organization?: string;
+}): Promise<NextResponse<unknown> | null> => {
+  if (!loginHint) {
+    return null;
+  }
+
+  try {
+    // sendLoginname derives enumeration protection (ignoreUnknownUsernames) from the
+    // same organization context server-side, so an unknown hint redirects to the
+    // (fake) /password step like a known one instead of falling back to /loginname
+    // and disclosing that the user does not exist.
+    const res = await sendLoginname({
+      loginName: loginHint,
+      requestId,
+      organization: organization || undefined,
+    });
+
+    if (res && "redirect" in res && res.redirect) {
+      return NextResponse.redirect(constructUrl(request, res.redirect));
+    }
+
+    if (res && "error" in res && res.error) {
+      logger.debug("login_hint could not be resolved, falling back to /loginname", { error: res.error });
+    }
+  } catch (error) {
+    logger.error("Failed to resolve login_hint via sendLoginname:", { error });
+  }
+
+  return null;
+};
+
+/**
+ * Filter sessions by organization, matching the same logic used in
+ * the accounts page and findValidSession.
+ */
+function getEligibleSessions(sessions: Session[], organization?: string): Session[] {
+  if (!organization) {
+    return sessions;
+  }
+  return sessions.filter((s) => s.factors?.user?.organizationId === organization);
+}
 
 export interface FlowInitiationParams {
   serviceConfig: ServiceConfig;
@@ -98,7 +191,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
   }
 
   let organization = "";
-  let suffix = "";
+  let orgDomain = "";
   let idpId = "";
 
   if (authRequest?.scope) {
@@ -113,15 +206,15 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
       if (orgDomainScope) {
         const matched = ORG_DOMAIN_SCOPE_REGEX.exec(orgDomainScope);
-        const orgDomain = matched?.[1] ?? "";
+        const scopeDomain = matched?.[1] ?? "";
 
-        logger.info("Extracted org domain:", { orgDomain });
-        if (orgDomain) {
-          const orgs = await getOrgsByDomain({ serviceConfig, domain: orgDomain });
+        logger.info("Extracted org domain:", { orgDomain: scopeDomain });
+        if (scopeDomain) {
+          const orgs = await getOrgsByDomain({ serviceConfig, domain: scopeDomain });
 
           if (orgs.result && orgs.result.length === 1) {
             organization = orgs.result[0].id ?? "";
-            suffix = orgDomain;
+            orgDomain = scopeDomain;
           }
         }
       }
@@ -145,9 +238,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
         if (identityProviderType === IdentityProviderType.LDAP) {
           const ldapUrl = constructUrl(request, "/ldap");
-          if (authRequest.id) {
-            ldapUrl.searchParams.set("requestId", `oidc_${authRequest.id}`);
-          }
+          ldapUrl.searchParams.set("requestId", requestId);
           if (organization) {
             ldapUrl.searchParams.set("organization", organization);
           }
@@ -224,48 +315,45 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
   // use existing session and hydrate it for oidc
   if (authRequest && sessions.length) {
+    // Pre-filter sessions by organization so we don't show an empty accounts
+    // page when the org scope excludes all existing browser sessions.
+    const eligibleSessions = getEligibleSessions(sessions, organization);
+
     if (authRequest.prompt.includes(Prompt.SELECT_ACCOUNT)) {
+      if (eligibleSessions.length === 0) {
+        return gotoLoginname({
+          request,
+          requestId,
+          loginHint: authRequest.loginHint,
+          organization,
+          orgDomain,
+        });
+      }
       return gotoAccounts({
         request,
-        requestId: `oidc_${authRequest.id}`,
+        requestId,
         organization,
+        orgDomain,
       });
     } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
-      if (authRequest.loginHint) {
-        try {
-          let command: SendLoginnameCommand = {
-            loginName: authRequest.loginHint,
-            requestId: authRequest.id,
-          };
+      const hintResponse = await resolveLoginHint({
+        request,
+        requestId,
+        loginHint: authRequest.loginHint,
+        organization,
+      });
 
-          if (organization) {
-            command = { ...command, organization };
-          }
-
-          const res = await sendLoginname(command);
-
-          if (res && "redirect" in res && res?.redirect) {
-            const absoluteUrl = constructUrl(request, res.redirect);
-            return NextResponse.redirect(absoluteUrl.toString());
-          }
-        } catch (error) {
-          logger.error("Failed to execute sendLoginname:", { error });
-        }
+      if (hintResponse) {
+        return hintResponse;
       }
 
-      const loginNameUrl = constructUrl(request, "/loginname");
-      loginNameUrl.searchParams.set("requestId", requestId);
-
-      if (authRequest.loginHint) {
-        loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
-      }
-      if (organization) {
-        loginNameUrl.searchParams.set("organization", organization);
-      }
-      if (suffix) {
-        loginNameUrl.searchParams.set("suffix", suffix);
-      }
-      return NextResponse.redirect(loginNameUrl);
+      return gotoLoginname({
+        request,
+        requestId,
+        loginHint: authRequest.loginHint,
+        organization,
+        orgDomain,
+      });
     } else if (authRequest.prompt.includes(Prompt.NONE)) {
       let securitySettings: SecuritySettings | undefined;
       try {
@@ -306,6 +394,10 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         }),
       });
 
+      if (!isSafeRedirectUri(callbackUrl)) {
+        logger.warn("Blocked unsafe OIDC callback URL (prompt=none)", { callbackUrl });
+        return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+      }
       const callbackResponse = NextResponse.redirect(callbackUrl);
       setCSPHeaders(callbackResponse, serviceConfig, securitySettings);
       return callbackResponse;
@@ -313,10 +405,34 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       let selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
 
       if (!selectedSession || !selectedSession.id) {
+        // login_hint matches no session: resolve it straight to the next step.
+        const hintResponse = await resolveLoginHint({
+          request,
+          requestId,
+          loginHint: authRequest.loginHint,
+          organization,
+        });
+
+        if (hintResponse) {
+          return hintResponse;
+        }
+
+        // Prefill loginname (not the account picker) for an unresolved hint or when
+        // no session is eligible: the picker would only list non-matching accounts.
+        if (authRequest.loginHint || eligibleSessions.length === 0) {
+          return gotoLoginname({
+            request,
+            requestId,
+            loginHint: authRequest.loginHint,
+            organization,
+            orgDomain,
+          });
+        }
         return gotoAccounts({
           request,
-          requestId: `oidc_${authRequest.id}`,
+          requestId,
           organization,
+          orgDomain,
         });
       }
 
@@ -325,8 +441,9 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       if (!cookie || !cookie.id || !cookie.token) {
         return gotoAccounts({
           request,
-          requestId: `oidc_${authRequest.id}`,
+          requestId,
           organization,
+          orgDomain,
         });
       }
 
@@ -347,12 +464,17 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           }),
         });
         if (callbackUrl) {
+          if (!isSafeRedirectUri(callbackUrl)) {
+            logger.warn("Blocked unsafe OIDC callback URL", { callbackUrl });
+            return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+          }
           return NextResponse.redirect(callbackUrl);
         } else {
           logger.info("could not create callback, redirect user to choose other account");
           return gotoAccounts({
             request,
             organization,
+            orgDomain,
             requestId,
           });
         }
@@ -362,27 +484,30 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           request,
           requestId,
           organization,
+          orgDomain,
         });
       }
     }
   } else {
-    const loginNameUrl = constructUrl(request, "/loginname");
-    loginNameUrl.searchParams.set("requestId", requestId);
+    // No session: resolve a login_hint straight to the next step if we can.
+    const hintResponse = await resolveLoginHint({
+      request,
+      requestId,
+      loginHint: authRequest?.loginHint,
+      organization,
+    });
 
-    if (authRequest?.loginHint) {
-      loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
-      loginNameUrl.searchParams.set("submit", "true");
+    if (hintResponse) {
+      return hintResponse;
     }
 
-    if (organization) {
-      loginNameUrl.searchParams.append("organization", organization);
-    }
-
-    if (suffix) {
-      loginNameUrl.searchParams.append("suffix", suffix);
-    }
-
-    return NextResponse.redirect(loginNameUrl);
+    return gotoLoginname({
+      request,
+      requestId,
+      loginHint: authRequest?.loginHint,
+      organization,
+      orgDomain,
+    });
   }
 }
 
@@ -446,8 +571,16 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
     });
 
     if (url && binding.case === "redirect") {
+      if (!isSafeRedirectUri(url)) {
+        logger.warn("Blocked unsafe SAML redirect URL", { url });
+        return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+      }
       return NextResponse.redirect(url);
     } else if (url && binding.case === "post") {
+      if (!isSafeRedirectUri(url)) {
+        logger.warn("Blocked unsafe SAML post URL", { url });
+        return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+      }
       const html = `
         <html>
           <body onload="document.forms[0].submit()">

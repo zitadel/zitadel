@@ -4,6 +4,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/metadata"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 type MetadataWriteModel struct {
@@ -17,6 +19,10 @@ type MetadataWriteModel struct {
 func (wm *MetadataWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent, *user.UserRemovedEvent,
+			*org.OrgAddedEvent, *org.OrgRemovedEvent:
+			wm.Value = nil
+			wm.State = domain.MetadataStateUnspecified
 		case *metadata.SetEvent:
 			if wm.Key != e.Key {
 				continue
@@ -44,6 +50,9 @@ type MetadataListWriteModel struct {
 func (wm *MetadataListWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent, *user.UserRemovedEvent,
+			*org.OrgAddedEvent, *org.OrgRemovedEvent:
+			wm.metadataList = make(map[string][]byte)
 		case *metadata.SetEvent:
 			wm.metadataList[e.Key] = e.Value
 		case *metadata.RemovedEvent:

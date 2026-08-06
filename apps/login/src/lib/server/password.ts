@@ -374,7 +374,7 @@ export async function sendPassword(
   }
 
   // check to see if user was verified
-  const emailVerificationCheck = checkEmailVerification(session, humanUser, command.organization, command.requestId);
+  const emailVerificationCheck = await checkEmailVerification(session, humanUser, command.organization, command.requestId);
 
   if (emailVerificationCheck?.redirect) {
     return emailVerificationCheck;

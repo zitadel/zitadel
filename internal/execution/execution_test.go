@@ -423,9 +423,7 @@ func Test_CallTarget(t *testing.T) {
 }
 
 func Test_CallTargets(t *testing.T) {
-	deniedLocalhost, err := denylist.NewHostChecker("127.0.0.1")
-	require.NoError(t, err)
-	deniedIPs := []denylist.AddressChecker{deniedLocalhost}
+	deniedIPs := []denylist.AddressChecker{denylist.NewHostChecker("127.0.0.1")}
 	type args struct {
 		ctx                    context.Context
 		info                   *middleware.ContextInfoRequest
@@ -720,7 +718,7 @@ func checkRequest(t *testing.T, sent *http.Request, method string, checkExpected
 
 func testCall(ctx context.Context, timeout time.Duration, body []byte, signingKey string) func(string) ([]byte, error) {
 	return func(url string) ([]byte, error) {
-		return execution.Call(ctx, url, timeout, body, signingKey)
+		return execution.Call(ctx, url, timeout, body, signingKey, http.DefaultClient)
 	}
 }
 
@@ -734,7 +732,7 @@ func testCallTarget(ctx context.Context,
 ) func(string) ([]byte, error) {
 	return func(url string) (r []byte, err error) {
 		target.Endpoint = url
-		return execution.CallTarget(ctx, target, info, alg, signerOnce, encrypters, actionsDenyList)
+		return execution.CallTarget(ctx, target, info, alg, signerOnce, encrypters, &http.Client{Transport: denylist.NewHTTPTransport(actionsDenyList)})
 	}
 }
 
@@ -751,7 +749,7 @@ func testCallTargets(ctx context.Context,
 			t.Endpoint = urls[i]
 			targets[i] = t
 		}
-		return execution.CallTargets(ctx, targets, info, alg, activeSigningKey, actionsDenyList)
+		return execution.CallTargets(ctx, targets, info, alg, activeSigningKey, &http.Client{Transport: denylist.NewHTTPTransport(actionsDenyList)})
 	}
 }
 
