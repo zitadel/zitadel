@@ -2672,7 +2672,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI",
+      "IOSAPPLINKINCOMPLETE": "Team ID i Bundle ID iOS muszą być ustawione razem albo oba pozostawione puste.",
+      "ANDROIDPACKAGEREQUIRED": "Nazwa pakietu Android jest wymagana, gdy ustawiono odciski certyfikatu."
     },
     "API": {
       "INFO": {

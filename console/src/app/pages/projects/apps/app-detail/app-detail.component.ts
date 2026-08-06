@@ -7,6 +7,8 @@ import {
   UntypedFormBuilder,
   UntypedFormControl,
   UntypedFormGroup,
+  ValidationErrors,
+  ValidatorFn,
   Validators,
 } from '@angular/forms';
 import { MatCheckboxChange } from '@angular/material/checkbox';
@@ -213,22 +215,25 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     private router: Router,
     private breadcrumbService: BreadcrumbService,
   ) {
-    this.oidcForm = this.fb.group({
-      devMode: [{ value: false, disabled: true }],
-      skipNativeAppSuccessPage: [{ value: false, disabled: true }],
-      clientId: [{ value: '', disabled: true }],
-      responseTypesList: [{ value: [], disabled: true }],
-      grantTypesList: [{ value: [], disabled: true }],
-      appType: [{ value: '', disabled: true }],
-      authMethodType: [{ value: '', disabled: true }],
-      loginV2: [{ value: false, disabled: true }],
-      loginV2BaseURL: [{ value: '', disabled: true }],
-      backChannelLogoutURI: [{ value: '', disabled: true }],
-      iosTeamId: [{ value: '', disabled: true }, [Validators.pattern(/^([A-Z0-9]{10})?$/)]],
-      iosBundleId: [{ value: '', disabled: true }, [Validators.maxLength(200)]],
-      androidPackageName: [{ value: '', disabled: true }, [Validators.maxLength(200)]],
-      androidSha256CertFingerprints: [{ value: '', disabled: true }],
-    });
+    this.oidcForm = this.fb.group(
+      {
+        devMode: [{ value: false, disabled: true }],
+        skipNativeAppSuccessPage: [{ value: false, disabled: true }],
+        clientId: [{ value: '', disabled: true }],
+        responseTypesList: [{ value: [], disabled: true }],
+        grantTypesList: [{ value: [], disabled: true }],
+        appType: [{ value: '', disabled: true }],
+        authMethodType: [{ value: '', disabled: true }],
+        loginV2: [{ value: false, disabled: true }],
+        loginV2BaseURL: [{ value: '', disabled: true }],
+        backChannelLogoutURI: [{ value: '', disabled: true }],
+        iosTeamId: [{ value: '', disabled: true }, [Validators.pattern(/^([A-Z0-9]{10})?$/)]],
+        iosBundleId: [{ value: '', disabled: true }, [Validators.maxLength(200)]],
+        androidPackageName: [{ value: '', disabled: true }, [Validators.maxLength(200)]],
+        androidSha256CertFingerprints: [{ value: '', disabled: true }],
+      },
+      { validators: [appLinkConfigValidator()] },
+    );
 
     this.oidcTokenForm = this.fb.group({
       accessTokenType: [{ value: '', disabled: true }],
@@ -1058,4 +1063,30 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       }
     }
   }
+}
+
+/** Mirrors backend AppLinkConfigValid: iOS fields together; package required when fingerprints are set. */
+function appLinkConfigValidator(): ValidatorFn {
+  return (group: AbstractControl): ValidationErrors | null => {
+    const teamId = String(group.get('iosTeamId')?.value ?? '').trim();
+    const bundleId = String(group.get('iosBundleId')?.value ?? '').trim();
+    const packageName = String(group.get('androidPackageName')?.value ?? '').trim();
+    const fingerprintsRaw = group.get('androidSha256CertFingerprints')?.value;
+    const fingerprints =
+      typeof fingerprintsRaw === 'string'
+        ? fingerprintsRaw
+            .split(/[\n,]+/)
+            .map((fp) => fp.trim())
+            .filter((fp) => fp.length > 0)
+        : [];
+
+    const errors: ValidationErrors = {};
+    if ((teamId === '') !== (bundleId === '')) {
+      errors['iosAppLinkIncomplete'] = true;
+    }
+    if (fingerprints.length > 0 && packageName === '') {
+      errors['androidAppLinkPackageRequired'] = true;
+    }
+    return Object.keys(errors).length ? errors : null;
+  };
 }

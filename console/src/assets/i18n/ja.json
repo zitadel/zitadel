@@ -2698,7 +2698,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "バックチャネルログアウトURI"
+      "BACKCHANNELLOOGOUTURI": "バックチャネルログアウトURI",
+      "IOSAPPLINKINCOMPLETE": "iOS の Team ID と Bundle ID は両方設定するか、両方とも空にしてください。",
+      "ANDROIDPACKAGEREQUIRED": "証明書フィンガープリントを設定する場合、Android パッケージ名は必須です。"
     },
     "API": {
       "INFO": {

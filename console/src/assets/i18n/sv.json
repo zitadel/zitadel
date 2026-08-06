@@ -2700,7 +2700,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID och Bundle ID måste båda anges, eller båda lämnas tomma.",
+      "ANDROIDPACKAGEREQUIRED": "Android-paketnamn krävs när certifikatfingeravtryck anges."
     },
     "API": {
       "INFO": {

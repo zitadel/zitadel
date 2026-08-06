@@ -2701,7 +2701,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI",
+      "IOSAPPLINKINCOMPLETE": "Az iOS Team ID-t és Bundle ID-t együtt kell megadni, vagy mindkettőt üresen hagyni.",
+      "ANDROIDPACKAGEREQUIRED": "Android csomagnév kötelező, ha tanúsítvány ujjlenyomatok vannak megadva."
     },
     "API": {
       "INFO": {

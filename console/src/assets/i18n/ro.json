@@ -2693,7 +2693,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI",
+      "IOSAPPLINKINCOMPLETE": "Team ID și Bundle ID iOS trebuie setate împreună sau ambele lăsate goale.",
+      "ANDROIDPACKAGEREQUIRED": "Numele pachetului Android este obligatoriu când sunt setate amprentele certificatului."
     },
     "API": {
       "INFO": {

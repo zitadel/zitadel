@@ -2785,7 +2785,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "URI выхода из системы через резервный канал"
+      "BACKCHANNELLOOGOUTURI": "URI выхода из системы через резервный канал",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID и Bundle ID должны быть заданы вместе или оба оставлены пустыми.",
+      "ANDROIDPACKAGEREQUIRED": "Имя пакета Android обязательно, если заданы отпечатки сертификата."
     },
     "API": {
       "INFO": {

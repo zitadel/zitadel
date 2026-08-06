@@ -2703,7 +2703,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "URI виходу з зворотного каналу"
+      "BACKCHANNELLOOGOUTURI": "URI виходу з зворотного каналу",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID та Bundle ID мають бути задані разом або обидва залишені порожніми.",
+      "ANDROIDPACKAGEREQUIRED": "Назва пакета Android обов’язкова, якщо задано відбитки сертифіката."
     },
     "API": {
       "INFO": {

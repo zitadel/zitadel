@@ -2691,7 +2691,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "عنوان URI لتسجيل الخروج من القناة الخلفية"
+      "BACKCHANNELLOOGOUTURI": "عنوان URI لتسجيل الخروج من القناة الخلفية",
+      "IOSAPPLINKINCOMPLETE": "يجب تعيين معرّف فريق iOS ومعرّف الحزمة معًا، أو تركهما فارغين معًا.",
+      "ANDROIDPACKAGEREQUIRED": "اسم حزمة Android مطلوب عند تعيين بصمات شهادة."
     },
     "API": {
       "INFO": {

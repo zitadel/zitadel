@@ -2681,7 +2681,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID a Bundle ID musí být nastaveny společně, nebo obě ponechány prázdné.",
+      "ANDROIDPACKAGEREQUIRED": "Název balíčku Android je povinný, pokud jsou nastaveny otisky certifikátu."
     },
     "API": {
       "INFO": {

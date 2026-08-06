@@ -2697,7 +2697,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "백채널 로그아웃 URI"
+      "BACKCHANNELLOOGOUTURI": "백채널 로그아웃 URI",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID와 Bundle ID는 둘 다 설정하거나 둘 다 비워 두어야 합니다.",
+      "ANDROIDPACKAGEREQUIRED": "인증서 지문이 설정된 경우 Android 패키지 이름이 필요합니다."
     },
     "API": {
       "INFO": {

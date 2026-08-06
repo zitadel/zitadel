@@ -2669,7 +2669,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID и Bundle ID мора да се постават заедно, или обете да останат празни.",
+      "ANDROIDPACKAGEREQUIRED": "Името на Android пакетот е задолжително кога се поставени отпечатоци од сертификат."
     },
     "API": {
       "INFO": {

@@ -2695,7 +2695,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI",
+      "IOSAPPLINKINCOMPLETE": "Team ID dan Bundle ID iOS harus keduanya diisi, atau keduanya dikosongkan.",
+      "ANDROIDPACKAGEREQUIRED": "Nama paket Android wajib diisi bila sidik jari sertifikat diatur."
     },
     "API": {
       "INFO": {
