@@ -31,7 +31,7 @@ var HandlerPrefixes = []string{
 type Config struct {
 	// AppLinksCacheControlMaxAge sets the Cache-Control max-age for
 	// apple-app-site-association and assetlinks.json responses.
-	// Non-positive values (including 0) set Cache-Control: no-store.
+	// 0 sets Cache-Control: no-store.
 	AppLinksCacheControlMaxAge time.Duration
 }
 

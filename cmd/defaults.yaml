@@ -703,7 +703,7 @@ OIDC:
 
 WellKnown:
   # HTTP Cache-Control max-age for /.well-known/apple-app-site-association and
-  # /.well-known/assetlinks.json. Non-positive values set Cache-Control: no-store.
+  # /.well-known/assetlinks.json. 0 sets Cache-Control: no-store.
   AppLinksCacheControlMaxAge: 5m # ZITADEL_WELLKNOWN_APPLINKSCACHECONTROLMAXAGE
 
 SAML:
