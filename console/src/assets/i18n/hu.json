@@ -2627,6 +2627,7 @@
       "TEAMID": "Team ID",
       "TEAMIDPLACEHOLDER": "ABCDE12345",
       "TEAMIDDESC": "Az Apple Team ID pontosan 10 alfanumerikus karakterből álljon, pl. ABCDE12345.",
+      "TEAMIDLENGTH": "A Team ID pontosan 10 alfanumerikus karakterből álljon.",
       "BUNDLEID": "Bundle ID",
       "BUNDLEIDPLACEHOLDER": "com.example.app",
       "BUNDLEIDDESC": "iOS Bundle Identifier (CFBundleIdentifier), pl. com.example.app. Ne tartalmazza a Team ID előtagot.",

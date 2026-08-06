@@ -2711,6 +2711,7 @@
       "TEAMID": "Team ID",
       "TEAMIDPLACEHOLDER": "ABCDE12345",
       "TEAMIDDESC": "Apple Team ID должен состоять ровно из 10 буквенно-цифровых символов, напр. ABCDE12345.",
+      "TEAMIDLENGTH": "Team ID должен состоять ровно из 10 буквенно-цифровых символов.",
       "BUNDLEID": "Bundle ID",
       "BUNDLEIDPLACEHOLDER": "com.example.app",
       "BUNDLEIDDESC": "iOS Bundle Identifier (CFBundleIdentifier), напр. com.example.app. Не включайте префикс Team ID.",

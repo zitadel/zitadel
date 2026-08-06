@@ -502,7 +502,7 @@
               <cnsl-info-section class="full-width app-desc">
                 <span>{{ 'APP.OIDC.TEAMIDDESC' | translate }} {{ 'APP.OIDC.BUNDLEIDDESC' | translate }}</span>
               </cnsl-info-section>
-              @if (oidcForm.hasError('iosAppLinkIncomplete')) {
+              @if (showIosAppLinkIncompleteWarning()) {
                 <cnsl-info-section class="full-width app-desc" [type]="InfoSectionType.WARN">
                   <span>{{ 'APP.OIDC.IOSAPPLINKINCOMPLETE' | translate }}</span>
                 </cnsl-info-section>
@@ -543,7 +543,7 @@
               <cnsl-info-section class="full-width app-desc">
                 <span>{{ 'APP.OIDC.FINGERPRINTSDESC' | translate }}</span>
               </cnsl-info-section>
-              @if (oidcForm.hasError('androidAppLinkPackageRequired')) {
+              @if (showAndroidPackageRequiredWarning()) {
                 <cnsl-info-section class="full-width app-desc" [type]="InfoSectionType.WARN">
                   <span>{{ 'APP.OIDC.ANDROIDPACKAGEREQUIRED' | translate }}</span>
                 </cnsl-info-section>
@@ -554,7 +554,7 @@
                   class="submit-button"
                   type="submit"
                   color="primary"
-                  [disabled]="oidcForm.invalid || !canWrite"
+                  [disabled]="!canWrite"
                   mat-raised-button
                 >
                   {{ 'ACTIONS.SAVE' | translate }}

@@ -2631,6 +2631,7 @@
       "TEAMID": "团队 ID",
       "TEAMIDPLACEHOLDER": "ABCDE12345",
       "TEAMIDDESC": "Apple Team ID 必须恰好为 10 个字母或数字，例如 ABCDE12345。",
+      "TEAMIDLENGTH": "Team ID 必须恰好为 10 个字母或数字。",
       "BUNDLEID": "Bundle ID",
       "BUNDLEIDPLACEHOLDER": "com.example.app",
       "BUNDLEIDDESC": "iOS Bundle Identifier（CFBundleIdentifier），例如 com.example.app。请勿包含 Team ID 前缀。",

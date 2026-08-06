@@ -2627,6 +2627,7 @@
       "TEAMID": "Team ID",
       "TEAMIDPLACEHOLDER": "ABCDE12345",
       "TEAMIDDESC": "Apple Team ID tam olarak 10 alfanümerik karakter olmalıdır, örn. ABCDE12345.",
+      "TEAMIDLENGTH": "Team ID tam olarak 10 alfanümerik karakter olmalıdır.",
       "BUNDLEID": "Bundle ID",
       "BUNDLEIDPLACEHOLDER": "com.example.app",
       "BUNDLEIDDESC": "iOS Bundle Identifier (CFBundleIdentifier), örn. com.example.app. Team ID önekini eklemeyin.",

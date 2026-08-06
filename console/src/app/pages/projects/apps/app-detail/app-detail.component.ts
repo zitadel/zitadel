@@ -227,7 +227,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         loginV2: [{ value: false, disabled: true }],
         loginV2BaseURL: [{ value: '', disabled: true }],
         backChannelLogoutURI: [{ value: '', disabled: true }],
-        iosTeamId: [{ value: '', disabled: true }, [Validators.pattern(/^([A-Z0-9]{10})?$/)]],
+        iosTeamId: [{ value: '', disabled: true }, [iosTeamIdValidator]],
         iosBundleId: [{ value: '', disabled: true }, [Validators.maxLength(200)]],
         androidPackageName: [{ value: '', disabled: true }, [Validators.maxLength(200)]],
         androidSha256CertFingerprints: [{ value: '', disabled: true }],
@@ -681,8 +681,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public saveOIDCApp(): void {
     this.requestRedirectValuesSubject$.next();
-    if (this.oidcForm.valid) {
-      if (this.app?.oidcConfig) {
+    if (!this.oidcForm.valid) {
+      this.markNativeAppLinkFieldsTouched();
+      return;
+    }
+    if (this.app?.oidcConfig) {
         //   configuration
         this.app.oidcConfig.responseTypesList = this.responseTypesList?.value;
         this.app.oidcConfig.grantTypesList = this.grantTypesList?.value;
@@ -778,7 +781,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
           .catch((error) => {
             this.toast.showError(error);
           });
-      }
     }
   }
 
@@ -1001,6 +1003,33 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     return this.oidcForm.get('androidSha256CertFingerprints');
   }
 
+  /** Defer cross-field warnings until the user has visited the paired empty field. */
+  public showIosAppLinkIncompleteWarning(): boolean {
+    if (!this.oidcForm.hasError('iosAppLinkIncomplete')) {
+      return false;
+    }
+    const teamId = String(this.iosTeamId?.value ?? '').trim();
+    const bundleId = String(this.iosBundleId?.value ?? '').trim();
+    if (teamId !== '' && bundleId === '') {
+      return !!this.iosBundleId?.touched;
+    }
+    if (bundleId !== '' && teamId === '') {
+      return !!this.iosTeamId?.touched;
+    }
+    return false;
+  }
+
+  public showAndroidPackageRequiredWarning(): boolean {
+    return this.oidcForm.hasError('androidAppLinkPackageRequired') && !!this.androidPackageName?.touched;
+  }
+
+  private markNativeAppLinkFieldsTouched(): void {
+    this.iosTeamId?.markAsTouched();
+    this.iosBundleId?.markAsTouched();
+    this.androidPackageName?.markAsTouched();
+    this.androidSha256CertFingerprints?.markAsTouched();
+  }
+
   public get accessTokenType(): AbstractControl | null {
     return this.oidcTokenForm.get('accessTokenType');
   }
@@ -1063,6 +1092,26 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       }
     }
   }
+}
+
+function iosTeamIdValidator(c: AbstractControl): ValidationErrors | null {
+  const value = String(c.value ?? '').trim();
+  if (value === '') {
+    return null;
+  }
+  if (!/^[A-Z0-9]+$/.test(value)) {
+    return {
+      invalid: true,
+      errorsinvalidformat: { valid: false, i18nKey: 'ERRORS.INVALID_FORMAT' },
+    };
+  }
+  if (value.length !== 10) {
+    return {
+      invalid: true,
+      errorsapoidcteamidlength: { valid: false, i18nKey: 'APP.OIDC.TEAMIDLENGTH' },
+    };
+  }
+  return null;
 }
 
 /** Mirrors backend AppLinkConfigValid: iOS fields together; package required when fingerprints are set. */

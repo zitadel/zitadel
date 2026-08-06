@@ -2623,6 +2623,7 @@
       "TEAMID": "팀 ID",
       "TEAMIDPLACEHOLDER": "ABCDE12345",
       "TEAMIDDESC": "Apple Team ID는 영숫자 정확히 10자여야 합니다(예: ABCDE12345).",
+      "TEAMIDLENGTH": "Team ID는 영숫자 정확히 10자여야 합니다.",
       "BUNDLEID": "번들 ID",
       "BUNDLEIDPLACEHOLDER": "com.example.app",
       "BUNDLEIDDESC": "iOS Bundle Identifier(CFBundleIdentifier), 예: com.example.app. Team ID 접두사는 포함하지 마세요.",

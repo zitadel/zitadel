@@ -2607,6 +2607,7 @@
       "TEAMID": "Team ID",
       "TEAMIDPLACEHOLDER": "ABCDE12345",
       "TEAMIDDESC": "Apple Team ID musí mít přesně 10 alfanumerických znaků, např. ABCDE12345.",
+      "TEAMIDLENGTH": "Team ID musí mít přesně 10 alfanumerických znaků.",
       "BUNDLEID": "Bundle ID",
       "BUNDLEIDPLACEHOLDER": "com.example.app",
       "BUNDLEIDDESC": "iOS Bundle Identifier (CFBundleIdentifier), např. com.example.app. Nezahrnujte prefix Team ID.",

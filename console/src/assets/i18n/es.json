@@ -2595,6 +2595,7 @@
       "TEAMID": "Team ID",
       "TEAMIDPLACEHOLDER": "ABCDE12345",
       "TEAMIDDESC": "El Apple Team ID debe tener exactamente 10 caracteres alfanuméricos, p. ej. ABCDE12345.",
+      "TEAMIDLENGTH": "El Team ID debe tener exactamente 10 caracteres alfanuméricos.",
       "BUNDLEID": "Bundle ID",
       "BUNDLEIDPLACEHOLDER": "com.example.app",
       "BUNDLEIDDESC": "Identificador de paquete de iOS (CFBundleIdentifier), p. ej. com.example.app. No incluya el prefijo del Team ID.",
