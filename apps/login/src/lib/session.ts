@@ -182,19 +182,26 @@ export async function isSessionValid({
   return true;
 }
 
-export async function findValidSession({
-  serviceConfig,
-  sessions,
-  authRequest,
-  samlRequest,
-  organization,
-}: {
+type FindSessionParams = {
   serviceConfig: ServiceConfig;
   sessions: Session[];
   authRequest?: AuthRequest;
   samlRequest?: SAMLRequest;
   organization?: string;
-}): Promise<Session | undefined> {
+};
+
+/**
+ * Narrow the browser's sessions to the ones this request could legitimately continue with:
+ * filtered by the request's user hint and by the organization scope, then sorted by change
+ * date descending (most recently used first). Validity is NOT checked here — callers decide
+ * how many candidates they need to validate.
+ */
+function getCandidateSessions({
+  sessions,
+  authRequest,
+  samlRequest,
+  organization,
+}: Omit<FindSessionParams, "serviceConfig">): Session[] {
   let sessionsWithHint = sessions.filter((s) => {
     if (authRequest && authRequest.hintUserId) {
       return s.factors?.user?.id === authRequest.hintUserId;
@@ -214,10 +221,6 @@ export async function findValidSession({
     sessionsWithHint = sessionsWithHint.filter((s) => s.factors?.user?.organizationId === organization);
   }
 
-  if (sessionsWithHint.length === 0) {
-    return undefined;
-  }
-
   // sort by change date descending
   sessionsWithHint.sort((a, b) => {
     const dateA = a.changeDate ? timestampDate(a.changeDate).getTime() : 0;
@@ -225,12 +228,42 @@ export async function findValidSession({
     return dateB - dateA;
   });
 
-  // return the first valid session according to settings
-  for (const session of sessionsWithHint) {
+  return sessionsWithHint;
+}
+
+/**
+ * The most recently changed session that is valid according to settings, or undefined.
+ * Short-circuits on the first valid candidate: use this when the caller only needs *a*
+ * session and does not care whether others would also have qualified.
+ */
+export async function findValidSession({ serviceConfig, ...params }: FindSessionParams): Promise<Session | undefined> {
+  for (const session of getCandidateSessions(params)) {
     if (await isSessionValid({ serviceConfig, session })) {
       return session;
     }
   }
 
   return undefined;
+}
+
+/**
+ * Every session that is valid according to settings, most recently changed first.
+ *
+ * Unlike findValidSession this validates all candidates, so the caller can tell an
+ * unambiguous single session apart from several equally valid ones and prompt the user
+ * to choose instead of silently picking for them. Validation can cost an API call per
+ * session (see isSessionValid), which is why the short-circuiting variant above still
+ * exists for callers that cannot act on the difference.
+ */
+export async function findValidSessions({ serviceConfig, ...params }: FindSessionParams): Promise<Session[]> {
+  const candidates = getCandidateSessions(params);
+  const valid: Session[] = [];
+
+  for (const session of candidates) {
+    if (await isSessionValid({ serviceConfig, session })) {
+      valid.push(session);
+    }
+  }
+
+  return valid;
 }

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { FlowInitiationParams, handleOIDCFlowInitiation } from "./flow-initiation";
+import { FlowInitiationParams, handleOIDCFlowInitiation, handleSAMLFlowInitiation } from "./flow-initiation";
 
 vi.mock("@/lib/cookies", () => ({
   getLanguageCookie: vi.fn(),
@@ -25,6 +25,7 @@ vi.mock("@/lib/service-url", () => ({
 
 vi.mock("@/lib/session", () => ({
   findValidSession: vi.fn(),
+  findValidSessions: vi.fn(),
 }));
 
 vi.mock("@/lib/zitadel", () => ({
@@ -69,6 +70,7 @@ describe("handleOIDCFlowInitiation — locale / cookie handling", () => {
   let mockGetAuthRequest: ReturnType<typeof vi.fn>;
   let mockConstructUrl: ReturnType<typeof vi.fn>;
   let mockFindValidSession: ReturnType<typeof vi.fn>;
+  let mockFindValidSessions: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -86,6 +88,7 @@ describe("handleOIDCFlowInitiation — locale / cookie handling", () => {
     mockGetAuthRequest = vi.mocked(zitadel.getAuthRequest);
     mockConstructUrl = vi.mocked(serviceUrl.constructUrl);
     mockFindValidSession = vi.mocked(session.findValidSession);
+    mockFindValidSessions = vi.mocked(session.findValidSessions);
 
     // Default auth request: no prompts, no special scopes
     mockGetAuthRequest.mockResolvedValue({
@@ -104,6 +107,7 @@ describe("handleOIDCFlowInitiation — locale / cookie handling", () => {
     });
 
     mockFindValidSession.mockResolvedValue(null);
+    mockFindValidSessions.mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -185,6 +189,7 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
   let mockGetAuthRequest: ReturnType<typeof vi.fn>;
   let mockConstructUrl: ReturnType<typeof vi.fn>;
   let mockFindValidSession: ReturnType<typeof vi.fn>;
+  let mockFindValidSessions: ReturnType<typeof vi.fn>;
   let mockSendLoginname: ReturnType<typeof vi.fn>;
   let mockGetLoginSettings: ReturnType<typeof vi.fn>;
 
@@ -210,6 +215,7 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     mockGetAuthRequest = vi.mocked(zitadel.getAuthRequest);
     mockConstructUrl = vi.mocked(serviceUrl.constructUrl);
     mockFindValidSession = vi.mocked(session.findValidSession);
+    mockFindValidSessions = vi.mocked(session.findValidSessions);
     mockSendLoginname = vi.mocked(loginname.sendLoginname);
     mockGetLoginSettings = vi.mocked(zitadel.getLoginSettings);
     mockGetLoginSettings.mockResolvedValue(undefined);
@@ -220,6 +226,7 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     });
 
     mockFindValidSession.mockResolvedValue(null);
+    mockFindValidSessions.mockResolvedValue([]);
     // Default: hint cannot be resolved to a redirect, exercising the prefilled
     // /loginname fallback. Individual tests override this to assert the happy path.
     mockSendLoginname.mockResolvedValue(undefined);
@@ -341,8 +348,8 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     });
 
     // An unrelated session is present (so eligibleSessions is non-empty), but
-    // findValidSession filtered by the hint returns nothing.
-    mockFindValidSession.mockResolvedValue(null);
+    // filtering by the hint leaves no valid session.
+    mockFindValidSessions.mockResolvedValue([]);
 
     mockSendLoginname.mockResolvedValue({
       redirect: "/password?loginName=user%40example.com",
@@ -372,7 +379,7 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
       },
     });
 
-    mockFindValidSession.mockResolvedValue(null);
+    mockFindValidSessions.mockResolvedValue([]);
     // mockSendLoginname resolves to undefined (default) → fallback path.
 
     const res = await handleOIDCFlowInitiation(
@@ -532,6 +539,166 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     const location = res.headers.get("location") ?? "";
     expect(location).toContain("/password");
     expect(location).not.toContain("/loginname");
+  });
+});
+
+describe("flow initiation — ambiguous session selection", () => {
+  let mockGetAuthRequest: ReturnType<typeof vi.fn>;
+  let mockGetSAMLRequest: ReturnType<typeof vi.fn>;
+  let mockConstructUrl: ReturnType<typeof vi.fn>;
+  let mockFindValidSession: ReturnType<typeof vi.fn>;
+  let mockFindValidSessions: ReturnType<typeof vi.fn>;
+  let mockCreateCallback: ReturnType<typeof vi.fn>;
+  let mockCreateResponse: ReturnType<typeof vi.fn>;
+
+  const sessionA = {
+    id: "session-a",
+    factors: { user: { id: "user-a", organizationId: "111111", loginName: "a@org.com" } },
+  };
+  const sessionB = {
+    id: "session-b",
+    factors: { user: { id: "user-b", organizationId: "111111", loginName: "b@org.com" } },
+  };
+
+  const bothCookies = [
+    { id: "session-a", token: "tok-a" },
+    { id: "session-b", token: "tok-b" },
+  ];
+
+  // Both sessions belong to the org named by the scope, so neither is filtered out.
+  const orgScopedAuthRequest = (overrides?: Record<string, unknown>) => ({
+    authRequest: {
+      id: "abc123",
+      uiLocales: [],
+      scope: ["urn:zitadel:iam:org:id:111111"],
+      prompt: [],
+      loginHint: undefined,
+      ...overrides,
+    },
+  });
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.unstubAllEnvs();
+
+    const zitadel = await import("@/lib/zitadel");
+    const serviceUrl = await import("@/lib/service-url");
+    const session = await import("@/lib/session");
+    const authUtils = await import("@/lib/auth-utils");
+
+    mockGetAuthRequest = vi.mocked(zitadel.getAuthRequest);
+    mockGetSAMLRequest = vi.mocked(zitadel.getSAMLRequest);
+    mockConstructUrl = vi.mocked(serviceUrl.constructUrl);
+    mockFindValidSession = vi.mocked(session.findValidSession);
+    mockFindValidSessions = vi.mocked(session.findValidSessions);
+    mockCreateCallback = vi.mocked(zitadel.createCallback);
+    mockCreateResponse = vi.mocked(zitadel.createResponse);
+
+    vi.mocked(authUtils.getValidLocaleFromUILocales).mockReturnValue(null);
+    mockConstructUrl.mockImplementation((_req: any, path: string) => new URL(`https://example.com${path}`));
+
+    mockGetAuthRequest.mockResolvedValue(orgScopedAuthRequest());
+    mockCreateCallback.mockResolvedValue({ callbackUrl: "https://app.example.com/callback?code=xyz" });
+    mockCreateResponse.mockResolvedValue({
+      url: "https://app.example.com/saml/acs",
+      binding: { case: "redirect" },
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  test("should show account selection when several sessions are valid and no prompt disambiguates them", async () => {
+    mockFindValidSessions.mockResolvedValue([sessionB, sessionA]);
+
+    const res = await handleOIDCFlowInitiation(
+      makeBaseParams({ sessions: [sessionA, sessionB] as any, sessionCookies: bothCookies }),
+    );
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toContain("/accounts");
+    expect(location).toContain("organization=111111");
+    // The user picks: no session may be handed to the callback on their behalf.
+    expect(mockCreateCallback).not.toHaveBeenCalled();
+  });
+
+  test("should complete silently when exactly one session is valid (default prompt)", async () => {
+    mockFindValidSessions.mockResolvedValue([sessionA]);
+
+    const res = await handleOIDCFlowInitiation(
+      makeBaseParams({ sessions: [sessionA, sessionB] as any, sessionCookies: bothCookies }),
+    );
+
+    expect(res.headers.get("location")).toBe("https://app.example.com/callback?code=xyz");
+    expect(mockCreateCallback).toHaveBeenCalled();
+  });
+
+  test("should keep completing silently with several valid sessions when login_hint names the user", async () => {
+    mockGetAuthRequest.mockResolvedValue(orgScopedAuthRequest({ loginHint: "a@org.com" }));
+    // The hint has already narrowed findValidSessions' own filtering; a caller that still
+    // sees several matches asked for this user, so the most recent one is the answer.
+    mockFindValidSessions.mockResolvedValue([sessionA, sessionB]);
+
+    const res = await handleOIDCFlowInitiation(
+      makeBaseParams({ sessions: [sessionA, sessionB] as any, sessionCookies: bothCookies }),
+    );
+
+    expect(res.headers.get("location")).toBe("https://app.example.com/callback?code=xyz");
+  });
+
+  test("should keep completing silently with several valid sessions when hintUserId names the user", async () => {
+    mockGetAuthRequest.mockResolvedValue(orgScopedAuthRequest({ hintUserId: "user-a" }));
+    mockFindValidSessions.mockResolvedValue([sessionA, sessionB]);
+
+    const res = await handleOIDCFlowInitiation(
+      makeBaseParams({ sessions: [sessionA, sessionB] as any, sessionCookies: bothCookies }),
+    );
+
+    expect(res.headers.get("location")).toBe("https://app.example.com/callback?code=xyz");
+  });
+
+  test("should not show account selection for prompt=none, which may not render UI", async () => {
+    const { Prompt } = await import("@zitadel/proto/zitadel/oidc/v2/authorization_pb");
+    mockGetAuthRequest.mockResolvedValue(orgScopedAuthRequest({ prompt: [Prompt.NONE] }));
+    mockFindValidSession.mockResolvedValue(sessionA);
+
+    const res = await handleOIDCFlowInitiation(
+      makeBaseParams({ sessions: [sessionA, sessionB] as any, sessionCookies: bothCookies }),
+    );
+
+    expect(res.headers.get("location")).toBe("https://app.example.com/callback?code=xyz");
+  });
+
+  test("should show account selection for SAML when several sessions are valid", async () => {
+    mockGetSAMLRequest.mockResolvedValue({ samlRequest: { id: "saml123" } });
+    mockFindValidSessions.mockResolvedValue([sessionB, sessionA]);
+
+    const res = await handleSAMLFlowInitiation(
+      makeBaseParams({
+        requestId: "saml_saml123",
+        sessions: [sessionA, sessionB] as any,
+        sessionCookies: bothCookies,
+      }),
+    );
+
+    expect(res.headers.get("location") ?? "").toContain("/accounts");
+    expect(mockCreateResponse).not.toHaveBeenCalled();
+  });
+
+  test("should complete the SAML flow when exactly one session is valid", async () => {
+    mockGetSAMLRequest.mockResolvedValue({ samlRequest: { id: "saml123" } });
+    mockFindValidSessions.mockResolvedValue([sessionA]);
+
+    const res = await handleSAMLFlowInitiation(
+      makeBaseParams({
+        requestId: "saml_saml123",
+        sessions: [sessionA, sessionB] as any,
+        sessionCookies: bothCookies,
+      }),
+    );
+
+    expect(res.headers.get("location")).toBe("https://app.example.com/saml/acs");
   });
 });
 
