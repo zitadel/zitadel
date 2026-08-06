@@ -686,101 +686,101 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       return;
     }
     if (this.app?.oidcConfig) {
-        //   configuration
-        this.app.oidcConfig.responseTypesList = this.responseTypesList?.value;
-        this.app.oidcConfig.grantTypesList = this.grantTypesList?.value;
-        this.app.oidcConfig.appType = this.appType?.value;
-        this.app.oidcConfig.authMethodType = this.authMethodType?.value;
-        this.app.oidcConfig.backChannelLogoutUri = this.backChannelLogoutURI?.value;
+      //   configuration
+      this.app.oidcConfig.responseTypesList = this.responseTypesList?.value;
+      this.app.oidcConfig.grantTypesList = this.grantTypesList?.value;
+      this.app.oidcConfig.appType = this.appType?.value;
+      this.app.oidcConfig.authMethodType = this.authMethodType?.value;
+      this.app.oidcConfig.backChannelLogoutUri = this.backChannelLogoutURI?.value;
 
-        // token
-        this.app.oidcConfig.accessTokenType = this.accessTokenType?.value;
-        this.app.oidcConfig.accessTokenRoleAssertion = this.accessTokenRoleAssertion?.value;
-        this.app.oidcConfig.idTokenRoleAssertion = this.idTokenRoleAssertion?.value;
-        this.app.oidcConfig.idTokenUserinfoAssertion = this.idTokenUserinfoAssertion?.value;
+      // token
+      this.app.oidcConfig.accessTokenType = this.accessTokenType?.value;
+      this.app.oidcConfig.accessTokenRoleAssertion = this.accessTokenRoleAssertion?.value;
+      this.app.oidcConfig.idTokenRoleAssertion = this.idTokenRoleAssertion?.value;
+      this.app.oidcConfig.idTokenUserinfoAssertion = this.idTokenUserinfoAssertion?.value;
 
-        // redirects
-        this.app.oidcConfig.redirectUrisList = this.redirectUrisList;
-        this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
-        this.app.oidcConfig.additionalOriginsList = this.additionalOriginsList;
-        this.app.oidcConfig.devMode = !!this.devMode?.value;
-        this.app.oidcConfig.skipNativeAppSuccessPage = !!this.skipNativeAppSuccessPage?.value;
+      // redirects
+      this.app.oidcConfig.redirectUrisList = this.redirectUrisList;
+      this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
+      this.app.oidcConfig.additionalOriginsList = this.additionalOriginsList;
+      this.app.oidcConfig.devMode = !!this.devMode?.value;
+      this.app.oidcConfig.skipNativeAppSuccessPage = !!this.skipNativeAppSuccessPage?.value;
 
-        const loginVersion: MessageInitShape<typeof LoginVersionSchema> = this.oidcLoginV2?.value
-          ? {
-              version: {
-                case: 'loginV2',
-                value: { baseUri: this.oidcLoginV2BaseURL?.value },
-              },
-            }
-          : {
-              version: {
-                case: 'loginV1',
-                value: {},
-              },
-            };
-
-        const req: MessageInitShape<typeof UpdateApplicationRequestSchema> = {
-          projectId: this.projectId,
-          applicationId: this.app.id,
-          applicationType: {
-            case: 'oidcConfiguration',
-            value: {
-              // configuration
-              responseTypes: this.app.oidcConfig.responseTypesList.map((type) => this.toOIDCV2ResponseType(type)),
-              authMethodType: this.app.oidcConfig.authMethodType as unknown as OIDCV2AuthMethodType,
-              grantTypes: this.app.oidcConfig.grantTypesList as unknown as OIDCV2GrantType[],
-              applicationType: this.app.oidcConfig.appType as unknown as OIDCV2ApplicationType,
-              backChannelLogoutUri: this.app.oidcConfig.backChannelLogoutUri,
-              loginVersion,
-
-              // token
-              accessTokenType: this.app.oidcConfig.accessTokenType as unknown as OIDCV2TokenType,
-              accessTokenRoleAssertion: this.app.oidcConfig.accessTokenRoleAssertion,
-              idTokenRoleAssertion: this.app.oidcConfig.idTokenRoleAssertion,
-              idTokenUserinfoAssertion: this.app.oidcConfig.idTokenUserinfoAssertion,
-
-              // redirects
-              redirectUris: this.normalizeOIDCListForUpdate(this.app.oidcConfig.redirectUrisList),
-              additionalOrigins: this.app.oidcConfig.additionalOriginsList,
-              postLogoutRedirectUris: this.normalizeOIDCListForUpdate(this.app.oidcConfig.postLogoutRedirectUrisList),
-              developmentMode: this.app.oidcConfig.devMode,
-              skipNativeAppSuccessPage: this.app.oidcConfig.skipNativeAppSuccessPage,
-              ios: {
-                teamId: (this.iosTeamId?.value ?? '').trim(),
-                bundleId: (this.iosBundleId?.value ?? '').trim(),
-              },
-              android: {
-                packageName: (this.androidPackageName?.value ?? '').trim(),
-                sha256CertFingerprints: this.parseAndroidFingerprints(this.androidSha256CertFingerprints?.value),
-              },
-              ...(this.clockSkewSeconds?.value
-                ? {
-                    clockSkew: {
-                      seconds: BigInt(Math.floor(this.clockSkewSeconds?.value)),
-                      nanos: Math.floor(this.clockSkewSeconds?.value % 1) * 10000,
-                    },
-                  }
-                : {}),
+      const loginVersion: MessageInitShape<typeof LoginVersionSchema> = this.oidcLoginV2?.value
+        ? {
+            version: {
+              case: 'loginV2',
+              value: { baseUri: this.oidcLoginV2BaseURL?.value },
             },
-          },
-        };
+          }
+        : {
+            version: {
+              case: 'loginV1',
+              value: {},
+            },
+          };
 
-        this.applicationService
-          .updateApplication(req)
-          .then(() => {
-            if (this.app?.oidcConfig) {
-              const config = { oidc: this.app.oidcConfig };
-              this.currentAuthMethod = this.authMethodFromPartialConfig(config);
-            }
-            this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
-            setTimeout(() => {
-              this.getData(this.projectId, this.appId);
-            }, 1000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
+      const req: MessageInitShape<typeof UpdateApplicationRequestSchema> = {
+        projectId: this.projectId,
+        applicationId: this.app.id,
+        applicationType: {
+          case: 'oidcConfiguration',
+          value: {
+            // configuration
+            responseTypes: this.app.oidcConfig.responseTypesList.map((type) => this.toOIDCV2ResponseType(type)),
+            authMethodType: this.app.oidcConfig.authMethodType as unknown as OIDCV2AuthMethodType,
+            grantTypes: this.app.oidcConfig.grantTypesList as unknown as OIDCV2GrantType[],
+            applicationType: this.app.oidcConfig.appType as unknown as OIDCV2ApplicationType,
+            backChannelLogoutUri: this.app.oidcConfig.backChannelLogoutUri,
+            loginVersion,
+
+            // token
+            accessTokenType: this.app.oidcConfig.accessTokenType as unknown as OIDCV2TokenType,
+            accessTokenRoleAssertion: this.app.oidcConfig.accessTokenRoleAssertion,
+            idTokenRoleAssertion: this.app.oidcConfig.idTokenRoleAssertion,
+            idTokenUserinfoAssertion: this.app.oidcConfig.idTokenUserinfoAssertion,
+
+            // redirects
+            redirectUris: this.normalizeOIDCListForUpdate(this.app.oidcConfig.redirectUrisList),
+            additionalOrigins: this.app.oidcConfig.additionalOriginsList,
+            postLogoutRedirectUris: this.normalizeOIDCListForUpdate(this.app.oidcConfig.postLogoutRedirectUrisList),
+            developmentMode: this.app.oidcConfig.devMode,
+            skipNativeAppSuccessPage: this.app.oidcConfig.skipNativeAppSuccessPage,
+            ios: {
+              teamId: (this.iosTeamId?.value ?? '').trim(),
+              bundleId: (this.iosBundleId?.value ?? '').trim(),
+            },
+            android: {
+              packageName: (this.androidPackageName?.value ?? '').trim(),
+              sha256CertFingerprints: this.parseAndroidFingerprints(this.androidSha256CertFingerprints?.value),
+            },
+            ...(this.clockSkewSeconds?.value
+              ? {
+                  clockSkew: {
+                    seconds: BigInt(Math.floor(this.clockSkewSeconds?.value)),
+                    nanos: Math.floor(this.clockSkewSeconds?.value % 1) * 10000,
+                  },
+                }
+              : {}),
+          },
+        },
+      };
+
+      this.applicationService
+        .updateApplication(req)
+        .then(() => {
+          if (this.app?.oidcConfig) {
+            const config = { oidc: this.app.oidcConfig };
+            this.currentAuthMethod = this.authMethodFromPartialConfig(config);
+          }
+          this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
+          setTimeout(() => {
+            this.getData(this.projectId, this.appId);
+          }, 1000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     }
   }
 
