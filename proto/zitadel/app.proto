@@ -218,6 +218,7 @@ message AndroidAppLinkConfig {
     ];
     repeated string sha256_cert_fingerprints = 2 [
         (validate.rules).repeated = {
+            max_items: 20,
             items: {
                 string: {
                     pattern: "^([0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){31}|[0-9A-Fa-f]{64})$";
@@ -226,7 +227,7 @@ message AndroidAppLinkConfig {
         },
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99\"]";
-            description: "SHA-256 signing certificate fingerprints for Digital Asset Links (passkey / get_login_creds). 64 hex chars, optionally colon-separated pairs. Include debug and release as needed.";
+            description: "SHA-256 signing certificate fingerprints for Digital Asset Links (passkey / get_login_creds). 64 hex chars, optionally colon-separated pairs. At most 20 entries. Include debug and release as needed.";
         }
     ];
 }
