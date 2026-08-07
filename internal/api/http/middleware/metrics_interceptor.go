@@ -40,10 +40,11 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	recorder := newStatusWriter(w)
 	// Requested paths contain object IDs and are therefore unbounded, so the router below
 	// gets the opportunity to report the route pattern it served the request with instead.
-	r = r.WithContext(metrics.WithRequestURIPattern(r.Context()))
+	ctx := metrics.WithRequestURIPattern(r.Context())
+	r = r.WithContext(ctx)
 	h.handler.ServeHTTP(recorder, r)
 	if pattern := chiRoutePattern(r); pattern != "" {
-		metrics.SetRequestURIPattern(r.Context(), pattern)
+		metrics.SetRequestURIPattern(ctx, pattern)
 	}
 	if h.containsMetricsMethod(metrics.MetricTypeRequestCount) {
 		metrics.RegisterRequestCounter(recorder, r)
