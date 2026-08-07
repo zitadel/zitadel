@@ -152,7 +152,9 @@
       "failedPrecondition": "前置条件失败",
       "sessionNotValid": "会话无效",
       "passwordVerificationMissing": "缺少密码验证。",
-      "passwordVerificationTooOld": "密码验证已过期。请重新通过验证。"
+      "passwordVerificationTooOld": "密码验证已过期。请重新通过验证。",
+      "passwordResetNotAllowed": "不允许重置密码！请联系您的管理员了解更多信息。",
+      "localAuthenticationNotAllowed": "不允许本地身份验证！请联系您的管理员以获取更多信息。"
     }
   },
   "idp": {
@@ -203,7 +205,8 @@
       "userCreationFailed": "无法创建用户账户",
       "orgResolutionFailed": "无法确定注册的组织",
       "sessionCreationFailed": "无法创建会话或确定重定向",
-      "unknownError": "发生未知错误"
+      "unknownError": "发生未知错误",
+      "unknown": "发生未知错误"
     }
   },
   "ldap": {
@@ -279,7 +282,8 @@
         "couldNotFindSession": "找不到会话",
         "couldNotUpdateSession": "无法更新会话",
         "userNotFound": "系统中未找到用户",
-        "couldNotDetermineRedirect": "密钥验证后无法确定重定向URL"
+        "couldNotDetermineRedirect": "密钥验证后无法确定重定向URL",
+        "couldNotGetUser": "无法获取用户"
       }
     },
     "set": {
@@ -353,7 +357,11 @@
       "couldNotCreateSession": "无法创建会话",
       "userNotFound": "系统中未找到用户",
       "couldNotLinkIDP": "无法将 IDP 关联到用户",
-      "couldNotRegisterUser": "无法注册用户"
+      "couldNotRegisterUser": "无法注册用户",
+      "registerNotAllowed": "不允许注册！请联系您的管理员了解更多信息。",
+      "userAlreadyExists": "使用此电子邮件地址的用户已存在。请尝试登录。",
+      "couldNotGetLoginSettings": "无法获取登录设置",
+      "localAuthenticationNotAllowed": "不允许本地身份验证！请联系您的管理员以获取更多信息。"
     }
   },
   "invite": {
@@ -413,7 +421,10 @@
       "couldNotResendInvite": "无法重新发送邀请",
       "inviteSendFailed": "发送邀请邮件失败",
       "emailSendFailed": "发送验证邮件失败",
-      "contextMissing": "发生错误。请重试。"
+      "contextMissing": "发生错误。请重试。",
+      "couldNotFindSession": "找不到会话",
+      "couldNotUpdateSession": "无法更新会话",
+      "invalidCode": "验证码无效。请重试。"
     }
   },
   "authenticator": {

@@ -246,7 +246,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
     lifetime: command.lifetime,
   });
 
-  if (result.error) {
+  if ("error" in result && result.error) {
     // try to interpret validation errors as translation keys if possible, or fallback to generic
     // For now returning the error string directly as key or default
     return { error: result.error };

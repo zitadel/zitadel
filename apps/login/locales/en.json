@@ -152,7 +152,9 @@
       "failedPrecondition": "Failed precondition",
       "sessionNotValid": "Session is not valid",
       "passwordVerificationMissing": "Password verification is missing.",
-      "passwordVerificationTooOld": "Password verification is too old. Please verify your password again."
+      "passwordVerificationTooOld": "Password verification is too old. Please verify your password again.",
+      "passwordResetNotAllowed": "Password reset is not allowed! Contact your administrator for more information.",
+      "localAuthenticationNotAllowed": "Local authentication is not allowed! Contact your administrator for more information."
     }
   },
   "idp": {
@@ -203,7 +205,8 @@
       "userCreationFailed": "Failed to create user account",
       "orgResolutionFailed": "Could not determine organization for registration",
       "sessionCreationFailed": "Could not create session or determine redirect",
-      "unknownError": "An unknown error occurred"
+      "unknownError": "An unknown error occurred",
+      "unknown": "An unknown error occurred"
     }
   },
   "ldap": {
@@ -279,7 +282,8 @@
         "couldNotFindSession": "Could not find session",
         "couldNotUpdateSession": "Could not update session",
         "userNotFound": "User not found in the system",
-        "couldNotDetermineRedirect": "Could not determine redirect URL after passkey verification"
+        "couldNotDetermineRedirect": "Could not determine redirect URL after passkey verification",
+        "couldNotGetUser": "Could not get user"
       }
     },
     "set": {
@@ -353,7 +357,11 @@
       "couldNotCreateSession": "Could not create session",
       "userNotFound": "User not found in the system",
       "couldNotLinkIDP": "Could not link IDP to user",
-      "couldNotRegisterUser": "Could not register user"
+      "couldNotRegisterUser": "Could not register user",
+      "registerNotAllowed": "Registration is not allowed! Contact your administrator for more information.",
+      "userAlreadyExists": "A user with this email address already exists. Try signing in instead.",
+      "couldNotGetLoginSettings": "Could not get login settings",
+      "localAuthenticationNotAllowed": "Local authentication is not allowed! Contact your administrator for more information."
     }
   },
   "invite": {
@@ -413,7 +421,10 @@
       "couldNotResendInvite": "Could not resend invite",
       "inviteSendFailed": "Failed to send invitation email",
       "emailSendFailed": "Failed to send verification email",
-      "contextMissing": "An error occurred. Please try again."
+      "contextMissing": "An error occurred. Please try again.",
+      "couldNotFindSession": "Could not find session",
+      "couldNotUpdateSession": "Could not update session",
+      "invalidCode": "Invalid code. Please try again."
     }
   },
   "authenticator": {

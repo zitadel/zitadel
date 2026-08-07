@@ -152,7 +152,9 @@
       "failedPrecondition": "Voorwaarde mislukt",
       "sessionNotValid": "Sessie is niet geldig",
       "passwordVerificationMissing": "Wachtwoordverificatie ontbreekt.",
-      "passwordVerificationTooOld": "Wachtwoordverificatie is te oud. Verifieer je wachtwoord opnieuw."
+      "passwordVerificationTooOld": "Wachtwoordverificatie is te oud. Verifieer je wachtwoord opnieuw.",
+      "passwordResetNotAllowed": "Wachtwoord opnieuw instellen is niet toegestaan! Neem contact op met uw beheerder voor meer informatie.",
+      "localAuthenticationNotAllowed": "Lokale authenticatie is niet toegestaan! Neem contact op met uw beheerder voor meer informatie."
     }
   },
   "idp": {
@@ -203,7 +205,8 @@
       "userCreationFailed": "Aanmaken van gebruikersaccount mislukt",
       "orgResolutionFailed": "Kon organisatie voor registratie niet bepalen",
       "sessionCreationFailed": "Kon sessie niet aanmaken of omleiding bepalen",
-      "unknownError": "Er is een onbekende fout opgetreden"
+      "unknownError": "Er is een onbekende fout opgetreden",
+      "unknown": "Er is een onbekende fout opgetreden"
     }
   },
   "ldap": {
@@ -279,7 +282,8 @@
         "couldNotFindSession": "Kon sessie niet vinden",
         "couldNotUpdateSession": "Kon sessie niet bijwerken",
         "userNotFound": "Gebruiker niet in het systeem gevonden",
-        "couldNotDetermineRedirect": "Kon omleidings-URL na passkey-verificatie niet bepalen"
+        "couldNotDetermineRedirect": "Kon omleidings-URL na passkey-verificatie niet bepalen",
+        "couldNotGetUser": "Gebruiker kon niet worden opgehaald"
       }
     },
     "set": {
@@ -353,7 +357,11 @@
       "couldNotCreateSession": "Kon sessie niet aanmaken",
       "userNotFound": "Gebruiker niet in het systeem gevonden",
       "couldNotLinkIDP": "Kon IDP niet aan gebruiker koppelen",
-      "couldNotRegisterUser": "Kon gebruiker niet registreren"
+      "couldNotRegisterUser": "Kon gebruiker niet registreren",
+      "registerNotAllowed": "Registratie is niet toegestaan! Neem contact op met uw beheerder voor meer informatie.",
+      "userAlreadyExists": "Er bestaat al een gebruiker met dit e-mailadres. Probeer in plaats daarvan in te loggen.",
+      "couldNotGetLoginSettings": "Kon aanmeldinstellingen niet ophalen",
+      "localAuthenticationNotAllowed": "Lokale authenticatie is niet toegestaan! Neem contact op met uw beheerder voor meer informatie."
     }
   },
   "invite": {
@@ -413,7 +421,10 @@
       "couldNotResendInvite": "Kon uitnodiging niet opnieuw versturen",
       "inviteSendFailed": "Versturen van uitnodigingsmail mislukt",
       "emailSendFailed": "Versturen van verificatie-e-mail mislukt",
-      "contextMissing": "Er is een fout opgetreden. Probeer het opnieuw."
+      "contextMissing": "Er is een fout opgetreden. Probeer het opnieuw.",
+      "couldNotFindSession": "Sessie kon niet worden gevonden",
+      "couldNotUpdateSession": "Sessie kon niet worden bijgewerkt",
+      "invalidCode": "Ongeldige code. Probeer het opnieuw."
     }
   },
   "authenticator": {

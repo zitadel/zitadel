@@ -42,7 +42,14 @@ export async function completeAuthFlow(
   let sessions: Session[] = [];
 
   if (ids && ids.length) {
-    sessions = await loadSessions({ serviceConfig, ids });
+    try {
+      sessions = await loadSessions({ serviceConfig, ids });
+    } catch (error) {
+      // Stale/expired session ids in cookies must not fail the whole action;
+      // the flow handlers below treat "no sessions" gracefully.
+      logger.warn("Failed to load sessions", { error });
+      sessions = [];
+    }
   }
 
   if (requestId.startsWith("oidc_")) {

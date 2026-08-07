@@ -135,7 +135,9 @@
       "couldNotLoadSession": "セッションを読み込めませんでした",
       "couldNotLoadAuthMethods": "認証方法を読み込めませんでした",
       "failedPrecondition": "前提条件に失敗しました",
-      "sessionNotValid": "セッションが無効です"
+      "sessionNotValid": "セッションが無効です",
+      "passwordResetNotAllowed": "パスワードのリセットは許可されていません。詳細については管理者にお問い合わせください。",
+      "localAuthenticationNotAllowed": "ローカル認証は許可されていません！ 詳細については管理者に問い合わせてください。"
     },
     "complexity": {
       "length": "{minLength} 文字以上である必要があります。",
@@ -196,7 +198,8 @@
       "userCreationFailed": "ユーザーアカウントの作成に失敗しました",
       "orgResolutionFailed": "登録する組織を特定できませんでした",
       "sessionCreationFailed": "セッションの作成またはリダイレクトの決定に失敗しました",
-      "unknownError": "不明なエラーが発生しました"
+      "unknownError": "不明なエラーが発生しました",
+      "unknown": "不明なエラーが発生しました"
     }
   },
   "ldap": {
@@ -272,7 +275,8 @@
         "couldNotFindSession": "セッションが見つかりませんでした",
         "couldNotUpdateSession": "セッションを更新できませんでした",
         "userNotFound": "ユーザーがシステムに見つかりません",
-        "couldNotDetermineRedirect": "パスキー確認後のリダイレクトURLを決定できませんでした"
+        "couldNotDetermineRedirect": "パスキー確認後のリダイレクトURLを決定できませんでした",
+        "couldNotGetUser": "ユーザーを取得できませんでした"
       }
     },
     "set": {
@@ -346,7 +350,11 @@
       "couldNotCreateSession": "セッションを作成できませんでした",
       "userNotFound": "ユーザーがシステムに見つかりません",
       "couldNotLinkIDP": "IDPをユーザーにリンクできませんでした",
-      "couldNotRegisterUser": "ユーザーを登録できませんでした"
+      "couldNotRegisterUser": "ユーザーを登録できませんでした",
+      "registerNotAllowed": "登録は許可されていません。詳細については管理者にお問い合わせください。",
+      "userAlreadyExists": "このメールアドレスのユーザーは既に存在します。代わりにサインインしてください。",
+      "couldNotGetLoginSettings": "ログイン設定を取得できませんでした",
+      "localAuthenticationNotAllowed": "ローカル認証は許可されていません！ 詳細については管理者に問い合わせてください。"
     }
   },
   "invite": {
@@ -406,7 +414,10 @@
       "couldNotResendInvite": "招待を再送信できませんでした",
       "inviteSendFailed": "招待メールの送信に失敗しました",
       "emailSendFailed": "確認メールの送信に失敗しました",
-      "contextMissing": "エラーが発生しました。もう一度お試しください。"
+      "contextMissing": "エラーが発生しました。もう一度お試しください。",
+      "couldNotFindSession": "セッションが見つかりませんでした",
+      "couldNotUpdateSession": "セッションを更新できませんでした",
+      "invalidCode": "コードが無効です。もう一度お試しください。"
     }
   },
   "authenticator": {

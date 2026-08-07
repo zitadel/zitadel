@@ -152,7 +152,9 @@
       "failedPrecondition": "Ön koşul başarısız",
       "sessionNotValid": "Oturum geçerli değil",
       "passwordVerificationMissing": "Şifre doğrulaması eksik.",
-      "passwordVerificationTooOld": "Şifre doğrulaması çok eski. Lütfen şifrenizi tekrar doğrulayın."
+      "passwordVerificationTooOld": "Şifre doğrulaması çok eski. Lütfen şifrenizi tekrar doğrulayın.",
+      "passwordResetNotAllowed": "Parola sıfırlamaya izin verilmiyor! Daha fazla bilgi için yöneticinizle iletişime geçin.",
+      "localAuthenticationNotAllowed": "Yerel kimlik doğrulamasına izin verilmiyor! Daha fazla bilgi için yöneticinize başvurun."
     }
   },
   "idp": {
@@ -203,7 +205,8 @@
       "userCreationFailed": "Kullanıcı hesabı oluşturulamadı",
       "orgResolutionFailed": "Kayıt için organizasyon belirlenemedi",
       "sessionCreationFailed": "Oturum oluşturulamadı veya yönlendirme belirlenemedi",
-      "unknownError": "Bilinmeyen bir hata oluştu"
+      "unknownError": "Bilinmeyen bir hata oluştu",
+      "unknown": "Bilinmeyen bir hata oluştu"
     }
   },
   "ldap": {
@@ -279,7 +282,8 @@
         "couldNotFindSession": "Oturum bulunamadı",
         "couldNotUpdateSession": "Oturum güncellenemedi",
         "userNotFound": "Kullanıcı sistemde bulunamadı",
-        "couldNotDetermineRedirect": "Passkey doğrulamasından sonra yönlendirme URL'si belirlenemedi"
+        "couldNotDetermineRedirect": "Passkey doğrulamasından sonra yönlendirme URL'si belirlenemedi",
+        "couldNotGetUser": "Kullanıcı alınamadı"
       }
     },
     "set": {
@@ -353,7 +357,11 @@
       "couldNotCreateSession": "Oturum oluşturulamadı",
       "userNotFound": "Kullanıcı sistemde bulunamadı",
       "couldNotLinkIDP": "IDP kullanıcıya bağlanamadı",
-      "couldNotRegisterUser": "Kullanıcı kayıt edilemedi"
+      "couldNotRegisterUser": "Kullanıcı kayıt edilemedi",
+      "registerNotAllowed": "Kayıt olmaya izin verilmiyor! Daha fazla bilgi için yöneticinizle iletişime geçin.",
+      "userAlreadyExists": "Bu e-posta adresine sahip bir kullanıcı zaten mevcut. Bunun yerine giriş yapmayı deneyin.",
+      "couldNotGetLoginSettings": "Giriş ayarları alınamadı",
+      "localAuthenticationNotAllowed": "Yerel kimlik doğrulamasına izin verilmiyor! Daha fazla bilgi için yöneticinize başvurun."
     }
   },
   "invite": {
@@ -413,7 +421,10 @@
       "couldNotResendInvite": "Davet yeniden gönderilemedi",
       "contextMissing": "Bir hata oluştu. Lütfen tekrar deneyin.",
       "inviteSendFailed": "Davet e-postası gönderilemedi",
-      "emailSendFailed": "Doğrulama e-postası gönderilemedi"
+      "emailSendFailed": "Doğrulama e-postası gönderilemedi",
+      "couldNotFindSession": "Oturum bulunamadı",
+      "couldNotUpdateSession": "Oturum güncellenemedi",
+      "invalidCode": "Geçersiz kod. Lütfen tekrar deneyin."
     }
   },
   "authenticator": {

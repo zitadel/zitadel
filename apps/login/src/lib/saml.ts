@@ -30,7 +30,12 @@ export async function loginWithSAMLAndSession({
   const selectedSession = sessions.find((s) => s.id === sessionId);
 
   if (selectedSession && selectedSession.id) {
-    const isValid = await isSessionValid({ serviceConfig, session: selectedSession });
+    // Treat a failed validity check like an invalid session (re-authenticate)
+    // instead of letting the error fail the whole server action.
+    const isValid = await isSessionValid({ serviceConfig, session: selectedSession }).catch((error) => {
+      console.warn("loginWithSAMLAndSession: could not validate session", error);
+      return false;
+    });
 
     if (!isValid && selectedSession.factors?.user) {
       // if the session is not valid anymore, we need to redirect the user to re-authenticate /
@@ -100,10 +105,12 @@ export async function loginWithSAMLAndSession({
         console.error(error);
 
         if (isClassifiedError(error) && error.code === Code.FailedPrecondition) {
+          // Recovery path: a failure to load settings must not escape the
+          // handler — fall through to the /signedin redirect instead.
           const loginSettings = await getLoginSettings({
             serviceConfig,
             organization: selectedSession.factors?.user?.organizationId,
-          });
+          }).catch(() => undefined);
 
           if (loginSettings?.defaultRedirectUri && isSafeRedirectUri(loginSettings.defaultRedirectUri)) {
             return { redirect: loginSettings.defaultRedirectUri };

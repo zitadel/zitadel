@@ -99,8 +99,10 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
         setLoading(false);
       });
 
-    if (sessionResponse && "error" in sessionResponse && sessionResponse.error) {
-      setError(sessionResponse.error);
+    if (!sessionResponse || "error" in sessionResponse) {
+      if (sessionResponse?.error) {
+        setError(sessionResponse.error);
+      }
       return;
     }
 

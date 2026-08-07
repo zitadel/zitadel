@@ -152,7 +152,9 @@
       "failedPrecondition": "Precondizione non soddisfatta",
       "sessionNotValid": "La sessione non è valida",
       "passwordVerificationMissing": "Manca la verifica della password.",
-      "passwordVerificationTooOld": "La verifica della password è troppo vecchia. Si prega di verificare nuovamente la password."
+      "passwordVerificationTooOld": "La verifica della password è troppo vecchia. Si prega di verificare nuovamente la password.",
+      "passwordResetNotAllowed": "La reimpostazione della password non è consentita! Contatta il tuo amministratore per maggiori informazioni.",
+      "localAuthenticationNotAllowed": "L'autenticazione locale non è consentita! Contatta il tuo amministratore per ulteriori informazioni."
     }
   },
   "idp": {
@@ -203,7 +205,8 @@
       "userCreationFailed": "Creazione dell'account utente non riuscita",
       "orgResolutionFailed": "Impossibile determinare l'organizzazione per la registrazione",
       "sessionCreationFailed": "Impossibile creare la sessione o determinare il reindirizzamento",
-      "unknownError": "Si è verificato un errore sconosciuto"
+      "unknownError": "Si è verificato un errore sconosciuto",
+      "unknown": "Si è verificato un errore sconosciuto"
     }
   },
   "ldap": {
@@ -279,7 +282,8 @@
         "couldNotFindSession": "Impossibile trovare la sessione",
         "couldNotUpdateSession": "Impossibile aggiornare la sessione",
         "userNotFound": "Utente non trovato nel sistema",
-        "couldNotDetermineRedirect": "Impossibile determinare l'URL di reindirizzamento dopo la verifica passkey"
+        "couldNotDetermineRedirect": "Impossibile determinare l'URL di reindirizzamento dopo la verifica passkey",
+        "couldNotGetUser": "Impossibile recuperare l'utente"
       }
     },
     "set": {
@@ -353,7 +357,11 @@
       "couldNotCreateSession": "Impossibile creare la sessione",
       "userNotFound": "Utente non trovato nel sistema",
       "couldNotLinkIDP": "Impossibile collegare l'IDP all'utente",
-      "couldNotRegisterUser": "Impossibile registrare l'utente"
+      "couldNotRegisterUser": "Impossibile registrare l'utente",
+      "registerNotAllowed": "La registrazione non è consentita! Contatta il tuo amministratore per maggiori informazioni.",
+      "userAlreadyExists": "Esiste già un utente con questo indirizzo e-mail. Prova invece ad accedere.",
+      "couldNotGetLoginSettings": "Impossibile ottenere le impostazioni di accesso",
+      "localAuthenticationNotAllowed": "L'autenticazione locale non è consentita! Contatta il tuo amministratore per ulteriori informazioni."
     }
   },
   "invite": {
@@ -413,7 +421,10 @@
       "couldNotResendInvite": "Impossibile reinviare l'invito",
       "inviteSendFailed": "Impossibile inviare l'email di invito",
       "emailSendFailed": "Impossibile inviare l'email di verifica",
-      "contextMissing": "Si è verificato un errore. Riprova."
+      "contextMissing": "Si è verificato un errore. Riprova.",
+      "couldNotFindSession": "Impossibile trovare la sessione",
+      "couldNotUpdateSession": "Impossibile aggiornare la sessione",
+      "invalidCode": "Codice non valido. Riprova."
     }
   },
   "authenticator": {

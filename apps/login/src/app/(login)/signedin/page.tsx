@@ -7,8 +7,8 @@ import { resolveRedirectUri } from "@/lib/client";
 import { getMostRecentCookieWithLoginname, getSessionCookieById } from "@/lib/cookies";
 import { completeDeviceAuthorization } from "@/lib/server/device";
 import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getLoginSettings, getSession, ServiceConfig } from "@/lib/zitadel";
+import { loadMostRecentSession, loadSessionById } from "@/lib/session";
+import { getBrandingSettings, getLoginSettings } from "@/lib/zitadel";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -17,20 +17,6 @@ import Link from "next/link";
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("signedin");
   return { title: t("title", { user: "" }) };
-}
-
-async function loadSessionById(serviceConfig: ServiceConfig, sessionId: string, organization?: string) {
-  const recent = await getSessionCookieById({ sessionId, organization });
-
-  if (!recent) {
-    return undefined;
-  }
-
-  return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((response) => {
-    if (response?.session) {
-      return response.session;
-    }
-  });
 }
 
 export default async function Page(props: { searchParams: Promise<any> }) {
@@ -76,7 +62,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   }
 
   const sessionFactors = sessionId
-    ? await loadSessionById(serviceConfig, sessionId, organization)
+    ? await loadSessionById({ serviceConfig, sessionId, organization })
     : await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } });
 
   let loginSettings;

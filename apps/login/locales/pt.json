@@ -152,7 +152,9 @@
       "failedPrecondition": "Pré-condição falhou",
       "sessionNotValid": "A sessão não é válida",
       "passwordVerificationMissing": "A verificação de senha está ausente.",
-      "passwordVerificationTooOld": "A verificação de senha expirou. Por favor, verifique sua senha novamente."
+      "passwordVerificationTooOld": "A verificação de senha expirou. Por favor, verifique sua senha novamente.",
+      "passwordResetNotAllowed": "A redefinição de senha não é permitida! Contate seu administrador para mais informações.",
+      "localAuthenticationNotAllowed": "A autenticação local não é permitida! Entre em contato com o administrador para mais informações."
     }
   },
   "idp": {
@@ -203,7 +205,8 @@
       "userCreationFailed": "Falha ao criar conta de usuário",
       "orgResolutionFailed": "Não foi possível determinar a organização para o cadastro",
       "sessionCreationFailed": "Não foi possível criar sessão ou determinar redirecionamento",
-      "unknownError": "Ocorreu um erro desconhecido"
+      "unknownError": "Ocorreu um erro desconhecido",
+      "unknown": "Ocorreu um erro desconhecido"
     }
   },
   "ldap": {
@@ -279,7 +282,8 @@
         "couldNotFindSession": "Não foi possível encontrar a sessão",
         "couldNotUpdateSession": "Não foi possível atualizar a sessão",
         "userNotFound": "Usuário não encontrado no sistema",
-        "couldNotDetermineRedirect": "Não foi possível determinar a URL de redirecionamento após verificação da chave de acesso"
+        "couldNotDetermineRedirect": "Não foi possível determinar a URL de redirecionamento após verificação da chave de acesso",
+        "couldNotGetUser": "Não foi possível obter o usuário"
       }
     },
     "set": {
@@ -353,7 +357,11 @@
       "couldNotCreateSession": "Não foi possível criar a sessão",
       "userNotFound": "Usuário não encontrado no sistema",
       "couldNotLinkIDP": "Não foi possível vincular o provedor de identidade ao usuário",
-      "couldNotRegisterUser": "Não foi possível cadastrar o usuário"
+      "couldNotRegisterUser": "Não foi possível cadastrar o usuário",
+      "registerNotAllowed": "O registro não é permitido! Contate seu administrador para mais informações.",
+      "userAlreadyExists": "Já existe um usuário com este endereço de e-mail. Tente fazer login.",
+      "couldNotGetLoginSettings": "Não foi possível obter as configurações de login",
+      "localAuthenticationNotAllowed": "A autenticação local não é permitida! Entre em contato com o administrador para mais informações."
     }
   },
   "invite": {
@@ -413,7 +421,10 @@
       "couldNotResendInvite": "Não foi possível reenviar o convite",
       "inviteSendFailed": "Falha ao enviar e-mail de convite",
       "emailSendFailed": "Falha ao enviar e-mail de verificação",
-      "contextMissing": "Ocorreu um erro. Por favor, tente novamente."
+      "contextMissing": "Ocorreu um erro. Por favor, tente novamente.",
+      "couldNotFindSession": "Não foi possível encontrar a sessão",
+      "couldNotUpdateSession": "Não foi possível atualizar a sessão",
+      "invalidCode": "Código inválido. Tente novamente."
     }
   },
   "authenticator": {

@@ -152,7 +152,9 @@
       "failedPrecondition": "Az előfeltétel nem teljesült",
       "sessionNotValid": "A munkamenet nem érvényes",
       "passwordVerificationMissing": "A jelszó hitelesítés hiányzik.",
-      "passwordVerificationTooOld": "A jelszó hitelesítés túl régi. Kérjük, erősítsd meg újra a jelszavadat."
+      "passwordVerificationTooOld": "A jelszó hitelesítés túl régi. Kérjük, erősítsd meg újra a jelszavadat.",
+      "passwordResetNotAllowed": "A jelszó visszaállítása nem engedélyezett! További információért forduljon a rendszergazdához.",
+      "localAuthenticationNotAllowed": "A helyi hitelesítés nem engedélyezett! További információért fordulj a rendszergazdához."
     }
   },
   "idp": {
@@ -203,7 +205,8 @@
       "userCreationFailed": "Nem sikerült létrehozni a felhasználói fiókot",
       "orgResolutionFailed": "Nem sikerült meghatározni a szervezetet a regisztrációhoz",
       "sessionCreationFailed": "Nem sikerült létrehozni a munkamenetet vagy meghatározni az átirányítási címet",
-      "unknownError": "Ismeretlen hiba történt"
+      "unknownError": "Ismeretlen hiba történt",
+      "unknown": "Ismeretlen hiba történt"
     }
   },
   "ldap": {
@@ -279,7 +282,8 @@
         "couldNotFindSession": "Nem található munkamenet",
         "couldNotUpdateSession": "Nem sikerült frissíteni a munkamenetet",
         "userNotFound": "A felhasználó nem található a rendszerben",
-        "couldNotDetermineRedirect": "Nem sikerült meghatározni az átirányítási címet a jelkulcs ellenőrzése után"
+        "couldNotDetermineRedirect": "Nem sikerült meghatározni az átirányítási címet a jelkulcs ellenőrzése után",
+        "couldNotGetUser": "A felhasználó lekérése nem sikerült"
       }
     },
     "set": {
@@ -353,7 +357,11 @@
       "couldNotCreateSession": "Nem sikerült létrehozni a munkamenetet",
       "userNotFound": "A felhasználó nem található a rendszerben",
       "couldNotLinkIDP": "Nem sikerült összekapcsolni az azonosítószolgáltatót a felhasználóval",
-      "couldNotRegisterUser": "Nem sikerült regisztrálni a felhasználót"
+      "couldNotRegisterUser": "Nem sikerült regisztrálni a felhasználót",
+      "registerNotAllowed": "A regisztráció nem engedélyezett! További információért forduljon a rendszergazdához.",
+      "userAlreadyExists": "Ezzel az e-mail-címmel már létezik felhasználó. Próbáljon meg inkább bejelentkezni.",
+      "couldNotGetLoginSettings": "Nem sikerült lekérni a bejelentkezési beállításokat",
+      "localAuthenticationNotAllowed": "A helyi hitelesítés nem engedélyezett! További információért fordulj a rendszergazdához."
     }
   },
   "invite": {
@@ -413,7 +421,10 @@
       "couldNotResendInvite": "Nem sikerült újraküldeni a meghívást",
       "inviteSendFailed": "Nem sikerült elküldeni a meghívó e-mailt",
       "emailSendFailed": "Nem sikerült elküldeni az ellenőrző e-mailt",
-      "contextMissing": "Hiba történt. Kérjük, próbáld újra."
+      "contextMissing": "Hiba történt. Kérjük, próbáld újra.",
+      "couldNotFindSession": "A munkamenet nem található",
+      "couldNotUpdateSession": "A munkamenet frissítése nem sikerült",
+      "invalidCode": "Érvénytelen kód. Kérjük, próbálja újra."
     }
   },
   "authenticator": {

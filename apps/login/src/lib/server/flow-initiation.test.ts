@@ -634,3 +634,79 @@ describe("handleOIDCFlowInitiation — Prompt.LOGIN + loginHint requestId prefix
     );
   });
 });
+
+describe("handleOIDCFlowInitiation — prompt=none callback errors", () => {
+  let mockGetAuthRequest: ReturnType<typeof vi.fn>;
+  let mockCreateCallback: ReturnType<typeof vi.fn>;
+  let mockFindValidSession: ReturnType<typeof vi.fn>;
+
+  const session = {
+    id: "session-1",
+    factors: { user: { id: "user1", organizationId: "111111", loginName: "user@org.com" } },
+  };
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.unstubAllEnvs();
+
+    const zitadel = await import("@/lib/zitadel");
+    const sessionLib = await import("@/lib/session");
+    const authUtils = await import("@/lib/auth-utils");
+    const { Prompt } = await import("@zitadel/proto/zitadel/oidc/v2/authorization_pb");
+
+    mockGetAuthRequest = vi.mocked(zitadel.getAuthRequest);
+    mockCreateCallback = vi.mocked(zitadel.createCallback);
+    mockFindValidSession = vi.mocked(sessionLib.findValidSession);
+    vi.mocked(authUtils.getValidLocaleFromUILocales).mockReturnValue(null);
+    vi.mocked(zitadel.getSecuritySettings).mockResolvedValue(undefined as any);
+
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: [],
+        prompt: [Prompt.NONE],
+        loginHint: undefined,
+      },
+    });
+    mockFindValidSession.mockResolvedValue(session);
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  test("returns the classified status for business rejections instead of throwing", async () => {
+    const { Code, ConnectError } = await import("@connectrpc/connect");
+    const { ClassifiedConnectError } = await import("../grpc/interceptors/error-classification");
+    mockCreateCallback.mockRejectedValue(
+      new ClassifiedConnectError(new ConnectError("Auth Request has already been handled", Code.FailedPrecondition)),
+    );
+
+    const res = await handleOIDCFlowInitiation(
+      makeBaseParams({
+        sessions: [session] as any,
+        sessionCookies: [{ id: "session-1", token: "tok" }],
+      }),
+    );
+
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toContain("already been handled");
+  });
+
+  test("rethrows genuine server errors from the callback", async () => {
+    const { Code, ConnectError } = await import("@connectrpc/connect");
+    const { ClassifiedConnectError } = await import("../grpc/interceptors/error-classification");
+    mockCreateCallback.mockRejectedValue(new ClassifiedConnectError(new ConnectError("database down", Code.Internal)));
+
+    await expect(
+      handleOIDCFlowInitiation(
+        makeBaseParams({
+          sessions: [session] as any,
+          sessionCookies: [{ id: "session-1", token: "tok" }],
+        }),
+      ),
+    ).rejects.toThrow("database down");
+  });
+});

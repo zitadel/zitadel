@@ -152,7 +152,9 @@
       "failedPrecondition": "Vorbedingung fehlgeschlagen",
       "sessionNotValid": "Sitzung ist nicht gültig",
       "passwordVerificationMissing": "Passwort-Verifizierung fehlt.",
-      "passwordVerificationTooOld": "Passwort-Verifizierung ist zu alt. Bitte verifizieren Sie Ihr Passwort erneut."
+      "passwordVerificationTooOld": "Passwort-Verifizierung ist zu alt. Bitte verifizieren Sie Ihr Passwort erneut.",
+      "passwordResetNotAllowed": "Passwort zurücksetzen ist nicht erlaubt! Kontaktieren Sie Ihren Administrator für weitere Informationen.",
+      "localAuthenticationNotAllowed": "Lokale Authentifizierung nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator."
     }
   },
   "idp": {
@@ -203,7 +205,8 @@
       "userCreationFailed": "Erstellen des Benutzerkontos fehlgeschlagen",
       "orgResolutionFailed": "Organisation für Registrierung konnte nicht ermittelt werden",
       "sessionCreationFailed": "Sitzung konnte nicht erstellt oder Weiterleitung konnte nicht ermittelt werden",
-      "unknownError": "Ein unbekannter Fehler ist aufgetreten"
+      "unknownError": "Ein unbekannter Fehler ist aufgetreten",
+      "unknown": "Ein unbekannter Fehler ist aufgetreten"
     }
   },
   "ldap": {
@@ -279,7 +282,8 @@
         "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
         "couldNotUpdateSession": "Sitzung konnte nicht aktualisiert werden",
         "userNotFound": "Benutzer nicht im System gefunden",
-        "couldNotDetermineRedirect": "Weiterleitungs-URL nach Passkey-Verifizierung konnte nicht ermittelt werden"
+        "couldNotDetermineRedirect": "Weiterleitungs-URL nach Passkey-Verifizierung konnte nicht ermittelt werden",
+        "couldNotGetUser": "Benutzer konnte nicht geladen werden"
       }
     },
     "set": {
@@ -353,7 +357,11 @@
       "couldNotCreateSession": "Sitzung konnte nicht erstellt werden",
       "userNotFound": "Benutzer nicht im System gefunden",
       "couldNotLinkIDP": "IDP konnte nicht mit dem Benutzer verknüpft werden",
-      "couldNotRegisterUser": "Benutzer konnte nicht registriert werden"
+      "couldNotRegisterUser": "Benutzer konnte nicht registriert werden",
+      "registerNotAllowed": "Registrierung ist nicht erlaubt! Kontaktieren Sie Ihren Administrator für weitere Informationen.",
+      "userAlreadyExists": "Ein Benutzer mit dieser E-Mail-Adresse existiert bereits. Versuchen Sie sich stattdessen anzumelden.",
+      "couldNotGetLoginSettings": "Anmeldeeinstellungen konnten nicht abgerufen werden",
+      "localAuthenticationNotAllowed": "Lokale Authentifizierung nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator."
     }
   },
   "invite": {
@@ -413,7 +421,10 @@
       "couldNotResendInvite": "Einladung konnte nicht erneut gesendet werden",
       "inviteSendFailed": "Einladungs-E-Mail konnte nicht gesendet werden",
       "emailSendFailed": "Verifizierungs-E-Mail konnte nicht gesendet werden",
-      "contextMissing": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+      "contextMissing": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+      "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
+      "couldNotUpdateSession": "Sitzung konnte nicht aktualisiert werden",
+      "invalidCode": "Ungültiger Code. Bitte versuchen Sie es erneut."
     }
   },
   "authenticator": {

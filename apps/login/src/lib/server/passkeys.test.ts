@@ -6,7 +6,8 @@ vi.mock("next/headers", () => ({
   headers: vi.fn(),
 }));
 
-vi.mock("@zitadel/client", () => ({
+vi.mock("@zitadel/client", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@zitadel/client")>()),
   create: vi.fn(),
   Duration: vi.fn(),
   Timestamp: vi.fn(),
@@ -204,8 +205,12 @@ describe("sendPasskey", () => {
       });
     });
 
-    test("should fallback to createSessionAndUpdateCookie when setSessionAndUpdateCookie fails and checks are present", async () => {
-      mockSetSessionAndUpdateCookie.mockRejectedValue(new Error("session already terminated"));
+    test("should fallback to createSessionAndUpdateCookie when the session is gone and checks are present", async () => {
+      const { Code, ConnectError } = await import("@connectrpc/connect");
+      const { ClassifiedConnectError } = await import("../grpc/interceptors/error-classification");
+      mockSetSessionAndUpdateCookie.mockRejectedValue(
+        new ClassifiedConnectError(new ConnectError("Errors.Session.NotExisting", Code.NotFound)),
+      );
 
       mockCreateSessionAndUpdateCookie.mockResolvedValue({
         session: {

@@ -25,7 +25,12 @@ export async function loginWithOIDCAndSession({
   const selectedSession = sessions.find((s) => s.id === sessionId);
 
   if (selectedSession && selectedSession.id) {
-    const isValid = await isSessionValid({ serviceConfig, session: selectedSession });
+    // Treat a failed validity check like an invalid session (re-authenticate)
+    // instead of letting the error fail the whole server action.
+    const isValid = await isSessionValid({ serviceConfig, session: selectedSession }).catch((error) => {
+      console.warn("loginWithOIDCAndSession: could not validate session", error);
+      return false;
+    });
 
     console.log("Session is valid:", isValid);
 
@@ -77,10 +82,12 @@ export async function loginWithOIDCAndSession({
         // handle already handled gracefully as these could come up if old emails with requestId are used (reset password, register emails etc.)
         console.error(error);
         if (isClassifiedError(error) && error.code === Code.FailedPrecondition) {
+          // Recovery path: a failure to load settings must not escape the
+          // handler — fall through to the /signedin redirect instead.
           const loginSettings = await getLoginSettings({
             serviceConfig,
             organization: selectedSession.factors?.user?.organizationId,
-          });
+          }).catch(() => undefined);
 
           if (loginSettings?.defaultRedirectUri && isSafeRedirectUri(loginSettings.defaultRedirectUri)) {
             return { redirect: loginSettings.defaultRedirectUri };

@@ -406,10 +406,10 @@ describe("verifyTOTP", () => {
     expect(result).toEqual({ done: true });
   });
 
-  test("throws when the session has no user id", async () => {
+  test("returns an error when the session has no user id", async () => {
     mockLoadMostRecentSession.mockResolvedValue({ id: "session-1", factors: {} });
 
-    await expect(verifyTOTP("123456")).rejects.toThrow("No user id found in session.");
+    await expect(verifyTOTP("123456")).resolves.toEqual({ error: "errors.couldNotVerify" });
     expect(mockVerifyTOTPRegistration).not.toHaveBeenCalled();
   });
 });
