@@ -134,3 +134,38 @@ describe("getEnrollmentAuthorizationError", () => {
     expect(result).toBeNull();
   });
 });
+
+describe("getEnrollmentAuthorizationError — service call failures", () => {
+  let listAuthenticationMethodTypes: any;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    listAuthenticationMethodTypes = vi.mocked((await import("@/lib/zitadel")).listAuthenticationMethodTypes);
+  });
+
+  const identifyOnlySession = { factors: { user: { id: "user-1" } } } as any;
+
+  test("fails closed when the method list cannot be loaded due to a user error", async () => {
+    const { Code, ConnectError } = await import("@connectrpc/connect");
+    const { ClassifiedConnectError } = await import("../grpc/interceptors/error-classification");
+    listAuthenticationMethodTypes.mockRejectedValue(
+      new ClassifiedConnectError(new ConnectError("user not found", Code.NotFound)),
+    );
+
+    await expect(
+      getEnrollmentAuthorizationError({ serviceConfig: {} as any, session: identifyOnlySession, userId: "user-1" }),
+    ).resolves.toBe("You have to authenticate or have a valid User Verification Check");
+  });
+
+  test("rethrows genuine server errors", async () => {
+    const { Code, ConnectError } = await import("@connectrpc/connect");
+    const { ClassifiedConnectError } = await import("../grpc/interceptors/error-classification");
+    listAuthenticationMethodTypes.mockRejectedValue(
+      new ClassifiedConnectError(new ConnectError("database down", Code.Internal)),
+    );
+
+    await expect(
+      getEnrollmentAuthorizationError({ serviceConfig: {} as any, session: identifyOnlySession, userId: "user-1" }),
+    ).rejects.toThrow("database down");
+  });
+});

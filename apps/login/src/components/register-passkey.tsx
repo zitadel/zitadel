@@ -194,6 +194,16 @@ export function RegisterPasskey({
       return;
     }
 
+    if ("error" in verificationResponse && verificationResponse.error) {
+      setError(verificationResponse.error);
+      return;
+    }
+
+    if (!("loginName" in verificationResponse)) {
+      setError("Could not verify Passkey!");
+      return;
+    }
+
     continueAndLogin(verificationResponse.loginName);
   }, [sessionId, userId, code, codeId, continueAndLogin]);
 

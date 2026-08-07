@@ -876,7 +876,10 @@ export async function processIDPCallback({
     if (requestId) errorParams.set("requestId", requestId);
     if (organization) errorParams.set("organization", organization);
     if (postErrorRedirectUrl) errorParams.set("postErrorRedirectUrl", postErrorRedirectUrl);
-    errorParams.set("error", error instanceof Error ? error.message : t("errors.unknownError"));
+    // only user errors carry their message to the failure page — internal
+    // error details must not leak into a user-visible URL
+    const userErrorMessage = isClassifiedError(error) && error.isUserError ? error.rawMessage : undefined;
+    errorParams.set("error", userErrorMessage || t("errors.unknownError"));
 
     return { redirect: `/idp/${provider}/failure?${errorParams.toString()}` };
   }

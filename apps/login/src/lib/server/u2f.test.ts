@@ -1,9 +1,16 @@
+import { Code, ConnectError } from "@connectrpc/connect";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import { ClassifiedConnectError } from "../grpc/interceptors/error-classification";
 import { addU2F, verifyU2F } from "./u2f";
 
 vi.mock("@zitadel/client", () => ({
   // `create(schema, data)` is only used to build the verify request — return the data.
   create: vi.fn((_schema: unknown, data: unknown) => data),
+}));
+
+// this returns the key itself so tests can assert on translation keys
+vi.mock("next-intl/server", () => ({
+  getTranslations: vi.fn(() => (key: string) => key),
 }));
 
 vi.mock("@/lib/zitadel", () => ({
@@ -90,7 +97,7 @@ describe("addU2F", () => {
 
     const result = await addU2F({ sessionId: "missing" });
 
-    expect(result).toEqual({ error: "Could not get session" });
+    expect(result).toEqual({ error: "errors.couldNotLoadSession" });
     expect(getEnrollmentAuthorizationError).not.toHaveBeenCalled();
     expect(registerU2F).not.toHaveBeenCalled();
   });
@@ -140,5 +147,34 @@ describe("verifyU2F", () => {
 
     expect(verifyU2FRegistration).toHaveBeenCalledTimes(1);
     expect(result).toEqual({ done: true });
+  });
+
+  test("returns an error for a failed attestation instead of throwing", async () => {
+    getEnrollmentAuthorizationError.mockResolvedValue(null);
+    verifyU2FRegistration.mockRejectedValue(
+      new ClassifiedConnectError(new ConnectError("invalid attestation", Code.InvalidArgument)),
+    );
+
+    await expect(
+      verifyU2F({ u2fId: "u2f-1", passkeyName: "my key", publicKeyCredential: {}, sessionId: "session-1" }),
+    ).resolves.toEqual({ error: "errors.couldNotVerify" });
+  });
+
+  test("returns an error when the session is gone server-side instead of throwing", async () => {
+    getSession.mockRejectedValue(new ClassifiedConnectError(new ConnectError("Errors.Session.NotExisting", Code.NotFound)));
+
+    await expect(
+      verifyU2F({ u2fId: "u2f-1", passkeyName: "my key", publicKeyCredential: {}, sessionId: "session-1" }),
+    ).resolves.toEqual({ error: "errors.couldNotLoadSession" });
+    expect(verifyU2FRegistration).not.toHaveBeenCalled();
+  });
+
+  test("rethrows genuine server errors so they still surface as 500", async () => {
+    getEnrollmentAuthorizationError.mockResolvedValue(null);
+    verifyU2FRegistration.mockRejectedValue(new ClassifiedConnectError(new ConnectError("database down", Code.Internal)));
+
+    await expect(
+      verifyU2F({ u2fId: "u2f-1", passkeyName: "my key", publicKeyCredential: {}, sessionId: "session-1" }),
+    ).rejects.toThrow("database down");
   });
 });

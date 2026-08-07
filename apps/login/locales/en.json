@@ -206,7 +206,10 @@
       "orgResolutionFailed": "Could not determine organization for registration",
       "sessionCreationFailed": "Could not create session or determine redirect",
       "unknownError": "An unknown error occurred",
-      "unknown": "An unknown error occurred"
+      "unknown": "An unknown error occurred",
+      "couldNotStartIDPFlow": "Could not start IDP flow",
+      "userNotFound": "User not found in the system",
+      "couldNotCreateSession": "Could not create session"
     }
   },
   "ldap": {
@@ -220,6 +223,9 @@
     "required": {
       "username": "This field is required",
       "password": "This field is required"
+    },
+    "errors": {
+      "couldNotVerify": "Could not sign in. Please check your username and password."
     }
   },
   "mfa": {
@@ -294,7 +300,15 @@
         "link": "Passkey Authentication"
       },
       "skip": "Skip",
-      "submit": "Continue"
+      "submit": "Continue",
+      "errors": {
+        "missingContext": "Missing session or user information. Restart the setup from the link you received.",
+        "couldNotLoadSession": "Could not load session",
+        "couldNotRegisterPasskey": "Could not set up the passkey. Please try again.",
+        "couldNotVerifyPasskey": "Could not verify the passkey. Please try again.",
+        "userNotFound": "User not found in the system",
+        "couldNotCreateSession": "Could not create session"
+      }
     }
   },
   "u2f": {
@@ -306,6 +320,11 @@
       "title": "Set up 2-Factor",
       "description": "Set up a device as a second factor.",
       "submit": "Continue"
+    },
+    "errors": {
+      "couldNotLoadSession": "Could not load session",
+      "couldNotRegister": "Could not set up the security key. Please try again.",
+      "couldNotVerify": "Could not verify the security key. Please try again."
     }
   },
   "register": {
@@ -458,6 +477,9 @@
       "email": "View your email address.",
       "profile": "View your full profile information.",
       "offline_access": "Allow offline access to your account."
+    },
+    "errors": {
+      "couldNotComplete": "Could not complete the device authorization. The code may already be used or expired."
     }
   },
   "error": {

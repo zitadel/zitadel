@@ -1,6 +1,7 @@
 import { ConsentScreen } from "@/components/consent";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { getServiceConfig } from "@/lib/service-url";
 import { getBrandingSettings, getDefaultOrg, getDeviceAuthorizationRequest } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
@@ -24,7 +25,15 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  const { deviceAuthorizationRequest } = await getDeviceAuthorizationRequest({ serviceConfig, userCode });
+  // user_code is user-supplied: an unknown or expired code is an expected
+  // state and must render the no-device-request message, not crash SSR
+  const { deviceAuthorizationRequest } = await getDeviceAuthorizationRequest({ serviceConfig, userCode }).catch((error) => {
+    if (isClassifiedError(error) && error.isUserError) {
+      console.warn("Could not get device authorization request", error);
+      return { deviceAuthorizationRequest: undefined };
+    }
+    throw error;
+  });
 
   if (!deviceAuthorizationRequest) {
     return (

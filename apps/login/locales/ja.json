@@ -199,7 +199,10 @@
       "orgResolutionFailed": "登録する組織を特定できませんでした",
       "sessionCreationFailed": "セッションの作成またはリダイレクトの決定に失敗しました",
       "unknownError": "不明なエラーが発生しました",
-      "unknown": "不明なエラーが発生しました"
+      "unknown": "不明なエラーが発生しました",
+      "couldNotStartIDPFlow": "IDPフローを開始できませんでした",
+      "userNotFound": "ユーザーがシステムに見つかりません",
+      "couldNotCreateSession": "セッションを作成できませんでした"
     }
   },
   "ldap": {
@@ -213,6 +216,9 @@
     "required": {
       "username": "必須項目です",
       "password": "必須項目です"
+    },
+    "errors": {
+      "couldNotVerify": "サインインできませんでした。ユーザー名とパスワードを確認してください。"
     }
   },
   "mfa": {
@@ -287,7 +293,15 @@
         "link": "パスキー認証"
       },
       "skip": "スキップ",
-      "submit": "続行"
+      "submit": "続行",
+      "errors": {
+        "missingContext": "セッションまたはユーザー情報がありません。受け取ったリンクから設定をやり直してください。",
+        "couldNotLoadSession": "セッションを読み込めませんでした",
+        "couldNotRegisterPasskey": "パスキーを設定できませんでした。もう一度お試しください。",
+        "couldNotVerifyPasskey": "パスキーを検証できませんでした。もう一度お試しください。",
+        "userNotFound": "ユーザーがシステムに見つかりません",
+        "couldNotCreateSession": "セッションを作成できませんでした"
+      }
     }
   },
   "u2f": {
@@ -299,6 +313,11 @@
       "title": "二要素認証の設定",
       "description": "デバイスを二要素認証として設定します。",
       "submit": "続行"
+    },
+    "errors": {
+      "couldNotLoadSession": "セッションを読み込めませんでした",
+      "couldNotRegister": "セキュリティキーを設定できませんでした。もう一度お試しください。",
+      "couldNotVerify": "セキュリティキーを検証できませんでした。もう一度お試しください。"
     }
   },
   "register": {
@@ -451,6 +470,9 @@
       "email": "メールアドレスを表示します。",
       "profile": "すべてのプロフィール情報を表示します。",
       "offline_access": "アカウントへのオフラインアクセスを許可します。"
+    },
+    "errors": {
+      "couldNotComplete": "デバイス認証を完了できませんでした。コードは既に使用されているか、期限切れの可能性があります。"
     }
   },
   "error": {

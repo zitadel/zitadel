@@ -206,7 +206,10 @@
       "orgResolutionFailed": "无法确定注册的组织",
       "sessionCreationFailed": "无法创建会话或确定重定向",
       "unknownError": "发生未知错误",
-      "unknown": "发生未知错误"
+      "unknown": "发生未知错误",
+      "couldNotStartIDPFlow": "无法启动身份提供者流程",
+      "userNotFound": "系统中未找到用户",
+      "couldNotCreateSession": "无法创建会话"
     }
   },
   "ldap": {
@@ -220,6 +223,9 @@
     "required": {
       "username": "此字段为必填项",
       "password": "此字段为必填项"
+    },
+    "errors": {
+      "couldNotVerify": "无法登录。请检查您的用户名和密码。"
     }
   },
   "mfa": {
@@ -294,7 +300,15 @@
         "link": "密码密钥认证"
       },
       "skip": "跳过",
-      "submit": "继续"
+      "submit": "继续",
+      "errors": {
+        "missingContext": "缺少会话或用户信息。请从您收到的链接重新开始设置。",
+        "couldNotLoadSession": "无法加载会话",
+        "couldNotRegisterPasskey": "无法设置通行密钥。请重试。",
+        "couldNotVerifyPasskey": "无法验证通行密钥。请重试。",
+        "userNotFound": "系统中未找到用户",
+        "couldNotCreateSession": "无法创建会话"
+      }
     }
   },
   "u2f": {
@@ -306,6 +320,11 @@
       "title": "设置双因素认证",
       "description": "设置设备为第二因素。",
       "submit": "继续"
+    },
+    "errors": {
+      "couldNotLoadSession": "无法加载会话",
+      "couldNotRegister": "无法设置安全密钥。请重试。",
+      "couldNotVerify": "无法验证安全密钥。请重试。"
     }
   },
   "register": {
@@ -458,6 +477,9 @@
       "email": "访问您的电子邮件地址。",
       "profile": "访问您的完整个人资料信息。",
       "offline_access": "允许离线访问您的账户。"
+    },
+    "errors": {
+      "couldNotComplete": "无法完成设备授权。验证码可能已被使用或已过期。"
     }
   },
   "error": {

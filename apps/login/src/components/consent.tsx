@@ -28,16 +28,23 @@ export function ConsentScreen({
 
   async function denyDeviceAuth() {
     setLoading(true);
+    let failed = false;
     const response = await completeDeviceAuthorization(deviceAuthorizationRequestId)
       .catch(() => {
-        setError("Could not register user");
+        setError("Could not deny the device authorization");
+        failed = true;
         return;
       })
       .finally(() => {
         setLoading(false);
       });
 
-    if (response) {
+    if (response && "error" in response && response.error) {
+      setError(response.error);
+      return;
+    }
+
+    if (!failed) {
       return router.push("/device");
     }
   }

@@ -206,7 +206,10 @@
       "orgResolutionFailed": "No se pudo determinar la organización para el registro",
       "sessionCreationFailed": "No se pudo crear la sesión o determinar la redirección",
       "unknownError": "Ocurrió un error desconocido",
-      "unknown": "Se produjo un error desconocido"
+      "unknown": "Se produjo un error desconocido",
+      "couldNotStartIDPFlow": "No se pudo iniciar el flujo de IDP",
+      "userNotFound": "Usuario no encontrado en el sistema",
+      "couldNotCreateSession": "No se pudo crear la sesión"
     }
   },
   "ldap": {
@@ -220,6 +223,9 @@
     "required": {
       "username": "Este campo es obligatorio",
       "password": "Este campo es obligatorio"
+    },
+    "errors": {
+      "couldNotVerify": "No se pudo iniciar sesión. Comprueba tu nombre de usuario y contraseña."
     }
   },
   "mfa": {
@@ -294,7 +300,15 @@
         "link": "Autenticación sin contraseña"
       },
       "skip": "Omitir",
-      "submit": "Continuar"
+      "submit": "Continuar",
+      "errors": {
+        "missingContext": "Falta información de la sesión o del usuario. Reinicia la configuración desde el enlace recibido.",
+        "couldNotLoadSession": "No se pudo cargar la sesión",
+        "couldNotRegisterPasskey": "No se pudo configurar la llave de acceso. Inténtalo de nuevo.",
+        "couldNotVerifyPasskey": "No se pudo verificar la llave de acceso. Inténtalo de nuevo.",
+        "userNotFound": "Usuario no encontrado en el sistema",
+        "couldNotCreateSession": "No se pudo crear la sesión"
+      }
     }
   },
   "u2f": {
@@ -306,6 +320,11 @@
       "title": "Configurar autenticación de 2 factores",
       "description": "Configura un dispositivo como segundo factor.",
       "submit": "Continuar"
+    },
+    "errors": {
+      "couldNotLoadSession": "No se pudo cargar la sesión",
+      "couldNotRegister": "No se pudo configurar la llave de seguridad. Inténtalo de nuevo.",
+      "couldNotVerify": "No se pudo verificar la llave de seguridad. Inténtalo de nuevo."
     }
   },
   "register": {
@@ -458,6 +477,9 @@
       "email": "Accede a tu dirección de correo electrónico.",
       "profile": "Accede a la información completa de tu perfil.",
       "offline_access": "Permitir acceso sin conexión a tu cuenta."
+    },
+    "errors": {
+      "couldNotComplete": "No se pudo completar la autorización del dispositivo. Es posible que el código ya se haya usado o haya caducado."
     }
   },
   "error": {

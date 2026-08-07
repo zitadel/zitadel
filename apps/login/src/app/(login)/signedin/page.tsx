@@ -39,10 +39,14 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         });
 
     if (cookie) {
-      await completeDeviceAuthorization(requestId.replace("device_", ""), {
+      // user errors (expired/already-handled device code) resolve to { error };
+      // genuine server faults keep throwing and surface via the error boundary
+      const deviceResult = await completeDeviceAuthorization(requestId.replace("device_", ""), {
         sessionId: cookie.id,
         sessionToken: cookie.token,
-      }).catch((err) => {
+      });
+
+      if (deviceResult && "error" in deviceResult && deviceResult.error) {
         return (
           <DynamicTheme branding={branding}>
             <div className="flex flex-col space-y-4">
@@ -52,12 +56,12 @@ export default async function Page(props: { searchParams: Promise<any> }) {
               <p className="ztdl-p mb-6 block">
                 <Translated i18nKey="error.description" namespace="signedin" />
               </p>
-              <Alert>{err.message}</Alert>
+              <Alert>{deviceResult.error}</Alert>
             </div>
             <div className="w-full"></div>
           </DynamicTheme>
         );
-      });
+      }
     }
   }
 

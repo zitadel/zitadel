@@ -43,7 +43,15 @@ export async function loginWithOIDCAndSession({
         requestId: `oidc_${authRequest}`,
       };
 
-      const res = await sendLoginname(command);
+      // a user-error here (e.g. removed org/user) must not fail the whole
+      // action — fall through and let the callback attempt decide
+      const res = await sendLoginname(command).catch((error) => {
+        if (isClassifiedError(error) && error.isUserError) {
+          console.warn("loginWithOIDCAndSession: could not restart login for invalid session", error);
+          return undefined;
+        }
+        throw error;
+      });
 
       if (res && "redirect" in res && res?.redirect) {
         return { redirect: res.redirect };

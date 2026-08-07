@@ -206,7 +206,10 @@
       "orgResolutionFailed": "Kayıt için organizasyon belirlenemedi",
       "sessionCreationFailed": "Oturum oluşturulamadı veya yönlendirme belirlenemedi",
       "unknownError": "Bilinmeyen bir hata oluştu",
-      "unknown": "Bilinmeyen bir hata oluştu"
+      "unknown": "Bilinmeyen bir hata oluştu",
+      "couldNotStartIDPFlow": "IDP akışı başlatılamadı",
+      "userNotFound": "Kullanıcı sistemde bulunamadı",
+      "couldNotCreateSession": "Oturum oluşturulamadı"
     }
   },
   "ldap": {
@@ -220,6 +223,9 @@
     "required": {
       "username": "Bu alan zorunludur",
       "password": "Bu alan zorunludur"
+    },
+    "errors": {
+      "couldNotVerify": "Oturum açılamadı. Lütfen kullanıcı adınızı ve parolanızı kontrol edin."
     }
   },
   "mfa": {
@@ -294,7 +300,15 @@
         "link": "Passkey ile Kimlik Doğrulama"
       },
       "skip": "Atla",
-      "submit": "Devam"
+      "submit": "Devam",
+      "errors": {
+        "missingContext": "Oturum veya kullanıcı bilgisi eksik. Kurulumu aldığınız bağlantıdan yeniden başlatın.",
+        "couldNotLoadSession": "Oturum yüklenemedi",
+        "couldNotRegisterPasskey": "Geçiş anahtarı kurulamadı. Lütfen tekrar deneyin.",
+        "couldNotVerifyPasskey": "Geçiş anahtarı doğrulanamadı. Lütfen tekrar deneyin.",
+        "userNotFound": "Kullanıcı sistemde bulunamadı",
+        "couldNotCreateSession": "Oturum oluşturulamadı"
+      }
     }
   },
   "u2f": {
@@ -306,6 +320,11 @@
       "title": "2 Faktörlü Doğrulama Kur",
       "description": "İkinci faktör olarak bir cihaz kurun.",
       "submit": "Devam"
+    },
+    "errors": {
+      "couldNotLoadSession": "Oturum yüklenemedi",
+      "couldNotRegister": "Güvenlik anahtarı kurulamadı. Lütfen tekrar deneyin.",
+      "couldNotVerify": "Güvenlik anahtarı doğrulanamadı. Lütfen tekrar deneyin."
     }
   },
   "register": {
@@ -458,6 +477,9 @@
       "email": "E-posta adresinizi görüntüleyin.",
       "profile": "Tam profil bilgilerinizi görüntüleyin.",
       "offline_access": "Hesabınıza çevrimdışı erişime izin verin."
+    },
+    "errors": {
+      "couldNotComplete": "Cihaz yetkilendirmesi tamamlanamadı. Kod zaten kullanılmış veya süresi dolmuş olabilir."
     }
   },
   "error": {

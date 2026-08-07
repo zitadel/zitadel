@@ -206,7 +206,10 @@
       "orgResolutionFailed": "Nem sikerült meghatározni a szervezetet a regisztrációhoz",
       "sessionCreationFailed": "Nem sikerült létrehozni a munkamenetet vagy meghatározni az átirányítási címet",
       "unknownError": "Ismeretlen hiba történt",
-      "unknown": "Ismeretlen hiba történt"
+      "unknown": "Ismeretlen hiba történt",
+      "couldNotStartIDPFlow": "Nem sikerült elindítani az IDP folyamatát",
+      "userNotFound": "A felhasználó nem található a rendszerben",
+      "couldNotCreateSession": "Nem sikerült létrehozni a munkamenetet"
     }
   },
   "ldap": {
@@ -220,6 +223,9 @@
     "required": {
       "username": "Ez a mező kötelező",
       "password": "Ez a mező kötelező"
+    },
+    "errors": {
+      "couldNotVerify": "A bejelentkezés nem sikerült. Ellenőrizze a felhasználónevet és a jelszót."
     }
   },
   "mfa": {
@@ -294,7 +300,15 @@
         "link": "Jelkulcsos hitelesítés"
       },
       "skip": "Kihagyás",
-      "submit": "Tovább"
+      "submit": "Tovább",
+      "errors": {
+        "missingContext": "Hiányzó munkamenet- vagy felhasználói adatok. Indítsa újra a beállítást a kapott hivatkozásból.",
+        "couldNotLoadSession": "Nem sikerült betölteni a munkamenetet",
+        "couldNotRegisterPasskey": "A jelszókulcs beállítása nem sikerült. Kérjük, próbálja újra.",
+        "couldNotVerifyPasskey": "A jelszókulcs ellenőrzése nem sikerült. Kérjük, próbálja újra.",
+        "userNotFound": "A felhasználó nem található a rendszerben",
+        "couldNotCreateSession": "Nem sikerült létrehozni a munkamenetet"
+      }
     }
   },
   "u2f": {
@@ -306,6 +320,11 @@
       "title": "Kétlépcsős azonosítás beállítása",
       "description": "Állíts be egy készüléket második hitelesítési módként.",
       "submit": "Tovább"
+    },
+    "errors": {
+      "couldNotLoadSession": "Nem sikerült betölteni a munkamenetet",
+      "couldNotRegister": "A biztonsági kulcs beállítása nem sikerült. Kérjük, próbálja újra.",
+      "couldNotVerify": "A biztonsági kulcs ellenőrzése nem sikerült. Kérjük, próbálja újra."
     }
   },
   "register": {
@@ -458,6 +477,9 @@
       "email": "Az e-mail címed megtekintése.",
       "profile": "A teljes profilinformációd megtekintése.",
       "offline_access": "Offline hozzáférés engedélyezése a fiókodhoz."
+    },
+    "errors": {
+      "couldNotComplete": "Az eszköz engedélyezése nem fejeződött be. Lehet, hogy a kódot már felhasználták, vagy lejárt."
     }
   },
   "error": {
