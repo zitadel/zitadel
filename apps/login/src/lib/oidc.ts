@@ -25,11 +25,16 @@ export async function loginWithOIDCAndSession({
   const selectedSession = sessions.find((s) => s.id === sessionId);
 
   if (selectedSession && selectedSession.id) {
-    // Treat a failed validity check like an invalid session (re-authenticate)
-    // instead of letting the error fail the whole server action.
+    // Only a classified user error (e.g. removed user/org behind the session)
+    // may degrade a failed validity check to "invalid" (re-authenticate).
+    // Genuine server faults must keep failing the action so outages stay
+    // visible as 500s instead of silently redirecting to re-authentication.
     const isValid = await isSessionValid({ serviceConfig, session: selectedSession }).catch((error) => {
-      console.warn("loginWithOIDCAndSession: could not validate session", error);
-      return false;
+      if (isClassifiedError(error) && error.isUserError) {
+        console.warn("loginWithOIDCAndSession: could not validate session", error);
+        return false;
+      }
+      throw error;
     });
 
     console.log("Session is valid:", isValid);
