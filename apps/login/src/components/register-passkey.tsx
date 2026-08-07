@@ -76,31 +76,34 @@ export function RegisterPasskey({
     [organization, requestId, sessionId, userId, initialLoginName, router],
   );
 
-  async function submitVerify(
-    passkeyId: string,
-    passkeyName: string,
-    publicKeyCredential: any,
-    currentSessionId?: string,
-    currentUserId?: string,
-  ) {
-    setLoading(true);
-    const response = await verifyPasskeyRegistration({
-      passkeyId,
-      passkeyName,
-      publicKeyCredential,
-      sessionId: currentSessionId,
-      userId: currentUserId,
-    })
-      .catch(() => {
-        setError(t("set.errors.couldNotVerifyPasskey"));
-        return;
+  const submitVerify = useCallback(
+    async (
+      passkeyId: string,
+      passkeyName: string,
+      publicKeyCredential: any,
+      currentSessionId?: string,
+      currentUserId?: string,
+    ) => {
+      setLoading(true);
+      const response = await verifyPasskeyRegistration({
+        passkeyId,
+        passkeyName,
+        publicKeyCredential,
+        sessionId: currentSessionId,
+        userId: currentUserId,
       })
-      .finally(() => {
-        setLoading(false);
-      });
+        .catch(() => {
+          setError(t("set.errors.couldNotVerifyPasskey"));
+          return;
+        })
+        .finally(() => {
+          setLoading(false);
+        });
 
-    return response;
-  }
+      return response;
+    },
+    [t],
+  );
 
   const submitRegisterAndContinue = useCallback(async (): Promise<boolean | void> => {
     // Require either sessionId or userId
@@ -208,7 +211,7 @@ export function RegisterPasskey({
     }
 
     continueAndLogin(verificationResponse.loginName);
-  }, [sessionId, userId, code, codeId, continueAndLogin, t]);
+  }, [sessionId, userId, code, codeId, continueAndLogin, submitVerify, t]);
 
   // Auto-submit when code is provided (similar to VerifyForm)
   useEffect(() => {
