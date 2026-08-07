@@ -31,7 +31,7 @@ export function ConsentScreen({
     let failed = false;
     const response = await completeDeviceAuthorization(deviceAuthorizationRequestId)
       .catch(() => {
-        setError("Could not deny the device authorization");
+        setError(t("device.errors.couldNotComplete"));
         failed = true;
         return;
       })

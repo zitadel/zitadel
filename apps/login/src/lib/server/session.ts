@@ -223,9 +223,14 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
   // Failed checks are user errors, most commonly a wrong OTP/TOTP code. They
   // must resolve to `{ error }` so the form can render them — a throw would
   // fail the whole action POST with a 500 even though nothing is wrong
-  // server-side.
-  const checkFailedMessage =
-    checks?.otpSms || checks?.otpEmail || checks?.totp ? t("invalidCode") : t("couldNotUpdateSession");
+  // server-side. Only an InvalidArgument on a code check is confidently a
+  // wrong code; other user errors (rate limits, preconditions, ...) get the
+  // generic message so the user is not misled.
+  const hasCodeCheck = Boolean(checks?.otpSms || checks?.otpEmail || checks?.totp);
+  const checkFailedMessage = (error: unknown) =>
+    hasCodeCheck && isClassifiedError(error) && error.code === Code.InvalidArgument
+      ? t("invalidCode")
+      : t("couldNotUpdateSession");
 
   let session;
   try {
@@ -247,7 +252,7 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
     const orgForCreation = options.organization || recentSession?.organization;
 
     if (!sessionGone || !loginNameForCreation) {
-      return catchUserError(error, checkFailedMessage, { flow: "updateSession" });
+      return catchUserError(error, checkFailedMessage(error), { flow: "updateSession" });
     }
 
     let users;
@@ -285,7 +290,7 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       // @ts-ignore
       session = { ...result.session, challenges: result.challenges };
     } catch (createError) {
-      return catchUserError(createError, checkFailedMessage, { flow: "recreateSession" });
+      return catchUserError(createError, checkFailedMessage(createError), { flow: "recreateSession" });
     }
   }
 

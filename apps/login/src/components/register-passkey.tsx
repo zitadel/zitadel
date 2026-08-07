@@ -2,6 +2,7 @@
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
 import { registerPasskeyLink, verifyPasskeyRegistration } from "@/lib/server/passkeys";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -34,6 +35,8 @@ export function RegisterPasskey({
   codeId,
   loginName: initialLoginName,
 }: Props) {
+  const t = useTranslations("passkey");
+
   const { handleSubmit, formState } = useForm<Inputs>({
     mode: "onChange",
   });
@@ -89,7 +92,7 @@ export function RegisterPasskey({
       userId: currentUserId,
     })
       .catch(() => {
-        setError("Could not verify Passkey");
+        setError(t("set.errors.couldNotVerifyPasskey"));
         return;
       })
       .finally(() => {
@@ -190,7 +193,7 @@ export function RegisterPasskey({
     const verificationResponse = await submitVerify(passkeyId, "", data, sessionId, userId);
 
     if (!verificationResponse) {
-      setError("Could not verify Passkey!");
+      setError(t("set.errors.couldNotVerifyPasskey"));
       return;
     }
 
@@ -200,12 +203,12 @@ export function RegisterPasskey({
     }
 
     if (!("loginName" in verificationResponse)) {
-      setError("Could not verify Passkey!");
+      setError(t("set.errors.couldNotVerifyPasskey"));
       return;
     }
 
     continueAndLogin(verificationResponse.loginName);
-  }, [sessionId, userId, code, codeId, continueAndLogin]);
+  }, [sessionId, userId, code, codeId, continueAndLogin, t]);
 
   // Auto-submit when code is provided (similar to VerifyForm)
   useEffect(() => {

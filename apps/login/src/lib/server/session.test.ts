@@ -193,6 +193,17 @@ describe("updateOrCreateSession", () => {
     ).rejects.toThrow("database down");
   });
 
+  test("does not claim invalidCode for non-InvalidArgument failures of a code check", async () => {
+    mockSetSessionAndUpdateCookie.mockRejectedValue(classifiedError(Code.ResourceExhausted, "Errors.Limits.ExceededQuota"));
+
+    const response = await updateOrCreateSession({
+      loginName: "user@example.com",
+      checks: otpChecks(),
+    });
+
+    expect(response).toEqual({ error: "couldNotUpdateSession" });
+  });
+
   test("passes through preformatted password-attempt errors", async () => {
     mockSetSessionAndUpdateCookie.mockRejectedValue({
       error: "Failed to authenticate: You had 2 password attempts.",
