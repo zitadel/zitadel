@@ -1,6 +1,6 @@
 import { createLogger } from "@/lib/logger";
 import { createServiceForHost } from "@/lib/service";
-import { getIDPByID, ServiceConfig } from "@/lib/zitadel";
+import { getIDPByID, getInstanceId, ServiceConfig } from "@/lib/zitadel";
 import { Client } from "@zitadel/client";
 import type { InstanceRolesInfo } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { InternalPermissionService } from "@zitadel/proto/zitadel/internal_permission/v2/internal_permission_service_pb";
@@ -85,6 +85,17 @@ export async function syncInstanceRolesFromIdpIntent({ serviceConfig, intent, us
     }
     const rolesInfo = config.value.instanceRolesInfo;
     if (!rolesInfo?.length) {
+      return;
+    }
+
+    // Instance-wide role grants may only originate from an instance-scoped IdP.
+    // An organization-scoped provider must never confer instance membership, even
+    // if its instanceRolesInfo is somehow populated (e.g. stale data): honoring it
+    // would let an org owner escalate themselves to instance-level roles.
+    // Mirrors the login v1 guard (external_provider_handler.go) and fails closed.
+    const instanceId = await getInstanceId({ serviceConfig });
+    if (!instanceId || idp?.details?.resourceOwner !== instanceId) {
+      logger.warn("Instance role sync skipped: IdP with instanceRolesInfo is not instance-scoped", { idpId });
       return;
     }
 
