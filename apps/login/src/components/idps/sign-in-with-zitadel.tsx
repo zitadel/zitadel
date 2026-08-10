@@ -11,7 +11,7 @@ export const SignInWithZitadel = forwardRef<HTMLButtonElement, SignInWithIdentit
     return (
       <BaseButton {...restProps} ref={ref}>
         <div className="flex h-12 w-12 items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 467 467" fillRule="evenodd" clipRule="evenodd">
+          <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 467 467" fillRule="evenodd" clipRule="evenodd" aria-hidden="true" focusable="false">
           <g transform="matrix(0.564847,0,0,0.659318,-1282.85,0)">
           <g transform="matrix(4.96737,-1.14029,1.331,4.25561,-5923.46,-2258.26)">
           <path d="M1493.5,1056.38L1493.5,1037L1496.5,1037L1496.5,1061.62L1426.02,1020.38L1496.5,979.392L1496.5,1004L1493.5,1004L1493.5,984.608L1431.98,1020.39L1493.5,1056.38Z" fill="currentColor"/>
