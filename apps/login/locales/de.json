@@ -164,6 +164,7 @@
     "signInWithAzureAD": "Mit AzureAD anmelden",
     "signInWithGithub": "Mit GitHub anmelden",
     "signInWithGitlab": "Mit GitLab anmelden",
+    "signInWithZitadel": "Mit Zitadel anmelden",
     "loginError": {
       "title": "Anmeldung fehlgeschlagen",
       "description": "Beim Anmelden ist ein Fehler aufgetreten."
