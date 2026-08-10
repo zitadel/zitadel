@@ -498,7 +498,7 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     expect(location).not.toContain("submit=true");
   });
 
-  test("should forward ignoreUnknownUsernames from login settings when resolving loginHint", async () => {
+  test("should resolve loginHint without forwarding enumeration settings (derived server-side by sendLoginname)", async () => {
     mockGetAuthRequest.mockResolvedValue({
       authRequest: {
         id: "abc123",
@@ -509,9 +509,9 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
       },
     });
 
-    // Org has enumeration protection enabled: sendLoginname must receive the
-    // flag so an unknown hint still redirects to the (fake) /password step.
-    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
+    // Enumeration protection is derived inside sendLoginname from the request-context
+    // login settings; resolveLoginHint only passes the hint and the org context, and
+    // an unknown hint still redirects to the (fake) /password step.
     mockSendLoginname.mockResolvedValue({
       redirect: "/password?loginName=unknown%40example.com",
     });
@@ -521,7 +521,11 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     expect(mockSendLoginname).toHaveBeenCalledWith(
       expect.objectContaining({
         loginName: "unknown@example.com",
-        ignoreUnknownUsernames: true,
+      }),
+    );
+    expect(mockSendLoginname).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        ignoreUnknownUsernames: expect.anything(),
       }),
     );
 
