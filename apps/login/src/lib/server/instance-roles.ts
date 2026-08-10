@@ -75,42 +75,23 @@ export async function syncInstanceRolesFromIdpIntent({ serviceConfig, intent, us
   try {
     const idpId = intent.idpInformation?.idpId;
     if (!idpId || !userId) {
-      logger.debug("Instance role sync skipped: missing idpId or userId", { idpId, userId });
       return;
     }
 
     const idp = await getIDPByID({ serviceConfig, id: idpId });
     const config = idp?.config?.config;
     if (config?.case !== "zitadel") {
-      logger.debug("Instance role sync skipped: IdP is not a ZITADEL provider", { idpId, type: config?.case });
       return;
     }
     const rolesInfo = config.value.instanceRolesInfo;
     if (!rolesInfo?.length) {
-      logger.info("Instance role sync skipped: ZITADEL IdP has no instanceRolesInfo configured", { idpId });
       return;
     }
-    logger.info("Instance role sync started", {
-      idpId,
-      userId,
-      rolesInfo: rolesInfo.map((info) => ({
-        organizationId: info.organizationId,
-        organizationDomain: info.organizationDomain,
-      })),
-    });
 
-    const rawInformation = intent.idpInformation?.rawInformation;
-    const hasClaim = !!(rawInformation as Record<string, unknown> | undefined)?.[ZITADEL_PROJECT_ROLES_CLAIM];
-    const grantedRoles = instanceRolesFromClaim(rawInformation, rolesInfo);
+    const grantedRoles = instanceRolesFromClaim(intent.idpInformation?.rawInformation, rolesInfo);
     if (!grantedRoles.length) {
-      logger.info("Instance role sync ended: no matching roles in claim", {
-        userId,
-        claimPresent: hasClaim,
-        claim: hasClaim ? (rawInformation as Record<string, unknown>)[ZITADEL_PROJECT_ROLES_CLAIM] : undefined,
-      });
       return;
     }
-    logger.info("Instance roles extracted from claim", { userId, grantedRoles });
 
     const permissionService: Client<typeof InternalPermissionService> = await createServiceForHost(
       InternalPermissionService,
@@ -133,14 +114,8 @@ export async function syncInstanceRolesFromIdpIntent({ serviceConfig, intent, us
       {},
     );
     const existing = administrators?.find((administrator) => administrator.resource?.case === "instance");
-    logger.info("Existing instance administrator lookup", {
-      userId,
-      found: !!existing,
-      existingRoles: existing?.roles,
-    });
 
     if (!existing) {
-      logger.info("Creating instance administrator", { userId, roles });
       await permissionService.createAdministrator({ userId, resource: instanceResource, roles }, {});
       logger.info("Added instance administrator from ZITADEL IdP roles", { userId, roles });
       return;
@@ -149,21 +124,12 @@ export async function syncInstanceRolesFromIdpIntent({ serviceConfig, intent, us
     // Merge-only: retain roles granted elsewhere, never remove any.
     const merged = Array.from(new Set([...existing.roles, ...roles]));
     if (merged.length === existing.roles.length) {
-      logger.info("Instance administrator already holds all roles, nothing to update", {
-        userId,
-        roles: existing.roles,
-      });
       return;
     }
 
-    logger.info("Updating instance administrator", { userId, from: existing.roles, to: merged });
     await permissionService.updateAdministrator({ userId, resource: instanceResource, roles: merged }, {});
     logger.info("Updated instance administrator from ZITADEL IdP roles", { userId, roles: merged });
   } catch (error) {
-    logger.warn("Could not synchronize instance roles from IdP intent", {
-      error,
-      message: error instanceof Error ? error.message : String(error),
-      code: (error as { code?: unknown })?.code,
-    });
+    logger.warn("Could not synchronize instance roles from IdP intent", { error });
   }
 }
