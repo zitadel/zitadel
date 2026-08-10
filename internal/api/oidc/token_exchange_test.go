@@ -41,12 +41,31 @@ func Test_validateTokenExchangeScopes(t *testing.T) {
 		require.Error(t, err)
 	})
 
+	t.Run("exchange: OrgRoleIDScope downscoping allowed", func(t *testing.T) {
+		subjectScopes := []string{oidc.ScopeOpenID, oidc.ScopeProfile}
+		orgRoleScope := domain.OrgRoleIDScope + "388047065096336384"
+		got, err := validateTokenExchangeScopes(client,
+			[]string{oidc.ScopeOpenID, orgRoleScope},
+			subjectScopes, subjectScopes, false)
+		require.NoError(t, err)
+		assert.Equal(t, []string{oidc.ScopeOpenID, orgRoleScope}, got)
+	})
+
 	t.Run("impersonation: subject-data scope not on actor allowed", func(t *testing.T) {
 		got, err := validateTokenExchangeScopes(client,
 			[]string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail},
 			nil, actorScopes, true)
 		require.NoError(t, err)
 		assert.Contains(t, got, oidc.ScopeEmail)
+	})
+
+	t.Run("impersonation: OrgRoleIDScope not on actor allowed", func(t *testing.T) {
+		orgRoleScope := domain.OrgRoleIDScope + "388047065096336384"
+		got, err := validateTokenExchangeScopes(client,
+			[]string{oidc.ScopeOpenID, orgRoleScope},
+			nil, actorScopes, true)
+		require.NoError(t, err)
+		assert.Contains(t, got, orgRoleScope)
 	})
 
 	t.Run("impersonation: authorization scope not on actor rejected", func(t *testing.T) {
@@ -102,11 +121,32 @@ func Test_isTokenExchangeAuthorizationScope(t *testing.T) {
 		{ScopeProjectsRoles, true},
 		{ScopeProjectRolePrefix + "admin", true},
 		{domain.ProjectIDScope + "proj" + domain.AudSuffix, true},
+		{domain.OrgRoleIDScope + "388047065096336384", false},
 		{ScopeUserMetaData, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.scope, func(t *testing.T) {
 			assert.Equal(t, tt.want, isTokenExchangeAuthorizationScope(tt.scope))
+		})
+	}
+}
+
+func Test_isTokenExchangeRestrictionScope(t *testing.T) {
+	tests := []struct {
+		scope string
+		want  bool
+	}{
+		{domain.OrgRoleIDScope + "388047065096336384", true},
+		{domain.OrgRoleIDScope, true},
+		{oidc.ScopeOpenID, false},
+		{oidc.ScopeOfflineAccess, false},
+		{ScopeProjectsRoles, false},
+		{domain.OrgIDScope + "388047065096336384", false},
+		{ScopeProjectRolePrefix + "admin", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.scope, func(t *testing.T) {
+			assert.Equal(t, tt.want, isTokenExchangeRestrictionScope(tt.scope))
 		})
 	}
 }
