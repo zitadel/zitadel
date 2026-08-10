@@ -610,6 +610,8 @@ const userLookupQuery = { limit: 2 };
 export async function listUsers({ serviceConfig, loginName, userName, phone, email, organizationId }: ListUsersCommand) {
   const queries: SearchQuery[] = [];
 
+  // loginnames, usernames and emails are matched case insensitively, mirroring how
+  // uniqueness is enforced in the backend and how the loginname page searches users
   // either use loginName or userName, email, phone
   if (loginName) {
     queries.push(
@@ -618,7 +620,7 @@ export async function listUsers({ serviceConfig, loginName, userName, phone, ema
           case: "loginNameQuery",
           value: {
             loginName,
-            method: TextQueryMethod.EQUALS,
+            method: TextQueryMethod.EQUALS_IGNORE_CASE,
           },
         },
       }),
@@ -632,7 +634,7 @@ export async function listUsers({ serviceConfig, loginName, userName, phone, ema
           case: "userNameQuery",
           value: {
             userName,
-            method: TextQueryMethod.EQUALS,
+            method: TextQueryMethod.EQUALS_IGNORE_CASE,
           },
         },
       });
@@ -645,7 +647,7 @@ export async function listUsers({ serviceConfig, loginName, userName, phone, ema
           case: "emailQuery",
           value: {
             emailAddress: email,
-            method: TextQueryMethod.EQUALS,
+            method: TextQueryMethod.EQUALS_IGNORE_CASE,
           },
         },
       });
@@ -896,7 +898,9 @@ export async function getOrgsByDomain({ serviceConfig, domain }: WithServiceConf
         {
           query: {
             case: "domainQuery",
-            value: { domain, method: TextQueryMethod.EQUALS },
+            // domains are case insensitive, so a loginname like "jackson@Example.com"
+            // must still discover the organization owning "example.com"
+            value: { domain, method: TextQueryMethod.EQUALS_IGNORE_CASE },
           },
         },
       ],
