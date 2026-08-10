@@ -33,6 +33,7 @@ google-credentials
 key.json
 .keys/*
 load-test/.keys
+*.pat
 
 # dumps
 .backups
@@ -82,8 +83,6 @@ build/local/*.env
 /zitadel
 node_modules/
 .kreya
-login-client.pat
-admin.pat
 .env.*local
 
 go.work
