@@ -18,12 +18,12 @@ set -euo pipefail
 # Note: macOS ships a universal binary, so darwin_amd64 and darwin_arm64 share
 #       the same tarball and checksum.
 
-CONNECT_OPENAPI_VERSION="0.25.5"
+CONNECT_OPENAPI_VERSION="0.25.7"
 # checksums from upstream checksums.txt
-CONNECT_OPENAPI_SHA256_linux_amd64="a9cbf821d42bc12a91b853d1fc8c3ffbea19bd8a6096d8db8b39263f1f67da74"
-CONNECT_OPENAPI_SHA256_linux_arm64="287575b705cdd4a037baef75adcd8813566c4fda2eba5399483a9cbad8be7422"
-CONNECT_OPENAPI_SHA256_darwin_amd64="07af8e3adbac202a0d09b97d281dcdb24949d642e43c101ea2a1a0d09aff7bd0"
-CONNECT_OPENAPI_SHA256_darwin_arm64="07af8e3adbac202a0d09b97d281dcdb24949d642e43c101ea2a1a0d09aff7bd0"
+CONNECT_OPENAPI_SHA256_linux_amd64="ddea887b432df5471ac67ef6167726b46a4f337af0eec4f5f88998fac5fb6cc2"
+CONNECT_OPENAPI_SHA256_linux_arm64="d7229a3ac65974e024210522cb3920e764fddf408e26cb501eb41406e514d6ec"
+CONNECT_OPENAPI_SHA256_darwin_amd64="717c86c3ca0346457b3e4c5f69596b28b2b2ec6bf047498001c02bfad8e59f52"
+CONNECT_OPENAPI_SHA256_darwin_arm64="717c86c3ca0346457b3e4c5f69596b28b2b2ec6bf047498001c02bfad8e59f52"
 
 # ── HELPERS ──────────────────────────────────────────────────────────────────
 

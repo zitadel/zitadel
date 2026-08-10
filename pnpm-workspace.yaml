@@ -5,6 +5,25 @@ packages:
   - apps/*
   - deploy/compose
 
+allowBuilds:
+  '@bufbuild/buf': false
+  '@parcel/watcher': false
+  '@swc/core': false
+  '@vercel/git-hooks': false
+  core-js: false
+  cpu-features: false
+  cypress: false
+  esbuild: false
+  grpc-tools: false
+  lmdb: false
+  msgpackr-extract: false
+  nx: false
+  protobufjs: false
+  sharp: false
+  ssh2: false
+  unrs-resolver: false
+  vue-demi: false
+
 exclude:
   - benchmark # because of the node 18 or 20 dependency
 

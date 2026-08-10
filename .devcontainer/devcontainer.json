@@ -37,7 +37,7 @@
 		},
 		"ghcr.io/devcontainers/features/docker-outside-of-docker": {},
 		"ghcr.io/schlich/devcontainer-features/cypress:1": {
-			"version": "14"
+			"version": "15"
 		}
 	},
 	"containerEnv": {
@@ -46,7 +46,7 @@
 	"remoteEnv": {
 		"PATH": "${containerEnv:PATH}:/workspaces/zitadel/.artifacts/bin/linux/amd64"
 	},
-	"postStartCommand": "npm install -g nx@21.6.9 && echo 'export PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\"' >> ~/.bashrc",
+	"postStartCommand": "npm install -g nx@23.1.1 && echo 'export PATH=\"${PWD}/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\"' >> ~/.bashrc",
 	"customizations": {
 		"vscode": {
 			"extensions": [
