@@ -469,7 +469,7 @@ func (s *Server) createExchangeJWT(
 	if err != nil {
 		return "", "", 0, err
 	}
-	accessToken, err = s.createJWT(ctx, client, session, getUserInfo, roleAssertion, getSigner)
+	accessToken, err = s.createJWT(ctx, client, session, getUserInfo, roleAssertion, getSigner, actor)
 	if err != nil {
 		return "", "", 0, err
 	}

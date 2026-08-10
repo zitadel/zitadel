@@ -3,8 +3,10 @@ package oidc
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -707,7 +709,7 @@ func Test_runUserinfoActions(t *testing.T) {
 			},
 		}
 
-		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", queriedActions)
+		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", nil, queriedActions)
 		require.NoError(t, err)
 		assert.Equal(t, "bar", userInfo.Claims["foo"])
 	})
@@ -724,7 +726,7 @@ func Test_runUserinfoActions(t *testing.T) {
 			{Name: "testFunc", Script: `function testFunc(ctx, api) {}`},
 		}
 
-		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", queriedActions)
+		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", nil, queriedActions)
 		require.Error(t, err)
 	})
 
@@ -741,7 +743,7 @@ func Test_runUserinfoActions(t *testing.T) {
 			},
 		}
 
-		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", queriedActions)
+		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", nil, queriedActions)
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "exactly 2")
 	})
@@ -763,15 +765,67 @@ func Test_runUserinfoActions(t *testing.T) {
 			},
 		}
 
-		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", queriedActions)
+		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", nil, queriedActions)
 		require.Error(t, err)
 		assert.NotContains(t, userInfo.Claims, "unreachable")
+	})
+
+	t.Run("actor delegation chain is readable from the script", func(t *testing.T) {
+		s := &Server{}
+		qu := &query.OIDCUserInfo{User: &query.User{ID: "user1", ResourceOwner: "org1"}}
+		userInfo := &oidc.UserInfo{Subject: "user1", Claims: map[string]any{}}
+		actor := &domain.TokenActor{
+			UserID: "actor1",
+			Issuer: "https://issuer1.example.com",
+			Actor: &domain.TokenActor{
+				UserID: "actor2",
+				Issuer: "https://issuer2.example.com",
+			},
+		}
+		queriedActions := []*query.Action{
+			{
+				Name: "testFunc",
+				Script: `function testFunc(ctx, api) {
+					api.v1.claims.setClaim("actor_user", ctx.v1.actor.userId)
+					api.v1.claims.setClaim("actor_issuer", ctx.v1.actor.issuer)
+					api.v1.claims.setClaim("nested_actor_user", ctx.v1.actor.actor.userId)
+					api.v1.claims.setClaim("chain_end", ctx.v1.actor.actor.actor === null)
+				}`,
+			},
+		}
+
+		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", actor, queriedActions)
+		require.NoError(t, err)
+		assert.Equal(t, "actor1", userInfo.Claims["actor_user"])
+		assert.Equal(t, "https://issuer1.example.com", userInfo.Claims["actor_issuer"])
+		assert.Equal(t, "actor2", userInfo.Claims["nested_actor_user"])
+		assert.Equal(t, true, userInfo.Claims["chain_end"])
+	})
+
+	t.Run("missing actor is null in the script", func(t *testing.T) {
+		s := &Server{}
+		qu := &query.OIDCUserInfo{User: &query.User{ID: "user1", ResourceOwner: "org1"}}
+		userInfo := &oidc.UserInfo{Subject: "user1", Claims: map[string]any{}}
+		queriedActions := []*query.Action{
+			{
+				Name: "testFunc",
+				Script: `function testFunc(ctx, api) {
+					api.v1.claims.setClaim("no_actor", ctx.v1.actor === null)
+				}`,
+			},
+		}
+
+		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", nil, queriedActions)
+		require.NoError(t, err)
+		assert.Equal(t, true, userInfo.Claims["no_actor"])
 	})
 }
 
 func Test_runUserinfoExecutionTargets(t *testing.T) {
 	respBody := []byte(`{"append_claims":[{"key":"foo","value":"bar"},{"key":"foo","value":"baz"}],"append_log_claims":["extra log entry"]}`)
+	var gotBody []byte
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotBody, _ = io.ReadAll(r.Body)
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write(respBody)
 	}))
@@ -780,12 +834,21 @@ func Test_runUserinfoExecutionTargets(t *testing.T) {
 	s := &Server{httpClient: server.Client()}
 	qu := &query.OIDCUserInfo{User: &query.User{ID: "user1", ResourceOwner: "org1"}}
 	userInfo := &oidc.UserInfo{Subject: "user1", Claims: map[string]any{}}
+	actor := &domain.TokenActor{
+		UserID: "actor1",
+		Issuer: "https://issuer1.example.com",
+		Actor:  &domain.TokenActor{UserID: "actor2"},
+	}
 	targets := []target_domain.Target{
 		{TargetType: target_domain.TargetTypeCall, Endpoint: server.URL, Timeout: 5 * time.Second},
 	}
 
-	err := s.runUserinfoExecutionTargets(context.Background(), qu, userInfo, "clientID", "function/test", targets)
+	err := s.runUserinfoExecutionTargets(context.Background(), qu, userInfo, "clientID", actor, "function/test", targets)
 	require.NoError(t, err)
+
+	var sent ContextInfo
+	require.NoError(t, json.Unmarshal(gotBody, &sent))
+	assert.Equal(t, actor, sent.Actor)
 
 	assert.Equal(t, "bar", userInfo.Claims["foo"])
 	logClaim, ok := userInfo.Claims[fmt.Sprintf(ClaimActionLogFormat, "function/test")]

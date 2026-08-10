@@ -60,7 +60,7 @@ func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoReques
 		assertion,
 		true,
 		false,
-	)(ctx, true, domain.TriggerTypePreUserinfoCreation)
+	)(ctx, true, domain.TriggerTypePreUserinfoCreation, token.actor)
 	if err != nil {
 		if !zerrors.IsNotFound(err) {
 			return nil, err
@@ -91,14 +91,14 @@ func (s *Server) userInfo(
 	projectID string,
 	clientID string,
 	projectRoleAssertion, userInfoAssertion, currentProjectOnly bool,
-) func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType) (_ *oidc.UserInfo, err error) {
+) userInfoFunc {
 	var (
 		once                         sync.Once
 		rawUserInfo                  *oidc.UserInfo
 		qu                           *query.OIDCUserInfo
 		roleAudience, requestedRoles []string
 	)
-	return func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType) (_ *oidc.UserInfo, err error) {
+	return func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType, actor *domain.TokenActor) (_ *oidc.UserInfo, err error) {
 		once.Do(func() {
 			ctx, span := tracing.NewSpan(ctx)
 			defer func() { span.EndWithError(err) }()
@@ -124,7 +124,7 @@ func (s *Server) userInfo(
 			Claims:          maps.Clone(rawUserInfo.Claims),
 		}
 		assertRoles(projectID, qu, roleAudience, requestedRoles, roleAssertion, userInfo)
-		return userInfo, s.userinfoFlows(ctx, qu, userInfo, triggerType, clientID)
+		return userInfo, s.userinfoFlows(ctx, qu, userInfo, triggerType, clientID, actor)
 	}
 }
 
@@ -311,28 +311,49 @@ func setUserInfoUserGroups(userGroups []query.UserInfoUserGroup, out *oidc.UserI
 	out.AppendClaims(ClaimUserGroups, groups)
 }
 
-func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, triggerType domain.TriggerType, clientID string) (err error) {
+func (s *Server) userinfoFlows(
+	ctx context.Context,
+	qu *query.OIDCUserInfo,
+	userInfo *oidc.UserInfo,
+	triggerType domain.TriggerType,
+	clientID string,
+	actor *domain.TokenActor,
+) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if err := s.runUserinfoActionFlows(ctx, qu, userInfo, triggerType, clientID); err != nil {
+	if err := s.runUserinfoActionFlows(ctx, qu, userInfo, triggerType, clientID, actor); err != nil {
 		return err
 	}
-	return s.runUserinfoExecutionFlow(ctx, qu, userInfo, triggerType, clientID)
+	return s.runUserinfoExecutionFlow(ctx, qu, userInfo, triggerType, clientID, actor)
 }
 
 // runUserinfoActionFlows loads the legacy, DB-configured Actions for triggerType and runs them.
-func (s *Server) runUserinfoActionFlows(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, triggerType domain.TriggerType, clientID string) error {
+func (s *Server) runUserinfoActionFlows(
+	ctx context.Context,
+	qu *query.OIDCUserInfo,
+	userInfo *oidc.UserInfo,
+	triggerType domain.TriggerType,
+	clientID string,
+	actor *domain.TokenActor,
+) error {
 	queriedActions, err := s.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, triggerType, qu.User.ResourceOwner)
 	if err != nil {
 		return err
 	}
-	return s.runUserinfoActions(ctx, qu, userInfo, clientID, queriedActions)
+	return s.runUserinfoActions(ctx, qu, userInfo, clientID, actor, queriedActions)
 }
 
 // runUserinfoActions runs the given, already queried Actions. It is kept separate from
 // runUserinfoActionFlows so it can be unit tested without a DB by injecting queriedActions directly.
-func (s *Server) runUserinfoActions(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, clientID string, queriedActions []*query.Action) error {
+func (s *Server) runUserinfoActions(
+	ctx context.Context,
+	qu *query.OIDCUserInfo,
+	userInfo *oidc.UserInfo,
+	clientID string,
+	actor *domain.TokenActor,
+	queriedActions []*query.Action,
+) error {
 	ctxFields := actions.SetContextFields(
 		actions.SetFields("v1",
 			actions.SetFields("claims", userinfoClaims(userInfo)),
@@ -365,6 +386,8 @@ func (s *Server) runUserinfoActions(ctx context.Context, qu *query.OIDCUserInfo,
 					}
 				}),
 			),
+			// actor is null unless the token was obtained through token exchange / impersonation.
+			actions.SetFields("actor", object.TokenActorField(actor)),
 		),
 	)
 
@@ -498,19 +521,19 @@ func functionForTriggerType(triggerType domain.TriggerType) string {
 }
 
 // runUserinfoExecutionFlow resolves and runs the new-style Executions (webhook targets) for triggerType.
-func (s *Server) runUserinfoExecutionFlow(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, triggerType domain.TriggerType, clientID string) error {
+func (s *Server) runUserinfoExecutionFlow(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, triggerType domain.TriggerType, clientID string, actor *domain.TokenActor) error {
 	function := functionForTriggerType(triggerType)
 	if function == "" {
 		return nil
 	}
 	executionTargets := execution.QueryExecutionTargetsForFunction(ctx, function)
-	return s.runUserinfoExecutionTargets(ctx, qu, userInfo, clientID, function, executionTargets)
+	return s.runUserinfoExecutionTargets(ctx, qu, userInfo, clientID, actor, function, executionTargets)
 }
 
 // runUserinfoExecutionTargets calls the given, already resolved Execution targets. It is kept
 // separate from runUserinfoExecutionFlow so it can be unit tested without authz/DB access by
 // injecting executionTargets directly (e.g. pointing at httptest servers).
-func (s *Server) runUserinfoExecutionTargets(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, clientID, function string, executionTargets []target_domain.Target) error {
+func (s *Server) runUserinfoExecutionTargets(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, clientID string, actor *domain.TokenActor, function string, executionTargets []target_domain.Target) error {
 	info := &ContextInfo{
 		Function:     function,
 		UserInfo:     userInfo,
@@ -519,6 +542,7 @@ func (s *Server) runUserinfoExecutionTargets(ctx context.Context, qu *query.OIDC
 		Org:          qu.Org,
 		Application:  &ContextInfoApplication{ClientID: clientID},
 		UserGrants:   qu.UserGrants,
+		Actor:        actor,
 	}
 
 	resp, err := execution.CallTargets(ctx, executionTargets, info, s.targetEncryptionAlgorithm, s.query.GetActiveSigningWebKey, s.httpClient)
@@ -559,7 +583,9 @@ type ContextInfo struct {
 	Org          *query.UserInfoOrg      `json:"org,omitempty"`
 	UserGrants   []query.UserGrant       `json:"user_grants,omitempty"`
 	Application  *ContextInfoApplication `json:"application,omitempty"`
-	Response     *ContextInfoResponse    `json:"response,omitempty"`
+	// Actor is only set when the token was obtained through token exchange / impersonation.
+	Actor    *domain.TokenActor   `json:"actor,omitempty"`
+	Response *ContextInfoResponse `json:"response,omitempty"`
 }
 type ContextInfoApplication struct {
 	ClientID string `json:"client_id,omitempty"`
