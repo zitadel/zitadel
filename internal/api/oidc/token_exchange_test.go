@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -51,6 +52,37 @@ func Test_validateTokenExchangeScopes(t *testing.T) {
 		assert.Equal(t, []string{oidc.ScopeOpenID, orgRoleScope}, got)
 	})
 
+	t.Run("exchange: OrgRoleIDScope further downscoping allowed", func(t *testing.T) {
+		orgA := domain.OrgRoleIDScope + "orgA"
+		orgB := domain.OrgRoleIDScope + "orgB"
+		subjectScopes := []string{oidc.ScopeOpenID, orgA, orgB}
+		got, err := validateTokenExchangeScopes(client,
+			[]string{oidc.ScopeOpenID, orgA},
+			subjectScopes, subjectScopes, false)
+		require.NoError(t, err)
+		assert.Equal(t, []string{oidc.ScopeOpenID, orgA}, got)
+	})
+
+	t.Run("exchange: OrgRoleIDScope widening rejected", func(t *testing.T) {
+		orgA := domain.OrgRoleIDScope + "orgA"
+		orgB := domain.OrgRoleIDScope + "orgB"
+		subjectScopes := []string{oidc.ScopeOpenID, orgA}
+		_, err := validateTokenExchangeScopes(client,
+			[]string{oidc.ScopeOpenID, orgB},
+			subjectScopes, subjectScopes, false)
+		require.Error(t, err)
+	})
+
+	t.Run("exchange: omitting OrgRoleIDScope inherits subject filter", func(t *testing.T) {
+		orgA := domain.OrgRoleIDScope + "orgA"
+		subjectScopes := []string{oidc.ScopeOpenID, oidc.ScopeProfile, orgA}
+		got, err := validateTokenExchangeScopes(client,
+			[]string{oidc.ScopeOpenID},
+			subjectScopes, subjectScopes, false)
+		require.NoError(t, err)
+		assert.Equal(t, []string{oidc.ScopeOpenID, orgA}, got)
+	})
+
 	t.Run("impersonation: subject-data scope not on actor allowed", func(t *testing.T) {
 		got, err := validateTokenExchangeScopes(client,
 			[]string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail},
@@ -66,6 +98,26 @@ func Test_validateTokenExchangeScopes(t *testing.T) {
 			nil, actorScopes, true)
 		require.NoError(t, err)
 		assert.Contains(t, got, orgRoleScope)
+	})
+
+	t.Run("impersonation: OrgRoleIDScope widening beyond actor rejected", func(t *testing.T) {
+		orgA := domain.OrgRoleIDScope + "orgA"
+		orgB := domain.OrgRoleIDScope + "orgB"
+		actorWithFilter := append(slices.Clone(actorScopes), orgA)
+		_, err := validateTokenExchangeScopes(client,
+			[]string{oidc.ScopeOpenID, orgB},
+			nil, actorWithFilter, true)
+		require.Error(t, err)
+	})
+
+	t.Run("impersonation: omitting OrgRoleIDScope inherits actor filter", func(t *testing.T) {
+		orgA := domain.OrgRoleIDScope + "orgA"
+		actorWithFilter := append(slices.Clone(actorScopes), orgA)
+		got, err := validateTokenExchangeScopes(client,
+			[]string{oidc.ScopeOpenID},
+			nil, actorWithFilter, true)
+		require.NoError(t, err)
+		assert.Equal(t, []string{oidc.ScopeOpenID, orgA}, got)
 	})
 
 	t.Run("impersonation: authorization scope not on actor rejected", func(t *testing.T) {
