@@ -9,6 +9,7 @@ import (
 
 // TokenActorField accepts a domain.TokenActor pointer and copies its content so scripts can't mutate the domain object.
 func TokenActorField(actor *domain.TokenActor) func(c *actions.FieldConfig) interface{} {
+	return func(c *actions.FieldConfig) interface{} {
 		return TokenActorFromDomain(c, actor)
 	}
 }

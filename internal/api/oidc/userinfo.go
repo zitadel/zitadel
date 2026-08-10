@@ -444,7 +444,7 @@ func (s *Server) runUserinfoActions(
 								Key:   key,
 								Value: value,
 							}
-							if _, err = s.command.SetUserMetadata(ctx, metadata, userInfo.Subject, qu.User.ResourceOwner, nil); err != nil {
+							if _, err = s.command.SetUserMetadata(actionCtx, metadata, userInfo.Subject, qu.User.ResourceOwner, nil); err != nil {
 								logging.WithError(err).Info("unable to set md in action")
 								panic(err)
 							}
