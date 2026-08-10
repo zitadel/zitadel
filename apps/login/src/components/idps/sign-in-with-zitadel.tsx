@@ -1,12 +1,15 @@
 "use client";
 
-import { forwardRef } from "react";
+import { forwardRef, useId } from "react";
 import { Translated } from "../translated";
 import { BaseButton, SignInWithIdentityProviderProps } from "./base-button";
 
 export const SignInWithZitadel = forwardRef<HTMLButtonElement, SignInWithIdentityProviderProps>(
   function SignInWithZitadel(props, ref) {
     const { children, name, ...restProps } = props;
+    // Unique per component instance: multiple ZITADEL IdPs can be rendered on
+    // the same page, and duplicate SVG gradient ids would be invalid HTML.
+    const gradientId = useId().replace(/:/g, "");
 
     return (
       <BaseButton {...restProps} ref={ref}>
@@ -18,22 +21,22 @@ export const SignInWithZitadel = forwardRef<HTMLButtonElement, SignInWithIdentit
           </g>
           <g transform="matrix(31.0036,0,0,15.0393,-397275,-666.457)">
           <g transform="matrix(-0.0429306,-0.282967,0.160219,-0.0758207,12884.5,137.392)">
-          <path d="M212.517,110L200.392,110L190,92L179.608,110L167.483,110L190,71L212.517,110Z" fill="url(#zitadelIdpGrad1)"/>
+          <path d="M212.517,110L200.392,110L190,92L179.608,110L167.483,110L190,71L212.517,110Z" fill={`url(#${gradientId}-g1)`}/>
           </g>
           <g transform="matrix(0.160219,0.0758207,-0.0429306,0.282967,12878.9,10.8747)">
-          <path d="M212.517,110L200.392,110L190,92L179.608,110L167.483,110L190,71L212.517,110Z" fill="url(#zitadelIdpGrad2)"/>
+          <path d="M212.517,110L200.392,110L190,92L179.608,110L167.483,110L190,71L212.517,110Z" fill={`url(#${gradientId}-g2)`}/>
           </g>
           <g transform="matrix(-0.117289,0.207146,-0.117289,-0.207146,12943.8,65.7)">
-          <path d="M212.517,110L200.392,110L190,92L179.608,110L167.483,110L190,71L212.517,110Z" fill="url(#zitadelIdpGrad3)"/>
+          <path d="M212.517,110L200.392,110L190,92L179.608,110L167.483,110L190,71L212.517,110Z" fill={`url(#${gradientId}-g3)`}/>
           </g>
           <g transform="matrix(-0.160219,-0.0758207,0.0429306,-0.282967,12917.4,132.195)">
-          <path d="M139.622,117L149,142L130.244,142L139.622,117Z" fill="url(#zitadelIdpGrad4)"/>
+          <path d="M139.622,117L149,142L130.244,142L139.622,117Z" fill={`url(#${gradientId}-g4)`}/>
           </g>
           <g transform="matrix(-0.117289,0.207146,0.117289,0.207146,12897.8,5.87512)">
-          <path d="M139.622,117L149,142L130.244,142L139.622,117Z" fill="url(#zitadelIdpGrad5)"/>
+          <path d="M139.622,117L149,142L130.244,142L139.622,117Z" fill={`url(#${gradientId}-g5)`}/>
           </g>
           <g transform="matrix(-0.0429306,-0.282967,-0.160219,0.0758207,12936.8,97.6441)">
-          <path d="M139.622,117L149,142L130.244,142L139.622,117Z" fill="url(#zitadelIdpGrad6)"/>
+          <path d="M139.622,117L149,142L130.244,142L139.622,117Z" fill={`url(#${gradientId}-g6)`}/>
           </g>
           </g>
           <g transform="matrix(4.96737,-1.14029,1.331,4.25561,-5928.43,-2257.12)">
@@ -65,12 +68,12 @@ export const SignInWithZitadel = forwardRef<HTMLButtonElement, SignInWithIdentit
           </g>
           </g>
           <defs>
-          <linearGradient id="zitadelIdpGrad1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-41.5984,155.247,-155.247,-41.5984,201.516,76.8392)"><stop offset="0" stopColor="rgb(255,143,0)" stopOpacity={1}/><stop offset="1" stopColor="rgb(254,0,255)" stopOpacity={1}/></linearGradient>
-          <linearGradient id="zitadelIdpGrad2" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(155.247,-41.5984,41.5984,155.247,110.08,195.509)"><stop offset="0" stopColor="rgb(255,143,0)" stopOpacity={1}/><stop offset="1" stopColor="rgb(254,0,255)" stopOpacity={1}/></linearGradient>
-          <linearGradient id="zitadelIdpGrad3" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-113.649,-113.649,113.649,-113.649,258.31,215.618)"><stop offset="0" stopColor="rgb(255,143,0)" stopOpacity={1}/><stop offset="1" stopColor="rgb(254,0,255)" stopOpacity={1}/></linearGradient>
-          <linearGradient id="zitadelIdpGrad4" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-155.247,41.5984,-41.5984,-155.247,220.914,144.546)"><stop offset="0" stopColor="rgb(255,143,0)" stopOpacity={1}/><stop offset="1" stopColor="rgb(254,0,255)" stopOpacity={1}/></linearGradient>
-          <linearGradient id="zitadelIdpGrad5" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-113.649,113.649,113.649,113.649,206.837,124.661)"><stop offset="0" stopColor="rgb(255,143,0)" stopOpacity={1}/><stop offset="1" stopColor="rgb(254,0,255)" stopOpacity={1}/></linearGradient>
-          <linearGradient id="zitadelIdpGrad6" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-41.5984,-155.247,-155.247,41.5984,152.054,262.8)"><stop offset="0" stopColor="rgb(255,143,0)" stopOpacity={1}/><stop offset="1" stopColor="rgb(254,0,255)" stopOpacity={1}/></linearGradient>
+          <linearGradient id={`${gradientId}-g1`} x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-41.5984,155.247,-155.247,-41.5984,201.516,76.8392)"><stop offset="0" stopColor="rgb(255,143,0)" stopOpacity={1}/><stop offset="1" stopColor="rgb(254,0,255)" stopOpacity={1}/></linearGradient>
+          <linearGradient id={`${gradientId}-g2`} x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(155.247,-41.5984,41.5984,155.247,110.08,195.509)"><stop offset="0" stopColor="rgb(255,143,0)" stopOpacity={1}/><stop offset="1" stopColor="rgb(254,0,255)" stopOpacity={1}/></linearGradient>
+          <linearGradient id={`${gradientId}-g3`} x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-113.649,-113.649,113.649,-113.649,258.31,215.618)"><stop offset="0" stopColor="rgb(255,143,0)" stopOpacity={1}/><stop offset="1" stopColor="rgb(254,0,255)" stopOpacity={1}/></linearGradient>
+          <linearGradient id={`${gradientId}-g4`} x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-155.247,41.5984,-41.5984,-155.247,220.914,144.546)"><stop offset="0" stopColor="rgb(255,143,0)" stopOpacity={1}/><stop offset="1" stopColor="rgb(254,0,255)" stopOpacity={1}/></linearGradient>
+          <linearGradient id={`${gradientId}-g5`} x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-113.649,113.649,113.649,113.649,206.837,124.661)"><stop offset="0" stopColor="rgb(255,143,0)" stopOpacity={1}/><stop offset="1" stopColor="rgb(254,0,255)" stopOpacity={1}/></linearGradient>
+          <linearGradient id={`${gradientId}-g6`} x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-41.5984,-155.247,-155.247,41.5984,152.054,262.8)"><stop offset="0" stopColor="rgb(255,143,0)" stopOpacity={1}/><stop offset="1" stopColor="rgb(254,0,255)" stopOpacity={1}/></linearGradient>
           </defs>
           </svg>
         </div>
