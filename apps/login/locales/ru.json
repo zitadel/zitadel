@@ -164,6 +164,7 @@
     "signInWithAzureAD": "Войти через AzureAD",
     "signInWithGithub": "Войти через GitHub",
     "signInWithGitlab": "Войти через GitLab",
+    "signInWithZitadel": "Войти через Zitadel",
     "loginError": {
       "title": "Ошибка входа",
       "description": "Произошла ошибка при попытке входа."
