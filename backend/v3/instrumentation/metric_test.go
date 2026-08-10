@@ -457,11 +457,21 @@ func Test_metricViews_httpAttributeFilterUnchanged(t *testing.T) {
 	views := metricViews()
 	require.NotEmpty(t, views)
 
-	stream, match := views[0](sdk_metric.Instrument{
+	httpInstrument := sdk_metric.Instrument{
 		Scope: instrumentation.Scope{Name: "go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"},
 		Name:  "http.server.request.duration",
-	})
-	require.True(t, match)
+	}
+	var (
+		stream sdk_metric.Stream
+		match  bool
+	)
+	for _, view := range views {
+		stream, match = view(httpInstrument)
+		if match {
+			break
+		}
+	}
+	require.True(t, match, "expected an otelhttp attribute-filter view")
 	require.NotNil(t, stream.AttributeFilter)
 	assert.True(t, stream.AttributeFilter(attribute.String("http.method", "GET")))
 	assert.False(t, stream.AttributeFilter(attribute.String("http.scheme", "https")))
