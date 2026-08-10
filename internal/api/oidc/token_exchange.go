@@ -192,7 +192,8 @@ func (s *Server) jwtProfileUserCheck(ctx context.Context, resourceOwner *string,
 
 // validateTokenExchangeScopes picks the scope rule set for this exchange.
 // scopelessActorPath selects impersonation rules (user_id/id_token subjects
-// on the actor path); otherwise every requested scope must ⊆ subject ∪ actor.
+// on the actor path); otherwise every requested scope must ⊆ subject ∪ actor,
+// except restriction scopes which may be newly requested for downscoping.
 func validateTokenExchangeScopes(
 	client *Client,
 	requestedScopes, subjectScopes, actorScopes []string,
@@ -212,9 +213,10 @@ func validateTokenExchangeScopes(
 // This covers standard exchange (actor == subject) and actor-path exchanges with
 // access/JWT subject tokens. Actor-path exchanges with scope-less subjects
 // (user_id, id_token) use validateImpersonationTokenExchangeScopes instead.
-// Rule: every scope must be present on the subject or actor token (union).
-// For standard exchange both lists are identical, so this is effectively
-// "subset of subject token only".
+// Rule: every non-restriction scope must be present on the subject or actor token
+// (union). Restriction scopes (e.g. OrgRoleIDScope) may be newly requested to
+// narrow roles claims. For standard exchange both lists are identical, so this
+// is effectively "subset of subject token only" plus allowed downscoping.
 func validateUnionTokenExchangeScopes(
 	client *Client,
 	requestedScopes, subjectScopes, actorScopes []string,
@@ -227,6 +229,9 @@ func validateUnionTokenExchangeScopes(
 	}
 
 	for _, scope := range requestedScopes {
+		if isTokenExchangeRestrictionScope(scope) {
+			continue
+		}
 		if !scopeInUnion(scope, subjectScopes, actorScopes) {
 			return nil, oidc.ErrInvalidScope().
 				WithDescription("scope %q not found in subject or actor token", scope)
@@ -240,8 +245,9 @@ func validateUnionTokenExchangeScopes(
 // cannot carry scopes (user_id, id_token). The actor token authorizes the
 // request; impersonation permission is checked later in CreateOIDCSession.
 //
-// Two scope classes:
+// Scope classes:
 //   - authorization scopes: privilege/audience/roles — must be on input tokens
+//   - restriction scopes: filter claims only (e.g. OrgRoleIDScope) — client allowlist
 //   - subject-data scopes: user claims (email, profile, …) — client allowlist only
 func validateImpersonationTokenExchangeScopes(
 	client *Client,
@@ -260,8 +266,8 @@ func validateImpersonationTokenExchangeScopes(
 				WithDescription("scope %q not found in subject or actor token", scope)
 		}
 
-		// Subject-data scopes (openid, profile, email, urn:zitadel:iam:user:*, …)
-		// skip the union check — validated by client allowlist below.
+		// Restriction and subject-data scopes skip the union check —
+		// validated by client allowlist below.
 	}
 
 	return op.ValidateAuthReqScopes(client, requestedScopes)
@@ -278,8 +284,16 @@ func scopeInUnion(scope string, subjectScopes, actorScopes []string) bool {
 	return slices.Contains(subjectScopes, scope) || slices.Contains(actorScopes, scope)
 }
 
+// isTokenExchangeRestrictionScope identifies scopes that only narrow token
+// claims and cannot escalate privileges. They may be newly requested during
+// exchange (downscoping) and are validated by the client allowlist only.
+func isTokenExchangeRestrictionScope(scope string) bool {
+	return strings.HasPrefix(scope, domain.OrgRoleIDScope)
+}
+
 // isTokenExchangeAuthorizationScope identifies scopes that control what a token
 // may do (audiences, refresh, roles), not which user claims to embed.
+// Restriction scopes are intentionally excluded — see isTokenExchangeRestrictionScope.
 func isTokenExchangeAuthorizationScope(scope string) bool {
 	switch scope {
 	case oidc.ScopeOfflineAccess, ScopeProjectsRoles:
@@ -295,9 +309,6 @@ func isTokenExchangeAuthorizationScope(scope string) bool {
 		return true
 	}
 	if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
-		return true
-	}
-	if strings.HasPrefix(scope, domain.OrgRoleIDScope) {
 		return true
 	}
 	if strings.HasPrefix(scope, domain.SelectIDPScope) {
