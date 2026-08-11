@@ -48,7 +48,7 @@
       "couldNotCreateSession": "ไม่สามารถสร้างเซสชันสำหรับผู้ใช้ได้",
       "initialUserNotSupported": "ไม่รองรับผู้ใช้เริ่มต้น",
       "localAuthenticationNotAllowed": "ไม่อนุญาตให้ใช้การยืนยันตัวตนภายในเครื่อง! โปรดติดต่อผู้ดูแลระบบของคุณเพื่อขอข้อมูลเพิ่มเติม",
-      "passkeysNotAllowed": "ไม่อนุญาตให้ใช้พาสคีย์! โปรดติดต่อผู้ดูแลระบบของคุณเพื่อขอข้อมูลเพิ่มเติม",
+      "passkeysNotAllowed": "ไม่อนุญาตให้ใช้ passkey! โปรดติดต่อผู้ดูแลระบบของคุณเพื่อขอข้อมูลเพิ่มเติม",
       "couldNotFindIdentityProvider": "ไม่พบผู้ให้บริการข้อมูลประจำตัว",
       "userNotActive": "ผู้ใช้ไม่ได้ใช้งานอยู่ โปรดติดต่อผู้ดูแลระบบของคุณเพื่อขอข้อมูลเพิ่มเติม"
     }
@@ -265,30 +265,30 @@
   },
   "passkey": {
     "verify": {
-      "title": "ยืนยันตัวตนด้วยพาสคีย์",
+      "title": "ยืนยันตัวตนด้วย passkey",
       "description": "อุปกรณ์ของคุณจะขอลายนิ้วมือ ใบหน้า หรือการล็อกหน้าจอของคุณ",
       "usePassword": "ใช้รหัสผ่าน",
       "submit": "ดำเนินการต่อ",
       "errors": {
-        "couldNotRequestChallenge": "ไม่สามารถขอ challenge ของพาสคีย์ได้",
-        "couldNotVerifyPasskey": "ไม่สามารถยืนยันพาสคีย์ได้",
-        "noResponseReceived": "การยืนยันพาสคีย์ล้มเหลว - ไม่ได้รับการตอบสนอง",
-        "noRedirectProvided": "การยืนยันพาสคีย์เสร็จสมบูรณ์แต่ไม่มีการเปลี่ยนเส้นทาง",
-        "couldNotRetrievePasskey": "เกิดข้อผิดพลาดขณะเรียกดูพาสคีย์",
-        "verificationCancelled": "การยืนยันพาสคีย์ถูกยกเลิก",
-        "verificationFailed": "เกิดข้อผิดพลาดระหว่างการยืนยันพาสคีย์",
+        "couldNotRequestChallenge": "ไม่สามารถขอ challenge ของ passkey ได้",
+        "couldNotVerifyPasskey": "ไม่สามารถยืนยัน passkey ได้",
+        "noResponseReceived": "การยืนยัน passkey ล้มเหลว - ไม่ได้รับการตอบสนอง",
+        "noRedirectProvided": "การยืนยัน passkey เสร็จสมบูรณ์แต่ไม่มีการเปลี่ยนเส้นทาง",
+        "couldNotRetrievePasskey": "เกิดข้อผิดพลาดขณะเรียกดู passkey",
+        "verificationCancelled": "การยืนยัน passkey ถูกยกเลิก",
+        "verificationFailed": "เกิดข้อผิดพลาดระหว่างการยืนยัน passkey",
         "couldNotFindSession": "ไม่พบเซสชัน",
         "couldNotUpdateSession": "ไม่สามารถอัปเดตเซสชันได้",
         "userNotFound": "ไม่พบผู้ใช้ในระบบ",
-        "couldNotDetermineRedirect": "ไม่สามารถระบุ URL การเปลี่ยนเส้นทางหลังจากการยืนยันพาสคีย์ได้"
+        "couldNotDetermineRedirect": "ไม่สามารถระบุ URL การเปลี่ยนเส้นทางหลังจากการยืนยัน passkey ได้"
       }
     },
     "set": {
-      "title": "ตั้งค่าพาสคีย์",
+      "title": "ตั้งค่า passkey",
       "description": "อุปกรณ์ของคุณจะขอลายนิ้วมือ ใบหน้า หรือการล็อกหน้าจอของคุณ",
       "info": {
-        "description": "พาสคีย์เป็นวิธีการยืนยันตัวตนบนอุปกรณ์ เช่น ลายนิ้วมือ Apple FaceID หรือวิธีที่คล้ายกัน ",
-        "link": "การยืนยันตัวตนด้วยพาสคีย์"
+        "description": "passkey เป็นวิธีการยืนยันตัวตนบนอุปกรณ์ เช่น ลายนิ้วมือ Apple FaceID หรือวิธีที่คล้ายกัน ",
+        "link": "การยืนยันตัวตนด้วย passkey"
       },
       "skip": "ข้าม",
       "submit": "ดำเนินการต่อ"
@@ -307,7 +307,7 @@
   },
   "register": {
     "methods": {
-      "passkey": "พาสคีย์",
+      "passkey": "passkey",
       "password": "รหัสผ่าน"
     },
     "disabled": {
