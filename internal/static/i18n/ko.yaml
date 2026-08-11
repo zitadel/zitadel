@@ -617,6 +617,10 @@ Errors:
     KeyIDMissing: "KeyID가 누락되었습니다"
     PrivateKeyMissing: "개인 키가 누락되었습니다"
     InvalidPrivateKey: "유효하지 않은 개인 키 형식"
+    AuthorizationParameterNameMissing: "Authorization parameter name missing"
+    AuthorizationParameterNameInvalid: "Invalid authorization parameter name"
+    AuthorizationParameterDuplicate: "Authorization parameter defined more than once"
+    AuthorizationParameterReserved: "Authorization parameter is managed by ZITADEL and can not be set"
 
 AggregateTypes:
   action: "작업"

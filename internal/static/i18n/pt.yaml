@@ -615,6 +615,10 @@ Errors:
     KeyIDMissing: "KeyID ausente"
     PrivateKeyMissing: "Chave privada ausente"
     InvalidPrivateKey: "Formato de chave privada inválido"
+    AuthorizationParameterNameMissing: "Authorization parameter name missing"
+    AuthorizationParameterNameInvalid: "Invalid authorization parameter name"
+    AuthorizationParameterDuplicate: "Authorization parameter defined more than once"
+    AuthorizationParameterReserved: "Authorization parameter is managed by ZITADEL and can not be set"
 
 AggregateTypes:
   action: "Ação"

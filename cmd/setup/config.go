@@ -194,6 +194,7 @@ type Steps struct {
 	s72AddColumnsToLoginNamesView           *AddColumnsToLoginNamesView
 	s73FixUserGrantRoles                    *FixUserGrantRoles
 	s74Apps7OIDCConfigsAddRegistrationToken *Apps7OIDCConfigsAddRegistrationToken
+	s75IDPTemplate6AddAuthorizationParams   *IDPTemplate6AddAuthorizationParameters
 	RelationalTables                        *TransactionalTables
 }
 

@@ -616,6 +616,10 @@ Errors:
     KeyIDMissing: "KeyID hiányzik"
     PrivateKeyMissing: "Privát kulcs hiányzik"
     InvalidPrivateKey: "Érvénytelen titkos kulcs formátum"
+    AuthorizationParameterNameMissing: "Authorization parameter name missing"
+    AuthorizationParameterNameInvalid: "Invalid authorization parameter name"
+    AuthorizationParameterDuplicate: "Authorization parameter defined more than once"
+    AuthorizationParameterReserved: "Authorization parameter is managed by ZITADEL and can not be set"
 
 AggregateTypes:
   action: "Művelet"

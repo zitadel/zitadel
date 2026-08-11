@@ -13116,6 +13116,26 @@ message AddGenericOAuthProviderRequest {
     zitadel.idp.v1.Options provider_options = 9;
     // Enable the use of Proof Key for Code Exchange (PKCE) for the OAuth2 flow.
     bool use_pkce = 10;
+    // Parameters which are added to the authorization request sent to the identity provider.
+    // They take precedence over the parameters ZITADEL sets itself, e.g. `prompt=select_account`.
+    // A parameter with an empty value is omitted from the request, which allows to remove such a default.
+    // Parameters managed by ZITADEL (client_id, client_secret, code, code_challenge, code_challenge_method,
+    // nonce, redirect_uri, response_type, scope and state) cannot be set.
+    map<string, string> authorization_parameters = 11 [
+        (validate.rules).map = {max_pairs: 20, keys: {string: {min_len: 1, max_len: 100}}, values: {string: {max_len: 1000}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "{\"acr_values\": \"AAL2_OR_AAL3_ANY\", \"prompt\": \"login\"}";
+        }
+    ];
+    // Names of the parameters of the original authorization request which are forwarded to the identity
+    // provider. Parameters set in authorization_parameters take precedence over the forwarded ones.
+    // Parameters managed by ZITADEL cannot be forwarded.
+    repeated string forwarded_parameters = 12 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"acr_values\", \"max_age\"]";
+        }
+    ];
 }
 
 message AddGenericOAuthProviderResponse {
@@ -13185,6 +13205,26 @@ message UpdateGenericOAuthProviderRequest {
     zitadel.idp.v1.Options provider_options = 10;
     // Enable the use of Proof Key for Code Exchange (PKCE) for the OAuth2 flow.
     bool use_pkce = 11;
+    // Parameters which are added to the authorization request sent to the identity provider.
+    // They take precedence over the parameters ZITADEL sets itself, e.g. `prompt=select_account`.
+    // A parameter with an empty value is omitted from the request, which allows to remove such a default.
+    // Parameters managed by ZITADEL (client_id, client_secret, code, code_challenge, code_challenge_method,
+    // nonce, redirect_uri, response_type, scope and state) cannot be set.
+    map<string, string> authorization_parameters = 12 [
+        (validate.rules).map = {max_pairs: 20, keys: {string: {min_len: 1, max_len: 100}}, values: {string: {max_len: 1000}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "{\"acr_values\": \"AAL2_OR_AAL3_ANY\", \"prompt\": \"login\"}";
+        }
+    ];
+    // Names of the parameters of the original authorization request which are forwarded to the identity
+    // provider. Parameters set in authorization_parameters take precedence over the forwarded ones.
+    // Parameters managed by ZITADEL cannot be forwarded.
+    repeated string forwarded_parameters = 13 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"acr_values\", \"max_age\"]";
+        }
+    ];
 }
 
 message UpdateGenericOAuthProviderResponse {
@@ -13230,6 +13270,26 @@ message AddGenericOIDCProviderRequest {
     bool is_id_token_mapping = 7;
     // Enable the use of Proof Key for Code Exchange (PKCE) for the OIDC flow.
     bool use_pkce = 8;
+    // Parameters which are added to the authorization request sent to the identity provider.
+    // They take precedence over the parameters ZITADEL sets itself, e.g. `prompt=select_account`.
+    // A parameter with an empty value is omitted from the request, which allows to remove such a default.
+    // Parameters managed by ZITADEL (client_id, client_secret, code, code_challenge, code_challenge_method,
+    // nonce, redirect_uri, response_type, scope and state) cannot be set.
+    map<string, string> authorization_parameters = 9 [
+        (validate.rules).map = {max_pairs: 20, keys: {string: {min_len: 1, max_len: 100}}, values: {string: {max_len: 1000}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "{\"acr_values\": \"AAL2_OR_AAL3_ANY\", \"prompt\": \"login\"}";
+        }
+    ];
+    // Names of the parameters of the original authorization request which are forwarded to the identity
+    // provider. Parameters set in authorization_parameters take precedence over the forwarded ones.
+    // Parameters managed by ZITADEL cannot be forwarded.
+    repeated string forwarded_parameters = 10 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"acr_values\", \"max_age\"]";
+        }
+    ];
 }
 
 message AddGenericOIDCProviderResponse {
@@ -13283,6 +13343,26 @@ message UpdateGenericOIDCProviderRequest {
     bool is_id_token_mapping = 8;
     // Enable the use of Proof Key for Code Exchange (PKCE) for the OIDC flow.
     bool use_pkce = 9;
+    // Parameters which are added to the authorization request sent to the identity provider.
+    // They take precedence over the parameters ZITADEL sets itself, e.g. `prompt=select_account`.
+    // A parameter with an empty value is omitted from the request, which allows to remove such a default.
+    // Parameters managed by ZITADEL (client_id, client_secret, code, code_challenge, code_challenge_method,
+    // nonce, redirect_uri, response_type, scope and state) cannot be set.
+    map<string, string> authorization_parameters = 10 [
+        (validate.rules).map = {max_pairs: 20, keys: {string: {min_len: 1, max_len: 100}}, values: {string: {max_len: 1000}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "{\"acr_values\": \"AAL2_OR_AAL3_ANY\", \"prompt\": \"login\"}";
+        }
+    ];
+    // Names of the parameters of the original authorization request which are forwarded to the identity
+    // provider. Parameters set in authorization_parameters take precedence over the forwarded ones.
+    // Parameters managed by ZITADEL cannot be forwarded.
+    repeated string forwarded_parameters = 11 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"acr_values\", \"max_age\"]";
+        }
+    ];
 }
 
 message UpdateGenericOIDCProviderResponse {

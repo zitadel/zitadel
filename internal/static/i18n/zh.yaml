@@ -617,6 +617,10 @@ Errors:
     KeyIDMissing: "密钥 ID 丢失"
     PrivateKeyMissing: "私钥丢失"
     InvalidPrivateKey: "无效的私钥格式"
+    AuthorizationParameterNameMissing: "Authorization parameter name missing"
+    AuthorizationParameterNameInvalid: "Invalid authorization parameter name"
+    AuthorizationParameterDuplicate: "Authorization parameter defined more than once"
+    AuthorizationParameterReserved: "Authorization parameter is managed by ZITADEL and can not be set"
 
 AggregateTypes:
   action: "动作"
