@@ -78,7 +78,7 @@ func apiWriteModelToAPIConfig(writeModel *APIApplicationWriteModel) *domain.APIA
 		State:                writeModel.State,
 		ClientID:             writeModel.ClientID,
 		AuthMethodType:       writeModel.AuthMethodType,
-		MinimalIntrospection: writeModel.MinimalIntrospection,
+		MinimalIntrospection: gu.Ptr(writeModel.MinimalIntrospection),
 	}
 }
 

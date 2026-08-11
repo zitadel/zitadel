@@ -14,7 +14,7 @@ type APIApp struct {
 	EncodedHash          string
 	ClientSecretString   string
 	AuthMethodType       APIAuthMethodType
-	MinimalIntrospection bool
+	MinimalIntrospection *bool
 
 	State AppState
 }

@@ -4,6 +4,8 @@ import (
 	"context"
 	"strings"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -152,7 +154,7 @@ func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 		apiApp.ClientID,
 		apiApp.EncodedHash,
 		apiApp.AuthMethodType,
-		apiApp.MinimalIntrospection))
+		gu.Value(apiApp.MinimalIntrospection)))
 
 	addedApplication.AppID = apiApp.AppID
 	pushedEvents, err := c.eventstore.Push(ctx, events...)

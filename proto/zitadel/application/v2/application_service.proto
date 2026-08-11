@@ -607,7 +607,8 @@ message UpdateAPIApplicationConfigurationRequest {
   // field (and other token metadata) for tokens issued to this application, skipping the lookup
   // of user information and claims. This reduces load on ZITADEL for resource servers that only
   // need to know whether a token is still valid.
-  bool minimal_introspection = 2;
+  // If not set, the minimal introspection setting will not be changed.
+  optional bool minimal_introspection = 2;
 }
 
 message GetApplicationRequest {

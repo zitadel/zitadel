@@ -189,7 +189,7 @@ func (wm *APIApplicationWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	appID string,
 	authMethodType domain.APIAuthMethodType,
-	minimalIntrospection bool,
+	minimalIntrospection *bool,
 ) (*project.APIConfigChangedEvent, bool, error) {
 	changes := make([]project.APIConfigChanges, 0)
 	var err error
@@ -197,8 +197,8 @@ func (wm *APIApplicationWriteModel) NewChangedEvent(
 	if wm.AuthMethodType != authMethodType {
 		changes = append(changes, project.ChangeAPIAuthMethodType(authMethodType))
 	}
-	if wm.MinimalIntrospection != minimalIntrospection {
-		changes = append(changes, project.ChangeAPIMinimalIntrospection(minimalIntrospection))
+	if minimalIntrospection != nil && wm.MinimalIntrospection != *minimalIntrospection {
+		changes = append(changes, project.ChangeAPIMinimalIntrospection(*minimalIntrospection))
 	}
 	if len(changes) == 0 {
 		return nil, false, nil

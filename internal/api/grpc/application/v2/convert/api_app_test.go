@@ -3,6 +3,7 @@ package convert
 import (
 	"testing"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -31,10 +32,11 @@ func TestCreateAPIApplicationRequestToDomain(t *testing.T) {
 				AuthMethodType: application.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC,
 			},
 			want: &domain.APIApp{
-				ObjectRoot:     models.ObjectRoot{AggregateID: "proj-1"},
-				AppName:        "my-application",
-				AuthMethodType: domain.APIAuthMethodTypeBasic,
-				AppID:          "someID",
+				ObjectRoot:           models.ObjectRoot{AggregateID: "proj-1"},
+				AppName:              "my-application",
+				AuthMethodType:       domain.APIAuthMethodTypeBasic,
+				AppID:                "someID",
+				MinimalIntrospection: gu.Ptr(false),
 			},
 		},
 		{
@@ -45,9 +47,10 @@ func TestCreateAPIApplicationRequestToDomain(t *testing.T) {
 				AuthMethodType: application.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
 			},
 			want: &domain.APIApp{
-				ObjectRoot:     models.ObjectRoot{AggregateID: "proj-2"},
-				AppName:        "jwt-application",
-				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
+				ObjectRoot:           models.ObjectRoot{AggregateID: "proj-2"},
+				AppName:              "jwt-application",
+				AuthMethodType:       domain.APIAuthMethodTypePrivateKeyJWT,
+				MinimalIntrospection: gu.Ptr(false),
 			},
 		},
 		{
@@ -64,7 +67,7 @@ func TestCreateAPIApplicationRequestToDomain(t *testing.T) {
 				AppName:              "minimal-app",
 				AuthMethodType:       domain.APIAuthMethodTypePrivateKeyJWT,
 				AppID:                "someID3",
-				MinimalIntrospection: true,
+				MinimalIntrospection: gu.Ptr(true),
 			},
 		},
 	}
@@ -122,13 +125,26 @@ func TestUpdateAPIApplicationConfigurationRequestToDomain(t *testing.T) {
 			projectID: "proj-3",
 			req: &application.UpdateAPIApplicationConfigurationRequest{
 				AuthMethodType:       application.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
-				MinimalIntrospection: true,
+				MinimalIntrospection: gu.Ptr(true),
 			},
 			want: &domain.APIApp{
 				ObjectRoot:           models.ObjectRoot{AggregateID: "proj-3"},
 				AppID:                "application-3",
 				AuthMethodType:       domain.APIAuthMethodTypePrivateKeyJWT,
-				MinimalIntrospection: true,
+				MinimalIntrospection: gu.Ptr(true),
+			},
+		},
+		{
+			name:      "minimal introspection not set stays unset",
+			appID:     "application-4",
+			projectID: "proj-4",
+			req: &application.UpdateAPIApplicationConfigurationRequest{
+				AuthMethodType: application.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC,
+			},
+			want: &domain.APIApp{
+				ObjectRoot:     models.ObjectRoot{AggregateID: "proj-4"},
+				AppID:          "application-4",
+				AuthMethodType: domain.APIAuthMethodTypeBasic,
 			},
 		},
 	}
