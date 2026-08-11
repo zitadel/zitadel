@@ -147,7 +147,7 @@ Errors:
       Empty: "รหัสว่างเปล่า"
       NotFound: "ไม่พบรหัส"
       Expired: "รหัสหมดอายุแล้ว"
-      GeneratorAlgNotSupported: "อัลกอริทึมตัวสร้างที่ไม่รองรับ"
+      GeneratorAlgNotSupported: "ไม่รองรับอัลกอริทึมของตัวสร้าง"
       Invalid: "รหัสไม่ถูกต้อง"
     Password:
       NotFound: "ไม่พบรหัสผ่าน"

@@ -429,7 +429,7 @@ Footer:
 SignIn: ลงชื่อเข้าใช้ด้วย {{.Provider}}
 
 Errors:
-  Internal: เกิดข้อผิดพลาดภายใน
+  Internal: เกิดข้อผิดพลาดภายในระบบ
   AuthRequest:
     NotFound: ไม่พบคำขอการยืนยันตัวตน
     UserAgentNotCorresponding: User Agent ไม่ตรงกัน
@@ -446,34 +446,34 @@ Errors:
     NotMatchingUserID: ผู้ใช้และผู้ใช้ในคำขอการยืนยันตัวตนไม่ตรงกัน
     UserIDMissing: UserID ว่างเปล่า
     Invalid: ข้อมูลผู้ใช้ไม่ถูกต้อง
-    DomainNotAllowedAsUsername: โดเมนถูกจองไว้แล้วและไม่สามารถใช้ได้
-    NotAllowedToLink: ผู้ใช้ไม่ได้รับอนุญาตให้เชื่อมโยงกับผู้ให้บริการการเข้าสู่ระบบภายนอก
+    DomainNotAllowedAsUsername: โดเมนถูกสงวนไว้แล้วและไม่สามารถใช้งานได้
+    NotAllowedToLink: ผู้ใช้ไม่ได้รับอนุญาตให้เชื่อมโยงกับผู้ให้บริการเข้าสู่ระบบภายนอก
     Profile:
       NotFound: ไม่พบโปรไฟล์
-      NotChanged: ไม่ได้เปลี่ยนแปลงโปรไฟล์
+      NotChanged: โปรไฟล์ไม่มีการเปลี่ยนแปลง
       Empty: โปรไฟล์ว่างเปล่า
       FirstNameEmpty: ชื่อในโปรไฟล์ว่างเปล่า
       LastNameEmpty: นามสกุลในโปรไฟล์ว่างเปล่า
-      IDMissing: ID โปรไฟล์ขาดหายไป
+      IDMissing: ไม่มี ID โปรไฟล์
     Email:
       NotFound: ไม่พบอีเมล
       Invalid: อีเมลไม่ถูกต้อง
       AlreadyVerified: อีเมลได้รับการยืนยันแล้ว
-      NotChanged: ไม่ได้เปลี่ยนแปลงอีเมล
+      NotChanged: อีเมลไม่มีการเปลี่ยนแปลง
       Empty: อีเมลว่างเปล่า
-      IDMissing: ID อีเมลขาดหายไป
+      IDMissing: ไม่มี ID อีเมล
     Phone:
-      NotFound: ไม่พบโทรศัพท์
-      Invalid: โทรศัพท์ไม่ถูกต้อง
-      AlreadyVerified: โทรศัพท์ได้รับการยืนยันแล้ว
-      Empty: โทรศัพท์ว่างเปล่า
-      NotChanged: ไม่ได้เปลี่ยนแปลงโทรศัพท์
+      NotFound: ไม่พบหมายเลขโทรศัพท์
+      Invalid: หมายเลขโทรศัพท์ไม่ถูกต้อง
+      AlreadyVerified: หมายเลขโทรศัพท์ได้รับการยืนยันแล้ว
+      Empty: หมายเลขโทรศัพท์ว่างเปล่า
+      NotChanged: หมายเลขโทรศัพท์ไม่มีการเปลี่ยนแปลง
     Address:
       NotFound: ไม่พบที่อยู่
-      NotChanged: ไม่ได้เปลี่ยนแปลงที่อยู่
+      NotChanged: ที่อยู่ไม่มีการเปลี่ยนแปลง
     Username:
-      AlreadyExists: ชื่อผู้ใช้ถูกใช้ไปแล้ว
-      Reserved: ชื่อผู้ใช้ถูกใช้ไปแล้ว
+      AlreadyExists: ชื่อผู้ใช้นี้ถูกใช้แล้ว
+      Reserved: ชื่อผู้ใช้นี้ถูกใช้แล้ว
       Empty: ชื่อผู้ใช้ว่างเปล่า
     Password:
       ConfirmationWrong: การยืนยันรหัสผ่านไม่ถูกต้อง
@@ -505,7 +505,7 @@ Errors:
       NoProviders: ไม่มีผู้ให้บริการการยืนยันตัวตนแบบหลายปัจจัยที่ใช้งานได้
       OTP:
         AlreadyReady: มีการตั้งค่า OTP แบบหลายปัจจัย (OneTimePassword) อยู่แล้ว
-        NotExisting: OTP แบบหลายปัจจัย (OneTimePassword) ไม่มีอยู่
+        NotExisting: ไม่มี OTP แบบหลายปัจจัย (OneTimePassword)
         InvalidCode: รหัสไม่ถูกต้อง
         NotReady: OTP แบบหลายปัจจัย (OneTimePassword) ยังไม่พร้อม
     Locked: ผู้ใช้ถูกล็อก
