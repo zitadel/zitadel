@@ -10,14 +10,14 @@ describe("instanceRolesFromClaim", () => {
     expect(instanceRolesFromClaim(raw, rolesInfo)).toEqual(["IAM_OWNER_VIEWER"]);
   });
 
-  it("returns multiple matching roles", () => {
+  it("returns multiple matching roles sorted deterministically", () => {
     const raw = {
       [CLAIM]: {
         IAM_OWNER_VIEWER: { "org-1": "support.example.com" },
         IAM_ORG_MANAGER: { "org-1": "support.example.com" },
       },
     };
-    expect(instanceRolesFromClaim(raw, rolesInfo)).toEqual(["IAM_OWNER_VIEWER", "IAM_ORG_MANAGER"]);
+    expect(instanceRolesFromClaim(raw, rolesInfo)).toEqual(["IAM_ORG_MANAGER", "IAM_OWNER_VIEWER"]);
   });
 
   it("ignores roles granted in an unconfigured organization", () => {

@@ -59,7 +59,9 @@ export function instanceRolesFromClaim(
       roles.push(role);
     }
   }
-  return roles;
+  // The claim is a map, so sort to keep the resulting role set deterministic
+  // (mirrors the login v1 flow).
+  return roles.sort();
 }
 
 /**
