@@ -406,6 +406,7 @@
       "couldNotVerifyInvite": "Einladung konnte nicht verifiziert werden",
       "couldNotVerifyEmail": "E-Mail konnte nicht verifiziert werden",
       "couldNotVerify": "Konnte nicht verifizieren",
+      "invalidCode": "Der Code ist ungültig. Bitte versuchen Sie es erneut.",
       "couldNotLoadUser": "Benutzer konnte nicht geladen werden",
       "couldNotLoadAuthenticators": "Mögliche Authentifikatoren konnten nicht geladen werden",
       "couldNotCreateSession": "Sitzung konnte nicht erstellt werden",

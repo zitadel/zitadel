@@ -11,10 +11,10 @@ import {
   listAuthenticationMethodTypes,
   listUsers,
 } from "@/lib/zitadel";
-import { create, Duration } from "@zitadel/client";
+import { Code, create, Duration } from "@zitadel/client";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { Checks, ChecksSchema, CheckUserSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
@@ -229,6 +229,19 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       lifetime,
     });
   } catch (error) {
+    // A rejected check (e.g. a wrong OTP code) means the request was invalid, not that the
+    // session is gone. Re-creating the session below would only replay the same rejected
+    // check and hide the actual reason from the user, so surface it instead.
+    if (isClassifiedError(error) && error.code === Code.InvalidArgument) {
+      logger.warn("Session check was rejected", { grpcCode: error.code, httpStatus: error.httpStatus });
+
+      if (checks?.totp || checks?.otpEmail || checks?.otpSms) {
+        return { error: t("invalidCode") };
+      }
+
+      throw error;
+    }
+
     const loginNameForCreation = options.loginName || recentSession?.loginName;
     const orgForCreation = options.organization || recentSession?.organization;
 
@@ -246,7 +259,12 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       const user = users.result[0];
       const newChecks = create(ChecksSchema, {
         ...(checks || {}),
-        user: { search: { case: "userId", value: user.userId } } as any,
+        // `create()` returns an init value that already is a message of the target type
+        // unchanged, so the spread above short-circuits the conversion of nested fields.
+        // A plain object literal here would therefore stay unconverted and break
+        // serialization with "cannot use field zitadel.session.v2.CheckUser.user_id with
+        // message undefined" - build the message explicitly.
+        user: create(CheckUserSchema, { search: { case: "userId", value: user.userId } }),
       });
 
       const result = await createSessionAndUpdateCookie({

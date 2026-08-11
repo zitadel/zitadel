@@ -406,6 +406,7 @@
       "couldNotVerifyInvite": "Nem sikerült ellenőrizni a meghívást",
       "couldNotVerifyEmail": "Nem sikerült ellenőrizni az e-mail címet",
       "couldNotVerify": "Nem sikerült ellenőrizni",
+      "invalidCode": "A kód érvénytelen. Kérjük, próbálja újra.",
       "couldNotLoadUser": "Nem sikerült betölteni a felhasználót",
       "couldNotLoadAuthenticators": "Nem sikerült betölteni a lehetséges hitelesítőket",
       "couldNotCreateSession": "Nem sikerült létrehozni a munkamenetet",

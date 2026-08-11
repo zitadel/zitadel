@@ -406,6 +406,7 @@
       "couldNotVerifyInvite": "Could not verify invite",
       "couldNotVerifyEmail": "Could not verify email",
       "couldNotVerify": "Could not verify",
+      "invalidCode": "The code is invalid. Please try again.",
       "couldNotLoadUser": "Could not load user",
       "couldNotLoadAuthenticators": "Could not load possible authenticators",
       "couldNotCreateSession": "Could not create session",
