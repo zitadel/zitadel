@@ -285,6 +285,8 @@ Errors:
     LabelPolicy:
       NotFound: "ไม่พบนโยบายฉลากส่วนตัว"
       NotChanged: "นโยบายฉลากส่วนตัวไม่มีการเปลี่ยนแปลง"
+    IDPConfig:
+      NotExisting: "ไม่มีการกำหนดค่าผู้ให้บริการข้อมูลประจำตัว"
   Project:
     ProjectIDMissing: "ไม่มี Project Id"
     AlreadyExists: "มีโปรเจกต์นี้อยู่ในองค์กรแล้ว"

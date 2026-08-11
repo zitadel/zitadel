@@ -164,6 +164,7 @@
     "signInWithAzureAD": "ลงชื่อเข้าใช้ด้วย AzureAD",
     "signInWithGithub": "ลงชื่อเข้าใช้ด้วย GitHub",
     "signInWithGitlab": "ลงชื่อเข้าใช้ด้วย GitLab",
+    "signInWithZitadel": "ลงชื่อเข้าใช้ด้วย Zitadel",
     "loginError": {
       "title": "การเข้าสู่ระบบล้มเหลว",
       "description": "เกิดข้อผิดพลาดขณะพยายามเข้าสู่ระบบ"

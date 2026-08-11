@@ -665,6 +665,7 @@
     "ORG_USER_PERMISSION_EDITOR": "มีสิทธิ์จัดการการมอบหมายบทบาท",
     "ORG_PROJECT_PERMISSION_EDITOR": "มีสิทธิ์จัดการการให้สิทธิ์โปรเจกต์",
     "ORG_PROJECT_CREATOR": "มีสิทธิ์สร้างโปรเจกต์ของตนเองและการตั้งค่าที่เกี่ยวข้อง",
+    "ORG_DYNAMIC_CLIENT_REGISTRAR": "มีสิทธิ์ลงทะเบียน OAuth 2.0 client แบบไดนามิก",
     "ORG_ADMIN_IMPERSONATOR": "มีสิทธิ์สวมสิทธิ์ผู้ดูแลระบบและผู้ใช้ปลายทางจากองค์กร",
     "ORG_END_USER_IMPERSONATOR": "มีสิทธิ์สวมสิทธิ์ผู้ใช้ปลายทางจากองค์กร",
     "ORG_USER_SELF_MANAGER": "มีสิทธิ์จัดการผู้ใช้ของตนเอง",
