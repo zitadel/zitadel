@@ -981,7 +981,11 @@ describe("isSessionValid", () => {
       });
 
       vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
-        authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.PASSKEY, AuthenticationMethodType.TOTP],
+        authMethodTypes: [
+          AuthenticationMethodType.PASSWORD,
+          AuthenticationMethodType.PASSKEY,
+          AuthenticationMethodType.TOTP,
+        ],
       } as any);
 
       vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
