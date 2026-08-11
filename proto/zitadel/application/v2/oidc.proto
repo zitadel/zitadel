@@ -157,4 +157,9 @@ message OIDCConfiguration {
   // hosted on any other domain.
   // If unset, the login UI is chosen by the instance default.
   LoginVersion login_version = 21;
+
+  // If MinimalIntrospection is enabled, the introspection endpoint returns only the "active"
+  // field (and other token metadata) for tokens issued to this application, skipping the lookup
+  // of user information and claims.
+  bool minimal_introspection = 22;
 }

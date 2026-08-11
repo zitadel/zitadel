@@ -48,6 +48,7 @@ type OIDCConfigAddedEvent struct {
 	BackChannelLogoutURI     string                     `json:"backChannelLogoutURI,omitempty"`
 	LoginVersion             domain.LoginVersion        `json:"loginVersion,omitempty"`
 	LoginBaseURI             string                     `json:"loginBaseURI,omitempty"`
+	MinimalIntrospection     bool                       `json:"minimalIntrospection,omitempty"`
 }
 
 func (e *OIDCConfigAddedEvent) Payload() interface{} {
@@ -82,6 +83,7 @@ func NewOIDCConfigAddedEvent(
 	backChannelLogoutURI string,
 	loginVersion domain.LoginVersion,
 	loginBaseURI string,
+	minimalIntrospection bool,
 ) *OIDCConfigAddedEvent {
 	return &OIDCConfigAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -110,6 +112,7 @@ func NewOIDCConfigAddedEvent(
 		BackChannelLogoutURI:     backChannelLogoutURI,
 		LoginVersion:             loginVersion,
 		LoginBaseURI:             loginBaseURI,
+		MinimalIntrospection:     minimalIntrospection,
 	}
 }
 
@@ -204,7 +207,10 @@ func (e *OIDCConfigAddedEvent) Validate(cmd eventstore.Command) bool {
 	if e.LoginVersion != c.LoginVersion {
 		return false
 	}
-	return e.LoginBaseURI == c.LoginBaseURI
+	if e.LoginBaseURI != c.LoginBaseURI {
+		return false
+	}
+	return e.MinimalIntrospection == c.MinimalIntrospection
 }
 
 func OIDCConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
@@ -242,6 +248,7 @@ type OIDCConfigChangedEvent struct {
 	BackChannelLogoutURI     *string                     `json:"backChannelLogoutURI,omitempty"`
 	LoginVersion             *domain.LoginVersion        `json:"loginVersion,omitempty"`
 	LoginBaseURI             *string                     `json:"loginBaseURI,omitempty"`
+	MinimalIntrospection     *bool                       `json:"minimalIntrospection,omitempty"`
 }
 
 func (e *OIDCConfigChangedEvent) Payload() interface{} {
@@ -395,6 +402,12 @@ func ChangeOIDCLoginVersion(loginVersion domain.LoginVersion) func(event *OIDCCo
 func ChangeOIDCLoginBaseURI(loginBaseURI string) func(event *OIDCConfigChangedEvent) {
 	return func(e *OIDCConfigChangedEvent) {
 		e.LoginBaseURI = &loginBaseURI
+	}
+}
+
+func ChangeOIDCMinimalIntrospection(minimalIntrospection bool) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.MinimalIntrospection = &minimalIntrospection
 	}
 }
 

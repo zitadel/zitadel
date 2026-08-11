@@ -66,6 +66,7 @@ func TestCreateOIDCAppRequestToDomain(t *testing.T) {
 				LoginVersion: &application.LoginVersion{Version: &application.LoginVersion_LoginV2{LoginV2: &application.LoginV2{
 					BaseUri: gu.Ptr("https://login"),
 				}}},
+				MinimalIntrospection: true,
 			},
 			expectedModel: &domain.OIDCApp{
 				ObjectRoot:               models.ObjectRoot{AggregateID: "project1"},
@@ -89,6 +90,7 @@ func TestCreateOIDCAppRequestToDomain(t *testing.T) {
 				BackChannelLogoutURI:     gu.Ptr("https://backchannel"),
 				LoginVersion:             gu.Ptr(domain.LoginVersion2),
 				LoginBaseURI:             gu.Ptr("https://login"),
+				MinimalIntrospection:     gu.Ptr(true),
 			},
 		},
 	}
@@ -473,6 +475,7 @@ func TestAppOIDCConfigToPb(t *testing.T) {
 				BackChannelLogoutURI:     "https://example.com/backchannel",
 				LoginVersion:             domain.LoginVersion2,
 				LoginBaseURI:             gu.Ptr("https://login.example.com"),
+				MinimalIntrospection:     true,
 			},
 			expected: &application.Application_OidcConfiguration{
 				OidcConfiguration: &application.OIDCConfiguration{
@@ -506,6 +509,7 @@ func TestAppOIDCConfigToPb(t *testing.T) {
 							},
 						},
 					},
+					MinimalIntrospection: true,
 				},
 			},
 		},

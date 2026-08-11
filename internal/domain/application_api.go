@@ -8,12 +8,13 @@ import (
 type APIApp struct {
 	models.ObjectRoot
 
-	AppID              string
-	AppName            string
-	ClientID           string
-	EncodedHash        string
-	ClientSecretString string
-	AuthMethodType     APIAuthMethodType
+	AppID                string
+	AppName              string
+	ClientID             string
+	EncodedHash          string
+	ClientSecretString   string
+	AuthMethodType       APIAuthMethodType
+	MinimalIntrospection bool
 
 	State AppState
 }

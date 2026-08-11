@@ -12,9 +12,10 @@ func CreateAPIApplicationRequestToDomain(name, projectID, appID string, app *app
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: projectID,
 		},
-		AppName:        name,
-		AppID:          appID,
-		AuthMethodType: apiAuthMethodTypeToDomain(app.GetAuthMethodType()),
+		AppName:              name,
+		AppID:                appID,
+		AuthMethodType:       apiAuthMethodTypeToDomain(app.GetAuthMethodType()),
+		MinimalIntrospection: app.GetMinimalIntrospection(),
 	}
 }
 
@@ -23,16 +24,18 @@ func UpdateAPIApplicationConfigurationRequestToDomain(appID, projectID string, a
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: projectID,
 		},
-		AppID:          appID,
-		AuthMethodType: apiAuthMethodTypeToDomain(app.GetAuthMethodType()),
+		AppID:                appID,
+		AuthMethodType:       apiAuthMethodTypeToDomain(app.GetAuthMethodType()),
+		MinimalIntrospection: app.GetMinimalIntrospection(),
 	}
 }
 
 func appAPIConfigToPb(apiApp *query.APIApp) application.IsApplicationConfiguration {
 	return &application.Application_ApiConfiguration{
 		ApiConfiguration: &application.APIConfiguration{
-			ClientId:       apiApp.ClientID,
-			AuthMethodType: apiAuthMethodTypeToPb(apiApp.AuthMethodType),
+			ClientId:             apiApp.ClientID,
+			AuthMethodType:       apiAuthMethodTypeToPb(apiApp.AuthMethodType),
+			MinimalIntrospection: apiApp.MinimalIntrospection,
 		},
 	}
 }
