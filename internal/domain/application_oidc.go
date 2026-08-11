@@ -20,11 +20,16 @@ const (
 type OIDCApp struct {
 	models.ObjectRoot
 
-	AppID                    string
-	AppName                  string
-	ClientID                 string
-	EncodedHash              string
-	ClientSecretString       string
+	AppID              string
+	AppName            string
+	ClientID           string
+	EncodedHash        string
+	ClientSecretString string
+	// RegistrationAccessToken is the plain registration access token (RFC 7592 §3) of a
+	// dynamically registered client. It is only populated transiently on registration and
+	// rotation so the registration endpoint can return it to the client; it is never
+	// persisted (only its hash is, see project.OIDCConfigRegistrationTokenChangedEvent).
+	RegistrationAccessToken  string
 	RedirectUris             []string
 	ResponseTypes            []OIDCResponseType
 	GrantTypes               []OIDCGrantType
@@ -377,6 +382,15 @@ func containsCustom(uris []string) bool {
 		}
 	}
 	return false
+}
+
+// OIDCRedirectURIsRequireNative reports whether the given redirect URIs can only be
+// compliant for a native application, because they use a custom scheme. It lets a caller
+// that has to infer the application type (see the dynamic client registration endpoint)
+// stay in agreement with CheckRedirectUrisCode and CheckRedirectUrisImplicitAndCode, which
+// reserve custom schemes for native applications.
+func OIDCRedirectURIsRequireNative(redirectURIs []string) bool {
+	return containsCustom(redirectURIs)
 }
 
 // onlyLocalhostIsHttp returns true if:

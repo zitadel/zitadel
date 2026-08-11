@@ -282,6 +282,8 @@ Errors:
     LabelPolicy:
       NotFound: "La politique d'étiquetage privé n'a pas été trouvée"
       NotChanged: "La politique en matière de marques privées n'a pas été modifiée"
+    IDPConfig:
+      NotExisting: "La configuration du fournisseur d'identité n'existe pas"
   Project:
     ProjectIDMissing: "Id de projet manquant"
     AlreadyExists: "Le projet existe déjà dans l'organisation"

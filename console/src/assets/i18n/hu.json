@@ -89,7 +89,7 @@
       },
       "FEATURES": {
         "TITLE": "Funkció beállításai",
-        "DESCRIPTION": "Oldd fel a funkciókat az instance-odhoz."
+        "DESCRIPTION": "Oldd fel a funkciókat a példányodhoz."
       },
       "IDPS": {
         "TITLE": "Identitásszolgáltatók",
@@ -97,7 +97,7 @@
         "NEXT": "Mi most?",
         "SAML": {
           "TITLE": "Konfiguráld a SAML identitásszolgáltatódat",
-          "DESCRIPTION": "A Zitadel konfigurálva van. Most a SAML identitásszolgáltatódnak van szüksége némi konfigurációra. A legtöbb szolgáltatónál elég, ha feltöltöd a teljes Zitadel metadat XML-t. Más szolgáltatók csak néhány külön URL megadását kérik, például az entitásazonosítót (metadata URL), az Assertion Consumer Service (ACS) URL-t vagy a Single Logout URL-t."
+          "DESCRIPTION": "A Zitadel konfigurálva van. Most a SAML identitásszolgáltatódnak van szüksége némi konfigurációra. A legtöbb szolgáltatónál elég, ha feltöltöd a teljes Zitadel metaadat XML-t. Más szolgáltatók csak néhány külön URL megadását kérik, például az entitásazonosítót (metaadat URL), az Assertion Consumer Service (ACS) URL-t vagy a Single Logout URL-t."
         },
         "CALLBACK": {
           "TITLE": "Konfiguráld a {{ provider }} Identity Providered",
@@ -214,7 +214,7 @@
       },
       "MESSAGE_TEXTS": {
         "TITLE": "Üzenet Szövegek",
-        "DESCRIPTION": "Testreszabhatod az értesítési e-mailjeid vagy SMS üzeneteid szövegeit. Ha le szeretnél tiltani néhány nyelvet, korlátozd azokat az instance nyelvi beállításaiban.",
+        "DESCRIPTION": "Testreszabhatod az értesítési e-mailjeid vagy SMS üzeneteid szövegeit. Ha le szeretnél tiltani néhány nyelvet, korlátozd azokat a példány nyelvi beállításaiban.",
         "TYPE_DESCRIPTIONS": {
           "DC": "Amikor lefoglalod a domain nevet a szervezet számára, azok a felhasználók, akik nem ezt a domaint használják bejelentkezési névként, felszólítást kapnak a login nevük megváltoztatására, hogy az egyezzen a lefoglalt domainnel.",
           "INIT": "Amikor létrehozol egy felhasználót, kapni fog egy e-mailt egy linkkel, amin megadhatja a jelszavát.",
@@ -303,15 +303,15 @@
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Domain felfedezés engedélyezve",
-            "DESCRIPTION": "Találd meg a felhasználóid szervezeteit a bejelentkezési neveik domainje alapján, például az email címük alapján."
+            "DESCRIPTION": "Találd meg a felhasználóid szervezeteit a bejelentkezési neveik domainje alapján, például az e-mail címük alapján."
           },
           "IGNORE_UNKNOWN_USERNAMES": {
             "TITLE": "Ismeretlen felhasználóneveket figyelmen kívül hagy",
             "DESCRIPTION": "Ha ez aktiválva van, a bejelentkezési űrlap nem mutat hibajelzést, ha a felhasználónév ismeretlen. Ez segít megakadályozni a felhasználónév kitalálását."
           },
           "DISABLE_EMAIL_LOGIN": {
-            "TITLE": "Email bejelentkezés letiltása",
-            "DESCRIPTION": "Ha ez aktiválva van, a felhasználóid nem használhatják az email címüket a bejelentkezéshez. Legyen óvatos, mert ha ezt kikapcsolod, a felhasználóid email címeinek egyedinek kell lenniük az összes szervezeten belül a bejelentkezéshez."
+            "TITLE": "E-mail bejelentkezés letiltása",
+            "DESCRIPTION": "Ha ez aktiválva van, a felhasználóid nem használhatják az e-mail címüket a bejelentkezéshez. Legyen óvatos, mert ha ezt kikapcsolod, a felhasználóid e-mail címeinek egyedinek kell lenniük az összes szervezeten belül a bejelentkezéshez."
           },
           "DISABLE_PHONE_LOGIN": {
             "TITLE": "Telefonos bejelentkezés letiltása",
@@ -367,7 +367,7 @@
     "DISMISS": "Nem, kösz, profi vagyok.",
     "CARD": {
       "TITLE": "Indítsd el a Zitadel-t",
-      "DESCRIPTION": "Ez az ellenőrzőlista segít beállítani az instanciádat és végigvezet a legfontosabb lépéseken"
+      "DESCRIPTION": "Ez az ellenőrzőlista segít beállítani a példányodat és végigvezet a legfontosabb lépéseken"
     },
     "MILESTONES": {
       "instance.policy.label.added": {
@@ -428,9 +428,10 @@
     "LOGOUT": "Minden Felhasználó Kijelentkezése",
     "NEWORG": "Új Szervezet",
     "IAMADMIN": "Te egy példány Adminisztrátor vagy. Ne felejtsd el, hogy kibővített jogosultságokkal rendelkezel.",
-    "SHOWORGS": "Show All Organizations",
+    "SHOWORGS": "Összes szervezet megjelenítése",
     "GRANTS": "Szerepkör hozzárendelések",
     "ACTIONS": "Műveletek",
+    "TARGETS": "Célpontok",
     "PRIVACY": "Adatvédelem",
     "TOS": "Szolgáltatási feltételek",
     "OPENSHORTCUTSTOOLTIP": "Írd be a ? jelet a billentyűparancsok megjelenítéséhez",
@@ -716,17 +717,17 @@
     "UNDERORGCONTEXT": "Szervezeti oldalakon belül",
     "SIDEWIDE": "Webhely-szintű parancsok",
     "SHORTCUTS": {
-      "HOME": "<strong>G</strong>o to <strong>F</strong>őoldal",
-      "INSTANCE": "<strong>G</strong>o to <strong>I</strong>instance",
-      "ORG": "<strong>G</strong>o to <strong>S</strong>zervezet",
-      "ORGSETTINGS": "<strong>G</strong>o to Szervezet <strong>B</strong>eállításai",
+      "HOME": "Menj a Főoldalra",
+      "INSTANCE": "Menj a Példányhoz",
+      "ORG": "Menj a Szervezethez",
+      "ORGSETTINGS": "Menj a Szervezet Beállításaihoz",
       "ORGSWITCHER": "Szervezet megváltoztatása",
       "ME": "Menj a saját profilodra",
-      "PROJECTS": "<strong>M</strong>enj a <strong>P</strong>rojektekhez",
-      "USERS": "<strong>M</strong>enj a <strong>F</strong>elhasználókhoz",
-      "ROLEASSIGNMENTS": "<strong>M</strong>enj a <strong>S</strong>zerepkör hozzárendelésekhez",
-      "ACTIONS": "<strong>M</strong>enj az Akciókhoz és a <strong>F</strong>olyamatokhoz",
-      "DOMAINS": "<strong>M</strong>enj a <strong>D</strong>oménekhez"
+      "PROJECTS": "Menj a Projektekhez",
+      "USERS": "Menj a Felhasználókhoz",
+      "ROLEASSIGNMENTS": "Menj a Szerepkör hozzárendelésekhez",
+      "ACTIONS": "Menj az Akciókhoz és a Folyamatokhoz",
+      "DOMAINS": "Menj a Doménekhez"
     }
   },
   "RESOURCEID": "Erőforrás azonosító",
@@ -743,8 +744,8 @@
       "DESCRIPTION": "Kattints az alábbi gombra az újrabejelentkezéshez."
     },
     "EXHAUSTED": {
-      "TITLE": "Az instance-od blokkolva van.",
-      "DESCRIPTION": "Kérd meg az Zitadel instance adminisztrátorát, hogy frissítse az előfizetést."
+      "TITLE": "A példányod blokkolva van.",
+      "DESCRIPTION": "Kérd meg a Zitadel példány adminisztrátorát, hogy frissítse az előfizetést."
     },
     "INVALID_FORMAT": "A formázás érvénytelen.",
     "NOTANEMAIL": "A megadott érték nem egy e-mail cím.",
@@ -810,8 +811,8 @@
     },
     "SENDEMAILDIALOG": {
       "TITLE": "E-mail értesítés küldése",
-      "DESCRIPTION": "Kattints az alábbi gombra, hogy értesítést küldj a jelenlegi email címre, vagy változtasd meg az email címet a mezőben.",
-      "NEWEMAIL": "Új email cím"
+      "DESCRIPTION": "Kattints az alábbi gombra, hogy értesítést küldj a jelenlegi e-mail címre, vagy változtasd meg az e-mail címet a mezőben.",
+      "NEWEMAIL": "Új e-mail cím"
     },
     "SECRETDIALOG": {
       "CLIENTSECRET": "Client Secret",
@@ -827,7 +828,7 @@
         "1": "Szűrés felhasználónév alapján",
         "2": "szűrő DisplayName-hez",
         "3": "szűrő felhasználónévhez",
-        "4": "szűrő emailhez",
+        "4": "szűrő e-mailhez",
         "5": "szűrő DisplayName-hez",
         "10": "szűrő szervezetnévhez",
         "12": "szűrő projekt névhez"
@@ -865,9 +866,9 @@
         "DELETE_DESCRIPTION": "Egy Passkey-t készülsz törölni. Biztos vagy benne?",
         "ADD_TITLE": "Passkey hitelesítés",
         "ADD_DESCRIPTION": "Válaszd ki az elérhető opciók közül a Passkey létrehozásához.",
-        "SEND_DESCRIPTION": "Küldj magadnak egy regisztrációs linket az email címedre.",
+        "SEND_DESCRIPTION": "Küldj magadnak egy regisztrációs linket az e-mail címedre.",
         "SEND": "Regisztrációs link küldése",
-        "SENT": "Az email sikeresen elküldve. Ellenőrizd a postaládádat a beállítás folytatásához.",
+        "SENT": "Az e-mail sikeresen elküldve. Ellenőrizd a postaládádat a beállítás folytatásához.",
         "QRCODE_DESCRIPTION": "Generálj QR-kódot egy másik eszközzel történő beolvasáshoz.",
         "QRCODE": "QR-kód generálása",
         "QRCODE_SCAN": "Olvasd be ezt a QR-kódot a beállítás folytatásához az eszközödön.",
@@ -894,7 +895,7 @@
       "U2F_ERROR": "Hiba történt a beállítás során!",
       "U2F_NAME": "Hitelesítő neve",
       "OTPSMS": "OTP SMS-el",
-      "OTPEMAIL": "OTP Email-el",
+      "OTPEMAIL": "OTP e-maillel",
       "SETUPOTPSMSDESCRIPTION": "Be akarod állítani ezt a telefonszámot mint OTP második faktort?",
       "OTPSMSSUCCESS": "Az OTP további biztonsági tényező sikeresen beállítva.",
       "OTPSMSPHONEMUSTBEVERIFIED": "A módszer használatához hitelesítened kell a telefonodat.",
@@ -1049,7 +1050,7 @@
     "PHONE": "Telefonszám",
     "PHONEEMPTY": "Nincs megadott telefonszám",
     "PHONEVERIFIED": "Telefonszám ellenőrizve.",
-    "EMAILVERIFIED": "Email megerősítve",
+    "EMAILVERIFIED": "E-mail megerősítve",
     "NOTVERIFIED": "nem megerősítve",
     "PREFERRED_LOGINNAME": "Előnyben részesített bejelentkezési név",
     "ISINITIAL": "A felhasználó még nem aktív.",
@@ -1059,7 +1060,7 @@
       "EMAIL": {
         "TITLE": "E-mail",
         "VALID": "ellenőrizve",
-        "ISVERIFIED": "Email megerősítve",
+        "ISVERIFIED": "E-mail megerősítve",
         "ISVERIFIEDDESC": "Ha az e-mail megerősítve van, nem küldünk e-mail megerősítési kérést.",
         "RESEND": "Ellenőrző e-mail újraküldése",
         "EDITTITLE": "E-mail megváltoztatása",
@@ -1127,14 +1128,14 @@
     "SIGNEDOUT_BTN": "Bejelentkezés",
     "EDITACCOUNT": "Fiók szerkesztése",
     "ADDACCOUNT": "Bejelentkezés másik fiókkal",
-    "RESENDINITIALEMAIL": "Aktiváló email újraküldése",
-    "RESENDEMAILNOTIFICATION": "Értesítési email újraküldése",
+    "RESENDINITIALEMAIL": "Aktiváló e-mail újraküldése",
+    "RESENDEMAILNOTIFICATION": "Értesítési e-mail újraküldése",
     "TOAST": {
       "CREATED": "Felhasználó létrehozva sikeresen.",
       "SAVED": "Profil sikeresen mentve.",
       "USERNAMECHANGED": "Felhasználónév megváltoztatva.",
-      "EMAILSAVED": "Email sikeresen mentve.",
-      "INITEMAILSENT": "Kezdő email elküldve.",
+      "EMAILSAVED": "E-mail sikeresen mentve.",
+      "INITEMAILSENT": "Kezdő e-mail elküldve.",
       "PHONESAVED": "Telefon sikeresen mentve.",
       "PHONEREMOVED": "A telefon eltávolítva.",
       "PHONEVERIFIED": "A telefon sikeresen ellenőrizve.",
@@ -1272,7 +1273,7 @@
     },
     "MEMBER": {
       "TITLE": "Adminisztrátorok",
-      "DESCRIPTION": "Ezek az adminisztrátorok végezhetnek módosításokat az instanciádban."
+      "DESCRIPTION": "Ezek az adminisztrátorok végezhetnek módosításokat a példányodban."
     },
     "PAGES": {
       "STATE": "Állapot",
@@ -1427,7 +1428,7 @@
     },
     "LIST": {
       "TITLE": "Szervezetek",
-      "DESCRIPTION": "Ezek a szervezetek az instanciádon"
+      "DESCRIPTION": "Ezek a szervezetek a példányodon"
     },
     "DOMAINS": {
       "NEW": "Domain hozzáadása",
@@ -1510,7 +1511,9 @@
       "SECURITY": "Biztonsági beállítások",
       "EVENTS": "Események",
       "FAILEDEVENTS": "Sikertelen események",
-      "VIEWS": "Nézetek"
+      "VIEWS": "Nézetek",
+      "ACTIONS": "Műveletek",
+      "TARGETS": "Célpontok"
     },
     "GROUPS": {
       "GENERAL": "Általános információ",
@@ -1520,7 +1523,8 @@
       "TEXTS": "Szövegek és nyelvek",
       "APPEARANCE": "Megjelenés",
       "OTHER": "Egyéb",
-      "STORAGE": "Tárolás"
+      "STORAGE": "Tárolás",
+      "ACTIONS": "Műveletek"
     },
     "BETA": "BÉTA"
   },
@@ -1562,7 +1566,7 @@
     "SMTP": {
       "TITLE": "SMTP Szolgáltató",
       "DESCRIPTION": "Leírás",
-      "SENDERADDRESS": "Küldő Email Cím",
+      "SENDERADDRESS": "Küldő E-mail Cím",
       "SENDERNAME": "Küldő Neve",
       "REPLYTOADDRESS": "Válasz-cím",
       "HOSTANDPORT": "Host és Port",
@@ -1593,6 +1597,8 @@
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Küldő száma",
+        "VERIFYSERVICESID": "Verification Service Sid",
+        "VERIFYSERVICESID_DESCRIPTION": "A Verification Service Sid beállításával a telefonszámok és az OTP SMS-ek ellenőrzéséhez a Twilio Verify Service használható az Messages Service helyett",
         "ADDED": "Twilio sikeresen hozzáadva.",
         "UPDATED": "Twilio sikeresen frissítve.",
         "REMOVED": "Twilio eltávolítva",
@@ -1611,7 +1617,7 @@
         "5": "Passkey inicializálás",
         "6": "Alkalmazás titok",
         "7": "OTP - SMS",
-        "8": "OTP - Email",
+        "8": "OTP - E-mail",
         "9": "Meghívókód"
       },
       "EXPIRY": "Lejárat (percben)",
@@ -1633,7 +1639,7 @@
     },
     "FEATURES": {
       "LOGINDEFAULTORG": "Alapértelmezett Org bejelentkezés",
-      "LOGINDEFAULTORG_DESCRIPTION": "A bejelentkezési felület az alapértelmezett org beállításait fogja használni (és nem az instance-tól), ha nincs megadva szervezeti kontextus",
+      "LOGINDEFAULTORG_DESCRIPTION": "A bejelentkezési felület az alapértelmezett org beállításait fogja használni (és nem a példánytól), ha nincs megadva szervezeti kontextus",
       "USERSCHEMA": "Felhasználói Séma",
       "USERSCHEMA_DESCRIPTION": "A Felhasználói Sémák lehetővé teszik a felhasználói adat sémák kezelését. Ha az opció engedélyezve van, használhatod az új API-t és annak funkcióit.",
       "ACTIONS": "Műveletek",
@@ -1666,8 +1672,8 @@
     "DIALOG": {
       "RESET": {
         "DEFAULTTITLE": "Beállítás visszaállítása",
-        "DEFAULTDESCRIPTION": "Készülsz visszaállítani a beállításaidat az instanciád alapértelmezett konfigurációjára. Biztosan folytatni akarod?",
-        "LOGINPOLICY_DESCRIPTION": "Figyelem: Ha folytatod, az Identity Provider beállítások is az instance beállításokra lesznek visszaállítva."
+        "DEFAULTDESCRIPTION": "Készülsz visszaállítani a beállításaidat a példányod alapértelmezett konfigurációjára. Biztosan folytatni akarod?",
+        "LOGINPOLICY_DESCRIPTION": "Figyelem: Ha folytatod, az Identity Provider beállítások is a példány beállításaira lesznek visszaállítva."
       }
     }
   },
@@ -1778,7 +1784,7 @@
       "RESET_DESCRIPTION": "Az alapértelmezett értékeket fogod visszaállítani. Minden elvégzett módosítás véglegesen törlésre kerül. Biztosan folytatni akarod?",
       "UNSAVED_TITLE": "Folytatod mentés nélkül?",
       "UNSAVED_DESCRIPTION": "Módosításokat végeztél mentés nélkül. Akarod most menteni?",
-      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Egy nem engedélyezett nyelvet választottál. Továbbra is módosíthatod a szövegeket. De ha azt akarod, hogy a felhasználók ténylegesen használni tudják ezt a nyelvet, változtasd meg az instance korlátozásait.",
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Egy nem engedélyezett nyelvet választottál. Továbbra is módosíthatod a szövegeket. De ha azt akarod, hogy a felhasználók ténylegesen használni tudják ezt a nyelvet, változtasd meg a példány korlátozásait.",
       "LANGUAGES_NOT_ALLOWED": "Nem engedélyezett:",
       "LANGUAGE": "Nyelv",
       "LANGUAGES": {
@@ -1846,10 +1852,10 @@
       "TYPE": "Értesítés",
       "TYPES": {
         "INIT": "Inicializálás",
-        "VE": "Email ellenőrzése",
+        "VE": "E-mail ellenőrzése",
         "VP": "Telefon igazolása",
         "VSO": "OTP SMS igazolása",
-        "VEO": "OTP Email igazolása",
+        "VEO": "OTP E-mail igazolása",
         "PR": "Jelszó visszaállítása",
         "DC": "Domain igénylés",
         "PL": "Passkey",
@@ -1865,9 +1871,9 @@
         "nickName": "Becenév",
         "loginnames": "Bejelentkezési nevek",
         "domain": "Tartomány",
-        "lastEmail": "Utolsó email",
+        "lastEmail": "Utolsó e-mail",
         "lastPhone": "Utolsó telefon",
-        "verifiedEmail": "Ellenőrzött email",
+        "verifiedEmail": "Ellenőrzött e-mail",
         "verifiedPhone": "Ellenőrzött telefon",
         "changedate": "Dátum megváltoztatása",
         "username": "Felhasználónév",
@@ -1881,7 +1887,7 @@
         "UPDATED": "Egyéni szövegek mentve."
       }
     },
-    "DEFAULTLABEL": "A jelenlegi beállítások megfelelnek az Instancia szabványának.",
+    "DEFAULTLABEL": "A jelenlegi beállítások megfelelnek a példányod szabványának.",
     "BTN_INSTALL": "Beállítás",
     "BTN_EDIT": "Módosítás",
     "DATA": {
@@ -1899,7 +1905,7 @@
       "USERLOGINMUSTBEDOMAIN": "Szervezeti domain hozzáadása utótagként a bejelentkezési nevekhez",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Ha engedélyezed ezt a beállítást, minden bejelentkezési név utótagként megkapja a szervezeti domaint. Ha ez a beállítás le van tiltva, biztosítanod kell, hogy a felhasználónevek egyediek legyenek minden szervezetben.",
       "VALIDATEORGDOMAINS": "Szervezeti domain ellenőrzése szükséges (DNS vagy HTTP kihívás)",
-      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "Az SMTP küldő címe megegyezik az Instance Domain-nel",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "Az SMTP küldő címe megegyezik a példány domainjével",
       "ALLOWUSERNAMEPASSWORD_DESC": "A hagyományos bejelentkezés felhasználónévvel és jelszóval engedélyezett.",
       "ALLOWEXTERNALIDP_DESC": "A bejelentkezés engedélyezett az alapul szolgáló identitásszolgáltatóknál",
       "ALLOWREGISTER_DESC": "Ha ezt az opciót választod, egy további lépés jelenik meg a bejelentkezés során a felhasználói regisztrációhoz.",
@@ -2267,7 +2273,7 @@
       "AUTOLINKINGTYPE": {
         "0": "Letiltva",
         "1": "Ellenőrizd a meglévő felhasználónevet",
-        "2": "Ellenőrizd a meglévő email címet"
+        "2": "Ellenőrizd a meglévő e-mail címet"
       }
     },
     "OWNERTYPES": {
@@ -2328,8 +2334,8 @@
     "LDAPIDATTRIBUTE": "ID attribútum",
     "AVATARURLATTRIBUTE": "Avatar Url attribútum",
     "DISPLAYNAMEATTRIBUTE": "Megjelenített név attribútum",
-    "EMAILATTRIBUTEATTRIBUTE": "Email attribútum",
-    "EMAILVERIFIEDATTRIBUTE": "Email ellenőrzött attribútum",
+    "EMAILATTRIBUTEATTRIBUTE": "E-mail attribútum",
+    "EMAILVERIFIEDATTRIBUTE": "E-mail ellenőrzött attribútum",
     "FIRSTNAMEATTRIBUTE": "Keresztnév attribútum",
     "LASTNAMEATTRIBUTE": "Vezetéknév attribútum",
     "NICKNAMEATTRIBUTE": "Becenév attribútum",
@@ -2431,7 +2437,7 @@
       "0": "Ismeretlen",
       "1": "OTP az Authenticator alkalmazással (TOTP)",
       "2": "Passkey",
-      "3": "OTP Email-el (OTP Email)",
+      "3": "OTP e-maillel (OTP e-mail)",
       "4": "OTP SMS-el (OTP SMS)",
       "5": "Helyreállítási kódok"
     }
@@ -2475,8 +2481,8 @@
         "DELETED": "Az SMTP konfiguráció törölve lett",
         "SENDER": "Írd be, hogy {{value}}, hogy töröld ezt az SMTP konfigurációt.",
         "TEST_TITLE": "Teszteld az SMTP konfigurációdat",
-        "TEST_DESCRIPTION": "Adj meg egy email címet az SMTP konfiguráció teszteléséhez ennél a szolgáltatónál",
-        "TEST_EMAIL": "Email cím",
+        "TEST_DESCRIPTION": "Adj meg egy e-mail címet az SMTP konfiguráció teszteléséhez ennél a szolgáltatónál",
+        "TEST_EMAIL": "E-mail cím",
         "TEST_RESULT": "Teszt eredmény"
       }
     },
@@ -2502,7 +2508,7 @@
         "TEST": {
           "TITLE": "Teszteld a beállításokat",
           "DESCRIPTION": "Tesztelheted az SMTP szolgáltató beállításait és ellenőrizheted a teszt eredményét, mielőtt elmentenéd azokat.",
-          "RESULT": "Az email sikeresen elküldve"
+          "RESULT": "Az e-mail sikeresen elküldve"
         }
       }
     },
@@ -2701,14 +2707,14 @@
       "CONFIGSECTION": "SAML Konfiguráció",
       "CHOOSEMETADATASOURCE": "Add meg a SAML konfigurációdat az alábbi lehetőségek egyikével:",
       "METADATAOPT1": "1. lehetőség: Add meg az URL-t, ahol a metaadat fájl található",
-      "METADATAOPT2": "2. opció. Tölts fel egy fájlt, amely tartalmazza a metadata XML-t",
-      "METADATAOPT3": "3. opció. Hozz létre egy minimális metadata fájlt menet közben ENTITYID és ACS URL megadásával",
+      "METADATAOPT2": "2. opció. Tölts fel egy fájlt, amely tartalmazza a metaadat XML-t",
+      "METADATAOPT3": "3. opció. Hozz létre egy minimális metaadat fájlt menet közben ENTITYID és ACS URL megadásával",
       "UPLOAD": "XML fájl feltöltése",
-      "METADATA": "Metadata",
-      "METADATAFROMFILE": "Metadata fájlból",
+      "METADATA": "Metaadatok",
+      "METADATAFROMFILE": "Metaadatok fájlból",
       "CERTIFICATE": "SAML tanúsítvány",
       "DOWNLOADCERT": "SAML tanúsítvány letöltése",
-      "CREATEMETADATA": "Metadata létrehozása",
+      "CREATEMETADATA": "Metaadatok létrehozása",
       "ENTITYID": "Entity ID",
       "ACSURL": "ACS végpont URL"
     },

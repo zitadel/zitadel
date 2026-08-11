@@ -663,6 +663,7 @@
     "ORG_USER_PERMISSION_EDITOR": "Ha l'autorizzazione per gestire le assegnazioni ruoli",
     "ORG_PROJECT_PERMISSION_EDITOR": "Ha il permesso di gestire le sovvenzioni di progetto (Project Grant)",
     "ORG_PROJECT_CREATOR": "Ha il permesso di creare propri progetti e le impostazioni sottostanti",
+    "ORG_DYNAMIC_CLIENT_REGISTRAR": "Ha il permesso di registrare dinamicamente client OAuth 2.0",
     "ORG_ADMIN_IMPERSONATOR": "Ha il permesso per rappresentare l'amministratore e gli utenti finali dell'organizzazione",
     "ORG_END_USER_IMPERSONATOR": "Ha il permesso per rappresentare gli utenti finali dell'organizzazione",
     "ORG_USER_SELF_MANAGER": "Ha il permesso per gestire il proprio account utente",
@@ -1040,7 +1041,7 @@
       "SET": "Imposta nuova password",
       "RESENDNOTIFICATION": "Invia email per la reimpostazione",
       "REQUIRED": "Mancano alcuni campi obbligatori.",
-      "MINLENGTHERROR": "Deve essere lunga almeno {{valore}} caratteri.",
+      "MINLENGTHERROR": "Deve essere lunga almeno {{value}} caratteri.",
       "MAXLENGTHERROR": "Deve contenere meno di {{value}} caratteri"
     },
     "ID": "ID utente",

@@ -665,6 +665,7 @@
     "ORG_USER_PERMISSION_EDITOR": "Has permission to manage role assignments",
     "ORG_PROJECT_PERMISSION_EDITOR": "Has permission to manage project grants",
     "ORG_PROJECT_CREATOR": "Has permission to create his own projects and underlying settings",
+    "ORG_DYNAMIC_CLIENT_REGISTRAR": "Has permission to dynamically register OAuth 2.0 clients",
     "ORG_ADMIN_IMPERSONATOR": "Has permission to impersonate admin and end users from the organization",
     "ORG_END_USER_IMPERSONATOR": "Has permission to impersonate end users from the organization",
     "ORG_USER_SELF_MANAGER": "Has permission to manage their own user",
