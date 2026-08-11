@@ -814,6 +814,10 @@ message SetSecuritySettingsRequest{
   // DynamicClientRegistrationSettings defines if OAuth 2.0 clients may register
   // themselves at runtime (RFC 7591) and whether they may do so without a token.
   DynamicClientRegistrationSettings dynamic_client_registration = 3;
+
+  // ClientIDMetadataDocumentSettings defines if a client_id that is an HTTPS URL is
+  // resolved as a Client ID Metadata Document instead of being looked up in the database.
+  ClientIDMetadataDocumentSettings client_id_metadata_document = 4;
 }
 
 message SetSecuritySettingsResponse{

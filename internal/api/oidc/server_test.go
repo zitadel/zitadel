@@ -162,3 +162,42 @@ func TestServer_createDiscoveryConfig_registrationEndpoint(t *testing.T) {
 		})
 	}
 }
+
+func TestServer_createDiscoveryConfig_clientIDMetadataDocument(t *testing.T) {
+	s := &Server{
+		LegacyServer: op.NewLegacyServer(
+			func() *op.Provider {
+				//nolint:staticcheck
+				provider, _ := op.NewForwardedOpenIDProvider("path", &op.Config{}, nil)
+				return provider
+			}(),
+			op.Endpoints{Authorization: op.NewEndpoint("auth")},
+		),
+		registrationEndpoint: op.NewEndpoint("register"),
+	}
+	tests := []struct {
+		name string
+		ctx  context.Context
+		want bool
+	}{
+		{
+			name: "setting disabled, support not advertised",
+			ctx:  op.ContextWithIssuer(context.Background(), "https://issuer.com"),
+			want: false,
+		},
+		{
+			name: "setting enabled, support advertised",
+			ctx: op.ContextWithIssuer(
+				authz.NewMockContext("instance", "org", "", authz.WithMockClientIDMetadataDocument(true)),
+				"https://issuer.com",
+			),
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := s.createDiscoveryConfig(tt.ctx, nil)
+			assert.Equal(t, tt.want, got.ClientIDMetadataDocumentSupported)
+		})
+	}
+}

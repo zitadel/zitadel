@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _PurposeName = "unspecifiedauthz_instancemilestonesorganizationid_p_form_callbackfederated_logout"
+const _PurposeName = "unspecifiedauthz_instancemilestonesorganizationid_p_form_callbackfederated_logoutclient_id_metadata_document"
 
-var _PurposeIndex = [...]uint8{0, 11, 25, 35, 47, 65, 81}
+var _PurposeIndex = [...]uint8{0, 11, 25, 35, 47, 65, 81, 108}
 
-const _PurposeLowerName = "unspecifiedauthz_instancemilestonesorganizationid_p_form_callbackfederated_logout"
+const _PurposeLowerName = "unspecifiedauthz_instancemilestonesorganizationid_p_form_callbackfederated_logoutclient_id_metadata_document"
 
 func (i Purpose) String() string {
 	if i < 0 || i >= Purpose(len(_PurposeIndex)-1) {
@@ -30,23 +30,26 @@ func _PurposeNoOp() {
 	_ = x[PurposeOrganization-(3)]
 	_ = x[PurposeIdPFormCallback-(4)]
 	_ = x[PurposeFederatedLogout-(5)]
+	_ = x[PurposeClientIDMetadataDocument-(6)]
 }
 
-var _PurposeValues = []Purpose{PurposeUnspecified, PurposeAuthzInstance, PurposeMilestones, PurposeOrganization, PurposeIdPFormCallback, PurposeFederatedLogout}
+var _PurposeValues = []Purpose{PurposeUnspecified, PurposeAuthzInstance, PurposeMilestones, PurposeOrganization, PurposeIdPFormCallback, PurposeFederatedLogout, PurposeClientIDMetadataDocument}
 
 var _PurposeNameToValueMap = map[string]Purpose{
-	_PurposeName[0:11]:       PurposeUnspecified,
-	_PurposeLowerName[0:11]:  PurposeUnspecified,
-	_PurposeName[11:25]:      PurposeAuthzInstance,
-	_PurposeLowerName[11:25]: PurposeAuthzInstance,
-	_PurposeName[25:35]:      PurposeMilestones,
-	_PurposeLowerName[25:35]: PurposeMilestones,
-	_PurposeName[35:47]:      PurposeOrganization,
-	_PurposeLowerName[35:47]: PurposeOrganization,
-	_PurposeName[47:65]:      PurposeIdPFormCallback,
-	_PurposeLowerName[47:65]: PurposeIdPFormCallback,
-	_PurposeName[65:81]:      PurposeFederatedLogout,
-	_PurposeLowerName[65:81]: PurposeFederatedLogout,
+	_PurposeName[0:11]:        PurposeUnspecified,
+	_PurposeLowerName[0:11]:   PurposeUnspecified,
+	_PurposeName[11:25]:       PurposeAuthzInstance,
+	_PurposeLowerName[11:25]:  PurposeAuthzInstance,
+	_PurposeName[25:35]:       PurposeMilestones,
+	_PurposeLowerName[25:35]:  PurposeMilestones,
+	_PurposeName[35:47]:       PurposeOrganization,
+	_PurposeLowerName[35:47]:  PurposeOrganization,
+	_PurposeName[47:65]:       PurposeIdPFormCallback,
+	_PurposeLowerName[47:65]:  PurposeIdPFormCallback,
+	_PurposeName[65:81]:       PurposeFederatedLogout,
+	_PurposeLowerName[65:81]:  PurposeFederatedLogout,
+	_PurposeName[81:108]:      PurposeClientIDMetadataDocument,
+	_PurposeLowerName[81:108]: PurposeClientIDMetadataDocument,
 }
 
 var _PurposeNames = []string{
@@ -56,6 +59,7 @@ var _PurposeNames = []string{
 	_PurposeName[35:47],
 	_PurposeName[47:65],
 	_PurposeName[65:81],
+	_PurposeName[81:108],
 }
 
 // PurposeString retrieves an enum value from the enum constants string name.
