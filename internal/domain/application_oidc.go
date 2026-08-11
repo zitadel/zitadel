@@ -49,6 +49,7 @@ type OIDCApp struct {
 	BackChannelLogoutURI     *string
 	LoginVersion             *LoginVersion
 	LoginBaseURI             *string
+	MinimalIntrospection     *bool
 
 	State AppState
 }

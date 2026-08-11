@@ -341,6 +341,12 @@ message CreateOIDCApplicationRequest {
   // hosted on any other domain.
   // If unset, the login UI is chosen by the instance default.
   LoginVersion login_version = 17;
+
+  // If MinimalIntrospection is enabled, the introspection endpoint returns only the "active"
+  // field (and other token metadata) for tokens issued to this application, skipping the lookup
+  // of user information and claims. This reduces load on ZITADEL for resource servers that only
+  // need to know whether a token is still valid.
+  bool minimal_introspection = 18;
 }
 
 message CreateOIDCApplicationResponse {
@@ -388,6 +394,12 @@ message CreateSAMLApplicationResponse {}
 message CreateAPIApplicationRequest {
   // The authentication method type used by the API to authenticate at the introspection endpoint.
   APIAuthMethodType auth_method_type = 1 [(validate.rules).enum = {defined_only: true}];
+
+  // If MinimalIntrospection is enabled, the introspection endpoint returns only the "active"
+  // field (and other token metadata) for tokens issued to this application, skipping the lookup
+  // of user information and claims. This reduces load on ZITADEL for resource servers that only
+  // need to know whether a token is still valid.
+  bool minimal_introspection = 2;
 }
 
 message CreateAPIApplicationResponse {
@@ -578,11 +590,25 @@ message UpdateOIDCApplicationConfigurationRequest {
   // hosted on any other domain.
   // If unset, the login UI is chosen by the instance default.
   optional LoginVersion login_version = 17;
+
+  // If MinimalIntrospection is enabled, the introspection endpoint returns only the "active"
+  // field (and other token metadata) for tokens issued to this application, skipping the lookup
+  // of user information and claims. This reduces load on ZITADEL for resource servers that only
+  // need to know whether a token is still valid.
+  // If not set, the minimal introspection setting will not be changed.
+  optional bool minimal_introspection = 18;
 }
 
 message UpdateAPIApplicationConfigurationRequest {
   // The authentication method type used by the API to authenticate at the introspection endpoint.
   APIAuthMethodType auth_method_type = 1 [(validate.rules).enum = {defined_only: true}];
+
+  // If MinimalIntrospection is enabled, the introspection endpoint returns only the "active"
+  // field (and other token metadata) for tokens issued to this application, skipping the lookup
+  // of user information and claims. This reduces load on ZITADEL for resource servers that only
+  // need to know whether a token is still valid.
+  // If not set, the minimal introspection setting will not be changed.
+  optional bool minimal_introspection = 2;
 }
 
 message GetApplicationRequest {

@@ -52,6 +52,7 @@ func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.O
 		BackChannelLogoutURI:     gu.Ptr(writeModel.BackChannelLogoutURI),
 		LoginVersion:             gu.Ptr(writeModel.LoginVersion),
 		LoginBaseURI:             gu.Ptr(writeModel.LoginBaseURI),
+		MinimalIntrospection:     gu.Ptr(writeModel.MinimalIntrospection),
 	}
 }
 
@@ -71,12 +72,13 @@ func samlWriteModelToSAMLConfig(writeModel *SAMLApplicationWriteModel) *domain.S
 
 func apiWriteModelToAPIConfig(writeModel *APIApplicationWriteModel) *domain.APIApp {
 	return &domain.APIApp{
-		ObjectRoot:     writeModelToObjectRoot(writeModel.WriteModel),
-		AppID:          writeModel.AppID,
-		AppName:        writeModel.AppName,
-		State:          writeModel.State,
-		ClientID:       writeModel.ClientID,
-		AuthMethodType: writeModel.AuthMethodType,
+		ObjectRoot:           writeModelToObjectRoot(writeModel.WriteModel),
+		AppID:                writeModel.AppID,
+		AppName:              writeModel.AppName,
+		State:                writeModel.State,
+		ClientID:             writeModel.ClientID,
+		AuthMethodType:       writeModel.AuthMethodType,
+		MinimalIntrospection: gu.Ptr(writeModel.MinimalIntrospection),
 	}
 }
 

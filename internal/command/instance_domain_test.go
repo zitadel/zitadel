@@ -157,7 +157,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 								false,
 								"",
 								domain.LoginVersionUnspecified,
-								"",
+								"", false,
 							),
 						),
 					),

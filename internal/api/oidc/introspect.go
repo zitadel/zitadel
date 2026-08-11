@@ -96,18 +96,6 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 	if err = validateIntrospectionAudience(token.audience, client.clientID, client.projectID); err != nil {
 		return nil, err
 	}
-	userInfo, err := s.userInfo(
-		token.userID,
-		token.scope,
-		client.projectID,
-		client.clientID,
-		client.projectRoleAssertion,
-		true,
-		true,
-	)(ctx, true, domain.TriggerTypePreUserinfoCreation)
-	if err != nil {
-		return nil, err
-	}
 	introspectionResp := &oidc.IntrospectionResponse{
 		Active:                          true,
 		Scope:                           token.scope,
@@ -123,6 +111,23 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 		JWTID:                           token.tokenID,
 		Actor:                           actorDomainToClaims(token.actor),
 	}
+	// Minimal introspection is configured on the introspecting app / API client and skips
+	// the userinfo lookup (and its DB call) entirely, returning only the token metadata above.
+	if client.minimalIntrospection {
+		return op.NewResponse(introspectionResp), nil
+	}
+	userInfo, err := s.userInfo(
+		token.userID,
+		token.scope,
+		client.projectID,
+		client.clientID,
+		client.projectRoleAssertion,
+		true,
+		true,
+	)(ctx, true, domain.TriggerTypePreUserinfoCreation)
+	if err != nil {
+		return nil, err
+	}
 	introspectionResp.SetUserInfo(userInfo)
 	return op.NewResponse(introspectionResp), nil
 }
@@ -131,6 +136,7 @@ type introspectionClientResult struct {
 	clientID             string
 	projectID            string
 	projectRoleAssertion bool
+	minimalIntrospection bool
 	err                  error
 }
 
@@ -139,27 +145,27 @@ var errNoClientSecret = errors.New("client has no configured secret")
 func (s *Server) introspectionClientAuth(ctx context.Context, cc *op.ClientCredentials, rc chan<- *introspectionClientResult) {
 	ctx, span := tracing.NewSpan(ctx)
 
-	clientID, projectID, projectRoleAssertion, err := func() (string, string, bool, error) {
+	clientID, projectID, projectRoleAssertion, minimalIntrospection, err := func() (string, string, bool, bool, error) {
 		client, err := s.clientFromCredentials(ctx, cc)
 		if err != nil {
-			return "", "", false, err
+			return "", "", false, false, err
 		}
 
 		if cc.ClientAssertion != "" {
 			verifier := op.NewJWTProfileVerifierKeySet(keySetMap(client.PublicKeys), op.IssuerFromContext(ctx), time.Hour, time.Second)
 			if _, err := op.VerifyJWTAssertion(ctx, cc.ClientAssertion, verifier); err != nil {
-				return "", "", false, oidc.ErrUnauthorizedClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
+				return "", "", false, false, oidc.ErrUnauthorizedClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 			}
-			return client.ClientID, client.ProjectID, client.ProjectRoleAssertion, nil
+			return client.ClientID, client.ProjectID, client.ProjectRoleAssertion, client.MinimalIntrospection, nil
 
 		}
 		if client.HashedSecret != "" {
 			if err := s.introspectionClientSecretAuth(ctx, client, cc.ClientSecret); err != nil {
-				return "", "", false, oidc.ErrUnauthorizedClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
+				return "", "", false, false, oidc.ErrUnauthorizedClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 			}
-			return client.ClientID, client.ProjectID, client.ProjectRoleAssertion, nil
+			return client.ClientID, client.ProjectID, client.ProjectRoleAssertion, client.MinimalIntrospection, nil
 		}
-		return "", "", false, oidc.ErrUnauthorizedClient().WithParent(errNoClientSecret).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
+		return "", "", false, false, oidc.ErrUnauthorizedClient().WithParent(errNoClientSecret).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 	}()
 
 	span.EndWithError(err)
@@ -168,6 +174,7 @@ func (s *Server) introspectionClientAuth(ctx context.Context, cc *op.ClientCrede
 		clientID:             clientID,
 		projectID:            projectID,
 		projectRoleAssertion: projectRoleAssertion,
+		minimalIntrospection: minimalIntrospection,
 		err:                  err,
 	}
 }

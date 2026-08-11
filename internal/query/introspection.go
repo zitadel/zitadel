@@ -41,6 +41,7 @@ type IntrospectionClient struct {
 	ResourceOwner        string
 	ProjectRoleAssertion bool
 	PublicKeys           database.Map[[]byte]
+	MinimalIntrospection bool
 }
 
 //go:embed introspection_client_by_id.sql
@@ -65,6 +66,7 @@ func (q *Queries) ActiveIntrospectionClientByID(ctx context.Context, clientID st
 			&client.ResourceOwner,
 			&client.ProjectRoleAssertion,
 			&client.PublicKeys,
+			&client.MinimalIntrospection,
 		)
 	},
 		introspectionClientByIDQuery,

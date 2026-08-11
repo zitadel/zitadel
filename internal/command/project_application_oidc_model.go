@@ -39,6 +39,7 @@ type OIDCApplicationWriteModel struct {
 	BackChannelLogoutURI     string
 	LoginVersion             domain.LoginVersion
 	LoginBaseURI             string
+	MinimalIntrospection     bool
 	oidc                     bool
 }
 
@@ -140,6 +141,7 @@ func (wm *OIDCApplicationWriteModel) Reduce() error {
 			wm.BackChannelLogoutURI = ""
 			wm.LoginVersion = domain.LoginVersionUnspecified
 			wm.LoginBaseURI = ""
+			wm.MinimalIntrospection = false
 			wm.oidc = false
 			wm.AppName = e.Name
 			wm.State = domain.AppStateActive
@@ -189,6 +191,7 @@ func (wm *OIDCApplicationWriteModel) Reduce() error {
 			wm.BackChannelLogoutURI = ""
 			wm.LoginVersion = domain.LoginVersionUnspecified
 			wm.LoginBaseURI = ""
+			wm.MinimalIntrospection = false
 			wm.oidc = false
 			wm.State = domain.AppStateRemoved
 		}
@@ -218,6 +221,7 @@ func (wm *OIDCApplicationWriteModel) appendAddOIDCEvent(e *project.OIDCConfigAdd
 	wm.BackChannelLogoutURI = e.BackChannelLogoutURI
 	wm.LoginVersion = e.LoginVersion
 	wm.LoginBaseURI = e.LoginBaseURI
+	wm.MinimalIntrospection = e.MinimalIntrospection
 }
 
 func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfigChangedEvent) {
@@ -275,6 +279,9 @@ func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfig
 	if e.LoginBaseURI != nil {
 		wm.LoginBaseURI = *e.LoginBaseURI
 	}
+	if e.MinimalIntrospection != nil {
+		wm.MinimalIntrospection = *e.MinimalIntrospection
+	}
 }
 
 func (wm *OIDCApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
@@ -320,6 +327,7 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	backChannelLogoutURI *string,
 	loginVersion *domain.LoginVersion,
 	loginBaseURI *string,
+	minimalIntrospection *bool,
 ) (*project.OIDCConfigChangedEvent, bool, error) {
 	changes := make([]project.OIDCConfigChanges, 0)
 	var err error
@@ -377,6 +385,9 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	}
 	if loginBaseURI != nil && wm.LoginBaseURI != *loginBaseURI {
 		changes = append(changes, project.ChangeOIDCLoginBaseURI(*loginBaseURI))
+	}
+	if minimalIntrospection != nil && wm.MinimalIntrospection != *minimalIntrospection {
+		changes = append(changes, project.ChangeOIDCMinimalIntrospection(*minimalIntrospection))
 	}
 
 	if len(changes) == 0 {
