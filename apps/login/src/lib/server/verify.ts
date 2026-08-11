@@ -27,6 +27,7 @@ import { checkMFAFactors } from "../mfa-helper";
 import { getServiceConfig } from "../service-url";
 import { loadMostRecentSession } from "../session";
 import { createSessionAndUpdateCookie } from "./cookie";
+import { getEnrollmentAuthorizationError } from "./enrollment-guard";
 import { getPublicHostWithProtocol } from "./host";
 
 const logger = createLogger("verify");
@@ -41,8 +42,19 @@ export async function verifyTOTP(code: string, loginName?: string, organization?
       loginName,
       organization,
     },
-  }).then((session) => {
+  }).then(async (session) => {
     if (session?.factors?.user?.id) {
+      // Enrollment must be authorized: a bare identify-only session must not be able to
+      // activate a TOTP factor on the account (GHSA-45f2-5q3r-xgg6).
+      const enrollmentError = await getEnrollmentAuthorizationError({
+        serviceConfig,
+        session,
+        userId: session.factors.user.id,
+      });
+      if (enrollmentError) {
+        return { error: enrollmentError };
+      }
+
       return verifyTOTPRegistration({ serviceConfig, code, userId: session.factors.user.id });
     } else {
       throw Error("No user id found in session.");

@@ -208,34 +208,6 @@ func Test_addZitadelProviderToCommand(t *testing.T) {
 		want command.ZitadelProvider
 	}{
 		{
-			name: "without instance roles info",
-			req: &mgmt_pb.AddZitadelProviderRequest{
-				Name:         "Zitadel Support IdP",
-				ClientId:     "test-client",
-				ClientSecret: "test-secret",
-				Scopes:       []string{"email", "profile", "urn:zitadel:iam:org:project:roles"},
-				ProviderOptions: &idp_pb.Options{
-					IsLinkingAllowed:  false,
-					IsCreationAllowed: true,
-					IsAutoCreation:    false,
-					IsAutoUpdate:      true,
-					AutoLinking:       0,
-				},
-			},
-			want: command.ZitadelProvider{
-				Name:         "Zitadel Support IdP",
-				ClientID:     "test-client",
-				ClientSecret: "test-secret",
-				Scopes:       []string{"email", "profile", "urn:zitadel:iam:org:project:roles"},
-				IDPOptions: idp.Options{
-					IsCreationAllowed: true,
-					IsAutoCreation:    false,
-					IsLinkingAllowed:  false,
-					IsAutoUpdate:      true,
-				},
-			},
-		},
-		{
 			name: "all fields filled",
 			req: &mgmt_pb.AddZitadelProviderRequest{
 				Name:         "Zitadel Support IdP",
@@ -249,17 +221,6 @@ func Test_addZitadelProviderToCommand(t *testing.T) {
 					IsAutoUpdate:      true,
 					AutoLinking:       0,
 				},
-				InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-					{
-						OrganizationId:     "org1",
-						OrganizationDomain: "org1.com",
-					},
-					{
-
-						OrganizationId:     "org2",
-						OrganizationDomain: "org2.com",
-					},
-				},
 			},
 			want: command.ZitadelProvider{
 				Name:         "Zitadel Support IdP",
@@ -271,16 +232,6 @@ func Test_addZitadelProviderToCommand(t *testing.T) {
 					IsAutoCreation:    false,
 					IsLinkingAllowed:  false,
 					IsAutoUpdate:      true,
-				},
-				InstanceRolesInfo: []idp.RolesInfo{
-					{
-						OrganizationID:     "org1",
-						OrganizationDomain: "org1.com",
-					},
-					{
-						OrganizationID:     "org2",
-						OrganizationDomain: "org2.com",
-					},
 				},
 			},
 		},
@@ -302,35 +253,6 @@ func Test_updateZitadelProviderToCommand(t *testing.T) {
 		want command.ZitadelProvider
 	}{
 		{
-			name: "without instance roles info",
-			req: &mgmt_pb.UpdateZitadelProviderRequest{
-				Name:         "Zitadel Support IdP",
-				ClientId:     "test-client",
-				ClientSecret: "test-secret",
-				Scopes:       []string{"email", "profile", "urn:zitadel:iam:org:project:roles"},
-				ProviderOptions: &idp_pb.Options{
-					IsLinkingAllowed:  false,
-					IsCreationAllowed: true,
-					IsAutoCreation:    false,
-					IsAutoUpdate:      true,
-					AutoLinking:       0,
-				},
-			},
-			want: command.ZitadelProvider{
-				Name:         "Zitadel Support IdP",
-				ClientID:     "test-client",
-				ClientSecret: "test-secret",
-				Scopes:       []string{"email", "profile", "urn:zitadel:iam:org:project:roles"},
-				IDPOptions: idp.Options{
-					IsCreationAllowed: true,
-					IsAutoCreation:    false,
-					IsLinkingAllowed:  false,
-					IsAutoUpdate:      true,
-				},
-				InstanceRolesInfo: nil,
-			},
-		},
-		{
 			name: "all fields filled",
 			req: &mgmt_pb.UpdateZitadelProviderRequest{
 				Name:         "Zitadel Support IdP",
@@ -344,17 +266,6 @@ func Test_updateZitadelProviderToCommand(t *testing.T) {
 					IsAutoUpdate:      true,
 					AutoLinking:       0,
 				},
-				InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-					{
-						OrganizationId:     "org1",
-						OrganizationDomain: "org1.com",
-					},
-					{
-
-						OrganizationId:     "org2",
-						OrganizationDomain: "org2.com",
-					},
-				},
 			},
 			want: command.ZitadelProvider{
 				Name:         "Zitadel Support IdP",
@@ -366,16 +277,6 @@ func Test_updateZitadelProviderToCommand(t *testing.T) {
 					IsAutoCreation:    false,
 					IsLinkingAllowed:  false,
 					IsAutoUpdate:      true,
-				},
-				InstanceRolesInfo: []idp.RolesInfo{
-					{
-						OrganizationID:     "org1",
-						OrganizationDomain: "org1.com",
-					},
-					{
-						OrganizationID:     "org2",
-						OrganizationDomain: "org2.com",
-					},
 				},
 			},
 		},

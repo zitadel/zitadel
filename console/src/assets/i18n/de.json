@@ -664,6 +664,7 @@
     "ORG_USER_PERMISSION_EDITOR": "Verfügt über die Berechtigung zum Verwalten von Rollen-Zuweisungen",
     "ORG_PROJECT_PERMISSION_EDITOR": "Hat die Berechtigung, Projektberechtigungen für externe Organisationen zu verwalten",
     "ORG_PROJECT_CREATOR": "Hat die Berechtigung, seine eigenen Projekte und dessen Einstellungen zu erstellen",
+    "ORG_DYNAMIC_CLIENT_REGISTRAR": "Hat die Berechtigung, OAuth-2.0-Clients dynamisch zu registrieren",
     "ORG_ADMIN_IMPERSONATOR": "Hat die Berechtigung, sich als Administrator und Endbenutzer der Organisation auszugeben",
     "ORG_END_USER_IMPERSONATOR": "Hat die Berechtigung, sich als Endbenutzer der Organisation auszugeben",
     "ORG_USER_SELF_MANAGER": "Hat die Berechtigung, seinen eigenen Benutzer zu verwalten",
