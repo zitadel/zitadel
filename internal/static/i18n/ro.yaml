@@ -612,10 +612,10 @@ Errors:
     KeyIDMissing: "KeyID lipsă"
     PrivateKeyMissing: "Cheie Privată lipsă"
     InvalidPrivateKey: "Format de cheie privată nevalid"
-    AuthorizationParameterNameMissing: "Authorization parameter name missing"
-    AuthorizationParameterNameInvalid: "Invalid authorization parameter name"
-    AuthorizationParameterDuplicate: "Authorization parameter defined more than once"
-    AuthorizationParameterReserved: "Authorization parameter is managed by ZITADEL and can not be set"
+    AuthorizationParameterNameMissing: "Numele parametrului de autorizare lipsește"
+    AuthorizationParameterNameInvalid: "Nume de parametru de autorizare nevalid"
+    AuthorizationParameterDuplicate: "Parametrul de autorizare este definit de mai multe ori"
+    AuthorizationParameterReserved: "Parametrul de autorizare este gestionat de ZITADEL și nu poate fi setat"
 
     AggregateTypes:
       action: "Acțiune"

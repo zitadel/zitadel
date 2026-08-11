@@ -617,10 +617,10 @@ Errors:
     KeyIDMissing: "密钥 ID 丢失"
     PrivateKeyMissing: "私钥丢失"
     InvalidPrivateKey: "无效的私钥格式"
-    AuthorizationParameterNameMissing: "Authorization parameter name missing"
-    AuthorizationParameterNameInvalid: "Invalid authorization parameter name"
-    AuthorizationParameterDuplicate: "Authorization parameter defined more than once"
-    AuthorizationParameterReserved: "Authorization parameter is managed by ZITADEL and can not be set"
+    AuthorizationParameterNameMissing: "缺少授权参数名称"
+    AuthorizationParameterNameInvalid: "无效的授权参数名称"
+    AuthorizationParameterDuplicate: "授权参数被重复定义"
+    AuthorizationParameterReserved: "授权参数由 ZITADEL 管理，无法设置"
 
 AggregateTypes:
   action: "动作"

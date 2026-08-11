@@ -614,10 +614,10 @@ Errors:
     KeyIDMissing: "Chybí KeyID"
     PrivateKeyMissing: "Chybí privátní klíč"
     InvalidPrivateKey: "Neplatný formát privátního klíče"
-    AuthorizationParameterNameMissing: "Authorization parameter name missing"
-    AuthorizationParameterNameInvalid: "Invalid authorization parameter name"
-    AuthorizationParameterDuplicate: "Authorization parameter defined more than once"
-    AuthorizationParameterReserved: "Authorization parameter is managed by ZITADEL and can not be set"
+    AuthorizationParameterNameMissing: "Chybí název autorizačního parametru"
+    AuthorizationParameterNameInvalid: "Neplatný název autorizačního parametru"
+    AuthorizationParameterDuplicate: "Autorizační parametr je definován více než jednou"
+    AuthorizationParameterReserved: "Autorizační parametr je spravován systémem ZITADEL a nelze jej nastavit"
 
 AggregateTypes:
   action: "Akce"

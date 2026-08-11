@@ -617,10 +617,10 @@ Errors:
     KeyIDMissing: "KeyID eksik"
     PrivateKeyMissing: "Özel Anahtar eksik"
     InvalidPrivateKey: "Geçersiz özel anahtar biçimi"
-    AuthorizationParameterNameMissing: "Authorization parameter name missing"
-    AuthorizationParameterNameInvalid: "Invalid authorization parameter name"
-    AuthorizationParameterDuplicate: "Authorization parameter defined more than once"
-    AuthorizationParameterReserved: "Authorization parameter is managed by ZITADEL and can not be set"
+    AuthorizationParameterNameMissing: "Yetkilendirme parametresi adı eksik"
+    AuthorizationParameterNameInvalid: "Geçersiz yetkilendirme parametresi adı"
+    AuthorizationParameterDuplicate: "Yetkilendirme parametresi birden fazla kez tanımlanmış"
+    AuthorizationParameterReserved: "Yetkilendirme parametresi ZITADEL tarafından yönetilir ve ayarlanamaz"
 
 AggregateTypes:
   action: "Eylem"

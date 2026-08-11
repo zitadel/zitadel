@@ -605,10 +605,10 @@ Errors:
     KeyIDMissing: "KeyID отсутствует"
     PrivateKeyMissing: "Закрытый ключ отсутствует"
     InvalidPrivateKey: "Неверный формат приватного ключа"
-    AuthorizationParameterNameMissing: "Authorization parameter name missing"
-    AuthorizationParameterNameInvalid: "Invalid authorization parameter name"
-    AuthorizationParameterDuplicate: "Authorization parameter defined more than once"
-    AuthorizationParameterReserved: "Authorization parameter is managed by ZITADEL and can not be set"
+    AuthorizationParameterNameMissing: "Отсутствует имя параметра авторизации"
+    AuthorizationParameterNameInvalid: "Неверное имя параметра авторизации"
+    AuthorizationParameterDuplicate: "Параметр авторизации определён более одного раза"
+    AuthorizationParameterReserved: "Параметр авторизации управляется ZITADEL и не может быть задан"
 
 AggregateTypes:
   action: "Действие"

@@ -616,10 +616,10 @@ Errors:
     KeyIDMissing: "Липсва KeyID"
     PrivateKeyMissing: "Липсва частен ключ"
     InvalidPrivateKey: "Невалиден формат на частния ключ"
-    AuthorizationParameterNameMissing: "Authorization parameter name missing"
-    AuthorizationParameterNameInvalid: "Invalid authorization parameter name"
-    AuthorizationParameterDuplicate: "Authorization parameter defined more than once"
-    AuthorizationParameterReserved: "Authorization parameter is managed by ZITADEL and can not be set"
+    AuthorizationParameterNameMissing: "Липсва име на параметъра за оторизация"
+    AuthorizationParameterNameInvalid: "Невалидно име на параметъра за оторизация"
+    AuthorizationParameterDuplicate: "Параметърът за оторизация е дефиниран повече от веднъж"
+    AuthorizationParameterReserved: "Параметърът за оторизация се управлява от ZITADEL и не може да бъде задаван"
 
 AggregateTypes:
   action: "Действие"

@@ -617,10 +617,10 @@ Errors:
     KeyIDMissing: "キーIDがありません"
     PrivateKeyMissing: "秘密キーがありません"
     InvalidPrivateKey: "無効な秘密鍵形式"
-    AuthorizationParameterNameMissing: "Authorization parameter name missing"
-    AuthorizationParameterNameInvalid: "Invalid authorization parameter name"
-    AuthorizationParameterDuplicate: "Authorization parameter defined more than once"
-    AuthorizationParameterReserved: "Authorization parameter is managed by ZITADEL and can not be set"
+    AuthorizationParameterNameMissing: "認可パラメーター名がありません"
+    AuthorizationParameterNameInvalid: "無効な認可パラメーター名"
+    AuthorizationParameterDuplicate: "認可パラメーターが複数回定義されています"
+    AuthorizationParameterReserved: "認可パラメーターはZITADELによって管理されているため、設定できません"
 
 AggregateTypes:
   action: "アクション"
