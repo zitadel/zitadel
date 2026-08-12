@@ -2617,6 +2617,25 @@
       "DEVMODEDESC": "注意：開発モードを有効にすると、URIが認証されません。",
       "SKIPNATIVEAPPSUCCESSPAGE": "ログイン後に成功ページをスキップする",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "このネイティブアプリのログイン後に成功ページをスキップする",
+      "APPLINKSSECTION": "ネイティブアプリリンク",
+      "APPLINKSDESC": "このインスタンスがネイティブアプリ向けのパスキー信頼ファイルを提供できるよう、iOS / Android の関連付けを設定します。",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "apple-app-site-association の webcredentials エントリ TEAMID.BUNDLEID として提供されます。",
+      "TEAMID": "チーム ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Apple Team ID は英数字ちょうど 10 文字である必要があります（例: ABCDE12345）。",
+      "TEAMIDLENGTH": "Team ID は英数字ちょうど 10 文字である必要があります。",
+      "BUNDLEID": "バンドル ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "iOS の Bundle Identifier（CFBundleIdentifier）、例: com.example.app。Team ID プレフィックスは含めないでください。",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "Digital Asset Links / パスキー認証情報用に assetlinks.json で提供されます。",
+      "PACKAGENAME": "パッケージ名",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "Android の applicationId / パッケージ名、例: com.example.app。",
+      "FINGERPRINTS": "SHA-256 証明書フィンガープリント",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "1 行に 1 つ（16 進 64 文字、コロンは任意）。必要に応じてデバッグ用とリリース用を含めてください。",
       "REDIRECT": "リダイレクトURI",
       "REDIRECTSECTION": "リダイレクトURI",
       "POSTLOGOUTREDIRECT": "ログアウトURI",
@@ -2680,7 +2699,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "バックチャネルログアウトURI"
+      "BACKCHANNELLOOGOUTURI": "バックチャネルログアウトURI",
+      "IOSAPPLINKINCOMPLETE": "iOS の Team ID と Bundle ID は両方設定するか、両方とも空にしてください。",
+      "ANDROIDPACKAGEREQUIRED": "証明書フィンガープリントを設定する場合、Android パッケージ名は必須です。"
     },
     "API": {
       "INFO": {

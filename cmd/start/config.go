@@ -24,6 +24,7 @@ import (
 	scim_config "github.com/zitadel/zitadel/internal/api/scim/config"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
+	"github.com/zitadel/zitadel/internal/api/well_known"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command"
@@ -72,6 +73,7 @@ type Config struct {
 	SCIM                scim_config.Config
 	Login               login.Config
 	Console             console.Config
+	WellKnown           well_known.Config
 	AssetStorage        static_config.AssetStorageConfig
 	InternalAuthZ       authz.Config
 	SystemAuthZ         authz.Config
