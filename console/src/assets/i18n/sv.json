@@ -2619,6 +2619,25 @@
       "DEVMODEDESC": "Observera: Med utvecklingsläge aktiverat kommer omdirigerings-URI:er inte att valideras.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Hoppa över inloggningsframgångssida",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Hoppa över framgångssidan efter en inloggning för denna inhemska app.",
+      "APPLINKSSECTION": "Länkar för inbyggda appar",
+      "APPLINKSDESC": "Konfigurera iOS- och Android-association så att den här instansen kan servera passkey-trustfiler för dina inbyggda appar.",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "Serveras i apple-app-site-association som webcredentials-posten TEAMID.BUNDLEID.",
+      "TEAMID": "Team-ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Apple Team ID måste vara exakt 10 alfanumeriska tecken, t.ex. ABCDE12345.",
+      "TEAMIDLENGTH": "Team ID måste vara exakt 10 alfanumeriska tecken.",
+      "BUNDLEID": "Bundle-ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "iOS Bundle Identifier (CFBundleIdentifier), t.ex. com.example.app. Inkludera inte Team ID-prefixet.",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "Serveras i assetlinks.json för Digital Asset Links / passkey-uppgifter.",
+      "PACKAGENAME": "Paketnamn",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "Android applicationId / paketnamn, t.ex. com.example.app.",
+      "FINGERPRINTS": "SHA-256-certifikatfingeravtryck",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "Ett fingeravtryck per rad (64 hexadecimala tecken, kolon valfritt). Inkludera debug och release vid behov.",
       "REDIRECT": "Omdirigerings-URI:er",
       "REDIRECTSECTION": "Omdirigerings-URI:er",
       "POSTLOGOUTREDIRECT": "Post Logout-URI:er",
@@ -2682,7 +2701,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID och Bundle ID måste båda anges, eller båda lämnas tomma.",
+      "ANDROIDPACKAGEREQUIRED": "Android-paketnamn krävs när certifikatfingeravtryck anges."
     },
     "API": {
       "INFO": {

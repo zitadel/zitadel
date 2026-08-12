@@ -742,6 +742,114 @@ func TestCommands_CreateInviteCode(t *testing.T) {
 				returnCode: gu.Ptr("code2"),
 			},
 		},
+		{
+			"user already has an auth method, precondition failed",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								"username", "firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.Afrikaans,
+								domain.GenderUnspecified,
+								"email",
+								false,
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								"idpConfigID", "displayName", "externalUserID",
+							),
+						),
+					),
+				),
+				checkPermission:         newMockPermissionCheckAllowed(),
+				defaultSecretGenerators: &SecretGenerators{},
+			},
+			args{
+				ctx: context.Background(),
+				invite: &CreateUserInvite{
+					UserID: "userID",
+				},
+			},
+			want{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-EF34g", "Errors.User.AlreadyInitialised"),
+			},
+		},
+		{
+			"create ok after all auth methods removed",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								"username", "firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.Afrikaans,
+								domain.GenderUnspecified,
+								"email",
+								false,
+							),
+						),
+						// user linked an IDP, then it was removed again
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								"idpConfigID", "displayName", "externalUserID",
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserIDPLinkRemovedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								"idpConfigID", "externalUserID",
+							),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code"),
+								},
+								time.Hour,
+								"",
+								false,
+								"",
+								"",
+							),
+						),
+					),
+				),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code", time.Hour),
+				defaultSecretGenerators:     &SecretGenerators{},
+			},
+			args{
+				ctx: context.Background(),
+				invite: &CreateUserInvite{
+					UserID: "userID",
+				},
+			},
+			want{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+					ID:            "userID",
+				},
+				returnCode: nil,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
