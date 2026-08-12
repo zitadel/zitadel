@@ -2704,6 +2704,25 @@
       "DEVMODEDESC": "Осторожно: При включённом режиме разработки URI перенаправления не будут проверяться.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Пропустить страницу успешного входа в систему",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Пропустите страницу успеха после входа в систему для этого собственного приложения.",
+      "APPLINKSSECTION": "Ссылки нативных приложений",
+      "APPLINKSDESC": "Настройте ассоциацию iOS и Android, чтобы этот инстанс мог отдавать trust-файлы passkey для ваших нативных приложений.",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "Отдаётся в apple-app-site-association как запись webcredentials TEAMID.BUNDLEID.",
+      "TEAMID": "Team ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Apple Team ID должен состоять ровно из 10 буквенно-цифровых символов, напр. ABCDE12345.",
+      "TEAMIDLENGTH": "Team ID должен состоять ровно из 10 буквенно-цифровых символов.",
+      "BUNDLEID": "Bundle ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "iOS Bundle Identifier (CFBundleIdentifier), напр. com.example.app. Не включайте префикс Team ID.",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "Отдаётся в assetlinks.json для Digital Asset Links / учётных данных passkey.",
+      "PACKAGENAME": "Имя пакета",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "Android applicationId / имя пакета, напр. com.example.app.",
+      "FINGERPRINTS": "Отпечатки сертификата SHA-256",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "Один отпечаток в строке (64 шестнадцатеричных символа, двоеточия необязательны). При необходимости укажите debug и release.",
       "REDIRECT": "Перенаправление URI",
       "REDIRECTSECTION": "Перенаправление URI",
       "POSTLOGOUTREDIRECT": "URI после выхода из системы",
@@ -2767,7 +2786,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "URI выхода из системы через резервный канал"
+      "BACKCHANNELLOOGOUTURI": "URI выхода из системы через резервный канал",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID и Bundle ID должны быть заданы вместе или оба оставлены пустыми.",
+      "ANDROIDPACKAGEREQUIRED": "Имя пакета Android обязательно, если заданы отпечатки сертификата."
     },
     "API": {
       "INFO": {
