@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/muhlemmer/gu"
+
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
@@ -49,6 +51,14 @@ type OIDCApp struct {
 	BackChannelLogoutURI     *string
 	LoginVersion             *LoginVersion
 	LoginBaseURI             *string
+	// IOSTeamID and IOSBundleID are Associated Domains / passkey trust fields.
+	// Both must be set together, or both empty. Composed as TEAMID.BUNDLEID in AASA.
+	IOSTeamID   *string
+	IOSBundleID *string
+	// AndroidPackageName and AndroidSHA256CertFingerprints are Digital Asset Links /
+	// passkey trust fields. Package name is required when fingerprints are non-empty.
+	AndroidPackageName            *string
+	AndroidSHA256CertFingerprints []string
 
 	State AppState
 }
@@ -138,7 +148,7 @@ const (
 )
 
 func (a *OIDCApp) IsValid() bool {
-	if (a.ClockSkew != nil && (*a.ClockSkew > time.Second*5 || *a.ClockSkew < time.Second*0)) || !a.OriginsValid() {
+	if (a.ClockSkew != nil && (*a.ClockSkew > time.Second*5 || *a.ClockSkew < time.Second*0)) || !a.OriginsValid() || !a.AppLinkConfigValid() {
 		return false
 	}
 	grantTypes := a.getRequiredGrantTypes()
@@ -152,6 +162,19 @@ func (a *OIDCApp) IsValid() bool {
 		}
 	}
 	return true
+}
+
+// AppLinkConfigValid checks sibling rules for iOS/Android association fields.
+// Nil and blank (after trim) are treated the same: both iOS fields must be set or
+// both empty; Android package name is required whenever fingerprints are present.
+func (a *OIDCApp) AppLinkConfigValid() bool {
+	teamID := strings.TrimSpace(gu.Value(a.IOSTeamID))
+	bundleID := strings.TrimSpace(gu.Value(a.IOSBundleID))
+	if (teamID == "") != (bundleID == "") {
+		return false
+	}
+	packageName := strings.TrimSpace(gu.Value(a.AndroidPackageName))
+	return len(a.AndroidSHA256CertFingerprints) == 0 || packageName != ""
 }
 
 func (a *OIDCApp) OriginsValid() bool {

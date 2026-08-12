@@ -269,6 +269,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "apis/openidoauth/grant-types",
           "apis/openidoauth/authrequest",
           "guides/integrate/login/oidc/webkeys",
+          "guides/integrate/login/oidc/native-app-links",
           "guides/integrate/token-exchange",
         ],
       },
