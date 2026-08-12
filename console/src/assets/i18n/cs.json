@@ -2600,6 +2600,25 @@
       "DEVMODEDESC": "Pozor: S povoleným vývojovým režimem nebudou URI pro přesměrování ověřovány.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Přeskočit stránku úspěchu přihlášení",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Přeskočit stránku úspěchu po přihlášení pro tuto nativní aplikaci.",
+      "APPLINKSSECTION": "Odkazy pro nativní aplikace",
+      "APPLINKSDESC": "Nakonfigurujte asociaci iOS a Android, aby tato instance mohla poskytovat trust soubory pro passkeys vašich nativních aplikací.",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "Poskytováno v apple-app-site-association jako webcredentials položka TEAMID.BUNDLEID.",
+      "TEAMID": "Team ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Apple Team ID musí mít přesně 10 alfanumerických znaků, např. ABCDE12345.",
+      "TEAMIDLENGTH": "Team ID musí mít přesně 10 alfanumerických znaků.",
+      "BUNDLEID": "Bundle ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "iOS Bundle Identifier (CFBundleIdentifier), např. com.example.app. Nezahrnujte prefix Team ID.",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "Poskytováno v assetlinks.json pro Digital Asset Links / passkey credentials.",
+      "PACKAGENAME": "Název balíčku",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "Android applicationId / název balíčku, např. com.example.app.",
+      "FINGERPRINTS": "SHA-256 otisky certifikátů",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "Jeden otisk na řádek (64 hexadecimálních znaků, dvojtečky volitelně). Podle potřeby uveďte debug i release.",
       "REDIRECT": "URI pro přesměrování",
       "REDIRECTSECTION": "URI pro přesměrování",
       "POSTLOGOUTREDIRECT": "URI po odhlášení",
@@ -2663,7 +2682,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID a Bundle ID musí být nastaveny společně, nebo obě ponechány prázdné.",
+      "ANDROIDPACKAGEREQUIRED": "Název balíčku Android je povinný, pokud jsou nastaveny otisky certifikátu."
     },
     "API": {
       "INFO": {
