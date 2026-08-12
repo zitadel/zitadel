@@ -12,8 +12,18 @@
 //      the error catalog from generate-error-reference.ts for the why-text.
 //
 // Run: node apps/docs/scripts/generate-endpoint-errors.ts
-// (standalone, like generate-error-reference.ts — not wired into the docs
-// build's `generate` chain; re-run manually after adding more traced output)
+// This *is* wired into the docs build's `generate` chain — the last step of
+// generate-api-reference.ts's `--only-fix` branch calls it, so every normal
+// docs build (and every Vercel deploy) re-applies whatever tracing JSON is
+// committed under endpoint-error-tracing/, with no extra step. Deliberate:
+// it's what makes "commit the tracing JSON, the pages update themselves" true.
+// You only need to run this file directly when iterating locally without
+// wanting to run the full docs generation pipeline.
+//
+// Unlike generate-error-reference.ts (which scans 2000+ backend Go files and
+// is genuinely too slow to run on every build), this only reads the small
+// set of already-traced JSON files plus the .proto files — cheap enough to
+// run on every generate.
 //
 // ── The standard: what a v2 service needs for this to pick it up ────────
 // discoverServices() below scans proto/zitadel/*/v2/*_service.proto and
@@ -250,6 +260,26 @@ function findCluster(id: string, file: string, line: number): ErrorCluster | nul
   return fallback ?? clusters.find((c) => c.ids.some((e) => e.id === id)) ?? null;
 }
 
+// A "GRPC-<CODE>" id (from internal/tools/errortrace's recordRawStatus) is a
+// raw status.Errorf(codes.X, ...) call, not a zerrors.Throw* — it was never
+// scanned into the error catalog, so there's no cluster to look up. Build
+// one on the fly instead of reporting it as unmatched: the code name alone
+// is enough to know the HTTP/gRPC status, and the traced site carries its
+// own literal message (see errorSite.Message in main.go) since nothing else
+// has it.
+function syntheticGrpcCluster(id: string, message: string): ErrorCluster | null {
+  if (!id.startsWith('GRPC-')) return null;
+  const status = GRPC_STATUS[id.slice('GRPC-'.length)];
+  if (!status) return null;
+  return {
+    key: `synthetic|${id}`,
+    message,
+    why: `This operation returns this status directly from its handler code, rather than through the usual error-catalog convention — so this explanation is mechanical, not researched.`,
+    ids: [{ id, locations: [] }],
+    example: { httpStatus: status.httpStatus, grpcCode: status.code },
+  };
+}
+
 // --- .proto openapiv2 annotation parsing -----------------------------------
 
 function extractBalancedFrom(text: string, searchStart: number): string | null {
@@ -313,14 +343,23 @@ function main() {
     // Scoped to this service's own tracing subdirectory — keeps two
     // services from silently colliding if they happen to both define an
     // operation with the same name.
-    const traced: Record<string, { errors: { id: string; file: string; line: number }[] }> = {};
+    const traced: Record<string, { errors: { id: string; file: string; line: number; message?: string }[] }> = {};
     if (existsSync(svc.tracingDir)) {
       for (const f of readdirSync(svc.tracingDir).filter((f) => f.endsWith('.json'))) {
         Object.assign(traced, JSON.parse(readFileSync(join(svc.tracingDir, f), 'utf8')));
       }
     }
 
-    for (const [operationId, opData] of Object.entries(traced)) {
+    // Union declaredByOp into the operation list, but only for a service
+    // that's actually been traced at all (traced has >=1 entry) — within an
+    // already-traced service, an operation with proto-declared responses but
+    // nothing in `traced` must still show its declared defaults rather than
+    // being silently skipped. For a service nobody has traced yet, stay
+    // fully empty rather than surface generic proto-declared placeholders
+    // for every operation across every untouched service.
+    const operationIds =
+      Object.keys(traced).length > 0 ? new Set([...Object.keys(traced), ...Object.keys(declaredByOp)]) : new Set(Object.keys(traced));
+    for (const operationId of operationIds) {
       const mdxPath = join(svc.contentDir, `${svc.service}.${operationId}.mdx`);
       if (!existsSync(mdxPath)) continue;
 
@@ -328,8 +367,12 @@ function main() {
       for (const d of declaredByOp[operationId] ?? []) {
         byStatus.set(d.status, { status: d.status, statusText: STATUS_TEXT[d.status] ?? '', description: d.description, causes: [] });
       }
-      for (const site of opData.errors) {
-        const cluster = findCluster(site.id, site.file, site.line);
+      for (const site of traced[operationId]?.errors ?? []) {
+        // A real, hand-assigned zerrors ID can coincidentally start with
+        // "GRPC-" too (confirmed: GRPC-vR9nC is a real catalog entry, not
+        // one of ours) — so the real catalog always gets first look, and
+        // the synthetic path is only a fallback for what it can't explain.
+        const cluster = findCluster(site.id, site.file, site.line) ?? syntheticGrpcCluster(site.id, site.message ?? '');
         if (!cluster) {
           unmatched++;
           continue;
@@ -344,15 +387,42 @@ function main() {
         }
       }
 
-      const groups = [...byStatus.values()].sort((a, b) => a.status - b.status);
+      // A status declared generically at the proto/file level (not
+      // substantiated by any traced cause) is a reasonable placeholder when
+      // this operation was never traced — we genuinely don't know yet. But
+      // if it *was* traced and the tracer confidently found zero reachable
+      // causes for that status, keeping the declared-only group is actively
+      // misleading, not just incomplete: e.g. SetOrganizationFeatures is a
+      // one-line `status.Errorf(codes.Unimplemented, ...)` stub that never
+      // touches zerrors at all, so it can only ever return UNIMPLEMENTED —
+      // yet the proto's generic file-level 403/404 defaults would otherwise
+      // show up here as if they were real possibilities for this endpoint.
+      const wasTraced = operationId in traced;
+      const byStatusFiltered = wasTraced ? new Map([...byStatus].filter(([, g]) => g.causes.length > 0)) : byStatus;
+      const groups = [...byStatusFiltered.values()].sort((a, b) => a.status - b.status);
       for (const g of groups) g.causes.sort((a, b) => a.message.localeCompare(b.message));
-      if (groups.length === 0) continue;
-
-      data[svc.service][operationId] = groups;
-
-      const original = readFileSync(mdxPath, 'utf8');
       const marker = '## Possible error responses';
+      const original = readFileSync(mdxPath, 'utf8');
       const base = original.includes(marker) ? original.slice(0, original.indexOf(marker)) : original;
+
+      if (groups.length === 0 && !wasTraced) {
+        // Never traced at all — stay fully silent rather than expose
+        // internal tooling state ("not traced yet") on a public docs page.
+        // Still strip a stale section from a previous run if one exists:
+        // original only differs from base when the marker was actually
+        // present, so this is a no-op write otherwise.
+        if (original !== base) writeFileSync(mdxPath, base.replace(/\n*$/, '') + '\n');
+        continue;
+      }
+
+      // Two ways to land here with an empty `groups`: either it genuinely
+      // has causes, or it was traced and confidently found none (an empty
+      // array here, as opposed to no entry at all, is what tells
+      // EndpointErrors this is a real, checked result — not staleness).
+      // Rendering a note either way is what actually resolves the
+      // SetOrganizationFeatures confusion: before this, "no table" looked
+      // identical whether an operation had been traced or not.
+      data[svc.service][operationId] = groups;
       const stub = `## Possible error responses\n\n<EndpointErrors service="${svc.service}" operationId="${operationId}" />\n`;
       writeFileSync(mdxPath, base.replace(/\n*$/, '') + '\n\n' + stub);
       opsUpdated++;

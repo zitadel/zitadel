@@ -54,11 +54,16 @@ var throwFuncs = func() map[string]bool {
 		"Internal", "PreconditionFailed", "Unauthenticated", "Unimplemented",
 		"DeadlineExceeded", "Unavailable", "ResourceExhausted", "Unknown",
 	}
-	m := make(map[string]bool, len(kinds)*2)
+	m := make(map[string]bool, len(kinds)*2+1)
 	for _, k := range kinds {
 		m["Throw"+k] = true
 		m["Throw"+k+"f"] = true
 	}
+	// ThrowError doesn't fit the Throw<Kind> naming pattern (it's not "Throw"
+	// + a Kind name) but has the exact same (parent, id, message) shape and
+	// always maps to KindUnknown (internal/zerrors/zerror.go). No ThrowErrorf
+	// variant exists.
+	m["ThrowError"] = true
 	return m
 }()
 
@@ -97,6 +102,12 @@ type errorSite struct {
 	File      string `json:"file"`
 	Line      int    `json:"line"`
 	Reasoning string `json:"reasoning"`
+	// Message is only set for synthetic sites (id starts with "GRPC-") that
+	// have no entry in the error catalog to pull a message from — a raw
+	// status.Errorf(codes.X, ...) call, unlike a zerrors.Throw* call, was
+	// never scanned into that catalog in the first place, so the message
+	// has to travel with the site itself instead of being looked up later.
+	Message string `json:"message,omitempty"`
 }
 
 type operationTrace struct {
@@ -479,15 +490,24 @@ func (w *walker) handleCall(pkg *packages.Package, call *ast.CallExpr, trail []s
 	switch fun := call.Fun.(type) {
 	case *ast.SelectorExpr:
 		if sel, ok := pkg.TypesInfo.Selections[fun]; ok {
-			fnObj, ok := sel.Obj().(*types.Func)
-			if !ok {
+			// Selections cover both method calls (Obj() is a *types.Func) and
+			// field accesses (Obj() is a *types.Var) — e.g. c.checkPermission(...)
+			// where checkPermission is a struct field holding a function value,
+			// not a declared method. That's dynamic dispatch exactly like a
+			// bare identifier of function type, so it must go through the same
+			// handleDynamic path (and knownIndirections table) rather than
+			// being silently dropped here.
+			if fnObj, ok := sel.Obj().(*types.Func); ok {
+				if isInterfaceRecv(sel.Recv()) {
+					w.handleDynamic(pkg, sel.Recv(), call)
+					return
+				}
+				w.followFunc(pkg, fnObj, call, trail)
 				return
 			}
-			if isInterfaceRecv(sel.Recv()) {
-				w.handleDynamic(pkg, sel.Recv(), call)
-				return
+			if fieldObj, ok := sel.Obj().(*types.Var); ok {
+				w.handleDynamic(pkg, fieldObj.Type(), call)
 			}
-			w.followFunc(pkg, fnObj, call, trail)
 			return
 		}
 		// Package-qualified call, e.g. zerrors.ThrowInvalidArgument(...) or
@@ -535,6 +555,16 @@ func (w *walker) followFunc(pkg *packages.Package, fnObj *types.Func, call *ast.
 	pkgPath := fnObj.Pkg().Path()
 	if pkgPath == "github.com/zitadel/zitadel/internal/zerrors" && throwFuncs[fnObj.Name()] {
 		w.recordThrow(pkg, call, trail)
+		return
+	}
+	// The gRPC-native equivalent of a Throw call: status.Errorf(codes.X, ...)
+	// / status.Error(codes.X, ...). Common in stub handlers
+	// (status.Errorf(codes.Unimplemented, "method X not implemented")) that
+	// never touch zerrors at all — a real, deterministic error with no
+	// zerrors ID to look up, so it's recorded as its own synthetic site
+	// rather than silently having nothing to show.
+	if pkgPath == "google.golang.org/grpc/status" && (fnObj.Name() == "Errorf" || fnObj.Name() == "Error") {
+		w.recordRawStatus(pkg, call, trail)
 		return
 	}
 	if !strings.HasPrefix(pkgPath, modulePath) {
@@ -640,6 +670,51 @@ func (w *walker) recordThrow(pkg *packages.Package, call *ast.CallExpr, trail []
 		File:      relPath(w.root, pos.Filename),
 		Line:      pos.Line,
 		Reasoning: strings.Join(trail, " -> "),
+	})
+}
+
+// recordRawStatus handles status.Errorf(codes.X, format, a...) /
+// status.Error(codes.X, msg) — the first argument must resolve to a real
+// constant in google.golang.org/grpc/codes (not just any identifier named
+// like a code), so an unrelated call that happens to pass an argument named
+// "codes.Foo" from some other package can't be mistaken for this. There's
+// no zerrors ID here, so a synthetic one ("GRPC-<CODE NAME>") is used
+// instead — clearly distinguishable from a real zerrors ID by its shape,
+// and matched specially in generate-endpoint-errors.ts rather than looked
+// up in the error catalog, since it was never scanned into that catalog.
+func (w *walker) recordRawStatus(pkg *packages.Package, call *ast.CallExpr, trail []string) {
+	if len(call.Args) < 1 {
+		return
+	}
+	sel, ok := call.Args[0].(*ast.SelectorExpr)
+	if !ok {
+		return
+	}
+	use, ok := pkg.TypesInfo.Uses[sel.Sel]
+	if !ok {
+		return
+	}
+	constObj, ok := use.(*types.Const)
+	if !ok || constObj.Pkg() == nil || constObj.Pkg().Path() != "google.golang.org/grpc/codes" {
+		return
+	}
+
+	message := ""
+	if len(call.Args) >= 2 {
+		if lit, ok := call.Args[1].(*ast.BasicLit); ok && lit.Kind == token.STRING {
+			if s, err := strconv.Unquote(lit.Value); err == nil {
+				message = s
+			}
+		}
+	}
+
+	pos := pkg.Fset.Position(call.Pos())
+	w.sites = append(w.sites, errorSite{
+		ID:        "GRPC-" + strings.ToUpper(sel.Sel.Name),
+		File:      relPath(w.root, pos.Filename),
+		Line:      pos.Line,
+		Reasoning: strings.Join(trail, " -> "),
+		Message:   message,
 	})
 }
 
