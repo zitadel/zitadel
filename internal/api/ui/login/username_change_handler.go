@@ -28,6 +28,10 @@ func (l *Login) handleChangeUsername(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	if _, ok := authReq.PossibleSteps[0].(*domain.ChangeUsernameStep); !ok {
+		l.renderError(w, r, authReq, err)
+		return
+	}
 	_, err = l.command.ChangeUsername(setContext(r.Context(), authReq.UserOrgID), authReq.UserOrgID, authReq.UserID, data.Username)
 	if err != nil {
 		l.renderChangeUsername(w, r, authReq, err)
