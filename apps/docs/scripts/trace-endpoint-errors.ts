@@ -21,7 +21,7 @@
 // trace-category-cli.ts (pnpm generate:endpoint-trace:category).
 import { execFileSync } from 'child_process';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
-import { basename, dirname, join, resolve } from 'path';
+import { basename, dirname, isAbsolute, join, relative, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { discoverServices } from './generate-endpoint-errors';
 
@@ -44,6 +44,16 @@ function fail(message: string): never {
   process.exit(1);
 }
 
+// path.relative() rather than a raw string-prefix check — resolve() and
+// join() both produce backslash-separated paths on Windows, so comparing
+// against a hand-appended '/' (as a plain prefix match would) silently never
+// matches there. relative() is the portable way to ask "is childPath inside
+// parentDir".
+function isInside(parentDir: string, childPath: string): boolean {
+  const rel = relative(parentDir, childPath);
+  return rel !== '' && !rel.startsWith('..') && !isAbsolute(rel);
+}
+
 function main() {
   const { goFile, proto, goPackage } = parseArgs(process.argv.slice(2));
   if ((goFile == null) === (proto == null)) {
@@ -54,7 +64,7 @@ function main() {
   const protoAbs = proto ? resolve(process.cwd(), proto) : undefined;
 
   const svc = goFileAbs
-    ? SERVICES.find((s) => goFileAbs.startsWith(s.goPackageDir + '/'))
+    ? SERVICES.find((s) => isInside(s.goPackageDir, goFileAbs))
     : SERVICES.find((s) => s.protoFile === protoAbs);
   if (!svc) {
     fail(

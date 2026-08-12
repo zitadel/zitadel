@@ -105,7 +105,18 @@ export default function EndpointErrors({ service, operationId }: { service: stri
   const [open, setOpen] = useState<number | null>(null);
   const [selected, setSelected] = useState<Record<number, string>>({});
 
-  if (!groups || groups.length === 0) return null;
+  // No entry at all means this operation hasn't been checked — stay silent
+  // rather than expose that as a public-facing gap. An explicit empty array
+  // means it *was* checked and confidently found nothing, which is worth
+  // saying rather than looking identical to "never checked".
+  if (!groups) return null;
+  if (groups.length === 0) {
+    return (
+      <div className="not-prose rounded-xl border bg-fd-card p-3 text-sm text-fd-muted-foreground">
+        No specific error causes are currently documented for this operation.
+      </div>
+    );
+  }
 
   return (
     <div className="not-prose flex flex-col gap-3">
@@ -139,7 +150,7 @@ export default function EndpointErrors({ service, operationId }: { service: stri
                 </p>
               </h3>
               {isOpen && (
-                <div className="overflow-hidden ps-4.5 pe-3 pb-3 flex flex-col gap-2">
+                <div className="overflow-hidden ps-[1.125rem] pe-3 pb-3 flex flex-col gap-2">
                   {g.description && <p className="text-sm text-fd-muted-foreground">{g.description}</p>}
                   {g.causes.length > 0 && (
                     <>
