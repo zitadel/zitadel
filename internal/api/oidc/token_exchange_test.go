@@ -139,6 +139,46 @@ func Test_validateTokenExchangeScopes(t *testing.T) {
 		assert.NotContains(t, got, orgB)
 	})
 
+	t.Run("exchange: bare OrgRoleIDScope request rejected", func(t *testing.T) {
+		subjectScopes := []string{oidc.ScopeOpenID, oidc.ScopeProfile}
+		_, err := validateTokenExchangeScopes(client,
+			[]string{oidc.ScopeOpenID, domain.OrgRoleIDScope},
+			subjectScopes, subjectScopes, false)
+		require.Error(t, err)
+	})
+
+	t.Run("impersonation: bare OrgRoleIDScope request rejected", func(t *testing.T) {
+		_, err := validateTokenExchangeScopes(client,
+			[]string{oidc.ScopeOpenID, domain.OrgRoleIDScope},
+			nil, actorScopes, true)
+		require.Error(t, err)
+	})
+
+	t.Run("exchange: bare OrgRoleIDScope on subject remains a ceiling", func(t *testing.T) {
+		orgA := domain.OrgRoleIDScope + "orgA"
+		subjectScopes := []string{oidc.ScopeOpenID, domain.OrgRoleIDScope}
+		_, err := validateTokenExchangeScopes(client,
+			[]string{oidc.ScopeOpenID, orgA},
+			subjectScopes, subjectScopes, false)
+		require.Error(t, err)
+	})
+
+	t.Run("exchange: omit inherits bare OrgRoleIDScope ceiling", func(t *testing.T) {
+		subjectScopes := []string{oidc.ScopeOpenID, oidc.ScopeProfile, domain.OrgRoleIDScope}
+		got, err := validateTokenExchangeScopes(client,
+			[]string{oidc.ScopeOpenID},
+			subjectScopes, subjectScopes, false)
+		require.NoError(t, err)
+		assert.Equal(t, []string{oidc.ScopeOpenID, domain.OrgRoleIDScope}, got)
+	})
+
+	t.Run("exchange: empty request inherits bare OrgRoleIDScope from subject", func(t *testing.T) {
+		subjectScopes := []string{oidc.ScopeOpenID, domain.OrgRoleIDScope}
+		got, err := validateTokenExchangeScopes(client, nil, subjectScopes, subjectScopes, false)
+		require.NoError(t, err)
+		assert.Equal(t, subjectScopes, got)
+	})
+
 	t.Run("impersonation: subject-data scope not on actor allowed", func(t *testing.T) {
 		got, err := validateTokenExchangeScopes(client,
 			[]string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail},
