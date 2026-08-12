@@ -83,6 +83,38 @@ func Test_validateTokenExchangeScopes(t *testing.T) {
 		assert.Equal(t, []string{oidc.ScopeOpenID, orgA}, got)
 	})
 
+	t.Run("actor path: subject filter is ceiling, actor filter ignored", func(t *testing.T) {
+		orgA := domain.OrgRoleIDScope + "orgA"
+		orgB := domain.OrgRoleIDScope + "orgB"
+		subjectScopes := []string{oidc.ScopeOpenID, oidc.ScopeProfile, orgA}
+		actorWithOtherFilter := append(slices.Clone(actorScopes), orgB)
+
+		_, err := validateTokenExchangeScopes(client,
+			[]string{oidc.ScopeOpenID, orgB},
+			subjectScopes, actorWithOtherFilter, false)
+		require.Error(t, err)
+
+		got, err := validateTokenExchangeScopes(client,
+			[]string{oidc.ScopeOpenID, orgA},
+			subjectScopes, actorWithOtherFilter, false)
+		require.NoError(t, err)
+		assert.Equal(t, []string{oidc.ScopeOpenID, orgA}, got)
+	})
+
+	t.Run("actor path: unfiltered subject ignores actor OrgRoleIDScope ceiling", func(t *testing.T) {
+		// Subject-primary: only the subject's filter is a ceiling. An unfiltered
+		// subject may still request any roles:id even if the actor is filtered.
+		orgA := domain.OrgRoleIDScope + "orgA"
+		orgB := domain.OrgRoleIDScope + "orgB"
+		subjectScopes := []string{oidc.ScopeOpenID, oidc.ScopeProfile}
+		actorWithFilter := append(slices.Clone(actorScopes), orgA)
+		got, err := validateTokenExchangeScopes(client,
+			[]string{oidc.ScopeOpenID, orgB},
+			subjectScopes, actorWithFilter, false)
+		require.NoError(t, err)
+		assert.Equal(t, []string{oidc.ScopeOpenID, orgB}, got)
+	})
+
 	t.Run("impersonation: subject-data scope not on actor allowed", func(t *testing.T) {
 		got, err := validateTokenExchangeScopes(client,
 			[]string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail},
