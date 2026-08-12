@@ -2624,6 +2624,25 @@
       "DEVMODEDESC": "注意：启用开发模式的重定向 URI 将不会被验证。",
       "SKIPNATIVEAPPSUCCESSPAGE": "登录后跳过成功页面",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "登录后跳过本机应用的成功页面",
+      "APPLINKSSECTION": "原生应用关联",
+      "APPLINKSDESC": "配置 iOS 和 Android 关联，使此实例能够为您的原生应用提供通行密钥信任文件。",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "在 apple-app-site-association 中作为 webcredentials 条目 TEAMID.BUNDLEID 提供。",
+      "TEAMID": "团队 ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Apple Team ID 必须恰好为 10 个字母或数字，例如 ABCDE12345。",
+      "TEAMIDLENGTH": "Team ID 必须恰好为 10 个字母或数字。",
+      "BUNDLEID": "Bundle ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "iOS Bundle Identifier（CFBundleIdentifier），例如 com.example.app。请勿包含 Team ID 前缀。",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "在 assetlinks.json 中为 Digital Asset Links / 通行密钥凭据提供。",
+      "PACKAGENAME": "软件包名称",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "Android applicationId / 软件包名称，例如 com.example.app。",
+      "FINGERPRINTS": "SHA-256 证书指纹",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "每行一个指纹（64 个十六进制字符，冒号可选）。按需包含调试版和正式版。",
       "REDIRECT": "重定向 URLs",
       "REDIRECTSECTION": "重定向 URLs",
       "POSTLOGOUTREDIRECT": "退出登录重定向 URLs",
@@ -2687,7 +2706,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "反向通道注销URI"
+      "BACKCHANNELLOOGOUTURI": "反向通道注销URI",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID 与 Bundle ID 必须同时填写，或同时留空。",
+      "ANDROIDPACKAGEREQUIRED": "设置证书指纹时必须填写 Android 软件包名称。"
     },
     "API": {
       "INFO": {

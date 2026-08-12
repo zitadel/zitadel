@@ -2588,6 +2588,25 @@
       "DEVMODEDESC": "Внимавајте: Со овозможен Development mode, URIs за пренасочување нема да бидат валидирани.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Прескокни страница за успешна најава",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Прескокнете ја страницата за успешна најава за оваа нативна апликација.",
+      "APPLINKSSECTION": "Врски за нативни апликации",
+      "APPLINKSDESC": "Конфигурирајте асоцијација за iOS и Android за оваа инстанца да може да доставува trust датотеки за passkeys на вашите нативни апликации.",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "Се доставува во apple-app-site-association како webcredentials запис TEAMID.BUNDLEID.",
+      "TEAMID": "Team ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Apple Team ID мора да има точно 10 алфанумерички знаци, нпр. ABCDE12345.",
+      "TEAMIDLENGTH": "Team ID мора да има точно 10 алфанумерички знаци.",
+      "BUNDLEID": "Bundle ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "iOS Bundle Identifier (CFBundleIdentifier), нпр. com.example.app. Не го вклучувајте префиксот Team ID.",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "Се доставува во assetlinks.json за Digital Asset Links / passkey credentials.",
+      "PACKAGENAME": "Име на пакет",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "Android applicationId / име на пакет, нпр. com.example.app.",
+      "FINGERPRINTS": "SHA-256 отпечатоци на сертификат",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "Еден отпечаток по ред (64 хексадецимални знаци, двоточките се опционални). Вклучете debug и release по потреба.",
       "REDIRECT": "Redirect URIs",
       "REDIRECTSECTION": "Redirect URIs",
       "POSTLOGOUTREDIRECT": "URIs по одјавувањето",
@@ -2651,7 +2670,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID и Bundle ID мора да се постават заедно, или обете да останат празни.",
+      "ANDROIDPACKAGEREQUIRED": "Името на Android пакетот е задолжително кога се поставени отпечатоци од сертификат."
     },
     "API": {
       "INFO": {

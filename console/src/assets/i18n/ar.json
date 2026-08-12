@@ -2610,6 +2610,25 @@
       "DEVMODEDESC": "احذر: مع تمكين وضع التطوير، لن يتم التحقق من عناوين URI لإعادة التوجيه.",
       "SKIPNATIVEAPPSUCCESSPAGE": "تخطي صفحة نجاح تسجيل الدخول",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "تخطي صفحة النجاح بعد تسجيل الدخول لهذا التطبيق الأصلي.",
+      "APPLINKSSECTION": "روابط التطبيقات الأصلية",
+      "APPLINKSDESC": "قم بتهيئة ارتباط iOS وAndroid حتى تتمكن هذه المثيلة من تقديم ملفات الثقة بـ Passkey لتطبيقاتك الأصلية.",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "تُقدَّم في apple-app-site-association كمدخل webcredentials بالصيغة TEAMID.BUNDLEID.",
+      "TEAMID": "معرّف الفريق",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "يجب أن يكون Apple Team ID مكونًا من 10 أحرف أبجدية رقمية بالضبط، مثل ABCDE12345.",
+      "TEAMIDLENGTH": "يجب أن يكون Team ID مكونًا من 10 أحرف أبجدية رقمية بالضبط.",
+      "BUNDLEID": "معرّف الحزمة",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "معرّف حزمة iOS (CFBundleIdentifier)، مثل com.example.app. لا تُدرج بادئة Team ID.",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "تُقدَّم في assetlinks.json لبيانات اعتماد Passkey عبر Digital Asset Links.",
+      "PACKAGENAME": "اسم الحزمة",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "معرّف تطبيق Android / اسم الحزمة (applicationId)، مثل com.example.app.",
+      "FINGERPRINTS": "بصمات شهادة SHA-256",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "بصمة واحدة لكل سطر (64 حرفًا سادس عشريًا، النقطتان اختياريتان). أدرج إصداري التصحيح والإصدار حسب الحاجة.",
       "REDIRECT": "عناوين URI لإعادة التوجيه",
       "REDIRECTSECTION": "عناوين URI لإعادة التوجيه",
       "POSTLOGOUTREDIRECT": "عناوين URI بعد تسجيل الخروج",
@@ -2673,7 +2692,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "عنوان URI لتسجيل الخروج من القناة الخلفية"
+      "BACKCHANNELLOOGOUTURI": "عنوان URI لتسجيل الخروج من القناة الخلفية",
+      "IOSAPPLINKINCOMPLETE": "يجب تعيين معرّف فريق iOS ومعرّف الحزمة معًا، أو تركهما فارغين معًا.",
+      "ANDROIDPACKAGEREQUIRED": "اسم حزمة Android مطلوب عند تعيين بصمات شهادة."
     },
     "API": {
       "INFO": {
