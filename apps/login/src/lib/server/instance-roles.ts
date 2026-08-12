@@ -1,7 +1,7 @@
 import { createLogger } from "@/lib/logger";
 import { createServiceForHost } from "@/lib/service";
 import { getIDPByID, getInstanceId, ServiceConfig } from "@/lib/zitadel";
-import { Client } from "@zitadel/client";
+import { Client, Code, ConnectError } from "@zitadel/client";
 import type { InstanceRolesInfo } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { InternalPermissionService } from "@zitadel/proto/zitadel/internal_permission/v2/internal_permission_service_pb";
 
@@ -74,8 +74,12 @@ export function instanceRolesFromClaim(
  * is retried implicitly on the next login.
  */
 export async function syncInstanceRolesFromIdpIntent({ serviceConfig, intent, userId }: SyncParams): Promise<void> {
+  const idpId = intent.idpInformation?.idpId;
+  // Tracked outside the try so failure logs can state which roles were being
+  // granted. Deliberately never log rawInformation - it carries profile PII;
+  // the filtered role keys are all support needs.
+  let attemptedRoles: string[] = [];
   try {
-    const idpId = intent.idpInformation?.idpId;
     if (!idpId || !userId) {
       return;
     }
@@ -105,6 +109,7 @@ export async function syncInstanceRolesFromIdpIntent({ serviceConfig, intent, us
     if (!grantedRoles.length) {
       return;
     }
+    attemptedRoles = grantedRoles;
 
     const permissionService: Client<typeof InternalPermissionService> = await createServiceForHost(
       InternalPermissionService,
@@ -112,10 +117,10 @@ export async function syncInstanceRolesFromIdpIntent({ serviceConfig, intent, us
     );
     const instanceResource = { resource: { case: "instance" as const, value: true } };
 
-    // Note: the claim originates from an external instance whose role set may
-    // differ. Unknown role keys are rejected by the API on write; the claim
-    // filter above already restricts to instance (IAM_) role keys.
-    const roles = grantedRoles;
+    // The claim originates from an external instance whose role set may differ
+    // from this one. Unlike login v1 (which drops unknown role keys and grants
+    // the rest), the v2 API rejects the ENTIRE write if any key is unknown -
+    // in that case no roles are granted; see the error handling below.
 
     const { administrators } = await permissionService.listAdministrators(
       {
@@ -129,20 +134,48 @@ export async function syncInstanceRolesFromIdpIntent({ serviceConfig, intent, us
     const existing = administrators?.find((administrator) => administrator.resource?.case === "instance");
 
     if (!existing) {
-      await permissionService.createAdministrator({ userId, resource: instanceResource, roles }, {});
-      logger.info("Added instance administrator from ZITADEL IdP roles", { userId, roles });
+      await permissionService.createAdministrator({ userId, resource: instanceResource, roles: grantedRoles }, {});
+      logger.info("Added instance administrator from ZITADEL IdP roles", { userId, roles: grantedRoles });
       return;
     }
 
     // Merge-only: retain roles granted elsewhere, never remove any.
-    const merged = Array.from(new Set([...existing.roles, ...roles]));
+    // Known limitation: the v2 API has no merge-only write, so this is a
+    // read-modify-write - ListAdministrators reads from the projection and
+    // UpdateAdministrator replaces the full role set. A role granted elsewhere
+    // between read and write is lost by the replace, and projection lag widens
+    // that window. This is weaker than v1, which merges inside the command
+    // layer on the eventstore (EnsureInstanceMemberRolesFromLogin) and has no
+    // such window. We accept this: the window is small, claim-derived roles
+    // are restored on the next login, and the login must never block on
+    // membership writes. If a second consumer of role sync shows up, that is
+    // the point to revisit (ideally by moving the sync into core).
+    const merged = Array.from(new Set([...existing.roles, ...grantedRoles]));
     if (merged.length === existing.roles.length) {
       return;
     }
+    attemptedRoles = merged;
 
     await permissionService.updateAdministrator({ userId, resource: instanceResource, roles: merged }, {});
     logger.info("Updated instance administrator from ZITADEL IdP roles", { userId, roles: merged });
   } catch (error) {
-    logger.warn("Could not synchronize instance roles from IdP intent", { error });
+    // Never block the login, but keep permanent failures diagnosable: a
+    // silently skipped sync manifests as "support user has no permissions".
+    const context = { userId, idpId, roles: attemptedRoles };
+    if (error instanceof ConnectError && error.code === Code.PermissionDenied) {
+      logger.error(
+        "Instance role sync failed permanently: service user lacks permission to manage instance administrators (iam.member.write)",
+        { ...context, code: error.code, message: error.message },
+      );
+      return;
+    }
+    if (error instanceof ConnectError && error.code === Code.InvalidArgument) {
+      logger.error(
+        "Instance role sync failed permanently: administrator write rejected, likely a role key unknown to this instance",
+        { ...context, code: error.code, message: error.message },
+      );
+      return;
+    }
+    logger.warn("Could not synchronize instance roles from IdP intent", { ...context, error });
   }
 }
