@@ -201,6 +201,14 @@ func validateTokenExchangeScopes(
 	scopelessActorPath bool,
 ) ([]string, error) {
 	requestedScopes = normalizeRequestedScopes(requestedScopes)
+	// Reject a client-requested bare prefix only. Input tokens may still carry
+	// it (authorize accepts it); empty-request fallback inherits that ceiling.
+	for _, scope := range requestedScopes {
+		if scope == domain.OrgRoleIDScope {
+			return nil, oidc.ErrInvalidScope().
+				WithDescription("scope %q requires an organization id", scope)
+		}
+	}
 
 	if scopelessActorPath {
 		return validateImpersonationTokenExchangeScopes(client, requestedScopes, subjectScopes, actorScopes)
