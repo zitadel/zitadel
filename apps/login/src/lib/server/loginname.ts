@@ -562,8 +562,19 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   // and must not prevent authentication via an external IdP.
   // Fixes: https://github.com/zitadel/zitadel/issues/12021
   // Fixes: https://github.com/zitadel/zitadel/issues/12023
+  //
+  // Enumeration protection (ignoreUnknownUsernames) must NOT gate the redirect
+  // when local authentication is disabled: in an IdP-only org, known users are
+  // auto-redirected to the IdP, so sending unknown usernames to the very same
+  // IdP is what keeps them indistinguishable. Diverting unknown users to the
+  // decoy password screen instead would both break silent SSO for first-time
+  // users (the IdP is meant to create the account on first login) and act as an
+  // enumeration oracle (redirect = user exists, password screen = unknown).
+  // Conversely, when local authentication is enabled, the decoy password screen
+  // is what known (password) users see, so enumeration protection keeps gating
+  // the discovery-based redirect there.
 
-  if ((!effectiveLoginSettings?.allowLocalAuthentication || discoveredOrganization) && !ignoreUnknownUsernames) {
+  if (!effectiveLoginSettings?.allowLocalAuthentication || (discoveredOrganization && !ignoreUnknownUsernames)) {
     const resp = await redirectUserToIDP(undefined, discoveredOrganization);
     if (resp) {
       logger.debug("Redirecting to IDP", { organization: discoveredOrganization });
