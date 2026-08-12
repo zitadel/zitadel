@@ -152,7 +152,9 @@
       "failedPrecondition": "Ön koşul başarısız",
       "sessionNotValid": "Oturum geçerli değil",
       "passwordVerificationMissing": "Şifre doğrulaması eksik.",
-      "passwordVerificationTooOld": "Şifre doğrulaması çok eski. Lütfen şifrenizi tekrar doğrulayın."
+      "passwordVerificationTooOld": "Şifre doğrulaması çok eski. Lütfen şifrenizi tekrar doğrulayın.",
+      "passwordResetNotAllowed": "Parola sıfırlamaya izin verilmiyor! Daha fazla bilgi için yöneticinizle iletişime geçin.",
+      "localAuthenticationNotAllowed": "Yerel kimlik doğrulamasına izin verilmiyor! Daha fazla bilgi için yöneticinize başvurun."
     }
   },
   "idp": {
@@ -204,7 +206,11 @@
       "userCreationFailed": "Kullanıcı hesabı oluşturulamadı",
       "orgResolutionFailed": "Kayıt için organizasyon belirlenemedi",
       "sessionCreationFailed": "Oturum oluşturulamadı veya yönlendirme belirlenemedi",
-      "unknownError": "Bilinmeyen bir hata oluştu"
+      "unknownError": "Bilinmeyen bir hata oluştu",
+      "unknown": "Bilinmeyen bir hata oluştu",
+      "couldNotStartIDPFlow": "IDP akışı başlatılamadı",
+      "userNotFound": "Kullanıcı sistemde bulunamadı",
+      "couldNotCreateSession": "Oturum oluşturulamadı"
     }
   },
   "ldap": {
@@ -218,6 +224,9 @@
     "required": {
       "username": "Bu alan zorunludur",
       "password": "Bu alan zorunludur"
+    },
+    "errors": {
+      "couldNotVerify": "Oturum açılamadı. Lütfen kullanıcı adınızı ve parolanızı kontrol edin."
     }
   },
   "mfa": {
@@ -280,7 +289,8 @@
         "couldNotFindSession": "Oturum bulunamadı",
         "couldNotUpdateSession": "Oturum güncellenemedi",
         "userNotFound": "Kullanıcı sistemde bulunamadı",
-        "couldNotDetermineRedirect": "Passkey doğrulamasından sonra yönlendirme URL'si belirlenemedi"
+        "couldNotDetermineRedirect": "Passkey doğrulamasından sonra yönlendirme URL'si belirlenemedi",
+        "couldNotGetUser": "Kullanıcı alınamadı"
       }
     },
     "set": {
@@ -291,7 +301,15 @@
         "link": "Passkey ile Kimlik Doğrulama"
       },
       "skip": "Atla",
-      "submit": "Devam"
+      "submit": "Devam",
+      "errors": {
+        "missingContext": "Oturum veya kullanıcı bilgisi eksik. Kurulumu aldığınız bağlantıdan yeniden başlatın.",
+        "couldNotLoadSession": "Oturum yüklenemedi",
+        "couldNotRegisterPasskey": "Geçiş anahtarı kurulamadı. Lütfen tekrar deneyin.",
+        "couldNotVerifyPasskey": "Geçiş anahtarı doğrulanamadı. Lütfen tekrar deneyin.",
+        "userNotFound": "Kullanıcı sistemde bulunamadı",
+        "couldNotCreateSession": "Oturum oluşturulamadı"
+      }
     }
   },
   "u2f": {
@@ -303,6 +321,11 @@
       "title": "2 Faktörlü Doğrulama Kur",
       "description": "İkinci faktör olarak bir cihaz kurun.",
       "submit": "Devam"
+    },
+    "errors": {
+      "couldNotLoadSession": "Oturum yüklenemedi",
+      "couldNotRegister": "Güvenlik anahtarı kurulamadı. Lütfen tekrar deneyin.",
+      "couldNotVerify": "Güvenlik anahtarı doğrulanamadı. Lütfen tekrar deneyin."
     }
   },
   "register": {
@@ -354,7 +377,11 @@
       "couldNotCreateSession": "Oturum oluşturulamadı",
       "userNotFound": "Kullanıcı sistemde bulunamadı",
       "couldNotLinkIDP": "IDP kullanıcıya bağlanamadı",
-      "couldNotRegisterUser": "Kullanıcı kayıt edilemedi"
+      "couldNotRegisterUser": "Kullanıcı kayıt edilemedi",
+      "registerNotAllowed": "Kayıt olmaya izin verilmiyor! Daha fazla bilgi için yöneticinizle iletişime geçin.",
+      "userAlreadyExists": "Bu e-posta adresine sahip bir kullanıcı zaten mevcut. Bunun yerine giriş yapmayı deneyin.",
+      "couldNotGetLoginSettings": "Giriş ayarları alınamadı",
+      "localAuthenticationNotAllowed": "Yerel kimlik doğrulamasına izin verilmiyor! Daha fazla bilgi için yöneticinize başvurun."
     }
   },
   "invite": {
@@ -414,7 +441,10 @@
       "couldNotResendInvite": "Davet yeniden gönderilemedi",
       "contextMissing": "Bir hata oluştu. Lütfen tekrar deneyin.",
       "inviteSendFailed": "Davet e-postası gönderilemedi",
-      "emailSendFailed": "Doğrulama e-postası gönderilemedi"
+      "emailSendFailed": "Doğrulama e-postası gönderilemedi",
+      "couldNotFindSession": "Oturum bulunamadı",
+      "couldNotUpdateSession": "Oturum güncellenemedi",
+      "invalidCode": "Geçersiz kod. Lütfen tekrar deneyin."
     }
   },
   "authenticator": {
@@ -448,6 +478,9 @@
       "email": "E-posta adresinizi görüntüleyin.",
       "profile": "Tam profil bilgilerinizi görüntüleyin.",
       "offline_access": "Hesabınıza çevrimdışı erişime izin verin."
+    },
+    "errors": {
+      "couldNotComplete": "Cihaz yetkilendirmesi tamamlanamadı. Kod zaten kullanılmış veya süresi dolmuş olabilir."
     }
   },
   "error": {

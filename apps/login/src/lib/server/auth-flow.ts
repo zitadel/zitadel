@@ -1,6 +1,7 @@
 "use server";
 
 import { getAllSessions } from "@/lib/cookies";
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/logger";
 import { loginWithOIDCAndSession } from "@/lib/oidc";
 import { loginWithSAMLAndSession } from "@/lib/saml";
@@ -42,7 +43,21 @@ export async function completeAuthFlow(
   let sessions: Session[] = [];
 
   if (ids && ids.length) {
-    sessions = await loadSessions({ serviceConfig, ids });
+    try {
+      sessions = await loadSessions({ serviceConfig, ids });
+    } catch (error) {
+      // listSessions resolves with an empty list for unknown or stale ids
+      // without throwing, so only a classified user error (e.g. malformed
+      // ids) may degrade to "no sessions" — the flow handlers treat that
+      // gracefully. A genuine service failure must keep failing the action
+      // so outages stay visible as 500s.
+      if (isClassifiedError(error) && error.isUserError) {
+        logger.warn("Failed to load sessions", { error });
+        sessions = [];
+      } else {
+        throw error;
+      }
+    }
   }
 
   if (requestId.startsWith("oidc_")) {

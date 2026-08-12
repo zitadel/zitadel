@@ -1,6 +1,7 @@
 import { getValidLocaleFromUILocales } from "@/lib/auth-utils";
 import { isSafeRedirectUri } from "@/lib/client-utils";
 import { getLanguageCookie, setLanguageCookie } from "@/lib/cookies";
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 
 import { shouldUILocalesOverrideCookie } from "@/lib/i18n";
 import { idpTypeToSlug } from "@/lib/idp";
@@ -383,16 +384,29 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         sessionToken: cookie.token,
       };
 
-      const { callbackUrl } = await createCallback({
-        serviceConfig,
-        req: create(CreateCallbackRequestSchema, {
-          authRequestId: requestId.replace("oidc_", ""),
-          callbackKind: {
-            case: "session",
-            value: create(SessionSchema, session),
-          },
-        }),
-      });
+      let callbackUrl: string;
+      try {
+        ({ callbackUrl } = await createCallback({
+          serviceConfig,
+          req: create(CreateCallbackRequestSchema, {
+            authRequestId: requestId.replace("oidc_", ""),
+            callbackKind: {
+              case: "session",
+              value: create(SessionSchema, session),
+            },
+          }),
+        }));
+      } catch (error) {
+        // Business rejections (auth request already handled, user grant
+        // required, ...) are client errors of the request, not server faults.
+        if (isClassifiedError(error) && error.isUserError) {
+          logger.warn("Could not create callback (prompt=none)", { requestId, grpcCode: error.code });
+          const rejectedResponse = NextResponse.json({ error: error.rawMessage }, { status: error.httpStatus });
+          setCSPHeaders(rejectedResponse, serviceConfig, securitySettings);
+          return rejectedResponse;
+        }
+        throw error;
+      }
 
       if (!isSafeRedirectUri(callbackUrl)) {
         logger.warn("Blocked unsafe OIDC callback URL (prompt=none)", { callbackUrl });

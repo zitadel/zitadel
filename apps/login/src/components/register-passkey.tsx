@@ -2,6 +2,7 @@
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
 import { registerPasskeyLink, verifyPasskeyRegistration } from "@/lib/server/passkeys";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -34,6 +35,8 @@ export function RegisterPasskey({
   codeId,
   loginName: initialLoginName,
 }: Props) {
+  const t = useTranslations("passkey");
+
   const { handleSubmit, formState } = useForm<Inputs>({
     mode: "onChange",
   });
@@ -73,31 +76,34 @@ export function RegisterPasskey({
     [organization, requestId, sessionId, userId, initialLoginName, router],
   );
 
-  async function submitVerify(
-    passkeyId: string,
-    passkeyName: string,
-    publicKeyCredential: any,
-    currentSessionId?: string,
-    currentUserId?: string,
-  ) {
-    setLoading(true);
-    const response = await verifyPasskeyRegistration({
-      passkeyId,
-      passkeyName,
-      publicKeyCredential,
-      sessionId: currentSessionId,
-      userId: currentUserId,
-    })
-      .catch(() => {
-        setError("Could not verify Passkey");
-        return;
+  const submitVerify = useCallback(
+    async (
+      passkeyId: string,
+      passkeyName: string,
+      publicKeyCredential: any,
+      currentSessionId?: string,
+      currentUserId?: string,
+    ) => {
+      setLoading(true);
+      const response = await verifyPasskeyRegistration({
+        passkeyId,
+        passkeyName,
+        publicKeyCredential,
+        sessionId: currentSessionId,
+        userId: currentUserId,
       })
-      .finally(() => {
-        setLoading(false);
-      });
+        .catch(() => {
+          setError(t("set.errors.couldNotVerifyPasskey"));
+          return;
+        })
+        .finally(() => {
+          setLoading(false);
+        });
 
-    return response;
-  }
+      return response;
+    },
+    [t],
+  );
 
   const submitRegisterAndContinue = useCallback(async (): Promise<boolean | void> => {
     // Require either sessionId or userId
@@ -190,12 +196,22 @@ export function RegisterPasskey({
     const verificationResponse = await submitVerify(passkeyId, "", data, sessionId, userId);
 
     if (!verificationResponse) {
-      setError("Could not verify Passkey!");
+      setError(t("set.errors.couldNotVerifyPasskey"));
+      return;
+    }
+
+    if ("error" in verificationResponse && verificationResponse.error) {
+      setError(verificationResponse.error);
+      return;
+    }
+
+    if (!("loginName" in verificationResponse)) {
+      setError(t("set.errors.couldNotVerifyPasskey"));
       return;
     }
 
     continueAndLogin(verificationResponse.loginName);
-  }, [sessionId, userId, code, codeId, continueAndLogin]);
+  }, [sessionId, userId, code, codeId, continueAndLogin, submitVerify, t]);
 
   // Auto-submit when code is provided (similar to VerifyForm)
   useEffect(() => {

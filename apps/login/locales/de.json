@@ -152,7 +152,9 @@
       "failedPrecondition": "Vorbedingung fehlgeschlagen",
       "sessionNotValid": "Sitzung ist nicht gültig",
       "passwordVerificationMissing": "Passwort-Verifizierung fehlt.",
-      "passwordVerificationTooOld": "Passwort-Verifizierung ist zu alt. Bitte verifizieren Sie Ihr Passwort erneut."
+      "passwordVerificationTooOld": "Passwort-Verifizierung ist zu alt. Bitte verifizieren Sie Ihr Passwort erneut.",
+      "passwordResetNotAllowed": "Passwort zurücksetzen ist nicht erlaubt! Kontaktieren Sie Ihren Administrator für weitere Informationen.",
+      "localAuthenticationNotAllowed": "Lokale Authentifizierung nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator."
     }
   },
   "idp": {
@@ -204,7 +206,11 @@
       "userCreationFailed": "Erstellen des Benutzerkontos fehlgeschlagen",
       "orgResolutionFailed": "Organisation für Registrierung konnte nicht ermittelt werden",
       "sessionCreationFailed": "Sitzung konnte nicht erstellt oder Weiterleitung konnte nicht ermittelt werden",
-      "unknownError": "Ein unbekannter Fehler ist aufgetreten"
+      "unknownError": "Ein unbekannter Fehler ist aufgetreten",
+      "unknown": "Ein unbekannter Fehler ist aufgetreten",
+      "couldNotStartIDPFlow": "IDP-Ablauf konnte nicht gestartet werden",
+      "userNotFound": "Benutzer im System nicht gefunden",
+      "couldNotCreateSession": "Sitzung konnte nicht erstellt werden"
     }
   },
   "ldap": {
@@ -218,6 +224,9 @@
     "required": {
       "username": "Dieses Feld ist erforderlich",
       "password": "Dieses Feld ist erforderlich"
+    },
+    "errors": {
+      "couldNotVerify": "Anmeldung fehlgeschlagen. Bitte überprüfen Sie Benutzername und Passwort."
     }
   },
   "mfa": {
@@ -280,7 +289,8 @@
         "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
         "couldNotUpdateSession": "Sitzung konnte nicht aktualisiert werden",
         "userNotFound": "Benutzer nicht im System gefunden",
-        "couldNotDetermineRedirect": "Weiterleitungs-URL nach Passkey-Verifizierung konnte nicht ermittelt werden"
+        "couldNotDetermineRedirect": "Weiterleitungs-URL nach Passkey-Verifizierung konnte nicht ermittelt werden",
+        "couldNotGetUser": "Benutzer konnte nicht geladen werden"
       }
     },
     "set": {
@@ -291,7 +301,15 @@
         "link": "Passkey-Authentifizierung"
       },
       "skip": "Überspringen",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "errors": {
+        "missingContext": "Sitzungs- oder Benutzerinformationen fehlen. Starten Sie die Einrichtung über den erhaltenen Link neu.",
+        "couldNotLoadSession": "Sitzung konnte nicht geladen werden",
+        "couldNotRegisterPasskey": "Der Passkey konnte nicht eingerichtet werden. Bitte versuchen Sie es erneut.",
+        "couldNotVerifyPasskey": "Der Passkey konnte nicht verifiziert werden. Bitte versuchen Sie es erneut.",
+        "userNotFound": "Benutzer im System nicht gefunden",
+        "couldNotCreateSession": "Sitzung konnte nicht erstellt werden"
+      }
     }
   },
   "u2f": {
@@ -303,6 +321,11 @@
       "title": "2-Faktor einrichten",
       "description": "Richten Sie ein Gerät als zweiten Faktor ein.",
       "submit": "Weiter"
+    },
+    "errors": {
+      "couldNotLoadSession": "Sitzung konnte nicht geladen werden",
+      "couldNotRegister": "Der Sicherheitsschlüssel konnte nicht eingerichtet werden. Bitte versuchen Sie es erneut.",
+      "couldNotVerify": "Der Sicherheitsschlüssel konnte nicht verifiziert werden. Bitte versuchen Sie es erneut."
     }
   },
   "register": {
@@ -354,7 +377,11 @@
       "couldNotCreateSession": "Sitzung konnte nicht erstellt werden",
       "userNotFound": "Benutzer nicht im System gefunden",
       "couldNotLinkIDP": "IDP konnte nicht mit dem Benutzer verknüpft werden",
-      "couldNotRegisterUser": "Benutzer konnte nicht registriert werden"
+      "couldNotRegisterUser": "Benutzer konnte nicht registriert werden",
+      "registerNotAllowed": "Registrierung ist nicht erlaubt! Kontaktieren Sie Ihren Administrator für weitere Informationen.",
+      "userAlreadyExists": "Ein Benutzer mit dieser E-Mail-Adresse existiert bereits. Versuchen Sie sich stattdessen anzumelden.",
+      "couldNotGetLoginSettings": "Anmeldeeinstellungen konnten nicht abgerufen werden",
+      "localAuthenticationNotAllowed": "Lokale Authentifizierung nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator."
     }
   },
   "invite": {
@@ -414,7 +441,10 @@
       "couldNotResendInvite": "Einladung konnte nicht erneut gesendet werden",
       "inviteSendFailed": "Einladungs-E-Mail konnte nicht gesendet werden",
       "emailSendFailed": "Verifizierungs-E-Mail konnte nicht gesendet werden",
-      "contextMissing": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+      "contextMissing": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+      "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
+      "couldNotUpdateSession": "Sitzung konnte nicht aktualisiert werden",
+      "invalidCode": "Ungültiger Code. Bitte versuchen Sie es erneut."
     }
   },
   "authenticator": {
@@ -448,6 +478,9 @@
       "email": "Zugriff auf Ihre E-Mail-Adresse.",
       "profile": "Zugriff auf Ihre vollständigen Profilinformationen.",
       "offline_access": "Erlauben Sie den Offline-Zugriff auf Ihr Konto."
+    },
+    "errors": {
+      "couldNotComplete": "Die Geräteautorisierung konnte nicht abgeschlossen werden. Der Code wurde möglicherweise bereits verwendet oder ist abgelaufen."
     }
   },
   "error": {

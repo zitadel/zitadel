@@ -3,11 +3,10 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { LoginOTP } from "@/components/login-otp";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getSessionCookieById } from "@/lib/cookies";
 import { getPublicHost } from "@/lib/server/host";
 import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getLoginSettings, getSession } from "@/lib/zitadel";
+import { loadMostRecentSession, loadSessionById } from "@/lib/session";
+import { getBrandingSettings, getLoginSettings } from "@/lib/zitadel";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -39,22 +38,8 @@ export default async function Page(props: {
   const { method } = params;
 
   const session = sessionId
-    ? await loadSessionById(sessionId, organization)
+    ? await loadSessionById({ serviceConfig, sessionId, organization })
     : await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } });
-
-  async function loadSessionById(sessionId: string, organization?: string) {
-    const recent = await getSessionCookieById({ sessionId, organization });
-
-    if (!recent) {
-      return undefined;
-    }
-
-    return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((response) => {
-      if (response?.session) {
-        return response.session;
-      }
-    });
-  }
 
   // email links do not come with organization, thus we need to use the session's organization
   const branding = await getBrandingSettings({

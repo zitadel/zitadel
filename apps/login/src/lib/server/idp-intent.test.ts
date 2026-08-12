@@ -280,13 +280,28 @@ describe("processIDPCallback", () => {
       expect(result.error).toBe("errors.idpNotFound");
     });
 
-    test("should handle retrieval errors gracefully", async () => {
+    test("should handle retrieval errors gracefully without leaking internal messages", async () => {
       mockRetrieveIDPIntent.mockRejectedValue(new Error("Network error"));
 
       const result = await processIDPCallback(defaultParams);
 
       expect(result.redirect).toContain("/idp/google/failure");
-      expect(result.redirect).toContain("error=Network+error");
+      // internal error details must not leak into the user-visible URL
+      expect(result.redirect).not.toContain("Network+error");
+      expect(result.redirect).toContain("error=errors.unknownError");
+    });
+
+    test("should carry user-error messages to the failure page", async () => {
+      const { Code, ConnectError } = await import("@connectrpc/connect");
+      const { ClassifiedConnectError } = await import("@/lib/grpc/interceptors/error-classification");
+      mockRetrieveIDPIntent.mockRejectedValue(
+        new ClassifiedConnectError(new ConnectError("Intent expired", Code.FailedPrecondition)),
+      );
+
+      const result = await processIDPCallback(defaultParams);
+
+      expect(result.redirect).toContain("/idp/google/failure");
+      expect(result.redirect).toContain("error=Intent+expired");
     });
   });
 

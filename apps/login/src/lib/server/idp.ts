@@ -9,6 +9,7 @@ import {
   startLDAPIdentityProviderFlow,
 } from "@/lib/zitadel";
 import crypto from "crypto";
+import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { completeFlowOrGetUrl } from "../client";
@@ -17,6 +18,7 @@ import { getOrSetFingerprintId } from "../fingerprint";
 import { getServiceConfig } from "../service-url";
 import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
+import { catchUserError } from "./error-utils";
 import { getPublicHost } from "./host";
 
 export type RedirectToIdpState =
@@ -103,19 +105,26 @@ export type StartIDPFlowCommand = {
 };
 
 async function startIDPFlow(command: StartIDPFlowCommand) {
+  const t = await getTranslations("idp");
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-  const response = await startIdentityProviderFlow({
-    serviceConfig: command.serviceConfig,
-    idpId: command.idpId,
-    urls: {
-      successUrl: `${command.host.includes("localhost") ? "http://" : "https://"}${command.host}${basePath}${command.successUrl}`,
-      failureUrl: `${command.host.includes("localhost") ? "http://" : "https://"}${command.host}${basePath}${command.failureUrl}`,
-    },
-  });
+  let response;
+  try {
+    response = await startIdentityProviderFlow({
+      serviceConfig: command.serviceConfig,
+      idpId: command.idpId,
+      urls: {
+        successUrl: `${command.host.includes("localhost") ? "http://" : "https://"}${command.host}${basePath}${command.successUrl}`,
+        failureUrl: `${command.host.includes("localhost") ? "http://" : "https://"}${command.host}${basePath}${command.failureUrl}`,
+      },
+    });
+  } catch (error) {
+    // e.g. the IDP was removed or misconfigured for this org — a request-side state
+    return catchUserError(error, t("errors.couldNotStartIDPFlow"));
+  }
 
   if (!response || !response.url) {
-    return { error: "Could not start IDP flow" };
+    return { error: t("errors.couldNotStartIDPFlow") };
   }
 
   if (response.fields) {
@@ -142,27 +151,40 @@ export async function createNewSessionFromIdpIntent(command: CreateNewSessionCom
 
   const { serviceConfig } = getServiceConfig(_headers);
 
+  const t = await getTranslations("idp");
+
   if (!command.userId || !command.idpIntent) {
-    throw new Error("No userId or loginName provided");
+    return { error: t("errors.missingParameters") };
   }
 
-  const userResponse = await getUserByID({ serviceConfig, userId: command.userId });
+  let userResponse;
+  try {
+    userResponse = await getUserByID({ serviceConfig, userId: command.userId });
+  } catch (error) {
+    return catchUserError(error, t("errors.userNotFound"));
+  }
 
   if (!userResponse || !userResponse.user) {
-    return { error: "User not found in the system" };
+    return { error: t("errors.userNotFound") };
   }
 
   const loginSettings = await getLoginSettings({ serviceConfig, organization: userResponse.user.details?.resourceOwner });
 
-  const session = await createSessionForIdpAndUpdateCookie({
-    userId: command.userId,
-    idpIntent: command.idpIntent,
-    requestId: command.requestId,
-    lifetime: loginSettings?.externalLoginCheckLifetime,
-  });
+  let session;
+  try {
+    session = await createSessionForIdpAndUpdateCookie({
+      userId: command.userId,
+      idpIntent: command.idpIntent,
+      requestId: command.requestId,
+      lifetime: loginSettings?.externalLoginCheckLifetime,
+    });
+  } catch (error) {
+    // e.g. an expired or already-consumed IDP intent
+    return catchUserError(error, t("errors.couldNotCreateSession"));
+  }
 
   if (!session || !session.factors?.user) {
-    return { error: "Could not create session" };
+    return { error: t("errors.couldNotCreateSession") };
   }
 
   const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
@@ -232,15 +254,23 @@ export async function createNewSessionForLDAP(command: createNewSessionForLDAPCo
     return { error: "No username or password provided" };
   }
 
-  const response = await startLDAPIdentityProviderFlow({
-    serviceConfig,
-    idpId: command.idpId,
-    username: command.username,
-    password: command.password,
-  });
+  const t = await getTranslations("ldap");
+
+  let response;
+  try {
+    response = await startLDAPIdentityProviderFlow({
+      serviceConfig,
+      idpId: command.idpId,
+      username: command.username,
+      password: command.password,
+    });
+  } catch (error) {
+    // wrong LDAP credentials are the routine failure here, not a server fault
+    return catchUserError(error, t("errors.couldNotVerify"));
+  }
 
   if (!response || response.nextStep.case !== "idpIntent" || !response.nextStep.value) {
-    return { error: "Could not start LDAP identity provider flow" };
+    return { error: t("errors.couldNotVerify") };
   }
 
   const { userId, idpIntentId, idpIntentToken } = response.nextStep.value;

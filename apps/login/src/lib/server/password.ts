@@ -32,6 +32,7 @@ import {
   checkPasswordChangeRequired,
   checkUserVerification,
 } from "../verify-helper";
+import { catchUserError } from "./error-utils";
 import { getPublicHostWithProtocol } from "./host";
 
 const logger = createLogger("password");
@@ -119,13 +120,15 @@ export async function resetPassword(command: ResetPasswordCommand) {
   const userId = user.userId;
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
+  // e.g. a user in a state that does not allow a reset, or rate limiting —
+  // request-side failures that must not crash the action
   return passwordReset({
     serviceConfig,
     userId,
     urlTemplate:
       `${hostWithProtocol}${basePath}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
       (command.requestId ? `&requestId=${command.requestId}` : ""),
-  });
+  }).catch((error) => catchUserError(error, t("errors.couldNotSendResetLink")));
 }
 
 export type UpdateSessionCommand = {
@@ -194,7 +197,13 @@ export async function sendPassword(
         // Force fallback if settings can't be loaded
         throw new Error("Could not load login settings");
       }
-    } catch {
+    } catch (error) {
+      // Genuine server faults must stay visible as 500s instead of silently
+      // degrading into a fresh-session retry; user errors (wrong password,
+      // terminated session, ...) keep using the fallback below.
+      if (isClassifiedError(error) && !error.isUserError) {
+        throw error;
+      }
       logger.warn("[Password] Could not update session");
       // If the session was terminated or any other error occurred during update,
       // we fall back to creating a new session.
@@ -284,7 +293,11 @@ export async function sendPassword(
           if (loginSettingsByContext?.ignoreUnknownUsernames) {
             return { error: t("errors.failedToAuthenticateNoLimit") };
           }
-          const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: command.organization });
+          // a failed settings lookup must not escape this handler — degrade to
+          // the no-limit message instead
+          const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: command.organization }).catch(
+            () => undefined,
+          );
 
           const hasLimit =
             lockoutSettings?.maxPasswordAttempts !== undefined && lockoutSettings?.maxPasswordAttempts > BigInt(0);
@@ -324,7 +337,13 @@ export async function sendPassword(
   }
 
   if (!user) {
-    const userResponse = await getUserByID({ serviceConfig, userId: session?.factors?.user?.id });
+    let userResponse;
+    try {
+      userResponse = await getUserByID({ serviceConfig, userId: session?.factors?.user?.id });
+    } catch (error) {
+      recordAuthFailure("password", "user_not_found", command.organization);
+      return catchUserError(error, t("errors.userNotFound"));
+    }
     if (!userResponse.user) {
       recordAuthFailure("password", "user_not_found", command.organization);
       return { error: t("errors.userNotFound") };
@@ -383,7 +402,13 @@ export async function sendPassword(
   // if password, check if user has MFA methods
   let authMethods;
   if (command.checks && command.checks.password && session.factors?.user?.id) {
-    const response = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id });
+    let response;
+    try {
+      response = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id });
+    } catch (error) {
+      recordAuthFailure("password", "no_auth_methods", command.organization);
+      return catchUserError(error, t("errors.couldNotVerifyPassword"));
+    }
     if (response.authMethodTypes && response.authMethodTypes.length) {
       authMethods = response.authMethodTypes;
     }
@@ -556,7 +581,11 @@ export async function checkSessionAndSetPassword({
       if (loginSettings?.ignoreUnknownUsernames) {
         return { error: t("errors.failedToAuthenticateNoLimit") };
       }
-      const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: sessionCookie.organization });
+      // a failed settings lookup must not escape this handler — degrade to
+      // the no-limit message instead
+      const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: sessionCookie.organization }).catch(
+        () => undefined,
+      );
 
       const hasLimit =
         lockoutSettings?.maxPasswordAttempts !== undefined && lockoutSettings?.maxPasswordAttempts > BigInt(0);

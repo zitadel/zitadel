@@ -3,6 +3,7 @@
 import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/logger";
 import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "@/lib/server/cookie";
+import { catchUserError } from "@/lib/server/error-utils";
 import {
   deleteSession,
   getLoginSettings,
@@ -11,10 +12,10 @@ import {
   listAuthenticationMethodTypes,
   listUsers,
 } from "@/lib/zitadel";
-import { create, Duration } from "@zitadel/client";
+import { Code, create, Duration } from "@zitadel/client";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { Checks, ChecksSchema, CheckUserSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
@@ -219,6 +220,18 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
     } as Duration;
   }
 
+  // Failed checks are user errors, most commonly a wrong OTP/TOTP code. They
+  // must resolve to `{ error }` so the form can render them — a throw would
+  // fail the whole action POST with a 500 even though nothing is wrong
+  // server-side. Only an InvalidArgument on a code check is confidently a
+  // wrong code; other user errors (rate limits, preconditions, ...) get the
+  // generic message so the user is not misled.
+  const hasCodeCheck = Boolean(checks?.otpSms || checks?.otpEmail || checks?.totp);
+  const checkFailedMessage = (error: unknown) =>
+    hasCodeCheck && isClassifiedError(error) && error.code === Code.InvalidArgument
+      ? t("invalidCode")
+      : t("couldNotUpdateSession");
+
   let session;
   try {
     session = await setSessionAndUpdateCookie({
@@ -229,26 +242,45 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       lifetime,
     });
   } catch (error) {
+    // Recreating the session from the login name only helps when the session
+    // itself is gone — deleted or expired server-side while the cookie survived
+    // (NotFound), or its token is no longer accepted (PermissionDenied). For
+    // every other failure the check itself was rejected, so recreating a
+    // session (with the same failing checks) cannot succeed.
+    const sessionGone = isClassifiedError(error) && (error.code === Code.NotFound || error.code === Code.PermissionDenied);
     const loginNameForCreation = options.loginName || recentSession?.loginName;
     const orgForCreation = options.organization || recentSession?.organization;
 
-    if (!loginNameForCreation) {
-      throw error;
+    if (!sessionGone || !loginNameForCreation) {
+      return catchUserError(error, checkFailedMessage(error), { flow: "updateSession" });
     }
 
-    const users = await listUsers({
-      serviceConfig,
-      loginName: loginNameForCreation,
-      organizationId: orgForCreation,
+    let users;
+    try {
+      users = await listUsers({
+        serviceConfig,
+        loginName: loginNameForCreation,
+        organizationId: orgForCreation,
+      });
+    } catch (listError) {
+      return catchUserError(listError, t("couldNotFindSession"), { flow: "recreateSession" });
+    }
+
+    const userId = users.details?.totalResult === BigInt(1) ? users.result[0]?.userId : undefined;
+
+    if (!userId) {
+      logger.warn("Session is gone and user could not be resolved for recreation", {
+        totalResult: users.details?.totalResult?.toString(),
+      });
+      return { error: t("couldNotFindSession") };
+    }
+
+    const newChecks = create(ChecksSchema, {
+      ...(checks || {}),
+      user: create(CheckUserSchema, { search: { case: "userId", value: userId } }),
     });
 
-    if (users.details?.totalResult === BigInt(1) && users.result[0].userId) {
-      const user = users.result[0];
-      const newChecks = create(ChecksSchema, {
-        ...(checks || {}),
-        user: { search: { case: "userId", value: user.userId } } as any,
-      });
-
+    try {
       const result = await createSessionAndUpdateCookie({
         checks: newChecks,
         requestId,
@@ -257,8 +289,8 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       });
       // @ts-ignore
       session = { ...result.session, challenges: result.challenges };
-    } else {
-      throw error;
+    } catch (createError) {
+      return catchUserError(createError, checkFailedMessage(createError), { flow: "recreateSession" });
     }
   }
 

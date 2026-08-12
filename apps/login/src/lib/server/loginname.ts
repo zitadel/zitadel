@@ -25,6 +25,7 @@ import {
   startIdentityProviderFlow,
 } from "../zitadel";
 import { createSessionAndUpdateCookie } from "./cookie";
+import { catchUserError } from "./error-utils";
 import { getPublicHost } from "./host";
 import { trySendVerification } from "./verify";
 
@@ -287,7 +288,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         if (isClassifiedError(error) && error.message?.includes("Errors.User.NotActive")) {
           return { error: t("errors.userNotActive") };
         }
-        throw error;
+        return catchUserError(error, t("errors.couldNotCreateSession"));
       });
 
       if ("error" in sessionOrError) {

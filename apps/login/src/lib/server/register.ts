@@ -1,6 +1,8 @@
 "use server";
 
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createSessionAndUpdateCookie, createSessionForIdpAndUpdateCookie } from "@/lib/server/cookie";
+import { catchUserError } from "@/lib/server/error-utils";
 import { addHumanUser, addIDPLink, getLoginSettings, getUserByID, listAuthenticationMethodTypes } from "@/lib/zitadel";
 import { Code, ConnectError, Duration, create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
@@ -227,34 +229,57 @@ export async function registerUserAndLinkToIDP(
     return { error: t("errors.registerNotAllowed") };
   }
 
-  const addUserResponse = await addHumanUser({
-    serviceConfig,
-    email: command.email,
-    firstName: command.firstName,
-    lastName: command.lastName,
-    organization: command.organization,
-  });
+  let addUserResponse;
+  try {
+    addUserResponse = await addHumanUser({
+      serviceConfig,
+      email: command.email,
+      firstName: command.firstName,
+      lastName: command.lastName,
+      organization: command.organization,
+    });
+  } catch (error) {
+    logger.error("Failed to create user for IDP registration", { error });
+    // Registering with an email that already has an account is a routine user
+    // mistake — tell them instead of failing the action with a 500.
+    if (isClassifiedError(error) && error.code === Code.AlreadyExists) {
+      return { error: t("errors.userAlreadyExists") };
+    }
+    return catchUserError(error, t("errors.couldNotCreateUser"));
+  }
 
-  const idpLink = await addIDPLink({
-    serviceConfig,
-    idp: {
-      id: command.idpId,
-      userId: command.idpUserId,
-      userName: command.idpUserName,
-    },
-    userId: addUserResponse.userId,
-  });
+  let idpLink;
+  try {
+    idpLink = await addIDPLink({
+      serviceConfig,
+      idp: {
+        id: command.idpId,
+        userId: command.idpUserId,
+        userName: command.idpUserName,
+      },
+      userId: addUserResponse.userId,
+    });
+  } catch (error) {
+    logger.error("Failed to link IDP to newly registered user", { error });
+    return catchUserError(error, t("errors.couldNotLinkIDP"));
+  }
 
   if (!idpLink) {
     return { error: t("errors.couldNotLinkIDP") };
   }
 
-  const session = await createSessionForIdpAndUpdateCookie({
-    requestId: command.requestId,
-    userId: addUserResponse.userId, // the user we just created
-    idpIntent: command.idpIntent,
-    lifetime: loginSettings?.externalLoginCheckLifetime,
-  });
+  let session;
+  try {
+    session = await createSessionForIdpAndUpdateCookie({
+      requestId: command.requestId,
+      userId: addUserResponse.userId, // the user we just created
+      idpIntent: command.idpIntent,
+      lifetime: loginSettings?.externalLoginCheckLifetime,
+    });
+  } catch (error) {
+    logger.error("Failed to create session for newly registered IDP user", { error });
+    return catchUserError(error, t("errors.couldNotCreateSession"));
+  }
 
   if (!session || !session.factors?.user) {
     return { error: t("errors.couldNotCreateSession") };
@@ -281,9 +306,14 @@ export async function registerUserAndLinkToIDP(
   // check if user has MFA methods
   let authMethods;
   if (session.factors?.user?.id) {
-    const response = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id });
-    if (response.authMethodTypes && response.authMethodTypes.length) {
-      authMethods = response.authMethodTypes;
+    try {
+      const response = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id });
+      if (response.authMethodTypes && response.authMethodTypes.length) {
+        authMethods = response.authMethodTypes;
+      }
+    } catch (error) {
+      logger.error("Failed to list authentication methods after IDP registration", { error });
+      return catchUserError(error, t("errors.couldNotRegisterUser"));
     }
   }
 

@@ -152,7 +152,9 @@
       "failedPrecondition": "Nie spełniono warunków wstępnych",
       "sessionNotValid": "Sesja jest nieważna",
       "passwordVerificationMissing": "Brak weryfikacji hasła.",
-      "passwordVerificationTooOld": "Weryfikacja hasła jest przestarzała. Proszę zweryfikować hasło ponownie."
+      "passwordVerificationTooOld": "Weryfikacja hasła jest przestarzała. Proszę zweryfikować hasło ponownie.",
+      "passwordResetNotAllowed": "Resetowanie hasła jest niedozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+      "localAuthenticationNotAllowed": "Uwierzytelnianie lokalne nie jest dozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji."
     }
   },
   "idp": {
@@ -204,7 +206,11 @@
       "userCreationFailed": "Nie udało się utworzyć konta użytkownika",
       "orgResolutionFailed": "Nie można określić organizacji do rejestracji",
       "sessionCreationFailed": "Nie można utworzyć sesji lub określić przekierowania",
-      "unknownError": "Wystąpił nieznany błąd"
+      "unknownError": "Wystąpił nieznany błąd",
+      "unknown": "Wystąpił nieznany błąd",
+      "couldNotStartIDPFlow": "Nie udało się rozpocząć procesu IDP",
+      "userNotFound": "Użytkownik nie został znaleziony w systemie",
+      "couldNotCreateSession": "Nie udało się utworzyć sesji"
     }
   },
   "ldap": {
@@ -218,6 +224,9 @@
     "required": {
       "username": "To pole jest wymagane",
       "password": "To pole jest wymagane"
+    },
+    "errors": {
+      "couldNotVerify": "Nie można się zalogować. Sprawdź nazwę użytkownika i hasło."
     }
   },
   "mfa": {
@@ -280,7 +289,8 @@
         "couldNotFindSession": "Nie można znaleźć sesji",
         "couldNotUpdateSession": "Nie można zaktualizować sesji",
         "userNotFound": "Użytkownik nie znaleziony w systemie",
-        "couldNotDetermineRedirect": "Nie można określić adresu URL przekierowania po weryfikacji klucza dostępu"
+        "couldNotDetermineRedirect": "Nie można określić adresu URL przekierowania po weryfikacji klucza dostępu",
+        "couldNotGetUser": "Nie można pobrać użytkownika"
       }
     },
     "set": {
@@ -291,7 +301,15 @@
         "link": "Uwierzytelnianie kluczem dostępu"
       },
       "skip": "Pomiń",
-      "submit": "Kontynuuj"
+      "submit": "Kontynuuj",
+      "errors": {
+        "missingContext": "Brak informacji o sesji lub użytkowniku. Uruchom konfigurację ponownie z otrzymanego linku.",
+        "couldNotLoadSession": "Nie można załadować sesji",
+        "couldNotRegisterPasskey": "Nie można skonfigurować klucza dostępu. Spróbuj ponownie.",
+        "couldNotVerifyPasskey": "Nie można zweryfikować klucza dostępu. Spróbuj ponownie.",
+        "userNotFound": "Użytkownik nie został znaleziony w systemie",
+        "couldNotCreateSession": "Nie udało się utworzyć sesji"
+      }
     }
   },
   "u2f": {
@@ -303,6 +321,11 @@
       "title": "Skonfiguruj uwierzytelnianie dwuskładnikowe",
       "description": "Skonfiguruj urządzenie jako dodatkowy czynnik uwierzytelniania.",
       "submit": "Kontynuuj"
+    },
+    "errors": {
+      "couldNotLoadSession": "Nie można załadować sesji",
+      "couldNotRegister": "Nie można skonfigurować klucza bezpieczeństwa. Spróbuj ponownie.",
+      "couldNotVerify": "Nie można zweryfikować klucza bezpieczeństwa. Spróbuj ponownie."
     }
   },
   "register": {
@@ -354,7 +377,11 @@
       "couldNotCreateSession": "Nie udało się utworzyć sesji",
       "userNotFound": "Nie znaleziono użytkownika w systemie",
       "couldNotLinkIDP": "Nie udało się powiązać IDP z użytkownikiem",
-      "couldNotRegisterUser": "Nie udało się zarejestrować użytkownika"
+      "couldNotRegisterUser": "Nie udało się zarejestrować użytkownika",
+      "registerNotAllowed": "Rejestracja jest niedozwolona! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+      "userAlreadyExists": "Użytkownik z tym adresem e-mail już istnieje. Spróbuj się zalogować.",
+      "couldNotGetLoginSettings": "Nie udało się pobrać ustawień logowania",
+      "localAuthenticationNotAllowed": "Uwierzytelnianie lokalne nie jest dozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji."
     }
   },
   "invite": {
@@ -414,7 +441,10 @@
       "couldNotResendInvite": "Nie udało się ponownie wysłać zaproszenia",
       "inviteSendFailed": "Nie udało się wysłać wiadomości e-mail z zaproszeniem",
       "emailSendFailed": "Nie udało się wysłać wiadomości e-mail weryfikacyjnej",
-      "contextMissing": "Wystąpił błąd. Spróbuj ponownie."
+      "contextMissing": "Wystąpił błąd. Spróbuj ponownie.",
+      "couldNotFindSession": "Nie można znaleźć sesji",
+      "couldNotUpdateSession": "Nie można zaktualizować sesji",
+      "invalidCode": "Nieprawidłowy kod. Spróbuj ponownie."
     }
   },
   "authenticator": {
@@ -448,6 +478,9 @@
       "email": "Uzyskaj dostęp do swojego adresu e-mail.",
       "profile": "Uzyskaj dostęp do pełnych informacji o swoim profilu.",
       "offline_access": "Zezwól na dostęp offline do swojego konta."
+    },
+    "errors": {
+      "couldNotComplete": "Nie można ukończyć autoryzacji urządzenia. Kod mógł już zostać użyty lub wygasł."
     }
   },
   "error": {

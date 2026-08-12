@@ -1,5 +1,6 @@
 import { isRSCRequest, validateAuthRequest } from "@/lib/auth-utils";
 import { getAllSessions } from "@/lib/cookies";
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/logger";
 import { FlowInitiationParams, handleOIDCFlowInitiation, handleSAMLFlowInitiation } from "@/lib/server/flow-initiation";
 import { getServiceConfig } from "@/lib/service-url";
@@ -66,6 +67,19 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Invalid request ID format" }, { status: 400 });
     }
   } catch (error: unknown) {
+    // Business rejections from the API (auth request already handled, expired,
+    // user grant required, ...) are 4xx equivalents caused by the request, not
+    // server faults — report them as such so availability metrics stay clean.
+    if (isClassifiedError(error) && error.isUserError) {
+      logger.warn("Flow initiation rejected", {
+        requestId,
+        grpcCode: error.code,
+        httpStatus: error.httpStatus,
+        message: error.rawMessage,
+      });
+      return NextResponse.json({ error: error.rawMessage }, { status: error.httpStatus });
+    }
+
     logger.error("Flow initiation failed", { requestId, error });
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

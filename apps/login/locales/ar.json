@@ -152,7 +152,9 @@
       "failedPrecondition": "فشل الشرط المسبق",
       "sessionNotValid": "الجلسة غير صالحة",
       "passwordVerificationMissing": "التحقق من كلمة المرور مفقود.",
-      "passwordVerificationTooOld": "التحقق من كلمة المرور قديم جدًا. يرجى التحقق من كلمة المرور مرة أخرى."
+      "passwordVerificationTooOld": "التحقق من كلمة المرور قديم جدًا. يرجى التحقق من كلمة المرور مرة أخرى.",
+      "passwordResetNotAllowed": "إعادة تعيين كلمة المرور غير مسموح بها! اتصل بالمسؤول لمزيد من المعلومات.",
+      "localAuthenticationNotAllowed": "المصادقة المحلية غير مسموح بها! اتصل بالمسؤول لمزيد من المعلومات."
     }
   },
   "idp": {
@@ -204,7 +206,11 @@
       "userCreationFailed": "فشل إنشاء حساب المستخدم",
       "orgResolutionFailed": "تعذر تحديد المنظمة للتسجيل",
       "sessionCreationFailed": "تعذر إنشاء الجلسة أو تحديد إعادة التوجيه",
-      "unknownError": "حدث خطأ غير معروف"
+      "unknownError": "حدث خطأ غير معروف",
+      "unknown": "حدث خطأ غير معروف",
+      "couldNotStartIDPFlow": "تعذر بدء تدفق مزود الهوية (IDP)",
+      "userNotFound": "المستخدم غير موجود في النظام",
+      "couldNotCreateSession": "تعذر إنشاء الجلسة"
     }
   },
   "ldap": {
@@ -218,6 +224,9 @@
     "required": {
       "username": "هذا الحقل مطلوب",
       "password": "هذا الحقل مطلوب"
+    },
+    "errors": {
+      "couldNotVerify": "تعذر تسجيل الدخول. يرجى التحقق من اسم المستخدم وكلمة المرور."
     }
   },
   "mfa": {
@@ -280,7 +289,8 @@
         "couldNotFindSession": "تعذر العثور على الجلسة",
         "couldNotUpdateSession": "تعذر تحديث الجلسة",
         "userNotFound": "المستخدم غير موجود في النظام",
-        "couldNotDetermineRedirect": "تعذر تحديد عنوان URL لإعادة التوجيه بعد التحقق من مفتاح المرور"
+        "couldNotDetermineRedirect": "تعذر تحديد عنوان URL لإعادة التوجيه بعد التحقق من مفتاح المرور",
+        "couldNotGetUser": "تعذر الحصول على المستخدم"
       }
     },
     "set": {
@@ -291,7 +301,15 @@
         "link": "المصادقة بدون كلمة مرور"
       },
       "skip": "تخطي",
-      "submit": "متابعة"
+      "submit": "متابعة",
+      "errors": {
+        "missingContext": "معلومات الجلسة أو المستخدم مفقودة. أعد بدء الإعداد من الرابط الذي تلقيته.",
+        "couldNotLoadSession": "تعذر تحميل الجلسة",
+        "couldNotRegisterPasskey": "تعذر إعداد مفتاح المرور. حاول مرة أخرى.",
+        "couldNotVerifyPasskey": "تعذر التحقق من مفتاح المرور. حاول مرة أخرى.",
+        "userNotFound": "المستخدم غير موجود في النظام",
+        "couldNotCreateSession": "تعذر إنشاء الجلسة"
+      }
     }
   },
   "u2f": {
@@ -303,6 +321,11 @@
       "title": "إعداد المصادقة الثنائية",
       "description": "إعداد جهاز كعامل ثانٍ.",
       "submit": "متابعة"
+    },
+    "errors": {
+      "couldNotLoadSession": "تعذر تحميل الجلسة",
+      "couldNotRegister": "تعذر إعداد مفتاح الأمان. حاول مرة أخرى.",
+      "couldNotVerify": "تعذر التحقق من مفتاح الأمان. حاول مرة أخرى."
     }
   },
   "register": {
@@ -354,7 +377,11 @@
       "couldNotCreateSession": "تعذر إنشاء الجلسة",
       "userNotFound": "المستخدم غير موجود في النظام",
       "couldNotLinkIDP": "تعذر ربط IDP بالمستخدم",
-      "couldNotRegisterUser": "تعذر تسجيل المستخدم"
+      "couldNotRegisterUser": "تعذر تسجيل المستخدم",
+      "registerNotAllowed": "التسجيل غير مسموح به! اتصل بالمسؤول لمزيد من المعلومات.",
+      "userAlreadyExists": "يوجد مستخدم بهذا البريد الإلكتروني بالفعل. حاول تسجيل الدخول بدلاً من ذلك.",
+      "couldNotGetLoginSettings": "تعذر الحصول على إعدادات تسجيل الدخول",
+      "localAuthenticationNotAllowed": "المصادقة المحلية غير مسموح بها! اتصل بالمسؤول لمزيد من المعلومات."
     }
   },
   "invite": {
@@ -414,7 +441,10 @@
       "couldNotResendInvite": "تعذر إعادة إرسال الدعوة",
       "inviteSendFailed": "فشل إرسال بريد الدعوة الإلكتروني",
       "emailSendFailed": "فشل إرسال بريد التحقق الإلكتروني",
-      "contextMissing": "حدث خطأ. يرجى المحاولة مرة أخرى."
+      "contextMissing": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+      "couldNotFindSession": "تعذر العثور على الجلسة",
+      "couldNotUpdateSession": "تعذر تحديث الجلسة",
+      "invalidCode": "الرمز غير صالح. حاول مرة أخرى."
     }
   },
   "authenticator": {
@@ -448,6 +478,9 @@
       "email": "عرض عنوان بريدك الإلكتروني.",
       "profile": "عرض معلومات ملفك الشخصي الكاملة.",
       "offline_access": "السماح بالوصول دون اتصال إلى حسابك."
+    },
+    "errors": {
+      "couldNotComplete": "تعذر إكمال تفويض الجهاز. ربما تم استخدام الرمز بالفعل أو انتهت صلاحيته."
     }
   },
   "error": {

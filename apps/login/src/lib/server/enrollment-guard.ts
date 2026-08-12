@@ -1,3 +1,4 @@
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/logger";
 import { hasVerifiedPrimaryFactor } from "@/lib/session";
 import { checkUserVerification } from "@/lib/verify-helper";
@@ -32,7 +33,19 @@ export async function getEnrollmentAuthorizationError({
   }
 
   // The session is only "identified", not authenticated.
-  const authmethods = await listAuthenticationMethodTypes({ serviceConfig, userId });
+  let authmethods;
+  try {
+    authmethods = await listAuthenticationMethodTypes({ serviceConfig, userId });
+  } catch (error) {
+    // Fail closed: without knowing the user's methods (e.g. the user was
+    // deleted mid-flow), enrollment must not proceed. Genuine server faults
+    // keep throwing so callers surface them.
+    if (isClassifiedError(error) && error.isUserError) {
+      logger.warn("Could not list authentication methods for enrollment authorization", { grpcCode: error.code });
+      return "You have to authenticate or have a valid User Verification Check";
+    }
+    throw error;
+  }
 
   // If the user already has any auth method configured, enrollment requires a real
   // authentication (or a valid user-verification check) — reject the identify-only session.

@@ -135,7 +135,9 @@
       "couldNotLoadSession": "セッションを読み込めませんでした",
       "couldNotLoadAuthMethods": "認証方法を読み込めませんでした",
       "failedPrecondition": "前提条件に失敗しました",
-      "sessionNotValid": "セッションが無効です"
+      "sessionNotValid": "セッションが無効です",
+      "passwordResetNotAllowed": "パスワードのリセットは許可されていません。詳細については管理者にお問い合わせください。",
+      "localAuthenticationNotAllowed": "ローカル認証は許可されていません！ 詳細については管理者に問い合わせてください。"
     },
     "complexity": {
       "length": "{minLength} 文字以上である必要があります。",
@@ -197,7 +199,11 @@
       "userCreationFailed": "ユーザーアカウントの作成に失敗しました",
       "orgResolutionFailed": "登録する組織を特定できませんでした",
       "sessionCreationFailed": "セッションの作成またはリダイレクトの決定に失敗しました",
-      "unknownError": "不明なエラーが発生しました"
+      "unknownError": "不明なエラーが発生しました",
+      "unknown": "不明なエラーが発生しました",
+      "couldNotStartIDPFlow": "IDPフローを開始できませんでした",
+      "userNotFound": "ユーザーがシステムに見つかりません",
+      "couldNotCreateSession": "セッションを作成できませんでした"
     }
   },
   "ldap": {
@@ -211,6 +217,9 @@
     "required": {
       "username": "必須項目です",
       "password": "必須項目です"
+    },
+    "errors": {
+      "couldNotVerify": "サインインできませんでした。ユーザー名とパスワードを確認してください。"
     }
   },
   "mfa": {
@@ -273,7 +282,8 @@
         "couldNotFindSession": "セッションが見つかりませんでした",
         "couldNotUpdateSession": "セッションを更新できませんでした",
         "userNotFound": "ユーザーがシステムに見つかりません",
-        "couldNotDetermineRedirect": "パスキー確認後のリダイレクトURLを決定できませんでした"
+        "couldNotDetermineRedirect": "パスキー確認後のリダイレクトURLを決定できませんでした",
+        "couldNotGetUser": "ユーザーを取得できませんでした"
       }
     },
     "set": {
@@ -284,7 +294,15 @@
         "link": "パスキー認証"
       },
       "skip": "スキップ",
-      "submit": "続行"
+      "submit": "続行",
+      "errors": {
+        "missingContext": "セッションまたはユーザー情報がありません。受け取ったリンクから設定をやり直してください。",
+        "couldNotLoadSession": "セッションを読み込めませんでした",
+        "couldNotRegisterPasskey": "パスキーを設定できませんでした。もう一度お試しください。",
+        "couldNotVerifyPasskey": "パスキーを検証できませんでした。もう一度お試しください。",
+        "userNotFound": "ユーザーがシステムに見つかりません",
+        "couldNotCreateSession": "セッションを作成できませんでした"
+      }
     }
   },
   "u2f": {
@@ -296,6 +314,11 @@
       "title": "二要素認証の設定",
       "description": "デバイスを二要素認証として設定します。",
       "submit": "続行"
+    },
+    "errors": {
+      "couldNotLoadSession": "セッションを読み込めませんでした",
+      "couldNotRegister": "セキュリティキーを設定できませんでした。もう一度お試しください。",
+      "couldNotVerify": "セキュリティキーを検証できませんでした。もう一度お試しください。"
     }
   },
   "register": {
@@ -347,7 +370,11 @@
       "couldNotCreateSession": "セッションを作成できませんでした",
       "userNotFound": "ユーザーがシステムに見つかりません",
       "couldNotLinkIDP": "IDPをユーザーにリンクできませんでした",
-      "couldNotRegisterUser": "ユーザーを登録できませんでした"
+      "couldNotRegisterUser": "ユーザーを登録できませんでした",
+      "registerNotAllowed": "登録は許可されていません。詳細については管理者にお問い合わせください。",
+      "userAlreadyExists": "このメールアドレスのユーザーは既に存在します。代わりにサインインしてください。",
+      "couldNotGetLoginSettings": "ログイン設定を取得できませんでした",
+      "localAuthenticationNotAllowed": "ローカル認証は許可されていません！ 詳細については管理者に問い合わせてください。"
     }
   },
   "invite": {
@@ -407,7 +434,10 @@
       "couldNotResendInvite": "招待を再送信できませんでした",
       "inviteSendFailed": "招待メールの送信に失敗しました",
       "emailSendFailed": "確認メールの送信に失敗しました",
-      "contextMissing": "エラーが発生しました。もう一度お試しください。"
+      "contextMissing": "エラーが発生しました。もう一度お試しください。",
+      "couldNotFindSession": "セッションが見つかりませんでした",
+      "couldNotUpdateSession": "セッションを更新できませんでした",
+      "invalidCode": "コードが無効です。もう一度お試しください。"
     }
   },
   "authenticator": {
@@ -441,6 +471,9 @@
       "email": "メールアドレスを表示します。",
       "profile": "すべてのプロフィール情報を表示します。",
       "offline_access": "アカウントへのオフラインアクセスを許可します。"
+    },
+    "errors": {
+      "couldNotComplete": "デバイス認証を完了できませんでした。コードは既に使用されているか、期限切れの可能性があります。"
     }
   },
   "error": {

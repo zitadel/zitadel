@@ -5,15 +5,13 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession } from "@/lib/session";
+import { loadMostRecentSession, loadSessionById } from "@/lib/session";
 import { checkUserVerification } from "@/lib/verify-helper";
 import {
   getActiveIdentityProviders,
   getBrandingSettings,
   getLoginSettings,
-  getSession,
   getUserByID,
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
@@ -37,15 +35,17 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  const sessionWithData = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadSessionByLoginname(loginName, organization);
+  const session = sessionId
+    ? await loadSessionById({ serviceConfig, sessionId, organization })
+    : await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } });
 
   async function getAuthMethodsAndUser(session?: Session) {
     const userId = session?.factors?.user?.id;
 
+    // A missing session (deleted/expired server-side) or one without a user is
+    // an expected state — the page renders its unknown-context alert for it.
     if (!userId) {
-      throw Error("Could not get user id from session");
+      return undefined;
     }
 
     const methods = await listAuthenticationMethodTypes({ serviceConfig, userId });
@@ -63,28 +63,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     };
   }
 
-  async function loadSessionByLoginname(loginName?: string, organization?: string) {
-    const session = await loadMostRecentSession({
-      serviceConfig,
-      sessionParams: {
-        loginName,
-        organization,
-      },
-    });
-
-    return getAuthMethodsAndUser(session);
-  }
-
-  async function loadSessionById(sessionId: string, organization?: string) {
-    const recent = await getSessionCookieById({ sessionId, organization });
-
-    if (!recent) {
-      return undefined;
-    }
-
-    const sessionResponse = await getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token });
-    return getAuthMethodsAndUser(sessionResponse.session);
-  }
+  const sessionWithData = await getAuthMethodsAndUser(session);
 
   if (!sessionWithData || !sessionWithData.factors || !sessionWithData.factors.user) {
     return (

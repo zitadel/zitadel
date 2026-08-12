@@ -6,7 +6,8 @@ vi.mock("next/headers", () => ({
   headers: vi.fn(),
 }));
 
-vi.mock("@zitadel/client", () => ({
+vi.mock("@zitadel/client", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@zitadel/client")>()),
   create: vi.fn(),
   Duration: vi.fn(),
   Timestamp: vi.fn(),
@@ -24,6 +25,7 @@ vi.mock("../zitadel", () => ({
   listUsers: vi.fn(),
   createPasskeyRegistrationLink: vi.fn(),
   registerPasskey: vi.fn(),
+  verifyPasskeyRegistration: vi.fn(),
   listAuthenticationMethodTypes: vi.fn(),
 }));
 
@@ -204,8 +206,12 @@ describe("sendPasskey", () => {
       });
     });
 
-    test("should fallback to createSessionAndUpdateCookie when setSessionAndUpdateCookie fails and checks are present", async () => {
-      mockSetSessionAndUpdateCookie.mockRejectedValue(new Error("session already terminated"));
+    test("should fallback to createSessionAndUpdateCookie when the session is gone and checks are present", async () => {
+      const { Code, ConnectError } = await import("@connectrpc/connect");
+      const { ClassifiedConnectError } = await import("../grpc/interceptors/error-classification");
+      mockSetSessionAndUpdateCookie.mockRejectedValue(
+        new ClassifiedConnectError(new ConnectError("Errors.Session.NotExisting", Code.NotFound)),
+      );
 
       mockCreateSessionAndUpdateCookie.mockResolvedValue({
         session: {
@@ -527,14 +533,14 @@ describe("registerPasskeyLink", () => {
 
   test("should return error when neither sessionId nor userId is provided", async () => {
     const result = await registerPasskeyLink({});
-    expect(result).toEqual({ error: "Either sessionId or userId must be provided" });
+    expect(result).toEqual({ error: "set.errors.missingContext" });
   });
 
   test("should return error when session cookie is not found", async () => {
     mockGetSessionCookieById.mockResolvedValue(null);
 
     const result = await registerPasskeyLink({ sessionId: "session-123" });
-    expect(result).toEqual({ error: "Could not get session cookie" });
+    expect(result).toEqual({ error: "set.errors.couldNotLoadSession" });
   });
 
   describe("IDP-authenticated session", () => {
@@ -714,5 +720,79 @@ describe("registerPasskeyLink", () => {
 
       expect(result).toHaveProperty("passkeyId");
     });
+  });
+});
+
+describe("verifyPasskeyRegistration", () => {
+  let mockGetSessionCookieById: any;
+  let mockGetSession: any;
+  let mockZitadelVerifyPasskeyRegistration: any;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+
+    const { getSessionCookieById } = await import("../cookies");
+    const { getSession, verifyPasskeyRegistration: zitadelVerify } = await import("@/lib/zitadel");
+
+    mockGetSessionCookieById = vi.mocked(getSessionCookieById);
+    mockGetSession = vi.mocked(getSession);
+    mockZitadelVerifyPasskeyRegistration = vi.mocked(zitadelVerify);
+
+    const { headers } = await import("next/headers");
+    vi.mocked(headers).mockResolvedValue(new Headers() as any);
+    const { getServiceConfig } = await import("../service-url");
+    vi.mocked(getServiceConfig).mockReturnValue({ serviceConfig: { baseUrl: "https://api.example.com" } } as any);
+
+    mockGetSessionCookieById.mockResolvedValue({ id: "session-123", token: "token-123" });
+    mockGetSession.mockResolvedValue({
+      session: { id: "session-123", factors: { user: { id: "user-123", loginName: "test@example.com" } } },
+    });
+  });
+
+  async function classifiedError(code: number, message: string) {
+    const { ConnectError } = await import("@connectrpc/connect");
+    const { ClassifiedConnectError } = await import("../grpc/interceptors/error-classification");
+    return new ClassifiedConnectError(new ConnectError(message, code));
+  }
+
+  test("returns an error instead of throwing when neither sessionId nor userId is provided", async () => {
+    const { verifyPasskeyRegistration } = await import("./passkeys");
+
+    await expect(verifyPasskeyRegistration({ passkeyId: "pk-1", publicKeyCredential: {} })).resolves.toEqual({
+      error: "set.errors.missingContext",
+    });
+  });
+
+  test("returns an error for a failed attestation instead of throwing", async () => {
+    const { verifyPasskeyRegistration } = await import("./passkeys");
+    const { Code } = await import("@connectrpc/connect");
+    mockZitadelVerifyPasskeyRegistration.mockRejectedValue(
+      await classifiedError(Code.InvalidArgument, "invalid attestation"),
+    );
+
+    await expect(
+      verifyPasskeyRegistration({ passkeyId: "pk-1", publicKeyCredential: {}, sessionId: "session-123" }),
+    ).resolves.toEqual({ error: "set.errors.couldNotVerifyPasskey" });
+  });
+
+  test("returns an error when the session is gone server-side instead of throwing", async () => {
+    const { verifyPasskeyRegistration } = await import("./passkeys");
+    const { Code } = await import("@connectrpc/connect");
+    mockGetSession.mockRejectedValue(await classifiedError(Code.NotFound, "Errors.Session.NotExisting"));
+
+    await expect(
+      verifyPasskeyRegistration({ passkeyId: "pk-1", publicKeyCredential: {}, sessionId: "session-123" }),
+    ).resolves.toEqual({ error: "set.errors.couldNotLoadSession" });
+    expect(mockZitadelVerifyPasskeyRegistration).not.toHaveBeenCalled();
+  });
+
+  test("rethrows genuine server errors so they still surface as 500", async () => {
+    const { verifyPasskeyRegistration } = await import("./passkeys");
+    const { Code } = await import("@connectrpc/connect");
+    mockZitadelVerifyPasskeyRegistration.mockRejectedValue(await classifiedError(Code.Internal, "database down"));
+
+    await expect(
+      verifyPasskeyRegistration({ passkeyId: "pk-1", publicKeyCredential: {}, sessionId: "session-123" }),
+    ).rejects.toThrow("database down");
   });
 });

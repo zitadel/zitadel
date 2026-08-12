@@ -152,7 +152,9 @@
       "failedPrecondition": "Pré-condition non remplie",
       "sessionNotValid": "La session n'est pas valide",
       "passwordVerificationMissing": "La vérification du mot de passe est manquante.",
-      "passwordVerificationTooOld": "La vérification du mot de passe est trop ancienne. Veuillez vérifier à nouveau votre mot de passe."
+      "passwordVerificationTooOld": "La vérification du mot de passe est trop ancienne. Veuillez vérifier à nouveau votre mot de passe.",
+      "passwordResetNotAllowed": "La réinitialisation du mot de passe n'est pas autorisée ! Contactez votre administrateur pour plus d'informations.",
+      "localAuthenticationNotAllowed": "L'authentification locale n'est pas autorisée ! Contactez votre administrateur pour plus d'informations."
     }
   },
   "idp": {
@@ -204,7 +206,11 @@
       "userCreationFailed": "Échec de la création du compte utilisateur",
       "orgResolutionFailed": "Impossible de déterminer l'organisation pour l'inscription",
       "sessionCreationFailed": "Impossible de créer la session ou de déterminer la redirection",
-      "unknownError": "Une erreur inconnue s'est produite"
+      "unknownError": "Une erreur inconnue s'est produite",
+      "unknown": "Une erreur inconnue s'est produite",
+      "couldNotStartIDPFlow": "Impossible de démarrer le flux IDP",
+      "userNotFound": "Utilisateur non trouvé dans le système",
+      "couldNotCreateSession": "Impossible de créer la session"
     }
   },
   "ldap": {
@@ -218,6 +224,9 @@
     "required": {
       "username": "Ce champ est requis",
       "password": "Ce champ est requis"
+    },
+    "errors": {
+      "couldNotVerify": "Connexion impossible. Veuillez vérifier votre nom d'utilisateur et votre mot de passe."
     }
   },
   "mfa": {
@@ -280,7 +289,8 @@
         "couldNotFindSession": "Session introuvable",
         "couldNotUpdateSession": "Impossible de mettre à jour la session",
         "userNotFound": "Utilisateur introuvable dans le système",
-        "couldNotDetermineRedirect": "Impossible de déterminer l'URL de redirection après la vérification de la clé d'accès"
+        "couldNotDetermineRedirect": "Impossible de déterminer l'URL de redirection après la vérification de la clé d'accès",
+        "couldNotGetUser": "Impossible de récupérer l'utilisateur"
       }
     },
     "set": {
@@ -291,7 +301,15 @@
         "link": "Authentification par clé d'accès"
       },
       "skip": "Ignorer",
-      "submit": "Continuer"
+      "submit": "Continuer",
+      "errors": {
+        "missingContext": "Informations de session ou d'utilisateur manquantes. Relancez la configuration depuis le lien reçu.",
+        "couldNotLoadSession": "Impossible de charger la session",
+        "couldNotRegisterPasskey": "Impossible de configurer la clé d'accès. Veuillez réessayer.",
+        "couldNotVerifyPasskey": "Impossible de vérifier la clé d'accès. Veuillez réessayer.",
+        "userNotFound": "Utilisateur non trouvé dans le système",
+        "couldNotCreateSession": "Impossible de créer la session"
+      }
     }
   },
   "u2f": {
@@ -303,6 +321,11 @@
       "title": "Configurer la double authentification",
       "description": "Configurez un appareil comme second facteur.",
       "submit": "Continuer"
+    },
+    "errors": {
+      "couldNotLoadSession": "Impossible de charger la session",
+      "couldNotRegister": "Impossible de configurer la clé de sécurité. Veuillez réessayer.",
+      "couldNotVerify": "Impossible de vérifier la clé de sécurité. Veuillez réessayer."
     }
   },
   "register": {
@@ -354,7 +377,11 @@
       "couldNotCreateSession": "Impossible de créer la session",
       "userNotFound": "Utilisateur non trouvé dans le système",
       "couldNotLinkIDP": "Impossible de lier le fournisseur d'identité à l'utilisateur",
-      "couldNotRegisterUser": "Impossible d'inscrire l'utilisateur"
+      "couldNotRegisterUser": "Impossible d'inscrire l'utilisateur",
+      "registerNotAllowed": "L'inscription n'est pas autorisée ! Contactez votre administrateur pour plus d'informations.",
+      "userAlreadyExists": "Un utilisateur avec cette adresse e-mail existe déjà. Essayez plutôt de vous connecter.",
+      "couldNotGetLoginSettings": "Impossible d'obtenir les paramètres de connexion",
+      "localAuthenticationNotAllowed": "L'authentification locale n'est pas autorisée ! Contactez votre administrateur pour plus d'informations."
     }
   },
   "invite": {
@@ -414,7 +441,10 @@
       "couldNotResendInvite": "Impossible de renvoyer l'invitation",
       "inviteSendFailed": "Échec de l'envoi de l'e-mail d'invitation",
       "emailSendFailed": "Échec de l'envoi de l'e-mail de vérification",
-      "contextMissing": "Une erreur s'est produite. Veuillez réessayer."
+      "contextMissing": "Une erreur s'est produite. Veuillez réessayer.",
+      "couldNotFindSession": "Impossible de trouver la session",
+      "couldNotUpdateSession": "Impossible de mettre à jour la session",
+      "invalidCode": "Code invalide. Veuillez réessayer."
     }
   },
   "authenticator": {
@@ -448,6 +478,9 @@
       "email": "Afficher votre adresse e-mail.",
       "profile": "Afficher les informations complètes de votre profil.",
       "offline_access": "Autoriser l'accès hors ligne à votre compte."
+    },
+    "errors": {
+      "couldNotComplete": "Impossible de terminer l'autorisation de l'appareil. Le code a peut-être déjà été utilisé ou a expiré."
     }
   },
   "error": {

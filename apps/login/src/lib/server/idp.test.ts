@@ -1,9 +1,16 @@
+import { Code, ConnectError } from "@connectrpc/connect";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { redirectToIdp } from "./idp";
+import { ClassifiedConnectError } from "../grpc/interceptors/error-classification";
+import { createNewSessionForLDAP, redirectToIdp } from "./idp";
 
 // Mock all the dependencies
 vi.mock("next/headers", () => ({
   headers: vi.fn(),
+}));
+
+// this returns the key itself so tests can assert on translation keys
+vi.mock("next-intl/server", () => ({
+  getTranslations: vi.fn(() => (key: string) => key),
 }));
 
 vi.mock("next/navigation", () => ({
@@ -26,7 +33,11 @@ vi.mock("./host", () => ({
 }));
 
 vi.mock("../zitadel", () => ({
+  getLoginSettings: vi.fn(),
+  getUserByID: vi.fn(),
+  listAuthenticationMethodTypes: vi.fn(),
   startIdentityProviderFlow: vi.fn(),
+  startLDAPIdentityProviderFlow: vi.fn(),
 }));
 
 vi.mock("../fingerprint", () => ({
@@ -279,7 +290,7 @@ describe("redirectToIdp", () => {
 
       const result = await redirectToIdp(undefined, formData);
 
-      expect(result).toEqual({ error: "Could not start IDP flow" });
+      expect(result).toEqual({ error: "errors.couldNotStartIDPFlow" });
     });
 
     test("should redirect when IDP flow returns a valid URL", async () => {
@@ -298,5 +309,63 @@ describe("redirectToIdp", () => {
         expect(error.message).toBe("REDIRECT: https://idp.example.com/auth");
       }
     });
+  });
+});
+
+describe("createNewSessionForLDAP", () => {
+  let mockHeaders: any;
+  let mockGetServiceUrlFromHeaders: any;
+  let mockStartLDAPIdentityProviderFlow: any;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+
+    const { headers } = await import("next/headers");
+    const { getServiceConfig } = await import("../service-url");
+    const { startLDAPIdentityProviderFlow } = await import("../zitadel");
+
+    mockHeaders = vi.mocked(headers);
+    mockGetServiceUrlFromHeaders = vi.mocked(getServiceConfig);
+    mockStartLDAPIdentityProviderFlow = vi.mocked(startLDAPIdentityProviderFlow);
+
+    mockHeaders.mockResolvedValue({} as any);
+    mockGetServiceUrlFromHeaders.mockReturnValue({ serviceConfig: { baseUrl: "https://api.example.com" } });
+  });
+
+  const command = {
+    username: "jane",
+    password: "secret",
+    idpId: "idp-1",
+    link: false,
+  };
+
+  test("returns an error for wrong LDAP credentials instead of throwing", async () => {
+    mockStartLDAPIdentityProviderFlow.mockRejectedValue(
+      new ClassifiedConnectError(new ConnectError("invalid credentials", Code.InvalidArgument)),
+    );
+
+    await expect(createNewSessionForLDAP(command)).resolves.toEqual({ error: "errors.couldNotVerify" });
+  });
+
+  test("rethrows genuine server errors so they still surface as 500", async () => {
+    mockStartLDAPIdentityProviderFlow.mockRejectedValue(
+      new ClassifiedConnectError(new ConnectError("ldap unreachable", Code.Internal)),
+    );
+
+    await expect(createNewSessionForLDAP(command)).rejects.toThrow("ldap unreachable");
+  });
+
+  test("redirects to the intent process page on success", async () => {
+    mockStartLDAPIdentityProviderFlow.mockResolvedValue({
+      nextStep: {
+        case: "idpIntent",
+        value: { userId: "user-1", idpIntentId: "intent-1", idpIntentToken: "token-1" },
+      },
+    });
+
+    const result = await createNewSessionForLDAP(command);
+
+    expect(result).toHaveProperty("redirect");
+    expect((result as { redirect: string }).redirect).toContain("/idp/ldap/process?");
   });
 });

@@ -30,7 +30,17 @@ export async function loginWithSAMLAndSession({
   const selectedSession = sessions.find((s) => s.id === sessionId);
 
   if (selectedSession && selectedSession.id) {
-    const isValid = await isSessionValid({ serviceConfig, session: selectedSession });
+    // Only a classified user error (e.g. removed user/org behind the session)
+    // may degrade a failed validity check to "invalid" (re-authenticate).
+    // Genuine server faults must keep failing the action so outages stay
+    // visible as 500s instead of silently redirecting to re-authentication.
+    const isValid = await isSessionValid({ serviceConfig, session: selectedSession }).catch((error) => {
+      if (isClassifiedError(error) && error.isUserError) {
+        console.warn("loginWithSAMLAndSession: could not validate session", error);
+        return false;
+      }
+      throw error;
+    });
 
     if (!isValid && selectedSession.factors?.user) {
       // if the session is not valid anymore, we need to redirect the user to re-authenticate /
@@ -41,7 +51,15 @@ export async function loginWithSAMLAndSession({
         requestId: `saml_${samlRequest}`,
       };
 
-      const res = await sendLoginname(command);
+      // a user-error here (e.g. removed org/user) must not fail the whole
+      // action — fall through and let the SAML response attempt decide
+      const res = await sendLoginname(command).catch((error) => {
+        if (isClassifiedError(error) && error.isUserError) {
+          console.warn("loginWithSAMLAndSession: could not restart login for invalid session", error);
+          return undefined;
+        }
+        throw error;
+      });
 
       if (res && "redirect" in res && res?.redirect) {
         return { redirect: res.redirect };
@@ -100,10 +118,12 @@ export async function loginWithSAMLAndSession({
         console.error(error);
 
         if (isClassifiedError(error) && error.code === Code.FailedPrecondition) {
+          // Recovery path: a failure to load settings must not escape the
+          // handler — fall through to the /signedin redirect instead.
           const loginSettings = await getLoginSettings({
             serviceConfig,
             organization: selectedSession.factors?.user?.organizationId,
-          });
+          }).catch(() => undefined);
 
           if (loginSettings?.defaultRedirectUri && isSafeRedirectUri(loginSettings.defaultRedirectUri)) {
             return { redirect: loginSettings.defaultRedirectUri };

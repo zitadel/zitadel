@@ -152,7 +152,9 @@
       "failedPrecondition": "Precondición fallida",
       "sessionNotValid": "La sesión no es válida",
       "passwordVerificationMissing": "Falta la verificación de la contraseña.",
-      "passwordVerificationTooOld": "La verificación de la contraseña es demasiado antigua. Por favor, verifique su contraseña de nuevo."
+      "passwordVerificationTooOld": "La verificación de la contraseña es demasiado antigua. Por favor, verifique su contraseña de nuevo.",
+      "passwordResetNotAllowed": "¡No se permite restablecer la contraseña! Contacta a tu administrador para más información.",
+      "localAuthenticationNotAllowed": "¡La autenticación local no está permitida! Contacte con su administrador para más información."
     }
   },
   "idp": {
@@ -204,7 +206,11 @@
       "userCreationFailed": "Error al crear la cuenta de usuario",
       "orgResolutionFailed": "No se pudo determinar la organización para el registro",
       "sessionCreationFailed": "No se pudo crear la sesión o determinar la redirección",
-      "unknownError": "Ocurrió un error desconocido"
+      "unknownError": "Ocurrió un error desconocido",
+      "unknown": "Se produjo un error desconocido",
+      "couldNotStartIDPFlow": "No se pudo iniciar el flujo de IDP",
+      "userNotFound": "Usuario no encontrado en el sistema",
+      "couldNotCreateSession": "No se pudo crear la sesión"
     }
   },
   "ldap": {
@@ -218,6 +224,9 @@
     "required": {
       "username": "Este campo es obligatorio",
       "password": "Este campo es obligatorio"
+    },
+    "errors": {
+      "couldNotVerify": "No se pudo iniciar sesión. Comprueba tu nombre de usuario y contraseña."
     }
   },
   "mfa": {
@@ -280,7 +289,8 @@
         "couldNotFindSession": "No se pudo encontrar la sesión",
         "couldNotUpdateSession": "No se pudo actualizar la sesión",
         "userNotFound": "Usuario no encontrado en el sistema",
-        "couldNotDetermineRedirect": "No se pudo determinar la URL de redirección después de la verificación de clave de acceso"
+        "couldNotDetermineRedirect": "No se pudo determinar la URL de redirección después de la verificación de clave de acceso",
+        "couldNotGetUser": "No se pudo obtener el usuario"
       }
     },
     "set": {
@@ -291,7 +301,15 @@
         "link": "Autenticación sin contraseña"
       },
       "skip": "Omitir",
-      "submit": "Continuar"
+      "submit": "Continuar",
+      "errors": {
+        "missingContext": "Falta información de la sesión o del usuario. Reinicia la configuración desde el enlace recibido.",
+        "couldNotLoadSession": "No se pudo cargar la sesión",
+        "couldNotRegisterPasskey": "No se pudo configurar la llave de acceso. Inténtalo de nuevo.",
+        "couldNotVerifyPasskey": "No se pudo verificar la llave de acceso. Inténtalo de nuevo.",
+        "userNotFound": "Usuario no encontrado en el sistema",
+        "couldNotCreateSession": "No se pudo crear la sesión"
+      }
     }
   },
   "u2f": {
@@ -303,6 +321,11 @@
       "title": "Configurar autenticación de 2 factores",
       "description": "Configura un dispositivo como segundo factor.",
       "submit": "Continuar"
+    },
+    "errors": {
+      "couldNotLoadSession": "No se pudo cargar la sesión",
+      "couldNotRegister": "No se pudo configurar la llave de seguridad. Inténtalo de nuevo.",
+      "couldNotVerify": "No se pudo verificar la llave de seguridad. Inténtalo de nuevo."
     }
   },
   "register": {
@@ -354,7 +377,11 @@
       "couldNotCreateSession": "No se pudo crear la sesión",
       "userNotFound": "Usuario no encontrado en el sistema",
       "couldNotLinkIDP": "No se pudo vincular el IdP al usuario",
-      "couldNotRegisterUser": "No se pudo registrar el usuario"
+      "couldNotRegisterUser": "No se pudo registrar el usuario",
+      "registerNotAllowed": "¡El registro no está permitido! Contacta a tu administrador para más información.",
+      "userAlreadyExists": "Ya existe un usuario con esta dirección de correo electrónico. Intenta iniciar sesión.",
+      "couldNotGetLoginSettings": "No se pudieron obtener los ajustes de inicio de sesión",
+      "localAuthenticationNotAllowed": "¡La autenticación local no está permitida! Contacte con su administrador para más información."
     }
   },
   "invite": {
@@ -414,7 +441,10 @@
       "couldNotResendInvite": "No se pudo reenviar la invitación",
       "inviteSendFailed": "No se pudo enviar el correo de invitación",
       "emailSendFailed": "No se pudo enviar el correo electrónico de verificación",
-      "contextMissing": "Ocurrió un error. Por favor inténtelo de nuevo."
+      "contextMissing": "Ocurrió un error. Por favor inténtelo de nuevo.",
+      "couldNotFindSession": "No se pudo encontrar la sesión",
+      "couldNotUpdateSession": "No se pudo actualizar la sesión",
+      "invalidCode": "Código no válido. Inténtalo de nuevo."
     }
   },
   "authenticator": {
@@ -448,6 +478,9 @@
       "email": "Accede a tu dirección de correo electrónico.",
       "profile": "Accede a la información completa de tu perfil.",
       "offline_access": "Permitir acceso sin conexión a tu cuenta."
+    },
+    "errors": {
+      "couldNotComplete": "No se pudo completar la autorización del dispositivo. Es posible que el código ya se haya usado o haya caducado."
     }
   },
   "error": {

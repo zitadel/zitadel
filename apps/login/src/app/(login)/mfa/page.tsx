@@ -4,10 +4,9 @@ import { ChooseSecondFactor } from "@/components/choose-second-factor";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getSession, listAuthenticationMethodTypes } from "@/lib/zitadel";
+import { loadMostRecentSession, loadSessionById } from "@/lib/session";
+import { getBrandingSettings, listAuthenticationMethodTypes } from "@/lib/zitadel";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -25,47 +24,19 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  const sessionFactors = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadSessionByLoginname(loginName, organization);
+  const session = sessionId
+    ? await loadSessionById({ serviceConfig, sessionId, organization })
+    : await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } });
 
-  async function loadSessionByLoginname(loginName?: string, organization?: string) {
-    return loadMostRecentSession({
-      serviceConfig,
-      sessionParams: {
-        loginName,
-        organization,
-      },
-    }).then((session) => {
-      if (session && session.factors?.user?.id) {
-        return listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id }).then((methods) => {
+  const sessionFactors =
+    session && session.factors?.user?.id
+      ? await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id }).then((methods) => {
           return {
-            factors: session?.factors,
+            factors: session.factors,
             authMethods: methods.authMethodTypes ?? [],
           };
-        });
-      }
-    });
-  }
-
-  async function loadSessionById(sessionId: string, organization?: string) {
-    const recent = await getSessionCookieById({ sessionId, organization });
-
-    if (!recent) {
-      return undefined;
-    }
-
-    return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((response) => {
-      if (response?.session && response.session.factors?.user?.id) {
-        return listAuthenticationMethodTypes({ serviceConfig, userId: response.session.factors.user.id }).then((methods) => {
-          return {
-            factors: response.session?.factors,
-            authMethods: methods.authMethodTypes ?? [],
-          };
-        });
-      }
-    });
-  }
+        })
+      : undefined;
 
   const branding = await getBrandingSettings({ serviceConfig, organization });
 

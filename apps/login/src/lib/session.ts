@@ -4,7 +4,7 @@ import { SAMLRequest } from "@zitadel/proto/zitadel/saml/v2/authorization_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { GetSessionResponse } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { getMostRecentCookieWithLoginname } from "./cookies";
+import { getMostRecentCookieWithLoginname, getSessionCookieById } from "./cookies";
 import { shouldEnforceMFA } from "./verify-helper";
 import { getLoginSettings, getSession, getUserByID, listAuthenticationMethodTypes, ServiceConfig } from "./zitadel";
 
@@ -44,6 +44,51 @@ export async function loadMostRecentSession({
       // or by throwing its own explicit "no session" error.
       if (isNotFound) {
         console.warn("[Session] Could not load most recent session", error);
+        return undefined;
+      }
+
+      throw error;
+    });
+}
+
+type LoadSessionByIdParams = {
+  serviceConfig: ServiceConfig;
+  sessionId: string;
+  organization?: string;
+};
+
+/**
+ * Resolves a `?sessionId=` search param to its session, or undefined when the
+ * cookie or the server-side session is gone.
+ *
+ * Like {@link loadMostRecentSession}, the `sessions` cookie can outlive the
+ * server-side session (logout in another tab, admin/API termination, expiry),
+ * and stale links can carry a sessionId whose cookie was already replaced. Both
+ * are expected user states: pages render their "unknown context" fallback for
+ * an undefined session, so a dead reference must not crash SSR with a 500.
+ * `not_found` covers a deleted session, `permission_denied` a session token
+ * that is no longer accepted.
+ */
+export async function loadSessionById({
+  serviceConfig,
+  sessionId,
+  organization,
+}: LoadSessionByIdParams): Promise<Session | undefined> {
+  const recent = await getSessionCookieById({ sessionId, organization });
+
+  if (!recent) {
+    return undefined;
+  }
+
+  return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token })
+    .then((resp: GetSessionResponse) => resp?.session)
+    .catch(async (error) => {
+      const { Code, ConnectError } = await import("@connectrpc/connect");
+      const sessionGone =
+        error instanceof ConnectError && (error.code === Code.NotFound || error.code === Code.PermissionDenied);
+
+      if (sessionGone) {
+        console.warn("[Session] Could not load session by id", error);
         return undefined;
       }
 

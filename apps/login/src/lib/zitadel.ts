@@ -38,7 +38,7 @@ import { getUserAgent } from "./fingerprint";
 import { applyCustomHeaders } from "@/lib/custom-headers";
 import { errorClassificationInterceptor, isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { otelGrpcInterceptor } from "@/lib/grpc/interceptors/otel";
-import { Code, Interceptor } from "@connectrpc/connect";
+import { Interceptor } from "@connectrpc/connect";
 import { PromiseCache } from "./cache";
 import { createServiceForHost } from "./service";
 
@@ -1207,8 +1207,11 @@ export async function setUserPassword({
   const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceConfig);
 
   return userService.setPassword(payload, {}).catch((error) => {
-    // throw error if failed precondition (ex. User is not yet initialized)
-    if (isClassifiedError(error) && error.code === Code.FailedPrecondition && error.message) {
+    // Return user errors — a wrong/expired verification code (InvalidArgument),
+    // a failed precondition (ex. User is not yet initialized), a policy
+    // violation — as `{ error }` so the calling action responds 200 and the
+    // form shows the message. Genuine server failures keep throwing.
+    if (isClassifiedError(error) && error.isUserError && error.message) {
       return { error: error.message };
     } else {
       throw error;

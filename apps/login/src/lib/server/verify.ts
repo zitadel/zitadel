@@ -1,5 +1,6 @@
 "use server";
 
+import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/logger";
 import {
   createInviteCode,
@@ -14,7 +15,7 @@ import {
 } from "@/lib/zitadel";
 import crypto from "crypto";
 
-import { create } from "@zitadel/client";
+import { Code, create } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
@@ -28,11 +29,13 @@ import { getServiceConfig } from "../service-url";
 import { loadMostRecentSession } from "../session";
 import { createSessionAndUpdateCookie } from "./cookie";
 import { getEnrollmentAuthorizationError } from "./enrollment-guard";
+import { catchUserError } from "./error-utils";
 import { getPublicHostWithProtocol } from "./host";
 
 const logger = createLogger("verify");
 
 export async function verifyTOTP(code: string, loginName?: string, organization?: string) {
+  const t = await getTranslations("verify");
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
@@ -55,9 +58,13 @@ export async function verifyTOTP(code: string, loginName?: string, organization?
         return { error: enrollmentError };
       }
 
-      return verifyTOTPRegistration({ serviceConfig, code, userId: session.factors.user.id });
+      // A mistyped code is the routine failure here — return it to the form
+      // instead of failing the action with a 500.
+      return verifyTOTPRegistration({ serviceConfig, code, userId: session.factors.user.id }).catch((error) =>
+        catchUserError(error, t("errors.invalidCode")),
+      );
     } else {
-      throw Error("No user id found in session.");
+      return { error: t("errors.couldNotVerify") };
     }
   });
 }
@@ -301,6 +308,13 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
         serviceConfig,
         userId: command.userId,
         urlTemplate,
+      }).catch((error) => {
+        // mirror the invite branch: resending to an already-verified user is a
+        // FailedPrecondition, not a server fault
+        if (isClassifiedError(error) && error.code === Code.FailedPrecondition) {
+          return { error: t("errors.userAlreadyVerified") };
+        }
+        return catchUserError(error, t("errors.couldNotResendEmail"));
       });
 }
 

@@ -236,4 +236,42 @@ describe("loginWithOIDCAndSession", () => {
       expect(result.redirect).toContain("/signedin");
     }
   });
+
+  it("should rethrow when session validation fails with a server error", async () => {
+    const { ConnectError } = await import("@zitadel/client");
+    const serverError = new ConnectError("internal failure", 13) as any;
+    serverError.isUserError = false;
+    vi.mocked(sessionModule.isSessionValid).mockRejectedValue(serverError);
+
+    await expect(
+      loginWithOIDCAndSession({
+        serviceConfig: {} as any,
+        authRequest: mockAuthRequest,
+        sessionId: mockSessionId,
+        sessions: mockSessions,
+        sessionCookies: mockCookies,
+      }),
+    ).rejects.toThrow("internal failure");
+    expect(zitadelModule.createCallback).not.toHaveBeenCalled();
+  });
+
+  it("should degrade to re-authentication when session validation fails with a user error", async () => {
+    const { ConnectError } = await import("@zitadel/client");
+    const userError = new ConnectError("user was removed", 5) as any;
+    userError.isUserError = true;
+    vi.mocked(sessionModule.isSessionValid).mockRejectedValue(userError);
+    vi.mocked(loginnameModule.sendLoginname).mockResolvedValue({
+      redirect: "/password",
+    });
+
+    const result = await loginWithOIDCAndSession({
+      serviceConfig: {} as any,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: mockSessions,
+      sessionCookies: mockCookies,
+    });
+
+    expect(result).toEqual({ redirect: "/password" });
+  });
 });

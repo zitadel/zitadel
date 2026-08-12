@@ -4,16 +4,9 @@ import { ChooseSecondFactorToSetup } from "@/components/choose-second-factor-to-
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceConfig } from "@/lib/service-url";
-import { hasVerifiedPrimaryFactor, loadMostRecentSession } from "@/lib/session";
-import {
-  getBrandingSettings,
-  getLoginSettings,
-  getSession,
-  getUserByID,
-  listAuthenticationMethodTypes,
-} from "@/lib/zitadel";
+import { hasVerifiedPrimaryFactor, loadMostRecentSession, loadSessionById } from "@/lib/session";
+import { getBrandingSettings, getLoginSettings, getUserByID, listAuthenticationMethodTypes } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { SecondFactorType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { Metadata } from "next";
@@ -34,15 +27,17 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  const sessionWithData = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadSessionByLoginname(loginName, organization);
+  const session = sessionId
+    ? await loadSessionById({ serviceConfig, sessionId, organization })
+    : await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } });
 
   async function getAuthMethodsAndUser(session?: Session) {
     const userId = session?.factors?.user?.id;
 
+    // A missing session (deleted/expired server-side) or one without a user is
+    // an expected state — the page renders its session-expired alert for it.
     if (!userId) {
-      throw Error("Could not get user id from session");
+      return undefined;
     }
 
     return listAuthenticationMethodTypes({ serviceConfig, userId }).then((methods) => {
@@ -61,29 +56,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     });
   }
 
-  async function loadSessionByLoginname(loginName?: string, organization?: string) {
-    return loadMostRecentSession({
-      serviceConfig,
-      sessionParams: {
-        loginName,
-        organization,
-      },
-    }).then((session) => {
-      return getAuthMethodsAndUser(session);
-    });
-  }
-
-  async function loadSessionById(sessionId: string, organization?: string) {
-    const recent = await getSessionCookieById({ sessionId, organization });
-
-    if (!recent) {
-      return undefined;
-    }
-
-    return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token }).then((sessionResponse) => {
-      return getAuthMethodsAndUser(sessionResponse.session);
-    });
-  }
+  const sessionWithData = await getAuthMethodsAndUser(session);
 
   const branding = await getBrandingSettings({ serviceConfig, organization });
   const loginSettings = await getLoginSettings({
