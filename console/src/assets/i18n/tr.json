@@ -2620,6 +2620,25 @@
       "DEVMODEDESC": "Dikkat: Geliştirme modu etkinleştirildiğinde yönlendirme URI'leri doğrulanmayacaktır.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Giriş Başarı Sayfasını Atla",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Bu yerel uygulama için giriş sonrası başarı sayfasını atla.",
+      "APPLINKSSECTION": "Yerel uygulama bağlantıları",
+      "APPLINKSDESC": "Bu instansın yerel uygulamalarınız için passkey güven dosyalarını sunabilmesi amacıyla iOS ve Android ilişkilendirmesini yapılandırın.",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "apple-app-site-association içinde webcredentials girdisi TEAMID.BUNDLEID olarak sunulur.",
+      "TEAMID": "Team ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Apple Team ID tam olarak 10 alfanümerik karakter olmalıdır, örn. ABCDE12345.",
+      "TEAMIDLENGTH": "Team ID tam olarak 10 alfanümerik karakter olmalıdır.",
+      "BUNDLEID": "Bundle ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "iOS Bundle Identifier (CFBundleIdentifier), örn. com.example.app. Team ID önekini eklemeyin.",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "Digital Asset Links / passkey kimlik bilgileri için assetlinks.json içinde sunulur.",
+      "PACKAGENAME": "Paket adı",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "Android applicationId / paket adı, örn. com.example.app.",
+      "FINGERPRINTS": "SHA-256 sertifika parmak izleri",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "Satır başına bir parmak izi (64 onaltılık karakter, iki nokta isteğe bağlı). Gerektiğinde debug ve release ekleyin.",
       "REDIRECT": "Yönlendirme URI'leri",
       "REDIRECTSECTION": "Yönlendirme URI'leri",
       "POSTLOGOUTREDIRECT": "Çıkış Sonrası URI'ler",
@@ -2683,7 +2702,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID ve Bundle ID ikisi birden ayarlanmalı veya ikisi de boş bırakılmalıdır.",
+      "ANDROIDPACKAGEREQUIRED": "Sertifika parmak izleri ayarlandığında Android paket adı zorunludur."
     },
     "API": {
       "INFO": {

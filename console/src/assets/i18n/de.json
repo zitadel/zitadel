@@ -2591,6 +2591,25 @@
       "DEVMODEDESC": "Bei eingeschaltetem Entwicklermodus werden die Weiterleitungs-URIs im OIDC-Flow nicht validiert.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Login Erfolgseite überspringen",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Erfolgseite nach dem Login für diese Native Applikation überspringen.",
+      "APPLINKSSECTION": "Native App Links",
+      "APPLINKSDESC": "Konfigurieren Sie iOS- und Android-Zuordnungen, damit diese Instanz Passkey-Trust-Dateien für Ihre nativen Apps bereitstellen kann.",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "Wird in apple-app-site-association als webcredentials-Eintrag TEAMID.BUNDLEID ausgeliefert.",
+      "TEAMID": "Team-ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Apple Team-ID muss genau 10 alphanumerische Zeichen haben, z. B. ABCDE12345.",
+      "TEAMIDLENGTH": "Team-ID muss genau 10 alphanumerische Zeichen haben.",
+      "BUNDLEID": "Bundle-ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "iOS Bundle Identifier (CFBundleIdentifier), z. B. com.example.app. Ohne Team-ID-Präfix.",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "Wird in assetlinks.json für Digital Asset Links / Passkey-Credentials ausgeliefert.",
+      "PACKAGENAME": "Package Name",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "Android applicationId / Package Name, z. B. com.example.app.",
+      "FINGERPRINTS": "SHA-256 Zertifikatsfingerabdrücke",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "Ein Fingerabdruck pro Zeile (64 Hex-Zeichen, Doppelpunkte optional). Debug und Release bei Bedarf angeben.",
       "REDIRECT": "Weiterleitungs-URIs",
       "REDIRECTSECTION": "Weiterleitungs-URIs",
       "POSTLOGOUTREDIRECT": "URIs für Post-Log-out",
@@ -2654,7 +2673,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID und Bundle ID müssen beide gesetzt oder beide leer sein.",
+      "ANDROIDPACKAGEREQUIRED": "Android-Paketname ist erforderlich, wenn Zertifikat-Fingerprints gesetzt sind."
     },
     "API": {
       "INFO": {

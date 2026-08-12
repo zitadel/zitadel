@@ -10,18 +10,18 @@ import (
 
 var (
 	//go:embed 75.sql
-	addIDPAuthorizationParameters string
+	addOIDCAppLinkConfig string
 )
 
-type IDPTemplate6AddAuthorizationParameters struct {
+type Apps7OIDCConfigsAddAppLinkConfig struct {
 	dbClient *database.DB
 }
 
-func (mig *IDPTemplate6AddAuthorizationParameters) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.ExecContext(ctx, addIDPAuthorizationParameters)
+func (mig *Apps7OIDCConfigsAddAppLinkConfig) Execute(ctx context.Context, _ eventstore.Event) error {
+	_, err := mig.dbClient.ExecContext(ctx, addOIDCAppLinkConfig)
 	return err
 }
 
-func (mig *IDPTemplate6AddAuthorizationParameters) String() string {
-	return "75_idp_templates6_add_authorization_parameters"
+func (mig *Apps7OIDCConfigsAddAppLinkConfig) String() string {
+	return "75_apps7_oidc_configs_add_app_link_config"
 }

@@ -1,4 +1,4 @@
-ALTER TABLE IF EXISTS projections.idp_templates6_oauth2 ADD COLUMN IF NOT EXISTS authorization_parameters JSONB;
-ALTER TABLE IF EXISTS projections.idp_templates6_oauth2 ADD COLUMN IF NOT EXISTS forwarded_parameters TEXT[];
-ALTER TABLE IF EXISTS projections.idp_templates6_oidc ADD COLUMN IF NOT EXISTS authorization_parameters JSONB;
-ALTER TABLE IF EXISTS projections.idp_templates6_oidc ADD COLUMN IF NOT EXISTS forwarded_parameters TEXT[];
+ALTER TABLE IF EXISTS projections.apps7_oidc_configs ADD COLUMN IF NOT EXISTS ios_team_id TEXT;
+ALTER TABLE IF EXISTS projections.apps7_oidc_configs ADD COLUMN IF NOT EXISTS ios_bundle_id TEXT;
+ALTER TABLE IF EXISTS projections.apps7_oidc_configs ADD COLUMN IF NOT EXISTS android_package_name TEXT;
+ALTER TABLE IF EXISTS projections.apps7_oidc_configs ADD COLUMN IF NOT EXISTS android_sha256_cert_fingerprints TEXT[];

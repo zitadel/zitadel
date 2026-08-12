@@ -2614,6 +2614,25 @@
       "DEVMODEDESC": "Hati-hati: Dengan mengaktifkan mode pengembangan, URI pengalihan tidak akan divalidasi.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Lewati Halaman Sukses Login",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Lewati halaman sukses setelah login untuk aplikasi asli ini.",
+      "APPLINKSSECTION": "Tautan Aplikasi Native",
+      "APPLINKSDESC": "Konfigurasikan asosiasi iOS dan Android agar instance ini dapat menyajikan file kepercayaan passkey untuk aplikasi native Anda.",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "Disajikan di apple-app-site-association sebagai entri webcredentials TEAMID.BUNDLEID.",
+      "TEAMID": "Team ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Apple Team ID harus tepat 10 karakter alfanumerik, mis. ABCDE12345.",
+      "TEAMIDLENGTH": "Team ID harus tepat 10 karakter alfanumerik.",
+      "BUNDLEID": "Bundle ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "iOS Bundle Identifier (CFBundleIdentifier), mis. com.example.app. Jangan sertakan awalan Team ID.",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "Disajikan di assetlinks.json untuk Digital Asset Links / kredensial passkey.",
+      "PACKAGENAME": "Nama Paket",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "Android applicationId / nama paket, mis. com.example.app.",
+      "FINGERPRINTS": "Sidik Jari Sertifikat SHA-256",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "Satu sidik jari per baris (64 karakter heksadesimal, titik dua opsional). Sertakan debug dan release sesuai kebutuhan.",
       "REDIRECT": "Arahkan ulang URI",
       "REDIRECTSECTION": "Arahkan ulang URI",
       "POSTLOGOUTREDIRECT": "URI Posting Logout",
@@ -2677,7 +2696,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI",
+      "IOSAPPLINKINCOMPLETE": "Team ID dan Bundle ID iOS harus keduanya diisi, atau keduanya dikosongkan.",
+      "ANDROIDPACKAGEREQUIRED": "Nama paket Android wajib diisi bila sidik jari sertifikat diatur."
     },
     "API": {
       "INFO": {
