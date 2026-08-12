@@ -154,6 +154,26 @@ export async function getBrandingSettings({
   );
 }
 
+/**
+ * Resolves the ID of the instance the login is serving. The default login
+ * settings (queried without organization context) are always owned by the
+ * instance, so the response details carry the instance ID. Cached per
+ * instance like the other settings lookups.
+ */
+export async function getInstanceId({ serviceConfig }: WithServiceConfig) {
+  const fetcher = async () => {
+    const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
+
+    return settingsService.getLoginSettings({ ctx: makeReqCtx(undefined) }, {}).then((resp) => resp.details?.resourceOwner);
+  };
+
+  return freshCache(
+    instanceCacheKey(serviceConfig, "getInstanceId"),
+    fetcher,
+    getTTLForKey("getLoginSettings", defaultCacheTTL),
+  );
+}
+
 export async function getLoginSettings({
   serviceConfig,
   organization,

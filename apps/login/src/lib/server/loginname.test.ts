@@ -546,6 +546,81 @@ describe("sendLoginname", () => {
       expect(result?.redirect).toContain("organization=org123");
     });
 
+    test("should redirect to IDP via domain discovery for IdP-only org even when ignoreUnknownUsernames is true", async () => {
+      // Regression test: enumeration protection must not divert unknown users of
+      // an IdP-only org (allowLocalAuthentication: false) to the decoy password
+      // screen — known users of that org are auto-redirected to the IdP, so the
+      // redirect is the indistinguishable (and functional) behavior.
+      mockGetLoginSettings
+        .mockResolvedValueOnce({
+          // context (instance default) settings
+          ignoreUnknownUsernames: true,
+          allowLocalAuthentication: true,
+        })
+        .mockResolvedValueOnce({
+          // discovered org settings: IdP-only
+          allowDomainDiscovery: true,
+          allowRegister: false,
+          allowLocalAuthentication: false,
+          ignoreUnknownUsernames: true,
+        });
+
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [{ id: "discovered-org-sso", name: "Enterprise Org" }],
+      });
+
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp-entra", type: "OIDC", options: { isCreationAllowed: true } }],
+      });
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://entra.example.com/auth" });
+
+      const result = await sendLoginname({
+        loginName: "newuser@enterprise.com",
+        requestId: "req123",
+      });
+
+      expect(result).toEqual({ redirect: "https://entra.example.com/auth" });
+
+      expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        orgId: "discovered-org-sso",
+      });
+    });
+
+    test("should keep decoy password screen when ignoreUnknownUsernames is true and discovered org allows local authentication", async () => {
+      // With local authentication enabled, known (password) users see the
+      // password screen, so the decoy is what keeps unknown users
+      // indistinguishable — the discovery-based IdP redirect stays gated.
+      mockGetLoginSettings
+        .mockResolvedValueOnce({
+          // context (instance default) settings
+          ignoreUnknownUsernames: true,
+          allowLocalAuthentication: true,
+        })
+        .mockResolvedValueOnce({
+          // discovered org settings: local auth enabled
+          allowDomainDiscovery: true,
+          allowRegister: false,
+          allowLocalAuthentication: true,
+          ignoreUnknownUsernames: true,
+        });
+
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [{ id: "discovered-org-local", name: "Password Org" }],
+      });
+
+      const result = await sendLoginname({
+        loginName: "newuser@company.com",
+        requestId: "req123",
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.redirect).toMatch(/^\/password\?/);
+      expect(result?.redirect).toContain("loginName=newuser%40company.com");
+      expect(result?.redirect).toContain("organization=discovered-org-local");
+      expect(mockStartIdentityProviderFlow).not.toHaveBeenCalled();
+    });
+
     test("should return error when user not found and no registration allowed", async () => {
       mockGetLoginSettings.mockResolvedValue({
         allowRegister: false,
