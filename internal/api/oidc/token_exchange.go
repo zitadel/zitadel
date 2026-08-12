@@ -216,8 +216,9 @@ func validateTokenExchangeScopes(
 // (user_id, id_token) use validateImpersonationTokenExchangeScopes instead.
 //
 // Non-restriction scopes must be present on subject ∪ actor. OrgRoleIDScope is
-// validated separately so a broad token can be narrowed, but a previously
-// narrowed subject filter cannot be widened (including via the actor's filter).
+// validated separately against the subject token's filter ceiling so a broad
+// subject can be narrowed, but a previously narrowed subject filter cannot be
+// widened (actor filters are ignored on this path).
 func validateUnionTokenExchangeScopes(
 	client *Client,
 	requestedScopes, subjectScopes, actorScopes []string,
@@ -239,7 +240,7 @@ func validateUnionTokenExchangeScopes(
 		}
 	}
 
-	requestedScopes, err := applyOrgRoleIDScopeDownscoping(requestedScopes, subjectScopes, actorScopes)
+	requestedScopes, err := applyOrgRoleIDScopeDownscoping(requestedScopes, subjectScopes)
 	if err != nil {
 		return nil, err
 	}
@@ -253,7 +254,7 @@ func validateUnionTokenExchangeScopes(
 //
 // Scope classes:
 //   - authorization scopes: privilege/audience/roles — must be on input tokens
-//   - restriction scopes: OrgRoleIDScope filter — downscope-only vs input filters
+//   - restriction scopes: OrgRoleIDScope filter — downscope-only vs actor filters
 //   - subject-data scopes: user claims (email, profile, …) — client allowlist only
 func validateImpersonationTokenExchangeScopes(
 	client *Client,
@@ -276,7 +277,8 @@ func validateImpersonationTokenExchangeScopes(
 		// restriction scopes are validated below; subject-data by client allowlist.
 	}
 
-	requestedScopes, err := applyOrgRoleIDScopeDownscoping(requestedScopes, subjectScopes, actorScopes)
+	// Subject cannot carry scopes; the actor filter is the only available ceiling.
+	requestedScopes, err := applyOrgRoleIDScopeDownscoping(requestedScopes, actorScopes)
 	if err != nil {
 		return nil, err
 	}
@@ -318,18 +320,17 @@ func orgRoleIDScopes(scopes []string) []string {
 }
 
 // applyOrgRoleIDScopeDownscoping enforces that OrgRoleIDScope can only narrow
-// role-org filters for the subject of the minted token:
-//   - subject has a filter → that set is the ceiling (actor filters ignored)
-//   - subject is scopeless and actor is filtered → actor set is the ceiling
-//     (user_id / id_token impersonation)
-//   - otherwise → any requested filter is allowed (broad → narrow)
-//   - a ceiling exists but request omits the filter → inherit the ceiling
+// role-org filters relative to ceilingScopes (the caller's chosen ceiling):
+//   - union / standard exchange passes the subject token scopes
+//   - impersonation (scopeless subject) passes the actor token scopes
+//
+// Rules:
+//   - ceiling unfiltered → any requested filter is allowed (broad → narrow)
+//   - ceiling filtered → requested filters must be ⊆ that set
+//   - ceiling filtered but request omits the filter → inherit the ceiling
 //     (omitting would otherwise re-widen role claims to all granted orgs)
-func applyOrgRoleIDScopeDownscoping(requested, subjectScopes, actorScopes []string) ([]string, error) {
-	allowed := orgRoleIDScopes(subjectScopes)
-	if len(allowed) == 0 && len(subjectScopes) == 0 {
-		allowed = orgRoleIDScopes(actorScopes)
-	}
+func applyOrgRoleIDScopeDownscoping(requested, ceilingScopes []string) ([]string, error) {
+	allowed := orgRoleIDScopes(ceilingScopes)
 	requestedFilters := orgRoleIDScopes(requested)
 
 	if len(allowed) == 0 {

@@ -115,6 +115,30 @@ func Test_validateTokenExchangeScopes(t *testing.T) {
 		assert.Equal(t, []string{oidc.ScopeOpenID, orgB}, got)
 	})
 
+	t.Run("union path: empty-scope subject ignores actor OrgRoleIDScope ceiling", func(t *testing.T) {
+		// Access/JWT subjects with an empty scope claim still use the union path.
+		// An empty subject is unfiltered, so actor roles:id must not become a ceiling.
+		orgA := domain.OrgRoleIDScope + "orgA"
+		orgB := domain.OrgRoleIDScope + "orgB"
+		actorWithFilter := append(slices.Clone(actorScopes), orgB)
+		got, err := validateTokenExchangeScopes(client,
+			[]string{oidc.ScopeOpenID, orgA},
+			nil, actorWithFilter, false)
+		require.NoError(t, err)
+		assert.Equal(t, []string{oidc.ScopeOpenID, orgA}, got)
+	})
+
+	t.Run("union path: empty-scope subject omit does not inherit actor filter", func(t *testing.T) {
+		orgB := domain.OrgRoleIDScope + "orgB"
+		actorWithFilter := append(slices.Clone(actorScopes), orgB)
+		got, err := validateTokenExchangeScopes(client,
+			[]string{oidc.ScopeOpenID},
+			nil, actorWithFilter, false)
+		require.NoError(t, err)
+		assert.Equal(t, []string{oidc.ScopeOpenID}, got)
+		assert.NotContains(t, got, orgB)
+	})
+
 	t.Run("impersonation: subject-data scope not on actor allowed", func(t *testing.T) {
 		got, err := validateTokenExchangeScopes(client,
 			[]string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail},
