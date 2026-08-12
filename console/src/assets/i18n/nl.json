@@ -2610,6 +2610,25 @@
       "DEVMODEDESC": "Let op: Met ingeschakelde ontwikkelingsmodus worden redirect URI's niet gevalideerd.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Sla Login Succes Pagina over",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Sla de succespagina na een login voor deze native app over.",
+      "APPLINKSSECTION": "Native app-koppelingen",
+      "APPLINKSDESC": "Configureer iOS- en Android-associatie zodat deze instance passkey-trustbestanden voor uw native apps kan serveren.",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "Wordt geserveerd in apple-app-site-association als webcredentials-vermelding TEAMID.BUNDLEID.",
+      "TEAMID": "Team-ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Apple Team ID moet precies 10 alfanumerieke tekens zijn, bijv. ABCDE12345.",
+      "TEAMIDLENGTH": "Team ID moet precies 10 alfanumerieke tekens zijn.",
+      "BUNDLEID": "Bundle-ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "iOS Bundle Identifier (CFBundleIdentifier), bijv. com.example.app. Neem het Team ID-voorvoegsel niet op.",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "Wordt geserveerd in assetlinks.json voor Digital Asset Links / passkey-credentials.",
+      "PACKAGENAME": "Pakketnaam",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "Android applicationId / pakketnaam, bijv. com.example.app.",
+      "FINGERPRINTS": "SHA-256-certificaatvingerafdrukken",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "Eén vingerafdruk per regel (64 hexadecimale tekens, dubbele punten optioneel). Voeg desgewenst debug en release toe.",
       "REDIRECT": "Redirect URI's",
       "REDIRECTSECTION": "Redirect URI's",
       "POSTLOGOUTREDIRECT": "Post Logout URI's",
@@ -2673,7 +2692,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID en Bundle ID moeten beide zijn ingesteld, of beide leeg blijven.",
+      "ANDROIDPACKAGEREQUIRED": "Android-pakketnaam is verplicht wanneer certificaatfingerprints zijn ingesteld."
     },
     "API": {
       "INFO": {
