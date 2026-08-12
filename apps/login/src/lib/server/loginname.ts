@@ -574,10 +574,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   // is what known (password) users see, so enumeration protection keeps gating
   // the discovery-based redirect there.
 
-  if (
-    !effectiveLoginSettings?.allowLocalAuthentication ||
-    (discoveredOrganization && !ignoreUnknownUsernames)
-  ) {
+  if (!effectiveLoginSettings?.allowLocalAuthentication || (discoveredOrganization && !ignoreUnknownUsernames)) {
     const resp = await redirectUserToIDP(undefined, discoveredOrganization);
     if (resp) {
       logger.debug("Redirecting to IDP", { organization: discoveredOrganization });
