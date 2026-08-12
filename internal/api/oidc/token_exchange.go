@@ -217,7 +217,7 @@ func validateTokenExchangeScopes(
 //
 // Non-restriction scopes must be present on subject ∪ actor. OrgRoleIDScope is
 // validated separately so a broad token can be narrowed, but a previously
-// narrowed filter cannot be widened.
+// narrowed subject filter cannot be widened (including via the actor's filter).
 func validateUnionTokenExchangeScopes(
 	client *Client,
 	requestedScopes, subjectScopes, actorScopes []string,
@@ -307,7 +307,7 @@ func isTokenExchangeRestrictionScope(scope string) bool {
 func orgRoleIDScopes(scopes []string) []string {
 	var out []string
 	for _, scope := range scopes {
-		if !strings.HasPrefix(scope, domain.OrgRoleIDScope) {
+		if !isTokenExchangeRestrictionScope(scope) {
 			continue
 		}
 		if !slices.Contains(out, scope) {
@@ -318,17 +318,17 @@ func orgRoleIDScopes(scopes []string) []string {
 }
 
 // applyOrgRoleIDScopeDownscoping enforces that OrgRoleIDScope can only narrow
-// role-org filters relative to the subject ∪ actor tokens:
-//   - no filter on input → any requested filter is allowed (broad → narrow)
-//   - input already filtered → requested filters must be ⊆ that set
-//   - input filtered but request omits the filter → inherit input filters
+// role-org filters for the subject of the minted token:
+//   - subject has a filter → that set is the ceiling (actor filters ignored)
+//   - subject is scopeless and actor is filtered → actor set is the ceiling
+//     (user_id / id_token impersonation)
+//   - otherwise → any requested filter is allowed (broad → narrow)
+//   - a ceiling exists but request omits the filter → inherit the ceiling
 //     (omitting would otherwise re-widen role claims to all granted orgs)
 func applyOrgRoleIDScopeDownscoping(requested, subjectScopes, actorScopes []string) ([]string, error) {
 	allowed := orgRoleIDScopes(subjectScopes)
-	for _, scope := range orgRoleIDScopes(actorScopes) {
-		if !slices.Contains(allowed, scope) {
-			allowed = append(allowed, scope)
-		}
+	if len(allowed) == 0 && len(subjectScopes) == 0 {
+		allowed = orgRoleIDScopes(actorScopes)
 	}
 	requestedFilters := orgRoleIDScopes(requested)
 
@@ -341,7 +341,7 @@ func applyOrgRoleIDScopeDownscoping(requested, subjectScopes, actorScopes []stri
 	for _, scope := range requestedFilters {
 		if !slices.Contains(allowed, scope) {
 			return nil, oidc.ErrInvalidScope().
-				WithDescription("scope %q expands org role filter beyond subject or actor token", scope)
+				WithDescription("scope %q expands org role filter beyond the permitted downscope set", scope)
 		}
 	}
 	return requested, nil
