@@ -10382,6 +10382,16 @@ message AddOIDCAppRequest {
             description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
         }
     ];
+    zitadel.app.v1.IOSAppLinkConfig ios = 20 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "iOS Associated Domains / passkey trust config. Served in /.well-known/apple-app-site-association as webcredentials.apps entry \"{team_id}.{bundle_id}\" (Apple's full App ID). That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer; changes can take time to take effect.";
+        }
+    ];
+    zitadel.app.v1.AndroidAppLinkConfig android = 21 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Android Digital Asset Links / passkey trust config. Served in /.well-known/assetlinks.json for delegate_permission/common.get_login_creds. That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer; changes can take time to take effect.";
+        }
+    ];
 }
 
 message AddOIDCAppResponse {
@@ -10571,6 +10581,16 @@ message UpdateOIDCAppConfigRequest {
     zitadel.app.v1.LoginVersion login_version = 18 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
+        }
+    ];
+    zitadel.app.v1.IOSAppLinkConfig ios = 19 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "iOS Associated Domains / passkey trust config. Served in /.well-known/apple-app-site-association as webcredentials.apps entry \"{team_id}.{bundle_id}\" (Apple's full App ID). That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer; changes can take time to take effect.";
+        }
+    ];
+    zitadel.app.v1.AndroidAppLinkConfig android = 20 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Android Digital Asset Links / passkey trust config. Served in /.well-known/assetlinks.json for delegate_permission/common.get_login_creds. That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer; changes can take time to take effect.";
         }
     ];
 }
@@ -14128,9 +14148,10 @@ message AddZitadelProviderRequest {
     ];
     zitadel.idp.v1.Options provider_options = 6;
 
-    // Optionally specify the details (organization_id, organization_domain) related to instance roles.
-    // It is used to determine if a user should be assigned instance administrator roles after authenticating with the provider.
-    repeated zitadel.idp.v1.InstanceRolesInfo instance_roles_info = 7 [(validate.rules).repeated = {max_items: 20}];
+    // field 7 previously held instance_roles_info, which was removed as it allowed
+    // org-scoped providers to grant instance-wide role memberships on login.
+    reserved 7;
+    reserved "instance_roles_info";
 }
 
 message AddZitadelProviderResponse {
@@ -14182,9 +14203,10 @@ message UpdateZitadelProviderRequest {
     ];
     zitadel.idp.v1.Options provider_options = 7;
 
-    // Optionally specify the details (organization_id, organization_domain) related to instance roles.
-    // It is used to determine if a user should be assigned instance administrator roles after authenticating with the provider.
-    repeated zitadel.idp.v1.InstanceRolesInfo instance_roles_info = 8 [(validate.rules).repeated = {max_items: 20}];
+    // field 8 previously held instance_roles_info, which was removed as it allowed
+    // org-scoped providers to grant instance-wide role memberships on login.
+    reserved 8;
+    reserved "instance_roles_info";
 }
 
 message UpdateZitadelProviderResponse {

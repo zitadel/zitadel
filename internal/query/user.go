@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
+	"slices"
 	"strings"
 	"time"
 
@@ -793,8 +794,23 @@ func NewUserPreferredLoginNameSearchQuery(value string, comparison TextCompariso
 	return NewTextQuery(userPreferredLoginNameCol, value, comparison)
 }
 
+//go:embed user_login_name_matches.sql
+var userLoginNameMatchesQuery string
+
+//go:embed user_login_name_matches_case_sensitive.sql
+var userLoginNameMatchesCaseSensitiveQuery string
+
+// NewUserLoginNameExistsQuery filters users by login name.
+// Equals / EqualsIgnoreCase use a planner marker rewritten in prepareUsersQuery
+// into an indexed join on login_names3_users. Other comparisons use the view.
 func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	// linking queries for the sub select
+	if comparison == TextEquals || comparison == TextEqualsIgnoreCase {
+		return newLoginNameEqualsFilter(value, comparison == TextEqualsIgnoreCase)
+	}
+	return newLoginNameExistsViewQuery(value, comparison)
+}
+
+func newLoginNameExistsViewQuery(value string, comparison TextComparison) (SearchQuery, error) {
 	instanceQuery, err := NewColumnComparisonQuery(LoginNameInstanceIDCol, UserInstanceIDCol, ColumnEquals)
 	if err != nil {
 		return nil, err
@@ -807,7 +823,6 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 	if err != nil {
 		return nil, err
 	}
-	// text query to select data from the linked sub select
 	var loginNameQuery SearchQuery
 	loginNameQuery, err = NewTextQuery(LoginNameNameCol, value, comparison)
 	if comparison == TextEqualsIgnoreCase {
@@ -816,17 +831,156 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 	if err != nil {
 		return nil, err
 	}
-	// full definition of the sub select
 	subSelect, err := NewSubSelect(LoginNameUserIDCol, []SearchQuery{instanceQuery, userIDQuery, resourceOwnerQuery, loginNameQuery})
 	if err != nil {
 		return nil, err
 	}
-	// "WHERE * IN (*)" query with subquery as list-data provider
 	return NewListQuery(
 		UserIDCol,
 		subSelect,
 		ListIn,
 	)
+}
+
+// loginNameEqualsFilter marks a login-name equality filter for prepareUsersQuery
+// to rewrite as an indexed join. Unextracted markers (e.g. inside OrQuery) fall
+// back to the view-based exists query.
+type loginNameEqualsFilter struct {
+	username   string
+	domain     string
+	loginName  string
+	ignoreCase bool
+}
+
+func newLoginNameEqualsFilter(value string, ignoreCase bool) (*loginNameEqualsFilter, error) {
+	if ignoreCase {
+		value = strings.ToLower(value)
+	}
+	username := value
+	domainIndex := strings.LastIndex(value, "@")
+	var domainSuffix string
+	// split between the last @ (so ignore it if the login name ends with it)
+	if domainIndex > 0 && domainIndex != len(value)-1 {
+		domainSuffix = value[domainIndex+1:]
+		username = value[:domainIndex]
+	}
+	return &loginNameEqualsFilter{
+		username:   username,
+		domain:     domainSuffix,
+		loginName:  value,
+		ignoreCase: ignoreCase,
+	}, nil
+}
+
+func (q *loginNameEqualsFilter) comparison() TextComparison {
+	if q.ignoreCase {
+		return TextEqualsIgnoreCase
+	}
+	return TextEquals
+}
+
+func (q *loginNameEqualsFilter) fallback() SearchQuery {
+	// Equals / EqualsIgnoreCase construction cannot fail for valid columns.
+	fallback, _ := newLoginNameExistsViewQuery(q.loginName, q.comparison())
+	return fallback
+}
+
+func (q *loginNameEqualsFilter) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return q.fallback().toQuery(query)
+}
+
+func (q *loginNameEqualsFilter) Col() Column {
+	return UserIDCol
+}
+
+func (q *loginNameEqualsFilter) comp() sq.Sqlizer {
+	return q.fallback().comp()
+}
+
+func (q *loginNameEqualsFilter) matchesArgs(instanceID string) []interface{} {
+	return []interface{}{
+		instanceID,
+		instanceID,
+		q.domain,
+		instanceID,
+		q.username,
+		q.loginName,
+		q.username,
+		q.domain,
+		q.loginName,
+	}
+}
+
+func (q *loginNameEqualsFilter) joinMatches(instanceID string) sq.Sqlizer {
+	subQuery := userLoginNameMatchesQuery
+	if !q.ignoreCase {
+		subQuery = userLoginNameMatchesCaseSensitiveQuery
+	}
+	return sq.Expr(
+		"INNER JOIN ("+subQuery+") AS login_name_matches ON "+UserIDCol.identifier()+" = login_name_matches.user_id",
+		q.matchesArgs(instanceID)...,
+	)
+}
+
+// extractLoginNameEqualsFilter extracts one login-name equals marker from
+// top-level or AndQuery filters. Markers inside OrQuery / NotQuery are kept.
+func extractLoginNameEqualsFilter(queries []SearchQuery) (filter *loginNameEqualsFilter, remaining []SearchQuery, ok bool) {
+	remaining = make([]SearchQuery, 0, len(queries))
+	var found *loginNameEqualsFilter
+
+	for _, qry := range queries {
+		switch v := qry.(type) {
+		case *loginNameEqualsFilter:
+			if found != nil {
+				return nil, queries, false
+			}
+			found = v
+		case *AndQuery:
+			inner, rest, extracted := extractLoginNameEqualsFilter(v.queries)
+			if !extracted {
+				remaining = append(remaining, qry)
+				continue
+			}
+			if found != nil {
+				return nil, queries, false
+			}
+			found = inner
+			if len(rest) == 1 {
+				remaining = append(remaining, rest[0])
+			} else if len(rest) > 1 {
+				andQuery, _ := NewAndQuery(rest...)
+				remaining = append(remaining, andQuery)
+			}
+		default:
+			remaining = append(remaining, qry)
+		}
+	}
+
+	if found == nil {
+		return nil, queries, false
+	}
+	return found, remaining, true
+}
+
+func (q *UserSearchQueries) hasMetadataFilter() bool {
+	return searchQueriesHaveMetadataFilter(q.Queries)
+}
+
+func searchQueriesHaveMetadataFilter(queries []SearchQuery) bool {
+	return slices.ContainsFunc(queries, searchQueryHasMetadataFilter)
+}
+
+func searchQueryHasMetadataFilter(qry SearchQuery) bool {
+	switch v := qry.(type) {
+	case *OrQuery:
+		return searchQueriesHaveMetadataFilter(v.queries)
+	case *AndQuery:
+		return searchQueriesHaveMetadataFilter(v.queries)
+	case *NotQuery:
+		return searchQueryHasMetadataFilter(v.query)
+	default:
+		return qry.Col().table.name == userMetadataTable.name
+	}
 }
 
 func triggerUserProjections(ctx context.Context) {
@@ -1257,13 +1411,24 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 }
 
 // prepareUsersQuery creates the select query for searching users and returns a matching scan function.
-// Permissions, filters and sorting are applied in a `SELECT FROM` distinct sub-select.
+// Permissions, filters and sorting are applied in a `SELECT FROM` sub-select.
 // The count over window function and limit are applied in the outer query.
 // It is not possible to pass more filters to the returned query, as they need to be applied in the sub-select.
+//
+// Metadata JOIN and DISTINCT are only applied when a metadata filter is present.
+// Login-name equals markers are rewritten into an indexed join when extractable.
 func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 	if q.SortingColumn.isZero() {
 		q.SortingColumn = UserIDCol
 	}
+
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	loginNameFilter, remainingFilters, loginNameExtracted := extractLoginNameEqualsFilter(q.Queries)
+	filters := q.Queries
+	if loginNameExtracted {
+		filters = remainingFilters
+	}
+	needsMetadataJoin := q.hasMetadataFilter()
 
 	// start building the sub-select
 	query := sq.Select(
@@ -1298,18 +1463,24 @@ func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionChe
 		MachineSecretCol.identifier(),
 		MachineAccessTokenTypeCol.identifier(),
 		q.SortingColumn.orderBy()).
-		Distinct().
 		From(userTable.identifier()).
 		LeftJoin(join(HumanUserIDCol, UserIDCol)).
 		LeftJoin(join(MachineUserIDCol, UserIDCol)).
-		LeftJoin(join(UserMetadataUserIDCol, UserIDCol)).
 		JoinClause(joinLoginNames).
-		Where(sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()})
+		Where(sq.Eq{UserInstanceIDCol.identifier(): instanceID})
 
-	query = userPermissionCheckV2(ctx, query, permissionCheckV2, q.Queries)
-	// apply requested filters
-	for _, q := range q.Queries {
-		query = q.toQuery(query)
+	if loginNameExtracted {
+		query = query.JoinClause(loginNameFilter.joinMatches(instanceID))
+	}
+
+	if needsMetadataJoin {
+		query = query.Distinct().
+			LeftJoin(join(UserMetadataUserIDCol, UserIDCol))
+	}
+
+	query = userPermissionCheckV2(ctx, query, permissionCheckV2, filters)
+	for _, filter := range filters {
+		query = filter.toQuery(query)
 	}
 	// apply sorting in the sub-select,because the identifier is fully qualified.
 	query = q.consumeSorting(query)

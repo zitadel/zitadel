@@ -7,6 +7,7 @@ import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/c
 import { formatPhone } from 'src/app/utils/formatPhone';
 
 export enum EditDialogType {
+  GENERIC = 0,
   PHONE = 1,
   EMAIL = 2,
 }
@@ -15,8 +16,11 @@ export type EditDialogData = {
   confirmKey: 'ACTIONS.SAVE' | 'ACTIONS.CHANGE';
   cancelKey: 'ACTIONS.CANCEL';
   labelKey: 'ACTIONS.NEWVALUE';
-  titleKey: 'USER.LOGINMETHODS.EMAIL.EDITTITLE';
-  descriptionKey: 'USER.LOGINMETHODS.EMAIL.EDITDESC';
+  titleKey: 'USER.LOGINMETHODS.EMAIL.EDITTITLE' | 'USER.PROFILE.CHANGEUSERNAME_TITLE' | 'USER.LOGINMETHODS.PHONE.EDITTITLE';
+  descriptionKey:
+    | 'USER.LOGINMETHODS.EMAIL.EDITDESC'
+    | 'USER.PROFILE.CHANGEUSERNAME_DESC'
+    | 'USER.LOGINMETHODS.PHONE.EDITDESC';
   isVerifiedTextKey?: 'USER.LOGINMETHODS.EMAIL.ISVERIFIED';
   isVerifiedTextDescKey?: 'USER.LOGINMETHODS.EMAIL.ISVERIFIEDDESC';
   value: string | undefined;
@@ -39,9 +43,8 @@ export class EditDialogComponent implements OnInit {
   public controlKey = 'editingField';
   public isPhone: boolean = false;
   public isVerified: boolean = false;
-  public phoneCountry: string = 'US';
   public dialogForm!: UntypedFormGroup;
-  public EditDialogType: any = EditDialogType;
+  protected readonly EditDialogType = EditDialogType;
   public selected: CountryPhoneCode | undefined = {
     countryCallingCode: '1',
     countryCode: 'US',

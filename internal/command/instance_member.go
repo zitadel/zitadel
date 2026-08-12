@@ -75,11 +75,88 @@ type AddInstanceMember struct {
 	Roles      []string
 }
 
+// AddInstanceMember adds a user as a member of the instance with the given roles.
 func (c *Commands) AddInstanceMember(ctx context.Context, member *AddInstanceMember) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(member.InstanceID)
 	if err := c.checkPermissionUpdateInstanceMember(ctx, member.InstanceID); err != nil {
 		return nil, err
 	}
+	return c.addInstanceMember(ctx, member)
+}
+
+// EnsureInstanceMemberRolesFromLogin makes sure the user holds the given instance member roles
+// during the login v1 ZITADEL-IdP flow.
+// It adds the membership if the user is not a member yet and otherwise adds the missing roles
+// to the existing membership. Roles the user already holds are never removed.
+//
+// It intentionally bypasses the standard instance-member permission check.
+// Authorization is established by the validated `urn:zitadel:iam:org:project:roles` token claim
+// and the configured InstanceRolesInfo for the Zitadel provider.
+// Do not use it for any user-initiated API path.
+func (c *Commands) EnsureInstanceMemberRolesFromLogin(ctx context.Context, member *AddInstanceMember) (*domain.ObjectDetails, error) {
+	if member.InstanceID == "" || member.UserID == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "INSTA-Ee7ai", "Errors.Instance.MemberInvalid")
+	}
+	granted := configuredRolesOnly(member.Roles, c.zitadelRoles)
+	if len(granted) == 0 {
+		return nil, zerrors.ThrowInvalidArgument(nil, "INSTA-oo0Ai", "Errors.Instance.MemberInvalid")
+	}
+	existingMember, err := c.instanceMemberWriteModelByID(ctx, member.InstanceID, member.UserID)
+	if err != nil {
+		return nil, err
+	}
+	if !existingMember.State.Exists() {
+		return c.addInstanceMember(ctx, &AddInstanceMember{
+			InstanceID: member.InstanceID,
+			UserID:     member.UserID,
+			Roles:      granted,
+		})
+	}
+	// the roles are merged so that roles granted elsewhere are retained.
+	roles := missingRolesAdded(existingMember.Roles, granted)
+	if len(roles) == len(existingMember.Roles) {
+		return writeModelToObjectDetails(&existingMember.WriteModel), nil
+	}
+	pushedEvents, err := c.eventstore.Push(ctx,
+		instance.NewMemberChangedEvent(ctx,
+			InstanceAggregateFromWriteModel(&existingMember.WriteModel),
+			member.UserID,
+			roles...,
+		),
+	)
+	if err != nil {
+		return nil, err
+	}
+	if err = AppendAndReduce(existingMember, pushedEvents...); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingMember.WriteModel), nil
+}
+
+// configuredRolesOnly returns the subset of roles that are configured as instance roles.
+// The roles of a ZITADEL provider's claim originate from an external
+// instance, whose role set may differ, so unknown roles are dropped.
+func configuredRolesOnly(roles []string, zitadelRoles []authz.RoleMapping) []string {
+	invalid := domain.CheckForInvalidRoles(roles, domain.IAMRolePrefix, zitadelRoles)
+	return slices.DeleteFunc(slices.Clone(roles), func(role string) bool {
+		return slices.Contains(invalid, role)
+	})
+}
+
+// missingRolesAdded returns the existing roles with new roles to be added that are not already
+// present, preserving the order of the existing roles.
+func missingRolesAdded(existing, add []string) []string {
+	roles := slices.Clone(existing)
+	for _, role := range add {
+		if !slices.Contains(roles, role) {
+			roles = append(roles, role)
+		}
+	}
+	return roles
+}
+
+// addInstanceMember performs the write without any permission check.
+func (c *Commands) addInstanceMember(ctx context.Context, member *AddInstanceMember) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(member.InstanceID)
 	//nolint:staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddInstanceMemberCommand(instanceAgg, member.UserID, member.Roles...))
 	if err != nil {

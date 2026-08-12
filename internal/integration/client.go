@@ -783,12 +783,6 @@ func (i *Instance) AddOrgZitadelProvider(ctx context.Context, name string) *mgmt
 		ProviderOptions: &idp.Options{
 			IsCreationAllowed: true,
 		},
-		InstanceRolesInfo: []*idp.InstanceRolesInfo{
-			{
-				OrganizationId:     "org1",
-				OrganizationDomain: "org1.com",
-			},
-		},
 	})
 	logging.OnError(err).Panic("create org zitadel idp")
 	return resp

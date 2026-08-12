@@ -179,6 +179,57 @@ message OIDCConfig {
             description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
         }
     ];
+    IOSAppLinkConfig ios = 23 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "iOS Associated Domains / passkey trust config. Served in /.well-known/apple-app-site-association as webcredentials.apps entry \"{team_id}.{bundle_id}\" (Apple's full App ID). That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer; changes can take time to take effect.";
+        }
+    ];
+    AndroidAppLinkConfig android = 24 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Android Digital Asset Links / passkey trust config. Served in /.well-known/assetlinks.json for delegate_permission/common.get_login_creds. That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer; changes can take time to take effect.";
+        }
+    ];
+}
+
+message IOSAppLinkConfig {
+    string team_id = 1 [
+        (validate.rules).string = {ignore_empty: true, len: 10, pattern: "^[A-Z0-9]+$"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ABCDE12345\"";
+            description: "Apple Team ID (App ID prefix), exactly 10 alphanumeric characters, e.g. ABCDE12345. Combined with bundle_id as TEAMID.BUNDLEID in AASA webcredentials.apps. Not the full Apple App ID by itself. Empty clears the value on update.";
+        }
+    ];
+    string bundle_id = 2 [
+        (validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"com.example.app\"";
+            description: "iOS Bundle ID (CFBundleIdentifier), e.g. com.example.app. Combined with team_id for AASA webcredentials.apps. Do not paste TEAMID.bundle.id here. Empty clears the value on update.";
+        }
+    ];
+}
+
+message AndroidAppLinkConfig {
+    string package_name = 1 [
+        (validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"com.example.app\"";
+            description: "Android package name (applicationId). Used in assetlinks.json target.package_name. Empty clears the value on update.";
+        }
+    ];
+    repeated string sha256_cert_fingerprints = 2 [
+        (validate.rules).repeated = {
+            max_items: 20,
+            items: {
+                string: {
+                    pattern: "^([0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){31}|[0-9A-Fa-f]{64})$";
+                }
+            }
+        },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99\"]";
+            description: "SHA-256 signing certificate fingerprints for Digital Asset Links (passkey / get_login_creds). 64 hex chars, optionally colon-separated pairs. At most 20 entries. Include debug and release as needed.";
+        }
+    ];
 }
 
 enum OIDCResponseType {
