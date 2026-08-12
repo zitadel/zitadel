@@ -141,6 +141,9 @@ func (c *Commands) addUserPasskeyCode(ctx context.Context, userID, resourceOwner
 	if err != nil {
 		return nil, err
 	}
+	if err := c.checkPermissionUpdateUserCredentials(ctx, wm.ResourceOwner, userID); err != nil {
+		return nil, err
+	}
 	agg := UserAggregateFromWriteModel(&wm.WriteModel)
 
 	if urlTmpl == "" {
