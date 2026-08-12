@@ -2618,6 +2618,25 @@
       "DEVMODEDESC": "Внимание: При активиран режим на разработка URI адресите за пренасочване няма да бъдат валидирани.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Пропуснете страницата за успешно влизане",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Пропуснете страницата за успех след влизане в това родно приложение.",
+      "APPLINKSSECTION": "Връзки за нативни приложения",
+      "APPLINKSDESC": "Конфигурирайте iOS и Android асоциации, за да може тази инстанция да предоставя trust файлове за passkeys на вашите нативни приложения.",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "Предоставя се в apple-app-site-association като webcredentials запис TEAMID.BUNDLEID.",
+      "TEAMID": "Team ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Apple Team ID трябва да е точно 10 буквено-цифрови знака, напр. ABCDE12345.",
+      "TEAMIDLENGTH": "Team ID трябва да е точно 10 буквено-цифрови знака.",
+      "BUNDLEID": "Bundle ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "iOS Bundle Identifier (CFBundleIdentifier), напр. com.example.app. Не включвайте префикса Team ID.",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "Предоставя се в assetlinks.json за Digital Asset Links / passkey credentials.",
+      "PACKAGENAME": "Име на пакета",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "Android applicationId / име на пакет, напр. com.example.app.",
+      "FINGERPRINTS": "SHA-256 сертификатни отпечатъци",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "Един отпечатък на ред (64 шестнадесетични знака, двоеточията са по избор). Добавете debug и release при нужда.",
       "REDIRECT": "Пренасочване на URI",
       "REDIRECTSECTION": "Пренасочване на URI",
       "POSTLOGOUTREDIRECT": "Публикувайте URI адреси за излизане",
@@ -2681,7 +2700,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID и Bundle ID трябва да бъдат зададени заедно или и двете да останат празни.",
+      "ANDROIDPACKAGEREQUIRED": "Името на Android пакета е задължително, когато са зададени сертификатни пръстови отпечатъци."
     },
     "API": {
       "INFO": {
