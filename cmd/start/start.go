@@ -85,6 +85,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/console/path"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
+	"github.com/zitadel/zitadel/internal/api/well_known"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/authz"
 	authz_repo "github.com/zitadel/zitadel/internal/authz/repository"
@@ -656,6 +657,9 @@ func startAPIs(
 		return nil, fmt.Errorf("unable to start robots txt handler: %w", err)
 	}
 	apis.RegisterHandlerOnPrefix(robots_txt.HandlerPrefix, robotsTxtHandler)
+
+	// native app link well-known files (instance-scoped)
+	apis.RegisterHandlerPrefixes(instanceInterceptor.Handler(well_known.NewHandler(queries, config.WellKnown)), well_known.HandlerPrefixes...)
 
 	// TODO: Record openapi access logs?
 	openAPIHandler, err := openapi.Start()
