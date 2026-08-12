@@ -1,0 +1,135 @@
+---
+title: Native app links for passkeys
+description: "Configure iOS and Android association on OIDC apps so ZITADEL can serve apple-app-site-association and assetlinks.json for native passkeys"
+sidebar_label: Native App Links
+---
+
+Native mobile apps that create or use passkeys with platform WebAuthn APIs need the issuer domain to publish OS trust association files.
+ZITADEL serves those files from your instance based on iOS and Android settings on OIDC applications.
+
+## Prerequisites
+
+- An OIDC **Native** application in your project
+- Passkeys enabled in your login policy
+- A stable issuer / [custom domain](/concepts/features/custom-domain) (passkeys are domain-bound)
+- Platform association configured in the mobile app project (Associated Domains on iOS; Digital Asset Links / App Links on Android)
+
+## Configure the OIDC application
+
+Set association fields on each Native OIDC app that should participate in passkey trust.
+
+You can do this in the [Console](/guides/manage/console/applications-overview#native-app-links) under the app's **Native App Links** section, or via the Application API / Management API OIDC app create and update endpoints (`ios` / `android`).
+
+### iOS
+
+| Field | Description |
+|-------|-------------|
+| **Team ID** | Apple Developer Team ID (exactly 10 alphanumeric characters), for example `ABCDE12345` |
+| **Bundle ID** | App bundle identifier (`CFBundleIdentifier`), for example `com.example.app` — do not include the Team ID prefix |
+
+ZITADEL publishes these as a single App ID in the association file: `{team_id}.{bundle_id}`.
+
+### Android
+
+| Field | Description |
+|-------|-------------|
+| **Package name** | Android `applicationId` / package name from the app manifest |
+| **SHA-256 certificate fingerprints** | Signing certificate fingerprints (64 hex characters, optionally colon-separated). Include debug and release fingerprints as needed. |
+
+### Update semantics
+
+On update:
+
+- Omit a field group to leave it unchanged
+- Send an empty message / empty values to clear
+- Send populated values to replace
+
+## Well-known endpoints
+
+ZITADEL aggregates association data from **active** OIDC apps on the instance and serves:
+
+| Path | Purpose |
+|------|---------|
+| `${CUSTOM_DOMAIN}/.well-known/apple-app-site-association` | iOS Associated Domains / `webcredentials` |
+| `${CUSTOM_DOMAIN}/.well-known/assetlinks.json` | Android Digital Asset Links for `delegate_permission/common.get_login_creds` |
+
+If no apps are configured, both endpoints still return HTTP `200` with empty collections.
+
+### Example: apple-app-site-association
+
+```json
+{
+  "webcredentials": {
+    "apps": [
+      "ABCDE12345.com.example.one",
+      "FGHIJ67890.com.example.two"
+    ]
+  }
+}
+```
+
+Duplicate iOS App IDs across apps are deduplicated.
+
+### Example: assetlinks.json
+
+```json
+[
+  {
+    "relation": ["delegate_permission/common.get_login_creds"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.example.one",
+      "sha256_cert_fingerprints": [
+        "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99"
+      ]
+    }
+  }
+]
+```
+
+Fingerprints are normalized to colon-separated uppercase hex when served.
+
+## Caching
+
+Successful responses include a `Cache-Control` header so intermediate caches may reuse the documents for a short time.
+
+By default (and in ZITADEL Cloud) caching is allowed for 5 minutes:
+
+```
+Cache-Control: public, max-age=300
+```
+
+Self-hosters can change this with the `ZITADEL_WELLKNOWN_APPLINKSCACHECONTROLMAXAGE` environment variable or in the settings YAML:
+
+```yaml
+WellKnown:
+  AppLinksCacheControlMaxAge: 5m
+```
+
+Setting the value to `0` results in `Cache-Control: no-store`.
+
+<Callout type="info">
+Platform verifiers may cache association files on their side as well.
+After you change app link settings, allow time for HTTP caches and OS verification to refresh before expecting passkeys to work with the new values.
+</Callout>
+
+## Verify
+
+```bash
+curl -i "${CUSTOM_DOMAIN}/.well-known/apple-app-site-association"
+curl -i "${CUSTOM_DOMAIN}/.well-known/assetlinks.json"
+```
+
+Confirm:
+
+- HTTP status `200`
+- `Content-Type: application/json`
+- Expected `Cache-Control` header
+- JSON contents match your configured apps
+
+## Related
+
+- [Passkeys concept](/concepts/features/passkeys)
+- [Console applications](/guides/manage/console/applications-overview)
+- [Custom domain](/concepts/features/custom-domain)
+- [Passkeys in a custom login UI](/guides/integrate/login-ui/passkey) (browser / WebAuthn APIs)
