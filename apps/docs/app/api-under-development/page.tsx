@@ -1,4 +1,4 @@
-export default function ApiUnderDevelopmentPage(): JSX.Element {
+export default function ApiUnderDevelopmentPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-8 text-center">
       <h1 className="mb-4 text-3xl font-bold">API Under Development</h1>
