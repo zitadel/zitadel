@@ -3260,7 +3260,7 @@
     "permanent": true
   },
   {
-    "source": "/api/group/:path*",
+    "source": "/reference/api/group/:path*",
     "destination": "/api-under-development",
     "permanent": false
   }
