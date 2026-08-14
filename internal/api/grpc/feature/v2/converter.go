@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	feature_pb "github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 )
 
@@ -105,7 +106,7 @@ func loginV2ToDomain(loginV2 *feature_pb.LoginV2) (_ *feature.LoginV2, err error
 	if loginV2.GetBaseUri() != "" {
 		baseURI, err = url.Parse(loginV2.GetBaseUri())
 		if err != nil {
-			return nil, err
+			return nil, zerrors.ThrowInvalidArgument(err, "FEAT-2xR9v", "invalid login base URI")
 		}
 	}
 	return &feature.LoginV2{

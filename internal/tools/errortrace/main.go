@@ -682,6 +682,35 @@ func (w *walker) recordThrow(pkg *packages.Package, call *ast.CallExpr, trail []
 // instead — clearly distinguishable from a real zerrors ID by its shape,
 // and matched specially in generate-endpoint-errors.ts rather than looked
 // up in the error catalog, since it was never scanned into that catalog.
+// grpcCodeToStatusKey maps a google.golang.org/grpc/codes constant name to
+// the exact key GRPC_STATUS (apps/docs/lib/grpc-status.ts) uses for it.
+// Deliberately not derived by upper-casing the Go name: several of these
+// don't round-trip (NotFound -> NOT_FOUND needs an inserted underscore;
+// Go spells Canceled with one L, GRPC_STATUS's key has two). Getting this
+// wrong doesn't just mean the code's status text is missing — combined with
+// the wasTraced filter in generate-endpoint-errors.ts, a genuinely-reachable
+// site that fails this lookup gets counted as "checked, confirmed empty"
+// instead of surfacing as unmatched, which is a worse failure than a gap.
+var grpcCodeToStatusKey = map[string]string{
+	"OK":                 "OK",
+	"Canceled":           "CANCELLED",
+	"Unknown":            "UNKNOWN",
+	"InvalidArgument":    "INVALID_ARGUMENT",
+	"DeadlineExceeded":   "DEADLINE_EXCEEDED",
+	"NotFound":           "NOT_FOUND",
+	"AlreadyExists":      "ALREADY_EXISTS",
+	"PermissionDenied":   "PERMISSION_DENIED",
+	"ResourceExhausted":  "RESOURCE_EXHAUSTED",
+	"FailedPrecondition": "FAILED_PRECONDITION",
+	"Aborted":            "ABORTED",
+	"OutOfRange":         "OUT_OF_RANGE",
+	"Unimplemented":      "UNIMPLEMENTED",
+	"Internal":           "INTERNAL",
+	"Unavailable":        "UNAVAILABLE",
+	"DataLoss":           "DATA_LOSS",
+	"Unauthenticated":    "UNAUTHENTICATED",
+}
+
 func (w *walker) recordRawStatus(pkg *packages.Package, call *ast.CallExpr, trail []string) {
 	if len(call.Args) < 1 {
 		return
@@ -709,8 +738,20 @@ func (w *walker) recordRawStatus(pkg *packages.Package, call *ast.CallExpr, trai
 	}
 
 	pos := pkg.Fset.Position(call.Pos())
+	statusKey, ok := grpcCodeToStatusKey[sel.Sel.Name]
+	if !ok {
+		// codes.<Name> resolved to a real constant in the codes package (the
+		// checks above confirm that), but isn't one of the 17 known ones —
+		// shouldn't happen in practice, but fail loud into unresolved rather
+		// than emit an ID nothing can look up.
+		w.unresolved = append(w.unresolved, unresolvedCall{
+			pos:      relPath(w.root, pos.Filename) + ":" + strconv.Itoa(pos.Line),
+			typeName: "unrecognized grpc/codes constant: " + sel.Sel.Name,
+		})
+		return
+	}
 	w.sites = append(w.sites, errorSite{
-		ID:        "GRPC-" + strings.ToUpper(sel.Sel.Name),
+		ID:        "GRPC-" + statusKey,
 		File:      relPath(w.root, pos.Filename),
 		Line:      pos.Line,
 		Reasoning: strings.Join(trail, " -> "),
