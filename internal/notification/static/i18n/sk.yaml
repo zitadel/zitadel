@@ -1,68 +1,67 @@
 InitCode:
-  Title: Initialize User
-  PreHeader: Initialize User
-  Subject: Initialize User
-  Greeting: Hello {{.DisplayName}},
-  Text: This user was created. Use the username {{.PreferredLoginName}} to login. Please click the button below to finish the initialization process. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.
-  ButtonText: Finish initialization
+  Title: "Inicializácia používateľa"
+  PreHeader: "Inicializácia používateľa"
+  Subject: "Inicializácia používateľa"
+  Greeting: "Dobrý deň, {{.DisplayName}},"
+  Text: "Tento používateľ bol vytvorený. Na prihlásenie použite používateľské meno {{.PreferredLoginName}}. Kliknutím na tlačidlo nižšie dokončite proces inicializácie. (Kód {{.Code}}) Ak ste o tento e-mail nežiadali, ignorujte ho."
+  ButtonText: "Dokončiť inicializáciu"
 PasswordReset:
-  Title: Reset password
-  PreHeader: Reset password
-  Subject: Reset password
-  Greeting: Hello {{.DisplayName}},
-  Text: We received a password reset request. Please use the button below to reset your password. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.
-  ButtonText: Reset password
+  Title: "Obnovenie hesla"
+  PreHeader: "Obnovenie hesla"
+  Subject: "Obnovenie hesla"
+  Greeting: "Dobrý deň, {{.DisplayName}},"
+  Text: "Prijali sme žiadosť o obnovenie hesla. Na obnovenie hesla použite tlačidlo nižšie. (Kód {{.Code}}) Ak ste o tento e-mail nežiadali, ignorujte ho."
+  ButtonText: "Obnoviť heslo"
 VerifyEmail:
-  Title: Verify email
-  PreHeader: Verify email
-  Subject: Verify email
-  Greeting: Hello {{.DisplayName}},
-  Text: A new email has been added. Please use the button below to verify your email. (Code {{.Code}}) If you didn't add a new email, please ignore this email.
-  ButtonText: Verify email
+  Title: "Overenie e-mailu"
+  PreHeader: "Overenie e-mailu"
+  Subject: "Overenie e-mailu"
+  Greeting: "Dobrý deň, {{.DisplayName}},"
+  Text: "Bola pridaná nová e-mailová adresa. Na jej overenie použite tlačidlo nižšie. (Kód {{.Code}}) Ak ste novú e-mailovú adresu nepridávali, tento e-mail ignorujte."
+  ButtonText: "Overiť e-mail"
 VerifyPhone:
-  Title: Verify phone
-  PreHeader: Verify phone
-  Subject: Verify phone
-  Greeting: Hello {{.DisplayName}},
-  Text: A new phone number has been added. Please use the following code to verify it {{.Code}}
-  ButtonText: Verify phone
+  Title: "Overenie telefónneho čísla"
+  PreHeader: "Overenie telefónneho čísla"
+  Subject: "Overenie telefónneho čísla"
+  Greeting: "Dobrý deň, {{.DisplayName}},"
+  Text: "Bolo pridané nové telefónne číslo. Na jeho overenie použite nasledujúci kód {{.Code}}"
+  ButtonText: "Overiť telefónne číslo"
 VerifyEmailOTP:
-  Title: Verify OTP
-  PreHeader: Verify OTP
-  Subject: Verify OTP
-  Greeting: Hello {{.DisplayName}},
-  Text: Please use the OTP {{.OTP}} to authenticate within the next five minutes or click the "Authenticate" button.
-  ButtonText: Authenticate
+  Title: "Overenie OTP"
+  PreHeader: "Overenie OTP"
+  Subject: "Overenie OTP"
+  Greeting: "Dobrý deň, {{.DisplayName}},"
+  Text: "Na overenie použite v priebehu nasledujúcich piatich minút OTP kód {{.OTP}} alebo kliknite na tlačidlo „Overiť“."
+  ButtonText: "Overiť"
 VerifySMSOTP:
-  Text: >-
-    {{.OTP}} is your OTP for {{ .Domain }}. Use it within the next {{.Expiry}}.
-    
+  Text: |-
+    {{.OTP}} je váš OTP kód pre {{ .Domain }}. Použite ho v priebehu nasledujúcich {{.Expiry}}.
     @{{.Domain}} #{{.OTP}}
 DomainClaimed:
-  Title: Domain has been claimed
-  PreHeader: Change email / username
-  Subject: Domain has been claimed
-  Greeting: Hello {{.DisplayName}},
-  Text: The domain {{.Domain}} has been claimed by an organization. Your current user {{.Username}} is not part of this organization. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.
-  ButtonText: Login
+  Title: "Doména bola prevzatá"
+  PreHeader: "Zmena e-mailu / používateľského mena"
+  Subject: "Doména bola prevzatá"
+  Greeting: "Dobrý deň, {{.DisplayName}},"
+  Text: "Doménu {{.Domain}} prevzala organizácia. Váš súčasný používateľ {{.Username}} nie je súčasťou tejto organizácie. Pri prihlásení si preto budete musieť zmeniť e-mailovú adresu. Pre toto prihlásenie sme vytvorili dočasné používateľské meno ({{.TempUsername}})."
+  ButtonText: "Prihlásiť sa"
 PasswordlessRegistration:
-  Title: Add Passkey Login
-  PreHeader: Add Passkey Login
-  Subject: Add Passkey Login
-  Greeting: Hello {{.DisplayName}},
-  Text: We received a request to add a token for passkey login. Please use the button below to add your token or device for passkey login.
-  ButtonText: Add Passkey Login
+  Title: "Pridanie prihlásenia prístupovým kľúčom"
+  PreHeader: "Pridanie prihlásenia prístupovým kľúčom"
+  Subject: "Pridanie prihlásenia prístupovým kľúčom"
+  Greeting: "Dobrý deň, {{.DisplayName}},"
+  Text: "Prijali sme žiadosť o pridanie tokenu na prihlásenie prístupovým kľúčom. Na pridanie tokenu alebo zariadenia použite tlačidlo nižšie."
+  ButtonText: "Pridať prístupový kľúč"
 PasswordChange:
-  Title: Password of user has changed
-  PreHeader: Change password
-  Subject: Password of user has changed
-  Greeting: Hello {{.DisplayName}},
-  Text: The password of your user has changed. If this change was not done by you, please be advised to immediately reset your password.
-  ButtonText: Login
+  Title: "Heslo používateľa bolo zmenené"
+  PreHeader: "Zmena hesla"
+  Subject: "Heslo používateľa bolo zmenené"
+  Greeting: "Dobrý deň, {{.DisplayName}},"
+  Text: "Heslo vášho používateľa bolo zmenené. Ak ste túto zmenu nevykonali vy, odporúčame vám okamžite si heslo obnoviť."
+  ButtonText: "Prihlásiť sa"
 InviteUser:
-  Title: Invitation to {{.ApplicationName}}
-  PreHeader: Invitation to {{.ApplicationName}}
-  Subject: Invitation to {{.ApplicationName}}
-  Greeting: Hello {{.DisplayName}},
-  Text: Your user has been invited to {{.ApplicationName}}. Please click the button below to finish the invite process. If you didn't ask for this mail, please ignore it.
-  ButtonText: Accept invite
+  Title: "Pozvánka do {{.ApplicationName}}"
+  PreHeader: "Pozvánka do {{.ApplicationName}}"
+  Subject: "Pozvánka do {{.ApplicationName}}"
+  Greeting: "Dobrý deň, {{.DisplayName}},"
+  Text: "Váš používateľ bol pozvaný do {{.ApplicationName}}. Kliknutím na tlačidlo nižšie dokončite proces pozvania. Ak ste o tento e-mail nežiadali, ignorujte ho."
+  ButtonText: "Prijať pozvánku"
