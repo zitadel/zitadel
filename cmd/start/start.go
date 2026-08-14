@@ -687,6 +687,7 @@ func startAPIs(
 		config.SystemDefaults.SecretHasher,
 		federatedLogoutsCache,
 		httpClient,
+		config.Instrumentation.Trace.TrustRemoteSpans,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start oidc provider: %w", err)
