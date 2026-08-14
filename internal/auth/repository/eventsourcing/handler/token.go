@@ -136,6 +136,10 @@ func (t *Token) Reducers() []handler.AggregateReducer {
 					Event:  org.OrgRemovedEventType,
 					Reduce: t.Reduce,
 				},
+				{
+					Event:  org.OrgDeactivatedEventType,
+					Reduce: t.Reduce,
+				},
 			},
 		},
 		{
@@ -311,7 +315,8 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
 			},
 		), nil
-	case org.OrgRemovedEventType:
+	case org.OrgRemovedEventType,
+		org.OrgDeactivatedEventType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
 				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
