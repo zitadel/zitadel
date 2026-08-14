@@ -164,6 +164,7 @@
     "signInWithAzureAD": "Aanmelden met AzureAD",
     "signInWithGithub": "Aanmelden met GitHub",
     "signInWithGitlab": "Aanmelden met GitLab",
+    "signInWithZitadel": "Aanmelden met Zitadel",
     "loginError": {
       "title": "Inloggen mislukt",
       "description": "Er is een fout opgetreden tijdens het inloggen."

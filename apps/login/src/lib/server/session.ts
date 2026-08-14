@@ -12,7 +12,7 @@ import {
   listUsers,
 } from "@/lib/zitadel";
 import { create, Duration } from "@zitadel/client";
-import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import { Challenges, RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { getTranslations } from "next-intl/server";
@@ -275,11 +275,17 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
     }
   }
 
+  // @ts-ignore
+  const challengeResponse: Challenges | undefined = session.challenges;
+
   return {
     sessionId: session.id,
     factors: session.factors,
-    // @ts-ignore
-    challenges: session.challenges,
+    // Only the WebAuthN challenge may reach the browser. `sanitizeChallenges` already stops
+    // `returnCode` from being requested, so `otpSms`/`otpEmail` should always be unset here —
+    // keeping the projection explicit means no OTP code can leak through this boundary even
+    // if that ever regresses (GHSA-3gwm-5wx8-4gm6).
+    challenges: challengeResponse?.webAuthN ? { webAuthN: challengeResponse.webAuthN } : undefined,
     authMethods,
   };
 }
