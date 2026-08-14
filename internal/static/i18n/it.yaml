@@ -204,6 +204,7 @@ Errors:
     AlreadyActive: "L'organizzazione è già attiva"
     Empty: "L'organizzazione è vuota"
     NotFound: "Organizzazione non trovata"
+    NotActive: "L'organizzazione non è attiva"
     NotChanged: "Organizzazione non cambiata"
     DefaultOrgNotDeletable: "L'organizzazione predefinita non deve essere cancellata"
     ZitadelOrgNotDeletable: "L'organizzazione con il progetto Zitadel non deve essere cancellata"

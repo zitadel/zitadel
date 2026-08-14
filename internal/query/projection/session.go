@@ -8,6 +8,7 @@ import (
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -180,6 +181,19 @@ func (p *sessionProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  user.UserRemovedType,
 					Reduce: p.reduceUserStateNotActive,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  org.OrgDeactivatedEventType,
+					Reduce: p.reduceOwnerRemoved,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -490,6 +504,23 @@ func (p *sessionProjection) reduceUserStateNotActive(event eventstore.Event) (_ 
 		event,
 		[]handler.Condition{
 			handler.NewCond(SessionColumnUserID, event.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, event.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	switch t := event.(type) {
+	case *org.OrgDeactivatedEvent, *org.OrgRemovedEvent:
+		// ok
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-oR9nA", "reduce.wrong.event.type %v", t)
+	}
+
+	return handler.NewDeleteStatement(
+		event,
+		[]handler.Condition{
+			handler.NewCond(SessionColumnUserResourceOwner, event.Aggregate().ID),
 			handler.NewCond(SessionColumnInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil

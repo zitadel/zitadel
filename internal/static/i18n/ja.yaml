@@ -205,6 +205,7 @@ Errors:
     AlreadyActive: "組織はすでにアクティブです"
     Empty: "組織は空です"
     NotFound: "組織が見つかりません"
+    NotActive: "組織はアクティブではありません"
     NotChanged: "組織は変更されていません"
     DefaultOrgNotDeletable: "デフォルトの組織は削除できません"
     ZitadelOrgNotDeletable: "Zitadelプロジェクトの組織は削除できません"

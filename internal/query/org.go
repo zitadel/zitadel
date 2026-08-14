@@ -264,6 +264,20 @@ func (q *Queries) ExistsOrg(ctx context.Context, id, domain string) (verifiedID 
 	return org.ID, nil
 }
 
+func (q *Queries) CheckOrgActive(ctx context.Context, orgID string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	org, err := q.OrgByID(ctx, orgID)
+	if err != nil {
+		return err
+	}
+	if !org.State.IsActive() {
+		return zerrors.ThrowPreconditionFailed(nil, "QUERY-oR9nA", "Errors.Org.NotActive")
+	}
+	return nil
+}
+
 func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries, permissionCheck domain_pkg.PermissionCheck) (*Orgs, error) {
 	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
 	orgs, err := q.searchOrgs(ctx, queries, permissionCheckV2)
