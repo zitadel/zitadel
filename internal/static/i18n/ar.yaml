@@ -205,6 +205,7 @@ Errors:
     AlreadyActive: "المنظمة نشطة بالفعل"
     Empty: "المنظمة فارغة"
     NotFound: "المنظمة غير موجودة"
+    NotActive: "المنظمة غير نشطة"
     NotChanged: "المنظمة لم تتغير"
     DefaultOrgNotDeletable: "لا يجب حذف المنظمة الافتراضية"
     ZitadelOrgNotDeletable: "المنظمة التي تحتوي على مشروع ZITADEL لا يجب حذفها"
