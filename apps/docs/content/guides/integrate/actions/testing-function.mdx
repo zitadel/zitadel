@@ -163,9 +163,15 @@ Your server should now print out something like the following. Check out the [Se
     "id" : "312909075211944344",
     "name" : "ZITADEL",
     "primary_domain" : "example.com"
+  },
+  "application" : {
+    "client_id" : "312909075212534168"
   }
 }
 ```
+
+This login was a regular OIDC flow, so no `actor` is included. The `actor` object is only sent if the
+token was obtained through [token exchange](/guides/integrate/token-exchange#actor-token) or impersonation.
 
 For any further information related to [the OIDC Flow, refer to our documentation.](/guides/integrate/login/oidc/login-users)
 

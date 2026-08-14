@@ -164,6 +164,7 @@
     "signInWithAzureAD": "Accedi con AzureAD",
     "signInWithGithub": "Accedi con GitHub",
     "signInWithGitlab": "Accedi con GitLab",
+    "signInWithZitadel": "Accedi con Zitadel",
     "loginError": {
       "title": "Accesso fallito",
       "description": "Si è verificato un errore durante il tentativo di accesso."

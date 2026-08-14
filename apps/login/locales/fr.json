@@ -164,6 +164,7 @@
     "signInWithAzureAD": "Se connecter avec AzureAD",
     "signInWithGithub": "Se connecter avec GitHub",
     "signInWithGitlab": "Se connecter avec GitLab",
+    "signInWithZitadel": "Se connecter avec Zitadel",
     "loginError": {
       "title": "Échec de la connexion",
       "description": "Une erreur est survenue lors de la tentative de connexion."

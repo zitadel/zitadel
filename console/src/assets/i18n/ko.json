@@ -2616,6 +2616,25 @@
       "DEVMODEDESC": "주의: 개발 모드가 활성화된 경우 리디렉션 URI가 검증되지 않습니다.",
       "SKIPNATIVEAPPSUCCESSPAGE": "로그인 성공 페이지 건너뛰기",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "네이티브 앱 로그인 후 성공 페이지를 건너뜁니다.",
+      "APPLINKSSECTION": "네이티브 앱 링크",
+      "APPLINKSDESC": "이 인스턴스가 네이티브 앱용 패스키 신뢰 파일을 제공할 수 있도록 iOS 및 Android 연결을 구성합니다.",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "apple-app-site-association의 webcredentials 항목 TEAMID.BUNDLEID로 제공됩니다.",
+      "TEAMID": "팀 ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Apple Team ID는 영숫자 정확히 10자여야 합니다(예: ABCDE12345).",
+      "TEAMIDLENGTH": "Team ID는 영숫자 정확히 10자여야 합니다.",
+      "BUNDLEID": "번들 ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "iOS Bundle Identifier(CFBundleIdentifier), 예: com.example.app. Team ID 접두사는 포함하지 마세요.",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "Digital Asset Links / 패스키 자격 증명을 위해 assetlinks.json에서 제공됩니다.",
+      "PACKAGENAME": "패키지 이름",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "Android applicationId / 패키지 이름, 예: com.example.app.",
+      "FINGERPRINTS": "SHA-256 인증서 지문",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "줄당 지문 하나(16진수 64자, 콜론 선택 사항). 필요에 따라 디버그 및 릴리스를 포함하세요.",
       "REDIRECT": "리디렉션 URI",
       "REDIRECTSECTION": "리디렉션 URI",
       "POSTLOGOUTREDIRECT": "로그아웃 후 리디렉션 URI",
@@ -2679,7 +2698,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "백채널 로그아웃 URI"
+      "BACKCHANNELLOOGOUTURI": "백채널 로그아웃 URI",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID와 Bundle ID는 둘 다 설정하거나 둘 다 비워 두어야 합니다.",
+      "ANDROIDPACKAGEREQUIRED": "인증서 지문이 설정된 경우 Android 패키지 이름이 필요합니다."
     },
     "API": {
       "INFO": {

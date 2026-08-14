@@ -2587,6 +2587,25 @@
       "DEVMODEDESC": "Atenção: Com o modo de desenvolvimento habilitado, as URIs de redirecionamento não serão validadas.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Pular Página de Sucesso de Login",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Pule a página de sucesso após o login para este aplicativo nativo.",
+      "APPLINKSSECTION": "Links de aplicativos nativos",
+      "APPLINKSDESC": "Configure a associação de iOS e Android para que esta instância possa servir arquivos de confiança de passkeys para seus aplicativos nativos.",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "Servido em apple-app-site-association como entrada webcredentials TEAMID.BUNDLEID.",
+      "TEAMID": "Team ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "O Apple Team ID deve ter exatamente 10 caracteres alfanuméricos, p. ex. ABCDE12345.",
+      "TEAMIDLENGTH": "O Team ID deve ter exatamente 10 caracteres alfanuméricos.",
+      "BUNDLEID": "Bundle ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "Identificador de pacote iOS (CFBundleIdentifier), p. ex. com.example.app. Não inclua o prefixo do Team ID.",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "Servido em assetlinks.json para Digital Asset Links / credenciais de passkey.",
+      "PACKAGENAME": "Nome do pacote",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "applicationId / nome do pacote Android, p. ex. com.example.app.",
+      "FINGERPRINTS": "Impressões digitais do certificado SHA-256",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "Uma impressão por linha (64 caracteres hexadecimais, dois-pontos opcionais). Inclua debug e release conforme necessário.",
       "REDIRECT": "URIs de Redirecionamento",
       "REDIRECTSECTION": "URIs de Redirecionamento",
       "POSTLOGOUTREDIRECT": "URIs de Pós-Logout",
@@ -2650,7 +2669,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI",
+      "IOSAPPLINKINCOMPLETE": "O Team ID e o Bundle ID do iOS devem estar ambos definidos, ou ambos vazios.",
+      "ANDROIDPACKAGEREQUIRED": "O nome do pacote Android é obrigatório quando as impressões digitais do certificado estão definidas."
     },
     "API": {
       "INFO": {
