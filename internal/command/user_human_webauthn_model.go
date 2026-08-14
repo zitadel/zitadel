@@ -493,6 +493,10 @@ func (wm *HumanPasswordlessInitCodeWriteModel) AppendEvents(events ...eventstore
 			if wm.CodeID == e.ID {
 				wm.WriteModel.AppendEvents(e)
 			}
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent:
+			// the user creation event resolves the target user's actual resource owner,
+			// which the permission check in addUserPasskeyCode relies on
+			wm.WriteModel.AppendEvents(e)
 		case *user.UserRemovedEvent:
 			wm.WriteModel.AppendEvents(e)
 		}
@@ -554,6 +558,10 @@ func (wm *HumanPasswordlessInitCodeWriteModel) Query() *eventstore.SearchQueryBu
 			user.HumanPasswordlessInitCodeSentType,
 			user.HumanPasswordlessInitCodeCheckFailedType,
 			user.HumanPasswordlessInitCodeCheckSucceededType,
-			user.UserRemovedType).
+			user.UserRemovedType,
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
+		).
 		Builder()
 }

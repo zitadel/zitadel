@@ -541,7 +541,7 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 			name: "id generator error",
 			fields: fields{
 				newCode:     mockEncryptedCode("passkey1", time.Hour),
-				eventstore:  expectEventstore(),
+				eventstore:  expectEventstore(expectFilter()), // init code write model
 				idGenerator: id_mock.NewIDGeneratorExpectError(t, io.ErrClosedPipe),
 			},
 			args: args{
@@ -595,6 +595,7 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
+				checkPermission:  newMockPermissionCheckAllowed(),
 				newEncryptedCode: tt.fields.newCode,
 				eventstore:       tt.fields.eventstore(t),
 				idGenerator:      tt.fields.idGenerator,
@@ -644,7 +645,7 @@ func TestCommands_AddUserPasskeyCodeURLTemplate(t *testing.T) {
 			name: "id generator error",
 			fields: fields{
 				newCode:     newEncryptedCode,
-				eventstore:  eventstoreExpect(t),
+				eventstore:  eventstoreExpect(t, expectFilter()), // init code write model
 				idGenerator: id_mock.NewIDGeneratorExpectError(t, io.ErrClosedPipe),
 			},
 			args: args{
@@ -703,6 +704,7 @@ func TestCommands_AddUserPasskeyCodeURLTemplate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
+				checkPermission:  newMockPermissionCheckAllowed(),
 				newEncryptedCode: tt.fields.newCode,
 				eventstore:       tt.fields.eventstore,
 				idGenerator:      tt.fields.idGenerator,
@@ -737,7 +739,7 @@ func TestCommands_AddUserPasskeyCodeReturn(t *testing.T) {
 			name: "id generator error",
 			fields: fields{
 				newCode:     newEncryptedCode,
-				eventstore:  eventstoreExpect(t),
+				eventstore:  eventstoreExpect(t, expectFilter()), // init code write model
 				idGenerator: id_mock.NewIDGeneratorExpectError(t, io.ErrClosedPipe),
 			},
 			args: args{
@@ -795,6 +797,7 @@ func TestCommands_AddUserPasskeyCodeReturn(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
+				checkPermission:  newMockPermissionCheckAllowed(),
 				newEncryptedCode: tt.fields.newCode,
 				eventstore:       tt.fields.eventstore,
 				idGenerator:      tt.fields.idGenerator,
@@ -834,7 +837,7 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 			name: "id generator error",
 			fields: fields{
 				newCode:     newEncryptedCode,
-				eventstore:  eventstoreExpect(t),
+				eventstore:  eventstoreExpect(t, expectFilter()), // init code write model
 				idGenerator: id_mock.NewIDGeneratorExpectError(t, io.ErrClosedPipe),
 			},
 			args: args{
@@ -846,8 +849,11 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 		{
 			name: "crypto error",
 			fields: fields{
-				newCode:     newEncryptedCode,
-				eventstore:  eventstoreExpect(t, expectFilterError(io.ErrClosedPipe)),
+				newCode: newEncryptedCode,
+				eventstore: eventstoreExpect(t,
+					expectFilter(), // init code write model
+					expectFilterError(io.ErrClosedPipe),
+				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "123"),
 			},
 			args: args{
@@ -960,6 +966,7 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
+				checkPermission:  newMockPermissionCheckAllowed(),
 				newEncryptedCode: tt.fields.newCode,
 				eventstore:       tt.fields.eventstore,
 				idGenerator:      tt.fields.idGenerator,

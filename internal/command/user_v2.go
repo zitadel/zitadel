@@ -117,11 +117,32 @@ func (c *Commands) ReactivateUserV2(ctx context.Context, userID string) (*domain
 	return writeModelToObjectDetails(&existingHuman.WriteModel), nil
 }
 
+// checkPermissionOnUser checks the given permission on the user, resolving the user's actual
+// resource owner first when the caller did not provide one. For example if a write model didn't
+// query any events, the resource owner is probably empty. Authorizing with a caller-supplied
+// or empty resource owner would allow permissions of another organization to be used.
+func (c *Commands) checkPermissionOnUser(ctx context.Context, permission, resourceOwner, userID string) error {
+	if userID == "" {
+		return zerrors.ThrowInternal(nil, "COMMAND-ulBlS", "Errors.IDMissing")
+	}
+	if resourceOwner == "" {
+		r := NewResourceOwnerModel(authz.GetInstance(ctx).InstanceID(), user.AggregateType, userID)
+		if err := c.eventstore.FilterToQueryReducer(ctx, r); err != nil {
+			return err
+		}
+		resourceOwner = r.resourceOwner
+	}
+	if resourceOwner == "" {
+		return zerrors.ThrowNotFound(nil, "COMMAND-4g3xq", "Errors.NotFound")
+	}
+	return c.checkPermission(ctx, permission, resourceOwner, userID)
+}
+
 func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner, userID string, allowSelfManagement bool) error {
 	if allowSelfManagement && userID != "" && userID == authz.GetCtxData(ctx).UserID {
 		return nil
 	}
-	if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, userID); err != nil {
+	if err := c.checkPermissionOnUser(ctx, domain.PermissionUserWrite, resourceOwner, userID); err != nil {
 		return err
 	}
 	return nil
@@ -131,7 +152,21 @@ func (c *Commands) checkPermissionUpdateUserCredentials(ctx context.Context, res
 	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
 		return nil
 	}
-	if err := c.checkPermission(ctx, domain.PermissionUserCredentialWrite, resourceOwner, userID); err != nil {
+	if err := c.checkPermissionOnUser(ctx, domain.PermissionUserCredentialWrite, resourceOwner, userID); err != nil {
+		return err
+	}
+	return nil
+}
+
+// checkPermissionUpdateUserPasskey checks the same permission the passkey RPCs declare in their
+// auth annotation, so that no role loses access. The API interceptor only verifies it in the
+// caller-supplied request-header org, therefore commands must re-check it against the target
+// user's actual resource owner.
+func (c *Commands) checkPermissionUpdateUserPasskey(ctx context.Context, resourceOwner, userID string) error {
+	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
+		return nil
+	}
+	if err := c.checkPermissionOnUser(ctx, domain.PermissionUserPasskeyWrite, resourceOwner, userID); err != nil {
 		return err
 	}
 	return nil
