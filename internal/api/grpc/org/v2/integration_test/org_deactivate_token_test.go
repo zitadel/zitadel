@@ -16,8 +16,8 @@ import (
 
 func TestServer_DeactivateOrganization_RejectsCallerToken(t *testing.T) {
 	orgResp := Instance.CreateOrganization(CTX, integration.OrganizationName(), integration.Email())
-	userID := orgResp.GetCreatedAdmins()[0].GetUserId()
-	pat := Instance.CreatePersonalAccessToken(CTX, userID)
+	machineUser := Instance.CreateUserTypeMachine(CTX, orgResp.GetOrganizationId())
+	pat := Instance.CreatePersonalAccessToken(CTX, machineUser.GetId())
 	userCtx := integration.WithAuthorizationToken(CTX, pat.GetToken())
 
 	_, err := Instance.Client.Auth.GetMyUser(userCtx, &auth.GetMyUserRequest{})
