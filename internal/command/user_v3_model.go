@@ -348,7 +348,7 @@ func (wm *UserV3WriteModel) NewUpdate(
 	}
 
 	if phone != nil {
-		phoneEvents, plainCodePhone, err := wm.NewPhoneCreate(ctx,
+		phoneEvents, plainCodePhone, err := wm.NewPhoneUpdate(ctx,
 			phone,
 			phoneCode,
 		)
