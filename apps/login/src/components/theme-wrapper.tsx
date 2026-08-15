@@ -110,7 +110,9 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
         case ThemeMode.AUTO:
         case ThemeMode.UNSPECIFIED:
         default:
-          setNextTheme("system");
+          // Do not forcibly override the user's theme preference.
+          // Let next-themes read from localStorage and fall back to system
+          // default only if no saved preference exists.
           break;
       }
     }
