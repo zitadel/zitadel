@@ -431,6 +431,21 @@ func (wm *UserV3WriteModel) checkPermissionWrite(
 	return nil
 }
 
+func (wm *UserV3WriteModel) checkPermissionWriteWithoutSelf(
+	ctx context.Context,
+	resourceOwner string,
+	userID string,
+) error {
+	if wm.writePermissionCheck {
+		return nil
+	}
+	if err := wm.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, userID); err != nil {
+		return err
+	}
+	wm.writePermissionCheck = true
+	return nil
+}
+
 func (wm *UserV3WriteModel) checkPermissionDelete(
 	ctx context.Context,
 	resourceOwner string,
@@ -484,6 +499,11 @@ func (wm *UserV3WriteModel) NewEmailUpdate(
 	}
 	if !wm.Exists() {
 		return nil, "", zerrors.ThrowNotFound(nil, "COMMAND-nJ0TQFuRmP", "Errors.User.NotFound")
+	}
+	if email != nil && email.Verified {
+		if err := wm.checkPermissionWriteWithoutSelf(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
+			return nil, "", err
+		}
 	}
 	return wm.NewEmailCreate(ctx, email, code)
 }
@@ -605,6 +625,11 @@ func (wm *UserV3WriteModel) NewPhoneUpdate(
 	}
 	if !wm.Exists() {
 		return nil, "", zerrors.ThrowNotFound(nil, "COMMAND-b33QAVgel6", "Errors.User.NotFound")
+	}
+	if phone != nil && phone.Verified {
+		if err := wm.checkPermissionWriteWithoutSelf(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
+			return nil, "", err
+		}
 	}
 	return wm.NewPhoneCreate(ctx, phone, code)
 }
