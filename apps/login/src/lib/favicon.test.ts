@@ -52,6 +52,22 @@ describe("buildIconsMetadata", () => {
 
       expect(icons.shortcut.startsWith(`${BASE_PATH}/`)).toBe(true);
     });
+
+    // A leading "//" would be read as a protocol relative URL and resolve
+    // against another host instead of this app.
+    it.each([
+      ["/", "/favicon/favicon.ico"],
+      ["", "/favicon/favicon.ico"],
+      ["   ", "/favicon/favicon.ico"],
+      ["/ui/v2/login/", "/ui/v2/login/favicon/favicon.ico"],
+      ["/ui/v2/login//", "/ui/v2/login/favicon/favicon.ico"],
+      ["ui/v2/login", "/ui/v2/login/favicon/favicon.ico"],
+    ])("should normalize base path %j into a single leading slash", (basePath, expected) => {
+      const icons = buildIconsMetadata(undefined, basePath) as { shortcut: string };
+
+      expect(icons.shortcut).toBe(expected);
+      expect(icons.shortcut.startsWith("//")).toBe(false);
+    });
   });
 
   describe("branding icon", () => {

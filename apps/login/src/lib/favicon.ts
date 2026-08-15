@@ -17,6 +17,23 @@ const BUNDLED_ICONS = {
 } as const;
 
 /**
+ * Normalizes a base path into a prefix that can be concatenated with the icon
+ * paths above.
+ *
+ * Next.js rejects a base path of "/" and one with a trailing slash, but this
+ * helper takes the prefix as an argument, so it does not rely on that
+ * validation: a stray slash would otherwise produce "//favicon/..." , which a
+ * browser resolves as a protocol relative URL pointing at another host.
+ */
+function normalizeBasePath(basePath: string): string {
+  const trimmed = basePath.trim().replace(/\/+$/, "");
+  if (!trimmed) {
+    return "";
+  }
+  return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+}
+
+/**
  * Builds the favicon metadata.
  *
  * When the branding (label policy) defines an icon, it is used so the favicon
@@ -33,13 +50,15 @@ export function buildIconsMetadata(brandingIconUrl?: string, basePath: string = 
     };
   }
 
+  const prefix = normalizeBasePath(basePath);
+
   return {
     icon: [
-      { url: `${basePath}${BUNDLED_ICONS.png32}`, sizes: "32x32", type: "image/png" },
-      { url: `${basePath}${BUNDLED_ICONS.png16}`, sizes: "16x16", type: "image/png" },
+      { url: `${prefix}${BUNDLED_ICONS.png32}`, sizes: "32x32", type: "image/png" },
+      { url: `${prefix}${BUNDLED_ICONS.png16}`, sizes: "16x16", type: "image/png" },
     ],
-    shortcut: `${basePath}${BUNDLED_ICONS.ico}`,
-    apple: { url: `${basePath}${BUNDLED_ICONS.apple}`, sizes: "180x180" },
+    shortcut: `${prefix}${BUNDLED_ICONS.ico}`,
+    apple: { url: `${prefix}${BUNDLED_ICONS.apple}`, sizes: "180x180" },
   };
 }
 
