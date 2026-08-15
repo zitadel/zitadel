@@ -72,6 +72,7 @@ func (wm *HumanOTPReadModel) Reduce() error {
 		case *user.HumanOTPRemovedEvent:
 			wm.State = domain.MFAStateRemoved
 		case *user.UserRemovedEvent:
+			wm.Secret = nil
 			wm.State = domain.MFAStateRemoved
 		}
 	}

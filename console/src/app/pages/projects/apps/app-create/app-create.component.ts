@@ -28,7 +28,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
+import { AppSecretDialogComponent, AppSecretDialogData } from '../app-secret-dialog/app-secret-dialog.component';
 import {
   BASIC_AUTH_METHOD,
   CODE_METHOD,
@@ -461,7 +461,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     if (added.clientId) {
       clientId = added.clientId;
     }
-    const dialogRef = this.dialog.open(AppSecretDialogComponent, {
+    const dialogRef = this.dialog.open<AppSecretDialogComponent, AppSecretDialogData>(AppSecretDialogComponent, {
       data: {
         clientSecret: clientSecret,
         clientId: clientId,

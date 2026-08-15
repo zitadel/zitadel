@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"net/http"
 	"testing"
 	"time"
 
@@ -325,7 +326,7 @@ func TestSession_FetchUser(t *testing.T) {
 			tt.fields.httpMock(tt.fields.issuer)
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.userMapper, tt.opts...)
+			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.userMapper, http.DefaultClient, tt.opts...)
 			require.NoError(t, err)
 
 			session := &Session{

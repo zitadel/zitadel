@@ -43,6 +43,10 @@ vi.mock("./host", () => ({
   getPublicHost: vi.fn(),
 }));
 
+vi.mock("./verify", () => ({
+  trySendVerification: vi.fn(() => Promise.resolve(false)),
+}));
+
 // this returns the key itself that can be checked not the translated value
 vi.mock("next-intl/server", () => ({
   getTranslations: vi.fn(() => (key: string) => key),
@@ -116,6 +120,8 @@ describe("sendLoginname", () => {
     });
     // Default: org discovery returns empty result
     mockGetOrgsByDomain.mockResolvedValue({ result: [] });
+    // Default: no active identity providers
+    mockGetActiveIdentityProviders.mockResolvedValue({ identityProviders: [] });
   });
 
   afterEach(() => {
@@ -198,7 +204,7 @@ describe("sendLoginname", () => {
       mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
     });
 
-    test("should redirect to verify with send=false when user has no authentication methods and email is unverified", async () => {
+    test("should redirect to verify without codeSent when user has no authentication methods and email is unverified", async () => {
       mockListAuthenticationMethodTypes.mockResolvedValue({ authMethodTypes: [] });
 
       const result = await sendLoginname({
@@ -210,12 +216,11 @@ describe("sendLoginname", () => {
       expect(result).toHaveProperty("redirect");
       expect((result as any).redirect).toMatch(/^\/verify\?/);
       expect((result as any).redirect).toContain("loginName=user%40example.com");
-      expect((result as any).redirect).toContain("send=false");
       expect((result as any).redirect).toContain("invite=true");
       expect((result as any).redirect).toContain("requestId=req123");
     });
 
-    test("should redirect to verify with send=true when user has no authentication methods and email is already verified", async () => {
+    test("should redirect to verify when user has no authentication methods and email is already verified", async () => {
       const verifiedEmailUser = {
         ...mockUser,
         type: { case: "human", value: { email: { email: "user@example.com", isVerified: true } } },
@@ -232,7 +237,6 @@ describe("sendLoginname", () => {
       expect(result).toHaveProperty("redirect");
       expect((result as any).redirect).toMatch(/^\/verify\?/);
       expect((result as any).redirect).toContain("loginName=user%40example.com");
-      expect((result as any).redirect).toContain("send=true");
       expect((result as any).redirect).toContain("invite=true");
       expect((result as any).redirect).toContain("requestId=req123");
     });
@@ -533,7 +537,6 @@ describe("sendLoginname", () => {
         loginName: "user@example.com",
         requestId: "req123",
         organization: "org123",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).toBeDefined();
@@ -541,6 +544,81 @@ describe("sendLoginname", () => {
       expect(result?.redirect).toContain("loginName=user%40example.com");
       expect(result?.redirect).toContain("requestId=req123");
       expect(result?.redirect).toContain("organization=org123");
+    });
+
+    test("should redirect to IDP via domain discovery for IdP-only org even when ignoreUnknownUsernames is true", async () => {
+      // Regression test: enumeration protection must not divert unknown users of
+      // an IdP-only org (allowLocalAuthentication: false) to the decoy password
+      // screen — known users of that org are auto-redirected to the IdP, so the
+      // redirect is the indistinguishable (and functional) behavior.
+      mockGetLoginSettings
+        .mockResolvedValueOnce({
+          // context (instance default) settings
+          ignoreUnknownUsernames: true,
+          allowLocalAuthentication: true,
+        })
+        .mockResolvedValueOnce({
+          // discovered org settings: IdP-only
+          allowDomainDiscovery: true,
+          allowRegister: false,
+          allowLocalAuthentication: false,
+          ignoreUnknownUsernames: true,
+        });
+
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [{ id: "discovered-org-sso", name: "Enterprise Org" }],
+      });
+
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp-entra", type: "OIDC", options: { isCreationAllowed: true } }],
+      });
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://entra.example.com/auth" });
+
+      const result = await sendLoginname({
+        loginName: "newuser@enterprise.com",
+        requestId: "req123",
+      });
+
+      expect(result).toEqual({ redirect: "https://entra.example.com/auth" });
+
+      expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        orgId: "discovered-org-sso",
+      });
+    });
+
+    test("should keep decoy password screen when ignoreUnknownUsernames is true and discovered org allows local authentication", async () => {
+      // With local authentication enabled, known (password) users see the
+      // password screen, so the decoy is what keeps unknown users
+      // indistinguishable — the discovery-based IdP redirect stays gated.
+      mockGetLoginSettings
+        .mockResolvedValueOnce({
+          // context (instance default) settings
+          ignoreUnknownUsernames: true,
+          allowLocalAuthentication: true,
+        })
+        .mockResolvedValueOnce({
+          // discovered org settings: local auth enabled
+          allowDomainDiscovery: true,
+          allowRegister: false,
+          allowLocalAuthentication: true,
+          ignoreUnknownUsernames: true,
+        });
+
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [{ id: "discovered-org-local", name: "Password Org" }],
+      });
+
+      const result = await sendLoginname({
+        loginName: "newuser@company.com",
+        requestId: "req123",
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.redirect).toMatch(/^\/password\?/);
+      expect(result?.redirect).toContain("loginName=newuser%40company.com");
+      expect(result?.redirect).toContain("organization=discovered-org-local");
+      expect(mockStartIdentityProviderFlow).not.toHaveBeenCalled();
     });
 
     test("should return error when user not found and no registration allowed", async () => {
@@ -584,6 +662,121 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user@example.com",
+      });
+
+      expect(result).toEqual({ error: "errors.userNotFound" });
+    });
+
+    test("should redirect to IDP when allowRegister: false, allowLocalAuthentication: true and discovered org has single active IDP", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowRegister: false,
+        allowLocalAuthentication: true,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp123", type: "OIDC", options: { isAutoCreation: true } }],
+      });
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+        organization: "org123",
+      });
+
+      expect(result).toEqual({ redirect: "https://idp.example.com/auth" });
+    });
+
+    test("should redirect to IDP via domain discovery when allowRegister: false, allowLocalAuthentication: true", async () => {
+      mockGetLoginSettings
+        .mockResolvedValueOnce({
+          allowRegister: false,
+          allowLocalAuthentication: true,
+        })
+        .mockResolvedValueOnce({
+          allowDomainDiscovery: true,
+          allowRegister: false,
+          allowLocalAuthentication: true,
+        });
+
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [{ id: "discovered-org-789", name: "Company Org" }],
+      });
+
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp456", type: "OIDC", options: { isAutoCreation: true } }],
+      });
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://company-idp.example.com/auth" });
+
+      const result = await sendLoginname({
+        loginName: "user@company.com",
+        requestId: "req123",
+      });
+
+      expect(result).toEqual({ redirect: "https://company-idp.example.com/auth" });
+
+      expect(mockGetOrgsByDomain).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        domain: "company.com",
+      });
+
+      expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        orgId: "discovered-org-789",
+      });
+    });
+
+    test("should redirect to IDP when allowRegister: true, allowLocalAuthentication: true and discovered org has single active IDP", async () => {
+      mockGetLoginSettings
+        .mockResolvedValueOnce({
+          allowRegister: true,
+          allowLocalAuthentication: true,
+          ignoreUnknownUsernames: false,
+        })
+        .mockResolvedValueOnce({
+          allowDomainDiscovery: true,
+          allowRegister: true,
+          allowLocalAuthentication: true,
+          ignoreUnknownUsernames: false,
+        });
+
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [{ id: "discovered-org-101", name: "Example Org" }],
+      });
+
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp789", type: "OIDC", options: { isAutoCreation: true } }],
+      });
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://example-idp.example.com/auth" });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+        requestId: "req123",
+      });
+
+      expect(result).toEqual({ redirect: "https://example-idp.example.com/auth" });
+    });
+
+    test("should return error when allowRegister: false, allowLocalAuthentication: true, discovered org but no active IDP", async () => {
+      mockGetLoginSettings
+        .mockResolvedValueOnce({
+          allowRegister: false,
+          allowLocalAuthentication: true,
+        })
+        .mockResolvedValueOnce({
+          allowDomainDiscovery: true,
+          allowRegister: false,
+          allowLocalAuthentication: true,
+        });
+
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [{ id: "discovered-org-empty", name: "No IDP Org" }],
+      });
+
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [],
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@noidp.com",
       });
 
       expect(result).toEqual({ error: "errors.userNotFound" });
@@ -755,7 +948,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user@example.com",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).not.toEqual({ error: "errors.userNotFound" });
@@ -780,7 +972,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user@example.com",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).not.toEqual({ error: "errors.userNotFound" });
@@ -870,7 +1061,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user@example.com",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).not.toEqual({ error: "errors.moreThanOneUserFound" });
@@ -901,7 +1091,7 @@ describe("sendLoginname", () => {
         rawMessage: "Errors.User.NotActive (SESSION-Gj4ko)",
       });
 
-      const result = await sendLoginname({ loginName: "user1", ignoreUnknownUsernames: true });
+      const result = await sendLoginname({ loginName: "user1" });
 
       expect(result).toEqual({ redirect: "/password?loginName=user1" });
       // With ignoreUnknownUsernames: true, we skip session creation, so this mock is NOT called
@@ -927,7 +1117,7 @@ describe("sendLoginname", () => {
         authMethodTypes: [AuthenticationMethodType.PASSWORD],
       });
 
-      const result = await sendLoginname({ loginName: "user1", ignoreUnknownUsernames: true });
+      const result = await sendLoginname({ loginName: "user1" });
 
       expect(result).toEqual({ redirect: "/password?loginName=user1" });
       expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
@@ -967,7 +1157,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user@example.com",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).not.toEqual({ error: "errors.localAuthenticationNotAllowed" });
@@ -1007,7 +1196,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user@example.com",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).not.toEqual({ error: "errors.passkeysNotAllowed" });
@@ -1120,7 +1308,6 @@ describe("sendLoginname", () => {
       // INPUT login name is just "user"
       const result = await sendLoginname({
         loginName: "user",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).toHaveProperty("redirect");
@@ -1162,7 +1349,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).toHaveProperty("redirect");
@@ -1204,7 +1390,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).toHaveProperty("redirect");
@@ -1252,7 +1437,6 @@ describe("sendLoginname", () => {
       const result = await sendLoginname({
         loginName: "input-name",
         organization: "context-org", // Context has ignore=true
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).toHaveProperty("redirect");
@@ -1300,7 +1484,6 @@ describe("sendLoginname", () => {
       const result = await sendLoginname({
         loginName: "input-name",
         organization: "context-org", // Context has ignore=false
-        ignoreUnknownUsernames: false,
       });
 
       expect(result).toHaveProperty("redirect");

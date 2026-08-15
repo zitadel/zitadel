@@ -19,12 +19,14 @@ import { SendInviteCodeSchema } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import {
   AddHumanUserRequest,
   AddHumanUserRequestSchema,
+  CreateUserRequest,
   ResendEmailCodeRequest,
   ResendEmailCodeRequestSchema,
   SendEmailCodeRequestSchema,
   SetPasswordRequest,
   SetPasswordRequestSchema,
   UpdateHumanUserRequest,
+  UpdateUserRequest,
   UserService,
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
@@ -32,15 +34,13 @@ import {
 import { getTranslations } from "next-intl/server";
 
 import { getUserAgent } from "./fingerprint";
-import { createLogger } from "./logger";
 
-import { errorClassificationInterceptor } from "@/lib/grpc/interceptors/error-classification";
+import { applyCustomHeaders } from "@/lib/custom-headers";
+import { errorClassificationInterceptor, isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { otelGrpcInterceptor } from "@/lib/grpc/interceptors/otel";
-import { Code, ConnectError, Interceptor } from "@connectrpc/connect";
+import { Code, Interceptor } from "@connectrpc/connect";
 import { PromiseCache } from "./cache";
 import { createServiceForHost } from "./service";
-
-const logger = createLogger("zitadel");
 
 const useCache = process.env.API_CACHE_ENABLED !== "false";
 
@@ -151,6 +151,26 @@ export async function getBrandingSettings({
     instanceCacheKey(serviceConfig, `getBrandingSettings-${organization || "instance"}`),
     fetcher,
     getTTLForKey("getBrandingSettings", longCacheTTL),
+  );
+}
+
+/**
+ * Resolves the ID of the instance the login is serving. The default login
+ * settings (queried without organization context) are always owned by the
+ * instance, so the response details carry the instance ID. Cached per
+ * instance like the other settings lookups.
+ */
+export async function getInstanceId({ serviceConfig }: WithServiceConfig) {
+  const fetcher = async () => {
+    const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
+
+    return settingsService.getLoginSettings({ ctx: makeReqCtx(undefined) }, {}).then((resp) => resp.details?.resourceOwner);
+  };
+
+  return freshCache(
+    instanceCacheKey(serviceConfig, "getInstanceId"),
+    fetcher,
+    getTTLForKey("getLoginSettings", defaultCacheTTL),
   );
 }
 
@@ -487,6 +507,22 @@ export async function updateHuman({
   return userService.updateHumanUser(request);
 }
 
+// createUser calls the non-deprecated CreateUser endpoint, which supports user metadata
+// (unlike the deprecated addHumanUser/AddHumanUserRequest flow).
+export async function createUser({ serviceConfig, request }: WithServiceConfig<{ request: CreateUserRequest }>) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceConfig);
+
+  return userService.createUser(request);
+}
+
+// updateUser calls the non-deprecated UpdateUser endpoint, which supports updating user
+// metadata in the same request (unlike the deprecated updateHuman/UpdateHumanUserRequest flow).
+export async function updateUser({ serviceConfig, request }: WithServiceConfig<{ request: UpdateUserRequest }>) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceConfig);
+
+  return userService.updateUser(request);
+}
+
 export async function verifyTOTPRegistration({
   serviceConfig,
   code,
@@ -589,6 +625,8 @@ export type ListUsersCommand = WithServiceConfig<{
   organizationId?: string;
 }>;
 
+const userLookupQuery = { limit: 2 };
+
 export async function listUsers({ serviceConfig, loginName, userName, phone, email, organizationId }: ListUsersCommand) {
   const queries: SearchQuery[] = [];
 
@@ -674,7 +712,7 @@ export async function listUsers({ serviceConfig, loginName, userName, phone, ema
 
   const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceConfig);
 
-  return userService.listUsers({ queries });
+  return userService.listUsers({ query: userLookupQuery, queries });
 }
 
 export type SearchUsersCommand = WithServiceConfig<{
@@ -757,7 +795,7 @@ export async function searchUsers({
 
   const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceConfig);
 
-  const loginNameResult = await userService.listUsers({ queries });
+  const loginNameResult = await userService.listUsers({ query: userLookupQuery, queries });
 
   if (!loginNameResult || !loginNameResult.details) {
     return { error: t("errors.errorOccured") };
@@ -819,6 +857,7 @@ export async function searchUsers({
   }
 
   const emailOrPhoneResult = await userService.listUsers({
+    query: userLookupQuery,
     queries: emailAndPhoneQueries,
   });
 
@@ -1169,7 +1208,7 @@ export async function setUserPassword({
 
   return userService.setPassword(payload, {}).catch((error) => {
     // throw error if failed precondition (ex. User is not yet initialized)
-    if (error instanceof ConnectError && error.code === Code.FailedPrecondition && error.message) {
+    if (isClassifiedError(error) && error.code === Code.FailedPrecondition && error.message) {
       return { error: error.message };
     } else {
       throw error;
@@ -1370,22 +1409,10 @@ export function createServerTransport(token: string, serviceConfig: ServiceConfi
     }
 
     // Apply headers from CUSTOM_REQUEST_HEADERS environment variable
-    if (process.env.CUSTOM_REQUEST_HEADERS) {
-      process.env.CUSTOM_REQUEST_HEADERS.split(",").forEach((header) => {
-        const kv = header.indexOf(":");
-        if (kv > 0) {
-          const key = header.slice(0, kv).trim();
-          const value = header.slice(kv + 1).trim();
-          if (value) {
-            req.header.set(key, value);
-          } else {
-            req.header.delete(key);
-          }
-        } else {
-          logger.warn("Skipping malformed header", { header });
-        }
-      });
-    }
+    applyCustomHeaders({
+      set: (key, value) => req.header.set(key, value),
+      remove: (key) => req.header.delete(key),
+    });
 
     return next(req);
   };

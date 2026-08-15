@@ -370,7 +370,7 @@ func TestSession_FetchUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.rootURL, tt.fields.metadata, tt.fields.certificate, tt.fields.key, tt.fields.options...)
+			provider, err := New(tt.fields.name, tt.fields.rootURL, tt.fields.metadata, tt.fields.certificate, tt.fields.key, http.DefaultClient, tt.fields.options...)
 			require.NoError(t, err)
 
 			session, err := NewSession(provider, tt.args.requestID, tt.args.request)

@@ -14,32 +14,36 @@ import (
 type OIDCApplicationWriteModel struct {
 	eventstore.WriteModel
 
-	AppID                    string
-	AppName                  string
-	ClientID                 string
-	HashedSecret             string
-	ClientSecretString       string
-	RedirectUris             []string
-	ResponseTypes            []domain.OIDCResponseType
-	GrantTypes               []domain.OIDCGrantType
-	ApplicationType          domain.OIDCApplicationType
-	AuthMethodType           domain.OIDCAuthMethodType
-	PostLogoutRedirectUris   []string
-	OIDCVersion              domain.OIDCVersion
-	Compliance               *domain.Compliance
-	DevMode                  bool
-	AccessTokenType          domain.OIDCTokenType
-	AccessTokenRoleAssertion bool
-	IDTokenRoleAssertion     bool
-	IDTokenUserinfoAssertion bool
-	ClockSkew                time.Duration
-	State                    domain.AppState
-	AdditionalOrigins        []string
-	SkipNativeAppSuccessPage bool
-	BackChannelLogoutURI     string
-	LoginVersion             domain.LoginVersion
-	LoginBaseURI             string
-	oidc                     bool
+	AppID                         string
+	AppName                       string
+	ClientID                      string
+	HashedSecret                  string
+	ClientSecretString            string
+	RedirectUris                  []string
+	ResponseTypes                 []domain.OIDCResponseType
+	GrantTypes                    []domain.OIDCGrantType
+	ApplicationType               domain.OIDCApplicationType
+	AuthMethodType                domain.OIDCAuthMethodType
+	PostLogoutRedirectUris        []string
+	OIDCVersion                   domain.OIDCVersion
+	Compliance                    *domain.Compliance
+	DevMode                       bool
+	AccessTokenType               domain.OIDCTokenType
+	AccessTokenRoleAssertion      bool
+	IDTokenRoleAssertion          bool
+	IDTokenUserinfoAssertion      bool
+	ClockSkew                     time.Duration
+	State                         domain.AppState
+	AdditionalOrigins             []string
+	SkipNativeAppSuccessPage      bool
+	BackChannelLogoutURI          string
+	LoginVersion                  domain.LoginVersion
+	LoginBaseURI                  string
+	IOSTeamID                     string
+	IOSBundleID                   string
+	AndroidPackageName            string
+	AndroidSHA256CertFingerprints []string
+	oidc                          bool
 }
 
 func NewOIDCApplicationWriteModelWithAppID(projectID, appID, resourceOwner string) *OIDCApplicationWriteModel {
@@ -108,7 +112,7 @@ func (wm *OIDCApplicationWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
-		case *project.ProjectRemovedEvent:
+		default:
 			wm.WriteModel.AppendEvents(e)
 		}
 	}
@@ -118,6 +122,33 @@ func (wm *OIDCApplicationWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *project.ApplicationAddedEvent:
+			wm.ClientID = ""
+			wm.HashedSecret = ""
+			wm.ClientSecretString = ""
+			wm.RedirectUris = nil
+			wm.ResponseTypes = nil
+			wm.GrantTypes = nil
+			wm.ApplicationType = domain.OIDCApplicationTypeWeb
+			wm.AuthMethodType = domain.OIDCAuthMethodTypeBasic
+			wm.PostLogoutRedirectUris = nil
+			wm.OIDCVersion = domain.OIDCVersionV1
+			wm.Compliance = nil
+			wm.DevMode = false
+			wm.AccessTokenType = domain.OIDCTokenTypeBearer
+			wm.AccessTokenRoleAssertion = false
+			wm.IDTokenRoleAssertion = false
+			wm.IDTokenUserinfoAssertion = false
+			wm.ClockSkew = 0
+			wm.AdditionalOrigins = nil
+			wm.SkipNativeAppSuccessPage = false
+			wm.BackChannelLogoutURI = ""
+			wm.LoginVersion = domain.LoginVersionUnspecified
+			wm.LoginBaseURI = ""
+			wm.IOSTeamID = ""
+			wm.IOSBundleID = ""
+			wm.AndroidPackageName = ""
+			wm.AndroidSHA256CertFingerprints = nil
+			wm.oidc = false
 			wm.AppName = e.Name
 			wm.State = domain.AppStateActive
 		case *project.ApplicationChangedEvent:
@@ -143,6 +174,34 @@ func (wm *OIDCApplicationWriteModel) Reduce() error {
 		case *project.OIDCConfigSecretHashUpdatedEvent:
 			wm.HashedSecret = e.HashedSecret
 		case *project.ProjectRemovedEvent:
+			wm.AppName = ""
+			wm.ClientID = ""
+			wm.HashedSecret = ""
+			wm.ClientSecretString = ""
+			wm.RedirectUris = nil
+			wm.ResponseTypes = nil
+			wm.GrantTypes = nil
+			wm.ApplicationType = domain.OIDCApplicationTypeWeb
+			wm.AuthMethodType = domain.OIDCAuthMethodTypeBasic
+			wm.PostLogoutRedirectUris = nil
+			wm.OIDCVersion = domain.OIDCVersionV1
+			wm.Compliance = nil
+			wm.DevMode = false
+			wm.AccessTokenType = domain.OIDCTokenTypeBearer
+			wm.AccessTokenRoleAssertion = false
+			wm.IDTokenRoleAssertion = false
+			wm.IDTokenUserinfoAssertion = false
+			wm.ClockSkew = 0
+			wm.AdditionalOrigins = nil
+			wm.SkipNativeAppSuccessPage = false
+			wm.BackChannelLogoutURI = ""
+			wm.LoginVersion = domain.LoginVersionUnspecified
+			wm.LoginBaseURI = ""
+			wm.IOSTeamID = ""
+			wm.IOSBundleID = ""
+			wm.AndroidPackageName = ""
+			wm.AndroidSHA256CertFingerprints = nil
+			wm.oidc = false
 			wm.State = domain.AppStateRemoved
 		}
 	}
@@ -171,6 +230,10 @@ func (wm *OIDCApplicationWriteModel) appendAddOIDCEvent(e *project.OIDCConfigAdd
 	wm.BackChannelLogoutURI = e.BackChannelLogoutURI
 	wm.LoginVersion = e.LoginVersion
 	wm.LoginBaseURI = e.LoginBaseURI
+	wm.IOSTeamID = e.IOSTeamID
+	wm.IOSBundleID = e.IOSBundleID
+	wm.AndroidPackageName = e.AndroidPackageName
+	wm.AndroidSHA256CertFingerprints = e.AndroidSHA256CertFingerprints
 }
 
 func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfigChangedEvent) {
@@ -228,6 +291,18 @@ func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfig
 	if e.LoginBaseURI != nil {
 		wm.LoginBaseURI = *e.LoginBaseURI
 	}
+	if e.IOSTeamID != nil {
+		wm.IOSTeamID = *e.IOSTeamID
+	}
+	if e.IOSBundleID != nil {
+		wm.IOSBundleID = *e.IOSBundleID
+	}
+	if e.AndroidPackageName != nil {
+		wm.AndroidPackageName = *e.AndroidPackageName
+	}
+	if e.AndroidSHA256CertFingerprints != nil {
+		wm.AndroidSHA256CertFingerprints = *e.AndroidSHA256CertFingerprints
+	}
 }
 
 func (wm *OIDCApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
@@ -237,6 +312,7 @@ func (wm *OIDCApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			project.ProjectAddedType,
 			project.ApplicationAddedType,
 			project.ApplicationChangedType,
 			project.ApplicationDeactivatedType,
@@ -272,6 +348,10 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	backChannelLogoutURI *string,
 	loginVersion *domain.LoginVersion,
 	loginBaseURI *string,
+	iosTeamID *string,
+	iosBundleID *string,
+	androidPackageName *string,
+	androidSHA256CertFingerprints []string,
 ) (*project.OIDCConfigChangedEvent, bool, error) {
 	changes := make([]project.OIDCConfigChanges, 0)
 	var err error
@@ -329,6 +409,18 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	}
 	if loginBaseURI != nil && wm.LoginBaseURI != *loginBaseURI {
 		changes = append(changes, project.ChangeOIDCLoginBaseURI(*loginBaseURI))
+	}
+	if iosTeamID != nil && wm.IOSTeamID != *iosTeamID {
+		changes = append(changes, project.ChangeIOSTeamID(*iosTeamID))
+	}
+	if iosBundleID != nil && wm.IOSBundleID != *iosBundleID {
+		changes = append(changes, project.ChangeIOSBundleID(*iosBundleID))
+	}
+	if androidPackageName != nil && wm.AndroidPackageName != *androidPackageName {
+		changes = append(changes, project.ChangeAndroidPackageName(*androidPackageName))
+	}
+	if androidSHA256CertFingerprints != nil && !slices.Equal(wm.AndroidSHA256CertFingerprints, androidSHA256CertFingerprints) {
+		changes = append(changes, project.ChangeAndroidSHA256CertFingerprints(androidSHA256CertFingerprints))
 	}
 
 	if len(changes) == 0 {

@@ -1,4 +1,4 @@
-import { getPageImage, getPage, source } from '@/lib/source';
+import { generateAllDocParams, getPageImage, getPage, source } from '@/lib/source';
 import {
   DocsBody,
   DocsPage,
@@ -38,11 +38,12 @@ export default async function Page(props: any) {
   );
 }
 
-export const dynamicParams = true;
-export const revalidate = 3600;
+export const dynamicParams = false;
+export const revalidate = false;
+export const dynamic = 'force-static';
 
 export async function generateStaticParams() {
-  return source.generateParams();
+  return generateAllDocParams();
 }
 
 export async function generateMetadata(

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { initialSendVerification, sendVerification } from "./verify";
+import { sendVerification, trySendVerification, verifyTOTP } from "./verify";
 
 import {
   createInviteCode,
@@ -23,6 +23,15 @@ vi.mock("@/lib/zitadel", () => ({
   getLoginSettings: vi.fn(),
   sendEmailCode: vi.fn(),
   createInviteCode: vi.fn(),
+  verifyTOTPRegistration: vi.fn(),
+}));
+
+vi.mock("../session", () => ({
+  loadMostRecentSession: vi.fn(),
+}));
+
+vi.mock("./enrollment-guard", () => ({
+  getEnrollmentAuthorizationError: vi.fn(),
 }));
 
 vi.mock("next/headers", () => ({
@@ -219,7 +228,7 @@ describe("sendVerification", () => {
   });
 });
 
-describe("initialSendVerification", () => {
+describe("trySendVerification", () => {
   let mockSendEmailCode: any;
   let mockCreateInviteCode: any;
   let originalBasePath: string | undefined;
@@ -243,12 +252,13 @@ describe("initialSendVerification", () => {
     }
   });
 
-  test("should call sendEmailCode with correct URL template for non-invite", async () => {
-    await initialSendVerification({
+  test("should call sendEmailCode with correct URL template for non-invite and return true", async () => {
+    const result = await trySendVerification({
       userId: "user-1",
       isInvite: false,
     });
 
+    expect(result).toBe(true);
     expect(mockSendEmailCode).toHaveBeenCalledWith({
       serviceConfig: {},
       userId: "user-1",
@@ -257,12 +267,13 @@ describe("initialSendVerification", () => {
     expect(mockCreateInviteCode).not.toHaveBeenCalled();
   });
 
-  test("should call createInviteCode with correct URL template for invite", async () => {
-    await initialSendVerification({
+  test("should call createInviteCode with correct URL template for invite and return true", async () => {
+    const result = await trySendVerification({
       userId: "user-1",
       isInvite: true,
     });
 
+    expect(result).toBe(true);
     expect(mockCreateInviteCode).toHaveBeenCalledWith({
       serviceConfig: {},
       userId: "user-1",
@@ -273,12 +284,13 @@ describe("initialSendVerification", () => {
   });
 
   test("should include URL-encoded requestId in URL template", async () => {
-    await initialSendVerification({
+    const result = await trySendVerification({
       userId: "user-1",
       isInvite: false,
       requestId: "req-123",
     });
 
+    expect(result).toBe(true);
     expect(mockSendEmailCode).toHaveBeenCalledWith({
       serviceConfig: {},
       userId: "user-1",
@@ -288,12 +300,13 @@ describe("initialSendVerification", () => {
   });
 
   test("should URL-encode special characters in requestId", async () => {
-    await initialSendVerification({
+    const result = await trySendVerification({
       userId: "user-1",
       isInvite: false,
       requestId: "req&id=injected",
     });
 
+    expect(result).toBe(true);
     expect(mockSendEmailCode).toHaveBeenCalledWith({
       serviceConfig: {},
       userId: "user-1",
@@ -303,17 +316,100 @@ describe("initialSendVerification", () => {
   });
 
   test("should include invite=true and requestId for invite with requestId", async () => {
-    await initialSendVerification({
+    const result = await trySendVerification({
       userId: "user-1",
       isInvite: true,
       requestId: "req-456",
     });
 
+    expect(result).toBe(true);
     expect(mockCreateInviteCode).toHaveBeenCalledWith({
       serviceConfig: {},
       userId: "user-1",
       urlTemplate:
         "https://example.com/ui/v2/login/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true&requestId=req-456",
     });
+  });
+
+  test("should return false when sendEmailCode fails", async () => {
+    mockSendEmailCode.mockRejectedValue(new Error("Network error"));
+
+    const result = await trySendVerification({
+      userId: "user-1",
+      isInvite: false,
+    });
+
+    expect(result).toBe(false);
+  });
+
+  test("should return false when createInviteCode fails", async () => {
+    mockCreateInviteCode.mockRejectedValue(new Error("Already invited"));
+
+    const result = await trySendVerification({
+      userId: "user-1",
+      isInvite: true,
+    });
+
+    expect(result).toBe(false);
+  });
+});
+
+describe("verifyTOTP", () => {
+  let mockLoadMostRecentSession: any;
+  let mockVerifyTOTPRegistration: any;
+  let mockGetEnrollmentAuthorizationError: any;
+
+  const totpSession = {
+    id: "session-1",
+    factors: { user: { id: "victim-1", loginName: "victim@example.com" } },
+  };
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    const _headers = await import("next/headers");
+    vi.mocked(_headers.headers).mockResolvedValue(new Headers() as any);
+
+    mockLoadMostRecentSession = vi.mocked((await import("../session")).loadMostRecentSession);
+    mockVerifyTOTPRegistration = vi.mocked((await import("@/lib/zitadel")).verifyTOTPRegistration);
+    mockGetEnrollmentAuthorizationError = vi.mocked((await import("./enrollment-guard")).getEnrollmentAuthorizationError);
+
+    mockLoadMostRecentSession.mockResolvedValue(totpSession);
+  });
+
+  test("rejects TOTP enrollment on an unauthenticated (identify-only) session", async () => {
+    mockGetEnrollmentAuthorizationError.mockResolvedValue(
+      "You have to authenticate or have a valid User Verification Check",
+    );
+
+    const result = await verifyTOTP("123456", "victim@example.com", "org-1");
+
+    expect(result).toEqual({ error: "You have to authenticate or have a valid User Verification Check" });
+    expect(mockGetEnrollmentAuthorizationError).toHaveBeenCalledWith({
+      serviceConfig: {},
+      session: totpSession,
+      userId: "victim-1",
+    });
+    expect(mockVerifyTOTPRegistration).not.toHaveBeenCalled();
+  });
+
+  test("verifies TOTP registration when the session is authorized", async () => {
+    mockGetEnrollmentAuthorizationError.mockResolvedValue(null);
+    mockVerifyTOTPRegistration.mockResolvedValue({ done: true });
+
+    const result = await verifyTOTP("123456", "victim@example.com", "org-1");
+
+    expect(mockVerifyTOTPRegistration).toHaveBeenCalledWith({
+      serviceConfig: {},
+      code: "123456",
+      userId: "victim-1",
+    });
+    expect(result).toEqual({ done: true });
+  });
+
+  test("throws when the session has no user id", async () => {
+    mockLoadMostRecentSession.mockResolvedValue({ id: "session-1", factors: {} });
+
+    await expect(verifyTOTP("123456")).rejects.toThrow("No user id found in session.");
+    expect(mockVerifyTOTPRegistration).not.toHaveBeenCalled();
   });
 });

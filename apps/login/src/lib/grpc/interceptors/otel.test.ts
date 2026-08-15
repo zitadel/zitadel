@@ -67,7 +67,7 @@ describe("otelGrpcInterceptor", () => {
     });
   });
 
-  it("records error spans with gRPC status codes", async () => {
+  it("records error spans with gRPC status codes and classification", async () => {
     const mockTransport = createRouterTransport(
       ({ service }) => {
         service(SessionService, {

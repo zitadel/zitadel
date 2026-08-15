@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	"net/http"
 	"time"
 
 	"github.com/riverqueue/river"
@@ -30,6 +31,7 @@ type BackChannelLogoutWorker struct {
 	config      *BackChannelLogoutWorkerConfig
 	now         nowFunc
 	idGenerator id.Generator
+	httpClient  *http.Client
 }
 
 // Timeout implements the Timeout-function of [river.Worker].
@@ -97,7 +99,8 @@ func (w *BackChannelLogoutWorker) sendLogoutRequest(ctx context.Context, request
 	if err != nil {
 		return err
 	}
-	if err = types.SendSecurityTokenEvent(ctx, set.Config{CallURL: request.BackChannelLogoutURI}, w.channels, &LogoutTokenMessage{LogoutToken: token}, request.TriggeringEventType).WithoutTemplate(); err != nil {
+	backchannelNotifCfg := set.Config{CallURL: request.BackChannelLogoutURI, Client: w.httpClient}
+	if err = types.SendSecurityTokenEvent(ctx, backchannelNotifCfg, w.channels, &LogoutTokenMessage{LogoutToken: token}, request.TriggeringEventType).WithoutTemplate(); err != nil {
 		return err
 	}
 	return w.commands.BackChannelLogoutSent(ctx, request.SessionID, request.OIDCSessionID, request.Aggregate.InstanceID)
@@ -129,6 +132,7 @@ func NewBackChannelLogoutWorker(
 	config *BackChannelLogoutWorkerConfig,
 
 	idGenerator id.Generator,
+	httpClient *http.Client,
 ) *BackChannelLogoutWorker {
 	return &BackChannelLogoutWorker{
 		commands:    commands,
@@ -139,6 +143,7 @@ func NewBackChannelLogoutWorker(
 		config:      config,
 		now:         time.Now,
 		idGenerator: idGenerator,
+		httpClient:  httpClient,
 	}
 }
 

@@ -13,17 +13,16 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server/connect_middleware"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/execution"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func ExecutionHandler(alg crypto.EncryptionAlgorithm, activeSigningKey execution.GetActiveSigningWebKey, deniedIPList []denylist.AddressChecker) grpc.UnaryServerInterceptor {
+func ExecutionHandler(alg crypto.EncryptionAlgorithm, activeSigningKey execution.GetActiveSigningWebKey, httpClient *http.Client) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		requestTargets := execution.QueryExecutionTargetsForRequest(ctx, info.FullMethod)
 		// call targets otherwise return req
-		handledReq, err := executeTargetsForRequest(ctx, requestTargets, info.FullMethod, req, alg, activeSigningKey, deniedIPList)
+		handledReq, err := executeTargetsForRequest(ctx, requestTargets, info.FullMethod, req, alg, activeSigningKey, httpClient)
 		if err != nil {
 			return nil, err
 		}
@@ -34,11 +33,11 @@ func ExecutionHandler(alg crypto.EncryptionAlgorithm, activeSigningKey execution
 		}
 
 		responseTargets := execution.QueryExecutionTargetsForResponse(ctx, info.FullMethod)
-		return executeTargetsForResponse(ctx, responseTargets, info.FullMethod, handledReq, response, alg, activeSigningKey, deniedIPList)
+		return executeTargetsForResponse(ctx, responseTargets, info.FullMethod, handledReq, response, alg, activeSigningKey, httpClient)
 	}
 }
 
-func executeTargetsForRequest(ctx context.Context, targets []target_domain.Target, fullMethod string, req any, alg crypto.EncryptionAlgorithm, activeSigningKey execution.GetActiveSigningWebKey, deniedIPList []denylist.AddressChecker) (_ interface{}, err error) {
+func executeTargetsForRequest(ctx context.Context, targets []target_domain.Target, fullMethod string, req any, alg crypto.EncryptionAlgorithm, activeSigningKey execution.GetActiveSigningWebKey, httpClient *http.Client) (_ interface{}, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -59,10 +58,10 @@ func executeTargetsForRequest(ctx context.Context, targets []target_domain.Targe
 		Headers:    connect_middleware.SetRequestHeaders(md),
 	}
 
-	return execution.CallTargets(ctx, targets, info, alg, activeSigningKey, deniedIPList)
+	return execution.CallTargets(ctx, targets, info, alg, activeSigningKey, httpClient)
 }
 
-func executeTargetsForResponse(ctx context.Context, targets []target_domain.Target, fullMethod string, req, resp interface{}, alg crypto.EncryptionAlgorithm, activeSigningKey execution.GetActiveSigningWebKey, deniedIPList []denylist.AddressChecker) (_ interface{}, err error) {
+func executeTargetsForResponse(ctx context.Context, targets []target_domain.Target, fullMethod string, req, resp interface{}, alg crypto.EncryptionAlgorithm, activeSigningKey execution.GetActiveSigningWebKey, httpClient *http.Client) (_ interface{}, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -84,7 +83,7 @@ func executeTargetsForResponse(ctx context.Context, targets []target_domain.Targ
 		Headers:    connect_middleware.SetRequestHeaders(md),
 	}
 
-	return execution.CallTargets(ctx, targets, info, alg, activeSigningKey, deniedIPList)
+	return execution.CallTargets(ctx, targets, info, alg, activeSigningKey, httpClient)
 }
 
 var _ execution.ContextInfo = &ContextInfoRequest{}

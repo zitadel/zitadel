@@ -1,6 +1,8 @@
 package gitlab
 
 import (
+	"net/http"
+
 	openid "github.com/zitadel/oidc/v3/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/idp"
@@ -20,13 +22,13 @@ type Provider struct {
 }
 
 // New creates a GitLab.com provider using the [oidc.Provider] (OIDC generic provider)
-func New(clientID, clientSecret, redirectURI string, scopes []string, options ...oidc.ProviderOpts) (*Provider, error) {
-	return NewCustomIssuer(name, issuer, clientID, clientSecret, redirectURI, scopes, options...)
+func New(clientID, clientSecret, redirectURI string, scopes []string, httpClient *http.Client, options ...oidc.ProviderOpts) (*Provider, error) {
+	return NewCustomIssuer(name, issuer, clientID, clientSecret, redirectURI, scopes, httpClient, options...)
 }
 
 // NewCustomIssuer creates a GitLab provider using the [oidc.Provider] (OIDC generic provider)
 // with a custom issuer for self-managed instances
-func NewCustomIssuer(name, issuer, clientID, clientSecret, redirectURI string, scopes []string, options ...oidc.ProviderOpts) (*Provider, error) {
+func NewCustomIssuer(name, issuer, clientID, clientSecret, redirectURI string, scopes []string, httpClient *http.Client, options ...oidc.ProviderOpts) (*Provider, error) {
 	if len(scopes) == 0 {
 		// the OIDC provider would set `openid profile email phone` as default scope,
 		// but since gitlab does not handle unknown scopes correctly (phone) and returns an error,
@@ -35,7 +37,7 @@ func NewCustomIssuer(name, issuer, clientID, clientSecret, redirectURI string, s
 	}
 	// gitlab is currently not able to handle the prompt `select_account`:
 	// https://gitlab.com/gitlab-org/gitlab/-/issues/377368
-	rp, err := oidc.New(name, issuer, clientID, clientSecret, redirectURI, scopes, oidc.DefaultMapper, options...)
+	rp, err := oidc.New(name, issuer, clientID, clientSecret, redirectURI, scopes, oidc.DefaultMapper, httpClient, options...)
 	if err != nil {
 		return nil, err
 	}

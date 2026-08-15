@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"net"
 	"testing"
 	"time"
 
@@ -10,6 +11,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -174,7 +176,10 @@ func TestAddOIDCApp(t *testing.T) {
 						"",
 						domain.LoginVersionUnspecified,
 						"",
-					),
+						"",
+						"",
+						"",
+						nil),
 				},
 			},
 		},
@@ -242,7 +247,10 @@ func TestAddOIDCApp(t *testing.T) {
 						"",
 						domain.LoginVersionUnspecified,
 						"",
-					),
+						"",
+						"",
+						"",
+						nil),
 				},
 			},
 		},
@@ -310,7 +318,10 @@ func TestAddOIDCApp(t *testing.T) {
 						"",
 						domain.LoginVersionUnspecified,
 						"",
-					),
+						"",
+						"",
+						"",
+						nil),
 				},
 			},
 		},
@@ -378,7 +389,10 @@ func TestAddOIDCApp(t *testing.T) {
 						"",
 						domain.LoginVersionUnspecified,
 						"",
-					),
+						"",
+						"",
+						"",
+						nil),
 				},
 			},
 		},
@@ -407,6 +421,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 	type fields struct {
 		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
+		denyList    []denylist.AddressChecker
 	}
 	type args struct {
 		ctx           context.Context
@@ -531,7 +546,10 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 							"https://test.ch/backchannel",
 							domain.LoginVersion2,
 							"https://login.test.ch",
-						),
+							"",
+							"",
+							"",
+							nil),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1", "client1"),
@@ -640,7 +658,10 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 							"https://test.ch/backchannel",
 							domain.LoginVersion2,
 							"https://login.test.ch",
-						),
+							"",
+							"",
+							"",
+							nil),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "client1"),
@@ -750,7 +771,10 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 							"https://test.ch/backchannel",
 							domain.LoginVersion2,
 							"https://login.test.ch",
-						),
+							"",
+							"",
+							"",
+							nil),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1", "client1"),
@@ -816,6 +840,83 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "backchannel logout URI invalid, invalid argument error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingUnspecified),
+						),
+					),
+					expectFilter(),
+					expectFilter(),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1", "client1"),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
+				oidcApp: &domain.OIDCApp{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					AppName:              "app",
+					AuthMethodType:       gu.Ptr(domain.OIDCAuthMethodTypeNone),
+					OIDCVersion:          gu.Ptr(domain.OIDCVersionV1),
+					ResponseTypes:        []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+					GrantTypes:           []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+					ApplicationType:      gu.Ptr(domain.OIDCApplicationTypeWeb),
+					AccessTokenType:      gu.Ptr(domain.OIDCTokenTypeBearer),
+					BackChannelLogoutURI: gu.Ptr("http://example.com\x00"),
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "backchannel logout URI on denylist, invalid argument error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingUnspecified),
+						),
+					),
+					expectFilter(),
+					expectFilter(),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1", "client1"),
+				denyList:    []denylist.AddressChecker{denylist.NewHostChecker("blocked.example.com")},
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
+				oidcApp: &domain.OIDCApp{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					AppName:              "app",
+					AuthMethodType:       gu.Ptr(domain.OIDCAuthMethodTypeNone),
+					OIDCVersion:          gu.Ptr(domain.OIDCVersionV1),
+					ResponseTypes:        []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+					GrantTypes:           []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+					ApplicationType:      gu.Ptr(domain.OIDCApplicationTypeWeb),
+					AccessTokenType:      gu.Ptr(domain.OIDCTokenTypeBearer),
+					BackChannelLogoutURI: gu.Ptr("https://blocked.example.com/logout"),
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -828,6 +929,10 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 					ClientSecret: emptyConfig,
 				},
 				checkPermission: newMockPermissionCheckAllowed(),
+				ipLookupFunction: func(_ string) ([]net.IP, error) {
+					return []net.IP{net.ParseIP("1.2.3.4")}, nil
+				},
+				denyList: tt.fields.denyList,
 			}
 			c.setMilestonesCompletedForTest("instanceID")
 			got, err := c.AddOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner)
@@ -848,6 +953,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 	t.Parallel()
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
+		denyList   []denylist.AddressChecker
 	}
 	type args struct {
 		ctx           context.Context
@@ -987,7 +1093,10 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 								"https://test.ch/backchannel",
 								domain.LoginVersion2,
 								"https://login.test.ch",
-							),
+								"",
+								"",
+								"",
+								nil),
 						),
 					),
 					expectFilter(),
@@ -1062,7 +1171,10 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 								"https://test.ch/backchannel",
 								domain.LoginVersion2,
 								"https://login.test.ch",
-							),
+								"",
+								"",
+								"",
+								nil),
 						),
 					),
 					expectFilter(),
@@ -1137,7 +1249,10 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 								"https://test.ch/backchannel",
 								domain.LoginVersion1,
 								"",
-							),
+								"",
+								"",
+								"",
+								nil),
 						),
 					),
 					expectFilter(),
@@ -1195,13 +1310,144 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "backchannel logout URI invalid, invalid argument error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewApplicationAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"app1",
+								"app",
+							),
+						),
+						eventFromEventPusher(
+							project.NewOIDCConfigAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								domain.OIDCVersionV1,
+								"app1",
+								"client1",
+								"",
+								nil,
+								[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+								[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+								domain.OIDCApplicationTypeWeb,
+								domain.OIDCAuthMethodTypeNone,
+								nil,
+								false,
+								domain.OIDCTokenTypeBearer,
+								false,
+								false,
+								false,
+								0,
+								nil,
+								false,
+								"",
+								domain.LoginVersionUnspecified,
+								"",
+								"",
+								"",
+								"",
+								nil),
+						),
+					),
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				oidcApp: &domain.OIDCApp{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					AppID:                "app1",
+					AuthMethodType:       gu.Ptr(domain.OIDCAuthMethodTypeNone),
+					GrantTypes:           []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+					ResponseTypes:        []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+					BackChannelLogoutURI: gu.Ptr("http://example.com\x00"),
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "backchannel logout URI on denylist, invalid argument error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewApplicationAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"app1",
+								"app",
+							),
+						),
+						eventFromEventPusher(
+							project.NewOIDCConfigAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								domain.OIDCVersionV1,
+								"app1",
+								"client1",
+								"",
+								nil,
+								[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+								[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+								domain.OIDCApplicationTypeWeb,
+								domain.OIDCAuthMethodTypeNone,
+								nil,
+								false,
+								domain.OIDCTokenTypeBearer,
+								false,
+								false,
+								false,
+								0,
+								nil,
+								false,
+								"",
+								domain.LoginVersionUnspecified,
+								"",
+								"",
+								"",
+								"",
+								nil),
+						),
+					),
+					expectFilter(),
+				),
+				denyList: []denylist.AddressChecker{denylist.NewHostChecker("blocked.example.com")},
+			},
+			args: args{
+				ctx: context.Background(),
+				oidcApp: &domain.OIDCApp{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					AppID:                "app1",
+					AuthMethodType:       gu.Ptr(domain.OIDCAuthMethodTypeNone),
+					GrantTypes:           []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+					ResponseTypes:        []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+					BackChannelLogoutURI: gu.Ptr("https://blocked.example.com/logout"),
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// t.Parallel()
+			t.Parallel()
 			r := &Commands{
 				eventstore:      tt.fields.eventstore(t),
 				checkPermission: newMockPermissionCheckAllowed(),
+				ipLookupFunction: func(host string) ([]net.IP, error) {
+					return []net.IP{net.ParseIP("1.2.3.4")}, nil
+				},
+				denyList: tt.fields.denyList,
 			}
 			got, err := r.UpdateOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -1321,7 +1567,10 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 								"",
 								domain.LoginVersionUnspecified,
 								"",
-							),
+								"",
+								"",
+								"",
+								nil),
 						),
 					),
 					expectPush(

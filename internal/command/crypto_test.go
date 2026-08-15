@@ -34,6 +34,15 @@ func mockEncryptedCode(code string, exp time.Duration) encrypedCodeFunc {
 	}
 }
 
+// newEncryptedCodeNoCall fails the test if a code is generated, e.g. before a permission check
+// denied the request.
+func newEncryptedCodeNoCall(t *testing.T) encrypedCodeFunc {
+	return func(context.Context, preparation.FilterToQueryReducer, domain.SecretGeneratorType, crypto.EncryptionAlgorithm) (*EncryptedCode, error) {
+		t.Error("unexpected code generation")
+		return nil, nil
+	}
+}
+
 func mockEncryptedCodeWithDefault(code string, exp time.Duration) encryptedCodeWithDefaultFunc {
 	return func(ctx context.Context, filter preparation.FilterToQueryReducer, _ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, _ *crypto.GeneratorConfig) (*EncryptedCode, error) {
 		return &EncryptedCode{
@@ -262,7 +271,7 @@ func Test_newHashedSecretWithDefault(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			hasher := &crypto.Hasher{
-				Swapper: passwap.NewSwapper(bcrypt.New(bcrypt.MinCost)),
+				Swapper: passwap.NewSwapper(bcrypt.New(bcrypt.DefaultMinCost, nil)),
 			}
 			defaultConfig := &crypto.GeneratorConfig{
 				Length:              32,

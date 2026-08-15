@@ -204,6 +204,7 @@ Errors:
     AlreadyActive: "L'organisation est déjà active"
     Empty: "L'organisation est vide"
     NotFound: "Organisation non trouvée"
+    NotActive: "L'organisation n'est pas active"
     NotChanged: "L'organisation n'a pas changé"
     DefaultOrgNotDeletable: "L'organisation par défault ne doit pas être supprimée"
     ZitadelOrgNotDeletable: "L'organisation avec Zitadel project ne doit pas être supprimée"
@@ -282,6 +283,8 @@ Errors:
     LabelPolicy:
       NotFound: "La politique d'étiquetage privé n'a pas été trouvée"
       NotChanged: "La politique en matière de marques privées n'a pas été modifiée"
+    IDPConfig:
+      NotExisting: "La configuration du fournisseur d'identité n'existe pas"
   Project:
     ProjectIDMissing: "Id de projet manquant"
     AlreadyExists: "Le projet existe déjà dans l'organisation"

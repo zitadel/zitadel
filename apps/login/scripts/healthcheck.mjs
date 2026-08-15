@@ -1,5 +1,11 @@
+import { getFips } from "node:crypto";
 import * as http from "node:http";
 import * as https from "node:https";
+
+if (process.env.ZITADEL_FIPS_REQUIRED === "true" && getFips() !== 1) {
+  console.error("Healthcheck failed: FIPS mode required but not enabled");
+  process.exit(1);
+}
 
 const scheme = process.env.ZITADEL_TLS_ENABLED === "true" ? "https" : "http";
 const port = process.env.PORT || "3000";

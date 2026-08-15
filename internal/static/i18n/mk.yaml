@@ -203,6 +203,7 @@ Errors:
     AlreadyActive: "Организацијата е веќе активна"
     Empty: "Организацијата е празна"
     NotFound: "Организацијата не е пронајдена"
+    NotActive: "Организацијата не е активна"
     NotChanged: "Организацијата не е променета"
     DefaultOrgNotDeletable: "Стандардната организација не смее да биде избришана"
     ZitadelOrgNotDeletable: "Организацијата со Zitadel проект не смее да биде избришана"
@@ -281,6 +282,8 @@ Errors:
     LabelPolicy:
       NotFound: "Приватната политика за ознаките не е пронајдена"
       NotChanged: "Приватната политика за ознаките не е променета"
+    IDPConfig:
+      NotExisting: "Конфигурацијата на IDP не постои"
   Project:
     ProjectIDMissing: "Недостасува ID на проектот"
     AlreadyExists: "Проектот веќе постои во организацијата"

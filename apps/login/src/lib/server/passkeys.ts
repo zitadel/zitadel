@@ -6,11 +6,10 @@ import {
   getLoginSettings,
   getSession,
   getUserByID,
-  listAuthenticationMethodTypes,
   registerPasskey,
   verifyPasskeyRegistration as zitadelVerifyPasskeyRegistration,
 } from "@/lib/zitadel";
-import { create, Duration, Timestamp, timestampDate } from "@zitadel/client";
+import { create, Duration } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks, ChecksSchema, GetSessionResponse } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import {
@@ -23,8 +22,9 @@ import { userAgent } from "next/server";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById } from "../cookies";
 import { getServiceConfig } from "../service-url";
-import { checkEmailVerification, checkUserVerification } from "../verify-helper";
+import { checkEmailVerification } from "../verify-helper";
 import { createSessionAndUpdateCookie } from "./cookie";
+import { getEnrollmentAuthorizationError } from "./enrollment-guard";
 import { getPublicHost } from "./host";
 import { updateOrCreateSession } from "./session";
 
@@ -44,20 +44,6 @@ type RegisterPasskeyCommand = {
   code?: string;
   codeId?: string;
 };
-
-function isSessionValid(session: Partial<Session>): {
-  valid: boolean;
-  verifiedAt?: Timestamp;
-} {
-  const validPassword = session?.factors?.password?.verifiedAt;
-  const validPasskey = session?.factors?.webAuthN?.verifiedAt;
-  const stillValid = session.expirationDate ? timestampDate(session.expirationDate) > new Date() : true;
-
-  const verifiedAt = validPassword || validPasskey;
-  const valid = !!((validPassword || validPasskey) && stillValid);
-
-  return { valid, verifiedAt };
-}
 
 export async function registerPasskeyLink(
   command: RegisterPasskeyCommand,
@@ -91,25 +77,14 @@ export async function registerPasskeyLink(
 
     currentUserId = session.session.factors.user.id;
 
-    const sessionValid = isSessionValid(session.session);
+    const enrollmentError = await getEnrollmentAuthorizationError({
+      serviceConfig,
+      session: session.session,
+      userId: currentUserId,
+    });
 
-    if (!sessionValid.valid) {
-      const authmethods = await listAuthenticationMethodTypes({ serviceConfig, userId: currentUserId });
-
-      // if the user has no authmethods set, we need to check if the user was verified
-      if (authmethods.authMethodTypes.length !== 0) {
-        return {
-          error: "You have to authenticate or have a valid User Verification Check",
-        };
-      }
-
-      // check if a verification was done earlier
-      const hasValidUserVerificationCheck = await checkUserVerification(currentUserId);
-
-      logger.info("hasValidUserVerificationCheck", { hasValidUserVerificationCheck });
-      if (!hasValidUserVerificationCheck) {
-        return { error: "User Verification Check has to be done" };
-      }
+    if (enrollmentError) {
+      return { error: enrollmentError };
     }
 
     // Generate registration code if not provided
@@ -308,7 +283,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
 
   const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
 
-  const emailVerificationCheck = checkEmailVerification(session as any, humanUser, organization, requestId);
+  const emailVerificationCheck = await checkEmailVerification(session as any, humanUser, organization, requestId);
 
   if (emailVerificationCheck?.redirect) {
     return emailVerificationCheck;

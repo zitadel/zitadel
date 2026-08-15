@@ -4,6 +4,7 @@ package zitadel.application.v2;
 
 import "google/protobuf/duration.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
 import "zitadel/application/v2/login.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/application/v2;application";
@@ -157,4 +158,55 @@ message OIDCConfiguration {
   // hosted on any other domain.
   // If unset, the login UI is chosen by the instance default.
   LoginVersion login_version = 21;
+
+  // IOS is iOS Associated Domains / passkey trust config.
+  // Served in /.well-known/apple-app-site-association as webcredentials.apps entry
+  // "{team_id}.{bundle_id}" (Apple's full App ID = Team ID prefix + Bundle ID).
+  // That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer;
+  // changes can take time to take effect.
+  IOSAppLinkConfig ios = 22;
+
+  // Android is Android Digital Asset Links / passkey trust config.
+  // Served in /.well-known/assetlinks.json for delegate_permission/common.get_login_creds.
+  // That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer;
+  // changes can take time to take effect.
+  AndroidAppLinkConfig android = 23;
+}
+
+// IOSAppLinkConfig is iOS Associated Domains / passkey trust config.
+// Served in /.well-known/apple-app-site-association as webcredentials.apps entry
+// "{team_id}.{bundle_id}" (Apple's full App ID = Team ID prefix + Bundle ID).
+// That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer;
+// changes can take time to take effect.
+message IOSAppLinkConfig {
+  // TeamID is the Apple Developer Team ID (exactly 10 alphanumeric characters), e.g. ABCDE12345.
+  // From Apple Developer account membership — not the Bundle ID.
+  // Empty clears the value on update.
+  string team_id = 1 [(validate.rules).string = {ignore_empty: true, len: 10, pattern: "^[A-Z0-9]+$"}];
+
+  // BundleID is the Xcode / CFBundleIdentifier, e.g. com.example.app.
+  // Not the full Apple App ID; do not include the Team ID prefix here.
+  // Empty clears the value on update.
+  string bundle_id = 2 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 200}];
+}
+
+// AndroidAppLinkConfig is Android Digital Asset Links / passkey trust config.
+// Served in /.well-known/assetlinks.json for delegate_permission/common.get_login_creds.
+// That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer;
+// changes can take time to take effect.
+message AndroidAppLinkConfig {
+  // PackageName is the Android applicationId / package name from the app manifest.
+  // Empty clears the value on update.
+  string package_name = 1 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 200}];
+
+  // SHA256CertFingerprints are signing certificate fingerprints (64 hex chars, optional colons).
+  // Include debug and release fingerprints as needed. At most 20 entries.
+  repeated string sha256_cert_fingerprints = 2 [(validate.rules).repeated = {
+    max_items: 20,
+    items: {
+      string: {
+        pattern: "^([0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){31}|[0-9A-Fa-f]{64})$";
+      }
+    }
+  }];
 }

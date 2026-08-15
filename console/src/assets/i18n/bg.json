@@ -663,6 +663,7 @@
     "ORG_USER_PERMISSION_EDITOR": "Има разрешение за управление на ролеви назначения",
     "ORG_PROJECT_PERMISSION_EDITOR": "Има разрешение за управление на грантове по проекти",
     "ORG_PROJECT_CREATOR": "Има разрешение да създава свои собствени проекти и основни настройки",
+    "ORG_DYNAMIC_CLIENT_REGISTRAR": "Има разрешение за динамично регистриране на OAuth 2.0 клиенти",
     "ORG_ADMIN_IMPERSONATOR": "Има разрешение да се представя за администратор и крайни потребители от организацията",
     "ORG_END_USER_IMPERSONATOR": "Има разрешение да се представя за крайни потребители от организацията",
     "ORG_USER_SELF_MANAGER": "Има разрешение да управлява собствените си потребители",
@@ -1615,7 +1616,8 @@
         "5": "Инициализация на ключ за достъп",
         "6": "Тайна на приложението",
         "7": "OTP - SMS",
-        "8": "OTP – имейл"
+        "8": "OTP – имейл",
+        "9": "Код за покана"
       },
       "EXPIRY": "Изтичане (в минути)",
       "INCLUDEDIGITS": "Включете числа",
@@ -2371,7 +2373,8 @@
       "DESCRIPTION": "Въведете данните за JWT Identity Provider.",
       "HEADERNAME": "Име на заглавката",
       "JWTENDPOINT": "Крайна точка на JWT",
-      "JWTKEYSENDPOINT": "Крайна точка на JWT ключове"
+      "JWTKEYSENDPOINT": "Крайна точка на JWT ключове",
+      "AUDIENCE": "Аудитория"
     },
     "APPLE": {
       "TEAMID": "Team ID",
@@ -2605,7 +2608,7 @@
       "TYPEREQUIRED": "Типът е задължителен.",
       "TITLE": "Конфигурация на OIDC",
       "CLIENTID": "ID на клиента",
-      "CLIENTSECRET": "Тайна на клиента",
+      "CLIENTDETAILS": "Детайли за клиента",
       "CLIENTSECRET_NOSECRET": "С избрания от вас поток за удостоверяване не се изисква тайна и следователно не е налична.",
       "CLIENTSECRET_DESCRIPTION": "Пазете клиентската си тайна на сигурно място, тъй като тя ще изчезне, след като диалоговият прозорец бъде затворен.",
       "REGENERATESECRET": "Повторно генериране на клиентска тайна",
@@ -2615,6 +2618,25 @@
       "DEVMODEDESC": "Внимание: При активиран режим на разработка URI адресите за пренасочване няма да бъдат валидирани.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Пропуснете страницата за успешно влизане",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Пропуснете страницата за успех след влизане в това родно приложение.",
+      "APPLINKSSECTION": "Връзки за нативни приложения",
+      "APPLINKSDESC": "Конфигурирайте iOS и Android асоциации, за да може тази инстанция да предоставя trust файлове за passkeys на вашите нативни приложения.",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "Предоставя се в apple-app-site-association като webcredentials запис TEAMID.BUNDLEID.",
+      "TEAMID": "Team ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Apple Team ID трябва да е точно 10 буквено-цифрови знака, напр. ABCDE12345.",
+      "TEAMIDLENGTH": "Team ID трябва да е точно 10 буквено-цифрови знака.",
+      "BUNDLEID": "Bundle ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "iOS Bundle Identifier (CFBundleIdentifier), напр. com.example.app. Не включвайте префикса Team ID.",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "Предоставя се в assetlinks.json за Digital Asset Links / passkey credentials.",
+      "PACKAGENAME": "Име на пакета",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "Android applicationId / име на пакет, напр. com.example.app.",
+      "FINGERPRINTS": "SHA-256 сертификатни отпечатъци",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "Един отпечатък на ред (64 шестнадесетични знака, двоеточията са по избор). Добавете debug и release при нужда.",
       "REDIRECT": "Пренасочване на URI",
       "REDIRECTSECTION": "Пренасочване на URI",
       "POSTLOGOUTREDIRECT": "Публикувайте URI адреси за излизане",
@@ -2678,7 +2700,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID и Bundle ID трябва да бъдат зададени заедно или и двете да останат празни.",
+      "ANDROIDPACKAGEREQUIRED": "Името на Android пакета е задължително, когато са зададени сертификатни пръстови отпечатъци."
     },
     "API": {
       "INFO": {

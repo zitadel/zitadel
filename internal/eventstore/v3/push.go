@@ -80,7 +80,12 @@ func writeEvents(ctx context.Context, tx database.Transaction, commands []events
 		return nil, err
 	}
 
-	rows, err := tx.Query(ctx, `select owner, created_at, "sequence", position from eventstore.push($1::eventstore.command[])`, cmds)
+	commandMapping := "eventstore.command2"
+	if command2Type.OID == 0 {
+		commandMapping = "eventstore.command"
+	}
+
+	rows, err := tx.Query(ctx, fmt.Sprintf(`select owner, created_at, "sequence", position from eventstore.push($1::%s[])`, commandMapping), cmds)
 	if err != nil {
 		return nil, err
 	}

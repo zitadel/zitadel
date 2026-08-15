@@ -97,6 +97,13 @@ declare namespace NodeJS {
     API_CACHE_CONFIG?: string;
 
     /**
+     * Optional: Disable the proxy's runtime CSP fetch from the ZITADEL API.
+     * Defaults to true (enabled). Set to "false" to skip fetching iframe origins
+     * and use a restrictive default CSP instead.
+     */
+    CSP_FETCH_ENABLED?: string;
+
+    /**
      * Optional: Disable OpenTelemetry instrumentation.
      * Set to "true" to bypass OTEL initialization.
      * In local development (NODE_ENV=development), it is disabled by default unless explicitly set to "false".

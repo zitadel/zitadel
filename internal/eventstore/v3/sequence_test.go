@@ -217,6 +217,45 @@ func Test_commandsToSequences(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "first command enforcing keeps owner for aggregate",
+			args: args{
+				ctx: context.Background(),
+				commands: []eventstore.Command{
+					&enforcedMockCommand{
+						mockCommand: &mockCommand{
+							aggregate: &eventstore.Aggregate{
+								ID:            "V3-3oEV1",
+								Type:          "type",
+								ResourceOwner: "new",
+								InstanceID:    "instance",
+								Version:       "v1",
+							},
+						},
+					},
+					&mockCommand{
+						aggregate: &eventstore.Aggregate{
+							ID:            "V3-3oEV1",
+							Type:          "type",
+							ResourceOwner: "ignored",
+							InstanceID:    "instance",
+							Version:       "v1",
+						},
+					},
+				},
+			},
+			want: []*latestSequence{
+				{
+					aggregate: &eventstore.Aggregate{
+						ID:            "V3-3oEV1",
+						Type:          "type",
+						ResourceOwner: "new",
+						InstanceID:    "instance",
+						Version:       "v1",
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

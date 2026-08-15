@@ -86,9 +86,7 @@ flutter pub add oidc_default_store
 
 Navigate to your `AndroidManifest.xml` at `<projectRoot>/android/app/src/main/AndroidManifest.xml` and add the following activity with your custom scheme.
 
-```xml reference
-https://github.com/zitadel/zitadel_flutter/blob/main/android/app/src/main/AndroidManifest.xml#L29-L38
-```
+<GithubCodeBlock url="https://github.com/zitadel/zitadel_flutter/blob/main/android/app/src/main/AndroidManifest.xml#L29-L38" />
 
 Furthermore, for `secure_storage`, you need to set the minimum SDK version to 18
 in `<projectRoot>/android/app/src/build.gradle`.
@@ -99,16 +97,12 @@ To reduce the commented default code, we will modify the `main.dart` file.
 
 First, the `MyApp` class: it remains a stateless widget:
 
-```dart reference
-https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L14-L28
-```
+<GithubCodeBlock url="https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L14-L28" />
 
 Second, the `MyHomePage` class will remain a stateful widget with
 its title, we don't change any code here.
 
-```dart reference
-https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L30-L37
-```
+<GithubCodeBlock url="https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L30-L37" />
 
 What we'll change now, is the `_MyHomePageState` class to enable
 authentication via ZITADEL and remove the counter button of the starter application. We'll show the username of the authenticated user.
@@ -126,16 +120,12 @@ Then the builder method, which does show the login button if you're not
 authenticated, a loading bar if the login process is going on and
 your name if you are authenticated:
 
-```dart reference
-https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L119-L159
-```
+<GithubCodeBlock url="https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L119-L159" />
 
 And finally the `_authenticate` method which calls the authorization endpoint,
 then fetches the user info and stores the tokens into the secure storage.
 
-```dart reference
-https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L45-L117
-```
+<GithubCodeBlock url="https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L45-L117" />
 
 Note that we have to use our http redirect URL for web applications or otherwise use our custom scheme for Android and iOS devices.
 To setup other platforms, read the documentation of the [Flutter Web Auth](https://pub.dev/packages/flutter_web_auth_2).
@@ -143,9 +133,7 @@ To setup other platforms, read the documentation of the [Flutter Web Auth](https
 To ensure our application catches the callback URL, you have to create a `auth.html` file in the `/web`
 folder with the following content:
 
-```html reference
-https://github.com/zitadel/zitadel_flutter/blob/main/web/auth.html
-```
+<GithubCodeBlock url="https://github.com/zitadel/zitadel_flutter/blob/main/web/auth.html" />
 
 Now, you can run your application for iOS and Android devices with
 

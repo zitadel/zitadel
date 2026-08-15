@@ -2,7 +2,6 @@ package eventstore_test
 
 import (
 	"context"
-	"encoding/json"
 	"os"
 	"testing"
 	"time"
@@ -159,10 +158,39 @@ func generateCommand(aggregateType eventstore.AggregateType, aggregateID string,
 	return e
 }
 
+func generateEnforcedCommand(aggregateType eventstore.AggregateType, aggregateID string, opts ...func(*testEvent)) eventstore.Command {
+	e := &enforcedTestEvent{
+		testEvent: testEvent{
+			BaseEvent: eventstore.BaseEvent{
+				Agg: &eventstore.Aggregate{
+					ID:            aggregateID,
+					Type:          aggregateType,
+					ResourceOwner: "ro",
+					Version:       "v1",
+				},
+				Service:   "svc",
+				EventType: "test.created",
+			},
+		},
+	}
+
+	for _, opt := range opts {
+		opt(&e.testEvent)
+	}
+
+	return e
+}
+
 type testEvent struct {
 	eventstore.BaseEvent
 	uniqueConstraints []*eventstore.UniqueConstraint
 }
+
+type enforcedTestEvent struct {
+	testEvent
+}
+
+func (*enforcedTestEvent) EnforceResourceOwner() {}
 
 func (e *testEvent) Payload() any {
 	return e.BaseEvent.Data
@@ -207,13 +235,9 @@ func generateRemoveUniqueConstraint(table, uniqueField string) func(e *testEvent
 	}
 }
 
-func withTestData(data any) func(e *testEvent) {
+func withEventType(eventType eventstore.EventType) func(e *testEvent) {
 	return func(e *testEvent) {
-		d, err := json.Marshal(data)
-		if err != nil {
-			panic("marshal data failed")
-		}
-		e.BaseEvent.Data = d
+		e.EventType = eventType
 	}
 }
 

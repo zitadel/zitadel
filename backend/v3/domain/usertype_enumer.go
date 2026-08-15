@@ -3,6 +3,7 @@
 package domain
 
 import (
+	"database/sql/driver"
 	"fmt"
 	"strings"
 )
@@ -79,4 +80,34 @@ func (i UserType) IsAUserType() bool {
 		}
 	}
 	return false
+}
+
+func (i UserType) Value() (driver.Value, error) {
+	return i.String(), nil
+}
+
+func (i *UserType) Scan(value interface{}) error {
+	if value == nil {
+		return nil
+	}
+
+	var str string
+	switch v := value.(type) {
+	case []byte:
+		str = string(v)
+	case string:
+		str = v
+	case fmt.Stringer:
+		str = v.String()
+	default:
+		return fmt.Errorf("invalid value of UserType: %[1]T(%[1]v)", value)
+	}
+
+	val, err := UserTypeString(str)
+	if err != nil {
+		return err
+	}
+
+	*i = val
+	return nil
 }

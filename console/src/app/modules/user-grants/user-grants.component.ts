@@ -31,6 +31,7 @@ import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { NewOrganizationService } from '../../services/new-organization.service';
+import { AuthorizationService } from '../../services/authorization.service';
 
 export enum UserGrantListSearchKey {
   DISPLAY_NAME,
@@ -55,7 +56,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   @Input() context: UserGrantContext = UserGrantContext.NONE;
   @Input() refreshOnPreviousRoutes: string[] = [];
 
-  public dataSource: UserGrantsDataSource = new UserGrantsDataSource(this.authService, this.userService);
+  public dataSource: UserGrantsDataSource = new UserGrantsDataSource(this.authService, this.mgmtService);
   public selection: SelectionModel<UserGrantAsObject> = new SelectionModel<UserGrantAsObject>(true, []);
   @ViewChild(PaginatorComponent) public paginator?: PaginatorComponent;
   @ViewChild(MatTable) public table?: MatTable<UserGrantAsObject>;
@@ -80,7 +81,8 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   public myOrgs: Array<Org.AsObject> = [];
   constructor(
     private readonly authService: GrpcAuthService,
-    private readonly userService: ManagementService,
+    private readonly mgmtService: ManagementService,
+    private readonly authorizationService: AuthorizationService,
     private readonly toast: ToastService,
     private readonly dialog: MatDialog,
     private readonly queryClient: QueryClient,
@@ -198,12 +200,8 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
       if (!resp || !resp.roles) {
         return;
       }
-      this.userService
-        .updateUserGrant(
-          (grant as MgmtUserGrant.AsObject).id ?? (grant as AuthUserGrant.AsObject).grantId,
-          grant.userId,
-          resp.roles,
-        )
+      this.mgmtService
+        .updateUserGrant('id' in grant ? grant.id : grant.grantId, grant.userId, resp.roles)
         .then(() => {
           this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
           grant.roleKeysList = resp.roles;
@@ -218,7 +216,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  public deleteGrant(event: any, grant: MgmtUserGrant.AsObject): void {
+  public deleteGrant(event: PointerEvent, grant: UserGrantAsObject): void {
     event.stopPropagation();
 
     const dialogRef = this.dialog.open(WarnDialogComponent, {
@@ -232,25 +230,32 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     });
 
     dialogRef.afterClosed().subscribe((resp) => {
-      if (resp) {
-        this.userService
-          .removeUserGrant(grant.id, grant.userId)
-          .then(() => {
-            this.toast.showInfo('GRANTS.TOAST.REMOVED', true);
-            const data = this.dataSource.grantsSubject.getValue();
-
-            const index = data.findIndex(
-              (i) => (i as MgmtUserGrant.AsObject).id && (i as MgmtUserGrant.AsObject).id === grant.id,
-            );
-            if (index > -1) {
-              data.splice(index, 1);
-              this.dataSource.grantsSubject.next(data);
-            }
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
+      if (!resp) {
+        return;
       }
+      this.authorizationService
+        .deleteAuthorization('id' in grant ? grant.id : grant.grantId)
+        .then(() => {
+          this.toast.showInfo('GRANTS.TOAST.REMOVED', true);
+          const data = this.dataSource.grantsSubject.getValue();
+
+          const index = data.findIndex((i) => {
+            if ('id' in i && 'id' in grant) {
+              return i.id === grant.id;
+            }
+            if ('grantId' in i && 'grantId' in grant) {
+              return i.grantId === grant.grantId;
+            }
+            return false;
+          });
+          if (index > -1) {
+            data.splice(index, 1);
+            this.dataSource.grantsSubject.next(data);
+          }
+        })
+        .catch((error: RpcError) => {
+          this.toast.showError(error);
+        });
     });
   }
 
@@ -267,7 +272,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
-        this.userService
+        this.mgmtService
           .bulkRemoveUserGrant(this.selection.selected.map((grant) => (grant as MgmtUserGrant.AsObject).id))
           .then(() => {
             this.toast.showInfo('GRANTS.TOAST.BULKREMOVED', true);

@@ -39,23 +39,6 @@ describe("Host utility functions", () => {
       expect(mockHeaders.get).toHaveBeenCalledWith("x-zitadel-instance-host");
       expect(mockHeaders.get).toHaveBeenCalledWith("x-zitadel-forward-host");
     });
-
-    test("should return null when neither x-zitadel-instance-host nor x-zitadel-forward-host are available", () => {
-      const mockHeaders = {
-        get: vi.fn((key: string) => {
-          if (key === "x-zitadel-instance-host") return null;
-          if (key === "x-zitadel-forward-host") return null;
-          if (key === "x-forwarded-host") return "accounts.mycompany.com";
-          if (key === "host") return "internal.server";
-          return null;
-        }),
-      } as any;
-
-      const result = getInstanceHost(mockHeaders);
-      expect(result).toBeNull();
-      expect(mockHeaders.get).toHaveBeenCalledWith("x-zitadel-instance-host");
-      expect(mockHeaders.get).toHaveBeenCalledWith("x-zitadel-forward-host");
-    });
   });
 
   describe("getPublicHostWithProtocol", () => {

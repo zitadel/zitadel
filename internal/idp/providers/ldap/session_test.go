@@ -75,6 +75,12 @@ func TestProvider_userFiltersToSearchQuery(t *testing.T) {
 			username: "user",
 			want:     []string{"(test1=user)", "(test2=user)", "(test3=user)", "(test4=user)", "(test5=user)"},
 		},
+		{
+			name:     "escaped",
+			fields:   []string{"test"},
+			username: "user)(*",
+			want:     []string{`(test=user\29\28\2a)`},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
