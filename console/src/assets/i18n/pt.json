@@ -1537,6 +1537,7 @@
       "DEFAULT_SAVED": "Idioma Padrão salvo",
       "ALLOWED_SAVED": "Idiomas Permitidos salvos",
       "OPTIONS": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1786,6 +1787,7 @@
       "LANGUAGES_NOT_ALLOWED": "Não permitido:",
       "LANGUAGE": "Idioma",
       "LANGUAGES": {
+        "da": "Dansk",
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -2763,6 +2765,7 @@
     "3": "Outro"
   },
   "LANGUAGES": {
+    "da": "Dansk",
     "de": "Deutsch",
     "en": "English",
     "es": "Español",

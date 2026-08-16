@@ -1,0 +1,2878 @@
+{
+  "APP_NAME": "Zitadel",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "Metadata",
+    "HOME": {
+      "TITLE": "Kom godt i gang med Zitadel",
+      "NEXT": {
+        "TITLE": "Dine næste skridt",
+        "DESCRIPTION": "Gennemfør følgende trin for at sikre din applikation.",
+        "CREATE_PROJECT": {
+          "TITLE": "Opret et projekt",
+          "DESCRIPTION": "Tilføj et projekt og definér dets roller og rolletildelinger."
+        }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "Kom godt i gang",
+          "DESCRIPTION": "Følg den trinvise lynstartvejledning og begynd at bygge med det samme."
+        },
+        "DOCS": {
+          "TITLE": "Dokumentation",
+          "DESCRIPTION": "Udforsk Zitadels vidensbase for at sætte dig ind i de grundlæggende koncepter og idéer. Lær, hvordan Zitadel fungerer, og hvordan du bruger det."
+        },
+        "EXAMPLES": {
+          "TITLE": "Eksempler og Software Development Kits",
+          "DESCRIPTION": "Gennemse vores eksempler og SDK'er for at bruge Zitadel sammen med dine foretrukne programmeringssprog og værktøjer."
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "Organisation",
+      "DESCRIPTION": "En organisation indeholder brugere, projekter med apps, identitetsudbydere og indstillinger som virksomhedens branding. Vil du dele indstillinger på tværs af flere organisationer? Konfigurér standardindstillinger.",
+      "METADATA": "Tilføj brugerdefinerede attributter til organisationen, såsom dens placering eller en identifikator i et andet system. Du kan bruge disse oplysninger i dine handlinger."
+    },
+    "PROJECTS": {
+      "TITLE": "Projekter",
+      "DESCRIPTION": "Et projekt indeholder en eller flere applikationer, som du kan bruge til at godkende dine brugere. Du kan for eksempel have ét projekt med 3 applikationer: én til din webfrontend, én til din mobilapplikation og én til dine backend-tjenester. Du kan også autorisere dine brugere med projekter. For at lade brugere fra andre organisationer logge ind på dine applikationer skal du give dem adgang til dit projekt.<br/><br/>Hvis du ikke kan finde et projekt, så kontakt projektets ejer eller en med de tilsvarende rettigheder for at få adgang.",
+      "OWNED": {
+        "TITLE": "Egne projekter",
+        "DESCRIPTION": "Dette er de projekter, du ejer. Du kan administrere disse projektindstillinger, rolletildelinger og applikationer."
+      },
+      "GRANTED": {
+        "TITLE": "Tildelte projekter",
+        "DESCRIPTION": "Dette er de projekter, som andre organisationer har tildelt dig. Med tildelte projekter kan du give dine brugere adgang til andre organisationers applikationer."
+      }
+    },
+    "USERS": {
+      "TITLE": "Brugere",
+      "DESCRIPTION": "En bruger er et menneske eller en servicekonto, der kan tilgå dine applikationer.",
+      "HUMANS": {
+        "TITLE": "Brugere",
+        "DESCRIPTION": "Brugere godkender interaktivt i en browsersession med en login-prompt.",
+        "METADATA": "Tilføj brugerdefinerede attributter til brugeren, såsom afdelingen. Du kan bruge disse oplysninger i dine handlinger."
+      },
+      "MACHINES": {
+        "TITLE": "Servicekonti",
+        "DESCRIPTION": "Servicekonti godkender ikke-interaktivt ved hjælp af et JWT bearer-token signeret med en privat nøgle. De kan også bruge et personligt adgangstoken.",
+        "METADATA": "Tilføj brugerdefinerede attributter til kontoen, såsom det godkendende system. Du kan bruge disse oplysninger i dine handlinger."
+      },
+      "SELF": {
+        "METADATA": "Tilføj brugerdefinerede attributter til din bruger, såsom din afdeling. Du kan bruge disse oplysninger i din organisations handlinger."
+      }
+    },
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Rolletildelinger",
+      "DESCRIPTION": "Rolletildelinger definerer en brugers adgangsrettigheder til et projekt. Du kan give en bruger adgang til et projekt og definere brugerens roller inden for det projekt."
+    },
+    "ACTIONS": {
+      "TITLE": "Handlinger",
+      "DESCRIPTION": "Kør brugerdefineret kode ved hændelser, der opstår, når dine brugere godkender hos Zitadel. Automatisér dine processer, berig dine brugeres metadata og deres tokens, eller notificér eksterne systemer.",
+      "SCRIPTS": {
+        "TITLE": "Scripts",
+        "DESCRIPTION": "Skriv din JavaScript-kode én gang, og udløs den i flere flows."
+      },
+      "FLOWS": {
+        "TITLE": "Flows",
+        "DESCRIPTION": "Vælg et godkendelsesflow og udløs din handling ved en specifik hændelse i dette flow."
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, en ny og forbedret version af Actions, er nu tilgængelig. Den nuværende version er stadig tilgængelig, men vores fremtidige udvikling vil fokusere på den nye, som med tiden vil erstatte den nuværende version."
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "Instansindstillinger",
+        "DESCRIPTION": "Standardindstillinger for alle organisationer. Med de rette tilladelser kan nogle af dem tilsidesættes i organisationsindstillingerne."
+      },
+      "ORG": {
+        "TITLE": "Organisationsindstillinger",
+        "DESCRIPTION": "Tilpas indstillingerne for din organisation."
+      },
+      "FEATURES": {
+        "TITLE": "Funktionsindstillinger",
+        "DESCRIPTION": "Lås funktioner op for din instans."
+      },
+      "IDPS": {
+        "TITLE": "Identitetsudbydere",
+        "DESCRIPTION": "Opret og aktivér eksterne identitetsudbydere. Vælg en velkendt udbyder eller konfigurér en hvilken som helst anden OIDC-, OAuth- eller SAML-kompatibel udbyder efter eget valg. Du kan endda bruge dine eksisterende JWT-tokens som fødererede identiteter ved at konfigurere en JWT-identitetsudbyder.",
+        "NEXT": "Hvad nu?",
+        "SAML": {
+          "TITLE": "Konfigurér din SAML-identitetsudbyder",
+          "DESCRIPTION": "Zitadel er konfigureret. Nu skal din SAML-identitetsudbyder konfigureres. De fleste udbydere giver dig mulighed for blot at uploade hele Zitadels metadata-XML. Andre udbydere beder dig kun om at angive nogle bestemte URL'er, som for eksempel entity-ID'et (metadata-URL), Assertion Consumer Service (ACS)-URL'en eller Single Logout-URL'en."
+        },
+        "CALLBACK": {
+          "TITLE": "Konfigurér din {{ provider }}-identitetsudbyder",
+          "DESCRIPTION": "Før du kan konfigurere Zitadel, skal du angive denne URL til din identitetsudbyder for at aktivere browser-omdirigeringen tilbage til Zitadel efter godkendelse."
+        },
+        "JWT": {
+          "TITLE": "Brug JWT'er som fødererede identiteter",
+          "DESCRIPTION": "JWT-identitetsudbyderen giver dig mulighed for at bruge dine eksisterende JWT-tokens som fødererede identiteter. Denne funktion er praktisk, hvis du allerede har en issuer til JWT'er. Med en JWT-IdP kan du bruge disse JWT'er til at oprette og opdatere brugere i Zitadel løbende."
+        },
+        "LDAP": {
+          "TITLE": "Konfigurér Zitadel til at oprette forbindelse til din LDAP-identitetsudbyder",
+          "DESCRIPTION": "Angiv forbindelsesoplysningerne til din LDAP-server og konfigurér mapningen af dine LDAP-attributter til Zitadel-attributter."
+        },
+        "AUTOFILL": {
+          "TITLE": "Udfyld brugerdata automatisk",
+          "DESCRIPTION": "Brug en handling til at forbedre dine brugeres oplevelse. Du kan forudfylde Zitadels registreringsformular med værdier fra identitetsudbyderen."
+        },
+        "ACTIVATE": {
+          "TITLE": "Aktivér IdP'en",
+          "DESCRIPTION": "Din IdP er endnu ikke aktiv. Aktivér den for at lade dine brugere logge ind."
+        }
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "Adgangskodekompleksitet",
+        "DESCRIPTION": "Sørg for, at dine brugere bruger stærke adgangskoder ved at definere kompleksitetsregler."
+      },
+      "BRANDING": {
+        "TITLE": "Branding",
+        "DESCRIPTION": "Tilpas udseendet og fornemmelsen af din login-formular. Husk at anvende dine indstillinger, når du er færdig."
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "Eksterne links",
+        "DESCRIPTION": "Vejled dine brugere til brugerdefinerede eksterne ressourcer, der vises på login-siden. Brugere skal acceptere servicevilkårene og privatlivspolitikken, før de kan tilmelde sig. Skift linket til din dokumentation, eller sæt en tom streng for at skjule dokumentationsknappen fra administrationskonsollen. Tilføj et brugerdefineret eksternt link og en brugerdefineret tekst til det link i administrationskonsollen, eller lad dem være tomme for at skjule den knap."
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "SMTP-indstillinger",
+        "DESCRIPTION": "Konfigurér din SMTP-server til at bruge et domæne til afsenderadressen, som dine brugere kender og stoler på."
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "SMS-indstillinger",
+        "DESCRIPTION": "For at låse alle Zitadel-funktioner op skal du konfigurere Twilio til at sende SMS-beskeder til dine brugere."
+      },
+      "IAM_EVENTS": {
+        "TITLE": "Hændelser",
+        "DESCRIPTION": "Denne side viser alle tilstandsændringer i din instans så langt tilbage som din instans' grænse for revisionsspor. Filtrér listen efter tidsinterval til fejlfinding eller filtrér den efter et aggregat til revisionsformål."
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "Fejlede hændelser",
+        "DESCRIPTION": "Denne side viser alle fejlede hændelser i din instans. Hvis Zitadel ikke opfører sig som forventet, så tjek altid denne liste først."
+      },
+      "IAM_VIEWS": {
+        "TITLE": "Visninger",
+        "DESCRIPTION": "Denne side viser alle dine databasevisninger, og hvornår de behandlede deres seneste hændelse. Hvis du mangler nogle data, så tjek, om visningen er opdateret."
+      },
+      "LANGUAGES": {
+        "TITLE": "Sprog",
+        "DESCRIPTION": "Begræns de sprog, som login-formularen og notifikationsbeskederne oversættes til. Hvis du vil deaktivere nogle af sprogene, så træk dem til sektionen Ikke-tilladte sprog. Du kan angive et tilladt sprog som standardsprog. Hvis en brugers foretrukne sprog ikke er tilladt, bruges standardsproget."
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "Hemmelighedsgeneratorer",
+        "DESCRIPTION": "Definér kompleksiteten og levetiden for dine hemmeligheder. En højere kompleksitet og levetid forbedrer sikkerheden, mens en lavere kompleksitet og levetid forbedrer dekrypteringsydeevnen."
+      },
+      "SECURITY": {
+        "TITLE": "Sikkerhedsindstillinger",
+        "DESCRIPTION": "Aktivér Zitadel-funktioner, der kan have sikkerhedsmæssige konsekvenser. Du bør virkelig vide, hvad du laver, før du ændrer disse indstillinger."
+      },
+      "OIDC": {
+        "TITLE": "OpenID Connect-indstillinger",
+        "DESCRIPTION": "Konfigurér dine OIDC-tokenlevetider. Brug kortere levetider for at øge dine brugeres sikkerhed, og brug længere levetider for at øge dine brugeres bekvemmelighed.",
+        "LABEL_HOURS": "Maksimal levetid i timer",
+        "LABEL_DAYS": "Maksimal levetid i dage",
+        "ACCESS_TOKEN": {
+          "TITLE": "Adgangstoken",
+          "DESCRIPTION": "Adgangstokenet bruges til at godkende en bruger. Det er et kortlivet token, der bruges til at tilgå brugerens data. Brug en kort levetid for at minimere risikoen for uautoriseret adgang. Adgangstokens kan automatisk fornyes ved hjælp af et fornyelsestoken."
+        },
+        "ID_TOKEN": {
+          "TITLE": "ID-token",
+          "DESCRIPTION": "ID-tokenet er et JSON Web Token (JWT), der indeholder claims om brugeren. ID-tokenets levetid bør ikke overstige adgangstokenets levetid."
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "Fornyelsestoken",
+          "DESCRIPTION": "Fornyelsestokenet bruges til at få et nyt adgangstoken. Det er et langlivet token, der bruges til at forny adgangstokenet. En bruger skal manuelt godkende igen, når fornyelsestokenet udløber."
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "Inaktivt fornyelsestoken",
+          "DESCRIPTION": "Det inaktive fornyelsestokens levetid er den maksimale tid, et fornyelsestoken kan være ubrugt."
+        }
+      },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Administrér dine OIDC Web Keys for sikkert at signere og validere tokens for din Zitadel-instans.",
+        "TABLE": {
+          "TITLE": "Aktive og fremtidige Web Keys",
+          "DESCRIPTION": "Dine aktive og kommende web keys. Aktivering af en ny nøgle deaktiverer den nuværende.",
+          "NOTE": "Bemærk: JWKs OIDC-endpointet returnerer et svar, der kan caches (standard 5 min). Undgå at aktivere en nøgle for tidligt, da den måske endnu ikke er tilgængelig for caches og applikationer.",
+          "ACTIVATE": "Aktivér næste Web Key",
+          "ACTIVE": "Aktuelt aktiv",
+          "NEXT": "Næste i køen",
+          "FUTURE": "Fremtidig",
+          "WARNING": "Web Key er mindre end 5 min gammel"
+        },
+        "CREATE": {
+          "TITLE": "Opret ny Web Key",
+          "DESCRIPTION": "Oprettelse af en ny web key føjer den til din liste. Zitadel bruger som standard RSA2048-nøgler med en SHA256-hasher.",
+          "KEY_TYPE": "Nøgletype",
+          "BITS": "Bits",
+          "HASHER": "Hasher",
+          "CURVE": "Kurve"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Tidligere Web Keys",
+          "DESCRIPTION": "Dette er dine tidligere web keys, der ikke længere er aktive.",
+          "DEACTIVATED_ON": "Deaktiveret den"
+        }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Beskedtekster",
+        "DESCRIPTION": "Tilpas teksterne i dine notifikations-e-mails eller SMS-beskeder. Hvis du vil deaktivere nogle af sprogene, så begræns dem i din instans' sprogindstillinger.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "Når du gør krav på et domæne for din organisation, vil brugere, der ikke bruger dette domæne i deres loginnavn, blive bedt om at ændre deres loginnavn, så det matcher det krævede domæne.",
+          "INIT": "Når en bruger oprettes, modtager de en e-mail med et link til at angive deres adgangskode.",
+          "PC": "Når en bruger ændrer sin adgangskode, modtager de en notifikation om ændringen, hvis du har aktiveret dette i notifikationsindstillingerne.",
+          "PL": "Når en bruger tilføjer en adgangsnøgle-godkendelsesmetode, skal de aktivere den ved at klikke på et link i en e-mail.",
+          "PR": "Når en bruger nulstiller sin adgangskode, modtager de en e-mail med et link til at angive en ny adgangskode.",
+          "VE": "Når en bruger ændrer sin e-mailadresse, modtager de en e-mail med et link til at bekræfte den nye adresse.",
+          "VP": "Når en bruger ændrer sit telefonnummer, modtager de en SMS med en kode til at bekræfte det nye nummer.",
+          "VEO": "Når en bruger tilføjer en metode med OTP via e-mail, skal de aktivere den ved at indtaste en kode, der sendes til deres e-mailadresse.",
+          "VSO": "Når en bruger tilføjer en metode med OTP via SMS, skal de aktivere den ved at indtaste en kode, der sendes til deres telefonnummer.",
+          "IU": "Når en brugerinvitationskode oprettes, modtager de en e-mail med et link til at angive deres godkendelsesmetode."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Tekster til login-grænsefladen",
+        "DESCRIPTION": "Tilpas teksterne i din login-formular. Hvis en tekst er tom, viser pladsholderen standardværdien. Hvis du vil deaktivere nogle af sprogene, så begræns dem i din instans' sprogindstillinger."
+      },
+      "DOMAINS": {
+        "TITLE": "Domæneindstillinger",
+        "DESCRIPTION": "Definér begrænsninger på dine domæner og konfigurér dine loginnavn-mønstre.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Kræv, at brugerdefinerede domæner bekræftes",
+          "DESCRIPTION": "Hvis dette er aktiveret, skal organisationsdomæner bekræftes, før de kan bruges til domæneopdagelse eller som suffiks for brugernavne."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Loginnavn-mønster",
+          "DESCRIPTION": "Styr mønsteret for dine brugeres loginnavne. Zitadel vælger dine brugeres organisation, så snart de indtaster deres loginnavn. Derfor skal loginnavnene være unikke på tværs af alle organisationer. Hvis du har brugere, der har en konto i flere domæner, kan du sikre unikhed ved at tilføje organisationsdomænet som suffiks til dine loginnavne."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Domænebekræftelse",
+          "DESCRIPTION": "Tillad kun, at din organisation bruger de domæner, de faktisk kontrollerer. Hvis dette er aktiveret, bekræftes organisationsdomæner regelmæssigt via DNS- eller HTTP-udfordring, før de kan bruges. Dette er en sikkerhedsfunktion til at forhindre domænekapring."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "SMTP-afsenderadresse",
+          "DESCRIPTION": "Tillad kun en SMTP-afsenderadresse, hvis den matcher et af dine instansdomæner."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Login-levetider",
+          "DESCRIPTION": "Styrk din sikkerhed ved at reducere nogle login-relaterede maksimale levetider.",
+          "LABEL": "Maksimal levetid i timer",
+          "PW_CHECK": {
+            "TITLE": "Adgangskodekontrol",
+            "DESCRIPTION": "Brugere skal godkende igen med deres adgangskode efter denne periode."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "Kontrol af eksternt login",
+            "DESCRIPTION": "Dine brugere omdirigeres til deres eksterne identitetsudbydere efter denne periode."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Kontrol af multifaktor-initialisering",
+            "DESCRIPTION": "Dine brugere bliver bedt om at opsætte en anden faktor eller en multifaktor efter denne periode, hvis de ikke allerede har gjort det. En levetid på 0 deaktiverer denne prompt."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Kontrol af anden faktor",
+            "DESCRIPTION": "Dine brugere skal genvalidere deres anden faktor i disse perioder."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Multifaktorkontrol",
+            "DESCRIPTION": "Dine brugere skal genvalidere deres multifaktor i disse perioder."
+          }
+        },
+        "FORM": {
+          "TITLE": "Login-formular",
+          "DESCRIPTION": "Tilpas login-formularen.",
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Lokal godkendelse tilladt",
+            "DESCRIPTION": "Tillad dine brugere at logge ind med deres brugernavn og adgangskode eller adgangsnøgle-godkendelse. Hvis dette er deaktiveret, kan dine brugere kun logge ind via en ekstern identitetsudbyder."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "Brugerregistrering tilladt",
+            "DESCRIPTION": "Tillad anonyme brugere at oprette en konto."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Organisationsregistrering tilladt",
+            "DESCRIPTION": "Tillad anonyme brugere at oprette en organisation."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "Eksternt login tilladt",
+            "DESCRIPTION": "Tillad dine brugere at logge ind med en ekstern identitetsudbyder i stedet for at bruge Zitadel-brugeren til at logge ind."
+          },
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Nulstilling af adgangskode skjult",
+            "DESCRIPTION": "Tillad ikke dine brugere at nulstille deres adgangskode."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Domæneopdagelse tilladt",
+            "DESCRIPTION": "Find dine brugeres organisationer ud fra deres loginnavnes domæne, for eksempel deres e-mailadresse."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Ignorér ukendte brugernavne",
+            "DESCRIPTION": "Hvis dette er aktiveret, viser login-formularen ikke en fejlmeddelelse, hvis brugernavnet er ukendt. Dette hjælper med at forhindre gætning af brugernavne."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "Deaktivér login med e-mail",
+            "DESCRIPTION": "Hvis dette er aktiveret, kan dine brugere ikke bruge deres e-mailadresser til at logge ind. Vær opmærksom på, at hvis du deaktiverer dette, skal dine brugeres e-mailadresser være unikke på tværs af alle organisationer for at kunne logge ind."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Deaktivér login med telefon",
+            "DESCRIPTION": "Hvis dette er aktiveret, kan dine brugere ikke bruge deres telefonnumre til at logge ind. Vær opmærksom på, at hvis du deaktiverer dette, skal dine brugeres telefonnumre være unikke på tværs af alle organisationer for at kunne logge ind."
+          }
+        }
+      }
+    }
+  },
+  "PAGINATOR": {
+    "PREVIOUS": "Forrige",
+    "NEXT": "Næste",
+    "COUNT": "Resultater i alt",
+    "MORE": "Mere"
+  },
+  "FOOTER": {
+    "LINKS": {
+      "CONTACT": "Kontakt",
+      "TOS": "Servicevilkår",
+      "PP": "Privatlivspolitik"
+    },
+    "THEME": {
+      "DARK": "Mørk",
+      "LIGHT": "Lys"
+    }
+  },
+  "HOME": {
+    "WELCOME": "Kom godt i gang med Zitadel",
+    "DISCLAIMER": "Zitadel behandler dine data fortroligt og sikkert.",
+    "DISCLAIMERLINK": "Yderligere information",
+    "DOCUMENTATION": {
+      "DESCRIPTION": "Kom hurtigt i gang med Zitadel."
+    },
+    "GETSTARTED": {
+      "DESCRIPTION": "Kom hurtigt i gang med Zitadel."
+    },
+    "QUICKSTARTS": {
+      "LABEL": "Første skridt",
+      "DESCRIPTION": "Kom hurtigt i gang med Zitadel."
+    },
+    "SHORTCUTS": {
+      "SHORTCUTS": "Genveje",
+      "SETTINGS": "Tilgængelige genveje",
+      "PROJECTS": "Projekter",
+      "REORDER": "Hold og træk feltet for at flytte det",
+      "ADD": "Hold og træk et felt for at tilføje"
+    }
+  },
+  "ONBOARDING": {
+    "DESCRIPTION": "Dine næste skridt",
+    "MOREDESCRIPTION": "flere genveje",
+    "COMPLETED": "gennemført",
+    "DISMISS": "Nej tak, jeg er en pro.",
+    "CARD": {
+      "TITLE": "Få din Zitadel op at køre",
+      "DESCRIPTION": "Denne tjekliste hjælper med at opsætte din instans og guider dig gennem de mest essentielle trin"
+    },
+    "MILESTONES": {
+      "instance.policy.label.added": {
+        "title": "Opsæt dit brand",
+        "description": "Definér farver og form på dit login, og upload dit logo og dine ikoner.",
+        "action": "Opsæt branding"
+      },
+      "instance.smtp.config.added": {
+        "title": "Opsæt dine SMTP-indstillinger",
+        "description": "Angiv dine egne mailserverindstillinger.",
+        "action": "Opsæt SMTP"
+      },
+      "PROJECT_CREATED": {
+        "title": "Opret et projekt",
+        "description": "Tilføj et projekt og definér dets roller og rolletildelinger.",
+        "action": "Opret projekt"
+      },
+      "APPLICATION_CREATED": {
+        "title": "Registrér din applikation",
+        "description": "Registrér din web-, native, API- eller SAML-applikation og opsæt et godkendelsesflow.",
+        "action": "Registrér applikation"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Log ind på din applikation",
+        "description": "Integrér din applikation med Zitadel til godkendelse, og test den ved at logge ind med din admin-bruger.",
+        "action": "Log ind"
+      },
+      "user.human.added": {
+        "title": "Tilføj brugere",
+        "description": "Tilføj dine applikationsbrugere",
+        "action": "Tilføj bruger"
+      },
+      "user.grant.added": {
+        "title": "Tildel roller til brugere",
+        "description": "Tillad brugere at tilgå din applikation og opsæt deres rolle.",
+        "action": "Tildel roller til brugere"
+      }
+    }
+  },
+  "MENU": {
+    "INSTANCE": "Standardindstillinger",
+    "DASHBOARD": "Hjem",
+    "PERSONAL_INFO": "Personlige oplysninger",
+    "DOCUMENTATION": "Dokumentation",
+    "INSTANCEOVERVIEW": "Instans",
+    "ORGS": "Organisationer",
+    "VIEWS": "Visninger",
+    "EVENTS": "Hændelser",
+    "FAILEDEVENTS": "Fejlede hændelser",
+    "ORGANIZATION": "Organisation",
+    "PROJECT": "Projekter",
+    "PROJECTOVERVIEW": "Oversigt",
+    "PROJECTGRANTS": "Projekttildelinger",
+    "ROLES": "Roller",
+    "GRANTEDPROJECT": "Tildelte projekter",
+    "HUMANUSERS": "Brugere",
+    "MACHINEUSERS": "Servicekonti",
+    "LOGOUT": "Log alle brugere ud",
+    "NEWORG": "Ny organisation",
+    "IAMADMIN": "Du er en IAM-administrator. Bemærk, at du har udvidede tilladelser.",
+    "SHOWORGS": "Vis alle organisationer",
+    "GRANTS": "Rolletildelinger",
+    "ACTIONS": "Handlinger",
+    "TARGETS": "Mål",
+    "PRIVACY": "Privatliv",
+    "TOS": "Servicevilkår",
+    "OPENSHORTCUTSTOOLTIP": "Skriv ? for at vise tastaturgenveje",
+    "SETTINGS": "Indstillinger",
+    "CUSTOMERPORTAL": "Kundeportal"
+  },
+  "QUICKSTART": {
+    "TITLE": "Integrér Zitadel i din applikation",
+    "DESCRIPTION": "Integrér Zitadel i din applikation, eller brug et af vores eksempler for at komme i gang på få minutter.",
+    "BTN_START": "Opret applikation",
+    "BTN_LEARNMORE": "Læs mere",
+    "CREATEPROJECTFORAPP": "Opret projekt {{value}}",
+    "SELECT_FRAMEWORK": "Vælg framework",
+    "FRAMEWORK": "Framework",
+    "FRAMEWORK_OTHER": "Andet (OIDC, SAML, API)",
+    "ALMOSTDONE": "Du er næsten færdig.",
+    "REVIEWCONFIGURATION": "Gennemgå indstillinger",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Vi har oprettet en grundlæggende opsætning til {{value}}-applikationer. Du kan tilpasse disse indstillinger til dine behov efter oprettelse.",
+    "REDIRECTS": "Konfigurér omdirigeringer",
+    "DEVMODEWARN": "Udviklingstilstand er som standard aktiveret. Du kan opdatere værdierne til produktion senere.",
+    "GUIDE": "Vejledning",
+    "BROWSEEXAMPLES": "Gennemse eksempler og SDK'er",
+    "DUPLICATEAPPRENAME": "Der findes allerede en applikation med samme navn. Vælg venligst et andet navn.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Skift framework",
+        "DESCRIPTION": "Vælg et af de tilgængelige frameworks til hurtig opsætning af din applikation."
+      }
+    }
+  },
+  "ACTIONS": {
+    "ACTIONS": "Handlinger",
+    "FILTER": "Filtrér",
+    "RENAME": "Omdøb",
+    "SET": "Angiv",
+    "COPY": "Kopiér til udklipsholder",
+    "COPIED": "Kopieret til udklipsholder.",
+    "RESET": "Nulstil",
+    "RESETDEFAULT": "Nulstil til standard",
+    "RESETTO": "Nulstil til: ",
+    "RESETCURRENT": "Nulstil til nuværende",
+    "SHOW": "Vis",
+    "HIDE": "Skjul",
+    "SAVE": "Gem",
+    "SAVENOW": "Gem nu",
+    "NEW": "Ny",
+    "ADD": "Tilføj",
+    "CREATE": "Opret",
+    "CONTINUE": "Fortsæt",
+    "CONTINUEWITH": "Fortsæt med {{value}}",
+    "BACK": "Tilbage",
+    "CLOSE": "Luk",
+    "CLEAR": "Ryd",
+    "CANCEL": "Annullér",
+    "INFO": "Info",
+    "OK": "OK",
+    "SELECT": "Vælg",
+    "VIEW": "Vis",
+    "SELECTIONDELETE": "Slet markering",
+    "DELETE": "Slet",
+    "REMOVE": "Fjern",
+    "VERIFY": "Bekræft",
+    "FINISH": "Afslut",
+    "FINISHED": "Luk",
+    "CHANGE": "Skift",
+    "REACTIVATE": "Genaktivér",
+    "ACTIVATE": "Aktivér",
+    "DEACTIVATE": "Deaktivér",
+    "REFRESH": "Opdater",
+    "LOGIN": "Login",
+    "EDIT": "Redigér",
+    "PIN": "Fastgør / Frigør",
+    "CONFIGURE": "Konfigurér",
+    "SEND": "Send",
+    "NEWVALUE": "Ny værdi",
+    "RESTORE": "Gendan",
+    "CONTINUEWITHOUTSAVE": "Fortsæt uden at gemme",
+    "OF": "af",
+    "PREVIOUS": "Forrige",
+    "NEXT": "Næste",
+    "MORE": "mere",
+    "STEP": "Trin",
+    "SETUP": "Opsætning",
+    "TEST": "Test",
+    "UNSAVEDCHANGES": "Ugemte ændringer",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Er du sikker på, at du vil kassere denne nye handling? Din handling vil gå tabt",
+        "CANCEL": "Annullér",
+        "DISCARD": "Kassér"
+      }
+    },
+    "TABLE": {
+      "SHOWUSER": "Vis bruger {{value}}"
+    },
+    "DOWNLOAD": "Download",
+    "APPLY": "Anvend"
+  },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "Du bruger i øjeblikket den nye Actions V2, som er i beta. Den tidligere version 1 er stadig tilgængelig, men vil blive udfaset i fremtiden. Rapportér venligst eventuelle problemer eller feedback.",
+    "EXECUTION": {
+      "TITLE": "Handlinger",
+      "DESCRIPTION": "Handlinger lader dig køre brugerdefineret kode som reaktion på API-forespørgsler, hændelser eller specifikke funktioner. Brug dem til at udvide Zitadel, automatisere workflows og integrere med andre systemer.",
+      "TYPES": {
+        "request": "Forespørgsel",
+        "response": "Svar",
+        "event": "Hændelser",
+        "function": "Funktion"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Opret en handling",
+        "UPDATE_TITLE": "Opdater en handling",
+        "TYPE": {
+          "DESCRIPTION": "Vælg, hvornår du vil have denne handling til at køre",
+          "REQUEST": {
+            "TITLE": "Forespørgsel",
+            "DESCRIPTION": "Forespørgsler, der opstår i Zitadel. Dette kan for eksempel være et kald af en login-forespørgsel."
+          },
+          "RESPONSE": {
+            "TITLE": "Svar",
+            "DESCRIPTION": "Et svar på en forespørgsel i Zitadel. Tænk på det svar, du får tilbage, når du henter en bruger."
+          },
+          "EVENTS": {
+            "TITLE": "Hændelser",
+            "DESCRIPTION": "Hændelser, der sker i Zitadel. Dette kan være alt fra en bruger, der opretter en konto, et vellykket login osv."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Funktioner",
+            "DESCRIPTION": "Funktioner, du kan kalde i Zitadel. Dette kan være alt fra at sende en e-mail til at oprette en bruger."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Vælg, om denne handling gælder for alle forespørgsler, en specifik tjeneste (f.eks. brugeradministration) eller en enkelt forespørgsel (f.eks. opret bruger).",
+          "ALL": {
+            "TITLE": "Alle",
+            "DESCRIPTION": "Vælg dette, hvis du vil køre din handling ved hver forespørgsel"
+          },
+          "ALL_EVENTS": "Vælg dette, hvis du vil køre din handling ved hver hændelse",
+          "SELECT_SERVICE": {
+            "TITLE": "Vælg tjeneste",
+            "DESCRIPTION": "Vælg en Zitadel-tjeneste til din handling."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Vælg metode",
+            "DESCRIPTION": "Hvis du kun vil udføre den ved en specifik forespørgsel, så vælg den her",
+            "NOTE": "Hvis du ikke vælger en metode, vil din handling køre ved hver forespørgsel i din valgte tjeneste."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Funktionsnavn",
+            "DESCRIPTION": "Vælg den funktion, du vil udføre"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Angiv gruppe",
+            "DESCRIPTION": "Hvis du kun vil udføre den for en gruppe af hændelser, så angiv gruppen her"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Vælg hændelse",
+            "DESCRIPTION": "Hvis du kun vil udføre den ved en specifik hændelse, så angiv den her"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Du kan vælge at udføre et mål eller at køre det på de samme betingelser som andre mål.",
+          "TARGET": {
+            "DESCRIPTION": "Det mål, du vil udføre for denne handling"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Udførelsesbetingelser"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Betingelse",
+        "TYPE": "Type",
+        "TARGET": "Mål",
+        "CREATIONDATE": "Oprettelsesdato"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Mål",
+      "DESCRIPTION": "Et mål er destinationen for den kode, du vil udføre fra en handling. Opret et mål her og føj det til dine handlinger.",
+      "CREATE": {
+        "TITLE": "Opret dit mål",
+        "DESCRIPTION": "Opret dit eget mål uden for Zitadel",
+        "NAME": "Navn",
+        "NAME_DESCRIPTION": "Giv dit mål et tydeligt, beskrivende navn, så det er nemt at identificere senere",
+        "TYPE": "Type",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST Call",
+          "restAsync": "REST Async"
+        },
+        "TYPES_DESCRIPTION": "Webhook: kaldet håndterer statuskoden, men svaret er irrelevant\nCall: kaldet håndterer statuskoden og svaret\nAsync: kaldet håndterer hverken statuskode eller svar, men kan kaldes parallelt med andre mål",
+        "PAYLOAD_TYPE": "Payload-type",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Uspecificeret",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Krypteret JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Standard JSON-payload med en signaturheader til verifikation.\nJWT: Payloaden sendes som et signeret JWT. Verifikation er selvstændig ved hjælp af JWT-signaturen.\nJWE: JWT'et er desuden krypteret for at forhindre uautoriseret adgang til payload-oplysninger.",
+        "ENDPOINT": "Endpoint",
+        "ENDPOINT_DESCRIPTION": "Indtast det endpoint, hvor din kode er hostet. Sørg for, at det er tilgængeligt for os!",
+        "TIMEOUT": "Timeout",
+        "TIMEOUT_DESCRIPTION": "Angiv den maksimale tid, dit mål har til at svare. Hvis det tager længere, stopper vi forespørgslen.",
+        "INTERRUPT_ON_ERROR": "Afbryd ved fejl",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Stop alle udførelser, når målet returnerer en fejl",
+        "INTERRUPT_ON_ERROR_WARNING": "Forsigtig: “Afbryd ved fejl” standser handlinger ved fejl og risikerer udelukkelse. Test med den deaktiveret for at undgå at blokere login/oprettelse.",
+        "AWAIT_RESPONSE": "Afvent svar",
+        "AWAIT_RESPONSE_DESCRIPTION": "Vi venter på et svar, før vi gør noget andet. Nyttigt, hvis du har til hensigt at bruge flere mål til en enkelt handling"
+      },
+      "TABLE": {
+        "NAME": "Navn",
+        "ENDPOINT": "Endpoint",
+        "CREATIONDATE": "Oprettelsesdato",
+        "REORDER": "Omarrangér"
+      }
+    }
+  },
+  "MEMBERROLES": {
+    "IAM_OWNER": "Har kontrol over hele instansen, inklusive alle organisationer",
+    "IAM_OWNER_VIEWER": "Har tilladelse til at gennemse hele instansen, inklusive alle organisationer",
+    "IAM_ORG_MANAGER": "Har tilladelse til at oprette og administrere organisationer",
+    "IAM_USER_MANAGER": "Har tilladelse til at oprette og administrere brugere",
+    "IAM_ADMIN_IMPERSONATOR": "Har tilladelse til at udgive sig for administratorer og slutbrugere fra alle organisationer",
+    "IAM_END_USER_IMPERSONATOR": "Har tilladelse til at udgive sig for slutbrugere fra alle organisationer",
+    "IAM_LOGIN_CLIENT": "Har tilladelse til at administrere login-applikationer",
+    "ORG_OWNER": "Har tilladelse over hele organisationen",
+    "ORG_USER_MANAGER": "Har tilladelse til at oprette og administrere organisationens brugere",
+    "ORG_OWNER_VIEWER": "Har tilladelse til at gennemse hele organisationen",
+    "ORG_SETTINGS_MANAGER": "Har tilladelse til at administrere organisationsindstillinger",
+    "ORG_USER_PERMISSION_EDITOR": "Har tilladelse til at administrere rolletildelinger",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Har tilladelse til at administrere projekttildelinger",
+    "ORG_PROJECT_CREATOR": "Har tilladelse til at oprette sine egne projekter og underliggende indstillinger",
+    "ORG_ADMIN_IMPERSONATOR": "Har tilladelse til at udgive sig for administratorer og slutbrugere fra organisationen",
+    "ORG_END_USER_IMPERSONATOR": "Har tilladelse til at udgive sig for slutbrugere fra organisationen",
+    "ORG_USER_SELF_MANAGER": "Har tilladelse til at administrere sin egen bruger",
+    "PROJECT_OWNER": "Har tilladelse over hele projektet",
+    "PROJECT_OWNER_VIEWER": "Har tilladelse til at gennemse hele projektet",
+    "PROJECT_OWNER_GLOBAL": "Har tilladelse over hele projektet",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Har tilladelse til at gennemse hele projektet",
+    "PROJECT_GRANT_OWNER": "Har tilladelse til at administrere projekttildelingen",
+    "PROJECT_GRANT_OWNER_VIEWER": "Har tilladelse til at gennemse projekttildelingen"
+  },
+  "OVERLAYS": {
+    "ORGSWITCHER": {
+      "TEXT": "Alle organisationsindstillinger og tabeller i administrationskonsollen er baseret på en valgt organisation. Klik på denne knap for at skifte organisation eller oprette en ny."
+    },
+    "INSTANCE": {
+      "TEXT": "Klik her for at komme til standardindstillingerne. Bemærk, at du kun har adgang til denne knap, hvis du har udvidede tilladelser."
+    },
+    "PROFILE": {
+      "TEXT": "Her kan du skifte mellem dine brugerkonti og administrere dine sessioner og din profil."
+    },
+    "NAV": {
+      "TEXT": "Denne navigation ændrer sig baseret på din valgte organisation ovenfor eller din instans"
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "Organisationskonteksten er ændret."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "Visningen skiftede netop til instans!"
+    }
+  },
+  "FILTER": {
+    "TITLE": "Filtrér",
+    "ORGNAME": "Organisationsnavn",
+    "ORGID": "Organisations-ID",
+    "STATE": "Tilstand",
+    "PRIMARYDOMAIN": "Organisationsdomæne",
+    "DISPLAYNAME": "Brugerens visningsnavn",
+    "EMAIL": "E-mail",
+    "USERNAME": "Brugernavn",
+    "PROJECTNAME": "Projektnavn",
+    "RESOURCEOWNER": "Ressourceejer",
+    "METHODS": {
+      "5": "indeholder",
+      "7": "slutter med",
+      "1": "er lig med"
+    }
+  },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "Tastaturgenveje",
+    "UNDERORGCONTEXT": "På organisationssider",
+    "SIDEWIDE": "Genveje for hele siden",
+    "SHORTCUTS": {
+      "HOME": "<strong>G</strong>å til <strong>H</strong>jem",
+      "INSTANCE": "<strong>G</strong>å til <strong>I</strong>nstans",
+      "ORG": "<strong>G</strong>å til <strong>O</strong>rganisation",
+      "ORGSETTINGS": "<strong>G</strong>å til organisations<strong>i</strong>ndstillinger",
+      "ORGSWITCHER": "Skift organisation",
+      "ME": "Gå til egen profil",
+      "PROJECTS": "<strong>G</strong>å til <strong>P</strong>rojekter",
+      "USERS": "<strong>G</strong>å til <strong>B</strong>rugere",
+      "ROLEASSIGNMENTS": "<strong>G</strong>å til <strong>R</strong>olletildelinger",
+      "ACTIONS": "<strong>G</strong>å til Handlinger og <strong>F</strong>lows",
+      "DOMAINS": "<strong>G</strong>å til <strong>D</strong>omæner"
+    }
+  },
+  "INSTANCEID": "Instans-ID",
+  "RESOURCEID": "Ressource-ID",
+  "NAME": "Navn",
+  "VERSION": "Version",
+  "TABLE": {
+    "NOROWS": "Ingen data"
+  },
+  "ERRORS": {
+    "REQUIRED": "Udfyld venligst dette felt.",
+    "ATLEASTONE": "Angiv mindst én værdi.",
+    "TOKENINVALID": {
+      "TITLE": "Dit autorisationstoken er udløbet.",
+      "DESCRIPTION": "Klik på knappen nedenfor for at logge ind igen."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Din instans er blokeret.",
+      "DESCRIPTION": "Bed din Zitadel-instansadministrator om at opdatere abonnementet."
+    },
+    "INVALID_FORMAT": "Formateringen er ugyldig.",
+    "NOTANEMAIL": "Den angivne værdi er ikke en e-mailadresse.",
+    "MINLENGTH": "Skal være mindst {{requiredLength}} tegn lang.",
+    "MAXLENGTH": "Skal være mindre end {{requiredLength}} tegn.",
+    "UPPERCASEMISSING": "Skal indeholde et stort bogstav.",
+    "LOWERCASEMISSING": "Skal indeholde et lille bogstav.",
+    "SYMBOLERROR": "Skal indeholde et symbol eller tegnsætningstegn.",
+    "NUMBERERROR": "Skal indeholde et ciffer.",
+    "PWNOTEQUAL": "De angivne adgangskoder stemmer ikke overens.",
+    "PHONE": "Telefonnummeret skal starte med +."
+  },
+  "USER": {
+    "SETTINGS": {
+      "TITLE": "Indstillinger",
+      "GENERAL": "Generelt",
+      "IDP": "Identitetsudbydere",
+      "SECURITY": "Adgangskode og sikkerhed",
+      "KEYS": "Nøgler",
+      "PAT": "Personlige adgangstokens",
+      "ROLEASSIGNMENTS": "Rolletildelinger",
+      "MEMBERSHIPS": "Administratorroller",
+      "METADATA": "Metadata"
+    },
+    "TITLE": "Personlige oplysninger",
+    "DESCRIPTION": "Administrér dine oplysninger og sikkerhedsindstillinger.",
+    "PAGES": {
+      "TITLE": "Bruger",
+      "DETAIL": "Detalje",
+      "CREATE": "Opret",
+      "MY": "Mine oplysninger",
+      "LOGINNAMES": "Loginnavne",
+      "LOGINMETHODS": "Loginmetoder",
+      "LOGINNAMESDESC": "Dette er dine loginnavne:",
+      "NOUSER": "Ingen tilknyttet bruger.",
+      "REACTIVATE": "Genaktivér",
+      "DEACTIVATE": "Deaktivér",
+      "FILTER": "Filtrér",
+      "STATE": "Status",
+      "DELETE": "Slet bruger",
+      "UNLOCK": "Lås bruger op",
+      "GENERATESECRET": "Generér klienthemmelighed",
+      "REMOVESECRET": "Fjern klienthemmelighed",
+      "LOCKEDDESCRIPTION": "Denne bruger er blevet låst ude på grund af overskridelse af det maksimale antal login-forsøg og skal låses op for at kunne bruges igen.",
+      "DELETEACCOUNT": "Slet konto",
+      "DELETEACCOUNT_DESC": "Hvis du udfører denne handling, bliver du logget ud og vil ikke længere have adgang til din konto. Denne handling kan ikke fortrydes, så fortsæt venligst med forsigtighed.",
+      "DELETEACCOUNT_BTN": "Slet konto",
+      "DELETEACCOUNT_SUCCESS": "Kontoen blev slettet!"
+    },
+    "DETAILS": {
+      "DATECREATED": "Oprettet",
+      "DATECHANGED": "Ændret"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Slet bruger",
+      "DELETE_SELF_TITLE": "Slet konto",
+      "DELETE_DESCRIPTION": "Du er ved at slette en bruger permanent. Er du sikker?",
+      "DELETE_SELF_DESCRIPTION": "Du er ved at slette din personlige konto permanent. Dette logger dig ud og sletter din bruger. Denne handling kan ikke fortrydes!",
+      "DELETE_AUTH_DESCRIPTION": "Du er ved at slette din personlige konto permanent. Er du sikker?",
+      "TYPEUSERNAME": "Skriv '{{value}}' for at bekræfte og slette brugeren.",
+      "USERNAME": "Loginnavn",
+      "DELETE_BTN": "Slet permanent"
+    },
+    "SENDEMAILDIALOG": {
+      "TITLE": "Send e-mailnotifikation",
+      "DESCRIPTION": "Klik på knappen nedenfor for at sende en notifikation til den nuværende e-mailadresse, eller skift e-mailadressen i feltet.",
+      "NEWEMAIL": "Ny e-mailadresse"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Klienthemmelighed",
+      "CLIENTSECRET_DESCRIPTION": "Opbevar din klienthemmelighed et sikkert sted, da den forsvinder, når dialogen lukkes."
+    },
+    "TABLE": {
+      "DEACTIVATE": "Deaktivér",
+      "ACTIVATE": "Aktivér",
+      "CHANGEDATE": "Senest ændret",
+      "CREATIONDATE": "Oprettet den",
+      "FILTER": {
+        "0": "Filtrér efter visningsnavn",
+        "1": "Filtrér efter brugernavn",
+        "2": "filtrér efter visningsnavn",
+        "3": "filtrér efter brugernavn",
+        "4": "filtrér efter e-mail",
+        "5": "filtrér efter visningsnavn",
+        "10": "filtrér efter organisationsnavn",
+        "12": "filtrér efter projektnavn"
+      },
+      "EMPTY": "Ingen poster"
+    },
+    "PASSWORDLESS": {
+      "SEND": "Send registreringslink",
+      "TABLETYPE": "Type",
+      "TABLESTATE": "Status",
+      "NAME": "Navn",
+      "EMPTY": "Ingen enhed angivet",
+      "TITLE": "Adgangsnøgle-godkendelse",
+      "DESCRIPTION": "Tilføj WebAuthn-baserede godkendelsesmetoder for at logge ind på Zitadel med en adgangsnøgle.",
+      "MANAGE_DESCRIPTION": "Administrér dine brugeres metoder til anden faktor.",
+      "U2F": "Tilføj metode",
+      "U2F_DIALOG_TITLE": "Bekræft autentificeringsenhed",
+      "U2F_DIALOG_DESCRIPTION": "Indtast et navn til din anvendte adgangsnøgle-login",
+      "U2F_SUCCESS": "Adgangsnøgle-godkendelse oprettet!",
+      "U2F_ERROR": "Der opstod en fejl under opsætningen!",
+      "U2F_NAME": "Navn på autentificeringsenhed",
+      "TYPE": {
+        "0": "Ingen MFA defineret",
+        "1": "OTP",
+        "2": "Adgangsnøgle"
+      },
+      "STATE": {
+        "0": "Ingen tilstand",
+        "1": "Ikke klar",
+        "2": "Klar",
+        "3": "Slettet"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Fjern adgangsnøgle",
+        "DELETE_DESCRIPTION": "Du er ved at slette en adgangsnøgle. Er du sikker?",
+        "ADD_TITLE": "Adgangsnøgle-godkendelse",
+        "ADD_DESCRIPTION": "Vælg en af de tilgængelige muligheder for at oprette en adgangsnøgle.",
+        "SEND_DESCRIPTION": "Send dig selv et registreringslink til din e-mailadresse.",
+        "SEND": "Send registreringslink",
+        "SENT": "E-mailen blev leveret. Tjek din indbakke for at fortsætte opsætningen.",
+        "QRCODE_DESCRIPTION": "Generér QR-kode til scanning med en anden enhed.",
+        "QRCODE": "Generér QR-kode",
+        "QRCODE_SCAN": "Scan denne QR-kode for at fortsætte opsætningen på din enhed.",
+        "NEW_DESCRIPTION": "Brug denne enhed til at opsætte adgangsnøgle.",
+        "NEW": "Tilføj ny"
+      }
+    },
+    "MFA": {
+      "TABLETYPE": "Type",
+      "TABLESTATE": "Status",
+      "NAME": "Navn",
+      "EMPTY": "Ingen yderligere faktorer",
+      "TITLE": "Multifaktorgodkendelse",
+      "DESCRIPTION": "Tilføj en anden faktor for at sikre optimal sikkerhed for din konto.",
+      "MANAGE_DESCRIPTION": "Administrér dine brugeres metoder til anden faktor.",
+      "ADD": "Tilføj faktor",
+      "OTP": "Autentificeringsapplikation til TOTP",
+      "OTP_DIALOG_TITLE": "Tilføj OTP",
+      "OTP_DIALOG_DESCRIPTION": "Scan QR-koden med en autentificeringsapplikation og indtast koden nedenfor for at bekræfte og aktivere TOTP-metoden.",
+      "U2F": "Adgangsnøgle",
+      "U2F_DIALOG_TITLE": "Bekræft faktor",
+      "U2F_DIALOG_DESCRIPTION": "Indtast et navn til din anvendte universelle multifaktor.",
+      "U2F_SUCCESS": "Faktor tilføjet!",
+      "U2F_ERROR": "Der opstod en fejl under opsætningen!",
+      "U2F_NAME": "Navn på autentificeringsenhed",
+      "OTPSMS": "OTP med SMS",
+      "OTPEMAIL": "OTP med e-mail",
+      "SETUPOTPSMSDESCRIPTION": "Vil du opsætte dette telefonnummer som OTP anden faktor?",
+      "OTPSMSSUCCESS": "OTP-faktor opsat.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Din telefon skal være bekræftet for at kunne bruge denne metode.",
+      "OTPEMAILSUCCESS": "OTP-faktor opsat.",
+      "TYPE": {
+        "0": "Ingen MFA defineret",
+        "1": "OTP",
+        "2": "Adgangsnøgle"
+      },
+      "STATE": {
+        "0": "Ingen tilstand",
+        "1": "Ikke klar",
+        "2": "Klar",
+        "3": "Slettet"
+      },
+      "DIALOG": {
+        "MFA_DELETE_TITLE": "Fjern anden faktor",
+        "MFA_DELETE_DESCRIPTION": "Du er ved at slette en anden faktor. Er du sikker?",
+        "ADD_MFA_TITLE": "Tilføj anden faktor",
+        "ADD_MFA_DESCRIPTION": "Vælg en af følgende muligheder."
+      }
+    },
+    "EXTERNALIDP": {
+      "TITLE": "Eksterne identitetsudbydere",
+      "DESC": "",
+      "IDPCONFIGID": "IDP-konfigurations-ID",
+      "IDPNAME": "IDP-navn",
+      "USERDISPLAYNAME": "Eksternt navn",
+      "EXTERNALUSERID": "Eksternt bruger-ID",
+      "EMPTY": "Ingen ekstern IdP fundet",
+      "DIALOG": {
+        "DELETE_TITLE": "Fjern IdP",
+        "DELETE_DESCRIPTION": "Du er ved at slette en identitetsudbyder fra en bruger. Vil du virkelig fortsætte?"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Opret en ny bruger",
+      "DESCRIPTION": "Angiv venligst de nødvendige oplysninger.",
+      "NAMEANDEMAILSECTION": "Navn og e-mail",
+      "GENDERLANGSECTION": "Køn og sprog",
+      "PHONESECTION": "Telefonnumre",
+      "PASSWORDSECTION": "Indledende adgangskode",
+      "ADDRESSANDPHONESECTION": "Telefonnummer",
+      "INITMAILDESCRIPTION": "Hvis begge muligheder er valgt, sendes der ingen e-mail til initialisering. Hvis kun én af mulighederne er valgt, sendes der en mail for at angive/bekræfte dataene.",
+      "SETUPAUTHENTICATIONLATER": "Opsæt godkendelse senere for denne bruger.",
+      "INVITATION": "Send en invitations-e-mail til opsætning af godkendelse og bekræftelse af e-mail.",
+      "INITIALPASSWORD": "Angiv en indledende adgangskode for brugeren."
+    },
+    "CODEDIALOG": {
+      "TITLE": "Bekræft telefonnummer",
+      "DESCRIPTION": "Indtast den kode, du modtog via tekstbesked, for at bekræfte dit telefonnummer.",
+      "CODE": "Kode"
+    },
+    "DATA": {
+      "STATE": "Status",
+      "STATE0": "Ukendt",
+      "STATE1": "Aktiv",
+      "STATE2": "Inaktiv",
+      "STATE3": "Slettet",
+      "STATE4": "Låst",
+      "STATE5": "Suspenderet",
+      "STATE6": "Indledende"
+    },
+    "PROFILE": {
+      "TITLE": "Profil",
+      "EMAIL": "E-mail",
+      "PHONE": "Telefonnummer",
+      "PHONE_HINT": "Brug +-symbolet efterfulgt af landekoden, eller vælg landet fra rullemenuen og indtast til sidst telefonnummeret",
+      "PHONE_VERIFIED": "Telefonnummer bekræftet",
+      "SEND_SMS": "Send bekræftelses-SMS",
+      "SEND_EMAIL": "Send e-mail",
+      "USERNAME": "Brugernavn",
+      "CHANGEUSERNAME": "redigér",
+      "CHANGEUSERNAME_TITLE": "Skift brugernavn",
+      "CHANGEUSERNAME_DESC": "Indtast det nye navn i feltet nedenfor.",
+      "FIRSTNAME": "Fornavn",
+      "LASTNAME": "Efternavn",
+      "NICKNAME": "Kælenavn",
+      "DISPLAYNAME": "Visningsnavn",
+      "PREFERREDLOGINNAME": "Foretrukne loginnavn",
+      "PREFERRED_LANGUAGE": "Sprog",
+      "GENDER": "Køn",
+      "PASSWORD": "Adgangskode",
+      "AVATAR": {
+        "UPLOADTITLE": "Upload dit profilbillede",
+        "UPLOADBTN": "Vælg fil",
+        "UPLOAD": "Upload",
+        "CURRENT": "Nuværende billede",
+        "PREVIEW": "Forhåndsvisning",
+        "DELETESUCCESS": "Slettet!",
+        "CROPPERERROR": "Der opstod en fejl under upload af din fil. Prøv et andet format og størrelse om nødvendigt."
+      },
+      "COUNTRY": "Land"
+    },
+    "MACHINE": {
+      "TITLE": "Detaljer om servicekonto",
+      "USERNAME": "Brugernavn",
+      "NAME": "Navn",
+      "DESCRIPTION": "Beskrivelse",
+      "KEYSTITLE": "Nøgler",
+      "KEYSDESC": "Definér dine nøgler og tilføj en valgfri udløbsdato.",
+      "TOKENSTITLE": "Personlige adgangstokens",
+      "TOKENSDESC": "Personlige adgangstokens fungerer som almindelige OAuth-adgangstokens.",
+      "ID": "Nøgle-ID",
+      "TYPE": "Type",
+      "EXPIRATIONDATE": "Udløbsdato",
+      "CHOOSEDATEAFTER": "Indtast en gyldig udløbsdato efter",
+      "CHOOSEEXPIRY": "Vælg en udløbsdato",
+      "CREATIONDATE": "Oprettelsesdato",
+      "KEYDETAILS": "Nøgledetaljer",
+      "ACCESSTOKENTYPE": "Adgangstokentype",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
+      "ADD": {
+        "TITLE": "Tilføj nøgle",
+        "DESCRIPTION": "Vælg din nøgletype og vælg en valgfri udløbsdato."
+      },
+      "ADDED": {
+        "TITLE": "Nøglen blev oprettet",
+        "DESCRIPTION": "Download nøglen, da den ikke vil være synlig efter lukning af denne dialog!"
+      },
+      "KEYTYPES": {
+        "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "Slet nøgle",
+          "DESCRIPTION": "Vil du slette den valgte nøgle? Dette kan ikke fortrydes."
+        }
+      }
+    },
+    "PASSWORD": {
+      "TITLE": "Adgangskode",
+      "LABEL": "En sikker adgangskode hjælper med at beskytte kontoen",
+      "DESCRIPTION": "Indtast den nye adgangskode i henhold til politikken nedenfor.",
+      "OLD": "Nuværende adgangskode",
+      "NEW": "Ny adgangskode",
+      "CONFIRM": "Bekræft ny adgangskode",
+      "NEWINITIAL": "Adgangskode",
+      "CONFIRMINITIAL": "Bekræft adgangskode",
+      "RESET": "Nulstil nuværende adgangskode",
+      "SET": "Angiv ny adgangskode",
+      "RESENDNOTIFICATION": "Send link til nulstilling af adgangskode",
+      "REQUIRED": "Nogle påkrævede felter mangler.",
+      "MINLENGTHERROR": "Skal være mindst {{value}} tegn lang.",
+      "MAXLENGTHERROR": "Skal være mindre end {{value}} tegn."
+    },
+    "ID": "Bruger-ID",
+    "EMAIL": "E-mail",
+    "PHONE": "Telefonnummer",
+    "PHONEEMPTY": "Intet telefonnummer defineret",
+    "PHONEVERIFIED": "Telefonnummer bekræftet.",
+    "EMAILVERIFIED": "E-mail bekræftet",
+    "NOTVERIFIED": "ikke bekræftet",
+    "PREFERRED_LOGINNAME": "Foretrukne loginnavn",
+    "ISINITIAL": "Brugeren er endnu ikke aktiv.",
+    "LOGINMETHODS": {
+      "TITLE": "Kontaktoplysninger",
+      "DESCRIPTION": "De angivne oplysninger bruges til at sende dig vigtige oplysninger, som f.eks. e-mails til nulstilling af adgangskode.",
+      "EMAIL": {
+        "TITLE": "E-mail",
+        "VALID": "valideret",
+        "ISVERIFIED": "E-mail bekræftet",
+        "ISVERIFIEDDESC": "Hvis e-mailen er angivet som bekræftet, foretages der ingen anmodning om e-mailbekræftelse.",
+        "RESEND": "Send bekræftelses-e-mail igen",
+        "EDITTITLE": "Skift e-mail",
+        "EDITDESC": "Indtast den nye e-mail i feltet nedenfor."
+      },
+      "PHONE": {
+        "TITLE": "Telefon",
+        "VALID": "valideret",
+        "RESEND": "Send bekræftelses-tekstbesked igen",
+        "EDITTITLE": "Skift nummer",
+        "EDITVALUE": "Telefonnummer",
+        "EDITDESC": "Indtast det nye telefonnummer i feltet nedenfor.",
+        "DELETETITLE": "Slet telefonnummer",
+        "DELETEDESC": "Vil du virkelig slette telefonnummeret",
+        "OTPSMSREMOVALWARNING": "Denne konto bruger dette telefonnummer som anden faktor. Du vil ikke kunne bruge det, efter du fortsætter."
+      },
+      "RESENDCODE": "Send kode igen",
+      "ENTERCODE": "Bekræft",
+      "ENTERCODE_DESC": "Bekræft kode"
+    },
+    "GRANTS": {
+      "TITLE": "Rolletildelinger",
+      "DESCRIPTION": "Giv denne bruger adgang til bestemte projekter",
+      "CREATE": {
+        "TITLE": "Opret rolletildeling",
+        "DESCRIPTION": "Søg efter organisationen, projektet og de tilsvarende projektroller."
+      },
+      "PROJECTNAME": "Projektnavn",
+      "PROJECT-OWNED": "Projekt",
+      "PROJECT-GRANTED": "Tildelt projekt",
+      "FILTER": {
+        "0": "filtrér efter bruger",
+        "1": "filtrér efter domæne",
+        "2": "filtrér efter projektnavn",
+        "3": "filtrér efter rollenavn"
+      }
+    },
+    "STATE": {
+      "0": "Ukendt",
+      "1": "Aktiv",
+      "2": "Inaktiv",
+      "3": "Slettet",
+      "4": "Låst",
+      "5": "Suspenderet",
+      "6": "Indledende"
+    },
+    "STATEV2": {
+      "0": "Ukendt",
+      "1": "Aktiv",
+      "2": "Inaktiv",
+      "3": "Slettet",
+      "4": "Låst",
+      "5": "Indledende"
+    },
+    "SEARCH": {
+      "ADDITIONAL": "Loginnavn (nuværende organisation)",
+      "ADDITIONAL-EXTERNAL": "Loginnavn (ekstern organisation)"
+    },
+    "TARGET": {
+      "SELF": "Hvis du vil tildele en rolle til en bruger fra en anden organisation",
+      "EXTERNAL": "For at tildele en rolle til en bruger fra din organisation",
+      "CLICKHERE": "klik her"
+    },
+    "SIGNEDOUT": "Du er logget ud. Klik på knappen \"Log ind\" for at logge ind igen.",
+    "SIGNEDOUT_BTN": "Log ind",
+    "EDITACCOUNT": "Redigér konto",
+    "ADDACCOUNT": "Log ind med en anden konto",
+    "RESENDINITIALEMAIL": "Send aktiveringsmail igen",
+    "RESENDEMAILNOTIFICATION": "Send e-mailnotifikation igen",
+    "TOAST": {
+      "CREATED": "Bruger oprettet.",
+      "SAVED": "Profil gemt.",
+      "USERNAMECHANGED": "Brugernavn ændret.",
+      "EMAILSAVED": "E-mail gemt.",
+      "INITEMAILSENT": "Initialiseringsmail sendt.",
+      "PHONESAVED": "Telefon gemt.",
+      "PHONEREMOVED": "Telefon er blevet fjernet.",
+      "PHONEVERIFIED": "Telefon bekræftet.",
+      "PHONEVERIFICATIONSENT": "Bekræftelseskode til telefon sendt.",
+      "EMAILVERIFICATIONSENT": "Bekræftelseskode til e-mail sendt.",
+      "OTPREMOVED": "OTP fjernet.",
+      "U2FREMOVED": "Faktor fjernet.",
+      "PASSWORDLESSREMOVED": "Adgangsnøgle fjernet.",
+      "INITIALPASSWORDSET": "Indledende adgangskode angivet.",
+      "PASSWORDNOTIFICATIONSENT": "Notifikation om ændring af adgangskode sendt.",
+      "PASSWORDCHANGED": "Adgangskode ændret.",
+      "REACTIVATED": "Bruger genaktiveret.",
+      "DEACTIVATED": "Bruger deaktiveret.",
+      "SELECTEDREACTIVATED": "Valgte brugere genaktiveret.",
+      "SELECTEDDEACTIVATED": "Valgte brugere deaktiveret.",
+      "SELECTEDKEYSDELETED": "Valgte nøgler slettet.",
+      "KEYADDED": "Nøgle tilføjet!",
+      "MACHINEADDED": "Servicekonto oprettet!",
+      "DELETED": "Bruger slettet!",
+      "UNLOCKED": "Bruger låst op!",
+      "PASSWORDLESSREGISTRATIONSENT": "Registreringslink sendt.",
+      "SECRETGENERATED": "Hemmelighed genereret!",
+      "SECRETREMOVED": "Hemmelighed fjernet!"
+    },
+    "MEMBERSHIPS": {
+      "TITLE": "Zitadel-administratorroller",
+      "DESCRIPTION": "Dette er alle brugerens administratorroller. Du kan også ændre dem på detaljesider for organisation, projekt eller IAM.",
+      "ORGCONTEXT": "Du ser alle organisationer og projekter, der er relateret til den aktuelt valgte organisation.",
+      "USERCONTEXT": "Du ser alle organisationer og projekter, som du er autoriseret til. Inklusive andre organisationer.",
+      "CREATIONDATE": "Oprettelsesdato",
+      "CHANGEDATE": "Senest ændret",
+      "DISPLAYNAME": "Visningsnavn",
+      "REMOVE": "Fjern",
+      "TYPE": "Type",
+      "ORGID": "Organisations-ID",
+      "UPDATED": "Administratorrollen blev opdateret.",
+      "NOPERMISSIONTOEDIT": "Du mangler de nødvendige tilladelser til at redigere roller!",
+      "TYPES": {
+        "UNKNOWN": "Ukendt",
+        "ORG": "Organisation",
+        "PROJECT": "Projekt",
+        "GRANTEDPROJECT": "Tildelt projekt"
+      }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKEN": "Token",
+      "ADD": {
+        "TITLE": "Generér nyt personligt adgangstoken",
+        "DESCRIPTION": "Definér en brugerdefineret udløbsdato for tokenet.",
+        "CHOOSEEXPIRY": "Vælg en udløbsdato",
+        "CHOOSEDATEAFTER": "Indtast en gyldig udløbsdato efter"
+      },
+      "ADDED": {
+        "TITLE": "Personligt adgangstoken",
+        "DESCRIPTION": "Sørg for at kopiere dit personlige adgangstoken. Du vil ikke kunne se det igen!"
+      },
+      "DELETE": {
+        "TITLE": "Slet token",
+        "DESCRIPTION": "Du er ved at slette det personlige adgangstoken. Er du sikker?"
+      },
+      "DELETED": "Token slettet."
+    }
+  },
+  "METADATA": {
+    "TITLE": "Metadata",
+    "KEY": "Nøgle",
+    "VALUE": "Værdi",
+    "ADD": "Ny post",
+    "SAVE": "Gem",
+    "EMPTY": "Ingen metadata",
+    "SETSUCCESS": "Element gemt",
+    "REMOVESUCCESS": "Element slettet"
+  },
+  "FLOWS": {
+    "ID": "ID",
+    "NAME": "Navn",
+    "STATE": "Tilstand",
+    "STATES": {
+      "0": "ingen status",
+      "1": "inaktiv",
+      "2": "aktiv"
+    },
+    "ADDTRIGGER": "Tilføj trigger",
+    "FLOWCHANGED": "Flowet blev ændret",
+    "FLOWCLEARED": "Flowet blev nulstillet",
+    "TIMEOUT": "Timeout",
+    "TIMEOUTINSEC": "Timeout i sekunder",
+    "ALLOWEDTOFAIL": "Må fejle",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Advarsel",
+      "DESCRIPTION": "Hvis du deaktiverer denne indstilling, kan det medføre, at brugere i din organisation ikke kan logge ind. Derudover vil du ikke længere kunne tilgå administrationskonsollen for at deaktivere handlingen. Vi anbefaler at oprette en administratorbruger i en separat organisation eller først at teste scripts i et udviklingsmiljø eller en udviklingsorganisation."
+    },
+    "SCRIPT": "Script",
+    "FLOWTYPE": "Flowtype",
+    "TRIGGERTYPE": "Triggertype",
+    "ACTIONS": "Handlinger",
+    "ACTIONSMAX": "Baseret på dit niveau har du et begrænset antal handlinger til rådighed ({{value}}). Sørg for at deaktivere dem, du ikke har brug for, eller overvej at opgradere dit niveau.",
+    "DIALOG": {
+      "ADD": {
+        "TITLE": "Opret en handling"
+      },
+      "UPDATE": {
+        "TITLE": "Opdater handling"
+      },
+      "DELETEACTION": {
+        "TITLE": "Slet handling?",
+        "DESCRIPTION": "Du er ved at slette en handling. Dette kan ikke fortrydes. Er du sikker?",
+        "DELETE_SUCCESS": "Handling slettet."
+      },
+      "CLEAR": {
+        "TITLE": "Ryd flow?",
+        "DESCRIPTION": "Du er ved at nulstille flowet sammen med dets triggere og handlinger. Denne ændring kan ikke gendannes. Er du sikker?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Slet valgte handlinger?",
+        "DESCRIPTION": "Er du sikker på, at du vil slette de valgte handlinger fra flowet?"
+      },
+      "ABOUTNAME": "Navnet på handlingen og navnet på funktionen i JavaScript skal være det samme"
+    },
+    "TOAST": {
+      "ACTIONSSET": "Handlinger angivet",
+      "ACTIONREACTIVATED": "Handlinger genaktiveret",
+      "ACTIONDEACTIVATED": "Handlinger deaktiveret"
+    }
+  },
+  "IAM": {
+    "POLICIES": {
+      "TITLE": "Systempolitikker og adgangsindstillinger",
+      "DESCRIPTION": "Administrér dine globale politikker og indstillinger for administrationsadgang."
+    },
+    "EVENTSTORE": {
+      "TITLE": "Administration af IAM-lager",
+      "DESCRIPTION": "Administrér dine Zitadel-visninger og fejlede hændelser."
+    },
+    "MEMBER": {
+      "TITLE": "Administratorer",
+      "DESCRIPTION": "Disse administratorer har tilladelse til at foretage ændringer i din instans."
+    },
+    "PAGES": {
+      "STATE": "Status",
+      "DOMAINLIST": "Brugerdefinerede domæner"
+    },
+    "STATE": {
+      "0": "Uspecificeret",
+      "1": "Opretter",
+      "2": "Kører",
+      "3": "Stopper",
+      "4": "Stoppet"
+    },
+    "VIEWS": {
+      "VIEWNAME": "Navn",
+      "DATABASE": "Database",
+      "SEQUENCE": "Sekvens",
+      "EVENTTIMESTAMP": "Tidsstempel",
+      "LASTSPOOL": "Vellykket spool",
+      "ACTIONS": "Handlinger",
+      "CLEAR": "Ryd",
+      "CLEARED": "Visningen blev ryddet!",
+      "DIALOG": {
+        "VIEW_CLEAR_TITLE": "Ryd visning",
+        "VIEW_CLEAR_DESCRIPTION": "Du er ved at rydde en visning. Rydning af en visning starter en proces, hvorunder data muligvis ikke er tilgængelige for slutbrugere. Er du virkelig sikker?"
+      }
+    },
+    "FAILEDEVENTS": {
+      "VIEWNAME": "Navn",
+      "DATABASE": "Database",
+      "FAILEDSEQUENCE": "Fejlet sekvens",
+      "FAILURECOUNT": "Antal fejl",
+      "LASTFAILED": "Senest fejlet den",
+      "ERRORMESSAGE": "Fejlmeddelelse",
+      "ACTIONS": "Handlinger",
+      "DELETE": "Fjern",
+      "DELETESUCCESS": "Fejlede hændelser fjernet."
+    },
+    "EVENTS": {
+      "EDITOR": "Redaktør",
+      "EDITORID": "Redaktør-ID",
+      "AGGREGATE": "Aggregat",
+      "AGGREGATEID": "Aggregat-ID",
+      "AGGREGATETYPE": "Aggregattype",
+      "RESOURCEOWNER": "Ressourceejer",
+      "SEQUENCE": "Sekvens",
+      "CREATIONDATE": "Oprettet den",
+      "TYPE": "Type",
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "BTN": "Filtrér",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrér efter redaktør"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Aggregattype",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrér efter aggregat"
+        },
+        "TYPE": {
+          "TYPELABEL": "Type",
+          "CHECKBOX": "Filtrér efter type"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filtrér efter ressourceejer"
+        },
+        "SEQUENCE": {
+          "LABEL": "Sekvens",
+          "CHECKBOX": "Filtrér efter sekvens"
+        },
+        "SORT": "Sortér",
+        "ASC": "Stigende",
+        "DESC": "Faldende",
+        "CREATIONDATE": {
+          "RADIO_FROM": "Fra",
+          "RADIO_RANGE": "Interval",
+          "LABEL_SINCE": "Siden",
+          "LABEL_UNTIL": "Indtil"
+        },
+        "OTHER": "anden",
+        "OTHERS": "andre"
+      },
+      "DIALOG": {
+        "TITLE": "Hændelsesdetalje"
+      }
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Administrator fjernet.",
+      "MEMBERSADDED": "Administratorer tilføjet.",
+      "MEMBERADDED": "Administrator tilføjet.",
+      "MEMBERCHANGED": "Administrator ændret.",
+      "ROLEREMOVED": "Rolle fjernet.",
+      "ROLECHANGED": "Rolle ændret.",
+      "REACTIVATED": "Genaktiveret",
+      "DEACTIVATED": "Deaktiveret"
+    }
+  },
+  "ORG": {
+    "PAGES": {
+      "NAME": "Navn",
+      "ID": "Organisations-ID",
+      "CREATIONDATE": "Oprettelsesdato",
+      "DATECHANGED": "Ændret",
+      "FILTER": "Filtrér",
+      "FILTERPLACEHOLDER": "Filtrér efter navnet",
+      "LIST": "Organisationer",
+      "LISTDESCRIPTION": "Vælg en organisation.",
+      "ACTIVE": "Aktiv",
+      "CREATE": "Opret organisation",
+      "DEACTIVATE": "Deaktivér organisation",
+      "REACTIVATE": "Genaktivér organisation",
+      "NOPERMISSION": "Du har ikke tilladelse til at tilgå organisationsindstillinger.",
+      "USERSELFACCOUNT": "Brug din personlige konto som organisationsejer",
+      "ORGDETAIL_TITLE": "Indtast navn og domæne for din nye organisation.",
+      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Indtast navnet på din nye organisation.",
+      "ORGDETAILUSER_TITLE": "Konfigurér organisationsejer",
+      "DELETE": "Slet organisation",
+      "DEFAULTLABEL": "Standard",
+      "SETASDEFAULT": "Indstil som standardorganisation",
+      "DEFAULTORGSET": "Standardorganisation ændret",
+      "RENAME": {
+        "ACTION": "Omdøb",
+        "TITLE": "Omdøb organisation",
+        "DESCRIPTION": "Indtast det nye navn for din organisation",
+        "BTN": "Omdøb"
+      },
+      "ORGDOMAIN": {
+        "TITLE": "Bekræft ejerskab af {{value}}",
+        "VERIFICATION": "Vi tilbyder dig to metoder til manuelt at validere dit domæne:",
+        "VERIFICATION_HTML": "- HTTP. Host en midlertidig verifikationsfil på din hjemmeside",
+        "VERIFICATION_DNS": "- DNS. Opret en TXT-record DNS-post",
+        "VERIFICATION_DNS_DESC": "Hvis du administrerer {{ value }} og har adgang til dine DNS-poster, kan du oprette en ny TXT-record med følgende værdier:",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Brug denne kode til værdien af TXT-recorden:",
+        "VERIFICATION_HTTP_DESC": "Hvis du har adgang til din hjemmesidehosting, skal du blot downloade verifikationsfilen og uploade den til den angivne URL",
+        "VERIFICATION_HTTP_URL_LABEL": "Forventet URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Verifikationsfil:",
+        "VERIFICATION_SKIP": "Du kan springe verifikationen over for nu og fortsætte med at oprette din organisation, men for at bruge dit domæne skal dette trin gennemføres!",
+        "VERIFICATION_VALIDATION_DESC": "Slet ikke verifikationskoden, da Zitadel fra tid til anden vil genkontrollere ejerskabet af dit domæne.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Anmod om nyt token",
+        "VERIFICATION_VALIDATION_ONGOING": "{{ value }}-metoden er valgt til at bekræfte dit organisationsdomæne. Klik på knappen for at udløse en verifikationskontrol eller nulstille verifikationsprocessen.",
+        "VERIFICATION_SUCCESSFUL": "Domæne bekræftet!",
+        "RESETMETHOD": "Nulstil verifikationsmetode"
+      },
+      "DOWNLOAD_FILE": "Download fil",
+      "SELECTORGTOOLTIP": "Vælg denne organisation.",
+      "PRIMARYDOMAIN": "Organisationsdomæne",
+      "STATE": "Tilstand",
+      "USEPASSWORD": "Angiv indledende adgangskode",
+      "USEPASSWORDDESC": "Brugeren behøver ikke at angive adgangskoden under initialiseringen."
+    },
+    "LIST": {
+      "TITLE": "Organisationer",
+      "DESCRIPTION": "Dette er organisationerne på din instans"
+    },
+    "DOMAINS": {
+      "NEW": "Tilføj domæne",
+      "TITLE": "Organisationsdomæner",
+      "DESCRIPTION": "Konfigurér dine organisationsdomæner. Dette domæne kan bruges til domæneopdagelse og som suffiks for brugernavne.",
+      "SETPRIMARY": "Indstil som organisationsdomæne",
+      "DELETE": {
+        "TITLE": "Slet domæne",
+        "DESCRIPTION": "Du er ved at slette et af dine domæner."
+      },
+      "ADD": {
+        "TITLE": "Tilføj domæne",
+        "DESCRIPTION": "Du er ved at tilføje et domæne til din organisation. Efter en vellykket proces kan domænet bruges til domæneopdagelse og som suffiks for dine brugere."
+      }
+    },
+    "STATE": {
+      "0": "Ikke defineret",
+      "1": "Aktiv",
+      "2": "Deaktiveret"
+    },
+    "MEMBER": {
+      "TITLE": "Organisationsadministratorer",
+      "DESCRIPTION": "Definér de brugere, der kan ændre din organisations indstillinger."
+    },
+    "TOAST": {
+      "UPDATED": "Organisation opdateret.",
+      "DEACTIVATED": "Organisation deaktiveret.",
+      "REACTIVATED": "Organisation genaktiveret.",
+      "DOMAINADDED": "Domæne tilføjet.",
+      "DOMAINREMOVED": "Domæne fjernet.",
+      "MEMBERADDED": "Administrator tilføjet.",
+      "MEMBERREMOVED": "Administrator fjernet.",
+      "MEMBERCHANGED": "Administrator ændret.",
+      "SETPRIMARY": "Organisationsdomæne indstillet.",
+      "DELETED": "Organisation slettet",
+      "DEFAULTORGNOTFOUND": "Standardorganisationen blev ikke fundet",
+      "ORG_WAS_DELETED": "Organisationen er blevet slettet."
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Deaktivér organisation",
+        "DESCRIPTION": "Du er ved at deaktivere din organisation. Brugere vil ikke kunne logge ind bagefter. Er du sikker på, at du vil fortsætte?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Genaktivér organisation",
+        "DESCRIPTION": "Du er ved at genaktivere din organisation. Brugere vil kunne logge ind igen. Er du sikker på, at du vil fortsætte?"
+      },
+      "DELETE": {
+        "TITLE": "Slet organisation",
+        "DESCRIPTION": "Du er ved at slette din organisation. Dette starter en proces, hvor alle organisationsrelaterede data slettes. Du kan indtil videre ikke fortryde denne handling.",
+        "TYPENAME": "Skriv '{{value}}' for at slette din organisation.",
+        "ORGNAME": "Navn",
+        "BTN": "Slet"
+      }
+    }
+  },
+  "SETTINGS": {
+    "LIST": {
+      "ORGS": "Organisationer",
+      "FEATURESETTINGS": "Funktioner",
+      "LANGUAGES": "Sprog",
+      "LOGIN": "Login-adfærd og sikkerhed",
+      "LOCKOUT": "Udelukkelse",
+      "AGE": "Udløb af adgangskode",
+      "COMPLEXITY": "Adgangskodekompleksitet",
+      "NOTIFICATIONS": "Notifikationer",
+      "SMTP_PROVIDER": "SMTP-udbyder",
+      "SMS_PROVIDER": "SMS/Telefon-udbyder",
+      "NOTIFICATIONS_DESC": "SMTP- og SMS-indstillinger",
+      "MESSAGETEXTS": "Beskedtekster",
+      "IDP": "Identitetsudbydere",
+      "VERIFIED_DOMAINS": "Organisationsdomæner",
+      "DOMAIN": "Domæneindstillinger",
+      "LOGINTEXTS": "Tekster til login-grænsefladen",
+      "BRANDING": "Branding",
+      "PRIVACYPOLICY": "Eksterne links",
+      "OIDC": "OIDC-tokenlevetid og -udløb",
+      "WEB_KEYS": "OIDC Web Keys",
+      "SECRETS": "Hemmelighedsgenerator",
+      "SECURITY": "Sikkerhedsindstillinger",
+      "EVENTS": "Hændelser",
+      "FAILEDEVENTS": "Fejlede hændelser",
+      "VIEWS": "Visninger",
+      "ACTIONS": "Handlinger",
+      "TARGETS": "Mål"
+    },
+    "GROUPS": {
+      "GENERAL": "Generelle oplysninger",
+      "NOTIFICATIONS": "Notifikationer",
+      "LOGIN": "Login og adgang",
+      "DOMAIN": "Domæne",
+      "TEXTS": "Tekster og sprog",
+      "APPEARANCE": "Udseende",
+      "OTHER": "Andet",
+      "STORAGE": "Lager",
+      "ACTIONS": "Handlinger"
+    },
+    "BETA": "BETA"
+  },
+  "SETTING": {
+    "LANGUAGES": {
+      "DEFAULT": "Standardsprog",
+      "ALLOWED": "Tilladte sprog",
+      "NOT_ALLOWED": "Ikke-tilladte sprog",
+      "ALLOW_ALL": "Tillad alle",
+      "DISALLOW_ALL": "Tillad ingen",
+      "SETASDEFAULT": "Indstil som standardsprog",
+      "DEFAULT_SAVED": "Standardsprog gemt",
+      "ALLOWED_SAVED": "Tilladte sprog gemt",
+      "OPTIONS": {
+        "da": "Dansk",
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands",
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية"
+      }
+    },
+    "SMTP": {
+      "TITLE": "SMTP-udbyder",
+      "DESCRIPTION": "Beskrivelse",
+      "SENDERADDRESS": "Afsenderens e-mailadresse",
+      "SENDERNAME": "Afsendernavn",
+      "REPLYTOADDRESS": "Svar-til-adresse",
+      "HOSTANDPORT": "Host og port",
+      "USER": "Bruger",
+      "PASSWORD": "Adgangskode",
+      "SETPASSWORD": "Angiv SMTP-adgangskode",
+      "PASSWORDSET": "SMTP-adgangskode blev angivet.",
+      "TLS": "Transport Layer Security (TLS)",
+      "SAVED": "Gemt!",
+      "NOCHANGES": "Ingen ændringer!",
+      "REQUIREDWARN": "For at sende notifikationer fra dit domæne skal du indtaste dine SMTP-data."
+    },
+    "SMS": {
+      "PROVIDERS": "Udbydere",
+      "PROVIDER": "SMS-udbyder",
+      "ADDPROVIDER": "Tilføj SMS-udbyder",
+      "ADDPROVIDERDESCRIPTION": "Vælg en af de tilgængelige udbydere og indtast de påkrævede data.",
+      "REMOVEPROVIDER": "Fjern udbyder",
+      "REMOVEPROVIDER_DESC": "Du er ved at slette en udbyder. Vil du fortsætte?",
+      "SMSPROVIDERSTATE": {
+        "0": "Uspecificeret",
+        "1": "Aktiv",
+        "2": "Inaktiv"
+      },
+      "ACTIVATED": "Udbyder aktiveret.",
+      "DEACTIVATED": "Udbyder deaktiveret.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Token",
+        "SENDERNUMBER": "Afsendernummer",
+        "VERIFYSERVICESID": "Verification Service Sid",
+        "VERIFYSERVICESID_DESCRIPTION": "Angivelse af en Verification Service Sid gør det muligt at bruge Twilio Verify Service i stedet for Messages Service til verifikation af telefonnumre og OTP-SMS",
+        "ADDED": "Twilio tilføjet.",
+        "UPDATED": "Twilio opdateret.",
+        "REMOVED": "Twilio fjernet",
+        "CHANGETOKEN": "Skift token",
+        "SETTOKEN": "Angiv token",
+        "TOKENSET": "Token angivet."
+      }
+    },
+    "SECRETS": {
+      "TYPES": "Hemmelighedstyper",
+      "TYPE": {
+        "1": "Initialiseringsmail",
+        "2": "E-mailbekræftelse",
+        "3": "Telefonbekræftelse",
+        "4": "Nulstilling af adgangskode",
+        "5": "Initialisering af adgangsnøgle",
+        "6": "Applikationshemmelighed",
+        "7": "OTP - SMS",
+        "8": "OTP - E-mail"
+      },
+      "EXPIRY": "Udløb (i minutter)",
+      "INCLUDEDIGITS": "Inkludér tal",
+      "INCLUDESYMBOLS": "Inkludér symboler",
+      "INCLUDELOWERLETTERS": "Inkludér små bogstaver",
+      "INCLUDEUPPERLETTERS": "Inkludér store bogstaver",
+      "LENGTH": "Længde",
+      "UPDATED": "Indstillinger opdateret."
+    },
+    "SECURITY": {
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Denne indstilling sætter CSP til at tillade framing fra et sæt af tilladte domæner. Bemærk, at du ved at aktivere brugen af iFrames løber risikoen for at tillade clickjacking.",
+      "IFRAMEENABLED": "Tillad iFrame",
+      "ALLOWEDORIGINS": "Tilladte URL'er",
+      "IMPERSONATIONTITLE": "Impersonering",
+      "IMPERSONATIONENABLED": "Tillad impersonering",
+      "IMPERSONATIONDESCRIPTION": "Denne indstilling tillader principielt at bruge impersonering. Bemærk, at impersonereren også skal have de relevante `*_IMPERSONATOR`-roller tildelt."
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "Login-standardorganisation",
+      "LOGINDEFAULTORG_DESCRIPTION": "Login-grænsefladen vil bruge indstillingerne fra standardorganisationen (og ikke fra instansen), hvis der ikke er angivet en organisationskontekst",
+      "USERSCHEMA": "Brugerskema",
+      "USERSCHEMA_DESCRIPTION": "Brugerskemaer gør det muligt at administrere brugeres dataskemaer. Hvis flaget er aktiveret, vil du kunne bruge den nye API og dens funktioner.",
+      "ACTIONS": "Handlinger",
+      "ACTIONS_DESCRIPTION": "Actions v2 gør det muligt at administrere dataudførelser og mål. Hvis flaget er aktiveret, vil du kunne bruge den nye API og dens funktioner.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Session Termination",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Hvis flaget er aktiveret, vil du kunne afslutte en enkelt session fra login-grænsefladen ved at angive et id_token med et `sid`-claim som id_token_hint på end_session-endpointet. Bemærk, at alle sessioner fra den samme user agent (browser) i øjeblikket afsluttes i login-grænsefladen. Sessioner, der administreres via Session API, tillader allerede afslutning af enkelte sessioner.",
+      "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Hvis flaget er aktiveret, vil OIDC-parentfejlen blive logget i konsollen.",
+      "PERMISSIONCHECKV2": "Permission Check V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Hvis flaget er aktiveret, vil du kunne bruge den nye API og dens funktioner.",
+      "STATES": {
+        "INHERITED": "Nedarv",
+        "ENABLED": "Aktiveret",
+        "DISABLED": "Deaktiveret"
+      },
+      "INHERITED_DESCRIPTION": "Dette sætter værdien til systemets standardværdi.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Aktiveret\" er nedarvet",
+        "DISABLED": "\"Deaktiveret\" er nedarvet"
+      },
+      "RESET": "Sæt alle til nedarv",
+      "CONSOLEUSEV2USERAPI": "Brug V2 API i administrationskonsollen til oprettelse af brugere",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Når dette flag er aktiveret, bruger administrationskonsollen V2 User API til at oprette nye brugere. Med V2 API'en starter nyoprettede brugere uden en indledende tilstand.",
+      "LOGINV2": "Login V2",
+      "LOGINV2_DESCRIPTION": "Aktivering af dette aktiverer den nye TypeScript-baserede login-grænseflade med forbedret sikkerhed, ydeevne og tilpasning.",
+      "LOGINV2_BASEURI": "Base-URI",
+      "ENABLERELATIONALTABLES": "Relationelle tabeller",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktivér dette for at bruge relationelle tabeller i stedet for projektioner til lagring af data. I øjeblikket gør denne kontakt ingenting."
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "Nulstil indstilling",
+        "DEFAULTDESCRIPTION": "Du er ved at nulstille dine indstillinger til din instans' standardindstillinger. Er du sikker på, at du vil fortsætte?",
+        "LOGINPOLICY_DESCRIPTION": "Advarsel: Hvis du fortsætter, vil indstillingerne for identitetsudbydere også blive nulstillet til instansindstillingen."
+      }
+    }
+  },
+  "POLICY": {
+    "APPLIEDTO": "Anvendt på",
+    "PWD_COMPLEXITY": {
+      "TITLE": "Adgangskodekompleksitet",
+      "DESCRIPTION": "Sikrer, at alle angivne adgangskoder svarer til et bestemt mønster",
+      "SYMBOLANDNUMBERERROR": "Skal bestå af et ciffer og et symbol/tegnsætningstegn.",
+      "SYMBOLERROR": "Skal indeholde et symbol/tegnsætningstegn.",
+      "NUMBERERROR": "Skal indeholde et ciffer.",
+      "PATTERNERROR": "Adgangskoden opfylder ikke det påkrævede mønster."
+    },
+    "NOTIFICATION": {
+      "TITLE": "Notifikation",
+      "DESCRIPTION": "Bestemmer, ved hvilke ændringer der sendes notifikationer.",
+      "PASSWORDCHANGE": "Adgangskode ændret"
+    },
+    "PRIVATELABELING": {
+      "DESCRIPTION": "Giv login din personlige stil og tilpas dets adfærd.",
+      "PREVIEW_DESCRIPTION": "Ændringer af politikken vil automatisk blive udrullet til forhåndsvisningsmiljøet.",
+      "BTN": "Vælg fil",
+      "ACTIVATEPREVIEW": "Anvend indstillinger",
+      "DARK": "Mørk tilstand",
+      "LIGHT": "Lys tilstand",
+      "CHANGEVIEW": "Skift visning",
+      "ACTIVATED": "Politikændringer er nu LIVE",
+      "THEME": "Tema",
+      "COLORS": "Farver",
+      "FONT": "Skrifttype",
+      "ADVANCEDBEHAVIOR": "Avanceret adfærd",
+      "DROP": "Slip billede her eller",
+      "RELEASE": "Slip",
+      "DROPFONT": "Slip skrifttypefil her",
+      "RELEASEFONT": "Slip",
+      "USEOFLOGO": "Dit logo vil blive brugt i login samt i e-mails, mens ikonet bruges til mindre UI-elementer som f.eks. i organisationsskifteren i administrationskonsollen",
+      "MAXSIZE": "Den maksimale størrelse er begrænset til 524 kB",
+      "EMAILNOSVG": "SVG-filformatet understøttes ikke i e-mails. Upload derfor dit logo i PNG eller et andet understøttet format.",
+      "MAXSIZEEXCEEDED": "Maksimal størrelse på 524 kB overskredet.",
+      "NOSVGSUPPORTED": "SVG understøttes ikke!",
+      "FONTINLOGINONLY": "Skrifttypen vises i øjeblikket kun i login-grænsefladen.",
+      "BACKGROUNDCOLOR": "Baggrundsfarve",
+      "PRIMARYCOLOR": "Primær farve",
+      "WARNCOLOR": "Advarselsfarve",
+      "FONTCOLOR": "Skriftfarve",
+      "VIEWS": {
+        "PREVIEW": "Forhåndsvisning",
+        "CURRENT": "Nuværende indstillinger"
+      },
+      "PREVIEW": {
+        "TITLE": "Login",
+        "SECOND": "log ind med din Zitadel-konto.",
+        "ERROR": "Bruger kunne ikke findes!",
+        "PRIMARYBUTTON": "næste",
+        "SECONDARYBUTTON": "registrér"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Automatisk tilstand",
+        "THEME_MODE_LIGHT": "Kun lys tilstand",
+        "THEME_MODE_DARK": "Kun mørk tilstand"
+      }
+    },
+    "PWD_AGE": {
+      "TITLE": "Udløb af adgangskode",
+      "DESCRIPTION": "Du kan angive en politik for udløb af adgangskoder. Denne politik vil tvinge brugeren til at ændre adgangskoden ved næste login efter udløbet. Der er ingen automatiske advarsler og notifikationer."
+    },
+    "PWD_LOCKOUT": {
+      "TITLE": "Udelukkelsespolitik",
+      "DESCRIPTION": "Angiv et maksimalt antal forsøg på adgangskode, hvorefter konti blokeres."
+    },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "Branding",
+      "BTN": "Vælg fil",
+      "DESCRIPTION": "Tilpas udseendet af login",
+      "ACTIVATEPREVIEW": "Aktivér indstillinger"
+    },
+    "LOGIN_POLICY": {
+      "TITLE": "Login-indstillinger",
+      "DESCRIPTION": "Definér, hvordan brugere kan godkendes, og konfigurér identitetsudbydere",
+      "DESCRIPTIONCREATEADMIN": "Brugere kan vælge fra de tilgængelige identitetsudbydere nedenfor.",
+      "DESCRIPTIONCREATEMGMT": "Brugere kan vælge fra de tilgængelige identitetsudbydere nedenfor. Bemærk: Du kan bruge systemindstillede udbydere såvel som udbydere, der kun er indstillet for din organisation.",
+      "LIFETIME_INVALID": "Formularen indeholder ugyldig(e) værdi(er).",
+      "SAVED": "Gemt!",
+      "PROVIDER_ADDED": "Identitetsudbyder aktiveret."
+    },
+    "PRIVACY_POLICY": {
+      "DESCRIPTION": "Angiv links til din privatlivspolitik og dine servicevilkår",
+      "TOSLINK": "Link til servicevilkår",
+      "POLICYLINK": "Link til privatlivspolitik",
+      "HELPLINK": "Link til hjælp",
+      "SUPPORTEMAIL": "Support-e-mail",
+      "DOCSLINK": "Dokumentationslink (administrationskonsol)",
+      "CUSTOMLINK": "Brugerdefineret link (administrationskonsol)",
+      "CUSTOMLINKTEXT": "Brugerdefineret linktekst (administrationskonsol)",
+      "SAVED": "Gemt!",
+      "RESET_TITLE": "Gendan standardværdier",
+      "RESET_DESCRIPTION": "Du er ved at gendanne standardlinkene for servicevilkår og privatlivspolitik. Vil du virkelig fortsætte?"
+    },
+    "LOGIN_TEXTS": {
+      "TITLE": "Tekster til login-grænsefladen",
+      "DESCRIPTION": "Definér dine tekster til login-grænsefladerne. Hvis tekster er tomme, vil standardværdien, der vises som pladsholder, blive brugt.",
+      "DESCRIPTION_SHORT": "Definér dine tekster til login-grænsefladerne.",
+      "NEWERVERSIONEXISTS": "Der findes en nyere version",
+      "CURRENTDATE": "Nuværende indstillinger",
+      "CHANGEDATE": "Nyere version fra",
+      "KEYNAME": "Login-skærm / grænseflade",
+      "RESET_TITLE": "Gendan standardværdier",
+      "RESET_DESCRIPTION": "Du er ved at gendanne alle standardværdier. Alle ændringer, du har foretaget, vil blive slettet permanent. Vil du virkelig fortsætte?",
+      "UNSAVED_TITLE": "Fortsæt uden at gemme?",
+      "UNSAVED_DESCRIPTION": "Du har foretaget ændringer uden at gemme. Vil du gemme nu?",
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Du valgte et sprog, der ikke er tilladt. Du kan fortsætte med at redigere teksterne. Men hvis du vil have dine brugere til faktisk at kunne bruge dette sprog, så ændr din instans' begrænsninger.",
+      "LANGUAGES_NOT_ALLOWED": "Ikke tilladt:",
+      "LANGUAGE": "Sprog",
+      "LANGUAGES": {
+        "da": "Dansk",
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands",
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية"
+      },
+      "KEYS": {
+        "emailVerificationDoneText": "E-mailbekræftelse udført",
+        "emailVerificationText": "E-mailbekræftelse",
+        "externalUserNotFoundText": "Ekstern bruger ikke fundet",
+        "footerText": "Sidefod",
+        "initMfaDoneText": "Initialisér MFA udført",
+        "initMfaOtpText": "Initialisér MFA",
+        "initMfaPromptText": "Initialisér MFA-prompt",
+        "initMfaU2fText": "Initialisér universel anden faktor",
+        "initPasswordDoneText": "Initialisér adgangskode udført",
+        "initPasswordText": "Initialisér adgangskode",
+        "initializeDoneText": "Initialisér bruger udført",
+        "initializeUserText": "Initialisér bruger",
+        "linkingUserDoneText": "Sammenkædning af bruger udført",
+        "loginText": "Login",
+        "logoutText": "Log ud",
+        "mfaProvidersText": "MFA-udbydere",
+        "passwordChangeDoneText": "Ændring af adgangskode udført",
+        "passwordChangeText": "Ændring af adgangskode",
+        "passwordResetDoneText": "Nulstilling af adgangskode udført",
+        "passwordText": "Adgangskode",
+        "registrationOptionText": "Registreringsmuligheder",
+        "registrationOrgText": "Registrér organisation",
+        "registrationUserText": "Registrér bruger",
+        "selectAccountText": "Vælg konto",
+        "successLoginText": "Login lykkedes",
+        "usernameChangeDoneText": "Ændring af brugernavn udført",
+        "usernameChangeText": "Ændring af brugernavn",
+        "verifyMfaOtpText": "Bekræft OTP",
+        "verifyMfaU2fText": "Bekræft universel anden faktor",
+        "passwordlessPromptText": "Adgangsnøgle-prompt",
+        "passwordlessRegistrationDoneText": "Adgangsnøgle-registrering udført",
+        "passwordlessRegistrationText": "Adgangsnøgle-registrering",
+        "passwordlessText": "Adgangsnøgle",
+        "externalRegistrationUserOverviewText": "Oversigt over ekstern brugerregistrering"
+      }
+    },
+    "MESSAGE_TEXTS": {
+      "TYPE": "Notifikation",
+      "TYPES": {
+        "INIT": "Initialisering",
+        "VE": "Bekræft e-mail",
+        "VP": "Bekræft telefon",
+        "VSO": "Bekræft OTP SMS",
+        "VEO": "Bekræft OTP e-mail",
+        "PR": "Nulstilling af adgangskode",
+        "DC": "Domænekrav",
+        "PL": "Adgangsnøgle",
+        "PC": "Ændring af adgangskode",
+        "IU": "Invitér bruger"
+      },
+      "CHIPS": {
+        "firstname": "Fornavn",
+        "lastname": "Efternavn",
+        "code": "Kode",
+        "preferredLoginName": "Foretrukne loginnavn",
+        "displayName": "Visningsnavn",
+        "nickName": "Kælenavn",
+        "loginnames": "Loginnavne",
+        "domain": "Domæne",
+        "lastEmail": "Seneste e-mail",
+        "lastPhone": "Seneste telefon",
+        "verifiedEmail": "Bekræftet e-mail",
+        "verifiedPhone": "Bekræftet telefon",
+        "changedate": "Ændringsdato",
+        "username": "Brugernavn",
+        "tempUsername": "Midlertidigt brugernavn",
+        "otp": "OTP",
+        "verifyUrl": "Bekræft OTP-URL",
+        "expiry": "Udløb",
+        "applicationName": "Applikationsnavn"
+      },
+      "TOAST": {
+        "UPDATED": "Brugerdefinerede tekster gemt."
+      }
+    },
+    "DEFAULTLABEL": "De nuværende indstillinger svarer til standarden for din instans.",
+    "BTN_INSTALL": "Opsætning",
+    "BTN_EDIT": "Redigér",
+    "DATA": {
+      "DESCRIPTION": "Beskrivelse",
+      "MINLENGTH": "skal have minimumslængde",
+      "HASNUMBER": "skal indeholde et tal",
+      "HASSYMBOL": "skal indeholde et symbol",
+      "HASLOWERCASE": "skal indeholde et lille bogstav",
+      "HASUPPERCASE": "skal indeholde et stort bogstav",
+      "SHOWLOCKOUTFAILURES": "vis udelukkelsesfejl",
+      "MAXPASSWORDATTEMPTS": "Maksimalt antal forsøg på adgangskode",
+      "MAXOTPATTEMPTS": "Maksimalt antal OTP-forsøg",
+      "EXPIREWARNDAYS": "Udløbsadvarsel efter dage",
+      "MAXAGEDAYS": "Maksimal gyldighed i dage",
+      "USERLOGINMUSTBEDOMAIN": "Tilføj organisationsdomæne som suffiks til loginnavne",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Hvis du aktiverer denne indstilling, vil alle loginnavne få organisationsdomænet tilføjet som suffiks. Hvis denne indstilling er deaktiveret, skal du sikre, at brugernavne er unikke på tværs af alle organisationer.",
+      "VALIDATEORGDOMAINS": "Bekræftelse af organisationsdomæne påkrævet (DNS- eller HTTP-udfordring)",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP-afsenderadresse matcher instansdomæne",
+      "ALLOWUSERNAMEPASSWORD_DESC": "Det konventionelle login med brugernavn og adgangskode er tilladt.",
+      "ALLOWEXTERNALIDP_DESC": "Login er tilladt for de underliggende identitetsudbydere",
+      "ALLOWREGISTER_DESC": "Hvis indstillingen er valgt, vises der et ekstra trin til registrering af en bruger i login.",
+      "FORCEMFA": "Tving MFA for alle brugere",
+      "FORCEMFALOCALONLY": "Tving MFA kun for lokalt godkendte brugere",
+      "FORCEMFALOCALONLY_DESC": "Hvis indstillingen er valgt, skal lokalt godkendte brugere konfigurere en anden faktor til login.",
+      "HIDEPASSWORDRESET_DESC": "Hvis indstillingen er valgt, kan brugeren ikke nulstille sin adgangskode i login-processen.",
+      "HIDELOGINNAMESUFFIX": "Skjul loginnavn-suffiks",
+      "HIDELOGINNAMESUFFIX_DESC": "Skjuler loginnavn-suffikset i login-grænsefladen",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "Hvis indstillingen er valgt, vises adgangskodeskærmen i login-processen, selv hvis brugeren ikke blev fundet. Fejlen ved adgangskodekontrollen vil ikke afsløre, om brugernavnet eller adgangskoden var forkert.",
+      "ALLOWDOMAINDISCOVERY_DESC": "Hvis indstillingen er valgt, vil suffikset (@domæne.com) på et ukendt brugernavn indtastet på login-skærmen blive matchet mod organisationsdomænerne og ved succes omdirigere til registreringen for den organisation.",
+      "DEFAULTREDIRECTURI": "Standard-omdirigerings-URI",
+      "DEFAULTREDIRECTURI_DESC": "Definerer, hvor brugeren vil blive omdirigeret til, hvis login er startet uden en app-kontekst (f.eks. fra mail)",
+      "ERRORMSGPOPUP": "Vis fejl i dialog",
+      "DISABLEWATERMARK": "Skjul vandmærke",
+      "DISABLEWATERMARK_DESC": "Skjul Powered by Zitadel-vandmærket i login-grænsefladen"
+    },
+    "RESET": "Nulstil til instansstandard",
+    "CREATECUSTOM": "Opret brugerdefineret politik",
+    "TOAST": {
+      "SET": "Politik angivet!",
+      "RESETSUCCESS": "Politik nulstillet!",
+      "UPLOADSUCCESS": "Uploadet!",
+      "DELETESUCCESS": "Slettet!",
+      "UPLOADFAILED": "Upload mislykkedes!"
+    }
+  },
+  "ORG_DETAIL": {
+    "TITLE": "Organisation",
+    "DESCRIPTION": "Her kan du redigere indstillingerne for din organisation og administrere medlemmerne.",
+    "DETAIL": {
+      "TITLE": "Detalje",
+      "NAME": "Navn",
+      "DOMAIN": "Domæne",
+      "STATE": {
+        "0": "Ikke defineret",
+        "1": "Aktiv",
+        "2": "Inaktiv"
+      }
+    },
+    "MEMBER": {
+      "TITLE": "Administratorer",
+      "USERNAME": "Brugernavn",
+      "DISPLAYNAME": "Visningsnavn",
+      "LOGINNAME": "Loginnavn",
+      "EMAIL": "E-mail",
+      "ROLES": "Roller",
+      "ADD": "Tilføj en administrator",
+      "ADDDESCRIPTION": "Indtast navnene på de brugere, der skal tilføjes."
+    },
+    "TABLE": {
+      "TOTAL": "Poster i alt",
+      "SELECTION": "Valgte elementer",
+      "DEACTIVATE": "Deaktivér bruger",
+      "ACTIVATE": "Aktivér bruger",
+      "DELETE": "Slet bruger",
+      "CLEAR": "Ryd markering"
+    }
+  },
+  "PROJECT": {
+    "PAGES": {
+      "ID": "Projekt-ID",
+      "TITLE": "Projekt",
+      "DESCRIPTION": "Her kan du definere applikationer, administrere roller og tildele andre organisationer ret til at bruge dit projekt.",
+      "DELETE": "Slet projekt",
+      "DETAIL": "Detalje",
+      "CREATE": "Opret projekt",
+      "CREATE_DESC": "Indsæt dit projekts navn.",
+      "ROLE": "Rolle",
+      "NOITEMS": "Ingen projekter",
+      "ZITADELPROJECT": "Dette tilhører Zitadel-projektet. Vær opmærksom: Hvis du foretager ændringer, opfører Zitadel sig muligvis ikke som tilsigtet.",
+      "TYPE": {
+        "OWNED": "Egne projekter",
+        "OWNED_SINGULAR": "Eget projekt",
+        "GRANTED_SINGULAR": "Tildelt projekt fra {{name}}"
+      },
+      "PRIVATELABEL": {
+        "TITLE": "Branding-indstilling",
+        "0": {
+          "TITLE": "Uspecificeret",
+          "DESC": "Så snart brugeren er identificeret, vises brandingen for den identificerede brugers organisation, før systemstandarden vises."
+        },
+        "1": {
+          "TITLE": "Brug projektindstilling",
+          "DESC": "Brandingen for den organisation, der ejer projektet, vises"
+        },
+        "2": {
+          "TITLE": "Brug brugerens organisationsindstilling",
+          "DESC": "Brandingen for projektets organisation vises, men så snart brugeren er identificeret, vises indstillingen for den identificerede brugers organisation."
+        },
+        "DIALOG": {
+          "TITLE": "Branding-indstilling",
+          "DESCRIPTION": "Vælg adfærden for login, når projektet bruges."
+        }
+      },
+      "PINNED": "Fastgjort",
+      "ALL": "Alle",
+      "CREATEDON": "Oprettet den",
+      "LASTMODIFIED": "Senest ændret den",
+      "ADDNEW": "Opret nyt projekt",
+      "DIALOG": {
+        "REACTIVATE": {
+          "TITLE": "Genaktivér projekt",
+          "DESCRIPTION": "Vil du virkelig genaktivere dit projekt?"
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deaktivér projekt",
+          "DESCRIPTION": "Vil du virkelig deaktivere dit projekt?"
+        },
+        "DELETE": {
+          "TITLE": "Slet projekt",
+          "DESCRIPTION": "Vil du virkelig slette dit projekt?",
+          "TYPENAME": "Skriv navnet på projektet for at slette det permanent."
+        }
+      }
+    },
+    "SETTINGS": {
+      "TITLE": "Indstillinger",
+      "DESCRIPTION": ""
+    },
+    "STATE": {
+      "TITLE": "Status",
+      "0": "Ikke defineret",
+      "1": "Aktiv",
+      "2": "Inaktiv"
+    },
+    "TYPE": {
+      "TITLE": "Type",
+      "0": "Ukendt type",
+      "1": "Eget",
+      "2": "Tildelt"
+    },
+    "NAME": "Navn",
+    "NAMEDIALOG": {
+      "TITLE": "Omdøb projekt",
+      "DESCRIPTION": "Indtast det nye navn for dit projekt",
+      "NAME": "Nyt navn"
+    },
+    "MEMBER": {
+      "TITLE": "Administratorer",
+      "TITLEDESC": "Administratorer kan foretage ændringer i dette projekt baseret på deres rolle.",
+      "DESCRIPTION": "Disse administratorer kan muligvis redigere dit projekt.",
+      "USERNAME": "Brugernavn",
+      "DISPLAYNAME": "Visningsnavn",
+      "LOGINNAME": "Loginnavn",
+      "EMAIL": "E-mail",
+      "ROLES": "Roller",
+      "USERID": "Bruger-ID"
+    },
+    "GRANT": {
+      "EMPTY": "Ingen tildelt organisation.",
+      "TITLE": "Projekttildelinger",
+      "DESCRIPTION": "Tillad en anden organisation at bruge dit projekt.",
+      "EDITTITLE": "Redigér roller",
+      "CREATE": {
+        "TITLE": "Opret projekttildeling",
+        "SEL_USERS": "Vælg de brugere, du vil give adgang",
+        "SEL_PROJECT": "Søg efter et projekt",
+        "SEL_ROLES": "Vælg de roller, du vil tilføje til projekttildelingen",
+        "SEL_USER": "Vælg brugere",
+        "SEL_ORG": "Søg efter en organisation",
+        "SEL_ORG_DESC": "Søg efter den organisation, du vil tildele.",
+        "ORG_DESCRIPTION": "Du er ved at tildele en bruger til organisationen {{name}}.",
+        "ORG_DESCRIPTION_DESC": "Skift konteksten i headeren ovenfor for at tildele en bruger til en anden organisation.",
+        "SEL_ORG_FORMFIELD": "Organisation",
+        "FOR_ORG": "Projekttildelingen oprettes for:"
+      },
+      "DETAIL": {
+        "TITLE": "Projekttildeling",
+        "DESC": "Du kan vælge, hvilke roller der kan bruges af den angivne organisation, og udpege administratorer",
+        "MEMBERTITLE": "Administratorer",
+        "MEMBERDESC": "Dette er administratorerne for den tildelte organisation. Tilføj brugere her, som skal have adgang til at redigere projektets data.",
+        "PROJECTNAME": "Projektnavn",
+        "GRANTEDORG": "Tildelt organisation",
+        "RESOURCEOWNER": "Ressourceejer"
+      },
+      "STATE": "Status",
+      "STATES": {
+        "1": "Aktiv",
+        "2": "Inaktiv"
+      },
+      "ALL": "Alle",
+      "SHOWDETAIL": "Vis detaljer",
+      "USER": "Bruger",
+      "MEMBERS": "Administratorer",
+      "ORG": "Organisation",
+      "PROJECTNAME": "Projektnavn",
+      "GRANTEDORG": "Tildelt organisation",
+      "GRANTEDORGDOMAIN": "Domæne",
+      "RESOURCEOWNER": "Ressourceejer",
+      "GRANTEDORGNAME": "Organisationsnavn",
+      "GRANTID": "Tildelings-ID",
+      "CREATIONDATE": "Oprettelsesdato",
+      "CHANGEDATE": "Senest ændret",
+      "DATES": "Datoer",
+      "ROLENAMESLIST": "Roller",
+      "NOROLES": "Ingen roller",
+      "TYPE": "Type",
+      "TOAST": {
+        "PROJECTGRANTUSERGRANTADDED": "Projekttildeling oprettet.",
+        "PROJECTGRANTADDED": "Projekttildeling oprettet.",
+        "PROJECTGRANTCHANGED": "Projekttildeling ændret.",
+        "PROJECTGRANTMEMBERADDED": "Tildelingsadministrator tilføjet.",
+        "PROJECTGRANTMEMBERCHANGED": "Tildelingsadministrator ændret.",
+        "PROJECTGRANTMEMBERREMOVED": "Tildelingsadministrator fjernet.",
+        "PROJECTGRANTUPDATED": "Projekttildeling opdateret"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Slet projekttildeling",
+        "DELETE_DESCRIPTION": "Du er ved at slette en projekttildeling. Er du sikker?"
+      },
+      "ROLES": "Projektroller"
+    },
+    "APP": {
+      "TITLE": "Applikationer",
+      "NAME": "Navn",
+      "NAMEREQUIRED": "Et navn er påkrævet."
+    },
+    "ROLE": {
+      "EMPTY": "Der er endnu ikke oprettet nogen rolle.",
+      "ADDNEWLINE": "Tilføj yderligere rolle",
+      "KEY": "Nøgle",
+      "TITLE": "Roller",
+      "DESCRIPTION": "Definér nogle roller, der kan bruges til at oprette projekttildelinger.",
+      "NAME": "Navn",
+      "DISPLAY_NAME": "Visningsnavn",
+      "GROUP": "Gruppe",
+      "ACTIONS": "Handlinger",
+      "ADDTITLE": "Opret rolle",
+      "ADDDESCRIPTION": "Indtast data for den nye rolle.",
+      "EDITTITLE": "Redigér rolle",
+      "EDITDESCRIPTION": "Indtast de nye data for rollen.",
+      "DELETE": "Slet rolle",
+      "CREATIONDATE": "Oprettet",
+      "CHANGEDATE": "Senest ændret",
+      "SELECTGROUPTOOLTIP": "Vælg alle roller i gruppen {{group}}.",
+      "OPTIONS": "Indstillinger",
+      "ASSERTION": "Returnér brugerroller under godkendelse",
+      "ASSERTION_DESCRIPTION": "Når en bruger godkender, leveres deres rolleoplysninger til din applikation. For OpenID Connect kan rollerne anmodes om fra UserInfo-endpointet eller sendes i ID- eller adgangstokenet, afhængigt af din applikations indstillinger.",
+      "CHECK": "Kun autoriserede brugere kan godkende",
+      "CHECK_DESCRIPTION": "Afvis godkendelse, hvis brugeren ikke har nogen roller tildelt til dette projekt. Adgang til projektet uden en specifik rolle tildelt brugeren er tilladt.",
+      "DIALOG": {
+        "DELETE_TITLE": "Slet rolle",
+        "DELETE_DESCRIPTION": "Du er ved at slette en projektrolle. Er du sikker?"
+      }
+    },
+    "HAS_PROJECT": "Godkendelse er begrænset til brugere fra organisationer, der er blevet tildelt adgang til dette projekt",
+    "HAS_PROJECT_DESCRIPTION": "Før en bruger kan godkendes, verificeres det, at deres tilknyttede organisation er blevet tildelt adgang til dette projekt. Godkendelse er ikke tilladt for brugere fra uautoriserede organisationer.",
+    "TABLE": {
+      "TOTAL": "Poster i alt:",
+      "SELECTION": "Valgte elementer",
+      "DEACTIVATE": "Deaktivér projekt",
+      "ACTIVATE": "Aktivér projekt",
+      "DELETE": "Slet projekt",
+      "ORGNAME": "Organisationsnavn",
+      "ORGID": "Organisations-ID",
+      "ORGDOMAIN": "Organisationsdomæne",
+      "STATE": "Status",
+      "TYPE": "Type",
+      "CREATIONDATE": "Oprettet den",
+      "CHANGEDATE": "Senest ændret",
+      "RESOURCEOWNER": "Ejer",
+      "SHOWTABLE": "Vis tabel",
+      "SHOWGRID": "Vis gitter",
+      "EMPTY": "Intet projekt fundet"
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Administrator fjernet.",
+      "MEMBERSADDED": "Administratorer tilføjet.",
+      "MEMBERADDED": "Administrator tilføjet.",
+      "MEMBERCHANGED": "Administrator ændret.",
+      "ROLESCREATED": "Roller oprettet.",
+      "ROLEREMOVED": "Rolle fjernet.",
+      "ROLECHANGED": "Rolle ændret.",
+      "REACTIVATED": "Genaktiveret.",
+      "DEACTIVATED": "Deaktiveret.",
+      "CREATED": "Projekt oprettet.",
+      "UPDATED": "Projekt ændret.",
+      "GRANTUPDATED": "Projekttildeling ændret.",
+      "DELETED": "Projekt slettet."
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Slet rolle",
+      "DELETE_DESCRIPTION": "Du er ved at slette en rolle. Er du sikker?"
+    }
+  },
+  "NEXTSTEPS": {
+    "TITLE": "Næste skridt"
+  },
+  "IDP": {
+    "LIST": {
+      "ACTIVETITLE": "Aktive identitetsudbydere"
+    },
+    "CREATE": {
+      "TITLE": "Tilføj udbyder",
+      "DESCRIPTION": "Vælg en eller flere af følgende udbydere.",
+      "STEPPERTITLE": "Opret udbyder",
+      "OIDC": {
+        "TITLE": "OIDC-udbyder",
+        "DESCRIPTION": "Indtast de påkrævede data for din OIDC-udbyder."
+      },
+      "OAUTH": {
+        "TITLE": "OAuth-udbyder",
+        "DESCRIPTION": "Indtast de påkrævede data for din OAuth-udbyder."
+      },
+      "JWT": {
+        "TITLE": "JWT-udbyder",
+        "DESCRIPTION": "Indtast de påkrævede data for din JWT-udbyder."
+      },
+      "GOOGLE": {
+        "TITLE": "Google-udbyder",
+        "DESCRIPTION": "Indtast legitimationsoplysningerne for din Google-identitetsudbyder"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab-udbyder",
+        "DESCRIPTION": "Indtast legitimationsoplysningerne for din Gitlab-identitetsudbyder"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab Self Hosted-udbyder",
+        "DESCRIPTION": "Indtast legitimationsoplysningerne for din Gitlab Self Hosted-identitetsudbyder"
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server-udbyder",
+        "DESCRIPTION": "Indtast legitimationsoplysningerne for din GitHub Enterprise Server-identitetsudbyder"
+      },
+      "GITHUB": {
+        "TITLE": "Github-udbyder",
+        "DESCRIPTION": "Indtast legitimationsoplysningerne for din Github-identitetsudbyder"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft-udbyder",
+        "DESCRIPTION": "Indtast legitimationsoplysningerne for din Microsoft-identitetsudbyder"
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Indtast legitimationsoplysningerne for din LDAP-udbyder"
+      },
+      "APPLE": {
+        "TITLE": "Log ind med Apple",
+        "DESCRIPTION": "Indtast legitimationsoplysningerne for din Apple-udbyder"
+      },
+      "SAML": {
+        "TITLE": "Log ind med SAML",
+        "DESCRIPTION": "Indtast legitimationsoplysningerne for din SAML-udbyder"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Identitetsudbyder",
+      "DESCRIPTION": "Opdater dine udbyderindstillinger",
+      "DATECREATED": "Oprettet",
+      "DATECHANGED": "Ændret"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Automatisk oprettelse",
+      "ISAUTOCREATION_DESC": "Hvis valgt, oprettes en konto, hvis den ikke allerede findes.",
+      "ISAUTOUPDATE": "Automatisk opdatering",
+      "ISAUTOUPDATE_DESC": "Hvis valgt, opdateres konti ved fornyet godkendelse.",
+      "ISCREATIONALLOWED": "Oprettelse af konto tilladt (manuelt)",
+      "ISCREATIONALLOWED_DESC": "Bestemmer, om konti kan oprettes ved hjælp af en ekstern konto. Deaktivér, hvis brugere ikke skal kunne redigere kontooplysninger, når auto_creation er aktiveret.",
+      "ISLINKINGALLOWED": "Sammenkædning af konto tilladt (manuelt)",
+      "ISLINKINGALLOWED_DESC": "Bestemmer, om en identitet manuelt kan sammenkædes med en eksisterende konto. Deaktivér, hvis brugere kun skal have tilladelse til at sammenkæde den foreslåede konto i tilfælde af aktiv auto_linking.",
+      "AUTOLINKING_DESC": "Bestemmer, om en identitet bliver bedt om at blive sammenkædet med en eksisterende konto.",
+      "AUTOLINKINGTYPE": {
+        "0": "Deaktiveret",
+        "1": "Tjek for eksisterende brugernavn",
+        "2": "Tjek for eksisterende e-mail"
+      }
+    },
+    "OWNERTYPES": {
+      "0": "ukendt",
+      "1": "Instans",
+      "2": "Organisation"
+    },
+    "STATES": {
+      "1": "aktiv",
+      "2": "inaktiv"
+    },
+    "AZUREADTENANTTYPES": {
+      "3": "Tenant-ID",
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Consumers"
+    },
+    "AZUREADTENANTTYPE": "Tenant-type",
+    "AZUREADTENANTID": "Tenant-ID",
+    "EMAILVERIFIED": "E-mail bekræftet",
+    "NAMEHINT": "Hvis angivet, vises det i login-grænsefladen.",
+    "OPTIONAL": "valgfri",
+    "LDAPATTRIBUTES": "LDAP-attributter",
+    "UPDATEBINDPASSWORD": "opdater Bind-adgangskode",
+    "UPDATECLIENTSECRET": "opdater klienthemmelighed",
+    "ADD": "Tilføj identitetsudbyder",
+    "TYPE": "Type",
+    "OWNER": "Ejer",
+    "ID": "Identitetsudbyder-ID",
+    "NAME": "Navn",
+    "AUTHORIZATIONENDPOINT": "Autorisations-endpoint",
+    "TOKENENDPOINT": "Token-endpoint",
+    "USERENDPOINT": "Bruger-endpoint",
+    "IDATTRIBUTE": "ID-attribut",
+    "AVAILABILITY": "Tilgængelighed",
+    "AVAILABLE": "tilgængelig",
+    "AVAILABLEBUTINACTIVE": "tilgængelig, men inaktiv",
+    "SETAVAILABLE": "indstil som tilgængelig",
+    "SETUNAVAILABLE": "indstil som ikke tilgængelig",
+    "CONFIG": "Indstillinger",
+    "STATE": "Status",
+    "ISSUER": "Issuer",
+    "SCOPESLIST": "Liste over scopes",
+    "CLIENTID": "Client ID",
+    "CLIENTSECRET": "Klienthemmelighed",
+    "LDAPCONNECTION": "Forbindelse",
+    "LDAPUSERBINDING": "User binding",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind-adgangskode",
+    "SERVERS": "Servere",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout i sekunder",
+    "USERBASE": "Userbase",
+    "USERFILTERS": "Brugerfiltre",
+    "USEROBJECTCLASSES": "User Object Classes",
+    "REQUIRED": "påkrævet",
+    "LDAPIDATTRIBUTE": "ID-attribut",
+    "AVATARURLATTRIBUTE": "Avatar-URL-attribut",
+    "DISPLAYNAMEATTRIBUTE": "Visningsnavn-attribut",
+    "EMAILATTRIBUTEATTRIBUTE": "E-mail-attribut",
+    "EMAILVERIFIEDATTRIBUTE": "E-mail bekræftet-attribut",
+    "FIRSTNAMEATTRIBUTE": "Fornavn-attribut",
+    "LASTNAMEATTRIBUTE": "Efternavn-attribut",
+    "NICKNAMEATTRIBUTE": "Kælenavn-attribut",
+    "PHONEATTRIBUTE": "Telefon-attribut",
+    "PHONEVERIFIEDATTRIBUTE": "Telefon bekræftet-attribut",
+    "PREFERREDLANGUAGEATTRIBUTE": "Foretrukne sprog-attribut",
+    "PREFERREDUSERNAMEATTRIBUTE": "Foretrukne brugernavn-attribut",
+    "PROFILEATTRIBUTE": "Profil-attribut",
+    "IDPDISPLAYNAMMAPPING": "Mapning af IdP-visningsnavn",
+    "USERNAMEMAPPING": "Mapning af brugernavn",
+    "DATES": "Datoer",
+    "CREATIONDATE": "Oprettet den",
+    "CHANGEDATE": "Senest ændret",
+    "DEACTIVATE": "Deaktivér",
+    "ACTIVATE": "Aktivér",
+    "DELETE": "Slet",
+    "DELETE_TITLE": "Slet IdP",
+    "DELETE_DESCRIPTION": "Du er ved at slette en identitetsudbyder. De resulterende ændringer kan ikke fortrydes. Vil du virkelig gøre dette?",
+    "REMOVE_WARN_TITLE": "Fjern IdP",
+    "REMOVE_WARN_DESCRIPTION": "Du er ved at fjerne en identitetsudbyder. Dette vil fjerne valget af den tilgængelige IdP for dine brugere, og allerede registrerede brugere vil ikke kunne logge ind igen. Er du sikker på, at du vil fortsætte?",
+    "DELETE_SELECTION_TITLE": "Slet IdP",
+    "DELETE_SELECTION_DESCRIPTION": "Du er ved at slette en identitetsudbyder. De resulterende ændringer kan ikke fortrydes. Vil du virkelig gøre dette?",
+    "FEDERATEDLOGOUTENABLED": "Fødereret logout aktiveret",
+    "FEDERATEDLOGOUTENABLED_DESC": "Hvis aktiveret, vil brugeren også blive logget ud fra IdP'en, hvis brugeren afslutter sessionen i Zitadel.",
+    "EMPTY": "Ingen IdP tilgængelig",
+    "OIDC": {
+      "GENERAL": "Generelle oplysninger",
+      "TITLE": "OIDC-indstillinger",
+      "DESCRIPTION": "Indtast data for OIDC-identitetsudbyderen."
+    },
+    "JWT": {
+      "TITLE": "JWT-indstillinger",
+      "DESCRIPTION": "Indtast data for JWT-identitetsudbyderen.",
+      "HEADERNAME": "Headernavn",
+      "JWTENDPOINT": "JWT-endpoint",
+      "JWTKEYSENDPOINT": "JWT Keys-endpoint"
+    },
+    "APPLE": {
+      "TEAMID": "Team ID",
+      "KEYID": "Key ID",
+      "PRIVATEKEY": "Privat nøgle",
+      "UPDATEPRIVATEKEY": "Opdater privat nøgle",
+      "UPLOADPRIVATEKEY": "Upload privat nøgle",
+      "KEYMAXSIZEEXCEEDED": "Maksimal størrelse på 5 kB overskredet."
+    },
+    "SAML": {
+      "METADATAXML": "Metadata-XML",
+      "METADATAURL": "Metadata-URL",
+      "BINDING": "Binding",
+      "SIGNEDREQUEST": "Signeret forespørgsel",
+      "SIGNATUREALGORITHM": "Signaturalgoritme",
+      "NAMEIDFORMAT": "NameID-format",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Brugerdefineret mapnings-attributnavn",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternativt attributnavn til at mappe brugeren, hvis det returnerede `nameid-format` er `transient`, f.eks. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    },
+    "TOAST": {
+      "SAVED": "Gemt.",
+      "REACTIVATED": "Idp genaktiveret.",
+      "DEACTIVATED": "Idp deaktiveret.",
+      "SELECTEDREACTIVATED": "Valgte Idp'er genaktiveret.",
+      "SELECTEDDEACTIVATED": "Valgte Idp'er deaktiveret.",
+      "SELECTEDKEYSDELETED": "Valgte Idp'er slettet.",
+      "DELETED": "Idp fjernet!",
+      "ADDED": "Tilføjet.",
+      "REMOVED": "Fjernet."
+    },
+    "ISIDTOKENMAPPING": "Map fra ID-tokenet",
+    "ISIDTOKENMAPPING_DESC": "Hvis valgt, mappes udbyderoplysninger fra ID-tokenet og ikke fra userinfo-endpointet.",
+    "USEPKCE": "Brug PKCE",
+    "USEPKCE_DESC": "Bestemmer, om parametrene code_challenge og code_challenge_method inkluderes i auth-forespørgslen"
+  },
+  "MFA": {
+    "LIST": {
+      "MULTIFACTORTITLE": "Adgangsnøgle",
+      "MULTIFACTORDESCRIPTION": "Definér dine multifaktorer for din adgangsnøgle her.",
+      "SECONDFACTORTITLE": "Multifaktorgodkendelse",
+      "SECONDFACTORDESCRIPTION": "Definér yderligere mulige faktorer, som du kan sikre din adgangskodegodkendelse med."
+    },
+    "CREATE": {
+      "TITLE": "Ny faktor",
+      "DESCRIPTION": "Vælg din nye faktortype."
+    },
+    "DELETE": {
+      "TITLE": "Slet faktor",
+      "DESCRIPTION": "Du er ved at slette en faktor fra login-indstillingerne. Er du sikker?"
+    },
+    "TOAST": {
+      "ADDED": "Tilføjet.",
+      "SAVED": "Gemt.",
+      "DELETED": "Fjernet"
+    },
+    "TYPE": "Type",
+    "MULTIFACTORTYPES": {
+      "0": "Ukendt",
+      "1": "Adgangsnøgle"
+    },
+    "SECONDFACTORTYPES": {
+      "0": "Ukendt",
+      "1": "TOTP (autentificeringsapp)",
+      "2": "Adgangsnøgle",
+      "3": "OTP via e-mail (OTP e-mail)",
+      "4": "OTP via SMS (OTP SMS)",
+      "5": "Gendannelseskoder"
+    }
+  },
+  "LOGINPOLICY": {
+    "CREATE": {
+      "TITLE": "Login-indstillinger",
+      "DESCRIPTION": "Definér, hvordan dine brugere kan godkendes i din organisation."
+    },
+    "IDPS": "Identitetsudbydere",
+    "ADDIDP": {
+      "TITLE": "Tilføj identitetsudbyder",
+      "DESCRIPTION": "Du kan vælge foruddefinerede eller selvoprettede udbydere til godkendelse.",
+      "SELECTIDPS": "Identitetsudbydere"
+    },
+    "PASSWORDLESS": "Adgangsnøgle-login",
+    "PASSWORDLESSTYPE": {
+      "0": "Ikke tilladt",
+      "1": "Tilladt"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "SMTP-udbyder",
+      "DESCRIPTION": "Dette er SMTP-udbyderne for din Zitadel-instans. Aktivér den, du vil bruge til at sende notifikationer til dine brugere.",
+      "EMPTY": "Ingen SMTP-udbyder tilgængelig",
+      "ACTIVATED": "Aktiveret",
+      "ACTIVATE": "Aktivér udbyder",
+      "DEACTIVATE": "Deaktivér udbyder",
+      "TEST": "Test din udbyder",
+      "TYPE": "Type",
+      "DIALOG": {
+        "ACTIVATED": "SMTP-udbyder er blevet aktiveret",
+        "ACTIVATE_WARN_TITLE": "Aktivér SMTP-indstillinger",
+        "ACTIVATE_WARN_DESCRIPTION": "Du er ved at aktivere en SMTP-udbyder. Først deaktiverer vi den nuværende aktive udbyder, og derefter aktiverer vi denne. Er du sikker?",
+        "DEACTIVATE_WARN_TITLE": "Deaktivér SMTP-indstillinger",
+        "DEACTIVATE_WARN_DESCRIPTION": "Du er ved at deaktivere en SMTP-udbyder. Er du sikker?",
+        "DEACTIVATED": "SMTP-udbyder er blevet deaktiveret",
+        "DELETE_TITLE": "Slet SMTP-udbyder",
+        "DELETE_DESCRIPTION": "Du er ved at slette en udbyder. Bekræft denne handling ved at skrive afsendernavnet",
+        "DELETED": "SMTP-udbyder er blevet slettet",
+        "SENDER": "Skriv {{value}} for at slette denne SMTP-udbyder.",
+        "TEST_TITLE": "Test dine SMTP-indstillinger",
+        "TEST_DESCRIPTION": "Angiv en e-mailadresse for at teste dine SMTP-indstillinger",
+        "TEST_EMAIL": "E-mailadresse",
+        "TEST_RESULT": "Testresultat"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Tilføj SMTP-udbyder",
+      "DESCRIPTION": "Vælg en eller flere af følgende udbydere.",
+      "STEPS": {
+        "TITLE": "Tilføj {{ value }} SMTP-udbyder",
+        "CREATE_DESC_TITLE": "Indtast dine {{ value }} SMTP-indstillinger trin for trin",
+        "CURRENT_DESC_TITLE": "Dette er dine SMTP-indstillinger",
+        "PROVIDER_SETTINGS": "SMTP-udbyderindstillinger",
+        "SENDER_SETTINGS": "Afsenderindstillinger",
+        "NEXT_STEPS": "Næste skridt",
+        "ACTIVATE": {
+          "TITLE": "Aktivér din SMTP-udbyder",
+          "DESCRIPTION": "Zitadel kan ikke bruge denne SMTP-udbyder til at sende notifikationer, før du aktiverer den. Hvis du aktiverer denne udbyder, vil enhver anden udbyder, der var aktiv, nu blive deaktiveret."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deaktivér din SMTP-udbyder",
+          "DESCRIPTION": "Hvis du deaktiverer denne SMTP-udbyder, kan Zitadel ikke bruge den til at sende notifikationer, før du aktiverer den igen."
+        },
+        "SAVE_SETTINGS": "Gem dine indstillinger",
+        "TEST": {
+          "TITLE": "Test dine indstillinger",
+          "DESCRIPTION": "Du kan teste dine SMTP-udbyderindstillinger og tjekke testresultatet, før du gemmer dem",
+          "RESULT": "Din e-mail blev sendt"
+        }
+      }
+    },
+    "DETAIL": {
+      "TITLE": "SMTP-udbyderindstillinger"
+    },
+    "EMPTY": "Ingen SMTP-udbyder tilgængelig",
+    "STEPS": {
+      "SENDGRID": {}
+    }
+  },
+  "APP": {
+    "LIST": "Applikationer",
+    "COMPLIANCE": "OIDC-overensstemmelse",
+    "URLS": "URL'er",
+    "CONFIGURATION": "Indstillinger",
+    "TOKEN": "Token-indstillinger",
+    "PAGES": {
+      "TITLE": "Applikation",
+      "ID": "Applikations-ID",
+      "DESCRIPTION": "Her kan du redigere dine applikationsdata og dens indstillinger.",
+      "CREATE": "Opret applikation",
+      "CREATE_SELECT_PROJECT": "Vælg først dit projekt",
+      "CREATE_NEW_PROJECT": "eller indtast navnet på dit nye projekt",
+      "CREATE_DESC_TITLE": "Indtast dine applikationsdetaljer trin for trin",
+      "CREATE_DESC_SUB": "En anbefalet opsætning genereres automatisk.",
+      "STATE": "Status",
+      "DATECREATED": "Oprettet",
+      "DATECHANGED": "Ændret",
+      "URLS": "URL'er",
+      "DELETE": "Slet app",
+      "JUMPTOPROJECT": "For at konfigurere roller, rolletildelinger og mere, naviger til projektet.",
+      "DETAIL": {
+        "TITLE": "Detalje",
+        "STATE": {
+          "0": "Ikke defineret",
+          "1": "Aktiv",
+          "2": "Inaktiv"
+        }
+      },
+      "DIALOG": {
+        "CONFIG": {
+          "TITLE": "Skift OIDC-indstillinger"
+        },
+        "DELETE": {
+          "TITLE": "Slet app",
+          "DESCRIPTION": "Vil du virkelig slette denne applikation?"
+        }
+      },
+      "NEXTSTEPS": {
+        "TITLE": "Næste skridt",
+        "0": {
+          "TITLE": "Tilføj roller",
+          "DESC": "Indtast dine projektroller"
+        },
+        "1": {
+          "TITLE": "Tilføj brugere",
+          "DESC": "Tilføj nye brugere i din organisation"
+        },
+        "2": {
+          "TITLE": "Hjælp og support",
+          "DESC": "Læs vores dokumentation om oprettelse af applikationer, eller kontakt vores support"
+        }
+      }
+    },
+    "NAMEDIALOG": {
+      "TITLE": "Omdøb app",
+      "DESCRIPTION": "Indtast det nye navn for din app",
+      "NAME": "Nyt navn"
+    },
+    "NAME": "Navn",
+    "TYPE": "Applikationstype",
+    "AUTHMETHOD": "Godkendelsesmetode",
+    "AUTHMETHODSECTION": "Godkendelsesmetode",
+    "GRANT": "Grant-typer",
+    "ADDITIONALORIGINS": "Yderligere origins",
+    "ADDITIONALORIGINSDESC": "Hvis du vil tilføje yderligere origins til din app, som ikke bruges som en omdirigering, kan du gøre det her.",
+    "ORIGINS": "Origins",
+    "NOTANORIGIN": "Den indtastede værdi er ikke en origin",
+    "PROSWITCH": "Jeg er en pro. Spring denne guide over.",
+    "NAMEANDTYPESECTION": "Navn og type",
+    "TITLEFIRST": "Applikationens navn",
+    "TYPETITLE": "Applikationstype",
+    "OIDC": {
+      "WELLKNOWN": "Yderligere links kan hentes fra <a href='{{url}}' title='Discovery endpoint' target='_blank'>discovery-endpointet</a>.",
+      "INFO": {
+        "ISSUER": "Issuer",
+        "CLIENTID": "Client Id"
+      },
+      "CURRENT": "Nuværende konfiguration",
+      "TOKENSECTIONTITLE": "AuthToken-indstillinger",
+      "REDIRECTSECTIONTITLE": "Omdirigeringsindstillinger",
+      "REDIRECTTITLE": "Angiv de URI'er, som login vil omdirigere til.",
+      "POSTREDIRECTTITLE": "Dette er omdirigerings-URI'en efter logout.",
+      "REDIRECTDESCRIPTIONWEB": "Omdirigerings-URI'er skal begynde med https://. http:// er kun gyldig med aktiveret udviklingstilstand.",
+      "REDIRECTDESCRIPTIONNATIVE": "Omdirigerings-URI'er skal begynde med din egen protokol, http://127.0.0.1, http://[::1] eller http://localhost.",
+      "REDIRECTNOTVALID": "Denne omdirigerings-URI er ikke gyldig.",
+      "COMMAORENTERSEPERATION": "adskil med ↵",
+      "TYPEREQUIRED": "Typen er påkrævet.",
+      "TITLE": "OIDC-indstillinger",
+      "CLIENTID": "Client ID",
+      "CLIENTDETAILS": "Klientdetaljer",
+      "CLIENTSECRET_NOSECRET": "Med dit valgte godkendelsesflow er der ikke brug for en hemmelighed, og den er derfor ikke tilgængelig.",
+      "CLIENTSECRET_DESCRIPTION": "Opbevar din klienthemmelighed et sikkert sted, da den forsvinder, når dialogen lukkes.",
+      "REGENERATESECRET": "Generér klienthemmelighed igen",
+      "DEVMODE": "Udviklingstilstand",
+      "DEVMODE_ENABLED": "Aktiveret",
+      "DEVMODE_DISABLED": "Deaktiveret",
+      "DEVMODEDESC": "Vær opmærksom: Med aktiveret udviklingstilstand vil omdirigerings-URI'er ikke blive valideret.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Spring login-successide over",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Spring successiden over efter et login for denne native app.",
+      "REDIRECT": "Omdirigerings-URI'er",
+      "REDIRECTSECTION": "Omdirigerings-URI'er",
+      "POSTLOGOUTREDIRECT": "Post Logout-URI'er",
+      "RESPONSESECTION": "Response-typer",
+      "GRANTSECTION": "Grant-typer",
+      "GRANTTITLE": "Vælg dine grant-typer. Bemærk: Implicit er kun tilgængelig for browserbaserede applikationer.",
+      "APPTYPE": {
+        "0": "Web",
+        "1": "User Agent",
+        "2": "Native"
+      },
+      "RESPONSETYPE": "Response-typer",
+      "RESPONSE": {
+        "0": "Code",
+        "1": "ID Token",
+        "2": "Token-ID Token"
+      },
+      "REFRESHTOKEN": "Fornyelsestoken",
+      "GRANTTYPE": "Grant-typer",
+      "GRANT": {
+        "0": "Authorization Code",
+        "1": "Implicit",
+        "2": "Refresh Token",
+        "3": "Device Code",
+        "4": "Token Exchange"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Post",
+        "2": "None",
+        "3": "Private Key JWT"
+      },
+      "TOKENTYPE": "Auth-tokentype",
+      "TOKENTYPE0": "Bearer Token",
+      "TOKENTYPE1": "JWT",
+      "UNSECUREREDIRECT": "Jeg håber virkelig, du ved, hvad du laver.",
+      "OVERVIEWSECTION": "Oversigt",
+      "OVERVIEWTITLE": "Du er nu færdig. Gennemgå dine indstillinger.",
+      "ACCESSTOKENROLEASSERTION": "Tilføj brugerroller til adgangstokenet",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Hvis valgt, tilføjes den godkendte brugers anmodede roller til adgangstokenet.",
+      "IDTOKENROLEASSERTION": "Brugerroller i ID-tokenet",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "Når denne mulighed er aktiveret, vil den godkendte brugers tildelte roller blive tilføjet direkte til deres ID-token. Sørg for at aktivere projektindstillingen 'Tildel brugerroller under godkendelse', eller anmod via et brugerdefineret scope.",
+      "IDTOKENUSERINFOASSERTION": "Inkludér brugerens profiloplysninger i ID-tokenet",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Gør det muligt for applikationer at hente profil-, e-mail-, telefon- og adresse-claims fra ID-tokenet.",
+      "CLOCKSKEW": "Gør det muligt for applikationer at håndtere clock skew mellem OP og applikation. Varigheden (0-5s) tilføjes til exp-claimet og trækkes fra iats, auth_time og nbf.",
+      "RECOMMENDED": "anbefalet",
+      "NOTRECOMMENDED": "ikke anbefalet",
+      "SELECTION": {
+        "APPTYPE": {
+          "WEB": {
+            "TITLE": "Web",
+            "DESCRIPTION": "Almindelige webapplikationer som .NET, PHP, Node.js, Java osv."
+          },
+          "NATIVE": {
+            "TITLE": "Native",
+            "DESCRIPTION": "Mobilapps, desktop, smarte enheder osv."
+          },
+          "USERAGENT": {
+            "TITLE": "User Agent",
+            "DESCRIPTION": "Single Page Applications (SPA) og generelt alle JS-frameworks, der køres i browsere"
+          }
+        }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout-URI"
+    },
+    "API": {
+      "INFO": {
+        "CLIENTID": "Client Id"
+      },
+      "REGENERATESECRET": "Generér klienthemmelighed igen",
+      "SELECTION": {
+        "TITLE": "API",
+        "DESCRIPTION": "API'er generelt"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Private Key JWT"
+      }
+    },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "SAML-applikationer"
+      },
+      "CONFIGSECTION": "SAML-indstillinger",
+      "CHOOSEMETADATASOURCE": "Angiv dine SAML-indstillinger ved hjælp af en af følgende muligheder:",
+      "METADATAOPT1": "Mulighed 1. Angiv den URL, hvor metadatafilen er placeret",
+      "METADATAOPT2": "Mulighed 2. Upload en fil, der indeholder din metadata-XML",
+      "METADATAOPT3": "Mulighed 3. Opret en minimal metadatafil løbende ved at angive ENTITYID og ACS-URL",
+      "UPLOAD": "Upload XML-fil",
+      "METADATA": "Metadata",
+      "METADATAFROMFILE": "Metadata fra fil",
+      "CERTIFICATE": "SAML-certifikat",
+      "DOWNLOADCERT": "Download SAML-certifikat",
+      "CREATEMETADATA": "Opret metadata",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS-endpoint-URL"
+    },
+    "AUTHMETHODS": {
+      "CODE": {
+        "TITLE": "Code",
+        "DESCRIPTION": "Udveksl autorisationskoden med tokens"
+      },
+      "PKCE": {
+        "TITLE": "PKCE",
+        "DESCRIPTION": "Brug en tilfældig hash i stedet for en statisk klienthemmelighed for mere sikkerhed"
+      },
+      "POST": {
+        "TITLE": "POST",
+        "DESCRIPTION": "Send client_id og client_secret som en del af formularen"
+      },
+      "PK_JWT": {
+        "TITLE": "Private Key JWT",
+        "DESCRIPTION": "Brug en privat nøgle til at autorisere din applikation"
+      },
+      "BASIC": {
+        "TITLE": "Basic",
+        "DESCRIPTION": "Godkendelse med brugernavn og adgangskode"
+      },
+      "IMPLICIT": {
+        "TITLE": "Implicit",
+        "DESCRIPTION": "Få tokens direkte fra autorisations-endpointet"
+      },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Autorisér enheden på en computer eller smartphone."
+      },
+      "CUSTOM": {
+        "TITLE": "Brugerdefineret",
+        "DESCRIPTION": "Din indstilling svarer ikke til nogen anden mulighed."
+      }
+    },
+    "TOAST": {
+      "REACTIVATED": "Applikation genaktiveret.",
+      "DEACTIVATED": "Applikation deaktiveret.",
+      "OIDCUPDATED": "App opdateret.",
+      "APIUPDATED": "App opdateret",
+      "UPDATED": "App opdateret.",
+      "CREATED": "App oprettet.",
+      "CLIENTSECRETREGENERATED": "klienthemmelighed genereret.",
+      "DELETED": "App slettet.",
+      "CONFIGCHANGED": "Ændringer registreret!"
+    },
+    "LOGINV2": {
+      "USEV2": "Brug den nye login-grænseflade",
+      "BASEURL": "Brugerdefineret base-URL til den nye login-grænseflade"
+    }
+  },
+  "GENDERS": {
+    "0": "Ukendt",
+    "1": "Kvinde",
+    "2": "Mand",
+    "3": "Andet"
+  },
+  "LANGUAGES": {
+    "da": "Dansk",
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文",
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский",
+    "nl": "Nederlands",
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română",
+    "tr": "Türkçe",
+    "uk": "Українська",
+    "ar": "العربية"
+  },
+  "MEMBER": {
+    "ADD": "Tilføj en administrator",
+    "CREATIONTYPE": "Oprettelsestype",
+    "CREATIONTYPES": {
+      "3": "IAM",
+      "2": "Organisation",
+      "0": "Eget projekt",
+      "1": "Tildelt projekt",
+      "4": "Projekt"
+    },
+    "EDITROLE": "Redigér roller",
+    "EDITFOR": "Redigér rollerne for brugeren: {{value}}",
+    "DIALOG": {
+      "DELETE_TITLE": "Fjern administrator",
+      "DELETE_DESCRIPTION": "Du er ved at fjerne en administrator. Er du sikker?"
+    },
+    "SHOWDETAILS": "Klik for at vise detaljer."
+  },
+  "ROLESLABEL": "Roller",
+  "GRANTS": {
+    "TITLE": "Rolletildelinger",
+    "DESC": "Dette er alle rolletildelinger i din organisation.",
+    "DELETE": "Slet rolletildeling",
+    "EMPTY": "Ingen rolletildeling fundet",
+    "ADD": "Opret rolletildeling",
+    "ADD_BTN": "Ny",
+    "PROJECT": {
+      "TITLE": "Rolletildeling",
+      "DESCRIPTION": "Definér rolletildelinger for det angivne projekt. Bemærk, at du kun kan se poster for projekter og brugere, som du har tilladelser til."
+    },
+    "USER": {
+      "TITLE": "Rolletildeling",
+      "DESCRIPTION": "Definér rolletildelinger for den angivne bruger. Bemærk, at du kun kan se poster for projekter og brugere, som du har tilladelser til."
+    },
+    "CREATE": {
+      "TITLE": "Opret rolletildeling",
+      "DESCRIPTION": "Søg efter organisationen, projektet og de tilsvarende roller."
+    },
+    "EDIT": {
+      "TITLE": "Skift rolletildeling"
+    },
+    "DETAIL": {
+      "TITLE": "Detalje om rolletildeling",
+      "DESCRIPTION": "Her kan du se alle detaljer om rolletildelingen."
+    },
+    "TOAST": {
+      "UPDATED": "Rolletildeling opdateret.",
+      "REMOVED": "Rolletildeling fjernet",
+      "BULKREMOVED": "Rolletildelinger fjernet.",
+      "CANTSHOWINFO": "Du kan ikke besøge denne brugers profil, da du ikke er administrator af den organisation, som denne bruger tilhører"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Slet rolletildeling",
+      "DELETE_DESCRIPTION": "Du er ved at slette en rolletildeling. Vil du fortsætte?",
+      "BULK_DELETE_TITLE": "Slet rolletildelinger",
+      "BULK_DELETE_DESCRIPTION": "Du er ved at slette flere rolletildelinger. Vil du fortsætte?"
+    }
+  },
+  "CHANGES": {
+    "LISTTITLE": "Seneste ændringer",
+    "BOTTOM": "Du er nået til slutningen af listen.",
+    "LOADMORE": "Indlæs flere",
+    "ORG": {
+      "TITLE": "Aktivitet",
+      "DESCRIPTION": "Her kan du se de seneste hændelser, der har genereret en organisationsændring."
+    },
+    "PROJECT": {
+      "TITLE": "Aktivitet",
+      "DESCRIPTION": "Her kan du se de seneste hændelser, der har genereret en projektændring."
+    },
+    "USER": {
+      "TITLE": "Aktivitet",
+      "DESCRIPTION": "Her kan du se de seneste hændelser, der har genereret en brugerændring."
+    }
+  }
+}

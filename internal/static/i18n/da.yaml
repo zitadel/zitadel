@@ -1,0 +1,1420 @@
+Errors:
+  Internal: "Der opstod en intern fejl"
+  NoChangesFound: "Ingen ændringer"
+  OriginNotAllowed: "Denne \"Origin\" er ikke tilladt"
+  IDMissing: "ID mangler"
+  ResourceOwnerMissing: "Ressourceejer-organisation mangler"
+  RemoveFailed: "Kunne ikke fjernes"
+  PermissionDenied: "Tilladelse nægtet"
+  ProjectionName:
+    Invalid: "Ugyldigt projektionsnavn"
+  Assets:
+    EmptyKey: "Asset-nøgle er tom"
+    Store:
+      NotInitialized: "Asset-lager ikke initialiseret"
+      NotConfigured: "Asset-lager ikke konfigureret"
+    Bucket:
+      Internal: "Intern fejl ved oprettelse af bucket"
+      AlreadyExists: "Bucket findes allerede"
+      CreateFailed: "Bucket blev ikke oprettet"
+      ListFailed: "Buckets kunne ikke læses"
+      RemoveFailed: "Bucket blev ikke slettet"
+      SetPublicFailed: "Kunne ikke gøre bucket offentlig"
+    Object:
+      PutFailed: "Objekt blev ikke oprettet"
+      GetFailed: "Objekt kunne ikke læses"
+      NotFound: "Objekt kunne ikke findes"
+      PresignedTokenFailed: "Signeret token kunne ikke oprettes"
+      ListFailed: "Objektliste kunne ikke læses"
+      RemoveFailed: "Objekt kunne ikke fjernes"
+  Limit:
+    ExceedsDefault: "Grænse overstiger standardgrænsen"
+  Limits:
+    NotFound: "Grænser ikke fundet"
+    NoneSpecified: "Ingen grænser angivet"
+    Instance:
+      Blocked: "Instans er blokeret"
+  Restrictions:
+    NoneSpecified: "Ingen begrænsninger angivet"
+    DefaultLanguageMustBeAllowed: "Standardsproget skal være tilladt"
+  Language:
+    NotParsed: "Sproget kunne ikke fortolkes"
+    NotSupported: "Sproget understøttes ikke"
+    NotAllowed: "Sproget er ikke tilladt"
+    Undefined: "Sproget er udefineret"
+    Duplicate: "Sprog indeholder dubletter"
+  OIDCSettings:
+    NotFound: "OIDC-konfiguration ikke fundet"
+    AlreadyExists: "OIDC-konfiguration findes allerede"
+  SecretGenerator:
+    AlreadyExists: "Hemmelighedsgenerator findes allerede"
+    TypeMissing: "Type for hemmelighedsgenerator mangler"
+    NotFound: "Hemmelighedsgenerator ikke fundet"
+  SMSConfig:
+    NotFound: "SMS-konfiguration ikke fundet"
+    AlreadyActive: "SMS-konfiguration er allerede aktiv"
+    AlreadyDeactivated: "SMS-konfiguration er allerede deaktiveret"
+    NotExternalVerification: "SMS-konfiguration understøtter ikke kodebekræftelse"
+  SMTP:
+    NotEmailMessage: "beskeden er ikke EmailMessage"
+    RequiredAttributes: "emne, modtagere og indhold skal være angivet, men nogle eller alle af dem er tomme"
+    CouldNotSplit: "kunne ikke opdele host og port til forbindelse til smtp"
+    CouldNotDial: "kunne ikke få kontakt til SMTP-serveren, tjek porten, firewall-problemer..."
+    CouldNotDialTLS: "kunne ikke få kontakt til SMTP-serveren via TLS, tjek porten, firewall-problemer..."
+    CouldNotCreateClient: "kunne ikke oprette smtp-klient"
+    CouldNotStartTLS: "kunne ikke starte tls"
+    CouldNotAuth: "kunne ikke tilføje smtp-godkendelse, tjek om både dit brugernavn og din adgangskode er korrekte; hvis de er korrekte, kræver din udbyder måske en godkendelsesmetode, der ikke understøttes af Zitadel"
+    CouldNotSetSender: "kunne ikke angive afsender"
+    CouldNotSetRecipient: "kunne ikke angive modtager"
+  SMTPConfig:
+    TestPassword: "Adgangskode til test ikke fundet"
+    NotFound: "SMTP-konfiguration ikke fundet"
+    AlreadyExists: "SMTP-konfiguration findes allerede"
+    AlreadyDeactivated: "SMTP-konfiguration allerede deaktiveret"
+    SenderAdressNotCustomDomain: "Afsenderadressen skal være konfigureret som Custom Domain på instansen."
+    TestEmailNotFound: "E-mailadresse til test ikke fundet"
+  Notification:
+    NoDomain: "Intet domæne fundet for beskeden"
+  User:
+    NotFound: "Brugeren kunne ikke findes"
+    AlreadyExists: "Brugeren findes allerede"
+    NotFoundOnOrg: "Brugeren kunne ikke findes i den valgte organisation"
+    NotAllowedOrg: "Brugeren er ikke medlem af den påkrævede organisation"
+    UserIDMissing: "Bruger-ID mangler"
+    UserIDWrong: "Den anmodede bruger er ikke den samme som den godkendte bruger"
+    DomainPolicyNil: "Organisationspolitik er tom"
+    EmailAsUsernameNotAllowed: "E-mail er ikke tilladt som brugernavn"
+    Invalid: "Brugerdata er ugyldige"
+    DomainNotAllowedAsUsername: "Domænet er allerede reserveret og kan ikke bruges"
+    AlreadyInactive: "Brugeren er allerede inaktiv"
+    NotInactive: "Brugeren er ikke inaktiv"
+    CantDeactivateInitial: "En bruger med status initial kan kun slettes, ikke deaktiveres"
+    ShouldBeActiveOrInitial: "Brugeren er ikke aktiv eller initial"
+    AlreadyInitialised: "Brugeren er allerede initialiseret"
+    NotInitialised: "Brugeren er endnu ikke initialiseret"
+    NotLocked: "Brugeren er ikke låst"
+    NoChanges: "Ingen ændringer fundet"
+    InitCodeNotFound: "Initialiseringskode ikke fundet"
+    UsernameNotChanged: "Brugernavn ikke ændret"
+    InvalidURLTemplate: "URL-skabelon er ugyldig"
+    Locked: "Brugeren er låst"
+    Profile:
+      NotFound: "Profil ikke fundet"
+      NotChanged: "Profil ikke ændret"
+      Empty: "Profil er tom"
+      FirstNameEmpty: "Fornavn i profil er tomt"
+      LastNameEmpty: "Efternavn i profil er tomt"
+      IDMissing: "Profil-ID mangler"
+    Email:
+      NotFound: "E-mail ikke fundet"
+      Invalid: "E-mail er ugyldig"
+      AlreadyVerified: "E-mail er allerede bekræftet"
+      NotChanged: "E-mail ikke ændret"
+      Empty: "E-mail er tom"
+      IDMissing: "E-mail-ID mangler"
+    Phone:
+      NotFound: "Telefon ikke fundet"
+      Invalid: "Telefon er ugyldig"
+      AlreadyVerified: "Telefon allerede bekræftet"
+      Empty: "Telefon er tom"
+      NotChanged: "Telefon ikke ændret"
+      VerifyingRemovalIsNotSupported: "Bekræftelse af fjernelse af telefon understøttes ikke"
+    Address:
+      NotFound: "Adresse ikke fundet"
+      NotChanged: "Adresse ikke ændret"
+    Machine:
+      Key:
+        NotFound: "Maskinnøgle ikke fundet"
+        AlreadyExisting: "Maskinnøgle findes allerede"
+        Invalid: "Den offentlige nøgle er ikke en gyldig RSA-offentlig nøgle i PKIX-format med PEM-kodning"
+      Secret:
+        NotExisting: "Hemmeligheden findes ikke"
+        Invalid: "Hemmeligheden er ugyldig"
+        CouldNotGenerate: "Hemmeligheden kunne ikke genereres"
+    PAT:
+      NotFound: "Personlig adgangstoken ikke fundet"
+    Metadata:
+      Conflicting: "Metadata må ikke være angivet på både bruger- og personfelterne"
+    NotHuman: "Brugeren skal være personlig"
+    NotMachine: "Brugeren skal være teknisk"
+    WrongType: "Ikke tilladt for denne brugertype"
+    NotAllowedToLink: "Brugeren har ikke tilladelse til at tilknytte en ekstern loginudbyder"
+    Username:
+      AlreadyExists: "Brugernavn allerede taget"
+      Reserved: "Brugernavn er allerede taget"
+      Empty: "Brugernavn er tomt"
+    Code:
+      Empty: "Koden er tom"
+      NotFound: "Koden ikke fundet"
+      Expired: "Koden er udløbet"
+      GeneratorAlgNotSupported: "Generator-algoritme understøttes ikke"
+      Invalid: "Koden er ugyldig"
+    Password:
+      NotFound: "Adgangskode ikke fundet"
+      Empty: "Adgangskode er tom"
+      Invalid: "Adgangskode er ugyldig"
+      NotSet: "Brugeren har ikke angivet en adgangskode"
+      NotChanged: "Den nye adgangskode må ikke være den samme som din nuværende adgangskode"
+      NotSupported: "Kodning af adgangskode-hash understøttes ikke. Se https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"
+    PasswordComplexityPolicy:
+      NotFound: "Adgangskodepolitik ikke fundet"
+      MinLength: "Adgangskoden er for kort"
+      MinLengthNotAllowed: "Den angivne minimumslængde er ikke tilladt"
+      HasLower: "Adgangskoden skal indeholde små bogstaver"
+      HasUpper: "Adgangskoden skal indeholde store bogstaver"
+      HasNumber: "Adgangskoden skal indeholde et tal"
+      HasSymbol: "Adgangskoden skal indeholde et symbol"
+    ExternalIDP:
+      Invalid: "Ekstern identitetsudbyder ugyldig"
+      IDPConfigNotExisting: "Identitetsudbyderen er ugyldig for denne organisation"
+      NotAllowed: "Ekstern identitetsudbyder ikke tilladt"
+      MinimumExternalIDPNeeded: "Mindst én identitetsudbyder skal tilføjes"
+      AlreadyExists: "Ekstern identitetsudbyder allerede taget"
+      NotFound: "Ekstern identitetsudbyder ikke fundet"
+      LoginFailed: "Login hos ekstern identitetsudbyder mislykkedes"
+    MFA:
+      OTP:
+        AlreadyReady: "Multifaktor-engangskode (OTP) er allerede konfigureret"
+        NotExisting: "Multifaktor-engangskode (OTP) findes ikke"
+        NotReady: "Multifaktor-engangskode (OTP) er ikke klar"
+        InvalidCode: "Ugyldig kode"
+      U2F:
+        NotExisting: "U2F findes ikke"
+      Passwordless:
+        NotExisting: "Adgangsnøgle findes ikke"
+      RecoveryCodes:
+        Empty: "Gendannelseskode er tom"
+        InvalidCode: "Ugyldig gendannelseskode angivet"
+        MaxCountExceeded: "Maksimalt antal gendannelseskoder overskredet"
+        NotReady: "Gendannelseskoder er ikke klar til brug"
+        ConfigInvalid: "Konfiguration af gendannelseskoder er ugyldig"
+    WebAuthN:
+      NotFound: "WebAuthN-token kunne ikke findes"
+      BeginRegisterFailed: "WebAuthN-registrering kunne ikke startes"
+      MarshalError: "Fejl ved marshalling af data"
+      ErrorOnParseCredential: "Fejl ved fortolkning af legitimationsdata"
+      CreateCredentialFailed: "Fejl ved oprettelse af legitimationsoplysninger"
+      BeginLoginFailed: "WebAuthN-login kunne ikke startes"
+      ValidateLoginFailed: "Fejl ved validering af login-legitimationsoplysninger"
+      CloneWarning: "Legitimationsoplysninger kan være klonede"
+    RefreshToken:
+      Invalid: "Refresh Token er ugyldigt"
+      NotFound: "Refresh Token ikke fundet"
+  Org:
+    AlreadyExists: "Organisationens navn eller id er allerede taget"
+    Invalid: "Organisationen er ugyldig"
+    AlreadyDeactivated: "Organisationen er allerede deaktiveret"
+    AlreadyActive: "Organisationen er allerede aktiv"
+    Empty: "Organisationen er tom"
+    NotFound: "Organisationen ikke fundet"
+    NotChanged: "Organisationen ikke ændret"
+    DefaultOrgNotDeletable: "Standardorganisationen må ikke slettes"
+    ZitadelOrgNotDeletable: "Organisation med Zitadel-projekt må ikke slettes"
+    InvalidDomain: "Ugyldigt domæne"
+    DomainMissing: "Domæne mangler"
+    DomainNotOnOrg: "Domænet findes ikke på organisationen"
+    DomainNotVerified: "Domænet er ikke bekræftet"
+    DomainAlreadyVerified: "Domænet er allerede bekræftet"
+    DomainVerificationTypeInvalid: "Domænebekræftelsestype er ugyldig"
+    DomainVerificationMissing: "Domænebekræftelse er endnu ikke startet"
+    DomainVerificationFailed: "Domænebekræftelse mislykkedes"
+    DomainVerificationTXTNotFound: "TXT-posten _zitadel-challenge blev ikke fundet for dit domæne. Tjek, at du har tilføjet den til din DNS-server, eller vent, til den nye post er udbredt"
+    DomainVerificationTXTNoMatch: "TXT-posten _zitadel-challenge blev fundet for dit domæne, men den indeholder ikke den rigtige token-tekst. Tjek, at du har tilføjet den rigtige token til din DNS-server, eller vent, til den nye post er udbredt"
+    DomainVerificationHTTPNotFound: "Filen, der indeholder challenge, blev ikke fundet på den forventede URL. Tjek, at du har uploadet filen det rigtige sted med læserettigheder"
+    DomainVerificationHTTPNoMatch: "Filen, der indeholder challenge, blev fundet på den forventede URL, men den indeholder ikke den rigtige token-tekst. Tjek dens indhold"
+    DomainVerificationTimeout: "Der opstod en timeout ved forespørgsel til DNS-serveren"
+    PrimaryDomainNotDeletable: "Organisationens domæne må ikke slettes"
+    DomainNotFound: "Domæne ikke fundet"
+    MemberIDMissing: "Medlems-ID mangler"
+    MemberNotFound: "Organisationsmedlem ikke fundet"
+    InvalidMember: "Organisationsmedlem er ugyldigt"
+    UserIDMissing: "Bruger-ID mangler"
+    PolicyAlreadyExists: "Politik findes allerede"
+    PolicyNotExisting: "Politik findes ikke"
+    IdpInvalid: "IDP-konfiguration er ugyldig"
+    IdpNotExisting: "IDP-konfiguration findes ikke"
+    OIDCConfigInvalid: "OIDC IDP-konfiguration er ugyldig"
+    IdpIsNotOIDC: "IDP-konfiguration er ikke af typen oidc"
+    Domain:
+      AlreadyExists: "Domæne findes allerede"
+      InvalidCharacter: "Kun alfanumeriske tegn, . og - er tilladt i et domæne"
+      EmptyString: "Ugyldige ikke-numeriske og ikke-alfabetiske tegn blev erstattet med tomme mellemrum, og det resulterende domæne er en tom streng"
+    LoginPolicy:
+      NotFound: "Login-politik ikke fundet"
+      Invalid: "Login-politik er ugyldig"
+      RedirectURIInvalid: "Standard-omdirigerings-URI er ugyldig"
+      NotExisting: "Login-politik findes ikke"
+      AlreadyExists: "Login-politik findes allerede"
+      IdpProviderAlreadyExisting: "Identitetsudbyder findes allerede"
+      IdpProviderNotExisting: "Identitetsudbyder findes ikke"
+      RegistrationNotAllowed: "Registrering er ikke tilladt"
+      UsernamePasswordNotAllowed: "Login med brugernavn / adgangskode er ikke tilladt"
+      MFA:
+        AlreadyExists: "Multifaktor findes allerede"
+        NotExisting: "Multifaktor findes ikke"
+        Unspecified: "Multifaktor ugyldig"
+    MailTemplate:
+      NotFound: "Standard-mailskabelon ikke fundet"
+      NotChanged: "Standard-mailskabelon er ikke ændret"
+      AlreadyExists: "Standard-mailskabelon findes allerede"
+      Invalid: "Standard-mailskabelon er ugyldig"
+    CustomMessageText:
+      NotFound: "Standard-beskedtekst ikke fundet"
+      NotChanged: "Standard-beskedtekst er ikke ændret"
+      AlreadyExists: "Standard-beskedtekst findes allerede"
+      Invalid: "Standard-beskedtekst er ugyldig"
+    PasswordComplexityPolicy:
+      NotFound: "Politik for adgangskodekompleksitet ikke fundet"
+      Empty: "Politik for adgangskodekompleksitet er tom"
+      NotExisting: "Politik for adgangskodekompleksitet findes ikke"
+      AlreadyExists: "Politik for adgangskodekompleksitet findes allerede"
+    PasswordLockoutPolicy:
+      NotFound: "Politik for adgangskodespærring ikke fundet"
+      Empty: "Politik for adgangskodespærring er tom"
+      NotExisting: "Politik for adgangskodespærring findes ikke"
+      AlreadyExists: "Politik for adgangskodespærring findes allerede"
+    PasswordAgePolicy:
+      NotFound: "Politik for adgangskodealder ikke fundet"
+      Empty: "Politik for adgangskodealder er tom"
+      NotExisting: "Politik for adgangskodealder findes ikke"
+      AlreadyExists: "Politik for adgangskodealder findes allerede"
+    NotificationPolicy:
+      NotFound: "Notifikationspolitik ikke fundet"
+      NotChanged: "Notifikationspolitik ikke ændret"
+      AlreadyExists: "Notifikationspolitik findes allerede"
+    LabelPolicy:
+      NotFound: "Privat label-politik ikke fundet"
+      NotChanged: "Privat label-politik er ikke ændret"
+  Project:
+    ProjectIDMissing: "Projekt-ID mangler"
+    AlreadyExists: "Projektet findes allerede i organisationen"
+    OrgNotExisting: "Organisationen findes ikke"
+    UserNotExisting: "Brugeren findes ikke"
+    CouldNotGenerateClientSecret: "Kunne ikke generere klienthemmelighed"
+    Invalid: "Projektet er ugyldigt"
+    NotActive: "Projektet er ikke aktivt"
+    NotInactive: "Projektet er ikke deaktiveret"
+    NotFound: "Projektet ikke fundet"
+    UserIDMissing: "Bruger-ID mangler"
+    Member:
+      NotFound: "Projektmedlem ikke fundet"
+      Invalid: "Projektmedlem er ugyldigt"
+      AlreadyExists: "Projektmedlem findes allerede"
+      NotExisting: "Projektmedlem findes ikke"
+    MinimumOneRoleNeeded: "Mindst én rolle skal tilføjes"
+    Role:
+      AlreadyExists: "Rollen findes allerede"
+      Invalid: "Rollen er ugyldig"
+      NotExisting: "Rollen findes ikke"
+    IDMissing: "ID mangler"
+    App:
+      AlreadyExists: "Applikationen findes allerede"
+      NotFound: "Applikationen ikke fundet"
+      Invalid: "Applikationen ugyldig"
+      NotExisting: "Applikationen findes ikke"
+      NotActive: "Applikationen er ikke aktiv"
+      NotInactive: "Applikationen er ikke inaktiv"
+      OIDCConfigInvalid: "OIDC-konfiguration er ugyldig"
+      APIConfigInvalid: "API-konfiguration er ugyldig"
+      SAMLConfigInvalid: "SAML-konfiguration er ugyldig"
+      IsNotOIDC: "Applikationen er ikke af typen OIDC"
+      IsNotAPI: "Applikationen er ikke af typen API"
+      IsNotSAML: "Applikationen er ikke af typen SAML"
+      SAMLMetadataMissing: "SAML-metadata mangler"
+      SAMLMetadataFormat: "Fejl i SAML-metadataformat"
+      SAMLEntityIDAlreadyExisting: "SAML EntityID findes allerede"
+      OIDCAuthMethodNoSecret: "Den valgte OIDC-godkendelsesmetode kræver ikke en hemmelighed"
+      APIAuthMethodNoSecret: "Den valgte API-godkendelsesmetode kræver ikke en hemmelighed"
+      AuthMethodNoPrivateKeyJWT: "Den valgte godkendelsesmetode kræver ikke en nøgle"
+      ClientSecretInvalid: "Klienthemmelighed er ugyldig"
+      Key:
+        AlreadyExisting: "Applikationsnøgle findes allerede"
+        NotFound: "Applikationsnøgle ikke fundet"
+    RequiredFieldsMissing: "Nogle påkrævede felter mangler"
+    Grant:
+      AlreadyExists: "Projekttildeling findes allerede"
+      NotFound: "Projekttildeling ikke fundet"
+      Invalid: "Projekttildeling er ugyldig"
+      NotExisting: "Projekttildeling findes ikke"
+      HasNotExistingRole: "En rolle findes ikke i projektet"
+      NotActive: "Projekttildeling er ikke aktiv"
+      NotInactive: "Projekttildeling er ikke inaktiv"
+  Instance:
+    AlreadyExists: "Instans findes allerede"
+    NotChanged: "Instans ikke ændret"
+    NotFound: "Instans ikke fundet. Sørg for, at du har det rigtige domæne. Se https://zitadel.com/docs/apis/introduction#domains"
+    Member:
+      RolesNotChanged: "Roller er ikke ændret"
+    MemberInvalid: "Medlem er ugyldigt"
+    MemberAlreadyExisting: "Medlem findes allerede"
+    MemberNotExisting: "Medlem findes ikke"
+    IDMissing: "Id mangler"
+    IdpInvalid: "IDP-konfiguration er ugyldig"
+    IdpNotExisting: "IDP-konfiguration findes ikke"
+    OIDCConfigInvalid: "OIDC IDP-konfiguration er ugyldig"
+    IdpIsNotOIDC: "IDP-konfiguration er ikke af typen oidc"
+    LoginPolicyInvalid: "Login-politik er ugyldig"
+    LoginPolicyNotExisting: "Login-politik findes ikke"
+    IdpProviderInvalid: "Identitetsudbyder er ugyldig"
+    LoginPolicy:
+      NotFound: "Standard-login-politik ikke fundet"
+      NotChanged: "Standard-login-politik er ikke ændret"
+      NotExisting: "Standard-login-politik findes ikke"
+      AlreadyExists: "Standard-login-politik findes allerede"
+      RedirectURIInvalid: "Standard-omdirigerings-URI er ugyldig"
+      MFA:
+        AlreadyExists: "Multifaktor findes allerede"
+        NotExisting: "Multifaktor findes ikke"
+        Unspecified: "Multifaktor ugyldig"
+      IDP:
+        AlreadyExists: "Identitetsudbyder findes allerede"
+        NotExisting: "Identitetsudbyder findes ikke"
+        Invalid: "Identitetsudbyder ugyldig"
+      IDPConfig:
+        AlreadyExists: "Identitetsudbyder-konfiguration findes allerede"
+        NotInactive: "Identitetsudbyder-konfiguration ikke inaktiv"
+        NotActive: "Identitetsudbyder-konfiguration ikke aktiv"
+    LabelPolicy:
+      NotFound: "Standard privat label-politik ikke fundet"
+      NotChanged: "Standard privat label-politik er ikke ændret"
+    MailTemplate:
+      NotFound: "Standard-mailskabelon ikke fundet"
+      NotChanged: "Standard-mailskabelon er ikke ændret"
+      AlreadyExists: "Standard-mailskabelon findes allerede"
+      Invalid: "Standard-mailskabelon er ugyldig"
+    CustomMessageText:
+      NotFound: "Standard-beskedtekst ikke fundet"
+      NotChanged: "Standard-beskedtekst er ikke ændret"
+      AlreadyExists: "Standard-beskedtekst findes allerede"
+      Invalid: "Standard-beskedtekst er ugyldig"
+    PasswordComplexityPolicy:
+      NotFound: "Standardpolitik for adgangskodekompleksitet ikke fundet"
+      NotExisting: "Standardpolitik for adgangskodekompleksitet findes ikke"
+      AlreadyExists: "Standardpolitik for adgangskodekompleksitet findes allerede"
+      Empty: "Standardpolitik for adgangskodekompleksitet er tom"
+      NotChanged: "Standardpolitik for adgangskodekompleksitet er ikke ændret"
+    PasswordAgePolicy:
+      NotFound: "Standardpolitik for adgangskodealder ikke fundet"
+      NotExisting: "Standardpolitik for adgangskodealder findes ikke"
+      AlreadyExists: "Standardpolitik for adgangskodealder findes allerede"
+      Empty: "Standardpolitik for adgangskodealder er tom"
+      NotChanged: "Standardpolitik for adgangskodealder er ikke ændret"
+    PasswordLockoutPolicy:
+      NotFound: "Standardpolitik for adgangskodespærring ikke fundet"
+      NotExisting: "Standardpolitik for adgangskodespærring findes ikke"
+      AlreadyExists: "Standardpolitik for adgangskodespærring findes allerede"
+      Empty: "Standardpolitik for adgangskodespærring er tom"
+      NotChanged: "Standardpolitik for adgangskodespærring er ikke ændret"
+    DomainPolicy:
+      NotFound: "Organisationens domænepolitik ikke fundet"
+      Empty: "Organisationens domænepolitik er tom"
+      NotExisting: "Organisationens domænepolitik findes ikke"
+      AlreadyExists: "Organisationens domænepolitik findes allerede"
+      NotChanged: "Organisationens domænepolitik er ikke ændret"
+    NotificationPolicy:
+      NotFound: "Standard-notifikationspolitik ikke fundet"
+      NotChanged: "Standard-notifikationspolitik ikke ændret"
+      AlreadyExists: "Standard-notifikationspolitik findes allerede"
+  Policy:
+    AlreadyExists: "Politik findes allerede"
+    Label:
+      Invalid:
+        PrimaryColor: "Primærfarve er ikke en gyldig hex-farveværdi"
+        BackgroundColor: "Baggrundsfarve er ikke en gyldig hex-farveværdi"
+        WarnColor: "Advarselsfarve er ikke en gyldig hex-farveværdi"
+        FontColor: "Skriftfarve er ikke en gyldig hex-farveværdi"
+        PrimaryColorDark: "Primærfarve (mørk tilstand) er ikke en gyldig hex-farveværdi"
+        BackgroundColorDark: "Baggrundsfarve (mørk tilstand) er ikke en gyldig hex-farveværdi"
+        WarnColorDark: "Advarselsfarve (mørk tilstand) er ikke en gyldig hex-farveværdi"
+        FontColorDark: "Skriftfarve (mørk tilstand) er ikke en gyldig hex-farveværdi"
+  UserGrant:
+    AlreadyExists: "Brugertildeling findes allerede"
+    NotFound: "Brugertildeling ikke fundet"
+    Invalid: "Brugertildeling er ugyldig"
+    NotChanged: "Brugertildeling er ikke ændret"
+    IDMissing: "Id mangler"
+    NoPermissionForProject: "Brugeren har ingen tilladelser på dette projekt"
+    RoleKeyNotFound: "Rolle ikke fundet"
+  Member:
+    AlreadyExists: "Medlem findes allerede"
+  IDPConfig:
+    AlreadyExists: "IDP-konfiguration med dette navn findes allerede"
+    NotExisting: "Identitetsudbyder-konfiguration findes ikke"
+  Changes:
+    NotFound: "Ingen historik fundet"
+    AuditRetention: "Historikken er uden for opbevaringsperioden for revisionsloggen"
+  Token:
+    NotFound: "Token ikke fundet"
+    Invalid: "Token er ugyldigt"
+  UserSession:
+    NotFound: "UserSession ikke fundet"
+  Key:
+    NotFound: "Nøgle ikke fundet"
+    ExpireBeforeNow: "Udløbsdatoen er i fortiden"
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: "Multifaktor er konfigureret som påkrævet, men ingen mulige udbydere er konfigureret. Kontakt din systemadministrator."
+  Step:
+    Started:
+      AlreadyExists: "Trin startet findes allerede"
+    Done:
+      AlreadyExists: "Trin udført findes allerede"
+  CustomText:
+    AlreadyExists: "Brugerdefineret tekst findes allerede"
+    Invalid: "Brugerdefineret tekst ugyldig"
+    NotFound: "Brugerdefineret tekst ikke fundet"
+  TranslationFile:
+    ReadError: "Fejl ved læsning af oversættelsesfil"
+    MergeError: "Oversættelsesfil kunne ikke flettes med brugerdefinerede oversættelser"
+    NotFound: "Oversættelsesfil findes ikke"
+  Metadata:
+    NotFound: "Metadata ikke fundet"
+    NoData: "Metadatalisten er tom"
+    Invalid: "Metadata er ugyldige"
+    KeyNotExisting: "En eller flere nøgler findes ikke"
+  Action:
+    Invalid: "Handling er ugyldig"
+    NotFound: "Handling ikke fundet"
+    NotActive: "Handling er ikke aktiv"
+    NotInactive: "Handling er ikke inaktiv"
+    MaxAllowed: "Ingen yderligere aktive handlinger tilladt"
+    NotEnabled: "Funktionen \"Action\" er ikke aktiveret"
+  Flow:
+    FlowTypeMissing: "FlowType mangler"
+    Empty: "Flowet er allerede tomt"
+    WrongTriggerType: "TriggerType er ugyldig"
+    NoChanges: "Ingen ændringer"
+    ActionIDsNotExist: "ActionIDs findes ikke"
+  Query:
+    CloseRows: "SQL-sætningen kunne ikke afsluttes"
+    SQLStatement: "SQL-sætningen kunne ikke oprettes"
+    InvalidRequest: "Anmodningen er ugyldig"
+    TooManyNestingLevels: "For mange indlejringsniveauer i forespørgslen (maks. 20)"
+    LimitExceeded: "Grænse overskredet"
+  Quota:
+    AlreadyExists: "Kvote findes allerede for denne enhed"
+    NotFound: "Kvote ikke fundet for denne enhed"
+    Invalid:
+      CallURL: "Kvotens kald-URL er ugyldig"
+      Percent: "Kvoteprocent er lavere end 1"
+      Unimplemented: "Kvoter er ikke implementeret for denne enhed"
+      Amount: "Kvotebeløb er lavere end 1"
+      ResetInterval: "Kvotens nulstillingsinterval er kortere end et minut"
+      Noop: "En ubegrænset kvote uden notifikationer har ingen effekt"
+    Access:
+      Exhausted: "Kvoten for godkendte anmodninger er opbrugt"
+    Execution:
+      Exhausted: "Kvoten for udførelsessekunder er opbrugt"
+  LogStore:
+    Access:
+      StorageFailed: "Lagring af adgangslog i databasen mislykkedes"
+      ScanFailed: "Forespørgsel om forbrug for godkendte anmodninger mislykkedes"
+    Execution:
+      StorageFailed: "Lagring af log for handlingsudførelse i databasen mislykkedes"
+      ScanFailed: "Forespørgsel om forbrug for handlingsudførelsessekunder mislykkedes"
+  Session:
+    IDMissing: "Sessions-ID mangler"
+    NotFound: "Session ikke fundet"
+    NotExisting: "Session findes ikke"
+    Terminated: "Session allerede afsluttet"
+    Expired: "Session er udløbet"
+    PositiveLifetime: "Sessionens levetid må ikke være mindre end 0"
+    Token:
+      Invalid: "Sessionstoken er ugyldigt"
+    WebAuthN:
+      NoChallenge: "Session uden WebAuthN-challenge"
+  Intent:
+    IDPMissing: "IDP-ID mangler i anmodningen"
+    IDPInvalid: "IDP ugyldig for anmodningen"
+    ResponseInvalid: "IDP-svar er ugyldigt"
+    MissingSingleMappingAttribute: "IDP-svaret indeholder ikke mapping-attributten eller har mere end én værdi"
+    SuccessURLMissing: "Success-URL mangler i anmodningen"
+    FailureURLMissing: "Failure-URL mangler i anmodningen"
+    StateMissing: "State-parameteren mangler i anmodningen"
+    NotStarted: "Intent er ikke startet eller blev allerede afsluttet"
+    NotSucceeded: "Intent er ikke lykkedes"
+    Expired: "Intent er udløbet"
+    TokenCreationFailed: "Oprettelse af token mislykkedes"
+    InvalidToken: "Intent-token er ugyldigt"
+    OtherUser: "Intent beregnet til en anden bruger"
+  AuthRequest:
+    AlreadyExists: "Auth Request findes allerede"
+    NotExisting: "Auth Request findes ikke"
+    WrongLoginClient: "Auth Request oprettet af en anden login-applikation"
+    AlreadyHandled: "Auth Request er allerede blevet behandlet"
+  OIDCSession:
+    RefreshTokenInvalid: "Refresh Token er ugyldigt"
+    Token:
+      Invalid: "Token er ugyldigt"
+      Expired: "Token er udløbet"
+    InvalidClient: "Token blev ikke udstedt til denne applikation"
+  SAMLRequest:
+    AlreadyExists: "SAMLRequest findes allerede"
+    NotExisting: "SAMLRequest findes ikke"
+    WrongLoginClient: "SAMLRequest oprettet af en anden login-applikation"
+    AlreadyHandled: "SAMLRequest er allerede blevet behandlet"
+  SAMLSession:
+    InvalidClient: "SAMLResponse blev ikke udstedt til denne applikation"
+  DeviceAuth:
+    NotFound: "Device Authorization Request findes ikke"
+    AlreadyHandled: "Device Authorization Request er allerede blevet behandlet"
+  Feature:
+    NotExisting: "Funktionen findes ikke"
+    TypeNotSupported: "Funktionstypen understøttes ikke"
+    InvalidValue: "Ugyldig værdi for denne funktion"
+  Target:
+    Invalid: "Mål er ugyldigt"
+    NoTimeout: "Mål har ingen timeout"
+    InvalidURL: "Mål har en ugyldig URL"
+    NotFound: "Mål ikke fundet"
+    InvalidExpirationDate: "Nøglens udløbsdato skal være i fremtiden"
+    PublicKeyExpired: "Målets offentlige nøgle er udløbet"
+    PublicKeyActive: "Kan ikke slette aktiv offentlig nøgle for mål"
+    InvalidPublicKey: "Den offentlige nøgle er ugyldig. Skal være en PEM-kodet RSA- eller ECDSA-offentlig nøgle i PKCS#8-format"
+  Execution:
+    ConditionInvalid: "Udførelsesbetingelse er ugyldig"
+    Invalid: "Udførelse er ugyldig"
+    NotFound: "Udførelse ikke fundet"
+    IncludeNotFound: "Include ikke fundet"
+    NoTargets: "Ingen mål defineret"
+    Failed: "Udførelse mislykkedes"
+    ResponseIsNotValidJSON: "Svaret er ikke gyldig JSON"
+    MissingEncryptionKey: "Ingen krypteringsnøgle fundet for mål"
+  UserSchema:
+    NotEnabled: "Funktionen \"User Schema\" er ikke aktiveret"
+    Type:
+      Missing: "User Schema-type mangler"
+      AlreadyExists: "User Schema-type findes allerede"
+    Authenticator:
+      Invalid: "Ugyldig authenticator-type"
+    NotActive: "User Schema ikke aktiv"
+    NotInactive: "User Schema ikke inaktiv"
+    NotExists: "User Schema findes ikke"
+    ID:
+      Missing: "User Schema-ID mangler"
+    Invalid: "User Schema ugyldig"
+    Data:
+      Invalid: "Data ugyldige for User Schema"
+  TokenExchange:
+    Token:
+      Missing: "Token mangler"
+      Invalid: "Token er ugyldigt"
+      TypeMissing: "Tokentype mangler"
+      TypeNotAllowed: "Tokentype er ikke tilladt"
+      TypeNotSupported: "Tokentype understøttes ikke"
+      NotForAPI: "Impersonerede tokens er ikke tilladt for API"
+    Impersonation:
+      PolicyDisabled: "Impersonering er deaktiveret i instansens sikkerhedspolitik"
+  WebKey:
+    ActiveDelete: "Kan ikke slette aktiv web-nøgle"
+    Config: "Ugyldig web-nøglekonfiguration"
+    Duplicate: "Web-nøgle-ID er ikke unikt"
+    NoActive: "Ingen aktiv web-nøgle fundet"
+    NotFound: "Web-nøgle ikke fundet"
+  IDP:
+    InvalidSearchQuery: "Ugyldig søgeforespørgsel"
+    ClientIDMissing: "ClientID mangler"
+    TeamIDMissing: "TeamID mangler"
+    KeyIDMissing: "KeyID mangler"
+    PrivateKeyMissing: "Privat nøgle mangler"
+    InvalidPrivateKey: "Ugyldigt format for privat nøgle"
+
+AggregateTypes:
+  action: "Handling"
+  instance: "Instans"
+  key_pair: "Nøglepar"
+  org: "Organisation"
+  project: "Projekt"
+  user: "Bruger"
+  usergrant: "Brugertildeling"
+  quota: "Kvote"
+  feature: "Funktion"
+  target: "Mål"
+  execution: "Udførelse"
+  user_schema: "User Schema"
+  auth_request: "Auth Request"
+  device_auth: "Device Auth"
+  idpintent: "IDP Intent"
+  limits: "Grænser"
+  milestone: "Milepæl"
+  oidc_session: "OIDC Session"
+  restrictions: "Begrænsninger"
+  system: "System"
+  session: "Session"
+  web_key: "Web-nøgle"
+  saml_request: "SAML Request"
+  saml_session: "SAML Session"
+EventTypes:
+  execution:
+    set: "Udførelse angivet"
+    removed: "Udførelse slettet"
+  target:
+    added: "Mål oprettet"
+    changed: "Mål ændret"
+    removed: "Mål slettet"
+  user:
+    added: "Bruger tilføjet"
+    selfregistered: "Bruger registrerede sig selv"
+    initialization:
+      code:
+        added: "Initialiseringskode genereret"
+        sent: "Initialiseringskode sendt"
+      check:
+        succeeded: "Initialiseringstjek lykkedes"
+        failed: "Initialiseringstjek mislykkedes"
+    token:
+      added: "Access Token oprettet"
+      v2.added: "Access Token oprettet"
+      removed: "Access Token fjernet"
+    impersonated: "Bruger impersoneret"
+    username:
+      reserved: "Brugernavn reserveret"
+      released: "Brugernavn frigivet"
+      changed: "Brugernavn ændret"
+    email:
+      reserved: "E-mailadresse reserveret"
+      released: "E-mailadresse frigivet"
+      changed: "E-mailadresse ændret"
+      verified: "E-mailadresse bekræftet"
+      verification:
+        failed: "Bekræftelse af e-mailadresse mislykkedes"
+      code:
+        added: "Bekræftelseskode for e-mailadresse genereret"
+        sent: "Bekræftelseskode for e-mailadresse sendt"
+    machine:
+      added: "Teknisk bruger tilføjet"
+      changed: "Teknisk bruger ændret"
+      key:
+        added: "Nøgle tilføjet"
+        removed: "Nøgle fjernet"
+      secret:
+        set: "Hemmelighed angivet"
+        updated: "Hemmelighed-hash opdateret"
+        removed: "Hemmelighed fjernet"
+        check:
+          succeeded: "Tjek af hemmelighed lykkedes"
+          failed: "Tjek af hemmelighed mislykkedes"
+    human:
+      added: "Person tilføjet"
+      selfregistered: "Person registrerede sig selv"
+      avatar:
+        added: "Avatar tilføjet"
+        removed: "Avatar fjernet"
+      initialization:
+        code:
+          added: "Initialiseringskode genereret"
+          sent: "Initialiseringskode sendt"
+        check:
+          succeeded: "Initialiseringstjek lykkedes"
+          failed: "Initialiseringstjek mislykkedes"
+      invite:
+        code:
+          added: "Invitationskode genereret"
+          sent: "Invitationskode sendt"
+        check:
+          succeeded: "Invitationstjek lykkedes"
+          failed: "Invitationstjek mislykkedes"
+      username:
+        reserved: "Brugernavn reserveret"
+        released: "Brugernavn frigivet"
+      email:
+        changed: "E-mailadresse ændret"
+        verified: "E-mailadresse bekræftet"
+        verification:
+          failed: "Bekræftelse af e-mailadresse mislykkedes"
+        code:
+          added: "Bekræftelseskode for e-mailadresse genereret"
+          sent: "Bekræftelseskode for e-mailadresse sendt"
+      password:
+        changed: "Adgangskode ændret"
+        code:
+          added: "Adgangskode-kode genereret"
+          sent: "Adgangskode-kode sendt"
+        check:
+          succeeded: "Tjek af adgangskode lykkedes"
+          failed: "Tjek af adgangskode mislykkedes"
+        change:
+          sent: "Ændring af adgangskode sendt"
+        hash:
+          updated: "Adgangskode-hash opdateret"
+      externallogin:
+        check:
+          succeeded: "Eksternt login lykkedes"
+      externalidp:
+        added: "Ekstern IDP tilføjet"
+        removed: "Ekstern IDP fjernet"
+        cascade:
+          removed: "Ekstern IDP cascade-fjernet"
+        id:
+          migrated: "Ekstern bruger-ID for IDP blev migreret"
+      phone:
+        changed: "Telefonnummer ændret"
+        verified: "Telefonnummer bekræftet"
+        verification:
+          failed: "Bekræftelse af telefonnummer mislykkedes"
+        code:
+          added: "Telefonnummer-kode genereret"
+          sent: "Telefonnummer-kode sendt"
+        removed: "Telefonnummer fjernet"
+      profile:
+        changed: "Brugerprofil ændret"
+      address:
+        changed: "Brugeradresse ændret"
+      mfa:
+        otp:
+          added: "Multifaktor-OTP tilføjet"
+          verified: "Multifaktor-OTP bekræftet"
+          removed: "Multifaktor-OTP fjernet"
+          check:
+            succeeded: "Tjek af multifaktor-OTP lykkedes"
+            failed: "Tjek af multifaktor-OTP mislykkedes"
+          sms:
+            added: "Multifaktor-OTP SMS tilføjet"
+            removed: "Multifaktor-OTP SMS fjernet"
+            code:
+              added: "Multifaktor-OTP SMS-kode tilføjet"
+              sent: "Multifaktor-OTP SMS-kode sendt"
+            check:
+              succeeded: "Tjek af multifaktor-OTP SMS lykkedes"
+              failed: "Tjek af multifaktor-OTP SMS mislykkedes"
+          email:
+            added: "Multifaktor-OTP e-mail tilføjet"
+            removed: "Multifaktor-OTP e-mail fjernet"
+            code:
+              added: "Multifaktor-OTP e-mailkode tilføjet"
+              sent: "Multifaktor-OTP e-mailkode sendt"
+            check:
+              succeeded: "Tjek af multifaktor-OTP e-mail lykkedes"
+              failed: "Tjek af multifaktor-OTP e-mail mislykkedes"
+        u2f:
+          token:
+            added: "Multifaktor-U2F-token tilføjet"
+            verified: "Multifaktor-U2F-token bekræftet"
+            removed: "Multifaktor-U2F-token fjernet"
+            begin:
+              login: "Tjek af multifaktor-U2F startet"
+            check:
+              succeeded: "Tjek af multifaktor-U2F lykkedes"
+              failed: "Tjek af multifaktor-U2F mislykkedes"
+            signcount:
+              changed: "Kontrolsum for multifaktor-U2F-token er blevet ændret"
+        init:
+          skipped: "Multifaktor-initialisering sprunget over"
+      passwordless:
+        token:
+          added: "Token til adgangsnøgle-login tilføjet"
+          verified: "Token til adgangsnøgle-login bekræftet"
+          removed: "Token til adgangsnøgle-login fjernet"
+          begin:
+            login: "Tjek af adgangsnøgle-login startet"
+          check:
+            succeeded: "Tjek af adgangsnøgle-login lykkedes"
+            failed: "Tjek af adgangsnøgle-login mislykkedes"
+          signcount:
+            changed: "Kontrolsum for adgangsnøgle-login-token er blevet ændret"
+        initialization:
+          code:
+            added: "Initialiseringskode for adgangsnøgle tilføjet"
+            sent: "Initialiseringskode for adgangsnøgle sendt"
+            requested: "Initialiseringskode for adgangsnøgle anmodet"
+            check:
+              succeeded: "Initialiseringskode for adgangsnøgle blev tjekket korrekt"
+              failed: "Tjek af initialiseringskode for adgangsnøgle mislykkedes"
+      signed:
+        out: "Bruger loggede ud"
+      refresh:
+        token:
+          added: "Refresh Token oprettet"
+          renewed: "Refresh Token fornyet"
+          removed: "Refresh Token fjernet"
+    locked: "Bruger låst"
+    unlocked: "Bruger låst op"
+    deactivated: "Bruger deaktiveret"
+    reactivated: "Bruger genaktiveret"
+    removed: "Bruger fjernet"
+    password:
+      changed: "Adgangskode ændret"
+      code:
+        added: "Adgangskode-kode genereret"
+        sent: "Adgangskode-kode sendt"
+      check:
+        succeeded: "Tjek af adgangskode lykkedes"
+        failed: "Tjek af adgangskode mislykkedes"
+    phone:
+      changed: "Telefonnummer ændret"
+      verified: "Telefonnummer bekræftet"
+      verification:
+        failed: "Bekræftelse af telefonnummer mislykkedes"
+      code:
+        added: "Telefonnummer-kode genereret"
+        sent: "Telefonnummer-kode sendt"
+    profile:
+      changed: "Brugerprofil ændret"
+    address:
+      changed: "Brugeradresse ændret"
+    mfa:
+      otp:
+        added: "Multifaktor-OTP tilføjet"
+        verified: "Multifaktor-OTP bekræftet"
+        removed: "Multifaktor-OTP fjernet"
+        check:
+          succeeded: "Tjek af multifaktor-OTP lykkedes"
+          failed: "Tjek af multifaktor-OTP mislykkedes"
+        init:
+          skipped: "Initialisering af multifaktor-OTP sprunget over"
+      init:
+        skipped: "Multifaktor-initialisering sprunget over"
+    signed:
+      out: "Bruger loggede ud"
+    grant:
+      added: "Autorisation tilføjet"
+      changed: "Autorisation ændret"
+      removed: "Autorisation fjernet"
+      deactivated: "Autorisation deaktiveret"
+      reactivated: "Autorisation genaktiveret"
+      reserved: "Autorisation reserveret"
+      released: "Autorisation frigivet"
+      cascade:
+        removed: "Autorisation fjernet"
+        changed: "Autorisation ændret"
+    metadata:
+      set: "Brugermetadata angivet"
+      removed: "Brugermetadata fjernet"
+      removed.all: "Alle brugermetadata fjernet"
+    domain:
+      claimed: "Domæne gjort krav på"
+      claimed.sent: "Notifikation om krav på domæne sendt"
+    pat:
+      added: "Personlig adgangstoken tilføjet"
+      removed: "Personlig adgangstoken fjernet"
+  org:
+    added: "Organisation tilføjet"
+    changed: "Organisation ændret"
+    deactivated: "Organisation deaktiveret"
+    reactivated: "Organisation genaktiveret"
+    removed: "Organisation fjernet"
+    domain:
+      added: "Domæne tilføjet"
+      verification:
+        added: "Domænebekræftelse tilføjet"
+        failed: "Domænebekræftelse mislykkedes"
+      verified: "Domæne bekræftet"
+      removed: "Domæne fjernet"
+      primary:
+        set: "Organisationsdomæne angivet"
+      reserved: "Domæne reserveret"
+      released: "Domæne frigivet"
+    name:
+      reserved: "Organisationsnavn reserveret"
+      released: "Organisationsnavn frigivet"
+    member:
+      added: "Organisationsmedlem tilføjet"
+      changed: "Organisationsmedlem ændret"
+      removed: "Organisationsmedlem fjernet"
+      cascade:
+        removed: "Organisationsmedlem cascade-fjernet"
+    iam:
+      policy:
+        added: "Systempolitik tilføjet"
+        changed: "Systempolitik ændret"
+        removed: "Systempolitik fjernet"
+    idp:
+      config:
+        added: "IDP-konfiguration tilføjet"
+        changed: "IDP-konfiguration ændret"
+        removed: "IDP-konfiguration fjernet"
+        deactivated: "IDP-konfiguration deaktiveret"
+        reactivated: "IDP-konfiguration genaktiveret"
+      oidc:
+        config:
+          added: "OIDC IDP-konfiguration tilføjet"
+          changed: "OIDC IDP-konfiguration ændret"
+      saml:
+        config:
+          added: "SAML IDP-konfiguration tilføjet"
+          changed: "SAML IDP-konfiguration ændret"
+      jwt:
+        config:
+          added: "JWT IDP-konfiguration tilføjet"
+          changed: "JWT IDP-konfiguration ændret"
+    customtext:
+      set: "Brugerdefineret tekst angivet"
+      removed: "Brugerdefineret tekst fjernet"
+      template:
+        removed: "Skabelon for brugerdefineret tekst fjernet"
+    policy:
+      login:
+        added: "Login-politik tilføjet"
+        changed: "Login-politik ændret"
+        removed: "Login-politik fjernet"
+        idpprovider:
+          added: "Identitetsudbyder tilføjet til login-politik"
+          removed: "Identitetsudbyder fjernet fra login-politik"
+          cascade:
+            removed: "Identitetsudbyder cascade-fjernet fra login-politik"
+        secondfactor:
+          added: "Anden faktor tilføjet til login-politik"
+          removed: "Anden faktor fjernet fra login-politik"
+        multifactor:
+          added: "Multifaktor tilføjet til login-politik"
+          removed: "Multifaktor fjernet fra login-politik"
+      password:
+        complexity:
+          added: "Politik for adgangskodekompleksitet tilføjet"
+          changed: "Politik for adgangskodekompleksitet ændret"
+          removed: "Politik for adgangskodekompleksitet fjernet"
+        age:
+          added: "Politik for adgangskodealder tilføjet"
+          changed: "Politik for adgangskodealder ændret"
+          removed: "Politik for adgangskodealder fjernet"
+        lockout:
+          added: "Politik for adgangskodespærring tilføjet"
+          changed: "Politik for adgangskodespærring ændret"
+          removed: "Politik for adgangskodespærring fjernet"
+      label:
+        added: "Label-politik tilføjet"
+        changed: "Label-politik ændret"
+        activated: "Label-politik aktiveret"
+        removed: "Label-politik fjernet"
+        logo:
+          added: "Logo tilføjet til label-politik"
+          removed: "Logo fjernet fra label-politik"
+          dark:
+            added: "Logo (mørk tilstand) tilføjet til label-politik"
+            removed: "Logo (mørk tilstand) fjernet fra label-politik"
+        icon:
+          added: "Ikon tilføjet til label-politik"
+          removed: "Ikon fjernet fra label-politik"
+          dark:
+            added: "Ikon (mørk tilstand) tilføjet til label-politik"
+            removed: "Ikon (mørk tilstand) fjernet fra label-politik"
+        font:
+          added: "Skrifttype tilføjet til label-politik"
+          removed: "Skrifttype fjernet fra label-politik"
+        assets:
+          removed: "Assets fjernet fra label-politik"
+      privacy:
+        added: "Privatlivspolitik og TOS tilføjet"
+        changed: "Privatlivspolitik og TOS ændret"
+        removed: "Privatlivspolitik og TOS fjernet"
+      domain:
+        added: "Domænepolitik tilføjet"
+        changed: "Domænepolitik ændret"
+        removed: "Domænepolitik fjernet"
+      lockout:
+        added: "Spærringspolitik tilføjet"
+        changed: "Spærringspolitik ændret"
+        removed: "Spærringspolitik fjernet"
+      notification:
+        added: "Notifikationspolitik tilføjet"
+        changed: "Notifikationspolitik ændret"
+        removed: "Notifikationspolitik fjernet"
+    flow:
+      trigger_actions:
+        set: "Handling angivet"
+        cascade:
+          removed: "Handlinger cascade-fjernet"
+        removed: "Handlinger fjernet"
+      cleared: "Flow ryddet"
+    mail:
+      template:
+        added: "E-mailskabelon tilføjet"
+        changed: "E-mailskabelon ændret"
+        removed: "E-mailskabelon fjernet"
+      text:
+        added: "E-mailtekst tilføjet"
+        changed: "E-mailtekst ændret"
+        removed: "E-mailtekst fjernet"
+    metadata:
+      removed: "Metadata fjernet"
+      removed.all: "Alle metadata fjernet"
+      set: "Metadata angivet"
+  project:
+    added: "Projekt tilføjet"
+    changed: "Projekt ændret"
+    deactivated: "Projekt deaktiveret"
+    reactivated: "Projekt genaktiveret"
+    removed: "Projekt fjernet"
+    member:
+      added: "Projektmedlem tilføjet"
+      changed: "Projektmedlem ændret"
+      removed: "Projektmedlem fjernet"
+      cascade:
+        removed: "Projektmedlem cascade-fjernet"
+    role:
+      added: "Projektrolle tilføjet"
+      changed: "Projektrolle ændret"
+      removed: "Projektrolle fjernet"
+    grant:
+      added: "Administrationsadgang tilføjet"
+      changed: "Administrationsadgang ændret"
+      removed: "Administrationsadgang fjernet"
+      deactivated: "Administrationsadgang deaktiveret"
+      reactivated: "Administrationsadgang genaktiveret"
+      cascade:
+        changed: "Administrationsadgang ændret"
+      member:
+        added: "Administrationsadgang-medlem tilføjet"
+        changed: "Administrationsadgang-medlem ændret"
+        removed: "Administrationsadgang-medlem fjernet"
+        cascade:
+          removed: "Administrationsadgang cascade-fjernet"
+    application:
+      added: "Applikation tilføjet"
+      changed: "Applikation ændret"
+      removed: "Applikation fjernet"
+      deactivated: "Applikation deaktiveret"
+      reactivated: "Applikation genaktiveret"
+      oidc:
+        secret:
+          check:
+            succeeded: "Tjek af OIDC-klienthemmelighed lykkedes"
+            failed: "Tjek af OIDC-klienthemmelighed mislykkedes"
+        key:
+          added: "OIDC-applikationsnøgle tilføjet"
+          removed: "OIDC-applikationsnøgle fjernet"
+      api:
+        secret:
+          check:
+            succeeded: "Tjek af API-hemmelighed lykkedes"
+            failed: "Tjek af API-hemmelighed mislykkedes"
+        key:
+          added: "Applikationsnøgle tilføjet"
+          removed: "Applikationsnøgle fjernet"
+      config:
+        saml:
+          added: "SAML-konfiguration tilføjet"
+          changed: "SAML-konfiguration ændret"
+        oidc:
+          added: "OIDC-konfiguration tilføjet"
+          changed: "OIDC-konfiguration ændret"
+          secret:
+            changed: "OIDC-hemmelighed ændret"
+            updated: "OIDC-hemmelighed-hash opdateret"
+        api:
+          added: "API-konfiguration tilføjet"
+          changed: "API-konfiguration ændret"
+          secret:
+            changed: "API-hemmelighed ændret"
+            updated: "API-hemmelighed-hash opdateret"
+  policy:
+    password:
+      complexity:
+        added: "Politik for adgangskodekompleksitet tilføjet"
+        changed: "Politik for adgangskodekompleksitet ændret"
+      age:
+        added: "Politik for adgangskodealder tilføjet"
+        changed: "Politik for adgangskodealder ændret"
+      lockout:
+        added: "Politik for adgangskodespærring tilføjet"
+        changed: "Politik for adgangskodespærring ændret"
+  iam:
+    setup:
+      started: "Zitadel-opsætning startet"
+      done: "Zitadel-opsætning fuldført"
+    global:
+      org:
+        set: "Global organisation angivet"
+    project:
+      iam:
+        set: "Zitadel-projekt angivet"
+    member:
+      added: "Zitadel-medlem tilføjet"
+      changed: "Zitadel-medlem ændret"
+      removed: "Zitadel-medlem fjernet"
+      cascade:
+        removed: "Zitadel-medlem cascade-fjernet"
+    idp:
+      config:
+        added: "IDP-konfiguration tilføjet"
+        changed: "IDP-konfiguration ændret"
+        removed: "IDP-konfiguration fjernet"
+        deactivated: "IDP-konfiguration deaktiveret"
+        reactivated: "IDP-konfiguration genaktiveret"
+      oidc:
+        config:
+          added: "OIDC IDP-konfiguration tilføjet"
+          changed: "OIDC IDP-konfiguration ændret"
+      saml:
+        config:
+          added: "SAML IDP-konfiguration tilføjet"
+          changed: "SAML IDP-konfiguration ændret"
+      jwt:
+        config:
+          added: "JWT-konfiguration tilføjet til identitetsudbyder"
+          changed: "JWT-konfiguration fjernet fra identitetsudbyder"
+    customtext:
+      set: "Tekst blev angivet"
+      removed: "Tekst blev fjernet"
+    policy:
+      login:
+        added: "Standard-login-politik tilføjet"
+        changed: "Standard-login-politik ændret"
+        idpprovider:
+          added: "Identitetsudbyder tilføjet til standard-login-politik"
+          removed: "Identitetsudbyder fjernet fra standard-login-politik"
+      label:
+        added: "Label-politik tilføjet"
+        changed: "Label-politik ændret"
+        activated: "Label-politik aktiveret"
+        logo:
+          added: "Logo tilføjet til label-politik"
+          removed: "Logo fjernet fra label-politik"
+          dark:
+            added: "Logo (mørk tilstand) tilføjet til label-politik"
+            removed: "Logo (mørk tilstand) fjernet fra label-politik"
+        icon:
+          added: "Ikon tilføjet til label-politik"
+          removed: "Ikon fjernet fra label-politik"
+          dark:
+            added: "Ikon (mørk tilstand) tilføjet til label-politik"
+            removed: "Ikon (mørk tilstand) fjernet fra label-politik"
+        font:
+          added: "Skrifttype tilføjet til label-politik"
+          removed: "Skrifttype fjernet fra label-politik"
+        assets:
+          removed: "Assets fjernet fra label-politik"
+    default:
+      language:
+        set: "Standardsprog angivet"
+    oidc:
+      settings:
+        added: "OIDC-konfiguration tilføjet"
+        changed: "OIDC-konfiguration ændret"
+        removed: "OIDC-konfiguration fjernet"
+    secret:
+      generator:
+        added: "Hemmelighedsgenerator tilføjet"
+        changed: "Hemmelighedsgenerator ændret"
+        removed: "Hemmelighedsgenerator fjernet"
+    smtp:
+      config:
+        added: "SMTP-konfiguration tilføjet"
+        changed: "SMTP-konfiguration ændret"
+        activated: "SMTP-konfiguration aktiveret"
+        deactivated: "SMTP-konfiguration deaktiveret"
+        removed: "SMTP-konfiguration fjernet"
+        password:
+          changed: "Hemmelighed for SMTP-konfiguration ændret"
+    sms:
+      config:
+        twilio:
+          added: "Twilio SMS-udbyder tilføjet"
+          changed: "Twilio SMS-udbyder ændret"
+          token:
+            changed: "Token for Twilio SMS-udbyder ændret"
+          removed: "Twilio SMS-udbyder fjernet"
+          activated: "Twilio SMS-udbyder aktiveret"
+          deactivated: "Twilio SMS-udbyder deaktiveret"
+  key_pair:
+    added: "Nøglepar tilføjet"
+    certificate:
+      added: "Certifikat tilføjet"
+  action:
+    added: "Handling tilføjet"
+    changed: "Handling ændret"
+    deactivated: "Handling deaktiveret"
+    reactivated: "Handling genaktiveret"
+    removed: "Handling fjernet"
+  instance:
+    added: "Instans tilføjet"
+    changed: "Instans ændret"
+    customtext:
+      removed: "Brugerdefineret tekst fjernet"
+      set: "Brugerdefineret tekst angivet"
+      template:
+        removed: "Skabelon for brugerdefineret tekst fjernet"
+    default:
+      language:
+        set: "Standardsprog angivet"
+      org:
+        set: "Standardorganisation angivet"
+    domain:
+      added: "Domæne tilføjet"
+      primary:
+        set: "Primært domæne angivet"
+      removed: "Domæne fjernet"
+    iam:
+      console:
+        set: "Zitadel Management Console-applikation angivet"
+      project:
+        set: "Zitadel-projekt angivet"
+    mail:
+      template:
+        added: "E-mailskabelon tilføjet"
+        changed: "E-mailskabelon ændret"
+      text:
+        added: "E-mailtekst tilføjet"
+        changed: "E-mailtekst ændret"
+    member:
+      added: "Instansmedlem tilføjet"
+      changed: "Instansmedlem ændret"
+      removed: "Instansmedlem fjernet"
+      cascade:
+        removed: "Instansmedlem cascade-fjernet"
+    notification:
+      provider:
+        debug:
+          fileadded: "Fil-debug-notifikationsudbyder tilføjet"
+          filechanged: "Fil-debug-notifikationsudbyder ændret"
+          fileremoved: "Fil-debug-notifikationsudbyder fjernet"
+          logadded: "Log-debug-notifikationsudbyder tilføjet"
+          logchanged: "Log-debug-notifikationsudbyder ændret"
+          logremoved: "Log-debug-notifikationsudbyder fjernet"
+    oidc:
+      settings:
+        added: "OIDC-indstillinger tilføjet"
+        changed: "OIDC-indstillinger ændret"
+    policy:
+      domain:
+        added: "Domænepolitik tilføjet"
+        changed: "Domænepolitik ændret"
+      label:
+        activated: "Label-politik aktiveret"
+        added: "Label-politik tilføjet"
+        assets:
+          removed: "Asset fjernet fra label-politik"
+        changed: "Label-politik ændret"
+        font:
+          added: "Skrifttype tilføjet til label-politik"
+          removed: "Skrifttype fjernet fra label-politik"
+        icon:
+          added: "Ikon tilføjet til label-politik"
+          removed: "Ikon fjernet fra label-politik"
+          dark:
+            added: "Ikon tilføjet til mørk label-politik"
+            removed: "Ikon fjernet fra mørk label-politik"
+        logo:
+          added: "Logo tilføjet til label-politik"
+          removed: "Logo fjernet fra label-politik"
+          dark:
+            added: "Logo tilføjet til mørk label-politik"
+            removed: "Logo fjernet fra mørk label-politik"
+      lockout:
+        added: "Spærringspolitik tilføjet"
+        changed: "Spærringspolitik ændret"
+      login:
+        added: "Login-politik tilføjet"
+        changed: "Login-politik ændret"
+        idpprovider:
+          added: "Identitetsudbyder tilføjet til login-politik"
+          cascade:
+            removed: "Identitetsudbyder cascade-fjernet fra login-politik"
+          removed: "Identitetsudbyder fjernet fra login-politik"
+        multifactor:
+          added: "Multifaktor tilføjet til login-politik"
+          removed: "Multifaktor fjernet fra login-politik"
+        secondfactor:
+          added: "Anden faktor tilføjet til login-politik"
+          removed: "Anden faktor fjernet fra login-politik"
+      password:
+        age:
+          added: "Politik for adgangskodealder tilføjet"
+          changed: "Politik for adgangskodealder ændret"
+        complexity:
+          added: "Politik for adgangskodekompleksitet tilføjet"
+          changed: "Politik for adgangskodekompleksitet fjernet"
+      privacy:
+        added: "Privatlivspolitik tilføjet"
+        changed: "Privatlivspolitik ændret"
+      security:
+        set: "Sikkerhedspolitik angivet"
+    removed: "Instans fjernet"
+    secret:
+      generator:
+        added: "Hemmelighedsgenerator tilføjet"
+        changed: "Hemmelighedsgenerator ændret"
+        removed: "Hemmelighedsgenerator fjernet"
+    sms:
+      configtwilio:
+        activated: "Twilio SMS-konfiguration aktiveret"
+        added: "Twilio SMS-konfiguration tilføjet"
+        changed: "Twilio SMS-konfiguration ændret"
+        deactivated: "Twilio SMS-konfiguration deaktiveret"
+        removed: "Twilio SMS-konfiguration fjernet"
+        token:
+          changed: "Token for Twilio SMS-konfiguration ændret"
+    smtp:
+      config:
+        added: "SMTP-konfiguration tilføjet"
+        changed: "SMTP-konfiguration ændret"
+        activated: "SMTP-konfiguration aktiveret"
+        deactivated: "SMTP-konfiguration deaktiveret"
+        password:
+          changed: "Adgangskode for SMTP-konfiguration ændret"
+        removed: "SMTP-konfiguration fjernet"
+  user_schema:
+    created: "User Schema oprettet"
+    updated: "User Schema opdateret"
+    deactivated: "User Schema deaktiveret"
+    reactivated: "User Schema genaktiveret"
+    deleted: "User Schema slettet"
+    user:
+      created: "Bruger oprettet"
+      updated: "Bruger opdateret"
+      deleted: "Bruger slettet"
+      email:
+        updated: "E-mailadresse ændret"
+        verified: "E-mailadresse bekræftet"
+        verification:
+          failed: "Bekræftelse af e-mailadresse mislykkedes"
+        code:
+          added: "Bekræftelseskode for e-mailadresse genereret"
+          sent: "Bekræftelseskode for e-mailadresse sendt"
+      phone:
+        updated: "Telefonnummer ændret"
+        verified: "Telefonnummer bekræftet"
+        verification:
+          failed: "Bekræftelse af telefonnummer mislykkedes"
+        code:
+          added: "Bekræftelseskode for telefonnummer genereret"
+          sent: "Bekræftelseskode for telefonnummer sendt"
+  web_key:
+    added: "Web-nøgle tilføjet"
+    activated: "Web-nøgle aktiveret"
+    deactivated: "Web-nøgle deaktiveret"
+    removed: "Web-nøgle fjernet"
+Application:
+  OIDC:
+    UnsupportedVersion: "Din OIDC-version understøttes ikke"
+    V1:
+      NotCompliant: "Din konfiguration er ikke compliant og afviger fra OIDC 1.0-standarden."
+      NoRedirectUris: "Mindst én redirect-uri skal være registreret."
+      NotAllCombinationsAreAllowed: "Konfigurationen er compliant, men ikke alle mulige kombinationer er tilladt."
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: "Grant type \"code\" tillader kun http redirect-uris for apptype \"web\"."
+          CustomOnlyForNative: "Grant type \"code\" tillader kun brugerdefinerede redirect-uris for apptype \"native\"  (f.eks. appname:// )"
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: "Grant type implicit tillader ikke brugerdefinerede redirect-uris"
+          HttpNotAllowed: "Grant type implicit tillader ikke http redirect-uris"
+          HttpLocalhostOnlyForNative: "Http://localhost redirect-uri er kun tilladt for native applikationer."
+      Native:
+        AuthMethodType:
+          NotNone: "Native applikationer skal have authmethodtype none."
+        RedirectUris:
+          MustBeHttpLocalhost: "Redirect-URI'er skal begynde med din egen protokol, http://127.0.0.1, http://[::1] eller http://localhost."
+      UserAgent:
+        AuthMethodType:
+          NotNone: "User agent-applikation skal have authmethodtype none."
+      GrantType:
+        Refresh:
+          NoAuthCode: "Refresh Token er kun tilladt i kombination med Authorization Code."
+Action:
+  Flow:
+    Type:
+      Unspecified: "Uspecificeret"
+      ExternalAuthentication: "Ekstern godkendelse"
+      CustomiseToken: "Suppler token"
+      InternalAuthentication: "Intern godkendelse"
+      CustomizeSAMLResponse: "Suppler SAMLResponse"
+  TriggerType:
+    Unspecified: "Uspecificeret"
+    PostAuthentication: "Efter godkendelse"
+    PreCreation: "Før oprettelse"
+    PostCreation: "Efter oprettelse"
+    PreUserinfoCreation: "Før oprettelse af userinfo"
+    PreAccessTokenCreation: "Før oprettelse af access token"
+    PreSAMLResponseCreation: "Før oprettelse af SAMLResponse"

@@ -97,6 +97,7 @@
                 "google-protobuf/google/protobuf/descriptor_pb.js",
                 "google-protobuf/google/protobuf/struct_pb.js",
                 "google-protobuf/google/protobuf/duration_pb.js",
+                "i18n-iso-countries/langs/da.json",
                 "i18n-iso-countries/langs/de.json",
                 "i18n-iso-countries/langs/en.json",
                 "i18n-iso-countries/langs/es.json",
