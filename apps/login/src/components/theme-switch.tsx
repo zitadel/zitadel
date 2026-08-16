@@ -57,7 +57,7 @@ export default function ThemeSwitch() {
 
   // themeMode is AUTO (1) or UNSPECIFIED (0): show light, system, dark options
   return (
-    <div className={`flex space-x-1 p-1 ${toggleRoundness} ${cardAppearance}`}>
+    <div className={`flex w-fit space-x-1 p-1 ${toggleRoundness} ${cardAppearance}`}>
       <button
         className={`flex h-8 w-8 flex-row items-center justify-center ${toggleRoundness} transition-colors ${getSelectedButtonStyle(theme === "light")}`}
         onClick={() => setTheme("light")}
