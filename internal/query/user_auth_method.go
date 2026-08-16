@@ -277,6 +277,9 @@ func (q *Queries) ListUserAuthMethodTypesRequired(ctx context.Context, userID st
 		authz.GetInstance(ctx).InstanceID(),
 	)
 	if err != nil {
+		if zerrors.IsNotFound(err) {
+			return nil, err
+		}
 		return nil, zerrors.ThrowInternal(err, "QUERY-Dun75", "Errors.Internal")
 	}
 	return requirements, nil
