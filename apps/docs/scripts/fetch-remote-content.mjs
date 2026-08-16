@@ -506,14 +506,28 @@ async function run() {
     const versionSlug = `v${semver.major(tag)}.${semver.minor(tag)}`;
     const contentDest = join(CONTENT_DIR, versionSlug);
 
-    // Simple cache check: if directory exists and looks populated, skip
-    // We could check for a specific file like meta.json or similar if we wanted to be more robust
-    if (fs.existsSync(contentDest)) {
-      console.log(`[skip] Version ${versionSlug} already exists. Skipping download.`);
+    const sentinelFile = join(contentDest, '.download-complete');
+    let isComplete = false;
+    if (fs.existsSync(sentinelFile)) {
+      try {
+        const cachedRef = fs.readFileSync(sentinelFile, 'utf8').trim();
+        if (cachedRef === sourceRef) {
+          isComplete = true;
+        }
+      } catch {
+        // Ignore read errors
+      }
+    }
+
+    if (isComplete) {
+      console.log(`[skip] Version ${versionSlug} already exists and is up-to-date. Skipping download.`);
     } else {
+        console.log(`[download] Downloading version ${versionSlug} (ref: ${sourceRef})...`);
+        fs.rmSync(contentDest, { recursive: true, force: true });
         await downloadVersion(tag, sourceRef);
         // Correctly pass sourceRef here so external files are fetched from the same place (local or remote)
         await fixRelativeImports(contentDest, sourceRef);
+        fs.writeFileSync(sentinelFile, sourceRef, 'utf8');
     }
   }));
 

@@ -5,6 +5,7 @@ import path from 'node:path';
 const TEXT_EXTENSIONS = ['.yaml', '.yml', '.conf', '.txt', '.json', '.caddyfile', '.go'];
 const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.ico', '.bmp'];
 const STYLE_EXTENSIONS = ['.css', '.scss', '.sass', '.less'];
+const MDX_EXTENSIONS = ['.mdx', '.md'];
 
 export async function resolve(specifier, context, nextResolve) {
   const ext = path.extname(specifier.split('?')[0]).toLowerCase();
@@ -12,7 +13,7 @@ export async function resolve(specifier, context, nextResolve) {
   try {
     return await nextResolve(specifier, context);
   } catch (err) {
-    if (TEXT_EXTENSIONS.includes(ext) || IMAGE_EXTENSIONS.includes(ext) || STYLE_EXTENSIONS.includes(ext)) {
+    if (TEXT_EXTENSIONS.includes(ext) || IMAGE_EXTENSIONS.includes(ext) || STYLE_EXTENSIONS.includes(ext) || MDX_EXTENSIONS.includes(ext)) {
       // If it's an absolute path or looks like one, and it failed, we still want to load it
       // This happens on Vercel if files are missing on disk but referenced in MDX
       let url = specifier;
