@@ -354,7 +354,8 @@
       "couldNotCreateSession": "Kon sessie niet aanmaken",
       "userNotFound": "Gebruiker niet in het systeem gevonden",
       "couldNotLinkIDP": "Kon IDP niet aan gebruiker koppelen",
-      "couldNotRegisterUser": "Kon gebruiker niet registreren"
+      "couldNotRegisterUser": "Kon gebruiker niet registreren",
+      "registerNotAllowed": "Registratie is niet toegestaan"
     }
   },
   "invite": {

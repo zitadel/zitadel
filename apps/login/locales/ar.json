@@ -354,7 +354,8 @@
       "couldNotCreateSession": "تعذر إنشاء الجلسة",
       "userNotFound": "المستخدم غير موجود في النظام",
       "couldNotLinkIDP": "تعذر ربط IDP بالمستخدم",
-      "couldNotRegisterUser": "تعذر تسجيل المستخدم"
+      "couldNotRegisterUser": "تعذر تسجيل المستخدم",
+      "registerNotAllowed": "التسجيل غير مسموح به"
     }
   },
   "invite": {

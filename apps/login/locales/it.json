@@ -354,7 +354,8 @@
       "couldNotCreateSession": "Impossibile creare la sessione",
       "userNotFound": "Utente non trovato nel sistema",
       "couldNotLinkIDP": "Impossibile collegare l'IDP all'utente",
-      "couldNotRegisterUser": "Impossibile registrare l'utente"
+      "couldNotRegisterUser": "Impossibile registrare l'utente",
+      "registerNotAllowed": "La registrazione non è consentita"
     }
   },
   "invite": {

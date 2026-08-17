@@ -354,7 +354,8 @@
       "couldNotCreateSession": "Не удалось создать сессию",
       "userNotFound": "Пользователь не найден в системе",
       "couldNotLinkIDP": "Не удалось привязать IDP к пользователю",
-      "couldNotRegisterUser": "Не удалось зарегистрировать пользователя"
+      "couldNotRegisterUser": "Не удалось зарегистрировать пользователя",
+      "registerNotAllowed": "Регистрация запрещена"
     }
   },
   "invite": {

@@ -354,7 +354,8 @@
       "couldNotCreateSession": "Не вдалося створити сеанс",
       "userNotFound": "Користувача не знайдено в системі",
       "couldNotLinkIDP": "Не вдалося прив'язати IDP до користувача",
-      "couldNotRegisterUser": "Не вдалося зареєструвати користувача"
+      "couldNotRegisterUser": "Не вдалося зареєструвати користувача",
+      "registerNotAllowed": "Реєстрація не дозволена"
     }
   },
   "invite": {
