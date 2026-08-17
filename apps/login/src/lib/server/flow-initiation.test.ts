@@ -565,6 +565,66 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     expect(mockConstructUrl).not.toHaveBeenCalledWith(expect.anything(), idpUrl);
   });
 
+  test("should render an auto-submit form when loginHint resolves to a SAML POST-binding IdP", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: [],
+        prompt: [],
+        loginHint: "user@discovered-org.com",
+      },
+    });
+
+    // sendLoginname resolved the hint via domain discovery to an org whose
+    // single IdP is SAML with POST binding: the AuthnRequest is delivered as
+    // form fields, not a redirect URL.
+    mockSendLoginname.mockResolvedValue({
+      samlData: {
+        url: "https://adfs.example.com/adfs/ls",
+        fields: { SAMLRequest: "PHNhbWxwOkF1dGhuUmVxdWVzdD4=", RelayState: "relay-123" },
+      },
+    });
+
+    const res = await handleOIDCFlowInitiation(makeBaseParams({ sessions: [] }));
+
+    // No redirect: the response is an HTML page auto-posting the form to the IdP.
+    expect(res.headers.get("location")).toBeNull();
+    expect(res.headers.get("content-type")).toContain("text/html");
+
+    const html = await res.text();
+    expect(html).toContain('action="https://adfs.example.com/adfs/ls"');
+    expect(html).toContain('name="SAMLRequest"');
+    expect(html).toContain('value="PHNhbWxwOkF1dGhuUmVxdWVzdD4="');
+    expect(html).toContain('name="RelayState"');
+    expect(html).toContain("document.forms[0].submit()");
+  });
+
+  test("should block unsafe SAML post URLs from loginHint resolution and fall back to /loginname", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: [],
+        prompt: [],
+        loginHint: "user@example.com",
+      },
+    });
+
+    mockSendLoginname.mockResolvedValue({
+      samlData: {
+        url: "javascript:alert(1)",
+        fields: { SAMLRequest: "abc" },
+      },
+    });
+
+    const res = await handleOIDCFlowInitiation(makeBaseParams({ sessions: [] }));
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toContain("/loginname");
+    expect(location).not.toContain("javascript:");
+  });
+
   test("should block unsafe absolute redirect URLs from loginHint resolution and fall back to /loginname", async () => {
     mockGetAuthRequest.mockResolvedValue({
       authRequest: {

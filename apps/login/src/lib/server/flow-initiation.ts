@@ -157,6 +157,39 @@ const resolveLoginHint = async ({
       return NextResponse.redirect(constructUrl(request, res.redirect));
     }
 
+    if (res && "samlData" in res && res.samlData) {
+      // SAML IdP with POST binding: the AuthnRequest must be submitted as a
+      // form post. Render the same auto-submit form used in the idp-scope
+      // branch above and in handleSAMLFlowInitiation, so a login_hint
+      // resolves silently for POST-binding SAML IdPs just like for
+      // redirect-based IdPs.
+      if (!isSafeRedirectUri(res.samlData.url)) {
+        logger.warn("Blocked unsafe SAML post URL from login_hint resolution", { url: res.samlData.url });
+        return null;
+      }
+
+      const hiddenInputs = Object.entries(res.samlData.fields)
+        .map(([key, value]) => `<input type="hidden" name="${escapeHtml(key)}" value="${escapeHtml(value)}" />`)
+        .join("\n");
+
+      const html = `
+        <html>
+          <body onload="document.forms[0].submit()">
+            <form action="${escapeHtml(res.samlData.url)}" method="post">
+              ${hiddenInputs}
+              <noscript>
+                <button type="submit">Continue</button>
+              </noscript>
+            </form>
+          </body>
+        </html>
+      `;
+
+      return new NextResponse(html, {
+        headers: { "Content-Type": "text/html" },
+      });
+    }
+
     if (res && "error" in res && res.error) {
       logger.debug("login_hint could not be resolved, falling back to /loginname", { error: res.error });
     }
