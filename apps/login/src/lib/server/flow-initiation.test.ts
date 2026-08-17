@@ -745,3 +745,130 @@ describe("handleOIDCFlowInitiation — Prompt.LOGIN + loginHint requestId prefix
     );
   });
 });
+
+describe("handleOIDCFlowInitiation — idp scope (urn:zitadel:iam:org:idp:id)", () => {
+  let mockGetAuthRequest: ReturnType<typeof vi.fn>;
+  let mockConstructUrl: ReturnType<typeof vi.fn>;
+  let mockGetActiveIdentityProviders: ReturnType<typeof vi.fn>;
+  let mockStartIdentityProviderFlow: ReturnType<typeof vi.fn>;
+  let mockIdpTypeToSlug: ReturnType<typeof vi.fn>;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.unstubAllEnvs();
+
+    const zitadel = await import("@/lib/zitadel");
+    const serviceUrl = await import("@/lib/service-url");
+    const authUtils = await import("@/lib/auth-utils");
+    const idpLib = await import("@/lib/idp");
+
+    mockGetAuthRequest = vi.mocked(zitadel.getAuthRequest);
+    mockConstructUrl = vi.mocked(serviceUrl.constructUrl);
+    mockGetActiveIdentityProviders = vi.mocked(zitadel.getActiveIdentityProviders);
+    mockStartIdentityProviderFlow = vi.mocked(zitadel.startIdentityProviderFlow);
+    mockIdpTypeToSlug = vi.mocked(idpLib.idpTypeToSlug);
+    vi.mocked(authUtils.getValidLocaleFromUILocales).mockReturnValue(null);
+
+    mockConstructUrl.mockImplementation((_req: any, path: string) => {
+      return new URL(`https://example.com${path}`);
+    });
+    mockIdpTypeToSlug.mockReturnValue("azure");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  test("should use the type of the scoped IdP, not the first active IdP (multi-IdP org)", async () => {
+    const { IdentityProviderType } = await import("@zitadel/proto/zitadel/settings/v2/login_settings_pb");
+
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: ["urn:zitadel:iam:org:idp:id:idp-2"],
+        prompt: [],
+        loginHint: undefined,
+      },
+    });
+
+    // Two active IdPs: the scope selects the SECOND one. Regression: the slug
+    // was previously derived from identityProviders[0].type.
+    mockGetActiveIdentityProviders.mockResolvedValue({
+      identityProviders: [
+        { id: "idp-1", type: IdentityProviderType.GITHUB },
+        { id: "idp-2", type: IdentityProviderType.AZURE_AD },
+      ],
+    });
+
+    mockStartIdentityProviderFlow.mockResolvedValue({
+      url: "https://login.microsoftonline.com/tenant/oauth2/v2.0/authorize?client_id=xyz",
+    });
+
+    const res = await handleOIDCFlowInitiation(makeBaseParams({ sessions: [] }));
+
+    expect(mockIdpTypeToSlug).toHaveBeenCalledWith(IdentityProviderType.AZURE_AD);
+    expect(mockIdpTypeToSlug).not.toHaveBeenCalledWith(IdentityProviderType.GITHUB);
+    expect(res.headers.get("location")).toBe("https://login.microsoftonline.com/tenant/oauth2/v2.0/authorize?client_id=xyz");
+  });
+
+  test("should block unsafe IdP URLs with a 400 instead of redirecting or rendering a form", async () => {
+    const { IdentityProviderType } = await import("@zitadel/proto/zitadel/settings/v2/login_settings_pb");
+
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: ["urn:zitadel:iam:org:idp:id:idp-1"],
+        prompt: [],
+        loginHint: undefined,
+      },
+    });
+
+    mockGetActiveIdentityProviders.mockResolvedValue({
+      identityProviders: [{ id: "idp-1", type: IdentityProviderType.SAML }],
+    });
+
+    mockStartIdentityProviderFlow.mockResolvedValue({
+      url: "javascript:alert(1)",
+      fields: { SAMLRequest: "abc" },
+    });
+
+    const res = await handleOIDCFlowInitiation(makeBaseParams({ sessions: [] }));
+
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toContain("Unsafe redirect URI");
+  });
+
+  test("should render the auto-submit form for a scoped SAML POST-binding IdP", async () => {
+    const { IdentityProviderType } = await import("@zitadel/proto/zitadel/settings/v2/login_settings_pb");
+
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: ["urn:zitadel:iam:org:idp:id:idp-1"],
+        prompt: [],
+        loginHint: undefined,
+      },
+    });
+
+    mockGetActiveIdentityProviders.mockResolvedValue({
+      identityProviders: [{ id: "idp-1", type: IdentityProviderType.SAML }],
+    });
+
+    mockStartIdentityProviderFlow.mockResolvedValue({
+      url: "https://adfs.example.com/adfs/ls",
+      fields: { SAMLRequest: "PHNhbWxwOkF1dGhuUmVxdWVzdD4=", RelayState: "relay-123" },
+    });
+
+    const res = await handleOIDCFlowInitiation(makeBaseParams({ sessions: [] }));
+
+    expect(res.headers.get("location")).toBeNull();
+    expect(res.headers.get("content-type")).toContain("text/html");
+    const html = await res.text();
+    expect(html).toContain('action="https://adfs.example.com/adfs/ls"');
+    expect(html).toContain('name="SAMLRequest"');
+  });
+});

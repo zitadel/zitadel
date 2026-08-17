@@ -290,7 +290,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       const idp = identityProviders.find((idp) => idp.id === idpId);
 
       if (idp) {
-        const identityProviderType = identityProviders[0].type;
+        const identityProviderType = idp.type;
 
         if (identityProviderType === IdentityProviderType.LDAP) {
           const ldapUrl = constructUrl(request, "/ldap");
@@ -323,6 +323,14 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
         if (!response || !response.url) {
           return NextResponse.json({ error: "Could not start IDP flow" }, { status: 500 });
+        }
+
+        // Covers both branches below: the form post (SAML POST binding) and
+        // the redirect. Relative paths and same-host/https URLs pass;
+        // javascript:/data:/file: style schemes are blocked.
+        if (!isSafeRedirectUri(response.url)) {
+          logger.warn("Blocked unsafe IdP URL", { url: response.url });
+          return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
         }
 
         if (response.fields) {
