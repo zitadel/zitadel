@@ -53,6 +53,36 @@ function setCSPHeaders(
   }
 }
 
+/**
+ * Renders a minimal HTML page that immediately POSTs the given fields to
+ * `url`, with a <noscript> fallback button. Used for flows whose next hop
+ * requires a form post instead of a redirect (e.g. SAML POST bindings).
+ * Callers must validate `url` (isSafeRedirectUri) before calling; all values
+ * are HTML-escaped here.
+ */
+function buildAutoSubmitFormResponse(url: string, fields: Record<string, string>): NextResponse {
+  const hiddenInputs = Object.entries(fields)
+    .map(([key, value]) => `<input type="hidden" name="${escapeHtml(key)}" value="${escapeHtml(value)}" />`)
+    .join("\n");
+
+  const html = `
+    <html>
+      <body onload="document.forms[0].submit()">
+        <form action="${escapeHtml(url)}" method="post">
+          ${hiddenInputs}
+          <noscript>
+            <button type="submit">Continue</button>
+          </noscript>
+        </form>
+      </body>
+    </html>
+  `;
+
+  return new NextResponse(html, {
+    headers: { "Content-Type": "text/html" },
+  });
+}
+
 const gotoAccounts = ({
   request,
   requestId,
@@ -168,26 +198,7 @@ const resolveLoginHint = async ({
         return null;
       }
 
-      const hiddenInputs = Object.entries(res.samlData.fields)
-        .map(([key, value]) => `<input type="hidden" name="${escapeHtml(key)}" value="${escapeHtml(value)}" />`)
-        .join("\n");
-
-      const html = `
-        <html>
-          <body onload="document.forms[0].submit()">
-            <form action="${escapeHtml(res.samlData.url)}" method="post">
-              ${hiddenInputs}
-              <noscript>
-                <button type="submit">Continue</button>
-              </noscript>
-            </form>
-          </body>
-        </html>
-      `;
-
-      return new NextResponse(html, {
-        headers: { "Content-Type": "text/html" },
-      });
+      return buildAutoSubmitFormResponse(res.samlData.url, res.samlData.fields);
     }
 
     if (res && "error" in res && res.error) {
@@ -315,26 +326,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         }
 
         if (response.fields) {
-          const hiddenInputs = Object.entries(response.fields)
-            .map(([key, value]) => `<input type="hidden" name="${escapeHtml(key)}" value="${escapeHtml(value)}" />`)
-            .join("\n");
-
-          const html = `
-            <html>
-              <body onload="document.forms[0].submit()">
-                <form action="${escapeHtml(response.url)}" method="post">
-                  ${hiddenInputs}
-                  <noscript>
-                    <button type="submit">Continue</button>
-                  </noscript>
-                </form>
-              </body>
-            </html>
-          `;
-
-          return new NextResponse(html, {
-            headers: { "Content-Type": "text/html" },
-          });
+          return buildAutoSubmitFormResponse(response.url, response.fields);
         }
 
         let url = response.url;
@@ -626,22 +618,9 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
         logger.warn("Blocked unsafe SAML post URL", { url });
         return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
       }
-      const html = `
-        <html>
-          <body onload="document.forms[0].submit()">
-            <form action="${escapeHtml(url)}" method="post">
-              <input type="hidden" name="RelayState" value="${escapeHtml(binding.value.relayState)}" />
-              <input type="hidden" name="SAMLResponse" value="${escapeHtml(binding.value.samlResponse)}" />
-              <noscript>
-                <button type="submit">Continue</button>
-              </noscript>
-            </form>
-          </body>
-        </html>
-      `;
-
-      return new NextResponse(html, {
-        headers: { "Content-Type": "text/html" },
+      return buildAutoSubmitFormResponse(url, {
+        RelayState: binding.value.relayState,
+        SAMLResponse: binding.value.samlResponse,
       });
     }
   } catch (error) {
