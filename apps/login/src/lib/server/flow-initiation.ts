@@ -1,5 +1,5 @@
 import { getValidLocaleFromUILocales } from "@/lib/auth-utils";
-import { isSafeRedirectUri } from "@/lib/client-utils";
+import { isExternalUrl, isSafeRedirectUri } from "@/lib/client-utils";
 import { getLanguageCookie, setLanguageCookie } from "@/lib/cookies";
 
 import { shouldUILocalesOverrideCookie } from "@/lib/i18n";
@@ -142,6 +142,18 @@ const resolveLoginHint = async ({
     });
 
     if (res && "redirect" in res && res.redirect) {
+      // sendLoginname can return an absolute URL, e.g. the IdP authorize
+      // endpoint when domain discovery resolves to an org that auto-redirects
+      // to its external IdP. Only relative paths may be resolved against the
+      // login's base path — prepending it to an absolute URL produces a
+      // malformed URL like "https://<host>/ui/v2/loginhttps://idp.example/...".
+      if (isExternalUrl(res.redirect)) {
+        if (!isSafeRedirectUri(res.redirect)) {
+          logger.warn("Blocked unsafe login_hint redirect URL", { redirect: res.redirect });
+          return null;
+        }
+        return NextResponse.redirect(res.redirect);
+      }
       return NextResponse.redirect(constructUrl(request, res.redirect));
     }
 

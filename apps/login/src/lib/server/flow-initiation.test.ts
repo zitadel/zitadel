@@ -533,6 +533,57 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     expect(location).toContain("/password");
     expect(location).not.toContain("/loginname");
   });
+
+  test("should redirect to an absolute IdP URL as-is without prepending the base path (domain discovery auto-redirect)", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: [],
+        prompt: [],
+        loginHint: "user@discovered-org.com",
+      },
+    });
+
+    // Simulate a base path being configured, as in ZITADEL Cloud (/ui/v2/login).
+    mockConstructUrl.mockImplementation((_req: any, path: string) => {
+      return new URL(`https://example.com/ui/v2/login${path}`);
+    });
+
+    // sendLoginname resolved the hint via domain discovery to an org with a
+    // single external IdP and returns the absolute authorize URL of that IdP.
+    const idpUrl = "https://login.microsoftonline.com/tenant-id/oauth2/v2.0/authorize?client_id=xyz&state=abc";
+    mockSendLoginname.mockResolvedValue({ redirect: idpUrl });
+
+    const res = await handleOIDCFlowInitiation(makeBaseParams({ sessions: [] }));
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toBe(idpUrl);
+    // The base path must never be glued onto an absolute URL
+    // (regression: https://<host>/ui/v2/loginhttps://login.microsoftonline.com/...).
+    expect(location).not.toContain("/ui/v2/login");
+    expect(mockConstructUrl).not.toHaveBeenCalledWith(expect.anything(), idpUrl);
+  });
+
+  test("should block unsafe absolute redirect URLs from loginHint resolution and fall back to /loginname", async () => {
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: [],
+        prompt: [],
+        loginHint: "user@example.com",
+      },
+    });
+
+    mockSendLoginname.mockResolvedValue({ redirect: "javascript:alert(1)" });
+
+    const res = await handleOIDCFlowInitiation(makeBaseParams({ sessions: [] }));
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toContain("/loginname");
+    expect(location).not.toContain("javascript:");
+  });
 });
 
 describe("handleOIDCFlowInitiation — Prompt.LOGIN + loginHint requestId prefix", () => {
