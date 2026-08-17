@@ -40,6 +40,7 @@ import { errorClassificationInterceptor, isClassifiedError } from "@/lib/grpc/in
 import { otelGrpcInterceptor } from "@/lib/grpc/interceptors/otel";
 import { Code, Interceptor } from "@connectrpc/connect";
 import { PromiseCache } from "./cache";
+import { normalizeLoginName } from "./login-name";
 import { createServiceForHost } from "./service";
 
 const useCache = process.env.API_CACHE_ENABLED !== "false";
@@ -630,7 +631,12 @@ const userLookupQuery = { limit: 2 };
 export async function listUsers({ serviceConfig, loginName, userName, phone, email, organizationId }: ListUsersCommand) {
   const queries: SearchQuery[] = [];
 
-  // either use loginName or userName, email, phone
+  // Either use loginName or userName, email, phone.
+  //
+  // Login names, usernames and email addresses are matched ignoring case: they are
+  // written case insensitively (the username unique constraint is lowercased), so a
+  // case sensitive lookup would miss users that do exist. Phone numbers have no
+  // casing to fold.
   if (loginName) {
     queries.push(
       create(SearchQuerySchema, {
@@ -638,7 +644,7 @@ export async function listUsers({ serviceConfig, loginName, userName, phone, ema
           case: "loginNameQuery",
           value: {
             loginName,
-            method: TextQueryMethod.EQUALS,
+            method: TextQueryMethod.EQUALS_IGNORE_CASE,
           },
         },
       }),
@@ -652,7 +658,7 @@ export async function listUsers({ serviceConfig, loginName, userName, phone, ema
           case: "userNameQuery",
           value: {
             userName,
-            method: TextQueryMethod.EQUALS,
+            method: TextQueryMethod.EQUALS_IGNORE_CASE,
           },
         },
       });
@@ -665,7 +671,7 @@ export async function listUsers({ serviceConfig, loginName, userName, phone, ema
           case: "emailQuery",
           value: {
             emailAddress: email,
-            method: TextQueryMethod.EQUALS,
+            method: TextQueryMethod.EQUALS_IGNORE_CASE,
           },
         },
       });
@@ -769,6 +775,10 @@ export async function searchUsers({
   const queries: SearchQuery[] = [];
 
   const t = await getTranslations("zitadel");
+
+  // Surrounding whitespace is never part of a login name, an email address or a
+  // phone number, but it is easily submitted by a browser or a mobile keyboard.
+  searchValue = normalizeLoginName(searchValue);
 
   // if a suffix is provided, we search for the userName concatenated with the suffix
   if (suffix) {
@@ -916,7 +926,9 @@ export async function getOrgsByDomain({ serviceConfig, domain }: WithServiceConf
         {
           query: {
             case: "domainQuery",
-            value: { domain, method: TextQueryMethod.EQUALS },
+            // Domains are case insensitive, and this one is taken from the suffix of a
+            // user supplied login name, so it may arrive in any casing.
+            value: { domain, method: TextQueryMethod.EQUALS_IGNORE_CASE },
           },
         },
       ],

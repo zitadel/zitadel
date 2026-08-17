@@ -681,6 +681,117 @@ describe("processIDPCallback", () => {
 
       expect(result.redirect).toContain("/idp/google/linking-failed");
     });
+
+    // Email addresses are not unique in ZITADEL, so the lookup can match several
+    // users. Linking to an arbitrary one of them would attach the external identity
+    // to the wrong account.
+    test("should not link when more than one user matches", async () => {
+      mockListUsers.mockResolvedValue({
+        result: [
+          { userId: "found123", details: { resourceOwner: "org123" } },
+          { userId: "found456", details: { resourceOwner: "org123" } },
+        ],
+      });
+
+      const result = await processIDPCallback(defaultParams);
+
+      expect(mockAddIDPLink).not.toHaveBeenCalled();
+      expect(mockCreateNewSessionFromIdpIntent).not.toHaveBeenCalled();
+      expect(result.redirect).toContain("/idp/google/linking-failed");
+      expect(result.redirect).toContain("error=ambiguous_match");
+    });
+
+    // With several case-insensitive matches, the candidate whose casing matches what
+    // the provider sent is the strongest signal available, so prefer it rather than
+    // failing closed. This keeps instances working that still hold usernames differing
+    // only by case.
+    test("should link the exact case match when several users match", async () => {
+      mockListUsers.mockResolvedValue({
+        result: [
+          {
+            userId: "other456",
+            details: { resourceOwner: "org123" },
+            type: { case: "human", value: { email: { email: "TEST@example.com" } } },
+          },
+          {
+            userId: "exact123",
+            details: { resourceOwner: "org123" },
+            type: { case: "human", value: { email: { email: "test@example.com" } } },
+          },
+        ],
+      });
+
+      const result = await processIDPCallback(defaultParams);
+
+      expect(mockAddIDPLink).toHaveBeenCalledWith(expect.objectContaining({ userId: "exact123" }));
+      expect(result.redirect).toBe("https://app.example.com/success");
+    });
+
+    test("should refuse when several users match and none matches the casing exactly", async () => {
+      mockListUsers.mockResolvedValue({
+        result: [
+          {
+            userId: "a",
+            details: { resourceOwner: "org123" },
+            type: { case: "human", value: { email: { email: "TEST@example.com" } } },
+          },
+          {
+            userId: "b",
+            details: { resourceOwner: "org123" },
+            type: { case: "human", value: { email: { email: "Test@Example.com" } } },
+          },
+        ],
+      });
+
+      const result = await processIDPCallback(defaultParams);
+
+      expect(mockAddIDPLink).not.toHaveBeenCalled();
+      expect(result.redirect).toContain("error=ambiguous_match");
+    });
+
+    test("should refuse when several users match the casing exactly", async () => {
+      mockListUsers.mockResolvedValue({
+        result: [
+          {
+            userId: "a",
+            details: { resourceOwner: "org123" },
+            type: { case: "human", value: { email: { email: "test@example.com" } } },
+          },
+          {
+            userId: "b",
+            details: { resourceOwner: "org123" },
+            type: { case: "human", value: { email: { email: "test@example.com" } } },
+          },
+        ],
+      });
+
+      const result = await processIDPCallback(defaultParams);
+
+      expect(mockAddIDPLink).not.toHaveBeenCalled();
+      expect(result.redirect).toContain("error=ambiguous_match");
+    });
+
+    // An ambiguous match must not silently fall through to creating yet another user.
+    test("should not create a user when more than one user matches", async () => {
+      mockGetIDPByID.mockResolvedValue({
+        ...defaultIdp,
+        config: {
+          options: {
+            ...defaultIdp.config.options,
+            autoLinking: AutoLinkingOption.EMAIL,
+            isLinkingAllowed: true,
+            isAutoCreation: true,
+          },
+        },
+      });
+      mockListUsers.mockResolvedValue({
+        result: [{ userId: "found123" }, { userId: "found456" }],
+      });
+
+      const result = await processIDPCallback(defaultParams);
+
+      expect(result.redirect).toContain("error=ambiguous_match");
+    });
   });
 
   describe("CASE 3: Auto-linking by username", () => {
