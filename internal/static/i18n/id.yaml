@@ -204,6 +204,7 @@ Errors:
     AlreadyActive: "Organisasi sudah aktif"
     Empty: "Organisasi kosong"
     NotFound: "Organisasi tidak ditemukan"
+    NotActive: "Organisasi tidak aktif"
     NotChanged: "Organisasi tidak berubah"
     DefaultOrgNotDeletable: "Organisasi Default tidak boleh dihapus"
     ZitadelOrgNotDeletable: "Organisasi dengan proyek Zitadel tidak boleh dihapus"

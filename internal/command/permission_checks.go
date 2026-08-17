@@ -72,6 +72,14 @@ func (c *Commands) checkPermissionUpdateUserCredentials(ctx context.Context, res
 	return c.checkPermissionOnUser(ctx, domain.PermissionUserCredentialWrite, true)(resourceOwner, userID)
 }
 
+// checkPermissionUpdateUserPasskey checks the same permission the passkey RPCs declare in their
+// auth annotation, so that no role loses access. The API interceptor only verifies it in the
+// caller-supplied request-header org, therefore commands must re-check it against the target
+// user's actual resource owner.
+func (c *Commands) checkPermissionUpdateUserPasskey(ctx context.Context, resourceOwner, userID string) error {
+	return c.checkPermissionOnUser(ctx, domain.PermissionUserPasskeyWrite, true)(resourceOwner, userID)
+}
+
 func (c *Commands) checkPermissionCreateProject(ctx context.Context, resourceOwner, projectID string) error {
 	return c.newPermissionCheck(ctx, domain.PermissionProjectCreate, project.AggregateType)(resourceOwner, projectID)
 }

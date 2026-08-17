@@ -207,6 +207,7 @@ Errors:
     AlreadyActive: "Organisation is already active"
     Empty: "Organisation is empty"
     NotFound: "Organisation not found"
+    NotActive: "Organisation is not active"
     NotChanged: "Organisation not changed"
     DefaultOrgNotDeletable: "Default Organisation must not be deleted"
     ZitadelOrgNotDeletable: "Organisation with Zitadel project must not be deleted"
