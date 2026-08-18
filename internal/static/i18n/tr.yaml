@@ -177,6 +177,7 @@ Errors:
         NotExisting: "Çok faktörlü OTP (Tek Kullanımlık Şifre) mevcut değil"
         NotReady: "Çok faktörlü OTP (Tek Kullanımlık Şifre) hazır değil"
         InvalidCode: "Geçersiz kod"
+        Reused: "Bu kod zaten kullanıldı. Lütfen yeni bir kod bekleyin"
       U2F:
         NotExisting: "U2F mevcut değil"
       Passwordless:

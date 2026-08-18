@@ -1090,6 +1090,9 @@ func TestCheckTOTP(t *testing.T) {
 	code, err := totp.GenerateCode(key.Secret(), testNow)
 	require.NoError(t, err)
 
+	// hash of a code which is guaranteed to be different from the checked code.
+	otherCodeHash := domain.HashTOTPCode("instance1", "user1", code+"0")
+
 	type fields struct {
 		sessionWriteModel *SessionWriteModel
 		eventstore        func(*testing.T) *eventstore.Eventstore
@@ -1236,9 +1239,155 @@ func TestCheckTOTP(t *testing.T) {
 				tarpit: expectTarpit(0),
 			},
 			wantEventCommands: []eventstore.Command{
-				user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil),
+				user.NewHumanOTPCheckSucceededEvent(
+					ctx,
+					userAgg,
+					nil,
+					domain.HashTOTPCode("instance1", "user1", code),
+				),
 				session.NewTOTPCheckedEvent(ctx, sessAgg, testNow),
 			},
+		},
+		{
+			name: "ok, previous check with a different code",
+			code: code,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+						),
+						eventFromEventPusher(
+							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, otherCodeHash),
+						),
+					),
+					expectFilter(), // recheck
+				),
+				tarpit: expectTarpit(0),
+			},
+			wantEventCommands: []eventstore.Command{
+				user.NewHumanOTPCheckSucceededEvent(
+					ctx,
+					userAgg,
+					nil,
+					domain.HashTOTPCode("instance1", "user1", code),
+				),
+				session.NewTOTPCheckedEvent(ctx, sessAgg, testNow),
+			},
+		},
+		{
+			name: "ok, previous check of the same code outside of the reuse window",
+			code: code,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+						),
+						eventFromEventPusher(
+							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
+						),
+						eventFromEventPusherWithCreationDate(
+							user.NewHumanOTPCheckSucceededEvent(
+								ctx,
+								userAgg,
+								nil,
+								domain.HashTOTPCode("instance1", "user1", code),
+							),
+							time.Now().Add(-2*time.Minute),
+						),
+					),
+					expectFilter(), // recheck
+				),
+				tarpit: expectTarpit(0),
+			},
+			wantEventCommands: []eventstore.Command{
+				user.NewHumanOTPCheckSucceededEvent(
+					ctx,
+					userAgg,
+					nil,
+					domain.HashTOTPCode("instance1", "user1", code),
+				),
+				session.NewTOTPCheckedEvent(ctx, sessAgg, testNow),
+			},
+		},
+		{
+			name: "code reuse error",
+			code: code,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+						),
+						eventFromEventPusher(
+							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPCheckSucceededEvent(
+								ctx,
+								userAgg,
+								nil,
+								domain.HashTOTPCode("instance1", "user1", code),
+							),
+						),
+					),
+					expectFilter(), // recheck
+				),
+				tarpit: expectTarpit(0),
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "TOTP-Auw0a", "Errors.User.MFA.OTP.Reused"),
+		},
+		{
+			name: "code reuse error, used in the meantime",
+			code: code,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+						),
+						eventFromEventPusher(
+							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
+						),
+					),
+					expectFilter( // recheck
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPCheckSucceededEvent(
+								ctx,
+								userAgg,
+								nil,
+								domain.HashTOTPCode("instance1", "user1", code),
+							),
+						),
+					),
+				),
+				tarpit: expectTarpit(0),
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "TOTP-Auw0a", "Errors.User.MFA.OTP.Reused"),
 		},
 		{
 			name: "ok, but locked in the meantime",

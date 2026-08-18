@@ -176,6 +176,7 @@ Errors:
         NotExisting: "Многофакторният OTP (OneTimePassword) не съществува"
         NotReady: "Многофакторният OTP (OneTimePassword) не е готов"
         InvalidCode: "Невалиден код"
+        Reused: "Този код вече е използван. Моля, изчакайте нов код"
       U2F:
         NotExisting: "U2F не съществува"
       Passwordless:

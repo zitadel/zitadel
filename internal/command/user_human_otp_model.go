@@ -16,6 +16,7 @@ type HumanTOTPWriteModel struct {
 	Secret           *crypto.CryptoValue
 	CheckFailedCount uint64
 	UserLocked       bool
+	History          *domain.TOTPHistory
 }
 
 func NewHumanTOTPWriteModel(userID, resourceOwner string) *HumanTOTPWriteModel {
@@ -24,6 +25,7 @@ func NewHumanTOTPWriteModel(userID, resourceOwner string) *HumanTOTPWriteModel {
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
+		History: new(domain.TOTPHistory),
 	}
 }
 
@@ -38,6 +40,7 @@ func (wm *HumanTOTPWriteModel) Reduce() error {
 			wm.CheckFailedCount = 0
 		case *user.HumanOTPCheckSucceededEvent:
 			wm.CheckFailedCount = 0
+			wm.History.AddRecent(e.CreatedAt(), e.CodeHash)
 		case *user.HumanOTPCheckFailedEvent:
 			wm.CheckFailedCount++
 		case *user.UserLockedEvent:
