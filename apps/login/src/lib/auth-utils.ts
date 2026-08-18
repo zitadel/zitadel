@@ -5,6 +5,21 @@ import { LANGS } from "@/lib/i18n";
  */
 
 /**
+ * Compare two identifiers (loginname, email, phone) case insensitively.
+ *
+ * User lookup is performed with EQUALS_IGNORE_CASE, so any follow up check that
+ * verifies *which* identifier the user was found by has to ignore case as well.
+ * Otherwise entering "Jackson@example.com" for the user "jackson@example.com"
+ * resolves the user but is then rejected as unknown.
+ */
+export function equalsIgnoreCase(a: string | undefined, b: string | undefined): boolean {
+  if (a === undefined || b === undefined) {
+    return false;
+  }
+  return a.toLowerCase() === b.toLowerCase();
+}
+
+/**
  * Check if a language code is valid (supported by the login UI)
  */
 export function isValidLanguage(code: string): boolean {
