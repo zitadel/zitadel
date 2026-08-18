@@ -56,6 +56,9 @@ func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (
 
 	if esErr != nil {
 		logging.Log("EVENT-5Nm9s").WithError(viewErr).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
+		if !token.Expiration.After(time.Now().UTC()) || token.Deactivated {
+			return nil, zerrors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.Token.NotFound")
+		}
 		return model.TokenViewToModel(token), nil
 	}
 	viewToken := *token
