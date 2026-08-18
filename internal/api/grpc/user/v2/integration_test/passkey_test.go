@@ -10,6 +10,8 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -320,6 +322,51 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestServer_CreatePasskeyRegistrationLink_CrossOrg simulates the cross-organization passkey
+// enrollment code issuance: the RPC's auth annotation carries user.passkey.write with no
+// org_field, so the interceptor only checks the caller's permission in the request-header org.
+// An org owner of one organization must not be able to mint an enrollment code - and with it a
+// takeover of the account - for a user in another organization.
+func TestServer_CreatePasskeyRegistrationLink_CrossOrg(t *testing.T) {
+	// The victim lives in another organization than the caller.
+	orgB := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
+	victimID := Instance.CreateHumanUserVerified(
+		IamCTX, orgB.GetOrganizationId(), integration.Email(), integration.Phone(),
+	).GetUserId()
+
+	t.Run("org owner of another org is denied", func(t *testing.T) {
+		// The attacker is ORG_OWNER of the default org only, and pins the request-header org
+		// to it - exactly the scope the interceptor verifies.
+		attackerCTX := integration.SetOrgID(OrgCTX, Instance.DefaultOrg.GetId())
+
+		got, err := Client.CreatePasskeyRegistrationLink(attackerCTX, &user.CreatePasskeyRegistrationLinkRequest{
+			UserId: victimID,
+			Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
+		})
+		require.Error(t, err)
+		// The default permission path reports "membership not found" (NotFound) because the
+		// caller has no membership in the victim's org at all; the v2 permission check reports
+		// PermissionDenied. Either is a correct denial.
+		assert.Contains(t, []codes.Code{codes.NotFound, codes.PermissionDenied}, status.Code(err))
+		assert.Empty(t, got.GetCode().GetCode())
+	})
+
+	t.Run("instance wide user manager is allowed", func(t *testing.T) {
+		// IAM_USER_MANAGER holds user.passkey.write instance wide, so it must keep working
+		// across organizations - the check narrows the org, it must not narrow the role set.
+		_, pat, err := Instance.CreateMachineUserPATWithMembership(IamCTX, "IAM_USER_MANAGER")
+		require.NoError(t, err)
+		managerCTX := integration.WithAuthorizationToken(CTX, pat)
+
+		got, err := Client.CreatePasskeyRegistrationLink(managerCTX, &user.CreatePasskeyRegistrationLinkRequest{
+			UserId: victimID,
+			Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
+		})
+		require.NoError(t, err)
+		assert.NotEmpty(t, got.GetCode().GetId())
+	})
 }
 
 func userWithPasskeyRegistered(t *testing.T) (string, *user.RegisterPasskeyResponse) {

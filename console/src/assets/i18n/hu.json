@@ -2620,6 +2620,25 @@
       "DEVMODEDESC": "Figyelem: Ha a fejlesztői mód be van kapcsolva, a redirect URI-k nem lesznek érvényesítve.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Login sikeroldal kihagyása",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Hagyd ki a sikeroldalt a bejelentkezés után ennél a helyi alkalmazásnál.",
+      "APPLINKSSECTION": "Natív alkalmazáshivatkozások",
+      "APPLINKSDESC": "Állítsa be az iOS és Android társítást, hogy ez a példány passkey trust fájlokat szolgálhasson ki a natív alkalmazásaihoz.",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "Az apple-app-site-association fájlban webcredentials bejegyzésként jelenik meg: TEAMID.BUNDLEID.",
+      "TEAMID": "Team ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Az Apple Team ID pontosan 10 alfanumerikus karakterből álljon, pl. ABCDE12345.",
+      "TEAMIDLENGTH": "A Team ID pontosan 10 alfanumerikus karakterből álljon.",
+      "BUNDLEID": "Bundle ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "iOS Bundle Identifier (CFBundleIdentifier), pl. com.example.app. Ne tartalmazza a Team ID előtagot.",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "Az assetlinks.json fájlban Digital Asset Links / passkey hitelesítő adatokhoz szolgál.",
+      "PACKAGENAME": "Csomagnév",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "Android applicationId / csomagnév, pl. com.example.app.",
+      "FINGERPRINTS": "SHA-256 tanúsítvány ujjlenyomatok",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "Soronként egy ujjlenyomat (64 hexadecimális karakter, a kettőspontok opcionálisak). Szükség szerint adja meg a debug és release értékeket.",
       "REDIRECT": "Redirect URIs",
       "REDIRECTSECTION": "Redirect URIs",
       "POSTLOGOUTREDIRECT": "Kijelentkezés utáni URIs",
@@ -2683,7 +2702,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI",
+      "IOSAPPLINKINCOMPLETE": "Az iOS Team ID-t és Bundle ID-t együtt kell megadni, vagy mindkettőt üresen hagyni.",
+      "ANDROIDPACKAGEREQUIRED": "Android csomagnév kötelező, ha tanúsítvány ujjlenyomatok vannak megadva."
     },
     "API": {
       "INFO": {
