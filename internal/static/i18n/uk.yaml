@@ -612,6 +612,10 @@ Errors:
     KeyIDMissing: "Відсутній KeyID"
     PrivateKeyMissing: "Відсутній приватний ключ"
     InvalidPrivateKey: "Невірний формат приватного ключа"
+    AuthorizationParameterNameMissing: "Відсутня назва параметра авторизації"
+    AuthorizationParameterNameInvalid: "Невірна назва параметра авторизації"
+    AuthorizationParameterDuplicate: "Параметр авторизації визначено більше одного разу"
+    AuthorizationParameterReserved: "Параметр авторизації керується ZITADEL і не може бути встановлений"
 
 AggregateTypes:
   action: "Дія"

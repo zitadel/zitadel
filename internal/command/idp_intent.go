@@ -137,7 +137,10 @@ func (c *Commands) GetActiveIntent(ctx context.Context, intentID string) (*IDPIn
 	return intent, nil
 }
 
-func (c *Commands) AuthFromProvider(ctx context.Context, idpID, idpCallback, samlRootURL string, loginHint string) (state string, session idp.Session, err error) {
+// AuthFromProvider starts the authentication with the given identity provider.
+// authorizationParameters are the parameters of the authorization request which started the
+// authentication. They are only sent to the provider if it is configured to forward them.
+func (c *Commands) AuthFromProvider(ctx context.Context, idpID, idpCallback, samlRootURL string, loginHint string, authorizationParameters map[string]string) (state string, session idp.Session, err error) {
 	state, err = c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
@@ -149,6 +152,9 @@ func (c *Commands) AuthFromProvider(ctx context.Context, idpID, idpCallback, sam
 	var params []idp.Parameter
 	if loginHint != "" {
 		params = append(params, idp.LoginHintParam(loginHint))
+	}
+	if len(authorizationParameters) > 0 {
+		params = append(params, idp.AuthorizationParameters(authorizationParameters))
 	}
 	session, err = provider.BeginAuth(ctx, state, params...)
 	return state, session, err

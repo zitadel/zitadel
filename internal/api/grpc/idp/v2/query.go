@@ -175,12 +175,14 @@ func AutoLinkingOptionToPb(linking domain.AutoLinkingOption) idp_pb.AutoLinkingO
 func oauthConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.OAuthIDPTemplate) {
 	idpConfig.Config = &idp_pb.IDPConfig_Oauth{
 		Oauth: &idp_pb.OAuthConfig{
-			ClientId:              template.ClientID,
-			AuthorizationEndpoint: template.AuthorizationEndpoint,
-			TokenEndpoint:         template.TokenEndpoint,
-			UserEndpoint:          template.UserEndpoint,
-			Scopes:                template.Scopes,
-			IdAttribute:           template.IDAttribute,
+			ClientId:                template.ClientID,
+			AuthorizationEndpoint:   template.AuthorizationEndpoint,
+			TokenEndpoint:           template.TokenEndpoint,
+			UserEndpoint:            template.UserEndpoint,
+			Scopes:                  template.Scopes,
+			IdAttribute:             template.IDAttribute,
+			AuthorizationParameters: template.AuthorizationParameters,
+			ForwardedParameters:     template.ForwardedParameters,
 		},
 	}
 }
@@ -188,10 +190,12 @@ func oauthConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.OAuthIDPTempla
 func oidcConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.OIDCIDPTemplate) {
 	idpConfig.Config = &idp_pb.IDPConfig_Oidc{
 		Oidc: &idp_pb.GenericOIDCConfig{
-			ClientId:         template.ClientID,
-			Issuer:           template.Issuer,
-			Scopes:           template.Scopes,
-			IsIdTokenMapping: template.IsIDTokenMapping,
+			ClientId:                template.ClientID,
+			Issuer:                  template.Issuer,
+			Scopes:                  template.Scopes,
+			IsIdTokenMapping:        template.IsIDTokenMapping,
+			AuthorizationParameters: template.AuthorizationParameters,
+			ForwardedParameters:     template.ForwardedParameters,
 		},
 	}
 }

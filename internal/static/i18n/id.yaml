@@ -612,6 +612,10 @@ Errors:
     KeyIDMissing: "ID Kunci hilang"
     PrivateKeyMissing: "Kunci Pribadi hilang"
     InvalidPrivateKey: "Format kunci pribadi tidak valid"
+    AuthorizationParameterNameMissing: "Nama parameter otorisasi tidak ada"
+    AuthorizationParameterNameInvalid: "Nama parameter otorisasi tidak valid"
+    AuthorizationParameterDuplicate: "Parameter otorisasi didefinisikan lebih dari sekali"
+    AuthorizationParameterReserved: "Parameter otorisasi dikelola oleh ZITADEL dan tidak dapat diatur"
 
 AggregateTypes:
   action: "Tindakan"

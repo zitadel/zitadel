@@ -210,9 +210,9 @@ func TestCommandSide_AddOrgGenericOAuthProvider(t *testing.T) {
 							"user",
 							"idAttribute",
 							nil,
-							false,
-							idp.Options{},
-						),
+							false, nil, nil,
+
+							idp.Options{}),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -257,14 +257,14 @@ func TestCommandSide_AddOrgGenericOAuthProvider(t *testing.T) {
 							"user",
 							"idAttribute",
 							[]string{"user"},
-							true,
+							true, nil, nil,
+
 							idp.Options{
 								IsCreationAllowed: true,
 								IsLinkingAllowed:  true,
 								IsAutoCreation:    true,
 								IsAutoUpdate:      true,
-							},
-						),
+							}),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -523,9 +523,10 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
-								false,
-								idp.Options{},
-							)),
+								false, nil, nil,
+
+								idp.Options{}),
+						),
 					),
 				),
 			},
@@ -568,9 +569,10 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
-								false,
-								idp.Options{},
-							)),
+								false, nil, nil,
+
+								idp.Options{}),
+						),
 					),
 					expectPush(
 						func() eventstore.Command {
@@ -771,9 +773,9 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 							},
 							nil,
 							false,
-							false,
-							idp.Options{},
-						),
+							false, nil, nil,
+
+							idp.Options{}),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -813,14 +815,14 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 							},
 							[]string{openid.ScopeOpenID},
 							true,
-							true,
+							true, nil, nil,
+
 							idp.Options{
 								IsCreationAllowed: true,
 								IsLinkingAllowed:  true,
 								IsAutoCreation:    true,
 								IsAutoUpdate:      true,
-							},
-						),
+							}),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -1006,9 +1008,10 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 								},
 								nil,
 								false,
-								false,
-								idp.Options{},
-							)),
+								false, nil, nil,
+
+								idp.Options{}),
+						),
 					),
 				),
 			},
@@ -1045,9 +1048,10 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 								},
 								nil,
 								false,
-								false,
-								idp.Options{},
-							)),
+								false, nil, nil,
+
+								idp.Options{}),
+						),
 					),
 					expectPush(
 						func() eventstore.Command {
@@ -1240,9 +1244,10 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 								},
 								nil,
 								false,
-								false,
-								idp.Options{},
-							)),
+								false, nil, nil,
+
+								idp.Options{}),
+						),
 					),
 					expectPush(
 						func() eventstore.Command {
@@ -1300,9 +1305,10 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 								},
 								nil,
 								false,
-								false,
-								idp.Options{},
-							)),
+								false, nil, nil,
+
+								idp.Options{}),
+						),
 					),
 					expectPush(
 						org.NewOIDCIDPMigratedAzureADEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -1469,9 +1475,10 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 								},
 								nil,
 								false,
-								false,
-								idp.Options{},
-							)),
+								false, nil, nil,
+
+								idp.Options{}),
+						),
 					),
 					expectPush(
 						org.NewOIDCIDPMigratedGoogleEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -1523,9 +1530,10 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 								},
 								nil,
 								false,
-								false,
-								idp.Options{},
-							)),
+								false, nil, nil,
+
+								idp.Options{}),
+						),
 					),
 					expectPush(
 						org.NewOIDCIDPMigratedGoogleEvent(context.Background(), &org.NewAggregate("org1").Aggregate,

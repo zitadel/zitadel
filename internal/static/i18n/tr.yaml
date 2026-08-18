@@ -618,6 +618,10 @@ Errors:
     KeyIDMissing: "KeyID eksik"
     PrivateKeyMissing: "Özel Anahtar eksik"
     InvalidPrivateKey: "Geçersiz özel anahtar biçimi"
+    AuthorizationParameterNameMissing: "Yetkilendirme parametresi adı eksik"
+    AuthorizationParameterNameInvalid: "Geçersiz yetkilendirme parametresi adı"
+    AuthorizationParameterDuplicate: "Yetkilendirme parametresi birden fazla kez tanımlanmış"
+    AuthorizationParameterReserved: "Yetkilendirme parametresi ZITADEL tarafından yönetilir ve ayarlanamaz"
 
 AggregateTypes:
   action: "Eylem"

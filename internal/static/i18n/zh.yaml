@@ -618,6 +618,10 @@ Errors:
     KeyIDMissing: "密钥 ID 丢失"
     PrivateKeyMissing: "私钥丢失"
     InvalidPrivateKey: "无效的私钥格式"
+    AuthorizationParameterNameMissing: "缺少授权参数名称"
+    AuthorizationParameterNameInvalid: "无效的授权参数名称"
+    AuthorizationParameterDuplicate: "授权参数被重复定义"
+    AuthorizationParameterReserved: "授权参数由 ZITADEL 管理，无法设置"
 
 AggregateTypes:
   action: "动作"

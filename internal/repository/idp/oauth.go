@@ -9,16 +9,18 @@ import (
 type OAuthIDPAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID                    string              `json:"id"`
-	Name                  string              `json:"name,omitempty"`
-	ClientID              string              `json:"clientId,omitempty"`
-	ClientSecret          *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	AuthorizationEndpoint string              `json:"authorizationEndpoint,omitempty"`
-	TokenEndpoint         string              `json:"tokenEndpoint,omitempty"`
-	UserEndpoint          string              `json:"userEndpoint,omitempty"`
-	Scopes                []string            `json:"scopes,omitempty"`
-	IDAttribute           string              `json:"idAttribute,omitempty"`
-	UsePKCE               bool                `json:"usePKCE,omitempty"`
+	ID                      string              `json:"id"`
+	Name                    string              `json:"name,omitempty"`
+	ClientID                string              `json:"clientId,omitempty"`
+	ClientSecret            *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	AuthorizationEndpoint   string              `json:"authorizationEndpoint,omitempty"`
+	TokenEndpoint           string              `json:"tokenEndpoint,omitempty"`
+	UserEndpoint            string              `json:"userEndpoint,omitempty"`
+	Scopes                  []string            `json:"scopes,omitempty"`
+	IDAttribute             string              `json:"idAttribute,omitempty"`
+	UsePKCE                 bool                `json:"usePKCE,omitempty"`
+	AuthorizationParameters map[string]string   `json:"authorizationParameters,omitempty"`
+	ForwardedParameters     []string            `json:"forwardedParameters,omitempty"`
 	Options
 }
 
@@ -34,21 +36,25 @@ func NewOAuthIDPAddedEvent(
 	idAttribute string,
 	scopes []string,
 	usePKCE bool,
+	authorizationParameters map[string]string,
+	forwardedParameters []string,
 	options Options,
 ) *OAuthIDPAddedEvent {
 	return &OAuthIDPAddedEvent{
-		BaseEvent:             *base,
-		ID:                    id,
-		Name:                  name,
-		ClientID:              clientID,
-		ClientSecret:          clientSecret,
-		AuthorizationEndpoint: authorizationEndpoint,
-		TokenEndpoint:         tokenEndpoint,
-		UserEndpoint:          userEndpoint,
-		Scopes:                scopes,
-		IDAttribute:           idAttribute,
-		UsePKCE:               usePKCE,
-		Options:               options,
+		BaseEvent:               *base,
+		ID:                      id,
+		Name:                    name,
+		ClientID:                clientID,
+		ClientSecret:            clientSecret,
+		AuthorizationEndpoint:   authorizationEndpoint,
+		TokenEndpoint:           tokenEndpoint,
+		UserEndpoint:            userEndpoint,
+		Scopes:                  scopes,
+		IDAttribute:             idAttribute,
+		UsePKCE:                 usePKCE,
+		AuthorizationParameters: authorizationParameters,
+		ForwardedParameters:     forwardedParameters,
+		Options:                 options,
 	}
 }
 
@@ -76,16 +82,18 @@ func OAuthIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) 
 type OAuthIDPChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID                    string              `json:"id"`
-	Name                  *string             `json:"name,omitempty"`
-	ClientID              *string             `json:"clientId,omitempty"`
-	ClientSecret          *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	AuthorizationEndpoint *string             `json:"authorizationEndpoint,omitempty"`
-	TokenEndpoint         *string             `json:"tokenEndpoint,omitempty"`
-	UserEndpoint          *string             `json:"userEndpoint,omitempty"`
-	Scopes                []string            `json:"scopes,omitempty"`
-	IDAttribute           *string             `json:"idAttribute,omitempty"`
-	UsePKCE               *bool               `json:"usePKCE,omitempty"`
+	ID                      string              `json:"id"`
+	Name                    *string             `json:"name,omitempty"`
+	ClientID                *string             `json:"clientId,omitempty"`
+	ClientSecret            *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	AuthorizationEndpoint   *string             `json:"authorizationEndpoint,omitempty"`
+	TokenEndpoint           *string             `json:"tokenEndpoint,omitempty"`
+	UserEndpoint            *string             `json:"userEndpoint,omitempty"`
+	Scopes                  []string            `json:"scopes,omitempty"`
+	IDAttribute             *string             `json:"idAttribute,omitempty"`
+	UsePKCE                 *bool               `json:"usePKCE,omitempty"`
+	AuthorizationParameters *map[string]string  `json:"authorizationParameters,omitempty"`
+	ForwardedParameters     *[]string           `json:"forwardedParameters,omitempty"`
 	OptionChanges
 }
 
@@ -165,6 +173,26 @@ func ChangeOAuthIDAttribute(idAttribute string) func(*OAuthIDPChangedEvent) {
 func ChangeOAuthUsePKCE(usePKCE bool) func(*OAuthIDPChangedEvent) {
 	return func(e *OAuthIDPChangedEvent) {
 		e.UsePKCE = &usePKCE
+	}
+}
+
+func ChangeOAuthAuthorizationParameters(parameters map[string]string) func(*OAuthIDPChangedEvent) {
+	return func(e *OAuthIDPChangedEvent) {
+		if parameters == nil {
+			// an empty map is marshalled as `{}` and therefore correctly resets the parameters,
+			// whereas a nil map would be omitted and treated as unchanged on replay
+			parameters = map[string]string{}
+		}
+		e.AuthorizationParameters = &parameters
+	}
+}
+
+func ChangeOAuthForwardedParameters(parameters []string) func(*OAuthIDPChangedEvent) {
+	return func(e *OAuthIDPChangedEvent) {
+		if parameters == nil {
+			parameters = []string{}
+		}
+		e.ForwardedParameters = &parameters
 	}
 }
 

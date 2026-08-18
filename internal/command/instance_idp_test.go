@@ -293,9 +293,9 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 							"user",
 							"idAttribute",
 							nil,
-							true,
-							idp.Options{},
-						),
+							true, nil, nil,
+
+							idp.Options{}),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -340,14 +340,14 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 							"user",
 							"idAttribute",
 							[]string{"user"},
-							true,
+							true, nil, nil,
+
 							idp.Options{
 								IsCreationAllowed: true,
 								IsLinkingAllowed:  true,
 								IsAutoCreation:    true,
 								IsAutoUpdate:      true,
-							},
-						),
+							}),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -596,9 +596,10 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
-								true,
-								idp.Options{},
-							)),
+								true, nil, nil,
+
+								idp.Options{}),
+						),
 					),
 				),
 			},
@@ -640,9 +641,10 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
-								false,
-								idp.Options{},
-							)),
+								false, nil, nil,
+
+								idp.Options{}),
+						),
 					),
 					expectPush(
 						func() eventstore.Command {
@@ -837,9 +839,9 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 							},
 							nil,
 							false,
-							true,
-							idp.Options{},
-						),
+							true, nil, nil,
+
+							idp.Options{}),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -879,14 +881,14 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 							},
 							[]string{openid.ScopeOpenID},
 							true,
-							true,
+							true, nil, nil,
+
 							idp.Options{
 								IsCreationAllowed: true,
 								IsLinkingAllowed:  true,
 								IsAutoCreation:    true,
 								IsAutoUpdate:      true,
-							},
-						),
+							}),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -1065,9 +1067,10 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 								},
 								nil,
 								false,
-								false,
-								idp.Options{},
-							)),
+								false, nil, nil,
+
+								idp.Options{}),
+						),
 					),
 				),
 			},
@@ -1103,9 +1106,10 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 								},
 								nil,
 								false,
-								false,
-								idp.Options{},
-							)),
+								false, nil, nil,
+
+								idp.Options{}),
+						),
 					),
 					expectPush(
 						func() eventstore.Command {
@@ -1293,9 +1297,10 @@ func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 								},
 								nil,
 								false,
-								false,
-								idp.Options{},
-							)),
+								false, nil, nil,
+
+								idp.Options{}),
+						),
 					),
 					expectPush(
 						func() eventstore.Command {
@@ -1352,9 +1357,10 @@ func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 								},
 								nil,
 								false,
-								false,
-								idp.Options{},
-							)),
+								false, nil, nil,
+
+								idp.Options{}),
+						),
 					),
 					expectPush(
 						func() eventstore.Command {
@@ -1517,9 +1523,10 @@ func TestCommandSide_MigrateInstanceOIDCToGoogleIDP(t *testing.T) {
 								},
 								nil,
 								false,
-								false,
-								idp.Options{},
-							)),
+								false, nil, nil,
+
+								idp.Options{}),
+						),
 					),
 					expectPush(
 						instance.NewOIDCIDPMigratedGoogleEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
@@ -1570,9 +1577,10 @@ func TestCommandSide_MigrateInstanceOIDCToGoogleIDP(t *testing.T) {
 								},
 								nil,
 								false,
-								false,
-								idp.Options{},
-							)),
+								false, nil, nil,
+
+								idp.Options{}),
+						),
 					),
 					expectPush(
 						instance.NewOIDCIDPMigratedGoogleEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,

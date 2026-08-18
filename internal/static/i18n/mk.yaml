@@ -616,6 +616,10 @@ Errors:
     KeyIDMissing: "Недостасува ID на клуч"
     PrivateKeyMissing: "Недостасува приватен клуч"
     InvalidPrivateKey: "Невалиден формат на приватен клуч"
+    AuthorizationParameterNameMissing: "Недостасува име на параметарот за авторизација"
+    AuthorizationParameterNameInvalid: "Невалидно име на параметарот за авторизација"
+    AuthorizationParameterDuplicate: "Параметарот за авторизација е дефиниран повеќе од еднаш"
+    AuthorizationParameterReserved: "Параметарот за авторизација се управува од ZITADEL и не може да се постави"
 
 AggregateTypes:
   action: "Акција"

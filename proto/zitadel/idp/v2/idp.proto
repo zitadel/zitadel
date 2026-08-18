@@ -183,6 +183,19 @@ message OAuthConfig {
         example:
           "\"user_id\"";
       } ];
+  // Parameters which are added to the authorization request sent to the identity provider.
+  map<string, string> authorization_parameters = 7
+      [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example:
+          "{\"acr_values\": \"AAL2_OR_AAL3_ANY\", \"prompt\": \"login\"}";
+      } ];
+  // Names of the parameters of the original authorization request which are forwarded to the
+  // identity provider.
+  repeated string forwarded_parameters = 8
+      [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example:
+          "[\"acr_values\", \"max_age\"]";
+      } ];
 }
 
 message GenericOIDCConfig {
@@ -211,6 +224,19 @@ message GenericOIDCConfig {
       [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example:
           "true";
+      } ];
+  // Parameters which are added to the authorization request sent to the identity provider.
+  map<string, string> authorization_parameters = 5
+      [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example:
+          "{\"acr_values\": \"AAL2_OR_AAL3_ANY\", \"prompt\": \"login\"}";
+      } ];
+  // Names of the parameters of the original authorization request which are forwarded to the
+  // identity provider.
+  repeated string forwarded_parameters = 6
+      [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example:
+          "[\"acr_values\", \"max_age\"]";
       } ];
 }
 

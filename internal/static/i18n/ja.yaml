@@ -618,6 +618,10 @@ Errors:
     KeyIDMissing: "キーIDがありません"
     PrivateKeyMissing: "秘密キーがありません"
     InvalidPrivateKey: "無効な秘密鍵形式"
+    AuthorizationParameterNameMissing: "認可パラメーター名がありません"
+    AuthorizationParameterNameInvalid: "無効な認可パラメーター名"
+    AuthorizationParameterDuplicate: "認可パラメーターが複数回定義されています"
+    AuthorizationParameterReserved: "認可パラメーターはZITADELによって管理されているため、設定できません"
 
 AggregateTypes:
   action: "アクション"

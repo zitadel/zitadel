@@ -617,6 +617,10 @@ Errors:
     KeyIDMissing: "Falta KeyID"
     PrivateKeyMissing: "Falta la clave privada"
     InvalidPrivateKey: "Formato de clave privada inválido"
+    AuthorizationParameterNameMissing: "Falta el nombre del parámetro de autorización"
+    AuthorizationParameterNameInvalid: "Nombre de parámetro de autorización no válido"
+    AuthorizationParameterDuplicate: "Parámetro de autorización definido más de una vez"
+    AuthorizationParameterReserved: "El parámetro de autorización lo gestiona ZITADEL y no se puede establecer"
 
 AggregateTypes:
   action: "Acción"

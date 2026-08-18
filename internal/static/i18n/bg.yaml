@@ -617,6 +617,10 @@ Errors:
     KeyIDMissing: "Липсва KeyID"
     PrivateKeyMissing: "Липсва частен ключ"
     InvalidPrivateKey: "Невалиден формат на частния ключ"
+    AuthorizationParameterNameMissing: "Липсва име на параметъра за оторизация"
+    AuthorizationParameterNameInvalid: "Невалидно име на параметъра за оторизация"
+    AuthorizationParameterDuplicate: "Параметърът за оторизация е дефиниран повече от веднъж"
+    AuthorizationParameterReserved: "Параметърът за оторизация се управлява от ZITADEL и не може да бъде задаван"
 
 AggregateTypes:
   action: "Действие"
