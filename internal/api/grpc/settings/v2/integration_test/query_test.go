@@ -429,6 +429,58 @@ func TestServer_GetHostedLoginTranslation(t *testing.T) {
 	}
 }
 
+// TestServer_GetHostedLoginTranslation_InheritsInstanceLevel verifies that a
+// translation set at instance level is returned when querying at organization
+// level with inheritance enabled. Regression test for the bug where the SQL
+// WHERE clause filtered strictly to the requested level, making the
+// instance→org merge branch unreachable.
+func TestServer_GetHostedLoginTranslation_InheritsInstanceLevel(t *testing.T) {
+	// Use a dedicated instance so other tests that write instance-level
+	// translations don't interfere with the assertions below.
+	instance := integration.NewInstance(CTX)
+	adminCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+
+	instanceTranslation := map[string]any{"loginTitle": "Login with Instance Branding"}
+	protoInstanceTranslation, err := structpb.NewStruct(instanceTranslation)
+	require.NoError(t, err)
+
+	_, err = instance.Client.SettingsV2.SetHostedLoginTranslation(adminCtx, &settings.SetHostedLoginTranslationRequest{
+		Level:        &settings.SetHostedLoginTranslationRequest_Instance{Instance: true},
+		Translations: protoInstanceTranslation,
+		Locale:       "en-US",
+	})
+	require.NoError(t, err)
+
+	// Reading at org level with inheritance enabled (the default) must
+	// return the instance-level override merged into the response. Before
+	// the fix this returned only the embedded system defaults.
+	res, err := instance.Client.SettingsV2.GetHostedLoginTranslation(adminCtx, &settings.GetHostedLoginTranslationRequest{
+		Level: &settings.GetHostedLoginTranslationRequest_OrganizationId{
+			OrganizationId: instance.DefaultOrg.GetId(),
+		},
+		Locale: "en-US",
+	})
+	require.NoError(t, err)
+	require.NotNil(t, res.GetTranslations())
+	assert.Equal(t, "Login with Instance Branding", res.GetTranslations().GetFields()["loginTitle"].GetStringValue(),
+		"org-level lookup with inheritance must surface instance-level overrides")
+
+	// Reading at org level with ignore_inheritance=true must NOT return the
+	// instance-level override because nothing was set at org level.
+	resNoInherit, err := instance.Client.SettingsV2.GetHostedLoginTranslation(adminCtx, &settings.GetHostedLoginTranslationRequest{
+		Level: &settings.GetHostedLoginTranslationRequest_OrganizationId{
+			OrganizationId: instance.DefaultOrg.GetId(),
+		},
+		Locale:            "en-US",
+		IgnoreInheritance: true,
+	})
+	require.NoError(t, err)
+	if resNoInherit.GetTranslations() != nil {
+		_, hasKey := resNoInherit.GetTranslations().GetFields()["loginTitle"]
+		assert.False(t, hasKey, "ignore_inheritance=true must not leak instance-level translations")
+	}
+}
+
 func TestServer_ListOrganizationSettings(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)

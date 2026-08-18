@@ -128,13 +128,30 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 		sq.Eq{hostedLoginTranslationColLocale.identifier(): lang.String()},
 		sq.Eq{hostedLoginTranslationColLocale.identifier(): parentLang.String()},
 	}
-	eq := sq.Eq{
+	requestedLevelEq := sq.Eq{
 		hostedLoginTranslationColInstanceID.identifier():        inst.InstanceID(),
 		hostedLoginTranslationColResourceOwner.identifier():     levelID,
 		hostedLoginTranslationColResourceOwnerType.identifier(): resourceOwner,
 	}
 
-	query, args, err := stmt.Where(eq).Where(langORBaseLang).ToSql()
+	// When querying at organization level with inheritance enabled, also
+	// fetch the instance-level row so it can be merged into the organization
+	// translations further down. Without this, the downstream merge branch
+	// for the instance parent is dead code because the WHERE clause would
+	// only ever return rows for the organization.
+	var levelFilter sq.Sqlizer = requestedLevelEq
+	if resourceOwner == org.AggregateType && !req.GetIgnoreInheritance() {
+		levelFilter = sq.Or{
+			requestedLevelEq,
+			sq.Eq{
+				hostedLoginTranslationColInstanceID.identifier():        inst.InstanceID(),
+				hostedLoginTranslationColResourceOwner.identifier():     inst.InstanceID(),
+				hostedLoginTranslationColResourceOwnerType.identifier(): instance.AggregateType,
+			},
+		}
+	}
+
+	query, args, err := stmt.Where(levelFilter).Where(langORBaseLang).ToSql()
 	if err != nil {
 		logging.WithError(err).Error("unable to generate sql statement")
 		return nil, zerrors.ThrowInternal(err, "QUERY-ZgCMux", "Errors.Query.SQLStatement")
@@ -207,15 +224,17 @@ func getSystemTranslation(lang, instanceDefaultLang language.Tag) (map[string]an
 }
 
 func prepareHostedLoginTranslationQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*HostedLoginTranslation, error)) {
+	// Up to 4 rows can legitimately match: 2 levels (requested + parent
+	// instance) × 2 locales (requested lang + its parent lang).
 	return sq.Select(
 			hostedLoginTranslationColFile.identifier(),
 			hostedLoginTranslationColResourceOwnerType.identifier(),
 			hostedLoginTranslationColEtag.identifier(),
 		).From(hostedLoginTranslationTable.identifier()).
-			Limit(2).
+			Limit(4).
 			PlaceholderFormat(sq.Dollar),
 		func(r *sql.Rows) ([]*HostedLoginTranslation, error) {
-			translations := make([]*HostedLoginTranslation, 0, 2)
+			translations := make([]*HostedLoginTranslation, 0, 4)
 			for r.Next() {
 				var rawTranslation json.RawMessage
 				translation := &HostedLoginTranslation{}
