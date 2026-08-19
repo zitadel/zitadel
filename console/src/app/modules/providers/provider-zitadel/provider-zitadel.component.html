@@ -4,8 +4,8 @@
 >
   <div class="identity-provider-create-content">
     <div class="identity-provider-title-row">
-      <img class="idp-logo dark" src="./assets/images/zitadel-logo-solo-dark-icon.svg" alt="zitadel" />
-      <img class="idp-logo light" src="./assets/images/zitadel-logo-solo-light-icon.svg" alt="zitadel" />
+      <img class="idp-logo dark" src="./assets/images/zitadel-logo-solo-light.svg" alt="zitadel" />
+      <img class="idp-logo light" src="./assets/images/zitadel-logo-solo-dark.svg" alt="zitadel" />
       <h1>{{ 'IDP.CREATE.ZITADEL.TITLE' | translate }}</h1>
       @if (exists$ | async) {
         @if ({ isNotActive: (activateLink$ | async) }; as idp) {
