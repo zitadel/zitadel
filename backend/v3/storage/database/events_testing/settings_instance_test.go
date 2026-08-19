@@ -13,6 +13,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
@@ -1287,41 +1288,35 @@ func TestServer_TestInstanceNotificationSettingsReduces(t *testing.T) {
 	})
 }
 
-func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
+func TestServer_TestInstanceLinksSettingsReduces(t *testing.T) {
 	t.Parallel()
 
-	settingsRepo := repository.LegalAndSupportSettingsRepository()
+	settingsRepo := repository.LinksSettingsRepository()
 
 	before := time.Now()
 	newInstance := integration.NewInstance(t.Context())
 	after := time.Now()
 	IAMCTX := newInstance.WithAuthorizationToken(t.Context(), integration.UserTypeIAMOwner)
 
-	t.Run("test add legal and support settings set", func(t *testing.T) {
-
+	t.Run("test links settings added", func(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			setting, err := settingsRepo.Get(
 				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLinks, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
 
-			assert.Equal(t, "", *setting.TOSLink)
-			assert.Equal(t, "", *setting.PrivacyPolicyLink)
-			assert.Equal(t, "", *setting.HelpLink)
-			assert.Equal(t, "", *setting.SupportEmail)
-			assert.Equal(t, "https://zitadel.com/docs", *setting.DocsLink)
-			assert.Equal(t, "", *setting.CustomLink)
-			assert.Equal(t, "", *setting.CustomLinkText)
+			assert.Len(t, setting.Links, 1)
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeDocs, URL: gu.Ptr("https://zitadel.com/docs"), Target: domain.LinkTargetBlank})
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
-	t.Run("test add legal and support settings re-set", func(t *testing.T) {
+	t.Run("test links settings re-set", func(t *testing.T) {
 		before := time.Now()
 		_, err := newInstance.Client.Admin.UpdatePrivacyPolicy(IAMCTX, &admin.UpdatePrivacyPolicyRequest{
 			TosLink:        "https://tos.example2.com",
@@ -1340,18 +1335,166 @@ func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLinks, domain.SettingStateActive),
 				),
 			)
 			require.NoError(t, err)
 
-			assert.Equal(t, "https://tos.example2.com", *setting.TOSLink)
-			assert.Equal(t, "https://privacy.example2.com", *setting.PrivacyPolicyLink)
-			assert.Equal(t, "https://help.example2.com", *setting.HelpLink)
-			assert.Equal(t, "support@example2.com", *setting.SupportEmail)
-			assert.Equal(t, "https://docs.example2.com", *setting.DocsLink)
-			assert.Equal(t, "https://custom.example2.com", *setting.CustomLink)
-			assert.Equal(t, "Custom link text2", *setting.CustomLinkText)
+			assert.Len(t, setting.Links, 6)
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeTermsOfService, URL: gu.Ptr("https://tos.example2.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypePrivacyPolicy, URL: gu.Ptr("https://privacy.example2.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeHelp, URL: gu.Ptr("https://help.example2.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeSupport, URL: gu.Ptr("mailto:support@example2.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeDocs, URL: gu.Ptr("https://docs.example2.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeCustom, URL: gu.Ptr("https://custom.example2.com"), Target: domain.LinkTargetBlank, TranslationKey: gu.Ptr("Custom link text2")})
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test links settings custom link text only update", func(t *testing.T) {
+		before := time.Now()
+		// Send the same values for all fields except CustomLinkText
+		_, err := newInstance.Client.Admin.UpdatePrivacyPolicy(IAMCTX, &admin.UpdatePrivacyPolicyRequest{
+			TosLink:        "https://tos.example2.com",
+			PrivacyLink:    "https://privacy.example2.com",
+			HelpLink:       "https://help.example2.com",
+			SupportEmail:   "support@example2.com",
+			DocsLink:       "https://docs.example2.com",
+			CustomLink:     "https://custom.example2.com",
+			CustomLinkText: "Updated custom link text",
+		})
+		require.NoError(t, err)
+		after := time.Now()
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLinks, domain.SettingStateActive),
+				),
+			)
+			require.NoError(t, err)
+
+			// All 6 links should still be present
+			assert.Len(t, setting.Links, 6)
+			// Custom link URL should remain unchanged, but translation key should be updated
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeCustom, URL: gu.Ptr("https://custom.example2.com"), Target: domain.LinkTargetBlank, TranslationKey: gu.Ptr("Updated custom link text")})
+			// Other links should remain unchanged
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeTermsOfService, URL: gu.Ptr("https://tos.example2.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypePrivacyPolicy, URL: gu.Ptr("https://privacy.example2.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeHelp, URL: gu.Ptr("https://help.example2.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeSupport, URL: gu.Ptr("mailto:support@example2.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeDocs, URL: gu.Ptr("https://docs.example2.com"), Target: domain.LinkTargetBlank})
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test links settings partial update", func(t *testing.T) {
+		before := time.Now()
+		// Only update TOS and Privacy links, keep the rest the same
+		_, err := newInstance.Client.Admin.UpdatePrivacyPolicy(IAMCTX, &admin.UpdatePrivacyPolicyRequest{
+			TosLink:        "https://tos.example3.com",
+			PrivacyLink:    "https://privacy.example3.com",
+			HelpLink:       "https://help.example2.com",
+			SupportEmail:   "support@example2.com",
+			DocsLink:       "https://docs.example2.com",
+			CustomLink:     "https://custom.example2.com",
+			CustomLinkText: "Updated custom link text",
+		})
+		require.NoError(t, err)
+		after := time.Now()
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLinks, domain.SettingStateActive),
+				),
+			)
+			require.NoError(t, err)
+
+			assert.Len(t, setting.Links, 6)
+			// Updated links
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeTermsOfService, URL: gu.Ptr("https://tos.example3.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypePrivacyPolicy, URL: gu.Ptr("https://privacy.example3.com"), Target: domain.LinkTargetBlank})
+			// Unchanged links
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeHelp, URL: gu.Ptr("https://help.example2.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeSupport, URL: gu.Ptr("mailto:support@example2.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeDocs, URL: gu.Ptr("https://docs.example2.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeCustom, URL: gu.Ptr("https://custom.example2.com"), Target: domain.LinkTargetBlank, TranslationKey: gu.Ptr("Updated custom link text")})
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test links settings remove link", func(t *testing.T) {
+		before := time.Now()
+		// Remove help link by setting it to empty
+		_, err := newInstance.Client.Admin.UpdatePrivacyPolicy(IAMCTX, &admin.UpdatePrivacyPolicyRequest{
+			TosLink:        "https://tos.example3.com",
+			PrivacyLink:    "https://privacy.example3.com",
+			HelpLink:       "",
+			SupportEmail:   "support@example2.com",
+			DocsLink:       "https://docs.example2.com",
+			CustomLink:     "https://custom.example2.com",
+			CustomLinkText: "Updated custom link text",
+		})
+		require.NoError(t, err)
+		after := time.Now()
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLinks, domain.SettingStateActive),
+				),
+			)
+			require.NoError(t, err)
+
+			// Help link should be removed, so only 5 links remain
+			assert.Len(t, setting.Links, 5)
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeTermsOfService, URL: gu.Ptr("https://tos.example3.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypePrivacyPolicy, URL: gu.Ptr("https://privacy.example3.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeSupport, URL: gu.Ptr("mailto:support@example2.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeDocs, URL: gu.Ptr("https://docs.example2.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeCustom, URL: gu.Ptr("https://custom.example2.com"), Target: domain.LinkTargetBlank, TranslationKey: gu.Ptr("Updated custom link text")})
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test links settings remove support email", func(t *testing.T) {
+		before := time.Now()
+		// Remove support email by setting it to empty
+		_, err := newInstance.Client.Admin.UpdatePrivacyPolicy(IAMCTX, &admin.UpdatePrivacyPolicyRequest{
+			TosLink:        "https://tos.example3.com",
+			PrivacyLink:    "https://privacy.example3.com",
+			HelpLink:       "",
+			SupportEmail:   "",
+			DocsLink:       "https://docs.example2.com",
+			CustomLink:     "https://custom.example2.com",
+			CustomLinkText: "Updated custom link text",
+		})
+		require.NoError(t, err)
+		after := time.Now()
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLinks, domain.SettingStateActive),
+				),
+			)
+			require.NoError(t, err)
+
+			// Support link should be removed, so only 4 links remain
+			assert.Len(t, setting.Links, 4)
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeTermsOfService, URL: gu.Ptr("https://tos.example3.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypePrivacyPolicy, URL: gu.Ptr("https://privacy.example3.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeDocs, URL: gu.Ptr("https://docs.example2.com"), Target: domain.LinkTargetBlank})
+			assert.Contains(t, setting.Links, domain.Link{Type: domain.LinkTypeCustom, URL: gu.Ptr("https://custom.example2.com"), Target: domain.LinkTargetBlank, TranslationKey: gu.Ptr("Updated custom link text")})
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1362,7 +1505,7 @@ func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
 			setting, err := settingsRepo.Get(
 				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLinks, domain.SettingStateActive),
 				),
 			)
 			require.NoError(collect, err)
@@ -1380,7 +1523,7 @@ func TestServer_TestInstanceLegalAndSupportSettingsReduces(t *testing.T) {
 			_, err := settingsRepo.Get(
 				IAMCTX, pool,
 				database.WithCondition(
-					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeLinks, domain.SettingStateActive),
 				),
 			)
 

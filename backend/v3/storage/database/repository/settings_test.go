@@ -4365,7 +4365,7 @@ func TestDeleteNotificationSettings(t *testing.T) {
 	}
 }
 
-func TestGetLegalAndSupportSettings(t *testing.T) {
+func TestGetLinksSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
 	defer rollback()
 
@@ -4373,22 +4373,38 @@ func TestGetLegalAndSupportSettings(t *testing.T) {
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.LegalAndSupportSettingsRepository()
+	repo := repository.LinksSettingsRepository()
 
-	settings := []*domain.LegalAndSupportSettings{
+	settings := []*domain.LinksSettings{
 		{
 			Settings: domain.Settings{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr("https://host"),
-				PrivacyPolicyLink: gu.Ptr("https://host"),
-				HelpLink:          gu.Ptr("https://host"),
-				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr("https://host"),
-				CustomLink:        gu.Ptr("https://host"),
-				CustomLinkText:    gu.Ptr("linktext"),
+			LinksSettingsAttributes: domain.LinksSettingsAttributes{
+				Links: []domain.Link{
+					{
+						Type:   domain.LinkTypeTermsOfService,
+						URL:    gu.Ptr("https://host"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:   domain.LinkTypePrivacyPolicy,
+						URL:    gu.Ptr("https://host"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:   domain.LinkTypeSupport,
+						URL:    gu.Ptr("mailto:email"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:           domain.LinkTypeCustom,
+						URL:            gu.Ptr("https://host"),
+						TranslationKey: gu.Ptr("linktext"),
+						Target:         domain.LinkTargetBlank,
+					},
+				},
 			},
 		},
 		{
@@ -4396,14 +4412,30 @@ func TestGetLegalAndSupportSettings(t *testing.T) {
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr("https://host"),
-				PrivacyPolicyLink: gu.Ptr("https://host"),
-				HelpLink:          gu.Ptr("https://host"),
-				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr("https://host"),
-				CustomLink:        gu.Ptr("https://host"),
-				CustomLinkText:    gu.Ptr("linktext"),
+			LinksSettingsAttributes: domain.LinksSettingsAttributes{
+				Links: []domain.Link{
+					{
+						Type:   domain.LinkTypeTermsOfService,
+						URL:    gu.Ptr("https://host"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:   domain.LinkTypePrivacyPolicy,
+						URL:    gu.Ptr("https://host"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:   domain.LinkTypeSupport,
+						URL:    gu.Ptr("mailto:email"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:           domain.LinkTypeCustom,
+						URL:            gu.Ptr("https://host"),
+						TranslationKey: gu.Ptr("linktext"),
+						Target:         domain.LinkTargetBlank,
+					},
+				},
 			},
 		},
 		{
@@ -4411,14 +4443,30 @@ func TestGetLegalAndSupportSettings(t *testing.T) {
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr("https://host"),
-				PrivacyPolicyLink: gu.Ptr("https://host"),
-				HelpLink:          gu.Ptr("https://host"),
-				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr("https://host"),
-				CustomLink:        gu.Ptr("https://host"),
-				CustomLinkText:    gu.Ptr("linktext"),
+			LinksSettingsAttributes: domain.LinksSettingsAttributes{
+				Links: []domain.Link{
+					{
+						Type:   domain.LinkTypeTermsOfService,
+						URL:    gu.Ptr("https://host"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:   domain.LinkTypePrivacyPolicy,
+						URL:    gu.Ptr("https://host"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:   domain.LinkTypeSupport,
+						URL:    gu.Ptr("mailto:email"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:           domain.LinkTypeCustom,
+						URL:            gu.Ptr("https://host"),
+						TranslationKey: gu.Ptr("linktext"),
+						Target:         domain.LinkTargetBlank,
+					},
+				},
 			},
 		},
 		{
@@ -4426,14 +4474,30 @@ func TestGetLegalAndSupportSettings(t *testing.T) {
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr("https://host"),
-				PrivacyPolicyLink: gu.Ptr("https://host"),
-				HelpLink:          gu.Ptr("https://host"),
-				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr("https://host"),
-				CustomLink:        gu.Ptr("https://host"),
-				CustomLinkText:    gu.Ptr("linktext"),
+			LinksSettingsAttributes: domain.LinksSettingsAttributes{
+				Links: []domain.Link{
+					{
+						Type:   domain.LinkTypeTermsOfService,
+						URL:    gu.Ptr("https://host"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:   domain.LinkTypePrivacyPolicy,
+						URL:    gu.Ptr("https://host"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:   domain.LinkTypeSupport,
+						URL:    gu.Ptr("mailto:email"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:           domain.LinkTypeCustom,
+						URL:            gu.Ptr("https://host"),
+						TranslationKey: gu.Ptr("linktext"),
+						Target:         domain.LinkTargetBlank,
+					},
+				},
 			},
 		},
 	}
@@ -4446,7 +4510,7 @@ func TestGetLegalAndSupportSettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      *domain.LegalAndSupportSettings
+		want      *domain.LinksSettings
 		wantErr   error
 	}{
 		{
@@ -4484,7 +4548,7 @@ func TestGetLegalAndSupportSettings(t *testing.T) {
 	}
 }
 
-func TestListLegalAndSupportSettings(t *testing.T) {
+func TestListLinksSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
 	defer rollback()
 
@@ -4492,22 +4556,38 @@ func TestListLegalAndSupportSettings(t *testing.T) {
 	secondInstanceID := createInstance(t, tx)
 	firstOrgID := createOrganization(t, tx, firstInstanceID)
 	secondOrgID := createOrganization(t, tx, secondInstanceID)
-	repo := repository.LegalAndSupportSettingsRepository()
+	repo := repository.LinksSettingsRepository()
 
-	settings := []*domain.LegalAndSupportSettings{
+	settings := []*domain.LinksSettings{
 		{
 			Settings: domain.Settings{
 				InstanceID:     firstInstanceID,
 				OrganizationID: nil,
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr("https://host"),
-				PrivacyPolicyLink: gu.Ptr("https://host"),
-				HelpLink:          gu.Ptr("https://host"),
-				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr("https://host"),
-				CustomLink:        gu.Ptr("https://host"),
-				CustomLinkText:    gu.Ptr("linktext"),
+			LinksSettingsAttributes: domain.LinksSettingsAttributes{
+				Links: []domain.Link{
+					{
+						Type:   domain.LinkTypeTermsOfService,
+						URL:    gu.Ptr("https://host"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:   domain.LinkTypePrivacyPolicy,
+						URL:    gu.Ptr("https://host"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:   domain.LinkTypeSupport,
+						URL:    gu.Ptr("mailto:email"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:           domain.LinkTypeCustom,
+						URL:            gu.Ptr("https://host"),
+						TranslationKey: gu.Ptr("linktext"),
+						Target:         domain.LinkTargetBlank,
+					},
+				},
 			},
 		},
 		{
@@ -4515,14 +4595,30 @@ func TestListLegalAndSupportSettings(t *testing.T) {
 				InstanceID:     secondInstanceID,
 				OrganizationID: nil,
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr("https://host"),
-				PrivacyPolicyLink: gu.Ptr("https://host"),
-				HelpLink:          gu.Ptr("https://host"),
-				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr("https://host"),
-				CustomLink:        gu.Ptr("https://host"),
-				CustomLinkText:    gu.Ptr("linktext"),
+			LinksSettingsAttributes: domain.LinksSettingsAttributes{
+				Links: []domain.Link{
+					{
+						Type:   domain.LinkTypeTermsOfService,
+						URL:    gu.Ptr("https://host"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:   domain.LinkTypePrivacyPolicy,
+						URL:    gu.Ptr("https://host"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:   domain.LinkTypeSupport,
+						URL:    gu.Ptr("mailto:email"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:           domain.LinkTypeCustom,
+						URL:            gu.Ptr("https://host"),
+						TranslationKey: gu.Ptr("linktext"),
+						Target:         domain.LinkTargetBlank,
+					},
+				},
 			},
 		},
 		{
@@ -4530,14 +4626,30 @@ func TestListLegalAndSupportSettings(t *testing.T) {
 				InstanceID:     firstInstanceID,
 				OrganizationID: gu.Ptr(firstOrgID),
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr("https://host"),
-				PrivacyPolicyLink: gu.Ptr("https://host"),
-				HelpLink:          gu.Ptr("https://host"),
-				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr("https://host"),
-				CustomLink:        gu.Ptr("https://host"),
-				CustomLinkText:    gu.Ptr("linktext"),
+			LinksSettingsAttributes: domain.LinksSettingsAttributes{
+				Links: []domain.Link{
+					{
+						Type:   domain.LinkTypeTermsOfService,
+						URL:    gu.Ptr("https://host"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:   domain.LinkTypePrivacyPolicy,
+						URL:    gu.Ptr("https://host"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:   domain.LinkTypeSupport,
+						URL:    gu.Ptr("mailto:email"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:           domain.LinkTypeCustom,
+						URL:            gu.Ptr("https://host"),
+						TranslationKey: gu.Ptr("linktext"),
+						Target:         domain.LinkTargetBlank,
+					},
+				},
 			},
 		},
 		{
@@ -4545,14 +4657,30 @@ func TestListLegalAndSupportSettings(t *testing.T) {
 				InstanceID:     secondInstanceID,
 				OrganizationID: gu.Ptr(secondOrgID),
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           gu.Ptr("https://host"),
-				PrivacyPolicyLink: gu.Ptr("https://host"),
-				HelpLink:          gu.Ptr("https://host"),
-				SupportEmail:      gu.Ptr("email"),
-				DocsLink:          gu.Ptr("https://host"),
-				CustomLink:        gu.Ptr("https://host"),
-				CustomLinkText:    gu.Ptr("linktext"),
+			LinksSettingsAttributes: domain.LinksSettingsAttributes{
+				Links: []domain.Link{
+					{
+						Type:   domain.LinkTypeTermsOfService,
+						URL:    gu.Ptr("https://host"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:   domain.LinkTypePrivacyPolicy,
+						URL:    gu.Ptr("https://host"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:   domain.LinkTypeSupport,
+						URL:    gu.Ptr("mailto:email"),
+						Target: domain.LinkTargetBlank,
+					},
+					{
+						Type:           domain.LinkTypeCustom,
+						URL:            gu.Ptr("https://host"),
+						TranslationKey: gu.Ptr("linktext"),
+						Target:         domain.LinkTargetBlank,
+					},
+				},
 			},
 		},
 	}
@@ -4565,7 +4693,7 @@ func TestListLegalAndSupportSettings(t *testing.T) {
 	tests := []struct {
 		name      string
 		condition database.Condition
-		want      []*domain.LegalAndSupportSettings
+		want      []*domain.LinksSettings
 		wantErr   error
 	}{
 		{
@@ -4576,12 +4704,12 @@ func TestListLegalAndSupportSettings(t *testing.T) {
 		{
 			name:      "no results, ok",
 			condition: repo.PrimaryKeyCondition(firstInstanceID, "nix"),
-			want:      []*domain.LegalAndSupportSettings{},
+			want:      []*domain.LinksSettings{},
 		},
 		{
 			name:      "all from instance",
 			condition: repo.InstanceIDCondition(firstInstanceID),
-			want:      []*domain.LegalAndSupportSettings{settings[2], settings[0]},
+			want:      []*domain.LinksSettings{settings[2], settings[0]},
 		},
 		{
 			name: "only from instance",
@@ -4589,7 +4717,7 @@ func TestListLegalAndSupportSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(nil),
 			),
-			want: []*domain.LegalAndSupportSettings{settings[0]},
+			want: []*domain.LinksSettings{settings[0]},
 		},
 		{
 			name: "all from first org",
@@ -4597,7 +4725,7 @@ func TestListLegalAndSupportSettings(t *testing.T) {
 				repo.InstanceIDCondition(firstInstanceID),
 				repo.OrganizationIDCondition(gu.Ptr(firstOrgID)),
 			),
-			want: []*domain.LegalAndSupportSettings{settings[2]},
+			want: []*domain.LinksSettings{settings[2]},
 		},
 	}
 
@@ -4613,27 +4741,43 @@ func TestListLegalAndSupportSettings(t *testing.T) {
 	}
 }
 
-func TestSetLegalAndSupportSettings(t *testing.T) {
+func TestSetLinksSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
 	defer rollback()
 
 	instanceID := createInstance(t, tx)
 	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.LegalAndSupportSettingsRepository()
+	repo := repository.LinksSettingsRepository()
 
-	existingSettings := &domain.LegalAndSupportSettings{
+	existingSettings := &domain.LinksSettings{
 		Settings: domain.Settings{
 			InstanceID:     instanceID,
 			OrganizationID: gu.Ptr(orgID),
 		},
-		LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-			TOSLink:           gu.Ptr("https://host"),
-			PrivacyPolicyLink: gu.Ptr("https://host"),
-			HelpLink:          gu.Ptr("https://host"),
-			SupportEmail:      gu.Ptr("email"),
-			DocsLink:          gu.Ptr("https://host"),
-			CustomLink:        gu.Ptr("https://host"),
-			CustomLinkText:    gu.Ptr("linktext"),
+		LinksSettingsAttributes: domain.LinksSettingsAttributes{
+			Links: []domain.Link{
+				{
+					Type:   domain.LinkTypeTermsOfService,
+					URL:    gu.Ptr("https://host"),
+					Target: domain.LinkTargetBlank,
+				},
+				{
+					Type:   domain.LinkTypePrivacyPolicy,
+					URL:    gu.Ptr("https://host"),
+					Target: domain.LinkTargetBlank,
+				},
+				{
+					Type:   domain.LinkTypeSupport,
+					URL:    gu.Ptr("mailto:email"),
+					Target: domain.LinkTargetBlank,
+				},
+				{
+					Type:           domain.LinkTypeCustom,
+					URL:            gu.Ptr("https://host"),
+					TranslationKey: gu.Ptr("linktext"),
+					Target:         domain.LinkTargetBlank,
+				},
+			},
 		},
 	}
 
@@ -4642,79 +4786,143 @@ func TestSetLegalAndSupportSettings(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		settings *domain.LegalAndSupportSettings
+		settings *domain.LinksSettings
 		wantErr  error
 	}{
 		{
 			name: "create instance",
-			settings: &domain.LegalAndSupportSettings{
+			settings: &domain.LinksSettings{
 				Settings: domain.Settings{
 					InstanceID:     instanceID,
 					OrganizationID: nil,
 				},
-				LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-					TOSLink:           gu.Ptr("https://host"),
-					PrivacyPolicyLink: gu.Ptr("https://host"),
-					HelpLink:          gu.Ptr("https://host"),
-					SupportEmail:      gu.Ptr("email"),
-					DocsLink:          gu.Ptr("https://host"),
-					CustomLink:        gu.Ptr("https://host"),
-					CustomLinkText:    gu.Ptr("linktext"),
+				LinksSettingsAttributes: domain.LinksSettingsAttributes{
+					Links: []domain.Link{
+						{
+							Type:   domain.LinkTypeTermsOfService,
+							URL:    gu.Ptr("https://host"),
+							Target: domain.LinkTargetBlank,
+						},
+						{
+							Type:   domain.LinkTypePrivacyPolicy,
+							URL:    gu.Ptr("https://host"),
+							Target: domain.LinkTargetBlank,
+						},
+						{
+							Type:   domain.LinkTypeSupport,
+							URL:    gu.Ptr("mailto:email"),
+							Target: domain.LinkTargetBlank,
+						},
+						{
+							Type:           domain.LinkTypeCustom,
+							URL:            gu.Ptr("https://host"),
+							TranslationKey: gu.Ptr("linktext"),
+							Target:         domain.LinkTargetBlank,
+						},
+					},
 				},
 			},
 		},
 		{
 			name: "update organization",
-			settings: &domain.LegalAndSupportSettings{
+			settings: &domain.LinksSettings{
 				Settings: domain.Settings{
 					InstanceID:     instanceID,
 					OrganizationID: gu.Ptr(orgID),
 				},
-				LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-					TOSLink:           gu.Ptr("https://host"),
-					PrivacyPolicyLink: gu.Ptr("https://host"),
-					HelpLink:          gu.Ptr("https://host"),
-					SupportEmail:      gu.Ptr("email"),
-					DocsLink:          gu.Ptr("https://host"),
-					CustomLink:        gu.Ptr("https://host"),
-					CustomLinkText:    gu.Ptr("linktext"),
+				LinksSettingsAttributes: domain.LinksSettingsAttributes{
+					Links: []domain.Link{
+						{
+							Type:   domain.LinkTypeTermsOfService,
+							URL:    gu.Ptr("https://host"),
+							Target: domain.LinkTargetBlank,
+						},
+						{
+							Type:   domain.LinkTypePrivacyPolicy,
+							URL:    gu.Ptr("https://host"),
+							Target: domain.LinkTargetBlank,
+						},
+						{
+							Type:   domain.LinkTypeSupport,
+							URL:    gu.Ptr("mailto:email"),
+							Target: domain.LinkTargetBlank,
+						},
+						{
+							Type:           domain.LinkTypeCustom,
+							URL:            gu.Ptr("https://host"),
+							TranslationKey: gu.Ptr("linktext"),
+							Target:         domain.LinkTargetBlank,
+						},
+					},
 				},
 			},
 		},
 		{
 			name: "non-existing instance",
-			settings: &domain.LegalAndSupportSettings{
+			settings: &domain.LinksSettings{
 				Settings: domain.Settings{
 					InstanceID:     "foo",
 					OrganizationID: nil,
 				},
-				LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-					TOSLink:           gu.Ptr("https://host"),
-					PrivacyPolicyLink: gu.Ptr("https://host"),
-					HelpLink:          gu.Ptr("https://host"),
-					SupportEmail:      gu.Ptr("email"),
-					DocsLink:          gu.Ptr("https://host"),
-					CustomLink:        gu.Ptr("https://host"),
-					CustomLinkText:    gu.Ptr("linktext"),
+				LinksSettingsAttributes: domain.LinksSettingsAttributes{
+					Links: []domain.Link{
+						{
+							Type:   domain.LinkTypeTermsOfService,
+							URL:    gu.Ptr("https://host"),
+							Target: domain.LinkTargetBlank,
+						},
+						{
+							Type:   domain.LinkTypePrivacyPolicy,
+							URL:    gu.Ptr("https://host"),
+							Target: domain.LinkTargetBlank,
+						},
+						{
+							Type:   domain.LinkTypeSupport,
+							URL:    gu.Ptr("mailto:email"),
+							Target: domain.LinkTargetBlank,
+						},
+						{
+							Type:           domain.LinkTypeCustom,
+							URL:            gu.Ptr("https://host"),
+							TranslationKey: gu.Ptr("linktext"),
+							Target:         domain.LinkTargetBlank,
+						},
+					},
 				},
 			},
 			wantErr: new(database.ForeignKeyError),
 		},
 		{
 			name: "non-existing org",
-			settings: &domain.LegalAndSupportSettings{
+			settings: &domain.LinksSettings{
 				Settings: domain.Settings{
 					InstanceID:     instanceID,
 					OrganizationID: gu.Ptr("foo"),
 				},
-				LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-					TOSLink:           gu.Ptr("https://host"),
-					PrivacyPolicyLink: gu.Ptr("https://host"),
-					HelpLink:          gu.Ptr("https://host"),
-					SupportEmail:      gu.Ptr("email"),
-					DocsLink:          gu.Ptr("https://host"),
-					CustomLink:        gu.Ptr("https://host"),
-					CustomLinkText:    gu.Ptr("linktext"),
+				LinksSettingsAttributes: domain.LinksSettingsAttributes{
+					Links: []domain.Link{
+						{
+							Type:   domain.LinkTypeTermsOfService,
+							URL:    gu.Ptr("https://host"),
+							Target: domain.LinkTargetBlank,
+						},
+						{
+							Type:   domain.LinkTypePrivacyPolicy,
+							URL:    gu.Ptr("https://host"),
+							Target: domain.LinkTargetBlank,
+						},
+						{
+							Type:   domain.LinkTypeSupport,
+							URL:    gu.Ptr("mailto:email"),
+							Target: domain.LinkTargetBlank,
+						},
+						{
+							Type:           domain.LinkTypeCustom,
+							URL:            gu.Ptr("https://host"),
+							TranslationKey: gu.Ptr("linktext"),
+							Target:         domain.LinkTargetBlank,
+						},
+					},
 				},
 			},
 			wantErr: new(database.ForeignKeyError),
@@ -4735,45 +4943,77 @@ func TestSetLegalAndSupportSettings(t *testing.T) {
 	}
 }
 
-func TestDeleteLegalAndSupportSettings(t *testing.T) {
+func TestDeleteLinksSettings(t *testing.T) {
 	tx, rollback := transactionForRollback(t)
 	defer rollback()
 
 	instanceID := createInstance(t, tx)
 	orgID := createOrganization(t, tx, instanceID)
-	repo := repository.LegalAndSupportSettingsRepository()
+	repo := repository.LinksSettingsRepository()
 
-	existingInstanceSettings := &domain.LegalAndSupportSettings{
+	existingInstanceSettings := &domain.LinksSettings{
 		Settings: domain.Settings{
 			InstanceID:     instanceID,
 			OrganizationID: nil,
 		},
-		LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-			TOSLink:           gu.Ptr("https://host"),
-			PrivacyPolicyLink: gu.Ptr("https://host"),
-			HelpLink:          gu.Ptr("https://host"),
-			SupportEmail:      gu.Ptr("email"),
-			DocsLink:          gu.Ptr("https://host"),
-			CustomLink:        gu.Ptr("https://host"),
-			CustomLinkText:    gu.Ptr("linktext"),
+		LinksSettingsAttributes: domain.LinksSettingsAttributes{
+			Links: []domain.Link{
+				{
+					Type:   domain.LinkTypeTermsOfService,
+					URL:    gu.Ptr("https://host"),
+					Target: domain.LinkTargetBlank,
+				},
+				{
+					Type:   domain.LinkTypePrivacyPolicy,
+					URL:    gu.Ptr("https://host"),
+					Target: domain.LinkTargetBlank,
+				},
+				{
+					Type:   domain.LinkTypeSupport,
+					URL:    gu.Ptr("mailto:email"),
+					Target: domain.LinkTargetBlank,
+				},
+				{
+					Type:           domain.LinkTypeCustom,
+					URL:            gu.Ptr("https://host"),
+					TranslationKey: gu.Ptr("linktext"),
+					Target:         domain.LinkTargetBlank,
+				},
+			},
 		},
 	}
 	err := repo.Set(t.Context(), tx, existingInstanceSettings)
 	require.NoError(t, err)
 
-	existingOrganizationSettings := &domain.LegalAndSupportSettings{
+	existingOrganizationSettings := &domain.LinksSettings{
 		Settings: domain.Settings{
 			InstanceID:     instanceID,
 			OrganizationID: gu.Ptr(orgID),
 		},
-		LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-			TOSLink:           gu.Ptr("https://host"),
-			PrivacyPolicyLink: gu.Ptr("https://host"),
-			HelpLink:          gu.Ptr("https://host"),
-			SupportEmail:      gu.Ptr("email"),
-			DocsLink:          gu.Ptr("https://host"),
-			CustomLink:        gu.Ptr("https://host"),
-			CustomLinkText:    gu.Ptr("linktext"),
+		LinksSettingsAttributes: domain.LinksSettingsAttributes{
+			Links: []domain.Link{
+				{
+					Type:   domain.LinkTypeTermsOfService,
+					URL:    gu.Ptr("https://host"),
+					Target: domain.LinkTargetBlank,
+				},
+				{
+					Type:   domain.LinkTypePrivacyPolicy,
+					URL:    gu.Ptr("https://host"),
+					Target: domain.LinkTargetBlank,
+				},
+				{
+					Type:   domain.LinkTypeSupport,
+					URL:    gu.Ptr("mailto:email"),
+					Target: domain.LinkTargetBlank,
+				},
+				{
+					Type:           domain.LinkTypeCustom,
+					URL:            gu.Ptr("https://host"),
+					TranslationKey: gu.Ptr("linktext"),
+					Target:         domain.LinkTargetBlank,
+				},
+			},
 		},
 	}
 	err = repo.Set(t.Context(), tx, existingOrganizationSettings)
@@ -4793,27 +5033,27 @@ func TestDeleteLegalAndSupportSettings(t *testing.T) {
 		},
 		{
 			name:             "not found",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, gu.Ptr("foo"), domain.SettingTypeLinks, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete instance",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeLinks, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete instance twice",
-			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+			condition:        repo.UniqueCondition(existingInstanceSettings.InstanceID, existingInstanceSettings.OrganizationID, domain.SettingTypeLinks, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 		{
 			name:             "delete organization",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeLinks, domain.SettingStateActive),
 			wantRowsAffected: 1,
 		},
 		{
 			name:             "delete organization twice",
-			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+			condition:        repo.UniqueCondition(existingOrganizationSettings.InstanceID, existingOrganizationSettings.OrganizationID, domain.SettingTypeLinks, domain.SettingStateActive),
 			wantRowsAffected: 0,
 		},
 	}

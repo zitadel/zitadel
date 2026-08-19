@@ -3,12 +3,15 @@ package projection
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/muhlemmer/gu"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	legacy_domain "github.com/zitadel/zitadel/internal/domain"
@@ -1270,23 +1273,42 @@ func (p *relationalTablesProjection) reducePrivacyPolicyAdded(event eventstore.E
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-chduE", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.LegalAndSupportSettingsRepository()
-		email := string(policyEvent.SupportEmail)
-		settings := domain.LegalAndSupportSettings{
+		settingsRepo := repository.LinksSettingsRepository()
+
+		links := []domain.Link{}
+
+		if policyEvent.TOSLink != "" {
+			links = append(links, domain.Link{Type: domain.LinkTypeTermsOfService, URL: gu.Ptr(policyEvent.TOSLink), Target: domain.LinkTargetBlank})
+		}
+		if policyEvent.PrivacyLink != "" {
+			links = append(links, domain.Link{Type: domain.LinkTypePrivacyPolicy, URL: gu.Ptr(policyEvent.PrivacyLink), Target: domain.LinkTargetBlank})
+		}
+		if policyEvent.HelpLink != "" {
+			links = append(links, domain.Link{Type: domain.LinkTypeHelp, URL: gu.Ptr(policyEvent.HelpLink), Target: domain.LinkTargetBlank})
+		}
+		if policyEvent.SupportEmail != "" {
+			supportURL := string(policyEvent.SupportEmail)
+			if !strings.HasPrefix(supportURL, "mailto:") {
+				supportURL = "mailto:" + supportURL
+			}
+			links = append(links, domain.Link{Type: domain.LinkTypeSupport, URL: gu.Ptr(supportURL), Target: domain.LinkTargetBlank})
+		}
+		if policyEvent.DocsLink != "" {
+			links = append(links, domain.Link{Type: domain.LinkTypeDocs, URL: gu.Ptr(policyEvent.DocsLink), Target: domain.LinkTargetBlank})
+		}
+		if policyEvent.CustomLink != "" {
+			links = append(links, domain.Link{Type: domain.LinkTypeCustom, URL: gu.Ptr(policyEvent.CustomLink), TranslationKey: &policyEvent.CustomLinkText, Target: domain.LinkTargetBlank})
+		}
+
+		settings := domain.LinksSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
 				CreatedAt:      policyEvent.Creation,
 				UpdatedAt:      policyEvent.Creation,
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           &policyEvent.TOSLink,
-				PrivacyPolicyLink: &policyEvent.PrivacyLink,
-				HelpLink:          &policyEvent.HelpLink,
-				SupportEmail:      &email,
-				DocsLink:          &policyEvent.DocsLink,
-				CustomLink:        &policyEvent.CustomLink,
-				CustomLinkText:    &policyEvent.CustomLinkText,
+			LinksSettingsAttributes: domain.LinksSettingsAttributes{
+				Links: links,
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
@@ -1312,29 +1334,128 @@ func (p *relationalTablesProjection) reducePrivacyPolicyChanged(event eventstore
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rbsxy", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.LegalAndSupportSettingsRepository()
-		var email string
-		if policyEvent.SupportEmail != nil {
-			email = string(*policyEvent.SupportEmail)
+		settingsRepo := repository.LinksSettingsRepository()
+
+		// Retrieve the current list of links
+		linksSettings, err := settingsRepo.Get(ctx, v3_sql.SQLTx(tx), database.WithCondition(
+			settingsRepo.UniqueCondition(event.Aggregate().InstanceID, orgId, domain.SettingTypeLinks, domain.SettingStateActive),
+		))
+		if err != nil && !errors.Is(err, &database.NoRowFoundError{}) {
+			return zerrors.ThrowInternalf(err, "HANDL-TxiHwy", "failed to get current links settings")
 		}
-		settings := domain.LegalAndSupportSettings{
+
+		var existingLinks []domain.Link
+		if linksSettings != nil {
+			existingLinks = linksSettings.Links
+		}
+		links := mergePrivacyPolicyChangedIntoLinks(policyEvent, existingLinks)
+
+		settings := domain.LinksSettings{
 			Settings: domain.Settings{
 				InstanceID:     event.Aggregate().InstanceID,
 				OrganizationID: orgId,
 				UpdatedAt:      policyEvent.Creation,
 			},
-			LegalAndSupportSettingsAttributes: domain.LegalAndSupportSettingsAttributes{
-				TOSLink:           policyEvent.TOSLink,
-				PrivacyPolicyLink: policyEvent.PrivacyLink,
-				HelpLink:          policyEvent.HelpLink,
-				SupportEmail:      &email,
-				DocsLink:          policyEvent.DocsLink,
-				CustomLink:        policyEvent.CustomLink,
-				CustomLinkText:    policyEvent.CustomLinkText,
+			LinksSettingsAttributes: domain.LinksSettingsAttributes{
+				Links: links,
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
 	}), nil
+}
+
+// mergePrivacyPolicyChangedIntoLinks merges a partial update event into the existing ordered list of links.
+func mergePrivacyPolicyChangedIntoLinks(policyEvent policy.PrivacyPolicyChangedEvent, existingLinks []domain.Link) []domain.Link {
+	result := []domain.Link{}
+	processed := make(map[domain.LinkType]bool)
+
+	// 1 - Convert PrivacyPolicyChangedEvent to a map
+	updateMap := make(map[domain.LinkType]domain.Link)
+	if policyEvent.TOSLink != nil {
+		updateMap[domain.LinkTypeTermsOfService] = domain.Link{Type: domain.LinkTypeTermsOfService, URL: policyEvent.TOSLink, Target: domain.LinkTargetBlank}
+	}
+	if policyEvent.PrivacyLink != nil {
+		updateMap[domain.LinkTypePrivacyPolicy] = domain.Link{Type: domain.LinkTypePrivacyPolicy, URL: policyEvent.PrivacyLink, Target: domain.LinkTargetBlank}
+	}
+	if policyEvent.HelpLink != nil {
+		updateMap[domain.LinkTypeHelp] = domain.Link{Type: domain.LinkTypeHelp, URL: policyEvent.HelpLink, Target: domain.LinkTargetBlank}
+	}
+	if policyEvent.SupportEmail != nil {
+		supportURL := string(*policyEvent.SupportEmail)
+		if supportURL != "" && !strings.HasPrefix(supportURL, "mailto:") {
+			supportURL = "mailto:" + supportURL
+		}
+		updateMap[domain.LinkTypeSupport] = domain.Link{Type: domain.LinkTypeSupport, URL: &supportURL, Target: domain.LinkTargetBlank}
+	}
+	if policyEvent.DocsLink != nil {
+		updateMap[domain.LinkTypeDocs] = domain.Link{Type: domain.LinkTypeDocs, URL: policyEvent.DocsLink, Target: domain.LinkTargetBlank}
+	}
+	if policyEvent.CustomLink != nil || policyEvent.CustomLinkText != nil {
+		link := domain.Link{Type: domain.LinkTypeCustom, Target: domain.LinkTargetBlank}
+		if policyEvent.CustomLink != nil {
+			link.URL = policyEvent.CustomLink
+		}
+		link.TranslationKey = policyEvent.CustomLinkText
+		updateMap[domain.LinkTypeCustom] = link
+	}
+
+	// 2 - Update/remove links
+	for _, link := range existingLinks {
+		upd, ok := updateMap[link.Type]
+		if !ok {
+			result = append(result, link)
+			continue
+		}
+
+		processed[link.Type] = true
+
+		// Remove if URL is explicitly set to empty string
+		if upd.URL != nil && *upd.URL == "" {
+			continue
+		}
+
+		// Update URL if provided
+		if upd.URL != nil {
+			link.URL = upd.URL
+		}
+
+		// Update translation key if provided
+		if upd.TranslationKey != nil {
+			link.TranslationKey = upd.TranslationKey
+		}
+
+		result = append(result, link)
+	}
+
+	// 3 - append new links in deterministic order
+	linkTypes := []domain.LinkType{
+		domain.LinkTypeTermsOfService,
+		domain.LinkTypePrivacyPolicy,
+		domain.LinkTypeHelp,
+		domain.LinkTypeSupport,
+		domain.LinkTypeDocs,
+		domain.LinkTypeCustom,
+	}
+	for _, linkType := range linkTypes {
+		upd, ok := updateMap[linkType]
+		if !ok || processed[linkType] {
+			continue
+		}
+
+		// Skip if URL is nil or empty (can't create a link without a URL)
+		if upd.URL == nil || *upd.URL == "" {
+			continue
+		}
+
+		result = append(result, domain.Link{
+			Type:           upd.Type,
+			URL:            upd.URL,
+			Target:         domain.LinkTargetBlank,
+			TranslationKey: upd.TranslationKey,
+		})
+	}
+
+	return result
 }
 
 func (p *relationalTablesProjection) reduceOrgPrivacyPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
@@ -1348,9 +1469,9 @@ func (p *relationalTablesProjection) reduceOrgPrivacyPolicyRemoved(event eventst
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-UrdHy", "reduce.wrong.db.pool %T", ex)
 		}
 
-		settingsRepo := repository.LegalAndSupportSettingsRepository()
+		settingsRepo := repository.LinksSettingsRepository()
 		_, err := settingsRepo.Delete(ctx, v3_sql.SQLTx(tx),
-			settingsRepo.UniqueCondition(policyEvent.Aggregate().InstanceID, &policyEvent.Aggregate().ID, domain.SettingTypeLegalAndSupport, domain.SettingStateActive),
+			settingsRepo.UniqueCondition(policyEvent.Aggregate().InstanceID, &policyEvent.Aggregate().ID, domain.SettingTypeLinks, domain.SettingStateActive),
 		)
 		return err
 	}), nil

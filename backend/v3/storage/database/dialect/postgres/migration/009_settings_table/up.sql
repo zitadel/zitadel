@@ -8,7 +8,7 @@ CREATE TYPE zitadel.settings_type AS ENUM (
     'security',
     'organization',
     'notification',
-    'legal_and_support',
+    'links',
     'secret_generator'
 );
 
