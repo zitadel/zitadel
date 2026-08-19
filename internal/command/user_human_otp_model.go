@@ -415,6 +415,7 @@ func (wm *HumanOTPEmailCodeWriteModel) Reduce() error {
 				Code:         e.Code,
 				CreationDate: e.CreationDate(),
 				Expiry:       e.Expiry,
+				GeneratorID:  e.GeneratorID,
 			}
 		case *user.HumanOTPEmailCheckSucceededEvent:
 			wm.checkFailedCount = 0
