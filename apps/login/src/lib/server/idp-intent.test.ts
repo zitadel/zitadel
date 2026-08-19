@@ -496,6 +496,17 @@ describe("processIDPCallback", () => {
 
       expect(result.error).toBe("errors.sessionCreationFailed");
     });
+
+    test("should return samlData when session returns SAML response", async () => {
+      const samlData = { url: "https://saml.example.com/acs", fields: { SAMLResponse: "abc123" } };
+      mockCreateNewSessionFromIdpIntent.mockResolvedValue({ samlData });
+
+      const result = await processIDPCallback(defaultParams);
+
+      expect(result.samlData).toEqual(samlData);
+      expect(result.redirect).toBeUndefined();
+      expect(result.error).toBeUndefined();
+    });
   });
 
   describe("CASE 2: Link IDP to existing user", () => {
@@ -601,6 +612,27 @@ describe("processIDPCallback", () => {
 
       expect(result.error).toBe("Session error");
     });
+
+    test("should return samlData when session returns SAML response after linking", async () => {
+      mockGetIDPByID.mockResolvedValue({
+        ...defaultIdp,
+        config: {
+          options: {
+            ...defaultIdp.config.options,
+            isLinkingAllowed: true,
+          },
+        },
+      });
+      const samlData = { url: "https://saml.example.com/acs", fields: { SAMLResponse: "abc123" } };
+      mockCreateNewSessionFromIdpIntent.mockResolvedValue({ samlData });
+
+      const result = await processIDPCallback(linkParams);
+
+      expect(mockAddIDPLink).toHaveBeenCalled();
+      expect(result.samlData).toEqual(samlData);
+      expect(result.redirect).toBeUndefined();
+      expect(result.error).toBeUndefined();
+    });
   });
 
   describe("CASE 3: Auto-linking by email", () => {
@@ -680,6 +712,23 @@ describe("processIDPCallback", () => {
       const result = await processIDPCallback(defaultParams);
 
       expect(result.redirect).toContain("/idp/google/linking-failed");
+    });
+
+    test("should return samlData when session returns SAML response after auto-linking", async () => {
+      const foundUser = {
+        userId: "found123",
+        details: { resourceOwner: "org123" },
+      };
+      mockListUsers.mockResolvedValue({ result: [foundUser] });
+      const samlData = { url: "https://saml.example.com/acs", fields: { SAMLResponse: "abc123" } };
+      mockCreateNewSessionFromIdpIntent.mockResolvedValue({ samlData });
+
+      const result = await processIDPCallback(defaultParams);
+
+      expect(mockAddIDPLink).toHaveBeenCalled();
+      expect(result.samlData).toEqual(samlData);
+      expect(result.redirect).toBeUndefined();
+      expect(result.error).toBeUndefined();
     });
   });
 
@@ -1024,6 +1073,19 @@ describe("processIDPCallback", () => {
       expect(mockCreateUser).not.toHaveBeenCalled();
       expect(result.redirect).toContain("/idp/google/complete-registration");
       expect(result.redirect).toContain("organization=default-org");
+    });
+
+    test("should return samlData when session returns SAML response after auto-creation", async () => {
+      mockCreateUser.mockResolvedValue({ id: "newuser123" });
+      const samlData = { url: "https://saml.example.com/acs", fields: { SAMLResponse: "abc123" } };
+      mockCreateNewSessionFromIdpIntent.mockResolvedValue({ samlData });
+
+      const result = await processIDPCallback(defaultParams);
+
+      expect(mockCreateUser).toHaveBeenCalled();
+      expect(result.samlData).toEqual(samlData);
+      expect(result.redirect).toBeUndefined();
+      expect(result.error).toBeUndefined();
     });
   });
 

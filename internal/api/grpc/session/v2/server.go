@@ -1,6 +1,8 @@
 package session
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 
 	"connectrpc.com/connect"
@@ -60,4 +62,43 @@ func (s *Server) AuthMethods() authz.MethodMapping {
 
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
 	return session.RegisterSessionServiceHandler
+}
+
+func (s *Server) GetFederatedLogoutRequest(ctx context.Context, req *connect.Request[session.GetFederatedLogoutRequestRequest]) (*connect.Response[session.GetFederatedLogoutRequestResponse], error) {
+	logoutRequest, err := s.command.GetFederatedLogoutRequest(ctx, req.Msg.GetLogoutId())
+	if err != nil {
+		return nil, err
+	}
+
+	response := &session.GetFederatedLogoutRequestResponse{
+		PostLogoutRedirectUri: logoutRequest.PostLogoutRedirectURI,
+	}
+
+	// Set the appropriate logout method based on binding type
+	if logoutRequest.SAMLBindingType == "redirect" {
+		response.LogoutMethod = &session.GetFederatedLogoutRequestResponse_Redirect{
+			Redirect: &session.RedirectLogout{
+				RedirectUri: logoutRequest.SAMLRedirectURL,
+			},
+		}
+	} else if logoutRequest.SAMLBindingType == "post" {
+		formData := map[string]string{
+			"SAMLRequest": logoutRequest.SAMLRequest,
+			"RelayState":  logoutRequest.SAMLRelayState,
+		}
+		response.LogoutMethod = &session.GetFederatedLogoutRequestResponse_Post{
+			Post: &session.PostLogout{
+				Url:      logoutRequest.SAMLPostURL,
+				FormData: formData,
+			},
+		}
+	} else {
+		// An unrecognised binding type means we cannot give the client actionable
+		// directions. Return an explicit error rather than a response with a nil
+		// LogoutMethod that the client cannot act on.
+		return nil, connect.NewError(connect.CodeInternal,
+			fmt.Errorf("unsupported SAML binding type %q for logout request %s", logoutRequest.SAMLBindingType, req.Msg.GetLogoutId()))
+	}
+
+	return connect.NewResponse(response), nil
 }
