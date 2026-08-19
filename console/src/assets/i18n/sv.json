@@ -2205,6 +2205,10 @@
       "TITLE": "Lägg till leverantör",
       "DESCRIPTION": "Välj en eller flera av följande leverantörer.",
       "STEPPERTITLE": "Skapa leverantör",
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "Ange de uppgifter som krävs för att användare från en annan ZITADEL-instans ska kunna autentisera sig."
+      },
       "OIDC": {
         "TITLE": "OIDC-leverantör",
         "DESCRIPTION": "Ange de nödvändiga uppgifterna för din OIDC-leverantör."
@@ -2317,6 +2321,10 @@
     "STATE": "Status",
     "ISSUER": "Utfärdare",
     "SCOPESLIST": "Scopes-lista",
+    "INSTANCEROLESINFO": "Mappning av instansroller",
+    "INSTANCEROLESINFO_DESC": "Användare som autentiserar sig med den här leverantören tilldelas de instansmedlemsroller (IAM_-prefix) som de har i de angivna organisationerna i den externa ZITADEL-instansen. Både organisations-ID och primär domän måste stämma.",
+    "ORGANIZATIONID": "Organisations-ID",
+    "ORGANIZATIONDOMAIN": "Organisationsdomän",
     "CLIENTID": "Klient-ID",
     "CLIENTSECRET": "Klienthemlighet",
     "LDAPCONNECTION": "Anslutning",
