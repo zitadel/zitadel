@@ -164,6 +164,19 @@ func Test_redisCache_set(t *testing.T) {
 			t.Log(rc.connector.HGetAll(context.Background(), objectID))
 			tt.assertions(t, server, objectID)
 		})
+
+		// Run the same test with the production circuit breaker config.
+		// This reproduces the bug where CLIENT MAINT_NOTIFICATIONS during
+		// the RESP3 handshake leaks through the shared Limiter and trips
+		// the circuit breaker, causing all cache operations to fail.
+		t.Run(tt.name+" with circuit breaker", func(t *testing.T) {
+			c, server := prepareCache(t, tt.config, withProductionCircuitBreaker())
+			rc := c.(*redisCache[testIndex, string, *testObject])
+			objectID, err := rc.set(tt.args.ctx, tt.args.value)
+			require.ErrorIs(t, err, tt.wantErr)
+			t.Log(rc.connector.HGetAll(context.Background(), objectID))
+			tt.assertions(t, server, objectID)
+		})
 	}
 }
 
@@ -317,6 +330,16 @@ func Test_redisCache_Get(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c, server := prepareCache(t, tt.config)
+			tt.preparation(t, c, server)
+			t.Log(server.Keys())
+
+			got, ok := c.Get(tt.args.ctx, tt.args.index, tt.args.key)
+			require.Equal(t, tt.wantOK, ok)
+			assert.Equal(t, tt.want, got)
+		})
+
+		t.Run(tt.name+" with circuit breaker", func(t *testing.T) {
+			c, server := prepareCache(t, tt.config, withProductionCircuitBreaker())
 			tt.preparation(t, c, server)
 			t.Log(server.Keys())
 
@@ -485,6 +508,19 @@ func Test_redisCache_Invalidate(t *testing.T) {
 			}
 			require.NoError(t, err)
 		})
+
+		t.Run(tt.name+" with circuit breaker", func(t *testing.T) {
+			c, server := prepareCache(t, tt.config, withProductionCircuitBreaker())
+			tt.preparation(t, c, server)
+			t.Log(server.Keys())
+
+			err := c.Invalidate(tt.args.ctx, tt.args.index, tt.args.key...)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+		})
 	}
 }
 
@@ -619,6 +655,19 @@ func Test_redisCache_Delete(t *testing.T) {
 			}
 			require.NoError(t, err)
 		})
+
+		t.Run(tt.name+" with circuit breaker", func(t *testing.T) {
+			c, server := prepareCache(t, tt.config, withProductionCircuitBreaker())
+			tt.preparation(t, c, server)
+			t.Log(server.Keys())
+
+			err := c.Delete(tt.args.ctx, tt.args.index, tt.args.key...)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+		})
 	}
 }
 
@@ -685,6 +734,19 @@ func Test_redisCache_Truncate(t *testing.T) {
 			}
 			require.NoError(t, err)
 		})
+
+		t.Run(tt.name+" with circuit breaker", func(t *testing.T) {
+			c, server := prepareCache(t, tt.config, withProductionCircuitBreaker())
+			tt.preparation(t, c, server)
+			t.Log(server.Keys())
+
+			err := c.Truncate(tt.args.ctx)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+		})
 	}
 }
 
@@ -719,4 +781,13 @@ func withCircuitBreakerOption(cb *CBConfig) func(*Config) {
 	return func(c *Config) {
 		c.CircuitBreaker = cb
 	}
+}
+
+func withProductionCircuitBreaker() func(*Config) {
+	return withCircuitBreakerOption(&CBConfig{
+		MaxConsecutiveFailures: 5,
+		MaxFailureRatio:        0.1,
+		Timeout:                60 * time.Second,
+		MaxRetryRequests:       1,
+	})
 }

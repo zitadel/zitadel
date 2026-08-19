@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/alicebob/miniredis/v2"
+	"github.com/redis/go-redis/v9/maintnotifications"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -112,6 +113,14 @@ func TestOptionsFromURL(t *testing.T) {
 		assert.NotNil(t, opts.Limiter)
 	})
 
+	t.Run("disables maint notifications", func(t *testing.T) {
+		c := Config{URL: "redis://localhost:6379/0"}
+		opts, err := optionsFromURL(c)
+		require.NoError(t, err)
+		require.NotNil(t, opts.MaintNotificationsConfig)
+		assert.Equal(t, maintnotifications.ModeDisabled, opts.MaintNotificationsConfig.Mode)
+	})
+
 	t.Run("invalid URL returns error", func(t *testing.T) {
 		c := Config{URL: "garbage://???"}
 		_, err := optionsFromURL(c)
@@ -142,6 +151,13 @@ func TestOptionsFromConfig(t *testing.T) {
 		c := Config{Addr: "host:6379", EnableTLS: true}
 		opts := optionsFromConfig(c)
 		assert.NotNil(t, opts.TLSConfig)
+	})
+
+	t.Run("disables maint notifications", func(t *testing.T) {
+		c := Config{Addr: "host:6379"}
+		opts := optionsFromConfig(c)
+		require.NotNil(t, opts.MaintNotificationsConfig)
+		assert.Equal(t, maintnotifications.ModeDisabled, opts.MaintNotificationsConfig.Mode)
 	})
 }
 
