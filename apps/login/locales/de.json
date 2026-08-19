@@ -1,7 +1,9 @@
 {
   "common": {
     "back": "Zurück",
-    "title": "Anmelden mit Zitadel"
+    "title": "Anmelden mit Zitadel",
+    "showPassword": "Passwort anzeigen",
+    "hidePassword": "Passwort verbergen"
   },
   "accounts": {
     "title": "Konten",
