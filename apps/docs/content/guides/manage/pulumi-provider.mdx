@@ -1,0 +1,184 @@
+---
+title: Zitadel Pulumi Provider
+description: "Manage Zitadel instances, organizations, and resources programmatically using the Pulumi Provider in TypeScript, Python, Go, C#, or Java."
+sidebar_label: Pulumi Provider
+---
+
+The Zitadel resource provider for Pulumi lets you use Zitadel resources in your cloud programs. To use this package, please [install the Pulumi CLI first](https://www.pulumi.com/docs/install/).
+
+## Before you start
+
+- Have a running [Zitadel instance](/guides/start/quickstart)
+- Create a [service account](/guides/integrate/service-accounts/authenticate-service-accounts) with [sufficient authorization](/guides/manage/console/administrators) to manage the desired resources
+
+## Installing
+
+This package is available in many languages in the standard packaging formats.
+
+### Node.js (JavaScript/TypeScript)
+
+To use from JavaScript or TypeScript in Node.js, install using either `npm`:
+
+```bash
+npm install @pulumiverse/zitadel
+```
+
+or `yarn`:
+
+```bash
+yarn add @pulumiverse/zitadel
+```
+
+### Python
+
+To use from Python, install using `pip`:
+
+```bash
+pip install pulumiverse_zitadel
+```
+
+### Go
+
+To use from Go, use `go get` to grab the latest version of the library:
+
+```bash
+go get github.com/pulumiverse/pulumi-zitadel/sdk/go/zitadel
+```
+
+### .NET
+
+To use from .NET, install using `dotnet add package`:
+
+```bash
+dotnet add package Pulumiverse.Zitadel
+```
+
+### Java
+
+To use from Java, add the dependency to your `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>com.pulumi</groupId>
+    <artifactId>zitadel</artifactId>
+    <version>x.y.z</version>
+</dependency>
+```
+
+## Configuration
+
+The following configuration points are available:
+
+- `domain` (Required) - Domain used to connect to the Zitadel instance (e.g. `my-instance.zitadel.cloud`).
+
+- `port` (Optional) - Used port if not the default ports 80 or 443 are configured.
+
+- `insecure` (Optional) - When set to `true` this uses an insecure (HTTP) connection to the Zitadel instance. Defaults to `false`.
+
+- `insecureSkipVerifyTls` (Optional) - When set to `true` this disables TLS certificate verification. Only use in development or testing environments with self-signed certificates.
+
+- `jwtProfileFile` (Optional) - Path to the file containing credentials to connect to Zitadel. This is the recommended authentication method for production use.
+
+- `jwtProfileJson` (Optional) - JSON value of credentials to connect to Zitadel. Useful when injecting credentials via CI/CD secrets.
+
+- `jwtFile` (Optional) - Path to the file containing a presigned JWT to connect to Zitadel.
+
+- `accessToken` (Optional) - Personal Access Token to connect to Zitadel. Suitable for development and testing.
+
+- `token` (Optional, Deprecated) - Path to the file containing credentials to connect to Zitadel. Use `jwtProfileFile` instead.
+
+- `transportHeaders` (Optional) - Custom headers to add to both HTTP (authentication) and gRPC (API) requests. Useful for proxy authentication.
+
+You can set configuration values using `pulumi config`:
+
+```bash
+pulumi config set zitadel:domain my-instance.zitadel.cloud
+pulumi config set zitadel:jwtProfileFile service-user.json
+```
+
+## Example usage
+
+The `@pulumiverse/zitadel` package provides a strongly-typed means to create cloud applications that create and interact closely with Zitadel resources.
+
+### TypeScript
+
+```typescript
+import * as zitadel from "@pulumiverse/zitadel";
+
+const org = new zitadel.Org("demo", {
+  name: "Demo Organization",
+});
+
+const user = new zitadel.HumanUser("alice", {
+  orgId: org.id,
+  userName: "alice@example.com",
+  firstName: "Alice",
+  lastName: "Example",
+  displayName: "Alice Example",
+  preferredLanguage: "en",
+  email: "alice@example.com",
+  isEmailVerified: true,
+});
+```
+
+### Python
+
+```python
+import pulumiverse_zitadel as zitadel
+
+org = zitadel.Org("demo", name="Demo Organization")
+
+user = zitadel.HumanUser("alice",
+    org_id=org.id,
+    user_name="alice@example.com",
+    first_name="Alice",
+    last_name="Example",
+    display_name="Alice Example",
+    preferred_language="en",
+    email="alice@example.com",
+    is_email_verified=True,
+)
+```
+
+### Go
+
+```go
+package main
+
+import (
+	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+	"github.com/pulumiverse/pulumi-zitadel/sdk/go/zitadel"
+)
+
+func main() {
+	pulumi.Run(func(ctx *pulumi.Context) error {
+		org, err := zitadel.NewOrg(ctx, "demo", &zitadel.OrgArgs{
+			Name: pulumi.String("Demo Organization"),
+		})
+		if err != nil {
+			return err
+		}
+
+		_, err = zitadel.NewHumanUser(ctx, "alice", &zitadel.HumanUserArgs{
+			OrgId:             org.ID(),
+			UserName:          pulumi.String("alice@example.com"),
+			FirstName:         pulumi.String("Alice"),
+			LastName:          pulumi.String("Example"),
+			DisplayName:       pulumi.String("Alice Example"),
+			PreferredLanguage: pulumi.String("en"),
+			Email:             pulumi.String("alice@example.com"),
+			IsEmailVerified:   pulumi.Bool(true),
+		})
+		return err
+	})
+}
+```
+
+## Reference
+
+For further information, please visit [the Zitadel provider docs](https://www.pulumi.com/registry/packages/zitadel/) or for detailed reference documentation, please visit [the API docs](https://www.pulumi.com/registry/packages/zitadel/api-docs/).
+
+- [GitHub — pulumiverse/pulumi-zitadel](https://github.com/pulumiverse/pulumi-zitadel)
+- [Deploy Zitadel in your infrastructure](/self-hosting/deploy/overview)
+- [Zitadel CLI](/self-hosting/manage/cli/overview)
+- [Configuration Options in Zitadel](/self-hosting/manage/configure)
