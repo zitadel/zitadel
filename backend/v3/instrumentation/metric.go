@@ -10,6 +10,7 @@ import (
 	google_metric "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/exporters/autoexport"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
@@ -22,6 +23,13 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 
 	"github.com/zitadel/zitadel/internal/zerrors"
+)
+
+var (
+	rpcDurationSecondsBuckets = []float64{0.005, 0.025, 0.1, 0.5, 2.5, 10}
+	rpcDurationMillisBuckets  = []float64{5, 25, 100, 500, 2500, 10000}
+	rpcSizeBytesBuckets       = []float64{256, 1024, 4096, 65536, 1048576}
+	rpcMessagesPerRPCBuckets  = []float64{1, 2, 5, 10}
 )
 
 type MetricConfig struct {
@@ -205,25 +213,83 @@ func newMeterProvider(ctx context.Context, cfg MetricConfig, resource *resource.
 		return nil, fmt.Errorf("meter reader: %w", err)
 	}
 
-	// create a view to filter out unwanted attributes
-	view := sdk_metric.NewView(
-		sdk_metric.Instrument{
-			Scope: instrumentation.Scope{Name: otelhttp.ScopeName},
-		},
-		sdk_metric.Stream{
-			AttributeFilter: attribute.NewAllowKeysFilter("http.method", "http.status_code", "http.target"),
-		},
-	)
-
 	opts := []sdk_metric.Option{
 		sdk_metric.WithResource(resource),
-		sdk_metric.WithView(view),
+	}
+	for _, view := range metricViews() {
+		opts = append(opts, sdk_metric.WithView(view))
 	}
 	if readerOption != nil {
 		opts = append(opts, readerOption)
 	}
 	meterProvider := sdk_metric.NewMeterProvider(opts...)
 	return meterProvider, nil
+}
+
+func metricViews() []sdk_metric.View {
+	otelgrpcScope := instrumentation.Scope{Name: otelgrpc.ScopeName}
+	return []sdk_metric.View{
+		sdk_metric.NewView(
+			sdk_metric.Instrument{
+				Scope: instrumentation.Scope{Name: otelhttp.ScopeName},
+			},
+			sdk_metric.Stream{
+				AttributeFilter: attribute.NewAllowKeysFilter("http.method", "http.status_code", "http.target"),
+			},
+		),
+		sdk_metric.NewView(
+			sdk_metric.Instrument{
+				Scope: otelgrpcScope,
+				Kind:  sdk_metric.InstrumentKindHistogram,
+				Unit:  "s",
+			},
+			sdk_metric.Stream{
+				Aggregation: sdk_metric.AggregationExplicitBucketHistogram{
+					Boundaries: rpcDurationSecondsBuckets,
+					NoMinMax:   true,
+				},
+			},
+		),
+		sdk_metric.NewView(
+			sdk_metric.Instrument{
+				Scope: otelgrpcScope,
+				Kind:  sdk_metric.InstrumentKindHistogram,
+				Unit:  "ms",
+			},
+			sdk_metric.Stream{
+				Aggregation: sdk_metric.AggregationExplicitBucketHistogram{
+					Boundaries: rpcDurationMillisBuckets,
+					NoMinMax:   true,
+				},
+			},
+		),
+		sdk_metric.NewView(
+			sdk_metric.Instrument{
+				Scope: otelgrpcScope,
+				Kind:  sdk_metric.InstrumentKindHistogram,
+				Unit:  "By",
+			},
+			sdk_metric.Stream{
+				Aggregation: sdk_metric.AggregationExplicitBucketHistogram{
+					Boundaries: rpcSizeBytesBuckets,
+					NoMinMax:   true,
+				},
+			},
+		),
+		sdk_metric.NewView(
+			sdk_metric.Instrument{
+				Scope: otelgrpcScope,
+				Kind:  sdk_metric.InstrumentKindHistogram,
+				Unit:  "{count}",
+			},
+			sdk_metric.Stream{
+				Aggregation: sdk_metric.AggregationExplicitBucketHistogram{
+					Boundaries: rpcMessagesPerRPCBuckets,
+					NoMinMax:   true,
+				},
+			},
+		),
+	}
 }
 
 func metricStdOutOption(cfg ExporterConfig) (sdk_metric.Option, error) {

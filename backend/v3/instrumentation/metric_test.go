@@ -5,6 +5,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/sdk/instrumentation"
+	sdk_metric "go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	"go.opentelemetry.io/otel/sdk/resource"
 )
 
@@ -360,4 +366,113 @@ func Test_newMeterProvider_autoexport(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Test_metricViews_reduceRPCHistogramBuckets(t *testing.T) {
+	reader := sdk_metric.NewManualReader()
+	res, err := resource.New(t.Context())
+	require.NoError(t, err)
+
+	opts := []sdk_metric.Option{
+		sdk_metric.WithResource(res),
+		sdk_metric.WithReader(reader),
+	}
+	for _, view := range metricViews() {
+		opts = append(opts, sdk_metric.WithView(view))
+	}
+	provider := sdk_metric.NewMeterProvider(opts...)
+	t.Cleanup(func() {
+		require.NoError(t, provider.Shutdown(t.Context()))
+	})
+
+	meter := provider.Meter(
+		otelgrpc.ScopeName,
+		metric.WithInstrumentationVersion("test"),
+	)
+
+	tests := []struct {
+		name       string
+		instrument string
+		unit       string
+		want       []float64
+	}{
+		{
+			name:       "duration seconds",
+			instrument: "rpc.server.call.duration",
+			unit:       "s",
+			want:       rpcDurationSecondsBuckets,
+		},
+		{
+			name:       "duration milliseconds",
+			instrument: "rpc.server.duration",
+			unit:       "ms",
+			want:       rpcDurationMillisBuckets,
+		},
+		{
+			name:       "size bytes",
+			instrument: "rpc.server.request.size",
+			unit:       "By",
+			want:       rpcSizeBytesBuckets,
+		},
+		{
+			name:       "messages per rpc",
+			instrument: "rpc.server.requests_per_rpc",
+			unit:       "{count}",
+			want:       rpcMessagesPerRPCBuckets,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			hist, err := meter.Float64Histogram(
+				tt.instrument,
+				metric.WithUnit(tt.unit),
+				metric.WithExplicitBucketBoundaries(0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000),
+			)
+			require.NoError(t, err)
+			hist.Record(t.Context(), 1, metric.WithAttributes(attribute.String("rpc.method", "Test")))
+		})
+	}
+
+	var rm metricdata.ResourceMetrics
+	require.NoError(t, reader.Collect(t.Context(), &rm))
+
+	gotBounds := map[string][]float64{}
+	for _, sm := range rm.ScopeMetrics {
+		assert.Equal(t, otelgrpc.ScopeName, sm.Scope.Name)
+		for _, m := range sm.Metrics {
+			hist, ok := m.Data.(metricdata.Histogram[float64])
+			require.True(t, ok, "expected histogram for %s", m.Name)
+			require.Len(t, hist.DataPoints, 1)
+			gotBounds[m.Name] = hist.DataPoints[0].Bounds
+		}
+	}
+
+	for _, tt := range tests {
+		assert.Equal(t, tt.want, gotBounds[tt.instrument], tt.instrument)
+	}
+}
+
+func Test_metricViews_httpAttributeFilterUnchanged(t *testing.T) {
+	views := metricViews()
+	require.NotEmpty(t, views)
+
+	httpInstrument := sdk_metric.Instrument{
+		Scope: instrumentation.Scope{Name: "go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"},
+		Name:  "http.server.request.duration",
+	}
+	var (
+		stream sdk_metric.Stream
+		match  bool
+	)
+	for _, view := range views {
+		stream, match = view(httpInstrument)
+		if match {
+			break
+		}
+	}
+	require.True(t, match, "expected an otelhttp attribute-filter view")
+	require.NotNil(t, stream.AttributeFilter)
+	assert.True(t, stream.AttributeFilter(attribute.String("http.method", "GET")))
+	assert.False(t, stream.AttributeFilter(attribute.String("http.scheme", "https")))
 }
