@@ -1074,6 +1074,23 @@ func TestCommands_updateSession(t *testing.T) {
 	}
 }
 
+// assertTOTPCodeHash asserts that every [user.HumanOTPCheckSucceededEvent] in
+// cmds carries a hash of code and clears it afterwards. The hash is salted with
+// a random value, so it cannot be compared against a precomputed expectation.
+func assertTOTPCodeHash(t *testing.T, cmds []eventstore.Command, code string) {
+	t.Helper()
+	for _, cmd := range cmds {
+		event, ok := cmd.(*user.HumanOTPCheckSucceededEvent)
+		if !ok {
+			continue
+		}
+		if assert.NotNil(t, event.CodeHash, "the OTP check succeeded event must carry a code hash") {
+			assert.True(t, event.CodeHash.Equal(code), "the code hash must match the checked code")
+		}
+		event.CodeHash = nil
+	}
+}
+
 func TestCheckTOTP(t *testing.T) {
 	ctx := authz.NewMockContext("instance1", "org1", "user1")
 
@@ -1091,7 +1108,7 @@ func TestCheckTOTP(t *testing.T) {
 	require.NoError(t, err)
 
 	// hash of a code which is guaranteed to be different from the checked code.
-	otherCodeHash := domain.HashTOTPCode("instance1", "user1", code+"0")
+	otherCodeHash := crypto.NewHMACValue(code + "0")
 
 	type fields struct {
 		sessionWriteModel *SessionWriteModel
@@ -1239,12 +1256,9 @@ func TestCheckTOTP(t *testing.T) {
 				tarpit: expectTarpit(0),
 			},
 			wantEventCommands: []eventstore.Command{
-				user.NewHumanOTPCheckSucceededEvent(
-					ctx,
-					userAgg,
-					nil,
-					domain.HashTOTPCode("instance1", "user1", code),
-				),
+				// The code hash is salted randomly and therefore not predictable.
+				// It is asserted separately by assertTOTPCodeHash.
+				user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, nil),
 				session.NewTOTPCheckedEvent(ctx, sessAgg, testNow),
 			},
 		},
@@ -1274,12 +1288,9 @@ func TestCheckTOTP(t *testing.T) {
 				tarpit: expectTarpit(0),
 			},
 			wantEventCommands: []eventstore.Command{
-				user.NewHumanOTPCheckSucceededEvent(
-					ctx,
-					userAgg,
-					nil,
-					domain.HashTOTPCode("instance1", "user1", code),
-				),
+				// The code hash is salted randomly and therefore not predictable.
+				// It is asserted separately by assertTOTPCodeHash.
+				user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, nil),
 				session.NewTOTPCheckedEvent(ctx, sessAgg, testNow),
 			},
 		},
@@ -1301,12 +1312,7 @@ func TestCheckTOTP(t *testing.T) {
 							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
 						),
 						eventFromEventPusherWithCreationDate(
-							user.NewHumanOTPCheckSucceededEvent(
-								ctx,
-								userAgg,
-								nil,
-								domain.HashTOTPCode("instance1", "user1", code),
-							),
+							user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, crypto.NewHMACValue(code)),
 							time.Now().Add(-2*time.Minute),
 						),
 					),
@@ -1315,12 +1321,9 @@ func TestCheckTOTP(t *testing.T) {
 				tarpit: expectTarpit(0),
 			},
 			wantEventCommands: []eventstore.Command{
-				user.NewHumanOTPCheckSucceededEvent(
-					ctx,
-					userAgg,
-					nil,
-					domain.HashTOTPCode("instance1", "user1", code),
-				),
+				// The code hash is salted randomly and therefore not predictable.
+				// It is asserted separately by assertTOTPCodeHash.
+				user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, nil),
 				session.NewTOTPCheckedEvent(ctx, sessAgg, testNow),
 			},
 		},
@@ -1342,12 +1345,7 @@ func TestCheckTOTP(t *testing.T) {
 							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							user.NewHumanOTPCheckSucceededEvent(
-								ctx,
-								userAgg,
-								nil,
-								domain.HashTOTPCode("instance1", "user1", code),
-							),
+							user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, crypto.NewHMACValue(code)),
 						),
 					),
 					expectFilter(), // recheck
@@ -1376,12 +1374,7 @@ func TestCheckTOTP(t *testing.T) {
 					),
 					expectFilter( // recheck
 						eventFromEventPusherWithCreationDateNow(
-							user.NewHumanOTPCheckSucceededEvent(
-								ctx,
-								userAgg,
-								nil,
-								domain.HashTOTPCode("instance1", "user1", code),
-							),
+							user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, crypto.NewHMACValue(code)),
 						),
 					),
 				),
@@ -1428,6 +1421,7 @@ func TestCheckTOTP(t *testing.T) {
 			gotCmds, err := CheckTOTP(tt.code)(ctx, cmd)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.wantErrorCommands, gotCmds)
+			assertTOTPCodeHash(t, cmd.eventCommands, tt.code)
 			assert.Equal(t, tt.wantEventCommands, cmd.eventCommands)
 			tt.fields.tarpit.metExpectedCalls(t)
 		})

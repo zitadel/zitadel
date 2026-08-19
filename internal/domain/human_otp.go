@@ -1,9 +1,6 @@
 package domain
 
 import (
-	"crypto/hmac"
-	"crypto/sha256"
-	"encoding/hex"
 	"slices"
 	"time"
 
@@ -67,40 +64,41 @@ func VerifyTOTP(code string, secret *crypto.CryptoValue, cryptoAlg crypto.Encryp
 	return nil
 }
 
-// HashTOTPCode creates a deterministic hash of the user-provided TOTP code.
-// This is mainly for compliance, so that we don't store clear text codes.
-// As codes are only 6 digits, they have a very low entropy:
-// instanceID and userID are combined as salt to counter rainbow table usage.
-func HashTOTPCode(instanceID, userID, code string) string {
-	h := hmac.New(sha256.New, []byte(instanceID+userID))
-	h.Write([]byte(code))
-	return hex.EncodeToString(h.Sum(nil))
-}
-
 const (
 	validPeriods  = 1 + 2*TOTPSkew
 	validDuration = TOTPPeriod * time.Second * validPeriods
 )
 
 type TOTPHistory struct {
-	start       time.Time
-	recentCodes []string
+	start        time.Time
+	recentValues []*crypto.HMACValue
 }
 
-// AddRecent appends a used codeHash if its timestamp is
-// within the current period window.
-func (h *TOTPHistory) AddRecent(ts time.Time, codeHash string) {
+// AddRecent appends the HMAC value of a used code if its timestamp is
+// within the current period window and value is not nil.
+// A nil value is ignored, as it originates from a legacy event
+// which did not record the used code yet.
+func (h *TOTPHistory) AddRecent(ts time.Time, value *crypto.HMACValue) {
+	if value == nil {
+		return
+	}
+
+	// If the start is zero, we assume this is the first code being added,
+	// and set the start to the beginning of the current window.
+	// This ensures that we only store codes that are within the valid window.
 	if h.start.IsZero() {
 		h.start = time.Now().Add(-validDuration)
 	}
 	if ts.After(h.start) {
-		h.recentCodes = append(h.recentCodes, codeHash)
+		h.recentValues = append(h.recentValues, value)
 	}
 }
 
-// CheckReuse returns an error if the provided codeHash was recently used.
-func (h *TOTPHistory) CheckReuse(codeHash string) error {
-	if slices.Contains(h.recentCodes, codeHash) {
+// CheckReuse returns an error if the provided code was recently used.
+func (h *TOTPHistory) CheckReuse(code string) error {
+	if slices.ContainsFunc(h.recentValues, func(v *crypto.HMACValue) bool {
+		return v.Equal(code)
+	}) {
 		return zerrors.ThrowInvalidArgument(nil, "TOTP-Auw0a", "Errors.User.MFA.OTP.Reused")
 	}
 	return nil

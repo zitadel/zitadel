@@ -7,7 +7,6 @@ import (
 	"github.com/pquerna/otp"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -212,8 +211,7 @@ func checkTOTP(
 
 	// the OTP check succeeded and the user was not locked in the meantime
 	if verifyErr == nil {
-		codeHash := domain.HashTOTPCode(authz.GetInstance(ctx).InstanceID(), userID, code)
-		if err := existingOTP.History.CheckReuse(codeHash); err != nil {
+		if err := existingOTP.History.CheckReuse(code); err != nil {
 			return nil, err
 		}
 
@@ -221,7 +219,7 @@ func checkTOTP(
 			ctx,
 			userAgg,
 			optionalAuthRequestInfo,
-			codeHash,
+			crypto.NewHMACValue(code),
 		)}, nil
 	}
 

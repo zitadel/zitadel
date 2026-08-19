@@ -1,8 +1,6 @@
 package domain
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"testing"
 	"time"
 
@@ -139,88 +137,85 @@ func TestVerifyTOTP(t *testing.T) {
 	}
 }
 
-func TestHashTOTPCode(t *testing.T) {
-	const (
-		instanceID = "instance1"
-		userID     = "user1"
-		code       = "123456"
-	)
-	got := HashTOTPCode(instanceID, userID, code)
-
-	assert.Len(t, got, hex.EncodedLen(sha256.Size))
-	assert.Equal(t, got, HashTOTPCode(instanceID, userID, code), "must be deterministic")
-	assert.NotEqual(t, got, HashTOTPCode("instance2", userID, code), "instanceID must be part of the salt")
-	assert.NotEqual(t, got, HashTOTPCode(instanceID, "user2", code), "userID must be part of the salt")
-	assert.NotEqual(t, got, HashTOTPCode(instanceID, userID, "654321"), "a different code must result in a different hash")
-}
-
 func TestTOTPHistory_AddRecent(t *testing.T) {
 	// start of a window which is still open.
 	start := time.Now().Add(-validDuration)
 
+	hash1 := crypto.NewHMACValue("123456")
+	hash2 := crypto.NewHMACValue("654321")
+
 	type args struct {
-		ts       time.Time
-		codeHash string
+		ts    time.Time
+		value *crypto.HMACValue
 	}
 	tests := []struct {
-		name      string
-		history   *TOTPHistory
-		args      args
-		wantCodes []string
+		name       string
+		history    *TOTPHistory
+		args       args
+		wantValues []*crypto.HMACValue
 	}{
 		{
 			name:    "zero start, timestamp inside the window",
 			history: new(TOTPHistory),
 			args: args{
-				ts:       time.Now(),
-				codeHash: "hash1",
+				ts:    time.Now(),
+				value: hash1,
 			},
-			wantCodes: []string{"hash1"},
+			wantValues: []*crypto.HMACValue{hash1},
 		},
 		{
 			name:    "zero start, timestamp outside the window",
 			history: new(TOTPHistory),
 			args: args{
-				ts:       time.Now().Add(-validDuration - time.Minute),
-				codeHash: "hash1",
+				ts:    time.Now().Add(-validDuration - time.Minute),
+				value: hash1,
 			},
-			wantCodes: nil,
+			wantValues: nil,
 		},
 		{
 			name:    "timestamp exactly at the start of the window",
 			history: &TOTPHistory{start: start},
 			args: args{
-				ts:       start,
-				codeHash: "hash1",
+				ts:    start,
+				value: hash1,
 			},
-			wantCodes: nil,
+			wantValues: nil,
 		},
 		{
 			name:    "appended after existing codes",
-			history: &TOTPHistory{start: start, recentCodes: []string{"hash1"}},
+			history: &TOTPHistory{start: start, recentValues: []*crypto.HMACValue{hash1}},
 			args: args{
-				ts:       time.Now(),
-				codeHash: "hash2",
+				ts:    time.Now(),
+				value: hash2,
 			},
-			wantCodes: []string{"hash1", "hash2"},
+			wantValues: []*crypto.HMACValue{hash1, hash2},
 		},
 		{
-			name:    "same hash added twice",
-			history: &TOTPHistory{start: start, recentCodes: []string{"hash1"}},
+			name:    "same value added twice",
+			history: &TOTPHistory{start: start, recentValues: []*crypto.HMACValue{hash1}},
 			args: args{
-				ts:       time.Now(),
-				codeHash: "hash1",
+				ts:    time.Now(),
+				value: hash1,
 			},
-			wantCodes: []string{"hash1", "hash1"},
+			wantValues: []*crypto.HMACValue{hash1, hash1},
 		},
 		{
-			name:    "empty hash of a legacy event",
+			name:    "nil value of a legacy event",
 			history: &TOTPHistory{start: start},
 			args: args{
-				ts:       time.Now(),
-				codeHash: "",
+				ts:    time.Now(),
+				value: nil,
 			},
-			wantCodes: []string{""},
+			wantValues: nil,
+		},
+		{
+			name:    "nil value of a legacy event, zero start",
+			history: new(TOTPHistory),
+			args: args{
+				ts:    time.Now(),
+				value: nil,
+			},
+			wantValues: nil,
 		},
 	}
 	for _, tt := range tests {
@@ -228,51 +223,59 @@ func TestTOTPHistory_AddRecent(t *testing.T) {
 			startWasZero := tt.history.start.IsZero()
 			startBefore := tt.history.start
 
-			tt.history.AddRecent(tt.args.ts, tt.args.codeHash)
+			tt.history.AddRecent(tt.args.ts, tt.args.value)
 
-			assert.Equal(t, tt.wantCodes, tt.history.recentCodes)
-			if startWasZero {
+			assert.Equal(t, tt.wantValues, tt.history.recentValues)
+			switch {
+			case tt.args.value == nil:
+				assert.Equal(t, startBefore, tt.history.start, "a nil value must not set the start")
+			case startWasZero:
 				assert.WithinDuration(t, time.Now().Add(-validDuration), tt.history.start, time.Second)
-				return
+			default:
+				assert.Equal(t, startBefore, tt.history.start, "an already set start must not be recomputed")
 			}
-			assert.Equal(t, startBefore, tt.history.start, "an already set start must not be recomputed")
 		})
 	}
 }
 
 func TestTOTPHistory_CheckReuse(t *testing.T) {
+	recentValues := []*crypto.HMACValue{
+		crypto.NewHMACValue("123456"),
+		crypto.NewHMACValue("654321"),
+	}
+
 	tests := []struct {
-		name     string
-		history  *TOTPHistory
-		codeHash string
-		wantErr  error
+		name    string
+		history *TOTPHistory
+		code    string
+		wantErr error
 	}{
 		{
-			name:     "empty history",
-			history:  new(TOTPHistory),
-			codeHash: "hash1",
+			name:    "empty history",
+			history: new(TOTPHistory),
+			code:    "123456",
 		},
 		{
-			name:     "code not used recently",
-			history:  &TOTPHistory{recentCodes: []string{"hash1", "hash2"}},
-			codeHash: "hash3",
+			name:    "code not used recently",
+			history: &TOTPHistory{recentValues: recentValues},
+			code:    "111111",
 		},
 		{
-			name:     "first code reused",
-			history:  &TOTPHistory{recentCodes: []string{"hash1", "hash2"}},
-			codeHash: "hash1",
-			wantErr:  zerrors.ThrowInvalidArgument(nil, "TOTP-Auw0a", "Errors.User.MFA.OTP.Reused"),
+			name:    "first code reused",
+			history: &TOTPHistory{recentValues: recentValues},
+			code:    "123456",
+			wantErr: zerrors.ThrowInvalidArgument(nil, "TOTP-Auw0a", "Errors.User.MFA.OTP.Reused"),
 		},
 		{
-			name:     "last code reused",
-			history:  &TOTPHistory{recentCodes: []string{"hash1", "hash2"}},
-			codeHash: "hash2",
-			wantErr:  zerrors.ThrowInvalidArgument(nil, "TOTP-Auw0a", "Errors.User.MFA.OTP.Reused"),
+			name:    "last code reused",
+			history: &TOTPHistory{recentValues: recentValues},
+			code:    "654321",
+			wantErr: zerrors.ThrowInvalidArgument(nil, "TOTP-Auw0a", "Errors.User.MFA.OTP.Reused"),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.history.CheckReuse(tt.codeHash)
+			err := tt.history.CheckReuse(tt.code)
 			require.ErrorIs(t, err, tt.wantErr)
 		})
 	}
@@ -280,10 +283,11 @@ func TestTOTPHistory_CheckReuse(t *testing.T) {
 
 func TestTOTPHistory_addAndCheck(t *testing.T) {
 	history := new(TOTPHistory)
-	history.AddRecent(time.Now(), "hash1")
-	history.AddRecent(time.Now().Add(-validDuration-time.Minute), "hash2")
+	history.AddRecent(time.Now(), crypto.NewHMACValue("123456"))
+	history.AddRecent(time.Now().Add(-validDuration-time.Minute), crypto.NewHMACValue("654321"))
+	history.AddRecent(time.Now(), nil)
 
-	require.Error(t, history.CheckReuse("hash1"), "a code used inside the window must be reported as reused")
-	require.NoError(t, history.CheckReuse("hash2"), "a code used before the window must not be reported as reused")
-	require.NoError(t, history.CheckReuse("hash3"))
+	require.Error(t, history.CheckReuse("123456"), "a code used inside the window must be reported as reused")
+	require.NoError(t, history.CheckReuse("654321"), "a code used before the window must not be reported as reused")
+	require.NoError(t, history.CheckReuse("111111"))
 }
