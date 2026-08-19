@@ -73,6 +73,22 @@ describe("Service URL utilities", () => {
       expect(() => getServiceConfig(mockHeaders)).toThrow("No host found in headers");
     });
 
+    test("should use ZITADEL_PUBLIC_URL as public host override", () => {
+      process.env.ZITADEL_API_URL = "https://api.zitadel.cloud";
+      process.env.ZITADEL_PUBLIC_URL = "https://login.example.com";
+
+      const mockHeaders = {
+        get: vi.fn((key: string) => {
+          if (key === "host") return "localhost:3000";
+          return null;
+        }),
+      } as any;
+
+      const result = getServiceConfig(mockHeaders);
+
+      expect(result.serviceConfig.publicHost).toBe("login.example.com");
+    });
+
     test("should handle host with port number", () => {
       process.env.ZITADEL_API_URL = "https://api.zitadel.cloud";
 
@@ -174,6 +190,29 @@ describe("Service URL utilities", () => {
 
       // Should use https: from nextUrl.protocol, not http from header
       expect(result.protocol).toBe("https:");
+    });
+
+    test("should use ZITADEL_PUBLIC_URL for host and protocol override", () => {
+      process.env.NEXT_PUBLIC_BASE_PATH = "";
+      process.env.ZITADEL_PUBLIC_URL = "https://login.example.com";
+
+      const mockRequest = {
+        headers: {
+          get: vi.fn((key: string) => {
+            if (key === "host") return "localhost:3000";
+            return null;
+          }),
+        },
+        nextUrl: {
+          protocol: "http:",
+        },
+      } as any;
+
+      const result = constructUrl(mockRequest as NextRequest, "/test");
+
+      expect(result.protocol).toBe("https:");
+      expect(result.hostname).toBe("login.example.com");
+      expect(result.pathname).toBe("/test");
     });
 
     test("should include base path when NEXT_PUBLIC_BASE_PATH is set", () => {
