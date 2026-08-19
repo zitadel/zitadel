@@ -34,6 +34,15 @@ var (
 	errStart  error
 )
 
+// Shutdown flushes the telemetry and log pipelines. It uses the cleanup
+// function returned by Start. Safe to call even if Start was never called.
+func Shutdown(ctx context.Context) error {
+	if shutdown != nil {
+		return shutdown(ctx)
+	}
+	return nil
+}
+
 // Start initializes global instrumentation once, based on the provided configuration.
 // It is safe to call multiple times; subsequent calls will return the same shutdown function and error as the first call.
 func Start(ctx context.Context, cfg Config) (ShutdownFunc, error) {
