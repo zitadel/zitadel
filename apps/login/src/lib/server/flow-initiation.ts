@@ -7,7 +7,7 @@ import { idpTypeToSlug } from "@/lib/idp";
 import { createLogger } from "@/lib/logger";
 import { sendLoginname } from "@/lib/server/loginname";
 import { constructUrl } from "@/lib/service-url";
-import { findValidSession } from "@/lib/session";
+import { findValidSession, findValidSessions } from "@/lib/session";
 import {
   createCallback,
   createResponse,
@@ -20,7 +20,7 @@ import {
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
-import { Prompt } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
+import { AuthRequest, Prompt } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { CreateCallbackRequestSchema, SessionSchema } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
@@ -220,6 +220,14 @@ function getEligibleSessions(sessions: Session[], organization?: string): Sessio
     return sessions;
   }
   return sessions.filter((s) => s.factors?.user?.organizationId === organization);
+}
+
+/**
+ * Whether the request names the user it wants, so picking a session for it is the
+ * requested behaviour rather than a guess.
+ */
+function hasUserHint(authRequest: AuthRequest): boolean {
+  return !!(authRequest.hintUserId || authRequest.loginHint);
 }
 
 export interface FlowInitiationParams {
@@ -447,7 +455,22 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       setCSPHeaders(callbackResponse, serviceConfig, securitySettings);
       return callbackResponse;
     } else {
-      let selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
+      const validSessions = await findValidSessions({ serviceConfig, sessions, authRequest, organization });
+
+      // More than one session could serve this request and nothing in it says which one:
+      // ask instead of silently continuing as whoever authenticated most recently. Per
+      // Technical Advisory 10000 the no-prompt shortcut only covers a single active session.
+      // A user hint (hintUserId / login_hint) already narrows the choice, so it stays silent.
+      if (validSessions.length > 1 && !hasUserHint(authRequest)) {
+        return gotoAccounts({
+          request,
+          requestId,
+          organization,
+          orgDomain,
+        });
+      }
+
+      let selectedSession = validSessions[0];
 
       if (!selectedSession || !selectedSession.id) {
         // login_hint matches no session: resolve it straight to the next step.
@@ -575,8 +598,18 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
     return NextResponse.redirect(loginNameUrl);
   }
 
-  // Try to find a valid session
-  let selectedSession = await findValidSession({ serviceConfig, sessions, samlRequest });
+  // Try to find a valid session. SAML requests carry no user hint (see findValidSession),
+  // so several valid sessions always mean the choice is the user's to make.
+  const validSessions = await findValidSessions({ serviceConfig, sessions, samlRequest });
+
+  if (validSessions.length > 1) {
+    return gotoAccounts({
+      request,
+      requestId,
+    });
+  }
+
+  let selectedSession = validSessions[0];
 
   // Early return: No valid session found - show account selection
   if (!selectedSession || !selectedSession.id) {
