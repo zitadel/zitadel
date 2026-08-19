@@ -1,0 +1,541 @@
+Login:
+  Title: Vitajte späť!
+  Description: Zadajte svoje prihlasovacie údaje.
+  TitleLinking: Prihlásenie na prepojenie používateľa
+  DescriptionLinking: Zadajte svoje prihlasovacie údaje, aby ste prepojili svojho externého používateľa.
+  LoginNameLabel: Prihlasovacie meno
+  UsernamePlaceHolder: pouzivatelskemeno
+  LoginnamePlaceHolder: pouzivatelskemeno@domena
+  ExternalUserDescription: Prihlásenie externým používateľom.
+  MustBeMemberOfOrg: Používateľ musí byť členom organizácie {{.OrgName}}.
+  RegisterButtonText: Registrovať
+  NextButtonText: Ďalej
+
+LDAP:
+  Title: Prihlásenie
+  Description: Zadajte svoje prihlasovacie údaje.
+  LoginNameLabel: Prihlasovacie meno
+  PasswordLabel: Heslo
+  NextButtonText: Ďalej
+
+SelectAccount:
+  Title: Výber účtu
+  Description: Použite svoj účet
+  TitleLinking: Výber účtu na prepojenie používateľa
+  DescriptionLinking: Vyberte účet, ktorý chcete prepojiť so svojím externým používateľom.
+  OtherUser: Iný používateľ
+  SessionState0: aktívny
+  SessionState1: Odhlásený
+  MustBeMemberOfOrg: Používateľ musí byť členom organizácie {{.OrgName}}.
+
+Password:
+  Title: Heslo
+  Description: Zadajte svoje prihlasovacie údaje.
+  PasswordLabel: Heslo
+  MinLength: Musí mať aspoň
+  MinLengthp2: znakov.
+  MaxLength: Musí mať menej ako 70 znakov.
+  HasUppercase: Musí obsahovať veľké písmeno.
+  HasLowercase: Musí obsahovať malé písmeno.
+  HasNumber: Musí obsahovať číslicu.
+  HasSymbol: Musí obsahovať špeciálny znak.
+  Confirmation: Potvrdenie hesla sa zhoduje.
+  ResetLinkText: Obnoviť heslo
+  BackButtonText: Späť
+  NextButtonText: Ďalej
+
+UsernameChange:
+  Title: Zmena používateľského mena
+  Description: Nastavte si nové používateľské meno
+  UsernameLabel: Používateľské meno
+  CancelButtonText: Zrušiť
+  NextButtonText: Ďalej
+
+UsernameChangeDone:
+  Title: Používateľské meno zmenené
+  Description: Vaše používateľské meno bolo úspešne zmenené.
+  NextButtonText: Ďalej
+
+InitPassword:
+  Title: Nastavenie hesla
+  Description: Dostali ste kód, ktorý musíte zadať vo formulári nižšie, aby ste si nastavili nové heslo.
+  CodeLabel: Kód
+  NewPasswordLabel: Nové heslo
+  NewPasswordConfirmLabel: Potvrdenie hesla
+  ResendButtonText: Odoslať kód znova
+  NextButtonText: Ďalej
+
+InitPasswordDone:
+  Title: Heslo nastavené
+  Description: Heslo bolo úspešne nastavené
+  NextButtonText: Ďalej
+  CancelButtonText: Zrušiť
+
+InitUser:
+  Title: Aktivácia používateľa
+  Description: Overte svoj e-mail kódom nižšie a nastavte si heslo.
+  CodeLabel: Kód
+  NewPasswordLabel: Nové heslo
+  NewPasswordConfirm: Potvrdenie hesla
+  NextButtonText: Ďalej
+  ResendButtonText: Odoslať kód znova
+
+InitUserDone:
+  Title: Používateľ aktivovaný
+  Description: E-mail overený a heslo úspešne nastavené
+  NextButtonText: Ďalej
+  CancelButtonText: Zrušiť
+
+InviteUser:
+  Title: Aktivácia používateľa
+  Description: Overte svoj e-mail kódom nižšie a nastavte si heslo.
+  CodeLabel: Kód
+  NewPasswordLabel: Nové heslo
+  NewPasswordConfirm: Potvrdenie hesla
+  NextButtonText: Ďalej
+  ResendButtonText: Odoslať kód znova
+
+InitMFAPrompt:
+  Title: Nastavenie 2-faktorového overenia
+  Description: Dvojfaktorové overenie prináša vášmu používateľskému kontu dodatočné zabezpečenie. Zaručuje, že k vášmu účtu máte prístup iba vy.
+  Provider0: Autentifikačná aplikácia (napr. Google/Microsoft Authenticator, Authy)
+  Provider1: Podľa zariadenia (napr. FaceID, Windows Hello, odtlačok prsta)
+  Provider3: OTP cez SMS
+  Provider4: OTP cez e-mail
+  NextButtonText: Ďalej
+  SkipButtonText: Preskočiť
+
+InitMFAOTP:
+  Title: Overenie druhého faktora
+  Description: Vytvorte si druhý faktor. Ak ešte nemáte autentifikačnú aplikáciu, stiahnite si ju.
+  OTPDescription: Naskenujte kód svojou autentifikačnou aplikáciou (napr. Google/Microsoft Authenticator, Authy) alebo skopírujte tajný kľúč a nižšie vložte vygenerovaný kód.
+  SecretLabel: Tajný kľúč
+  CodeLabel: Kód
+  NextButtonText: Ďalej
+  CancelButtonText: Zrušiť
+
+InitMFAOTPSMS:
+  Title: Overenie druhého faktora
+  DescriptionPhone: Vytvorte si druhý faktor. Zadajte svoje telefónne číslo, aby ste ho overili.
+  DescriptionCode: Vytvorte si druhý faktor. Zadajte prijatý kód, aby ste overili svoje telefónne číslo.
+  CountryCodeLabel: Krajina
+  PhoneLabel: Telefón
+  CodeLabel: Kód
+  EditButtonText: Upraviť
+  ResendButtonText: Odoslať kód znova
+  NextButtonText: Ďalej
+
+InitMFAU2F:
+  Title: Pridanie bezpečnostného kľúča
+  Description: Bezpečnostný kľúč je metóda overenia, ktorá môže byť zabudovaná vo vašom telefóne, používať Bluetooth alebo sa zapájať priamo do USB portu vášho počítača.
+  TokenNameLabel: Názov bezpečnostného kľúča / zariadenia
+  NotSupported: Váš prehliadač nepodporuje WebAuthN. Skontrolujte, či je aktuálny, alebo použite iný (napr. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Pridať bezpečnostný kľúč
+  ErrorRetry: Skúste to znova, vytvorte novú výzvu alebo zvoľte inú metódu.
+
+InitMFADone:
+  Title: Druhý faktor overený
+  Description: Výborne! Práve ste si úspešne nastavili druhý faktor a výrazne zvýšili bezpečnosť svojho účtu. Faktor je potrebné zadať pri každom prihlásení.
+  NextButtonText: Ďalej
+  CancelButtonText: Zrušiť
+
+MFAProvider:
+  Provider0: Autentifikačná aplikácia (napr. Google/Microsoft Authenticator, Authy)
+  Provider1: Podľa zariadenia (napr. FaceID, Windows Hello, odtlačok prsta)
+  Provider3: OTP cez SMS
+  Provider4: OTP cez e-mail
+  ChooseOther: alebo zvoľte inú možnosť
+
+VerifyMFAOTP:
+  Title: Overenie druhého faktora
+  Description: Overte svoj druhý faktor
+  CodeLabel: Kód
+  NextButtonText: Ďalej
+
+VerifyOTP:
+  Title: Overenie druhého faktora
+  Description: Overte svoj druhý faktor
+  CodeLabel: Kód
+  ResendButtonText: Odoslať kód znova
+  NextButtonText: Ďalej
+
+VerifyMFAU2F:
+  Title: Overenie druhého faktora
+  Description: Overte svoj druhý faktor zaregistrovaným zariadením (napr. FaceID, Windows Hello, odtlačok prsta)
+  NotSupported: Váš prehliadač nepodporuje WebAuthN. Skontrolujte, či používate najnovšiu verziu, alebo prejdite na podporovaný prehliadač (Chrome, Safari, Firefox)
+  ErrorRetry: Skúste to znova, vytvorte novú požiadavku alebo zvoľte inú metódu.
+  ValidateTokenButtonText: Overiť druhý faktor
+
+Passwordless:
+  Title: Prihlásenie bez hesla
+  Description: Prihláste sa metódami overenia, ktoré poskytuje vaše zariadenie, ako sú FaceID, Windows Hello alebo odtlačok prsta.
+  NotSupported: Váš prehliadač nepodporuje WebAuthN. Skontrolujte, či je aktuálny, alebo použite iný (napr. Chrome, Safari, Firefox)
+  ErrorRetry: Skúste to znova, vytvorte novú výzvu alebo zvoľte inú metódu.
+  LoginWithPwButtonText: Prihlásiť sa heslom
+  ValidateTokenButtonText: Prihlásiť sa bez hesla
+
+PasswordlessPrompt:
+  Title: Nastavenie prihlásenia bez hesla
+  Description: Chcete si nastaviť prihlásenie bez hesla? (Metódy overenia vášho zariadenia, ako sú FaceID, Windows Hello alebo odtlačok prsta)
+  DescriptionInit: Musíte si nastaviť prihlásenie bez hesla. Na registráciu svojho zariadenia použite odkaz, ktorý ste dostali.
+  PasswordlessButtonText: Prejsť na prihlásenie bez hesla
+  NextButtonText: Ďalej
+  SkipButtonText: Preskočiť
+
+PasswordlessRegistration:
+  Title: Nastavenie prihlásenia bez hesla
+  Description: Pridajte svoju metódu overenia tak, že zadáte názov (napr. MojMobil, MacBook a pod.) a potom kliknete na tlačidlo „Registrovať bez hesla“ nižšie.
+  TokenNameLabel: Názov zariadenia
+  NotSupported: Váš prehliadač nepodporuje WebAuthN. Skontrolujte, či je aktuálny, alebo použite iný (napr. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Registrovať bez hesla
+  ErrorRetry: Skúste to znova, vytvorte novú výzvu alebo zvoľte inú metódu.
+
+PasswordlessRegistrationDone:
+  Title: Prihlásenie bez hesla nastavené
+  Description: Zariadenie na prihlásenie bez hesla bolo úspešne pridané.
+  DescriptionClose: Toto okno môžete teraz zavrieť.
+  NextButtonText: Ďalej
+  CancelButtonText: Zrušiť
+
+PasswordChange:
+  Title: Zmena hesla
+  Description: Zmeňte si heslo. Zadajte svoje staré a nové heslo.
+  ExpiredDescription: Platnosť vášho hesla vypršala a je potrebné ho zmeniť. Zadajte svoje staré a nové heslo.
+  OldPasswordLabel: Staré heslo
+  NewPasswordLabel: Nové heslo
+  NewPasswordConfirmLabel: Potvrdenie hesla
+  CancelButtonText: Zrušiť
+  NextButtonText: Ďalej
+  Footer: Päta
+
+PasswordChangeDone:
+  Title: Zmena hesla
+  Description: Vaše heslo bolo úspešne zmenené.
+  NextButtonText: Ďalej
+
+PasswordResetDone:
+  Title: Odkaz na obnovenie hesla odoslaný
+  Description: Na obnovenie hesla si skontrolujte e-mail.
+  NextButtonText: Ďalej
+
+EmailVerification:
+  Title: Overenie e-mailu
+  Description: Poslali sme vám e-mail na overenie vašej adresy. Zadajte kód vo formulári nižšie.
+  CodeLabel: Kód
+  NextButtonText: Ďalej
+  ResendButtonText: Odoslať kód znova
+
+EmailVerificationDone:
+  Title: Overenie e-mailu
+  Description: Vaša e-mailová adresa bola úspešne overená.
+  NextButtonText: Ďalej
+  CancelButtonText: Zrušiť
+  LoginButtonText: Prihlásiť sa
+
+RegisterOption:
+  Title: Možnosti registrácie
+  Description: Vyberte si, ako sa chcete zaregistrovať
+  RegisterUsernamePasswordButtonText: Používateľským menom a heslom
+  ExternalLoginDescription: alebo sa zaregistrujte externým používateľom
+  LoginButtonText: Prihlásiť sa
+
+RegistrationUser:
+  Title: Registrácia
+  Description: Zadajte svoje údaje. Vaša e-mailová adresa sa použije ako prihlasovacie meno.
+  DescriptionOrgRegister: Zadajte svoje údaje.
+  EmailLabel: E-mail
+  UsernameLabel: Používateľské meno
+  FirstnameLabel: Meno
+  LastnameLabel: Priezvisko
+  LanguageLabel: Jazyk
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Slovak: Slovenčina
+  GenderLabel: Pohlavie
+  Female: Žena
+  Male: Muž
+  Diverse: iné / X
+  PasswordLabel: Heslo
+  PasswordConfirmLabel: Potvrdenie hesla
+  TosAndPrivacyLabel: Podmienky a ochrana osobných údajov
+  TosConfirm: Súhlasím s
+  TosLinkText: podmienkami používania
+  PrivacyConfirm: Súhlasím so
+  PrivacyLinkText: zásadami ochrany osobných údajov
+  ExternalLogin: alebo sa zaregistrujte externým používateľom
+  BackButtonText: Prihlásiť sa
+  NextButtonText: Ďalej
+
+ExternalRegistrationUserOverview:
+  Title: Registrácia externého používateľa
+  Description: Vaše používateľské údaje sme prevzali od zvoleného poskytovateľa. Teraz ich môžete zmeniť alebo doplniť.
+  EmailLabel: E-mail
+  UsernameLabel: Používateľské meno
+  FirstnameLabel: Meno
+  LastnameLabel: Priezvisko
+  NicknameLabel: Prezývka
+  PhoneLabel: Telefónne číslo
+  LanguageLabel: Jazyk
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Slovak: Slovenčina
+  TosAndPrivacyLabel: Podmienky a ochrana osobných údajov
+  TosConfirm: Súhlasím s
+  TosLinkText: podmienkami používania
+  PrivacyConfirm: Súhlasím so
+  PrivacyLinkText: zásadami ochrany osobných údajov
+  ExternalLogin: alebo sa zaregistrujte externým používateľom
+  BackButtonText: Späť
+  NextButtonText: Uložiť
+
+RegistrationOrg:
+  Title: Registrácia organizácie
+  Description: Zadajte názov svojej organizácie a používateľské údaje.
+  OrgNameLabel: Názov organizácie
+  EmailLabel: E-mail
+  UsernameLabel: Používateľské meno
+  FirstnameLabel: Meno
+  LastnameLabel: Priezvisko
+  PasswordLabel: Heslo
+  PasswordConfirmLabel: Potvrdenie hesla
+  TosAndPrivacyLabel: Podmienky a ochrana osobných údajov
+  TosConfirm: Súhlasím s
+  TosLinkText: podmienkami používania
+  PrivacyConfirm: Súhlasím so
+  PrivacyLinkText: zásadami ochrany osobných údajov
+  SaveButtonText: Vytvoriť organizáciu
+
+LoginSuccess:
+  Title: Prihlásenie úspešné
+  AutoRedirectDescription: Automaticky vás presmerujeme späť do vašej aplikácie. Ak sa tak nestane, kliknite na tlačidlo nižšie. Potom môžete okno zavrieť.
+  RedirectedDescription: Toto okno môžete teraz zavrieť.
+  NextButtonText: Ďalej
+
+LogoutDone:
+  Title: Odhlásené
+  Description: Boli ste úspešne odhlásení.
+  LoginButtonText: Prihlásiť sa
+
+LinkingUserPrompt:
+  Title: Nájdený existujúci používateľ
+  Description: "Chcete prepojiť svoj existujúci účet:"
+  LinkButtonText: Prepojiť
+  OtherButtonText: Ďalšie možnosti
+
+LinkingUsersDone:
+  Title: Prepojenie používateľa
+  Description: Používateľ prepojený.
+  CancelButtonText: Zrušiť
+  NextButtonText: Ďalej
+
+ExternalNotFound:
+  Title: Externý používateľ sa nenašiel
+  Description: Externý používateľ sa nenašiel. Chcete prepojiť svojho používateľa alebo automaticky zaregistrovať nového?
+  LinkButtonText: Prepojiť
+  AutoRegisterButtonText: Registrovať
+  TosAndPrivacyLabel: Podmienky a ochrana osobných údajov
+  TosConfirm: Súhlasím s
+  TosLinkText: podmienkami používania
+  PrivacyConfirm: Súhlasím so
+  PrivacyLinkText: zásadami ochrany osobných údajov
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Slovak: Slovenčina
+DeviceAuth:
+  Title: Autorizácia zariadenia
+  UserCode:
+    Label: Používateľský kód
+    Description: Zadajte používateľský kód zobrazený na zariadení.
+    ButtonNext: Ďalej
+  Action:
+    Description: Udeľte zariadeniu prístup.
+    GrantDevice: chystáte sa udeliť zariadeniu
+    AccessToScopes: prístup k nasledujúcim rozsahom oprávnení
+    Button:
+      Allow: Povoliť
+      Deny: Zamietnuť
+  Done:
+    Description: Hotovo.
+    Approved: Autorizácia zariadenia bola schválená. Teraz sa môžete vrátiť k zariadeniu.
+    Denied: Autorizácia zariadenia bola zamietnutá. Teraz sa môžete vrátiť k zariadeniu.
+
+Footer:
+  PoweredBy: Beží na
+  Tos: Podmienky používania
+  PrivacyPolicy: Zásady ochrany osobných údajov
+  Help: Pomoc
+  SupportEmail: E-mail podpory
+
+SignIn: Prihlásiť sa cez {{.Provider}}
+
+Errors:
+  Internal: Vyskytla sa interná chyba
+  AuthRequest:
+    NotFound: Autentifikačná požiadavka sa nenašla
+    UserAgentNotCorresponding: User Agent nesúhlasí
+    UserAgentNotFound: ID User Agenta sa nenašlo
+    TokenNotFound: Token sa nenašiel
+    RequestTypeNotSupported: Typ požiadavky nie je podporovaný
+    MissingParameters: Chýbajú povinné parametre
+  User:
+    NotFound: Používateľ sa nenašiel
+    AlreadyExists: Používateľ už existuje
+    Inactive: Používateľ je neaktívny
+    NotFoundOnOrg: Používateľ sa vo zvolenej organizácii nenašiel
+    NotAllowedOrg: Používateľ nie je členom požadovanej organizácie
+    NotMatchingUserID: Používateľ a používateľ v autentifikačnej požiadavke sa nezhodujú
+    UserIDMissing: UserID je prázdne
+    Invalid: Neplatné používateľské údaje
+    DomainNotAllowedAsUsername: Doména je už rezervovaná a nedá sa použiť
+    NotAllowedToLink: Používateľ nesmie byť prepojený s externým poskytovateľom prihlásenia
+    Profile:
+      NotFound: Profil sa nenašiel
+      NotChanged: Profil sa nezmenil
+      Empty: Profil je prázdny
+      FirstNameEmpty: Meno v profile je prázdne
+      LastNameEmpty: Priezvisko v profile je prázdne
+      IDMissing: Chýba ID profilu
+    Email:
+      NotFound: E-mail sa nenašiel
+      Invalid: E-mail je neplatný
+      AlreadyVerified: E-mail je už overený
+      NotChanged: E-mail sa nezmenil
+      Empty: E-mail je prázdny
+      IDMissing: Chýba ID e-mailu
+    Phone:
+      NotFound: Telefónne číslo sa nenašlo
+      Invalid: Telefónne číslo je neplatné
+      AlreadyVerified: Telefónne číslo je už overené
+      Empty: Telefónne číslo je prázdne
+      NotChanged: Telefónne číslo sa nezmenilo
+    Address:
+      NotFound: Adresa sa nenašla
+      NotChanged: Adresa sa nezmenila
+    Username:
+      AlreadyExists: Používateľské meno je už obsadené
+      Reserved: Používateľské meno je už obsadené
+      Empty: Používateľské meno je prázdne
+    Password:
+      ConfirmationWrong: Potvrdenie hesla je nesprávne
+      Empty: Heslo je prázdne
+      Invalid: Heslo je neplatné
+      InvalidAndLocked: Heslo je neplatné a používateľ je zablokovaný, kontaktujte svojho správcu.
+      NotChanged: Nové heslo nemôže byť rovnaké ako vaše súčasné heslo
+    UsernameOrPassword:
+      Invalid: Používateľské meno alebo heslo je neplatné
+    PasswordComplexityPolicy:
+      NotFound: Politika hesiel sa nenašla
+      MinLength: Heslo je príliš krátke
+      HasLower: Heslo musí obsahovať malé písmeno
+      HasUpper: Heslo musí obsahovať veľké písmeno
+      HasNumber: Heslo musí obsahovať číslicu
+      HasSymbol: Heslo musí obsahovať špeciálny znak
+    Code:
+      Expired: Platnosť kódu vypršala
+      Invalid: Kód je neplatný
+      Empty: Kód je prázdny
+      CryptoCodeNil: Kryptografický kód je nil
+      NotFound: Kód sa nenašiel
+      GeneratorAlgNotSupported: Nepodporovaný algoritmus generátora
+    EmailVerify:
+      UserIDEmpty: UserID je prázdne
+    ExternalData:
+      CouldNotRead: Externé údaje sa nepodarilo správne načítať
+    MFA:
+      NoProviders: Nie sú k dispozícii žiadni poskytovatelia viacfaktorového overenia
+      OTP:
+        AlreadyReady: Viacfaktorové OTP (OneTimePassword) je už nastavené
+        NotExisting: Viacfaktorové OTP (OneTimePassword) neexistuje
+        InvalidCode: Neplatný kód
+        NotReady: Viacfaktorové OTP (OneTimePassword) nie je pripravené
+    Locked: Používateľ je zablokovaný
+    SomethingWentWrong: Niečo sa pokazilo
+    NotActive: Používateľ nie je aktívny
+    ExternalIDP:
+      IDPTypeNotImplemented: Typ poskytovateľa identity nie je implementovaný
+      NotAllowed: Externý poskytovateľ prihlásenia nie je povolený
+      IDPConfigIDEmpty: ID poskytovateľa identity je prázdne
+      ExternalUserIDEmpty: ID externého používateľa je prázdne
+      UserDisplayNameEmpty: Zobrazované meno používateľa je prázdne
+      NoExternalUserData: Neprišli žiadne údaje o externom používateľovi
+      CreationNotAllowed: Vytvorenie nového používateľa nie je u tohto poskytovateľa povolené
+      LinkingNotAllowed: Prepojenie používateľa nie je u tohto poskytovateľa povolené
+      NoOptionAllowed: U tohto poskytovateľa nie je povolené ani vytvorenie, ani prepojenie. Kontaktujte svojho správcu.
+      LoginFailedSwitchLocal: |
+        Prihlásenie u externého poskytovateľa identity zlyhalo. Vraciame sa na lokálne prihlásenie.
+
+        Podrobnosti o chybe: {{.Details}}
+    GrantRequired: Prihlásenie nie je možné. Používateľ musí mať k aplikácii aspoň jedno oprávnenie. Kontaktujte svojho správcu.
+    ProjectRequired: Prihlásenie nie je možné. Organizácia používateľa musí mať udelený prístup k projektu. Kontaktujte svojho správcu.
+  IdentityProvider:
+    InvalidConfig: Konfigurácia poskytovateľa identity je neplatná
+  IAM:
+    LockoutPolicy:
+      NotExisting: Politika blokovania neexistuje
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Registrácia nie je povolená
+  DeviceAuth:
+    NotExisting: Používateľský kód neexistuje
+
+optional: (voliteľné)

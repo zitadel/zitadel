@@ -1556,7 +1556,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "sk": "Slovenčina"
       }
     },
     "SMTP": {
@@ -1802,7 +1803,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "sk": "Slovenčina"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifikasi email selesai",
@@ -2811,7 +2813,8 @@
     "ro": "Română",
     "tr": "Türkçe",
     "uk": "Українська",
-    "ar": "العربية"
+    "ar": "العربية",
+    "sk": "Slovenčina"
   },
   "MEMBER": {
     "ADD": "Tambahkan Administrator",
