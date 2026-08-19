@@ -119,7 +119,10 @@ func loginVersionToDomain(version *app.LoginVersion) (*domain.LoginVersion, *str
 		return gu.Ptr(domain.LoginVersion1), gu.Ptr(""), nil
 	case *app.LoginVersion_LoginV2:
 		_, err := url.Parse(v.LoginV2.GetBaseUri())
-		return gu.Ptr(domain.LoginVersion2), gu.Ptr(v.LoginV2.GetBaseUri()), err
+		if err != nil {
+			return nil, nil, zerrors.ThrowInvalidArgument(err, "CONV-8mK2p", "invalid login base URI")
+		}
+		return gu.Ptr(domain.LoginVersion2), gu.Ptr(v.LoginV2.GetBaseUri()), nil
 	default:
 		return gu.Ptr(domain.LoginVersionUnspecified), gu.Ptr(""), nil
 	}

@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 )
 
@@ -37,11 +38,11 @@ func TestCreateOIDCAppRequestToDomain(t *testing.T) {
 				},
 			},
 			expectedModel: nil,
-			expectedError: &url.Error{
+			expectedError: zerrors.ThrowInvalidArgument(&url.Error{
 				URL: "%+o",
 				Op:  "parse",
 				Err: url.EscapeError("%+o"),
-			},
+			}, "CONV-8mK2p", "invalid login base URI"),
 		},
 		{
 			testName:  "all fields set",
@@ -130,11 +131,11 @@ func TestUpdateOIDCAppConfigRequestToDomain(t *testing.T) {
 				}},
 			},
 			expectedModel: nil,
-			expectedError: &url.Error{
+			expectedError: zerrors.ThrowInvalidArgument(&url.Error{
 				URL: "%+o",
 				Op:  "parse",
 				Err: url.EscapeError("%+o"),
-			},
+			}, "CONV-8mK2p", "invalid login base URI"),
 		},
 		{
 			testName:  "successful Update",

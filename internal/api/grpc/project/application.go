@@ -343,7 +343,10 @@ func LoginVersionToDomain(version *app_pb.LoginVersion) (domain.LoginVersion, st
 		return domain.LoginVersion1, "", nil
 	case *app_pb.LoginVersion_LoginV2:
 		_, err := url.Parse(v.LoginV2.GetBaseUri())
-		return domain.LoginVersion2, v.LoginV2.GetBaseUri(), err
+		if err != nil {
+			return domain.LoginVersionUnspecified, "", zerrors.ThrowInvalidArgument(err, "APP-6vD3s", "invalid login base URI")
+		}
+		return domain.LoginVersion2, v.LoginV2.GetBaseUri(), nil
 	default:
 		return domain.LoginVersionUnspecified, "", nil
 	}
