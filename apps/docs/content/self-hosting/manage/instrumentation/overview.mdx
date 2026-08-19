@@ -1,0 +1,150 @@
+---
+title: Instrumentation
+description: "Configure ZITADEL's unified Instrumentation section to collect traces, metrics, logs, and profiles using OpenTelemetry-compatible exporters."
+sidebar_label: Instrumentation
+---
+
+ZITADEL emits telemetry for four pillars of observability: **tracing**, **metrics**, **logging**, and **profiling**.
+All four are configured under a single `Instrumentation` section in the [runtime configuration](/self-hosting/manage/configure), which replaces several older, inconsistent configuration sections (`Log`, `Tracing`, `Metrics`, `Profiler`).
+
+<Callout>
+The examples on this page show a subset of the available options. The full, always up-to-date list of fields and their defaults is in [`cmd/defaults.yaml`](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml).
+</Callout>
+
+## Exporters
+
+Every pillar sends its data through an **Exporter**, configured the same way everywhere:
+
+```yaml
+Exporter:
+  Type: "none" # which exporter implementation to use
+  Endpoint: "" # collector endpoint, for grpc/http exporters
+  Insecure: false # disable TLS for grpc/http exporters
+  BatchDuration: 1s # interval for batching before export
+  GoogleProjectID: "" # project ID for the google exporter
+```
+
+Not every `Type` is supported by every pillar:
+
+| Type | Trace | Metric | Log | Profile | Description |
+|---|---|---|---|---|---|
+| `none` | ✅ | ✅ | ✅ | ✅ | Disables exporting for this pillar. |
+| `auto` | ✅ | ✅ | ✅ | ❌ | Delegates to standard OTEL environment variables (`OTEL_TRACES_EXPORTER`, `OTEL_EXPORTER_OTLP_ENDPOINT`, etc.). Only takes effect if one of the recognized OTEL env vars is actually set. |
+| `stdOut` / `stdErr` | ✅ | ✅ | ✅ | ❌ | Writes OTEL-formatted output to standard output/error. |
+| `grpc` / `http` | ✅ | ✅ | ✅ | ❌ | Sends data to an OTEL collector via OTLP over gRPC or HTTP (recommended for production). |
+| `google` | ✅ | ✅ | ❌ | ✅ | Sends data to Google Cloud (Trace, Monitoring, or Profiler). Requires `GoogleProjectID`. |
+| `prometheus` | ❌ | ✅ | ❌ | ❌ | Exposes metrics for Prometheus to scrape, see [Metrics](/self-hosting/manage/metrics/overview). |
+
+Profiling only supports `none` and `google`, because there is currently no OTEL-upstream exporter for profiles.
+
+## Service name
+
+`Instrumentation.ServiceName` sets the service name attached to traces, metrics, and logs (default `"zitadel"`):
+
+```yaml
+Instrumentation:
+  ServiceName: "zitadel" # ZITADEL_INSTRUMENTATION_SERVICENAME
+```
+
+## Tracing
+
+ZITADEL creates a trace span for every request and propagates trace context so calls can be correlated across your infrastructure. Each log line written while a span is active also carries the same `TraceID`/`SpanID`, so traces and logs can be cross-referenced.
+
+```yaml
+Instrumentation:
+  Trace:
+    Fraction: 1.0 # ZITADEL_INSTRUMENTATION_TRACE_FRACTION
+    # Trust incoming trace context from remote services for distributed tracing.
+    # Enable only in controlled environments; defaults to false for security.
+    TrustRemoteSpans: false # ZITADEL_INSTRUMENTATION_TRACE_TRUSTREMOTESPANS
+    Exporter:
+      Type: "none" # none|auto|stdOut|stdErr|grpc|http|google
+      Endpoint: "" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_ENDPOINT
+```
+
+`TrustRemoteSpans` defaults to `false`: incoming trace context from clients is not trusted by default, since a client could otherwise inject an arbitrary trace ID. Only enable it in environments where you control everything upstream of ZITADEL (for example behind your own OTEL-aware ingress).
+
+See the [Kubernetes observability guide](/self-hosting/deploy/kubernetes/observability) for an example of shipping traces to an OpenTelemetry Collector.
+
+## Metrics
+
+Metrics use the same `Exporter` shape, plus the `prometheus` type for pull-based scraping:
+
+```yaml
+Instrumentation:
+  Metric:
+    Exporter:
+      Type: "none" # none|auto|stdOut|stdErr|grpc|http|google|prometheus
+```
+
+Metrics have their own dedicated pages with more detail: [Metrics overview](/self-hosting/manage/metrics/overview) and [Prometheus setup](/self-hosting/manage/metrics/prometheus).
+
+## Logging
+
+ZITADEL emits structured logs through Go's standard `log/slog`. Logging has two independent knobs:
+
+<Callout title="Format vs. Exporter">
+`Instrumentation.Log.Format` controls what gets printed to standard error (for a human, a log collector tailing stdout/stderr, etc.).
+`Instrumentation.Log.Exporter` controls whether logs are **also** pushed to an OTEL collector.
+These are independent — for example you can print JSON to stderr **and** export the same log records via OTLP gRPC at the same time.
+</Callout>
+
+```yaml
+Instrumentation:
+  Log:
+    # Log lines lower than this level are not emitted.
+    Level: "INFO" # ZITADEL_INSTRUMENTATION_LOG_LEVEL
+    # Streams enable logging for specific parts of the application.
+    Streams: # ZITADEL_INSTRUMENTATION_LOG_STREAMS (comma separated list)
+      - runtime # General runtime logs, such as startup and shutdown messages.
+      - ready # Logs related to readiness and health checks.
+      - request # Logs for incoming API and HTTP requests.
+      - event_handler # Logs for event handling in projections.
+      - queue # Logs for the job queue processing.
+      #- event_pusher # Logs for event pushing to the database. Warning: contains sensitive information.
+    Mask:
+      Keys: # ZITADEL_INSTRUMENTATION_LOG_MASK_KEYS (comma separated list)
+        # - "first_name"
+      Value: "****" # ZITADEL_INSTRUMENTATION_LOG_MASK_VALUE
+    # "disabled" | "text" | "json" | "gcp" | "gcp_error_reporting"
+    Format: "disabled" # ZITADEL_INSTRUMENTATION_LOG_STDERR
+    AddSource: true # ZITADEL_INSTRUMENTATION_LOG_ADDSOURCE
+    Errors:
+      ReportLocation: true # ZITADEL_INSTRUMENTATION_LOG_ERRORS_REPORTLOCATION
+      StackTrace: false # ZITADEL_INSTRUMENTATION_LOG_ERRORS_STACKTRACE
+    Exporter:
+      Type: "none" # none|auto|stdOut|stdErr|grpc|http
+```
+
+A `Stream` is a coarse category of logs (application runtime, readiness checks, API requests, event projections, the job queue, and event pushes to the database). Each stream can be turned on or off independently — a disabled stream produces no output at all. `event_pusher` is disabled by default because it can contain sensitive event payload data.
+
+`Mask.Keys` redacts attribute values by key name, at any nesting depth, replacing the value with `Mask.Value` while preserving the surrounding structure — useful for keeping personal data (like `first_name`) out of your log sink.
+
+For the exact shape of a log line — which fields appear, and real example output — see [Structured Log Fields](/self-hosting/manage/instrumentation/log-fields).
+
+## Profiling
+
+Profiling data (CPU, memory, …) can be sent to Google Cloud Profiler:
+
+```yaml
+Instrumentation:
+  Profile:
+    Exporter:
+      Type: "none" # none|google
+      GoogleProjectID: "" # ZITADEL_INSTRUMENTATION_PROFILE_EXPORTER_GOOGLEPROJECTID
+```
+
+## Legacy configuration
+
+The older, top-level `Log`, `Metrics`, `Tracing`, and `Profiler` sections still exist in `defaults.yaml` for backward compatibility, but each only takes effect while the corresponding `Instrumentation.*` field is left at its default (unset). They are deprecated and scheduled for removal in ZITADEL v5 — new deployments should configure `Instrumentation` directly rather than relying on the legacy fallback.
+
+<Callout>
+Don't confuse this with the separate, still-current `Telemetry` section: that section pushes anonymized usage milestones to external endpoints and has nothing to do with tracing, metrics, or logging. See [Production Setup](/self-hosting/manage/production#telemetry) and [Service Ping](/self-hosting/manage/service_ping).
+</Callout>
+
+## What's next
+
+- [Structured Log Fields](/self-hosting/manage/instrumentation/log-fields) — the JSON schema of ZITADEL's log output, with real example log lines.
+- [Metrics overview](/self-hosting/manage/metrics/overview) and [Prometheus setup](/self-hosting/manage/metrics/prometheus).
+- [Kubernetes observability guide](/self-hosting/deploy/kubernetes/observability) for collecting traces, metrics, and logs in a cluster.
+- Check out all possible [runtime configuration properties and their defaults in the source code](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml).
