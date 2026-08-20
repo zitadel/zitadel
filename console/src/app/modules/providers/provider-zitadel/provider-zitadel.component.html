@@ -124,13 +124,14 @@
                   <cnsl-label>{{ 'IDP.SCOPESLIST' | translate }}</cnsl-label>
                   <input
                     cnslInput
+                    #scopeInput
                     [matChipInputFor]="chipScopesList"
                     [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
                     [matChipInputAddOnBlur]="true"
                     (matChipInputTokenEnd)="addScope($event)"
                   />
                 </cnsl-form-field>
-                <button class="scope-add-button" (click)="addScope($any($event))" mat-icon-button>
+                <button class="scope-add-button" type="button" (click)="addScopeFromInput(scopeInput)" mat-icon-button>
                   <mat-icon>add</mat-icon>
                 </button>
               </div>

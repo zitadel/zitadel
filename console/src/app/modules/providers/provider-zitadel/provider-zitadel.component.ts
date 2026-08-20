@@ -218,7 +218,7 @@ export class ProviderZitadelComponent {
         req.setId(this.provider?.id || this.justCreated$.value);
         req.setName(this.name?.value);
         req.setClientId(this.clientId?.value);
-        req.setClientSecret(this.clientSecret?.value);
+        req.setClientSecret(this.clientSecretForUpdate);
         req.setIssuer(this.issuer?.value);
         req.setScopesList(this.scopesList?.value);
         req.setProviderOptions(this.options);
@@ -241,7 +241,7 @@ export class ProviderZitadelComponent {
         req.setId(this.provider?.id || this.justCreated$.value);
         req.setName(this.name?.value);
         req.setClientId(this.clientId?.value);
-        req.setClientSecret(this.clientSecret?.value);
+        req.setClientSecret(this.clientSecretForUpdate);
         req.setIssuer(this.issuer?.value);
         req.setScopesList(this.scopesList?.value);
         req.setProviderOptions(this.options);
@@ -262,6 +262,17 @@ export class ProviderZitadelComponent {
           });
       }
     }
+  }
+
+  /**
+   * The client secret to send on update. An existing provider only receives a
+   * new secret when the user explicitly opted in: the form control keeps its
+   * value when the "update client secret" checkbox is unticked again, and
+   * sending it would silently rotate the secret. An empty value is treated as
+   * "unchanged" by the API.
+   */
+  private get clientSecretForUpdate(): string {
+    return !this.provider || this.updateClientSecret ? (this.clientSecret?.value ?? '') : '';
   }
 
   private instanceRolesInfoToProto(): InstanceRolesInfo[] {
@@ -291,15 +302,21 @@ export class ProviderZitadelComponent {
   }
 
   public addScope(event: MatChipInputEvent): void {
-    const input = event.chipInput?.inputElement;
-    const value = event.value.trim();
+    this.addScopeFromInput(event.chipInput?.inputElement, event.value);
+  }
 
-    if (value !== '') {
-      if (this.scopesList?.value) {
-        this.scopesList.value.push(value);
-        if (input) {
-          input.value = '';
-        }
+  /**
+   * Adds the scope currently typed into the chip input. Takes the value from
+   * the input element because the add button emits a MouseEvent, which carries
+   * no value of its own.
+   */
+  public addScopeFromInput(input?: HTMLInputElement, value?: string): void {
+    const scope = (value ?? input?.value ?? '').trim();
+
+    if (scope !== '' && this.scopesList?.value) {
+      this.scopesList.value.push(scope);
+      if (input) {
+        input.value = '';
       }
     }
   }
