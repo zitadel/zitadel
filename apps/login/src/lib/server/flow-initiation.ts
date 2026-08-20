@@ -20,7 +20,7 @@ import {
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
-import { Prompt } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
+import { AuthorizationErrorSchema, ErrorReason, Prompt } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { CreateCallbackRequestSchema, SessionSchema } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
@@ -222,6 +222,57 @@ function getEligibleSessions(sessions: Session[], organization?: string): Sessio
   return sessions.filter((s) => s.factors?.user?.organizationId === organization);
 }
 
+/**
+ * OIDC Core 3.1.2.6: with prompt=none the authorization server must not render
+ * interactive UI when it cannot authenticate the end-user. Send the relying
+ * party back to its redirect_uri with error=login_required instead.
+ */
+async function loginRequiredResponse({
+  serviceConfig,
+  requestId,
+}: {
+  serviceConfig: ServiceConfig;
+  requestId: string;
+}): Promise<NextResponse> {
+  try {
+    const { callbackUrl } = await createCallback({
+      serviceConfig,
+      req: create(CreateCallbackRequestSchema, {
+        authRequestId: requestId.replace("oidc_", ""),
+        callbackKind: {
+          case: "error",
+          value: create(AuthorizationErrorSchema, {
+            error: ErrorReason.LOGIN_REQUIRED,
+          }),
+        },
+      }),
+    });
+
+    if (!callbackUrl) {
+      logger.warn("Empty OIDC error callback URL (prompt=none)");
+    } else if (!isSafeRedirectUri(callbackUrl)) {
+      logger.warn("Blocked unsafe OIDC error callback URL (prompt=none)", { callbackUrl });
+    } else {
+      return NextResponse.redirect(callbackUrl);
+    }
+  } catch (error) {
+    logger.error("Error creating login_required callback (prompt=none):", { error });
+  }
+
+  // Fallback only: without a callback URL there is nowhere to send the client.
+  let securitySettings: SecuritySettings | undefined;
+  try {
+    securitySettings = await getSecuritySettings({ serviceConfig });
+  } catch (err) {
+    logger.error("Failed to load security settings for CSP in prompt=none flow", {
+      error: err,
+    });
+  }
+  const noSessionResponse = NextResponse.json({ error: "No active session found" }, { status: 400 });
+  setCSPHeaders(noSessionResponse, serviceConfig, securitySettings);
+  return noSessionResponse;
+}
+
 export interface FlowInitiationParams {
   serviceConfig: ServiceConfig;
   requestId: string;
@@ -400,6 +451,18 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         orgDomain,
       });
     } else if (authRequest.prompt.includes(Prompt.NONE)) {
+      const selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
+
+      if (!selectedSession || !selectedSession.id) {
+        return loginRequiredResponse({ serviceConfig, requestId });
+      }
+
+      const cookie = sessionCookies.find((cookie) => cookie.id === selectedSession.id);
+
+      if (!cookie || !cookie.id || !cookie.token) {
+        return loginRequiredResponse({ serviceConfig, requestId });
+      }
+
       let securitySettings: SecuritySettings | undefined;
       try {
         securitySettings = await getSecuritySettings({ serviceConfig });
@@ -407,20 +470,6 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         logger.error("Failed to load security settings for CSP in prompt=none flow", {
           error: err,
         });
-      }
-      const selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
-
-      const noSessionResponse = NextResponse.json({ error: "No active session found" }, { status: 400 });
-      setCSPHeaders(noSessionResponse, serviceConfig, securitySettings);
-
-      if (!selectedSession || !selectedSession.id) {
-        return noSessionResponse;
-      }
-
-      const cookie = sessionCookies.find((cookie) => cookie.id === selectedSession.id);
-
-      if (!cookie || !cookie.id || !cookie.token) {
-        return noSessionResponse;
       }
 
       const session = {
@@ -534,6 +583,12 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       }
     }
   } else {
+    // prompt=none with no session at all: same rule as the branch above, the
+    // relying party gets the error callback instead of the /loginname screen.
+    if (authRequest?.prompt.includes(Prompt.NONE)) {
+      return loginRequiredResponse({ serviceConfig, requestId });
+    }
+
     // No session: resolve a login_hint straight to the next step if we can.
     const hintResponse = await resolveLoginHint({
       request,
