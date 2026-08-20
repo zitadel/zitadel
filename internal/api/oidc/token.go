@@ -141,6 +141,7 @@ func (s *Server) createJWT(ctx context.Context, client op.Client, session *comma
 	)
 	claims.Actor = actorDomainToClaims(session.Actor)
 	claims.Claims = userInfo.Claims
+	claims.Scopes = session.Scope
 
 	return crypto.Sign(claims, signer)
 }
