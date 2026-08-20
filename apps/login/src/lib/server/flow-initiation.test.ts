@@ -872,3 +872,147 @@ describe("handleOIDCFlowInitiation — idp scope (urn:zitadel:iam:org:idp:id)", 
     expect(html).toContain('name="SAMLRequest"');
   });
 });
+
+describe("handleOIDCFlowInitiation — Prompt.NONE (OIDC prompt=none)", () => {
+  let mockGetAuthRequest: ReturnType<typeof vi.fn>;
+  let mockConstructUrl: ReturnType<typeof vi.fn>;
+  let mockFindValidSession: ReturnType<typeof vi.fn>;
+  let mockCreateCallback: ReturnType<typeof vi.fn>;
+  let mockCreate: ReturnType<typeof vi.fn>;
+
+  const existingSession = {
+    id: "session-1",
+    factors: { user: { id: "user1", organizationId: "org1", loginName: "user@example.com" } },
+  };
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.unstubAllEnvs();
+
+    const zitadel = await import("@/lib/zitadel");
+    const serviceUrl = await import("@/lib/service-url");
+    const session = await import("@/lib/session");
+    const authUtils = await import("@/lib/auth-utils");
+    const client = await import("@zitadel/client");
+    const { Prompt } = await import("@zitadel/proto/zitadel/oidc/v2/authorization_pb");
+
+    mockGetAuthRequest = vi.mocked(zitadel.getAuthRequest);
+    mockConstructUrl = vi.mocked(serviceUrl.constructUrl);
+    mockFindValidSession = vi.mocked(session.findValidSession);
+    mockCreateCallback = vi.mocked(zitadel.createCallback);
+    mockCreate = vi.mocked(client.create);
+    vi.mocked(authUtils.getValidLocaleFromUILocales).mockReturnValue(null);
+    vi.mocked(zitadel.getSecuritySettings).mockResolvedValue(undefined as any);
+
+    mockConstructUrl.mockImplementation((_req: any, path: string) => {
+      return new URL(`https://example.com${path}`);
+    });
+
+    // Pass the message init through so assertions can inspect the callback request.
+    mockCreate.mockImplementation((_schema: any, value: any) => value);
+
+    mockCreateCallback.mockResolvedValue({
+      callbackUrl: "https://client.example.com/callback?error=login_required",
+    });
+
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: [],
+        prompt: [Prompt.NONE],
+        loginHint: undefined,
+      },
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  async function expectLoginRequiredCallback(res: any) {
+    const { ErrorReason } = await import("@zitadel/proto/zitadel/oidc/v2/authorization_pb");
+
+    expect(mockCreateCallback).toHaveBeenCalledWith(
+      expect.objectContaining({
+        req: expect.objectContaining({
+          authRequestId: "abc123",
+          callbackKind: expect.objectContaining({
+            case: "error",
+            value: expect.objectContaining({ error: ErrorReason.LOGIN_REQUIRED }),
+          }),
+        }),
+      }),
+    );
+
+    expect(res.status).toBe(307);
+    expect(res.headers.get("location")).toBe("https://client.example.com/callback?error=login_required");
+  }
+
+  test("should redirect to the client with error=login_required when there is no session at all", async () => {
+    const res = await handleOIDCFlowInitiation(makeBaseParams({ sessions: [], sessionCookies: [] }));
+
+    await expectLoginRequiredCallback(res);
+    expect(res.headers.get("location")).not.toContain("/loginname");
+  });
+
+  test("should redirect to the client with error=login_required when no session is valid (stale session)", async () => {
+    mockFindValidSession.mockResolvedValue(null);
+
+    const res = await handleOIDCFlowInitiation(
+      makeBaseParams({
+        sessions: [existingSession] as any,
+        sessionCookies: [{ id: "session-1", token: "tok" }],
+      }),
+    );
+
+    await expectLoginRequiredCallback(res);
+    expect(res.status).not.toBe(400);
+  });
+
+  test("should redirect to the client with error=login_required when the session cookie is missing", async () => {
+    mockFindValidSession.mockResolvedValue(existingSession);
+
+    const res = await handleOIDCFlowInitiation(
+      makeBaseParams({
+        sessions: [existingSession] as any,
+        sessionCookies: [{ id: "other-session", token: "tok" }],
+      }),
+    );
+
+    await expectLoginRequiredCallback(res);
+  });
+
+  test("should still complete the flow with the session callback when a valid session exists", async () => {
+    mockFindValidSession.mockResolvedValue(existingSession);
+    mockCreateCallback.mockResolvedValue({
+      callbackUrl: "https://client.example.com/callback?code=abc",
+    });
+
+    const res = await handleOIDCFlowInitiation(
+      makeBaseParams({
+        sessions: [existingSession] as any,
+        sessionCookies: [{ id: "session-1", token: "tok" }],
+      }),
+    );
+
+    expect(mockCreateCallback).toHaveBeenCalledWith(
+      expect.objectContaining({
+        req: expect.objectContaining({
+          callbackKind: expect.objectContaining({ case: "session" }),
+        }),
+      }),
+    );
+    expect(res.headers.get("location")).toBe("https://client.example.com/callback?code=abc");
+  });
+
+  test("should fall back to a 400 when the error callback cannot be created", async () => {
+    mockFindValidSession.mockResolvedValue(null);
+    mockCreateCallback.mockRejectedValue(new Error("backend unavailable"));
+
+    const res = await handleOIDCFlowInitiation(makeBaseParams({ sessions: [], sessionCookies: [] }));
+
+    expect(res.status).toBe(400);
+    expect(res.headers.get("location")).toBeNull();
+  });
+});
