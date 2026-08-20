@@ -453,6 +453,26 @@ describe("sendLoginname", () => {
         expect(result).toEqual({ redirect: "https://idp.example.com/auth" });
       });
 
+      test("should forward the login name as the IDP loginHint when redirecting via a user-linked IDP", async () => {
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.IDP],
+        });
+        mockListIDPLinks.mockResolvedValue({
+          result: [{ idpId: "idp123" }],
+        });
+        mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+        await sendLoginname({
+          loginName: "user@example.com",
+        });
+
+        expect(mockStartIdentityProviderFlow).toHaveBeenCalledWith(
+          expect.objectContaining({
+            urls: expect.objectContaining({ loginHint: "user@example.com" }),
+          }),
+        );
+      });
+
       test("should redirect to password when no passkey or IDP, only password available and allowed", async () => {
         mockListAuthenticationMethodTypes.mockResolvedValue({
           authMethodTypes: [AuthenticationMethodType.PASSWORD],
@@ -649,6 +669,30 @@ describe("sendLoginname", () => {
       });
 
       expect(result).toEqual({ redirect: "https://idp.example.com/auth" });
+    });
+
+    test("should forward the login name as the IDP loginHint on single active IDP discovery", async () => {
+      // Regression test: the typed login hint must be forwarded to the
+      // external IdP (via RedirectURLs.loginHint) so it can prefill the
+      // username there, instead of being dropped on discovery-based redirects.
+      mockGetLoginSettings.mockResolvedValue({
+        allowRegister: false,
+        allowLocalAuthentication: false,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp123", type: "OIDC", options: { isAutoCreation: true } }],
+      });
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+      await sendLoginname({
+        loginName: "user@example.com",
+      });
+
+      expect(mockStartIdentityProviderFlow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          urls: expect.objectContaining({ loginHint: "user@example.com" }),
+        }),
+      );
     });
 
     test("should not redirect to IDP when single active IDP does not allow creation", async () => {
