@@ -209,7 +209,9 @@
         "PREVIOUS_TABLE": {
           "TITLE": "Kunci Web Sebelumnya",
           "DESCRIPTION": "Ini adalah kunci web sebelumnya yang tidak lagi aktif.",
-          "DEACTIVATED_ON": "Dinonaktifkan pada"
+          "DEACTIVATED_ON": "Dinonaktifkan pada",
+          "DELETE_TITLE": "Hapus Kunci Web Sebelumnya",
+          "DELETE_DESCRIPTION": "Menghapus kunci web sebelumnya ini akan membatalkan semua token yang ditandatangani dengannya. Tindakan ini tidak dapat dibatalkan."
         }
       },
       "MESSAGE_TEXTS": {
