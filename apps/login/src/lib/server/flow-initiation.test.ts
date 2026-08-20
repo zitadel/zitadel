@@ -812,6 +812,36 @@ describe("handleOIDCFlowInitiation — idp scope (urn:zitadel:iam:org:idp:id)", 
     expect(res.headers.get("location")).toBe("https://login.microsoftonline.com/tenant/oauth2/v2.0/authorize?client_id=xyz");
   });
 
+  test("should forward the auth request's loginHint to the scoped IdP flow", async () => {
+    const { IdentityProviderType } = await import("@zitadel/proto/zitadel/settings/v2/login_settings_pb");
+
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: ["urn:zitadel:iam:org:idp:id:idp-1"],
+        prompt: [],
+        loginHint: "user@example.com",
+      },
+    });
+
+    mockGetActiveIdentityProviders.mockResolvedValue({
+      identityProviders: [{ id: "idp-1", type: IdentityProviderType.AZURE_AD }],
+    });
+
+    mockStartIdentityProviderFlow.mockResolvedValue({
+      url: "https://login.microsoftonline.com/tenant/oauth2/v2.0/authorize?client_id=xyz",
+    });
+
+    await handleOIDCFlowInitiation(makeBaseParams({ sessions: [] }));
+
+    expect(mockStartIdentityProviderFlow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        urls: expect.objectContaining({ loginHint: "user@example.com" }),
+      }),
+    );
+  });
+
   test("should block unsafe IdP URLs with a 400 instead of redirecting or rendering a form", async () => {
     const { IdentityProviderType } = await import("@zitadel/proto/zitadel/settings/v2/login_settings_pb");
 
