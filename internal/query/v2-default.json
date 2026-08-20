@@ -6913,5 +6913,466 @@
       "tryagain": "Tentar Novamente",
       "couldNotContinueSession": "Não foi possível continuar a sessão — informações do usuário ausentes"
     }
+  },
+  "ro": {
+    "common": {
+      "back": "Înapoi",
+      "title": "Autentificare cu Zitadel"
+    },
+    "accounts": {
+      "title": "Conturi",
+      "description": "Selectați contul pe care doriți să îl utilizați.",
+      "addAnother": "Adăugați un alt cont",
+      "noResults": "Nu au fost găsite conturi",
+      "verified": "verificat",
+      "expired": "expirat"
+    },
+    "logout": {
+      "title": "Deconectare",
+      "description": "Faceți clic pe un cont pentru a încheia sesiunea",
+      "noResults": "Nu au fost găsite conturi",
+      "clear": "Încheiați sesiunea",
+      "verifiedAt": "Ultima activitate: {time}",
+      "success": {
+        "title": "Deconectare reușită",
+        "description": "V-ați deconectat cu succes."
+      }
+    },
+    "loginname": {
+      "title": "Bine ați revenit!",
+      "description": "Introduceți datele de autentificare.",
+      "register": "Înregistrați un utilizator nou",
+      "submit": "Continuați",
+      "labels": {
+        "loginname": "Nume de autentificare",
+        "username": "Nume de utilizator",
+        "usernameOrPhoneNumber": "Nume de utilizator sau număr de telefon",
+        "usernameOrEmail": "Nume de utilizator sau e-mail"
+      },
+      "required": {
+        "loginName": "Acest câmp este obligatoriu"
+      },
+      "errors": {
+        "internalError": "A apărut o eroare internă",
+        "couldNotGetLoginSettings": "Setările de autentificare nu au putut fi obținute",
+        "couldNotSearchUsers": "Căutarea utilizatorilor nu a reușit",
+        "couldNotGetDomain": "Domeniul nu a putut fi obținut",
+        "couldNotGetHost": "Gazda nu a putut fi obținută",
+        "couldNotStartIDPFlow": "Fluxul furnizorului de identitate nu a putut fi pornit",
+        "moreThanOneUserFound": "A fost găsit mai mult de un utilizator. Furnizați un identificator unic.",
+        "userNotFound": "Utilizatorul nu a fost găsit în sistem",
+        "couldNotCreateSession": "Sesiunea pentru utilizator nu a putut fi creată",
+        "initialUserNotSupported": "Utilizatorul inițial nu este acceptat",
+        "localAuthenticationNotAllowed": "Autentificarea locală nu este permisă! Contactați administratorul pentru mai multe informații.",
+        "passkeysNotAllowed": "Passkey-urile nu sunt permise! Contactați administratorul pentru mai multe informații.",
+        "couldNotFindIdentityProvider": "Furnizorul de identitate nu a putut fi găsit.",
+        "userNotActive": "Utilizatorul nu este activ. Contactați administratorul pentru mai multe informații."
+      }
+    },
+    "zitadel": {
+      "errors": {
+        "errorOccured": "A apărut o eroare",
+        "multipleUsersFound": "Au fost găsiți mai mulți utilizatori",
+        "userNotFound": "Utilizatorul nu a fost găsit în sistem"
+      }
+    },
+    "password": {
+      "verify": {
+        "title": "Parola",
+        "description": "Introduceți parola.",
+        "resetPassword": "Resetați parola",
+        "submit": "Continuați",
+        "labels": {
+          "password": "Parola"
+        },
+        "required": {
+          "password": "Acest câmp este obligatoriu"
+        },
+        "errors": {
+          "couldNotVerifyPassword": "Parola nu a putut fi verificată",
+          "couldNotResetPassword": "Parola nu a putut fi resetată"
+        },
+        "info": {
+          "passwordResetSent": "Parola a fost resetată. Verificați-vă e-mailul"
+        }
+      },
+      "set": {
+        "title": "Setați parola",
+        "description": "Setați parola pentru contul dvs.",
+        "codeSent": "Un cod nou a fost trimis la adresa dvs. de e-mail.",
+        "noCodeReceived": "Nu ați primit un cod?",
+        "resend": "Retrimiteți codul",
+        "submit": "Continuați",
+        "labels": {
+          "code": "Cod",
+          "newPassword": "Parolă nouă",
+          "confirmPassword": "Confirmați parola"
+        },
+        "required": {
+          "code": "Acest câmp este obligatoriu",
+          "newPassword": "Trebuie să furnizați o parolă!",
+          "confirmPassword": "Acest câmp este obligatoriu"
+        },
+        "errors": {
+          "couldNotSetPassword": "Parola nu a putut fi setată",
+          "couldNotResetPassword": "Parola nu a putut fi resetată",
+          "couldNotVerifyPassword": "Parola nu a putut fi verificată"
+        }
+      },
+      "change": {
+        "title": "Schimbați parola",
+        "description": "Setați parola pentru contul dvs.",
+        "submit": "Continuați",
+        "labels": {
+          "currentPassword": "Parola actuală",
+          "newPassword": "Parolă nouă",
+          "confirmPassword": "Confirmați parola"
+        },
+        "required": {
+          "currentPassword": "Trebuie să furnizați parola actuală!",
+          "newPassword": "Trebuie să furnizați o parolă nouă!",
+          "confirmPassword": "Acest câmp este obligatoriu"
+        },
+        "errors": {
+          "currentPasswordInvalid": "Parola actuală este incorectă.",
+          "couldNotChangePassword": "Parola nu a putut fi schimbată",
+          "couldNotVerifyPassword": "Parola nu a putut fi verificată",
+          "unknownError": "Eroare necunoscută"
+        }
+      },
+      "complexity": {
+        "length": "Trebuie să aibă cel puțin {minLength} caractere.",
+        "hasSymbol": "Trebuie să includă un simbol.",
+        "hasNumber": "Trebuie să includă un număr.",
+        "hasUppercase": "Trebuie să includă o literă mare.",
+        "hasLowercase": "Trebuie să includă o literă mică.",
+        "equals": "Confirmarea parolei se potrivește.",
+        "matches": "Se potrivește",
+        "doesNotMatch": "Nu se potrivește"
+      },
+      "errors": {
+        "noHostFound": "Nu a fost găsită nicio gazdă",
+        "couldNotSendResetLink": "Linkul de resetare a parolei nu a putut fi trimis",
+        "couldNotCreateSessionForUser": "Sesiunea pentru utilizator nu a putut fi creată",
+        "couldNotVerifyPassword": "Parola nu a putut fi verificată",
+        "failedToAuthenticate": "Autentificarea a eșuat. Ați folosit {failedAttempts} din {maxPasswordAttempts} încercări de parolă.{lockoutMessage}",
+        "failedToAuthenticateNoLimit": "Autentificarea a eșuat.",
+        "accountLockedContactAdmin": " Contactați administratorul pentru a vă debloca contul",
+        "userNotFound": "Utilizatorul nu a fost găsit în sistem",
+        "initialUserNotSupported": "Utilizatorul inițial nu este acceptat",
+        "userInitialStateNotSupported": "Starea inițială a utilizatorului nu este acceptată",
+        "codeOrVerificationRequired": "Trebuie să furnizați un cod sau să aveți o verificare valabilă a utilizatorului",
+        "verificationRequired": "Verificarea utilizatorului trebuie efectuată",
+        "couldNotLoadSession": "Sesiunea nu a putut fi încărcată",
+        "couldNotLoadAuthMethods": "Metodele de autentificare nu au putut fi încărcate",
+        "failedPrecondition": "Precondiție neîndeplinită",
+        "sessionNotValid": "Sesiunea nu este valabilă",
+        "passwordVerificationMissing": "Lipsește verificarea parolei.",
+        "passwordVerificationTooOld": "Verificarea parolei este prea veche. Verificați-vă parola din nou."
+      }
+    },
+    "idp": {
+      "title": "Autentificare cu SSO",
+      "description": "Selectați unul dintre furnizorii următori pentru a vă autentifica",
+      "orSignInWith": "sau autentificați-vă cu",
+      "signInWithApple": "Autentificare cu Apple",
+      "signInWithGoogle": "Autentificare cu Google",
+      "signInWithAzureAD": "Autentificare cu AzureAD",
+      "signInWithGithub": "Autentificare cu GitHub",
+      "signInWithGitlab": "Autentificare cu GitLab",
+      "loginError": {
+        "title": "Autentificarea a eșuat",
+        "description": "A apărut o eroare la încercarea de autentificare."
+      },
+      "linkingError": {
+        "title": "Asocierea contului a eșuat",
+        "description": "A apărut o eroare la încercarea de asociere a contului."
+      },
+      "completeRegister": {
+        "title": "Completați datele",
+        "description": "Trebuie să vă finalizați înregistrarea furnizând adresa de e-mail și numele."
+      },
+      "accountNotFound": {
+        "title": "Contul nu a fost găsit",
+        "description": "Nu am găsit un cont asociat cu datele dvs. de la furnizorul de identitate.",
+        "info": "Nu a fost găsit niciun cont existent. Autentificați-vă cu un cont existent sau contactați administratorul pentru asistență.",
+        "backToLogin": "Înapoi la autentificare"
+      },
+      "registrationFailed": {
+        "title": "Înregistrarea nu este disponibilă",
+        "description": "Nu am putut finaliza procesul de înregistrare.",
+        "info": "Organizația pentru înregistrare nu a putut fi determinată. Contactați administratorul pentru asistență.",
+        "backToLogin": "Înapoi la autentificare"
+      },
+      "processing": {
+        "message": "Se procesează autentificarea...",
+        "noRedirect": "Serverul nu a returnat nicio redirecționare sau eroare",
+        "unexpectedError": "A apărut o eroare neașteptată"
+      },
+      "errors": {
+        "missingParameters": "Lipsesc parametrii obligatorii",
+        "missingIdpInfo": "Lipsesc informațiile despre furnizorul de identitate",
+        "idpNotFound": "Furnizorul de identitate nu a fost găsit",
+        "linkingNotAllowed": "Asocierea nu este permisă pentru acest furnizor de identitate",
+        "linkingFailed": "Asocierea furnizorului de identitate cu contul a eșuat",
+        "autoLinkingFailed": "Asocierea automată a contului a eșuat",
+        "userCreationFailed": "Crearea contului de utilizator a eșuat",
+        "orgResolutionFailed": "Organizația pentru înregistrare nu a putut fi determinată",
+        "sessionCreationFailed": "Sesiunea nu a putut fi creată sau redirecționarea nu a putut fi determinată",
+        "unknownError": "A apărut o eroare necunoscută"
+      }
+    },
+    "ldap": {
+      "title": "Autentificare LDAP",
+      "description": "Introduceți datele dvs. de autentificare LDAP.",
+      "submit": "Continuați",
+      "labels": {
+        "username": "Nume de utilizator",
+        "password": "Parola"
+      },
+      "required": {
+        "username": "Acest câmp este obligatoriu",
+        "password": "Acest câmp este obligatoriu"
+      }
+    },
+    "mfa": {
+      "verify": {
+        "title": "Verificați-vă identitatea",
+        "description": "Alegeți unul dintre factorii următori.",
+        "noResults": "Nu există factori secunzi disponibili pentru configurare."
+      },
+      "set": {
+        "title": "Configurați autentificarea în 2 factori",
+        "description": "Alegeți unul dintre factorii secunzi următori.",
+        "skip": "Omiteți"
+      }
+    },
+    "otp": {
+      "verify": {
+        "title": "Verificați autentificarea în 2 factori",
+        "totpDescription": "Introduceți codul din aplicația de autentificare.",
+        "smsDescription": "Introduceți codul primit prin SMS.",
+        "emailDescription": "Introduceți codul primit prin e-mail.",
+        "noCodeReceived": "Nu ați primit un cod?",
+        "resendCode": "Retrimiteți codul",
+        "submit": "Continuați",
+        "labels": {
+          "code": "Cod"
+        },
+        "required": {
+          "code": "Acest câmp este obligatoriu"
+        }
+      },
+      "set": {
+        "title": "Configurați autentificarea în 2 factori",
+        "totpDescription": "Scanați codul QR cu aplicația de autentificare.",
+        "smsDescription": "Introduceți numărul de telefon pentru a primi un cod prin SMS.",
+        "emailDescription": "Introduceți adresa de e-mail pentru a primi un cod prin e-mail.",
+        "totpRegisterDescription": "Scanați codul QR sau accesați manual adresa URL.",
+        "submit": "Continuați",
+        "labels": {
+          "code": "Cod"
+        },
+        "required": {
+          "code": "Acest câmp este obligatoriu"
+        }
+      }
+    },
+    "passkey": {
+      "verify": {
+        "title": "Autentificare cu un passkey",
+        "description": "Dispozitivul dvs. vă va cere amprenta, fața sau codul de blocare a ecranului",
+        "usePassword": "Folosiți parola",
+        "submit": "Continuați",
+        "errors": {
+          "couldNotRequestChallenge": "Provocarea passkey nu a putut fi solicitată",
+          "couldNotVerifyPasskey": "Passkey-ul nu a putut fi verificat",
+          "noResponseReceived": "Verificarea passkey a eșuat - nu s-a primit niciun răspuns",
+          "noRedirectProvided": "Verificarea passkey a fost finalizată, dar nu a fost furnizată nicio redirecționare",
+          "couldNotRetrievePasskey": "A apărut o eroare la preluarea passkey-ului",
+          "verificationCancelled": "Verificarea passkey a fost anulată",
+          "verificationFailed": "A apărut o eroare în timpul verificării passkey",
+          "couldNotFindSession": "Sesiunea nu a putut fi găsită",
+          "couldNotUpdateSession": "Sesiunea nu a putut fi actualizată",
+          "userNotFound": "Utilizatorul nu a fost găsit în sistem",
+          "couldNotDetermineRedirect": "Adresa URL de redirecționare nu a putut fi determinată după verificarea passkey"
+        }
+      },
+      "set": {
+        "title": "Configurați un passkey",
+        "description": "Dispozitivul dvs. vă va cere amprenta, fața sau codul de blocare a ecranului",
+        "info": {
+          "description": "Un passkey este o metodă de autentificare pe un dispozitiv, cum ar fi amprenta, Apple FaceID sau similar. ",
+          "link": "Autentificare cu passkey"
+        },
+        "skip": "Omiteți",
+        "submit": "Continuați"
+      }
+    },
+    "u2f": {
+      "verify": {
+        "title": "Verificați autentificarea în 2 factori",
+        "description": "Verificați-vă contul cu dispozitivul dvs."
+      },
+      "set": {
+        "title": "Configurați autentificarea în 2 factori",
+        "description": "Configurați un dispozitiv ca factor secund.",
+        "submit": "Continuați"
+      }
+    },
+    "register": {
+      "methods": {
+        "passkey": "Passkey",
+        "password": "Parola"
+      },
+      "disabled": {
+        "title": "Înregistrare dezactivată",
+        "description": "Înregistrarea este dezactivată. Contactați administratorul."
+      },
+      "missingdata": {
+        "title": "Date lipsă",
+        "description": "Furnizați adresa de e-mail, prenumele și numele pentru a vă înregistra."
+      },
+      "title": "Înregistrare",
+      "description": "Creați-vă contul Zitadel.",
+      "noMethodAvailableWarning": "Nu este disponibilă nicio metodă de autentificare. Contactați administratorul.",
+      "selectMethod": "Selectați metoda cu care doriți să vă autentificați",
+      "agreeTo": "Pentru a vă înregistra trebuie să acceptați termenii și condițiile",
+      "termsOfService": "Termeni și condiții",
+      "privacyPolicy": "Politica de confidențialitate",
+      "submit": "Continuați",
+      "password": {
+        "title": "Setați parola",
+        "description": "Setați parola pentru contul dvs.",
+        "submit": "Continuați",
+        "labels": {
+          "password": "Parola",
+          "confirmPassword": "Confirmați parola"
+        },
+        "required": {
+          "password": "Trebuie să furnizați o parolă!",
+          "confirmPassword": "Acest câmp este obligatoriu"
+        }
+      },
+      "labels": {
+        "firstname": "Prenume",
+        "lastname": "Nume de familie",
+        "email": "E-mail"
+      },
+      "required": {
+        "firstname": "Acest câmp este obligatoriu",
+        "lastname": "Acest câmp este obligatoriu",
+        "email": "Acest câmp este obligatoriu"
+      },
+      "errors": {
+        "couldNotCreateUser": "Utilizatorul nu a putut fi creat",
+        "couldNotCreateSession": "Sesiunea nu a putut fi creată",
+        "userNotFound": "Utilizatorul nu a fost găsit în sistem",
+        "couldNotLinkIDP": "Furnizorul de identitate nu a putut fi asociat utilizatorului",
+        "couldNotRegisterUser": "Utilizatorul nu a putut fi înregistrat"
+      }
+    },
+    "invite": {
+      "title": "Invitați un utilizator",
+      "description": "Furnizați adresa de e-mail și numele utilizatorului pe care doriți să îl invitați.",
+      "info": "Utilizatorul va primi un e-mail cu instrucțiuni suplimentare.",
+      "notAllowed": "Setările dvs. nu vă permit să invitați utilizatori.",
+      "submit": "Continuați",
+      "success": {
+        "title": "Utilizator invitat",
+        "description": "E-mailul a fost trimis cu succes.",
+        "verified": "Utilizatorul a fost invitat și și-a verificat deja adresa de e-mail.",
+        "notVerifiedYet": "Utilizatorul a fost invitat. Va primi un e-mail cu instrucțiuni suplimentare.",
+        "submit": "Invitați un alt utilizator"
+      }
+    },
+    "signedin": {
+      "title": "Bun venit, {user}!",
+      "description": "Sunteți autentificat.",
+      "continue": "Continuați",
+      "error": {
+        "title": "Eroare",
+        "description": "A apărut o eroare la încercarea de autentificare."
+      }
+    },
+    "verify": {
+      "userIdMissing": "Nu a fost furnizat niciun userId!",
+      "successTitle": "Utilizator verificat",
+      "successDescription": "Utilizatorul a fost verificat cu succes.",
+      "successContinue": "Continuați",
+      "setupAuthenticator": "Configurați autentificatorul",
+      "verify": {
+        "title": "Verificați utilizatorul",
+        "description": "Introduceți codul furnizat în e-mailul de verificare.",
+        "noCodeReceived": "Nu ați primit un cod?",
+        "resendCode": "Retrimiteți codul",
+        "codeSent": "Un cod nou a fost trimis la adresa dvs. de e-mail.",
+        "submit": "Continuați",
+        "labels": {
+          "code": "Cod"
+        },
+        "required": {
+          "code": "Acest câmp este obligatoriu"
+        }
+      },
+      "errors": {
+        "couldNotResendEmail": "E-mailul nu a putut fi retrimis",
+        "couldNotVerifyUser": "Utilizatorul nu a putut fi verificat",
+        "couldNotVerifyInvite": "Invitația nu a putut fi verificată",
+        "couldNotVerifyEmail": "E-mailul nu a putut fi verificat",
+        "couldNotVerify": "Verificarea nu a reușit",
+        "couldNotLoadUser": "Utilizatorul nu a putut fi încărcat",
+        "couldNotLoadAuthenticators": "Autentificatorii posibili nu au putut fi încărcați",
+        "couldNotCreateSession": "Sesiunea nu a putut fi creată",
+        "noHostFound": "Nu a fost găsită nicio gazdă",
+        "userAlreadyVerified": "Utilizatorul este deja verificat!",
+        "couldNotResendInvite": "Invitația nu a putut fi retrimisă",
+        "inviteSendFailed": "Trimiterea e-mailului de invitație a eșuat",
+        "emailSendFailed": "Trimiterea e-mailului de verificare a eșuat",
+        "contextMissing": "A apărut o eroare. Încercați din nou."
+      }
+    },
+    "authenticator": {
+      "title": "Alegeți metoda de autentificare",
+      "description": "Selectați metoda cu care doriți să vă autentificați",
+      "noMethodsAvailable": "Nu există metode de autentificare disponibile",
+      "allSetup": "Ați configurat deja un autentificator!",
+      "linkWithIDP": "sau asociați cu un furnizor de identitate"
+    },
+    "device": {
+      "usercode": {
+        "title": "Cod de dispozitiv",
+        "description": "Introduceți codul afișat pe aplicația sau dispozitivul dvs.",
+        "submit": "Continuați",
+        "labels": {
+          "code": "Cod"
+        },
+        "required": {
+          "code": "Acest câmp este obligatoriu"
+        }
+      },
+      "request": {
+        "title": "{appName} dorește să se conecteze",
+        "description": "{appName} va avea acces la:",
+        "disclaimer": "Făcând clic pe Permiteți, permiteți {appName} și Zitadel să utilizeze informațiile dvs. în conformitate cu termenii de utilizare și politicile de confidențialitate respective. Puteți revoca acest acces în orice moment.",
+        "submit": "Permiteți",
+        "deny": "Refuzați"
+      },
+      "scope": {
+        "openid": "Să vă verifice identitatea.",
+        "email": "Să vă vadă adresa de e-mail.",
+        "profile": "Să vadă toate informațiile din profilul dvs.",
+        "offline_access": "Să acceseze contul dvs. offline."
+      }
+    },
+    "error": {
+      "noUserCode": "Nu a fost furnizat niciun cod de utilizator!",
+      "noDeviceRequest": "Nu a fost găsită nicio cerere de dispozitiv.",
+      "unknownContext": "Contextul utilizatorului nu a putut fi obținut. Asigurați-vă că introduceți mai întâi numele de utilizator sau că furnizați un loginName ca parametru de căutare.",
+      "sessionExpired": "Sesiunea dvs. actuală a expirat. Autentificați-vă din nou.",
+      "failedLoading": "Încărcarea datelor a eșuat. Încercați din nou.",
+      "tryagain": "Încercați din nou",
+      "couldNotContinueSession": "Nu s-a putut continua cu sesiunea - lipsesc informațiile despre utilizator"
+    }
   }
 }
