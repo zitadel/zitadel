@@ -1,0 +1,67 @@
+InitCode:
+  Title: "Zitadel - Inicialitzar usuari"
+  PreHeader: "Inicialitzar usuari"
+  Subject: "Inicialitzar usuari"
+  Greeting: "Hola {{.DisplayName}},"
+  Text: "Aquest usuari s'ha creat a Zitadel. Utilitza el nom d'usuari {{.PreferredLoginName}} per iniciar la sessió. Si us plau, fes clic al botó de més avall per finalitzar el procés d'inicialització. (Codi {{.Code}}) Si no has sol·licitat aquest correu electrònic, si us plau, ignora'l."
+  ButtonText: "Finalitzar la inicialització"
+PasswordReset:
+  Title: "Zitadel - Restablir la contrasenya"
+  PreHeader: "Restablir la contrasenya"
+  Subject: "Restablir la contrasenya"
+  Greeting: "Hola {{.DisplayName}},"
+  Text: "Hem rebut una sol·licitud de restabliment de contrasenya. Si us plau, utilitza el botó de més avall per restablir la teva contrasenya. (Codi {{.Code}}) Si no has sol·licitat aquest correu electrònic, si us plau, ignora'l."
+  ButtonText: "Restablir la contrasenya"
+VerifyEmail:
+  Title: "Zitadel - Verificar el correu electrònic"
+  PreHeader: "Verificar el correu electrònic"
+  Subject: "Verificar el correu electrònic"
+  Greeting: "Hola {{.DisplayName}},"
+  Text: "S'ha afegit una nova adreça de correu electrònic. Si us plau, utilitza el botó de més avall per verificar el teu correu electrònic. (Codi {{.Code}}) Si no has afegit cap adreça de correu electrònic nova, si us plau, ignora aquest correu."
+  ButtonText: "Verificar el correu electrònic"
+VerifyPhone:
+  Title: "Zitadel - Verificar el telèfon"
+  PreHeader: "Verificar el telèfon"
+  Subject: "Verificar el telèfon"
+  Greeting: "Hola {{.DisplayName}},"
+  Text: "S'ha afegit un nou número de telèfon. Si us plau, utilitza el codi següent per verificar-lo {{.Code}}"
+  ButtonText: "Verificar el telèfon"
+VerifyEmailOTP:
+  Title: "Zitadel - Verifica l'OTP"
+  PreHeader: "Verifica l'OTP"
+  Subject: "Verifica l'OTP"
+  Greeting: "Hola {{.DisplayName}},"
+  Text: "Si us plau, utilitza el botó 'Autenticar' o copia l'OTP {{.OTP}} i enganxa'l a la pantalla d'autenticació per autenticar-te a Zitadel durant els pròxims cinc minuts."
+  ButtonText: "Autenticar"
+VerifySMSOTP:
+  Text: |-
+    {{.OTP}} és el vostre OTP per a {{ .Domain }}. Feu-lo servir dins dels pròxims {{.Expiry}}.
+    @{{.Domain}} #{{.OTP}}
+DomainClaimed:
+  Title: "Zitadel - S'ha reclamat un domini"
+  PreHeader: "Canviar l'adreça de correu electrònic / el nom d'usuari"
+  Subject: "S'ha reclamat un domini"
+  Greeting: "Hola {{.DisplayName}},"
+  Text: "El domini {{.Domain}} ha estat reclamat per una organització. El teu usuari actual {{.Username}} no forma part d'aquesta organització. Per tant, hauràs de canviar la teva adreça de correu electrònic quan iniciïs la sessió. Hem creat un nom d'usuari temporal ({{.TempUsername}}) per a aquest inici de sessió."
+  ButtonText: "Iniciar la sessió"
+PasswordlessRegistration:
+  Title: "Zitadel - Afegir inici de sessió sense contrasenya"
+  PreHeader: "Afegir inici de sessió sense contrasenya"
+  Subject: "Afegir inici de sessió sense contrasenya"
+  Greeting: "Hola {{.DisplayName}},"
+  Text: "Hem rebut una sol·licitud per afegir un testimoni per iniciar la sessió sense contrasenya. Si us plau, utilitza el botó de més avall per afegir el teu testimoni o dispositiu per a un inici de sessió sense contrasenya."
+  ButtonText: "Afegir inici de sessió sense contrasenya"
+PasswordChange:
+  Title: "Zitadel - La contrasenya de l'usuari s'ha canviat"
+  PreHeader: "Canviar la contrasenya"
+  Subject: "La contrasenya de l'usuari s'ha canviat"
+  Greeting: "Hola {{.DisplayName}},"
+  Text: "La contrasenya del teu usuari s'ha canviat; si aquest canvi no l'has fet tu, si us plau, restableix immediatament la teva contrasenya."
+  ButtonText: "Iniciar la sessió"
+InviteUser:
+  Title: "Invitació a {{.ApplicationName}}"
+  PreHeader: "Invitació a {{.ApplicationName}}"
+  Subject: "Invitació a {{.ApplicationName}}"
+  Greeting: "Hola {{.DisplayName}},"
+  Text: "El teu usuari ha estat convidat a {{.ApplicationName}}. Fes clic al botó de sota per finalitzar el procés d'invitació. Si no has sol·licitat aquest correu electrònic, si us plau, ignora'l."
+  ButtonText: "Acceptar la invitació"

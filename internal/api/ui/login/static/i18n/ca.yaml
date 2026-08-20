@@ -1,0 +1,522 @@
+Login:
+  Title: Hola de nou!
+  Description: Introdueix les teves dades d'inici de sessió.
+  TitleLinking: Inici de sessió per vincular un usuari
+  DescriptionLinking: Introdueix les teves dades d'inici de sessió per vincular el teu usuari extern amb un usuari.
+  LoginNameLabel: Nom d'inici de sessió
+  UsernamePlaceHolder: username
+  LoginnamePlaceHolder: username@domini
+  ExternalUserDescription: Inicia la sessió amb un usuari extern.
+  MustBeMemberOfOrg: L'usuari ha de ser membre de l'organització {{.OrgName}}.
+  RegisterButtonText: registrar
+  NextButtonText: següent
+
+LDAP:
+  Title: Inici de sessió
+  Description: Introdueix les teves dades d'inici de sessió.
+  LoginNameLabel: Nom d'inici de sessió
+  PasswordLabel: Contrasenya
+  NextButtonText: següent
+
+SelectAccount:
+  Title: Selecciona un compte
+  Description: Utilitza el teu compte
+  TitleLinking: Selecciona el teu compte per vincular l'usuari
+  DescriptionLinking: Selecciona el teu compte per vincular-lo amb el teu usuari extern.
+  OtherUser: Un altre usuari
+  SessionState0: actiu
+  SessionState1: S'ha tancat la sessió
+  MustBeMemberOfOrg: L'usuari ha de ser membre de l'organització {{.OrgName}}.
+
+Password:
+  Title: Contrasenya
+  Description: Introdueix les teves dades d'accés.
+  PasswordLabel: Contrasenya
+  MinLength: Ha de tenir com a mínim
+  MinLengthp2: caràcters de longitud.
+  MaxLength: Ha de tenir menys de 70 caràcters de longitud.
+  HasUppercase: Ha d'incloure una lletra majúscula.
+  HasLowercase: Ha d'incloure una lletra minúscula.
+  HasNumber: Ha d'incloure un número.
+  HasSymbol: Ha d'incloure un símbol.
+  Confirmation: La confirmació de la contrasenya coincideix.
+  ResetLinkText: Restableix la contrasenya
+  BackButtonText: Enrere
+  NextButtonText: Següent
+
+UsernameChange:
+  Title: Canvia el nom d'usuari
+  Description: Introdueix el teu nou nom d'usuari
+  UsernameLabel: Nom d'usuari
+  CancelButtonText: cancel·lar
+  NextButtonText: següent
+
+UsernameChangeDone:
+  Title: Nom d'usuari canviat
+  Description: El teu nom d'usuari s'ha canviat correctament.
+  NextButtonText: següent
+
+InitPassword:
+  Title: Estableix la contrasenya
+  Description: Hauràs rebut un codi, que caldrà que introdueixis en el camp següent, per establir la teva nova contrasenya.
+  CodeLabel: Codi
+  NewPasswordLabel: Nova contrasenya
+  NewPasswordConfirmLabel: Confirma la contrasenya
+  ResendButtonText: reenviar el codi
+  NextButtonText: següent
+
+InitPasswordDone:
+  Title: Contrasenya establerta
+  Description: La contrasenya s'ha establert correctament
+  NextButtonText: següent
+  CancelButtonText: cancel·lar
+
+InitUser:
+  Title: Activa l'usuari
+  Description: Verifica el teu correu electrònic amb el codi següent i estableix la teva contrasenya.
+  CodeLabel: Codi
+  NewPasswordLabel: Nova contrasenya
+  NewPasswordConfirm: Confirma la contrasenya
+  NextButtonText: següent
+  ResendButtonText: reenviar el codi
+
+InitUserDone:
+  Title: Usuari activat
+  Description: Correu electrònic verificat i contrasenya establerta correctament
+  NextButtonText: següent
+  CancelButtonText: cancel·lar
+
+InviteUser:
+  Title: Activa l'usuari
+  Description: Verifica el teu correu electrònic amb el codi següent i estableix la teva contrasenya.
+  CodeLabel: Codi
+  NewPasswordLabel: Nova contrasenya
+  NewPasswordConfirm: Confirma la contrasenya
+  NextButtonText: següent
+  ResendButtonText: reenviar el codi
+
+InitMFAPrompt:
+  Title: Configuració de doble factor
+  Description: L'autenticació de doble factor et proporciona seguretat addicional per al teu compte d'usuari. Això assegura que només tu tens accés al teu compte.
+  Provider0: Aplicació autenticadora (p. ex. Google/Microsoft Authenticator, Authy)
+  Provider1: Dependent d'un dispositiu (p. ex. FaceID, Windows Hello, empremta digital)
+  Provider3: OTP per SMS
+  Provider4: OTP per correu electrònic
+  NextButtonText: següent
+  SkipButtonText: ometre
+
+InitMFAOTP:
+  Title: Verificació de doble factor
+  Description: Crea el teu doble factor d'autenticació. Descarrega una aplicació autenticadora si encara no en tens cap.
+  OTPDescription: Escaneja el codi amb la teva aplicació autenticadora (p. ex. Google/Microsoft Authenticator, Authy) o copia el secret i insereix el codi generat més avall.
+  SecretLabel: Secret
+  CodeLabel: Codi
+  NextButtonText: següent
+  CancelButtonText: cancel·lar
+
+InitMFAOTPSMS:
+  Title: Verificació de doble factor
+  DescriptionPhone: Crea el teu doble factor d'autenticació. Introdueix el teu número de telèfon per verificar-lo.
+  DescriptionCode: Crea el teu doble factor d'autenticació. Introdueix el codi rebut per verificar el teu número de telèfon.
+  CountryCodeLabel: País
+  PhoneLabel: Número de telèfon
+  CodeLabel: Codi
+  EditButtonText: editar
+  ResendButtonText: reenviar el codi
+  NextButtonText: següent
+
+InitMFAU2F:
+  Title: Afegeix una clau de seguretat
+  Description: Una clau de seguretat és un mètode de verificació que es pot integrar en el teu telèfon mòbil, amb Bluetooth, o connectant-la directament al port USB del teu ordinador.
+  TokenNameLabel: Nom de la clau de seguretat / dispositiu
+  NotSupported: El teu navegador no admet WebAuthN. Assegura't que està actualitzat o utilitza'n un altre (p. ex. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Afegeix una clau de seguretat
+  ErrorRetry: Torna-ho a provar, crea un nou repte (challenge) o tria un altre mètode.
+
+InitMFADone:
+  Title: Clau de seguretat verificada
+  Description: Genial! Acabes de configurar correctament el teu doble factor i has fet que el teu compte sigui més segur. El doble factor s'haurà d'introduir en cada inici de sessió.
+  NextButtonText: següent
+  CancelButtonText: cancel·lar
+
+MFAProvider:
+  Provider0: Aplicació autenticadora (p. ex. Google/Microsoft Authenticator, Authy)
+  Provider1: Dependent d'un dispositiu (p. ex. FaceID, Windows Hello, empremta digital)
+  Provider3: OTP per SMS
+  Provider4: OTP per correu electrònic
+  ChooseOther: o tria una altra opció
+
+VerifyMFAOTP:
+  Title: Verifica el doble factor
+  Description: Verifica el teu doble factor
+  CodeLabel: Codi
+  NextButtonText: següent
+
+VerifyOTP:
+  Title: Verifica el doble factor
+  Description: Verifica el teu doble factor
+  CodeLabel: Codi
+  ResendButtonText: reenviar el codi
+  NextButtonText: següent
+
+VerifyMFAU2F:
+  Title: Verificació de doble factor
+  Description: Verifica el teu doble factor d'autenticació amb el dispositiu registrat (p. ex. FaceID, Windows Hello, empremta digital)
+  NotSupported: El teu navegador no admet WebAuthN. Assegura't que està actualitzat o utilitza'n un altre (p. ex. Chrome, Safari, Firefox)
+  ErrorRetry: Torna-ho a provar, crea una nova petició o tria un altre mètode.
+  ValidateTokenButtonText: Verifica el doble factor
+
+Passwordless:
+  Title: Inici de sessió sense contrasenya
+  Description: Inicia la sessió amb els mètodes d'autenticació que proporciona el teu dispositiu, com FaceID, Windows Hello o la teva empremta digital.
+  NotSupported: El teu navegador no admet WebAuthN. Assegura't que està actualitzat o utilitza'n un altre (p. ex. Chrome, Safari, Firefox)
+  ErrorRetry: Torna-ho a provar, crea un nou repte (challenge) o tria un altre mètode.
+  LoginWithPwButtonText: Inici de sessió amb contrasenya
+  ValidateTokenButtonText: Inici de sessió sense contrasenya
+
+PasswordlessPrompt:
+  Title: Configuració de l'accés sense contrasenya
+  Description: Vols configurar el teu inici de sessió sense contrasenya? (mètodes d'autenticació del teu dispositiu com FaceID, Windows Hello o la teva empremta digital)
+  DescriptionInit: Cal que configuris el teu inici de sessió sense contrasenya. Utilitza l'enllaç que se t'ha proporcionat per registrar el teu dispositiu.
+  PasswordlessButtonText: Endavant amb l'inici sense contrasenya
+  NextButtonText: següent
+  SkipButtonText: ometre
+
+PasswordlessRegistration:
+  Title: Configuració de l'accés sense contrasenya
+  Description: Afegeix el teu mitjà d'autenticació indicant un nom (p. ex. ElMeuMòbil, MacBook, etc.) i després fes clic al botó 'Registra l'accés sense contrasenya'.
+  TokenNameLabel: Nom del dispositiu
+  NotSupported: El teu navegador no admet WebAuthN. Assegura't que està actualitzat o utilitza'n un altre (p. ex. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Registra l'accés sense contrasenya
+  ErrorRetry: Torna-ho a provar, crea un nou repte (challenge) o tria un altre mètode.
+
+PasswordlessRegistrationDone:
+  Title: Configuració de l'accés sense contrasenya
+  Description: S'ha afegit correctament el dispositiu per iniciar la sessió sense contrasenya.
+  DescriptionClose: Ja pots tancar aquesta finestra.
+  NextButtonText: següent
+  CancelButtonText: cancel·lar
+
+PasswordChange:
+  Title: Canvia la contrasenya
+  Description: Canvia la teva contrasenya. Introdueix la teva contrasenya anterior i la nova.
+  ExpiredDescription: La teva contrasenya ha caducat i l'has de canviar. Introdueix la teva contrasenya anterior i la nova.
+  OldPasswordLabel: Contrasenya anterior
+  NewPasswordLabel: Nova contrasenya
+  NewPasswordConfirmLabel: Confirmació de la contrasenya
+  CancelButtonText: cancel·lar
+  NextButtonText: següent
+  Footer: Peu
+
+PasswordChangeDone:
+  Title: Canvia la contrasenya
+  Description: La teva contrasenya s'ha canviat correctament.
+  NextButtonText: següent
+
+PasswordResetDone:
+  Title: S'ha enviat un enllaç per restablir la contrasenya
+  Description: Comprova el teu correu electrònic per restablir la contrasenya.
+  NextButtonText: següent
+
+EmailVerification:
+  Title: Verificació del correu electrònic
+  Description: T'hem enviat un correu electrònic per verificar la teva adreça. Introdueix el codi en el camp següent.
+  CodeLabel: Codi
+  NextButtonText: següent
+  ResendButtonText: reenviar el codi
+
+EmailVerificationDone:
+  Title: Verificació del correu electrònic
+  Description: La teva adreça de correu electrònic s'ha verificat correctament.
+  NextButtonText: següent
+  CancelButtonText: cancel·lar
+  LoginButtonText: iniciar la sessió
+
+RegisterOption:
+  Title: Opcions de registre
+  Description: Tria com vols registrar-te
+  RegisterUsernamePasswordButtonText: Amb nom d'usuari i contrasenya
+  ExternalLoginDescription: o registra't amb un usuari extern
+  LoginButtonText: iniciar la sessió
+
+RegistrationUser:
+  Title: Registre
+  Description: Introdueix les teves dades d'usuari. El teu correu electrònic s'utilitzarà com a nom d'inici de sessió.
+  DescriptionOrgRegister: Introdueix les teves dades d'usuari.
+  EmailLabel: Correu electrònic
+  UsernameLabel: Nom d'usuari
+  FirstnameLabel: Nom
+  LastnameLabel: Cognoms
+  LanguageLabel: Idioma
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Catalan: Català
+  GenderLabel: Gènere
+  Female: Dona
+  Male: Home
+  Diverse: Divers / X
+  PasswordLabel: Contrasenya
+  PasswordConfirmLabel: Confirmació de la contrasenya
+  TosAndPrivacyLabel: Termes i condicions
+  TosConfirm: Accepto els
+  TosLinkText: TdS
+  PrivacyConfirm: Accepto la
+  PrivacyLinkText: política de privacitat
+  ExternalLogin: o registra't amb un usuari extern
+  BackButtonText: inici de sessió
+  NextButtonText: següent
+
+ExternalRegistrationUserOverview:
+  Title: Registre d'usuaris externs
+  Description: Hem obtingut les dades del teu usuari del proveïdor seleccionat. Ara les pots modificar o completar.
+  EmailLabel: Correu electrònic
+  UsernameLabel: Nom d'usuari
+  FirstnameLabel: Nom
+  LastnameLabel: Cognoms
+  NicknameLabel: Sobrenom
+  PhoneLabel: Número de telèfon
+  LanguageLabel: Idioma
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Catalan: Català
+  TosAndPrivacyLabel: Termes i condicions
+  TosConfirm: Accepto els
+  TosLinkText: TdS
+  PrivacyConfirm: Accepto la
+  PrivacyLinkText: política de privacitat
+  ExternalLogin: o registra't amb un usuari extern
+  BackButtonText: enrere
+  NextButtonText: guardar
+
+RegistrationOrg:
+  Title: Registre d'organització
+  Description: Introdueix el nom de la teva organització i les teves dades d'usuari.
+  OrgNameLabel: Nom de l'organització
+  EmailLabel: Correu electrònic
+  UsernameLabel: Nom d'usuari
+  FirstnameLabel: Nom
+  LastnameLabel: Cognoms
+  PasswordLabel: Contrasenya
+  PasswordConfirmLabel: Confirmació de la contrasenya
+  TosAndPrivacyLabel: Termes i condicions
+  TosConfirm: Accepto els
+  TosLinkText: TdS
+  PrivacyConfirm: Accepto la
+  PrivacyLinkText: política de privacitat
+  SaveButtonText: Crea l'organització
+
+LoginSuccess:
+  Title: La sessió s'ha iniciat correctament
+  AutoRedirectDescription: Se't redirigirà automàticament a la teva aplicació. Si no fos així, fes clic al botó següent. Després pots tancar aquesta finestra.
+  RedirectedDescription: Ja pots tancar aquesta finestra.
+  NextButtonText: següent
+
+LogoutDone:
+  Title: Has tancat la sessió
+  Description: Has tancat la sessió correctament.
+  LoginButtonText: iniciar la sessió
+
+LinkingUserPrompt:
+  Title: S'ha trobat un usuari existent
+  Description: "Vols vincular el teu compte existent?"
+  LinkButtonText: Vincular
+  OtherButtonText: Altres opcions
+
+LinkingUsersDone:
+  Title: Vinculació d'usuari
+  Description: usuari vinculat correctament.
+  CancelButtonText: cancel·lar
+  NextButtonText: següent
+
+ExternalNotFound:
+  Title: Usuari extern no trobat
+  Description: No s'ha trobat l'usuari extern. Vols vincular el teu usuari o registrar-ne un de nou automàticament?
+  LinkButtonText: Vincular
+  AutoRegisterButtonText: registrar
+  TosAndPrivacyLabel: Termes i condicions
+  TosConfirm: Accepto els
+  TosLinkText: TdS
+  PrivacyConfirm: Accepto la
+  PrivacyLinkText: política de privacitat
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Catalan: Català
+
+Footer:
+  PoweredBy: Powered By
+  Tos: TdS
+  PrivacyPolicy: Política de privacitat
+  Help: Ajuda
+  SupportEmail: Correu electrònic de suport
+
+SignIn: Inicia la sessió amb {{.Provider}}
+
+Errors:
+  Internal: S'ha produït un error intern
+  AuthRequest:
+    NotFound: No s'ha pogut trobar la petició d'autenticació (authrequest)
+    UserAgentNotCorresponding: El User Agent no es correspon
+    UserAgentNotFound: No s'ha trobat l'ID del User Agent
+    TokenNotFound: No s'ha trobat el Token
+    RequestTypeNotSupported: El tipus de petició no està admès
+    MissingParameters: Falten paràmetres obligatoris
+  User:
+    NotFound: No s'ha pogut trobar l'usuari
+    AlreadyExists: L'usuari ja existeix
+    Inactive: L'usuari està inactiu
+    NotFoundOnOrg: No s'ha pogut trobar l'usuari en l'organització escollida
+    NotAllowedOrg: L'usuari no és membre de l'organització requerida
+    NotMatchingUserID: L'usuari i l'usuari contingut en la petició d'autenticació (authrequest) no coincideixen
+    UserIDMissing: L'ID d'usuari és buit
+    Invalid: Dades d'usuari no vàlides
+    DomainNotAllowedAsUsername: El domini ja està reservat i no es pot utilitzar
+    NotAllowedToLink: L'usuari no està autoritzat a vincular-se amb un proveïdor d'inici de sessió extern
+    Profile:
+      NotFound: Perfil no trobat
+      NotChanged: El perfil no ha canviat
+      Empty: El perfil és buit
+      FirstNameEmpty: El nom del perfil és buit
+      LastNameEmpty: El cognom del perfil és buit
+      IDMissing: Falta l'ID del perfil
+    Email:
+      NotFound: Correu electrònic no trobat
+      Invalid: El correu electrònic no és vàlid
+      AlreadyVerified: El correu electrònic ja s'ha verificat
+      NotChanged: El correu electrònic no ha canviat
+      Empty: El correu electrònic és buit
+      IDMissing: Falta l'ID del correu electrònic
+    Phone:
+      NotFound: Telèfon no trobat
+      Invalid: El telèfon no és vàlid
+      AlreadyVerified: El telèfon ja s'ha verificat
+      Empty: El telèfon és buit
+      NotChanged: El telèfon no ha canviat
+    Address:
+      NotFound: Adreça no trobada
+      NotChanged: L'adreça no ha canviat
+    Username:
+      AlreadyExists: El nom d'usuari ja està agafat
+      Reserved: El nom d'usuari ja està agafat
+      Empty: El nom d'usuari és buit
+    Password:
+      ConfirmationWrong: La confirmació de la contrasenya és incorrecta
+      Empty: La contrasenya és buida
+      Invalid: La contrasenya no és vàlida
+      InvalidAndLocked: La contrasenya no és vàlida i l'usuari està bloquejat, contacta amb el teu administrador.
+      NotChanged: La nova contrasenya no pot coincidir amb la contrasenya actual
+    UsernameOrPassword:
+      Invalid: El nom d'usuari o la contrasenya no són vàlids
+    PasswordComplexityPolicy:
+      NotFound: No s'ha trobat cap política de contrasenyes
+      MinLength: La contrasenya és massa curta
+      HasLower: La contrasenya ha de contenir una lletra minúscula
+      HasUpper: La contrasenya ha de contenir una lletra majúscula
+      HasNumber: La contrasenya ha de contenir un número
+      HasSymbol: La contrasenya ha de contenir un símbol
+    Code:
+      Expired: El codi ha caducat
+      Invalid: El codi no és vàlid
+      Empty: El codi és buit
+      CryptoCodeNil: El codi criptogràfic és nul
+      NotFound: No s'ha pogut trobar el codi
+      GeneratorAlgNotSupported: Algorisme de generació no admès
+    EmailVerify:
+      UserIDEmpty: L'ID d'usuari és buit
+    ExternalData:
+      CouldNotRead: No s'han pogut llegir correctament les dades externes
+    MFA:
+      NoProviders: No hi ha proveïdors multifactor disponibles
+      OTP:
+        AlreadyReady: El multifactor OTP (OneTimePassword) ja està configurat
+        NotExisting: El multifactor OTP (OneTimePassword) no existeix
+        InvalidCode: Codi no vàlid
+        NotReady: El multifactor OTP (OneTimePassword) no està a punt
+    Locked: L'usuari està bloquejat
+    SomethingWentWrong: Alguna cosa ha anat malament
+    NotActive: L'usuari no està actiu
+    ExternalIDP:
+      IDPTypeNotImplemented: El tipus d'IDP no està implementat
+      NotAllowed: El proveïdor d'inici de sessió extern no està permès
+      IDPConfigIDEmpty: L'ID del proveïdor d'identitat és buit
+      ExternalUserIDEmpty: L'ID d'usuari extern és buit
+      UserDisplayNameEmpty: El nom mostrat de l'usuari és buit
+      NoExternalUserData: No s'han rebut dades de l'usuari extern
+      CreationNotAllowed: La creació d'un nou usuari no està permesa per a aquest proveïdor
+      LinkingNotAllowed: La vinculació d'un usuari no està permesa per a aquest proveïdor
+      NoOptionAllowed: Ni la creació ni la vinculació estan permeses en aquest proveïdor. Posa't en contacte amb el teu administrador.
+      LoginFailedSwitchLocal: |
+        Error en iniciar la sessió al proveïdor d'identitat extern. Es torna a l'inici de sessió local.
+        
+        Detalls de l'error: {{.Details}}
+    GrantRequired: L'inici de sessió no és possible. Es requereix que l'usuari tingui com a mínim una concessió sobre l'aplicació. Contacta amb el teu administrador.
+    ProjectRequired: L'inici de sessió no és possible. L'organització de l'usuari ha de tenir l'accés concedit per al projecte. Contacta amb el teu administrador.
+  IdentityProvider:
+    InvalidConfig: La configuració del proveïdor d'identitats no és vàlida
+  IAM:
+    LockoutPolicy:
+      NotExisting: No existeix cap política de bloqueig
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: El registre no està permès
+
+optional: (opcional)
