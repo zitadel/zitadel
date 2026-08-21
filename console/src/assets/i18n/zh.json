@@ -2205,6 +2205,10 @@
       "TITLE": "创建身份提供者",
       "DESCRIPTION": "选择以下一个或多个身份提供者。",
       "STEPPERTITLE": "创建身份提供者",
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "输入所需数据，以允许其他 ZITADEL 实例的用户进行身份验证。"
+      },
       "OIDC": {
         "TITLE": "OIDC 身份提供者",
         "DESCRIPTION": "输入你的 OIDC 供应商的必要数据。"
@@ -2322,6 +2326,10 @@
     "STATE": "状态",
     "ISSUER": "Issuer",
     "SCOPESLIST": "Scopes List",
+    "INSTANCEROLESINFO": "实例角色映射",
+    "INSTANCEROLESINFO_DESC": "通过此提供者进行身份验证的用户将获得他们在远程 ZITADEL 实例的所列组织中拥有的实例成员角色（IAM_ 前缀）。组织 ID 和主域名必须同时匹配。",
+    "ORGANIZATIONID": "组织 ID",
+    "ORGANIZATIONDOMAIN": "组织域名",
     "CLIENTID": "Client ID",
     "CLIENTSECRET": "Client Secret",
     "LDAPCONNECTION": "联系",
