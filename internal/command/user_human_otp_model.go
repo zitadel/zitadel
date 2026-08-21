@@ -90,6 +90,11 @@ func (wm *HumanTOTPWriteModel) Query() *eventstore.SearchQueryBuilder {
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
 	}
+	// checkTOTP rechecks the same write model for events which arrived during the
+	// code verification. Bound the query so only those are reduced again.
+	if wm.ProcessedSequence != 0 {
+		query.SequenceGreater(wm.ProcessedSequence)
+	}
 	return query
 }
 
