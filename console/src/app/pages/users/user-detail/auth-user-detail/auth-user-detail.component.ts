@@ -35,9 +35,7 @@ import { LoginPolicy } from '@zitadel/proto/zitadel/policy_pb';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 
 type MetadataQuery =
-  | { state: 'success'; value: Metadata[] }
-  | { state: 'loading'; value: Metadata[] }
-  | { state: 'error'; error: any };
+  { state: 'success'; value: Metadata[] } | { state: 'loading'; value: Metadata[] } | { state: 'error'; error: any };
 
 type UserWithHumanType = Omit<User, 'type'> & { type: { case: 'human'; value: HumanUser } };
 
