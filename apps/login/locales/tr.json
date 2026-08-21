@@ -9,7 +9,8 @@
     "addAnother": "Başka hesap ekle",
     "noResults": "Hesap bulunamadı",
     "verified": "doğrulandı",
-    "expired": "süresi doldu"
+    "expired": "süresi doldu",
+    "reauthRequired": "Devam etmek için tekrar giriş yapın"
   },
   "logout": {
     "title": "Çıkış",

@@ -9,7 +9,8 @@
     "addAnother": "Másik fiók hozzáadása",
     "noResults": "Nem található fiók",
     "verified": "ellenőrizve",
-    "expired": "lejárt"
+    "expired": "lejárt",
+    "reauthRequired": "A folytatáshoz jelentkezzen be újra"
   },
   "logout": {
     "title": "Kijelentkezés",

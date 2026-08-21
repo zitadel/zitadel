@@ -9,7 +9,8 @@
     "addAnother": "別のアカウントを追加",
     "noResults": "アカウントが見つかりません",
     "verified": "認証済み",
-    "expired": "期限切れ"
+    "expired": "期限切れ",
+    "reauthRequired": "続行するには再度サインインしてください"
   },
   "logout": {
     "title": "ログアウト",

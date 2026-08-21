@@ -9,7 +9,8 @@
     "addAnother": "Nog een account toevoegen",
     "noResults": "Geen accounts gevonden",
     "verified": "geverifieerd",
-    "expired": "verlopen"
+    "expired": "verlopen",
+    "reauthRequired": "Log opnieuw in om door te gaan"
   },
   "logout": {
     "title": "Uitloggen",

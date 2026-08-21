@@ -121,6 +121,26 @@ export async function loginWithSAMLAndSession({
             params.append("organization", selectedSession.factors?.user?.organizationId);
           }
           return { redirect: signedinUrl + "?" + params.toString() };
+        } else if (selectedSession.factors?.user) {
+          // The session could not be used to complete this authentication request
+          // (e.g. the target organization enforces a different authentication
+          // policy than the one the session was created with). Instead of
+          // surfacing a generic error and leaving the user stuck, guide them into
+          // re-authentication for the current request - the same outcome as
+          // selecting "Add another account".
+          const command: SendLoginnameCommand = {
+            loginName: selectedSession.factors.user.loginName,
+            organization: selectedSession.factors.user.organizationId,
+            requestId: `saml_${samlRequest}`,
+          };
+
+          const res = await sendLoginname(command).catch(() => undefined);
+
+          if (res && "redirect" in res && res?.redirect) {
+            return { redirect: res.redirect };
+          }
+
+          return { error: "This session can't be reused for this request. Please authenticate again." };
         } else {
           return { error: "Unknown error occurred" };
         }

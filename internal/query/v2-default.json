@@ -10,7 +10,8 @@
       "addAnother": "Ein weiteres Konto hinzufügen",
       "noResults": "Keine Konten gefunden",
       "verified": "verifiziert",
-      "expired": "abgelaufen"
+      "expired": "abgelaufen",
+      "reauthRequired": "Zum Fortfahren erneut anmelden"
     },
     "logout": {
       "title": "Logout",
@@ -471,7 +472,8 @@
       "addAnother": "Add another account",
       "noResults": "No accounts found",
       "verified": "verified",
-      "expired": "expired"
+      "expired": "expired",
+      "reauthRequired": "Sign in again to continue"
     },
     "logout": {
       "title": "Logout",
@@ -932,7 +934,8 @@
       "addAnother": "Agregar otra cuenta",
       "noResults": "No se encontraron cuentas",
       "verified": "verificado",
-      "expired": "expirado"
+      "expired": "expirado",
+      "reauthRequired": "Inicie sesión de nuevo para continuar"
     },
     "logout": {
       "title": "Cerrar sesión",
@@ -1393,7 +1396,8 @@
       "addAnother": "Aggiungi un altro account",
       "noResults": "Nessun account trovato",
       "verified": "verificato",
-      "expired": "scaduto"
+      "expired": "scaduto",
+      "reauthRequired": "Accedi di nuovo per continuare"
     },
     "logout": {
       "title": "Esci",
@@ -1854,7 +1858,8 @@
       "addAnother": "Nog een account toevoegen",
       "noResults": "Geen accounts gevonden",
       "verified": "geverifieerd",
-      "expired": "verlopen"
+      "expired": "verlopen",
+      "reauthRequired": "Log opnieuw in om door te gaan"
     },
     "logout": {
       "title": "Uitloggen",
@@ -2315,7 +2320,8 @@
       "addAnother": "Dodaj kolejne konto",
       "noResults": "Nie znaleziono kont",
       "verified": "zweryfikowany",
-      "expired": "wygasł"
+      "expired": "wygasł",
+      "reauthRequired": "Zaloguj się ponownie, aby kontynuować"
     },
     "logout": {
       "title": "Wyloguj się",
@@ -2776,7 +2782,8 @@
       "addAnother": "Добавить другой аккаунт",
       "noResults": "Аккаунты не найдены",
       "verified": "проверенный",
-      "expired": "истёк"
+      "expired": "истёк",
+      "reauthRequired": "Войдите снова, чтобы продолжить"
     },
     "logout": {
       "title": "Выход",
@@ -3237,7 +3244,8 @@
       "addAnother": "添加另一个账户",
       "noResults": "未找到账户",
       "verified": "已验证",
-      "expired": "已过期"
+      "expired": "已过期",
+      "reauthRequired": "请重新登录以继续"
     },
     "logout": {
       "title": "注销",
@@ -3698,7 +3706,8 @@
       "addAnother": "Başka hesap ekle",
       "noResults": "Hesap bulunamadı",
       "verified": "doğrulandı",
-      "expired": "süresi doldu"
+      "expired": "süresi doldu",
+      "reauthRequired": "Devam etmek için tekrar giriş yapın"
     },
     "logout": {
       "title": "Çıkış",
@@ -4159,7 +4168,8 @@
       "addAnother": "Додати інший обліковий запис",
       "noResults": "Облікові записи не знайдено",
       "verified": "підтверджено",
-      "expired": "закінчився"
+      "expired": "закінчився",
+      "reauthRequired": "Увійдіть знову, щоб продовжити"
     },
     "logout": {
       "title": "Вихід",
@@ -4620,7 +4630,8 @@
       "addAnother": "إضافة حساب آخر",
       "noResults": "لم يتم العثور على حسابات",
       "verified": "تم التحقق",
-      "expired": "منتهي الصلاحية"
+      "expired": "منتهي الصلاحية",
+      "reauthRequired": "سجّل الدخول مرة أخرى للمتابعة"
     },
     "logout": {
       "title": "تسجيل الخروج",
@@ -5081,7 +5092,8 @@
       "addAnother": "Másik fiók hozzáadása",
       "noResults": "Nem található fiók",
       "verified": "ellenőrizve",
-      "expired": "lejárt"
+      "expired": "lejárt",
+      "reauthRequired": "A folytatáshoz jelentkezzen be újra"
     },
     "logout": {
       "title": "Kijelentkezés",
@@ -5542,7 +5554,8 @@
       "addAnother": "Ajouter un nouveau compte",
       "noResults": "Pas de compte trouvé",
       "verified": "vérifié",
-      "expired": "expiré"
+      "expired": "expiré",
+      "reauthRequired": "Reconnectez-vous pour continuer"
     },
     "logout": {
       "title": "Déconnexion",
@@ -6003,7 +6016,8 @@
       "addAnother": "別のアカウントを追加",
       "noResults": "アカウントが見つかりません",
       "verified": "認証済み",
-      "expired": "期限切れ"
+      "expired": "期限切れ",
+      "reauthRequired": "続行するには再度サインインしてください"
     },
     "logout": {
       "title": "ログアウト",
@@ -6464,7 +6478,8 @@
       "addAnother": "Adicionar outra conta",
       "noResults": "Nenhuma conta encontrada",
       "verified": "verificado",
-      "expired": "expirado"
+      "expired": "expirado",
+      "reauthRequired": "Inicie sessão novamente para continuar"
     },
     "logout": {
       "title": "Sair",
