@@ -188,9 +188,9 @@ func (h *Handler) writeJSON(w http.ResponseWriter, r *http.Request, v any) {
 // setCacheControl sets the Cache-Control header for the well-known app link files.
 //
 // The header intentionally omits the "public" directive and mirrors the JWKS
-// endpoint (max-age + must-revalidate). Shared caches such as a CDN in front of
-// ZITADEL only cache responses that explicitly opt in via "public" or
-// "s-maxage". With "public", a fleet of independent edge caches could each pin
+// endpoint (max-age + must-revalidate). In ZITADEL Cloud, the CDN is configured
+// to cache only responses that explicitly opt in via "public" or "s-maxage".
+// With "public", a fleet of independent edge caches could each pin
 // a momentarily inconsistent (e.g. empty) copy and serve diverging content for
 // the whole max-age, breaking native passkey verification. Without it, clients
 // (the Apple and Google verifiers, browsers) still cache for max-age while the
