@@ -204,6 +204,7 @@ Errors:
     AlreadyActive: "Organisatie is al actief"
     Empty: "Organisatie is leeg"
     NotFound: "Organisatie niet gevonden"
+    NotActive: "Organisatie is niet actief"
     NotChanged: "Organisatie is niet veranderd"
     DefaultOrgNotDeletable: "Standaard organisatie kan niet worden verwijderd"
     ZitadelOrgNotDeletable: "Organisatie met Zitadel-project kan niet worden verwijderd"
@@ -282,6 +283,8 @@ Errors:
     LabelPolicy:
       NotFound: "Privé Label Beleid niet gevonden"
       NotChanged: "Privé Label Beleid is niet veranderd"
+    IDPConfig:
+      NotExisting: "Identiteitsprovider-configuratie bestaat niet"
   Project:
     ProjectIDMissing: "Project ID ontbreekt"
     AlreadyExists: "Project bestaat al op organisatie"

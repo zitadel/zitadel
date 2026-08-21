@@ -8,6 +8,8 @@ body:
     value: |
       Thanks for taking the time to fill out this bug report!  
       Learn more in our [contribution guide](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#product-management) on how we will process your issue.
+
+      **To help us better prioritize your bug report**, if you have an active ZITADEL Cloud subscription, please [link your GitHub account to your Cloud account in the Customer Portal](https://zitadel.com/admin/support).
 - type: checkboxes
   id: preflight
   attributes:

@@ -13,6 +13,7 @@ import { SignInWithGeneric } from "./idps/sign-in-with-generic";
 import { SignInWithGithub } from "./idps/sign-in-with-github";
 import { SignInWithGitlab } from "./idps/sign-in-with-gitlab";
 import { SignInWithGoogle } from "./idps/sign-in-with-google";
+import { SignInWithZitadel } from "./idps/sign-in-with-zitadel";
 import { Translated } from "./translated";
 
 export interface SignInWithIDPProps {
@@ -51,6 +52,7 @@ export function SignInWithIdp({
       [IdentityProviderType.SAML]: SignInWithGeneric,
       [IdentityProviderType.LDAP]: SignInWithGeneric,
       [IdentityProviderType.JWT]: SignInWithGeneric,
+      [IdentityProviderType.ZITADEL]: SignInWithZitadel,
     };
 
     const Component = components[type];

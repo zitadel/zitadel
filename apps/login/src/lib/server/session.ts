@@ -12,7 +12,7 @@ import {
   listUsers,
 } from "@/lib/zitadel";
 import { create, Duration } from "@zitadel/client";
-import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import { Challenges, RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { getTranslations } from "next-intl/server";
@@ -25,7 +25,9 @@ import {
   removeSessionFromCookie,
 } from "../cookies";
 import { getServiceConfig } from "../service-url";
+import { isSessionValid } from "../session";
 import { getPublicHost } from "./host";
+import { sendLoginname } from "./loginname";
 
 const logger = createLogger("session");
 
@@ -79,9 +81,39 @@ export async function continueWithSession({ requestId, ...session }: ContinueWit
 
   const t = await getTranslations("error");
 
-  const loginSettings = await getLoginSettings({ serviceConfig, organization: session.factors?.user?.organizationId });
+  if (!session.factors?.user) {
+    return { error: t("couldNotContinueSession") };
+  }
 
-  if (requestId && session.id && session.factors?.user) {
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: session.factors.user.organizationId });
+
+  // Validate session (including MFA) before completing the flow
+  const valid = await isSessionValid({ serviceConfig, session: session as Session });
+
+  if (!valid) {
+    logger.warn("continueWithSession: session is not valid (e.g. MFA not completed), redirecting to re-authenticate", {
+      sessionId: session.id,
+    });
+
+    // Redirect user to re-authenticate (will route to MFA page if password is still valid)
+    const res = await sendLoginname({
+      loginName: session.factors.user.loginName,
+      organization: session.factors.user.organizationId,
+      requestId: requestId,
+    });
+
+    if (res && "redirect" in res && res.redirect) {
+      return { redirect: res.redirect };
+    }
+
+    if (res && "samlData" in res && res.samlData) {
+      return { samlData: res.samlData };
+    }
+
+    return { error: t("couldNotContinueSession") };
+  }
+
+  if (requestId && session.id) {
     return completeFlowOrGetUrl(
       {
         sessionId: session.id,
@@ -90,18 +122,15 @@ export async function continueWithSession({ requestId, ...session }: ContinueWit
       },
       loginSettings?.defaultRedirectUri,
     );
-  } else if (session.factors?.user) {
-    return completeFlowOrGetUrl(
-      {
-        loginName: session.factors.user.loginName,
-        organization: session.factors.user.organizationId,
-      },
-      loginSettings?.defaultRedirectUri,
-    );
   }
 
-  // Fallback error if we couldn't determine where to redirect
-  return { error: t("couldNotContinueSession") };
+  return completeFlowOrGetUrl(
+    {
+      loginName: session.factors.user.loginName,
+      organization: session.factors.user.organizationId,
+    },
+    loginSettings?.defaultRedirectUri,
+  );
 }
 
 export type UpdateSessionCommand = {
@@ -246,11 +275,17 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
     }
   }
 
+  // @ts-ignore
+  const challengeResponse: Challenges | undefined = session.challenges;
+
   return {
     sessionId: session.id,
     factors: session.factors,
-    // @ts-ignore
-    challenges: session.challenges,
+    // Only the WebAuthN challenge may reach the browser. `sanitizeChallenges` already stops
+    // `returnCode` from being requested, so `otpSms`/`otpEmail` should always be unset here —
+    // keeping the projection explicit means no OTP code can leak through this boundary even
+    // if that ever regresses (GHSA-3gwm-5wx8-4gm6).
+    challenges: challengeResponse?.webAuthN ? { webAuthN: challengeResponse.webAuthN } : undefined,
     authMethods,
   };
 }

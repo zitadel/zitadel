@@ -6286,3 +6286,520 @@ func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
 		})
 	}
 }
+
+func TestCommands_UpdateInstanceZitadelProvider(t *testing.T) {
+	pushErr := errors.New("push error")
+	type fields struct {
+		eventstore   func(*testing.T) *eventstore.Eventstore
+		secretCrypto crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx      context.Context
+		id       string
+		provider ZitadelProvider
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"invalid name",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
+				id:       "idp-id",
+				provider: ZitadelProvider{},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Sgtj5", ""))
+				},
+			},
+		},
+		{
+			"invalid issuer",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "idp-id",
+				provider: ZitadelProvider{
+					Name: "name",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Hz6zj", ""))
+				},
+			},
+		},
+		{
+			"invalid clientID",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "idp-id",
+				provider: ZitadelProvider{
+					Name:   "name",
+					Issuer: "issuer",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-fb5jm", ""))
+				},
+			},
+		},
+		{
+			name: "not found",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "idp-id",
+				provider: ZitadelProvider{
+					Name:     "name",
+					Issuer:   "issuer",
+					ClientID: "clientID",
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "INST-Bg281", "Errors.IDPConfig.NotExisting"))
+				},
+			},
+		},
+		{
+			name: "push error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewZitadelIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{openid.ScopeOpenID, openid.ScopeEmail},
+								idp.Options{},
+								[]idp.RolesInfo{
+									{
+										OrganizationID:     "org1",
+										OrganizationDomain: "example-org1.com",
+									},
+								},
+							)),
+					),
+					expectPushFailed(
+						pushErr,
+						instance.NewZitadelIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							[]idp.ZitadelIDPChanges{
+								idp.ChangeZitadelIDPName("new name"),
+								idp.ChangeZitadelIDPIssuer("new issuer"),
+								idp.ChangeZitadelIDPClientID("clientID2"),
+								idp.ChangeZitadelIDPClientSecret(&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("newSecret"),
+								}),
+								idp.ChangeZitadelIDPInstanceRolesInfo(nil),
+								idp.ChangeZitadelIDPScopes(nil),
+							},
+						),
+					),
+				),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: ZitadelProvider{
+					Name:              "new name",
+					Issuer:            "new issuer",
+					ClientID:          "clientID2",
+					ClientSecret:      "newSecret",
+					Scopes:            nil,
+					InstanceRolesInfo: nil,
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, pushErr)
+				},
+			},
+		},
+		{
+			name: "no changes",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewZitadelIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"idp-id",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "key-id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{openid.ScopeOpenID, openid.ScopeEmail},
+								idp.Options{},
+								[]idp.RolesInfo{
+									{
+										OrganizationID:     "org1",
+										OrganizationDomain: "example-org1.com",
+									},
+									{
+										OrganizationID:     "org2",
+										OrganizationDomain: "example-org2.com",
+									},
+								},
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "idp-id",
+				provider: ZitadelProvider{
+					Name:     "name",
+					Issuer:   "issuer",
+					ClientID: "clientID",
+					Scopes:   []string{openid.ScopeOpenID, openid.ScopeEmail},
+					InstanceRolesInfo: []idp.RolesInfo{
+						{
+							OrganizationID:     "org1",
+							OrganizationDomain: "example-org1.com",
+						},
+						{
+							OrganizationID:     "org2",
+							OrganizationDomain: "example-org2.com",
+						},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+		{
+			name: "change ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewZitadelIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{openid.ScopeOpenID, openid.ScopeEmail},
+								idp.Options{},
+								[]idp.RolesInfo{
+									{
+										OrganizationID:     "org1",
+										OrganizationDomain: "example-org1.com",
+									},
+								},
+							)),
+					),
+					expectPush(
+						func() eventstore.Command {
+							t := true
+							event := instance.NewZitadelIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.ZitadelIDPChanges{
+									idp.ChangeZitadelIDPName("new name"),
+									idp.ChangeZitadelIDPIssuer("new issuer"),
+									idp.ChangeZitadelIDPClientID("clientID2"),
+									idp.ChangeZitadelIDPClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newSecret"),
+									}),
+									idp.ChangeZitadelIDPScopes([]string{"openid", "profile"}),
+									idp.ChangeZitadelIDPOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+									idp.ChangeZitadelIDPInstanceRolesInfo([]idp.RolesInfo{
+										{
+											OrganizationID:     "org1",
+											OrganizationDomain: "example-org1.com",
+										},
+										{
+											OrganizationID:     "org2",
+											OrganizationDomain: "example-org2.com",
+										},
+									}),
+								},
+							)
+							return event
+						}(),
+					),
+				),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: ZitadelProvider{
+					Name:         "new name",
+					Issuer:       "new issuer",
+					ClientID:     "clientID2",
+					ClientSecret: "newSecret",
+					Scopes:       []string{"openid", "profile"},
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+					InstanceRolesInfo: []idp.RolesInfo{
+						{
+							OrganizationID:     "org1",
+							OrganizationDomain: "example-org1.com",
+						},
+						{
+							OrganizationID:     "org2",
+							OrganizationDomain: "example-org2.com",
+						},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+		{
+			name: "change, unset scopes, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewZitadelIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{openid.ScopeOpenID, openid.ScopeEmail},
+								idp.Options{},
+								[]idp.RolesInfo{
+									{
+										OrganizationID:     "org1",
+										OrganizationDomain: "example-org1.com",
+									},
+								},
+							)),
+					),
+					expectPush(
+						func() eventstore.Command {
+							t := true
+							event := instance.NewZitadelIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.ZitadelIDPChanges{
+									idp.ChangeZitadelIDPName("new name"),
+									idp.ChangeZitadelIDPIssuer("new issuer"),
+									idp.ChangeZitadelIDPClientID("clientID2"),
+									idp.ChangeZitadelIDPClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newSecret"),
+									}),
+									idp.ChangeZitadelIDPScopes(nil),
+									idp.ChangeZitadelIDPOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+									idp.ChangeZitadelIDPInstanceRolesInfo([]idp.RolesInfo{
+										{
+											OrganizationID:     "org1",
+											OrganizationDomain: "example-org1.com",
+										},
+										{
+											OrganizationID:     "org2",
+											OrganizationDomain: "example-org2.com",
+										},
+									}),
+								},
+							)
+							return event
+						}(),
+					),
+				),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: ZitadelProvider{
+					Name:         "new name",
+					Issuer:       "new issuer",
+					ClientID:     "clientID2",
+					ClientSecret: "newSecret",
+					Scopes:       []string{},
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+					InstanceRolesInfo: []idp.RolesInfo{
+						{
+							OrganizationID:     "org1",
+							OrganizationDomain: "example-org1.com",
+						},
+						{
+							OrganizationID:     "org2",
+							OrganizationDomain: "example-org2.com",
+						},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+		{
+			name: "change, unset instance roles info, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewZitadelIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{openid.ScopeOpenID, openid.ScopeEmail},
+								idp.Options{},
+								[]idp.RolesInfo{
+									{
+										OrganizationID:     "org1",
+										OrganizationDomain: "example-org1.com",
+									},
+								},
+							)),
+					),
+					expectPush(
+						func() eventstore.Command {
+							t := true
+							event := instance.NewZitadelIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.ZitadelIDPChanges{
+									idp.ChangeZitadelIDPName("new name"),
+									idp.ChangeZitadelIDPIssuer("new issuer"),
+									idp.ChangeZitadelIDPClientID("clientID2"),
+									idp.ChangeZitadelIDPClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newSecret"),
+									}),
+									idp.ChangeZitadelIDPOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+									idp.ChangeZitadelIDPInstanceRolesInfo(nil),
+								},
+							)
+							return event
+						}(),
+					),
+				),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: ZitadelProvider{
+					Name:         "new name",
+					Issuer:       "new issuer",
+					ClientID:     "clientID2",
+					ClientSecret: "newSecret",
+					Scopes:       []string{openid.ScopeOpenID, openid.ScopeEmail},
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+					InstanceRolesInfo: []idp.RolesInfo{},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:          tt.fields.eventstore(t),
+				idpConfigEncryption: tt.fields.secretCrypto,
+			}
+			got, err := c.UpdateInstanceZitadelProvider(tt.args.ctx, tt.args.id, tt.args.provider)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assertObjectDetails(t, tt.res.want, got)
+			}
+		})
+	}
+}

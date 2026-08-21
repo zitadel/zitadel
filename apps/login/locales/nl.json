@@ -150,7 +150,9 @@
       "couldNotLoadSession": "Kon sessie niet laden",
       "couldNotLoadAuthMethods": "Kon verificatiemethoden niet laden",
       "failedPrecondition": "Voorwaarde mislukt",
-      "sessionNotValid": "Sessie is niet geldig"
+      "sessionNotValid": "Sessie is niet geldig",
+      "passwordVerificationMissing": "Wachtwoordverificatie ontbreekt.",
+      "passwordVerificationTooOld": "Wachtwoordverificatie is te oud. Verifieer je wachtwoord opnieuw."
     }
   },
   "idp": {
@@ -162,6 +164,7 @@
     "signInWithAzureAD": "Aanmelden met AzureAD",
     "signInWithGithub": "Aanmelden met GitHub",
     "signInWithGitlab": "Aanmelden met GitLab",
+    "signInWithZitadel": "Aanmelden met Zitadel",
     "loginError": {
       "title": "Inloggen mislukt",
       "description": "Er is een fout opgetreden tijdens het inloggen."
@@ -410,7 +413,8 @@
       "userAlreadyVerified": "Gebruiker is al geverifieerd!",
       "couldNotResendInvite": "Kon uitnodiging niet opnieuw versturen",
       "inviteSendFailed": "Versturen van uitnodigingsmail mislukt",
-      "emailSendFailed": "Versturen van verificatie-e-mail mislukt"
+      "emailSendFailed": "Versturen van verificatie-e-mail mislukt",
+      "contextMissing": "Er is een fout opgetreden. Probeer het opnieuw."
     }
   },
   "authenticator": {

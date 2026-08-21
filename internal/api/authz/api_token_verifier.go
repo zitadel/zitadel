@@ -15,6 +15,7 @@ type APITokenVerifier interface {
 	CheckAuthMethod(method string) (Option, bool)
 	ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (_ string, _ []string, err error)
 	ExistsOrg(ctx context.Context, id, domain string) (orgID string, err error)
+	CheckOrgActive(ctx context.Context, orgID string) error
 	SearchMyMemberships(ctx context.Context, orgID string, shouldTriggerBulk bool) (_ []*Membership, err error)
 }
 
@@ -61,6 +62,12 @@ func (v *ApiTokenVerifier) ExistsOrg(ctx context.Context, id, domain string) (or
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	return v.authZRepo.ExistsOrg(ctx, id, domain)
+}
+
+func (v *ApiTokenVerifier) CheckOrgActive(ctx context.Context, orgID string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	return v.authZRepo.CheckOrgActive(ctx, orgID)
 }
 
 func (v *ApiTokenVerifier) CheckAuthMethod(method string) (Option, bool) {

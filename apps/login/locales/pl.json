@@ -164,6 +164,7 @@
     "signInWithAzureAD": "Zaloguj się przez AzureAD",
     "signInWithGithub": "Zaloguj się przez GitHub",
     "signInWithGitlab": "Zaloguj się przez GitLab",
+    "signInWithZitadel": "Zaloguj się przez Zitadel",
     "loginError": {
       "title": "Logowanie nieudane",
       "description": "Wystąpił błąd podczas próby logowania."

@@ -271,6 +271,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "apis/openidoauth/grant-types",
           "apis/openidoauth/authrequest",
           "guides/integrate/login/oidc/webkeys",
+          "guides/integrate/login/oidc/native-app-links",
           "guides/integrate/token-exchange",
         ],
       },
@@ -573,6 +574,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "guides/migrate/sources/zitadel",
           "guides/migrate/sources/auth0",
           "guides/migrate/sources/keycloak",
+          "guides/migrate/sources/firebase",
         ],
       },
     ],
@@ -583,6 +585,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
     collapsed: true,
     items: [
       "guides/manage/user/reg-create-user",
+      "guides/manage/user/self-deletion",
       "guides/manage/terraform-provider",
       {
         type: "category",
@@ -745,6 +748,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
                   "self-hosting/manage/tls_modes",
                   "self-hosting/manage/http2",
                   "self-hosting/manage/login-client",
+                  "self-hosting/manage/adopt-login-v2",
                 ],
               },
               {
@@ -810,8 +814,10 @@ export const guidesSidebar: readonly SidebarItem[] = [
         label: "Scaling & Performance",
         items: [
           "self-hosting/manage/updating_scaling",
+          "self-hosting/manage/upgrade-v3-to-v4",
           "self-hosting/manage/database/database",
           "self-hosting/manage/cache",
+          "self-hosting/manage/tuning",
         ],
       },
 
@@ -863,23 +869,9 @@ export const guidesSidebar: readonly SidebarItem[] = [
     collapsed: true,
     items: [
       {
-        type: "category",
-        label: "Product Features",
-        items: [
-          "product/roadmap",
-        ],
-      },
-      {
-        type: "category",
-        label: "Releases",
-        items: [
-          {
-            type: "link",
-            label: "Changelog",
-            href: "https://zitadel.com/changelog",
-          },
-          "product/release-cycle",
-        ],
+        type: "doc",
+        id: "product/roadmap",
+        label: "Roadmap",
       },
       {
         type: "category",
