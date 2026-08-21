@@ -50,10 +50,13 @@ func buildHandler(
 	usersHandler := sresources.NewResourceHandlerAdapter(sresources.NewUsersHandler(command, query, userCodeAlg, cfg))
 	mapResource(router, middleware, usersHandler)
 
-	bulkHandler := sresources.NewBulkHandler(cfg.Bulk, translator, usersHandler)
+	groupsHandler := sresources.NewResourceHandlerAdapter(sresources.NewGroupsHandler(command, query))
+	mapResource(router, middleware, groupsHandler)
+
+	bulkHandler := sresources.NewBulkHandler(cfg.Bulk, translator, usersHandler, groupsHandler)
 	router.Handle("/"+zhttp.OrgIdInPathVariable+"/Bulk", middleware(handleJsonResponse(bulkHandler.BulkFromHttp))).Methods(http.MethodPost)
 
-	serviceProviderHandler := newServiceProviderHandler(cfg, usersHandler)
+	serviceProviderHandler := newServiceProviderHandler(cfg, usersHandler, groupsHandler)
 	router.Handle("/"+zhttp.OrgIdInPathVariable+"/ServiceProviderConfig", middleware(handleJsonResponse(serviceProviderHandler.GetConfig))).Methods(http.MethodGet)
 	router.Handle("/"+zhttp.OrgIdInPathVariable+"/ResourceTypes", middleware(handleJsonResponse(serviceProviderHandler.ListResourceTypes))).Methods(http.MethodGet)
 	router.Handle("/"+zhttp.OrgIdInPathVariable+"/ResourceTypes/{name}", middleware(handleResourceResponse(serviceProviderHandler.GetResourceType))).Methods(http.MethodGet)

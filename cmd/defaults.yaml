@@ -1704,6 +1704,9 @@ InternalAuthZ:
         - "group.user.write"
         - "group.user.read"
         - "group.user.delete"
+        - "group.grant.write"
+        - "group.grant.read"
+        - "group.grant.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -1742,6 +1745,7 @@ InternalAuthZ:
         - "session.read"
         - "group.read"
         - "group.user.read"
+        - "group.grant.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"
@@ -1809,6 +1813,9 @@ InternalAuthZ:
         - "group.user.write"
         - "group.user.read"
         - "group.user.delete"
+        - "group.grant.write"
+        - "group.grant.read"
+        - "group.grant.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -1839,6 +1846,7 @@ InternalAuthZ:
         - "session.delete"
         - "group.read"
         - "group.user.read"
+        - "group.grant.read"
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
         - "admin.impersonation"
@@ -1911,6 +1919,9 @@ InternalAuthZ:
         - "group.user.write"
         - "group.user.read"
         - "group.user.delete"
+        - "group.grant.write"
+        - "group.grant.read"
+        - "group.grant.delete"
     - Role: "IAM_LOGIN_CLIENT"
       Permissions:
         - "iam.read"
@@ -1951,6 +1962,7 @@ InternalAuthZ:
         - "userschema.read"
         - "group.read"
         - "group.user.read"
+        - "group.grant.read"
     - Role: "ORG_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -1972,6 +1984,7 @@ InternalAuthZ:
         - "session.delete"
         - "group.read"
         - "group.user.read"
+        - "group.grant.read"
     - Role: "ORG_OWNER_VIEWER"
       Permissions:
         - "org.read"
@@ -1995,6 +2008,7 @@ InternalAuthZ:
         - "project.grant.user.grant.read"
         - "group.read"
         - "group.user.read"
+        - "group.grant.read"
     - Role: "ORG_SETTINGS_MANAGER"
       Permissions:
         - "org.read"
@@ -2027,6 +2041,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "group.read"
         - "group.user.read"
+        - "group.grant.read"
     - Role: "ORG_PROJECT_PERMISSION_EDITOR"
       Permissions:
         - "org.read"
@@ -2303,6 +2318,9 @@ SystemAuthZ:
         - "group.user.write"
         - "group.user.read"
         - "group.user.delete"
+        - "group.grant.write"
+        - "group.grant.read"
+        - "group.grant.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -2341,6 +2359,7 @@ SystemAuthZ:
         - "session.read"
         - "group.read"
         - "group.user.read"
+        - "group.grant.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"
@@ -2408,6 +2427,9 @@ SystemAuthZ:
         - "group.user.write"
         - "group.user.read"
         - "group.user.delete"
+        - "group.grant.write"
+        - "group.grant.read"
+        - "group.grant.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -2438,6 +2460,7 @@ SystemAuthZ:
         - "session.delete"
         - "group.read"
         - "group.user.read"
+        - "group.grant.read"
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
         - "admin.impersonation"
@@ -2485,6 +2508,7 @@ SystemAuthZ:
         - "userschema.read"
         - "group.read"
         - "group.user.read"
+        - "group.grant.read"
 
 # If a new projection is introduced it will be prefilled during the setup process (if enabled)
 # This can prevent serving outdated data after a version upgrade, but might require a longer setup / upgrade process:

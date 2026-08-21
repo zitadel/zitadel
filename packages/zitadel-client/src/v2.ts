@@ -1,5 +1,6 @@
 import { create } from "@bufbuild/protobuf";
 import { FeatureService } from "@zitadel/proto/zitadel/feature/v2/feature_service_pb.js";
+import { GroupService } from "@zitadel/proto/zitadel/group/v2/group_service_pb.js";
 import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb.js";
 import { InternalPermissionService } from "@zitadel/proto/zitadel/internal_permission/v2/internal_permission_service_pb.js";
 import { RequestContextSchema } from "@zitadel/proto/zitadel/object/v2/object_pb.js";
@@ -20,6 +21,7 @@ export const createSAMLServiceClient = createClientFor(SAMLService);
 export const createOrganizationServiceClient = createClientFor(OrganizationService);
 export const createFeatureServiceClient = createClientFor(FeatureService);
 export const createIdpServiceClient = createClientFor(IdentityProviderService);
+export const createGroupServiceClient = createClientFor(GroupService);
 export const createInternalPermissionServiceClient = createClientFor(InternalPermissionService);
 
 export function makeReqCtx(orgId: string | undefined) {

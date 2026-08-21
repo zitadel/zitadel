@@ -45,7 +45,7 @@ func (g *GroupWriteModel) Query() *eventstore.SearchQueryBuilder {
 		group.GroupRemovedEventType,
 	}
 	if g.UserIDs != nil {
-		eventTypes = append(eventTypes, group.GroupUsersAddedEventType, group.GroupUsersRemovedEventType)
+		eventTypes = append(eventTypes, group.GroupUserAddedEventType, group.GroupUserRemovedEventType)
 	}
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(g.ResourceOwner).
@@ -76,14 +76,10 @@ func (g *GroupWriteModel) Reduce() error {
 			g.UserIDs = nil
 			g.existingUserIDs = make(map[string]struct{})
 			g.State = domain.GroupStateRemoved
-		case *group.GroupUsersAddedEvent:
-			for _, userID := range e.UserIDs {
-				g.existingUserIDs[userID] = struct{}{}
-			}
-		case *group.GroupUsersRemovedEvent:
-			for _, userID := range e.UserIDs {
-				delete(g.existingUserIDs, userID)
-			}
+		case *group.GroupUserAddedEvent:
+			g.existingUserIDs[e.UserID] = struct{}{}
+		case *group.GroupUserRemovedEvent:
+			delete(g.existingUserIDs, e.UserID)
 		}
 	}
 	return g.WriteModel.Reduce()

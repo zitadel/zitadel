@@ -57,6 +57,21 @@ export function createHumanUser(api: API, username: string, failOnStatusCode = t
   });
 }
 
+export function ensureHumanUserExistsInOrg(api: API, orgId: string, username: string) {
+  return ensureItemExists(
+    api,
+    `${api.mgmtBaseURL}/users/_search`,
+    (user: any) => user.userName === username,
+    `${api.mgmtBaseURL}/users/human`,
+    {
+      ...defaultHuman,
+      user_name: username,
+    },
+    orgId,
+    'userId',
+  );
+}
+
 const defaultHuman = {
   profile: {
     first_name: 'e2efirstName',

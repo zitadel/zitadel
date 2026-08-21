@@ -90,6 +90,17 @@
                   </a>
                 </ng-template>
 
+                <ng-template cnslHasRole [hasRole]="['group.read']">
+                  <a
+                    class="nav-item"
+                    [routerLinkActive]="['active']"
+                    [routerLink]="['/groups']"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                  >
+                    <span class="label">{{ 'MENU.GROUPS' | translate }}</span>
+                  </a>
+                </ng-template>
+
                 <ng-template cnslHasRole [hasRole]="['org.read']">
                   <a
                     class="nav-item"
