@@ -211,7 +211,16 @@ func checkTOTP(
 
 	// the OTP check succeeded and the user was not locked in the meantime
 	if verifyErr == nil {
-		return []eventstore.Command{user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, optionalAuthRequestInfo)}, nil
+		if err := existingOTP.History.CheckReuse(code); err != nil {
+			return nil, err
+		}
+
+		return []eventstore.Command{user.NewHumanOTPCheckSucceededEvent(
+			ctx,
+			userAgg,
+			optionalAuthRequestInfo,
+			crypto.NewHMACValue(code),
+		)}, nil
 	}
 
 	// the OTP check failed, therefore check if the limit was reached and the user must additionally be locked

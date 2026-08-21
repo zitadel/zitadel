@@ -178,6 +178,7 @@ Errors:
         NotExisting: "Multifactor OTP (OneTimePassword) doesn't exist"
         NotReady: "Multifactor OTP (OneTimePassword) isn't ready"
         InvalidCode: "Invalid code"
+        Reused: "This code was already used. Please wait for a new code"
       U2F:
         NotExisting: "U2F does not exist"
       Passwordless:

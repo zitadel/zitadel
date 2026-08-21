@@ -176,6 +176,7 @@ Errors:
         NotExisting: "Мультифактор OTP (OneTimePassword) не существует"
         NotReady: "Мультифактор OTP (OneTimePassword) не готов"
         InvalidCode: "Неверный код"
+        Reused: "Этот код уже был использован. Пожалуйста, дождитесь нового кода"
       U2F:
         NotExisting: "Двухфакторная аутентификация не существует"
       Passwordless:

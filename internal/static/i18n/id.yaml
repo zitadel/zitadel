@@ -176,6 +176,7 @@ Errors:
         NotExisting: "OTP multifaktor (OneTimePassword) tidak ada"
         NotReady: "OTP multifaktor (OneTimePassword) belum siap"
         InvalidCode: "Kode tidak valid"
+        Reused: "Kode ini sudah digunakan. Silakan tunggu kode baru"
       U2F:
         NotExisting: "U2F tidak ada"
       Passwordless:

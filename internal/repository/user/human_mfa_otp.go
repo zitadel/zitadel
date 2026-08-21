@@ -145,6 +145,7 @@ func HumanOTPRemovedEventMapper(event eventstore.Event) (eventstore.Event, error
 type HumanOTPCheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	*AuthRequestInfo
+	CodeHash *crypto.HMACValue `json:"codeHash,omitempty"`
 }
 
 func (e *HumanOTPCheckSucceededEvent) Payload() interface{} {
@@ -159,6 +160,7 @@ func NewHumanOTPCheckSucceededEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	info *AuthRequestInfo,
+	codeHash *crypto.HMACValue,
 ) *HumanOTPCheckSucceededEvent {
 	return &HumanOTPCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -167,6 +169,7 @@ func NewHumanOTPCheckSucceededEvent(
 			HumanMFAOTPCheckSucceededType,
 		),
 		AuthRequestInfo: info,
+		CodeHash:        codeHash,
 	}
 }
 
