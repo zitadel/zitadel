@@ -96,7 +96,7 @@ func TestBuildAssetLinks(t *testing.T) {
 			},
 			want: []assetLink{
 				{
-					Relation: []string{"delegate_permission/common.get_login_creds"},
+					Relation: []string{"delegate_permission/common.handle_all_urls", "delegate_permission/common.get_login_creds"},
 					Target: assetLinkTarget{
 						Namespace:   "android_app",
 						PackageName: "com.one",
@@ -106,7 +106,7 @@ func TestBuildAssetLinks(t *testing.T) {
 					},
 				},
 				{
-					Relation: []string{"delegate_permission/common.get_login_creds"},
+					Relation: []string{"delegate_permission/common.handle_all_urls", "delegate_permission/common.get_login_creds"},
 					Target: assetLinkTarget{
 						Namespace:   "android_app",
 						PackageName: "com.two",

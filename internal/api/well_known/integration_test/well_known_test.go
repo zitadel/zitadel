@@ -77,7 +77,7 @@ func TestWellKnownAppLinks(t *testing.T) {
 		},
 		[]any{
 			map[string]any{
-				"relation": []any{"delegate_permission/common.get_login_creds"},
+				"relation": []any{"delegate_permission/common.handle_all_urls", "delegate_permission/common.get_login_creds"},
 				"target": map[string]any{
 					"namespace":                "android_app",
 					"package_name":             "com.example.one",
@@ -85,7 +85,7 @@ func TestWellKnownAppLinks(t *testing.T) {
 				},
 			},
 			map[string]any{
-				"relation": []any{"delegate_permission/common.get_login_creds"},
+				"relation": []any{"delegate_permission/common.handle_all_urls", "delegate_permission/common.get_login_creds"},
 				"target": map[string]any{
 					"namespace":                "android_app",
 					"package_name":             "com.example.two",

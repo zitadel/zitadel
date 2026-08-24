@@ -134,7 +134,14 @@ func buildAssetLinks(ctx context.Context, configs []*query.OIDCAppLinkConfig) []
 			continue
 		}
 		links = append(links, assetLink{
-			Relation: []string{"delegate_permission/common.get_login_creds"},
+			// Google's Credential Manager prerequisites require both relations for
+			// passkeys; some devices (e.g. Pixel) reject passkey creation when
+			// handle_all_urls is missing.
+			// https://developer.android.com/identity/credential-manager/prerequisites
+			Relation: []string{
+				"delegate_permission/common.handle_all_urls",
+				"delegate_permission/common.get_login_creds",
+			},
 			Target: assetLinkTarget{
 				Namespace:              "android_app",
 				PackageName:            cfg.AndroidPackageName,
