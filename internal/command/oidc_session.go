@@ -192,11 +192,11 @@ func (c *Commands) CreateOIDCSession(ctx context.Context,
 	return session, nil
 }
 
-type RefreshTokenComplianceChecker func(ctx context.Context, wm *OIDCSessionWriteModel, requestedScope []string) (scope []string, err error)
+type RefreshTokenComplianceChecker func(ctx context.Context, wm *OIDCSessionWriteModel, requestedScope []string, reqClientID string) (scope []string, err error)
 
 // ExchangeOIDCSessionRefreshAndAccessToken updates an existing OIDC Session, creates a new access and refresh token.
 // It returns the access token id and expiration and the new refresh token.
-func (c *Commands) ExchangeOIDCSessionRefreshAndAccessToken(ctx context.Context, refreshToken string, scope []string, complianceCheck RefreshTokenComplianceChecker) (_ *OIDCSession, err error) {
+func (c *Commands) ExchangeOIDCSessionRefreshAndAccessToken(ctx context.Context, refreshToken string, scope []string, reqClientID string, complianceCheck RefreshTokenComplianceChecker) (_ *OIDCSession, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -204,7 +204,7 @@ func (c *Commands) ExchangeOIDCSessionRefreshAndAccessToken(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	scope, err = complianceCheck(ctx, cmd.oidcSessionWriteModel, scope)
+	scope, err = complianceCheck(ctx, cmd.oidcSessionWriteModel, scope, reqClientID)
 	if err != nil {
 		return nil, err
 	}
@@ -239,6 +239,9 @@ func (c *Commands) OIDCSessionByRefreshToken(ctx context.Context, refreshToken s
 		return nil, zerrors.ThrowPreconditionFailed(err, "OIDCS-SAF31", "Errors.OIDCSession.RefreshTokenInvalid")
 	}
 	if err = writeModel.CheckRefreshToken(refreshTokenID); err != nil {
+		return nil, err
+	}
+	if err = c.checkOrgNotDeactivatedAfter(ctx, writeModel.UserResourceOwner, writeModel.RefreshTokenIssuedAt); err != nil {
 		return nil, err
 	}
 	return writeModel, nil
@@ -294,12 +297,9 @@ func (c *Commands) RevokeOIDCSessionToken(ctx context.Context, token, clientID s
 }
 
 func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, userID, resourceOwner string, pending ...eventstore.Command) (*OIDCSessionEvents, error) {
-	userStateModel, err := c.userStateWriteModel(ctx, userID)
+	userStateModel, err := c.userStateForAuthentication(ctx, userID, resourceOwner, "OIDCS-kj3g2", "OIDCS-oR9nA")
 	if err != nil {
 		return nil, err
-	}
-	if !userStateModel.UserState.IsEnabled() {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDCS-kj3g2", "Errors.User.NotActive")
 	}
 	accessTokenLifetime, refreshTokenLifeTime, refreshTokenIdleLifetime, err := c.tokenTokenLifetimes(ctx)
 	if err != nil {
@@ -353,12 +353,11 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken 
 	if err = sessionWriteModel.CheckRefreshToken(refreshTokenID); err != nil {
 		return nil, err
 	}
-	userStateWriteModel, err := c.userStateWriteModel(ctx, sessionWriteModel.UserID)
-	if err != nil {
+	if err = c.checkOrgNotDeactivatedAfter(ctx, sessionWriteModel.UserResourceOwner, sessionWriteModel.RefreshTokenIssuedAt); err != nil {
 		return nil, err
 	}
-	if !userStateWriteModel.UserState.IsEnabled() {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDCS-J39h2", "Errors.User.NotActive")
+	if _, err = c.userStateForAuthentication(ctx, sessionWriteModel.UserID, sessionWriteModel.UserResourceOwner, "OIDCS-J39h2", "OIDCS-pQ2mB"); err != nil {
+		return nil, err
 	}
 	accessTokenLifetime, refreshTokenLifeTime, refreshTokenIdleLifetime, err := c.tokenTokenLifetimes(ctx)
 	if err != nil {

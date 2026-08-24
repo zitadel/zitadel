@@ -2,6 +2,7 @@ package oauth
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -65,12 +66,13 @@ func WithRelyingPartyOption(option rp.Option) ProviderOpts {
 }
 
 // New creates a generic OAuth 2.0 provider
-func New(config *oauth2.Config, name, userEndpoint string, user func() idp.User, options ...ProviderOpts) (provider *Provider, err error) {
+func New(config *oauth2.Config, name, userEndpoint string, user func() idp.User, httpClient *http.Client, options ...ProviderOpts) (provider *Provider, err error) {
 	provider = &Provider{
 		name:             name,
 		userEndpoint:     userEndpoint,
 		user:             user,
 		generateVerifier: oauth2.GenerateVerifier,
+		options:          []rp.Option{rp.WithHTTPClient(httpClient)},
 	}
 	for _, option := range options {
 		option(provider)

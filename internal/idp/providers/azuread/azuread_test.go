@@ -2,6 +2,7 @@ package azuread
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -74,7 +75,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 			a := assert.New(t)
 			r := require.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.options...)
+			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, http.DefaultClient, tt.fields.options...)
 			r.NoError(err)
 
 			ctx := context.Background()
@@ -169,7 +170,7 @@ func TestProvider_Options(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.options...)
+			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, http.DefaultClient, tt.fields.options...)
 			require.NoError(t, err)
 
 			a.Equal(tt.want.name, provider.Name())

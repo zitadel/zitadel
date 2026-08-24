@@ -9,9 +9,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"io"
-	"net"
 	"net/http"
-	"net/url"
 	"sync"
 	"time"
 
@@ -22,7 +20,6 @@ import (
 	zhttp "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/oidc/sign"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/repository/execution"
@@ -46,7 +43,7 @@ func CallTargets(
 	info ContextInfo,
 	alg crypto.EncryptionAlgorithm,
 	activeSigningKey GetActiveSigningWebKey,
-	deniedIPList []denylist.AddressChecker,
+	client *http.Client,
 ) (_ any, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -58,7 +55,7 @@ func CallTargets(
 
 	for _, target := range targets {
 		// call the type of target
-		resp, err := CallTarget(ctx, target, info, alg, signerOnce, encrypters, deniedIPList)
+		resp, err := CallTarget(ctx, target, info, alg, signerOnce, encrypters, client)
 		// handle error if interrupt is set
 		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "target", target.GetTargetID()).OnError(err).Error("error calling target")
 		if err != nil && target.IsInterruptOnError() {
@@ -86,7 +83,7 @@ func CallTarget(
 	alg crypto.EncryptionAlgorithm,
 	signerOnce sign.SignerFunc,
 	encrypters *sync.Map,
-	deniedIPList []denylist.AddressChecker,
+	client *http.Client,
 ) (res []byte, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -94,16 +91,6 @@ func CallTarget(
 	signingKey, err := target.GetSigningKey(alg)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "EXEC-thiiCh5b", "Errors.Internal")
-	}
-
-	if target.GetEndpoint() != "" {
-		endpointURL, err := url.Parse(target.GetEndpoint())
-		if err != nil {
-			return nil, zerrors.ThrowInvalidArgument(err, "EXEC-N5lu09", "Errors.Endpoint.Invalid")
-		}
-		if err := denylist.IsHostBlocked(deniedIPList, endpointURL, net.LookupIP); err != nil {
-			return nil, zerrors.ThrowInvalidArgument(err, "EXEC-N5lu09", "Errors.Endpoint.Denied")
-		}
 	}
 
 	body, err := payload(ctx, info.GetHTTPRequestBody(), target, signerOnce, encrypters)
@@ -114,13 +101,13 @@ func CallTarget(
 	switch target.GetTargetType() {
 	// get request, ignore response and return request and error for handling in list of targets
 	case target_domain.TargetTypeWebhook:
-		return nil, webhook(ctx, target.GetEndpoint(), target.GetTimeout(), body, signingKey)
+		return nil, webhook(ctx, target.GetEndpoint(), target.GetTimeout(), body, signingKey, client)
 	// get request, return response and error
 	case target_domain.TargetTypeCall:
-		return Call(ctx, target.GetEndpoint(), target.GetTimeout(), body, signingKey)
+		return Call(ctx, target.GetEndpoint(), target.GetTimeout(), body, signingKey, client)
 	case target_domain.TargetTypeAsync:
 		go func(ctx context.Context, target target_domain.Target, info []byte) {
-			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info, signingKey); err != nil {
+			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info, signingKey, client); err != nil {
 				logging.WithFields("target", target.GetTargetID()).OnError(err).Info(err)
 			}
 		}(context.WithoutCancel(ctx), target, body)
@@ -238,13 +225,13 @@ func publicKeyFromBytes(data []byte) (any, jose.KeyAlgorithm, error) {
 }
 
 // webhook call a webhook, ignore the response but return the errror
-func webhook(ctx context.Context, url string, timeout time.Duration, body []byte, signingKey string) error {
-	_, err := Call(ctx, url, timeout, body, signingKey)
+func webhook(ctx context.Context, url string, timeout time.Duration, body []byte, signingKey string, client *http.Client) error {
+	_, err := Call(ctx, url, timeout, body, signingKey, client)
 	return err
 }
 
 // Call function to do a post HTTP request to a desired url with timeout
-func Call(ctx context.Context, url string, timeout time.Duration, body []byte, signingKey string) (_ []byte, err error) {
+func Call(ctx context.Context, url string, timeout time.Duration, body []byte, signingKey string, client *http.Client) (_ []byte, err error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
@@ -261,7 +248,6 @@ func Call(ctx context.Context, url string, timeout time.Duration, body []byte, s
 		req.Header.Set(actions.SigningHeader, actions.ComputeSignatureHeader(time.Now(), body, signingKey))
 	}
 
-	client := http.DefaultClient
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err

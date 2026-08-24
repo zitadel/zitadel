@@ -204,6 +204,7 @@ Errors:
     AlreadyActive: "Organisasi sudah aktif"
     Empty: "Organisasi kosong"
     NotFound: "Organisasi tidak ditemukan"
+    NotActive: "Organisasi tidak aktif"
     NotChanged: "Organisasi tidak berubah"
     DefaultOrgNotDeletable: "Organisasi Default tidak boleh dihapus"
     ZitadelOrgNotDeletable: "Organisasi dengan proyek Zitadel tidak boleh dihapus"
@@ -282,6 +283,8 @@ Errors:
     LabelPolicy:
       NotFound: "Kebijakan Label Pribadi tidak ditemukan"
       NotChanged: "Kebijakan Label Pribadi belum diubah"
+    IDPConfig:
+      NotExisting: "Konfigurasi Penyedia Identitas tidak ada"
   Project:
     ProjectIDMissing: "Id Proyek tidak ada"
     AlreadyExists: "Proyek sudah ada di organisasi"

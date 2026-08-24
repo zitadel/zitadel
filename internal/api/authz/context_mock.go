@@ -22,6 +22,13 @@ func WithMockFeatures(features feature.Features) MockContextInstanceOpts {
 	}
 }
 
+func WithMockDynamicClientRegistration(enabled, allowUnauthenticated bool) MockContextInstanceOpts {
+	return func(i *instance) {
+		i.enableDCR = enabled
+		i.allowUnauthenticatedDCR = allowUnauthenticated
+	}
+}
+
 func WithMockProjectID(projectID string) MockContextInstanceOpts {
 	return func(i *instance) {
 		i.projectID = projectID

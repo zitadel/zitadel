@@ -47,6 +47,7 @@ type IDPTemplate struct {
 	*LDAPIDPTemplate
 	*AppleIDPTemplate
 	*SAMLIDPTemplate
+	*ZitadelIDPTemplate
 }
 
 type IDPTemplates struct {
@@ -82,6 +83,7 @@ type JWTIDPTemplate struct {
 	KeysEndpoint string
 	HeaderName   string
 	Endpoint     string
+	Audience     string
 }
 
 type AzureADIDPTemplate struct {
@@ -167,6 +169,15 @@ type SAMLIDPTemplate struct {
 	NameIDFormat                  sql.Null[domain.SAMLNameIDFormat]
 	TransientMappingAttributeName string
 	FederatedLogoutEnabled        bool
+}
+
+type ZitadelIDPTemplate struct {
+	IDPID             string
+	ClientID          string
+	ClientSecret      *crypto.CryptoValue
+	Issuer            string
+	Scopes            database.TextArray[string]
+	InstanceRolesInfo database.JSONArray[idp.RolesInfo]
 }
 
 var (
@@ -353,6 +364,10 @@ var (
 	}
 	JWTHeaderNameCol = Column{
 		name:  projection.JWTHeaderNameCol,
+		table: jwtIdpTemplateTable,
+	}
+	JWTAudienceCol = Column{
+		name:  projection.JWTAudienceCol,
 		table: jwtIdpTemplateTable,
 	}
 )
@@ -736,6 +751,41 @@ var (
 	}
 )
 
+var (
+	zitadelIdpTemplateTable = table{
+		name:          projection.IDPTemplateZitadelTable,
+		instanceIDCol: projection.ZitadelInstanceIDCol,
+	}
+	ZitadelIDCol = Column{
+		name:  projection.ZitadelIDCol,
+		table: zitadelIdpTemplateTable,
+	}
+	ZitadelInstanceIDCol = Column{
+		name:  projection.ZitadelInstanceIDCol,
+		table: zitadelIdpTemplateTable,
+	}
+	ZitadelIssuerCol = Column{
+		name:  projection.ZitadelIssuerCol,
+		table: zitadelIdpTemplateTable,
+	}
+	ZitadelClientIDCol = Column{
+		name:  projection.ZitadelClientIDCol,
+		table: zitadelIdpTemplateTable,
+	}
+	ZitadelClientSecretCol = Column{
+		name:  projection.ZitadelClientSecretCol,
+		table: zitadelIdpTemplateTable,
+	}
+	ZitadelScopesCol = Column{
+		name:  projection.ZitadelScopesCol,
+		table: zitadelIdpTemplateTable,
+	}
+	ZitadelInstanceRolesInfoCol = Column{
+		name:  projection.ZitadelInstanceRolesInfoCol,
+		table: zitadelIdpTemplateTable,
+	}
+)
+
 // IDPTemplateByID searches for the requested id with permission check if necessary
 func (q *Queries) IDPTemplateByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool, permissionCheck domain.PermissionCheck, queries ...SearchQuery) (template *IDPTemplate, err error) {
 	idp, err := q.idpTemplateByID(ctx, shouldTriggerBulk, id, withOwnerRemoved, queries...)
@@ -913,6 +963,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			JWTEndpointCol.identifier(),
 			JWTKeysEndpointCol.identifier(),
 			JWTHeaderNameCol.identifier(),
+			JWTAudienceCol.identifier(),
 			// azure
 			AzureADIDCol.identifier(),
 			AzureADClientIDCol.identifier(),
@@ -992,6 +1043,13 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			AppleKeyIDCol.identifier(),
 			ApplePrivateKeyCol.identifier(),
 			AppleScopesCol.identifier(),
+			// zitadel
+			ZitadelIDCol.identifier(),
+			ZitadelIssuerCol.identifier(),
+			ZitadelClientIDCol.identifier(),
+			ZitadelClientSecretCol.identifier(),
+			ZitadelScopesCol.identifier(),
+			ZitadelInstanceRolesInfoCol.identifier(),
 		).From(idpTemplateTable.identifier()).
 			LeftJoin(join(OAuthIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(OIDCIDCol, IDPTemplateIDCol)).
@@ -1005,6 +1063,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			LeftJoin(join(SAMLIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(AppleIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(ZitadelIDCol, IDPTemplateIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*IDPTemplate, error) {
 			idpTemplate := new(IDPTemplate)
@@ -1034,6 +1093,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			jwtEndpoint := sql.NullString{}
 			jwtKeysEndpoint := sql.NullString{}
 			jwtHeaderName := sql.NullString{}
+			jwtAudience := sql.NullString{}
 
 			azureadID := sql.NullString{}
 			azureadClientID := sql.NullString{}
@@ -1114,6 +1174,13 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			applePrivateKey := new(crypto.CryptoValue)
 			appleScopes := database.TextArray[string]{}
 
+			zitadelID := sql.NullString{}
+			zitadelClientID := sql.NullString{}
+			zitadelClientSecret := new(crypto.CryptoValue)
+			zitadelIssuer := sql.NullString{}
+			zitadelScopes := database.TextArray[string]{}
+			zitadelInstanceRolesInfo := database.JSONArray[idp.RolesInfo]{}
+
 			err := row.Scan(
 				&idpTemplate.ID,
 				&idpTemplate.ResourceOwner,
@@ -1153,6 +1220,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				&jwtEndpoint,
 				&jwtKeysEndpoint,
 				&jwtHeaderName,
+				&jwtAudience,
 				// azure
 				&azureadID,
 				&azureadClientID,
@@ -1232,6 +1300,13 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				&appleKeyID,
 				&applePrivateKey,
 				&appleScopes,
+				// zitadel
+				&zitadelID,
+				&zitadelIssuer,
+				&zitadelClientID,
+				&zitadelClientSecret,
+				&zitadelScopes,
+				&zitadelInstanceRolesInfo,
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
@@ -1273,6 +1348,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 					KeysEndpoint: jwtKeysEndpoint.String,
 					HeaderName:   jwtHeaderName.String,
 					Endpoint:     jwtEndpoint.String,
+					Audience:     jwtAudience.String,
 				}
 			}
 			if azureadID.Valid {
@@ -1383,7 +1459,16 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 					Scopes:     appleScopes,
 				}
 			}
-
+			if zitadelID.Valid {
+				idpTemplate.ZitadelIDPTemplate = &ZitadelIDPTemplate{
+					IDPID:             zitadelID.String,
+					ClientID:          zitadelClientID.String,
+					ClientSecret:      zitadelClientSecret,
+					Issuer:            zitadelIssuer.String,
+					Scopes:            zitadelScopes,
+					InstanceRolesInfo: zitadelInstanceRolesInfo,
+				}
+			}
 			return idpTemplate, nil
 		}
 }
@@ -1429,6 +1514,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			JWTEndpointCol.identifier(),
 			JWTKeysEndpointCol.identifier(),
 			JWTHeaderNameCol.identifier(),
+			JWTAudienceCol.identifier(),
 			// azure
 			AzureADIDCol.identifier(),
 			AzureADClientIDCol.identifier(),
@@ -1508,6 +1594,13 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			AppleKeyIDCol.identifier(),
 			ApplePrivateKeyCol.identifier(),
 			AppleScopesCol.identifier(),
+			// zitadel
+			ZitadelIDCol.identifier(),
+			ZitadelIssuerCol.identifier(),
+			ZitadelClientIDCol.identifier(),
+			ZitadelClientSecretCol.identifier(),
+			ZitadelScopesCol.identifier(),
+			ZitadelInstanceRolesInfoCol.identifier(),
 			// count
 			countColumn.identifier(),
 		).From(idpTemplateTable.identifier()).
@@ -1523,6 +1616,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			LeftJoin(join(SAMLIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(AppleIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(ZitadelIDCol, IDPTemplateIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPTemplates, error) {
 			templates := make([]*IDPTemplate, 0)
@@ -1555,6 +1649,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 				jwtEndpoint := sql.NullString{}
 				jwtKeysEndpoint := sql.NullString{}
 				jwtHeaderName := sql.NullString{}
+				jwtAudience := sql.NullString{}
 
 				azureadID := sql.NullString{}
 				azureadClientID := sql.NullString{}
@@ -1635,6 +1730,13 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 				applePrivateKey := new(crypto.CryptoValue)
 				appleScopes := database.TextArray[string]{}
 
+				zitadelID := sql.NullString{}
+				zitadelIssuer := sql.NullString{}
+				zitadelClientID := sql.NullString{}
+				zitadelClientSecret := new(crypto.CryptoValue)
+				zitadelScopes := database.TextArray[string]{}
+				zitadelInstanceRolesInfo := database.JSONArray[idp.RolesInfo]{}
+
 				err := rows.Scan(
 					&idpTemplate.ID,
 					&idpTemplate.ResourceOwner,
@@ -1674,6 +1776,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					&jwtEndpoint,
 					&jwtKeysEndpoint,
 					&jwtHeaderName,
+					&jwtAudience,
 					// azure
 					&azureadID,
 					&azureadClientID,
@@ -1753,6 +1856,13 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					&appleKeyID,
 					&applePrivateKey,
 					&appleScopes,
+					// zitadel
+					&zitadelID,
+					&zitadelIssuer,
+					&zitadelClientID,
+					&zitadelClientSecret,
+					&zitadelScopes,
+					&zitadelInstanceRolesInfo,
 					&count,
 				)
 
@@ -1793,6 +1903,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 						KeysEndpoint: jwtKeysEndpoint.String,
 						HeaderName:   jwtHeaderName.String,
 						Endpoint:     jwtEndpoint.String,
+						Audience:     jwtAudience.String,
 					}
 				}
 				if azureadID.Valid {
@@ -1901,6 +2012,16 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 						KeyID:      appleKeyID.String,
 						PrivateKey: applePrivateKey,
 						Scopes:     appleScopes,
+					}
+				}
+				if zitadelID.Valid {
+					idpTemplate.ZitadelIDPTemplate = &ZitadelIDPTemplate{
+						IDPID:             zitadelID.String,
+						Issuer:            zitadelIssuer.String,
+						ClientID:          zitadelClientID.String,
+						ClientSecret:      zitadelClientSecret,
+						Scopes:            zitadelScopes,
+						InstanceRolesInfo: zitadelInstanceRolesInfo,
 					}
 				}
 				templates = append(templates, idpTemplate)

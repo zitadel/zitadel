@@ -40,9 +40,7 @@ export class ProjectMembersDataSource extends DataSource<Member.AsObject> {
     this.loadingSubject.next(true);
 
     const promise:
-      | Promise<ListProjectMembersResponse.AsObject>
-      | Promise<ListProjectGrantMembersResponse.AsObject>
-      | undefined =
+      Promise<ListProjectMembersResponse.AsObject> | Promise<ListProjectGrantMembersResponse.AsObject> | undefined =
       projectType === ProjectType.PROJECTTYPE_OWNED
         ? this.service.listProjectMembers(projectId, pageSize, offset)
         : projectType === ProjectType.PROJECTTYPE_GRANTED && grantId

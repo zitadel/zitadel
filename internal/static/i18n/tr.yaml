@@ -205,6 +205,7 @@ Errors:
     AlreadyActive: "Organizasyon zaten aktif"
     Empty: "Organizasyon boş"
     NotFound: "Organizasyon bulunamadı"
+    NotActive: "Organizasyon aktif değil"
     NotChanged: "Organizasyon değişmedi"
     DefaultOrgNotDeletable: "Varsayılan Organizasyon silinmemeli"
     ZitadelOrgNotDeletable: "Zitadel projesi olan organizasyon silinmemeli"
@@ -283,6 +284,8 @@ Errors:
     LabelPolicy:
       NotFound: "Özel Etiket Politikası bulunamadı"
       NotChanged: "Özel Etiket Politikası değişmedi"
+    IDPConfig:
+      NotExisting: "Kimlik Sağlayıcısı Yapılandırması mevcut değil"
   Project:
     ProjectIDMissing: "Proje Id eksik"
     AlreadyExists: "Proje organizasyonda zaten mevcut"

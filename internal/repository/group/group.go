@@ -20,6 +20,8 @@ type GroupAddedEvent struct {
 	Description string `json:"description,omitempty"`
 }
 
+func (*GroupAddedEvent) EnforceResourceOwner() {}
+
 func NewGroupAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,

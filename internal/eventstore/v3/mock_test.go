@@ -5,12 +5,19 @@ import (
 )
 
 var _ eventstore.Command = (*mockCommand)(nil)
+var _ eventstore.EnforceResourceOwnerCommand = (*enforcedMockCommand)(nil)
 
 type mockCommand struct {
 	aggregate   *eventstore.Aggregate
 	payload     any
 	constraints []*eventstore.UniqueConstraint
 }
+
+type enforcedMockCommand struct {
+	*mockCommand
+}
+
+func (*enforcedMockCommand) EnforceResourceOwner() {}
 
 // Aggregate implements [eventstore.Command]
 func (m *mockCommand) Aggregate() *eventstore.Aggregate {

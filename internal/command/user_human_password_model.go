@@ -58,13 +58,35 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
+			wm.Code = nil
+			wm.CodeCreationDate = time.Time{}
+			wm.CodeExpiry = 0
+			wm.PasswordCheckFailedCount = 0
+			wm.GeneratorID = ""
+			wm.VerificationID = ""
 			wm.EncodedHash = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 			wm.SecretChangeRequired = e.ChangeRequired
 			wm.UserState = domain.UserStateActive
 		case *user.HumanRegisteredEvent:
+			wm.Code = nil
+			wm.CodeCreationDate = time.Time{}
+			wm.CodeExpiry = 0
+			wm.PasswordCheckFailedCount = 0
+			wm.GeneratorID = ""
+			wm.VerificationID = ""
 			wm.EncodedHash = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 			wm.SecretChangeRequired = e.ChangeRequired
 			wm.UserState = domain.UserStateActive
+		case *user.MachineAddedEvent:
+			wm.Code = nil
+			wm.CodeCreationDate = time.Time{}
+			wm.CodeExpiry = 0
+			wm.PasswordCheckFailedCount = 0
+			wm.GeneratorID = ""
+			wm.VerificationID = ""
+			wm.EncodedHash = ""
+			wm.SecretChangeRequired = false
+			wm.UserState = domain.UserStateUnspecified
 		case *user.HumanInitialCodeAddedEvent:
 			wm.UserState = domain.UserStateInitial
 		case *user.HumanInitializedCheckSucceededEvent:
@@ -98,6 +120,14 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 				wm.UserState = domain.UserStateActive
 			}
 		case *user.UserRemovedEvent:
+			wm.EncodedHash = ""
+			wm.SecretChangeRequired = false
+			wm.Code = nil
+			wm.CodeCreationDate = time.Time{}
+			wm.CodeExpiry = 0
+			wm.PasswordCheckFailedCount = 0
+			wm.GeneratorID = ""
+			wm.VerificationID = ""
 			wm.UserState = domain.UserStateDeleted
 		case *user.HumanPasswordHashUpdatedEvent:
 			wm.EncodedHash = e.EncodedHash
@@ -113,6 +143,7 @@ func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(user.HumanAddedType,
 			user.HumanRegisteredType,
+			user.MachineAddedEventType,
 			user.HumanInitialCodeAddedType,
 			user.HumanInitializedCheckSucceededType,
 			user.HumanPasswordChangedType,

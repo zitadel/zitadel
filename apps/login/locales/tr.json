@@ -164,6 +164,7 @@
     "signInWithAzureAD": "AzureAD ile Giriş",
     "signInWithGithub": "GitHub ile Giriş",
     "signInWithGitlab": "GitLab ile Giriş",
+    "signInWithZitadel": "Zitadel ile Giriş",
     "loginError": {
       "title": "Giriş başarısız",
       "description": "Giriş yapılmaya çalışılırken bir hata oluştu."
