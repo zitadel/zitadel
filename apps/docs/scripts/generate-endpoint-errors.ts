@@ -85,7 +85,7 @@
 // ─────────────────────────────────────────────────────────────────────────
 
 import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync } from 'fs';
-import { join, dirname } from 'path';
+import { join, dirname, relative } from 'path';
 import { fileURLToPath } from 'url';
 import { GRPC_STATUS } from '../lib/grpc-status';
 
@@ -202,7 +202,7 @@ export function listUnwiredProtoServices(): { category: string; service: string;
 }
 
 function relativeToRepo(absPath: string): string {
-  return absPath.startsWith(REPO_ROOT + '/') ? absPath.slice(REPO_ROOT.length + 1) : absPath;
+  return relative(REPO_ROOT, absPath);
 }
 
 const SERVICES = discoverServices();
