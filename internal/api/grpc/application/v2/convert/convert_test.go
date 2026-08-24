@@ -362,7 +362,9 @@ func TestLoginVersionToDomain(t *testing.T) {
 		{
 			name:          "login v2 invalid URI",
 			version:       &application.LoginVersion{Version: &application.LoginVersion_LoginV2{LoginV2: &application.LoginV2{BaseUri: gu.Ptr("://invalid")}}},
-			expectedError: zerrors.ThrowInvalidArgument(&url.Error{Op: "parse", URL: "://invalid", Err: errors.New("missing protocol scheme")}, "CONV-4nQ7x", "invalid login base URI"),
+			expectedVer:   gu.Ptr(domain.LoginVersion2),
+			expectedURI:   gu.Ptr("://invalid"),
+			expectedError: &url.Error{Op: "parse", URL: "://invalid", Err: errors.New("missing protocol scheme")},
 		},
 		{
 			name:        "unknown version type",

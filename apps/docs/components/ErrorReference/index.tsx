@@ -1,9 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ChevronRight, TriangleAlert } from 'lucide-react';
 import { cn } from '@/utils/cn';
-import rawData from './data.json';
 
 interface ErrorLocation {
   file: string;
@@ -52,8 +51,6 @@ interface ErrorReferenceData {
   subsystems: Subsystem[];
 }
 
-const data = rawData as ErrorReferenceData;
-
 const WHY_SOURCE_LABEL: Record<WhySource, string> = {
   curated: 'Researched from source',
   'i18n-decomposition': 'Derived from message key',
@@ -88,13 +85,33 @@ function matchesQuery(cluster: ErrorCluster, q: string) {
 }
 
 export default function ErrorReference() {
+  const [data, setData] = useState<ErrorReferenceData | null>(null);
+  const [loadError, setLoadError] = useState(false);
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/error-reference')
+      .then((res) => {
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+        return res.json();
+      })
+      .then((json) => {
+        if (!cancelled) setData(json as ErrorReferenceData);
+      })
+      .catch(() => {
+        if (!cancelled) setLoadError(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const trimmedQuery = query.trim().toLowerCase();
 
   const searchResults = useMemo(() => {
-    if (!trimmedQuery) return null;
+    if (!data || !trimmedQuery) return null;
     const results: { subsystem: Subsystem; kind: KindBucket; cluster: ErrorCluster }[] = [];
     for (const subsystem of data.subsystems) {
       for (const kind of subsystem.kinds) {
@@ -107,7 +124,7 @@ export default function ErrorReference() {
       }
     }
     return results;
-  }, [trimmedQuery]);
+  }, [data, trimmedQuery]);
 
   function toggle(key: string) {
     setExpanded((prev) => {
@@ -116,6 +133,13 @@ export default function ErrorReference() {
       else next.add(key);
       return next;
     });
+  }
+
+  if (loadError) {
+    return <p className="text-sm text-fd-muted-foreground">Couldn&apos;t load the error reference. Try reloading the page.</p>;
+  }
+  if (!data) {
+    return <p className="text-sm text-fd-muted-foreground">Loading error reference…</p>;
   }
 
   return (
@@ -197,6 +221,7 @@ function SubsystemSection({
       <button
         type="button"
         onClick={() => toggle(subsystem.id)}
+        aria-expanded={open}
         className="flex items-start w-full gap-2 px-3 py-2 text-left"
       >
         <ChevronRight className={cn('size-4 shrink-0 mt-0.5 transition-transform text-fd-muted-foreground', open && 'rotate-90')} />
@@ -239,7 +264,7 @@ function KindSection({
   const open = expanded.has(key);
   return (
     <div className="border rounded-md border-fd-border/60">
-      <button type="button" onClick={() => toggle(key)} className="flex items-center w-full gap-2 px-3 py-1.5 text-left">
+      <button type="button" onClick={() => toggle(key)} aria-expanded={open} className="flex items-center w-full gap-2 px-3 py-1.5 text-left">
         <ChevronRight className={cn('size-3.5 shrink-0 transition-transform text-fd-muted-foreground', open && 'rotate-90')} />
         <span className="font-mono text-xs text-fd-foreground">{kind.kind}</span>
         <span className="text-xs text-fd-muted-foreground">
@@ -269,7 +294,7 @@ function ClusterRow({
   const open = expanded.has(cluster.key);
   return (
     <div className="border rounded-md border-fd-border/60">
-      <button type="button" onClick={() => toggle(cluster.key)} className="flex items-start w-full gap-2 px-2 py-1.5 text-left">
+      <button type="button" onClick={() => toggle(cluster.key)} aria-expanded={open} className="flex items-start w-full gap-2 px-2 py-1.5 text-left">
         <ChevronRight className={cn('size-3.5 shrink-0 mt-0.5 transition-transform text-fd-muted-foreground', open && 'rotate-90')} />
         <span className="flex-1 font-mono text-xs break-all text-fd-foreground">{cluster.message || '(empty message)'}</span>
         {cluster.collidesWith.length > 0 && <TriangleAlert className="size-3.5 shrink-0 text-amber-500" />}

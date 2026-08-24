@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/zerrors"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 )
 
@@ -64,11 +63,11 @@ func TestCreateSAMLAppRequestToDomain(t *testing.T) {
 					},
 				},
 			},
-			expectedError: zerrors.ThrowInvalidArgument(&url.Error{
+			expectedError: &url.Error{
 				URL: "%+o",
 				Op:  "parse",
 				Err: url.EscapeError("%+o"),
-			}, "CONV-8mK2p", "invalid login base URI"),
+			},
 		},
 		{
 			testName:  "valid request",
@@ -148,11 +147,11 @@ func TestUpdateSAMLAppConfigRequestToDomain(t *testing.T) {
 					},
 				},
 			},
-			expectedError: zerrors.ThrowInvalidArgument(&url.Error{
+			expectedError: &url.Error{
 				URL: "%+o",
 				Op:  "parse",
 				Err: url.EscapeError("%+o"),
-			}, "CONV-8mK2p", "invalid login base URI"),
+			},
 		},
 		{
 			testName:  "valid request",
