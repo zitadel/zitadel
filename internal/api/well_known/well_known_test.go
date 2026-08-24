@@ -96,7 +96,7 @@ func TestBuildAssetLinks(t *testing.T) {
 			},
 			want: []assetLink{
 				{
-					Relation: []string{"delegate_permission/common.get_login_creds"},
+					Relation: []string{"delegate_permission/common.handle_all_urls", "delegate_permission/common.get_login_creds"},
 					Target: assetLinkTarget{
 						Namespace:   "android_app",
 						PackageName: "com.one",
@@ -106,7 +106,7 @@ func TestBuildAssetLinks(t *testing.T) {
 					},
 				},
 				{
-					Relation: []string{"delegate_permission/common.get_login_creds"},
+					Relation: []string{"delegate_permission/common.handle_all_urls", "delegate_permission/common.get_login_creds"},
 					Target: assetLinkTarget{
 						Namespace:   "android_app",
 						PackageName: "com.two",
@@ -191,7 +191,7 @@ func TestHandlerCacheControl(t *testing.T) {
 		{
 			name:       "default max-age",
 			maxAge:     5 * time.Minute,
-			wantHeader: "public, max-age=300",
+			wantHeader: "max-age=300, must-revalidate",
 		},
 		{
 			name:       "no-store when zero",
@@ -215,8 +215,12 @@ func TestHandlerCacheControl(t *testing.T) {
 				rec := httptest.NewRecorder()
 				h.ServeHTTP(rec, req)
 				require.Equal(t, http.StatusOK, rec.Code)
-				assert.Equal(t, tc.wantHeader, rec.Header().Get(http_util.CacheControl), path)
-				assert.NotContains(t, rec.Header().Get(http_util.CacheControl), "stale-while-revalidate")
+				cacheControl := rec.Header().Get(http_util.CacheControl)
+				assert.Equal(t, tc.wantHeader, cacheControl, path)
+				assert.NotContains(t, cacheControl, "stale-while-revalidate")
+				// "public" must never be set: it opts the response into shared caches
+				// (e.g. a CDN), whose independent edges can pin diverging copies.
+				assert.NotContains(t, cacheControl, "public", path)
 			}
 		})
 	}
@@ -234,7 +238,7 @@ func TestHandlerHeadOmitsBody(t *testing.T) {
 			h.ServeHTTP(rec, req)
 			require.Equal(t, http.StatusOK, rec.Code)
 			assert.Equal(t, "application/json", rec.Header().Get("Content-Type"))
-			assert.Equal(t, "public, max-age=300", rec.Header().Get(http_util.CacheControl))
+			assert.Equal(t, "max-age=300, must-revalidate", rec.Header().Get(http_util.CacheControl))
 			assert.Empty(t, rec.Body.Bytes())
 		})
 	}
