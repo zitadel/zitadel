@@ -556,6 +556,12 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
         });
         logger.info("User auto-linked successfully, creating session");
 
+        // Synchronize instance member roles for ZITADEL IdPs with instanceRolesInfo
+        // configured (e.g. support access). Merge-only and never blocks the login.
+        // Required here as well: a user that is auto-linked on this login would
+        // otherwise only receive its roles on the next one (via the existing-user path).
+        await syncInstanceRolesFromIdpIntent({ serviceConfig, intent, userId: foundUser.userId });
+
         // Create session after auto-linking
         const sessionResult = await createNewSessionFromIdpIntent({
           userId: foundUser.userId,

@@ -2203,6 +2203,10 @@
       "TITLE": "Añadir proveedor",
       "DESCRIPTION": "Selecciona uno o más de los siguientes proveedores.",
       "STEPPERTITLE": "Crear proveedor",
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "Introduce los datos necesarios para permitir que los usuarios de otra instancia de ZITADEL se autentiquen."
+      },
       "OIDC": {
         "TITLE": "Proveedor OIDC",
         "DESCRIPTION": "Introduce los datos requeridos por tu proveedor OIDC."
@@ -2307,6 +2311,10 @@
     "STATE": "Estado",
     "ISSUER": "Emisor",
     "SCOPESLIST": "Lista de scopes",
+    "INSTANCEROLESINFO": "Asignación de roles de instancia",
+    "INSTANCEROLESINFO_DESC": "Los usuarios que se autentican con este proveedor reciben los roles de miembro de instancia (prefijo IAM_) que poseen en las organizaciones indicadas de la instancia ZITADEL remota. El ID de la organización y el dominio principal deben coincidir.",
+    "ORGANIZATIONID": "ID de la organización",
+    "ORGANIZATIONDOMAIN": "Dominio de la organización",
     "CLIENTID": "ID del cliente",
     "CLIENTSECRET": "Secreto del cliente",
     "LDAPCONNECTION": "Conexión",
