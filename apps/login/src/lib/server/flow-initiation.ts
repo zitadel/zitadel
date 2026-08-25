@@ -1,5 +1,5 @@
 import { getValidLocaleFromUILocales } from "@/lib/auth-utils";
-import { isSafeRedirectUri } from "@/lib/client-utils";
+import { isExternalUrl, isSafeRedirectUri } from "@/lib/client-utils";
 import { getLanguageCookie, setLanguageCookie } from "@/lib/cookies";
 
 import { shouldUILocalesOverrideCookie } from "@/lib/i18n";
@@ -51,6 +51,36 @@ function setCSPHeaders(
   if (!iframeOrigins) {
     response.headers.set("X-Frame-Options", "deny");
   }
+}
+
+/**
+ * Renders a minimal HTML page that immediately POSTs the given fields to
+ * `url`, with a <noscript> fallback button. Used for flows whose next hop
+ * requires a form post instead of a redirect (e.g. SAML POST bindings).
+ * Callers must validate `url` (isSafeRedirectUri) before calling; all values
+ * are HTML-escaped here.
+ */
+function buildAutoSubmitFormResponse(url: string, fields: Record<string, string>): NextResponse {
+  const hiddenInputs = Object.entries(fields)
+    .map(([key, value]) => `<input type="hidden" name="${escapeHtml(key)}" value="${escapeHtml(value)}" />`)
+    .join("\n");
+
+  const html = `
+    <html>
+      <body onload="document.forms[0].submit()">
+        <form action="${escapeHtml(url)}" method="post">
+          ${hiddenInputs}
+          <noscript>
+            <button type="submit">Continue</button>
+          </noscript>
+        </form>
+      </body>
+    </html>
+  `;
+
+  return new NextResponse(html, {
+    headers: { "Content-Type": "text/html" },
+  });
 }
 
 const gotoAccounts = ({
@@ -142,7 +172,33 @@ const resolveLoginHint = async ({
     });
 
     if (res && "redirect" in res && res.redirect) {
+      // sendLoginname can return an absolute URL, e.g. the IdP authorize
+      // endpoint when domain discovery resolves to an org that auto-redirects
+      // to its external IdP. Only relative paths may be resolved against the
+      // login's base path — prepending it to an absolute URL produces a
+      // malformed URL like "https://<host>/ui/v2/loginhttps://idp.example/...".
+      if (isExternalUrl(res.redirect)) {
+        if (!isSafeRedirectUri(res.redirect)) {
+          logger.warn("Blocked unsafe login_hint redirect URL", { redirect: res.redirect });
+          return null;
+        }
+        return NextResponse.redirect(res.redirect);
+      }
       return NextResponse.redirect(constructUrl(request, res.redirect));
+    }
+
+    if (res && "samlData" in res && res.samlData) {
+      // SAML IdP with POST binding: the AuthnRequest must be submitted as a
+      // form post. Render the same auto-submit form used in the idp-scope
+      // branch above and in handleSAMLFlowInitiation, so a login_hint
+      // resolves silently for POST-binding SAML IdPs just like for
+      // redirect-based IdPs.
+      if (!isSafeRedirectUri(res.samlData.url)) {
+        logger.warn("Blocked unsafe SAML post URL from login_hint resolution", { url: res.samlData.url });
+        return null;
+      }
+
+      return buildAutoSubmitFormResponse(res.samlData.url, res.samlData.fields);
     }
 
     if (res && "error" in res && res.error) {
@@ -234,7 +290,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       const idp = identityProviders.find((idp) => idp.id === idpId);
 
       if (idp) {
-        const identityProviderType = identityProviders[0].type;
+        const identityProviderType = idp.type;
 
         if (identityProviderType === IdentityProviderType.LDAP) {
           const ldapUrl = constructUrl(request, "/ldap");
@@ -269,27 +325,16 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           return NextResponse.json({ error: "Could not start IDP flow" }, { status: 500 });
         }
 
+        // Covers both branches below: the form post (SAML POST binding) and
+        // the redirect. Relative paths and same-host/https URLs pass;
+        // javascript:/data:/file: style schemes are blocked.
+        if (!isSafeRedirectUri(response.url)) {
+          logger.warn("Blocked unsafe IdP URL", { url: response.url });
+          return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+        }
+
         if (response.fields) {
-          const hiddenInputs = Object.entries(response.fields)
-            .map(([key, value]) => `<input type="hidden" name="${escapeHtml(key)}" value="${escapeHtml(value)}" />`)
-            .join("\n");
-
-          const html = `
-            <html>
-              <body onload="document.forms[0].submit()">
-                <form action="${escapeHtml(response.url)}" method="post">
-                  ${hiddenInputs}
-                  <noscript>
-                    <button type="submit">Continue</button>
-                  </noscript>
-                </form>
-              </body>
-            </html>
-          `;
-
-          return new NextResponse(html, {
-            headers: { "Content-Type": "text/html" },
-          });
+          return buildAutoSubmitFormResponse(response.url, response.fields);
         }
 
         let url = response.url;
@@ -581,22 +626,9 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
         logger.warn("Blocked unsafe SAML post URL", { url });
         return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
       }
-      const html = `
-        <html>
-          <body onload="document.forms[0].submit()">
-            <form action="${escapeHtml(url)}" method="post">
-              <input type="hidden" name="RelayState" value="${escapeHtml(binding.value.relayState)}" />
-              <input type="hidden" name="SAMLResponse" value="${escapeHtml(binding.value.samlResponse)}" />
-              <noscript>
-                <button type="submit">Continue</button>
-              </noscript>
-            </form>
-          </body>
-        </html>
-      `;
-
-      return new NextResponse(html, {
-        headers: { "Content-Type": "text/html" },
+      return buildAutoSubmitFormResponse(url, {
+        RelayState: binding.value.relayState,
+        SAMLResponse: binding.value.samlResponse,
       });
     }
   } catch (error) {

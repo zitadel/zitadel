@@ -486,7 +486,22 @@ func (c *Commands) HumanRemovePasswordless(ctx context.Context, userID, webAuthN
 	return c.removeHumanWebAuthN(ctx, userID, webAuthNID, resourceOwner, event)
 }
 
+// HumanAddPasswordlessInitCode issues a passwordless init code and returns it to the caller.
+//
+// The permission is deliberately checked with an empty resource owner. Callers pass their own
+// organization, which only scopes the write model's read: for a user of another organization
+// that read matches no events, so the write model keeps the caller's organization while the
+// pushed event is re-owned to the target's organization by the eventstore. Handing an empty
+// resource owner to the check makes it resolve the target's real owner instead, and fail with
+// not found when the user does not exist at all.
+//
+// user.credential.write mirrors the auth annotation of the management RPC calling this
+// (AddPasswordlessRegistration), so no role gains or loses access. Self management stays
+// allowed for the auth API's AddMyPasswordlessLink.
 func (c *Commands) HumanAddPasswordlessInitCode(ctx context.Context, userID, resourceOwner string, passwordlessCodeGenerator crypto.Generator) (*domain.PasswordlessInitCode, error) {
+	if err := c.checkPermissionUpdateUserCredentials(ctx, "", userID); err != nil {
+		return nil, err
+	}
 	codeEvent, initCode, code, err := c.humanAddPasswordlessInitCode(ctx, userID, resourceOwner, true, passwordlessCodeGenerator)
 	if err != nil {
 		return nil, err
@@ -502,7 +517,16 @@ func (c *Commands) HumanAddPasswordlessInitCode(ctx context.Context, userID, res
 	return writeModelToPasswordlessInitCode(initCode, code), nil
 }
 
+// HumanSendPasswordlessInitCode issues a passwordless init code and has it mailed to the user.
+//
+// It checks user.write, the annotation of the management RPC calling this
+// (SendPasswordlessRegistration), which a wider set of roles holds than the
+// user.credential.write of HumanAddPasswordlessInitCode. See there for why the resource owner
+// passed to the check is empty.
 func (c *Commands) HumanSendPasswordlessInitCode(ctx context.Context, userID, resourceOwner string, passwordlessCodeGenerator crypto.Generator) (*domain.PasswordlessInitCode, error) {
+	if err := c.checkPermissionUpdateUser(ctx, "", userID, true); err != nil {
+		return nil, err
+	}
 	codeEvent, initCode, code, err := c.humanAddPasswordlessInitCode(ctx, userID, resourceOwner, false, passwordlessCodeGenerator)
 	if err != nil {
 		return nil, err
@@ -518,6 +542,9 @@ func (c *Commands) HumanSendPasswordlessInitCode(ctx context.Context, userID, re
 	return writeModelToPasswordlessInitCode(initCode, code), nil
 }
 
+// humanAddPasswordlessInitCode is unauthorized on purpose: importHuman calls it while creating
+// the user, whose aggregate has no events yet, so the target's owner cannot be resolved here.
+// Authorization belongs to the exported callers.
 func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, resourceOwner string, direct bool, passwordlessCodeGenerator crypto.Generator) (eventstore.Command, *HumanPasswordlessInitCodeWriteModel, string, error) {
 	if userID == "" {
 		return nil, nil, "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-GVfg3", "Errors.IDMissing")
