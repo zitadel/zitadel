@@ -27,32 +27,7 @@ import (
 )
 
 func setImpersonationPolicy(t *testing.T, instance *integration.Instance, value bool) {
-	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-
-	policy, err := instance.Client.Admin.GetSecurityPolicy(iamCTX, &admin.GetSecurityPolicyRequest{})
-	require.NoError(t, err)
-	if policy.GetPolicy().GetEnableImpersonation() != value {
-		_, err = instance.Client.Admin.SetSecurityPolicy(iamCTX, &admin.SetSecurityPolicyRequest{
-			EnableImpersonation: value,
-		})
-		require.NoError(t, err)
-	}
-
-	retryDuration := time.Minute
-	if ctxDeadline, ok := iamCTX.Deadline(); ok {
-		retryDuration = time.Until(ctxDeadline)
-	}
-	require.EventuallyWithT(t,
-		func(ttt *assert.CollectT) {
-			f, err := instance.Client.Admin.GetSecurityPolicy(iamCTX, &admin.GetSecurityPolicyRequest{})
-			assert.NoError(ttt, err)
-			if f.GetPolicy().GetEnableImpersonation() != value {
-				return
-			}
-		},
-		retryDuration,
-		time.Second,
-		"timed out waiting for ensuring impersonation policy")
+	instance.SetImpersonationPolicy(CTX, t, value)
 }
 
 func createMachineUserPATWithMembership(ctx context.Context, t *testing.T, instance *integration.Instance, roles ...string) (userID, pat string) {

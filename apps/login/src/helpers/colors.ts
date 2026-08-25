@@ -11,20 +11,7 @@ export interface Color {
 export type MapName = "background" | "primary" | "warn" | "text" | "link";
 
 export type ColorName =
-  | "50"
-  | "100"
-  | "200"
-  | "300"
-  | "400"
-  | "500"
-  | "600"
-  | "700"
-  | "800"
-  | "C900"
-  | "A100"
-  | "A200"
-  | "A400"
-  | "A700";
+  "50" | "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "C900" | "A100" | "A200" | "A400" | "A700";
 
 export type ColorMap = {
   [_key in MapName]: Color[];

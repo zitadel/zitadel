@@ -204,6 +204,7 @@ Errors:
     AlreadyActive: "A szervezet már aktív"
     Empty: "A szervezet üres"
     NotFound: "Szervezet nem található"
+    NotActive: "A szervezet nem aktív"
     NotChanged: "A szervezet nem változott"
     DefaultOrgNotDeletable: "Az alapértelmezett szervezetet nem szabad törölni"
     ZitadelOrgNotDeletable: "A Zitadel projekttel rendelkező szervezetet nem szabad törölni"

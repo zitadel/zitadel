@@ -15,6 +15,13 @@ This would give us `${CUSTOM_DOMAIN}/.well-known/openid-configuration`.
 
 **Link to spec.** [OpenID Connect Discovery 1.0 incorporating errata set 1](https://openid.net/specs/openid-connect-discovery-1_0.html)
 
+ZITADEL also serves instance-scoped association files for native passkeys (not part of OIDC discovery):
+
+- `${CUSTOM_DOMAIN}/.well-known/apple-app-site-association`
+- `${CUSTOM_DOMAIN}/.well-known/assetlinks.json`
+
+See [Native app links for passkeys](/guides/integrate/login/oidc/native-app-links).
+
 ## authorization_endpoint
 
 `${CUSTOM_DOMAIN}/oauth/v2/authorize`

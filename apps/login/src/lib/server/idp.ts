@@ -20,8 +20,7 @@ import { createSessionForIdpAndUpdateCookie } from "./cookie";
 import { getPublicHost } from "./host";
 
 export type RedirectToIdpState =
-  | { error?: string | null; samlData?: { url: string; fields: Record<string, string> } }
-  | undefined;
+  { error?: string | null; samlData?: { url: string; fields: Record<string, string> } } | undefined;
 
 export async function redirectToIdp(prevState: RedirectToIdpState, formData: FormData): Promise<RedirectToIdpState> {
   const _headers = await headers();
