@@ -157,6 +157,7 @@
     "signInWithAzureAD": "AzureADでサインイン",
     "signInWithGithub": "GitHubでサインイン",
     "signInWithGitlab": "GitLabでサインイン",
+    "signInWithZitadel": "Zitadelでサインイン",
     "loginError": {
       "title": "ログイン失敗",
       "description": "ログインの際にエラーが発生しました。"

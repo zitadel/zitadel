@@ -20,6 +20,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 async function loadSessions({ serviceConfig, organization }: { serviceConfig: ServiceConfig; organization?: string }) {
+  // Deliberately no cleanup: expired cookie entries are still listed (as invalid
+  // accounts) so the user can re-authenticate with one click, like Login V1.
   const sessionCookies = await getAllSessions();
 
   if (!sessionCookies || !sessionCookies.length) {

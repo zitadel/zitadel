@@ -204,6 +204,7 @@ Errors:
     AlreadyActive: "Organisationen är redan aktiv"
     Empty: "Organisationen är tom"
     NotFound: "Organisationen hittades inte"
+    NotActive: "Organisationen är inte aktiv"
     NotChanged: "Organisationen ändrades inte"
     DefaultOrgNotDeletable: "Standardorganisationen får inte raderas"
     ZitadelOrgNotDeletable: "Organisationen med Zitadel-projekt får inte raderas"

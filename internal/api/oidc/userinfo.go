@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"maps"
 	"net/http"
@@ -21,6 +22,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/execution"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/query"
 	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -58,7 +60,7 @@ func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoReques
 		assertion,
 		true,
 		false,
-	)(ctx, true, domain.TriggerTypePreUserinfoCreation)
+	)(ctx, true, domain.TriggerTypePreUserinfoCreation, token.actor)
 	if err != nil {
 		if !zerrors.IsNotFound(err) {
 			return nil, err
@@ -89,14 +91,14 @@ func (s *Server) userInfo(
 	projectID string,
 	clientID string,
 	projectRoleAssertion, userInfoAssertion, currentProjectOnly bool,
-) func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType) (_ *oidc.UserInfo, err error) {
+) userInfoFunc {
 	var (
 		once                         sync.Once
 		rawUserInfo                  *oidc.UserInfo
 		qu                           *query.OIDCUserInfo
 		roleAudience, requestedRoles []string
 	)
-	return func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType) (_ *oidc.UserInfo, err error) {
+	return func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType, actor *domain.TokenActor) (_ *oidc.UserInfo, err error) {
 		once.Do(func() {
 			ctx, span := tracing.NewSpan(ctx)
 			defer func() { span.EndWithError(err) }()
@@ -122,7 +124,7 @@ func (s *Server) userInfo(
 			Claims:          maps.Clone(rawUserInfo.Claims),
 		}
 		assertRoles(projectID, qu, roleAudience, requestedRoles, roleAssertion, userInfo)
-		return userInfo, s.userinfoFlows(ctx, qu, userInfo, triggerType, clientID)
+		return userInfo, s.userinfoFlows(ctx, qu, userInfo, triggerType, clientID, actor)
 	}
 }
 
@@ -309,16 +311,49 @@ func setUserInfoUserGroups(userGroups []query.UserInfoUserGroup, out *oidc.UserI
 	out.AppendClaims(ClaimUserGroups, groups)
 }
 
-//nolint:gocognit
-func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, triggerType domain.TriggerType, clientID string) (err error) {
+func (s *Server) userinfoFlows(
+	ctx context.Context,
+	qu *query.OIDCUserInfo,
+	userInfo *oidc.UserInfo,
+	triggerType domain.TriggerType,
+	clientID string,
+	actor *domain.TokenActor,
+) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	if err := s.runUserinfoActionFlows(ctx, qu, userInfo, triggerType, clientID, actor); err != nil {
+		return err
+	}
+	return s.runUserinfoExecutionFlow(ctx, qu, userInfo, triggerType, clientID, actor)
+}
+
+// runUserinfoActionFlows loads the legacy, DB-configured Actions for triggerType and runs them.
+func (s *Server) runUserinfoActionFlows(
+	ctx context.Context,
+	qu *query.OIDCUserInfo,
+	userInfo *oidc.UserInfo,
+	triggerType domain.TriggerType,
+	clientID string,
+	actor *domain.TokenActor,
+) error {
 	queriedActions, err := s.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, triggerType, qu.User.ResourceOwner)
 	if err != nil {
 		return err
 	}
+	return s.runUserinfoActions(ctx, qu, userInfo, clientID, actor, queriedActions)
+}
 
+// runUserinfoActions runs the given, already queried Actions. It is kept separate from
+// runUserinfoActionFlows so it can be unit tested without a DB by injecting queriedActions directly.
+func (s *Server) runUserinfoActions(
+	ctx context.Context,
+	qu *query.OIDCUserInfo,
+	userInfo *oidc.UserInfo,
+	clientID string,
+	actor *domain.TokenActor,
+	queriedActions []*query.Action,
+) error {
 	ctxFields := actions.SetContextFields(
 		actions.SetFields("v1",
 			actions.SetFields("claims", userinfoClaims(userInfo)),
@@ -351,106 +386,154 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 					}
 				}),
 			),
+			// actor is null unless the token was obtained through token exchange / impersonation.
+			actions.SetFields("actor", object.TokenActorField(actor)),
 		),
 	)
 
 	for _, action := range queriedActions {
-		actionCtx, cancel := context.WithTimeout(ctx, action.Timeout())
-		claimLogs := []string{}
+		// Actions.contextFields/apiFields are unexported types in package actions, so ctxFields
+		// can't be passed as a typed parameter to a separate function - it's captured by this
+		// closure instead. The closure also gives each iteration its own deferred cancel() and
+		// recover(), so a timeout-bound context never outlives its iteration and a panic from
+		// building or running the script (whether from a goja-exposed closure or from
+		// constructing ctxFields/apiFields itself) is converted into a returned error instead
+		// of escaping to the caller.
+		runAction := func(action *query.Action) (err error) {
+			actionCtx, cancel := context.WithTimeout(ctx, action.Timeout())
+			defer cancel()
+			defer func() {
+				if r := recover(); r != nil {
+					err = errorFromRecover(r)
+				}
+			}()
 
-		apiFields := actions.WithAPIFields(
-			actions.SetFields("v1",
-				actions.SetFields("userinfo",
-					actions.SetFields("setClaim", func(key string, value interface{}) {
-						if strings.HasPrefix(key, ClaimPrefix) {
-							return
-						}
-						if userInfo.Claims[key] == nil {
-							userInfo.AppendClaims(key, value)
-							return
-						}
-						claimLogs = append(claimLogs, fmt.Sprintf("key %q already exists", key))
-					}),
-					actions.SetFields("appendLogIntoClaims", func(entry string) {
-						claimLogs = append(claimLogs, entry)
-					}),
+			claimLogs := []string{}
+			setClaim := func(key string, value interface{}) {
+				appendOrLogClaim(userInfo, key, value, &claimLogs)
+			}
+			appendLogIntoClaims := func(entry string) {
+				claimLogs = append(claimLogs, entry)
+			}
+
+			apiFields := actions.WithAPIFields(
+				actions.SetFields("v1",
+					actions.SetFields("userinfo",
+						actions.SetFields("setClaim", setClaim),
+						actions.SetFields("appendLogIntoClaims", appendLogIntoClaims),
+					),
+					actions.SetFields("claims",
+						actions.SetFields("setClaim", setClaim),
+						actions.SetFields("appendLogIntoClaims", appendLogIntoClaims),
+					),
+					actions.SetFields("user",
+						actions.SetFields("setMetadata", func(call goja.FunctionCall) goja.Value {
+							if len(call.Arguments) != 2 {
+								panic("exactly 2 (key, value) arguments expected")
+							}
+							key := call.Arguments[0].Export().(string)
+							val := call.Arguments[1].Export()
+
+							value, err := json.Marshal(val)
+							if err != nil {
+								logging.WithError(err).Debug("unable to marshal")
+								panic(err)
+							}
+
+							metadata := &domain.Metadata{
+								Key:   key,
+								Value: value,
+							}
+							if _, err = s.command.SetUserMetadata(actionCtx, metadata, userInfo.Subject, qu.User.ResourceOwner, nil); err != nil {
+								logging.WithError(err).Info("unable to set md in action")
+								panic(err)
+							}
+							return nil
+						}),
+					),
 				),
-				actions.SetFields("claims",
-					actions.SetFields("setClaim", func(key string, value interface{}) {
-						if strings.HasPrefix(key, ClaimPrefix) {
-							return
-						}
-						if userInfo.Claims[key] == nil {
-							userInfo.AppendClaims(key, value)
-							return
-						}
-						claimLogs = append(claimLogs, fmt.Sprintf("key %q already exists", key))
-					}),
-					actions.SetFields("appendLogIntoClaims", func(entry string) {
-						claimLogs = append(claimLogs, entry)
-					}),
-				),
-				actions.SetFields("user",
-					actions.SetFields("setMetadata", func(call goja.FunctionCall) goja.Value {
-						if len(call.Arguments) != 2 {
-							panic("exactly 2 (key, value) arguments expected")
-						}
-						key := call.Arguments[0].Export().(string)
-						val := call.Arguments[1].Export()
+			)
 
-						value, err := json.Marshal(val)
-						if err != nil {
-							logging.WithError(err).Debug("unable to marshal")
-							panic(err)
-						}
+			if err := actions.Run(
+				actionCtx,
+				ctxFields,
+				apiFields,
+				action.Script,
+				action.Name,
+				append(actions.ActionToOptions(action), actions.WithHTTP(actionCtx, s.httpClient), actions.WithUUID(actionCtx))...,
+			); err != nil {
+				return err
+			}
+			if len(claimLogs) > 0 {
+				userInfo.AppendClaims(fmt.Sprintf(ClaimActionLogFormat, action.Name), claimLogs)
+			}
+			return nil
+		}
 
-						metadata := &domain.Metadata{
-							Key:   key,
-							Value: value,
-						}
-						if _, err = s.command.SetUserMetadata(ctx, metadata, userInfo.Subject, qu.User.ResourceOwner, nil); err != nil {
-							logging.WithError(err).Info("unable to set md in action")
-							panic(err)
-						}
-						return nil
-					}),
-				),
-			),
-		)
-
-		err = actions.Run(
-			actionCtx,
-			ctxFields,
-			apiFields,
-			action.Script,
-			action.Name,
-			append(actions.ActionToOptions(action), actions.WithHTTP(actionCtx, s.httpClient), actions.WithUUID(actionCtx))...,
-		)
-		cancel()
-		if err != nil {
+		if err := runAction(action); err != nil {
 			return err
 		}
-		if len(claimLogs) > 0 {
-			userInfo.AppendClaims(fmt.Sprintf(ClaimActionLogFormat, action.Name), claimLogs)
-		}
 	}
+	return nil
+}
 
-	var function string
-	switch triggerType {
-	case domain.TriggerTypePreUserinfoCreation:
-		function = exec_repo.ID(domain.ExecutionTypeFunction, domain.ActionFunctionPreUserinfo.LocalizationKey())
-	case domain.TriggerTypePreAccessTokenCreation:
-		function = exec_repo.ID(domain.ExecutionTypeFunction, domain.ActionFunctionPreAccessToken.LocalizationKey())
-	case domain.TriggerTypeUnspecified, domain.TriggerTypePostAuthentication, domain.TriggerTypePreCreation, domain.TriggerTypePostCreation, domain.TriggerTypePreSAMLResponseCreation:
-		// added for linting, there should never be any trigger type be used here besides PreUserinfo and PreAccessToken
+// appendOrLogClaim adds value under key unless key is reserved (ClaimPrefix) or already set,
+// in which case a conflict message is appended to logs instead. Shared by the setClaim
+// goja closures and the execution-response AppendClaims merge.
+func appendOrLogClaim(userInfo *oidc.UserInfo, key string, value any, logs *[]string) {
+	if strings.HasPrefix(key, ClaimPrefix) {
+		return
+	}
+	if userInfo.Claims[key] == nil {
+		userInfo.AppendClaims(key, value)
+		return
+	}
+	*logs = append(*logs, fmt.Sprintf("key %q already exists", key))
+}
+
+// errorFromRecover converts a recovered panic value into an error, mirroring the idiom
+// internal/actions.executeFn already uses internally for panics from goja-exposed closures.
+func errorFromRecover(r any) error {
+	if err, ok := r.(error); ok {
 		return err
 	}
+	if s, ok := r.(string); ok {
+		return errors.New(s)
+	}
+	return fmt.Errorf("unknown error occurred: %v", r)
+}
 
+// functionForTriggerType resolves the Execution function key for a trigger type, or ""
+// if no Execution runs for that trigger type. The switch is kept exhaustive (no default)
+// so the `exhaustive` linter forces a conscious decision whenever a new domain.TriggerType
+// is added, rather than silently falling through.
+func functionForTriggerType(triggerType domain.TriggerType) string {
+	switch triggerType {
+	case domain.TriggerTypePreUserinfoCreation:
+		return exec_repo.ID(domain.ExecutionTypeFunction, domain.ActionFunctionPreUserinfo.LocalizationKey())
+	case domain.TriggerTypePreAccessTokenCreation:
+		return exec_repo.ID(domain.ExecutionTypeFunction, domain.ActionFunctionPreAccessToken.LocalizationKey())
+	case domain.TriggerTypeUnspecified, domain.TriggerTypePostAuthentication, domain.TriggerTypePreCreation, domain.TriggerTypePostCreation, domain.TriggerTypePreSAMLResponseCreation:
+		// there should never be any trigger type used here besides PreUserinfo and PreAccessToken
+		return ""
+	}
+	return ""
+}
+
+// runUserinfoExecutionFlow resolves and runs the new-style Executions (webhook targets) for triggerType.
+func (s *Server) runUserinfoExecutionFlow(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, triggerType domain.TriggerType, clientID string, actor *domain.TokenActor) error {
+	function := functionForTriggerType(triggerType)
 	if function == "" {
 		return nil
 	}
-
 	executionTargets := execution.QueryExecutionTargetsForFunction(ctx, function)
+	return s.runUserinfoExecutionTargets(ctx, qu, userInfo, clientID, actor, function, executionTargets)
+}
+
+// runUserinfoExecutionTargets calls the given, already resolved Execution targets. It is kept
+// separate from runUserinfoExecutionFlow so it can be unit tested without authz/DB access by
+// injecting executionTargets directly (e.g. pointing at httptest servers).
+func (s *Server) runUserinfoExecutionTargets(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, clientID string, actor *domain.TokenActor, function string, executionTargets []target_domain.Target) error {
 	info := &ContextInfo{
 		Function:     function,
 		UserInfo:     userInfo,
@@ -459,6 +542,7 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 		Org:          qu.Org,
 		Application:  &ContextInfoApplication{ClientID: clientID},
 		UserGrants:   qu.UserGrants,
+		Actor:        actor,
 	}
 
 	resp, err := execution.CallTargets(ctx, executionTargets, info, s.targetEncryptionAlgorithm, s.query.GetActiveSigningWebKey, s.httpClient)
@@ -469,28 +553,26 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 	if !ok || contextInfoResponse == nil {
 		return nil
 	}
+	s.applyContextInfoResponse(ctx, qu, userInfo, function, contextInfoResponse)
+	return nil
+}
+
+// applyContextInfoResponse merges an Execution's response back into userInfo: applying
+// requested user metadata writes and appending claims, logging any conflicts along the way.
+func (s *Server) applyContextInfoResponse(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, function string, resp *ContextInfoResponse) {
 	claimLogs := make([]string, 0)
-	for _, metadata := range contextInfoResponse.SetUserMetadata {
-		if _, err = s.command.SetUserMetadata(ctx, metadata, userInfo.Subject, qu.User.ResourceOwner, nil); err != nil {
+	for _, metadata := range resp.SetUserMetadata {
+		if _, err := s.command.SetUserMetadata(ctx, metadata, userInfo.Subject, qu.User.ResourceOwner, nil); err != nil {
 			claimLogs = append(claimLogs, fmt.Sprintf("failed to set user metadata key %q", metadata.Key))
 		}
 	}
-	for _, claim := range contextInfoResponse.AppendClaims {
-		if strings.HasPrefix(claim.Key, ClaimPrefix) {
-			continue
-		}
-		if userInfo.Claims[claim.Key] == nil {
-			userInfo.AppendClaims(claim.Key, claim.Value)
-			continue
-		}
-		claimLogs = append(claimLogs, fmt.Sprintf("key %q already exists", claim.Key))
+	for _, claim := range resp.AppendClaims {
+		appendOrLogClaim(userInfo, claim.Key, claim.Value, &claimLogs)
 	}
-	claimLogs = append(claimLogs, contextInfoResponse.AppendLogClaims...)
+	claimLogs = append(claimLogs, resp.AppendLogClaims...)
 	if len(claimLogs) > 0 {
 		userInfo.AppendClaims(fmt.Sprintf(ClaimActionLogFormat, function), claimLogs)
 	}
-
-	return nil
 }
 
 type ContextInfo struct {
@@ -501,7 +583,9 @@ type ContextInfo struct {
 	Org          *query.UserInfoOrg      `json:"org,omitempty"`
 	UserGrants   []query.UserGrant       `json:"user_grants,omitempty"`
 	Application  *ContextInfoApplication `json:"application,omitempty"`
-	Response     *ContextInfoResponse    `json:"response,omitempty"`
+	// Actor is only set when the token was obtained through token exchange / impersonation.
+	Actor    *domain.TokenActor   `json:"actor,omitempty"`
+	Response *ContextInfoResponse `json:"response,omitempty"`
 }
 type ContextInfoApplication struct {
 	ClientID string `json:"client_id,omitempty"`

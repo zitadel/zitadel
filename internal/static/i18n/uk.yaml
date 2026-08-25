@@ -199,6 +199,7 @@ Errors:
     AlreadyActive: "Організація вже активна"
     Empty: "Організація порожня"
     NotFound: "Організація не знайдена"
+    NotActive: "Організація неактивна"
     NotChanged: "Організація не змінена"
     DefaultOrgNotDeletable: "Організація за замовчуванням не може бути видалена"
     ZitadelOrgNotDeletable: "Організація з проектом Zitadel не може бути видалена"

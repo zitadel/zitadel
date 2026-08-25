@@ -1,11 +1,11 @@
 import { getValidLocaleFromUILocales } from "@/lib/auth-utils";
-import { isSafeRedirectUri } from "@/lib/client-utils";
+import { isExternalUrl, isSafeRedirectUri } from "@/lib/client-utils";
 import { getLanguageCookie, setLanguageCookie, type Cookie } from "@/lib/cookies";
 
 import { shouldUILocalesOverrideCookie } from "@/lib/i18n";
 import { idpTypeToSlug } from "@/lib/idp";
 import { createLogger } from "@/lib/logger";
-import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
+import { sendLoginname } from "@/lib/server/loginname";
 import { constructUrl } from "@/lib/service-url";
 import { findValidSession } from "@/lib/session";
 import {
@@ -53,6 +53,36 @@ function setCSPHeaders(
   }
 }
 
+/**
+ * Renders a minimal HTML page that immediately POSTs the given fields to
+ * `url`, with a <noscript> fallback button. Used for flows whose next hop
+ * requires a form post instead of a redirect (e.g. SAML POST bindings).
+ * Callers must validate `url` (isSafeRedirectUri) before calling; all values
+ * are HTML-escaped here.
+ */
+function buildAutoSubmitFormResponse(url: string, fields: Record<string, string>): NextResponse {
+  const hiddenInputs = Object.entries(fields)
+    .map(([key, value]) => `<input type="hidden" name="${escapeHtml(key)}" value="${escapeHtml(value)}" />`)
+    .join("\n");
+
+  const html = `
+    <html>
+      <body onload="document.forms[0].submit()">
+        <form action="${escapeHtml(url)}" method="post">
+          ${hiddenInputs}
+          <noscript>
+            <button type="submit">Continue</button>
+          </noscript>
+        </form>
+      </body>
+    </html>
+  `;
+
+  return new NextResponse(html, {
+    headers: { "Content-Type": "text/html" },
+  });
+}
+
 const gotoAccounts = ({
   request,
   requestId,
@@ -95,9 +125,9 @@ const gotoLoginname = ({
   const loginNameUrl = constructUrl(request, "/loginname");
   loginNameUrl.searchParams.set("requestId", requestId);
 
+  // Prefill only, no auto-submit: see resolveLoginHint.
   if (loginHint) {
     loginNameUrl.searchParams.set("loginName", loginHint);
-    loginNameUrl.searchParams.set("submit", "true");
   }
   if (organization) {
     loginNameUrl.searchParams.set("organization", organization);
@@ -107,6 +137,78 @@ const gotoLoginname = ({
   }
 
   return NextResponse.redirect(loginNameUrl);
+};
+
+/**
+ * Resolve a login_hint server-side to a redirect straight to the next step
+ * (e.g. /password), skipping the /loginname screen entirely. Returns null when
+ * there is no hint or it can't be resolved (unknown/ambiguous user, transient
+ * error), in which case callers fall back to the prefilled /loginname screen.
+ */
+const resolveLoginHint = async ({
+  request,
+  requestId,
+  loginHint,
+  organization,
+}: {
+  request: NextRequest;
+  requestId: string;
+  loginHint?: string;
+  organization?: string;
+}): Promise<NextResponse<unknown> | null> => {
+  if (!loginHint) {
+    return null;
+  }
+
+  try {
+    // sendLoginname derives enumeration protection (ignoreUnknownUsernames) from the
+    // same organization context server-side, so an unknown hint redirects to the
+    // (fake) /password step like a known one instead of falling back to /loginname
+    // and disclosing that the user does not exist.
+    const res = await sendLoginname({
+      loginName: loginHint,
+      requestId,
+      organization: organization || undefined,
+    });
+
+    if (res && "redirect" in res && res.redirect) {
+      // sendLoginname can return an absolute URL, e.g. the IdP authorize
+      // endpoint when domain discovery resolves to an org that auto-redirects
+      // to its external IdP. Only relative paths may be resolved against the
+      // login's base path — prepending it to an absolute URL produces a
+      // malformed URL like "https://<host>/ui/v2/loginhttps://idp.example/...".
+      if (isExternalUrl(res.redirect)) {
+        if (!isSafeRedirectUri(res.redirect)) {
+          logger.warn("Blocked unsafe login_hint redirect URL", { redirect: res.redirect });
+          return null;
+        }
+        return NextResponse.redirect(res.redirect);
+      }
+      return NextResponse.redirect(constructUrl(request, res.redirect));
+    }
+
+    if (res && "samlData" in res && res.samlData) {
+      // SAML IdP with POST binding: the AuthnRequest must be submitted as a
+      // form post. Render the same auto-submit form used in the idp-scope
+      // branch above and in handleSAMLFlowInitiation, so a login_hint
+      // resolves silently for POST-binding SAML IdPs just like for
+      // redirect-based IdPs.
+      if (!isSafeRedirectUri(res.samlData.url)) {
+        logger.warn("Blocked unsafe SAML post URL from login_hint resolution", { url: res.samlData.url });
+        return null;
+      }
+
+      return buildAutoSubmitFormResponse(res.samlData.url, res.samlData.fields);
+    }
+
+    if (res && "error" in res && res.error) {
+      logger.debug("login_hint could not be resolved, falling back to /loginname", { error: res.error });
+    }
+  } catch (error) {
+    logger.error("Failed to resolve login_hint via sendLoginname:", { error });
+  }
+
+  return null;
 };
 
 /**
@@ -199,7 +301,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       const idp = identityProviders.find((idp) => idp.id === idpId);
 
       if (idp) {
-        const identityProviderType = identityProviders[0].type;
+        const identityProviderType = idp.type;
 
         if (identityProviderType === IdentityProviderType.LDAP) {
           const ldapUrl = constructUrl(request, "/ldap");
@@ -234,27 +336,16 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           return NextResponse.json({ error: "Could not start IDP flow" }, { status: 500 });
         }
 
+        // Covers both branches below: the form post (SAML POST binding) and
+        // the redirect. Relative paths and same-host/https URLs pass;
+        // javascript:/data:/file: style schemes are blocked.
+        if (!isSafeRedirectUri(response.url)) {
+          logger.warn("Blocked unsafe IdP URL", { url: response.url });
+          return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+        }
+
         if (response.fields) {
-          const hiddenInputs = Object.entries(response.fields)
-            .map(([key, value]) => `<input type="hidden" name="${escapeHtml(key)}" value="${escapeHtml(value)}" />`)
-            .join("\n");
-
-          const html = `
-            <html>
-              <body onload="document.forms[0].submit()">
-                <form action="${escapeHtml(response.url)}" method="post">
-                  ${hiddenInputs}
-                  <noscript>
-                    <button type="submit">Continue</button>
-                  </noscript>
-                </form>
-              </body>
-            </html>
-          `;
-
-          return new NextResponse(html, {
-            headers: { "Content-Type": "text/html" },
-          });
+          return buildAutoSubmitFormResponse(response.url, response.fields);
         }
 
         let url = response.url;
@@ -305,41 +396,24 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         orgDomain,
       });
     } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
-      if (authRequest.loginHint) {
-        try {
-          let command: SendLoginnameCommand = {
-            loginName: authRequest.loginHint,
-            requestId: requestId,
-          };
+      const hintResponse = await resolveLoginHint({
+        request,
+        requestId,
+        loginHint: authRequest.loginHint,
+        organization,
+      });
 
-          if (organization) {
-            command = { ...command, organization };
-          }
-
-          const res = await sendLoginname(command);
-
-          if (res && "redirect" in res && res?.redirect) {
-            const absoluteUrl = constructUrl(request, res.redirect);
-            return NextResponse.redirect(absoluteUrl.toString());
-          }
-        } catch (error) {
-          logger.error("Failed to execute sendLoginname:", { error });
-        }
+      if (hintResponse) {
+        return hintResponse;
       }
 
-      const loginNameUrl = constructUrl(request, "/loginname");
-      loginNameUrl.searchParams.set("requestId", requestId);
-
-      if (authRequest.loginHint) {
-        loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
-      }
-      if (organization) {
-        loginNameUrl.searchParams.set("organization", organization);
-      }
-      if (orgDomain) {
-        loginNameUrl.searchParams.set("orgDomain", orgDomain);
-      }
-      return NextResponse.redirect(loginNameUrl);
+      return gotoLoginname({
+        request,
+        requestId,
+        loginHint: authRequest.loginHint,
+        organization,
+        orgDomain,
+      });
     } else if (authRequest.prompt.includes(Prompt.NONE)) {
       let securitySettings: SecuritySettings | undefined;
       try {
@@ -391,7 +465,23 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       let selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
 
       if (!selectedSession || !selectedSession.id) {
-        if (eligibleSessions.length === 0 && !hasCookieAccount(sessionCookies, organization)) {
+        // login_hint matches no session: resolve it straight to the next step.
+        const hintResponse = await resolveLoginHint({
+          request,
+          requestId,
+          loginHint: authRequest.loginHint,
+          organization,
+        });
+
+        if (hintResponse) {
+          return hintResponse;
+        }
+
+        // Prefill loginname (not the account picker) for an unresolved hint or when
+        // no session is eligible: the picker would only list non-matching accounts.
+        // Exception: if the sessions cookie still references a previous account for
+        // this organization, keep the picker so the user can select it (#12252).
+        if (authRequest.loginHint || (eligibleSessions.length === 0 && !hasCookieAccount(sessionCookies, organization))) {
           return gotoLoginname({
             request,
             requestId,
@@ -464,7 +554,12 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
     // No live sessions were resolved. If the sessions cookie still references a
     // previous account and the RP did not pass a login_hint, show account
     // selection (mirrors Login V1 behavior after RP-initiated logout, #12252).
-    if (!authRequest?.loginHint && hasCookieAccount(sessionCookies, organization)) {
+    // prompt=none must never render UI, so it keeps the existing behavior.
+    if (
+      !authRequest?.loginHint &&
+      !authRequest?.prompt.includes(Prompt.NONE) &&
+      hasCookieAccount(sessionCookies, organization)
+    ) {
       return gotoAccounts({
         request,
         requestId,
@@ -473,23 +568,25 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       });
     }
 
-    const loginNameUrl = constructUrl(request, "/loginname");
-    loginNameUrl.searchParams.set("requestId", requestId);
+    // No session: resolve a login_hint straight to the next step if we can.
+    const hintResponse = await resolveLoginHint({
+      request,
+      requestId,
+      loginHint: authRequest?.loginHint,
+      organization,
+    });
 
-    if (authRequest?.loginHint) {
-      loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
-      loginNameUrl.searchParams.set("submit", "true");
+    if (hintResponse) {
+      return hintResponse;
     }
 
-    if (organization) {
-      loginNameUrl.searchParams.set("organization", organization);
-    }
-
-    if (orgDomain) {
-      loginNameUrl.searchParams.set("orgDomain", orgDomain);
-    }
-
-    return NextResponse.redirect(loginNameUrl);
+    return gotoLoginname({
+      request,
+      requestId,
+      loginHint: authRequest?.loginHint,
+      organization,
+      orgDomain,
+    });
   }
 }
 
@@ -563,22 +660,9 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
         logger.warn("Blocked unsafe SAML post URL", { url });
         return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
       }
-      const html = `
-        <html>
-          <body onload="document.forms[0].submit()">
-            <form action="${escapeHtml(url)}" method="post">
-              <input type="hidden" name="RelayState" value="${escapeHtml(binding.value.relayState)}" />
-              <input type="hidden" name="SAMLResponse" value="${escapeHtml(binding.value.samlResponse)}" />
-              <noscript>
-                <button type="submit">Continue</button>
-              </noscript>
-            </form>
-          </body>
-        </html>
-      `;
-
-      return new NextResponse(html, {
-        headers: { "Content-Type": "text/html" },
+      return buildAutoSubmitFormResponse(url, {
+        RelayState: binding.value.relayState,
+        SAMLResponse: binding.value.samlResponse,
       });
     }
   } catch (error) {

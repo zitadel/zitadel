@@ -669,6 +669,10 @@ OIDC:
       Path: /oauth/v2/keys # ZITADEL_OIDC_CUSTOMENDPOINTS_KEYS_PATH
     DeviceAuth:
       Path: /oauth/v2/device_authorization # ZITADEL_OIDC_CUSTOMENDPOINTS_DEVICEAUTH_PATH
+    # OAuth 2.0 Dynamic Client Registration (RFC 7591). The endpoint is only served and
+    # advertised when it is enabled in the instance's security settings.
+    Registration:
+      Path: /oauth/v2/register # ZITADEL_OIDC_CUSTOMENDPOINTS_REGISTRATION_PATH
   DeviceAuth:
     Lifetime: 5m # ZITADEL_OIDC_DEVICEAUTH_LIFETIME
     PollInterval: 5s # ZITADEL_OIDC_DEVICEAUTH_POLLINTERVAL
@@ -696,6 +700,11 @@ OIDC:
     MaxTtl: 5m  # ZITADEL_OIDC_BACKCHANNELLOGOUT_MAXTTL
     # Lifetime of the token used to notify clients through OIDC back-channel logout.
     TokenLifetime: 15m # ZITADEL_OIDC_BACKCHANNELLOGOUT_TOKENLIFETIME
+
+WellKnown:
+  # HTTP Cache-Control max-age for /.well-known/apple-app-site-association and
+  # /.well-known/assetlinks.json. 0 sets Cache-Control: no-store.
+  AppLinksCacheControlMaxAge: 5m # ZITADEL_WELLKNOWN_APPLINKSCACHECONTROLMAXAGE
 
 SAML:
   DefaultLoginURLV2: "/ui/v2/login/login?samlRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2
@@ -1667,6 +1676,7 @@ InternalAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.app.delete"
         - "project.grant.read"
         - "project.grant.write"
@@ -1782,6 +1792,7 @@ InternalAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.app.delete"
         - "project.grant.read"
         - "project.grant.write"
@@ -1884,6 +1895,7 @@ InternalAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.grant.read"
         - "project.grant.write"
         - "project.grant.delete"
@@ -2039,6 +2051,9 @@ InternalAuthZ:
         - "policy.read"
         - "project.read:self"
         - "project.create"
+    - Role: "ORG_DYNAMIC_CLIENT_REGISTRAR"
+      Permissions:
+        - "project.app.register_dynamic"
     - Role: "ORG_ADMIN_IMPERSONATOR"
       Permissions:
         - "admin.impersonation"
@@ -2260,6 +2275,7 @@ SystemAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.app.delete"
         - "project.grant.read"
         - "project.grant.write"
@@ -2375,6 +2391,7 @@ SystemAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.app.delete"
         - "project.grant.read"
         - "project.grant.write"

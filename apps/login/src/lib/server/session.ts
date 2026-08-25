@@ -11,8 +11,8 @@ import {
   listAuthenticationMethodTypes,
   listUsers,
 } from "@/lib/zitadel";
-import { create, Duration } from "@zitadel/client";
-import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import { Code, create, Duration } from "@zitadel/client";
+import { Challenges, RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { getTranslations } from "next-intl/server";
@@ -275,11 +275,17 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
     }
   }
 
+  // @ts-ignore
+  const challengeResponse: Challenges | undefined = session.challenges;
+
   return {
     sessionId: session.id,
     factors: session.factors,
-    // @ts-ignore
-    challenges: session.challenges,
+    // Only the WebAuthN challenge may reach the browser. `sanitizeChallenges` already stops
+    // `returnCode` from being requested, so `otpSms`/`otpEmail` should always be unset here —
+    // keeping the projection explicit means no OTP code can leak through this boundary even
+    // if that ever regresses (GHSA-3gwm-5wx8-4gm6).
+    challenges: challengeResponse?.webAuthN ? { webAuthN: challengeResponse.webAuthN } : undefined,
     authMethods,
   };
 }
@@ -311,13 +317,20 @@ export async function clearSession(options: ClearSessionOptions) {
       sessionToken: sessionCookie.token,
     });
   } catch (error) {
-    // The server-side session may already be gone.
-    // Prune the cookie entry anyway so the account card is removed from the selection screen.
-    logger.warn("clearSession: deleteSession failed, pruning cookie entry anyway", {
-      sessionId: sessionCookie.id,
-      error,
-    });
-    return removeSessionFromCookie({ session: sessionCookie, iFrameEnabled });
+    // The server-side session may already be gone (e.g. terminated by an
+    // RP-initiated logout): the API answers NotFound, or PermissionDenied because
+    // the cookie's token no longer matches. Prune the cookie entry in that case so
+    // the account card disappears from the selection screen. Any other failure
+    // (transport error, API down) is rethrown: dropping the cookie would orphan a
+    // still-valid server session while the user believes it was removed.
+    if (isClassifiedError(error) && (error.code === Code.NotFound || error.code === Code.PermissionDenied)) {
+      logger.warn("clearSession: session already gone on server, pruning cookie entry", {
+        sessionId: sessionCookie.id,
+        code: error.code,
+      });
+      return removeSessionFromCookie({ session: sessionCookie, iFrameEnabled });
+    }
+    throw error;
   }
 
   if (!deleteResponse) {
