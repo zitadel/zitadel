@@ -231,7 +231,7 @@ export async function getSessionCookieByLoginName<T>({
 
 /**
  *
- * @param cleanup when true, removes all expired sessions, default true
+ * @param cleanup when true, excludes expired sessions from the result, default false
  * @returns Session Cookies
  */
 export async function getAllSessionCookieIds<T>(cleanup: boolean = false): Promise<string[]> {
@@ -241,7 +241,7 @@ export async function getAllSessionCookieIds<T>(cleanup: boolean = false): Promi
 
 /**
  *
- * @param cleanup when true, removes all expired sessions, default true
+ * @param cleanup when true, excludes expired sessions from the result, default false
  * @returns Session Cookies
  */
 export async function getAllSessions<T>(cleanup: boolean = false): Promise<SessionCookie<T>[]> {
