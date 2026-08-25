@@ -52,7 +52,8 @@ async function loadSessions({ serviceConfig, organization }: { serviceConfig: Se
         factors: {
           user: {
             loginName: c.loginName,
-            displayName: c.loginName,
+            // No displayName: the cookie does not carry one, and reusing the
+            // loginName would render it twice and break the avatar initials.
             organizationId: c.organization ?? "",
           },
         },
