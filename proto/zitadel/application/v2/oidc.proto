@@ -166,7 +166,7 @@ message OIDCConfiguration {
   IOSAppLinkConfig ios = 22;
 
   // Android is Android Digital Asset Links / passkey trust config.
-  // Served in /.well-known/assetlinks.json for delegate_permission/common.get_login_creds.
+  // Served in /.well-known/assetlinks.json for delegate_permission/common.handle_all_urls and delegate_permission/common.get_login_creds.
   // Platform verifiers may cache the file; changes can take time to take effect.
   AndroidAppLinkConfig android = 23;
 }
@@ -188,7 +188,7 @@ message IOSAppLinkConfig {
 }
 
 // AndroidAppLinkConfig is Android Digital Asset Links / passkey trust config.
-// Served in /.well-known/assetlinks.json for delegate_permission/common.get_login_creds.
+// Served in /.well-known/assetlinks.json for delegate_permission/common.handle_all_urls and delegate_permission/common.get_login_creds.
 // Platform verifiers may cache the file; changes can take time to take effect.
 message AndroidAppLinkConfig {
   // PackageName is the Android applicationId / package name from the app manifest.

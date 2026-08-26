@@ -349,7 +349,7 @@ message CreateOIDCApplicationRequest {
   IOSAppLinkConfig ios = 18;
 
   // Android is Android Digital Asset Links / passkey trust config.
-  // Served in /.well-known/assetlinks.json for delegate_permission/common.get_login_creds.
+  // Served in /.well-known/assetlinks.json for delegate_permission/common.handle_all_urls and delegate_permission/common.get_login_creds.
   // Platform verifiers may cache the file; changes can take time to take effect.
   AndroidAppLinkConfig android = 19;
 }
@@ -598,7 +598,7 @@ message UpdateOIDCApplicationConfigurationRequest {
   optional IOSAppLinkConfig ios = 18;
 
   // Android is Android Digital Asset Links / passkey trust config.
-  // Served in /.well-known/assetlinks.json for delegate_permission/common.get_login_creds.
+  // Served in /.well-known/assetlinks.json for delegate_permission/common.handle_all_urls and delegate_permission/common.get_login_creds.
   // Platform verifiers may cache the file; changes can take time to take effect.
   // If not set, the Android config will not be changed.
   optional AndroidAppLinkConfig android = 19;
