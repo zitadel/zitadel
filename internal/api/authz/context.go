@@ -120,8 +120,9 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 		sysMemberships, userID, sysTokenErr = t.VerifySystemToken(ctx, tokenWOBearer, orgID)
 		if sysTokenErr != nil || sysMemberships == nil {
 			// Both verifications failed, so the token really is invalid.
-			logging.WithFields("org_id", orgID, "org_domain", orgDomain).WithError(errors.Join(err, sysTokenErr)).Warn("authz: token is neither a valid access token nor a valid system token")
-			return CtxData{}, zerrors.ThrowUnauthenticated(errors.Join(err, sysTokenErr), "AUTH-7fs1e", "Errors.Token.Invalid")
+			tokenErr := errors.Join(err, sysTokenErr)
+			logging.WithFields("org_id", orgID, "org_domain", orgDomain).WithError(tokenErr).Warn("authz: token is neither a valid access token nor a valid system token")
+			return CtxData{}, zerrors.ThrowUnauthenticated(tokenErr, "AUTH-7fs1e", "Errors.Token.Invalid")
 		}
 	}
 	projectID, err := projectIDAndCheckOriginForClientID(ctx, clientID, t)
