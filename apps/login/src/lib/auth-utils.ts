@@ -5,16 +5,25 @@ import { LANGS } from "@/lib/i18n";
  */
 
 /**
+ * Resolve a language tag to a supported language code.
+ * The comparison is case insensitive, the returned code is the one declared in
+ * LANGS, so region qualified codes keep their canonical casing (e.g. "zh-TW").
+ */
+export function resolveLanguage(code: string): string | null {
+  const normalized = code.trim().toLowerCase();
+  return LANGS.find((lang) => lang.code.toLowerCase() === normalized)?.code ?? null;
+}
+
+/**
  * Check if a language code is valid (supported by the login UI)
  */
 export function isValidLanguage(code: string): boolean {
-  const normalized = code.trim().toLowerCase();
-  return LANGS.some((lang) => lang.code === normalized);
+  return resolveLanguage(code) !== null;
 }
 
 /**
  * Extract a valid language code from uiLocales array.
- * Returns the first valid language code (normalized to lowercase), or null if none found.
+ * Returns the first supported language code, or null if none found.
  */
 export function getValidLocaleFromUILocales(uiLocales: string[] | undefined): string | null {
   if (!uiLocales || uiLocales.length === 0) {
@@ -24,19 +33,19 @@ export function getValidLocaleFromUILocales(uiLocales: string[] | undefined): st
   for (const locale of uiLocales) {
     const normalized = locale.trim().toLowerCase();
 
-    // Check if the full locale is a valid language code (e.g., "de", "EN")
-    if (isValidLanguage(normalized)) {
-      return normalized;
+    // Check if the full locale is a valid language code (e.g., "de", "EN", "zh-TW")
+    const exactMatch = resolveLanguage(normalized);
+    if (exactMatch) {
+      return exactMatch;
     }
 
     // uiLocales may contain language tags like "en-US" or "de-CH"
-    // Extract the language code (part before the hyphen)
-    // Note: this strips any regional specifier
+    // Fall back to the language code (part before the hyphen)
     // e.g., de-CH and de-AT both become just de
-    // zh-Hans-CN (Simplified) and zh-Hant-TW (Traditional) both become zh
-    // As of time of writing, this is expected behaviour, since there is only one translation for all languages
-    const languageCode = normalized.split("-")[0];
-    if (isValidLanguage(languageCode)) {
+    // Region qualified languages are only kept if they are supported themselves,
+    // so zh-Hans-CN falls back to zh while zh-TW matches the Traditional Chinese translation
+    const languageCode = resolveLanguage(normalized.split("-")[0]);
+    if (languageCode) {
       return languageCode;
     }
   }

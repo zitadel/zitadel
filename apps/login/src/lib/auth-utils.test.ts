@@ -8,6 +8,7 @@ describe("auth-utils", () => {
       expect(isValidLanguage("de")).toBe(true);
       expect(isValidLanguage("fr")).toBe(true);
       expect(isValidLanguage("zh")).toBe(true);
+      expect(isValidLanguage("zh-TW")).toBe(true);
     });
 
     it("should return false for invalid language codes", () => {
@@ -19,6 +20,7 @@ describe("auth-utils", () => {
     it("should be case-insensitive", () => {
       expect(isValidLanguage("EN")).toBe(true);
       expect(isValidLanguage("De")).toBe(true);
+      expect(isValidLanguage("zh-tw")).toBe(true);
     });
   });
 
@@ -37,6 +39,12 @@ describe("auth-utils", () => {
       expect(getValidLocaleFromUILocales(["de-CH"])).toBe("de");
       expect(getValidLocaleFromUILocales(["en-US"])).toBe("en");
       expect(getValidLocaleFromUILocales(["zh-CN"])).toBe("zh");
+    });
+
+    it("should keep region qualified languages that are supported themselves", () => {
+      expect(getValidLocaleFromUILocales(["zh-TW"])).toBe("zh-TW");
+      expect(getValidLocaleFromUILocales(["zh-tw"])).toBe("zh-TW");
+      expect(getValidLocaleFromUILocales(["zh-Hant-TW"])).toBe("zh");
     });
 
     it("should return first valid language when multiple provided", () => {
