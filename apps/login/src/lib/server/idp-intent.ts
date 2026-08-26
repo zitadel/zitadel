@@ -34,6 +34,7 @@ import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { getFingerprintIdCookie } from "../fingerprint";
 import { createNewSessionFromIdpIntent } from "./idp";
+import { syncInstanceRolesFromIdpIntent } from "./instance-roles";
 
 const logger = createLogger("idp-intent");
 
@@ -457,6 +458,10 @@ async function handleUserExists(ctx: IDPHandlerContext): Promise<IDPHandlerResul
       }
     }
 
+    // Synchronize instance member roles for ZITADEL IdPs with instanceRolesInfo
+    // configured (e.g. support access). Merge-only and never blocks the login.
+    await syncInstanceRolesFromIdpIntent({ serviceConfig, intent: ctx.intent, userId });
+
     // Create session and handle redirect
     logger.debug("Creating session for existing user");
     const sessionResult = await createNewSessionFromIdpIntent({
@@ -550,6 +555,12 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
           userId: foundUser.userId,
         });
         logger.info("User auto-linked successfully, creating session");
+
+        // Synchronize instance member roles for ZITADEL IdPs with instanceRolesInfo
+        // configured (e.g. support access). Merge-only and never blocks the login.
+        // Required here as well: a user that is auto-linked on this login would
+        // otherwise only receive its roles on the next one (via the existing-user path).
+        await syncInstanceRolesFromIdpIntent({ serviceConfig, intent, userId: foundUser.userId });
 
         // Create session after auto-linking
         const sessionResult = await createNewSessionFromIdpIntent({
@@ -649,6 +660,10 @@ async function handleAutoCreation(ctx: IDPHandlerContext): Promise<IDPHandlerRes
     try {
       const newUser = await createUser({ serviceConfig, request: createUserRequest });
       logger.info("User auto-created successfully, creating session");
+
+      // Synchronize instance member roles for ZITADEL IdPs with instanceRolesInfo
+      // configured (e.g. support access). Merge-only and never blocks the login.
+      await syncInstanceRolesFromIdpIntent({ serviceConfig, intent, userId: newUser.id });
 
       // Create session for newly created user
       const sessionResult = await createNewSessionFromIdpIntent({

@@ -233,7 +233,12 @@ func TestCommandSide_AddDynamicOIDCClient(t *testing.T) {
 							false,
 							"",
 							domain.LoginVersionUnspecified,
-							"", false,
+							"",
+							false,
+							"",
+							"",
+							"",
+							nil,
 						),
 						// The registration access token (RFC 7592 §3) is persisted in the same
 						// push as the application, so a registered client is never left
@@ -336,7 +341,12 @@ func TestCommandSide_AddDynamicOIDCClient(t *testing.T) {
 							false,
 							"",
 							domain.LoginVersionUnspecified,
-							"", false,
+							"",
+							false,
+							"",
+							"",
+							"",
+							nil,
 						),
 						project.NewOIDCConfigRegistrationTokenChangedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -583,7 +593,11 @@ func TestCommandSide_UpdateDynamicOIDCClient(t *testing.T) {
 				domain.OIDCApplicationTypeWeb, domain.OIDCAuthMethodTypeNone,
 				[]string{}, false, domain.OIDCTokenTypeBearer,
 				false, false, false, 0, []string{}, false, "",
-				domain.LoginVersionUnspecified, "", false)),
+				domain.LoginVersionUnspecified, "", false,
+				"",
+				"",
+				"",
+				nil)),
 		}
 	}
 	sameMetadata := &domain.OIDCApp{

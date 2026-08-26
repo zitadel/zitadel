@@ -194,7 +194,8 @@ type Steps struct {
 	s72AddColumnsToLoginNamesView           *AddColumnsToLoginNamesView
 	s73FixUserGrantRoles                    *FixUserGrantRoles
 	s74Apps7OIDCConfigsAddRegistrationToken *Apps7OIDCConfigsAddRegistrationToken
-	s75AppsConfigsAddMinimalIntrospection   *AppsConfigsAddMinimalIntrospection
+	s75Apps7OIDCConfigsAddAppLinkConfig     *Apps7OIDCConfigsAddAppLinkConfig
+	s76AppsConfigsAddMinimalIntrospection   *AppsConfigsAddMinimalIntrospection
 	RelationalTables                        *TransactionalTables
 }
 

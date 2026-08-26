@@ -574,7 +574,7 @@ func TestAppProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.apps7_oidc_configs (app_id, instance_id, version, client_id, client_secret, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins, skip_native_app_success_page, back_channel_logout_uri, login_version, login_base_uri, minimal_introspection) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)",
+							expectedStmt: "INSERT INTO projections.apps7_oidc_configs (app_id, instance_id, version, client_id, client_secret, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins, skip_native_app_success_page, back_channel_logout_uri, login_version, login_base_uri, minimal_introspection, ios_team_id, ios_bundle_id, android_package_name, android_sha256_cert_fingerprints) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27)",
 							expectedArgs: []interface{}{
 								"app-id",
 								"instance-id",
@@ -599,6 +599,10 @@ func TestAppProjection_reduces(t *testing.T) {
 								domain.LoginVersion2,
 								"https://login.ch/",
 								false,
+								"",
+								"",
+								"",
+								database.TextArray[string](nil),
 							},
 						},
 						{
@@ -653,7 +657,7 @@ func TestAppProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.apps7_oidc_configs (app_id, instance_id, version, client_id, client_secret, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins, skip_native_app_success_page, back_channel_logout_uri, login_version, login_base_uri, minimal_introspection) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)",
+							expectedStmt: "INSERT INTO projections.apps7_oidc_configs (app_id, instance_id, version, client_id, client_secret, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins, skip_native_app_success_page, back_channel_logout_uri, login_version, login_base_uri, minimal_introspection, ios_team_id, ios_bundle_id, android_package_name, android_sha256_cert_fingerprints) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27)",
 							expectedArgs: []interface{}{
 								"app-id",
 								"instance-id",
@@ -678,6 +682,10 @@ func TestAppProjection_reduces(t *testing.T) {
 								domain.LoginVersion2,
 								"https://login.ch/",
 								false,
+								"",
+								"",
+								"",
+								database.TextArray[string](nil),
 							},
 						},
 						{
@@ -748,6 +756,52 @@ func TestAppProjection_reduces(t *testing.T) {
 								true,
 								"back.channel.one.ch",
 								domain.LoginVersion2,
+								"app-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.apps7 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"app-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "project reduceOIDCConfigChanged app links",
+			args: args{
+				event: getEvent(
+					testEvent(
+						project.OIDCConfigChangedType,
+						project.AggregateType,
+						[]byte(`{
+                        "appId": "app-id",
+						"iosTeamId": "TEAMID",
+						"iosBundleId": "com.example.app",
+						"androidPackageName": "com.example.app",
+						"androidSha256CertFingerprints": ["AA:BB:CC"]
+		}`),
+					), project.OIDCConfigChangedEventMapper),
+			},
+			reduce: (&appProjection{}).reduceOIDCConfigChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.apps7_oidc_configs SET (ios_team_id, ios_bundle_id, android_package_name, android_sha256_cert_fingerprints) = ($1, $2, $3, $4) WHERE (app_id = $5) AND (instance_id = $6)",
+							expectedArgs: []interface{}{
+								"TEAMID",
+								"com.example.app",
+								"com.example.app",
+								database.TextArray[string]{"AA:BB:CC"},
 								"app-id",
 								"instance-id",
 							},

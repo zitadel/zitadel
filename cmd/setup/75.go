@@ -10,18 +10,18 @@ import (
 
 var (
 	//go:embed 75.sql
-	addMinimalIntrospection string
+	addOIDCAppLinkConfig string
 )
 
-type AppsConfigsAddMinimalIntrospection struct {
+type Apps7OIDCConfigsAddAppLinkConfig struct {
 	dbClient *database.DB
 }
 
-func (mig *AppsConfigsAddMinimalIntrospection) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.ExecContext(ctx, addMinimalIntrospection)
+func (mig *Apps7OIDCConfigsAddAppLinkConfig) Execute(ctx context.Context, _ eventstore.Event) error {
+	_, err := mig.dbClient.ExecContext(ctx, addOIDCAppLinkConfig)
 	return err
 }
 
-func (mig *AppsConfigsAddMinimalIntrospection) String() string {
-	return "75_apps_configs_add_minimal_introspection"
+func (mig *Apps7OIDCConfigsAddAppLinkConfig) String() string {
+	return "75_apps7_oidc_configs_add_app_link_config"
 }

@@ -124,7 +124,7 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 		client.projectRoleAssertion,
 		true,
 		true,
-	)(ctx, true, domain.TriggerTypePreUserinfoCreation)
+	)(ctx, true, domain.TriggerTypePreUserinfoCreation, token.actor)
 	if err != nil {
 		return nil, err
 	}

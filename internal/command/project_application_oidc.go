@@ -20,25 +20,29 @@ import (
 
 type addOIDCApp struct {
 	AddApp
-	Version                     domain.OIDCVersion
-	RedirectUris                []string
-	ResponseTypes               []domain.OIDCResponseType
-	GrantTypes                  []domain.OIDCGrantType
-	ApplicationType             domain.OIDCApplicationType
-	AuthMethodType              domain.OIDCAuthMethodType
-	PostLogoutRedirectUris      []string
-	DevMode                     bool
-	AccessTokenType             domain.OIDCTokenType
-	AccessTokenRoleAssertion    bool
-	IDTokenRoleAssertion        bool
-	IDTokenUserinfoAssertion    bool
-	ClockSkew                   time.Duration
-	AdditionalOrigins           []string
-	SkipSuccessPageForNativeApp bool
-	BackChannelLogoutURI        string
-	LoginVersion                domain.LoginVersion
-	LoginBaseURI                string
-	MinimalIntrospection        bool
+	Version                       domain.OIDCVersion
+	RedirectUris                  []string
+	ResponseTypes                 []domain.OIDCResponseType
+	GrantTypes                    []domain.OIDCGrantType
+	ApplicationType               domain.OIDCApplicationType
+	AuthMethodType                domain.OIDCAuthMethodType
+	PostLogoutRedirectUris        []string
+	DevMode                       bool
+	AccessTokenType               domain.OIDCTokenType
+	AccessTokenRoleAssertion      bool
+	IDTokenRoleAssertion          bool
+	IDTokenUserinfoAssertion      bool
+	ClockSkew                     time.Duration
+	AdditionalOrigins             []string
+	SkipSuccessPageForNativeApp   bool
+	BackChannelLogoutURI          string
+	LoginVersion                  domain.LoginVersion
+	LoginBaseURI                  string
+	MinimalIntrospection          bool
+	IOSTeamID                     string
+	IOSBundleID                   string
+	AndroidPackageName            string
+	AndroidSHA256CertFingerprints []string
 
 	ClientID          string
 	ClientSecret      string
@@ -120,6 +124,10 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp) preparation.Validation {
 					app.LoginVersion,
 					app.LoginBaseURI,
 					app.MinimalIntrospection,
+					app.IOSTeamID,
+					app.IOSBundleID,
+					app.AndroidPackageName,
+					app.AndroidSHA256CertFingerprints,
 				),
 			}, nil
 		}, nil
@@ -254,6 +262,10 @@ func (c *Commands) pushOIDCApplication(ctx context.Context, addedApplication *OI
 		gu.Value(oidcApp.LoginVersion),
 		strings.TrimSpace(gu.Value(oidcApp.LoginBaseURI)),
 		gu.Value(oidcApp.MinimalIntrospection),
+		strings.TrimSpace(gu.Value(oidcApp.IOSTeamID)),
+		strings.TrimSpace(gu.Value(oidcApp.IOSBundleID)),
+		strings.TrimSpace(gu.Value(oidcApp.AndroidPackageName)),
+		trimStringSliceWhiteSpaces(oidcApp.AndroidSHA256CertFingerprints),
 	))
 
 	events = append(events, extraEvents...)
@@ -343,7 +355,7 @@ func (c *Commands) UpdateOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 // UpdateDynamicOIDCClient). It reports whether anything actually changed.
 func (c *Commands) oidcApplicationChangeEvent(ctx context.Context, existingOIDC *OIDCApplicationWriteModel, oidc *domain.OIDCApp) (*project_repo.OIDCConfigChangedEvent, bool, error) {
 	projectAgg := ProjectAggregateFromWriteModelWithCTX(ctx, &existingOIDC.WriteModel)
-	var backChannelLogout, loginBaseURI *string
+	var backChannelLogout, loginBaseURI, iosTeamID, iosBundleID, androidPackageName *string
 	if oidc.BackChannelLogoutURI != nil {
 		bcl, err := c.validateBackchannelLogoutURI(oidc)
 		if err != nil {
@@ -354,6 +366,15 @@ func (c *Commands) oidcApplicationChangeEvent(ctx context.Context, existingOIDC 
 
 	if oidc.LoginBaseURI != nil {
 		loginBaseURI = gu.Ptr(strings.TrimSpace(*oidc.LoginBaseURI))
+	}
+	if oidc.IOSTeamID != nil {
+		iosTeamID = gu.Ptr(strings.TrimSpace(*oidc.IOSTeamID))
+	}
+	if oidc.IOSBundleID != nil {
+		iosBundleID = gu.Ptr(strings.TrimSpace(*oidc.IOSBundleID))
+	}
+	if oidc.AndroidPackageName != nil {
+		androidPackageName = gu.Ptr(strings.TrimSpace(*oidc.AndroidPackageName))
 	}
 
 	return existingOIDC.NewChangedEvent(
@@ -379,6 +400,10 @@ func (c *Commands) oidcApplicationChangeEvent(ctx context.Context, existingOIDC 
 		oidc.LoginVersion,
 		loginBaseURI,
 		oidc.MinimalIntrospection,
+		iosTeamID,
+		iosBundleID,
+		androidPackageName,
+		trimStringSliceWhiteSpaces(oidc.AndroidSHA256CertFingerprints),
 	)
 }
 
