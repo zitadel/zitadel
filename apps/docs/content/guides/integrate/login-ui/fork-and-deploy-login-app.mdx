@@ -253,8 +253,8 @@ Set `NEXT_PUBLIC_BASE_PATH=/ui/v2/login` at build and runtime as required by you
 If the Login UI uses a separate public domain such as `login.example.com`:
 
 - Serve it over HTTPS.
-- Add the Login domain to the instance's [Trusted Domains](/docs/apis/resources/admin/admin-service-add-instance-trusted-domain).
-- Configure the proxy in front of the Login UI as documented in the [Login App](/docs/guides/integrate/login-ui/login-app#oidc-proxy):
+- Add the Login domain to the instance's [Trusted Domains](/apis/resources/admin/admin-service-add-instance-trusted-domain).
+- Configure the proxy in front of the Login UI as documented in the [Login App](/guides/integrate/login-ui/login-app#oidc-proxy):
   - `x-zitadel-public-host`: the public Login UI host, for example `login.example.com`
   - `x-zitadel-instance-host`: the ZITADEL instance host, for example `auth.example.com`
 
@@ -268,7 +268,7 @@ Do not assume that setting only `ZITADEL_API_URL` replaces the required host-rou
 
 ## Enable Login V2 safely
 
-For an existing self-hosted ZITADEL installation, follow [Adopt Login V2 on an existing installation](/docs/self-hosting/manage/adopt-login-v2).
+For an existing self-hosted ZITADEL installation, follow [Adopt Login V2 on an existing installation](/self-hosting/manage/adopt-login-v2).
 
 Prefer a gradual rollout:
 
@@ -350,6 +350,6 @@ If the Login UI returns an internal error or an authentication flow redirects in
 
 - [Login App architecture and setup](/guides/integrate/login-ui/login-app)
 - [Contribute to the Login UI](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#contribute-to-login)
-- [Connect your self-hosted Login UI to ZITADEL](/docs/self-hosting/manage/login-client)
+- [Connect your self-hosted Login UI to ZITADEL](/self-hosting/manage/login-client)
 - [Adopt Login V2 on an existing installation](/docs/self-hosting/manage/adopt-login-v2)
 - [ZITADEL releases](https://github.com/zitadel/zitadel/releases)
