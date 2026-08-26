@@ -12,3 +12,15 @@ WHERE metric_name = 'http_reqs' AND "group" IS NULL
 GROUP BY ALL
 ORDER BY requests DESC
 LIMIT 30;
+
+-- Non-2xx over time: distinguishes a steady failure rate (e.g. expiring
+-- credentials) from bursts (e.g. a container being recycled).
+SELECT strftime(to_timestamp(CAST(timestamp AS BIGINT)), '%H:%M') AS minute,
+       status,
+       count(*) AS requests
+FROM read_csv(getvariable('csv'), header=true, all_varchar=false)
+WHERE metric_name = 'http_reqs' AND "group" IS NULL
+  AND (CAST(status AS INTEGER) >= 400 OR CAST(status AS INTEGER) = 0)
+GROUP BY ALL
+ORDER BY minute, status
+LIMIT 60;
