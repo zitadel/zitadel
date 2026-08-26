@@ -7,6 +7,15 @@ if [ -f .hold ]; then
   exit 0
 fi
 set -a; . ./.env; set +a
+
+# The session and user targets tag every metric with a unique session / user id via
+# the url and name system tags, producing hundreds of thousands of time series
+# (k6 warns above 100k) and multi-GB k6 memory on a 8GB runner. None of the
+# published artefacts use those tags: output.json aggregates per metric name, and
+# the status breakdown needs only status/error/error_code/group. Drop the two
+# high-cardinality tags and keep the rest.
+export K6_SYSTEM_TAGS="${K6_SYSTEM_TAGS:-proto,status,method,group,check,error,error_code,scenario,expected_response}"
+
 TARGET="$1"; VUS="$2"; DURATION="$3"
 STAMP="$(date -u '+%Y%m%dT%H%M%SZ')"
 mkdir -p summaries
