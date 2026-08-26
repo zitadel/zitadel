@@ -162,22 +162,19 @@ message OIDCConfiguration {
   // IOS is iOS Associated Domains / passkey trust config.
   // Served in /.well-known/apple-app-site-association as webcredentials.apps entry
   // "{team_id}.{bundle_id}" (Apple's full App ID = Team ID prefix + Bundle ID).
-  // That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer;
-  // changes can take time to take effect.
+  // Platform verifiers may cache the file; changes can take time to take effect.
   IOSAppLinkConfig ios = 22;
 
   // Android is Android Digital Asset Links / passkey trust config.
-  // Served in /.well-known/assetlinks.json for delegate_permission/common.get_login_creds.
-  // That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer;
-  // changes can take time to take effect.
+  // Served in /.well-known/assetlinks.json for delegate_permission/common.handle_all_urls and delegate_permission/common.get_login_creds.
+  // Platform verifiers may cache the file; changes can take time to take effect.
   AndroidAppLinkConfig android = 23;
 }
 
 // IOSAppLinkConfig is iOS Associated Domains / passkey trust config.
 // Served in /.well-known/apple-app-site-association as webcredentials.apps entry
 // "{team_id}.{bundle_id}" (Apple's full App ID = Team ID prefix + Bundle ID).
-// That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer;
-// changes can take time to take effect.
+// Platform verifiers may cache the file; changes can take time to take effect.
 message IOSAppLinkConfig {
   // TeamID is the Apple Developer Team ID (exactly 10 alphanumeric characters), e.g. ABCDE12345.
   // From Apple Developer account membership — not the Bundle ID.
@@ -191,9 +188,8 @@ message IOSAppLinkConfig {
 }
 
 // AndroidAppLinkConfig is Android Digital Asset Links / passkey trust config.
-// Served in /.well-known/assetlinks.json for delegate_permission/common.get_login_creds.
-// That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer;
-// changes can take time to take effect.
+// Served in /.well-known/assetlinks.json for delegate_permission/common.handle_all_urls and delegate_permission/common.get_login_creds.
+// Platform verifiers may cache the file; changes can take time to take effect.
 message AndroidAppLinkConfig {
   // PackageName is the Android applicationId / package name from the app manifest.
   // Empty clears the value on update.
