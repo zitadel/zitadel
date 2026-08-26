@@ -22,6 +22,28 @@ export function isValidLanguage(code: string): boolean {
 }
 
 /**
+ * Find a supported language sharing the language and script of the given
+ * locale, using the CLDR data the runtime already ships. Returns null if the
+ * locale cannot be parsed or carries no script information.
+ */
+function matchLanguageByScript(locale: string): string | null {
+  try {
+    const wanted = new Intl.Locale(locale).maximize();
+    if (!wanted.script) {
+      return null;
+    }
+    return (
+      LANGS.find((lang) => {
+        const candidate = new Intl.Locale(lang.code).maximize();
+        return candidate.language === wanted.language && candidate.script === wanted.script;
+      })?.code ?? null
+    );
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Extract a valid language code from uiLocales array.
  * Returns the first supported language code, or null if none found.
  */
@@ -39,11 +61,17 @@ export function getValidLocaleFromUILocales(uiLocales: string[] | undefined): st
       return exactMatch;
     }
 
+    // Then a language with the same script, matching how the backends
+    // language.NewMatcher resolves tags. This is what maps zh-HK (Hant) onto
+    // zh-TW instead of letting it fall through to zh (Hans).
+    const scriptMatch = matchLanguageByScript(normalized);
+    if (scriptMatch) {
+      return scriptMatch;
+    }
+
     // uiLocales may contain language tags like "en-US" or "de-CH"
     // Fall back to the language code (part before the hyphen)
     // e.g., de-CH and de-AT both become just de
-    // Region qualified languages are only kept if they are supported themselves,
-    // so zh-Hans-CN falls back to zh while zh-TW matches the Traditional Chinese translation
     const languageCode = resolveLanguage(normalized.split("-")[0]);
     if (languageCode) {
       return languageCode;

@@ -44,7 +44,26 @@ describe("auth-utils", () => {
     it("should keep region qualified languages that are supported themselves", () => {
       expect(getValidLocaleFromUILocales(["zh-TW"])).toBe("zh-TW");
       expect(getValidLocaleFromUILocales(["zh-tw"])).toBe("zh-TW");
-      expect(getValidLocaleFromUILocales(["zh-Hant-TW"])).toBe("zh");
+    });
+
+    it("should match on script before falling back to the base language", () => {
+      // Hant locales resolve to the Traditional Chinese translation, matching
+      // how the backend's language.NewMatcher resolves them
+      expect(getValidLocaleFromUILocales(["zh-Hant"])).toBe("zh-TW");
+      expect(getValidLocaleFromUILocales(["zh-Hant-TW"])).toBe("zh-TW");
+      expect(getValidLocaleFromUILocales(["zh-HK"])).toBe("zh-TW");
+      expect(getValidLocaleFromUILocales(["zh-MO"])).toBe("zh-TW");
+      // Hans locales still resolve to Simplified Chinese
+      expect(getValidLocaleFromUILocales(["zh-Hans"])).toBe("zh");
+      expect(getValidLocaleFromUILocales(["zh-Hans-CN"])).toBe("zh");
+      expect(getValidLocaleFromUILocales(["zh-SG"])).toBe("zh");
+    });
+
+    it("should not change resolution for languages with a single variant", () => {
+      expect(getValidLocaleFromUILocales(["de-CH"])).toBe("de");
+      expect(getValidLocaleFromUILocales(["de-AT"])).toBe("de");
+      expect(getValidLocaleFromUILocales(["en-GB"])).toBe("en");
+      expect(getValidLocaleFromUILocales(["pt-BR"])).toBe("pt");
     });
 
     it("should return first valid language when multiple provided", () => {
