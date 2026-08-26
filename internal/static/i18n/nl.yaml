@@ -768,6 +768,7 @@ EventTypes:
           check:
             succeeded: "Multifactor OTP controle geslaagd"
             failed: "Multifactor OTP controle mislukt"
+            reused: "Multifactor OTP code hergebruikt"
           sms:
             added: "Multifactor OTP SMS toegevoegd"
             removed: "Multifactor OTP SMS verwijderd"

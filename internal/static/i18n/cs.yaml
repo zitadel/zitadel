@@ -766,6 +766,7 @@ EventTypes:
           check:
             succeeded: "Kontrola OTP pro vícefaktorové ověření byla úspěšná"
             failed: "Kontrola OTP pro vícefaktorové ověření selhala"
+            reused: "Kód OTP pro vícefaktorové ověření byl použit opakovaně"
           sms:
             added: "SMS pro vícefaktorové OTP přidána"
             removed: "SMS pro vícefaktorové OTP odstraněna"

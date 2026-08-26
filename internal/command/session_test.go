@@ -1352,6 +1352,9 @@ func TestCheckTOTP(t *testing.T) {
 				),
 				tarpit: expectTarpit(0),
 			},
+			wantErrorCommands: []eventstore.Command{
+				user.NewHumanOTPCheckReusedEvent(ctx, userAgg, nil),
+			},
 			wantErr: zerrors.ThrowInvalidArgument(nil, "TOTP-Auw0a", "Errors.User.MFA.OTP.Reused"),
 		},
 		{
@@ -1379,6 +1382,9 @@ func TestCheckTOTP(t *testing.T) {
 					),
 				),
 				tarpit: expectTarpit(0),
+			},
+			wantErrorCommands: []eventstore.Command{
+				user.NewHumanOTPCheckReusedEvent(ctx, userAgg, nil),
 			},
 			wantErr: zerrors.ThrowInvalidArgument(nil, "TOTP-Auw0a", "Errors.User.MFA.OTP.Reused"),
 		},

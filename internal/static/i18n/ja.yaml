@@ -769,6 +769,7 @@ EventTypes:
           check:
             succeeded: "MFA OTPチェックの成功"
             failed: "MFA OTPチェックの失敗"
+            reused: "MFA OTPコードの再利用"
           sms:
             added: "多要素 OTP SMS を追加しました"
             removed: "多要素 OTP SMS を削除しました"

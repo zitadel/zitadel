@@ -18,6 +18,7 @@ const (
 	HumanMFAOTPRemovedType        = otpEventPrefix + "removed"
 	HumanMFAOTPCheckSucceededType = otpEventPrefix + "check.succeeded"
 	HumanMFAOTPCheckFailedType    = otpEventPrefix + "check.failed"
+	HumanMFAOTPCheckReusedType    = otpEventPrefix + "check.reused"
 
 	otpSMSEventPrefix             = otpEventPrefix + "sms."
 	HumanOTPSMSAddedType          = otpSMSEventPrefix + "added"
@@ -221,6 +222,43 @@ func HumanOTPCheckFailedEventMapper(event eventstore.Event) (eventstore.Event, e
 		return nil, zerrors.ThrowInternal(err, "USER-Ns9df", "unable to unmarshal human otp check failed")
 	}
 	return otpAdded, nil
+}
+
+// HumanOTPCheckReusedEvent is pushed when a correct TOTP code was presented,
+// but had already been consumed within the current validation window.
+// It is deliberately distinct from [HumanOTPCheckFailedEvent]: a replay must be
+// observable to admins, but must not count towards the lockout policy.
+// Otherwise anyone who captured a code could replay it to lock the user out.
+type HumanOTPCheckReusedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	*AuthRequestInfo
+}
+
+func (e *HumanOTPCheckReusedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *HumanOTPCheckReusedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func (e *HumanOTPCheckReusedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewHumanOTPCheckReusedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	info *AuthRequestInfo,
+) *HumanOTPCheckReusedEvent {
+	return &HumanOTPCheckReusedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanMFAOTPCheckReusedType,
+		),
+		AuthRequestInfo: info,
+	}
 }
 
 type HumanOTPSMSAddedEvent struct {

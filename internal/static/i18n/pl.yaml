@@ -768,6 +768,7 @@ EventTypes:
           check:
             succeeded: "Sprawdzenie wielofaktorowego OTP zakończone powodzeniem"
             failed: "Sprawdzenie wielofaktorowego OTP nie powiodło się"
+            reused: "Kod wielofaktorowego OTP użyty ponownie"
           sms:
             added: "Dodano wieloskładnikowy OTP SMS"
             removed: "Usunięto wieloskładnikowy OTP SMS"

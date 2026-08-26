@@ -766,6 +766,7 @@ EventTypes:
           check:
             succeeded: "Vérification de l'OTP multifactorielle réussie"
             failed: "La vérification de l'OTP multifactorielle a échoué"
+            reused: "Code OTP multifactoriel réutilisé"
           sms:
             added: "Ajout de SMS OTP multifactoriels"
             removed: "Suppression des SMS OTP multifactoriels"

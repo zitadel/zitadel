@@ -769,6 +769,7 @@ EventTypes:
           check:
             succeeded: "다중인증 OTP 확인 성공"
             failed: "다중인증 OTP 확인 실패"
+            reused: "다중인증 OTP 코드 재사용"
           sms:
             added: "다중인증 OTP SMS 추가됨"
             removed: "다중인증 OTP SMS 삭제됨"

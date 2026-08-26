@@ -769,6 +769,7 @@ EventTypes:
           check:
             succeeded: "验证 MFA OTP 成功"
             failed: "验证 MFA OTP 失败"
+            reused: "重复使用 MFA OTP 验证码"
           sms:
             added: "添加了多因素 OTP 短信"
             removed: "删除了多因素 OTP 短信"

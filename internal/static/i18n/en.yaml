@@ -773,6 +773,7 @@ EventTypes:
           check:
             succeeded: "Multifactor OTP check succeeded"
             failed: "Multifactor OTP check failed"
+            reused: "Multifactor OTP code reused"
           sms:
             added: "Multifactor OTP SMS added"
             removed: "Multifactor OTP SMS removed"

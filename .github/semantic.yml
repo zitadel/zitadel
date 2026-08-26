@@ -23,7 +23,6 @@ scopes:
   # Backend — domain areas
   - api
   - session
-  - authn
   - authz
   - command
   - query

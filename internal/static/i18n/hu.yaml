@@ -768,6 +768,7 @@ EventTypes:
           check:
             succeeded: "A multifaktoros OTP ellenőrzés sikeres"
             failed: "A multifaktoros OTP ellenőrzés sikertelen"
+            reused: "A multifaktoros OTP kód újrafelhasználva"
           sms:
             added: "Multifaktoros OTP SMS hozzáadva"
             removed: "Multifaktoros OTP SMS eltávolítva"

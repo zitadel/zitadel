@@ -767,6 +767,7 @@ EventTypes:
           check:
             succeeded: "Controllo OTP riuscito"
             failed: "Controllo OTP fallito"
+            reused: "Codice OTP riutilizzato"
           sms:
             added: "Aggiunta SMS OTP"
             removed: "SMS OTP rimossa"

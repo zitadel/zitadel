@@ -768,6 +768,7 @@ EventTypes:
           check:
             succeeded: "Tvåfaktor OTP-kontroll lyckades"
             failed: "Tvåfaktor OTP-kontroll misslyckades"
+            reused: "Tvåfaktor OTP-kod återanvänd"
           sms:
             added: "Tvåfaktor OTP SMS tillagd"
             removed: "Tvåfaktor OTP SMS borttagen"
