@@ -6,3 +6,4 @@ output/**
 summaries/**
 tools/.bin/**
 .hold
+.skip-orgs

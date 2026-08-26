@@ -25,8 +25,12 @@ resp="$(curl -sf -m 30 -X POST "${ZITADEL_HOST}/v2/organizations/_search" \
 echo "--- all organizations ---"
 jq -r '.result[]? | "\(.id)\t\(.name)"' <<<"$resp"
 
+# orgs known to be undeletable (server returns 500); retrying them every run
+# would hammer the deployment under measurement
+SKIP_FILE=".skip-orgs"
 mapfile -t stale < <(jq -r --arg re "$PATTERN" \
-  '.result[]? | select(.name | test($re)) | "\(.id)\t\(.name)"' <<<"$resp")
+  '.result[]? | select(.name | test($re)) | "\(.id)\t\(.name)"' <<<"$resp" \
+  | { if [ -f "$SKIP_FILE" ]; then grep -vFf "$SKIP_FILE"; else cat; fi; })
 
 echo "--- matching the benchmark convention (${#stale[@]}) ---"
 printf '%s\n' "${stale[@]:-}" | sed '/^$/d'

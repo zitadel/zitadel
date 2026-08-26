@@ -23,7 +23,9 @@ if [ -n "${ADMIN_PAT:-}" ]; then
     left="$(curl -sf -m 20 -X POST "${ZITADEL_HOST}/v2/organizations/_search" \
       -H "Authorization: Bearer ${ADMIN_PAT}" -H "Content-Type: application/json" \
       -d '{"query":{"limit":1000}}' \
-      | jq '[.result[]? | select(.name | test("^load-test-"))] | length')" || left=0
+      | jq --arg skip "$(tr '\n' ',' < .skip-orgs 2>/dev/null || true)" \
+           '[.result[]? | select(.name | test("^load-test-"))
+                        | select($skip | contains(.id) | not)] | length')" || left=0
     [ "${left:-0}" -eq 0 ] && break
     sleep 2
   done
