@@ -341,7 +341,7 @@ If the Login UI returns an internal error or an authentication flow redirects in
 - the public Login domain is trusted by the ZITADEL instance
 - the configured Login V2 base URI exactly matches the public route and base path
 - the ingress sends Login UI traffic to the correct service
-- separate-domain deployments set the `public-host` and `instance-host` headers correctly
+- separate-domain deployments set the `x-zitadel-public-host` and `x-zitadel-instance-host` headers correctly
 - the selected Login source, client package, proto package, and ZITADEL API version were tested together
 - external IdP callback URLs reach the expected public endpoint
 - the prior known-good image and configuration can still be restored
