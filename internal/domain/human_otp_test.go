@@ -139,7 +139,7 @@ func TestVerifyTOTP(t *testing.T) {
 
 func TestTOTPHistory_AddRecent(t *testing.T) {
 	// start of a window which is still open.
-	start := time.Now().Add(-validDuration)
+	start := time.Now().Add(-checkDuration)
 
 	hash1 := crypto.NewHMACValue("123456")
 	hash2 := crypto.NewHMACValue("654321")
@@ -167,7 +167,7 @@ func TestTOTPHistory_AddRecent(t *testing.T) {
 			name:    "zero start, timestamp outside the window",
 			history: new(TOTPHistory),
 			args: args{
-				ts:    time.Now().Add(-validDuration - time.Minute),
+				ts:    time.Now().Add(-checkDuration - time.Minute),
 				value: hash1,
 			},
 			wantValues: nil,
@@ -230,7 +230,7 @@ func TestTOTPHistory_AddRecent(t *testing.T) {
 			case tt.args.value == nil:
 				assert.Equal(t, startBefore, tt.history.start, "a nil value must not set the start")
 			case startWasZero:
-				assert.WithinDuration(t, time.Now().Add(-validDuration), tt.history.start, time.Second)
+				assert.WithinDuration(t, time.Now().Add(-checkDuration), tt.history.start, time.Second)
 			default:
 				assert.Equal(t, startBefore, tt.history.start, "an already set start must not be recomputed")
 			}
@@ -284,7 +284,7 @@ func TestTOTPHistory_CheckReuse(t *testing.T) {
 func TestTOTPHistory_addAndCheck(t *testing.T) {
 	history := new(TOTPHistory)
 	history.AddRecent(time.Now(), crypto.NewHMACValue("123456"))
-	history.AddRecent(time.Now().Add(-validDuration-time.Minute), crypto.NewHMACValue("654321"))
+	history.AddRecent(time.Now().Add(-checkDuration-time.Minute), crypto.NewHMACValue("654321"))
 	history.AddRecent(time.Now(), nil)
 
 	require.Error(t, history.CheckReuse("123456"), "a code used inside the window must be reported as reused")

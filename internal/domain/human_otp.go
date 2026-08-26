@@ -65,8 +65,8 @@ func VerifyTOTP(code string, secret *crypto.CryptoValue, cryptoAlg crypto.Encryp
 }
 
 const (
-	validPeriods  = 1 + 2*TOTPSkew
-	validDuration = TOTPPeriod * time.Second * validPeriods
+	checkPeriods  = 2 + 2*TOTPSkew // 1 extra period to account for DB clock skew.
+	checkDuration = TOTPPeriod * time.Second * checkPeriods
 )
 
 type TOTPHistory struct {
@@ -87,7 +87,7 @@ func (h *TOTPHistory) AddRecent(ts time.Time, value *crypto.HMACValue) {
 	// and set the start to the beginning of the current window.
 	// This ensures that we only store codes that are within the valid window.
 	if h.start.IsZero() {
-		h.start = time.Now().Add(-validDuration)
+		h.start = time.Now().Add(-checkDuration)
 	}
 	if ts.After(h.start) {
 		h.recentValues = append(h.recentValues, value)
