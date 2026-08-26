@@ -111,7 +111,7 @@ The token must belong to a machine user with the Instance Login Client role (`IA
 
 ## Run the required quality checks
 
-Run the checks for all three affected projects, not only the Next.js application:
+Run the checks for the Login UI and `@zitadel/client` (and ensure `@zitadel/proto` is generated when needed):
 
 ```bash
 pnpm nx run-many \
