@@ -1,0 +1,96 @@
+---
+title: add session benchmark of zitadel v4.17.1
+sidebar_label: add session
+---
+
+import OutputSource from "./output.json";
+import { BenchmarkChart } from '@/components/benchmark_chart';
+
+Benchmark results of the v4.17.1 release of Zitadel.
+
+## Performance test results
+
+| Metric                                | Value                                                                            |
+|:--------------------------------------|:---------------------------------------------------------------------------------|
+| Baseline                              | none                                                                             |
+| Purpose                               | Test current performance                                                         |
+| Test start                            | 20:12 UTC                                                                      |
+| Test duration                         | 30min                                                                          |
+| Executed test                         | add\_session                                                                    |
+| k6 version                            | v2.1.0                                                                           |
+| VUs                                   | 600                                                                              |
+| Client location                       | US1                                                                              |
+| ZITADEL location                      | US1                                                                              |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 7<br/>Container max scale: 7 |
+| ZITADEL Version                       | v4.17.1                                                                           |
+| ZITADEL feature flags                 |                                                                                  |
+| Database                              | type: psql<br />version: v17.4                                                   |
+| Database location                     | US1                                                                              |
+| Database specification                | vCPU: 8<br/> memory: 32Gib                                                       |
+| ZITADEL metrics during test           |                                                                                  |
+| Observed errors                       | 2 of 2654819 checks failed (0.00%): add Session status ok (2 failed)                                                                          |
+| Top 3 most expensive database queries |                                                                                  |
+| Database metrics during test          |                                                                                  |
+| k6 Iterations per second              | 721                                                                       |
+| k6 output                             | [output](#k6-output)                                                             |
+| flowchart outcome                     |                                                                                  |
+
+## Endpoint latencies
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output
+```bash
+  █ TOTAL RESULTS 
+
+    checks_total.......: 2654819 1442.03768/s
+    checks_succeeded...: 99.99%  2654817 out of 2654819
+    checks_failed......: 0.00%   2 out of 2654819
+
+    ✓ user defined
+    ✓ authorize status ok
+    ✓ login name status ok
+    ✓ login shows password page
+    ✓ password status ok
+    ✓ password callback
+    ✓ code set
+    ✓ token status ok
+    ✓ access token created
+    ✓ id token created
+    ✓ info created
+    ✓ org created
+    ✓ create user is status ok
+    ✗ add Session status ok
+      ↳  99% — ✓ 1327102 / ✗ 2
+    ✓ add session is status ok
+    ✓ org removed
+
+    CUSTOM
+    add_session_duration.................: min=22ms     avg=813.77ms max=17.01s   p(50)=101ms    p(95)=4s       p(99)=4.88s   
+    login_ui_enter_login_name_duration...: min=204.36ms avg=204.36ms max=204.36ms p(50)=204.36ms p(95)=204.36ms p(99)=204.36ms
+    login_ui_enter_password_duration.....: min=11.99ms  avg=11.99ms  max=11.99ms  p(50)=11.99ms  p(95)=11.99ms  p(99)=11.99ms 
+    login_ui_init_login_duration.........: min=121.35ms avg=121.35ms max=121.35ms p(50)=121.35ms p(95)=121.35ms p(99)=121.35ms
+    login_ui_token_duration..............: min=104.49ms avg=104.49ms max=104.49ms p(50)=104.49ms p(95)=104.49ms p(99)=104.49ms
+    org_create_org_duration..............: min=69.54ms  avg=69.54ms  max=69.54ms  p(50)=69.54ms  p(95)=69.54ms  p(99)=69.54ms 
+    session_add_session_duration.........: min=694.84µs avg=812.5ms  max=17.01s   p(50)=99.43ms  p(95)=4s       p(99)=4.87s   
+    user_create_human_duration...........: min=450.15ms avg=3.99s    max=6.6s     p(50)=4.21s    p(95)=6.34s    p(99)=6.45s   
+
+    HTTP
+    http_req_duration....................: min=694.84µs avg=813.59ms max=17.01s   p(50)=99.43ms  p(95)=4s       p(99)=4.88s   
+      { expected_response:true }.........: min=11.99ms  avg=813.59ms max=17.01s   p(50)=99.43ms  p(95)=4s       p(99)=4.88s   
+    http_req_failed......................: 0.00%   2 out of 1328314
+    http_reqs............................: 1328314 721.510144/s
+
+    EXECUTION
+    iteration_duration...................: min=2ms      avg=813.88ms max=17.01s   p(50)=100.72ms p(95)=4s       p(99)=4.88s   
+    iterations...........................: 1327104 720.852899/s
+    vus..................................: 0       min=0            max=600
+    vus_max..............................: 600     min=600          max=600
+
+    NETWORK
+    data_received........................: 1.0 GB  549 kB/s
+    data_sent............................: 220 MB  120 kB/s
+
+running (30m41.0s), 000/600 VUs, 1327104 complete and 0 interrupted iterations
+default ✓ [ 100% ] 600 VUs  30m0s
+```

@@ -1,0 +1,105 @@
+---
+title: oidc session benchmark of zitadel v4.17.1
+sidebar_label: oidc session
+---
+
+import OutputSource from "./output.json";
+import { BenchmarkChart } from '@/components/benchmark_chart';
+
+Benchmark results of the v4.17.1 release of Zitadel.
+
+## Performance test results
+
+| Metric                                | Value                                                                            |
+|:--------------------------------------|:---------------------------------------------------------------------------------|
+| Baseline                              | none                                                                             |
+| Purpose                               | Test current performance                                                         |
+| Test start                            | 00:18 UTC                                                                      |
+| Test duration                         | 30min                                                                          |
+| Executed test                         | oidc\_session                                                                    |
+| k6 version                            | v2.1.0                                                                           |
+| VUs                                   | 600                                                                              |
+| Client location                       | US1                                                                              |
+| ZITADEL location                      | US1                                                                              |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 7<br/>Container max scale: 7 |
+| ZITADEL Version                       | v4.17.1                                                                           |
+| ZITADEL feature flags                 |                                                                                  |
+| Database                              | type: psql<br />version: v17.4                                                   |
+| Database location                     | US1                                                                              |
+| Database specification                | vCPU: 8<br/> memory: 32Gib                                                       |
+| ZITADEL metrics during test           |                                                                                  |
+| Observed errors                       | 1 of 2395491 checks failed (0.00%): finalize auth request status ok (1 failed)                                                                          |
+| Top 3 most expensive database queries |                                                                                  |
+| Database metrics during test          |                                                                                  |
+| k6 Iterations per second              | 332                                                                       |
+| k6 output                             | [output](#k6-output)                                                             |
+| flowchart outcome                     |                                                                                  |
+
+## Endpoint latencies
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output
+```bash
+  █ TOTAL RESULTS 
+
+    checks_total.......: 2395491 1328.088109/s
+    checks_succeeded...: 99.99%  2395490 out of 2395491
+    checks_failed......: 0.00%   1 out of 2395491
+
+    ✓ user defined
+    ✓ authorize status ok
+    ✓ login name status ok
+    ✓ login shows password page
+    ✓ password status ok
+    ✓ password callback
+    ✓ code set
+    ✓ token status ok
+    ✓ access token created
+    ✓ id token created
+    ✓ info created
+    ✓ org created
+    ✓ create user is status ok
+    ✓ generate machine key status ok
+    ✓ member added successful
+    ✓ openid configuration
+    ✓ access token returned
+    ✓ auth request id returned
+    ✓ add Session status ok
+    ✗ finalize auth request status ok
+      ↳  99% — ✓ 598867 / ✗ 1
+    ✓ org removed
+
+    CUSTOM
+    login_ui_enter_login_name_duration...: min=167.01ms avg=167.01ms max=167.01ms p(50)=167.01ms p(95)=167.01ms p(99)=167.01ms
+    login_ui_enter_password_duration.....: min=14.32ms  avg=14.32ms  max=14.32ms  p(50)=14.32ms  p(95)=14.32ms  p(99)=14.32ms 
+    login_ui_init_login_duration.........: min=15.03ms  avg=274.85ms max=2.53s    p(50)=46.34ms  p(95)=1.05s    p(99)=1.3s    
+    login_ui_token_duration..............: min=102.23ms avg=102.23ms max=102.23ms p(50)=102.23ms p(95)=102.23ms p(99)=102.23ms
+    membership_iam_member................: min=85.79ms  avg=85.79ms  max=85.79ms  p(50)=85.79ms  p(95)=85.79ms  p(99)=85.79ms 
+    oidc_auth_request_finalize...........: min=28.62ms  avg=817.17ms max=7.31s    p(50)=95.04ms  p(95)=3.63s    p(99)=4.36s   
+    oidc_session_duration................: min=82ms     avg=1.8s     max=13.66s   p(50)=1.29s    p(95)=5s       p(99)=6.98s   
+    oidc_token_duration..................: min=41.08ms  avg=41.08ms  max=41.08ms  p(50)=41.08ms  p(95)=41.08ms  p(99)=41.08ms 
+    org_create_org_duration..............: min=116.08ms avg=116.08ms max=116.08ms p(50)=116.08ms p(95)=116.08ms p(99)=116.08ms
+    session_add_session_duration.........: min=21.37ms  avg=707.55ms max=6.68s    p(50)=77.47ms  p(95)=3.21s    p(99)=3.88s   
+    user_add_machine_key_duration........: min=74.9ms   avg=74.9ms   max=74.9ms   p(50)=74.9ms   p(95)=74.9ms   p(99)=74.9ms  
+    user_create_machine_duration.........: min=54.21ms  avg=54.21ms  max=54.21ms  p(50)=54.21ms  p(95)=54.21ms  p(99)=54.21ms 
+
+    HTTP
+    http_req_duration....................: min=921.98µs avg=599.69ms max=7.31s    p(50)=74.02ms  p(95)=3.18s    p(99)=3.99s   
+      { expected_response:true }.........: min=9.39ms   avg=599.69ms max=7.31s    p(50)=74.02ms  p(95)=3.18s    p(99)=3.99s   
+    http_req_failed......................: 0.00%   1 out of 1797220
+    http_reqs............................: 1797220 996.399699/s
+
+    EXECUTION
+    iteration_duration...................: min=82.36ms  avg=1.8s     max=13.66s   p(50)=1.29s    p(95)=4.99s    p(99)=6.98s   
+    iterations...........................: 598868  332.019394/s
+    vus..................................: 64      min=0            max=600
+    vus_max..............................: 600     min=600          max=600
+
+    NETWORK
+    data_received........................: 1.3 GB  715 kB/s
+    data_sent............................: 586 MB  325 kB/s
+
+running (30m03.7s), 000/600 VUs, 598868 complete and 0 interrupted iterations
+default ✓ [ 100% ] 600 VUs  30m0s
+```

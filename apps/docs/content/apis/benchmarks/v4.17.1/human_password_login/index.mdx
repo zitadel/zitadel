@@ -1,0 +1,97 @@
+---
+title: human password login benchmark of zitadel v4.17.1
+sidebar_label: human password login
+---
+
+import OutputSource from "./output.json";
+import { BenchmarkChart } from '@/components/benchmark_chart';
+
+Benchmark results of the v4.17.1 release of Zitadel.
+
+## Performance test results
+
+| Metric                                | Value                                                                            |
+|:--------------------------------------|:---------------------------------------------------------------------------------|
+| Baseline                              | none                                                                             |
+| Purpose                               | Test current performance                                                         |
+| Test start                            | 22:44 UTC                                                                      |
+| Test duration                         | 30min                                                                          |
+| Executed test                         | human\_password\_login                                                                    |
+| k6 version                            | v2.1.0                                                                           |
+| VUs                                   | 600                                                                              |
+| Client location                       | US1                                                                              |
+| ZITADEL location                      | US1                                                                              |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 7<br/>Container max scale: 7 |
+| ZITADEL Version                       | v4.17.1                                                                           |
+| ZITADEL feature flags                 |                                                                                  |
+| Database                              | type: psql<br />version: v17.4                                                   |
+| Database location                     | US1                                                                              |
+| Database specification                | vCPU: 8<br/> memory: 32Gib                                                       |
+| ZITADEL metrics during test           |                                                                                  |
+| Observed errors                       | 20 of 1005199 checks failed (0.00%): login name status ok (2 failed), password callback (18 failed)                                                                          |
+| Top 3 most expensive database queries |                                                                                  |
+| Database metrics during test          |                                                                                  |
+| k6 Iterations per second              | 45                                                                       |
+| k6 output                             | [output](#k6-output)                                                             |
+| flowchart outcome                     |                                                                                  |
+
+## Endpoint latencies
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output
+```bash
+  █ TOTAL RESULTS 
+
+    checks_total.......: 1005199 543.596814/s
+    checks_succeeded...: 99.99%  1005179 out of 1005199
+    checks_failed......: 0.00%   20 out of 1005199
+
+    ✓ user defined
+    ✓ authorize status ok
+    ✗ login name status ok
+      ↳  99% — ✓ 83675 / ✗ 2
+    ✓ login shows password page
+    ✓ password status ok
+    ✗ password callback
+      ↳  99% — ✓ 83657 / ✗ 18
+    ✓ code set
+    ✓ token status ok
+    ✓ access token created
+    ✓ id token created
+    ✓ info created
+    ✓ org created
+    ✓ create user is status ok
+    ✓ openid configuration
+    ✓ userinfo status ok
+    ✓ org removed
+
+    CUSTOM
+    human_password_login_duration........: min=697ms    avg=12.93s   max=1m0s    p(50)=6.4s     p(95)=43.66s   p(99)=51.93s  
+    login_ui_enter_login_name_duration...: min=64.85ms  avg=8.84s    max=51.6s   p(50)=580.07ms p(95)=39.95s   p(99)=48.03s  
+    login_ui_enter_password_duration.....: min=1.26ms   avg=17.5ms   max=5.84s   p(50)=2.59ms   p(95)=5.32ms   p(99)=16.22ms 
+    login_ui_init_login_duration.........: min=28.97ms  avg=553.06ms max=3.03s   p(50)=98.11ms  p(95)=2.03s    p(99)=2.39s   
+    login_ui_token_duration..............: min=43.41ms  avg=712.94ms max=3.75s   p(50)=165.74ms p(95)=2.54s    p(99)=2.97s   
+    oidc_user_info_duration..............: min=11.85ms  avg=107.11ms max=956.3ms p(50)=30.44ms  p(95)=372.14ms p(99)=458.37ms
+    org_create_org_duration..............: min=50.32ms  avg=50.32ms  max=50.32ms p(50)=50.32ms  p(95)=50.32ms  p(99)=50.32ms 
+    user_create_human_duration...........: min=381.03ms avg=3.31s    max=5.63s   p(50)=3.31s    p(95)=5.55s    p(99)=5.6s    
+
+    HTTP
+    http_req_duration....................: min=1.26ms   avg=1.61s    max=51.6s   p(50)=149.06ms p(95)=5.35s    p(99)=33.32s  
+      { expected_response:true }.........: min=1.26ms   avg=1.61s    max=51.6s   p(50)=149.06ms p(95)=5.35s    p(99)=33.32s  
+    http_req_failed......................: 0.00%  2 out of 672354
+    http_reqs............................: 672354 363.59914/s
+
+    EXECUTION
+    iteration_duration...................: min=697.1ms  avg=12.94s   max=1m0s    p(50)=6.4s     p(95)=43.66s   p(99)=51.93s  
+    iterations...........................: 83676  45.250748/s
+    vus..................................: 15     min=0           max=600
+    vus_max..............................: 600    min=600         max=600
+
+    NETWORK
+    data_received........................: 1.5 GB 807 kB/s
+    data_sent............................: 322 MB 174 kB/s
+
+running (30m49.2s), 000/600 VUs, 83676 complete and 0 interrupted iterations
+default ✓ [ 100% ] 600 VUs  30m0s
+```

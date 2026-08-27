@@ -1,0 +1,96 @@
+---
+title: user info benchmark of zitadel v4.17.1
+sidebar_label: user info
+---
+
+import OutputSource from "./output.json";
+import { BenchmarkChart } from '@/components/benchmark_chart';
+
+Benchmark results of the v4.17.1 release of Zitadel.
+
+## Performance test results
+
+| Metric                                | Value                                                                            |
+|:--------------------------------------|:---------------------------------------------------------------------------------|
+| Baseline                              | none                                                                             |
+| Purpose                               | Test current performance                                                         |
+| Test start                            | 01:21 UTC                                                                      |
+| Test duration                         | 30min                                                                          |
+| Executed test                         | user\_info                                                                    |
+| k6 version                            | v2.1.0                                                                           |
+| VUs                                   | 600                                                                              |
+| Client location                       | US1                                                                              |
+| ZITADEL location                      | US1                                                                              |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 7<br/>Container max scale: 7 |
+| ZITADEL Version                       | v4.17.1                                                                           |
+| ZITADEL feature flags                 |                                                                                  |
+| Database                              | type: psql<br />version: v17.4                                                   |
+| Database location                     | US1                                                                              |
+| Database specification                | vCPU: 8<br/> memory: 32Gib                                                       |
+| ZITADEL metrics during test           |                                                                                  |
+| Observed errors                       | 9 of 6067021 checks failed (0.00%): userinfo status ok (8 failed), org removed (1 failed)                                                                          |
+| Top 3 most expensive database queries |                                                                                  |
+| Database metrics during test          |                                                                                  |
+| k6 Iterations per second              | 3364                                                                       |
+| k6 output                             | [output](#k6-output)                                                             |
+| flowchart outcome                     |                                                                                  |
+
+## Endpoint latencies
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output
+```bash
+  █ TOTAL RESULTS 
+
+    checks_total.......: 6067021 3364.30029/s
+    checks_succeeded...: 99.99%  6067012 out of 6067021
+    checks_failed......: 0.00%   9 out of 6067021
+
+    ✓ user defined
+    ✓ authorize status ok
+    ✓ login name status ok
+    ✓ login shows password page
+    ✓ password status ok
+    ✓ password callback
+    ✓ code set
+    ✓ token status ok
+    ✓ access token created
+    ✓ id token created
+    ✓ info created
+    ✓ org created
+    ✓ create user is status ok
+    ✓ openid configuration
+    ✗ userinfo status ok
+      ↳  99% — ✓ 6066388 / ✗ 8
+    ✗ org removed
+      ↳  0% — ✓ 0 / ✗ 1
+
+    CUSTOM
+    login_ui_enter_login_name_duration...: min=158.54ms avg=199.96ms max=241.38ms p(50)=199.96ms p(95)=237.24ms p(99)=240.55ms
+    login_ui_enter_password_duration.....: min=12.1ms   avg=266.13ms max=520.15ms p(50)=266.13ms p(95)=494.75ms p(99)=515.07ms
+    login_ui_init_login_duration.........: min=84.21ms  avg=94.66ms  max=105.1ms  p(50)=94.66ms  p(95)=104.06ms p(99)=104.89ms
+    login_ui_token_duration..............: min=127ms    avg=142.33ms max=157.65ms p(50)=142.33ms p(95)=156.12ms p(99)=157.35ms
+    oidc_user_info_duration..............: min=475.43µs avg=177.79ms max=3.51s    p(50)=26.58ms  p(95)=835.76ms p(99)=963.67ms
+    org_create_org_duration..............: min=56.96ms  avg=56.96ms  max=56.96ms  p(50)=56.96ms  p(95)=56.96ms  p(99)=56.96ms 
+    user_create_human_duration...........: min=369.86ms avg=369.86ms max=369.86ms p(50)=369.86ms p(95)=369.86ms p(99)=369.86ms
+
+    HTTP
+    http_req_duration....................: min=475.43µs avg=177.78ms max=3.51s    p(50)=26.58ms  p(95)=835.75ms p(99)=963.65ms
+      { expected_response:true }.........: min=8.66ms   avg=177.77ms max=3.51s    p(50)=26.58ms  p(95)=835.75ms p(99)=963.64ms
+    http_req_failed......................: 0.00%   9 out of 6067016
+    http_reqs............................: 6067016 3364.297518/s
+
+    EXECUTION
+    iteration_duration...................: min=753.77µs avg=177.99ms max=3.51s    p(50)=26.77ms  p(95)=835.95ms p(99)=963.86ms
+    iterations...........................: 6066396 3363.953714/s
+    vus..................................: 0       min=0            max=600
+    vus_max..............................: 600     min=600          max=600
+
+    NETWORK
+    data_received........................: 4.2 GB  2.3 MB/s
+    data_sent............................: 479 MB  266 kB/s
+
+running (30m03.4s), 000/600 VUs, 6066396 complete and 0 interrupted iterations
+default ✓ [ 100% ] 600 VUs  30m0s
+```

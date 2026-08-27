@@ -1,0 +1,98 @@
+---
+title: password session benchmark of zitadel v4.17.1
+sidebar_label: password session
+---
+
+import OutputSource from "./output.json";
+import { BenchmarkChart } from '@/components/benchmark_chart';
+
+Benchmark results of the v4.17.1 release of Zitadel.
+
+## Performance test results
+
+| Metric                                | Value                                                                            |
+|:--------------------------------------|:---------------------------------------------------------------------------------|
+| Baseline                              | none                                                                             |
+| Purpose                               | Test current performance                                                         |
+| Test start                            | 01:56 UTC                                                                      |
+| Test duration                         | 30min                                                                          |
+| Executed test                         | password\_session                                                                    |
+| k6 version                            | v2.1.0                                                                           |
+| VUs                                   | 600                                                                              |
+| Client location                       | US1                                                                              |
+| ZITADEL location                      | US1                                                                              |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 7<br/>Container max scale: 7 |
+| ZITADEL Version                       | v4.17.1                                                                           |
+| ZITADEL feature flags                 |                                                                                  |
+| Database                              | type: psql<br />version: v17.4                                                   |
+| Database location                     | US1                                                                              |
+| Database specification                | vCPU: 8<br/> memory: 32Gib                                                       |
+| ZITADEL metrics during test           |                                                                                  |
+| Observed errors                       | none                                                                          |
+| Top 3 most expensive database queries |                                                                                  |
+| Database metrics during test          |                                                                                  |
+| k6 Iterations per second              | 73                                                                       |
+| k6 output                             | [output](#k6-output)                                                             |
+| flowchart outcome                     |                                                                                  |
+
+## Endpoint latencies
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output
+```bash
+  █ TOTAL RESULTS 
+
+    checks_total.......: 271487  146.658356/s
+    checks_succeeded...: 100.00% 271487 out of 271487
+    checks_failed......: 0.00%   0 out of 271487
+
+    ✓ user defined
+    ✓ authorize status ok
+    ✓ login name status ok
+    ✓ login shows password page
+    ✓ password status ok
+    ✓ password callback
+    ✓ code set
+    ✓ token status ok
+    ✓ access token created
+    ✓ id token created
+    ✓ info created
+    ✓ org created
+    ✓ create user is status ok
+    ✓ set email otp status ok
+    ✓ add Session status ok
+    ✓ set Session status ok
+    ✓ org removed
+
+    CUSTOM
+    login_ui_enter_login_name_duration...: min=108.17ms avg=108.17ms max=108.17ms p(50)=108.17ms p(95)=108.17ms p(99)=108.17ms
+    login_ui_enter_password_duration.....: min=15.2ms   avg=15.2ms   max=15.2ms   p(50)=15.2ms   p(95)=15.2ms   p(99)=15.2ms  
+    login_ui_init_login_duration.........: min=67.49ms  avg=67.49ms  max=67.49ms  p(50)=67.49ms  p(95)=67.49ms  p(99)=67.49ms 
+    login_ui_token_duration..............: min=138.62ms avg=138.62ms max=138.62ms p(50)=138.62ms p(95)=138.62ms p(99)=138.62ms
+    org_create_org_duration..............: min=44.48ms  avg=44.48ms  max=44.48ms  p(50)=44.48ms  p(95)=44.48ms  p(99)=44.48ms 
+    password_session_duration............: min=358ms    avg=8s       max=38.44s   p(50)=5.63s    p(95)=23.25s   p(99)=26.94s  
+    session_add_session_duration.........: min=55.51ms  avg=7.59s    max=37.64s   p(50)=5.23s    p(95)=22.84s   p(99)=26.43s  
+    session_set_session_duration.........: min=285.05ms avg=405.16ms max=7.21s    p(50)=343.91ms p(95)=547.34ms p(99)=2.08s   
+    set_human_email_otp_duration.........: min=29.45ms  avg=138.78ms max=319.21ms p(50)=134.81ms p(95)=254.92ms p(99)=304.56ms
+    user_create_human_duration...........: min=354.35ms avg=3.68s    max=5.22s    p(50)=4.23s    p(95)=5.15s    p(99)=5.17s   
+
+    HTTP
+    http_req_duration....................: min=13.24ms  avg=3.98s    max=37.64s   p(50)=406.21ms p(95)=19.78s   p(99)=25.05s  
+      { expected_response:true }.........: min=13.24ms  avg=3.98s    max=37.64s   p(50)=406.21ms p(95)=19.78s   p(99)=25.05s  
+    http_req_failed......................: 0.00%  0 out of 272084
+    http_reqs............................: 272084 146.980858/s
+
+    EXECUTION
+    iteration_duration...................: min=357.58ms avg=8s       max=38.44s   p(50)=5.63s    p(95)=23.25s   p(99)=26.94s  
+    iterations...........................: 135137 73.001544/s
+    vus..................................: 0      min=0           max=600
+    vus_max..............................: 600    min=600         max=600
+
+    NETWORK
+    data_received........................: 207 MB 112 kB/s
+    data_sent............................: 92 MB  50 kB/s
+
+running (30m51.2s), 000/600 VUs, 135137 complete and 0 interrupted iterations
+default ✓ [ 100% ] 600 VUs  30m0s
+```
