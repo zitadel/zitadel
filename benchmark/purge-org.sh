@@ -48,8 +48,11 @@ del_one() {
   owner="$(curl -sf -m 30 "${ZITADEL_HOST}/v2/users/${id}" \
     -H "Authorization: Bearer ${ADMIN_PAT}" | jq -r '.user.details.resourceOwner // ""')" || return 0
   [ "$owner" = "${ORG}" ] || { echo "SKIP ${id} (owner ${owner:-unknown})"; return 0; }
-  curl -sf -m 60 -o /dev/null -X DELETE "${ZITADEL_HOST}/v2/users/${id}" \
-    -H "Authorization: Bearer ${ADMIN_PAT}" || echo "FAILED ${id}"
+  code="$(curl -s -m 60 -o /dev/null -w '%{http_code}' -X DELETE "${ZITADEL_HOST}/v2/users/${id}" \
+    -H "Authorization: Bearer ${ADMIN_PAT}")"
+  # 404 means the write side already removed the user and only the projection
+  # still lists it. That is done, not a failure.
+  case "$code" in 200|404) ;; *) echo "FAILED ${id} -> HTTP ${code}" ;; esac
 }
 export -f del_one
 
@@ -67,6 +70,13 @@ while :; do
   left="$(count)"
   echo "page ${page} done, ${left} user(s) left"
   [ "$left" -eq 0 ] && break
+  # Stop if a page removed nothing: the remainder are users the command side has
+  # already deleted but the query side still lists, and retrying loops forever.
+  if [ -n "${prev_left:-}" ] && [ "$left" -ge "$prev_left" ]; then
+    echo "no progress (${left} left); treating the remainder as stale projections"
+    break
+  fi
+  prev_left="$left"
 done
 
 echo "deleting org ${ORG} ..."
