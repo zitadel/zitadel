@@ -1,0 +1,715 @@
+{
+  "DeleteOrganizationSettings": {
+    "handler": "internal/api/grpc/settings/v2/settings.go:46",
+    "errors": [
+      {
+        "id": "AUTH-rKLWEH",
+        "file": "internal/api/authz/permissions.go",
+        "line": 30,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e getUserPermissions"
+      },
+      {
+        "id": "AUTHZ-cdgFk",
+        "file": "internal/api/authz/permissions.go",
+        "line": 46,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e getUserPermissions"
+      },
+      {
+        "id": "AUTH-AWfge",
+        "file": "internal/api/authz/permissions.go",
+        "line": 60,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e checkUserResourcePermissions"
+      },
+      {
+        "id": "AUTH-Swrgg2",
+        "file": "internal/api/authz/permissions.go",
+        "line": 75,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e checkUserResourcePermissions"
+      },
+      {
+        "id": "COMMAND-eU5hkMy3Pf",
+        "file": "internal/command/organization_settings.go",
+        "line": 56,
+        "reasoning": "DeleteOrganizationSettings -\u003e DeleteOrganizationSettings"
+      },
+      {
+        "id": "COMMAND-6R54f4vWqv",
+        "file": "internal/command/organization_settings_model.go",
+        "line": 46,
+        "reasoning": "DeleteOrganizationSettings -\u003e DeleteOrganizationSettings -\u003e NewRemoved -\u003e checkPermissionDelete"
+      },
+      {
+        "id": "USER-Ggk9n",
+        "file": "internal/command/user_domain_policy.go",
+        "line": 45,
+        "reasoning": "DeleteOrganizationSettings -\u003e DeleteOrganizationSettings -\u003e domainPolicyWriteModel"
+      }
+    ]
+  },
+  "GetActiveIdentityProviders": {
+    "handler": "internal/api/grpc/settings/v2/query.go:133",
+    "errors": [
+      {
+        "id": "QUERY-aAZ1D",
+        "file": "internal/query/current_state.go",
+        "line": 232,
+        "reasoning": "GetActiveIdentityProviders -\u003e IDPLoginPolicyLinks -\u003e latestState -\u003e latestState -\u003e prepareLatestState"
+      },
+      {
+        "id": "QUERY-5CfX9",
+        "file": "internal/query/generic.go",
+        "line": 78,
+        "reasoning": "GetActiveIdentityProviders -\u003e IDPLoginPolicyLinks -\u003e latestState -\u003e latestState"
+      },
+      {
+        "id": "QUERY-FDbKW",
+        "file": "internal/query/idp_login_policy_link.go",
+        "line": 110,
+        "reasoning": "GetActiveIdentityProviders -\u003e IDPLoginPolicyLinks"
+      },
+      {
+        "id": "QUERY-ZkKUc",
+        "file": "internal/query/idp_login_policy_link.go",
+        "line": 118,
+        "reasoning": "GetActiveIdentityProviders -\u003e IDPLoginPolicyLinks"
+      },
+      {
+        "id": "QUERY-vOLFG",
+        "file": "internal/query/idp_login_policy_link.go",
+        "line": 211,
+        "reasoning": "GetActiveIdentityProviders -\u003e IDPLoginPolicyLinks -\u003e prepareIDPLoginPolicyLinksQuery"
+      }
+    ]
+  },
+  "GetBrandingSettings": {
+    "handler": "internal/api/grpc/settings/v2/query.go:69",
+    "errors": [
+      {
+        "id": "QUERY-V22un",
+        "file": "internal/query/label_policy.go",
+        "line": 68,
+        "reasoning": "GetBrandingSettings -\u003e ActiveLabelPolicyByOrg"
+      },
+      {
+        "id": "QUERY-bJEsm",
+        "file": "internal/query/label_policy.go",
+        "line": 324,
+        "reasoning": "GetBrandingSettings -\u003e ActiveLabelPolicyByOrg -\u003e prepareLabelPolicyQuery"
+      },
+      {
+        "id": "QUERY-awLM6",
+        "file": "internal/query/label_policy.go",
+        "line": 326,
+        "reasoning": "GetBrandingSettings -\u003e ActiveLabelPolicyByOrg -\u003e prepareLabelPolicyQuery"
+      }
+    ]
+  },
+  "GetDomainSettings": {
+    "handler": "internal/api/grpc/settings/v2/query.go:85",
+    "errors": [
+      {
+        "id": "CRDB-Unnex",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 84,
+        "reasoning": "GetDomainSettings -\u003e DomainPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e failureCount"
+      },
+      {
+        "id": "CRDB-RwSMV",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 87,
+        "reasoning": "GetDomainSettings -\u003e DomainPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e failureCount"
+      },
+      {
+        "id": "CRDB-4Ht4x",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 104,
+        "reasoning": "GetDomainSettings -\u003e DomainPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e setFailureCount"
+      },
+      {
+        "id": "V2-WF23g2",
+        "file": "internal/eventstore/handler/v2/state.go",
+        "line": 85,
+        "reasoning": "GetDomainSettings -\u003e DomainPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e setState"
+      },
+      {
+        "id": "V2-FGEKi",
+        "file": "internal/eventstore/handler/v2/state.go",
+        "line": 90,
+        "reasoning": "GetDomainSettings -\u003e DomainPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e setState"
+      },
+      {
+        "id": "QUERY-D3CqT",
+        "file": "internal/query/domain_policy.go",
+        "line": 124,
+        "reasoning": "GetDomainSettings -\u003e DomainPolicyByOrg"
+      },
+      {
+        "id": "QUERY-K0Jr5",
+        "file": "internal/query/domain_policy.go",
+        "line": 187,
+        "reasoning": "GetDomainSettings -\u003e DomainPolicyByOrg -\u003e prepareDomainPolicyQuery"
+      },
+      {
+        "id": "QUERY-rIy6j",
+        "file": "internal/query/domain_policy.go",
+        "line": 189,
+        "reasoning": "GetDomainSettings -\u003e DomainPolicyByOrg -\u003e prepareDomainPolicyQuery"
+      }
+    ]
+  },
+  "GetEffectiveSettings": {
+    "handler": "internal/api/grpc/settings/v2/settings.go:72",
+    "errors": []
+  },
+  "GetGeneralSettings": {
+    "handler": "internal/api/grpc/settings/v2/query.go:187",
+    "errors": []
+  },
+  "GetHostedLoginTranslation": {
+    "handler": "internal/api/grpc/settings/v2/query.go:211",
+    "errors": [
+      {
+        "id": "QUERY-rZLAGi",
+        "file": "internal/query/hosted_login_translation.go",
+        "line": 99,
+        "reasoning": "GetHostedLoginTranslation -\u003e GetHostedLoginTranslation"
+      },
+      {
+        "id": "QUERY-YB6Sri",
+        "file": "internal/query/hosted_login_translation.go",
+        "line": 122,
+        "reasoning": "GetHostedLoginTranslation -\u003e GetHostedLoginTranslation"
+      },
+      {
+        "id": "QUERY-ZgCMux",
+        "file": "internal/query/hosted_login_translation.go",
+        "line": 140,
+        "reasoning": "GetHostedLoginTranslation -\u003e GetHostedLoginTranslation"
+      },
+      {
+        "id": "QUERY-6k1zjx",
+        "file": "internal/query/hosted_login_translation.go",
+        "line": 150,
+        "reasoning": "GetHostedLoginTranslation -\u003e GetHostedLoginTranslation"
+      },
+      {
+        "id": "QUERY-pdgEJd",
+        "file": "internal/query/hosted_login_translation.go",
+        "line": 177,
+        "reasoning": "GetHostedLoginTranslation -\u003e GetHostedLoginTranslation"
+      },
+      {
+        "id": "QUERY-HdprNF",
+        "file": "internal/query/hosted_login_translation.go",
+        "line": 188,
+        "reasoning": "GetHostedLoginTranslation -\u003e GetHostedLoginTranslation"
+      },
+      {
+        "id": "QUERY-6gb5QR",
+        "file": "internal/query/hosted_login_translation.go",
+        "line": 200,
+        "reasoning": "GetHostedLoginTranslation -\u003e GetHostedLoginTranslation -\u003e getSystemTranslation"
+      },
+      {
+        "id": "QUERY-oc7r7i",
+        "file": "internal/query/hosted_login_translation.go",
+        "line": 239,
+        "reasoning": "GetHostedLoginTranslation -\u003e GetHostedLoginTranslation -\u003e prepareHostedLoginTranslationQuery"
+      },
+      {
+        "id": "QUERY-70ppPp",
+        "file": "internal/query/hosted_login_translation.go",
+        "line": 249,
+        "reasoning": "GetHostedLoginTranslation -\u003e GetHostedLoginTranslation -\u003e getTranslationOutputMessage"
+      }
+    ]
+  },
+  "GetLegalAndSupportSettings": {
+    "handler": "internal/api/grpc/settings/v2/query.go:101",
+    "errors": [
+      {
+        "id": "CRDB-Unnex",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 84,
+        "reasoning": "GetLegalAndSupportSettings -\u003e PrivacyPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e failureCount"
+      },
+      {
+        "id": "CRDB-RwSMV",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 87,
+        "reasoning": "GetLegalAndSupportSettings -\u003e PrivacyPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e failureCount"
+      },
+      {
+        "id": "CRDB-4Ht4x",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 104,
+        "reasoning": "GetLegalAndSupportSettings -\u003e PrivacyPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e setFailureCount"
+      },
+      {
+        "id": "V2-WF23g2",
+        "file": "internal/eventstore/handler/v2/state.go",
+        "line": 85,
+        "reasoning": "GetLegalAndSupportSettings -\u003e PrivacyPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e setState"
+      },
+      {
+        "id": "V2-FGEKi",
+        "file": "internal/eventstore/handler/v2/state.go",
+        "line": 90,
+        "reasoning": "GetLegalAndSupportSettings -\u003e PrivacyPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e setState"
+      },
+      {
+        "id": "QUERY-UXuPI",
+        "file": "internal/query/privacy_policy.go",
+        "line": 135,
+        "reasoning": "GetLegalAndSupportSettings -\u003e PrivacyPolicyByOrg"
+      },
+      {
+        "id": "QUERY-vNMHL",
+        "file": "internal/query/privacy_policy.go",
+        "line": 213,
+        "reasoning": "GetLegalAndSupportSettings -\u003e PrivacyPolicyByOrg -\u003e preparePrivacyPolicyQuery"
+      },
+      {
+        "id": "QUERY-csrdo",
+        "file": "internal/query/privacy_policy.go",
+        "line": 215,
+        "reasoning": "GetLegalAndSupportSettings -\u003e PrivacyPolicyByOrg -\u003e preparePrivacyPolicyQuery"
+      }
+    ]
+  },
+  "GetLinkSettings": {
+    "handler": "internal/api/grpc/settings/v2/settings.go:60",
+    "errors": []
+  },
+  "GetLockoutSettings": {
+    "handler": "internal/api/grpc/settings/v2/query.go:117",
+    "errors": [
+      {
+        "id": "CRDB-Unnex",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 84,
+        "reasoning": "GetLockoutSettings -\u003e LockoutPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e failureCount"
+      },
+      {
+        "id": "CRDB-RwSMV",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 87,
+        "reasoning": "GetLockoutSettings -\u003e LockoutPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e failureCount"
+      },
+      {
+        "id": "CRDB-4Ht4x",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 104,
+        "reasoning": "GetLockoutSettings -\u003e LockoutPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e setFailureCount"
+      },
+      {
+        "id": "V2-WF23g2",
+        "file": "internal/eventstore/handler/v2/state.go",
+        "line": 85,
+        "reasoning": "GetLockoutSettings -\u003e LockoutPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e setState"
+      },
+      {
+        "id": "V2-FGEKi",
+        "file": "internal/eventstore/handler/v2/state.go",
+        "line": 90,
+        "reasoning": "GetLockoutSettings -\u003e LockoutPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e setState"
+      },
+      {
+        "id": "QUERY-SKR6X",
+        "file": "internal/query/lockout_policy.go",
+        "line": 112,
+        "reasoning": "GetLockoutSettings -\u003e LockoutPolicyByOrg"
+      },
+      {
+        "id": "QUERY-38pZnUemLP",
+        "file": "internal/query/lockout_policy.go",
+        "line": 175,
+        "reasoning": "GetLockoutSettings -\u003e LockoutPolicyByOrg -\u003e prepareLockoutPolicyQuery"
+      },
+      {
+        "id": "QUERY-PJURxRUoYG",
+        "file": "internal/query/lockout_policy.go",
+        "line": 177,
+        "reasoning": "GetLockoutSettings -\u003e LockoutPolicyByOrg -\u003e prepareLockoutPolicyQuery"
+      }
+    ]
+  },
+  "GetLoginSettings": {
+    "handler": "internal/api/grpc/settings/v2/query.go:21",
+    "errors": [
+      {
+        "id": "CRDB-Unnex",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 84,
+        "reasoning": "GetLoginSettings -\u003e LoginPolicyByID -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e failureCount"
+      },
+      {
+        "id": "CRDB-RwSMV",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 87,
+        "reasoning": "GetLoginSettings -\u003e LoginPolicyByID -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e failureCount"
+      },
+      {
+        "id": "CRDB-4Ht4x",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 104,
+        "reasoning": "GetLoginSettings -\u003e LoginPolicyByID -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e setFailureCount"
+      },
+      {
+        "id": "V2-WF23g2",
+        "file": "internal/eventstore/handler/v2/state.go",
+        "line": 85,
+        "reasoning": "GetLoginSettings -\u003e LoginPolicyByID -\u003e Trigger -\u003e processEvents -\u003e setState"
+      },
+      {
+        "id": "V2-FGEKi",
+        "file": "internal/eventstore/handler/v2/state.go",
+        "line": 90,
+        "reasoning": "GetLoginSettings -\u003e LoginPolicyByID -\u003e Trigger -\u003e processEvents -\u003e setState"
+      },
+      {
+        "id": "QUERY-aAZ1D",
+        "file": "internal/query/current_state.go",
+        "line": 232,
+        "reasoning": "GetLoginSettings -\u003e LoginPolicyByID -\u003e addLinksToLoginPolicy -\u003e IDPLoginPolicyLinks -\u003e latestState -\u003e latestState -\u003e prepareLatestState"
+      },
+      {
+        "id": "QUERY-5CfX9",
+        "file": "internal/query/generic.go",
+        "line": 78,
+        "reasoning": "GetLoginSettings -\u003e LoginPolicyByID -\u003e addLinksToLoginPolicy -\u003e IDPLoginPolicyLinks -\u003e latestState -\u003e latestState"
+      },
+      {
+        "id": "QUERY-FDbKW",
+        "file": "internal/query/idp_login_policy_link.go",
+        "line": 110,
+        "reasoning": "GetLoginSettings -\u003e LoginPolicyByID -\u003e addLinksToLoginPolicy -\u003e IDPLoginPolicyLinks"
+      },
+      {
+        "id": "QUERY-ZkKUc",
+        "file": "internal/query/idp_login_policy_link.go",
+        "line": 118,
+        "reasoning": "GetLoginSettings -\u003e LoginPolicyByID -\u003e addLinksToLoginPolicy -\u003e IDPLoginPolicyLinks"
+      },
+      {
+        "id": "QUERY-vOLFG",
+        "file": "internal/query/idp_login_policy_link.go",
+        "line": 211,
+        "reasoning": "GetLoginSettings -\u003e LoginPolicyByID -\u003e addLinksToLoginPolicy -\u003e IDPLoginPolicyLinks -\u003e prepareIDPLoginPolicyLinksQuery"
+      },
+      {
+        "id": "QUERY-scVHo",
+        "file": "internal/query/login_policy.go",
+        "line": 195,
+        "reasoning": "GetLoginSettings -\u003e LoginPolicyByID"
+      },
+      {
+        "id": "QUERY-SWgr3",
+        "file": "internal/query/login_policy.go",
+        "line": 203,
+        "reasoning": "GetLoginSettings -\u003e LoginPolicyByID"
+      },
+      {
+        "id": "QUERY-aa4Ve",
+        "file": "internal/query/login_policy.go",
+        "line": 211,
+        "reasoning": "GetLoginSettings -\u003e LoginPolicyByID -\u003e addLinksToLoginPolicy"
+      },
+      {
+        "id": "QUERY-YcC53",
+        "file": "internal/query/login_policy.go",
+        "line": 419,
+        "reasoning": "GetLoginSettings -\u003e LoginPolicyByID -\u003e prepareLoginPolicyQuery"
+      },
+      {
+        "id": "QUERY-QsUBJ",
+        "file": "internal/query/login_policy.go",
+        "line": 423,
+        "reasoning": "GetLoginSettings -\u003e LoginPolicyByID -\u003e prepareLoginPolicyQuery"
+      }
+    ]
+  },
+  "GetPasswordComplexitySettings": {
+    "handler": "internal/api/grpc/settings/v2/query.go:37",
+    "errors": [
+      {
+        "id": "CRDB-Unnex",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 84,
+        "reasoning": "GetPasswordComplexitySettings -\u003e PasswordComplexityPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e failureCount"
+      },
+      {
+        "id": "CRDB-RwSMV",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 87,
+        "reasoning": "GetPasswordComplexitySettings -\u003e PasswordComplexityPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e failureCount"
+      },
+      {
+        "id": "CRDB-4Ht4x",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 104,
+        "reasoning": "GetPasswordComplexitySettings -\u003e PasswordComplexityPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e setFailureCount"
+      },
+      {
+        "id": "V2-WF23g2",
+        "file": "internal/eventstore/handler/v2/state.go",
+        "line": 85,
+        "reasoning": "GetPasswordComplexitySettings -\u003e PasswordComplexityPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e setState"
+      },
+      {
+        "id": "V2-FGEKi",
+        "file": "internal/eventstore/handler/v2/state.go",
+        "line": 90,
+        "reasoning": "GetPasswordComplexitySettings -\u003e PasswordComplexityPolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e setState"
+      },
+      {
+        "id": "QUERY-lDnrk",
+        "file": "internal/query/password_complexity_policy.go",
+        "line": 63,
+        "reasoning": "GetPasswordComplexitySettings -\u003e PasswordComplexityPolicyByOrg"
+      },
+      {
+        "id": "QUERY-hgA9vuM0qg",
+        "file": "internal/query/password_complexity_policy.go",
+        "line": 200,
+        "reasoning": "GetPasswordComplexitySettings -\u003e PasswordComplexityPolicyByOrg -\u003e preparePasswordComplexityPolicyQuery"
+      },
+      {
+        "id": "QUERY-TvvW9Uij7M",
+        "file": "internal/query/password_complexity_policy.go",
+        "line": 202,
+        "reasoning": "GetPasswordComplexitySettings -\u003e PasswordComplexityPolicyByOrg -\u003e preparePasswordComplexityPolicyQuery"
+      }
+    ]
+  },
+  "GetPasswordExpirySettings": {
+    "handler": "internal/api/grpc/settings/v2/query.go:53",
+    "errors": [
+      {
+        "id": "CRDB-Unnex",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 84,
+        "reasoning": "GetPasswordExpirySettings -\u003e PasswordAgePolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e failureCount"
+      },
+      {
+        "id": "CRDB-RwSMV",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 87,
+        "reasoning": "GetPasswordExpirySettings -\u003e PasswordAgePolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e failureCount"
+      },
+      {
+        "id": "CRDB-4Ht4x",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 104,
+        "reasoning": "GetPasswordExpirySettings -\u003e PasswordAgePolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e setFailureCount"
+      },
+      {
+        "id": "V2-WF23g2",
+        "file": "internal/eventstore/handler/v2/state.go",
+        "line": 85,
+        "reasoning": "GetPasswordExpirySettings -\u003e PasswordAgePolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e setState"
+      },
+      {
+        "id": "V2-FGEKi",
+        "file": "internal/eventstore/handler/v2/state.go",
+        "line": 90,
+        "reasoning": "GetPasswordExpirySettings -\u003e PasswordAgePolicyByOrg -\u003e Trigger -\u003e processEvents -\u003e setState"
+      },
+      {
+        "id": "QUERY-SKR6X",
+        "file": "internal/query/password_age_policy.go",
+        "line": 111,
+        "reasoning": "GetPasswordExpirySettings -\u003e PasswordAgePolicyByOrg"
+      },
+      {
+        "id": "QUERY-ShCWRnWJfH",
+        "file": "internal/query/password_age_policy.go",
+        "line": 178,
+        "reasoning": "GetPasswordExpirySettings -\u003e PasswordAgePolicyByOrg -\u003e preparePasswordAgePolicyQuery"
+      },
+      {
+        "id": "QUERY-6nj7Bm4fxT",
+        "file": "internal/query/password_age_policy.go",
+        "line": 180,
+        "reasoning": "GetPasswordExpirySettings -\u003e PasswordAgePolicyByOrg -\u003e preparePasswordAgePolicyQuery"
+      }
+    ]
+  },
+  "GetSecuritySettings": {
+    "handler": "internal/api/grpc/settings/v2/query.go:201",
+    "errors": [
+      {
+        "id": "QUERY-Sf6d1",
+        "file": "internal/query/security_policy.go",
+        "line": 81,
+        "reasoning": "GetSecuritySettings -\u003e SecurityPolicy"
+      },
+      {
+        "id": "QUERY-Dfrt2",
+        "file": "internal/query/security_policy.go",
+        "line": 120,
+        "reasoning": "GetSecuritySettings -\u003e SecurityPolicy -\u003e prepareSecurityPolicyQuery"
+      }
+    ]
+  },
+  "ListOrganizationSettings": {
+    "handler": "internal/api/grpc/settings/v2/query.go:220",
+    "errors": [
+      {
+        "id": "AUTH-rKLWEH",
+        "file": "internal/api/authz/permissions.go",
+        "line": 30,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e getUserPermissions"
+      },
+      {
+        "id": "AUTHZ-cdgFk",
+        "file": "internal/api/authz/permissions.go",
+        "line": 46,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e getUserPermissions"
+      },
+      {
+        "id": "AUTH-AWfge",
+        "file": "internal/api/authz/permissions.go",
+        "line": 60,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e checkUserResourcePermissions"
+      },
+      {
+        "id": "AUTH-Swrgg2",
+        "file": "internal/api/authz/permissions.go",
+        "line": 75,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e checkUserResourcePermissions"
+      },
+      {
+        "id": "QUERY-4M0fs",
+        "file": "internal/api/grpc/filter/v2/converter.go",
+        "line": 71,
+        "reasoning": "ListOrganizationSettings -\u003e listOrganizationSettingsRequestToModel -\u003e PaginationPbToQuery"
+      },
+      {
+        "id": "SETTINGS-uvTDqZHlvS",
+        "file": "internal/api/grpc/settings/v2/query.go",
+        "line": 291,
+        "reasoning": "ListOrganizationSettings -\u003e listOrganizationSettingsRequestToModel -\u003e organizationSettingsFiltersToQuery -\u003e organizationSettingsToModel"
+      },
+      {
+        "id": "QUERY-qNPeOXlMwj",
+        "file": "internal/query/organization_settings.go",
+        "line": 127,
+        "reasoning": "ListOrganizationSettings -\u003e SearchOrganizationSettings -\u003e searchOrganizationSettings"
+      },
+      {
+        "id": "QUERY-mmC1K0t5Fq",
+        "file": "internal/query/organization_settings.go",
+        "line": 186,
+        "reasoning": "ListOrganizationSettings -\u003e SearchOrganizationSettings -\u003e searchOrganizationSettings -\u003e prepareOrganizationSettingsListQuery"
+      },
+      {
+        "id": "PERMISSION-OoS5o",
+        "file": "internal/query/permission.go",
+        "line": 151,
+        "reasoning": "ListOrganizationSettings -\u003e SearchOrganizationSettings -\u003e searchOrganizationSettings -\u003e organizationSettingsPermissionCheckV2 -\u003e PermissionClause"
+      }
+    ]
+  },
+  "ResetLinkSettings": {
+    "handler": "internal/api/grpc/settings/v2/settings.go:68",
+    "errors": []
+  },
+  "SetHostedLoginTranslation": {
+    "handler": "internal/api/grpc/settings/v2/settings.go:23",
+    "errors": [
+      {
+        "id": "COMMA-YB6Sri",
+        "file": "internal/command/hosted_login_translation.go",
+        "line": 31,
+        "reasoning": "SetHostedLoginTranslation -\u003e SetHostedLoginTranslation"
+      },
+      {
+        "id": "COMMA-xmjATA",
+        "file": "internal/command/hosted_login_translation.go",
+        "line": 36,
+        "reasoning": "SetHostedLoginTranslation -\u003e SetHostedLoginTranslation"
+      },
+      {
+        "id": "COMMA-i8nqFl",
+        "file": "internal/command/hosted_login_translation.go",
+        "line": 46,
+        "reasoning": "SetHostedLoginTranslation -\u003e SetHostedLoginTranslation"
+      },
+      {
+        "id": "COMMA-0aw7In",
+        "file": "internal/command/hosted_login_translation.go",
+        "line": 69,
+        "reasoning": "SetHostedLoginTranslation -\u003e SetHostedLoginTranslation -\u003e setTranslationEvents"
+      }
+    ]
+  },
+  "SetLinkSettings": {
+    "handler": "internal/api/grpc/settings/v2/settings.go:64",
+    "errors": []
+  },
+  "SetOrganizationSettings": {
+    "handler": "internal/api/grpc/settings/v2/settings.go:32",
+    "errors": [
+      {
+        "id": "AUTH-rKLWEH",
+        "file": "internal/api/authz/permissions.go",
+        "line": 30,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e getUserPermissions"
+      },
+      {
+        "id": "AUTHZ-cdgFk",
+        "file": "internal/api/authz/permissions.go",
+        "line": 46,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e getUserPermissions"
+      },
+      {
+        "id": "AUTH-AWfge",
+        "file": "internal/api/authz/permissions.go",
+        "line": 60,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e checkUserResourcePermissions"
+      },
+      {
+        "id": "AUTH-Swrgg2",
+        "file": "internal/api/authz/permissions.go",
+        "line": 75,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e checkUserResourcePermissions"
+      },
+      {
+        "id": "COMMAND-zI4z7cLLRJ",
+        "file": "internal/command/organization_settings.go",
+        "line": 20,
+        "reasoning": "SetOrganizationSettings -\u003e SetOrganizationSettings -\u003e IsValid"
+      },
+      {
+        "id": "COMMAND-oDzwP5kmdP",
+        "file": "internal/command/organization_settings.go",
+        "line": 34,
+        "reasoning": "SetOrganizationSettings -\u003e SetOrganizationSettings"
+      },
+      {
+        "id": "COMMAND-8Dttuyj0B4",
+        "file": "internal/command/organization_settings_model.go",
+        "line": 35,
+        "reasoning": "SetOrganizationSettings -\u003e SetOrganizationSettings -\u003e NewSet -\u003e checkPermissionWrite"
+      },
+      {
+        "id": "USER-Ggk9n",
+        "file": "internal/command/user_domain_policy.go",
+        "line": 45,
+        "reasoning": "SetOrganizationSettings -\u003e SetOrganizationSettings -\u003e domainPolicyWriteModel"
+      }
+    ]
+  },
+  "SetSecuritySettings": {
+    "handler": "internal/api/grpc/settings/v2/settings.go:13",
+    "errors": [
+      {
+        "id": "POLICY-EWsf3",
+        "file": "internal/repository/instance/policy_security.go",
+        "line": 39,
+        "reasoning": "SetSecuritySettings -\u003e SetSecurityPolicy -\u003e prepareSetSecurityPolicy -\u003e NewSetEvent -\u003e NewSecurityPolicySetEvent"
+      }
+    ]
+  }
+}
