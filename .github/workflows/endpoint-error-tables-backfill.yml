@@ -59,6 +59,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # The tracer type-checks real Go packages, which import generated
+      # gRPC stubs (pkg/grpc/**) that are gitignored, not committed.
+      - name: Generate protobuf/gRPC stubs
+        run: pnpm exec nx run @zitadel/api:generate-stubs
+
       - name: Trace every category
         working-directory: apps/docs
         run: pnpm exec tsx scripts/trace-all-categories.ts

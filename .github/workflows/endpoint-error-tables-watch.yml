@@ -49,6 +49,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # The tracer type-checks real Go packages, which import generated
+      # gRPC stubs (pkg/grpc/**) that are gitignored, not committed. Without
+      # this, every category fails to even load, not just the one that
+      # actually changed.
+      - name: Generate protobuf/gRPC stubs
+        run: pnpm exec nx run @zitadel/api:generate-stubs
+
       - name: Find affected categories
         id: affected
         working-directory: apps/docs
