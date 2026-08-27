@@ -263,7 +263,7 @@ Test OIDC and SAML callbacks and every configured external identity provider thr
 The exact configuration depends on whether the Login UI and ZITADEL share a public origin, use separate domains, or communicate through an internal cluster address. `CUSTOM_REQUEST_HEADERS=Host:<public-zitadel-domain>` is used when the Login container calls ZITADEL through an internal service address and must preserve the public instance host. `x-zitadel-public-host` and `x-zitadel-instance-host` apply to the documented separate-domain/proxy topology. Do not conflate these settings.
 
 <Callout type="warn">
-Do not assume that setting only `ZITADEL_API_URL` replaces the required host-routing behavior for every topology. The [Login App architectural and proxy guidance](/docs/guides/integrate/login-ui/login-app) is the source of truth for these headers.
+Do not assume that setting only `ZITADEL_API_URL` replaces the required host-routing behavior for every topology. The [Login App architectural and proxy guidance](/guides/integrate/login-ui/login-app) is the source of truth for these headers.
 </Callout>
 
 ## Enable Login V2 safely
@@ -294,7 +294,6 @@ git merge --no-ff vX.Y.Z
 ```
 
 Teams may use a different branching model, but the update branch must start from the current customized state.
-```
 
 Resolve conflicts while preserving the intent of your customizations. Then install, generate, test, and build again. For a slim fork, fetch a freshly filtered copy of the same release and merge its history using the identical filter configuration used during bootstrap.
 
@@ -318,7 +317,7 @@ Do not merge upstream continuously into production without qualification. Login 
 ZITADEL releases are the upstream input; your custom Login UI image is your own release artifact. A useful version format is:
 
 ```
-<upstream-zitadel-version>-custom.<revision>
+upstream-zitadel-version-custom.build-revision
 ```
 
 Maintain a short release record containing:
@@ -351,5 +350,5 @@ If the Login UI returns an internal error or an authentication flow redirects in
 - [Login App architecture and setup](/guides/integrate/login-ui/login-app)
 - [Contribute to the Login UI](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#contribute-to-login)
 - [Connect your self-hosted Login UI to ZITADEL](/self-hosting/manage/login-client)
-- [Adopt Login V2 on an existing installation](/docs/self-hosting/manage/adopt-login-v2)
+- [Adopt Login V2 on an existing installation](/self-hosting/manage/adopt-login-v2)
 - [ZITADEL releases](https://github.com/zitadel/zitadel/releases)
