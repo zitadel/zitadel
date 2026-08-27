@@ -1,0 +1,89 @@
+name: Endpoint error tables — backfill
+
+# Traces every discovered v2 API category with internal/tools/errortrace and
+# regenerates the per-endpoint "Possible error responses" tables
+# (apps/docs/scripts/trace-all-categories.ts).
+#
+# Runs automatically on every push to main that touches a proto service or
+# its Go handlers — the normal case needs no one to click anything. Mostly a
+# no-op in steady state: the endpoint-error-tables-watch workflow already
+# catches this per-PR before merge, so by the time a change lands on main
+# its tables are usually already current, and this run finds nothing to do.
+# It only does real work right after this repo's own error-tracer PR merges
+# (nothing traced yet for most categories) or when the watch workflow
+# couldn't push directly (e.g. a merged fork PR).
+#
+# workflow_dispatch stays as a manual fallback — same script, run on demand
+# if the automatic trigger ever misses something or you just want to force
+# a full recheck. The underlying CLI (trace-all-categories.ts /
+# trace-category-cli.ts) is also always runnable by hand regardless of CI.
+#
+# Either way this opens its own PR rather than pushing straight to main —
+# it's a bulk, mechanically-generated diff across many docs pages, worth a
+# human glance before it lands.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "proto/zitadel/**/v2/*_service.proto"
+      - "internal/api/grpc/**"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Trace every category
+        working-directory: apps/docs
+        run: pnpm exec tsx scripts/trace-all-categories.ts
+
+      - name: Open a PR with the results
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git add apps/docs/scripts/endpoint-error-tracing apps/docs/components/EndpointErrors/data.json
+          if git diff --cached --quiet; then
+            echo "Nothing to update — every category is already traced and current."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          branch="bot/endpoint-error-tables-$(date +%Y%m%d%H%M%S)"
+          git checkout -b "$branch"
+          git commit -m "docs: backfill endpoint error tables"
+          git push origin "$branch"
+
+          gh pr create \
+            --title "docs: backfill endpoint error tables" \
+            --body "Automated run of \`trace-all-categories.ts\` — traces every discovered v2 API category and regenerates the per-endpoint \"Possible error responses\" tables. Triggered manually via the endpoint-error-tables-backfill workflow." \
+            --base main \
+            --head "$branch"

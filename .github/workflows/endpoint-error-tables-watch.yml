@@ -1,0 +1,89 @@
+name: Endpoint error tables — watch
+
+# Runs on every PR that touches a v2 service's .proto file or its Go
+# handler package. Re-traces just the affected categories
+# (apps/docs/scripts/trace-all-categories.ts --only <categories>) to see
+# whether that changes anything, and if so, comments on the PR with what's
+# affected and the exact command to run.
+#
+# Deliberately comment-only, for every PR regardless of whose it is —
+# this workflow never pushes a commit onto a PR branch it doesn't own.
+# The PR's own author runs the command and pushes it themselves, same as
+# any other review feedback.
+on:
+  pull_request:
+    paths:
+      - "proto/zitadel/**/v2/*_service.proto"
+      - "internal/api/grpc/**"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Find affected categories
+        id: affected
+        working-directory: apps/docs
+        run: |
+          set -euo pipefail
+          git fetch origin "${{ github.event.pull_request.base.sha }}" --depth=1
+          categories=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" \
+            | pnpm exec tsx scripts/affected-categories.ts)
+          echo "categories=$categories" >> "$GITHUB_OUTPUT"
+          echo "Affected categories: ${categories:-none}"
+
+      - name: Re-trace affected categories
+        if: steps.affected.outputs.categories != ''
+        working-directory: apps/docs
+        run: pnpm exec tsx scripts/trace-all-categories.ts --only "${{ steps.affected.outputs.categories }}"
+
+      - name: Check for drift
+        id: drift
+        if: steps.affected.outputs.categories != ''
+        run: |
+          if git status --porcelain apps/docs/scripts/endpoint-error-tracing apps/docs/components/EndpointErrors/data.json | grep -q .; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Comment with what changed
+        if: steps.drift.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment "${{ github.event.pull_request.number }}" --body "🤖 This PR changes Go/proto code for: \`${{ steps.affected.outputs.categories }}\`, and their error tables are now out of date — that's the only reason these categories are affected and not others, it's a side effect of what this PR touches, not a deliberate pick. Run this locally and push the result so the tables (and the preview) reflect it:
+
+          \`\`\`
+          pnpm exec tsx scripts/trace-all-categories.ts --only ${{ steps.affected.outputs.categories }}
+          \`\`\`
+
+          (from \`apps/docs\`)."
