@@ -3,13 +3,20 @@ name: Endpoint error tables — watch
 # Runs on every PR that touches a v2 service's .proto file or its Go
 # handler package. Re-traces just the affected categories
 # (apps/docs/scripts/trace-all-categories.ts --only <categories>) to see
-# whether that changes anything, and if so, comments on the PR with what's
-# affected and the exact command to run.
+# whether that changes anything.
 #
-# Deliberately comment-only, for every PR regardless of whose it is —
-# this workflow never pushes a commit onto a PR branch it doesn't own.
-# The PR's own author runs the command and pushes it themselves, same as
-# any other review feedback.
+# Never pushes a commit onto a PR branch it doesn't own — same treatment
+# for a same-repo PR or a fork, since neither gets touched. Instead: if the
+# tables are out of date, it comments with the exact command to run *and
+# fails the check* — a comment with no enforcement gets ignored, so this is
+# a required check once branch protection is set to require it (see the
+# repo settings — that's a separate, deliberate step, not done by this
+# workflow itself).
+#
+# Bypass: add the "skip-endpoint-error-check" label to the PR. For when the
+# detector itself is wrong (false positive) rather than the tables actually
+# being stale — without this there'd be no way to merge through a bug in
+# this workflow.
 on:
   pull_request:
     paths:
@@ -82,15 +89,40 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Check for bypass label
+        id: bypass
+        if: steps.drift.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          labels=$(gh pr view "${{ github.event.pull_request.number }}" --json labels --jq '.labels[].name')
+          if echo "$labels" | grep -qx "skip-endpoint-error-check"; then
+            echo "bypassed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "bypassed=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Comment with what changed
         if: steps.drift.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr comment "${{ github.event.pull_request.number }}" --body "🤖 This PR changes Go/proto code for: \`${{ steps.affected.outputs.categories }}\`, and their error tables are now out of date — that's the only reason these categories are affected and not others, it's a side effect of what this PR touches, not a deliberate pick. Run this locally and push the result so the tables (and the preview) reflect it:
+          note=""
+          if [ "${{ steps.bypass.outputs.bypassed }}" = "true" ]; then
+            note=" (bypassed via the \`skip-endpoint-error-check\` label — not blocking this PR.)"
+          fi
+          gh pr comment "${{ github.event.pull_request.number }}" --body "🤖 This PR changes Go/proto code for: \`${{ steps.affected.outputs.categories }}\`, and their error tables are now out of date — that's the only reason these categories are affected and not others, it's a side effect of what this PR touches, not a deliberate pick.${note}
+
+          Run this locally and push the result so the tables (and the preview) reflect it:
 
           \`\`\`
           pnpm exec tsx scripts/trace-all-categories.ts --only ${{ steps.affected.outputs.categories }}
           \`\`\`
 
-          (from \`apps/docs\`)."
+          (from \`apps/docs\`). If this check is wrong (the tables are actually fine), add the \`skip-endpoint-error-check\` label instead of running it."
+
+      - name: Fail if not addressed
+        if: steps.drift.outputs.changed == 'true' && steps.bypass.outputs.bypassed != 'true'
+        run: |
+          echo "::error::Error tables are out of date for: ${{ steps.affected.outputs.categories }}. Run 'pnpm exec tsx scripts/trace-all-categories.ts --only ${{ steps.affected.outputs.categories }}' from apps/docs and push the result — or add the 'skip-endpoint-error-check' label if this check is wrong."
+          exit 1
