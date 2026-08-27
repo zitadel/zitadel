@@ -1,0 +1,1071 @@
+{
+  "CreateSession": {
+    "handler": "internal/api/grpc/session/v2/session.go:23",
+    "errors": [
+      {
+        "id": "AUTH-rKLWEH",
+        "file": "internal/api/authz/permissions.go",
+        "line": 30,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e getUserPermissions"
+      },
+      {
+        "id": "AUTHZ-cdgFk",
+        "file": "internal/api/authz/permissions.go",
+        "line": 46,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e getUserPermissions"
+      },
+      {
+        "id": "AUTH-AWfge",
+        "file": "internal/api/authz/permissions.go",
+        "line": 60,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e checkUserResourcePermissions"
+      },
+      {
+        "id": "AUTH-Swrgg2",
+        "file": "internal/api/authz/permissions.go",
+        "line": 75,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e checkUserResourcePermissions"
+      },
+      {
+        "id": "SESSION-Gj4ko",
+        "file": "internal/api/grpc/session/v2/session.go",
+        "line": 127,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand"
+      },
+      {
+        "id": "SESSION-k3ng0",
+        "file": "internal/api/grpc/session/v2/session.go",
+        "line": 233,
+        "reasoning": "CreateSession -\u003e challengesToCommand -\u003e createOTPEmailChallengeCommand"
+      },
+      {
+        "id": "SESSION-d3b4g0",
+        "file": "internal/api/grpc/session/v2/session.go",
+        "line": 247,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e userCheck"
+      },
+      {
+        "id": "COMMAND-Sfw3r",
+        "file": "internal/command/session.go",
+        "line": 94,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent"
+      },
+      {
+        "id": "COMMAND-Df4bw",
+        "file": "internal/command/session.go",
+        "line": 105,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent"
+      },
+      {
+        "id": "COMMAND-SAf42",
+        "file": "internal/command/session.go",
+        "line": 108,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent"
+      },
+      {
+        "id": "COMMAND-O8xk3w",
+        "file": "internal/command/session.go",
+        "line": 112,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent"
+      },
+      {
+        "id": "COMMAND-O8xk3w",
+        "file": "internal/command/session.go",
+        "line": 121,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent"
+      },
+      {
+        "id": "COMMAND-asEG4",
+        "file": "internal/command/session.go",
+        "line": 257,
+        "reasoning": "CreateSession -\u003e CreateSession -\u003e updateSession -\u003e SetLifetime"
+      },
+      {
+        "id": "COMMAND-eeR2e",
+        "file": "internal/command/session.go",
+        "line": 268,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckWebAuthN -\u003e getHumanWebAuthNTokens -\u003e gethumanWriteModel"
+      },
+      {
+        "id": "COMMAND-Df4b3",
+        "file": "internal/command/session.go",
+        "line": 276,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckWebAuthN -\u003e getHumanWebAuthNTokens -\u003e gethumanWriteModel"
+      },
+      {
+        "id": "COMMAND-Hewfq",
+        "file": "internal/command/session_model.go",
+        "line": 290,
+        "reasoning": "CreateSession -\u003e CreateSession -\u003e updateSession -\u003e CheckNotInvalidated"
+      },
+      {
+        "id": "COMMAND-Hkl3d",
+        "file": "internal/command/session_model.go",
+        "line": 293,
+        "reasoning": "CreateSession -\u003e CreateSession -\u003e updateSession -\u003e CheckNotInvalidated"
+      },
+      {
+        "id": "COMMAND-JKL3g",
+        "file": "internal/command/session_otp.go",
+        "line": 28,
+        "reasoning": "CreateSession -\u003e challengesToCommand -\u003e createOTPSMSChallengeCommand -\u003e CreateOTPSMSChallengeReturnCode -\u003e createOTPSMSChallenge"
+      },
+      {
+        "id": "COMMAND-BJ2g3",
+        "file": "internal/command/session_otp.go",
+        "line": 35,
+        "reasoning": "CreateSession -\u003e challengesToCommand -\u003e createOTPSMSChallengeCommand -\u003e CreateOTPSMSChallengeReturnCode -\u003e createOTPSMSChallenge"
+      },
+      {
+        "id": "COMMAND-JK3gp",
+        "file": "internal/command/session_otp.go",
+        "line": 81,
+        "reasoning": "CreateSession -\u003e challengesToCommand -\u003e createOTPEmailChallengeCommand -\u003e CreateOTPEmailChallengeURLTemplate -\u003e createOTPEmailChallenge"
+      },
+      {
+        "id": "COMMAND-JKLJ3",
+        "file": "internal/command/session_otp.go",
+        "line": 88,
+        "reasoning": "CreateSession -\u003e challengesToCommand -\u003e createOTPEmailChallengeCommand -\u003e CreateOTPEmailChallengeURLTemplate -\u003e createOTPEmailChallenge"
+      },
+      {
+        "id": "COMMAND-Yah6A",
+        "file": "internal/command/session_webauhtn.go",
+        "line": 55,
+        "reasoning": "CreateSession -\u003e challengesToCommand -\u003e createWebAuthNChallengeCommand -\u003e CreateWebAuthNChallenge"
+      },
+      {
+        "id": "COMMAND-ohG2o",
+        "file": "internal/command/session_webauhtn.go",
+        "line": 67,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckWebAuthN"
+      },
+      {
+        "id": "COMMAND-Ioqu5",
+        "file": "internal/command/session_webauhtn.go",
+        "line": 71,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckWebAuthN"
+      },
+      {
+        "id": "COMMAND-Aej7i",
+        "file": "internal/command/session_webauhtn.go",
+        "line": 85,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckWebAuthN"
+      },
+      {
+        "id": "COMMAND-2M9fs",
+        "file": "internal/command/user_human.go",
+        "line": 808,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP -\u003e verifyCode"
+      },
+      {
+        "id": "COMMAND-M0g95",
+        "file": "internal/command/user_human.go",
+        "line": 817,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP -\u003e verifyCode"
+      },
+      {
+        "id": "COMMAND-8N9ds",
+        "file": "internal/command/user_human_otp.go",
+        "line": 190,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckTOTP -\u003e checkTOTP"
+      },
+      {
+        "id": "COMMAND-3Mif9s",
+        "file": "internal/command/user_human_otp.go",
+        "line": 198,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckTOTP -\u003e checkTOTP"
+      },
+      {
+        "id": "COMMAND-SF3fg",
+        "file": "internal/command/user_human_otp.go",
+        "line": 209,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckTOTP -\u003e checkTOTP"
+      },
+      {
+        "id": "COMMAND-S453v",
+        "file": "internal/command/user_human_otp.go",
+        "line": 587,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP"
+      },
+      {
+        "id": "COMMAND-SJl2g",
+        "file": "internal/command/user_human_otp.go",
+        "line": 590,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP"
+      },
+      {
+        "id": "COMMAND-d2r52",
+        "file": "internal/command/user_human_otp.go",
+        "line": 597,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP"
+      },
+      {
+        "id": "COMMAND-S34gh",
+        "file": "internal/command/user_human_otp.go",
+        "line": 600,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP"
+      },
+      {
+        "id": "COMMAND-S6h4R",
+        "file": "internal/command/user_human_otp.go",
+        "line": 620,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP"
+      },
+      {
+        "id": "COMMAND-3M0fs",
+        "file": "internal/command/user_human_password.go",
+        "line": 24,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckPassword -\u003e checkPassword -\u003e verifyPasswordWithLockoutPolicy -\u003e convertLoginPasswapErr -\u003e ErrPasswordInvalid"
+      },
+      {
+        "id": "COMMAND-Sfw3f",
+        "file": "internal/command/user_human_password.go",
+        "line": 393,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckPassword -\u003e checkPassword"
+      },
+      {
+        "id": "COMMAND-3n77z",
+        "file": "internal/command/user_human_password.go",
+        "line": 414,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckPassword -\u003e checkPassword -\u003e verifyPasswordWithLockoutPolicy"
+      },
+      {
+        "id": "COMMAND-JLK35",
+        "file": "internal/command/user_human_password.go",
+        "line": 420,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckPassword -\u003e checkPassword -\u003e verifyPasswordWithLockoutPolicy"
+      },
+      {
+        "id": "COMMAND-3nJ4t",
+        "file": "internal/command/user_human_password.go",
+        "line": 423,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckPassword -\u003e checkPassword -\u003e verifyPasswordWithLockoutPolicy"
+      },
+      {
+        "id": "COMMAND-SFA3t",
+        "file": "internal/command/user_human_password.go",
+        "line": 442,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckPassword -\u003e checkPassword -\u003e verifyPasswordWithLockoutPolicy"
+      },
+      {
+        "id": "COMMAND-CahN2",
+        "file": "internal/command/user_human_password.go",
+        "line": 492,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckPassword -\u003e checkPassword -\u003e verifyPasswordWithLockoutPolicy -\u003e convertLoginPasswapErr"
+      },
+      {
+        "id": "COMMAND-u0b6c",
+        "file": "internal/command/user_human_recovery_codes.go",
+        "line": 151,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckRecoveryCode -\u003e checkRecoveryCode"
+      },
+      {
+        "id": "COMMAND-4m9s2",
+        "file": "internal/command/user_human_recovery_codes.go",
+        "line": 155,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckRecoveryCode -\u003e checkRecoveryCode"
+      },
+      {
+        "id": "COMMAND-2w6oa",
+        "file": "internal/command/user_human_recovery_codes.go",
+        "line": 165,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckRecoveryCode -\u003e checkRecoveryCode"
+      },
+      {
+        "id": "COMMAND-84rgg",
+        "file": "internal/command/user_human_recovery_codes.go",
+        "line": 169,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckRecoveryCode -\u003e checkRecoveryCode"
+      },
+      {
+        "id": "COMMAND-ASV12",
+        "file": "internal/command/user_human_recovery_codes.go",
+        "line": 180,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckRecoveryCode -\u003e checkRecoveryCode"
+      },
+      {
+        "id": "CODE-QvUQ4P",
+        "file": "internal/crypto/code.go",
+        "line": 146,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP -\u003e verifyCode -\u003e VerifyCode"
+      },
+      {
+        "id": "CRYPT-aqrFV",
+        "file": "internal/crypto/code.go",
+        "line": 173,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP -\u003e verifyCode -\u003e VerifyCode -\u003e verifyEncryptedCode"
+      },
+      {
+        "id": "CODE-woT0xc",
+        "file": "internal/crypto/code.go",
+        "line": 181,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP -\u003e verifyCode -\u003e VerifyCode -\u003e verifyEncryptedCode"
+      },
+      {
+        "id": "CRYPT-mNsQwe",
+        "file": "internal/crypto/crypto.go",
+        "line": 138,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckTOTP -\u003e checkTOTP -\u003e VerifyTOTP -\u003e DecryptString -\u003e checkEncryptionAlgorithm"
+      },
+      {
+        "id": "CRYPT-paiRey",
+        "file": "internal/crypto/crypto.go",
+        "line": 141,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckTOTP -\u003e checkTOTP -\u003e VerifyTOTP -\u003e DecryptString -\u003e checkEncryptionAlgorithm"
+      },
+      {
+        "id": "CRYPT-Nx7XlT",
+        "file": "internal/crypto/crypto.go",
+        "line": 144,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckTOTP -\u003e checkTOTP -\u003e VerifyTOTP -\u003e DecryptString -\u003e checkEncryptionAlgorithm"
+      },
+      {
+        "id": "CRYPT-Kq12vn",
+        "file": "internal/crypto/crypto.go",
+        "line": 149,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckTOTP -\u003e checkTOTP -\u003e VerifyTOTP -\u003e DecryptString -\u003e checkEncryptionAlgorithm"
+      },
+      {
+        "id": "CRYPTO-Sfefs",
+        "file": "internal/crypto/crypto.go",
+        "line": 154,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent -\u003e CheckToken"
+      },
+      {
+        "id": "CRYPT-edCJsp",
+        "file": "internal/crypto/crypto.go",
+        "line": 157,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent -\u003e CheckToken"
+      },
+      {
+        "id": "CRYPTO-Swg31",
+        "file": "internal/crypto/crypto.go",
+        "line": 161,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent -\u003e CheckToken"
+      },
+      {
+        "id": "CRYPTO-Sf4gt",
+        "file": "internal/crypto/crypto.go",
+        "line": 165,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent -\u003e CheckToken"
+      },
+      {
+        "id": "CRYPTO-CRYPTO",
+        "file": "internal/crypto/crypto.go",
+        "line": 168,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent -\u003e CheckToken"
+      },
+      {
+        "id": "EVENT-8isk2",
+        "file": "internal/domain/human_otp.go",
+        "line": 34,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckTOTP -\u003e checkTOTP -\u003e VerifyTOTP"
+      },
+      {
+        "id": "DOMAIN-9xrr0",
+        "file": "internal/domain/human_recovery_codes.go",
+        "line": 125,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckRecoveryCode -\u003e checkRecoveryCode -\u003e ValidateRecoveryCode"
+      },
+      {
+        "id": "DOMAIN-6uvh0",
+        "file": "internal/domain/human_recovery_codes.go",
+        "line": 138,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckRecoveryCode -\u003e checkRecoveryCode -\u003e ValidateRecoveryCode"
+      },
+      {
+        "id": "DOMAIN-oGh5e",
+        "file": "internal/domain/url_template.go",
+        "line": 17,
+        "reasoning": "CreateSession -\u003e challengesToCommand -\u003e createOTPEmailChallengeCommand -\u003e CreateOTPEmailChallengeURLTemplate -\u003e RenderOTPEmailURLTemplate -\u003e renderURLTemplate"
+      },
+      {
+        "id": "DOMAIN-ieYa7",
+        "file": "internal/domain/url_template.go",
+        "line": 20,
+        "reasoning": "CreateSession -\u003e challengesToCommand -\u003e createOTPEmailChallengeCommand -\u003e CreateOTPEmailChallengeURLTemplate -\u003e RenderOTPEmailURLTemplate -\u003e renderURLTemplate"
+      },
+      {
+        "id": "WEBAU-4G8sw",
+        "file": "internal/webauthn/webauthn.go",
+        "line": 143,
+        "reasoning": "CreateSession -\u003e challengesToCommand -\u003e createWebAuthNChallengeCommand -\u003e CreateWebAuthNChallenge -\u003e BeginLogin"
+      },
+      {
+        "id": "WEBAU-2M0s9",
+        "file": "internal/webauthn/webauthn.go",
+        "line": 147,
+        "reasoning": "CreateSession -\u003e challengesToCommand -\u003e createWebAuthNChallengeCommand -\u003e CreateWebAuthNChallenge -\u003e BeginLogin"
+      },
+      {
+        "id": "WEBAU-ADgv4",
+        "file": "internal/webauthn/webauthn.go",
+        "line": 179,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckWebAuthN -\u003e FinishLogin"
+      },
+      {
+        "id": "WEBAU-3M9si",
+        "file": "internal/webauthn/webauthn.go",
+        "line": 192,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckWebAuthN -\u003e FinishLogin"
+      },
+      {
+        "id": "WEBAU-4M90s",
+        "file": "internal/webauthn/webauthn.go",
+        "line": 196,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckWebAuthN -\u003e FinishLogin"
+      },
+      {
+        "id": "WEBAU-UX9ta",
+        "file": "internal/webauthn/webauthn.go",
+        "line": 232,
+        "reasoning": "CreateSession -\u003e createSessionRequestToCommand -\u003e checksToCommand -\u003e CheckWebAuthN -\u003e FinishLogin -\u003e serverFromContext"
+      }
+    ]
+  },
+  "DeleteSession": {
+    "handler": "internal/api/grpc/session/v2/session.go:67",
+    "errors": [
+      {
+        "id": "AUTH-rKLWEH",
+        "file": "internal/api/authz/permissions.go",
+        "line": 30,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e getUserPermissions"
+      },
+      {
+        "id": "AUTHZ-cdgFk",
+        "file": "internal/api/authz/permissions.go",
+        "line": 46,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e getUserPermissions"
+      },
+      {
+        "id": "AUTH-AWfge",
+        "file": "internal/api/authz/permissions.go",
+        "line": 60,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e checkUserResourcePermissions"
+      },
+      {
+        "id": "AUTH-Swrgg2",
+        "file": "internal/api/authz/permissions.go",
+        "line": 75,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e checkUserResourcePermissions"
+      }
+    ]
+  },
+  "GetSession": {
+    "handler": "internal/api/grpc/session/v2/query.go:31",
+    "errors": [
+      {
+        "id": "AUTH-rKLWEH",
+        "file": "internal/api/authz/permissions.go",
+        "line": 30,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e getUserPermissions"
+      },
+      {
+        "id": "AUTHZ-cdgFk",
+        "file": "internal/api/authz/permissions.go",
+        "line": 46,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e getUserPermissions"
+      },
+      {
+        "id": "AUTH-AWfge",
+        "file": "internal/api/authz/permissions.go",
+        "line": 60,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e checkUserResourcePermissions"
+      },
+      {
+        "id": "AUTH-Swrgg2",
+        "file": "internal/api/authz/permissions.go",
+        "line": 75,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e checkUserResourcePermissions"
+      },
+      {
+        "id": "CRDB-Unnex",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 84,
+        "reasoning": "GetSession -\u003e SessionByID -\u003e sessionByID -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e failureCount"
+      },
+      {
+        "id": "CRDB-RwSMV",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 87,
+        "reasoning": "GetSession -\u003e SessionByID -\u003e sessionByID -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e failureCount"
+      },
+      {
+        "id": "CRDB-4Ht4x",
+        "file": "internal/eventstore/handler/v2/failed_event.go",
+        "line": 104,
+        "reasoning": "GetSession -\u003e SessionByID -\u003e sessionByID -\u003e Trigger -\u003e processEvents -\u003e generateStatements -\u003e eventsToStatements -\u003e handleFailedStmt -\u003e setFailureCount"
+      },
+      {
+        "id": "V2-WF23g2",
+        "file": "internal/eventstore/handler/v2/state.go",
+        "line": 85,
+        "reasoning": "GetSession -\u003e SessionByID -\u003e sessionByID -\u003e Trigger -\u003e processEvents -\u003e setState"
+      },
+      {
+        "id": "V2-FGEKi",
+        "file": "internal/eventstore/handler/v2/state.go",
+        "line": 90,
+        "reasoning": "GetSession -\u003e SessionByID -\u003e sessionByID -\u003e Trigger -\u003e processEvents -\u003e setState"
+      },
+      {
+        "id": "QUERY-dsfr3",
+        "file": "internal/query/session.go",
+        "line": 274,
+        "reasoning": "GetSession -\u003e SessionByID"
+      },
+      {
+        "id": "QUERY-dn9JW",
+        "file": "internal/query/session.go",
+        "line": 298,
+        "reasoning": "GetSession -\u003e SessionByID -\u003e sessionByID"
+      },
+      {
+        "id": "QUERY-SFeaa",
+        "file": "internal/query/session.go",
+        "line": 467,
+        "reasoning": "GetSession -\u003e SessionByID -\u003e sessionByID -\u003e prepareSessionQuery"
+      },
+      {
+        "id": "QUERY-SAder",
+        "file": "internal/query/session.go",
+        "line": 469,
+        "reasoning": "GetSession -\u003e SessionByID -\u003e sessionByID -\u003e prepareSessionQuery"
+      }
+    ]
+  },
+  "ListSessions": {
+    "handler": "internal/api/grpc/session/v2/query.go:41",
+    "errors": [
+      {
+        "id": "DOM-x8n24uh",
+        "file": "backend/v3/api/session/v2/convert/session_list.go",
+        "line": 70,
+        "reasoning": "ListSessions -\u003e ListSessions -\u003e ListSessionsRequestGRPCToDomain -\u003e searchQueriesGRPCToDomain -\u003e searchQueryGRPCToDomain"
+      },
+      {
+        "id": "DOM-x8n23uh",
+        "file": "backend/v3/api/session/v2/convert/session_list.go",
+        "line": 80,
+        "reasoning": "ListSessions -\u003e ListSessions -\u003e ListSessionsRequestGRPCToDomain -\u003e searchQueriesGRPCToDomain -\u003e searchQueryGRPCToDomain"
+      },
+      {
+        "id": "CONV-Cz5s3t",
+        "file": "backend/v3/api/session/v2/convert/session_list.go",
+        "line": 93,
+        "reasoning": "ListSessions -\u003e ListSessions -\u003e ListSessionsRequestGRPCToDomain -\u003e searchQueriesGRPCToDomain -\u003e searchQueryGRPCToDomain"
+      },
+      {
+        "id": "AUTH-rKLWEH",
+        "file": "internal/api/authz/permissions.go",
+        "line": 30,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e getUserPermissions"
+      },
+      {
+        "id": "AUTHZ-cdgFk",
+        "file": "internal/api/authz/permissions.go",
+        "line": 46,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e getUserPermissions"
+      },
+      {
+        "id": "AUTH-AWfge",
+        "file": "internal/api/authz/permissions.go",
+        "line": 60,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e checkUserResourcePermissions"
+      },
+      {
+        "id": "AUTH-Swrgg2",
+        "file": "internal/api/authz/permissions.go",
+        "line": 75,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e checkUserResourcePermissions"
+      },
+      {
+        "id": "GRPC-x8n24uh",
+        "file": "internal/api/grpc/session/v2/query.go",
+        "line": 105,
+        "reasoning": "ListSessions -\u003e listSessionsRequestToQuery -\u003e sessionQueriesToQuery -\u003e sessionQueryToQuery"
+      },
+      {
+        "id": "GRPC-x8n23uh",
+        "file": "internal/api/grpc/session/v2/query.go",
+        "line": 116,
+        "reasoning": "ListSessions -\u003e listSessionsRequestToQuery -\u003e sessionQueriesToQuery -\u003e sessionQueryToQuery"
+      },
+      {
+        "id": "GRPC-Sfefs",
+        "file": "internal/api/grpc/session/v2/query.go",
+        "line": 120,
+        "reasoning": "ListSessions -\u003e listSessionsRequestToQuery -\u003e sessionQueriesToQuery -\u003e sessionQueryToQuery"
+      },
+      {
+        "id": "GRPC-Dwigt",
+        "file": "internal/api/grpc/session/v2/query.go",
+        "line": 153,
+        "reasoning": "ListSessions -\u003e listSessionsRequestToQuery -\u003e sessionQueriesToQuery -\u003e sessionQueryToQuery -\u003e expirationDateQueryToQuery"
+      },
+      {
+        "id": "QUERY-aAZ1D",
+        "file": "internal/query/current_state.go",
+        "line": 232,
+        "reasoning": "ListSessions -\u003e SearchSessions -\u003e searchSessions -\u003e latestState -\u003e latestState -\u003e prepareLatestState"
+      },
+      {
+        "id": "QUERY-5CfX9",
+        "file": "internal/query/generic.go",
+        "line": 78,
+        "reasoning": "ListSessions -\u003e SearchSessions -\u003e searchSessions -\u003e latestState -\u003e latestState"
+      },
+      {
+        "id": "PERMISSION-OoS5o",
+        "file": "internal/query/permission.go",
+        "line": 151,
+        "reasoning": "ListSessions -\u003e SearchSessions -\u003e searchSessions -\u003e sessionsPermissionCheckV2 -\u003e PermissionClause"
+      },
+      {
+        "id": "QUERY-sn9Jf",
+        "file": "internal/query/session.go",
+        "line": 335,
+        "reasoning": "ListSessions -\u003e SearchSessions -\u003e searchSessions"
+      },
+      {
+        "id": "QUERY-Sfg42",
+        "file": "internal/query/session.go",
+        "line": 343,
+        "reasoning": "ListSessions -\u003e SearchSessions -\u003e searchSessions"
+      },
+      {
+        "id": "QUERY-SAfeg",
+        "file": "internal/query/session.go",
+        "line": 585,
+        "reasoning": "ListSessions -\u003e SearchSessions -\u003e searchSessions -\u003e prepareSessionsQuery"
+      }
+    ]
+  },
+  "SetSession": {
+    "handler": "internal/api/grpc/session/v2/session.go:46",
+    "errors": [
+      {
+        "id": "AUTH-rKLWEH",
+        "file": "internal/api/authz/permissions.go",
+        "line": 30,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e getUserPermissions"
+      },
+      {
+        "id": "AUTHZ-cdgFk",
+        "file": "internal/api/authz/permissions.go",
+        "line": 46,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e getUserPermissions"
+      },
+      {
+        "id": "AUTH-AWfge",
+        "file": "internal/api/authz/permissions.go",
+        "line": 60,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e checkUserResourcePermissions"
+      },
+      {
+        "id": "AUTH-Swrgg2",
+        "file": "internal/api/authz/permissions.go",
+        "line": 75,
+        "reasoning": "CheckPermission (via github.com/zitadel/zitadel/internal/domain.PermissionCheck) -\u003e checkUserResourcePermissions"
+      },
+      {
+        "id": "SESSION-Gj4ko",
+        "file": "internal/api/grpc/session/v2/session.go",
+        "line": 127,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand"
+      },
+      {
+        "id": "SESSION-k3ng0",
+        "file": "internal/api/grpc/session/v2/session.go",
+        "line": 233,
+        "reasoning": "SetSession -\u003e challengesToCommand -\u003e createOTPEmailChallengeCommand"
+      },
+      {
+        "id": "SESSION-d3b4g0",
+        "file": "internal/api/grpc/session/v2/session.go",
+        "line": 247,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e userCheck"
+      },
+      {
+        "id": "COMMAND-Sfw3r",
+        "file": "internal/command/session.go",
+        "line": 94,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent"
+      },
+      {
+        "id": "COMMAND-Df4bw",
+        "file": "internal/command/session.go",
+        "line": 105,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent"
+      },
+      {
+        "id": "COMMAND-SAf42",
+        "file": "internal/command/session.go",
+        "line": 108,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent"
+      },
+      {
+        "id": "COMMAND-O8xk3w",
+        "file": "internal/command/session.go",
+        "line": 112,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent"
+      },
+      {
+        "id": "COMMAND-O8xk3w",
+        "file": "internal/command/session.go",
+        "line": 121,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent"
+      },
+      {
+        "id": "COMMAND-asEG4",
+        "file": "internal/command/session.go",
+        "line": 257,
+        "reasoning": "SetSession -\u003e UpdateSession -\u003e updateSession -\u003e SetLifetime"
+      },
+      {
+        "id": "COMMAND-eeR2e",
+        "file": "internal/command/session.go",
+        "line": 268,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckWebAuthN -\u003e getHumanWebAuthNTokens -\u003e gethumanWriteModel"
+      },
+      {
+        "id": "COMMAND-Df4b3",
+        "file": "internal/command/session.go",
+        "line": 276,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckWebAuthN -\u003e getHumanWebAuthNTokens -\u003e gethumanWriteModel"
+      },
+      {
+        "id": "COMMAND-Hewfq",
+        "file": "internal/command/session_model.go",
+        "line": 290,
+        "reasoning": "SetSession -\u003e UpdateSession -\u003e updateSession -\u003e CheckNotInvalidated"
+      },
+      {
+        "id": "COMMAND-Hkl3d",
+        "file": "internal/command/session_model.go",
+        "line": 293,
+        "reasoning": "SetSession -\u003e UpdateSession -\u003e updateSession -\u003e CheckNotInvalidated"
+      },
+      {
+        "id": "COMMAND-JKL3g",
+        "file": "internal/command/session_otp.go",
+        "line": 28,
+        "reasoning": "SetSession -\u003e challengesToCommand -\u003e createOTPSMSChallengeCommand -\u003e CreateOTPSMSChallengeReturnCode -\u003e createOTPSMSChallenge"
+      },
+      {
+        "id": "COMMAND-BJ2g3",
+        "file": "internal/command/session_otp.go",
+        "line": 35,
+        "reasoning": "SetSession -\u003e challengesToCommand -\u003e createOTPSMSChallengeCommand -\u003e CreateOTPSMSChallengeReturnCode -\u003e createOTPSMSChallenge"
+      },
+      {
+        "id": "COMMAND-JK3gp",
+        "file": "internal/command/session_otp.go",
+        "line": 81,
+        "reasoning": "SetSession -\u003e challengesToCommand -\u003e createOTPEmailChallengeCommand -\u003e CreateOTPEmailChallengeURLTemplate -\u003e createOTPEmailChallenge"
+      },
+      {
+        "id": "COMMAND-JKLJ3",
+        "file": "internal/command/session_otp.go",
+        "line": 88,
+        "reasoning": "SetSession -\u003e challengesToCommand -\u003e createOTPEmailChallengeCommand -\u003e CreateOTPEmailChallengeURLTemplate -\u003e createOTPEmailChallenge"
+      },
+      {
+        "id": "COMMAND-Yah6A",
+        "file": "internal/command/session_webauhtn.go",
+        "line": 55,
+        "reasoning": "SetSession -\u003e challengesToCommand -\u003e createWebAuthNChallengeCommand -\u003e CreateWebAuthNChallenge"
+      },
+      {
+        "id": "COMMAND-ohG2o",
+        "file": "internal/command/session_webauhtn.go",
+        "line": 67,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckWebAuthN"
+      },
+      {
+        "id": "COMMAND-Ioqu5",
+        "file": "internal/command/session_webauhtn.go",
+        "line": 71,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckWebAuthN"
+      },
+      {
+        "id": "COMMAND-Aej7i",
+        "file": "internal/command/session_webauhtn.go",
+        "line": 85,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckWebAuthN"
+      },
+      {
+        "id": "COMMAND-2M9fs",
+        "file": "internal/command/user_human.go",
+        "line": 808,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP -\u003e verifyCode"
+      },
+      {
+        "id": "COMMAND-M0g95",
+        "file": "internal/command/user_human.go",
+        "line": 817,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP -\u003e verifyCode"
+      },
+      {
+        "id": "COMMAND-8N9ds",
+        "file": "internal/command/user_human_otp.go",
+        "line": 190,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckTOTP -\u003e checkTOTP"
+      },
+      {
+        "id": "COMMAND-3Mif9s",
+        "file": "internal/command/user_human_otp.go",
+        "line": 198,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckTOTP -\u003e checkTOTP"
+      },
+      {
+        "id": "COMMAND-SF3fg",
+        "file": "internal/command/user_human_otp.go",
+        "line": 209,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckTOTP -\u003e checkTOTP"
+      },
+      {
+        "id": "COMMAND-S453v",
+        "file": "internal/command/user_human_otp.go",
+        "line": 587,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP"
+      },
+      {
+        "id": "COMMAND-SJl2g",
+        "file": "internal/command/user_human_otp.go",
+        "line": 590,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP"
+      },
+      {
+        "id": "COMMAND-d2r52",
+        "file": "internal/command/user_human_otp.go",
+        "line": 597,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP"
+      },
+      {
+        "id": "COMMAND-S34gh",
+        "file": "internal/command/user_human_otp.go",
+        "line": 600,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP"
+      },
+      {
+        "id": "COMMAND-S6h4R",
+        "file": "internal/command/user_human_otp.go",
+        "line": 620,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP"
+      },
+      {
+        "id": "COMMAND-3M0fs",
+        "file": "internal/command/user_human_password.go",
+        "line": 24,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckPassword -\u003e checkPassword -\u003e verifyPasswordWithLockoutPolicy -\u003e convertLoginPasswapErr -\u003e ErrPasswordInvalid"
+      },
+      {
+        "id": "COMMAND-Sfw3f",
+        "file": "internal/command/user_human_password.go",
+        "line": 393,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckPassword -\u003e checkPassword"
+      },
+      {
+        "id": "COMMAND-3n77z",
+        "file": "internal/command/user_human_password.go",
+        "line": 414,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckPassword -\u003e checkPassword -\u003e verifyPasswordWithLockoutPolicy"
+      },
+      {
+        "id": "COMMAND-JLK35",
+        "file": "internal/command/user_human_password.go",
+        "line": 420,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckPassword -\u003e checkPassword -\u003e verifyPasswordWithLockoutPolicy"
+      },
+      {
+        "id": "COMMAND-3nJ4t",
+        "file": "internal/command/user_human_password.go",
+        "line": 423,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckPassword -\u003e checkPassword -\u003e verifyPasswordWithLockoutPolicy"
+      },
+      {
+        "id": "COMMAND-SFA3t",
+        "file": "internal/command/user_human_password.go",
+        "line": 442,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckPassword -\u003e checkPassword -\u003e verifyPasswordWithLockoutPolicy"
+      },
+      {
+        "id": "COMMAND-CahN2",
+        "file": "internal/command/user_human_password.go",
+        "line": 492,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckPassword -\u003e checkPassword -\u003e verifyPasswordWithLockoutPolicy -\u003e convertLoginPasswapErr"
+      },
+      {
+        "id": "COMMAND-u0b6c",
+        "file": "internal/command/user_human_recovery_codes.go",
+        "line": 151,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckRecoveryCode -\u003e checkRecoveryCode"
+      },
+      {
+        "id": "COMMAND-4m9s2",
+        "file": "internal/command/user_human_recovery_codes.go",
+        "line": 155,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckRecoveryCode -\u003e checkRecoveryCode"
+      },
+      {
+        "id": "COMMAND-2w6oa",
+        "file": "internal/command/user_human_recovery_codes.go",
+        "line": 165,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckRecoveryCode -\u003e checkRecoveryCode"
+      },
+      {
+        "id": "COMMAND-84rgg",
+        "file": "internal/command/user_human_recovery_codes.go",
+        "line": 169,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckRecoveryCode -\u003e checkRecoveryCode"
+      },
+      {
+        "id": "COMMAND-ASV12",
+        "file": "internal/command/user_human_recovery_codes.go",
+        "line": 180,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckRecoveryCode -\u003e checkRecoveryCode"
+      },
+      {
+        "id": "CODE-QvUQ4P",
+        "file": "internal/crypto/code.go",
+        "line": 146,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP -\u003e verifyCode -\u003e VerifyCode"
+      },
+      {
+        "id": "CRYPT-aqrFV",
+        "file": "internal/crypto/code.go",
+        "line": 173,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP -\u003e verifyCode -\u003e VerifyCode -\u003e verifyEncryptedCode"
+      },
+      {
+        "id": "CODE-woT0xc",
+        "file": "internal/crypto/code.go",
+        "line": 181,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckOTPSMS -\u003e checkOTP -\u003e verifyCode -\u003e VerifyCode -\u003e verifyEncryptedCode"
+      },
+      {
+        "id": "CRYPT-mNsQwe",
+        "file": "internal/crypto/crypto.go",
+        "line": 138,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckTOTP -\u003e checkTOTP -\u003e VerifyTOTP -\u003e DecryptString -\u003e checkEncryptionAlgorithm"
+      },
+      {
+        "id": "CRYPT-paiRey",
+        "file": "internal/crypto/crypto.go",
+        "line": 141,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckTOTP -\u003e checkTOTP -\u003e VerifyTOTP -\u003e DecryptString -\u003e checkEncryptionAlgorithm"
+      },
+      {
+        "id": "CRYPT-Nx7XlT",
+        "file": "internal/crypto/crypto.go",
+        "line": 144,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckTOTP -\u003e checkTOTP -\u003e VerifyTOTP -\u003e DecryptString -\u003e checkEncryptionAlgorithm"
+      },
+      {
+        "id": "CRYPT-Kq12vn",
+        "file": "internal/crypto/crypto.go",
+        "line": 149,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckTOTP -\u003e checkTOTP -\u003e VerifyTOTP -\u003e DecryptString -\u003e checkEncryptionAlgorithm"
+      },
+      {
+        "id": "CRYPTO-Sfefs",
+        "file": "internal/crypto/crypto.go",
+        "line": 154,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent -\u003e CheckToken"
+      },
+      {
+        "id": "CRYPT-edCJsp",
+        "file": "internal/crypto/crypto.go",
+        "line": 157,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent -\u003e CheckToken"
+      },
+      {
+        "id": "CRYPTO-Swg31",
+        "file": "internal/crypto/crypto.go",
+        "line": 161,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent -\u003e CheckToken"
+      },
+      {
+        "id": "CRYPTO-Sf4gt",
+        "file": "internal/crypto/crypto.go",
+        "line": 165,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent -\u003e CheckToken"
+      },
+      {
+        "id": "CRYPTO-CRYPTO",
+        "file": "internal/crypto/crypto.go",
+        "line": 168,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckIntent -\u003e CheckToken"
+      },
+      {
+        "id": "EVENT-8isk2",
+        "file": "internal/domain/human_otp.go",
+        "line": 34,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckTOTP -\u003e checkTOTP -\u003e VerifyTOTP"
+      },
+      {
+        "id": "DOMAIN-9xrr0",
+        "file": "internal/domain/human_recovery_codes.go",
+        "line": 125,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckRecoveryCode -\u003e checkRecoveryCode -\u003e ValidateRecoveryCode"
+      },
+      {
+        "id": "DOMAIN-6uvh0",
+        "file": "internal/domain/human_recovery_codes.go",
+        "line": 138,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckRecoveryCode -\u003e checkRecoveryCode -\u003e ValidateRecoveryCode"
+      },
+      {
+        "id": "DOMAIN-oGh5e",
+        "file": "internal/domain/url_template.go",
+        "line": 17,
+        "reasoning": "SetSession -\u003e challengesToCommand -\u003e createOTPEmailChallengeCommand -\u003e CreateOTPEmailChallengeURLTemplate -\u003e RenderOTPEmailURLTemplate -\u003e renderURLTemplate"
+      },
+      {
+        "id": "DOMAIN-ieYa7",
+        "file": "internal/domain/url_template.go",
+        "line": 20,
+        "reasoning": "SetSession -\u003e challengesToCommand -\u003e createOTPEmailChallengeCommand -\u003e CreateOTPEmailChallengeURLTemplate -\u003e RenderOTPEmailURLTemplate -\u003e renderURLTemplate"
+      },
+      {
+        "id": "WEBAU-4G8sw",
+        "file": "internal/webauthn/webauthn.go",
+        "line": 143,
+        "reasoning": "SetSession -\u003e challengesToCommand -\u003e createWebAuthNChallengeCommand -\u003e CreateWebAuthNChallenge -\u003e BeginLogin"
+      },
+      {
+        "id": "WEBAU-2M0s9",
+        "file": "internal/webauthn/webauthn.go",
+        "line": 147,
+        "reasoning": "SetSession -\u003e challengesToCommand -\u003e createWebAuthNChallengeCommand -\u003e CreateWebAuthNChallenge -\u003e BeginLogin"
+      },
+      {
+        "id": "WEBAU-ADgv4",
+        "file": "internal/webauthn/webauthn.go",
+        "line": 179,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckWebAuthN -\u003e FinishLogin"
+      },
+      {
+        "id": "WEBAU-3M9si",
+        "file": "internal/webauthn/webauthn.go",
+        "line": 192,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckWebAuthN -\u003e FinishLogin"
+      },
+      {
+        "id": "WEBAU-4M90s",
+        "file": "internal/webauthn/webauthn.go",
+        "line": 196,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckWebAuthN -\u003e FinishLogin"
+      },
+      {
+        "id": "WEBAU-UX9ta",
+        "file": "internal/webauthn/webauthn.go",
+        "line": 232,
+        "reasoning": "SetSession -\u003e setSessionRequestToCommand -\u003e checksToCommand -\u003e CheckWebAuthN -\u003e FinishLogin -\u003e serverFromContext"
+      }
+    ]
+  }
+}

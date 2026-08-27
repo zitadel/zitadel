@@ -1,0 +1,112 @@
+{
+  "GetInstanceFeatures": {
+    "handler": "internal/api/grpc/feature/v2/feature.go:70",
+    "errors": []
+  },
+  "GetOrganizationFeatures": {
+    "handler": "internal/api/grpc/feature/v2/feature.go:84",
+    "errors": [
+      {
+        "id": "GRPC-UNIMPLEMENTED",
+        "file": "internal/api/grpc/feature/v2/feature.go",
+        "line": 85,
+        "reasoning": "GetOrganizationFeatures",
+        "message": "method GetOrganizationFeatures not implemented"
+      }
+    ]
+  },
+  "GetSystemFeatures": {
+    "handler": "internal/api/grpc/feature/v2/feature.go:38",
+    "errors": []
+  },
+  "GetUserFeatures": {
+    "handler": "internal/api/grpc/feature/v2/feature.go:93",
+    "errors": [
+      {
+        "id": "GRPC-UNIMPLEMENTED",
+        "file": "internal/api/grpc/feature/v2/feature.go",
+        "line": 94,
+        "reasoning": "GetUserFeatures",
+        "message": "method GetUserFeatures not implemented"
+      }
+    ]
+  },
+  "ResetInstanceFeatures": {
+    "handler": "internal/api/grpc/feature/v2/feature.go:60",
+    "errors": []
+  },
+  "ResetOrganizationFeatures": {
+    "handler": "internal/api/grpc/feature/v2/feature.go:81",
+    "errors": [
+      {
+        "id": "GRPC-UNIMPLEMENTED",
+        "file": "internal/api/grpc/feature/v2/feature.go",
+        "line": 82,
+        "reasoning": "ResetOrganizationFeatures",
+        "message": "method ResetOrganizationFeatures not implemented"
+      }
+    ]
+  },
+  "ResetSystemFeatures": {
+    "handler": "internal/api/grpc/feature/v2/feature.go:28",
+    "errors": []
+  },
+  "ResetUserFeatures": {
+    "handler": "internal/api/grpc/feature/v2/feature.go:90",
+    "errors": [
+      {
+        "id": "GRPC-UNIMPLEMENTED",
+        "file": "internal/api/grpc/feature/v2/feature.go",
+        "line": 91,
+        "reasoning": "ResetUserFeatures",
+        "message": "method ResetUserFeatures not implemented"
+      }
+    ]
+  },
+  "SetInstanceFeatures": {
+    "handler": "internal/api/grpc/feature/v2/feature.go:46",
+    "errors": [
+      {
+        "id": "COMMAND-Vigh1",
+        "file": "internal/command/instance_features.go",
+        "line": 42,
+        "reasoning": "SetInstanceFeatures -\u003e SetInstanceFeatures"
+      }
+    ]
+  },
+  "SetOrganizationFeatures": {
+    "handler": "internal/api/grpc/feature/v2/feature.go:78",
+    "errors": [
+      {
+        "id": "GRPC-UNIMPLEMENTED",
+        "file": "internal/api/grpc/feature/v2/feature.go",
+        "line": 79,
+        "reasoning": "SetOrganizationFeatures",
+        "message": "method SetOrganizationFeatures not implemented"
+      }
+    ]
+  },
+  "SetSystemFeatures": {
+    "handler": "internal/api/grpc/feature/v2/feature.go:14",
+    "errors": [
+      {
+        "id": "COMMAND-Oop8a",
+        "file": "internal/command/system_features.go",
+        "line": 35,
+        "reasoning": "SetSystemFeatures -\u003e SetSystemFeatures"
+      }
+    ]
+  },
+  "SetUserFeatures": {
+    "handler": "internal/api/grpc/feature/v2/feature.go:87",
+    "errors": [
+      {
+        "id": "GRPC-UNIMPLEMENTED",
+        "file": "internal/api/grpc/feature/v2/feature.go",
+        "line": 88,
+        "reasoning": "SetUserFeatures",
+        "message": "method SetUserFeatures not implemented"
+      }
+    ]
+  }
+}
