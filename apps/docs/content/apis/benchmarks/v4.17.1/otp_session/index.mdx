@@ -14,8 +14,8 @@ Benchmark results of the v4.17.1 release of Zitadel.
 |:--------------------------------------|:---------------------------------------------------------------------------------|
 | Baseline                              | none                                                                             |
 | Purpose                               | Test current performance                                                         |
-| Test start                            | 2026-08-27 00:49:39 UTC                                                                      |
-| Test end                              | 2026-08-27 01:19:45 UTC                                                                        |
+| Test start                            | 2026-08-27 18:49:09 UTC                                                                      |
+| Test end                              | 2026-08-27 19:19:16 UTC                                                                        |
 | Test duration                         | 30min                                                                          |
 | Executed test                         | otp\_session                                                                    |
 | k6 version                            | v2.1.0                                                                           |
@@ -25,15 +25,15 @@ Benchmark results of the v4.17.1 release of Zitadel.
 | ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 7<br/>Container max scale: 7 |
 | ZITADEL Version                       | v4.17.1                                                                           |
 | ZITADEL Settings                      | Eventstore autovacuum (new in v4.17): Enabled: true<br/>VacuumThreshold: 1000000<br/>AnalyzeThreshold: 1000000<br/>Tuned for the ~4,000 events/s expected during the benchmark, per the [tuning guide](https://zitadel.com/docs/self-hosting/manage/tuning#reading-events). |
-| ZITADEL feature flags                 | Enabled: loginDefaultOrg (instance), oidcTokenExchange (system), enableBackChannelLogout (system), consoleUseV2UserApi (instance)<br/>Disabled: loginV2, userSchema, improvedPerformance (empty list), debugOidcParentError, oidcSingleV1SessionTermination, permissionCheckV2<br/>Note: `improvedPerformance` was empty for this run, while the v4 benchmark ran with five options enabled. Four of those options still exist and still select a faster code path in v4.17.1, so the version-over-version comparison is **not** like-for-like. |
+| ZITADEL feature flags                 |                                                                                  |
 | Database                              | type: psql<br />version: v17.4                                                   |
 | Database location                     | US1                                                                              |
 | Database specification                | vCPU: 8<br/> memory: 32Gib                                                       |
-| ZITADEL metrics during test           | CPU: p50 9%, p99 13% (peak 30%)<br/>Memory: p50 6%, peak 11%<br/>Instances: 7 (constant)<br/>Server-side: 249 req/s, latency p50 2.1s / p95 10.0s / p99 11.2s |
-| Observed errors                       | 2 of 450,867 requests failed (0.00%): 2x connection reset. 1 iteration aborted on a null response body. 2 of 450,270 checks failed (0.00%): set Session status ok (2 failed)                                                                          |
-| Top 3 most expensive database queries | 1: Projection handler advisory lock, one per projection per instance (`pg_advisory_xact_lock`) — **lock wait, not query work** (13,315 s)<br/>2: Push events (`eventstore.push`) (4,745 s)<br/>3: Query events by instance_id, aggregate_types, event_types, position (paged) (3,677 s)<br/>Ranked by total accumulated execution time summed across concurrent sessions (Cloud SQL Query Insights) — not CPU time; it can exceed the wall-clock window. |
-| Database metrics during test          | CPU: 64% median, 74% peak<br/>Memory: 40%<br/>Connections: 46<br/>Transactions: 3,449/s<br/>IOPS: read 3, write 803 |
-| k6 Iterations per second              | 81                                                                       |
+| ZITADEL metrics during test           |                                                                                  |
+| Observed errors                       | 182 of 466,756 requests failed (0.03%): none of the 182 individually logged (see k6 output). 182 of 466,159 checks failed (0.03%): add Session status ok (56 failed), set Session status ok (126 failed)                                                                          |
+| Top 3 most expensive database queries |                                                                                  |
+| Database metrics during test          |                                                                                  |
+| k6 Iterations per second              | 84                                                                       |
 | k6 output                             | [output](#k6-output)                                                             |
 | flowchart outcome                     |                                                                                  |
 
@@ -45,9 +45,9 @@ Benchmark results of the v4.17.1 release of Zitadel.
 ```bash
   █ TOTAL RESULTS 
 
-    checks_total.......: 450270 244.092384/s
-    checks_succeeded...: 99.99% 450268 out of 450270
-    checks_failed......: 0.00%  2 out of 450270
+    checks_total.......: 466159 252.308936/s
+    checks_succeeded...: 99.96% 465977 out of 466159
+    checks_failed......: 0.03%  182 out of 466159
 
     ✓ user defined
     ✓ authorize status ok
@@ -63,39 +63,40 @@ Benchmark results of the v4.17.1 release of Zitadel.
     ✓ org created
     ✓ create user is status ok
     ✓ set email otp status ok
-    ✓ add Session status ok
+    ✗ add Session status ok
+      ↳  99% — ✓ 154981 / ✗ 56
     ✗ set Session status ok
-      ↳  99% — ✓ 299369 / ✗ 2
+      ↳  99% — ✓ 309783 / ✗ 126
     ✓ org removed
 
     CUSTOM
-    login_ui_enter_login_name_duration...: min=162.94ms avg=162.94ms max=162.94ms p(50)=162.94ms p(95)=162.94ms p(99)=162.94ms
-    login_ui_enter_password_duration.....: min=12.16ms  avg=12.16ms  max=12.16ms  p(50)=12.16ms  p(95)=12.16ms  p(99)=12.16ms 
-    login_ui_init_login_duration.........: min=106.2ms  avg=106.2ms  max=106.2ms  p(50)=106.2ms  p(95)=106.2ms  p(99)=106.2ms 
-    login_ui_token_duration..............: min=166.67ms avg=166.67ms max=166.67ms p(50)=166.67ms p(95)=166.67ms p(99)=166.67ms
-    org_create_org_duration..............: min=62.63ms  avg=62.63ms  max=62.63ms  p(50)=62.63ms  p(95)=62.63ms  p(99)=62.63ms 
-    otp_session_duration.................: min=127ms    avg=7.22s    max=43.6s    p(50)=4.85s    p(95)=21.97s   p(99)=26.32s  
-    session_add_session_duration.........: min=58.86ms  avg=6.87s    max=34.83s   p(50)=4.39s    p(95)=21.74s   p(99)=24.93s  
-    session_set_session_duration.........: min=0s       avg=175.68ms max=9.34s    p(50)=38.3ms   p(95)=571.45ms p(99)=3.71s   
-    set_human_email_otp_duration.........: min=27.76ms  avg=159.22ms max=392.82ms p(50)=149.29ms p(95)=306.57ms p(99)=378.16ms
-    user_create_human_duration...........: min=383.84ms avg=3.6s     max=5.19s    p(50)=4.01s    p(95)=5.13s    p(99)=5.18s   
+    login_ui_enter_login_name_duration...: min=111.91ms avg=111.91ms max=111.91ms p(50)=111.91ms p(95)=111.91ms p(99)=111.91ms
+    login_ui_enter_password_duration.....: min=19.51ms  avg=19.51ms  max=19.51ms  p(50)=19.51ms  p(95)=19.51ms  p(99)=19.51ms 
+    login_ui_init_login_duration.........: min=72.77ms  avg=72.77ms  max=72.77ms  p(50)=72.77ms  p(95)=72.77ms  p(99)=72.77ms 
+    login_ui_token_duration..............: min=112.4ms  avg=112.4ms  max=112.4ms  p(50)=112.4ms  p(95)=112.4ms  p(99)=112.4ms 
+    org_create_org_duration..............: min=57.4ms   avg=57.4ms   max=57.4ms   p(50)=57.4ms   p(95)=57.4ms   p(99)=57.4ms  
+    otp_session_duration.................: min=125ms    avg=6.97s    max=36.37s   p(50)=5.63s    p(95)=18.87s   p(99)=23s     
+    session_add_session_duration.........: min=52.96ms  avg=6.77s    max=30.32s   p(50)=5.35s    p(95)=18.76s   p(99)=22.29s  
+    session_set_session_duration.........: min=20.57ms  avg=96.93ms  max=8.56s    p(50)=39.41ms  p(95)=64.73ms  p(99)=2.29s   
+    set_human_email_otp_duration.........: min=27.64ms  avg=241.81ms max=549.68ms p(50)=256.75ms p(95)=481.96ms p(99)=535.73ms
+    user_create_human_duration...........: min=378.51ms avg=3.51s    max=6.81s    p(50)=3.82s    p(95)=5.86s    p(99)=6.72s   
 
     HTTP
-    http_req_duration....................: min=0s       avg=2.4s     max=34.83s   p(50)=45.83ms  p(95)=14.95s   p(99)=22.97s  
-      { expected_response:true }.........: min=12.16ms  avg=2.4s     max=34.83s   p(50)=45.83ms  p(95)=14.95s   p(99)=22.97s  
-    http_req_failed......................: 0.00%  2 out of 450867
-    http_reqs............................: 450867 244.416019/s
+    http_req_duration....................: min=17.42ms  avg=2.32s    max=30.32s   p(50)=47.8ms   p(95)=13.83s   p(99)=20.22s  
+      { expected_response:true }.........: min=17.42ms  avg=2.32s    max=30.32s   p(50)=47.79ms  p(95)=13.83s   p(99)=20.22s  
+    http_req_failed......................: 0.03%  182 out of 466756
+    http_reqs............................: 466756 252.632063/s
 
     EXECUTION
-    iteration_duration...................: min=127.21ms avg=7.22s    max=43.6s    p(50)=4.85s    p(95)=21.97s   p(99)=26.32s  
-    iterations...........................: 149686 81.145119/s
-    vus..................................: 0      min=0           max=600
-    vus_max..............................: 600    min=600         max=600
+    iteration_duration...................: min=124.68ms avg=6.97s    max=36.37s   p(50)=5.62s    p(95)=18.86s   p(99)=23s     
+    iterations...........................: 155037 83.913902/s
+    vus..................................: 0      min=0             max=600
+    vus_max..............................: 600    min=600           max=600
 
     NETWORK
-    data_received........................: 340 MB 184 kB/s
-    data_sent............................: 172 MB 93 kB/s
+    data_received........................: 351 MB 190 kB/s
+    data_sent............................: 178 MB 96 kB/s
 
-running (30m44.7s), 000/600 VUs, 149686 complete and 0 interrupted iterations
+running (30m47.6s), 000/600 VUs, 155037 complete and 0 interrupted iterations
 default ✓ [ 100% ] 600 VUs  30m0s
 ```
