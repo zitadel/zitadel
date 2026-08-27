@@ -817,4 +817,19 @@ func TestServer_TokenExchange_OrgRoleIDScopeDownscope(t *testing.T) {
 	narrowUserinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, exchanged.AccessToken, exchanged.TokenType, User.GetUserId(), provider)
 	require.NoError(t, err)
 	assertProjectRoleClaims(t, project.GetId(), narrowUserinfo.Claims, true, []string{roleFoo, roleBar}, []string{grantedOrgID})
+
+	// Widening to another org after downscoping must fail.
+	_, err = tokenexchange.ExchangeToken(
+		CTX,
+		exchanger,
+		exchanged.AccessToken,
+		oidc.AccessTokenType,
+		"",
+		"",
+		nil,
+		nil,
+		[]string{oidc.ScopeOpenID, domain.OrgRoleIDScope + Instance.DefaultOrg.Id},
+		oidc.AccessTokenType,
+	)
+	require.Error(t, err)
 }
