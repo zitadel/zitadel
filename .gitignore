@@ -104,6 +104,12 @@ go.work.sum
 CLAUDE.md
 .mcp.json
 .gemini/*
+.claude/
+.cursor/
+.codex/
+.windsurf/
+.copilot/
+.aider*
 
 docs_old
 apps/docs/package-lock.json

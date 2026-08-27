@@ -457,6 +457,7 @@
     "sessionExpired": "Votre session actuelle a expiré. Veuillez vous reconnecter.",
     "failedLoading": "Échec du chargement des données. Veuillez réessayer.",
     "tryagain": "Réessayer",
-    "couldNotContinueSession": "Impossible de continuer la session - informations utilisateur manquantes"
+    "couldNotContinueSession": "Impossible de continuer la session - informations utilisateur manquantes",
+    "couldNotClearSession": "La session n'a pas pu être terminée. Veuillez réessayer."
   }
 }
