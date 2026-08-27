@@ -36,8 +36,13 @@ else:
 
 # --- test window from the converted per-second data ---
 rows = json.loads(pathlib.Path(out_json).read_text())
-start_ts, end_ts = rows[0]['timestamp'], rows[-1]['timestamp']
-start_hm = start_ts[11:16]
+# The per-second rows are the only absolute record of when the test ran, so the
+# page reports the full window rather than just a time of day: without the date
+# the metrics cannot be traced back in monitoring the next day.
+timestamps = sorted(r['timestamp'] for r in rows)
+start_ts, end_ts = timestamps[0], timestamps[-1]
+fmt = lambda ts: f'{ts[:10]} {ts[11:19]} UTC'
+start_pretty, end_pretty = fmt(start_ts), fmt(end_ts)
 run = re.search(r'running \((\d+)m([\d.]+)s\)', summary)
 duration = f'{run.group(1)}min' if run else ''
 
@@ -60,7 +65,8 @@ Benchmark results of the {version} release of Zitadel.
 |:--------------------------------------|:---------------------------------------------------------------------------------|
 | Baseline                              | none                                                                             |
 | Purpose                               | Test current performance                                                         |
-| Test start                            | {start_hm} UTC                                                                      |
+| Test start                            | {start_pretty}                                                                      |
+| Test end                              | {end_pretty}                                                                        |
 | Test duration                         | {duration}                                                                          |
 | Executed test                         | {esc(target)}                                                                    |
 | k6 version                            | v2.1.0                                                                           |
@@ -96,8 +102,10 @@ data_dir = DOCS / 'src/data/benchmarks' / version / target
 content_dir.mkdir(parents=True, exist_ok=True)
 data_dir.mkdir(parents=True, exist_ok=True)
 (content_dir / 'index.mdx').write_text(mdx)
-shutil.copyfile(out_json, content_dir / 'output.json')
-shutil.copyfile(out_json, data_dir / 'output.json')
+# republishing a page from its own output.json is a legitimate no-op copy
+for dest in (content_dir / 'output.json', data_dir / 'output.json'):
+    if pathlib.Path(out_json).resolve() != dest.resolve():
+        shutil.copyfile(out_json, dest)
 print(f'{target}: start={start_ts} end={end_ts} duration={duration} '
       f'iterations={iterations} ({per_sec:.0f}/s) rows={len(rows)}')
 print(f'  observed errors: {observed}')

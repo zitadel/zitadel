@@ -11,8 +11,14 @@ assistant you use.
 | Skill | Verifies |
 | --- | --- |
 | [test-actor-in-action-v2.md](test-actor-in-action-v2.md) | The impersonation actor is passed to Actions v2 execution targets and appears in the token claims. |
+| [run-zitadel-benchmarks.md](run-zitadel-benchmarks.md) | Running a load-test sweep against the QA instance and publishing the results as versioned docs pages. |
 
 ## Conventions for new skills
+
+Most skills run against a local instance. [run-zitadel-benchmarks.md](run-zitadel-benchmarks.md)
+is the exception: it targets the shared QA benchmark instance, and states its own, stricter
+destructive-action rules in place of the local-only rule below.
+
 
 - **Local only.** A skill may create users, flip instance settings and delete things. Refuse to
   run against anything but `localhost`, and enforce it in the script rather than only saying it
