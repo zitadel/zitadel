@@ -20,8 +20,16 @@ export interface Human extends User {
 // then returns no user at all. Retry briefly rather than resolving undefined, which
 // surfaces much later as "Cannot read property '0' of undefined" while mapping
 // login names, hiding the real cause.
-function readUserAfterCreate(path: string, userId: string, org: Org, accessToken: string): any {
-  for (let attempt = 0; attempt < 10; attempt++) {
+// Diagnostics from the last attempt, so an exhausted retry loop can say *why* it gave
+// up rather than only that it did. Two failures on 2026-08-27 burned 30 attempts each
+// and reported nothing more useful than "not readable", which cost a whole cycle.
+export type ReadUserResult = { user?: any; lastStatus: number; lastBody: string; attempts: number };
+
+function readUserAfterCreate(path: string, userId: string, org: Org, accessToken: string): ReadUserResult {
+  let lastStatus = -1;
+  let lastBody = '';
+  let attempt = 0;
+  for (attempt = 0; attempt < 60; attempt++) {
     const res = http.get(url(`${path}/${userId}`), {
       tags: { name: `${path}/{userId}` },
       headers: {
@@ -34,14 +42,28 @@ function readUserAfterCreate(path: string, userId: string, org: Org, accessToken
     // throws "GoError: the body is null" and kills the iteration instead of consuming
     // a retry, which is exactly the failure this retry loop exists to absorb.
     if (res.status >= 200 && res.status < 300 && res.body) {
-      const user = res.json('user');
-      if (user) {
-        return user;
+      const user = res.json('user') as any;
+      // The user record can come back before its login names have been projected.
+      // Accepting a merely-truthy user here returns a partial record, and every
+      // caller immediately does loginNames[0] on it -- so this must wait for the
+      // field itself, not just for the object. Observed at 600 VUs on
+      // human_password_login, 2026-08-27: ten retries available, none consumed.
+      if (user && Array.isArray(user.loginNames) && user.loginNames.length > 0) {
+        return { user, lastStatus: res.status, lastBody: '', attempts: attempt + 1 };
       }
     }
-    sleep(0.1 * (attempt + 1));
+    lastStatus = res.status;
+    lastBody = (res.body ? String(res.body) : '<null body>').slice(0, 200);
+    // ~100s of waiting in total (backoff rises to 2s and stays there). Sized against a
+    // measured behaviour, not a guess: unloaded, login names are present on the *first*
+    // GET, but a burst of MaxVUs concurrent creations queues them all behind the
+    // projection handler advisory lock -- the single largest database cost in the whole
+    // v4.17.1 sweep -- and some users then take longer than 25s. Successive budgets of
+    // 5.5s and 25s were both exhausted at 600 VUs on 2026-08-27, returning HTTP 200 with
+    // a valid user record and no loginNames every time.
+    sleep(Math.min(0.1 * (attempt + 1), 2));
   }
-  return undefined;
+  return { user: undefined, lastStatus, lastBody, attempts: attempt };
 }
 
 const createHumanTrend = new Trend('user_create_human_duration', true);
@@ -89,12 +111,16 @@ export function createHuman(username: string, org: Org, accessToken: string): Pr
         }
         createHumanTrend.add(res.timings.duration);
 
-        const user = readUserAfterCreate('/v2/users', res.json('userId') as string, org, accessToken);
-        if (!user) {
-          reject(`user ${res.json('userId')} not readable after create (username: ${username})`);
+        const read = readUserAfterCreate('/v2/users', res.json('userId') as string, org, accessToken);
+        if (!read.user) {
+          reject(
+            `user ${res.json('userId')} not readable with login names after create ` +
+              `(username: ${username}, attempts: ${read.attempts}, last status: ${read.lastStatus}, ` +
+              `last body: ${read.lastBody})`,
+          );
           return;
         }
-        resolve(user as unknown as Human);
+        resolve(read.user as unknown as Human);
       })
       .catch((reason) => {
         reject(reason);
@@ -188,12 +214,16 @@ export function createMachine(username: string, org: Org, accessToken: string): 
         }
         createMachineTrend.add(res.timings.duration);
 
-        const user = readUserAfterCreate('/v2beta/users', res.json('userId') as string, org, accessToken);
-        if (!user) {
-          reject(`user ${res.json('userId')} not readable after create (username: ${username})`);
+        const read = readUserAfterCreate('/v2beta/users', res.json('userId') as string, org, accessToken);
+        if (!read.user) {
+          reject(
+            `user ${res.json('userId')} not readable with login names after create ` +
+              `(username: ${username}, attempts: ${read.attempts}, last status: ${read.lastStatus}, ` +
+              `last body: ${read.lastBody})`,
+          );
           return;
         }
-        resolve(user as unknown as Machine);
+        resolve(read.user as unknown as Machine);
       })
       .catch((reason) => {
         reject(reason);

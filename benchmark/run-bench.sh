@@ -15,6 +15,12 @@ set -a; . ./.env; set +a
 # which drove k6 to 6.8GB and an OOM - so it stays out.
 export K6_SYSTEM_TAGS="${K6_SYSTEM_TAGS:-proto,status,method,name,group,check,error,error_code,scenario,expected_response}"
 
+# Creating MaxVUs human users costs ~3.3s each at 600 VUs, and each one then waits for
+# its login names to project. k6's default 60s setupTimeout is not enough: otp_session
+# died on "setup() execution timed out after 60 seconds" on 2026-08-27. Setup is excluded
+# from output.json by the empty-`group` filter, so this bounds nothing that gets published.
+export K6_SETUP_TIMEOUT="${K6_SETUP_TIMEOUT:-600s}"
+
 TARGET="$1"; VUS="$2"; DURATION="$3"
 STAMP="$(date -u '+%Y%m%dT%H%M%SZ')"
 mkdir -p summaries
@@ -38,6 +44,17 @@ if [ -n "${ADMIN_PAT:-}" ]; then
     sleep 2
   done
   echo "preflight: ${left:-0} benchmark org(s) remaining" | tee -a "${LOG}"
+fi
+
+# Settle period. Tearing down the previous target deletes an org and its MaxVUs users,
+# and that flood is still draining through the projections when the next setup starts
+# creating MaxVUs more. Every setup failure of 2026-08-27 was a target starting within
+# seconds of a completed run's teardown; every target that started on a quiet instance
+# succeeded. Setup is excluded from output.json, so this costs wall-clock and nothing else.
+SETTLE="${SETTLE_SECONDS:-180}"
+if [ "${SETTLE}" -gt 0 ]; then
+  echo "preflight: settling ${SETTLE}s before setup" | tee -a "${LOG}"
+  sleep "${SETTLE}"
 fi
 
 echo "start_utc=$(date -u '+%Y-%m-%d %H:%M:%S UTC') target=${TARGET} vus=${VUS} duration=${DURATION} host=${ZITADEL_HOST}" | tee -a "${LOG}"
