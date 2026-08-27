@@ -96,12 +96,20 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Comment with what changed
-        if: steps.drift.outputs.changed == 'true'
+      # Always posts a status comment, success or failure — a silent green
+      # check is easy to miss buried among all the PR's other checks.
+      # Updates the same comment across pushes (found via the hidden
+      # marker) instead of leaving a new one behind every run.
+      - name: Post/update status comment
+        if: steps.affected.outputs.categories != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr comment "${{ github.event.pull_request.number }}" --body "🤖 This PR changes Go/proto code for: \`${{ steps.affected.outputs.categories }}\`, and their error tables are now out of date — that's the only reason these categories are affected and not others, it's a side effect of what this PR touches, not a deliberate pick.
+          set -euo pipefail
+          marker="<!-- endpoint-error-tables-watch -->"
+          if [ "${{ steps.drift.outputs.changed }}" = "true" ]; then
+            body="$marker
+          🤖 This PR changes Go/proto code for: \`${{ steps.affected.outputs.categories }}\`, and their error tables are now out of date — that's the only reason these categories are affected and not others, it's a side effect of what this PR touches, not a deliberate pick.
 
           Run this locally and push the result so the tables (and the preview) reflect it:
 
@@ -110,6 +118,18 @@ jobs:
           \`\`\`
 
           (from \`apps/docs\`)."
+          else
+            body="$marker
+          ✅ Checked \`${{ steps.affected.outputs.categories }}\` — error tables are already up to date."
+          fi
+
+          existing_id=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+            --jq ".[] | select(.body | startswith(\"$marker\")) | .id" | head -1)
+          if [ -n "$existing_id" ]; then
+            gh api -X PATCH "repos/${{ github.repository }}/issues/comments/$existing_id" -f body="$body"
+          else
+            gh pr comment "${{ github.event.pull_request.number }}" --body "$body"
+          fi
 
       - name: Fail if not addressed
         if: steps.drift.outputs.changed == 'true'
