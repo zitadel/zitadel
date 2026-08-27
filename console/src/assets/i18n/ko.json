@@ -2201,6 +2201,10 @@
       "TITLE": "제공자 추가",
       "DESCRIPTION": "다음 제공자 중 하나 이상을 선택하세요.",
       "STEPPERTITLE": "제공자 생성",
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "다른 ZITADEL 인스턴스의 사용자가 인증할 수 있도록 필요한 데이터를 입력하세요."
+      },
       "OIDC": {
         "TITLE": "OIDC 제공자",
         "DESCRIPTION": "OIDC 제공자에 필요한 데이터를 입력하세요."
@@ -2313,6 +2317,10 @@
     "STATE": "상태",
     "ISSUER": "발급자",
     "SCOPESLIST": "스코프 목록",
+    "INSTANCEROLESINFO": "인스턴스 역할 매핑",
+    "INSTANCEROLESINFO_DESC": "이 제공자로 인증하는 사용자는 원격 ZITADEL 인스턴스의 나열된 조직에서 보유한 인스턴스 멤버 역할(IAM_ 접두사)을 부여받습니다. 조직 ID와 기본 도메인이 모두 일치해야 합니다.",
+    "ORGANIZATIONID": "조직 ID",
+    "ORGANIZATIONDOMAIN": "조직 도메인",
     "CLIENTID": "클라이언트 ID",
     "CLIENTSECRET": "클라이언트 시크릿",
     "LDAPCONNECTION": "연결",

@@ -504,6 +504,7 @@ Errors:
         AlreadyReady: MFA OTP (OneTimePassword) este deja configurat
         NotExisting: Multifactor OTP (OneTimePassword) nu există
         InvalidCode: Cod nevalid
+        Reused: Acest cod a fost deja utilizat. Vă rugăm să așteptați un cod nou
         NotReady: Multifactor OTP (OneTimePassword) nu este gata
     Locked: Utilizatorul este blocat
     SomethingWentWrong: Ceva nu a mers bine
