@@ -1,5 +1,8 @@
 syntax = "proto3";
 
+// Test-only comment: verifying the endpoint-error-tables-watch workflow
+// detects a proto change and re-traces this category. Safe to revert
+// before merge — no functional change.
 package zitadel.session.v2;
 
 
