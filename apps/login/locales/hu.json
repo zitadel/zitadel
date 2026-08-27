@@ -457,6 +457,7 @@
     "sessionExpired": "A munkameneted lejárt. Kérjük, jelentkezz be újra.",
     "failedLoading": "Nem sikerült betölteni az adatokat. Kérjük, próbáld újra.",
     "tryagain": "Próbáld újra",
-    "couldNotContinueSession": "Nem sikerült folytatni a munkamenetet - hiányzó felhasználói információk"
+    "couldNotContinueSession": "Nem sikerült folytatni a munkamenetet - hiányzó felhasználói információk",
+    "couldNotClearSession": "A munkamenetet nem sikerült befejezni. Kérjük, próbálja újra."
   }
 }

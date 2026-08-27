@@ -378,8 +378,10 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
     if (authRequest.prompt.includes(Prompt.SELECT_ACCOUNT)) {
       if (eligibleSessions.length === 0) {
         // No live session is eligible. If the session cookie still references
-        // a previous account, keep account selection so the user can pick it
-        if (!hasCookieAccount(sessionCookies, organization)) {
+        // a previous account (and the RP did not pass a login_hint, which always
+        // takes precedence over the cookie fallback), keep account selection so
+        // the user can pick it.
+        if (authRequest.loginHint || !hasCookieAccount(sessionCookies, organization)) {
           return gotoLoginname({
             request,
             requestId,
@@ -554,10 +556,13 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
     // No live sessions were resolved. If the sessions cookie still references a
     // previous account and the RP did not pass a login_hint, show account
     // selection (mirrors Login V1 behavior after RP-initiated logout, #12252).
-    // prompt=none must never render UI, so it keeps the existing behavior.
+    // prompt=none must never render UI and prompt=login goes straight to
+    // /loginname like it does when live sessions exist, so both keep the
+    // existing behavior.
     if (
       !authRequest?.loginHint &&
       !authRequest?.prompt.includes(Prompt.NONE) &&
+      !authRequest?.prompt.includes(Prompt.LOGIN) &&
       hasCookieAccount(sessionCookies, organization)
     ) {
       return gotoAccounts({

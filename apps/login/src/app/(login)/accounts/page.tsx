@@ -29,20 +29,20 @@ async function loadSessions({ serviceConfig, organization }: { serviceConfig: Se
     return [];
   }
 
+  // listSessions is a plain search: ids of terminated or unknown sessions are
+  // simply absent from the response, it does not fail. Transport failures are
+  // deliberately not caught here, they must surface instead of downgrading
+  // live sessions to invalid cards.
   const ids = sessionCookies.map((s) => s.id).filter((id) => !!id) as string[];
   let liveSessions: Session[] = [];
   if (ids.length) {
-    try {
-      const response = await listSessions({ serviceConfig, ids });
-      liveSessions = response?.sessions ?? [];
-    } catch (error) {
-      // listSessions can fail for stale/expired session IDs still in cookies,
-      console.error("Failed to load sessions from API, falling back to cookie", error);
-    }
+    const response = await listSessions({ serviceConfig, ids });
+    liveSessions = response?.sessions ?? [];
   }
 
-  // For cookie entries whose server-side session no longer exists
-  // synthesize an invalid Session so the account stays selectable
+  // For cookie entries whose server-side session no longer exists (e.g. after
+  // an RP-initiated logout) synthesize an invalid Session so the account stays
+  // selectable and the user can re-authenticate with one click.
   const liveIds = new Set(liveSessions.map((s) => s.id));
   const synthesized: Session[] = sessionCookies
     .filter((c) => !!c.id && !!c.loginName && !liveIds.has(c.id))
