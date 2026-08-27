@@ -457,6 +457,7 @@
     "sessionExpired": "Sua sessão atual expirou. Por favor, faça login novamente.",
     "failedLoading": "Falha ao carregar dados. Por favor, tente novamente.",
     "tryagain": "Tentar Novamente",
-    "couldNotContinueSession": "Não foi possível continuar a sessão — informações do usuário ausentes"
+    "couldNotContinueSession": "Não foi possível continuar a sessão — informações do usuário ausentes",
+    "couldNotClearSession": "Não foi possível terminar a sessão. Tente novamente."
   }
 }
