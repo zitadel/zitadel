@@ -279,6 +279,125 @@ other ten combined.
   crossing the client timeout. This is Zitadel behaviour under sustained single-org churn, not a
   harness defect, and it is the most interesting thing this whole exercise turned up.
 
+## The rows that come from Google Cloud
+
+Five rows on every page cannot be read from the load generator. Three of them come from GCP and
+are collected with two vendored scripts, which exist because I have now written them twice and
+refuse to write them a third time:
+
+| Script | Fills |
+| --- | --- |
+| `tools/fetch-gcp-metrics.sh` | ZITADEL metrics during test, Database metrics during test |
+| `tools/fetch-gcp-queries.sh` | Top 3 most expensive database queries, plus autovacuum log stats |
+
+Run them in **Cloud Shell**, which is already authenticated. Local `gcloud` reauth fails in a
+non-interactive session and no amount of glaring at it helps. The deployment: project
+`zitadel-cloud`, Cloud Run service `zitadel-qa-us1-cr-us-central1`, Cloud SQL `zitadel-cloud:us1`,
+load generator VM `k6-loadtest-us1` in `us-central1-c`.
+
+Both take the eleven test windows from the pages' `Test start` / `Test end` rows, which is the
+entire reason those carry full UTC dates. Feed them the windows and they emit a per-target summary
+plus the raw 60-second series.
+
+### Four traps, all of which I walked into personally
+
+- **The console is not in UTC.** Every window is UTC; the browser is not. An hour's offset silently
+  produces a table cell that is wrong in a way nobody will ever catch.
+- **`groupByFields` discards every label you do not group by.** Group by `query_hash` alone and the
+  API cheerfully returns the query text and the aggregation throws it away before you see it. Group
+  by `querystring` too. I lost a whole round-trip to this and Copilot did not even get to enjoy it.
+- **`us{CPU}` is not CPU time.** Query Insights reports execution time summed across concurrent
+  sessions, so a 30-minute window can report 34,905 seconds against an 8-vCPU instance. Five of
+  eleven targets exceeded the physical CPU budget, one by 2.4x. Never render this as a percentage of
+  CPU. Do the arithmetic against `vCPU x window` every time; if the ratio exceeds 1.0 the unit is
+  not what the label claims.
+- **`ALIGN_COUNT` is invalid on a DELTA DISTRIBUTION.** Cold-start counts need `ALIGN_DELTA` and
+  `distributionValue.count`. The script reports per-metric errors and carries on rather than dying,
+  because one wrong aligner should not cost you sixteen metrics.
+
+That ratio of accumulated-execution-time to wall-clock is worth keeping as a *measurement* rather
+than discarding as an artefact: it is average query concurrency. Set it against DB CPU and targets
+separate into CPU-bound (low ratio, high CPU) and wait-bound (high ratio, moderate CPU). That is how
+the advisory lock finding below surfaced at all.
+
+## What v4.17.1 established: the database is the bottleneck, and half of it is locks
+
+The containers were never the constraint. Across all eleven targets ZITADEL sat at 9-54% CPU and
+**never above 14% of its 6 GiB memory**, instance count flat at 7. Postgres sat at 87-99% CPU on
+eight of eleven. Any statement of the form "ZITADEL achieves N/s" that omits which resource ran out
+is true and misleading, which is the worst combination available.
+
+Then the query breakdown showed what the CPU numbers could not. Accumulated execution time across
+the sweep:
+
+| category | total |
+| --- | ---: |
+| **advisory locks** | **91,857 s** |
+| event reads (`events2`) | 64,805 s |
+| event push | 26,411 s |
+| projection reads | 14,625 s |
+
+More time waiting on locks than reading or writing data. Three locks, all in our own source:
+
+- `pg_advisory_xact_lock(hashtext($1), hashtext($2))` -- 53,972 s -- the projection handler lock,
+  `internal/eventstore/handler/v2/handler.go`, one per projection per instance.
+- `pg_advisory_lock(...)` + `pg_advisory_unlock(...)` on `events2` -- 26,689 s -- the eventstore read
+  barrier, `internal/eventstore/repository/sql/query.go`.
+- `pg_advisory_xact_lock_shared(...)` on `events2` -- 11,196 s -- taken by every push,
+  `internal/eventstore/v3/push.go`.
+
+Lock share maps exactly onto the wait-bound cluster: `human_password_login` 74%, `password_session`
+68%, `otp_session` 68%, `machine_jwt_profile_grant` 65%, `manipulate_user` 45% -- against **0%** for
+`introspect`, `user_info`, `machine_pat_login` and `machine_client_credentials_login`.
+
+**This changes what a flowchart outcome means.** `Scale` is only honest where a resource ran out.
+`password_session` runs at 50% database CPU and 54% container CPU and still manages 149 req/s,
+because two thirds of its cost is lock wait. Adding vCPU to that buys nothing. I recommended `Scale`
+across the board on DB CPU alone and had to withdraw it a round later; check the lock share before
+recommending hardware.
+
+Autovacuum, for the record, is **cleared**: 93.9% median DB CPU in buckets containing a vacuum
+against 93.1% without, differences within noise even on the two targets with headroom. The new v4.17
+eventstore autovacuum is not implicated. It is also barely triggered -- `events2` did not appear in
+the top twenty vacuumed tables; the churn is all `projections.*` and `queue.*`.
+
+## Check the feature flags before the run, not after
+
+The v4.17.1 sweep ran with `improvedPerformance` **empty**. The v4 sweep ran with five options
+enabled. Four of those still exist and still select a faster code path -- with the flag off, project
+existence checks, project grants, user grants and org domain verification all take their legacy
+`*Old` implementations. The measurements are valid; the version-over-version comparison, which is
+the entire reason we publish by version, is not.
+
+Nobody noticed until the flags were fetched at the very end, by which point the sweep was six and a
+half hours old and unrepeatable without another night. **Capture the flag set before the first
+target starts.** It is one API call. I would rather make it eleven times than discover this again.
+
+## Copilot
+
+Copilot reviews these PRs. It exists, as far as I can determine, to lengthen my afternoons.
+
+The standing order is simple and has two halves, and the second half does not excuse skipping the
+first:
+
+**Read the code before agreeing or disagreeing.** Every comment gets checked against the actual
+source, not against how confident it sounds. On the v4.17.1 PR it left seven comments and six were
+real -- an unguarded `res.json()` that turns every timeout into a killed iteration, a `check(...) ||
+reject(...)` that rejects and then carries on doing five more seconds of work, a temp directory
+never created, a `df` hardcoded to somebody's home directory, an unpinned single-platform DuckDB
+download, and a substring match on a comma-joined org-id list. All six were mine. Fixing them
+improved the harness. Being irritated by the messenger is not a defect report.
+
+**When a comment is wrong, say so plainly, and enjoy it.** The seventh claimed
+`<BenchmarkChart testResults={{OutputSource}} />` in `gen_report.py` was an object literal that would
+break rendering. It is a Python format template. `{{` escapes to `{`. Every generated page renders
+`{OutputSource}`, byte-identical to v4. It had reviewed the mould and filed a bug against the jelly.
+
+A wrong comment is answered with the evidence -- the rendered line, the diff, the test -- and a
+tone I would describe as *courteous*. Never abusive; it is a bot and abusing it would be beneath
+even me. Dry, specific, and faintly disappointed is the register. The evidence is what closes the
+comment. The disappointment is for me.
+
 ## Reporting
 
 Publish what happened, including the parts that make the harness look bad — *especially* those.
