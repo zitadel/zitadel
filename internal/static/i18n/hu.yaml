@@ -176,6 +176,7 @@ Errors:
         NotExisting: "A multifaktoros OTP (OneTimePassword) nem létezik"
         NotReady: "A multifaktoros OTP (OneTimePassword) nincs készen"
         InvalidCode: "Érvénytelen kód"
+        Reused: "Ezt a kódot már felhasználták. Kérjük, várjon egy új kódra"
       U2F:
         NotExisting: "Az U2F nem létezik"
       Passwordless:
@@ -767,6 +768,7 @@ EventTypes:
           check:
             succeeded: "A multifaktoros OTP ellenőrzés sikeres"
             failed: "A multifaktoros OTP ellenőrzés sikertelen"
+            reused: "A multifaktoros OTP kód újrafelhasználva"
           sms:
             added: "Multifaktoros OTP SMS hozzáadva"
             removed: "Multifaktoros OTP SMS eltávolítva"
