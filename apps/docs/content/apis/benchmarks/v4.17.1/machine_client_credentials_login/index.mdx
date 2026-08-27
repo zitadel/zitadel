@@ -29,7 +29,7 @@ Benchmark results of the v4.17.1 release of Zitadel.
 | Database location                     | US1                                                                              |
 | Database specification                | vCPU: 8<br/> memory: 32Gib                                                       |
 | ZITADEL metrics during test           |                                                                                  |
-| Observed errors                       | 1517 of 4306676 checks failed (0.03%): client credentials status ok (769 failed), userinfo status ok (748 failed)                                                                          |
+| Observed errors                       | 1,517 of 2,872,575 requests failed (0.05%): 2x connection reset, 1,515x not individually logged (see k6 output). 1 iteration aborted on a null response body. 1,517 of 4,306,676 checks failed (0.03%): client credentials status ok (769 failed), userinfo status ok (748 failed)                                                                          |
 | Top 3 most expensive database queries |                                                                                  |
 | Database metrics during test          |                                                                                  |
 | k6 Iterations per second              | 779                                                                       |

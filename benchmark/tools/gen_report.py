@@ -6,7 +6,7 @@ Writes apps/docs/content/apis/benchmarks/<version>/<target>/index.mdx
 (and mirrors output.json into apps/docs/src/data/benchmarks/... like every
 existing version does).
 """
-import json, re, sys, pathlib, shutil
+import collections, json, re, sys, pathlib, shutil
 
 ANSI = re.compile(r'\x1b\[[0-9;]*m')
 DOCS = pathlib.Path(__file__).resolve().parents[2] / 'apps/docs'
@@ -25,14 +25,80 @@ summary = re.sub(r'\n{3,}', '\n\n', summary)
 it = re.search(r'^\s*iterations\.+:\s*(\d+)\s+([\d.]+)/s', summary, re.M)
 iterations, per_sec = (it.group(1), float(it.group(2))) if it else ('', 0.0)
 
-# --- failed checks -> "Observed errors" ---
+# --- "Observed errors" ---
+# k6 counts a failed check and a failed request separately. A run can have zero
+# failed checks and still have thousands of failed requests, so reporting only
+# checks publishes "none" over real errors. Report both.
 cf = re.search(r'^\s*checks_failed\.+:\s*([\d.]+)%\s+(\d+) out of (\d+)', summary, re.M)
 failed_names = re.findall(r'^\s*✗ (.+?)\n\s*↳\s+(\d+)% — ✓ ([\d,]+) / ✗ ([\d,]+)', summary, re.M)
+rf = re.search(r'^\s*http_req_failed\.+:\s*([\d.]+)%\s+(\d+) out of (\d+)', summary, re.M)
+
+# Classify what k6 logged, so the row says what went wrong and not only how much.
+# Counted over error/warning lines only, to avoid matching unrelated prose.
+# Network-level causes, which partition the failed requests.
+REQUEST_SIGNATURES = [
+    ('request timeout', 'request timeout'),
+    ('GOAWAY', 'connection closed by server (GOAWAY)'),
+    ('connection reset by peer', 'connection reset'),
+    ('read tcp', 'connection reset'),
+    ('context deadline exceeded', 'context deadline exceeded'),
+    ('no such host', 'DNS resolution failure'),
+]
+# Script-level fallout. These are consequences of the failures above, not extra
+# failed requests, so they are reported separately and never summed with them.
+SCRIPT_SIGNATURES = [
+    ('the body is null', 'iteration{s} aborted on a null response body'),
+]
+err_lines = [l for l in log.splitlines()
+             if 'level=error' in l or 'Request Failed' in l or 'level=warning' in l]
+blob = '\n'.join(err_lines)
+
+# Classify each logged request failure once, by its first matching signature.
+# Counting signature occurrences across the whole blob instead would double-count
+# any line two signatures both match, and can report more causes than failures.
+counts = collections.Counter()
+for line in err_lines:
+    if 'Request Failed' not in line:
+        continue
+    for needle, label in REQUEST_SIGNATURES:
+        if needle in line:
+            counts[label] += 1
+            break
+    else:
+        m = re.search(r'status: (\d{3})', line)
+        counts[f'HTTP {m.group(1)}' if m else 'unclassified'] += 1
+breakdown = [f'{n:,}x {label}' for label, n in counts.most_common()]
+
+# k6 counts a request as failed whether or not it logged a line for it (a 503
+# that fails expected_response logs nothing), so the classified causes can add
+# up to less than the total. Say so rather than implying the list is complete.
+if rf:
+    unexplained = int(rf.group(2)) - sum(counts.values())
+    if unexplained > 0:
+        breakdown.append(f'{unexplained:,}x not individually logged (see k6 output)'
+                         if breakdown else
+                         f'none of the {unexplained:,} individually logged (see k6 output)')
+
+script_errs = [f'{blob.count(needle):,} ' + label.format(s='' if blob.count(needle) == 1 else 's')
+               for needle, label in SCRIPT_SIGNATURES if blob.count(needle)]
+
+parts = []
+if rf and int(rf.group(2)) > 0:
+    part = f'{int(rf.group(2)):,} of {int(rf.group(3)):,} requests failed ({rf.group(1)}%)'
+    if breakdown:
+        part += ': ' + ', '.join(breakdown)
+    parts.append(part)
+elif breakdown:
+    parts.append('logged errors: ' + ', '.join(breakdown))
+
+if script_errs:
+    parts.append('; '.join(script_errs))
+
 if cf and int(cf.group(2)) > 0:
     detail = ', '.join(f'{n.strip()} ({f} failed)' for n, _, _, f in failed_names) or 'see k6 output'
-    observed = f'{cf.group(2)} of {cf.group(3)} checks failed ({cf.group(1)}%): {detail}'
-else:
-    observed = 'none'
+    parts.append(f'{int(cf.group(2)):,} of {int(cf.group(3)):,} checks failed ({cf.group(1)}%): {detail}')
+
+observed = '. '.join(parts) if parts else 'none'
 
 # --- test window from the converted per-second data ---
 rows = json.loads(pathlib.Path(out_json).read_text())

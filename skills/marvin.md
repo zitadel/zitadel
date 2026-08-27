@@ -223,8 +223,11 @@ exactly one check's worth per iteration — suspect the harness before the serve
 ### Org deletion 500s after heavy churn
 
 Deleting an org sends every child object to the pusher in one call and blows past the maximum
-argument size once enough users have churned. `./purge-org.sh <org-id> <exact-name> --confirm`
-deletes users a page (1000) at a time, then the org. One org that had been returning a 16-second
+argument size once enough users have churned. This is a known Zitadel bug —
+[#8510](https://github.com/zitadel/zitadel/issues/8510), "Deleting an organization fails with
+internal error V3-C8l3V", open, labelled `performance` / `area/storage`. Don't file another one;
+I nearly did. `./purge-org.sh <org-id> <exact-name> --confirm` works around it by deleting users a
+page (1000) at a time, then the org. One org that had been returning a 16-second
 500 deleted in 1.3 seconds afterwards.
 
 Two ways to loop forever, both of which I found the slow way:
