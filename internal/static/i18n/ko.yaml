@@ -177,6 +177,7 @@ Errors:
         NotExisting: "다중 요소 OTP(일회용 비밀번호)가 존재하지 않습니다"
         NotReady: "다중 요소 OTP(일회용 비밀번호)가 준비되지 않았습니다"
         InvalidCode: "코드가 잘못되었습니다"
+        Reused: "이 코드는 이미 사용되었습니다. 새 코드를 기다려 주세요"
       U2F:
         NotExisting: "U2F가 존재하지 않습니다"
       Passwordless:
@@ -768,6 +769,7 @@ EventTypes:
           check:
             succeeded: "다중인증 OTP 확인 성공"
             failed: "다중인증 OTP 확인 실패"
+            reused: "다중인증 OTP 코드 재사용"
           sms:
             added: "다중인증 OTP SMS 추가됨"
             removed: "다중인증 OTP SMS 삭제됨"

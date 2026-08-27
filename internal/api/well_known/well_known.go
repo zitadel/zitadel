@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
@@ -26,28 +25,16 @@ var HandlerPrefixes = []string{
 	AssetLinksPath,
 }
 
-// Config holds runtime options for the well-known handlers.
-type Config struct {
-	// AppLinksCacheControlMaxAge sets the Cache-Control max-age for
-	// apple-app-site-association and assetlinks.json responses.
-	// 0 sets Cache-Control: no-store.
-	AppLinksCacheControlMaxAge time.Duration
-}
-
 type appLinkQuerier interface {
 	SearchOIDCAppLinkConfigs(ctx context.Context) ([]*query.OIDCAppLinkConfig, error)
 }
 
 type Handler struct {
-	queries            appLinkQuerier
-	cacheControlMaxAge time.Duration
+	queries appLinkQuerier
 }
 
-func NewHandler(queries appLinkQuerier, config Config) *Handler {
-	return &Handler{
-		queries:            queries,
-		cacheControlMaxAge: config.AppLinksCacheControlMaxAge,
-	}
+func NewHandler(queries appLinkQuerier) *Handler {
+	return &Handler{queries: queries}
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -182,7 +169,17 @@ func normalizeSHA256Fingerprint(ctx context.Context, fp string) string {
 
 func (h *Handler) writeJSON(w http.ResponseWriter, r *http.Request, v any) {
 	w.Header().Set("Content-Type", "application/json")
-	h.setCacheControl(w)
+	// The bodies are instance specific: the same path serves different content
+	// per requested host, and the request field selecting the instance can also
+	// be a (configurable) proxy header rather than Host. HTTP caching must
+	// therefore be disabled entirely: a shared cache whose key does not cover
+	// the effective selector would serve one instance's file on another
+	// instance's domain. Caching is also of no use here, as the only relevant
+	// consumers (the Apple and Google association verifiers) fetch rarely and
+	// cache on their side regardless of these headers. Should the query load
+	// ever become a concern, add a server-side per-instance cache instead of
+	// HTTP caching.
+	w.Header().Set(http_util.CacheControl, "no-store")
 	w.WriteHeader(http.StatusOK)
 	if r.Method == http.MethodHead {
 		return
@@ -190,24 +187,4 @@ func (h *Handler) writeJSON(w http.ResponseWriter, r *http.Request, v any) {
 	if err := json.NewEncoder(w).Encode(v); err != nil {
 		logging.Error(r.Context(), "unable to encode well-known response", "err", err)
 	}
-}
-
-// setCacheControl sets the Cache-Control header for the well-known app link files.
-//
-// The header intentionally omits the "public" directive and mirrors the JWKS
-// endpoint (max-age + must-revalidate). In ZITADEL Cloud, the CDN is configured
-// to cache only responses that explicitly opt in via "public" or "s-maxage".
-// With "public", a fleet of independent edge caches could each pin
-// a momentarily inconsistent (e.g. empty) copy and serve diverging content for
-// the whole max-age, breaking native passkey verification. Without it, clients
-// (the Apple and Google verifiers, browsers) still cache for max-age while the
-// origin stays the single source of truth.
-func (h *Handler) setCacheControl(w http.ResponseWriter) {
-	if h.cacheControlMaxAge <= 0 {
-		w.Header().Set(http_util.CacheControl, "no-store")
-		return
-	}
-	w.Header().Set(http_util.CacheControl,
-		fmt.Sprintf("max-age=%d, must-revalidate", int(h.cacheControlMaxAge/time.Second)),
-	)
 }
