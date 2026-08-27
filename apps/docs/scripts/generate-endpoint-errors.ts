@@ -181,6 +181,22 @@ export function discoverServices(): ServiceConfig[] {
   return scanCandidates().filter((c) => c.contentDirExists && c.goPackageDirExists);
 }
 
+// Like discoverServices(), but doesn't require content/reference/api to
+// exist — only the real, always-checked-in Go handler package. That content
+// dir is gitignored, build-generated output (the full fetch-remote-content ->
+// generate-proto-docs -> generate-api-reference chain), so it's absent on a
+// bare CI checkout that hasn't run the full docs build. discoverServices()
+// is deliberately strict for anything that writes committed output (this
+// file's own main() below), since a category it can't find a real page for
+// has nowhere correct to stamp a table anyway. This lenient variant is for
+// callers that only need to identify/trace a category — detecting a PR's
+// affected categories (affected-categories.ts) and running the tracer
+// against them (trace-all-categories.ts) — where no docs page needing to
+// exist yet is fine.
+export function discoverTraceableServices(): ServiceConfig[] {
+  return scanCandidates().filter((c) => c.goPackageDirExists);
+}
+
 // The other half of discoverServices(): proto services that exist but aren't
 // fully wired up yet, with exactly what's missing — rule #4 in the "standard"
 // comment above is the one with no error message if violated (a <category>

@@ -17,7 +17,7 @@ import { execFileSync } from 'child_process';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { discoverServices, type ServiceConfig } from './generate-endpoint-errors';
+import { discoverTraceableServices, type ServiceConfig } from './generate-endpoint-errors';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DOCS_ROOT = join(__dirname, '..');
@@ -57,7 +57,7 @@ function traceOne(svc: ServiceConfig): number {
 
 function main() {
   const only = parseOnly(process.argv.slice(2));
-  const services = discoverServices();
+  const services = discoverTraceableServices();
   const selected = only ? services.filter((s) => only.has(s.category)) : services;
 
   if (only) {
