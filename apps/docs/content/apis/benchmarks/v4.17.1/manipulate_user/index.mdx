@@ -14,12 +14,12 @@ Benchmark results of the v4.17.1 release of Zitadel.
 |:--------------------------------------|:---------------------------------------------------------------------------------|
 | Baseline                              | none                                                                             |
 | Purpose                               | Test current performance                                                         |
-| Test start                            | 2026-08-26 21:47:57 UTC                                                                      |
-| Test end                              | 2026-08-26 22:18:23 UTC                                                                        |
+| Test start                            | 2026-08-27 11:09:50 UTC                                                                      |
+| Test end                              | 2026-08-27 11:40:02 UTC                                                                        |
 | Test duration                         | 30min                                                                          |
 | Executed test                         | manipulate\_user                                                                    |
 | k6 version                            | v2.1.0                                                                           |
-| VUs                                   | 600                                                                              |
+| VUs                                   | 200                                                                              |
 | Client location                       | US1                                                                              |
 | ZITADEL location                      | US1                                                                              |
 | ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 7<br/>Container max scale: 7 |
@@ -29,7 +29,7 @@ Benchmark results of the v4.17.1 release of Zitadel.
 | Database location                     | US1                                                                              |
 | Database specification                | vCPU: 8<br/> memory: 32Gib                                                       |
 | ZITADEL metrics during test           |                                                                                  |
-| Observed errors                       | 4283 request timeouts, 6x 502 and 1 GOAWAY out of 163182 requests (2.6%). The 28% check failure rate in the k6 output below is a test defect, not a server error: `update user is status ok` is registered twice with contradictory criteria (`status === 201` in `src/user.ts`, `2xx` in the use case), and k6 aggregates checks by name, so one of the pair always fails. Teardown could not remove the organization. |
+| Observed errors                       | 87 failed requests out of 172,875 (0.05%), of which 77 were timeouts on the read-back after user creation. All checks passed (138,251/138,251). The failures are not spread evenly: the first arrives 1,255s (~21min) into the run and they cluster in the final minutes, alongside a steady latency climb (`update_human_duration` p50 39ms → 233ms, `lock_user_duration` 54ms → 269ms between the first and last five minutes). **This target ran at 200 VUs, not the 600 used for every other target**: at 600 VUs the same failure begins after 179s and produces a far higher error rate for identical throughput. See `skills/marvin.md`. |
 | Top 3 most expensive database queries |                                                                                  |
 | Database metrics during test          |                                                                                  |
 | k6 Iterations per second              | 19                                                                       |
@@ -44,9 +44,9 @@ Benchmark results of the v4.17.1 release of Zitadel.
 ```bash
   █ TOTAL RESULTS 
 
-    checks_total.......: 220744 119.701949/s
-    checks_succeeded...: 71.98% 158903 out of 220744
-    checks_failed......: 28.01% 61841 out of 220744
+    checks_total.......: 138251  76.189348/s
+    checks_succeeded...: 100.00% 138251 out of 138251
+    checks_failed......: 0.00%   0 out of 138251
 
     ✓ user defined
     ✓ authorize status ok
@@ -61,40 +61,38 @@ Benchmark results of the v4.17.1 release of Zitadel.
     ✓ info created
     ✓ org created
     ✓ create user is status ok
-    ✗ update user is status ok
-      ↳  50% — ✓ 61840 / ✗ 61840
+    ✓ update user is status ok
     ✓ lock user is status ok
     ✓ delete user is status ok
-    ✗ org removed
-      ↳  0% — ✓ 0 / ✗ 1
+    ✓ org removed
 
     CUSTOM
-    delete_user_duration.................: min=39.11ms  avg=994.6ms  max=12.49s   p(50)=444.46ms p(95)=3.97s    p(99)=7.23s   
-    lock_user_duration...................: min=23.02ms  avg=188.77ms max=2.41s    p(50)=121.77ms p(95)=530ms    p(99)=971.9ms 
-    login_ui_enter_login_name_duration...: min=211.87ms avg=211.87ms max=211.87ms p(50)=211.87ms p(95)=211.87ms p(99)=211.87ms
-    login_ui_enter_password_duration.....: min=11.95ms  avg=11.95ms  max=11.95ms  p(50)=11.95ms  p(95)=11.95ms  p(99)=11.95ms 
-    login_ui_init_login_duration.........: min=62.84ms  avg=62.84ms  max=62.84ms  p(50)=62.84ms  p(95)=62.84ms  p(99)=62.84ms 
-    login_ui_token_duration..............: min=110.42ms avg=110.42ms max=110.42ms p(50)=110.42ms p(95)=110.42ms p(99)=110.42ms
-    org_create_org_duration..............: min=57.45ms  avg=57.45ms  max=57.45ms  p(50)=57.45ms  p(95)=57.45ms  p(99)=57.45ms 
-    update_human_duration................: min=15.72ms  avg=160.99ms max=3.31s    p(50)=99.49ms  p(95)=474.82ms p(99)=843.75ms
-    user_create_human_duration...........: min=294.94ms avg=568.94ms max=5.02s    p(50)=447.74ms p(95)=1.03s    p(99)=3.76s   
+    delete_user_duration.................: min=37.4ms   avg=947.24ms max=15.3s    p(50)=323.57ms p(95)=4.74s    p(99)=8.23s   
+    lock_user_duration...................: min=21.07ms  avg=132.48ms max=1.83s    p(50)=108.2ms  p(95)=315.59ms p(99)=449.41ms
+    login_ui_enter_login_name_duration...: min=211.53ms avg=211.53ms max=211.53ms p(50)=211.53ms p(95)=211.53ms p(99)=211.53ms
+    login_ui_enter_password_duration.....: min=19.44ms  avg=19.44ms  max=19.44ms  p(50)=19.44ms  p(95)=19.44ms  p(99)=19.44ms 
+    login_ui_init_login_duration.........: min=91.13ms  avg=91.13ms  max=91.13ms  p(50)=91.13ms  p(95)=91.13ms  p(99)=91.13ms 
+    login_ui_token_duration..............: min=114.81ms avg=114.81ms max=114.81ms p(50)=114.81ms p(95)=114.81ms p(99)=114.81ms
+    org_create_org_duration..............: min=53.52ms  avg=53.52ms  max=53.52ms  p(50)=53.52ms  p(95)=53.52ms  p(99)=53.52ms 
+    update_human_duration................: min=15.11ms  avg=110.56ms max=1.72s    p(50)=87.92ms  p(95)=279.05ms p(99)=393.7ms 
+    user_create_human_duration...........: min=288.91ms avg=452.59ms max=2.42s    p(50)=427.69ms p(95)=663.99ms p(99)=862.76ms
 
     HTTP
-    http_req_duration....................: min=11.95ms  avg=6.66s    max=1m0s     p(50)=393.4ms  p(95)=58.65s   p(99)=1m0s    
-      { expected_response:true }.........: min=11.95ms  avg=5.22s    max=1m0s     p(50)=383.19ms p(95)=50.9s    p(99)=59.62s  
-    http_req_failed......................: 2.63%  4292 out of 163192
-    http_reqs............................: 163192 88.493461/s
+    http_req_duration....................: min=15.11ms  avg=2.08s    max=1m0s     p(50)=309.83ms p(95)=11.52s   p(99)=37.81s  
+      { expected_response:true }.........: min=15.11ms  avg=2.06s    max=59.99s   p(50)=309.64ms p(95)=11.41s   p(99)=36.76s  
+    http_req_failed......................: 0.05%  87 out of 172875
+    http_reqs............................: 172875 95.27044/s
 
     EXECUTION
-    iteration_duration...................: min=567.5ms  avg=30.91s   max=1m13s    p(50)=23.38s   p(95)=1m1s     p(99)=1m3s    
-    iterations...........................: 35211  19.093725/s
-    vus..................................: 0      min=0              max=600
-    vus_max..............................: 600    min=600            max=600
+    iteration_duration...................: min=483.77ms avg=10.43s   max=1m9s     p(50)=4.63s    p(95)=39.61s   p(99)=58.45s  
+    iterations...........................: 34618  19.077785/s
+    vus..................................: 0      min=0            max=200
+    vus_max..............................: 200    min=200          max=200
 
     NETWORK
-    data_received........................: 93 MB  50 kB/s
-    data_sent............................: 30 MB  17 kB/s
+    data_received........................: 98 MB  54 kB/s
+    data_sent............................: 31 MB  17 kB/s
 
-running (30m44.1s), 000/600 VUs, 35211 complete and 0 interrupted iterations
-default ✓ [ 100% ] 600 VUs  30m0s
+running (30m14.6s), 000/200 VUs, 34618 complete and 0 interrupted iterations
+default ✓ [ 100% ] 200 VUs  30m0s
 ```

@@ -46,6 +46,12 @@ start_pretty, end_pretty = fmt(start_ts), fmt(end_ts)
 run = re.search(r'running \((\d+)m([\d.]+)s\)', summary)
 duration = f'{run.group(1)}min' if run else ''
 
+# VU count comes from the run-bench.sh stamp rather than a constant: targets are
+# not all run at the same concurrency, and a hardcoded 600 would silently
+# misreport any run that deviates.
+vu = re.search(r'^start_utc=.*\bvus=(\d+)', log, re.M)
+vus = vu.group(1) if vu else '600'
+
 esc = lambda s: s.replace('_', r'\_')
 pretty = target.replace('_', ' ')
 
@@ -70,7 +76,7 @@ Benchmark results of the {version} release of Zitadel.
 | Test duration                         | {duration}                                                                          |
 | Executed test                         | {esc(target)}                                                                    |
 | k6 version                            | v2.1.0                                                                           |
-| VUs                                   | 600                                                                              |
+| VUs                                   | {vus}                                                                              |
 | Client location                       | US1                                                                              |
 | ZITADEL location                      | US1                                                                              |
 | ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 7<br/>Container max scale: 7 |
