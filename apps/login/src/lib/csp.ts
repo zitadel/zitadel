@@ -14,10 +14,27 @@ export interface CSPOptions {
   iframeOrigins?: string[] | null;
 }
 
+/* The API URL is how the server reaches ZITADEL. In a container deployment that
+ * is an internal name such as `http://zitadel:8080`. Putting it in a header the
+ * browser reads grants nothing, because no browser can resolve it, and it
+ * publishes the service's internal hostname to every visitor. */
+function isBrowserReachable(serviceUrl: string): boolean {
+  try {
+    const { hostname } = new URL(serviceUrl);
+    return hostname.includes(".") || hostname === "localhost";
+  } catch {
+    return false;
+  }
+}
+
 export function buildCSP(options: CSPOptions = {}): string {
   const directives: Record<string, string[]> = { ...BASE_DIRECTIVES };
 
-  if (options.serviceUrl) {
+  // next/font inlines the fallback faces it generates as data: URIs, and a
+  // policy without `data:` blocks every font on the page.
+  directives["font-src"] = [...directives["font-src"], "data:"];
+
+  if (options.serviceUrl && isBrowserReachable(options.serviceUrl)) {
     directives["img-src"] = [...directives["img-src"], options.serviceUrl];
     directives["font-src"] = [...directives["font-src"], options.serviceUrl];
   }
