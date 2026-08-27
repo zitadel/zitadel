@@ -30,9 +30,14 @@ function readUserAfterCreate(path: string, userId: string, org: Org, accessToken
         'x-zitadel-orgid': org.organizationId,
       },
     });
-    const user = res.json('user');
-    if (user) {
-      return user;
+    // A timed-out request has status 0 and a null body. Calling res.json() on that
+    // throws "GoError: the body is null" and kills the iteration instead of consuming
+    // a retry, which is exactly the failure this retry loop exists to absorb.
+    if (res.status >= 200 && res.status < 300 && res.body) {
+      const user = res.json('user');
+      if (user) {
+        return user;
+      }
     }
     sleep(0.1 * (attempt + 1));
   }
@@ -74,9 +79,14 @@ export function createHuman(username: string, org: Org, accessToken: string): Pr
 
     response
       .then((res) => {
-        check(res, {
-          'create user is status ok': (r) => r.status >= 200 && r.status < 300,
-        }) || reject(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
+        if (
+          !check(res, {
+            'create user is status ok': (r) => r.status >= 200 && r.status < 300,
+          })
+        ) {
+          reject(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
+          return;
+        }
         createHumanTrend.add(res.timings.duration);
 
         const user = readUserAfterCreate('/v2/users', res.json('userId') as string, org, accessToken);
@@ -168,9 +178,14 @@ export function createMachine(username: string, org: Org, accessToken: string): 
 
     response
       .then((res) => {
-        check(res, {
-          'create user is status ok': (r) => r.status >= 200 && r.status < 300,
-        }) || reject(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
+        if (
+          !check(res, {
+            'create user is status ok': (r) => r.status >= 200 && r.status < 300,
+          })
+        ) {
+          reject(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
+          return;
+        }
         createMachineTrend.add(res.timings.duration);
 
         const user = readUserAfterCreate('/v2beta/users', res.json('userId') as string, org, accessToken);

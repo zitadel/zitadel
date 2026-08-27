@@ -33,7 +33,7 @@ if [ -n "${ADMIN_PAT:-}" ]; then
       -d '{"query":{"limit":1000}}' \
       | jq --arg skip "$(tr '\n' ',' < .skip-orgs 2>/dev/null || true)" \
            '[.result[]? | select(.name | test("^load-test-"))
-                        | select(. as $o | $skip | contains($o.id) | not)] | length')" || left=0
+                        | select(. as $o | (($skip | split(",")) | index($o.id)) == null)] | length')" || left=0
     [ "${left:-0}" -eq 0 ] && break
     sleep 2
   done

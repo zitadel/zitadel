@@ -20,4 +20,4 @@ fi
   || echo "postprocess: status breakdown failed (non-fatal)"
 python3 tools/gen_report.py "$TARGET" "$LOG" "${OUT}" "$VERSION"
 rm -f "$CSV"
-echo "postprocess: ${TARGET} done (${ROWS} rows), csv removed, df: $(df -h /home/tim | awk 'NR==2{print $4}') free"
+echo "postprocess: ${TARGET} done (${ROWS} rows), csv removed, df: $(df -h . | awk 'NR==2{print $4}') free"
