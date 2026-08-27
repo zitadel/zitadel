@@ -124,6 +124,16 @@ From `benchmark/`:
 | `./run-11.sh` | The full sweep. Eleven targets, 600 VUs, 1800s each, published as each lands. About six and a half hours. I'll be here. |
 | `./retry-failed.sh <sweep.log>` | Re-runs whatever the sweep logged as failed. There is always something. |
 
+**Duration takes a unit.** `1800s`, not `1800` — k6 v2.1.0 rejects a bare integer with
+`invalid argument "1800" for "-d, --duration" flag: time: missing unit in duration`. It dies in the
+argument parser, after the build, before setup, so it costs four minutes and creates no org and no
+CSV. `run-11.sh` has said `1800s` on line 11 the entire time.
+
+**A detached launch must outlive the shell that started it.** `setsid nohup ./run-bench.sh ... &`
+was reaped the instant its parent returned, dying mid-`go install` with no error line at all — which
+looks exactly like a toolchain failure and is not one. Check that k6 is actually up a minute in
+rather than trusting the launch.
+
 Touch `.hold` to stop a sweep cleanly after the current target. Killing a run instead leaves an
 orphan org and a multi-gigabyte partial CSV, and then someone has to clear it up. Someone.
 
@@ -202,12 +212,84 @@ read-back failed. It cost four runs, three of them consecutive, all of them mine
 `readUserAfterCreate()` now retries up to ten times with backoff and rejects with the user id and
 username instead of resolving `undefined`.
 
-**The hole that is still open:** that loop calls `res.json('user')` unguarded, so a GET that
-*times out* — null body — throws `GoError: the body is null so we can't transform it to JSON`
-rather than consuming a retry. Guard status and body before parsing and keep looping on timeout.
-I proposed this. It was declined. I mention it here purely for completeness, obviously.
+**That hole is now closed**, in `cdde3ab3e`: status and body are guarded before parsing, so a GET
+that times out consumes a retry instead of throwing `GoError: the body is null so we can't
+transform it to JSON`. I proposed it, it was declined, and then Copilot proposed the same thing and
+it landed. I have decided not to have feelings about this.
+
+It is confirmed by measurement rather than by reading the diff — two 200-VU/1800s `manipulate_user`
+runs on 2026-08-27, either side of the fix:
+
+| | 11:09, pre-fix | 13:41, post-fix |
+|---|---:|---:|
+| request timeouts | 77 | 75 |
+| iterations killed by null body | 77 | **0** |
+| failed checks | 0 | 127 |
+
+**Do not read that last row as a regression; it is the opposite.** Pre-fix a timeout killed the
+iteration *before* its check could be recorded, so the checks looked immaculate while 77 iterations
+quietly died. Post-fix the iteration survives and records the failure. The number got worse because
+the instrument got honest.
+
+**And a third variant, found at 600 VUs on 2026-08-27, which the first two fixes did not cover.**
+The read-back can return a user object whose `loginNames` array has *not* been projected yet — a
+partial record rather than a missing one. The retry guarded on `if (user)`, saw a truthy object,
+returned satisfied, and every caller then did `loginNames[0]` on it and died with the original
+`Cannot read property '0' of undefined`. Ten retries were available and none were consumed.
+`http_req_failed` was **0.00%, 0 of 1209**: nothing failed, the harness simply believed a
+half-built answer.
+
+`readUserAfterCreate()` now requires the field, not just the object:
+
+    if (user && Array.isArray(user.loginNames) && user.loginNames.length > 0)
+
+`user.loginNames[0]` is dereferenced unguarded in **nine** use cases, so the guard belongs in the
+helper — which both `createHuman` and `createMachine` go through — and nowhere else.
+
+The lesson generalises past this bug: *a retry that checks for the wrong thing is indistinguishable
+from no retry at all*, and reads as a server defect while it does nothing.
 
 This is also real signal: projection lag under load is Zitadel behaviour, not merely a test flaw.
+
+### Projection lag at 600 VUs, which is the real one
+
+The read-after-write race above is not a 5-second inconvenience at scale. Creating `MaxVUs`
+users in one `Promise.all` burst queues every projection behind the projection handler advisory
+lock -- 53,972 s across the v4.17.1 sweep, the largest single database cost there is -- and the
+read-back then fails in **two distinct ways**, both measured on 2026-08-27 at 600 VUs:
+
+| symptom | meaning | observed |
+| --- | --- | --- |
+| `200` + valid user + **no `loginNames`** | login-name projection behind | exceeded 25 s |
+| `404 User could not be found (QUERY-Dfbg2)` | user projection behind entirely | exceeded **100 s** |
+
+Unloaded, both are instant: five users created by hand over curl had `loginNames` present on the
+**first** GET, every time. This is load-induced projection lag and nothing else -- not a timeout,
+not a permission, not a response-shape quirk.
+
+### The settle period, and why whoever goes second fails
+
+Every setup failure of 2026-08-27 was a target starting within seconds of a *completed* run's
+teardown; every target that began on a quiet instance succeeded. Teardown deletes an org and its
+600 users, and that flood is still draining through the projections while the next setup creates
+600 more. It is not a property of the failing target -- `password_session` failed three times and
+`otp_session` twice, and both succeeded when they followed a run that had itself died early and so
+torn down almost nothing.
+
+`run-bench.sh` now waits `SETTLE_SECONDS` (default 180) after the orphan-org preflight. It costs
+wall-clock and nothing else: setup is excluded from `output.json` by the empty-`group` filter.
+
+### Instrument before you widen a budget
+
+I raised the read-back retry budget three times -- 5.5 s, 25 s, 100 s -- and the first two were
+guesses wearing the costume of a fix. Each cost a 30-minute slot to disprove. What actually solved
+it was making the exhausted loop *report what it had been getting*: attempts, last status, and 200
+characters of body. The very first instrumented failure said `status: 200` with a valid user, which
+eliminated every theory I had at once, and the second said `404`, which identified a different
+failure hiding under an identical symptom.
+
+A retry loop that swallows its own errors is not a retry loop, it is a delay with good intentions.
+Instrument first. It costs one run. Guessing costs all of them.
 
 ### Colliding check names
 
@@ -219,6 +301,33 @@ checks per iteration under one name, two structurally impossible. Result: a perm
 Distinct name per check, assert `2xx` not an exact code, and don't duplicate in the use case what
 the library already checks. If a failure rate looks *structural* — a suspiciously round split,
 exactly one check's worth per iteration — suspect the harness before the server. It's usually us.
+
+### Infrastructure 503 -- `Service error -27` -- which is not Zitadel at all
+
+An **HTML** error page from the Google frontend, not a Zitadel JSON error:
+
+    503 Server Error ... <h2>The service you requested is not available at this time.
+    <p>Service error -27.</h2>
+
+On 2026-08-27 the 200-VU `manipulate_user` run took 150 of these in a **55-second burst**
+(13:43:19-13:44:13, two minutes in) and then nothing for the next 25 minutes. A bounded burst
+followed by silence is the shape of a container being restarted or replaced; a service actually
+buckling under load does not recover to zero and stay there. Reported as one number the run reads
+as 225 failures / 0.13% and looks like a regression. It is 150 platform plus 75 of the documented
+wall, half an hour apart, and the two go on the page separately.
+
+Post-mortem is a GCP question -- restarts, panics, instance count, who emitted the 503 -- and the
+queries are written out in `benchmark/summaries/manipulate_user_20260827T134109Z_postmortem.md`.
+Run them in Cloud Shell: local `gcloud` on the load-generator VM returns
+`PERMISSION_DENIED ... ACCESS_TOKEN_SCOPE_INSUFFICIENT`, which is the VM's *access scopes* and is
+therefore immune to `gcloud auth login`, as I established by trying it.
+
+### Counting failures from the log, which undercounts them
+
+`grep -c level=error` on that run gave **29**. The CSV gave **150**. Only user *creation* throws;
+update, lock and delete merely fail a check and say nothing. **Always count from
+`tools/status_breakdown.sh`.** The log tells you a class of failure exists. Only the CSV tells you
+how much of it there was, and only until the CSV is deleted.
 
 ### Org deletion 500s after heavy churn
 
@@ -372,6 +481,25 @@ the entire reason we publish by version, is not.
 Nobody noticed until the flags were fetched at the very end, by which point the sweep was six and a
 half hours old and unrepeatable without another night. **Capture the flag set before the first
 target starts.** It is one API call. I would rather make it eleven times than discover this again.
+
+    GET  {ZITADEL_HOST}/v2/features/instance          # capture, before target one
+    PUT  {ZITADEL_HOST}/v2/features/instance          # set them
+    {"improvedPerformance":["IMPROVED_PERFORMANCE_PROJECT_GRANT","IMPROVED_PERFORMANCE_PROJECT",
+     "IMPROVED_PERFORMANCE_USER_GRANT","IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED"]}
+
+The `PUT` only touches the fields present in the body; every other feature came back
+byte-identical either side of it, which I verified rather than assumed. Enabled on the QA
+instance 2026-08-27T13:35:31Z, sequence 6 -> 7.
+
+**The PAT could not do this until 2026-08-27.** Its machine user held `IAM_OWNER_VIEWER`, which
+reads the flags and cannot write them: the `PUT` returns `403 AUTH-5mWD2 No matching permissions
+found`. It now holds `IAM_OWNER`. The runbook had been describing this limitation in the phrase
+"IAM owner viewer" for months without anyone, me included, reading it as one.
+
+And temper the expectation: these four cover project existence, project grants, user grants and
+org domain verification. A target that touches none of them -- `manipulate_user` is human-user
+CRUD -- **is not expected to move at all**, and an unchanged number there is the correct result
+rather than a failed experiment.
 
 ## Copilot
 
