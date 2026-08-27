@@ -7,7 +7,7 @@
 //   git diff --name-only origin/main...HEAD | pnpm exec tsx scripts/affected-categories.ts
 import { relative, dirname, resolve, join } from 'path';
 import { fileURLToPath } from 'url';
-import { discoverServices } from './generate-endpoint-errors';
+import { discoverTraceableServices } from './generate-endpoint-errors';
 
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../..');
 
@@ -28,7 +28,7 @@ async function main() {
     // the repo root rather than process.cwd(), which may be apps/docs.
     .map((f) => resolve(REPO_ROOT, f));
 
-  const services = discoverServices();
+  const services = discoverTraceableServices();
   const affected = new Set<string>();
   for (const file of changed) {
     for (const svc of services) {
