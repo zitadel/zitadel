@@ -8,13 +8,12 @@ if [ -f .hold ]; then
 fi
 set -a; . ./.env; set +a
 
-# The session and user targets tag every metric with a unique session / user id via
-# the url and name system tags, producing hundreds of thousands of time series
-# (k6 warns above 100k) and multi-GB k6 memory on a 8GB runner. None of the
-# published artefacts use those tags: output.json aggregates per metric name, and
-# the status breakdown needs only status/error/error_code/group. Drop the two
-# high-cardinality tags and keep the rest.
-export K6_SYSTEM_TAGS="${K6_SYSTEM_TAGS:-proto,status,method,group,check,error,error_code,scenario,expected_response}"
+# Requests whose path carries a user/session/project id now set a grouped `name`
+# tag at the call site (e.g. /v2beta/users/{userId}), so `name` stays low
+# cardinality and is worth keeping. The raw `url` tag is still one time series per
+# request - over 800k in a 30 minute run against k6's suggested limit of 100k,
+# which drove k6 to 6.8GB and an OOM - so it stays out.
+export K6_SYSTEM_TAGS="${K6_SYSTEM_TAGS:-proto,status,method,name,group,check,error,error_code,scenario,expected_response}"
 
 TARGET="$1"; VUS="$2"; DURATION="$3"
 STAMP="$(date -u '+%Y%m%dT%H%M%SZ')"

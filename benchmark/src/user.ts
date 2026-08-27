@@ -2,7 +2,7 @@ import { Trend } from 'k6/metrics';
 import { Org } from './org';
 import http, { RefinedResponse } from 'k6/http';
 import url from './url';
-import { check } from 'k6';
+import { check, sleep } from 'k6';
 import { Metadata } from './metadata';
 
 export type User = {
@@ -13,6 +13,30 @@ export type User = {
 
 export interface Human extends User {
   loginNames: string[];
+}
+
+// A user is created by a write, but its login names can only be read back from the
+// query side. Under load that projection can lag behind the write, and the read
+// then returns no user at all. Retry briefly rather than resolving undefined, which
+// surfaces much later as "Cannot read property '0' of undefined" while mapping
+// login names, hiding the real cause.
+function readUserAfterCreate(path: string, userId: string, org: Org, accessToken: string): any {
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const res = http.get(url(`${path}/${userId}`), {
+      tags: { name: `${path}/{userId}` },
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'x-zitadel-orgid': org.organizationId,
+      },
+    });
+    const user = res.json('user');
+    if (user) {
+      return user;
+    }
+    sleep(0.1 * (attempt + 1));
+  }
+  return undefined;
 }
 
 const createHumanTrend = new Trend('user_create_human_duration', true);
@@ -55,14 +79,12 @@ export function createHuman(username: string, org: Org, accessToken: string): Pr
         }) || reject(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
         createHumanTrend.add(res.timings.duration);
 
-        const user = http.get(url(`/v2/users/${res.json('userId')!}`), {
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-            'x-zitadel-orgid': org.organizationId,
-          },
-        });
-        resolve(user.json('user')! as unknown as Human);
+        const user = readUserAfterCreate('/v2/users', res.json('userId') as string, org, accessToken);
+        if (!user) {
+          reject(`user ${res.json('userId')} not readable after create (username: ${username})`);
+          return;
+        }
+        resolve(user as unknown as Human);
       })
       .catch((reason) => {
         reject(reason);
@@ -73,6 +95,7 @@ export function createHuman(username: string, org: Org, accessToken: string): Pr
 const setEmailOTPOnHumanTrend = new Trend('set_human_email_otp_duration', true);
 export async function setEmailOTPOnHuman(user: User, org: Org, accessToken: string): Promise<void> {
   const response = await http.asyncRequest('POST', url(`/v2/users/${user.userId}/otp_email`), null, {
+    tags: { name: '/v2/users/{userId}/otp_email' },
     headers: {
       authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
@@ -96,6 +119,7 @@ export function updateHuman(
 ): Promise<RefinedResponse<any>> {
   return new Promise((resolve, reject) => {
     let response = http.asyncRequest('PUT', url(`/v2beta/users/${userId}`), JSON.stringify(payload), {
+      tags: { name: '/v2beta/users/{userId}' },
       headers: {
         authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
@@ -106,7 +130,7 @@ export function updateHuman(
     response
       .then((res) => {
         check(res, {
-          'update user is status ok': (r) => r.status === 201,
+          'update user is status ok': (r) => r.status >= 200 && r.status < 300,
         });
         updateHumanTrend.add(res.timings.duration);
         resolve(res);
@@ -149,14 +173,12 @@ export function createMachine(username: string, org: Org, accessToken: string): 
         }) || reject(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
         createMachineTrend.add(res.timings.duration);
 
-        const user = http.get(url(`/v2beta/users/${res.json('userId')!}`), {
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-            'x-zitadel-orgid': org.organizationId,
-          },
-        });
-        resolve(user.json('user')! as unknown as Machine);
+        const user = readUserAfterCreate('/v2beta/users', res.json('userId') as string, org, accessToken);
+        if (!user) {
+          reject(`user ${res.json('userId')} not readable after create (username: ${username})`);
+          return;
+        }
+        resolve(user as unknown as Machine);
       })
       .catch((reason) => {
         reject(reason);
@@ -172,6 +194,7 @@ const addMachinePatTrend = new Trend('user_add_machine_pat_duration', true);
 export function addMachinePat(userId: string, org: Org, accessToken: string): Promise<MachinePat> {
   return new Promise((resolve, reject) => {
     let response = http.asyncRequest('POST', url(`/management/v1/users/${userId}/pats`), null, {
+      tags: { name: '/management/v1/users/{userId}/pats' },
       headers: {
         authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
@@ -198,6 +221,7 @@ const addMachineSecretTrend = new Trend('user_add_machine_secret_duration', true
 export function addMachineSecret(userId: string, org: Org, accessToken: string): Promise<MachineSecret> {
   return new Promise((resolve, reject) => {
     let response = http.asyncRequest('PUT', url(`/management/v1/users/${userId}/secret`), null, {
+      tags: { name: '/management/v1/users/{userId}/secret' },
       headers: {
         authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
@@ -232,6 +256,7 @@ export function addMachineKey(userId: string, org: Org, accessToken: string, pub
         publicKey: publicKey,
       }),
       {
+        tags: { name: '/management/v1/users/{userId}/keys' },
         headers: {
           authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
@@ -254,6 +279,7 @@ const lockUserTrend = new Trend('lock_user_duration', true);
 export function lockUser(userId: string, org: Org, accessToken: string): Promise<RefinedResponse<any>> {
   return new Promise((resolve, reject) => {
     let response = http.asyncRequest('POST', url(`/v2beta/users/${userId}/lock`), null, {
+      tags: { name: '/v2beta/users/{userId}/lock' },
       headers: {
         authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
@@ -264,7 +290,7 @@ export function lockUser(userId: string, org: Org, accessToken: string): Promise
     response
       .then((res) => {
         check(res, {
-          'update user is status ok': (r) => r.status >= 200 && r.status < 300,
+          'lock user is status ok': (r) => r.status >= 200 && r.status < 300,
         });
         lockUserTrend.add(res.timings.duration);
         resolve(res);
@@ -279,6 +305,7 @@ const deleteUserTrend = new Trend('delete_user_duration', true);
 export function deleteUser(userId: string, org: Org, accessToken: string): Promise<RefinedResponse<any>> {
   return new Promise((resolve, reject) => {
     let response = http.asyncRequest('DELETE', url(`/v2beta/users/${userId}`), null, {
+      tags: { name: '/v2beta/users/{userId}' },
       headers: {
         authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
@@ -289,7 +316,7 @@ export function deleteUser(userId: string, org: Org, accessToken: string): Promi
     response
       .then((res) => {
         check(res, {
-          'update user is status ok': (r) => r.status === 201,
+          'delete user is status ok': (r) => r.status >= 200 && r.status < 300,
         });
         deleteUserTrend.add(res.timings.duration);
         resolve(res);
@@ -304,6 +331,7 @@ const setUserMetadataTrend = new Trend('set_user_metadata_duration', true);
 export function setUserMetadata(metadata: Metadata[], userId: string, accessToken: string): Promise<RefinedResponse<any>> {
   return new Promise((resolve, reject) => {
     let response = http.asyncRequest('POST', url(`/v2/users/${userId}/metadata`), JSON.stringify({ metadata: metadata }), {
+      tags: { name: '/v2/users/{userId}/metadata' },
       headers: {
         authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',

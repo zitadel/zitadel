@@ -13,7 +13,7 @@ set -a; . ./.env; set +a
 PATTERN='^load-test-[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}Z$'
 CONFIRM="${1:-}"
 
-if pgrep -f "xk6-modules/k6 run" >/dev/null; then
+if pgrep -x k6 >/dev/null; then
   echo "REFUSING: a k6 run is in flight; its org matches the pattern. Stop it first." >&2
   exit 1
 fi
