@@ -504,6 +504,7 @@ Errors:
         AlreadyReady: OTP (一次性密码) 已设置
         NotExisting: OTP (一次性密码) 不存在
         InvalidCode: 无效的验证码
+        Reused: 此验证码已被使用。请等待新的验证码
         NotReady: OTP (一次性密码) 还没准备好
     Locked: 用户被锁定
     SomethingWentWrong: 似乎出问题了

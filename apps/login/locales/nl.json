@@ -457,6 +457,7 @@
     "sessionExpired": "Uw huidige sessie is verlopen. Log opnieuw in.",
     "failedLoading": "Gegevens laden mislukt. Probeer het opnieuw.",
     "tryagain": "Opnieuw proberen",
-    "couldNotContinueSession": "Kon de sessie niet voortzetten - ontbrekende gebruikersinformatie"
+    "couldNotContinueSession": "Kon de sessie niet voortzetten - ontbrekende gebruikersinformatie",
+    "couldNotClearSession": "De sessie kon niet worden beëindigd. Probeer het opnieuw."
   }
 }
