@@ -83,7 +83,14 @@ jobs:
         id: drift
         if: steps.affected.outputs.categories != ''
         run: |
-          if git status --porcelain apps/docs/scripts/endpoint-error-tracing apps/docs/components/EndpointErrors/data.json | grep -q .; then
+          # Only the raw per-category tracing JSON is a meaningful signal
+          # here — it depends solely on real Go source + generated stubs,
+          # both present in this checkout. EndpointErrors/data.json also
+          # depends on content/reference/api (gitignored, only produced by
+          # a full docs build), which doesn't exist in a bare CI checkout —
+          # comparing it here would report drift even when the committed
+          # tracing JSON is already fully up to date.
+          if git status --porcelain apps/docs/scripts/endpoint-error-tracing | grep -q .; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
