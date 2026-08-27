@@ -24,14 +24,15 @@ Benchmark results of the v4.17.1 release of Zitadel.
 | ZITADEL location                      | US1                                                                              |
 | ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 7<br/>Container max scale: 7 |
 | ZITADEL Version                       | v4.17.1                                                                           |
-| ZITADEL feature flags                 |                                                                                  |
+| ZITADEL Settings                      | Eventstore autovacuum (new in v4.17): Enabled: true<br/>VacuumThreshold: 1000000<br/>AnalyzeThreshold: 1000000<br/>Tuned for the ~4,000 events/s expected during the benchmark, per the [tuning guide](https://zitadel.com/docs/self-hosting/manage/tuning#reading-events). |
+| ZITADEL feature flags                 | Enabled: loginDefaultOrg (instance), oidcTokenExchange (system), enableBackChannelLogout (system), consoleUseV2UserApi (instance)<br/>Disabled: loginV2, userSchema, improvedPerformance (empty list), debugOidcParentError, oidcSingleV1SessionTermination, permissionCheckV2<br/>Note: `improvedPerformance` was empty for this run, while the v4 benchmark ran with five options enabled. Four of those options still exist and still select a faster code path in v4.17.1, so the version-over-version comparison is **not** like-for-like. |
 | Database                              | type: psql<br />version: v17.4                                                   |
 | Database location                     | US1                                                                              |
 | Database specification                | vCPU: 8<br/> memory: 32Gib                                                       |
-| ZITADEL metrics during test           |                                                                                  |
+| ZITADEL metrics during test           | CPU: p50 24%, p99 32% (peak 38%)<br/>Memory: p50 4%, peak 6%<br/>Instances: 7 (constant)<br/>Server-side: 1,501 req/s, latency p50 39ms / p95 1.9s / p99 2.3s |
 | Observed errors                       | 1,517 of 2,872,575 requests failed (0.05%): 2x connection reset, 1,515x not individually logged (see k6 output). 1 iteration aborted on a null response body. 1,517 of 4,306,676 checks failed (0.03%): client credentials status ok (769 failed), userinfo status ok (748 failed)                                                                          |
-| Top 3 most expensive database queries |                                                                                  |
-| Database metrics during test          |                                                                                  |
+| Top 3 most expensive database queries | 1: Query events by aggregate_id and event_types, ordered by sequence (3,823 s)<br/>2: Push events (`eventstore.push`) (3,628 s)<br/>3: Query events by instance_id, aggregate_types, event_types, position (paged) (3,424 s)<br/>Ranked by total accumulated execution time summed across concurrent sessions (Cloud SQL Query Insights) — not CPU time; it can exceed the wall-clock window. |
+| Database metrics during test          | CPU: 94% median, 98% peak<br/>Memory: 40%<br/>Connections: 46<br/>Transactions: 9,684/s<br/>IOPS: read 0, write 755<br/>**CPU-saturated — the bottleneck for this target.** |
 | k6 Iterations per second              | 779                                                                       |
 | k6 output                             | [output](#k6-output)                                                             |
 | flowchart outcome                     |                                                                                  |

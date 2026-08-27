@@ -24,14 +24,15 @@ Benchmark results of the v4.17.1 release of Zitadel.
 | ZITADEL location                      | US1                                                                              |
 | ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 7<br/>Container max scale: 7 |
 | ZITADEL Version                       | v4.17.1                                                                           |
-| ZITADEL feature flags                 |                                                                                  |
+| ZITADEL Settings                      | Eventstore autovacuum (new in v4.17): Enabled: true<br/>VacuumThreshold: 1000000<br/>AnalyzeThreshold: 1000000<br/>Tuned for the ~4,000 events/s expected during the benchmark, per the [tuning guide](https://zitadel.com/docs/self-hosting/manage/tuning#reading-events). |
+| ZITADEL feature flags                 | Enabled: loginDefaultOrg (instance), oidcTokenExchange (system), enableBackChannelLogout (system), consoleUseV2UserApi (instance)<br/>Disabled: loginV2, userSchema, improvedPerformance (empty list), debugOidcParentError, oidcSingleV1SessionTermination, permissionCheckV2<br/>Note: `improvedPerformance` was empty for this run, while the v4 benchmark ran with five options enabled. Four of those options still exist and still select a faster code path in v4.17.1, so the version-over-version comparison is **not** like-for-like. |
 | Database                              | type: psql<br />version: v17.4                                                   |
 | Database location                     | US1                                                                              |
 | Database specification                | vCPU: 8<br/> memory: 32Gib                                                       |
-| ZITADEL metrics during test           |                                                                                  |
+| ZITADEL metrics during test           | CPU: p50 54%, p99 66% (peak 70%)<br/>Memory: p50 6%, peak 14%<br/>Instances: 7 (constant)<br/>Server-side: 149 req/s, latency p50 2.7s / p95 11.5s / p99 12.6s |
 | Observed errors                       | none                                                                          |
-| Top 3 most expensive database queries |                                                                                  |
-| Database metrics during test          |                                                                                  |
+| Top 3 most expensive database queries | 1: Projection handler advisory lock, one per projection per instance (`pg_advisory_xact_lock`) — **lock wait, not query work** (12,805 s)<br/>2: Query events by instance_id, aggregate_types, event_types, position (paged) (3,637 s)<br/>3: Load user with primary login name and human profile (`projections.users14` + `login_names3`) (1,778 s)<br/>Ranked by total accumulated execution time summed across concurrent sessions (Cloud SQL Query Insights) — not CPU time; it can exceed the wall-clock window. |
+| Database metrics during test          | CPU: 50% median, 52% peak<br/>Memory: 40%<br/>Connections: 46<br/>Transactions: 2,171/s<br/>IOPS: read 3, write 648 |
 | k6 Iterations per second              | 73                                                                       |
 | k6 output                             | [output](#k6-output)                                                             |
 | flowchart outcome                     |                                                                                  |
