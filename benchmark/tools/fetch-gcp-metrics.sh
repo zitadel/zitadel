@@ -94,7 +94,7 @@ while IFS='|' read -r target start end; do
     fi
 
     echo "$resp" | jq -r --arg t "$target" --arg m "$label" \
-      '.timeSeries[]?.points[]? | [$t,$m,.interval.endTime,(.value.doubleValue // .value.int64Value // .value.distributionValue.count // .value.distributionValue.mean // empty)] | @csv' \
+      '.timeSeries[]?.points[]? | [$t,$m,.interval.endTime,(.value.doubleValue // .value.int64Value // .value.distributionValue.count // .value.distributionValue.mean // 0)] | @csv' \
       >> "$RAW"
 
     stats="$(echo "$resp" | jq -r '

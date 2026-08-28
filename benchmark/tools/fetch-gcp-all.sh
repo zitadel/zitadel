@@ -58,11 +58,12 @@ step "4/4  Cloud Run logs around each burst"
 RES="resource.type=\"cloud_run_revision\" AND resource.labels.service_name=\"${SERVICE}\""
 
 logq() { # logq <outfile> <filter> [extra-format]
-  local f="$1" filter="$2" fmt="${3:-table(timestamp,severity,textPayload)}"
-  gcloud logging read "$filter" --project="$PROJECT" --limit="${4:-200}" --order=asc \
+  local f="$1" filter="$2" fmt="${3:-value(timestamp,severity,textPayload,jsonPayload.message,jsonPayload.error)}"
+  gcloud logging read "$filter" --project="$PROJECT" --limit="${4:-5000}" --order=asc \
     --format="$fmt" > "${OUT}/logs/${f}" 2>"${OUT}/logs/${f}.err" \
     || note "log query ${f} failed (see ${f}.err)"
-  printf '  %-34s %s lines\n' "$f" "$(wc -l < "${OUT}/logs/${f}")"
+  local n; n="$(wc -l < "${OUT}/logs/${f}")"
+  printf '  %-34s %s lines%s\n' "$f" "$n" "$( [ "$n" -ge "${4:-5000}" ] && printf ' *** TRUNCATED AT LIMIT ***' )"
 }
 
 for b in "burst1 2026-08-27T13:38:00Z 2026-08-27T13:50:00Z" \
@@ -70,10 +71,10 @@ for b in "burst1 2026-08-27T13:38:00Z 2026-08-27T13:50:00Z" \
   set -- $b; name="$1"; s="$2"; e="$3"
   W="AND timestamp>=\"${s}\" AND timestamp<=\"${e}\""
   logq "${name}_panics.txt" \
-    "${RES} ${W} AND (textPayload:\"panic\" OR textPayload:\"fatal error\" OR textPayload:\"goroutine\" OR jsonPayload.message:\"panic\")"
+    "${RES} ${W} AND (textPayload:\"panic\" OR textPayload:\"fatal error\" OR textPayload:\"goroutine\" OR jsonPayload.message:\"panic\" OR jsonPayload.message:\"fatal\" OR jsonPayload.error:\"panic\")"
   logq "${name}_restarts.txt" \
-    "${RES} ${W} AND (textPayload:\"STARTUP\" OR textPayload:\"Container called exit\" OR textPayload:\"Memory limit\" OR textPayload:\"terminated\" OR severity>=WARNING)" \
-    'table(timestamp,severity,labels."run.googleapis.com/instance_id",textPayload)'
+    "${RES} ${W} AND (textPayload:\"STARTUP\" OR textPayload:\"Container called exit\" OR textPayload:\"Memory limit\" OR textPayload:\"terminated\" OR jsonPayload.message:\"STARTUP\" OR jsonPayload.message:\"terminated\" OR severity>=WARNING)" \
+    'value(timestamp,severity,labels."run.googleapis.com/instance_id",textPayload,jsonPayload.message,jsonPayload.error)'
   logq "${name}_503s.txt" \
     "${RES} ${W} AND httpRequest.status=503" \
     'table(timestamp,httpRequest.status,httpRequest.requestUrl)'
