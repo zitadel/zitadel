@@ -1,10 +1,5 @@
 .env
-*.swp
 dist/**
 .keys/**
 output/**
-summaries/**
-tools/.bin/**
-.hold
-.skip-orgs
-bench-gcp-*
+
