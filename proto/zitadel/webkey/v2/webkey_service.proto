@@ -1,5 +1,8 @@
 syntax = "proto3";
 
+// Test-only comment: verifying endpoint-error-tables-watch fires on a PR
+// whose base is docs/user-api-error-responses (not main), and that a fresh
+// category still gets correctly flagged. Safe to revert before merge.
 package zitadel.webkey.v2;
 
 import "google/api/annotations.proto";
