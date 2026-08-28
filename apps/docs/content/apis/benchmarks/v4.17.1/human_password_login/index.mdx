@@ -35,7 +35,7 @@ Benchmark results of the v4.17.1 release of Zitadel.
 | Database metrics during test          | CPU: 87% median, 90% peak<br/>Memory: 40%<br/>Connections: 46<br/>Transactions: 12,351/s<br/>IOPS: read 0, write 711<br/>**CPU-saturated — the bottleneck for this target.** |
 | k6 Iterations per second              | 49                                                                       |
 | k6 output                             | [output](#k6-output)                                                             |
-| flowchart outcome                     |                                                                                  |
+| flowchart outcome                     | **Potential issues.** Not resource-bound: database CPU 87%, ZITADEL CPU 48%, yet **86% of the top-5 query time is advisory lock wait** — predominantly the projection handler lock, which serialises this workload. Additional vCPU will not help. Logged as an issue rather than blocking further scale testing. The run also contains a 1,044-request platform 503 burst (19:37-19:44) under separate investigation in `benchmark/postmortems/2026-08-27-503-burst.md`; it does not affect this verdict. |
 
 ## Endpoint latencies
 

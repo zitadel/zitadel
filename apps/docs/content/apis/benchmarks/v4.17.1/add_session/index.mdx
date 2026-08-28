@@ -35,7 +35,7 @@ Benchmark results of the v4.17.1 release of Zitadel.
 | Database metrics during test          | CPU: 97% median, 98% peak<br/>Memory: 40%<br/>Connections: 46<br/>Transactions: 9,895/s<br/>IOPS: read 0, write 787<br/>**CPU-saturated — the bottleneck for this target.** |
 | k6 Iterations per second              | 767                                                                       |
 | k6 output                             | [output](#k6-output)                                                             |
-| flowchart outcome                     |                                                                                  |
+| flowchart outcome                     | **Scale.** Database CPU is the limit: 97% median against ZITADEL at 18%, with advisory lock wait only 6% of the top-5 query time. Raising the database beyond 8 vCPU is the next step, and throughput should be re-measured against the increase. |
 
 ## Endpoint latencies
 
