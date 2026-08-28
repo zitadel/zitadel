@@ -170,7 +170,7 @@ func localize(localizer *i18n.Localizer, id string, args map[string]interface{})
 	if err != nil {
 		// Only the argument keys are logged: the values regularly contain PII
 		// such as e-mail addresses (https://github.com/zitadel/zitadel/issues/9385).
-		logging.WithFields("id", id, "argKeys", slices.Sorted(maps.Keys(args))).WithError(err).Warnf("missing translation")
+		logging.WithFields("id", id, "argKeys", slices.Sorted(maps.Keys(args))).WithError(err).Warn("missing translation")
 		return id
 	}
 	return s
