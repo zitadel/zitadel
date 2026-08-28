@@ -55,37 +55,17 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Set SHAs for nx affected commands
         uses: nrwl/nx-set-shas@v4
-      # TODO: remove again - debug step to confirm *.integration.localhost resolution on the runner
-      - name: Debug integration.localhost DNS resolution
+      # The Depot runner image points /etc/resolv.conf directly at public DNS (8.8.8.8),
+      # bypassing the systemd-resolved stub, so *.integration.localhost (synthesized by
+      # systemd-resolved) no longer resolves and all API integration tests hang.
+      # Route DNS back through the stub until the image is fixed or the tests stop
+      # depending on wildcard localhost DNS.
+      - name: Restore systemd-resolved stub for *.localhost resolution
         run: |
-          set -x
-          getent hosts foo.integration.localhost || true
-          getent hosts localhost || true
-          resolvectl query foo.integration.localhost || true
-          resolvectl status || true
-          cat /etc/resolv.conf || true
-          cat /etc/nsswitch.conf || true
-          grep -r localhost /etc/hosts || true
-          curl -sv --max-time 5 http://foo.integration.localhost:1/ 2>&1 | head -5 || true
-          mkdir -p /tmp/dnsprobe && cd /tmp/dnsprobe
-          cat > main.go <<'EOF'
-          package main
-
-          import (
-          	"context"
-          	"fmt"
-          	"net"
-          	"time"
-          )
-
-          func main() {
-          	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-          	defer cancel()
-          	addrs, err := net.DefaultResolver.LookupHost(ctx, "foo.integration.localhost")
-          	fmt.Printf("go resolver: addrs=%v err=%v\n", addrs, err)
-          }
-          EOF
-          go mod init dnsprobe && go run .
+          set -ex
+          test -e /run/systemd/resolve/stub-resolv.conf
+          sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+          getent hosts foo.integration.localhost
       - name: Lint, Test and Build
         env:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
