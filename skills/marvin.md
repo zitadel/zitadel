@@ -461,6 +461,13 @@ wrong. That is the failure mode worth fearing.
   wrong aligner should not cost you sixteen metrics. I documented this trap, left it unfixed for a
   day, and then watched it scroll past in a live run. Documenting a bug is not fixing it.
 
+- **A padded window plus an entry cap reads the padding, not the event.** This service logs
+  800-1,300 errors a minute at 600 VUs. A 20-minute window ordered ascending with a 5,000-entry
+  cap stopped at minute five, three minutes before the burst it was aimed at, and returned 5 MB
+  of perfectly valid output about nothing in particular. Pad the window for low-volume targeted
+  filters; query the event window exactly for anything that dumps by severity. And always print
+  entries-per-minute, because a truncated log looks exactly like a complete one.
+
 That ratio of accumulated-execution-time to wall-clock is worth keeping as a *measurement* rather
 than discarding as an artefact: it is average query concurrency. Set it against DB CPU and targets
 separate into CPU-bound (low ratio, high CPU) and wait-bound (high ratio, moderate CPU). That is how

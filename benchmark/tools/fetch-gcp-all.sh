@@ -66,10 +66,15 @@ logq() { # logq <outfile> <filter> [extra-format]
   printf '  %-34s %s lines%s\n' "$f" "$n" "$( [ "$n" -ge "${4:-5000}" ] && printf ' *** TRUNCATED AT LIMIT ***' )"
 }
 
-for b in "burst1 2026-08-27T13:38:00Z 2026-08-27T13:50:00Z" \
-         "burst2 2026-08-27T19:30:00Z 2026-08-27T19:50:00Z"; do
-  set -- $b; name="$1"; s="$2"; e="$3"
+# Two windows per burst. The padded one is for low-volume targeted filters, where the
+# cause may precede the effect. The exact one is for the severity dump: this service logs
+# ~1,200 errors/minute at baseline, so a padded window plus --order=asc plus any cap reads
+# the padding and never reaches the event. That is exactly what happened on the first run.
+for b in "burst1 2026-08-27T13:38:00Z 2026-08-27T13:50:00Z 2026-08-27T13:43:00Z 2026-08-27T13:45:00Z" \
+         "burst2 2026-08-27T19:30:00Z 2026-08-27T19:50:00Z 2026-08-27T19:36:30Z 2026-08-27T19:44:30Z"; do
+  set -- $b; name="$1"; s="$2"; e="$3"; xs="$4"; xe="$5"
   W="AND timestamp>=\"${s}\" AND timestamp<=\"${e}\""
+  XW="AND timestamp>=\"${xs}\" AND timestamp<=\"${xe}\""
   logq "${name}_panics.txt" \
     "${RES} ${W} AND (textPayload:\"panic\" OR textPayload:\"fatal error\" OR textPayload:\"goroutine\" OR jsonPayload.message:\"panic\" OR jsonPayload.message:\"fatal\" OR jsonPayload.error:\"panic\")"
   logq "${name}_restarts.txt" \
@@ -78,6 +83,9 @@ for b in "burst1 2026-08-27T13:38:00Z 2026-08-27T13:50:00Z" \
   logq "${name}_503s.txt" \
     "${RES} ${W} AND httpRequest.status=503" \
     'table(timestamp,httpRequest.status,httpRequest.requestUrl)'
+  # the burst window itself, unpadded, with room for the baseline error rate
+  logq "${name}_errors.txt" "${RES} ${XW} AND severity>=ERROR" \
+    'value(timestamp,severity,textPayload,jsonPayload.message,jsonPayload.error)' 40000
   logq "${name}_deploys.txt" \
     "protoPayload.serviceName=\"run.googleapis.com\" AND resource.labels.service_name=\"${SERVICE}\" ${W}" \
     'table(timestamp,protoPayload.methodName,protoPayload.authenticationInfo.principalEmail)' 50
