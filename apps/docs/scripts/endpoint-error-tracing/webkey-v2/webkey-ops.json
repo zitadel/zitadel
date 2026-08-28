@@ -1,0 +1,64 @@
+{
+  "ActivateWebKey": {
+    "handler": "internal/api/grpc/webkey/v2/webkey.go:28",
+    "errors": [
+      {
+        "id": "COMMAND-teiG3",
+        "file": "internal/command/web_key.go",
+        "line": 128,
+        "reasoning": "ActivateWebKey -\u003e ActivateWebKey"
+      }
+    ]
+  },
+  "CreateWebKey": {
+    "handler": "internal/api/grpc/webkey/v2/webkey.go:13",
+    "errors": [
+      {
+        "id": "WEBKEY-IY9fa",
+        "file": "internal/repository/webkey/webkey.go",
+        "line": 58,
+        "reasoning": "CreateWebKey -\u003e CreateWebKey -\u003e generateWebKeyCommand -\u003e NewAddedEvent"
+      }
+    ]
+  },
+  "DeleteWebKey": {
+    "handler": "internal/api/grpc/webkey/v2/webkey.go:42",
+    "errors": [
+      {
+        "id": "COMMAND-Chai1",
+        "file": "internal/command/web_key.go",
+        "line": 173,
+        "reasoning": "DeleteWebKey -\u003e DeleteWebKey"
+      }
+    ]
+  },
+  "ListWebKeys": {
+    "handler": "internal/api/grpc/webkey/v2/webkey.go:60",
+    "errors": [
+      {
+        "id": "CRYPT-Ii3AiH",
+        "file": "internal/crypto/web_key.go",
+        "line": 90,
+        "reasoning": "ListWebKeys -\u003e ListWebKeys -\u003e UnmarshalWebKeyConfig"
+      },
+      {
+        "id": "CRYPT-Eig8ho",
+        "file": "internal/crypto/web_key.go",
+        "line": 98,
+        "reasoning": "ListWebKeys -\u003e ListWebKeys -\u003e UnmarshalWebKeyConfig"
+      },
+      {
+        "id": "CRYPT-waeR0N",
+        "file": "internal/crypto/web_key.go",
+        "line": 101,
+        "reasoning": "ListWebKeys -\u003e ListWebKeys -\u003e UnmarshalWebKeyConfig"
+      },
+      {
+        "id": "QUERY-Ohl3A",
+        "file": "internal/query/web_key.go",
+        "line": 119,
+        "reasoning": "ListWebKeys -\u003e ListWebKeys"
+      }
+    ]
+  }
+}
