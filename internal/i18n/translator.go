@@ -2,7 +2,9 @@ package i18n
 
 import (
 	"context"
+	"maps"
 	"net/http"
+	"slices"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -166,7 +168,9 @@ func localize(localizer *i18n.Localizer, id string, args map[string]interface{})
 		TemplateData: args,
 	})
 	if err != nil {
-		logging.WithFields("id", id, "args", args).WithError(err).Warnf("missing translation")
+		// Only the argument keys are logged: the values regularly contain PII
+		// such as e-mail addresses (https://github.com/zitadel/zitadel/issues/9385).
+		logging.WithFields("id", id, "argKeys", slices.Sorted(maps.Keys(args))).WithError(err).Warnf("missing translation")
 		return id
 	}
 	return s
