@@ -196,22 +196,6 @@
             "benchmarks/v4/password_session/index",
             "benchmarks/v4/user_info/index"
           ]
-        },
-        {
-          "title": "v4.17.1",
-          "pages": [
-            "benchmarks/v4.17.1/add_session/index",
-            "benchmarks/v4.17.1/human_password_login/index",
-            "benchmarks/v4.17.1/introspect/index",
-            "benchmarks/v4.17.1/machine_client_credentials_login/index",
-            "benchmarks/v4.17.1/machine_jwt_profile_grant/index",
-            "benchmarks/v4.17.1/machine_pat_login/index",
-            "benchmarks/v4.17.1/manipulate_user/index",
-            "benchmarks/v4.17.1/oidc_session/index",
-            "benchmarks/v4.17.1/otp_session/index",
-            "benchmarks/v4.17.1/password_session/index",
-            "benchmarks/v4.17.1/user_info/index"
-          ]
         }
       ]
     }
