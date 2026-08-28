@@ -24,6 +24,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/app"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 )
 
 func setImpersonationPolicy(t *testing.T, instance *integration.Instance, value bool) {
@@ -739,4 +740,96 @@ func TestImpersonation_API_Call(t *testing.T) {
 	status := status.Convert(err)
 	assert.Equal(t, codes.PermissionDenied, status.Code())
 	assert.Equal(t, "Errors.TokenExchange.Token.NotForAPI (APP-Shi0J)", status.Message())
+}
+
+// TestServer_TokenExchange_OrgRoleIDScopeDownscope covers #12413: a broad access
+// token can be exchanged with urn:zitadel:iam:org:roles:id:{orgID} even when that
+// scope was not present on the subject token, and roles claims are filtered.
+func TestServer_TokenExchange_OrgRoleIDScopeDownscope(t *testing.T) {
+	const (
+		roleFoo = "foo"
+		roleBar = "bar"
+	)
+
+	project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
+	client, keyData, err := Instance.CreateOIDCWebClientJWT(CTX, redirectURI, logoutRedirectURI, project.GetId(),
+		app.OIDCGrantType_OIDC_GRANT_TYPE_TOKEN_EXCHANGE,
+		app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE,
+		app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN,
+	)
+	require.NoError(t, err)
+
+	_, err = Instance.Client.Mgmt.UpdateProject(CTX, &management.UpdateProjectRequest{
+		Id:                   project.GetId(),
+		Name:                 integration.ProjectName(),
+		ProjectRoleAssertion: true,
+	})
+	require.NoError(t, err)
+
+	addProjectRolesGrants(t, User.GetUserId(), project.GetId(), roleFoo, roleBar)
+	grantedOrgID := addProjectOrgGrant(t, User.GetUserId(), project.GetId(), roleFoo, roleBar)
+
+	authRequestID := createAuthRequest(t, Instance, client.GetClientId(), redirectURI, oidc.ScopeOpenID, oidc.ScopeProfile)
+	sessionID, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
+	linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+		AuthRequestId: authRequestID,
+		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	provider, err := rp.NewRelyingPartyOIDC(CTX, Instance.OIDCIssuer(), client.GetClientId(), "", redirectURI, []string{oidc.ScopeOpenID},
+		rp.WithJWTProfile(rp.SignerFromKeyFile(keyData)))
+	require.NoError(t, err)
+	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+	broadTokens, err := rp.CodeExchange[*oidc.IDTokenClaims](context.Background(), code, provider, codeExchangeOptions(t, provider)...)
+	require.NoError(t, err)
+
+	broadUserinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, broadTokens.AccessToken, broadTokens.TokenType, User.GetUserId(), provider)
+	require.NoError(t, err)
+	assertProjectRoleClaims(t, project.GetId(), broadUserinfo.Claims, true, []string{roleFoo, roleBar}, []string{Instance.DefaultOrg.Id, grantedOrgID})
+
+	signer, err := rp.SignerFromKeyFile(keyData)()
+	require.NoError(t, err)
+	exchanger, err := tokenexchange.NewTokenExchangerJWTProfile(CTX, Instance.OIDCIssuer(), client.GetClientId(), signer)
+	require.NoError(t, err)
+
+	orgRoleScope := domain.OrgRoleIDScope + grantedOrgID
+	exchanged, err := tokenexchange.ExchangeToken(
+		CTX,
+		exchanger,
+		broadTokens.AccessToken,
+		oidc.AccessTokenType,
+		"",
+		"",
+		nil,
+		nil,
+		[]string{oidc.ScopeOpenID, orgRoleScope},
+		oidc.AccessTokenType,
+	)
+	require.NoError(t, err)
+	assert.Contains(t, []string(exchanged.Scopes), orgRoleScope)
+
+	narrowUserinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, exchanged.AccessToken, exchanged.TokenType, User.GetUserId(), provider)
+	require.NoError(t, err)
+	assertProjectRoleClaims(t, project.GetId(), narrowUserinfo.Claims, true, []string{roleFoo, roleBar}, []string{grantedOrgID})
+
+	// Widening to another org after downscoping must fail.
+	_, err = tokenexchange.ExchangeToken(
+		CTX,
+		exchanger,
+		exchanged.AccessToken,
+		oidc.AccessTokenType,
+		"",
+		"",
+		nil,
+		nil,
+		[]string{oidc.ScopeOpenID, domain.OrgRoleIDScope + Instance.DefaultOrg.Id},
+		oidc.AccessTokenType,
+	)
+	require.Error(t, err)
 }
