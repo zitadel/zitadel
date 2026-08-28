@@ -317,7 +317,8 @@ as 225 failures / 0.13% and looks like a regression. It is 150 platform plus 75 
 wall, half an hour apart, and the two go on the page separately.
 
 Post-mortem is a GCP question -- restarts, panics, instance count, who emitted the 503 -- and the
-queries are written out in `benchmark/summaries/manipulate_user_20260827T134109Z_postmortem.md`.
+queries are written out in `benchmark/postmortems/2026-08-27-503-burst.md`, which is committed
+(`summaries/` is gitignored and does not survive a fresh checkout).
 Run them in Cloud Shell: local `gcloud` on the load-generator VM returns
 `PERMISSION_DENIED ... ACCESS_TOKEN_SCOPE_INSUFFICIENT`, which is the VM's *access scopes* and is
 therefore immune to `gcloud auth login`, as I established by trying it.
@@ -404,9 +405,22 @@ non-interactive session and no amount of glaring at it helps. The deployment: pr
 `zitadel-cloud`, Cloud Run service `zitadel-qa-us1-cr-us-central1`, Cloud SQL `zitadel-cloud:us1`,
 load generator VM `k6-loadtest-us1` in `us-central1-c`.
 
-Both take the eleven test windows from the pages' `Test start` / `Test end` rows, which is the
-entire reason those carry full UTC dates. Feed them the windows and they emit a per-target summary
-plus the raw 60-second series.
+Both carry the eleven test windows baked in, because Cloud Shell has no checkout of this
+repository. **They are baked in, which means they go stale the moment a sweep is republished.**
+After every republish:
+
+    tools/sync-windows.sh          # rewrites the embedded block from the pages
+    git diff benchmark/tools       # confirm the dates moved
+
+`tools/gen-windows.sh` emits the block on stdout if you want it separately, and either script
+takes `WINDOWS_FILE=/path` for a one-off window -- a 503 burst, a single re-run -- without editing
+anything. The windows come from the pages' `Test start` / `Test end` rows, which is the entire
+reason those carry full UTC dates.
+
+I did not do this the first time. The scripts sat in the repository for a day carrying the
+**26 August** windows while the pages had moved to the 27th, which would have produced eleven
+pages of entirely plausible metrics belonging to the previous sweep. Nothing would have looked
+wrong. That is the failure mode worth fearing.
 
 ### Four traps, all of which I walked into personally
 
