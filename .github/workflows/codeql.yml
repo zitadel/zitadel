@@ -26,15 +26,15 @@ jobs:
         language: [go,javascript]
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
     - if: matrix.language == 'go'
       name: Install Go
-      uses: actions/setup-go@v6
+      uses: actions/setup-go@v7
       with:
         go-version-file: go.mod
     - if: matrix.language == 'go'
       name: Set up pnpm
-      uses: pnpm/action-setup@v4
+      uses: pnpm/action-setup@v6
     - name: Generate gRPC Stubs and Static Assets
       if: matrix.language == 'go'
       run: |
