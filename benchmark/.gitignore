@@ -7,3 +7,4 @@ summaries/**
 tools/.bin/**
 .hold
 .skip-orgs
+bench-gcp-*

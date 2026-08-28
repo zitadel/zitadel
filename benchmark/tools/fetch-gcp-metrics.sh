@@ -52,7 +52,7 @@ zit_req_per_s|metric.type=\"run.googleapis.com/request_count\" AND ${RUN_RES}|AL
 zit_lat_p50_ms|metric.type=\"run.googleapis.com/request_latencies\" AND ${RUN_RES}|ALIGN_PERCENTILE_50|REDUCE_MEAN
 zit_lat_p95_ms|metric.type=\"run.googleapis.com/request_latencies\" AND ${RUN_RES}|ALIGN_PERCENTILE_95|REDUCE_MEAN
 zit_lat_p99_ms|metric.type=\"run.googleapis.com/request_latencies\" AND ${RUN_RES}|ALIGN_PERCENTILE_99|REDUCE_MEAN
-zit_startups|metric.type=\"run.googleapis.com/container/startup_latencies\" AND ${RUN_RES}|ALIGN_COUNT|REDUCE_SUM
+zit_startups|metric.type=\"run.googleapis.com/container/startup_latencies\" AND ${RUN_RES}|ALIGN_DELTA|-
 db_cpu|metric.type=\"cloudsql.googleapis.com/database/cpu/utilization\" AND ${SQL_RES}|ALIGN_MEAN|REDUCE_MEAN
 db_mem|metric.type=\"cloudsql.googleapis.com/database/memory/utilization\" AND ${SQL_RES}|ALIGN_MEAN|REDUCE_MEAN
 db_connections|metric.type=\"cloudsql.googleapis.com/database/postgresql/num_backends\" AND ${SQL_RES}|ALIGN_MEAN|REDUCE_SUM
@@ -77,6 +77,8 @@ while IFS='|' read -r target start end; do
   echo "== $target  $start -> $end" | tee -a "$OUT"
   while IFS='|' read -r label filter aligner reducer; do
     [ -z "${label:-}" ] && continue
+    # reducer "-" means: send no crossSeriesReducer at all
+    if [ "${reducer}" = "-" ]; then RED_ARG=(); else RED_ARG=(--data-urlencode "aggregation.crossSeriesReducer=${reducer}"); fi
     resp="$(curl -sS -G "$API" \
       -H "Authorization: Bearer ${TOK}" \
       --data-urlencode "filter=${filter}" \
@@ -84,7 +86,7 @@ while IFS='|' read -r target start end; do
       --data-urlencode "interval.endTime=${end}" \
       --data-urlencode "aggregation.alignmentPeriod=${ALIGN}" \
       --data-urlencode "aggregation.perSeriesAligner=${aligner}" \
-      --data-urlencode "aggregation.crossSeriesReducer=${reducer}")"
+      "${RED_ARG[@]}")"
 
     if echo "$resp" | jq -e '.error' >/dev/null 2>&1; then
       printf '   %-16s ERROR: %s\n' "$label" "$(echo "$resp" | jq -r '.error.message' | head -c 160)" | tee -a "$OUT"
@@ -92,11 +94,11 @@ while IFS='|' read -r target start end; do
     fi
 
     echo "$resp" | jq -r --arg t "$target" --arg m "$label" \
-      '.timeSeries[]?.points[]? | [$t,$m,.interval.endTime,(.value.doubleValue // .value.int64Value // .value.distributionValue.mean // empty)] | @csv' \
+      '.timeSeries[]?.points[]? | [$t,$m,.interval.endTime,(.value.doubleValue // .value.int64Value // .value.distributionValue.count // .value.distributionValue.mean // empty)] | @csv' \
       >> "$RAW"
 
     stats="$(echo "$resp" | jq -r '
-      [ .timeSeries[]?.points[]? | (.value.doubleValue // (.value.int64Value|tonumber?) // empty) ] | sort
+      [ .timeSeries[]?.points[]? | (.value.doubleValue // (.value.int64Value|tonumber?) // (.value.distributionValue.count|tonumber?) // empty) ] | sort
       | if length==0 then "no data"
         else "n=\(length) median=\(.[(length/2)|floor]) max=\(.[length-1]) min=\(.[0])" end')"
     printf '   %-16s %s\n' "$label" "$stats" | tee -a "$OUT"

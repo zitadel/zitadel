@@ -178,6 +178,21 @@ An empty cell is honest. A cell copied from the previous version is a lie with g
 - ZITADEL feature flags
 - flowchart outcome
 
+## `git add -A` and the artefacts that are not in `.gitignore` yet
+
+Twice in two days: `benchmark/summaries` arrived from the load-test host misspelled as
+`sumaries`, which `.gitignore` did not match, and `tools/fetch-gcp-all.sh` wrote its output to
+`benchmark/bench-gcp-<stamp>/`, which `.gitignore` also did not match. The first was caught with
+`git add -A` already typed. The second was not: 27 files and 84,877 lines of collected metrics
+went into a commit alongside a three-line fix, and were only found because a later `git status`
+showed them as deleted rather than untracked.
+
+**Any new artefact path gets a `.gitignore` line in the same change that creates it**, not after
+something sweeps it up. And read what `git add -A` staged before committing, because it is
+indiscriminate by design and does not care that you only meant the one file.
+
+It was recoverable both times because nothing had been pushed. That is luck, not process.
+
 ## Cardinality, or: how k6 ate 6.8 GB
 
 k6's `url` system tag is one time series per distinct URL. Targets with ids in their paths produced
@@ -440,8 +455,11 @@ wrong. That is the failure mode worth fearing.
   CPU. Do the arithmetic against `vCPU x window` every time; if the ratio exceeds 1.0 the unit is
   not what the label claims.
 - **`ALIGN_COUNT` is invalid on a DELTA DISTRIBUTION.** Cold-start counts need `ALIGN_DELTA` and
-  `distributionValue.count`. The script reports per-metric errors and carries on rather than dying,
-  because one wrong aligner should not cost you sixteen metrics.
+  `distributionValue.count`, **and no `crossSeriesReducer` at all** -- reducer validity on
+  distributions is a second trap sitting directly behind the first. Sum the per-series counts in
+  `jq` instead. The script reports per-metric errors and carries on rather than dying, because one
+  wrong aligner should not cost you sixteen metrics. I documented this trap, left it unfixed for a
+  day, and then watched it scroll past in a live run. Documenting a bug is not fixing it.
 
 That ratio of accumulated-execution-time to wall-clock is worth keeping as a *measurement* rather
 than discarding as an artefact: it is average query concurrency. Set it against DB CPU and targets
