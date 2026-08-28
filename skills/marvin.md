@@ -397,8 +397,13 @@ refuse to write them a third time:
 
 | Script | Fills |
 | --- | --- |
+| **`tools/fetch-gcp-all.sh`** | **all of the below, plus the 503 post-mortem logs, in one run** |
 | `tools/fetch-gcp-metrics.sh` | ZITADEL metrics during test, Database metrics during test |
 | `tools/fetch-gcp-queries.sh` | Top 3 most expensive database queries, plus autovacuum log stats |
+
+Run the wrapper. It knows the service name, keeps the sweep and post-mortem outputs in separate
+directories so the second run cannot overwrite the first, reports failed steps instead of dying on
+them, and leaves a single tarball. The two lower scripts are what it calls and remain usable alone.
 
 Run them in **Cloud Shell**, which is already authenticated. Local `gcloud` reauth fails in a
 non-interactive session and no amount of glaring at it helps. The deployment: project
