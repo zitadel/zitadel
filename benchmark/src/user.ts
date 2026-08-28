@@ -154,8 +154,8 @@ export function updateHuman(
   accessToken: string,
 ): Promise<RefinedResponse<any>> {
   return new Promise((resolve, reject) => {
-    let response = http.asyncRequest('PUT', url(`/v2beta/users/${userId}`), JSON.stringify(payload), {
-      tags: { name: '/v2beta/users/{userId}' },
+    let response = http.asyncRequest('PATCH', url(`/v2/users/${userId}`), JSON.stringify(payload), {
+      tags: { name: '/v2/users/{userId}' },
       headers: {
         authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
@@ -214,7 +214,7 @@ export function createMachine(username: string, org: Org, accessToken: string): 
         }
         createMachineTrend.add(res.timings.duration);
 
-        const read = readUserAfterCreate('/v2beta/users', res.json('userId') as string, org, accessToken);
+        const read = readUserAfterCreate('/v2/users', res.json('userId') as string, org, accessToken);
         if (!read.user) {
           reject(
             `user ${res.json('userId')} not readable with login names after create ` +
@@ -323,8 +323,8 @@ export function addMachineKey(userId: string, org: Org, accessToken: string, pub
 const lockUserTrend = new Trend('lock_user_duration', true);
 export function lockUser(userId: string, org: Org, accessToken: string): Promise<RefinedResponse<any>> {
   return new Promise((resolve, reject) => {
-    let response = http.asyncRequest('POST', url(`/v2beta/users/${userId}/lock`), null, {
-      tags: { name: '/v2beta/users/{userId}/lock' },
+    let response = http.asyncRequest('POST', url(`/v2/users/${userId}/lock`), null, {
+      tags: { name: '/v2/users/{userId}/lock' },
       headers: {
         authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
@@ -349,8 +349,8 @@ export function lockUser(userId: string, org: Org, accessToken: string): Promise
 const deleteUserTrend = new Trend('delete_user_duration', true);
 export function deleteUser(userId: string, org: Org, accessToken: string): Promise<RefinedResponse<any>> {
   return new Promise((resolve, reject) => {
-    let response = http.asyncRequest('DELETE', url(`/v2beta/users/${userId}`), null, {
-      tags: { name: '/v2beta/users/{userId}' },
+    let response = http.asyncRequest('DELETE', url(`/v2/users/${userId}`), null, {
+      tags: { name: '/v2/users/{userId}' },
       headers: {
         authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',

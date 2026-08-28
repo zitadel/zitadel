@@ -19,8 +19,10 @@ export default async function (data: any) {
   // here would double count, and k6 aggregates checks by name.
   await updateHuman(
     {
-      profile: {
-        nickName: `${new Date(Date.now()).toISOString()}`,
+      human: {
+        profile: {
+          nickName: `${new Date(Date.now()).toISOString()}`,
+        },
       },
     },
     human.userId,
