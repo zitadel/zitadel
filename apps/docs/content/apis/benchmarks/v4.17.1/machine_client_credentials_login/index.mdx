@@ -29,10 +29,10 @@ Benchmark results of the v4.17.1 release of Zitadel.
 | Database                              | type: psql<br />version: v17.4                                                   |
 | Database location                     | US1                                                                              |
 | Database specification                | vCPU: 8<br/> memory: 32Gib                                                       |
-| ZITADEL metrics during test           |                                                                                  |
+| ZITADEL metrics during test           | CPU: p50 26%, p99 36% (peak 44%)<br/>Memory: p50 6%, peak 12%<br/>Instances: 7 (constant), no container startups recorded<br/>Server-side: 1,674 req/s, latency p50 46ms / p95 1.8s / p99 2.3s |
 | Observed errors                       | 1,789 of 3,073,497 requests failed (0.05%): 3x connection reset, 1,786x not individually logged (see k6 output). 1 iteration aborted on a null response body. 1,789 of 4,607,991 checks failed (0.03%): client credentials status ok (905 failed), userinfo status ok (884 failed)                                                                          |
-| Top 3 most expensive database queries |                                                                                  |
-| Database metrics during test          |                                                                                  |
+| Top 3 most expensive database queries | 1: Query events by aggregate_id and event_types, ordered by sequence (4,057 s)<br/>2: Push events (`eventstore.push`) (3,810 s)<br/>3: Query events by instance_id, aggregate_types, event_types, position (paged) (3,573 s)<br/>Ranked by total accumulated execution time summed across concurrent sessions (Cloud SQL Query Insights) — not CPU time; it can exceed the wall-clock window. |
+| Database metrics during test          | CPU: 96% median, 98% peak<br/>Memory: 40%<br/>Connections: 46<br/>Transactions: 10,804/s<br/>IOPS: read 0, write 857<br/>**CPU-saturated — the bottleneck for this target.** |
 | k6 Iterations per second              | 834                                                                       |
 | k6 output                             | [output](#k6-output)                                                             |
 | flowchart outcome                     |                                                                                  |

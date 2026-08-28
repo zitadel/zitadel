@@ -29,10 +29,10 @@ Benchmark results of the v4.17.1 release of Zitadel.
 | Database                              | type: psql<br />version: v17.4                                                   |
 | Database location                     | US1                                                                              |
 | Database specification                | vCPU: 8<br/> memory: 32Gib                                                       |
-| ZITADEL metrics during test           |                                                                                  |
+| ZITADEL metrics during test           | CPU: p50 29%, p99 46% (peak 50%)<br/>Memory: p50 6%, peak 14%<br/>Instances: 7 (constant), no container startups recorded<br/>Server-side: 3,562 req/s, latency p50 11ms / p95 863ms / p99 1.0s |
 | Observed errors                       | 29 of 6,335,633 requests failed (0.00%): 29x connection reset. 29 of 6,335,036 checks failed (0.00%): userinfo status ok (29 failed)                                                                          |
-| Top 3 most expensive database queries |                                                                                  |
-| Database metrics during test          |                                                                                  |
+| Top 3 most expensive database queries | 1: Load user with primary login name and human profile (2,135 s)<br/>2: Query events by instance_id, aggregate_types, event_types, position (paged) (1,778 s)<br/>3: Query events by aggregate_id, event_types and created_at (474 s)<br/>Ranked by total accumulated execution time summed across concurrent sessions (Cloud SQL Query Insights) — not CPU time; it can exceed the wall-clock window. |
+| Database metrics during test          | CPU: 86% median, 95% peak<br/>Memory: 40%<br/>Connections: 46<br/>Transactions: 21,329/s<br/>IOPS: read 0, write 12<br/>**CPU-saturated — the bottleneck for this target.** |
 | k6 Iterations per second              | 3452                                                                       |
 | k6 output                             | [output](#k6-output)                                                             |
 | flowchart outcome                     |                                                                                  |

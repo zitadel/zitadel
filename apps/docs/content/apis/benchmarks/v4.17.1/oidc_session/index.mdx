@@ -29,10 +29,10 @@ Benchmark results of the v4.17.1 release of Zitadel.
 | Database                              | type: psql<br />version: v17.4                                                   |
 | Database location                     | US1                                                                              |
 | Database specification                | vCPU: 8<br/> memory: 32Gib                                                       |
-| ZITADEL metrics during test           |                                                                                  |
+| ZITADEL metrics during test           | CPU: p50 20%, p99 34% (peak 37%)<br/>Memory: p50 6%, peak 12%<br/>Instances: 7 (constant), no container startups recorded<br/>Server-side: 1,001 req/s, latency p50 59ms / p95 2.8s / p99 3.3s |
 | Observed errors                       | 3 of 1,767,162 requests failed (0.00%): 2x connection reset, 1x not individually logged (see k6 output). 3 of 2,355,414 checks failed (0.00%): add Session status ok (1 failed), finalize auth request status ok (2 failed)                                                                          |
-| Top 3 most expensive database queries |                                                                                  |
-| Database metrics during test          |                                                                                  |
+| Top 3 most expensive database queries | 1: Push events (`eventstore.push`) (3,945 s)<br/>2: Query events by instance_id, aggregate_types, event_types, position (paged) (3,572 s)<br/>3: Shared advisory lock on `events2`, taken by every push — **lock wait** (1,973 s)<br/>Ranked by total accumulated execution time summed across concurrent sessions (Cloud SQL Query Insights) — not CPU time; it can exceed the wall-clock window. |
+| Database metrics during test          | CPU: 92% median, 94% peak<br/>Memory: 40%<br/>Connections: 46<br/>Transactions: 10,721/s<br/>IOPS: read 1, write 1,086<br/>**CPU-saturated — the bottleneck for this target.** |
 | k6 Iterations per second              | 326                                                                       |
 | k6 output                             | [output](#k6-output)                                                             |
 | flowchart outcome                     |                                                                                  |

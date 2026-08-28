@@ -29,10 +29,10 @@ Benchmark results of the v4.17.1 release of Zitadel.
 | Database                              | type: psql<br />version: v17.4                                                   |
 | Database location                     | US1                                                                              |
 | Database specification                | vCPU: 8<br/> memory: 32Gib                                                       |
-| ZITADEL metrics during test           |                                                                                  |
+| ZITADEL metrics during test           | CPU: p50 9%, p99 20% (peak 22%)<br/>Memory: p50 6%, peak 14%<br/>Instances: 7 (constant), no container startups recorded<br/>Server-side: 256 req/s, latency p50 2.8s / p95 8.4s / p99 9.3s |
 | Observed errors                       | 182 of 466,756 requests failed (0.03%): none of the 182 individually logged (see k6 output). 182 of 466,159 checks failed (0.03%): add Session status ok (56 failed), set Session status ok (126 failed)                                                                          |
-| Top 3 most expensive database queries |                                                                                  |
-| Database metrics during test          |                                                                                  |
+| Top 3 most expensive database queries | 1: Projection handler advisory lock, one per projection per instance — **lock wait, not query work** (13,149 s)<br/>2: Query events by instance_id, aggregate_types, event_types, position (paged) (3,760 s)<br/>3: Load user with primary login name and human profile (1,615 s)<br/>Ranked by total accumulated execution time summed across concurrent sessions (Cloud SQL Query Insights) — not CPU time; it can exceed the wall-clock window. |
+| Database metrics during test          | CPU: 63% median, 64% peak<br/>Memory: 40%<br/>Connections: 46<br/>Transactions: 3,554/s<br/>IOPS: read 3, write 860 |
 | k6 Iterations per second              | 84                                                                       |
 | k6 output                             | [output](#k6-output)                                                             |
 | flowchart outcome                     |                                                                                  |
