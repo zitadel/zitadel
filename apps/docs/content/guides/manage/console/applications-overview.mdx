@@ -170,7 +170,7 @@ The **Use new login UI** checkbox and **Custom base URL for the new Login UI** f
 
 * **Checkbox Behavior:** This checkbox only has an effect when the instance-level Login V2 feature flag is **disabled**. When the instance-wide feature is off, checking this box enables Login V2 specifically for this application while other applications continue using Login V1.
 
-* **Custom Base URL:** This field is used when you're running a self-hosted Login UI at a different domain (e.g., `https://login.acme.com`). If you leave this field empty, ZITADEL redirects to its built-in `/ui/v2/login` endpoint.
+* **Custom Base URL:** This field is used when you're self-hosting the Login UI at a different domain (e.g., `https://login.acme.com`). If you leave this field empty, ZITADEL redirects to its built-in `/ui/v2/login` endpoint.
 
 <Callout type="info">
 If the instance-level Login V2 feature flag is already enabled, all applications use Login V2 by default, and the checkbox has no effect. The feature flag takes precedence over per-application settings. Note that enabling this flag makes the console unreachable if the `zitadel-login` container is not deployed and routed, as the console depends on it.
