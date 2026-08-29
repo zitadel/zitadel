@@ -192,13 +192,23 @@ func (s *Server) jwtProfileUserCheck(ctx context.Context, resourceOwner *string,
 
 // validateTokenExchangeScopes picks the scope rule set for this exchange.
 // scopelessActorPath selects impersonation rules (user_id/id_token subjects
-// on the actor path); otherwise every requested scope must ⊆ subject ∪ actor.
+// on the actor path); otherwise every requested scope must ⊆ subject ∪ actor,
+// with OrgRoleIDScope handled as a downscoping filter (see
+// applyOrgRoleIDScopeDownscoping).
 func validateTokenExchangeScopes(
 	client *Client,
 	requestedScopes, subjectScopes, actorScopes []string,
 	scopelessActorPath bool,
 ) ([]string, error) {
 	requestedScopes = normalizeRequestedScopes(requestedScopes)
+	// Reject a client-requested bare prefix only. Input tokens may still carry
+	// it (authorize accepts it); empty-request fallback inherits that ceiling.
+	for _, scope := range requestedScopes {
+		if scope == domain.OrgRoleIDScope {
+			return nil, oidc.ErrInvalidScope().
+				WithDescription("scope %q requires an organization id", scope)
+		}
+	}
 
 	if scopelessActorPath {
 		return validateImpersonationTokenExchangeScopes(client, requestedScopes, subjectScopes, actorScopes)
@@ -212,9 +222,11 @@ func validateTokenExchangeScopes(
 // This covers standard exchange (actor == subject) and actor-path exchanges with
 // access/JWT subject tokens. Actor-path exchanges with scope-less subjects
 // (user_id, id_token) use validateImpersonationTokenExchangeScopes instead.
-// Rule: every scope must be present on the subject or actor token (union).
-// For standard exchange both lists are identical, so this is effectively
-// "subset of subject token only".
+//
+// Non-restriction scopes must be present on subject ∪ actor. OrgRoleIDScope is
+// validated separately against the subject token's filter ceiling so a broad
+// subject can be narrowed, but a previously narrowed subject filter cannot be
+// widened (actor filters are ignored on this path).
 func validateUnionTokenExchangeScopes(
 	client *Client,
 	requestedScopes, subjectScopes, actorScopes []string,
@@ -227,10 +239,18 @@ func validateUnionTokenExchangeScopes(
 	}
 
 	for _, scope := range requestedScopes {
+		if isTokenExchangeRestrictionScope(scope) {
+			continue
+		}
 		if !scopeInUnion(scope, subjectScopes, actorScopes) {
 			return nil, oidc.ErrInvalidScope().
 				WithDescription("scope %q not found in subject or actor token", scope)
 		}
+	}
+
+	requestedScopes, err := applyOrgRoleIDScopeDownscoping(requestedScopes, subjectScopes)
+	if err != nil {
+		return nil, err
 	}
 
 	return op.ValidateAuthReqScopes(client, requestedScopes)
@@ -240,8 +260,9 @@ func validateUnionTokenExchangeScopes(
 // cannot carry scopes (user_id, id_token). The actor token authorizes the
 // request; impersonation permission is checked later in CreateOIDCSession.
 //
-// Two scope classes:
+// Scope classes:
 //   - authorization scopes: privilege/audience/roles — must be on input tokens
+//   - restriction scopes: OrgRoleIDScope filter — downscope-only vs actor filters
 //   - subject-data scopes: user claims (email, profile, …) — client allowlist only
 func validateImpersonationTokenExchangeScopes(
 	client *Client,
@@ -260,8 +281,14 @@ func validateImpersonationTokenExchangeScopes(
 				WithDescription("scope %q not found in subject or actor token", scope)
 		}
 
-		// Subject-data scopes (openid, profile, email, urn:zitadel:iam:user:*, …)
-		// skip the union check — validated by client allowlist below.
+		// Restriction and subject-data scopes skip the union check —
+		// restriction scopes are validated below; subject-data by client allowlist.
+	}
+
+	// Subject cannot carry scopes; the actor filter is the only available ceiling.
+	requestedScopes, err := applyOrgRoleIDScopeDownscoping(requestedScopes, actorScopes)
+	if err != nil {
+		return nil, err
 	}
 
 	return op.ValidateAuthReqScopes(client, requestedScopes)
@@ -278,8 +305,60 @@ func scopeInUnion(scope string, subjectScopes, actorScopes []string) bool {
 	return slices.Contains(subjectScopes, scope) || slices.Contains(actorScopes, scope)
 }
 
+// isTokenExchangeRestrictionScope identifies scopes that only filter token
+// claims. They may be newly requested when the input tokens are unfiltered,
+// but must not expand an existing filter — see applyOrgRoleIDScopeDownscoping.
+func isTokenExchangeRestrictionScope(scope string) bool {
+	return strings.HasPrefix(scope, domain.OrgRoleIDScope)
+}
+
+// orgRoleIDScopes returns the OrgRoleIDScope entries from scopes, preserving order
+// and dropping duplicates.
+func orgRoleIDScopes(scopes []string) []string {
+	var out []string
+	for _, scope := range scopes {
+		if !isTokenExchangeRestrictionScope(scope) {
+			continue
+		}
+		if !slices.Contains(out, scope) {
+			out = append(out, scope)
+		}
+	}
+	return out
+}
+
+// applyOrgRoleIDScopeDownscoping enforces that OrgRoleIDScope can only narrow
+// role-org filters relative to ceilingScopes (the caller's chosen ceiling):
+//   - union / standard exchange passes the subject token scopes
+//   - impersonation (scopeless subject) passes the actor token scopes
+//
+// Rules:
+//   - ceiling unfiltered → any requested filter is allowed (broad → narrow)
+//   - ceiling filtered → requested filters must be ⊆ that set
+//   - ceiling filtered but request omits the filter → inherit the ceiling
+//     (omitting would otherwise re-widen role claims to all granted orgs)
+func applyOrgRoleIDScopeDownscoping(requested, ceilingScopes []string) ([]string, error) {
+	allowed := orgRoleIDScopes(ceilingScopes)
+	requestedFilters := orgRoleIDScopes(requested)
+
+	if len(allowed) == 0 {
+		return requested, nil
+	}
+	if len(requestedFilters) == 0 {
+		return append(slices.Clone(requested), allowed...), nil
+	}
+	for _, scope := range requestedFilters {
+		if !slices.Contains(allowed, scope) {
+			return nil, oidc.ErrInvalidScope().
+				WithDescription("scope %q expands org role filter beyond the permitted downscope set", scope)
+		}
+	}
+	return requested, nil
+}
+
 // isTokenExchangeAuthorizationScope identifies scopes that control what a token
 // may do (audiences, refresh, roles), not which user claims to embed.
+// Restriction scopes are intentionally excluded — see isTokenExchangeRestrictionScope.
 func isTokenExchangeAuthorizationScope(scope string) bool {
 	switch scope {
 	case oidc.ScopeOfflineAccess, ScopeProjectsRoles:
@@ -295,9 +374,6 @@ func isTokenExchangeAuthorizationScope(scope string) bool {
 		return true
 	}
 	if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
-		return true
-	}
-	if strings.HasPrefix(scope, domain.OrgRoleIDScope) {
 		return true
 	}
 	if strings.HasPrefix(scope, domain.SelectIDPScope) {

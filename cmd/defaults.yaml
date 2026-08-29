@@ -701,11 +701,6 @@ OIDC:
     # Lifetime of the token used to notify clients through OIDC back-channel logout.
     TokenLifetime: 15m # ZITADEL_OIDC_BACKCHANNELLOGOUT_TOKENLIFETIME
 
-WellKnown:
-  # HTTP Cache-Control max-age for /.well-known/apple-app-site-association and
-  # /.well-known/assetlinks.json. 0 sets Cache-Control: no-store.
-  AppLinksCacheControlMaxAge: 5m # ZITADEL_WELLKNOWN_APPLINKSCACHECONTROLMAXAGE
-
 SAML:
   DefaultLoginURLV2: "/ui/v2/login/login?samlRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2
   ProviderConfig:

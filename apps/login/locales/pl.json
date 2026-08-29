@@ -457,6 +457,7 @@
     "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie.",
     "failedLoading": "Nie udało się załadować danych. Spróbuj ponownie.",
     "tryagain": "Spróbuj ponownie",
-    "couldNotContinueSession": "Nie udało się kontynuować sesji - brak informacji o użytkowniku"
+    "couldNotContinueSession": "Nie udało się kontynuować sesji - brak informacji o użytkowniku",
+    "couldNotClearSession": "Nie udało się zakończyć sesji. Spróbuj ponownie."
   }
 }
