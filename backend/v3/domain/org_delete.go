@@ -16,7 +16,8 @@ import (
 type DeleteOrgCommand struct {
 	OrganizationName string `json:"organization_name"`
 	Domains          []*OrganizationDomain
-	ID               string `json:"id"`
+	ProjectNames     []string `json:"project_names"`
+	ID               string   `json:"id"`
 }
 
 func NewDeleteOrgCommand(organizationID string) *DeleteOrgCommand {
@@ -91,6 +92,7 @@ func (cmd *DeleteOrgCommand) Events(ctx context.Context, opts *InvokeOpts) ([]ev
 			domainNames,
 			externalIDPLinks,
 			samlEntityIDs,
+			cmd.ProjectNames,
 		),
 	}, nil
 }
@@ -109,6 +111,19 @@ func (cmd *DeleteOrgCommand) Execute(ctx context.Context, opts *InvokeOpts) (err
 	}
 	cmd.OrganizationName = orgToDelete.Name
 	cmd.Domains = orgToDelete.Domains
+
+	projectRepo := opts.projectRepo
+	projects, err := projectRepo.List(ctx, opts.DB(), database.WithCondition(database.And(
+		projectRepo.InstanceIDCondition(instance.InstanceID()),
+		projectRepo.OrganizationIDCondition(cmd.ID),
+	)))
+	if err != nil {
+		return err
+	}
+	cmd.ProjectNames = make([]string, len(projects))
+	for i, project := range projects {
+		cmd.ProjectNames[i] = project.Name
+	}
 
 	deletedRows, err := orgRepo.Delete(ctx, opts.DB(),
 		orgRepo.PrimaryKeyCondition(authz.GetInstance(ctx).InstanceID(), cmd.ID),
