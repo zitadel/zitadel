@@ -33,6 +33,7 @@ import crypto from "crypto";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { getFingerprintIdCookie } from "../fingerprint";
+import { getEnrollmentAuthorizationError } from "./enrollment-guard";
 import { createNewSessionFromIdpIntent } from "./idp";
 import { syncInstanceRolesFromIdpIntent } from "./instance-roles";
 
@@ -312,7 +313,7 @@ async function resolveUserIdFromSession({
       return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
     }
 
-    return { userId: session.factors.user.id };
+    return { userId: session.factors.user.id, session };
   } catch (error) {
     logger.warn("Error retrieving session for linking", { error });
     return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
@@ -345,13 +346,17 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
     }
 
     // 2. Retrieve Session & Resolve User
-    const { userId: resolvedUserId, redirect: sessionRedirect } = await resolveUserIdFromSession({
+    const {
+      userId: resolvedUserId,
+      redirect: sessionRedirect,
+      session: linkingSession,
+    } = await resolveUserIdFromSession({
       sessionId,
       serviceConfig,
       provider,
     });
 
-    if (sessionRedirect || !resolvedUserId) {
+    if (sessionRedirect || !resolvedUserId || !linkingSession) {
       return { redirect: sessionRedirect || `/idp/${provider}/linking-failed?error=session_invalid` };
     }
 
@@ -381,6 +386,19 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
 
       if (!isAllowed) {
         logger.error("IDP linking validation failed");
+        const params = buildRedirectParams();
+        return { redirect: `/idp/${provider}/linking-failed?${params}&error=validation_failed` };
+      }
+
+      // An identify-only session (only the user factor set) must not be able to attach a new
+      // identity provider to the account. Require a verified primary factor before linking.
+      const enrollmentError = await getEnrollmentAuthorizationError({
+        serviceConfig,
+        session: linkingSession,
+        userId: resolvedUserId,
+      });
+      if (enrollmentError) {
+        logger.error("IDP linking not authorized for identify-only session", { error: enrollmentError });
         const params = buildRedirectParams();
         return { redirect: `/idp/${provider}/linking-failed?${params}&error=validation_failed` };
       }
