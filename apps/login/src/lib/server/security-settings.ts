@@ -86,27 +86,25 @@ export async function getIframeOrigins(
 
 async function fetchIframeOrigins(baseUrl: string, instanceHost?: string, publicHost?: string): Promise<string[] | null> {
   const token = await resolveAuthToken();
-  const reqHeaders: Record<string, string> = {
+  // Headers (not a plain object) so CUSTOM_REQUEST_HEADERS entries replace
+  // derived headers regardless of name casing instead of duplicating them
+  const reqHeaders = new Headers({
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
-  };
+  });
 
   // Apply instance/public host headers — same pattern as createServerTransport
   if (instanceHost) {
-    reqHeaders["x-zitadel-instance-host"] = instanceHost;
+    reqHeaders.set("x-zitadel-instance-host", instanceHost);
   }
   if (publicHost) {
-    reqHeaders["x-zitadel-public-host"] = publicHost;
+    reqHeaders.set("x-zitadel-public-host", publicHost);
   }
 
   // Apply custom headers from environment
   applyCustomHeaders({
-    set: (key, value) => {
-      reqHeaders[key] = value;
-    },
-    remove: (key) => {
-      delete reqHeaders[key];
-    },
+    set: (key, value) => reqHeaders.set(key, value),
+    remove: (key) => reqHeaders.delete(key),
   });
 
   const response = await fetch(`${baseUrl}/zitadel.settings.v2.SettingsService/GetSecuritySettings`, {
