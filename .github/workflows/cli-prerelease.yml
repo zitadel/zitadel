@@ -1,0 +1,62 @@
+name: CLI Pre-Release (Snapshot)
+
+on:
+  push:
+    branches:
+      - poc-cli
+    paths:
+      - "apps/cli/**"
+      - ".goreleaser.yml"
+      - ".github/workflows/cli-prerelease.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate proto code
+        run: pnpm nx run @zitadel/cli:generate
+
+      - name: Run GoReleaser Snapshot
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: build --snapshot --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload CLI Binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: zitadel-cli-snapshot
+          path: |
+            .artifacts/cli/zitadel-cli_*/
+          retention-days: 14
