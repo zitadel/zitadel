@@ -270,6 +270,7 @@ RegistrationUser:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: vietnamesiska
   GenderLabel: Kön
   Female: Man
   Male: Kvinna
@@ -284,7 +285,6 @@ RegistrationUser:
   ExternalLogin: eller registrera dig med ett extern användarkonto
   BackButtonText: Logga in
   NextButtonText: Fortsätt
-
 ExternalRegistrationUserOverview:
   Title: Registrering via externt konto
   Description: Vi har fyllt i den information som fanns från det exrna kontot. Du kan komplettera eler ändra den här.
@@ -317,6 +317,7 @@ ExternalRegistrationUserOverview:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: vietnamesiska
   TosAndPrivacyLabel: Användarvillkor
   TosConfirm: Jag accepterar
   TosLinkText: Användarvillkoren
@@ -325,7 +326,6 @@ ExternalRegistrationUserOverview:
   ExternalLogin: or register with an external user
   BackButtonText: Tillbaka
   NextButtonText: Spara
-
 RegistrationOrg:
   Title: Registrering av organisation
   Description: Ange din organisation-data
@@ -398,6 +398,7 @@ ExternalNotFound:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: vietnamesiska
 DeviceAuth:
   Title: Tillgång från hårdvaruenhet
   UserCode:

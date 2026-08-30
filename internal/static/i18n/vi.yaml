@@ -1,0 +1,1457 @@
+Errors:
+  Internal: Đã xảy ra lỗi nội bộ
+  NoChangesFound: Không có thay đổi
+  OriginNotAllowed: '"Xuất xứ" này không được phép'
+  IDMissing: Thiếu ID
+  ResourceOwnerMissing: Thiếu tổ chức chủ sở hữu tài nguyên
+  RemoveFailed: Không thể xóa được
+  PermissionDenied: Quyền bị từ chối
+  ProjectionName:
+    Invalid: Tên phép chiếu không hợp lệ
+  Assets:
+    EmptyKey: Khóa nội dung trống
+    Store:
+      NotInitialized: Bộ nhớ tài sản chưa được khởi tạo
+      NotConfigured: Kho lưu trữ tài sản chưa được định cấu hình
+    Bucket:
+      Internal: Lỗi nội bộ khi tạo nhóm
+      AlreadyExists: Nhóm đã tồn tại
+      CreateFailed: Nhóm chưa được tạo
+      ListFailed: Không thể đọc được nhóm
+      RemoveFailed: Nhóm chưa bị xóa
+      SetPublicFailed: Không thể đặt nhóm thành công khai
+    Object:
+      PutFailed: Đối tượng chưa được tạo
+      GetFailed: Không thể đọc được đối tượng
+      NotFound: Không thể tìm thấy đối tượng
+      PresignedTokenFailed: Không thể tạo mã thông báo đã ký
+      ListFailed: Danh sách đối tượng không thể đọc được
+      RemoveFailed: Không thể xóa đối tượng
+  Limit:
+    ExceedsDefault: Giới hạn vượt quá giới hạn mặc định
+  Limits:
+    NotFound: Không tìm thấy giới hạn
+    NoneSpecified: Không có giới hạn nào được chỉ định
+    Instance:
+      Blocked: Phiên bản bị chặn
+  Restrictions:
+    NoneSpecified: Không có hạn chế nào được chỉ định
+    DefaultLanguageMustBeAllowed: Ngôn ngữ mặc định phải được cho phép
+  Language:
+    NotParsed: Không thể phân tích ngôn ngữ
+    NotSupported: Ngôn ngữ không được hỗ trợ
+    NotAllowed: Ngôn ngữ không được phép
+    Undefined: Ngôn ngữ không được xác định
+    Duplicate: Ngôn ngữ có bản sao
+  OIDCSettings:
+    NotFound: Không tìm thấy cấu hình OIDC
+    AlreadyExists: Cấu hình OIDC đã tồn tại
+  SecretGenerator:
+    AlreadyExists: Trình tạo bí mật đã tồn tại
+    TypeMissing: Loại trình tạo bí mật bị thiếu
+    NotFound: Không tìm thấy trình tạo bí mật
+  SMSConfig:
+    NotFound: Không tìm thấy cấu hình SMS
+    AlreadyActive: Cấu hình SMS đã hoạt động
+    AlreadyDeactivated: Cấu hình SMS đã bị vô hiệu hóa
+    NotExternalVerification: Cấu hình SMS không hỗ trợ xác minh mã
+  SMTP:
+    NotEmailMessage: tin nhắn không phải là EmailMessage
+    RequiredAttributes: chủ đề, người nhận và nội dung phải được đặt nhưng một số
+      hoặc tất cả chúng đều trống
+    CouldNotSplit: không thể phân chia máy chủ và cổng để kết nối với smtp
+    CouldNotDial: không liên lạc được với máy chủ SMTP, kiểm tra cổng, tường lửa có
+      vấn đề...
+    CouldNotDialTLS: không liên lạc được với máy chủ SMTP bằng TLS, kiểm tra cổng,
+      tường lửa...
+    CouldNotCreateClient: không thể tạo ứng dụng khách smtp
+    CouldNotStartTLS: không thể bắt đầu tls
+    CouldNotAuth: không thể thêm smtp auth, hãy kiểm tra xem cả người dùng và mật
+      khẩu của bạn đều đúng hay không, nếu đúng thì có thể nhà cung cấp của bạn yêu
+      cầu phương thức xác thực không được Zitadel hỗ trợ
+    CouldNotSetSender: không thể đặt người gửi
+    CouldNotSetRecipient: không thể đặt người nhận
+  SMTPConfig:
+    TestPassword: Không tìm thấy mật khẩu kiểm tra
+    NotFound: Không tìm thấy cấu hình SMTP
+    AlreadyExists: Cấu hình SMTP đã tồn tại
+    AlreadyDeactivated: Cấu hình SMTP đã bị vô hiệu hóa
+    SenderAdressNotCustomDomain: Địa chỉ người gửi phải được định cấu hình là Miền
+      tùy chỉnh trên phiên bản.
+    TestEmailNotFound: Không tìm thấy địa chỉ email để kiểm tra
+  Notification:
+    NoDomain: Không tìm thấy tên miền cho tin nhắn
+  User:
+    NotFound: Không thể tìm thấy người dùng
+    AlreadyExists: Người dùng đã tồn tại
+    NotFoundOnOrg: Không thể tìm thấy người dùng trên tổ chức đã chọn
+    NotAllowedOrg: Người dùng không phải là thành viên của tổ chức được yêu cầu
+    UserIDMissing: Thiếu ID người dùng
+    UserIDWrong: Người dùng yêu cầu không bằng người dùng được xác thực
+    DomainPolicyNil: Chính sách tổ chức trống
+    EmailAsUsernameNotAllowed: Email không được phép làm tên người dùng
+    Invalid: Dữ liệu người dùng không hợp lệ
+    DomainNotAllowedAsUsername: Tên miền đã được bảo lưu và không thể sử dụng được
+    AlreadyInactive: Người dùng đã không hoạt động
+    NotInactive: Người dùng không hoạt động
+    CantDeactivateInitial: Người dùng có trạng thái ban đầu chỉ có thể bị xóa mà không
+      bị vô hiệu hóa
+    ShouldBeActiveOrInitial: Người dùng không hoạt động hoặc viết tắt
+    AlreadyInitialised: Người dùng đã được khởi tạo
+    NotInitialised: Người dùng chưa được khởi tạo
+    NotLocked: Người dùng không bị khóa
+    NoChanges: Không tìm thấy thay đổi nào
+    InitCodeNotFound: Không tìm thấy mã khởi tạo
+    UsernameNotChanged: Tên người dùng không thay đổi
+    InvalidURLTemplate: Mẫu URL không hợp lệ
+    Locked: Người dùng đã bị khóa
+    Profile:
+      NotFound: Không tìm thấy hồ sơ
+      NotChanged: Hồ sơ không thay đổi
+      Empty: Hồ sơ trống
+      FirstNameEmpty: Tên trong hồ sơ trống
+      LastNameEmpty: Họ trong hồ sơ trống
+      IDMissing: ID hồ sơ bị thiếu
+    Email:
+      NotFound: Không tìm thấy email
+      Invalid: Email không hợp lệ
+      AlreadyVerified: Email đã được xác minh
+      NotChanged: Email không thay đổi
+      Empty: Email trống
+      IDMissing: ID email bị thiếu
+    Phone:
+      NotFound: Không tìm thấy điện thoại
+      Invalid: Điện thoại không hợp lệ
+      AlreadyVerified: Điện thoại đã được xác minh
+      Empty: Điện thoại trống
+      NotChanged: Điện thoại không đổi
+      VerifyingRemovalIsNotSupported: Xác minh việc xóa điện thoại không được hỗ trợ
+    Address:
+      NotFound: Không tìm thấy địa chỉ
+      NotChanged: Địa chỉ không thay đổi
+    Machine:
+      Key:
+        NotFound: Không tìm thấy chìa khóa máy
+        AlreadyExisting: Chìa khóa máy đã có sẵn
+        Invalid: Khóa công khai không phải là khóa công khai RSA hợp lệ ở định dạng
+          PKIX với mã hóa PEM
+      Secret:
+        NotExisting: Bí mật không tồn tại
+        Invalid: Bí mật không hợp lệ
+        CouldNotGenerate: Không thể tạo bí mật
+    PAT:
+      NotFound: Không tìm thấy mã thông báo truy cập cá nhân
+    Metadata:
+      Conflicting: Không được đặt siêu dữ liệu trên cả trường người dùng và trường
+        con người
+    NotHuman: Người dùng phải là cá nhân
+    NotMachine: Người dùng phải có kỹ thuật
+    WrongType: Không được phép đối với loại người dùng này
+    NotAllowedToLink: Người dùng không được phép liên kết với nhà cung cấp đăng nhập
+      bên ngoài
+    Username:
+      AlreadyExists: Tên người dùng đã được sử dụng
+      Reserved: Tên người dùng đã được sử dụng
+      Empty: Tên người dùng trống
+    Code:
+      Empty: Mã trống
+      NotFound: Không tìm thấy mã
+      Expired: Mã đã hết hạn
+      GeneratorAlgNotSupported: Thuật toán tạo không được hỗ trợ
+      Invalid: Mã không hợp lệ
+    Password:
+      NotFound: Không tìm thấy mật khẩu
+      Empty: Mật khẩu trống
+      Invalid: Mật khẩu không hợp lệ
+      NotSet: Người dùng chưa đặt mật khẩu
+      NotChanged: Mật khẩu mới không được giống với mật khẩu hiện tại của bạn
+      NotSupported: Mã hóa băm mật khẩu không được hỗ trợ. Hãy xem https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
+    PasswordComplexityPolicy:
+      NotFound: Không tìm thấy chính sách mật khẩu
+      MinLength: Mật khẩu quá ngắn
+      MinLengthNotAllowed: Độ dài tối thiểu nhất định là không được phép
+      HasLower: Mật khẩu phải chứa chữ thường
+      HasUpper: Mật khẩu phải chứa chữ hoa
+      HasNumber: Mật khẩu phải chứa số
+      HasSymbol: Mật khẩu phải chứa ký hiệu
+    ExternalIDP:
+      Invalid: IDP bên ngoài không hợp lệ
+      IDPConfigNotExisting: Nhà cung cấp IDP không hợp lệ đối với tổ chức này
+      NotAllowed: IDP bên ngoài không được phép
+      MinimumExternalIDPNeeded: Phải thêm ít nhất một IDP
+      AlreadyExists: IDP bên ngoài đã được sử dụng
+      NotFound: Không tìm thấy IDP bên ngoài
+      LoginFailed: Đăng nhập tại IDP bên ngoài không thành công
+    MFA:
+      OTP:
+        AlreadyReady: Multifactor OTP (OneTimePassword) đã được thiết lập
+        NotExisting: OTP đa yếu tố (OneTimePassword) không tồn tại
+        NotReady: OTP đa yếu tố (OneTimePassword) chưa sẵn sàng
+        InvalidCode: Mã không hợp lệ
+      U2F:
+        NotExisting: U2F không tồn tại
+      Passwordless:
+        NotExisting: Mật mã không tồn tại
+      RecoveryCodes:
+        Empty: Mã khôi phục trống
+        InvalidCode: Mã khôi phục được cung cấp không hợp lệ
+        MaxCountExceeded: Đã vượt quá số lượng mã khôi phục tối đa
+        NotReady: Mã khôi phục chưa sẵn sàng để sử dụng
+        ConfigInvalid: Cấu hình mã khôi phục không hợp lệ
+    WebAuthN:
+      NotFound: Không thể tìm thấy Mã thông báo WebAuthN
+      BeginRegisterFailed: WebAuthN bắt đầu đăng ký không thành công
+      MarshalError: Lỗi về dữ liệu soái ca
+      ErrorOnParseCredential: Lỗi phân tích dữ liệu thông tin xác thực
+      CreateCredentialFailed: Lỗi khi tạo thông tin xác thực
+      BeginLoginFailed: WebAuthN bắt đầu đăng nhập không thành công
+      ValidateLoginFailed: Lỗi khi xác thực thông tin đăng nhập
+      CloneWarning: Thông tin xác thực có thể được sao chép
+    RefreshToken:
+      Invalid: Mã thông báo làm mới không hợp lệ
+      NotFound: Không tìm thấy mã thông báo làm mới
+  Org:
+    AlreadyExists: Tên hoặc id của tổ chức đã được sử dụng
+    Invalid: Tổ chức không hợp lệ
+    AlreadyDeactivated: Tổ chức đã bị vô hiệu hóa
+    AlreadyActive: Tổ chức đã hoạt động
+    Empty: Tổ chức trống
+    NotFound: Không tìm thấy tổ chức
+    NotChanged: Tổ chức không thay đổi
+    DefaultOrgNotDeletable: Tổ chức mặc định không được phép xóa
+    ZitadelOrgNotDeletable: Không được xóa tổ chức có dự án Zitadel
+    InvalidDomain: Tên miền không hợp lệ
+    DomainMissing: Tên miền bị thiếu
+    DomainNotOnOrg: Tên miền không tồn tại trên tổ chức
+    DomainNotVerified: Tên miền chưa được xác minh
+    DomainAlreadyVerified: Tên miền đã được xác minh
+    DomainVerificationTypeInvalid: Loại xác minh tên miền không hợp lệ
+    DomainVerificationMissing: Quá trình xác minh tên miền chưa bắt đầu
+    DomainVerificationFailed: Xác minh tên miền không thành công
+    DomainVerificationTXTNotFound: Không tìm thấy bản ghi TXT _zitadel-challenge cho
+      miền của bạn. Kiểm tra xem bạn đã thêm nó vào máy chủ DNS của mình chưa hay
+      đợi cho đến khi bản ghi mới được phổ biến
+    DomainVerificationTXTNoMatch: Đã tìm thấy bản ghi TXT _zitadel-challenge cho miền
+      của bạn nhưng nó không chứa văn bản mã thông báo phù hợp. Kiểm tra xem bạn đã
+      thêm đúng mã thông báo vào máy chủ DNS của mình chưa hay đợi cho đến khi bản
+      ghi mới được truyền bá
+    DomainVerificationHTTPNotFound: Không tìm thấy tệp chứa thử thách trong URL dự
+      kiến. Kiểm tra xem bạn đã tải tệp lên đúng nơi có quyền đọc chưa
+    DomainVerificationHTTPNoMatch: Tệp chứa thử thách đã được tìm thấy trong URL dự
+      kiến ​​nhưng tệp này không chứa văn bản mã thông báo phù hợp. Kiểm tra nội dung
+      của nó
+    DomainVerificationTimeout: Đã hết thời gian chờ truy vấn máy chủ DNS
+    PrimaryDomainNotDeletable: Tên miền tổ chức không được phép xóa
+    DomainNotFound: Không tìm thấy tên miền
+    MemberIDMissing: Thiếu ID thành viên
+    MemberNotFound: Không tìm thấy thành viên tổ chức
+    InvalidMember: Thành viên tổ chức không hợp lệ
+    UserIDMissing: Thiếu ID người dùng
+    PolicyAlreadyExists: Chính sách đã tồn tại
+    PolicyNotExisting: Chính sách không tồn tại
+    IdpInvalid: Cấu hình IDP không hợp lệ
+    IdpNotExisting: Cấu hình IDP không tồn tại
+    OIDCConfigInvalid: Cấu hình IDP OIDC không hợp lệ
+    IdpIsNotOIDC: Cấu hình IDP không thuộc loại oidc
+    Domain:
+      AlreadyExists: Tên miền đã tồn tại
+      InvalidCharacter: Chỉ các ký tự chữ và số, . và - được phép cho một tên miền
+      EmptyString: Các ký tự không phải số và chữ cái không hợp lệ đã được thay thế
+        bằng khoảng trắng và miền kết quả là một chuỗi trống
+    LoginPolicy:
+      NotFound: Không tìm thấy Chính sách đăng nhập
+      Invalid: Chính sách đăng nhập không hợp lệ
+      RedirectURIInvalid: URI chuyển hướng mặc định không hợp lệ
+      NotExisting: Chính sách đăng nhập không tồn tại
+      AlreadyExists: Chính sách đăng nhập đã tồn tại
+      IdpProviderAlreadyExisting: Nhà cung cấp danh tính đã tồn tại
+      IdpProviderNotExisting: Nhà cung cấp danh tính không tồn tại
+      RegistrationNotAllowed: Không được phép đăng ký
+      UsernamePasswordNotAllowed: Không được phép đăng nhập bằng Tên đăng nhập / Mật
+        khẩu
+      MFA:
+        AlreadyExists: Đa yếu tố đã tồn tại
+        NotExisting: Đa yếu tố không tồn tại
+        Unspecified: Đa yếu tố không hợp lệ
+    MailTemplate:
+      NotFound: Không tìm thấy mẫu thư mặc định
+      NotChanged: Mẫu thư mặc định chưa được thay đổi
+      AlreadyExists: Mẫu thư mặc định đã tồn tại
+      Invalid: Mẫu thư mặc định không hợp lệ
+    CustomMessageText:
+      NotFound: Tin nhắn mặc định Không tìm thấy nội dung
+      NotChanged: Nội dung tin nhắn mặc định chưa được thay đổi
+      AlreadyExists: Nội dung tin nhắn mặc định đã tồn tại
+      Invalid: Nội dung tin nhắn mặc định không hợp lệ
+    PasswordComplexityPolicy:
+      NotFound: Không tìm thấy chính sách về độ phức tạp của mật khẩu
+      Empty: Chính sách về độ phức tạp của mật khẩu trống
+      NotExisting: Chính sách về độ phức tạp của mật khẩu không tồn tại
+      AlreadyExists: Chính sách phức tạp về mật khẩu đã tồn tại
+    PasswordLockoutPolicy:
+      NotFound: Không tìm thấy chính sách khóa mật khẩu
+      Empty: Chính sách khóa mật khẩu trống
+      NotExisting: Chính sách khóa mật khẩu không tồn tại
+      AlreadyExists: Chính sách khóa mật khẩu đã tồn tại
+    PasswordAgePolicy:
+      NotFound: Không tìm thấy chính sách tuổi mật khẩu
+      Empty: Chính sách tuổi mật khẩu trống
+      NotExisting: Chính sách tuổi mật khẩu không tồn tại
+      AlreadyExists: Chính sách về độ tuổi của mật khẩu đã tồn tại
+    NotificationPolicy:
+      NotFound: Chính sách thông báo không tìm thấy
+      NotChanged: Chính sách thông báo không thay đổi
+      AlreadyExists: Chính sách thông báo đã tồn tại
+    LabelPolicy:
+      NotFound: Không tìm thấy Chính sách nhãn hiệu riêng
+      NotChanged: Chính sách nhãn hiệu riêng không được thay đổi
+  Project:
+    ProjectIDMissing: Thiếu Id dự án
+    AlreadyExists: Dự án đã tồn tại trên tổ chức
+    OrgNotExisting: Tổ chức không tồn tại
+    UserNotExisting: Người dùng không tồn tại
+    CouldNotGenerateClientSecret: Không thể tạo bí mật khách hàng
+    Invalid: Dự án không hợp lệ
+    NotActive: Dự án không hoạt động
+    NotInactive: Dự án chưa bị vô hiệu hóa
+    NotFound: Không tìm thấy dự án
+    UserIDMissing: Thiếu ID người dùng
+    Member:
+      NotFound: Không tìm thấy thành viên dự án
+      Invalid: Thành viên dự án không hợp lệ
+      AlreadyExists: Thành viên dự án đã tồn tại
+      NotExisting: Thành viên dự án không tồn tại
+    MinimumOneRoleNeeded: Phải thêm ít nhất một vai trò
+    Role:
+      AlreadyExists: Vai trò đã tồn tại
+      Invalid: Vai trò không hợp lệ
+      NotExisting: Vai trò không tồn tại
+    IDMissing: Thiếu ID
+    App:
+      AlreadyExists: Ứng dụng đã tồn tại
+      NotFound: Không tìm thấy ứng dụng
+      Invalid: Ứng dụng không hợp lệ
+      NotExisting: Ứng dụng không tồn tại
+      NotActive: Ứng dụng không hoạt động
+      NotInactive: Ứng dụng không hoạt động
+      OIDCConfigInvalid: Cấu hình OIDC không hợp lệ
+      APIConfigInvalid: Cấu hình API không hợp lệ
+      SAMLConfigInvalid: Cấu hình SAML không hợp lệ
+      IsNotOIDC: Ứng dụng không phải loại OIDC
+      IsNotAPI: Ứng dụng không phải loại API
+      IsNotSAML: Ứng dụng không thuộc loại SAML
+      SAMLMetadataMissing: Thiếu siêu dữ liệu SAML
+      SAMLMetadataFormat: Lỗi định dạng siêu dữ liệu SAML
+      SAMLEntityIDAlreadyExisting: SAML EntityID đã tồn tại
+      OIDCAuthMethodNoSecret: Phương thức xác thực OIDC được chọn không yêu cầu bí
+        mật
+      APIAuthMethodNoSecret: Phương thức xác thực API được chọn không yêu cầu bí mật
+      AuthMethodNoPrivateKeyJWT: Phương thức xác thực được chọn không yêu cầu khóa
+      ClientSecretInvalid: Bí mật của khách hàng không hợp lệ
+      Key:
+        AlreadyExisting: Khóa ứng dụng đã tồn tại
+        NotFound: Không tìm thấy khóa ứng dụng
+    RequiredFieldsMissing: Thiếu một số trường bắt buộc
+    Grant:
+      AlreadyExists: Dự án tài trợ đã tồn tại
+      NotFound: Không tìm thấy tài trợ dự án
+      Invalid: Dự án tài trợ không hợp lệ
+      NotExisting: Dự án tài trợ không tồn tại
+      HasNotExistingRole: Một vai trò không tồn tại trong dự án
+      NotActive: Dự án tài trợ không hoạt động
+      NotInactive: Dự án tài trợ không hoạt động
+  Instance:
+    AlreadyExists: Phiên bản đã tồn tại
+    NotChanged: Trường hợp không thay đổi
+    NotFound: Không tìm thấy trường hợp nào. Hãy chắc chắn rằng bạn có tên miền phù
+      hợp. Hãy xem https://zitadel.com/docs/apis/introduction#domains
+    Member:
+      RolesNotChanged: Vai trò không được thay đổi
+    MemberInvalid: Thành viên không hợp lệ
+    MemberAlreadyExisting: Thành viên đã tồn tại
+    MemberNotExisting: Thành viên không tồn tại
+    IDMissing: Id bị thiếu
+    IdpInvalid: Cấu hình IDP không hợp lệ
+    IdpNotExisting: Cấu hình IDP không tồn tại
+    OIDCConfigInvalid: Cấu hình IDP OIDC không hợp lệ
+    IdpIsNotOIDC: Cấu hình IDP không thuộc loại oidc
+    LoginPolicyInvalid: Chính sách đăng nhập không hợp lệ
+    LoginPolicyNotExisting: Chính sách đăng nhập không tồn tại
+    IdpProviderInvalid: Nhà cung cấp danh tính không hợp lệ
+    LoginPolicy:
+      NotFound: Không tìm thấy Chính sách đăng nhập mặc định
+      NotChanged: Chính sách đăng nhập mặc định chưa được thay đổi
+      NotExisting: Chính sách đăng nhập mặc định không tồn tại
+      AlreadyExists: Chính sách đăng nhập mặc định đã tồn tại
+      RedirectURIInvalid: URI chuyển hướng mặc định không hợp lệ
+      MFA:
+        AlreadyExists: Đa yếu tố đã tồn tại
+        NotExisting: Đa yếu tố không tồn tại
+        Unspecified: Đa yếu tố không hợp lệ
+      IDP:
+        AlreadyExists: Nhà cung cấp danh tính đã tồn tại
+        NotExisting: Nhà cung cấp danh tính không tồn tại
+        Invalid: Nhà cung cấp danh tính không hợp lệ
+      IDPConfig:
+        AlreadyExists: Cấu hình nhà cung cấp danh tính đã tồn tại
+        NotInactive: Cấu hình nhà cung cấp danh tính không hoạt động
+        NotActive: Cấu hình nhà cung cấp danh tính không hoạt động
+    LabelPolicy:
+      NotFound: Không tìm thấy Chính sách nhãn riêng mặc định
+      NotChanged: Chính sách nhãn hiệu riêng mặc định chưa được thay đổi
+    MailTemplate:
+      NotFound: Không tìm thấy mẫu thư mặc định
+      NotChanged: Mẫu thư mặc định chưa được thay đổi
+      AlreadyExists: Mẫu thư mặc định đã tồn tại
+      Invalid: Mẫu thư mặc định không hợp lệ
+    CustomMessageText:
+      NotFound: Tin nhắn mặc định Không tìm thấy nội dung
+      NotChanged: Nội dung tin nhắn mặc định chưa được thay đổi
+      AlreadyExists: Nội dung tin nhắn mặc định đã tồn tại
+      Invalid: Nội dung tin nhắn mặc định không hợp lệ
+    PasswordComplexityPolicy:
+      NotFound: Không tìm thấy Chính sách độ phức tạp của mật khẩu mặc định
+      NotExisting: Chính sách độ phức tạp của mật khẩu mặc định không tồn tại
+      AlreadyExists: Chính sách độ phức tạp của mật khẩu mặc định đã tồn tại
+      Empty: Chính sách độ phức tạp của mật khẩu mặc định trống
+      NotChanged: Chính sách độ phức tạp của mật khẩu mặc định chưa được thay đổi
+    PasswordAgePolicy:
+      NotFound: Không tìm thấy chính sách độ tuổi mật khẩu mặc định
+      NotExisting: Chính sách về độ tuổi mật khẩu mặc định không tồn tại
+      AlreadyExists: Chính sách về độ tuổi mật khẩu mặc định đã tồn tại
+      Empty: Mật khẩu mặc định Chính sách độ tuổi trống
+      NotChanged: Chính sách tuổi mật khẩu mặc định chưa được thay đổi
+    PasswordLockoutPolicy:
+      NotFound: Không tìm thấy Chính sách khóa mật khẩu mặc định
+      NotExisting: Chính sách khóa mật khẩu mặc định không tồn tại
+      AlreadyExists: Chính sách khóa mật khẩu mặc định đã tồn tại
+      Empty: Chính sách khóa mật khẩu mặc định trống
+      NotChanged: Chính sách khóa mật khẩu mặc định chưa được thay đổi
+    DomainPolicy:
+      NotFound: Không tìm thấy Chính sách miền của tổ chức
+      Empty: Chính sách miền của tổ chức trống
+      NotExisting: Chính sách miền của tổ chức không tồn tại
+      AlreadyExists: Chính sách miền của tổ chức đã tồn tại
+      NotChanged: Chính sách miền của tổ chức chưa được thay đổi
+    NotificationPolicy:
+      NotFound: Không tìm thấy Chính sách thông báo mặc định
+      NotChanged: Chính sách thông báo mặc định không thay đổi
+      AlreadyExists: Chính sách thông báo mặc định đã tồn tại
+  Policy:
+    AlreadyExists: Chính sách đã tồn tại
+    Label:
+      Invalid:
+        PrimaryColor: Màu chính không có giá trị màu Hex hợp lệ
+        BackgroundColor: Màu nền không có giá trị màu Hex hợp lệ
+        WarnColor: Màu cảnh báo không có giá trị màu Hex hợp lệ
+        FontColor: Màu phông chữ không có giá trị màu Hex hợp lệ
+        PrimaryColorDark: Màu chính (chế độ tối) không có giá trị màu Hex hợp lệ
+        BackgroundColorDark: Màu nền (chế độ tối) không có giá trị màu Hex hợp lệ
+        WarnColorDark: Màu cảnh báo (chế độ tối) không có giá trị màu Hex hợp lệ
+        FontColorDark: Màu phông chữ (chế độ tối) không có giá trị màu Hex hợp lệ
+  UserGrant:
+    AlreadyExists: Quyền sử dụng đã tồn tại
+    NotFound: Không tìm thấy quyền của người dùng
+    Invalid: Quyền của người dùng không hợp lệ
+    NotChanged: Quyền của người dùng không được thay đổi
+    IDMissing: Id bị thiếu
+    NoPermissionForProject: Người dùng không có quyền đối với dự án này
+    RoleKeyNotFound: Không tìm thấy vai trò
+  Member:
+    AlreadyExists: Thành viên đã tồn tại
+  IDPConfig:
+    AlreadyExists: Cấu hình IDP với tên này đã tồn tại
+    NotExisting: Cấu hình nhà cung cấp danh tính không tồn tại
+  Changes:
+    NotFound: Không tìm thấy lịch sử
+    AuditRetention: Lịch sử nằm ngoài việc lưu giữ nhật ký kiểm tra
+  Token:
+    NotFound: Không tìm thấy mã thông báo
+    Invalid: Mã thông báo không hợp lệ
+  UserSession:
+    NotFound: Không tìm thấy phiên người dùng
+  Key:
+    NotFound: Không tìm thấy chìa khóa
+    ExpireBeforeNow: Ngày hết hạn đã qua
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: Multifactor được cấu hình theo yêu cầu, nhưng không
+          có nhà cung cấp nào được cấu hình. Vui lòng liên hệ với quản trị viên hệ
+          thống của bạn.
+  Step:
+    Started:
+      AlreadyExists: Bước bắt đầu đã tồn tại
+    Done:
+      AlreadyExists: Bước thực hiện đã tồn tại
+  CustomText:
+    AlreadyExists: Văn bản tùy chỉnh đã tồn tại
+    Invalid: Văn bản tùy chỉnh không hợp lệ
+    NotFound: Không tìm thấy văn bản tùy chỉnh
+  TranslationFile:
+    ReadError: Lỗi đọc file dịch
+    MergeError: Không thể hợp nhất tệp dịch với các bản dịch tùy chỉnh
+    NotFound: Tệp dịch không tồn tại
+  Metadata:
+    NotFound: Không tìm thấy siêu dữ liệu
+    NoData: Danh sách siêu dữ liệu trống
+    Invalid: Siêu dữ liệu không hợp lệ
+    KeyNotExisting: Một hoặc nhiều khóa không tồn tại
+  Action:
+    Invalid: Hành động không hợp lệ
+    NotFound: Không tìm thấy hành động
+    NotActive: Hành động không hoạt động
+    NotInactive: Hành động không hoạt động
+    MaxAllowed: Không có hành động tích cực bổ sung nào được phép
+    NotEnabled: Tính năng "Hành động" chưa được bật
+  Flow:
+    FlowTypeMissing: Thiếu loại luồng
+    Empty: Luồng đã trống
+    WrongTriggerType: TriggerType không hợp lệ
+    NoChanges: Không có thay đổi
+    ActionIDsNotExist: ActionID không tồn tại
+  Query:
+    CloseRows: Câu lệnh SQL không thể hoàn thành
+    SQLStatement: Không thể tạo câu lệnh SQL
+    InvalidRequest: Yêu cầu không hợp lệ
+    TooManyNestingLevels: Quá nhiều cấp độ lồng truy vấn (Tối đa 20)
+    LimitExceeded: Vượt quá giới hạn
+  Quota:
+    AlreadyExists: Đã có hạn ngạch cho đơn vị này
+    NotFound: Không tìm thấy hạn ngạch cho đơn vị này
+    Invalid:
+      CallURL: URL cuộc gọi hạn ngạch không hợp lệ
+      Percent: Phần trăm hạn ngạch thấp hơn 1
+      Unimplemented: Hạn ngạch không được triển khai cho đơn vị này
+      Amount: Số lượng hạn ngạch thấp hơn 1
+      ResetInterval: Khoảng thời gian đặt lại hạn ngạch ngắn hơn một phút
+      Noop: Hạn ngạch không giới hạn mà không có thông báo sẽ không có hiệu lực
+    Access:
+      Exhausted: Hạn ngạch cho các yêu cầu được xác thực đã hết
+    Execution:
+      Exhausted: Hạn ngạch cho số giây thực hiện đã hết
+  LogStore:
+    Access:
+      StorageFailed: Lưu trữ nhật ký truy cập vào cơ sở dữ liệu không thành công
+      ScanFailed: Việc sử dụng truy vấn cho các yêu cầu được xác thực không thành
+        công
+    Execution:
+      StorageFailed: Lưu trữ nhật ký thực hiện hành động vào cơ sở dữ liệu không thành
+        công
+      ScanFailed: Truy vấn việc sử dụng số giây thực hiện hành động không thành công
+  Session:
+    IDMissing: Thiếu ID phiên
+    NotFound: Không tìm thấy phiên
+    NotExisting: Phiên không tồn tại
+    Terminated: Phiên đã kết thúc
+    Expired: Phiên đã hết hạn
+    PositiveLifetime: Thời gian tồn tại của phiên không được nhỏ hơn 0
+    Token:
+      Invalid: Mã thông báo phiên không hợp lệ
+    WebAuthN:
+      NoChallenge: Phiên không có thử thách WebAuthN
+  Intent:
+    IDPMissing: ID IDP bị thiếu trong yêu cầu
+    IDPInvalid: IDP không hợp lệ đối với yêu cầu
+    ResponseInvalid: Phản hồi IDP không hợp lệ
+    MissingSingleMappingAttribute: Phản hồi IDP không chứa thuộc tính ánh xạ hoặc
+      có nhiều giá trị
+    SuccessURLMissing: URL thành công bị thiếu trong yêu cầu
+    FailureURLMissing: URL bị lỗi bị thiếu trong yêu cầu
+    StateMissing: Tham số trạng thái bị thiếu trong yêu cầu
+    NotStarted: Ý định chưa được bắt đầu hoặc đã bị chấm dứt
+    NotSucceeded: Ý định chưa thành công
+    Expired: Ý định đã hết hạn
+    TokenCreationFailed: Tạo mã thông báo không thành công
+    InvalidToken: Mã thông báo ý định không hợp lệ
+    OtherUser: Mục đích dành cho người dùng khác
+  AuthRequest:
+    AlreadyExists: Yêu cầu xác thực đã tồn tại
+    NotExisting: Yêu cầu xác thực không tồn tại
+    WrongLoginClient: Yêu cầu xác thực được tạo bởi ứng dụng đăng nhập khác
+    AlreadyHandled: Yêu cầu xác thực đã được xử lý
+  OIDCSession:
+    RefreshTokenInvalid: Mã thông báo làm mới không hợp lệ
+    Token:
+      Invalid: Mã thông báo không hợp lệ
+      Expired: Mã thông báo đã hết hạn
+    InvalidClient: Mã thông báo không được phát hành cho ứng dụng này
+  SAMLRequest:
+    AlreadyExists: SAMLRequest đã tồn tại
+    NotExisting: SAMLRequest không tồn tại
+    WrongLoginClient: SAMLRequest được tạo bởi ứng dụng đăng nhập khác
+    AlreadyHandled: SAMLRequest đã được xử lý
+  SAMLSession:
+    InvalidClient: SAMLResponse không được phát hành cho ứng dụng này
+  DeviceAuth:
+    NotFound: Yêu cầu cấp phép thiết bị không tồn tại
+    AlreadyHandled: Yêu cầu cấp phép thiết bị đã được xử lý
+  Feature:
+    NotExisting: Tính năng không tồn tại
+    TypeNotSupported: Loại tính năng không được hỗ trợ
+    InvalidValue: Giá trị không hợp lệ cho tính năng này
+  Target:
+    Invalid: Mục tiêu không hợp lệ
+    NoTimeout: Mục tiêu không có thời gian chờ
+    InvalidURL: Mục tiêu có URL không hợp lệ
+    NotFound: Không tìm thấy mục tiêu
+    InvalidExpirationDate: Ngày hết hạn của khóa phải ở trong tương lai
+    PublicKeyExpired: Khóa công khai mục tiêu đã hết hạn
+    PublicKeyActive: Không thể xóa khóa công khai mục tiêu đang hoạt động
+    InvalidPublicKey: Khóa công khai không hợp lệ. Phải là khóa công khai RSA hoặc
+      ECDSA được mã hóa PEM ở định dạng PKCS#8
+  Execution:
+    ConditionInvalid: Điều kiện thực hiện không hợp lệ
+    Invalid: Việc thực thi không hợp lệ
+    NotFound: Không tìm thấy việc thực thi
+    IncludeNotFound: Bao gồm không tìm thấy
+    NoTargets: Không có mục tiêu nào được xác định
+    Failed: Thực thi không thành công
+    ResponseIsNotValidJSON: Phản hồi không hợp lệ JSON
+    MissingEncryptionKey: Không tìm thấy khóa mã hóa cho mục tiêu
+  UserSchema:
+    NotEnabled: Tính năng "Lược đồ người dùng" chưa được bật
+    Type:
+      Missing: Loại lược đồ người dùng bị thiếu
+      AlreadyExists: Loại lược đồ người dùng đã tồn tại
+    Authenticator:
+      Invalid: Loại xác thực không hợp lệ
+    NotActive: Lược đồ người dùng không hoạt động
+    NotInactive: Lược đồ người dùng không hoạt động
+    NotExists: Lược đồ người dùng không tồn tại
+    ID:
+      Missing: ID lược đồ người dùng bị thiếu
+    Invalid: Lược đồ người dùng không hợp lệ
+    Data:
+      Invalid: Dữ liệu không hợp lệ đối với Lược đồ người dùng
+  TokenExchange:
+    Token:
+      Missing: Mã thông báo bị thiếu
+      Invalid: Mã thông báo không hợp lệ
+      TypeMissing: Loại mã thông báo bị thiếu
+      TypeNotAllowed: Loại mã thông báo không được phép
+      TypeNotSupported: Loại mã thông báo không được hỗ trợ
+      NotForAPI: Mã thông báo mạo danh không được phép đối với API
+    Impersonation:
+      PolicyDisabled: Mạo danh bị vô hiệu hóa trong chính sách bảo mật phiên bản
+  WebKey:
+    ActiveDelete: Không thể xóa khóa web đang hoạt động
+    Config: Cấu hình khóa web không hợp lệ
+    Duplicate: ID khóa web không phải là duy nhất
+    NoActive: Không tìm thấy khóa web đang hoạt động
+    NotFound: Không tìm thấy khóa web
+  IDP:
+    InvalidSearchQuery: Truy vấn tìm kiếm không hợp lệ
+    ClientIDMissing: Thiếu ID khách hàng
+    TeamIDMissing: Thiếu ID nhóm
+    KeyIDMissing: Thiếu ID khóa
+    PrivateKeyMissing: Thiếu khóa riêng
+    InvalidPrivateKey: Định dạng khóa riêng không hợp lệ
+AggregateTypes:
+  action: Hành động
+  instance: Ví dụ
+  key_pair: Cặp chìa khóa
+  org: Tổ chức
+  project: Dự án
+  user: Người dùng
+  usergrant: Cấp cho người dùng
+  quota: Hạn ngạch
+  feature: Tính năng
+  target: Mục tiêu
+  execution: Thực thi
+  user_schema: Lược đồ người dùng
+  auth_request: Yêu cầu xác thực
+  device_auth: Xác thực thiết bị
+  idpintent: Ý định của IDP
+  limits: Giới hạn
+  milestone: Cột mốc
+  oidc_session: Phiên OIDC
+  restrictions: Hạn chế
+  system: Hệ thống
+  session: Phiên
+  web_key: Khóa Web
+  saml_request: Yêu cầu SAML
+  saml_session: Phiên SAML
+EventTypes:
+  execution:
+    set: Bộ thực thi
+    removed: Đã xóa lệnh thực thi
+  target:
+    added: Đã tạo mục tiêu
+    changed: Mục tiêu đã thay đổi
+    removed: Đã xóa mục tiêu
+  user:
+    added: Người dùng đã thêm
+    selfregistered: Người dùng đã tự đăng ký
+    initialization:
+      code:
+        added: Mã khởi tạo được tạo
+        sent: Mã khởi tạo được gửi
+      check:
+        succeeded: Kiểm tra khởi tạo thành công
+        failed: Kiểm tra khởi tạo không thành công
+    token:
+      added: Mã thông báo truy cập đã được tạo
+      v2.added: Mã thông báo truy cập đã được tạo
+      removed: Mã thông báo truy cập đã bị xóa
+    impersonated: Người dùng mạo danh
+    username:
+      reserved: Tên người dùng được bảo lưu
+      released: Tên người dùng đã được phát hành
+      changed: Tên người dùng đã thay đổi
+    email:
+      reserved: Địa chỉ email được bảo lưu
+      released: Địa chỉ email được phát hành
+      changed: Địa chỉ email đã thay đổi
+      verified: Địa chỉ email đã được xác minh
+      verification:
+        failed: Xác minh địa chỉ email không thành công
+      code:
+        added: Mã xác minh địa chỉ email được tạo
+        sent: Mã xác minh địa chỉ email đã được gửi
+    machine:
+      added: Người dùng kỹ thuật đã thêm
+      changed: Người dùng kỹ thuật đã thay đổi
+      key:
+        added: Đã thêm khóa
+        removed: Đã xóa khóa
+      secret:
+        set: Bộ bí mật
+        updated: Đã cập nhật hàm băm bí mật
+        removed: Đã xóa bí mật
+        check:
+          succeeded: Kiểm tra bí mật thành công
+          failed: Kiểm tra bí mật không thành công
+    human:
+      added: Người đã thêm
+      selfregistered: Người đã tự đăng ký
+      avatar:
+        added: Đã thêm hình đại diện
+        removed: Đã xóa hình đại diện
+      initialization:
+        code:
+          added: Mã khởi tạo được tạo
+          sent: Mã khởi tạo được gửi
+        check:
+          succeeded: Kiểm tra khởi tạo thành công
+          failed: Kiểm tra khởi tạo không thành công
+      invite:
+        code:
+          added: Mã lời mời được tạo
+          sent: Mã lời mời đã được gửi
+        check:
+          succeeded: Kiểm tra lời mời đã thành công
+          failed: Kiểm tra lời mời không thành công
+      username:
+        reserved: Tên người dùng được bảo lưu
+        released: Tên người dùng đã được phát hành
+      email:
+        changed: Địa chỉ email đã thay đổi
+        verified: Địa chỉ email đã được xác minh
+        verification:
+          failed: Xác minh địa chỉ email không thành công
+        code:
+          added: Mã xác minh địa chỉ email được tạo
+          sent: Mã xác minh địa chỉ email đã được gửi
+      password:
+        changed: Mật khẩu đã thay đổi
+        code:
+          added: Mã mật khẩu được tạo
+          sent: Mã mật khẩu đã được gửi
+        check:
+          succeeded: Kiểm tra mật khẩu thành công
+          failed: Kiểm tra mật khẩu không thành công
+        change:
+          sent: Đã gửi thay đổi mật khẩu
+        hash:
+          updated: Đã cập nhật hàm băm mật khẩu
+      externallogin:
+        check:
+          succeeded: Đăng nhập bên ngoài thành công
+      externalidp:
+        added: Đã thêm IDP bên ngoài
+        removed: IDP bên ngoài đã bị xóa
+        cascade:
+          removed: Đã xóa tầng IDP bên ngoài
+        id:
+          migrated: ID người dùng bên ngoài của IDP đã được di chuyển
+      phone:
+        changed: Số điện thoại đã thay đổi
+        verified: Đã xác minh số điện thoại
+        verification:
+          failed: Xác minh số điện thoại không thành công
+        code:
+          added: Mã số điện thoại được tạo
+          sent: Mã số điện thoại đã gửi
+        removed: Đã xóa số điện thoại
+      profile:
+        changed: Hồ sơ người dùng đã thay đổi
+      address:
+        changed: Địa chỉ người dùng đã thay đổi
+      mfa:
+        otp:
+          added: Đã thêm OTP đa yếu tố
+          verified: Đã xác minh OTP đa yếu tố
+          removed: OTP đa yếu tố đã bị xóa
+          check:
+            succeeded: Kiểm tra OTP đa yếu tố thành công
+            failed: Kiểm tra OTP đa yếu tố không thành công
+          sms:
+            added: Đã thêm SMS OTP đa yếu tố
+            removed: Đã xóa SMS OTP đa yếu tố
+            code:
+              added: Đã thêm mã SMS OTP đa yếu tố
+              sent: Đã gửi mã SMS OTP đa yếu tố
+            check:
+              succeeded: Kiểm tra SMS OTP đa yếu tố đã thành công
+              failed: Kiểm tra SMS OTP đa yếu tố không thành công
+          email:
+            added: Đã thêm email OTP đa yếu tố
+            removed: Email OTP đa yếu tố đã bị xóa
+            code:
+              added: Đã thêm mã Email OTP đa yếu tố
+              sent: Đã gửi mã Email OTP đa yếu tố
+            check:
+              succeeded: Kiểm tra email OTP đa yếu tố thành công
+              failed: Kiểm tra email OTP đa yếu tố không thành công
+        u2f:
+          token:
+            added: Đã thêm mã thông báo U2F đa yếu tố
+            verified: Mã thông báo U2F đa yếu tố đã được xác minh
+            removed: Mã thông báo U2F đa yếu tố đã bị xóa
+            begin:
+              login: Đã bắt đầu kiểm tra U2F đa yếu tố
+            check:
+              succeeded: Kiểm tra U2F đa yếu tố đã thành công
+              failed: Kiểm tra U2F đa yếu tố không thành công
+            signcount:
+              changed: Tổng kiểm tra của Mã thông báo Multifactor U2F đã được thay
+                đổi
+        init:
+          skipped: Quá trình khởi tạo đa yếu tố bị bỏ qua
+      passwordless:
+        token:
+          added: Đã thêm mã thông báo cho Đăng nhập bằng mật khẩu
+          verified: Mã thông báo cho mật khẩu Đăng nhập đã được xác minh
+          removed: Đã xóa mã thông báo đăng nhập bằng mật mã
+          begin:
+            login: Kiểm tra đăng nhập bằng mật mã đã bắt đầu
+          check:
+            succeeded: Mật khẩu Kiểm tra đăng nhập thành công
+            failed: Mật khẩu Kiểm tra đăng nhập không thành công
+          signcount:
+            changed: Tổng kiểm tra Mã thông báo đăng nhập mật mã đã được thay đổi
+        initialization:
+          code:
+            added: Đã thêm mã khởi tạo mật khẩu
+            sent: Mã khởi tạo mật mã đã được gửi
+            requested: Mã khởi tạo mật mã được yêu cầu
+            check:
+              succeeded: Mã khởi tạo mật khẩu đã được kiểm tra thành công
+              failed: Kiểm tra mã khởi tạo mật khẩu không thành công
+      signed:
+        out: Người dùng đã đăng xuất
+      refresh:
+        token:
+          added: Đã tạo mã thông báo làm mới
+          renewed: Làm mới mã thông báo được gia hạn
+          removed: Đã xóa mã thông báo làm mới
+    locked: Người dùng đã bị khóa
+    unlocked: Người dùng đã được mở khóa
+    deactivated: Người dùng đã vô hiệu hóa
+    reactivated: Người dùng đã kích hoạt lại
+    removed: Người dùng đã xóa
+    password:
+      changed: Mật khẩu đã thay đổi
+      code:
+        added: Mã mật khẩu được tạo
+        sent: Mã mật khẩu đã được gửi
+      check:
+        succeeded: Kiểm tra mật khẩu thành công
+        failed: Kiểm tra mật khẩu không thành công
+    phone:
+      changed: Số điện thoại đã thay đổi
+      verified: Đã xác minh số điện thoại
+      verification:
+        failed: Xác minh số điện thoại không thành công
+      code:
+        added: Mã số điện thoại được tạo
+        sent: Mã số điện thoại đã gửi
+    profile:
+      changed: Hồ sơ người dùng đã thay đổi
+    address:
+      changed: Địa chỉ người dùng đã thay đổi
+    mfa:
+      otp:
+        added: Đã thêm OTP đa yếu tố
+        verified: Đã xác minh OTP đa yếu tố
+        removed: OTP đa yếu tố đã bị xóa
+        check:
+          succeeded: Kiểm tra OTP đa yếu tố thành công
+          failed: Kiểm tra OTP đa yếu tố không thành công
+        init:
+          skipped: Quá trình khởi tạo OTP đa yếu tố bị bỏ qua
+      init:
+        skipped: Quá trình khởi tạo đa yếu tố bị bỏ qua
+    signed:
+      out: Người dùng đã đăng xuất
+    grant:
+      added: Đã thêm ủy quyền
+      changed: Ủy quyền đã thay đổi
+      removed: Đã xóa ủy quyền
+      deactivated: Ủy quyền đã bị vô hiệu hóa
+      reactivated: Ủy quyền đã được kích hoạt lại
+      reserved: Ủy quyền được bảo lưu
+      released: Đã phát hành ủy quyền
+      cascade:
+        removed: Đã xóa ủy quyền
+        changed: Ủy quyền đã thay đổi
+    metadata:
+      set: Bộ siêu dữ liệu người dùng
+      removed: Đã xóa siêu dữ liệu người dùng
+      removed.all: Tất cả siêu dữ liệu của người dùng đã bị xóa
+    domain:
+      claimed: Đã xác nhận miền
+      claimed.sent: Đã gửi thông báo xác nhận miền
+    pat:
+      added: Đã thêm mã thông báo truy cập cá nhân
+      removed: Mã thông báo truy cập cá nhân đã bị xóa
+  org:
+    added: Đã thêm tổ chức
+    changed: Tổ chức đã thay đổi
+    deactivated: Tổ chức đã ngừng hoạt động
+    reactivated: Tổ chức đã được kích hoạt lại
+    removed: Tổ chức đã bị xóa
+    domain:
+      added: Đã thêm tên miền
+      verification:
+        added: Đã thêm xác minh tên miền
+        failed: Xác minh tên miền không thành công
+      verified: Đã xác minh tên miền
+      removed: Đã xóa tên miền
+      primary:
+        set: Bộ miền tổ chức
+      reserved: Tên miền dành riêng
+      released: Đã phát hành tên miền
+    name:
+      reserved: Tên tổ chức được bảo lưu
+      released: Tên tổ chức được phát hành
+    member:
+      added: Đã thêm thành viên tổ chức
+      changed: Thành viên tổ chức đã thay đổi
+      removed: Thành viên tổ chức đã bị xóa
+      cascade:
+        removed: Đã xóa tầng thành viên của tổ chức
+    iam:
+      policy:
+        added: Đã thêm chính sách hệ thống
+        changed: Chính sách hệ thống đã thay đổi
+        removed: Chính sách hệ thống đã bị xóa
+    idp:
+      config:
+        added: Đã thêm cấu hình IDP
+        changed: Cấu hình IDP đã thay đổi
+        removed: Đã xóa cấu hình IDP
+        deactivated: Cấu hình IDP bị vô hiệu hóa
+        reactivated: Cấu hình IDP đã được kích hoạt lại
+      oidc:
+        config:
+          added: Đã thêm cấu hình OIDC IDP
+          changed: Cấu hình IDP OIDC đã thay đổi
+      saml:
+        config:
+          added: Đã thêm cấu hình SAML IDP
+          changed: Đã thay đổi cấu hình SAML IDP
+      jwt:
+        config:
+          added: Đã thêm cấu hình JWT IDP
+          changed: Cấu hình JWT IDP đã thay đổi
+    customtext:
+      set: Bộ văn bản tùy chỉnh
+      removed: Đã xóa văn bản tùy chỉnh
+      template:
+        removed: Đã xóa mẫu văn bản tùy chỉnh
+    policy:
+      login:
+        added: Chính sách đăng nhập đã được thêm
+        changed: Chính sách đăng nhập đã thay đổi
+        removed: Chính sách đăng nhập đã bị xóa
+        idpprovider:
+          added: Nhà cung cấp danh tính được thêm vào Chính sách đăng nhập
+          removed: Nhà cung cấp danh tính đã bị xóa khỏi Chính sách đăng nhập
+          cascade:
+            removed: Tầng nhà cung cấp danh tính đã bị xóa khỏi Chính sách đăng nhập
+        secondfactor:
+          added: Yếu tố thứ hai được thêm vào Chính sách đăng nhập
+          removed: Yếu tố thứ hai bị xóa khỏi Chính sách đăng nhập
+        multifactor:
+          added: Đa yếu tố được thêm vào Chính sách đăng nhập
+          removed: Đã xóa đa yếu tố khỏi Chính sách đăng nhập
+      password:
+        complexity:
+          added: Đã thêm chính sách về độ phức tạp của mật khẩu
+          changed: Chính sách về độ phức tạp của mật khẩu đã thay đổi
+          removed: Đã xóa chính sách về độ phức tạp của mật khẩu
+        age:
+          added: Đã thêm chính sách tuổi mật khẩu
+          changed: Chính sách tuổi mật khẩu đã thay đổi
+          removed: Chính sách tuổi mật khẩu đã bị xóa
+        lockout:
+          added: Đã thêm chính sách khóa mật khẩu
+          changed: Chính sách khóa mật khẩu đã thay đổi
+          removed: Đã xóa chính sách khóa mật khẩu
+      label:
+        added: Đã thêm chính sách nhãn
+        changed: Chính sách Nhãn đã thay đổi
+        activated: Chính sách nhãn được kích hoạt
+        removed: Chính sách nhãn đã bị xóa
+        logo:
+          added: Đã thêm logo vào Chính sách nhãn
+          removed: Logo bị xóa khỏi Chính sách nhãn
+          dark:
+            added: Đã thêm biểu trưng (chế độ tối) vào Chính sách nhãn
+            removed: Logo (chế độ tối) đã bị xóa khỏi Chính sách nhãn
+        icon:
+          added: Biểu tượng được thêm vào Chính sách nhãn
+          removed: Biểu tượng đã bị xóa khỏi Chính sách nhãn
+          dark:
+            added: Biểu tượng (chế độ tối) được thêm vào Chính sách nhãn
+            removed: Biểu tượng (chế độ tối) đã bị xóa khỏi Chính sách nhãn
+        font:
+          added: Đã thêm phông chữ vào Chính sách nhãn
+          removed: Đã xóa phông chữ khỏi Chính sách nhãn
+        assets:
+          removed: Nội dung bị xóa khỏi Chính sách nhãn
+      privacy:
+        added: Đã thêm chính sách quyền riêng tư và ĐKDV
+        changed: Chính sách bảo mật và ĐKDV đã thay đổi
+        removed: Chính sách quyền riêng tư và ĐKDV đã bị xóa
+      domain:
+        added: Đã thêm chính sách tên miền
+        changed: Chính sách tên miền đã thay đổi
+        removed: Chính sách tên miền đã bị xóa
+      lockout:
+        added: Đã thêm chính sách khóa
+        changed: Chính sách khóa đã thay đổi
+        removed: Chính sách khóa đã bị xóa
+      notification:
+        added: Đã thêm chính sách thông báo
+        changed: Chính sách thông báo đã thay đổi
+        removed: Chính sách thông báo đã bị xóa
+    flow:
+      trigger_actions:
+        set: Bộ hành động
+        cascade:
+          removed: Đã xóa tầng hành động
+        removed: Đã xóa hành động
+      cleared: Đã xóa luồng
+    mail:
+      template:
+        added: Đã thêm mẫu E-mail
+        changed: Mẫu email đã thay đổi
+        removed: Đã xóa mẫu E-mail
+      text:
+        added: Đã thêm văn bản E-mail
+        changed: Nội dung email đã thay đổi
+        removed: Đã xóa văn bản E-mail
+    metadata:
+      removed: Đã xóa siêu dữ liệu
+      removed.all: Tất cả siêu dữ liệu đã bị xóa
+      set: Bộ siêu dữ liệu
+  project:
+    added: Đã thêm dự án
+    changed: Dự án đã thay đổi
+    deactivated: Dự án đã ngừng hoạt động
+    reactivated: Dự án được kích hoạt lại
+    removed: Dự án đã bị xóa
+    member:
+      added: Đã thêm thành viên dự án
+      changed: Thành viên dự án đã thay đổi
+      removed: Thành viên dự án đã bị xóa
+      cascade:
+        removed: Đã xóa tầng thành viên dự án
+    role:
+      added: Đã thêm vai trò dự án
+      changed: Vai trò dự án đã thay đổi
+      removed: Đã xóa vai trò dự án
+    grant:
+      added: Đã thêm quyền truy cập quản lý
+      changed: Quyền truy cập quản lý đã thay đổi
+      removed: Đã xóa quyền truy cập quản lý
+      deactivated: Quyền truy cập quản lý đã bị vô hiệu hóa
+      reactivated: Quyền truy cập quản lý đã được kích hoạt lại
+      cascade:
+        changed: Quyền truy cập quản lý đã thay đổi
+      member:
+        added: Đã thêm thành viên truy cập quản lý
+        changed: Thành viên truy cập quản lý đã thay đổi
+        removed: Đã xóa thành viên truy cập quản lý
+        cascade:
+          removed: Đã xóa tầng truy cập quản lý
+    application:
+      added: Đã thêm ứng dụng
+      changed: Ứng dụng đã thay đổi
+      removed: Ứng dụng đã bị xóa
+      deactivated: Ứng dụng đã bị vô hiệu hóa
+      reactivated: Ứng dụng đã được kích hoạt lại
+      oidc:
+        secret:
+          check:
+            succeeded: Kiểm tra bí mật ứng dụng khách OIDC đã thành công
+            failed: Kiểm tra bí mật ứng dụng khách OIDC không thành công
+        key:
+          added: Đã thêm khóa ứng dụng OIDC
+          removed: Đã xóa khóa ứng dụng OIDC
+      api:
+        secret:
+          check:
+            succeeded: Kiểm tra bí mật API thành công
+            failed: Kiểm tra bí mật API không thành công
+        key:
+          added: Đã thêm khóa ứng dụng
+          removed: Đã xóa khóa ứng dụng
+      config:
+        saml:
+          added: Đã thêm cấu hình SAML
+          changed: Cấu hình SAML đã thay đổi
+        oidc:
+          added: Đã thêm cấu hình OIDC
+          changed: Cấu hình OIDC đã thay đổi
+          secret:
+            changed: Bí mật OIDC đã thay đổi
+            updated: Cập nhật hàm băm bí mật OIDC
+        api:
+          added: Đã thêm cấu hình API
+          changed: Cấu hình API đã thay đổi
+          secret:
+            changed: Bí mật API đã thay đổi
+            updated: Đã cập nhật hàm băm bí mật API
+  policy:
+    password:
+      complexity:
+        added: Đã thêm chính sách về độ phức tạp của mật khẩu
+        changed: Chính sách về độ phức tạp của mật khẩu đã thay đổi
+      age:
+        added: Đã thêm chính sách tuổi mật khẩu
+        changed: Chính sách tuổi mật khẩu đã thay đổi
+      lockout:
+        added: Đã thêm chính sách khóa mật khẩu
+        changed: Chính sách khóa mật khẩu đã thay đổi
+  iam:
+    setup:
+      started: Đã bắt đầu thiết lập Zitadel
+      done: Đã thiết lập xong Zitadel
+    global:
+      org:
+        set: Nhóm tổ chức toàn cầu
+    project:
+      iam:
+        set: Bộ dự án Zitadel
+    member:
+      added: Đã thêm thành viên Zitadel
+      changed: Thành viên Zitadel đã thay đổi
+      removed: Thành viên Zitadel bị xóa
+      cascade:
+        removed: Đã xóa tầng thành viên Zitadel
+    idp:
+      config:
+        added: Đã thêm cấu hình IDP
+        changed: Cấu hình IDP đã thay đổi
+        removed: Đã xóa cấu hình IDP
+        deactivated: Cấu hình IDP bị vô hiệu hóa
+        reactivated: Cấu hình IDP đã được kích hoạt lại
+      oidc:
+        config:
+          added: Đã thêm cấu hình OIDC IDP
+          changed: Cấu hình IDP OIDC đã thay đổi
+      saml:
+        config:
+          added: Đã thêm cấu hình SAML IDP
+          changed: Đã thay đổi cấu hình SAML IDP
+      jwt:
+        config:
+          added: Đã thêm cấu hình JWT cho nhà cung cấp danh tính
+          changed: Đã xóa cấu hình JWT khỏi nhà cung cấp danh tính
+    customtext:
+      set: Văn bản đã được đặt
+      removed: Văn bản đã bị xóa
+    policy:
+      login:
+        added: Đã thêm Chính sách đăng nhập mặc định
+        changed: Chính sách đăng nhập mặc định đã thay đổi
+        idpprovider:
+          added: Nhà cung cấp danh tính được thêm vào Chính sách đăng nhập mặc định
+          removed: Nhà cung cấp danh tính đã bị xóa khỏi Chính sách đăng nhập mặc
+            định
+      label:
+        added: Đã thêm chính sách nhãn
+        changed: Chính sách Nhãn đã thay đổi
+        activated: Chính sách nhãn được kích hoạt
+        logo:
+          added: Đã thêm logo vào Chính sách nhãn
+          removed: Logo bị xóa khỏi Chính sách nhãn
+          dark:
+            added: Đã thêm biểu trưng (chế độ tối) vào Chính sách nhãn
+            removed: Logo (chế độ tối) đã bị xóa khỏi Chính sách nhãn
+        icon:
+          added: Biểu tượng được thêm vào Chính sách nhãn
+          removed: Biểu tượng đã bị xóa khỏi Chính sách nhãn
+          dark:
+            added: Biểu tượng (chế độ tối) được thêm vào Chính sách nhãn
+            removed: Biểu tượng (chế độ tối) đã bị xóa khỏi Chính sách nhãn
+        font:
+          added: Đã thêm phông chữ vào Chính sách nhãn
+          removed: Đã xóa phông chữ khỏi Chính sách nhãn
+        assets:
+          removed: Nội dung bị xóa khỏi Chính sách nhãn
+    default:
+      language:
+        set: Bộ ngôn ngữ mặc định
+    oidc:
+      settings:
+        added: Đã thêm cấu hình OIDC
+        changed: Cấu hình OIDC đã thay đổi
+        removed: Đã xóa cấu hình OIDC
+    secret:
+      generator:
+        added: Đã thêm trình tạo bí mật
+        changed: Trình tạo bí mật đã thay đổi
+        removed: Trình tạo bí mật đã bị xóa
+    smtp:
+      config:
+        added: Đã thêm cấu hình SMTP
+        changed: Cấu hình SMTP đã thay đổi
+        activated: Đã kích hoạt cấu hình SMTP
+        deactivated: Cấu hình SMTP bị vô hiệu hóa
+        removed: Đã xóa cấu hình SMTP
+        password:
+          changed: Bí mật cấu hình SMTP đã thay đổi
+    sms:
+      config:
+        twilio:
+          added: Đã thêm nhà cung cấp SMS Twilio
+          changed: Nhà cung cấp SMS Twilio đã thay đổi
+          token:
+            changed: Mã thông báo nhà cung cấp SMS Twilio đã thay đổi
+          removed: Nhà cung cấp SMS Twilio đã bị xóa
+          activated: Nhà cung cấp SMS Twilio đã được kích hoạt
+          deactivated: Nhà cung cấp SMS Twilio đã ngừng hoạt động
+  key_pair:
+    added: Đã thêm cặp khóa
+    certificate:
+      added: Đã thêm chứng chỉ
+  action:
+    added: Đã thêm hành động
+    changed: Hành động đã thay đổi
+    deactivated: Hành động đã bị vô hiệu hóa
+    reactivated: Hành động đã được kích hoạt lại
+    removed: Đã xóa hành động
+  instance:
+    added: Đã thêm phiên bản
+    changed: Trường hợp đã thay đổi
+    customtext:
+      removed: Đã xóa văn bản tùy chỉnh
+      set: Bộ văn bản tùy chỉnh
+      template:
+        removed: Đã xóa mẫu văn bản tùy chỉnh
+    default:
+      language:
+        set: Bộ ngôn ngữ mặc định
+      org:
+        set: Bộ tổ chức mặc định
+    domain:
+      added: Đã thêm tên miền
+      primary:
+        set: Bộ tên miền chính
+      removed: Đã xóa tên miền
+    iam:
+      console:
+        set: Bộ ứng dụng Zitadel Management Console
+      project:
+        set: Bộ dự án Zitadel
+    mail:
+      template:
+        added: Đã thêm mẫu E-mail
+        changed: Mẫu email đã thay đổi
+      text:
+        added: Đã thêm văn bản E-mail
+        changed: Nội dung email đã thay đổi
+    member:
+      added: Đã thêm thành viên phiên bản
+      changed: Thành viên sơ thẩm đã thay đổi
+      removed: Thành viên phiên bản đã bị xóa
+      cascade:
+        removed: Đã xóa tầng thành viên phiên bản
+    notification:
+      provider:
+        debug:
+          fileadded: Đã thêm nhà cung cấp thông báo gỡ lỗi tệp
+          filechanged: Nhà cung cấp thông báo gỡ lỗi tệp đã thay đổi
+          fileremoved: Đã xóa nhà cung cấp thông báo gỡ lỗi tệp
+          logadded: Đã thêm nhà cung cấp thông báo gỡ lỗi nhật ký
+          logchanged: Nhà cung cấp thông báo gỡ lỗi nhật ký đã thay đổi
+          logremoved: Đã xóa nhà cung cấp thông báo gỡ lỗi nhật ký
+    oidc:
+      settings:
+        added: Đã thêm cài đặt OIDC
+        changed: Cài đặt OIDC đã thay đổi
+    policy:
+      domain:
+        added: Đã thêm chính sách tên miền
+        changed: Chính sách tên miền đã thay đổi
+      label:
+        activated: Chính sách nhãn được kích hoạt
+        added: Đã thêm chính sách nhãn
+        assets:
+          removed: Đã xóa nội dung khỏi chính sách nhãn
+        changed: Chính sách nhãn đã thay đổi
+        font:
+          added: Đã thêm phông chữ vào chính sách nhãn
+          removed: Đã xóa phông chữ khỏi chính sách nhãn
+        icon:
+          added: Biểu tượng được thêm vào chính sách nhãn
+          removed: Biểu tượng bị xóa khỏi chính sách nhãn
+          dark:
+            added: Biểu tượng được thêm vào chính sách nhãn tối
+            removed: Biểu tượng bị xóa khỏi chính sách nhãn tối
+        logo:
+          added: Đã thêm logo vào chính sách nhãn
+          removed: Logo bị xóa khỏi chính sách nhãn
+          dark:
+            added: Đã thêm logo vào chính sách nhãn tối
+            removed: Logo bị xóa khỏi chính sách nhãn tối
+      lockout:
+        added: Đã thêm chính sách khóa
+        changed: Chính sách khóa đã thay đổi
+      login:
+        added: Đã thêm chính sách đăng nhập
+        changed: Chính sách đăng nhập đã thay đổi
+        idpprovider:
+          added: Nhà cung cấp danh tính được thêm vào chính sách đăng nhập
+          cascade:
+            removed: Tầng nhà cung cấp danh tính đã bị xóa khỏi chính sách đăng nhập
+          removed: Nhà cung cấp danh tính đã bị xóa khỏi chính sách đăng nhập
+        multifactor:
+          added: Đã thêm đa yếu tố vào chính sách đăng nhập
+          removed: Đã xóa đa yếu tố khỏi chính sách đăng nhập
+        secondfactor:
+          added: Yếu tố thứ hai được thêm vào chính sách đăng nhập
+          removed: Yếu tố thứ hai bị xóa khỏi chính sách đăng nhập
+      password:
+        age:
+          added: Đã thêm chính sách tuổi mật khẩu
+          changed: Chính sách về độ tuổi của mật khẩu đã thay đổi
+        complexity:
+          added: Đã thêm chính sách về độ phức tạp của mật khẩu
+          changed: Đã xóa chính sách về độ phức tạp của mật khẩu
+      privacy:
+        added: Đã thêm chính sách bảo mật
+        changed: Chính sách bảo mật đã thay đổi
+      security:
+        set: Đã đặt chính sách bảo mật
+    removed: Đã xóa phiên bản
+    secret:
+      generator:
+        added: Đã thêm trình tạo bí mật
+        changed: Trình tạo bí mật đã thay đổi
+        removed: Trình tạo bí mật đã bị xóa
+    sms:
+      configtwilio:
+        activated: Đã kích hoạt cấu hình SMS Twilio
+        added: Đã thêm cấu hình SMS Twilio
+        changed: Cấu hình SMS Twilio đã thay đổi
+        deactivated: Cấu hình SMS Twilio đã bị vô hiệu hóa
+        removed: Đã xóa cấu hình SMS Twilio
+        token:
+          changed: Mã thông báo của cấu hình Twilio SMS đã thay đổi
+    smtp:
+      config:
+        added: Đã thêm cấu hình SMTP
+        changed: Cấu hình SMTP đã thay đổi
+        activated: Đã kích hoạt cấu hình SMTP
+        deactivated: Cấu hình SMTP bị vô hiệu hóa
+        password:
+          changed: Mật khẩu cấu hình SMTP đã thay đổi
+        removed: Đã xóa cấu hình SMTP
+  user_schema:
+    created: Lược đồ người dùng đã được tạo
+    updated: Lược đồ người dùng được cập nhật
+    deactivated: Lược đồ người dùng đã bị vô hiệu hóa
+    reactivated: Lược đồ người dùng đã được kích hoạt lại
+    deleted: Lược đồ người dùng đã bị xóa
+    user:
+      created: Người dùng đã tạo
+      updated: Người dùng đã cập nhật
+      deleted: Người dùng đã xóa
+      email:
+        updated: Địa chỉ email đã thay đổi
+        verified: Địa chỉ email đã được xác minh
+        verification:
+          failed: Xác minh địa chỉ email không thành công
+        code:
+          added: Mã xác minh địa chỉ email được tạo
+          sent: Mã xác minh địa chỉ email đã được gửi
+      phone:
+        updated: Số điện thoại đã thay đổi
+        verified: Đã xác minh số điện thoại
+        verification:
+          failed: Xác minh số điện thoại không thành công
+        code:
+          added: Mã xác minh số điện thoại được tạo
+          sent: Mã xác minh số điện thoại đã được gửi
+  web_key:
+    added: Đã thêm khóa Web
+    activated: Khóa Web được kích hoạt
+    deactivated: Khóa Web đã bị vô hiệu hóa
+    removed: Khóa web đã bị xóa
+Application:
+  OIDC:
+    UnsupportedVersion: Phiên bản OIDC của bạn không được hỗ trợ
+    V1:
+      NotCompliant: Cấu hình của bạn không tuân thủ và khác với tiêu chuẩn OIDC 1.0.
+      NoRedirectUris: Ít nhất một uri chuyển hướng phải được đăng ký.
+      NotAllCombinationsAreAllowed: Cấu hình tuân thủ nhưng không phải tất cả các
+        kết hợp có thể đều được phép.
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: Loại cấp "mã" chỉ cho phép uris chuyển hướng http cho loại
+            ứng dụng "web".
+          CustomOnlyForNative: 'Loại cấp "mã" chỉ cho phép uri chuyển hướng tùy chỉnh
+            cho loại ứng dụng "bản địa" (ví dụ: tên ứng dụng:// )'
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: Loại trợ cấp ngầm định không cho phép chuyển hướng tùy
+            chỉnh uris
+          HttpNotAllowed: Loại trợ cấp ngầm định không cho phép uris chuyển hướng
+            http
+          HttpLocalhostOnlyForNative: Http://localhost uri chuyển hướng chỉ được phép
+            cho các ứng dụng gốc.
+      Native:
+        AuthMethodType:
+          NotNone: Các ứng dụng gốc không nên có authmethodtype.
+        RedirectUris:
+          MustBeHttpLocalhost: URI chuyển hướng phải bắt đầu bằng giao thức của riêng
+            bạn, http://127.0.0.1, http://[::1] hoặc http://localhost.
+      UserAgent:
+        AuthMethodType:
+          NotNone: Ứng dụng tác nhân người dùng không được có loại phương thức xác
+            thực.
+      GrantType:
+        Refresh:
+          NoAuthCode: Mã thông báo làm mới chỉ được phép kết hợp với Mã ủy quyền.
+Action:
+  Flow:
+    Type:
+      Unspecified: Không xác định
+      ExternalAuthentication: Xác thực bên ngoài
+      CustomiseToken: Mã thông báo bổ sung
+      InternalAuthentication: Xác thực nội bộ
+      CustomizeSAMLResponse: Bổ sung SAMLResponse
+  TriggerType:
+    Unspecified: Không xác định
+    PostAuthentication: Đăng xác thực
+    PreCreation: Tạo trước
+    PostCreation: Tạo bài đăng
+    PreUserinfoCreation: Tạo thông tin người dùng trước
+    PreAccessTokenCreation: Tạo mã thông báo truy cập trước
+    PreSAMLResponseCreation: Tạo trước SAMLResponse

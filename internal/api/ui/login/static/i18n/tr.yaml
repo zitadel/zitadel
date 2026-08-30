@@ -270,6 +270,7 @@ RegistrationUser:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: Vietnam
   GenderLabel: Cinsiyet
   Female: Kadın
   Male: Erkek
@@ -284,7 +285,6 @@ RegistrationUser:
   ExternalLogin: veya harici bir kullanıcı ile kayıt olun
   BackButtonText: Giriş
   NextButtonText: İleri
-
 ExternalRegistrationUserOverview:
   Title: Harici Kullanıcı Kaydı
   Description: Seçilen sağlayıcıdan kullanıcı bilgilerinizi aldık. Artık bunları değiştirebilir veya tamamlayabilirsiniz.
@@ -317,6 +317,7 @@ ExternalRegistrationUserOverview:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: Vietnam
   TosAndPrivacyLabel: Şartlar ve koşullar
   TosConfirm: Kabul ediyorum
   TosLinkText: Kullanım Şartları
@@ -325,7 +326,6 @@ ExternalRegistrationUserOverview:
   ExternalLogin: veya harici bir kullanıcı ile kayıt olun
   BackButtonText: Geri
   NextButtonText: Kaydet
-
 RegistrationOrg:
   Title: Organizasyon Kaydı
   Description: Organizasyon adınızı ve kullanıcı verilerinizi girin.
@@ -398,6 +398,7 @@ ExternalNotFound:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: Vietnam
 DeviceAuth:
   Title: Cihaz Yetkilendirme
   UserCode:
