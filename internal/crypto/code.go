@@ -2,6 +2,7 @@ package crypto
 
 import (
 	"crypto/rand"
+	"math/big"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -151,22 +152,20 @@ func GenerateRandomString(length uint, chars []rune) (string, error) {
 	if length == 0 {
 		return "", nil
 	}
-
-	max := len(chars) - 1
-	maxStr := int(length - 1)
+	if len(chars) == 0 {
+		return "", zerrors.ThrowInvalidArgument(nil, "CODE-aa1wf", "chars must not be empty")
+	}
 
 	str := make([]rune, length)
-	randBytes := make([]byte, length)
-	if _, err := rand.Read(randBytes); err != nil {
-		return "", err
-	}
-	for i, rb := range randBytes {
-		str[i] = chars[int(rb)%max]
-		if i == maxStr {
-			return string(str), nil
+	max := big.NewInt(int64(len(chars)))
+	for i := range str {
+		idx, err := rand.Int(rand.Reader, max)
+		if err != nil {
+			return "", err
 		}
+		str[i] = chars[int(idx.Int64())]
 	}
-	return "", nil
+	return string(str), nil
 }
 
 func verifyEncryptedCode(cryptoCode *CryptoValue, verificationCode string, alg EncryptionAlgorithm) error {

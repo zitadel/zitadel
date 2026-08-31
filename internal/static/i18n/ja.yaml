@@ -177,6 +177,7 @@ Errors:
         NotExisting: "多要素OTP（ワンタイムパスワード）が存在しません"
         NotReady: "多要素OTP（ワンタイムパスワード）が利用可能でありません"
         InvalidCode: "無効なコードです"
+        Reused: "このコードはすでに使用されています。新しいコードをお待ちください"
       U2F:
         NotExisting: "U2Fは存在しません"
       Passwordless:
@@ -205,6 +206,7 @@ Errors:
     AlreadyActive: "組織はすでにアクティブです"
     Empty: "組織は空です"
     NotFound: "組織が見つかりません"
+    NotActive: "組織はアクティブではありません"
     NotChanged: "組織は変更されていません"
     DefaultOrgNotDeletable: "デフォルトの組織は削除できません"
     ZitadelOrgNotDeletable: "Zitadelプロジェクトの組織は削除できません"
@@ -283,6 +285,8 @@ Errors:
     LabelPolicy:
       NotFound: "プライベートラベルポリシーが見つかりません"
       NotChanged: "プライベートラベルポリシーが変更されていません"
+    IDPConfig:
+      NotExisting: "IDプロバイダーの構成は存在しません"
   Project:
     ProjectIDMissing: "プロジェクトIDがありません"
     AlreadyExists: "プロジェクトはすでに組織に存在しています"
@@ -765,6 +769,7 @@ EventTypes:
           check:
             succeeded: "MFA OTPチェックの成功"
             failed: "MFA OTPチェックの失敗"
+            reused: "MFA OTPコードの再利用"
           sms:
             added: "多要素 OTP SMS を追加しました"
             removed: "多要素 OTP SMS を削除しました"

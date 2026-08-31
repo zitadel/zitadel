@@ -164,6 +164,7 @@
     "signInWithAzureAD": "Sign in with AzureAD",
     "signInWithGithub": "Sign in with GitHub",
     "signInWithGitlab": "Sign in with GitLab",
+    "signInWithZitadel": "Sign in with Zitadel",
     "loginError": {
       "title": "Login failed",
       "description": "An error occurred while trying to login."
@@ -456,6 +457,7 @@
     "sessionExpired": "Your current session has expired. Please login again.",
     "failedLoading": "Failed to load data. Please try again.",
     "tryagain": "Try Again",
-    "couldNotContinueSession": "Could not continue with session - missing user information"
+    "couldNotContinueSession": "Could not continue with session - missing user information",
+    "couldNotClearSession": "Could not end the session. Please try again."
   }
 }
