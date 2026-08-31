@@ -59,6 +59,16 @@ async function readUserAfterCreate(path: string, userId: string, org: Org, acces
       // field itself, not just for the object. Observed at 600 VUs on
       // human_password_login, 2026-08-27: ten retries available, none consumed.
       if (user && Array.isArray(user.loginNames) && user.loginNames.length > 0) {
+        // A loop that only reports itself when it gives up says nothing about how close it
+        // came, which is how the budget below got guessed at three times before it was
+        // measured once. Deliberately a log line and not a Trend: a Trend recorded here
+        // reaches output.json for manipulate_user, where this runs inside the measured
+        // iteration, and moving a published series to observe it would defeat the point.
+        if (attempt > 0) {
+          console.warn(
+            `read-back retried: user ${userId} readable after ${attempt + 1} attempts, previous status ${lastStatus}`,
+          );
+        }
         return { user, lastStatus: res.status, lastBody: '', attempts: attempt + 1 };
       }
     }
