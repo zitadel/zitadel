@@ -73,7 +73,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          git add apps/docs/scripts/endpoint-error-tracing apps/docs/components/EndpointErrors/data.json
+          # Only the raw tracing JSON, deliberately — EndpointErrors/data.json
+          # also depends on content/reference/api (gitignored, only produced
+          # by a full docs build), which doesn't exist in this bare checkout.
+          # Committing it here would overwrite the real, already-populated
+          # data.json with an empty one. The next real docs build regenerates
+          # it correctly from the tracing JSON committed here — that's
+          # already wired into the build chain, nothing extra needed.
+          git add apps/docs/scripts/endpoint-error-tracing
           if git diff --cached --quiet; then
             echo "Nothing to update — every category is already traced and current."
             exit 0
