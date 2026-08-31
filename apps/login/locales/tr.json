@@ -152,7 +152,8 @@
       "failedPrecondition": "Ön koşul başarısız",
       "sessionNotValid": "Oturum geçerli değil",
       "passwordVerificationMissing": "Şifre doğrulaması eksik.",
-      "passwordVerificationTooOld": "Şifre doğrulaması çok eski. Lütfen şifrenizi tekrar doğrulayın."
+      "passwordVerificationTooOld": "Şifre doğrulaması çok eski. Lütfen şifrenizi tekrar doğrulayın.",
+      "passwordResetNotAllowed": "Şifre sıfırlamaya izin verilmiyor. Daha fazla bilgi için yöneticinizle iletişime geçin."
     }
   },
   "idp": {
@@ -261,6 +262,10 @@
       "required": {
         "code": "Bu alan zorunludur"
       }
+    },
+    "errors": {
+      "couldNotRequestChallenge": "OTP meydan okuması istenemedi",
+      "couldNotVerifyCode": "OTP kodu doğrulanamadı"
     }
   },
   "passkey": {
@@ -422,7 +427,15 @@
     "description": "Kimlik doğrulaması yapmak istediğiniz yöntemi seçin",
     "noMethodsAvailable": "Kullanılabilir kimlik doğrulama yöntemi yok",
     "allSetup": "Zaten bir kimlik doğrulayıcı kurdunuz!",
-    "linkWithIDP": "veya bir Kimlik Sağlayıcı ile bağlantı kurun"
+    "linkWithIDP": "veya bir Kimlik Sağlayıcı ile bağlantı kurun",
+    "methods": {
+      "totp": "Kimlik doğrulayıcı uygulaması",
+      "u2f": "Evrensel ikinci faktör",
+      "otpEmail": "E-posta ile kod",
+      "otpSms": "SMS ile kod",
+      "passkey": "Passkey",
+      "password": "Şifre"
+    }
   },
   "device": {
     "usercode": {

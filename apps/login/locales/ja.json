@@ -135,7 +135,8 @@
       "couldNotLoadSession": "セッションを読み込めませんでした",
       "couldNotLoadAuthMethods": "認証方法を読み込めませんでした",
       "failedPrecondition": "前提条件に失敗しました",
-      "sessionNotValid": "セッションが無効です"
+      "sessionNotValid": "セッションが無効です",
+      "passwordResetNotAllowed": "パスワードのリセットは許可されていません。詳細については管理者に問い合わせてください。"
     },
     "complexity": {
       "length": "{minLength} 文字以上である必要があります。",
@@ -254,6 +255,10 @@
       "required": {
         "code": "必須項目です"
       }
+    },
+    "errors": {
+      "couldNotRequestChallenge": "OTPチャレンジをリクエストできませんでした",
+      "couldNotVerifyCode": "OTPコードを確認できませんでした"
     }
   },
   "passkey": {
@@ -415,7 +420,15 @@
     "description": "認証に使用する方法を選択してください",
     "noMethodsAvailable": "使用可能な認証方法がありません",
     "allSetup": "認証の設定は既に完了しています！",
-    "linkWithIDP": "またはIDプロバイダーと連携"
+    "linkWithIDP": "またはIDプロバイダーと連携",
+    "methods": {
+      "totp": "認証アプリ",
+      "u2f": "ユニバーサルセカンドファクター",
+      "otpEmail": "メールでコードを受け取る",
+      "otpSms": "SMSでコードを受け取る",
+      "passkey": "パスキー",
+      "password": "パスワード"
+    }
   },
   "device": {
     "usercode": {
