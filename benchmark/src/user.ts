@@ -2,7 +2,8 @@ import { Trend } from 'k6/metrics';
 import { Org } from './org';
 import http, { RefinedResponse } from 'k6/http';
 import url from './url';
-import { check, sleep } from 'k6';
+import { check } from 'k6';
+import { setTimeout } from 'k6/timers';
 import { Metadata } from './metadata';
 
 export type User = {
@@ -25,12 +26,21 @@ export interface Human extends User {
 // and reported nothing more useful than "not readable", which cost a whole cycle.
 export type ReadUserResult = { user?: any; lastStatus: number; lastBody: string; attempts: number };
 
-function readUserAfterCreate(path: string, userId: string, org: Org, accessToken: string): ReadUserResult {
+// Backoff that yields to the event loop. `sleep()` would not: k6 documents that it "blocks VU
+// execution and prevents promises from resolving and event handlers from running", and the same
+// is true of the synchronous `http.get`. That matters here and nowhere else in this file, because
+// this is the one helper called from inside a `.then()` callback while up to MaxVUs sibling
+// creations are still in flight -- blocking serialises every one of them behind this loop.
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function readUserAfterCreate(path: string, userId: string, org: Org, accessToken: string): Promise<ReadUserResult> {
   let lastStatus = -1;
   let lastBody = '';
   let attempt = 0;
   for (attempt = 0; attempt < 60; attempt++) {
-    const res = http.get(url(`${path}/${userId}`), {
+    const res = await http.asyncRequest('GET', url(`${path}/${userId}`), null, {
       tags: { name: `${path}/{userId}` },
       headers: {
         authorization: `Bearer ${accessToken}`,
@@ -61,71 +71,62 @@ function readUserAfterCreate(path: string, userId: string, org: Org, accessToken
     // v4.17.1 sweep -- and some users then take longer than 25s. Successive budgets of
     // 5.5s and 25s were both exhausted at 600 VUs on 2026-08-27, returning HTTP 200 with
     // a valid user record and no loginNames every time.
-    sleep(Math.min(0.1 * (attempt + 1), 2));
+    await delay(Math.min(100 * (attempt + 1), 2000));
   }
   return { user: undefined, lastStatus, lastBody, attempts: attempt };
 }
 
 const createHumanTrend = new Trend('user_create_human_duration', true);
-export function createHuman(username: string, org: Org, accessToken: string): Promise<Human> {
-  return new Promise((resolve, reject) => {
-    let response = http.asyncRequest(
-      'POST',
-      url('/v2/users/human'),
-      JSON.stringify({
-        username: username,
-        organization: {
-          orgId: org.organizationId,
-        },
-        profile: {
-          givenName: 'Gigi',
-          familyName: 'Zitizen',
-        },
-        email: {
-          email: `${username}@zitadel.com`,
-          isVerified: true,
-        },
-        password: {
-          password: 'Password1!',
-          changeRequired: false,
-        },
-      }),
-      {
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-          'x-zitadel-orgid': org.organizationId,
-        },
+export async function createHuman(username: string, org: Org, accessToken: string): Promise<Human> {
+  const res = await http.asyncRequest(
+    'POST',
+    url('/v2/users/human'),
+    JSON.stringify({
+      username: username,
+      organization: {
+        orgId: org.organizationId,
       },
+      profile: {
+        givenName: 'Gigi',
+        familyName: 'Zitizen',
+      },
+      email: {
+        email: `${username}@zitadel.com`,
+        isVerified: true,
+      },
+      password: {
+        password: 'Password1!',
+        changeRequired: false,
+      },
+    }),
+    {
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'x-zitadel-orgid': org.organizationId,
+      },
+    },
+  );
+
+  if (
+    !check(res, {
+      'create user is status ok': (r) => r.status >= 200 && r.status < 300,
+    })
+  ) {
+    throw new Error(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
+  }
+  createHumanTrend.add(res.timings.duration);
+
+  const userId = res.json('userId') as string;
+  const read = await readUserAfterCreate('/v2/users', userId, org, accessToken);
+  if (!read.user) {
+    throw new Error(
+      `user ${userId} not readable with login names after create ` +
+        `(username: ${username}, attempts: ${read.attempts}, last status: ${read.lastStatus}, ` +
+        `last body: ${read.lastBody})`,
     );
-
-    response
-      .then((res) => {
-        if (
-          !check(res, {
-            'create user is status ok': (r) => r.status >= 200 && r.status < 300,
-          })
-        ) {
-          reject(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
-          return;
-        }
-        createHumanTrend.add(res.timings.duration);
-
-        const read = readUserAfterCreate('/v2/users', res.json('userId') as string, org, accessToken);
-        if (!read.user) {
-          reject(
-            `user ${res.json('userId')} not readable with login names after create ` +
-              `(username: ${username}, attempts: ${read.attempts}, last status: ${read.lastStatus}, ` +
-              `last body: ${read.lastBody})`,
-          );
-          return;
-        }
-        resolve(read.user as unknown as Human);
-      })
-      .catch((reason) => {
-        reject(reason);
-      });
-  });
+  }
+  return read.user as unknown as Human;
 }
 
 const setEmailOTPOnHumanTrend = new Trend('set_human_email_otp_duration', true);
@@ -182,53 +183,44 @@ export interface Machine extends User {
 }
 
 const createMachineTrend = new Trend('user_create_machine_duration', true);
-export function createMachine(username: string, org: Org, accessToken: string): Promise<Machine> {
-  return new Promise((resolve, reject) => {
-    let response = http.asyncRequest(
-      'POST',
-      url('/management/v1/users/machine'),
-      JSON.stringify({
-        userName: username,
-        name: username,
-        // bearer
-        access_token_type: 0,
-      }),
-      {
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-          'x-zitadel-orgid': org.organizationId,
-        },
+export async function createMachine(username: string, org: Org, accessToken: string): Promise<Machine> {
+  const res = await http.asyncRequest(
+    'POST',
+    url('/management/v1/users/machine'),
+    JSON.stringify({
+      userName: username,
+      name: username,
+      // bearer
+      access_token_type: 0,
+    }),
+    {
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'x-zitadel-orgid': org.organizationId,
       },
+    },
+  );
+
+  if (
+    !check(res, {
+      'create user is status ok': (r) => r.status >= 200 && r.status < 300,
+    })
+  ) {
+    throw new Error(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
+  }
+  createMachineTrend.add(res.timings.duration);
+
+  const userId = res.json('userId') as string;
+  const read = await readUserAfterCreate('/v2/users', userId, org, accessToken);
+  if (!read.user) {
+    throw new Error(
+      `user ${userId} not readable with login names after create ` +
+        `(username: ${username}, attempts: ${read.attempts}, last status: ${read.lastStatus}, ` +
+        `last body: ${read.lastBody})`,
     );
-
-    response
-      .then((res) => {
-        if (
-          !check(res, {
-            'create user is status ok': (r) => r.status >= 200 && r.status < 300,
-          })
-        ) {
-          reject(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
-          return;
-        }
-        createMachineTrend.add(res.timings.duration);
-
-        const read = readUserAfterCreate('/v2/users', res.json('userId') as string, org, accessToken);
-        if (!read.user) {
-          reject(
-            `user ${res.json('userId')} not readable with login names after create ` +
-              `(username: ${username}, attempts: ${read.attempts}, last status: ${read.lastStatus}, ` +
-              `last body: ${read.lastBody})`,
-          );
-          return;
-        }
-        resolve(read.user as unknown as Machine);
-      })
-      .catch((reason) => {
-        reject(reason);
-      });
-  });
+  }
+  return read.user as unknown as Machine;
 }
 
 export type MachinePat = {
