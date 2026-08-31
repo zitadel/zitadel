@@ -39,7 +39,7 @@ async function readUserAfterCreate(path: string, userId: string, org: Org, acces
   let lastStatus = -1;
   let lastBody = '';
   let attempt = 0;
-  for (attempt = 0; attempt < 60; attempt++) {
+  for (attempt = 0; attempt < 120; attempt++) {
     const res = await http.asyncRequest('GET', url(`${path}/${userId}`), null, {
       tags: { name: `${path}/{userId}` },
       headers: {
@@ -74,13 +74,19 @@ async function readUserAfterCreate(path: string, userId: string, org: Org, acces
     }
     lastStatus = res.status;
     lastBody = (res.body ? String(res.body) : '<null body>').slice(0, 200);
-    // ~100s of waiting in total (backoff rises to 2s and stays there). Sized against a
+    // ~220s of waiting in total (backoff rises to 2s and stays there). Sized against a
     // measured behaviour, not a guess: unloaded, login names are present on the *first*
     // GET, but a burst of MaxVUs concurrent creations queues them all behind the
     // projection handler advisory lock -- the single largest database cost in the whole
-    // v4.17.1 sweep -- and some users then take longer than 25s. Successive budgets of
-    // 5.5s and 25s were both exhausted at 600 VUs on 2026-08-27, returning HTTP 200 with
-    // a valid user record and no loginNames every time.
+    // v4.17.1 sweep.
+    // 5.5s and 25s were exhausted at 600 VUs on 2026-08-27; ~100s was exhausted at 200 VUs
+    // on 2026-08-31, once the read-back stopped blocking the event loop. That last increase
+    // is not the previous ones repeated. While the loop blocked, read-backs ran one at a
+    // time, so user N's budget did not start until users 0..N-1 had finished -- a straggler
+    // at index 150 was first asked ~10s in and got 110s of projection time without anyone
+    // choosing to give it any. Running them concurrently aligns all MaxVUs deadlines on the
+    // same instant, which is correct but strictly less forgiving, and the budget has to be
+    // the one somebody picked rather than the one serialisation happened to provide.
     await delay(Math.min(100 * (attempt + 1), 2000));
   }
   return { user: undefined, lastStatus, lastBody, attempts: attempt };
