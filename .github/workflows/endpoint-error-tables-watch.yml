@@ -1,17 +1,17 @@
 name: Endpoint error tables — watch
 
 # Runs on every PR that touches a v2 service's .proto file or its Go
-# handler package. Re-traces just the affected categories
-# (apps/docs/scripts/trace-all-categories.ts --only <categories>) to see
+# handler package. Re-traces whatever categories changed since the PR's
+# base (apps/docs/scripts/trace-endpoint-errors.ts --changed-since) to see
 # whether that changes anything.
 #
 # Never pushes a commit onto a PR branch it doesn't own — same treatment
 # for a same-repo PR or a fork, since neither gets touched. Instead: if the
-# tables are out of date, it comments with the exact command to run *and
-# fails the check* — a comment with no enforcement gets ignored, so this is
-# a required check once branch protection is set to require it (see the
-# repo settings — that's a separate, deliberate step, not done by this
-# workflow itself).
+# tables are out of date, it fails the check with the exact command to run —
+# that failure message is what shows up in the PR's checks UI, no separate
+# comment needed. This is a required check once branch protection is set to
+# require it (see the repo settings — that's a separate, deliberate step,
+# not done by this workflow itself).
 #
 # No bypass, deliberately: the trigger only fires when a proto/Go file
 # actually changed, so a failure here always means the tables genuinely
@@ -25,7 +25,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   watch:
@@ -63,25 +62,21 @@ jobs:
       - name: Generate protobuf/gRPC stubs
         run: pnpm exec nx run @zitadel/api:generate-stubs
 
-      - name: Find affected categories
-        id: affected
+      - name: Trace affected categories
+        id: trace
         working-directory: apps/docs
         run: |
           set -euo pipefail
           git fetch origin "${{ github.event.pull_request.base.sha }}" --depth=1
-          categories=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" \
-            | pnpm exec tsx scripts/affected-categories.ts)
+          output=$(pnpm exec tsx scripts/trace-endpoint-errors.ts --changed-since "${{ github.event.pull_request.base.sha }}")
+          echo "$output"
+          categories=$(echo "$output" | grep -o 'AFFECTED_CATEGORIES=.*' | head -1 | cut -d= -f2)
           echo "categories=$categories" >> "$GITHUB_OUTPUT"
           echo "Affected categories: ${categories:-none}"
 
-      - name: Re-trace affected categories
-        if: steps.affected.outputs.categories != ''
-        working-directory: apps/docs
-        run: pnpm exec tsx scripts/trace-all-categories.ts --only "${{ steps.affected.outputs.categories }}"
-
       - name: Check for drift
         id: drift
-        if: steps.affected.outputs.categories != ''
+        if: steps.trace.outputs.categories != ''
         run: |
           # Only the raw per-category tracing JSON is a meaningful signal
           # here — it depends solely on real Go source + generated stubs,
@@ -96,43 +91,8 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 
-      # Always posts a status comment, success or failure — a silent green
-      # check is easy to miss buried among all the PR's other checks.
-      # Updates the same comment across pushes (found via the hidden
-      # marker) instead of leaving a new one behind every run.
-      - name: Post/update status comment
-        if: steps.affected.outputs.categories != ''
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          marker="<!-- endpoint-error-tables-watch -->"
-          if [ "${{ steps.drift.outputs.changed }}" = "true" ]; then
-            body="$marker
-          🤖 This PR changes Go/proto code for: \`${{ steps.affected.outputs.categories }}\`, and their error tables are now out of date — that's the only reason these categories are affected and not others, it's a side effect of what this PR touches, not a deliberate pick.
-
-          Run this locally and push the result so the tables (and the preview) reflect it:
-
-          \`\`\`
-          pnpm exec tsx scripts/trace-all-categories.ts --only ${{ steps.affected.outputs.categories }}
-          \`\`\`
-
-          (from \`apps/docs\`)."
-          else
-            body="$marker
-          ✅ Checked \`${{ steps.affected.outputs.categories }}\` — error tables are already up to date."
-          fi
-
-          existing_id=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
-            --jq ".[] | select(.body | startswith(\"$marker\")) | .id" | head -1)
-          if [ -n "$existing_id" ]; then
-            gh api -X PATCH "repos/${{ github.repository }}/issues/comments/$existing_id" -f body="$body"
-          else
-            gh pr comment "${{ github.event.pull_request.number }}" --body "$body"
-          fi
-
       - name: Fail if not addressed
         if: steps.drift.outputs.changed == 'true'
         run: |
-          echo "::error::Error tables are out of date for: ${{ steps.affected.outputs.categories }}. Run 'pnpm exec tsx scripts/trace-all-categories.ts --only ${{ steps.affected.outputs.categories }}' from apps/docs and push the result."
+          echo "::error::Error tables are out of date for: ${{ steps.trace.outputs.categories }}. Run 'pnpm exec tsx scripts/trace-endpoint-errors.ts --only ${{ steps.trace.outputs.categories }}' from apps/docs and push the result."
           exit 1

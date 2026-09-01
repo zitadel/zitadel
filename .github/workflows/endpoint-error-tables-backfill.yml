@@ -2,7 +2,7 @@ name: Endpoint error tables — backfill
 
 # Traces every discovered v2 API category with internal/tools/errortrace and
 # regenerates the per-endpoint "Possible error responses" tables
-# (apps/docs/scripts/trace-all-categories.ts).
+# (apps/docs/scripts/trace-endpoint-errors.ts).
 #
 # Runs automatically on every push to main that touches a proto service or
 # its Go handlers — the normal case needs no one to click anything. Mostly a
@@ -15,8 +15,8 @@ name: Endpoint error tables — backfill
 #
 # workflow_dispatch stays as a manual fallback — same script, run on demand
 # if the automatic trigger ever misses something or you just want to force
-# a full recheck. The underlying CLI (trace-all-categories.ts /
-# trace-category-cli.ts) is also always runnable by hand regardless of CI.
+# a full recheck. trace-endpoint-errors.ts is also always runnable by hand
+# regardless of CI.
 #
 # Either way this opens its own PR rather than pushing straight to main —
 # it's a bulk, mechanically-generated diff across many docs pages, worth a
@@ -66,7 +66,7 @@ jobs:
 
       - name: Trace every category
         working-directory: apps/docs
-        run: pnpm exec tsx scripts/trace-all-categories.ts
+        run: pnpm exec tsx scripts/trace-endpoint-errors.ts
 
       - name: Open a PR with the results
         env:
@@ -96,6 +96,6 @@ jobs:
 
           gh pr create \
             --title "docs: backfill endpoint error tables" \
-            --body "Automated run of \`trace-all-categories.ts\` — traces every discovered v2 API category and regenerates the per-endpoint \"Possible error responses\" tables. Triggered manually via the endpoint-error-tables-backfill workflow." \
+            --body "Automated run of \`trace-endpoint-errors.ts\` — traces every discovered v2 API category and regenerates the per-endpoint \"Possible error responses\" tables. Triggered manually via the endpoint-error-tables-backfill workflow." \
             --base main \
             --head "$branch"

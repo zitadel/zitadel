@@ -53,13 +53,12 @@
 //    proto/zitadel/, internal/api/grpc/, and content/reference/api/) must be
 //    IDENTICAL across all three. This is the one rule with no error message
 //    if you get it wrong — a mismatch just makes the service quietly not
-//    appear. Run `pnpm generate:endpoint-trace:category` and check the
-//    "not fully wired up yet" section it prints (via
-//    listUnwiredProtoServices() below) if a category you expect is missing;
-//    it names exactly which of #2/#3 it can't find.
+//    appear. If a category you expect is missing, compare its directory name
+//    across all three paths by hand — that's exactly what a mismatch here
+//    looks like.
 // 5. (Optional, cosmetic only) A `description: "..."` inside the proto's own
-//    openapiv2_swagger info block, before the `service` line, shows in the
-//    category picker. No description there just means the CLI shows none —
+//    openapiv2_swagger info block, before the `service` line, is surfaced
+//    alongside the category. No description there just means none shows —
 //    never invented.
 //
 // None of this is new process to adopt — it's already how every existing v2
@@ -85,7 +84,7 @@
 // ─────────────────────────────────────────────────────────────────────────
 
 import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync } from 'fs';
-import { join, dirname, relative } from 'path';
+import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { GRPC_STATUS } from '../lib/grpc-status';
 
@@ -189,37 +188,13 @@ export function discoverServices(): ServiceConfig[] {
 // is deliberately strict for anything that writes committed output (this
 // file's own main() below), since a category it can't find a real page for
 // has nowhere correct to stamp a table anyway. This lenient variant is for
-// callers that only need to identify/trace a category — detecting a PR's
-// affected categories (affected-categories.ts) and running the tracer
-// against them (trace-all-categories.ts) — where no docs page needing to
-// exist yet is fine.
+// callers that only need to identify/trace a category — trace-endpoint-errors.ts,
+// detecting a PR's affected categories and tracing them, where no docs page
+// needing to exist yet is fine.
 export function discoverTraceableServices(): ServiceConfig[] {
   return scanCandidates().filter((c) => c.goPackageDirExists);
 }
 
-// The other half of discoverServices(): proto services that exist but aren't
-// fully wired up yet, with exactly what's missing — rule #4 in the "standard"
-// comment above is the one with no error message if violated (a <category>
-// segment mismatch just makes a service silently not appear), so this makes
-// that failure mode visible instead of silent. trace-category-cli.ts prints
-// this below the main menu.
-export function listUnwiredProtoServices(): { category: string; service: string; protoFile: string; missing: string[] }[] {
-  return scanCandidates()
-    .filter((c) => !c.contentDirExists || !c.goPackageDirExists)
-    .map((c) => ({
-      category: c.category,
-      service: c.service,
-      protoFile: c.protoFile,
-      missing: [
-        !c.contentDirExists && `docs content dir (${relativeToRepo(c.contentDir)})`,
-        !c.goPackageDirExists && `Go handler package (${relativeToRepo(c.goPackageDir)})`,
-      ].filter((x): x is string => Boolean(x)),
-    }));
-}
-
-function relativeToRepo(absPath: string): string {
-  return relative(REPO_ROOT, absPath);
-}
 
 const SERVICES = discoverServices();
 
@@ -452,7 +427,7 @@ function main() {
 
 // Only run the merge when this file is executed directly (`tsx
 // generate-endpoint-errors.ts`) — not when another script imports
-// discoverServices() from it (trace-endpoint-errors.ts, trace-category-cli.ts),
-// which would otherwise silently trigger a full merge run as a side effect
-// of just wanting the service list.
+// discoverServices()/discoverTraceableServices() from it
+// (trace-endpoint-errors.ts), which would otherwise silently trigger a full
+// merge run as a side effect of just wanting the service list.
 if (import.meta.url === `file://${process.argv[1]}`) main();
