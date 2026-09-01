@@ -457,6 +457,7 @@
     "sessionExpired": "当前会话已过期，请重新登录。",
     "failedLoading": "加载数据失败，请再试一次。",
     "tryagain": "重试",
-    "couldNotContinueSession": "无法继续会话 - 缺少用户信息"
+    "couldNotContinueSession": "无法继续会话 - 缺少用户信息",
+    "couldNotClearSession": "无法结束会话。请重试。"
   }
 }

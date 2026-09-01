@@ -505,6 +505,7 @@ Errors:
         AlreadyReady: OTP (OneTimePassword) уже настроен
         NotExisting: OTP (OneTimePassword) не существует
         InvalidCode: Неверный код
+        Reused: Этот код уже был использован. Пожалуйста, дождитесь нового кода
         NotReady: OTP (OneTimePassword) не готов
     Locked: Пользователь заблокирован
     SomethingWentWrong: Что-то пошло не так
