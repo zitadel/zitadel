@@ -164,6 +164,7 @@
     "signInWithAzureAD": "Se connecter avec AzureAD",
     "signInWithGithub": "Se connecter avec GitHub",
     "signInWithGitlab": "Se connecter avec GitLab",
+    "signInWithZitadel": "Se connecter avec Zitadel",
     "loginError": {
       "title": "Échec de la connexion",
       "description": "Une erreur est survenue lors de la tentative de connexion."
@@ -456,6 +457,7 @@
     "sessionExpired": "Votre session actuelle a expiré. Veuillez vous reconnecter.",
     "failedLoading": "Échec du chargement des données. Veuillez réessayer.",
     "tryagain": "Réessayer",
-    "couldNotContinueSession": "Impossible de continuer la session - informations utilisateur manquantes"
+    "couldNotContinueSession": "Impossible de continuer la session - informations utilisateur manquantes",
+    "couldNotClearSession": "La session n'a pas pu être terminée. Veuillez réessayer."
   }
 }

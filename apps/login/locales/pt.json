@@ -164,6 +164,7 @@
     "signInWithAzureAD": "Entrar com AzureAD",
     "signInWithGithub": "Entrar com GitHub",
     "signInWithGitlab": "Entrar com GitLab",
+    "signInWithZitadel": "Entrar com Zitadel",
     "loginError": {
       "title": "Falha no login",
       "description": "Ocorreu um erro ao tentar fazer login."
@@ -456,6 +457,7 @@
     "sessionExpired": "Sua sessão atual expirou. Por favor, faça login novamente.",
     "failedLoading": "Falha ao carregar dados. Por favor, tente novamente.",
     "tryagain": "Tentar Novamente",
-    "couldNotContinueSession": "Não foi possível continuar a sessão — informações do usuário ausentes"
+    "couldNotContinueSession": "Não foi possível continuar a sessão — informações do usuário ausentes",
+    "couldNotClearSession": "Não foi possível terminar a sessão. Tente novamente."
   }
 }

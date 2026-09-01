@@ -164,6 +164,7 @@
     "signInWithAzureAD": "AzureAD ile Giriş",
     "signInWithGithub": "GitHub ile Giriş",
     "signInWithGitlab": "GitLab ile Giriş",
+    "signInWithZitadel": "Zitadel ile Giriş",
     "loginError": {
       "title": "Giriş başarısız",
       "description": "Giriş yapılmaya çalışılırken bir hata oluştu."
@@ -456,6 +457,7 @@
     "sessionExpired": "Mevcut oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.",
     "failedLoading": "Veri yüklenemedi. Lütfen tekrar deneyin.",
     "tryagain": "Tekrar Dene",
-    "couldNotContinueSession": "Oturuma devam edilemedi - kullanıcı bilgileri eksik"
+    "couldNotContinueSession": "Oturuma devam edilemedi - kullanıcı bilgileri eksik",
+    "couldNotClearSession": "Oturum sonlandırılamadı. Lütfen tekrar deneyin."
   }
 }

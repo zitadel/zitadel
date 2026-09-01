@@ -91,6 +91,7 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, HumanMFAOTPRemovedType, HumanOTPRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, HumanMFAOTPCheckSucceededType, HumanOTPCheckSucceededEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, HumanMFAOTPCheckFailedType, HumanOTPCheckFailedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, HumanMFAOTPCheckReusedType, eventstore.GenericEventMapper[HumanOTPCheckReusedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, HumanOTPSMSAddedType, eventstore.GenericEventMapper[HumanOTPSMSAddedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, HumanOTPSMSRemovedType, eventstore.GenericEventMapper[HumanOTPSMSRemovedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, HumanOTPSMSCodeAddedType, eventstore.GenericEventMapper[HumanOTPSMSCodeAddedEvent])

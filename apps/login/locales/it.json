@@ -164,6 +164,7 @@
     "signInWithAzureAD": "Accedi con AzureAD",
     "signInWithGithub": "Accedi con GitHub",
     "signInWithGitlab": "Accedi con GitLab",
+    "signInWithZitadel": "Accedi con Zitadel",
     "loginError": {
       "title": "Accesso fallito",
       "description": "Si è verificato un errore durante il tentativo di accesso."
@@ -456,6 +457,7 @@
     "sessionExpired": "La tua sessione attuale è scaduta. Effettua nuovamente l'accesso.",
     "failedLoading": "Impossibile caricare i dati. Riprova.",
     "tryagain": "Riprova",
-    "couldNotContinueSession": "Impossibile continuare con la sessione - informazioni utente mancanti"
+    "couldNotContinueSession": "Impossibile continuare con la sessione - informazioni utente mancanti",
+    "couldNotClearSession": "Impossibile terminare la sessione. Riprova."
   }
 }

@@ -269,6 +269,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "apis/openidoauth/grant-types",
           "apis/openidoauth/authrequest",
           "guides/integrate/login/oidc/webkeys",
+          "guides/integrate/login/oidc/native-app-links",
           "guides/integrate/token-exchange",
         ],
       },
@@ -513,6 +514,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "guides/integrate/login-ui/saml-standard",
           "guides/integrate/login-ui/device-auth",
           "guides/integrate/login-ui/login-app",
+          "guides/integrate/login-ui/fork-and-deploy-login-app",
         ],
       },
       {

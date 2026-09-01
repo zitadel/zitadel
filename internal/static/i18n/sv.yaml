@@ -176,6 +176,7 @@ Errors:
         NotExisting: "Tvåfaktor OTP (OneTimePassword) finns inte"
         NotReady: "Tvåfaktor OTP (OneTimePassword) är inte redo"
         InvalidCode: "Ogiltig kod"
+        Reused: "Den här koden har redan använts. Vänta på en ny kod"
       U2F:
         NotExisting: "U2F finns inte"
       Passwordless:
@@ -204,6 +205,7 @@ Errors:
     AlreadyActive: "Organisationen är redan aktiv"
     Empty: "Organisationen är tom"
     NotFound: "Organisationen hittades inte"
+    NotActive: "Organisationen är inte aktiv"
     NotChanged: "Organisationen ändrades inte"
     DefaultOrgNotDeletable: "Standardorganisationen får inte raderas"
     ZitadelOrgNotDeletable: "Organisationen med Zitadel-projekt får inte raderas"
@@ -766,6 +768,7 @@ EventTypes:
           check:
             succeeded: "Tvåfaktor OTP-kontroll lyckades"
             failed: "Tvåfaktor OTP-kontroll misslyckades"
+            reused: "Tvåfaktor OTP-kod återanvänd"
           sms:
             added: "Tvåfaktor OTP SMS tillagd"
             removed: "Tvåfaktor OTP SMS borttagen"

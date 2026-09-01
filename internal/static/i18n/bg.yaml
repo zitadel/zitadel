@@ -176,6 +176,7 @@ Errors:
         NotExisting: "Многофакторният OTP (OneTimePassword) не съществува"
         NotReady: "Многофакторният OTP (OneTimePassword) не е готов"
         InvalidCode: "Невалиден код"
+        Reused: "Този код вече е използван. Моля, изчакайте нов код"
       U2F:
         NotExisting: "U2F не съществува"
       Passwordless:
@@ -204,6 +205,7 @@ Errors:
     AlreadyActive: "Организацията вече е активна"
     Empty: "Организацията е празна"
     NotFound: "Организацията не е намерена"
+    NotActive: "Организацията не е активна"
     NotChanged: "Организацията не е променена"
     DefaultOrgNotDeletable: "Организацията по подразбиране не трябва да се изтрива"
     ZitadelOrgNotDeletable: "Организация с проект Zitadel не трябва да се изтрива"
@@ -762,6 +764,7 @@ EventTypes:
           check:
             succeeded: "Многофакторната OTP проверка е успешна"
             failed: "Многофакторната OTP проверка е неуспешна"
+            reused: "Многофакторният OTP код е използван повторно"
           sms:
             added: "Добавен Многофакторната OTP SMS"
             removed: "Премахнато многофакторно OTP SMS"
