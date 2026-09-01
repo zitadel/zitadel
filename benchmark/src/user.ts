@@ -39,7 +39,7 @@ async function readUserAfterCreate(path: string, userId: string, org: Org, acces
   let lastStatus = -1;
   let lastBody = '';
   let attempt = 0;
-  for (attempt = 0; attempt < 120; attempt++) {
+  for (attempt = 0; attempt < 60; attempt++) {
     const res = await http.asyncRequest('GET', url(`${path}/${userId}`), null, {
       tags: { name: `${path}/{userId}` },
       headers: {
@@ -74,19 +74,29 @@ async function readUserAfterCreate(path: string, userId: string, org: Org, acces
     }
     lastStatus = res.status;
     lastBody = (res.body ? String(res.body) : '<null body>').slice(0, 200);
-    // ~220s of waiting in total (backoff rises to 2s and stays there). Sized against a
+    // ~100s of waiting in total (backoff rises to 2s and stays there). Sized against a
     // measured behaviour, not a guess: unloaded, login names are present on the *first*
-    // GET, but a burst of MaxVUs concurrent creations queues them all behind the
-    // projection handler advisory lock -- the single largest database cost in the whole
-    // v4.17.1 sweep.
-    // 5.5s and 25s were exhausted at 600 VUs on 2026-08-27; ~100s was exhausted at 200 VUs
-    // on 2026-08-31, once the read-back stopped blocking the event loop. That last increase
-    // is not the previous ones repeated. While the loop blocked, read-backs ran one at a
-    // time, so user N's budget did not start until users 0..N-1 had finished -- a straggler
-    // at index 150 was first asked ~10s in and got 110s of projection time without anyone
-    // choosing to give it any. Running them concurrently aligns all MaxVUs deadlines on the
-    // same instant, which is correct but strictly less forgiving, and the budget has to be
-    // the one somebody picked rather than the one serialisation happened to provide.
+    // GET, but a burst of MaxVUs concurrent creations queues them behind the projection
+    // handler advisory lock -- the largest single database cost in the whole v4.17.1 sweep.
+    //
+    // Two things measured on 2026-08-31 that this budget cannot fix, recorded so the next
+    // person does not widen it a fourth time:
+    //
+    // Retries are never consumed successfully. Across every run that day the warn above
+    // fired zero times -- each user either had its login names on the *first* GET or never
+    // had them at all. The read-back is bimodal, so the budget only sets how long we wait
+    // before reporting a failure, not how many succeed.
+    //
+    // And some of those failures are permanent. In one 200-VU run all 200 creates returned
+    // 2xx and, ten minutes later, the query side was still missing zitizen-6 entirely and
+    // zitizen-7/-24/-25 had no login names. Widening the budget to ~220s changed nothing
+    // except how long it took to give up, which is why it was reverted to this.
+    //
+    // Note also that serialising this loop used to grant an accidental grace period: user N
+    // was not asked until users 0..N-1 had finished, so a late user got the queue's time for
+    // free. Awaiting concurrently aligns every deadline on the same instant. That is correct
+    // and strictly less forgiving, and it is a real effect -- it was simply not the cause of
+    // the failures above, which were loss rather than lag.
     await delay(Math.min(100 * (attempt + 1), 2000));
   }
   return { user: undefined, lastStatus, lastBody, attempts: attempt };
