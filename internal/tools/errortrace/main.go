@@ -118,9 +118,6 @@ type operationTrace struct {
 func main() {
 	goFile := flag.String("go-file", "", "trace every exported handler method defined in this Go file")
 	protoFile := flag.String("proto", "", "trace every RPC declared in this service .proto file")
-	goPackage := flag.String("go-package", "", "Go package (relative to repo root) holding the proto service's handlers; defaults to the proto path convention proto/zitadel/<x>/v2/... -> internal/api/grpc/<x>/v2")
-	repoRoot := flag.String("repo-root", ".", "repository root (module root); defaults to the current directory")
-	out := flag.String("out", "", "write JSON here instead of stdout")
 	flag.Parse()
 
 	if (*goFile == "") == (*protoFile == "") {
@@ -128,7 +125,7 @@ func main() {
 		os.Exit(2)
 	}
 
-	root, err := filepath.Abs(*repoRoot)
+	root, err := filepath.Abs(".")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "errortrace:", err)
 		os.Exit(1)
@@ -141,7 +138,7 @@ func main() {
 	case *goFile != "":
 		targets, err = targetsFromGoFile(l, root, *goFile)
 	case *protoFile != "":
-		targets, err = targetsFromProto(l, root, *protoFile, *goPackage)
+		targets, err = targetsFromProto(l, root, *protoFile)
 	}
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "errortrace:", err)
@@ -179,15 +176,7 @@ func main() {
 		os.Exit(1)
 	}
 	data = append(data, '\n')
-
-	if *out == "" {
-		os.Stdout.Write(data)
-		return
-	}
-	if err := os.WriteFile(*out, data, 0o644); err != nil {
-		fmt.Fprintln(os.Stderr, "errortrace:", err)
-		os.Exit(1)
-	}
+	os.Stdout.Write(data)
 }
 
 // --- entry point resolution -------------------------------------------------
@@ -231,7 +220,7 @@ var rpcNameRe = regexp.MustCompile(`\brpc\s+(\w+)\s*\(`)
 // service .proto file (the same convention already used by
 // apps/docs/scripts/generate-endpoint-errors.ts's declared-response parser)
 // and resolves each name to its Go handler method.
-func targetsFromProto(l *loader, root, protoFile, goPackage string) ([]target, error) {
+func targetsFromProto(l *loader, root, protoFile string) ([]target, error) {
 	protoAbs := protoFile
 	if !filepath.IsAbs(protoAbs) {
 		protoAbs = filepath.Join(root, protoFile)
@@ -248,12 +237,9 @@ func targetsFromProto(l *loader, root, protoFile, goPackage string) ([]target, e
 		return nil, fmt.Errorf("%s: no `rpc Name(...)` declarations found — is this a service file? (message-only files like metadata.proto have none)", protoFile)
 	}
 
-	pkgDir := goPackage
-	if pkgDir == "" {
-		pkgDir, err = derivePackageDir(root, protoAbs)
-		if err != nil {
-			return nil, err
-		}
+	pkgDir, err := derivePackageDir(root, protoAbs)
+	if err != nil {
+		return nil, err
 	}
 	pkg, err := l.loadDir(filepath.Join(root, pkgDir))
 	if err != nil {
@@ -297,7 +283,7 @@ func derivePackageDir(root, protoAbs string) (string, error) {
 	}
 	parts := strings.Split(filepath.ToSlash(rel), "/")
 	if len(parts) < 2 {
-		return "", fmt.Errorf("%s: doesn't match proto/zitadel/<service>/<version>/... — pass --go-package explicitly", protoAbs)
+		return "", fmt.Errorf("%s: doesn't match proto/zitadel/<service>/<version>/...", protoAbs)
 	}
 	return filepath.Join("internal", "api", "grpc", parts[0], parts[1]), nil
 }
