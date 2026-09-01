@@ -26,6 +26,13 @@ func TestAuthRequestV2_LogValue(t *testing.T) {
 			expected: slog.Value{},
 		},
 		{
+			name: "nil embedded auth request",
+			req: &AuthRequestV2{
+				CurrentAuthRequest: &command.CurrentAuthRequest{},
+			},
+			expected: slog.Value{},
+		},
+		{
 			name: "populated auth request v2",
 			req: &AuthRequestV2{
 				CurrentAuthRequest: &command.CurrentAuthRequest{

@@ -129,7 +129,6 @@ func TestPromptToBusiness(t *testing.T) {
 	}
 }
 
-
 func TestAuthRequest_LogValue(t *testing.T) {
 	tests := []struct {
 		name     string
