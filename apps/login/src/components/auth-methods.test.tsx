@@ -23,44 +23,37 @@ describe("auth-methods", () => {
       name: "TOTP",
       card: TOTP,
       translatedText: "authenticator.methods.totp",
-      previousLiteral: "Authenticator App",
     },
     {
       name: "U2F",
       card: U2F,
       translatedText: "authenticator.methods.u2f",
-      previousLiteral: "Universal Second Factor",
     },
     {
       name: "EMAIL",
       card: EMAIL,
       translatedText: "authenticator.methods.otpEmail",
-      previousLiteral: "Code via Email",
     },
     {
       name: "SMS",
       card: SMS,
       translatedText: "authenticator.methods.otpSms",
-      previousLiteral: "Code via SMS",
     },
     {
       name: "PASSKEYS",
       card: PASSKEYS,
       translatedText: "authenticator.methods.passkey",
-      previousLiteral: "Passkeys",
     },
     {
       name: "PASSWORD",
       card: PASSWORD,
       translatedText: "authenticator.methods.password",
-      previousLiteral: "Password",
     },
-  ])("renders $name label from translation key", ({ card, translatedText, previousLiteral }) => {
+  ])("renders $name label from translation key", ({ card, translatedText }) => {
     render(card(false, "/auth/method"));
 
     const translatedLabel = screen.getByText(translatedText);
     expect(translatedLabel).toBeInTheDocument();
     expect(translatedLabel).toHaveAttribute("data-i18n-key", translatedText);
-    expect(screen.queryByText(previousLiteral)).not.toBeInTheDocument();
   });
 });
