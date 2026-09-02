@@ -21,6 +21,7 @@ on:
   pull_request:
     paths:
       - "proto/zitadel/**/v2/*_service.proto"
+      - "proto/zitadel/*.proto"
       - "internal/api/grpc/**"
 
 permissions:

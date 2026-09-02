@@ -26,6 +26,7 @@ on:
     branches: [main]
     paths:
       - "proto/zitadel/**/v2/*_service.proto"
+      - "proto/zitadel/*.proto"
       - "internal/api/grpc/**"
   workflow_dispatch: {}
 

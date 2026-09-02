@@ -110,19 +110,58 @@ interface Candidate extends ServiceConfig {
   goPackageDirExists: boolean;
 }
 
-// Reads every proto/zitadel/*/v2/*_service.proto file and derives everything
-// discoverServices()/listUnwiredProtoServices() need, regardless of whether
+// Parses the bits every candidate needs out of one service .proto file's
+// text: the service name, its full package, its (optional) top-level
+// description, and its RPC names in declaration order. Returns null for a
+// message-only file (no `service X { ... }` block) — shared between the v2
+// (one directory per category) and v1 (flat proto/zitadel/<name>.proto)
+// scans below so the parsing logic can't drift between the two.
+function parseServiceFromProtoText(text: string, fallbackPackage: string) {
+  const serviceIdx = text.search(/\bservice\s+\w+\s*\{/);
+  if (serviceIdx === -1) return null;
+  const serviceName = text.slice(serviceIdx).match(/\bservice\s+(\w+)\s*\{/)?.[1];
+  if (!serviceName) return null;
+
+  const protoPackage = text.match(/\bpackage\s+([\w.]+)\s*;/)?.[1] ?? fallbackPackage;
+  // Only search before the `service` keyword — same region parseDeclaredResponses
+  // reads the swagger defaults from — so a per-RPC/per-field description
+  // declared later in the file is never mistaken for the service's own.
+  const description = text
+    .slice(0, serviceIdx)
+    .match(/\bdescription:\s*"((?:[^"\\]|\\.)*)"/)?.[1]
+    .replace(/\\"/g, '"')
+    .replace(/\\n/g, ' ')
+    .trim();
+  const rpcNames = [...text.matchAll(/\brpc\s+(\w+)\s*\(/g)].map((m) => m[1]);
+
+  return { service: `${protoPackage}.${serviceName}`, description, rpcNames };
+}
+
+// Reads every service proto file and derives everything
+// discoverServices()/discoverTraceableServices() need, regardless of whether
 // its docs/Go side is wired up yet — the two public functions below just
 // filter this differently. Kept as one shared scan so "is this category
 // wired up" and "what's it missing" can never disagree with each other.
+//
+// Two shapes of service, both scanned here:
+//   v2:  proto/zitadel/<category>/v2/<name>_service.proto
+//        -> internal/api/grpc/<category>/v2
+//   v1:  proto/zitadel/<name>.proto (flat, legacy, predates the v2 per-
+//        category convention: management.proto, admin.proto, auth.proto,
+//        system.proto — the only 4 flat files that declare their own
+//        `service`, the rest are message-only and skipped)
+//        -> internal/api/grpc/<name>, no version segment
+// In both shapes the docs content dir is content/reference/api/<category>;
+// there's no naming collision between the two (v1's 4 verb-named services —
+// admin, auth, management, system — don't match any v2 resource category).
 function scanCandidates(): Candidate[] {
   if (!existsSync(PROTO_ZITADEL_ROOT)) return [];
+  const candidates: Candidate[] = [];
+
   const categories = readdirSync(PROTO_ZITADEL_ROOT, { withFileTypes: true })
     .filter((e) => e.isDirectory())
     .map((e) => e.name)
     .sort();
-
-  const candidates: Candidate[] = [];
   for (const category of categories) {
     const v2Dir = join(PROTO_ZITADEL_ROOT, category, 'v2');
     if (!existsSync(v2Dir)) continue;
@@ -130,33 +169,14 @@ function scanCandidates(): Candidate[] {
     if (!serviceFileName) continue; // message-only dirs (metadata, filter, object, error, ...) — not a service
 
     const protoFile = join(v2Dir, serviceFileName);
-    const text = readFileSync(protoFile, 'utf8');
-
-    const serviceIdx = text.search(/\bservice\s+\w+\s*\{/);
-    if (serviceIdx === -1) continue;
-    const serviceName = text.slice(serviceIdx).match(/\bservice\s+(\w+)\s*\{/)?.[1];
-    if (!serviceName) continue;
-
-    const protoPackage = text.match(/\bpackage\s+([\w.]+)\s*;/)?.[1] ?? `zitadel.${category}.v2`;
-    // Only search before the `service` keyword — same region parseDeclaredResponses
-    // reads the swagger defaults from — so a per-RPC/per-field description
-    // declared later in the file is never mistaken for the service's own.
-    const description = text
-      .slice(0, serviceIdx)
-      .match(/\bdescription:\s*"((?:[^"\\]|\\.)*)"/)?.[1]
-      .replace(/\\"/g, '"')
-      .replace(/\\n/g, ' ')
-      .trim();
-    const rpcNames = [...text.matchAll(/\brpc\s+(\w+)\s*\(/g)].map((m) => m[1]);
+    const parsed = parseServiceFromProtoText(readFileSync(protoFile, 'utf8'), `zitadel.${category}.v2`);
+    if (!parsed) continue;
 
     const contentDir = join(DOCS_ROOT, 'content/reference/api', category);
     const goPackageDir = join(REPO_ROOT, 'internal/api/grpc', category, 'v2');
-
     candidates.push({
-      service: `${protoPackage}.${serviceName}`,
+      ...parsed,
       category,
-      description,
-      rpcNames,
       contentDir,
       protoFile,
       tracingDir: join(__dirname, 'endpoint-error-tracing', `${category}-v2`),
@@ -165,6 +185,31 @@ function scanCandidates(): Candidate[] {
       goPackageDirExists: existsSync(goPackageDir),
     });
   }
+
+  const flatProtoFiles = readdirSync(PROTO_ZITADEL_ROOT, { withFileTypes: true })
+    .filter((e) => e.isFile() && e.name.endsWith('.proto'))
+    .map((e) => e.name)
+    .sort();
+  for (const fileName of flatProtoFiles) {
+    const category = fileName.slice(0, -'.proto'.length);
+    const protoFile = join(PROTO_ZITADEL_ROOT, fileName);
+    const parsed = parseServiceFromProtoText(readFileSync(protoFile, 'utf8'), `zitadel.${category}.v1`);
+    if (!parsed) continue; // message-only file (object.proto, text.proto, ...) — not a service
+
+    const contentDir = join(DOCS_ROOT, 'content/reference/api', category);
+    const goPackageDir = join(REPO_ROOT, 'internal/api/grpc', category);
+    candidates.push({
+      ...parsed,
+      category,
+      contentDir,
+      protoFile,
+      tracingDir: join(__dirname, 'endpoint-error-tracing', `${category}-v1`),
+      goPackageDir,
+      contentDirExists: existsSync(contentDir),
+      goPackageDirExists: existsSync(goPackageDir),
+    });
+  }
+
   return candidates;
 }
 

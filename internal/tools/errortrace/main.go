@@ -273,19 +273,29 @@ func targetsFromProto(l *loader, root, protoFile string) ([]target, error) {
 	return targets, nil
 }
 
-// derivePackageDir maps proto/zitadel/<x>/v2/<name>_service.proto to
-// internal/api/grpc/<x>/v2, the convention confirmed across user, org and
-// session v2 services.
+// derivePackageDir maps a service proto file to its Go handler package, in
+// either of the two conventions this repo uses:
+//
+//   proto/zitadel/<x>/v2/<name>_service.proto -> internal/api/grpc/<x>/v2
+//     (confirmed across user, org and session v2 services)
+//   proto/zitadel/<name>.proto -> internal/api/grpc/<name>, no version
+//     segment (the 4 legacy v1 services that predate the per-category
+//     convention: management.proto, admin.proto, auth.proto, system.proto)
 func derivePackageDir(root, protoAbs string) (string, error) {
 	rel, err := filepath.Rel(filepath.Join(root, "proto", "zitadel"), protoAbs)
 	if err != nil {
 		return "", err
 	}
 	parts := strings.Split(filepath.ToSlash(rel), "/")
-	if len(parts) < 2 {
-		return "", fmt.Errorf("%s: doesn't match proto/zitadel/<service>/<version>/...", protoAbs)
+	switch len(parts) {
+	case 1:
+		name := strings.TrimSuffix(parts[0], ".proto")
+		return filepath.Join("internal", "api", "grpc", name), nil
+	case 2:
+		return filepath.Join("internal", "api", "grpc", parts[0], parts[1]), nil
+	default:
+		return "", fmt.Errorf("%s: doesn't match proto/zitadel/<service>/<version>/... or proto/zitadel/<name>.proto", protoAbs)
 	}
-	return filepath.Join("internal", "api", "grpc", parts[0], parts[1]), nil
 }
 
 // --- package loading ---------------------------------------------------
