@@ -70,9 +70,15 @@ describe("buildCSP", () => {
     expect(csp).toContain("img-src 'self'");
   });
 
-  test("keeps localhost, which a browser can resolve", () => {
-    const csp = buildCSP({ serviceUrl: "http://localhost:8080" });
-
-    expect(csp).toContain("http://localhost:8080");
+  test("keeps hosts a browser can reach", () => {
+    for (const serviceUrl of [
+      "http://localhost:8080",
+      "http://127.0.0.1:8080",
+      "http://[::1]:8080",
+      "http://[2001:db8::1]:8080",
+      "https://zitadel.example.com",
+    ]) {
+      expect(buildCSP({ serviceUrl })).toContain(serviceUrl);
+    }
   });
 });
