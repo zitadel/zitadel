@@ -32,7 +32,7 @@ Eliminate Single Points of Failure (SPOF) for administrative access.
 - [ ] **Diverse MFA Methods**: Ensure your administrators enroll multiple MFA methods (e.g., one on a YubiKey, one on an Authenticator app) to maximize recovery options.
 - [ ] **Backup Service Account**: Create a dedicated Service Account with a PAT and with administrative roles (IAM_OWNER).
   - **Why**: If a misconfigured "Action" or a CSS error breaks the Management Console UI, you can still revert changes or manage the instance directly via the ZITADEL Management API using this PAT.
-
+- [ ] **Platform organization**: Keep instance administrators and the login client service account in a [dedicated platform organization](/guides/manage/console/administrator-hardening) with a login policy suited for operators—not mixed with customer users or org admins.
 
 ### ZITADEL Setup and Configuration
 

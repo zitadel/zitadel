@@ -663,6 +663,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "guides/integrate/retrieve-user-roles",
           "concepts/structure/granted_projects",
           "guides/manage/console/administrators",
+          "guides/manage/console/administrator-hardening",
         ],
       },
       {
