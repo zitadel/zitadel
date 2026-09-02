@@ -5,7 +5,7 @@
  */
 export async function mapPool<T, R>(
   items: T[],
-  concurrency: number, 
+  concurrency: number,
   fn: (item: T, index: number) => Promise<R>,
 ): Promise<R[]> {
   if (items.length === 0) {
