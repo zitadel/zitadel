@@ -279,6 +279,27 @@ describe("sendLoginname", () => {
         });
       });
 
+      test("should pass the login name to the user's IDP as a login hint", async () => {
+        mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD],
+        });
+        mockListIDPLinks.mockResolvedValue({
+          result: [{ idpId: "idp123" }],
+        });
+        mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+        await sendLoginname({
+          loginName: "user@example.com",
+        });
+
+        expect(mockStartIdentityProviderFlow).toHaveBeenCalledWith(
+          expect.objectContaining({
+            urls: expect.objectContaining({ loginHint: "user@example.com" }),
+          }),
+        );
+      });
+
       test("should return error when password not allowed and no IDP links available", async () => {
         mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
         mockListAuthenticationMethodTypes.mockResolvedValue({
@@ -317,6 +338,29 @@ describe("sendLoginname", () => {
           serviceConfig: { baseUrl: "https://api.example.com" },
           orgId: "org123", // User's organization from resourceOwner
         });
+      });
+
+      test("should pass the login name to the organization's single active IDP as a login hint", async () => {
+        mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD],
+        });
+        mockListIDPLinks.mockResolvedValue({ result: [] });
+        mockGetActiveIdentityProviders.mockResolvedValue({
+          identityProviders: [{ id: "org-idp-123", type: 0, options: { isAutoCreation: true } }],
+        });
+        mockIdpTypeToSlug.mockReturnValue("google");
+        mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://org-idp.example.com/auth" });
+
+        await sendLoginname({
+          loginName: "user@example.com",
+        });
+
+        expect(mockStartIdentityProviderFlow).toHaveBeenCalledWith(
+          expect.objectContaining({
+            urls: expect.objectContaining({ loginHint: "user@example.com" }),
+          }),
+        );
       });
 
       test("should redirect to passkey when user has only passkey method and it's allowed", async () => {

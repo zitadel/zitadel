@@ -1061,4 +1061,34 @@ describe("handleOIDCFlowInitiation — idp scope (urn:zitadel:iam:org:idp:id)", 
     expect(html).toContain('action="https://adfs.example.com/adfs/ls"');
     expect(html).toContain('name="SAMLRequest"');
   });
+
+  test("should pass the login_hint of the auth request on to the scoped IdP", async () => {
+    const { IdentityProviderType } = await import("@zitadel/proto/zitadel/settings/v2/login_settings_pb");
+
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: ["urn:zitadel:iam:org:idp:id:idp-1"],
+        prompt: [],
+        loginHint: "user@example.com",
+      },
+    });
+
+    mockGetActiveIdentityProviders.mockResolvedValue({
+      identityProviders: [{ id: "idp-1", type: IdentityProviderType.AZURE_AD }],
+    });
+
+    mockStartIdentityProviderFlow.mockResolvedValue({
+      url: "https://login.microsoftonline.com/tenant/oauth2/v2.0/authorize?client_id=xyz",
+    });
+
+    await handleOIDCFlowInitiation(makeBaseParams({ sessions: [] }));
+
+    expect(mockStartIdentityProviderFlow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        urls: expect.objectContaining({ loginHint: "user@example.com" }),
+      }),
+    );
+  });
 });
