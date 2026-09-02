@@ -6,28 +6,28 @@ sidebar_label: Administrator hardening
 
 Instance administrators (`IAM_*` roles) can manage resources across every organization on an instance.
 Organization administrators (`ORG_*` roles) manage users, projects, and policies within a single organization.
-When both kinds of principals share the same organization, their authorization scope and login experience overlap in ways that are easy to underestimate.
+When both kinds of principals share the same organization, their authorization scope and login experience overlap in ways that can potentially lead to unexpected account takeover.
 
 This guide describes a practical layout that keeps platform operations separate from customer or application organizations, and how to harden the login client and break-glass access.
 
 ## Why use a dedicated platform organization
 
-Create a **platform organization** that is reserved for instance-level operators and automation—not for end users or application teams.
+Create a **platform organization** that is reserved for instance-level operators and automation - not for end users or application teams.
 
-| Concern | When operators share an application org | With a dedicated platform org |
+| Concern | When operators share an application organization | With a dedicated platform organization |
 | --- | --- | --- |
-| **Authorization scope** | Org roles such as `ORG_USER_MANAGER` apply within the same organization where instance admins may also exist. | Instance roles remain on the instance; org roles in application orgs cannot reach platform accounts. |
-| **Login policy** | [Login behavior and security](/guides/manage/console/default-settings#login-behavior-and-security) can be overridden per organization. Org admins may change MFA, passkeys, external IdPs, or self-registration for the org where platform accounts live. | You define a strict login policy only for operators—without coupling it to product org settings. |
-| **Password and lockout policy** | [Password complexity](/guides/manage/console/default-settings#password-complexity), [password expiry](/guides/manage/console/default-settings#password-expiry), and [lockout](/guides/manage/console/default-settings#lockout) follow the org context of the user. | Operator accounts inherit policies you chose for the platform org, independent of customer orgs. |
+| **Authorization scope** | Organization roles such as `ORG_USER_MANAGER` apply within the same organization where instance administrators may also exist. | Instance roles remain on the instance; organization roles in application organizations cannot reach platform accounts. |
+| **Login policy** | [Login behavior and security](/guides/manage/console/default-settings#login-behavior-and-security) can be overridden per organization. Organization administrators may change MFA, passkeys, external IdPs, or self-registration for the organization where platform accounts live. | You define a strict login policy only for operators—without coupling it to product organization settings. |
+| **Password and lockout policy** | [Password complexity](/guides/manage/console/default-settings#password-complexity), [password expiry](/guides/manage/console/default-settings#password-expiry), and [lockout](/guides/manage/console/default-settings#lockout) follow the organization context of the user. | Operator accounts inherit policies you chose for the platform organization, independent of customer organizations. |
 | **Operational clarity** | Auditing “who is an admin” mixes customers and operators in one user list. | Instance members and platform service accounts are easy to inventory. |
 
 Instance [default settings](/guides/manage/console/default-settings) act as fallbacks for organizations.
-Org-level overrides still apply to users in that org.
-Placing human instance owners or shared break-glass accounts in a customer org means that org’s administrators can shape how those users authenticate and how local policies behave.
+Organization-level permissions override still apply to users in that organization.
+Placing human instance owners or shared break-glass accounts in a customer organization means that organization's administrators can shape how those users authenticate and how local policies behave.
 
 <Callout type="info">
 The default organization created at setup is often used for the ZITADEL Console and internal projects.
-Treat it as a platform org **only** if it does not host customer users and no org-level administrators manage it on behalf of tenants.
+Treat it as a platform organization **only** if it does not host customer users and no organization-level administrators manage it on behalf of tenants.
 Otherwise, create a separate organization for platform operations.
 </Callout>
 
@@ -35,41 +35,39 @@ Otherwise, create a separate organization for platform operations.
 
 ```text
 Instance
-├── Platform org (operators only)
+├── Platform organization (operators only)
 │   ├── Break-glass IAM_OWNER service account (PAT, offline storage)
 │   ├── Login client service account (IAM_LOGIN_CLIENT only)
 │   └── Optional: other instance automation service accounts
-├── Customer / application org A
+├── Customer / application organization A
 │   └── End users, app admins (ORG_* only)
-└── Customer / application org B
+└── Customer / application organization B
     └── End users, app admins (ORG_* only)
 ```
 
 **Guidelines:**
 
-- Do not assign `ORG_USER_MANAGER`, `ORG_OWNER`, or similar org roles to humans in the platform org unless they truly manage that org only.
-- Do not add customer end users to the platform org.
-- Assign instance roles (`IAM_OWNER`, `IAM_LOGIN_CLIENT`, …) only on the **instance** administrator list, not as a substitute for org roles on application resources.
-
-See [ZITADEL Administrators](/guides/manage/console/administrators) for the full role list and permission matrix.
+- Do not assign `ORG_USER_MANAGER`, `ORG_OWNER`, or similar organization roles to operators or service accounts in the platform organization unless they truly manage that organization only.
+- Do not add customer end users to the platform organization: tenant users inherit that organization's login and lockout policies, and tenant organization administrators can grant organization roles that blur operator and customer boundaries.
+- Grant instance roles only on the **instance** administrator list, not as a substitute for organization roles on application resources. For instance service accounts (login client, break-glass), follow [Login client (`IAM_LOGIN_CLIENT`)](#login-client-iam_login_client) and review critical permissions in the [administrator permission matrix](/guides/manage/console/administrators#administrator-permission-matrix)—for example `iam.member.write`, `org.member.write`, `user.write`, `user.credential.write`, and `user.passkey.write`. Session permissions (`session.write`, `session.link`) are also granted by default and are required for the login UI—do not remove them without testing the full authentication flow. In self-hosted deployments, defaults can be customized via [`InternalAuthZ.RolePermissionMappings`](/guides/manage/console/administrators#configure-roles).
 
 ## Login policy for the platform organization
 
-Configure login behavior for the platform org explicitly—do not rely on whatever policy happens to apply to a busy application org.
+Configure login behavior for the platform organization explicitly—do not rely on whatever policy happens to apply to a busy application organization.
 
 1. Open the platform organization in the management console.
 2. Review **Login behavior and security** (or set instance defaults first, then override only where needed).
 3. For operator accounts, consider:
    - **Enforcing MFA** for local authentication.
    - **Restricting external IdPs** if operators should only use credentials you control.
-   - **Disabling self-registration** if the org is not meant for public signup.
+   - **Disabling self-registration** if the organization is not meant for public signup.
    - **Tight lockout** and **password complexity** aligned with your operator baseline.
    - A **default redirect URI** that does not send operators to the customer console by mistake.
 
 Instance-level and organization-level [identity providers](/guides/manage/console/default-settings#identity-providers) are separate from the login policy that controls whether external login is allowed and which providers are linked for a given organization.
-An instance IdP can be used by users in an organization only when the **effective login policy** for that org allows external IdPs (`External IDP allowed`) and the provider is **linked** to that policy—or when the org inherits instance default settings, which includes the default IdP links.
-Organizations with a **custom login policy** must enable external IdPs themselves and explicitly add instance or org IdPs to their provider list; see [Let users login with preferred identity provider](/guides/integrate/identity-providers/introduction).
-Document which IdPs platform operators may use in the platform org.
+An instance IdP can be used by users in an organization only when the **effective login policy** for that organization allows external IdPs (`External IDP allowed`) and the provider is **linked** to that policy—or when the organization inherits instance default settings, which includes the default IdP links.
+Organizations with a **custom login policy** must enable external IdPs themselves and explicitly add instance or organization IdPs to their provider list; see [Let users login with preferred identity provider](/guides/integrate/identity-providers/introduction).
+Document which IdPs platform operators may use in the platform organization.
 
 More context on policy inheritance: [Settings and policies](/concepts/structure/policies).
 
@@ -79,7 +77,7 @@ The self-hosted [Login UI](/guides/integrate/login-ui/fork-and-deploy-login-app)
 
 **Hardening steps:**
 
-- Create the login client user in the **platform org**, not in a tenant org.
+- Create the login client user in the **platform organization**, not in a tenant organization.
 - Use a **dedicated machine user** per login deployment; do not reuse admin or application service account PATs.
 - Grant **only** `IAM_LOGIN_CLIENT` on the instance unless you have a documented exception.
 - Store the PAT in a **secrets manager**; rotate when the login stack is redeployed or team access changes.
@@ -95,7 +93,7 @@ Review the [administrator permission matrix](/guides/manage/console/administrato
 Before changing login routes, features, or instance settings, keep a recovery path that does not depend on the interactive login UI.
 
 <Callout type="warn" title="Avoid lockout">
-Create a service account in the platform org with the **Instance Owner** role (`IAM_OWNER`) and a PAT.
+Create a service account in the platform organization with the **Instance Owner** role (`IAM_OWNER`) and a PAT.
 Store the PAT offline according to your incident-access policy.
 If the login UI or console becomes unreachable, you can still call the [Admin API](/reference/api/admin) to revert settings.
 </Callout>
@@ -114,7 +112,7 @@ If you override [`InternalAuthZ.RolePermissionMappings`](/guides/manage/console/
 
 ## Periodic review
 
-Review instance membership on a schedule and after major org or login changes.
+Review instance membership on a schedule and after major organization or login changes.
 
 **List instance administrators** ([Internal Permission Service v2](/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.ListAdministrators)):
 
@@ -132,7 +130,7 @@ curl -sS -X POST \
   }'
 ```
 
-The response includes each user's `organizationId` and granted `roles`, which helps verify platform-org placement.
+The response includes each user's `organizationId` and granted `roles`, which helps verify platform-organization placement.
 
 <Callout type="info">
 The Admin API `POST /admin/v1/members/_search` endpoint is deprecated; prefer `ListAdministrators` above.
@@ -140,9 +138,9 @@ The Admin API `POST /admin/v1/members/_search` endpoint is deprecated; prefer `L
 
 **Questions to answer:**
 
-- Does every `IAM_*` holder belong to the platform org (or a documented exception)?
+- Does every `IAM_*` holder belong to the platform organization (or a documented exception)?
 - Does the login client service account hold **only** `IAM_LOGIN_CLIENT`?
-- Are there human `IAM_OWNER` accounts in application orgs?
+- Are there human `IAM_OWNER` accounts in application organizations?
 - Did any instance member change since the last review? Use the [Event API](/guides/integrate/zitadel-apis/event-api) or [stream audit logs to external systems](/guides/integrate/external-audit-log) for change history.
 
 ## Detect grants with Actions v2
@@ -224,7 +222,7 @@ Example decoded `event_payload` for a grant:
 
 Combine real-time events with the [periodic `ListAdministrators` review](#periodic-review) above:
 
-- Any `IAM_OWNER` or `IAM_USER_MANAGER` grant outside your platform org (compare `userId` to your allow-list or resolve org via API).
+- Any `IAM_OWNER` or `IAM_USER_MANAGER` grant outside your platform organization (compare `userId` to your allow-list or resolve organization via API).
 - Login client service account holding roles other than `IAM_LOGIN_CLIENT`.
 - `instance.member.changed` where `roles` includes high-privilege `IAM_*` roles you did not expect.
 - Grants performed by users or service accounts that are not on your approved administrator list (`userID` in the outer payload).
@@ -235,9 +233,9 @@ See also: [Actions v2 examples](https://github.com/zitadel/actions/tree/main/act
 
 ## Monitor platform organization administrators
 
-Instance `IAM_*` roles are not the only risk in a mixed layout: **organization roles inside the platform org** (`ORG_USER_MANAGER`, `ORG_OWNER`, …) apply to users in that same org, including break-glass accounts and service users.
+Instance `IAM_*` roles are not the only risk in a mixed layout: **organization roles inside the platform organization** (`ORG_USER_MANAGER`, `ORG_OWNER`, …) apply to users in that same organization, including break-glass accounts and service users.
 
-Monitor organization administrators for the platform org alongside instance membership.
+Monitor organization administrators for the platform organization alongside instance membership.
 
 ### Periodic review (API)
 
@@ -259,11 +257,11 @@ curl -sS -X POST \
 
 **Questions to answer:**
 
-- Are there `ORG_USER_MANAGER` or `ORG_OWNER` grants on the platform org you did not expect?
-- Do any humans hold org admin roles in the platform org without an operational reason?
-- Are customer or tenant admins accidentally granted roles in the platform org?
+- Are there `ORG_USER_MANAGER` or `ORG_OWNER` grants on the platform organization you did not expect?
+- Do any operators or service accounts hold organization administrator roles in the platform organization without an operational reason?
+- Are customer or tenant administrators accidentally granted roles in the platform organization?
 
-In the management console, open the platform organization and review **ADMINISTRATORS** in the org details panel (same UI pattern as [ZITADEL Administrators](/guides/manage/console/administrators)).
+In the management console, open the platform organization and review **ADMINISTRATORS** in the organization details panel (same UI pattern as [ZITADEL Administrators](/guides/manage/console/administrators)).
 
 ### Organization member events (Actions v2)
 
@@ -294,7 +292,7 @@ Repeat for `org.member.changed` and `org.member.removed` as needed.
 
 The webhook payload uses the same [event structure](/guides/integrate/actions/usage#sent-information-event). For `org.member.*` events, `aggregateType` is `org` and `aggregateID` is the organization ID. Filter in your handler so you only alert when `aggregateID` equals your `${PLATFORM_ORG_ID}`. The `event_payload` contains `userId` and `roles` (for example `ORG_USER_MANAGER`, `ORG_OWNER`).
 
-Flag grants such as unexpected `ORG_USER_MANAGER` on the platform org, or any org admin role on users that should be machine-only service accounts.
+Flag grants such as unexpected `ORG_USER_MANAGER` on the platform organization, or any organization administrator role on users that should be machine-only service accounts.
 
 ## Review changes with the Event API
 
@@ -354,12 +352,12 @@ Parse each event payload for `userId` and `roles`, then apply the same allow-lis
 
 ## Checklist
 
-- [ ] Platform org exists; customer users are not members.
-- [ ] Login policy for the platform org enforces your operator authentication baseline (MFA, IdPs, lockout).
-- [ ] Login client service account lives in the platform org with a dedicated PAT.
+- [ ] Platform organization exists; customer users are not members.
+- [ ] Login policy for the platform organization enforces your operator authentication baseline (MFA, IdPs, lockout).
+- [ ] Login client service account lives in the platform organization with a dedicated PAT.
 - [ ] Break-glass `IAM_OWNER` PAT is stored offline and tested periodically.
 - [ ] Custom `RolePermissionMappings` (if any) are reviewed against least privilege.
-- [ ] Platform org **organization** administrators (`ORG_*`) are reviewed and monitored (`org.member.*` events or Event API).
+- [ ] Platform organization administrators (`ORG_*`) are reviewed and monitored (`org.member.*` events or Event API).
 - [ ] Instance membership is reviewed regularly and **Actions v2** monitors `instance.member.*` events (or changes are pulled via the **Event API** / SIEM).
 
 ## Related guides
