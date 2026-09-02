@@ -2,12 +2,16 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { getInstanceHost, getPublicHost, getPublicHostWithProtocol } from "./host";
 
 describe("Host utility functions", () => {
+  const originalEnv = process.env;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env = { ...originalEnv };
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+    process.env = originalEnv;
   });
 
   describe("getInstanceHost", () => {
@@ -42,6 +46,17 @@ describe("Host utility functions", () => {
   });
 
   describe("getPublicHostWithProtocol", () => {
+    test("should prefer ZITADEL_PUBLIC_URL when configured", () => {
+      process.env.ZITADEL_PUBLIC_URL = "https://login.example.com";
+
+      const mockHeaders = {
+        get: vi.fn(() => "localhost:3000"),
+      } as any;
+
+      const result = getPublicHostWithProtocol(mockHeaders);
+      expect(result).toBe("https://login.example.com");
+    });
+
     test("should return https for production domain", () => {
       const mockHeaders = {
         get: vi.fn(() => "zitadel.com"),
@@ -187,6 +202,61 @@ describe("Host utility functions", () => {
   });
 
   describe("getPublicHost", () => {
+    test("should prefer ZITADEL_PUBLIC_URL when configured", () => {
+      process.env.ZITADEL_PUBLIC_URL = "https://login.example.com";
+
+      const mockHeaders = {
+        get: vi.fn(() => "localhost:3000"),
+      } as any;
+
+      const result = getPublicHost(mockHeaders);
+      expect(result).toBe("login.example.com");
+    });
+
+    test("should throw when ZITADEL_PUBLIC_URL is invalid", () => {
+      process.env.ZITADEL_PUBLIC_URL = "login.example.com";
+
+      const mockHeaders = {
+        get: vi.fn(() => "localhost:3000"),
+      } as any;
+
+      expect(() => getPublicHost(mockHeaders)).toThrow(
+        "ZITADEL_PUBLIC_URL must be a valid absolute URL, for example: https://login.example.com",
+      );
+    });
+
+    test("should throw when ZITADEL_PUBLIC_URL has unsupported scheme", () => {
+      process.env.ZITADEL_PUBLIC_URL = "javascript:alert(1)";
+
+      const mockHeaders = {
+        get: vi.fn(() => "localhost:3000"),
+      } as any;
+
+      expect(() => getPublicHost(mockHeaders)).toThrow(
+        "ZITADEL_PUBLIC_URL must be a valid absolute URL, for example: https://login.example.com",
+      );
+    });
+
+    test("should throw when ZITADEL_PUBLIC_URL includes path, query, hash, or credentials", () => {
+      const invalidPublicURLs = [
+        "https://user:pass@login.example.com",
+        "https://login.example.com/path",
+        "https://login.example.com?foo=bar",
+        "https://login.example.com#anchor",
+      ];
+
+      const mockHeaders = {
+        get: vi.fn(() => "localhost:3000"),
+      } as any;
+
+      for (const invalidURL of invalidPublicURLs) {
+        process.env.ZITADEL_PUBLIC_URL = invalidURL;
+        expect(() => getPublicHost(mockHeaders)).toThrow(
+          "ZITADEL_PUBLIC_URL must be a valid absolute URL, for example: https://login.example.com",
+        );
+      }
+    });
+
     test("should use x-zitadel-public-host when available", () => {
       const mockHeaders = {
         get: vi.fn((key: string) => {
