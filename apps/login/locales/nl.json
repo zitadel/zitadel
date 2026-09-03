@@ -152,7 +152,8 @@
       "failedPrecondition": "Voorwaarde mislukt",
       "sessionNotValid": "Sessie is niet geldig",
       "passwordVerificationMissing": "Wachtwoordverificatie ontbreekt.",
-      "passwordVerificationTooOld": "Wachtwoordverificatie is te oud. Verifieer je wachtwoord opnieuw."
+      "passwordVerificationTooOld": "Wachtwoordverificatie is te oud. Verifieer je wachtwoord opnieuw.",
+      "passwordResetNotAllowed": "Wachtwoord resetten is niet toegestaan. Neem contact op met uw beheerder voor meer informatie."
     }
   },
   "idp": {
@@ -261,6 +262,10 @@
       "required": {
         "code": "Dit veld is verplicht"
       }
+    },
+    "errors": {
+      "couldNotRequestChallenge": "Kon OTP-uitdaging niet aanvragen",
+      "couldNotVerifyCode": "Kon OTP-code niet verifiëren"
     }
   },
   "passkey": {
@@ -422,7 +427,15 @@
     "description": "Selecteer de methode waarmee u wilt verifiëren",
     "noMethodsAvailable": "Geen authenticatiemethoden beschikbaar",
     "allSetup": "U heeft al een authenticator ingesteld!",
-    "linkWithIDP": "of link met een identiteitsprovider"
+    "linkWithIDP": "of link met een identiteitsprovider",
+    "methods": {
+      "totp": "Authenticator-app",
+      "u2f": "Universele tweede factor",
+      "otpEmail": "Code via e-mail",
+      "otpSms": "Code via sms",
+      "passkey": "Passkeys",
+      "password": "Wachtwoord"
+    }
   },
   "device": {
     "usercode": {

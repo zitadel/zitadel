@@ -152,7 +152,8 @@
       "failedPrecondition": "Precondizione non soddisfatta",
       "sessionNotValid": "La sessione non è valida",
       "passwordVerificationMissing": "Manca la verifica della password.",
-      "passwordVerificationTooOld": "La verifica della password è troppo vecchia. Si prega di verificare nuovamente la password."
+      "passwordVerificationTooOld": "La verifica della password è troppo vecchia. Si prega di verificare nuovamente la password.",
+      "passwordResetNotAllowed": "Il ripristino della password non è consentito. Contatta il tuo amministratore per ulteriori informazioni."
     }
   },
   "idp": {
@@ -261,6 +262,10 @@
       "required": {
         "code": "Questo campo è obbligatorio"
       }
+    },
+    "errors": {
+      "couldNotRequestChallenge": "Impossibile richiedere la challenge OTP",
+      "couldNotVerifyCode": "Impossibile verificare il codice OTP"
     }
   },
   "passkey": {
@@ -422,7 +427,15 @@
     "description": "Seleziona il metodo con cui desideri autenticarti",
     "noMethodsAvailable": "Nessun metodo di autenticazione disponibile",
     "allSetup": "Hai già configurato un autenticatore!",
-    "linkWithIDP": "o collega con un Identity Provider"
+    "linkWithIDP": "o collega con un Identity Provider",
+    "methods": {
+      "totp": "App di autenticazione",
+      "u2f": "Secondo fattore universale",
+      "otpEmail": "Codice via email",
+      "otpSms": "Codice via SMS",
+      "passkey": "Passkey",
+      "password": "Password"
+    }
   },
   "device": {
     "usercode": {
