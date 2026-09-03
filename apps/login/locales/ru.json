@@ -152,7 +152,8 @@
       "failedPrecondition": "Нарушено предварительное условие",
       "sessionNotValid": "Сессия недействительна",
       "passwordVerificationMissing": "Отсутствует проверка пароля.",
-      "passwordVerificationTooOld": "Проверка пароля устарела. Пожалуйста, подтвердите пароль еще раз."
+      "passwordVerificationTooOld": "Проверка пароля устарела. Пожалуйста, подтвердите пароль еще раз.",
+      "passwordResetNotAllowed": "Сброс пароля запрещен. Обратитесь к администратору за дополнительной информацией."
     }
   },
   "idp": {
@@ -261,6 +262,10 @@
       "required": {
         "code": "Это поле обязательно для заполнения"
       }
+    },
+    "errors": {
+      "couldNotRequestChallenge": "Не удалось запросить OTP-челлендж",
+      "couldNotVerifyCode": "Не удалось проверить OTP-код"
     }
   },
   "passkey": {
@@ -422,7 +427,15 @@
     "description": "Выберите предпочитаемый метод аутентификации",
     "noMethodsAvailable": "Нет доступных методов аутентификации",
     "allSetup": "Аутентификатор уже настроен!",
-    "linkWithIDP": "или привязать через Identity Provider"
+    "linkWithIDP": "или привязать через Identity Provider",
+    "methods": {
+      "totp": "Приложение-аутентификатор",
+      "u2f": "Универсальный второй фактор",
+      "otpEmail": "Код по email",
+      "otpSms": "Код по SMS",
+      "passkey": "Пасскей",
+      "password": "Пароль"
+    }
   },
   "device": {
     "usercode": {

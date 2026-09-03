@@ -152,7 +152,8 @@
       "failedPrecondition": "Az előfeltétel nem teljesült",
       "sessionNotValid": "A munkamenet nem érvényes",
       "passwordVerificationMissing": "A jelszó hitelesítés hiányzik.",
-      "passwordVerificationTooOld": "A jelszó hitelesítés túl régi. Kérjük, erősítsd meg újra a jelszavadat."
+      "passwordVerificationTooOld": "A jelszó hitelesítés túl régi. Kérjük, erősítsd meg újra a jelszavadat.",
+      "passwordResetNotAllowed": "A jelszó-visszaállítás nem engedélyezett. További információért fordulj a rendszergazdához."
     }
   },
   "idp": {
@@ -261,6 +262,10 @@
       "required": {
         "code": "Ez a mező kötelező"
       }
+    },
+    "errors": {
+      "couldNotRequestChallenge": "Nem sikerült OTP-kihívást kérni",
+      "couldNotVerifyCode": "Nem sikerült ellenőrizni az OTP-kódot"
     }
   },
   "passkey": {
@@ -422,7 +427,15 @@
     "description": "Válaszd ki, milyen módszerrel szeretnél hitelesíteni",
     "noMethodsAvailable": "Nincs elérhető hitelesítési módszer",
     "allSetup": "Már beállítottál egy hitelesítőt!",
-    "linkWithIDP": "vagy kapcsold össze egy azonosítószolgáltatóval"
+    "linkWithIDP": "vagy kapcsold össze egy azonosítószolgáltatóval",
+    "methods": {
+      "totp": "Hitelesítő alkalmazás",
+      "u2f": "Univerzális második faktor",
+      "otpEmail": "Kód e-mailben",
+      "otpSms": "Kód SMS-ben",
+      "passkey": "Jelkulcs",
+      "password": "Jelszó"
+    }
   },
   "device": {
     "usercode": {
