@@ -33,7 +33,6 @@ interface RawEntry {
   kind: string; // GRPC_STATUS key
   message: string;
   messageType: 'i18n' | 'literal';
-  i18nKey?: string;
   i18nResolved?: boolean;
   file: string;
   line: number;
@@ -47,7 +46,6 @@ interface ErrorLocation {
 interface ErrorIdEntry {
   id: string;
   locations: ErrorLocation[];
-  i18nKey?: string;
 }
 
 interface ExampleResponse {
@@ -176,9 +174,13 @@ function subsystemForPath(relPath: string): string {
   )
     return 'query';
   if (relPath.startsWith('internal/command/')) return 'command';
-  // Event-payload unmarshal guards for these three aggregates are documented
-  // (ERRORS.md) as conceptually part of the command layer, sharing its ID
-  // prefixes (ORG-/INSTANCE-/PROJECT-), unlike other internal/repository/*.
+  // internal/repository/{org,instance,project} hold the event definitions
+  // (including unmarshal-guard errors) for the aggregates internal/command
+  // writes to — they're the write model's event payloads, not a read model,
+  // so route them to 'command' too. ID prefix isn't a reliable signal for
+  // this: internal/repository/instance mostly throws INST-, not INSTANCE-,
+  // and internal/repository/project also throws APPLICATION-/API-/OIDC-/
+  // SAML-/USER-, not just PROJECT-.
   if (
     relPath.startsWith('internal/repository/org/') ||
     relPath.startsWith('internal/repository/instance/') ||
@@ -262,7 +264,6 @@ function scanFile(absPath: string, relPath: string): RawEntry[] {
       kind: grpcKey,
       message,
       messageType,
-      i18nKey: messageType === 'i18n' ? message : undefined,
       file: relPath,
       line: lineOf(content, m.index),
     });
@@ -330,7 +331,7 @@ function humanizeI18nKey(key: string): string {
   return words.length > 0 ? `The ${words.toLowerCase()}` : 'This condition';
 }
 
-function mechanicalWhy(kind: string, message: string, messageType: 'i18n' | 'literal'): {
+function mechanicalWhy(kind: string, message: string, messageType: 'i18n' | 'literal', i18nResolved: boolean): {
   why: string;
   whySource: ErrorCluster['whySource'];
 } {
@@ -340,7 +341,12 @@ function mechanicalWhy(kind: string, message: string, messageType: 'i18n' | 'lit
       whySource: 'defensive-guard-template',
     };
   }
-  if (messageType === 'i18n') {
+  // Only decompose while `message` is still the raw dotted key (unresolved).
+  // Once resolveI18n() has replaced it with the actual translated English
+  // sentence, decomposing that sentence as if it were a key produces mangled
+  // prose (e.g. "Errors.Internal" -> "An internal error occurred" fed back
+  // through humanizeI18nKey reads as "the an internal error occurred").
+  if (messageType === 'i18n' && !i18nResolved) {
     const subject = humanizeI18nKey(message);
     const verb = KIND_WHY_VERB[kind];
     return {
@@ -382,14 +388,28 @@ function main() {
   // Cluster by (subsystem, kind, trimmed message).
   const clusterMap = new Map<
     string,
-    { subsystem: string; kind: string; message: string; messageType: 'i18n' | 'literal'; entries: RawEntry[] }
+    {
+      subsystem: string;
+      kind: string;
+      message: string;
+      messageType: 'i18n' | 'literal';
+      i18nResolved: boolean;
+      entries: RawEntry[];
+    }
   >();
   for (const e of rawEntries) {
     const subsystem = subsystemForPath(e.file);
     const message = e.message.trim();
     const key = `${subsystem}|${e.kind}|${message}`;
     if (!clusterMap.has(key)) {
-      clusterMap.set(key, { subsystem, kind: e.kind, message, messageType: e.messageType, entries: [] });
+      clusterMap.set(key, {
+        subsystem,
+        kind: e.kind,
+        message,
+        messageType: e.messageType,
+        i18nResolved: e.i18nResolved ?? false,
+        entries: [],
+      });
     }
     clusterMap.get(key)!.entries.push(e);
   }
@@ -421,7 +441,7 @@ function main() {
     totalClusters++;
     const idMap = new Map<string, ErrorIdEntry>();
     for (const e of c.entries) {
-      if (!idMap.has(e.id)) idMap.set(e.id, { id: e.id, locations: [], i18nKey: e.i18nResolved === false ? e.i18nKey : undefined });
+      if (!idMap.has(e.id)) idMap.set(e.id, { id: e.id, locations: [] });
       idMap.get(e.id)!.locations.push({ file: e.file, line: e.line });
     }
     const ids = [...idMap.values()].sort((a, b) => a.id.localeCompare(b.id));
@@ -446,18 +466,21 @@ function main() {
     if (collidesWith.length > 0) totalCollisions++;
 
     const override = overrides.get(key);
-    const mech = mechanicalWhy(c.kind, c.message, c.messageType);
+    const mech = mechanicalWhy(c.kind, c.message, c.messageType, c.i18nResolved);
     const why = override?.why ?? mech.why;
     const whySource: ErrorCluster['whySource'] = override ? 'curated' : mech.whySource;
 
     const status = GRPC_STATUS[c.kind];
     const repId = ids[0].id;
+    // The server always appends " (ID)" to the top-level message (see
+    // internal/api/grpc/gerrors/zitadel_errors.go: msg := key; msg += " (" + id + ")").
+    // The nested details[].message is the plain text without that suffix.
     const example: ExampleResponse = {
       httpStatus: status.httpStatus,
       grpcCode: status.code,
       body: {
         code: status.code,
-        message: c.message,
+        message: `${c.message} (${repId})`,
         details: [{ '@type': 'type.googleapis.com/zitadel.v1.ErrorDetail', id: repId, message: c.message }],
       },
     };
