@@ -462,22 +462,44 @@ describe("resetPassword", () => {
   let mockSearchUsers: any;
   let mockGetLoginSettings: any;
   let mockPasswordReset: any;
+  let mockGetTranslations: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
 
     const { headers } = await import("next/headers");
+    const { getTranslations } = await import("next-intl/server");
     const { getServiceConfig } = await import("../service-url");
     const { getLoginSettings, passwordReset, searchUsers } = await import("../zitadel");
 
     mockHeaders = vi.mocked(headers);
+    mockGetTranslations = vi.mocked(getTranslations);
     mockGetServiceConfig = vi.mocked(getServiceConfig);
     mockSearchUsers = vi.mocked(searchUsers);
     mockGetLoginSettings = vi.mocked(getLoginSettings);
     mockPasswordReset = vi.mocked(passwordReset);
 
     mockHeaders.mockResolvedValue({ get: vi.fn(() => "example.com") });
+    mockGetTranslations.mockResolvedValue((key: string) => key);
     mockGetServiceConfig.mockReturnValue({ serviceConfig: { baseUrl: "https://api.example.com" } });
+  });
+
+  test("should return translated password reset not allowed error when hidePasswordReset is true", async () => {
+    mockGetLoginSettings.mockResolvedValue({ hidePasswordReset: true });
+    mockGetTranslations.mockResolvedValue((key: string) => {
+      if (key === "errors.passwordResetNotAllowed") {
+        return "translated-password-reset-not-allowed";
+      }
+      return key;
+    });
+
+    const result = await resetPassword({
+      loginName: "user@example.com",
+    });
+
+    expect(result).toEqual({ error: "translated-password-reset-not-allowed" });
+    expect(mockSearchUsers).not.toHaveBeenCalled();
+    expect(mockPasswordReset).not.toHaveBeenCalled();
   });
 
   test("should return generic success when user not found and ignoreUnknownUsernames is true", async () => {
