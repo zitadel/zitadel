@@ -4,6 +4,11 @@ description: "Separate instance administrators from application organizations, a
 sidebar_label: Administrator hardening
 ---
 
+<TerminologyUpdate
+    newTerm="Administrators"
+    oldTerms={["Members", "Memberships", "Managers"]}
+/>
+
 Instance administrators (`IAM_*` roles) can manage resources across every organization on an instance.
 Organization administrators (`ORG_*` roles) manage users, projects, and policies within a single organization.
 When both kinds of principals share the same organization, their authorization scope and login experience overlap in ways that can potentially lead to unexpected account takeover.
@@ -19,7 +24,7 @@ Create a **dedicated organization** reserved for instance administrators and aut
 | **Authorization scope** | Organization roles such as `ORG_USER_MANAGER` apply within the same organization where instance administrators may also exist. | Instance roles remain on the instance; organization roles in application organizations cannot reach instance-administrator accounts. |
 | **Login Behavior and Security** | [Login Behavior and Security](/guides/manage/console/default-settings#login-behavior-and-security) can be overridden per organization. Organization Administrators may change MFA, passkeys, external IdPs, or self-registration for the organization where instance-administrator accounts live. | You define strict Organization Login Settings only for instance administrators—without coupling them to product organization settings. |
 | **Password and lockout settings** | [Password complexity](/guides/manage/console/default-settings#password-complexity), [password expiry](/guides/manage/console/default-settings#password-expiry), and [lockout](/guides/manage/console/default-settings#lockout) follow the organization context of the user. | Instance-administrator accounts inherit the Organization Settings you chose for that dedicated organization, independent of customer organizations. |
-| **Operational clarity** | Auditing who is an Administrator mixes customers and operators in one user list. | Instance administrators and service accounts are easy to inventory. |
+| **Operational clarity** | Auditing who is an Administrator mixes customers and instance administrators in one user list. | Instance administrators and service accounts are easy to inventory. |
 
 Instance [default settings](/guides/manage/console/default-settings) act as fallbacks for organizations.
 Organization-level settings and policies still override instance defaults for users in that organization.
@@ -48,7 +53,7 @@ Instance
 **Guidelines:**
 
 - Do not assign `ORG_USER_MANAGER`, `ORG_OWNER`, or similar organization roles to instance administrators or service accounts in the dedicated organization unless they truly manage that organization only.
-- Do not add customer end users to the dedicated organization: users in customer organizations inherit that organization's login and lockout settings, and Organization Administrators can grant organization roles that blur operator and customer boundaries.
+- Do not add customer end users to the dedicated organization: users in customer organizations inherit that organization's login and lockout settings, and Organization Administrators can grant organization roles that blur instance-administrator and customer boundaries.
 - Grant instance roles only on the **instance** administrator list, not as a substitute for organization roles on application resources. For instance service accounts (login client, break-glass), follow [Login client (`IAM_LOGIN_CLIENT`)](#login-client-iam_login_client) and review critical permissions in the [administrator permission matrix](/guides/manage/console/administrators#administrator-permission-matrix)—for example `iam.member.write`, `org.member.write`, `user.write`, `user.credential.write`, and `user.passkey.write`. Session permissions (`session.write`, `session.link`) are also granted by default and are required for the login UI—do not remove them without testing the full authentication flow. In self-hosted deployments, defaults can be customized via [`InternalAuthZ.RolePermissionMappings`](/guides/manage/console/administrators#configure-roles).
 
 ## Login settings for the dedicated organization
@@ -61,7 +66,7 @@ Configure Login Behavior and Security for the dedicated organization explicitly�
    - **Enforcing MFA** for local authentication.
    - **Restricting external IdPs** if instance administrators should only use credentials you control.
    - **Disabling self-registration** if the organization is not meant for public signup.
-   - **Tight lockout** and **password complexity** aligned with your operator baseline.
+   - **Tight lockout** and **password complexity** aligned with your instance-administrator baseline.
    - A **default redirect URI** that does not send instance administrators to a customer application by mistake.
 
 Instance-level and organization-level [identity providers](/guides/manage/console/default-settings#identity-providers) are separate from the Organization Login Settings that control whether external login is allowed and which providers are linked for a given organization.
@@ -353,7 +358,7 @@ Parse each event payload for `userId` and `roles`, then apply the same allow-lis
 ## Checklist
 
 - [ ] Dedicated organization for instance administrators exists; customer users are not members.
-- [ ] Login Behavior and Security for the dedicated organization enforces your operator authentication baseline (MFA, IdPs, lockout).
+- [ ] Login Behavior and Security for the dedicated organization enforces your instance-administrator authentication baseline (MFA, IdPs, lockout).
 - [ ] Login client service account lives in the dedicated organization with a dedicated PAT.
 - [ ] Break-glass `IAM_OWNER` PAT is stored offline and tested periodically.
 - [ ] Custom `RolePermissionMappings` (if any) are reviewed against least privilege.
