@@ -11,8 +11,8 @@ import { getServiceConfig } from "@/lib/service-url";
 import { getAllowedLanguages } from "@/lib/zitadel";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
-import { Lato } from "next/font/google";
+import { getLocale, getTranslations } from "next-intl/server";
+import { Lato, Noto_Kufi_Arabic } from "next/font/google";
 import { headers } from "next/headers";
 import React, { Suspense } from "react";
 
@@ -20,6 +20,17 @@ const lato = Lato({
   weight: ["400", "700", "900"],
   subsets: ["latin"],
 });
+
+// Lato ships no Arabic glyphs, so an Arabic page falls back to whatever face
+// the operating system happens to substitute.
+const arabic = Noto_Kufi_Arabic({
+  weight: ["400", "700"],
+  subsets: ["arabic"],
+});
+
+// Locales in LANGS that are written right to left. Currently only Arabic, but
+// the set keeps the check in one place if Hebrew, Persian or Urdu are added.
+const RTL_LOCALES = new Set(["ar", "he", "fa", "ur"]);
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("common");
@@ -29,6 +40,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
+  const locale = await getLocale();
+  const isRtl = RTL_LOCALES.has(locale);
 
   let languages = LANGS;
   try {
@@ -43,7 +56,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <html className={`${lato.className}`} suppressHydrationWarning>
+    <html
+      lang={locale}
+      dir={isRtl ? "rtl" : "ltr"}
+      className={isRtl ? arabic.className : lato.className}
+      suppressHydrationWarning
+    >
       <head />
       <body>
         <ThemeProvider>
