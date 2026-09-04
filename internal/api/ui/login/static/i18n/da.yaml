@@ -1,0 +1,542 @@
+Login:
+  Title: Velkommen tilbage!
+  Description: Indtast dine loginoplysninger.
+  TitleLinking: Login til brugertilknytning
+  DescriptionLinking: Indtast dine loginoplysninger for at tilknytte din eksterne bruger.
+  LoginNameLabel: Loginnavn
+  UsernamePlaceHolder: brugernavn
+  LoginnamePlaceHolder: brugernavn@domæne
+  ExternalUserDescription: Log ind med en ekstern bruger.
+  MustBeMemberOfOrg: Brugeren skal være medlem af organisationen {{.OrgName}}.
+  RegisterButtonText: Registrer
+  NextButtonText: Næste
+
+LDAP:
+  Title: Log ind
+  Description: Indtast dine loginoplysninger.
+  LoginNameLabel: Loginnavn
+  PasswordLabel: Adgangskode
+  NextButtonText: Næste
+
+SelectAccount:
+  Title: Vælg konto
+  Description: Brug din konto
+  TitleLinking: Vælg konto til brugertilknytning
+  DescriptionLinking: Vælg din konto for at tilknytte med din eksterne bruger.
+  OtherUser: Anden bruger
+  SessionState0: aktiv
+  SessionState1: Logget ud
+  MustBeMemberOfOrg: Brugeren skal være medlem af organisationen {{.OrgName}}.
+
+Password:
+  Title: Adgangskode
+  Description: Indtast dine loginoplysninger.
+  PasswordLabel: Adgangskode
+  MinLength: Skal være mindst
+  MinLengthp2: tegn lang.
+  MaxLength: Må ikke være længere end 70 tegn.
+  HasUppercase: Skal indeholde et stort bogstav.
+  HasLowercase: Skal indeholde et lille bogstav.
+  HasNumber: Skal indeholde et tal.
+  HasSymbol: Skal indeholde et symbol.
+  Confirmation: Adgangskoderne stemmer overens.
+  ResetLinkText: Nulstil adgangskode
+  BackButtonText: Tilbage
+  NextButtonText: Næste
+
+UsernameChange:
+  Title: Skift brugernavn
+  Description: Angiv dit nye brugernavn
+  UsernameLabel: Brugernavn
+  CancelButtonText: Annuller
+  NextButtonText: Næste
+
+UsernameChangeDone:
+  Title: Brugernavn ændret
+  Description: Dit brugernavn er blevet ændret.
+  NextButtonText: Næste
+
+InitPassword:
+  Title: Angiv adgangskode
+  Description: Du har modtaget en kode, som du skal indtaste i formularen nedenfor for at angive din nye adgangskode.
+  CodeLabel: Kode
+  NewPasswordLabel: Ny adgangskode
+  NewPasswordConfirmLabel: Bekræft adgangskode
+  ResendButtonText: Send kode igen
+  NextButtonText: Næste
+
+InitPasswordDone:
+  Title: Adgangskode angivet
+  Description: Adgangskoden er angivet
+  NextButtonText: Næste
+  CancelButtonText: Annuller
+
+InitUser:
+  Title: Aktiver bruger
+  Description: Bekræft din e-mail med koden nedenfor, og angiv din adgangskode.
+  CodeLabel: Kode
+  NewPasswordLabel: Ny adgangskode
+  NewPasswordConfirm: Bekræft adgangskode
+  NextButtonText: Næste
+  ResendButtonText: Send kode igen
+
+InitUserDone:
+  Title: Bruger aktiveret
+  Description: E-mail bekræftet, og adgangskode angivet
+  NextButtonText: Næste
+  CancelButtonText: Annuller
+
+InviteUser:
+  Title: Aktiver bruger
+  Description: Bekræft din e-mail med koden nedenfor, og angiv din adgangskode.
+  CodeLabel: Kode
+  NewPasswordLabel: Ny adgangskode
+  NewPasswordConfirm: Bekræft adgangskode
+  NextButtonText: Næste
+  ResendButtonText: Send kode igen
+
+InitMFAPrompt:
+  Title: Konfigurer tofaktorgodkendelse
+  Description: Tofaktorgodkendelse giver dig ekstra sikkerhed for din brugerkonto. Det sikrer, at kun du har adgang til din konto.
+  Provider0: TOTP-app (f.eks. Google/Microsoft Authenticator, Authy)
+  Provider1: Enhedsbaseret (f.eks. Face ID, Windows Hello eller fingeraftryk)
+  Provider3: OTP via SMS
+  Provider4: OTP via e-mail
+  NextButtonText: Næste
+  SkipButtonText: Spring over
+
+InitMFAOTP:
+  Title: Verificering af anden faktor
+  Description: Konfigurer din anden faktor. Download en TOTP-app, hvis du ikke allerede har en.
+  OTPDescription: Scan koden med din TOTP-app (f.eks. Google/Microsoft Authenticator, Authy), eller kopiér hemmeligheden og indtast den genererede kode nedenfor.
+  SecretLabel: Hemmelighed
+  CodeLabel: Kode
+  NextButtonText: Næste
+  CancelButtonText: Annuller
+
+InitMFAOTPSMS:
+  Title: Verificering af anden faktor
+  DescriptionPhone: Konfigurer din anden faktor. Indtast dit telefonnummer for at bekræfte det.
+  DescriptionCode: Konfigurer din anden faktor. Indtast den modtagne kode for at bekræfte dit telefonnummer.
+  CountryCodeLabel: Land
+  PhoneLabel: Telefon
+  CodeLabel: Kode
+  EditButtonText: Rediger
+  ResendButtonText: Send kode igen
+  NextButtonText: Næste
+
+InitMFAU2F:
+  Title: Tilføj sikkerhedsnøgle
+  Description: En sikkerhedsnøgle er en verificeringsmetode, der kan være indbygget i din telefon, bruge Bluetooth eller tilsluttes direkte til din computers USB-port.
+  TokenNameLabel: Navn på sikkerhedsnøglen / enheden
+  NotSupported: WebAuthN understøttes ikke af din browser. Sørg for, at den er opdateret, eller brug en anden (f.eks. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Tilføj sikkerhedsnøgle
+  ErrorRetry: Prøv igen, opret en ny udfordring, eller vælg en anden metode.
+
+InitMFADone:
+  Title: Anden faktor bekræftet
+  Description: Fantastisk! Du har netop konfigureret din anden faktor og gjort din konto langt mere sikker. Faktoren skal indtastes ved hvert login.
+  NextButtonText: Næste
+  CancelButtonText: Annuller
+
+MFAProvider:
+  Provider0: TOTP-app (f.eks. Google/Microsoft Authenticator, Authy)
+  Provider1: Enhedsbaseret (f.eks. Face ID, Windows Hello eller fingeraftryk)
+  Provider3: OTP via SMS
+  Provider4: OTP via e-mail
+  ChooseOther: eller vælg en anden mulighed
+
+VerifyMFAOTP:
+  Title: Bekræft med anden faktor
+  Description: Bekræft din anden faktor
+  CodeLabel: Kode
+  NextButtonText: Næste
+
+VerifyOTP:
+  Title: Bekræft med anden faktor
+  Description: Bekræft din anden faktor
+  CodeLabel: Kode
+  ResendButtonText: Send kode igen
+  NextButtonText: Næste
+
+VerifyMFAU2F:
+  Title: Verificering af anden faktor
+  Description: Bekræft din anden faktor med den registrerede enhed (f.eks. Face ID, Windows Hello, fingeraftryk)
+  NotSupported: WebAuthN understøttes ikke af din browser. Sørg for, at du bruger den nyeste version, eller skift til en understøttet browser (Chrome, Safari, Firefox)
+  ErrorRetry: Prøv igen, opret en ny anmodning, eller vælg en anden metode.
+  ValidateTokenButtonText: Bekræft med anden faktor
+
+Passwordless:
+  Title: Log ind med adgangsnøgle
+  Description: Log ind med autentificeringsmetoder fra din enhed, f.eks. Face ID, Windows Hello eller fingeraftryk.
+  NotSupported: WebAuthN understøttes ikke af din browser. Sørg for, at den er opdateret, eller brug en anden (f.eks. Chrome, Safari, Firefox)
+  ErrorRetry: Prøv igen, opret en ny udfordring, eller vælg en anden metode.
+  LoginWithPwButtonText: Log ind med adgangskode
+  ValidateTokenButtonText: Log ind med adgangsnøgle
+
+PasswordlessPrompt:
+  Title: Opsæt adgangsnøgle
+  Description: Vil du opsætte login med adgangsnøgle? (Autentificeringsmetoder på din enhed som Face ID, Windows Hello eller fingeraftryk)
+  DescriptionInit: Du skal opsætte login med adgangsnøgle. Brug det link, du har fået, til at registrere din enhed.
+  PasswordlessButtonText: Opsæt adgangsnøgle
+  NextButtonText: Næste
+  SkipButtonText: Spring over
+
+PasswordlessRegistration:
+  Title: Opsæt adgangsnøgle
+  Description: Registrer din adgangsnøgle ved at angive et navn på enheden (f.eks. Min mobil eller MacBook) og derefter vælge "Registrer adgangsnøgle".
+  TokenNameLabel: Navn på enheden
+  NotSupported: WebAuthN understøttes ikke af din browser. Sørg for, at den er opdateret, eller brug en anden (f.eks. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Registrer adgangsnøgle
+  ErrorRetry: Prøv igen, opret en ny udfordring, eller vælg en anden metode.
+
+PasswordlessRegistrationDone:
+  Title: Adgangsnøgle er opsat
+  Description: Enhed til login med adgangsnøgle er tilføjet.
+  DescriptionClose: Du kan nu lukke dette vindue.
+  NextButtonText: Næste
+  CancelButtonText: Annuller
+
+PasswordChange:
+  Title: Skift adgangskode
+  Description: Skift din adgangskode. Indtast din gamle og nye adgangskode.
+  ExpiredDescription: Din adgangskode er udløbet og skal skiftes. Indtast din gamle og nye adgangskode.
+  OldPasswordLabel: Gammel adgangskode
+  NewPasswordLabel: Ny adgangskode
+  NewPasswordConfirmLabel: Bekræftelse af adgangskode
+  CancelButtonText: Annuller
+  NextButtonText: Næste
+  Footer: Sidefod
+
+PasswordChangeDone:
+  Title: Skift adgangskode
+  Description: Din adgangskode er blevet ændret.
+  NextButtonText: Næste
+
+PasswordResetDone:
+  Title: Link til nulstilling af adgangskode sendt
+  Description: Tjek din e-mail for at nulstille din adgangskode.
+  NextButtonText: Næste
+
+EmailVerification:
+  Title: E-mailbekræftelse
+  Description: Vi har sendt dig en e-mail for at bekræfte din adresse. Indtast koden i formularen nedenfor.
+  CodeLabel: Kode
+  NextButtonText: Næste
+  ResendButtonText: Send kode igen
+
+EmailVerificationDone:
+  Title: E-mailbekræftelse
+  Description: Din e-mailadresse er blevet bekræftet.
+  NextButtonText: Næste
+  CancelButtonText: Annuller
+  LoginButtonText: Log ind
+
+RegisterOption:
+  Title: Registreringsmuligheder
+  Description: Vælg, hvordan du vil registrere dig
+  RegisterUsernamePasswordButtonText: Med brugernavn og adgangskode
+  ExternalLoginDescription: eller registrer dig med en ekstern bruger
+  LoginButtonText: Log ind
+
+RegistrationUser:
+  Title: Registrering
+  Description: Indtast dine brugeroplysninger. Din e-mailadresse bruges som dit loginnavn.
+  DescriptionOrgRegister: Indtast dine brugeroplysninger.
+  EmailLabel: E-mail
+  UsernameLabel: Brugernavn
+  FirstnameLabel: Fornavn
+  LastnameLabel: Efternavn
+  LanguageLabel: Sprog
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Danish: Dansk
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  GenderLabel: Køn
+  Female: Kvinde
+  Male: Mand
+  Diverse: Andet / X
+  PasswordLabel: Adgangskode
+  PasswordConfirmLabel: Bekræftelse af adgangskode
+  TosAndPrivacyLabel: Vilkår og betingelser
+  TosConfirm: Jeg accepterer
+  TosLinkText: brugsvilkårene
+  PrivacyConfirm: Jeg accepterer
+  PrivacyLinkText: privatlivspolitikken
+  ExternalLogin: eller registrer dig med en ekstern bruger
+  BackButtonText: Log ind
+  NextButtonText: Næste
+
+ExternalRegistrationUserOverview:
+  Title: Ekstern brugerregistrering
+  Description: Vi har hentet dine brugeroplysninger fra den valgte udbyder. Du kan nu ændre eller fuldføre dem.
+  EmailLabel: E-mail
+  UsernameLabel: Brugernavn
+  FirstnameLabel: Fornavn
+  LastnameLabel: Efternavn
+  NicknameLabel: Kaldenavn
+  PhoneLabel: Telefonnummer
+  LanguageLabel: Sprog
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Danish: Dansk
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  TosAndPrivacyLabel: Vilkår og betingelser
+  TosConfirm: Jeg accepterer
+  TosLinkText: brugsvilkårene
+  PrivacyConfirm: Jeg accepterer
+  PrivacyLinkText: privatlivspolitikken
+  ExternalLogin: eller registrer dig med en ekstern bruger
+  BackButtonText: Tilbage
+  NextButtonText: Gem
+
+RegistrationOrg:
+  Title: Organisationsregistrering
+  Description: Indtast dit organisationsnavn og dine brugeroplysninger.
+  OrgNameLabel: Organisationsnavn
+  EmailLabel: E-mail
+  UsernameLabel: Brugernavn
+  FirstnameLabel: Fornavn
+  LastnameLabel: Efternavn
+  PasswordLabel: Adgangskode
+  PasswordConfirmLabel: Bekræftelse af adgangskode
+  TosAndPrivacyLabel: Vilkår og betingelser
+  TosConfirm: Jeg accepterer
+  TosLinkText: brugsvilkårene
+  PrivacyConfirm: Jeg accepterer
+  PrivacyLinkText: privatlivspolitikken
+  SaveButtonText: Opret organisation
+
+LoginSuccess:
+  Title: Login gennemført
+  AutoRedirectDescription: Du bliver automatisk omdirigeret tilbage til din applikation. Hvis ikke, skal du klikke på knappen nedenfor. Du kan lukke vinduet bagefter.
+  RedirectedDescription: Du kan nu lukke dette vindue.
+  NextButtonText: Næste
+
+LogoutDone:
+  Title: Logget ud
+  Description: Du er blevet logget ud.
+  LoginButtonText: Log ind
+
+LinkingUserPrompt:
+  Title: Eksisterende bruger fundet
+  Description: "Vil du tilknytte din eksisterende konto:"
+  LinkButtonText: Tilknyt
+  OtherButtonText: Andre muligheder
+
+LinkingUsersDone:
+  Title: Tilknytter bruger
+  Description: Bruger tilknyttet.
+  CancelButtonText: Annuller
+  NextButtonText: Næste
+
+ExternalNotFound:
+  Title: Ekstern bruger ikke fundet
+  Description: Ekstern bruger ikke fundet. Vil du tilknytte din bruger eller automatisk registrere en ny?
+  LinkButtonText: Tilknyt
+  AutoRegisterButtonText: Registrer
+  TosAndPrivacyLabel: Vilkår og betingelser
+  TosConfirm: Jeg accepterer
+  TosLinkText: brugsvilkårene
+  PrivacyConfirm: Jeg accepterer
+  PrivacyLinkText: privatlivspolitikken
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Danish: Dansk
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+DeviceAuth:
+  Title: Enhedsautorisation
+  UserCode:
+    Label: Brugerkode
+    Description: Indtast brugerkoden, der vises på enheden.
+    ButtonNext: Næste
+  Action:
+    Description: Giv enheden adgang.
+    GrantDevice: du er ved at give enheden
+    AccessToScopes: adgang til følgende scopes
+    Button:
+      Allow: Tillad
+      Deny: Afvis
+  Done:
+    Description: Færdig.
+    Approved: Enhedsautorisation godkendt. Du kan nu vende tilbage til enheden.
+    Denied: Enhedsautorisation afvist. Du kan nu vende tilbage til enheden.
+
+Footer:
+  PoweredBy: Drevet af
+  Tos: Brugsvilkår
+  PrivacyPolicy: Privatlivspolitik
+  Help: Hjælp
+  SupportEmail: Support-e-mail
+
+SignIn: Log ind med {{.Provider}}
+
+Errors:
+  Internal: Der opstod en intern fejl
+  AuthRequest:
+    NotFound: Kunne ikke finde auth-anmodning
+    UserAgentNotCorresponding: User Agent stemmer ikke overens
+    UserAgentNotFound: User Agent-ID ikke fundet
+    TokenNotFound: Token ikke fundet
+    RequestTypeNotSupported: Anmodningstype understøttes ikke
+    MissingParameters: Påkrævede parametre mangler
+  User:
+    NotFound: Brugeren kunne ikke findes
+    AlreadyExists: Brugeren findes allerede
+    Inactive: Brugeren er inaktiv
+    NotFoundOnOrg: Brugeren kunne ikke findes i den valgte organisation
+    NotAllowedOrg: Brugeren er ikke medlem af den påkrævede organisation
+    NotMatchingUserID: Brugeren matcher ikke brugeren i autentificeringsanmodningen
+    UserIDMissing: Bruger-ID mangler
+    Invalid: Ugyldige brugeroplysninger
+    DomainNotAllowedAsUsername: Domænet er allerede reserveret og kan ikke bruges
+    NotAllowedToLink: Brugeren har ikke tilladelse til at tilknytte med ekstern loginudbyder
+    Profile:
+      NotFound: Profil ikke fundet
+      NotChanged: Profil ikke ændret
+      Empty: Profil er tom
+      FirstNameEmpty: Fornavn i profil er tomt
+      LastNameEmpty: Efternavn i profil er tomt
+      IDMissing: Profil-ID mangler
+    Email:
+      NotFound: E-mail ikke fundet
+      Invalid: E-mail er ugyldig
+      AlreadyVerified: E-mail er allerede bekræftet
+      NotChanged: E-mail ikke ændret
+      Empty: E-mail er tom
+      IDMissing: E-mail-ID mangler
+    Phone:
+      NotFound: Telefon ikke fundet
+      Invalid: Telefon er ugyldig
+      AlreadyVerified: Telefonnummeret er allerede bekræftet
+      Empty: Telefon er tom
+      NotChanged: Telefon ikke ændret
+    Address:
+      NotFound: Adresse ikke fundet
+      NotChanged: Adresse ikke ændret
+    Username:
+      AlreadyExists: Brugernavn er allerede optaget
+      Reserved: Brugernavn er allerede optaget
+      Empty: Brugernavn er tomt
+    Password:
+      ConfirmationWrong: Bekræftelse af adgangskode er forkert
+      Empty: Adgangskode er tom
+      Invalid: Adgangskode er ugyldig
+      InvalidAndLocked: Adgangskode er ugyldig, og brugeren er låst – kontakt din administrator.
+      NotChanged: Ny adgangskode må ikke være den samme som din nuværende adgangskode
+    UsernameOrPassword:
+      Invalid: Brugernavn eller adgangskode er ugyldig
+    PasswordComplexityPolicy:
+      NotFound: Adgangskodepolitik ikke fundet
+      MinLength: Adgangskode er for kort
+      HasLower: Adgangskode skal indeholde et lille bogstav
+      HasUpper: Adgangskode skal indeholde et stort bogstav
+      HasNumber: Adgangskode skal indeholde et tal
+      HasSymbol: Adgangskode skal indeholde et symbol
+    Code:
+      Expired: Kode er udløbet
+      Invalid: Kode er ugyldig
+      Empty: Kode er tom
+      CryptoCodeNil: Kryptokode er nil
+      NotFound: Kunne ikke finde kode
+      GeneratorAlgNotSupported: Generatoralgoritme understøttes ikke
+    EmailVerify:
+      UserIDEmpty: Bruger-ID mangler
+    ExternalData:
+      CouldNotRead: Eksterne data kunne ikke læses korrekt
+    MFA:
+      NoProviders: Ingen tilgængelige multifaktor-udbydere
+      OTP:
+        AlreadyReady: Multifaktor OTP (engangskode) er allerede opsat
+        NotExisting: Multifaktor OTP (engangskode) findes ikke
+        InvalidCode: Ugyldig kode
+        Reused: Denne kode er allerede brugt. Vent venligst på en ny kode
+        NotReady: Multifaktor OTP (engangskode) er ikke klar
+    Locked: Brugeren er låst
+    SomethingWentWrong: Noget gik galt
+    NotActive: Brugeren er ikke aktiv
+    ExternalIDP:
+      IDPTypeNotImplemented: IDP-type er ikke implementeret
+      NotAllowed: Ekstern loginudbyder er ikke tilladt
+      IDPConfigIDEmpty: Identitetsudbyder-ID er tomt
+      ExternalUserIDEmpty: Eksternt bruger-ID er tomt
+      UserDisplayNameEmpty: Brugerens visningsnavn er tomt
+      NoExternalUserData: Ingen eksterne brugerdata modtaget
+      CreationNotAllowed: Oprettelse af en ny bruger er ikke tilladt på denne udbyder
+      LinkingNotAllowed: Tilknytning af en bruger er ikke tilladt på denne udbyder
+      NoOptionAllowed: Hverken oprettelse eller tilknytning er tilladt på denne udbyder. Kontakt venligst din administrator.
+      LoginFailedSwitchLocal: |
+        Login hos ekstern IDP mislykkedes. Skifter tilbage til lokalt login.
+                
+        Fejldetaljer: {{.Details}}
+    GrantRequired: Login ikke muligt. Brugeren skal have mindst én rolletildeling på applikationen. Kontakt venligst din administrator.
+    ProjectRequired: Login ikke muligt. Brugerens organisation skal have projektadgang til projektet. Kontakt venligst din administrator.
+  IdentityProvider:
+    InvalidConfig: Konfiguration af identitetsudbyder er ugyldig
+  IAM:
+    LockoutPolicy:
+      NotExisting: Låsepolitik findes ikke
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Registrering er ikke tilladt
+  DeviceAuth:
+    NotExisting: Brugerkode findes ikke
+
+optional: (valgfrit)
