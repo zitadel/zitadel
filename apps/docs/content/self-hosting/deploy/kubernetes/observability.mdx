@@ -12,25 +12,27 @@ This guide covers how to collect traces, metrics, and logs from the Zitadel and 
 
 ### Traces
 
-Zitadel can push traces to an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) using the [OTLP protocol](https://opentelemetry.io/docs/specs/otlp/) over gRPC:
+Zitadel can push traces to an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) using the [OTLP protocol](https://opentelemetry.io/docs/specs/otlp/) over gRPC, configured through the [`Instrumentation`](/self-hosting/manage/instrumentation/overview) section:
 
 ```yaml
 env:
-  - name: ZITADEL_TRACING_TYPE
-    value: "otel"
-  - name: ZITADEL_TRACING_ENDPOINT
+  - name: ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_TYPE
+    value: "grpc"
+  - name: ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_ENDPOINT
     value: "otelcol-opentelemetry-collector.monitoring.svc.cluster.local:4317"
-  - name: ZITADEL_TRACING_SERVICENAME
+  - name: ZITADEL_INSTRUMENTATION_SERVICENAME
     value: "zitadel"
 ```
 
-The `ZITADEL_TRACING_ENDPOINT` should point to your OpenTelemetry Collector's gRPC receiver, typically listening on port 4317. The collector can then forward traces to your preferred backend such as [Jaeger](https://www.jaegertracing.io/), [Grafana Tempo](https://grafana.com/oss/tempo/), or [OpenObserve](https://openobserve.ai/).
+Note that `ZITADEL_INSTRUMENTATION_SERVICENAME` is shared across all instrumentation pillars (tracing, metrics, logging), so it's set at the top level rather than nested under trace-specific settings.
+
+The `ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_ENDPOINT` should point to your OpenTelemetry Collector's gRPC receiver, typically listening on port 4317. The collector can then forward traces to your preferred backend such as [Jaeger](https://www.jaegertracing.io/), [Grafana Tempo](https://grafana.com/oss/tempo/), or [OpenObserve](https://openobserve.ai/).
 
 You can deploy an OpenTelemetry Collector in your cluster using the [OpenTelemetry Operator](https://github.com/open-telemetry/opentelemetry-operator) or the [OpenTelemetry Collector Helm chart](https://github.com/open-telemetry/opentelemetry-helm-charts/tree/main/charts/opentelemetry-collector).
 
 ### Metrics
 
-Zitadel exposes [Prometheus](https://prometheus.io/) metrics at `/debug/metrics`. Metrics must be scraped by Prometheus. Pushing metrics is not supported.
+Zitadel exposes [Prometheus](https://prometheus.io/) metrics at `/debug/metrics`, when `Instrumentation.Metric.Exporter.Type: prometheus` (`ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_TYPE=prometheus`) is set — see [Instrumentation](/self-hosting/manage/instrumentation/overview#metrics). Metrics must be scraped by Prometheus. Pushing metrics is not supported.
 
 Enable the metrics endpoint:
 
@@ -56,7 +58,15 @@ Your Prometheus configuration must include a [scrape job](https://prometheus.io/
 
 ### Logs
 
-Zitadel writes structured JSON logs to stdout. Logs must be collected by a log collector running in your cluster. Pushing logs is not supported.
+By default, Zitadel writes plain text logs to stderr. To get structured JSON logs suitable for a log collector, set `Instrumentation.Log.Format: json` explicitly:
+
+```yaml
+env:
+  - name: ZITADEL_INSTRUMENTATION_LOG_FORMAT
+    value: "json"
+```
+
+See [Instrumentation](/self-hosting/manage/instrumentation/overview#logging) for all supported formats, and [Structured Log Fields](/self-hosting/manage/instrumentation/log-fields) for the resulting JSON schema. Logs must be collected by a log collector running in your cluster. Pushing logs is not supported.
 
 Common log collectors include:
 - [Fluent Bit](https://fluentbit.io/) — Lightweight log processor and forwarder
