@@ -55,7 +55,7 @@ type Commands struct {
 	externalSecure bool
 	externalPort   uint16
 
-	idpConfigEncryption             crypto.EncryptionAlgorithm
+	idpConfigEncryption             crypto.AuthEncryptionAlgorithm
 	smtpEncryption                  crypto.EncryptionAlgorithm
 	smsEncryption                   crypto.EncryptionAlgorithm
 	userEncryption                  crypto.EncryptionAlgorithm
@@ -129,7 +129,8 @@ func StartCommands(
 	externalDomain string,
 	externalSecure bool,
 	externalPort uint16,
-	idpConfigEncryption, otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, samlEncryption, targetEncryption crypto.EncryptionAlgorithm,
+	idpConfigEncryption crypto.AuthEncryptionAlgorithm,
+	otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, samlEncryption, targetEncryption crypto.EncryptionAlgorithm,
 	oidcEncryption crypto.AuthEncryptionAlgorithm,
 	httpClient *http.Client,
 	permissionCheck domain.PermissionCheck,

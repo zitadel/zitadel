@@ -22,8 +22,8 @@ import (
 )
 
 func Test_idpIntentToIDPIntentPb(t *testing.T) {
-	decryption := func(err error) crypto.EncryptionAlgorithm {
-		mCrypto := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
+	decryption := func(err error) crypto.AuthEncryptionAlgorithm {
+		mCrypto := crypto.NewMockAuthEncryptionAlgorithm(gomock.NewController(t))
 		mCrypto.EXPECT().Algorithm().Return("enc")
 		mCrypto.EXPECT().DecryptionKeyIDs().Return([]string{"id"})
 		mCrypto.EXPECT().DecryptString(gomock.Any(), gomock.Any()).DoAndReturn(
@@ -38,7 +38,7 @@ func Test_idpIntentToIDPIntentPb(t *testing.T) {
 
 	type args struct {
 		intent *command.IDPIntentWriteModel
-		alg    crypto.EncryptionAlgorithm
+		alg    crypto.AuthEncryptionAlgorithm
 	}
 	type res struct {
 		resp *user.RetrieveIdentityProviderIntentResponse
