@@ -38,16 +38,16 @@ Errors:
     DefaultLanguageMustBeAllowed: "Standardspråket måste vara tillåtet"
   Language:
     NotParsed: "Kunde inte tolka språk"
-    NotSupported: "språket stöds inte"
-    NotAllowed: "språket är inte tillåtet"
-    Undefined: "språket är odefinierat"
+    NotSupported: "Språket stöds inte"
+    NotAllowed: "Språket är inte tillåtet"
+    Undefined: "Språket är odefinierat"
     Duplicate: "Språket har dubbletter"
   OIDCSettings:
     NotFound: "OIDC-konfiguration hittades inte"
     AlreadyExists: "OIDC-konfiguration finns redan"
   SecretGenerator:
     AlreadyExists: "Hemlig kod-generator finns redan"
-    TypeMissing: "Typ av Hemlig kod-generator saknas"
+    TypeMissing: "Typ av hemlig kod-generator saknas"
     NotFound: "Hemlig kod-generator hittades inte"
   SMSConfig:
     NotFound: "SMS-konfiguration hittades inte"
@@ -420,14 +420,14 @@ Errors:
     AlreadyExists: "Policyn finns redan"
     Label:
       Invalid:
-        PrimaryColor: "Primärfärgen är inte ett giltigt Hex-färgvärde"
-        BackgroundColor: "Bakgrundsfärgen är inte ett giltigt Hex-färgvärde"
-        WarnColor: "Varningsfärgen är inte ett giltigt Hex-färgvärde"
-        FontColor: "Teckensnittsfärgen är inte ett giltigt Hex-färgvärde"
-        PrimaryColorDark: "Primärfärgen (mörkt läge) är inte ett giltigt Hex-färgvärde"
-        BackgroundColorDark: "Bakgrundsfärgen (mörkt läge) är inte ett giltigt Hex-färgvärde"
-        WarnColorDark: "Varningsfärgen (mörkt läge) är inte ett giltigt Hex-färgvärde"
-        FontColorDark: "Teckensnittsfärgen (mörkt läge) är inte ett giltigt Hex-färgvärde"
+        PrimaryColor: "Primärfärgen är inte ett giltigt hex-färgvärde"
+        BackgroundColor: "Bakgrundsfärgen är inte ett giltigt hex-färgvärde"
+        WarnColor: "Varningsfärgen är inte ett giltigt hex-färgvärde"
+        FontColor: "Teckensnittsfärgen är inte ett giltigt hex-färgvärde"
+        PrimaryColorDark: "Primärfärgen (mörkt läge) är inte ett giltigt hex-färgvärde"
+        BackgroundColorDark: "Bakgrundsfärgen (mörkt läge) är inte ett giltigt hex-färgvärde"
+        WarnColorDark: "Varningsfärgen (mörkt läge) är inte ett giltigt hex-färgvärde"
+        FontColorDark: "Teckensnittsfärgen (mörkt läge) är inte ett giltigt hex-färgvärde"
   UserGrant:
     AlreadyExists: "Användarbeviljandet finns redan"
     NotFound: "Användarbeviljandet hittades inte"
@@ -491,7 +491,7 @@ Errors:
     CloseRows: "SQL-satsen kunde inte avslutas"
     SQLStatement: "SQL-satsen kunde inte skapas"
     InvalidRequest: "Begäran är ogiltig"
-    TooManyNestingLevels: "För många nivåer av frågenästning (Max 20)"
+    TooManyNestingLevels: "För många nivåer av frågenästning (max 20)"
     LimitExceeded: "Gränsen överskreds"
   Quota:
     AlreadyExists: "Kvota finns redan för denna enhet"
@@ -779,14 +779,14 @@ EventTypes:
               succeeded: "Tvåfaktor OTP SMS-kontroll lyckades"
               failed: "Tvåfaktor OTP SMS-kontroll misslyckades"
           email:
-            added: "Tvåfaktor OTP E-post tillagd"
-            removed: "Tvåfaktor OTP E-post borttagen"
+            added: "Tvåfaktor OTP e-post tillagd"
+            removed: "Tvåfaktor OTP e-post borttagen"
             code:
-              added: "Tvåfaktor OTP E-postkod tillagd"
-              sent: "Tvåfaktor OTP E-postkod skickad"
+              added: "Tvåfaktor OTP e-postkod tillagd"
+              sent: "Tvåfaktor OTP e-postkod skickad"
             check:
-              succeeded: "Tvåfaktor OTP E-postkontroll lyckades"
-              failed: "Tvåfaktor OTP E-postkontroll misslyckades"
+              succeeded: "Tvåfaktor OTP e-postkontroll lyckades"
+              failed: "Tvåfaktor OTP e-postkontroll misslyckades"
         u2f:
           token:
             added: "Tvåfaktor U2F-token tillagd"
@@ -798,7 +798,7 @@ EventTypes:
               succeeded: "Tvåfaktor U2F-kontroll lyckades"
               failed: "Tvåfaktor U2F-kontroll misslyckades"
             signcount:
-              changed: "Kontrollsumman för Tvåfaktor U2F-token har ändrats"
+              changed: "Kontrollsumman för tvåfaktor U2F-token har ändrats"
         init:
           skipped: "Tvåfaktorinitialisering hoppades över"
       passwordless:
@@ -807,10 +807,10 @@ EventTypes:
           verified: "Token för lösenordsfri inloggning verifierad"
           removed: "Token för lösenordsfri inloggning borttagen"
           begin:
-            login: "lösenordsfri inloggningskontroll startad"
+            login: "Lösenordsfri inloggningskontroll startad"
           check:
-            succeeded: "lösenordsfri inloggningskontroll lyckades"
-            failed: "lösenordsfri inloggningskontroll misslyckades"
+            succeeded: "Lösenordsfri inloggningskontroll lyckades"
+            failed: "Lösenordsfri inloggningskontroll misslyckades"
           signcount:
             changed: "Kontrollsumman för lösenordsfri inloggningstoken har ändrats"
         initialization:
@@ -845,7 +845,7 @@ EventTypes:
       changed: "Mobilnummer ändrat"
       verified: "Mobilnummer verifierat"
       verification:
-        failed: "Verifiering av Mobilnummer misslyckades"
+        failed: "Verifiering av mobilnummer misslyckades"
       code:
         added: "Mobilnummerkod genererad"
         sent: "Mobilnummerkod skickad"
@@ -862,7 +862,7 @@ EventTypes:
           succeeded: "Tvåfaktor OTP-kontroll lyckades"
           failed: "Tvåfaktor OTP-kontroll misslyckades"
         init:
-          skipped: "Hoppade över Tvåfaktor OTP-initialisering"
+          skipped: "Hoppade över tvåfaktor OTP-initialisering"
       init:
         skipped: "Hoppade över tvåfaktorinitialisering"
     signed:
@@ -1072,8 +1072,8 @@ EventTypes:
             succeeded: "OIDC Client Secret-kontroll lyckades"
             failed: "OIDC Client Secret-kontroll misslyckades"
         key:
-          added: "OIDC App-nyckel tillagd"
-          removed: "OIDC App-nyckel borttagen"
+          added: "OIDC-appnyckel tillagd"
+          removed: "OIDC-appnyckel borttagen"
       api:
         secret:
           check:
