@@ -177,7 +177,7 @@ Passwordless:
 PasswordlessPrompt:
   Title: Configuração de login sem senha
   Description: Você gostaria de configurar o login sem senha? (Métodos de autenticação do seu dispositivo, como FaceID, Windows Hello ou Impressão digital)
-  
+
 PasswordlessRegistration:
   Title: Configuração de login sem senha
   Description: Adicione sua autenticação fornecendo um nome (por exemplo, MeuCelular, MacBook, etc.) e clique no botão 'Registrar login sem senha' abaixo.

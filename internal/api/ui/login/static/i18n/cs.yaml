@@ -518,7 +518,7 @@ Errors:
       NoExternalUserData: Nebyla přijata žádná externí uživatelská data
       CreationNotAllowed: Vytvoření nového uživatele není na tomto poskytovateli povoleno
       LinkingNotAllowed: Propojení uživatele není na tomto poskytovateli povoleno
-      NoOptionAllowed:   Ani vytvoření, ani propojení není povoleno pro tohoto poskytovatele. Obraťte se na svého správce.
+      NoOptionAllowed: Ani vytvoření, ani propojení není povoleno pro tohoto poskytovatele. Obraťte se na svého správce.
       LoginFailedSwitchLocal: |
         Přihlášení u externího poskytovatele identit selhalo. Vracíme se k místnímu přihlášení.
 

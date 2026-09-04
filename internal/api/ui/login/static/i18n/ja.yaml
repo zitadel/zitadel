@@ -424,7 +424,7 @@ Footer:
   Help: ヘルプ
   SupportEmail: サポートメール
 
-SignIn: '{{.Provider}} でサインイン'
+SignIn: "{{.Provider}} でサインイン"
 
 Errors:
   Internal: 内部でエラーが発生しました
