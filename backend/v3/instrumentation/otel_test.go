@@ -81,7 +81,7 @@ func Test_newResource(t *testing.T) {
 
 			attributes := make(map[attribute.Key]string)
 			for _, kv := range got.Attributes() {
-				attributes[kv.Key] = kv.Value.Emit()
+				attributes[kv.Key] = kv.Value.String()
 			}
 			for key, value := range tt.want {
 				assert.Equal(t, value, attributes[key], "attribute %q", key)
