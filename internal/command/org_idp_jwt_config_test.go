@@ -19,7 +19,7 @@ import (
 func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 	type fields struct {
 		eventstore   *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type (
 		args struct {
@@ -165,7 +165,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 						),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -220,7 +220,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 						),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: context.Background(),
