@@ -22,7 +22,7 @@ type IDPIntentCheckCommand struct {
 
 	SessionID  string
 	InstanceID string
-	EncAlgo    crypto.EncryptionAlgorithm
+	EncAlgo    crypto.AuthEncryptionAlgorithm
 
 	FetchedUser        User
 	IsCheckComplete    bool
@@ -32,7 +32,7 @@ type IDPIntentCheckCommand struct {
 // NewIDPIntentCheckCommand returns an IDPIntentCheckCommand initialized with the input values.
 //
 // If encryptionAlgo is nil, the default [crypto.EncryptionAlgorithm] will be used
-func NewIDPIntentCheckCommand(request *CheckIDPIntentType, sessionID, instanceID string, encryptionAlgo crypto.EncryptionAlgorithm) *IDPIntentCheckCommand {
+func NewIDPIntentCheckCommand(request *CheckIDPIntentType, sessionID, instanceID string, encryptionAlgo crypto.AuthEncryptionAlgorithm) *IDPIntentCheckCommand {
 	idpCheckCommand := &IDPIntentCheckCommand{
 		CheckIntent: request,
 		SessionID:   sessionID,
