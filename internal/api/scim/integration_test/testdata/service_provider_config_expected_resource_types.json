@@ -3,7 +3,7 @@
     "urn:ietf:params:scim:api:messages:2.0:ListResponse"
   ],
   "itemsPerPage": 100,
-  "totalResults": 1,
+  "totalResults": 2,
   "startIndex": 1,
   "Resources": [
     {
@@ -19,6 +19,20 @@
       "endpoint": "Users",
       "schema": "urn:ietf:params:scim:schemas:core:2.0:User",
       "description": "User Account"
+    },
+    {
+      "schemas": [
+        "urn:ietf:params:scim:schemas:core:2.0:ResourceType"
+      ],
+      "meta": {
+        "resourceType": "Group",
+        "location": "http://{domain}:8082/scim/v2/{orgId}/ResourceTypes/Group"
+      },
+      "id": "Group",
+      "name": "Group",
+      "endpoint": "Groups",
+      "schema": "urn:ietf:params:scim:schemas:core:2.0:Group",
+      "description": "Group"
     }
   ]
 }

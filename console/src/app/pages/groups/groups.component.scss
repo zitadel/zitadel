@@ -1,0 +1,19 @@
+.groups-header {
+  margin-bottom: 1rem;
+}
+
+.table-wrapper {
+  overflow: auto;
+
+  .no-content-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+}
+
+.no-break {
+  white-space: nowrap;
+}

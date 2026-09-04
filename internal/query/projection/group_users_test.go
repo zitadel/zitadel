@@ -22,52 +22,27 @@ func Test_GroupUsersReduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "reduceGroupUsersAdded",
+			name: "reduceGroupUserAdded",
 			args: args{
 				event: getEvent(
 					testEvent(
-						group.GroupUsersAddedEventType,
+						group.GroupUserAddedEventType,
 						group.AggregateType,
-						[]byte(
-							`{
-"userIds": ["user-id-1", "user-id-2", "user-id-3"]
-}`),
-					), eventstore.GenericEventMapper[group.GroupUsersAddedEvent],
+						[]byte(`{"userId": "user-id-1"}`),
+					), eventstore.GenericEventMapper[group.GroupUserAddedEvent],
 				),
 			},
-			reduce: (&groupUsersProjection{}).reduceGroupUsersAdded,
+			reduce: (&groupUsersProjection{}).reduceGroupUserAdded,
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("group"),
 				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.group_users1 (group_id, user_id, resource_owner, instance_id, sequence, creation_date) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.group_users1 (group_id, user_id, resource_owner, instance_id, sequence, creation_date) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (instance_id, group_id, user_id) DO UPDATE SET (resource_owner, sequence, creation_date) = (EXCLUDED.resource_owner, EXCLUDED.sequence, projections.group_users1.creation_date)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"user-id-1",
-								"ro-id",
-								"instance-id",
-								uint64(15),
-								anyArg{},
-							},
-						},
-						{
-							expectedStmt: "INSERT INTO projections.group_users1 (group_id, user_id, resource_owner, instance_id, sequence, creation_date) VALUES ($1, $2, $3, $4, $5, $6)",
-							expectedArgs: []interface{}{
-								"agg-id",
-								"user-id-2",
-								"ro-id",
-								"instance-id",
-								uint64(15),
-								anyArg{},
-							},
-						},
-						{
-							expectedStmt: "INSERT INTO projections.group_users1 (group_id, user_id, resource_owner, instance_id, sequence, creation_date) VALUES ($1, $2, $3, $4, $5, $6)",
-							expectedArgs: []interface{}{
-								"agg-id",
-								"user-id-3",
 								"ro-id",
 								"instance-id",
 								uint64(15),
@@ -79,20 +54,17 @@ func Test_GroupUsersReduces(t *testing.T) {
 			},
 		},
 		{
-			name: "reduceGroupUsersRemoved",
+			name: "reduceGroupUserRemoved",
 			args: args{
 				event: getEvent(
 					testEvent(
-						group.GroupUsersRemovedEventType,
+						group.GroupUserRemovedEventType,
 						group.AggregateType,
-						[]byte(
-							`{
-"userIds": ["user-id-1", "user-id-2"]
-}`),
-					), eventstore.GenericEventMapper[group.GroupUsersRemovedEvent],
+						[]byte(`{"userId": "user-id-1"}`),
+					), eventstore.GenericEventMapper[group.GroupUserRemovedEvent],
 				),
 			},
-			reduce: (&groupUsersProjection{}).reduceGroupUsersRemoved,
+			reduce: (&groupUsersProjection{}).reduceGroupUserRemoved,
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("group"),
 				sequence:      15,
@@ -101,10 +73,6 @@ func Test_GroupUsersReduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.group_users1 WHERE (group_id = $1) AND (user_id = $2) AND (resource_owner = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{"agg-id", "user-id-1", "ro-id", "instance-id"},
-						},
-						{
-							expectedStmt: "DELETE FROM projections.group_users1 WHERE (group_id = $1) AND (user_id = $2) AND (resource_owner = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{"agg-id", "user-id-2", "ro-id", "instance-id"},
 						},
 					},
 				},
