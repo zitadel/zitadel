@@ -31,6 +31,7 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 		},
 		EnableRelationalTables: gu.Ptr(true),
 		PermissionCheckV2:      gu.Ptr(true),
+		AllowOtpCodeOverride:   gu.Ptr(true),
 	}
 	want := &command.SystemFeatures{
 		LoginDefaultOrg:                gu.Ptr(true),
@@ -43,6 +44,7 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 		},
 		EnableRelationalTables: gu.Ptr(true),
 		PermissionCheckV2:      gu.Ptr(true),
+		AllowOTPCodeOverride:   gu.Ptr(true),
 	}
 
 	// Test
@@ -94,6 +96,10 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Level: feature.LevelSystem,
 			Value: true,
 		},
+		AllowOTPCodeOverride: query.FeatureSource[bool]{
+			Level: feature.LevelSystem,
+			Value: true,
+		},
 	}
 	want := &feature_pb.GetSystemFeaturesResponse{
 		Details: &object.Details{
@@ -138,6 +144,10 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
+		AllowOtpCodeOverride: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
+		},
 	}
 
 	// Test
@@ -163,6 +173,7 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		ConsoleUseV2UserApi:    gu.Ptr(true),
 		PermissionCheckV2:      gu.Ptr(false),
 		EnableRelationalTables: gu.Ptr(true),
+		AllowOtpCodeOverride:   gu.Ptr(true),
 	}
 	want := &command.InstanceFeatures{
 		LoginDefaultOrg:                gu.Ptr(true),
@@ -177,6 +188,7 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		ManagementConsoleUseV2UserApi: gu.Ptr(true),
 		PermissionCheckV2:             gu.Ptr(false),
 		EnableRelationalTables:        gu.Ptr(true),
+		AllowOTPCodeOverride:          gu.Ptr(true),
 	}
 
 	// Test
@@ -231,6 +243,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Level: feature.LevelInstance,
 			Value: true,
 		},
+		AllowOTPCodeOverride: query.FeatureSource[bool]{
+			Level: feature.LevelInstance,
+			Value: true,
+		},
 	}
 	want := &feature_pb.GetInstanceFeaturesResponse{
 		Details: &object.Details{
@@ -280,6 +296,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},
 		EnableRelationalTables: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_INSTANCE,
+		},
+		AllowOtpCodeOverride: &feature_pb.FeatureFlag{
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},
