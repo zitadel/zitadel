@@ -37,6 +37,7 @@ func TestOIDCApplicationWriteModel_NewChangedEvent_AppLinks(t *testing.T) {
 			context.Background(), agg, "app-id",
 			nil, nil, nil, nil, nil, nil, nil, nil,
 			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
+			nil,
 			nil, nil, nil, nil,
 		)
 		require.NoError(t, err)
@@ -51,6 +52,7 @@ func TestOIDCApplicationWriteModel_NewChangedEvent_AppLinks(t *testing.T) {
 			context.Background(), agg, "app-id",
 			nil, nil, nil, nil, nil, nil, nil, nil,
 			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
+			nil,
 			gu.Ptr("NEWTEAM"),
 			gu.Ptr("com.new.app"),
 			gu.Ptr("com.new.app"),
@@ -72,6 +74,7 @@ func TestOIDCApplicationWriteModel_NewChangedEvent_AppLinks(t *testing.T) {
 			context.Background(), agg, "app-id",
 			nil, nil, nil, nil, nil, nil, nil, nil,
 			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
+			nil,
 			gu.Ptr(""),
 			gu.Ptr(""),
 			gu.Ptr(""),

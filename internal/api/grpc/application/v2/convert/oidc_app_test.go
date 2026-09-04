@@ -66,6 +66,7 @@ func TestCreateOIDCAppRequestToDomain(t *testing.T) {
 				LoginVersion: &application.LoginVersion{Version: &application.LoginVersion_LoginV2{LoginV2: &application.LoginV2{
 					BaseUri: gu.Ptr("https://login"),
 				}}},
+				MinimalIntrospection: true,
 				Ios: &application.IOSAppLinkConfig{
 					TeamId:   "TEAMID",
 					BundleId: "com.example.app",
@@ -97,6 +98,7 @@ func TestCreateOIDCAppRequestToDomain(t *testing.T) {
 				BackChannelLogoutURI:          gu.Ptr("https://backchannel"),
 				LoginVersion:                  gu.Ptr(domain.LoginVersion2),
 				LoginBaseURI:                  gu.Ptr("https://login"),
+				MinimalIntrospection:          gu.Ptr(true),
 				IOSTeamID:                     gu.Ptr("TEAMID"),
 				IOSBundleID:                   gu.Ptr("com.example.app"),
 				AndroidPackageName:            gu.Ptr("com.example.app"),
@@ -550,6 +552,7 @@ func TestAppOIDCConfigToPb(t *testing.T) {
 				BackChannelLogoutURI:          "https://example.com/backchannel",
 				LoginVersion:                  domain.LoginVersion2,
 				LoginBaseURI:                  gu.Ptr("https://login.example.com"),
+				MinimalIntrospection:          true,
 				IOSTeamID:                     "TEAMID",
 				IOSBundleID:                   "com.example.app",
 				AndroidPackageName:            "com.example.app",
@@ -587,6 +590,7 @@ func TestAppOIDCConfigToPb(t *testing.T) {
 							},
 						},
 					},
+					MinimalIntrospection: true,
 					Ios: &application.IOSAppLinkConfig{
 						TeamId:   "TEAMID",
 						BundleId: "com.example.app",

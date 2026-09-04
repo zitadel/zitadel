@@ -38,6 +38,7 @@ type addOIDCApp struct {
 	BackChannelLogoutURI          string
 	LoginVersion                  domain.LoginVersion
 	LoginBaseURI                  string
+	MinimalIntrospection          bool
 	IOSTeamID                     string
 	IOSBundleID                   string
 	AndroidPackageName            string
@@ -122,6 +123,7 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp) preparation.Validation {
 					app.BackChannelLogoutURI,
 					app.LoginVersion,
 					app.LoginBaseURI,
+					app.MinimalIntrospection,
 					app.IOSTeamID,
 					app.IOSBundleID,
 					app.AndroidPackageName,
@@ -259,6 +261,7 @@ func (c *Commands) pushOIDCApplication(ctx context.Context, addedApplication *OI
 		backchannelLogoutURI,
 		gu.Value(oidcApp.LoginVersion),
 		strings.TrimSpace(gu.Value(oidcApp.LoginBaseURI)),
+		gu.Value(oidcApp.MinimalIntrospection),
 		strings.TrimSpace(gu.Value(oidcApp.IOSTeamID)),
 		strings.TrimSpace(gu.Value(oidcApp.IOSBundleID)),
 		strings.TrimSpace(gu.Value(oidcApp.AndroidPackageName)),
@@ -396,6 +399,7 @@ func (c *Commands) oidcApplicationChangeEvent(ctx context.Context, existingOIDC 
 		backChannelLogout,
 		oidc.LoginVersion,
 		loginBaseURI,
+		oidc.MinimalIntrospection,
 		iosTeamID,
 		iosBundleID,
 		androidPackageName,

@@ -18,4 +18,9 @@ message APIConfiguration {
 
   // The authentication method type used by the API to authenticate at the introspection endpoint.
   APIAuthMethodType auth_method_type = 2;
+
+  // If MinimalIntrospection is enabled, the introspection endpoint returns only the "active"
+  // field (and other token metadata) for tokens issued to this application, skipping the lookup
+  // of user information and claims.
+  bool minimal_introspection = 3;
 }

@@ -169,6 +169,11 @@ message OIDCConfiguration {
   // Served in /.well-known/assetlinks.json for delegate_permission/common.handle_all_urls and delegate_permission/common.get_login_creds.
   // Platform verifiers may cache the file; changes can take time to take effect.
   AndroidAppLinkConfig android = 23;
+
+  // If MinimalIntrospection is enabled, the introspection endpoint returns only the "active"
+  // field (and other token metadata) for tokens issued to this application, skipping the lookup
+  // of user information and claims.
+  bool minimal_introspection = 24;
 }
 
 // IOSAppLinkConfig is iOS Associated Domains / passkey trust config.

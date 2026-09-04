@@ -3,10 +3,12 @@ package convert
 import (
 	"testing"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/pkg/grpc/application/v2"
 )
 
@@ -30,10 +32,11 @@ func TestCreateAPIApplicationRequestToDomain(t *testing.T) {
 				AuthMethodType: application.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC,
 			},
 			want: &domain.APIApp{
-				ObjectRoot:     models.ObjectRoot{AggregateID: "proj-1"},
-				AppName:        "my-application",
-				AuthMethodType: domain.APIAuthMethodTypeBasic,
-				AppID:          "someID",
+				ObjectRoot:           models.ObjectRoot{AggregateID: "proj-1"},
+				AppName:              "my-application",
+				AuthMethodType:       domain.APIAuthMethodTypeBasic,
+				AppID:                "someID",
+				MinimalIntrospection: gu.Ptr(false),
 			},
 		},
 		{
@@ -44,9 +47,27 @@ func TestCreateAPIApplicationRequestToDomain(t *testing.T) {
 				AuthMethodType: application.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
 			},
 			want: &domain.APIApp{
-				ObjectRoot:     models.ObjectRoot{AggregateID: "proj-2"},
-				AppName:        "jwt-application",
-				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
+				ObjectRoot:           models.ObjectRoot{AggregateID: "proj-2"},
+				AppName:              "jwt-application",
+				AuthMethodType:       domain.APIAuthMethodTypePrivateKeyJWT,
+				MinimalIntrospection: gu.Ptr(false),
+			},
+		},
+		{
+			name:      "minimal introspection enabled",
+			appName:   "minimal-app",
+			projectID: "proj-3",
+			appID:     "someID3",
+			req: &application.CreateAPIApplicationRequest{
+				AuthMethodType:       application.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
+				MinimalIntrospection: true,
+			},
+			want: &domain.APIApp{
+				ObjectRoot:           models.ObjectRoot{AggregateID: "proj-3"},
+				AppName:              "minimal-app",
+				AuthMethodType:       domain.APIAuthMethodTypePrivateKeyJWT,
+				AppID:                "someID3",
+				MinimalIntrospection: gu.Ptr(true),
 			},
 		},
 	}
@@ -98,6 +119,34 @@ func TestUpdateAPIApplicationConfigurationRequestToDomain(t *testing.T) {
 				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
 			},
 		},
+		{
+			name:      "minimal introspection enabled",
+			appID:     "application-3",
+			projectID: "proj-3",
+			req: &application.UpdateAPIApplicationConfigurationRequest{
+				AuthMethodType:       application.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
+				MinimalIntrospection: gu.Ptr(true),
+			},
+			want: &domain.APIApp{
+				ObjectRoot:           models.ObjectRoot{AggregateID: "proj-3"},
+				AppID:                "application-3",
+				AuthMethodType:       domain.APIAuthMethodTypePrivateKeyJWT,
+				MinimalIntrospection: gu.Ptr(true),
+			},
+		},
+		{
+			name:      "minimal introspection not set stays unset",
+			appID:     "application-4",
+			projectID: "proj-4",
+			req: &application.UpdateAPIApplicationConfigurationRequest{
+				AuthMethodType: application.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC,
+			},
+			want: &domain.APIApp{
+				ObjectRoot:     models.ObjectRoot{AggregateID: "proj-4"},
+				AppID:          "application-4",
+				AuthMethodType: domain.APIAuthMethodTypeBasic,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -110,6 +159,24 @@ func TestUpdateAPIApplicationConfigurationRequestToDomain(t *testing.T) {
 			assert.Equal(t, tt.want, got)
 		})
 	}
+}
+
+func Test_appAPIConfigToPb(t *testing.T) {
+	t.Parallel()
+
+	got := appAPIConfigToPb(&query.APIApp{
+		ClientID:             "client-1",
+		AuthMethodType:       domain.APIAuthMethodTypePrivateKeyJWT,
+		MinimalIntrospection: true,
+	})
+
+	assert.Equal(t, &application.Application_ApiConfiguration{
+		ApiConfiguration: &application.APIConfiguration{
+			ClientId:             "client-1",
+			AuthMethodType:       application.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
+			MinimalIntrospection: true,
+		},
+	}, got)
 }
 
 func Test_apiAuthMethodTypeToPb(t *testing.T) {

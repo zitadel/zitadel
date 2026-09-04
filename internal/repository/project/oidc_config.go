@@ -49,6 +49,7 @@ type OIDCConfigAddedEvent struct {
 	BackChannelLogoutURI          string                     `json:"backChannelLogoutURI,omitempty"`
 	LoginVersion                  domain.LoginVersion        `json:"loginVersion,omitempty"`
 	LoginBaseURI                  string                     `json:"loginBaseURI,omitempty"`
+	MinimalIntrospection          bool                       `json:"minimalIntrospection,omitempty"`
 	IOSTeamID                     string                     `json:"iosTeamId,omitempty"`
 	IOSBundleID                   string                     `json:"iosBundleId,omitempty"`
 	AndroidPackageName            string                     `json:"androidPackageName,omitempty"`
@@ -87,6 +88,7 @@ func NewOIDCConfigAddedEvent(
 	backChannelLogoutURI string,
 	loginVersion domain.LoginVersion,
 	loginBaseURI string,
+	minimalIntrospection bool,
 	iosTeamID string,
 	iosBundleID string,
 	androidPackageName string,
@@ -119,6 +121,7 @@ func NewOIDCConfigAddedEvent(
 		BackChannelLogoutURI:          backChannelLogoutURI,
 		LoginVersion:                  loginVersion,
 		LoginBaseURI:                  loginBaseURI,
+		MinimalIntrospection:          minimalIntrospection,
 		IOSTeamID:                     iosTeamID,
 		IOSBundleID:                   iosBundleID,
 		AndroidPackageName:            androidPackageName,
@@ -220,6 +223,9 @@ func (e *OIDCConfigAddedEvent) Validate(cmd eventstore.Command) bool {
 	if e.LoginBaseURI != c.LoginBaseURI {
 		return false
 	}
+	if e.MinimalIntrospection != c.MinimalIntrospection {
+		return false
+	}
 	if e.IOSTeamID != c.IOSTeamID {
 		return false
 	}
@@ -267,6 +273,7 @@ type OIDCConfigChangedEvent struct {
 	BackChannelLogoutURI          *string                     `json:"backChannelLogoutURI,omitempty"`
 	LoginVersion                  *domain.LoginVersion        `json:"loginVersion,omitempty"`
 	LoginBaseURI                  *string                     `json:"loginBaseURI,omitempty"`
+	MinimalIntrospection          *bool                       `json:"minimalIntrospection,omitempty"`
 	IOSTeamID                     *string                     `json:"iosTeamId,omitempty"`
 	IOSBundleID                   *string                     `json:"iosBundleId,omitempty"`
 	AndroidPackageName            *string                     `json:"androidPackageName,omitempty"`
@@ -424,6 +431,12 @@ func ChangeOIDCLoginVersion(loginVersion domain.LoginVersion) func(event *OIDCCo
 func ChangeOIDCLoginBaseURI(loginBaseURI string) func(event *OIDCConfigChangedEvent) {
 	return func(e *OIDCConfigChangedEvent) {
 		e.LoginBaseURI = &loginBaseURI
+	}
+}
+
+func ChangeOIDCMinimalIntrospection(minimalIntrospection bool) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.MinimalIntrospection = &minimalIntrospection
 	}
 }
 

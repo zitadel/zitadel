@@ -89,7 +89,7 @@ func apiAppEvents(ctx context.Context, orgID, projectID, id, name string) []even
 			id,
 			"clientID",
 			"",
-			domain.APIAuthMethodTypePrivateKeyJWT,
+			domain.APIAuthMethodTypePrivateKeyJWT, false,
 		),
 	}
 }
@@ -125,10 +125,12 @@ func oidcAppEvents(ctx context.Context, orgID, projectID, id, name, clientID str
 			"",
 			domain.LoginVersionUnspecified,
 			"",
+			false,
 			"",
 			"",
 			"",
-			nil),
+			nil,
+		),
 	}
 }
 
@@ -471,10 +473,12 @@ func generatedDomainFilters(instanceID, orgID, projectID, appID, generatedDomain
 				"",
 				domain.LoginVersionUnspecified,
 				"",
+				false,
 				"",
 				"",
 				"",
-				nil),
+				nil,
+			),
 		),
 		expectFilter(
 			func() eventstore.Event {

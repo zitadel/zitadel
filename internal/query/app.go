@@ -64,6 +64,7 @@ type OIDCApp struct {
 	BackChannelLogoutURI          string
 	LoginVersion                  domain.LoginVersion
 	LoginBaseURI                  *string
+	MinimalIntrospection          bool
 	IOSTeamID                     string
 	IOSBundleID                   string
 	AndroidPackageName            string
@@ -79,8 +80,9 @@ type SAMLApp struct {
 }
 
 type APIApp struct {
-	ClientID       string
-	AuthMethodType domain.APIAuthMethodType
+	ClientID             string
+	AuthMethodType       domain.APIAuthMethodType
+	MinimalIntrospection bool
 }
 
 type AppSearchQueries struct {
@@ -191,6 +193,10 @@ var (
 		name:  projection.AppAPIConfigColumnAuthMethod,
 		table: appAPIConfigsTable,
 	}
+	AppAPIConfigColumnMinimalIntrospection = Column{
+		name:  projection.AppAPIConfigColumnMinimalIntrospection,
+		table: appAPIConfigsTable,
+	}
 )
 
 var (
@@ -280,6 +286,10 @@ var (
 	}
 	AppOIDCConfigColumnLoginBaseURI = Column{
 		name:  projection.AppOIDCConfigColumnLoginBaseURI,
+		table: appOIDCConfigsTable,
+	}
+	AppOIDCConfigColumnMinimalIntrospection = Column{
+		name:  projection.AppOIDCConfigColumnMinimalIntrospection,
 		table: appOIDCConfigsTable,
 	}
 	AppOIDCConfigColumnIOSTeamID = Column{
@@ -724,6 +734,7 @@ func prepareAppQuery(activeOnly bool) (sq.SelectBuilder, func(*sql.Row) (*App, e
 		AppAPIConfigColumnAppID.identifier(),
 		AppAPIConfigColumnClientID.identifier(),
 		AppAPIConfigColumnAuthMethod.identifier(),
+		AppAPIConfigColumnMinimalIntrospection.identifier(),
 
 		AppOIDCConfigColumnAppID.identifier(),
 		AppOIDCConfigColumnVersion.identifier(),
@@ -745,6 +756,7 @@ func prepareAppQuery(activeOnly bool) (sq.SelectBuilder, func(*sql.Row) (*App, e
 		AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
 		AppOIDCConfigColumnLoginVersion.identifier(),
 		AppOIDCConfigColumnLoginBaseURI.identifier(),
+		AppOIDCConfigColumnMinimalIntrospection.identifier(),
 		AppOIDCConfigColumnIOSTeamID.identifier(),
 		AppOIDCConfigColumnIOSBundleID.identifier(),
 		AppOIDCConfigColumnAndroidPackageName.identifier(),
@@ -797,6 +809,7 @@ func scanApp(row *sql.Row) (*App, error) {
 		&apiConfig.appID,
 		&apiConfig.clientID,
 		&apiConfig.authMethod,
+		&apiConfig.minimalIntrospection,
 
 		&oidcConfig.appID,
 		&oidcConfig.version,
@@ -818,6 +831,7 @@ func scanApp(row *sql.Row) (*App, error) {
 		&oidcConfig.backChannelLogoutURI,
 		&oidcConfig.loginVersion,
 		&oidcConfig.loginBaseURI,
+		&oidcConfig.minimalIntrospection,
 		&oidcConfig.iosTeamID,
 		&oidcConfig.iosBundleID,
 		&oidcConfig.androidPackageName,
@@ -876,6 +890,7 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 			AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
 			AppOIDCConfigColumnLoginVersion.identifier(),
 			AppOIDCConfigColumnLoginBaseURI.identifier(),
+			AppOIDCConfigColumnMinimalIntrospection.identifier(),
 			AppOIDCConfigColumnIOSTeamID.identifier(),
 			AppOIDCConfigColumnIOSBundleID.identifier(),
 			AppOIDCConfigColumnAndroidPackageName.identifier(),
@@ -919,6 +934,7 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 				&oidcConfig.backChannelLogoutURI,
 				&oidcConfig.loginVersion,
 				&oidcConfig.loginBaseURI,
+				&oidcConfig.minimalIntrospection,
 				&oidcConfig.iosTeamID,
 				&oidcConfig.iosBundleID,
 				&oidcConfig.androidPackageName,
@@ -1019,6 +1035,7 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 			AppAPIConfigColumnAppID.identifier(),
 			AppAPIConfigColumnClientID.identifier(),
 			AppAPIConfigColumnAuthMethod.identifier(),
+			AppAPIConfigColumnMinimalIntrospection.identifier(),
 
 			AppOIDCConfigColumnAppID.identifier(),
 			AppOIDCConfigColumnVersion.identifier(),
@@ -1040,6 +1057,7 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 			AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
 			AppOIDCConfigColumnLoginVersion.identifier(),
 			AppOIDCConfigColumnLoginBaseURI.identifier(),
+			AppOIDCConfigColumnMinimalIntrospection.identifier(),
 			AppOIDCConfigColumnIOSTeamID.identifier(),
 			AppOIDCConfigColumnIOSBundleID.identifier(),
 			AppOIDCConfigColumnAndroidPackageName.identifier(),
@@ -1080,6 +1098,7 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 					&apiConfig.appID,
 					&apiConfig.clientID,
 					&apiConfig.authMethod,
+					&apiConfig.minimalIntrospection,
 
 					&oidcConfig.appID,
 					&oidcConfig.version,
@@ -1101,6 +1120,7 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 					&oidcConfig.backChannelLogoutURI,
 					&oidcConfig.loginVersion,
 					&oidcConfig.loginBaseURI,
+					&oidcConfig.minimalIntrospection,
 					&oidcConfig.iosTeamID,
 					&oidcConfig.iosBundleID,
 					&oidcConfig.androidPackageName,
@@ -1212,6 +1232,7 @@ type sqlOIDCConfig struct {
 	backChannelLogoutURI          sql.NullString
 	loginVersion                  sql.NullInt16
 	loginBaseURI                  sql.NullString
+	minimalIntrospection          sql.NullBool
 	iosTeamID                     sql.NullString
 	iosBundleID                   sql.NullString
 	androidPackageName            sql.NullString
@@ -1241,6 +1262,7 @@ func (c sqlOIDCConfig) set(app *App) {
 		SkipNativeAppSuccessPage:      c.skipNativeAppSuccessPage.Bool,
 		BackChannelLogoutURI:          c.backChannelLogoutURI.String,
 		LoginVersion:                  domain.LoginVersion(c.loginVersion.Int16),
+		MinimalIntrospection:          c.minimalIntrospection.Bool,
 		IOSTeamID:                     c.iosTeamID.String,
 		IOSBundleID:                   c.iosBundleID.String,
 		AndroidPackageName:            c.androidPackageName.String,
@@ -1282,9 +1304,10 @@ func (c sqlSAMLConfig) set(app *App) {
 }
 
 type sqlAPIConfig struct {
-	appID      sql.NullString
-	clientID   sql.NullString
-	authMethod sql.NullInt16
+	appID                sql.NullString
+	clientID             sql.NullString
+	authMethod           sql.NullInt16
+	minimalIntrospection sql.NullBool
 }
 
 func (c sqlAPIConfig) set(app *App) {
@@ -1292,7 +1315,8 @@ func (c sqlAPIConfig) set(app *App) {
 		return
 	}
 	app.APIConfig = &APIApp{
-		ClientID:       c.clientID.String,
-		AuthMethodType: domain.APIAuthMethodType(c.authMethod.Int16),
+		ClientID:             c.clientID.String,
+		AuthMethodType:       domain.APIAuthMethodType(c.authMethod.Int16),
+		MinimalIntrospection: c.minimalIntrospection.Bool,
 	}
 }

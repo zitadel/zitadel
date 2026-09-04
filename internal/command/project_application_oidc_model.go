@@ -39,6 +39,7 @@ type OIDCApplicationWriteModel struct {
 	BackChannelLogoutURI          string
 	LoginVersion                  domain.LoginVersion
 	LoginBaseURI                  string
+	MinimalIntrospection          bool
 	IOSTeamID                     string
 	IOSBundleID                   string
 	AndroidPackageName            string
@@ -144,6 +145,7 @@ func (wm *OIDCApplicationWriteModel) Reduce() error {
 			wm.BackChannelLogoutURI = ""
 			wm.LoginVersion = domain.LoginVersionUnspecified
 			wm.LoginBaseURI = ""
+			wm.MinimalIntrospection = false
 			wm.IOSTeamID = ""
 			wm.IOSBundleID = ""
 			wm.AndroidPackageName = ""
@@ -197,6 +199,7 @@ func (wm *OIDCApplicationWriteModel) Reduce() error {
 			wm.BackChannelLogoutURI = ""
 			wm.LoginVersion = domain.LoginVersionUnspecified
 			wm.LoginBaseURI = ""
+			wm.MinimalIntrospection = false
 			wm.IOSTeamID = ""
 			wm.IOSBundleID = ""
 			wm.AndroidPackageName = ""
@@ -230,6 +233,7 @@ func (wm *OIDCApplicationWriteModel) appendAddOIDCEvent(e *project.OIDCConfigAdd
 	wm.BackChannelLogoutURI = e.BackChannelLogoutURI
 	wm.LoginVersion = e.LoginVersion
 	wm.LoginBaseURI = e.LoginBaseURI
+	wm.MinimalIntrospection = e.MinimalIntrospection
 	wm.IOSTeamID = e.IOSTeamID
 	wm.IOSBundleID = e.IOSBundleID
 	wm.AndroidPackageName = e.AndroidPackageName
@@ -291,6 +295,9 @@ func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfig
 	if e.LoginBaseURI != nil {
 		wm.LoginBaseURI = *e.LoginBaseURI
 	}
+	if e.MinimalIntrospection != nil {
+		wm.MinimalIntrospection = *e.MinimalIntrospection
+	}
 	if e.IOSTeamID != nil {
 		wm.IOSTeamID = *e.IOSTeamID
 	}
@@ -348,6 +355,7 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	backChannelLogoutURI *string,
 	loginVersion *domain.LoginVersion,
 	loginBaseURI *string,
+	minimalIntrospection *bool,
 	iosTeamID *string,
 	iosBundleID *string,
 	androidPackageName *string,
@@ -409,6 +417,9 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	}
 	if loginBaseURI != nil && wm.LoginBaseURI != *loginBaseURI {
 		changes = append(changes, project.ChangeOIDCLoginBaseURI(*loginBaseURI))
+	}
+	if minimalIntrospection != nil && wm.MinimalIntrospection != *minimalIntrospection {
+		changes = append(changes, project.ChangeOIDCMinimalIntrospection(*minimalIntrospection))
 	}
 	if iosTeamID != nil && wm.IOSTeamID != *iosTeamID {
 		changes = append(changes, project.ChangeIOSTeamID(*iosTeamID))
