@@ -5,7 +5,7 @@ import { SAMLRequest } from "@zitadel/proto/zitadel/saml/v2/authorization_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { GetSessionResponse } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { getMostRecentCookieWithLoginname, removeSessionFromCookie } from "./cookies";
+import { getMostRecentCookieWithLoginname } from "./cookies";
 import { shouldEnforceMFA } from "./verify-helper";
 import { getLoginSettings, getSession, getUserByID, listAuthenticationMethodTypes, ServiceConfig } from "./zitadel";
 
@@ -38,24 +38,18 @@ export async function loadMostRecentSession({
     });
     return response.session;
   } catch (error) {
-    const isStaleCookieSession = error instanceof ConnectError && error.code === Code.NotFound;
-
-    if (!isStaleCookieSession) {
-      throw error;
+    // The `sessions` cookie has no maxAge, so it can outlive the server-side session
+    // (logout, admin/API termination, removed user/org/instance) and getSession throws
+    // `not_found`. Treat it like the no-cookie case above. The stale entry is not pruned
+    // here: nearly every caller is a server-component render, where Next.js forbids
+    // cookie writes. Pruning lives in the server actions that already rewrite the
+    // cookie with the instance's iframe setting (see clearSession in server/session.ts).
+    if (error instanceof ConnectError && error.code === Code.NotFound) {
+      console.warn("[Session] Could not load most recent session", error);
+      return undefined;
     }
 
-    // A server-side logout or termination can remove a session while the browser
-    // still holds its entry. The most recent-session callers already handle this
-    // as no session; remove the stale entry when the current context permits it.
-    console.warn("[Session] Removing stale session from cookie", error);
-    try {
-      await removeSessionFromCookie({ session: recent });
-    } catch (cookieError) {
-      if (!(cookieError instanceof Error) || !cookieError.message.includes("Cookies can only be modified")) {
-        throw cookieError;
-      }
-    }
-    return undefined;
+    throw error;
   }
 }
 
