@@ -1,6 +1,7 @@
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import localeBg from '@angular/common/locales/bg';
+import localeDa from '@angular/common/locales/da';
 import localeDe from '@angular/common/locales/de';
 import localeCs from '@angular/common/locales/cs';
 import localeEn from '@angular/common/locales/en';
@@ -81,6 +82,8 @@ import { withDevtools } from '@tanstack/angular-query-experimental/devtools';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { provideNgIconsConfig } from '@ng-icons/core';
 
+registerLocaleData(localeDa);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/da.json'));
 registerLocaleData(localeDe);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/de.json'));
 registerLocaleData(localeEn);

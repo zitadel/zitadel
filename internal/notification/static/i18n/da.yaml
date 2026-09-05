@@ -1,0 +1,68 @@
+InitCode:
+  Title: Initialisér bruger
+  PreHeader: Initialisér bruger
+  Subject: Initialisér bruger
+  Greeting: Hej {{.DisplayName}},
+  Text: Denne bruger blev oprettet. Brug brugernavnet {{.PreferredLoginName}} til at logge ind. Klik på knappen nedenfor for at afslutte initialiseringsprocessen. (Kode {{.Code}}) Hvis du ikke har anmodet om denne e-mail, kan du ignorere den.
+  ButtonText: Afslut initialisering
+PasswordReset:
+  Title: Nulstil adgangskode
+  PreHeader: Nulstil adgangskode
+  Subject: Nulstil adgangskode
+  Greeting: Hej {{.DisplayName}},
+  Text: Vi har modtaget en anmodning om at nulstille din adgangskode. Brug knappen nedenfor for at nulstille din adgangskode. (Kode {{.Code}}) Hvis du ikke har anmodet om denne e-mail, kan du ignorere den.
+  ButtonText: Nulstil adgangskode
+VerifyEmail:
+  Title: Bekræft e-mail
+  PreHeader: Bekræft e-mail
+  Subject: Bekræft e-mail
+  Greeting: Hej {{.DisplayName}},
+  Text: En ny e-mail er blevet tilføjet. Brug knappen nedenfor for at bekræfte din e-mail. (Kode {{.Code}}) Hvis du ikke har tilføjet en ny e-mail, kan du ignorere denne e-mail.
+  ButtonText: Bekræft e-mail
+VerifyPhone:
+  Title: Bekræft telefon
+  PreHeader: Bekræft telefon
+  Subject: Bekræft telefon
+  Greeting: Hej {{.DisplayName}},
+  Text: Et nyt telefonnummer er blevet tilføjet. Brug følgende kode for at bekræfte det {{.Code}}
+  ButtonText: Bekræft telefon
+VerifyEmailOTP:
+  Title: Bekræft OTP
+  PreHeader: Bekræft OTP
+  Subject: Bekræft OTP
+  Greeting: Hej {{.DisplayName}},
+  Text: Brug engangskoden (OTP) {{.OTP}} for at godkende inden for de næste fem minutter, eller klik på knappen "Godkend".
+  ButtonText: Godkend
+VerifySMSOTP:
+  Text: >-
+    {{.OTP}} er din OTP for {{ .Domain }}. Brug den inden for de næste {{.Expiry}}.
+
+    @{{.Domain}} #{{.OTP}}
+DomainClaimed:
+  Title: Domæne er taget i brug
+  PreHeader: Skift e-mail / brugernavn
+  Subject: Domæne er taget i brug
+  Greeting: Hej {{.DisplayName}},
+  Text: Domænet {{.Domain}} er taget i brug af en organisation. Din nuværende bruger {{.Username}} er ikke en del af denne organisation. Derfor skal du skifte din e-mail, når du logger ind. Vi har oprettet et midlertidigt brugernavn ({{.TempUsername}}) til dette login.
+  ButtonText: Log ind
+PasswordlessRegistration:
+  Title: Tilføj login med adgangsnøgle
+  PreHeader: Tilføj login med adgangsnøgle
+  Subject: Tilføj login med adgangsnøgle
+  Greeting: Hej {{.DisplayName}},
+  Text: Vi har modtaget en anmodning om at tilføje et token til login med adgangsnøgle. Brug knappen nedenfor for at tilføje dit token eller din enhed til login med adgangsnøgle.
+  ButtonText: Tilføj login med adgangsnøgle
+PasswordChange:
+  Title: Brugerens adgangskode er ændret
+  PreHeader: Skift adgangskode
+  Subject: Brugerens adgangskode er ændret
+  Greeting: Hej {{.DisplayName}},
+  Text: Adgangskoden for din bruger er ændret. Hvis denne ændring ikke blev foretaget af dig, anbefales du straks at nulstille din adgangskode.
+  ButtonText: Log ind
+InviteUser:
+  Title: Invitation til {{.ApplicationName}}
+  PreHeader: Invitation til {{.ApplicationName}}
+  Subject: Invitation til {{.ApplicationName}}
+  Greeting: Hej {{.DisplayName}},
+  Text: Din bruger er blevet inviteret til {{.ApplicationName}}. Klik på knappen nedenfor for at afslutte invitationsprocessen. Hvis du ikke har anmodet om denne e-mail, kan du ignorere den.
+  ButtonText: Acceptér invitation
