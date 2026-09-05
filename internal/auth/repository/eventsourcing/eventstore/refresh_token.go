@@ -71,6 +71,9 @@ func (r *RefreshTokenRepo) RefreshTokenByID(ctx context.Context, tokenID, userID
 
 	if esErr != nil {
 		logging.Log("EVENT-AE462").WithError(viewErr).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
+		if !tokenView.Expiration.After(time.Now()) {
+			return nil, zerrors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.User.RefreshToken.Invalid")
+		}
 		return model.RefreshTokenViewToModel(tokenView), nil
 	}
 	viewToken := *tokenView
