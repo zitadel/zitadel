@@ -35,7 +35,6 @@ vi.mock("./zitadel", () => ({
 
 vi.mock("./cookies", () => ({
   getMostRecentCookieWithLoginname: vi.fn(),
-  removeSessionFromCookie: vi.fn(),
 }));
 
 vi.mock("./verify-helper", () => ({
@@ -1642,29 +1641,19 @@ describe("loadMostRecentSession", () => {
     });
   });
 
-  test("removes the stale cookie and returns undefined when getSession rejects with NotFound", async () => {
+  test("returns undefined instead of throwing when getSession rejects with NotFound (stale cookie)", async () => {
+    // The `sessions` cookie can outlive the server-side session, so getSession may reject with
+    // a NotFound ConnectError. loadMostRecentSession must treat that the same as no session.
     const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const error = new ConnectError("session is gone", Code.NotFound);
+    const notFound = new ConnectError("Session does not exist (QUERY-SFeaa)", Code.NotFound);
     vi.mocked(cookiesModule.getMostRecentCookieWithLoginname).mockResolvedValue(cookie as any);
-    vi.mocked(zitadelModule.getSession).mockRejectedValue(error);
+    vi.mocked(zitadelModule.getSession).mockRejectedValue(notFound);
 
     const result = await loadMostRecentSession({ serviceConfig, sessionParams });
 
     expect(result).toBeUndefined();
-    expect(cookiesModule.removeSessionFromCookie).toHaveBeenCalledWith({ session: cookie });
-    expect(consoleSpy).toHaveBeenCalledWith("[Session] Removing stale session from cookie", error);
+    expect(consoleSpy).toHaveBeenCalledWith("[Session] Could not load most recent session", notFound);
     consoleSpy.mockRestore();
-  });
-
-  test("returns undefined when cookie mutation is unavailable during render", async () => {
-    const notFound = new ConnectError("session is gone", Code.NotFound);
-    vi.mocked(cookiesModule.getMostRecentCookieWithLoginname).mockResolvedValue(cookie as any);
-    vi.mocked(zitadelModule.getSession).mockRejectedValue(notFound);
-    vi.mocked(cookiesModule.removeSessionFromCookie).mockRejectedValue(
-      new Error("Cookies can only be modified in a Server Action or Route Handler"),
-    );
-
-    await expect(loadMostRecentSession({ serviceConfig, sessionParams })).resolves.toBeUndefined();
   });
 
   test("re-throws non-NotFound ConnectErrors (real failures must propagate)", async () => {
