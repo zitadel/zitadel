@@ -359,7 +359,8 @@
       "couldNotCreateSession": "Impossible de créer la session",
       "userNotFound": "Utilisateur non trouvé dans le système",
       "couldNotLinkIDP": "Impossible de lier le fournisseur d'identité à l'utilisateur",
-      "couldNotRegisterUser": "Impossible d'inscrire l'utilisateur"
+      "couldNotRegisterUser": "Impossible d'inscrire l'utilisateur",
+      "registerNotAllowed": "L'enregistrement n'est pas autorisé"
     }
   },
   "invite": {
