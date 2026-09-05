@@ -1,10 +1,11 @@
+import { Code, ConnectError } from "@connectrpc/connect";
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { AuthRequest } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { SAMLRequest } from "@zitadel/proto/zitadel/saml/v2/authorization_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { GetSessionResponse } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { getMostRecentCookieWithLoginname } from "./cookies";
+import { getMostRecentCookieWithLoginname, removeSessionFromCookie } from "./cookies";
 import { shouldEnforceMFA } from "./verify-helper";
 import { getLoginSettings, getSession, getUserByID, listAuthenticationMethodTypes, ServiceConfig } from "./zitadel";
 
@@ -29,26 +30,33 @@ export async function loadMostRecentSession({
     return undefined;
   }
 
-  return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token })
-    .then((resp: GetSessionResponse) => resp.session)
-    .catch(async (error) => {
-      const { Code, ConnectError } = await import("@connectrpc/connect");
-      const isNotFound = error instanceof ConnectError && error.code === Code.NotFound;
-
-      // The `sessions` cookie has no maxAge, so it can outlive the server-side session
-      // and reference one the session projection no longer holds — e.g. the user logged out, an
-      // admin/API terminated the session, or the user/org/instance was removed. In that
-      // case getSession throws `not_found`. Treat it like the no-cookie case above and
-      // return undefined instead of letting the error crash the caller's render. Every
-      // call site already handles an undefined session — either with a graceful fallback
-      // or by throwing its own explicit "no session" error.
-      if (isNotFound) {
-        console.warn("[Session] Could not load most recent session", error);
-        return undefined;
-      }
-
-      throw error;
+  try {
+    const response: GetSessionResponse = await getSession({
+      serviceConfig,
+      sessionId: recent.id,
+      sessionToken: recent.token,
     });
+    return response.session;
+  } catch (error) {
+    const isStaleCookieSession = error instanceof ConnectError && error.code === Code.NotFound;
+
+    if (!isStaleCookieSession) {
+      throw error;
+    }
+
+    // A server-side logout or termination can remove a session while the browser
+    // still holds its entry. The most recent-session callers already handle this
+    // as no session; remove the stale entry when the current context permits it.
+    console.warn("[Session] Removing stale session from cookie", error);
+    try {
+      await removeSessionFromCookie({ session: recent });
+    } catch (cookieError) {
+      if (!(cookieError instanceof Error) || !cookieError.message.includes("Cookies can only be modified")) {
+        throw cookieError;
+      }
+    }
+    return undefined;
+  }
 }
 
 /**
