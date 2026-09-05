@@ -1,0 +1,98 @@
+name: Endpoint error tables — watch
+
+# Runs on every PR that touches a v2 service's .proto file or its Go
+# handler package. Re-traces whatever categories changed since the PR's
+# base (apps/docs/scripts/trace-endpoint-errors.ts --changed-since) to see
+# whether that changes anything.
+#
+# Never pushes a commit onto a PR branch it doesn't own — same treatment
+# for a same-repo PR or a fork, since neither gets touched. Instead: if the
+# tables are out of date, it fails the check with the exact command to run —
+# that failure message is what shows up in the PR's checks UI, no separate
+# comment needed. This is a required check once branch protection is set to
+# require it (see the repo settings — that's a separate, deliberate step,
+# not done by this workflow itself).
+#
+# No bypass, deliberately: the trigger only fires when a proto/Go file
+# actually changed, so a failure here always means the tables genuinely
+# need regenerating — there's no false-positive case to escape. Merging
+# stays blocked until the requested files exist.
+on:
+  pull_request:
+    paths:
+      - "proto/zitadel/**/v2/*_service.proto"
+      - "internal/api/grpc/**"
+
+permissions:
+  contents: read
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The tracer type-checks real Go packages, which import generated
+      # gRPC stubs (pkg/grpc/**) that are gitignored, not committed. Without
+      # this, every category fails to even load, not just the one that
+      # actually changed.
+      - name: Generate protobuf/gRPC stubs
+        run: pnpm exec nx run @zitadel/api:generate-stubs
+
+      - name: Trace affected categories
+        id: trace
+        working-directory: apps/docs
+        run: |
+          set -euo pipefail
+          git fetch origin "${{ github.event.pull_request.base.sha }}" --depth=1
+          output=$(pnpm exec tsx scripts/trace-endpoint-errors.ts --changed-since "${{ github.event.pull_request.base.sha }}")
+          echo "$output"
+          categories=$(echo "$output" | grep -o 'AFFECTED_CATEGORIES=.*' | head -1 | cut -d= -f2)
+          echo "categories=$categories" >> "$GITHUB_OUTPUT"
+          echo "Affected categories: ${categories:-none}"
+
+      - name: Check for drift
+        id: drift
+        if: steps.trace.outputs.categories != ''
+        run: |
+          # Only the raw per-category tracing JSON is a meaningful signal
+          # here — it depends solely on real Go source + generated stubs,
+          # both present in this checkout. EndpointErrors/data.json also
+          # depends on content/reference/api (gitignored, only produced by
+          # a full docs build), which doesn't exist in a bare CI checkout —
+          # comparing it here would report drift even when the committed
+          # tracing JSON is already fully up to date.
+          if git status --porcelain apps/docs/scripts/endpoint-error-tracing | grep -q .; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fail if not addressed
+        if: steps.drift.outputs.changed == 'true'
+        run: |
+          echo "::error::Error tables are out of date for: ${{ steps.trace.outputs.categories }}. Run 'pnpm exec tsx scripts/trace-endpoint-errors.ts --only ${{ steps.trace.outputs.categories }}' from apps/docs and push the result."
+          exit 1

@@ -1,0 +1,41 @@
+---
+title: API error reference
+description: Every error ID ZITADEL's gRPC/Connect APIs can return, grouped by subsystem and cause, with why each one happens and an example response.
+sidebar_label: Error Reference
+---
+
+import ErrorReference from '@/components/ErrorReference';
+
+An error from a ZITADEL gRPC/Connect ("resource") API looks like this:
+
+```json
+{
+  "code": 16,
+  "message": "Token is invalid (AUTH-7fs1e)",
+  "details": [
+    {
+      "@type": "type.googleapis.com/zitadel.v1.ErrorDetail",
+      "id": "AUTH-7fs1e",
+      "message": "Token is invalid"
+    }
+  ]
+}
+```
+
+`code` is the gRPC status code — see [gRPC Status Codes](/apis/statuscodes) for the full mapping to HTTP statuses. `details[].id` is a free-form identifier assigned by hand at the source call site (a package prefix plus a short random suffix) — it is **not** a stable, structured error code, and the same ID string is occasionally reused for more than one distinct condition (flagged below where it happens). `details[].message` is either translated for end users or, for internal/operator-facing failures, a literal diagnostic string that's never translated.
+
+This page excludes the OAuth2/OIDC token-endpoint error format (`{"error": "invalid_request", ...}` from `/oauth/v2/token`, `/oauth/v2/introspect`, etc.), which follows [RFC 6749 §5.2](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2) and is documented at the [OIDC endpoints reference](/apis/openidoauth/endpoints).
+
+## How to use this reference
+
+Every error ID is listed below, organized three levels deep — outward to inward, common to distinct:
+
+1. **Subsystem** — the part of the backend that throws it (broadest: 8 groups)
+2. **gRPC code** — the kind of failure: Not Found, Invalid Argument, Permission Denied, and so on
+3. **Cause** — one entry per distinct underlying message. IDs that mean exactly the same thing (the same validation check copied word-for-word into several call sites) are merged into a single entry instead of repeated
+
+That shape follows how the errors actually break down: there are only 8 subsystems and about a dozen gRPC codes, but roughly 1,150 genuinely distinct causes behind the ~3,200 individual IDs. **Use the search box** below to jump straight to an ID or a phrase — it matches across IDs, messages, and explanations, so it's usually faster than browsing the tree if you already have an ID or error text in hand.
+
+Each entry shows why the error happens, an example response, and every source location it's thrown from. When the same ID string is also thrown for a *different* reason elsewhere, a warning links the two — the ID alone isn't sufficient to tell them apart, so check the message too.
+
+<ErrorReference />
