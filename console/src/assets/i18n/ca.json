@@ -1,0 +1,2848 @@
+{
+  "APP_NAME": "Zitadel",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "Metadades",
+    "HOME": {
+      "TITLE": "Comença amb Zitadel",
+      "NEXT": {
+        "TITLE": "Els teus propers passos",
+        "DESCRIPTION": "Completa els passos següents per assegurar la teva aplicació.",
+        "CREATE_PROJECT": {
+          "TITLE": "Crear un projecte",
+          "DESCRIPTION": "Afegeix un projecte i defineix els seus rols i assignacions de rols."
+        }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "Començar",
+          "DESCRIPTION": "Segueix la guia d'inici ràpid pas a pas i comença a construir immediatament."
+        },
+        "DOCS": {
+          "TITLE": "Documentació",
+          "DESCRIPTION": "Explora la base de coneixement de Zitadel per familiaritzar-te amb conceptes i idees fonamentals. Aprèn com funciona Zitadel i com fer-lo servir."
+        },
+        "EXAMPLES": {
+          "TITLE": "Exemples i Kits de Desenvolupament de Programari",
+          "DESCRIPTION": "Explora els nostres exemples i SDK per fer servir Zitadel juntament amb els teus llenguatges de programació i eines preferides."
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "Organització",
+      "DESCRIPTION": "Una organització allotja usuaris, projectes amb aplicacions, proveïdors d'identitat i configuracions com la marca de l'empresa. Vols compartir configuracions entre múltiples organitzacions? Configura els paràmetres predeterminats.",
+      "METADATA": "Afegeix atributs personalitzats a l'organització com la seva ubicació o un identificador en un altre sistema. Pots fer servir aquesta informació en les teves accions."
+    },
+    "PROJECTS": {
+      "TITLE": "Projectes",
+      "DESCRIPTION": "Un projecte allotja una o més aplicacions, que pots fer servir per autenticar els teus usuaris. Per exemple, podries tenir un sol projecte amb 3 aplicacions: una per al teu frontend web, una altra per a la teva aplicació mòbil i una altra per als teus serveis backend. També pots autoritzar els teus usuaris amb projectes. Per permetre que usuaris d'altres organitzacions es registrin a les teves aplicacions, atorga'ls accés al teu projecte.<br/><br/>Si no trobes un projecte, contacta amb el propietari del projecte o amb algú amb els drets corresponents per obtenir accés.",
+      "OWNED": {
+        "TITLE": "Projectes Propis",
+        "DESCRIPTION": "Aquests són els projectes que posseeixes. Pots gestionar la configuració d'aquests projectes, les assignacions de rols i les aplicacions."
+      },
+      "GRANTED": {
+        "TITLE": "Projectes Concedits",
+        "DESCRIPTION": "Aquests són els projectes que altres organitzacions t'han concedit. Amb els projectes concedits pots donar accés als teus usuaris a aplicacions d'altres organitzacions."
+      }
+    },
+    "USERS": {
+      "TITLE": "Usuaris",
+      "DESCRIPTION": "Un usuari és un humà o un compte de servei que pot accedir a les teves aplicacions.",
+      "HUMANS": {
+        "TITLE": "Usuaris",
+        "DESCRIPTION": "Els Usuaris s'autentiquen de manera interactiva en una sessió de navegador amb una sol·licitud d'inici de sessió.",
+        "METADATA": "Afegeix atributs personalitzats a l'usuari com el departament. Pots fer servir aquesta informació en les teves accions."
+      },
+      "MACHINES": {
+        "TITLE": "Comptes de servei",
+        "DESCRIPTION": "Els comptes de servei s'autentiquen de manera no interactiva fent servir un token portador JWT signat amb una clau privada. També poden fer servir un token d'accés personal.",
+        "METADATA": "Afegeix atributs personalitzats al compte com el sistema autenticador. Pots fer servir aquesta informació en les teves accions."
+      },
+      "SELF": {
+        "METADATA": "Afegeix atributs personalitzats al teu usuari com el teu departament. Pots fer servir aquesta informació en les accions de la teva organització."
+      }
+    },
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Assignacions de rols",
+      "DESCRIPTION": "Les assignacions de rols defineixen els drets d'accés d'un usuari a un projecte. Pots atorgar accés a un usuari a un projecte i definir els rols de l'usuari dins d'aquest projecte."
+    },
+    "ACTIONS": {
+      "TITLE": "Accions",
+      "DESCRIPTION": "Executa codi personalitzat en esdeveniments que passin mentre els teus usuaris s'autentiquen a Zitadel. Automatitza els teus processos, enriqueix les metadades dels teus usuaris i els seus tokens o notifica sistemes externs.",
+      "SCRIPTS": {
+        "TITLE": "Scripts",
+        "DESCRIPTION": "Escriu el teu codi JavaScript una vegada i activa'l en múltiples fluxos."
+      },
+      "FLOWS": {
+        "TITLE": "Fluxos",
+        "DESCRIPTION": "Tria un flux d'autenticació i activa la teva acció en un esdeveniment específic dins d'aquest flux."
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, una versió nova i millorada d'Actions, ja està disponible. La versió actual continua sent accessible, però el nostre desenvolupament futur se centrarà en la nova, que acabarà substituint la versió actual."
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "Configuració per defecte",
+        "DESCRIPTION": "Configuracions predeterminades per a totes les organitzacions. Amb els permisos adequats, algunes d'elles es poden anul·lar en la configuració de l'organització."
+      },
+      "ORG": {
+        "TITLE": "Configuració de l'Organització",
+        "DESCRIPTION": "Personalitza la configuració de la teva organització."
+      },
+      "FEATURES": {
+        "TITLE": "Configuració de funcions",
+        "DESCRIPTION": "Desbloqueja funcions per a la teva instància."
+      },
+      "IDPS": {
+        "TITLE": "Proveïdors d'Identitat",
+        "DESCRIPTION": "Crea i activa proveïdors d'identitat externs. Tria un proveïdor conegut o configura qualsevol altre proveïdor compatible amb OIDC, OAuth o SAML que vulguis. Fins i tot pots fer servir els teus tokens JWT existents com a identitats federades configurant un proveïdor d'identitat JWT.",
+        "NEXT": "I ara què?",
+        "SAML": {
+          "TITLE": "Configura el teu Proveïdor d'Identitat SAML",
+          "DESCRIPTION": "Zitadel està configurat. Ara el teu Proveïdor d'Identitat SAML necessita una mica de configuració. La majoria dels proveïdors et permeten pujar tot l'XML de metadades de Zitadel. Altres proveïdors et demanen que proporcionis només algunes URL concretes, com per exemple l'ID d'entitat (URL de metadades), la URL del Servei de Consum d'Asserció (ACS) o la URL de Tancament de Sessió Únic."
+        },
+        "CALLBACK": {
+          "TITLE": "Configura el teu Proveïdor d'Identitat {{ provider }}",
+          "DESCRIPTION": "Abans de poder configurar Zitadel, passa aquesta URL al teu Proveïdor d'Identitat per habilitar la redirecció del navegador de tornada a Zitadel després de l'autenticació."
+        },
+        "JWT": {
+          "TITLE": "Fes servir JWT com a identitats federades",
+          "DESCRIPTION": "El Proveïdor d'Identitat JWT et permet fer servir els teus tokens JWT existents com a identitats federades. Aquesta característica és útil si ja tens un emissor de JWT. Amb un IdP JWT, pots fer servir aquests JWT per crear i actualitzar usuaris a Zitadel al vol."
+        },
+        "LDAP": {
+          "TITLE": "Configura Zitadel per connectar amb el teu Proveïdor d'Identitat LDAP",
+          "DESCRIPTION": "Proporciona els detalls de connexió al teu servidor LDAP i configura el mapatge dels teus atributs LDAP als atributs de Zitadel."
+        },
+        "AUTOFILL": {
+          "TITLE": "Autocompletar dades d'usuari",
+          "DESCRIPTION": "Fes servir una acció per millorar l'experiència dels teus usuaris. Pots preomplir el formulari de registre de Zitadel amb valors del proveïdor d'identitat."
+        },
+        "ACTIVATE": {
+          "TITLE": "Activa l'IdP",
+          "DESCRIPTION": "El teu IdP encara no està actiu. Activa'l per permetre als teus usuaris iniciar la sessió."
+        }
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "Complexitat de la Contrasenya",
+        "DESCRIPTION": "Assegura que els teus usuaris facin servir contrasenyes fortes definint regles de complexitat."
+      },
+      "BRANDING": {
+        "TITLE": "Branding",
+        "DESCRIPTION": "Personalitza l'aparença del teu formulari d'inici de sessió. Recorda aplicar la teva configuració quan hagis acabat."
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "Enllaços Externs",
+        "DESCRIPTION": "Guia els teus usuaris cap a recursos externs personalitzats que es mostren a la pàgina d'inici de sessió. Els usuaris han d'acceptar els Termes del servei i la Política de privadesa abans de poder registrar-se. Canvia l'enllaç a la teva documentació o introdueix una cadena de text buida per ocultar el botó de documentació de la consola d'administració. Afegeix un enllaç extern personalitzat i un text personalitzat per a aquest enllaç a la consola d'administració, o deixa'ls buits per ocultar aquest botó."
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "Configuració d'SMTP",
+        "DESCRIPTION": "Configura el teu servidor SMTP per fer servir un domini per a l'adreça del remitent que els teus usuaris coneguin i en el qual confiïn."
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "Configuració d'SMS",
+        "DESCRIPTION": "Per desbloquejar totes les característiques de Zitadel, configura Twilio per enviar missatges SMS als teus usuaris."
+      },
+      "IAM_EVENTS": {
+        "TITLE": "Esdeveniments",
+        "DESCRIPTION": "Aquesta pàgina mostra tots els canvis d'estat de la teva instància fins al límit de l'historial d'auditoria de les teves instàncies. Filtra la llista per interval de temps amb finalitats de depuració o filtra-la per un agregat amb finalitats d'auditoria."
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "Esdeveniments Fallits",
+        "DESCRIPTION": "Aquesta pàgina mostra tots els esdeveniments fallits de la teva instància. Si Zitadel no es comporta com esperes, revisa sempre aquesta llista primer."
+      },
+      "IAM_VIEWS": {
+        "TITLE": "Vistes",
+        "DESCRIPTION": "Aquesta pàgina mostra totes les teves vistes de base de dades i quan van processar el seu últim esdeveniment. Si et falta alguna dada, verifica si la vista està actualitzada."
+      },
+      "LANGUAGES": {
+        "TITLE": "Idiomes",
+        "DESCRIPTION": "Restringeix els idiomes als quals es tradueixen el formulari d'inici de sessió i els missatges de notificació. Si vols deshabilitar alguns dels idiomes, arrossega'ls a la secció d'Idiomes No Permesos. Pots especificar un idioma permès com a idioma predeterminat. Si l'idioma preferit d'un usuari no està permès, es fa servir l'idioma predeterminat."
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "Generadors de Secrets",
+        "DESCRIPTION": "Defineix les complexitats i la vida útil dels teus secrets. Una complexitat i vida útil més altes milloren la seguretat; una complexitat i vida útil més baixes milloren el rendiment de desxifratge."
+      },
+      "SECURITY": {
+        "TITLE": "Configuració de Seguretat",
+        "DESCRIPTION": "Habilita característiques de Zitadel que poden tenir impactes en la seguretat. Realment hauries de saber què estàs fent abans de canviar aquestes configuracions."
+      },
+      "OIDC": {
+        "TITLE": "Configuració d'OpenID Connect",
+        "DESCRIPTION": "Configura la durada de vida dels teus tokens OIDC. Fes servir durades més curtes per augmentar la seguretat dels teus usuaris; fes servir durades més llargues per augmentar la comoditat dels teus usuaris.",
+        "LABEL_HOURS": "Durada màxima en hores",
+        "LABEL_DAYS": "Durada màxima en dies",
+        "ACCESS_TOKEN": {
+          "TITLE": "Token d'Accés",
+          "DESCRIPTION": "El token d'accés es fa servir per autenticar un usuari. És un token de curta durada que es fa servir per accedir a les dades de l'usuari. Fes servir una durada curta per minimitzar el risc d'accés no autoritzat. Els tokens d'accés es poden actualitzar automàticament fent servir un token d'actualització."
+        },
+        "ID_TOKEN": {
+          "TITLE": "Token d'ID",
+          "DESCRIPTION": "El token d'ID és un JSON Web Token (JWT) que conté afirmacions sobre l'usuari. La durada de vida del token d'ID no ha d'excedir la durada de vida del token d'accés."
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "Token d'Actualització",
+          "DESCRIPTION": "El token d'actualització es fa servir per obtenir un nou token d'accés. És un token de llarga durada que es fa servir per actualitzar el token d'accés. Un usuari s'ha de tornar a autenticar manualment quan el token d'actualització caduca."
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "Token d'Actualització en Espera",
+          "DESCRIPTION": "La durada de vida del token d'actualització en espera és el temps màxim que un token d'actualització pot estar sense fer-se servir."
+        }
+      },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Gestiona les teves claus web OIDC per signar i validar tokens de manera segura a la teva instància de Zitadel.",
+        "TABLE": {
+          "TITLE": "Claus Web Actives i Futures",
+          "DESCRIPTION": "Les teves claus web actives i properes. Activar una clau nova desactivarà l'actual.",
+          "NOTE": "Nota: L'endpoint JWKs OIDC retorna una resposta emmagatzemable en memòria cau (per defecte 5 min). Evita activar una clau massa aviat, ja que pot ser que encara no estigui disponible en memòries cau i aplicacions.",
+          "ACTIVATE": "Activar la següent Clau Web",
+          "ACTIVE": "Actualment activa",
+          "NEXT": "Següent a la cua",
+          "FUTURE": "Futur",
+          "WARNING": "La clau web té menys de 5 minuts"
+        },
+        "CREATE": {
+          "TITLE": "Crear una nova Clau Web",
+          "DESCRIPTION": "Crear una nova clau web l'afegirà a la teva llista. Zitadel utilitza per defecte claus RSA2048 amb un algorisme de hash SHA256.",
+          "KEY_TYPE": "Tipus de Clau",
+          "BITS": "Bits",
+          "HASHER": "Algorisme de Hash",
+          "CURVE": "Corba"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Claus Web Anteriors",
+          "DESCRIPTION": "Aquestes són les teves claus web anteriors que ja no estan actives.",
+          "DEACTIVATED_ON": "Desactivada el"
+        }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Textos dels Missatges",
+        "DESCRIPTION": "Personalitza els textos dels teus missatges de correu electrònic de notificació o missatges SMS. Si vols desactivar alguns dels idiomes, restringeix-los a la configuració d'idiomes de les teves instàncies.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "Quan reclames un domini per a la teva organització, als usuaris que no utilitzin aquest domini en el seu nom d'inici de sessió se'ls demanarà canviar el seu nom d'inici de sessió per tal que coincideixi amb el domini reclamat.",
+          "INIT": "Quan es crea un usuari, rebrà un correu electrònic amb un enllaç per establir la seva contrasenya.",
+          "PC": "Quan un usuari canvia la seva contrasenya, rebrà una notificació sobre el canvi si has habilitat això a la configuració de notificacions.",
+          "PL": "Quan un usuari afegeix una clau d'accés com a mètode d'autenticació, cal activar-la fent clic en un enllaç d'un correu electrònic.",
+          "PR": "Quan un usuari restableix la seva contrasenya, rebrà un correu electrònic amb un enllaç per establir una nova contrasenya.",
+          "VE": "Quan un usuari canvia la seva adreça de correu electrònic, rebrà un correu electrònic amb un enllaç per verificar la nova adreça.",
+          "VP": "Quan un usuari canvia el seu número de telèfon, rebrà un SMS amb un codi per verificar el nou número.",
+          "VEO": "Quan un usuari afegeix una OTP mitjançant correu electrònic, cal activar-la introduint un codi enviat a la seva adreça de correu electrònic.",
+          "VSO": "Quan un usuari afegeix una OTP mitjançant SMS, cal activar-la introduint un codi enviat al seu número de telèfon.",
+          "IU": "Quan es crea un codi d'invitació d'usuari, rebran un correu electrònic amb un enllaç per configurar el seu mètode d'autenticació."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Textos de la Interfície d'Inici de Sessió",
+        "DESCRIPTION": "Personalitza els textos del teu formulari d'inici de sessió. Si un text és buit, el marcador de posició mostra el valor predeterminat. Si vols desactivar alguns dels idiomes, restringeix-los a la configuració d'idiomes de les teves instàncies."
+      },
+      "DOMAINS": {
+        "TITLE": "Configuració de Dominis",
+        "DESCRIPTION": "Defineix restriccions als teus dominis i configura els patrons de nom d'inici de sessió.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Requerir que els dominis personalitzats siguin verificats",
+          "DESCRIPTION": "Si això està activat, els dominis de l'organització s'han de verificar abans que puguin ser utilitzats per al descobriment de dominis o el sufix de nom d'usuari."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Patró de Nom d'Inici de Sessió",
+          "DESCRIPTION": "Controla el patró dels noms d'inici de sessió dels teus usuaris. Zitadel selecciona l'organització dels teus usuaris tan bon punt introdueixen el seu nom d'inici de sessió. Per tant, els noms d'inici de sessió han de ser únics a totes les organitzacions. Si tens usuaris que tenen un compte en múltiples dominis, pots assegurar la unicitat afegint el domini de l'organització als teus noms d'inici de sessió."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Verificació de Domini",
+          "DESCRIPTION": "Permet només que la teva organització utilitzi els dominis que realment controla. Si està activat, els dominis de l'organització es verifiquen periòdicament per DNS o desafiament HTTP abans que puguin ser utilitzats. Aquesta és una característica de seguretat per prevenir la usurpació de dominis."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "Adreça del Remitent SMTP",
+          "DESCRIPTION": "Permet una adreça del remitent SMTP només si coincideix amb un dels dominis de la teva instància."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Durades d'Inici de Sessió",
+          "DESCRIPTION": "Reforça la teva seguretat reduint algunes durades màximes relacionades amb l'inici de sessió.",
+          "LABEL": "Durada Màxima en hores",
+          "PW_CHECK": {
+            "TITLE": "Verificació de Contrasenya",
+            "DESCRIPTION": "Els usuaris hauran de tornar a autenticar-se amb la seva contrasenya després d'aquest període."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "Verificació d'Inici de Sessió Extern",
+            "DESCRIPTION": "Els teus usuaris són redirigits als seus proveïdors d'identitat externs en aquests períodes."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Verificació d'Inici de Multifactor",
+            "DESCRIPTION": "Es demanarà als teus usuaris configurar un segon factor o un Multifactor en aquests períodes, si encara no ho han fet. Una durada de 0 desactiva aquest avís."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Verificació de Segon Factor",
+            "DESCRIPTION": "Els teus usuaris han de revalidar el seu segon factor en aquests períodes."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Verificació de Multifactor",
+            "DESCRIPTION": "Els teus usuaris han de revalidar el seu Multifactor en aquests períodes."
+          }
+        },
+        "FORM": {
+          "TITLE": "Formulari d'Inici de Sessió",
+          "DESCRIPTION": "Personalitza el formulari d'inici de sessió.",
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Autenticació local permesa",
+            "DESCRIPTION": "Permet que els teus usuaris iniciïn la sessió amb el seu nom d'usuari i contrasenya o amb autenticació amb passkey. Si això es desactiva, els teus usuaris només podran iniciar la sessió utilitzant un proveïdor d'identitat extern."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "Registre d'Usuaris permès",
+            "DESCRIPTION": "Permet als usuaris anònims crear un compte."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Registre d'Organitzacions permès",
+            "DESCRIPTION": "Permet als usuaris anònims crear una organització."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "Inici de Sessió Extern permès",
+            "DESCRIPTION": "Permet als teus usuaris iniciar la sessió amb un proveïdor d'identitat extern en lloc d'utilitzar l'usuari de Zitadel per iniciar la sessió."
+          },
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Restabliment de contrasenya ocult",
+            "DESCRIPTION": "No permetis que els teus usuaris restableixin la seva contrasenya."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Descobriment de Domini permès",
+            "DESCRIPTION": "Troba les organitzacions dels teus usuaris depenent del domini dels seus noms d'inici de sessió, per exemple, la seva adreça de correu electrònic."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Ignorar Noms d'Usuari Desconeguts",
+            "DESCRIPTION": "Si això està activat, el formulari d'inici de sessió no mostrarà un missatge d'error si el nom d'usuari és desconegut. Això ajuda a prevenir l'endevinació de noms d'usuari."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "Desactivar l'Inici de Sessió amb Email",
+            "DESCRIPTION": "Si això està activat, els teus usuaris no poden utilitzar les seves adreces de correu electrònic per iniciar la sessió. Tingues en compte que si desactives això, les adreces de correu electrònic dels teus usuaris han de ser úniques a totes les organitzacions per poder iniciar la sessió."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Desactivar l'Inici de Sessió amb Telèfon",
+            "DESCRIPTION": "Si això està activat, els teus usuaris no poden utilitzar els seus números de telèfon per iniciar la sessió. Tingues en compte que si desactives això, els números de telèfon dels teus usuaris han de ser únics a totes les organitzacions per poder iniciar la sessió."
+          }
+        }
+      }
+    }
+  },
+  "PAGINATOR": {
+    "PREVIOUS": "Anterior",
+    "NEXT": "Següent",
+    "COUNT": "Resultats totals",
+    "MORE": "Més"
+  },
+  "FOOTER": {
+    "LINKS": {
+      "CONTACT": "Contacte",
+      "TOS": "Termes del servei",
+      "PP": "Política de privacitat"
+    },
+    "THEME": {
+      "DARK": "Fosc",
+      "LIGHT": "Clar"
+    }
+  },
+  "HOME": {
+    "WELCOME": "Comença amb Zitadel",
+    "DISCLAIMER": "Zitadel tracta les teves dades de manera confidencial i segura.",
+    "DISCLAIMERLINK": "Més informació",
+    "DOCUMENTATION": {
+      "DESCRIPTION": "Comença ràpidament amb Zitadel."
+    },
+    "GETSTARTED": {
+      "DESCRIPTION": "Comença ràpidament amb Zitadel."
+    },
+    "QUICKSTARTS": {
+      "LABEL": "Primers passos",
+      "DESCRIPTION": "Comença ràpidament amb Zitadel."
+    },
+    "SHORTCUTS": {
+      "SHORTCUTS": "Accessos directes",
+      "SETTINGS": "Accessos directes disponibles",
+      "PROJECTS": "Projectes",
+      "REORDER": "Mantén i arrossega el plafó per moure'l",
+      "ADD": "Mantén i arrossega el plafó per afegir-lo"
+    }
+  },
+  "ONBOARDING": {
+    "DESCRIPTION": "El teu procés d'incorporació",
+    "COMPLETED": "completat",
+    "MOREDESCRIPTION": "més accessos directes",
+    "DISMISS": "No gràcies, sóc pro.",
+    "CARD": {
+      "TITLE": "Posa't en marxa amb Zitadel",
+      "DESCRIPTION": "Aquesta llista de tasques t'ajuda a configurar la teva instància i et guia pels passos més essencials"
+    },
+    "MILESTONES": {
+      "instance.policy.label.added": {
+        "title": "Configura la teva imatge de marca",
+        "description": "Defineix l'esquema de colors, dóna forma al teu inici de sessió i puja el teu logotip i les teves icones.",
+        "action": "Configurar imatge"
+      },
+      "instance.smtp.config.added": {
+        "title": "Estableix la teva configuració SMTP",
+        "description": "Introdueix la configuració del teu propi servidor de correu.",
+        "action": "Configurar SMTP"
+      },
+      "PROJECT_CREATED": {
+        "title": "Crea el teu primer projecte",
+        "description": "Afegeix el teu primer projecte i defineix els seus rols i assignacions de rols.",
+        "action": "Crear projecte"
+      },
+      "APPLICATION_CREATED": {
+        "title": "Registra la teva aplicació",
+        "description": "Registra la teva aplicació web, nativa, api o saml i configura el teu flux d'autenticació.",
+        "action": "Registrar aplicació"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Inicia la sessió a la teva aplicació",
+        "description": "Integra la teva aplicació amb Zitadel per a l'autenticació i prova-la iniciant la sessió amb el teu usuari administrador.",
+        "action": "Iniciar la sessió"
+      },
+      "user.human.added": {
+        "title": "Afegeix usuaris",
+        "description": "Afegeix els usuaris de la teva aplicació",
+        "action": "Afegir usuari"
+      },
+      "user.grant.added": {
+        "title": "Assignar rols a usuaris",
+        "description": "Permet als teus usuaris accedir a la teva aplicació i configurar els seus rols.",
+        "action": "Assignar rols a usuaris"
+      }
+    }
+  },
+  "MENU": {
+    "INSTANCE": "configuració per defecte",
+    "DASHBOARD": "Inici",
+    "PERSONAL_INFO": "Informació personal",
+    "DOCUMENTATION": "Documentació",
+    "INSTANCEOVERVIEW": "Instància",
+    "ORGS": "Organitzacions",
+    "VIEWS": "Vistes",
+    "EVENTS": "Esdeveniments",
+    "FAILEDEVENTS": "Esdeveniments fallits",
+    "ORGANIZATION": "Organització",
+    "PROJECT": "Projectes",
+    "PROJECTOVERVIEW": "Resum",
+    "PROJECTGRANTS": "Concessions del projecte",
+    "ROLES": "Rols",
+    "GRANTEDPROJECT": "Projecte concedit",
+    "HUMANUSERS": "Usuaris",
+    "MACHINEUSERS": "Comptes de servei",
+    "LOGOUT": "Tancar la sessió per a tots els usuaris",
+    "NEWORG": "Nova organització",
+    "IAMADMIN": "Ets un administrador d'instància. Tingues en compte que tens permisos ampliats.",
+    "SHOWORGS": "Mostrar totes les organitzacions",
+    "GRANTS": "Assignacions de rols",
+    "ACTIONS": "Accions",
+    "PRIVACY": "Privacitat",
+    "TOS": "Condicions del servei",
+    "OPENSHORTCUTSTOOLTIP": "Prem ? per mostrar les dreceres de teclat",
+    "SETTINGS": "Configuració",
+    "CUSTOMERPORTAL": "Portal del client"
+  },
+  "QUICKSTART": {
+    "TITLE": "Integra Zitadel a la teva aplicació",
+    "DESCRIPTION": "Integra Zitadel a la teva aplicació o utilitza un dels nostres exemples per començar en qüestió de minuts",
+    "BTN_START": "Crear aplicació",
+    "BTN_LEARNMORE": "Aprèn més",
+    "CREATEPROJECTFORAPP": "Crear projecte {{value}}",
+    "SELECT_FRAMEWORK": "Seleccionar marc",
+    "FRAMEWORK": "Framework",
+    "FRAMEWORK_OTHER": "Altre (OIDC, SAML, API)",
+    "ALMOSTDONE": "Ja gairebé has acabat",
+    "REVIEWCONFIGURATION": "Configuració de revisió",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Hem creat una configuració bàsica per a aplicacions {{value}}. Pots adaptar aquesta configuració a les teves necessitats després de crear-la.",
+    "REDIRECTS": "Configurar redireccions",
+    "DEVMODEWARN": "El mode de desenvolupament està habilitat de manera predeterminada. Pots actualitzar els valors per a la producció més endavant.",
+    "GUIDE": "Guia",
+    "BROWSEEXAMPLES": "Explora exemples",
+    "DUPLICATEAPPRENAME": "Ja existeix una aplicació amb el mateix nom. Si us plau, tria un nom diferent.",
+    "DIALOG": {
+      "CAMBIAR": {
+        "TITLE": "Canvi de framework",
+        "DESCRIPTION": "Tria un dels frameworks disponibles per configurar ràpidament la teva aplicació."
+      }
+    }
+  },
+  "ACTIONS": {
+    "ACTIONS": "Accions",
+    "FILTER": "Filtrar",
+    "RENAME": "Reanomenar",
+    "SET": "Establir",
+    "COPY": "Copiar al porta-retalls",
+    "COPIED": "Copiat al porta-retalls.",
+    "RESET": "Restablir",
+    "RESETDEFAULT": "Restablir als valors per defecte",
+    "RESETTO": "Restablir a: ",
+    "RESETCURRENT": "Restablir a l'actual",
+    "SHOW": "Mostrar",
+    "HIDE": "Ocultar",
+    "SAVE": "Desar",
+    "SAVENOW": "Desar ara",
+    "NEW": "Nou",
+    "ADD": "Afegir",
+    "CREATE": "Crear",
+    "CONTINUE": "Continuar",
+    "CONTINUEWITH": "Continuar amb {{value}}",
+    "BACK": "Enrere",
+    "CLOSE": "Tancar",
+    "CLEAR": "Netejar",
+    "CANCEL": "Cancel·lar",
+    "INFO": "Info",
+    "OK": "OK",
+    "SELECT": "Seleccionar",
+    "VIEW": "Mostrar",
+    "SELECTIONDELETE": "Esborrar selecció",
+    "DELETE": "Esborrar",
+    "REMOVE": "Eliminar",
+    "VERIFY": "Verificar",
+    "FINISH": "Finalitzar",
+    "FINISHED": "Tancar",
+    "CHANGE": "Canviar",
+    "REACTIVATE": "Reactivar",
+    "ACTIVATE": "Activar",
+    "DEACTIVATE": "Desactivar",
+    "REFRESH": "Actualitzar",
+    "LOGIN": "Iniciar la sessió",
+    "EDIT": "Editar",
+    "PIN": "Marcar / Desmarcar",
+    "CONFIGURE": "Configurar",
+    "SEND": "Enviar",
+    "NEWVALUE": "Nou valor",
+    "RESTORE": "Restaurar",
+    "CONTINUEWITHOUTSAVE": "Continuar sense desar",
+    "OF": "de",
+    "PREVIOUS": "Anterior",
+    "NEXT": "Següent",
+    "MORE": "més",
+    "STEP": "Pas",
+    "SETUP": "Configurar",
+    "TEST": "Provar",
+    "UNSAVEDCHANGES": "Canvis no desats",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Segur que vols descartar aquesta nova acció? La teva acció es perdrà",
+        "CANCEL": "Cancel·lar",
+        "DISCARD": "Descartar"
+      }
+    },
+    "TABLE": {
+      "SHOWUSER": "Mostrar usuari {{value}}"
+    },
+    "DOWNLOAD": "Descarregar",
+    "APPLY": "Aplicar"
+  },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "Actualment estàs utilitzant la nova versió Actions V2, que està en fase beta. La versió anterior 1 encara està disponible, però es discontinuarà en el futur. Si us plau, informa de qualsevol problema o comentari.",
+    "EXECUTION": {
+      "TITLE": "Accions",
+      "DESCRIPTION": "Les accions et permeten executar codi personalitzat en resposta a sol·licituds d'API, esdeveniments o funcions específiques. Fes-les servir per estendre Zitadel, automatitzar fluxos de treball i integrar-te amb altres sistemes.",
+      "TYPES": {
+        "request": "Sol·licitud",
+        "response": "Resposta",
+        "event": "Esdeveniments",
+        "function": "Funció"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Crear una acció",
+        "UPDATE_TITLE": "Actualitzar una acció",
+        "TYPE": {
+          "DESCRIPTION": "Selecciona quan vols que s'executi aquesta acció",
+          "REQUEST": {
+            "TITLE": "Sol·licitud",
+            "DESCRIPTION": "Sol·licituds que es produeixen dins de Zitadel. Això podria ser una cosa com una crida de sol·licitud d'inici de sessió."
+          },
+          "RESPONSE": {
+            "TITLE": "Resposta",
+            "DESCRIPTION": "Una resposta d'una sol·licitud dins de Zitadel. Pensa en la resposta que reps en obtenir un usuari."
+          },
+          "EVENTS": {
+            "TITLE": "Esdeveniments",
+            "DESCRIPTION": "Esdeveniments que es produeixen dins de Zitadel. Això podria ser qualsevol cosa com un usuari creant un compte, un inici de sessió correcte, etc."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Funcions",
+            "DESCRIPTION": "Funcions que pots cridar dins de Zitadel. Això podria ser qualsevol cosa, des d'enviar un correu electrònic fins a crear un usuari."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Tria si aquesta acció s'aplica a totes les sol·licituds, a un servei específic (p. ex., administració d'usuaris) o a una sola sol·licitud (p. ex., crear usuari).",
+          "ALL": {
+            "TITLE": "Totes",
+            "DESCRIPTION": "Selecciona això si vols executar la teva acció en cada sol·licitud"
+          },
+          "ALL_EVENTS": "Selecciona això si vols executar la teva acció en cada esdeveniment",
+          "SELECT_SERVICE": {
+            "TITLE": "Seleccionar servei",
+            "DESCRIPTION": "Tria un servei de Zitadel per a la teva acció."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Seleccionar mètode",
+            "DESCRIPTION": "Si vols executar només en una sol·licitud específica, selecciona-la aquí",
+            "NOTE": "Si no selecciones un mètode, la teva acció s'executarà en cada sol·licitud del servei seleccionat."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Nom de la funció",
+            "DESCRIPTION": "Tria la funció que vols executar"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Establir grup",
+            "DESCRIPTION": "Si vols executar només en un grup d'esdeveniments, estableix el grup aquí"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Seleccionar esdeveniment",
+            "DESCRIPTION": "Si vols executar només en un esdeveniment específic, especifica'l aquí"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Pots triar executar un objectiu o executar-lo en les mateixes condicions que altres objectius.",
+          "TARGET": {
+            "DESCRIPTION": "L'objectiu que vols executar per a aquesta acció"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Condicions d'execució"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Condició",
+        "TYPE": "Tipus",
+        "TARGET": "Objectiu",
+        "CREATIONDATE": "Data de creació"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Objectius",
+      "DESCRIPTION": "Un objectiu és la destinació del codi que vols executar des d'una acció. Crea un objectiu aquí i afegeix-lo a les teves accions.",
+      "CREATE": {
+        "TITLE": "Crear el teu objectiu",
+        "DESCRIPTION": "Crea el teu propi objectiu fora de Zitadel",
+        "NAME": "Nom",
+        "NAME_DESCRIPTION": "Dona al teu objectiu un nom clar i descriptiu perquè sigui fàcil d'identificar més endavant",
+        "TYPE": "Tipus",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "Crida REST",
+          "restAsync": "REST Asíncron"
+        },
+        "TYPES_DESCRIPTION": "Webhook, la crida gestiona el codi d'estat però la resposta és irrellevant\nCall, la crida gestiona el codi d'estat i la resposta\nAsync, la crida no gestiona ni el codi d'estat ni la resposta, però es pot cridar en paral·lel amb altres objectius",
+        "PAYLOAD_TYPE": "Tipus de càrrega útil",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "No especificat",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "JSON Web Token xifrat (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Càrrega útil JSON estàndard amb una capçalera de signatura per a la verificació.\nJWT: La càrrega útil s'envia com un JWT signat. La verificació és autònoma mitjançant la signatura del JWT.\nJWE: El JWT es xifra addicionalment per evitar l'accés no autoritzat a la informació de la càrrega útil.",
+        "ENDPOINT": "Punt de connexió",
+        "ENDPOINT_DESCRIPTION": "Introdueix el punt de connexió on s'allotja el teu codi. Assegura't que hi puguem accedir!",
+        "TIMEOUT": "Temps d'espera",
+        "TIMEOUT_DESCRIPTION": "Estableix el temps màxim que té el teu objectiu per respondre. Si tarda més, aturarem la sol·licitud.",
+        "INTERRUPT_ON_ERROR": "Interrompre en cas d'error",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Atura totes les execucions quan els objectius retornin un error",
+        "INTERRUPT_ON_ERROR_WARNING": "Precaució: «Interrompre en cas d'error» atura les operacions si fallen, cosa que pot provocar un bloqueig. Prova-ho amb aquesta opció desactivada per evitar bloquejar l'inici de sessió o la creació.",
+        "AWAIT_RESPONSE": "Esperar resposta",
+        "AWAIT_RESPONSE_DESCRIPTION": "Esperarem una resposta abans de fer qualsevol altra cosa. Útil si tens la intenció d'utilitzar múltiples objectius per a una sola acció"
+      },
+      "TABLE": {
+        "NAME": "Nom",
+        "ENDPOINT": "Punt de connexió",
+        "CREATIONDATE": "Data de creació",
+        "REORDER": "Reordenar"
+      }
+    }
+  },
+  "MEMBERROLES": {
+    "IAM_OWNER": "Té control sobre tota la instància, incloent-hi totes les organitzacions",
+    "IAM_OWNER_VIEWER": "Té permís per revisar tota la instància, incloent-hi totes les organitzacions",
+    "IAM_ORG_MANAGER": "Té permís per crear i gestionar organitzacions",
+    "IAM_USER_MANAGER": "Té permís per crear i gestionar usuaris",
+    "IAM_ADMIN_IMPERSONATOR": "Té permís per suplantar administradors i usuaris finals de totes les organitzacions",
+    "IAM_END_USER_IMPERSONATOR": "Té permís per suplantar usuaris finals de totes les organitzacions",
+    "IAM_LOGIN_CLIENT": "Té permís per gestionar les aplicacions d'inici de sessió",
+    "ORG_OWNER": "Té permisos sobre tota l'organització",
+    "ORG_USER_MANAGER": "Té permís per crear i gestionar usuaris de l'organització",
+    "ORG_OWNER_VIEWER": "Té permís per revisar tota l'organització",
+    "ORG_SETTINGS_MANAGER": "Té permís per gestionar les configuracions de l'organització",
+    "ORG_USER_PERMISSION_EDITOR": "Té permís per gestionar assignacions de rols",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Té permís per gestionar concessions de projecte",
+    "ORG_PROJECT_CREATOR": "Té permís per crear els seus propis projectes i la configuració subjacent",
+    "ORG_DYNAMIC_CLIENT_REGISTRAR": "Té permís per registrar dinàmicament clients OAuth 2.0",
+    "ORG_ADMIN_IMPERSONATOR": "Té permís per suplantar administradors i usuaris finals de l'organització",
+    "ORG_END_USER_IMPERSONATOR": "Té permís per suplantar usuaris finals de l'organització",
+    "ORG_USER_SELF_MANAGER": "Té permís per gestionar el seu propi usuari",
+    "PROJECT_OWNER": "Té permís sobre tot el projecte",
+    "PROJECT_OWNER_VIEWER": "Té permís per revisar tot el projecte",
+    "PROJECT_OWNER_GLOBAL": "Té permís sobre tot el projecte",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Té permís per revisar tot el projecte",
+    "PROJECT_GRANT_OWNER": "Té permís per gestionar la concessió del projecte",
+    "PROJECT_GRANT_OWNER_VIEWER": "Té permís per revisar la concessió del projecte"
+  },
+  "OVERLAYS": {
+    "ORGSWITCHER": {
+      "TEXT": "Tota la configuració de l'organització i les taules de la consola es basen en l'organització seleccionada. Fes clic en aquest botó per canviar d'organització o crear-ne una de nova."
+    },
+    "INSTANCE": {
+      "TEXT": "Fes clic aquí per obtenir la configuració de la instància. Tingues en compte que només tens accés a aquest botó si tens permisos ampliats."
+    },
+    "PROFILE": {
+      "TEXT": "Aquí pots canviar entre els teus comptes d'usuari i gestionar les teves sessions i perfils."
+    },
+    "NAV": {
+      "TEXT": "Aquesta navegació canvia d'acord amb l'organització que has seleccionat a dalt o amb la teva instància"
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "Atenció! El context de l'organització ha canviat."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "La vista acaba de canviar a instància!"
+    }
+  },
+  "FILTER": {
+    "TITLE": "Filtrar",
+    "STATE": "Estat",
+    "DISPLAYNAME": "Nom mostrat",
+    "EMAIL": "Correu electrònic",
+    "USERNAME": "Nom d'usuari",
+    "ORGNAME": "Nom d'organització",
+    "ORGID": "ID d'organització",
+    "PRIMARYDOMAIN": "Domini d'organització",
+    "PROJECTNAME": "Nom de projecte",
+    "RESOURCEOWNER": "Propietari del recurs",
+    "METHODS": {
+      "5": "conté",
+      "7": "acaba amb",
+      "1": "igual"
+    }
+  },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "Dreceres de teclat",
+    "UNDERORGCONTEXT": "Dins de les pàgines de l'organització",
+    "SIDEWIDE": "Dreceres per a tot el lloc",
+    "SHORTCUTS": {
+      "HOME": "<strong>G</strong>o to <strong>H</strong>ome",
+      "INSTANCE": "<strong>G</strong>o to <strong>I</strong>instance",
+      "ORG": "<strong>G</strong>o to <strong>O</strong>rganization",
+      "ORGSETTINGS": "<strong>G</strong>o to Organization <strong>S</strong>ettings",
+      "ORGSWITCHER": "Canviar d'organització",
+      "ME": "Ves al teu propi perfil",
+      "PROJECTS": "<strong>G</strong>o to <strong>P</strong>rojects",
+      "USERS": "<strong>G</strong>o to <strong>U</strong>sers",
+      "ROLEASSIGNMENTS": "<strong>G</strong>o to <strong>R</strong>ole Assignments",
+      "ACTIONS": "<strong>G</strong>o to Actions and <strong>F</strong>lows",
+      "DOMAINS": "<strong>G</strong>o to <strong>D</strong>omains"
+    }
+  },
+  "RESOURCEID": "Id de recurs",
+  "NAME": "Nom",
+  "VERSION": "Versió",
+  "TABLE": {
+    "NOROWS": "No hi ha dades"
+  },
+  "ERRORS": {
+    "REQUIRED": "Si us plau, omple aquest camp.",
+    "ATLEASTONE": "Proporciona almenys un valor.",
+    "TOKENINVALID": {
+      "TITLE": "El teu token d'autorització ha caducat.",
+      "DESCRIPTION": "Fes clic al botó de més avall per iniciar la sessió de nou."
+    },
+    "EXHAUSTED": {
+      "TITLE": "La teva instància està blocada.",
+      "DESCRIPTION": "Demana a l'administrador de la teva instància de Zitadel que actualitzi la subscripció."
+    },
+    "INVALID_FORMAT": "El format no és vàlid.",
+    "NOTANEMAIL": "El valor proporcionat no és una adreça de correu electrònic.",
+    "MINLENGTH": "Ha de tenir com a mínim {{requiredLength}} caràcters de longitud.",
+    "MAXLENGTH": "Ha de tenir menys de {{requiredLength}} caràcters.",
+    "UPPERCASEMISSING": "Ha d'incloure un caràcter en majúscula.",
+    "LOWERCASEMISSING": "Ha d'incloure un caràcter en minúscula.",
+    "SYMBOLERROR": "Ha d'incloure un símbol o un signe de puntuació.",
+    "NUMBERERROR": "Ha d'incloure un dígit.",
+    "PWNOTEQUAL": "Les contrasenyes proporcionades no coincideixen.",
+    "PHONE": "El número de telèfon ha de començar amb +."
+  },
+  "USER": {
+    "SETTINGS": {
+      "TITLE": "Configuració",
+      "GENERAL": "General",
+      "IDP": "Proveïdors d'identitat (IDP)",
+      "SECURITY": "Contrasenyes i seguretat",
+      "KEYS": "Claus",
+      "PAT": "Tokens d'accés personal",
+      "ROLEASSIGNMENTS": "Assignacions de rols",
+      "MEMBERSHIPS": "Rols d'administrador",
+      "METADATA": "Metadades"
+    },
+    "TITLE": "Informació personal",
+    "DESCRIPTION": "Gestiona la teva informació i la configuració de seguretat.",
+    "PAGES": {
+      "TITLE": "Usuari",
+      "DETAIL": "Detall",
+      "CREATE": "Crear",
+      "MY": "La meva informació",
+      "LOGINNAMES": "Noms d'inici de sessió",
+      "LOGINMETHODS": "Mètodes d'inici de sessió",
+      "LOGINNAMESDESC": "Aquests són els teus noms d'inici de sessió:",
+      "NOUSER": "No hi ha usuaris associats.",
+      "REACTIVATE": "Reactivar",
+      "DEACTIVATE": "Desactivar",
+      "FILTER": "Filtrar",
+      "STATE": "Estat",
+      "DELETE": "Elimina l'usuari",
+      "UNLOCK": "Desbloqueja l'usuari",
+      "GENERATESECRET": "Generar secret del client",
+      "REMOVESECRET": "Eliminar secret del client",
+      "LOCKEDDESCRIPTION": "Aquest usuari ha estat blocat perquè ha excedit el nombre màxim d'intents d'inici de sessió i cal desblocar-lo per poder utilitzar-lo de nou.",
+      "DELETEACCOUNT": "Eliminar el compte",
+      "DELETEACCOUNT_DESC": "Si fas aquesta acció, es tancarà la teva sessió i no podràs tornar a accedir al teu compte. Aquesta acció no és reversible; si us plau, procedeix amb cura.",
+      "DELETEACCOUNT_BTN": "Eliminar el compte",
+      "DELETEACCOUNT_SUCCESS": "El compte s'ha eliminat correctament!"
+    },
+    "DETAILS": {
+      "DATECREATED": "Creat",
+      "DATECHANGED": "Canviat"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Esborrar usuari",
+      "DELETE_SELF_TITLE": "Esborrar compte",
+      "DELETE_DESCRIPTION": "Està a punt d'esborrar permanentment un usuari. N'està segur?",
+      "DELETE_SELF_DESCRIPTION": "Estàs a punt d'esborrar permanentment el teu compte personal. Això tancarà la teva sessió i esborrarà el teu usuari. Aquesta acció no es pot desfer!",
+      "DELETE_AUTH_DESCRIPTION": "Estàs a punt d'esborrar permanentment el teu compte personal. N'estàs segur?",
+      "TYPEUSERNAME": "Escriu '{{value}}', per confirmar i esborrar l'usuari.",
+      "USERNAME": "Nom d'inici de sessió",
+      "DELETE_BTN": "Esborrar permanentment"
+    },
+    "SENDEMAILDIALOG": {
+      "TITLE": "Enviar notificació per correu electrònic",
+      "DESCRIPTION": "Fes clic al botó següent per enviar una notificació a l'adreça de correu electrònic actual o canvia l'adreça de correu electrònic al camp habilitat.",
+      "NEWEMAIL": "Nova adreça de correu electrònic"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Secret de client",
+      "CLIENTSECRET_DESCRIPTION": "Guarda el teu secret de client en un lloc segur, ja que desapareixerà un cop es tanqui el diàleg."
+    },
+    "TABLE": {
+      "DEACTIVATE": "Desactivar",
+      "ACTIVATE": "Activar",
+      "CHANGEDATE": "Última modificació",
+      "CREATIONDATE": "Creat el",
+      "FILTER": {
+        "0": "Filtrar per nom mostrat",
+        "1": "Filtrar per nom d'usuari",
+        "2": "Filtrar per nom mostrat",
+        "3": "Filtrar per nom d'usuari",
+        "4": "filtrar per correu electrònic",
+        "5": "filtrar per nom mostrat",
+        "10": "filtrar per nom d'organització",
+        "12": "filtrar per nom de projecte"
+      },
+      "EMPTY": "Sense entrades"
+    },
+    "PASSWORDLESS": {
+      "SEND": "Enviar enllaç de registre",
+      "TABLETYPE": "Tipus",
+      "TABLESTATE": "Estat",
+      "NAME": "Nom",
+      "EMPTY": "No s'han configurat dispositius",
+      "TITLE": "Clau d'accés",
+      "DESCRIPTION": "Afegir mètodes d'autenticació basats en WebAuthn per iniciar la sessió a Zitadel amb una clau d'accés.",
+      "MANAGE_DESCRIPTION": "Gestiona els mètodes de doble factor dels teus usuaris.",
+      "U2F": "Afegir mètode",
+      "U2F_DIALOG_TITLE": "Verificar autenticador",
+      "U2F_DIALOG_DESCRIPTION": "Introdueix un nom per a l'inici de sessió amb clau d'accés utilitzat",
+      "U2F_SUCCESS": "La clau d'accés s'ha creat amb èxit!",
+      "U2F_ERROR": "S'ha produït un error durant la configuració!",
+      "U2F_NAME": "Nom d'autenticador",
+      "TYPE": {
+        "0": "No s'ha definit MFA",
+        "1": "OTP",
+        "2": "Clau d'accés (empremta digital, claus de seguretat, Face ID i altres)"
+      },
+      "STATE": {
+        "0": "Sense estat",
+        "1": "No està a punt",
+        "2": "A punt",
+        "3": "Esborrat"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Eliminar clau d'accés",
+        "DELETE_DESCRIPTION": "Estàs a punt d'esborrar una clau d'accés. N'estàs segur?",
+        "ADD_TITLE": "Clau d'accés",
+        "ADD_DESCRIPTION": "Selecciona una de les opcions disponibles per crear una clau d'accés.",
+        "SEND_DESCRIPTION": "Envia't a tu mateix un enllaç de registre a la teva adreça de correu electrònic.",
+        "SEND": "Enviar enllaç de registre",
+        "SENT": "El correu electrònic s'ha enviat amb èxit. Comprova la teva safata d'entrada per continuar amb la configuració.",
+        "QRCODE_DESCRIPTION": "Genera un codi QR per escanejar-lo amb un altre dispositiu.",
+        "QRCODE": "Generar codi QR",
+        "QRCODE_SCAN": "Escaneja aquest codi QR per continuar amb la configuració del teu dispositiu.",
+        "NEW_DESCRIPTION": "Utilitza aquest dispositiu per configurar una clau d'accés.",
+        "NEW": "Afegir nova"
+      }
+    },
+    "MFA": {
+      "TABLETYPE": "Tipus",
+      "TABLESTATE": "Estat",
+      "NAME": "Nom",
+      "EMPTY": "No hi ha factors addicionals",
+      "TITLE": "Autenticació multifactor (MFA)",
+      "DESCRIPTION": "Afegeix un doble factor per configurar una seguretat òptima del teu compte.",
+      "MANAGE_DESCRIPTION": "Gestiona el mètode de doble factor per als teus usuaris.",
+      "ADD": "Afegir factor",
+      "OTP": "Aplicació autenticadora per a TOTP (Time-based One-Time Password)",
+      "OTP_DIALOG_TITLE": "Afegir TOTP",
+      "OTP_DIALOG_DESCRIPTION": "Escaneja el codi QR amb una aplicació autenticadora introduint el codi següent per verificar i activar el mètode OTP.",
+      "U2F": "Clau d'accés (empremta digital, claus de seguretat, Face ID i altres)",
+      "U2F_DIALOG_TITLE": "Verificar factor",
+      "U2F_DIALOG_DESCRIPTION": "Introdueix un nom per al teu multifactor universal.",
+      "U2F_SUCCESS": "Factor afegit amb èxit!",
+      "U2F_ERROR": "S'ha produït un error durant la configuració!",
+      "U2F_NAME": "Nom de l'autenticador",
+      "OTPSMS": "OTP amb SMS",
+      "OTPEMAIL": "OTP amb correu electrònic",
+      "SETUPOTPSMSDESCRIPTION": "Vol configurar aquest número de telèfon com a segon factor OTP?",
+      "OTPSMSSUCCESS": "Factor OTP establert amb èxit.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "El seu telèfon ha d'estar verificat per utilitzar aquest mètode.",
+      "OTPEMAILSUCCESS": "Factor OTP establert amb èxit.",
+      "TYPE": {
+        "0": "No s'ha definit MFA",
+        "1": "OTP",
+        "2": "Clau d'accés (empremta digital, claus de seguretat, Face ID i altres)"
+      },
+      "STATE": {
+        "0": "Sense estat",
+        "1": "No està a punt",
+        "2": "A punt",
+        "3": "Esborrat"
+      },
+      "DIALOG": {
+        "MFA_DELETE_TITLE": "Eliminar doble factor",
+        "MFA_DELETE_DESCRIPTION": "Estàs a punt d'esborrar un doble factor. N'estàs segur?",
+        "ADD_MFA_TITLE": "Afegir doble factor",
+        "ADD_MFA_DESCRIPTION": "Selecciona una de les opcions següents."
+      }
+    },
+    "EXTERNALIDP": {
+      "TITLE": "Proveïdor d'identitat (IDP) extern",
+      "DESC": "",
+      "IDPCONFIGID": "IDP Config ID",
+      "IDPNAME": "Nom de l'IDP",
+      "USERDISPLAYNAME": "Nom extern",
+      "EXTERNALUSERID": "ID d'usuari extern",
+      "EMPTY": "No s'ha trobat l'IDP extern",
+      "DIALOG": {
+        "DELETE_TITLE": "Eliminar IDP",
+        "DELETE_DESCRIPTION": "Estàs a punt d'esborrar un proveïdor d'identitat (IDP) per a un usuari. Vols continuar?"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Crear un nou usuari",
+      "DESCRIPTION": "Si us plau, proporciona la informació necessària.",
+      "NAMEANDEMAILSECTION": "Nom i correu electrònic",
+      "GENDERLANGSECTION": "Gènere i idioma",
+      "PHONESECTION": "Números de telèfon",
+      "PASSWORDSECTION": "Contrasenya inicial",
+      "ADDRESSANDPHONESECTION": "Número de telèfon",
+      "INITMAILDESCRIPTION": "Si se seleccionen ambdues opcions, no s'enviarà cap correu electrònic per a la inicialització. Si només se selecciona una de les opcions, s'enviarà un correu electrònic per proporcionar / verificar les dades.",
+      "SETUPAUTHENTICATIONLATER": "Configurar l'autenticació més tard per a aquest usuari.",
+      "INVITATION": "Enviar un correu d'invitació per a la configuració de l'autenticació i la verificació del correu electrònic.",
+      "INITIALPASSWORD": "Estableix una contrasenya inicial per a l'usuari."
+    },
+    "CODEDIALOG": {
+      "TITLE": "Verificar número de telèfon",
+      "DESCRIPTION": "Introduir el codi que has rebut per missatge de text per verificar el teu número de telèfon.",
+      "CODE": "Codi"
+    },
+    "DATA": {
+      "STATE": "Estat",
+      "STATE0": "Desconegut",
+      "STATE1": "Actiu",
+      "STATE2": "Inactiu",
+      "STATE3": "Esborrat",
+      "STATE4": "Blocat",
+      "STATE5": "Suspès",
+      "STATE6": "Inicial"
+    },
+    "PROFILE": {
+      "TITLE": "Perfil",
+      "EMAIL": "Correu electrònic",
+      "PHONE": "Número de telèfon",
+      "PHONE_HINT": "Usa el símbol + seguit del prefix del país o selecciona el país del menú desplegable i finalment introdueix el número de telèfon",
+      "PHONE_VERIFIED": "Número de telèfon verificat",
+      "SEND_SMS": "Enviar SMS de verificació",
+      "SEND_EMAIL": "Enviar correu electrònic",
+      "USERNAME": "Nom d'usuari",
+      "CHANGEUSERNAME": "modificar",
+      "CHANGEUSERNAME_TITLE": "Canviar nom d'usuari",
+      "CHANGEUSERNAME_DESC": "Introdueix el nou nom al camp següent.",
+      "FIRSTNAME": "Nom",
+      "LASTNAME": "Cognoms",
+      "NICKNAME": "Àlies",
+      "DISPLAYNAME": "Nom mostrat",
+      "PREFERREDLOGINNAME": "Nom d'inici de sessió preferit",
+      "PREFERRED_LANGUAGE": "Idioma",
+      "GENDER": "Gènere",
+      "PASSWORD": "Contrasenya",
+      "AVATAR": {
+        "UPLOADTITLE": "Pujar la teva imatge de perfil",
+        "UPLOADBTN": "Triar fitxer",
+        "UPLOAD": "Pujar",
+        "CURRENT": "Imatge actual",
+        "PREVIEW": "Previsualitzar",
+        "DELETESUCCESS": "Esborrada amb èxit!",
+        "CROPPERERROR": "S'ha produït un error mentre es pujava el fitxer. Prova-ho amb un format o mida diferent si és necessari."
+      },
+      "COUNTRY": "País"
+    },
+    "MACHINE": {
+      "TITLE": "Detalls del compte de servei",
+      "USERNAME": "Nom del compte",
+      "NAME": "Nom",
+      "DESCRIPTION": "Descripció",
+      "KEYSTITLE": "Claus",
+      "KEYSDESC": "Defineix les teves claus i afegeix una data de caducitat opcional.",
+      "TOKENSTITLE": "Tokens d'accés personal",
+      "TOKENSDESC": "Els tokens d'accés personal funcionen com els tokens d'accés OAuth ordinaris.",
+      "ID": "ID de clau",
+      "TYPE": "Tipus",
+      "EXPIRATIONDATE": "Data de caducitat",
+      "CHOOSEDATEAFTER": "Introdueix una data de caducitat vàlida",
+      "CHOOSEEXPIRY": "Selecciona una data de caducitat",
+      "CREATIONDATE": "Data de creació",
+      "KEYDETAILS": "Detalls de la clau",
+      "ACCESSTOKENTYPE": "Tipus de token d'accés",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
+      "ADD": {
+        "TITLE": "Afegir clau",
+        "DESCRIPTION": "Selecciona el teu tipus de clau i tria una data de caducitat opcional."
+      },
+      "ADDED": {
+        "TITLE": "La clau s'ha creat",
+        "DESCRIPTION": "Descarrega la clau, ja que no serà visible un cop es tanqui aquest diàleg!"
+      },
+      "KEYTYPES": {
+        "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "Esborrar clau",
+          "DESCRIPTION": "Vols esborrar la clau seleccionada? Aquesta acció no es pot desfer."
+        }
+      }
+    },
+    "PASSWORD": {
+      "TITLE": "Contrasenya",
+      "LABEL": "Una contrasenya segura ajuda a protegir el compte",
+      "DESCRIPTION": "Introdueix la nova contrasenya d'acord amb la política següent.",
+      "OLD": "Contrasenya actual",
+      "NEW": "Nova contrasenya",
+      "CONFIRM": "Confirmar la nova contrasenya",
+      "NEWINITIAL": "Contrasenya",
+      "CONFIRMINITIAL": "Confirmar la contrasenya",
+      "RESET": "Restablir la contrasenya actual",
+      "SET": "Establir una nova contrasenya",
+      "RESENDNOTIFICATION": "Enviar enllaç per restablir la contrasenya",
+      "REQUIRED": "Falten alguns camps obligatoris.",
+      "MINLENGTHERROR": "Ha de tenir com a mínim {{value}} caràcters de longitud.",
+      "MAXLENGTHERROR": "Ha de tenir menys de {{value}} caràcters"
+    },
+    "ID": "ID d'usuari",
+    "EMAIL": "Correu electrònic",
+    "PHONE": "Número de telèfon",
+    "PHONEEMPTY": "No s'ha definit cap número de telèfon",
+    "PHONEVERIFIED": "Número de telèfon verificat.",
+    "EMAILVERIFIED": "Correu electrònic verificat",
+    "NOTVERIFIED": "no verificat",
+    "PREFERRED_LOGINNAME": "Nom d'inici de sessió preferit",
+    "ISINITIAL": "L'usuari encara no està actiu.",
+    "LOGINMETHODS": {
+      "TITLE": "Informació de contacte",
+      "DESCRIPTION": "La informació proporcionada s'utilitza per enviar-te informació important, com ara correus per restablir la contrasenya.",
+      "EMAIL": {
+        "TITLE": "Correu electrònic",
+        "VALID": "validat",
+        "ISVERIFIED": "Correu electrònic verificat",
+        "ISVERIFIEDDESC": "Si el correu electrònic es mostra com a verificat, no es farà cap sol·licitud de verificació del correu electrònic.",
+        "RESEND": "Reenviar el correu de verificació",
+        "EDITTITLE": "Canviar el correu electrònic",
+        "EDITDESC": "Introdueix el nou correu electrònic al camp següent."
+      },
+      "PHONE": {
+        "TITLE": "Telèfon",
+        "VALID": "validat",
+        "RESEND": "Reenviar el missatge de text de verificació",
+        "EDITTITLE": "Canviar el número",
+        "EDITVALUE": "Número de telèfon",
+        "EDITDESC": "Introdueix el número de telèfon al camp següent.",
+        "DELETETITLE": "Esborrar el número de telèfon",
+        "DELETEDESC": "Segur que vols esborrar el número de telèfon",
+        "OTPSMSREMOVALWARNING": "Aquest compte utilitza aquest número de telèfon com a segon factor. No el podràs utilitzar després de continuar."
+      },
+      "RESENDCODE": "Reenviar el codi",
+      "ENTERCODE": "Verificar",
+      "ENTERCODE_DESC": "Verificar el codi"
+    },
+    "GRANTS": {
+      "TITLE": "Concessions d'usuari",
+      "DESCRIPTION": "Concedeix a aquest usuari accés a certs projectes",
+      "CREATE": {
+        "TITLE": "Crear concessió d'usuari",
+        "DESCRIPTION": "Cercar l'organització, el projecte i els rols de projecte corresponents."
+      },
+      "PROJECTNAME": "Nom del projecte",
+      "PROJECT-OWNED": "Projecte",
+      "PROJECT-GRANTED": "Projecte concedit",
+      "FILTER": {
+        "0": "filtrar per usuari",
+        "1": "filtrar per domini",
+        "2": "filtrar per nom de projecte",
+        "3": "filtrar per rol"
+      }
+    },
+    "STATE": {
+      "0": "Desconegut",
+      "1": "Actiu",
+      "2": "Inactiu",
+      "3": "Esborrat",
+      "4": "Bloquejat",
+      "5": "Suspès",
+      "6": "Inicial"
+    },
+    "STATEV2": {
+      "0": "Desconegut",
+      "1": "Actiu",
+      "2": "Inactiu",
+      "3": "Esborrat",
+      "4": "Bloquejat",
+      "5": "Inicial"
+    },
+    "SEARCH": {
+      "ADDITIONAL": "Nom d'inici de sessió (organització actual)",
+      "ADDITIONAL-EXTERNAL": "Nom d'inici de sessió (organització externa)"
+    },
+    "TARGET": {
+      "SELF": "Si vols concedir accés a un usuari d'una altra organització",
+      "EXTERNAL": "Per concedir accés a un usuari a la teva organització",
+      "CLICKHERE": "fes clic aquí"
+    },
+    "SIGNEDOUT": "Has tancat la sessió. Fes clic al botó \"Iniciar la sessió\" per accedir un altre cop.",
+    "SIGNEDOUT_BTN": "Iniciar la sessió",
+    "EDITACCOUNT": "Editar el compte",
+    "ADDACCOUNT": "Iniciar la sessió amb un altre compte",
+    "RESENDINITIALEMAIL": "Reenviar el correu d'activació",
+    "RESENDEMAILNOTIFICATION": "Reenviar el correu de notificació",
+    "TOAST": {
+      "CREATED": "Usuari creat correctament.",
+      "SAVED": "Perfil desat correctament.",
+      "USERNAMECHANGED": "Nom d'usuari modificat.",
+      "EMAILSAVED": "El correu electrònic s'ha desat correctament.",
+      "INITEMAILSENT": "Correu d'inicialització enviat.",
+      "PHONESAVED": "Telèfon desat correctament.",
+      "PHONEREMOVED": "El telèfon s'ha eliminat.",
+      "PHONEVERIFIED": "Telèfon verificat correctament.",
+      "PHONEVERIFICATIONSENT": "Codi de verificació per al telèfon enviat.",
+      "EMAILVERIFICATIONSENT": "Codi de verificació per al correu electrònic enviat.",
+      "OTPREMOVED": "OTP eliminat.",
+      "U2FREMOVED": "Factor eliminat.",
+      "PASSWORDLESSREMOVED": "Clau d'accés eliminada.",
+      "INITIALPASSWORDSET": "S'ha establert una contrasenya inicial.",
+      "PASSWORDNOTIFICATIONSENT": "S'ha enviat una notificació de canvi de contrasenya.",
+      "PASSWORDCHANGED": "La contrasenya s'ha canviat correctament.",
+      "REACTIVATED": "Usuari reactivat.",
+      "DEACTIVATED": "Usuari desactivat.",
+      "SELECTEDREACTIVATED": "S'han reactivat els usuaris seleccionats.",
+      "SELECTEDDEACTIVATED": "S'han desactivat els usuaris seleccionats.",
+      "SELECTEDKEYSDELETED": "S'han esborrat les claus seleccionades.",
+      "KEYADDED": "Clau afegida!",
+      "MACHINEADDED": "Compte de servei creat!",
+      "DELETED": "L'usuari s'ha esborrat correctament!",
+      "UNLOCKED": "L'usuari s'ha desbloquejat correctament!",
+      "PASSWORDLESSREGISTRATIONSENT": "S'ha enviat correctament un enllaç de registre.",
+      "SECRETGENERATED": "Secret generat correctament!",
+      "SECRETREMOVED": "Secret eliminat correctament!"
+    },
+    "MEMBERSHIPS": {
+      "TITLE": "Rols d'administrador de Zitadel",
+      "DESCRIPTION": "Aquests són tots els rols d'administrador de l'usuari. També els pots modificar a les pàgines de detalls d'organització, projecte o instància.",
+      "ORGCONTEXT": "Pots veure totes les organitzacions i projectes que estan relacionats amb l'organització seleccionada actualment.",
+      "USERCONTEXT": "Pots veure totes les organitzacions i projectes per als quals estàs autoritzat. Incloent-hi altres organitzacions.",
+      "CREATIONDATE": "Data de creació",
+      "CHANGEDATE": "Última modificació",
+      "DISPLAYNAME": "Nom mostrat",
+      "REMOVE": "Eliminar",
+      "TYPE": "Tipus",
+      "ORGID": "ID d'organització",
+      "UPDATED": "El rol d'administrador s'ha actualitzat.",
+      "NOPERMISSIONTOEDIT": "No disposes dels permisos necessaris per editar rols!",
+      "TYPES": {
+        "UNKNOWN": "Desconegut",
+        "ORG": "Organització",
+        "PROJECT": "Projecte",
+        "GRANTEDPROJECT": "Projectes concedits"
+      }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKEN": "Token",
+      "ADD": {
+        "TITLE": "Generar un nou token d'accés personal",
+        "DESCRIPTION": "Defineix una data de caducitat personalitzada per al token.",
+        "CHOOSEEXPIRY": "Selecciona una data de caducitat",
+        "CHOOSEDATEAFTER": "Introdueix una data vàlida per tal que els tokens comencin a caducar"
+      },
+      "ADDED": {
+        "TITLE": "Token d'accés personal",
+        "DESCRIPTION": "Assegura't de copiar el teu token d'accés personal. No el podràs tornar a veure!"
+      },
+      "DELETE": {
+        "TITLE": "Esborrar el token",
+        "DESCRIPTION": "Estàs a punt d'esborrar el token d'accés personal. Segur que vols continuar?"
+      },
+      "DELETED": "El token s'ha esborrat correctament."
+    }
+  },
+  "METADATA": {
+    "TITLE": "Metadades",
+    "KEY": "Clau",
+    "VALUE": "Valor",
+    "ADD": "Nova entrada",
+    "SAVE": "Desar",
+    "EMPTY": "Sense metadades",
+    "SETSUCCESS": "L'element s'ha desat amb èxit",
+    "REMOVESUCCESS": "L'element s'ha esborrat amb èxit"
+  },
+  "FLOWS": {
+    "ID": "ID",
+    "NAME": "Nom",
+    "STATE": "Estat",
+    "STATES": {
+      "0": "sense estat",
+      "1": "inactiu",
+      "2": "actiu"
+    },
+    "ADDTRIGGER": "Afegir activador",
+    "FLOWCHANGED": "El flux s'ha canviat amb èxit",
+    "FLOWCLEARED": "El flux s'ha restablert amb èxit",
+    "TIMEOUT": "Timeout",
+    "TIMEOUTINSEC": "Timeout en segons",
+    "ALLOWEDTOFAIL": "Es permet la fallada",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Advertiment",
+      "DESCRIPTION": "Si desactives aquesta configuració, pot fer que els usuaris de la teva organització no puguin iniciar la sessió. A més, ja no podràs accedir a la consola d'administració per desactivar l'acció. Recomanem crear un usuari administrador en una organització separada o provar els scripts primer en un entorn de desenvolupament o una organització de desenvolupament."
+    },
+    "SCRIPT": "Script",
+    "FLOWTYPE": "Tipus de flux",
+    "TRIGGERTYPE": "Tipus d'activador",
+    "ACTIONS": "Accions",
+    "ACTIONSMAX": "Segons el teu Tier, tens disponible un nombre limitat d'accions ({{value}}). Assegura't de desactivar aquelles que no necessites o considera millorar el teu tier.",
+    "DIALOG": {
+      "ADD": {
+        "TITLE": "Crear una acció"
+      },
+      "UPDATE": {
+        "TITLE": "Actualitzar acció"
+      },
+      "DELETEACTION": {
+        "TITLE": "Esborrar l'acció?",
+        "DESCRIPTION": "Estàs a punt d'esborrar una acció. Això no es pot revertir. N'estàs segur?",
+        "DELETE_SUCCESS": "L'acció s'ha esborrat amb èxit."
+      },
+      "CLEAR": {
+        "TITLE": "Netejar el flux?",
+        "DESCRIPTION": "Estàs a punt de restablir el flux juntament amb els seus activadors i accions. Aquest canvi no es pot revertir. N'estàs segur?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Esborrar les accions seleccionades?",
+        "DESCRIPTION": "Segur que vols esborrar les accions seleccionades del flux?"
+      },
+      "ABOUTNAME": "El nom de l'acció i el nom de la funció en javascript han de ser el mateix"
+    },
+    "TOAST": {
+      "ACTIONSSET": "Accions establertes",
+      "ACTIONREACTIVATED": "Accions reactivades amb èxit",
+      "ACTIONDEACTIVATED": "Accions desactivades amb èxit"
+    }
+  },
+  "IAM": {
+    "POLICIES": {
+      "TITLE": "Polítiques del sistema i paràmetres d'accés",
+      "DESCRIPTION": "Gestiona les teves polítiques globals i els teus paràmetres de gestió d'accessos."
+    },
+    "EVENTSTORE": {
+      "TITLE": "Administració de l'emmagatzematge de la Instància",
+      "DESCRIPTION": "Gestiona les teves vistes de Zitadel i els teus esdeveniments fallits."
+    },
+    "MEMBER": {
+      "TITLE": "Administradors",
+      "DESCRIPTION": "Aquests administradors estan autoritzats per fer canvis a la teva instància."
+    },
+    "PAGES": {
+      "STATE": "Estat",
+      "DOMAINLIST": "Dominis personalitzats"
+    },
+    "STATE": {
+      "0": "No especificat",
+      "1": "Creant",
+      "2": "En execució",
+      "3": "Aturant",
+      "4": "Aturat"
+    },
+    "VIEWS": {
+      "VIEWNAME": "Nom",
+      "DATABASE": "Base de dades",
+      "SEQUENCE": "Seqüència",
+      "EVENTTIMESTAMP": "Marca de temps",
+      "LASTSPOOL": "Spool amb èxit",
+      "ACTIONS": "Accions",
+      "CLEAR": "Netejar",
+      "CLEARED": "La vista s'ha netejat amb èxit!",
+      "DIALOG": {
+        "VIEW_CLEAR_TITLE": "Netejar la vista",
+        "VIEW_CLEAR_DESCRIPTION": "Estàs a punt de netejar la vista. Netejar una vista crea un procés durant el qual és possible que les dades no estiguin disponibles per als usuaris finals. N'estàs segur?"
+      }
+    },
+    "FAILEDEVENTS": {
+      "VIEWNAME": "Nom",
+      "DATABASE": "Base de dades",
+      "FAILEDSEQUENCE": "Seqüència fallida",
+      "FAILURECOUNT": "Nombre de fallades",
+      "LASTFAILED": "Última fallada a les",
+      "ERRORMESSAGE": "Missatge d'error",
+      "ACTIONS": "Accions",
+      "DELETE": "Eliminar",
+      "DELETESUCCESS": "Esdeveniments fallits eliminats."
+    },
+    "EVENTS": {
+      "EDITOR": "Editor",
+      "EDITORID": "ID d'editor",
+      "AGGREGATE": "Agregat",
+      "AGGREGATEID": "ID d'agregat",
+      "AGGREGATETYPE": "Tipus d'agregat",
+      "RESOURCEOWNER": "Propietari del recurs",
+      "SEQUENCE": "Seqüència",
+      "CREATIONDATE": "Creat el",
+      "TYPE": "Tipus",
+      "PAYLOAD": "Càrrega útil",
+      "FILTERS": {
+        "BTN": "Filtrar",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrar per editor"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Tipus d'agregat",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrar per agregat"
+        },
+        "TYPE": {
+          "TYPELABEL": "Tipus",
+          "CHECKBOX": "Filtrar per tipus"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filtrar per propietari del recurs"
+        },
+        "SEQUENCE": {
+          "LABEL": "Seqüència",
+          "CHECKBOX": "Filtrar per seqüència"
+        },
+        "SORT": "Ordenat",
+        "ASC": "Ascendent",
+        "DESC": "Descendent",
+        "CREATIONDATE": {
+          "RADIO_FROM": "Des de",
+          "RADIO_RANGE": "Interval",
+          "LABEL_SINCE": "Des de",
+          "LABEL_UNTIL": "Fins a"
+        },
+        "OTHER": "altre",
+        "OTHERS": "altres"
+      },
+      "DIALOG": {
+        "TITLE": "Detall de l'esdeveniment"
+      }
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Administrador eliminat.",
+      "MEMBERSADDED": "Administradors afegits.",
+      "MEMBERADDED": "Administrador afegit.",
+      "MEMBERCHANGED": "Administrador modificat.",
+      "ROLEREMOVED": "Rol eliminat.",
+      "ROLECHANGED": "Rol canviat.",
+      "REACTIVATED": "Reactivat",
+      "DEACTIVATED": "Desactivat"
+    }
+  },
+  "ORG": {
+    "PAGES": {
+      "NAME": "Nom",
+      "ID": "ID d'organització",
+      "CREATIONDATE": "Creat",
+      "DATECHANGED": "Modificat",
+      "FILTER": "Filtrar",
+      "FILTERPLACEHOLDER": "Filtrar pel nom",
+      "LIST": "Organitzacions",
+      "LISTDESCRIPTION": "Tria una organització.",
+      "ACTIVE": "Activar",
+      "CREATE": "Crear organització",
+      "DEACTIVATE": "Desactivar organització",
+      "REACTIVATE": "Reactivar organització",
+      "NOPERMISSION": "No tens permís per accedir a la configuració de l'organització.",
+      "USERSELFACCOUNT": "Utilitza el teu compte personal com a propietari de l'organització",
+      "ORGDETAIL_TITLE": "Introdueix el nom i el domini de la teva nova organització.",
+      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Introdueix el nom de la teva nova organització.",
+      "ORGDETAILUSER_TITLE": "Configurar el propietari de l'organització",
+      "DELETE": "Esborrar organització",
+      "DEFAULTLABEL": "Predeterminada",
+      "SETASDEFAULT": "Establir com a organització predeterminada",
+      "DEFAULTORGSET": "S'ha canviat amb èxit l'organització predeterminada",
+      "RENAME": {
+        "ACTION": "Reanomenar",
+        "TITLE": "Reanomenar organització",
+        "DESCRIPTION": "Introdueix el nou nom de la teva organització",
+        "BTN": "Reanomenar"
+      },
+      "ORGDOMAIN": {
+        "TITLE": "Verifica la propietat de {{value}}",
+        "VERIFICATION": "Oferim dos mètodes per validar manualment el teu domini:",
+        "VERIFICATION_HTML": "- HTTP. Col·loca un fitxer de verificació temporal al teu lloc web",
+        "VERIFICATION_DNS": "- DNS. Crea un registre TXT al teu DNS",
+        "VERIFICATION_DNS_DESC": "Si administres {{ value }} i tens accés als teus registres DNS, pots crear un nou registre TXT amb els valors següents:",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Utilitza aquest codi com a valor per al registre TXT:",
+        "VERIFICATION_HTTP_DESC": "Si tens accés a l'allotjament del teu lloc web, simplement descarrega el fitxer de verificació i puja'l a l'URL proporcionada.",
+        "VERIFICATION_HTTP_URL_LABEL": "URL esperada:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Fitxer de verificació:",
+        "VERIFICATION_SKIP": "Pots ometre la verificació per ara i continuar creant la teva organització, però per poder usar aquest domini has de completar aquest pas.",
+        "VERIFICATION_VALIDATION_DESC": "No elimines el codi de verificació, ja que Zitadel tornarà a comprovar la propietat del teu domini de tant en tant.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Sol·licitar un token nou",
+        "VERIFICATION_NEWTOKEN_DESC": "Si vols sol·licitar un token nou, selecciona el teu mètode preferit. Si vols validar un token persistent, fes clic al botó de dalt.",
+        "VERIFICATION_VALIDATION_ONGOING": "S'ha seleccionat el mètode {{ value }} per verificar el teu domini. Fes clic al botó per forçar una verificació o restablir el procés de verificació.",
+        "VERIFICATION_SUCCESSFUL": "Domini verificat amb èxit!",
+        "RESETMETHOD": "Restablir el mètode de verificació"
+      },
+      "DOWNLOAD_FILE": "Descarregar fitxer",
+      "SELECTORGTOOLTIP": "Seleccionar aquesta organització.",
+      "PRIMARYDOMAIN": "Domini d'organització",
+      "STATE": "Estat",
+      "USEPASSWORD": "Establir la contrasenya inicial",
+      "USEPASSWORDDESC": "L'usuari no ha d'establir la contrasenya durant la inicialització."
+    },
+    "LIST": {
+      "TITLE": "Organitzacions",
+      "DESCRIPTION": "Aquestes són les organitzacions de la teva instància"
+    },
+    "DOMAINS": {
+      "NEW": "Afegir domini",
+      "TITLE": "Domini d'organització",
+      "DESCRIPTION": "Configura els teus dominis. Aquest domini es pot usar per iniciar la sessió amb els teus usuaris.",
+      "SETPRIMARY": "Domini d'organització",
+      "DELETE": {
+        "TITLE": "Esborrar domini",
+        "DESCRIPTION": "Estàs a punt d'esborrar un dels teus dominis. Tingues en compte que els teus usuaris ja no podran usar aquest domini per iniciar la sessió."
+      },
+      "ADD": {
+        "TITLE": "Afegir domini",
+        "DESCRIPTION": "Estàs a punt d'afegir un domini per a la teva organització. Després que es processi amb èxit, els teus usuaris podran usar el domini per al seu inici de sessió."
+      }
+    },
+    "STATE": {
+      "0": "No definida",
+      "1": "Activa",
+      "2": "Desactivada"
+    },
+    "MEMBER": {
+      "TITLE": "Administradors de l'organització",
+      "DESCRIPTION": "Indica quins usuaris podran canviar les preferències de la teva organització."
+    },
+    "TOAST": {
+      "UPDATED": "L'organització s'ha actualitzat amb èxit.",
+      "DEACTIVATED": "Organització desactivada.",
+      "REACTIVATED": "Organització reactivada.",
+      "DOMAINADDED": "Domini afegit.",
+      "DOMAINREMOVED": "Domini eliminat.",
+      "MEMBERADDED": "Administrador afegit.",
+      "MEMBERREMOVED": "Administrador eliminat.",
+      "MEMBERCHANGED": "Administrador modificat.",
+      "SETPRIMARY": "El domini de l'organització s'ha establert correctament.",
+      "DELETED": "Organització esborrada amb èxit",
+      "DEFAULTORGNOTFOUND": "No s'ha trobat l'organització per defecte",
+      "ORG_WAS_DELETED": "L'organització ha estat esborrada."
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Organització desactivada",
+        "DESCRIPTION": "Estàs a punt de desactivar la teva organització. Els usuaris no podran iniciar la sessió després de fer-ho. Segur que vols continuar?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Reactivar organització",
+        "DESCRIPTION": "Estàs a punt de reactivar la teva organització. Els usuaris podran iniciar la sessió una altra vegada. Segur que vols continuar?"
+      },
+      "DELETE": {
+        "TITLE": "Esborrar organització",
+        "DESCRIPTION": "Estàs a punt d'esborrar la teva organització. Això inicia un procés on totes les dades de les organitzacions relacionades s'esborraran. No pots revertir aquesta acció.",
+        "TYPENAME": "Escriu '{{value}}', per esborrar la teva organització.",
+        "ORGNAME": "Nom",
+        "BTN": "Esborrar"
+      }
+    }
+  },
+  "SETTINGS": {
+    "LIST": {
+      "ORGS": "Organitzacions",
+      "FEATURESETTINGS": "Configuració de funcionalitats",
+      "LANGUAGES": "Idiomes",
+      "LOGIN": "Comportament de l'inici de sessió i de la seguretat",
+      "LOCKOUT": "Bloqueig",
+      "AGE": "Caducitat de la contrasenya",
+      "COMPLEXITY": "Complexitat de la contrasenya",
+      "NOTIFICATIONS": "Configuració de notificacions",
+      "SMTP_PROVIDER": "Proveïdor SMTP",
+      "SMS_PROVIDER": "Proveïdor SMS/Telèfon",
+      "NOTIFICATIONS_DESC": "Configuració SMTP i SMS",
+      "MESSAGETEXTS": "Missatges de text",
+      "IDP": "Proveïdors d'identitat",
+      "VERIFIED_DOMAINS": "Domini d'organització",
+      "DOMAIN": "Configuració de domini",
+      "LOGINTEXTS": "Textos d'interfície d'inici de sessió",
+      "BRANDING": "Imatge de marca",
+      "PRIVACYPOLICY": "Política de privadesa",
+      "OIDC": "OIDC Token lifetime and expiration",
+      "WEB_KEYS": "OIDC Web Keys",
+      "SECRETS": "Aparença del secret",
+      "SECURITY": "Configuració de seguretat",
+      "EVENTS": "Esdeveniments",
+      "FAILEDEVENTS": "Esdeveniments fallits",
+      "VIEWS": "Vistes"
+    },
+    "GROUPS": {
+      "GENERAL": "General",
+      "NOTIFICATIONS": "Notificacions",
+      "LOGIN": "Inici de sessió i accés",
+      "DOMAIN": "Domini",
+      "TEXTS": "Textos i idiomes",
+      "APPEARANCE": "Aparença",
+      "OTHER": "Altres",
+      "STORAGE": "Dades"
+    },
+    "BETA": "BETA"
+  },
+  "SETTING": {
+    "LANGUAGES": {
+      "DEFAULT": "Idioma predeterminat",
+      "ALLOWED": "Idiomes permesos",
+      "NOT_ALLOWED": "Idiomes no permesos",
+      "ALLOW_ALL": "Permetre tots els idiomes",
+      "DISALLOW_ALL": "No permetre cap idioma",
+      "SETASDEFAULT": "Establir com a idioma predeterminat",
+      "DEFAULT_SAVED": "Idioma predeterminat desat",
+      "ALLOWED_SAVED": "Idiomes permesos desats",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "ca": "Català",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands",
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية"
+      }
+    },
+    "SMTP": {
+      "TITLE": "Configuració SMTP",
+      "DESCRIPTION": "Descripció",
+      "SENDERADDRESS": "Adreça de correu electrònic del remitent",
+      "SENDERNAME": "Nom del remitent",
+      "REPLYTOADDRESS": "Adreça Reply-To",
+      "HOSTANDPORT": "Servidor i port",
+      "USER": "Usuari",
+      "PASSWORD": "Contrasenya",
+      "SETPASSWORD": "Establir la contrasenya SMTP",
+      "PASSWORDSET": "La contrasenya SMTP s'ha establert amb èxit.",
+      "TLS": "Transport Layer Security (TLS)",
+      "SAVED": "S'ha desat amb èxit!",
+      "NOCHANGES": "Sense canvis!",
+      "REQUIREDWARN": "Per enviar notificacions per al teu domini, has d'introduir les teves dades SMTP."
+    },
+    "SMS": {
+      "PROVIDERS": "Proveïdors",
+      "PROVIDER": "Proveïdor d'SMS",
+      "ADDPROVIDER": "Afegir proveïdor SMS",
+      "ADDPROVIDERDESCRIPTION": "Tria un dels proveïdors següents i introdueix les dades requerides.",
+      "REMOVEPROVIDER": "Eliminar proveïdor",
+      "REMOVEPROVIDER_DESC": "Estàs a punt d'esborrar un proveïdor. Vols continuar?",
+      "SMSPROVIDERSTATE": {
+        "0": "No especificat",
+        "1": "Actiu",
+        "2": "Inactiu"
+      },
+      "ACTIVATED": "Proveïdor activat.",
+      "DEACTIVATED": "Proveïdor desactivat.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Token",
+        "SENDERNUMBER": "Número de remitent",
+        "VERIFYSERVICESID": "SID del servei de verificació",
+        "VERIFYSERVICESID_DESCRIPTION": "Establir un SID del servei de verificació permet usar el servei Twilio Verify en lloc del servei de missatges per a la verificació de números de telèfon i OTP SMS.",
+        "ADDED": "Twilio afegit amb èxit.",
+        "UPDATED": "Twilio actualitzat amb èxit",
+        "REMOVED": "Twilio eliminat",
+        "CHANGETOKEN": "Canviar token",
+        "SETTOKEN": "Establir token",
+        "TOKENSET": "Token establert amb èxit."
+      }
+    },
+    "SECRETS": {
+      "TYPES": "Tipus de secret",
+      "TYPE": {
+        "1": "Correu d'inicialització",
+        "2": "Verificació de correu electrònic",
+        "3": "Verificació de telèfon",
+        "4": "Restabliment de contrasenya",
+        "5": "Inicialització de clau d'accés",
+        "6": "Secret d'aplicació",
+        "7": "One Time Password (OTP) - SMS",
+        "8": "One Time Password (OTP) - email",
+        "9": "Codi d'invitació"
+      },
+      "EXPIRY": "Caducitat (en minuts)",
+      "INCLUDEDIGITS": "Incloure números",
+      "INCLUDESYMBOLS": "Incloure símbols",
+      "INCLUDELOWERLETTERS": "Incloure lletres minúscules",
+      "INCLUDEUPPERLETTERS": "Incloure lletres majúscules",
+      "LENGTH": "Longitud",
+      "UPDATED": "Configuració actualitzada."
+    },
+    "SECURITY": {
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Aquesta configuració estableix el CSP per permetre l'ús de frames per a un grup de dominis permesos. Tingues en compte que, si habilites l'ús d'iFrames, corres el risc de permetre atacs de clickjacking.",
+      "IFRAMEENABLED": "Permetre iFrame",
+      "ALLOWEDORIGINS": "URLs permeses",
+      "IMPERSONATIONTITLE": "Suplantació",
+      "IMPERSONATIONENABLED": "Permetre la suplantació",
+      "IMPERSONATIONDESCRIPTION": "Aquesta configuració permet utilitzar la suplantació en principi. Tingues en compte que el suplantador també necessita que se li assignin els rols `*_IMPERSONATOR` apropiats."
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "Organització predeterminada d'inici de sessió",
+      "LOGINDEFAULTORG_DESCRIPTION": "La interfície d'inici de sessió utilitzarà la configuració de l'organització predeterminada (i no de la instància) si no s'estableix cap context d'organització.",
+      "USERSCHEMA": "Esquema d'usuari",
+      "USERSCHEMA_DESCRIPTION": "Els esquemes d'usuari permeten gestionar els esquemes de dades dels usuaris. Si s'activa la bandera, podràs utilitzar la nova API i les seves funcions.",
+      "ACTIONS": "Accions",
+      "ACTIONS_DESCRIPTION": "Accions v2 permet administrar les execucions i els objectius de dades. Si la bandera està habilitada, podràs utilitzar la nova API i les seves funcions.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Finalització de sessió",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Si la bandera està habilitada, podràs finalitzar una sessió única des de la interfície d'usuari d'inici de sessió proporcionant un id_token amb una reclamació `sid` com a id_token_hint al punt final d'end_session. Tingues en compte que actualment es finalitzen totes les sessions del mateix agent d'usuari (navegador) a la interfície d'usuari d'inici de sessió. Les sessions administrades a través de l'API de sessió ja permeten la finalització de sessions individuals.",
+      "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Si la bandera està habilitada, l'error del pare OIDC es registrarà a la consola.",
+      "PERMISSIONCHECKV2": "Verificació de permisos V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Si la bandera està habilitada, podràs utilitzar la nova API i les seves funcions.",
+      "STATES": {
+        "INHERITED": "Heretat",
+        "ENABLED": "Habilitat",
+        "DISABLED": "Deshabilitat"
+      },
+      "INHERITED_DESCRIPTION": "Aquesta configuració estableix el valor al valor predeterminat del sistema.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Habilitat\" s'hereta",
+        "DISABLED": "\"Deshabilitat\" s'hereta"
+      },
+      "RESET": "Establir tot a heretat",
+      "CONSOLEUSEV2USERAPI": "Utilitza l'API V2 a la consola d'administració per a la creació d'usuaris",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Quan aquesta opció està habilitada, la consola d'administració utilitza l'API V2 d'usuari per crear nous usuaris. Amb l'API V2, els usuaris acabats de crear comencen sense un estat inicial.",
+      "LOGINV2": "Inici de sessió V2",
+      "LOGINV2_DESCRIPTION": "En habilitar això, s'activa la nova interfície d'inici de sessió basada en TypeScript amb millores en seguretat, rendiment i personalització.",
+      "LOGINV2_BASEURI": "URI base",
+      "ENABLERELATIONALTABLES": "Taules relacionals",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Habilita això per utilitzar taules relacionals en lloc de projeccions per emmagatzemar dades. Actualment aquest commutador no fa res."
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "Restablir la configuració",
+        "DEFAULTDESCRIPTION": "Estàs a punt de restablir la teva configuració als valors predeterminats de la teva instància. Segur que vols continuar?",
+        "LOGINPOLICY_DESCRIPTION": "Avís: Si continues, la configuració del proveïdor d'identitat es restablirà també als valors de la instància."
+      }
+    }
+  },
+  "POLICY": {
+    "APPLIEDTO": "S'aplica a",
+    "PWD_COMPLEXITY": {
+      "TITLE": "Complexitat de la contrasenya",
+      "DESCRIPTION": "Garanteix que totes les contrasenyes establertes es corresponen amb un patró específic",
+      "SYMBOLANDNUMBERERROR": "Ha de consistir en un dígit i un signe de puntuació/símbol.",
+      "SYMBOLERROR": "Ha d'incloure un símbol/signe de puntuació.",
+      "NUMBERERROR": "Ha d'incloure un dígit.",
+      "PATTERNERROR": "La contrasenya no compleix el patró requerit."
+    },
+    "NOTIFICATION": {
+      "TITLE": "Notificació",
+      "DESCRIPTION": "Determina en quins canvis s'enviaran notificacions.",
+      "PASSWORDCHANGE": "Contrasenya canviada"
+    },
+    "PRIVATELABELING": {
+      "DESCRIPTION": "Dona al teu inici de sessió el teu estil personalitzat i modifica'n el comportament.",
+      "PREVIEW_DESCRIPTION": "Els canvis en la política es desplegaran automàticament per previsualitzar l'entorn.",
+      "BTN": "Seleccionar fitxer",
+      "ACTIVATEPREVIEW": "Aplicar la configuració",
+      "DARK": "Mode fosc",
+      "LIGHT": "Mode clar",
+      "CHANGEVIEW": "Canviar la vista",
+      "ACTIVATED": "Els canvis en la política ja estan disponibles",
+      "THEME": "Tema",
+      "COLORS": "Colors",
+      "FONT": "Tipus de lletra",
+      "ADVANCEDBEHAVIOR": "Comportament avançat",
+      "DROP": "Porta aquí la imatge o",
+      "RELEASE": "Deixa-la anar",
+      "DROPFONT": "Porta aquí el fitxer del tipus de lletra",
+      "RELEASEFONT": "Deixa'l anar",
+      "USEOFLOGO": "El teu logotip s'utilitzarà tant a l'inici de sessió com als correus electrònics, mentre que la icona s'usarà per a elements de la interfície més petits com el menú de canvi d'organitzacions a la consola d'administració",
+      "MAXSIZE": "La mida màxima està limitada a 524kB",
+      "EMAILNOSVG": "El format de fitxer SVG no està suportat als correus electrònics. Per tant, puja el teu logotip en PNG o en un altre format suportat.",
+      "MAXSIZEEXCEEDED": "S'ha superat la mida màxima de 524kB.",
+      "NOSVGSUPPORTED": "SVG no està suportat!",
+      "FONTINLOGINONLY": "El tipus de lletra es mostra actualment només a la interfície d'inici de sessió.",
+      "BACKGROUNDCOLOR": "Color de fons",
+      "PRIMARYCOLOR": "Color primari",
+      "WARNCOLOR": "Color d'advertència",
+      "FONTCOLOR": "Color del tipus de lletra",
+      "VIEWS": {
+        "PREVIEW": "Previsualitzar",
+        "CURRENT": "Configuració actualitzada"
+      },
+      "PREVIEW": {
+        "TITLE": "Inici de sessió",
+        "SECOND": "iniciar la sessió amb el teu compte de Zitadel.",
+        "ERROR": "No s'ha trobat l'usuari!",
+        "PRIMARYBUTTON": "següent",
+        "SECONDARYBUTTON": "registrar"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Mode automàtic",
+        "THEME_MODE_LIGHT": "Només mode clar",
+        "THEME_MODE_DARK": "Només mode fosc"
+      }
+    },
+    "PWD_AGE": {
+      "TITLE": "Caducitat de la contrasenya",
+      "DESCRIPTION": "Pots establir una política per a la caducitat de les contrasenyes. Aquesta política obligarà l'usuari a canviar la contrasenya en el pròxim inici de sessió després de la caducitat. No hi ha avisos ni notificacions automàtics."
+    },
+    "PWD_LOCKOUT": {
+      "TITLE": "Política de bloqueig",
+      "DESCRIPTION": "Estableix un nombre màxim de reintents d'introducció de contrasenya, després del qual els comptes seran bloquejats."
+    },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "Imatge de marca",
+      "BTN": "Seleccionar fitxer",
+      "DESCRIPTION": "Personalitzar l'aparença de l'inici de sessió",
+      "ACTIVATEPREVIEW": "Activar la configuració"
+    },
+    "LOGIN_POLICY": {
+      "TITLE": "Configuració d'inici de sessió",
+      "DESCRIPTION": "Defineix com es poden autenticar els usuaris i configura proveïdors d'identitat",
+      "DESCRIPTIONCREATEADMIN": "Els usuaris poden triar entre els següents proveïdors d'identitat disponibles.",
+      "DESCRIPTIONCREATEMGMT": "Els usuaris poden triar entre els següents proveïdors d'identitat. Nota: Pots usar els proveïdors integrats al sistema així com només els proveïdors configurats per a la teva organització.",
+      "LIFETIME_INVALID": "El formulari conté valors no vàlids.",
+      "SAVED": "Desat amb èxit!",
+      "PROVIDER_ADDED": "Proveïdor d'identitat activat."
+    },
+    "PRIVACY_POLICY": {
+      "DESCRIPTION": "Estableix la teva Política de privacitat i els enllaços als Termes de Servei (TDS)",
+      "TOSLINK": "Enllaç als Termes de Servei",
+      "POLICYLINK": "Enllaç a la Política de privacitat",
+      "HELPLINK": "Enllaç d'ajuda",
+      "SUPPORTEMAIL": "Correu electrònic de suport",
+      "DOCSLINK": "Enllaç de documents (Consola d'Administració)",
+      "CUSTOMLINK": "Enllaç personalitzat (Consola d'Administració)",
+      "CUSTOMLINKTEXT": "Text d'enllaç personalitzat (Consola d'Administració)",
+      "SAVED": "S'ha desat amb èxit!",
+      "RESET_TITLE": "Restaurar els valors predeterminats",
+      "RESET_DESCRIPTION": "Estàs a punt de restaurar els enllaços predeterminats per als TDS i la política de privacitat. Vols continuar?"
+    },
+    "LOGIN_TEXTS": {
+      "TITLE": "Textos de les interfícies d'inici de sessió",
+      "DESCRIPTION": "Defineix els teus textos per a les interfícies d'inici de sessió. Si els textos estan buits, s'usaran els valors predeterminats mostrats com a suggeriments.",
+      "DESCRIPTION_SHORT": "Defineix els teus textos per a les interfícies d'inici de sessió.",
+      "NEWERVERSIONEXISTS": "Existeix una versió nova",
+      "CURRENTDATE": "Configuració actual",
+      "CHANGEDATE": "Versió nova des de",
+      "KEYNAME": "Pantalla d'inici de sessió / Interfície",
+      "RESET_TITLE": "Restaurar els valors predeterminats",
+      "RESET_DESCRIPTION": "Estàs a punt de restaurar tots els valors predeterminats. Tots els canvis que has fet s'esborraran permanentment. Segur que vols continuar?",
+      "UNSAVED_TITLE": "Continuar sense desar?",
+      "UNSAVED_DESCRIPTION": "Has fet canvis sense desar. Vols desar-los ara?",
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Has seleccionat un idioma que no està permès. Pots continuar modificant els textos. Però si vols que els teus usuaris realment puguin usar aquest idioma, canvia les restriccions de les teves instàncies.",
+      "LANGUAGES_NOT_ALLOWED": "No permès:",
+      "LANGUAGE": "Idioma",
+      "LANGUAGES": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "ca": "Català",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands",
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية"
+      },
+      "KEYS": {
+        "emailVerificationDoneText": "Verificació de correu electrònic realitzada",
+        "emailVerificationText": "Verificació de correu electrònic",
+        "externalUserNotFoundText": "Usuari extern no trobat",
+        "footerText": "Peu",
+        "initMfaDoneText": "Inicialització d'MFA, fet",
+        "initMfaOtpText": "Inicialitzar MFA",
+        "initMfaPromptText": "Inicialitzar diàleg d'entrada MFA",
+        "initMfaU2fText": "Inicialitzar doble factor universal",
+        "initPasswordDoneText": "Inicialitzar contrasenya, fet",
+        "initPasswordText": "Inicialitzar contrasenya",
+        "initializeDoneText": "Inicialitzar usuari, fet",
+        "initializeUserText": "Inicialitzar usuari",
+        "linkingUserDoneText": "Vinculació d'usuari, fet",
+        "loginText": "Iniciar la sessió",
+        "logoutText": "Tancar la sessió",
+        "mfaProvidersText": "Proveïdors MFA",
+        "passwordChangeDoneText": "Canvi de contrasenya, fet",
+        "passwordChangeText": "Canvi de contrasenya",
+        "passwordResetDoneText": "Restabliment de contrasenya, fet",
+        "passwordText": "Contrasenya",
+        "registrationOptionText": "Opcions de registre",
+        "registrationOrgText": "Registrar org",
+        "registrationUserText": "Registrar usuari",
+        "selectAccountText": "Seleccionar compte",
+        "successLoginText": "Inici de sessió amb èxit",
+        "usernameChangeDoneText": "Canvi de nom d'usuari, fet",
+        "usernameChangeText": "Canvi de nom d'usuari",
+        "verifyMfaOtpText": "Verificar OTP",
+        "verifyMfaU2fText": "Verificar doble factor universal",
+        "passwordlessPromptText": "Símbol de clau d'accés",
+        "passwordlessRegistrationDoneText": "Registre de clau d'accés completat",
+        "passwordlessRegistrationText": "Registre de clau d'accés",
+        "passwordlessText": "Clau d'accés",
+        "externalRegistrationUserOverviewText": "Resum de registre d'usuari extern"
+      }
+    },
+    "MESSAGE_TEXTS": {
+      "TYPE": "Notificació",
+      "TYPES": {
+        "INIT": "Inicialització",
+        "VE": "Verificació de correu electrònic",
+        "VP": "Verificació de telèfon",
+        "VSO": "Verificar OTP d'SMS",
+        "VEO": "Verificar OTP de correu electrònic",
+        "PR": "Restabliment de contrasenya",
+        "DC": "Reclamar un domini",
+        "PL": "Clau d'accés",
+        "PC": "Canvi de contrasenya",
+        "IU": "Convidar usuari"
+      },
+      "CHIPS": {
+        "firstname": "Nom",
+        "lastname": "Cognoms",
+        "code": "Codi",
+        "preferredLoginName": "Nom d'inici de sessió preferit",
+        "displayName": "Nom mostrat",
+        "nickName": "Àlies",
+        "loginnames": "Noms d'inici de sessió",
+        "domain": "Domini",
+        "lastEmail": "Últim correu electrònic",
+        "lastPhone": "Últim telèfon",
+        "verifiedEmail": "Correu electrònic verificat",
+        "verifiedPhone": "Telèfon verificat",
+        "changedate": "Canviar data",
+        "username": "Nom d'usuari",
+        "tempUsername": "Nom d'usuari temporal",
+        "otp": "OTP",
+        "verifyUrl": "URL per verificar l'OTP",
+        "expiry": "Expiració",
+        "applicationName": "Nom de l'aplicació"
+      },
+      "TOAST": {
+        "UPDATED": "Textos personalitzats desats."
+      }
+    },
+    "DEFAULTLABEL": "La configuració actual es correspon amb l'estàndard de la teva instància.",
+    "BTN_INSTALL": "Configurar",
+    "BTN_EDIT": "Modificar",
+    "DATA": {
+      "DESCRIPTION": "Descripció",
+      "MINLENGTH": "longitud mínima",
+      "HASNUMBER": "té números",
+      "HASSYMBOL": "té símbols",
+      "HASLOWERCASE": "té minúscules",
+      "HASUPPERCASE": "té majúscules",
+      "SHOWLOCKOUTFAILURES": "mostrar errors de bloqueig",
+      "MAXPASSWORDATTEMPTS": "Intents màxims de contrasenya",
+      "MAXOTPATTEMPTS": "Intents màxims d'OTP",
+      "EXPIREWARNDAYS": "Avís de caducitat després de dies",
+      "MAXAGEDAYS": "Validesa màxima en dies",
+      "USERLOGINMUSTBEDOMAIN": "Afegir el domini de l'organització com a sufix dels noms d'inici de sessió",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Si actives aquesta opció, tots els noms d'inici de sessió tindran com a sufix el domini d'aquesta organització. Si aquesta opció està desactivada, hauràs d'assegurar-te que els noms d'usuari són únics per a totes les organitzacions.",
+      "VALIDATEORGDOMAINS": "Verificació de domini de l'organització requerida (desafiament DNS o HTTP)",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "L'adreça del remitent SMTP coincideix amb el domini de la instància",
+      "ALLOWUSERNAMEPASSWORD_DESC": "L'inici de sessió convencional amb nom d'usuari i contrasenya està permès.",
+      "ALLOWEXTERNALIDP_DESC": "L'inici de sessió està permès per als proveïdors d'identitat subjacents",
+      "ALLOWREGISTER_DESC": "Si aquesta opció està seleccionada, apareix un pas addicional durant l'inici de sessió per registrar un usuari.",
+      "FORCEMFA": "Forçar MFA per a tots els usuaris",
+      "FORCEMFALOCALONLY": "Forçar MFA només per als usuaris autenticats localment",
+      "FORCEMFALOCALONLY_DESC": "Si aquesta opció està seleccionada, els usuaris autenticats localment hauran de configurar un doble factor per iniciar la sessió",
+      "HIDEPASSWORDRESET_DESC": "Si aquesta opció està seleccionada, l'usuari no podrà restablir la seva contrasenya en el procés d'inici de sessió.",
+      "HIDELOGINNAMESUFFIX": "Ocultar sufix del nom d'inici de sessió",
+      "HIDELOGINNAMESUFFIX_DESC": "Oculta el sufix del nom d'inici de sessió a la interfície d'accés",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "Si aquesta opció està seleccionada, la pantalla de contrasenya es mostrarà durant el procés d'inici de sessió encara que l'usuari no existeixi. L'error en la comprovació de la contrasenya no revelarà si era l'usuari o la contrasenya el que era incorrecte.",
+      "ALLOWDOMAINDISCOVERY_DESC": "Si aquesta opció està seleccionada, el sufix (@domini.com) d'un nom d'usuari desconegut a la pantalla d'inici de sessió es comprovarà contra els dominis de l'organització i es redirigirà a l'organització en qüestió en cas d'èxit.",
+      "DEFAULTREDIRECTURI": "URI de redirecció per defecte",
+      "DEFAULTREDIRECTURI_DESC": "Defineix on es redirigirà l'usuari si l'inici de sessió ha començat sense un context d'aplicació (p. ex. des d'un correu electrònic)",
+      "ERRORMSGPOPUP": "Mostrar error en diàleg",
+      "DISABLEWATERMARK": "Ocultar marca d'aigua",
+      "DISABLEWATERMARK_DESC": "Ocultar la marca d'aigua Powered by Zitadel a la interfície d'inici de sessió"
+    },
+    "RESET": "Restableix els valors per defecte de la instància",
+    "CREATECUSTOM": "Crear política personalitzada",
+    "TOAST": {
+      "SET": "La política s'ha establert amb èxit!",
+      "RESETSUCCESS": "La política s'ha restablert amb èxit!",
+      "UPLOADSUCCESS": "Pujada amb èxit!",
+      "DELETESUCCESS": "Eliminada amb èxit!",
+      "UPLOADFAILED": "Ha fallat la pujada!"
+    }
+  },
+  "ORG_DETAIL": {
+    "TITLE": "Organització",
+    "DESCRIPTION": "Aquí pots editar la configuració de la teva organització i gestionar els membres.",
+    "DETAIL": {
+      "TITLE": "Detall",
+      "NAME": "Nom",
+      "DOMAIN": "Domini",
+      "STATE": {
+        "0": "No definida",
+        "1": "Activa",
+        "2": "Inactiva"
+      }
+    },
+    "MEMBER": {
+      "TITLE": "Administradors",
+      "USERNAME": "Nom d'usuari",
+      "DISPLAYNAME": "Nom mostrat",
+      "LOGINNAME": "Nom d'inici de sessió",
+      "EMAIL": "Correu electrònic",
+      "ROLES": "Rols",
+      "ADD": "Afegir administrador",
+      "ADDDESCRIPTION": "Introduir els noms dels usuaris a afegir."
+    },
+    "TABLE": {
+      "TOTAL": "Total d'entrades",
+      "SELECTION": "Elements seleccionats",
+      "DEACTIVATE": "Desactivar usuari",
+      "ACTIVATE": "Activar usuari",
+      "DELETE": "Eliminar usuari",
+      "CLEAR": "Esborrar la selecció"
+    }
+  },
+  "PROJECT": {
+    "PAGES": {
+      "TITLE": "Projecte",
+      "DESCRIPTION": "Aquí pots definir aplicacions, gestionar rols i permetre a altres organitzacions utilitzar el teu projecte.",
+      "DELETE": "Eliminar projecte",
+      "DETAIL": "Detall",
+      "CREATE": "Crear projecte",
+      "CREATE_DESC": "Introdueix el nom del teu projecte.",
+      "ROLE": "Rol",
+      "NOITEMS": "Sense projectes",
+      "ZITADELPROJECT": "Això pertany al projecte Zitadel. Atenció: Si fas canvis pot ser que Zitadel no es comporti com s'espera.",
+      "TYPE": {
+        "OWNED": "Projectes propis",
+        "OWNED_SINGULAR": "Projecte propi",
+        "GRANTED_SINGULAR": "Projecte assignat {{name}}"
+      },
+      "PRIVATELABEL": {
+        "TITLE": "Configuració d'imatge de marca",
+        "0": {
+          "TITLE": "No especificat",
+          "DESC": "Tan bon punt l'usuari s'identifiqui, es mostrarà la imatge de marca de l'organització de l'usuari identificat, abans que es mostri l'aspecte per defecte."
+        },
+        "1": {
+          "TITLE": "Utilitzar configuració del projecte",
+          "DESC": "Es mostrarà la imatge de marca de l'organització que és propietària del projecte"
+        },
+        "2": {
+          "TITLE": "Utilitzar configuració de l'organització de l'usuari",
+          "DESC": "Es mostrarà la imatge de marca de l'organització del projecte, però tan bon punt l'usuari s'identifiqui, es mostrarà la configuració de l'organització de l'usuari identificat."
+        },
+        "DIALOG": {
+          "TITLE": "Configuració de la imatge de marca",
+          "DESCRIPTION": "Selecciona el comportament de l'inici de sessió quan s'utilitza el projecte."
+        }
+      },
+      "PINNED": "Fixat",
+      "ALL": "Tots",
+      "CREATEDON": "Creat el",
+      "LASTMODIFIED": "Modificat per última vegada el",
+      "ADDNEW": "Crear un projecte nou",
+      "DIALOG": {
+        "REACTIVATE": {
+          "TITLE": "Reactivar el projecte",
+          "DESCRIPTION": "Realment vols reactivar el teu projecte?"
+        },
+        "DEACTIVATE": {
+          "TITLE": "Desactivar el projecte",
+          "DESCRIPTION": "Realment vols desactivar el teu projecte?"
+        },
+        "DELETE": {
+          "TITLE": "Eliminar el projecte",
+          "DESCRIPTION": "Realment vols eliminar el teu projecte?",
+          "TYPENAME": "Escriu el nom del projecte per eliminar-lo permanentment."
+        }
+      },
+      "ID": "ID del projecte"
+    },
+    "SETTINGS": {
+      "TITLE": "Configuració",
+      "DESCRIPTION": ""
+    },
+    "STATE": {
+      "TITLE": "Estat",
+      "0": "No definit",
+      "1": "Actiu",
+      "2": "Inactiu"
+    },
+    "TYPE": {
+      "TITLE": "Tipus",
+      "0": "Tipus desconegut",
+      "1": "Propi",
+      "2": "Concedit"
+    },
+    "NAME": "Nom",
+    "NAMEDIALOG": {
+      "TITLE": "Canviar el nom del projecte",
+      "DESCRIPTION": "Introdueix el nou nom del teu projecte",
+      "NAME": "Nom nou"
+    },
+    "MEMBER": {
+      "TITLE": "Administradors",
+      "TITLEDESC": "Els administradors poden fer canvis en aquest projecte segons el seu rol.",
+      "DESCRIPTION": "Aquests administradors poden editar el teu projecte.",
+      "USERNAME": "Nom d'usuari",
+      "DISPLAYNAME": "Nom mostrat",
+      "LOGINNAME": "Nom d'inici de sessió",
+      "EMAIL": "Correu electrònic",
+      "ROLES": "Rols",
+      "USERID": "ID d'usuari"
+    },
+    "GRANT": {
+      "EMPTY": "No hi ha organitzacions concessionàries.",
+      "TITLE": "Concessions del projecte",
+      "DESCRIPTION": "Permetre que una altra organització utilitzi el teu projecte.",
+      "EDITTITLE": "Editar els rols",
+      "CREATE": {
+        "TITLE": "Crear una concessió del projecte",
+        "SEL_USERS": "Selecciona els usuaris als quals vols concedir accés",
+        "SEL_PROJECT": "Cercar un projecte",
+        "SEL_ROLES": "Selecciona els rols que vols que s'afegeixin a la concessió",
+        "SEL_USER": "Seleccionar usuaris",
+        "SEL_ORG": "Cercar una organització",
+        "SEL_ORG_DESC": "Cerca l'organització concessionària.",
+        "ORG_DESCRIPTION": "Estàs a punt de concedir accés a un usuari per a l'organització {{name}}.",
+        "ORG_DESCRIPTION_DESC": "Canvia el context a la capçalera superior per concedir accés a un usuari per a una altra organització.",
+        "SEL_ORG_FORMFIELD": "Organització",
+        "FOR_ORG": "La concessió del projecte s'ha creat per a:"
+      },
+      "DETAIL": {
+        "TITLE": "Concessió del projecte",
+        "DESC": "Pots seleccionar quins rols pot utilitzar l'organització especificada i triar administradors",
+        "MEMBERTITLE": "Administradors",
+        "MEMBERDESC": "Aquests són els administradors de l'organització concessionària. Afegeix aquí els usuaris que haurien d'obtenir accés per editar les dades del projecte.",
+        "PROJECTNAME": "Nom del projecte",
+        "GRANTEDORG": "Organització concessionària",
+        "RESOURCEOWNER": "Propietari del recurs"
+      },
+      "STATE": "Estat",
+      "STATES": {
+        "1": "Actiu",
+        "2": "Inactiu"
+      },
+      "ALL": "Tots",
+      "SHOWDETAIL": "Mostrar els detalls",
+      "USER": "Usuari",
+      "MEMBERS": "Administradors",
+      "ORG": "Organització",
+      "PROJECTNAME": "Nom del projecte",
+      "GRANTEDORG": "Organització concessionària",
+      "GRANTEDORGDOMAIN": "Domini",
+      "RESOURCEOWNER": "Propietari del recurs",
+      "GRANTEDORGNAME": "Nom de l'organització",
+      "GRANTID": "ID de concessions",
+      "CREATIONDATE": "Data de creació",
+      "CHANGEDATE": "Última modificació",
+      "DATES": "Data",
+      "ROLENAMESLIST": "Rols",
+      "NOROLES": "Sense rols",
+      "TYPE": "Tipus",
+      "TOAST": {
+        "PROJECTGRANTUSERGRANTADDED": "Concessió del projecte creada.",
+        "PROJECTGRANTADDED": "Concessió del projecte afegida.",
+        "PROJECTGRANTCHANGED": "Concessió del projecte modificada.",
+        "PROJECTGRANTMEMBERADDED": "Administrador de concessions afegit.",
+        "PROJECTGRANTMEMBERCHANGED": "Administrador de concessions modificat.",
+        "PROJECTGRANTMEMBERREMOVED": "Administrador de concessions eliminat.",
+        "PROJECTGRANTUPDATED": "Concessió del projecte actualitzada"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Eliminar la concessió del projecte",
+        "DELETE_DESCRIPTION": "Estàs a punt d'eliminar una concessió de projecte. Segur que vols continuar?"
+      },
+      "ROLES": "Rols del projecte"
+    },
+    "APP": {
+      "TITLE": "Aplicacions",
+      "NAME": "Nom",
+      "NAMEREQUIRED": "Cal indicar un nom."
+    },
+    "ROLE": {
+      "EMPTY": "Encara no s'ha creat cap rol.",
+      "ADDNEWLINE": "Afegir un rol addicional",
+      "KEY": "Clau",
+      "TITLE": "Rols",
+      "DESCRIPTION": "Defineix alguns rols que es puguin utilitzar per crear concessions sobre projectes.",
+      "NAME": "Nom",
+      "DISPLAY_NAME": "Nom mostrat",
+      "GROUP": "Grup",
+      "ACTIONS": "Accions",
+      "ADDTITLE": "Crear un rol",
+      "ADDDESCRIPTION": "Introduir les dades del nou rol.",
+      "EDITTITLE": "Editar el rol",
+      "EDITDESCRIPTION": "Introduir les noves dades del rol.",
+      "DELETE": "Eliminar el rol",
+      "CREATIONDATE": "Creat",
+      "CHANGEDATE": "Última modificació",
+      "SELECTGROUPTOOLTIP": "Selecciona tots els rols del grup {{group}}.",
+      "OPTIONS": "Opcions",
+      "ASSERTION": "Comprovar els rols en l'autenticació",
+      "ASSERTION_DESCRIPTION": "La informació del rol s'envia des de l'endpoint de Userinfo i, segons la configuració de l'aplicació, en tokens i altres tipus.",
+      "CHECK": "Comprovar l'autorització en l'autenticació",
+      "CHECK_DESCRIPTION": "Si s'estableix, els usuaris només es poden autenticar si s'ha assignat algun rol al seu compte.",
+      "DIALOG": {
+        "DELETE_TITLE": "Eliminar el rol",
+        "DELETE_DESCRIPTION": "Estàs a punt d'eliminar un rol de projecte. Segur que vols continuar?"
+      }
+    },
+    "HAS_PROJECT": "Comprovar el projecte en l'autenticació",
+    "HAS_PROJECT_DESCRIPTION": "Es comprova si l'organització de l'usuari té aquest projecte. Si no el té, l'usuari no pot ser autenticat.",
+    "TABLE": {
+      "TOTAL": "Total d'entrades:",
+      "SELECTION": "Elements seleccionats",
+      "DEACTIVATE": "Desactivar el projecte",
+      "ACTIVATE": "Activar el projecte",
+      "DELETE": "Eliminar el projecte",
+      "ORGNAME": "Nom de l'organització",
+      "ORGID": "ID de l'organització",
+      "ORGDOMAIN": "Domini de l'organització",
+      "STATE": "Estat",
+      "TYPE": "Tipus",
+      "CREATIONDATE": "Creat el",
+      "CHANGEDATE": "Última modificació",
+      "RESOURCEOWNER": "Propietari",
+      "SHOWTABLE": "Mostrar la taula",
+      "SHOWGRID": "Mostrar la quadrícula",
+      "EMPTY": "No s'ha trobat cap projecte"
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Administrador eliminat.",
+      "MEMBERSADDED": "Administradors afegits.",
+      "MEMBERADDED": "Administrador afegit.",
+      "MEMBERCHANGED": "Administrador modificat.",
+      "ROLESCREATED": "Rols creats.",
+      "ROLEREMOVED": "Rol eliminat.",
+      "ROLECHANGED": "Rol modificat.",
+      "REACTIVATED": "Reactivat.",
+      "DEACTIVATED": "Desactivat.",
+      "CREATED": "Projecte creat.",
+      "UPDATED": "Projecte modificat.",
+      "GRANTUPDATED": "Concessió del projecte modificada.",
+      "DELETED": "Projecte eliminat."
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Eliminar el rol",
+      "DELETE_DESCRIPTION": "Estàs a punt d'eliminar un rol. Segur que vols continuar?"
+    }
+  },
+  "NEXTSTEPS": {
+    "TITLE": "Passos següents"
+  },
+  "IDP": {
+    "LIST": {
+      "ACTIVETITLE": "Activar els proveïdors d'identitat"
+    },
+    "CREATE": {
+      "TITLE": "Afegir proveïdor",
+      "DESCRIPTION": "Selecciona un o més dels proveïdors següents.",
+      "STEPPERTITLE": "Crear proveïdor",
+      "OIDC": {
+        "TITLE": "Proveïdor OIDC",
+        "DESCRIPTION": "Introdueix les dades requerides pel teu proveïdor OIDC."
+      },
+      "OAUTH": {
+        "TITLE": "Proveïdor OAuth",
+        "DESCRIPTION": "Introdueix les dades requerides pel teu proveïdor OAuth."
+      },
+      "JWT": {
+        "TITLE": "Proveïdor JWT",
+        "DESCRIPTION": "Introdueix les dades requerides pel teu proveïdor JWT."
+      },
+      "GOOGLE": {
+        "TITLE": "Proveïdor Google",
+        "DESCRIPTION": "Introdueix les dades requerides pel teu proveïdor d'identitat Google"
+      },
+      "GITLAB": {
+        "TITLE": "Proveïdor Gitlab",
+        "DESCRIPTION": "Introdueix les dades requerides pel teu proveïdor d'identitat Gitlab"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Proveïdor Gitlab Self Hosted",
+        "DESCRIPTION": "Introdueix les credencials per al teu proveïdor d'identitat Gitlab Self Hosted"
+      },
+      "GITHUBES": {
+        "TITLE": "Proveïdor GitHub Enterprise Server",
+        "DESCRIPTION": "Introdueix les credencials per al teu proveïdor d'identitat GitHub Enterprise Server"
+      },
+      "GITHUB": {
+        "TITLE": "Proveïdor Github",
+        "DESCRIPTION": "Introdueix les credencials per al teu proveïdor d'identitat Github"
+      },
+      "AZUREAD": {
+        "TITLE": "Proveïdor Microsoft",
+        "DESCRIPTION": "Introdueix les credencials per al teu proveïdor d'identitat Microsoft"
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Introdueix les credencials per al teu proveïdor LDAP"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Proveïdor d'identitat (IDP)",
+      "DESCRIPTION": "Actualitza la configuració del teu proveïdor",
+      "DATECREATED": "Creat",
+      "DATECHANGED": "Canviat"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Creació automàtica",
+      "ISAUTOCREATION_DESC": "Si se selecciona, es crearà un compte si encara no existeix.",
+      "ISAUTOUPDATE": "Actualització automàtica",
+      "ISAUTOUPDATE_DESC": "Si se selecciona, els comptes s'actualitzaran en la reautenticació.",
+      "ISCREATIONALLOWED": "Creació de compte permesa (manualment)",
+      "ISCREATIONALLOWED_DESC": "Determina si els comptes es poden crear utilitzant un compte extern. Deshabilita-ho si els usuaris no haurien de poder editar la informació del compte quan la creació automàtica està habilitada.",
+      "ISLINKINGALLOWED": "Enllaç de compte permès (manualment)",
+      "ISLINKINGALLOWED_DESC": "Determina si una identitat es pot vincular manualment a un compte existent. Deshabilita-ho si els usuaris només haurien de poder vincular el compte proposat en cas de vinculació automàtica activa.",
+      "AUTOLINKING_DESC": "Determina si es demanarà a una identitat que es vinculi a un compte existent.",
+      "AUTOLINKINGTYPE": {
+        "0": "Desactivat",
+        "1": "Comprovar nom d'usuari existent",
+        "2": "Comprovar correu electrònic existent"
+      }
+    },
+    "OWNERTYPES": {
+      "0": "desconegut",
+      "1": "Instància",
+      "2": "Organització"
+    },
+    "STATES": {
+      "1": "actiu",
+      "2": "inactiu"
+    },
+    "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Consumers"
+    },
+    "AZUREADTENANTTYPE": "Tipus de Tenant",
+    "AZUREADTENANTID": "ID de Tenant",
+    "EMAILVERIFIED": "Correu verificat",
+    "NAMEHINT": "Si s'especifica es mostrarà a la interfície d'inici de sessió.",
+    "OPTIONAL": "opcional",
+    "LDAPATTRIBUTES": "Atributs LDAP",
+    "UPDATEBINDPASSWORD": "actualitzar contrasenya per a Bind",
+    "UPDATECLIENTSECRET": "actualitzar secret del client",
+    "ADD": "Afegir proveïdor d'identitat",
+    "TYPE": "Tipus",
+    "OWNER": "Propietari",
+    "ID": "ID del proveïdor d'identitat",
+    "NAME": "Nom",
+    "AUTHORIZATIONENDPOINT": "Endpoint d'autorització",
+    "TOKENENDPOINT": "Endpoint de Tokens",
+    "USERENDPOINT": "Endpoint d'usuaris",
+    "IDATTRIBUTE": "Atribut ID",
+    "AVAILABILITY": "Disponibilitat",
+    "AVAILABLE": "disponible",
+    "AVAILABLEBUTINACTIVE": "disponible però inactiu",
+    "SETAVAILABLE": "configurar com a disponible",
+    "SETUNAVAILABLE": "configurar com a no disponible",
+    "CONFIG": "Configuració",
+    "STATE": "Estat",
+    "ISSUER": "Emissor",
+    "SCOPESLIST": "Llista de scopes",
+    "CLIENTID": "ID del client",
+    "CLIENTSECRET": "Secret del client",
+    "LDAPCONNECTION": "Connexió",
+    "LDAPUSERBINDING": "User binding",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Contrasenya Bind",
+    "SERVERS": "Servidors",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout en segons",
+    "USERBASE": "Userbase",
+    "USERFILTERS": "Filtres d'usuari",
+    "USEROBJECTCLASSES": "User Object Classes",
+    "REQUIRED": "obligatori",
+    "LDAPIDATTRIBUTE": "Atribut ID",
+    "AVATARURLATTRIBUTE": "Atribut d'Url d'avatar",
+    "DISPLAYNAMEATTRIBUTE": "Atribut Displayname",
+    "EMAILATTRIBUTEATTRIBUTE": "Atribut Email",
+    "EMAILVERIFIEDATTRIBUTE": "Atribut Email verificat",
+    "FIRSTNAMEATTRIBUTE": "Atribut del nom",
+    "LASTNAMEATTRIBUTE": "Atribut del cognom",
+    "NICKNAMEATTRIBUTE": "Atribut Nickname",
+    "PHONEATTRIBUTE": "Atribut Phone",
+    "PHONEVERIFIEDATTRIBUTE": "Atribut phone verificat",
+    "PREFERREDLANGUAGEATTRIBUTE": "Atribut Preferred language",
+    "PREFERREDUSERNAMEATTRIBUTE": "Atribut Preferred username",
+    "PROFILEATTRIBUTE": "Atribut Profile",
+    "IDPDISPLAYNAMMAPPING": "Mapatge de noms mostrats IDP",
+    "USERNAMEMAPPING": "Mapatge de noms d'usuari",
+    "DATES": "Dates",
+    "CREATIONDATE": "Creat el",
+    "CHANGEDATE": "Última modificació",
+    "DEACTIVATE": "Desactivar",
+    "ACTIVATE": "Activar",
+    "DELETE": "Esborrar",
+    "DELETE_TITLE": "Esborrar IDP",
+    "DELETE_DESCRIPTION": "Estàs a punt d'esborrar un proveïdor d'identitat. Els canvis són irrevocables. Segur que vols fer-ho?",
+    "REMOVE_WARN_TITLE": "Treure desplaçat intern",
+    "REMOVE_WARN_DESCRIPTION": "Estàs a punt d'eliminar un proveïdor d'identitat. Això eliminarà la selecció de l'IDP disponible per als teus usuaris i els usuaris ja registrats no podran tornar a iniciar la sessió. Segur que vols continuar?",
+    "DELETE_SELECTION_TITLE": "Esborrar IDP",
+    "DELETE_SELECTION_DESCRIPTION": "Estàs a punt d'esborrar un proveïdor d'identitat. Els canvis resultants són irrevocables. Segur que vols fer-ho?",
+    "FEDERATEDLOGOUTENABLED": "Tancament de sessió federat habilitat",
+    "FEDERATEDLOGOUTENABLED_DESC": "Si està habilitat, l'usuari també es desconnectarà de l'IdP si finalitza la sessió a Zitadel.",
+    "EMPTY": "No hi ha cap IDP disponible",
+    "OIDC": {
+      "GENERAL": "Informació general",
+      "TITLE": "Configuració OIDC",
+      "DESCRIPTION": "Introdueix les dades del proveïdor d'identitat OIDC."
+    },
+    "JWT": {
+      "TITLE": "Configuració JWT",
+      "DESCRIPTION": "Introdueix les dades per al proveïdor d'identitat JWT.",
+      "HEADERNAME": "Nom de capçalera",
+      "JWTENDPOINT": "JWT Endpoint",
+      "JWTKEYSENDPOINT": "JWT Keys Endpoint",
+      "AUDIENCE": "Audience"
+    },
+    "TOAST": {
+      "SAVED": "Desat amb èxit.",
+      "REACTIVATED": "IDP reactivat.",
+      "DEACTIVATED": "IDP desactivat.",
+      "SELECTEDREACTIVATED": "Els IDPs seleccionats s'han reactivat.",
+      "SELECTEDDEACTIVATED": "Els IDPs seleccionats s'han desactivat.",
+      "SELECTEDKEYSDELETED": "Els IDPs seleccionats s'han esborrat.",
+      "DELETED": "IDP eliminat amb èxit!",
+      "ADDED": "Afegit amb èxit.",
+      "REMOVED": "Eliminat amb èxit."
+    },
+    "ISIDTOKENMAPPING": "Assignació de l'ID token",
+    "ISIDTOKENMAPPING_DESC": "Si se selecciona, la informació del proveïdor s'assigna des de l'ID token, no des del punt final de userinfo.",
+    "USEPKCE": "Usa PKCE",
+    "USEPKCE_DESC": "Determina si els paràmetres code_challenge i code_challenge_method s'inclouen a la sol·licitud d'autenticació."
+  },
+  "MFA": {
+    "LIST": {
+      "MULTIFACTORTITLE": "Clau d'accés",
+      "MULTIFACTORDESCRIPTION": "Defineix aquí els teus multifactors per a la teva autenticació amb clau d'accés.",
+      "SECONDFACTORTITLE": "Autenticació multifactor",
+      "SECONDFACTORDESCRIPTION": "Defineix altres factors possibles amb els quals pots assegurar la teva autenticació amb contrasenya."
+    },
+    "CREATE": {
+      "TITLE": "Nou factor",
+      "DESCRIPTION": "Selecciona el teu nou tipus de factor."
+    },
+    "DELETE": {
+      "TITLE": "Esborrar factor",
+      "DESCRIPTION": "Estàs a punt d'esborrar un factor de les configuracions d'inici de sessió. Segur?"
+    },
+    "TOAST": {
+      "ADDED": "Afegit amb èxit.",
+      "SAVED": "Desat amb èxit.",
+      "DELETED": "Eliminat correctament."
+    },
+    "TYPE": "Tipus",
+    "MULTIFACTORTYPES": {
+      "0": "Desconegut",
+      "1": "Clau d'accés"
+    },
+    "SECONDFACTORTYPES": {
+      "0": "Desconegut",
+      "1": "One Time Password per aplicació autenticadora (TOTP)",
+      "2": "Clau d'accés",
+      "3": "OTP per correu electrònic (OTP Email)",
+      "4": "OTP per SMS (OTP SMS)",
+      "5": "Codis de recuperació"
+    }
+  },
+  "LOGINPOLICY": {
+    "CREATE": {
+      "TITLE": "Configuració d'inici de sessió",
+      "DESCRIPTION": "Defineix com els teus usuaris es poden autenticar a la teva organització."
+    },
+    "IDPS": "Proveïdors d'identitat (IDPs)",
+    "ADDIDP": {
+      "TITLE": "Afegir proveïdor d'identitat (IDP)",
+      "DESCRIPTION": "Pots seleccionar proveïdors predefinits o creats per un mateix per a l'autenticació.",
+      "SELECTIDPS": "Proveïdors d'identitat (IDP)"
+    },
+    "PASSWORDLESS": "Inici de sessió amb clau d'accés",
+    "PASSWORDLESSTYPE": {
+      "0": "No permès",
+      "1": "Permès"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "Proveïdor SMTP",
+      "DESCRIPTION": "Aquests són els proveïdors SMTP per a la teva instància de Zitadel. Activa el que vulguis utilitzar per enviar notificacions als teus usuaris.",
+      "EMPTY": "No hi ha cap proveïdor SMTP disponible",
+      "ACTIVATED": "Activat",
+      "ACTIVATE": "Activar proveïdor",
+      "DEACTIVATE": "Desactivar proveïdor",
+      "TEST": "Prova el teu proveïdor",
+      "TYPE": "Tipus",
+      "DIALOG": {
+        "ACTIVATED": "La teva configuració SMTP s'ha activat",
+        "ACTIVATE_WARN_TITLE": "Activar configuració SMTP",
+        "ACTIVATE_WARN_DESCRIPTION": "Estàs a punt d'activar una configuració SMTP. Primer desactivarem la configuració del teu proveïdor actual i després activarem aquesta configuració. Estàs segur?",
+        "DEACTIVATE_WARN_TITLE": "Desactivar configuració SMTP",
+        "DEACTIVATE_WARN_DESCRIPTION": "Estàs a punt de desactivar una configuració SMTP. Estàs segur?",
+        "DEACTIVATED": "La configuració SMTP s'ha desactivat",
+        "DELETE_TITLE": "Eliminar configuració SMTP",
+        "DELETE_DESCRIPTION": "Estàs a punt d'eliminar una configuració. Confirma aquesta acció escrivint el nom del remitent",
+        "DELETED": "La configuració SMTP s'ha eliminat",
+        "SENDER": "Escriu {{ value }} per eliminar aquesta configuració SMTP."
+      }
+    },
+    "CREATE": {
+      "TITLE": "Afegeix un proveïdor SMTP",
+      "DESCRIPTION": "Selecciona un o més dels proveïdors següents.",
+      "STEPS": {
+        "TITLE": "Afegeix un proveïdor SMTP {{ value }} ",
+        "CREATE_DESC_TITLE": "Introdueix la teva configuració SMTP de {{ value }} pas a pas",
+        "CURRENT_DESC_TITLE": "Aquestes són les teves configuracions SMTP",
+        "PROVIDER_SETTINGS": "Configuració del proveïdor SMTP",
+        "SENDER_SETTINGS": "Configuració del remitent",
+        "NEXT_STEPS": "Passos següents",
+        "ACTIVATE": {
+          "TITLE": "Activa el teu proveïdor SMTP",
+          "DESCRIPTION": "Zitadel no pot utilitzar aquest proveïdor SMTP per enviar notificacions fins que l'actives. Si actives aquest proveïdor, qualsevol altre proveïdor que estigués activat es desactivarà ara."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Desactiva el teu proveïdor SMTP",
+          "DESCRIPTION": "Si desactives aquest proveïdor SMTP, Zitadel no el pot utilitzar per enviar notificacions fins que el tornis a activar."
+        },
+        "SAVE_SETTINGS": "Desa la teva configuració",
+        "TEST": {
+          "TITLE": "Prova la teva configuració",
+          "DESCRIPTION": "Pots provar la teva configuració SMTP i revisar el resultat de la prova abans de desar la configuració",
+          "RESULT": "El teu correu electrònic s'ha enviat correctament"
+        }
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Configuració del proveïdor SMTP"
+    },
+    "EMPTY": "No hi ha cap proveïdor SMTP disponible",
+    "STEPS": {
+      "SENDGRID": {}
+    }
+  },
+  "APP": {
+    "LIST": "Aplicacions",
+    "COMPLIANCE": "Compliment OIDC",
+    "URLS": "URLs",
+    "CONFIGURATION": "Configuració",
+    "TOKEN": "Configuració de Token",
+    "PAGES": {
+      "TITLE": "Aplicació",
+      "ID": "ID d'aplicació",
+      "DESCRIPTION": "Aquí pots editar les dades de la teva aplicació i la seva configuració.",
+      "CREATE": "Crear aplicació",
+      "CREATE_SELECT_PROJECT": "Selecciona primer el teu projecte",
+      "CREATE_NEW_PROJECT": "o crea'n un de nou <a href='{{url}}' title='Crear projecte'>aquí</a>.",
+      "CREATE_DESC_TITLE": "Introdueix els detalls de la teva aplicació pas a pas",
+      "CREATE_DESC_SUB": "Es generarà automàticament una configuració recomanada.",
+      "STATE": "Estat",
+      "DATECREATED": "Creada",
+      "DATECHANGED": "Modificada",
+      "URLS": "URLs",
+      "DELETE": "Eliminar App",
+      "JUMPTOPROJECT": "Per configurar rols, assignacions de rols i més, navega fins al projecte.",
+      "DETAIL": {
+        "TITLE": "Detall",
+        "STATE": {
+          "0": "No definida",
+          "1": "Activa",
+          "2": "Inactiva"
+        }
+      },
+      "DIALOG": {
+        "CONFIG": {
+          "TITLE": "Canviar la configuració OIDC"
+        },
+        "DELETE": {
+          "TITLE": "Eliminar App",
+          "DESCRIPTION": "Realment vols eliminar aquesta aplicació?"
+        }
+      },
+      "NEXTSTEPS": {
+        "TITLE": "Passos següents",
+        "0": {
+          "TITLE": "Afegir rols",
+          "DESC": "Introdueix els teus rols de projecte"
+        },
+        "1": {
+          "TITLE": "Afegir usuaris",
+          "DESC": "Afegir nous usuaris de la teva organització"
+        },
+        "2": {
+          "TITLE": "Ajuda i suport",
+          "DESC": "Llegeix la nostra documentació sobre com crear aplicacions o contacta amb el nostre suport"
+        }
+      }
+    },
+    "NAMEDIALOG": {
+      "TITLE": "Reanomenar App",
+      "DESCRIPTION": "Introdueix el nou nom de la teva app",
+      "NAME": "Nom nou"
+    },
+    "NAME": "Nom",
+    "TYPE": "Tipus d'aplicació",
+    "AUTHMETHOD": "Mètode d'autenticació",
+    "AUTHMETHODSECTION": "Mètode d'autenticació",
+    "GRANT": "Tipus de concessió",
+    "ADDITIONALORIGINS": "Orígens addicionals",
+    "ADDITIONALORIGINSDESC": "Si vols afegir orígens addicionals a la teva aplicació que no s'utilitzen com a redirecció, pots fer-ho aquí.",
+    "ORIGINS": "Orígens",
+    "NOTANORIGIN": "El valor introduït no és un origen",
+    "PROSWITCH": "Sóc pro. Salta aquest assistent.",
+    "NAMEANDTYPESECTION": "Nom i tipus",
+    "TITLEFIRST": "Nom de l'aplicació",
+    "TYPETITLE": "Tipus d'aplicació",
+    "OIDC": {
+      "WELLKNOWN": "Es poden obtenir més enllaços des de l'<a href='{{url}}' title='Discovery endpoint' target='_blank'>endpoint de descobriment</a>.",
+      "INFO": {
+        "ISSUER": "Emissor",
+        "CLIENTID": "Id de client"
+      },
+      "CURRENT": "Configuració actual",
+      "TOKENSECTIONTITLE": "Opcions d'AuthToken",
+      "REDIRECTSECTIONTITLE": "Configuració de redirecció",
+      "REDIRECTTITLE": "Especifica les URIs a les quals redirigirà l'inici de sessió.",
+      "POSTREDIRECTTITLE": "Aquesta és la URI a la qual es redirigirà després de tancar la sessió.",
+      "REDIRECTDESCRIPTIONWEB": "Les URIs de redirecció han de començar amb https://. http:// només és vàlida amb el mode de desenvolupament activat.",
+      "REDIRECTDESCRIPTIONNATIVE": "Les URIs de redirecció han de començar amb el teu propi protocol, http://127.0.0.1, http://[::1] o http://localhost.",
+      "REDIRECTNOTVALID": "Aquesta URI de redirecció no és vàlida.",
+      "COMMAORENTERSEPERATION": "separat amb ↵",
+      "TYPEREQUIRED": "El tipus és obligatori.",
+      "TITLE": "Configuració OIDC",
+      "CLIENTID": "ID de client",
+      "CLIENTDETAILS": "Detalls del client",
+      "CLIENTSECRET_NOSECRET": "Amb el flux d'autenticació que has triat, no es requereix cap secret i, per tant, no està disponible.",
+      "CLIENTSECRET_DESCRIPTION": "Guarda el teu secret de client en un lloc segur, ja que desapareixerà un cop es tanqui el diàleg.",
+      "REGENERATESECRET": "Regenerar secret de client",
+      "DEVMODE": "Mode Desenvolupament",
+      "DEVMODE_ENABLED": "Activat",
+      "DEVMODE_DISABLED": "Desactivat",
+      "DEVMODEDESC": "Atenció: Si el mode de desenvolupament està activat, les URIs de redirecció no es validaran.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Ometre la pàgina d'inici de sessió correcte",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Omet la pàgina d'èxit després d'iniciar la sessió en aquesta app nativa.",
+      "REDIRECT": "URIs de redirecció",
+      "REDIRECTSECTION": "URIs de redirecció",
+      "POSTLOGOUTREDIRECT": "URIs a utilitzar després de tancar la sessió",
+      "RESPONSESECTION": "Tipus de respostes",
+      "GRANTSECTION": "Tipus de concessions",
+      "GRANTTITLE": "Selecciona els teus tipus de concessions. Nota: Implícit només està disponible per a aplicacions de navegador.",
+      "APPTYPE": {
+        "0": "Web",
+        "1": "User Agent",
+        "2": "Natiu"
+      },
+      "RESPONSETYPE": "Tipus de respostes",
+      "RESPONSE": {
+        "0": "Codi",
+        "1": "ID Token",
+        "2": "Token-ID Token"
+      },
+      "REFRESHTOKEN": "Token de refresc",
+      "GRANTTYPE": "Tipus de concessions",
+      "GRANT": {
+        "0": "Codi d'autorització",
+        "1": "Implícit",
+        "2": "Token de refresc",
+        "3": "Device Code",
+        "4": "Intercanvi de tokens"
+      },
+      "AUTHMETHOD": {
+        "0": "Bàsic",
+        "1": "Post",
+        "2": "Cap",
+        "3": "Clau privada JWT"
+      },
+      "TOKENTYPE": "Auth Token Type",
+      "TOKENTYPE0": "Bearer Token",
+      "TOKENTYPE1": "JWT",
+      "UNSECUREREDIRECT": "Espero que sàpigues què estàs fent.",
+      "OVERVIEWSECTION": "Resum",
+      "OVERVIEWTITLE": "Has acabat. Revisa la teva configuració.",
+      "ACCESSTOKENROLEASSERTION": "Afegir rols d'usuari al token d'accés",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Si se selecciona, els rols sol·licitats per a l'usuari autenticat s'afegeixen al token d'accés.",
+      "IDTOKENROLEASSERTION": "Rols d'usuari dins del Token d'ID",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "Si se selecciona, els rols sol·licitats per a l'usuari autenticat s'afegeixen al token d'ID.",
+      "IDTOKENUSERINFOASSERTION": "Informació de l'usuari dins del Token d'ID",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Permet a les aplicacions obtenir els claims de perfil, correu electrònic, telèfon i adreça del token d'ID.",
+      "CLOCKSKEW": "Permet a les aplicacions gestionar el desfasament de rellotge de l'OP i de l'aplicació. La durada (0-5 s) s'afegirà al claim exp i es restarà d'iats, auth_time i nbf.",
+      "RECOMMENDED": "recomanat",
+      "NOTRECOMMENDED": "no recomanat",
+      "SELECTION": {
+        "APPTYPE": {
+          "WEB": {
+            "TITLE": "Web",
+            "DESCRIPTION": "Aplicacions web habituals com .net, PHP, Node.js, Java, etc."
+          },
+          "NATIVE": {
+            "TITLE": "Natiu",
+            "DESCRIPTION": "Apps mòbils, d'escriptori, dispositius intel·ligents, etc."
+          },
+          "USERAGENT": {
+            "TITLE": "User Agent",
+            "DESCRIPTION": "Single Page Applications (SPA) i en general tots els frameworks de JS executats en navegadors"
+          }
+        }
+      },
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+    },
+    "API": {
+      "INFO": {
+        "CLIENTID": "Id de client"
+      },
+      "REGENERATESECRET": "Regenerar el secret del client",
+      "SELECTION": {
+        "TITLE": "API",
+        "DESCRIPTION": "APIs en general"
+      },
+      "AUTHMETHOD": {
+        "0": "Bàsica",
+        "1": "Clau privada JWT"
+      }
+    },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "Aplicacions SAML"
+      },
+      "CONFIGSECTION": "Configuració SAML",
+      "CHOOSEMETADATASOURCE": "Proporciona la teva configuració SAML fent servir una de les opcions següents:",
+      "METADATAOPT1": "Opció 1. Especifica l'URL on es troba el fitxer de metadades",
+      "METADATAOPT2": "Opció 2. Puja un fitxer que contingui les teves metadades XML",
+      "METADATAOPT3": "Opció 3. Crea, al vol, un fitxer de metadades mínim proporcionant l'ENTITYID i l'ACS URL",
+      "UPLOAD": "Pujar fitxer XML",
+      "METADATA": "Metadades",
+      "METADATAFROMFILE": "Metadades des d'un fitxer",
+      "CERTIFICATE": "Certificat SAML",
+      "DOWNLOADCERT": "Descarregar el certificat SAML",
+      "CREATEMETADATA": "Crear metadades",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
+    },
+    "AUTHMETHODS": {
+      "CODE": {
+        "TITLE": "Codi",
+        "DESCRIPTION": "Intercanvia el codi d'autorització per tokens"
+      },
+      "PKCE": {
+        "TITLE": "PKCE",
+        "DESCRIPTION": "Usar un hash aleatori en lloc d'un secret de client estàtic per a més seguretat"
+      },
+      "POST": {
+        "TITLE": "POST",
+        "DESCRIPTION": "Enviar client_id i client_secret com a part del formulari"
+      },
+      "PK_JWT": {
+        "TITLE": "Clau privada JWT",
+        "DESCRIPTION": "Usar una clau privada per autoritzar l'aplicació"
+      },
+      "BASIC": {
+        "TITLE": "Bàsica",
+        "DESCRIPTION": "Autenticació amb nom d'usuari i contrasenya"
+      },
+      "IMPLICIT": {
+        "TITLE": "Implícita",
+        "DESCRIPTION": "Obtén els tokens directament de l'endpoint d'autorització"
+      },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Autoritzar el dispositiu en un ordinador o telèfon."
+      },
+      "CUSTOM": {
+        "TITLE": "Personalitzada",
+        "DESCRIPTION": "La teva configuració no es correspon amb cap de les altres opcions."
+      }
+    },
+    "TOAST": {
+      "REACTIVATED": "Aplicació reactivada.",
+      "DEACTIVATED": "Aplicació desactivada.",
+      "OIDCUPDATED": "App actualitzada.",
+      "APIUPDATED": "App actualitzada",
+      "UPDATED": "App actualitzada.",
+      "CREATED": "App creada.",
+      "CLIENTSECRETREGENERATED": "secret del client generat.",
+      "DELETED": "App esborrada.",
+      "CONFIGCHANGED": "Canvis detectats!"
+    },
+    "LOGINV2": {
+      "USEV2": "Usar la nova interfície d'usuari d'inici de sessió",
+      "BASEURL": "URL base personalitzat per a la nova interfície d'usuari d'inici de sessió"
+    }
+  },
+  "GENDERS": {
+    "0": "Desconegut",
+    "1": "Dona",
+    "2": "Home",
+    "3": "Altre"
+  },
+  "LANGUAGES": {
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文",
+    "bg": "Български",
+    "ca": "Català",
+    "pt": "Portuguese",
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский",
+    "nl": "Nederlands",
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română",
+    "tr": "Türkçe",
+    "uk": "Українська",
+    "ar": "العربية"
+  },
+  "MEMBER": {
+    "ADD": "Afegir un Administrador",
+    "CREATIONTYPE": "Tipus de creació",
+    "CREATIONTYPES": {
+      "3": "Instància",
+      "2": "Organització",
+      "0": "Projecte propi",
+      "1": "Projecte amb accés concedit",
+      "4": "Projecte"
+    },
+    "EDITROLE": "Editar rols",
+    "EDITFOR": "Editar els rols per a l'usuari: {{value}}",
+    "DIALOG": {
+      "DELETE_TITLE": "Eliminar Administrador",
+      "DELETE_DESCRIPTION": "Estàs a punt d'eliminar un administrador. Estàs segur?"
+    },
+    "SHOWDETAILS": "Mostrar detalls"
+  },
+  "ROLESLABEL": "Rols",
+  "GRANTS": {
+    "TITLE": "Assignacions de rols",
+    "DESC": "Aquestes són totes les assignacions de rols de la teva organització.",
+    "DELETE": "Esborrar assignació de rol",
+    "EMPTY": "No s'han trobat assignacions de rols",
+    "ADD": "Crear assignació de rol",
+    "ADD_BTN": "Nova",
+    "PROJECT": {
+      "TITLE": "Assignació de rol",
+      "DESCRIPTION": "Defineix les assignacions de rols per al projecte especificat. Tingues en compte que només pots veure entrades dels projectes i usuaris per als quals tens permisos."
+    },
+    "USER": {
+      "TITLE": "Assignació de rol",
+      "DESCRIPTION": "Defineix les assignacions de rols per a l'usuari especificat. Tingues en compte que només pots veure entrades dels projectes i usuaris per als quals tens permisos."
+    },
+    "CREATE": {
+      "TITLE": "Crear assignació de rol",
+      "DESCRIPTION": "Cercar l'organització, el projecte i els rols corresponents."
+    },
+    "EDIT": {
+      "TITLE": "Canviar assignació de rol"
+    },
+    "DETAIL": {
+      "TITLE": "Detalls de l'assignació de rol",
+      "DESCRIPTION": "Aquí pots veure tots els detalls de l'assignació de rol."
+    },
+    "TOAST": {
+      "UPDATED": "Assignació de rol actualitzada.",
+      "REMOVED": "Assignació de rol eliminada",
+      "BULKREMOVED": "Assignacions de rols eliminades.",
+      "CANTSHOWINFO": "No pots visitar el perfil d'aquest usuari perquè no ets administrador de l'organització a la qual pertany aquest usuari."
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Esborrar assignació de rol",
+      "DELETE_DESCRIPTION": "Estàs a punt d'esborrar una assignació de rol. Vols continuar?",
+      "BULK_DELETE_TITLE": "Esborrar assignacions de rols",
+      "BULK_DELETE_DESCRIPTION": "Estàs a punt d'esborrar múltiples assignacions de rols. Vols continuar?"
+    }
+  },
+  "CHANGES": {
+    "LISTTITLE": "Últims canvis",
+    "BOTTOM": "Has arribat al final de la llista.",
+    "LOADMORE": "Carregar més",
+    "ORG": {
+      "TITLE": "Activitat",
+      "DESCRIPTION": "Aquí pots veure els últims esdeveniments que han generat un canvi d'organització."
+    },
+    "PROJECT": {
+      "TITLE": "Activitat",
+      "DESCRIPTION": "Aquí pots veure els últims esdeveniments que han generat un canvi de projecte."
+    },
+    "USER": {
+      "TITLE": "Activitat",
+      "DESCRIPTION": "Aquí pots veure els últims esdeveniments que han generat un canvi d'usuari."
+    }
+  },
+  "INSTANCEID": "ID d'instància"
+}
