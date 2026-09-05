@@ -13,7 +13,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { AppSecretDialogComponent, AppSecretDialogData } from '../app-secret-dialog/app-secret-dialog.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { Framework } from 'src/app/components/quickstart/quickstart.component';
-import { OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
+import { FRAMEWORK_DEFINITION, OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
 import { NavigationService } from 'src/app/services/navigation.service';
 import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.component';
 
@@ -34,6 +34,7 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
 
   public OIDCAppType: any = OIDCAppType;
   public requestRedirectValuesSubject$: Subject<void> = new Subject();
+  public frameworks: Framework[] = FRAMEWORK_DEFINITION.map((f) => ({ ...f, fragment: '' }));
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -100,6 +101,14 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
       ];
       this.projectId = projectId;
       this.breadcrumbService.setBreadcrumb(breadcrumbs);
+    }
+
+    const frameworkId = this.activatedRoute.snapshot.queryParamMap.get('framework');
+    if (frameworkId) {
+      const framework = this.frameworks.find((f) => f.id === frameworkId);
+      if (framework) {
+        this.setFramework(framework);
+      }
     }
   }
 
