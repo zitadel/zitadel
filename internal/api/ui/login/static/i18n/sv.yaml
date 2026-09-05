@@ -22,7 +22,7 @@ SelectAccount:
   Title: Välj konto
   Description: Använd befintligt konto
   TitleLinking: Välj konto som ska kopplas ihop
-  DescriptionLinking: Välj det konto som ska kopplas ihop med det extrerna kontot.
+  DescriptionLinking: Välj det konto som ska kopplas ihop med det externa kontot.
   OtherUser: Välj ett annat konto
   SessionState0: aktivt
   SessionState1: Utloggad
@@ -328,7 +328,7 @@ ExternalRegistrationUserOverview:
 
 RegistrationOrg:
   Title: Registrering av organisation
-  Description: Ange din organisation-data.
+  Description: Ange din organisations namn och användardata.
   OrgNameLabel: Namn på organisation
   EmailLabel: E-post
   UsernameLabel: Användarnamn
