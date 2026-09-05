@@ -46,6 +46,9 @@ func (s *Server) refreshTokenV1(ctx context.Context, client *Client, r *op.Clien
 	if err != nil {
 		return nil, err
 	}
+	if refreshToken.ClientID != client.client.ClientID {
+		return nil, oidc.ErrInvalidClient().WithDescription("client_id does not correspond to the client_id in the refresh token")
+	}
 	scope, err := validateRefreshTokenScopes(refreshToken.Scopes, r.Data.Scopes)
 	if err != nil {
 		return nil, err
