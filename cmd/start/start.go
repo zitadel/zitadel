@@ -777,6 +777,17 @@ func startAPIs(
 	return apis, nil
 }
 
+const (
+	// shutdownDrainDelay keeps the server serving after receiving SIGTERM, giving the
+	// upstream load balancer / serverless NEG time to stop routing new requests to this
+	// instance before we close the listener. Without it, requests still routed during
+	// teardown are reset and recorded as 5xx on every deploy and scale-down.
+	// shutdownDrainDelay + shutdownGracePeriod must stay within the platform's
+	// SIGTERM->SIGKILL grace period (Cloud Run default is ~10s). Tune per platform.
+	shutdownDrainDelay  = 3 * time.Second
+	shutdownGracePeriod = 5 * time.Second
+)
+
 func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls.Config, shutdown <-chan os.Signal) error {
 	http2Server := &http2.Server{}
 	http1Server := &http.Server{Handler: h2c.NewHandler(router, http2Server), TLSConfig: tlsConfig}
@@ -803,7 +814,10 @@ func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls
 	case err := <-errCh:
 		return fmt.Errorf("error starting server: %w", err)
 	case <-shutdown:
-		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+		// Lame-duck: keep serving during the drain window so the load balancer
+		// deregisters this instance before we stop accepting connections.
+		time.Sleep(shutdownDrainDelay)
+		ctx, cancel := context.WithTimeout(ctx, shutdownGracePeriod)
 		defer cancel()
 		return shutdownServer(ctx, http1Server)
 	case <-ctx.Done():

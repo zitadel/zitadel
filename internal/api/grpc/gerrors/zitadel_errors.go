@@ -82,6 +82,13 @@ func ExtractZITADELError(err error) (code codes.Code, msg, id string) {
 }
 
 func extractError(err error) (c codes.Code, msg, id string, lvl slog.Level) {
+	// A cancelled request context (client disconnect, browser navigation away, LB idle
+	// timeout) is not a server fault. Map it to codes.Canceled so the grpc-gateway
+	// returns 499 instead of falling through to codes.Unknown => 500. This keeps benign
+	// client cancellations out of the 5xx availability SLI.
+	if errors.Is(err, context.Canceled) {
+		return codes.Canceled, "context canceled", "", slog.LevelWarn
+	}
 	connErr := new(pgconn.ConnectError)
 	if ok := errors.As(err, &connErr); ok {
 		return codes.Internal, "db connection error", "", slog.LevelError
