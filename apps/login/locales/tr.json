@@ -1,7 +1,9 @@
 {
   "common": {
     "back": "Geri",
-    "title": "Zitadel ile Giriş"
+    "title": "Zitadel ile Giriş",
+    "showPassword": "Parolayı göster",
+    "hidePassword": "Parolayı gizle"
   },
   "accounts": {
     "title": "Hesaplar",

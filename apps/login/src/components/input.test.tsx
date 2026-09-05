@@ -1,6 +1,10 @@
-import { render, screen } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { TextInput } from "./input";
+
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => key,
+}));
 
 describe("TextInput Component", () => {
   const originalEnv = process.env;
@@ -189,6 +193,54 @@ describe("TextInput Component", () => {
       const { container } = render(<TextInput label="UniqueRequiredField" required />);
       const label = container.querySelector("label");
       expect(label?.textContent).toContain("*");
+    });
+  });
+
+  describe("Password Reveal Toggle", () => {
+    const revealButton = (container: HTMLElement) =>
+      container.querySelector('[data-testid="password-reveal-button"]') as HTMLButtonElement | null;
+
+    it("renders a reveal button for password inputs and toggles visibility", () => {
+      const { container } = render(<TextInput label="Password" type="password" />);
+      const input = container.querySelector("input");
+      const button = revealButton(container);
+
+      expect(input?.type).toBe("password");
+      expect(button?.getAttribute("aria-pressed")).toBe("false");
+
+      fireEvent.click(button!);
+      expect(input?.type).toBe("text");
+      expect(button?.getAttribute("aria-pressed")).toBe("true");
+
+      fireEvent.click(button!);
+      expect(input?.type).toBe("password");
+    });
+
+    it("does not render the reveal button for non-password inputs", () => {
+      const { container } = render(<TextInput label="Email" type="text" />);
+      expect(revealButton(container)).toBeNull();
+    });
+
+    it("hides the reveal button when showPasswordToggle is false", () => {
+      const { container } = render(<TextInput label="Password" type="password" showPasswordToggle={false} />);
+      expect(revealButton(container)).toBeNull();
+      expect(container.querySelector("input")?.type).toBe("password");
+    });
+
+    it("does not submit the surrounding form when the reveal button is clicked", () => {
+      let submitted = false;
+      const { container } = render(
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            submitted = true;
+          }}
+        >
+          <TextInput label="Password" type="password" />
+        </form>,
+      );
+      fireEvent.click(revealButton(container)!);
+      expect(submitted).toBe(false);
     });
   });
 });

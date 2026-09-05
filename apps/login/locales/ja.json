@@ -1,7 +1,9 @@
 {
   "common": {
     "back": "戻る",
-    "title": "Zitadelでログイン"
+    "title": "Zitadelでログイン",
+    "showPassword": "パスワードを表示",
+    "hidePassword": "パスワードを非表示"
   },
   "accounts": {
     "title": "アカウント",
