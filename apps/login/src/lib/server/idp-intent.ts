@@ -520,6 +520,26 @@ async function handleUserExists(ctx: IDPHandlerContext): Promise<IDPHandlerResul
 }
 
 /**
+ * Reads the identifier that an auto-linking lookup matched on, so candidates can be
+ * compared against the value the provider sent with their original casing.
+ *
+ * Returns undefined when the user does not carry that identifier, which never equals
+ * the searched value and therefore never counts as an exact match.
+ */
+function identifierOf(
+  user: NonNullable<Awaited<ReturnType<typeof listUsers>>["result"]>[number],
+  matchedBy: "email" | "username" | undefined,
+): string | undefined {
+  if (matchedBy === "username") {
+    return user.username;
+  }
+  if (matchedBy === "email") {
+    return user.type?.case === "human" ? user.type.value.email?.email : undefined;
+  }
+  return undefined;
+}
+
+/**
  * CASE 3: Auto-linking (search for user and link)
  */
 async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResult> {
@@ -529,24 +549,58 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
   const { organization, provider } = ctx.params;
 
   if (options?.autoLinking) {
-    let foundUser;
+    let foundUsers: Awaited<ReturnType<typeof listUsers>>["result"] = [];
+    let matchedBy: "email" | "username" | undefined;
+    let searchedValue: string | undefined;
     const email = createUserData?.email?.email;
     const emailVerified =
       createUserData?.email?.verification?.case === "isVerified" && createUserData?.email?.verification?.value;
 
     if (options.autoLinking === AutoLinkingOption.EMAIL && email && emailVerified) {
-      foundUser = await listUsers({ serviceConfig, email, organizationId: organization }).then((response) => {
-        return response.result ? response.result[0] : null;
+      matchedBy = "email";
+      searchedValue = email;
+      foundUsers = await listUsers({ serviceConfig, email, organizationId: organization }).then((response) => {
+        return response.result ?? [];
       });
     } else if (options.autoLinking === AutoLinkingOption.USERNAME) {
-      foundUser = await listUsers({
+      matchedBy = "username";
+      searchedValue = idpInformation!.userName;
+      foundUsers = await listUsers({
         serviceConfig,
         userName: idpInformation!.userName,
         organizationId: organization,
       }).then((response) => {
-        return response.result ? response.result[0] : null;
+        return response.result ?? [];
       });
     }
+
+    // Only an unambiguous match may be linked. The lookup ignores case, and ZITADEL
+    // does not enforce email uniqueness, so it can legitimately return several users;
+    // instances upgraded from before the unique constraints were lowercased can also
+    // still hold usernames that differ only by case.
+    //
+    // Prefer the candidate that matches what the provider sent exactly: it is the
+    // strongest signal available, and it keeps such instances working instead of
+    // failing them closed. Only when that does not single one out is the result truly
+    // ambiguous, and then the identity must neither be linked to an arbitrary account
+    // nor fall through to user creation.
+    if (foundUsers.length > 1) {
+      const exactMatches = foundUsers.filter((user) => identifierOf(user, matchedBy) === searchedValue);
+
+      if (exactMatches.length === 1) {
+        logger.info("Auto-linking resolved several matches by exact casing", { count: foundUsers.length });
+        foundUsers = exactMatches;
+      } else {
+        logger.error("Auto-linking matched more than one user", {
+          count: foundUsers.length,
+          exactMatches: exactMatches.length,
+        });
+        const params = buildRedirectParams();
+        return { redirect: `/idp/${provider}/linking-failed?${params}&error=ambiguous_match` };
+      }
+    }
+
+    const foundUser = foundUsers[0];
 
     if (foundUser) {
       try {
