@@ -25,6 +25,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 		userMapper   func(info *oidc.UserInfo) idp.User
 		httpMock     func(issuer string)
 		opts         []ProviderOpts
+		params       []idp.Parameter
 	}
 	tests := []struct {
 		name   string
@@ -81,6 +82,210 @@ func TestProvider_BeginAuth(t *testing.T) {
 			},
 			want: &Session{AuthURL: "https://issuer.com/authorize?client_id=clientID&code_challenge=2ZoH_a01aprzLkwVbjlPsBo4m8mJ_zOKkaDqYM7Oh5w&code_challenge_method=S256&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState"},
 		},
+		{
+			name: "authorization parameters override the default prompt",
+			fields: fields{
+				name:         "oidc",
+				issuer:       "https://issuer.com",
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
+				userMapper:   DefaultMapper,
+				httpMock: func(issuer string) {
+					gock.New(issuer).
+						Get(oidc.DiscoveryEndpoint).
+						Reply(200).
+						JSON(&oidc.DiscoveryConfiguration{
+							Issuer:                issuer,
+							AuthorizationEndpoint: issuer + "/authorize",
+							TokenEndpoint:         issuer + "/token",
+							UserinfoEndpoint:      issuer + "/userinfo",
+						})
+				},
+				opts: []ProviderOpts{WithSelectAccount(), WithAuthorizationParameters(map[string]string{"prompt": "login", "acr_values": "AAL2_OR_AAL3_ANY"})},
+			},
+			want: &Session{AuthURL: "https://issuer.com/authorize?acr_values=AAL2_OR_AAL3_ANY&client_id=clientID&prompt=login&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState"},
+		},
+		{
+			name: "an empty authorization parameter removes the default prompt",
+			fields: fields{
+				name:         "oidc",
+				issuer:       "https://issuer.com",
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
+				userMapper:   DefaultMapper,
+				httpMock: func(issuer string) {
+					gock.New(issuer).
+						Get(oidc.DiscoveryEndpoint).
+						Reply(200).
+						JSON(&oidc.DiscoveryConfiguration{
+							Issuer:                issuer,
+							AuthorizationEndpoint: issuer + "/authorize",
+							TokenEndpoint:         issuer + "/token",
+							UserinfoEndpoint:      issuer + "/userinfo",
+						})
+				},
+				opts: []ProviderOpts{WithSelectAccount(), WithAuthorizationParameters(map[string]string{"prompt": ""})},
+			},
+			want: &Session{AuthURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState"},
+		},
+		{
+			name: "authorization parameters are escaped",
+			fields: fields{
+				name:         "oidc",
+				issuer:       "https://issuer.com",
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
+				userMapper:   DefaultMapper,
+				httpMock: func(issuer string) {
+					gock.New(issuer).
+						Get(oidc.DiscoveryEndpoint).
+						Reply(200).
+						JSON(&oidc.DiscoveryConfiguration{
+							Issuer:                issuer,
+							AuthorizationEndpoint: issuer + "/authorize",
+							TokenEndpoint:         issuer + "/token",
+							UserinfoEndpoint:      issuer + "/userinfo",
+						})
+				},
+				opts: []ProviderOpts{WithSelectAccount(), WithAuthorizationParameters(map[string]string{"acr_values": "level 2&3"})},
+			},
+			want: &Session{AuthURL: "https://issuer.com/authorize?acr_values=level+2%263&client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState"},
+		},
+		{
+			name: "reserved authorization parameters are dropped",
+			fields: fields{
+				name:         "oidc",
+				issuer:       "https://issuer.com",
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
+				userMapper:   DefaultMapper,
+				httpMock: func(issuer string) {
+					gock.New(issuer).
+						Get(oidc.DiscoveryEndpoint).
+						Reply(200).
+						JSON(&oidc.DiscoveryConfiguration{
+							Issuer:                issuer,
+							AuthorizationEndpoint: issuer + "/authorize",
+							TokenEndpoint:         issuer + "/token",
+							UserinfoEndpoint:      issuer + "/userinfo",
+						})
+				},
+				opts: []ProviderOpts{WithSelectAccount(), WithAuthorizationParameters(map[string]string{"client_id": "evil", "redirect_uri": "https://evil.com", "acr_values": "loa2"})},
+			},
+			want: &Session{AuthURL: "https://issuer.com/authorize?acr_values=loa2&client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState"},
+		},
+		{
+			name: "only allow-listed parameters are forwarded",
+			fields: fields{
+				name:         "oidc",
+				issuer:       "https://issuer.com",
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
+				userMapper:   DefaultMapper,
+				httpMock: func(issuer string) {
+					gock.New(issuer).
+						Get(oidc.DiscoveryEndpoint).
+						Reply(200).
+						JSON(&oidc.DiscoveryConfiguration{
+							Issuer:                issuer,
+							AuthorizationEndpoint: issuer + "/authorize",
+							TokenEndpoint:         issuer + "/token",
+							UserinfoEndpoint:      issuer + "/userinfo",
+						})
+				},
+				opts:   []ProviderOpts{WithSelectAccount(), WithForwardedParameters([]string{"acr_values", "max_age"})},
+				params: []idp.Parameter{idp.AuthorizationParameters{"acr_values": "loa3", "max_age": "300", "ui_locales": "de"}},
+			},
+			want: &Session{AuthURL: "https://issuer.com/authorize?acr_values=loa3&client_id=clientID&max_age=300&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState"},
+		},
+		{
+			name: "nothing is forwarded without an allow-list",
+			fields: fields{
+				name:         "oidc",
+				issuer:       "https://issuer.com",
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
+				userMapper:   DefaultMapper,
+				httpMock: func(issuer string) {
+					gock.New(issuer).
+						Get(oidc.DiscoveryEndpoint).
+						Reply(200).
+						JSON(&oidc.DiscoveryConfiguration{
+							Issuer:                issuer,
+							AuthorizationEndpoint: issuer + "/authorize",
+							TokenEndpoint:         issuer + "/token",
+							UserinfoEndpoint:      issuer + "/userinfo",
+						})
+				},
+				opts:   []ProviderOpts{WithSelectAccount()},
+				params: []idp.Parameter{idp.AuthorizationParameters{"acr_values": "loa3"}},
+			},
+			want: &Session{AuthURL: "https://issuer.com/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState"},
+		},
+		{
+			name: "forwarded prompt replaces the default",
+			fields: fields{
+				name:         "oidc",
+				issuer:       "https://issuer.com",
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
+				userMapper:   DefaultMapper,
+				httpMock: func(issuer string) {
+					gock.New(issuer).
+						Get(oidc.DiscoveryEndpoint).
+						Reply(200).
+						JSON(&oidc.DiscoveryConfiguration{
+							Issuer:                issuer,
+							AuthorizationEndpoint: issuer + "/authorize",
+							TokenEndpoint:         issuer + "/token",
+							UserinfoEndpoint:      issuer + "/userinfo",
+						})
+				},
+				opts:   []ProviderOpts{WithSelectAccount(), WithForwardedParameters([]string{"prompt"})},
+				params: []idp.Parameter{idp.AuthorizationParameters{"prompt": "login"}},
+			},
+			want: &Session{AuthURL: "https://issuer.com/authorize?client_id=clientID&prompt=login&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState"},
+		},
+		{
+			name: "configured parameters take precedence over forwarded ones",
+			fields: fields{
+				name:         "oidc",
+				issuer:       "https://issuer.com",
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
+				userMapper:   DefaultMapper,
+				httpMock: func(issuer string) {
+					gock.New(issuer).
+						Get(oidc.DiscoveryEndpoint).
+						Reply(200).
+						JSON(&oidc.DiscoveryConfiguration{
+							Issuer:                issuer,
+							AuthorizationEndpoint: issuer + "/authorize",
+							TokenEndpoint:         issuer + "/token",
+							UserinfoEndpoint:      issuer + "/userinfo",
+						})
+				},
+				opts:   []ProviderOpts{WithSelectAccount(), WithForwardedParameters([]string{"acr_values"}), WithAuthorizationParameters(map[string]string{"acr_values": "static"})},
+				params: []idp.Parameter{idp.AuthorizationParameters{"acr_values": "forwarded"}},
+			},
+			want: &Session{AuthURL: "https://issuer.com/authorize?acr_values=static&client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -96,7 +301,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 			}
 
 			ctx := context.Background()
-			session, err := provider.BeginAuth(ctx, "testState")
+			session, err := provider.BeginAuth(ctx, "testState", tt.fields.params...)
 			r.NoError(err)
 
 			wantAuth, wantErr := tt.want.GetAuth(ctx)

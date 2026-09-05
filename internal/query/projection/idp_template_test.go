@@ -228,7 +228,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_oauth2 (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes, id_attribute, use_pkce) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_oauth2 (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes, id_attribute, use_pkce, authorization_parameters, forwarded_parameters) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -240,6 +240,8 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 								database.TextArray[string]{"profile"},
 								"id-attribute",
 								false,
+								database.Map[string](nil),
+								database.TextArray[string](nil),
 							},
 						},
 					},
@@ -303,7 +305,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_oauth2 (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes, id_attribute, use_pkce) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_oauth2 (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes, id_attribute, use_pkce, authorization_parameters, forwarded_parameters) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -315,6 +317,8 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 								database.TextArray[string]{"profile"},
 								"id-attribute",
 								true,
+								database.Map[string](nil),
+								database.TextArray[string](nil),
 							},
 						},
 					},
@@ -3176,7 +3180,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping, use_pkce) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping, use_pkce, authorization_parameters, forwarded_parameters) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -3186,6 +3190,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								database.TextArray[string]{"profile"},
 								true,
 								true,
+								database.Map[string](nil),
+								database.TextArray[string](nil),
 							},
 						},
 					},
@@ -3246,7 +3252,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping, use_pkce) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping, use_pkce, authorization_parameters, forwarded_parameters) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -3256,6 +3262,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								database.TextArray[string]{"profile"},
 								true,
 								true,
+								database.Map[string](nil),
+								database.TextArray[string](nil),
 							},
 						},
 					},

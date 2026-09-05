@@ -2,7 +2,9 @@ package oauth
 
 import (
 	"context"
+	"maps"
 	"net/http"
+	"slices"
 
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -16,15 +18,17 @@ var _ idp.Provider = (*Provider)(nil)
 // Provider is the [idp.Provider] implementation for a generic OAuth 2.0 provider
 type Provider struct {
 	rp.RelyingParty
-	options           []rp.Option
-	name              string
-	userEndpoint      string
-	user              func() idp.User
-	isLinkingAllowed  bool
-	isCreationAllowed bool
-	isAutoCreation    bool
-	isAutoUpdate      bool
-	generateVerifier  func() string
+	options                 []rp.Option
+	name                    string
+	userEndpoint            string
+	user                    func() idp.User
+	isLinkingAllowed        bool
+	isCreationAllowed       bool
+	isAutoCreation          bool
+	isAutoUpdate            bool
+	authorizationParameters map[string]string
+	forwardedParameters     []string
+	generateVerifier        func() string
 }
 
 type ProviderOpts func(provider *Provider)
@@ -65,6 +69,23 @@ func WithRelyingPartyOption(option rp.Option) ProviderOpts {
 	}
 }
 
+// WithAuthorizationParameters sets additional parameters on the authorization request sent to the
+// provider. They take precedence over any parameter ZITADEL sets itself, e.g. `prompt=select_account`.
+// A parameter with an empty value is omitted from the request altogether.
+func WithAuthorizationParameters(parameters map[string]string) ProviderOpts {
+	return func(p *Provider) {
+		p.authorizationParameters = parameters
+	}
+}
+
+// WithForwardedParameters allows the listed parameters of the original authorization request
+// to be forwarded to the provider. Parameters set by [WithAuthorizationParameters] take precedence.
+func WithForwardedParameters(parameters []string) ProviderOpts {
+	return func(p *Provider) {
+		p.forwardedParameters = parameters
+	}
+}
+
 // New creates a generic OAuth 2.0 provider
 func New(config *oauth2.Config, name, userEndpoint string, user func() idp.User, httpClient *http.Client, options ...ProviderOpts) (provider *Provider, err error) {
 	provider = &Provider{
@@ -97,10 +118,11 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Pa
 	for _, param := range params {
 		if username, ok := param.(idp.LoginHintParam); ok {
 			loginHintSet = true
-			opts = append(opts, loginHint(string(username)))
+			opts = append(opts, urlParam("login_hint", string(username)))
 		}
 	}
-	if !loginHintSet {
+	authParams := idp.ResolveAuthorizationParameters(p.authorizationParameters, p.forwardedParameters, params)
+	if _, promptSet := authParams["prompt"]; !promptSet && !loginHintSet {
 		opts = append(opts, rp.WithPrompt(oidc.PromptSelectAccount))
 	}
 
@@ -109,14 +131,30 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Pa
 		codeVerifier = p.generateVerifier()
 		opts = append(opts, rp.WithCodeChallenge(oidc.NewSHACodeChallenge(codeVerifier)))
 	}
+	// applied last so that the configured parameters take precedence over the ones set by ZITADEL
+	opts = append(opts, urlParams(authParams)...)
 
 	url := rp.AuthURL(state, p.RelyingParty, opts...)
 	return &Session{AuthURL: url, Provider: p, CodeVerifier: codeVerifier}, nil
 }
 
-func loginHint(hint string) rp.AuthURLOpt {
+// urlParams returns the options to set the parameters on the authorization request.
+// Parameters without a value are skipped, which removes ZITADEL's default if there is any.
+// The keys are sorted to keep the resulting authorization URL stable.
+func urlParams(parameters map[string]string) []rp.AuthURLOpt {
+	opts := make([]rp.AuthURLOpt, 0, len(parameters))
+	for _, key := range slices.Sorted(maps.Keys(parameters)) {
+		if parameters[key] == "" {
+			continue
+		}
+		opts = append(opts, urlParam(key, parameters[key]))
+	}
+	return opts
+}
+
+func urlParam(key, value string) rp.AuthURLOpt {
 	return func() []oauth2.AuthCodeOption {
-		return []oauth2.AuthCodeOption{oauth2.SetAuthURLParam("login_hint", hint)}
+		return []oauth2.AuthCodeOption{oauth2.SetAuthURLParam(key, value)}
 	}
 }
 

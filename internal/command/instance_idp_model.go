@@ -69,6 +69,8 @@ func (wm *InstanceOAuthIDPWriteModel) NewChangedEvent(
 	idAttribute string,
 	scopes []string,
 	usePKCE bool,
+	authorizationParameters map[string]string,
+	forwardedParameters []string,
 	options idp.Options,
 ) (*instance.OAuthIDPChangedEvent, error) {
 
@@ -83,6 +85,8 @@ func (wm *InstanceOAuthIDPWriteModel) NewChangedEvent(
 		idAttribute,
 		scopes,
 		usePKCE,
+		authorizationParameters,
+		forwardedParameters,
 		options,
 	)
 	if err != nil || len(changes) == 0 {
@@ -177,6 +181,8 @@ func (wm *InstanceOIDCIDPWriteModel) NewChangedEvent(
 	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	idTokenMapping, usePKCE bool,
+	authorizationParameters map[string]string,
+	forwardedParameters []string,
 	options idp.Options,
 ) (*instance.OIDCIDPChangedEvent, error) {
 
@@ -189,6 +195,8 @@ func (wm *InstanceOIDCIDPWriteModel) NewChangedEvent(
 		scopes,
 		idTokenMapping,
 		usePKCE,
+		authorizationParameters,
+		forwardedParameters,
 		options,
 	)
 	if err != nil || len(changes) == 0 {

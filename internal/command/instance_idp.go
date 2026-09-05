@@ -632,6 +632,14 @@ func (c *Commands) prepareAddInstanceOAuthProvider(a *instance.Aggregate, writeM
 		if provider.IDAttribute = strings.TrimSpace(provider.IDAttribute); provider.IDAttribute == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-sdf3f", "Errors.Invalid.Argument")
 		}
+		authorizationParameters, err := checkAuthorizationParameters(provider.AuthorizationParameters)
+		if err != nil {
+			return nil, err
+		}
+		forwardedParameters, err := checkForwardedParameters(provider.ForwardedParameters)
+		if err != nil {
+			return nil, err
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -659,6 +667,8 @@ func (c *Commands) prepareAddInstanceOAuthProvider(a *instance.Aggregate, writeM
 					provider.IDAttribute,
 					provider.Scopes,
 					provider.UsePKCE,
+					authorizationParameters,
+					forwardedParameters,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -689,6 +699,14 @@ func (c *Commands) prepareUpdateInstanceOAuthProvider(a *instance.Aggregate, wri
 		if provider.IDAttribute = strings.TrimSpace(provider.IDAttribute); provider.IDAttribute == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-JKD3h", "Errors.Invalid.Argument")
 		}
+		authorizationParameters, err := checkAuthorizationParameters(provider.AuthorizationParameters)
+		if err != nil {
+			return nil, err
+		}
+		forwardedParameters, err := checkForwardedParameters(provider.ForwardedParameters)
+		if err != nil {
+			return nil, err
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -715,6 +733,8 @@ func (c *Commands) prepareUpdateInstanceOAuthProvider(a *instance.Aggregate, wri
 				provider.IDAttribute,
 				provider.Scopes,
 				provider.UsePKCE,
+				authorizationParameters,
+				forwardedParameters,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {
@@ -738,6 +758,14 @@ func (c *Commands) prepareAddInstanceOIDCProvider(a *instance.Aggregate, writeMo
 		}
 		if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-Sfdf4", "Errors.Invalid.Argument")
+		}
+		authorizationParameters, err := checkAuthorizationParameters(provider.AuthorizationParameters)
+		if err != nil {
+			return nil, err
+		}
+		forwardedParameters, err := checkForwardedParameters(provider.ForwardedParameters)
+		if err != nil {
+			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
@@ -764,6 +792,8 @@ func (c *Commands) prepareAddInstanceOIDCProvider(a *instance.Aggregate, writeMo
 					provider.Scopes,
 					provider.IsIDTokenMapping,
 					provider.UsePKCE,
+					authorizationParameters,
+					forwardedParameters,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -784,6 +814,14 @@ func (c *Commands) prepareUpdateInstanceOIDCProvider(a *instance.Aggregate, writ
 		}
 		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-Db3bs", "Errors.Invalid.Argument")
+		}
+		authorizationParameters, err := checkAuthorizationParameters(provider.AuthorizationParameters)
+		if err != nil {
+			return nil, err
+		}
+		forwardedParameters, err := checkForwardedParameters(provider.ForwardedParameters)
+		if err != nil {
+			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
@@ -809,6 +847,8 @@ func (c *Commands) prepareUpdateInstanceOIDCProvider(a *instance.Aggregate, writ
 				provider.Scopes,
 				provider.IsIDTokenMapping,
 				provider.UsePKCE,
+				authorizationParameters,
+				forwardedParameters,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {

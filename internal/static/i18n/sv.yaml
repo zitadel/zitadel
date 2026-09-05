@@ -618,6 +618,10 @@ Errors:
     KeyIDMissing: "KeyID saknas"
     PrivateKeyMissing: "Privat nyckel saknas"
     InvalidPrivateKey: "Ogiltigt format för privat nyckel"
+    AuthorizationParameterNameMissing: "Namn på auktoriseringsparameter saknas"
+    AuthorizationParameterNameInvalid: "Ogiltigt namn på auktoriseringsparameter"
+    AuthorizationParameterDuplicate: "Auktoriseringsparametern är definierad mer än en gång"
+    AuthorizationParameterReserved: "Auktoriseringsparametern hanteras av ZITADEL och kan inte anges"
 
 AggregateTypes:
   action: "Åtgärd"

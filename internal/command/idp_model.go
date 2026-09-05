@@ -2,6 +2,7 @@ package command
 
 import (
 	"bytes"
+	"maps"
 	"net/http"
 	"reflect"
 	"slices"
@@ -37,16 +38,18 @@ import (
 type OAuthIDPWriteModel struct {
 	eventstore.WriteModel
 
-	Name                  string
-	ID                    string
-	ClientID              string
-	ClientSecret          *crypto.CryptoValue
-	AuthorizationEndpoint string
-	TokenEndpoint         string
-	UserEndpoint          string
-	Scopes                []string
-	IDAttribute           string
-	UsePKCE               bool
+	Name                    string
+	ID                      string
+	ClientID                string
+	ClientSecret            *crypto.CryptoValue
+	AuthorizationEndpoint   string
+	TokenEndpoint           string
+	UserEndpoint            string
+	Scopes                  []string
+	IDAttribute             string
+	UsePKCE                 bool
+	AuthorizationParameters map[string]string
+	ForwardedParameters     []string
 	idp.Options
 
 	State domain.IDPState
@@ -76,6 +79,8 @@ func (wm *OAuthIDPWriteModel) reduceAddedEvent(e *idp.OAuthIDPAddedEvent) {
 	wm.Scopes = e.Scopes
 	wm.IDAttribute = e.IDAttribute
 	wm.UsePKCE = e.UsePKCE
+	wm.AuthorizationParameters = e.AuthorizationParameters
+	wm.ForwardedParameters = e.ForwardedParameters
 	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
@@ -108,6 +113,12 @@ func (wm *OAuthIDPWriteModel) reduceChangedEvent(e *idp.OAuthIDPChangedEvent) {
 	if e.UsePKCE != nil {
 		wm.UsePKCE = *e.UsePKCE
 	}
+	if e.AuthorizationParameters != nil {
+		wm.AuthorizationParameters = *e.AuthorizationParameters
+	}
+	if e.ForwardedParameters != nil {
+		wm.ForwardedParameters = *e.ForwardedParameters
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
@@ -122,6 +133,8 @@ func (wm *OAuthIDPWriteModel) NewChanges(
 	idAttribute string,
 	scopes []string,
 	usePKCE bool,
+	authorizationParameters map[string]string,
+	forwardedParameters []string,
 	options idp.Options,
 ) ([]idp.OAuthIDPChanges, error) {
 	changes := make([]idp.OAuthIDPChanges, 0)
@@ -158,6 +171,12 @@ func (wm *OAuthIDPWriteModel) NewChanges(
 	if wm.UsePKCE != usePKCE {
 		changes = append(changes, idp.ChangeOAuthUsePKCE(usePKCE))
 	}
+	if !maps.Equal(wm.AuthorizationParameters, authorizationParameters) {
+		changes = append(changes, idp.ChangeOAuthAuthorizationParameters(authorizationParameters))
+	}
+	if !slices.Equal(wm.ForwardedParameters, forwardedParameters) {
+		changes = append(changes, idp.ChangeOAuthForwardedParameters(forwardedParameters))
+	}
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {
 		changes = append(changes, idp.ChangeOAuthOptions(opts))
@@ -180,9 +199,15 @@ func (wm *OAuthIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encry
 		RedirectURL: callbackURL,
 		Scopes:      wm.Scopes,
 	}
-	opts := make([]oauth.ProviderOpts, 0, 5)
+	opts := make([]oauth.ProviderOpts, 0, 7)
 	if wm.UsePKCE {
 		opts = append(opts, oauth.WithRelyingPartyOption(rp.WithPKCE(nil)))
+	}
+	if len(wm.AuthorizationParameters) > 0 {
+		opts = append(opts, oauth.WithAuthorizationParameters(wm.AuthorizationParameters))
+	}
+	if len(wm.ForwardedParameters) > 0 {
+		opts = append(opts, oauth.WithForwardedParameters(wm.ForwardedParameters))
 	}
 	if wm.IsCreationAllowed {
 		opts = append(opts, oauth.WithCreationAllowed())
@@ -215,14 +240,16 @@ func (wm *OAuthIDPWriteModel) GetProviderOptions() idp.Options {
 type OIDCIDPWriteModel struct {
 	eventstore.WriteModel
 
-	Name             string
-	ID               string
-	Issuer           string
-	ClientID         string
-	ClientSecret     *crypto.CryptoValue
-	Scopes           []string
-	IsIDTokenMapping bool
-	UsePKCE          bool
+	Name                    string
+	ID                      string
+	Issuer                  string
+	ClientID                string
+	ClientSecret            *crypto.CryptoValue
+	Scopes                  []string
+	IsIDTokenMapping        bool
+	UsePKCE                 bool
+	AuthorizationParameters map[string]string
+	ForwardedParameters     []string
 	idp.Options
 
 	State domain.IDPState
@@ -264,6 +291,8 @@ func (wm *OIDCIDPWriteModel) reduceAddedEvent(e *idp.OIDCIDPAddedEvent) {
 	wm.Scopes = e.Scopes
 	wm.IsIDTokenMapping = e.IsIDTokenMapping
 	wm.UsePKCE = e.UsePKCE
+	wm.AuthorizationParameters = e.AuthorizationParameters
+	wm.ForwardedParameters = e.ForwardedParameters
 	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
@@ -290,6 +319,12 @@ func (wm *OIDCIDPWriteModel) reduceChangedEvent(e *idp.OIDCIDPChangedEvent) {
 	if e.UsePKCE != nil {
 		wm.UsePKCE = *e.UsePKCE
 	}
+	if e.AuthorizationParameters != nil {
+		wm.AuthorizationParameters = *e.AuthorizationParameters
+	}
+	if e.ForwardedParameters != nil {
+		wm.ForwardedParameters = *e.ForwardedParameters
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
@@ -301,6 +336,8 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	idTokenMapping, usePKCE bool,
+	authorizationParameters map[string]string,
+	forwardedParameters []string,
 	options idp.Options,
 ) ([]idp.OIDCIDPChanges, error) {
 	changes := make([]idp.OIDCIDPChanges, 0)
@@ -330,6 +367,12 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 	}
 	if wm.UsePKCE != usePKCE {
 		changes = append(changes, idp.ChangeOIDCUsePKCE(usePKCE))
+	}
+	if !maps.Equal(wm.AuthorizationParameters, authorizationParameters) {
+		changes = append(changes, idp.ChangeOIDCAuthorizationParameters(authorizationParameters))
+	}
+	if !slices.Equal(wm.ForwardedParameters, forwardedParameters) {
+		changes = append(changes, idp.ChangeOIDCForwardedParameters(forwardedParameters))
 	}
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {
@@ -387,10 +430,16 @@ func (wm *OIDCIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]oidc.ProviderOpts, 1, 7)
+	opts := make([]oidc.ProviderOpts, 1, 9)
 	opts[0] = oidc.WithSelectAccount()
 	if wm.IsIDTokenMapping {
 		opts = append(opts, oidc.WithIDTokenMapping())
+	}
+	if len(wm.AuthorizationParameters) > 0 {
+		opts = append(opts, oidc.WithAuthorizationParameters(wm.AuthorizationParameters))
+	}
+	if len(wm.ForwardedParameters) > 0 {
+		opts = append(opts, oidc.WithForwardedParameters(wm.ForwardedParameters))
 	}
 	if wm.UsePKCE {
 		opts = append(opts, oidc.WithRelyingPartyOption(rp.WithPKCE(nil)))
