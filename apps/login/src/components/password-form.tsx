@@ -113,9 +113,11 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
       {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
         <div className={`${error && "animate-shake transform-gpu"}`}>
+          {loginName && <input type="hidden" name="loginName" autoComplete="username" value={loginName} />}
+
           <TextInput
             type="password"
-            autoComplete="password"
+            autoComplete="current-password"
             autoFocus
             {...register("password", { required: t("verify.required.password") })}
             label={t("verify.labels.password")}
@@ -132,8 +134,6 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
               <Translated i18nKey="verify.resetPassword" namespace="password" />
             </button>
           )}
-
-          {loginName && <input type="hidden" name="loginName" autoComplete="username" value={loginName} />}
         </div>
 
         {info && (
