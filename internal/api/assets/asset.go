@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -141,6 +142,34 @@ const (
 	paramFile = "file"
 )
 
+// fontExtensionContentTypes maps well-known font file extensions to their
+// correct content type. Some valid font files, in particular TrueType and
+// OpenType fonts whose table directory does not start with one of the
+// commonly recognized SFNT table tags, are misdetected as
+// application/octet-stream by content-based mimetype sniffing.
+var fontExtensionContentTypes = map[string]string{
+	".ttf":   "font/ttf",
+	".otf":   "font/otf",
+	".woff":  "font/woff",
+	".woff2": "font/woff2",
+	".eot":   "application/vnd.ms-fontobject",
+	".ttc":   "font/collection",
+}
+
+// refineContentType corrects a generic application/octet-stream detection
+// based on the uploaded file's extension, for extensions whose content-based
+// sniffing is known to be unreliable. Any other detected content type is
+// returned unchanged.
+func refineContentType(contentType, filename string) string {
+	if contentType != "application/octet-stream" {
+		return contentType
+	}
+	if refined, ok := fontExtensionContentTypes[strings.ToLower(filepath.Ext(filename))]; ok {
+		return refined
+	}
+	return contentType
+}
+
 func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -171,9 +200,11 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 			return
 		}
 
+		contentType := refineContentType(mimeType.String(), handler.Filename)
+
 		size := handler.Size
-		if !uploader.ContentTypeAllowed(mimeType.String()) {
-			s.ErrorHandler()(w, r, fmt.Errorf("invalid content-type: %s", mimeType), http.StatusBadRequest)
+		if !uploader.ContentTypeAllowed(contentType) {
+			s.ErrorHandler()(w, r, fmt.Errorf("invalid content-type: %s", contentType), http.StatusBadRequest)
 			return
 		}
 		if size > uploader.MaxFileSize() {
@@ -190,7 +221,7 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 		uploadInfo := &command.AssetUpload{
 			ResourceOwner: resourceOwner,
 			ObjectName:    objectName,
-			ContentType:   mimeType.String(),
+			ContentType:   contentType,
 			ObjectType:    uploader.ObjectType(),
 			File:          file,
 			Size:          size,
