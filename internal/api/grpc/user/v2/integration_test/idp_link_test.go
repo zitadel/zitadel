@@ -62,6 +62,27 @@ func TestServer_AddIDPLink(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			// Security regression (account takeover): a self-link, an unprivileged
+			// user binding an external identity to their own account, must now be
+			// denied. The previous self-link bypass skipped the user-write permission
+			// check, letting any authenticated user pre-claim an unproven external
+			// subject on themselves and hijack a victim's future federated logins.
+			name: "self-link without permission, error",
+			args: args{
+				UserCTX,
+				&user.AddIDPLinkRequest{
+					UserId: Instance.Users.Get(integration.UserTypeNoPermission).ID,
+					IdpLink: &user.IDPLink{
+						IdpId:    idpResp.Id,
+						UserId:   "external-selflink",
+						UserName: "username",
+					},
+				},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
 			name: "add link",
 			args: args{
 				OrgCTX,

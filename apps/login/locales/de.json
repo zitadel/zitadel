@@ -152,7 +152,8 @@
       "failedPrecondition": "Vorbedingung fehlgeschlagen",
       "sessionNotValid": "Sitzung ist nicht gültig",
       "passwordVerificationMissing": "Passwort-Verifizierung fehlt.",
-      "passwordVerificationTooOld": "Passwort-Verifizierung ist zu alt. Bitte verifizieren Sie Ihr Passwort erneut."
+      "passwordVerificationTooOld": "Passwort-Verifizierung ist zu alt. Bitte verifizieren Sie Ihr Passwort erneut.",
+      "passwordResetNotAllowed": "Das Zurücksetzen des Passworts ist nicht zulässig. Wenden Sie sich für weitere Informationen an Ihren Administrator."
     }
   },
   "idp": {
@@ -261,6 +262,10 @@
       "required": {
         "code": "Dieses Feld ist erforderlich"
       }
+    },
+    "errors": {
+      "couldNotRequestChallenge": "OTP-Challenge konnte nicht angefordert werden",
+      "couldNotVerifyCode": "OTP-Code konnte nicht verifiziert werden"
     }
   },
   "passkey": {
@@ -422,7 +427,15 @@
     "description": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten.",
     "noMethodsAvailable": "Keine Authentifizierungsmethoden verfügbar",
     "allSetup": "Sie haben bereits einen Authentifikator eingerichtet!",
-    "linkWithIDP": "oder verknüpfe mit einem Identitätsanbieter"
+    "linkWithIDP": "oder verknüpfe mit einem Identitätsanbieter",
+    "methods": {
+      "totp": "Authentifizierungs-App",
+      "u2f": "Universeller zweiter Faktor",
+      "otpEmail": "Code per E-Mail",
+      "otpSms": "Code per SMS",
+      "passkey": "Passkeys",
+      "password": "Passwort"
+    }
   },
   "device": {
     "usercode": {
