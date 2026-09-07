@@ -4,7 +4,7 @@ import { PasswordForm } from "@/components/password-form";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession } from "@/lib/session";
+import { loadMostRecentSession, loadSessionById } from "@/lib/session";
 import { getBrandingSettings, getDefaultOrg, getLoginSettings } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
-  let { loginName, organization, requestId } = searchParams;
+  let { loginName, organization, requestId, sessionId } = searchParams;
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
@@ -32,14 +32,20 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     }
   }
 
-  // also allow no session to be found (ignoreUnkownUsername)
-  const sessionFactors = await loadMostRecentSession({
-    serviceConfig,
-    sessionParams: {
-      loginName,
-      organization,
-    },
-  });
+  // Prefer the session created at loginname (explicit id). Fall back to
+  // loginName+org cookie lookup for direct /password visits and enumeration
+  // protection, where no session exists by design.
+  let sessionFactors = sessionId ? await loadSessionById({ serviceConfig, sessionId, organization }) : undefined;
+
+  if (!sessionFactors) {
+    sessionFactors = await loadMostRecentSession({
+      serviceConfig,
+      sessionParams: {
+        loginName,
+        organization,
+      },
+    });
+  }
 
   const branding = await getBrandingSettings({
     serviceConfig,
@@ -88,6 +94,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
         {loginName && (
           <PasswordForm
             loginName={loginName}
+            sessionId={sessionId}
             requestId={requestId}
             organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
             defaultOrganization={defaultOrganization}

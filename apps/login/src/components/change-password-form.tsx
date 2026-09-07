@@ -82,6 +82,7 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
 
     const passwordResponse = await sendPassword({
       loginName,
+      sessionId,
       organization,
       checks: create(ChecksSchema, {
         password: { password: values.password },

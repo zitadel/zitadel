@@ -4,7 +4,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession } from "@/lib/session";
+import { loadMostRecentSession, loadSessionById } from "@/lib/session";
 import { getBrandingSettings, getPasswordComplexitySettings } from "@/lib/zitadel";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -21,16 +21,21 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   const searchParams = await props.searchParams;
 
-  const { loginName, organization, requestId } = searchParams;
+  const { loginName, organization, requestId, sessionId } = searchParams;
 
-  // also allow no session to be found (ignoreUnkownUsername)
-  const sessionFactors = await loadMostRecentSession({
-    serviceConfig,
-    sessionParams: {
-      loginName,
-      organization,
-    },
-  });
+  // Prefer the session from the password-change redirect. Fall back to
+  // loginName+org cookie lookup when sessionId is missing (direct visit).
+  let sessionFactors = sessionId ? await loadSessionById({ serviceConfig, sessionId, organization }) : undefined;
+
+  if (!sessionFactors) {
+    sessionFactors = await loadMostRecentSession({
+      serviceConfig,
+      sessionParams: {
+        loginName,
+        organization,
+      },
+    });
+  }
 
   const branding = await getBrandingSettings({ serviceConfig, organization });
 

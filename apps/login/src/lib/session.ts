@@ -4,9 +4,11 @@ import { SAMLRequest } from "@zitadel/proto/zitadel/saml/v2/authorization_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { GetSessionResponse } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { getMostRecentCookieWithLoginname } from "./cookies";
+import { getMostRecentCookieWithLoginname, getSessionCookieById } from "./cookies";
 import { shouldEnforceMFA } from "./verify-helper";
 import { getLoginSettings, getSession, getUserByID, listAuthenticationMethodTypes, ServiceConfig } from "./zitadel";
+
+type SessionCookieRef = { id: string; token: string };
 
 type LoadMostRecentSessionParams = {
   serviceConfig: ServiceConfig;
@@ -16,15 +18,16 @@ type LoadMostRecentSessionParams = {
   };
 };
 
-export async function loadMostRecentSession({
-  serviceConfig,
-  sessionParams,
-}: LoadMostRecentSessionParams): Promise<Session | undefined> {
-  const recent = await getMostRecentCookieWithLoginname({
-    loginName: sessionParams.loginName,
-    organization: sessionParams.organization,
-  });
+type LoadSessionByIdParams = {
+  serviceConfig: ServiceConfig;
+  sessionId: string;
+  organization?: string;
+};
 
+async function sessionFromCookie(
+  serviceConfig: ServiceConfig,
+  recent: SessionCookieRef | undefined,
+): Promise<Session | undefined> {
   if (!recent) {
     return undefined;
   }
@@ -49,6 +52,27 @@ export async function loadMostRecentSession({
 
       throw error;
     });
+}
+
+export async function loadMostRecentSession({
+  serviceConfig,
+  sessionParams,
+}: LoadMostRecentSessionParams): Promise<Session | undefined> {
+  const recent = await getMostRecentCookieWithLoginname({
+    loginName: sessionParams.loginName,
+    organization: sessionParams.organization,
+  });
+
+  return sessionFromCookie(serviceConfig, recent);
+}
+
+export async function loadSessionById({
+  serviceConfig,
+  sessionId,
+  organization,
+}: LoadSessionByIdParams): Promise<Session | undefined> {
+  const recent = await getSessionCookieById({ sessionId, organization });
+  return sessionFromCookie(serviceConfig, recent);
 }
 
 /**

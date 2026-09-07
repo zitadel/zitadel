@@ -40,6 +40,16 @@ export type SendLoginnameCommand = {
 
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
+// Carry sessionId so the next page can load the cookie by id. LoginName+org
+// lookup is fragile (proxy cookie scoping, org mismatch) and is what dropped
+// user context on /password and /passkey (zitadel/zitadel#12112).
+function withSessionId(params: URLSearchParams, sessionId?: string) {
+  if (sessionId) {
+    params.append("sessionId", sessionId);
+  }
+  return params;
+}
+
 export async function sendLoginname(command: SendLoginnameCommand) {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
@@ -424,7 +434,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             }
 
             return {
-              redirect: "/password?" + paramsPassword,
+              redirect: "/password?" + withSessionId(paramsPassword, session?.id),
             };
           }
 
@@ -450,7 +460,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
               paramsPasskey.append("organization", organization);
             }
 
-            return { redirect: "/passkey?" + paramsPasskey };
+            return { redirect: "/passkey?" + withSessionId(paramsPasskey, session?.id) };
           }
 
         case AuthenticationMethodType.IDP: {
@@ -483,7 +493,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           passkeyParams.append("organization", organization);
         }
 
-        return { redirect: "/passkey?" + passkeyParams };
+        return { redirect: "/passkey?" + withSessionId(passkeyParams, session?.id) };
       } else if (methods.authMethodTypes.includes(AuthenticationMethodType.IDP)) {
         return redirectUserToIDP(userId, organization);
       } else if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)) {
@@ -511,7 +521,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         }
 
         return {
-          redirect: "/password?" + paramsPasswordDefault,
+          redirect: "/password?" + withSessionId(paramsPasswordDefault, session?.id),
         };
       }
     }
