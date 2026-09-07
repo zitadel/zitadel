@@ -317,6 +317,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s67SyncMemberRoleFields,
 		steps.s69CacheTablesLogged,
 		steps.s70AddEventStoreCommandEnforceOwner,
+		steps.s76Users14LoginEqualityIndexes,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
@@ -393,7 +394,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s73FixUserGrantRoles,
 		steps.s74Apps7OIDCConfigsAddRegistrationToken,
 		steps.s75Apps7OIDCConfigsAddAppLinkConfig,
-		steps.s76Users14LoginEqualityIndexes,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {

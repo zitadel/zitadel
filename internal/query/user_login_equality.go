@@ -111,11 +111,14 @@ func newLowerEqualsSearchQuery(valueCol Column, tbl table, idCol Column, value s
 
 func (q *lowerEqualsFilter) idSeek(instanceID string) loginEqualitySeek {
 	sql := "SELECT " + q.idCol.identifier() + " AS id FROM " + q.tbl.identifier() +
-		" WHERE " + q.tbl.InstanceIDIdentifier() + " = ? AND LOWER(" + q.Column.identifier() + ") = ?"
-	args := []interface{}{instanceID, strings.ToLower(q.Text)}
+		" WHERE " + q.tbl.InstanceIDIdentifier() + " = ? AND LOWER(" + q.Column.identifier() + ") = "
+	args := []interface{}{instanceID}
 	if q.Compare == TextEquals {
-		sql += " AND " + q.Column.identifier() + " = ?"
-		args = append(args, q.Text)
+		sql += "LOWER(?) AND " + q.Column.identifier() + " = ?"
+		args = append(args, q.Text, q.Text)
+	} else {
+		sql += "?"
+		args = append(args, strings.ToLower(q.Text))
 	}
 	return loginEqualitySeek{sql: sql, args: args}
 }

@@ -2,6 +2,7 @@ package setup
 
 import (
 	"context"
+	"database/sql"
 	"embed"
 	"fmt"
 
@@ -20,6 +21,14 @@ type Users14LoginEqualityIndexes struct {
 }
 
 func (mig *Users14LoginEqualityIndexes) Execute(ctx context.Context, _ eventstore.Event) error {
+	var exists bool
+	err := mig.dbClient.QueryRowContext(ctx, func(r *sql.Row) error {
+		return r.Scan(&exists)
+	}, "SELECT exists(SELECT 1 FROM information_schema.tables WHERE table_schema = 'projections' AND table_name = 'users14')")
+	if err != nil || !exists {
+		return err
+	}
+
 	statements, err := readStatements(users14LoginEqualityIndexes, "76")
 	if err != nil {
 		return err
