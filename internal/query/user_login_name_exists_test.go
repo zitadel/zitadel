@@ -360,6 +360,97 @@ func TestPrepareUsersQuery_UsernameOrContainsDoesNotUseUnion(t *testing.T) {
 	assert.NotContains(t, sql, " UNION ")
 }
 
+func TestPrepareUsersQuery_UsernameOrUsernameUsesUnion(t *testing.T) {
+	ctx := authz.WithInstanceID(t.Context(), "inst-1")
+	alice, err := NewUserUsernameSearchQuery("alice", TextEqualsIgnoreCase)
+	require.NoError(t, err)
+	bob, err := NewUserUsernameSearchQuery("bob", TextEqualsIgnoreCase)
+	require.NoError(t, err)
+	orQuery, err := NewOrQuery(alice, bob)
+	require.NoError(t, err)
+
+	q := &UserSearchQueries{
+		Queries: []SearchQuery{orQuery},
+	}
+	builder, _ := q.prepareUsersQuery(ctx, false)
+	sql, args, err := builder.ToSql()
+	require.NoError(t, err)
+
+	assert.Contains(t, sql, "UNION")
+	assert.Contains(t, sql, "AS matches")
+	assert.Equal(t, 2, strings.Count(sql, "LOWER("+UserUsernameCol.identifier()+")"))
+	assert.Contains(t, args, "alice")
+	assert.Contains(t, args, "bob")
+}
+
+func TestPrepareUsersQuery_SiblingUsernameAndKeepsRemainingWhere(t *testing.T) {
+	ctx := authz.WithInstanceID(t.Context(), "inst-1")
+	alice, err := NewUserUsernameSearchQuery("alice", TextEqualsIgnoreCase)
+	require.NoError(t, err)
+	bob, err := NewUserUsernameSearchQuery("bob", TextEqualsIgnoreCase)
+	require.NoError(t, err)
+
+	q := &UserSearchQueries{
+		Queries: []SearchQuery{alice, bob},
+	}
+	builder, _ := q.prepareUsersQuery(ctx, false)
+	sql, args, err := builder.ToSql()
+	require.NoError(t, err)
+
+	assert.Contains(t, sql, "AS matches")
+	assert.NotContains(t, sql, " UNION ")
+	assert.Contains(t, args, "alice")
+	assert.Contains(t, args, "bob")
+}
+
+func TestPrepareUsersQuery_NestedAndOfOrDoesNotUseUnion(t *testing.T) {
+	ctx := authz.WithInstanceID(t.Context(), "inst-1")
+	alice, err := NewUserUsernameSearchQuery("alice", TextEqualsIgnoreCase)
+	require.NoError(t, err)
+	bob, err := NewUserUsernameSearchQuery("bob", TextEqualsIgnoreCase)
+	require.NoError(t, err)
+	orQuery, err := NewOrQuery(alice, bob)
+	require.NoError(t, err)
+	orgQuery, err := NewUserResourceOwnerSearchQuery("org1", TextEquals)
+	require.NoError(t, err)
+	andQuery, err := NewAndQuery(orQuery, orgQuery)
+	require.NoError(t, err)
+
+	q := &UserSearchQueries{
+		Queries: []SearchQuery{andQuery},
+	}
+	builder, _ := q.prepareUsersQuery(ctx, false)
+	sql, _, err := builder.ToSql()
+	require.NoError(t, err)
+
+	assert.NotContains(t, sql, "AS matches")
+	assert.NotContains(t, sql, " UNION ")
+}
+
+func TestPrepareUsersQuery_NestedOrOfAndDoesNotUseUnion(t *testing.T) {
+	ctx := authz.WithInstanceID(t.Context(), "inst-1")
+	alice, err := NewUserUsernameSearchQuery("alice", TextEqualsIgnoreCase)
+	require.NoError(t, err)
+	orgQuery, err := NewUserResourceOwnerSearchQuery("org1", TextEquals)
+	require.NoError(t, err)
+	andQuery, err := NewAndQuery(alice, orgQuery)
+	require.NoError(t, err)
+	bob, err := NewUserUsernameSearchQuery("bob", TextEqualsIgnoreCase)
+	require.NoError(t, err)
+	orQuery, err := NewOrQuery(andQuery, bob)
+	require.NoError(t, err)
+
+	q := &UserSearchQueries{
+		Queries: []SearchQuery{orQuery},
+	}
+	builder, _ := q.prepareUsersQuery(ctx, false)
+	sql, _, err := builder.ToSql()
+	require.NoError(t, err)
+
+	assert.NotContains(t, sql, "AS matches")
+	assert.NotContains(t, sql, " UNION ")
+}
+
 func TestPrepareUsersQuery_MetadataFilterKeepsDistinctJoin(t *testing.T) {
 	ctx := authz.WithInstanceID(t.Context(), "inst-1")
 	metadataQuery, err := NewUserMetadataKeySearchQuery("key", TextContains)
