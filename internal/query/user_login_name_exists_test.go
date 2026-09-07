@@ -104,7 +104,7 @@ func TestExtractLoginEqualitySeeks_EmptyOrArmDoesNotExtract(t *testing.T) {
 	assert.Equal(t, orQuery, remaining[0])
 }
 
-func TestExtractLoginEqualitySeeks_NestedAndDoesNotExtract(t *testing.T) {
+func TestExtractLoginEqualitySeeks_NestedAndExtractsLoginName(t *testing.T) {
 	loginNameQuery, err := NewUserLoginNameExistsQuery("user@org.localhost", TextEqualsIgnoreCase)
 	require.NoError(t, err)
 	orgQuery, err := NewUserResourceOwnerSearchQuery("org1", TextEquals)
@@ -113,10 +113,11 @@ func TestExtractLoginEqualitySeeks_NestedAndDoesNotExtract(t *testing.T) {
 	require.NoError(t, err)
 
 	seeks, remaining, ok := extractLoginEqualitySeeks("inst-1", []SearchQuery{andQuery})
-	assert.False(t, ok)
-	assert.Nil(t, seeks)
+	require.True(t, ok)
+	require.Len(t, seeks, 1)
+	assert.Contains(t, seeks[0].sql, "login_name_matches")
 	require.Len(t, remaining, 1)
-	assert.Equal(t, andQuery, remaining[0])
+	assert.Equal(t, orgQuery, remaining[0])
 }
 
 func TestPrepareUsersQuery_LoginNameEqualsUsesIndexedJoin(t *testing.T) {
@@ -407,7 +408,7 @@ func TestPrepareUsersQuery_SiblingUsernameAndKeepsRemainingWhere(t *testing.T) {
 	assert.Contains(t, args, "bob")
 }
 
-func TestPrepareUsersQuery_NestedAndOfOrDoesNotUseUnion(t *testing.T) {
+func TestPrepareUsersQuery_NestedAndOfOrUsesUnion(t *testing.T) {
 	ctx := authz.WithInstanceID(t.Context(), "inst-1")
 	alice, err := NewUserUsernameSearchQuery("alice", TextEqualsIgnoreCase)
 	require.NoError(t, err)
@@ -424,11 +425,15 @@ func TestPrepareUsersQuery_NestedAndOfOrDoesNotUseUnion(t *testing.T) {
 		Queries: []SearchQuery{andQuery},
 	}
 	builder, _ := q.prepareUsersQuery(ctx, false)
-	sql, _, err := builder.ToSql()
+	sql, args, err := builder.ToSql()
 	require.NoError(t, err)
 
-	assert.NotContains(t, sql, "AS matches")
-	assert.NotContains(t, sql, " UNION ")
+	assert.Contains(t, sql, "AS matches")
+	assert.Contains(t, sql, " UNION ")
+	assert.Contains(t, sql, "resource_owner")
+	assert.Contains(t, args, "org1")
+	assert.Contains(t, args, "alice")
+	assert.Contains(t, args, "bob")
 }
 
 func TestPrepareUsersQuery_NestedOrOfAndDoesNotUseUnion(t *testing.T) {

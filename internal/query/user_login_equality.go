@@ -162,20 +162,55 @@ func loginEqualitySeeksFromQuery(instanceID string, qry SearchQuery) ([]loginEqu
 	return seeks, true
 }
 
-// extractLoginEqualitySeeks pulls one top-level login-equality filter (a single
-// equals leaf or a flat OrQuery of those leaves). Remaining filters stay as WHERE.
+// extractLoginEqualitySeeks pulls one login-equality filter from queries.
+// A match may be a top-level equals leaf, a flat OrQuery of those leaves, or
+// the same nested under AndQuery. Remaining AND conjuncts stay as WHERE.
+// Equality nested under OrQuery or NotQuery is not extracted.
 func extractLoginEqualitySeeks(instanceID string, queries []SearchQuery) ([]loginEqualitySeek, []SearchQuery, bool) {
 	for i, qry := range queries {
+		if and, ok := qry.(*AndQuery); ok {
+			seeks, andRest, ok := extractLoginEqualitySeeks(instanceID, and.queries)
+			if !ok {
+				continue
+			}
+			return seeks, spliceRemainingQuery(queries, i, remainingAndQuery(andRest)), true
+		}
 		seeks, ok := loginEqualitySeeksFromQuery(instanceID, qry)
 		if !ok {
 			continue
 		}
-		remaining := make([]SearchQuery, 0, len(queries)-1)
-		remaining = append(remaining, queries[:i]...)
-		remaining = append(remaining, queries[i+1:]...)
-		return seeks, remaining, true
+		return seeks, spliceRemainingQuery(queries, i, nil), true
 	}
 	return nil, queries, false
+}
+
+func remainingAndQuery(rest []SearchQuery) SearchQuery {
+	switch len(rest) {
+	case 0:
+		return nil
+	case 1:
+		return rest[0]
+	default:
+		and, err := NewAndQuery(rest...)
+		if err != nil {
+			return nil
+		}
+		return and
+	}
+}
+
+func spliceRemainingQuery(queries []SearchQuery, i int, replacement SearchQuery) []SearchQuery {
+	n := len(queries) - 1
+	if replacement != nil {
+		n++
+	}
+	remaining := make([]SearchQuery, 0, n)
+	remaining = append(remaining, queries[:i]...)
+	if replacement != nil {
+		remaining = append(remaining, replacement)
+	}
+	remaining = append(remaining, queries[i+1:]...)
+	return remaining
 }
 
 func joinLoginEqualitySeeks(seeks []loginEqualitySeek) sq.Sqlizer {
