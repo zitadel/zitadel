@@ -79,6 +79,30 @@ func Test_query_event_sort_key(t *testing.T) {
 				uint64(200),
 			},
 		},
+		{
+			name: "after sort key with aggregate id still uses sort-key order",
+			query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+				InstanceID("instanceID").
+				OrderAsc().
+				Limit(200).
+				AfterEventSortKey(cursor).
+				AddQuery().
+				AggregateTypes("user").
+				AggregateIDs("agg-a").
+				Builder(),
+			sql: `SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND aggregate_id = $3 AND (` + eventSortKeySQL + `) > ($4, $5, $6, $7, $8) ORDER BY ` + eventSortKeySQL + ` LIMIT $9`,
+			args: []driver.Value{
+				"instanceID",
+				eventstore.AggregateType("user"),
+				"agg-a",
+				cursor.Position,
+				cursor.InTxOrder,
+				cursor.AggregateType,
+				cursor.AggregateID,
+				cursor.Sequence,
+				uint64(200),
+			},
+		},
 	}
 
 	client := NewPostgres(&database.DB{Database: new(testDB)})
@@ -86,6 +110,9 @@ func Test_query_event_sort_key(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if strings.Contains(tt.sql, "OFFSET") {
 				t.Fatal("sort-key resume must not use OFFSET")
+			}
+			if strings.Contains(tt.sql, `ORDER BY "sequence"`) {
+				t.Fatal("sort-key resume must not order by sequence")
 			}
 			if !strings.Contains(tt.sql, tuple) {
 				t.Fatalf("expected sort-key tuple %s in SQL", tuple)

@@ -24,12 +24,3 @@ func EventSortKeyFromEvent(e Event) EventSortKey {
 func (k EventSortKey) IsZero() bool {
 	return k.Position.IsZero()
 }
-
-// IdentityEquals reports whether k and o are the same events2 row.
-// InTxOrder is ignored so a pre-migration filter_offset of 0 still matches.
-func (k EventSortKey) IdentityEquals(o EventSortKey) bool {
-	return k.Position.Equal(o.Position) &&
-		k.AggregateType == o.AggregateType &&
-		k.AggregateID == o.AggregateID &&
-		k.Sequence == o.Sequence
-}

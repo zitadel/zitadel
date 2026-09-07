@@ -103,7 +103,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 
 	// if there is only one subquery we can optimize the query ordering by sequence
 	var shouldOrderBySequence bool
-	if len(q.SubQueries) == 1 {
+	if q.EventSortKeyAfter == nil && len(q.SubQueries) == 1 {
 		for _, filter := range q.SubQueries[0] {
 			if filter.Field == repository.FieldAggregateID {
 				shouldOrderBySequence = filter.Operation == repository.OperationEquals

@@ -587,12 +587,8 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		return false, nil
 	}
 
-	if config.minPosition.GreaterThan(decimal.NewFromInt(0)) {
-		currentState.cursor = eventstore.EventSortKey{Position: config.minPosition}
-	}
-
 	var statements []*Statement
-	statements, additionalIteration, err = h.generateStatements(ctx, tx, currentState)
+	statements, additionalIteration, err = h.generateStatements(ctx, tx, currentState, config.minPosition)
 	if err != nil {
 		return additionalIteration, err
 	}
@@ -635,7 +631,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	return additionalIteration, err
 }
 
-func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentState *state) (_ []*Statement, additionalIteration bool, err error) {
+func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentState *state, minPosition decimal.Decimal) (_ []*Statement, additionalIteration bool, err error) {
 	if h.triggerWithoutEvents != nil {
 		stmt, err := h.triggerWithoutEvents(pseudo.NewScheduledEvent(ctx, time.Now(), currentState.instanceID))
 		if err != nil {
@@ -644,7 +640,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		return []*Statement{stmt}, false, nil
 	}
 
-	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
+	events, err := h.es.Filter(ctx, h.eventQuery(currentState, minPosition).SetTx(tx))
 	if err != nil {
 		logging.WithError(ctx, err).Debug("filter eventstore failed")
 		return nil, false, err
@@ -656,14 +652,6 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		return nil, false, err
 	}
 
-	idx := skipPreviouslyReduced(statements, currentState.cursor, (*Statement).eventSortKey)
-	if idx+1 == len(statements) {
-		currentState.applyStatement(statements[len(statements)-1])
-
-		return nil, false, nil
-	}
-	statements = statements[idx+1:]
-
 	additionalIteration = eventAmount == int(h.bulkLimit)
 	if len(statements) < len(events) {
 		// retry immediately if statements failed
@@ -671,15 +659,6 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	}
 
 	return statements, additionalIteration, nil
-}
-
-func skipPreviouslyReduced[T any](items []T, cursor eventstore.EventSortKey, key func(T) eventstore.EventSortKey) int {
-	for i, item := range items {
-		if cursor.IdentityEquals(key(item)) {
-			return i
-		}
-	}
-	return -1
 }
 
 func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, statements []*Statement) (lastProcessedIndex int, err error) {
@@ -728,14 +707,16 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, statement *S
 	return nil
 }
 
-func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder {
+func (h *Handler) eventQuery(currentState *state, minPosition decimal.Decimal) *eventstore.SearchQueryBuilder {
 	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AwaitOpenTransactions().
 		Limit(uint64(h.bulkLimit)).
 		OrderAsc().
 		InstanceID(currentState.instanceID)
 
-	if !currentState.cursor.IsZero() {
+	if minPosition.GreaterThan(decimal.NewFromInt(0)) {
+		builder = builder.PositionAtLeast(minPosition)
+	} else if !currentState.cursor.IsZero() {
 		builder = builder.AfterEventSortKey(currentState.cursor)
 	}
 

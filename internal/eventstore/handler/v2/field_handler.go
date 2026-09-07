@@ -145,11 +145,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		return false, nil
 	}
 
-	if config.minPosition.GreaterThan(decimal.NewFromInt(0)) {
-		currentState.cursor = eventstore.EventSortKey{Position: config.minPosition}
-	}
-
-	events, additionalIteration, err := h.fetchEvents(ctx, tx, currentState)
+	events, additionalIteration, err := h.fetchEvents(ctx, tx, currentState, config.minPosition)
 	if err != nil {
 		return additionalIteration, err
 	}
@@ -168,24 +164,15 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 	return additionalIteration, err
 }
 
-func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState *state) (_ []eventstore.FillFieldsEvent, additionalIteration bool, err error) {
-	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
+func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState *state, minPosition decimal.Decimal) (_ []eventstore.FillFieldsEvent, additionalIteration bool, err error) {
+	events, err := h.es.Filter(ctx, h.eventQuery(currentState, minPosition).SetTx(tx))
 	if err != nil || len(events) == 0 {
 		logging.OnError(ctx, err).Debug("filter eventstore failed")
 		return nil, false, err
 	}
-	eventAmount := len(events)
-
-	idx := skipPreviouslyReduced(events, currentState.cursor, eventstore.EventSortKeyFromEvent)
 
 	currentState.applyEvent(events[len(events)-1])
-
-	if idx+1 == len(events) {
-		return nil, false, nil
-	}
-	events = events[idx+1:]
-
-	additionalIteration = eventAmount == int(h.bulkLimit)
+	additionalIteration = len(events) == int(h.bulkLimit)
 
 	fillFieldsEvents := make([]eventstore.FillFieldsEvent, len(events))
 	for i, event := range events {
