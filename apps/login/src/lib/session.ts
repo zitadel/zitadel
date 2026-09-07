@@ -21,7 +21,6 @@ type LoadMostRecentSessionParams = {
 type LoadSessionByIdParams = {
   serviceConfig: ServiceConfig;
   sessionId: string;
-  organization?: string;
 };
 
 async function sessionFromCookie(
@@ -66,12 +65,10 @@ export async function loadMostRecentSession({
   return sessionFromCookie(serviceConfig, recent);
 }
 
-export async function loadSessionById({
-  serviceConfig,
-  sessionId,
-  organization,
-}: LoadSessionByIdParams): Promise<Session | undefined> {
-  const recent = await getSessionCookieById({ sessionId, organization });
+export async function loadSessionById({ serviceConfig, sessionId }: LoadSessionByIdParams): Promise<Session | undefined> {
+  // Session ids are unique; skip the org filter so a mismatched URL org cannot
+  // hide a valid cookie (the loginname → password/passkey handoff case).
+  const recent = await getSessionCookieById({ sessionId });
   return sessionFromCookie(serviceConfig, recent);
 }
 

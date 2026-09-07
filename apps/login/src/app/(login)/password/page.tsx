@@ -35,7 +35,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   // Prefer the session created at loginname (explicit id). Fall back to
   // loginName+org cookie lookup for direct /password visits and enumeration
   // protection, where no session exists by design.
-  let sessionFactors = sessionId ? await loadSessionById({ serviceConfig, sessionId, organization }) : undefined;
+  let sessionFactors = sessionId ? await loadSessionById({ serviceConfig, sessionId }) : undefined;
 
   if (!sessionFactors) {
     sessionFactors = await loadMostRecentSession({
@@ -47,13 +47,15 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     });
   }
 
+  const resolvedOrganization = sessionFactors?.factors?.user?.organizationId ?? organization ?? defaultOrganization;
+
   const branding = await getBrandingSettings({
     serviceConfig,
-    organization: organization ?? sessionFactors?.factors?.user?.organizationId ?? defaultOrganization,
+    organization: resolvedOrganization,
   });
   const loginSettings = await getLoginSettings({
     serviceConfig,
-    organization: organization ?? sessionFactors?.factors?.user?.organizationId ?? defaultOrganization,
+    organization: resolvedOrganization,
   });
 
   return (

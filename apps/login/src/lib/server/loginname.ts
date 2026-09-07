@@ -45,7 +45,9 @@ const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 // user context on /password and /passkey (zitadel/zitadel#12112).
 function withSessionId(params: URLSearchParams, sessionId?: string) {
   if (sessionId) {
-    params.append("sessionId", sessionId);
+    // set (not append) so a pre-existing sessionId from retry/back nav stays unique.
+    // Duplicate keys make Next.js searchParams.sessionId an array.
+    params.set("sessionId", sessionId);
   }
   return params;
 }

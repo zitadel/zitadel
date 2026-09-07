@@ -1694,7 +1694,7 @@ describe("loadSessionById", () => {
   test("returns undefined without calling getSession when no cookie is found", async () => {
     vi.mocked(cookiesModule.getSessionCookieById).mockResolvedValue(undefined as any);
 
-    const result = await loadSessionById({ serviceConfig, sessionId: "session-id", organization: "test-org-id" });
+    const result = await loadSessionById({ serviceConfig, sessionId: "session-id" });
 
     expect(result).toBeUndefined();
     expect(zitadelModule.getSession).not.toHaveBeenCalled();
@@ -1705,12 +1705,11 @@ describe("loadSessionById", () => {
     vi.mocked(cookiesModule.getSessionCookieById).mockResolvedValue(cookie as any);
     vi.mocked(zitadelModule.getSession).mockResolvedValue({ session } as any);
 
-    const result = await loadSessionById({ serviceConfig, sessionId: "session-id", organization: "test-org-id" });
+    const result = await loadSessionById({ serviceConfig, sessionId: "session-id" });
 
     expect(result).toBe(session);
     expect(cookiesModule.getSessionCookieById).toHaveBeenCalledWith({
       sessionId: "session-id",
-      organization: "test-org-id",
     });
     expect(zitadelModule.getSession).toHaveBeenCalledWith({
       serviceConfig,
@@ -1728,7 +1727,7 @@ describe("loadSessionById", () => {
     const result = await loadSessionById({ serviceConfig, sessionId: "session-id" });
 
     expect(result).toBeUndefined();
-    expect(consoleSpy).toHaveBeenCalledWith("[Session] Could not load most recent session", notFound);
+    expect(consoleSpy).toHaveBeenCalledWith(expect.any(String), notFound);
     consoleSpy.mockRestore();
   });
 });

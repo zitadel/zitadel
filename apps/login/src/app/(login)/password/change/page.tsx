@@ -25,7 +25,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   // Prefer the session from the password-change redirect. Fall back to
   // loginName+org cookie lookup when sessionId is missing (direct visit).
-  let sessionFactors = sessionId ? await loadSessionById({ serviceConfig, sessionId, organization }) : undefined;
+  let sessionFactors = sessionId ? await loadSessionById({ serviceConfig, sessionId }) : undefined;
 
   if (!sessionFactors) {
     sessionFactors = await loadMostRecentSession({
@@ -37,7 +37,10 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     });
   }
 
-  const branding = await getBrandingSettings({ serviceConfig, organization });
+  const branding = await getBrandingSettings({
+    serviceConfig,
+    organization: sessionFactors?.factors?.user?.organizationId ?? organization,
+  });
 
   const passwordComplexity = await getPasswordComplexitySettings({
     serviceConfig,
