@@ -7,7 +7,9 @@ import (
 	"net/http"
 	"net/url"
 	"slices"
+	"strconv"
 	"strings"
+	"time"
 
 	crewjam_saml "github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
@@ -1204,7 +1206,7 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]openid.ProviderOpts, 1, 3)
+	opts := make([]openid.ProviderOpts, 1, 5)
 	opts[0] = openid.WithSelectAccount()
 	if identityProvider.OIDCIDPTemplate.IsIDTokenMapping {
 		opts = append(opts, openid.WithIDTokenMapping())
@@ -1213,6 +1215,12 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 	if identityProvider.OIDCIDPTemplate.UsePKCE {
 		// we do not pass any cookie handler, since we store the verifier internally, rather than in a cookie
 		opts = append(opts, openid.WithRelyingPartyOption(rp.WithPKCE(nil)))
+	}
+	if len(identityProvider.OIDCIDPTemplate.AuthorizationParameters) > 0 {
+		opts = append(opts, openid.WithAuthorizationParameters(identityProvider.OIDCIDPTemplate.AuthorizationParameters))
+	}
+	if len(identityProvider.OIDCIDPTemplate.ForwardedParameters) > 0 {
+		opts = append(opts, openid.WithForwardedParameters(identityProvider.OIDCIDPTemplate.ForwardedParameters))
 	}
 
 	return openid.New(identityProvider.Name,
@@ -1256,10 +1264,16 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 		Scopes:      identityProvider.OAuthIDPTemplate.Scopes,
 	}
 
-	opts := make([]oauth.ProviderOpts, 0, 1)
+	opts := make([]oauth.ProviderOpts, 0, 3)
 	if identityProvider.OAuthIDPTemplate.UsePKCE {
 		// we do not pass any cookie handler, since we store the verifier internally, rather than in a cookie
 		opts = append(opts, oauth.WithRelyingPartyOption(rp.WithPKCE(nil)))
+	}
+	if len(identityProvider.OAuthIDPTemplate.AuthorizationParameters) > 0 {
+		opts = append(opts, oauth.WithAuthorizationParameters(identityProvider.OAuthIDPTemplate.AuthorizationParameters))
+	}
+	if len(identityProvider.OAuthIDPTemplate.ForwardedParameters) > 0 {
+		opts = append(opts, oauth.WithForwardedParameters(identityProvider.OAuthIDPTemplate.ForwardedParameters))
 	}
 	return oauth.New(
 		config,
@@ -1599,8 +1613,11 @@ func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOpti
 }
 
 func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domain.AuthRequest, identityProviderID string) []idp.Parameter {
-	params := make([]idp.Parameter, 1, 2)
+	params := make([]idp.Parameter, 1, 3)
 	params[0] = idp.UserAgentID(authReq.AgentID)
+	if authorizationParameters := authorizationParametersFromAuthRequest(authReq); len(authorizationParameters) > 0 {
+		params = append(params, authorizationParameters)
+	}
 
 	if authReq.UserID != "" && identityProviderID != "" {
 		links, err := l.getUserLinks(ctx, authReq.UserID, identityProviderID)
@@ -1622,6 +1639,48 @@ func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domai
 		return append(params, idp.LoginHintParam(authReq.LoginHint))
 	}
 	return params
+}
+
+// authorizationParametersFromAuthRequest returns the parameters of the authorization request which
+// started the authentication. Only the ones an identity provider is explicitly configured to
+// forward are added to its authorization request.
+func authorizationParametersFromAuthRequest(authReq *domain.AuthRequest) idp.AuthorizationParameters {
+	parameters := make(idp.AuthorizationParameters, 4)
+	if prompts := promptsToStrings(authReq.Prompt); len(prompts) > 0 {
+		parameters["prompt"] = strings.Join(prompts, " ")
+	}
+	if authReq.MaxAuthAge != nil {
+		parameters["max_age"] = strconv.FormatInt(int64(*authReq.MaxAuthAge/time.Second), 10)
+	}
+	if len(authReq.UiLocales) > 0 {
+		parameters["ui_locales"] = strings.Join(authReq.UiLocales, " ")
+	}
+	if authReq.LoginHint != "" {
+		parameters["login_hint"] = authReq.LoginHint
+	}
+	return parameters
+}
+
+func promptsToStrings(prompts []domain.Prompt) []string {
+	values := make([]string, 0, len(prompts))
+	for _, prompt := range prompts {
+		switch prompt {
+		case domain.PromptNone:
+			values = append(values, oidc.PromptNone)
+		case domain.PromptLogin:
+			values = append(values, oidc.PromptLogin)
+		case domain.PromptConsent:
+			values = append(values, oidc.PromptConsent)
+		case domain.PromptSelectAccount:
+			values = append(values, oidc.PromptSelectAccount)
+		case domain.PromptCreate:
+			// https://openid.net/specs/openid-connect-prompt-create-1_0.html
+			values = append(values, "create")
+		case domain.PromptUnspecified:
+			continue
+		}
+	}
+	return values
 }
 
 func (l *Login) getUserLinks(ctx context.Context, userID, idpID string) (*query.IDPUserLinks, error) {

@@ -618,6 +618,10 @@ Errors:
     KeyIDMissing: "KeyID ontbreekt"
     PrivateKeyMissing: "Privésleutel ontbreekt"
     InvalidPrivateKey: "Ongeldig formaat van privésleutel"
+    AuthorizationParameterNameMissing: "Naam van autorisatieparameter ontbreekt"
+    AuthorizationParameterNameInvalid: "Ongeldige naam van autorisatieparameter"
+    AuthorizationParameterDuplicate: "Autorisatieparameter meer dan één keer gedefinieerd"
+    AuthorizationParameterReserved: "Autorisatieparameter wordt beheerd door ZITADEL en kan niet worden ingesteld"
 
 AggregateTypes:
   action: "Actie"

@@ -1,0 +1,37 @@
+**Authorization parameters**: Additional parameters ZITADEL adds to the authorization request it sends
+to the provider, for example `acr_values=AAL2_OR_AAL3_ANY` to request a specific assurance level.
+
+**Forwarded parameters**: Names of the parameters of the original authorization request — the one your
+application sent to ZITADEL — that are forwarded to the provider, for example `acr_values` or `max_age`.
+Only the parameters listed here are forwarded; everything else is dropped.
+
+### Precedence
+
+When ZITADEL builds the authorization request for the provider, the parameters are applied in this order,
+with later ones overriding earlier ones:
+
+1. The parameters ZITADEL sets itself, such as `prompt=select_account` or `login_hint`.
+2. The allow-listed parameters forwarded from the original authorization request.
+3. The configured authorization parameters.
+
+Setting a parameter to an **empty value** removes it from the request entirely. This is how you disable a
+default: configuring `prompt` with an empty value stops ZITADEL from sending `prompt=select_account`,
+while configuring `prompt=login` replaces it.
+
+### Reserved parameters
+
+The parameters ZITADEL needs to run the flow securely are managed by ZITADEL and can neither be configured
+nor forwarded. Trying to configure one of them is rejected:
+
+`client_id`, `client_secret`, `code`, `code_challenge`, `code_challenge_method`, `nonce`, `redirect_uri`,
+`response_type`, `scope`, `state`
+
+Parameter names are case-insensitive and are stored in lower case. Values are URL-encoded when the
+authorization request is built.
+
+:::note
+Forwarding only takes effect if the login sends the original parameters along. The hosted login UI forwards
+`prompt`, `max_age`, `ui_locales` and `login_hint` of the OIDC authorization request it received. When you
+build your own login using the [`StartIdentityProviderIntent`](/apis/resources/user_service_v2/user-service-start-identity-provider-intent)
+endpoint, pass them in the `authorizationParameters` field of the request.
+:::

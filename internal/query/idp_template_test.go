@@ -40,6 +40,8 @@ var (
 		` projections.idp_templates6_oauth2.scopes,` +
 		` projections.idp_templates6_oauth2.id_attribute,` +
 		` projections.idp_templates6_oauth2.use_pkce,` +
+		` projections.idp_templates6_oauth2.authorization_parameters,` +
+		` projections.idp_templates6_oauth2.forwarded_parameters,` +
 		// oidc
 		` projections.idp_templates6_oidc.idp_id,` +
 		` projections.idp_templates6_oidc.issuer,` +
@@ -48,6 +50,8 @@ var (
 		` projections.idp_templates6_oidc.scopes,` +
 		` projections.idp_templates6_oidc.id_token_mapping,` +
 		` projections.idp_templates6_oidc.use_pkce,` +
+		` projections.idp_templates6_oidc.authorization_parameters,` +
+		` projections.idp_templates6_oidc.forwarded_parameters,` +
 		// jwt
 		` projections.idp_templates6_jwt.idp_id,` +
 		` projections.idp_templates6_jwt.issuer,` +
@@ -180,6 +184,8 @@ var (
 		"scopes",
 		"id_attribute",
 		"use_pkce",
+		"authorization_parameters",
+		"forwarded_parameters",
 		// oidc config
 		"id_id",
 		"issuer",
@@ -188,6 +194,8 @@ var (
 		"scopes",
 		"id_token_mapping",
 		"use_pkce",
+		"authorization_parameters",
+		"forwarded_parameters",
 		// jwt
 		"idp_id",
 		"issuer",
@@ -306,6 +314,8 @@ var (
 		` projections.idp_templates6_oauth2.scopes,` +
 		` projections.idp_templates6_oauth2.id_attribute,` +
 		` projections.idp_templates6_oauth2.use_pkce,` +
+		` projections.idp_templates6_oauth2.authorization_parameters,` +
+		` projections.idp_templates6_oauth2.forwarded_parameters,` +
 		// oidc
 		` projections.idp_templates6_oidc.idp_id,` +
 		` projections.idp_templates6_oidc.issuer,` +
@@ -314,6 +324,8 @@ var (
 		` projections.idp_templates6_oidc.scopes,` +
 		` projections.idp_templates6_oidc.id_token_mapping,` +
 		` projections.idp_templates6_oidc.use_pkce,` +
+		` projections.idp_templates6_oidc.authorization_parameters,` +
+		` projections.idp_templates6_oidc.forwarded_parameters,` +
 		// jwt
 		` projections.idp_templates6_jwt.idp_id,` +
 		` projections.idp_templates6_jwt.issuer,` +
@@ -447,6 +459,8 @@ var (
 		"scopes",
 		"id_attribute",
 		"use_pkce",
+		"authorization_parameters",
+		"forwarded_parameters",
 		// oidc config
 		"id_id",
 		"issuer",
@@ -455,6 +469,8 @@ var (
 		"scopes",
 		"id_token_mapping",
 		"use_pkce",
+		"authorization_parameters",
+		"forwarded_parameters",
 		// jwt
 		"idp_id",
 		"issuer",
@@ -614,7 +630,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						database.TextArray[string]{"profile"},
 						"id-attribute",
 						true,
+						nil,
+						nil,
 						// oidc
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -778,6 +798,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
 						// oidc
 						"idp-id",
 						"issuer",
@@ -786,6 +808,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						database.TextArray[string]{"profile"},
 						true,
 						true,
+						nil,
+						nil,
 						// jwt
 						nil,
 						nil,
@@ -940,7 +964,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
 						// oidc
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1101,7 +1129,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
 						// oidc
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1260,7 +1292,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
 						// oidc
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1419,7 +1455,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
 						// oidc
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1579,7 +1619,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
 						// oidc
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1738,7 +1782,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
 						// oidc
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1903,7 +1951,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
 						// oidc
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -2083,7 +2135,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
 						// oidc
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -2244,7 +2300,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
 						// oidc
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -2410,7 +2470,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
 						// oidc
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -2599,7 +2663,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 							// oidc
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2788,7 +2856,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 							// oidc
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2950,7 +3022,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 							// oidc
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -3077,7 +3153,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 							// oidc
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -3204,7 +3284,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 							// oidc
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -3331,7 +3415,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							database.TextArray[string]{"profile"},
 							"id-attribute",
 							true,
+							nil,
+							nil,
 							// oidc
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -3458,6 +3546,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 							// oidc
 							"idp-id-oidc",
 							"issuer",
@@ -3466,6 +3556,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							database.TextArray[string]{"profile"},
 							true,
 							true,
+							nil,
+							nil,
 							// jwt
 							nil,
 							nil,
@@ -3585,7 +3677,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 							// oidc
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -3712,7 +3808,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 							// oidc
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,

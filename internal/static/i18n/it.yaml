@@ -618,6 +618,10 @@ Errors:
     KeyIDMissing: "ID chiave mancante"
     PrivateKeyMissing: "Chiave privata mancante"
     InvalidPrivateKey: "Formato chiave privata non valido"
+    AuthorizationParameterNameMissing: "Nome del parametro di autorizzazione mancante"
+    AuthorizationParameterNameInvalid: "Nome del parametro di autorizzazione non valido"
+    AuthorizationParameterDuplicate: "Parametro di autorizzazione definito più volte"
+    AuthorizationParameterReserved: "Il parametro di autorizzazione è gestito da ZITADEL e non può essere impostato"
 
 AggregateTypes:
   action: "Azione"

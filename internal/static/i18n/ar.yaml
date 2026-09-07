@@ -614,6 +614,10 @@ Errors:
     KeyIDMissing: "معرف المفتاح مفقود"
     PrivateKeyMissing: "المفتاح الخاص مفقود"
     InvalidPrivateKey: "تنسيق مفتاح خاص غير صالح"
+    AuthorizationParameterNameMissing: "اسم معامل التفويض مفقود"
+    AuthorizationParameterNameInvalid: "اسم معامل التفويض غير صالح"
+    AuthorizationParameterDuplicate: "تم تعريف معامل التفويض أكثر من مرة"
+    AuthorizationParameterReserved: "معامل التفويض تديره ZITADEL ولا يمكن تعيينه"
 
 AggregateTypes:
   action: "إجراء"

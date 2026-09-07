@@ -3167,6 +3167,16 @@ message StartIdentityProviderIntentRequest{
     RedirectURLs urls = 2;
     LDAPCredentials ldap = 3;
   }
+
+  // Parameters of the authorization request which started this authentication.
+  // They are only forwarded to the identity provider if its configuration explicitly lists them
+  // in `forwarded_parameters`. Parameters managed by ZITADEL are never forwarded.
+  map<string, string> authorization_parameters = 4 [
+    (validate.rules).map = {max_pairs: 20, keys: {string: {min_len: 1, max_len: 100}}, values: {string: {max_len: 1000}}},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "{\"acr_values\": \"AAL2_OR_AAL3_ANY\", \"max_age\": \"300\"}";
+    }
+  ];
 }
 
 message StartIdentityProviderIntentResponse{

@@ -2,7 +2,9 @@ package oidc
 
 import (
 	"context"
+	"maps"
 	"net/http"
+	"slices"
 
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -16,16 +18,27 @@ var _ idp.Provider = (*Provider)(nil)
 // Provider is the [idp.Provider] implementation for a generic OIDC provider
 type Provider struct {
 	rp.RelyingParty
-	options           []rp.Option
-	name              string
-	isLinkingAllowed  bool
-	isCreationAllowed bool
-	isAutoCreation    bool
-	isAutoUpdate      bool
-	useIDToken        bool
-	userInfoMapper    func(info *oidc.UserInfo) idp.User
-	authOptions       []func(bool) rp.AuthURLOpt
-	generateVerifier  func() string
+	options                 []rp.Option
+	name                    string
+	isLinkingAllowed        bool
+	isCreationAllowed       bool
+	isAutoCreation          bool
+	isAutoUpdate            bool
+	useIDToken              bool
+	userInfoMapper          func(info *oidc.UserInfo) idp.User
+	authOptions             []func(authURLContext) rp.AuthURLOpt
+	authorizationParameters map[string]string
+	forwardedParameters     []string
+	generateVerifier        func() string
+}
+
+// authURLContext provides the information needed to decide whether a default
+// authorization request parameter still applies.
+type authURLContext struct {
+	// loginHintSet is true if a login_hint was passed to BeginAuth.
+	loginHintSet bool
+	// parameters are the resolved additional parameters of the upstream authorization request.
+	parameters map[string]string
 }
 
 type ProviderOpts func(provider *Provider)
@@ -73,11 +86,15 @@ func WithRelyingPartyOption(option rp.Option) ProviderOpts {
 	}
 }
 
-// WithSelectAccount adds the select_account prompt to the auth request (if no login_hint is set)
+// WithSelectAccount adds the select_account prompt to the auth request
+// (if no login_hint is set and the prompt is not controlled by the provider configuration)
 func WithSelectAccount() ProviderOpts {
 	return func(p *Provider) {
-		p.authOptions = append(p.authOptions, func(loginHintSet bool) rp.AuthURLOpt {
-			if loginHintSet {
+		p.authOptions = append(p.authOptions, func(auth authURLContext) rp.AuthURLOpt {
+			if _, ok := auth.parameters["prompt"]; ok {
+				return nil
+			}
+			if auth.loginHintSet {
 				return nil
 			}
 			return rp.WithPrompt(oidc.PromptSelectAccount)
@@ -89,9 +106,26 @@ func WithSelectAccount() ProviderOpts {
 func WithResponseMode(mode oidc.ResponseMode) ProviderOpts {
 	return func(p *Provider) {
 		paramOpt := rp.WithResponseModeURLParam(mode)
-		p.authOptions = append(p.authOptions, func(_ bool) rp.AuthURLOpt {
+		p.authOptions = append(p.authOptions, func(_ authURLContext) rp.AuthURLOpt {
 			return rp.AuthURLOpt(paramOpt)
 		})
+	}
+}
+
+// WithAuthorizationParameters sets additional parameters on the authorization request sent to the
+// provider. They take precedence over any parameter ZITADEL sets itself, e.g. `prompt=select_account`.
+// A parameter with an empty value is omitted from the request altogether.
+func WithAuthorizationParameters(parameters map[string]string) ProviderOpts {
+	return func(p *Provider) {
+		p.authorizationParameters = parameters
+	}
+}
+
+// WithForwardedParameters allows the listed parameters of the original authorization request
+// to be forwarded to the provider. Parameters set by [WithAuthorizationParameters] take precedence.
+func WithForwardedParameters(parameters []string) ProviderOpts {
+	return func(p *Provider) {
+		p.forwardedParameters = parameters
 	}
 }
 
@@ -146,11 +180,12 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Pa
 	for _, param := range params {
 		if username, ok := param.(idp.LoginHintParam); ok {
 			loginHintSet = true
-			opts = append(opts, loginHint(string(username)))
+			opts = append(opts, urlParam("login_hint", string(username)))
 		}
 	}
+	authParams := idp.ResolveAuthorizationParameters(p.authorizationParameters, p.forwardedParameters, params)
 	for _, option := range p.authOptions {
-		if opt := option(loginHintSet); opt != nil {
+		if opt := option(authURLContext{loginHintSet: loginHintSet, parameters: authParams}); opt != nil {
 			opts = append(opts, opt)
 		}
 	}
@@ -160,14 +195,30 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Pa
 		codeVerifier = p.generateVerifier()
 		opts = append(opts, rp.WithCodeChallenge(oidc.NewSHACodeChallenge(codeVerifier)))
 	}
+	// applied last so that the configured parameters take precedence over the ones set by ZITADEL
+	opts = append(opts, urlParams(authParams)...)
 
 	url := rp.AuthURL(state, p.RelyingParty, opts...)
 	return &Session{AuthURL: url, Provider: p, CodeVerifier: codeVerifier}, nil
 }
 
-func loginHint(hint string) rp.AuthURLOpt {
+// urlParams returns the options to set the parameters on the authorization request.
+// Parameters without a value are skipped, which removes ZITADEL's default if there is any.
+// The keys are sorted to keep the resulting authorization URL stable.
+func urlParams(parameters map[string]string) []rp.AuthURLOpt {
+	opts := make([]rp.AuthURLOpt, 0, len(parameters))
+	for _, key := range slices.Sorted(maps.Keys(parameters)) {
+		if parameters[key] == "" {
+			continue
+		}
+		opts = append(opts, urlParam(key, parameters[key]))
+	}
+	return opts
+}
+
+func urlParam(key, value string) rp.AuthURLOpt {
 	return func() []oauth2.AuthCodeOption {
-		return []oauth2.AuthCodeOption{oauth2.SetAuthURLParam("login_hint", hint)}
+		return []oauth2.AuthCodeOption{oauth2.SetAuthURLParam(key, value)}
 	}
 }
 

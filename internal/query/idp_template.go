@@ -56,25 +56,29 @@ type IDPTemplates struct {
 }
 
 type OAuthIDPTemplate struct {
-	IDPID                 string
-	ClientID              string
-	ClientSecret          *crypto.CryptoValue
-	AuthorizationEndpoint string
-	TokenEndpoint         string
-	UserEndpoint          string
-	Scopes                database.TextArray[string]
-	IDAttribute           string
-	UsePKCE               bool
+	IDPID                   string
+	ClientID                string
+	ClientSecret            *crypto.CryptoValue
+	AuthorizationEndpoint   string
+	TokenEndpoint           string
+	UserEndpoint            string
+	Scopes                  database.TextArray[string]
+	IDAttribute             string
+	UsePKCE                 bool
+	AuthorizationParameters database.Map[string]
+	ForwardedParameters     database.TextArray[string]
 }
 
 type OIDCIDPTemplate struct {
-	IDPID            string
-	ClientID         string
-	ClientSecret     *crypto.CryptoValue
-	Issuer           string
-	Scopes           database.TextArray[string]
-	IsIDTokenMapping bool
-	UsePKCE          bool
+	IDPID                   string
+	ClientID                string
+	ClientSecret            *crypto.CryptoValue
+	Issuer                  string
+	Scopes                  database.TextArray[string]
+	IsIDTokenMapping        bool
+	UsePKCE                 bool
+	AuthorizationParameters database.Map[string]
+	ForwardedParameters     database.TextArray[string]
 }
 
 type JWTIDPTemplate struct {
@@ -296,6 +300,14 @@ var (
 		name:  projection.OAuthUsePKCECol,
 		table: oauthIdpTemplateTable,
 	}
+	OAuthAuthorizationParamsCol = Column{
+		name:  projection.OAuthAuthorizationParamsCol,
+		table: oauthIdpTemplateTable,
+	}
+	OAuthForwardedParamsCol = Column{
+		name:  projection.OAuthForwardedParamsCol,
+		table: oauthIdpTemplateTable,
+	}
 )
 
 var (
@@ -333,6 +345,14 @@ var (
 	}
 	OIDCUsePKCECol = Column{
 		name:  projection.OIDCUsePKCECol,
+		table: oidcIdpTemplateTable,
+	}
+	OIDCAuthorizationParamsCol = Column{
+		name:  projection.OIDCAuthorizationParamsCol,
+		table: oidcIdpTemplateTable,
+	}
+	OIDCForwardedParamsCol = Column{
+		name:  projection.OIDCForwardedParamsCol,
 		table: oidcIdpTemplateTable,
 	}
 )
@@ -949,6 +969,8 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			OAuthScopesCol.identifier(),
 			OAuthIDAttributeCol.identifier(),
 			OAuthUsePKCECol.identifier(),
+			OAuthAuthorizationParamsCol.identifier(),
+			OAuthForwardedParamsCol.identifier(),
 			// oidc
 			OIDCIDCol.identifier(),
 			OIDCIssuerCol.identifier(),
@@ -957,6 +979,8 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			OIDCScopesCol.identifier(),
 			OIDCIDTokenMappingCol.identifier(),
 			OIDCUsePKCECol.identifier(),
+			OIDCAuthorizationParamsCol.identifier(),
+			OIDCForwardedParamsCol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
@@ -1079,6 +1103,8 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			oauthScopes := database.TextArray[string]{}
 			oauthIDAttribute := sql.NullString{}
 			oauthUserPKCE := sql.NullBool{}
+			var oauthAuthorizationParams database.Map[string]
+			oauthForwardedParams := database.TextArray[string]{}
 
 			oidcID := sql.NullString{}
 			oidcIssuer := sql.NullString{}
@@ -1087,6 +1113,8 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			oidcScopes := database.TextArray[string]{}
 			oidcIDTokenMapping := sql.NullBool{}
 			oidcUserPKCE := sql.NullBool{}
+			var oidcAuthorizationParams database.Map[string]
+			oidcForwardedParams := database.TextArray[string]{}
 
 			jwtID := sql.NullString{}
 			jwtIssuer := sql.NullString{}
@@ -1206,6 +1234,8 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				&oauthScopes,
 				&oauthIDAttribute,
 				&oauthUserPKCE,
+				&oauthAuthorizationParams,
+				&oauthForwardedParams,
 				// oidc
 				&oidcID,
 				&oidcIssuer,
@@ -1214,6 +1244,8 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				&oidcScopes,
 				&oidcIDTokenMapping,
 				&oidcUserPKCE,
+				&oidcAuthorizationParams,
+				&oidcForwardedParams,
 				// jwt
 				&jwtID,
 				&jwtIssuer,
@@ -1319,26 +1351,30 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 
 			if oauthID.Valid {
 				idpTemplate.OAuthIDPTemplate = &OAuthIDPTemplate{
-					IDPID:                 oauthID.String,
-					ClientID:              oauthClientID.String,
-					ClientSecret:          oauthClientSecret,
-					AuthorizationEndpoint: oauthAuthorizationEndpoint.String,
-					TokenEndpoint:         oauthTokenEndpoint.String,
-					UserEndpoint:          oauthUserEndpoint.String,
-					Scopes:                oauthScopes,
-					IDAttribute:           oauthIDAttribute.String,
-					UsePKCE:               oauthUserPKCE.Bool,
+					IDPID:                   oauthID.String,
+					ClientID:                oauthClientID.String,
+					ClientSecret:            oauthClientSecret,
+					AuthorizationEndpoint:   oauthAuthorizationEndpoint.String,
+					TokenEndpoint:           oauthTokenEndpoint.String,
+					UserEndpoint:            oauthUserEndpoint.String,
+					Scopes:                  oauthScopes,
+					IDAttribute:             oauthIDAttribute.String,
+					UsePKCE:                 oauthUserPKCE.Bool,
+					AuthorizationParameters: oauthAuthorizationParams,
+					ForwardedParameters:     oauthForwardedParams,
 				}
 			}
 			if oidcID.Valid {
 				idpTemplate.OIDCIDPTemplate = &OIDCIDPTemplate{
-					IDPID:            oidcID.String,
-					ClientID:         oidcClientID.String,
-					ClientSecret:     oidcClientSecret,
-					Issuer:           oidcIssuer.String,
-					Scopes:           oidcScopes,
-					IsIDTokenMapping: oidcIDTokenMapping.Bool,
-					UsePKCE:          oidcUserPKCE.Bool,
+					IDPID:                   oidcID.String,
+					ClientID:                oidcClientID.String,
+					ClientSecret:            oidcClientSecret,
+					Issuer:                  oidcIssuer.String,
+					Scopes:                  oidcScopes,
+					IsIDTokenMapping:        oidcIDTokenMapping.Bool,
+					UsePKCE:                 oidcUserPKCE.Bool,
+					AuthorizationParameters: oidcAuthorizationParams,
+					ForwardedParameters:     oidcForwardedParams,
 				}
 			}
 			if jwtID.Valid {
@@ -1500,6 +1536,8 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			OAuthScopesCol.identifier(),
 			OAuthIDAttributeCol.identifier(),
 			OAuthUsePKCECol.identifier(),
+			OAuthAuthorizationParamsCol.identifier(),
+			OAuthForwardedParamsCol.identifier(),
 			// oidc
 			OIDCIDCol.identifier(),
 			OIDCIssuerCol.identifier(),
@@ -1508,6 +1546,8 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			OIDCScopesCol.identifier(),
 			OIDCIDTokenMappingCol.identifier(),
 			OIDCUsePKCECol.identifier(),
+			OIDCAuthorizationParamsCol.identifier(),
+			OIDCForwardedParamsCol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
@@ -1635,6 +1675,8 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 				oauthScopes := database.TextArray[string]{}
 				oauthIDAttribute := sql.NullString{}
 				oauthUserPKCE := sql.NullBool{}
+				var oauthAuthorizationParams database.Map[string]
+				oauthForwardedParams := database.TextArray[string]{}
 
 				oidcID := sql.NullString{}
 				oidcIssuer := sql.NullString{}
@@ -1643,6 +1685,8 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 				oidcScopes := database.TextArray[string]{}
 				oidcIDTokenMapping := sql.NullBool{}
 				oidcUserPKCE := sql.NullBool{}
+				var oidcAuthorizationParams database.Map[string]
+				oidcForwardedParams := database.TextArray[string]{}
 
 				jwtID := sql.NullString{}
 				jwtIssuer := sql.NullString{}
@@ -1762,6 +1806,8 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					&oauthScopes,
 					&oauthIDAttribute,
 					&oauthUserPKCE,
+					&oauthAuthorizationParams,
+					&oauthForwardedParams,
 					// oidc
 					&oidcID,
 					&oidcIssuer,
@@ -1770,6 +1816,8 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					&oidcScopes,
 					&oidcIDTokenMapping,
 					&oidcUserPKCE,
+					&oidcAuthorizationParams,
+					&oidcForwardedParams,
 					// jwt
 					&jwtID,
 					&jwtIssuer,
@@ -1874,26 +1922,30 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 
 				if oauthID.Valid {
 					idpTemplate.OAuthIDPTemplate = &OAuthIDPTemplate{
-						IDPID:                 oauthID.String,
-						ClientID:              oauthClientID.String,
-						ClientSecret:          oauthClientSecret,
-						AuthorizationEndpoint: oauthAuthorizationEndpoint.String,
-						TokenEndpoint:         oauthTokenEndpoint.String,
-						UserEndpoint:          oauthUserEndpoint.String,
-						Scopes:                oauthScopes,
-						IDAttribute:           oauthIDAttribute.String,
-						UsePKCE:               oauthUserPKCE.Bool,
+						IDPID:                   oauthID.String,
+						ClientID:                oauthClientID.String,
+						ClientSecret:            oauthClientSecret,
+						AuthorizationEndpoint:   oauthAuthorizationEndpoint.String,
+						TokenEndpoint:           oauthTokenEndpoint.String,
+						UserEndpoint:            oauthUserEndpoint.String,
+						Scopes:                  oauthScopes,
+						IDAttribute:             oauthIDAttribute.String,
+						UsePKCE:                 oauthUserPKCE.Bool,
+						AuthorizationParameters: oauthAuthorizationParams,
+						ForwardedParameters:     oauthForwardedParams,
 					}
 				}
 				if oidcID.Valid {
 					idpTemplate.OIDCIDPTemplate = &OIDCIDPTemplate{
-						IDPID:            oidcID.String,
-						ClientID:         oidcClientID.String,
-						ClientSecret:     oidcClientSecret,
-						Issuer:           oidcIssuer.String,
-						Scopes:           oidcScopes,
-						IsIDTokenMapping: oidcIDTokenMapping.Bool,
-						UsePKCE:          oidcUserPKCE.Bool,
+						IDPID:                   oidcID.String,
+						ClientID:                oidcClientID.String,
+						ClientSecret:            oidcClientSecret,
+						Issuer:                  oidcIssuer.String,
+						Scopes:                  oidcScopes,
+						IsIDTokenMapping:        oidcIDTokenMapping.Bool,
+						UsePKCE:                 oidcUserPKCE.Bool,
+						AuthorizationParameters: oidcAuthorizationParams,
+						ForwardedParameters:     oidcForwardedParams,
 					}
 				}
 				if jwtID.Valid {

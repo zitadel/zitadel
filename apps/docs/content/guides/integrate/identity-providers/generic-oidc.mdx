@@ -12,6 +12,7 @@ import IDPsOverview from './_idps_overview.mdx';
 import Activate from './_activate.mdx';
 import PrefillAction from './_prefill_action.mdx';
 import TestSetup from './_test_setup.mdx';
+import AuthorizationParameters from './_authorization_parameters.mdx';
 
 <Intro components={props.components} provider="your OIDC Provider"/>
 
@@ -51,6 +52,8 @@ This information is used to create or update the user within ZITADEL.
 ZITADEL ensures that at least the `openid` scope is always sent.
 
 **Use PKCE**: If enabled, Proof Key for Code Exchange (PKCE) will be used to secure the authorization code flow in addition to the client secret.
+
+<AuthorizationParameters components={props.components} />
 
 <GeneralConfigDescription components={props.components} provider_account="OIDC provider account" />
 

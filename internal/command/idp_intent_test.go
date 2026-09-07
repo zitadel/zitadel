@@ -189,9 +189,10 @@ func TestCommands_CreateIntent(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
-								true,
-								rep_idp.Options{},
-							)),
+								true, nil, nil,
+
+								rep_idp.Options{}),
+						),
 					),
 					expectPush(
 						func() eventstore.Command {
@@ -245,9 +246,10 @@ func TestCommands_CreateIntent(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
-								true,
-								rep_idp.Options{},
-							)),
+								true, nil, nil,
+
+								rep_idp.Options{}),
+						),
 					),
 					expectPush(
 						func() eventstore.Command {
@@ -306,9 +308,10 @@ func TestCommands_CreateIntent(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
-								true,
-								rep_idp.Options{},
-							)),
+								true, nil, nil,
+
+								rep_idp.Options{}),
+						),
 					),
 					expectPush(
 						func() eventstore.Command {
@@ -367,9 +370,10 @@ func TestCommands_CreateIntent(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
-								true,
-								rep_idp.Options{},
-							)),
+								true, nil, nil,
+
+								rep_idp.Options{}),
+						),
 					),
 					expectPush(
 						func() eventstore.Command {
@@ -432,11 +436,12 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 		idGenerator  id.Generator
 	}
 	type args struct {
-		ctx         context.Context
-		idpID       string
-		loginHint   string
-		callbackURL string
-		samlRootURL string
+		ctx                     context.Context
+		idpID                   string
+		loginHint               string
+		callbackURL             string
+		samlRootURL             string
+		authorizationParameters map[string]string
 	}
 	type res struct {
 		auth       idp.Auth
@@ -506,9 +511,10 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
-								true,
-								rep_idp.Options{},
-							)),
+								true, nil, nil,
+
+								rep_idp.Options{}),
+						),
 						eventFromEventPusherWithInstanceID(
 							"instance",
 							instance.NewIDPRemovedEvent(context.Background(), &instance.NewAggregate("instance").Aggregate,
@@ -551,9 +557,10 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
-								true,
-								rep_idp.Options{},
-							)),
+								true, nil, nil,
+
+								rep_idp.Options{}),
+						),
 					),
 					expectFilter(
 						eventFromEventPusherWithInstanceID(
@@ -573,9 +580,10 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
-								true,
-								rep_idp.Options{},
-							)),
+								true, nil, nil,
+
+								rep_idp.Options{}),
+						),
 					),
 				),
 				idGenerator: mock.ExpectID(t, "id"),
@@ -613,9 +621,10 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
-								true,
-								rep_idp.Options{},
-							)),
+								true, nil, nil,
+
+								rep_idp.Options{}),
+						),
 					),
 					expectFilter(
 						eventFromEventPusherWithInstanceID(
@@ -635,9 +644,10 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
-								true,
-								rep_idp.Options{},
-							)),
+								true, nil, nil,
+
+								rep_idp.Options{}),
+						),
 					),
 				),
 				idGenerator: mock.ExpectID(t, "id"),
@@ -674,9 +684,10 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 								},
 								[]string{"openid", "profile", "User.Read"},
 								false,
-								true,
-								rep_idp.Options{},
-							)),
+								true, nil, nil,
+
+								rep_idp.Options{}),
+						),
 						eventFromEventPusherWithInstanceID(
 							"instance",
 							instance.NewOIDCIDPMigratedAzureADEvent(context.Background(), &instance.NewAggregate("instance").Aggregate,
@@ -711,9 +722,10 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 								},
 								[]string{"openid", "profile", "User.Read"},
 								false,
-								true,
-								rep_idp.Options{},
-							)),
+								true, nil, nil,
+
+								rep_idp.Options{}),
+						),
 						eventFromEventPusherWithInstanceID(
 							"instance",
 							instance.NewOIDCIDPMigratedAzureADEvent(context.Background(), &instance.NewAggregate("instance").Aggregate,
@@ -752,7 +764,7 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 				idpConfigEncryption: tt.fields.secretCrypto,
 				idGenerator:         tt.fields.idGenerator,
 			}
-			_, session, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.callbackURL, tt.args.samlRootURL, tt.args.loginHint)
+			_, session, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.callbackURL, tt.args.samlRootURL, tt.args.loginHint, tt.args.authorizationParameters)
 			require.ErrorIs(t, err, tt.res.err)
 
 			var got idp.Auth
@@ -803,11 +815,12 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 		idGenerator  id.Generator
 	}
 	type args struct {
-		ctx         context.Context
-		idpID       string
-		callbackURL string
-		samlRootURL string
-		loginHint   string
+		ctx                     context.Context
+		idpID                   string
+		callbackURL             string
+		samlRootURL             string
+		loginHint               string
+		authorizationParameters map[string]string
 	}
 	type res struct {
 		url    string
@@ -1018,7 +1031,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 				idpConfigEncryption: tt.fields.secretCrypto,
 				idGenerator:         tt.fields.idGenerator,
 			}
-			_, session, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.callbackURL, tt.args.samlRootURL, tt.args.loginHint)
+			_, session, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.callbackURL, tt.args.samlRootURL, tt.args.loginHint, tt.args.authorizationParameters)
 			require.ErrorIs(t, err, tt.res.err)
 
 			auth, err := session.GetAuth(tt.args.ctx)

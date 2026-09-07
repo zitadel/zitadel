@@ -2,14 +2,73 @@ package command
 
 import (
 	"context"
+	"net/url"
+	"slices"
+	"strings"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
+	providers "github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+// checkAuthorizationParameters normalizes the names of the parameters which are added to the
+// authorization request of an upstream identity provider and rejects the ones managed by ZITADEL.
+func checkAuthorizationParameters(parameters map[string]string) (map[string]string, error) {
+	if len(parameters) == 0 {
+		return nil, nil
+	}
+	checked := make(map[string]string, len(parameters))
+	for name, value := range parameters {
+		name, err := checkAuthorizationParameterName(name)
+		if err != nil {
+			return nil, err
+		}
+		if _, ok := checked[name]; ok {
+			return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-Ae8ie", "Errors.IDP.AuthorizationParameterDuplicate")
+		}
+		checked[name] = strings.TrimSpace(value)
+	}
+	return checked, nil
+}
+
+// checkForwardedParameters normalizes the names of the parameters which may be forwarded from the
+// original authorization request and rejects the ones managed by ZITADEL.
+func checkForwardedParameters(parameters []string) ([]string, error) {
+	if len(parameters) == 0 {
+		return nil, nil
+	}
+	checked := make([]string, 0, len(parameters))
+	for _, name := range parameters {
+		name, err := checkAuthorizationParameterName(name)
+		if err != nil {
+			return nil, err
+		}
+		if slices.Contains(checked, name) {
+			continue
+		}
+		checked = append(checked, name)
+	}
+	slices.Sort(checked)
+	return checked, nil
+}
+
+func checkAuthorizationParameterName(name string) (string, error) {
+	name = strings.ToLower(strings.TrimSpace(name))
+	if name == "" {
+		return "", zerrors.ThrowInvalidArgument(nil, "COMMA-Eij1o", "Errors.IDP.AuthorizationParameterNameMissing")
+	}
+	if url.QueryEscape(name) != name {
+		return "", zerrors.ThrowInvalidArgument(nil, "COMMA-oo0Ai", "Errors.IDP.AuthorizationParameterNameInvalid")
+	}
+	if providers.IsReservedAuthorizationParameter(name) {
+		return "", zerrors.ThrowInvalidArgument(nil, "COMMA-quo9C", "Errors.IDP.AuthorizationParameterReserved")
+	}
+	return name, nil
+}
 
 type GenericOAuthProvider struct {
 	Name                  string
@@ -21,7 +80,12 @@ type GenericOAuthProvider struct {
 	Scopes                []string
 	IDAttribute           string
 	UsePKCE               bool
-	IDPOptions            idp.Options
+	// AuthorizationParameters are statically added to the authorization request sent to the provider.
+	AuthorizationParameters map[string]string
+	// ForwardedParameters are the parameters of the original authorization request
+	// which may be forwarded to the provider.
+	ForwardedParameters []string
+	IDPOptions          idp.Options
 }
 
 type GenericOIDCProvider struct {
@@ -32,7 +96,12 @@ type GenericOIDCProvider struct {
 	Scopes           []string
 	IsIDTokenMapping bool
 	UsePKCE          bool
-	IDPOptions       idp.Options
+	// AuthorizationParameters are statically added to the authorization request sent to the provider.
+	AuthorizationParameters map[string]string
+	// ForwardedParameters are the parameters of the original authorization request
+	// which may be forwarded to the provider.
+	ForwardedParameters []string
+	IDPOptions          idp.Options
 }
 
 type JWTProvider struct {

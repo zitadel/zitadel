@@ -607,6 +607,10 @@ Errors:
     KeyIDMissing: "KeyID отсутствует"
     PrivateKeyMissing: "Закрытый ключ отсутствует"
     InvalidPrivateKey: "Неверный формат приватного ключа"
+    AuthorizationParameterNameMissing: "Отсутствует имя параметра авторизации"
+    AuthorizationParameterNameInvalid: "Неверное имя параметра авторизации"
+    AuthorizationParameterDuplicate: "Параметр авторизации определён более одного раза"
+    AuthorizationParameterReserved: "Параметр авторизации управляется ZITADEL и не может быть задан"
 
 AggregateTypes:
   action: "Действие"

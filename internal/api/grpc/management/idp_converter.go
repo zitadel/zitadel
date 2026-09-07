@@ -201,57 +201,65 @@ func providerQueryToQuery(idpQuery *mgmt_pb.ProviderQuery) (query.SearchQuery, e
 
 func addGenericOAuthProviderToCommand(req *mgmt_pb.AddGenericOAuthProviderRequest) command.GenericOAuthProvider {
 	return command.GenericOAuthProvider{
-		Name:                  req.Name,
-		ClientID:              req.ClientId,
-		ClientSecret:          req.ClientSecret,
-		AuthorizationEndpoint: req.AuthorizationEndpoint,
-		TokenEndpoint:         req.TokenEndpoint,
-		UserEndpoint:          req.UserEndpoint,
-		Scopes:                req.Scopes,
-		IDAttribute:           req.IdAttribute,
-		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
-		UsePKCE:               req.UsePkce,
+		Name:                    req.Name,
+		ClientID:                req.ClientId,
+		ClientSecret:            req.ClientSecret,
+		AuthorizationEndpoint:   req.AuthorizationEndpoint,
+		TokenEndpoint:           req.TokenEndpoint,
+		UserEndpoint:            req.UserEndpoint,
+		Scopes:                  req.Scopes,
+		IDAttribute:             req.IdAttribute,
+		IDPOptions:              idp_grpc.OptionsToCommand(req.ProviderOptions),
+		UsePKCE:                 req.UsePkce,
+		AuthorizationParameters: req.GetAuthorizationParameters(),
+		ForwardedParameters:     req.GetForwardedParameters(),
 	}
 }
 
 func updateGenericOAuthProviderToCommand(req *mgmt_pb.UpdateGenericOAuthProviderRequest) command.GenericOAuthProvider {
 	return command.GenericOAuthProvider{
-		Name:                  req.Name,
-		ClientID:              req.ClientId,
-		ClientSecret:          req.ClientSecret,
-		AuthorizationEndpoint: req.AuthorizationEndpoint,
-		TokenEndpoint:         req.TokenEndpoint,
-		UserEndpoint:          req.UserEndpoint,
-		Scopes:                req.Scopes,
-		IDAttribute:           req.IdAttribute,
-		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
-		UsePKCE:               req.UsePkce,
+		Name:                    req.Name,
+		ClientID:                req.ClientId,
+		ClientSecret:            req.ClientSecret,
+		AuthorizationEndpoint:   req.AuthorizationEndpoint,
+		TokenEndpoint:           req.TokenEndpoint,
+		UserEndpoint:            req.UserEndpoint,
+		Scopes:                  req.Scopes,
+		IDAttribute:             req.IdAttribute,
+		IDPOptions:              idp_grpc.OptionsToCommand(req.ProviderOptions),
+		UsePKCE:                 req.UsePkce,
+		AuthorizationParameters: req.GetAuthorizationParameters(),
+		ForwardedParameters:     req.GetForwardedParameters(),
 	}
 }
 
 func addGenericOIDCProviderToCommand(req *mgmt_pb.AddGenericOIDCProviderRequest) command.GenericOIDCProvider {
 	return command.GenericOIDCProvider{
-		Name:             req.Name,
-		Issuer:           req.Issuer,
-		ClientID:         req.ClientId,
-		ClientSecret:     req.ClientSecret,
-		Scopes:           req.Scopes,
-		IsIDTokenMapping: req.IsIdTokenMapping,
-		UsePKCE:          req.UsePkce,
-		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Name:                    req.Name,
+		Issuer:                  req.Issuer,
+		ClientID:                req.ClientId,
+		ClientSecret:            req.ClientSecret,
+		Scopes:                  req.Scopes,
+		IsIDTokenMapping:        req.IsIdTokenMapping,
+		UsePKCE:                 req.UsePkce,
+		AuthorizationParameters: req.GetAuthorizationParameters(),
+		ForwardedParameters:     req.GetForwardedParameters(),
+		IDPOptions:              idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 
 func updateGenericOIDCProviderToCommand(req *mgmt_pb.UpdateGenericOIDCProviderRequest) command.GenericOIDCProvider {
 	return command.GenericOIDCProvider{
-		Name:             req.Name,
-		Issuer:           req.Issuer,
-		ClientID:         req.ClientId,
-		ClientSecret:     req.ClientSecret,
-		Scopes:           req.Scopes,
-		IsIDTokenMapping: req.IsIdTokenMapping,
-		UsePKCE:          req.UsePkce,
-		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Name:                    req.Name,
+		Issuer:                  req.Issuer,
+		ClientID:                req.ClientId,
+		ClientSecret:            req.ClientSecret,
+		Scopes:                  req.Scopes,
+		IsIDTokenMapping:        req.IsIdTokenMapping,
+		UsePKCE:                 req.UsePkce,
+		AuthorizationParameters: req.GetAuthorizationParameters(),
+		ForwardedParameters:     req.GetForwardedParameters(),
+		IDPOptions:              idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 

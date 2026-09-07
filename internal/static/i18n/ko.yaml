@@ -619,6 +619,10 @@ Errors:
     KeyIDMissing: "KeyID가 누락되었습니다"
     PrivateKeyMissing: "개인 키가 누락되었습니다"
     InvalidPrivateKey: "유효하지 않은 개인 키 형식"
+    AuthorizationParameterNameMissing: "인가 파라미터 이름이 누락되었습니다"
+    AuthorizationParameterNameInvalid: "유효하지 않은 인가 파라미터 이름"
+    AuthorizationParameterDuplicate: "인가 파라미터가 두 번 이상 정의되었습니다"
+    AuthorizationParameterReserved: "인가 파라미터는 ZITADEL에서 관리하므로 설정할 수 없습니다"
 
 AggregateTypes:
   action: "작업"

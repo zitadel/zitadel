@@ -9,14 +9,16 @@ import (
 type OIDCIDPAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID               string              `json:"id"`
-	Name             string              `json:"name"`
-	Issuer           string              `json:"issuer"`
-	ClientID         string              `json:"clientId"`
-	ClientSecret     *crypto.CryptoValue `json:"clientSecret"`
-	Scopes           []string            `json:"scopes,omitempty"`
-	IsIDTokenMapping bool                `json:"idTokenMapping,omitempty"`
-	UsePKCE          bool                `json:"usePKCE,omitempty"`
+	ID                      string              `json:"id"`
+	Name                    string              `json:"name"`
+	Issuer                  string              `json:"issuer"`
+	ClientID                string              `json:"clientId"`
+	ClientSecret            *crypto.CryptoValue `json:"clientSecret"`
+	Scopes                  []string            `json:"scopes,omitempty"`
+	IsIDTokenMapping        bool                `json:"idTokenMapping,omitempty"`
+	UsePKCE                 bool                `json:"usePKCE,omitempty"`
+	AuthorizationParameters map[string]string   `json:"authorizationParameters,omitempty"`
+	ForwardedParameters     []string            `json:"forwardedParameters,omitempty"`
 	Options
 }
 
@@ -29,19 +31,23 @@ func NewOIDCIDPAddedEvent(
 	clientSecret *crypto.CryptoValue,
 	scopes []string,
 	isIDTokenMapping, usePKCE bool,
+	authorizationParameters map[string]string,
+	forwardedParameters []string,
 	options Options,
 ) *OIDCIDPAddedEvent {
 	return &OIDCIDPAddedEvent{
-		BaseEvent:        *base,
-		ID:               id,
-		Name:             name,
-		Issuer:           issuer,
-		ClientID:         clientID,
-		ClientSecret:     clientSecret,
-		Scopes:           scopes,
-		IsIDTokenMapping: isIDTokenMapping,
-		UsePKCE:          usePKCE,
-		Options:          options,
+		BaseEvent:               *base,
+		ID:                      id,
+		Name:                    name,
+		Issuer:                  issuer,
+		ClientID:                clientID,
+		ClientSecret:            clientSecret,
+		Scopes:                  scopes,
+		IsIDTokenMapping:        isIDTokenMapping,
+		UsePKCE:                 usePKCE,
+		AuthorizationParameters: authorizationParameters,
+		ForwardedParameters:     forwardedParameters,
+		Options:                 options,
 	}
 }
 
@@ -69,14 +75,16 @@ func OIDCIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 type OIDCIDPChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID               string              `json:"id"`
-	Name             *string             `json:"name,omitempty"`
-	Issuer           *string             `json:"issuer,omitempty"`
-	ClientID         *string             `json:"clientId,omitempty"`
-	ClientSecret     *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	Scopes           []string            `json:"scopes,omitempty"`
-	IsIDTokenMapping *bool               `json:"idTokenMapping,omitempty"`
-	UsePKCE          *bool               `json:"usePKCE,omitempty"`
+	ID                      string              `json:"id"`
+	Name                    *string             `json:"name,omitempty"`
+	Issuer                  *string             `json:"issuer,omitempty"`
+	ClientID                *string             `json:"clientId,omitempty"`
+	ClientSecret            *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	Scopes                  []string            `json:"scopes,omitempty"`
+	IsIDTokenMapping        *bool               `json:"idTokenMapping,omitempty"`
+	UsePKCE                 *bool               `json:"usePKCE,omitempty"`
+	AuthorizationParameters *map[string]string  `json:"authorizationParameters,omitempty"`
+	ForwardedParameters     *[]string           `json:"forwardedParameters,omitempty"`
 	OptionChanges
 }
 
@@ -145,6 +153,26 @@ func ChangeOIDCIsIDTokenMapping(idTokenMapping bool) func(*OIDCIDPChangedEvent) 
 func ChangeOIDCUsePKCE(usePKCE bool) func(*OIDCIDPChangedEvent) {
 	return func(e *OIDCIDPChangedEvent) {
 		e.UsePKCE = &usePKCE
+	}
+}
+
+func ChangeOIDCAuthorizationParameters(parameters map[string]string) func(*OIDCIDPChangedEvent) {
+	return func(e *OIDCIDPChangedEvent) {
+		if parameters == nil {
+			// an empty map is marshalled as `{}` and therefore correctly resets the parameters,
+			// whereas a nil map would be omitted and treated as unchanged on replay
+			parameters = map[string]string{}
+		}
+		e.AuthorizationParameters = &parameters
+	}
+}
+
+func ChangeOIDCForwardedParameters(parameters []string) func(*OIDCIDPChangedEvent) {
+	return func(e *OIDCIDPChangedEvent) {
+		if parameters == nil {
+			parameters = []string{}
+		}
+		e.ForwardedParameters = &parameters
 	}
 }
 

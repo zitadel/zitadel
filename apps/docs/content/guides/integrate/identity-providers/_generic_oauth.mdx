@@ -10,3 +10,11 @@ The following information you need to fill out by yourself:
 <li><b>Client-ID</b> {props.clientid}</li>
 <li><b>Client-Secret</b> {props.clientid}</li>
 <li><b>Scopes</b>: (openid, profile, email is preconfigured)</li>
+
+You can additionally control which parameters ZITADEL sends to the provider in the authorization request:
+
+<li><b>Authorization parameters</b>: parameters that are always added, e.g. <code>acr_values</code></li>
+<li><b>Forwarded parameters</b>: parameters of the original authorization request that may be forwarded</li>
+
+See [Control the parameters sent to the provider](/guides/integrate/identity-providers/generic-oidc#precedence)
+for the precedence rules, how to disable ZITADEL's default `prompt=select_account` and which parameters are reserved.

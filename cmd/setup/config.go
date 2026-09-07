@@ -195,6 +195,7 @@ type Steps struct {
 	s73FixUserGrantRoles                    *FixUserGrantRoles
 	s74Apps7OIDCConfigsAddRegistrationToken *Apps7OIDCConfigsAddRegistrationToken
 	s75Apps7OIDCConfigsAddAppLinkConfig     *Apps7OIDCConfigsAddAppLinkConfig
+	s76IDPTemplate6AddAuthorizationParams   *IDPTemplate6AddAuthorizationParameters
 	RelationalTables                        *TransactionalTables
 }
 

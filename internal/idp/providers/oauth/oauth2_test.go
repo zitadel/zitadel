@@ -20,6 +20,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 		userEndpoint string
 		userMapper   func() idp.User
 		options      []ProviderOpts
+		params       []idp.Parameter
 	}
 	tests := []struct {
 		name   string
@@ -65,6 +66,111 @@ func TestProvider_BeginAuth(t *testing.T) {
 			},
 			want: &Session{AuthURL: "https://oauth2.com/authorize?client_id=clientID&code_challenge=2ZoH_a01aprzLkwVbjlPsBo4m8mJ_zOKkaDqYM7Oh5w&code_challenge_method=S256&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=user&state=testState"},
 		},
+		{
+			name: "authorization parameters override the default prompt",
+			fields: fields{
+				config: &oauth2.Config{
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+					Endpoint: oauth2.Endpoint{
+						AuthURL:  "https://oauth2.com/authorize",
+						TokenURL: "https://oauth2.com/token",
+					},
+					RedirectURL: "redirectURI",
+					Scopes:      []string{"user"},
+				},
+				options: []ProviderOpts{WithAuthorizationParameters(map[string]string{"prompt": "login", "acr_values": "AAL2_OR_AAL3_ANY"})},
+			},
+			want: &Session{AuthURL: "https://oauth2.com/authorize?acr_values=AAL2_OR_AAL3_ANY&client_id=clientID&prompt=login&redirect_uri=redirectURI&response_type=code&scope=user&state=testState"},
+		},
+		{
+			name: "an empty authorization parameter removes the default prompt",
+			fields: fields{
+				config: &oauth2.Config{
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+					Endpoint: oauth2.Endpoint{
+						AuthURL:  "https://oauth2.com/authorize",
+						TokenURL: "https://oauth2.com/token",
+					},
+					RedirectURL: "redirectURI",
+					Scopes:      []string{"user"},
+				},
+				options: []ProviderOpts{WithAuthorizationParameters(map[string]string{"prompt": ""})},
+			},
+			want: &Session{AuthURL: "https://oauth2.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=user&state=testState"},
+		},
+		{
+			name: "reserved authorization parameters are dropped",
+			fields: fields{
+				config: &oauth2.Config{
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+					Endpoint: oauth2.Endpoint{
+						AuthURL:  "https://oauth2.com/authorize",
+						TokenURL: "https://oauth2.com/token",
+					},
+					RedirectURL: "redirectURI",
+					Scopes:      []string{"user"},
+				},
+				options: []ProviderOpts{WithAuthorizationParameters(map[string]string{"client_id": "evil", "scope": "admin", "acr_values": "loa2"})},
+			},
+			want: &Session{AuthURL: "https://oauth2.com/authorize?acr_values=loa2&client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=user&state=testState"},
+		},
+		{
+			name: "only allow-listed parameters are forwarded",
+			fields: fields{
+				config: &oauth2.Config{
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+					Endpoint: oauth2.Endpoint{
+						AuthURL:  "https://oauth2.com/authorize",
+						TokenURL: "https://oauth2.com/token",
+					},
+					RedirectURL: "redirectURI",
+					Scopes:      []string{"user"},
+				},
+				options: []ProviderOpts{WithForwardedParameters([]string{"acr_values", "max_age"})},
+				params:  []idp.Parameter{idp.AuthorizationParameters{"acr_values": "loa3", "max_age": "300", "ui_locales": "de"}},
+			},
+			want: &Session{AuthURL: "https://oauth2.com/authorize?acr_values=loa3&client_id=clientID&max_age=300&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=user&state=testState"},
+		},
+		{
+			name: "nothing is forwarded without an allow-list",
+			fields: fields{
+				config: &oauth2.Config{
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+					Endpoint: oauth2.Endpoint{
+						AuthURL:  "https://oauth2.com/authorize",
+						TokenURL: "https://oauth2.com/token",
+					},
+					RedirectURL: "redirectURI",
+					Scopes:      []string{"user"},
+				},
+				options: []ProviderOpts{},
+				params:  []idp.Parameter{idp.AuthorizationParameters{"acr_values": "loa3"}},
+			},
+			want: &Session{AuthURL: "https://oauth2.com/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=user&state=testState"},
+		},
+		{
+			name: "configured parameters take precedence over forwarded ones",
+			fields: fields{
+				config: &oauth2.Config{
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+					Endpoint: oauth2.Endpoint{
+						AuthURL:  "https://oauth2.com/authorize",
+						TokenURL: "https://oauth2.com/token",
+					},
+					RedirectURL: "redirectURI",
+					Scopes:      []string{"user"},
+				},
+				options: []ProviderOpts{WithForwardedParameters([]string{"acr_values"}), WithAuthorizationParameters(map[string]string{"acr_values": "static"})},
+				params:  []idp.Parameter{idp.AuthorizationParameters{"acr_values": "forwarded"}},
+			},
+			want: &Session{AuthURL: "https://oauth2.com/authorize?acr_values=static&client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=user&state=testState"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -78,7 +184,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 			}
 
 			ctx := context.Background()
-			session, err := provider.BeginAuth(ctx, "testState")
+			session, err := provider.BeginAuth(ctx, "testState", tt.fields.params...)
 			r.NoError(err)
 
 			wantAuth, wantErr := tt.want.GetAuth(ctx)

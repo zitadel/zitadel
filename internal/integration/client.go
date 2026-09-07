@@ -666,6 +666,21 @@ func (i *Instance) AddProviderToDefaultLoginPolicy(ctx context.Context, id strin
 		IdpId: id,
 	})
 	logging.OnError(err).Panic("add provider to default login policy")
+
+	// the login policy links are read from a projection, e.g. to determine the allowed IDPs of an
+	// auth request. Await the link, so tests can select the provider right away.
+	mustAwait(func() error {
+		resp, err := i.Client.Admin.ListLoginPolicyIDPs(ctx, &admin.ListLoginPolicyIDPsRequest{})
+		if err != nil {
+			return err
+		}
+		for _, link := range resp.GetResult() {
+			if link.GetIdpId() == id {
+				return nil
+			}
+		}
+		return fmt.Errorf("provider %s not (yet) linked to default login policy", id)
+	})
 }
 
 func (i *Instance) AddAzureADProvider(ctx context.Context, name string) *admin.AddAzureADProviderResponse {
