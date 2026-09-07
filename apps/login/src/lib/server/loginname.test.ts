@@ -300,6 +300,28 @@ describe("sendLoginname", () => {
         );
       });
 
+      test("should add the suffix back to the login hint when the user only typed the local part", async () => {
+        mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD],
+        });
+        mockListIDPLinks.mockResolvedValue({
+          result: [{ idpId: "idp123" }],
+        });
+        mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+        await sendLoginname({
+          loginName: "user",
+          suffix: "example.com",
+        });
+
+        expect(mockStartIdentityProviderFlow).toHaveBeenCalledWith(
+          expect.objectContaining({
+            urls: expect.objectContaining({ loginHint: "user@example.com" }),
+          }),
+        );
+      });
+
       test("should return error when password not allowed and no IDP links available", async () => {
         mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
         mockListAuthenticationMethodTypes.mockResolvedValue({
