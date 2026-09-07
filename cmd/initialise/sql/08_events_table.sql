@@ -53,7 +53,7 @@ END $$;
 CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command2[]) 
     RETURNS SETOF eventstore.events2 
     LANGUAGE 'plpgsql'
-    STABLE PARALLEL SAFE
+    VOLATILE PARALLEL SAFE
     ROWS 10
 AS $$
 DECLARE

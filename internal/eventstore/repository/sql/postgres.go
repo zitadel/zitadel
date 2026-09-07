@@ -15,9 +15,9 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-// awaitOpenTransactions ensures event ordering, so we don't events younger that open transactions.
-// The v2 cap must stay now() (projector TX start), not clock_timestamp(). A wall-clock cap at
-// SELECT time would include rows inserted after BEGIN and recreate position overtake.
+// awaitOpenTransactions drains in-flight writers, then caps at projector TX start (now()),
+// not clock_timestamp(). A wall-clock cap at SELECT time would include rows inserted after
+// BEGIN and recreate position overtake.
 var (
 	awaitOpenTransactionsV1 = ` AND created_at <= now()`
 	awaitOpenTransactionsV2 = ` AND "position" <= EXTRACT(EPOCH FROM now())`
