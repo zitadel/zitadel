@@ -177,6 +177,7 @@ Errors:
         NotExisting: "Multifactor OTP (Parolă Unică) nu există"
         NotReady: "Multifactor OTP (Parolă Unică) nu este pregătit"
         InvalidCode: "Cod invalid"
+        Reused: "Acest cod a fost deja utilizat. Vă rugăm să așteptați un cod nou"
       U2F:
         NotExisting: "U2F nu există"
       Passwordless:
@@ -763,6 +764,7 @@ Errors:
               check:
                 succeeded: "Verificarea Multifactor OTP a reușit"
                 failed: "Verificarea Multifactor OTP a eșuat"
+                reused: "Cod Multifactor OTP reutilizat"
               sms:
                 added: "Multifactor OTP SMS adăugat"
                 removed: "Multifactor OTP SMS șters"

@@ -176,6 +176,7 @@ Errors:
         NotExisting: "Tvåfaktor OTP (OneTimePassword) finns inte"
         NotReady: "Tvåfaktor OTP (OneTimePassword) är inte redo"
         InvalidCode: "Ogiltig kod"
+        Reused: "Den här koden har redan använts. Vänta på en ny kod"
       U2F:
         NotExisting: "U2F finns inte"
       Passwordless:
@@ -767,6 +768,7 @@ EventTypes:
           check:
             succeeded: "Tvåfaktor OTP-kontroll lyckades"
             failed: "Tvåfaktor OTP-kontroll misslyckades"
+            reused: "Tvåfaktor OTP-kod återanvänd"
           sms:
             added: "Tvåfaktor OTP SMS tillagd"
             removed: "Tvåfaktor OTP SMS borttagen"

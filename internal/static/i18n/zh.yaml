@@ -177,6 +177,7 @@ Errors:
         NotExisting: "OTP (一次性密码) 不存在"
         NotReady: "OTP (一次性密码) 还没准备好"
         InvalidCode: "无效的验证码"
+        Reused: "此验证码已被使用。请等待新的验证码"
       U2F:
         NotExisting: "U2F 不存在"
       Passwordless:
@@ -768,6 +769,7 @@ EventTypes:
           check:
             succeeded: "验证 MFA OTP 成功"
             failed: "验证 MFA OTP 失败"
+            reused: "重复使用 MFA OTP 验证码"
           sms:
             added: "添加了多因素 OTP 短信"
             removed: "删除了多因素 OTP 短信"

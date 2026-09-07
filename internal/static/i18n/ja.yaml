@@ -177,6 +177,7 @@ Errors:
         NotExisting: "多要素OTP（ワンタイムパスワード）が存在しません"
         NotReady: "多要素OTP（ワンタイムパスワード）が利用可能でありません"
         InvalidCode: "無効なコードです"
+        Reused: "このコードはすでに使用されています。新しいコードをお待ちください"
       U2F:
         NotExisting: "U2Fは存在しません"
       Passwordless:
@@ -768,6 +769,7 @@ EventTypes:
           check:
             succeeded: "MFA OTPチェックの成功"
             failed: "MFA OTPチェックの失敗"
+            reused: "MFA OTPコードの再利用"
           sms:
             added: "多要素 OTP SMS を追加しました"
             removed: "多要素 OTP SMS を削除しました"
