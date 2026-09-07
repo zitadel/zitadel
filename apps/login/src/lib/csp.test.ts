@@ -9,7 +9,7 @@ describe("buildCSP", () => {
     expect(csp).toContain("script-src 'self' 'unsafe-inline' 'unsafe-eval'");
     expect(csp).toContain("connect-src 'self'");
     expect(csp).toContain("style-src 'self' 'unsafe-inline'");
-    expect(csp).toContain("font-src 'self'");
+    expect(csp).toContain("font-src 'self' data:");
     expect(csp).toContain("img-src 'self'");
     expect(csp).toContain("object-src 'none'");
     expect(csp).toContain("frame-ancestors 'none'");
@@ -19,7 +19,7 @@ describe("buildCSP", () => {
     const csp = buildCSP({ serviceUrl: "https://my-instance.zitadel.cloud" });
 
     expect(csp).toContain("img-src 'self' https://my-instance.zitadel.cloud");
-    expect(csp).toContain("font-src 'self' https://my-instance.zitadel.cloud");
+    expect(csp).toContain("font-src 'self' data: https://my-instance.zitadel.cloud");
   });
 
   test("keeps frame-ancestors as 'none' when iframeOrigins is empty", () => {
@@ -44,7 +44,7 @@ describe("buildCSP", () => {
     });
 
     expect(csp).toContain("img-src 'self' https://zitadel.mycompany.com");
-    expect(csp).toContain("font-src 'self' https://zitadel.mycompany.com");
+    expect(csp).toContain("font-src 'self' data: https://zitadel.mycompany.com");
     expect(csp).toContain("frame-ancestors https://portal.mycompany.com");
     expect(csp).not.toContain("frame-ancestors 'none'");
   });
@@ -60,5 +60,25 @@ describe("buildCSP", () => {
     expect(csp).toContain("connect-src 'self'");
     expect(csp).toContain("style-src 'self' 'unsafe-inline'");
     expect(csp).toContain("object-src 'none'");
+  });
+
+  test("omits a service URL the browser cannot resolve", () => {
+    const csp = buildCSP({ serviceUrl: "http://zitadel:8080" });
+
+    expect(csp).not.toContain("zitadel:8080");
+    expect(csp).toContain("font-src 'self' data:");
+    expect(csp).toContain("img-src 'self'");
+  });
+
+  test("keeps hosts a browser can reach", () => {
+    for (const serviceUrl of [
+      "http://localhost:8080",
+      "http://127.0.0.1:8080",
+      "http://[::1]:8080",
+      "http://[2001:db8::1]:8080",
+      "https://zitadel.example.com",
+    ]) {
+      expect(buildCSP({ serviceUrl })).toContain(serviceUrl);
+    }
   });
 });
