@@ -11,9 +11,10 @@ import (
 )
 
 type AssetStorageConfig struct {
-	Type   string
-	Cache  middleware.CacheConfig
-	Config map[string]interface{} `mapstructure:",remain"`
+	MaxFontSize int64
+	Type        string
+	Cache       middleware.CacheConfig
+	Config      map[string]interface{} `mapstructure:",remain"`
 }
 
 func (a *AssetStorageConfig) NewStorage(client *sql.DB) (static.Storage, error) {
