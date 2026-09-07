@@ -3,6 +3,7 @@
 import { clearSession } from "@/lib/server/session";
 import { timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { useTranslations } from "next-intl";
 import { redirect, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, AlertType } from "./alert";
@@ -18,7 +19,9 @@ type Props = {
 
 export function SessionsClearList({ sessions, logoutHint, postLogoutRedirectUri, organization }: Props) {
   const [list, setList] = useState<Session[]>(sessions);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const t = useTranslations("error");
 
   const clearHintedSession = useCallback(async () => {
     console.log("Clearing session for login hint:", logoutHint);
@@ -28,15 +31,22 @@ export function SessionsClearList({ sessions, logoutHint, postLogoutRedirectUri,
     })?.id;
 
     if (sessionIdToBeCleared) {
-      const clearSessionResponse = await clearSession({
-        sessionId: sessionIdToBeCleared,
-      }).catch((error) => {
+      let clearError: string | undefined;
+      try {
+        const clearSessionResponse = await clearSession({ sessionId: sessionIdToBeCleared });
+        if (clearSessionResponse && "error" in clearSessionResponse) {
+          clearError = clearSessionResponse.error;
+        }
+      } catch (error) {
         console.error("Error clearing session:", error);
-        return;
-      });
+        clearError = t("couldNotClearSession");
+      }
 
-      if (!clearSessionResponse) {
-        console.error("Failed to clear session for login hint:", logoutHint);
+      // Do not tell the RP the logout completed when the session was kept:
+      // show the error and leave the card so the user can retry.
+      if (clearError) {
+        setError(clearError);
+        return;
       }
 
       if (postLogoutRedirectUri) {
@@ -53,7 +63,7 @@ export function SessionsClearList({ sessions, logoutHint, postLogoutRedirectUri,
     } else {
       console.warn(`No session found for login hint: ${logoutHint}`);
     }
-  }, [logoutHint, sessions, postLogoutRedirectUri, organization, router]);
+  }, [logoutHint, sessions, postLogoutRedirectUri, organization, router, t]);
 
   useEffect(() => {
     if (logoutHint) {
@@ -86,6 +96,7 @@ export function SessionsClearList({ sessions, logoutHint, postLogoutRedirectUri,
             />
           );
         })}
+      {error && <Alert>{error}</Alert>}
       {list.length === 0 && (
         <Alert type={AlertType.INFO}>
           <Translated i18nKey="noResults" namespace="logout" />

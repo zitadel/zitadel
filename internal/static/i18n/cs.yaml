@@ -176,6 +176,7 @@ Errors:
         NotExisting: "Vícefaktorové OTP (OneTimePassword) neexistuje"
         NotReady: "Vícefaktorové OTP (OneTimePassword) není připraveno"
         InvalidCode: "Neplatný kód"
+        Reused: "Tento kód již byl použit. Počkejte prosím na nový kód"
       U2F:
         NotExisting: "U2F neexistuje"
       Passwordless:
@@ -204,6 +205,7 @@ Errors:
     AlreadyActive: "Organizace je již aktivní"
     Empty: "Organizace je prázdná"
     NotFound: "Organizace nenalezena"
+    NotActive: "Organizace není aktivní"
     NotChanged: "Organizace nezměněna"
     DefaultOrgNotDeletable: "Výchozí organizace nesmí být smazána"
     ZitadelOrgNotDeletable: "Organizaci s projektem Zitadel nelze smazat"
@@ -764,6 +766,7 @@ EventTypes:
           check:
             succeeded: "Kontrola OTP pro vícefaktorové ověření byla úspěšná"
             failed: "Kontrola OTP pro vícefaktorové ověření selhala"
+            reused: "Kód OTP pro vícefaktorové ověření byl použit opakovaně"
           sms:
             added: "SMS pro vícefaktorové OTP přidána"
             removed: "SMS pro vícefaktorové OTP odstraněna"

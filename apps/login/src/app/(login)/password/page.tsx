@@ -73,8 +73,11 @@ export default async function Page(props: { searchParams: Promise<Record<string 
       </div>
 
       <div className="w-full">
-        {/* show error only if usernames should be shown to be unknown */}
-        {(!sessionFactors || !loginName) && !loginSettings?.ignoreUnknownUsernames && (
+        {/* Only warn when there is no loginName to continue with (e.g. a direct visit
+            without searchParams). A failed session lookup alone is not an error: the
+            form still works via the user-search fallback in sendPassword, and under
+            enumeration protection no session exists by design. */}
+        {!loginName && (
           <div className="py-4">
             <Alert>
               <Translated i18nKey="unknownContext" namespace="error" />

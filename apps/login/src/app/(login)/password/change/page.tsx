@@ -5,7 +5,7 @@ import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getLoginSettings, getPasswordComplexitySettings } from "@/lib/zitadel";
+import { getBrandingSettings, getPasswordComplexitySettings } from "@/lib/zitadel";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -39,11 +39,6 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     organization: sessionFactors?.factors?.user?.organizationId,
   });
 
-  const loginSettings = await getLoginSettings({
-    serviceConfig,
-    organization: sessionFactors?.factors?.user?.organizationId,
-  });
-
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col space-y-4">
@@ -54,8 +49,10 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           <Translated i18nKey="change.description" namespace="password" />
         </p>
 
-        {/* show error only if usernames should be shown to be unknown */}
-        {(!sessionFactors || !loginName) && !loginSettings?.ignoreUnknownUsernames && (
+        {/* Only warn when there is no loginName to continue with; a failed session
+            lookup is reported by the form gate below (failedLoading), and under
+            enumeration protection no session may exist by design. */}
+        {!loginName && (
           <div className="py-4">
             <Alert>
               <Translated i18nKey="unknownContext" namespace="error" />

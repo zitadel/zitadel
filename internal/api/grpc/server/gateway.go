@@ -28,7 +28,7 @@ import (
 
 const (
 	mimeWildcard = "*/*"
-	UnknownPath  = "UNKNOWN_PATH"
+	UnknownPath  = metrics.UnknownPath
 )
 
 var (
@@ -44,9 +44,13 @@ var (
 	httpErrorHandler = runtime.RoutingErrorHandlerFunc(
 		func(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.Marshaler, w http.ResponseWriter, r *http.Request, httpStatus int) {
 			if httpStatus != http.StatusMethodNotAllowed {
+				// Every other routing error is passed on to the configured errorHandler.
 				runtime.DefaultRoutingErrorHandler(ctx, mux, marshaler, w, r, httpStatus)
 				return
 			}
+			// This branch answers without going through the configured errorHandler,
+			// so the URI pattern has to be set here as well.
+			setRequestURIPattern(ctx)
 
 			// Use HTTPStatusError to customize the DefaultHTTPErrorHandler status code
 			err := &runtime.HTTPStatusError{
@@ -276,6 +280,9 @@ func grpcCredentials(tlsConfig *tls.Config) credentials.TransportCredentials {
 	return creds
 }
 
+// setRequestURIPattern reports the route pattern that served the request, e.g.
+// "/v2/sessions/{session_id}", to tracing and metrics. Both would otherwise fall back to
+// the requested path, which embeds resource IDs and therefore grows without bound.
 func setRequestURIPattern(ctx context.Context) {
 	pattern, ok := runtime.HTTPPathPattern(ctx)
 	if !ok {
@@ -287,4 +294,5 @@ func setRequestURIPattern(ctx context.Context) {
 	}
 	span := trace.SpanFromContext(ctx)
 	span.SetName(pattern)
+	metrics.SetRequestURIPattern(ctx, pattern)
 }

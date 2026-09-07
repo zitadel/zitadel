@@ -2,7 +2,8 @@ with usr as (
 	select u.id, u.creation_date, u.change_date, u.sequence, u.state, u.resource_owner, u.username, n.login_name as preferred_login_name
 	from projections.users14 u
 	left join projections.login_names3 n on u.id = n.user_id and u.instance_id = n.instance_id
-	where u.id = $1 and u.state = 1 -- only allow active users
+	join projections.orgs1 o on o.id = u.resource_owner and o.instance_id = u.instance_id and o.org_state = 1
+	where u.id = $1 and u.state = 1 -- only allow active users in active organizations
 	and u.instance_id = $2
 	and n.is_primary = true
 ),

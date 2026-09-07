@@ -152,7 +152,8 @@
       "failedPrecondition": "فشل الشرط المسبق",
       "sessionNotValid": "الجلسة غير صالحة",
       "passwordVerificationMissing": "التحقق من كلمة المرور مفقود.",
-      "passwordVerificationTooOld": "التحقق من كلمة المرور قديم جدًا. يرجى التحقق من كلمة المرور مرة أخرى."
+      "passwordVerificationTooOld": "التحقق من كلمة المرور قديم جدًا. يرجى التحقق من كلمة المرور مرة أخرى.",
+      "passwordResetNotAllowed": "إعادة تعيين كلمة المرور غير مسموح بها. اتصل بالمسؤول لمزيد من المعلومات."
     }
   },
   "idp": {
@@ -164,6 +165,7 @@
     "signInWithAzureAD": "تسجيل الدخول باستخدام AzureAD",
     "signInWithGithub": "تسجيل الدخول باستخدام GitHub",
     "signInWithGitlab": "تسجيل الدخول باستخدام GitLab",
+    "signInWithZitadel": "تسجيل الدخول باستخدام Zitadel",
     "loginError": {
       "title": "فشل تسجيل الدخول",
       "description": "حدث خطأ أثناء محاولة تسجيل الدخول."
@@ -260,6 +262,10 @@
       "required": {
         "code": "هذا الحقل مطلوب"
       }
+    },
+    "errors": {
+      "couldNotRequestChallenge": "تعذر طلب تحدي OTP",
+      "couldNotVerifyCode": "تعذر التحقق من رمز OTP"
     }
   },
   "passkey": {
@@ -421,7 +427,15 @@
     "description": "حدد الطريقة التي ترغب في المصادقة بها",
     "noMethodsAvailable": "لا توجد طرق مصادقة متاحة",
     "allSetup": "لقد قمت بالفعل بإعداد مصادق!",
-    "linkWithIDP": "أو الربط مع مزود هوية"
+    "linkWithIDP": "أو الربط مع مزود هوية",
+    "methods": {
+      "totp": "تطبيق المصادقة",
+      "u2f": "العامل الثاني العالمي",
+      "otpEmail": "رمز عبر البريد الإلكتروني",
+      "otpSms": "رمز عبر الرسائل القصيرة",
+      "passkey": "مفاتيح المرور",
+      "password": "كلمة المرور"
+    }
   },
   "device": {
     "usercode": {
@@ -456,6 +470,7 @@
     "sessionExpired": "انتهت صلاحية جلستك الحالية. يرجى تسجيل الدخول مرة أخرى.",
     "failedLoading": "فشل تحميل البيانات. يرجى المحاولة مرة أخرى.",
     "tryagain": "حاول مرة أخرى",
-    "couldNotContinueSession": "تعذر المتابعة مع الجلسة - معلومات المستخدم مفقودة"
+    "couldNotContinueSession": "تعذر المتابعة مع الجلسة - معلومات المستخدم مفقودة",
+    "couldNotClearSession": "تعذر إنهاء الجلسة. يرجى المحاولة مرة أخرى."
   }
 }

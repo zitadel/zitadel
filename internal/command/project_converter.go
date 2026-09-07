@@ -29,30 +29,43 @@ func projectGrantWriteModelToProjectGrant(writeModel *ProjectGrantWriteModel) *d
 
 func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.OIDCApp {
 	return &domain.OIDCApp{
-		ObjectRoot:               writeModelToObjectRoot(writeModel.WriteModel),
-		AppID:                    writeModel.AppID,
-		AppName:                  writeModel.AppName,
-		State:                    writeModel.State,
-		ClientID:                 writeModel.ClientID,
-		RedirectUris:             writeModel.RedirectUris,
-		ResponseTypes:            writeModel.ResponseTypes,
-		GrantTypes:               writeModel.GrantTypes,
-		ApplicationType:          gu.Ptr(writeModel.ApplicationType),
-		AuthMethodType:           gu.Ptr(writeModel.AuthMethodType),
-		PostLogoutRedirectUris:   writeModel.PostLogoutRedirectUris,
-		OIDCVersion:              gu.Ptr(writeModel.OIDCVersion),
-		DevMode:                  gu.Ptr(writeModel.DevMode),
-		AccessTokenType:          gu.Ptr(writeModel.AccessTokenType),
-		AccessTokenRoleAssertion: gu.Ptr(writeModel.AccessTokenRoleAssertion),
-		IDTokenRoleAssertion:     gu.Ptr(writeModel.IDTokenRoleAssertion),
-		IDTokenUserinfoAssertion: gu.Ptr(writeModel.IDTokenUserinfoAssertion),
-		ClockSkew:                gu.Ptr(writeModel.ClockSkew),
-		AdditionalOrigins:        writeModel.AdditionalOrigins,
-		SkipNativeAppSuccessPage: gu.Ptr(writeModel.SkipNativeAppSuccessPage),
-		BackChannelLogoutURI:     gu.Ptr(writeModel.BackChannelLogoutURI),
-		LoginVersion:             gu.Ptr(writeModel.LoginVersion),
-		LoginBaseURI:             gu.Ptr(writeModel.LoginBaseURI),
+		ObjectRoot:                    writeModelToObjectRoot(writeModel.WriteModel),
+		AppID:                         writeModel.AppID,
+		AppName:                       writeModel.AppName,
+		State:                         writeModel.State,
+		ClientID:                      writeModel.ClientID,
+		RedirectUris:                  writeModel.RedirectUris,
+		ResponseTypes:                 writeModel.ResponseTypes,
+		GrantTypes:                    writeModel.GrantTypes,
+		ApplicationType:               gu.Ptr(writeModel.ApplicationType),
+		AuthMethodType:                gu.Ptr(writeModel.AuthMethodType),
+		PostLogoutRedirectUris:        writeModel.PostLogoutRedirectUris,
+		OIDCVersion:                   gu.Ptr(writeModel.OIDCVersion),
+		DevMode:                       gu.Ptr(writeModel.DevMode),
+		AccessTokenType:               gu.Ptr(writeModel.AccessTokenType),
+		AccessTokenRoleAssertion:      gu.Ptr(writeModel.AccessTokenRoleAssertion),
+		IDTokenRoleAssertion:          gu.Ptr(writeModel.IDTokenRoleAssertion),
+		IDTokenUserinfoAssertion:      gu.Ptr(writeModel.IDTokenUserinfoAssertion),
+		ClockSkew:                     gu.Ptr(writeModel.ClockSkew),
+		AdditionalOrigins:             writeModel.AdditionalOrigins,
+		SkipNativeAppSuccessPage:      gu.Ptr(writeModel.SkipNativeAppSuccessPage),
+		BackChannelLogoutURI:          gu.Ptr(writeModel.BackChannelLogoutURI),
+		LoginVersion:                  gu.Ptr(writeModel.LoginVersion),
+		LoginBaseURI:                  gu.Ptr(writeModel.LoginBaseURI),
+		IOSTeamID:                     emptyStringPtr(writeModel.IOSTeamID),
+		IOSBundleID:                   emptyStringPtr(writeModel.IOSBundleID),
+		AndroidPackageName:            emptyStringPtr(writeModel.AndroidPackageName),
+		AndroidSHA256CertFingerprints: writeModel.AndroidSHA256CertFingerprints,
 	}
+}
+
+// emptyStringPtr returns nil for empty strings so unset app-link fields stay
+// distinguishable from explicitly set values in equality checks / APIs.
+func emptyStringPtr(s string) *string {
+	if s == "" {
+		return nil
+	}
+	return gu.Ptr(s)
 }
 
 func samlWriteModelToSAMLConfig(writeModel *SAMLApplicationWriteModel) *domain.SAMLApp {

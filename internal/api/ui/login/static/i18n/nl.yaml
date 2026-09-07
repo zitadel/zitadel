@@ -504,6 +504,7 @@ Errors:
         AlreadyReady: Multifactor OTP (OneTimePassword) is al ingesteld
         NotExisting: Multifactor OTP (OneTimePassword) bestaat niet
         InvalidCode: Ongeldige code
+        Reused: Deze code is al gebruikt. Wacht op een nieuwe code
         NotReady: Multifactor OTP (OneTimePassword) is niet klaar
     Locked: Gebruiker is vergrendeld
     SomethingWentWrong: Er is iets misgegaan

@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
+	"github.com/zitadel/oidc/v3/pkg/client/tokenexchange"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 	"golang.org/x/text/language"
@@ -781,7 +782,7 @@ func expectPreUserinfoExecution(ctx context.Context, t *testing.T, instance *int
 			SessionToken: sessionResp.GetSessionToken(),
 		},
 	}
-	expectedContextInfo := contextInfoForUserOIDC(instance, "function/preuserinfo", clientID, userResp, userEmail, userPhone)
+	expectedContextInfo := contextInfoForUserOIDC(instance, "function/preuserinfo", clientID, userResp, userEmail, userPhone, nil)
 
 	targetURL, closeF, _, _ := integration.TestServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
@@ -859,7 +860,9 @@ func getAccessTokenClaims(ctx context.Context, t *testing.T, instance *integrati
 	return claims
 }
 
-func contextInfoForUserOIDC(instance *integration.Instance, function string, clientID string, userResp *user.AddHumanUserResponse, email, phone string) *oidc_api.ContextInfo {
+// contextInfoForUserOIDC builds the payload a target is expected to receive. actor is nil for
+// regular flows and only set when the token was obtained through impersonation.
+func contextInfoForUserOIDC(instance *integration.Instance, function string, clientID string, userResp *user.AddHumanUserResponse, email, phone string, actor *domain.TokenActor) *oidc_api.ContextInfo {
 	return &oidc_api.ContextInfo{
 		Function: function,
 		UserInfo: &oidc.UserInfo{
@@ -901,6 +904,7 @@ func contextInfoForUserOIDC(instance *integration.Instance, function string, cli
 			PrimaryDomain: instance.DefaultOrg.GetPrimaryDomain(),
 		},
 		UserGrants: nil,
+		Actor:      actor,
 		Response:   nil,
 	}
 }
@@ -1089,13 +1093,93 @@ func expectPreAccessTokenExecution(ctx context.Context, t *testing.T, instance *
 			SessionToken: sessionResp.GetSessionToken(),
 		},
 	}
-	expectedContextInfo := contextInfoForUserOIDC(instance, "function/preaccesstoken", clientID, userResp, userEmail, userPhone)
+	expectedContextInfo := contextInfoForUserOIDC(instance, "function/preaccesstoken", clientID, userResp, userEmail, userPhone, nil)
 
 	targetURL, closeF, _, _ := integration.TestServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
 	targetResp := waitForTarget(ctx, t, instance, targetURL, target_domain.TargetTypeCall, true, action.PayloadType_PAYLOAD_TYPE_JSON)
 	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preaccesstoken"), []string{targetResp.GetId()})
 	return userResp.GetUserId(), closeF
+}
+
+// TestServer_ExecutionTargetPreUserinfoImpersonation checks that a target called for the
+// preuserinfo function is told who impersonated the user.
+func TestServer_ExecutionTargetPreUserinfoImpersonation(t *testing.T) {
+	testExecutionTargetImpersonation(t, "preuserinfo")
+}
+
+// TestServer_ExecutionTargetPreAccessTokenImpersonation checks the same for the
+// preaccesstoken function.
+func TestServer_ExecutionTargetPreAccessTokenImpersonation(t *testing.T) {
+	testExecutionTargetImpersonation(t, "preaccesstoken")
+}
+
+// testExecutionTargetImpersonation obtains a token through impersonation and asserts that the
+// target registered for function receives the actor of that token.
+//
+// The counterpart is covered by TestServer_ExecutionTargetPreUserinfo and
+// TestServer_ExecutionTargetPreAccessToken: their expected ContextInfo has no actor, and since
+// the target server compares the received body byte for byte, they would fail if an actor was
+// sent for a token that was not impersonated.
+func testExecutionTargetImpersonation(t *testing.T, function string) {
+	instance := integration.NewInstance(CTX)
+	isolatedIAMCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+
+	instance.SetImpersonationPolicy(CTX, t, true)
+
+	// the user being impersonated, created the same way as in the non impersonated tests so
+	// that contextInfoForUserOIDC describes it correctly
+	userEmail := integration.Email()
+	userPhone := integration.Phone()
+	userResp := instance.CreateHumanUserVerified(isolatedIAMCtx, instance.DefaultOrg.Id, userEmail, userPhone)
+
+	// the impersonator, whose PAT is passed as actor token
+	impersonatorID, impersonatorPAT, err := instance.CreateMachineUserPATWithMembership(isolatedIAMCtx, "IAM_END_USER_IMPERSONATOR")
+	require.NoError(t, err)
+
+	client, keyData, err := instance.CreateOIDCTokenExchangeClient(isolatedIAMCtx, t)
+	require.NoError(t, err)
+	signer, err := rp.SignerFromKeyFile(keyData)()
+	require.NoError(t, err)
+	exchanger, err := tokenexchange.NewTokenExchangerJWTProfile(isolatedIAMCtx, instance.OIDCIssuer(), client.GetClientId(), signer)
+	require.NoError(t, err)
+
+	expectedContextInfo := contextInfoForUserOIDC(instance, "function/"+function, client.GetClientId(), userResp, userEmail, userPhone,
+		&domain.TokenActor{
+			UserID: impersonatorID,
+			Issuer: instance.OIDCIssuer(),
+		},
+	)
+	response := &oidc_api.ContextInfoResponse{
+		AppendClaims: []*oidc_api.AppendClaim{
+			{Key: "added", Value: "value"},
+		},
+	}
+	targetURL, closeF, calledF, _ := integration.TestServerCall(expectedContextInfo, 0, http.StatusOK, response)
+	defer closeF()
+
+	// interrupt on error, so a payload that does not match the expectation fails the token
+	// exchange below instead of passing silently
+	targetResp := waitForTarget(isolatedIAMCtx, t, instance, targetURL, target_domain.TargetTypeCall, true, action.PayloadType_PAYLOAD_TYPE_JSON)
+	waitForExecutionOnCondition(isolatedIAMCtx, t, instance, conditionFunction(function), []string{targetResp.GetId()})
+
+	// Impersonate by user ID. A JWT is requested so that the access token is signed by
+	// createJWT, which is what triggers preaccesstoken. The openid scope produces an ID token,
+	// which is what triggers preuserinfo. Only one of the two has an execution registered.
+	tokens, err := tokenexchange.ExchangeToken(isolatedIAMCtx, exchanger,
+		userResp.GetUserId(), oidc_api.UserIDTokenType,
+		impersonatorPAT, oidc.AccessTokenType,
+		nil, nil, []string{oidc.ScopeOpenID}, oidc.JWTTokenType,
+	)
+	require.NoError(t, err)
+	assert.Equal(t, 1, calledF())
+
+	verifier := op.NewAccessTokenVerifier(instance.OIDCIssuer(), rp.NewRemoteKeySet(http.DefaultClient, instance.OIDCIssuer()+"/oauth/v2/keys"))
+	claims, err := op.VerifyAccessToken[*oidc.AccessTokenClaims](isolatedIAMCtx, tokens.AccessToken, verifier)
+	require.NoError(t, err)
+	assert.Equal(t, userResp.GetUserId(), claims.Subject)
+	require.NotNil(t, claims.Actor)
+	assert.Equal(t, impersonatorID, claims.Actor.Subject)
 }
 
 func TestServer_ExecutionTargetPreSAMLResponse(t *testing.T) {

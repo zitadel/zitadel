@@ -241,6 +241,9 @@ func (c *Commands) OIDCSessionByRefreshToken(ctx context.Context, refreshToken s
 	if err = writeModel.CheckRefreshToken(refreshTokenID); err != nil {
 		return nil, err
 	}
+	if err = c.checkOrgNotDeactivatedAfter(ctx, writeModel.UserResourceOwner, writeModel.RefreshTokenIssuedAt); err != nil {
+		return nil, err
+	}
 	return writeModel, nil
 }
 
@@ -294,12 +297,9 @@ func (c *Commands) RevokeOIDCSessionToken(ctx context.Context, token, clientID s
 }
 
 func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, userID, resourceOwner string, pending ...eventstore.Command) (*OIDCSessionEvents, error) {
-	userStateModel, err := c.userStateWriteModel(ctx, userID)
+	userStateModel, err := c.userStateForAuthentication(ctx, userID, resourceOwner, "OIDCS-kj3g2", "OIDCS-oR9nA")
 	if err != nil {
 		return nil, err
-	}
-	if !userStateModel.UserState.IsEnabled() {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDCS-kj3g2", "Errors.User.NotActive")
 	}
 	accessTokenLifetime, refreshTokenLifeTime, refreshTokenIdleLifetime, err := c.tokenTokenLifetimes(ctx)
 	if err != nil {
@@ -353,12 +353,11 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken 
 	if err = sessionWriteModel.CheckRefreshToken(refreshTokenID); err != nil {
 		return nil, err
 	}
-	userStateWriteModel, err := c.userStateWriteModel(ctx, sessionWriteModel.UserID)
-	if err != nil {
+	if err = c.checkOrgNotDeactivatedAfter(ctx, sessionWriteModel.UserResourceOwner, sessionWriteModel.RefreshTokenIssuedAt); err != nil {
 		return nil, err
 	}
-	if !userStateWriteModel.UserState.IsEnabled() {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDCS-J39h2", "Errors.User.NotActive")
+	if _, err = c.userStateForAuthentication(ctx, sessionWriteModel.UserID, sessionWriteModel.UserResourceOwner, "OIDCS-J39h2", "OIDCS-pQ2mB"); err != nil {
+		return nil, err
 	}
 	accessTokenLifetime, refreshTokenLifeTime, refreshTokenIdleLifetime, err := c.tokenTokenLifetimes(ctx)
 	if err != nil {

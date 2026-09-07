@@ -35,6 +35,7 @@ type OIDCSessionWriteModel struct {
 	RefreshToken               string
 	RefreshTokenExpiration     time.Time
 	RefreshTokenIdleExpiration time.Time
+	RefreshTokenIssuedAt       time.Time
 
 	aggregate *eventstore.Aggregate
 }
@@ -125,6 +126,7 @@ func (wm *OIDCSessionWriteModel) reduceRefreshTokenAdded(e *oidcsession.RefreshT
 	wm.RefreshTokenID = e.ID
 	wm.RefreshTokenExpiration = e.CreationDate().Add(e.Lifetime)
 	wm.RefreshTokenIdleExpiration = e.CreationDate().Add(e.IdleLifetime)
+	wm.RefreshTokenIssuedAt = e.CreationDate()
 }
 
 func (wm *OIDCSessionWriteModel) reduceRefreshTokenRenewed(e *oidcsession.RefreshTokenRenewedEvent) {
@@ -136,6 +138,7 @@ func (wm *OIDCSessionWriteModel) reduceRefreshTokenRevoked(e *oidcsession.Refres
 	wm.RefreshTokenID = ""
 	wm.RefreshTokenExpiration = e.CreationDate()
 	wm.RefreshTokenIdleExpiration = e.CreationDate()
+	wm.RefreshTokenIssuedAt = time.Time{}
 	wm.AccessTokenID = ""
 	wm.AccessTokenExpiration = e.CreationDate()
 }

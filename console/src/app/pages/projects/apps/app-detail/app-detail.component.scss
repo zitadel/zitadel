@@ -53,6 +53,11 @@
   .app-desc {
     font-size: 14px;
     margin: 0;
+
+    .app-link-endpoint {
+      margin-top: 0.5rem;
+      word-break: break-all;
+    }
   }
 
   .app-input {
@@ -160,7 +165,7 @@
     .current-auth-method {
       display: flex;
       align-items: center;
-      border: 1px solid if(sass($is-dark-theme): rgba(#8795a1, 0.2) ; else: rgba(#8795a1, 0.2));
+      border: 1px solid if(sass($is-dark-theme): rgba(#8795a1, 0.2); else: rgba(#8795a1, 0.2));
       color: white;
       border-radius: 0.5rem;
       padding: 0.5rem 1rem;
@@ -280,6 +285,17 @@
 
     input {
       max-width: none;
+    }
+
+    textarea.fingerprints-input,
+    .fingerprints-input {
+      max-width: none;
+      width: 100%;
+      min-height: 12rem;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+      font-size: 0.875rem;
+      line-height: 1.4;
     }
   }
 }

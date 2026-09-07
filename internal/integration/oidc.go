@@ -10,6 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/client/rs"
@@ -18,6 +20,7 @@ import (
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	oidc_internal "github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/app"
 	"github.com/zitadel/zitadel/pkg/grpc/authn"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
@@ -442,6 +445,32 @@ func (i *Instance) CreateOIDCJWTProfileClient(ctx context.Context, keyLifetime t
 	})
 
 	return machine, name, keyResp.GetKeyDetails(), nil
+}
+
+// SetImpersonationPolicy sets EnableImpersonation on the instance security policy and waits
+// until the change is visible again, so a subsequent token exchange doesn't race the projection.
+func (i *Instance) SetImpersonationPolicy(ctx context.Context, t *testing.T, value bool) {
+	iamCTX := i.WithAuthorization(ctx, UserTypeIAMOwner)
+
+	policy, err := i.Client.Admin.GetSecurityPolicy(iamCTX, &admin.GetSecurityPolicyRequest{})
+	require.NoError(t, err)
+	if policy.GetPolicy().GetEnableImpersonation() != value {
+		_, err = i.Client.Admin.SetSecurityPolicy(iamCTX, &admin.SetSecurityPolicyRequest{
+			EnableImpersonation: value,
+		})
+		require.NoError(t, err)
+	}
+
+	retryDuration, tick := WaitForAndTickWithMaxDuration(iamCTX, time.Minute)
+	require.EventuallyWithT(t,
+		func(ttt *assert.CollectT) {
+			f, err := i.Client.Admin.GetSecurityPolicy(iamCTX, &admin.GetSecurityPolicyRequest{})
+			assert.NoError(ttt, err)
+			assert.Equal(ttt, value, f.GetPolicy().GetEnableImpersonation())
+		},
+		retryDuration,
+		tick,
+		"timed out waiting for ensuring impersonation policy")
 }
 
 func (i *Instance) CreateDeviceAuthorizationRequest(ctx context.Context, clientID string, scopes ...string) (*oidc.DeviceAuthorizationResponse, error) {

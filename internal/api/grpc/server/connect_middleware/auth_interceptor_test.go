@@ -37,6 +37,10 @@ func (v *authzRepoMock) ExistsOrg(ctx context.Context, orgID, domain string) (st
 	return orgID, nil
 }
 
+func (v *authzRepoMock) CheckOrgActive(ctx context.Context, orgID string) error {
+	return nil
+}
+
 func (v *authzRepoMock) VerifierClientID(ctx context.Context, appName string) (string, string, error) {
 	return "", "", nil
 }

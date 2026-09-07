@@ -487,6 +487,7 @@ Errors:
         AlreadyReady: El multifactor OTP (OneTimePassword) ya está configurado
         NotExisting: El multifactor OTP (OneTimePassword) no existe
         InvalidCode: Código no válido
+        Reused: Este código ya se ha utilizado. Espera a que se genere un nuevo código
         NotReady: El multifactor OTP (OneTimePassword) no está listo
     Locked: El usuario está bloqueado
     SomethingWentWrong: Algo fue mal

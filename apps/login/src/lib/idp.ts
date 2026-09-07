@@ -28,6 +28,8 @@ export function idpTypeToSlug(idpType: IdentityProviderType) {
       return "ldap";
     case IdentityProviderType.JWT:
       return "jwt";
+    case IdentityProviderType.ZITADEL:
+      return "zitadel";
     default:
       throw new Error("Unknown identity provider type");
   }
@@ -68,6 +70,9 @@ export function idpTypeToIdentityProviderType(idpType: IDPType): IdentityProvide
 
     case IDPType.IDP_TYPE_JWT:
       return IdentityProviderType.JWT;
+
+    case IDPType.IDP_TYPE_ZITADEL:
+      return IdentityProviderType.ZITADEL;
 
     default:
       throw new Error("Unknown identity provider type");

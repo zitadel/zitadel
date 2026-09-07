@@ -17,10 +17,7 @@ import { ProjectMembersDataSource } from '../project-members/project-members-dat
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 
 type MemberDatasource =
-  | OrgMembersDataSource
-  | ProjectMembersDataSource
-  | ProjectGrantMembersDataSource
-  | InstanceMembersDataSource;
+  OrgMembersDataSource | ProjectMembersDataSource | ProjectGrantMembersDataSource | InstanceMembersDataSource;
 
 @Component({
   selector: 'cnsl-members-table',

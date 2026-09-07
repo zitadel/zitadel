@@ -44,6 +44,9 @@ func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	if !l.checkMFAPromptStep(w, r, authReq) {
+		return
+	}
 	credData, err := base64.URLEncoding.DecodeString(data.CredentialData)
 	if err != nil {
 		l.renderRegisterU2F(w, r, authReq, err)

@@ -421,15 +421,14 @@ func TestCommands_UpdateSession(t *testing.T) {
 }
 
 func TestCommands_updateSession(t *testing.T) {
-	decryption := func(err error) crypto.EncryptionAlgorithm {
-		mCrypto := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
-		mCrypto.EXPECT().EncryptionKeyID().Return("id")
-		mCrypto.EXPECT().DecryptString(gomock.Any(), gomock.Any()).DoAndReturn(
-			func(code []byte, keyID string) (string, error) {
+	decryption := func(err error) crypto.AuthEncryptionAlgorithm {
+		mCrypto := crypto.NewMockAuthEncryptionAlgorithm(gomock.NewController(t))
+		mCrypto.EXPECT().DecryptToken(gomock.Any()).DoAndReturn(
+			func(token string) (string, error) {
 				if err != nil {
 					return "", err
 				}
-				return string(code), nil
+				return token, nil
 			})
 		return mCrypto
 	}
@@ -705,7 +704,7 @@ func TestCommands_updateSession(t *testing.T) {
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
 						CheckUser("userID", "org1", &language.Afrikaans),
-						CheckIntent("intent", "aW50ZW50"),
+						CheckIntent("intent", "intent"),
 					},
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
@@ -756,7 +755,7 @@ func TestCommands_updateSession(t *testing.T) {
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
 						CheckUser("userID", "org1", &language.Afrikaans),
-						CheckIntent("intent", "aW50ZW50"),
+						CheckIntent("intent", "intent"),
 					},
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
@@ -843,7 +842,7 @@ func TestCommands_updateSession(t *testing.T) {
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
 						CheckUser("userID", "org1", &language.Afrikaans),
-						CheckIntent("intent", "aW50ZW50"),
+						CheckIntent("intent", "intent"),
 					},
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
@@ -894,7 +893,7 @@ func TestCommands_updateSession(t *testing.T) {
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
 						CheckUser("userID", "org1", &language.Afrikaans),
-						CheckIntent("intent", "aW50ZW50"),
+						CheckIntent("intent", "intent"),
 					},
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
@@ -956,7 +955,7 @@ func TestCommands_updateSession(t *testing.T) {
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
 						CheckUser("userID", "org1", &language.Afrikaans),
-						CheckIntent("intent", "aW50ZW50"),
+						CheckIntent("intent", "intent"),
 					},
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
@@ -1037,7 +1036,7 @@ func TestCommands_updateSession(t *testing.T) {
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
 						CheckUser("userID", "org1", &language.Afrikaans),
-						CheckIntent("intent", "aW50ZW50"),
+						CheckIntent("intent", "intent"),
 					},
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
@@ -1074,6 +1073,23 @@ func TestCommands_updateSession(t *testing.T) {
 	}
 }
 
+// assertTOTPCodeHash asserts that every [user.HumanOTPCheckSucceededEvent] in
+// cmds carries a hash of code and clears it afterwards. The hash is salted with
+// a random value, so it cannot be compared against a precomputed expectation.
+func assertTOTPCodeHash(t *testing.T, cmds []eventstore.Command, code string) {
+	t.Helper()
+	for _, cmd := range cmds {
+		event, ok := cmd.(*user.HumanOTPCheckSucceededEvent)
+		if !ok {
+			continue
+		}
+		if assert.NotNil(t, event.CodeHash, "the OTP check succeeded event must carry a code hash") {
+			assert.True(t, event.CodeHash.Equal(code), "the code hash must match the checked code")
+		}
+		event.CodeHash = nil
+	}
+}
+
 func TestCheckTOTP(t *testing.T) {
 	ctx := authz.NewMockContext("instance1", "org1", "user1")
 
@@ -1089,6 +1105,9 @@ func TestCheckTOTP(t *testing.T) {
 
 	code, err := totp.GenerateCode(key.Secret(), testNow)
 	require.NoError(t, err)
+
+	// hash of a code which is guaranteed to be different from the checked code.
+	otherCodeHash := crypto.NewHMACValue(code + "0")
 
 	type fields struct {
 		sessionWriteModel *SessionWriteModel
@@ -1236,9 +1255,137 @@ func TestCheckTOTP(t *testing.T) {
 				tarpit: expectTarpit(0),
 			},
 			wantEventCommands: []eventstore.Command{
-				user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil),
+				// The code hash is salted randomly and therefore not predictable.
+				// It is asserted separately by assertTOTPCodeHash.
+				user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, nil),
 				session.NewTOTPCheckedEvent(ctx, sessAgg, testNow),
 			},
+		},
+		{
+			name: "ok, previous check with a different code",
+			code: code,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+						),
+						eventFromEventPusher(
+							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, otherCodeHash),
+						),
+					),
+					expectFilter(), // recheck
+				),
+				tarpit: expectTarpit(0),
+			},
+			wantEventCommands: []eventstore.Command{
+				// The code hash is salted randomly and therefore not predictable.
+				// It is asserted separately by assertTOTPCodeHash.
+				user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, nil),
+				session.NewTOTPCheckedEvent(ctx, sessAgg, testNow),
+			},
+		},
+		{
+			name: "ok, previous check of the same code outside of the reuse window",
+			code: code,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+						),
+						eventFromEventPusher(
+							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
+						),
+						eventFromEventPusherWithCreationDate(
+							user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, crypto.NewHMACValue(code)),
+							time.Now().Add(-2*time.Minute),
+						),
+					),
+					expectFilter(), // recheck
+				),
+				tarpit: expectTarpit(0),
+			},
+			wantEventCommands: []eventstore.Command{
+				// The code hash is salted randomly and therefore not predictable.
+				// It is asserted separately by assertTOTPCodeHash.
+				user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, nil),
+				session.NewTOTPCheckedEvent(ctx, sessAgg, testNow),
+			},
+		},
+		{
+			name: "code reuse error",
+			code: code,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+						),
+						eventFromEventPusher(
+							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, crypto.NewHMACValue(code)),
+						),
+					),
+					expectFilter(), // recheck
+				),
+				tarpit: expectTarpit(0),
+			},
+			wantErrorCommands: []eventstore.Command{
+				user.NewHumanOTPCheckReusedEvent(ctx, userAgg, nil),
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "TOTP-Auw0a", "Errors.User.MFA.OTP.Reused"),
+		},
+		{
+			name: "code reuse error, used in the meantime",
+			code: code,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+						),
+						eventFromEventPusher(
+							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
+						),
+					),
+					expectFilter( // recheck
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, crypto.NewHMACValue(code)),
+						),
+					),
+				),
+				tarpit: expectTarpit(0),
+			},
+			wantErrorCommands: []eventstore.Command{
+				user.NewHumanOTPCheckReusedEvent(ctx, userAgg, nil),
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "TOTP-Auw0a", "Errors.User.MFA.OTP.Reused"),
 		},
 		{
 			name: "ok, but locked in the meantime",
@@ -1279,6 +1426,7 @@ func TestCheckTOTP(t *testing.T) {
 			gotCmds, err := CheckTOTP(tt.code)(ctx, cmd)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.wantErrorCommands, gotCmds)
+			assertTOTPCodeHash(t, cmd.eventCommands, tt.code)
 			assert.Equal(t, tt.wantEventCommands, cmd.eventCommands)
 			tt.fields.tarpit.metExpectedCalls(t)
 		})

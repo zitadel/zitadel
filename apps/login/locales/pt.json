@@ -152,7 +152,8 @@
       "failedPrecondition": "Pré-condição falhou",
       "sessionNotValid": "A sessão não é válida",
       "passwordVerificationMissing": "A verificação de senha está ausente.",
-      "passwordVerificationTooOld": "A verificação de senha expirou. Por favor, verifique sua senha novamente."
+      "passwordVerificationTooOld": "A verificação de senha expirou. Por favor, verifique sua senha novamente.",
+      "passwordResetNotAllowed": "A redefinição de senha não é permitida. Entre em contato com o administrador para mais informações."
     }
   },
   "idp": {
@@ -164,6 +165,7 @@
     "signInWithAzureAD": "Entrar com AzureAD",
     "signInWithGithub": "Entrar com GitHub",
     "signInWithGitlab": "Entrar com GitLab",
+    "signInWithZitadel": "Entrar com Zitadel",
     "loginError": {
       "title": "Falha no login",
       "description": "Ocorreu um erro ao tentar fazer login."
@@ -260,6 +262,10 @@
       "required": {
         "code": "Este campo é obrigatório"
       }
+    },
+    "errors": {
+      "couldNotRequestChallenge": "Não foi possível solicitar o desafio OTP",
+      "couldNotVerifyCode": "Não foi possível verificar o código OTP"
     }
   },
   "passkey": {
@@ -421,7 +427,15 @@
     "description": "Selecione o método de autenticação desejado",
     "noMethodsAvailable": "Nenhum método de autenticação disponível",
     "allSetup": "Você já configurou um autenticador!",
-    "linkWithIDP": "ou vincule com um Provedor de Identidade"
+    "linkWithIDP": "ou vincule com um Provedor de Identidade",
+    "methods": {
+      "totp": "Aplicativo autenticador",
+      "u2f": "Segundo fator universal",
+      "otpEmail": "Código via e-mail",
+      "otpSms": "Código via SMS",
+      "passkey": "Chave de Acesso",
+      "password": "Senha"
+    }
   },
   "device": {
     "usercode": {
@@ -456,6 +470,7 @@
     "sessionExpired": "Sua sessão atual expirou. Por favor, faça login novamente.",
     "failedLoading": "Falha ao carregar dados. Por favor, tente novamente.",
     "tryagain": "Tentar Novamente",
-    "couldNotContinueSession": "Não foi possível continuar a sessão — informações do usuário ausentes"
+    "couldNotContinueSession": "Não foi possível continuar a sessão — informações do usuário ausentes",
+    "couldNotClearSession": "Não foi possível terminar a sessão. Tente novamente."
   }
 }

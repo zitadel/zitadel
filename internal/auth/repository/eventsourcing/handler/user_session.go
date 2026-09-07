@@ -192,6 +192,10 @@ func (s *UserSession) Reducers() []handler.AggregateReducer {
 					Event:  org.OrgRemovedEventType,
 					Reduce: s.Reduce,
 				},
+				{
+					Event:  org.OrgDeactivatedEventType,
+					Reduce: s.Reduce,
+				},
 			},
 		},
 		{
@@ -502,7 +506,8 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 				handler.NewCond(view_model.UserSessionKeyInstanceID, event.Aggregate().InstanceID),
 			},
 		), nil
-	case org.OrgRemovedEventType:
+	case org.OrgRemovedEventType,
+		org.OrgDeactivatedEventType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
 				handler.NewCond(view_model.UserSessionKeyInstanceID, event.Aggregate().InstanceID),

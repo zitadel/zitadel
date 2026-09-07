@@ -78,7 +78,14 @@ func (s *Server) dynamicClientRegistration(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	s.writeRegistrationJSON(ctx, w, http.StatusCreated, newClientRegistrationResponse(registered, req.ClientName, time.Now().Unix()))
+	resp := newClientRegistrationResponse(registered, req.ClientName, time.Now().Unix())
+	resp.RegistrationAccessToken, err = s.registrationAccessToken(registered.ClientID, resourceOwner, registered.RegistrationAccessToken)
+	if err != nil {
+		s.writeRegistrationServerError(ctx, w, err)
+		return
+	}
+	resp.RegistrationClientURI = s.registrationClientURI(ctx, registered.ClientID)
+	s.writeRegistrationJSON(ctx, w, http.StatusCreated, resp)
 }
 
 // dynamicClientRegistrationResourceOwner authorizes the registration and returns the
@@ -186,9 +193,12 @@ func (s *Server) writeRegistrationError(ctx context.Context, w http.ResponseWrit
 	s.writeRegistrationJSON(ctx, w, http.StatusBadRequest, regErr)
 }
 
+// writeRegistrationUnauthorized answers a 401 for both the registration endpoint (a missing
+// or invalid initial access token) and the management endpoints (a missing or invalid
+// registration access token), so the description is kept token-neutral.
 func (s *Server) writeRegistrationUnauthorized(ctx context.Context, w http.ResponseWriter) {
 	w.Header().Set("WWW-Authenticate", `Bearer error="invalid_token"`)
-	s.writeRegistrationJSON(ctx, w, http.StatusUnauthorized, newRegistrationError("invalid_token", "a valid access token is required to register a client"))
+	s.writeRegistrationJSON(ctx, w, http.StatusUnauthorized, newRegistrationError("invalid_token", "a valid bearer token is required"))
 }
 
 func (s *Server) writeRegistrationForbidden(ctx context.Context, w http.ResponseWriter) {
@@ -196,9 +206,12 @@ func (s *Server) writeRegistrationForbidden(ctx context.Context, w http.Response
 	s.writeRegistrationJSON(ctx, w, http.StatusForbidden, newRegistrationError("insufficient_scope", "the access token is not allowed to register clients"))
 }
 
+// writeRegistrationServerError answers a 500 for both the registration endpoint and the
+// management endpoints, so like the 401 above the description is kept operation-neutral. The
+// cause is logged rather than returned, as it is not the client's to act on.
 func (s *Server) writeRegistrationServerError(ctx context.Context, w http.ResponseWriter, err error) {
 	s.getLogger(ctx).ErrorContext(ctx, "dynamic client registration", "err", err)
-	s.writeRegistrationJSON(ctx, w, http.StatusInternalServerError, newRegistrationError("server_error", "the client could not be registered"))
+	s.writeRegistrationJSON(ctx, w, http.StatusInternalServerError, newRegistrationError("server_error", "the request could not be processed"))
 }
 
 func (s *Server) writeRegistrationCommandError(ctx context.Context, w http.ResponseWriter, err error) {
@@ -253,12 +266,18 @@ type clientRegistrationRequest struct {
 }
 
 // clientRegistrationResponse is the client information response of a successful
-// registration (RFC 7591 §3.2.1).
+// registration (RFC 7591 §3.2.1) and of the RFC 7592 read and update operations.
 type clientRegistrationResponse struct {
 	ClientID              string `json:"client_id"`
 	ClientSecret          string `json:"client_secret,omitempty"`
 	ClientIDIssuedAt      int64  `json:"client_id_issued_at,omitempty"`
 	ClientSecretExpiresAt *int64 `json:"client_secret_expires_at,omitempty"`
+
+	// RegistrationAccessToken and RegistrationClientURI let the client manage its own
+	// registration (RFC 7592 §3). The token is only returned when it is (re)issued, i.e. on
+	// registration and on update; a read does not rotate it and therefore omits it.
+	RegistrationAccessToken string `json:"registration_access_token,omitempty"`
+	RegistrationClientURI   string `json:"registration_client_uri,omitempty"`
 
 	RedirectURIs            []string `json:"redirect_uris,omitempty"`
 	ResponseTypes           []string `json:"response_types,omitempty"`

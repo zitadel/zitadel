@@ -2205,6 +2205,10 @@
       "TITLE": "Додати постачальника",
       "DESCRIPTION": "Виберіть одного або декількох з наступних постачальників.",
       "STEPPERTITLE": "Створити постачальника",
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "Введіть необхідні дані, щоб користувачі іншого екземпляра ZITADEL могли проходити автентифікацію."
+      },
       "OIDC": {
         "TITLE": "OIDC постачальник",
         "DESCRIPTION": "Введіть необхідні дані для вашого OIDC постачальника."
@@ -2317,6 +2321,10 @@
     "STATE": "Статус",
     "ISSUER": "Видавець",
     "SCOPESLIST": "Список областей",
+    "INSTANCEROLESINFO": "Зіставлення ролей екземпляра",
+    "INSTANCEROLESINFO_DESC": "Користувачі, які автентифікуються через цього постачальника, отримують ролі учасника екземпляра (префікс IAM_), які вони мають у перелічених організаціях віддаленого екземпляра ZITADEL. Ідентифікатор організації та основний домен мають збігатися.",
+    "ORGANIZATIONID": "Ідентифікатор організації",
+    "ORGANIZATIONDOMAIN": "Домен організації",
     "CLIENTID": "ID клієнта",
     "CLIENTSECRET": "Секрет клієнта",
     "LDAPCONNECTION": "Підключення",
@@ -2622,6 +2630,25 @@
       "DEVMODEDESC": "Увага: з увімкненим режимом розробки URI перенаправлення не перевірятимуться.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Пропустити сторінку успішного входу",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Пропустити сторінку успіху після входу для цього нативного додатку.",
+      "APPLINKSSECTION": "Посилання нативних застосунків",
+      "APPLINKSDESC": "Налаштуйте асоціацію iOS та Android, щоб цей інстанс міг віддавати trust-файли passkey для ваших нативних застосунків.",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "Віддається в apple-app-site-association як запис webcredentials TEAMID.BUNDLEID.",
+      "TEAMID": "Team ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Apple Team ID має складатися рівно з 10 буквено-цифрових символів, напр. ABCDE12345.",
+      "TEAMIDLENGTH": "Team ID має складатися рівно з 10 буквено-цифрових символів.",
+      "BUNDLEID": "Bundle ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "iOS Bundle Identifier (CFBundleIdentifier), напр. com.example.app. Не включайте префікс Team ID.",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "Віддається в assetlinks.json для Digital Asset Links / облікових даних passkey.",
+      "PACKAGENAME": "Назва пакета",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "Android applicationId / назва пакета, напр. com.example.app.",
+      "FINGERPRINTS": "Відбитки сертифіката SHA-256",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "Один відбиток у рядку (64 шістнадцяткові символи, двокрапки необов’язкові). За потреби вкажіть debug і release.",
       "REDIRECT": "URI перенаправлення",
       "REDIRECTSECTION": "URI перенаправлення",
       "POSTLOGOUTREDIRECT": "URI після виходу",
@@ -2685,7 +2712,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "URI виходу з зворотного каналу"
+      "BACKCHANNELLOOGOUTURI": "URI виходу з зворотного каналу",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID та Bundle ID мають бути задані разом або обидва залишені порожніми.",
+      "ANDROIDPACKAGEREQUIRED": "Назва пакета Android обов’язкова, якщо задано відбитки сертифіката."
     },
     "API": {
       "INFO": {
