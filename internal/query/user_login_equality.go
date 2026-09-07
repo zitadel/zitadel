@@ -79,6 +79,7 @@ func (q *loginNameEqualsFilter) matchesArgs(instanceID string) []interface{} {
 }
 
 func (q *loginNameEqualsFilter) idSeek(instanceID string) loginEqualitySeek {
+	// userLoginNameMatchesQuery uses *_lower columns; the _case_sensitive embed uses raw columns.
 	subQuery := userLoginNameMatchesQuery
 	if !q.ignoreCase {
 		subQuery = userLoginNameMatchesCaseSensitiveQuery
@@ -110,8 +111,8 @@ func newLowerEqualsSearchQuery(valueCol Column, tbl table, idCol Column, value s
 
 func (q *lowerEqualsFilter) idSeek(instanceID string) loginEqualitySeek {
 	sql := "SELECT " + q.idCol.identifier() + " AS id FROM " + q.tbl.identifier() +
-		" WHERE " + q.tbl.InstanceIDIdentifier() + " = ? AND LOWER(" + q.Column.identifier() + ") = LOWER(?)"
-	args := []interface{}{instanceID, q.Text}
+		" WHERE " + q.tbl.InstanceIDIdentifier() + " = ? AND LOWER(" + q.Column.identifier() + ") = ?"
+	args := []interface{}{instanceID, strings.ToLower(q.Text)}
 	if q.Compare == TextEquals {
 		sql += " AND " + q.Column.identifier() + " = ?"
 		args = append(args, q.Text)

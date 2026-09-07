@@ -269,7 +269,9 @@ func TestPrepareUsersQuery_EmailEqualsRechecksExactColumn(t *testing.T) {
 
 	assert.Contains(t, sql, "AS matches")
 	assert.Contains(t, sql, "LOWER("+HumanEmailCol.identifier()+")")
+	assert.NotContains(t, sql, "LOWER($")
 	assert.Contains(t, sql, HumanEmailCol.identifier()+" =")
+	assert.Contains(t, args, "ada@example.com")
 	assert.Contains(t, args, "Ada@Example.com")
 }
 
@@ -287,8 +289,10 @@ func TestPrepareUsersQuery_EmailIgnoreCaseDoesNotRecheckExactColumn(t *testing.T
 
 	assert.Contains(t, sql, "AS matches")
 	assert.Contains(t, sql, "LOWER("+HumanEmailCol.identifier()+")")
+	assert.NotContains(t, sql, "LOWER($")
 	assert.NotContains(t, sql, HumanEmailCol.identifier()+" =")
-	assert.Contains(t, args, "Ada@Example.com")
+	assert.Contains(t, args, "ada@example.com")
+	assert.NotContains(t, args, "Ada@Example.com")
 }
 
 func TestPrepareUsersQuery_PhoneIgnoreCaseUsesUnion(t *testing.T) {
