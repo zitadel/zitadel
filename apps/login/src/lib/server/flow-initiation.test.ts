@@ -936,6 +936,76 @@ describe("handleOIDCFlowInitiation — Prompt.LOGIN + loginHint requestId prefix
   });
 });
 
+describe("handleOIDCFlowInitiation — urn:zitadel:iam:org:id opaque org IDs", () => {
+  let mockGetAuthRequest: ReturnType<typeof vi.fn>;
+  let mockConstructUrl: ReturnType<typeof vi.fn>;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.unstubAllEnvs();
+
+    const zitadel = await import("@/lib/zitadel");
+    const serviceUrl = await import("@/lib/service-url");
+    const authUtils = await import("@/lib/auth-utils");
+
+    mockGetAuthRequest = vi.mocked(zitadel.getAuthRequest);
+    mockConstructUrl = vi.mocked(serviceUrl.constructUrl);
+    vi.mocked(authUtils.getValidLocaleFromUILocales).mockReturnValue(null);
+
+    mockConstructUrl.mockImplementation((_req: any, path: string) => {
+      return new URL(`https://example.com${path}`);
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  test.each([["5297fcf5-7898-4afd-92d2-de4fc99036c3"], ["acme-corp"]])(
+    "should keep the full opaque org ID %s from the org:id scope (not truncate at the first non-digit)",
+    async (orgId) => {
+      // Regression: ORG_SCOPE_REGEX used ([0-9]+), so a UUID like
+      // urn:zitadel:iam:org:id:5297fcf5-… captured "5297", and a letter-leading
+      // custom ID did not match at all.
+      mockGetAuthRequest.mockResolvedValue({
+        authRequest: {
+          id: "abc123",
+          uiLocales: [],
+          scope: [`urn:zitadel:iam:org:id:${orgId}`],
+          prompt: [],
+          loginHint: undefined,
+        },
+      });
+
+      const res = await handleOIDCFlowInitiation(makeBaseParams({ sessions: [] }));
+
+      const location = res.headers.get("location") ?? "";
+      expect(location).toContain("/loginname");
+      expect(new URL(location).searchParams.get("organization")).toBe(orgId);
+    },
+  );
+
+  test("should still extract numeric snowflake org IDs from the org:id scope", async () => {
+    const orgId = "381578688031883907";
+
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: [`urn:zitadel:iam:org:id:${orgId}`],
+        prompt: [],
+        loginHint: undefined,
+      },
+    });
+
+    const res = await handleOIDCFlowInitiation(makeBaseParams({ sessions: [] }));
+
+    const location = res.headers.get("location") ?? "";
+    expect(location).toContain("/loginname");
+    expect(new URL(location).searchParams.get("organization")).toBe(orgId);
+  });
+});
+
 describe("handleOIDCFlowInitiation — idp scope (urn:zitadel:iam:org:idp:id)", () => {
   let mockGetAuthRequest: ReturnType<typeof vi.fn>;
   let mockConstructUrl: ReturnType<typeof vi.fn>;
