@@ -3442,6 +3442,39 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			},
 		},
 		{
+			"self cannot mark phone verified in combined update",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"type",
+								1,
+								json.RawMessage(`{
+						"name": "user"
+				}`),
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "user1", ""),
+				user: &ChangeSchemaUser{
+					ID:    "user1",
+					Phone: &Phone{Number: "+41791234567", Verified: true},
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+				},
+			},
+		},
+		{
 			"user updated, full verified",
 			fields{
 				eventstore: expectEventstore(
