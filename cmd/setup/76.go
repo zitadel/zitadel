@@ -13,6 +13,8 @@ import (
 var (
 	//go:embed 76.sql
 	stampEventPositionAtInsert string
+	//go:embed 76_current_states.sql
+	backfillCurrentStatesInTxOrder string
 )
 
 type StampEventPositionAtInsert struct {
@@ -25,11 +27,19 @@ func (mig *StampEventPositionAtInsert) Execute(ctx context.Context, _ eventstore
 		return err
 	}
 
-	stmt := fmt.Sprintf(stampEventPositionAtInsert, inTxOrderType)
-	_, err = mig.dbClient.ExecContext(ctx, stmt)
+	tx, err := mig.dbClient.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
+	stmt := fmt.Sprintf(stampEventPositionAtInsert, inTxOrderType)
+	_, err = tx.ExecContext(ctx, stmt)
+	if err == nil {
+		_, err = tx.ExecContext(ctx, backfillCurrentStatesInTxOrder)
+	}
+	if err = database.CloseTransaction(tx, err); err != nil {
+		return err
+	}
+
 	// close idle connections to prevent them from using the old prepared statement
 	for _, conn := range mig.dbClient.Pool.AcquireAllIdle(ctx) {
 		logging.OnError(ctx, conn.Conn().Close(ctx)).Debug("failed to close idle connection")

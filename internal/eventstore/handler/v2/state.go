@@ -17,12 +17,8 @@ import (
 
 type state struct {
 	instanceID     string
-	position       decimal.Decimal
 	eventTimestamp time.Time
-	aggregateType  eventstore.AggregateType
-	aggregateID    string
-	sequence       uint64
-	offset         uint32
+	cursor         eventstore.EventSortKey
 }
 
 var (
@@ -43,7 +39,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 		sequence      = new(sql.NullInt64)
 		timestamp     = new(sql.NullTime)
 		position      = new(decimal.NullDecimal)
-		offset        = new(sql.NullInt64)
+		inTxOrder     = new(sql.NullInt64)
 	)
 
 	row := tx.QueryRow(currentStateStmt, currentState.instanceID, h.projection.Name())
@@ -53,20 +49,21 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 		sequence,
 		timestamp,
 		position,
-		offset,
+		inTxOrder,
 	)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		logging.WithError(ctx, err).Debug("unable to query current state")
 		return nil, err
 	}
 
-	currentState.aggregateID = aggregateID.String
-	currentState.aggregateType = eventstore.AggregateType(aggregateType.String)
-	currentState.sequence = uint64(sequence.Int64)
 	currentState.eventTimestamp = timestamp.Time
-	currentState.position = position.Decimal
-	// psql does not provide unsigned numbers so we work around it
-	currentState.offset = uint32(offset.Int64)
+	currentState.cursor = eventstore.EventSortKey{
+		Position:      position.Decimal,
+		InTxOrder:     uint32(inTxOrder.Int64),
+		AggregateType: eventstore.AggregateType(aggregateType.String),
+		AggregateID:   aggregateID.String,
+		Sequence:      uint64(sequence.Int64),
+	}
 	return currentState, nil
 }
 
@@ -74,12 +71,12 @@ func (h *Handler) setState(ctx context.Context, tx *sql.Tx, updatedState *state)
 	res, err := tx.Exec(updateStateStmt,
 		h.projection.Name(),
 		updatedState.instanceID,
-		updatedState.aggregateID,
-		updatedState.aggregateType,
-		updatedState.sequence,
+		updatedState.cursor.AggregateID,
+		updatedState.cursor.AggregateType,
+		updatedState.cursor.Sequence,
 		updatedState.eventTimestamp,
-		updatedState.position,
-		updatedState.offset,
+		updatedState.cursor.Position,
+		updatedState.cursor.InTxOrder,
 	)
 	if err != nil {
 		err = zerrors.ThrowInternal(err, "V2-WF23g2", "unable to update state")
@@ -92,4 +89,14 @@ func (h *Handler) setState(ctx context.Context, tx *sql.Tx, updatedState *state)
 		return err
 	}
 	return nil
+}
+
+func (s *state) applyStatement(stmt *Statement) {
+	s.cursor = stmt.eventSortKey()
+	s.eventTimestamp = stmt.CreationDate
+}
+
+func (s *state) applyEvent(event eventstore.Event) {
+	s.cursor = eventstore.EventSortKeyFromEvent(event)
+	s.eventTimestamp = event.CreatedAt()
 }

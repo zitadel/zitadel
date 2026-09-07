@@ -284,7 +284,7 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 		if clauses != "" {
 			clauses += " AND "
 		}
-		clauses += `("position", in_tx_order, aggregate_type, aggregate_id, "sequence") > (?, ?, ?, ?, ?)`
+		clauses += `(` + eventSortKeySQL + `) > (?, ?, ?, ?, ?)`
 		args = append(args,
 			query.EventSortKeyAfter.Position,
 			query.EventSortKeyAfter.InTxOrder,

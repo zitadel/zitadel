@@ -109,14 +109,14 @@ BEGIN
         , c.command_type AS event_type
         , COALESCE(e.sequence, 0) + ROW_NUMBER() OVER (PARTITION BY c.instance_id, c.aggregate_type, c.aggregate_id ORDER BY c.ordinality) AS sequence
         , c.revision
-        , statement_timestamp() AS created_at
+        , NOW() AS created_at
         , c.payload
         , c.creator
         , CASE WHEN c.enforce_owner
             THEN c.owner
             ELSE COALESCE(e.owner, c.owner)
         END AS owner
-        , EXTRACT(EPOCH FROM clock_timestamp()) AS position
+        , EXTRACT(EPOCH FROM NOW()) AS position
         , c.ordinality::%s AS in_tx_order
     FROM UNNEST(commands) WITH ORDINALITY AS c
     LEFT JOIN unnest(_latest_events) AS e

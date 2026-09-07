@@ -51,8 +51,6 @@ func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []e
 			}
 			return statements, &executionError{err}
 		}
-		statement.offset = event.InTxOrder()
-		statement.Position = event.Position()
 		statements = append(statements, statement)
 	}
 	return statements, nil
@@ -79,9 +77,19 @@ type Statement struct {
 	Position     decimal.Decimal
 	CreationDate time.Time
 
-	offset uint32
+	inTxOrder uint32
 
 	Execute Exec
+}
+
+func (s *Statement) eventSortKey() eventstore.EventSortKey {
+	return eventstore.EventSortKey{
+		Position:      s.Position,
+		InTxOrder:     s.inTxOrder,
+		AggregateType: s.Aggregate.Type,
+		AggregateID:   s.Aggregate.ID,
+		Sequence:      s.Sequence,
+	}
 }
 
 type Exec func(ctx context.Context, ex Executer, projectionName string) error
@@ -104,6 +112,7 @@ func NewStatement(event eventstore.Event, e Exec) *Statement {
 		Sequence:     event.Sequence(),
 		Position:     event.Position(),
 		CreationDate: event.CreatedAt(),
+		inTxOrder:    event.InTxOrder(),
 		Execute:      e,
 	}
 }

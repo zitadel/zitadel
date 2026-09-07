@@ -38,6 +38,8 @@ func NewPostgres(client *database.DB) *Postgres {
 
 func (db *Postgres) Health(ctx context.Context) error { return db.Ping() }
 
+const eventSortKeySQL = `"position", in_tx_order, aggregate_type, aggregate_id, "sequence"`
+
 // FilterToReducer finds all events matching the given search query and passes them to the reduce function.
 func (psql *Postgres) FilterToReducer(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder, reduce eventstore.Reducer) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
@@ -91,9 +93,9 @@ func (db *Postgres) orderByEventSequence(desc, shouldOrderBySequence, useV1 bool
 	}
 
 	if desc {
-		return ` ORDER BY "position" DESC, in_tx_order DESC, aggregate_type, aggregate_id, "sequence"`
+		return ` ORDER BY (` + eventSortKeySQL + `) DESC`
 	}
-	return ` ORDER BY "position", in_tx_order, aggregate_type, aggregate_id, "sequence"`
+	return ` ORDER BY ` + eventSortKeySQL
 }
 
 func (db *Postgres) eventQuery(useV1 bool) string {

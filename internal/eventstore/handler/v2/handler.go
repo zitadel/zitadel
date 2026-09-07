@@ -583,14 +583,12 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	if err != nil {
 		return additionalIteration, err
 	}
-	// stop execution if currentState.position >= config.maxPosition
-	if !config.maxPosition.IsZero() && currentState.position.GreaterThanOrEqual(config.maxPosition) {
+	if !config.maxPosition.IsZero() && currentState.cursor.Position.GreaterThanOrEqual(config.maxPosition) {
 		return false, nil
 	}
 
 	if config.minPosition.GreaterThan(decimal.NewFromInt(0)) {
-		currentState.position = config.minPosition
-		currentState.offset = 0
+		currentState.cursor = eventstore.EventSortKey{Position: config.minPosition}
 	}
 
 	var statements []*Statement
@@ -607,7 +605,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 
 		h.metrics.ProjectionEventsProcessed(ctx, h.ProjectionName(), int64(len(statements)), err == nil)
 
-		if err == nil && currentState.aggregateID != "" && len(statements) > 0 {
+		if err == nil && currentState.cursor.AggregateID != "" && len(statements) > 0 {
 			// Don't update projection timing or latency unless we successfully processed events
 			h.metrics.ProjectionUpdateTiming(ctx, h.ProjectionName(), float64(time.Since(start).Seconds()))
 			h.metrics.ProjectionStateLatency(ctx, h.ProjectionName(), time.Since(currentState.eventTimestamp).Seconds())
@@ -627,12 +625,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		return false, err
 	}
 
-	currentState.position = statements[lastProcessedIndex].Position
-	currentState.offset = statements[lastProcessedIndex].offset
-	currentState.aggregateID = statements[lastProcessedIndex].Aggregate.ID
-	currentState.aggregateType = statements[lastProcessedIndex].Aggregate.Type
-	currentState.sequence = statements[lastProcessedIndex].Sequence
-	currentState.eventTimestamp = statements[lastProcessedIndex].CreationDate
+	currentState.applyStatement(statements[lastProcessedIndex])
 
 	setStateErr := h.setState(ctx, tx, currentState)
 	if setStateErr != nil {
@@ -663,14 +656,9 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		return nil, false, err
 	}
 
-	idx := skipPreviouslyReducedStatements(statements, currentState)
+	idx := skipPreviouslyReduced(statements, currentState.cursor, (*Statement).eventSortKey)
 	if idx+1 == len(statements) {
-		currentState.position = statements[len(statements)-1].Position
-		currentState.offset = statements[len(statements)-1].offset
-		currentState.aggregateID = statements[len(statements)-1].Aggregate.ID
-		currentState.aggregateType = statements[len(statements)-1].Aggregate.Type
-		currentState.sequence = statements[len(statements)-1].Sequence
-		currentState.eventTimestamp = statements[len(statements)-1].CreationDate
+		currentState.applyStatement(statements[len(statements)-1])
 
 		return nil, false, nil
 	}
@@ -685,12 +673,9 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	return statements, additionalIteration, nil
 }
 
-func skipPreviouslyReducedStatements(statements []*Statement, currentState *state) int {
-	for i, statement := range statements {
-		if statement.Position.Equal(currentState.position) &&
-			statement.Aggregate.ID == currentState.aggregateID &&
-			statement.Aggregate.Type == currentState.aggregateType &&
-			statement.Sequence == currentState.sequence {
+func skipPreviouslyReduced[T any](items []T, cursor eventstore.EventSortKey, key func(T) eventstore.EventSortKey) int {
+	for i, item := range items {
+		if cursor.IdentityEquals(key(item)) {
 			return i
 		}
 	}
@@ -750,14 +735,8 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 		OrderAsc().
 		InstanceID(currentState.instanceID)
 
-	if currentState.position.GreaterThan(decimal.Decimal{}) {
-		builder = builder.PositionAfter(
-			currentState.position,
-			currentState.offset,
-			currentState.aggregateType,
-			currentState.aggregateID,
-			currentState.sequence,
-		)
+	if !currentState.cursor.IsZero() {
+		builder = builder.AfterEventSortKey(currentState.cursor)
 	}
 
 	if h.queryGlobal {

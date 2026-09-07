@@ -285,30 +285,16 @@ func (builder *SearchQueryBuilder) EditorUser(id string) *SearchQueryBuilder {
 	return builder
 }
 
-// EventSortKey is the events2 cursor: position, in_tx_order, aggregate_type, aggregate_id, sequence.
-type EventSortKey struct {
-	Position      decimal.Decimal
-	InTxOrder     uint32
-	AggregateType AggregateType
-	AggregateID   string
-	Sequence      uint64
-}
-
 // PositionAtLeast filters for events which happened after the specified time
 func (builder *SearchQueryBuilder) PositionAtLeast(position decimal.Decimal) *SearchQueryBuilder {
 	builder.positionAtLeast = position
 	return builder
 }
 
-// PositionAfter resumes after the given event sort key using a lexicographic row comparison.
-func (builder *SearchQueryBuilder) PositionAfter(position decimal.Decimal, inTxOrder uint32, aggregateType AggregateType, aggregateID string, sequence uint64) *SearchQueryBuilder {
-	builder.eventSortKeyAfter = &EventSortKey{
-		Position:      position,
-		InTxOrder:     inTxOrder,
-		AggregateType: aggregateType,
-		AggregateID:   aggregateID,
-		Sequence:      sequence,
-	}
+// AfterEventSortKey resumes after the given event using a lexicographic row comparison.
+func (builder *SearchQueryBuilder) AfterEventSortKey(key EventSortKey) *SearchQueryBuilder {
+	k := key
+	builder.eventSortKeyAfter = &k
 	return builder
 }
 

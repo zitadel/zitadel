@@ -98,16 +98,3 @@ BEGIN
         in_tx_order;
 END;
 $$;
-
--- filter_offset now stores in_tx_order. Unmatched rows stay 0 so the next fetch re-reads this position.
-UPDATE projections.current_states
-SET filter_offset = 0;
-
-UPDATE projections.current_states cs
-SET filter_offset = e.in_tx_order
-FROM eventstore.events2 e
-WHERE cs.instance_id = e.instance_id
-  AND cs.aggregate_id = e.aggregate_id
-  AND cs.aggregate_type = e.aggregate_type
-  AND cs."sequence" = e.sequence
-  AND cs.position = e.position;

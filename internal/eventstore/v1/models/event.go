@@ -86,7 +86,7 @@ func (e *Event) Position() decimal.Decimal {
 	return e.Pos
 }
 
-// InTxOrder implements [eventstore.Event]
+// InTxOrder implements [eventstore.Event]. The v1 events table has no in_tx_order column.
 func (e *Event) InTxOrder() uint32 {
 	return 0
 }

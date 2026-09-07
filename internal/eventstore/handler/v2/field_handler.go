@@ -141,14 +141,12 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 	if err != nil {
 		return additionalIteration, err
 	}
-	// stop execution if currentState.eventTimestamp >= config.maxCreatedAt
-	if !config.maxPosition.IsZero() && currentState.position.GreaterThanOrEqual(config.maxPosition) {
+	if !config.maxPosition.IsZero() && currentState.cursor.Position.GreaterThanOrEqual(config.maxPosition) {
 		return false, nil
 	}
 
 	if config.minPosition.GreaterThan(decimal.NewFromInt(0)) {
-		currentState.position = config.minPosition
-		currentState.offset = 0
+		currentState.cursor = eventstore.EventSortKey{Position: config.minPosition}
 	}
 
 	events, additionalIteration, err := h.fetchEvents(ctx, tx, currentState)
@@ -178,14 +176,9 @@ func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState
 	}
 	eventAmount := len(events)
 
-	idx := skipPreviouslyReducedEvents(events, currentState)
+	idx := skipPreviouslyReduced(events, currentState.cursor, eventstore.EventSortKeyFromEvent)
 
-	currentState.position = events[len(events)-1].Position()
-	currentState.offset = events[len(events)-1].InTxOrder()
-	currentState.aggregateID = events[len(events)-1].Aggregate().ID
-	currentState.aggregateType = events[len(events)-1].Aggregate().Type
-	currentState.sequence = events[len(events)-1].Sequence()
-	currentState.eventTimestamp = events[len(events)-1].CreatedAt()
+	currentState.applyEvent(events[len(events)-1])
 
 	if idx+1 == len(events) {
 		return nil, false, nil
@@ -200,16 +193,4 @@ func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState
 	}
 
 	return fillFieldsEvents, additionalIteration, nil
-}
-
-func skipPreviouslyReducedEvents(events []eventstore.Event, currentState *state) int {
-	for i, event := range events {
-		if event.Position().Equal(currentState.position) &&
-			event.Aggregate().ID == currentState.aggregateID &&
-			event.Aggregate().Type == currentState.aggregateType &&
-			event.Sequence() == currentState.sequence {
-			return i
-		}
-	}
-	return -1
 }

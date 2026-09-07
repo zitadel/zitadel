@@ -26,25 +26,22 @@ func TestHandler_eventQuery(t *testing.T) {
 		assert.True(t, builder.GetPositionAtLeast().IsZero())
 	})
 
-	t.Run("resumes with sort key instead of OFFSET", func(t *testing.T) {
-		position := decimal.NewFromFloat(1788336088.993079)
+	t.Run("resumes after event sort key", func(t *testing.T) {
+		cursor := eventstore.EventSortKey{
+			Position:      decimal.NewFromFloat(1788336088.993079),
+			InTxOrder:     5,
+			AggregateType: "user",
+			AggregateID:   "388963124960608862",
+			Sequence:      5,
+		}
 		builder := h.eventQuery(&state{
-			instanceID:    "inst",
-			position:      position,
-			offset:        5,
-			aggregateType: "user",
-			aggregateID:   "388963124960608862",
-			sequence:      5,
+			instanceID: "inst",
+			cursor:     cursor,
 		})
 		assert.Equal(t, uint32(0), builder.GetOffset())
 		assert.True(t, builder.GetPositionAtLeast().IsZero())
-		key := builder.GetEventSortKeyAfter()
-		require.NotNil(t, key)
-		assert.True(t, position.Equal(key.Position))
-		assert.Equal(t, uint32(5), key.InTxOrder)
-		assert.Equal(t, eventstore.AggregateType("user"), key.AggregateType)
-		assert.Equal(t, "388963124960608862", key.AggregateID)
-		assert.Equal(t, uint64(5), key.Sequence)
+		require.NotNil(t, builder.GetEventSortKeyAfter())
+		assert.Equal(t, cursor, *builder.GetEventSortKeyAfter())
 	})
 }
 
@@ -82,9 +79,9 @@ func TestHandler_eventsToStatements_inTxOrder(t *testing.T) {
 	statements, err := h.eventsToStatements(context.Background(), nil, events)
 	require.NoError(t, err)
 	require.Len(t, statements, 3)
-	assert.Equal(t, uint32(1), statements[0].offset)
-	assert.Equal(t, uint32(2), statements[1].offset)
-	assert.Equal(t, uint32(1), statements[2].offset)
+	assert.Equal(t, uint32(1), statements[0].inTxOrder)
+	assert.Equal(t, uint32(2), statements[1].inTxOrder)
+	assert.Equal(t, uint32(1), statements[2].inTxOrder)
 	assert.Equal(t, "agg-b", statements[2].Aggregate.ID)
 }
 
@@ -115,30 +112,46 @@ func TestHandler_eventsToStatements_samePositionInTxOrder(t *testing.T) {
 	require.Len(t, statements, 2)
 	assert.Equal(t, "agg-a", statements[0].Aggregate.ID)
 	assert.Equal(t, "agg-b", statements[1].Aggregate.ID)
-	assert.Equal(t, uint32(1), statements[0].offset)
-	assert.Equal(t, uint32(1), statements[1].offset)
+	assert.Equal(t, uint32(1), statements[0].inTxOrder)
+	assert.Equal(t, uint32(1), statements[1].inTxOrder)
 }
 
-func TestSkipPreviouslyReducedEvents(t *testing.T) {
+func TestSkipPreviouslyReduced(t *testing.T) {
 	pos := decimal.NewFromInt(1)
 	events := []eventstore.Event{
 		&eventstore.BaseEvent{
-			Agg: &eventstore.Aggregate{ID: "agg-a", Type: "user"},
-			Seq: 1,
-			Pos: pos,
+			Agg:  &eventstore.Aggregate{ID: "agg-a", Type: "user"},
+			Seq:  1,
+			Pos:  pos,
+			InTx: 5,
 		},
 		&eventstore.BaseEvent{
-			Agg: &eventstore.Aggregate{ID: "agg-b", Type: "user"},
-			Seq: 1,
-			Pos: pos,
+			Agg:  &eventstore.Aggregate{ID: "agg-b", Type: "user"},
+			Seq:  1,
+			Pos:  pos,
+			InTx: 1,
 		},
 	}
 
-	idx := skipPreviouslyReducedEvents(events, &state{
-		position:      pos,
-		aggregateID:   "agg-a",
-		aggregateType: "user",
-		sequence:      1,
+	t.Run("matches last reduced event", func(t *testing.T) {
+		idx := skipPreviouslyReduced(events, eventstore.EventSortKeyFromEvent(events[0]), eventstore.EventSortKeyFromEvent)
+		assert.Equal(t, 0, idx)
 	})
-	assert.Equal(t, 0, idx)
+
+	t.Run("matches without in_tx_order so pre-backfill 0 still skips", func(t *testing.T) {
+		cursor := eventstore.EventSortKeyFromEvent(events[0])
+		cursor.InTxOrder = 0
+		idx := skipPreviouslyReduced(events, cursor, eventstore.EventSortKeyFromEvent)
+		assert.Equal(t, 0, idx)
+	})
+
+	t.Run("unknown cursor keeps the batch", func(t *testing.T) {
+		idx := skipPreviouslyReduced(events, eventstore.EventSortKey{
+			Position:      pos,
+			AggregateType: "user",
+			AggregateID:   "agg-c",
+			Sequence:      1,
+		}, eventstore.EventSortKeyFromEvent)
+		assert.Equal(t, -1, idx)
+	})
 }
