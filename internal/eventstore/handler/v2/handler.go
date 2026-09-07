@@ -658,7 +658,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	}
 	eventAmount := len(events)
 
-	statements, err := h.eventsToStatements(ctx, tx, events, currentState)
+	statements, err := h.eventsToStatements(ctx, tx, events)
 	if err != nil || len(statements) == 0 {
 		return nil, false, err
 	}
@@ -751,10 +751,13 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 		InstanceID(currentState.instanceID)
 
 	if currentState.position.GreaterThan(decimal.Decimal{}) {
-		builder = builder.PositionAtLeast(currentState.position)
-		if currentState.offset > 0 {
-			builder = builder.Offset(currentState.offset)
-		}
+		builder = builder.PositionAfter(
+			currentState.position,
+			currentState.offset,
+			currentState.aggregateType,
+			currentState.aggregateID,
+			currentState.sequence,
+		)
 	}
 
 	if h.queryGlobal {

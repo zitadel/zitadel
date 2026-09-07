@@ -181,13 +181,13 @@ func Test_prepareColumns(t *testing.T) {
 				}),
 			},
 			res: res{
-				query: `SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2`,
+				query: `SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2`,
 				expected: []eventstore.Event{
-					&repository.Event{AggregateID: "hodor", AggregateType: "user", Seq: 5, Pos: decimal.NewFromInt(42), Data: nil, Version: "v1"},
+					&repository.Event{AggregateID: "hodor", AggregateType: "user", Seq: 5, Pos: decimal.NewFromInt(42), Data: nil, Version: "v1", InTx: 3},
 				},
 			},
 			fields: fields{
-				dbRow: []interface{}{time.Time{}, eventstore.EventType(""), uint64(5), decimal.NewNullDecimal(decimal.NewFromInt(42)), sql.RawBytes(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", uint8(1)},
+				dbRow: []interface{}{time.Time{}, eventstore.EventType(""), uint64(5), decimal.NewNullDecimal(decimal.NewFromInt(42)), sql.RawBytes(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", uint8(1), uint32(3)},
 			},
 		},
 		{
@@ -200,13 +200,13 @@ func Test_prepareColumns(t *testing.T) {
 				}),
 			},
 			res: res{
-				query: `SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2`,
+				query: `SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2`,
 				expected: []eventstore.Event{
 					&repository.Event{AggregateID: "hodor", AggregateType: "user", Seq: 5, Pos: decimal.Decimal{}, Data: nil, Version: "v1"},
 				},
 			},
 			fields: fields{
-				dbRow: []interface{}{time.Time{}, eventstore.EventType(""), uint64(5), decimal.NullDecimal{}, sql.RawBytes(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", uint8(1)},
+				dbRow: []interface{}{time.Time{}, eventstore.EventType(""), uint64(5), decimal.NullDecimal{}, sql.RawBytes(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", uint8(1), uint32(0)},
 			},
 		},
 		{
@@ -904,7 +904,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(
-					regexp.QuoteMeta(`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND "position" >= $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND "position" >= $8) ORDER BY "position" DESC, in_tx_order DESC, instance_id, aggregate_type, aggregate_id LIMIT $9`),
+					regexp.QuoteMeta(`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND "position" >= $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND "position" >= $8) ORDER BY "position" DESC, in_tx_order DESC, aggregate_type, aggregate_id, "sequence" LIMIT $9`),
 					[]driver.Value{"instanceID", eventstore.AggregateType("notify"), eventstore.EventType("notify.foo.bar"), decimal.NewFromFloat(123.456), eventstore.AggregateType("notify"), []eventstore.EventType{"notification.failed", "notification.success"}, "instanceID", decimal.NewFromFloat(123.456), uint64(5)},
 				),
 			},
@@ -933,8 +933,86 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(
-					regexp.QuoteMeta(`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND created_at > $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND created_at > $8) ORDER BY "position" DESC, in_tx_order DESC, instance_id, aggregate_type, aggregate_id LIMIT $9`),
+					regexp.QuoteMeta(`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND created_at > $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND created_at > $8) ORDER BY "position" DESC, in_tx_order DESC, aggregate_type, aggregate_id, "sequence" LIMIT $9`),
 					[]driver.Value{"instanceID", eventstore.AggregateType("notify"), eventstore.EventType("notify.foo.bar"), time.Unix(123, 456), eventstore.AggregateType("notify"), []eventstore.EventType{"notification.failed", "notification.success"}, "instanceID", time.Unix(123, 456), uint64(5)},
+				),
+			},
+			res: res{
+				wantErr: false,
+			},
+		},
+		{
+			name: "sort key after, await cap now, lock then unlock, v2",
+			args: args{
+				dest: &[]*repository.Event{},
+				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					InstanceID("instanceID").
+					OrderAsc().
+					AwaitOpenTransactions().
+					Limit(200).
+					PositionAfter(decimal.NewFromFloat(1788336088.993079), 5, "user", "388963124960608862", 5).
+					AddQuery().
+					AggregateTypes("user").
+					EventTypes("user.human.added").
+					Builder(),
+				useV1: false,
+			},
+			fields: fields{
+				mock: newMockClient(t).
+					expectExec(regexp.QuoteMeta(
+						`select pg_advisory_lock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1)), pg_advisory_unlock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))`),
+						[]driver.Value{"instanceID"}).
+					expectQuery(
+						regexp.QuoteMeta(`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND ("position", in_tx_order, aggregate_type, aggregate_id, "sequence") > ($4, $5, $6, $7, $8) AND "position" <= EXTRACT(EPOCH FROM now()) ORDER BY "position", in_tx_order, aggregate_type, aggregate_id, "sequence" LIMIT $9`),
+						[]driver.Value{"instanceID", eventstore.AggregateType("user"), eventstore.EventType("user.human.added"), decimal.NewFromFloat(1788336088.993079), uint32(5), eventstore.AggregateType("user"), "388963124960608862", uint64(5), uint64(200)},
+					),
+			},
+			res: res{
+				wantErr: false,
+			},
+		},
+		{
+			name: "sort key after does not use OFFSET, v2",
+			args: args{
+				dest: &[]*repository.Event{},
+				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					InstanceID("instanceID").
+					OrderAsc().
+					Limit(200).
+					PositionAfter(decimal.NewFromFloat(1.5), 5, "user", "agg-a", 5).
+					AddQuery().
+					AggregateTypes("user").
+					Builder(),
+				useV1: false,
+			},
+			fields: fields{
+				mock: newMockClient(t).expectQuery(
+					regexp.QuoteMeta(`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND ("position", in_tx_order, aggregate_type, aggregate_id, "sequence") > ($3, $4, $5, $6, $7) ORDER BY "position", in_tx_order, aggregate_type, aggregate_id, "sequence" LIMIT $8`),
+					[]driver.Value{"instanceID", eventstore.AggregateType("user"), decimal.NewFromFloat(1.5), uint32(5), eventstore.AggregateType("user"), "agg-a", uint64(5), uint64(200)},
+				),
+			},
+			res: res{
+				wantErr: false,
+			},
+		},
+		{
+			name: "same position in_tx_order collision uses full sort key, v2",
+			args: args{
+				dest: &[]*repository.Event{},
+				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					InstanceID("instanceID").
+					OrderAsc().
+					Limit(200).
+					PositionAfter(decimal.NewFromFloat(1), 1, "user", "agg-a", 1).
+					AddQuery().
+					AggregateTypes("user").
+					Builder(),
+				useV1: false,
+			},
+			fields: fields{
+				mock: newMockClient(t).expectQuery(
+					regexp.QuoteMeta(`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND ("position", in_tx_order, aggregate_type, aggregate_id, "sequence") > ($3, $4, $5, $6, $7) ORDER BY "position", in_tx_order, aggregate_type, aggregate_id, "sequence" LIMIT $8`),
+					[]driver.Value{"instanceID", eventstore.AggregateType("user"), decimal.NewFromFloat(1), uint32(1), eventstore.AggregateType("user"), "agg-a", uint64(1), uint64(200)},
 				),
 			},
 			res: res{

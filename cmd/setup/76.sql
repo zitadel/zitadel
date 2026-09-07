@@ -1,32 +1,3 @@
--- represents an event to be created.
-DO $$ BEGIN
-    CREATE TYPE eventstore.command2 AS (
-        instance_id TEXT
-        , aggregate_type TEXT
-        , aggregate_id TEXT
-        , command_type TEXT
-        , revision INT2
-        , payload JSONB
-        , creator TEXT
-        , owner TEXT
-        , enforce_owner BOOLEAN
-    );
-EXCEPTION
-    WHEN duplicate_object THEN null;
-END $$;
-
-DO $$ BEGIN
-    CREATE TYPE eventstore.latest_command AS (
-        instance_id TEXT
-        , aggregate_type TEXT
-        , aggregate_id TEXT
-        , owner TEXT
-        , sequence BIGINT
-    );
-EXCEPTION
-    WHEN duplicate_object THEN null;
-END $$;
-
 CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command2[]) 
     RETURNS SETOF eventstore.events2 
     LANGUAGE 'plpgsql'
@@ -128,9 +99,17 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command2[]) RETURNS SETOF eventstore.events2 VOLATILE AS $$
-INSERT INTO eventstore.events2
-SELECT * FROM eventstore.commands_to_events(commands)
-ORDER BY in_tx_order
-RETURNING *
-$$ LANGUAGE SQL;
+-- Resume projections from the last event's in_tx_order instead of a filtered row count.
+-- Unmatched current_states keep filter_offset = 0 so the next fetch re-reads the current
+-- position and skipPreviouslyReducedStatements drops the already-applied event.
+UPDATE projections.current_states
+SET filter_offset = 0;
+
+UPDATE projections.current_states cs
+SET filter_offset = e.in_tx_order
+FROM eventstore.events2 e
+WHERE cs.instance_id = e.instance_id
+  AND cs.aggregate_id = e.aggregate_id
+  AND cs.aggregate_type = e.aggregate_type
+  AND cs."sequence" = e.sequence
+  AND cs.position = e.position;

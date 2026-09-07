@@ -178,13 +178,10 @@ func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState
 	}
 	eventAmount := len(events)
 
-	idx, offset := skipPreviouslyReducedEvents(events, currentState)
+	idx := skipPreviouslyReducedEvents(events, currentState)
 
-	if currentState.position.Equal(events[len(events)-1].Position()) {
-		offset += currentState.offset
-	}
 	currentState.position = events[len(events)-1].Position()
-	currentState.offset = offset
+	currentState.offset = events[len(events)-1].InTxOrder()
 	currentState.aggregateID = events[len(events)-1].Aggregate().ID
 	currentState.aggregateType = events[len(events)-1].Aggregate().Type
 	currentState.sequence = events[len(events)-1].Sequence()
@@ -198,31 +195,21 @@ func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState
 	additionalIteration = eventAmount == int(h.bulkLimit)
 
 	fillFieldsEvents := make([]eventstore.FillFieldsEvent, len(events))
-	highestPosition := events[len(events)-1].Position()
 	for i, event := range events {
-		if event.Position().Equal(highestPosition) {
-			offset++
-		}
 		fillFieldsEvents[i] = event.(eventstore.FillFieldsEvent)
 	}
 
 	return fillFieldsEvents, additionalIteration, nil
 }
 
-func skipPreviouslyReducedEvents(events []eventstore.Event, currentState *state) (index int, offset uint32) {
-	var position decimal.Decimal
+func skipPreviouslyReducedEvents(events []eventstore.Event, currentState *state) int {
 	for i, event := range events {
-		if !event.Position().Equal(position) {
-			offset = 0
-			position = event.Position()
-		}
-		offset++
 		if event.Position().Equal(currentState.position) &&
 			event.Aggregate().ID == currentState.aggregateID &&
 			event.Aggregate().Type == currentState.aggregateType &&
 			event.Sequence() == currentState.sequence {
-			return i, offset
+			return i
 		}
 	}
-	return -1, 0
+	return -1
 }

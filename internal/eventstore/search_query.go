@@ -26,6 +26,7 @@ type SearchQueryBuilder struct {
 	excludeAggregateIDs   *ExclusionQuery
 	tx                    *sql.Tx
 	positionAtLeast       decimal.Decimal
+	eventSortKeyAfter     *EventSortKey
 	awaitOpenTransactions bool
 	creationDateAfter     time.Time
 	creationDateBefore    time.Time
@@ -78,6 +79,10 @@ func (b *SearchQueryBuilder) GetTx() *sql.Tx {
 
 func (b SearchQueryBuilder) GetPositionAtLeast() decimal.Decimal {
 	return b.positionAtLeast
+}
+
+func (b SearchQueryBuilder) GetEventSortKeyAfter() *EventSortKey {
+	return b.eventSortKeyAfter
 }
 
 func (b SearchQueryBuilder) GetAwaitOpenTransactions() bool {
@@ -280,9 +285,31 @@ func (builder *SearchQueryBuilder) EditorUser(id string) *SearchQueryBuilder {
 	return builder
 }
 
+// EventSortKey identifies an events2 row in the same order as the projection
+// fetch: position, in_tx_order, aggregate_type, aggregate_id, sequence.
+type EventSortKey struct {
+	Position      decimal.Decimal
+	InTxOrder     uint32
+	AggregateType AggregateType
+	AggregateID   string
+	Sequence      uint64
+}
+
 // PositionAtLeast filters for events which happened after the specified time
 func (builder *SearchQueryBuilder) PositionAtLeast(position decimal.Decimal) *SearchQueryBuilder {
 	builder.positionAtLeast = position
+	return builder
+}
+
+// PositionAfter resumes after the given event sort key using a lexicographic row comparison.
+func (builder *SearchQueryBuilder) PositionAfter(position decimal.Decimal, inTxOrder uint32, aggregateType AggregateType, aggregateID string, sequence uint64) *SearchQueryBuilder {
+	builder.eventSortKeyAfter = &EventSortKey{
+		Position:      position,
+		InTxOrder:     inTxOrder,
+		AggregateType: aggregateType,
+		AggregateID:   aggregateID,
+		Sequence:      sequence,
+	}
 	return builder
 }
 

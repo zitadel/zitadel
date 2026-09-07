@@ -226,6 +226,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 				&event.AggregateType,
 				&event.AggregateID,
 				&revision,
+				&event.InTx,
 			)
 			event.Version = eventstore.Version("v" + strconv.Itoa(int(revision)))
 		}
@@ -277,6 +278,20 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 		}
 		clauses += additionalClauses
 		args = append(args, additionalArgs...)
+	}
+
+	if query.EventSortKeyAfter != nil && !useV1 {
+		if clauses != "" {
+			clauses += " AND "
+		}
+		clauses += `("position", in_tx_order, aggregate_type, aggregate_id, "sequence") > (?, ?, ?, ?, ?)`
+		args = append(args,
+			query.EventSortKeyAfter.Position,
+			query.EventSortKeyAfter.InTxOrder,
+			query.EventSortKeyAfter.AggregateType,
+			query.EventSortKeyAfter.AggregateID,
+			query.EventSortKeyAfter.Sequence,
+		)
 	}
 
 	excludeAggregateIDs := query.ExcludeAggregateIDs

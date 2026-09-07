@@ -86,6 +86,11 @@ func (e *Event) Position() decimal.Decimal {
 	return e.Pos
 }
 
+// InTxOrder implements [eventstore.Event]
+func (e *Event) InTxOrder() uint32 {
+	return 0
+}
+
 // Type implements [eventstore.action]
 func (e *Event) Type() eventstore.EventType {
 	return e.Typ

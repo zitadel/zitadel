@@ -39,11 +39,9 @@ func (s *executionError) Unwrap() error {
 	return s.parent
 }
 
-func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []eventstore.Event, currentState *state) (statements []*Statement, err error) {
+func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []eventstore.Event) (statements []*Statement, err error) {
 	statements = make([]*Statement, 0, len(events))
 
-	previousPosition := currentState.position
-	offset := currentState.offset
 	for _, event := range events {
 		statement, err := h.reduce(event)
 		if err != nil {
@@ -53,14 +51,8 @@ func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []e
 			}
 			return statements, &executionError{err}
 		}
-		offset++
-		if !previousPosition.Equal(event.Position()) {
-			// offset is 1 because we want to skip this event
-			offset = 1
-		}
-		statement.offset = offset
+		statement.offset = event.InTxOrder()
 		statement.Position = event.Position()
-		previousPosition = event.Position()
 		statements = append(statements, statement)
 	}
 	return statements, nil
