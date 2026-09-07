@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"log/slog"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -124,6 +125,72 @@ func TestPromptToBusiness(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := PromptToBusiness(tt.args.oidcPrompt)
 			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestAuthRequest_LogValue(t *testing.T) {
+	tests := []struct {
+		name     string
+		req      *AuthRequest
+		expected slog.Value
+	}{
+		{
+			name:     "nil receiver",
+			req:      nil,
+			expected: slog.Value{},
+		},
+		{
+			name:     "nil inner request",
+			req:      &AuthRequest{},
+			expected: slog.Value{},
+		},
+		{
+			name: "populated auth request",
+			req: &AuthRequest{
+				AuthRequest: &domain.AuthRequest{
+					ID:         "auth-123",
+					InstanceID: "inst-456",
+					ApplicationID:    "client-789",
+					CallbackURI: "https://example.com/callback",
+					Request: &domain.AuthRequestOIDC{
+						Scopes:      []string{"openid", "profile"},
+					},
+				},
+			},
+			expected: slog.GroupValue(
+				slog.String("id", "auth-123"),
+				slog.String("client_id", "client-789"),
+				slog.String("instance_id", "inst-456"),
+				slog.Any("scopes", []string{"openid", "profile"}),
+				slog.String("redirect_uri", "https://example.com/callback"),
+			),
+		},
+		{
+			name: "populated auth request with nil inner request",
+			req: &AuthRequest{
+				AuthRequest: &domain.AuthRequest{
+					ID:            "auth-123",
+					InstanceID:    "inst-456",
+					ApplicationID: "client-789",
+					CallbackURI:   "https://example.com/callback",
+					Request:       nil,
+				},
+			},
+			expected: slog.GroupValue(
+				slog.String("id", "auth-123"),
+				slog.String("client_id", "client-789"),
+				slog.String("instance_id", "inst-456"),
+				slog.Any("scopes", []string(nil)),
+				slog.String("redirect_uri", "https://example.com/callback"),
+			),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.req.LogValue()
+			assert.Equal(t, tt.expected, got)
 		})
 	}
 }
