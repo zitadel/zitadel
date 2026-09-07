@@ -5,6 +5,8 @@ sidebar_label: Create a Login Client
 ---
 
 To enable your self-hosted Login UI to connect to the Zitadel API, it needs a token for a user with the IAM_LOGIN_CLIENT role.
+Place that service account in a dedicated organization for instance administrators and follow [Hardening instance administrators](/guides/manage/console/administrator-hardening) for least-privilege and login settings alignment.
+
 On new installations, the Zitadel setup job can be configured to automatically write a Personal Access Token (PAT) for the login client.
 Check out [one of the deployment examples](https://zitadel.com/docs/self-hosting/deploy/overview) to learn how to do this.
 
