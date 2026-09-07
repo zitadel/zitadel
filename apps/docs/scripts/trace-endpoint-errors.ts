@@ -18,10 +18,11 @@
 // generate-endpoint-errors.ts runs once at the end so the docs data picks it
 // up immediately.
 //
-// Used directly for local one-off tracing, and by the two GitHub Actions
-// workflows: endpoint-error-tables-backfill.yml (no flags — everything not
-// covered yet) and endpoint-error-tables-watch.yml (--changed-since the PR's
-// base — only what that PR touched).
+// Used directly for local one-off tracing (including generating the actual
+// tables for a category, by hand, in its own PR), and by the
+// endpoint-error-tables-watch.yml GitHub Actions workflow
+// (--changed-since the PR's base — only what that PR touched, to flag
+// what's now out of date, never to generate the tables itself).
 import { execFileSync } from 'child_process';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { basename, dirname, isAbsolute, join, relative, resolve } from 'path';
