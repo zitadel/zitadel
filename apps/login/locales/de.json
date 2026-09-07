@@ -25,6 +25,7 @@
   "loginname": {
     "title": "Willkommen zurück!",
     "description": "Geben Sie Ihre Anmeldedaten ein.",
+    "passwordResetHint": "Passwort vergessen? Nach der Eingabe deiner E-Mail-Adresse findest du auf der nächsten Seite den Link zum Zurücksetzen.",
     "register": "Neuen Benutzer registrieren",
     "submit": "Weiter",
     "labels": {

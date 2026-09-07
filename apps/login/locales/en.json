@@ -25,6 +25,7 @@
   "loginname": {
     "title": "Welcome back!",
     "description": "Enter your login details.",
+    "passwordResetHint": "Forgot your password? After entering your email address you will find the reset link on the next page.",
     "register": "Register new user",
     "submit": "Continue",
     "labels": {

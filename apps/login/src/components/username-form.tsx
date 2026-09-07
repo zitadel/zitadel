@@ -113,6 +113,12 @@ export function UsernameForm({
             data-testid="username-text-input"
             suffix={suffix}
           />
+          <p
+            className="text-text-light-secondary-500 dark:text-text-dark-secondary-500 mt-2 text-sm"
+            data-testid="password-reset-hint"
+          >
+            <Translated i18nKey="passwordResetHint" namespace="loginname" />
+          </p>
           {allowRegister && (
             <button
               className="hover:text-primary-light-500 dark:hover:text-primary-dark-500 text-sm transition-all"
