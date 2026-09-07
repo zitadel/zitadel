@@ -152,7 +152,8 @@
       "failedPrecondition": "Pré-condition non remplie",
       "sessionNotValid": "La session n'est pas valide",
       "passwordVerificationMissing": "La vérification du mot de passe est manquante.",
-      "passwordVerificationTooOld": "La vérification du mot de passe est trop ancienne. Veuillez vérifier à nouveau votre mot de passe."
+      "passwordVerificationTooOld": "La vérification du mot de passe est trop ancienne. Veuillez vérifier à nouveau votre mot de passe.",
+      "passwordResetNotAllowed": "La réinitialisation du mot de passe n'est pas autorisée. Contactez votre administrateur pour plus d'informations."
     }
   },
   "idp": {
@@ -261,6 +262,10 @@
       "required": {
         "code": "Ce champ est requis"
       }
+    },
+    "errors": {
+      "couldNotRequestChallenge": "Impossible de demander le challenge OTP",
+      "couldNotVerifyCode": "Impossible de vérifier le code OTP"
     }
   },
   "passkey": {
@@ -422,7 +427,15 @@
     "description": "Sélectionnez la méthode que vous souhaitez utiliser pour vous authentifier",
     "noMethodsAvailable": "Aucune méthode d'authentification disponible",
     "allSetup": "Vous avez déjà configuré un authentificateur !",
-    "linkWithIDP": "ou lier avec un fournisseur d'identité"
+    "linkWithIDP": "ou lier avec un fournisseur d'identité",
+    "methods": {
+      "totp": "Application d'authentification",
+      "u2f": "Second facteur universel",
+      "otpEmail": "Code par e-mail",
+      "otpSms": "Code par SMS",
+      "passkey": "Clés d'accès",
+      "password": "Mot de passe"
+    }
   },
   "device": {
     "usercode": {

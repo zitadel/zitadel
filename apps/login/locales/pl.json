@@ -152,7 +152,8 @@
       "failedPrecondition": "Nie spełniono warunków wstępnych",
       "sessionNotValid": "Sesja jest nieważna",
       "passwordVerificationMissing": "Brak weryfikacji hasła.",
-      "passwordVerificationTooOld": "Weryfikacja hasła jest przestarzała. Proszę zweryfikować hasło ponownie."
+      "passwordVerificationTooOld": "Weryfikacja hasła jest przestarzała. Proszę zweryfikować hasło ponownie.",
+      "passwordResetNotAllowed": "Resetowanie hasła jest niedozwolone. Skontaktuj się z administratorem, aby uzyskać więcej informacji."
     }
   },
   "idp": {
@@ -261,6 +262,10 @@
       "required": {
         "code": "To pole jest wymagane"
       }
+    },
+    "errors": {
+      "couldNotRequestChallenge": "Nie można zażądać wyzwania OTP",
+      "couldNotVerifyCode": "Nie można zweryfikować kodu OTP"
     }
   },
   "passkey": {
@@ -422,7 +427,15 @@
     "description": "Wybierz metodę, której chcesz użyć do uwierzytelnienia.",
     "noMethodsAvailable": "Brak dostępnych metod uwierzytelniania",
     "allSetup": "Już skonfigurowałeś metodę uwierzytelniania!",
-    "linkWithIDP": "lub połącz z dostawcą tożsamości"
+    "linkWithIDP": "lub połącz z dostawcą tożsamości",
+    "methods": {
+      "totp": "Aplikacja uwierzytelniająca",
+      "u2f": "Uniwersalny drugi składnik",
+      "otpEmail": "Kod przez e-mail",
+      "otpSms": "Kod przez SMS",
+      "passkey": "Klucz dostępu",
+      "password": "Hasło"
+    }
   },
   "device": {
     "usercode": {
