@@ -27,7 +27,7 @@ type BaseEvent struct {
 
 	Seq                           uint64
 	Pos                           decimal.Decimal
-	TxOrder                       uint32
+	InTx                          uint32
 	Creation                      time.Time
 	previousAggregateSequence     uint64
 	previousAggregateTypeSequence uint64
@@ -71,7 +71,7 @@ func (e *BaseEvent) Sequence() uint64 {
 
 // InTxOrder implements Event
 func (e *BaseEvent) InTxOrder() uint32 {
-	return e.TxOrder
+	return e.InTx
 }
 
 // CreationDate is the time, the event is inserted into the eventstore
@@ -122,7 +122,7 @@ func BaseEventFromRepo(event Event) *BaseEvent {
 		User:      event.Creator(),
 		Data:      event.DataAsBytes(),
 		Pos:       event.Position(),
-		TxOrder:   event.InTxOrder(),
+		InTx:      event.InTxOrder(),
 	}
 }
 

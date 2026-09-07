@@ -36,7 +36,7 @@ func TestHandler_eventQuery(t *testing.T) {
 			aggregateID:   "388963124960608862",
 			sequence:      5,
 		})
-		assert.Equal(t, uint32(0), builder.GetOffset(), "projection fetch must not use SQL OFFSET")
+		assert.Equal(t, uint32(0), builder.GetOffset())
 		assert.True(t, builder.GetPositionAtLeast().IsZero())
 		key := builder.GetEventSortKeyAfter()
 		require.NotNil(t, key)
@@ -61,21 +61,21 @@ func TestHandler_eventsToStatements_inTxOrder(t *testing.T) {
 			EventType: "user.human.added",
 			Seq:       1,
 			Pos:       pos1,
-			TxOrder:   1,
+			InTx:      1,
 		},
 		&eventstore.BaseEvent{
 			Agg:       &eventstore.Aggregate{ID: "agg-a", Type: "user"},
 			EventType: "user.human.email.verified",
 			Seq:       2,
 			Pos:       pos1,
-			TxOrder:   2,
+			InTx:      2,
 		},
 		&eventstore.BaseEvent{
 			Agg:       &eventstore.Aggregate{ID: "agg-b", Type: "user"},
 			EventType: "user.human.password.changed",
 			Seq:       10,
 			Pos:       pos2,
-			TxOrder:   1,
+			InTx:      1,
 		},
 	}
 
@@ -84,7 +84,7 @@ func TestHandler_eventsToStatements_inTxOrder(t *testing.T) {
 	require.Len(t, statements, 3)
 	assert.Equal(t, uint32(1), statements[0].offset)
 	assert.Equal(t, uint32(2), statements[1].offset)
-	assert.Equal(t, uint32(1), statements[2].offset, "next position in_tx_order 1 must not be skipped")
+	assert.Equal(t, uint32(1), statements[2].offset)
 	assert.Equal(t, "agg-b", statements[2].Aggregate.ID)
 }
 
@@ -99,14 +99,14 @@ func TestHandler_eventsToStatements_samePositionInTxOrder(t *testing.T) {
 			EventType: "user.human.added",
 			Seq:       1,
 			Pos:       pos,
-			TxOrder:   1,
+			InTx:      1,
 		},
 		&eventstore.BaseEvent{
 			Agg:       &eventstore.Aggregate{ID: "agg-b", Type: "user"},
 			EventType: "user.human.password.changed",
 			Seq:       1,
 			Pos:       pos,
-			TxOrder:   1,
+			InTx:      1,
 		},
 	}
 

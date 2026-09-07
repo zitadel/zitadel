@@ -99,9 +99,7 @@ BEGIN
 END;
 $$;
 
--- Resume projections from the last event's in_tx_order instead of a filtered row count.
--- Unmatched current_states keep filter_offset = 0 so the next fetch re-reads the current
--- position and skipPreviouslyReducedStatements drops the already-applied event.
+-- filter_offset now stores in_tx_order. Unmatched rows stay 0 so the next fetch re-reads this position.
 UPDATE projections.current_states
 SET filter_offset = 0;
 

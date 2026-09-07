@@ -285,8 +285,7 @@ func (builder *SearchQueryBuilder) EditorUser(id string) *SearchQueryBuilder {
 	return builder
 }
 
-// EventSortKey identifies an events2 row in the same order as the projection
-// fetch: position, in_tx_order, aggregate_type, aggregate_id, sequence.
+// EventSortKey is the events2 cursor: position, in_tx_order, aggregate_type, aggregate_id, sequence.
 type EventSortKey struct {
 	Position      decimal.Decimal
 	InTxOrder     uint32
