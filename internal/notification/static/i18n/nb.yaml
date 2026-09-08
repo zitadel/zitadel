@@ -1,0 +1,68 @@
+InitCode:
+  Title: Initialiser bruker
+  PreHeader: Initialiser bruker
+  Subject: Initialiser bruker
+  Greeting: Hei {{.DisplayName}},
+  Text: Denne brukeren ble opprettet. Bruk brukernavnet {{.PreferredLoginName}} for å logge inn. Klikk på knappen nedenfor for å fullføre initialiseringen. (Kode {{.Code}}) Hvis du ikke ba om denne e-posten, kan du se bort fra den.
+  ButtonText: Fullfør initialisering
+PasswordReset:
+  Title: Tilbakestill passord
+  PreHeader: Tilbakestill passord
+  Subject: Tilbakestill passord
+  Greeting: Hei {{.DisplayName}},
+  Text: Vi mottok en forespørsel om tilbakestilling av passord. Vennligst bruk knappen nedenfor for å tilbakestille passordet ditt. (Kode {{.Code}}) Hvis du ikke ba om denne e-posten, kan du se bort fra den.
+  ButtonText: Tilbakestill passord
+VerifyEmail:
+  Title: Bekreft e-post
+  PreHeader: Bekreft e-post
+  Subject: Bekreft e-post
+  Greeting: Hei {{.DisplayName}},
+  Text: En ny e-postadresse har blitt lagt til. Vennligst bruk knappen nedenfor for å bekrefte e-postadressen din. (Kode {{.Code}}) Hvis du ikke la til en ny e-postadresse, kan du se bort fra denne e-posten.
+  ButtonText: Bekreft e-post
+VerifyPhone:
+  Title: Bekreft telefon
+  PreHeader: Bekreft telefon
+  Subject: Bekreft telefon
+  Greeting: Hei {{.DisplayName}},
+  Text: 'Et nytt telefonnummer har blitt lagt til. Vennligst bruk følgende kode for å bekrefte det: {{.Code}}'
+  ButtonText: Bekreft telefon
+VerifyEmailOTP:
+  Title: Bekreft engangspassord
+  PreHeader: Bekreft engangspassord
+  Subject: Bekreft engangspassord
+  Greeting: Hei {{.DisplayName}},
+  Text: Vennligst bruk engangspassordet {{.OTP}} for å autentisere deg innen de neste fem minuttene, eller klikk på «Autentiser»-knappen.
+  ButtonText: Autentiser
+VerifySMSOTP:
+  Text: >-
+    {{.OTP}} er ditt engangspassord for {{ .Domain }}. Bruk det innen {{.Expiry}}.
+
+    @{{.Domain}} #{{.OTP}}
+DomainClaimed:
+  Title: Domene er krevd
+  PreHeader: Endre e-post / brukernavn
+  Subject: Domene er krevd
+  Greeting: Hei {{.DisplayName}},
+  Text: Domenet {{.Domain}} har blitt krevd av en organisasjon. Din nåværende bruker {{.Username}} er ikke en del av denne organisasjonen. Derfor må du endre e-postadressen din når du logger inn. Vi har opprettet et midlertidig brukernavn ({{.TempUsername}}) for denne innloggingen.
+  ButtonText: Logg inn
+PasswordlessRegistration:
+  Title: Legg til passnøkkel-innlogging
+  PreHeader: Legg til passnøkkel-innlogging
+  Subject: Legg til passnøkkel-innlogging
+  Greeting: Hei {{.DisplayName}},
+  Text: Vi mottok en forespørsel om å legge til en token for passnøkkel-innlogging. Vennligst bruk knappen nedenfor for å legge til din token eller enhet for passnøkkel-innlogging.
+  ButtonText: Legg til passnøkkel-innlogging
+PasswordChange:
+  Title: Passordet til brukeren er endret
+  PreHeader: Endre passord
+  Subject: Passordet til brukeren er endret
+  Greeting: Hei {{.DisplayName}},
+  Text: Passordet til brukeren din har blitt endret. Hvis denne endringen ikke ble gjort av deg, anbefaler vi at du tilbakestiller passordet ditt umiddelbart.
+  ButtonText: Logg inn
+InviteUser:
+  Title: Invitasjon til {{.ApplicationName}}
+  PreHeader: Invitasjon til {{.ApplicationName}}
+  Subject: Invitasjon til {{.ApplicationName}}
+  Greeting: Hei {{.DisplayName}},
+  Text: Din bruker har blitt invitert til {{.ApplicationName}}. Vennligst klikk på knappen nedenfor for å godta invitasjonen.
+  ButtonText: Godta invitasjon
