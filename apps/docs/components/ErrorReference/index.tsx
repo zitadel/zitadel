@@ -91,7 +91,10 @@ export default function ErrorReference() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/error-reference')
+    // The app is served under basePath '/docs' (next.config.mjs), and a plain
+    // fetch() doesn't get that prefix added automatically the way <Link> and
+    // router.push() do, so this has to spell it out or it 404s.
+    fetch('/docs/api/error-reference')
       .then((res) => {
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
         return res.json();
