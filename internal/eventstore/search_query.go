@@ -293,8 +293,7 @@ func (builder *SearchQueryBuilder) PositionAtLeast(position decimal.Decimal) *Se
 
 // AfterEventSortKey resumes after the given event using a lexicographic row comparison.
 func (builder *SearchQueryBuilder) AfterEventSortKey(key EventSortKey) *SearchQueryBuilder {
-	k := key
-	builder.eventSortKeyAfter = &k
+	builder.eventSortKeyAfter = &key
 	return builder
 }
 

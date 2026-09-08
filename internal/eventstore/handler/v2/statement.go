@@ -86,6 +86,7 @@ func (s *Statement) eventSortKey() eventstore.EventSortKey {
 	return eventstore.EventSortKey{
 		Position:      s.Position,
 		InTxOrder:     s.inTxOrder,
+		InstanceID:    s.Aggregate.InstanceID,
 		AggregateType: s.Aggregate.Type,
 		AggregateID:   s.Aggregate.ID,
 		Sequence:      s.Sequence,

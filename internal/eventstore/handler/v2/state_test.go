@@ -266,6 +266,7 @@ func TestHandler_currentState(t *testing.T) {
 					cursor: eventstore.EventSortKey{
 						Position:      decimal.NewFromInt(42),
 						InTxOrder:     10,
+						InstanceID:    "instance",
 						AggregateType: "aggregate type",
 						AggregateID:   "aggregate id",
 						Sequence:      42,

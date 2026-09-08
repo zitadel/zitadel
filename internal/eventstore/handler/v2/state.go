@@ -60,6 +60,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 	currentState.cursor = eventstore.EventSortKey{
 		Position:      position.Decimal,
 		InTxOrder:     uint32(inTxOrder.Int64),
+		InstanceID:    currentState.instanceID,
 		AggregateType: eventstore.AggregateType(aggregateType.String),
 		AggregateID:   aggregateID.String,
 		Sequence:      uint64(sequence.Int64),

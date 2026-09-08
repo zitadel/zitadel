@@ -18,6 +18,7 @@ func Test_query_event_sort_key(t *testing.T) {
 	cursor := eventstore.EventSortKey{
 		Position:      decimal.NewFromFloat(1.5),
 		InTxOrder:     5,
+		InstanceID:    "instanceID",
 		AggregateType: "user",
 		AggregateID:   "agg-a",
 		Sequence:      5,
@@ -43,13 +44,14 @@ func Test_query_event_sort_key(t *testing.T) {
 				AggregateTypes("user").
 				EventTypes("user.human.added").
 				Builder(),
-			sql: `SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND (` + eventSortKeySQL + `) > ($4, $5, $6, $7, $8) AND "position" <= EXTRACT(EPOCH FROM now()) ORDER BY ` + eventSortKeySQL + ` LIMIT $9`,
+			sql: `SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND (` + eventSortKeySQL + `) > ($4, $5, $6, $7, $8, $9) AND "position" <= EXTRACT(EPOCH FROM now()) ORDER BY ` + eventSortKeySQL + ` LIMIT $10`,
 			args: []driver.Value{
 				"instanceID",
 				eventstore.AggregateType("user"),
 				eventstore.EventType("user.human.added"),
 				cursor.Position,
 				cursor.InTxOrder,
+				cursor.InstanceID,
 				cursor.AggregateType,
 				cursor.AggregateID,
 				cursor.Sequence,
@@ -67,12 +69,13 @@ func Test_query_event_sort_key(t *testing.T) {
 				AddQuery().
 				AggregateTypes("user").
 				Builder(),
-			sql: `SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND (` + eventSortKeySQL + `) > ($3, $4, $5, $6, $7) ORDER BY ` + eventSortKeySQL + ` LIMIT $8`,
+			sql: `SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND (` + eventSortKeySQL + `) > ($3, $4, $5, $6, $7, $8) ORDER BY ` + eventSortKeySQL + ` LIMIT $9`,
 			args: []driver.Value{
 				"instanceID",
 				eventstore.AggregateType("user"),
 				cursor.Position,
 				cursor.InTxOrder,
+				cursor.InstanceID,
 				cursor.AggregateType,
 				cursor.AggregateID,
 				cursor.Sequence,
@@ -90,13 +93,14 @@ func Test_query_event_sort_key(t *testing.T) {
 				AggregateTypes("user").
 				AggregateIDs("agg-a").
 				Builder(),
-			sql: `SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND aggregate_id = $3 AND (` + eventSortKeySQL + `) > ($4, $5, $6, $7, $8) ORDER BY ` + eventSortKeySQL + ` LIMIT $9`,
+			sql: `SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND aggregate_id = $3 AND (` + eventSortKeySQL + `) > ($4, $5, $6, $7, $8, $9) ORDER BY ` + eventSortKeySQL + ` LIMIT $10`,
 			args: []driver.Value{
 				"instanceID",
 				eventstore.AggregateType("user"),
 				"agg-a",
 				cursor.Position,
 				cursor.InTxOrder,
+				cursor.InstanceID,
 				cursor.AggregateType,
 				cursor.AggregateID,
 				cursor.Sequence,
