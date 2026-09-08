@@ -2,7 +2,8 @@ package setup
 
 import (
 	"context"
-	_ "embed"
+	"database/sql"
+	"embed"
 	"fmt"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
@@ -11,43 +12,82 @@ import (
 )
 
 var (
-	//go:embed 76.sql
-	stampEventPositionAtInsert string
-	//go:embed 76_current_states.sql
-	backfillCurrentStatesInTxOrder string
+	//go:embed 76/*.sql
+	users14LoginEqualityIndexes embed.FS
 )
 
-type StampEventPositionAtInsert struct {
+const (
+	users14TableExistsQuery  = "SELECT exists(SELECT 1 FROM information_schema.tables WHERE table_schema = 'projections' AND table_name = 'users14')"
+	users14InvalidIndexQuery = `SELECT EXISTS (
+	SELECT 1
+	FROM pg_index i
+	JOIN pg_class c ON c.oid = i.indexrelid
+	JOIN pg_namespace n ON n.oid = c.relnamespace
+	WHERE n.nspname = 'projections'
+		AND c.relname = $1
+		AND NOT i.indisvalid
+)`
+	users14UsernameLowerIdx      = "users14_username_lower_idx"
+	users14HumansPhoneLowerIdx   = "users14_humans_phone_lower_idx"
+	dropInvalidIndexConcurrently = "DROP INDEX CONCURRENTLY IF EXISTS projections."
+)
+
+var users14LoginEqualityIndexNames = []string{
+	users14UsernameLowerIdx,
+	users14HumansPhoneLowerIdx,
+}
+
+type Users14LoginEqualityIndexes struct {
 	dbClient *database.DB
 }
 
-func (mig *StampEventPositionAtInsert) Execute(ctx context.Context, _ eventstore.Event) error {
-	inTxOrderType, err := inTxOrderType(ctx, mig.dbClient)
-	if err != nil {
+func (mig *Users14LoginEqualityIndexes) Execute(ctx context.Context, _ eventstore.Event) error {
+	var exists bool
+	err := mig.dbClient.QueryRowContext(ctx, func(r *sql.Row) error {
+		return r.Scan(&exists)
+	}, users14TableExistsQuery)
+	if err != nil || !exists {
 		return err
 	}
 
-	tx, err := mig.dbClient.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-	stmt := fmt.Sprintf(stampEventPositionAtInsert, inTxOrderType)
-	_, err = tx.ExecContext(ctx, stmt)
-	if err == nil {
-		_, err = tx.ExecContext(ctx, backfillCurrentStatesInTxOrder)
-	}
-	if err = database.CloseTransaction(tx, err); err != nil {
+	if err := mig.dropInvalidIndexes(ctx); err != nil {
 		return err
 	}
 
-	// close idle connections to prevent them from using the old prepared statement
-	for _, conn := range mig.dbClient.Pool.AcquireAllIdle(ctx) {
-		logging.OnError(ctx, conn.Conn().Close(ctx)).Debug("failed to close idle connection")
-		conn.Release()
+	statements, err := readStatements(users14LoginEqualityIndexes, "76")
+	if err != nil {
+		return err
+	}
+	for _, stmt := range statements {
+		logging.Info(ctx, "execute statement", "file", stmt.file, "migration", mig.String())
+		if _, err := mig.dbClient.ExecContext(ctx, stmt.query); err != nil {
+			return fmt.Errorf("%s %s: %w", mig.String(), stmt.file, err)
+		}
 	}
 	return nil
 }
 
-func (mig *StampEventPositionAtInsert) String() string {
-	return "76_eventstore_position_clock_timestamp"
+func (mig *Users14LoginEqualityIndexes) dropInvalidIndexes(ctx context.Context) error {
+	for _, name := range users14LoginEqualityIndexNames {
+		var invalid bool
+		err := mig.dbClient.QueryRowContext(ctx, func(r *sql.Row) error {
+			return r.Scan(&invalid)
+		}, users14InvalidIndexQuery, name)
+		if err != nil {
+			return fmt.Errorf("%s check invalid index %s: %w", mig.String(), name, err)
+		}
+		if !invalid {
+			continue
+		}
+		drop := dropInvalidIndexConcurrently + name
+		logging.Info(ctx, "drop invalid leftover index", "index", name, "migration", mig.String())
+		if _, err := mig.dbClient.ExecContext(ctx, drop); err != nil {
+			return fmt.Errorf("%s drop invalid index %s: %w", mig.String(), name, err)
+		}
+	}
+	return nil
+}
+
+func (mig *Users14LoginEqualityIndexes) String() string {
+	return "76_users14_login_equality_indexes"
 }
