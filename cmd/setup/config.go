@@ -186,6 +186,7 @@ type Steps struct {
 	s68TargetAddPayloadTypeColumn           *TargetAddPayloadTypeColumn
 	s69CacheTablesLogged                    *CacheTablesLogged
 	s72AddColumnsToLoginNamesView           *AddColumnsToLoginNamesView
+	s76Users14LoginEqualityIndexes          *Users14LoginEqualityIndexes
 }
 
 func NewSteps(ctx context.Context, v *viper.Viper) (*Steps, error) {
