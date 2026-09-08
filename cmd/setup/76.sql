@@ -7,7 +7,6 @@ AS $$
 DECLARE
     _latest_events eventstore.latest_command[];
     command eventstore.command2;
-    last_owner TEXT;
     i INTEGER;
 BEGIN
 
