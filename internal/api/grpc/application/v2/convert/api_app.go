@@ -1,6 +1,8 @@
 package convert
 
 import (
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -12,27 +14,34 @@ func CreateAPIApplicationRequestToDomain(name, projectID, appID string, app *app
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: projectID,
 		},
-		AppName:        name,
-		AppID:          appID,
-		AuthMethodType: apiAuthMethodTypeToDomain(app.GetAuthMethodType()),
+		AppName:              name,
+		AppID:                appID,
+		AuthMethodType:       apiAuthMethodTypeToDomain(app.GetAuthMethodType()),
+		MinimalIntrospection: gu.Ptr(app.GetMinimalIntrospection()),
 	}
 }
 
+// UpdateAPIApplicationConfigurationRequestToDomain converts an update request to a domain.APIApp.
+// MinimalIntrospection is passed through as-is (nil if unset) so the command layer only changes it
+// when the caller explicitly set it, keeping older clients that don't send this field from
+// unintentionally resetting it to false.
 func UpdateAPIApplicationConfigurationRequestToDomain(appID, projectID string, app *application.UpdateAPIApplicationConfigurationRequest) *domain.APIApp {
 	return &domain.APIApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: projectID,
 		},
-		AppID:          appID,
-		AuthMethodType: apiAuthMethodTypeToDomain(app.GetAuthMethodType()),
+		AppID:                appID,
+		AuthMethodType:       apiAuthMethodTypeToDomain(app.GetAuthMethodType()),
+		MinimalIntrospection: app.MinimalIntrospection,
 	}
 }
 
 func appAPIConfigToPb(apiApp *query.APIApp) application.IsApplicationConfiguration {
 	return &application.Application_ApiConfiguration{
 		ApiConfiguration: &application.APIConfiguration{
-			ClientId:       apiApp.ClientID,
-			AuthMethodType: apiAuthMethodTypeToPb(apiApp.AuthMethodType),
+			ClientId:             apiApp.ClientID,
+			AuthMethodType:       apiAuthMethodTypeToPb(apiApp.AuthMethodType),
+			MinimalIntrospection: apiApp.MinimalIntrospection,
 		},
 	}
 }

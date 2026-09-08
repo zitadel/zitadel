@@ -158,10 +158,12 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 								"",
 								domain.LoginVersionUnspecified,
 								"",
+								false,
 								"",
 								"",
 								"",
-								nil),
+								nil,
+							),
 						),
 					),
 					expectPush(

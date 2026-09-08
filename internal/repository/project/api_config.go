@@ -28,6 +28,8 @@ type APIConfigAddedEvent struct {
 	HashedSecret string              `json:"hashedSecret,omitempty"`
 
 	AuthMethodType domain.APIAuthMethodType `json:"authMethodType,omitempty"`
+
+	MinimalIntrospection bool `json:"minimalIntrospection,omitempty"`
 }
 
 func (e *APIConfigAddedEvent) Payload() interface{} {
@@ -45,6 +47,7 @@ func NewAPIConfigAddedEvent(
 	clientID string,
 	hashedSecret string,
 	authMethodType domain.APIAuthMethodType,
+	minimalIntrospection bool,
 ) *APIConfigAddedEvent {
 	return &APIConfigAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -52,10 +55,11 @@ func NewAPIConfigAddedEvent(
 			aggregate,
 			APIConfigAddedType,
 		),
-		AppID:          appID,
-		ClientID:       clientID,
-		HashedSecret:   hashedSecret,
-		AuthMethodType: authMethodType,
+		AppID:                appID,
+		ClientID:             clientID,
+		HashedSecret:         hashedSecret,
+		AuthMethodType:       authMethodType,
+		MinimalIntrospection: minimalIntrospection,
 	}
 }
 
@@ -72,6 +76,9 @@ func (e *APIConfigAddedEvent) Validate(cmd eventstore.Command) bool {
 		return false
 	}
 	if e.AuthMethodType != c.AuthMethodType {
+		return false
+	}
+	if e.MinimalIntrospection != c.MinimalIntrospection {
 		return false
 	}
 
@@ -96,6 +103,8 @@ type APIConfigChangedEvent struct {
 
 	AppID          string                    `json:"appId"`
 	AuthMethodType *domain.APIAuthMethodType `json:"authMethodType,omitempty"`
+
+	MinimalIntrospection *bool `json:"minimalIntrospection,omitempty"`
 }
 
 func (e *APIConfigChangedEvent) Payload() interface{} {
@@ -135,6 +144,12 @@ type APIConfigChanges func(event *APIConfigChangedEvent)
 func ChangeAPIAuthMethodType(authMethodType domain.APIAuthMethodType) func(event *APIConfigChangedEvent) {
 	return func(e *APIConfigChangedEvent) {
 		e.AuthMethodType = &authMethodType
+	}
+}
+
+func ChangeAPIMinimalIntrospection(minimalIntrospection bool) func(event *APIConfigChangedEvent) {
+	return func(e *APIConfigChangedEvent) {
+		e.MinimalIntrospection = &minimalIntrospection
 	}
 }
 

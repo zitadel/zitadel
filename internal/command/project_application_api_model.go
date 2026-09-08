@@ -12,14 +12,15 @@ import (
 type APIApplicationWriteModel struct {
 	eventstore.WriteModel
 
-	AppID              string
-	AppName            string
-	ClientID           string
-	HashedSecret       string
-	ClientSecretString string
-	AuthMethodType     domain.APIAuthMethodType
-	State              domain.AppState
-	api                bool
+	AppID                string
+	AppName              string
+	ClientID             string
+	HashedSecret         string
+	ClientSecretString   string
+	AuthMethodType       domain.APIAuthMethodType
+	MinimalIntrospection bool
+	State                domain.AppState
+	api                  bool
 }
 
 func NewAPIApplicationWriteModelWithAppID(projectID, appID, resourceOwner string) *APIApplicationWriteModel {
@@ -128,6 +129,7 @@ func (wm *APIApplicationWriteModel) Reduce() error {
 			wm.HashedSecret = ""
 			wm.ClientSecretString = ""
 			wm.AuthMethodType = domain.APIAuthMethodTypeBasic
+			wm.MinimalIntrospection = false
 			wm.api = false
 			wm.State = domain.AppStateRemoved
 		case *project.ProjectAddedEvent:
@@ -136,6 +138,7 @@ func (wm *APIApplicationWriteModel) Reduce() error {
 			wm.HashedSecret = ""
 			wm.ClientSecretString = ""
 			wm.AuthMethodType = domain.APIAuthMethodTypeBasic
+			wm.MinimalIntrospection = false
 			wm.api = false
 			wm.State = domain.AppStateUnspecified
 		}
@@ -148,11 +151,15 @@ func (wm *APIApplicationWriteModel) appendAddAPIEvent(e *project.APIConfigAddedE
 	wm.ClientID = e.ClientID
 	wm.HashedSecret = crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)
 	wm.AuthMethodType = e.AuthMethodType
+	wm.MinimalIntrospection = e.MinimalIntrospection
 }
 
 func (wm *APIApplicationWriteModel) appendChangeAPIEvent(e *project.APIConfigChangedEvent) {
 	if e.AuthMethodType != nil {
 		wm.AuthMethodType = *e.AuthMethodType
+	}
+	if e.MinimalIntrospection != nil {
+		wm.MinimalIntrospection = *e.MinimalIntrospection
 	}
 }
 
@@ -182,12 +189,16 @@ func (wm *APIApplicationWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	appID string,
 	authMethodType domain.APIAuthMethodType,
+	minimalIntrospection *bool,
 ) (*project.APIConfigChangedEvent, bool, error) {
 	changes := make([]project.APIConfigChanges, 0)
 	var err error
 
 	if wm.AuthMethodType != authMethodType {
 		changes = append(changes, project.ChangeAPIAuthMethodType(authMethodType))
+	}
+	if minimalIntrospection != nil && wm.MinimalIntrospection != *minimalIntrospection {
+		changes = append(changes, project.ChangeAPIMinimalIntrospection(*minimalIntrospection))
 	}
 	if len(changes) == 0 {
 		return nil, false, nil

@@ -4,6 +4,8 @@ import (
 	"context"
 	"strings"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -14,7 +16,8 @@ import (
 
 type addAPIApp struct {
 	AddApp
-	AuthMethodType domain.APIAuthMethodType
+	AuthMethodType       domain.APIAuthMethodType
+	MinimalIntrospection bool
 
 	ClientID          string
 	EncodedHash       string
@@ -61,6 +64,7 @@ func (c *Commands) AddAPIAppCommand(app *addAPIApp) preparation.Validation {
 					app.ClientID,
 					app.EncodedHash,
 					app.AuthMethodType,
+					app.MinimalIntrospection,
 				),
 			}, nil
 		}, nil
@@ -149,7 +153,8 @@ func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 		apiApp.AppID,
 		apiApp.ClientID,
 		apiApp.EncodedHash,
-		apiApp.AuthMethodType))
+		apiApp.AuthMethodType,
+		gu.Value(apiApp.MinimalIntrospection)))
 
 	addedApplication.AppID = apiApp.AppID
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
@@ -192,7 +197,8 @@ func (c *Commands) UpdateAPIApplication(ctx context.Context, apiApp *domain.APIA
 		ctx,
 		projectAgg,
 		apiApp.AppID,
-		apiApp.AuthMethodType)
+		apiApp.AuthMethodType,
+		apiApp.MinimalIntrospection)
 	if err != nil {
 		return nil, err
 	}

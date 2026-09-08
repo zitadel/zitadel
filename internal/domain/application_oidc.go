@@ -51,6 +51,7 @@ type OIDCApp struct {
 	BackChannelLogoutURI     *string
 	LoginVersion             *LoginVersion
 	LoginBaseURI             *string
+	MinimalIntrospection     *bool
 	// IOSTeamID and IOSBundleID are Associated Domains / passkey trust fields.
 	// Both must be set together, or both empty. Composed as TEAMID.BUNDLEID in AASA.
 	IOSTeamID   *string

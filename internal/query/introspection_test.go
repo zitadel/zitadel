@@ -50,8 +50,8 @@ func TestQueries_ActiveIntrospectionClientByID(t *testing.T) {
 				getKeys:  false,
 			},
 			mock: mockQuery(expQuery,
-				[]string{"app_id", "client_id", "client_secret", "app_type", "project_id", "resource_owner", "project_role_assertion", "public_keys"},
-				[]driver.Value{"appID", "clientID", "secret", "oidc", "projectID", "orgID", true, nil},
+				[]string{"app_id", "client_id", "client_secret", "app_type", "project_id", "resource_owner", "project_role_assertion", "public_keys", "minimal_introspection"},
+				[]driver.Value{"appID", "clientID", "secret", "oidc", "projectID", "orgID", true, nil, false},
 				"instanceID", "clientID", false),
 			want: &IntrospectionClient{
 				AppID:                "appID",
@@ -62,6 +62,7 @@ func TestQueries_ActiveIntrospectionClientByID(t *testing.T) {
 				ResourceOwner:        "orgID",
 				ProjectRoleAssertion: true,
 				PublicKeys:           nil,
+				MinimalIntrospection: false,
 			},
 		},
 		{
@@ -71,8 +72,8 @@ func TestQueries_ActiveIntrospectionClientByID(t *testing.T) {
 				getKeys:  true,
 			},
 			mock: mockQuery(expQuery,
-				[]string{"app_id", "client_id", "client_secret", "app_type", "project_id", "resource_owner", "project_role_assertion", "public_keys"},
-				[]driver.Value{"appID", "clientID", "", "oidc", "projectID", "orgID", true, encPubkeys},
+				[]string{"app_id", "client_id", "client_secret", "app_type", "project_id", "resource_owner", "project_role_assertion", "public_keys", "minimal_introspection"},
+				[]driver.Value{"appID", "clientID", "", "oidc", "projectID", "orgID", true, encPubkeys, true},
 				"instanceID", "clientID", true),
 			want: &IntrospectionClient{
 				AppID:                "appID",
@@ -83,6 +84,7 @@ func TestQueries_ActiveIntrospectionClientByID(t *testing.T) {
 				ResourceOwner:        "orgID",
 				ProjectRoleAssertion: true,
 				PublicKeys:           pubkeys,
+				MinimalIntrospection: true,
 			},
 		},
 	}

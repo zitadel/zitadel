@@ -33,6 +33,12 @@ introspect: ensure_key_pair ensure_modules bundle
 	cd ../../xk6-modules && xk6 build --with xk6-zitadel=.
 	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/introspection.js --vus ${VUS} --duration ${DURATION} --out csv=output/introspect_${DATE}.csv
 
+.PHONY: introspect_minimal
+introspect_minimal: ensure_key_pair ensure_modules bundle
+	go install go.k6.io/xk6/cmd/xk6@latest
+	cd ../../xk6-modules && xk6 build --with xk6-zitadel=.
+	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/introspection_minimal.js --vus ${VUS} --duration ${DURATION} --out csv=output/introspect_minimal_${DATE}.csv
+
 .PHONY: oidc_session
 oidc_session: ensure_key_pair ensure_modules bundle
 	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/oidc_session.js --vus ${VUS} --duration ${DURATION} --out csv=output/oidc_session_${DATE}.csv

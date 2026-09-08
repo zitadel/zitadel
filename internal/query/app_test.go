@@ -30,6 +30,7 @@ var (
 		` projections.apps7_api_configs.app_id,` +
 		` projections.apps7_api_configs.client_id,` +
 		` projections.apps7_api_configs.auth_method,` +
+		` projections.apps7_api_configs.minimal_introspection,` +
 		// oidc config
 		` projections.apps7_oidc_configs.app_id,` +
 		` projections.apps7_oidc_configs.version,` +
@@ -51,6 +52,7 @@ var (
 		` projections.apps7_oidc_configs.back_channel_logout_uri,` +
 		` projections.apps7_oidc_configs.login_version,` +
 		` projections.apps7_oidc_configs.login_base_uri,` +
+		` projections.apps7_oidc_configs.minimal_introspection,` +
 		` projections.apps7_oidc_configs.ios_team_id,` +
 		` projections.apps7_oidc_configs.ios_bundle_id,` +
 		` projections.apps7_oidc_configs.android_package_name,` +
@@ -82,6 +84,7 @@ var (
 		` projections.apps7_api_configs.app_id,` +
 		` projections.apps7_api_configs.client_id,` +
 		` projections.apps7_api_configs.auth_method,` +
+		` projections.apps7_api_configs.minimal_introspection,` +
 		// oidc config
 		` projections.apps7_oidc_configs.app_id,` +
 		` projections.apps7_oidc_configs.version,` +
@@ -103,6 +106,7 @@ var (
 		` projections.apps7_oidc_configs.back_channel_logout_uri,` +
 		` projections.apps7_oidc_configs.login_version,` +
 		` projections.apps7_oidc_configs.login_base_uri,` +
+		` projections.apps7_oidc_configs.minimal_introspection,` +
 		` projections.apps7_oidc_configs.ios_team_id,` +
 		` projections.apps7_oidc_configs.ios_bundle_id,` +
 		` projections.apps7_oidc_configs.android_package_name,` +
@@ -159,6 +163,7 @@ var (
 		"app_id",
 		"client_id",
 		"auth_method",
+		"minimal_introspection",
 		// oidc config
 		"app_id",
 		"version",
@@ -180,6 +185,7 @@ var (
 		"back_channel_logout_uri",
 		"login_version",
 		"login_base_uri",
+		"minimal_introspection",
 		"ios_team_id",
 		"ios_bundle_id",
 		"android_package_name",
@@ -239,7 +245,9 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -314,7 +322,9 @@ func Test_AppsPrepare(t *testing.T) {
 							"app-id",
 							"api-client-id",
 							domain.APIAuthMethodTypePrivateKeyJWT,
+							nil,
 							// oidc config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -392,7 +402,9 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -472,6 +484,7 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc config
 							"app-id",
 							domain.OIDCVersionV1,
@@ -492,6 +505,7 @@ func Test_AppsPrepare(t *testing.T) {
 							false,
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -570,6 +584,7 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc config
 							"app-id",
 							domain.OIDCVersionV1,
@@ -590,6 +605,7 @@ func Test_AppsPrepare(t *testing.T) {
 							false,
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -668,6 +684,7 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc config
 							"app-id",
 							domain.OIDCVersionV1,
@@ -688,6 +705,7 @@ func Test_AppsPrepare(t *testing.T) {
 							false,
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -766,6 +784,7 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc config
 							"app-id",
 							domain.OIDCVersionV1,
@@ -786,6 +805,7 @@ func Test_AppsPrepare(t *testing.T) {
 							false,
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -864,6 +884,7 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc config
 							"app-id",
 							domain.OIDCVersionV1,
@@ -884,6 +905,7 @@ func Test_AppsPrepare(t *testing.T) {
 							false,
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -962,6 +984,7 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc config
 							"app-id",
 							domain.OIDCVersionV1,
@@ -982,6 +1005,7 @@ func Test_AppsPrepare(t *testing.T) {
 							true,
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1060,6 +1084,7 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc config
 							"oidc-app-id",
 							domain.OIDCVersionV1,
@@ -1085,6 +1110,7 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// saml config
 							nil,
 							nil,
@@ -1106,7 +1132,9 @@ func Test_AppsPrepare(t *testing.T) {
 							"api-app-id",
 							"api-client-id",
 							domain.APIAuthMethodTypePrivateKeyJWT,
+							nil,
 							// oidc config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1152,7 +1180,9 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1341,7 +1371,9 @@ func Test_AppPrepare(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// oidc config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1410,7 +1442,9 @@ func Test_AppPrepare(t *testing.T) {
 							"app-id",
 							"api-client-id",
 							domain.APIAuthMethodTypePrivateKeyJWT,
+							nil,
 							// oidc config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1484,6 +1518,7 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc config
 							"app-id",
 							domain.OIDCVersionV1,
@@ -1504,6 +1539,7 @@ func Test_AppPrepare(t *testing.T) {
 							false,
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1577,6 +1613,7 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc config
 							"app-id",
 							domain.OIDCVersionV1,
@@ -1597,6 +1634,7 @@ func Test_AppPrepare(t *testing.T) {
 							false,
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1670,7 +1708,9 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1747,6 +1787,7 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc config
 							"app-id",
 							domain.OIDCVersionV1,
@@ -1767,6 +1808,7 @@ func Test_AppPrepare(t *testing.T) {
 							false,
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1840,6 +1882,7 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc config
 							"app-id",
 							domain.OIDCVersionV1,
@@ -1860,6 +1903,7 @@ func Test_AppPrepare(t *testing.T) {
 							false,
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1933,6 +1977,7 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc config
 							"app-id",
 							domain.OIDCVersionV1,
@@ -1953,6 +1998,7 @@ func Test_AppPrepare(t *testing.T) {
 							false,
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2026,6 +2072,7 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc config
 							"app-id",
 							domain.OIDCVersionV1,
@@ -2046,6 +2093,7 @@ func Test_AppPrepare(t *testing.T) {
 							false,
 							"back.channel.logout.ch",
 							domain.LoginVersionUnspecified,
+							nil,
 							nil,
 							nil,
 							nil,

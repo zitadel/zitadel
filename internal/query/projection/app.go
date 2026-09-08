@@ -31,12 +31,13 @@ const (
 	AppColumnState         = "state"
 	AppColumnSequence      = "sequence"
 
-	appAPITableSuffix              = "api_configs"
-	AppAPIConfigColumnAppID        = "app_id"
-	AppAPIConfigColumnInstanceID   = "instance_id"
-	AppAPIConfigColumnClientID     = "client_id"
-	AppAPIConfigColumnClientSecret = "client_secret"
-	AppAPIConfigColumnAuthMethod   = "auth_method"
+	appAPITableSuffix                      = "api_configs"
+	AppAPIConfigColumnAppID                = "app_id"
+	AppAPIConfigColumnInstanceID           = "instance_id"
+	AppAPIConfigColumnClientID             = "client_id"
+	AppAPIConfigColumnClientSecret         = "client_secret"
+	AppAPIConfigColumnAuthMethod           = "auth_method"
+	AppAPIConfigColumnMinimalIntrospection = "minimal_introspection"
 
 	appOIDCTableSuffix                               = "oidc_configs"
 	AppOIDCConfigColumnAppID                         = "app_id"
@@ -61,11 +62,12 @@ const (
 	AppOIDCConfigColumnBackChannelLogoutURI          = "back_channel_logout_uri"
 	AppOIDCConfigColumnLoginVersion                  = "login_version"
 	AppOIDCConfigColumnLoginBaseURI                  = "login_base_uri"
+	AppOIDCConfigColumnRegistrationToken             = "registration_token"
+	AppOIDCConfigColumnMinimalIntrospection          = "minimal_introspection"
 	AppOIDCConfigColumnIOSTeamID                     = "ios_team_id"
 	AppOIDCConfigColumnIOSBundleID                   = "ios_bundle_id"
 	AppOIDCConfigColumnAndroidPackageName            = "android_package_name"
 	AppOIDCConfigColumnAndroidSHA256CertFingerprints = "android_sha256_cert_fingerprints"
-	AppOIDCConfigColumnRegistrationToken             = "registration_token"
 
 	appSAMLTableSuffix              = "saml_configs"
 	AppSAMLConfigColumnAppID        = "app_id"
@@ -109,6 +111,7 @@ func (*appProjection) Init() *old_handler.Check {
 			handler.NewColumn(AppAPIConfigColumnClientID, handler.ColumnTypeText),
 			handler.NewColumn(AppAPIConfigColumnClientSecret, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(AppAPIConfigColumnAuthMethod, handler.ColumnTypeEnum),
+			handler.NewColumn(AppAPIConfigColumnMinimalIntrospection, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(AppAPIConfigColumnInstanceID, AppAPIConfigColumnAppID),
 			appAPITableSuffix,
@@ -143,6 +146,7 @@ func (*appProjection) Init() *old_handler.Check {
 			handler.NewColumn(AppOIDCConfigColumnAndroidPackageName, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(AppOIDCConfigColumnAndroidSHA256CertFingerprints, handler.ColumnTypeTextArray, handler.Nullable()),
 			handler.NewColumn(AppOIDCConfigColumnRegistrationToken, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(AppOIDCConfigColumnMinimalIntrospection, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(AppOIDCConfigColumnInstanceID, AppOIDCConfigColumnAppID),
 			appOIDCTableSuffix,
@@ -385,6 +389,7 @@ func (p *appProjection) reduceAPIConfigAdded(event eventstore.Event) (*handler.S
 				handler.NewCol(AppAPIConfigColumnClientID, e.ClientID),
 				handler.NewCol(AppAPIConfigColumnClientSecret, crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)),
 				handler.NewCol(AppAPIConfigColumnAuthMethod, e.AuthMethodType),
+				handler.NewCol(AppAPIConfigColumnMinimalIntrospection, e.MinimalIntrospection),
 			},
 			handler.WithTableSuffix(appAPITableSuffix),
 		),
@@ -409,6 +414,9 @@ func (p *appProjection) reduceAPIConfigChanged(event eventstore.Event) (*handler
 	cols := make([]handler.Column, 0, 2)
 	if e.AuthMethodType != nil {
 		cols = append(cols, handler.NewCol(AppAPIConfigColumnAuthMethod, *e.AuthMethodType))
+	}
+	if e.MinimalIntrospection != nil {
+		cols = append(cols, handler.NewCol(AppAPIConfigColumnMinimalIntrospection, *e.MinimalIntrospection))
 	}
 	if len(cols) == 0 {
 		return handler.NewNoOpStatement(e), nil
@@ -527,6 +535,7 @@ func (p *appProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCol(AppOIDCConfigColumnBackChannelLogoutURI, e.BackChannelLogoutURI),
 				handler.NewCol(AppOIDCConfigColumnLoginVersion, e.LoginVersion),
 				handler.NewCol(AppOIDCConfigColumnLoginBaseURI, e.LoginBaseURI),
+				handler.NewCol(AppOIDCConfigColumnMinimalIntrospection, e.MinimalIntrospection),
 				handler.NewCol(AppOIDCConfigColumnIOSTeamID, e.IOSTeamID),
 				handler.NewCol(AppOIDCConfigColumnIOSBundleID, e.IOSBundleID),
 				handler.NewCol(AppOIDCConfigColumnAndroidPackageName, e.AndroidPackageName),
@@ -607,6 +616,9 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 	}
 	if e.LoginBaseURI != nil {
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnLoginBaseURI, *e.LoginBaseURI))
+	}
+	if e.MinimalIntrospection != nil {
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnMinimalIntrospection, *e.MinimalIntrospection))
 	}
 	if e.IOSTeamID != nil {
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnIOSTeamID, *e.IOSTeamID))

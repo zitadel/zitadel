@@ -70,3 +70,40 @@ export function createAppKey(appId: string, projectId: string, org: Org, accessT
     });
   });
 }
+
+// setMinimalIntrospection enables the minimal_introspection setting on an existing API app via the
+// v2 ApplicationService (Connect protocol, plain JSON POST). With it enabled, the introspection
+// endpoint skips the userinfo/claims lookup for tokens issued to this app.
+const setMinimalIntrospectionTrend = new Trend('app_set_minimal_introspection_duration', true);
+export function setMinimalIntrospection(appId: string, projectId: string, org: Org, accessToken: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    let response = http.asyncRequest(
+      'POST',
+      url('/zitadel.application.v2.ApplicationService/UpdateApplication'),
+      JSON.stringify({
+        projectId: projectId,
+        applicationId: appId,
+        apiConfiguration: {
+          authMethodType: 'API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT',
+          minimalIntrospection: true,
+        },
+      }),
+      {
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          'x-zitadel-orgid': org.organizationId,
+        },
+      },
+    );
+    response.then((res) => {
+      check(res, {
+        'set minimal introspection status ok': (r) => r.status >= 200 && r.status < 300,
+      }) ||
+        reject(`unable to set minimal introspection project: ${projectId} app: ${appId} status: ${res.status} body: ${res.body}`);
+      resolve();
+
+      setMinimalIntrospectionTrend.add(res.timings.duration);
+    });
+  });
+}
