@@ -134,6 +134,7 @@ export type UpdateSessionCommand = {
   defaultOrganization?: string;
   checks: Checks;
   requestId?: string;
+  sessionId?: string;
 };
 
 export async function sendPassword(
@@ -145,10 +146,16 @@ export async function sendPassword(
 
   recordAuthAttempt("password", command.organization);
 
-  let sessionCookie = await getSessionCookieByLoginName({
-    loginName: command.loginName,
-    organization: command.organization,
-  });
+  // Prefer the explicit session from the loginname handoff. Id is unique, so skip
+  // the organization filter that can miss a valid cookie on org mismatch.
+  let sessionCookie = command.sessionId ? await getSessionCookieById({ sessionId: command.sessionId }) : undefined;
+
+  if (!sessionCookie) {
+    sessionCookie = await getSessionCookieByLoginName({
+      loginName: command.loginName,
+      organization: command.organization,
+    });
+  }
 
   let session;
   let user: User | undefined;
