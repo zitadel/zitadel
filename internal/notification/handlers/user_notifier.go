@@ -72,6 +72,16 @@ func init() {
 			return commands.PasswordChangeSent(ctx, orgID, id)
 		},
 	)
+	RegisterSentHandler(user.HumanEmailChangedType,
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
+			return commands.EmailChangeSent(ctx, orgID, id)
+		},
+	)
+	RegisterSentHandler(user.HumanPhoneChangedType,
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
+			return commands.PhoneChangeSent(ctx, orgID, id)
+		},
+	)
 	RegisterSentHandler(user.HumanPhoneCodeAddedType,
 		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
 			return commands.HumanPhoneVerificationCodeSent(ctx, orgID, id, generatorInfo)
@@ -169,6 +179,14 @@ func (u *userNotifier) Reducers() []handler.AggregateReducer {
 				{
 					Event:  user.HumanPasswordChangedType,
 					Reduce: u.reducePasswordChanged,
+				},
+				{
+					Event:  user.HumanEmailChangedType,
+					Reduce: u.reduceEmailChanged,
+				},
+				{
+					Event:  user.HumanPhoneChangedType,
+					Reduce: u.reducePhoneChanged,
 				},
 				{
 					Event:  user.HumanOTPSMSCodeAddedType,
@@ -706,6 +724,92 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 				EventType:                     e.EventType,
 				NotificationType:              domain.NotificationTypeEmail,
 				MessageType:                   domain.PasswordChangeMessageType,
+				URLTemplate:                   console.LoginHintLink(origin, "{{.PreferredLoginName}}"),
+				UnverifiedNotificationChannel: true,
+			},
+			queue.WithQueueName(notification.QueueName),
+			queue.WithMaxAttempts(u.maxAttempts),
+		)
+	}), nil
+}
+
+// reduceEmailChanged notifies the user that their email address was changed, mirroring
+// reducePasswordChanged's security-notification shape. Unlike password changes, this is
+// unconditional (not gated by NotificationPolicy) -- following the same unconditional
+// pattern as reduceDomainClaimed, since there is no existing per-org opt-out for this event.
+func (u *userNotifier) reduceEmailChanged(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanEmailChangedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ah8vX", "reduce.wrong.event.type %s", user.HumanEmailChangedType)
+	}
+
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		ctx = HandlerContext(ctx, event.Aggregate())
+		alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil, user.HumanEmailChangeSentType)
+		if err != nil {
+			return err
+		}
+		if alreadyHandled {
+			return nil
+		}
+
+		ctx, err = u.queries.Origin(ctx, e)
+		if err != nil {
+			return err
+		}
+		origin := http_util.DomainContext(ctx).Origin()
+
+		return u.queue.Insert(ctx,
+			&notification.Request{
+				Aggregate:                     e.Aggregate(),
+				UserID:                        e.Aggregate().ID,
+				UserResourceOwner:             e.Aggregate().ResourceOwner,
+				TriggeredAtOrigin:             origin,
+				EventType:                     e.EventType,
+				NotificationType:              domain.NotificationTypeEmail,
+				MessageType:                   domain.EmailChangeMessageType,
+				URLTemplate:                   console.LoginHintLink(origin, "{{.PreferredLoginName}}"),
+				UnverifiedNotificationChannel: true,
+			},
+			queue.WithQueueName(notification.QueueName),
+			queue.WithMaxAttempts(u.maxAttempts),
+		)
+	}), nil
+}
+
+// reducePhoneChanged notifies the user that their phone number was changed, mirroring
+// reduceEmailChanged/reducePasswordChanged.
+func (u *userNotifier) reducePhoneChanged(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanPhoneChangedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Bh9wY", "reduce.wrong.event.type %s", user.HumanPhoneChangedType)
+	}
+
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		ctx = HandlerContext(ctx, event.Aggregate())
+		alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil, user.HumanPhoneChangeSentType)
+		if err != nil {
+			return err
+		}
+		if alreadyHandled {
+			return nil
+		}
+
+		ctx, err = u.queries.Origin(ctx, e)
+		if err != nil {
+			return err
+		}
+		origin := http_util.DomainContext(ctx).Origin()
+
+		return u.queue.Insert(ctx,
+			&notification.Request{
+				Aggregate:                     e.Aggregate(),
+				UserID:                        e.Aggregate().ID,
+				UserResourceOwner:             e.Aggregate().ResourceOwner,
+				TriggeredAtOrigin:             origin,
+				EventType:                     e.EventType,
+				NotificationType:              domain.NotificationTypeEmail,
+				MessageType:                   domain.PhoneChangeMessageType,
 				URLTemplate:                   console.LoginHintLink(origin, "{{.PreferredLoginName}}"),
 				UnverifiedNotificationChannel: true,
 			},

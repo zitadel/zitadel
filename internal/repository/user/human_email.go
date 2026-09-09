@@ -14,6 +14,7 @@ import (
 const (
 	emailEventPrefix                 = humanEventPrefix + "email."
 	HumanEmailChangedType            = emailEventPrefix + "changed"
+	HumanEmailChangeSentType         = emailEventPrefix + "change.sent"
 	HumanEmailVerifiedType           = emailEventPrefix + "verified"
 	HumanEmailVerificationFailedType = emailEventPrefix + "verification.failed"
 	HumanEmailCodeAddedType          = emailEventPrefix + "code.added"
@@ -55,6 +56,34 @@ func HumanEmailChangedEventMapper(event eventstore.Event) (eventstore.Event, err
 	}
 
 	return emailChangedEvent, nil
+}
+
+type HumanEmailChangeSentEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanEmailChangeSentEvent) Payload() interface{} {
+	return nil
+}
+
+func (e *HumanEmailChangeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewHumanEmailChangeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanEmailChangeSentEvent {
+	return &HumanEmailChangeSentEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanEmailChangeSentType,
+		),
+	}
+}
+
+func HumanEmailChangeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	return &HumanEmailChangeSentEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
 }
 
 type HumanEmailVerifiedEvent struct {

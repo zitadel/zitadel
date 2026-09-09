@@ -20,6 +20,8 @@ type Commands interface {
 	UserDomainClaimedSent(ctx context.Context, orgID, userID string) error
 	HumanPasswordlessInitCodeSent(ctx context.Context, userID, resourceOwner, codeID string) error
 	PasswordChangeSent(ctx context.Context, orgID, userID string) error
+	EmailChangeSent(ctx context.Context, orgID, userID string) error
+	PhoneChangeSent(ctx context.Context, orgID, userID string) error
 	HumanPhoneVerificationCodeSent(ctx context.Context, orgID, userID string, generatorInfo *senders.CodeGeneratorInfo) error
 	InviteCodeSent(ctx context.Context, orgID, userID string) error
 	UsageNotificationSent(ctx context.Context, dueEvent *quota.NotificationDueEvent) error

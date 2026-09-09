@@ -15,6 +15,7 @@ import (
 const (
 	phoneEventPrefix                 = humanEventPrefix + "phone."
 	HumanPhoneChangedType            = phoneEventPrefix + "changed"
+	HumanPhoneChangeSentType         = phoneEventPrefix + "change.sent"
 	HumanPhoneRemovedType            = phoneEventPrefix + "removed"
 	HumanPhoneVerifiedType           = phoneEventPrefix + "verified"
 	HumanPhoneVerificationFailedType = phoneEventPrefix + "verification.failed"
@@ -57,6 +58,34 @@ func HumanPhoneChangedEventMapper(event eventstore.Event) (eventstore.Event, err
 	}
 
 	return phoneChangedEvent, nil
+}
+
+type HumanPhoneChangeSentEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanPhoneChangeSentEvent) Payload() interface{} {
+	return nil
+}
+
+func (e *HumanPhoneChangeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewHumanPhoneChangeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPhoneChangeSentEvent {
+	return &HumanPhoneChangeSentEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanPhoneChangeSentType,
+		),
+	}
+}
+
+func HumanPhoneChangeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	return &HumanPhoneChangeSentEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
 }
 
 type HumanPhoneRemovedEvent struct {
