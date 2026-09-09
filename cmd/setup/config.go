@@ -196,6 +196,7 @@ type Steps struct {
 	s74Apps7OIDCConfigsAddRegistrationToken *Apps7OIDCConfigsAddRegistrationToken
 	s75Apps7OIDCConfigsAddAppLinkConfig     *Apps7OIDCConfigsAddAppLinkConfig
 	s76Users14LoginEqualityIndexes          *Users14LoginEqualityIndexes
+	s77StampEventPositionAtInsert           *StampEventPositionAtInsert
 }
 
 func NewSteps(ctx context.Context, v *viper.Viper) (*Steps, error) {
