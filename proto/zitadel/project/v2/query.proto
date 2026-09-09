@@ -144,6 +144,9 @@ message ProjectSearchFilter {
     // Filter for projects that are owned by or granted to a specific organization.
     // You can specify whether to search for owned, granted or both types of projects.
     ProjectOrganizationIDFilter organization_id_filter = 3;
+
+    // Filter the projects by their state.
+    ProjectState state_filter = 4;
   }
 }
 

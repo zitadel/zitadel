@@ -352,6 +352,10 @@ func NewGrantedProjectGrantedOrganizationIDSearchQuery(value string) (SearchQuer
 	return NewTextQuery(grantedProjectColumnGrantedOrganization, value, TextEquals)
 }
 
+func NewGrantedProjectStateSearchQuery(value domain.ProjectState) (SearchQuery, error) {
+	return NewNumberQuery(grantedProjectColumnState, value, NumberEquals)
+}
+
 func NewProjectNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
 	return NewTextQuery(ProjectColumnName, value, method)
 }
