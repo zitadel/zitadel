@@ -26,10 +26,15 @@ func (c *Commands) AddUserIDPLink(ctx context.Context, userID, resourceOwner str
 	if !isUserStateExists(existingUser.UserState) {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-vzktar7b7f", "Errors.User.NotFound")
 	}
-	if userID != authz.GetCtxData(ctx).UserID {
-		if err := c.checkPermission(ctx, domain.PermissionUserWrite, existingUser.ResourceOwner, existingUser.AggregateID); err != nil {
-			return nil, err
-		}
+	// Binding an external identity (idpID + externalUserID) to a user must always require a
+	// user-write permission, even when the caller targets their own account. The external
+	// subject is caller-supplied and unverified here, and external links are globally unique
+	// on a first-claim-wins basis, so a self-service link of an unproven subject lets an
+	// attacker claim a victim's external identity and hijack their future federated logins
+	// (account takeover). Verified self-service linking is performed through the IDP-intent
+	// flow, whose service account holds this permission.
+	if err := c.checkPermission(ctx, domain.PermissionUserWrite, existingUser.ResourceOwner, existingUser.AggregateID); err != nil {
+		return nil, err
 	}
 	//nolint:staticcheck
 	event, err := addLink(ctx, c.eventstore.Filter, user.NewAggregate(existingUser.AggregateID, existingUser.ResourceOwner), link)
@@ -48,6 +53,13 @@ func (c *Commands) AddUserIDPLink(ctx context.Context, userID, resourceOwner str
 	}, nil
 }
 
+// BulkAddedUserIDPLinks intentionally performs no user-write permission check.
+// It is reachable only from the Login V1 auth-request flow, and only after the
+// external authentication has already been verified, so the external subjects it
+// binds are proven rather than caller-supplied. No API surface exposes this
+// command. Do NOT wire it to an API endpoint as-is: without a permission check
+// (or verified IDP-intent proof, as AddUserIDPLink requires) it would reintroduce
+// the account-takeover via unproven external-identity pre-claim.
 func (c *Commands) BulkAddedUserIDPLinks(ctx context.Context, userID, resourceOwner string, links []*domain.UserIDPLink) (err error) {
 	if userID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-03j8f", "Errors.IDMissing")

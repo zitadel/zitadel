@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -729,6 +730,249 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 			}
 			err := r.BulkAddedUserIDPLinks(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.links)
 			assert.ErrorIs(t, err, tt.res.err)
+		})
+	}
+}
+
+func TestCommandSide_AddUserIDPLink(t *testing.T) {
+	type fields struct {
+		eventstore      func(*testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
+	}
+	type args struct {
+		ctx           context.Context
+		userID        string
+		resourceOwner string
+		link          *AddLink
+	}
+	type res struct {
+		err func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "missing userid, invalid argument error",
+			fields: fields{
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:    context.Background(),
+				userID: "",
+				link: &AddLink{
+					IDPID:         "config1",
+					IDPExternalID: "externaluser1",
+				},
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "user not existing, precondition failed error",
+			fields: fields{
+				eventstore:      expectEventstore(expectFilter()),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				link: &AddLink{
+					IDPID:         "config1",
+					IDPExternalID: "externaluser1",
+				},
+			},
+			res: res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
+			// Security regression (account takeover): binding an external identity to a user
+			// must require an explicit user-write permission even when the caller targets
+			// their own account (self-link). The previous self-link bypass let any
+			// authenticated user claim an unproven external subject on themselves and, because
+			// external links are globally unique, hijack a victim's future federated logins.
+			name: "self-link without permission, permission denied error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(
+								context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"userName",
+								"firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.German,
+								domain.GenderFemale,
+								"email@Address.ch",
+								false,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				// ctx acts as the target user itself (self-link).
+				ctx:           authz.SetCtxData(context.Background(), authz.CtxData{UserID: "user1"}),
+				userID:        "user1",
+				resourceOwner: "org1",
+				link: &AddLink{
+					IDPID:         "config1",
+					DisplayName:   "name",
+					IDPExternalID: "externaluser1",
+				},
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
+		{
+			// Self-link is allowed when the caller holds the user-write permission.
+			// This pins the login-client flow (service user with user.write links a
+			// verified external subject to its own IDP-intent session) so a future
+			// refactor cannot silently break it.
+			name: "self-link with permission, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(
+								context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"userName",
+								"firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.German,
+								domain.GenderFemale,
+								"email@Address.ch",
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewIDPConfigAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"config1",
+								"name",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeUnspecified,
+								false,
+							),
+						),
+					),
+					expectPush(
+						user.NewUserIDPLinkAddedEvent(
+							authz.SetCtxData(context.Background(), authz.CtxData{UserID: "user1"}),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"config1",
+							"name",
+							"externaluser1",
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				// ctx acts as the target user itself (self-link).
+				ctx:           authz.SetCtxData(context.Background(), authz.CtxData{UserID: "user1"}),
+				userID:        "user1",
+				resourceOwner: "org1",
+				link: &AddLink{
+					IDPID:         "config1",
+					DisplayName:   "name",
+					IDPExternalID: "externaluser1",
+				},
+			},
+			res: res{},
+		},
+		{
+			// Linking another user's account with the user-write permission is the
+			// ordinary managed path and must keep working.
+			name: "other-user link with permission, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(
+								context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"userName",
+								"firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.German,
+								domain.GenderFemale,
+								"email@Address.ch",
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewIDPConfigAddedEvent(
+								context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"config1",
+								"name",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeUnspecified,
+								false,
+							),
+						),
+					),
+					expectPush(
+						user.NewUserIDPLinkAddedEvent(
+							authz.SetCtxData(context.Background(), authz.CtxData{UserID: "admin1"}),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"config1",
+							"name",
+							"externaluser1",
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				// ctx is a different user (e.g. an admin) than the link target.
+				ctx:           authz.SetCtxData(context.Background(), authz.CtxData{UserID: "admin1"}),
+				userID:        "user1",
+				resourceOwner: "org1",
+				link: &AddLink{
+					IDPID:         "config1",
+					DisplayName:   "name",
+					IDPExternalID: "externaluser1",
+				},
+			},
+			res: res{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
+			}
+			_, err := r.AddUserIDPLink(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.link)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
 		})
 	}
 }

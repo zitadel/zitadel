@@ -345,14 +345,12 @@ message CreateOIDCApplicationRequest {
   // IOS is iOS Associated Domains / passkey trust config.
   // Served in /.well-known/apple-app-site-association as webcredentials.apps entry
   // "{team_id}.{bundle_id}" (Apple's full App ID = Team ID prefix + Bundle ID).
-  // That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer;
-  // changes can take time to take effect.
+  // Platform verifiers may cache the file; changes can take time to take effect.
   IOSAppLinkConfig ios = 18;
 
   // Android is Android Digital Asset Links / passkey trust config.
-  // Served in /.well-known/assetlinks.json for delegate_permission/common.get_login_creds.
-  // That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer;
-  // changes can take time to take effect.
+  // Served in /.well-known/assetlinks.json for delegate_permission/common.handle_all_urls and delegate_permission/common.get_login_creds.
+  // Platform verifiers may cache the file; changes can take time to take effect.
   AndroidAppLinkConfig android = 19;
 }
 
@@ -595,15 +593,13 @@ message UpdateOIDCApplicationConfigurationRequest {
   // IOS is iOS Associated Domains / passkey trust config.
   // Served in /.well-known/apple-app-site-association as webcredentials.apps entry
   // "{team_id}.{bundle_id}" (Apple's full App ID = Team ID prefix + Bundle ID).
-  // That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer;
-  // changes can take time to take effect.
+  // Platform verifiers may cache the file; changes can take time to take effect.
   // If not set, the iOS config will not be changed.
   optional IOSAppLinkConfig ios = 18;
 
   // Android is Android Digital Asset Links / passkey trust config.
-  // Served in /.well-known/assetlinks.json for delegate_permission/common.get_login_creds.
-  // That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer;
-  // changes can take time to take effect.
+  // Served in /.well-known/assetlinks.json for delegate_permission/common.handle_all_urls and delegate_permission/common.get_login_creds.
+  // Platform verifiers may cache the file; changes can take time to take effect.
   // If not set, the Android config will not be changed.
   optional AndroidAppLinkConfig android = 19;
 }

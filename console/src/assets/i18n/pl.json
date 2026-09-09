@@ -2201,6 +2201,10 @@
       "TITLE": "Dodaj dostawcę",
       "DESCRIPTION": "Wybierz jednego lub więcej z następujących dostawców.",
       "STEPPERTITLE": "Utwórz dostawcę",
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "Wprowadź wymagane dane, aby umożliwić uwierzytelnianie użytkownikom innej instancji ZITADEL."
+      },
       "OIDC": {
         "TITLE": "OIDC Provider",
         "DESCRIPTION": "Wprowadź wymagane dane dla swojego dostawcy OIDC."
@@ -2310,6 +2314,10 @@
     "STATE": "Stan",
     "ISSUER": "Emitent",
     "SCOPESLIST": "Lista zakresów",
+    "INSTANCEROLESINFO": "Mapowanie ról instancji",
+    "INSTANCEROLESINFO_DESC": "Użytkownicy uwierzytelniający się przez tego dostawcę otrzymują role członków instancji (prefiks IAM_), które posiadają w wymienionych organizacjach zdalnej instancji ZITADEL. Identyfikator organizacji i domena główna muszą być zgodne.",
+    "ORGANIZATIONID": "Identyfikator organizacji",
+    "ORGANIZATIONDOMAIN": "Domena organizacji",
     "CLIENTID": "Identyfikator klienta",
     "CLIENTSECRET": "Tajne klienta",
     "LDAPCONNECTION": "Połączenie",

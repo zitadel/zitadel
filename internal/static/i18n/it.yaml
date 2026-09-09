@@ -176,6 +176,7 @@ Errors:
         NotExisting: "Multifattore OTP (OneTimePassword) non esistente"
         NotReady: "Multifattore OTP (OneTimePassword) non è pronto"
         InvalidCode: "Codice non valido"
+        Reused: "Questo codice è già stato utilizzato. Attendere un nuovo codice"
       U2F:
         NotExisting: "U2F non esistente"
       Passwordless:
@@ -766,6 +767,7 @@ EventTypes:
           check:
             succeeded: "Controllo OTP riuscito"
             failed: "Controllo OTP fallito"
+            reused: "Codice OTP riutilizzato"
           sms:
             added: "Aggiunta SMS OTP"
             removed: "SMS OTP rimossa"

@@ -659,7 +659,7 @@ func startAPIs(
 	apis.RegisterHandlerOnPrefix(robots_txt.HandlerPrefix, robotsTxtHandler)
 
 	// native app link well-known files (instance-scoped)
-	apis.RegisterHandlerPrefixes(instanceInterceptor.Handler(well_known.NewHandler(queries, config.WellKnown)), well_known.HandlerPrefixes...)
+	apis.RegisterHandlerPrefixes(instanceInterceptor.Handler(well_known.NewHandler(queries)), well_known.HandlerPrefixes...)
 
 	// TODO: Record openapi access logs?
 	openAPIHandler, err := openapi.Start()

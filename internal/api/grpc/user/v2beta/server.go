@@ -23,7 +23,7 @@ type Server struct {
 	command     *command.Commands
 	query       *query.Queries
 	userCodeAlg crypto.EncryptionAlgorithm
-	idpAlg      crypto.EncryptionAlgorithm
+	idpAlg      crypto.AuthEncryptionAlgorithm
 	idpCallback func(ctx context.Context) string
 	samlRootURL func(ctx context.Context, idpID string) string
 
@@ -38,7 +38,7 @@ func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
 	userCodeAlg crypto.EncryptionAlgorithm,
-	idpAlg crypto.EncryptionAlgorithm,
+	idpAlg crypto.AuthEncryptionAlgorithm,
 	idpCallback func(ctx context.Context) string,
 	samlRootURL func(ctx context.Context, idpID string) string,
 	assetAPIPrefix func(ctx context.Context) string,
