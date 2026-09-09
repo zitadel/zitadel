@@ -11,7 +11,6 @@ interface ErrorLocation {
 interface ErrorIdEntry {
   id: string;
   locations: ErrorLocation[];
-  i18nKey?: string;
 }
 interface ExampleResponse {
   httpStatus: number;
@@ -92,7 +91,10 @@ export default function ErrorReference() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/error-reference')
+    // The app is served under basePath '/docs' (next.config.mjs), and a plain
+    // fetch() doesn't get that prefix added automatically the way <Link> and
+    // router.push() do, so this has to spell it out or it 404s.
+    fetch('/docs/api/error-reference')
       .then((res) => {
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
         return res.json();
@@ -150,6 +152,7 @@ export default function ErrorReference() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={`Search ${data.meta.totalIds.toLocaleString()} error IDs or messages, e.g. "COMMAND-2M0fs" or "not found"…`}
+          aria-label="Search error IDs or messages"
           className="w-full px-3 py-2 text-sm bg-transparent border rounded-md border-fd-border text-fd-foreground focus:outline-none focus:ring-2 focus:ring-fd-accent"
         />
         <p className="text-xs text-fd-muted-foreground">
@@ -306,6 +309,15 @@ function ClusterRow({
 }
 
 function ClusterDetail({ cluster }: { cluster: ErrorCluster }) {
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  function toggleLocations(id: string) {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
   return (
     <div className="flex flex-col gap-3 px-3 pb-3 text-xs">
       <div className="flex items-start justify-between gap-2">
@@ -336,19 +348,41 @@ function ClusterDetail({ cluster }: { cluster: ErrorCluster }) {
       <div className="flex flex-col gap-1.5">
         <p className="font-medium text-fd-muted-foreground">{cluster.ids.length === 1 ? 'ID' : `IDs (${cluster.ids.length})`}</p>
         <div className="flex flex-col gap-2">
-          {cluster.ids.map((idEntry) => (
-            <div key={idEntry.id} className="flex flex-col gap-0.5">
-              <code className="font-mono text-fd-foreground">{idEntry.id}</code>
-              <div className="flex flex-wrap gap-x-3 gap-y-0.5 pl-3 text-fd-muted-foreground">
-                {idEntry.locations.slice(0, MAX_LOCATIONS_SHOWN).map((loc, i) => (
-                  <span key={i} className="font-mono">
-                    {loc.file}:{loc.line}
-                  </span>
-                ))}
-                {idEntry.locations.length > MAX_LOCATIONS_SHOWN && <span>+{idEntry.locations.length - MAX_LOCATIONS_SHOWN} more</span>}
+          {cluster.ids.map((idEntry) => {
+            const showAll = expandedIds.has(idEntry.id);
+            const shown = showAll ? idEntry.locations : idEntry.locations.slice(0, MAX_LOCATIONS_SHOWN);
+            const hiddenCount = idEntry.locations.length - shown.length;
+            return (
+              <div key={idEntry.id} className="flex flex-col gap-0.5">
+                <code className="font-mono text-fd-foreground">{idEntry.id}</code>
+                <div className="flex flex-wrap gap-x-3 gap-y-0.5 pl-3 text-fd-muted-foreground">
+                  {shown.map((loc, i) => (
+                    <span key={i} className="font-mono">
+                      {loc.file}:{loc.line}
+                    </span>
+                  ))}
+                  {hiddenCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => toggleLocations(idEntry.id)}
+                      className="underline underline-offset-2 hover:text-fd-foreground"
+                    >
+                      +{hiddenCount} more
+                    </button>
+                  )}
+                  {showAll && idEntry.locations.length > MAX_LOCATIONS_SHOWN && (
+                    <button
+                      type="button"
+                      onClick={() => toggleLocations(idEntry.id)}
+                      className="underline underline-offset-2 hover:text-fd-foreground"
+                    >
+                      show fewer
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

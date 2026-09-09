@@ -2,7 +2,10 @@
 // sites and emits apps/docs/components/ErrorReference/data.json: a
 // 3-level tree (subsystem -> gRPC kind -> cluster) that the ErrorReference
 // component renders. Regenerate after backend error call sites change:
-//   node apps/docs/scripts/generate-error-reference.ts
+//   pnpm nx run @zitadel/docs:generate-error-reference   (from repo root)
+//   pnpm generate:error-reference                        (from apps/docs)
+// This file is TypeScript/ESM (run via tsx, see package.json) — plain
+// `node` won't execute it without a loader.
 //
 // This is intentionally NOT wired into the Nx `generate` chain (which
 // `dev`/`build`/`lint` all depend on) — scanning 2000+ backend Go files on
@@ -33,7 +36,6 @@ interface RawEntry {
   kind: string; // GRPC_STATUS key
   message: string;
   messageType: 'i18n' | 'literal';
-  i18nKey?: string;
   i18nResolved?: boolean;
   file: string;
   line: number;
@@ -47,7 +49,6 @@ interface ErrorLocation {
 interface ErrorIdEntry {
   id: string;
   locations: ErrorLocation[];
-  i18nKey?: string;
 }
 
 interface ExampleResponse {
@@ -176,9 +177,13 @@ function subsystemForPath(relPath: string): string {
   )
     return 'query';
   if (relPath.startsWith('internal/command/')) return 'command';
-  // Event-payload unmarshal guards for these three aggregates are documented
-  // (ERRORS.md) as conceptually part of the command layer, sharing its ID
-  // prefixes (ORG-/INSTANCE-/PROJECT-), unlike other internal/repository/*.
+  // internal/repository/{org,instance,project} hold the event definitions
+  // (including unmarshal-guard errors) for the aggregates internal/command
+  // writes to — they're the write model's event payloads, not a read model,
+  // so route them to 'command' too. ID prefix isn't a reliable signal for
+  // this: internal/repository/instance mostly throws INST-, not INSTANCE-,
+  // and internal/repository/project also throws APPLICATION-/API-/OIDC-/
+  // SAML-/USER-, not just PROJECT-.
   if (
     relPath.startsWith('internal/repository/org/') ||
     relPath.startsWith('internal/repository/instance/') ||
@@ -242,12 +247,25 @@ function lineOf(content: string, idx: number): number {
   return line;
 }
 
+// True if `idx` is textually preceded, on its own source line, by a `//`
+// comment marker — i.e. the call site is commented out. This is a line-level
+// heuristic, not real Go parsing: it doesn't know whether an earlier `//` on
+// the line sits inside a string literal, and it doesn't handle `/* */` block
+// comments. Neither case is a realistic way to write commented-out Go code,
+// so this is enough to skip the actual failure mode (a fully commented-out
+// `//   zerrors.ThrowX(...)` line) without the cost of a real parser.
+function isCommentedOut(content: string, idx: number): boolean {
+  const lineStart = content.lastIndexOf('\n', idx) + 1;
+  return content.slice(lineStart, idx).includes('//');
+}
+
 function scanFile(absPath: string, relPath: string): RawEntry[] {
   const content = readFileSync(absPath, 'utf8');
   const entries: RawEntry[] = [];
   let m: RegExpExecArray | null;
   CALL_RE.lastIndex = 0;
   while ((m = CALL_RE.exec(content))) {
+    if (isCommentedOut(content, m.index)) continue;
     const kindRaw = m[1];
     const grpcKey = KIND_ALIASES[kindRaw];
     if (!grpcKey) continue; // not a real Throw<Kind> (defensive)
@@ -262,7 +280,6 @@ function scanFile(absPath: string, relPath: string): RawEntry[] {
       kind: grpcKey,
       message,
       messageType,
-      i18nKey: messageType === 'i18n' ? message : undefined,
       file: relPath,
       line: lineOf(content, m.index),
     });
@@ -440,7 +457,7 @@ function main() {
     totalClusters++;
     const idMap = new Map<string, ErrorIdEntry>();
     for (const e of c.entries) {
-      if (!idMap.has(e.id)) idMap.set(e.id, { id: e.id, locations: [], i18nKey: e.i18nResolved === false ? e.i18nKey : undefined });
+      if (!idMap.has(e.id)) idMap.set(e.id, { id: e.id, locations: [] });
       idMap.get(e.id)!.locations.push({ file: e.file, line: e.line });
     }
     const ids = [...idMap.values()].sort((a, b) => a.id.localeCompare(b.id));

@@ -42,9 +42,5 @@ export const THROW_KIND_TO_GRPC_STATUS: Record<string, keyof typeof GRPC_STATUS>
   ResourceExhausted: 'RESOURCE_EXHAUSTED',
   Unavailable: 'UNAVAILABLE',
   DeadlineExceeded: 'DEADLINE_EXCEEDED',
-  Aborted: 'ABORTED',
-  OutOfRange: 'OUT_OF_RANGE',
-  DataLoss: 'DATA_LOSS',
   Unknown: 'UNKNOWN',
-  Canceled: 'CANCELLED',
 };
