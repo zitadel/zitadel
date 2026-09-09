@@ -287,11 +287,14 @@ func derivePackageDir(root, protoAbs string) (string, error) {
 		return "", err
 	}
 	parts := strings.Split(filepath.ToSlash(rel), "/")
-	switch len(parts) {
-	case 1:
+	switch {
+	case len(parts) == 1:
 		name := strings.TrimSuffix(parts[0], ".proto")
 		return filepath.Join("internal", "api", "grpc", name), nil
-	case 2:
+	case len(parts) >= 2:
+		// <category>/<version>/<name>_service.proto — only the first two
+		// segments matter, whatever comes after (the filename, or deeper
+		// nesting) is ignored.
 		return filepath.Join("internal", "api", "grpc", parts[0], parts[1]), nil
 	default:
 		return "", fmt.Errorf("%s: doesn't match proto/zitadel/<service>/<version>/... or proto/zitadel/<name>.proto", protoAbs)
