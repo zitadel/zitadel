@@ -39,11 +39,9 @@ func (s *executionError) Unwrap() error {
 	return s.parent
 }
 
-func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []eventstore.Event, currentState *state) (statements []*Statement, err error) {
+func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []eventstore.Event) (statements []*Statement, err error) {
 	statements = make([]*Statement, 0, len(events))
 
-	previousPosition := currentState.position
-	offset := currentState.offset
 	for _, event := range events {
 		statement, err := h.reduce(event)
 		if err != nil {
@@ -53,14 +51,6 @@ func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []e
 			}
 			return statements, &executionError{err}
 		}
-		offset++
-		if !previousPosition.Equal(event.Position()) {
-			// offset is 1 because we want to skip this event
-			offset = 1
-		}
-		statement.offset = offset
-		statement.Position = event.Position()
-		previousPosition = event.Position()
 		statements = append(statements, statement)
 	}
 	return statements, nil
@@ -87,9 +77,20 @@ type Statement struct {
 	Position     decimal.Decimal
 	CreationDate time.Time
 
-	offset uint32
+	inTxOrder uint32
 
 	Execute Exec
+}
+
+func (s *Statement) eventSortKey() eventstore.EventSortKey {
+	return eventstore.EventSortKey{
+		Position:      s.Position,
+		InTxOrder:     s.inTxOrder,
+		InstanceID:    s.Aggregate.InstanceID,
+		AggregateType: s.Aggregate.Type,
+		AggregateID:   s.Aggregate.ID,
+		Sequence:      s.Sequence,
+	}
 }
 
 type Exec func(ctx context.Context, ex Executer, projectionName string) error
@@ -112,6 +113,7 @@ func NewStatement(event eventstore.Event, e Exec) *Statement {
 		Sequence:     event.Sequence(),
 		Position:     event.Position(),
 		CreationDate: event.CreatedAt(),
+		inTxOrder:    event.InTxOrder(),
 		Execute:      e,
 	}
 }
