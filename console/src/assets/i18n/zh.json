@@ -209,7 +209,9 @@
         "PREVIOUS_TABLE": {
           "TITLE": "先前的 Web 密钥",
           "DESCRIPTION": "这些是您之前使用但不再活动的 Web 密钥。",
-          "DEACTIVATED_ON": "停用时间"
+          "DEACTIVATED_ON": "停用时间",
+          "DELETE_TITLE": "删除先前的 Web 密钥",
+          "DELETE_DESCRIPTION": "删除此前的 Web 密钥会使所有使用该密钥签名的令牌失效。此操作无法撤销。"
         }
       },
       "MESSAGE_TEXTS": {
