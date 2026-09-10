@@ -81,6 +81,13 @@ message SetSystemFeaturesRequest{
     }
   ];
 
+  optional bool allow_otp_code_override = 14 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If enabled, Actions V2 pre-OTP-code hooks (preotpsmscode, preotpemailcode) are invoked before OTP code generation and may override the code value, generation parameters, or expiry. When disabled (default), the hooks are not called and OTP codes use the instance's configured secret generator.";
+    }
+  ];
+
 }
 
 message SetSystemFeaturesResponse {
@@ -160,6 +167,13 @@ message GetSystemFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "If this is enabled Zitadel will use the relational tables instead of the projections as the main source to store the data. Regardless of the flag state, both the relational table and the projections are kept up to date. Currently the flag has no effect.";
+    }
+  ];
+
+  FeatureFlag allow_otp_code_override = 15 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If enabled, Actions V2 pre-OTP-code hooks (preotpsmscode, preotpemailcode) are invoked before OTP code generation and may override the code value, generation parameters, or expiry.";
     }
   ];
 }

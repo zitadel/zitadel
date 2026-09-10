@@ -19,6 +19,7 @@ var (
 	SystemLoginVersion                            = setEventTypeFromFeature(feature.LevelSystem, feature.KeyLoginV2)
 	SystemPermissionCheckV2                       = setEventTypeFromFeature(feature.LevelSystem, feature.KeyPermissionCheckV2)
 	SystemEnableRelationalTables                  = setEventTypeFromFeature(feature.LevelSystem, feature.KeyEnableRelationalTables)
+	SystemAllowOTPCodeOverride                    = setEventTypeFromFeature(feature.LevelSystem, feature.KeyAllowOTPCodeOverride)
 
 	InstanceResetEventType                          = resetEventTypeFromFeature(feature.LevelInstance)
 	InstanceLoginDefaultOrgEventType                = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLoginDefaultOrg)
@@ -30,6 +31,7 @@ var (
 	InstancePermissionCheckV2                       = setEventTypeFromFeature(feature.LevelInstance, feature.KeyPermissionCheckV2)
 	InstanceManagementConsoleUseV2UserApi           = setEventTypeFromFeature(feature.LevelInstance, feature.KeyConsoleUseV2UserApi)
 	InstanceEnableRelationalTables                  = setEventTypeFromFeature(feature.LevelInstance, feature.KeyEnableRelationalTables)
+	InstanceAllowOTPCodeOverride                    = setEventTypeFromFeature(feature.LevelInstance, feature.KeyAllowOTPCodeOverride)
 )
 
 const (
