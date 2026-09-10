@@ -61,7 +61,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@faker-js/faker": "^9.9.0",
-    "@next/eslint-plugin-next": "16.2.11",
+    "@next/eslint-plugin-next": "16.3.3",
     "@opentelemetry/sdk-trace-base": "^2.7.1",
     "@opentelemetry/sdk-trace-node": "^2.7.1",
     "@otplib/core": "^12.0.1",
