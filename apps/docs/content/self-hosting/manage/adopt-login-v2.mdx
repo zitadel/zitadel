@@ -87,9 +87,13 @@ Also prepare:
 
 ## 4. Cut over
 
+<Callout type="warn">
+Enabling the instance-level `loginV2.required` flag makes the console unreachable if the `zitadel-login` container is not deployed and routed. This container is mandatory when `loginV2.required=true`, even if custom apps never use the hosted UI, because the console depends on it. There is no supported way to keep the console on V1 while apps use V2 auth requests—the per-app setting only works when the instance flag is disabled. The recommended deployment is path-based routing on a single origin, not separate ports.
+</Callout>
+
 ### Gradual (recommended)
 
-With the instance Login V2 feature **disabled**:
+For users self-hosting the Login V2 app, with the instance Login V2 feature **disabled**:
 
 1. Open the application in Console
 2. Enable **Use new login UI**
