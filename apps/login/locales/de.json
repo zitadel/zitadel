@@ -153,7 +153,8 @@
       "sessionNotValid": "Sitzung ist nicht gültig",
       "passwordVerificationMissing": "Passwort-Verifizierung fehlt.",
       "passwordVerificationTooOld": "Passwort-Verifizierung ist zu alt. Bitte verifizieren Sie Ihr Passwort erneut.",
-      "passwordResetNotAllowed": "Das Zurücksetzen des Passworts ist nicht zulässig. Wenden Sie sich für weitere Informationen an Ihren Administrator."
+      "passwordResetNotAllowed": "Das Zurücksetzen des Passworts ist nicht zulässig. Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+      "localAuthenticationNotAllowed": "Lokale Authentifizierung nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator."
     }
   },
   "idp": {
@@ -285,7 +286,8 @@
         "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
         "couldNotUpdateSession": "Sitzung konnte nicht aktualisiert werden",
         "userNotFound": "Benutzer nicht im System gefunden",
-        "couldNotDetermineRedirect": "Weiterleitungs-URL nach Passkey-Verifizierung konnte nicht ermittelt werden"
+        "couldNotDetermineRedirect": "Weiterleitungs-URL nach Passkey-Verifizierung konnte nicht ermittelt werden",
+        "couldNotGetUser": "Benutzer konnte nicht geladen werden"
       }
     },
     "set": {
@@ -359,7 +361,10 @@
       "couldNotCreateSession": "Sitzung konnte nicht erstellt werden",
       "userNotFound": "Benutzer nicht im System gefunden",
       "couldNotLinkIDP": "IDP konnte nicht mit dem Benutzer verknüpft werden",
-      "couldNotRegisterUser": "Benutzer konnte nicht registriert werden"
+      "couldNotRegisterUser": "Benutzer konnte nicht registriert werden",
+      "couldNotGetLoginSettings": "Anmeldeeinstellungen konnten nicht abgerufen werden",
+      "localAuthenticationNotAllowed": "Lokale Authentifizierung nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+      "registerNotAllowed": "Registrierung ist nicht erlaubt"
     }
   },
   "invite": {
@@ -419,7 +424,9 @@
       "couldNotResendInvite": "Einladung konnte nicht erneut gesendet werden",
       "inviteSendFailed": "Einladungs-E-Mail konnte nicht gesendet werden",
       "emailSendFailed": "Verifizierungs-E-Mail konnte nicht gesendet werden",
-      "contextMissing": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+      "contextMissing": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+      "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
+      "couldNotUpdateSession": "Sitzung konnte nicht aktualisiert werden"
     }
   },
   "authenticator": {

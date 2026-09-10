@@ -153,7 +153,8 @@
       "sessionNotValid": "A sessão não é válida",
       "passwordVerificationMissing": "A verificação de senha está ausente.",
       "passwordVerificationTooOld": "A verificação de senha expirou. Por favor, verifique sua senha novamente.",
-      "passwordResetNotAllowed": "A redefinição de senha não é permitida. Entre em contato com o administrador para mais informações."
+      "passwordResetNotAllowed": "A redefinição de senha não é permitida. Entre em contato com o administrador para mais informações.",
+      "localAuthenticationNotAllowed": "A autenticação local não é permitida! Entre em contato com o administrador para mais informações."
     }
   },
   "idp": {
@@ -285,7 +286,8 @@
         "couldNotFindSession": "Não foi possível encontrar a sessão",
         "couldNotUpdateSession": "Não foi possível atualizar a sessão",
         "userNotFound": "Usuário não encontrado no sistema",
-        "couldNotDetermineRedirect": "Não foi possível determinar a URL de redirecionamento após verificação da chave de acesso"
+        "couldNotDetermineRedirect": "Não foi possível determinar a URL de redirecionamento após verificação da chave de acesso",
+        "couldNotGetUser": "Não foi possível carregar o usuário"
       }
     },
     "set": {
@@ -359,7 +361,10 @@
       "couldNotCreateSession": "Não foi possível criar a sessão",
       "userNotFound": "Usuário não encontrado no sistema",
       "couldNotLinkIDP": "Não foi possível vincular o provedor de identidade ao usuário",
-      "couldNotRegisterUser": "Não foi possível cadastrar o usuário"
+      "couldNotRegisterUser": "Não foi possível cadastrar o usuário",
+      "couldNotGetLoginSettings": "Não foi possível obter as configurações de login",
+      "localAuthenticationNotAllowed": "A autenticação local não é permitida! Entre em contato com o administrador para mais informações.",
+      "registerNotAllowed": "O registro não é permitido"
     }
   },
   "invite": {
@@ -419,7 +424,9 @@
       "couldNotResendInvite": "Não foi possível reenviar o convite",
       "inviteSendFailed": "Falha ao enviar e-mail de convite",
       "emailSendFailed": "Falha ao enviar e-mail de verificação",
-      "contextMissing": "Ocorreu um erro. Por favor, tente novamente."
+      "contextMissing": "Ocorreu um erro. Por favor, tente novamente.",
+      "couldNotFindSession": "Não foi possível encontrar a sessão",
+      "couldNotUpdateSession": "Não foi possível atualizar a sessão"
     }
   },
   "authenticator": {

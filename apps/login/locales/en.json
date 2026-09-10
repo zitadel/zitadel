@@ -153,7 +153,8 @@
       "sessionNotValid": "Session is not valid",
       "passwordVerificationMissing": "Password verification is missing.",
       "passwordVerificationTooOld": "Password verification is too old. Please verify your password again.",
-      "passwordResetNotAllowed": "Password reset is not allowed. Contact your administrator for more information."
+      "passwordResetNotAllowed": "Password reset is not allowed. Contact your administrator for more information.",
+      "localAuthenticationNotAllowed": "Local authentication is not allowed! Contact your administrator for more information."
     }
   },
   "idp": {
@@ -285,7 +286,8 @@
         "couldNotFindSession": "Could not find session",
         "couldNotUpdateSession": "Could not update session",
         "userNotFound": "User not found in the system",
-        "couldNotDetermineRedirect": "Could not determine redirect URL after passkey verification"
+        "couldNotDetermineRedirect": "Could not determine redirect URL after passkey verification",
+        "couldNotGetUser": "Could not load user"
       }
     },
     "set": {
@@ -359,7 +361,10 @@
       "couldNotCreateSession": "Could not create session",
       "userNotFound": "User not found in the system",
       "couldNotLinkIDP": "Could not link IDP to user",
-      "couldNotRegisterUser": "Could not register user"
+      "couldNotRegisterUser": "Could not register user",
+      "couldNotGetLoginSettings": "Could not get login settings",
+      "localAuthenticationNotAllowed": "Local authentication is not allowed! Contact your administrator for more information.",
+      "registerNotAllowed": "Registration is not allowed"
     }
   },
   "invite": {
@@ -419,7 +424,9 @@
       "couldNotResendInvite": "Could not resend invite",
       "inviteSendFailed": "Failed to send invitation email",
       "emailSendFailed": "Failed to send verification email",
-      "contextMissing": "An error occurred. Please try again."
+      "contextMissing": "An error occurred. Please try again.",
+      "couldNotFindSession": "Could not find session",
+      "couldNotUpdateSession": "Could not update session"
     }
   },
   "authenticator": {

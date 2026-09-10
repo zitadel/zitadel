@@ -136,7 +136,8 @@
       "couldNotLoadAuthMethods": "認証方法を読み込めませんでした",
       "failedPrecondition": "前提条件に失敗しました",
       "sessionNotValid": "セッションが無効です",
-      "passwordResetNotAllowed": "パスワードのリセットは許可されていません。詳細については管理者に問い合わせてください。"
+      "passwordResetNotAllowed": "パスワードのリセットは許可されていません。詳細については管理者に問い合わせてください。",
+      "localAuthenticationNotAllowed": "ローカル認証は許可されていません！ 詳細については管理者に問い合わせてください。"
     },
     "complexity": {
       "length": "{minLength} 文字以上である必要があります。",
@@ -278,7 +279,8 @@
         "couldNotFindSession": "セッションが見つかりませんでした",
         "couldNotUpdateSession": "セッションを更新できませんでした",
         "userNotFound": "ユーザーがシステムに見つかりません",
-        "couldNotDetermineRedirect": "パスキー確認後のリダイレクトURLを決定できませんでした"
+        "couldNotDetermineRedirect": "パスキー確認後のリダイレクトURLを決定できませんでした",
+        "couldNotGetUser": "ユーザーを読み込めませんでした"
       }
     },
     "set": {
@@ -352,7 +354,10 @@
       "couldNotCreateSession": "セッションを作成できませんでした",
       "userNotFound": "ユーザーがシステムに見つかりません",
       "couldNotLinkIDP": "IDPをユーザーにリンクできませんでした",
-      "couldNotRegisterUser": "ユーザーを登録できませんでした"
+      "couldNotRegisterUser": "ユーザーを登録できませんでした",
+      "couldNotGetLoginSettings": "ログイン設定を取得できませんでした",
+      "localAuthenticationNotAllowed": "ローカル認証は許可されていません！ 詳細については管理者に問い合わせてください。",
+      "registerNotAllowed": "新規登録は許可されていません"
     }
   },
   "invite": {
@@ -412,7 +417,9 @@
       "couldNotResendInvite": "招待を再送信できませんでした",
       "inviteSendFailed": "招待メールの送信に失敗しました",
       "emailSendFailed": "確認メールの送信に失敗しました",
-      "contextMissing": "エラーが発生しました。もう一度お試しください。"
+      "contextMissing": "エラーが発生しました。もう一度お試しください。",
+      "couldNotFindSession": "セッションが見つかりませんでした",
+      "couldNotUpdateSession": "セッションを更新できませんでした"
     }
   },
   "authenticator": {

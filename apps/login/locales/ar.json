@@ -153,7 +153,8 @@
       "sessionNotValid": "الجلسة غير صالحة",
       "passwordVerificationMissing": "التحقق من كلمة المرور مفقود.",
       "passwordVerificationTooOld": "التحقق من كلمة المرور قديم جدًا. يرجى التحقق من كلمة المرور مرة أخرى.",
-      "passwordResetNotAllowed": "إعادة تعيين كلمة المرور غير مسموح بها. اتصل بالمسؤول لمزيد من المعلومات."
+      "passwordResetNotAllowed": "إعادة تعيين كلمة المرور غير مسموح بها. اتصل بالمسؤول لمزيد من المعلومات.",
+      "localAuthenticationNotAllowed": "المصادقة المحلية غير مسموح بها! اتصل بالمسؤول لمزيد من المعلومات."
     }
   },
   "idp": {
@@ -285,7 +286,8 @@
         "couldNotFindSession": "تعذر العثور على الجلسة",
         "couldNotUpdateSession": "تعذر تحديث الجلسة",
         "userNotFound": "المستخدم غير موجود في النظام",
-        "couldNotDetermineRedirect": "تعذر تحديد عنوان URL لإعادة التوجيه بعد التحقق من مفتاح المرور"
+        "couldNotDetermineRedirect": "تعذر تحديد عنوان URL لإعادة التوجيه بعد التحقق من مفتاح المرور",
+        "couldNotGetUser": "تعذر تحميل المستخدم"
       }
     },
     "set": {
@@ -359,7 +361,10 @@
       "couldNotCreateSession": "تعذر إنشاء الجلسة",
       "userNotFound": "المستخدم غير موجود في النظام",
       "couldNotLinkIDP": "تعذر ربط IDP بالمستخدم",
-      "couldNotRegisterUser": "تعذر تسجيل المستخدم"
+      "couldNotRegisterUser": "تعذر تسجيل المستخدم",
+      "couldNotGetLoginSettings": "تعذر الحصول على إعدادات تسجيل الدخول",
+      "localAuthenticationNotAllowed": "المصادقة المحلية غير مسموح بها! اتصل بالمسؤول لمزيد من المعلومات.",
+      "registerNotAllowed": "التسجيل غير مسموح به"
     }
   },
   "invite": {
@@ -419,7 +424,9 @@
       "couldNotResendInvite": "تعذر إعادة إرسال الدعوة",
       "inviteSendFailed": "فشل إرسال بريد الدعوة الإلكتروني",
       "emailSendFailed": "فشل إرسال بريد التحقق الإلكتروني",
-      "contextMissing": "حدث خطأ. يرجى المحاولة مرة أخرى."
+      "contextMissing": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+      "couldNotFindSession": "تعذر العثور على الجلسة",
+      "couldNotUpdateSession": "تعذر تحديث الجلسة"
     }
   },
   "authenticator": {

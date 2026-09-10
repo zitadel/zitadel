@@ -153,7 +153,8 @@
       "sessionNotValid": "A munkamenet nem érvényes",
       "passwordVerificationMissing": "A jelszó hitelesítés hiányzik.",
       "passwordVerificationTooOld": "A jelszó hitelesítés túl régi. Kérjük, erősítsd meg újra a jelszavadat.",
-      "passwordResetNotAllowed": "A jelszó-visszaállítás nem engedélyezett. További információért fordulj a rendszergazdához."
+      "passwordResetNotAllowed": "A jelszó-visszaállítás nem engedélyezett. További információért fordulj a rendszergazdához.",
+      "localAuthenticationNotAllowed": "A helyi hitelesítés nem engedélyezett! További információért fordulj a rendszergazdához."
     }
   },
   "idp": {
@@ -285,7 +286,8 @@
         "couldNotFindSession": "Nem található munkamenet",
         "couldNotUpdateSession": "Nem sikerült frissíteni a munkamenetet",
         "userNotFound": "A felhasználó nem található a rendszerben",
-        "couldNotDetermineRedirect": "Nem sikerült meghatározni az átirányítási címet a jelkulcs ellenőrzése után"
+        "couldNotDetermineRedirect": "Nem sikerült meghatározni az átirányítási címet a jelkulcs ellenőrzése után",
+        "couldNotGetUser": "Nem sikerült betölteni a felhasználót"
       }
     },
     "set": {
@@ -359,7 +361,10 @@
       "couldNotCreateSession": "Nem sikerült létrehozni a munkamenetet",
       "userNotFound": "A felhasználó nem található a rendszerben",
       "couldNotLinkIDP": "Nem sikerült összekapcsolni az azonosítószolgáltatót a felhasználóval",
-      "couldNotRegisterUser": "Nem sikerült regisztrálni a felhasználót"
+      "couldNotRegisterUser": "Nem sikerült regisztrálni a felhasználót",
+      "couldNotGetLoginSettings": "Nem sikerült lekérni a bejelentkezési beállításokat",
+      "localAuthenticationNotAllowed": "A helyi hitelesítés nem engedélyezett! További információért fordulj a rendszergazdához.",
+      "registerNotAllowed": "A regisztráció nem engedélyezett"
     }
   },
   "invite": {
@@ -419,7 +424,9 @@
       "couldNotResendInvite": "Nem sikerült újraküldeni a meghívást",
       "inviteSendFailed": "Nem sikerült elküldeni a meghívó e-mailt",
       "emailSendFailed": "Nem sikerült elküldeni az ellenőrző e-mailt",
-      "contextMissing": "Hiba történt. Kérjük, próbáld újra."
+      "contextMissing": "Hiba történt. Kérjük, próbáld újra.",
+      "couldNotFindSession": "Nem található munkamenet",
+      "couldNotUpdateSession": "Nem sikerült frissíteni a munkamenetet"
     }
   },
   "authenticator": {

@@ -907,7 +907,7 @@ export async function processIDPCallback({
     }
 
     // Should theoretically be unreachable if handleNoUserFound covers the rest
-    return { error: t("errors.unknown") };
+    return { error: t("errors.unknownError") };
   } catch (error: unknown) {
     logger.error("Error processing intent", { error });
 

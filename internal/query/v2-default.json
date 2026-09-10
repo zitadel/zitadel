@@ -154,7 +154,8 @@
         "sessionNotValid": "Sitzung ist nicht gültig",
         "passwordVerificationMissing": "Passwort-Verifizierung fehlt.",
         "passwordVerificationTooOld": "Passwort-Verifizierung ist zu alt. Bitte verifizieren Sie Ihr Passwort erneut.",
-        "passwordResetNotAllowed": "Das Zurücksetzen des Passworts ist nicht zulässig. Wenden Sie sich für weitere Informationen an Ihren Administrator."
+        "passwordResetNotAllowed": "Das Zurücksetzen des Passworts ist nicht zulässig. Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+        "localAuthenticationNotAllowed": "Lokale Authentifizierung nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator."
       }
     },
     "idp": {
@@ -285,7 +286,8 @@
           "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
           "couldNotUpdateSession": "Sitzung konnte nicht aktualisiert werden",
           "userNotFound": "Benutzer nicht im System gefunden",
-          "couldNotDetermineRedirect": "Weiterleitungs-URL nach Passkey-Verifizierung konnte nicht ermittelt werden"
+          "couldNotDetermineRedirect": "Weiterleitungs-URL nach Passkey-Verifizierung konnte nicht ermittelt werden",
+          "couldNotGetUser": "Benutzer konnte nicht geladen werden"
         }
       },
       "set": {
@@ -359,7 +361,10 @@
         "couldNotCreateSession": "Sitzung konnte nicht erstellt werden",
         "userNotFound": "Benutzer nicht im System gefunden",
         "couldNotLinkIDP": "IDP konnte nicht mit dem Benutzer verknüpft werden",
-        "couldNotRegisterUser": "Benutzer konnte nicht registriert werden"
+        "couldNotRegisterUser": "Benutzer konnte nicht registriert werden",
+        "couldNotGetLoginSettings": "Anmeldeeinstellungen konnten nicht abgerufen werden",
+        "localAuthenticationNotAllowed": "Lokale Authentifizierung nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+        "registerNotAllowed": "Registrierung ist nicht erlaubt"
       }
     },
     "invite": {
@@ -419,7 +424,9 @@
         "couldNotResendInvite": "Einladung konnte nicht erneut gesendet werden",
         "inviteSendFailed": "Einladungs-E-Mail konnte nicht gesendet werden",
         "emailSendFailed": "Verifizierungs-E-Mail konnte nicht gesendet werden",
-        "contextMissing": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+        "contextMissing": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+        "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
+        "couldNotUpdateSession": "Sitzung konnte nicht aktualisiert werden"
       }
     },
     "authenticator": {
@@ -628,7 +635,8 @@
         "sessionNotValid": "Session is not valid",
         "passwordVerificationMissing": "Password verification is missing.",
         "passwordVerificationTooOld": "Password verification is too old. Please verify your password again.",
-        "passwordResetNotAllowed": "Password reset is not allowed. Contact your administrator for more information."
+        "passwordResetNotAllowed": "Password reset is not allowed. Contact your administrator for more information.",
+        "localAuthenticationNotAllowed": "Local authentication is not allowed! Contact your administrator for more information."
       }
     },
     "idp": {
@@ -759,7 +767,8 @@
           "couldNotFindSession": "Could not find session",
           "couldNotUpdateSession": "Could not update session",
           "userNotFound": "User not found in the system",
-          "couldNotDetermineRedirect": "Could not determine redirect URL after passkey verification"
+          "couldNotDetermineRedirect": "Could not determine redirect URL after passkey verification",
+          "couldNotGetUser": "Could not load user"
         }
       },
       "set": {
@@ -833,7 +842,10 @@
         "couldNotCreateSession": "Could not create session",
         "userNotFound": "User not found in the system",
         "couldNotLinkIDP": "Could not link IDP to user",
-        "couldNotRegisterUser": "Could not register user"
+        "couldNotRegisterUser": "Could not register user",
+        "couldNotGetLoginSettings": "Could not get login settings",
+        "localAuthenticationNotAllowed": "Local authentication is not allowed! Contact your administrator for more information.",
+        "registerNotAllowed": "Registration is not allowed"
       }
     },
     "invite": {
@@ -893,7 +905,9 @@
         "couldNotResendInvite": "Could not resend invite",
         "inviteSendFailed": "Failed to send invitation email",
         "emailSendFailed": "Failed to send verification email",
-        "contextMissing": "An error occurred. Please try again."
+        "contextMissing": "An error occurred. Please try again.",
+        "couldNotFindSession": "Could not find session",
+        "couldNotUpdateSession": "Could not update session"
       }
     },
     "authenticator": {
@@ -1102,7 +1116,8 @@
         "sessionNotValid": "La sesión no es válida",
         "passwordVerificationMissing": "Falta la verificación de la contraseña.",
         "passwordVerificationTooOld": "La verificación de la contraseña es demasiado antigua. Por favor, verifique su contraseña de nuevo.",
-        "passwordResetNotAllowed": "El restablecimiento de contraseña no está permitido. Contacte con su administrador para más información."
+        "passwordResetNotAllowed": "El restablecimiento de contraseña no está permitido. Contacte con su administrador para más información.",
+        "localAuthenticationNotAllowed": "¡La autenticación local no está permitida! Contacte con su administrador para más información."
       }
     },
     "idp": {
@@ -1233,7 +1248,8 @@
           "couldNotFindSession": "No se pudo encontrar la sesión",
           "couldNotUpdateSession": "No se pudo actualizar la sesión",
           "userNotFound": "Usuario no encontrado en el sistema",
-          "couldNotDetermineRedirect": "No se pudo determinar la URL de redirección después de la verificación de clave de acceso"
+          "couldNotDetermineRedirect": "No se pudo determinar la URL de redirección después de la verificación de clave de acceso",
+          "couldNotGetUser": "No se pudo cargar al usuario"
         }
       },
       "set": {
@@ -1307,7 +1323,10 @@
         "couldNotCreateSession": "No se pudo crear la sesión",
         "userNotFound": "Usuario no encontrado en el sistema",
         "couldNotLinkIDP": "No se pudo vincular el IdP al usuario",
-        "couldNotRegisterUser": "No se pudo registrar el usuario"
+        "couldNotRegisterUser": "No se pudo registrar el usuario",
+        "couldNotGetLoginSettings": "No se pudieron obtener los ajustes de inicio de sesión",
+        "localAuthenticationNotAllowed": "¡La autenticación local no está permitida! Contacte con su administrador para más información.",
+        "registerNotAllowed": "El registro no está permitido"
       }
     },
     "invite": {
@@ -1367,7 +1386,9 @@
         "couldNotResendInvite": "No se pudo reenviar la invitación",
         "inviteSendFailed": "No se pudo enviar el correo de invitación",
         "emailSendFailed": "No se pudo enviar el correo electrónico de verificación",
-        "contextMissing": "Ocurrió un error. Por favor inténtelo de nuevo."
+        "contextMissing": "Ocurrió un error. Por favor inténtelo de nuevo.",
+        "couldNotFindSession": "No se pudo encontrar la sesión",
+        "couldNotUpdateSession": "No se pudo actualizar la sesión"
       }
     },
     "authenticator": {
@@ -1576,7 +1597,8 @@
         "sessionNotValid": "La sessione non è valida",
         "passwordVerificationMissing": "Manca la verifica della password.",
         "passwordVerificationTooOld": "La verifica della password è troppo vecchia. Si prega di verificare nuovamente la password.",
-        "passwordResetNotAllowed": "Il ripristino della password non è consentito. Contatta il tuo amministratore per ulteriori informazioni."
+        "passwordResetNotAllowed": "Il ripristino della password non è consentito. Contatta il tuo amministratore per ulteriori informazioni.",
+        "localAuthenticationNotAllowed": "L'autenticazione locale non è consentita! Contatta il tuo amministratore per ulteriori informazioni."
       }
     },
     "idp": {
@@ -1707,7 +1729,8 @@
           "couldNotFindSession": "Impossibile trovare la sessione",
           "couldNotUpdateSession": "Impossibile aggiornare la sessione",
           "userNotFound": "Utente non trovato nel sistema",
-          "couldNotDetermineRedirect": "Impossibile determinare l'URL di reindirizzamento dopo la verifica passkey"
+          "couldNotDetermineRedirect": "Impossibile determinare l'URL di reindirizzamento dopo la verifica passkey",
+          "couldNotGetUser": "Impossibile caricare l'utente"
         }
       },
       "set": {
@@ -1781,7 +1804,10 @@
         "couldNotCreateSession": "Impossibile creare la sessione",
         "userNotFound": "Utente non trovato nel sistema",
         "couldNotLinkIDP": "Impossibile collegare l'IDP all'utente",
-        "couldNotRegisterUser": "Impossibile registrare l'utente"
+        "couldNotRegisterUser": "Impossibile registrare l'utente",
+        "couldNotGetLoginSettings": "Impossibile ottenere le impostazioni di accesso",
+        "localAuthenticationNotAllowed": "L'autenticazione locale non è consentita! Contatta il tuo amministratore per ulteriori informazioni.",
+        "registerNotAllowed": "La registrazione non è consentita"
       }
     },
     "invite": {
@@ -1841,7 +1867,9 @@
         "couldNotResendInvite": "Impossibile reinviare l'invito",
         "inviteSendFailed": "Impossibile inviare l'email di invito",
         "emailSendFailed": "Impossibile inviare l'email di verifica",
-        "contextMissing": "Si è verificato un errore. Riprova."
+        "contextMissing": "Si è verificato un errore. Riprova.",
+        "couldNotFindSession": "Impossibile trovare la sessione",
+        "couldNotUpdateSession": "Impossibile aggiornare la sessione"
       }
     },
     "authenticator": {
@@ -2050,7 +2078,8 @@
         "sessionNotValid": "Sessie is niet geldig",
         "passwordVerificationMissing": "Wachtwoordverificatie ontbreekt.",
         "passwordVerificationTooOld": "Wachtwoordverificatie is te oud. Verifieer je wachtwoord opnieuw.",
-        "passwordResetNotAllowed": "Wachtwoord resetten is niet toegestaan. Neem contact op met uw beheerder voor meer informatie."
+        "passwordResetNotAllowed": "Wachtwoord resetten is niet toegestaan. Neem contact op met uw beheerder voor meer informatie.",
+        "localAuthenticationNotAllowed": "Lokale authenticatie is niet toegestaan! Neem contact op met uw beheerder voor meer informatie."
       }
     },
     "idp": {
@@ -2181,7 +2210,8 @@
           "couldNotFindSession": "Kon sessie niet vinden",
           "couldNotUpdateSession": "Kon sessie niet bijwerken",
           "userNotFound": "Gebruiker niet in het systeem gevonden",
-          "couldNotDetermineRedirect": "Kon omleidings-URL na passkey-verificatie niet bepalen"
+          "couldNotDetermineRedirect": "Kon omleidings-URL na passkey-verificatie niet bepalen",
+          "couldNotGetUser": "Kon gebruiker niet laden"
         }
       },
       "set": {
@@ -2255,7 +2285,10 @@
         "couldNotCreateSession": "Kon sessie niet aanmaken",
         "userNotFound": "Gebruiker niet in het systeem gevonden",
         "couldNotLinkIDP": "Kon IDP niet aan gebruiker koppelen",
-        "couldNotRegisterUser": "Kon gebruiker niet registreren"
+        "couldNotRegisterUser": "Kon gebruiker niet registreren",
+        "couldNotGetLoginSettings": "Kon aanmeldinstellingen niet ophalen",
+        "localAuthenticationNotAllowed": "Lokale authenticatie is niet toegestaan! Neem contact op met uw beheerder voor meer informatie.",
+        "registerNotAllowed": "Registratie is niet toegestaan"
       }
     },
     "invite": {
@@ -2315,7 +2348,9 @@
         "couldNotResendInvite": "Kon uitnodiging niet opnieuw versturen",
         "inviteSendFailed": "Versturen van uitnodigingsmail mislukt",
         "emailSendFailed": "Versturen van verificatie-e-mail mislukt",
-        "contextMissing": "Er is een fout opgetreden. Probeer het opnieuw."
+        "contextMissing": "Er is een fout opgetreden. Probeer het opnieuw.",
+        "couldNotFindSession": "Kon sessie niet vinden",
+        "couldNotUpdateSession": "Kon sessie niet bijwerken"
       }
     },
     "authenticator": {
@@ -2524,7 +2559,8 @@
         "sessionNotValid": "Sesja jest nieważna",
         "passwordVerificationMissing": "Brak weryfikacji hasła.",
         "passwordVerificationTooOld": "Weryfikacja hasła jest przestarzała. Proszę zweryfikować hasło ponownie.",
-        "passwordResetNotAllowed": "Resetowanie hasła jest niedozwolone. Skontaktuj się z administratorem, aby uzyskać więcej informacji."
+        "passwordResetNotAllowed": "Resetowanie hasła jest niedozwolone. Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+        "localAuthenticationNotAllowed": "Uwierzytelnianie lokalne nie jest dozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji."
       }
     },
     "idp": {
@@ -2655,7 +2691,8 @@
           "couldNotFindSession": "Nie można znaleźć sesji",
           "couldNotUpdateSession": "Nie można zaktualizować sesji",
           "userNotFound": "Użytkownik nie znaleziony w systemie",
-          "couldNotDetermineRedirect": "Nie można określić adresu URL przekierowania po weryfikacji klucza dostępu"
+          "couldNotDetermineRedirect": "Nie można określić adresu URL przekierowania po weryfikacji klucza dostępu",
+          "couldNotGetUser": "Nie udało się załadować użytkownika"
         }
       },
       "set": {
@@ -2729,7 +2766,10 @@
         "couldNotCreateSession": "Nie udało się utworzyć sesji",
         "userNotFound": "Nie znaleziono użytkownika w systemie",
         "couldNotLinkIDP": "Nie udało się powiązać IDP z użytkownikiem",
-        "couldNotRegisterUser": "Nie udało się zarejestrować użytkownika"
+        "couldNotRegisterUser": "Nie udało się zarejestrować użytkownika",
+        "couldNotGetLoginSettings": "Nie udało się pobrać ustawień logowania",
+        "localAuthenticationNotAllowed": "Uwierzytelnianie lokalne nie jest dozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+        "registerNotAllowed": "Rejestracja nie jest dozwolona"
       }
     },
     "invite": {
@@ -2789,7 +2829,9 @@
         "couldNotResendInvite": "Nie udało się ponownie wysłać zaproszenia",
         "inviteSendFailed": "Nie udało się wysłać wiadomości e-mail z zaproszeniem",
         "emailSendFailed": "Nie udało się wysłać wiadomości e-mail weryfikacyjnej",
-        "contextMissing": "Wystąpił błąd. Spróbuj ponownie."
+        "contextMissing": "Wystąpił błąd. Spróbuj ponownie.",
+        "couldNotFindSession": "Nie można znaleźć sesji",
+        "couldNotUpdateSession": "Nie można zaktualizować sesji"
       }
     },
     "authenticator": {
@@ -2998,7 +3040,8 @@
         "sessionNotValid": "Сессия недействительна",
         "passwordVerificationMissing": "Отсутствует проверка пароля.",
         "passwordVerificationTooOld": "Проверка пароля устарела. Пожалуйста, подтвердите пароль еще раз.",
-        "passwordResetNotAllowed": "Сброс пароля запрещен. Обратитесь к администратору за дополнительной информацией."
+        "passwordResetNotAllowed": "Сброс пароля запрещен. Обратитесь к администратору за дополнительной информацией.",
+        "localAuthenticationNotAllowed": "Локальная аутентификация запрещена! Обратитесь к администратору за дополнительной информацией."
       }
     },
     "idp": {
@@ -3129,7 +3172,8 @@
           "couldNotFindSession": "Не удалось найти сеанс",
           "couldNotUpdateSession": "Не удалось обновить сеанс",
           "userNotFound": "Пользователь не найден в системе",
-          "couldNotDetermineRedirect": "Не удалось определить URL перенаправления после проверки пасскей"
+          "couldNotDetermineRedirect": "Не удалось определить URL перенаправления после проверки пасскей",
+          "couldNotGetUser": "Не удалось загрузить пользователя"
         }
       },
       "set": {
@@ -3203,7 +3247,10 @@
         "couldNotCreateSession": "Не удалось создать сессию",
         "userNotFound": "Пользователь не найден в системе",
         "couldNotLinkIDP": "Не удалось привязать IDP к пользователю",
-        "couldNotRegisterUser": "Не удалось зарегистрировать пользователя"
+        "couldNotRegisterUser": "Не удалось зарегистрировать пользователя",
+        "couldNotGetLoginSettings": "Не удалось получить настройки входа",
+        "localAuthenticationNotAllowed": "Локальная аутентификация запрещена! Обратитесь к администратору за дополнительной информацией.",
+        "registerNotAllowed": "Регистрация запрещена"
       }
     },
     "invite": {
@@ -3263,7 +3310,9 @@
         "couldNotResendInvite": "Не удалось повторно отправить приглашение",
         "inviteSendFailed": "Не удалось отправить письмо с приглашением",
         "emailSendFailed": "Не удалось отправить письмо с подтверждением",
-        "contextMissing": "Произошла ошибка. Пожалуйста, попробуйте еще раз."
+        "contextMissing": "Произошла ошибка. Пожалуйста, попробуйте еще раз.",
+        "couldNotFindSession": "Не удалось найти сеанс",
+        "couldNotUpdateSession": "Не удалось обновить сеанс"
       }
     },
     "authenticator": {
@@ -3472,7 +3521,8 @@
         "sessionNotValid": "会话无效",
         "passwordVerificationMissing": "缺少密码验证。",
         "passwordVerificationTooOld": "密码验证已过期。请重新通过验证。",
-        "passwordResetNotAllowed": "不允许重置密码。请联系您的管理员以获取更多信息。"
+        "passwordResetNotAllowed": "不允许重置密码。请联系您的管理员以获取更多信息。",
+        "localAuthenticationNotAllowed": "不允许本地身份验证！请联系您的管理员以获取更多信息。"
       }
     },
     "idp": {
@@ -3603,7 +3653,8 @@
           "couldNotFindSession": "找不到会话",
           "couldNotUpdateSession": "无法更新会话",
           "userNotFound": "系统中未找到用户",
-          "couldNotDetermineRedirect": "密钥验证后无法确定重定向URL"
+          "couldNotDetermineRedirect": "密钥验证后无法确定重定向URL",
+          "couldNotGetUser": "无法加载用户"
         }
       },
       "set": {
@@ -3677,7 +3728,10 @@
         "couldNotCreateSession": "无法创建会话",
         "userNotFound": "系统中未找到用户",
         "couldNotLinkIDP": "无法将 IDP 关联到用户",
-        "couldNotRegisterUser": "无法注册用户"
+        "couldNotRegisterUser": "无法注册用户",
+        "couldNotGetLoginSettings": "无法获取登录设置",
+        "localAuthenticationNotAllowed": "不允许本地身份验证！请联系您的管理员以获取更多信息。",
+        "registerNotAllowed": "不允许注册"
       }
     },
     "invite": {
@@ -3737,7 +3791,9 @@
         "couldNotResendInvite": "无法重新发送邀请",
         "inviteSendFailed": "发送邀请邮件失败",
         "emailSendFailed": "发送验证邮件失败",
-        "contextMissing": "发生错误。请重试。"
+        "contextMissing": "发生错误。请重试。",
+        "couldNotFindSession": "找不到会话",
+        "couldNotUpdateSession": "无法更新会话"
       }
     },
     "authenticator": {
@@ -3946,7 +4002,8 @@
         "sessionNotValid": "Oturum geçerli değil",
         "passwordVerificationMissing": "Şifre doğrulaması eksik.",
         "passwordVerificationTooOld": "Şifre doğrulaması çok eski. Lütfen şifrenizi tekrar doğrulayın.",
-        "passwordResetNotAllowed": "Şifre sıfırlamaya izin verilmiyor. Daha fazla bilgi için yöneticinizle iletişime geçin."
+        "passwordResetNotAllowed": "Şifre sıfırlamaya izin verilmiyor. Daha fazla bilgi için yöneticinizle iletişime geçin.",
+        "localAuthenticationNotAllowed": "Yerel kimlik doğrulamasına izin verilmiyor! Daha fazla bilgi için yöneticinize başvurun."
       }
     },
     "idp": {
@@ -4077,7 +4134,8 @@
           "couldNotFindSession": "Oturum bulunamadı",
           "couldNotUpdateSession": "Oturum güncellenemedi",
           "userNotFound": "Kullanıcı sistemde bulunamadı",
-          "couldNotDetermineRedirect": "Passkey doğrulamasından sonra yönlendirme URL'si belirlenemedi"
+          "couldNotDetermineRedirect": "Passkey doğrulamasından sonra yönlendirme URL'si belirlenemedi",
+          "couldNotGetUser": "Kullanıcı yüklenemedi"
         }
       },
       "set": {
@@ -4151,7 +4209,10 @@
         "couldNotCreateSession": "Oturum oluşturulamadı",
         "userNotFound": "Kullanıcı sistemde bulunamadı",
         "couldNotLinkIDP": "IDP kullanıcıya bağlanamadı",
-        "couldNotRegisterUser": "Kullanıcı kayıt edilemedi"
+        "couldNotRegisterUser": "Kullanıcı kayıt edilemedi",
+        "couldNotGetLoginSettings": "Giriş ayarları alınamadı",
+        "localAuthenticationNotAllowed": "Yerel kimlik doğrulamasına izin verilmiyor! Daha fazla bilgi için yöneticinize başvurun.",
+        "registerNotAllowed": "Kayıt olmasına izin verilmiyor"
       }
     },
     "invite": {
@@ -4211,7 +4272,9 @@
         "couldNotResendInvite": "Davet yeniden gönderilemedi",
         "inviteSendFailed": "Davet e-postası gönderilemedi",
         "emailSendFailed": "Doğrulama e-postası gönderilemedi",
-        "contextMissing": "Bir hata oluştu. Lütfen tekrar deneyin."
+        "contextMissing": "Bir hata oluştu. Lütfen tekrar deneyin.",
+        "couldNotFindSession": "Oturum bulunamadı",
+        "couldNotUpdateSession": "Oturum güncellenemedi"
       }
     },
     "authenticator": {
@@ -4420,7 +4483,8 @@
         "sessionNotValid": "Сеанс недійсний",
         "passwordVerificationMissing": "Відсутня перевірка пароля.",
         "passwordVerificationTooOld": "Перевірка пароля застаріла. Будь ласка, перевірте пароль ще раз.",
-        "passwordResetNotAllowed": "Скидання пароля заборонено. Зверніться до адміністратора за додатковою інформацією."
+        "passwordResetNotAllowed": "Скидання пароля заборонено. Зверніться до адміністратора за додатковою інформацією.",
+        "localAuthenticationNotAllowed": "Локальна аутентифікація заборонена! Зверніться до адміністратора за додатковою інформацією."
       }
     },
     "idp": {
@@ -4551,7 +4615,8 @@
           "couldNotFindSession": "Не вдалося знайти сеанс",
           "couldNotUpdateSession": "Не вдалося оновити сеанс",
           "userNotFound": "Користувача не знайдено в системі",
-          "couldNotDetermineRedirect": "Не вдалося визначити URL перенаправлення після перевірки ключа доступу"
+          "couldNotDetermineRedirect": "Не вдалося визначити URL перенаправлення після перевірки ключа доступу",
+          "couldNotGetUser": "Не вдалося завантажити користувача"
         }
       },
       "set": {
@@ -4625,7 +4690,10 @@
         "couldNotCreateSession": "Не вдалося створити сеанс",
         "userNotFound": "Користувача не знайдено в системі",
         "couldNotLinkIDP": "Не вдалося прив'язати IDP до користувача",
-        "couldNotRegisterUser": "Не вдалося зареєструвати користувача"
+        "couldNotRegisterUser": "Не вдалося зареєструвати користувача",
+        "couldNotGetLoginSettings": "Не вдалося отримати налаштування входу",
+        "localAuthenticationNotAllowed": "Локальна аутентифікація заборонена! Зверніться до адміністратора за додатковою інформацією.",
+        "registerNotAllowed": "Реєстрація не дозволена"
       }
     },
     "invite": {
@@ -4685,7 +4753,9 @@
         "couldNotResendInvite": "Не вдалося повторно надіслати запрошення",
         "inviteSendFailed": "Не вдалося надіслати лист-запрошення",
         "emailSendFailed": "Не вдалося надіслати лист підтвердження",
-        "contextMissing": "Сталася помилка. Будь ласка, спробуйте ще раз."
+        "contextMissing": "Сталася помилка. Будь ласка, спробуйте ще раз.",
+        "couldNotFindSession": "Не вдалося знайти сеанс",
+        "couldNotUpdateSession": "Не вдалося оновити сеанс"
       }
     },
     "authenticator": {
@@ -4894,7 +4964,8 @@
         "sessionNotValid": "الجلسة غير صالحة",
         "passwordVerificationMissing": "التحقق من كلمة المرور مفقود.",
         "passwordVerificationTooOld": "التحقق من كلمة المرور قديم جدًا. يرجى التحقق من كلمة المرور مرة أخرى.",
-        "passwordResetNotAllowed": "إعادة تعيين كلمة المرور غير مسموح بها. اتصل بالمسؤول لمزيد من المعلومات."
+        "passwordResetNotAllowed": "إعادة تعيين كلمة المرور غير مسموح بها. اتصل بالمسؤول لمزيد من المعلومات.",
+        "localAuthenticationNotAllowed": "المصادقة المحلية غير مسموح بها! اتصل بالمسؤول لمزيد من المعلومات."
       }
     },
     "idp": {
@@ -5025,7 +5096,8 @@
           "couldNotFindSession": "تعذر العثور على الجلسة",
           "couldNotUpdateSession": "تعذر تحديث الجلسة",
           "userNotFound": "المستخدم غير موجود في النظام",
-          "couldNotDetermineRedirect": "تعذر تحديد عنوان URL لإعادة التوجيه بعد التحقق من مفتاح المرور"
+          "couldNotDetermineRedirect": "تعذر تحديد عنوان URL لإعادة التوجيه بعد التحقق من مفتاح المرور",
+          "couldNotGetUser": "تعذر تحميل المستخدم"
         }
       },
       "set": {
@@ -5099,7 +5171,10 @@
         "couldNotCreateSession": "تعذر إنشاء الجلسة",
         "userNotFound": "المستخدم غير موجود في النظام",
         "couldNotLinkIDP": "تعذر ربط IDP بالمستخدم",
-        "couldNotRegisterUser": "تعذر تسجيل المستخدم"
+        "couldNotRegisterUser": "تعذر تسجيل المستخدم",
+        "couldNotGetLoginSettings": "تعذر الحصول على إعدادات تسجيل الدخول",
+        "localAuthenticationNotAllowed": "المصادقة المحلية غير مسموح بها! اتصل بالمسؤول لمزيد من المعلومات.",
+        "registerNotAllowed": "التسجيل غير مسموح به"
       }
     },
     "invite": {
@@ -5159,7 +5234,9 @@
         "couldNotResendInvite": "تعذر إعادة إرسال الدعوة",
         "inviteSendFailed": "فشل إرسال بريد الدعوة الإلكتروني",
         "emailSendFailed": "فشل إرسال بريد التحقق الإلكتروني",
-        "contextMissing": "حدث خطأ. يرجى المحاولة مرة أخرى."
+        "contextMissing": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+        "couldNotFindSession": "تعذر العثور على الجلسة",
+        "couldNotUpdateSession": "تعذر تحديث الجلسة"
       }
     },
     "authenticator": {
@@ -5368,7 +5445,8 @@
         "sessionNotValid": "A munkamenet nem érvényes",
         "passwordVerificationMissing": "A jelszó hitelesítés hiányzik.",
         "passwordVerificationTooOld": "A jelszó hitelesítés túl régi. Kérjük, erősítsd meg újra a jelszavadat.",
-        "passwordResetNotAllowed": "A jelszó-visszaállítás nem engedélyezett. További információért fordulj a rendszergazdához."
+        "passwordResetNotAllowed": "A jelszó-visszaállítás nem engedélyezett. További információért fordulj a rendszergazdához.",
+        "localAuthenticationNotAllowed": "A helyi hitelesítés nem engedélyezett! További információért fordulj a rendszergazdához."
       }
     },
     "idp": {
@@ -5499,7 +5577,8 @@
           "couldNotFindSession": "Nem található munkamenet",
           "couldNotUpdateSession": "Nem sikerült frissíteni a munkamenetet",
           "userNotFound": "A felhasználó nem található a rendszerben",
-          "couldNotDetermineRedirect": "Nem sikerült meghatározni az átirányítási címet a jelkulcs ellenőrzése után"
+          "couldNotDetermineRedirect": "Nem sikerült meghatározni az átirányítási címet a jelkulcs ellenőrzése után",
+          "couldNotGetUser": "Nem sikerült betölteni a felhasználót"
         }
       },
       "set": {
@@ -5573,7 +5652,10 @@
         "couldNotCreateSession": "Nem sikerült létrehozni a munkamenetet",
         "userNotFound": "A felhasználó nem található a rendszerben",
         "couldNotLinkIDP": "Nem sikerült összekapcsolni az azonosítószolgáltatót a felhasználóval",
-        "couldNotRegisterUser": "Nem sikerült regisztrálni a felhasználót"
+        "couldNotRegisterUser": "Nem sikerült regisztrálni a felhasználót",
+        "couldNotGetLoginSettings": "Nem sikerült lekérni a bejelentkezési beállításokat",
+        "localAuthenticationNotAllowed": "A helyi hitelesítés nem engedélyezett! További információért fordulj a rendszergazdához.",
+        "registerNotAllowed": "A regisztráció nem engedélyezett"
       }
     },
     "invite": {
@@ -5633,7 +5715,9 @@
         "couldNotResendInvite": "Nem sikerült újraküldeni a meghívást",
         "inviteSendFailed": "Nem sikerült elküldeni a meghívó e-mailt",
         "emailSendFailed": "Nem sikerült elküldeni az ellenőrző e-mailt",
-        "contextMissing": "Hiba történt. Kérjük, próbáld újra."
+        "contextMissing": "Hiba történt. Kérjük, próbáld újra.",
+        "couldNotFindSession": "Nem található munkamenet",
+        "couldNotUpdateSession": "Nem sikerült frissíteni a munkamenetet"
       }
     },
     "authenticator": {
@@ -5842,7 +5926,8 @@
         "sessionNotValid": "La session n'est pas valide",
         "passwordVerificationMissing": "La vérification du mot de passe est manquante.",
         "passwordVerificationTooOld": "La vérification du mot de passe est trop ancienne. Veuillez vérifier à nouveau votre mot de passe.",
-        "passwordResetNotAllowed": "La réinitialisation du mot de passe n'est pas autorisée. Contactez votre administrateur pour plus d'informations."
+        "passwordResetNotAllowed": "La réinitialisation du mot de passe n'est pas autorisée. Contactez votre administrateur pour plus d'informations.",
+        "localAuthenticationNotAllowed": "L'authentification locale n'est pas autorisée ! Contactez votre administrateur pour plus d'informations."
       }
     },
     "idp": {
@@ -5973,7 +6058,8 @@
           "couldNotFindSession": "Session introuvable",
           "couldNotUpdateSession": "Impossible de mettre à jour la session",
           "userNotFound": "Utilisateur introuvable dans le système",
-          "couldNotDetermineRedirect": "Impossible de déterminer l'URL de redirection après la vérification de la clé d'accès"
+          "couldNotDetermineRedirect": "Impossible de déterminer l'URL de redirection après la vérification de la clé d'accès",
+          "couldNotGetUser": "Impossible de charger l'utilisateur"
         }
       },
       "set": {
@@ -6047,7 +6133,10 @@
         "couldNotCreateSession": "Impossible de créer la session",
         "userNotFound": "Utilisateur non trouvé dans le système",
         "couldNotLinkIDP": "Impossible de lier le fournisseur d'identité à l'utilisateur",
-        "couldNotRegisterUser": "Impossible d'inscrire l'utilisateur"
+        "couldNotRegisterUser": "Impossible d'inscrire l'utilisateur",
+        "couldNotGetLoginSettings": "Impossible d'obtenir les paramètres de connexion",
+        "localAuthenticationNotAllowed": "L'authentification locale n'est pas autorisée ! Contactez votre administrateur pour plus d'informations.",
+        "registerNotAllowed": "L'enregistrement n'est pas autorisé"
       }
     },
     "invite": {
@@ -6107,7 +6196,9 @@
         "couldNotResendInvite": "Impossible de renvoyer l'invitation",
         "inviteSendFailed": "Échec de l'envoi de l'e-mail d'invitation",
         "emailSendFailed": "Échec de l'envoi de l'e-mail de vérification",
-        "contextMissing": "Une erreur s'est produite. Veuillez réessayer."
+        "contextMissing": "Une erreur s'est produite. Veuillez réessayer.",
+        "couldNotFindSession": "Session introuvable",
+        "couldNotUpdateSession": "Impossible de mettre à jour la session"
       }
     },
     "authenticator": {
@@ -6316,7 +6407,8 @@
         "sessionNotValid": "セッションが無効です",
         "passwordVerificationMissing": "パスワード確認がありません。",
         "passwordVerificationTooOld": "パスワード確認が古すぎます。もう一度パスワードを確認してください。",
-        "passwordResetNotAllowed": "パスワードのリセットは許可されていません。詳細については管理者に問い合わせてください。"
+        "passwordResetNotAllowed": "パスワードのリセットは許可されていません。詳細については管理者に問い合わせてください。",
+        "localAuthenticationNotAllowed": "ローカル認証は許可されていません！ 詳細については管理者に問い合わせてください。"
       }
     },
     "idp": {
@@ -6447,7 +6539,8 @@
           "couldNotFindSession": "セッションが見つかりませんでした",
           "couldNotUpdateSession": "セッションを更新できませんでした",
           "userNotFound": "ユーザーがシステムに見つかりません",
-          "couldNotDetermineRedirect": "パスキー確認後のリダイレクトURLを決定できませんでした"
+          "couldNotDetermineRedirect": "パスキー確認後のリダイレクトURLを決定できませんでした",
+          "couldNotGetUser": "ユーザーを読み込めませんでした"
         }
       },
       "set": {
@@ -6521,7 +6614,10 @@
         "couldNotCreateSession": "セッションを作成できませんでした",
         "userNotFound": "ユーザーがシステムに見つかりません",
         "couldNotLinkIDP": "IDPをユーザーにリンクできませんでした",
-        "couldNotRegisterUser": "ユーザーを登録できませんでした"
+        "couldNotRegisterUser": "ユーザーを登録できませんでした",
+        "couldNotGetLoginSettings": "ログイン設定を取得できませんでした",
+        "localAuthenticationNotAllowed": "ローカル認証は許可されていません！ 詳細については管理者に問い合わせてください。",
+        "registerNotAllowed": "新規登録は許可されていません"
       }
     },
     "invite": {
@@ -6581,7 +6677,9 @@
         "couldNotResendInvite": "招待を再送信できませんでした",
         "inviteSendFailed": "招待メールの送信に失敗しました",
         "emailSendFailed": "確認メールの送信に失敗しました",
-        "contextMissing": "エラーが発生しました。もう一度お試しください。"
+        "contextMissing": "エラーが発生しました。もう一度お試しください。",
+        "couldNotFindSession": "セッションが見つかりませんでした",
+        "couldNotUpdateSession": "セッションを更新できませんでした"
       }
     },
     "authenticator": {
@@ -6790,7 +6888,8 @@
         "sessionNotValid": "A sessão não é válida",
         "passwordVerificationMissing": "A verificação de senha está ausente.",
         "passwordVerificationTooOld": "A verificação de senha expirou. Por favor, verifique sua senha novamente.",
-        "passwordResetNotAllowed": "A redefinição de senha não é permitida. Entre em contato com o administrador para mais informações."
+        "passwordResetNotAllowed": "A redefinição de senha não é permitida. Entre em contato com o administrador para mais informações.",
+        "localAuthenticationNotAllowed": "A autenticação local não é permitida! Entre em contato com o administrador para mais informações."
       }
     },
     "idp": {
@@ -6921,7 +7020,8 @@
           "couldNotFindSession": "Não foi possível encontrar a sessão",
           "couldNotUpdateSession": "Não foi possível atualizar a sessão",
           "userNotFound": "Usuário não encontrado no sistema",
-          "couldNotDetermineRedirect": "Não foi possível determinar a URL de redirecionamento após verificação da chave de acesso"
+          "couldNotDetermineRedirect": "Não foi possível determinar a URL de redirecionamento após verificação da chave de acesso",
+          "couldNotGetUser": "Não foi possível carregar o usuário"
         }
       },
       "set": {
@@ -6995,7 +7095,10 @@
         "couldNotCreateSession": "Não foi possível criar a sessão",
         "userNotFound": "Usuário não encontrado no sistema",
         "couldNotLinkIDP": "Não foi possível vincular o provedor de identidade ao usuário",
-        "couldNotRegisterUser": "Não foi possível cadastrar o usuário"
+        "couldNotRegisterUser": "Não foi possível cadastrar o usuário",
+        "couldNotGetLoginSettings": "Não foi possível obter as configurações de login",
+        "localAuthenticationNotAllowed": "A autenticação local não é permitida! Entre em contato com o administrador para mais informações.",
+        "registerNotAllowed": "O registro não é permitido"
       }
     },
     "invite": {
@@ -7055,7 +7158,9 @@
         "couldNotResendInvite": "Não foi possível reenviar o convite",
         "inviteSendFailed": "Falha ao enviar e-mail de convite",
         "emailSendFailed": "Falha ao enviar e-mail de verificação",
-        "contextMissing": "Ocorreu um erro. Por favor, tente novamente."
+        "contextMissing": "Ocorreu um erro. Por favor, tente novamente.",
+        "couldNotFindSession": "Não foi possível encontrar a sessão",
+        "couldNotUpdateSession": "Não foi possível atualizar a sessão"
       }
     },
     "authenticator": {
