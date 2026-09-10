@@ -78,6 +78,11 @@
       "cache": true,
       "inputs": ["default"]
     },
+    "lint-check-i18n": {
+      "description": "Checks the translation files in locales/ for errors with eloqnt/cli",
+      "cache": true,
+      "inputs": ["default"]
+    },
     "lint-check-next": {
       "description": "Runs Next.js specific lint checks",
       "cache": true,

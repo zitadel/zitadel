@@ -153,7 +153,8 @@
       "sessionNotValid": "La sessione non è valida",
       "passwordVerificationMissing": "Manca la verifica della password.",
       "passwordVerificationTooOld": "La verifica della password è troppo vecchia. Si prega di verificare nuovamente la password.",
-      "passwordResetNotAllowed": "Il ripristino della password non è consentito. Contatta il tuo amministratore per ulteriori informazioni."
+      "passwordResetNotAllowed": "Il ripristino della password non è consentito. Contatta il tuo amministratore per ulteriori informazioni.",
+      "localAuthenticationNotAllowed": "L'autenticazione locale non è consentita! Contatta il tuo amministratore per ulteriori informazioni."
     }
   },
   "idp": {
@@ -285,7 +286,8 @@
         "couldNotFindSession": "Impossibile trovare la sessione",
         "couldNotUpdateSession": "Impossibile aggiornare la sessione",
         "userNotFound": "Utente non trovato nel sistema",
-        "couldNotDetermineRedirect": "Impossibile determinare l'URL di reindirizzamento dopo la verifica passkey"
+        "couldNotDetermineRedirect": "Impossibile determinare l'URL di reindirizzamento dopo la verifica passkey",
+        "couldNotGetUser": "Impossibile caricare l'utente"
       }
     },
     "set": {
@@ -359,7 +361,10 @@
       "couldNotCreateSession": "Impossibile creare la sessione",
       "userNotFound": "Utente non trovato nel sistema",
       "couldNotLinkIDP": "Impossibile collegare l'IDP all'utente",
-      "couldNotRegisterUser": "Impossibile registrare l'utente"
+      "couldNotRegisterUser": "Impossibile registrare l'utente",
+      "couldNotGetLoginSettings": "Impossibile ottenere le impostazioni di accesso",
+      "localAuthenticationNotAllowed": "L'autenticazione locale non è consentita! Contatta il tuo amministratore per ulteriori informazioni.",
+      "registerNotAllowed": "La registrazione non è consentita"
     }
   },
   "invite": {
@@ -419,7 +424,9 @@
       "couldNotResendInvite": "Impossibile reinviare l'invito",
       "inviteSendFailed": "Impossibile inviare l'email di invito",
       "emailSendFailed": "Impossibile inviare l'email di verifica",
-      "contextMissing": "Si è verificato un errore. Riprova."
+      "contextMissing": "Si è verificato un errore. Riprova.",
+      "couldNotFindSession": "Impossibile trovare la sessione",
+      "couldNotUpdateSession": "Impossibile aggiornare la sessione"
     }
   },
   "authenticator": {

@@ -153,7 +153,8 @@
       "sessionNotValid": "Sessie is niet geldig",
       "passwordVerificationMissing": "Wachtwoordverificatie ontbreekt.",
       "passwordVerificationTooOld": "Wachtwoordverificatie is te oud. Verifieer je wachtwoord opnieuw.",
-      "passwordResetNotAllowed": "Wachtwoord resetten is niet toegestaan. Neem contact op met uw beheerder voor meer informatie."
+      "passwordResetNotAllowed": "Wachtwoord resetten is niet toegestaan. Neem contact op met uw beheerder voor meer informatie.",
+      "localAuthenticationNotAllowed": "Lokale authenticatie is niet toegestaan! Neem contact op met uw beheerder voor meer informatie."
     }
   },
   "idp": {
@@ -285,7 +286,8 @@
         "couldNotFindSession": "Kon sessie niet vinden",
         "couldNotUpdateSession": "Kon sessie niet bijwerken",
         "userNotFound": "Gebruiker niet in het systeem gevonden",
-        "couldNotDetermineRedirect": "Kon omleidings-URL na passkey-verificatie niet bepalen"
+        "couldNotDetermineRedirect": "Kon omleidings-URL na passkey-verificatie niet bepalen",
+        "couldNotGetUser": "Kon gebruiker niet laden"
       }
     },
     "set": {
@@ -359,7 +361,10 @@
       "couldNotCreateSession": "Kon sessie niet aanmaken",
       "userNotFound": "Gebruiker niet in het systeem gevonden",
       "couldNotLinkIDP": "Kon IDP niet aan gebruiker koppelen",
-      "couldNotRegisterUser": "Kon gebruiker niet registreren"
+      "couldNotRegisterUser": "Kon gebruiker niet registreren",
+      "couldNotGetLoginSettings": "Kon aanmeldinstellingen niet ophalen",
+      "localAuthenticationNotAllowed": "Lokale authenticatie is niet toegestaan! Neem contact op met uw beheerder voor meer informatie.",
+      "registerNotAllowed": "Registratie is niet toegestaan"
     }
   },
   "invite": {
@@ -419,7 +424,9 @@
       "couldNotResendInvite": "Kon uitnodiging niet opnieuw versturen",
       "inviteSendFailed": "Versturen van uitnodigingsmail mislukt",
       "emailSendFailed": "Versturen van verificatie-e-mail mislukt",
-      "contextMissing": "Er is een fout opgetreden. Probeer het opnieuw."
+      "contextMissing": "Er is een fout opgetreden. Probeer het opnieuw.",
+      "couldNotFindSession": "Kon sessie niet vinden",
+      "couldNotUpdateSession": "Kon sessie niet bijwerken"
     }
   },
   "authenticator": {

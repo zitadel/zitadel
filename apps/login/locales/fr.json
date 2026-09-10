@@ -153,7 +153,8 @@
       "sessionNotValid": "La session n'est pas valide",
       "passwordVerificationMissing": "La vérification du mot de passe est manquante.",
       "passwordVerificationTooOld": "La vérification du mot de passe est trop ancienne. Veuillez vérifier à nouveau votre mot de passe.",
-      "passwordResetNotAllowed": "La réinitialisation du mot de passe n'est pas autorisée. Contactez votre administrateur pour plus d'informations."
+      "passwordResetNotAllowed": "La réinitialisation du mot de passe n'est pas autorisée. Contactez votre administrateur pour plus d'informations.",
+      "localAuthenticationNotAllowed": "L'authentification locale n'est pas autorisée ! Contactez votre administrateur pour plus d'informations."
     }
   },
   "idp": {
@@ -285,7 +286,8 @@
         "couldNotFindSession": "Session introuvable",
         "couldNotUpdateSession": "Impossible de mettre à jour la session",
         "userNotFound": "Utilisateur introuvable dans le système",
-        "couldNotDetermineRedirect": "Impossible de déterminer l'URL de redirection après la vérification de la clé d'accès"
+        "couldNotDetermineRedirect": "Impossible de déterminer l'URL de redirection après la vérification de la clé d'accès",
+        "couldNotGetUser": "Impossible de charger l'utilisateur"
       }
     },
     "set": {
@@ -359,7 +361,10 @@
       "couldNotCreateSession": "Impossible de créer la session",
       "userNotFound": "Utilisateur non trouvé dans le système",
       "couldNotLinkIDP": "Impossible de lier le fournisseur d'identité à l'utilisateur",
-      "couldNotRegisterUser": "Impossible d'inscrire l'utilisateur"
+      "couldNotRegisterUser": "Impossible d'inscrire l'utilisateur",
+      "couldNotGetLoginSettings": "Impossible d'obtenir les paramètres de connexion",
+      "localAuthenticationNotAllowed": "L'authentification locale n'est pas autorisée ! Contactez votre administrateur pour plus d'informations.",
+      "registerNotAllowed": "L'enregistrement n'est pas autorisé"
     }
   },
   "invite": {
@@ -419,7 +424,9 @@
       "couldNotResendInvite": "Impossible de renvoyer l'invitation",
       "inviteSendFailed": "Échec de l'envoi de l'e-mail d'invitation",
       "emailSendFailed": "Échec de l'envoi de l'e-mail de vérification",
-      "contextMissing": "Une erreur s'est produite. Veuillez réessayer."
+      "contextMissing": "Une erreur s'est produite. Veuillez réessayer.",
+      "couldNotFindSession": "Session introuvable",
+      "couldNotUpdateSession": "Impossible de mettre à jour la session"
     }
   },
   "authenticator": {

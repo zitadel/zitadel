@@ -153,7 +153,8 @@
       "sessionNotValid": "Oturum geçerli değil",
       "passwordVerificationMissing": "Şifre doğrulaması eksik.",
       "passwordVerificationTooOld": "Şifre doğrulaması çok eski. Lütfen şifrenizi tekrar doğrulayın.",
-      "passwordResetNotAllowed": "Şifre sıfırlamaya izin verilmiyor. Daha fazla bilgi için yöneticinizle iletişime geçin."
+      "passwordResetNotAllowed": "Şifre sıfırlamaya izin verilmiyor. Daha fazla bilgi için yöneticinizle iletişime geçin.",
+      "localAuthenticationNotAllowed": "Yerel kimlik doğrulamasına izin verilmiyor! Daha fazla bilgi için yöneticinize başvurun."
     }
   },
   "idp": {
@@ -285,7 +286,8 @@
         "couldNotFindSession": "Oturum bulunamadı",
         "couldNotUpdateSession": "Oturum güncellenemedi",
         "userNotFound": "Kullanıcı sistemde bulunamadı",
-        "couldNotDetermineRedirect": "Passkey doğrulamasından sonra yönlendirme URL'si belirlenemedi"
+        "couldNotDetermineRedirect": "Passkey doğrulamasından sonra yönlendirme URL'si belirlenemedi",
+        "couldNotGetUser": "Kullanıcı yüklenemedi"
       }
     },
     "set": {
@@ -359,7 +361,10 @@
       "couldNotCreateSession": "Oturum oluşturulamadı",
       "userNotFound": "Kullanıcı sistemde bulunamadı",
       "couldNotLinkIDP": "IDP kullanıcıya bağlanamadı",
-      "couldNotRegisterUser": "Kullanıcı kayıt edilemedi"
+      "couldNotRegisterUser": "Kullanıcı kayıt edilemedi",
+      "couldNotGetLoginSettings": "Giriş ayarları alınamadı",
+      "localAuthenticationNotAllowed": "Yerel kimlik doğrulamasına izin verilmiyor! Daha fazla bilgi için yöneticinize başvurun.",
+      "registerNotAllowed": "Kayıt olmasına izin verilmiyor"
     }
   },
   "invite": {
@@ -419,7 +424,9 @@
       "couldNotResendInvite": "Davet yeniden gönderilemedi",
       "contextMissing": "Bir hata oluştu. Lütfen tekrar deneyin.",
       "inviteSendFailed": "Davet e-postası gönderilemedi",
-      "emailSendFailed": "Doğrulama e-postası gönderilemedi"
+      "emailSendFailed": "Doğrulama e-postası gönderilemedi",
+      "couldNotFindSession": "Oturum bulunamadı",
+      "couldNotUpdateSession": "Oturum güncellenemedi"
     }
   },
   "authenticator": {

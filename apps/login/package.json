@@ -10,6 +10,7 @@
     "prod": "cd ./.next/standalone && HOSTNAME=127.0.0.1 ./entrypoint.sh node apps/login/server.js",
     "lint-check-next": "eslint .",
     "lint-check-prettier": "prettier --check .",
+    "lint-check-i18n": "eloqnt lint",
     "lint-fix": "prettier --write .",
     "test-unit": "vitest --run",
     "test-dockerized": "vitest --run --config vitest.config.dockerized.ts",
@@ -59,6 +60,7 @@
     "winston": "^3.19.0"
   },
   "devDependencies": {
+    "@eloqnt/cli": "^0.6.29",
     "@eslint/js": "^10.0.1",
     "@faker-js/faker": "^9.9.0",
     "@next/eslint-plugin-next": "16.2.11",

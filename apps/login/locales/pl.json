@@ -153,7 +153,8 @@
       "sessionNotValid": "Sesja jest nieważna",
       "passwordVerificationMissing": "Brak weryfikacji hasła.",
       "passwordVerificationTooOld": "Weryfikacja hasła jest przestarzała. Proszę zweryfikować hasło ponownie.",
-      "passwordResetNotAllowed": "Resetowanie hasła jest niedozwolone. Skontaktuj się z administratorem, aby uzyskać więcej informacji."
+      "passwordResetNotAllowed": "Resetowanie hasła jest niedozwolone. Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+      "localAuthenticationNotAllowed": "Uwierzytelnianie lokalne nie jest dozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji."
     }
   },
   "idp": {
@@ -285,7 +286,8 @@
         "couldNotFindSession": "Nie można znaleźć sesji",
         "couldNotUpdateSession": "Nie można zaktualizować sesji",
         "userNotFound": "Użytkownik nie znaleziony w systemie",
-        "couldNotDetermineRedirect": "Nie można określić adresu URL przekierowania po weryfikacji klucza dostępu"
+        "couldNotDetermineRedirect": "Nie można określić adresu URL przekierowania po weryfikacji klucza dostępu",
+        "couldNotGetUser": "Nie udało się załadować użytkownika"
       }
     },
     "set": {
@@ -359,7 +361,10 @@
       "couldNotCreateSession": "Nie udało się utworzyć sesji",
       "userNotFound": "Nie znaleziono użytkownika w systemie",
       "couldNotLinkIDP": "Nie udało się powiązać IDP z użytkownikiem",
-      "couldNotRegisterUser": "Nie udało się zarejestrować użytkownika"
+      "couldNotRegisterUser": "Nie udało się zarejestrować użytkownika",
+      "couldNotGetLoginSettings": "Nie udało się pobrać ustawień logowania",
+      "localAuthenticationNotAllowed": "Uwierzytelnianie lokalne nie jest dozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+      "registerNotAllowed": "Rejestracja nie jest dozwolona"
     }
   },
   "invite": {
@@ -419,7 +424,9 @@
       "couldNotResendInvite": "Nie udało się ponownie wysłać zaproszenia",
       "inviteSendFailed": "Nie udało się wysłać wiadomości e-mail z zaproszeniem",
       "emailSendFailed": "Nie udało się wysłać wiadomości e-mail weryfikacyjnej",
-      "contextMissing": "Wystąpił błąd. Spróbuj ponownie."
+      "contextMissing": "Wystąpił błąd. Spróbuj ponownie.",
+      "couldNotFindSession": "Nie można znaleźć sesji",
+      "couldNotUpdateSession": "Nie można zaktualizować sesji"
     }
   },
   "authenticator": {
@@ -452,7 +459,7 @@
     "request": {
       "title": "{appName} chce się połączyć:",
       "description": "{appName} będzie miało dostęp do:",
-      "disclaimer": "Klikając Zezwól, pozwalasz tej aplikacji i Zitadel na korzystanie z Twoich informacji zgodnie z ich odpowiednimi warunkami użytkowania i politykami prywatności. Możesz cofnąć ten dostęp w dowolnym momencie.",
+      "disclaimer": "Klikając Zezwól, pozwalasz aplikacji {appName} i Zitadel na korzystanie z Twoich informacji zgodnie z ich odpowiednimi warunkami użytkowania i politykami prywatności. Możesz cofnąć ten dostęp w dowolnym momencie.",
       "submit": "Zezwól",
       "deny": "Odmów"
     },

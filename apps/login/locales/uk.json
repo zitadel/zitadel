@@ -153,7 +153,8 @@
       "sessionNotValid": "Сеанс недійсний",
       "passwordVerificationMissing": "Відсутня перевірка пароля.",
       "passwordVerificationTooOld": "Перевірка пароля застаріла. Будь ласка, перевірте пароль ще раз.",
-      "passwordResetNotAllowed": "Скидання пароля заборонено. Зверніться до адміністратора за додатковою інформацією."
+      "passwordResetNotAllowed": "Скидання пароля заборонено. Зверніться до адміністратора за додатковою інформацією.",
+      "localAuthenticationNotAllowed": "Локальна аутентифікація заборонена! Зверніться до адміністратора за додатковою інформацією."
     }
   },
   "idp": {
@@ -285,7 +286,8 @@
         "couldNotFindSession": "Не вдалося знайти сеанс",
         "couldNotUpdateSession": "Не вдалося оновити сеанс",
         "userNotFound": "Користувача не знайдено в системі",
-        "couldNotDetermineRedirect": "Не вдалося визначити URL перенаправлення після перевірки ключа доступу"
+        "couldNotDetermineRedirect": "Не вдалося визначити URL перенаправлення після перевірки ключа доступу",
+        "couldNotGetUser": "Не вдалося завантажити користувача"
       }
     },
     "set": {
@@ -359,7 +361,10 @@
       "couldNotCreateSession": "Не вдалося створити сеанс",
       "userNotFound": "Користувача не знайдено в системі",
       "couldNotLinkIDP": "Не вдалося прив'язати IDP до користувача",
-      "couldNotRegisterUser": "Не вдалося зареєструвати користувача"
+      "couldNotRegisterUser": "Не вдалося зареєструвати користувача",
+      "couldNotGetLoginSettings": "Не вдалося отримати налаштування входу",
+      "localAuthenticationNotAllowed": "Локальна аутентифікація заборонена! Зверніться до адміністратора за додатковою інформацією.",
+      "registerNotAllowed": "Реєстрація не дозволена"
     }
   },
   "invite": {
@@ -419,7 +424,9 @@
       "couldNotResendInvite": "Не вдалося повторно надіслати запрошення",
       "inviteSendFailed": "Не вдалося надіслати лист-запрошення",
       "emailSendFailed": "Не вдалося надіслати лист підтвердження",
-      "contextMissing": "Сталася помилка. Будь ласка, спробуйте ще раз."
+      "contextMissing": "Сталася помилка. Будь ласка, спробуйте ще раз.",
+      "couldNotFindSession": "Не вдалося знайти сеанс",
+      "couldNotUpdateSession": "Не вдалося оновити сеанс"
     }
   },
   "authenticator": {

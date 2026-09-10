@@ -18,6 +18,7 @@ export default [
       "integration/**",
       "vitest.config*.ts",
       "next-env.d.ts",
+      ".eloqnt/**",
     ],
   },
   js.configs.recommended,
