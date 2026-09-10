@@ -41,16 +41,16 @@
       "couldNotGetLoginSettings": "Kunne ikke hente loginindstillinger",
       "couldNotSearchUsers": "Kunne ikke søge efter brugere",
       "couldNotGetDomain": "Kunne ikke hente domæne",
-      "couldNotGetHost": "Kunne ikke hente værtsnavn",
+      "couldNotGetHost": "Kunne ikke hente vært",
       "couldNotStartIDPFlow": "Kunne ikke starte IDP-flow",
       "moreThanOneUserFound": "Flere brugere fundet. Angiv en entydig identifikator.",
       "userNotFound": "Brugeren blev ikke fundet i systemet",
       "couldNotCreateSession": "Kunne ikke oprette session for brugeren",
       "initialUserNotSupported": "Brugere med status Initial understøttes ikke",
-      "localAuthenticationNotAllowed": "Lokal autentificering er ikke tilladt! Kontakt din administrator for mere information.",
-      "passkeysNotAllowed": "Adgangsnøgler er ikke tilladt! Kontakt din administrator for mere information.",
+      "localAuthenticationNotAllowed": "Lokal autentificering er ikke tilladt! Kontakt din administrator for at få flere oplysninger.",
+      "passkeysNotAllowed": "Adgangsnøgler er ikke tilladt! Kontakt din administrator for at få flere oplysninger.",
       "couldNotFindIdentityProvider": "Kunne ikke finde identitetsudbyder.",
-      "userNotActive": "Brugeren er ikke aktiv. Kontakt din administrator for mere information."
+      "userNotActive": "Brugeren er ikke aktiv. Kontakt din administrator for at få flere oplysninger."
     }
   },
   "zitadel": {
@@ -98,7 +98,7 @@
         "confirmPassword": "Dette felt er påkrævet"
       },
       "errors": {
-        "couldNotSetPassword": "Kunne ikke angive adgangskode",
+        "couldNotSetPassword": "Kunne ikke gemme adgangskoden",
         "couldNotResetPassword": "Kunne ikke nulstille adgangskode",
         "couldNotVerifyPassword": "Kunne ikke verificere adgangskode"
       }
@@ -126,7 +126,7 @@
     },
     "complexity": {
       "length": "Skal være mindst {minLength} tegn lang.",
-      "hasSymbol": "Skal indeholde et symbol.",
+      "hasSymbol": "Skal indeholde et specialtegn.",
       "hasNumber": "Skal indeholde et tal.",
       "hasUppercase": "Skal indeholde et stort bogstav.",
       "hasLowercase": "Skal indeholde et lille bogstav.",
@@ -152,8 +152,8 @@
       "failedPrecondition": "Forudsætning ikke opfyldt",
       "sessionNotValid": "Sessionen er ikke gyldig",
       "passwordVerificationMissing": "Verificering af adgangskode mangler.",
-      "passwordVerificationTooOld": "Verificering af adgangskode er for gammel. Verificer venligst din adgangskode igen.",
-      "passwordResetNotAllowed": "Nulstilling af adgangskode er ikke tilladt. Kontakt din administrator for mere information."
+      "passwordVerificationTooOld": "Verificering af adgangskode er for gammel. Verificer din adgangskode igen.",
+      "passwordResetNotAllowed": "Nulstilling af adgangskode er ikke tilladt. Kontakt din administrator for at få flere oplysninger."
     }
   },
   "idp": {
@@ -187,7 +187,7 @@
     "registrationFailed": {
       "title": "Registrering ikke tilgængelig",
       "description": "Vi kunne ikke fuldføre registreringsprocessen.",
-      "info": "Kunne ikke bestemme organisationen til registrering. Kontakt din administrator for hjælp.",
+      "info": "Kunne ikke fastslå organisationen til registrering. Kontakt din administrator for at få hjælp.",
       "backToLogin": "Tilbage til login"
     },
     "processing": {
@@ -225,18 +225,18 @@
     "verify": {
       "title": "Bekræft din identitet",
       "description": "Vælg en af følgende faktorer.",
-      "noResults": "Ingen yderligere faktorer kan konfigureres."
+      "noResults": "Ingen yderligere faktorer tilgængelige."
     },
     "set": {
-      "title": "Konfigurer tofaktorgodkendelse",
-      "description": "Vælg en af følgende yderligere faktorer.",
+      "title": "Konfigurer totrinsbekræftelse",
+      "description": "Vælg en af følgende faktorer.",
       "skip": "Spring over"
     }
   },
   "otp": {
     "verify": {
-      "title": "Bekræft med anden faktor",
-      "totpDescription": "Indtast koden fra din TOTP-app.",
+      "title": "Totrinsbekræftelse",
+      "totpDescription": "Indtast koden fra din authenticator-app.",
       "smsDescription": "Indtast koden, du har modtaget via SMS.",
       "emailDescription": "Indtast koden, du har modtaget via e-mail.",
       "noCodeReceived": "Modtog du ikke en kode?",
@@ -250,8 +250,8 @@
       }
     },
     "set": {
-      "title": "Konfigurer tofaktorgodkendelse",
-      "totpDescription": "Scan QR-koden med din TOTP-app.",
+      "title": "Konfigurer totrinsbekræftelse",
+      "totpDescription": "Scan QR-koden med din authenticator-app.",
       "smsDescription": "Indtast dit telefonnummer for at modtage en kode via SMS.",
       "emailDescription": "Indtast din e-mailadresse for at modtage en kode via e-mail.",
       "totpRegisterDescription": "Scan QR-koden, eller åbn URL'en manuelt.",
@@ -301,11 +301,11 @@
   },
   "u2f": {
     "verify": {
-      "title": "Bekræft med anden faktor",
+      "title": "Totrinsbekræftelse",
       "description": "Bekræft din konto med din enhed."
     },
     "set": {
-      "title": "Konfigurer tofaktorgodkendelse",
+      "title": "Konfigurer totrinsbekræftelse",
       "description": "Konfigurer en enhed som anden faktor.",
       "submit": "Fortsæt"
     }
@@ -327,7 +327,7 @@
     "description": "Opret din Zitadel-konto.",
     "noMethodAvailableWarning": "Ingen autentificeringsmetode tilgængelig. Kontakt venligst din administrator.",
     "selectMethod": "Vælg den metode, du vil bruge til autentificering",
-    "agreeTo": "For at registrere dig skal du acceptere vilkårene og betingelserne",
+    "agreeTo": "For at registrere dig skal du acceptere brugsvilkårene",
     "termsOfService": "Brugsvilkår",
     "privacyPolicy": "Privatlivspolitik",
     "submit": "Fortsæt",
@@ -427,13 +427,13 @@
     "description": "Vælg den metode, du vil bruge til autentificering",
     "noMethodsAvailable": "Ingen autentificeringsmetoder tilgængelige",
     "allSetup": "Du har allerede konfigureret en autentificeringsmetode!",
-    "linkWithIDP": "eller tilknyt med en identitetsudbyder",
+    "linkWithIDP": "eller tilknyt en identitetsudbyder",
     "methods": {
-      "totp": "TOTP-app",
-      "u2f": "Universal Second Factor",
-      "otpEmail": "OTP via e-mail",
-      "otpSms": "OTP via SMS",
-      "passkey": "Adgangsnøgle",
+      "totp": "Authenticator-app",
+      "u2f": "Sikkerhedsnøgle (U2F)",
+      "otpEmail": "Kode via e-mail",
+      "otpSms": "Kode via SMS",
+      "passkey": "Adgangsnøgler",
       "password": "Adgangskode"
     }
   },
