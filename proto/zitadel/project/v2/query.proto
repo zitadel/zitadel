@@ -146,7 +146,7 @@ message ProjectSearchFilter {
     ProjectOrganizationIDFilter organization_id_filter = 3;
 
     // Filter the projects by their state.
-    ProjectState state_filter = 4;
+    ProjectState state_filter = 4 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
   }
 }
 
