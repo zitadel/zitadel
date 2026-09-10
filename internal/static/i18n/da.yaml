@@ -30,7 +30,7 @@ Errors:
   Limit:
     ExceedsDefault: "Grænsen overskrider standardgrænsen"
   Limits:
-    NotFound: "Grænser mangler"
+    NotFound: "Grænser blev ikke fundet"
     NoneSpecified: "Ingen grænser angivet"
     Instance:
       Blocked: "Instansen er blokeret"
@@ -58,12 +58,12 @@ Errors:
   SMTP:
     NotEmailMessage: "meddelelsen er ikke EmailMessage"
     RequiredAttributes: "Emne, modtagere og indhold skal angives, men nogle eller alle er tomme"
-    CouldNotSplit: "kunne ikke opdele vært og port til forbindelse til smtp"
+    CouldNotSplit: "kunne ikke opdele vært og port for SMTP-forbindelsen"
     CouldNotDial: "kunne ikke kontakte SMTP-serveren, tjek porten, firewallproblemer..."
     CouldNotDialTLS: "kunne ikke kontakte SMTP-serveren med TLS, tjek porten, firewallproblemer..."
     CouldNotCreateClient: "kunne ikke oprette smtp-klient"
     CouldNotStartTLS: "kunne ikke starte tls"
-    CouldNotAuth: "kunne ikke tilføje smtp auth, tjek om både din bruger og adgangskode er korrekte; hvis de er korrekte, kræver din udbyder måske en auth-metode, der ikke understøttes af Zitadel"
+    CouldNotAuth: "kunne ikke tilføje SMTP-autentificering, tjek om både din bruger og adgangskode er korrekte; hvis de er korrekte, kræver din udbyder måske en autentificeringsmetode, der ikke understøttes af Zitadel"
     CouldNotSetSender: "kunne ikke angive afsender"
     CouldNotSetRecipient: "kunne ikke angive modtager"
   SMTPConfig:
@@ -81,7 +81,7 @@ Errors:
     NotFoundOnOrg: "Brugeren kunne ikke findes i den valgte organisation"
     NotAllowedOrg: "Brugeren er ikke medlem af den påkrævede organisation"
     UserIDMissing: "Bruger-ID mangler"
-    UserIDWrong: "Anmodet bruger er ikke den samme som den godkendte bruger"
+    UserIDWrong: "Brugeren i anmodningen er ikke den samme som den autentificerede bruger"
     DomainPolicyNil: "Organisationspolitik er tom"
     EmailAsUsernameNotAllowed: "E-mail er ikke tilladt som brugernavn"
     Invalid: "Brugerdata er ugyldige"
@@ -89,7 +89,7 @@ Errors:
     AlreadyInactive: "Brugeren er allerede inaktiv"
     NotInactive: "Brugeren er ikke inaktiv"
     CantDeactivateInitial: "Brugere med status 'Initial' kan kun slettes, ikke deaktiveres"
-    ShouldBeActiveOrInitial: "Brugeren er ikke aktiv eller initial"
+    ShouldBeActiveOrInitial: "Brugeren er ikke aktiv eller i status 'Initial'"
     AlreadyInitialised: "Brugeren er allerede initialiseret"
     NotInitialised: "Brugeren er endnu ikke initialiseret"
     NotLocked: "Brugeren er ikke låst"
@@ -118,27 +118,27 @@ Errors:
       AlreadyVerified: "Telefonnummer allerede verificeret"
       Empty: "Telefonnummer er tomt"
       NotChanged: "Telefonnummer ikke ændret"
-      VerifyingRemovalIsNotSupported: "Verificering af fjernelse understøttes ikke"
+      VerifyingRemovalIsNotSupported: "Verifikation af fjernelse af telefonnummer understøttes ikke"
     Address:
       NotFound: "Adresse ikke fundet"
       NotChanged: "Adresse ikke ændret"
     Machine:
       Key:
-        NotFound: "Maskinnøgle ikke fundet"
+        NotFound: "Nøgle til teknisk bruger ikke fundet"
         AlreadyExisting: "Maskinnøgle findes allerede"
         Invalid: "Offentlig nøgle er ikke en gyldig offentlig RSA-nøgle i PKIX-format med PEM-kodning"
       Secret:
-        NotExisting: "Hemmelig kode findes ikke"
-        Invalid: "Hemmelig kode er ugyldig"
-        CouldNotGenerate: "Hemmelig kode kunne ikke genereres"
+        NotExisting: "Hemmeligheden findes ikke"
+        Invalid: "Hemmeligheden er ugyldig"
+        CouldNotGenerate: "Hemmeligheden kunne ikke genereres"
     PAT:
       NotFound: "Personligt adgangstoken ikke fundet"
     Metadata:
-      Conflicting: "Metadata må ikke angives samtidigt i felterne [user] og [human]"
+      Conflicting: "Metadata må ikke angives i både user- og human-feltet"
     NotHuman: "Brugeren skal være en person"
     NotMachine: "Brugeren skal være en teknisk bruger"
     WrongType: "Ikke tilladt for denne brugertype"
-    NotAllowedToLink: "Brugeren må ikke tilknytte med ekstern loginudbyder"
+    NotAllowedToLink: "Brugeren må ikke knyttes til en ekstern loginudbyder"
     Username:
       AlreadyExists: "Brugernavn allerede optaget"
       Reserved: "Brugernavn er allerede optaget"
@@ -160,7 +160,7 @@ Errors:
       NotFound: "Adgangskodepolitik ikke fundet"
       MinLength: "Adgangskoden er for kort"
       MinLengthNotAllowed: "Angivet minimumslængde er ikke tilladt"
-      HasLower: "Adgangskode skal indeholde små bogstaver"
+      HasLower: "Adgangskoden skal indeholde små bogstaver"
       HasUpper: "Adgangskode skal indeholde store bogstaver"
       HasNumber: "Adgangskode skal indeholde tal"
       HasSymbol: "Adgangskode skal indeholde symbol"
@@ -191,9 +191,9 @@ Errors:
         ConfigInvalid: "Konfiguration for gendannelseskoder er ugyldig"
     WebAuthN:
       NotFound: "WebAuthN-token kunne ikke findes"
-      BeginRegisterFailed: "WebAuthN-registrering mislykkedes"
+      BeginRegisterFailed: "Start af WebAuthN-registrering mislykkedes"
       MarshalError: "Fejl ved serialisering af data"
-      ErrorOnParseCredential: "Fejl ved fortolkning af autentificeringsdata"
+      ErrorOnParseCredential: "Fejl ved fortolkning af legitimationsoplysninger"
       CreateCredentialFailed: "Fejl ved oprettelse af legitimationsoplysninger"
       BeginLoginFailed: "WebAuthN-login mislykkedes"
       ValidateLoginFailed: "Fejl ved validering af loginoplysninger"
@@ -204,7 +204,7 @@ Errors:
   Org:
     AlreadyExists: "Organisationens navn eller ID er allerede optaget"
     Invalid: "Organisationen er ugyldig"
-    AlreadyDeactivated: "Organisation er allerede deaktiveret"
+    AlreadyDeactivated: "Organisationen er allerede deaktiveret"
     AlreadyActive: "Organisationen er allerede aktiv"
     Empty: "Organisationen er tom"
     NotFound: "Organisationen blev ikke fundet"
@@ -221,7 +221,7 @@ Errors:
     DomainVerificationMissing: "Domæneverifikation er endnu ikke startet"
     DomainVerificationFailed: "Domæneverifikation mislykkedes"
     DomainVerificationTXTNotFound: "TXT-posten _zitadel-challenge blev ikke fundet for dit domæne. Tjek at du har tilføjet den på din DNS-server, eller vent til den nye post er propageret"
-    DomainVerificationTXTNoMatch: "TXT-posten _zitadel-challenge er fundet for dit domæne, men den indeholder ikke den rigtige token-tekst. Tjek at du har tilføjet den rigtige token på din DNS-server, eller vent til den nye post er propageret"
+    DomainVerificationTXTNoMatch: "TXT-posten _zitadel-challenge er fundet for dit domæne, men den indeholder ikke den rigtige token-tekst. Tjek at du har tilføjet det rigtige token på din DNS-server, eller vent til den nye post er propageret"
     DomainVerificationHTTPNotFound: "Filen med udfordringen blev ikke fundet på den forventede URL. Tjek at du har uploadet filen på det rigtige sted med læserettigheder"
     DomainVerificationHTTPNoMatch: "Filen med udfordringen er fundet på den forventede URL, men den indeholder ikke den rigtige token-tekst. Tjek dens indhold"
     DomainVerificationTimeout: "Der opstod en timeout ved forespørgsel til DNS-serveren"
@@ -229,7 +229,7 @@ Errors:
     DomainNotFound: "Domæne ikke fundet"
     MemberIDMissing: "Medlems-ID mangler"
     MemberNotFound: "Organisationsmedlem ikke fundet"
-    InvalidMember: "Organisationsmedlem er ugyldig"
+    InvalidMember: "Organisationsmedlem er ugyldigt"
     UserIDMissing: "Bruger-ID mangler"
     PolicyAlreadyExists: "Politikken findes allerede"
     PolicyNotExisting: "Politikken findes ikke"
@@ -240,11 +240,11 @@ Errors:
     Domain:
       AlreadyExists: "Domænet findes allerede"
       InvalidCharacter: "Kun alfanumeriske tegn, . og - er tilladt for et domæne"
-      EmptyString: "Ugyldige ikke-numeriske og alfabetiske tegn blev erstattet med tomme mellemrum, og det resulterende domæne er en tom streng"
+      EmptyString: "Ugyldige ikke-alfanumeriske tegn blev erstattet med mellemrum, og det resulterende domæne er en tom streng"
     LoginPolicy:
       NotFound: "Loginpolitikken blev ikke fundet"
       Invalid: "Loginpolitikken er ugyldig"
-      RedirectURIInvalid: "Standard-Redirect URI er ugyldig"
+      RedirectURIInvalid: "Standardomdirigerings-URI er ugyldig"
       NotExisting: "Loginpolitikken findes ikke"
       AlreadyExists: "Loginpolitikken findes allerede"
       IdpProviderAlreadyExisting: "Identitetsudbyder findes allerede"
@@ -256,10 +256,10 @@ Errors:
         NotExisting: "Multifaktor findes ikke"
         Unspecified: "Multifaktor er ugyldig"
     MailTemplate:
-      NotFound: "Standard e-mailskabelon ikke fundet"
-      NotChanged: "Standard e-mailskabelon er ikke blevet ændret"
-      AlreadyExists: "Standard e-mailskabelon findes allerede"
-      Invalid: "Standard e-mailskabelon er ugyldig"
+      NotFound: "Standard-e-mailskabelon ikke fundet"
+      NotChanged: "Standard-e-mailskabelon er ikke blevet ændret"
+      AlreadyExists: "Standard-e-mailskabelon findes allerede"
+      Invalid: "Standard-e-mailskabelon er ugyldig"
     CustomMessageText:
       NotFound: "Standardmeddelelsestekst ikke fundet"
       NotChanged: "Standardmeddelelsestekst er ikke blevet ændret"
@@ -302,7 +302,7 @@ Errors:
     UserIDMissing: "Bruger-ID mangler"
     Member:
       NotFound: "Projektmedlem ikke fundet"
-      Invalid: "Projektmedlem er ugyldig"
+      Invalid: "Projektmedlem er ugyldigt"
       AlreadyExists: "Projektmedlem findes allerede"
       NotExisting: "Projektmedlem findes ikke"
     MinimumOneRoleNeeded: "Mindst én rolle skal tilføjes"
@@ -352,11 +352,11 @@ Errors:
     MemberInvalid: "Medlemmet er ugyldigt"
     MemberAlreadyExisting: "Medlemmet findes allerede"
     MemberNotExisting: "Medlemmet findes ikke"
-    IDMissing: "Id mangler"
+    IDMissing: "ID mangler"
     IdpInvalid: "IDP-konfigurationen er ugyldig"
     IdpNotExisting: "IDP-konfigurationen findes ikke"
     OIDCConfigInvalid: "OIDC IDP-konfigurationen er ugyldig"
-    IdpIsNotOIDC: "IDP-konfigurationen er ikke af typen oidc"
+    IdpIsNotOIDC: "IDP-konfigurationen er ikke af typen OIDC"
     LoginPolicyInvalid: "Loginpolitikken er ugyldig"
     LoginPolicyNotExisting: "Loginpolitikken findes ikke"
     IdpProviderInvalid: "Identitetsudbyderen er ugyldig"
@@ -382,33 +382,33 @@ Errors:
       NotFound: "Standardbrandingpolitik ikke fundet"
       NotChanged: "Standardbrandingpolitik er ikke blevet ændret"
     MailTemplate:
-      NotFound: "Standard e-mailskabelon ikke fundet"
-      NotChanged: "Standard e-mailskabelon er ikke blevet ændret"
-      AlreadyExists: "Standard e-mailskabelon findes allerede"
-      Invalid: "Standard e-mailskabelon er ugyldig"
+      NotFound: "Standard-e-mailskabelon ikke fundet"
+      NotChanged: "Standard-e-mailskabelon er ikke blevet ændret"
+      AlreadyExists: "Standard-e-mailskabelon findes allerede"
+      Invalid: "Standard-e-mailskabelon er ugyldig"
     CustomMessageText:
       NotFound: "Standardmeddelelsestekst ikke fundet"
       NotChanged: "Standardmeddelelsestekst er ikke blevet ændret"
       AlreadyExists: "Standardmeddelelsestekst findes allerede"
       Invalid: "Standardmeddelelsestekst er ugyldig"
     PasswordComplexityPolicy:
-      NotFound: "Standard adgangskodekompleksitetspolitik ikke fundet"
-      NotExisting: "Standard adgangskodekompleksitetspolitik findes ikke"
-      AlreadyExists: "Standard adgangskodekompleksitetspolitik findes allerede"
-      Empty: "Standard adgangskodekompleksitetspolitik er tom"
-      NotChanged: "Standard adgangskodekompleksitetspolitik er ikke blevet ændret"
+      NotFound: "Standard-adgangskodekompleksitetspolitik ikke fundet"
+      NotExisting: "Standard-adgangskodekompleksitetspolitik findes ikke"
+      AlreadyExists: "Standard-adgangskodekompleksitetspolitik findes allerede"
+      Empty: "Standard-adgangskodekompleksitetspolitik er tom"
+      NotChanged: "Standard-adgangskodekompleksitetspolitik er ikke blevet ændret"
     PasswordAgePolicy:
-      NotFound: "Standard adgangskodealderpolitik ikke fundet"
-      NotExisting: "Standard adgangskodealderpolitik findes ikke"
-      AlreadyExists: "Standard adgangskodealderpolitik findes allerede"
-      Empty: "Standard adgangskodealderpolitik er tom"
-      NotChanged: "Standard adgangskodealderpolitik er ikke blevet ændret"
+      NotFound: "Standard-adgangskodealderpolitik ikke fundet"
+      NotExisting: "Standard-adgangskodealderpolitik findes ikke"
+      AlreadyExists: "Standard-adgangskodealderpolitik findes allerede"
+      Empty: "Standard-adgangskodealderpolitik er tom"
+      NotChanged: "Standard-adgangskodealderpolitik er ikke blevet ændret"
     PasswordLockoutPolicy:
-      NotFound: "Standard adgangskodelåsepolitik ikke fundet"
-      NotExisting: "Standard adgangskodelåsepolitik findes ikke"
-      AlreadyExists: "Standard adgangskodelåsepolitik findes allerede"
-      Empty: "Standard adgangskodelåsepolitik er tom"
-      NotChanged: "Standard adgangskodelåsepolitik er ikke blevet ændret"
+      NotFound: "Standard-adgangskodelåsepolitik ikke fundet"
+      NotExisting: "Standard-adgangskodelåsepolitik findes ikke"
+      AlreadyExists: "Standard-adgangskodelåsepolitik findes allerede"
+      Empty: "Standard-adgangskodelåsepolitik er tom"
+      NotChanged: "Standard-adgangskodelåsepolitik er ikke blevet ændret"
     DomainPolicy:
       NotFound: "Organisationsdomænepolitik ikke fundet"
       Empty: "Organisationsdomænepolitik er tom"
@@ -436,7 +436,7 @@ Errors:
     NotFound: "Rolletildelingen blev ikke fundet"
     Invalid: "Rolletildelingen er ugyldig"
     NotChanged: "Rolletildelingen er ikke blevet ændret"
-    IDMissing: "Id mangler"
+    IDMissing: "ID mangler"
     NoPermissionForProject: "Brugeren har ingen rettigheder i dette projekt"
     RoleKeyNotFound: "Rollen blev ikke fundet"
   Member:
@@ -515,7 +515,7 @@ Errors:
       StorageFailed: "Lagring af adgangslog til databasen mislykkedes"
       ScanFailed: "Forespørgslen om brugen af autentificerede anmodninger mislykkedes"
     Execution:
-      StorageFailed: "Lagring af handlingslog til databasen mislykkedes"
+      StorageFailed: "Lagring af handlingseksekveringslog til databasen mislykkedes"
       ScanFailed: "Forespørgslen om brug af eksekveringstid mislykkedes"
   Session:
     IDMissing: "Sessions-ID mangler"
@@ -552,14 +552,14 @@ Errors:
     Token:
       Invalid: "Tokenet er ugyldigt"
       Expired: "Tokenet er udløbet"
-    InvalidClient: "Tokenet blev ikke udstedt til denne klient"
+    InvalidClient: "Tokenet blev ikke udstedt til denne applikation"
   SAMLRequest:
     AlreadyExists: "SAMLRequest findes allerede"
     NotExisting: "SAMLRequest findes ikke"
     WrongLoginClient: "SAMLRequest oprettet af en anden loginapplikation"
-    AlreadyHandled: "SAML-anmodning er allerede blevet håndteret"
+    AlreadyHandled: "SAMLRequest er allerede blevet håndteret"
   SAMLSession:
-    InvalidClient: "SAMLResponse blev ikke udstedt til denne klient"
+    InvalidClient: "SAMLResponse blev ikke udstedt til denne applikation"
   DeviceAuth:
     NotFound: "Anmodning om enhedsautorisation findes ikke"
     AlreadyHandled: "Anmodning om enhedsautorisation er allerede blevet håndteret"
@@ -575,7 +575,7 @@ Errors:
     InvalidExpirationDate: "Nøglens udløbsdato skal være i fremtiden"
     PublicKeyExpired: "Målets offentlige nøgle er udløbet"
     PublicKeyActive: "Kan ikke slette en aktiv offentlig nøgle for målet"
-    InvalidPublicKey: "Den offentlige nøgle er ugyldig. Skal være en PEM-kodet RSA- eller ECDSA-offentlig nøgle i PKCS#8-format"
+    InvalidPublicKey: "Den offentlige nøgle er ugyldig. Den skal være en PEM-kodet offentlig RSA- eller ECDSA-nøgle i PKCS#8-format"
   Execution:
     ConditionInvalid: "Eksekveringsbetingelsen er ugyldig"
     Invalid: "Eksekveringen er ugyldig"
@@ -591,7 +591,7 @@ Errors:
       Missing: "Brugerskematype mangler"
       AlreadyExists: "Brugerskematype findes allerede"
     Authenticator:
-      Invalid: "Ugyldig autentificatortype"
+      Invalid: "Ugyldig autentificeringstype"
     NotActive: "Brugerskema ikke aktivt"
     NotInactive: "Brugerskema ikke inaktivt"
     NotExists: "Brugerskema findes ikke"
@@ -607,13 +607,13 @@ Errors:
       TypeMissing: "Tokentype mangler"
       TypeNotAllowed: "Tokentype er ikke tilladt"
       TypeNotSupported: "Tokentype understøttes ikke"
-      NotForAPI: "Impersonation-tokens er ikke tilladt for API"
+      NotForAPI: "Impersoneringstokens er ikke tilladt for API"
     Impersonation:
-      PolicyDisabled: "Impersonation er deaktiveret i instansens sikkerhedspolitik"
+      PolicyDisabled: "Impersonering er deaktiveret i instansens sikkerhedspolitik"
   WebKey:
-    ActiveDelete: "Det er ikke muligt at slette aktiv webnøgle"
+    ActiveDelete: "Kan ikke slette en aktiv webnøgle"
     Config: "Ugyldig webnøglekonfiguration"
-    Duplicate: "Webnøgle-ID er ikke unik"
+    Duplicate: "Webnøgle-ID er ikke unikt"
     NoActive: "Ingen aktiv webnøgle fundet"
     NotFound: "Webnøgle ikke fundet"
   IDP:
@@ -640,7 +640,7 @@ AggregateTypes:
   auth_request: "Autentificeringsanmodning"
   device_auth: "Enhedsautorisation"
   idpintent: "IDP-intent"
-  limits: "Begrænsninger"
+  limits: "Grænser"
   milestone: "Milepæl"
   oidc_session: "OIDC-session"
   restrictions: "Restriktioner"
@@ -652,14 +652,14 @@ AggregateTypes:
 EventTypes:
   execution:
     set: "Eksekvering angivet"
-    removed: "Eksekvering fjernet"
+    removed: "Eksekvering slettet"
   target:
     added: "Mål oprettet"
     changed: "Mål ændret"
-    removed: "Mål fjernet"
+    removed: "Mål slettet"
   user:
     added: "Bruger tilføjet"
-    selfregistered: "Brugeren registrerede sig selv"
+    selfregistered: "Bruger selvregistreret"
     initialization:
       code:
         added: "Initialiseringskode genereret"
@@ -701,7 +701,7 @@ EventTypes:
           failed: "Hemmelighedskontrol mislykkedes"
     human:
       added: "Person tilføjet"
-      selfregistered: "Personen registrerede sig selv"
+      selfregistered: "Person selvregistreret"
       avatar:
         added: "Avatar tilføjet"
         removed: "Avatar fjernet"
@@ -751,12 +751,12 @@ EventTypes:
         cascade:
           removed: "Ekstern IDP fjernet via kaskade"
         id:
-          migrated: "Eksternt bruger-ID for IDP blev migreret"
+          migrated: "Eksternt bruger-ID for IDP migreret"
       phone:
         changed: "Telefonnummer ændret"
         verified: "Telefonnummer verificeret"
         verification:
-          failed: "Telefonnummerverifikation mislykkedes"
+          failed: "Verifikation af telefonnummer mislykkedes"
         code:
           added: "Telefonnummerkode genereret"
           sent: "Telefonnummerkode sendt"
@@ -767,7 +767,7 @@ EventTypes:
         changed: "Brugeradresse ændret"
       mfa:
         otp:
-          added: "Multifaktor OTP tilføjet"
+          added: "Multifaktor-OTP tilføjet"
           verified: "Multifaktor OTP verificeret"
           removed: "Multifaktor OTP fjernet"
           check:
@@ -803,7 +803,7 @@ EventTypes:
               succeeded: "Multifaktor U2F-kontrol lykkedes"
               failed: "Multifaktor U2F-kontrol mislykkedes"
             signcount:
-              changed: "Kontrolsummen for multifaktor U2F-token er blevet ændret"
+              changed: "Kontrolsum for multifaktor U2F-token ændret"
         init:
           skipped: "Multifaktorinitialisering sprunget over"
       passwordless:
@@ -817,12 +817,12 @@ EventTypes:
             succeeded: "Kontrol af login med adgangsnøgle lykkedes"
             failed: "Kontrol af login med adgangsnøgle mislykkedes"
           signcount:
-            changed: "Kontrolsummen for token til login med adgangsnøgle er blevet ændret"
+            changed: "Kontrolsum for token til login med adgangsnøgle ændret"
         initialization:
           code:
             added: "Initialiseringskode til adgangsnøgle tilføjet"
             sent: "Initialiseringskode til adgangsnøgle sendt"
-            requested: "Initialiseringskode til adgangsnøgle anmodet"
+            requested: "Initialiseringskode til adgangsnøgle rekvireret"
             check:
               succeeded: "Kontrol af initialiseringskode til adgangsnøgle lykkedes"
               failed: "Kontrol af initialiseringskode til adgangsnøgle mislykkedes"
@@ -867,9 +867,9 @@ EventTypes:
           succeeded: "Multifaktor OTP-kontrol lykkedes"
           failed: "Multifaktor OTP-kontrol mislykkedes"
         init:
-          skipped: "Sprang over multifaktor OTP-initialisering"
+          skipped: "Multifaktor OTP-initialisering sprunget over"
       init:
-        skipped: "Sprang over multifaktorinitialisering"
+        skipped: "Multifaktorinitialisering sprunget over"
     signed:
       out: "Bruger logget ud"
     grant:
@@ -886,7 +886,7 @@ EventTypes:
     metadata:
       set: "Brugermetadata angivet"
       removed: "Brugermetadata fjernet"
-      removed.all: "Al brugermetadata fjernet"
+      removed.all: "Alle brugermetadata fjernet"
     domain:
       claimed: "Domæne gjort krav på"
       claimed.sent: "Meddelelse om domænekrav sendt"
@@ -998,11 +998,11 @@ EventTypes:
           added: "Skrifttype tilføjet til brandingpolitik"
           removed: "Skrifttype fjernet fra brandingpolitik"
         assets:
-          removed: "Ressourcer fjernet fra brandingpolitikken"
+          removed: "Ressourcer fjernet fra brandingpolitik"
       privacy:
-        added: "Privatlivspolitik og TOS tilføjet"
-        changed: "Privatlivspolitik og TOS ændret"
-        removed: "Privatlivspolitik og TOS fjernet"
+        added: "Privatlivspolitik og brugsvilkår tilføjet"
+        changed: "Privatlivspolitik og brugsvilkår ændret"
+        removed: "Privatlivspolitik og brugsvilkår fjernet"
       domain:
         added: "Domænepolitik tilføjet"
         changed: "Domænepolitik ændret"
@@ -1060,9 +1060,9 @@ EventTypes:
       cascade:
         changed: "Projektadgang ændret"
       member:
-        added: "Administrator for projektadgang tilføjet"
-        changed: "Administrator for projektadgang ændret"
-        removed: "Administrator for projektadgang fjernet"
+        added: "Medlem af projektadgang tilføjet"
+        changed: "Medlem af projektadgang ændret"
+        removed: "Medlem af projektadgang fjernet"
         cascade:
           removed: "Projektadgang fjernet via kaskade"
     application:
@@ -1074,11 +1074,11 @@ EventTypes:
       oidc:
         secret:
           check:
-            succeeded: "OIDC Client Secret-kontrol lykkedes"
-            failed: "OIDC Client Secret-kontrol mislykkedes"
+            succeeded: "Kontrol af OIDC-klienthemmelighed lykkedes"
+            failed: "Kontrol af OIDC-klienthemmelighed mislykkedes"
         key:
-          added: "OIDC app-nøgle tilføjet"
-          removed: "OIDC app-nøgle fjernet"
+          added: "OIDC-applikationsnøgle tilføjet"
+          removed: "OIDC-applikationsnøgle fjernet"
       api:
         secret:
           check:
@@ -1116,11 +1116,11 @@ EventTypes:
         changed: "Adgangskodelåsepolitik ændret"
   iam:
     setup:
-      started: "Zitadel-setup startet"
-      done: "Zitadel-setup færdig"
+      started: "Zitadel-opsætning startet"
+      done: "Zitadel-opsætning afsluttet"
     global:
       org:
-        set: "Global org angivet"
+        set: "Global organisation angivet"
     project:
       iam:
         set: "Zitadel-projekt angivet"
@@ -1148,7 +1148,7 @@ EventTypes:
       jwt:
         config:
           added: "JWT-konfiguration til identitetsudbyder tilføjet"
-          changed: "JWT-konfiguration fra identitetsudbyder fjernet"
+          changed: "JWT-konfiguration for identitetsudbyder ændret"
     customtext:
       set: "Tekst angivet"
       removed: "Tekst fjernet"
@@ -1179,7 +1179,7 @@ EventTypes:
           added: "Skrifttype tilføjet til brandingpolitik"
           removed: "Skrifttype fjernet fra brandingpolitik"
         assets:
-          removed: "Ressourcer fjernet fra brandingpolitikken"
+          removed: "Ressourcer fjernet fra brandingpolitik"
     default:
       language:
         set: "Standardsprog angivet"
@@ -1288,7 +1288,7 @@ EventTypes:
           added: "Ikon tilføjet til brandingpolitik"
           removed: "Ikon fjernet fra brandingpolitik"
           dark:
-            added: "Ikon tilføjet til mørk brandingpolitik"
+            added: "Ikon (mørk tilstand) tilføjet til brandingpolitik"
             removed: "Ikon fjernet fra mørk brandingpolitik"
         logo:
           added: "Logo tilføjet til brandingpolitik"
@@ -1354,19 +1354,19 @@ EventTypes:
     updated: "Brugerskema opdateret"
     deactivated: "Brugerskema deaktiveret"
     reactivated: "Brugerskema genaktiveret"
-    deleted: "Brugerskema fjernet"
+    deleted: "Brugerskema slettet"
     user:
       created: "Bruger oprettet"
-      updated: "Brugeren opdateret"
+      updated: "Bruger opdateret"
       deleted: "Bruger slettet"
       email:
         updated: "E-mailadresse ændret"
         verified: "E-mailadresse verificeret"
         verification:
-          failed: "E-mailadresseverifikation mislykkedes"
+          failed: "E-mailverifikation mislykkedes"
         code:
-          added: "Verifikationskode for e-mailadresse genereret"
-          sent: "E-mailadressens verifikationskode er sendt"
+          added: "E-mailverifikationskode genereret"
+          sent: "E-mailverifikationskode sendt"
       phone:
         updated: "Telefonnummer ændret"
         verified: "Telefonnummer verificeret"
@@ -1374,19 +1374,19 @@ EventTypes:
           failed: "Verifikation af telefonnummer mislykkedes"
         code:
           added: "Verifikationskode for telefonnummer genereret"
-          sent: "Verifikationskoden for telefonnummer er sendt"
+          sent: "Verifikationskode for telefonnummer sendt"
   web_key:
-    added: "Webnøgle er tilføjet"
+    added: "Webnøgle tilføjet"
     activated: "Webnøgle aktiveret"
     deactivated: "Webnøgle deaktiveret"
-    removed: "Webnøglen er blevet fjernet"
+    removed: "Webnøgle fjernet"
 Application:
   OIDC:
     UnsupportedVersion: "Din OIDC-version understøttes ikke"
     V1:
-      NotCompliant: "Din konfiguration er ikke kompatibel og adskiller sig fra OIDC 1.0-standarden."
+      NotCompliant: "Din konfiguration er ikke i overensstemmelse med OIDC 1.0-standarden og afviger fra den."
       NoRedirectUris: "Mindst én omdirigerings-URI skal registreres."
-      NotAllCombinationsAreAllowed: "Konfigurationen er kompatibel, men ikke alle mulige kombinationer er tilladt."
+      NotAllCombinationsAreAllowed: "Konfigurationen overholder standarden, men ikke alle mulige kombinationer er tilladt."
       Code:
         RedirectUris:
           HttpOnlyForWeb: "Granttypen \"code\" tillader kun http-omdirigerings-URI'er for apptype web."
@@ -1395,7 +1395,7 @@ Application:
         RedirectUris:
           CustomNotAllowed: "Granttypen implicit tillader ikke tilpassede omdirigerings-URI'er"
           HttpNotAllowed: "Granttypen implicit tillader ikke http-omdirigerings-URI'er"
-          HttpLocalhostOnlyForNative: "Http://localhost omdirigerings-URI er kun tilladt for native-applikationer."
+          HttpLocalhostOnlyForNative: "Omdirigerings-URI'er med http://localhost er kun tilladt for native-applikationer."
       Native:
         AuthMethodType:
           NotNone: "Native-applikationer bør have authmethodtype none."
@@ -1403,7 +1403,7 @@ Application:
           MustBeHttpLocalhost: "Omdirigerings-URI'er skal starte med din egen protokol, http://127.0.0.1, http://[::1] eller http://localhost."
       UserAgent:
         AuthMethodType:
-          NotNone: "User agent-app bør have authmethodtype none."
+          NotNone: "User agent-applikationer bør have authmethodtype none."
       GrantType:
         Refresh:
           NoAuthCode: "Opdateringstoken er kun tilladt i kombination med autorisationskode."
@@ -1412,7 +1412,7 @@ Action:
     Type:
       Unspecified: "Uspecificeret"
       ExternalAuthentication: "Ekstern autentificering"
-      CustomiseToken: "Suppler token"
+      CustomiseToken: "Supplering af token"
       InternalAuthentication: "Intern autentificering"
       CustomizeSAMLResponse: "Suppler SAMLResponse"
   TriggerType:
@@ -1420,6 +1420,6 @@ Action:
     PostAuthentication: "Efter autentificering"
     PreCreation: "Før oprettelse"
     PostCreation: "Efter oprettelse"
-    PreUserinfoCreation: "Før oprettelse af brugerinformation"
+    PreUserinfoCreation: "Før oprettelse af userinfo"
     PreAccessTokenCreation: "Før oprettelse af adgangstoken"
     PreSAMLResponseCreation: "Før oprettelse af SAMLResponse"
