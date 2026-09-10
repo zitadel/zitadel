@@ -737,6 +737,11 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 // reducePasswordChanged's security-notification shape. Unlike password changes, this is
 // unconditional (not gated by NotificationPolicy) -- following the same unconditional
 // pattern as reduceDomainClaimed, since there is no existing per-org opt-out for this event.
+// Unlike reducePasswordChanged, UnverifiedNotificationChannel is deliberately false: the
+// user projection updates NotifyUser.LastEmail to the *new* address as part of this very
+// event, so allowing the unverified channel here would send the "your email changed"
+// security alert to the new (and potentially attacker-controlled) address instead of the
+// still-verified old one that actually needs to see it.
 func (u *userNotifier) reduceEmailChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanEmailChangedEvent)
 	if !ok {
@@ -769,7 +774,7 @@ func (u *userNotifier) reduceEmailChanged(event eventstore.Event) (*handler.Stat
 				NotificationType:              domain.NotificationTypeEmail,
 				MessageType:                   domain.EmailChangeMessageType,
 				URLTemplate:                   console.LoginHintLink(origin, "{{.PreferredLoginName}}"),
-				UnverifiedNotificationChannel: true,
+				UnverifiedNotificationChannel: false,
 			},
 			queue.WithQueueName(notification.QueueName),
 			queue.WithMaxAttempts(u.maxAttempts),
@@ -778,7 +783,9 @@ func (u *userNotifier) reduceEmailChanged(event eventstore.Event) (*handler.Stat
 }
 
 // reducePhoneChanged notifies the user that their phone number was changed, mirroring
-// reduceEmailChanged/reducePasswordChanged.
+// reduceEmailChanged/reducePasswordChanged. This notification is always delivered by
+// email (not SMS), so -- as with reduceEmailChanged -- UnverifiedNotificationChannel is
+// deliberately false to always use NotifyUser.VerifiedEmail, the verified channel.
 func (u *userNotifier) reducePhoneChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanPhoneChangedEvent)
 	if !ok {
@@ -811,7 +818,7 @@ func (u *userNotifier) reducePhoneChanged(event eventstore.Event) (*handler.Stat
 				NotificationType:              domain.NotificationTypeEmail,
 				MessageType:                   domain.PhoneChangeMessageType,
 				URLTemplate:                   console.LoginHintLink(origin, "{{.PreferredLoginName}}"),
-				UnverifiedNotificationChannel: true,
+				UnverifiedNotificationChannel: false,
 			},
 			queue.WithQueueName(notification.QueueName),
 			queue.WithMaxAttempts(u.maxAttempts),

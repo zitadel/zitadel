@@ -1083,7 +1083,55 @@ func Test_userNotifier_reduceEmailChanged(t *testing.T) {
 		test func(*gomock.Controller, *mock.MockQueries, *mock.MockQueue) (fields, args, want)
 	}{
 		{
-			name: "email changed",
+			name: "with event trigger",
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						UserID:                        userID,
+						UserResourceOwner:             orgID,
+						TriggeredAtOrigin:             eventOrigin,
+						URLTemplate:                   fmt.Sprintf("%s/ui/console?login_hint={{.PreferredLoginName}}", eventOrigin),
+						Code:                          nil,
+						CodeExpiry:                    0,
+						EventType:                     user.HumanEmailChangedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.EmailChangeMessageType,
+						UnverifiedNotificationChannel: false,
+						Args:                          nil,
+						IsOTP:                         false,
+						RequiresPreviousDomain:        false,
+					},
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
+				return fields{
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanEmailChangedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanEmailChangedType,
+						}),
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+			},
+		},
+		{
+			name: "without event trigger",
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
 					Domains: []*query.InstanceDomain{{
@@ -1109,7 +1157,7 @@ func Test_userNotifier_reduceEmailChanged(t *testing.T) {
 						EventType:                     user.HumanEmailChangedType,
 						NotificationType:              domain.NotificationTypeEmail,
 						MessageType:                   domain.EmailChangeMessageType,
-						UnverifiedNotificationChannel: true,
+						UnverifiedNotificationChannel: false,
 						Args:                          nil,
 						IsOTP:                         false,
 						RequiresPreviousDomain:        false,
@@ -1165,7 +1213,55 @@ func Test_userNotifier_reducePhoneChanged(t *testing.T) {
 		test func(*gomock.Controller, *mock.MockQueries, *mock.MockQueue) (fields, args, want)
 	}{
 		{
-			name: "phone changed",
+			name: "with event trigger",
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						UserID:                        userID,
+						UserResourceOwner:             orgID,
+						TriggeredAtOrigin:             eventOrigin,
+						URLTemplate:                   fmt.Sprintf("%s/ui/console?login_hint={{.PreferredLoginName}}", eventOrigin),
+						Code:                          nil,
+						CodeExpiry:                    0,
+						EventType:                     user.HumanPhoneChangedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.PhoneChangeMessageType,
+						UnverifiedNotificationChannel: false,
+						Args:                          nil,
+						IsOTP:                         false,
+						RequiresPreviousDomain:        false,
+					},
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
+				return fields{
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanPhoneChangedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanPhoneChangedType,
+						}),
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+			},
+		},
+		{
+			name: "without event trigger",
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
 					Domains: []*query.InstanceDomain{{
@@ -1191,7 +1287,7 @@ func Test_userNotifier_reducePhoneChanged(t *testing.T) {
 						EventType:                     user.HumanPhoneChangedType,
 						NotificationType:              domain.NotificationTypeEmail,
 						MessageType:                   domain.PhoneChangeMessageType,
-						UnverifiedNotificationChannel: true,
+						UnverifiedNotificationChannel: false,
 						Args:                          nil,
 						IsOTP:                         false,
 						RequiresPreviousDomain:        false,

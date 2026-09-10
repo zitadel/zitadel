@@ -26,7 +26,8 @@ const (
 type HumanPhoneChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	PhoneNumber domain.PhoneNumber `json:"phone,omitempty"`
+	PhoneNumber       domain.PhoneNumber `json:"phone,omitempty"`
+	TriggeredAtOrigin string             `json:"triggerOrigin,omitempty"`
 }
 
 func (e *HumanPhoneChangedEvent) Payload() interface{} {
@@ -37,6 +38,10 @@ func (e *HumanPhoneChangedEvent) UniqueConstraints() []*eventstore.UniqueConstra
 	return nil
 }
 
+func (e *HumanPhoneChangedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
+}
+
 func NewHumanPhoneChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, phone domain.PhoneNumber) *HumanPhoneChangedEvent {
 	return &HumanPhoneChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -44,7 +49,8 @@ func NewHumanPhoneChangedEvent(ctx context.Context, aggregate *eventstore.Aggreg
 			aggregate,
 			HumanPhoneChangedType,
 		),
-		PhoneNumber: phone,
+		PhoneNumber:       phone,
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }
 

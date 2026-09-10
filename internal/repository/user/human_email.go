@@ -24,7 +24,8 @@ const (
 type HumanEmailChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	EmailAddress domain.EmailAddress `json:"email,omitempty"`
+	EmailAddress      domain.EmailAddress `json:"email,omitempty"`
+	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
 func (e *HumanEmailChangedEvent) Payload() interface{} {
@@ -35,6 +36,10 @@ func (e *HumanEmailChangedEvent) UniqueConstraints() []*eventstore.UniqueConstra
 	return nil
 }
 
+func (e *HumanEmailChangedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
+}
+
 func NewHumanEmailChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, emailAddress domain.EmailAddress) *HumanEmailChangedEvent {
 	return &HumanEmailChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -42,7 +47,8 @@ func NewHumanEmailChangedEvent(ctx context.Context, aggregate *eventstore.Aggreg
 			aggregate,
 			HumanEmailChangedType,
 		),
-		EmailAddress: emailAddress,
+		EmailAddress:      emailAddress,
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }
 

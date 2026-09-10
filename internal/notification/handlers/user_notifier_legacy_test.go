@@ -1512,13 +1512,44 @@ func Test_userNotifierLegacy_reduceEmailChanged(t *testing.T) {
 		name string
 		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, wantLegacy)
 	}{{
+		name: "asset url with event trigger url",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+			givenTemplate := "{{.LogoURL}}"
+			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{verifiedEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
+			}
+			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
+			commands.EXPECT().EmailChangeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+			}, args{
+				event: &user.HumanEmailChangedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
+					}),
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
+		},
+	}, {
 		name: "asset url without event trigger url",
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
 			w.message = &wantLegacyEmail{
 				email: &messages.Email{
-					Recipients: []string{lastEmail},
+					Recipients: []string{verifiedEmail},
 					Subject:    expectMailSubject,
 					Content:    expectContent,
 				},
@@ -1576,13 +1607,44 @@ func Test_userNotifierLegacy_reducePhoneChanged(t *testing.T) {
 		name string
 		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, wantLegacy)
 	}{{
+		name: "asset url with event trigger url",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+			givenTemplate := "{{.LogoURL}}"
+			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{verifiedEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
+			}
+			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
+			commands.EXPECT().PhoneChangeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+			}, args{
+				event: &user.HumanPhoneChangedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
+					}),
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
+		},
+	}, {
 		name: "asset url without event trigger url",
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
 			w.message = &wantLegacyEmail{
 				email: &messages.Email{
-					Recipients: []string{lastEmail},
+					Recipients: []string{verifiedEmail},
 					Subject:    expectMailSubject,
 					Content:    expectContent,
 				},
