@@ -44,29 +44,6 @@ import (
 
 const modulePath = "github.com/zitadel/zitadel"
 
-// throwFuncs is every zerrors.Throw<Kind>[f] function. All 24 share the
-// convention that the error ID literal is their 2nd positional argument
-// (confirmed against internal/zerrors/*.go: Throw<Kind>(parent, id, message)
-// and Throw<Kind>f(parent, id, format, a...) both put id at index 1).
-var throwFuncs = func() map[string]bool {
-	kinds := []string{
-		"InvalidArgument", "NotFound", "AlreadyExists", "PermissionDenied",
-		"Internal", "PreconditionFailed", "Unauthenticated", "Unimplemented",
-		"DeadlineExceeded", "Unavailable", "ResourceExhausted", "Unknown",
-	}
-	m := make(map[string]bool, len(kinds)*2+1)
-	for _, k := range kinds {
-		m["Throw"+k] = true
-		m["Throw"+k+"f"] = true
-	}
-	// ThrowError doesn't fit the Throw<Kind> naming pattern (it's not "Throw"
-	// + a Kind name) but has the exact same (parent, id, message) shape and
-	// always maps to KindUnknown (internal/zerrors/zerror.go). No ThrowErrorf
-	// variant exists.
-	m["ThrowError"] = true
-	return m
-}()
-
 // funcRef names a free function to jump into instead of a call site we can't
 // resolve locally.
 type funcRef struct {
@@ -113,6 +90,14 @@ type errorSite struct {
 type operationTrace struct {
 	Handler string      `json:"handler"`
 	Errors  []errorSite `json:"errors"`
+	// Unresolved is how many call sites this operation's walk gave up on —
+	// dynamic dispatch through an in-module type not in knownIndirections,
+	// or a zerrors.Throw* call whose id argument isn't a string literal.
+	// generate-endpoint-errors.ts needs this to tell "traced, and every
+	// site resolved cleanly" apart from "traced, but the walker stopped
+	// looking partway through" — the two look identical if all you check is
+	// whether this operation has an entry at all.
+	Unresolved int `json:"unresolved"`
 }
 
 func main() {
@@ -157,8 +142,9 @@ func main() {
 		sites := dedupeSort(w.sites)
 		pos := t.pkg.Fset.Position(t.decl.Name.Pos())
 		result[t.decl.Name.Name] = operationTrace{
-			Handler: relPath(root, pos.Filename) + ":" + strconv.Itoa(pos.Line),
-			Errors:  sites,
+			Handler:    relPath(root, pos.Filename) + ":" + strconv.Itoa(pos.Line),
+			Errors:     sites,
+			Unresolved: len(w.unresolved),
 		}
 		for _, u := range w.unresolved {
 			fmt.Fprintf(os.Stderr, "errortrace: %s: unresolved dynamic call to a value of type %s (not in the known-indirection table)\n", u.pos, u.typeName)
@@ -215,6 +201,11 @@ func targetsFromGoFile(l *loader, root, goFile string) ([]target, error) {
 }
 
 var rpcNameRe = regexp.MustCompile(`\brpc\s+(\w+)\s*\(`)
+
+// formatVerbRe matches a Printf-style verb (%s, %d, %v, %%, ...). Used to
+// reject a raw status.Errorf format string as a displayable message — see
+// recordRawStatus.
+var formatVerbRe = regexp.MustCompile(`%[-+ #0]*[0-9]*\.?[0-9]*[a-zA-Z%]`)
 
 // targetsFromProto parses `rpc <Name>(` declarations out of the given
 // service .proto file (the same convention already used by
@@ -418,15 +409,25 @@ type unresolvedCall struct {
 }
 
 type walker struct {
-	l          *loader
-	root       string
-	visited    map[string]bool // "pkgPath#name#recv" cycle/dedup guard, scoped to one operation's trace
-	sites      []errorSite
-	unresolved []unresolvedCall
+	l            *loader
+	root         string
+	indirections map[string]funcRef
+	visited      map[string]bool // "pkgPath#name#recv" cycle/dedup guard, scoped to one operation's trace
+	sites        []errorSite
+	unresolved   []unresolvedCall
 }
 
 func newWalker(l *loader, root string) *walker {
-	return &walker{l: l, root: root, visited: map[string]bool{}}
+	return newWalkerWithIndirections(l, root, knownIndirections)
+}
+
+// newWalkerWithIndirections lets a test point the knownIndirections lookup
+// at a small fixture instead of the real table — exercising the "call
+// through a func-typed field the walker can't resolve on its own" path
+// without coupling the test to whatever internal/api/authz.CheckPermission
+// happens to do today.
+func newWalkerWithIndirections(l *loader, root string, indirections map[string]funcRef) *walker {
+	return &walker{l: l, root: root, indirections: indirections, visited: map[string]bool{}}
 }
 
 func funcKey(pkgPath, name, recv string) string { return pkgPath + "#" + name + "#" + recv }
@@ -552,7 +553,10 @@ func (w *walker) followFunc(pkg *packages.Package, fnObj *types.Func, call *ast.
 		return // builtin
 	}
 	pkgPath := fnObj.Pkg().Path()
-	if pkgPath == "github.com/zitadel/zitadel/internal/zerrors" && throwFuncs[fnObj.Name()] {
+	// The package check already narrows this to internal/zerrors, so a plain
+	// name prefix is enough to catch every Throw<Kind>[f] plus ThrowError —
+	// no separate hand-kept list to go stale against internal/zerrors/*.go.
+	if pkgPath == "github.com/zitadel/zitadel/internal/zerrors" && strings.HasPrefix(fnObj.Name(), "Throw") {
 		w.recordThrow(pkg, call, trail)
 		return
 	}
@@ -582,7 +586,7 @@ func (w *walker) followFunc(pkg *packages.Package, fnObj *types.Func, call *ast.
 // up.
 func (w *walker) handleDynamic(pkg *packages.Package, t types.Type, call *ast.CallExpr) {
 	name := namedTypeName(t)
-	if ref, ok := knownIndirections[name]; ok {
+	if ref, ok := w.indirections[name]; ok {
 		w.recurseInto(ref.pkgPath, ref.name, "", []string{ref.name + " (via " + name + ")"})
 		return
 	}
@@ -730,7 +734,15 @@ func (w *walker) recordRawStatus(pkg *packages.Package, call *ast.CallExpr, trai
 	message := ""
 	if len(call.Args) >= 2 {
 		if lit, ok := call.Args[1].(*ast.BasicLit); ok && lit.Kind == token.STRING {
-			if s, err := strconv.Unquote(lit.Value); err == nil {
+			// A literal format string with a real Printf verb (e.g.
+			// status.Errorf(codes.NotFound, "instance %s not found", id))
+			// can't be shown as-is: the verb's actual value only exists at
+			// runtime, from an argument this static walk never evaluates.
+			// Showing the raw literal would put a stray "%s" on a public
+			// docs page instead of a real message, so skip it — the
+			// downstream generator falls back to "(empty message)" rather
+			// than fabricate one.
+			if s, err := strconv.Unquote(lit.Value); err == nil && !formatVerbRe.MatchString(s) {
 				message = s
 			}
 		}
@@ -770,7 +782,10 @@ func namedTypeName(t types.Type) string {
 	if ptr, ok := t.(*types.Pointer); ok {
 		t = ptr.Elem()
 	}
-	named, ok := t.(*types.Named)
+	// go.mod is on go 1.25, where go/types materializes generic type aliases
+	// by default. Without unwrapping, an aliased type fails this assertion
+	// outright and silently looks identical to "not a named type at all".
+	named, ok := types.Unalias(t).(*types.Named)
 	if !ok || named.Obj().Pkg() == nil {
 		return ""
 	}
@@ -785,7 +800,7 @@ func bareTypeName(t types.Type) string {
 	if ptr, ok := t.(*types.Pointer); ok {
 		t = ptr.Elem()
 	}
-	named, ok := t.(*types.Named)
+	named, ok := types.Unalias(t).(*types.Named)
 	if !ok {
 		return ""
 	}

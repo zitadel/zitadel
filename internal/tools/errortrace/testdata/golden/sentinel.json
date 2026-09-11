@@ -1,0 +1,14 @@
+{
+  "Lookup": {
+    "handler": "internal/tools/errortrace/testdata/sentinel/handler.go:19",
+    "errors": [
+      {
+        "id": "TEST-s3nt1n",
+        "file": "internal/tools/errortrace/testdata/sentinel/handler.go",
+        "line": 22,
+        "reasoning": "Lookup"
+      }
+    ],
+    "unresolved": 0
+  }
+}

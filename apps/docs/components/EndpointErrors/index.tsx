@@ -1,35 +1,64 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
-import rawData from './data.json';
 
 type ExampleResponse = {
   httpStatus: number;
   grpcCode: number;
-  body: { code: number; message: string; details: { '@type': string; id: string; message: string }[] };
+  body: { code: number; message: string; details?: { '@type': string; id: string; message: string }[] };
 };
 type Cause = { key: string; id: string; message: string; why: string; example: ExampleResponse };
 type StatusGroup = { status: number; statusText: string; description?: string; causes: Cause[] };
-const data = rawData as Record<string, Record<string, StatusGroup[]>>;
+type EndpointErrorsData = Record<string, Record<string, StatusGroup[]>>;
 
 export default function EndpointErrors({ service, operationId }: { service: string; operationId: string }) {
-  const groups = data[service]?.[operationId];
+  // Fetched at runtime from a route handler instead of a static `import
+  // data from './data.json'`: a static import bakes the *entire* catalog
+  // (every category, every operation — measured at 3.1MB once every
+  // category is filled in) into this client component's JS, which then
+  // ships on every single endpoint page whether that page needs 2 rows of
+  // it or none. The route handler serves the same file once, cached
+  // long-term by the browser, instead of duplicating it into every bundle.
+  const [data, setData] = useState<EndpointErrorsData | null>(null);
+  const [loadError, setLoadError] = useState(false);
   const [selected, setSelected] = useState<Record<number, string>>({});
 
-  // No entry at all means this operation hasn't been checked — stay silent
-  // rather than expose that as a public-facing gap. An explicit empty array
-  // means it *was* checked and confidently found nothing, which is worth
-  // saying rather than looking identical to "never checked".
-  if (!groups) return null;
-  if (groups.length === 0) {
-    return (
-      <div className="not-prose rounded-xl border bg-fd-card p-3 text-sm text-fd-muted-foreground">
-        No specific error causes are currently documented for this operation.
-      </div>
-    );
-  }
+  useEffect(() => {
+    let cancelled = false;
+    // The app is served under basePath '/docs', but fetch() (unlike
+    // <Link>/router.push()) doesn't get that prefix applied automatically —
+    // it has to be spelled out here or this 404s under the real deployment.
+    fetch('/docs/api/endpoint-errors')
+      .then((res) => {
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+        return res.json();
+      })
+      .then((json) => {
+        if (!cancelled) setData(json as EndpointErrorsData);
+      })
+      .catch(() => {
+        if (!cancelled) setLoadError(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (loadError) return null;
+  if (!data) return null;
+
+  const groups = data[service]?.[operationId];
+  // No entry, or an entry the tracer confidently found nothing for, are
+  // treated the same here: stay silent. The tracer genuinely can't tell
+  // "this endpoint has no errors" apart from "the tracer couldn't see
+  // through this handler" (e.g. GetInstanceFeatures returns a bare
+  // unwrapped error, so the walker finds zero zerrors.Throw* sites even
+  // though the endpoint can absolutely still hand back a 500) — so a card
+  // claiming "no error causes are documented" would be asserting something
+  // the tool has no way to actually know.
+  if (!groups || groups.length === 0) return null;
 
   return (
     <div className="not-prose flex flex-col gap-3">

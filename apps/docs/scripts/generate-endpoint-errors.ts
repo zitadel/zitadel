@@ -85,7 +85,7 @@
 
 import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { GRPC_STATUS } from '../lib/grpc-status';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -255,7 +255,7 @@ interface ErrorCluster {
 type ExampleResponse = {
   httpStatus: number;
   grpcCode: number;
-  body: { code: number; message: string; details: { '@type': string; id: string; message: string }[] };
+  body: { code: number; message: string; details?: { '@type': string; id: string; message: string }[] };
 };
 type Cause = { key: string; id: string; message: string; why: string; example: ExampleResponse };
 type StatusGroup = { status: number; statusText: string; description?: string; causes: Cause[] };
@@ -267,7 +267,21 @@ type EndpointErrorsData = Record<string, Record<string, StatusGroup[]>>;
 // with no suffix inside details[].message. Built per-cause with the exact ID
 // this endpoint actually throws, not an arbitrary representative from the
 // cluster, so the example matches what this specific endpoint returns.
+//
+// A "GRPC-<CODE>" id is a raw status.Errorf(codes.X, ...) call, which
+// ZITADELToGRPCError (internal/api/grpc/gerrors/zitadel_errors.go) passes
+// straight through untouched once status.FromError succeeds on it — no
+// " (ID)" suffix, no details[]. Only a real zerrors ID goes through the
+// wrapping that adds both, so the synthetic example has to mirror the
+// plain shape or it documents a response gRPC never actually sends.
 function buildExample(cluster: ErrorCluster, id: string, message: string): ExampleResponse {
+  if (id.startsWith('GRPC-')) {
+    return {
+      httpStatus: cluster.example.httpStatus,
+      grpcCode: cluster.example.grpcCode,
+      body: { code: cluster.example.grpcCode, message },
+    };
+  }
   return {
     httpStatus: cluster.example.httpStatus,
     grpcCode: cluster.example.grpcCode,
@@ -368,6 +382,18 @@ function parseDeclaredResponses(protoFile: string): Record<string, { status: num
 // --- main --------------------------------------------------------------
 
 function main() {
+  // SERVICES (discoverServices(), the strict variant) comes back empty on
+  // any checkout where content/reference/api hasn't been generated yet —
+  // true of every bare CI checkout, and just as true for a contributor who
+  // hasn't run the full docs build locally. Writing DATA_OUT in that state
+  // would mean writing {} for every service, silently truncating whatever
+  // real, committed data is already there. Leave the file alone instead —
+  // there's nothing this run could correctly say about it.
+  if (SERVICES.length === 0) {
+    console.log('[endpoint-errors] content/reference/api not found — skipping data.json, nothing to safely regenerate here.');
+    return;
+  }
+
   const data: EndpointErrorsData = {};
   let opsUpdated = 0;
   let matched = 0;
@@ -379,7 +405,7 @@ function main() {
     // Scoped to this service's own tracing subdirectory — keeps two
     // services from silently colliding if they happen to both define an
     // operation with the same name.
-    const traced: Record<string, { errors: { id: string; file: string; line: number; message?: string }[] }> = {};
+    const traced: Record<string, { errors: { id: string; file: string; line: number; message?: string }[]; unresolved?: number }> = {};
     if (existsSync(svc.tracingDir)) {
       for (const f of readdirSync(svc.tracingDir).filter((f) => f.endsWith('.json'))) {
         Object.assign(traced, JSON.parse(readFileSync(join(svc.tracingDir, f), 'utf8')));
@@ -403,6 +429,7 @@ function main() {
       for (const d of declaredByOp[operationId] ?? []) {
         byStatus.set(d.status, { status: d.status, statusText: STATUS_TEXT[d.status] ?? '', description: d.description, causes: [] });
       }
+      let unmatchedForOp = 0;
       for (const site of traced[operationId]?.errors ?? []) {
         // A real, hand-assigned zerrors ID can coincidentally start with
         // "GRPC-" too (confirmed: GRPC-vR9nC is a real catalog entry, not
@@ -411,6 +438,7 @@ function main() {
         const cluster = findCluster(site.id, site.file, site.line) ?? syntheticGrpcCluster(site.id, site.message ?? '');
         if (!cluster) {
           unmatched++;
+          unmatchedForOp++;
           continue;
         }
         matched++;
@@ -433,20 +461,33 @@ function main() {
       // touches zerrors at all, so it can only ever return UNIMPLEMENTED —
       // yet the proto's generic file-level 403/404 defaults would otherwise
       // show up here as if they were real possibilities for this endpoint.
-      const wasTraced = operationId in traced;
-      const byStatusFiltered = wasTraced ? new Map([...byStatus].filter(([, g]) => g.causes.length > 0)) : byStatus;
+      //
+      // "Has an entry in traced" isn't enough to call that confident,
+      // though: GetInstanceFeatures returns a bare, unwrapped error, so the
+      // walker reaches it and finds zero zerrors.Throw* sites — which looks
+      // identical to SetOrganizationFeatures's one-line stub unless we also
+      // check *how* the walk went. wasCleanlyTraced additionally requires
+      // zero unresolved call sites (the Go tool's walker gave up on some
+      // dynamic dispatch it couldn't follow) and zero traced IDs that
+      // failed to match the error catalog (unmatchedForOp) — either one
+      // means the tracer stopped looking partway through, not that it
+      // looked and confirmed nothing. Short of both being zero, this
+      // operation gets the same treatment as "never traced".
+      const wasCleanlyTraced = operationId in traced && (traced[operationId].unresolved ?? 0) === 0 && unmatchedForOp === 0;
+      const byStatusFiltered = wasCleanlyTraced ? new Map([...byStatus].filter(([, g]) => g.causes.length > 0)) : byStatus;
       const groups = [...byStatusFiltered.values()].sort((a, b) => a.status - b.status);
       for (const g of groups) g.causes.sort((a, b) => a.message.localeCompare(b.message));
       const marker = '## Possible error responses';
       const original = readFileSync(mdxPath, 'utf8');
       const base = original.includes(marker) ? original.slice(0, original.indexOf(marker)) : original;
 
-      if (groups.length === 0 && !wasTraced) {
-        // Never traced at all — stay fully silent rather than expose
-        // internal tooling state ("not traced yet") on a public docs page.
-        // Still strip a stale section from a previous run if one exists:
-        // original only differs from base when the marker was actually
-        // present, so this is a no-op write otherwise.
+      if (groups.length === 0 && !wasCleanlyTraced) {
+        // Never traced, or traced but not cleanly (see wasCleanlyTraced
+        // above) — stay fully silent rather than expose internal tooling
+        // state, or a false "confirmed nothing" claim, on a public docs
+        // page. Still strip a stale section from a previous run if one
+        // exists: original only differs from base when the marker was
+        // actually present, so this is a no-op write otherwise.
         if (original !== base) writeFileSync(mdxPath, base.replace(/\n*$/, '') + '\n');
         continue;
       }
@@ -475,4 +516,4 @@ function main() {
 // discoverServices()/discoverTraceableServices() from it
 // (trace-endpoint-errors.ts), which would otherwise silently trigger a full
 // merge run as a side effect of just wanting the service list.
-if (import.meta.url === `file://${process.argv[1]}`) main();
+if (import.meta.url === pathToFileURL(process.argv[1]).href) main();

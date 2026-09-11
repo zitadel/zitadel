@@ -24,8 +24,8 @@
 // (--changed-since the PR's base — only what that PR touched, to flag
 // what's now out of date, never to generate the tables itself).
 import { execFileSync } from 'child_process';
-import { existsSync, mkdirSync, writeFileSync } from 'fs';
-import { basename, dirname, isAbsolute, join, relative, resolve } from 'path';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { dirname, isAbsolute, join, relative, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { discoverTraceableServices, type ServiceConfig } from './generate-endpoint-errors';
 
@@ -56,12 +56,28 @@ function parseArgs(argv: string[]) {
   return { goFile: get('--go-file'), proto: get('--proto'), only: get('--only'), changedSince: get('--changed-since') };
 }
 
-// Runs the Go tracer against one service's proto file and writes its output.
+// Runs the Go tracer against one service and writes its output. Defaults to
+// tracing by proto file; pass traceArg to trace by --go-file instead (used
+// in single-service mode when that's what the caller pointed at — tracing
+// by proto there would silently ignore which file was actually given).
+//
+// merge controls what happens to operations already sitting in outFile that
+// this run didn't touch. A --proto (or --only, or no-flags) run traces
+// every RPC the service declares, so its result is the complete, current
+// truth for that category — a plain overwrite is correct, and is in fact
+// required to let a removed RPC's stale entry actually disappear. A
+// --go-file run only traces the methods defined in that one file, a
+// deliberately narrow slice for fast local iteration — overwriting the
+// whole per-category file with just that slice would silently delete every
+// other operation this category already had traced. merge: true instead
+// folds this run's results into whatever's already there, touching only
+// the keys this run actually produced.
+//
 // Returns the operation count found (0 if the tracer found nothing, in
 // which case nothing is written).
-function traceService(svc: ServiceConfig, outFile: string): number {
+function traceService(svc: ServiceConfig, outFile: string, traceArg: [string, string] = ['--proto', svc.protoFile], merge = false): number {
   console.log(`[trace-endpoint-errors] tracing ${svc.category} (${svc.service})...`);
-  const output = execFileSync('go', ['run', './internal/tools/errortrace', '--proto', svc.protoFile], {
+  const output = execFileSync('go', ['run', './internal/tools/errortrace', ...traceArg], {
     cwd: REPO_ROOT,
     stdio: ['ignore', 'pipe', 'inherit'],
   }).toString();
@@ -73,8 +89,14 @@ function traceService(svc: ServiceConfig, outFile: string): number {
     return 0;
   }
   if (!existsSync(svc.tracingDir)) mkdirSync(svc.tracingDir, { recursive: true });
-  writeFileSync(outFile, output);
-  console.log(`[trace-endpoint-errors] wrote ${opCount} operation(s) to ${outFile}`);
+
+  let toWrite = traced;
+  if (merge && existsSync(outFile)) {
+    const existing = JSON.parse(readFileSync(outFile, 'utf8'));
+    toWrite = { ...existing, ...traced };
+  }
+  writeFileSync(outFile, JSON.stringify(toWrite, null, 2) + '\n');
+  console.log(`[trace-endpoint-errors] wrote ${opCount} operation(s) to ${outFile}${merge ? ' (merged)' : ''}`);
   return opCount;
 }
 
@@ -86,8 +108,16 @@ function regenerate() {
 // Maps whatever changed between sinceRef and HEAD to the categories it
 // touches — did it change a category's .proto file (or anything alongside
 // it) or anything under its Go handler package.
+//
+// Three-dot (sinceRef...HEAD), not two-dot: two-dot diffs the tips of both
+// refs directly, so if sinceRef (a PR's base, e.g. origin/main) has moved
+// on since the PR branched off it, every category anyone else merged into
+// main in the meantime shows up as "changed" too — wildly widening what a
+// single PR gets flagged for. Three-dot diffs from the merge-base instead,
+// which is what a PR's actual file changes are and what GitHub's own
+// "Files changed" tab shows.
 function findAffectedCategories(sinceRef: string, services: ServiceConfig[]): Set<string> {
-  const changed = execFileSync('git', ['diff', '--name-only', sinceRef, 'HEAD'], { cwd: REPO_ROOT })
+  const changed = execFileSync('git', ['diff', '--name-only', `${sinceRef}...HEAD`], { cwd: REPO_ROOT })
     .toString()
     .split('\n')
     .map((l) => l.trim())
@@ -114,8 +144,16 @@ function main() {
 
   // Single-service mode: trace exactly the one service that owns this file.
   if (goFile || proto) {
-    const goFileAbs = goFile ? resolve(process.cwd(), goFile) : undefined;
-    const protoAbs = proto ? resolve(process.cwd(), proto) : undefined;
+    // Resolved against REPO_ROOT, not process.cwd(): every documented
+    // example above is written as a repo-root-relative path (matching how
+    // someone actually browsing the repo would copy one), but pnpm always
+    // runs a package's script from that package's own directory — so
+    // process.cwd() here is apps/docs regardless of where the command was
+    // typed from, and a repo-root-relative path resolved against it would
+    // silently look inside apps/docs/proto/... instead, which doesn't
+    // exist. An already-absolute path is unaffected either way.
+    const goFileAbs = goFile ? resolve(REPO_ROOT, goFile) : undefined;
+    const protoAbs = proto ? resolve(REPO_ROOT, proto) : undefined;
     const svc = goFileAbs
       ? services.find((s) => isInside(s.goPackageDir, goFileAbs))
       : services.find((s) => s.protoFile === protoAbs);
@@ -125,9 +163,23 @@ function main() {
           `package doesn't exist yet — see discoverTraceableServices() in generate-endpoint-errors.ts.`,
       );
     }
-    const base = goFileAbs ? basename(goFileAbs, '.go') : basename(protoAbs!, '.proto');
-    const outFile = join(svc.tracingDir, `${base}-ops.json`);
-    const opCount = traceService(svc, outFile);
+    // Always the same filename regardless of mode (never named after the
+    // --go-file/--proto argument itself). Naming the file after whichever
+    // argument happened to be passed would let --go-file and --only (or a
+    // plain full run) each write their own same-service file side by side
+    // in the tracing dir, and generate-endpoint-errors.ts merges every
+    // *.json file it finds there with Object.assign() in directory-listing
+    // order, which is unspecified — so a stale file could silently outrank
+    // a fresh one. One filename per service instead.
+    //
+    // --proto traces every RPC the service declares, a complete dump, so
+    // it replaces the file outright (see traceService's merge param). A
+    // --go-file run only covers the methods in that one file, so it merges
+    // into whatever's already there instead of overwriting the rest of the
+    // category's already-traced operations with just that narrow slice.
+    const outFile = join(svc.tracingDir, `${svc.category}-ops.json`);
+    const traceArg: [string, string] = goFileAbs ? ['--go-file', goFileAbs] : ['--proto', svc.protoFile];
+    const opCount = traceService(svc, outFile, traceArg, !!goFileAbs);
     if (opCount === 0) fail('the tracer found no operations — check --go-file/--proto point at an actual handler/service file');
     regenerate();
     return;

@@ -1,0 +1,27 @@
+{
+  "FormattedMessage": {
+    "handler": "internal/tools/errortrace/testdata/grpcstatus/handler.go:23",
+    "errors": [
+      {
+        "id": "GRPC-NOT_FOUND",
+        "file": "internal/tools/errortrace/testdata/grpcstatus/handler.go",
+        "line": 24,
+        "reasoning": "FormattedMessage"
+      }
+    ],
+    "unresolved": 0
+  },
+  "Unimplemented": {
+    "handler": "internal/tools/errortrace/testdata/grpcstatus/handler.go:15",
+    "errors": [
+      {
+        "id": "GRPC-UNIMPLEMENTED",
+        "file": "internal/tools/errortrace/testdata/grpcstatus/handler.go",
+        "line": 16,
+        "reasoning": "Unimplemented",
+        "message": "method Unimplemented not implemented"
+      }
+    ],
+    "unresolved": 0
+  }
+}

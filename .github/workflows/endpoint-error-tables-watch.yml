@@ -68,7 +68,14 @@ jobs:
         working-directory: apps/docs
         run: |
           set -euo pipefail
-          git fetch origin "${{ github.event.pull_request.base.sha }}" --depth=1
+          # No extra fetch here: the checkout step above already ran with
+          # fetch-depth: 0, which pulls full history for every branch, base
+          # included. A shallow --depth=1 fetch of just the base sha (the
+          # previous version of this step) would sit on top of that fine on
+          # its own, but risks leaving a partial history the moment anyone
+          # trims the checkout step's fetch-depth back down later — and
+          # trace-endpoint-errors.ts's --changed-since needs the real merge
+          # base, not just the base sha's own commit, to do a three-dot diff.
           output=$(pnpm exec tsx scripts/trace-endpoint-errors.ts --changed-since "${{ github.event.pull_request.base.sha }}")
           echo "$output"
           categories=$(echo "$output" | grep -o 'AFFECTED_CATEGORIES=.*' | head -1 | cut -d= -f2)
