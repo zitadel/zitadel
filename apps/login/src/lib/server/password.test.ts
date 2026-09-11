@@ -82,8 +82,9 @@ describe("checkSessionAndSetPassword", () => {
     const { headers } = await import("next/headers");
     const { getServiceConfig } = await import("../service-url");
     const { getSessionCookieById } = await import("../cookies");
-    const { getSession, listAuthenticationMethodTypes, getLoginSettings, getLockoutSettings, setPassword } =
-      await import("../zitadel");
+    const { getSession, listAuthenticationMethodTypes, getLoginSettings, getLockoutSettings, setPassword } = await import(
+      "../zitadel"
+    );
     const { setSessionAndUpdateCookie } = await import("./cookie");
 
     mockHeaders = vi.mocked(headers);
@@ -410,6 +411,56 @@ describe("sendPassword", () => {
     expect(result).toEqual({
       error: "errors.failedToAuthenticate",
     });
+  });
+
+  test("should return invalid password error without recreating session when existing session verification fails", async () => {
+    mockGetSessionCookieByLoginName.mockResolvedValue({
+      id: "session123",
+      token: "token123",
+      organization: "org123",
+    });
+    mockGetLoginSettings.mockResolvedValue({
+      ignoreUnknownUsernames: false,
+      allowLocalAuthentication: true,
+      passwordCheckLifetime: { seconds: BigInt(60 * 60 * 24), nanos: 0 },
+    });
+    mockSetSessionAndUpdateCookie.mockRejectedValue({ failedAttempts: 3 });
+    mockGetLockoutSettings.mockResolvedValue({ maxPasswordAttempts: BigInt(5) });
+
+    const result = await sendPassword({
+      loginName: "user@example.com",
+      organization: "org123",
+      checks: { password: { password: "wrong" } } as any,
+    });
+
+    expect(result).toEqual({ error: "errors.failedToAuthenticate" });
+    expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+    expect(mockSearchUsers).not.toHaveBeenCalled();
+  });
+
+  test("should return no-limit invalid password error without recreating session when no password limit is configured", async () => {
+    mockGetSessionCookieByLoginName.mockResolvedValue({
+      id: "session123",
+      token: "token123",
+      organization: "org123",
+    });
+    mockGetLoginSettings.mockResolvedValue({
+      ignoreUnknownUsernames: false,
+      allowLocalAuthentication: true,
+      passwordCheckLifetime: { seconds: BigInt(60 * 60 * 24), nanos: 0 },
+    });
+    mockSetSessionAndUpdateCookie.mockRejectedValue({ failedAttempts: 3 });
+    mockGetLockoutSettings.mockResolvedValue({ maxPasswordAttempts: BigInt(0) });
+
+    const result = await sendPassword({
+      loginName: "user@example.com",
+      organization: "org123",
+      checks: { password: { password: "wrong" } } as any,
+    });
+
+    expect(result).toEqual({ error: "errors.failedToAuthenticateNoLimit" });
+    expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+    expect(mockSearchUsers).not.toHaveBeenCalled();
   });
 
   test("should recreate session when session verification fails with keys/session terminated error and ignoreUnknownUsernames is true", async () => {
