@@ -1,0 +1,27 @@
+services:
+  zitadel-login:
+    build:
+      context: .
+      dockerfile: Dockerfile.login
+      args:
+        NEXT_PUBLIC_BASE_PATH: '${ZITADEL_LOGIN_BASE_PATH:-/ui/v2/login}'
+    restart: unless-stopped
+    environment:
+      PORT: '${ZITADEL_LOGIN_PORT:-3000}'
+      NEXT_PUBLIC_BASE_PATH: '${ZITADEL_LOGIN_BASE_PATH:-/ui/v2/login}'
+      ZITADEL_API_URL: 'http://zitadel-api:${ZITADEL_INTERNAL_PORT:-8080}'
+      ZITADEL_SERVICE_USER_TOKEN_FILE: /zitadel/bootstrap/login-client.pat
+      CUSTOM_REQUEST_HEADERS: 'Host:${ZITADEL_DOMAIN}'
+      ZITADEL_TLS_ENABLED: '${ZITADEL_LOGIN_TLS_ENABLED:-false}'
+      DEBUG: '${DEBUG:-false}'
+    volumes:
+      - '/data/zitadel/bootstrap:/zitadel/bootstrap:ro'
+    networks:
+      zitadel-network:
+        aliases:
+          - zitadel-login
+
+networks:
+  zitadel-network:
+    external: true
+    name: '${COOLIFY_NETWORK:-zitadel-sandbox}'
