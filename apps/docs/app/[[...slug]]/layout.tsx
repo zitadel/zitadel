@@ -63,7 +63,7 @@ export default async function Layout(props: { children: ReactNode; params: Promi
       {...baseOptions()}
       sidebar={{
         banner: (
-          <VersionSelector />
+          <VersionSelector key="version-selector" />
         ),
       }}
     >
