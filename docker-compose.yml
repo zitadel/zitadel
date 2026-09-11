@@ -6,6 +6,7 @@ services:
       args:
         NEXT_PUBLIC_BASE_PATH: '${ZITADEL_LOGIN_BASE_PATH:-/ui/v2/login}'
     restart: unless-stopped
+    user: '0'
     environment:
       PORT: '${ZITADEL_LOGIN_PORT:-3000}'
       NEXT_PUBLIC_BASE_PATH: '${ZITADEL_LOGIN_BASE_PATH:-/ui/v2/login}'
