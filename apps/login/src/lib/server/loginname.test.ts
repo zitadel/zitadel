@@ -1023,6 +1023,76 @@ describe("sendLoginname", () => {
       expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
     });
 
+    test("should allow login with a differently cased login name when email and phone login are disabled", async () => {
+      // Regression test for: https://github.com/zitadel/zitadel/issues/12025
+      // The user search matches case insensitively, so the follow up check that verifies
+      // the user was found by login name must not reject "Jackson@Example.com".
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "jackson@example.com",
+        details: { resourceOwner: "org123" },
+        type: { case: "human", value: { email: { email: "jackson@example.com" } } },
+        state: UserState.ACTIVE,
+      };
+
+      const mockSession = {
+        factors: { user: { id: "user123", loginName: "jackson@example.com", organizationId: "org123" } },
+      };
+
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockGetLoginSettings.mockResolvedValue({
+        disableLoginWithEmail: true,
+        disableLoginWithPhone: true,
+        allowLocalAuthentication: true,
+      });
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+
+      const result = await sendLoginname({
+        loginName: "Jackson@Example.com",
+      });
+
+      expect(result).not.toEqual({ error: "errors.userNotFound" });
+      expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
+    });
+
+    test("should allow login with a differently cased email when disableLoginWithPhone is true", async () => {
+      // Regression test for: https://github.com/zitadel/zitadel/issues/12025
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "jackson@orgdomain.com",
+        details: { resourceOwner: "org123" },
+        type: {
+          case: "human",
+          value: { email: { email: "jackson@example.com" }, phone: { phone: "+1234567890" } },
+        },
+        state: UserState.ACTIVE,
+      };
+
+      const mockSession = {
+        factors: { user: { id: "user123", loginName: "jackson@orgdomain.com", organizationId: "org123" } },
+      };
+
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockGetLoginSettings.mockResolvedValue({
+        disableLoginWithPhone: true,
+        allowLocalAuthentication: true,
+      });
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({ session: mockSession, sessionCookie: {} });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+
+      const result = await sendLoginname({
+        loginName: "Jackson@Example.com",
+      });
+
+      expect(result).not.toEqual({ error: "errors.userNotFound" });
+      expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
+    });
+
     test("should block login with phone number when disableLoginWithPhone is true", async () => {
       const mockUser = {
         userId: "user123",

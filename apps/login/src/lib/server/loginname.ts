@@ -1,5 +1,6 @@
 "use server";
 
+import { equalsIgnoreCase } from "@/lib/auth-utils";
 import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/logger";
 import { create } from "@zitadel/client";
@@ -258,15 +259,21 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     // recheck login settings after user discovery, as the search might have been done without org scope
     if (userLoginSettings?.disableLoginWithEmail && userLoginSettings?.disableLoginWithPhone) {
-      if (user.preferredLoginName !== concatLoginname) {
+      if (!equalsIgnoreCase(user.preferredLoginName, concatLoginname)) {
         return preventUserEnumeration(command.organization);
       }
     } else if (userLoginSettings?.disableLoginWithEmail) {
-      if (user.preferredLoginName !== concatLoginname && humanUser?.phone?.phone !== command.loginName) {
+      if (
+        !equalsIgnoreCase(user.preferredLoginName, concatLoginname) &&
+        !equalsIgnoreCase(humanUser?.phone?.phone, command.loginName)
+      ) {
         return preventUserEnumeration(command.organization);
       }
     } else if (userLoginSettings?.disableLoginWithPhone) {
-      if (user.preferredLoginName !== concatLoginname && humanUser?.email?.email !== command.loginName) {
+      if (
+        !equalsIgnoreCase(user.preferredLoginName, concatLoginname) &&
+        !equalsIgnoreCase(humanUser?.email?.email, command.loginName)
+      ) {
         return preventUserEnumeration(command.organization);
       }
     }
