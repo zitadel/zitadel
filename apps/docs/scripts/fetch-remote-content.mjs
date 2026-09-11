@@ -449,6 +449,42 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
   }
 }
 
+/**
+ * fumadocs wraps heading text in its own anchor (`<a href="#id">`), so a markdown
+ * link inside a heading ends up as nested `<a>` tags. Browsers split those while
+ * parsing, which breaks React hydration (error #418) and the heading's anchor.
+ * Latest content is fixed at the source; versioned content is downloaded from git
+ * tags, so the link is unwrapped into plain heading text here instead.
+ */
+export function unwrapHeadingLinks(content) {
+  let inFence = false;
+  return content
+    .split('\n')
+    .map((line) => {
+      if (/^\s*(```|~~~)/.test(line)) inFence = !inFence;
+      if (inFence || !/^#{1,6}\s/.test(line)) return line;
+      // [text](url) -> text; leaves images (![alt](src)) alone
+      return line.replace(/(?<!!)\[([^\]]+)\]\([^)]*\)/g, '$1');
+    })
+    .join('\n');
+}
+
+function fixHeadingLinks(versionDir) {
+  if (!fs.existsSync(versionDir)) return;
+  for (const file of fs.readdirSync(versionDir, { recursive: true })) {
+    const filePath = join(versionDir, file);
+    if (!filePath.endsWith('.mdx') && !filePath.endsWith('.md')) continue;
+    if (!fs.statSync(filePath).isFile()) continue;
+
+    const content = fs.readFileSync(filePath, 'utf8');
+    const fixed = unwrapHeadingLinks(content);
+    if (fixed !== content) {
+      console.log(`[fix-headings] Unwrapped link in heading: ${file}`);
+      fs.writeFileSync(filePath, fixed);
+    }
+  }
+}
+
 function getLocalVersion() {
     const vercelBranch = process.env.VERCEL_GIT_COMMIT_REF;
     let branch = vercelBranch;
@@ -515,6 +551,7 @@ async function run() {
         // Correctly pass sourceRef here so external files are fetched from the same place (local or remote)
         await fixRelativeImports(contentDest, sourceRef);
     }
+    fixHeadingLinks(contentDest);
   }));
 
   const versionsJson = [

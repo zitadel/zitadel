@@ -1,32 +1,32 @@
+import { getBreadcrumbItems } from 'fumadocs-core/breadcrumb';
 import { createSearchAPI } from 'fumadocs-core/search/server';
 import { source, versionSource } from '@/lib/source';
+import { getVersionFromUrl, LATEST_VERSION } from '@/lib/versions';
 
-// 1. Process latest docs
-const latestPages = source.getPages().map((page) => ({
-  title: page.data.title,
-  description: page.data.description,
-  url: page.url,
-  id: page.url,
-  structuredData: page.data.structuredData,
-  tag: 'latest',
-}));
+// Both loaders share one index. Every entry is tagged with its docs version so the
+// client can scope results to the version being viewed (see app/providers.tsx).
+function indexPages(loader: typeof source | typeof versionSource, getTag: (url: string) => string) {
+  const tree = loader.getPageTree();
 
-// 2. Process versioned docs
-const versionedPages = versionSource.getPages().map((page) => {
-  // Extract version from URL (e.g., /v4.17/guides/... -> v4.17)
-  const match = page.url.match(/^\/(v\d+\.\d+)/);
-  
-  return {
+  return loader.getPages().map((page) => ({
+    id: page.url,
+    url: page.url,
     title: page.data.title,
     description: page.data.description,
-    url: page.url,
-    id: page.url,
     structuredData: page.data.structuredData,
-    tag: match ? match[1] : 'latest',
-  };
-});
+    // Sidebar path (e.g. "Deploy & Operate › Self-Hosted"), shown with each result.
+    breadcrumbs: getBreadcrumbItems(page.url, tree)
+      .map((item) => item.name)
+      .filter((name): name is string => typeof name === 'string'),
+    tag: getTag(page.url),
+  }));
+}
 
-// 3. Export combined search index
 export const { GET } = createSearchAPI('advanced', {
-  indexes: [...latestPages, ...versionedPages],
+  // https://docs.orama.com/docs/orama-js/supported-languages
+  language: 'english',
+  indexes: [
+    ...indexPages(source, () => LATEST_VERSION),
+    ...indexPages(versionSource, getVersionFromUrl),
+  ],
 });
