@@ -1,0 +1,9 @@
+.git
+.github
+**/node_modules
+**/.next
+.nx
+.artifacts
+coverage
+tmp
+*.log
