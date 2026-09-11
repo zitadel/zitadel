@@ -943,7 +943,10 @@ func contextInfoForUserOIDC(instance *integration.Instance, function string, cli
 			PrimaryDomain: instance.DefaultOrg.GetPrimaryDomain(),
 		},
 		UserGrants: nil,
-		Response:   nil,
+		Request: &oidc_api.ContextInfoRequest{
+			Scope: []string{oidc.ScopeOpenID},
+		},
+		Response: nil,
 	}
 }
 
