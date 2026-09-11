@@ -25,7 +25,6 @@
   "dependencies": {
     "@headlessui/react": "^2.2.10",
     "@heroicons/react": "^2.2.0",
-    "@inkeep/cxkit-react": "^0.5.117",
     "@scalar/api-reference": "^1.55.3",
     "@shikijs/rehype": "^4.0.2",
     "@shikijs/types": "^4.0.2",
