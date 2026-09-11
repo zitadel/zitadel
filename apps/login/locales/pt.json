@@ -1,7 +1,7 @@
 {
   "common": {
     "back": "Voltar",
-    "title": "Entrar com Zitadel"
+    "title": "Ailton Account"
   },
   "accounts": {
     "title": "Contas",
@@ -23,8 +23,8 @@
     }
   },
   "loginname": {
-    "title": "Bem-vindo de volta!",
-    "description": "Insira seus dados de acesso.",
+    "title": "Bem-vindo à Ailton Account",
+    "description": "Entre com sua conta para continuar.",
     "register": "Cadastrar novo usuário",
     "submit": "Continuar",
     "labels": {
@@ -324,7 +324,7 @@
       "description": "Forneça e-mail, nome e sobrenome para se cadastrar."
     },
     "title": "Cadastrar",
-    "description": "Crie sua conta Zitadel.",
+    "description": "Crie sua Ailton Account.",
     "noMethodAvailableWarning": "Nenhum método de autenticação disponível. Por favor, entre em contato com o administrador.",
     "selectMethod": "Selecione o método de autenticação desejado",
     "agreeTo": "Para se cadastrar, você deve concordar com os termos e condições",
