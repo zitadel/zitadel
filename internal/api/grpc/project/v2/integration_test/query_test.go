@@ -311,6 +311,70 @@ func TestServer_ListProjects(t *testing.T) {
 			},
 		},
 		{
+			name: "list by state active",
+			args: args{
+				ctx: iamOwnerCtx,
+				dep: func(request *project.ListProjectsRequest, response *project.ListProjectsResponse) {
+					orgID := instance.DefaultOrg.GetId()
+					response.Projects[0] = createProject(iamOwnerCtx, instance, t, orgID, false, false)
+					request.Filters[0].Filter = &project.ProjectSearchFilter_InProjectIdsFilter{
+						InProjectIdsFilter: &filter.InIDsFilter{
+							Ids: []string{response.Projects[0].GetProjectId()},
+						},
+					}
+					request.Filters[1].Filter = &project.ProjectSearchFilter_StateFilter{
+						StateFilter: project.ProjectState_PROJECT_STATE_ACTIVE,
+					}
+				},
+				req: &project.ListProjectsRequest{
+					Filters: []*project.ProjectSearchFilter{{}, {}},
+				},
+			},
+			want: &project.ListProjectsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  1,
+					AppliedLimit: 100,
+				},
+				Projects: []*project.Project{
+					{},
+				},
+			},
+		},
+		{
+			name: "list by state inactive",
+			args: args{
+				ctx: iamOwnerCtx,
+				dep: func(request *project.ListProjectsRequest, response *project.ListProjectsResponse) {
+					orgID := instance.DefaultOrg.GetId()
+					created := createProject(iamOwnerCtx, instance, t, orgID, false, false)
+					deactivateResp := instance.DeactivateProject(iamOwnerCtx, t, created.GetProjectId())
+					created.State = project.ProjectState_PROJECT_STATE_INACTIVE
+					created.ChangeDate = deactivateResp.GetChangeDate()
+					response.Projects[0] = created
+					request.Filters[0].Filter = &project.ProjectSearchFilter_InProjectIdsFilter{
+						InProjectIdsFilter: &filter.InIDsFilter{
+							Ids: []string{created.GetProjectId()},
+						},
+					}
+					request.Filters[1].Filter = &project.ProjectSearchFilter_StateFilter{
+						StateFilter: project.ProjectState_PROJECT_STATE_INACTIVE,
+					}
+				},
+				req: &project.ListProjectsRequest{
+					Filters: []*project.ProjectSearchFilter{{}, {}},
+				},
+			},
+			want: &project.ListProjectsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  1,
+					AppliedLimit: 100,
+				},
+				Projects: []*project.Project{
+					{},
+				},
+			},
+		},
+		{
 			name: "list multiple id",
 			args: args{
 				ctx: iamOwnerCtx,
