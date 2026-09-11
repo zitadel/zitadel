@@ -385,6 +385,36 @@ describe("sendLoginname", () => {
         expect(result).toEqual({ redirect: "https://idp.example.com/auth" });
       });
 
+      test("should redirect to the IDP selection when user has only IDP method and multiple IDP links", async () => {
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.IDP],
+        });
+        mockListIDPLinks.mockResolvedValue({
+          result: [{ idpId: "idp123" }, { idpId: "idp456" }],
+        });
+
+        const result = await sendLoginname({
+          loginName: "user@example.com",
+        });
+
+        expect(result).toEqual({ redirect: "/idp?organization=org123" });
+        expect(mockStartIdentityProviderFlow).not.toHaveBeenCalled();
+      });
+
+      test("should return error when user has only IDP method and no identity provider is available", async () => {
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.IDP],
+        });
+        mockListIDPLinks.mockResolvedValue({ result: [] });
+        mockGetActiveIdentityProviders.mockResolvedValue({ identityProviders: [] });
+
+        const result = await sendLoginname({
+          loginName: "user@example.com",
+        });
+
+        expect(result).toEqual({ error: "errors.couldNotFindIdentityProvider" });
+      });
+
       test("should NOT create session when ignoreUnknownUsernames is true", async () => {
         mockGetLoginSettings.mockResolvedValue({
           allowLocalAuthentication: true,
@@ -453,6 +483,37 @@ describe("sendLoginname", () => {
         expect(result).toEqual({ redirect: "https://idp.example.com/auth" });
       });
 
+      test("should redirect to the IDP selection when user has multiple IDP links next to a password", async () => {
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.IDP],
+        });
+        mockListIDPLinks.mockResolvedValue({
+          result: [{ idpId: "idp123" }, { idpId: "idp456" }],
+        });
+
+        const result = await sendLoginname({
+          loginName: "user@example.com",
+          requestId: "request123",
+        });
+
+        expect(result).toEqual({ redirect: "/idp?requestId=request123&organization=org123" });
+        expect(mockStartIdentityProviderFlow).not.toHaveBeenCalled();
+      });
+
+      test("should redirect to password when the IDP method has no identity provider available", async () => {
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.IDP],
+        });
+        mockListIDPLinks.mockResolvedValue({ result: [] });
+        mockGetActiveIdentityProviders.mockResolvedValue({ identityProviders: [] });
+
+        const result = await sendLoginname({
+          loginName: "user@example.com",
+        });
+
+        expect(result?.redirect).toMatch(/^\/password\?/);
+      });
+
       test("should redirect to password when no passkey or IDP, only password available and allowed", async () => {
         mockListAuthenticationMethodTypes.mockResolvedValue({
           authMethodTypes: [AuthenticationMethodType.PASSWORD],
@@ -505,6 +566,26 @@ describe("sendLoginname", () => {
       });
 
       expect(result).toEqual({ redirect: "https://idp.example.com/auth" });
+    });
+
+    test("should redirect to the IDP selection when register allowed, password not allowed and several IDPs are active", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        allowRegister: true,
+        allowLocalAuthentication: false,
+      });
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [
+          { id: "idp123", type: "OIDC", options: { isAutoCreation: true } },
+          { id: "idp456", type: "OIDC", options: { isAutoCreation: true } },
+        ],
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@example.com",
+      });
+
+      expect(result).toEqual({ redirect: "/idp" });
+      expect(mockStartIdentityProviderFlow).not.toHaveBeenCalled();
     });
 
     test("should redirect to register when both register and password allowed", async () => {
