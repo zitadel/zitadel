@@ -1,4 +1,5 @@
 export const supportedLanguages = [
+  'da',
   'de',
   'en',
   'es',
@@ -22,5 +23,5 @@ export const supportedLanguages = [
   'uk',
   'ar',
 ];
-export const supportedLanguagesRegexp: RegExp = /de|en|es|fr|id|it|ja|pl|zh|bg|pt|mk|cs|ru|nl|sv|hu|ko|ro|tr|uk|ar/;
+export const supportedLanguagesRegexp: RegExp = /da|de|en|es|fr|id|it|ja|pl|zh|bg|pt|mk|cs|ru|nl|sv|hu|ko|ro|tr|uk|ar/;
 export const fallbackLanguage: string = 'en';

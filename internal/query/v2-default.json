@@ -1,4 +1,337 @@
 {
+  "da": {
+    "common": {
+      "back": "Tilbage",
+      "title": "Log ind med Zitadel"
+    },
+    "accounts": {
+      "title": "Konti",
+      "description": "Vælg den konto, du vil bruge.",
+      "addAnother": "Tilføj en anden konto",
+      "noResults": "Ingen konti fundet",
+      "verified": "bekræftet",
+      "expired": "udløbet"
+    },
+    "logout": {
+      "title": "Log ud",
+      "description": "Klik på en konto for at afslutte sessionen",
+      "noResults": "Ingen konti fundet",
+      "clear": "Afslut session",
+      "verifiedAt": "Sidst aktiv: {time}",
+      "success": {
+        "title": "Log ud gennemført",
+        "description": "Du er nu logget ud."
+      }
+    },
+    "loginname": {
+      "title": "Velkommen tilbage!",
+      "description": "Indtast dine loginoplysninger.",
+      "register": "Registrér ny bruger",
+      "submit": "Fortsæt",
+      "labels": {
+        "loginname": "Loginnavn",
+        "username": "Brugernavn",
+        "usernameOrPhoneNumber": "Brugernavn eller telefonnummer",
+        "usernameOrEmail": "Brugernavn eller e-mail"
+      },
+      "required": {
+        "loginName": "Dette felt er påkrævet"
+      }
+    },
+    "password": {
+      "verify": {
+        "title": "Adgangskode",
+        "description": "Indtast din adgangskode.",
+        "resetPassword": "Nulstil adgangskode",
+        "submit": "Fortsæt",
+        "labels": {
+          "password": "Adgangskode"
+        },
+        "required": {
+          "password": "Dette felt er påkrævet"
+        }
+      },
+      "set": {
+        "title": "Angiv adgangskode",
+        "description": "Angiv adgangskoden til din konto",
+        "codeSent": "En ny kode er blevet sendt til din e-mailadresse.",
+        "noCodeReceived": "Modtog du ikke en kode?",
+        "resend": "Send kode igen",
+        "submit": "Fortsæt",
+        "labels": {
+          "code": "Kode",
+          "newPassword": "Ny adgangskode",
+          "confirmPassword": "Bekræft adgangskode"
+        },
+        "required": {
+          "code": "Dette felt er påkrævet",
+          "newPassword": "Du skal angive en adgangskode!",
+          "confirmPassword": "Dette felt er påkrævet"
+        }
+      },
+      "change": {
+        "title": "Skift adgangskode",
+        "description": "Angiv adgangskoden til din konto",
+        "submit": "Fortsæt",
+        "labels": {
+          "newPassword": "Ny adgangskode",
+          "confirmPassword": "Bekræft adgangskode"
+        },
+        "required": {
+          "newPassword": "Du skal angive en ny adgangskode!",
+          "confirmPassword": "Dette felt er påkrævet"
+        }
+      }
+    },
+    "idp": {
+      "title": "Log ind med SSO",
+      "description": "Vælg en af følgende udbydere for at logge ind",
+      "orSignInWith": "eller log ind med",
+      "signInWithApple": "Log ind med Apple",
+      "signInWithGoogle": "Log ind med Google",
+      "signInWithAzureAD": "Log ind med AzureAD",
+      "signInWithGithub": "Log ind med GitHub",
+      "signInWithGitlab": "Log ind med GitLab",
+      "loginSuccess": {
+        "title": "Login gennemført",
+        "description": "Du er nu logget ind!"
+      },
+      "linkingSuccess": {
+        "title": "Konto sammenkædet",
+        "description": "Din konto er blevet sammenkædet!"
+      },
+      "registerSuccess": {
+        "title": "Registrering gennemført",
+        "description": "Du er nu registreret!"
+      },
+      "loginError": {
+        "title": "Login mislykkedes",
+        "description": "Der opstod en fejl under forsøget på at logge ind."
+      },
+      "linkingError": {
+        "title": "Sammenkædning af konto mislykkedes",
+        "description": "Der opstod en fejl under forsøget på at sammenkæde din konto."
+      },
+      "completeRegister": {
+        "title": "Færdiggør dine oplysninger",
+        "description": "Du skal færdiggøre din registrering ved at angive din e-mailadresse og dit navn."
+      }
+    },
+    "ldap": {
+      "title": "LDAP-login",
+      "description": "Indtast dine LDAP-loginoplysninger.",
+      "submit": "Fortsæt",
+      "labels": {
+        "username": "Brugernavn",
+        "password": "Adgangskode"
+      },
+      "required": {
+        "username": "Dette felt er påkrævet",
+        "password": "Dette felt er påkrævet"
+      }
+    },
+    "mfa": {
+      "verify": {
+        "title": "Bekræft din identitet",
+        "description": "Vælg en af følgende faktorer.",
+        "noResults": "Ingen anden faktor tilgængelig at konfigurere."
+      },
+      "set": {
+        "title": "Konfigurer 2-faktor",
+        "description": "Vælg en af følgende anden faktor.",
+        "skip": "Spring over"
+      }
+    },
+    "otp": {
+      "verify": {
+        "title": "Bekræft 2-faktor",
+        "totpDescription": "Indtast koden fra din autentificeringsapp.",
+        "smsDescription": "Indtast koden, du modtog via SMS.",
+        "emailDescription": "Indtast koden, du modtog via e-mail.",
+        "noCodeReceived": "Modtog du ikke en kode?",
+        "resendCode": "Send kode igen",
+        "submit": "Fortsæt",
+        "labels": {
+          "code": "Kode"
+        },
+        "required": {
+          "code": "Dette felt er påkrævet"
+        }
+      },
+      "set": {
+        "title": "Konfigurer 2-faktor",
+        "totpDescription": "Scan QR-koden med din autentificeringsapp.",
+        "smsDescription": "Indtast dit telefonnummer for at modtage en kode via SMS.",
+        "emailDescription": "Indtast din e-mailadresse for at modtage en kode via e-mail.",
+        "totpRegisterDescription": "Scan QR-koden, eller naviger til URL'en manuelt.",
+        "submit": "Fortsæt",
+        "labels": {
+          "code": "Kode"
+        },
+        "required": {
+          "code": "Dette felt er påkrævet"
+        }
+      }
+    },
+    "passkey": {
+      "verify": {
+        "title": "Godkend med en adgangsnøgle",
+        "description": "Din enhed vil bede om dit fingeraftryk, ansigt eller din skærmlås",
+        "usePassword": "Brug adgangskode",
+        "submit": "Fortsæt"
+      },
+      "set": {
+        "title": "Konfigurer en adgangsnøgle",
+        "description": "Din enhed vil bede om dit fingeraftryk, ansigt eller din skærmlås",
+        "info": {
+          "description": "En adgangsnøgle er en godkendelsesmetode på en enhed, såsom dit fingeraftryk, Apple FaceID eller lignende. ",
+          "link": "Godkendelse med adgangsnøgle"
+        },
+        "skip": "Spring over",
+        "submit": "Fortsæt"
+      }
+    },
+    "u2f": {
+      "verify": {
+        "title": "Bekræft 2-faktor",
+        "description": "Bekræft din konto med din enhed."
+      },
+      "set": {
+        "title": "Konfigurer 2-faktor",
+        "description": "Konfigurer en enhed som anden faktor.",
+        "submit": "Fortsæt"
+      }
+    },
+    "register": {
+      "methods": {
+        "passkey": "Adgangsnøgle",
+        "password": "Adgangskode"
+      },
+      "disabled": {
+        "title": "Registrering deaktiveret",
+        "description": "Registrering er deaktiveret. Kontakt venligst din administrator."
+      },
+      "missingdata": {
+        "title": "Manglende data",
+        "description": "Angiv e-mail, fornavn og efternavn for at registrere."
+      },
+      "title": "Registrér",
+      "description": "Opret din Zitadel-konto.",
+      "noMethodAvailableWarning": "Ingen godkendelsesmetode tilgængelig. Kontakt venligst din administrator.",
+      "selectMethod": "Vælg den metode, du vil bruge til at godkende dig",
+      "agreeTo": "For at registrere dig skal du acceptere vilkår og betingelser",
+      "termsOfService": "Servicevilkår",
+      "privacyPolicy": "Privatlivspolitik",
+      "submit": "Fortsæt",
+      "password": {
+        "title": "Angiv adgangskode",
+        "description": "Angiv adgangskoden til din konto",
+        "submit": "Fortsæt",
+        "labels": {
+          "password": "Adgangskode",
+          "confirmPassword": "Bekræft adgangskode"
+        },
+        "required": {
+          "password": "Du skal angive en adgangskode!",
+          "confirmPassword": "Dette felt er påkrævet"
+        }
+      },
+      "labels": {
+        "firstname": "Fornavn",
+        "lastname": "Efternavn",
+        "email": "E-mail"
+      },
+      "required": {
+        "firstname": "Dette felt er påkrævet",
+        "lastname": "Dette felt er påkrævet",
+        "email": "Dette felt er påkrævet"
+      }
+    },
+    "invite": {
+      "title": "Inviter bruger",
+      "description": "Angiv e-mailadressen og navnet på den bruger, du vil invitere.",
+      "info": "Brugeren vil modtage en e-mail med yderligere instruktioner.",
+      "notAllowed": "Dine indstillinger tillader dig ikke at invitere brugere.",
+      "submit": "Fortsæt",
+      "success": {
+        "title": "Bruger inviteret",
+        "description": "E-mailen er blevet sendt.",
+        "verified": "Brugeren er blevet inviteret og har allerede bekræftet sin e-mail.",
+        "notVerifiedYet": "Brugeren er blevet inviteret. De vil modtage en e-mail med yderligere instruktioner.",
+        "submit": "Inviter en anden bruger"
+      }
+    },
+    "signedin": {
+      "title": "Velkommen {user}!",
+      "description": "Du er logget ind.",
+      "continue": "Fortsæt",
+      "error": {
+        "title": "Fejl",
+        "description": "Der opstod en fejl under forsøget på at logge ind."
+      }
+    },
+    "verify": {
+      "userIdMissing": "Intet bruger-id angivet!",
+      "successTitle": "Bruger bekræftet",
+      "successDescription": "Brugeren er blevet bekræftet.",
+      "setupAuthenticator": "Konfigurer autentificering",
+      "verify": {
+        "title": "Bekræft bruger",
+        "description": "Indtast den kode, der står i bekræftelses-e-mailen.",
+        "noCodeReceived": "Modtog du ikke en kode?",
+        "resendCode": "Send kode igen",
+        "codeSent": "En ny kode er netop blevet sendt til din e-mailadresse.",
+        "submit": "Fortsæt",
+        "labels": {
+          "code": "Kode"
+        },
+        "required": {
+          "code": "Dette felt er påkrævet"
+        }
+      }
+    },
+    "authenticator": {
+      "title": "Vælg godkendelsesmetode",
+      "description": "Vælg den metode, du vil bruge til at godkende dig",
+      "noMethodsAvailable": "Ingen godkendelsesmetoder tilgængelige",
+      "allSetup": "Du har allerede konfigureret en autentificering!",
+      "linkWithIDP": "eller sammenkæd med en identitetsudbyder"
+    },
+    "device": {
+      "usercode": {
+        "title": "Enhedskode",
+        "description": "Indtast den kode, der vises på din app eller enhed.",
+        "submit": "Fortsæt",
+        "labels": {
+          "code": "Kode"
+        },
+        "required": {
+          "code": "Dette felt er påkrævet"
+        }
+      },
+      "request": {
+        "title": "{appName} vil gerne oprette forbindelse",
+        "description": "{appName} vil få adgang til:",
+        "disclaimer": "Ved at klikke på Tillad giver du {appName} og Zitadel lov til at bruge dine oplysninger i overensstemmelse med deres respektive servicevilkår og privatlivspolitikker. Du kan til enhver tid tilbagekalde denne adgang.",
+        "submit": "Tillad",
+        "deny": "Afvis"
+      },
+      "scope": {
+        "openid": "Bekræft din identitet.",
+        "email": "Se din e-mailadresse.",
+        "profile": "Se alle dine profiloplysninger.",
+        "offline_access": "Tillad offlineadgang til din konto."
+      }
+    },
+    "error": {
+      "noUserCode": "Ingen brugerkode angivet!",
+      "noDeviceRequest": "Ingen enhedsanmodning fundet.",
+      "unknownContext": "Kunne ikke fastslå brugerens kontekst. Sørg for at indtaste brugernavnet først, eller angiv et loginName som søgeparameter.",
+      "sessionExpired": "Din nuværende session er udløbet. Log venligst ind igen.",
+      "failedLoading": "Kunne ikke indlæse data. Prøv venligst igen.",
+      "tryagain": "Prøv igen"
+    }
+  },
   "de": {
     "common": {
       "back": "Zurück",
