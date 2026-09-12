@@ -1,6 +1,6 @@
 import { Code } from "@connectrpc/connect";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { clearSession } from "./session";
+import { clearSession, updateOrCreateSession } from "./session";
 
 vi.mock("@zitadel/client", async () => {
   const { Code } = await import("@connectrpc/connect");
@@ -126,5 +126,52 @@ describe("clearSession", () => {
 
     expect(res).toBeUndefined();
     expect(deleteSession).not.toHaveBeenCalled();
+  });
+});
+
+describe("updateOrCreateSession lifetime mapping", () => {
+  let getLoginSettings: any;
+  let getMostRecentSessionCookie: any;
+  let setSessionAndUpdateCookie: any;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    const zitadel = await import("@/lib/zitadel");
+    const cookies = await import("../cookies");
+    const cookieServer = await import("@/lib/server/cookie");
+    getLoginSettings = vi.mocked(zitadel.getLoginSettings);
+    getMostRecentSessionCookie = vi.mocked(cookies.getMostRecentSessionCookie);
+    setSessionAndUpdateCookie = vi.mocked(cookieServer.setSessionAndUpdateCookie);
+
+    getMostRecentSessionCookie.mockResolvedValue(cookie);
+    setSessionAndUpdateCookie.mockResolvedValue({ factors: { user: {} } });
+  });
+
+  test("applies secondFactorCheckLifetime to a TOTP check", async () => {
+    const secondFactorCheckLifetime = { seconds: BigInt(600), nanos: 0 };
+    getLoginSettings.mockResolvedValue({ secondFactorCheckLifetime });
+
+    await updateOrCreateSession({ checks: { totp: {} } as any });
+
+    expect(setSessionAndUpdateCookie).toHaveBeenCalledWith(expect.objectContaining({ lifetime: secondFactorCheckLifetime }));
+  });
+
+  test("applies secondFactorCheckLifetime to an otpEmail/otpSms check the same way", async () => {
+    const secondFactorCheckLifetime = { seconds: BigInt(600), nanos: 0 };
+    getLoginSettings.mockResolvedValue({ secondFactorCheckLifetime });
+
+    await updateOrCreateSession({ checks: { otpEmail: {} } as any });
+
+    expect(setSessionAndUpdateCookie).toHaveBeenCalledWith(expect.objectContaining({ lifetime: secondFactorCheckLifetime }));
+  });
+
+  test("falls back to the 24h default when no lifetime policy is configured for a TOTP check", async () => {
+    getLoginSettings.mockResolvedValue({});
+
+    await updateOrCreateSession({ checks: { totp: {} } as any });
+
+    expect(setSessionAndUpdateCookie).toHaveBeenCalledWith(
+      expect.objectContaining({ lifetime: { seconds: BigInt(60 * 60 * 24), nanos: 0 } }),
+    );
   });
 });
