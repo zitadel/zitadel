@@ -2202,6 +2202,10 @@
       "TITLE": "プロバイダーの追加",
       "DESCRIPTION": "以下のプロバイダーから1つ以上選択してください。",
       "STEPPERTITLE": "プロバイダーの作成",
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "別の ZITADEL インスタンスのユーザーが認証できるように、必要な情報を入力してください。"
+      },
       "OIDC": {
         "TITLE": "OIDCプロバイダー",
         "DESCRIPTION": "OIDCプロバイダーに必要なデータを入力してください。"
@@ -2314,6 +2318,10 @@
     "STATE": "ステータス",
     "ISSUER": "発行者",
     "SCOPESLIST": "スコープリスト",
+    "INSTANCEROLESINFO": "インスタンスロールのマッピング",
+    "INSTANCEROLESINFO_DESC": "このプロバイダーで認証したユーザーには、リモートの ZITADEL インスタンスの指定した組織で保持しているインスタンスメンバーロール（IAM_ プレフィックス）が付与されます。組織 ID とプライマリドメインの両方が一致する必要があります。",
+    "ORGANIZATIONID": "組織 ID",
+    "ORGANIZATIONDOMAIN": "組織ドメイン",
     "CLIENTID": "クライアントID",
     "CLIENTSECRET": "クライアントシークレット",
     "LDAPCONNECTION": "繋がり",

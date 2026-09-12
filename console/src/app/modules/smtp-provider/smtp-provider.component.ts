@@ -299,8 +299,7 @@ export class SMTPProviderComponent {
           ? ({
               case: 'defaults',
               defaults: SMTPKnownProviders[configOrProvider as keyof typeof SMTPKnownProviders] as
-                | (typeof SMTPKnownProviders)[keyof typeof SMTPKnownProviders]
-                | undefined,
+                (typeof SMTPKnownProviders)[keyof typeof SMTPKnownProviders] | undefined,
             } as const)
           : ({ case: 'config', config: this.getConfig(configOrProvider) } as const);
 

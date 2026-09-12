@@ -153,7 +153,8 @@
         "failedPrecondition": "Vorbedingung fehlgeschlagen",
         "sessionNotValid": "Sitzung ist nicht gültig",
         "passwordVerificationMissing": "Passwort-Verifizierung fehlt.",
-        "passwordVerificationTooOld": "Passwort-Verifizierung ist zu alt. Bitte verifizieren Sie Ihr Passwort erneut."
+        "passwordVerificationTooOld": "Passwort-Verifizierung ist zu alt. Bitte verifizieren Sie Ihr Passwort erneut.",
+        "passwordResetNotAllowed": "Das Zurücksetzen des Passworts ist nicht zulässig. Wenden Sie sich für weitere Informationen an Ihren Administrator."
       }
     },
     "idp": {
@@ -261,6 +262,10 @@
         "required": {
           "code": "Dieses Feld ist erforderlich"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "OTP-Challenge konnte nicht angefordert werden",
+        "couldNotVerifyCode": "OTP-Code konnte nicht verifiziert werden"
       }
     },
     "passkey": {
@@ -422,7 +427,15 @@
       "description": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten.",
       "noMethodsAvailable": "Keine Authentifizierungsmethoden verfügbar",
       "allSetup": "Sie haben bereits einen Authentifikator eingerichtet!",
-      "linkWithIDP": "oder verknüpfe mit einem Identitätsanbieter"
+      "linkWithIDP": "oder verknüpfe mit einem Identitätsanbieter",
+      "methods": {
+        "totp": "Authentifizierungs-App",
+        "u2f": "Universeller zweiter Faktor",
+        "otpEmail": "Code per E-Mail",
+        "otpSms": "Code per SMS",
+        "passkey": "Passkeys",
+        "password": "Passwort"
+      }
     },
     "device": {
       "usercode": {
@@ -614,7 +627,8 @@
         "failedPrecondition": "Failed precondition",
         "sessionNotValid": "Session is not valid",
         "passwordVerificationMissing": "Password verification is missing.",
-        "passwordVerificationTooOld": "Password verification is too old. Please verify your password again."
+        "passwordVerificationTooOld": "Password verification is too old. Please verify your password again.",
+        "passwordResetNotAllowed": "Password reset is not allowed. Contact your administrator for more information."
       }
     },
     "idp": {
@@ -722,6 +736,10 @@
         "required": {
           "code": "This field is required"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Could not request OTP challenge",
+        "couldNotVerifyCode": "Could not verify OTP code"
       }
     },
     "passkey": {
@@ -883,7 +901,15 @@
       "description": "Select the method you would like to authenticate",
       "noMethodsAvailable": "No authentication methods available",
       "allSetup": "You have already setup an authenticator!",
-      "linkWithIDP": "or link with an Identity Provider"
+      "linkWithIDP": "or link with an Identity Provider",
+      "methods": {
+        "totp": "Authenticator App",
+        "u2f": "Universal Second Factor",
+        "otpEmail": "Code via Email",
+        "otpSms": "Code via SMS",
+        "passkey": "Passkeys",
+        "password": "Password"
+      }
     },
     "device": {
       "usercode": {
@@ -1075,7 +1101,8 @@
         "failedPrecondition": "Precondición fallida",
         "sessionNotValid": "La sesión no es válida",
         "passwordVerificationMissing": "Falta la verificación de la contraseña.",
-        "passwordVerificationTooOld": "La verificación de la contraseña es demasiado antigua. Por favor, verifique su contraseña de nuevo."
+        "passwordVerificationTooOld": "La verificación de la contraseña es demasiado antigua. Por favor, verifique su contraseña de nuevo.",
+        "passwordResetNotAllowed": "El restablecimiento de contraseña no está permitido. Contacte con su administrador para más información."
       }
     },
     "idp": {
@@ -1183,6 +1210,10 @@
         "required": {
           "code": "Este campo es obligatorio"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "No se pudo solicitar el desafío OTP",
+        "couldNotVerifyCode": "No se pudo verificar el código OTP"
       }
     },
     "passkey": {
@@ -1344,7 +1375,15 @@
       "description": "Selecciona el método con el que deseas autenticarte",
       "noMethodsAvailable": "No hay métodos de autenticación disponibles",
       "allSetup": "¡Ya has configurado un autenticador!",
-      "linkWithIDP": "o vincúlalo con un proveedor de identidad"
+      "linkWithIDP": "o vincúlalo con un proveedor de identidad",
+      "methods": {
+        "totp": "Aplicación de autenticación",
+        "u2f": "Segundo factor universal",
+        "otpEmail": "Código por correo electrónico",
+        "otpSms": "Código por SMS",
+        "passkey": "Clave de acceso",
+        "password": "Contraseña"
+      }
     },
     "device": {
       "usercode": {
@@ -1536,7 +1575,8 @@
         "failedPrecondition": "Precondizione non soddisfatta",
         "sessionNotValid": "La sessione non è valida",
         "passwordVerificationMissing": "Manca la verifica della password.",
-        "passwordVerificationTooOld": "La verifica della password è troppo vecchia. Si prega di verificare nuovamente la password."
+        "passwordVerificationTooOld": "La verifica della password è troppo vecchia. Si prega di verificare nuovamente la password.",
+        "passwordResetNotAllowed": "Il ripristino della password non è consentito. Contatta il tuo amministratore per ulteriori informazioni."
       }
     },
     "idp": {
@@ -1644,6 +1684,10 @@
         "required": {
           "code": "Questo campo è obbligatorio"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Impossibile richiedere la challenge OTP",
+        "couldNotVerifyCode": "Impossibile verificare il codice OTP"
       }
     },
     "passkey": {
@@ -1805,7 +1849,15 @@
       "description": "Seleziona il metodo con cui desideri autenticarti",
       "noMethodsAvailable": "Nessun metodo di autenticazione disponibile",
       "allSetup": "Hai già configurato un autenticatore!",
-      "linkWithIDP": "o collega con un Identity Provider"
+      "linkWithIDP": "o collega con un Identity Provider",
+      "methods": {
+        "totp": "App di autenticazione",
+        "u2f": "Secondo fattore universale",
+        "otpEmail": "Codice via email",
+        "otpSms": "Codice via SMS",
+        "passkey": "Passkey",
+        "password": "Password"
+      }
     },
     "device": {
       "usercode": {
@@ -1997,7 +2049,8 @@
         "failedPrecondition": "Voorwaarde mislukt",
         "sessionNotValid": "Sessie is niet geldig",
         "passwordVerificationMissing": "Wachtwoordverificatie ontbreekt.",
-        "passwordVerificationTooOld": "Wachtwoordverificatie is te oud. Verifieer je wachtwoord opnieuw."
+        "passwordVerificationTooOld": "Wachtwoordverificatie is te oud. Verifieer je wachtwoord opnieuw.",
+        "passwordResetNotAllowed": "Wachtwoord resetten is niet toegestaan. Neem contact op met uw beheerder voor meer informatie."
       }
     },
     "idp": {
@@ -2105,6 +2158,10 @@
         "required": {
           "code": "Dit veld is verplicht"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Kon OTP-uitdaging niet aanvragen",
+        "couldNotVerifyCode": "Kon OTP-code niet verifiëren"
       }
     },
     "passkey": {
@@ -2266,7 +2323,15 @@
       "description": "Selecteer de methode waarmee u wilt verifiëren",
       "noMethodsAvailable": "Geen authenticatiemethoden beschikbaar",
       "allSetup": "U heeft al een authenticator ingesteld!",
-      "linkWithIDP": "of link met een identiteitsprovider"
+      "linkWithIDP": "of link met een identiteitsprovider",
+      "methods": {
+        "totp": "Authenticator-app",
+        "u2f": "Universele tweede factor",
+        "otpEmail": "Code via e-mail",
+        "otpSms": "Code via sms",
+        "passkey": "Passkeys",
+        "password": "Wachtwoord"
+      }
     },
     "device": {
       "usercode": {
@@ -2458,7 +2523,8 @@
         "failedPrecondition": "Nie spełniono warunków wstępnych",
         "sessionNotValid": "Sesja jest nieważna",
         "passwordVerificationMissing": "Brak weryfikacji hasła.",
-        "passwordVerificationTooOld": "Weryfikacja hasła jest przestarzała. Proszę zweryfikować hasło ponownie."
+        "passwordVerificationTooOld": "Weryfikacja hasła jest przestarzała. Proszę zweryfikować hasło ponownie.",
+        "passwordResetNotAllowed": "Resetowanie hasła jest niedozwolone. Skontaktuj się z administratorem, aby uzyskać więcej informacji."
       }
     },
     "idp": {
@@ -2566,6 +2632,10 @@
         "required": {
           "code": "To pole jest wymagane"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Nie można zażądać wyzwania OTP",
+        "couldNotVerifyCode": "Nie można zweryfikować kodu OTP"
       }
     },
     "passkey": {
@@ -2727,7 +2797,15 @@
       "description": "Wybierz metodę, której chcesz użyć do uwierzytelnienia.",
       "noMethodsAvailable": "Brak dostępnych metod uwierzytelniania",
       "allSetup": "Już skonfigurowałeś metodę uwierzytelniania!",
-      "linkWithIDP": "lub połącz z dostawcą tożsamości"
+      "linkWithIDP": "lub połącz z dostawcą tożsamości",
+      "methods": {
+        "totp": "Aplikacja uwierzytelniająca",
+        "u2f": "Uniwersalny drugi składnik",
+        "otpEmail": "Kod przez e-mail",
+        "otpSms": "Kod przez SMS",
+        "passkey": "Klucz dostępu",
+        "password": "Hasło"
+      }
     },
     "device": {
       "usercode": {
@@ -2919,7 +2997,8 @@
         "failedPrecondition": "Нарушено предварительное условие",
         "sessionNotValid": "Сессия недействительна",
         "passwordVerificationMissing": "Отсутствует проверка пароля.",
-        "passwordVerificationTooOld": "Проверка пароля устарела. Пожалуйста, подтвердите пароль еще раз."
+        "passwordVerificationTooOld": "Проверка пароля устарела. Пожалуйста, подтвердите пароль еще раз.",
+        "passwordResetNotAllowed": "Сброс пароля запрещен. Обратитесь к администратору за дополнительной информацией."
       }
     },
     "idp": {
@@ -3027,6 +3106,10 @@
         "required": {
           "code": "Это поле обязательно для заполнения"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Не удалось запросить OTP-челлендж",
+        "couldNotVerifyCode": "Не удалось проверить OTP-код"
       }
     },
     "passkey": {
@@ -3188,7 +3271,15 @@
       "description": "Выберите предпочитаемый метод аутентификации",
       "noMethodsAvailable": "Нет доступных методов аутентификации",
       "allSetup": "Аутентификатор уже настроен!",
-      "linkWithIDP": "или привязать через Identity Provider"
+      "linkWithIDP": "или привязать через Identity Provider",
+      "methods": {
+        "totp": "Приложение-аутентификатор",
+        "u2f": "Универсальный второй фактор",
+        "otpEmail": "Код по email",
+        "otpSms": "Код по SMS",
+        "passkey": "Пасскей",
+        "password": "Пароль"
+      }
     },
     "device": {
       "usercode": {
@@ -3380,7 +3471,8 @@
         "failedPrecondition": "前置条件失败",
         "sessionNotValid": "会话无效",
         "passwordVerificationMissing": "缺少密码验证。",
-        "passwordVerificationTooOld": "密码验证已过期。请重新通过验证。"
+        "passwordVerificationTooOld": "密码验证已过期。请重新通过验证。",
+        "passwordResetNotAllowed": "不允许重置密码。请联系您的管理员以获取更多信息。"
       }
     },
     "idp": {
@@ -3488,6 +3580,10 @@
         "required": {
           "code": "此字段为必填项"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "无法请求 OTP 质询",
+        "couldNotVerifyCode": "无法验证 OTP 验证码"
       }
     },
     "passkey": {
@@ -3649,7 +3745,15 @@
       "description": "选择您想使用的认证方法",
       "noMethodsAvailable": "没有可用的认证方法",
       "allSetup": "您已经设置好了一个认证器！",
-      "linkWithIDP": "或将其与身份提供者关联"
+      "linkWithIDP": "或将其与身份提供者关联",
+      "methods": {
+        "totp": "认证器应用",
+        "u2f": "通用第二因素",
+        "otpEmail": "通过电子邮件接收验证码",
+        "otpSms": "通过短信接收验证码",
+        "passkey": "密钥",
+        "password": "密码"
+      }
     },
     "device": {
       "usercode": {
@@ -3841,7 +3945,8 @@
         "failedPrecondition": "Ön koşul başarısız",
         "sessionNotValid": "Oturum geçerli değil",
         "passwordVerificationMissing": "Şifre doğrulaması eksik.",
-        "passwordVerificationTooOld": "Şifre doğrulaması çok eski. Lütfen şifrenizi tekrar doğrulayın."
+        "passwordVerificationTooOld": "Şifre doğrulaması çok eski. Lütfen şifrenizi tekrar doğrulayın.",
+        "passwordResetNotAllowed": "Şifre sıfırlamaya izin verilmiyor. Daha fazla bilgi için yöneticinizle iletişime geçin."
       }
     },
     "idp": {
@@ -3949,6 +4054,10 @@
         "required": {
           "code": "Bu alan zorunludur"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "OTP meydan okuması istenemedi",
+        "couldNotVerifyCode": "OTP kodu doğrulanamadı"
       }
     },
     "passkey": {
@@ -4110,7 +4219,15 @@
       "description": "Kimlik doğrulaması yapmak istediğiniz yöntemi seçin",
       "noMethodsAvailable": "Kullanılabilir kimlik doğrulama yöntemi yok",
       "allSetup": "Zaten bir kimlik doğrulayıcı kurdunuz!",
-      "linkWithIDP": "veya bir Kimlik Sağlayıcı ile bağlantı kurun"
+      "linkWithIDP": "veya bir Kimlik Sağlayıcı ile bağlantı kurun",
+      "methods": {
+        "totp": "Kimlik doğrulayıcı uygulaması",
+        "u2f": "Evrensel ikinci faktör",
+        "otpEmail": "E-posta ile kod",
+        "otpSms": "SMS ile kod",
+        "passkey": "Passkey",
+        "password": "Şifre"
+      }
     },
     "device": {
       "usercode": {
@@ -4302,7 +4419,8 @@
         "failedPrecondition": "Не виконано передумову",
         "sessionNotValid": "Сеанс недійсний",
         "passwordVerificationMissing": "Відсутня перевірка пароля.",
-        "passwordVerificationTooOld": "Перевірка пароля застаріла. Будь ласка, перевірте пароль ще раз."
+        "passwordVerificationTooOld": "Перевірка пароля застаріла. Будь ласка, перевірте пароль ще раз.",
+        "passwordResetNotAllowed": "Скидання пароля заборонено. Зверніться до адміністратора за додатковою інформацією."
       }
     },
     "idp": {
@@ -4410,6 +4528,10 @@
         "required": {
           "code": "Це поле обов'язкове"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Не вдалося запросити OTP-виклик",
+        "couldNotVerifyCode": "Не вдалося перевірити OTP-код"
       }
     },
     "passkey": {
@@ -4571,7 +4693,15 @@
       "description": "Виберіть метод автентифікації",
       "noMethodsAvailable": "Немає доступних методів автентифікації",
       "allSetup": "Ви вже налаштували автентифікатор!",
-      "linkWithIDP": "або прив'яжіть до постачальника ідентичності"
+      "linkWithIDP": "або прив'яжіть до постачальника ідентичності",
+      "methods": {
+        "totp": "Додаток автентифікації",
+        "u2f": "Універсальний другий фактор",
+        "otpEmail": "Код через електронну пошту",
+        "otpSms": "Код через SMS",
+        "passkey": "Ключ доступу",
+        "password": "Пароль"
+      }
     },
     "device": {
       "usercode": {
@@ -4763,7 +4893,8 @@
         "failedPrecondition": "فشل الشرط المسبق",
         "sessionNotValid": "الجلسة غير صالحة",
         "passwordVerificationMissing": "التحقق من كلمة المرور مفقود.",
-        "passwordVerificationTooOld": "التحقق من كلمة المرور قديم جدًا. يرجى التحقق من كلمة المرور مرة أخرى."
+        "passwordVerificationTooOld": "التحقق من كلمة المرور قديم جدًا. يرجى التحقق من كلمة المرور مرة أخرى.",
+        "passwordResetNotAllowed": "إعادة تعيين كلمة المرور غير مسموح بها. اتصل بالمسؤول لمزيد من المعلومات."
       }
     },
     "idp": {
@@ -4871,6 +5002,10 @@
         "required": {
           "code": "هذا الحقل مطلوب"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "تعذر طلب تحدي OTP",
+        "couldNotVerifyCode": "تعذر التحقق من رمز OTP"
       }
     },
     "passkey": {
@@ -5032,7 +5167,15 @@
       "description": "حدد الطريقة التي ترغب في المصادقة بها",
       "noMethodsAvailable": "لا توجد طرق مصادقة متاحة",
       "allSetup": "لقد قمت بالفعل بإعداد مصادق!",
-      "linkWithIDP": "أو الربط مع مزود هوية"
+      "linkWithIDP": "أو الربط مع مزود هوية",
+      "methods": {
+        "totp": "تطبيق المصادقة",
+        "u2f": "العامل الثاني العالمي",
+        "otpEmail": "رمز عبر البريد الإلكتروني",
+        "otpSms": "رمز عبر الرسائل القصيرة",
+        "passkey": "مفاتيح المرور",
+        "password": "كلمة المرور"
+      }
     },
     "device": {
       "usercode": {
@@ -5224,7 +5367,8 @@
         "failedPrecondition": "Az előfeltétel nem teljesült",
         "sessionNotValid": "A munkamenet nem érvényes",
         "passwordVerificationMissing": "A jelszó hitelesítés hiányzik.",
-        "passwordVerificationTooOld": "A jelszó hitelesítés túl régi. Kérjük, erősítsd meg újra a jelszavadat."
+        "passwordVerificationTooOld": "A jelszó hitelesítés túl régi. Kérjük, erősítsd meg újra a jelszavadat.",
+        "passwordResetNotAllowed": "A jelszó-visszaállítás nem engedélyezett. További információért fordulj a rendszergazdához."
       }
     },
     "idp": {
@@ -5332,6 +5476,10 @@
         "required": {
           "code": "Ez a mező kötelező"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Nem sikerült OTP-kihívást kérni",
+        "couldNotVerifyCode": "Nem sikerült ellenőrizni az OTP-kódot"
       }
     },
     "passkey": {
@@ -5493,7 +5641,15 @@
       "description": "Válaszd ki, milyen módszerrel szeretnél hitelesíteni",
       "noMethodsAvailable": "Nincs elérhető hitelesítési módszer",
       "allSetup": "Már beállítottál egy hitelesítőt!",
-      "linkWithIDP": "vagy kapcsold össze egy azonosítószolgáltatóval"
+      "linkWithIDP": "vagy kapcsold össze egy azonosítószolgáltatóval",
+      "methods": {
+        "totp": "Hitelesítő alkalmazás",
+        "u2f": "Univerzális második faktor",
+        "otpEmail": "Kód e-mailben",
+        "otpSms": "Kód SMS-ben",
+        "passkey": "Jelkulcs",
+        "password": "Jelszó"
+      }
     },
     "device": {
       "usercode": {
@@ -5685,7 +5841,8 @@
         "failedPrecondition": "Pré-condition non remplie",
         "sessionNotValid": "La session n'est pas valide",
         "passwordVerificationMissing": "La vérification du mot de passe est manquante.",
-        "passwordVerificationTooOld": "La vérification du mot de passe est trop ancienne. Veuillez vérifier à nouveau votre mot de passe."
+        "passwordVerificationTooOld": "La vérification du mot de passe est trop ancienne. Veuillez vérifier à nouveau votre mot de passe.",
+        "passwordResetNotAllowed": "La réinitialisation du mot de passe n'est pas autorisée. Contactez votre administrateur pour plus d'informations."
       }
     },
     "idp": {
@@ -5793,6 +5950,10 @@
         "required": {
           "code": "Ce champ est requis"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Impossible de demander le challenge OTP",
+        "couldNotVerifyCode": "Impossible de vérifier le code OTP"
       }
     },
     "passkey": {
@@ -5954,7 +6115,15 @@
       "description": "Sélectionnez la méthode que vous souhaitez utiliser pour vous authentifier",
       "noMethodsAvailable": "Aucune méthode d'authentification disponible",
       "allSetup": "Vous avez déjà configuré un authentificateur !",
-      "linkWithIDP": "ou lier avec un fournisseur d'identité"
+      "linkWithIDP": "ou lier avec un fournisseur d'identité",
+      "methods": {
+        "totp": "Application d'authentification",
+        "u2f": "Second facteur universel",
+        "otpEmail": "Code par e-mail",
+        "otpSms": "Code par SMS",
+        "passkey": "Clés d'accès",
+        "password": "Mot de passe"
+      }
     },
     "device": {
       "usercode": {
@@ -6146,7 +6315,8 @@
         "failedPrecondition": "前提条件に失敗しました",
         "sessionNotValid": "セッションが無効です",
         "passwordVerificationMissing": "パスワード確認がありません。",
-        "passwordVerificationTooOld": "パスワード確認が古すぎます。もう一度パスワードを確認してください。"
+        "passwordVerificationTooOld": "パスワード確認が古すぎます。もう一度パスワードを確認してください。",
+        "passwordResetNotAllowed": "パスワードのリセットは許可されていません。詳細については管理者に問い合わせてください。"
       }
     },
     "idp": {
@@ -6254,6 +6424,10 @@
         "required": {
           "code": "必須項目です"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "OTPチャレンジをリクエストできませんでした",
+        "couldNotVerifyCode": "OTPコードを確認できませんでした"
       }
     },
     "passkey": {
@@ -6415,7 +6589,15 @@
       "description": "認証に使用する方法を選択してください",
       "noMethodsAvailable": "使用可能な認証方法がありません",
       "allSetup": "認証の設定は既に完了しています！",
-      "linkWithIDP": "またはIDプロバイダーと連携"
+      "linkWithIDP": "またはIDプロバイダーと連携",
+      "methods": {
+        "totp": "認証アプリ",
+        "u2f": "ユニバーサルセカンドファクター",
+        "otpEmail": "メールでコードを受け取る",
+        "otpSms": "SMSでコードを受け取る",
+        "passkey": "パスキー",
+        "password": "パスワード"
+      }
     },
     "device": {
       "usercode": {
@@ -6607,7 +6789,8 @@
         "failedPrecondition": "Pré-condição falhou",
         "sessionNotValid": "A sessão não é válida",
         "passwordVerificationMissing": "A verificação de senha está ausente.",
-        "passwordVerificationTooOld": "A verificação de senha expirou. Por favor, verifique sua senha novamente."
+        "passwordVerificationTooOld": "A verificação de senha expirou. Por favor, verifique sua senha novamente.",
+        "passwordResetNotAllowed": "A redefinição de senha não é permitida. Entre em contato com o administrador para mais informações."
       }
     },
     "idp": {
@@ -6715,6 +6898,10 @@
         "required": {
           "code": "Este campo é obrigatório"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Não foi possível solicitar o desafio OTP",
+        "couldNotVerifyCode": "Não foi possível verificar o código OTP"
       }
     },
     "passkey": {
@@ -6876,7 +7063,15 @@
       "description": "Selecione o método de autenticação desejado",
       "noMethodsAvailable": "Nenhum método de autenticação disponível",
       "allSetup": "Você já configurou um autenticador!",
-      "linkWithIDP": "ou vincule com um Provedor de Identidade"
+      "linkWithIDP": "ou vincule com um Provedor de Identidade",
+      "methods": {
+        "totp": "Aplicativo autenticador",
+        "u2f": "Segundo fator universal",
+        "otpEmail": "Código via e-mail",
+        "otpSms": "Código via SMS",
+        "passkey": "Chave de Acesso",
+        "password": "Senha"
+      }
     },
     "device": {
       "usercode": {

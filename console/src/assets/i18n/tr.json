@@ -2205,6 +2205,10 @@
       "TITLE": "Sağlayıcı ekle",
       "DESCRIPTION": "Aşağıdaki sağlayıcılardan birini veya daha fazlasını seçin.",
       "STEPPERTITLE": "Sağlayıcı Oluştur",
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "Başka bir ZITADEL örneğindeki kullanıcıların kimlik doğrulaması yapabilmesi için gerekli verileri girin."
+      },
       "OIDC": {
         "TITLE": "OIDC Sağlayıcısı",
         "DESCRIPTION": "OIDC sağlayıcınız için gerekli verileri girin."
@@ -2317,6 +2321,10 @@
     "STATE": "Durum",
     "ISSUER": "Yayıncı",
     "SCOPESLIST": "Kapsam Listesi",
+    "INSTANCEROLESINFO": "Örnek rol eşlemesi",
+    "INSTANCEROLESINFO_DESC": "Bu sağlayıcı ile kimlik doğrulaması yapan kullanıcılara, uzak ZITADEL örneğindeki listelenen organizasyonlarda sahip oldukları örnek üyelik rolleri (IAM_ öneki) verilir. Organizasyon kimliği ve birincil alan adının ikisi de eşleşmelidir.",
+    "ORGANIZATIONID": "Organizasyon Kimliği",
+    "ORGANIZATIONDOMAIN": "Organizasyon Alan Adı",
     "CLIENTID": "İstemci ID",
     "CLIENTSECRET": "İstemci Gizli Anahtarı",
     "LDAPCONNECTION": "Bağlantı",

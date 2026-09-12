@@ -11,7 +11,7 @@ import {
   listAuthenticationMethodTypes,
   listUsers,
 } from "@/lib/zitadel";
-import { create, Duration } from "@zitadel/client";
+import { Code, create, Duration } from "@zitadel/client";
 import { Challenges, RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -294,7 +294,7 @@ type ClearSessionOptions = {
   sessionId: string;
 };
 
-export async function clearSession(options: ClearSessionOptions) {
+export async function clearSession(options: ClearSessionOptions): Promise<{ error?: string } | void> {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
@@ -306,18 +306,40 @@ export async function clearSession(options: ClearSessionOptions) {
     return;
   }
 
-  const deleteResponse = await deleteSession({
-    serviceConfig,
-    sessionId: sessionCookie.id,
-    sessionToken: sessionCookie.token,
-  });
+  try {
+    const deleteResponse = await deleteSession({
+      serviceConfig,
+      sessionId: sessionCookie.id,
+      sessionToken: sessionCookie.token,
+    });
+    if (!deleteResponse) {
+      throw new Error("Could not delete session");
+    }
+  } catch (error) {
+    // The backend verifies the cookie's token before it looks at the session
+    // state, so PermissionDenied is what a session that no longer exists answers
+    // (nothing to verify against). It is also what a live session with a stale
+    // cookie token would answer; we deliberately prune the cookie entry in that
+    // case too: the user explicitly asked to remove the account from this
+    // browser, and without its token the server-side session cannot be used by
+    // anyone and simply expires. Every other failure keeps the entry and is
+    // reported so the caller can show it.
+    // (A session terminated by an RP-initiated logout keeps its token id, so
+    // deleting it again succeeds and never reaches this branch.)
+    if (!isClassifiedError(error) || error.code !== Code.PermissionDenied) {
+      logger.error("clearSession: could not delete session", { sessionId: sessionCookie.id, error });
+      const t = await getTranslations("error");
+      return { error: t("couldNotClearSession") };
+    }
 
+    logger.warn("clearSession: session rejected the cookie token (gone or stale), pruning cookie entry", {
+      sessionId: sessionCookie.id,
+    });
+  }
+
+  // Only needed for the cookie rewrite, so it must not gate the delete above.
   const securitySettings = await getSecuritySettings({ serviceConfig });
   const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;
 
-  if (!deleteResponse) {
-    throw new Error("Could not delete session");
-  }
-
-  return removeSessionFromCookie({ session: sessionCookie, iFrameEnabled });
+  await removeSessionFromCookie({ session: sessionCookie, iFrameEnabled });
 }

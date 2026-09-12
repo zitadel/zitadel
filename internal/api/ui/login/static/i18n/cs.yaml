@@ -504,6 +504,7 @@ Errors:
         AlreadyReady: Vícefaktorové OTP (jednorázové heslo) je již nastaveno
         NotExisting: Vícefaktorové OTP (jednorázové heslo) neexistuje
         InvalidCode: Neplatný kód
+        Reused: Tento kód již byl použit. Počkejte prosím na nový kód
         NotReady: Vícefaktorové OTP (jednorázové heslo) není připraveno
     Locked: Uživatel je uzamčen
     SomethingWentWrong: Něco se pokazilo
