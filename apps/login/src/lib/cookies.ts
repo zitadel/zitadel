@@ -23,6 +23,33 @@ export type Cookie = {
 
 type SessionCookie<T> = Cookie & T;
 
+// Without an explicit maxAge, this is a browser-session cookie: it dies when the browser
+// closes, even though the underlying Zitadel session (per secondFactorCheckLifetime /
+// passwordCheckLifetime) is still valid for days or weeks. Track the cookie's lifetime on
+// the furthest expirationTs among the sessions it carries, so a closed browser no longer
+// forces a full password+MFA replay before that policy-driven expiration is reached.
+function computeMaxAgeSeconds<T>(sessions: SessionCookie<T>[]): number | undefined {
+  const expirations = sessions
+    .map((s) => {
+      const ms = s.expirationTs ? Number(s.expirationTs) : NaN;
+      if (!Number.isFinite(ms)) {
+        return undefined;
+      }
+      const date = timestampDate(timestampFromMs(ms));
+      return Number.isNaN(date.getTime()) ? undefined : date;
+    })
+    .filter((d): d is Date => !!d);
+
+  if (expirations.length === 0) {
+    return undefined;
+  }
+
+  const latest = expirations.reduce((a, b) => (a > b ? a : b));
+  const seconds = Math.floor((latest.getTime() - Date.now()) / 1000);
+
+  return seconds > 0 ? seconds : undefined;
+}
+
 async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameEnabled: boolean = false) {
   const cookiesList = await cookies();
 
@@ -37,6 +64,8 @@ async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameE
     resolvedSameSite = "lax";
   }
 
+  const maxAge = computeMaxAgeSeconds(sessions);
+
   return cookiesList.set({
     name: "sessions",
     value: JSON.stringify(sessions),
@@ -44,6 +73,7 @@ async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameE
     path: "/",
     sameSite: resolvedSameSite,
     secure: process.env.NODE_ENV === "production",
+    ...(maxAge !== undefined ? { maxAge } : {}),
   });
 }
 

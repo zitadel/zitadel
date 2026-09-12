@@ -244,7 +244,9 @@ export async function setSessionAndUpdateCookie(command: {
               id: sessionCookie.id,
               token: updatedSession.sessionToken,
               creationTs: sessionCookie.creationTs,
-              expirationTs: sessionCookie.expirationTs,
+              // Re-derive from the freshly fetched session rather than reusing
+              // sessionCookie.expirationTs, which still holds the pre-renewal value.
+              expirationTs: session.expirationDate ? `${timestampMs(session.expirationDate)}` : sessionCookie.expirationTs,
               // just overwrite the changeDate with the new one
               changeTs: updatedSession.details?.changeDate ? `${timestampMs(updatedSession.details.changeDate)}` : "",
               loginName: session.factors?.user?.loginName ?? "",
