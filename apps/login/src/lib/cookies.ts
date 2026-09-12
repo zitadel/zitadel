@@ -30,7 +30,14 @@ type SessionCookie<T> = Cookie & T;
 // forces a full password+MFA replay before that policy-driven expiration is reached.
 function computeMaxAgeSeconds<T>(sessions: SessionCookie<T>[]): number | undefined {
   const expirations = sessions
-    .map((s) => (s.expirationTs ? timestampDate(timestampFromMs(Number(s.expirationTs))) : undefined))
+    .map((s) => {
+      const ms = s.expirationTs ? Number(s.expirationTs) : NaN;
+      if (!Number.isFinite(ms)) {
+        return undefined;
+      }
+      const date = timestampDate(timestampFromMs(ms));
+      return Number.isNaN(date.getTime()) ? undefined : date;
+    })
     .filter((d): d is Date => !!d);
 
   if (expirations.length === 0) {
