@@ -38,6 +38,14 @@ type accessToken struct {
 
 var ErrInvalidTokenFormat = errors.New("invalid token format")
 
+func splitDecryptedOpaqueToken(decrypted string) (tokenID, subject string, err error) {
+	split := strings.SplitN(decrypted, ":", 2)
+	if len(split) != 2 {
+		return "", "", ErrInvalidTokenFormat
+	}
+	return split[0], split[1], nil
+}
+
 func (s *Server) verifyAccessToken(ctx context.Context, tkn string) (_ *accessToken, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -45,11 +53,11 @@ func (s *Server) verifyAccessToken(ctx context.Context, tkn string) (_ *accessTo
 	var tokenID, subject string
 
 	if tokenIDSubject, err := s.Provider().Crypto().Decrypt(tkn); err == nil {
-		split := strings.Split(tokenIDSubject, ":")
-		if len(split) != 2 {
-			return nil, zerrors.ThrowPermissionDenied(ErrInvalidTokenFormat, "OIDC-rei1O", "token is not valid or has expired")
+		var splitErr error
+		tokenID, subject, splitErr = splitDecryptedOpaqueToken(tokenIDSubject)
+		if splitErr != nil {
+			return nil, zerrors.ThrowPermissionDenied(splitErr, "OIDC-rei1O", "token is not valid or has expired")
 		}
-		tokenID, subject = split[0], split[1]
 	} else {
 		verifier := op.NewAccessTokenVerifier(op.IssuerFromContext(ctx), s.accessTokenKeySet,
 			op.WithSupportedAccessTokenSigningAlgorithms(supportedSigningAlgs()...),
