@@ -40,9 +40,13 @@ func (m *logMiddleware) InsertMany(
 		slog.Duration("duration", time.Since(start)),
 	)
 
-	// Only do expensive operations if debug is enabled
+	// Only do expensive operations if debug is enabled.
+	// Skip nil results: InsertManyFast returns empty slots with no job rows (#12225).
 	if m.logger.Enabled(ctx, slog.LevelDebug) {
 		for _, result := range results {
+			if result == nil || result.Job == nil {
+				continue
+			}
 			logging.Debug(ctx, "inserted job details", attributesFromJobInsertResult(result)...)
 		}
 	}
