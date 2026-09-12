@@ -189,7 +189,7 @@ export async function registerUser(
   }
 }
 
-type RegisterUserAndLinkToIDPommand = {
+type RegisterUserAndLinkToIDPCommand = {
   email: string;
   firstName: string;
   lastName: string;
@@ -210,7 +210,7 @@ export type registerUserAndLinkToIDPResponse = {
   factors: Factors | undefined;
 };
 export async function registerUserAndLinkToIDP(
-  command: RegisterUserAndLinkToIDPommand,
+  command: RegisterUserAndLinkToIDPCommand,
 ): Promise<{ error: string } | { redirect: string } | { samlData: { url: string; fields: Record<string, string> } }> {
   const t = await getTranslations("register");
 
