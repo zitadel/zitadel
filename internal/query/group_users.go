@@ -53,6 +53,7 @@ type GroupUsers struct {
 
 type GroupUser struct {
 	GroupID       string
+	GroupName     string
 	ResourceOwner string
 	CreationDate  time.Time
 	Sequence      uint64
@@ -101,6 +102,10 @@ func NewGroupUsersGroupIDsSearchQuery(groupIDs []string) (SearchQuery, error) {
 	return NewListQuery(GroupUsersColumnGroupID, list, ListIn)
 }
 
+func NewGroupUsersOrganizationIDSearchQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(GroupUsersColumnResourceOwner, id, TextEquals)
+}
+
 func (q *Queries) searchGroupUsers(ctx context.Context, queries *GroupUsersSearchQuery, permissionCheckV2 bool) (groupUsers *GroupUsers, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -112,7 +117,11 @@ func (q *Queries) searchGroupUsers(ctx context.Context, queries *GroupUsersSearc
 			GroupUsersColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		},
 	}
-	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
+	// unique tiebreaker keeps pagination stable when sorting values collide,
+	// e.g. members added in one batch sharing the same creation date
+	stmt, args, err := queries.toQuery(query).
+		OrderBy(GroupUsersColumnGroupID.identifier(), GroupUsersColumnUserID.identifier()).
+		Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-TTlfF6", "Errors.Query.InvalidRequest")
 	}
@@ -131,8 +140,10 @@ func (q *Queries) searchGroupUsers(ctx context.Context, queries *GroupUsersSearc
 func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*GroupUsers, error)) {
 	return sq.Select(
 			GroupUsersColumnGroupID.identifier(),
+			GroupColumnName.identifier(),
 			GroupUsersColumnUserID.identifier(),
 			HumanDisplayNameCol.identifier(),
+			MachineNameCol.identifier(),
 			LoginNameNameCol.identifier(),
 			GroupUsersColumnResourceOwner.identifier(),
 			HumanAvatarURLCol.identifier(),
@@ -140,7 +151,9 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 			GroupUsersColumnSequence.identifier(),
 			countColumn.identifier(),
 		).From(groupUsersTable.identifier()).
+			LeftJoin(join(GroupColumnID, GroupUsersColumnGroupID)).
 			LeftJoin(join(HumanUserIDCol, GroupUsersColumnUserID)).
+			LeftJoin(join(MachineUserIDCol, GroupUsersColumnUserID)).
 			LeftJoin(join(LoginNameUserIDCol, GroupUsersColumnUserID)).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
@@ -152,15 +165,19 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 				g := new(GroupUser)
 
 				var (
+					groupName          sql.NullString
 					displayName        sql.NullString
+					machineName        sql.NullString
 					avatarURL          sql.NullString
 					preferredLoginName sql.NullString
 				)
 
 				err := rows.Scan(
 					&g.GroupID,
+					&groupName,
 					&g.UserID,
 					&displayName,
+					&machineName,
 					&preferredLoginName,
 					&g.ResourceOwner,
 					&avatarURL,
@@ -172,7 +189,12 @@ func prepareGroupUsersQuery() (query sq.SelectBuilder, scan func(*sql.Rows) (*Gr
 					return nil, err
 				}
 
-				g.DisplayName = displayName.String
+				g.GroupName = groupName.String
+				if displayName.Valid {
+					g.DisplayName = displayName.String
+				} else {
+					g.DisplayName = machineName.String
+				}
 				g.AvatarUrl = avatarURL.String
 				g.PreferredLoginName = preferredLoginName.String
 				groupUsers = append(groupUsers, g)

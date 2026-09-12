@@ -1,0 +1,32 @@
+<h2 mat-dialog-title>
+  {{ (data.group ? 'GROUPS.DIALOG.UPDATE.TITLE' : 'GROUPS.DIALOG.CREATE.TITLE') | translate }}
+</h2>
+
+<form [formGroup]="groupForm" (ngSubmit)="submit()">
+  <mat-dialog-content>
+    <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'GROUPS.DIALOG.NAME' | translate }}</cnsl-label>
+      <input cnslInput formControlName="name" data-e2e="group-name-input" required />
+    </cnsl-form-field>
+
+    <cnsl-form-field class="full-width">
+      <cnsl-label>{{ 'GROUPS.DIALOG.DESCRIPTION' | translate }}</cnsl-label>
+      <input cnslInput formControlName="description" data-e2e="group-description-input" />
+    </cnsl-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button type="button" (click)="dialogRef.close()">
+      {{ 'ACTIONS.CANCEL' | translate }}
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      data-e2e="group-dialog-save"
+      [disabled]="groupForm.invalid || groupForm.pristine"
+    >
+      {{ 'ACTIONS.SAVE' | translate }}
+    </button>
+  </mat-dialog-actions>
+</form>

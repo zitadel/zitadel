@@ -1,0 +1,41 @@
+.add-grant {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  .add-grant-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+.grants-list {
+  margin-top: 1rem;
+
+  .grant-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.25rem 0;
+
+    .grant-info {
+      display: flex;
+      flex-direction: column;
+
+      .project {
+        font-weight: 500;
+      }
+    }
+
+    &.empty {
+      justify-content: center;
+      padding: 1rem 0;
+    }
+  }
+}

@@ -2282,6 +2282,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								[]string{},
 								[]*domain.UserIDPLink{},
 								[]string{},
+								[]string{},
 							),
 						),
 					),

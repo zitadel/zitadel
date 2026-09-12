@@ -96,8 +96,21 @@ Zitadel’s SCIM implementation follows the core SCIM specification but includes
 
 ### Supported schemas
 
-Zitadel currently supports only the SCIM User schema: `urn:ietf:params:scim:schemas:core:2.0:User`
-Group provisioning and other extended schemas are not supported.
+Zitadel supports the SCIM User schema (`urn:ietf:params:scim:schemas:core:2.0:User`)
+and the SCIM Group schema (`urn:ietf:params:scim:schemas:core:2.0:Group`).
+Other extended schemas are not supported.
+
+### Groups
+
+The `/Groups` endpoint supports create, get, list, replace (`PUT`), and delete.
+`PATCH` is not supported for groups, use `PUT` instead. Filtering groups is not supported.
+
+Zitadel groups are **flat**:
+
+* Group members must be users. Members of type `Group` (nested groups, allowed by RFC 7643) are rejected
+  with an explicit error instead of being misinterpreted.
+* The read-only `groups` attribute on User resources lists the user's group memberships,
+  always with `type: "direct"` (RFC 7643 section 4.1.2), since indirect memberships cannot exist.
 
 ### Required attributes
 

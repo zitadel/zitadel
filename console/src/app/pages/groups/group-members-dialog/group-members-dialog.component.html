@@ -1,0 +1,54 @@
+<h2 mat-dialog-title>{{ 'GROUPS.MEMBERS.TITLE' | translate }} — {{ data.group.name }}</h2>
+
+<mat-dialog-content>
+  <cnsl-search-user-autocomplete [target]="UserTarget.SELF" (selectionChanged)="selectionChanged($event)">
+  </cnsl-search-user-autocomplete>
+
+  <div class="members-list" *ngIf="!loading()">
+    <div class="member-row" *ngFor="let member of members()">
+      <cnsl-avatar
+        class="avatar"
+        [name]="member.user?.displayName || ''"
+        [avatarUrl]="member.user?.avatarUrl || ''"
+        [forColor]="member.user?.preferredLoginName || ''"
+        [size]="32"
+      >
+      </cnsl-avatar>
+      <div class="user-name-column">
+        <span>{{ member.user?.displayName }}</span>
+        <span class="smaller cnsl-secondary-text">{{ member.user?.preferredLoginName }}</span>
+      </div>
+      <span class="fill-space"></span>
+      <button
+        class="member-rm-btn"
+        mat-icon-button
+        color="warn"
+        matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+        data-e2e="group-member-remove"
+        (click)="removeUser(member)"
+      >
+        <i class="las la-minus-circle"></i>
+      </button>
+    </div>
+    <div class="member-row empty" *ngIf="members().length === 0">
+      <span class="cnsl-secondary-text">{{ 'GROUPS.MEMBERS.EMPTY' | translate }}</span>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<div mat-dialog-actions class="action">
+  <button mat-stroked-button (click)="close()">
+    {{ 'ACTIONS.CLOSE' | translate }}
+  </button>
+
+  <button
+    [disabled]="!usersToAdd.length"
+    color="primary"
+    mat-raised-button
+    class="ok-button"
+    data-e2e="group-members-add"
+    (click)="addUsers()"
+  >
+    {{ 'GROUPS.MEMBERS.ADD' | translate }}
+  </button>
+</div>

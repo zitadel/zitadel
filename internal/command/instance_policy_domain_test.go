@@ -376,6 +376,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 								[]string{},
 								[]*domain.UserIDPLink{},
 								[]string{},
+								[]string{},
 							),
 						),
 					),

@@ -28,6 +28,27 @@ var AuthMapping = authz.MethodMapping{
 	"DELETE:/scim/v2/" + http.OrgIdInPathVariable + "/Users/{id}": {
 		Permission: domain.PermissionUserDelete,
 	},
+	"POST:/scim/v2/" + http.OrgIdInPathVariable + "/Groups": {
+		Permission: domain.PermissionGroupCreate,
+	},
+	"POST:/scim/v2/" + http.OrgIdInPathVariable + "/Groups/.search": {
+		Permission: domain.PermissionGroupRead,
+	},
+	"GET:/scim/v2/" + http.OrgIdInPathVariable + "/Groups": {
+		Permission: domain.PermissionGroupRead,
+	},
+	"GET:/scim/v2/" + http.OrgIdInPathVariable + "/Groups/{id}": {
+		Permission: domain.PermissionGroupRead,
+	},
+	"PUT:/scim/v2/" + http.OrgIdInPathVariable + "/Groups/{id}": {
+		Permission: domain.PermissionGroupWrite,
+	},
+	"PATCH:/scim/v2/" + http.OrgIdInPathVariable + "/Groups/{id}": {
+		Permission: domain.PermissionGroupWrite,
+	},
+	"DELETE:/scim/v2/" + http.OrgIdInPathVariable + "/Groups/{id}": {
+		Permission: domain.PermissionGroupDelete,
+	},
 	"POST:/scim/v2/" + http.OrgIdInPathVariable + "/Bulk": {
 		Permission: "authenticated",
 	},

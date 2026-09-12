@@ -19,6 +19,7 @@ const (
 	idPrefixZitadelMessages = "urn:ietf:params:scim:api:zitadel:messages:2.0:"
 
 	IdUser                  ScimSchemaType = idPrefixCore + "User"
+	IdGroup                 ScimSchemaType = idPrefixCore + "Group"
 	IdServiceProviderConfig ScimSchemaType = idPrefixCore + "ServiceProviderConfig"
 	IdResourceType          ScimSchemaType = idPrefixCore + "ResourceType"
 	IdSchema                ScimSchemaType = idPrefixCore + "Schema"
@@ -32,6 +33,9 @@ const (
 
 	UserResourceType  ScimResourceTypeSingular = "User"
 	UsersResourceType ScimResourceTypePlural   = "Users"
+
+	GroupResourceType  ScimResourceTypeSingular = "Group"
+	GroupsResourceType ScimResourceTypePlural   = "Groups"
 
 	ServiceProviderConfigResourceType  ScimResourceTypeSingular = "ServiceProviderConfig"
 	ServiceProviderConfigsResourceType ScimResourceTypePlural   = "ServiceProviderConfig"
@@ -105,6 +109,7 @@ type SchemaAttributeMutability string
 const (
 	SchemaAttributeMutabilityReadWrite SchemaAttributeMutability = "readWrite"
 	SchemaAttributeMutabilityWriteOnly SchemaAttributeMutability = "writeOnly"
+	SchemaAttributeMutabilityReadOnly  SchemaAttributeMutability = "readOnly"
 )
 
 type SchemaAttributeReturned string
