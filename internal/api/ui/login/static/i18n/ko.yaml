@@ -270,6 +270,7 @@ RegistrationUser:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Slovenian: Slovenščina
   GenderLabel: 성별
   Female: 여성
   Male: 남성
@@ -317,6 +318,7 @@ ExternalRegistrationUserOverview:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Slovenian: Slovenščina
   TosAndPrivacyLabel: 동의사항
   TosConfirm: 이용 약관에 동의합니다.
   TosLinkText: 이용 약관
@@ -398,6 +400,7 @@ ExternalNotFound:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Slovenian: Slovenščina
 DeviceAuth:
   Title: 기기 인증
   UserCode:

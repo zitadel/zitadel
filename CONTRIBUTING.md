@@ -619,7 +619,7 @@ Zitadel loads translations from four files:
 - [Common texts](./internal/static/i18n) for success or error toasts
 
 You may edit the texts in these files or create a new file for additional language support. Make sure you set the locale (ISO 639-1 code) as the name of the new language file.
-Please make sure that the languages within the files remain in their own language, e.g. German must always be `Deutsch.
+Please make sure that the language names within the files remain in their own language, e.g. German must always be `Deutsch`.
 If you have added support for a new language, please also ensure that it is added in the list of languages in all the other language files.
 
 You also have to add some changes to the following files:
@@ -627,7 +627,7 @@ You also have to add some changes to the following files:
 - [Register Local File](./console/src/app/app.module.ts) - Import and register the Angular locale, register `i18n-iso-countries` locale
 - [Exclude from Angular prebundle](./console/angular.json) - Add `i18n-iso-countries/langs/<locale>.json` to `prebundle.exclude`
 - [Add Supported Language](./console/src/app/utils/language.ts)
-- [Customized Text Docs](./apps/docs/docs/guides/manage/customize/texts.md)
+- [Customized Text Docs](./apps/docs/content/guides/manage/customize/texts.mdx)
 - [Add language option](./internal/api/ui/login/static/templates/external_not_found_option.html)
 
 ### Login v2 (Next.js)
