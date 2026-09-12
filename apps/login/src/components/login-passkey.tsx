@@ -29,45 +29,61 @@ type Props = {
 
 export function LoginPasskey({ loginName, sessionId, requestId, altPassword, organization, login = true }: Props) {
   const [error, setError] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  // Start busy: the ceremony is auto-started in the mount effect below, so the submit
+  // button must be disabled from first paint — a click cannot precede that effect.
+  const [loading, setLoading] = useState<boolean>(true);
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const t = useTranslations("passkey");
   const router = useRouter();
 
-  const initialized = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Runs the full passkey ceremony: request a challenge, get the assertion from the
+  // authenticator, then verify it. A single AbortController guards against overlapping
+  // ceremonies — starting a new one aborts the WebAuthn request still in flight — so we
+  // never sign an assertion against a challenge that a second, overlapping request has
+  // already overwritten on the session. See https://github.com/zitadel/zitadel/issues/12495.
+  async function startPasskeyLogin() {
+    abortControllerRef.current?.abort();
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
+    setError("");
+    setLoading(true);
+    try {
+      const response = await updateOrCreateSessionForChallenge();
+      if (abortController.signal.aborted) {
+        return;
+      }
+
+      const pK = response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
+      if (!pK) {
+        setError(t("verify.errors.couldNotRequestChallenge"));
+        return;
+      }
+
+      await submitLoginAndContinue(pK, abortController.signal);
+    } catch (error) {
+      if (!abortController.signal.aborted) {
+        setError(error instanceof Error ? error.message : String(error));
+      }
+    } finally {
+      // Only the most recent ceremony owns the shared loading state.
+      if (abortControllerRef.current === abortController) {
+        setLoading(false);
+      }
+    }
+  }
 
   useEffect(() => {
-    if (!initialized.current) {
-      initialized.current = true;
-      setLoading(true);
-      updateOrCreateSessionForChallenge()
-        .then((response) => {
-          const pK = response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
+    startPasskeyLogin();
 
-          if (!pK) {
-            setError(t("verify.errors.couldNotRequestChallenge"));
-            setLoading(false);
-            return;
-          }
-
-          return submitLoginAndContinue(pK)
-            .catch((error) => {
-              setError(error instanceof Error ? error.message : String(error));
-              return;
-            })
-            .finally(() => {
-              setLoading(false);
-            });
-        })
-        .catch((error) => {
-          setError(error instanceof Error ? error.message : String(error));
-          return;
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
+    // Abort an in-flight WebAuthn request if the component unmounts (e.g. an RSC
+    // navigation remounts the page) so it cannot resolve against a stale challenge.
+    return () => {
+      abortControllerRef.current?.abort();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -76,8 +92,6 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
       ? UserVerificationRequirement.REQUIRED
       : UserVerificationRequirement.DISCOURAGED,
   ) {
-    setError("");
-    setLoading(true);
     const sessionResponse = await updateOrCreateSession({
       loginName,
       sessionId,
@@ -89,15 +103,11 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
         },
       }),
       requestId,
-    })
-      .catch((error) => {
-        console.error(error);
-        setError(t("verify.errors.couldNotRequestChallenge"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch((error) => {
+      console.error(error);
+      setError(t("verify.errors.couldNotRequestChallenge"));
+      return;
+    });
 
     if (sessionResponse && "error" in sessionResponse && sessionResponse.error) {
       setError(sessionResponse.error);
@@ -136,7 +146,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
     }
   }
 
-  async function submitLoginAndContinue(publicKey: any): Promise<boolean | void> {
+  async function submitLoginAndContinue(publicKey: any, signal?: AbortSignal): Promise<boolean | void> {
     publicKey.challenge = coerceToArrayBuffer(publicKey.challenge, "publicKey.challenge");
     publicKey.allowCredentials.map((listItem: any) => {
       listItem.id = coerceToArrayBuffer(listItem.id, "publicKey.allowCredentials.id");
@@ -145,8 +155,16 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
     return navigator.credentials
       .get({
         publicKey,
+        signal,
       })
       .then((assertedCredential: any) => {
+        // Ignore a result that resolved after this ceremony was superseded or unmounted:
+        // an aborted get() can still resolve if the authenticator already completed, and
+        // we must not submit an assertion for a ceremony we abandoned (mirrors the
+        // post-challenge guard in startPasskeyLogin).
+        if (signal?.aborted) {
+          return;
+        }
         if (!assertedCredential) {
           setError(t("verify.errors.couldNotRetrievePasskey"));
           return;
@@ -172,6 +190,12 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
         return submitLogin(data);
       })
       .catch((error) => {
+        // A superseded or unmounted ceremony rejects with AbortError once we abort its
+        // signal — that is expected, not a verification failure. An AbortError that we
+        // did not cause is unexpected, so let it fall through and surface an error.
+        if (error?.name === "AbortError" && signal?.aborted) {
+          return;
+        }
         // Handle passkey cancellation or errors
         if (error?.name === "NotAllowedError") {
           setError(t("verify.errors.verificationCancelled"));
@@ -179,9 +203,6 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
           setError(t("verify.errors.verificationFailed"));
         }
         console.error("Passkey verification error:", error);
-      })
-      .finally(() => {
-        setLoading(false);
       });
   }
 
@@ -235,29 +256,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
           className="self-end"
           variant={ButtonVariants.Primary}
           disabled={loading}
-          onClick={async () => {
-            const response = await updateOrCreateSessionForChallenge().finally(() => {
-              setLoading(false);
-            });
-
-            const pK = response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
-
-            if (!pK) {
-              setError(t("verify.errors.couldNotRequestChallenge"));
-              return;
-            }
-
-            setLoading(true);
-
-            return submitLoginAndContinue(pK)
-              .catch((error) => {
-                setError(error instanceof Error ? error.message : String(error));
-                return;
-              })
-              .finally(() => {
-                setLoading(false);
-              });
-          }}
+          onClick={() => startPasskeyLogin()}
           data-testid="submit-button"
         >
           {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="verify.submit" namespace="passkey" />
