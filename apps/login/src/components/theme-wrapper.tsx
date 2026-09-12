@@ -110,7 +110,15 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
         case ThemeMode.AUTO:
         case ThemeMode.UNSPECIFIED:
         default:
-          setNextTheme("system");
+          // Do not forcibly override the user's theme preference.
+          // Let next-themes read from localStorage and fall back to
+          // system default only if no saved preference exists.
+          //
+          // branding.themeMode is a static setting from the org's
+          // branding policy and does not change at runtime. If the
+          // branding ever changes, the component will re-render and
+          // either enforce a new forced theme (LIGHT/DARK) or
+          // continue respecting the user's stored preference (AUTO).
           break;
       }
     }
