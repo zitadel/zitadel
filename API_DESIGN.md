@@ -40,6 +40,16 @@ Please check out their style guides and concepts for more information:
 Additionally, there are some conventions that are specific to the ZITADEL API.
 These conventions are described in the following sections.
 
+### File Structure
+
+In addition to the file structure proposed by [Protobuf](https://protobuf.dev/programming-guides/style/#file-structure) and [connectRPC / buf](https://buf.build/docs/best-practices/style-guide/#recommendations), the ZITADEL API uses the following order for `Everything else` section of files:
+- `Service(s)`
+- `Messages` / `Enums`
+
+Related endpoints and messages are grouped together in the same proto file and SHOULD be ordered by reading > creation > update > remove.
+For example, all endpoints and messages related to managing project roles are grouped together in the `ProjectService` and corresponding messages 
+are defined in the same proto file in the same order.
+
 ### Versioning
 
 The services and messages are versioned using major version numbers. This means that any change within a major version number is backward compatible.
@@ -49,7 +59,14 @@ When creating a new service, start with version `2`, as version `1` is reserved 
 
 Please check out the structure Buf style guide for more information about the folder and package structure: https://buf.build/docs/best-practices/style-guide/
 
-### Deprecations
+#### Removal and Deprecation of Message Fields
+
+Whenever a message field is not supported anymore, deprecation of the field is preferred over removal.
+This prevents breaking changes and allows the client to handle the deprecation gracefully.
+The field MUST be marked as deprecated and the reason for the deprecation MUST be documented in the proto file as well as the major version in which the field will be removed. 
+Additionally, the field SHOULD be removed in the next major version of the API.
+
+#### Removal and Deprecation of API Methods
 
 As a rule of thumb, redundant API methods are deprecated.
 
@@ -57,7 +74,7 @@ As a rule of thumb, redundant API methods are deprecated.
 - One or more links to recommended replacement methods CAN be added to the deprecation message as a proto comment above the rpc spec.
 - Guidance for switching to the recommended methods for common use cases SHOULD be added as a proto comment above the rpc spec.
 
-#### Example
+##### Example
 
 ```protobuf
 // Delete the user phone
@@ -104,7 +121,7 @@ Do not rely on implicit fallbacks or defaults if the client does not provide cer
 Only use defaults if they are explicitly documented, such as returning a result set for the whole instance if no filter is provided.
 
 Some API calls may create multiple resources such as in the case of `zitadel.org.v2.AddOrganization`, where you can create an organization AND multiple users as admin.
-In such cases the response should include **ALL** created resources and their ids. This removes any ambiguity from the users perspective whether or not
+In such cases the response SHOULD include **ALL** created resources and their ids. This removes any ambiguity from the users perspective whether or not
 the additional resources were created and it also helps in testing.
 
 ### Naming Conventions
@@ -143,7 +160,7 @@ However, it is possible to provide the `organization_id` as a filter to retrieve
 
 ##### Context information in Responses
 
-When the action of creation, update or deletion of a resource was successful, the returned response has to include the time of the operation and the generated identifiers.
+When the action of creation, update or deletion of a resource was successful, the returned response MUST include the time of the operation and the generated identifiers.
 This is achieved through the addition of a timestamp attribute with the operation as a prefix, and the generated information as separate attributes.
 
 ```protobuf
@@ -403,6 +420,12 @@ and possibly some details about the error. See the following sections for more i
 The API uses status codes to indicate the status of a request. Depending on the protocol used to call the API,
 the status code is returned as an HTTP status code or as a gRPC / connectRPC status code.
 Check the possible status codes https://zitadel.com/docs/apis/statuscodes
+
+> [!NOTE]
+> For new services and new endpoints, do not introduce REST-specific success codes such as `201` or `204`.
+> Likewise, do not introduce new uses of the `http_response` proto annotation of the zitadel option.
+> Existing stable protos may still contain legacy `http_response` annotations and REST-specific success codes.
+> Treat those cases as backwards-compatible legacy behavior and avoid expanding that pattern.
 
 ### Error Slugs
 
