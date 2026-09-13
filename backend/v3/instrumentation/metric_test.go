@@ -1,10 +1,12 @@
 package instrumentation
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 )
 
@@ -199,6 +201,24 @@ func Test_newMeterProvider(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestMeter_RegisterCounterObserver(t *testing.T) {
+	m := NewMeter(t.Name())
+	callback := func(_ context.Context, o metric.Int64Observer) error {
+		o.Observe(1)
+		return nil
+	}
+
+	err := m.RegisterCounterObserver("test.counter.observer", "test counter observer", callback)
+	require.NoError(t, err)
+
+	// registering the same name again is a no-op, not an error.
+	err = m.RegisterCounterObserver("test.counter.observer", "test counter observer", callback)
+	require.NoError(t, err)
+
+	_, exists := m.CounterObservers.Load("test.counter.observer")
+	assert.True(t, exists)
 }
 
 func Test_newMeterProvider_autoexport(t *testing.T) {
