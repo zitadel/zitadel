@@ -216,9 +216,15 @@ func uniqueConstraints(ctx context.Context, tx *sql.Tx, commands []*command) (er
 			}
 			switch constraint.Action {
 			case eventstore.UniqueConstraintAdd:
-				stmt.WriteString(`INSERT INTO eventstore.unique_constraints (instance_id, unique_type, unique_field) VALUES (`)
-				stmt.WriteArgs(instance, constraint.UniqueType, constraint.UniqueField)
-				stmt.WriteRune(')')
+				stmt.WriteString(`INSERT INTO eventstore.unique_constraints (instance_id, unique_type, unique_field, owners) VALUES (`)
+				stmt.WriteArg(instance)
+				stmt.WriteString(`, `)
+				stmt.WriteArg(constraint.UniqueType)
+				stmt.WriteString(`, `)
+				stmt.WriteArg(constraint.UniqueField)
+				stmt.WriteString(`, COALESCE(`)
+				stmt.WriteArg(uniqueConstraintOwnersArg(constraint.Owners))
+				stmt.WriteString(`::text[], '{}'::text[]))`)
 			case eventstore.UniqueConstraintInstanceRemove:
 				stmt.WriteString(`DELETE FROM eventstore.unique_constraints WHERE instance_id = `)
 				stmt.WriteArgs(instance)
@@ -230,6 +236,16 @@ func uniqueConstraints(ctx context.Context, tx *sql.Tx, commands []*command) (er
 					constraint.UniqueType,
 					constraint.UniqueField,
 				)
+			case eventstore.UniqueConstraintRemoveByOwner:
+				tag := eventstore.OwnerTag(constraint.OwnerKind, constraint.OwnerID)
+				if tag == "" {
+					continue
+				}
+				stmt.WriteString(`DELETE FROM eventstore.unique_constraints WHERE instance_id = `)
+				stmt.WriteArgs(instance)
+				stmt.WriteString(` AND owners @> ARRAY[`)
+				stmt.WriteArgs(tag)
+				stmt.WriteString(`]::text[]`)
 			}
 			_, err := tx.ExecContext(ctx, stmt.String(), stmt.Args()...)
 			if err != nil {
@@ -260,3 +276,10 @@ var deleteUniqueConstraintClause = `
         WHERE instance_id = $1 AND unique_type = $2 AND unique_field = LOWER($3)
     ) AS case_insensitive_constraints LIMIT 1)
 )`
+
+func uniqueConstraintOwnersArg(owners []string) []string {
+	if owners == nil {
+		return []string{}
+	}
+	return owners
+}

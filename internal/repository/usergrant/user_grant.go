@@ -46,8 +46,17 @@ func (e *UserGrantAddedEvent) Payload() interface{} {
 	return e
 }
 
+func userGrantOwnerTags(agg *eventstore.Aggregate, userID, projectID, grantID string) []string {
+	return []string{
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, agg.ResourceOwner),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerUser, userID),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerProject, projectID),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerGrant, grantID),
+	}
+}
+
 func (e *UserGrantAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.UserID, e.ProjectID, e.ProjectGrantID)}
+	return []*eventstore.UniqueConstraint{NewAddUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.UserID, e.ProjectID, e.ProjectGrantID).WithOwners(userGrantOwnerTags(e.Aggregate(), e.UserID, e.ProjectID, e.ProjectGrantID)...)}
 }
 
 func NewUserGrantAddedEvent(
@@ -178,7 +187,7 @@ func (e *UserGrantRemovedEvent) Payload() interface{} {
 }
 
 func (e *UserGrantRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.UserID, e.ProjectID, e.ProjectGrantID)}
+	return []*eventstore.UniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.UserID, e.ProjectID, e.ProjectGrantID).WithOwners(userGrantOwnerTags(e.Aggregate(), e.UserID, e.ProjectID, e.ProjectGrantID)...)}
 }
 
 func NewUserGrantRemovedEvent(
@@ -218,7 +227,7 @@ func (e *UserGrantCascadeRemovedEvent) Payload() interface{} {
 }
 
 func (e *UserGrantCascadeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.userID, e.projectID, e.projectGrantID)}
+	return []*eventstore.UniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.userID, e.projectID, e.projectGrantID).WithOwners(userGrantOwnerTags(e.Aggregate(), e.userID, e.projectID, e.projectGrantID)...)}
 }
 
 func NewUserGrantCascadeRemovedEvent(

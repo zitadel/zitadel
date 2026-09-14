@@ -260,6 +260,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s75Apps7OIDCConfigsAddAppLinkConfig = &Apps7OIDCConfigsAddAppLinkConfig{dbClient: dbClient}
 	steps.s76Users14LoginEqualityIndexes = &Users14LoginEqualityIndexes{dbClient: dbClient}
 	steps.s77StampEventPositionAtInsert = &StampEventPositionAtInsert{dbClient: dbClient}
+	steps.s78UniqueConstraintOwners = &UniqueConstraintOwners{dbClient: dbClient}
+	steps.s79BackfillUniqueConstraintOwners = &BackfillUniqueConstraintOwners{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	if err != nil {
@@ -320,6 +322,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s70AddEventStoreCommandEnforceOwner,
 		steps.s76Users14LoginEqualityIndexes,
 		steps.s77StampEventPositionAtInsert,
+		steps.s78UniqueConstraintOwners,
+		steps.s79BackfillUniqueConstraintOwners,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {

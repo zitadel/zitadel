@@ -43,8 +43,17 @@ func (e *GrantMemberAddedEvent) Payload() interface{} {
 	return e
 }
 
+func grantMemberOwnerTags(agg *eventstore.Aggregate, userID, grantID string) []string {
+	return []string{
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, agg.ResourceOwner),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerUser, userID),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerProject, agg.ID),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerGrant, grantID),
+	}
+}
+
 func (e *GrantMemberAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID)}
+	return []*eventstore.UniqueConstraint{NewAddProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID).WithOwners(grantMemberOwnerTags(e.Aggregate(), e.UserID, e.GrantID)...)}
 }
 
 func NewProjectGrantMemberAddedEvent(
@@ -139,7 +148,7 @@ func (e *GrantMemberRemovedEvent) Payload() interface{} {
 }
 
 func (e *GrantMemberRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID)}
+	return []*eventstore.UniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID).WithOwners(grantMemberOwnerTags(e.Aggregate(), e.UserID, e.GrantID)...)}
 }
 
 func NewProjectGrantMemberRemovedEvent(
@@ -184,7 +193,7 @@ func (e *GrantMemberCascadeRemovedEvent) Payload() interface{} {
 }
 
 func (e *GrantMemberCascadeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID)}
+	return []*eventstore.UniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID).WithOwners(grantMemberOwnerTags(e.Aggregate(), e.UserID, e.GrantID)...)}
 }
 
 func NewProjectGrantMemberCascadeRemovedEvent(

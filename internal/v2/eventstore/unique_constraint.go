@@ -11,6 +11,12 @@ type UniqueConstraint struct {
 	ErrorMessage string
 	// IsGlobal defines if the unique constraint is globally unique or just within a single instance
 	IsGlobal bool
+	// Owners is a bag of kind:id tags used for bulk lifecycle deletes.
+	Owners []string
+	// OwnerKind is set for UniqueConstraintRemoveByOwner.
+	OwnerKind string
+	// OwnerID is set for UniqueConstraintRemoveByOwner.
+	OwnerID string
 }
 
 type UniqueConstraintAction int8
@@ -19,12 +25,44 @@ const (
 	UniqueConstraintAdd UniqueConstraintAction = iota
 	UniqueConstraintRemove
 	UniqueConstraintInstanceRemove
+	UniqueConstraintRemoveByOwner
 
 	uniqueConstraintActionCount
 )
 
+const (
+	UniqueConstraintOwnerOrg     = "org"
+	UniqueConstraintOwnerUser    = "user"
+	UniqueConstraintOwnerIDP     = "idp"
+	UniqueConstraintOwnerProject = "project"
+	UniqueConstraintOwnerGrant   = "grant"
+)
+
 func (f UniqueConstraintAction) Valid() bool {
 	return f >= 0 && f < uniqueConstraintActionCount
+}
+
+// OwnerTag returns kind:id. Empty kind or id yields an empty string so it is skipped by WithOwners.
+func OwnerTag(kind, id string) string {
+	if kind == "" || id == "" {
+		return ""
+	}
+	return kind + ":" + id
+}
+
+// WithOwners stores non-empty owner tags on the constraint and returns the receiver for chaining.
+func (u *UniqueConstraint) WithOwners(tags ...string) *UniqueConstraint {
+	if u == nil {
+		return nil
+	}
+	owners := make([]string, 0, len(tags))
+	for _, tag := range tags {
+		if tag != "" {
+			owners = append(owners, tag)
+		}
+	}
+	u.Owners = owners
+	return u
 }
 
 func NewAddEventUniqueConstraint(
@@ -52,6 +90,14 @@ func NewRemoveUniqueConstraint(
 func NewRemoveInstanceUniqueConstraints() *UniqueConstraint {
 	return &UniqueConstraint{
 		Action: UniqueConstraintInstanceRemove,
+	}
+}
+
+func NewRemoveUniqueConstraintsByOwner(kind, id string) *UniqueConstraint {
+	return &UniqueConstraint{
+		Action:    UniqueConstraintRemoveByOwner,
+		OwnerKind: kind,
+		OwnerID:   id,
 	}
 }
 

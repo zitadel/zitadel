@@ -191,7 +191,7 @@ func (e *DomainVerifiedEvent) Payload() interface{} {
 }
 
 func (e *DomainVerifiedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddOrgDomainUniqueConstraint(e.Domain)}
+	return []*eventstore.UniqueConstraint{NewAddOrgDomainUniqueConstraint(e.Domain).WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ID))}
 }
 
 func (e *DomainVerifiedEvent) Fields() []*eventstore.FieldOperation {
@@ -291,7 +291,7 @@ func (e *DomainRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint 
 	if !e.isVerified {
 		return nil
 	}
-	return []*eventstore.UniqueConstraint{NewRemoveOrgDomainUniqueConstraint(e.Domain)}
+	return []*eventstore.UniqueConstraint{NewRemoveOrgDomainUniqueConstraint(e.Domain).WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ID))}
 }
 
 func (e *DomainRemovedEvent) Fields() []*eventstore.FieldOperation {

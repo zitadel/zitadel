@@ -28,6 +28,13 @@ func NewRemoveMailTextUniqueConstraint(aggregateID, mailTextType, langugage stri
 		fmt.Sprintf("%v:%v:%v", aggregateID, mailTextType, langugage))
 }
 
+func mailTextOwnerTags(agg *eventstore.Aggregate) []string {
+	if agg == nil || agg.Type != "org" {
+		return nil
+	}
+	return []string{eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, agg.ResourceOwner)}
+}
+
 type MailTextAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
@@ -46,7 +53,7 @@ func (e *MailTextAddedEvent) Payload() interface{} {
 }
 
 func (e *MailTextAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddMailTextUniqueConstraint(e.Aggregate().ResourceOwner, e.MailTextType, e.Language)}
+	return []*eventstore.UniqueConstraint{NewAddMailTextUniqueConstraint(e.Aggregate().ResourceOwner, e.MailTextType, e.Language).WithOwners(mailTextOwnerTags(e.Aggregate())...)}
 }
 
 func NewMailTextAddedEvent(
@@ -190,7 +197,7 @@ func (e *MailTextRemovedEvent) Payload() interface{} {
 }
 
 func (e *MailTextRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveMailTextUniqueConstraint(e.Aggregate().ResourceOwner, e.MailTextType, e.Language)}
+	return []*eventstore.UniqueConstraint{NewRemoveMailTextUniqueConstraint(e.Aggregate().ResourceOwner, e.MailTextType, e.Language).WithOwners(mailTextOwnerTags(e.Aggregate())...)}
 }
 
 func NewMailTextRemovedEvent(base *eventstore.BaseEvent, mailTextType, language string) *MailTextRemovedEvent {

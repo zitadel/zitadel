@@ -43,7 +43,7 @@ func (e *ApplicationAddedEvent) Payload() interface{} {
 }
 
 func (e *ApplicationAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID)}
+	return []*eventstore.UniqueConstraint{NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID).WithOwners(projectOwnerTags(e.Aggregate())...)}
 }
 
 func NewApplicationAddedEvent(
@@ -90,8 +90,8 @@ func (e *ApplicationChangedEvent) Payload() interface{} {
 
 func (e *ApplicationChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{
-		NewRemoveApplicationUniqueConstraint(e.oldName, e.Aggregate().ID),
-		NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID),
+		NewRemoveApplicationUniqueConstraint(e.oldName, e.Aggregate().ID).WithOwners(projectOwnerTags(e.Aggregate())...),
+		NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID).WithOwners(projectOwnerTags(e.Aggregate())...),
 	}
 }
 
@@ -224,9 +224,9 @@ func (e *ApplicationRemovedEvent) Payload() interface{} {
 }
 
 func (e *ApplicationRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	remove := []*eventstore.UniqueConstraint{NewRemoveApplicationUniqueConstraint(e.name, e.Aggregate().ID)}
+	remove := []*eventstore.UniqueConstraint{NewRemoveApplicationUniqueConstraint(e.name, e.Aggregate().ID).WithOwners(projectOwnerTags(e.Aggregate())...)}
 	if e.entityID != "" {
-		remove = append(remove, NewRemoveSAMLConfigEntityIDUniqueConstraint(e.entityID))
+		remove = append(remove, NewRemoveSAMLConfigEntityIDUniqueConstraint(e.entityID).WithOwners(projectOwnerTags(e.Aggregate())...))
 	}
 	return remove
 }

@@ -30,15 +30,7 @@ func (e *OrganizationSettingsSetEvent) Payload() any {
 }
 
 func (e *OrganizationSettingsSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	if len(e.usernameChanges) == 0 || e.oldOrganizationScopedUsernames == e.OrganizationScopedUsernames {
-		return []*eventstore.UniqueConstraint{}
-	}
-	changes := make([]*eventstore.UniqueConstraint, len(e.usernameChanges)*2)
-	for i, username := range e.usernameChanges {
-		changes[i*2] = user.NewRemoveUsernameUniqueConstraint(username, e.Aggregate().ResourceOwner, e.oldOrganizationScopedUsernames)
-		changes[i*2+1] = user.NewAddUsernameUniqueConstraint(username, e.Aggregate().ResourceOwner, e.OrganizationScopedUsernames)
-	}
-	return changes
+	return user.NewUsernameUniqueConstraints(e.usernameChanges, e.Aggregate().ResourceOwner, e.OrganizationScopedUsernames, e.oldOrganizationScopedUsernames)
 }
 
 func NewOrganizationSettingsAddedEvent(

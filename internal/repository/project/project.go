@@ -53,8 +53,23 @@ func (e *ProjectAddedEvent) Payload() interface{} {
 	return e
 }
 
+func projectOwnerTags(agg *eventstore.Aggregate) []string {
+	return []string{
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, agg.ResourceOwner),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerProject, agg.ID),
+	}
+}
+
+func grantOwnerTags(agg *eventstore.Aggregate, grantedOrgID string) []string {
+	return []string{
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, agg.ResourceOwner),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, grantedOrgID),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerProject, agg.ID),
+	}
+}
+
 func (e *ProjectAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
+	return []*eventstore.UniqueConstraint{NewAddProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner).WithOwners(projectOwnerTags(e.Aggregate())...)}
 }
 
 func (e *ProjectAddedEvent) Fields() []*eventstore.FieldOperation {
@@ -150,8 +165,8 @@ func (e *ProjectChangeEvent) Payload() interface{} {
 func (e *ProjectChangeEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	if e.Name != nil {
 		return []*eventstore.UniqueConstraint{
-			NewRemoveProjectNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner),
-			NewAddProjectNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner),
+			NewRemoveProjectNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner).WithOwners(projectOwnerTags(e.Aggregate())...),
+			NewAddProjectNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner).WithOwners(projectOwnerTags(e.Aggregate())...),
 		}
 	}
 	return nil
@@ -358,10 +373,13 @@ func (e *ProjectRemovedEvent) Payload() interface{} {
 }
 
 func (e *ProjectRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	constraints := []*eventstore.UniqueConstraint{NewRemoveProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
+	constraints := []*eventstore.UniqueConstraint{
+		NewRemoveProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner).WithOwners(projectOwnerTags(e.Aggregate())...),
+		eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerProject, e.Aggregate().ID),
+	}
 	if e.entityIDUniqueContraints != nil {
 		for _, constraint := range e.entityIDUniqueContraints {
-			constraints = append(constraints, constraint)
+			constraints = append(constraints, constraint.WithOwners(projectOwnerTags(e.Aggregate())...))
 		}
 	}
 	return constraints

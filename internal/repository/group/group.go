@@ -46,8 +46,12 @@ func (g *GroupAddedEvent) Payload() any {
 	return g
 }
 
+func groupOwnerTags(agg *eventstore.Aggregate) []string {
+	return []string{eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, agg.ResourceOwner)}
+}
+
 func (g *GroupAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddGroupNameUniqueConstraint(g.Name, g.Aggregate().ResourceOwner)}
+	return []*eventstore.UniqueConstraint{NewAddGroupNameUniqueConstraint(g.Name, g.Aggregate().ResourceOwner).WithOwners(groupOwnerTags(g.Aggregate())...)}
 }
 
 func NewAddGroupNameUniqueConstraint(groupName, organizationID string) *eventstore.UniqueConstraint {
@@ -120,8 +124,8 @@ func (g *GroupChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 		return nil
 	}
 	return []*eventstore.UniqueConstraint{
-		NewRemoveGroupNameUniqueConstraint(g.oldName, g.Aggregate().ResourceOwner),
-		NewAddGroupNameUniqueConstraint(*g.Name, g.Aggregate().ResourceOwner)}
+		NewRemoveGroupNameUniqueConstraint(g.oldName, g.Aggregate().ResourceOwner).WithOwners(groupOwnerTags(g.Aggregate())...),
+		NewAddGroupNameUniqueConstraint(*g.Name, g.Aggregate().ResourceOwner).WithOwners(groupOwnerTags(g.Aggregate())...)}
 }
 
 type GroupRemovedEvent struct {
@@ -153,5 +157,5 @@ func (g *GroupRemovedEvent) Payload() any {
 }
 
 func (g *GroupRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveGroupNameUniqueConstraint(g.name, g.Aggregate().ResourceOwner)}
+	return []*eventstore.UniqueConstraint{NewRemoveGroupNameUniqueConstraint(g.name, g.Aggregate().ResourceOwner).WithOwners(groupOwnerTags(g.Aggregate())...)}
 }

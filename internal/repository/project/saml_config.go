@@ -43,7 +43,7 @@ func NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID string) *eventstore.Un
 }
 
 func (e *SAMLConfigAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddSAMLConfigEntityIDUniqueConstraint(e.EntityID)}
+	return []*eventstore.UniqueConstraint{NewAddSAMLConfigEntityIDUniqueConstraint(e.EntityID).WithOwners(projectOwnerTags(e.Aggregate())...)}
 }
 
 func NewSAMLConfigAddedEvent(
@@ -103,8 +103,8 @@ func (e *SAMLConfigChangedEvent) Payload() interface{} {
 func (e *SAMLConfigChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	if e.EntityID != "" {
 		return []*eventstore.UniqueConstraint{
-			NewRemoveSAMLConfigEntityIDUniqueConstraint(e.oldEntityID),
-			NewAddSAMLConfigEntityIDUniqueConstraint(e.EntityID),
+			NewRemoveSAMLConfigEntityIDUniqueConstraint(e.oldEntityID).WithOwners(projectOwnerTags(e.Aggregate())...),
+			NewAddSAMLConfigEntityIDUniqueConstraint(e.EntityID).WithOwners(projectOwnerTags(e.Aggregate())...),
 		}
 	}
 	return nil

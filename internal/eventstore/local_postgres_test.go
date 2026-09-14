@@ -206,18 +206,23 @@ func canceledCtx() context.Context {
 	return ctx
 }
 
-func fillUniqueData(unique_type, field, instanceID string) error {
-	_, err := testClient.Exec("INSERT INTO eventstore.unique_constraints (unique_type, unique_field, instance_id) VALUES ($1, $2, $3)", unique_type, field, instanceID)
+func fillUniqueData(unique_type, field, instanceID string, owners ...string) error {
+	if len(owners) == 0 {
+		_, err := testClient.Exec("INSERT INTO eventstore.unique_constraints (unique_type, unique_field, instance_id) VALUES ($1, $2, $3)", unique_type, field, instanceID)
+		return err
+	}
+	_, err := testClient.Exec("INSERT INTO eventstore.unique_constraints (unique_type, unique_field, instance_id, owners) VALUES ($1, $2, $3, $4)", unique_type, field, instanceID, database.TextArray[string](owners))
 	return err
 }
 
-func generateAddUniqueConstraint(table, uniqueField string) func(e *testEvent) {
+func generateAddUniqueConstraint(table, uniqueField string, owners ...string) func(e *testEvent) {
 	return func(e *testEvent) {
 		e.uniqueConstraints = append(e.uniqueConstraints,
 			&eventstore.UniqueConstraint{
 				UniqueType:  table,
 				UniqueField: uniqueField,
 				Action:      eventstore.UniqueConstraintAdd,
+				Owners:      owners,
 			},
 		)
 	}
@@ -232,6 +237,24 @@ func generateRemoveUniqueConstraint(table, uniqueField string) func(e *testEvent
 				Action:      eventstore.UniqueConstraintRemove,
 			},
 		)
+	}
+}
+
+func generateRemoveInstanceUniqueConstraints() func(e *testEvent) {
+	return func(e *testEvent) {
+		e.uniqueConstraints = append(e.uniqueConstraints, eventstore.NewRemoveInstanceUniqueConstraints())
+	}
+}
+
+func generateRemoveUniqueConstraintsByOwner(kind, id string) func(e *testEvent) {
+	return func(e *testEvent) {
+		e.uniqueConstraints = append(e.uniqueConstraints, eventstore.NewRemoveUniqueConstraintsByOwner(kind, id))
+	}
+}
+
+func withInstanceID(instanceID string) func(e *testEvent) {
+	return func(e *testEvent) {
+		e.Agg.InstanceID = instanceID
 	}
 }
 

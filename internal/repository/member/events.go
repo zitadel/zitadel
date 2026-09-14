@@ -48,8 +48,22 @@ func (e *MemberAddedEvent) Payload() interface{} {
 	return e
 }
 
+func memberOwnerTags(agg *eventstore.Aggregate, userID string) []string {
+	tags := []string{eventstore.OwnerTag(eventstore.UniqueConstraintOwnerUser, userID)}
+	switch agg.Type {
+	case "project":
+		tags = append(tags,
+			eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, agg.ResourceOwner),
+			eventstore.OwnerTag(eventstore.UniqueConstraintOwnerProject, agg.ID),
+		)
+	case "org":
+		tags = append(tags, eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, agg.ID))
+	}
+	return tags
+}
+
 func (e *MemberAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddMemberUniqueConstraint(e.Aggregate().ID, e.UserID)}
+	return []*eventstore.UniqueConstraint{NewAddMemberUniqueConstraint(e.Aggregate().ID, e.UserID).WithOwners(memberOwnerTags(e.Aggregate(), e.UserID)...)}
 }
 
 func (e *MemberAddedEvent) FieldOperations(prefix string) []*eventstore.FieldOperation {
@@ -187,7 +201,7 @@ func (e *MemberRemovedEvent) Payload() interface{} {
 }
 
 func (e *MemberRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveMemberUniqueConstraint(e.Aggregate().ID, e.UserID)}
+	return []*eventstore.UniqueConstraint{NewRemoveMemberUniqueConstraint(e.Aggregate().ID, e.UserID).WithOwners(memberOwnerTags(e.Aggregate(), e.UserID)...)}
 }
 
 func (e *MemberRemovedEvent) FieldOperations(prefix string) []*eventstore.FieldOperation {
@@ -234,7 +248,7 @@ func (e *MemberCascadeRemovedEvent) Payload() interface{} {
 }
 
 func (e *MemberCascadeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveMemberUniqueConstraint(e.Aggregate().ID, e.UserID)}
+	return []*eventstore.UniqueConstraint{NewRemoveMemberUniqueConstraint(e.Aggregate().ID, e.UserID).WithOwners(memberOwnerTags(e.Aggregate(), e.UserID)...)}
 }
 
 func (e *MemberCascadeRemovedEvent) FieldOperations(prefix string) []*eventstore.FieldOperation {

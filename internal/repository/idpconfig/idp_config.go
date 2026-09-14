@@ -55,8 +55,15 @@ func (e *IDPConfigAddedEvent) Payload() interface{} {
 	return e
 }
 
+func idpConfigOwnerTags(agg *eventstore.Aggregate, configID string) []string {
+	return []string{
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, agg.ResourceOwner),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerIDP, configID),
+	}
+}
+
 func (e *IDPConfigAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
+	return []*eventstore.UniqueConstraint{NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner).WithOwners(idpConfigOwnerTags(e.Aggregate(), e.ConfigID)...)}
 }
 
 func IDPConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
@@ -91,8 +98,8 @@ func (e *IDPConfigChangedEvent) UniqueConstraints() []*eventstore.UniqueConstrai
 		return nil
 	}
 	return []*eventstore.UniqueConstraint{
-		NewRemoveIDPConfigNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner),
-		NewAddIDPConfigNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner),
+		NewRemoveIDPConfigNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner).WithOwners(idpConfigOwnerTags(e.Aggregate(), e.ConfigID)...),
+		NewAddIDPConfigNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner).WithOwners(idpConfigOwnerTags(e.Aggregate(), e.ConfigID)...),
 	}
 }
 
@@ -250,7 +257,10 @@ func (e *IDPConfigRemovedEvent) Payload() interface{} {
 }
 
 func (e *IDPConfigRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveIDPConfigNameUniqueConstraint(e.name, e.Aggregate().ResourceOwner)}
+	return []*eventstore.UniqueConstraint{
+		NewRemoveIDPConfigNameUniqueConstraint(e.name, e.Aggregate().ResourceOwner).WithOwners(idpConfigOwnerTags(e.Aggregate(), e.ConfigID)...),
+		eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerIDP, e.ConfigID),
+	}
 }
 
 func IDPConfigRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
