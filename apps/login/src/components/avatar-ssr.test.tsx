@@ -25,7 +25,15 @@ describe("Avatar hydration safety", () => {
 
   it("switches palettes through CSS variables and dark: variants", () => {
     const html = renderToString(<Avatar name="Jane Doe" loginName="jane@example.com" />);
-    expect(html).toContain("--avatar-bg");
-    expect(html).toContain("--avatar-bg-dark");
+    // Trailing `:` keeps `--avatar-bg` from matching `--avatar-bg-dark`.
+    expect(html).toContain("--avatar-bg:");
+    expect(html).toContain("--avatar-fg:");
+    expect(html).toContain("--avatar-bg-dark:");
+    expect(html).toContain("--avatar-fg-dark:");
+    // The dark: classes are what actually swap the palette client-side.
+    expect(html).toContain("bg-[var(--avatar-bg)]");
+    expect(html).toContain("dark:bg-[var(--avatar-bg-dark)]");
+    expect(html).toContain("text-[var(--avatar-fg)]");
+    expect(html).toContain("dark:text-[var(--avatar-fg-dark)]");
   });
 });
