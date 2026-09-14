@@ -435,7 +435,8 @@ type walker struct {
 	l            *loader
 	root         string
 	indirections map[string]funcRef
-	visited      map[string]bool // "pkgPath#name#recv" cycle/dedup guard, scoped to one operation's trace
+	visited      map[string]bool           // "pkgPath#name#recv" cycle/dedup guard, scoped to one operation's trace
+	sentinelArgs map[*ast.CallExpr]bool    // zerrors.Throw* calls that are a direct argument to errors.Is(...), see walkBody
 	sites        []errorSite
 	unresolved   []unresolvedCall
 }
@@ -450,7 +451,7 @@ func newWalker(l *loader, root string) *walker {
 // without coupling the test to whatever internal/api/authz.CheckPermission
 // happens to do today.
 func newWalkerWithIndirections(l *loader, root string, indirections map[string]funcRef) *walker {
-	return &walker{l: l, root: root, indirections: indirections, visited: map[string]bool{}}
+	return &walker{l: l, root: root, indirections: indirections, visited: map[string]bool{}, sentinelArgs: map[*ast.CallExpr]bool{}}
 }
 
 func funcKey(pkgPath, name, recv string) string { return pkgPath + "#" + name + "#" + recv }
@@ -467,6 +468,38 @@ func (w *walker) walkBody(pkg *packages.Package, body *ast.BlockStmt, visitKey s
 		return
 	}
 	w.visited[visitKey] = true
+
+	// A first, separate pass to find every errors.Is(a, b) call and mark
+	// any argument that's itself a call expression as a sentinel argument
+	// (see recordThrow). This has to happen before the real pass below:
+	// ast.Inspect visits errors.Is(...) itself before it descends into its
+	// arguments, but handleCall/recordThrow need to already know a given
+	// nested call is a sentinel argument by the time they reach it, not
+	// find out afterward.
+	ast.Inspect(body, func(n ast.Node) bool {
+		call, ok := n.(*ast.CallExpr)
+		if !ok {
+			return true
+		}
+		sel, ok := call.Fun.(*ast.SelectorExpr)
+		if !ok || sel.Sel.Name != "Is" {
+			return true
+		}
+		use, ok := pkg.TypesInfo.Uses[sel.Sel]
+		if !ok {
+			return true
+		}
+		fnObj, ok := use.(*types.Func)
+		if !ok || fnObj.Pkg() == nil || fnObj.Pkg().Path() != "errors" {
+			return true
+		}
+		for _, arg := range call.Args {
+			if argCall, ok := arg.(*ast.CallExpr); ok {
+				w.sentinelArgs[argCall] = true
+			}
+		}
+		return true
+	})
 
 	ast.Inspect(body, func(n ast.Node) bool {
 		call, ok := n.(*ast.CallExpr)
@@ -698,15 +731,18 @@ func (w *walker) recordThrow(pkg *packages.Package, call *ast.CallExpr, trail []
 		return
 	}
 	pos := pkg.Fset.Position(call.Pos())
-	if id == "" {
-		// A real Throw site always has a non-empty ID, that's the whole
-		// point of the ID (an addressable, greppable tag). An empty one
-		// (e.g. zerrors.ThrowNotFound(nil, "", "")) is the errors.Is()
-		// sentinel-value idiom: the constructed error is only used for a
-		// type comparison, never actually returned to a caller. See
-		// internal/command/org_domain.go:44 for the pattern this guards
-		// against.
-		fmt.Fprintf(os.Stderr, "errortrace: %s: skipped a zerrors.Throw call with an empty ID (looks like an errors.Is() sentinel, not a real returned error)\n",
+	if w.sentinelArgs[call] {
+		// This exact call is a direct argument to errors.Is(...), the
+		// errors.Is() sentinel-value idiom: the constructed error is only
+		// used for a type comparison, never actually returned to a
+		// caller. See internal/command/org_domain.go for the pattern this
+		// guards against. An empty ID used to be treated as this same
+		// signal on its own, but that's wrong: internal/api/grpc/user/v2/
+		// user.go's CreateUser and UpdateUser both directly return a real,
+		// empty-ID error from a default switch case, so id == "" alone
+		// isn't reliably a sentinel, only being an errors.Is() argument
+		// is.
+		fmt.Fprintf(os.Stderr, "errortrace: %s: skipped a zerrors.Throw call used as an errors.Is() sentinel argument (never actually returned)\n",
 			relPath(w.root, pos.Filename)+":"+strconv.Itoa(pos.Line))
 		return
 	}

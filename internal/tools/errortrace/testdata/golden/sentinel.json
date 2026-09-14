@@ -1,11 +1,23 @@
 {
+  "DirectEmptyID": {
+    "handler": "internal/tools/errortrace/testdata/sentinel/handler.go:39",
+    "errors": [
+      {
+        "id": "",
+        "file": "internal/tools/errortrace/testdata/sentinel/handler.go",
+        "line": 44,
+        "reasoning": "DirectEmptyID"
+      }
+    ],
+    "unresolved": 0
+  },
   "Lookup": {
-    "handler": "internal/tools/errortrace/testdata/sentinel/handler.go:19",
+    "handler": "internal/tools/errortrace/testdata/sentinel/handler.go:27",
     "errors": [
       {
         "id": "TEST-s3nt1n",
         "file": "internal/tools/errortrace/testdata/sentinel/handler.go",
-        "line": 22,
+        "line": 30,
         "reasoning": "Lookup"
       }
     ],

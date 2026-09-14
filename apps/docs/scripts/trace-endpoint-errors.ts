@@ -48,10 +48,23 @@ function isInside(parentDir: string, childPath: string): boolean {
   return rel !== '' && !rel.startsWith('..') && !isAbsolute(rel);
 }
 
+const KNOWN_FLAGS = ['--go-file', '--proto', '--only', '--changed-since'];
+
 function parseArgs(argv: string[]) {
   const get = (flag: string) => {
     const i = argv.indexOf(flag);
-    return i === -1 ? undefined : argv[i + 1];
+    if (i === -1) return undefined;
+    const value = argv[i + 1];
+    // A missing value used to silently come back as undefined, the exact
+    // same result as the flag not being passed at all, so `--proto` typed
+    // alone (forgot the path) quietly fell through to "no flags: trace
+    // everything" instead of failing. Also reject the next token being
+    // another known flag, the same typo (`--proto --only user`) with a
+    // different accidental result.
+    if (value === undefined || KNOWN_FLAGS.includes(value)) {
+      fail(`${flag} requires a value`);
+    }
+    return value;
   };
   return { goFile: get('--go-file'), proto: get('--proto'), only: get('--only'), changedSince: get('--changed-since') };
 }

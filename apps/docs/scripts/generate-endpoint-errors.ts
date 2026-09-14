@@ -454,37 +454,48 @@ function main() {
         const status = cluster.example.httpStatus;
         if (!byStatus.has(status)) byStatus.set(status, { status, statusText: STATUS_TEXT[status] ?? '', causes: [] });
         const group = byStatus.get(status)!;
-        if (!group.causes.some((c) => c.key === cluster.key)) {
+        // Deduping on cluster.key alone would drop a real, distinct id
+        // whenever two different ids happen to share the same message and
+        // land in the same cluster, which the catalog does on purpose (a
+        // cluster key bakes in subsystem, kind and message, not id, see
+        // generate-error-reference.ts). Since the id is what actually
+        // shows up in the example response body below, silently keeping
+        // only the first one would show a real endpoint returning an id
+        // it may never actually send, and hide one it does. Deduping on
+        // cluster.key plus site.id instead only collapses the same id
+        // appearing at multiple call sites within this one operation,
+        // which is the actual duplicate case worth collapsing.
+        const causeKey = `${cluster.key}|${site.id}`;
+        if (!group.causes.some((c) => c.key === causeKey)) {
           const message = cluster.message.trim() || '(empty message)';
-          group.causes.push({ key: cluster.key, id: site.id, message, why: cluster.why, example: buildExample(cluster, site.id, message) });
+          group.causes.push({ key: causeKey, id: site.id, message, why: cluster.why, example: buildExample(cluster, site.id, message) });
         }
       }
 
-      // A status declared generically at the proto/file level (not
-      // substantiated by any traced cause) is a reasonable placeholder when
-      // this operation was never traced, we genuinely don't know yet. But
-      // if it *was* traced and the tracer confidently found zero reachable
-      // causes for that status, keeping the declared-only group is actively
-      // misleading, not just incomplete: e.g. SetOrganizationFeatures is a
-      // one-line `status.Errorf(codes.Unimplemented, ...)` stub that never
-      // touches zerrors at all, so it can only ever return UNIMPLEMENTED,
-      // yet the proto's generic file-level 403/404 defaults would otherwise
-      // show up here as if they were real possibilities for this endpoint.
+      // A status declared generically at the proto/file level is always
+      // kept, even when the tracer confidently walked this operation's own
+      // handler and found zero causes for that status. This used to be
+      // filtered out on the theory that a fully, cleanly traced handler
+      // that never touches a given status can only mean that status isn't
+      // really possible here, e.g. SetOrganizationFeatures is a one-line
+      // `status.Errorf(codes.Unimplemented, ...)` stub that never touches
+      // zerrors at all. That theory doesn't hold: every RPC first passes
+      // through AuthorizationInterceptor (internal/api/grpc/server/
+      // middleware/auth_interceptor.go), which can return Unauthenticated
+      // or PermissionDenied before the handler ever runs at all. The
+      // tracer starts at the handler method, so no amount of tracing that
+      // handler's own body, however completely, can rule out an error
+      // thrown one layer above it. A declared status is only ever removed
+      // by not being declared in the first place.
       //
-      // "Has an entry in traced" isn't enough to call that confident,
-      // though: GetInstanceFeatures returns a bare, unwrapped error, so the
-      // walker reaches it and finds zero zerrors.Throw* sites, which looks
-      // identical to SetOrganizationFeatures's one-line stub unless we also
-      // check *how* the walk went. wasCleanlyTraced additionally requires
-      // zero unresolved call sites (the Go tool's walker gave up on some
-      // dynamic dispatch it couldn't follow) and zero traced IDs that
-      // failed to match the error catalog (unmatchedForOp), either one
-      // means the tracer stopped looking partway through, not that it
-      // looked and confirmed nothing. Short of both being zero, this
-      // operation gets the same treatment as "never traced".
+      // wasCleanlyTraced is still worth knowing: it's what tells
+      // EndpointErrors whether to warn the reader that this operation's
+      // own traced causes might be incomplete (see the complete flag
+      // below), and whether a genuinely empty result means "confirmed
+      // nothing found" versus "never traced at all" further down. It's
+      // just no longer a reason to remove a declared possibility.
       const wasCleanlyTraced = operationId in traced && (traced[operationId].unresolved ?? 0) === 0 && unmatchedForOp === 0;
-      const byStatusFiltered = wasCleanlyTraced ? new Map([...byStatus].filter(([, g]) => g.causes.length > 0)) : byStatus;
-      const groups = [...byStatusFiltered.values()].sort((a, b) => a.status - b.status);
+      const groups = [...byStatus.values()].sort((a, b) => a.status - b.status);
       for (const g of groups) g.causes.sort((a, b) => a.message.localeCompare(b.message));
       const marker = '## Possible error responses';
       const original = readFileSync(mdxPath, 'utf8');
