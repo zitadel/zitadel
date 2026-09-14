@@ -26,7 +26,7 @@ func TestUniqueConstraintAction_Valid(t *testing.T) {
 	if !UniqueConstraintRemoveByOwner.Valid() {
 		t.Error("UniqueConstraintRemoveByOwner should be valid")
 	}
-	if UniqueConstraintAction(uniqueConstraintActionCount).Valid() {
+	if uniqueConstraintActionCount.Valid() {
 		t.Error("uniqueConstraintActionCount should be invalid")
 	}
 }
