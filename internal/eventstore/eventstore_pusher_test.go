@@ -9,7 +9,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestEventstore_Push_OneAggregate(t *testing.T) {
