@@ -267,6 +267,7 @@ RegistrationUser:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Hindi: हिन्दी
   Arabic: العربية
   GenderLabel: الجنس
   Female: أنثى
@@ -313,6 +314,7 @@ ExternalRegistrationUserOverview:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Hindi: हिन्दी
   Arabic: العربية
   TosAndPrivacyLabel: الشروط والأحكام
   TosConfirm: أنا أقبل
@@ -393,6 +395,7 @@ ExternalNotFound:
   Korean: 한국어
   Romanian: Română
   Turkish: Türkçe
+  Hindi: हिन्दी
   Arabic: العربية
 DeviceAuth:
   Title: تفويض الجهاز
