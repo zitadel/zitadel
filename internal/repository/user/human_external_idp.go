@@ -94,7 +94,7 @@ func (e *UserIDPLinkRemovedEvent) Payload() interface{} {
 }
 
 func (e *UserIDPLinkRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveUserIDPLinkUniqueConstraint(e.IDPConfigID, e.ExternalUserID).WithOwners(idpLinkOwnerTags(e.Aggregate(), e.IDPConfigID)...)}
+	return []*eventstore.UniqueConstraint{NewRemoveUserIDPLinkUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
 }
 
 func NewUserIDPLinkRemovedEvent(
@@ -139,7 +139,7 @@ func (e *UserIDPLinkCascadeRemovedEvent) Payload() interface{} {
 }
 
 func (e *UserIDPLinkCascadeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveUserIDPLinkUniqueConstraint(e.IDPConfigID, e.ExternalUserID).WithOwners(idpLinkOwnerTags(e.Aggregate(), e.IDPConfigID)...)}
+	return []*eventstore.UniqueConstraint{NewRemoveUserIDPLinkUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
 }
 
 func NewUserIDPLinkCascadeRemovedEvent(

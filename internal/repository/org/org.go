@@ -46,12 +46,8 @@ func (e *OrgAddedEvent) Payload() interface{} {
 	return e
 }
 
-func orgOwnerTags(agg *eventstore.Aggregate) []string {
-	return []string{eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, agg.ID)}
-}
-
 func (e *OrgAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddOrgNameUniqueConstraint(e.Name).WithOwners(orgOwnerTags(e.Aggregate())...)}
+	return []*eventstore.UniqueConstraint{NewAddOrgNameUniqueConstraint(e.Name).WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ID))}
 }
 
 func (e *OrgAddedEvent) Fields() []*eventstore.FieldOperation {
@@ -127,8 +123,8 @@ func (e *OrgChangedEvent) Payload() interface{} {
 
 func (e *OrgChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{
-		NewRemoveOrgNameUniqueConstraint(e.oldName).WithOwners(orgOwnerTags(e.Aggregate())...),
-		NewAddOrgNameUniqueConstraint(e.Name).WithOwners(orgOwnerTags(e.Aggregate())...),
+		NewRemoveOrgNameUniqueConstraint(e.oldName),
+		NewAddOrgNameUniqueConstraint(e.Name).WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ID)),
 	}
 }
 
@@ -294,21 +290,20 @@ func (e *OrgRemovedEvent) Payload() interface{} {
 
 func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	constraints := []*eventstore.UniqueConstraint{
-		NewRemoveOrgNameUniqueConstraint(e.name).WithOwners(orgOwnerTags(e.Aggregate())...),
+		NewRemoveOrgNameUniqueConstraint(e.name),
 		eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ID),
 	}
-	orgTag := eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ID)
 	for _, name := range e.usernames {
-		constraints = append(constraints, user.NewRemoveUsernameUniqueConstraint(name, e.Aggregate().ID, e.organizationScopedUsernames).WithOwners(orgTag))
+		constraints = append(constraints, user.NewRemoveUsernameUniqueConstraint(name, e.Aggregate().ID, e.organizationScopedUsernames))
 	}
 	for _, domain := range e.domains {
-		constraints = append(constraints, NewRemoveOrgDomainUniqueConstraint(domain).WithOwners(orgTag))
+		constraints = append(constraints, NewRemoveOrgDomainUniqueConstraint(domain))
 	}
 	for _, idp := range e.externalIDPs {
-		constraints = append(constraints, user.NewRemoveUserIDPLinkUniqueConstraint(idp.IDPConfigID, idp.ExternalUserID).WithOwners(orgTag, eventstore.OwnerTag(eventstore.UniqueConstraintOwnerIDP, idp.IDPConfigID)))
+		constraints = append(constraints, user.NewRemoveUserIDPLinkUniqueConstraint(idp.IDPConfigID, idp.ExternalUserID))
 	}
 	for _, entityID := range e.samlEntityIDs {
-		constraints = append(constraints, project.NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID).WithOwners(orgTag))
+		constraints = append(constraints, project.NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID))
 	}
 	return constraints
 }

@@ -207,23 +207,22 @@ func canceledCtx() context.Context {
 }
 
 func fillUniqueData(unique_type, field, instanceID string, owners ...string) error {
+	return insertUniqueConstraint(testClient, instanceID, unique_type, field, owners...)
+}
+
+func insertUniqueConstraint(db *database.DB, instanceID, uniqueType, uniqueField string, owners ...string) error {
 	if len(owners) == 0 {
-		_, err := testClient.Exec("INSERT INTO eventstore.unique_constraints (unique_type, unique_field, instance_id) VALUES ($1, $2, $3)", unique_type, field, instanceID)
+		_, err := db.Exec("INSERT INTO eventstore.unique_constraints (instance_id, unique_type, unique_field) VALUES ($1, $2, $3)", instanceID, uniqueType, uniqueField)
 		return err
 	}
-	_, err := testClient.Exec("INSERT INTO eventstore.unique_constraints (unique_type, unique_field, instance_id, owners) VALUES ($1, $2, $3, $4)", unique_type, field, instanceID, database.TextArray[string](owners))
+	_, err := db.Exec("INSERT INTO eventstore.unique_constraints (instance_id, unique_type, unique_field, owners) VALUES ($1, $2, $3, $4)", instanceID, uniqueType, uniqueField, database.TextArray[string](owners))
 	return err
 }
 
 func generateAddUniqueConstraint(table, uniqueField string, owners ...string) func(e *testEvent) {
 	return func(e *testEvent) {
 		e.uniqueConstraints = append(e.uniqueConstraints,
-			&eventstore.UniqueConstraint{
-				UniqueType:  table,
-				UniqueField: uniqueField,
-				Action:      eventstore.UniqueConstraintAdd,
-				Owners:      owners,
-			},
+			eventstore.NewAddEventUniqueConstraint(table, uniqueField, "").WithOwners(owners...),
 		)
 	}
 }

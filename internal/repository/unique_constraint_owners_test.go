@@ -168,26 +168,22 @@ func TestBulkRemoveAlsoEmitsRemoveByOwner(t *testing.T) {
 	orgConstraints := org.NewOrgRemovedEvent(ctx, orgAgg, "acme", nil, false, nil, nil, nil).UniqueConstraints()
 	require.GreaterOrEqual(t, len(orgConstraints), 2)
 	assert.Equal(t, eventstore.UniqueConstraintRemoveByOwner, orgConstraints[1].Action)
-	assert.Equal(t, eventstore.UniqueConstraintOwnerOrg, orgConstraints[1].OwnerKind)
-	assert.Equal(t, "org-1", orgConstraints[1].OwnerID)
+	assert.Equal(t, []string{"org:org-1"}, orgConstraints[1].Owners)
 
 	userAgg := agg(user.AggregateType, "user-1", "org-1")
 	userConstraints := user.NewUserRemovedEvent(ctx, userAgg, "alice", nil, false).UniqueConstraints()
 	last := userConstraints[len(userConstraints)-1]
 	assert.Equal(t, eventstore.UniqueConstraintRemoveByOwner, last.Action)
-	assert.Equal(t, eventstore.UniqueConstraintOwnerUser, last.OwnerKind)
-	assert.Equal(t, "user-1", last.OwnerID)
+	assert.Equal(t, []string{"user:user-1"}, last.Owners)
 
 	idpConstraints := idpconfig.NewIDPConfigRemovedEvent(&eventstore.BaseEvent{Agg: orgAgg}, "idp-1", "Google").UniqueConstraints()
 	assert.Equal(t, eventstore.UniqueConstraintRemoveByOwner, idpConstraints[1].Action)
-	assert.Equal(t, eventstore.UniqueConstraintOwnerIDP, idpConstraints[1].OwnerKind)
-	assert.Equal(t, "idp-1", idpConstraints[1].OwnerID)
+	assert.Equal(t, []string{"idp:idp-1"}, idpConstraints[1].Owners)
 
 	projectAgg := agg(project.AggregateType, "project-1", "org-1")
 	projectConstraints := project.NewProjectRemovedEvent(ctx, projectAgg, "docs", nil).UniqueConstraints()
 	assert.Equal(t, eventstore.UniqueConstraintRemoveByOwner, projectConstraints[1].Action)
-	assert.Equal(t, eventstore.UniqueConstraintOwnerProject, projectConstraints[1].OwnerKind)
-	assert.Equal(t, "project-1", projectConstraints[1].OwnerID)
+	assert.Equal(t, []string{"project:project-1"}, projectConstraints[1].Owners)
 }
 
 func agg(typ eventstore.AggregateType, id, resourceOwner string) *eventstore.Aggregate {

@@ -148,7 +148,7 @@ func (e *GrantMemberRemovedEvent) Payload() interface{} {
 }
 
 func (e *GrantMemberRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID).WithOwners(grantMemberOwnerTags(e.Aggregate(), e.UserID, e.GrantID)...)}
+	return []*eventstore.UniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID)}
 }
 
 func NewProjectGrantMemberRemovedEvent(
@@ -193,7 +193,7 @@ func (e *GrantMemberCascadeRemovedEvent) Payload() interface{} {
 }
 
 func (e *GrantMemberCascadeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID).WithOwners(grantMemberOwnerTags(e.Aggregate(), e.UserID, e.GrantID)...)}
+	return []*eventstore.UniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID)}
 }
 
 func NewProjectGrantMemberCascadeRemovedEvent(

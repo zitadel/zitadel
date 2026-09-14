@@ -90,7 +90,7 @@ func (e *ApplicationChangedEvent) Payload() interface{} {
 
 func (e *ApplicationChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{
-		NewRemoveApplicationUniqueConstraint(e.oldName, e.Aggregate().ID).WithOwners(projectOwnerTags(e.Aggregate())...),
+		NewRemoveApplicationUniqueConstraint(e.oldName, e.Aggregate().ID),
 		NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID).WithOwners(projectOwnerTags(e.Aggregate())...),
 	}
 }
@@ -224,9 +224,9 @@ func (e *ApplicationRemovedEvent) Payload() interface{} {
 }
 
 func (e *ApplicationRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	remove := []*eventstore.UniqueConstraint{NewRemoveApplicationUniqueConstraint(e.name, e.Aggregate().ID).WithOwners(projectOwnerTags(e.Aggregate())...)}
+	remove := []*eventstore.UniqueConstraint{NewRemoveApplicationUniqueConstraint(e.name, e.Aggregate().ID)}
 	if e.entityID != "" {
-		remove = append(remove, NewRemoveSAMLConfigEntityIDUniqueConstraint(e.entityID).WithOwners(projectOwnerTags(e.Aggregate())...))
+		remove = append(remove, NewRemoveSAMLConfigEntityIDUniqueConstraint(e.entityID))
 	}
 	return remove
 }

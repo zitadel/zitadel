@@ -98,7 +98,7 @@ func (e *IDPConfigChangedEvent) UniqueConstraints() []*eventstore.UniqueConstrai
 		return nil
 	}
 	return []*eventstore.UniqueConstraint{
-		NewRemoveIDPConfigNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner).WithOwners(idpConfigOwnerTags(e.Aggregate(), e.ConfigID)...),
+		NewRemoveIDPConfigNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner),
 		NewAddIDPConfigNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner).WithOwners(idpConfigOwnerTags(e.Aggregate(), e.ConfigID)...),
 	}
 }
@@ -258,7 +258,7 @@ func (e *IDPConfigRemovedEvent) Payload() interface{} {
 
 func (e *IDPConfigRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{
-		NewRemoveIDPConfigNameUniqueConstraint(e.name, e.Aggregate().ResourceOwner).WithOwners(idpConfigOwnerTags(e.Aggregate(), e.ConfigID)...),
+		NewRemoveIDPConfigNameUniqueConstraint(e.name, e.Aggregate().ResourceOwner),
 		eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerIDP, e.ConfigID),
 	}
 }

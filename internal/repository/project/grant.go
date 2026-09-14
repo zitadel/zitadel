@@ -458,7 +458,7 @@ func (e *GrantRemovedEvent) Payload() interface{} {
 }
 
 func (e *GrantRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveProjectGrantUniqueConstraint(e.grantedOrgID, e.Aggregate().ID).WithOwners(grantOwnerTags(e.Aggregate(), e.grantedOrgID)...)}
+	return []*eventstore.UniqueConstraint{NewRemoveProjectGrantUniqueConstraint(e.grantedOrgID, e.Aggregate().ID)}
 }
 
 func (e *GrantRemovedEvent) Fields() []*eventstore.FieldOperation {

@@ -46,12 +46,8 @@ func (e *AddedEvent) Payload() interface{} {
 	return e
 }
 
-func actionOwnerTags(agg *eventstore.Aggregate) []string {
-	return []string{eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, agg.ResourceOwner)}
-}
-
 func (e *AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddActionNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner).WithOwners(actionOwnerTags(e.Aggregate())...)}
+	return []*eventstore.UniqueConstraint{NewAddActionNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner).WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ResourceOwner))}
 }
 
 func NewAddedEvent(
@@ -107,8 +103,8 @@ func (e *ChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 		return nil
 	}
 	return []*eventstore.UniqueConstraint{
-		NewRemoveActionNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner).WithOwners(actionOwnerTags(e.Aggregate())...),
-		NewAddActionNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner).WithOwners(actionOwnerTags(e.Aggregate())...),
+		NewRemoveActionNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner),
+		NewAddActionNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner).WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ResourceOwner)),
 	}
 }
 
@@ -240,7 +236,7 @@ func (e *RemovedEvent) Payload() interface{} {
 }
 
 func (e *RemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveActionNameUniqueConstraint(e.name, e.Aggregate().ResourceOwner).WithOwners(actionOwnerTags(e.Aggregate())...)}
+	return []*eventstore.UniqueConstraint{NewRemoveActionNameUniqueConstraint(e.name, e.Aggregate().ResourceOwner)}
 }
 
 func NewRemovedEvent(

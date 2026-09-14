@@ -54,7 +54,7 @@ func NewUsernameUniqueConstraints(usernameChanges []string, resourceOwner string
 	changes := make([]*eventstore.UniqueConstraint, len(usernameChanges)*2)
 	orgTag := eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, resourceOwner)
 	for i, username := range usernameChanges {
-		changes[i*2] = NewRemoveUsernameUniqueConstraint(username, resourceOwner, oldOrgScopedUsername).WithOwners(orgTag)
+		changes[i*2] = NewRemoveUsernameUniqueConstraint(username, resourceOwner, oldOrgScopedUsername)
 		changes[i*2+1] = NewAddUsernameUniqueConstraint(username, resourceOwner, orgScopedUsername).WithOwners(orgTag)
 	}
 	return changes
@@ -202,10 +202,10 @@ func (e *UserRemovedEvent) Payload() interface{} {
 func (e *UserRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	events := make([]*eventstore.UniqueConstraint, 0, 2+len(e.externalIDPs))
 	if e.userName != "" {
-		events = append(events, NewRemoveUsernameUniqueConstraint(e.userName, e.Aggregate().ResourceOwner, e.orgScopedUsername).WithOwners(usernameOwnerTags(e.Aggregate())...))
+		events = append(events, NewRemoveUsernameUniqueConstraint(e.userName, e.Aggregate().ResourceOwner, e.orgScopedUsername))
 	}
 	for _, idp := range e.externalIDPs {
-		events = append(events, NewRemoveUserIDPLinkUniqueConstraint(idp.IDPConfigID, idp.ExternalUserID).WithOwners(idpLinkOwnerTags(e.Aggregate(), idp.IDPConfigID)...))
+		events = append(events, NewRemoveUserIDPLinkUniqueConstraint(idp.IDPConfigID, idp.ExternalUserID))
 	}
 	events = append(events, eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerUser, e.Aggregate().ID))
 	return events
@@ -401,7 +401,7 @@ func (e *DomainClaimedEvent) Payload() interface{} {
 
 func (e *DomainClaimedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{
-		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, e.orgScopedUsername).WithOwners(usernameOwnerTags(e.Aggregate())...),
+		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, e.orgScopedUsername),
 		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.orgScopedUsername).WithOwners(usernameOwnerTags(e.Aggregate())...),
 	}
 }
@@ -502,7 +502,7 @@ func (e *UsernameChangedEvent) UniqueConstraints() []*eventstore.UniqueConstrain
 	}
 
 	return []*eventstore.UniqueConstraint{
-		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, oldSetting).WithOwners(usernameOwnerTags(e.Aggregate())...),
+		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, oldSetting),
 		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, newSetting).WithOwners(usernameOwnerTags(e.Aggregate())...),
 	}
 }

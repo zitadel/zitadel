@@ -14,6 +14,9 @@ const (
 	ChangedEventType        = "member.changed"
 	RemovedEventType        = "member.removed"
 	CascadeRemovedEventType = "member.cascade.removed"
+
+	orgAggregateType     eventstore.AggregateType = "org"
+	projectAggregateType eventstore.AggregateType = "project"
 )
 
 // Field table and unique types
@@ -51,12 +54,12 @@ func (e *MemberAddedEvent) Payload() interface{} {
 func memberOwnerTags(agg *eventstore.Aggregate, userID string) []string {
 	tags := []string{eventstore.OwnerTag(eventstore.UniqueConstraintOwnerUser, userID)}
 	switch agg.Type {
-	case "project":
+	case projectAggregateType:
 		tags = append(tags,
 			eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, agg.ResourceOwner),
 			eventstore.OwnerTag(eventstore.UniqueConstraintOwnerProject, agg.ID),
 		)
-	case "org":
+	case orgAggregateType:
 		tags = append(tags, eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, agg.ID))
 	}
 	return tags
@@ -201,7 +204,7 @@ func (e *MemberRemovedEvent) Payload() interface{} {
 }
 
 func (e *MemberRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveMemberUniqueConstraint(e.Aggregate().ID, e.UserID).WithOwners(memberOwnerTags(e.Aggregate(), e.UserID)...)}
+	return []*eventstore.UniqueConstraint{NewRemoveMemberUniqueConstraint(e.Aggregate().ID, e.UserID)}
 }
 
 func (e *MemberRemovedEvent) FieldOperations(prefix string) []*eventstore.FieldOperation {
@@ -248,7 +251,7 @@ func (e *MemberCascadeRemovedEvent) Payload() interface{} {
 }
 
 func (e *MemberCascadeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveMemberUniqueConstraint(e.Aggregate().ID, e.UserID).WithOwners(memberOwnerTags(e.Aggregate(), e.UserID)...)}
+	return []*eventstore.UniqueConstraint{NewRemoveMemberUniqueConstraint(e.Aggregate().ID, e.UserID)}
 }
 
 func (e *MemberCascadeRemovedEvent) FieldOperations(prefix string) []*eventstore.FieldOperation {

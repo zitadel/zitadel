@@ -291,7 +291,7 @@ func (e *DomainRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint 
 	if !e.isVerified {
 		return nil
 	}
-	return []*eventstore.UniqueConstraint{NewRemoveOrgDomainUniqueConstraint(e.Domain).WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ID))}
+	return []*eventstore.UniqueConstraint{NewRemoveOrgDomainUniqueConstraint(e.Domain)}
 }
 
 func (e *DomainRemovedEvent) Fields() []*eventstore.FieldOperation {

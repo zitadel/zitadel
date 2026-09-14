@@ -49,7 +49,14 @@ func TestUniqueConstraint_WithOwners(t *testing.T) {
 	if len(got.Owners) != 2 || got.Owners[0] != "org:org1" || got.Owners[1] != "user:user1" {
 		t.Errorf("unexpected owners: %#v", got.Owners)
 	}
-	if NewRemoveUniqueConstraintsByOwner(UniqueConstraintOwnerOrg, "org1").Action != UniqueConstraintRemoveByOwner {
+	remove := NewRemoveUniqueConstraintsByOwner(UniqueConstraintOwnerOrg, "org1")
+	if remove.Action != UniqueConstraintRemoveByOwner {
 		t.Error("expected UniqueConstraintRemoveByOwner")
+	}
+	if len(remove.Owners) != 1 || remove.Owners[0] != "org:org1" {
+		t.Errorf("unexpected remove owners: %#v", remove.Owners)
+	}
+	if empty := NewRemoveUniqueConstraintsByOwner("", "org1"); len(empty.Owners) != 0 {
+		t.Errorf("empty kind should not stamp owners: %#v", empty.Owners)
 	}
 }

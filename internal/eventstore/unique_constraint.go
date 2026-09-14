@@ -11,12 +11,8 @@ type UniqueConstraint struct {
 	ErrorMessage string
 	// IsGlobal defines if the unique constraint is globally unique or just within a single instance
 	IsGlobal bool
-	// Owners is a bag of kind:id tags used for bulk lifecycle deletes.
+	// Owners is a bag of kind:id tags used for bulk lifecycle deletes
 	Owners []string
-	// OwnerKind is set for UniqueConstraintRemoveByOwner.
-	OwnerKind string
-	// OwnerID is set for UniqueConstraintRemoveByOwner.
-	OwnerID string
 }
 
 type UniqueConstraintAction int8
@@ -42,7 +38,6 @@ func (f UniqueConstraintAction) Valid() bool {
 	return f >= 0 && f < uniqueConstraintActionCount
 }
 
-// OwnerTag returns kind:id. Empty kind or id yields an empty string so it is skipped by WithOwners.
 func OwnerTag(kind, id string) string {
 	if kind == "" || id == "" {
 		return ""
@@ -50,11 +45,7 @@ func OwnerTag(kind, id string) string {
 	return kind + ":" + id
 }
 
-// WithOwners stores non-empty owner tags on the constraint and returns the receiver for chaining.
 func (u *UniqueConstraint) WithOwners(tags ...string) *UniqueConstraint {
-	if u == nil {
-		return nil
-	}
 	owners := make([]string, 0, len(tags))
 	for _, tag := range tags {
 		if tag != "" {
@@ -74,6 +65,7 @@ func NewAddEventUniqueConstraint(
 		UniqueField:  uniqueField,
 		ErrorMessage: errMessage,
 		Action:       UniqueConstraintAdd,
+		Owners:       []string{},
 	}
 }
 
@@ -94,11 +86,13 @@ func NewRemoveInstanceUniqueConstraints() *UniqueConstraint {
 }
 
 func NewRemoveUniqueConstraintsByOwner(kind, id string) *UniqueConstraint {
-	return &UniqueConstraint{
-		Action:    UniqueConstraintRemoveByOwner,
-		OwnerKind: kind,
-		OwnerID:   id,
+	constraint := &UniqueConstraint{
+		Action: UniqueConstraintRemoveByOwner,
 	}
+	if tag := OwnerTag(kind, id); tag != "" {
+		constraint.Owners = []string{tag}
+	}
+	return constraint
 }
 
 func NewAddGlobalUniqueConstraint(
@@ -111,6 +105,7 @@ func NewAddGlobalUniqueConstraint(
 		ErrorMessage: errMessage,
 		IsGlobal:     true,
 		Action:       UniqueConstraintAdd,
+		Owners:       []string{},
 	}
 }
 

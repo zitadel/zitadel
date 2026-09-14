@@ -262,7 +262,7 @@ func (e *RoleRemovedEvent) Payload() interface{} {
 }
 
 func (e *RoleRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveProjectRoleUniqueConstraint(e.Key, e.Aggregate().ID).WithOwners(projectOwnerTags(e.Aggregate())...)}
+	return []*eventstore.UniqueConstraint{NewRemoveProjectRoleUniqueConstraint(e.Key, e.Aggregate().ID)}
 }
 
 func (e *RoleRemovedEvent) Fields() []*eventstore.FieldOperation {

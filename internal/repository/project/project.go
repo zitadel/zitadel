@@ -165,7 +165,7 @@ func (e *ProjectChangeEvent) Payload() interface{} {
 func (e *ProjectChangeEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	if e.Name != nil {
 		return []*eventstore.UniqueConstraint{
-			NewRemoveProjectNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner).WithOwners(projectOwnerTags(e.Aggregate())...),
+			NewRemoveProjectNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner),
 			NewAddProjectNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner).WithOwners(projectOwnerTags(e.Aggregate())...),
 		}
 	}
@@ -374,14 +374,10 @@ func (e *ProjectRemovedEvent) Payload() interface{} {
 
 func (e *ProjectRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	constraints := []*eventstore.UniqueConstraint{
-		NewRemoveProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner).WithOwners(projectOwnerTags(e.Aggregate())...),
+		NewRemoveProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner),
 		eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerProject, e.Aggregate().ID),
 	}
-	if e.entityIDUniqueContraints != nil {
-		for _, constraint := range e.entityIDUniqueContraints {
-			constraints = append(constraints, constraint.WithOwners(projectOwnerTags(e.Aggregate())...))
-		}
-	}
+	constraints = append(constraints, e.entityIDUniqueContraints...)
 	return constraints
 }
 
