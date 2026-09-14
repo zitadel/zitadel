@@ -44,33 +44,46 @@ import (
 
 const modulePath = "github.com/zitadel/zitadel"
 
-// funcRef names a free function to jump into instead of a call site we can't
-// resolve locally.
+// funcRef names a function to jump into instead of a call site we can't
+// resolve locally. recv is the receiver type name for a method ("" for a
+// free function), matching how findFuncDecl reads it off the AST.
 type funcRef struct {
 	pkgPath string
 	name    string
+	recv    string
 }
 
 // knownIndirections maps the fully-qualified name of a named function type
 // to the real function that ends up handling any call through a value of
-// that type. Seeded from chains already verified by hand while tracing the
-// 11 operations under apps/docs/scripts/endpoint-error-tracing/user-v2/: every
-// PermissionCheck closure, regardless of which factory built it
-// (NewPermissionCheckUserWrite, checkPermissionOnUser, ...), bottoms out at
-// authz.CheckPermission.
+// that type.
+//
+// command.PermissionCheck and command.OrganizationPermissionCheck both
+// target newPermissionCheck itself, not authz.CheckPermission directly.
+// Every concrete producer of either type (checkPermissionOnUser, the three
+// CheckPermissionOrganization{Write,Create,Delete} methods, ...) is a thin
+// wrapper that immediately calls newPermissionCheck and returns exactly
+// what it returns, but newPermissionCheck's own closure body throws
+// COMMAND-ulBlS and COMMAND-4g3xq (internal/command/permission_checks.go)
+// before ever reaching the authz check. Jumping straight to
+// authz.CheckPermission skipped both of those for every single permission
+// check in the codebase. Targeting newPermissionCheck instead loses
+// nothing: its body's own last call is through the checkPermission field
+// (type domain.PermissionCheck), which the entry below still resolves to
+// authz.CheckPermission the normal way, so that chain is still walked in
+// full, just no longer at the cost of the two checks in front of it.
+//
+// domain.PermissionCheck really does bottom out at authz.CheckPermission
+// directly: it's a field (Commands.checkPermission) wired up at
+// construction time, not a wrapper with its own logic in front.
 var knownIndirections = map[string]funcRef{
 	"github.com/zitadel/zitadel/internal/command.PermissionCheck": {
-		pkgPath: "github.com/zitadel/zitadel/internal/api/authz", name: "CheckPermission",
+		pkgPath: "github.com/zitadel/zitadel/internal/command", name: "newPermissionCheck", recv: "Commands",
 	},
 	"github.com/zitadel/zitadel/internal/domain.PermissionCheck": {
 		pkgPath: "github.com/zitadel/zitadel/internal/api/authz", name: "CheckPermission",
 	},
-	// The three concrete CheckPermissionOrganization{Write,Create,Delete}
-	// methods (internal/command/permission_checks.go) all just call
-	// newPermissionCheck with a different permission string — same downstream
-	// errors regardless of which one a given operation actually passes.
 	"github.com/zitadel/zitadel/internal/command.OrganizationPermissionCheck": {
-		pkgPath: "github.com/zitadel/zitadel/internal/api/authz", name: "CheckPermission",
+		pkgPath: "github.com/zitadel/zitadel/internal/command", name: "newPermissionCheck", recv: "Commands",
 	},
 }
 
@@ -80,7 +93,7 @@ type errorSite struct {
 	Line      int    `json:"line"`
 	Reasoning string `json:"reasoning"`
 	// Message is only set for synthetic sites (id starts with "GRPC-") that
-	// have no entry in the error catalog to pull a message from — a raw
+	// have no entry in the error catalog to pull a message from, a raw
 	// status.Errorf(codes.X, ...) call, unlike a zerrors.Throw* call, was
 	// never scanned into that catalog in the first place, so the message
 	// has to travel with the site itself instead of being looked up later.
@@ -90,12 +103,12 @@ type errorSite struct {
 type operationTrace struct {
 	Handler string      `json:"handler"`
 	Errors  []errorSite `json:"errors"`
-	// Unresolved is how many call sites this operation's walk gave up on —
+	// Unresolved is how many call sites this operation's walk gave up on,
 	// dynamic dispatch through an in-module type not in knownIndirections,
 	// or a zerrors.Throw* call whose id argument isn't a string literal.
 	// generate-endpoint-errors.ts needs this to tell "traced, and every
 	// site resolved cleanly" apart from "traced, but the walker stopped
-	// looking partway through" — the two look identical if all you check is
+	// looking partway through", the two look identical if all you check is
 	// whether this operation has an entry at all.
 	Unresolved int `json:"unresolved"`
 }
@@ -153,7 +166,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "errortrace: %s: %d error site(s) found\n", t.decl.Name.Name, len(sites))
 	}
 	if unresolvedTotal > 0 {
-		fmt.Fprintf(os.Stderr, "errortrace: %d unresolved dynamic call site(s) total — extend knownIndirections in main.go if these matter\n", unresolvedTotal)
+		fmt.Fprintf(os.Stderr, "errortrace: %d unresolved dynamic call site(s) total, extend knownIndirections in main.go if these matter\n", unresolvedTotal)
 	}
 
 	data, err := json.MarshalIndent(result, "", "  ")
@@ -203,7 +216,7 @@ func targetsFromGoFile(l *loader, root, goFile string) ([]target, error) {
 var rpcNameRe = regexp.MustCompile(`\brpc\s+(\w+)\s*\(`)
 
 // formatVerbRe matches a Printf-style verb (%s, %d, %v, %%, ...). Used to
-// reject a raw status.Errorf format string as a displayable message — see
+// reject a raw status.Errorf format string as a displayable message, see
 // recordRawStatus.
 var formatVerbRe = regexp.MustCompile(`%[-+ #0]*[0-9]*\.?[0-9]*[a-zA-Z%]`)
 
@@ -225,7 +238,7 @@ func targetsFromProto(l *loader, root, protoFile string) ([]target, error) {
 		names[m[1]] = true
 	}
 	if len(names) == 0 {
-		return nil, fmt.Errorf("%s: no `rpc Name(...)` declarations found — is this a service file? (message-only files like metadata.proto have none)", protoFile)
+		return nil, fmt.Errorf("%s: no `rpc Name(...)` declarations found, is this a service file? (message-only files like metadata.proto have none)", protoFile)
 	}
 
 	pkgDir, err := derivePackageDir(root, protoAbs)
@@ -257,8 +270,18 @@ func targetsFromProto(l *loader, root, protoFile string) ([]target, error) {
 		targets = append(targets, target{pkg: pkg, decl: fd})
 	}
 	if len(missing) > 0 {
+		// A missing handler used to just print a warning and return
+		// whatever targets it did find. The caller (traceService in
+		// trace-endpoint-errors.ts) treats that as a complete, successful
+		// result and overwrites the whole per-category file with it,
+		// silently dropping the missing RPC's previously-traced entry (if
+		// any) with no non-zero exit code anywhere to catch it. A proto
+		// declaring an RPC this scan can't match to a Go method is a real
+		// problem (a rename, a typo, a method on the wrong receiver) that
+		// belongs in front of the person running this, not buried in
+		// stderr underneath everything else it printed.
 		sort.Strings(missing)
-		fmt.Fprintf(os.Stderr, "errortrace: no handler method found in %s for: %s\n", pkgDir, strings.Join(missing, ", "))
+		return nil, fmt.Errorf("no handler method found in %s for: %s", pkgDir, strings.Join(missing, ", "))
 	}
 	sort.Slice(targets, func(i, j int) bool { return targets[i].decl.Name.Name < targets[j].decl.Name.Name })
 	return targets, nil
@@ -283,7 +306,7 @@ func derivePackageDir(root, protoAbs string) (string, error) {
 		name := strings.TrimSuffix(parts[0], ".proto")
 		return filepath.Join("internal", "api", "grpc", name), nil
 	case len(parts) >= 2:
-		// <category>/<version>/<name>_service.proto — only the first two
+		// <category>/<version>/<name>_service.proto, only the first two
 		// segments matter, whatever comes after (the filename, or deeper
 		// nesting) is ignored.
 		return filepath.Join("internal", "api", "grpc", parts[0], parts[1]), nil
@@ -422,7 +445,7 @@ func newWalker(l *loader, root string) *walker {
 }
 
 // newWalkerWithIndirections lets a test point the knownIndirections lookup
-// at a small fixture instead of the real table — exercising the "call
+// at a small fixture instead of the real table, exercising the "call
 // through a func-typed field the walker can't resolve on its own" path
 // without coupling the test to whatever internal/api/authz.CheckPermission
 // happens to do today.
@@ -456,7 +479,7 @@ func (w *walker) walkBody(pkg *packages.Package, body *ast.BlockStmt, visitKey s
 }
 
 // findPackageLevelFuncLit looks for `var Name = func(...) {...}` (or `var (
-// Name = func...)` inside a grouped block) at package scope — the pattern
+// Name = func...)` inside a grouped block) at package scope, the pattern
 // used for e.g. internal/command/user_human_password.go's ErrPasswordInvalid.
 // A *types.Var resolved to this has no FuncDecl to find via the normal path,
 // since it's a literal assigned to a var, not a declared function.
@@ -491,7 +514,7 @@ func (w *walker) handleCall(pkg *packages.Package, call *ast.CallExpr, trail []s
 	case *ast.SelectorExpr:
 		if sel, ok := pkg.TypesInfo.Selections[fun]; ok {
 			// Selections cover both method calls (Obj() is a *types.Func) and
-			// field accesses (Obj() is a *types.Var) — e.g. c.checkPermission(...)
+			// field accesses (Obj() is a *types.Var), e.g. c.checkPermission(...)
 			// where checkPermission is a struct field holding a function value,
 			// not a declared method. That's dynamic dispatch exactly like a
 			// bare identifier of function type, so it must go through the same
@@ -526,7 +549,7 @@ func (w *walker) handleCall(pkg *packages.Package, call *ast.CallExpr, trail []s
 		case *types.Func:
 			w.followFunc(pkg, obj, call, trail)
 		case *types.Var:
-			if lit, litPkg := w.findVarFuncLit(obj); lit != nil {
+			if lit, litPkg := w.findVarFuncLit(obj, call); lit != nil {
 				key := funcKey(obj.Pkg().Path(), obj.Name(), "")
 				w.walkBody(litPkg, lit.Body, key, append(trail, obj.Name()))
 				return
@@ -535,7 +558,7 @@ func (w *walker) handleCall(pkg *packages.Package, call *ast.CallExpr, trail []s
 		}
 	case *ast.CallExpr:
 		// An immediately-invoked result, e.g.
-		// c.NewPermissionCheckUserWrite(ctx, false)(resourceOwner, userID) —
+		// c.NewPermissionCheckUserWrite(ctx, false)(resourceOwner, userID),
 		// the outer call's Fun is itself a call. We can't know which closure
 		// comes back without evaluating fun, so treat it like any other
 		// dynamic dispatch keyed on the static (named) return type.
@@ -554,7 +577,7 @@ func (w *walker) followFunc(pkg *packages.Package, fnObj *types.Func, call *ast.
 	}
 	pkgPath := fnObj.Pkg().Path()
 	// The package check already narrows this to internal/zerrors, so a plain
-	// name prefix is enough to catch every Throw<Kind>[f] plus ThrowError —
+	// name prefix is enough to catch every Throw<Kind>[f] plus ThrowError,
 	// no separate hand-kept list to go stale against internal/zerrors/*.go.
 	if pkgPath == "github.com/zitadel/zitadel/internal/zerrors" && strings.HasPrefix(fnObj.Name(), "Throw") {
 		w.recordThrow(pkg, call, trail)
@@ -563,7 +586,7 @@ func (w *walker) followFunc(pkg *packages.Package, fnObj *types.Func, call *ast.
 	// The gRPC-native equivalent of a Throw call: status.Errorf(codes.X, ...)
 	// / status.Error(codes.X, ...). Common in stub handlers
 	// (status.Errorf(codes.Unimplemented, "method X not implemented")) that
-	// never touch zerrors at all — a real, deterministic error with no
+	// never touch zerrors at all, a real, deterministic error with no
 	// zerrors ID to look up, so it's recorded as its own synthetic site
 	// rather than silently having nothing to show.
 	if pkgPath == "google.golang.org/grpc/status" && (fnObj.Name() == "Errorf" || fnObj.Name() == "Error") {
@@ -581,13 +604,13 @@ func (w *walker) followFunc(pkg *packages.Package, fnObj *types.Func, call *ast.
 }
 
 // handleDynamic is reached for a call through an interface method or a
-// function-typed variable/field/parameter — something static analysis can't
+// function-typed variable/field/parameter, something static analysis can't
 // resolve to one concrete target. It checks knownIndirections before giving
 // up.
 func (w *walker) handleDynamic(pkg *packages.Package, t types.Type, call *ast.CallExpr) {
 	name := namedTypeName(t)
 	if ref, ok := w.indirections[name]; ok {
-		w.recurseInto(ref.pkgPath, ref.name, "", []string{ref.name + " (via " + name + ")"})
+		w.recurseInto(ref.pkgPath, ref.name, ref.recv, []string{ref.name + " (via " + name + ")"})
 		return
 	}
 	// Calls through a stdlib/third-party interface (context.Context,
@@ -609,16 +632,35 @@ func (w *walker) handleDynamic(pkg *packages.Package, t types.Type, call *ast.Ca
 // initializer, if it's one of those rather than a local/parameter var. It
 // returns the FuncLit's package (loaded fresh if needed, same as
 // recurseInto) so the caller has the right TypesInfo to walk its body with.
-func (w *walker) findVarFuncLit(obj *types.Var) (*ast.FuncLit, *packages.Package) {
+//
+// By the time this is called, obj is already known to be an in-module
+// package-level var (the check right below confirms it), so either
+// failure path here is a real call this walk can't follow, not "nothing
+// to see here". That distinction matters because the caller's fallback
+// (handleDynamic) can't catch it either: a bare `var X = func(...) {...}`
+// has no declared name for its type (unlike `type X func(...)`), so
+// handleDynamic's own name-based unresolved check silently no-ops on it.
+// Recording it here, with the call site handleCall already has in hand,
+// is the one place left that still knows this was a real target.
+func (w *walker) findVarFuncLit(obj *types.Var, call *ast.CallExpr) (*ast.FuncLit, *packages.Package) {
 	if obj.Pkg() == nil || !strings.HasPrefix(obj.Pkg().Path(), modulePath) {
 		return nil, nil
 	}
+	recordUnresolved := func() {
+		pos := w.l.fset.Position(call.Pos())
+		w.unresolved = append(w.unresolved, unresolvedCall{
+			pos:      relPath(w.root, pos.Filename) + ":" + strconv.Itoa(pos.Line),
+			typeName: obj.Pkg().Path() + "." + obj.Name(),
+		})
+	}
 	varPkg, err := w.l.loadImportPath(obj.Pkg().Path())
 	if err != nil {
+		recordUnresolved()
 		return nil, nil
 	}
 	lit := findPackageLevelFuncLit(varPkg, obj.Name())
 	if lit == nil {
+		recordUnresolved()
 		return nil, nil
 	}
 	return lit, varPkg
@@ -657,7 +699,7 @@ func (w *walker) recordThrow(pkg *packages.Package, call *ast.CallExpr, trail []
 	}
 	pos := pkg.Fset.Position(call.Pos())
 	if id == "" {
-		// A real Throw site always has a non-empty ID — that's the whole
+		// A real Throw site always has a non-empty ID, that's the whole
 		// point of the ID (an addressable, greppable tag). An empty one
 		// (e.g. zerrors.ThrowNotFound(nil, "", "")) is the errors.Is()
 		// sentinel-value idiom: the constructed error is only used for a
@@ -677,12 +719,12 @@ func (w *walker) recordThrow(pkg *packages.Package, call *ast.CallExpr, trail []
 }
 
 // recordRawStatus handles status.Errorf(codes.X, format, a...) /
-// status.Error(codes.X, msg) — the first argument must resolve to a real
+// status.Error(codes.X, msg), the first argument must resolve to a real
 // constant in google.golang.org/grpc/codes (not just any identifier named
 // like a code), so an unrelated call that happens to pass an argument named
 // "codes.Foo" from some other package can't be mistaken for this. There's
 // no zerrors ID here, so a synthetic one ("GRPC-<CODE NAME>") is used
-// instead — clearly distinguishable from a real zerrors ID by its shape,
+// instead, clearly distinguishable from a real zerrors ID by its shape,
 // and matched specially in generate-endpoint-errors.ts rather than looked
 // up in the error catalog, since it was never scanned into that catalog.
 // grpcCodeToStatusKey maps a google.golang.org/grpc/codes constant name to
@@ -690,7 +732,7 @@ func (w *walker) recordThrow(pkg *packages.Package, call *ast.CallExpr, trail []
 // Deliberately not derived by upper-casing the Go name: several of these
 // don't round-trip (NotFound -> NOT_FOUND needs an inserted underscore;
 // Go spells Canceled with one L, GRPC_STATUS's key has two). Getting this
-// wrong doesn't just mean the code's status text is missing — combined with
+// wrong doesn't just mean the code's status text is missing, combined with
 // the wasTraced filter in generate-endpoint-errors.ts, a genuinely-reachable
 // site that fails this lookup gets counted as "checked, confirmed empty"
 // instead of surfacing as unmatched, which is a worse failure than a gap.
@@ -739,7 +781,7 @@ func (w *walker) recordRawStatus(pkg *packages.Package, call *ast.CallExpr, trai
 			// can't be shown as-is: the verb's actual value only exists at
 			// runtime, from an argument this static walk never evaluates.
 			// Showing the raw literal would put a stray "%s" on a public
-			// docs page instead of a real message, so skip it — the
+			// docs page instead of a real message, so skip it, the
 			// downstream generator falls back to "(empty message)" rather
 			// than fabricate one.
 			if s, err := strconv.Unquote(lit.Value); err == nil && !formatVerbRe.MatchString(s) {
@@ -752,7 +794,7 @@ func (w *walker) recordRawStatus(pkg *packages.Package, call *ast.CallExpr, trai
 	statusKey, ok := grpcCodeToStatusKey[sel.Sel.Name]
 	if !ok {
 		// codes.<Name> resolved to a real constant in the codes package (the
-		// checks above confirm that), but isn't one of the 17 known ones —
+		// checks above confirm that), but isn't one of the 17 known ones,
 		// shouldn't happen in practice, but fail loud into unresolved rather
 		// than emit an ID nothing can look up.
 		w.unresolved = append(w.unresolved, unresolvedCall{
@@ -776,7 +818,7 @@ func isInterfaceRecv(t types.Type) bool {
 }
 
 // namedTypeName returns "<import path>.<name>" for a named type (following
-// through a leading pointer), or "" if t isn't a named type — e.g. a raw
+// through a leading pointer), or "" if t isn't a named type, e.g. a raw
 // func literal type has no stable name to key knownIndirections on.
 func namedTypeName(t types.Type) string {
 	if ptr, ok := t.(*types.Pointer); ok {

@@ -17,7 +17,7 @@ func (h *Handler) Unimplemented(ctx context.Context) error {
 }
 
 // FormattedMessage pins that a literal format string containing a real
-// Printf verb is dropped rather than shown as-is — the verb's value only
+// Printf verb is dropped rather than shown as-is, the verb's value only
 // exists at runtime, so the raw literal ("instance %s not found") would be
 // a false, half-templated message on a public docs page.
 func (h *Handler) FormattedMessage(ctx context.Context, id string) error {

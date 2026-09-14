@@ -11,12 +11,13 @@ type ExampleResponse = {
 };
 type Cause = { key: string; id: string; message: string; why: string; example: ExampleResponse };
 type StatusGroup = { status: number; statusText: string; description?: string; causes: Cause[] };
-type EndpointErrorsData = Record<string, Record<string, StatusGroup[]>>;
+type OperationErrors = { groups: StatusGroup[]; complete: boolean };
+type EndpointErrorsData = Record<string, Record<string, OperationErrors>>;
 
 export default function EndpointErrors({ service, operationId }: { service: string; operationId: string }) {
   // Fetched at runtime from a route handler instead of a static `import
   // data from './data.json'`: a static import bakes the *entire* catalog
-  // (every category, every operation — measured at 3.1MB once every
+  // (every category, every operation, measured at 3.1MB once every
   // category is filled in) into this client component's JS, which then
   // ships on every single endpoint page whether that page needs 2 rows of
   // it or none. The route handler serves the same file once, cached
@@ -28,7 +29,7 @@ export default function EndpointErrors({ service, operationId }: { service: stri
   useEffect(() => {
     let cancelled = false;
     // The app is served under basePath '/docs', but fetch() (unlike
-    // <Link>/router.push()) doesn't get that prefix applied automatically —
+    // <Link>/router.push()) doesn't get that prefix applied automatically,
     // it has to be spelled out here or this 404s under the real deployment.
     fetch('/docs/api/endpoint-errors')
       .then((res) => {
@@ -49,16 +50,17 @@ export default function EndpointErrors({ service, operationId }: { service: stri
   if (loadError) return null;
   if (!data) return null;
 
-  const groups = data[service]?.[operationId];
+  const entry = data[service]?.[operationId];
   // No entry, or an entry the tracer confidently found nothing for, are
   // treated the same here: stay silent. The tracer genuinely can't tell
   // "this endpoint has no errors" apart from "the tracer couldn't see
   // through this handler" (e.g. GetInstanceFeatures returns a bare
   // unwrapped error, so the walker finds zero zerrors.Throw* sites even
-  // though the endpoint can absolutely still hand back a 500) — so a card
+  // though the endpoint can absolutely still hand back a 500), so a card
   // claiming "no error causes are documented" would be asserting something
   // the tool has no way to actually know.
-  if (!groups || groups.length === 0) return null;
+  if (!entry || entry.groups.length === 0) return null;
+  const { groups, complete } = entry;
 
   return (
     <div className="not-prose flex flex-col gap-3">
@@ -67,7 +69,14 @@ export default function EndpointErrors({ service, operationId }: { service: stri
         <Link href="/apis/errors" className="underline decoration-fd-border hover:text-fd-primary">
           error reference
         </Link>
-        .
+        {complete ? (
+          '.'
+        ) : (
+          <>
+            . This operation's code could not be fully traced, so besides what is listed below, other error responses
+            may also be possible.
+          </>
+        )}
       </p>
       <div className="not-prose flex flex-col rounded-xl border shadow-md overflow-hidden bg-fd-card text-fd-card-foreground">
         <div className="divide-y divide-fd-border">
@@ -76,8 +85,8 @@ export default function EndpointErrors({ service, operationId }: { service: stri
             const cause = g.causes.find((c) => c.key === selectedKey);
             return (
               // <details>/<summary> instead of a hand-rolled button + state:
-              // free keyboard handling, free ARIA expanded state, and —
-              // unlike the button version — text inside stays findable via
+              // free keyboard handling, free ARIA expanded state, and,
+              // unlike the button version, text inside stays findable via
               // Ctrl-F even while collapsed.
               <details key={g.status} className="group scroll-m-20">
                 <summary className="flex cursor-pointer list-none items-center py-2 px-3 text-fd-foreground font-medium [&::-webkit-details-marker]:hidden">
@@ -96,6 +105,7 @@ export default function EndpointErrors({ service, operationId }: { service: stri
                       <select
                         value={selectedKey}
                         onChange={(e) => setSelected((prev) => ({ ...prev, [g.status]: e.target.value }))}
+                        aria-label={`Cause of the ${g.status} ${g.statusText} response`}
                         className="p-2 bg-transparent text-sm font-medium rounded-md border border-fd-border hover:bg-fd-accent/50 focus:outline-none focus:ring-2 focus:ring-fd-ring text-fd-foreground w-full"
                       >
                         {g.causes.map((c) => (
@@ -112,7 +122,7 @@ export default function EndpointErrors({ service, operationId }: { service: stri
                           </div>
                           <div className="flex flex-col gap-1">
                             <p className="text-xs font-medium text-fd-muted-foreground">
-                              Example response — a real call to this endpoint that hits this cause comes back exactly like this:
+                              Example response, a real call to this endpoint that hits this cause comes back exactly like this:
                             </p>
                             <pre className="p-2 overflow-x-auto text-xs rounded-md bg-fd-secondary text-fd-secondary-foreground">
                               <code>{JSON.stringify(cause.example.body, null, 2)}</code>

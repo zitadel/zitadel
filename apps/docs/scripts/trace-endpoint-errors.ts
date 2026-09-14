@@ -1,4 +1,4 @@
-// Wraps the Go call-graph tracer (internal/tools/errortrace) — from "a Go
+// Wraps the Go call-graph tracer (internal/tools/errortrace), from "a Go
 // handler file, a proto service, a list of categories, or a git diff" to
 // "the docs page shows it", in one command. Four ways to say what to trace,
 // pick at most one:
@@ -21,7 +21,7 @@
 // Used directly for local one-off tracing (including generating the actual
 // tables for a category, by hand, in its own PR), and by the
 // endpoint-error-tables-watch.yml GitHub Actions workflow
-// (--changed-since the PR's base — only what that PR touched, to flag
+// (--changed-since the PR's base, only what that PR touched, to flag
 // what's now out of date, never to generate the tables itself).
 import { execFileSync } from 'child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
@@ -38,7 +38,7 @@ function fail(message: string): never {
   process.exit(1);
 }
 
-// path.relative() rather than a raw string-prefix check — resolve() and
+// path.relative() rather than a raw string-prefix check, resolve() and
 // join() both produce backslash-separated paths on Windows, so comparing
 // against a hand-appended '/' (as a plain prefix match would) silently never
 // matches there. relative() is the portable way to ask "is childPath inside
@@ -58,16 +58,16 @@ function parseArgs(argv: string[]) {
 
 // Runs the Go tracer against one service and writes its output. Defaults to
 // tracing by proto file; pass traceArg to trace by --go-file instead (used
-// in single-service mode when that's what the caller pointed at — tracing
+// in single-service mode when that's what the caller pointed at, tracing
 // by proto there would silently ignore which file was actually given).
 //
 // merge controls what happens to operations already sitting in outFile that
 // this run didn't touch. A --proto (or --only, or no-flags) run traces
 // every RPC the service declares, so its result is the complete, current
-// truth for that category — a plain overwrite is correct, and is in fact
+// truth for that category, a plain overwrite is correct, and is in fact
 // required to let a removed RPC's stale entry actually disappear. A
 // --go-file run only traces the methods defined in that one file, a
-// deliberately narrow slice for fast local iteration — overwriting the
+// deliberately narrow slice for fast local iteration, overwriting the
 // whole per-category file with just that slice would silently delete every
 // other operation this category already had traced. merge: true instead
 // folds this run's results into whatever's already there, touching only
@@ -85,7 +85,7 @@ function traceService(svc: ServiceConfig, outFile: string, traceArg: [string, st
   const traced = JSON.parse(output);
   const opCount = Object.keys(traced).length;
   if (opCount === 0) {
-    console.error(`[trace-endpoint-errors] ${svc.category}: tracer found no operations — skipping write`);
+    console.error(`[trace-endpoint-errors] ${svc.category}: tracer found no operations, skipping write`);
     return 0;
   }
   if (!existsSync(svc.tracingDir)) mkdirSync(svc.tracingDir, { recursive: true });
@@ -105,14 +105,40 @@ function regenerate() {
   execFileSync('pnpm', ['exec', 'tsx', 'scripts/generate-endpoint-errors.ts'], { cwd: DOCS_ROOT, stdio: 'inherit' });
 }
 
+// Shared backend packages a handler's error trace commonly passes through
+// on its way to a zerrors.Throw* call (permission checks, eventstore
+// projections, crypto, ...). A change under any of these can add or remove
+// a real error site for every single category without touching that
+// category's own proto file or Go handler package at all, which the
+// per-category containment check below has no way to see on its own.
+// There's no reverse-dependency graph to consult for which categories a
+// specific change here actually reaches, so the conservative,
+// correct-by-construction answer is "recheck every category" rather than
+// silently missing drift. Keep this in sync with
+// endpoint-error-tables-watch.yml's own trigger paths, or a change here
+// could land on a PR the workflow never even runs on.
+const SHARED_PACKAGE_DIRS = [
+  'internal/command',
+  'internal/query',
+  'internal/eventstore',
+  'internal/api/authz',
+  'internal/domain',
+  'internal/crypto',
+  'internal/idp',
+  'internal/webauthn',
+  'internal/zerrors',
+  'internal/repository',
+].map((p) => join(REPO_ROOT, p));
+
 // Maps whatever changed between sinceRef and HEAD to the categories it
-// touches — did it change a category's .proto file (or anything alongside
-// it) or anything under its Go handler package.
+// touches: did it change a category's .proto file (or anything alongside
+// it), anything under its Go handler package, or a shared package any
+// category's trace could pass through.
 //
 // Three-dot (sinceRef...HEAD), not two-dot: two-dot diffs the tips of both
 // refs directly, so if sinceRef (a PR's base, e.g. origin/main) has moved
 // on since the PR branched off it, every category anyone else merged into
-// main in the meantime shows up as "changed" too — wildly widening what a
+// main in the meantime shows up as "changed" too, wildly widening what a
 // single PR gets flagged for. Three-dot diffs from the merge-base instead,
 // which is what a PR's actual file changes are and what GitHub's own
 // "Files changed" tab shows.
@@ -123,6 +149,10 @@ function findAffectedCategories(sinceRef: string, services: ServiceConfig[]): Se
     .map((l) => l.trim())
     .filter(Boolean)
     .map((f) => resolve(REPO_ROOT, f));
+
+  if (changed.some((file) => SHARED_PACKAGE_DIRS.some((dir) => file === dir || isInside(dir, file)))) {
+    return new Set(services.map((s) => s.category));
+  }
 
   const affected = new Set<string>();
   for (const file of changed) {
@@ -147,7 +177,7 @@ function main() {
     // Resolved against REPO_ROOT, not process.cwd(): every documented
     // example above is written as a repo-root-relative path (matching how
     // someone actually browsing the repo would copy one), but pnpm always
-    // runs a package's script from that package's own directory — so
+    // runs a package's script from that package's own directory, so
     // process.cwd() here is apps/docs regardless of where the command was
     // typed from, and a repo-root-relative path resolved against it would
     // silently look inside apps/docs/proto/... instead, which doesn't
@@ -160,7 +190,7 @@ function main() {
     if (!svc) {
       fail(
         `${goFileAbs ?? protoAbs} doesn't match any discovered service. That means its proto file or Go handler ` +
-          `package doesn't exist yet — see discoverTraceableServices() in generate-endpoint-errors.ts.`,
+          `package doesn't exist yet, see discoverTraceableServices() in generate-endpoint-errors.ts.`,
       );
     }
     // Always the same filename regardless of mode (never named after the
@@ -169,7 +199,7 @@ function main() {
     // plain full run) each write their own same-service file side by side
     // in the tracing dir, and generate-endpoint-errors.ts merges every
     // *.json file it finds there with Object.assign() in directory-listing
-    // order, which is unspecified — so a stale file could silently outrank
+    // order, which is unspecified, so a stale file could silently outrank
     // a fresh one. One filename per service instead.
     //
     // --proto traces every RPC the service declares, a complete dump, so
@@ -180,7 +210,7 @@ function main() {
     const outFile = join(svc.tracingDir, `${svc.category}-ops.json`);
     const traceArg: [string, string] = goFileAbs ? ['--go-file', goFileAbs] : ['--proto', svc.protoFile];
     const opCount = traceService(svc, outFile, traceArg, !!goFileAbs);
-    if (opCount === 0) fail('the tracer found no operations — check --go-file/--proto point at an actual handler/service file');
+    if (opCount === 0) fail('the tracer found no operations, check --go-file/--proto point at an actual handler/service file');
     regenerate();
     return;
   }
@@ -190,7 +220,7 @@ function main() {
   if (changedSince) {
     const affected = findAffectedCategories(changedSince, services);
     // Printed unconditionally (even when empty) as a stable, parseable line
-    // — endpoint-error-tables-watch.yml reads this back into $GITHUB_OUTPUT.
+    //, endpoint-error-tables-watch.yml reads this back into $GITHUB_OUTPUT.
     console.log(`AFFECTED_CATEGORIES=${[...affected].join(',')}`);
     selected = services.filter((s) => affected.has(s.category));
   } else if (only) {

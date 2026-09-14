@@ -1,6 +1,6 @@
 // Package sentinel is a tracer fixture pinning the empty-ID skip: a
 // zerrors.Throw* call with an empty ID literal is the errors.Is() sentinel
-// idiom (constructed only for a type comparison, never actually returned —
+// idiom (constructed only for a type comparison, never actually returned,
 // see internal/command/org_domain.go for the real-code pattern this
 // mirrors), and must not be recorded as a real error site. A real,
 // non-empty-ID throw right next to it must still be recorded, proving the

@@ -10,7 +10,7 @@ import (
 )
 
 // repoRoot resolves the module root the same way main() does
-// (filepath.Abs(".")) when invoked from there — but `go test` runs from this
+// (filepath.Abs(".")) when invoked from there, but `go test` runs from this
 // package's own directory regardless of the caller's cwd, so this walks up
 // from this file's own path instead: internal/tools/errortrace/main_test.go
 // is three directories below the repo root.
@@ -27,8 +27,8 @@ func repoRoot(t *testing.T) string {
 	return root
 }
 
-// traceGoFile runs exactly the --go-file path main() does — same
-// targetsFromGoFile call, same per-target walk — but returns the result
+// traceGoFile runs exactly the --go-file path main() does, same
+// targetsFromGoFile call, same per-target walk, but returns the result
 // instead of printing it, and takes an indirections table instead of always
 // using the real knownIndirections.
 func traceGoFile(t *testing.T, root, goFile string, indirections map[string]funcRef) map[string]operationTrace {
@@ -56,7 +56,7 @@ func traceGoFile(t *testing.T, root, goFile string, indirections map[string]func
 }
 
 // TestTraceGoldenCases pins the walker's semantics against small, isolated
-// fixture packages under testdata/ — one per case called out in review as
+// fixture packages under testdata/, one per case called out in review as
 // the specific way this tool has silently gone wrong before: a direct
 // throw, a throw one method call away, a call through a knownIndirections
 // entry, a raw gRPC status stub (with and without a Printf verb in its
@@ -66,7 +66,7 @@ func traceGoFile(t *testing.T, root, goFile string, indirections map[string]func
 //
 // The known-indirection case uses a fixture funcRef instead of the real
 // knownIndirections table, so this test can't start failing just because
-// internal/api/authz.CheckPermission's own internals change — it's
+// internal/api/authz.CheckPermission's own internals change, it's
 // pinning the lookup mechanism, not that function's business logic.
 func TestTraceGoldenCases(t *testing.T) {
 	root := repoRoot(t)
@@ -120,5 +120,32 @@ func TestTraceGoldenCases(t *testing.T) {
 				t.Errorf("trace output for %s doesn't match golden file %s\n--- got ---\n%s\n--- want ---\n%s", tc.name, goldenPath, gotJSON, want)
 			}
 		})
+	}
+}
+
+// TestKnownIndirectionsSkipsNoValidation pins that command.PermissionCheck
+// and command.OrganizationPermissionCheck target newPermissionCheck, not
+// authz.CheckPermission directly. Every concrete producer of either type
+// is a thin wrapper around newPermissionCheck, whose own closure body
+// throws COMMAND-ulBlS and COMMAND-4g3xq before ever reaching the authz
+// check (see internal/command/permission_checks.go); targeting
+// authz.CheckPermission directly skipped both for every permission check
+// in the codebase, silently, with no build failure and no diagnostic. This
+// doesn't re-derive the finding from scratch (that needs the real
+// permission_checks.go body, not a fixture), it just guards against the
+// table quietly reverting to the old, shorter chain.
+func TestKnownIndirectionsSkipsNoValidation(t *testing.T) {
+	for _, key := range []string{
+		modulePath + "/internal/command.PermissionCheck",
+		modulePath + "/internal/command.OrganizationPermissionCheck",
+	} {
+		ref, ok := knownIndirections[key]
+		if !ok {
+			t.Fatalf("knownIndirections has no entry for %s", key)
+		}
+		want := funcRef{pkgPath: modulePath + "/internal/command", name: "newPermissionCheck", recv: "Commands"}
+		if ref != want {
+			t.Errorf("knownIndirections[%s] = %+v, want %+v (jumping straight to authz.CheckPermission skips newPermissionCheck's own COMMAND-ulBlS/COMMAND-4g3xq throws)", key, ref, want)
+		}
 	}
 }

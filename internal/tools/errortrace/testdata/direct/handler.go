@@ -1,5 +1,5 @@
 // Package direct is a tracer fixture: a handler method that throws directly,
-// with no indirection at all. Pins the simplest possible case — the walker
+// with no indirection at all. Pins the simplest possible case, the walker
 // must find this without following anything.
 package direct
 

@@ -3,7 +3,7 @@
 //
 // Two sources feed the data, merged per (service, operationId, status):
 //   1. Response codes the .proto file already declares via grpc-gateway
-//      openapiv2 annotations (file-level defaults + per-RPC additions) —
+//      openapiv2 annotations (file-level defaults + per-RPC additions),
 //      authoritative, but invisible in the generated docs today because the
 //      OpenAPI generator tool reads a different annotation vocabulary and
 //      silently drops them. Parsed directly from the .proto source here.
@@ -12,7 +12,7 @@
 //      the error catalog from generate-error-reference.ts for the why-text.
 //
 // Run: node apps/docs/scripts/generate-endpoint-errors.ts
-// This *is* wired into the docs build's `generate` chain — the last step of
+// This *is* wired into the docs build's `generate` chain, the last step of
 // generate-api-reference.ts's `--only-fix` branch calls it, so every normal
 // docs build (and every Vercel deploy) re-applies whatever tracing JSON is
 // committed under endpoint-error-tracing/, with no extra step. Deliberate:
@@ -22,24 +22,24 @@
 //
 // Unlike generate-error-reference.ts (which scans 2000+ backend Go files and
 // is genuinely too slow to run on every build), this only reads the small
-// set of already-traced JSON files plus the .proto files — cheap enough to
+// set of already-traced JSON files plus the .proto files, cheap enough to
 // run on every generate.
 //
 // ── The standard: what a v2 service needs for this to pick it up ────────
 // discoverServices() below scans proto/zitadel/*/v2/*_service.proto and
-// derives everything by reading source — nothing is hand-typed, so there is
+// derives everything by reading source, nothing is hand-typed, so there is
 // no service-name string anyone can get wrong (see discoverServices()'s own
 // comment for why that matters). But that scan only works if a service
 // follows the same layout every existing v2 service already follows. This is
-// the exact, complete contract — not a summary of it:
+// the exact, complete contract, not a summary of it:
 //
 // 1. Proto file at `proto/zitadel/<category>/v2/<anything>_service.proto`
-//    (must end in `_service.proto` — that's how a real service is told apart
+//    (must end in `_service.proto`, that's how a real service is told apart
 //    from a message-only file like metadata.proto, which has none). Must
 //    contain `package zitadel.<category>.v2;` and `service <Name> { ... }`.
 //    Each RPC declared as `rpc <OperationId>(...)`. This is already standard
-//    ZITADEL proto style — nothing new to learn to satisfy it.
-// 2. Go handlers in package `internal/api/grpc/<category>/v2` — any file(s),
+//    ZITADEL proto style, nothing new to learn to satisfy it.
+// 2. Go handlers in package `internal/api/grpc/<category>/v2`, any file(s),
 //    the tracer scans the whole package. For each RPC you want covered,
 //    there must be a method (any receiver, but `*Server` by convention)
 //    named EXACTLY the RPC's name, e.g. `rpc CreateSession(...)` needs a
@@ -47,37 +47,38 @@
 // 3. Docs content dir `apps/docs/content/reference/api/<category>/` must
 //    exist with the generated per-operation MDX files already in it. This
 //    comes from the normal docs generation pipeline once the proto is wired
-//    into it the same way every other service is — not something to
+//    into it the same way every other service is, not something to
 //    hand-create.
 // 4. The <category> path segment (the directory name right after
 //    proto/zitadel/, internal/api/grpc/, and content/reference/api/) must be
 //    IDENTICAL across all three. This is the one rule with no error message
-//    if you get it wrong — a mismatch just makes the service quietly not
+//    if you get it wrong, a mismatch just makes the service quietly not
 //    appear. If a category you expect is missing, compare its directory name
-//    across all three paths by hand — that's exactly what a mismatch here
+//    across all three paths by hand, that's exactly what a mismatch here
 //    looks like.
 // 5. (Optional, cosmetic only) A `description: "..."` inside the proto's own
 //    openapiv2_swagger info block, before the `service` line, is surfaced
-//    alongside the category. No description there just means none shows —
+//    alongside the category. No description there just means none shows,
 //    never invented.
 //
-// None of this is new process to adopt — it's already how every existing v2
+// None of this is new process to adopt, it's already how every existing v2
 // service in this repo is laid out. The contract only exists so tooling can
 // rely on it holding, not to add extra steps to writing a new API.
 //
 // To actually trace a category's operations once it satisfies the above:
 // 1. Run `go run ./internal/tools/errortrace --proto <service>.proto` (see
 //    internal/tools/errortrace/main.go) to compute every zerrors.Throw*(...)
-//    site reachable from each RPC's handler — mechanical, no manual code
+//    site reachable from each RPC's handler, mechanical, no manual code
 //    reading required. It writes { "<OperationId>": { "handler": "file:line",
 //    "errors": [{ "id", "file", "line", "reasoning" }] } }; drop that into
 //    the service's tracing subdirectory (this script merges every *.json
-//    file it finds there — one file per operation or batched, either works).
-//    `pnpm generate:endpoint-trace:category` does this step for you, for a
-//    whole category at once, picked from a menu.
+//    file it finds there, one file per operation or batched, either works).
+//    `pnpm generate:endpoint-trace -- --only <category>` does this step for
+//    you, for one or more categories by name (no interactive picker, just
+//    pass the category name directly).
 // 2. Re-run this script (or let the CLI above do it). It resolves each
 //    traced (id, file, line) against the existing error catalog for the
-//    why-text and example response — if a newly-added error ID shows up as
+//    why-text and example response, if a newly-added error ID shows up as
 //    "unmatched", the catalog is stale: re-run `pnpm generate:error-reference`
 //    first, since that's what scans internal/**/*.go for every
 //    zerrors.Throw*() site in the first place.
@@ -97,7 +98,7 @@ const PROTO_ZITADEL_ROOT = join(REPO_ROOT, 'proto/zitadel');
 export interface ServiceConfig {
   service: string; // full proto package + service name, e.g. 'zitadel.org.v2.OrganizationService'
   category: string; // proto/docs directory segment, e.g. 'org'
-  description?: string; // from the proto's own openapiv2_swagger info block, if it has one — never invented
+  description?: string; // from the proto's own openapiv2_swagger info block, if it has one, never invented
   rpcNames: string[]; // declaration order, straight from the .proto file
   contentDir: string;
   protoFile: string;
@@ -113,7 +114,7 @@ interface Candidate extends ServiceConfig {
 // Parses the bits every candidate needs out of one service .proto file's
 // text: the service name, its full package, its (optional) top-level
 // description, and its RPC names in declaration order. Returns null for a
-// message-only file (no `service X { ... }` block) — shared between the v2
+// message-only file (no `service X { ... }` block), shared between the v2
 // (one directory per category) and v1 (flat proto/zitadel/<name>.proto)
 // scans below so the parsing logic can't drift between the two.
 function parseServiceFromProtoText(text: string, fallbackPackage: string) {
@@ -123,8 +124,8 @@ function parseServiceFromProtoText(text: string, fallbackPackage: string) {
   if (!serviceName) return null;
 
   const protoPackage = text.match(/\bpackage\s+([\w.]+)\s*;/)?.[1] ?? fallbackPackage;
-  // Only search before the `service` keyword — same region parseDeclaredResponses
-  // reads the swagger defaults from — so a per-RPC/per-field description
+  // Only search before the `service` keyword, same region parseDeclaredResponses
+  // reads the swagger defaults from, so a per-RPC/per-field description
   // declared later in the file is never mistaken for the service's own.
   const description = text
     .slice(0, serviceIdx)
@@ -139,7 +140,7 @@ function parseServiceFromProtoText(text: string, fallbackPackage: string) {
 
 // Reads every service proto file and derives everything
 // discoverServices()/discoverTraceableServices() need, regardless of whether
-// its docs/Go side is wired up yet — the two public functions below just
+// its docs/Go side is wired up yet, the two public functions below just
 // filter this differently. Kept as one shared scan so "is this category
 // wired up" and "what's it missing" can never disagree with each other.
 //
@@ -148,12 +149,12 @@ function parseServiceFromProtoText(text: string, fallbackPackage: string) {
 //        -> internal/api/grpc/<category>/v2
 //   v1:  proto/zitadel/<name>.proto (flat, legacy, predates the v2 per-
 //        category convention: management.proto, admin.proto, auth.proto,
-//        system.proto — the only 4 flat files that declare their own
+//        system.proto, the only 4 flat files that declare their own
 //        `service`, the rest are message-only and skipped)
 //        -> internal/api/grpc/<name>, no version segment
 // In both shapes the docs content dir is content/reference/api/<category>;
-// there's no naming collision between the two (v1's 4 verb-named services —
-// admin, auth, management, system — don't match any v2 resource category).
+// there's no naming collision between the two (v1's 4 verb-named services,
+// admin, auth, management, system, don't match any v2 resource category).
 function scanCandidates(): Candidate[] {
   if (!existsSync(PROTO_ZITADEL_ROOT)) return [];
   const candidates: Candidate[] = [];
@@ -166,7 +167,7 @@ function scanCandidates(): Candidate[] {
     const v2Dir = join(PROTO_ZITADEL_ROOT, category, 'v2');
     if (!existsSync(v2Dir)) continue;
     const serviceFileName = readdirSync(v2Dir).find((f) => f.endsWith('_service.proto'));
-    if (!serviceFileName) continue; // message-only dirs (metadata, filter, object, error, ...) — not a service
+    if (!serviceFileName) continue; // message-only dirs (metadata, filter, object, error, ...), not a service
 
     const protoFile = join(v2Dir, serviceFileName);
     const parsed = parseServiceFromProtoText(readFileSync(protoFile, 'utf8'), `zitadel.${category}.v2`);
@@ -194,7 +195,7 @@ function scanCandidates(): Candidate[] {
     const category = fileName.slice(0, -'.proto'.length);
     const protoFile = join(PROTO_ZITADEL_ROOT, fileName);
     const parsed = parseServiceFromProtoText(readFileSync(protoFile, 'utf8'), `zitadel.${category}.v1`);
-    if (!parsed) continue; // message-only file (object.proto, text.proto, ...) — not a service
+    if (!parsed) continue; // message-only file (object.proto, text.proto, ...), not a service
 
     const contentDir = join(DOCS_ROOT, 'content/reference/api', category);
     const goPackageDir = join(REPO_ROOT, 'internal/api/grpc', category);
@@ -217,7 +218,7 @@ function scanCandidates(): Candidate[] {
 // dir + Go handler package all exist), by reading source directly instead of
 // a hand-typed list. This exists because a hand-typed SERVICES array is
 // exactly how a real bug happened: an entry once read
-// `service: 'zitadel.org.v2.OrgService'` — a guess — when the .proto file
+// `service: 'zitadel.org.v2.OrgService'`, a guess, when the .proto file
 // actually declares `service OrganizationService`. Reading the name from the
 // source it's declared in makes that whole class of mistake impossible,
 // rather than just "be more careful next time."
@@ -226,14 +227,14 @@ export function discoverServices(): ServiceConfig[] {
 }
 
 // Like discoverServices(), but doesn't require content/reference/api to
-// exist — only the real, always-checked-in Go handler package. That content
+// exist, only the real, always-checked-in Go handler package. That content
 // dir is gitignored, build-generated output (the full fetch-remote-content ->
 // generate-proto-docs -> generate-api-reference chain), so it's absent on a
 // bare CI checkout that hasn't run the full docs build. discoverServices()
 // is deliberately strict for anything that writes committed output (this
 // file's own main() below), since a category it can't find a real page for
 // has nowhere correct to stamp a table anyway. This lenient variant is for
-// callers that only need to identify/trace a category — trace-endpoint-errors.ts,
+// callers that only need to identify/trace a category, trace-endpoint-errors.ts,
 // detecting a PR's affected categories and tracing them, where no docs page
 // needing to exist yet is fine.
 export function discoverTraceableServices(): ServiceConfig[] {
@@ -259,7 +260,15 @@ type ExampleResponse = {
 };
 type Cause = { key: string; id: string; message: string; why: string; example: ExampleResponse };
 type StatusGroup = { status: number; statusText: string; description?: string; causes: Cause[] };
-type EndpointErrorsData = Record<string, Record<string, StatusGroup[]>>;
+// complete mirrors wasCleanlyTraced below: false means the tracer couldn't
+// follow every call site for this operation (some dynamic dispatch it
+// gave up on, or a traced id the catalog couldn't explain), so the causes
+// listed are real but not necessarily the whole story, other error
+// responses this operation can return may exist beyond what's shown here.
+// The component uses this to say so, instead of implying completeness it
+// can't back up.
+type OperationErrors = { groups: StatusGroup[]; complete: boolean };
+type EndpointErrorsData = Record<string, Record<string, OperationErrors>>;
 
 // Mirrors generate-error-reference.ts's example construction: the server
 // always appends " (ID)" to the top-level message (see
@@ -270,7 +279,7 @@ type EndpointErrorsData = Record<string, Record<string, StatusGroup[]>>;
 //
 // A "GRPC-<CODE>" id is a raw status.Errorf(codes.X, ...) call, which
 // ZITADELToGRPCError (internal/api/grpc/gerrors/zitadel_errors.go) passes
-// straight through untouched once status.FromError succeeds on it — no
+// straight through untouched once status.FromError succeeds on it, no
 // " (ID)" suffix, no details[]. Only a real zerrors ID goes through the
 // wrapping that adds both, so the synthetic example has to mirror the
 // plain shape or it documents a response gRPC never actually sends.
@@ -311,7 +320,7 @@ function findCluster(id: string, file: string, line: number): ErrorCluster | nul
 }
 
 // A "GRPC-<CODE>" id (from internal/tools/errortrace's recordRawStatus) is a
-// raw status.Errorf(codes.X, ...) call, not a zerrors.Throw* — it was never
+// raw status.Errorf(codes.X, ...) call, not a zerrors.Throw*, it was never
 // scanned into the error catalog, so there's no cluster to look up. Build
 // one on the fly instead of reporting it as unmatched: the code name alone
 // is enough to know the HTTP/gRPC status, and the traced site carries its
@@ -324,7 +333,7 @@ function syntheticGrpcCluster(id: string, message: string): ErrorCluster | null 
   return {
     key: `synthetic|${id}`,
     message,
-    why: `This operation returns this status directly from its handler code, rather than through the usual error-catalog convention — so this explanation is mechanical, not researched.`,
+    why: `This operation returns this status directly from its handler code, rather than through the usual error-catalog convention, so this explanation is mechanical, not researched.`,
     ids: [{ id, locations: [] }],
     example: { httpStatus: status.httpStatus, grpcCode: status.code },
   };
@@ -383,14 +392,14 @@ function parseDeclaredResponses(protoFile: string): Record<string, { status: num
 
 function main() {
   // SERVICES (discoverServices(), the strict variant) comes back empty on
-  // any checkout where content/reference/api hasn't been generated yet —
+  // any checkout where content/reference/api hasn't been generated yet,
   // true of every bare CI checkout, and just as true for a contributor who
   // hasn't run the full docs build locally. Writing DATA_OUT in that state
   // would mean writing {} for every service, silently truncating whatever
-  // real, committed data is already there. Leave the file alone instead —
+  // real, committed data is already there. Leave the file alone instead,
   // there's nothing this run could correctly say about it.
   if (SERVICES.length === 0) {
-    console.log('[endpoint-errors] content/reference/api not found — skipping data.json, nothing to safely regenerate here.');
+    console.log('[endpoint-errors] content/reference/api not found, skipping data.json, nothing to safely regenerate here.');
     return;
   }
 
@@ -402,7 +411,7 @@ function main() {
   for (const svc of SERVICES) {
     data[svc.service] = {};
     const declaredByOp = parseDeclaredResponses(svc.protoFile);
-    // Scoped to this service's own tracing subdirectory — keeps two
+    // Scoped to this service's own tracing subdirectory, keeps two
     // services from silently colliding if they happen to both define an
     // operation with the same name.
     const traced: Record<string, { errors: { id: string; file: string; line: number; message?: string }[]; unresolved?: number }> = {};
@@ -413,7 +422,7 @@ function main() {
     }
 
     // Union declaredByOp into the operation list, but only for a service
-    // that's actually been traced at all (traced has >=1 entry) — within an
+    // that's actually been traced at all (traced has >=1 entry), within an
     // already-traced service, an operation with proto-declared responses but
     // nothing in `traced` must still show its declared defaults rather than
     // being silently skipped. For a service nobody has traced yet, stay
@@ -433,7 +442,7 @@ function main() {
       for (const site of traced[operationId]?.errors ?? []) {
         // A real, hand-assigned zerrors ID can coincidentally start with
         // "GRPC-" too (confirmed: GRPC-vR9nC is a real catalog entry, not
-        // one of ours) — so the real catalog always gets first look, and
+        // one of ours), so the real catalog always gets first look, and
         // the synthetic path is only a fallback for what it can't explain.
         const cluster = findCluster(site.id, site.file, site.line) ?? syntheticGrpcCluster(site.id, site.message ?? '');
         if (!cluster) {
@@ -453,23 +462,23 @@ function main() {
 
       // A status declared generically at the proto/file level (not
       // substantiated by any traced cause) is a reasonable placeholder when
-      // this operation was never traced — we genuinely don't know yet. But
+      // this operation was never traced, we genuinely don't know yet. But
       // if it *was* traced and the tracer confidently found zero reachable
       // causes for that status, keeping the declared-only group is actively
       // misleading, not just incomplete: e.g. SetOrganizationFeatures is a
       // one-line `status.Errorf(codes.Unimplemented, ...)` stub that never
-      // touches zerrors at all, so it can only ever return UNIMPLEMENTED —
+      // touches zerrors at all, so it can only ever return UNIMPLEMENTED,
       // yet the proto's generic file-level 403/404 defaults would otherwise
       // show up here as if they were real possibilities for this endpoint.
       //
       // "Has an entry in traced" isn't enough to call that confident,
       // though: GetInstanceFeatures returns a bare, unwrapped error, so the
-      // walker reaches it and finds zero zerrors.Throw* sites — which looks
+      // walker reaches it and finds zero zerrors.Throw* sites, which looks
       // identical to SetOrganizationFeatures's one-line stub unless we also
       // check *how* the walk went. wasCleanlyTraced additionally requires
       // zero unresolved call sites (the Go tool's walker gave up on some
       // dynamic dispatch it couldn't follow) and zero traced IDs that
-      // failed to match the error catalog (unmatchedForOp) — either one
+      // failed to match the error catalog (unmatchedForOp), either one
       // means the tracer stopped looking partway through, not that it
       // looked and confirmed nothing. Short of both being zero, this
       // operation gets the same treatment as "never traced".
@@ -483,7 +492,7 @@ function main() {
 
       if (groups.length === 0 && !wasCleanlyTraced) {
         // Never traced, or traced but not cleanly (see wasCleanlyTraced
-        // above) — stay fully silent rather than expose internal tooling
+        // above): stay fully silent rather than expose internal tooling
         // state, or a false "confirmed nothing" claim, on a public docs
         // page. Still strip a stale section from a previous run if one
         // exists: original only differs from base when the marker was
@@ -492,14 +501,18 @@ function main() {
         continue;
       }
 
-      // Two ways to land here with an empty `groups`: either it genuinely
-      // has causes, or it was traced and confidently found none (an empty
-      // array here, as opposed to no entry at all, is what tells
-      // EndpointErrors this is a real, checked result — not staleness).
-      // Rendering a note either way is what actually resolves the
-      // SetOrganizationFeatures confusion: before this, "no table" looked
-      // identical whether an operation had been traced or not.
-      data[svc.service][operationId] = groups;
+      // A cleanly traced operation with zero groups (genuinely nothing
+      // declared or found) is worth recording in data.json for future
+      // tooling, but there is nothing for the page itself to show:
+      // EndpointErrors returns null for an empty groups array, so
+      // stamping the "## Possible error responses" heading anyway would
+      // leave a bare heading with nothing rendered under it. Only stamp
+      // the section when there is actually a group to render.
+      data[svc.service][operationId] = { groups, complete: wasCleanlyTraced };
+      if (groups.length === 0) {
+        if (original !== base) writeFileSync(mdxPath, base.replace(/\n*$/, '') + '\n');
+        continue;
+      }
       const stub = `## Possible error responses\n\n<EndpointErrors service="${svc.service}" operationId="${operationId}" />\n`;
       writeFileSync(mdxPath, base.replace(/\n*$/, '') + '\n\n' + stub);
       opsUpdated++;
@@ -512,7 +525,7 @@ function main() {
 }
 
 // Only run the merge when this file is executed directly (`tsx
-// generate-endpoint-errors.ts`) — not when another script imports
+// generate-endpoint-errors.ts`), not when another script imports
 // discoverServices()/discoverTraceableServices() from it
 // (trace-endpoint-errors.ts), which would otherwise silently trigger a full
 // merge run as a side effect of just wanting the service list.
