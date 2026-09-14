@@ -2202,6 +2202,10 @@
       "TITLE": "Voeg provider toe",
       "DESCRIPTION": "Selecteer een of meer van de volgende providers.",
       "STEPPERTITLE": "Creëer Provider",
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "Voer de vereiste gegevens in zodat gebruikers van een andere ZITADEL-instantie kunnen inloggen."
+      },
       "OIDC": {
         "TITLE": "OIDC Provider",
         "DESCRIPTION": "Voer de vereiste gegevens in voor uw OIDC provider."
@@ -2314,6 +2318,10 @@
     "STATE": "Status",
     "ISSUER": "Uitgever",
     "SCOPESLIST": "Scopes Lijst",
+    "INSTANCEROLESINFO": "Toewijzing van instantierollen",
+    "INSTANCEROLESINFO_DESC": "Gebruikers die zich via deze provider authenticeren, krijgen de instantielidrollen (IAM_-prefix) die ze hebben in de vermelde organisaties van de externe ZITADEL-instantie. Het organisatie-ID en het primaire domein moeten beide overeenkomen.",
+    "ORGANIZATIONID": "Organisatie-ID",
+    "ORGANIZATIONDOMAIN": "Organisatiedomein",
     "CLIENTID": "Client ID",
     "CLIENTSECRET": "Client Geheim",
     "LDAPCONNECTION": "Verbinding",

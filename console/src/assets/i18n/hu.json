@@ -2205,6 +2205,10 @@
       "TITLE": "Szolgáltató hozzáadása",
       "DESCRIPTION": "Válassz egyet vagy többet az alábbi szolgáltatók közül.",
       "STEPPERTITLE": "Szolgáltató létrehozása",
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "Add meg a szükséges adatokat, hogy egy másik ZITADEL példány felhasználói is bejelentkezhessenek."
+      },
       "OIDC": {
         "TITLE": "OIDC szolgáltató",
         "DESCRIPTION": "Add meg a szükséges adatokat az OIDC szolgáltatódhoz."
@@ -2317,6 +2321,10 @@
     "STATE": "Állapot",
     "ISSUER": "Kibocsátó",
     "SCOPESLIST": "Hatókörök listája",
+    "INSTANCEROLESINFO": "Példányszerepkörök leképezése",
+    "INSTANCEROLESINFO_DESC": "Az ezzel a szolgáltatóval bejelentkező felhasználók megkapják azokat a példánytagsági szerepköröket (IAM_ előtaggal), amelyekkel a távoli ZITADEL példány felsorolt szervezeteiben rendelkeznek. A szervezet azonosítójának és az elsődleges domainnek is egyeznie kell.",
+    "ORGANIZATIONID": "Szervezet azonosítója",
+    "ORGANIZATIONDOMAIN": "Szervezet domainje",
     "CLIENTID": "Client ID",
     "CLIENTSECRET": "Client Secret",
     "LDAPCONNECTION": "Kapcsolat",

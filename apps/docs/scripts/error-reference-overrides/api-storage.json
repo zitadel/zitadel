@@ -1,0 +1,62 @@
+{
+  "api|INVALID_ARGUMENT|List.Query.Invalid": {
+    "why": "The list/search request included a filter or sub-query variant that the endpoint's query converter has no matching case for, so it falls through to a default branch that rejects it. Common causes: an unset oneof filter field, a filter type that belongs to a different list endpoint, or a filter variant added to the proto but not yet implemented in that endpoint's converter."
+  },
+  "storage|INTERNAL|An internal error occurred": {
+    "why": "Generic internal-error fallback from the CockroachDB-backed static asset store (internal/static/database/crdb.go): building the SQL statement for an asset insert/select/delete failed, or the database round trip itself (query, scan, or exec) failed — for example because of a lost connection or constraint violation. The message carries no further detail beyond 'the asset store's database call failed.'"
+  },
+  "api|INTERNAL|An internal error occurred": {
+    "why": "Generic Errors.Internal fallback covering unrelated failures: a stored event's JSON payload fails to unmarshal while building an event/audit API response, or an outbound HTTP request or DNS lookup fails while ZITADEL checks a custom domain's ownership-verification challenge file. These call sites share only the fallback message, not a common root cause."
+  },
+  "storage|PERMISSION_DENIED|Permission denied": {
+    "why": "A backend/v3 domain command's permission check (opts.Permissions.Check*Permission) rejected the caller before the command ran — for example a missing session-write, instance-domain-write, or instance-read permission, depending on which command was invoked. The caller is authenticated but the acting user or service account lacks the specific role or grant that command requires."
+  },
+  "api|INVALID_ARGUMENT|Errors.ExternalIDP.IDPTypeNotImplemented": {
+    "why": "The external-IdP flow being invoked doesn't support the provider's type: the OAuth authorization-code callback path receives an intent backed by a JWT, LDAP, or SAML provider (none of which use code exchange), the intent-retrieval endpoint hits an IdP type it has no user-unmarshalling case for, or the LDAP-credential login path is called with an idpId that doesn't resolve to an LDAP provider. Verify idpId points to a provider whose type matches the operation being called."
+  },
+  "api|FAILED_PRECONDITION|no user agent id": {
+    "why": "The legacy (v1) OIDC auth-request flow resolves a 'user agent ID' from the zitadel.useragent cookie set by the login UI, and that cookie is missing from the request — typically because the auth-code or token endpoint was reached without first completing the browser-based login UI in the same browser session, or because the cookie was blocked or had expired. The newer v2 session-based auth request flow doesn't use this cookie and isn't affected."
+  },
+  "storage|FAILED_PRECONDITION|Errors.Missing.InstanceID": {
+    "why": "A backend/v3 session-factor-check command (password, TOTP, OTP-SMS, passkey, IdP-intent) has an empty InstanceID field at validation time. Instance ID is populated from the resolved request context rather than direct caller input, so this points to the instance context not being attached when the command was built, not a value the API caller sets."
+  },
+  "storage|FAILED_PRECONDITION|Errors.Missing.SessionID": {
+    "why": "Same guard as Errors.Missing.InstanceID but for SessionID: a session-factor-check command (password, TOTP, OTP-SMS, passkey, or IdP-intent check) was built without a session_id. In practice, the request submitting the factor-check result omitted the sessionId identifying which in-progress session it belongs to."
+  },
+  "storage|INVALID_ARGUMENT|Errors.Invalid.Argument": {
+    "why": "Generic field-validation failure in the backend/v3 instance-domain add/remove commands: domain_name is empty or longer than 253 characters after trimming, or the instance_id in the request doesn't match the instance resolved from the request context. The generic message doesn't indicate which of these checks failed."
+  },
+  "storage|INVALID_ARGUMENT|List.Query.Invalid": {
+    "why": "Backend/v3 counterpart to the API-layer List.Query.Invalid: a List query (instances, instance domains, sessions, …) received a filter variant with no matching case in its condition-building switch. An unrecognized, unset, or wrong-endpoint filter oneof falls through to the default branch and produces this error."
+  },
+  "api|PERMISSION_DENIED|Token is invalid": {
+    "why": "Returned by the OAuth token-exchange endpoint (grant_type=...token-exchange) when subject_token or actor_token fails verification for its declared token type: an access token that doesn't verify or has the wrong audience, an ID token failing signature/hint verification, a JWT-profile assertion failing signature or claim checks, or a urn:zitadel:params:oauth:token-type:user_id value that doesn't match an existing user. The token must match its declared *_token_type and still be valid/unexpired."
+  },
+  "storage|INTERNAL|unexpected number of rows updated": {
+    "why": "Defensive invariant check after an UPDATE scoped to a primary key in backend/v3 commands (session-factor checks, org activate/deactivate, …): the code expects exactly one row affected and throws this if more than one was. Since the WHERE clause always matches a primary key, this should be unreachable in normal operation — it guards against a data-integrity bug, not a condition an API caller can trigger."
+  },
+  "storage|NOT_FOUND|Organisation not found": {
+    "why": "The id supplied to an organization command (update, activate, deactivate, delete) doesn't match any organization on the current instance — the ID is wrong, the org was already deleted, or it belongs to a different instance."
+  },
+  "api|INVALID_ARGUMENT|Code is invalid": {
+    "why": "Login-UI handlers for setting an initial password, verifying/initializing a user, and completing an invite all collapse the underlying command's error (SetPasswordWithVerifyCode, HumanVerifyInitCode, VerifyInviteCodeSetPassword) into this single message. It surfaces whenever the code submitted through the emailed link's form doesn't match what ZITADEL generated for that user — wrong, expired, or already used — without distinguishing which."
+  },
+  "storage|INTERNAL|Object could not be read": {
+    "why": "Wraps read failures across the asset-storage backends: on the CockroachDB-backed store, a Scan against the assets table failed for a reason other than 'no rows' (e.g. a dropped connection); on the S3/minio-backed store, fetching an object's metadata or bytes failed at the storage API/network level. Affects reads of uploaded assets such as org logos, icons, or custom CSS."
+  },
+  "storage|INTERNAL|Object could not be removed": {
+    "why": "Same failure class as Object could not be read but for deletes: the SQL DELETE against the assets table, or the S3/minio RemoveObject(s) call, failed at the database or storage-API level while removing one asset or all assets of a given type/instance."
+  },
+  "api|INTERNAL|Error on validate login credentials": {
+    "why": "Wraps go-webauthn library failures validating a passkey/security-key assertion at login: either the browser's credential-assertion response couldn't be parsed, or ValidateLogin rejected it due to a signature/challenge mismatch, wrong authenticator, or origin/RPID mismatch. Almost always caused by a bad, stale, or replayed WebAuthn response from the client, but the underlying library error isn't surfaced beyond this generic message."
+  },
+  "api|INTERNAL|Error.Internal": {
+    "why": "A defensive type-assertion guard repeated across the OIDC token endpoints (device, code, refresh, client-credentials, token-exchange): r.Client is expected to always be ZITADEL's own Client implementation as handed back by the underlying OIDC (op) framework, and the failure branch should be unreachable in normal operation. It signals a framework-level bug rather than something triggerable by a malformed request."
+  },
+  "api|PERMISSION_DENIED|No matching permissions found": {
+    "why": "The authenticated caller has no role or membership granting the permission the called endpoint requires, either globally or — for endpoints that check a specific org/resource — scoped to the org/resource named in the request. This is the standard 'authenticated but not authorized' rejection from the role/permission-mapping layer, distinct from a token-validity error."
+  },
+  "api|UNAUTHENTICATED|invalid token": {
+    "why": "Bearer access-token verification failed for one of several reasons depending on the call site: the token string couldn't be parsed, its ID doesn't match any known non-revoked token, it has expired, or — for v2 access tokens — the subject claim embedded in the token doesn't match the user ID stored for it (a tamper/truncation guard; see GHSA-6mq3-xmgp-pjm5). Re-authenticate and use a fresh, valid access token."
+  }
+}

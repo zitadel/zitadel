@@ -152,7 +152,8 @@
       "failedPrecondition": "Failed precondition",
       "sessionNotValid": "Session is not valid",
       "passwordVerificationMissing": "Password verification is missing.",
-      "passwordVerificationTooOld": "Password verification is too old. Please verify your password again."
+      "passwordVerificationTooOld": "Password verification is too old. Please verify your password again.",
+      "passwordResetNotAllowed": "Password reset is not allowed. Contact your administrator for more information."
     }
   },
   "idp": {
@@ -261,6 +262,10 @@
       "required": {
         "code": "This field is required"
       }
+    },
+    "errors": {
+      "couldNotRequestChallenge": "Could not request OTP challenge",
+      "couldNotVerifyCode": "Could not verify OTP code"
     }
   },
   "passkey": {
@@ -422,7 +427,15 @@
     "description": "Select the method you would like to authenticate",
     "noMethodsAvailable": "No authentication methods available",
     "allSetup": "You have already setup an authenticator!",
-    "linkWithIDP": "or link with an Identity Provider"
+    "linkWithIDP": "or link with an Identity Provider",
+    "methods": {
+      "totp": "Authenticator App",
+      "u2f": "Universal Second Factor",
+      "otpEmail": "Code via Email",
+      "otpSms": "Code via SMS",
+      "passkey": "Passkeys",
+      "password": "Password"
+    }
   },
   "device": {
     "usercode": {
@@ -457,6 +470,7 @@
     "sessionExpired": "Your current session has expired. Please login again.",
     "failedLoading": "Failed to load data. Please try again.",
     "tryagain": "Try Again",
-    "couldNotContinueSession": "Could not continue with session - missing user information"
+    "couldNotContinueSession": "Could not continue with session - missing user information",
+    "couldNotClearSession": "Could not end the session. Please try again."
   }
 }

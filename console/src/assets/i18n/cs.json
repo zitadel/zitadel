@@ -2203,6 +2203,10 @@
       "TITLE": "Přidat poskytovatele",
       "DESCRIPTION": "Vyberte jednoho nebo více z následujících poskytovatelů.",
       "STEPPERTITLE": "Vytvořit poskytovatele",
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "Zadej požadované údaje, aby se mohli přihlašovat uživatelé jiné instance ZITADEL."
+      },
       "OIDC": {
         "TITLE": "OIDC",
         "DESCRIPTION": "Zadejte požadovaná data pro vašeho OIDC poskytovatele."
@@ -2311,6 +2315,10 @@
     "STATE": "Stav",
     "ISSUER": "Vystavitel",
     "SCOPESLIST": "Seznam oprávnění",
+    "INSTANCEROLESINFO": "Mapování rolí instance",
+    "INSTANCEROLESINFO_DESC": "Uživatelé, kteří se přihlásí přes tohoto poskytovatele, získají role členů instance (s prefixem IAM_), které mají v uvedených organizacích vzdálené instance ZITADEL. ID organizace i primární doména se musí shodovat.",
+    "ORGANIZATIONID": "ID organizace",
+    "ORGANIZATIONDOMAIN": "Doména organizace",
     "CLIENTID": "ID klienta",
     "CLIENTSECRET": "Tajemství klienta",
     "LDAPCONNECTION": "Spojení",

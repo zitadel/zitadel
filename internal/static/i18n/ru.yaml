@@ -176,6 +176,7 @@ Errors:
         NotExisting: "Мультифактор OTP (OneTimePassword) не существует"
         NotReady: "Мультифактор OTP (OneTimePassword) не готов"
         InvalidCode: "Неверный код"
+        Reused: "Этот код уже был использован. Пожалуйста, дождитесь нового кода"
       U2F:
         NotExisting: "Двухфакторная аутентификация не существует"
       Passwordless:
@@ -756,6 +757,7 @@ EventTypes:
           check:
             succeeded: "Проверка мультифактора OTP прошла успешно"
             failed: "Проверка мультифактора OTP не удалась"
+            reused: "Код мультифактора OTP использован повторно"
           sms:
             added: "Добавлен многофакторный OTP SMS"
             removed: "Удалены многофакторные OTP SMS"

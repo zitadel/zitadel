@@ -10384,12 +10384,12 @@ message AddOIDCAppRequest {
     ];
     zitadel.app.v1.IOSAppLinkConfig ios = 20 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "iOS Associated Domains / passkey trust config. Served in /.well-known/apple-app-site-association as webcredentials.apps entry \"{team_id}.{bundle_id}\" (Apple's full App ID). That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer; changes can take time to take effect.";
+            description: "iOS Associated Domains / passkey trust config. Served in /.well-known/apple-app-site-association as webcredentials.apps entry \"{team_id}.{bundle_id}\" (Apple's full App ID). Platform verifiers may cache the file; changes can take time to take effect.";
         }
     ];
     zitadel.app.v1.AndroidAppLinkConfig android = 21 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Android Digital Asset Links / passkey trust config. Served in /.well-known/assetlinks.json for delegate_permission/common.get_login_creds. That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer; changes can take time to take effect.";
+            description: "Android Digital Asset Links / passkey trust config. Served in /.well-known/assetlinks.json for delegate_permission/common.handle_all_urls and delegate_permission/common.get_login_creds. Platform verifiers may cache the file; changes can take time to take effect.";
         }
     ];
 }
@@ -10585,12 +10585,12 @@ message UpdateOIDCAppConfigRequest {
     ];
     zitadel.app.v1.IOSAppLinkConfig ios = 19 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "iOS Associated Domains / passkey trust config. Served in /.well-known/apple-app-site-association as webcredentials.apps entry \"{team_id}.{bundle_id}\" (Apple's full App ID). That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer; changes can take time to take effect.";
+            description: "iOS Associated Domains / passkey trust config. Served in /.well-known/apple-app-site-association as webcredentials.apps entry \"{team_id}.{bundle_id}\" (Apple's full App ID). Platform verifiers may cache the file; changes can take time to take effect.";
         }
     ];
     zitadel.app.v1.AndroidAppLinkConfig android = 20 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Android Digital Asset Links / passkey trust config. Served in /.well-known/assetlinks.json for delegate_permission/common.get_login_creds. That response may be HTTP-cached (Cache-Control), and platform verifiers may cache longer; changes can take time to take effect.";
+            description: "Android Digital Asset Links / passkey trust config. Served in /.well-known/assetlinks.json for delegate_permission/common.handle_all_urls and delegate_permission/common.get_login_creds. Platform verifiers may cache the file; changes can take time to take effect.";
         }
     ];
 }

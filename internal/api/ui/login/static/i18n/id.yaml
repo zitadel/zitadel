@@ -464,6 +464,7 @@ Errors:
         AlreadyReady: OTP multifaktor (OneTimePassword) sudah disiapkan
         NotExisting: OTP multifaktor (OneTimePassword) tidak ada
         InvalidCode: Kode tidak valid
+        Reused: Kode ini sudah digunakan. Silakan tunggu kode baru
         NotReady: OTP multifaktor (OneTimePassword) belum siap
     Locked: Pengguna terkunci
     SomethingWentWrong: Ada yang tidak beres

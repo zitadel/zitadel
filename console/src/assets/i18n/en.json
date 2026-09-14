@@ -2254,6 +2254,10 @@
       "SAML": {
         "TITLE": "Sign in with SAML",
         "DESCRIPTION": "Enter the credentials for your SAML Provider"
+      },
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "Enter the required data to let users of another ZITADEL instance authenticate."
       }
     },
     "DETAIL": {
@@ -2319,6 +2323,10 @@
     "STATE": "Status",
     "ISSUER": "Issuer",
     "SCOPESLIST": "Scopes List",
+    "INSTANCEROLESINFO": "Instance role mapping",
+    "INSTANCEROLESINFO_DESC": "Users authenticating with this provider are granted the instance member roles (IAM_ prefix) they hold in the listed organizations of the remote ZITADEL instance. Organization ID and primary domain must both match.",
+    "ORGANIZATIONID": "Organization ID",
+    "ORGANIZATIONDOMAIN": "Organization Domain",
     "CLIENTID": "Client ID",
     "CLIENTSECRET": "Client Secret",
     "LDAPCONNECTION": "Connection",

@@ -2202,6 +2202,10 @@
       "TITLE": "Aggiungi provider",
       "DESCRIPTION": "Seleziona uno dei seguenti provider.",
       "STEPPERTITLE": "Create Provider",
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "Inserisci i dati richiesti per consentire agli utenti di un'altra istanza ZITADEL di autenticarsi."
+      },
       "OIDC": {
         "TITLE": "OIDC Provider",
         "DESCRIPTION": "Inserisci i dati necessari per il tuo provider OIDC."
@@ -2311,6 +2315,10 @@
     "STATE": "Stato",
     "ISSUER": "Issuer",
     "SCOPESLIST": "Scope list",
+    "INSTANCEROLESINFO": "Mappatura dei ruoli di istanza",
+    "INSTANCEROLESINFO_DESC": "Gli utenti che si autenticano con questo provider ricevono i ruoli di membro dell'istanza (prefisso IAM_) che possiedono nelle organizzazioni elencate dell'istanza ZITADEL remota. L'ID dell'organizzazione e il dominio primario devono corrispondere entrambi.",
+    "ORGANIZATIONID": "ID organizzazione",
+    "ORGANIZATIONDOMAIN": "Dominio organizzazione",
     "CLIENTID": "Client ID",
     "CLIENTSECRET": "Client Secret",
     "LDAPCONNECTION": "Connessione",

@@ -2199,6 +2199,10 @@
       "TITLE": "Adăugați furnizor",
       "DESCRIPTION": "Selectați unul sau mai mulți dintre următorii furnizori.",
       "STEPPERTITLE": "Creați furnizorul",
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "Introduceți datele necesare pentru a permite utilizatorilor unei alte instanțe ZITADEL să se autentifice."
+      },
       "OIDC": {
         "TITLE": "Furnizor OIDC",
         "DESCRIPTION": "Introduceți datele necesare pentru furnizorul dvs. OIDC."
@@ -2311,6 +2315,10 @@
     "STATE": "Stare",
     "ISSUER": "Emitent",
     "SCOPESLIST": "Listă de domenii",
+    "INSTANCEROLESINFO": "Maparea rolurilor de instanță",
+    "INSTANCEROLESINFO_DESC": "Utilizatorii care se autentifică cu acest furnizor primesc rolurile de membru al instanței (prefix IAM_) pe care le dețin în organizațiile listate din instanța ZITADEL la distanță. ID-ul organizației și domeniul principal trebuie să corespundă ambele.",
+    "ORGANIZATIONID": "ID-ul organizației",
+    "ORGANIZATIONDOMAIN": "Domeniul organizației",
     "CLIENTID": "ID client",
     "CLIENTSECRET": "Secret client",
     "LDAPCONNECTION": "Conexiune",

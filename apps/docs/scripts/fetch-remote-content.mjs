@@ -83,7 +83,38 @@ export function resetCache() {
   cachedRef = null;
 }
 
+// Parses `git ls-remote --tags` output into the `{ name }` shape the GitHub API returns.
+export function parseLsRemoteTags(output) {
+  const names = new Set();
+  for (const line of output.split('\n')) {
+    const ref = line.split('\t')[1];
+    if (!ref?.startsWith('refs/tags/')) continue;
+    // annotated tags are listed twice, the second time peeled as `<tag>^{}`
+    names.add(ref.slice('refs/tags/'.length).replace(/\^\{\}$/, ''));
+  }
+  return [...names].map((name) => ({ name }));
+}
+
 async function fetchTags() {
+  // Unauthenticated GitHub REST API calls are limited to 60/hour per IP, which shared
+  // build runners such as Vercel regularly exhaust. `git ls-remote` is not rate limited.
+  const remote = `https://github.com/${REPO}.git`;
+  try {
+    console.log(`Listing tags via git ls-remote ${remote}...`);
+    const output = execSync(`git ls-remote --tags ${remote}`, {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      maxBuffer: 16 * 1024 * 1024,
+      env: { ...process.env, GIT_TERMINAL_PROMPT: '0' },
+    });
+    const tags = parseLsRemoteTags(output);
+    if (tags.length === 0) throw new Error('no tags returned');
+    console.log(`Found ${tags.length} tags.`);
+    return tags;
+  } catch (err) {
+    console.warn(`[tags] git ls-remote failed (${safeLog(err.message)}), falling back to the GitHub API...`);
+  }
+
   const token = process.env.GITHUB_TOKEN;
   const headers = { 'User-Agent': 'node-fetch' };
   if (token) headers['Authorization'] = `token ${token}`;
@@ -449,6 +480,42 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
   }
 }
 
+/**
+ * fumadocs wraps heading text in its own anchor (`<a href="#id">`), so a markdown
+ * link inside a heading ends up as nested `<a>` tags. Browsers split those while
+ * parsing, which breaks React hydration (error #418) and the heading's anchor.
+ * Latest content is fixed at the source; versioned content is downloaded from git
+ * tags, so the link is unwrapped into plain heading text here instead.
+ */
+export function unwrapHeadingLinks(content) {
+  let inFence = false;
+  return content
+    .split('\n')
+    .map((line) => {
+      if (/^\s*(```|~~~)/.test(line)) inFence = !inFence;
+      if (inFence || !/^#{1,6}\s/.test(line)) return line;
+      // [text](url) -> text; leaves images (![alt](src)) alone
+      return line.replace(/(?<!!)\[([^\]]+)\]\([^)]*\)/g, '$1');
+    })
+    .join('\n');
+}
+
+function fixHeadingLinks(versionDir) {
+  if (!fs.existsSync(versionDir)) return;
+  for (const file of fs.readdirSync(versionDir, { recursive: true })) {
+    const filePath = join(versionDir, file);
+    if (!filePath.endsWith('.mdx') && !filePath.endsWith('.md')) continue;
+    if (!fs.statSync(filePath).isFile()) continue;
+
+    const content = fs.readFileSync(filePath, 'utf8');
+    const fixed = unwrapHeadingLinks(content);
+    if (fixed !== content) {
+      console.log(`[fix-headings] Unwrapped link in heading: ${file}`);
+      fs.writeFileSync(filePath, fixed);
+    }
+  }
+}
+
 function getLocalVersion() {
     const vercelBranch = process.env.VERCEL_GIT_COMMIT_REF;
     let branch = vercelBranch;
@@ -515,6 +582,7 @@ async function run() {
         // Correctly pass sourceRef here so external files are fetched from the same place (local or remote)
         await fixRelativeImports(contentDest, sourceRef);
     }
+    fixHeadingLinks(contentDest);
   }));
 
   const versionsJson = [

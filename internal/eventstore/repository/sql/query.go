@@ -103,7 +103,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 
 	// if there is only one subquery we can optimize the query ordering by sequence
 	var shouldOrderBySequence bool
-	if len(q.SubQueries) == 1 {
+	if q.EventSortKeyAfter == nil && len(q.SubQueries) == 1 {
 		for _, filter := range q.SubQueries[0] {
 			if filter.Field == repository.FieldAggregateID {
 				shouldOrderBySequence = filter.Operation == repository.OperationEquals
@@ -226,6 +226,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 				&event.AggregateType,
 				&event.AggregateID,
 				&revision,
+				&event.InTx,
 			)
 			event.Version = eventstore.Version("v" + strconv.Itoa(int(revision)))
 		}
@@ -277,6 +278,21 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 		}
 		clauses += additionalClauses
 		args = append(args, additionalArgs...)
+	}
+
+	if query.EventSortKeyAfter != nil && !useV1 {
+		if clauses != "" {
+			clauses += " AND "
+		}
+		clauses += `(` + eventSortKeySQL + `) > (?, ?, ?, ?, ?, ?)`
+		args = append(args,
+			query.EventSortKeyAfter.Position,
+			query.EventSortKeyAfter.InTxOrder,
+			query.EventSortKeyAfter.InstanceID,
+			query.EventSortKeyAfter.AggregateType,
+			query.EventSortKeyAfter.AggregateID,
+			query.EventSortKeyAfter.Sequence,
+		)
 	}
 
 	excludeAggregateIDs := query.ExcludeAggregateIDs

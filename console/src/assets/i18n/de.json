@@ -2206,6 +2206,10 @@
         "TITLE": "OIDC Provider",
         "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren OIDC-Provider ein."
       },
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten ein, damit sich Benutzer einer anderen ZITADEL-Instanz anmelden können."
+      },
       "JWT": {
         "TITLE": "JWT Provider",
         "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren JWT-Provider ein."
@@ -2307,6 +2311,10 @@
     "STATE": "Status",
     "ISSUER": "Issuer",
     "SCOPESLIST": "Scopes List",
+    "INSTANCEROLESINFO": "Instanzrollen-Zuordnung",
+    "INSTANCEROLESINFO_DESC": "Benutzer, die sich über diesen Provider anmelden, erhalten die Instanz-Mitgliedsrollen (IAM_-Präfix), die sie in den aufgeführten Organisationen der entfernten ZITADEL-Instanz besitzen. Organisations-ID und primäre Domain müssen beide übereinstimmen.",
+    "ORGANIZATIONID": "Organisations-ID",
+    "ORGANIZATIONDOMAIN": "Organisations-Domain",
     "CLIENTID": "Client ID",
     "CLIENTSECRET": "Client Secret",
     "LDAPCONNECTION": "Verbindung",

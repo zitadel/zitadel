@@ -2202,6 +2202,10 @@
       "TITLE": "Ajouter un fournisseur",
       "DESCRIPTION": "Sélectionnez un ou plusieurs des fournisseurs suivants.",
       "STEPPERTITLE": "Créer un fournisseur",
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "Saisissez les données requises pour permettre aux utilisateurs d'une autre instance ZITADEL de s'authentifier."
+      },
       "OIDC": {
         "TITLE": "Fournisseur OIDC",
         "DESCRIPTION": "Entrez les données requises pour votre fournisseur OIDC."
@@ -2311,6 +2315,10 @@
     "STATE": "Statut",
     "ISSUER": "Émetteur",
     "SCOPESLIST": "Liste des champs d'application",
+    "INSTANCEROLESINFO": "Mappage des rôles d'instance",
+    "INSTANCEROLESINFO_DESC": "Les utilisateurs qui s'authentifient avec ce fournisseur reçoivent les rôles de membre d'instance (préfixe IAM_) qu'ils possèdent dans les organisations listées de l'instance ZITADEL distante. L'ID de l'organisation et le domaine principal doivent tous deux correspondre.",
+    "ORGANIZATIONID": "ID de l'organisation",
+    "ORGANIZATIONDOMAIN": "Domaine de l'organisation",
     "CLIENTID": "ID du client",
     "CLIENTSECRET": "Secret du client",
     "LDAPCONNECTION": "Connexion",

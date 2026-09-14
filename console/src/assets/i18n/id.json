@@ -2199,6 +2199,10 @@
       "TITLE": "Tambahkan penyedia",
       "DESCRIPTION": "Pilih satu atau lebih penyedia berikut.",
       "STEPPERTITLE": "Buat Penyedia",
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "Masukkan data yang diperlukan agar pengguna dari instans ZITADEL lain dapat melakukan autentikasi."
+      },
       "OIDC": {
         "TITLE": "Penyedia OIDC",
         "DESCRIPTION": "Masukkan data yang diperlukan untuk penyedia OIDC Anda."
@@ -2311,6 +2315,10 @@
     "STATE": "Status",
     "ISSUER": "Penerbit",
     "SCOPESLIST": "Daftar Cakupan",
+    "INSTANCEROLESINFO": "Pemetaan peran instans",
+    "INSTANCEROLESINFO_DESC": "Pengguna yang melakukan autentikasi dengan penyedia ini akan mendapatkan peran anggota instans (awalan IAM_) yang mereka miliki di organisasi yang terdaftar pada instans ZITADEL jarak jauh. ID organisasi dan domain utama keduanya harus cocok.",
+    "ORGANIZATIONID": "ID Organisasi",
+    "ORGANIZATIONDOMAIN": "Domain Organisasi",
     "CLIENTID": "ID Klien",
     "CLIENTSECRET": "Rahasia Klien",
     "LDAPCONNECTION": "Koneksi",

@@ -94,7 +94,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
         requestId,
       });
     } catch {
-      return { error: "Could not request OTP challenge" };
+      return { error: t("errors.couldNotRequestChallenge") };
     }
 
     if (response && "error" in response && response.error) {
@@ -102,7 +102,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
     }
 
     return response;
-  }, [method, host, requestId, loginName, sessionId, organization]);
+  }, [method, host, requestId, loginName, sessionId, organization, t]);
 
   useEffect(() => {
     if (!initialized.current && ["email", "sms"].includes(method) && !code) {
@@ -162,7 +162,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
       requestId,
     })
       .catch(() => {
-        setError("Could not verify OTP code");
+        setError(t("errors.couldNotVerifyCode"));
         return;
       })
       .finally(() => {
@@ -220,7 +220,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
                 <Translated i18nKey="verify.noCodeReceived" namespace="otp" />
               </span>
               <button
-                aria-label="Resend OTP Code"
+                aria-label={t("verify.resendCode")}
                 disabled={loading}
                 type="button"
                 className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
