@@ -20,10 +20,13 @@ const Name = "zitadel/backend/v3/instrumentation/tracing"
 
 type Config struct {
 	ServiceName string
-	Trace       TraceConfig
-	Metric      MetricConfig
-	Log         LogConfig
-	Profile     ProfileConfig
+	// Detectors enrich the resource of every exported signal with attributes
+	// describing the platform we run on. Empty by default.
+	Detectors []DetectorType
+	Trace     TraceConfig
+	Metric    MetricConfig
+	Log       LogConfig
+	Profile   ProfileConfig
 }
 
 type ShutdownFunc func(context.Context) error
