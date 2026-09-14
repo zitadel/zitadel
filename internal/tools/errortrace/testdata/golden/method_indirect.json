@@ -1,0 +1,14 @@
+{
+  "ViaMethod": {
+    "handler": "internal/tools/errortrace/testdata/method/handler.go:14",
+    "errors": [
+      {
+        "id": "TEST-m3th0d",
+        "file": "internal/tools/errortrace/testdata/method/handler.go",
+        "line": 19,
+        "reasoning": "ViaMethod -\u003e helper"
+      }
+    ],
+    "unresolved": 0
+  }
+}
