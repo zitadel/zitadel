@@ -150,7 +150,10 @@
       "couldNotLoadSession": "Kon sessie niet laden",
       "couldNotLoadAuthMethods": "Kon verificatiemethoden niet laden",
       "failedPrecondition": "Voorwaarde mislukt",
-      "sessionNotValid": "Sessie is niet geldig"
+      "sessionNotValid": "Sessie is niet geldig",
+      "passwordVerificationMissing": "Wachtwoordverificatie ontbreekt.",
+      "passwordVerificationTooOld": "Wachtwoordverificatie is te oud. Verifieer je wachtwoord opnieuw.",
+      "passwordResetNotAllowed": "Wachtwoord resetten is niet toegestaan. Neem contact op met uw beheerder voor meer informatie."
     }
   },
   "idp": {
@@ -162,6 +165,7 @@
     "signInWithAzureAD": "Aanmelden met AzureAD",
     "signInWithGithub": "Aanmelden met GitHub",
     "signInWithGitlab": "Aanmelden met GitLab",
+    "signInWithZitadel": "Aanmelden met Zitadel",
     "loginError": {
       "title": "Inloggen mislukt",
       "description": "Er is een fout opgetreden tijdens het inloggen."
@@ -258,6 +262,10 @@
       "required": {
         "code": "Dit veld is verplicht"
       }
+    },
+    "errors": {
+      "couldNotRequestChallenge": "Kon OTP-uitdaging niet aanvragen",
+      "couldNotVerifyCode": "Kon OTP-code niet verifiëren"
     }
   },
   "passkey": {
@@ -410,7 +418,8 @@
       "userAlreadyVerified": "Gebruiker is al geverifieerd!",
       "couldNotResendInvite": "Kon uitnodiging niet opnieuw versturen",
       "inviteSendFailed": "Versturen van uitnodigingsmail mislukt",
-      "emailSendFailed": "Versturen van verificatie-e-mail mislukt"
+      "emailSendFailed": "Versturen van verificatie-e-mail mislukt",
+      "contextMissing": "Er is een fout opgetreden. Probeer het opnieuw."
     }
   },
   "authenticator": {
@@ -418,7 +427,15 @@
     "description": "Selecteer de methode waarmee u wilt verifiëren",
     "noMethodsAvailable": "Geen authenticatiemethoden beschikbaar",
     "allSetup": "U heeft al een authenticator ingesteld!",
-    "linkWithIDP": "of link met een identiteitsprovider"
+    "linkWithIDP": "of link met een identiteitsprovider",
+    "methods": {
+      "totp": "Authenticator-app",
+      "u2f": "Universele tweede factor",
+      "otpEmail": "Code via e-mail",
+      "otpSms": "Code via sms",
+      "passkey": "Passkeys",
+      "password": "Wachtwoord"
+    }
   },
   "device": {
     "usercode": {
@@ -453,6 +470,7 @@
     "sessionExpired": "Uw huidige sessie is verlopen. Log opnieuw in.",
     "failedLoading": "Gegevens laden mislukt. Probeer het opnieuw.",
     "tryagain": "Opnieuw proberen",
-    "couldNotContinueSession": "Kon de sessie niet voortzetten - ontbrekende gebruikersinformatie"
+    "couldNotContinueSession": "Kon de sessie niet voortzetten - ontbrekende gebruikersinformatie",
+    "couldNotClearSession": "De sessie kon niet worden beëindigd. Probeer het opnieuw."
   }
 }

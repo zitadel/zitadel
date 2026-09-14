@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS projections.apps7_oidc_configs
+ADD COLUMN IF NOT EXISTS registration_token text;

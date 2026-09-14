@@ -43,13 +43,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         loginName,
         organization,
       },
-    }).catch(async (error) => {
-      loginSettings = await getLoginSettings({ serviceConfig, organization });
-      if (!loginSettings?.ignoreUnknownUsernames) {
-        console.error("loadMostRecentSession failed", error);
-      }
-      // ignore error, as we might not have a session yet
-      return undefined;
     });
   } else if ("userId" in searchParams && userId) {
     const userResponse = await getUserByID({ serviceConfig, userId });

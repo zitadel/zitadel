@@ -2049,15 +2049,12 @@ func (c *Commands) validateOrgZitadelProvider(provider *ZitadelProvider, create 
 	if create && provider.ClientSecret == "" {
 		return zerrors.ThrowInvalidArgument(nil, "ORG-DxaSb9", "Errors.Invalid.Argument")
 	}
-	for i := range provider.InstanceRolesInfo {
-		provider.InstanceRolesInfo[i].OrganizationID = strings.TrimSpace(provider.InstanceRolesInfo[i].OrganizationID)
-		if provider.InstanceRolesInfo[i].OrganizationID == "" {
-			return zerrors.ThrowInvalidArgument(nil, "ORG-M0QmjB", "Errors.Invalid.Argument")
-		}
-		provider.InstanceRolesInfo[i].OrganizationDomain = strings.TrimSpace(provider.InstanceRolesInfo[i].OrganizationDomain)
-		if provider.InstanceRolesInfo[i].OrganizationDomain == "" {
-			return zerrors.ThrowInvalidArgument(nil, "ORG-HAELEz", "Errors.Invalid.Argument")
-		}
+	// instance_roles_info must never be set on an organization-scoped Zitadel provider:
+	// it drives instance-wide role grants on login, and honoring it here would let an
+	// org owner escalate themselves to instance-level roles. Only the instance-scoped
+	// Admin API may configure it.
+	if len(provider.InstanceRolesInfo) > 0 {
+		return zerrors.ThrowInvalidArgument(nil, "ORG-ImOVF3", "Errors.Invalid.Argument")
 	}
 	return nil
 }

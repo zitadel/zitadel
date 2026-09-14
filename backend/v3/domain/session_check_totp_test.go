@@ -877,7 +877,7 @@ func TestTOTPCheckCommand_Events(t *testing.T) {
 			},
 
 			expectedEvents: []eventstore.Command{
-				user.NewHumanOTPCheckSucceededEvent(t.Context(), &userAgg, nil),
+				user.NewHumanOTPCheckSucceededEvent(t.Context(), &userAgg, nil, nil),
 				session.NewTOTPCheckedEvent(t.Context(), &sessionAgg, time.Now()),
 			},
 		},

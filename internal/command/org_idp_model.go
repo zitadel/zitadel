@@ -1010,6 +1010,8 @@ func (wm *OrgIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) {
 			wm.IDPRemoveWriteModel.AppendEvents(&e.IDPConfigAddedEvent)
 		case *org.IDPConfigRemovedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.IDPConfigRemovedEvent)
+		case *org.ZitadelIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.ZitadelIDPAddedEvent)
 		default:
 			wm.IDPRemoveWriteModel.AppendEvents(e)
 		}
@@ -1035,6 +1037,7 @@ func (wm *OrgIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.LDAPIDPAddedEventType,
 			org.AppleIDPAddedEventType,
 			org.SAMLIDPAddedEventType,
+			org.ZitadelIDPAddedEventType,
 			org.IDPRemovedEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).

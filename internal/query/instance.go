@@ -467,6 +467,7 @@ type authzInstance struct {
 	DefaultOrgID           string                     `json:"default_org_id,omitempty"`
 	CSP                    csp                        `json:"csp,omitempty"`
 	Impersonation          bool                       `json:"impersonation,omitempty"`
+	DCR                    dcr                        `json:"dcr,omitempty"`
 	IsBlocked              *bool                      `json:"is_blocked,omitempty"`
 	LogRetention           *time.Duration             `json:"log_retention,omitempty"`
 	Feature                feature.Features           `json:"feature,omitempty"`
@@ -479,6 +480,12 @@ type authzInstance struct {
 type csp struct {
 	EnableIframeEmbedding bool                       `json:"enable_iframe_embedding,omitempty"`
 	AllowedOrigins        database.TextArray[string] `json:"allowed_origins,omitempty"`
+}
+
+// dcr holds the instance's OAuth 2.0 Dynamic Client Registration (RFC 7591) settings.
+type dcr struct {
+	Enabled              bool `json:"enabled,omitempty"`
+	AllowUnauthenticated bool `json:"allow_unauthenticated,omitempty"`
 }
 
 func (i *authzInstance) InstanceID() string {
@@ -518,6 +525,14 @@ func (i *authzInstance) SecurityPolicyAllowedOrigins() []string {
 
 func (i *authzInstance) EnableImpersonation() bool {
 	return i.Impersonation
+}
+
+func (i *authzInstance) EnableDynamicClientRegistration() bool {
+	return i.DCR.Enabled
+}
+
+func (i *authzInstance) AllowUnauthenticatedDynamicClientRegistration() bool {
+	return i.DCR.Enabled && i.DCR.AllowUnauthenticated
 }
 
 func (i *authzInstance) Block() *bool {
@@ -568,6 +583,8 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			lang                  string
 			enableIframeEmbedding sql.NullBool
 			enableImpersonation   sql.NullBool
+			enableDCR             sql.NullBool
+			allowUnauthDCR        sql.NullBool
 			auditLogRetention     database.NullDuration
 			block                 sql.NullBool
 			features              []byte
@@ -584,6 +601,8 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			&enableIframeEmbedding,
 			&instance.CSP.AllowedOrigins,
 			&enableImpersonation,
+			&enableDCR,
+			&allowUnauthDCR,
 			&auditLogRetention,
 			&block,
 			&features,
@@ -607,6 +626,8 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 		}
 		instance.CSP.EnableIframeEmbedding = enableIframeEmbedding.Bool
 		instance.Impersonation = enableImpersonation.Bool
+		instance.DCR.Enabled = enableDCR.Bool
+		instance.DCR.AllowUnauthenticated = allowUnauthDCR.Bool
 		if len(features) > 0 {
 			if err = json.Unmarshal(features, &instance.Feature); err != nil {
 				return zerrors.ThrowInternal(err, "QUERY-Po8ki", "Errors.Internal")

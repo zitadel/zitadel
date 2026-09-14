@@ -7,6 +7,7 @@ import { headers } from "next/headers";
 import { userAgent } from "next/server";
 import { getSessionCookieById } from "../cookies";
 import { getServiceConfig } from "../service-url";
+import { getEnrollmentAuthorizationError } from "./enrollment-guard";
 import { getPublicHost } from "./host";
 
 type RegisterU2FCommand = {
@@ -47,6 +48,13 @@ export async function addU2F(command: RegisterU2FCommand) {
     return { error: "Could not get session" };
   }
 
+  // Enrollment must be authorized: a bare identify-only session (only the user factor set)
+  // must not be able to attach a new authenticator to the account (GHSA-45f2-5q3r-xgg6).
+  const enrollmentError = await getEnrollmentAuthorizationError({ serviceConfig, session: session.session!, userId });
+  if (enrollmentError) {
+    return { error: enrollmentError };
+  }
+
   return registerU2F({ serviceConfig, userId, domain: hostname });
 }
 
@@ -77,6 +85,13 @@ export async function verifyU2F(command: VerifyU2FCommand) {
 
   if (!userId) {
     return { error: "Could not get session" };
+  }
+
+  // Enrollment must be authorized: only an authenticated session (or a valid onboarding
+  // verification) may finish registering a new authenticator (GHSA-45f2-5q3r-xgg6).
+  const enrollmentError = await getEnrollmentAuthorizationError({ serviceConfig, session: session.session!, userId });
+  if (enrollmentError) {
+    return { error: enrollmentError };
   }
 
   const request = create(VerifyU2FRegistrationRequestSchema, {

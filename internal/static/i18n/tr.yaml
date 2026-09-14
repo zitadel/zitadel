@@ -177,6 +177,7 @@ Errors:
         NotExisting: "Çok faktörlü OTP (Tek Kullanımlık Şifre) mevcut değil"
         NotReady: "Çok faktörlü OTP (Tek Kullanımlık Şifre) hazır değil"
         InvalidCode: "Geçersiz kod"
+        Reused: "Bu kod zaten kullanıldı. Lütfen yeni bir kod bekleyin"
       U2F:
         NotExisting: "U2F mevcut değil"
       Passwordless:
@@ -205,6 +206,7 @@ Errors:
     AlreadyActive: "Organizasyon zaten aktif"
     Empty: "Organizasyon boş"
     NotFound: "Organizasyon bulunamadı"
+    NotActive: "Organizasyon aktif değil"
     NotChanged: "Organizasyon değişmedi"
     DefaultOrgNotDeletable: "Varsayılan Organizasyon silinmemeli"
     ZitadelOrgNotDeletable: "Zitadel projesi olan organizasyon silinmemeli"
@@ -283,6 +285,8 @@ Errors:
     LabelPolicy:
       NotFound: "Özel Etiket Politikası bulunamadı"
       NotChanged: "Özel Etiket Politikası değişmedi"
+    IDPConfig:
+      NotExisting: "Kimlik Sağlayıcısı Yapılandırması mevcut değil"
   Project:
     ProjectIDMissing: "Proje Id eksik"
     AlreadyExists: "Proje organizasyonda zaten mevcut"
@@ -765,6 +769,7 @@ EventTypes:
           check:
             succeeded: "Çok faktörlü OTP kontrolü başarılı"
             failed: "Çok faktörlü OTP kontrolü başarısız"
+            reused: "Çok faktörlü OTP kodu yeniden kullanıldı"
           sms:
             added: "Çok faktörlü OTP SMS eklendi"
             removed: "Çok faktörlü OTP SMS kaldırıldı"

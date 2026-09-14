@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	SecurityPolicyProjectionTable             = "projections.security_policies2"
+	SecurityPolicyProjectionTable             = "projections.security_policies3"
 	SecurityPolicyColumnInstanceID            = "instance_id"
 	SecurityPolicyColumnCreationDate          = "creation_date"
 	SecurityPolicyColumnChangeDate            = "change_date"
@@ -19,6 +19,9 @@ const (
 	SecurityPolicyColumnEnableIframeEmbedding = "enable_iframe_embedding"
 	SecurityPolicyColumnAllowedOrigins        = "origins"
 	SecurityPolicyColumnEnableImpersonation   = "enable_impersonation"
+
+	SecurityPolicyColumnEnableDynamicClientRegistration               = "enable_dynamic_client_registration"
+	SecurityPolicyColumnAllowUnauthenticatedDynamicClientRegistration = "allow_unauthenticated_dynamic_client_registration"
 )
 
 type securityPolicyProjection struct{}
@@ -41,6 +44,8 @@ func (*securityPolicyProjection) Init() *old_handler.Check {
 			handler.NewColumn(SecurityPolicyColumnEnableIframeEmbedding, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(SecurityPolicyColumnAllowedOrigins, handler.ColumnTypeTextArray, handler.Nullable()),
 			handler.NewColumn(SecurityPolicyColumnEnableImpersonation, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(SecurityPolicyColumnEnableDynamicClientRegistration, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(SecurityPolicyColumnAllowUnauthenticatedDynamicClientRegistration, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(SecurityPolicyColumnInstanceID),
 		),
@@ -86,6 +91,12 @@ func (p *securityPolicyProjection) reduceSecurityPolicySet(event eventstore.Even
 	}
 	if e.EnableImpersonation != nil {
 		changes = append(changes, handler.NewCol(SecurityPolicyColumnEnableImpersonation, e.EnableImpersonation))
+	}
+	if e.EnableDynamicClientRegistration != nil {
+		changes = append(changes, handler.NewCol(SecurityPolicyColumnEnableDynamicClientRegistration, e.EnableDynamicClientRegistration))
+	}
+	if e.AllowUnauthenticatedDynamicClientRegistration != nil {
+		changes = append(changes, handler.NewCol(SecurityPolicyColumnAllowUnauthenticatedDynamicClientRegistration, e.AllowUnauthenticatedDynamicClientRegistration))
 	}
 	return handler.NewUpsertStatement(
 		e,

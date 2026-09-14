@@ -25,6 +25,7 @@ type OIDCClient struct {
 	ClientID                 string                     `json:"client_id,omitempty"`
 	BackChannelLogoutURI     string                     `json:"back_channel_logout_uri,omitempty"`
 	HashedSecret             string                     `json:"client_secret,omitempty"`
+	RegistrationTokenHash    string                     `json:"registration_token,omitempty"`
 	RedirectURIs             []string                   `json:"redirect_uris,omitempty"`
 	ResponseTypes            []domain.OIDCResponseType  `json:"response_types,omitempty"`
 	GrantTypes               []domain.OIDCGrantType     `json:"grant_types,omitempty"`

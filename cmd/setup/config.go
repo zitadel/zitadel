@@ -193,6 +193,10 @@ type Steps struct {
 	s71JWTProvideAddAudienceColumn          *JWTProvideAddAudienceColumn
 	s72AddColumnsToLoginNamesView           *AddColumnsToLoginNamesView
 	s73FixUserGrantRoles                    *FixUserGrantRoles
+	s74Apps7OIDCConfigsAddRegistrationToken *Apps7OIDCConfigsAddRegistrationToken
+	s75Apps7OIDCConfigsAddAppLinkConfig     *Apps7OIDCConfigsAddAppLinkConfig
+	s76Users14LoginEqualityIndexes          *Users14LoginEqualityIndexes
+	s77StampEventPositionAtInsert           *StampEventPositionAtInsert
 	RelationalTables                        *TransactionalTables
 }
 

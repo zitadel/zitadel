@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
+	"slices"
 	"strings"
 	"time"
 
@@ -746,7 +747,7 @@ func NewUserResourceOwnerSearchQuery(value string, comparison TextComparison) (S
 }
 
 func NewUserUsernameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(UserUsernameCol, value, comparison)
+	return newLowerEqualsSearchQuery(UserUsernameCol, userTable, UserIDCol, value, comparison)
 }
 
 func NewUserFirstNameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
@@ -766,11 +767,11 @@ func NewUserDisplayNameSearchQuery(value string, comparison TextComparison) (Sea
 }
 
 func NewUserEmailSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(HumanEmailCol, value, comparison)
+	return newLowerEqualsSearchQuery(HumanEmailCol, humanTable, HumanUserIDCol, value, comparison)
 }
 
 func NewUserPhoneSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(HumanPhoneCol, value, comparison)
+	return newLowerEqualsSearchQuery(HumanPhoneCol, humanTable, HumanUserIDCol, value, comparison)
 }
 
 func NewUserVerifiedEmailSearchQuery(value string) (SearchQuery, error) {
@@ -793,8 +794,23 @@ func NewUserPreferredLoginNameSearchQuery(value string, comparison TextCompariso
 	return NewTextQuery(userPreferredLoginNameCol, value, comparison)
 }
 
+//go:embed user_login_name_matches.sql
+var userLoginNameMatchesQuery string
+
+//go:embed user_login_name_matches_case_sensitive.sql
+var userLoginNameMatchesCaseSensitiveQuery string
+
+// NewUserLoginNameExistsQuery filters users by login name.
+// Equals / EqualsIgnoreCase are rewritten in prepareUsersQuery into an indexed
+// ID-seek. Other comparisons use the login_names3 view.
 func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	// linking queries for the sub select
+	if comparison == TextEquals || comparison == TextEqualsIgnoreCase {
+		return newLoginNameEqualsFilter(value, comparison == TextEqualsIgnoreCase)
+	}
+	return newLoginNameExistsViewQuery(value, comparison)
+}
+
+func newLoginNameExistsViewQuery(value string, comparison TextComparison) (SearchQuery, error) {
 	instanceQuery, err := NewColumnComparisonQuery(LoginNameInstanceIDCol, UserInstanceIDCol, ColumnEquals)
 	if err != nil {
 		return nil, err
@@ -807,7 +823,6 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 	if err != nil {
 		return nil, err
 	}
-	// text query to select data from the linked sub select
 	var loginNameQuery SearchQuery
 	loginNameQuery, err = NewTextQuery(LoginNameNameCol, value, comparison)
 	if comparison == TextEqualsIgnoreCase {
@@ -816,17 +831,36 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 	if err != nil {
 		return nil, err
 	}
-	// full definition of the sub select
 	subSelect, err := NewSubSelect(LoginNameUserIDCol, []SearchQuery{instanceQuery, userIDQuery, resourceOwnerQuery, loginNameQuery})
 	if err != nil {
 		return nil, err
 	}
-	// "WHERE * IN (*)" query with subquery as list-data provider
 	return NewListQuery(
 		UserIDCol,
 		subSelect,
 		ListIn,
 	)
+}
+
+func (q *UserSearchQueries) hasMetadataFilter() bool {
+	return searchQueriesHaveMetadataFilter(q.Queries)
+}
+
+func searchQueriesHaveMetadataFilter(queries []SearchQuery) bool {
+	return slices.ContainsFunc(queries, searchQueryHasMetadataFilter)
+}
+
+func searchQueryHasMetadataFilter(qry SearchQuery) bool {
+	switch v := qry.(type) {
+	case *OrQuery:
+		return searchQueriesHaveMetadataFilter(v.queries)
+	case *AndQuery:
+		return searchQueriesHaveMetadataFilter(v.queries)
+	case *NotQuery:
+		return searchQueryHasMetadataFilter(v.query)
+	default:
+		return qry.Col().table.name == userMetadataTable.name
+	}
 }
 
 func triggerUserProjections(ctx context.Context) {
@@ -1257,13 +1291,21 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 }
 
 // prepareUsersQuery creates the select query for searching users and returns a matching scan function.
-// Permissions, filters and sorting are applied in a `SELECT FROM` distinct sub-select.
+// Permissions, filters and sorting are applied in a `SELECT FROM` sub-select.
 // The count over window function and limit are applied in the outer query.
 // It is not possible to pass more filters to the returned query, as they need to be applied in the sub-select.
+//
+// Metadata JOIN and DISTINCT are only applied when a metadata filter is present.
+// Login-equality filters (username, email, phone, login name EQUALS /
+// EQUALS_IGNORE_CASE) become an indexed UNION of ID seeks.
 func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 	if q.SortingColumn.isZero() {
 		q.SortingColumn = UserIDCol
 	}
+
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	loginEqualitySeeks, filters, loginEqualityExtracted := extractLoginEqualitySeeks(instanceID, q.Queries)
+	needsMetadataJoin := q.hasMetadataFilter()
 
 	// start building the sub-select
 	query := sq.Select(
@@ -1298,18 +1340,24 @@ func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionChe
 		MachineSecretCol.identifier(),
 		MachineAccessTokenTypeCol.identifier(),
 		q.SortingColumn.orderBy()).
-		Distinct().
 		From(userTable.identifier()).
 		LeftJoin(join(HumanUserIDCol, UserIDCol)).
 		LeftJoin(join(MachineUserIDCol, UserIDCol)).
-		LeftJoin(join(UserMetadataUserIDCol, UserIDCol)).
 		JoinClause(joinLoginNames).
-		Where(sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()})
+		Where(sq.Eq{UserInstanceIDCol.identifier(): instanceID})
 
-	query = userPermissionCheckV2(ctx, query, permissionCheckV2, q.Queries)
-	// apply requested filters
-	for _, q := range q.Queries {
-		query = q.toQuery(query)
+	if loginEqualityExtracted {
+		query = query.JoinClause(joinLoginEqualitySeeks(loginEqualitySeeks))
+	}
+
+	if needsMetadataJoin {
+		query = query.Distinct().
+			LeftJoin(join(UserMetadataUserIDCol, UserIDCol))
+	}
+
+	query = userPermissionCheckV2(ctx, query, permissionCheckV2, filters)
+	for _, filter := range filters {
+		query = filter.toQuery(query)
 	}
 	// apply sorting in the sub-select,because the identifier is fully qualified.
 	query = q.consumeSorting(query)

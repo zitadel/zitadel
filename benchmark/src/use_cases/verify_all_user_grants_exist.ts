@@ -46,7 +46,9 @@ export default async function (data: any) {
 
 export function teardown(data: any) {
   // removeOrg(data.org, data.tokens.accessToken);
-  console.info('teardown: org is not removed to verify correctness of projections, do not forget to remove the org afterwards');
+  console.info(
+    'teardown: org is not removed to verify correctness of projections, do not forget to remove the org afterwards',
+  );
 }
 
 /** 

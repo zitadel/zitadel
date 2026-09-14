@@ -1,0 +1,71 @@
+{
+  "query|INVALID_ARGUMENT|reduce.wrong.event.type %s": {
+    "why": "Internal consistency check inside a query-projection event handler (internal/query/projection/*.go): the handler asserts that the eventstore event it received is the exact event type it was registered for, and this fires when that assertion fails. Since the projection framework only ever routes an event to reducers registered for that event's precise type, this signals a bug in the projection's event-to-reducer wiring rather than anything caused by an API request."
+  },
+  "query|INTERNAL|An internal error occurred": {
+    "why": "Generic fallback used across dozens of unrelated code paths — an unhandled branch in the legacy login-flow state machine, a failed JSON unmarshal of stored event data, a panic from a SQL query-builder call, and similar defensive should-not-happen checks. There is no single trigger for this cluster; each call site guards a different unexpected server-side fault rather than something the caller did wrong."
+  },
+  "query|INVALID_ARGUMENT|reduce.wrong.event.type %v": {
+    "why": "Same projection event-routing assertion as the %s-formatted variant of this message: a reducer's type assertion on the incoming event failed because it was invoked with an event type it isn't registered to handle. This is an internal wiring bug in the projection code, not something a client can trigger."
+  },
+  "query|INVALID_ARGUMENT|reduce.wrong.db.pool %T": {
+    "why": "Inside the newer relational-table projection handlers (internal/query/projection/*_relational.go), each write statement's execution closure asserts that the database executor it's given is a *sql.Tx before using it. This fires only if the projection-handler framework passes a different executor type than expected — an internal plumbing bug, not something triggered by API traffic."
+  },
+  "query|INTERNAL|SQL Statement could not be created": {
+    "why": "The squirrel SQL query builder's ToSql() call failed while assembling a read query, for example in the IDP-by-ID, project-by-ID, or message-text lookups. Because the query shape is fixed Go code and only the bind values come from the request, this points to a query-builder usage bug rather than bad caller input."
+  },
+  "query|INTERNAL|SQL Statement could not be finished": {
+    "why": "Fires when rows.Close() returns an error after a result set has already been fully scanned, for example in the user-auth-method, instance-domain, or custom-text list queries. This reflects a database connection or driver-level fault hit while finalizing the query, not a problem with the query itself or its inputs."
+  },
+  "query|INVALID_ARGUMENT|Request is invalid": {
+    "why": "Returned by the shared list/search query helpers (genericRowsQuery and the equivalents used by project-role and IDP-user-link search, among others) when the caller's filter criteria can't be composed into a valid SQL statement by the query builder. Points to a malformed or self-contradictory combination of search parameters in the request rather than a data problem."
+  },
+  "query|INTERNAL|could not unmarshal event": {
+    "why": "Deserializing a stored event's JSON payload into the corresponding legacy view-model struct failed (internal/user/repository/view and eventsourcing model code for tokens, phone numbers, external IDPs, etc). This means the event data persisted in the eventstore doesn't match what the current model code expects to decode — a data or schema mismatch rather than anything the caller controls."
+  },
+  "query|NOT_FOUND|User could not be found": {
+    "why": "Two legacy paths share this message. The auth-request login flow's user lookup re-applies any events newer than its cached view before answering, and only returns this when the user has no view row and no events at all (unknown ID) or the freshly-applied events show the user was deleted; GetHumanOTPSecret returns it when an OTP configuration exists but never reached the ready state, which the API then treats as if no OTP were configured."
+  },
+  "query|INTERNAL|reduce.wrong.event.type %s": {
+    "why": "Identical event-routing type-assertion failure as the INVALID_ARGUMENT-classified variant of this message, just thrown with ThrowInternalf instead by a handful of newer relational-table projection reducers (project_grant_relational.go, authorization_relational.go). Same should-never-happen wiring bug — the different gRPC status code reflects inconsistent error classification between call sites, not a different cause."
+  },
+  "query|FAILED_PRECONDITION|The User must be personal": {
+    "why": "Thrown by legacy login and auth-flow code when an operation that needs a human profile — interactive login, or reading an email, phone, or address — is attempted against a user that turns out to be a machine or service account with no human profile data. Machine users can't complete these human-only flows or expose these profile fields."
+  },
+  "query|INTERNAL|Could not be removed": {
+    "why": "Surfaces from internal projection-maintenance operations (RemoveFailedEvent, ClearCurrentSequence) when the DELETE, TRUNCATE, or transaction used to clear a stuck failed-event record or reset a projection's cursor fails at the database level. These are administrative reset operations, not part of normal read or write request handling."
+  },
+  "query|INTERNAL|could not unmarshal data": {
+    "why": "Same failure mode as could-not-unmarshal-event under a different literal string: legacy user view-model code (internal/user/repository/view/model/user.go) fails to deserialize a stored user, password, or WebAuthn-token event payload into its struct. Indicates the persisted event data doesn't match the struct the projection code currently expects."
+  },
+  "query|INTERNAL|Error in reading translation file": {
+    "why": "The server failed to open or read one of its bundled i18n YAML files, distinct from the separate not-found error used when the file is missing entirely. Since these files ship embedded in the binary, this points to a broken build or a misconfigured filesystem-backed i18n directory rather than anything about the request."
+  },
+  "query|NOT_FOUND|Errors.NotFound": {
+    "why": "While processing a UserGrant event, the projection looks up the resource-owner org of the referenced user, project, or project grant by querying the eventstore directly for that aggregate's creation event. If no such event exists for the referenced ID, the projection can't determine which org should own the row; because this checks the eventstore itself rather than a read model, it signals a genuine data or event-ordering inconsistency rather than the projection simply lagging behind a recent write."
+  },
+  "query|INVALID_ARGUMENT|Limit exceeds default limit": {
+    "why": "Legacy view search requests (user-session, user-membership, external-IDP list views) reject calls whose requested page-size limit exceeds the server-configured maximum. Lower the requested limit and paginate across multiple requests instead."
+  },
+  "query|INVALID_ARGUMENT|reduce.wrong.event.type, %v": {
+    "why": "Same projection event-routing assertion as the other reduce.wrong.event.type variants, just with a different format string, seen in the mail-template, lockout-policy, and relational settings projections. A reducer received an event type it wasn't built to handle — an internal wiring issue, not something callers trigger."
+  },
+  "query|INVALID_ARGUMENT|SQL Statement could not be created": {
+    "why": "Same squirrel ToSql() builder failure as the INTERNAL-classified cluster of this message, just returned as INVALID_ARGUMENT by the instance and instance-domain search queries. Effectively never happens outside a query-builder bug; the differing gRPC code reflects inconsistent classification between call sites rather than a different cause."
+  },
+  "query|NOT_FOUND|Errors.App.NotFound": {
+    "why": "A lookup by OIDC client ID, SAML entity ID, or app ID returned no row, seen in the client-ID permission check, the SAML service-provider lookup, and the OIDC userinfo client lookup. Means the given client or app ID doesn't exist, was removed, or the corresponding app isn't active on this instance."
+  },
+  "query|INVALID_ARGUMENT|reduce.wrong.event.type %T": {
+    "why": "Same projection event-routing assertion as the other reduce.wrong.event.type variants, using Go's %T type-name formatting, seen in the device-auth, instance-features, and system-features projections. The reducer was invoked with an event type outside what it's registered to handle — an internal bug, not something callers trigger."
+  },
+  "query|INTERNAL|Translation file could not be merged with custom translations": {
+    "why": "After loading the base i18n YAML and overlaying instance- or org-level custom-text overrides stored in the database, the JSON marshal/unmarshal round trip used to merge them fails. An internal serialization step failing, unrelated to whatever request triggered the text lookup."
+  },
+  "query|INTERNAL|unable to create sql stmt": {
+    "why": "Same squirrel ToSql() builder failure as the other SQL-statement-could-not-be-created clusters, just in the label-policy queries, which predate the shared SQL-statement i18n key and hardcode this message text directly instead."
+  },
+  "query|UNAUTHENTICATED|Token is invalid": {
+    "why": "access_token.go rejects an OIDC access token when it doesn't split into the expected session-ID/token-ID shape, when replaying that OIDC session's events yields no matching access-token ID, or when the underlying session was terminated — for example by logout — after the token was issued. All three cases mean the token is no longer usable and the caller needs to re-authenticate."
+  }
+}

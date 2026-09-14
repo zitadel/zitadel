@@ -2213,6 +2213,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 	oauthIdpID := Instance.AddGenericOAuthProvider(IamCTX, integration.IDPName()).GetId()
 	oidcIdpID := Instance.AddGenericOIDCProvider(IamCTX, integration.IDPName()).GetId()
+	zitadelIdpID := Instance.AddZitadelProvider(IamCTX, integration.IDPName()).GetId()
 	samlIdpID := Instance.AddSAMLPostProvider(IamCTX)
 	ldapIdpID := Instance.AddLDAPProvider(IamCTX)
 	authURL, err := url.Parse(Instance.CreateIntent(CTX, oauthIdpID).GetAuthUrl())
@@ -2240,6 +2241,11 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 	oidcSuccessful, oidcToken, oidcChangeDate, oidcSequence, err := sink.SuccessfulOIDCIntent(Instance.ID(), oidcIdpID, "id", "", expiry)
 	require.NoError(t, err)
 	oidcSuccessfulWithUserID, oidcWithUserIDToken, oidcWithUserIDChangeDate, oidcWithUserIDSequence, err := sink.SuccessfulOIDCIntent(Instance.ID(), oidcIdpID, "id", "user", expiry)
+	require.NoError(t, err)
+	// the ZITADEL provider reuses the OIDC user mapper
+	zitadelSuccessful, zitadelToken, zitadelChangeDate, zitadelSequence, err := sink.SuccessfulOIDCIntent(Instance.ID(), zitadelIdpID, "id", "", expiry)
+	require.NoError(t, err)
+	zitadelSuccessfulWithUserID, zitadelWithUserIDToken, zitadelWithUserIDChangeDate, zitadelWithUserIDSequence, err := sink.SuccessfulOIDCIntent(Instance.ID(), zitadelIdpID, "id", "user", expiry)
 	require.NoError(t, err)
 	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), ldapIdpID, "id", "")
 	require.NoError(t, err)
@@ -2448,6 +2454,84 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 						},
 					},
 					IdpId:    oidcIdpID,
+					UserId:   "id",
+					UserName: "username",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"sub":                "id",
+							"preferred_username": "username",
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "retrieve successful zitadel intent",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    zitadelSuccessful,
+					IdpIntentToken: zitadelToken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderIntentResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(zitadelChangeDate),
+					ResourceOwner: Instance.ID(),
+					Sequence:      zitadelSequence,
+				},
+				UserId: "",
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Oauth{
+						Oauth: &user.IDPOAuthAccessInformation{
+							AccessToken:  "accessToken",
+							RefreshToken: gu.Ptr("refreshToken"),
+							IdToken:      gu.Ptr("idToken"),
+						},
+					},
+					IdpId:    zitadelIdpID,
+					UserId:   "id",
+					UserName: "username",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"sub":                "id",
+							"preferred_username": "username",
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "retrieve successful zitadel intent with linked user",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    zitadelSuccessfulWithUserID,
+					IdpIntentToken: zitadelWithUserIDToken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderIntentResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(zitadelWithUserIDChangeDate),
+					ResourceOwner: Instance.ID(),
+					Sequence:      zitadelWithUserIDSequence,
+				},
+				UserId: "user",
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Oauth{
+						Oauth: &user.IDPOAuthAccessInformation{
+							AccessToken:  "accessToken",
+							RefreshToken: gu.Ptr("refreshToken"),
+							IdToken:      gu.Ptr("idToken"),
+						},
+					},
+					IdpId:    zitadelIdpID,
 					UserId:   "id",
 					UserName: "username",
 					RawInformation: func() *structpb.Struct {

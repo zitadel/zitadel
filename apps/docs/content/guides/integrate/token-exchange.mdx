@@ -113,9 +113,11 @@ Currently ZITADEL supports requesting of:
 
 #### Scope
 
-[Scope](/apis/openidoauth/scopes) is an optional parameter that allows changing the scope of the supplied token, for the requested token. Scope can be entirely different from any of the supplied tokens. It can be used to extend or decrease the scope of the new token.
+[Scope](/apis/openidoauth/scopes) is an optional parameter that allows changing the scope of the supplied token, for the requested token. Scope can be used to decrease privileges carried by the input tokens. Authorization-related reserved scopes (for example project audience or `offline_access`) must already be present on the `subject_token` and/or `actor_token`.
 
 When scope is omitted in the request, it is taken from the `subject_token`. If the `subject_token` doesn't carry any scope (some types can't), it is taken from the `actor_token`. All allowed token types for the `actor_token` typically have a scope.
+
+The reserved scope `urn:zitadel:iam:org:roles:id:{orgID}` is special: it only filters which organization IDs appear in role claims and never grants additional roles. During token exchange it is **downscope-only**. You may add it to narrow a broad token, or further reduce an existing filter, but you cannot switch to an organization that was not already allowed by the subject token. If the subject token already includes that filter and the exchange request omits it, ZITADEL inherits the filter so omitting scope cannot re-widen role claims.
 
 #### Audience
 

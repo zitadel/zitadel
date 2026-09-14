@@ -109,7 +109,7 @@ func Test_AddZitadelProvider(t *testing.T) {
 			),
 		},
 		{
-			name: "missing org ID in instance roles info",
+			name: "valid request",
 			args: args{
 				ctx: OrgCTX,
 				req: &mgmt_pb.AddZitadelProviderRequest{
@@ -120,87 +120,6 @@ func Test_AddZitadelProvider(t *testing.T) {
 					Scopes:       []string{"email", "profile"},
 					ProviderOptions: &idp_pb.Options{
 						IsCreationAllowed: true,
-					},
-					InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-						{
-							OrganizationId: "",
-						},
-					},
-				},
-			},
-			wantErr: status.Error(
-				codes.InvalidArgument,
-				"invalid AddZitadelProviderRequest.InstanceRolesInfo[0]: embedded message failed validation | caused by: invalid InstanceRolesInfo.OrganizationId: value length must be between 1 and 200 runes, inclusive",
-			),
-		},
-		{
-			name: "missing org domain in instance roles info",
-			args: args{
-				ctx: OrgCTX,
-				req: &mgmt_pb.AddZitadelProviderRequest{
-					Name:         "Zitadel Support IdP",
-					Issuer:       "zitadel.example.com",
-					ClientId:     "test-client",
-					ClientSecret: "test-secret",
-					Scopes:       []string{"email", "profile"},
-					ProviderOptions: &idp_pb.Options{
-						IsCreationAllowed: true,
-					},
-					InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-						{
-							OrganizationId:     "org1",
-							OrganizationDomain: "org1.com",
-						},
-						{
-							OrganizationId: "org2",
-						},
-					},
-				},
-			},
-			wantErr: status.Error(
-				codes.InvalidArgument,
-				"invalid AddZitadelProviderRequest.InstanceRolesInfo[1]: embedded message failed validation | caused by: invalid InstanceRolesInfo.OrganizationDomain: value length must be between 1 and 200 runes, inclusive",
-			),
-		},
-		{
-			name: "valid request without instance roles info",
-			args: args{
-				ctx: OrgCTX,
-				req: &mgmt_pb.AddZitadelProviderRequest{
-					Name:         "Zitadel Support IdP",
-					Issuer:       "zitadel.example.com",
-					ClientId:     "test-client",
-					ClientSecret: "test-secret",
-					Scopes:       []string{"email", "profile"},
-					ProviderOptions: &idp_pb.Options{
-						IsCreationAllowed: true,
-					},
-				},
-			},
-			wantResponse: &mgmt_pb.AddZitadelProviderResponse{
-				Details: &object_pb.ObjectDetails{
-					ResourceOwner: Instance.DefaultOrg.Id,
-				},
-			},
-		},
-		{
-			name: "valid request with instance roles info",
-			args: args{
-				ctx: OrgCTX,
-				req: &mgmt_pb.AddZitadelProviderRequest{
-					Name:         "Zitadel Support IdP",
-					Issuer:       "zitadel.example.com",
-					ClientId:     "test-client",
-					ClientSecret: "test-secret",
-					Scopes:       []string{"email", "profile"},
-					ProviderOptions: &idp_pb.Options{
-						IsCreationAllowed: true,
-					},
-					InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-						{
-							OrganizationId:     "org1",
-							OrganizationDomain: "org1.com",
-						},
 					},
 				},
 			},
@@ -229,6 +148,10 @@ func Test_AddZitadelProvider(t *testing.T) {
 			assert.NotEmpty(t, got.GetId())
 			assert.WithinRange(t, got.GetDetails().GetCreationDate().AsTime(), before, after)
 			assert.Equal(t, tt.wantResponse.GetDetails().GetResourceOwner(), got.GetDetails().GetResourceOwner())
+			t.Cleanup(func() {
+				_, err := Client.DeleteProvider(OrgCTX, &mgmt_pb.DeleteProviderRequest{Id: got.GetId()})
+				require.NoError(t, err)
+			})
 		})
 	}
 }
@@ -314,16 +237,6 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 					Issuer:   "acme.example.com",
 					ClientId: "test-client",
 					Scopes:   []string{"email", "profile", "openid", "offline_access"},
-					InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-						{
-							OrganizationId:     "org1",
-							OrganizationDomain: "org1.com",
-						},
-						{
-							OrganizationId:     "org2",
-							OrganizationDomain: "org2.com",
-						},
-					},
 				},
 			},
 			wantResponse: &mgmt_pb.UpdateZitadelProviderResponse{
@@ -343,16 +256,6 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 							Issuer:   "acme.example.com",
 							ClientId: "test-client",
 							Scopes:   []string{"email", "profile", "openid", "offline_access"},
-							InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-								{
-									OrganizationId:     "org1",
-									OrganizationDomain: "org1.com",
-								},
-								{
-									OrganizationId:     "org2",
-									OrganizationDomain: "org2.com",
-								},
-							},
 						},
 					},
 				},
@@ -369,12 +272,6 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 					Scopes:   []string{}, // scopes unset -> will be updated by the API
 					ProviderOptions: &idp_pb.Options{
 						IsAutoCreation: true,
-					},
-					InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-						{
-							OrganizationId:     "org3",
-							OrganizationDomain: "org3.com",
-						},
 					},
 				},
 			},
@@ -397,52 +294,6 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 							Issuer:   "acme.example.com",
 							ClientId: "test-client",
 							Scopes:   nil, // unset scopes
-							InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-								{
-									OrganizationId:     "org3",
-									OrganizationDomain: "org3.com",
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "update with instance roles info not set, ok",
-			args: args{
-				ctx: OrgCTX,
-				req: &mgmt_pb.UpdateZitadelProviderRequest{
-					Name:     "Zitadel Support IdP updated 2",
-					Issuer:   "acme.example.com",
-					ClientId: "test-client",
-					Scopes:   []string{"email", "openid"},
-					ProviderOptions: &idp_pb.Options{
-						IsCreationAllowed: true,
-					},
-					InstanceRolesInfo: nil, // instance roles info isn't set -> will be unset by the API
-				},
-			},
-			wantResponse: &mgmt_pb.UpdateZitadelProviderResponse{
-				Details: &object_pb.ObjectDetails{
-					ResourceOwner: Instance.DefaultOrg.Id,
-				},
-			},
-			wantUpdatedProvider: &idp_pb.Provider{
-				State: idp_pb.IDPState_IDP_STATE_ACTIVE,
-				Name:  "Zitadel Support IdP updated 2",
-				Owner: idp_pb.IDPOwnerType_IDP_OWNER_TYPE_ORG,
-				Type:  idp_pb.ProviderType_PROVIDER_TYPE_ZITADEL,
-				Config: &idp_pb.ProviderConfig{
-					Options: &idp_pb.Options{
-						IsCreationAllowed: true,
-					},
-					Config: &idp_pb.ProviderConfig_Zitadel{
-						Zitadel: &idp_pb.ZitadelConfig{
-							Issuer:            "acme.example.com",
-							ClientId:          "test-client",
-							Scopes:            []string{"email", "openid"},
-							InstanceRolesInfo: nil, // instance roles info isn't set
 						},
 					},
 				},
@@ -454,6 +305,10 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 			// create a new provider per subtest and set the ID in the request
 			zitadelProvider := Instance.AddOrgZitadelProvider(OrgCTX, integration.IDPName())
 			tt.args.req.Id = zitadelProvider.Id
+			t.Cleanup(func() {
+				_, err := Client.DeleteProvider(OrgCTX, &mgmt_pb.DeleteProviderRequest{Id: zitadelProvider.GetId()})
+				require.NoError(t, err)
+			})
 
 			before := time.Now()
 			updateResp, err := Client.UpdateZitadelProvider(tt.args.ctx, tt.args.req)
@@ -482,7 +337,11 @@ func Test_UpdateZitadelProvider(t *testing.T) {
 }
 
 func Test_UpdateZitadelProvider_MissingID(t *testing.T) {
-	_ = Instance.AddOrgZitadelProvider(OrgCTX, integration.IDPName())
+	existingProvider := Instance.AddOrgZitadelProvider(OrgCTX, integration.IDPName())
+	t.Cleanup(func() {
+		_, err := Client.DeleteProvider(OrgCTX, &mgmt_pb.DeleteProviderRequest{Id: existingProvider.GetId()})
+		require.NoError(t, err)
+	})
 	// Attempt to update the provider without specifying the ID
 	updateResp, err := Client.UpdateZitadelProvider(OrgCTX, &mgmt_pb.UpdateZitadelProviderRequest{})
 	require.Error(t, err)
@@ -555,12 +414,6 @@ func Test_GetProviderByID(t *testing.T) {
 								Issuer:   "zitadel.example.com",
 								ClientId: "test-client",
 								Scopes:   []string{"email", "profile"},
-								InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-									{
-										OrganizationId:     "org1",
-										OrganizationDomain: "org1.com",
-									},
-								},
 							},
 						},
 					},
@@ -597,7 +450,12 @@ func Test_ListProviders(t *testing.T) {
 	provider1 := Instance.AddOrgZitadelProvider(orgCtx, provider1Name)
 	provider2Name := integration.IDPName()
 	provider2 := Instance.AddOrgZitadelProvider(orgCtx, provider2Name)
-
+	t.Cleanup(func() {
+		_, err := Client.DeleteProvider(orgCtx, &mgmt_pb.DeleteProviderRequest{Id: provider1.GetId()})
+		require.NoError(t, err)
+		_, err = Client.DeleteProvider(orgCtx, &mgmt_pb.DeleteProviderRequest{Id: provider2.GetId()})
+		require.NoError(t, err)
+	})
 	tests := []struct {
 		name     string
 		ctx      context.Context
@@ -659,12 +517,6 @@ func Test_ListProviders(t *testing.T) {
 									Issuer:   "zitadel.example.com",
 									ClientId: "test-client",
 									Scopes:   []string{"email", "profile"},
-									InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-										{
-											OrganizationId:     "org1",
-											OrganizationDomain: "org1.com",
-										},
-									},
 								},
 							},
 						},
@@ -714,12 +566,6 @@ func Test_ListProviders(t *testing.T) {
 									Issuer:   "zitadel.example.com",
 									ClientId: "test-client",
 									Scopes:   []string{"email", "profile"},
-									InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-										{
-											OrganizationId:     "org1",
-											OrganizationDomain: "org1.com",
-										},
-									},
 								},
 							},
 						},
@@ -760,12 +606,6 @@ func Test_ListProviders(t *testing.T) {
 									Issuer:   "zitadel.example.com",
 									ClientId: "test-client",
 									Scopes:   []string{"email", "profile"},
-									InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-										{
-											OrganizationId:     "org1",
-											OrganizationDomain: "org1.com",
-										},
-									},
 								},
 							},
 						},
@@ -790,12 +630,6 @@ func Test_ListProviders(t *testing.T) {
 									Issuer:   "zitadel.example.com",
 									ClientId: "test-client",
 									Scopes:   []string{"email", "profile"},
-									InstanceRolesInfo: []*idp_pb.InstanceRolesInfo{
-										{
-											OrganizationId:     "org1",
-											OrganizationDomain: "org1.com",
-										},
-									},
 								},
 							},
 						},
@@ -818,11 +652,82 @@ func Test_ListProviders(t *testing.T) {
 			require.NoError(t, err)
 			assert.NotNil(t, got)
 			assert.Equal(t, tt.wantResp.GetDetails().GetTotalResult(), got.GetDetails().GetTotalResult())
-			for i, want := range tt.wantResp.GetResult() {
-				assert.Equal(t, want.GetDetails().GetCreationDate().AsTime(), got.GetResult()[i].GetDetails().GetCreationDate().AsTime())
-				assert.Equal(t, org.GetOrganizationId(), got.GetResult()[i].GetDetails().GetResourceOwner())
-				assertProvider(t, want, got.GetResult()[i])
+			gotByID := make(map[string]*idp_pb.Provider)
+			for _, p := range got.GetResult() {
+				gotByID[p.GetId()] = p
 			}
+			for _, want := range tt.wantResp.GetResult() {
+				actual, ok := gotByID[want.GetId()]
+				require.True(t, ok, "expected provider %s not found in results", want.GetId())
+				assert.Equal(t, want.GetDetails().GetCreationDate().AsTime(), actual.GetDetails().GetCreationDate().AsTime())
+				assert.Equal(t, org.GetOrganizationId(), actual.GetDetails().GetResourceOwner())
+				assertProvider(t, want, actual)
+			}
+		})
+	}
+}
+
+func Test_DeleteZitadelProvider(t *testing.T) {
+	existingProvider := Instance.AddOrgZitadelProvider(OrgCTX, integration.IDPName())
+	t.Cleanup(func() {
+		_, err := Client.DeleteProvider(OrgCTX, &mgmt_pb.DeleteProviderRequest{Id: existingProvider.GetId()})
+		if err != nil && status.Code(err) != codes.NotFound {
+			require.NoError(t, err)
+		}
+	})
+
+	tests := []struct {
+		name         string
+		ctx          context.Context
+		req          *mgmt_pb.DeleteProviderRequest
+		wantResponse *mgmt_pb.DeleteProviderResponse
+		wantErr      error
+	}{
+		{
+			name:    "no permissions, error",
+			ctx:     Instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
+			req:     &mgmt_pb.DeleteProviderRequest{Id: "idp-id"},
+			wantErr: status.Error(codes.NotFound, "membership not found (AUTHZ-cdgFk)"),
+		},
+		{
+			name:    "insufficient permissions, error", // no iam.idp.write permission
+			ctx:     integration.WithSystemUserWithNoPermissionsAuthorization(CTX),
+			req:     &mgmt_pb.DeleteProviderRequest{Id: "idp-id"},
+			wantErr: status.Error(codes.PermissionDenied, "No matching permissions found (AUTH-5mWD2)"),
+		},
+		{
+			name:    "not found, error",
+			ctx:     OrgCTX,
+			req:     &mgmt_pb.DeleteProviderRequest{Id: "idp-id"},
+			wantErr: status.Error(codes.NotFound, "Identity Provider Configuration doesn't exist (ORG-Se3tg)"),
+		},
+		{
+			name: "delete, ok",
+			ctx:  OrgCTX,
+			req:  &mgmt_pb.DeleteProviderRequest{Id: existingProvider.GetId()},
+			wantResponse: &mgmt_pb.DeleteProviderResponse{
+				Details: &object_pb.ObjectDetails{
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.DeleteProvider(tt.ctx, tt.req)
+			after := time.Now()
+			if tt.wantErr != nil {
+				require.Error(t, err)
+				grpcStatus, ok := status.FromError(err)
+				require.True(t, ok)
+				assert.Equal(t, status.Code(tt.wantErr), grpcStatus.Code())
+				assert.Equal(t, status.Convert(tt.wantErr).Message(), grpcStatus.Message())
+				return
+			}
+			require.NoError(t, err)
+			assert.NotNil(t, got)
+			assert.Equal(t, tt.wantResponse.GetDetails().GetResourceOwner(), got.GetDetails().GetResourceOwner())
+			assert.WithinRange(t, got.GetDetails().GetChangeDate().AsTime(), existingProvider.GetDetails().GetCreationDate().AsTime(), after)
 		})
 	}
 }

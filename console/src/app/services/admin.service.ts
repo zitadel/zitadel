@@ -50,6 +50,8 @@ import {
   AddSMSProviderTwilioResponse,
   AddSMTPConfigRequest,
   AddSMTPConfigResponse,
+  AddZitadelProviderRequest,
+  AddZitadelProviderResponse,
   DeactivateIDPRequest,
   DeactivateIDPResponse,
   DeactivateSMSProviderRequest,
@@ -304,6 +306,8 @@ import {
   UpdateSMTPConfigPasswordResponse,
   UpdateSMTPConfigRequest,
   UpdateSMTPConfigResponse,
+  UpdateZitadelProviderRequest,
+  UpdateZitadelProviderResponse,
 } from '../proto/generated/zitadel/admin_pb';
 import {
   ResetCustomDomainClaimedMessageTextToDefaultRequest,
@@ -1286,6 +1290,14 @@ export class AdminService {
     req: UpdateGenericOIDCProviderRequest,
   ): Promise<UpdateGenericOIDCProviderResponse.AsObject> {
     return this.grpcService.admin.updateGenericOIDCProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addZitadelProvider(req: AddZitadelProviderRequest): Promise<AddZitadelProviderResponse.AsObject> {
+    return this.grpcService.admin.addZitadelProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateZitadelProvider(req: UpdateZitadelProviderRequest): Promise<UpdateZitadelProviderResponse.AsObject> {
+    return this.grpcService.admin.updateZitadelProvider(req, null).then((resp) => resp.toObject());
   }
 
   public addGenericOAuthProvider(req: AddGenericOAuthProviderRequest): Promise<AddGenericOAuthProviderResponse.AsObject> {

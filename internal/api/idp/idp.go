@@ -35,6 +35,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	saml2 "github.com/zitadel/zitadel/internal/idp/providers/saml"
+	"github.com/zitadel/zitadel/internal/idp/providers/zitadel"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -554,6 +555,8 @@ func (h *Handler) fetchIDPUserFromCode(ctx context.Context, identityProvider idp
 	case *gitlab.Provider:
 		session = openid.NewSession(provider.Provider, code, idpArguments)
 	case *google.Provider:
+		session = openid.NewSession(provider.Provider, code, idpArguments)
+	case *zitadel.Provider:
 		session = openid.NewSession(provider.Provider, code, idpArguments)
 	case *apple.Provider:
 		session = apple.NewSession(provider, code, appleUser)

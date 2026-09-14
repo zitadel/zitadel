@@ -175,6 +175,7 @@ Errors:
         NotExisting: "OTP (OneTimePassword) de autenticação multifator não existe"
         NotReady: "OTP (OneTimePassword) de autenticação multifator não está pronto"
         InvalidCode: "Código inválido"
+        Reused: "Este código já foi utilizado. Aguarde um novo código"
       U2F:
         NotExisting: "U2F não existe"
       Passwordless:
@@ -203,6 +204,7 @@ Errors:
     AlreadyActive: "Organização já está ativa"
     Empty: "Organização está vazia"
     NotFound: "Organização não encontrada"
+    NotActive: "A organização não está ativa"
     NotChanged: "Organização não alterada"
     DefaultOrgNotDeletable: "A organização padrão não pode ser excluída"
     ZitadelOrgNotDeletable: "A organização com o projeto Zitadel não pode ser excluída"
@@ -281,6 +283,8 @@ Errors:
     LabelPolicy:
       NotFound: "Política de Rótulo Privado não encontrada"
       NotChanged: "Política de Rótulo Privado não foi alterada"
+    IDPConfig:
+      NotExisting: "A Configuração do Provedor de Identidade não existe"
   Project:
     ProjectIDMissing: "ID do Projeto ausente"
     AlreadyExists: "Projeto já existe na organização"
@@ -759,6 +763,7 @@ EventTypes:
           check:
             succeeded: "Verificação de OTP de autenticação multifator bem-sucedida"
             failed: "Verificação de OTP de autenticação multifator falhou"
+            reused: "Código de OTP de autenticação multifator reutilizado"
           sms:
             added: "Adicionado OTP SMS multifator"
             removed: "OTP SMS multifator removido"

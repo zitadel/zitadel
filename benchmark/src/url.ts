@@ -1,4 +1,6 @@
-import { options } from 'k6/http';
+// @ts-ignore Import module
+import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
+
 import { Config } from './config';
 
 export type options = {

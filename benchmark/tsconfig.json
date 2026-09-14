@@ -1,8 +1,8 @@
 {
     "compilerOptions": {
       "target": "ES6",
-      "moduleResolution": "node",
-      "module": "commonjs",
+      "moduleResolution": "bundler",
+      "module": "esnext",
       "noEmit": true,
       "allowJs": true,
       "removeComments": false,

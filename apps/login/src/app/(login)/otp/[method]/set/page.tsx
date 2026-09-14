@@ -5,6 +5,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { TotpRegister } from "@/components/totp-register";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
+import { getEnrollmentAuthorizationError } from "@/lib/server/enrollment-guard";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { addOTPEmail, addOTPSMS, getBrandingSettings, getLoginSettings, registerTOTP } from "@/lib/zitadel";
@@ -39,7 +40,16 @@ export default async function Page(props: {
 
   let totpResponse: RegisterTOTPResponse | undefined, error: Error | undefined;
   if (session && session.factors?.user?.id) {
-    if (method === "time-based") {
+    // Enrollment must be authorized: a bare identify-only session must not be able to
+    // attach a new OTP/TOTP factor to the account (GHSA-45f2-5q3r-xgg6).
+    const enrollmentError = await getEnrollmentAuthorizationError({
+      serviceConfig,
+      session,
+      userId: session.factors.user.id,
+    });
+    if (enrollmentError) {
+      error = new Error(enrollmentError);
+    } else if (method === "time-based") {
       await registerTOTP({ serviceConfig, userId: session.factors.user.id })
         .then((resp) => {
           if (resp) {
@@ -86,7 +96,7 @@ export default async function Page(props: {
     urlToContinue = `/otp/${method}?` + paramsToContinue;
 
     // immediately check the OTP on the next page if sms or email was set up
-    if (["email", "sms"].includes(method)) {
+    if (method && ["email", "sms"].includes(method)) {
       return redirect(urlToContinue);
     }
   } else if (requestId && sessionId) {
