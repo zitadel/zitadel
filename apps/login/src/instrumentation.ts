@@ -40,9 +40,9 @@ export async function register(): Promise<void> {
   // Verify the configured API credentials once at startup (fail fast).
   // Connectivity problems are only logged; reachability is covered by the
   // readiness probe (/ready) and ZITADEL_API_AWAITINITIALCONN.
-  const { verifyApiCredentials } = await import("./lib/verify-credentials");
+  const { verifyApiCredentials, FATAL_CREDENTIAL_CHECK_RESULTS } = await import("./lib/verify-credentials");
   const result = await verifyApiCredentials();
-  if (result === "rejected" || result === "missing") {
+  if (FATAL_CREDENTIAL_CHECK_RESULTS.has(result)) {
     process.exit(1);
   }
 }

@@ -55,6 +55,16 @@ describe("verifyApiCredentials", () => {
     expect(getGeneralSettings).toHaveBeenCalledTimes(1);
   });
 
+  test("bounds the startup RPC with a timeout", async () => {
+    const getGeneralSettings = vi.fn().mockResolvedValue({});
+    vi.mocked(createServiceForHost).mockResolvedValue({ getGeneralSettings } as any);
+
+    await verifyApiCredentials();
+
+    expect(getGeneralSettings).toHaveBeenCalledWith({}, { timeoutMs: expect.any(Number) });
+    expect(getGeneralSettings.mock.calls[0][1].timeoutMs).toBeGreaterThan(0);
+  });
+
   test("returns skipped when ZITADEL_API_URL is not set", async () => {
     delete process.env.ZITADEL_API_URL;
 
@@ -71,6 +81,14 @@ describe("verifyApiCredentials", () => {
     expect(createServiceForHost).not.toHaveBeenCalled();
   });
 
+  test("returns invalid when the credentials cannot be loaded or signed", async () => {
+    vi.mocked(createServiceForHost).mockRejectedValue(
+      new Error('Failed to read login client key file "/keys/login.json": ENOENT: no such file or directory'),
+    );
+
+    await expect(verifyApiCredentials()).resolves.toBe("invalid");
+  });
+
   test.each([
     ["Unauthenticated", Code.Unauthenticated],
     ["PermissionDenied", Code.PermissionDenied],
@@ -82,9 +100,21 @@ describe("verifyApiCredentials", () => {
     await expect(verifyApiCredentials()).resolves.toBe("rejected");
   });
 
-  test("returns unreachable when the API cannot be reached", async () => {
+  test("returns skipped when ZITADEL_API_URL does not resolve to an instance", async () => {
     vi.mocked(createServiceForHost).mockResolvedValue({
-      getGeneralSettings: vi.fn().mockRejectedValue(new ConnectError("connection refused", Code.Unavailable)),
+      getGeneralSettings: vi.fn().mockRejectedValue(new ConnectError("no instanceHost specified", Code.NotFound)),
+    } as any);
+
+    await expect(verifyApiCredentials()).resolves.toBe("skipped");
+  });
+
+  test.each([
+    ["Unavailable", Code.Unavailable],
+    ["DeadlineExceeded", Code.DeadlineExceeded],
+    ["Internal", Code.Internal],
+  ])("returns unreachable when the API responds with %s", async (_, code) => {
+    vi.mocked(createServiceForHost).mockResolvedValue({
+      getGeneralSettings: vi.fn().mockRejectedValue(new ConnectError("failed", code)),
     } as any);
 
     await expect(verifyApiCredentials()).resolves.toBe("unreachable");

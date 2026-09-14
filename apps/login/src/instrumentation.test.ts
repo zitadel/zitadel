@@ -3,7 +3,13 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 const verifyApiCredentials = vi.fn();
 const registerNode = vi.fn();
 
-vi.mock("./lib/verify-credentials", () => ({ verifyApiCredentials }));
+// Keep the real FATAL_CREDENTIAL_CHECK_RESULTS, but replace the check itself
+// and cut the import chain into the API client.
+vi.mock("./lib/verify-credentials", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("./lib/verify-credentials")>()),
+  verifyApiCredentials,
+}));
+vi.mock("@/lib/service", () => ({ createServiceForHost: vi.fn() }));
 vi.mock("./instrumentation.node", () => ({ registerNode }));
 
 async function loadRegister() {
@@ -48,7 +54,7 @@ describe("register", () => {
     expect(exitSpy).not.toHaveBeenCalled();
   });
 
-  test.each(["rejected", "missing"])("exits the process when the credential check returns %s", async (result) => {
+  test.each(["rejected", "invalid", "missing"])("exits the process when the credential check returns %s", async (result) => {
     verifyApiCredentials.mockResolvedValue(result);
     const register = await loadRegister();
 
