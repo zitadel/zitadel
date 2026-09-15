@@ -12,6 +12,7 @@ import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { IDPLink } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { loginNameEquals, normalizeLoginName } from "../login-name";
 import { getServiceConfig } from "../service-url";
 import {
   getActiveIdentityProviders,
@@ -45,6 +46,12 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   const { serviceConfig } = getServiceConfig(_headers);
 
   const t = await getTranslations("loginname");
+
+  // Normalize once, so the lookup, the comparisons below and the login name echoed
+  // into redirect URLs all operate on the same value. Browsers and mobile keyboards
+  // readily submit a trailing space, which would otherwise make an existing user
+  // unfindable.
+  command = { ...command, loginName: normalizeLoginName(command.loginName) };
 
   const loginSettingsByContext = await getLoginSettings({ serviceConfig, organization: command.organization });
 
@@ -258,15 +265,18 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     // recheck login settings after user discovery, as the search might have been done without org scope
     if (userLoginSettings?.disableLoginWithEmail && userLoginSettings?.disableLoginWithPhone) {
-      if (user.preferredLoginName !== concatLoginname) {
+      if (!loginNameEquals(user.preferredLoginName, concatLoginname)) {
         return preventUserEnumeration(command.organization);
       }
     } else if (userLoginSettings?.disableLoginWithEmail) {
-      if (user.preferredLoginName !== concatLoginname && humanUser?.phone?.phone !== command.loginName) {
+      if (!loginNameEquals(user.preferredLoginName, concatLoginname) && humanUser?.phone?.phone !== command.loginName) {
         return preventUserEnumeration(command.organization);
       }
     } else if (userLoginSettings?.disableLoginWithPhone) {
-      if (user.preferredLoginName !== concatLoginname && humanUser?.email?.email !== command.loginName) {
+      if (
+        !loginNameEquals(user.preferredLoginName, concatLoginname) &&
+        !loginNameEquals(humanUser?.email?.email, command.loginName)
+      ) {
         return preventUserEnumeration(command.organization);
       }
     }

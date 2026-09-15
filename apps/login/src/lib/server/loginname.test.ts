@@ -1048,6 +1048,88 @@ describe("sendLoginname", () => {
       expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
     });
 
+    // Regression tests for: https://github.com/zitadel/zitadel/issues/12572
+    // A username cannot exist twice with different casing, so a casing difference must
+    // never make the user unfindable.
+    test("should allow login when the login name casing differs from the stored one", async () => {
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "BREcloud@foodman.no",
+        details: { resourceOwner: "org123" },
+        type: {
+          case: "human",
+          value: { email: { email: "BREcloud@foodman.no" } },
+        },
+        state: UserState.ACTIVE,
+      };
+
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockGetLoginSettings.mockResolvedValue({
+        disableLoginWithPhone: true,
+        allowLocalAuthentication: true,
+      });
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({
+        session: { factors: { user: { id: "user123", loginName: "BREcloud@foodman.no", organizationId: "org123" } } },
+        sessionCookie: {},
+      });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+
+      const result = await sendLoginname({
+        loginName: "brecloud@foodman.no", // same user, typed in lower case
+      });
+
+      expect(result).not.toEqual({ error: "errors.userNotFound" });
+      expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
+    });
+
+    test("should allow login when the email casing differs from the stored one", async () => {
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "user@orgdomain.com",
+        details: { resourceOwner: "org123" },
+        type: {
+          case: "human",
+          value: { email: { email: "User@Test.com" } },
+        },
+        state: UserState.ACTIVE,
+      };
+
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockGetLoginSettings.mockResolvedValue({
+        disableLoginWithPhone: true,
+        allowLocalAuthentication: true,
+      });
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({
+        session: { factors: { user: { id: "user123", loginName: "user@orgdomain.com", organizationId: "org123" } } },
+        sessionCookie: {},
+      });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+
+      const result = await sendLoginname({ loginName: "user@test.com" });
+
+      expect(result).not.toEqual({ error: "errors.userNotFound" });
+      expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
+    });
+
+    test("should trim the login name before searching and echoing it back", async () => {
+      mockGetLoginSettings.mockResolvedValue({
+        ignoreUnknownUsernames: true,
+        allowLocalAuthentication: true,
+      });
+      mockSearchUsers.mockResolvedValue({ result: [] });
+
+      const result = await sendLoginname({ loginName: "  user@example.com  " });
+
+      expect(mockSearchUsers).toHaveBeenCalledWith(expect.objectContaining({ searchValue: "user@example.com" }));
+      // the raw input is echoed into the redirect while enumeration protection applies,
+      // so it has to be normalized there too
+      expect((result as any).redirect).toContain("loginName=user%40example.com");
+    });
+
     test("should redirect to password when ignoreUnknownUsernames is true and more than one user found", async () => {
       mockGetLoginSettings.mockResolvedValue({
         ignoreUnknownUsernames: true,
