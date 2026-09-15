@@ -38,6 +38,14 @@ export type SendLoginnameCommand = {
   suffix?: string;
 };
 
+// What sending a user to an identity provider can result in. Spelled out because `undefined` is a
+// real outcome here (there may be no provider to send them to), and callers have to handle it
+// instead of passing it on to the form, which then has nothing to act on.
+type IdentityProviderRedirect =
+  | { redirect: string; error?: undefined; samlData?: undefined }
+  | { error: string; redirect?: undefined; samlData?: undefined }
+  | { samlData: { url: string; fields: Record<string, string> }; redirect?: undefined; error?: undefined };
+
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
 export async function sendLoginname(command: SendLoginnameCommand) {
@@ -115,7 +123,28 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     return { error: t("errors.userNotFound") };
   };
 
-  const redirectUserToIDP = async (userId?: string, organization?: string) => {
+  // No single identity provider can be chosen for the user, so let them pick one on the IDP
+  // selection page instead of returning nothing at all.
+  const redirectUserToIDPSelection = (organization?: string): IdentityProviderRedirect => {
+    const params = new URLSearchParams();
+
+    if (command.requestId) {
+      params.set("requestId", command.requestId);
+    }
+
+    if (organization) {
+      params.set("organization", organization);
+    }
+
+    const query = params.toString();
+
+    return { redirect: query ? "/idp?" + query : "/idp" };
+  };
+
+  const redirectUserToIDP = async (
+    userId?: string,
+    organization?: string,
+  ): Promise<IdentityProviderRedirect | undefined> => {
     // If userId is provided, check for user-specific IDP links first
     let identityProviders: IDPLink[] = [];
     if (userId) {
@@ -129,6 +158,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const activeIdps = await getActiveIdentityProviders({ serviceConfig, orgId: organization }).then((resp) => {
         return resp.identityProviders.filter((idp) => idp.options?.isAutoCreation || idp.options?.isCreationAllowed);
       });
+
+      // Several providers are available and none of them is the obvious one, so the user chooses.
+      if (activeIdps.length > 1) {
+        return redirectUserToIDPSelection(organization);
+      }
 
       // If exactly one active IDP exists in the organization, redirect to it
       if (activeIdps.length === 1) {
@@ -236,6 +270,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       }
 
       return { redirect: response.url };
+    }
+
+    // The user has linked more than one identity provider, so there is no single destination.
+    if (identityProviders.length > 1) {
+      return redirectUserToIDPSelection(organization);
     }
   };
 
@@ -460,6 +499,12 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             return { error: resp.error };
           }
 
+          // The user authenticates through an identity provider, but none is available to send
+          // them to. Say so, because an empty response leaves the form with nothing to act on.
+          if (!resp) {
+            return { error: t("errors.couldNotFindIdentityProvider") };
+          }
+
           return resp;
         }
       }
@@ -485,8 +530,17 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
         return { redirect: "/passkey?" + passkeyParams };
       } else if (methods.authMethodTypes.includes(AuthenticationMethodType.IDP)) {
-        return redirectUserToIDP(userId, organization);
-      } else if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)) {
+        const idpResponse = await redirectUserToIDP(userId, organization);
+
+        if (idpResponse) {
+          return idpResponse;
+        }
+
+        // No identity provider to send the user to, so fall through to the other methods below
+        // rather than answering with nothing.
+      }
+
+      if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)) {
         // Check if password authentication is allowed
         if (!userLoginSettings?.allowLocalAuthentication) {
           if (ignoreUnknownUsernames) {
