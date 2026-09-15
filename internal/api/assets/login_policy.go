@@ -276,11 +276,11 @@ func (l *labelPolicyIconDownloader) ResourceOwner(ctx context.Context, _ string)
 }
 
 func (h *Handler) UploadDefaultLabelPolicyFont() Uploader {
-	return &labelPolicyFontUploader{h.idGenerator, true, []string{"font/", "application/octet-stream"}, 1 << 19}
+	return &labelPolicyFontUploader{h.idGenerator, true, []string{"font/", "application/octet-stream"}, h.maxFontSize}
 }
 
 func (h *Handler) UploadOrgLabelPolicyFont() Uploader {
-	return &labelPolicyFontUploader{h.idGenerator, false, []string{"font/", "application/octet-stream"}, 1 << 19}
+	return &labelPolicyFontUploader{h.idGenerator, false, []string{"font/", "application/octet-stream"}, h.maxFontSize}
 }
 
 type labelPolicyFontUploader struct {

@@ -637,6 +637,7 @@ func startAPIs(
 		assetsCache.Handler,
 		limitingAccessInterceptor.Handle,
 		translator,
+		config.AssetStorage.MaxFontSize,
 	))
 
 	federatedLogoutsCache, err := connector.StartCache[federatedlogout.Index, string, *federatedlogout.FederatedLogout](ctx, []federatedlogout.Index{federatedlogout.IndexRequestID}, cache.PurposeFederatedLogout, cacheConnectors.Config.FederatedLogouts, cacheConnectors)
