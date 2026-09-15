@@ -18,7 +18,7 @@ import { KeyboardShortcutsService } from './services/keyboard-shortcuts/keyboard
 import { ManagementService } from './services/mgmt.service';
 import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
-import { fallbackLanguage, supportedLanguages, supportedLanguagesRegexp } from './utils/language';
+import { fallbackLanguage, resolveSupportedLanguage, supportedLanguages } from './utils/language';
 import { PosthogService } from './services/posthog.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NewOrganizationService } from './services/new-organization.service';
@@ -284,12 +284,9 @@ export class AppComponent {
     this.translate.setDefaultLang(fallbackLanguage);
 
     this.authService.user.pipe(filter(Boolean), takeUntilDestroyed(this.destroyRef)).subscribe((userprofile) => {
-      const cropped = navigator.language.split('-')[0] ?? fallbackLanguage;
-      const fallbackLang = cropped.match(supportedLanguagesRegexp) ? cropped : fallbackLanguage;
+      const browserLang = resolveSupportedLanguage(navigator.language) ?? fallbackLanguage;
+      const lang = resolveSupportedLanguage(userprofile?.human?.profile?.preferredLanguage) ?? browserLang;
 
-      const lang = userprofile?.human?.profile?.preferredLanguage.match(supportedLanguagesRegexp)
-        ? userprofile.human.profile?.preferredLanguage
-        : fallbackLang;
       this.translate.use(lang);
       this.document.documentElement.lang = lang;
     });
