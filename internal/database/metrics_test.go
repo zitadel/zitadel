@@ -1,6 +1,7 @@
 package database
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -74,10 +75,8 @@ func Test_registerPoolMetrics(t *testing.T) {
 func findMetric(t *testing.T, rm metricdata.ResourceMetrics, name string) metricdata.Metrics {
 	t.Helper()
 	for _, sm := range rm.ScopeMetrics {
-		for _, m := range sm.Metrics {
-			if m.Name == name {
-				return m
-			}
+		if i := slices.IndexFunc(sm.Metrics, func(m metricdata.Metrics) bool { return m.Name == name }); i >= 0 {
+			return sm.Metrics[i]
 		}
 	}
 	t.Fatalf("metric %q not found in collected data", name)
