@@ -2,11 +2,12 @@ package database
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/zitadel/logging"
 	"go.opentelemetry.io/otel/metric"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 )
 
@@ -39,14 +40,14 @@ func registerPoolMetrics(ctx context.Context, m metrics.Metrics, pool *pgxpool.P
 			o.Observe(value(pool.Stat()))
 			return nil
 		})
-		logging.OnError(err).WithField("metric", name).Error("failed to register database pool gauge metric")
+		logging.OnError(ctx, err).Error("failed to register database pool gauge metric", slog.String("metric", name))
 	}
 	counter := func(name, description string, value func(*pgxpool.Stat) int64) {
 		err := m.RegisterCounterObserver(name, description, func(_ context.Context, o metric.Int64Observer) error {
 			o.Observe(value(pool.Stat()))
 			return nil
 		})
-		logging.OnError(err).WithField("metric", name).Error("failed to register database pool counter metric")
+		logging.OnError(ctx, err).Error("failed to register database pool counter metric", slog.String("metric", name))
 	}
 
 	gauge(PoolAcquiredConns, "Number of currently acquired connections in the pool", func(s *pgxpool.Stat) int64 { return int64(s.AcquiredConns()) })
