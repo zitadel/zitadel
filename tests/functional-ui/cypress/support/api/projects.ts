@@ -12,6 +12,10 @@ export function ensureProjectExists(api: API, projectName: string, orgId?: strin
   );
 }
 
+export function ensureProjectExistsInOrg(api: API, orgId: string, projectName: string) {
+  return ensureProjectExists(api, projectName, orgId);
+}
+
 export function ensureProjectDoesntExist(api: API, projectName: string, orgId?: string) {
   return ensureItemDoesntExist(
     api,

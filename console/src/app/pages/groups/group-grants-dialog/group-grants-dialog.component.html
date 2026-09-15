@@ -1,0 +1,69 @@
+<h2 mat-dialog-title>{{ 'GROUPS.GRANTS.TITLE' | translate }} — {{ data.group.name }}</h2>
+
+<mat-dialog-content>
+  <p class="cnsl-secondary-text">{{ 'GROUPS.GRANTS.DESCRIPTION' | translate }}</p>
+
+  <div class="add-grant" data-e2e="group-grant-add-form">
+    <h3>{{ 'GROUPS.GRANTS.PROJECTID' | translate }}</h3>
+    <cnsl-search-project-autocomplete
+      class="block"
+      data-e2e="group-grant-project-autocomplete"
+      (selectionChanged)="selectProject($event.project, $event.type)"
+    >
+    </cnsl-search-project-autocomplete>
+
+    @if (selectedProjectId()) {
+      <h3>{{ 'GROUPS.GRANTS.ROLEKEYS' | translate }}</h3>
+      <cnsl-project-roles-table
+        data-e2e="group-grant-roles-table"
+        [displayedColumns]="['select', 'key', 'displayname', 'group']"
+        [projectId]="selectedProjectId()"
+        [grantId]="selectedGrantId()"
+        [actionsVisible]="false"
+        [showSelectionActionButton]="false"
+        (changedSelection)="selectRoles($event)"
+      >
+      </cnsl-project-roles-table>
+    }
+
+    <div class="add-grant-actions">
+      <button
+        mat-raised-button
+        color="primary"
+        type="button"
+        data-e2e="group-grant-save"
+        [disabled]="!canSave"
+        (click)="addGrant()"
+      >
+        {{ 'GROUPS.GRANTS.ADD' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <div class="grants-list" *ngIf="!loading()">
+    <div class="grant-row" *ngFor="let grant of grants()">
+      <div class="grant-info">
+        <span class="project">{{ grant.projectId }}</span>
+        <span class="cnsl-secondary-text">{{ grant.roleKeys.join(', ') }}</span>
+      </div>
+      <button
+        mat-icon-button
+        color="warn"
+        matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+        data-e2e="group-grant-remove"
+        (click)="removeGrant(grant)"
+      >
+        <i class="las la-trash"></i>
+      </button>
+    </div>
+    <div class="grant-row empty" *ngIf="grants().length === 0">
+      <span class="cnsl-secondary-text">{{ 'GROUPS.GRANTS.EMPTY' | translate }}</span>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button (click)="dialogRef.close()">
+    {{ 'ACTIONS.CLOSE' | translate }}
+  </button>
+</mat-dialog-actions>

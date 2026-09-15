@@ -55,18 +55,13 @@ func (g *groupUsersProjection) Reducers() []handler.AggregateReducer {
 			Aggregate: group.AggregateType,
 			EventReducers: []handler.EventReducer{
 				{
-					Event:  group.GroupUsersAddedEventType,
-					Reduce: g.reduceGroupUsersAdded,
+					Event:  group.GroupUserAddedEventType,
+					Reduce: g.reduceGroupUserAdded,
 				},
 				{
-					Event:  group.GroupUsersRemovedEventType,
-					Reduce: g.reduceGroupUsersRemoved,
+					Event:  group.GroupUserRemovedEventType,
+					Reduce: g.reduceGroupUserRemoved,
 				},
-			},
-		},
-		{
-			Aggregate: group.AggregateType,
-			EventReducers: []handler.EventReducer{
 				{
 					Event:  group.GroupRemovedEventType,
 					Reduce: g.reduceGroupRemoved,
@@ -94,45 +89,48 @@ func (g *groupUsersProjection) Reducers() []handler.AggregateReducer {
 	}
 }
 
-func (g *groupUsersProjection) reduceGroupUsersAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, err := assertEvent[*group.GroupUsersAddedEvent](event)
+func (g *groupUsersProjection) reduceGroupUserAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*group.GroupUserAddedEvent](event)
 	if err != nil {
 		return nil, err
 	}
-
-	stmts := make([]func(eventstore.Event) handler.Exec, 0, len(e.UserIDs))
-	for _, userID := range e.UserIDs {
-		stmts = append(stmts, handler.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(GroupUsersColumnGroupID, e.Aggregate().ID),
-				handler.NewCol(GroupUsersColumnUserID, userID),
-				handler.NewCol(GroupUsersColumnResourceOwner, e.Aggregate().ResourceOwner),
-				handler.NewCol(GroupUsersColumnInstanceID, e.Aggregate().InstanceID),
-				handler.NewCol(GroupUsersColumnSequence, e.Sequence()),
-				handler.NewCol(GroupUsersColumnCreationDate, e.CreationDate()),
-			},
-		))
-	}
-	return handler.NewMultiStatement(e, stmts...), nil
+	// ON CONFLICT DO UPDATE is belt-and-suspenders alongside the eventstore
+	// unique constraint registered by GroupUserAddedEvent.UniqueConstraints();
+	// the constraint is the primary defense against duplicate memberships,
+	// the upsert keeps the projection self-healing if an old duplicate event
+	// is ever re-applied.
+	return handler.NewUpsertStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(GroupUsersColumnInstanceID, nil),
+			handler.NewCol(GroupUsersColumnGroupID, nil),
+			handler.NewCol(GroupUsersColumnUserID, nil),
+		},
+		[]handler.Column{
+			handler.NewCol(GroupUsersColumnGroupID, e.Aggregate().ID),
+			handler.NewCol(GroupUsersColumnUserID, e.UserID),
+			handler.NewCol(GroupUsersColumnResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(GroupUsersColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCol(GroupUsersColumnSequence, e.Sequence()),
+			handler.NewCol(GroupUsersColumnCreationDate, handler.OnlySetValueOnInsert(GroupUsersProjectionTable, e.CreationDate())),
+		},
+	), nil
 }
 
-func (g *groupUsersProjection) reduceGroupUsersRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, err := assertEvent[*group.GroupUsersRemovedEvent](event)
+func (g *groupUsersProjection) reduceGroupUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*group.GroupUserRemovedEvent](event)
 	if err != nil {
 		return nil, err
 	}
-	stmts := make([]func(eventstore.Event) handler.Exec, 0, len(e.UserIDs))
-	for _, userID := range e.UserIDs {
-		stmts = append(stmts, handler.AddDeleteStatement(
-			[]handler.Condition{
-				handler.NewCond(GroupUsersColumnGroupID, e.Aggregate().ID),
-				handler.NewCond(GroupUsersColumnUserID, userID),
-				handler.NewCond(GroupUsersColumnResourceOwner, e.Aggregate().ResourceOwner),
-				handler.NewCond(GroupUsersColumnInstanceID, e.Aggregate().InstanceID),
-			},
-		))
-	}
-	return handler.NewMultiStatement(e, stmts...), nil
+	return handler.NewDeleteStatement(
+		e,
+		[]handler.Condition{
+			handler.NewCond(GroupUsersColumnGroupID, e.Aggregate().ID),
+			handler.NewCond(GroupUsersColumnUserID, e.UserID),
+			handler.NewCond(GroupUsersColumnResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCond(GroupUsersColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
 }
 
 func (g *groupUsersProjection) reduceGroupRemoved(event eventstore.Event) (*handler.Statement, error) {

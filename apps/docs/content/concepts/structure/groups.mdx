@@ -1,0 +1,95 @@
+---
+title: User Groups
+description: "Organize the users of an organization into groups, manage memberships, and include group memberships in tokens."
+sidebar_label: User Groups
+---
+
+A user group is a named collection of users that belongs to an [organization](/guides/manage/console/organizations-overview).
+Groups help administrators organize users — for example by team, department, or customer — and allow applications
+to receive a user's group memberships in tokens.
+
+## Group Structure
+
+- A group has a **name** and an optional **description**.
+- Group names are unique inside their organization. Uniqueness is case-insensitive: `Admins` and `admins` are considered the same name.
+- Both **human users** and **machine users** can be members of a group, as long as they belong to the same organization as the group.
+- **Groups are flat**: a group cannot be a member of another group, and every membership is direct.
+  [SCIM (RFC 7643)](https://www.rfc-editor.org/rfc/rfc7643) allows nested groups (members of type `Group`)
+  and distinguishes `direct` from `indirect` memberships — ZITADEL rejects `Group` members explicitly
+  and reports all memberships as `direct`, so the behavior is unambiguous for provisioning tools.
+- Deleting a user removes them from all groups. Deleting an organization removes all of its groups.
+
+## Managing Groups
+
+Groups are managed in the [Console](/guides/manage/console/groups-overview) or through the
+[Group API](/reference/api/group): create, update, and delete groups,
+add or remove users, and search groups or memberships.
+Group listings include the number of users per group.
+
+Adding users to a group is all-or-nothing: if any of the given users does not exist in the organization,
+no users are added and the error lists all missing user IDs.
+Users that are already members are ignored, so requests can safely be retried.
+
+The following permissions control access to groups:
+
+| Permission          | Allows                          |
+| ------------------- | ------------------------------- |
+| `group.create`      | Create groups                   |
+| `group.read`        | Read and search groups          |
+| `group.write`       | Update groups                   |
+| `group.delete`      | Delete groups                   |
+| `group.user.write`  | Add users to groups             |
+| `group.user.read`   | Read and search group members   |
+| `group.user.delete` | Remove users from groups        |
+
+These permissions are included in the default `IAM_OWNER`, `ORG_OWNER`, and related manager roles.
+
+## Group Memberships in Tokens
+
+Applications can request the user's group memberships with the [`groups` scope](/apis/openidoauth/scopes).
+The resulting `groups` claim follows [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068.html#section-2.2.3.1),
+with values encoded according to [SCIM (RFC 7643)](https://www.rfc-editor.org/rfc/rfc7643#section-4.1.2):
+
+```json
+{
+  "groups": [
+    { "value": "317391152422278297", "display": "Support Team" },
+    { "value": "317391152422278312", "display": "Engineering" }
+  ]
+}
+```
+
+`value` contains the stable group ID, `display` the group name.
+Use `value` for stable references in your application, since group names can change.
+The optional `type` sub-attribute (`direct`/`indirect` per RFC 7643) is omitted from claims:
+groups are flat, so every membership is direct.
+
+For SAML applications, the user's group names are included as a `groups` attribute in the assertion.
+An action that sets a `groups` attribute takes precedence over the built-in attribute.
+
+## Group Authorizations
+
+Project roles can be granted to a group: every member receives the granted roles in addition to their
+personal [authorizations](/concepts/structure/granted_projects).
+Group authorizations resolve when a user authenticates, so adding or removing members — or deleting the
+group or the grant — changes the effective roles immediately, without leftover permissions.
+Listings name the supplying group, so group-sourced roles can be distinguished from personal ones.
+
+Groups can also receive **ZITADEL manager roles** for their organization (e.g. `ORG_OWNER_VIEWER`):
+every member of the group acts with these roles, resolved when permissions are evaluated.
+Setting an empty role list removes them. Managing group manager roles requires the permission
+to manage organization members (`org.member.write`).
+
+## Automate with Actions
+
+Group changes can be automated with [Actions](/concepts/features/actions):
+all group events (`group.added`, `group.changed`, `group.removed`, `group.user.added`,
+`group.user.removed`, `group.grant.*`) can be used as event execution conditions, and every
+Group API method (e.g. `/zitadel.group.v2.GroupService/CreateGroup`) can be used as a
+request or response condition.
+
+## Current Limitations
+
+- Group-supplied manager roles resolve through the membership queries used by the console and the
+  legacy permission path; API permission checks evaluated with the `permission_check_v2` feature flag
+  do not include group-supplied manager roles yet.

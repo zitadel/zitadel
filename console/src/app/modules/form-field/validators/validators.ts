@@ -51,6 +51,20 @@ export function minLengthValidator(minLength: number): ValidatorFn {
   };
 }
 
+export function maxLengthValidator(maxLength: number): ValidatorFn {
+  return (c: AbstractControl): ValidationErrors | null => {
+    return i18nErr(Validators.maxLength(maxLength)(c), 'ERRORS.MAXLENGTH', { requiredLength: maxLength });
+  };
+}
+
+export function trimmedRequiredValidator(c: AbstractControl): ValidationErrors | null {
+  const value = c.value;
+  if (typeof value !== 'string') {
+    return requiredValidator(c);
+  }
+  return value.trim().length === 0 ? i18nErr({}, 'ERRORS.REQUIRED') : null;
+}
+
 export function passwordConfirmValidator(passwordControlName: string = 'password') {
   return (c: AbstractControl): ValidationErrors | null => {
     if (!c.parent || !c) {

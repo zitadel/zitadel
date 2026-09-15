@@ -82,6 +82,14 @@ const routes: Routes = [
     },
   },
   {
+    path: 'groups',
+    loadChildren: () => import('./pages/groups/groups.module'),
+    canActivate: [authGuard, roleGuard],
+    data: {
+      roles: ['group.read'],
+    },
+  },
+  {
     path: 'grants',
     loadChildren: () => import('./pages/grants/grants.module'),
     canActivate: [authGuard, roleGuard],

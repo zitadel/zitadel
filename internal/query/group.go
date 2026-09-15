@@ -58,6 +58,11 @@ var (
 		name:  projection.GroupColumnState,
 		table: groupsTable,
 	}
+
+	// groupUserCountColumn counts the members of a group as a correlated subquery
+	groupUserCountColumn = "(SELECT COUNT(*) FROM " + groupUsersTable.identifier() +
+		" WHERE " + GroupUsersColumnGroupID.identifier() + " = " + GroupColumnID.identifier() +
+		" AND " + GroupUsersColumnInstanceID.identifier() + " = " + GroupColumnInstanceID.identifier() + ")"
 )
 
 type Groups struct {
@@ -75,6 +80,7 @@ type Group struct {
 	InstanceID    string
 	State         domain.GroupState
 	Sequence      uint64
+	UserCount     uint64
 }
 
 type GroupSearchQuery struct {
@@ -129,7 +135,15 @@ func NewGroupOrganizationIdSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(GroupColumnResourceOwner, id, TextEquals)
 }
 
+func NewGroupDescriptionSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
+	return NewTextQuery(GroupColumnDescription, value, comparison)
+}
+
 func groupCheckPermission(ctx context.Context, resourceOwner, groupID string, permissionCheck domain.PermissionCheck) error {
+	// a nil check indicates an internal call where permissions are enforced by the caller
+	if permissionCheck == nil {
+		return nil
+	}
 	return permissionCheck(ctx, domain.PermissionGroupRead, resourceOwner, groupID)
 }
 
@@ -169,7 +183,8 @@ func prepareGroupQuery() (sq.SelectBuilder, func(*sql.Row) (*Group, error)) {
 			GroupColumnResourceOwner.identifier(),
 			GroupColumnInstanceID.identifier(),
 			GroupColumnSequence.identifier(),
-			GroupColumnState.identifier()).
+			GroupColumnState.identifier(),
+			groupUserCountColumn).
 			From(groupsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Group, error) {
@@ -184,6 +199,7 @@ func prepareGroupQuery() (sq.SelectBuilder, func(*sql.Row) (*Group, error)) {
 				&group.InstanceID,
 				&group.Sequence,
 				&group.State,
+				&group.UserCount,
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
@@ -204,7 +220,10 @@ func (q *Queries) searchGroups(ctx context.Context, queries *GroupSearchQuery, p
 	eq := sq.Eq{
 		GroupColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
+	// unique tiebreaker keeps pagination stable when sorting values collide
+	stmt, args, err := queries.toQuery(query).
+		OrderBy(GroupColumnID.identifier()).
+		Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-FpBnrv", "Errors.Query.InvalidRequest")
 	}
@@ -245,6 +264,7 @@ func prepareGroupsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Groups, error)) {
 			GroupColumnInstanceID.identifier(),
 			GroupColumnSequence.identifier(),
 			GroupColumnState.identifier(),
+			groupUserCountColumn,
 			countColumn.identifier()).
 			From(groupsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
@@ -263,6 +283,7 @@ func prepareGroupsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Groups, error)) {
 					&group.InstanceID,
 					&group.Sequence,
 					&group.State,
+					&group.UserCount,
 					&count,
 				)
 				if err != nil {
