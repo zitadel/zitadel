@@ -45,14 +45,19 @@ type MemberAddedEvent struct {
 
 	Roles  []string `json:"roles"`
 	UserID string   `json:"userId"`
+	// userResourceOwner is the user's home org. It is not persisted in the event payload.
+	userResourceOwner string
 }
 
 func (e *MemberAddedEvent) Payload() interface{} {
 	return e
 }
 
-func memberOwnerTags(agg *eventstore.Aggregate, userID string) []string {
-	tags := []string{eventstore.OwnerTag(eventstore.UniqueConstraintOwnerUser, userID)}
+func memberOwnerTags(agg *eventstore.Aggregate, userID, userResourceOwner string) []string {
+	tags := []string{
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerUser, userID),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, userResourceOwner),
+	}
 	switch agg.Type {
 	case projectAggregateType:
 		tags = append(tags,
@@ -66,7 +71,12 @@ func memberOwnerTags(agg *eventstore.Aggregate, userID string) []string {
 }
 
 func (e *MemberAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddMemberUniqueConstraint(e.Aggregate().ID, e.UserID).WithOwners(memberOwnerTags(e.Aggregate(), e.UserID)...)}
+	return []*eventstore.UniqueConstraint{NewAddMemberUniqueConstraint(e.Aggregate().ID, e.UserID).WithOwners(memberOwnerTags(e.Aggregate(), e.UserID, e.userResourceOwner)...)}
+}
+
+func (e *MemberAddedEvent) WithUserResourceOwner(userResourceOwner string) *MemberAddedEvent {
+	e.userResourceOwner = userResourceOwner
+	return e
 }
 
 func (e *MemberAddedEvent) FieldOperations(prefix string) []*eventstore.FieldOperation {

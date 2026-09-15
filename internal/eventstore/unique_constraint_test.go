@@ -45,6 +45,7 @@ func TestUniqueConstraint_WithOwners(t *testing.T) {
 		OwnerTag(UniqueConstraintOwnerOrg, "org1"),
 		"",
 		OwnerTag(UniqueConstraintOwnerUser, "user1"),
+		OwnerTag(UniqueConstraintOwnerOrg, "org1"),
 	)
 	if len(got.Owners) != 2 || got.Owners[0] != "org:org1" || got.Owners[1] != "user:user1" {
 		t.Errorf("unexpected owners: %#v", got.Owners)

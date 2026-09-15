@@ -47,10 +47,16 @@ func OwnerTag(kind, id string) string {
 
 func (u *UniqueConstraint) WithOwners(tags ...string) *UniqueConstraint {
 	owners := make([]string, 0, len(tags))
+	seen := make(map[string]struct{}, len(tags))
 	for _, tag := range tags {
-		if tag != "" {
-			owners = append(owners, tag)
+		if tag == "" {
+			continue
 		}
+		if _, ok := seen[tag]; ok {
+			continue
+		}
+		seen[tag] = struct{}{}
+		owners = append(owners, tag)
 	}
 	u.Owners = owners
 	return u

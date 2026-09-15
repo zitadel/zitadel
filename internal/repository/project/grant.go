@@ -53,7 +53,7 @@ func (e *GrantAddedEvent) Payload() interface{} {
 }
 
 func (e *GrantAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddProjectGrantUniqueConstraint(e.GrantedOrgID, e.Aggregate().ID).WithOwners(grantOwnerTags(e.Aggregate(), e.GrantedOrgID)...)}
+	return []*eventstore.UniqueConstraint{NewAddProjectGrantUniqueConstraint(e.GrantedOrgID, e.Aggregate().ID).WithOwners(grantOwnerTags(e.Aggregate(), e.GrantID, e.GrantedOrgID)...)}
 }
 
 func (e *GrantAddedEvent) Fields() []*eventstore.FieldOperation {
@@ -458,7 +458,10 @@ func (e *GrantRemovedEvent) Payload() interface{} {
 }
 
 func (e *GrantRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveProjectGrantUniqueConstraint(e.grantedOrgID, e.Aggregate().ID)}
+	return []*eventstore.UniqueConstraint{
+		NewRemoveProjectGrantUniqueConstraint(e.grantedOrgID, e.Aggregate().ID),
+		eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerGrant, e.GrantID),
+	}
 }
 
 func (e *GrantRemovedEvent) Fields() []*eventstore.FieldOperation {

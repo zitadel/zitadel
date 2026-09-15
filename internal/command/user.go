@@ -399,6 +399,11 @@ func (c *Commands) userWriteModelByID(ctx context.Context, userID, resourceOwner
 }
 
 func ExistsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id, resourceOwner string, machineOnly bool) (exists bool, err error) {
+	_, exists, err = existingUser(ctx, filter, id, resourceOwner, machineOnly)
+	return exists, err
+}
+
+func existingUser(ctx context.Context, filter preparation.FilterToQueryReducer, id, resourceOwner string, machineOnly bool) (userResourceOwner string, exists bool, err error) {
 	eventTypes := []eventstore.EventType{
 		user.MachineAddedEventType,
 		user.UserRemovedType,
@@ -420,19 +425,21 @@ func ExistsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id
 		EventTypes(eventTypes...).
 		Builder())
 	if err != nil {
-		return false, err
+		return "", false, err
 	}
 
 	for _, event := range events {
 		switch event.(type) {
 		case *user.HumanRegisteredEvent, *user.HumanAddedEvent, *user.MachineAddedEvent:
 			exists = true
+			userResourceOwner = event.Aggregate().ResourceOwner
 		case *user.UserRemovedEvent:
 			exists = false
+			userResourceOwner = ""
 		}
 	}
 
-	return exists, nil
+	return userResourceOwner, exists, nil
 }
 
 func (c *Commands) newUserInitCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*EncryptedCode, error) {

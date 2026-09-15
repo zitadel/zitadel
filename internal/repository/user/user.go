@@ -47,15 +47,23 @@ func NewRemoveUsernameUniqueConstraint(userName, resourceOwner string, orgScoped
 		uniqueUserName)
 }
 
-func NewUsernameUniqueConstraints(usernameChanges []string, resourceOwner string, orgScopedUsername, oldOrgScopedUsername bool) []*eventstore.UniqueConstraint {
+// UsernameChange is a username rewrite keyed by the owning user so owner tags stay intact.
+type UsernameChange struct {
+	Username string
+	UserID   string
+}
+
+func NewUsernameUniqueConstraints(usernameChanges []UsernameChange, resourceOwner string, orgScopedUsername, oldOrgScopedUsername bool) []*eventstore.UniqueConstraint {
 	if len(usernameChanges) == 0 || oldOrgScopedUsername == orgScopedUsername {
 		return []*eventstore.UniqueConstraint{}
 	}
 	changes := make([]*eventstore.UniqueConstraint, len(usernameChanges)*2)
-	orgTag := eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, resourceOwner)
-	for i, username := range usernameChanges {
-		changes[i*2] = NewRemoveUsernameUniqueConstraint(username, resourceOwner, oldOrgScopedUsername)
-		changes[i*2+1] = NewAddUsernameUniqueConstraint(username, resourceOwner, orgScopedUsername).WithOwners(orgTag)
+	for i, change := range usernameChanges {
+		changes[i*2] = NewRemoveUsernameUniqueConstraint(change.Username, resourceOwner, oldOrgScopedUsername)
+		changes[i*2+1] = NewAddUsernameUniqueConstraint(change.Username, resourceOwner, orgScopedUsername).WithOwners(
+			eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, resourceOwner),
+			eventstore.OwnerTag(eventstore.UniqueConstraintOwnerUser, change.UserID),
+		)
 	}
 	return changes
 }

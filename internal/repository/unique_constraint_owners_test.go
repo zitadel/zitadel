@@ -77,41 +77,59 @@ func TestUniqueConstraintOwners(t *testing.T) {
 		{
 			name: "project grant two orgs",
 			cmd:  project.NewGrantAddedEvent(ctx, agg(project.AggregateType, "project-1", "granting-org"), "grant-1", "granted-org", nil),
-			want: [][]string{{"org:granting-org", "org:granted-org", "project:project-1"}},
+			want: [][]string{{"org:granting-org", "org:granted-org", "project:project-1", "grant:grant-1"}},
 		},
 		{
 			name: "project grant member",
-			cmd:  project.NewProjectGrantMemberAddedEvent(ctx, agg(project.AggregateType, "project-1", "org-1"), "user-1", "grant-1", "ROLE"),
-			want: [][]string{{"org:org-1", "user:user-1", "project:project-1", "grant:grant-1"}},
+			cmd: project.NewProjectGrantMemberAddedEvent(ctx, agg(project.AggregateType, "project-1", "org-1"), "user-1", "grant-1", "ROLE").
+				WithOwnerOrgs("user-org", "granted-org"),
+			want: [][]string{{"org:org-1", "org:user-org", "org:granted-org", "user:user-1", "project:project-1", "grant:grant-1"}},
 		},
 		{
 			name: "user grant",
-			cmd:  usergrant.NewUserGrantAddedEvent(ctx, agg(user.AggregateType, "grant-row", "org-1"), "user-1", "project-1", "grant-1", nil),
-			want: [][]string{{"org:org-1", "user:user-1", "project:project-1", "grant:grant-1"}},
+			cmd: usergrant.NewUserGrantAddedEvent(ctx, agg(user.AggregateType, "grant-row", "org-1"), "user-1", "project-1", "grant-1", nil).
+				WithOwnerOrgs("user-org", "project-org", "granted-org"),
+			want: [][]string{{"org:org-1", "org:user-org", "org:project-org", "org:granted-org", "user:user-1", "project:project-1", "grant:grant-1"}},
 		},
 		{
 			name: "org member",
-			cmd: &member.MemberAddedEvent{
-				BaseEvent: eventstore.BaseEvent{Agg: agg(org.AggregateType, "org-1", "org-1")},
-				UserID:    "user-1",
-			},
+			cmd: member.NewMemberAddedEvent(
+				&eventstore.BaseEvent{Agg: agg(org.AggregateType, "org-1", "org-1")},
+				"user-1",
+			).WithUserResourceOwner("org-1"),
 			want: [][]string{{"user:user-1", "org:org-1"}},
 		},
 		{
+			name: "org member cross-org user",
+			cmd: member.NewMemberAddedEvent(
+				&eventstore.BaseEvent{Agg: agg(org.AggregateType, "org-1", "org-1")},
+				"user-1",
+			).WithUserResourceOwner("user-org"),
+			want: [][]string{{"user:user-1", "org:user-org", "org:org-1"}},
+		},
+		{
 			name: "project member",
-			cmd: &member.MemberAddedEvent{
-				BaseEvent: eventstore.BaseEvent{Agg: agg(project.AggregateType, "project-1", "org-1")},
-				UserID:    "user-1",
-			},
+			cmd: member.NewMemberAddedEvent(
+				&eventstore.BaseEvent{Agg: agg(project.AggregateType, "project-1", "org-1")},
+				"user-1",
+			).WithUserResourceOwner("org-1"),
 			want: [][]string{{"user:user-1", "org:org-1", "project:project-1"}},
 		},
 		{
+			name: "project member cross-org user",
+			cmd: member.NewMemberAddedEvent(
+				&eventstore.BaseEvent{Agg: agg(project.AggregateType, "project-1", "org-1")},
+				"user-1",
+			).WithUserResourceOwner("user-org"),
+			want: [][]string{{"user:user-1", "org:user-org", "org:org-1", "project:project-1"}},
+		},
+		{
 			name: "instance member",
-			cmd: &member.MemberAddedEvent{
-				BaseEvent: eventstore.BaseEvent{Agg: agg(instance.AggregateType, "instance-1", "instance-1")},
-				UserID:    "user-1",
-			},
-			want: [][]string{{"user:user-1"}},
+			cmd: member.NewMemberAddedEvent(
+				&eventstore.BaseEvent{Agg: agg(instance.AggregateType, "instance-1", "instance-1")},
+				"user-1",
+			).WithUserResourceOwner("user-org"),
+			want: [][]string{{"user:user-1", "org:user-org"}},
 		},
 		{
 			name: "group name",
@@ -184,6 +202,25 @@ func TestBulkRemoveAlsoEmitsRemoveByOwner(t *testing.T) {
 	projectConstraints := project.NewProjectRemovedEvent(ctx, projectAgg, "docs", nil).UniqueConstraints()
 	assert.Equal(t, eventstore.UniqueConstraintRemoveByOwner, projectConstraints[1].Action)
 	assert.Equal(t, []string{"project:project-1"}, projectConstraints[1].Owners)
+
+	grantConstraints := project.NewGrantRemovedEvent(ctx, projectAgg, "grant-1", "granted-org").UniqueConstraints()
+	require.Len(t, grantConstraints, 2)
+	assert.Equal(t, eventstore.UniqueConstraintRemove, grantConstraints[0].Action)
+	assert.Equal(t, eventstore.UniqueConstraintRemoveByOwner, grantConstraints[1].Action)
+	assert.Equal(t, []string{"grant:grant-1"}, grantConstraints[1].Owners)
+}
+
+func TestUsernameScopeRewriteKeepsUserTag(t *testing.T) {
+	constraints := user.NewUsernameUniqueConstraints(
+		[]user.UsernameChange{{Username: "alice", UserID: "user-1"}},
+		"org-1",
+		true,
+		false,
+	)
+	require.Len(t, constraints, 2)
+	assert.Equal(t, eventstore.UniqueConstraintRemove, constraints[0].Action)
+	assert.Equal(t, eventstore.UniqueConstraintAdd, constraints[1].Action)
+	assert.ElementsMatch(t, []string{"org:org-1", "user:user-1"}, constraints[1].Owners)
 }
 
 func agg(typ eventstore.AggregateType, id, resourceOwner string) *eventstore.Aggregate {

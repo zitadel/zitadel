@@ -18,7 +18,7 @@ type OrganizationSettingsSetEvent struct {
 
 	OrganizationScopedUsernames    bool `json:"organizationScopedUsernames,omitempty"`
 	oldOrganizationScopedUsernames bool
-	usernameChanges                []string
+	usernameChanges                []user.UsernameChange
 }
 
 func (e *OrganizationSettingsSetEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -36,7 +36,7 @@ func (e *OrganizationSettingsSetEvent) UniqueConstraints() []*eventstore.UniqueC
 func NewOrganizationSettingsAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	usernameChanges []string,
+	usernameChanges []user.UsernameChange,
 	organizationScopedUsernames bool,
 	oldOrganizationScopedUsernames bool,
 ) *OrganizationSettingsSetEvent {
@@ -55,7 +55,7 @@ type OrganizationSettingsRemovedEvent struct {
 
 	organizationScopedUsernames    bool
 	oldOrganizationScopedUsernames bool
-	usernameChanges                []string
+	usernameChanges                []user.UsernameChange
 }
 
 func (e *OrganizationSettingsRemovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -73,7 +73,7 @@ func (e *OrganizationSettingsRemovedEvent) UniqueConstraints() []*eventstore.Uni
 func NewOrganizationSettingsRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	usernameChanges []string,
+	usernameChanges []user.UsernameChange,
 	organizationScopedUsernames bool,
 	oldOrganizationScopedUsernames bool,
 ) *OrganizationSettingsRemovedEvent {
