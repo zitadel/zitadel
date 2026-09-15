@@ -359,7 +359,8 @@
       "couldNotCreateSession": "Oturum oluşturulamadı",
       "userNotFound": "Kullanıcı sistemde bulunamadı",
       "couldNotLinkIDP": "IDP kullanıcıya bağlanamadı",
-      "couldNotRegisterUser": "Kullanıcı kayıt edilemedi"
+      "couldNotRegisterUser": "Kullanıcı kayıt edilemedi",
+      "registerNotAllowed": "Kayıt olmasına izin verilmiyor"
     }
   },
   "invite": {
