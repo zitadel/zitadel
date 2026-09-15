@@ -578,6 +578,14 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate, permissionCheck Organizati
 				return nil, nil
 			}
 
+			ownerDeleteReady, err := c.isUniqueConstraintOwnerDeleteReady(ctx)
+			if err != nil {
+				return nil, err
+			}
+			if ownerDeleteReady {
+				return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, nil, false, nil, nil, nil)}, nil
+			}
+
 			domainPolicy, err := domainPolicyWriteModel(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err

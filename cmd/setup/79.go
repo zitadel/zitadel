@@ -20,6 +20,15 @@ var (
 
 type BackfillUniqueConstraintOwners struct {
 	dbClient *database.DB
+	Version  string `json:"version"`
+}
+
+func (mig *BackfillUniqueConstraintOwners) Check(lastRun map[string]interface{}) bool {
+	if lastRun == nil {
+		return true
+	}
+	currentVersion, _ := lastRun["version"].(string)
+	return currentVersion != mig.Version
 }
 
 func (mig *BackfillUniqueConstraintOwners) Execute(ctx context.Context, _ eventstore.Event) error {
@@ -41,7 +50,8 @@ func (mig *BackfillUniqueConstraintOwners) Execute(ctx context.Context, _ events
 	var unmatched int64
 	err = mig.dbClient.QueryRowContext(ctx, func(row *sql.Row) error {
 		return row.Scan(&unmatched)
-	}, `SELECT COUNT(*) FROM eventstore.unique_constraints WHERE owners = '{}'`)
+	}, `SELECT COUNT(*) FROM eventstore.unique_constraints WHERE unique_type = ANY($1) AND owners = '{}'`,
+		database.TextArray[string](eventstore.UniqueTypesWithOwners))
 	if err != nil {
 		return err
 	}
@@ -50,7 +60,7 @@ func (mig *BackfillUniqueConstraintOwners) Execute(ctx context.Context, _ events
 }
 
 func (mig *BackfillUniqueConstraintOwners) String() string {
-	return "79_backfill_unique_constraint_owners"
+	return eventstore.UniqueConstraintOwnersBackfillStep
 }
 
 func isUndefinedTable(err error) bool {

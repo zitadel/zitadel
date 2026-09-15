@@ -5,7 +5,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/migration"
 )
+
+var _ migration.RepeatableMigration = (*BackfillUniqueConstraintOwners)(nil)
 
 func TestBackfillUniqueConstraintOwnersStmts(t *testing.T) {
 	statements, err := readStatements(backfillUniqueConstraintOwnersFS, "79")
@@ -48,4 +53,19 @@ func TestBackfillUniqueConstraintOwnersStmts(t *testing.T) {
 			assert.Contains(t, stmt.query, extra)
 		}
 	}
+}
+
+func TestBackfillUniqueConstraintOwners_Check(t *testing.T) {
+	mig := &BackfillUniqueConstraintOwners{Version: "v2.0.0"}
+
+	assert.True(t, mig.Check(nil), "missing lastRun should run")
+	assert.True(t, mig.Check(map[string]interface{}{}), "empty lastRun should run")
+	assert.True(t, mig.Check(map[string]interface{}{"version": "v1.0.0"}), "different version should run")
+	assert.False(t, mig.Check(map[string]interface{}{"version": "v2.0.0"}), "same version should skip")
+}
+
+func TestUniqueTypesWithOwnersOmitsMailText(t *testing.T) {
+	assert.NotContains(t, eventstore.UniqueTypesWithOwners, "mail_text")
+	assert.Contains(t, eventstore.UniqueTypesWithOwners, "usernames")
+	assert.Contains(t, eventstore.UniqueTypesWithOwners, "idp_config_names")
 }

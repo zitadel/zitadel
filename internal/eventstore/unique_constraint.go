@@ -32,7 +32,30 @@ const (
 	UniqueConstraintOwnerIDP     = "idp"
 	UniqueConstraintOwnerProject = "project"
 	UniqueConstraintOwnerGrant   = "grant"
+
+	// UniqueConstraintOwnersBackfillStep is the setup migration that stamps owners from projections.
+	UniqueConstraintOwnersBackfillStep = "79_backfill_unique_constraint_owners"
 )
+
+// UniqueTypesWithOwners are unique_types that live writes and setup 79 stamp with owner tags.
+// Instance mail_text shares unique_type "mail_text" but stays empty by design, so it is omitted.
+var UniqueTypesWithOwners = []string{
+	"usernames",
+	"external_idps",
+	"org_name",
+	"org_domain",
+	"project_names",
+	"appname",
+	"project_role",
+	"entity_ids",
+	"project_grant",
+	"project_grant_member",
+	"user_grant",
+	"member",
+	"group_name",
+	"action_names",
+	"idp_config_names",
+}
 
 func (f UniqueConstraintAction) Valid() bool {
 	return f >= 0 && f < uniqueConstraintActionCount

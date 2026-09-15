@@ -60,3 +60,14 @@ func TestUniqueConstraint_WithOwners(t *testing.T) {
 		t.Errorf("empty kind should not stamp owners: %#v", empty.Owners)
 	}
 }
+
+func TestUniqueTypesWithOwners(t *testing.T) {
+	if len(UniqueTypesWithOwners) == 0 {
+		t.Fatal("UniqueTypesWithOwners must not be empty")
+	}
+	for _, typ := range UniqueTypesWithOwners {
+		if typ == "mail_text" {
+			t.Fatal("mail_text must be omitted: instance rows stay empty")
+		}
+	}
+}

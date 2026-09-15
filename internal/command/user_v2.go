@@ -152,7 +152,19 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 	}
 
 	var events []eventstore.Command
-	events = append(events, user.NewUserRemovedEvent(ctx, &existingUser.Aggregate().Aggregate, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain || organizationScopedUsername))
+	userName := existingUser.UserName
+	idpLinks := existingUser.IDPLinks
+	orgScoped := domainPolicy.UserLoginMustBeDomain || organizationScopedUsername
+	ownerDeleteReady, err := c.isUniqueConstraintOwnerDeleteReady(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if ownerDeleteReady {
+		userName = ""
+		idpLinks = nil
+		orgScoped = false
+	}
+	events = append(events, user.NewUserRemovedEvent(ctx, &existingUser.Aggregate().Aggregate, userName, idpLinks, orgScoped))
 
 	for _, grantID := range cascadingGrantIDs {
 		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true, true, nil)
