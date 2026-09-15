@@ -12,7 +12,6 @@ import {
   verifyTOTPRegistration,
   sendEmailCode as zitadelSendEmailCode,
 } from "@/lib/zitadel";
-import crypto from "crypto";
 
 import { create } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
@@ -26,6 +25,7 @@ import { getOrSetFingerprintId } from "../fingerprint";
 import { checkMFAFactors } from "../mfa-helper";
 import { getServiceConfig } from "../service-url";
 import { loadMostRecentSession } from "../session";
+import { computeUserVerificationCheck } from "../verification-check";
 import { createSessionAndUpdateCookie } from "./cookie";
 import { getEnrollmentAuthorizationError } from "./enrollment-guard";
 import { getPublicHostWithProtocol } from "./host";
@@ -176,7 +176,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     const cookiesList = await cookies();
     const userAgentId = await getOrSetFingerprintId();
 
-    const verificationCheck = crypto.createHash("sha256").update(`${user.userId}:${userAgentId}`).digest("hex");
+    const verificationCheck = computeUserVerificationCheck(user.userId, userAgentId);
 
     await cookiesList.set({
       name: "verificationCheck",
