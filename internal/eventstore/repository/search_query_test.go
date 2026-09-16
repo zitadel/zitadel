@@ -153,6 +153,7 @@ func TestQueryFromBuilder_eventTypeScans(t *testing.T) {
 		name    string
 		builder *eventstore.SearchQueryBuilder
 		want    []EventTypeScan
+		wantErr bool
 	}{
 		{
 			name: "not requested",
@@ -175,29 +176,32 @@ func TestQueryFromBuilder_eventTypeScans(t *testing.T) {
 		{
 			name:    "sub query with several aggregate types",
 			builder: base().AddQuery().AggregateTypes("user", "org").EventTypes("user.locked", "org.removed").Builder(),
-			want:    nil,
+			wantErr: true,
 		},
 		{
 			name:    "sub query without event types",
 			builder: base().AddQuery().AggregateTypes("user").Builder(),
-			want:    nil,
+			wantErr: true,
 		},
 		{
 			name:    "sub query with aggregate ids",
 			builder: base().AddQuery().AggregateTypes("user").AggregateIDs("id").EventTypes("user.locked").Builder(),
-			want:    nil,
+			wantErr: true,
 		},
 		{
 			name:    "sub query with event data",
 			builder: base().AddQuery().AggregateTypes("user").EventTypes("user.locked").EventData(map[string]any{"key": "value"}).Builder(),
-			want:    nil,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			query, err := QueryFromBuilder(tt.builder)
-			if err != nil {
-				t.Fatalf("QueryFromBuilder() error = %v", err)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("QueryFromBuilder() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if tt.wantErr {
+				return
 			}
 			if !reflect.DeepEqual(query.EventTypeScans, tt.want) {
 				t.Errorf("EventTypeScans = %v, want %v", query.EventTypeScans, tt.want)

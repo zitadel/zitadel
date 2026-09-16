@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func Test_query_event_type_scans(t *testing.T) {
@@ -78,18 +79,6 @@ func Test_query_event_type_scans(t *testing.T) {
 			},
 		},
 		{
-			name: "sub query filtering by aggregate id is not scanned separately",
-			query: projectionQuery().
-				AfterEventSortKey(cursor).
-				AddQuery().AggregateTypes("user").AggregateIDs("agg-a").EventTypes("user.locked").Builder(),
-			sql: `SELECT ` + eventColumnsSQL + ` FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND aggregate_id = $3 AND event_type = $4 AND (` + eventSortKeySQL + `) > ($5, $6, $7, $8, $9, $10) AND "position" <= EXTRACT(EPOCH FROM now()) ORDER BY ` + eventSortKeySQL + ` LIMIT $11`,
-			args: []driver.Value{
-				"instanceID", eventstore.AggregateType("user"), "agg-a", eventstore.EventType("user.locked"),
-				cursor.Position, cursor.InTxOrder, cursor.InstanceID, cursor.AggregateType, cursor.AggregateID, cursor.Sequence,
-				uint64(200),
-			},
-		},
-		{
 			name: "descending order is not scanned separately",
 			query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 				InstanceID("instanceID").
@@ -121,6 +110,18 @@ func Test_query_event_type_scans(t *testing.T) {
 			assert.NoError(t, mock.mock.ExpectationsWereMet())
 		})
 	}
+
+	t.Run("sub query filtering by aggregate id returns an error", func(t *testing.T) {
+		mock := newMockClient(t)
+		client.DB.DB = mock.client
+
+		err := query(t.Context(), client,
+			projectionQuery().AddQuery().AggregateTypes("user").AggregateIDs("agg-a").EventTypes("user.locked").Builder(),
+			&[]*repository.Event{}, false,
+		)
+		require.ErrorIs(t, err, zerrors.ThrowInvalidArgument(nil, "REPO-Ahx6e", ""))
+		assert.NoError(t, mock.mock.ExpectationsWereMet())
+	})
 }
 
 // Test_query_event_type_scans_postgres checks against a real database that reading every combination of
