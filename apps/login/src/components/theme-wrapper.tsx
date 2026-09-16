@@ -11,6 +11,24 @@ type Props = {
   children: ReactNode;
 };
 
+// Tells the browser which color schemes the page supports. Chrome on Android and
+// Samsung Internet darken pages that don't declare one ("Auto Dark Theme"), which
+// inverts a forced light theme and hides checked checkboxes. "only light" / "only dark"
+// is the documented opt-out; without a forced theme the declaration is removed again.
+function setColorSchemeMeta(value: string | null) {
+  let meta = document.head.querySelector<HTMLMetaElement>('meta[name="color-scheme"]');
+  if (value === null) {
+    meta?.remove();
+    return;
+  }
+  if (!meta) {
+    meta = document.createElement("meta");
+    meta.name = "color-scheme";
+    document.head.appendChild(meta);
+  }
+  meta.content = value;
+}
+
 export const ThemeWrapper = ({ children, branding }: Props) => {
   const { setTheme: setNextTheme } = useTheme();
 
@@ -91,6 +109,7 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
       switch (branding.themeMode) {
         case ThemeMode.LIGHT:
           document.documentElement.classList.remove("dark");
+          setColorSchemeMeta("only light");
           try {
             localStorage.setItem("cp-theme", "light");
           } catch {
@@ -100,6 +119,7 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
           break;
         case ThemeMode.DARK:
           document.documentElement.classList.add("dark");
+          setColorSchemeMeta("only dark");
           try {
             localStorage.setItem("cp-theme", "dark");
           } catch {
@@ -110,6 +130,7 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
         case ThemeMode.AUTO:
         case ThemeMode.UNSPECIFIED:
         default:
+          setColorSchemeMeta(null);
           setNextTheme("system");
           break;
       }
