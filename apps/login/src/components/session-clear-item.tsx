@@ -4,9 +4,10 @@ import { clearSession } from "@/lib/server/session";
 import { timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import moment from "moment";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Alert } from "./alert";
 import { Avatar } from "./avatar";
 import { isSessionPrimaryFactorAndLifetimeValid } from "./session-item";
 import { Translated } from "./translated";
@@ -14,83 +15,93 @@ import { Translated } from "./translated";
 export function SessionClearItem({ session, reload }: { session: Session; reload: () => void }) {
   const currentLocale = useLocale();
   moment.locale(currentLocale === "zh" ? "zh-cn" : currentLocale);
+  const t = useTranslations("error");
 
   const [_loading, setLoading] = useState<boolean>(false);
 
-  async function clearSessionId(id: string) {
+  /**
+   * Returns true when the session was removed (server-side and from the cookie).
+   * On failure the error is shown and the card must stay in the list.
+   */
+  async function clearSessionId(id: string): Promise<boolean> {
     setLoading(true);
-    const response = await clearSession({
-      sessionId: id,
-    })
-      .catch((error) => {
-        setError(error.message);
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-
-    return response;
+    setError(null);
+    try {
+      const response = await clearSession({ sessionId: id });
+      if (response && "error" in response && response.error) {
+        setError(response.error);
+        return false;
+      }
+      return true;
+    } catch {
+      setError(t("couldNotClearSession"));
+      return false;
+    } finally {
+      setLoading(false);
+    }
   }
 
   const { valid, verifiedAt } = isSessionPrimaryFactorAndLifetimeValid(session);
 
-  const [_error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // TODO: To we have to call this?
   useRouter();
 
   return (
-    <button
-      onClick={async () => {
-        clearSessionId(session.id).then(() => {
-          reload();
-        });
-      }}
-      className="group border-divider-light bg-background-light-400 dark:bg-background-dark-400 flex flex-row items-center rounded-md border px-4 py-2 transition-all hover:shadow-lg dark:hover:bg-white/10"
-    >
-      <div className="pr-4">
-        <Avatar
-          size="small"
-          loginName={session.factors?.user?.loginName as string}
-          name={session.factors?.user?.displayName ?? ""}
-        />
-      </div>
-
-      <div className="flex flex-col items-start overflow-hidden">
-        <span className="">{session.factors?.user?.displayName}</span>
-        <span className="text-xs text-ellipsis opacity-80">{session.factors?.user?.loginName}</span>
-        {valid ? (
-          <span className="text-xs text-ellipsis opacity-80">
-            {verifiedAt && (
-              <Translated
-                i18nKey="verifiedAt"
-                namespace="logout"
-                data={{ time: moment(timestampDate(verifiedAt)).fromNow() }}
-              />
-            )}
-          </span>
-        ) : (
-          verifiedAt && (
-            <span className="text-xs text-ellipsis opacity-80">
-              expired {session.expirationDate && moment(timestampDate(session.expirationDate)).fromNow()}
-            </span>
-          )
-        )}
-      </div>
-
-      <span className="flex-grow"></span>
-      <div className="relative flex flex-row items-center">
-        <div className="text-warn-light-500 dark:text-warn-dark-500 mr-6 flex hidden items-center justify-center rounded-full bg-[#ff0000]/10 px-2 py-[2px] text-xs transition-all group-hover:block dark:bg-[#ff0000]/10">
-          <Translated i18nKey="clear" namespace="logout" />
+    <>
+      <button
+        onClick={async () => {
+          if (await clearSessionId(session.id)) {
+            reload();
+          }
+        }}
+        className="group border-divider-light bg-background-light-400 dark:bg-background-dark-400 flex flex-row items-center rounded-md border px-4 py-2 transition-all hover:shadow-lg dark:hover:bg-white/10"
+      >
+        <div className="pr-4">
+          <Avatar
+            size="small"
+            loginName={session.factors?.user?.loginName as string}
+            name={session.factors?.user?.displayName ?? ""}
+          />
         </div>
 
-        {valid ? (
-          <div className="absolute right-0 mx-2 h-2 w-2 transform rounded-full bg-green-500 transition-all"></div>
-        ) : (
-          <div className="absolute right-0 mx-2 h-2 w-2 transform rounded-full bg-red-500 transition-all"></div>
-        )}
-      </div>
-    </button>
+        <div className="flex flex-col items-start overflow-hidden">
+          <span className="">{session.factors?.user?.displayName}</span>
+          <span className="text-xs text-ellipsis opacity-80">{session.factors?.user?.loginName}</span>
+          {valid ? (
+            <span className="text-xs text-ellipsis opacity-80">
+              {verifiedAt && (
+                <Translated
+                  i18nKey="verifiedAt"
+                  namespace="logout"
+                  data={{ time: moment(timestampDate(verifiedAt)).fromNow() }}
+                />
+              )}
+            </span>
+          ) : (
+            verifiedAt && (
+              <span className="text-xs text-ellipsis opacity-80">
+                expired {session.expirationDate && moment(timestampDate(session.expirationDate)).fromNow()}
+              </span>
+            )
+          )}
+        </div>
+
+        <span className="flex-grow"></span>
+        <div className="relative flex flex-row items-center">
+          <div className="text-warn-light-500 dark:text-warn-dark-500 mr-6 flex hidden items-center justify-center rounded-full bg-[#ff0000]/10 px-2 py-[2px] text-xs transition-all group-hover:block dark:bg-[#ff0000]/10">
+            <Translated i18nKey="clear" namespace="logout" />
+          </div>
+
+          {valid ? (
+            <div className="absolute right-0 mx-2 h-2 w-2 transform rounded-full bg-green-500 transition-all"></div>
+          ) : (
+            <div className="absolute right-0 mx-2 h-2 w-2 transform rounded-full bg-red-500 transition-all"></div>
+          )}
+        </div>
+      </button>
+      {error && <Alert>{error}</Alert>}
+    </>
   );
 }

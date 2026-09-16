@@ -138,9 +138,23 @@ The information sent to the Endpoint is structured as JSON:
       "projectId": "",
       "projectName": ""
     }
-  ]
+  ],
+  "application": {
+    "client_id": "The client_id of the application the token was requested for"
+  },
+  "actor": {
+    "user_id": "The ID of the user acting on behalf of the token subject",
+    "issuer": "The issuer of the token the actor was authenticated with",
+    "actor": {
+      "user_id": "The previous actor in the delegation chain, if there is one",
+      "issuer": ""
+    }
+  }
 }
 ```
+
+The `actor` object corresponds to the `act` claim of the token. It is only sent if the token was
+obtained through [token exchange](/guides/integrate/token-exchange#actor-token) or impersonation.
 
 The expected structure of the JSON as response:
 
@@ -232,9 +246,23 @@ The information sent to the Endpoint is structured as JSON:
       "projectId": "",
       "projectName": ""
     }
-  ]
+  ],
+  "application": {
+    "client_id": "The client_id of the application the token was requested for"
+  },
+  "actor": {
+    "user_id": "The ID of the user acting on behalf of the token subject",
+    "issuer": "The issuer of the token the actor was authenticated with",
+    "actor": {
+      "user_id": "The previous actor in the delegation chain, if there is one",
+      "issuer": ""
+    }
+  }
 }
 ```
+
+The `actor` object corresponds to the `act` claim of the token. It is only sent if the token was
+obtained through [token exchange](/guides/integrate/token-exchange#actor-token) or impersonation.
 
 The expected structure of the JSON as response:
 

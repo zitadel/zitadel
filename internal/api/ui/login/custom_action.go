@@ -99,6 +99,7 @@ func (l *Login) runPostExternalAuthenticationActions(
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
+				actions.SetFields("appendMetadataRaw", metadataList.AppendMetadataRawFunc),
 			),
 		),
 	)
@@ -201,6 +202,7 @@ func (l *Login) runPostInternalAuthenticationActions(
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
+				actions.SetFields("appendMetadataRaw", metadataList.AppendMetadataRawFunc),
 			),
 		),
 	)
@@ -304,6 +306,7 @@ func (l *Login) runPreCreationActions(
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
+				actions.SetFields("appendMetadataRaw", metadataList.AppendMetadataRawFunc),
 			),
 		),
 	)

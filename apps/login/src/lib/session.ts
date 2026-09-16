@@ -126,14 +126,22 @@ export async function isSessionValid({
       method === AuthenticationMethodType.U2F,
   );
 
+  // A user-verified passkey (possession + user verification) is inherently multi-factor.
+  // Mirrors the passkey escape in checkMFAFactors, which never prompts for an additional
+  // second factor after a passkey login. Without this, users with a passkey plus a
+  // configured TOTP/OTP factor get stuck in a redirect loop on /passkey, because the
+  // flow never asks for the second factor but this check would deem the session invalid.
+  const hasAuthenticatedWithPasskey = !!session.factors.webAuthN?.verifiedAt && !!session.factors.webAuthN?.userVerified;
+
   if (mfaMethods && mfaMethods.length > 0) {
-    // User has MFA methods configured — they must be verified regardless of policy
+    // User has MFA methods configured — they must be verified regardless of policy,
+    // unless the session was already authenticated with a user-verified passkey
     const totpValid = mfaMethods.includes(AuthenticationMethodType.TOTP) && !!session.factors.totp?.verifiedAt;
     const otpEmailValid = mfaMethods.includes(AuthenticationMethodType.OTP_EMAIL) && !!session.factors.otpEmail?.verifiedAt;
     const otpSmsValid = mfaMethods.includes(AuthenticationMethodType.OTP_SMS) && !!session.factors.otpSms?.verifiedAt;
     const u2fValid = mfaMethods.includes(AuthenticationMethodType.U2F) && !!session.factors.webAuthN?.verifiedAt;
 
-    mfaValid = totpValid || otpEmailValid || otpSmsValid || u2fValid;
+    mfaValid = hasAuthenticatedWithPasskey || totpValid || otpEmailValid || otpSmsValid || u2fValid;
   } else if (isMfaRequired) {
     // No MFA methods configured, but MFA is forced by policy — check for any verified MFA factors
     const otpEmail = session.factors.otpEmail?.verifiedAt;

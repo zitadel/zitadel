@@ -26,6 +26,7 @@ type SearchQueryBuilder struct {
 	excludeAggregateIDs   *ExclusionQuery
 	tx                    *sql.Tx
 	positionAtLeast       decimal.Decimal
+	eventSortKeyAfter     *EventSortKey
 	awaitOpenTransactions bool
 	creationDateAfter     time.Time
 	creationDateBefore    time.Time
@@ -78,6 +79,10 @@ func (b *SearchQueryBuilder) GetTx() *sql.Tx {
 
 func (b SearchQueryBuilder) GetPositionAtLeast() decimal.Decimal {
 	return b.positionAtLeast
+}
+
+func (b SearchQueryBuilder) GetEventSortKeyAfter() *EventSortKey {
+	return b.eventSortKeyAfter
 }
 
 func (b SearchQueryBuilder) GetAwaitOpenTransactions() bool {
@@ -283,6 +288,12 @@ func (builder *SearchQueryBuilder) EditorUser(id string) *SearchQueryBuilder {
 // PositionAtLeast filters for events which happened after the specified time
 func (builder *SearchQueryBuilder) PositionAtLeast(position decimal.Decimal) *SearchQueryBuilder {
 	builder.positionAtLeast = position
+	return builder
+}
+
+// AfterEventSortKey resumes after the given event using a lexicographic row comparison.
+func (builder *SearchQueryBuilder) AfterEventSortKey(key EventSortKey) *SearchQueryBuilder {
+	builder.eventSortKeyAfter = &key
 	return builder
 }
 

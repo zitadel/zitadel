@@ -71,9 +71,7 @@ type UserQuery =
   | { state: 'notfound' };
 
 type MetadataQuery =
-  | { state: 'success'; value: Metadata[] }
-  | { state: 'loading'; value: Metadata[] }
-  | { state: 'error'; value: string };
+  { state: 'success'; value: Metadata[] } | { state: 'loading'; value: Metadata[] } | { state: 'error'; value: string };
 
 type UserWithHumanType = Omit<UserV2, 'type'> & { type: { case: 'human'; value: HumanUser } };
 

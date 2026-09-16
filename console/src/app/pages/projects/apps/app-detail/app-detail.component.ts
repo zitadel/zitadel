@@ -1,7 +1,16 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
-import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import {
+  AbstractControl,
+  FormControl,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -206,18 +215,25 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     private router: Router,
     private breadcrumbService: BreadcrumbService,
   ) {
-    this.oidcForm = this.fb.group({
-      devMode: [{ value: false, disabled: true }],
-      skipNativeAppSuccessPage: [{ value: false, disabled: true }],
-      clientId: [{ value: '', disabled: true }],
-      responseTypesList: [{ value: [], disabled: true }],
-      grantTypesList: [{ value: [], disabled: true }],
-      appType: [{ value: '', disabled: true }],
-      authMethodType: [{ value: '', disabled: true }],
-      loginV2: [{ value: false, disabled: true }],
-      loginV2BaseURL: [{ value: '', disabled: true }],
-      backChannelLogoutURI: [{ value: '', disabled: true }],
-    });
+    this.oidcForm = this.fb.group(
+      {
+        devMode: [{ value: false, disabled: true }],
+        skipNativeAppSuccessPage: [{ value: false, disabled: true }],
+        clientId: [{ value: '', disabled: true }],
+        responseTypesList: [{ value: [], disabled: true }],
+        grantTypesList: [{ value: [], disabled: true }],
+        appType: [{ value: '', disabled: true }],
+        authMethodType: [{ value: '', disabled: true }],
+        loginV2: [{ value: false, disabled: true }],
+        loginV2BaseURL: [{ value: '', disabled: true }],
+        backChannelLogoutURI: [{ value: '', disabled: true }],
+        iosTeamId: [{ value: '', disabled: true }, [iosTeamIdValidator]],
+        iosBundleId: [{ value: '', disabled: true }, [Validators.maxLength(200)]],
+        androidPackageName: [{ value: '', disabled: true }, [Validators.maxLength(200)]],
+        androidSha256CertFingerprints: [{ value: '', disabled: true }],
+      },
+      { validators: [appLinkConfigValidator()] },
+    );
 
     this.oidcTokenForm = this.fb.group({
       accessTokenType: [{ value: '', disabled: true }],
@@ -375,6 +391,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                   this.settingsList = [
                     { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
                     { id: 'token', i18nKey: 'APP.TOKEN' },
+                    { id: 'native-app-links', i18nKey: 'APP.OIDC.APPLINKSSECTION' },
                     { id: 'urls', i18nKey: 'APP.URLS' },
                   ];
                 } else {
@@ -383,6 +400,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                     { id: 'token', i18nKey: 'APP.TOKEN' },
                     { id: 'redirect-uris', i18nKey: 'APP.OIDC.REDIRECTSECTIONTITLE' },
                     { id: 'additional-origins', i18nKey: 'APP.ADDITIONALORIGINS' },
+                    { id: 'native-app-links', i18nKey: 'APP.OIDC.APPLINKSSECTION' },
                     { id: 'urls', i18nKey: 'APP.URLS' },
                   ];
                 }
@@ -465,6 +483,12 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               if (this.app.oidcConfig) {
                 this.oidcForm.patchValue(this.app.oidcConfig);
                 this.oidcTokenForm.patchValue(this.app.oidcConfig);
+                this.oidcForm.controls['iosTeamId'].setValue(this.app.oidcConfig.ios?.teamId ?? '');
+                this.oidcForm.controls['iosBundleId'].setValue(this.app.oidcConfig.ios?.bundleId ?? '');
+                this.oidcForm.controls['androidPackageName'].setValue(this.app.oidcConfig.android?.packageName ?? '');
+                this.oidcForm.controls['androidSha256CertFingerprints'].setValue(
+                  (this.app.oidcConfig.android?.sha256CertFingerprintsList ?? []).join('\n'),
+                );
               }
               if (this.app.apiConfig) {
                 this.apiForm.patchValue(this.app.apiConfig);
@@ -657,101 +681,121 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public saveOIDCApp(): void {
     this.requestRedirectValuesSubject$.next();
-    if (this.oidcForm.valid) {
-      if (this.app?.oidcConfig) {
-        //   configuration
-        this.app.oidcConfig.responseTypesList = this.responseTypesList?.value;
-        this.app.oidcConfig.grantTypesList = this.grantTypesList?.value;
-        this.app.oidcConfig.appType = this.appType?.value;
-        this.app.oidcConfig.authMethodType = this.authMethodType?.value;
-        this.app.oidcConfig.backChannelLogoutUri = this.backChannelLogoutURI?.value;
+    if (!this.oidcForm.valid) {
+      this.markNativeAppLinkFieldsTouched();
+      return;
+    }
+    if (this.app?.oidcConfig) {
+      //   configuration
+      this.app.oidcConfig.responseTypesList = this.responseTypesList?.value;
+      this.app.oidcConfig.grantTypesList = this.grantTypesList?.value;
+      this.app.oidcConfig.appType = this.appType?.value;
+      this.app.oidcConfig.authMethodType = this.authMethodType?.value;
+      this.app.oidcConfig.backChannelLogoutUri = this.backChannelLogoutURI?.value;
 
-        // token
-        this.app.oidcConfig.accessTokenType = this.accessTokenType?.value;
-        this.app.oidcConfig.accessTokenRoleAssertion = this.accessTokenRoleAssertion?.value;
-        this.app.oidcConfig.idTokenRoleAssertion = this.idTokenRoleAssertion?.value;
-        this.app.oidcConfig.idTokenUserinfoAssertion = this.idTokenUserinfoAssertion?.value;
+      // token
+      this.app.oidcConfig.accessTokenType = this.accessTokenType?.value;
+      this.app.oidcConfig.accessTokenRoleAssertion = this.accessTokenRoleAssertion?.value;
+      this.app.oidcConfig.idTokenRoleAssertion = this.idTokenRoleAssertion?.value;
+      this.app.oidcConfig.idTokenUserinfoAssertion = this.idTokenUserinfoAssertion?.value;
 
-        // redirects
-        this.app.oidcConfig.redirectUrisList = this.redirectUrisList;
-        this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
-        this.app.oidcConfig.additionalOriginsList = this.additionalOriginsList;
-        this.app.oidcConfig.devMode = !!this.devMode?.value;
-        this.app.oidcConfig.skipNativeAppSuccessPage = !!this.skipNativeAppSuccessPage?.value;
+      // redirects
+      this.app.oidcConfig.redirectUrisList = this.redirectUrisList;
+      this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
+      this.app.oidcConfig.additionalOriginsList = this.additionalOriginsList;
+      this.app.oidcConfig.devMode = !!this.devMode?.value;
+      this.app.oidcConfig.skipNativeAppSuccessPage = !!this.skipNativeAppSuccessPage?.value;
 
-        const loginVersion: MessageInitShape<typeof LoginVersionSchema> = this.oidcLoginV2?.value
-          ? {
-              version: {
-                case: 'loginV2',
-                value: { baseUri: this.oidcLoginV2BaseURL?.value },
-              },
-            }
-          : {
-              version: {
-                case: 'loginV1',
-                value: {},
-              },
-            };
-
-        const req: MessageInitShape<typeof UpdateApplicationRequestSchema> = {
-          projectId: this.projectId,
-          applicationId: this.app.id,
-          applicationType: {
-            case: 'oidcConfiguration',
-            value: {
-              // configuration
-              responseTypes: this.app.oidcConfig.responseTypesList.map((type) => this.toOIDCV2ResponseType(type)),
-              authMethodType: this.app.oidcConfig.authMethodType as unknown as OIDCV2AuthMethodType,
-              grantTypes: this.app.oidcConfig.grantTypesList as unknown as OIDCV2GrantType[],
-              applicationType: this.app.oidcConfig.appType as unknown as OIDCV2ApplicationType,
-              backChannelLogoutUri: this.app.oidcConfig.backChannelLogoutUri,
-              loginVersion,
-
-              // token
-              accessTokenType: this.app.oidcConfig.accessTokenType as unknown as OIDCV2TokenType,
-              accessTokenRoleAssertion: this.app.oidcConfig.accessTokenRoleAssertion,
-              idTokenRoleAssertion: this.app.oidcConfig.idTokenRoleAssertion,
-              idTokenUserinfoAssertion: this.app.oidcConfig.idTokenUserinfoAssertion,
-
-              // redirects
-              redirectUris: this.normalizeOIDCListForUpdate(this.app.oidcConfig.redirectUrisList),
-              additionalOrigins: this.app.oidcConfig.additionalOriginsList,
-              postLogoutRedirectUris: this.normalizeOIDCListForUpdate(this.app.oidcConfig.postLogoutRedirectUrisList),
-              developmentMode: this.app.oidcConfig.devMode,
-              skipNativeAppSuccessPage: this.app.oidcConfig.skipNativeAppSuccessPage,
-              ...(this.clockSkewSeconds?.value
-                ? {
-                    clockSkew: {
-                      seconds: BigInt(Math.floor(this.clockSkewSeconds?.value)),
-                      nanos: Math.floor(this.clockSkewSeconds?.value % 1) * 10000,
-                    },
-                  }
-                : {}),
+      const loginVersion: MessageInitShape<typeof LoginVersionSchema> = this.oidcLoginV2?.value
+        ? {
+            version: {
+              case: 'loginV2',
+              value: { baseUri: this.oidcLoginV2BaseURL?.value },
             },
-          },
-        };
+          }
+        : {
+            version: {
+              case: 'loginV1',
+              value: {},
+            },
+          };
 
-        this.applicationService
-          .updateApplication(req)
-          .then(() => {
-            if (this.app?.oidcConfig) {
-              const config = { oidc: this.app.oidcConfig };
-              this.currentAuthMethod = this.authMethodFromPartialConfig(config);
-            }
-            this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
-            setTimeout(() => {
-              this.getData(this.projectId, this.appId);
-            }, 1000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-      }
+      const req: MessageInitShape<typeof UpdateApplicationRequestSchema> = {
+        projectId: this.projectId,
+        applicationId: this.app.id,
+        applicationType: {
+          case: 'oidcConfiguration',
+          value: {
+            // configuration
+            responseTypes: this.app.oidcConfig.responseTypesList.map((type) => this.toOIDCV2ResponseType(type)),
+            authMethodType: this.app.oidcConfig.authMethodType as unknown as OIDCV2AuthMethodType,
+            grantTypes: this.app.oidcConfig.grantTypesList as unknown as OIDCV2GrantType[],
+            applicationType: this.app.oidcConfig.appType as unknown as OIDCV2ApplicationType,
+            backChannelLogoutUri: this.app.oidcConfig.backChannelLogoutUri,
+            loginVersion,
+
+            // token
+            accessTokenType: this.app.oidcConfig.accessTokenType as unknown as OIDCV2TokenType,
+            accessTokenRoleAssertion: this.app.oidcConfig.accessTokenRoleAssertion,
+            idTokenRoleAssertion: this.app.oidcConfig.idTokenRoleAssertion,
+            idTokenUserinfoAssertion: this.app.oidcConfig.idTokenUserinfoAssertion,
+
+            // redirects
+            redirectUris: this.normalizeOIDCListForUpdate(this.app.oidcConfig.redirectUrisList),
+            additionalOrigins: this.app.oidcConfig.additionalOriginsList,
+            postLogoutRedirectUris: this.normalizeOIDCListForUpdate(this.app.oidcConfig.postLogoutRedirectUrisList),
+            developmentMode: this.app.oidcConfig.devMode,
+            skipNativeAppSuccessPage: this.app.oidcConfig.skipNativeAppSuccessPage,
+            ios: {
+              teamId: (this.iosTeamId?.value ?? '').trim(),
+              bundleId: (this.iosBundleId?.value ?? '').trim(),
+            },
+            android: {
+              packageName: (this.androidPackageName?.value ?? '').trim(),
+              sha256CertFingerprints: this.parseAndroidFingerprints(this.androidSha256CertFingerprints?.value),
+            },
+            ...(this.clockSkewSeconds?.value
+              ? {
+                  clockSkew: {
+                    seconds: BigInt(Math.floor(this.clockSkewSeconds?.value)),
+                    nanos: Math.floor(this.clockSkewSeconds?.value % 1) * 10000,
+                  },
+                }
+              : {}),
+          },
+        },
+      };
+
+      this.applicationService
+        .updateApplication(req)
+        .then(() => {
+          if (this.app?.oidcConfig) {
+            const config = { oidc: this.app.oidcConfig };
+            this.currentAuthMethod = this.authMethodFromPartialConfig(config);
+          }
+          this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
+          setTimeout(() => {
+            this.getData(this.projectId, this.appId);
+          }, 1000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     }
   }
 
   private normalizeOIDCListForUpdate(values: string[]): string[] {
     return values.length === 0 ? [''] : values;
+  }
+
+  private parseAndroidFingerprints(value: unknown): string[] {
+    if (typeof value !== 'string' || !value.trim()) {
+      return [];
+    }
+    return value
+      .split(/[\n,]+/)
+      .map((fp) => fp.trim())
+      .filter((fp) => fp.length > 0);
   }
 
   private toOIDCV2ResponseType(type: OIDCResponseType): OIDCV2ResponseType {
@@ -943,6 +987,49 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     return this.oidcForm.get('skipNativeAppSuccessPage') as FormControl<boolean>;
   }
 
+  public get iosTeamId(): AbstractControl | null {
+    return this.oidcForm.get('iosTeamId');
+  }
+
+  public get iosBundleId(): AbstractControl | null {
+    return this.oidcForm.get('iosBundleId');
+  }
+
+  public get androidPackageName(): AbstractControl | null {
+    return this.oidcForm.get('androidPackageName');
+  }
+
+  public get androidSha256CertFingerprints(): AbstractControl | null {
+    return this.oidcForm.get('androidSha256CertFingerprints');
+  }
+
+  /** Defer cross-field warnings until the user has visited the paired empty field. */
+  public showIosAppLinkIncompleteWarning(): boolean {
+    if (!this.oidcForm.hasError('iosAppLinkIncomplete')) {
+      return false;
+    }
+    const teamId = String(this.iosTeamId?.value ?? '').trim();
+    const bundleId = String(this.iosBundleId?.value ?? '').trim();
+    if (teamId !== '' && bundleId === '') {
+      return !!this.iosBundleId?.touched;
+    }
+    if (bundleId !== '' && teamId === '') {
+      return !!this.iosTeamId?.touched;
+    }
+    return false;
+  }
+
+  public showAndroidPackageRequiredWarning(): boolean {
+    return this.oidcForm.hasError('androidAppLinkPackageRequired') && !!this.androidPackageName?.touched;
+  }
+
+  private markNativeAppLinkFieldsTouched(): void {
+    this.iosTeamId?.markAsTouched();
+    this.iosBundleId?.markAsTouched();
+    this.androidPackageName?.markAsTouched();
+    this.androidSha256CertFingerprints?.markAsTouched();
+  }
+
   public get accessTokenType(): AbstractControl | null {
     return this.oidcTokenForm.get('accessTokenType');
   }
@@ -1005,4 +1092,50 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       }
     }
   }
+}
+
+function iosTeamIdValidator(c: AbstractControl): ValidationErrors | null {
+  const value = String(c.value ?? '').trim();
+  if (value === '') {
+    return null;
+  }
+  if (!/^[A-Z0-9]+$/.test(value)) {
+    return {
+      invalid: true,
+      errorsinvalidformat: { valid: false, i18nKey: 'ERRORS.INVALID_FORMAT' },
+    };
+  }
+  if (value.length !== 10) {
+    return {
+      invalid: true,
+      errorsapoidcteamidlength: { valid: false, i18nKey: 'APP.OIDC.TEAMIDLENGTH' },
+    };
+  }
+  return null;
+}
+
+/** Mirrors backend AppLinkConfigValid: iOS fields together; package required when fingerprints are set. */
+function appLinkConfigValidator(): ValidatorFn {
+  return (group: AbstractControl): ValidationErrors | null => {
+    const teamId = String(group.get('iosTeamId')?.value ?? '').trim();
+    const bundleId = String(group.get('iosBundleId')?.value ?? '').trim();
+    const packageName = String(group.get('androidPackageName')?.value ?? '').trim();
+    const fingerprintsRaw = group.get('androidSha256CertFingerprints')?.value;
+    const fingerprints =
+      typeof fingerprintsRaw === 'string'
+        ? fingerprintsRaw
+            .split(/[\n,]+/)
+            .map((fp) => fp.trim())
+            .filter((fp) => fp.length > 0)
+        : [];
+
+    const errors: ValidationErrors = {};
+    if ((teamId === '') !== (bundleId === '')) {
+      errors['iosAppLinkIncomplete'] = true;
+    }
+    if (fingerprints.length > 0 && packageName === '') {
+      errors['androidAppLinkPackageRequired'] = true;
+    }
+    return Object.keys(errors).length ? errors : null;
+  };
 }

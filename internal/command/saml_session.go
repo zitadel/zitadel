@@ -93,12 +93,9 @@ func (c *Commands) CreateSAMLSessionFromSAMLRequest(ctx context.Context, samlReq
 }
 
 func (c *Commands) newSAMLSessionAddEvents(ctx context.Context, userID, resourceOwner string, pending ...eventstore.Command) (*SAMLSessionEvents, error) {
-	userStateModel, err := c.userStateWriteModel(ctx, userID)
+	userStateModel, err := c.userStateForAuthentication(ctx, userID, resourceOwner, "SAML-1768ZQpmcP", "SAML-oR9nA")
 	if err != nil {
 		return nil, err
-	}
-	if !userStateModel.UserState.IsEnabled() {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "SAML-1768ZQpmcP", "Errors.User.NotActive")
 	}
 	sessionID, err := c.idGenerator.Next()
 	if err != nil {

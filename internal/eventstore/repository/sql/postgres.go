@@ -15,7 +15,9 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-// awaitOpenTransactions ensures event ordering, so we don't events younger that open transactions
+// awaitOpenTransactions drains in-flight writers, then caps at projector TX start (now()),
+// not clock_timestamp(). A wall-clock cap at SELECT time would include rows inserted after
+// BEGIN and recreate position overtake.
 var (
 	awaitOpenTransactionsV1 = ` AND created_at <= now()`
 	awaitOpenTransactionsV2 = ` AND "position" <= EXTRACT(EPOCH FROM now())`
@@ -37,6 +39,8 @@ func NewPostgres(client *database.DB) *Postgres {
 }
 
 func (db *Postgres) Health(ctx context.Context) error { return db.Ping() }
+
+const eventSortKeySQL = `"position", in_tx_order, instance_id, aggregate_type, aggregate_id, "sequence"`
 
 // FilterToReducer finds all events matching the given search query and passes them to the reduce function.
 func (psql *Postgres) FilterToReducer(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder, reduce eventstore.Reducer) (err error) {
@@ -91,9 +95,9 @@ func (db *Postgres) orderByEventSequence(desc, shouldOrderBySequence, useV1 bool
 	}
 
 	if desc {
-		return ` ORDER BY "position" DESC, in_tx_order DESC, instance_id, aggregate_type, aggregate_id`
+		return ` ORDER BY (` + eventSortKeySQL + `) DESC`
 	}
-	return ` ORDER BY "position", in_tx_order, instance_id, aggregate_type, aggregate_id`
+	return ` ORDER BY ` + eventSortKeySQL
 }
 
 func (db *Postgres) eventQuery(useV1 bool) string {
@@ -123,6 +127,7 @@ func (db *Postgres) eventQuery(useV1 bool) string {
 		", aggregate_type" +
 		", aggregate_id" +
 		", revision" +
+		", in_tx_order" +
 		" FROM eventstore.events2"
 }
 

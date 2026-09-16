@@ -24,7 +24,7 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 	type fields struct {
 		eventstore   *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -118,7 +118,7 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "config1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),

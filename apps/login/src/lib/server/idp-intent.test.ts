@@ -1,4 +1,5 @@
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import crypto from "crypto";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { processIDPCallback } from "./idp-intent";
@@ -10,6 +11,9 @@ vi.mock("next/headers", () => ({
 
 vi.mock("@zitadel/client", () => ({
   create: vi.fn((schema: any, data: any) => data),
+  // Convert a {seconds} Timestamp-like object into a real Date so the real
+  // hasVerifiedPrimaryFactor (via the enrollment guard) can evaluate expiry.
+  timestampDate: vi.fn((ts: { seconds: bigint | number }) => new Date(Number(ts.seconds) * 1000)),
   ConnectError: class extends Error {
     code: any;
     constructor(message: string, code: any) {
@@ -39,10 +43,17 @@ vi.mock("../zitadel", () => ({
   getUserByID: vi.fn(),
   getDefaultOrg: vi.fn(),
   getSession: vi.fn(),
+  listAuthenticationMethodTypes: vi.fn(),
 }));
 
 vi.mock("./idp", () => ({
   createNewSessionFromIdpIntent: vi.fn(),
+}));
+
+// The linking guard (getEnrollmentAuthorizationError) runs for real; only its
+// leaf dependency checkUserVerification (cookie/fingerprint proof) is mocked.
+vi.mock("@/lib/verify-helper", () => ({
+  checkUserVerification: vi.fn(),
 }));
 
 vi.mock("@/lib/cookies", () => ({
@@ -76,6 +87,8 @@ describe("processIDPCallback", () => {
   let mockCreateNewSessionFromIdpIntent: any;
   let mockGetSessionCookieById: any;
   let mockGetFingerprintIdCookie: any;
+  let mockListAuthenticationMethodTypes: any;
+  let mockCheckUserVerification: any;
 
   const defaultParams = {
     provider: "google",
@@ -156,10 +169,12 @@ describe("processIDPCallback", () => {
       getUserByID,
       getDefaultOrg,
       getSession,
+      listAuthenticationMethodTypes,
     } = await import("../zitadel");
     const { createNewSessionFromIdpIntent } = await import("./idp");
     const { getSessionCookieById } = await import("@/lib/cookies");
     const { getFingerprintIdCookie } = await import("../fingerprint");
+    const { checkUserVerification } = await import("@/lib/verify-helper");
 
     // Setup mocks
     mockHeaders = vi.mocked(headers);
@@ -180,6 +195,8 @@ describe("processIDPCallback", () => {
     mockCreateNewSessionFromIdpIntent = vi.mocked(createNewSessionFromIdpIntent);
     mockGetSessionCookieById = vi.mocked(getSessionCookieById);
     mockGetFingerprintIdCookie = vi.mocked(getFingerprintIdCookie);
+    mockListAuthenticationMethodTypes = vi.mocked(listAuthenticationMethodTypes);
+    mockCheckUserVerification = vi.mocked(checkUserVerification);
 
     // Default mock implementations
     mockHeaders.mockResolvedValue({} as any);
@@ -205,6 +222,11 @@ describe("processIDPCallback", () => {
     mockGetActiveIdentityProviders.mockResolvedValue({
       identityProviders: [{ id: "idp123", name: "Test IDP" }],
     });
+    // Default: the linking guard authorizes (no configured auth methods yet + a passed
+    // user-verification check — the first-authenticator onboarding path). Individual tests
+    // override these to exercise the identify-only rejection paths.
+    mockListAuthenticationMethodTypes.mockResolvedValue({ authMethodTypes: [] });
+    mockCheckUserVerification.mockResolvedValue(true);
   });
 
   afterEach(() => {
@@ -564,6 +586,117 @@ describe("processIDPCallback", () => {
       expect(result.redirect).toContain("/idp/google/linking-failed");
       expect(result.redirect).toContain("error=linking_not_allowed");
       expect(mockAddIDPLink).not.toHaveBeenCalled();
+    });
+
+    // Security regression: an "identify-only" session (login name submitted, no verified
+    // primary factor) must never drive linking, even when the IDP allows it and the browser
+    // fingerprint matches. Otherwise an unauthenticated attacker who only knows a victim's
+    // login name could bind their own external identity to the victim's account (ATO).
+    //
+    // These four cases run the real enrollment guard (getEnrollmentAuthorizationError); only
+    // its leaf dependencies (listAuthenticationMethodTypes, checkUserVerification) are mocked.
+    const linkingAllowedIdp = {
+      ...defaultIdp,
+      config: {
+        options: {
+          ...defaultIdp.config.options,
+          isLinkingAllowed: true,
+        },
+      },
+    };
+
+    test("should reject linking for an identify-only session when the user already has credentials", async () => {
+      // Identify-only session (default) + user has a configured auth method → not authorized.
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+      mockGetIDPByID.mockResolvedValue(linkingAllowedIdp);
+
+      const result = await processIDPCallback(linkParams);
+
+      expect(result.redirect).toContain("/idp/google/linking-failed");
+      expect(result.redirect).toContain("error=session_invalid");
+      expect(mockAddIDPLink).not.toHaveBeenCalled();
+    });
+
+    test("should reject linking for an identify-only session with no credentials and no verification check", async () => {
+      // No auth methods yet, but the user-verification check has not been passed → not authorized.
+      mockListAuthenticationMethodTypes.mockResolvedValue({ authMethodTypes: [] });
+      mockCheckUserVerification.mockResolvedValue(false);
+      mockGetIDPByID.mockResolvedValue(linkingAllowedIdp);
+
+      const result = await processIDPCallback(linkParams);
+
+      expect(result.redirect).toContain("/idp/google/linking-failed");
+      expect(result.redirect).toContain("error=session_invalid");
+      expect(mockAddIDPLink).not.toHaveBeenCalled();
+    });
+
+    test("should reject linking when the primary factor is expired", async () => {
+      // A password factor was verified, but the session has expired, so it no longer counts
+      // as a verified primary factor. Were it still valid, the guard would authorize at the
+      // primary-factor branch; expired, it falls through and the configured credential
+      // (PASSWORD) means it is not the credential-less onboarding path → rejected.
+      const past = { seconds: BigInt(Math.floor(Date.now() / 1000) - 3600), nanos: 0 };
+      const factorVerifiedAt = { seconds: BigInt(Math.floor(Date.now() / 1000) - 7200), nanos: 0 };
+      mockGetSession.mockResolvedValue({
+        session: {
+          factors: {
+            user: { id: "user123" },
+            password: { verifiedAt: factorVerifiedAt },
+          },
+          expirationDate: past,
+        },
+      });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+      mockGetIDPByID.mockResolvedValue(linkingAllowedIdp);
+
+      const result = await processIDPCallback(linkParams);
+
+      expect(result.redirect).toContain("/idp/google/linking-failed");
+      expect(result.redirect).toContain("error=session_invalid");
+      expect(mockAddIDPLink).not.toHaveBeenCalled();
+    });
+
+    test("should allow linking as the first authenticator when the user-verification check passed", async () => {
+      // Identify-only session, no auth methods yet, but the email/invite-code verification
+      // check passed → the legitimate "link an IDP as the first authenticator" onboarding path.
+      mockListAuthenticationMethodTypes.mockResolvedValue({ authMethodTypes: [] });
+      mockCheckUserVerification.mockResolvedValue(true);
+      mockGetIDPByID.mockResolvedValue(linkingAllowedIdp);
+
+      const result = await processIDPCallback(linkParams);
+
+      expect(mockAddIDPLink).toHaveBeenCalled();
+      expect(result.redirect).toBe("https://app.example.com/success");
+    });
+
+    test("should allow linking when the session has a verified, non-expired primary factor", async () => {
+      // A fully authenticated session (verified password, not expired) is authorized at the
+      // primary-factor branch regardless of configured methods / verification check. This pins
+      // the other half of the guard's OR so a refactor cannot silently drop it.
+      const future = { seconds: BigInt(Math.floor(Date.now() / 1000) + 3600), nanos: 0 };
+      mockGetSession.mockResolvedValue({
+        session: {
+          factors: {
+            user: { id: "user123" },
+            password: { verifiedAt: future },
+          },
+          expirationDate: future,
+        },
+      });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+      mockCheckUserVerification.mockResolvedValue(false);
+      mockGetIDPByID.mockResolvedValue(linkingAllowedIdp);
+
+      const result = await processIDPCallback(linkParams);
+
+      expect(mockAddIDPLink).toHaveBeenCalled();
+      expect(result.redirect).toBe("https://app.example.com/success");
     });
 
     test("should return error redirect when linking fails", async () => {

@@ -19,6 +19,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/repository/mock"
 	"github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -104,6 +105,15 @@ func expectFilter(events ...eventstore.Event) expect {
 		m.ExpectFilterEvents(events...)
 	}
 }
+
+func expectFilterActiveOrg(orgID string) expect {
+	return expectFilter(
+		org.NewOrgAddedEvent(context.Background(),
+			&org.NewAggregate(orgID).Aggregate,
+			"org"),
+	)
+}
+
 func expectFilterError(err error) expect {
 	return func(m *mock.MockRepository) {
 		m.ExpectFilterEventsError(err)

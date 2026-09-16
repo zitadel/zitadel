@@ -2199,6 +2199,10 @@
       "TITLE": "Adăugați furnizor",
       "DESCRIPTION": "Selectați unul sau mai mulți dintre următorii furnizori.",
       "STEPPERTITLE": "Creați furnizorul",
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "Introduceți datele necesare pentru a permite utilizatorilor unei alte instanțe ZITADEL să se autentifice."
+      },
       "OIDC": {
         "TITLE": "Furnizor OIDC",
         "DESCRIPTION": "Introduceți datele necesare pentru furnizorul dvs. OIDC."
@@ -2311,6 +2315,10 @@
     "STATE": "Stare",
     "ISSUER": "Emitent",
     "SCOPESLIST": "Listă de domenii",
+    "INSTANCEROLESINFO": "Maparea rolurilor de instanță",
+    "INSTANCEROLESINFO_DESC": "Utilizatorii care se autentifică cu acest furnizor primesc rolurile de membru al instanței (prefix IAM_) pe care le dețin în organizațiile listate din instanța ZITADEL la distanță. ID-ul organizației și domeniul principal trebuie să corespundă ambele.",
+    "ORGANIZATIONID": "ID-ul organizației",
+    "ORGANIZATIONDOMAIN": "Domeniul organizației",
     "CLIENTID": "ID client",
     "CLIENTSECRET": "Secret client",
     "LDAPCONNECTION": "Conexiune",
@@ -2612,6 +2620,25 @@
       "DEVMODEDESC": "Atenție: Cu modul de dezvoltare activat, URI-urile de redirecționare nu vor fi validate.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Omiteți pagina de succes la conectare",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Omiteți pagina de succes după o conectare pentru această aplicație nativă.",
+      "APPLINKSSECTION": "Linkuri pentru aplicații native",
+      "APPLINKSDESC": "Configurați asocierea iOS și Android pentru ca această instanță să poată servi fișierele de încredere passkey pentru aplicațiile dvs. native.",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "Servit în apple-app-site-association ca intrare webcredentials TEAMID.BUNDLEID.",
+      "TEAMID": "Team ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Apple Team ID trebuie să aibă exact 10 caractere alfanumerice, de ex. ABCDE12345.",
+      "TEAMIDLENGTH": "Team ID trebuie să aibă exact 10 caractere alfanumerice.",
+      "BUNDLEID": "Bundle ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "Identificatorul de bundle iOS (CFBundleIdentifier), de ex. com.example.app. Nu includeți prefixul Team ID.",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "Servit în assetlinks.json pentru Digital Asset Links / acreditări passkey.",
+      "PACKAGENAME": "Numele pachetului",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "Android applicationId / numele pachetului, de ex. com.example.app.",
+      "FINGERPRINTS": "Amprente de certificat SHA-256",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "O amprentă pe linie (64 caractere hexazecimale, două puncte opționale). Includeți debug și release după nevoie.",
       "REDIRECT": "URI-uri de redirecționare",
       "REDIRECTSECTION": "URI-uri de redirecționare",
       "POSTLOGOUTREDIRECT": "URI-uri de redirecționare după deconectare",
@@ -2675,7 +2702,9 @@
           }
         }
       },
-      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI"
+      "BACKCHANNELLOOGOUTURI": "Back-Channel Logout URI",
+      "IOSAPPLINKINCOMPLETE": "Team ID și Bundle ID iOS trebuie setate împreună sau ambele lăsate goale.",
+      "ANDROIDPACKAGEREQUIRED": "Numele pachetului Android este obligatoriu când sunt setate amprentele certificatului."
     },
     "API": {
       "INFO": {
