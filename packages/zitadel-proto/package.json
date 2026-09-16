@@ -1,6 +1,13 @@
 {
   "name": "@zitadel/proto",
+  "description": "Generated TypeScript protobuf/Connect definitions of the ZITADEL API. Versioned together with ZITADEL.",
   "license": "MIT",
+  "homepage": "https://zitadel.com/docs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zitadel/zitadel.git",
+    "directory": "packages/zitadel-proto"
+  },
   "publishConfig": {
     "access": "public"
   },

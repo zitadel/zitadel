@@ -181,32 +181,60 @@ jobs:
         run: |
           gh workflow -R zitadel/zitadel-charts run bump.yml
 
+  # Publishes @zitadel/proto and @zitadel/client to npm with the exact same
+  # version as the ZITADEL release (e.g. v4.18.0 -> 4.18.0). Authentication
+  # uses npm trusted publishing (OIDC), so no NPM_TOKEN secret is needed.
+  # Both packages must be configured on npmjs.com with the trusted publisher
+  # zitadel/zitadel, workflow file "ci.yml" (the *calling* workflow).
   npm-packages:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: version
-    if: needs.version.outputs.published == 'true' && github.ref_name == 'next'
+    if: needs.version.outputs.published == 'true' && (github.ref_name == 'next' || github.ref_name == 'next-rc')
     continue-on-error: true
+    permissions:
+      contents: read
+      id-token: write
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "22"
+          cache: "pnpm"
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+      # npm >= 11.5.1 is required for trusted publishing (pnpm publish delegates to npm)
+      - name: Update npm
+        run: npm install -g npm@latest
 
       - name: Install dependencies
-        working-directory: login
         run: pnpm install --frozen-lockfile
 
-      - name: Create Release Pull Request
-        uses: changesets/action@v1
+      - name: Build packages
+        run: pnpm nx run-many --targets=generate,build --projects=@zitadel/proto,@zitadel/client
+
+      - name: Set package versions to ${{ needs.version.outputs.version }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          version: ${{ needs.version.outputs.version }}
-          cwd: packages
-          createGithubReleases: false
+          VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          pnpm --filter @zitadel/proto --filter @zitadel/client exec npm pkg set version="${VERSION#v}"
+
+      - name: Publish ${{ needs.version.outputs.version }}
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          # prereleases (next-rc, e.g. v4.18.0-rc.1) go to the "rc" dist-tag, everything else to "latest"
+          if [[ "${VERSION}" == *-* ]]; then TAG="rc"; else TAG="latest"; fi
+          pnpm publish \
+            --recursive \
+            --filter @zitadel/proto \
+            --filter @zitadel/client \
+            --access public \
+            --tag "${TAG}" \
+            --no-git-checks

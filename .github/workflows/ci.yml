@@ -54,6 +54,7 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
+      id-token: write
     needs:
       - lint_test_build
       - pack
