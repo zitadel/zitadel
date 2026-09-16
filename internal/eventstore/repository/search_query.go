@@ -1,7 +1,9 @@
 package repository
 
 import (
+	"cmp"
 	"database/sql"
+	"slices"
 
 	"github.com/shopspring/decimal"
 
@@ -32,6 +34,16 @@ type SearchQuery struct {
 	CreatedBefore       *Filter
 	ExcludeAggregateIDs []*Filter
 	EventSortKeyAfter   *eventstore.EventSortKey
+	// EventTypeScans contains the combinations of aggregate type and event type to read separately,
+	// see [eventstore.SearchQueryBuilder.ScanEventTypesSeparately].
+	// It is empty if the sub queries cannot be read that way.
+	EventTypeScans []EventTypeScan
+}
+
+// EventTypeScan is a combination of aggregate type and event type, which is read separately.
+type EventTypeScan struct {
+	AggregateType eventstore.AggregateType
+	EventType     eventstore.EventType
 }
 
 // Filter represents all fields needed to compare a field of an event with a value
@@ -134,6 +146,7 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 		AwaitOpenTransactions: builder.GetAwaitOpenTransactions(),
 		SubQueries:            make([][]*Filter, len(builder.GetQueries())),
 		EventSortKeyAfter:     builder.GetEventSortKeyAfter(),
+		EventTypeScans:        eventTypeScans(builder),
 	}
 
 	for _, f := range []func(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter{
@@ -190,6 +203,34 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 	}
 
 	return query, nil
+}
+
+// eventTypeScans returns the distinct combinations of aggregate type and event type of all sub queries,
+// if [eventstore.SearchQueryBuilder.ScanEventTypesSeparately] was set and the sub queries filter by nothing else.
+func eventTypeScans(builder *eventstore.SearchQueryBuilder) []EventTypeScan {
+	if !builder.GetScanEventTypesSeparately() {
+		return nil
+	}
+	var scans []EventTypeScan
+	for _, query := range builder.GetQueries() {
+		if len(query.GetAggregateTypes()) == 0 ||
+			len(query.GetEventTypes()) == 0 ||
+			len(query.GetAggregateIDs()) > 0 ||
+			len(query.GetEventData()) > 0 ||
+			!query.GetPositionAfter().IsZero() {
+			return nil
+		}
+		for _, aggregateType := range query.GetAggregateTypes() {
+			for _, eventType := range query.GetEventTypes() {
+				scans = append(scans, EventTypeScan{AggregateType: aggregateType, EventType: eventType})
+			}
+		}
+	}
+	// sub queries are OR-connected, so a combination listed twice must still be read once
+	slices.SortFunc(scans, func(a, b EventTypeScan) int {
+		return cmp.Or(cmp.Compare(a.AggregateType, b.AggregateType), cmp.Compare(a.EventType, b.EventType))
+	})
+	return slices.Compact(scans)
 }
 
 func eventSequenceGreaterFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {

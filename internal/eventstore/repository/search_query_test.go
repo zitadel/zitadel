@@ -144,3 +144,59 @@ func TestColumns_Validate(t *testing.T) {
 		})
 	}
 }
+
+func TestQueryFromBuilder_eventTypeScans(t *testing.T) {
+	base := func() *eventstore.SearchQueryBuilder {
+		return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).ScanEventTypesSeparately()
+	}
+	tests := []struct {
+		name    string
+		builder *eventstore.SearchQueryBuilder
+		want    []EventTypeScan
+	}{
+		{
+			name: "not requested",
+			builder: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+				AddQuery().AggregateTypes("user").EventTypes("user.locked").Builder(),
+			want: nil,
+		},
+		{
+			name: "every combination of each sub query, sorted and distinct",
+			builder: base().
+				AddQuery().AggregateTypes("user", "org").EventTypes("user.locked", "org.removed").Builder().
+				AddQuery().AggregateTypes("user").EventTypes("user.locked").Builder(),
+			want: []EventTypeScan{
+				{AggregateType: "org", EventType: "org.removed"},
+				{AggregateType: "org", EventType: "user.locked"},
+				{AggregateType: "user", EventType: "org.removed"},
+				{AggregateType: "user", EventType: "user.locked"},
+			},
+		},
+		{
+			name:    "sub query without event types",
+			builder: base().AddQuery().AggregateTypes("user").Builder(),
+			want:    nil,
+		},
+		{
+			name:    "sub query with aggregate ids",
+			builder: base().AddQuery().AggregateTypes("user").AggregateIDs("id").EventTypes("user.locked").Builder(),
+			want:    nil,
+		},
+		{
+			name:    "sub query with event data",
+			builder: base().AddQuery().AggregateTypes("user").EventTypes("user.locked").EventData(map[string]any{"key": "value"}).Builder(),
+			want:    nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			query, err := QueryFromBuilder(tt.builder)
+			if err != nil {
+				t.Fatalf("QueryFromBuilder() error = %v", err)
+			}
+			if !reflect.DeepEqual(query.EventTypeScans, tt.want) {
+				t.Errorf("EventTypeScans = %v, want %v", query.EventTypeScans, tt.want)
+			}
+		})
+	}
+}
