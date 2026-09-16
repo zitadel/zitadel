@@ -14,19 +14,17 @@ type Props = {
 // Tells the browser which color schemes the page supports. Chrome on Android and
 // Samsung Internet darken pages that don't declare one ("Auto Dark Theme"), which
 // inverts a forced light theme and hides checked checkboxes. "only light" / "only dark"
-// is the documented opt-out; without a forced theme the declaration is removed again.
-function setColorSchemeMeta(value: string | null) {
-  let meta = document.head.querySelector<HTMLMetaElement>('meta[name="color-scheme"]');
-  if (value === null) {
-    meta?.remove();
-    return;
+// is the documented opt-out. Without a forced theme nothing is declared, so the
+// browser keeps following the system preference.
+function colorSchemeFor(themeMode: ThemeMode | undefined): string | undefined {
+  switch (themeMode) {
+    case ThemeMode.LIGHT:
+      return "only light";
+    case ThemeMode.DARK:
+      return "only dark";
+    default:
+      return undefined;
   }
-  if (!meta) {
-    meta = document.createElement("meta");
-    meta.name = "color-scheme";
-    document.head.appendChild(meta);
-  }
-  meta.content = value;
 }
 
 export const ThemeWrapper = ({ children, branding }: Props) => {
@@ -109,7 +107,6 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
       switch (branding.themeMode) {
         case ThemeMode.LIGHT:
           document.documentElement.classList.remove("dark");
-          setColorSchemeMeta("only light");
           try {
             localStorage.setItem("cp-theme", "light");
           } catch {
@@ -119,7 +116,6 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
           break;
         case ThemeMode.DARK:
           document.documentElement.classList.add("dark");
-          setColorSchemeMeta("only dark");
           try {
             localStorage.setItem("cp-theme", "dark");
           } catch {
@@ -130,7 +126,6 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
         case ThemeMode.AUTO:
         case ThemeMode.UNSPECIFIED:
         default:
-          setColorSchemeMeta(null);
           setNextTheme("system");
           break;
       }
@@ -138,5 +133,15 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [branding?.themeMode]);
 
-  return <div>{children}</div>;
+  // Rendered as JSX so React hoists the tag into <head> already during server
+  // rendering; a client effect would only run after the browser painted (and
+  // possibly darkened) the initial HTML.
+  const colorScheme = colorSchemeFor(branding?.themeMode);
+
+  return (
+    <>
+      {colorScheme && <meta name="color-scheme" content={colorScheme} />}
+      <div>{children}</div>
+    </>
+  );
 };

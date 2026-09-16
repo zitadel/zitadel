@@ -11,60 +11,69 @@ vi.mock("@/helpers/colors", () => ({
   setTheme: vi.fn(),
 }));
 
-function colorSchemeMeta(): HTMLMetaElement | null {
-  return document.head.querySelector<HTMLMetaElement>('meta[name="color-scheme"]');
+function colorSchemeMetas(): HTMLMetaElement[] {
+  return Array.from(document.head.querySelectorAll<HTMLMetaElement>('meta[name="color-scheme"]'));
+}
+
+function wrapper(branding: BrandingSettings | undefined) {
+  return (
+    <ThemeWrapper branding={branding}>
+      <div>child</div>
+    </ThemeWrapper>
+  );
 }
 
 function renderWithThemeMode(themeMode: ThemeMode) {
-  const branding = { themeMode } as BrandingSettings;
-  return render(
-    <ThemeWrapper branding={branding}>
-      <div>child</div>
-    </ThemeWrapper>,
-  );
+  return render(wrapper({ themeMode } as BrandingSettings));
 }
 
 describe("ThemeWrapper color-scheme", () => {
   afterEach(() => {
-    colorSchemeMeta()?.remove();
     document.documentElement.classList.remove("dark");
   });
 
   it("declares only light when the theme mode forces light", () => {
-    renderWithThemeMode(ThemeMode.LIGHT);
-    expect(colorSchemeMeta()?.content).toBe("only light");
+    const { unmount } = renderWithThemeMode(ThemeMode.LIGHT);
+    expect(colorSchemeMetas().map((m) => m.content)).toEqual(["only light"]);
+    unmount();
   });
 
   it("declares only dark when the theme mode forces dark", () => {
-    renderWithThemeMode(ThemeMode.DARK);
-    expect(colorSchemeMeta()?.content).toBe("only dark");
+    const { unmount } = renderWithThemeMode(ThemeMode.DARK);
+    expect(colorSchemeMetas().map((m) => m.content)).toEqual(["only dark"]);
+    unmount();
   });
 
-  it("leaves the choice to the browser when the theme mode is auto", () => {
-    renderWithThemeMode(ThemeMode.AUTO);
-    expect(colorSchemeMeta()).toBeNull();
+  it.each([
+    ["auto", ThemeMode.AUTO],
+    ["unspecified", ThemeMode.UNSPECIFIED],
+  ])("leaves the choice to the browser when the theme mode is %s", (_name, themeMode) => {
+    const { unmount } = renderWithThemeMode(themeMode);
+    expect(colorSchemeMetas()).toHaveLength(0);
+    unmount();
   });
 
-  it("removes a stale declaration when the theme mode changes to auto", () => {
-    const { rerender } = renderWithThemeMode(ThemeMode.LIGHT);
-    expect(colorSchemeMeta()?.content).toBe("only light");
-
-    rerender(
-      <ThemeWrapper branding={{ themeMode: ThemeMode.AUTO } as BrandingSettings}>
-        <div>child</div>
-      </ThemeWrapper>,
-    );
-    expect(colorSchemeMeta()).toBeNull();
+  it("declares nothing without branding", () => {
+    const { unmount } = render(wrapper(undefined));
+    expect(colorSchemeMetas()).toHaveLength(0);
+    unmount();
   });
 
-  it("reuses an existing meta element instead of adding a second one", () => {
-    const existing = document.createElement("meta");
-    existing.name = "color-scheme";
-    existing.content = "light dark";
-    document.head.appendChild(existing);
+  it("removes the declaration when the theme mode changes to auto", () => {
+    const { rerender, unmount } = renderWithThemeMode(ThemeMode.LIGHT);
+    expect(colorSchemeMetas()).toHaveLength(1);
 
-    renderWithThemeMode(ThemeMode.DARK);
-    expect(document.head.querySelectorAll('meta[name="color-scheme"]')).toHaveLength(1);
-    expect(existing.content).toBe("only dark");
+    rerender(wrapper({ themeMode: ThemeMode.AUTO } as BrandingSettings));
+    expect(colorSchemeMetas()).toHaveLength(0);
+    unmount();
+  });
+
+  it("removes the declaration when branding disappears", () => {
+    const { rerender, unmount } = renderWithThemeMode(ThemeMode.DARK);
+    expect(colorSchemeMetas()).toHaveLength(1);
+
+    rerender(wrapper(undefined));
+    expect(colorSchemeMetas()).toHaveLength(0);
+    unmount();
   });
 });
