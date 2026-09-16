@@ -165,6 +165,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             failureUrl:
               `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/failure?` +
               new URLSearchParams(params),
+            loginHint: command.loginName,
           },
         });
 
@@ -224,6 +225,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           failureUrl:
             `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/failure?` +
             new URLSearchParams(params),
+          loginHint: command.loginName,
         },
       });
 
