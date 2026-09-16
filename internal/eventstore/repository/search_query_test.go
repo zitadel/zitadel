@@ -4,7 +4,11 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestNewFilter(t *testing.T) {
@@ -149,11 +153,12 @@ func TestQueryFromBuilder_eventTypeScans(t *testing.T) {
 	base := func() *eventstore.SearchQueryBuilder {
 		return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).ScanEventTypesSeparately()
 	}
+	errScan := zerrors.ThrowInvalidArgument(nil, "REPO-Ahx6e", "")
 	tests := []struct {
 		name    string
 		builder *eventstore.SearchQueryBuilder
 		want    []EventTypeScan
-		wantErr bool
+		wantErr error
 	}{
 		{
 			name: "not requested",
@@ -176,36 +181,33 @@ func TestQueryFromBuilder_eventTypeScans(t *testing.T) {
 		{
 			name:    "sub query with several aggregate types",
 			builder: base().AddQuery().AggregateTypes("user", "org").EventTypes("user.locked", "org.removed").Builder(),
-			wantErr: true,
+			wantErr: errScan,
 		},
 		{
 			name:    "sub query without event types",
 			builder: base().AddQuery().AggregateTypes("user").Builder(),
-			wantErr: true,
+			wantErr: errScan,
 		},
 		{
 			name:    "sub query with aggregate ids",
 			builder: base().AddQuery().AggregateTypes("user").AggregateIDs("id").EventTypes("user.locked").Builder(),
-			wantErr: true,
+			wantErr: errScan,
 		},
 		{
 			name:    "sub query with event data",
 			builder: base().AddQuery().AggregateTypes("user").EventTypes("user.locked").EventData(map[string]any{"key": "value"}).Builder(),
-			wantErr: true,
+			wantErr: errScan,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			query, err := QueryFromBuilder(tt.builder)
-			if (err != nil) != tt.wantErr {
-				t.Fatalf("QueryFromBuilder() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			if tt.wantErr {
+			if tt.wantErr != nil {
+				require.ErrorIs(t, err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(query.EventTypeScans, tt.want) {
-				t.Errorf("EventTypeScans = %v, want %v", query.EventTypeScans, tt.want)
-			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, query.EventTypeScans)
 		})
 	}
 }
