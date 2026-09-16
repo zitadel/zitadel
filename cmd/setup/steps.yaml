@@ -185,3 +185,9 @@ FillFields:
 RelationalTables:
   # This is used for development DO NOT USE IN PRODUCTION
   ShouldRecreateSchema: false # ZITADEL_RELATIONALTABLES_SHOULDRECREATESCHEMA
+
+BackfillUniqueConstraintOwners:
+  # After a rolling update on this same version, set true and re-run setup to
+  # backfill leftover empty owners and enable owner-only unique-constraint delete.
+  # Default false: owner-delete waits until the next release runs 79 again.
+  ForceFinalize: false # ZITADEL_BACKFILLUNIQUECONSTRAINTOWNERS_FORCEFINALIZE

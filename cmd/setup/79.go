@@ -20,15 +20,26 @@ var (
 
 type BackfillUniqueConstraintOwners struct {
 	dbClient *database.DB
-	Version  string `json:"version"`
+
+	Version       string `json:"version"`
+	Finalized     bool   `json:"finalized"`
+	ForceFinalize bool   `json:"-"` // YAML/env only; not persisted on lastRun
 }
 
 func (mig *BackfillUniqueConstraintOwners) Check(lastRun map[string]interface{}) bool {
 	if lastRun == nil {
+		lastRun = map[string]interface{}{}
+	}
+	lastVersion, _ := lastRun["version"].(string)
+	lastFinalized, _ := lastRun["finalized"].(bool)
+
+	versionChanged := lastVersion != mig.Version
+	mig.Finalized = lastFinalized || mig.ForceFinalize || (lastVersion != "" && versionChanged)
+
+	if lastVersion == "" {
 		return true
 	}
-	currentVersion, _ := lastRun["version"].(string)
-	return currentVersion != mig.Version
+	return versionChanged || (mig.ForceFinalize && !lastFinalized)
 }
 
 func (mig *BackfillUniqueConstraintOwners) Execute(ctx context.Context, _ eventstore.Event) error {
@@ -55,7 +66,7 @@ func (mig *BackfillUniqueConstraintOwners) Execute(ctx context.Context, _ events
 	if err != nil {
 		return err
 	}
-	logging.Info(ctx, "unique constraint owners backfill complete", "unmatched", unmatched, "migration", mig.String())
+	logging.Info(ctx, "unique constraint owners backfill complete", "unmatched", unmatched, "finalized", mig.Finalized, "migration", mig.String())
 	return nil
 }
 

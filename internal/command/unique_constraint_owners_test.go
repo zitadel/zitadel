@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -56,28 +55,37 @@ func TestIsUniqueConstraintOwnerDeleteReady(t *testing.T) {
 	})
 }
 
-func TestUniqueConstraintOwnersBackfillMatchesVersion(t *testing.T) {
+func TestUniqueConstraintOwnersBackfillFinalized(t *testing.T) {
 	t.Run("no backfill event", func(t *testing.T) {
 		c := &Commands{eventstore: expectEventstore(expectFilter())(t)}
-		ready, err := c.uniqueConstraintOwnersBackfillMatchesVersion(t.Context())
+		ready, err := c.uniqueConstraintOwnersBackfillFinalized(t.Context())
 		require.NoError(t, err)
 		assert.False(t, ready)
 	})
 
-	t.Run("matching version", func(t *testing.T) {
+	t.Run("finalized false is not ready", func(t *testing.T) {
 		c := &Commands{eventstore: expectEventstore(
-			expectFilter(uniqueConstraintOwnersBackfillDoneEvent(build.Version())),
+			expectFilter(uniqueConstraintOwnersBackfillDoneEvent("v2.0.0", false)),
 		)(t)}
-		ready, err := c.uniqueConstraintOwnersBackfillMatchesVersion(t.Context())
+		ready, err := c.uniqueConstraintOwnersBackfillFinalized(t.Context())
+		require.NoError(t, err)
+		assert.False(t, ready)
+	})
+
+	t.Run("finalized true is ready", func(t *testing.T) {
+		c := &Commands{eventstore: expectEventstore(
+			expectFilter(uniqueConstraintOwnersBackfillDoneEvent("other-version", true)),
+		)(t)}
+		ready, err := c.uniqueConstraintOwnersBackfillFinalized(t.Context())
 		require.NoError(t, err)
 		assert.True(t, ready)
 	})
 
-	t.Run("different version", func(t *testing.T) {
+	t.Run("missing finalized key is not ready", func(t *testing.T) {
 		c := &Commands{eventstore: expectEventstore(
-			expectFilter(uniqueConstraintOwnersBackfillDoneEvent("other-version")),
+			expectFilter(uniqueConstraintOwnersBackfillDoneEventLastRun(map[string]any{"version": "v2.0.0"})),
 		)(t)}
-		ready, err := c.uniqueConstraintOwnersBackfillMatchesVersion(t.Context())
+		ready, err := c.uniqueConstraintOwnersBackfillFinalized(t.Context())
 		require.NoError(t, err)
 		assert.False(t, ready)
 	})
@@ -86,12 +94,19 @@ func TestUniqueConstraintOwnersBackfillMatchesVersion(t *testing.T) {
 		c := &Commands{eventstore: expectEventstore(
 			expectFilterError(zerrors.ThrowInternal(nil, "id", "err")),
 		)(t)}
-		_, err := c.uniqueConstraintOwnersBackfillMatchesVersion(t.Context())
+		_, err := c.uniqueConstraintOwnersBackfillFinalized(t.Context())
 		assert.Error(t, err)
 	})
 }
 
-func uniqueConstraintOwnersBackfillDoneEvent(version string) *repository.Event {
+func uniqueConstraintOwnersBackfillDoneEvent(version string, finalized bool) *repository.Event {
+	return uniqueConstraintOwnersBackfillDoneEventLastRun(map[string]any{
+		"version":   version,
+		"finalized": finalized,
+	})
+}
+
+func uniqueConstraintOwnersBackfillDoneEventLastRun(lastRun map[string]any) *repository.Event {
 	ctx := authz.WithInstanceID(context.Background(), "")
 	cmd := &migration.SetupStep{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -100,7 +115,7 @@ func uniqueConstraintOwnersBackfillDoneEvent(version string) *repository.Event {
 			eventstore.EventType("system.migration.repeatable.done"),
 		),
 		Name:    eventstore.UniqueConstraintOwnersBackfillStep,
-		LastRun: map[string]any{"version": version},
+		LastRun: lastRun,
 	}
 	data, err := eventstore.EventData(cmd)
 	if err != nil {

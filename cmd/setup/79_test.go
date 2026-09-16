@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -56,16 +57,106 @@ func TestBackfillUniqueConstraintOwnersStmts(t *testing.T) {
 }
 
 func TestBackfillUniqueConstraintOwners_Check(t *testing.T) {
-	mig := &BackfillUniqueConstraintOwners{Version: "v2.0.0"}
+	tests := []struct {
+		name          string
+		forceFinalize bool
+		lastRun       map[string]interface{}
+		wantRun       bool
+		wantFinalized bool
+	}{
+		{
+			name:          "missing lastRun runs without finalizing",
+			lastRun:       nil,
+			wantRun:       true,
+			wantFinalized: false,
+		},
+		{
+			name:          "empty lastRun runs without finalizing",
+			lastRun:       map[string]interface{}{},
+			wantRun:       true,
+			wantFinalized: false,
+		},
+		{
+			name:          "missing lastRun with ForceFinalize finalizes",
+			forceFinalize: true,
+			lastRun:       nil,
+			wantRun:       true,
+			wantFinalized: true,
+		},
+		{
+			name:          "same version not finalized skips",
+			lastRun:       map[string]interface{}{"version": "v2.0.0", "finalized": false},
+			wantRun:       false,
+			wantFinalized: false,
+		},
+		{
+			name:          "same version missing finalized skips",
+			lastRun:       map[string]interface{}{"version": "v2.0.0"},
+			wantRun:       false,
+			wantFinalized: false,
+		},
+		{
+			name:          "same version not finalized with ForceFinalize runs and finalizes",
+			forceFinalize: true,
+			lastRun:       map[string]interface{}{"version": "v2.0.0", "finalized": false},
+			wantRun:       true,
+			wantFinalized: true,
+		},
+		{
+			name:          "same version already finalized skips",
+			lastRun:       map[string]interface{}{"version": "v2.0.0", "finalized": true},
+			wantRun:       false,
+			wantFinalized: true,
+		},
+		{
+			name:          "same version already finalized with ForceFinalize skips",
+			forceFinalize: true,
+			lastRun:       map[string]interface{}{"version": "v2.0.0", "finalized": true},
+			wantRun:       false,
+			wantFinalized: true,
+		},
+		{
+			name:          "version changed runs and finalizes",
+			lastRun:       map[string]interface{}{"version": "v1.0.0", "finalized": false},
+			wantRun:       true,
+			wantFinalized: true,
+		},
+		{
+			name:          "version changed keeps finalized true",
+			lastRun:       map[string]interface{}{"version": "v1.0.0", "finalized": true},
+			wantRun:       true,
+			wantFinalized: true,
+		},
+	}
 
-	assert.True(t, mig.Check(nil), "missing lastRun should run")
-	assert.True(t, mig.Check(map[string]interface{}{}), "empty lastRun should run")
-	assert.True(t, mig.Check(map[string]interface{}{"version": "v1.0.0"}), "different version should run")
-	assert.False(t, mig.Check(map[string]interface{}{"version": "v2.0.0"}), "same version should skip")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mig := &BackfillUniqueConstraintOwners{Version: "v2.0.0", ForceFinalize: tt.forceFinalize}
+			assert.Equal(t, tt.wantRun, mig.Check(tt.lastRun))
+			assert.Equal(t, tt.wantFinalized, mig.Finalized)
+		})
+	}
 }
 
 func TestUniqueTypesWithOwnersOmitsMailText(t *testing.T) {
 	assert.NotContains(t, eventstore.UniqueTypesWithOwners, "mail_text")
 	assert.Contains(t, eventstore.UniqueTypesWithOwners, "usernames")
 	assert.Contains(t, eventstore.UniqueTypesWithOwners, "idp_config_names")
+}
+
+func TestBackfillUniqueConstraintOwnersJSONOmitsForceFinalize(t *testing.T) {
+	mig := &BackfillUniqueConstraintOwners{
+		Version:       "v2.0.0",
+		Finalized:     true,
+		ForceFinalize: true,
+	}
+	data, err := json.Marshal(mig)
+	require.NoError(t, err)
+
+	var payload map[string]any
+	require.NoError(t, json.Unmarshal(data, &payload))
+	assert.Equal(t, "v2.0.0", payload["version"])
+	assert.Equal(t, true, payload["finalized"])
+	assert.NotContains(t, payload, "ForceFinalize")
+	assert.NotContains(t, payload, "forceFinalize")
 }

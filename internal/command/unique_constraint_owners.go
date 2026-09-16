@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/migration"
 )
@@ -25,7 +24,7 @@ func (c *Commands) isUniqueConstraintOwnerDeleteReady(ctx context.Context) (bool
 	return ready, nil
 }
 
-func (c *Commands) uniqueConstraintOwnersBackfillMatchesVersion(ctx context.Context) (bool, error) {
+func (c *Commands) uniqueConstraintOwnersBackfillFinalized(ctx context.Context) (bool, error) {
 	var states migration.StepStates
 	if err := c.eventstore.FilterToQueryReducer(ctx, &states); err != nil {
 		return false, err
@@ -38,8 +37,8 @@ func (c *Commands) uniqueConstraintOwnersBackfillMatchesVersion(ctx context.Cont
 		if lastRun == nil {
 			return false, nil
 		}
-		version, _ := lastRun["version"].(string)
-		return version != "" && version == build.Version(), nil
+		finalized, _ := lastRun["finalized"].(bool)
+		return finalized, nil
 	}
 	return false, nil
 }

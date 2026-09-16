@@ -198,7 +198,7 @@ type Steps struct {
 	s76Users14LoginEqualityIndexes          *Users14LoginEqualityIndexes
 	s77StampEventPositionAtInsert           *StampEventPositionAtInsert
 	s78UniqueConstraintOwners               *UniqueConstraintOwners
-	s79BackfillUniqueConstraintOwners       *BackfillUniqueConstraintOwners
+	BackfillUniqueConstraintOwners          *BackfillUniqueConstraintOwners
 	RelationalTables                        *TransactionalTables
 }
 

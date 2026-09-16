@@ -243,7 +243,7 @@ func StartCommands(
 		denyList:         denyList,
 	}
 
-	repo.ownerDeleteReady = repo.uniqueConstraintOwnersBackfillMatchesVersion
+	repo.ownerDeleteReady = repo.uniqueConstraintOwnersBackfillFinalized
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {
 		repo.newHashedSecret = newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret)
