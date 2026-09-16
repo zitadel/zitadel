@@ -6,10 +6,12 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { Skeleton } from "@/components/skeleton";
 import { ThemeProvider } from "@/components/theme-provider";
 import ThemeSwitch from "@/components/theme-switch";
+import { ColorSchemeMeta } from "@/components/theme-wrapper";
 import { LANGS, getLanguage } from "@/lib/i18n";
 import { getServiceConfig } from "@/lib/service-url";
-import { getAllowedLanguages } from "@/lib/zitadel";
+import { getAllowedLanguages, getBrandingSettings } from "@/lib/zitadel";
 import * as Tooltip from "@radix-ui/react-tooltip";
+import { ThemeMode } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Lato } from "next/font/google";
@@ -42,6 +44,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     console.error("Failed to load supported languages", e);
   }
 
+  // Instance-level theme mode for the streamed shell. Pages render the
+  // organization-specific branding once their data has resolved.
+  let shellThemeMode: ThemeMode | undefined;
+  try {
+    shellThemeMode = (await getBrandingSettings({ serviceConfig }))?.themeMode;
+  } catch (e) {
+    console.error("Failed to load branding settings", e);
+  }
+
   return (
     <html className={`${lato.className}`} suppressHydrationWarning>
       <head />
@@ -53,6 +64,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <BackgroundWrapper
                   className={`bg-background-light-600 dark:bg-background-dark-600 relative flex min-h-screen flex-col justify-center`}
                 >
+                  <ColorSchemeMeta themeMode={shellThemeMode} />
                   <div className="relative mx-auto w-full max-w-[440px] py-8">
                     <Skeleton>
                       <div className="h-40"></div>

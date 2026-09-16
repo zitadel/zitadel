@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { BrandingSettings, ThemeMode } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ThemeWrapper } from "./theme-wrapper";
+import { ColorSchemeMeta, ThemeWrapper } from "./theme-wrapper";
 
 vi.mock("next-themes", () => ({
   useTheme: () => ({ setTheme: vi.fn() }),
@@ -44,10 +44,12 @@ describe("ThemeWrapper color-scheme", () => {
     unmount();
   });
 
-  it.each([
+  const unforcedModes: [string, ThemeMode][] = [
     ["auto", ThemeMode.AUTO],
     ["unspecified", ThemeMode.UNSPECIFIED],
-  ])("leaves the choice to the browser when the theme mode is %s", (_name, themeMode) => {
+  ];
+
+  it.each(unforcedModes)("leaves the choice to the browser when the theme mode is %s", (_name, themeMode) => {
     const { unmount } = renderWithThemeMode(themeMode);
     expect(colorSchemeMetas()).toHaveLength(0);
     unmount();
@@ -74,6 +76,22 @@ describe("ThemeWrapper color-scheme", () => {
 
     rerender(wrapper(undefined));
     expect(colorSchemeMetas()).toHaveLength(0);
+    unmount();
+  });
+});
+
+describe("ColorSchemeMeta", () => {
+  const cases: [string, ThemeMode | undefined, string[]][] = [
+    ["light", ThemeMode.LIGHT, ["only light"]],
+    ["dark", ThemeMode.DARK, ["only dark"]],
+    ["auto", ThemeMode.AUTO, []],
+    ["unspecified", ThemeMode.UNSPECIFIED, []],
+    ["unknown", undefined, []],
+  ];
+
+  it.each(cases)("declares %s as %j", (_name, themeMode, expected) => {
+    const { unmount } = render(<ColorSchemeMeta themeMode={themeMode} />);
+    expect(colorSchemeMetas().map((m) => m.content)).toEqual(expected);
     unmount();
   });
 });

@@ -16,14 +16,20 @@ type Props = {
 // inverts a forced light theme and hides checked checkboxes. "only light" / "only dark"
 // is the documented opt-out. Without a forced theme nothing is declared, so the
 // browser keeps following the system preference.
-function colorSchemeFor(themeMode: ThemeMode | undefined): string | undefined {
+//
+// Rendered as JSX so React hoists the tag into <head> already during server
+// rendering; a client effect would only run after the browser painted (and
+// possibly darkened) the initial HTML. The login layout renders it in its
+// Suspense fallback as well, so the streamed shell is covered before the page
+// with its organization-specific branding arrives.
+export function ColorSchemeMeta({ themeMode }: { themeMode: ThemeMode | undefined }) {
   switch (themeMode) {
     case ThemeMode.LIGHT:
-      return "only light";
+      return <meta name="color-scheme" content="only light" />;
     case ThemeMode.DARK:
-      return "only dark";
+      return <meta name="color-scheme" content="only dark" />;
     default:
-      return undefined;
+      return null;
   }
 }
 
@@ -133,14 +139,9 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [branding?.themeMode]);
 
-  // Rendered as JSX so React hoists the tag into <head> already during server
-  // rendering; a client effect would only run after the browser painted (and
-  // possibly darkened) the initial HTML.
-  const colorScheme = colorSchemeFor(branding?.themeMode);
-
   return (
     <>
-      {colorScheme && <meta name="color-scheme" content={colorScheme} />}
+      <ColorSchemeMeta themeMode={branding?.themeMode} />
       <div>{children}</div>
     </>
   );
