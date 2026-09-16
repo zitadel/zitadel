@@ -207,23 +207,23 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 
 // eventTypeScans returns the distinct combinations of aggregate type and event type of all sub queries,
 // if [eventstore.SearchQueryBuilder.ScanEventTypesSeparately] was set and the sub queries filter by nothing else.
+// Each sub query must filter a single aggregate type, because event types belong to an aggregate type:
+// a sub query with several aggregate types would combine event types with aggregate types they do not belong to.
 func eventTypeScans(builder *eventstore.SearchQueryBuilder) []EventTypeScan {
 	if !builder.GetScanEventTypesSeparately() {
 		return nil
 	}
 	var scans []EventTypeScan
 	for _, query := range builder.GetQueries() {
-		if len(query.GetAggregateTypes()) == 0 ||
+		if len(query.GetAggregateTypes()) != 1 ||
 			len(query.GetEventTypes()) == 0 ||
 			len(query.GetAggregateIDs()) > 0 ||
 			len(query.GetEventData()) > 0 ||
 			!query.GetPositionAfter().IsZero() {
 			return nil
 		}
-		for _, aggregateType := range query.GetAggregateTypes() {
-			for _, eventType := range query.GetEventTypes() {
-				scans = append(scans, EventTypeScan{AggregateType: aggregateType, EventType: eventType})
-			}
+		for _, eventType := range query.GetEventTypes() {
+			scans = append(scans, EventTypeScan{AggregateType: query.GetAggregateTypes()[0], EventType: eventType})
 		}
 	}
 	// sub queries are OR-connected, so a combination listed twice must still be read once

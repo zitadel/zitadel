@@ -161,16 +161,21 @@ func TestQueryFromBuilder_eventTypeScans(t *testing.T) {
 			want: nil,
 		},
 		{
-			name: "every combination of each sub query, sorted and distinct",
+			name: "event types of each sub query, sorted and distinct",
 			builder: base().
-				AddQuery().AggregateTypes("user", "org").EventTypes("user.locked", "org.removed").Builder().
+				AddQuery().AggregateTypes("user").EventTypes("user.locked", "user.removed").Builder().
+				AddQuery().AggregateTypes("org").EventTypes("org.removed").Builder().
 				AddQuery().AggregateTypes("user").EventTypes("user.locked").Builder(),
 			want: []EventTypeScan{
 				{AggregateType: "org", EventType: "org.removed"},
-				{AggregateType: "org", EventType: "user.locked"},
-				{AggregateType: "user", EventType: "org.removed"},
 				{AggregateType: "user", EventType: "user.locked"},
+				{AggregateType: "user", EventType: "user.removed"},
 			},
+		},
+		{
+			name:    "sub query with several aggregate types",
+			builder: base().AddQuery().AggregateTypes("user", "org").EventTypes("user.locked", "org.removed").Builder(),
+			want:    nil,
 		},
 		{
 			name:    "sub query without event types",
