@@ -189,8 +189,11 @@ jobs:
   npm-packages:
     runs-on: ubuntu-22.04
     needs: version
-    if: needs.version.outputs.published == 'true' && (github.ref_name == 'next' || github.ref_name == 'next-rc')
-    continue-on-error: true
+    # Gated by the PUBLISH_NPM_PACKAGES repository variable so the job is skipped (not failed)
+    # until the trusted publishers are configured on npmjs.com. Once enabled, a failed publish
+    # fails the job on purpose: the npm packages must exist for every ZITADEL release version.
+    # "Re-run failed jobs" republishes with the same version.
+    if: needs.version.outputs.published == 'true' && (github.ref_name == 'next' || github.ref_name == 'next-rc') && vars.PUBLISH_NPM_PACKAGES == 'true'
     permissions:
       contents: read
       id-token: write
@@ -209,9 +212,10 @@ jobs:
           node-version: "22"
           cache: "pnpm"
 
-      # npm >= 11.5.1 is required for trusted publishing (pnpm publish delegates to npm)
-      - name: Update npm
-        run: npm install -g npm@latest
+      # npm >= 11.5.1 is required for trusted publishing (pnpm publish delegates to npm).
+      # Node 22 ships npm 10.x, so install a pinned npm 11.
+      - name: Install npm 11
+        run: npm install -g npm@11.19.1
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
