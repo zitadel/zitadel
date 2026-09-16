@@ -28,7 +28,7 @@
     "register": "Register new user",
     "submit": "Continue",
     "labels": {
-       "loginname": "Loginname",
+      "loginname": "Loginname",
       "usernameEmailOrPhone": "Username, email or phone number",
       "username": "Username",
       "usernameOrPhoneNumber": "Username or phone number",
