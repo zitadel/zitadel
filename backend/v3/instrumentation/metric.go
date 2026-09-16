@@ -33,6 +33,7 @@ type Meter struct {
 	Counters          sync.Map
 	UpDownSumObserver sync.Map
 	ValueObservers    sync.Map
+	CounterObservers  sync.Map
 	Histograms        sync.Map
 }
 
@@ -133,6 +134,20 @@ func (m *Meter) RegisterValueObserver(name, description string, callbackFunc met
 	}
 
 	m.UpDownSumObserver.Store(name, gauge)
+	return nil
+}
+
+func (m *Meter) RegisterCounterObserver(name, description string, callbackFunc metric.Int64Callback) error {
+	if _, exists := m.CounterObservers.Load(name); exists {
+		return nil
+	}
+
+	counter, err := m.Meter.Int64ObservableCounter(name, metric.WithInt64Callback(callbackFunc), metric.WithDescription(description))
+	if err != nil {
+		return err
+	}
+
+	m.CounterObservers.Store(name, counter)
 	return nil
 }
 
