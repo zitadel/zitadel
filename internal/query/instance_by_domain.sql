@@ -68,6 +68,8 @@ select
     s.enable_iframe_embedding,
     s.origins,
 	s.enable_impersonation,
+	s.enable_dynamic_client_registration,
+	s.allow_unauthenticated_dynamic_client_registration,
     l.audit_log_retention,
     l.block,
 	f.features,
@@ -77,7 +79,7 @@ select
 	r.allowed_languages
 from domain d
 join projections.instances i on i.id = d.instance_id
-left join projections.security_policies2 s on i.id = s.instance_id
+left join projections.security_policies3 s on i.id = s.instance_id
 left join projections.limits l on i.id = l.instance_id
 left join features f on i.id = f.instance_id
 left join external_domains ed on i.id = ed.instance_id

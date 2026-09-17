@@ -80,17 +80,13 @@ func (l *Login) handlePasswordlessRegistration(w http.ResponseWriter, r *http.Re
 func (l *Login) renderPasswordlessRegistration(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, orgID, codeID, code string, requestedPlatformType authPlatform, err error) {
 	var credentialData string
 	var disabled bool
-	if authReq != nil {
-		userID = authReq.UserID
-		orgID = authReq.UserOrgID
-	}
+	// Passwordless registration in the legacy login is only ever driven by an emailed
+	// init code (userID/orgID/codeID/code carried in the query/form). The auth-request based
+	// setup path was a never-active leftover and has been removed (GHSA-45f2-5q3r-xgg6);
+	// authReq is only used for rendering (translator/user data) below.
 	var webAuthNToken *domain.WebAuthNToken
 	if err == nil {
-		if authReq != nil {
-			webAuthNToken, err = l.authRepo.BeginPasswordlessSetup(setUserContext(r.Context(), userID, authReq.UserOrgID), userID, authReq.UserOrgID, domain.AuthenticatorAttachment(requestedPlatformType))
-		} else {
-			webAuthNToken, err = l.authRepo.BeginPasswordlessInitCodeSetup(setUserContext(r.Context(), userID, orgID), userID, orgID, codeID, code, domain.AuthenticatorAttachment(requestedPlatformType))
-		}
+		webAuthNToken, err = l.authRepo.BeginPasswordlessInitCodeSetup(setUserContext(r.Context(), userID, orgID), userID, orgID, codeID, code, domain.AuthenticatorAttachment(requestedPlatformType))
 	}
 	if err != nil {
 		disabled = true
@@ -171,11 +167,10 @@ func (l *Login) checkPasswordlessRegistration(w http.ResponseWriter, r *http.Req
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	if authReq != nil {
-		err = l.authRepo.VerifyPasswordlessSetup(setContext(r.Context(), authReq.UserOrgID), formData.UserID, authReq.UserOrgID, userAgentID, formData.TokenName, credData)
-	} else {
-		err = l.authRepo.VerifyPasswordlessInitCodeSetup(setContext(r.Context(), formData.OrgID), formData.UserID, formData.OrgID, userAgentID, formData.TokenName, formData.CodeID, formData.Code, credData)
-	}
+	// Passwordless setup is verified exclusively through the emailed init code; the
+	// auth-request based setup path was removed (GHSA-45f2-5q3r-xgg6). A request that
+	// carries an authRequestID but no valid code therefore fails here.
+	err = l.authRepo.VerifyPasswordlessInitCodeSetup(setContext(r.Context(), formData.OrgID), formData.UserID, formData.OrgID, userAgentID, formData.TokenName, formData.CodeID, formData.Code, credData)
 	if err != nil {
 		l.renderPasswordlessRegistration(w, r, authReq, formData.UserID, formData.OrgID, formData.CodeID, formData.Code, formData.RequestPlatformType, err)
 		return

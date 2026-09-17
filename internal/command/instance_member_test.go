@@ -276,6 +276,261 @@ func TestCommandSide_AddInstanceMember(t *testing.T) {
 	}
 }
 
+func TestCommandSide_EnsureInstanceMemberRolesFromLogin(t *testing.T) {
+	type fields struct {
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		zitadelRoles    []authz.RoleMapping
+		checkPermission domain.PermissionCheck
+	}
+	type args struct {
+		member *AddInstanceMember
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "no roles, invalid argument error",
+			fields: fields{
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				member: &AddInstanceMember{
+					InstanceID: "INSTANCE",
+					UserID:     "user1",
+				},
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "member not existing, added, bypasses permission check",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+					),
+					expectFilter(),
+					expectPush(
+						instance.NewMemberAddedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"user1",
+							[]string{"IAM_OWNER_VIEWER"}...,
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: "IAM_OWNER_VIEWER",
+					},
+				},
+			},
+			args: args{
+				member: &AddInstanceMember{
+					InstanceID: "INSTANCE",
+					UserID:     "user1",
+					Roles:      []string{"IAM_OWNER_VIEWER"},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "member existing without the role, role added",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewMemberAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"user1",
+								[]string{"IAM_LOGIN_CLIENT"}...,
+							),
+						),
+					),
+					expectPush(
+						instance.NewMemberChangedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"user1",
+							[]string{"IAM_LOGIN_CLIENT", "IAM_OWNER_VIEWER"}...,
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: "IAM_LOGIN_CLIENT",
+					},
+					{
+						Role: "IAM_OWNER_VIEWER",
+					},
+				},
+			},
+			args: args{
+				member: &AddInstanceMember{
+					InstanceID: "INSTANCE",
+					UserID:     "user1",
+					Roles:      []string{"IAM_OWNER_VIEWER"},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "member existing with the role, no push",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewMemberAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"user1",
+								[]string{"IAM_OWNER", "IAM_OWNER_VIEWER"}...,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: "IAM_OWNER",
+					},
+					{
+						Role: "IAM_OWNER_VIEWER",
+					},
+				},
+			},
+			args: args{
+				member: &AddInstanceMember{
+					InstanceID: "INSTANCE",
+					UserID:     "user1",
+					Roles:      []string{"IAM_OWNER_VIEWER"},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "no role configured on instance, invalid argument error",
+			fields: fields{
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: "IAM_OWNER",
+					},
+				},
+			},
+			args: args{
+				member: &AddInstanceMember{
+					InstanceID: "INSTANCE",
+					UserID:     "user1",
+					Roles:      []string{"IAM_OWNER_VIEWER"},
+				},
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "role not configured on instance, dropped from the granted roles",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewMemberAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"user1",
+								[]string{"IAM_LOGIN_CLIENT"}...,
+							),
+						),
+					),
+					expectPush(
+						instance.NewMemberChangedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"user1",
+							[]string{"IAM_LOGIN_CLIENT", "IAM_OWNER_VIEWER"}...,
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: "IAM_LOGIN_CLIENT",
+					},
+					{
+						Role: "IAM_OWNER_VIEWER",
+					},
+				},
+			},
+			args: args{
+				member: &AddInstanceMember{
+					InstanceID: "INSTANCE",
+					UserID:     "user1",
+					Roles:      []string{"IAM_OWNER_VIEWER", "IAM_ROLE_OF_OTHER_INSTANCE"},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore:      tt.fields.eventstore(t),
+				zitadelRoles:    tt.fields.zitadelRoles,
+				checkPermission: tt.fields.checkPermission,
+			}
+			got, err := r.EnsureInstanceMemberRolesFromLogin(context.Background(), tt.args.member)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assertObjectDetails(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
 func TestCommandSide_ChangeInstanceMember(t *testing.T) {
 	type fields struct {
 		eventstore      func(t *testing.T) *eventstore.Eventstore

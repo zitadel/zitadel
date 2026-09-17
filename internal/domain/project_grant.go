@@ -1,6 +1,10 @@
 package domain
 
-import es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+import (
+	"slices"
+
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+)
 
 type ProjectGrant struct {
 	es_models.ObjectRoot
@@ -34,11 +38,11 @@ func (p *ProjectGrant) IsValid() bool {
 	return p.GrantedOrgID != ""
 }
 
-func GetRemovedRoles(existingRoles, newRoles []string) []string {
-	removed := make([]string, 0)
+func GetRemovedRoles(existingRoles, newRoles []string) map[string]bool {
+	removed := make(map[string]bool, 0)
 	for _, role := range existingRoles {
-		if !containsRoleKey(role, newRoles) {
-			removed = append(removed, role)
+		if !slices.Contains(newRoles, role) {
+			removed[role] = true
 		}
 	}
 	return removed

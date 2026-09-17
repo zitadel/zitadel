@@ -20,7 +20,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const loginName = searchParams?.loginName;
   const requestId = searchParams?.requestId;
   const organization = searchParams?.organization;
-  const suffix = searchParams?.suffix;
+  const orgDomain = searchParams?.orgDomain;
   const submit: boolean = searchParams?.submit === "true";
 
   const _headers = await headers();
@@ -64,7 +64,8 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
             defaultOrganization={defaultOrganization}
             loginSettings={loginSettings}
-            suffix={suffix}
+            suffix={orgDomain}
+            hideSuffix={branding?.hideLoginNameSuffix}
             submit={submit}
             allowRegister={!!loginSettings?.allowRegister}
           ></UsernameForm>

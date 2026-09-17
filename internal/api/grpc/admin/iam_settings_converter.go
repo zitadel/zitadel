@@ -105,6 +105,8 @@ func SecretGeneratorTypeToPb(generatorType domain.SecretGeneratorType) settings_
 		return settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_OTP_SMS
 	case domain.SecretGeneratorTypeOTPEmail:
 		return settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_OTP_EMAIL
+	case domain.SecretGeneratorTypeInviteCode:
+		return settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_INVITE_CODE
 	default:
 		return settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_UNSPECIFIED
 	}
@@ -128,6 +130,8 @@ func SecretGeneratorTypeToDomain(generatorType settings_pb.SecretGeneratorType) 
 		return domain.SecretGeneratorTypeOTPSMS
 	case settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_OTP_EMAIL:
 		return domain.SecretGeneratorTypeOTPEmail
+	case settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_INVITE_CODE:
+		return domain.SecretGeneratorTypeInviteCode
 	default:
 		return domain.SecretGeneratorTypeUnspecified
 	}

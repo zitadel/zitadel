@@ -133,7 +133,14 @@ var (
 		` projections.idp_templates6_apple.team_id,` +
 		` projections.idp_templates6_apple.key_id,` +
 		` projections.idp_templates6_apple.private_key,` +
-		` projections.idp_templates6_apple.scopes` +
+		` projections.idp_templates6_apple.scopes,` +
+		// zitadel
+		` projections.idp_templates6_zitadel.idp_id,` +
+		` projections.idp_templates6_zitadel.issuer,` +
+		` projections.idp_templates6_zitadel.client_id,` +
+		` projections.idp_templates6_zitadel.client_secret,` +
+		` projections.idp_templates6_zitadel.scopes,` +
+		` projections.idp_templates6_zitadel.instance_roles_info` +
 		` FROM projections.idp_templates6` +
 		` LEFT JOIN projections.idp_templates6_oauth2 ON projections.idp_templates6.id = projections.idp_templates6_oauth2.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_oauth2.instance_id` +
 		` LEFT JOIN projections.idp_templates6_oidc ON projections.idp_templates6.id = projections.idp_templates6_oidc.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_oidc.instance_id` +
@@ -146,7 +153,8 @@ var (
 		` LEFT JOIN projections.idp_templates6_google ON projections.idp_templates6.id = projections.idp_templates6_google.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_google.instance_id` +
 		` LEFT JOIN projections.idp_templates6_saml ON projections.idp_templates6.id = projections.idp_templates6_saml.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_saml.instance_id` +
 		` LEFT JOIN projections.idp_templates6_ldap2 ON projections.idp_templates6.id = projections.idp_templates6_ldap2.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_ldap2.instance_id` +
-		` LEFT JOIN projections.idp_templates6_apple ON projections.idp_templates6.id = projections.idp_templates6_apple.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_apple.instance_id`
+		` LEFT JOIN projections.idp_templates6_apple ON projections.idp_templates6.id = projections.idp_templates6_apple.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_apple.instance_id` +
+		` LEFT JOIN projections.idp_templates6_zitadel ON projections.idp_templates6.id = projections.idp_templates6_zitadel.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_zitadel.instance_id`
 	idpTemplateCols = []string{
 		"id",
 		"resource_owner",
@@ -266,6 +274,13 @@ var (
 		"key_id",
 		"private_key",
 		"scopes",
+		// zitadel config
+		"idp_id",
+		"issuer",
+		"client_id",
+		"client_secret",
+		"scopes",
+		"instance_roles_info",
 	}
 	idpTemplatesQuery = `SELECT projections.idp_templates6.id,` +
 		` projections.idp_templates6.resource_owner,` +
@@ -385,6 +400,13 @@ var (
 		` projections.idp_templates6_apple.key_id,` +
 		` projections.idp_templates6_apple.private_key,` +
 		` projections.idp_templates6_apple.scopes,` +
+		// zitadel
+		` projections.idp_templates6_zitadel.idp_id,` +
+		` projections.idp_templates6_zitadel.issuer,` +
+		` projections.idp_templates6_zitadel.client_id,` +
+		` projections.idp_templates6_zitadel.client_secret,` +
+		` projections.idp_templates6_zitadel.scopes,` +
+		` projections.idp_templates6_zitadel.instance_roles_info,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.idp_templates6` +
 		` LEFT JOIN projections.idp_templates6_oauth2 ON projections.idp_templates6.id = projections.idp_templates6_oauth2.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_oauth2.instance_id` +
@@ -398,7 +420,8 @@ var (
 		` LEFT JOIN projections.idp_templates6_google ON projections.idp_templates6.id = projections.idp_templates6_google.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_google.instance_id` +
 		` LEFT JOIN projections.idp_templates6_saml ON projections.idp_templates6.id = projections.idp_templates6_saml.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_saml.instance_id` +
 		` LEFT JOIN projections.idp_templates6_ldap2 ON projections.idp_templates6.id = projections.idp_templates6_ldap2.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_ldap2.instance_id` +
-		` LEFT JOIN projections.idp_templates6_apple ON projections.idp_templates6.id = projections.idp_templates6_apple.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_apple.instance_id`
+		` LEFT JOIN projections.idp_templates6_apple ON projections.idp_templates6.id = projections.idp_templates6_apple.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_apple.instance_id` +
+		` LEFT JOIN projections.idp_templates6_zitadel ON projections.idp_templates6.id = projections.idp_templates6_zitadel.idp_id AND projections.idp_templates6.instance_id = projections.idp_templates6_zitadel.instance_id`
 	idpTemplatesCols = []string{
 		"id",
 		"resource_owner",
@@ -518,6 +541,14 @@ var (
 		"key_id",
 		"private_key",
 		"scopes",
+		// zitadel config
+		"idp_id",
+		"issuer",
+		"client_id",
+		"client_secret",
+		"scopes",
+		"instance_roles_info",
+		// count
 		"count",
 	}
 )
@@ -671,6 +702,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// apple
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// zitadel
 						nil,
 						nil,
 						nil,
@@ -834,6 +872,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// zitadel
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -983,6 +1028,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// apple
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// zitadel
 						nil,
 						nil,
 						nil,
@@ -1143,6 +1195,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// zitadel
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -1295,6 +1354,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// zitadel
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -1441,6 +1507,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// apple
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// zitadel
 						nil,
 						nil,
 						nil,
@@ -1600,6 +1673,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// zitadel
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -1746,6 +1826,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// apple
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// zitadel
 						nil,
 						nil,
 						nil,
@@ -1904,6 +1991,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						"avatar",
 						"profile",
 						// apple
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// zitadel
 						nil,
 						nil,
 						nil,
@@ -2083,6 +2177,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						"key_id",
 						nil,
 						database.TextArray[string]{"profile"},
+						// zitadel
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -2108,6 +2209,172 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 					KeyID:      "key_id",
 					PrivateKey: nil,
 					Scopes:     []string{"profile"},
+				},
+			},
+		},
+		{
+			name:    "prepareIDPTemplateByIDQuery zitadel idp",
+			prepare: prepareIDPTemplateByIDQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					regexp.QuoteMeta(idpTemplateQuery),
+					idpTemplateCols,
+					[]driver.Value{
+						"idp-id",
+						"ro",
+						testNow,
+						testNow,
+						uint64(20211109),
+						domain.IDPConfigStateActive,
+						"idp-name",
+						domain.IDPTypeZitadel,
+						domain.IdentityProviderTypeOrg,
+						true,
+						true,
+						true,
+						true,
+						domain.AutoLinkingOptionUsername,
+						// oauth
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// oidc
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// azure
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// github
+						nil,
+						nil,
+						nil,
+						nil,
+						// github enterprise
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab self hosted
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// google
+						nil,
+						nil,
+						nil,
+						nil,
+						// saml
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// ldap config
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// apple
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// zitadel
+						"idp-id",
+						"issuer",
+						"client_id",
+						nil,
+						database.TextArray[string]{"profile"},
+						[]byte(`[{"organizationId":"org1","organizationDomain":"org1.com"}]`),
+					},
+				),
+			},
+			object: &IDPTemplate{
+				CreationDate:      testNow,
+				ChangeDate:        testNow,
+				Sequence:          20211109,
+				ResourceOwner:     "ro",
+				ID:                "idp-id",
+				State:             domain.IDPStateActive,
+				Name:              "idp-name",
+				Type:              domain.IDPTypeZitadel,
+				OwnerType:         domain.IdentityProviderTypeOrg,
+				IsCreationAllowed: true,
+				IsLinkingAllowed:  true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       domain.AutoLinkingOptionUsername,
+				ZitadelIDPTemplate: &ZitadelIDPTemplate{
+					IDPID:        "idp-id",
+					Issuer:       "issuer",
+					ClientID:     "client_id",
+					ClientSecret: nil,
+					Scopes:       []string{"profile"},
+					InstanceRolesInfo: []idp.RolesInfo{
+						{
+							OrganizationID:     "org1",
+							OrganizationDomain: "org1.com",
+						},
+					},
 				},
 			},
 		},
@@ -2231,6 +2498,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// apple
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// zitadel
 						nil,
 						nil,
 						nil,
@@ -2419,6 +2693,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// zitadel
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -2601,6 +2882,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// zitadel
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -2756,6 +3044,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// zitadel
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 						{
 							"idp-id-saml",
@@ -2870,6 +3165,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							// apple
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// zitadel
 							nil,
 							nil,
 							nil,
@@ -2996,6 +3298,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// zitadel
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 						{
 							"idp-id-oauth",
@@ -3110,6 +3419,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							// apple
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// zitadel
 							nil,
 							nil,
 							nil,
@@ -3236,6 +3552,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// zitadel
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 						{
 							"idp-id-jwt",
@@ -3356,13 +3679,147 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// zitadel
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+						},
+						{
+							"idp-id-zitadel",
+							"ro",
+							testNow,
+							testNow,
+							uint64(20211109),
+							domain.IDPConfigStateActive,
+							"idp-name",
+							domain.IDPTypeZitadel,
+							domain.IdentityProviderTypeOrg,
+							true,
+							true,
+							true,
+							true,
+							domain.AutoLinkingOptionUsername,
+							// oauth
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// oidc
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// jwt
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// azure
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// github
+							nil,
+							nil,
+							nil,
+							nil,
+							// github enterprise
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// gitlab
+							nil,
+							nil,
+							nil,
+							nil,
+							// gitlab self hosted
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// google
+							nil,
+							nil,
+							nil,
+							nil,
+							// saml
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// ldap config
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// apple
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// zitadel
+							"idp-id-zitadel",
+							"issuer",
+							"client_id",
+							nil,
+							database.TextArray[string]{"profile"},
+							[]byte(`[{"organizationId":"org1","organizationDomain":"org1.com"}]`),
 						},
 					},
 				),
 			},
 			object: &IDPTemplates{
 				SearchResponse: SearchResponse{
-					Count: 6,
+					Count: 7,
 				},
 				Templates: []*IDPTemplate{
 					{
@@ -3458,7 +3915,6 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							Scopes:       []string{"profile"},
 						},
 					},
-
 					{
 						CreationDate:      testNow,
 						ChangeDate:        testNow,
@@ -3533,6 +3989,35 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							KeysEndpoint: "keys",
 							HeaderName:   "header",
 							Audience:     "audience",
+						},
+					},
+					{
+						CreationDate:      testNow,
+						ChangeDate:        testNow,
+						Sequence:          20211109,
+						ResourceOwner:     "ro",
+						ID:                "idp-id-zitadel",
+						State:             domain.IDPStateActive,
+						Name:              "idp-name",
+						Type:              domain.IDPTypeZitadel,
+						OwnerType:         domain.IdentityProviderTypeOrg,
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+						AutoLinking:       domain.AutoLinkingOptionUsername,
+						ZitadelIDPTemplate: &ZitadelIDPTemplate{
+							IDPID:        "idp-id-zitadel",
+							Issuer:       "issuer",
+							ClientID:     "client_id",
+							ClientSecret: nil,
+							Scopes:       []string{"profile"},
+							InstanceRolesInfo: []idp.RolesInfo{
+								{
+									OrganizationID:     "org1",
+									OrganizationDomain: "org1.com",
+								},
+							},
 						},
 					},
 				},

@@ -254,6 +254,12 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s69CacheTablesLogged = &CacheTablesLogged{dbClient: dbClient}
 	steps.s70AddEventStoreCommandEnforceOwner = &AddEventStoreCommandEnforceOwnerColumn{dbClient: dbClient}
 	steps.s71JWTProvideAddAudienceColumn = &JWTProvideAddAudienceColumn{dbClient: dbClient}
+	steps.s72AddColumnsToLoginNamesView = &AddColumnsToLoginNamesView{dbClient: dbClient}
+	steps.s73FixUserGrantRoles = &FixUserGrantRoles{eventstore: eventstoreClient}
+	steps.s74Apps7OIDCConfigsAddRegistrationToken = &Apps7OIDCConfigsAddRegistrationToken{dbClient: dbClient}
+	steps.s75Apps7OIDCConfigsAddAppLinkConfig = &Apps7OIDCConfigsAddAppLinkConfig{dbClient: dbClient}
+	steps.s76Users14LoginEqualityIndexes = &Users14LoginEqualityIndexes{dbClient: dbClient}
+	steps.s77StampEventPositionAtInsert = &StampEventPositionAtInsert{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	if err != nil {
@@ -312,6 +318,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s67SyncMemberRoleFields,
 		steps.s69CacheTablesLogged,
 		steps.s70AddEventStoreCommandEnforceOwner,
+		steps.s76Users14LoginEqualityIndexes,
+		steps.s77StampEventPositionAtInsert,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
@@ -352,6 +360,12 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		&RiverMigrateRepeatable{
 			client: dbClient,
 		},
+		&eventstoreAutovacuum{
+			dbClient:         dbClient,
+			Enabled:          config.Eventstore.Autovacuum.Enabled,
+			VacuumThreshold:  config.Eventstore.Autovacuum.VacuumThreshold,
+			AnalyzeThreshold: config.Eventstore.Autovacuum.AnalyzeThreshold,
+		},
 	}
 	repeatableSteps = append(repeatableSteps, triggerSteps(dbClient)...)
 
@@ -378,6 +392,10 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s66SessionRecoveryCodeCheckedAt,
 		steps.s68TargetAddPayloadTypeColumn,
 		steps.s71JWTProvideAddAudienceColumn,
+		steps.s72AddColumnsToLoginNamesView,
+		steps.s73FixUserGrantRoles,
+		steps.s74Apps7OIDCConfigsAddRegistrationToken,
+		steps.s75Apps7OIDCConfigsAddAppLinkConfig,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
@@ -533,6 +551,7 @@ func startCommandsQueries(
 		0,   // not needed for projections
 		nil, // not needed for projections
 		false,
+		config.DefaultInstance.SecretGenerators.ToMap(),
 	)
 	logging.OnError(ctx, err).Fatal("unable to start queries")
 

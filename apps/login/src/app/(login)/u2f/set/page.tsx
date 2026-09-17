@@ -3,6 +3,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterU2f } from "@/components/register-u2f";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
+import { getEnrollmentAuthorizationError } from "@/lib/server/enrollment-guard";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings } from "@/lib/zitadel";
@@ -33,6 +34,19 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   const branding = await getBrandingSettings({ serviceConfig, organization });
 
+  // Enrollment must be authorized: a bare identify-only session must not be offered the
+  // authenticator-registration form (defense in depth alongside the addU2F/verifyU2F server
+  // actions, GHSA-45f2-5q3r-xgg6).
+  let enrollmentAuthorized = false;
+  if (sessionFactors?.id && sessionFactors.factors?.user?.id) {
+    const enrollmentError = await getEnrollmentAuthorizationError({
+      serviceConfig,
+      session: sessionFactors,
+      userId: sessionFactors.factors.user.id,
+    });
+    enrollmentAuthorized = !enrollmentError;
+  }
+
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
@@ -55,7 +69,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
       </div>
 
       <div className="w-full">
-        {!sessionFactors && (
+        {(!sessionFactors || !enrollmentAuthorized) && (
           <div className="py-4">
             <Alert>
               <Translated i18nKey="unknownContext" namespace="error" />
@@ -63,7 +77,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           </div>
         )}
 
-        {sessionFactors?.id && (
+        {sessionFactors?.id && enrollmentAuthorized && (
           <RegisterU2f
             loginName={loginName}
             sessionId={sessionFactors.id}

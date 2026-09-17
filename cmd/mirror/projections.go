@@ -177,6 +177,7 @@ func projections(
 		0,
 		config.SystemAPIUsers,
 		false,
+		config.DefaultInstance.SecretGenerators.ToMap(),
 	)
 	logging.OnError(ctx, err).Fatal("unable to start queries")
 

@@ -29,7 +29,7 @@ export function AuthenticationMethodRadio({
                 value={method}
                 data-testid={method + "-radio"}
                 className={({ focus, checked }) =>
-                  `${focus ? "ring-primary-light-500 ring-opacity-60 ring-2 dark:ring-white/20" : ""} ${
+                  `${focus ? "ring-primary-light-500/60 ring-2 dark:ring-white/20" : ""} ${
                     checked
                       ? "bg-background-light-400 ring-primary-light-500 dark:bg-background-dark-400 dark:ring-primary-dark-500 ring-2"
                       : "bg-background-light-400 dark:bg-background-dark-400"

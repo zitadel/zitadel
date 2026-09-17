@@ -202,6 +202,10 @@ func (e *mockEvent) Position() decimal.Decimal {
 	return decimal.Decimal{}
 }
 
+func (e *mockEvent) InTxOrder() uint32 {
+	return 0
+}
+
 func (e *mockEvent) CreatedAt() time.Time {
 	return e.createdAt
 }

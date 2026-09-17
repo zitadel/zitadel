@@ -104,6 +104,7 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, SAMLIDPAddedEventType, SAMLIDPAddedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, SAMLIDPChangedEventType, SAMLIDPChangedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, ZitadelIDPAddedEventType, eventstore.GenericEventMapper[ZitadelIDPAddedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, ZitadelIDPChangedEventType, eventstore.GenericEventMapper[ZitadelIDPChangedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, IDPRemovedEventType, IDPRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, TriggerActionsSetEventType, TriggerActionsSetEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, TriggerActionsCascadeRemovedEventType, TriggerActionsCascadeRemovedEventMapper)

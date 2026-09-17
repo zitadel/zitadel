@@ -26,6 +26,7 @@ export async function addUserGrant(
         roleKeys: roles,
       }),
       {
+        tags: { name: '/management/v1/users/{userId}/grants' },
         headers: {
           authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',

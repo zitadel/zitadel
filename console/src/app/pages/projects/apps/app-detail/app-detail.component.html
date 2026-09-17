@@ -462,6 +462,102 @@
             </div>
           </cnsl-card>
         }
+
+        @if (currentSetting.id === 'native-app-links' && oidcForm && app?.oidcConfig) {
+          <cnsl-card title="{{ 'APP.OIDC.APPLINKSSECTION' | translate }}">
+            <p class="app-desc cnsl-secondary-text">{{ 'APP.OIDC.APPLINKSDESC' | translate }}</p>
+            <form [formGroup]="oidcForm" (ngSubmit)="saveOIDCApp()">
+              <h3 class="title">{{ 'APP.OIDC.IOSTITLE' | translate }}</h3>
+              <cnsl-info-section class="full-width app-desc">
+                <span>{{ 'APP.OIDC.IOSDESC' | translate }}</span>
+                @if (issuer$ | async; as issuer) {
+                  <div class="link app-link-endpoint">
+                    <a [href]="issuer + '/.well-known/apple-app-site-association'" rel="noreferrer" target="_blank"
+                      >{{ issuer }}/.well-known/apple-app-site-association</a
+                    >
+                  </div>
+                }
+              </cnsl-info-section>
+              <div class="content">
+                <cnsl-form-field class="app-formfield">
+                  <cnsl-label>{{ 'APP.OIDC.TEAMID' | translate }}</cnsl-label>
+                  <input
+                    cnslInput
+                    formControlName="iosTeamId"
+                    maxlength="10"
+                    autocomplete="off"
+                    [placeholder]="'APP.OIDC.TEAMIDPLACEHOLDER' | translate"
+                  />
+                </cnsl-form-field>
+                <cnsl-form-field class="app-formfield">
+                  <cnsl-label>{{ 'APP.OIDC.BUNDLEID' | translate }}</cnsl-label>
+                  <input
+                    cnslInput
+                    formControlName="iosBundleId"
+                    autocomplete="off"
+                    [placeholder]="'APP.OIDC.BUNDLEIDPLACEHOLDER' | translate"
+                  />
+                </cnsl-form-field>
+              </div>
+              <cnsl-info-section class="full-width app-desc">
+                <span>{{ 'APP.OIDC.TEAMIDDESC' | translate }} {{ 'APP.OIDC.BUNDLEIDDESC' | translate }}</span>
+              </cnsl-info-section>
+              @if (showIosAppLinkIncompleteWarning()) {
+                <cnsl-info-section class="full-width app-desc" [type]="InfoSectionType.WARN">
+                  <span>{{ 'APP.OIDC.IOSAPPLINKINCOMPLETE' | translate }}</span>
+                </cnsl-info-section>
+              }
+
+              <h3 class="title" style="margin-top: 1.5rem">{{ 'APP.OIDC.ANDROIDTITLE' | translate }}</h3>
+              <cnsl-info-section class="full-width app-desc">
+                <span>{{ 'APP.OIDC.ANDROIDDESC' | translate }}</span>
+                @if (issuer$ | async; as issuer) {
+                  <div class="link app-link-endpoint">
+                    <a [href]="issuer + '/.well-known/assetlinks.json'" rel="noreferrer" target="_blank"
+                      >{{ issuer }}/.well-known/assetlinks.json</a
+                    >
+                  </div>
+                }
+              </cnsl-info-section>
+              <div class="content">
+                <cnsl-form-field class="app-formfield full-width">
+                  <cnsl-label>{{ 'APP.OIDC.PACKAGENAME' | translate }}</cnsl-label>
+                  <input
+                    cnslInput
+                    formControlName="androidPackageName"
+                    autocomplete="off"
+                    [placeholder]="'APP.OIDC.PACKAGENAMEPLACEHOLDER' | translate"
+                  />
+                </cnsl-form-field>
+                <cnsl-form-field class="app-formfield full-width fingerprints-field">
+                  <cnsl-label>{{ 'APP.OIDC.FINGERPRINTS' | translate }}</cnsl-label>
+                  <textarea
+                    cnslInput
+                    class="fingerprints-input"
+                    formControlName="androidSha256CertFingerprints"
+                    rows="10"
+                    [placeholder]="'APP.OIDC.FINGERPRINTSPLACEHOLDER' | translate"
+                  ></textarea>
+                </cnsl-form-field>
+              </div>
+              <cnsl-info-section class="full-width app-desc">
+                <span>{{ 'APP.OIDC.FINGERPRINTSDESC' | translate }}</span>
+              </cnsl-info-section>
+              @if (showAndroidPackageRequiredWarning()) {
+                <cnsl-info-section class="full-width app-desc" [type]="InfoSectionType.WARN">
+                  <span>{{ 'APP.OIDC.ANDROIDPACKAGEREQUIRED' | translate }}</span>
+                </cnsl-info-section>
+              }
+
+              <div class="btn-container">
+                <button class="submit-button" type="submit" color="primary" [disabled]="!canWrite" mat-raised-button>
+                  {{ 'ACTIONS.SAVE' | translate }}
+                </button>
+              </div>
+            </form>
+          </cnsl-card>
+        }
+
         @if (currentSetting.id === 'urls') {
           <cnsl-card title=" {{ 'APP.URLS' | translate }}">
             @if (issuer$ | async; as issuer) {

@@ -16,6 +16,7 @@ type HumanTOTPWriteModel struct {
 	Secret           *crypto.CryptoValue
 	CheckFailedCount uint64
 	UserLocked       bool
+	History          *domain.TOTPHistory
 }
 
 func NewHumanTOTPWriteModel(userID, resourceOwner string) *HumanTOTPWriteModel {
@@ -24,6 +25,7 @@ func NewHumanTOTPWriteModel(userID, resourceOwner string) *HumanTOTPWriteModel {
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
+		History: new(domain.TOTPHistory),
 	}
 }
 
@@ -38,6 +40,7 @@ func (wm *HumanTOTPWriteModel) Reduce() error {
 			wm.CheckFailedCount = 0
 		case *user.HumanOTPCheckSucceededEvent:
 			wm.CheckFailedCount = 0
+			wm.History.AddRecent(e.CreatedAt(), e.CodeHash)
 		case *user.HumanOTPCheckFailedEvent:
 			wm.CheckFailedCount++
 		case *user.UserLockedEvent:
@@ -86,6 +89,11 @@ func (wm *HumanTOTPWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
+	}
+	// checkTOTP rechecks the same write model for events which arrived during the
+	// code verification. Bound the query so only those are reduced again.
+	if wm.ProcessedSequence != 0 {
+		query.SequenceGreater(wm.ProcessedSequence)
 	}
 	return query
 }

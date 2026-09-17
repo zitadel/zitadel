@@ -176,6 +176,7 @@ Errors:
         NotExisting: "Multifattore OTP (OneTimePassword) non esistente"
         NotReady: "Multifattore OTP (OneTimePassword) non è pronto"
         InvalidCode: "Codice non valido"
+        Reused: "Questo codice è già stato utilizzato. Attendere un nuovo codice"
       U2F:
         NotExisting: "U2F non esistente"
       Passwordless:
@@ -204,6 +205,7 @@ Errors:
     AlreadyActive: "L'organizzazione è già attiva"
     Empty: "L'organizzazione è vuota"
     NotFound: "Organizzazione non trovata"
+    NotActive: "L'organizzazione non è attiva"
     NotChanged: "Organizzazione non cambiata"
     DefaultOrgNotDeletable: "L'organizzazione predefinita non deve essere cancellata"
     ZitadelOrgNotDeletable: "L'organizzazione con il progetto Zitadel non deve essere cancellata"
@@ -282,6 +284,8 @@ Errors:
     LabelPolicy:
       NotFound: "Etichettatura privata non trovata"
       NotChanged: "Private Labelling non è stata cambiata"
+    IDPConfig:
+      NotExisting: "La configurazione del IDP non esiste"
   Project:
     ProjectIDMissing: "ID del progetto mancante"
     AlreadyExists: "Il progetto è già stato creato nell'organizzazione"
@@ -763,6 +767,7 @@ EventTypes:
           check:
             succeeded: "Controllo OTP riuscito"
             failed: "Controllo OTP fallito"
+            reused: "Codice OTP riutilizzato"
           sms:
             added: "Aggiunta SMS OTP"
             removed: "SMS OTP rimossa"

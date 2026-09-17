@@ -85,6 +85,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/console/path"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
+	"github.com/zitadel/zitadel/internal/api/well_known"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/authz"
 	authz_repo "github.com/zitadel/zitadel/internal/authz/repository"
@@ -182,6 +183,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	if err != nil {
 		return fmt.Errorf("cannot start DB client for queries: %w", err)
 	}
+	database.RegisterPoolMetrics(ctx, dbClient.Pool)
 	new_domain.SetPool(v3_postgres.PGxPool(dbClient.Pool))
 
 	keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterKey)
@@ -248,6 +250,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		config.AuditLogRetention,
 		config.SystemAPIUsers,
 		true,
+		config.DefaultInstance.SecretGenerators.ToMap(),
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
@@ -655,6 +658,9 @@ func startAPIs(
 		return nil, fmt.Errorf("unable to start robots txt handler: %w", err)
 	}
 	apis.RegisterHandlerOnPrefix(robots_txt.HandlerPrefix, robotsTxtHandler)
+
+	// native app link well-known files (instance-scoped)
+	apis.RegisterHandlerPrefixes(instanceInterceptor.Handler(well_known.NewHandler(queries)), well_known.HandlerPrefixes...)
 
 	// TODO: Record openapi access logs?
 	openAPIHandler, err := openapi.Start()

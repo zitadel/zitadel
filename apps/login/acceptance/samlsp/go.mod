@@ -1,6 +1,6 @@
 module github.com/zitadel/typescript/acceptance/saml
 
-go 1.24.0
+go 1.25.0
 
 require github.com/crewjam/saml v0.4.14
 
@@ -14,5 +14,5 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/russellhaering/goxmldsig v1.5.0 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
-	golang.org/x/crypto v0.36.0 // indirect
+	golang.org/x/crypto v0.52.0 // indirect
 )

@@ -117,7 +117,7 @@ export class ProviderJWTComponent {
       issuer: new UntypedFormControl('', [requiredValidator]),
       jwtEndpoint: new UntypedFormControl('', [requiredValidator]),
       keysEndpoint: new UntypedFormControl('', [requiredValidator]),
-      audience: new UntypedFormControl('' ),
+      audience: new UntypedFormControl(''),
     });
 
     this.authService

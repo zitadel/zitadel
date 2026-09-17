@@ -65,6 +65,10 @@ export async function loginWithOIDCAndSession({
           }),
         });
         if (callbackUrl) {
+          if (!isSafeRedirectUri(callbackUrl)) {
+            console.warn("loginWithOIDCAndSession: Blocked unsafe OIDC callback URL:", callbackUrl);
+            return { error: "Unsafe redirect URI was blocked" };
+          }
           return { redirect: callbackUrl };
         } else {
           return { error: "An error occurred!" };

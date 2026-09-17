@@ -37,6 +37,46 @@ func CreateMockEncryptionAlg(ctrl *gomock.Controller) EncryptionAlgorithm {
 	return mCrypto
 }
 
+func CreateMockAuthEncryptionAlg(ctrl *gomock.Controller) AuthEncryptionAlgorithm {
+	mCrypto := NewMockAuthEncryptionAlgorithm(ctrl)
+	mCrypto.EXPECT().Algorithm().AnyTimes().Return("enc")
+	mCrypto.EXPECT().EncryptionKeyID().AnyTimes().Return("id")
+	mCrypto.EXPECT().DecryptionKeyIDs().AnyTimes().Return([]string{"id"})
+	mCrypto.EXPECT().Encrypt(gomock.Any()).AnyTimes().DoAndReturn(
+		func(code []byte) ([]byte, error) {
+			return code, nil
+		},
+	)
+	mCrypto.EXPECT().DecryptString(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
+		func(code []byte, keyID string) (string, error) {
+			if keyID != "id" {
+				return "", zerrors.ThrowInternal(nil, "id", "invalid key id")
+			}
+			return string(code), nil
+		},
+	)
+	mCrypto.EXPECT().Decrypt(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
+		func(code []byte, keyID string) ([]byte, error) {
+			if keyID != "id" {
+				return nil, zerrors.ThrowInternal(nil, "id", "invalid key id")
+			}
+			return code, nil
+		},
+	)
+	mCrypto.EXPECT().EncryptToken(gomock.Any()).AnyTimes().DoAndReturn(
+		func(data string) (string, error) {
+			return data, nil
+		},
+	)
+	mCrypto.EXPECT().DecryptToken(gomock.Any()).AnyTimes().DoAndReturn(
+		func(token string) (string, error) {
+			return token, nil
+		},
+	)
+	mCrypto.EXPECT().LegacyTokenEnabled().AnyTimes().Return(false)
+	return mCrypto
+}
+
 func createMockCrypto(t *testing.T) EncryptionAlgorithm {
 	mCrypto := NewMockEncryptionAlgorithm(gomock.NewController(t))
 	mCrypto.EXPECT().Algorithm().AnyTimes().Return("crypto")
