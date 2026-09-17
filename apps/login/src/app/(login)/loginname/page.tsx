@@ -78,6 +78,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
               requestId={requestId}
               organization={organization}
               postErrorRedirectUrl="/loginname"
+              loginHint={loginName}
               showLabel={loginSettings?.allowLocalAuthentication}
             ></SignInWithIdp>
           </div>
