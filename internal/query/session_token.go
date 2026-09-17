@@ -16,7 +16,6 @@ import (
 )
 
 // SessionTokenReadModel holds the state needed to verify a session token.
-// It is reduced from the events of a single session, so it does not depend on the session projection being up to date.
 type SessionTokenReadModel struct {
 	eventstore.ReadModel
 
@@ -106,7 +105,7 @@ func (wm *SessionTokenReadModel) Query() *eventstore.SearchQueryBuilder {
 
 // AuthMethodTypes returns the [domain.UserAuthMethodType] of all succeeded checks of the session.
 func (wm *SessionTokenReadModel) AuthMethodTypes() []domain.UserAuthMethodType {
-	types := make([]domain.UserAuthMethodType, 0, domain.UserAuthMethodTypeIDP)
+	types := make([]domain.UserAuthMethodType, 0, 7)
 	if !wm.PasswordCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypePassword)
 	}
@@ -178,6 +177,8 @@ func (q *Queries) ActiveSessionByToken(ctx context.Context, sessionID, sessionTo
 // sessionInvalidationModel searches for user and organization events,
 // which invalidate a session or its password check after they occurred.
 type sessionInvalidationModel struct {
+	eventstore.ReadModel
+
 	userID                  string
 	userResourceOwner       string
 	userCheckedPosition     decimal.Decimal
@@ -188,8 +189,8 @@ type sessionInvalidationModel struct {
 	passwordChanged bool
 }
 
-func (m *sessionInvalidationModel) AppendEvents(events ...eventstore.Event) {
-	for _, event := range events {
+func (m *sessionInvalidationModel) Reduce() error {
+	for _, event := range m.Events {
 		switch event.Type() {
 		case user.HumanPasswordChangedType:
 			m.passwordChanged = true
@@ -201,10 +202,7 @@ func (m *sessionInvalidationModel) AppendEvents(events ...eventstore.Event) {
 			m.terminated = true
 		}
 	}
-}
-
-func (m *sessionInvalidationModel) Reduce() error {
-	return nil
+	return m.ReadModel.Reduce()
 }
 
 func (m *sessionInvalidationModel) Query() *eventstore.SearchQueryBuilder {
