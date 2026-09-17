@@ -1110,6 +1110,46 @@ describe("sendLoginname", () => {
       expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
     });
 
+    test.each([
+      ["email login disabled", { disableLoginWithEmail: true }],
+      ["phone login disabled", { disableLoginWithPhone: true }],
+      ["email and phone login disabled", { disableLoginWithEmail: true, disableLoginWithPhone: true }],
+    ])("should allow login with a login name other than the preferred one when %s", async (_label, settings) => {
+      // Regression test for: https://github.com/zitadel/zitadel/issues/12606
+      const mockUser = {
+        userId: "user123",
+        preferredLoginName: "user@example.com",
+        loginNames: ["user@example.com", "user@organization.id.example.com"],
+        details: { resourceOwner: "org123" },
+        type: {
+          case: "human",
+          value: { email: { email: "user@gmail.com" }, phone: { phone: "+1234567890" } },
+        },
+        state: UserState.ACTIVE,
+      };
+
+      mockSearchUsers.mockResolvedValue({ result: [mockUser] });
+      mockGetLoginSettings.mockResolvedValue({ ...settings, allowLocalAuthentication: true });
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({
+        session: {
+          factors: {
+            user: { id: "user123", loginName: "user@organization.id.example.com", organizationId: "org123" },
+          },
+        },
+        sessionCookie: {},
+      });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+
+      const result = await sendLoginname({
+        loginName: "user@organization.id.example.com",
+      });
+
+      expect(result).not.toEqual({ error: "errors.userNotFound" });
+      expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
+    });
+
     test("should block login with phone number when disableLoginWithPhone is true", async () => {
       const mockUser = {
         userId: "user123",

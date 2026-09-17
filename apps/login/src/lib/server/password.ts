@@ -2,6 +2,7 @@
 
 import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/logger";
+import { isLoginNameOfUser } from "@/lib/login-names";
 import { recordAuthAttempt, recordAuthFailure, recordAuthSuccess } from "@/lib/metrics";
 import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "@/lib/server/cookie";
 import {
@@ -42,16 +43,6 @@ type ResetPasswordCommand = {
   defaultOrganization?: string;
   requestId?: string;
 };
-
-/**
- * Whether `loginName` is one of the user's login names. A user holds one per
- * verified domain, and searchUsers matches them case-insensitively, so checking
- * only the preferred one rejects a valid name the search itself just matched.
- */
-function isLoginNameOfUser(user: Pick<User, "preferredLoginName" | "loginNames">, loginName: string) {
-  const wanted = loginName.toLowerCase();
-  return [user.preferredLoginName, ...user.loginNames].some((name) => name.toLowerCase() === wanted);
-}
 
 export async function resetPassword(command: ResetPasswordCommand) {
   const _headers = await headers();
