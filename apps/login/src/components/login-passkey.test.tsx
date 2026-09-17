@@ -177,9 +177,9 @@ describe("LoginPasskey Component", () => {
       await waitFor(() => {
         expect(mockCredentialsGet).toHaveBeenCalledTimes(1);
       });
-      // Let the challenge request's own promise chain finish before checking.
-      await new Promise((resolve) => setTimeout(resolve, 0));
-      expect(submitButton()).toBeDisabled();
+      await waitFor(() => {
+        expect(submitButton()).toBeDisabled();
+      });
 
       cancelPrompt(Object.assign(new Error("cancelled"), { name: "NotAllowedError" }));
 

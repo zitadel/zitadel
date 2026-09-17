@@ -96,11 +96,9 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
     });
 
     // Loading stays set on success: the caller goes straight on to the WebAuthn
-    // ceremony, and Continue must stay disabled until that settles.
+    // ceremony, and Continue must stay disabled until that settles. On failure both
+    // callers show couldNotRequestChallenge, so only loading is reset here.
     if (!sessionResponse || ("error" in sessionResponse && sessionResponse.error)) {
-      if (sessionResponse && "error" in sessionResponse && sessionResponse.error) {
-        setError(sessionResponse.error);
-      }
       setLoading(false);
       return;
     }
