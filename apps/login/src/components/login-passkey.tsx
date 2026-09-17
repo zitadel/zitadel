@@ -89,18 +89,19 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
         },
       }),
       requestId,
-    })
-      .catch((error) => {
-        console.error(error);
-        setError(t("verify.errors.couldNotRequestChallenge"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }).catch((error) => {
+      console.error(error);
+      setError(t("verify.errors.couldNotRequestChallenge"));
+      return;
+    });
 
-    if (sessionResponse && "error" in sessionResponse && sessionResponse.error) {
-      setError(sessionResponse.error);
+    // Loading stays set on success: the caller goes straight on to the WebAuthn
+    // ceremony, and Continue must stay disabled until that settles.
+    if (!sessionResponse || ("error" in sessionResponse && sessionResponse.error)) {
+      if (sessionResponse && "error" in sessionResponse && sessionResponse.error) {
+        setError(sessionResponse.error);
+      }
+      setLoading(false);
       return;
     }
 
@@ -137,6 +138,9 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
   }
 
   async function submitLoginAndContinue(publicKey: any): Promise<boolean | void> {
+    // Held for the whole ceremony: tapping Continue while the browser's passkey
+    // prompt is open would request a new challenge and start a second one.
+    setLoading(true);
     publicKey.challenge = coerceToArrayBuffer(publicKey.challenge, "publicKey.challenge");
     publicKey.allowCredentials.map((listItem: any) => {
       listItem.id = coerceToArrayBuffer(listItem.id, "publicKey.allowCredentials.id");
@@ -236,18 +240,15 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
           variant={ButtonVariants.Primary}
           disabled={loading}
           onClick={async () => {
-            const response = await updateOrCreateSessionForChallenge().finally(() => {
-              setLoading(false);
-            });
+            const response = await updateOrCreateSessionForChallenge();
 
             const pK = response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
 
             if (!pK) {
               setError(t("verify.errors.couldNotRequestChallenge"));
+              setLoading(false);
               return;
             }
-
-            setLoading(true);
 
             return submitLoginAndContinue(pK)
               .catch((error) => {
