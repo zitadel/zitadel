@@ -467,6 +467,7 @@ Errors:
         AlreadyReady: Flerfaktor OTP (engangspassord) er allerede konfigurert
         NotExisting: Flerfaktor OTP (engangspassord) eksisterer ikke
         InvalidCode: Ugyldig kode
+        Reused: Denne koden er allerede brukt. Vent på en ny kode
         NotReady: Flerfaktor OTP (engangspassord) er ikke klar
     Locked: Brukeren er låst
     SomethingWentWrong: Noe gikk galt
@@ -481,10 +482,10 @@ Errors:
       CreationNotAllowed: Oppretting av ny bruker er ikke tillatt hos denne leverandøren
       LinkingNotAllowed: Kobling av bruker er ikke tillatt hos denne leverandøren
       NoOptionAllowed: Verken oppretting eller kobling er tillatt hos denne leverandøren. Vennligst kontakt administratoren.
-      LoginFailedSwitchLocal: 'Innlogging hos ekstern IDP feilet. Faller tilbake til lokal innlogging.
+      LoginFailedSwitchLocal: |
+        Innlogging hos ekstern IDP feilet. Faller tilbake til lokal innlogging.
 
-
-        Feildetaljer: {{.Details}}'
+        Feildetaljer: {{.Details}}
     GrantRequired: Innlogging ikke mulig. Brukeren må ha minst én tildeling på den forespurte applikasjonen. Vennligst kontakt administratoren din.
     ProjectRequired: Innlogging ikke mulig. Brukerens organisasjon må ha tilgang til det forespurte prosjektet. Vennligst kontakt administratoren din.
   IdentityProvider:

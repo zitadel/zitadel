@@ -152,7 +152,8 @@
       "failedPrecondition": "Forutsetning mislyktes",
       "sessionNotValid": "Økten er ikke gyldig",
       "passwordVerificationMissing": "Passordverifisering mangler.",
-      "passwordVerificationTooOld": "Passordverifiseringen er for gammel. Vennligst verifiser passordet ditt på nytt."
+      "passwordVerificationTooOld": "Passordverifiseringen er for gammel. Vennligst verifiser passordet ditt på nytt.",
+      "passwordResetNotAllowed": "Tilbakestilling av passord er ikke tillatt. Kontakt administratoren din for mer informasjon."
     }
   },
   "idp": {
@@ -164,6 +165,7 @@
     "signInWithAzureAD": "Logg inn med AzureAD",
     "signInWithGithub": "Logg inn med GitHub",
     "signInWithGitlab": "Logg inn med GitLab",
+    "signInWithZitadel": "Logg inn med Zitadel",
     "loginError": {
       "title": "Innlogging mislyktes",
       "description": "Det oppstod en feil under innlogging."
@@ -260,6 +262,10 @@
       "required": {
         "code": "Dette feltet er påkrevd"
       }
+    },
+    "errors": {
+      "couldNotRequestChallenge": "Kunne ikke be om OTP-utfordring",
+      "couldNotVerifyCode": "Kunne ikke bekrefte OTP-kode"
     }
   },
   "passkey": {
@@ -421,7 +427,15 @@
     "description": "Velg metoden du ønsker å autentisere med",
     "noMethodsAvailable": "Ingen autentiseringsmetoder tilgjengelig",
     "allSetup": "Du har allerede satt opp en autentisering!",
-    "linkWithIDP": "eller koble til en identitetsleverandør"
+    "linkWithIDP": "eller koble til en identitetsleverandør",
+    "methods": {
+      "totp": "Autentiseringsapp",
+      "u2f": "Universell andrefaktor",
+      "otpEmail": "Kode via e-post",
+      "otpSms": "Kode via SMS",
+      "passkey": "Passnøkler",
+      "password": "Passord"
+    }
   },
   "device": {
     "usercode": {
@@ -456,6 +470,7 @@
     "sessionExpired": "Den nåværende økten har utløpt. Vennligst logg inn på nytt.",
     "failedLoading": "Kunne ikke laste inn data. Vennligst prøv igjen.",
     "tryagain": "Prøv igjen",
-    "couldNotContinueSession": "Kunne ikke fortsette med økten - manglende brukerinformasjon"
+    "couldNotContinueSession": "Kunne ikke fortsette med økten - manglende brukerinformasjon",
+    "couldNotClearSession": "Kunne ikke avslutte økten. Prøv igjen."
   }
 }

@@ -178,6 +178,7 @@ Errors:
         NotExisting: Multifaktor OTP (engangspassord) eksisterer ikke
         NotReady: Multifaktor OTP (engangspassord) er ikke klar
         InvalidCode: Ugyldig kode
+        Reused: Denne koden er allerede brukt. Vent på en ny kode
       U2F:
         NotExisting: U2F eksisterer ikke
       Passwordless:
@@ -207,6 +208,7 @@ Errors:
     AlreadyActive: Organisasjon er allerede aktiv
     Empty: Organisasjon er tom
     NotFound: Organisasjon ikke funnet
+    NotActive: Organisasjon er ikke aktiv
     NotChanged: Organisasjon ikke endret
     DefaultOrgNotDeletable: Standard organisasjon kan ikke slettes
     ZitadelOrgNotDeletable: Organisasjon med Zitadel-prosjekt kan ikke slettes
@@ -285,6 +287,8 @@ Errors:
     LabelPolicy:
       NotFound: Privat etikettpolicy ikke funnet
       NotChanged: Privat etikettpolicy er ikke endret
+    IDPConfig:
+      NotExisting: Identitetsleverandør-konfigurasjon eksisterer ikke
   Project:
     ProjectIDMissing: Prosjekt-ID mangler
     AlreadyExists: Prosjekt eksisterer allerede på organisasjonen
@@ -768,6 +772,7 @@ EventTypes:
           check:
             succeeded: Flerfaktor-OTP-sjekk vellykket
             failed: Flerfaktor-OTP-sjekk mislyktes
+            reused: Flerfaktor-OTP-kode gjenbrukt
           sms:
             added: Flerfaktor-OTP-SMS lagt til
             removed: Flerfaktor-OTP-SMS fjernet
