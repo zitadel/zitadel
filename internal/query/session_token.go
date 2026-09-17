@@ -135,7 +135,7 @@ func (wm *SessionTokenReadModel) AuthMethodTypes() []domain.UserAuthMethodType {
 }
 
 // ActiveSessionByToken verifies the session token and returns the state of the session, based on the eventstore.
-// The session is regarded as not existing if it was terminated,
+// The session is regarded as not existing if it was terminated or got a new token,
 // or if its user was deactivated, locked or removed, or the user's organization was deactivated or removed after the user was checked.
 // A password check is dropped if the user's password was changed after it.
 func (q *Queries) ActiveSessionByToken(ctx context.Context, sessionID, sessionToken string) (model *SessionTokenReadModel, err error) {
@@ -152,10 +152,9 @@ func (q *Queries) ActiveSessionByToken(ctx context.Context, sessionID, sessionTo
 	if err = q.sessionTokenVerifier(ctx, sessionToken, model.AggregateID, model.TokenID); err != nil {
 		return nil, zerrors.ThrowPermissionDenied(nil, "QUERY-ieV6o", "Errors.PermissionDenied")
 	}
-	if model.UserID == "" {
-		return model, nil
-	}
 	invalidation := &sessionInvalidationModel{
+		sessionID:               model.AggregateID,
+		sessionPosition:         model.Position,
 		userID:                  model.UserID,
 		userResourceOwner:       model.UserResourceOwner,
 		userCheckedPosition:     model.userCheckedPosition,
@@ -174,11 +173,14 @@ func (q *Queries) ActiveSessionByToken(ctx context.Context, sessionID, sessionTo
 	return model, nil
 }
 
-// sessionInvalidationModel searches for user and organization events,
+// sessionInvalidationModel searches for session, user and organization events,
 // which invalidate a session or its password check after they occurred.
+// The session events cover a termination or a new token committed after the session was read.
 type sessionInvalidationModel struct {
 	eventstore.ReadModel
 
+	sessionID               string
+	sessionPosition         decimal.Decimal
 	userID                  string
 	userResourceOwner       string
 	userCheckedPosition     decimal.Decimal
@@ -194,7 +196,9 @@ func (m *sessionInvalidationModel) Reduce() error {
 		switch event.Type() {
 		case user.HumanPasswordChangedType:
 			m.passwordChanged = true
-		case user.UserDeactivatedType,
+		case session.TerminateType,
+			session.TokenSetType,
+			user.UserDeactivatedType,
 			user.UserLockedType,
 			user.UserRemovedType,
 			org.OrgDeactivatedEventType,
@@ -208,6 +212,18 @@ func (m *sessionInvalidationModel) Reduce() error {
 func (m *sessionInvalidationModel) Query() *eventstore.SearchQueryBuilder {
 	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
+		AggregateTypes(session.AggregateType).
+		AggregateIDs(m.sessionID).
+		EventTypes(
+			session.TerminateType,
+			session.TokenSetType,
+		).
+		PositionAfter(m.sessionPosition).
+		Builder()
+	if m.userID == "" {
+		return builder
+	}
+	builder = builder.AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(m.userID).
 		EventTypes(

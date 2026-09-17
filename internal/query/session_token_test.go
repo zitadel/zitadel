@@ -94,9 +94,22 @@ func TestQueries_ActiveSessionByToken(t *testing.T) {
 					sessionEventAt(session.NewAddedEvent(ctx, sessionAgg, nil), 1),
 					sessionEventAt(session.NewTokenSetEvent(ctx, sessionAgg, "tokenID"), 1),
 				),
+				expectFilter(),
 			),
 			token: "sess_sessionID:tokenID",
 			res:   res{authMethods: []domain.UserAuthMethodType{}},
+		},
+		{
+			name: "terminated after session read, without user",
+			eventstore: expectEventstore(
+				expectFilter(
+					sessionEventAt(session.NewAddedEvent(ctx, sessionAgg, nil), 1),
+					sessionEventAt(session.NewTokenSetEvent(ctx, sessionAgg, "tokenID"), 1),
+				),
+				expectFilter(sessionEventAt(session.NewTerminateEvent(ctx, sessionAgg), 2)),
+			),
+			token: "sess_sessionID:tokenID",
+			res:   res{err: zerrors.ThrowNotFound(nil, "QUERY-Cie5v", "Errors.Session.NotExisting")},
 		},
 		{
 			name: "active with lifetime",
@@ -121,6 +134,24 @@ func TestQueries_ActiveSessionByToken(t *testing.T) {
 			eventstore: expectEventstore(activeSessionWithPassword, expectFilter()),
 			token:      "sess_sessionID:tokenID",
 			res:        res{authMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}},
+		},
+		{
+			name: "terminated after session read",
+			eventstore: expectEventstore(
+				activeSessionWithPassword,
+				expectFilter(sessionEventAt(session.NewTerminateEvent(ctx, sessionAgg), 3)),
+			),
+			token: "sess_sessionID:tokenID",
+			res:   res{err: zerrors.ThrowNotFound(nil, "QUERY-Cie5v", "Errors.Session.NotExisting")},
+		},
+		{
+			name: "new token set after session read",
+			eventstore: expectEventstore(
+				activeSessionWithPassword,
+				expectFilter(sessionEventAt(session.NewTokenSetEvent(ctx, sessionAgg, "newTokenID"), 3)),
+			),
+			token: "sess_sessionID:tokenID",
+			res:   res{err: zerrors.ThrowNotFound(nil, "QUERY-Cie5v", "Errors.Session.NotExisting")},
 		},
 		{
 			name: "user locked after user check",
@@ -169,11 +200,21 @@ func TestQueries_ActiveSessionByToken(t *testing.T) {
 }
 
 func Test_sessionInvalidationModel_Query(t *testing.T) {
+	sessionRead := decimal.NewFromInt(30)
 	userChecked := decimal.NewFromInt(10)
 	passwordChecked := decimal.NewFromInt(20)
 
-	userAndOrgQuery := func() *eventstore.SearchQueryBuilder {
+	sessionQuery := func() *eventstore.SearchQueryBuilder {
 		return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+			AddQuery().
+			AggregateTypes(session.AggregateType).
+			AggregateIDs("sessionID").
+			EventTypes(session.TerminateType, session.TokenSetType).
+			PositionAfter(sessionRead).
+			Builder()
+	}
+	userAndOrgQuery := func() *eventstore.SearchQueryBuilder {
+		return sessionQuery().
 			AddQuery().
 			AggregateTypes(user.AggregateType).
 			AggregateIDs("userID").
@@ -194,8 +235,18 @@ func Test_sessionInvalidationModel_Query(t *testing.T) {
 		want  *eventstore.SearchQueryBuilder
 	}{
 		{
+			name: "without user",
+			model: &sessionInvalidationModel{
+				sessionID:       "sessionID",
+				sessionPosition: sessionRead,
+			},
+			want: sessionQuery(),
+		},
+		{
 			name: "without password check",
 			model: &sessionInvalidationModel{
+				sessionID:           "sessionID",
+				sessionPosition:     sessionRead,
 				userID:              "userID",
 				userResourceOwner:   "org1",
 				userCheckedPosition: userChecked,
@@ -205,6 +256,8 @@ func Test_sessionInvalidationModel_Query(t *testing.T) {
 		{
 			name: "with password check",
 			model: &sessionInvalidationModel{
+				sessionID:               "sessionID",
+				sessionPosition:         sessionRead,
 				userID:                  "userID",
 				userResourceOwner:       "org1",
 				userCheckedPosition:     userChecked,
@@ -222,10 +275,12 @@ func Test_sessionInvalidationModel_Query(t *testing.T) {
 		{
 			name: "without user resource owner",
 			model: &sessionInvalidationModel{
+				sessionID:           "sessionID",
+				sessionPosition:     sessionRead,
 				userID:              "userID",
 				userCheckedPosition: userChecked,
 			},
-			want: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+			want: sessionQuery().
 				AddQuery().
 				AggregateTypes(user.AggregateType).
 				AggregateIDs("userID").
