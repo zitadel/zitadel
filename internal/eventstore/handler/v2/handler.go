@@ -728,11 +728,22 @@ func (h *Handler) eventQuery(currentState *state, minPosition decimal.Decimal) *
 	// Reading each event type separately keeps the cost of a batch bounded by the bulk limit.
 	// A single query for all event types must read every matching event after the position before it can sort and limit them,
 	// so a projection that falls behind would get slower the further behind it is.
-	builder = builder.ScanEventTypesSeparately()
-	for _, aggregate := range slices.Sorted(maps.Keys(h.eventTypes)) {
-		builder = builder.AddQuery().AggregateTypes(aggregate).EventTypes(h.eventTypes[aggregate]...).Builder()
+	// Handlers which subscribe to all events of an aggregate (no event types) keep the single query.
+	if !slices.ContainsFunc(slices.Collect(maps.Values(h.eventTypes)), func(eventTypes []eventstore.EventType) bool { return len(eventTypes) == 0 }) {
+		builder = builder.ScanEventTypesSeparately()
+		for _, aggregate := range slices.Sorted(maps.Keys(h.eventTypes)) {
+			builder = builder.AddQuery().AggregateTypes(aggregate).EventTypes(h.eventTypes[aggregate]...).Builder()
+		}
+		return builder
 	}
-	return builder
+
+	aggregateTypes := make([]eventstore.AggregateType, 0, len(h.eventTypes))
+	eventTypes := make([]eventstore.EventType, 0, len(h.eventTypes))
+	for aggregate, events := range h.eventTypes {
+		aggregateTypes = append(aggregateTypes, aggregate)
+		eventTypes = append(eventTypes, events...)
+	}
+	return builder.AddQuery().AggregateTypes(aggregateTypes...).EventTypes(eventTypes...).Builder()
 }
 
 // ProjectionName returns the name of the underlying projection.

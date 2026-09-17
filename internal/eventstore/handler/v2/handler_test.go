@@ -37,6 +37,21 @@ func TestHandler_eventQuery(t *testing.T) {
 		assert.Equal(t, []eventstore.EventType{"user.human.added", "user.locked"}, queries[1].GetEventTypes())
 	})
 
+	t.Run("aggregate without event types keeps the single query", func(t *testing.T) {
+		h := &Handler{
+			bulkLimit: 200,
+			eventTypes: map[eventstore.AggregateType][]eventstore.EventType{
+				"org": nil,
+			},
+		}
+		builder := h.eventQuery(&state{instanceID: "inst"}, decimal.Decimal{})
+		assert.False(t, builder.GetScanEventTypesSeparately())
+		queries := builder.GetQueries()
+		require.Len(t, queries, 1)
+		assert.Equal(t, []eventstore.AggregateType{"org"}, queries[0].GetAggregateTypes())
+		assert.Empty(t, queries[0].GetEventTypes())
+	})
+
 	t.Run("no cursor on empty position", func(t *testing.T) {
 		builder := h.eventQuery(&state{instanceID: "inst"}, decimal.Decimal{})
 		assert.Equal(t, uint32(0), builder.GetOffset())
