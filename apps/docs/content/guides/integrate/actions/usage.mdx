@@ -142,6 +142,13 @@ The information sent to the Endpoint is structured as JSON:
   "application": {
     "client_id": "The client_id of the application the token was requested for"
   },
+  "request": {
+    "scope": [
+      "openid",
+      "profile",
+      "email"
+    ]
+  },
   "actor": {
     "user_id": "The ID of the user acting on behalf of the token subject",
     "issuer": "The issuer of the token the actor was authenticated with",
@@ -249,6 +256,13 @@ The information sent to the Endpoint is structured as JSON:
   ],
   "application": {
     "client_id": "The client_id of the application the token was requested for"
+  },
+  "request": {
+    "scope": [
+      "openid",
+      "profile",
+      "email"
+    ]
   },
   "actor": {
     "user_id": "The ID of the user acting on behalf of the token subject",
