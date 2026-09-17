@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/query"
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 )
 
@@ -52,12 +53,36 @@ func (s *Server) UpdateGroup(ctx context.Context, req *connect.Request[group_v2.
 }
 
 // DeleteGroup deletes a user group from an organization.
+// Grants of the group are cascade removed, so the derived authorizations
+// of its members stop resolving immediately.
 func (s *Server) DeleteGroup(ctx context.Context, req *connect.Request[group_v2.DeleteGroupRequest]) (*connect.Response[group_v2.DeleteGroupResponse], error) {
-	details, err := s.command.DeleteGroup(ctx, req.Msg.GetId())
+	cascadingGrantIDs, err := s.groupGrantIDsOfGroup(ctx, req.Msg.GetId())
+	if err != nil {
+		return nil, err
+	}
+	details, err := s.command.DeleteGroup(ctx, req.Msg.GetId(), cascadingGrantIDs...)
 	if err != nil {
 		return nil, err
 	}
 	return connect.NewResponse(&group_v2.DeleteGroupResponse{
 		DeletionDate: timestamppb.New(details.EventDate),
 	}), nil
+}
+
+func (s *Server) groupGrantIDsOfGroup(ctx context.Context, groupID string) ([]string, error) {
+	groupIDsQuery, err := query.NewGroupGrantGroupIDsSearchQuery([]string{groupID})
+	if err != nil {
+		return nil, err
+	}
+	grants, err := s.query.SearchGroupGrants(ctx, &query.GroupGrantsSearchQuery{
+		Queries: []query.SearchQuery{groupIDsQuery},
+	}, nil)
+	if err != nil {
+		return nil, err
+	}
+	grantIDs := make([]string, len(grants.GroupGrants))
+	for i, grant := range grants.GroupGrants {
+		grantIDs[i] = grant.ID
+	}
+	return grantIDs, nil
 }

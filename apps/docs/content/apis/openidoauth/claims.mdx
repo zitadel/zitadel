@@ -22,6 +22,7 @@ Please check below the matrix for an overview where which scope is asserted.
 | family_name                                       | When requested | When requested                          | When requested and response_type `id_token`     | No                                                   |
 | gender                                            | When requested | When requested                          | When requested and response_type `id_token`     | No                                                   |
 | given_name                                        | When requested | When requested                          | When requested and response_type `id_token`     | No                                                   |
+| groups [^2]                                       | When requested | When requested                          | When requested                                  | When JWT and requested                               |
 | iat                                               | No             | Yes                                     | Yes                                             | When JWT                                             |
 | iss                                               | No             | Yes                                     | Yes                                             | When JWT                                             |
 | jti                                               | No             | Yes                                     | No                                              | When JWT                                             |
@@ -42,6 +43,8 @@ Please check below the matrix for an overview where which scope is asserted.
 | urn:zitadel:iam:user:resourceowner:primary_domain | When requested | When requested                          | When requested                                  | When JWT and requested                               |
 
 [^1]: The nonce can also be used to distinguish between an id_token and a logout_token as latter must never include a nonce.
+
+[^2]: The `groups` claim contains the user's [group](/concepts/structure/groups) memberships, requested with the `groups` scope. It follows [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068.html#section-2.2.3.1) with values encoded according to [SCIM (RFC 7643)](https://www.rfc-editor.org/rfc/rfc7643#section-4.1.2): `{"groups": [{"value": "<group ID>", "display": "<group name>"}]}`.
 
 ## Standard Claims
 

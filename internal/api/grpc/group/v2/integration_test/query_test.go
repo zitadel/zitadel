@@ -13,7 +13,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	authorization "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
 	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
@@ -152,6 +151,108 @@ func TestServer_GetGroup(t *testing.T) {
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCtx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := instance.Client.GroupV2.GetGroup(tt.args.ctx, tt.args.req)
+				if tt.wantErrCode != codes.OK {
+					require.Error(ttt, err)
+					assert.Equal(ttt, tt.wantErrCode, status.Code(err))
+					assert.Equal(ttt, tt.wantErrMsg, status.Convert(err).Message())
+					return
+				}
+				require.NoError(ttt, err)
+				assert.EqualExportedValues(t, tt.want.Group, got.Group, "want: %v, got: %v", tt.want.Group, got.Group)
+			}, retryDuration, tick, "timeout waiting for expected result")
+		})
+	}
+}
+
+func TestServer_GetGroup_WithPermissionV2(t *testing.T) {
+	ensureFeaturePermissionV2Enabled(t, instancePermissionV2)
+	iamOwnerCtx := instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	type args struct {
+		ctx context.Context
+		req *group_v2.GetGroupRequest
+		dep func(*group_v2.GetGroupRequest, *group_v2.GetGroupResponse)
+	}
+	tests := []struct {
+		name        string
+		args        args
+		want        *group_v2.GetGroupResponse
+		wantErrCode codes.Code
+		wantErrMsg  string
+	}{
+		{
+			name: "get group, missing permission, error",
+			args: args{
+				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
+				dep: func(req *group_v2.GetGroupRequest, resp *group_v2.GetGroupResponse) {
+					groupName := integration.GroupName()
+					group := instancePermissionV2.CreateGroup(iamOwnerCtx, t, instancePermissionV2.DefaultOrg.GetId(), groupName)
+
+					req.Id = group.GetId()
+				},
+				req: &group_v2.GetGroupRequest{},
+			},
+			wantErrCode: codes.NotFound,
+			wantErrMsg:  "membership not found (AUTHZ-cdgFk)",
+		},
+		{
+			name: "get group, organization owner, with permission, found",
+			args: args{
+				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+				dep: func(req *group_v2.GetGroupRequest, resp *group_v2.GetGroupResponse) {
+					groupName := integration.GroupName()
+					group := instancePermissionV2.CreateGroup(iamOwnerCtx, t, instancePermissionV2.DefaultOrg.GetId(), groupName)
+
+					req.Id = group.GetId()
+					resp.Group = &group_v2.Group{
+						Id:             group.GetId(),
+						Name:           groupName,
+						Description:    "",
+						OrganizationId: instancePermissionV2.DefaultOrg.GetId(),
+						ChangeDate:     group.GetCreationDate(),
+						CreationDate:   group.GetCreationDate(),
+					}
+				},
+				req: &group_v2.GetGroupRequest{},
+			},
+			want: &group_v2.GetGroupResponse{
+				Group: &group_v2.Group{},
+			},
+		},
+		{
+			name: "get group, instance owner, found",
+			args: args{
+				ctx: iamOwnerCtx,
+				dep: func(req *group_v2.GetGroupRequest, resp *group_v2.GetGroupResponse) {
+					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+					groupName := integration.GroupName()
+					group := instancePermissionV2.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName)
+
+					req.Id = group.GetId()
+					resp.Group = &group_v2.Group{
+						Id:             group.GetId(),
+						Name:           groupName,
+						Description:    "",
+						OrganizationId: orgResp.GetOrganizationId(),
+						ChangeDate:     group.GetCreationDate(),
+						CreationDate:   group.GetCreationDate(),
+					}
+				},
+				req: &group_v2.GetGroupRequest{},
+			},
+			want: &group_v2.GetGroupResponse{
+				Group: &group_v2.Group{},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.dep != nil {
+				tt.args.dep(tt.args.req, tt.want)
+			}
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCtx, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := instancePermissionV2.Client.GroupV2.GetGroup(tt.args.ctx, tt.args.req)
 				if tt.wantErrCode != codes.OK {
 					require.Error(ttt, err)
 					assert.Equal(ttt, tt.wantErrCode, status.Code(err))
@@ -895,7 +996,7 @@ func TestServer_ListGroupUsers(t *testing.T) {
 				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 				dep: func(req *group_v2.ListGroupUsersRequest, resp *group_v2.ListGroupUsersResponse) {
 					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
-					groupID, _, _ := addUsersToGroup(iamOwnerCtx, t, instance, orgResp.GetOrganizationId(), 2)
+					groupID, _, _, _ := addUsersToGroup(iamOwnerCtx, t, instance, orgResp.GetOrganizationId(), 2)
 
 					req.Filters[0].Filter = &group_v2.GroupUsersSearchFilter_GroupIds{
 						GroupIds: &filter.InIDsFilter{
@@ -921,7 +1022,7 @@ func TestServer_ListGroupUsers(t *testing.T) {
 				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(req *group_v2.ListGroupUsersRequest, resp *group_v2.ListGroupUsersResponse) {
 					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
-					groupID, _, _ := addUsersToGroup(iamOwnerCtx, t, instance, orgResp.GetOrganizationId(), 2)
+					groupID, _, _, _ := addUsersToGroup(iamOwnerCtx, t, instance, orgResp.GetOrganizationId(), 2)
 
 					req.Filters[0].Filter = &group_v2.GroupUsersSearchFilter_GroupIds{
 						GroupIds: &filter.InIDsFilter{
@@ -946,7 +1047,7 @@ func TestServer_ListGroupUsers(t *testing.T) {
 			args: args{
 				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(req *group_v2.ListGroupUsersRequest, resp *group_v2.ListGroupUsersResponse) {
-					groupID, users, addUsersResp := addUsersToGroup(iamOwnerCtx, t, instance, instance.DefaultOrg.GetId(), 2)
+					groupID, groupIDName, users, addUsersResp := addUsersToGroup(iamOwnerCtx, t, instance, instance.DefaultOrg.GetId(), 2)
 
 					user0, err := instance.Client.UserV2.GetUserByID(iamOwnerCtx, &user.GetUserByIDRequest{UserId: users[0]})
 					require.NoError(t, err)
@@ -961,8 +1062,9 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					}
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        groupID,
+						GroupName:      groupIDName,
 						OrganizationId: instance.DefaultOrg.GetId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 user0.User.GetUserId(),
 							OrganizationId:     user0.User.Details.ResourceOwner,
 							PreferredLoginName: user0.User.GetPreferredLoginName(),
@@ -972,8 +1074,9 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					}
 					resp.GroupUsers[1] = &group_v2.GroupUser{
 						GroupId:        groupID,
+						GroupName:      groupIDName,
 						OrganizationId: instance.DefaultOrg.GetId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 user1.User.GetUserId(),
 							OrganizationId:     instance.DefaultOrg.GetId(),
 							PreferredLoginName: user1.User.GetPreferredLoginName(),
@@ -993,6 +1096,52 @@ func TestServer_ListGroupUsers(t *testing.T) {
 				},
 				GroupUsers: []*group_v2.GroupUser{
 					{}, {},
+				},
+			},
+		},
+		{
+			name: "machine user in group, ok",
+			args: args{
+				ctx: iamOwnerCtx,
+				dep: func(req *group_v2.ListGroupUsersRequest, resp *group_v2.ListGroupUsersResponse) {
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+					groupName := integration.GroupName()
+					groupResp := instance.CreateGroup(iamOwnerCtx, t, orgResp.GetOrganizationId(), groupName)
+					machineResp := instance.CreateUserTypeMachine(iamOwnerCtx, orgResp.GetOrganizationId())
+					addUsersResp := instance.AddUsersToGroup(iamOwnerCtx, t, groupResp.GetId(), []string{machineResp.GetId()})
+
+					machineUser, err := instance.Client.UserV2.GetUserByID(iamOwnerCtx, &user.GetUserByIDRequest{UserId: machineResp.GetId()})
+					require.NoError(t, err)
+
+					req.Filters[0].Filter = &group_v2.GroupUsersSearchFilter_GroupIds{
+						GroupIds: &filter.InIDsFilter{
+							Ids: []string{groupResp.GetId()},
+						},
+					}
+					resp.GroupUsers[0] = &group_v2.GroupUser{
+						GroupId:        groupResp.GetId(),
+						GroupName:      groupName,
+						OrganizationId: orgResp.GetOrganizationId(),
+						User: &group_v2.User{
+							Id:                 machineUser.User.GetUserId(),
+							OrganizationId:     machineUser.User.Details.ResourceOwner,
+							PreferredLoginName: machineUser.User.GetPreferredLoginName(),
+							DisplayName:        "machine",
+						},
+						CreationDate: addUsersResp.GetChangeDate(),
+					}
+				},
+				req: &group_v2.ListGroupUsersRequest{
+					Filters: []*group_v2.GroupUsersSearchFilter{{}},
+				},
+			},
+			want: &group_v2.ListGroupUsersResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  1,
+					AppliedLimit: 100,
+				},
+				GroupUsers: []*group_v2.GroupUser{
+					{},
 				},
 			},
 		},
@@ -1025,13 +1174,13 @@ func TestServer_ListGroupUsers(t *testing.T) {
 				ctx: iamOwnerCtx,
 				dep: func(req *group_v2.ListGroupUsersRequest, resp *group_v2.ListGroupUsersResponse) {
 					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
-					group0, group0Users, addUsersResp0 := addUsersToGroup(iamOwnerCtx, t, instance, orgResp.GetOrganizationId(), 2)
+					group0, group0Name, group0Users, addUsersResp0 := addUsersToGroup(iamOwnerCtx, t, instance, orgResp.GetOrganizationId(), 2)
 					group0User0, err := instance.Client.UserV2.GetUserByID(iamOwnerCtx, &user.GetUserByIDRequest{UserId: group0Users[0]})
 					require.NoError(t, err)
 					group0User1, err := instance.Client.UserV2.GetUserByID(iamOwnerCtx, &user.GetUserByIDRequest{UserId: group0Users[1]})
 					require.NoError(t, err)
 
-					group1, group1Users, addUsersResp1 := addUsersToGroup(iamOwnerCtx, t, instance, orgResp.GetOrganizationId(), 2)
+					group1, group1Name, group1Users, addUsersResp1 := addUsersToGroup(iamOwnerCtx, t, instance, orgResp.GetOrganizationId(), 2)
 					group1User0, err := instance.Client.UserV2.GetUserByID(iamOwnerCtx, &user.GetUserByIDRequest{UserId: group1Users[0]})
 					require.NoError(t, err)
 					group1User1, err := instance.Client.UserV2.GetUserByID(iamOwnerCtx, &user.GetUserByIDRequest{UserId: group1Users[1]})
@@ -1039,8 +1188,9 @@ func TestServer_ListGroupUsers(t *testing.T) {
 
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        group1,
+						GroupName:      group1Name,
 						OrganizationId: orgResp.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group1User0.User.GetUserId(),
 							OrganizationId:     group1User0.User.Details.ResourceOwner,
 							PreferredLoginName: group1User0.User.GetPreferredLoginName(),
@@ -1050,8 +1200,9 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					}
 					resp.GroupUsers[1] = &group_v2.GroupUser{
 						GroupId:        group1,
+						GroupName:      group1Name,
 						OrganizationId: orgResp.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group1User1.User.GetUserId(),
 							OrganizationId:     group1User1.User.Details.ResourceOwner,
 							PreferredLoginName: group1User1.User.GetPreferredLoginName(),
@@ -1061,8 +1212,9 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					}
 					resp.GroupUsers[2] = &group_v2.GroupUser{
 						GroupId:        group0,
+						GroupName:      group0Name,
 						OrganizationId: orgResp.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group0User0.User.GetUserId(),
 							OrganizationId:     group0User0.User.Details.ResourceOwner,
 							PreferredLoginName: group0User0.User.GetPreferredLoginName(),
@@ -1072,8 +1224,9 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					}
 					resp.GroupUsers[3] = &group_v2.GroupUser{
 						GroupId:        group0,
+						GroupName:      group0Name,
 						OrganizationId: orgResp.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group0User1.User.GetUserId(),
 							OrganizationId:     group0User1.User.Details.ResourceOwner,
 							PreferredLoginName: group0User1.User.GetPreferredLoginName(),
@@ -1108,19 +1261,20 @@ func TestServer_ListGroupUsers(t *testing.T) {
 				ctx: iamOwnerCtx,
 				dep: func(req *group_v2.ListGroupUsersRequest, resp *group_v2.ListGroupUsersResponse) {
 					org0 := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
-					group0, group0Users, addUsersResp0 := addUsersToGroup(iamOwnerCtx, t, instance, org0.GetOrganizationId(), 2)
+					group0, group0Name, group0Users, addUsersResp0 := addUsersToGroup(iamOwnerCtx, t, instance, org0.GetOrganizationId(), 2)
 					group0User0, err := instance.Client.UserV2.GetUserByID(iamOwnerCtx, &user.GetUserByIDRequest{UserId: group0Users[0]})
 					require.NoError(t, err)
 
 					org1 := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
-					group1, group1Users, addUsersResp1 := addUsersToGroup(iamOwnerCtx, t, instance, org1.GetOrganizationId(), 2)
+					group1, group1Name, group1Users, addUsersResp1 := addUsersToGroup(iamOwnerCtx, t, instance, org1.GetOrganizationId(), 2)
 					group1User1, err := instance.Client.UserV2.GetUserByID(iamOwnerCtx, &user.GetUserByIDRequest{UserId: group1Users[1]})
 					require.NoError(t, err)
 
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        group1,
+						GroupName:      group1Name,
 						OrganizationId: org1.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group1User1.User.GetUserId(),
 							OrganizationId:     group1User1.User.Details.ResourceOwner,
 							PreferredLoginName: group1User1.User.GetPreferredLoginName(),
@@ -1130,8 +1284,9 @@ func TestServer_ListGroupUsers(t *testing.T) {
 					}
 					resp.GroupUsers[1] = &group_v2.GroupUser{
 						GroupId:        group0,
+						GroupName:      group0Name,
 						OrganizationId: org0.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group0User0.User.GetUserId(),
 							OrganizationId:     group0User0.User.Details.ResourceOwner,
 							PreferredLoginName: group0User0.User.GetPreferredLoginName(),
@@ -1218,7 +1373,7 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 				dep: func(req *group_v2.ListGroupUsersRequest, resp *group_v2.ListGroupUsersResponse) {
 					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
-					groupID, _, _ := addUsersToGroup(iamOwnerCtx, t, instancePermissionV2, orgResp.GetOrganizationId(), 2)
+					groupID, _, _, _ := addUsersToGroup(iamOwnerCtx, t, instancePermissionV2, orgResp.GetOrganizationId(), 2)
 
 					req.Filters[0].Filter = &group_v2.GroupUsersSearchFilter_GroupIds{
 						GroupIds: &filter.InIDsFilter{
@@ -1244,7 +1399,7 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(req *group_v2.ListGroupUsersRequest, resp *group_v2.ListGroupUsersResponse) {
 					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
-					groupID, _, _ := addUsersToGroup(iamOwnerCtx, t, instancePermissionV2, orgResp.GetOrganizationId(), 2)
+					groupID, _, _, _ := addUsersToGroup(iamOwnerCtx, t, instancePermissionV2, orgResp.GetOrganizationId(), 2)
 
 					req.Filters[0].Filter = &group_v2.GroupUsersSearchFilter_GroupIds{
 						GroupIds: &filter.InIDsFilter{
@@ -1269,7 +1424,7 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 			args: args{
 				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(req *group_v2.ListGroupUsersRequest, resp *group_v2.ListGroupUsersResponse) {
-					groupID, users, addUsersResp := addUsersToGroup(iamOwnerCtx, t, instancePermissionV2, instancePermissionV2.DefaultOrg.GetId(), 2)
+					groupID, groupIDName, users, addUsersResp := addUsersToGroup(iamOwnerCtx, t, instancePermissionV2, instancePermissionV2.DefaultOrg.GetId(), 2)
 
 					user0, err := instancePermissionV2.Client.UserV2.GetUserByID(iamOwnerCtx, &user.GetUserByIDRequest{UserId: users[0]})
 					require.NoError(t, err)
@@ -1284,8 +1439,9 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 					}
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        groupID,
+						GroupName:      groupIDName,
 						OrganizationId: instancePermissionV2.DefaultOrg.GetId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 user0.User.GetUserId(),
 							OrganizationId:     user0.User.Details.ResourceOwner,
 							PreferredLoginName: user0.User.GetPreferredLoginName(),
@@ -1295,8 +1451,9 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 					}
 					resp.GroupUsers[1] = &group_v2.GroupUser{
 						GroupId:        groupID,
+						GroupName:      groupIDName,
 						OrganizationId: instancePermissionV2.DefaultOrg.GetId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 user1.User.GetUserId(),
 							OrganizationId:     instancePermissionV2.DefaultOrg.GetId(),
 							PreferredLoginName: user1.User.GetPreferredLoginName(),
@@ -1348,13 +1505,13 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 				ctx: iamOwnerCtx,
 				dep: func(req *group_v2.ListGroupUsersRequest, resp *group_v2.ListGroupUsersResponse) {
 					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
-					group0, group0Users, addUsersResp0 := addUsersToGroup(iamOwnerCtx, t, instancePermissionV2, orgResp.GetOrganizationId(), 2)
+					group0, group0Name, group0Users, addUsersResp0 := addUsersToGroup(iamOwnerCtx, t, instancePermissionV2, orgResp.GetOrganizationId(), 2)
 					group0User0, err := instancePermissionV2.Client.UserV2.GetUserByID(iamOwnerCtx, &user.GetUserByIDRequest{UserId: group0Users[0]})
 					require.NoError(t, err)
 					group0User1, err := instancePermissionV2.Client.UserV2.GetUserByID(iamOwnerCtx, &user.GetUserByIDRequest{UserId: group0Users[1]})
 					require.NoError(t, err)
 
-					group1, group1Users, addUsersResp1 := addUsersToGroup(iamOwnerCtx, t, instancePermissionV2, orgResp.GetOrganizationId(), 2)
+					group1, group1Name, group1Users, addUsersResp1 := addUsersToGroup(iamOwnerCtx, t, instancePermissionV2, orgResp.GetOrganizationId(), 2)
 					group1User0, err := instancePermissionV2.Client.UserV2.GetUserByID(iamOwnerCtx, &user.GetUserByIDRequest{UserId: group1Users[0]})
 					require.NoError(t, err)
 					group1User1, err := instancePermissionV2.Client.UserV2.GetUserByID(iamOwnerCtx, &user.GetUserByIDRequest{UserId: group1Users[1]})
@@ -1362,8 +1519,9 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        group1,
+						GroupName:      group1Name,
 						OrganizationId: orgResp.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group1User0.User.GetUserId(),
 							OrganizationId:     group1User0.User.Details.ResourceOwner,
 							PreferredLoginName: group1User0.User.GetPreferredLoginName(),
@@ -1373,8 +1531,9 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 					}
 					resp.GroupUsers[1] = &group_v2.GroupUser{
 						GroupId:        group1,
+						GroupName:      group1Name,
 						OrganizationId: orgResp.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group1User1.User.GetUserId(),
 							OrganizationId:     group1User1.User.Details.ResourceOwner,
 							PreferredLoginName: group1User1.User.GetPreferredLoginName(),
@@ -1384,8 +1543,9 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 					}
 					resp.GroupUsers[2] = &group_v2.GroupUser{
 						GroupId:        group0,
+						GroupName:      group0Name,
 						OrganizationId: orgResp.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group0User0.User.GetUserId(),
 							OrganizationId:     group0User0.User.Details.ResourceOwner,
 							PreferredLoginName: group0User0.User.GetPreferredLoginName(),
@@ -1395,8 +1555,9 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 					}
 					resp.GroupUsers[3] = &group_v2.GroupUser{
 						GroupId:        group0,
+						GroupName:      group0Name,
 						OrganizationId: orgResp.GetOrganizationId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group0User1.User.GetUserId(),
 							OrganizationId:     group0User1.User.Details.ResourceOwner,
 							PreferredLoginName: group0User1.User.GetPreferredLoginName(),
@@ -1430,19 +1591,20 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 			args: args{
 				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(req *group_v2.ListGroupUsersRequest, resp *group_v2.ListGroupUsersResponse) {
-					group0, group0Users, addUsersResp0 := addUsersToGroup(iamOwnerCtx, t, instancePermissionV2, instancePermissionV2.DefaultOrg.GetId(), 2)
+					group0, group0Name, group0Users, addUsersResp0 := addUsersToGroup(iamOwnerCtx, t, instancePermissionV2, instancePermissionV2.DefaultOrg.GetId(), 2)
 					group0User0, err := instancePermissionV2.Client.UserV2.GetUserByID(iamOwnerCtx, &user.GetUserByIDRequest{UserId: group0Users[0]})
 					require.NoError(t, err)
 
 					org1 := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
-					_, group1Users, _ := addUsersToGroup(iamOwnerCtx, t, instancePermissionV2, org1.GetOrganizationId(), 2)
+					_, _, group1Users, _ := addUsersToGroup(iamOwnerCtx, t, instancePermissionV2, org1.GetOrganizationId(), 2)
 					group1User1, err := instancePermissionV2.Client.UserV2.GetUserByID(iamOwnerCtx, &user.GetUserByIDRequest{UserId: group1Users[1]})
 					require.NoError(t, err)
 
 					resp.GroupUsers[0] = &group_v2.GroupUser{
 						GroupId:        group0,
+						GroupName:      group0Name,
 						OrganizationId: instancePermissionV2.DefaultOrg.GetId(),
-						User: &authorization.User{
+						User: &group_v2.User{
 							Id:                 group0User0.User.GetUserId(),
 							OrganizationId:     group0User0.User.Details.ResourceOwner,
 							PreferredLoginName: group0User0.User.GetPreferredLoginName(),
@@ -1499,7 +1661,7 @@ func TestServer_ListGroupUsers_WithPermissionV2(t *testing.T) {
 	}
 }
 
-func addUsersToGroup(ctx context.Context, t *testing.T, instance *integration.Instance, orgID string, numUsers int) (string, []string, *group_v2.AddUsersToGroupResponse) {
+func addUsersToGroup(ctx context.Context, t *testing.T, instance *integration.Instance, orgID string, numUsers int) (string, string, []string, *group_v2.AddUsersToGroupResponse) {
 	groupName := integration.GroupName()
 	group1 := instance.CreateGroup(ctx, t, orgID, groupName)
 	users := make([]string, 0, numUsers)
@@ -1508,5 +1670,5 @@ func addUsersToGroup(ctx context.Context, t *testing.T, instance *integration.In
 		users = append(users, u.GetUserId())
 	}
 	addUsersResp := instance.AddUsersToGroup(ctx, t, group1.GetId(), users)
-	return group1.GetId(), users, addUsersResp
+	return group1.GetId(), groupName, users, addUsersResp
 }

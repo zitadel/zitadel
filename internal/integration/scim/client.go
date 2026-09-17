@@ -24,6 +24,7 @@ type Client struct {
 	client  *http.Client
 	baseURL string
 	Users   *ResourceClient[resources.ScimUser]
+	Groups  *ResourceClient[resources.ScimGroup]
 }
 
 type ResourceClient[T any] struct {
@@ -121,6 +122,11 @@ func NewScimClient(target string) *Client {
 			client:       client,
 			baseURL:      target,
 			resourceName: "Users",
+		},
+		Groups: &ResourceClient[resources.ScimGroup]{
+			client:       client,
+			baseURL:      target,
+			resourceName: "Groups",
 		},
 	}
 }

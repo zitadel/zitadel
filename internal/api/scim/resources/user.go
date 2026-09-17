@@ -48,6 +48,16 @@ type ScimUser struct {
 	Photos                 []*ScimPhoto                  `json:"photos,omitempty"`
 	Entitlements           []*ScimEntitlement            `json:"entitlements,omitempty"`
 	Roles                  []*ScimRole                   `json:"roles,omitempty"`
+	Groups                 []*ScimUserGroup              `json:"groups,omitempty" scim:"readOnly"`
+}
+
+// ScimUserGroup is the read-only groups attribute defined in RFC 7643 section 4.1.2.
+// ZITADEL groups are flat, so every membership is direct.
+type ScimUserGroup struct {
+	Value   string `json:"value,omitempty"`
+	Display string `json:"display,omitempty"`
+	Type    string `json:"type,omitempty"`
+	Ref     string `json:"$ref,omitempty" scim:"ignoreInSchema"`
 }
 
 type ScimEntitlement struct {
@@ -222,7 +232,11 @@ func (h *UsersHandler) Get(ctx context.Context, id string) (*ScimUser, error) {
 	if err != nil {
 		return nil, err
 	}
-	return h.mapToScimUser(ctx, user, metadata), nil
+	groups, err := h.queryGroupsForUsers(ctx, []string{id})
+	if err != nil {
+		return nil, err
+	}
+	return h.mapToScimUser(ctx, user, metadata, groups[id]), nil
 }
 
 func (h *UsersHandler) List(ctx context.Context, request *ListRequest) (*ListResponse[*ScimUser], error) {
@@ -250,8 +264,34 @@ func (h *UsersHandler) List(ctx context.Context, request *ListRequest) (*ListRes
 		return nil, err
 	}
 
-	scimUsers := h.mapToScimUsers(ctx, users.Users, metadata)
+	groups, err := h.queryGroupsForUsers(ctx, usersToIDs(users.Users))
+	if err != nil {
+		return nil, err
+	}
+
+	scimUsers := h.mapToScimUsers(ctx, users.Users, metadata, groups)
 	return NewListResponse(users.SearchResponse.Count, q.SearchRequest, scimUsers), nil
+}
+
+func (h *UsersHandler) queryGroupsForUsers(ctx context.Context, userIDs []string) (map[string][]*query.GroupUser, error) {
+	if len(userIDs) == 0 {
+		return nil, nil
+	}
+	userIDsQuery, err := query.NewGroupUsersUserIDsSearchQuery(userIDs)
+	if err != nil {
+		return nil, err
+	}
+	memberships, err := h.query.SearchGroupUsers(ctx, &query.GroupUsersSearchQuery{
+		Queries: []query.SearchQuery{userIDsQuery},
+	}, nil)
+	if err != nil {
+		return nil, err
+	}
+	groupsByUser := make(map[string][]*query.GroupUser, len(userIDs))
+	for _, membership := range memberships.GroupUsers {
+		groupsByUser[membership.UserID] = append(groupsByUser[membership.UserID], membership)
+	}
+	return groupsByUser, nil
 }
 
 func (h *UsersHandler) queryUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, []string, error) {
