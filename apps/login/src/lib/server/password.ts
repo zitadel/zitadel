@@ -43,6 +43,16 @@ type ResetPasswordCommand = {
   requestId?: string;
 };
 
+/**
+ * Whether `loginName` is one of the user's login names. A user holds one per
+ * verified domain, and searchUsers matches them case-insensitively, so checking
+ * only the preferred one rejects a valid name the search itself just matched.
+ */
+function isLoginNameOfUser(user: Pick<User, "preferredLoginName" | "loginNames">, loginName: string) {
+  const wanted = loginName.toLowerCase();
+  return [user.preferredLoginName, ...user.loginNames].some((name) => name.toLowerCase() === wanted);
+}
+
 export async function resetPassword(command: ResetPasswordCommand) {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
@@ -91,7 +101,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
   const userLoginSettings = await getLoginSettings({ serviceConfig, organization: user.details?.resourceOwner });
 
   if (userLoginSettings?.disableLoginWithEmail && userLoginSettings?.disableLoginWithPhone) {
-    if (user.preferredLoginName !== command.loginName) {
+    if (!isLoginNameOfUser(user, command.loginName)) {
       if (userLoginSettings?.ignoreUnknownUsernames) {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         return {};
@@ -99,7 +109,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
       return { error: t("errors.couldNotSendResetLink") };
     }
   } else if (userLoginSettings?.disableLoginWithEmail) {
-    if (user.preferredLoginName !== command.loginName && humanUser?.phone?.phone !== command.loginName) {
+    if (!isLoginNameOfUser(user, command.loginName) && humanUser?.phone?.phone !== command.loginName) {
       if (userLoginSettings?.ignoreUnknownUsernames) {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         return {};
@@ -107,7 +117,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
       return { error: t("errors.couldNotSendResetLink") };
     }
   } else if (userLoginSettings?.disableLoginWithPhone) {
-    if (user.preferredLoginName !== command.loginName && humanUser?.email?.email !== command.loginName) {
+    if (!isLoginNameOfUser(user, command.loginName) && humanUser?.email?.email !== command.loginName) {
       if (userLoginSettings?.ignoreUnknownUsernames) {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         return {};
@@ -239,7 +249,7 @@ export async function sendPassword(
 
       // recheck login settings after user discovery, as the search might have been done without org scope
       if (userLoginSettings?.disableLoginWithEmail && userLoginSettings?.disableLoginWithPhone) {
-        if (user.preferredLoginName !== command.loginName) {
+        if (!isLoginNameOfUser(user, command.loginName)) {
           // emulate user not found to prevent enumeration (use context settings not user settings)
           recordAuthFailure("password", "login_name_mismatch", command.organization);
           if (loginSettingsByContext?.ignoreUnknownUsernames) {
@@ -248,7 +258,7 @@ export async function sendPassword(
           return { error: t("errors.couldNotVerifyPassword") };
         }
       } else if (userLoginSettings?.disableLoginWithEmail) {
-        if (user.preferredLoginName !== command.loginName && humanUser?.phone?.phone !== command.loginName) {
+        if (!isLoginNameOfUser(user, command.loginName) && humanUser?.phone?.phone !== command.loginName) {
           recordAuthFailure("password", "login_name_mismatch", command.organization);
           if (loginSettingsByContext?.ignoreUnknownUsernames) {
             return { error: t("errors.failedToAuthenticateNoLimit") };
@@ -256,7 +266,7 @@ export async function sendPassword(
           return { error: t("errors.couldNotVerifyPassword") };
         }
       } else if (userLoginSettings?.disableLoginWithPhone) {
-        if (user.preferredLoginName !== command.loginName && humanUser?.email?.email !== command.loginName) {
+        if (!isLoginNameOfUser(user, command.loginName) && humanUser?.email?.email !== command.loginName) {
           recordAuthFailure("password", "login_name_mismatch", command.organization);
           if (loginSettingsByContext?.ignoreUnknownUsernames) {
             return { error: t("errors.failedToAuthenticateNoLimit") };
