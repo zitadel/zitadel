@@ -665,6 +665,7 @@
     "ORG_USER_PERMISSION_EDITOR": "Har tillatelse til å administrere rolletildelinger",
     "ORG_PROJECT_PERMISSION_EDITOR": "Har tillatelse til å administrere prosjekttildelinger",
     "ORG_PROJECT_CREATOR": "Har tillatelse til å opprette egne prosjekter og underliggende innstillinger",
+    "ORG_DYNAMIC_CLIENT_REGISTRAR": "Har tillatelse til å registrere OAuth 2.0-klienter dynamisk",
     "ORG_ADMIN_IMPERSONATOR": "Har tillatelse til å etterligne administrator- og sluttbrukere fra organisasjonen",
     "ORG_END_USER_IMPERSONATOR": "Har tillatelse til å etterligne sluttbrukere fra organisasjonen",
     "ORG_USER_SELF_MANAGER": "Har tillatelse til å administrere sin egen bruker",
@@ -1619,7 +1620,8 @@
         "5": "Passordnøkkel-initialisering",
         "6": "App-hemmelighet",
         "7": "Engangspassord (OTP) - SMS",
-        "8": "Engangspassord (OTP) - E-post"
+        "8": "Engangspassord (OTP) - E-post",
+        "9": "Invitasjonskode"
       },
       "EXPIRY": "Utløp (i minutter)",
       "INCLUDEDIGITS": "Inkluder tall",
@@ -2254,6 +2256,10 @@
       "SAML": {
         "TITLE": "Logg inn med SAML",
         "DESCRIPTION": "Skriv inn påloggingsinformasjonen for SAML-leverandøren din"
+      },
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "Skriv inn de nødvendige dataene for å la brukere fra en annen ZITADEL-instans autentisere seg."
       }
     },
     "DETAIL": {
@@ -2319,6 +2325,10 @@
     "STATE": "Status",
     "ISSUER": "Utsteder",
     "SCOPESLIST": "Scope-liste",
+    "INSTANCEROLESINFO": "Tilordning av instansroller",
+    "INSTANCEROLESINFO_DESC": "Brukere som autentiserer seg med denne leverandøren, får instansmedlemsrollene (IAM_-prefiks) de har i de oppførte organisasjonene i den eksterne ZITADEL-instansen. Både organisasjons-ID og primærdomene må stemme.",
+    "ORGANIZATIONID": "Organisasjons-ID",
+    "ORGANIZATIONDOMAIN": "Organisasjonsdomene",
     "CLIENTID": "Klient-ID",
     "CLIENTSECRET": "Klienthemmelighet",
     "LDAPCONNECTION": "Tilkobling",
@@ -2619,6 +2629,27 @@
       "DEVMODEDESC": "Advarsel: Med utviklingsmodus aktivert vil ikke omdirigerings-URI-er bli validert.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Hopp over påloggingssuksessiden",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Hopp over suksessiden etter pålogging for denne native appen.",
+      "APPLINKSSECTION": "Native app-lenker",
+      "APPLINKSDESC": "Konfigurer iOS- og Android-tilknytning slik at denne instansen kan levere tillitsfiler for passnøkler til de native appene dine.",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "Leveres i apple-app-site-association som en webcredentials-oppføring TEAMID.BUNDLEID.",
+      "TEAMID": "Team ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Apple Team ID må være nøyaktig 10 alfanumeriske tegn, f.eks. ABCDE12345.",
+      "TEAMIDLENGTH": "Team ID må være nøyaktig 10 alfanumeriske tegn.",
+      "BUNDLEID": "Bundle ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "iOS Bundle Identifier (CFBundleIdentifier), f.eks. com.example.app. Ikke inkluder Team ID-prefikset.",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "Leveres i assetlinks.json for Digital Asset Links / passnøkkel-legitimasjon.",
+      "PACKAGENAME": "Pakkenavn",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "Android applicationId / pakkenavn, f.eks. com.example.app.",
+      "FINGERPRINTS": "SHA-256-sertifikatfingeravtrykk",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "Ett fingeravtrykk per linje (64 heksadesimale tegn, kolon er valgfritt). Ta med debug og release etter behov.",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID og Bundle ID må enten begge være satt, eller begge stå tomme.",
+      "ANDROIDPACKAGEREQUIRED": "Android-pakkenavn er påkrevd når sertifikatfingeravtrykk er satt.",
       "REDIRECT": "Omdirigerings-URI-er",
       "REDIRECTSECTION": "Omdirigerings-URI-er",
       "POSTLOGOUTREDIRECT": "URI-er etter utlogging",
