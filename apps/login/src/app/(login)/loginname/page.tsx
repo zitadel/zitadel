@@ -23,6 +23,11 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const orgDomain = searchParams?.orgDomain;
   const submit: boolean = searchParams?.submit === "true";
 
+  // With an org domain suffix the login name may only be the local part (the
+  // form shows the suffix separately), so put it back together for the IdP
+  // login hint the same way sendLoginname does for the username form.
+  const idpLoginHint = loginName && orgDomain && !loginName.includes("@") ? `${loginName}@${orgDomain}` : loginName;
+
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
@@ -78,7 +83,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
               requestId={requestId}
               organization={organization}
               postErrorRedirectUrl="/loginname"
-              loginHint={loginName}
+              loginHint={idpLoginHint}
               showLabel={loginSettings?.allowLocalAuthentication}
             ></SignInWithIdp>
           </div>
