@@ -57,6 +57,20 @@ func (mr *MockCommandsMockRecorder) BackChannelLogoutSent(ctx, id, oidcSessionID
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BackChannelLogoutSent", reflect.TypeOf((*MockCommands)(nil).BackChannelLogoutSent), ctx, id, oidcSessionID, instanceID)
 }
 
+// EmailChangeSent mocks base method.
+func (m *MockCommands) EmailChangeSent(ctx context.Context, orgID, userID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EmailChangeSent", ctx, orgID, userID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// EmailChangeSent indicates an expected call of EmailChangeSent.
+func (mr *MockCommandsMockRecorder) EmailChangeSent(ctx, orgID, userID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EmailChangeSent", reflect.TypeOf((*MockCommands)(nil).EmailChangeSent), ctx, orgID, userID)
+}
+
 // HumanEmailVerificationCodeSent mocks base method.
 func (m *MockCommands) HumanEmailVerificationCodeSent(ctx context.Context, orgID, userID string) error {
 	m.ctrl.T.Helper()
@@ -223,6 +237,20 @@ func (m *MockCommands) PasswordCodeSent(ctx context.Context, orgID, userID strin
 func (mr *MockCommandsMockRecorder) PasswordCodeSent(ctx, orgID, userID, generatorInfo any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PasswordCodeSent", reflect.TypeOf((*MockCommands)(nil).PasswordCodeSent), ctx, orgID, userID, generatorInfo)
+}
+
+// PhoneChangeSent mocks base method.
+func (m *MockCommands) PhoneChangeSent(ctx context.Context, orgID, userID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PhoneChangeSent", ctx, orgID, userID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PhoneChangeSent indicates an expected call of PhoneChangeSent.
+func (mr *MockCommandsMockRecorder) PhoneChangeSent(ctx, orgID, userID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PhoneChangeSent", reflect.TypeOf((*MockCommands)(nil).PhoneChangeSent), ctx, orgID, userID)
 }
 
 // UsageNotificationSent mocks base method.

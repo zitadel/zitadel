@@ -50,24 +50,24 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanInitCodeSent(gomock.Any(), orgID, userID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+			}, args{
+				event: &user.HumanInitialCodeAddedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-				}, args{
-					event: &user.HumanInitialCodeAddedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:              code,
-						Expiry:            time.Hour,
-						TriggeredAtOrigin: eventOrigin,
-					},
-				}, w
+					Code:              code,
+					Expiry:            time.Hour,
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
 		},
 	}, {
 		name: "asset url without event trigger url",
@@ -91,23 +91,23 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanInitCodeSent(gomock.Any(), orgID, userID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+			}, args{
+				event: &user.HumanInitialCodeAddedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-				}, args{
-					event: &user.HumanInitialCodeAddedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:   code,
-						Expiry: time.Hour,
-					},
-				}, w
+					Code:   code,
+					Expiry: time.Hour,
+				},
+			}, w
 		},
 	}, {
 		name: "button url with event trigger url",
@@ -126,24 +126,24 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanInitCodeSent(gomock.Any(), orgID, userID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+			}, args{
+				event: &user.HumanInitialCodeAddedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-				}, args{
-					event: &user.HumanInitialCodeAddedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:              code,
-						Expiry:            time.Hour,
-						TriggeredAtOrigin: eventOrigin,
-					},
-				}, w
+					Code:              code,
+					Expiry:            time.Hour,
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
 		},
 	}, {
 		name: "button url without event trigger url",
@@ -168,23 +168,23 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanInitCodeSent(gomock.Any(), orgID, userID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+			}, args{
+				event: &user.HumanInitialCodeAddedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-				}, args{
-					event: &user.HumanInitialCodeAddedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:   code,
-						Expiry: time.Hour,
-					},
-				}, w
+					Code:   code,
+					Expiry: time.Hour,
+				},
+			}, w
 		},
 	}, {
 		name: "button url without event trigger url with authRequestID",
@@ -209,24 +209,24 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanInitCodeSent(gomock.Any(), orgID, userID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+			}, args{
+				event: &user.HumanInitialCodeAddedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-				}, args{
-					event: &user.HumanInitialCodeAddedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:          code,
-						Expiry:        time.Hour,
-						AuthRequestID: authRequestID,
-					},
-				}, w
+					Code:          code,
+					Expiry:        time.Hour,
+					AuthRequestID: authRequestID,
+				},
+			}, w
 		},
 	}, {
 		name: "cancel error, no reduce error expected",
@@ -251,24 +251,24 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 			}, nil)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+			}, args{
+				event: &user.HumanInitialCodeAddedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-				}, args{
-					event: &user.HumanInitialCodeAddedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:          code,
-						Expiry:        time.Hour,
-						AuthRequestID: authRequestID,
-					},
-				}, w
+					Code:          code,
+					Expiry:        time.Hour,
+					AuthRequestID: authRequestID,
+				},
+			}, w
 		},
 	}}
 	// TODO: Why don't we have an url template on user.HumanInitialCodeAddedEvent?
@@ -315,26 +315,26 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+			}, args{
+				event: &user.HumanEmailCodeAddedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-				}, args{
-					event: &user.HumanEmailCodeAddedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:              code,
-						Expiry:            time.Hour,
-						URLTemplate:       "",
-						CodeReturned:      false,
-						TriggeredAtOrigin: eventOrigin,
-					},
-				}, w
+					Code:              code,
+					Expiry:            time.Hour,
+					URLTemplate:       "",
+					CodeReturned:      false,
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
 		},
 	}, {
 		name: "asset url without event trigger url",
@@ -358,25 +358,25 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+			}, args{
+				event: &user.HumanEmailCodeAddedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-				}, args{
-					event: &user.HumanEmailCodeAddedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:         code,
-						Expiry:       time.Hour,
-						URLTemplate:  "",
-						CodeReturned: false,
-					},
-				}, w
+					Code:         code,
+					Expiry:       time.Hour,
+					URLTemplate:  "",
+					CodeReturned: false,
+				},
+			}, w
 		},
 	}, {
 		name: "button url with event trigger url",
@@ -395,27 +395,27 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+				SMSTokenCrypto: nil,
+			}, args{
+				event: &user.HumanEmailCodeAddedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-					SMSTokenCrypto: nil,
-				}, args{
-					event: &user.HumanEmailCodeAddedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:              code,
-						Expiry:            time.Hour,
-						URLTemplate:       "",
-						CodeReturned:      false,
-						TriggeredAtOrigin: eventOrigin,
-					},
-				}, w
+					Code:              code,
+					Expiry:            time.Hour,
+					URLTemplate:       "",
+					CodeReturned:      false,
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
 		},
 	}, {
 		name: "button url without event trigger url",
@@ -440,25 +440,25 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+			}, args{
+				event: &user.HumanEmailCodeAddedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-				}, args{
-					event: &user.HumanEmailCodeAddedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:         code,
-						Expiry:       time.Hour,
-						URLTemplate:  "",
-						CodeReturned: false,
-					},
-				}, w
+					Code:         code,
+					Expiry:       time.Hour,
+					URLTemplate:  "",
+					CodeReturned: false,
+				},
+			}, w
 		},
 	}, {
 		name: "button url without event trigger url with authRequestID",
@@ -483,26 +483,26 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+			}, args{
+				event: &user.HumanEmailCodeAddedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-				}, args{
-					event: &user.HumanEmailCodeAddedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:          code,
-						Expiry:        time.Hour,
-						URLTemplate:   "",
-						CodeReturned:  false,
-						AuthRequestID: authRequestID,
-					},
-				}, w
+					Code:          code,
+					Expiry:        time.Hour,
+					URLTemplate:   "",
+					CodeReturned:  false,
+					AuthRequestID: authRequestID,
+				},
+			}, w
 		},
 	}, {
 		name: "button url with url template and event trigger url",
@@ -522,27 +522,27 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+				SMSTokenCrypto: nil,
+			}, args{
+				event: &user.HumanEmailCodeAddedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-					SMSTokenCrypto: nil,
-				}, args{
-					event: &user.HumanEmailCodeAddedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:              code,
-						Expiry:            time.Hour,
-						URLTemplate:       urlTemplate,
-						CodeReturned:      false,
-						TriggeredAtOrigin: eventOrigin,
-					},
-				}, w
+					Code:              code,
+					Expiry:            time.Hour,
+					URLTemplate:       urlTemplate,
+					CodeReturned:      false,
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
 		},
 	}, {
 		name: "cancel error, no reduce error expected",
@@ -562,27 +562,27 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+				SMSTokenCrypto: nil,
+			}, args{
+				event: &user.HumanEmailCodeAddedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-					SMSTokenCrypto: nil,
-				}, args{
-					event: &user.HumanEmailCodeAddedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:              code,
-						Expiry:            time.Hour,
-						URLTemplate:       urlTemplate,
-						CodeReturned:      false,
-						TriggeredAtOrigin: eventOrigin,
-					},
-				}, w
+					Code:              code,
+					Expiry:            time.Hour,
+					URLTemplate:       urlTemplate,
+					CodeReturned:      false,
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
 		},
 	}}
 	for _, tt := range tests {
@@ -629,26 +629,26 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+					userDataCrypto: codeAlg,
+				}, args{
+					event: &user.HumanPasswordCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
 						}),
-						userDataCrypto: codeAlg,
-					}, args{
-						event: &user.HumanPasswordCodeAddedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-							}),
-							Code:              code,
-							Expiry:            time.Hour,
-							URLTemplate:       "",
-							CodeReturned:      false,
-							TriggeredAtOrigin: eventOrigin,
-						},
-					}, w
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       "",
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
 			},
 		}, {
 			name: "asset url without event trigger url",
@@ -672,25 +672,25 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+					userDataCrypto: codeAlg,
+				}, args{
+					event: &user.HumanPasswordCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
 						}),
-						userDataCrypto: codeAlg,
-					}, args{
-						event: &user.HumanPasswordCodeAddedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-							}),
-							Code:         code,
-							Expiry:       time.Hour,
-							URLTemplate:  "",
-							CodeReturned: false,
-						},
-					}, w
+						Code:         code,
+						Expiry:       time.Hour,
+						URLTemplate:  "",
+						CodeReturned: false,
+					},
+				}, w
 			},
 		}, {
 			name: "button url with event trigger url",
@@ -709,27 +709,27 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+					userDataCrypto: codeAlg,
+					SMSTokenCrypto: nil,
+				}, args{
+					event: &user.HumanPasswordCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
 						}),
-						userDataCrypto: codeAlg,
-						SMSTokenCrypto: nil,
-					}, args{
-						event: &user.HumanPasswordCodeAddedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-							}),
-							Code:              code,
-							Expiry:            time.Hour,
-							URLTemplate:       "",
-							CodeReturned:      false,
-							TriggeredAtOrigin: eventOrigin,
-						},
-					}, w
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       "",
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
 			},
 		}, {
 			name: "button url without event trigger url",
@@ -754,25 +754,25 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+					userDataCrypto: codeAlg,
+				}, args{
+					event: &user.HumanPasswordCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
 						}),
-						userDataCrypto: codeAlg,
-					}, args{
-						event: &user.HumanPasswordCodeAddedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-							}),
-							Code:         code,
-							Expiry:       time.Hour,
-							URLTemplate:  "",
-							CodeReturned: false,
-						},
-					}, w
+						Code:         code,
+						Expiry:       time.Hour,
+						URLTemplate:  "",
+						CodeReturned: false,
+					},
+				}, w
 			},
 		}, {
 			name: "button url without event trigger url with authRequestID",
@@ -797,26 +797,26 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+					userDataCrypto: codeAlg,
+				}, args{
+					event: &user.HumanPasswordCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
 						}),
-						userDataCrypto: codeAlg,
-					}, args{
-						event: &user.HumanPasswordCodeAddedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-							}),
-							Code:          code,
-							Expiry:        time.Hour,
-							URLTemplate:   "",
-							CodeReturned:  false,
-							AuthRequestID: authRequestID,
-						},
-					}, w
+						Code:          code,
+						Expiry:        time.Hour,
+						URLTemplate:   "",
+						CodeReturned:  false,
+						AuthRequestID: authRequestID,
+					},
+				}, w
 			},
 		}, {
 			name: "button url with url template and event trigger url",
@@ -836,27 +836,27 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+					userDataCrypto: codeAlg,
+					SMSTokenCrypto: nil,
+				}, args{
+					event: &user.HumanPasswordCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
 						}),
-						userDataCrypto: codeAlg,
-						SMSTokenCrypto: nil,
-					}, args{
-						event: &user.HumanPasswordCodeAddedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-							}),
-							Code:              code,
-							Expiry:            time.Hour,
-							URLTemplate:       urlTemplate,
-							CodeReturned:      false,
-							TriggeredAtOrigin: eventOrigin,
-						},
-					}, w
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       urlTemplate,
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
 			},
 		}, {
 			name: "external code",
@@ -874,28 +874,28 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{ID: smsProviderID, VerificationID: verificationID}).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+					SMSTokenCrypto: nil,
+				}, args{
+					event: &user.HumanPasswordCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
 						}),
-						SMSTokenCrypto: nil,
-					}, args{
-						event: &user.HumanPasswordCodeAddedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-							}),
-							Code:              nil,
-							Expiry:            0,
-							URLTemplate:       "",
-							CodeReturned:      false,
-							NotificationType:  domain.NotificationTypeSms,
-							GeneratorID:       smsProviderID,
-							TriggeredAtOrigin: eventOrigin,
-						},
-					}, w
+						Code:              nil,
+						Expiry:            0,
+						URLTemplate:       "",
+						CodeReturned:      false,
+						NotificationType:  domain.NotificationTypeSms,
+						GeneratorID:       smsProviderID,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
 			},
 		}, {
 			name: "cancel error, no reduce error expected",
@@ -913,28 +913,28 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 				}
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 				return fields{
-						queries:  queries,
-						commands: commands,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+					SMSTokenCrypto: nil,
+				}, args{
+					event: &user.HumanPasswordCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
 						}),
-						SMSTokenCrypto: nil,
-					}, args{
-						event: &user.HumanPasswordCodeAddedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-							}),
-							Code:              nil,
-							Expiry:            0,
-							URLTemplate:       "",
-							CodeReturned:      false,
-							NotificationType:  domain.NotificationTypeSms,
-							GeneratorID:       smsProviderID,
-							TriggeredAtOrigin: eventOrigin,
-						},
-					}, w
+						Code:              nil,
+						Expiry:            0,
+						URLTemplate:       "",
+						CodeReturned:      false,
+						NotificationType:  domain.NotificationTypeSms,
+						GeneratorID:       smsProviderID,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
 			},
 		},
 	}
@@ -980,21 +980,21 @@ func Test_userNotifierLegacy_reduceDomainClaimed(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().UserDomainClaimedSent(gomock.Any(), orgID, userID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+			}, args{
+				event: &user.DomainClaimedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-				}, args{
-					event: &user.DomainClaimedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						TriggeredAtOrigin: eventOrigin,
-					},
-				}, w
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
 		},
 	}, {
 		name: "asset url without event trigger url",
@@ -1017,20 +1017,20 @@ func Test_userNotifierLegacy_reduceDomainClaimed(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().UserDomainClaimedSent(gomock.Any(), orgID, userID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+			}, args{
+				event: &user.DomainClaimedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-				}, args{
-					event: &user.DomainClaimedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-					},
-				}, w
+				},
+			}, w
 		},
 	}, {
 		name: "cancel error, no reduce error expected",
@@ -1053,20 +1053,20 @@ func Test_userNotifierLegacy_reduceDomainClaimed(t *testing.T) {
 			}, nil)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+			}, args{
+				event: &user.DomainClaimedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-				}, args{
-					event: &user.DomainClaimedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-					},
-				}, w
+				},
+			}, w
 		},
 	}}
 	for _, tt := range tests {
@@ -1112,27 +1112,27 @@ func Test_userNotifierLegacy_reducePasswordlessCodeRequested(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanPasswordlessInitCodeSent(gomock.Any(), userID, orgID, codeID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+			}, args{
+				event: &user.HumanPasswordlessInitCodeRequestedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-				}, args{
-					event: &user.HumanPasswordlessInitCodeRequestedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						ID:                codeID,
-						Code:              code,
-						Expiry:            time.Hour,
-						URLTemplate:       "",
-						CodeReturned:      false,
-						TriggeredAtOrigin: eventOrigin,
-					},
-				}, w
+					ID:                codeID,
+					Code:              code,
+					Expiry:            time.Hour,
+					URLTemplate:       "",
+					CodeReturned:      false,
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
 		},
 	}, {
 		name: "asset url without event trigger url",
@@ -1156,26 +1156,26 @@ func Test_userNotifierLegacy_reducePasswordlessCodeRequested(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanPasswordlessInitCodeSent(gomock.Any(), userID, orgID, codeID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+			}, args{
+				event: &user.HumanPasswordlessInitCodeRequestedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-				}, args{
-					event: &user.HumanPasswordlessInitCodeRequestedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						ID:           codeID,
-						Code:         code,
-						Expiry:       time.Hour,
-						URLTemplate:  "",
-						CodeReturned: false,
-					},
-				}, w
+					ID:           codeID,
+					Code:         code,
+					Expiry:       time.Hour,
+					URLTemplate:  "",
+					CodeReturned: false,
+				},
+			}, w
 		},
 	}, {
 		name: "button url with event trigger url",
@@ -1194,28 +1194,28 @@ func Test_userNotifierLegacy_reducePasswordlessCodeRequested(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanPasswordlessInitCodeSent(gomock.Any(), userID, orgID, codeID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+				SMSTokenCrypto: nil,
+			}, args{
+				event: &user.HumanPasswordlessInitCodeRequestedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-					SMSTokenCrypto: nil,
-				}, args{
-					event: &user.HumanPasswordlessInitCodeRequestedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						ID:                codeID,
-						Code:              code,
-						Expiry:            time.Hour,
-						URLTemplate:       "",
-						CodeReturned:      false,
-						TriggeredAtOrigin: eventOrigin,
-					},
-				}, w
+					ID:                codeID,
+					Code:              code,
+					Expiry:            time.Hour,
+					URLTemplate:       "",
+					CodeReturned:      false,
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
 		},
 	}, {
 		name: "button url without event trigger url",
@@ -1240,26 +1240,26 @@ func Test_userNotifierLegacy_reducePasswordlessCodeRequested(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanPasswordlessInitCodeSent(gomock.Any(), userID, orgID, codeID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+			}, args{
+				event: &user.HumanPasswordlessInitCodeRequestedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-				}, args{
-					event: &user.HumanPasswordlessInitCodeRequestedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						ID:           codeID,
-						Code:         code,
-						Expiry:       time.Hour,
-						URLTemplate:  "",
-						CodeReturned: false,
-					},
-				}, w
+					ID:           codeID,
+					Code:         code,
+					Expiry:       time.Hour,
+					URLTemplate:  "",
+					CodeReturned: false,
+				},
+			}, w
 		},
 	}, {
 		name: "button url with url template and event trigger url",
@@ -1279,28 +1279,28 @@ func Test_userNotifierLegacy_reducePasswordlessCodeRequested(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanPasswordlessInitCodeSent(gomock.Any(), userID, orgID, codeID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+				SMSTokenCrypto: nil,
+			}, args{
+				event: &user.HumanPasswordlessInitCodeRequestedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-					SMSTokenCrypto: nil,
-				}, args{
-					event: &user.HumanPasswordlessInitCodeRequestedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						ID:                codeID,
-						Code:              code,
-						Expiry:            time.Hour,
-						URLTemplate:       urlTemplate,
-						CodeReturned:      false,
-						TriggeredAtOrigin: eventOrigin,
-					},
-				}, w
+					ID:                codeID,
+					Code:              code,
+					Expiry:            time.Hour,
+					URLTemplate:       urlTemplate,
+					CodeReturned:      false,
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
 		},
 	}, {
 		name: "cancel error, no reduce error expected",
@@ -1320,28 +1320,28 @@ func Test_userNotifierLegacy_reducePasswordlessCodeRequested(t *testing.T) {
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+				SMSTokenCrypto: nil,
+			}, args{
+				event: &user.HumanPasswordlessInitCodeRequestedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-					SMSTokenCrypto: nil,
-				}, args{
-					event: &user.HumanPasswordlessInitCodeRequestedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						ID:                codeID,
-						Code:              code,
-						Expiry:            time.Hour,
-						URLTemplate:       urlTemplate,
-						CodeReturned:      false,
-						TriggeredAtOrigin: eventOrigin,
-					},
-				}, w
+					ID:                codeID,
+					Code:              code,
+					Expiry:            time.Hour,
+					URLTemplate:       urlTemplate,
+					CodeReturned:      false,
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
 		},
 	}}
 	for _, tt := range tests {
@@ -1389,21 +1389,21 @@ func Test_userNotifierLegacy_reducePasswordChanged(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().PasswordChangeSent(gomock.Any(), orgID, userID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+			}, args{
+				event: &user.HumanPasswordChangedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-				}, args{
-					event: &user.HumanPasswordChangedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						TriggeredAtOrigin: eventOrigin,
-					},
-				}, w
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
 		},
 	}, {
 		name: "asset url without event trigger url",
@@ -1429,20 +1429,20 @@ func Test_userNotifierLegacy_reducePasswordChanged(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().PasswordChangeSent(gomock.Any(), orgID, userID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+			}, args{
+				event: &user.HumanPasswordChangedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-				}, args{
-					event: &user.HumanPasswordChangedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-					},
-				}, w
+				},
+			}, w
 		},
 	}, {
 		name: "cancel error, no reduce error expected",
@@ -1468,20 +1468,20 @@ func Test_userNotifierLegacy_reducePasswordChanged(t *testing.T) {
 			}, nil)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+			}, args{
+				event: &user.HumanPasswordChangedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-				}, args{
-					event: &user.HumanPasswordChangedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-					},
-				}, w
+				},
+			}, w
 		},
 	}}
 	for _, tt := range tests {
@@ -1491,6 +1491,196 @@ func Test_userNotifierLegacy_reducePasswordChanged(t *testing.T) {
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
 			stmt, err := newUserNotifierLegacy(t, ctrl, queries, f, a, w).reducePasswordChanged(a.event)
+			if w.err != nil {
+				w.err(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+			err = stmt.Execute(t.Context(), nil, "")
+			if w.err != nil {
+				w.err(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func Test_userNotifierLegacy_reduceEmailChanged(t *testing.T) {
+	expectMailSubject := "Email of user has changed"
+	tests := []struct {
+		name string
+		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, wantLegacy)
+	}{{
+		name: "asset url with event trigger url",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+			givenTemplate := "{{.LogoURL}}"
+			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{verifiedEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
+			}
+			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
+			commands.EXPECT().EmailChangeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+			}, args{
+				event: &user.HumanEmailChangedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
+					}),
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
+		},
+	}, {
+		name: "asset url without event trigger url",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+			givenTemplate := "{{.LogoURL}}"
+			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{verifiedEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
+			}
+			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
+				Domains: []*query.InstanceDomain{{
+					Domain:    instancePrimaryDomain,
+					IsPrimary: true,
+				}},
+			}, nil)
+			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
+			commands.EXPECT().EmailChangeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+			}, args{
+				event: &user.HumanEmailChangedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
+					}),
+				},
+			}, w
+		},
+	}}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			queries := mock.NewMockQueries(ctrl)
+			commands := mock.NewMockCommands(ctrl)
+			f, a, w := tt.test(ctrl, queries, commands)
+			stmt, err := newUserNotifierLegacy(t, ctrl, queries, f, a, w).reduceEmailChanged(a.event)
+			if w.err != nil {
+				w.err(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+			err = stmt.Execute(t.Context(), nil, "")
+			if w.err != nil {
+				w.err(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func Test_userNotifierLegacy_reducePhoneChanged(t *testing.T) {
+	expectMailSubject := "Phone number of user has changed"
+	tests := []struct {
+		name string
+		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, wantLegacy)
+	}{{
+		name: "asset url with event trigger url",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+			givenTemplate := "{{.LogoURL}}"
+			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{verifiedEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
+			}
+			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
+			commands.EXPECT().PhoneChangeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+			}, args{
+				event: &user.HumanPhoneChangedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
+					}),
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
+		},
+	}, {
+		name: "asset url without event trigger url",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+			givenTemplate := "{{.LogoURL}}"
+			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{verifiedEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
+			}
+			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
+				Domains: []*query.InstanceDomain{{
+					Domain:    instancePrimaryDomain,
+					IsPrimary: true,
+				}},
+			}, nil)
+			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
+			commands.EXPECT().PhoneChangeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+			}, args{
+				event: &user.HumanPhoneChangedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
+					}),
+				},
+			}, w
+		},
+	}}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			queries := mock.NewMockQueries(ctrl)
+			commands := mock.NewMockCommands(ctrl)
+			f, a, w := tt.test(ctrl, queries, commands)
+			stmt, err := newUserNotifierLegacy(t, ctrl, queries, f, a, w).reducePhoneChanged(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1528,26 +1718,26 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
 			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+			}, args{
+				event: &session.OTPEmailChallengedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-				}, args{
-					event: &session.OTPEmailChallengedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:              code,
-						Expiry:            time.Hour,
-						URLTmpl:           "",
-						ReturnCode:        false,
-						TriggeredAtOrigin: eventOrigin,
-					},
-				}, w
+					Code:              code,
+					Expiry:            time.Hour,
+					URLTmpl:           "",
+					ReturnCode:        false,
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
 		},
 	}, {
 		name: "asset url without event trigger url",
@@ -1572,25 +1762,25 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 			}, nil)
 			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+			}, args{
+				event: &session.OTPEmailChallengedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-				}, args{
-					event: &session.OTPEmailChallengedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:       code,
-						Expiry:     time.Hour,
-						URLTmpl:    "",
-						ReturnCode: false,
-					},
-				}, w
+					Code:       code,
+					Expiry:     time.Hour,
+					URLTmpl:    "",
+					ReturnCode: false,
+				},
+			}, w
 		},
 	}, {
 		name: "button url with event trigger url",
@@ -1610,27 +1800,27 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
 			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+				SMSTokenCrypto: nil,
+			}, args{
+				event: &session.OTPEmailChallengedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-					SMSTokenCrypto: nil,
-				}, args{
-					event: &session.OTPEmailChallengedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:              code,
-						Expiry:            time.Hour,
-						URLTmpl:           "",
-						ReturnCode:        false,
-						TriggeredAtOrigin: eventOrigin,
-					},
-				}, w
+					Code:              code,
+					Expiry:            time.Hour,
+					URLTmpl:           "",
+					ReturnCode:        false,
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
 		},
 	}, {
 		name: "button url without event trigger url",
@@ -1656,24 +1846,24 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
 			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+			}, args{
+				event: &session.OTPEmailChallengedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-				}, args{
-					event: &session.OTPEmailChallengedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:       code,
-						Expiry:     time.Hour,
-						ReturnCode: false,
-					},
-				}, w
+					Code:       code,
+					Expiry:     time.Hour,
+					ReturnCode: false,
+				},
+			}, w
 		},
 	}, {
 		name: "button url with url template and event trigger url",
@@ -1694,27 +1884,27 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
 			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+				SMSTokenCrypto: nil,
+			}, args{
+				event: &session.OTPEmailChallengedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-					SMSTokenCrypto: nil,
-				}, args{
-					event: &session.OTPEmailChallengedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:              code,
-						Expiry:            time.Hour,
-						ReturnCode:        false,
-						URLTmpl:           urlTemplate,
-						TriggeredAtOrigin: eventOrigin,
-					},
-				}, w
+					Code:              code,
+					Expiry:            time.Hour,
+					ReturnCode:        false,
+					URLTmpl:           urlTemplate,
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
 		},
 	}, {
 		name: "cancel error, no reduce error expected",
@@ -1735,27 +1925,27 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries:  queries,
+				commands: commands,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+				userDataCrypto: codeAlg,
+				SMSTokenCrypto: nil,
+			}, args{
+				event: &session.OTPEmailChallengedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
 					}),
-					userDataCrypto: codeAlg,
-					SMSTokenCrypto: nil,
-				}, args{
-					event: &session.OTPEmailChallengedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-						}),
-						Code:              code,
-						Expiry:            time.Hour,
-						ReturnCode:        false,
-						URLTmpl:           urlTemplate,
-						TriggeredAtOrigin: eventOrigin,
-					},
-				}, w
+					Code:              code,
+					Expiry:            time.Hour,
+					ReturnCode:        false,
+					URLTmpl:           urlTemplate,
+					TriggeredAtOrigin: eventOrigin,
+				},
+			}, w
 		},
 	}}
 	for _, tt := range tests {
@@ -1799,25 +1989,25 @@ func Test_userNotifierLegacy_reduceOTPSMSChallenged(t *testing.T) {
 				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
 				commands.EXPECT().OTPSMSSent(gomock.Any(), userID, orgID, &senders.CodeGeneratorInfo{ID: smsProviderID, VerificationID: verificationID}).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &session.OTPSMSChallengedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
 						}),
-					}, args{
-						event: &session.OTPSMSChallengedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-							}),
-							Code:              nil,
-							Expiry:            expiry,
-							CodeReturned:      false,
-							GeneratorID:       smsProviderID,
-							TriggeredAtOrigin: eventOrigin,
-						},
-					}, w
+						Code:              nil,
+						Expiry:            expiry,
+						CodeReturned:      false,
+						GeneratorID:       smsProviderID,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
 			},
 		}, {
 			name: "asset url without event trigger url",
@@ -1845,24 +2035,24 @@ func Test_userNotifierLegacy_reduceOTPSMSChallenged(t *testing.T) {
 				}, nil)
 				commands.EXPECT().OTPSMSSent(gomock.Any(), userID, orgID, &senders.CodeGeneratorInfo{ID: smsProviderID, VerificationID: verificationID}).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &session.OTPSMSChallengedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
 						}),
-					}, args{
-						event: &session.OTPSMSChallengedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-							}),
-							Code:         nil,
-							Expiry:       expiry,
-							CodeReturned: false,
-							GeneratorID:  smsProviderID,
-						},
-					}, w
+						Code:         nil,
+						Expiry:       expiry,
+						CodeReturned: false,
+						GeneratorID:  smsProviderID,
+					},
+				}, w
 			},
 		}, {
 			name: "cancel error, no reduce error expected",
@@ -1890,24 +2080,24 @@ func Test_userNotifierLegacy_reduceOTPSMSChallenged(t *testing.T) {
 					}},
 				}, nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &session.OTPSMSChallengedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
 						}),
-					}, args{
-						event: &session.OTPSMSChallengedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-							}),
-							Code:         nil,
-							Expiry:       expiry,
-							CodeReturned: false,
-							GeneratorID:  smsProviderID,
-						},
-					}, w
+						Code:         nil,
+						Expiry:       expiry,
+						CodeReturned: false,
+						GeneratorID:  smsProviderID,
+					},
+				}, w
 			},
 		},
 	}
