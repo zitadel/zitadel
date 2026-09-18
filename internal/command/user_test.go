@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -1430,6 +1431,52 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 			assertObjectDetails(t, tt.res.want, got)
 		})
 	}
+}
+
+func TestCommandSide_RemoveUserOwnerDeleteReady(t *testing.T) {
+	r := &Commands{
+		eventstore: expectEventstore(
+			expectFilter(
+				eventFromEventPusher(
+					user.NewHumanAddedEvent(context.Background(),
+						&user.NewAggregate("user1", "org1").Aggregate,
+						"username",
+						"firstname",
+						"lastname",
+						"nickname",
+						"displayname",
+						language.German,
+						domain.GenderUnspecified,
+						"email@test.ch",
+						true,
+					),
+				),
+			),
+			expectFilter(),
+			expectFilter(
+				eventFromEventPusher(
+					instance.NewDomainPolicyAddedEvent(context.Background(),
+						&user.NewAggregate("user1", "org1").Aggregate,
+						true,
+						true,
+						true,
+					),
+				),
+			),
+			expectPush(
+				user.NewUserRemovedEvent(context.Background(),
+					&user.NewAggregate("user1", "org1").Aggregate,
+					"",
+					nil,
+					false,
+				),
+			),
+		)(t),
+		ownerDeleteReady: func(context.Context) (bool, error) { return true, nil },
+	}
+	got, err := r.RemoveUser(context.Background(), "user1", "org1", nil)
+	require.NoError(t, err)
+	assertObjectDetails(t, &domain.ObjectDetails{ResourceOwner: "org1"}, got)
 }
 
 func TestCommands_RevokeAccessToken(t *testing.T) {

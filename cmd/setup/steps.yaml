@@ -181,3 +181,9 @@ AddEventCreatedAt:
 
 FillFields:
   BatchSize: 1000 # ZITADEL_EVENTSTORE_FILLFIELDS_BULKLIMIT
+
+BackfillUniqueConstraintOwners:
+  # After a rolling update on this same version, set true and re-run setup to
+  # backfill leftover empty owners and enable owner-only unique-constraint delete.
+  # Default false: owner-delete waits until the next release runs 79 again.
+  ForceFinalize: false # ZITADEL_BACKFILLUNIQUECONSTRAINTOWNERS_FORCEFINALIZE

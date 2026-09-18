@@ -46,8 +46,8 @@ func handleUniqueConstraints(ctx context.Context, tx database.Tx, commands []eve
 			switch constraint.Action {
 			case eventstore.UniqueConstraintAdd:
 				constraint.UniqueField = strings.ToLower(constraint.UniqueField)
-				addPlaceholders = append(addPlaceholders, fmt.Sprintf("($%d, $%d, $%d)", len(addArgs)+1, len(addArgs)+2, len(addArgs)+3))
-				addArgs = append(addArgs, instanceID, constraint.UniqueType, constraint.UniqueField)
+				addPlaceholders = append(addPlaceholders, fmt.Sprintf("($%d, $%d, $%d, $%d)", len(addArgs)+1, len(addArgs)+2, len(addArgs)+3, len(addArgs)+4))
+				addArgs = append(addArgs, instanceID, constraint.UniqueType, constraint.UniqueField, constraint.Owners)
 				addConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, instanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			case eventstore.UniqueConstraintRemove:
 				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf(deleteConstraintPlaceholdersStmt, len(deleteArgs)+1, len(deleteArgs)+2, len(deleteArgs)+3))
@@ -57,6 +57,14 @@ func handleUniqueConstraints(ctx context.Context, tx database.Tx, commands []eve
 				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%d)", len(deleteArgs)+1))
 				deleteArgs = append(deleteArgs, instanceID)
 				deleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, instanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
+			case eventstore.UniqueConstraintRemoveByOwner:
+				if len(constraint.Owners) == 0 {
+					continue
+				}
+				tag := constraint.Owners[0]
+				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%d AND owners @> ARRAY[$%d]::text[])", len(deleteArgs)+1, len(deleteArgs)+2))
+				deleteArgs = append(deleteArgs, instanceID, tag)
+				deleteConstraints[fmt.Sprintf("%s:%s", instanceID, tag)] = constraint
 			}
 		}
 	}
