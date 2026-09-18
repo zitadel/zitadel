@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { LoginPasskey } from "./login-passkey";
@@ -144,6 +144,49 @@ describe("LoginPasskey Component", () => {
       await waitFor(() => {
         expect(mockCredentialsGet).toHaveBeenCalled();
       });
+    });
+  });
+
+  describe("Continue while the passkey prompt is open", () => {
+    test("stays disabled until the automatic WebAuthn request settles", async () => {
+      mockUpdateSession.mockResolvedValue({
+        challenges: {
+          webAuthN: {
+            publicKeyCredentialRequestOptions: {
+              publicKey: {
+                challenge: new Uint8Array([1, 2, 3]),
+                allowCredentials: [{ id: new Uint8Array([4, 5, 6]), type: "public-key" }],
+              },
+            },
+          },
+        },
+      });
+
+      // The browser's passkey prompt is open until this promise settles.
+      let cancelPrompt: (reason: unknown) => void = () => {};
+      mockCredentialsGet.mockImplementation(
+        () =>
+          new Promise((_resolve, reject) => {
+            cancelPrompt = reject;
+          }),
+      );
+
+      const { container } = renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+      const submitButton = () => within(container).getByTestId("submit-button");
+
+      await waitFor(() => {
+        expect(mockCredentialsGet).toHaveBeenCalledTimes(1);
+      });
+      await waitFor(() => {
+        expect(submitButton()).toBeDisabled();
+      });
+
+      cancelPrompt(Object.assign(new Error("cancelled"), { name: "NotAllowedError" }));
+
+      await waitFor(() => {
+        expect(submitButton()).not.toBeDisabled();
+      });
+      expect(mockUpdateSession).toHaveBeenCalledTimes(1);
     });
   });
 
