@@ -1,3 +1,4 @@
+import { getValidLocaleFromUILocales } from "@/lib/auth-utils";
 import { LANGS, LANGUAGE_COOKIE_NAME, LANGUAGE_HEADER_NAME } from "@/lib/i18n";
 import { getServiceConfig } from "@/lib/service-url";
 import { getAllowedLanguages, getHostedLoginTranslation } from "@/lib/zitadel";
@@ -33,9 +34,10 @@ export default getRequestConfig(async () => {
 
   const languageHeader = await (await headers()).get(LANGUAGE_HEADER_NAME);
   if (languageHeader) {
-    // splits "en-US,en;q=0.9" to ["en", "US"] or ["en"]
-    const headerLocale = languageHeader.split(",")[0].split("-")[0];
-    if (allowedLanguages.includes(headerLocale)) {
+    // takes the first entry of "en-US,en;q=0.9" and resolves it to a supported
+    // language, preferring an exact match (zh-TW) over the base language (zh)
+    const headerLocale = getValidLocaleFromUILocales([languageHeader.split(",")[0].split(";")[0]]);
+    if (headerLocale && allowedLanguages.includes(headerLocale)) {
       locale = headerLocale;
     }
   }
