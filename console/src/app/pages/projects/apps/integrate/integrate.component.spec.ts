@@ -102,9 +102,10 @@ describe('IntegrateAppComponent', () => {
   });
 
   /**
-   * "Java" and "Dart / Flutter" are offered by the framework picker (they have
-   * an id, which is all it filters on) but have no entry in
-   * OIDC_CONFIGURATIONS.
+   * Deep link / stale URL: the pickers no longer offer frameworks without an
+   * OIDC configuration, but ?framework= can still name one (Java, Dart /
+   * Flutter, or any SDK entry). The page must fall back to an empty request
+   * rather than throw.
    */
   describe('with a framework that has no OIDC configuration (?framework=java)', () => {
     beforeEach(waitForAsync(() => setup({ framework: 'java' })));
@@ -115,9 +116,10 @@ describe('IntegrateAppComponent', () => {
   });
 
   /**
-   * OIDC_CONFIGURATIONS holds one AddOIDCAppRequest per framework at module
-   * scope. Handing that object straight to the page means edits leak into the
-   * next app the user creates with the same framework.
+   * Regression: OIDC_CONFIGURATIONS used to hold one shared AddOIDCAppRequest
+   * per framework at module scope, and the page configured it in place, so
+   * edits leaked into the next app created with the same framework. The
+   * entries are factories now; this pins that down.
    */
   describe('creating two apps with the same framework', () => {
     beforeEach(waitForAsync(() => setup({ framework: 'next' })));

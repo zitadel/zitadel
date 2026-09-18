@@ -19,7 +19,9 @@ import { OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
 export class FrameworkChangeComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject();
   public framework: BehaviorSubject<Framework | undefined> = new BehaviorSubject<Framework | undefined>(undefined);
-  @Output() public frameworkChanged: EventEmitter<Framework> = new EventEmitter();
+  // Emits undefined before a framework is chosen and when ?framework= names
+  // one that is not offered here, so consumers must handle both.
+  @Output() public frameworkChanged: EventEmitter<Framework | undefined> = new EventEmitter();
   // Only frameworks with an OIDC configuration can be integrated: the
   // integrate page builds its app request from OIDC_CONFIGURATIONS, so
   // offering any other framework here leads the user to a dead end.
