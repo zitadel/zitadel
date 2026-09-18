@@ -8,9 +8,15 @@ import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/he
  * @throws Error if no host is found
  */
 export function getInstanceHost(headers: ReadonlyHeaders): string | null {
-  // use standard proxy headers (x-forwarded-host → host) for both multi-tenant and self-hosted, do not use x-zitadel-instance-host
+  // 1. Check for explicit environment variable override (Fixes local dev with remote ZITADEL cloud)
+  const envOverride = process.env.ZITADEL_INSTANCE_HOST?.trim();
+  if (envOverride) return envOverride;
+
+  // 2. Fall back to standard proxy headers
   const instanceHost =
-    headers.get("x-zitadel-instance-host") || headers.get("x-zitadel-forward-host") || headers.get("host");
+    headers.get("x-zitadel-instance-host") || 
+    headers.get("x-zitadel-forward-host") || 
+    headers.get("host");
 
   return instanceHost;
 }
@@ -27,8 +33,11 @@ export function getInstanceHost(headers: ReadonlyHeaders): string | null {
  * @throws Error if no host is found
  */
 export function getPublicHost(headers: ReadonlyHeaders): string {
-  // Only use standard proxy headers (x-zitadel-public-host → x-zitadel-forward-host → x-forwarded-host → host)
-  // Do NOT use x-zitadel-instance-host as it may differ from what the user sees
+  // 1. Check for explicit environment variable override
+  const envOverride = process.env.ZITADEL_PUBLIC_HOST?.trim();
+  if (envOverride) return envOverride;
+
+  // 2. Fall back to standard proxy headers
   const publicHost =
     headers.get("x-zitadel-public-host") ||
     headers.get("x-zitadel-forward-host") ||
