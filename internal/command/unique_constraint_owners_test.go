@@ -90,6 +90,27 @@ func TestUniqueConstraintOwnersBackfillFinalized(t *testing.T) {
 		assert.False(t, ready)
 	})
 
+	t.Run("failed event with finalized true is not ready", func(t *testing.T) {
+		c := &Commands{eventstore: expectEventstore(
+			expectFilter(uniqueConstraintOwnersBackfillFailedEvent("v2.0.0", true)),
+		)(t)}
+		ready, err := c.uniqueConstraintOwnersBackfillFinalized(t.Context())
+		require.NoError(t, err)
+		assert.False(t, ready)
+	})
+
+	t.Run("failed then done finalized is ready", func(t *testing.T) {
+		c := &Commands{eventstore: expectEventstore(
+			expectFilter(
+				uniqueConstraintOwnersBackfillFailedEvent("v2.0.0", true),
+				uniqueConstraintOwnersBackfillDoneEvent("v2.0.0", true),
+			),
+		)(t)}
+		ready, err := c.uniqueConstraintOwnersBackfillFinalized(t.Context())
+		require.NoError(t, err)
+		assert.True(t, ready)
+	})
+
 	t.Run("filter error", func(t *testing.T) {
 		c := &Commands{eventstore: expectEventstore(
 			expectFilterError(zerrors.ThrowInternal(nil, "id", "err")),
@@ -100,19 +121,30 @@ func TestUniqueConstraintOwnersBackfillFinalized(t *testing.T) {
 }
 
 func uniqueConstraintOwnersBackfillDoneEvent(version string, finalized bool) *repository.Event {
-	return uniqueConstraintOwnersBackfillDoneEventLastRun(map[string]any{
+	return uniqueConstraintOwnersBackfillEvent(eventstore.EventType("system.migration.repeatable.done"), map[string]any{
+		"version":   version,
+		"finalized": finalized,
+	})
+}
+
+func uniqueConstraintOwnersBackfillFailedEvent(version string, finalized bool) *repository.Event {
+	return uniqueConstraintOwnersBackfillEvent(eventstore.EventType("system.migration.failed"), map[string]any{
 		"version":   version,
 		"finalized": finalized,
 	})
 }
 
 func uniqueConstraintOwnersBackfillDoneEventLastRun(lastRun map[string]any) *repository.Event {
+	return uniqueConstraintOwnersBackfillEvent(eventstore.EventType("system.migration.repeatable.done"), lastRun)
+}
+
+func uniqueConstraintOwnersBackfillEvent(typ eventstore.EventType, lastRun map[string]any) *repository.Event {
 	ctx := authz.WithInstanceID(context.Background(), "")
 	cmd := &migration.SetupStep{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			eventstore.NewAggregate(ctx, migration.SystemAggregateID, migration.SystemAggregate, "v1"),
-			eventstore.EventType("system.migration.repeatable.done"),
+			typ,
 		),
 		Name:    eventstore.UniqueConstraintOwnersBackfillStep,
 		LastRun: lastRun,

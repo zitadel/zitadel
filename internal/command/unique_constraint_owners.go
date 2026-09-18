@@ -7,6 +7,8 @@ import (
 	"github.com/zitadel/zitadel/internal/migration"
 )
 
+var _ eventstore.QueryReducer = (*uniqueConstraintOwnersBackfillState)(nil)
+
 func (c *Commands) isUniqueConstraintOwnerDeleteReady(ctx context.Context) (bool, error) {
 	if c.ownerDeleteReadyCached.Load() {
 		return true, nil
@@ -25,20 +27,44 @@ func (c *Commands) isUniqueConstraintOwnerDeleteReady(ctx context.Context) (bool
 }
 
 func (c *Commands) uniqueConstraintOwnersBackfillFinalized(ctx context.Context) (bool, error) {
-	var states migration.StepStates
-	if err := c.eventstore.FilterToQueryReducer(ctx, &states); err != nil {
+	var state uniqueConstraintOwnersBackfillState
+	if err := c.eventstore.FilterToQueryReducer(ctx, &state); err != nil {
 		return false, err
 	}
-	for _, step := range states.Steps {
-		if step == nil || step.Name != eventstore.UniqueConstraintOwnersBackfillStep {
+	return state.finalized, nil
+}
+
+type uniqueConstraintOwnersBackfillState struct {
+	eventstore.ReadModel
+	finalized bool
+}
+
+func (*uniqueConstraintOwnersBackfillState) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		InstanceID("").
+		AddQuery().
+		AggregateTypes(migration.SystemAggregate).
+		AggregateIDs(migration.SystemAggregateID).
+		EventTypes(eventstore.EventType("system.migration.repeatable.done")).
+		Builder()
+}
+
+func (s *uniqueConstraintOwnersBackfillState) Reduce() error {
+	for _, event := range s.Events {
+		if event.Type() != eventstore.EventType("system.migration.repeatable.done") {
+			continue
+		}
+		step, ok := event.(*migration.SetupStep)
+		if !ok || step.Name != eventstore.UniqueConstraintOwnersBackfillStep {
 			continue
 		}
 		lastRun, _ := step.LastRun.(map[string]interface{})
 		if lastRun == nil {
-			return false, nil
+			s.finalized = false
+			continue
 		}
 		finalized, _ := lastRun["finalized"].(bool)
-		return finalized, nil
+		s.finalized = finalized
 	}
-	return false, nil
+	return s.ReadModel.Reduce()
 }

@@ -4,8 +4,8 @@ UPDATE eventstore.unique_constraints uc
 SET owners = ARRAY['org:' || g.resource_owner, 'org:' || g.resource_owner_user, 'org:' || g.resource_owner_project, 'user:' || g.user_id, 'project:' || g.project_id]
 	|| CASE WHEN COALESCE(g.granted_org, '') <> '' THEN ARRAY['org:' || g.granted_org] ELSE ARRAY[]::text[] END
 	|| CASE WHEN COALESCE(g.grant_id, '') <> '' THEN ARRAY['grant:' || g.grant_id] ELSE ARRAY[]::text[] END
-FROM projections.user_grants5 g
+FROM {{.user_grants}} g
 WHERE uc.unique_type = 'user_grant'
 	AND uc.instance_id = g.instance_id
 	AND uc.owners = '{}'
-	AND lower(uc.unique_field) = lower(g.resource_owner || ':' || g.user_id || ':' || g.project_id || ':' || g.grant_id);
+	AND uc.unique_field IN (g.resource_owner || ':' || g.user_id || ':' || g.project_id || ':' || g.grant_id, lower(g.resource_owner || ':' || g.user_id || ':' || g.project_id || ':' || g.grant_id));
