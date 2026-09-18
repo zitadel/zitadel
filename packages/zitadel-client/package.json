@@ -1,6 +1,13 @@
 {
   "name": "@zitadel/client",
+  "description": "Services and utilities to interact with the ZITADEL API. Versioned together with ZITADEL.",
   "license": "MIT",
+  "homepage": "https://zitadel.com/docs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zitadel/zitadel.git",
+    "directory": "packages/zitadel-client"
+  },
   "publishConfig": {
     "access": "public"
   },
