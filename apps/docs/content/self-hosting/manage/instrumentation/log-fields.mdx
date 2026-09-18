@@ -1,0 +1,155 @@
+---
+title: Structured Log Fields
+description: "Reference of the structured JSON log fields ZITADEL emits, including request context, trace correlation, and error details."
+sidebar_label: Log Fields
+---
+
+This page describes the fields that appear in ZITADEL's structured log output, once [`Instrumentation.Log.Format`](/self-hosting/manage/instrumentation/overview#logging) is set to `json`, `gcp`, or `gcp_error_reporting`. The examples below are real log lines, captured from a local instance by calling the API with [grpcurl](https://github.com/fullstorydev/grpcurl) while running with `Instrumentation.Log.Format: json` and `Instrumentation.Log.Level: debug`.
+
+## Common fields
+
+Every log line contains these fields:
+
+| Field | Description |
+|---|---|
+| `time` | RFC3339 timestamp. |
+| `level` | `DEBUG`, `INFO`, `WARN`, or `ERROR` (plus GCP-specific alert/emergency levels used by [`logging.ErrorContextLogger`](#error-fields-err-group) for panics and fatal errors). |
+| `msg` | Human-readable log message. |
+| `source.function` / `source.file` / `source.line` | Where the log line was emitted, present when `AddSource: true`. |
+| `stream` | Which [stream](/self-hosting/manage/instrumentation/overview#logging) the line belongs to: `runtime`, `ready`, `request`, `event_handler`, `queue`, or `event_pusher`. |
+| `version` | The running ZITADEL build version. |
+| `TraceID` / `SpanID` | Present when the log line was emitted inside an active trace span, allowing correlation with [tracing](/self-hosting/manage/instrumentation/overview#tracing) data. |
+
+## Request context fields
+
+Once a request starts being handled, every subsequent log line on that request also carries a `request` group:
+
+| Field | Description |
+|---|---|
+| `request.id` | Unique ID for this request. Also returned to the client (as a response header for HTTP/gRPC, or header/trailer for connect RPC depending on success/failure). |
+| `request.instance_host` | The host used to resolve the ZITADEL instance for this request. |
+| `request.public_host` | The public-facing host, if different from `instance_host`. |
+| `request.instance_id` | The resolved instance ID, once authorization has resolved it. |
+| `request.user_id` | The authenticated user or service account ID, once resolved. |
+
+## Request-served fields
+
+A `"request served"` line is logged for every API call, in the `request` stream, once the call completes. The exact fields depend on which protocol handler served the request:
+
+| Field | grpc / connect | http |
+|---|---|---|
+| `protocol` | `"grpc"` or `"connect"` | `"http"` |
+| `service` | ✅ | ✅ |
+| `http_method` | ✅ | ✅ |
+| `path` | ✅ | ✅ |
+| `code` | ✅ (gRPC status code) | ❌ |
+| `status` | ❌ | ✅ (HTTP status code) |
+| `duration` | ✅ (nanoseconds) | ✅ (nanoseconds) |
+
+<Callout>
+`protocol` reflects the server-side handler stack that processed the request, not the wire protocol a client happened to use. ZITADEL's v2/v2beta services (like `zitadel.user.v2.UserService`) are all served through a [Connect](https://connectrpc.com) handler, which transparently accepts gRPC, gRPC-Web, and Connect wire formats — so calls to those services always log `protocol: "connect"`, even when made with a plain gRPC client like `grpcurl`. The legacy v1 services (`AdminService`, `ManagementService`, `AuthService`, `SystemService`) are still served by a classic gRPC server and log `protocol: "grpc"`. Non-gRPC endpoints (OIDC, SAML, Console, the legacy Login UI) log `protocol: "http"`.
+</Callout>
+
+### Example: successful request
+
+Captured from `grpcurl -plaintext -H "Authorization: Bearer $(cat admin.pat)" localhost:8080 zitadel.user.v2.UserService.ListUsers`:
+
+```json
+{
+  "time": "2026-07-20T14:04:35.984512809Z",
+  "level": "INFO",
+  "source": {
+    "function": "github.com/zitadel/zitadel/internal/api.(*API).registerConnectServer.LogHandler.func4.1",
+    "file": "/workspaces/zitadel/internal/api/grpc/server/connect_middleware/log_interceptor.go",
+    "line": 34
+  },
+  "msg": "request served",
+  "request": {
+    "id": "d9f2lsvhdckqk9sg9nf0",
+    "instance_host": "localhost:8080",
+    "instance_id": "382621618297372675",
+    "user_id": "382621618297962499"
+  },
+  "TraceID": "6d509f22d2f334570d1905960a05c523",
+  "SpanID": "bf80407e7f354922",
+  "stream": "request",
+  "version": "2026-07-20T14:04:16Z",
+  "protocol": "connect",
+  "service": "zitadel.user.v2.UserService",
+  "http_method": "POST",
+  "path": "/zitadel.user.v2.UserService/ListUsers",
+  "code": "code_0",
+  "duration": 11302933
+}
+```
+
+## Error fields (`err` group)
+
+When a request fails, ZITADEL logs a `WARN` (client errors, e.g. `NotFound`, `InvalidArgument`) or `ERROR` (server errors, e.g. `Internal`) line in addition to the `"request served"` line, carrying an `err` group:
+
+| Field | Description |
+|---|---|
+| `err.kind` | One of ZITADEL's error kinds: `Canceled`, `Unknown`, `InvalidArgument`, `DeadlineExceeded`, `NotFound`, `AlreadyExists`, `PermissionDenied`, `ResourceExhausted`, `PreconditionFailed`, `Aborted`, `OutOfRange`, `Unimplemented`, `Internal`, `Unavailable`, `DataLoss`, `Unauthenticated`. |
+| `err.message` | Human-readable error message. |
+| `err.id` | ZITADEL's error code, in `<PACKAGE>-<shortcode>` form (e.g. `QUERY-Dfbg2`), useful for searching source/support material. |
+| `err.parent` | The wrapped underlying error, if any (e.g. a driver-level error). |
+| `err.reportLocation.filePath` / `.lineNumber` / `.functionName` | Where the error was created, present when `Instrumentation.Log.Errors.ReportLocation: true` (the default). |
+| `err.stackTrace` | A full stack trace, present only when `Instrumentation.Log.Errors.StackTrace: true` (disabled by default — verbose). |
+
+When `Format: gcp_error_reporting` is set, the `err` attribute is renamed to `error`, `reportLocation`/`stackTrace` move to top-level fields, and the whole line is reshaped to match the [GCP Error Reporting](https://cloud.google.com/error-reporting/docs/formatting-error-messages) JSON schema (adding a top-level `@type` field).
+
+### Example: NotFound error
+
+Captured from `grpcurl -plaintext -H "Authorization: Bearer $(cat admin.pat)" -d '{"user_id":"does-not-exist"}' localhost:8080 zitadel.user.v2.UserService.GetUserByID`:
+
+```json
+{
+  "time": "2026-07-20T14:04:44.595817096Z",
+  "level": "WARN",
+  "source": {
+    "function": "github.com/zitadel/zitadel/internal/api/grpc/gerrors.ZITADELToConnectError",
+    "file": "/workspaces/zitadel/internal/api/grpc/gerrors/zitadel_errors.go",
+    "line": 65
+  },
+  "msg": "User could not be found (QUERY-Dfbg2)",
+  "request": {
+    "id": "d9f2lv7hdckqk9sg9njg",
+    "instance_host": "localhost:8080",
+    "instance_id": "382621618297372675",
+    "user_id": "382621618297962499"
+  },
+  "TraceID": "9f5bd938f3ab20c43b271a1667fb0394",
+  "SpanID": "5f879d60abe74692",
+  "stream": "request",
+  "version": "2026-07-20T14:04:16Z",
+  "err": {
+    "kind": "NotFound",
+    "message": "User could not be found",
+    "id": "QUERY-Dfbg2",
+    "parent": "sql: no rows in result set",
+    "reportLocation": {
+      "filePath": "/workspaces/zitadel/internal/query/user.go",
+      "lineNumber": 890,
+      "functionName": "github.com/zitadel/zitadel/internal/query.scanUser"
+    }
+  }
+}
+```
+
+Note this is the same request (`request.id: d9f2lv7hdckqk9sg9njg`) that also produced a `"request served"` line with `code: "not_found"` — the two lines can be correlated by `request.id` or by `TraceID`/`SpanID`.
+
+## Masking
+
+`Instrumentation.Log.Mask.Keys` redacts attribute values by key name, matching the key at any nesting depth (both a leaf attribute and an entire group), and replaces the value with `Mask.Value` while preserving structure. For example, with `Mask.Keys: ["message"]` and `Mask.Value: "****"`, the error example above would log `"message": "****"` instead of `"message": "User could not be found"`, while every other field stays intact.
+
+## Format differences
+
+`Instrumentation.Log.Format` controls how the fields above are rendered to standard error:
+
+| Format | Output |
+|---|---|
+| `disabled` | No output on stderr (falls back to the legacy `Log` config if set, see [Legacy configuration](/self-hosting/manage/instrumentation/overview#legacy-configuration)). |
+| `text` | Human-readable `key=value` text, one line per log entry. |
+| `json` | The JSON shown in the examples above. |
+| `gcp` | JSON, with `level` renamed to `severity`, `msg` renamed to `message`, and `source` renamed to `logging.googleapis.com/sourceLocation`, matching [Google Cloud Logging](https://cloud.google.com/logging/docs/structured-logging)'s expected field names. |
+| `gcp_error_reporting` | Same as `gcp`, plus: whenever an `err`/`error` attribute is present, the line is additionally reshaped to match the [GCP Error Reporting](https://cloud.google.com/error-reporting/docs/formatting-error-messages) schema (`@type`, `message` containing the stack trace when available, top-level `reportLocation`). |
