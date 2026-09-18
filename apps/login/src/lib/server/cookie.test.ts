@@ -1,4 +1,4 @@
-import { create } from "@zitadel/client";
+import { create, timestampMs } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -97,5 +97,73 @@ describe("session challenge sanitization", () => {
 
     expect(setSession).toHaveBeenCalledTimes(1);
     expectSanitized(vi.mocked(setSession).mock.calls[0][0].challenges);
+  });
+});
+
+describe("session cookie renewal", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    vi.mocked(headers).mockResolvedValue({} as any);
+    vi.mocked(getServiceConfig).mockReturnValue({ serviceConfig: {} } as any);
+    vi.mocked(getSecuritySettings).mockResolvedValue({ embeddedIframe: { enabled: false } } as any);
+    vi.mocked(addSessionToCookie).mockResolvedValue(undefined as any);
+    vi.mocked(updateSessionCookie).mockResolvedValue(undefined as any);
+    vi.mocked(setSession).mockResolvedValue({
+      sessionToken: "sessionToken",
+      details: {},
+    } as any);
+  });
+
+  test("refreshes expirationTs from the newly fetched session instead of the stale cookie", async () => {
+    const freshExpirationDate = { seconds: BigInt(2000), nanos: 0 };
+
+    vi.mocked(getSession).mockResolvedValue({
+      session: {
+        id: "sessionId",
+        expirationDate: freshExpirationDate,
+        factors: { user: { loginName: "victim@example.com", organizationId: "orgId" } },
+      },
+    } as any);
+
+    await setSessionAndUpdateCookie({
+      recentCookie: {
+        id: "sessionId",
+        token: "sessionToken",
+        loginName: "victim@example.com",
+        creationTs: "",
+        expirationTs: "1000000", // stale value carried over from before this renewal
+        changeTs: "",
+      },
+      lifetime: {} as any,
+    });
+
+    const newCookie = vi.mocked(updateSessionCookie).mock.calls[0][0].session;
+    expect(newCookie.expirationTs).toBe(`${timestampMs(freshExpirationDate as any)}`);
+    expect(newCookie.expirationTs).not.toBe("1000000");
+  });
+
+  test("falls back to the previous expirationTs when the fetched session has none", async () => {
+    vi.mocked(getSession).mockResolvedValue({
+      session: {
+        id: "sessionId",
+        factors: { user: { loginName: "victim@example.com", organizationId: "orgId" } },
+      },
+    } as any);
+
+    await setSessionAndUpdateCookie({
+      recentCookie: {
+        id: "sessionId",
+        token: "sessionToken",
+        loginName: "victim@example.com",
+        creationTs: "",
+        expirationTs: "1000000",
+        changeTs: "",
+      },
+      lifetime: {} as any,
+    });
+
+    const newCookie = vi.mocked(updateSessionCookie).mock.calls[0][0].session;
+    expect(newCookie.expirationTs).toBe("1000000");
   });
 });

@@ -271,6 +271,98 @@ describe("cookies", () => {
     });
   });
 
+  describe("session cookie maxAge", () => {
+    const baseTime = 1700000000000;
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date(baseTime));
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("sets maxAge from the session's expiration", async () => {
+      mockCookies.get.mockReturnValue(undefined);
+
+      const session: Cookie = {
+        id: "session-1",
+        token: "token-1",
+        loginName: "user@example.com",
+        creationTs: `${baseTime}`,
+        expirationTs: `${baseTime + 600_000}`, // 600s in the future
+        changeTs: `${baseTime}`,
+      };
+
+      await addSessionToCookie({ session });
+
+      expect(mockCookies.set).toHaveBeenCalledWith(expect.objectContaining({ maxAge: 600 }));
+    });
+
+    it("picks the furthest expiration among multiple sessions", async () => {
+      const nearSession: Cookie = {
+        id: "session-near",
+        token: "token-near",
+        loginName: "near@example.com",
+        creationTs: `${baseTime}`,
+        expirationTs: `${baseTime + 60_000}`,
+        changeTs: `${baseTime}`,
+      };
+
+      mockCookies.get.mockReturnValue({ value: JSON.stringify([nearSession]) });
+
+      const farSession: Cookie = {
+        id: "session-far",
+        token: "token-far",
+        loginName: "far@example.com",
+        creationTs: `${baseTime}`,
+        expirationTs: `${baseTime + 600_000}`,
+        changeTs: `${baseTime}`,
+      };
+
+      await addSessionToCookie({ session: farSession });
+
+      expect(mockCookies.set).toHaveBeenCalledWith(expect.objectContaining({ maxAge: 600 }));
+    });
+
+    it("omits maxAge when every session is already expired", async () => {
+      mockCookies.get.mockReturnValue(undefined);
+
+      const expiredSession: Cookie = {
+        id: "session-expired",
+        token: "token-expired",
+        loginName: "expired@example.com",
+        creationTs: `${baseTime}`,
+        expirationTs: `${baseTime - 1000}`,
+        changeTs: `${baseTime}`,
+      };
+
+      await addSessionToCookie({ session: expiredSession });
+
+      const setCall = mockCookies.set.mock.calls[0][0];
+      expect(setCall).not.toHaveProperty("maxAge");
+    });
+
+    it("omits maxAge without throwing when expirationTs is not a valid number", async () => {
+      mockCookies.get.mockReturnValue(undefined);
+
+      const malformedSession = {
+        id: "session-malformed",
+        token: "token-malformed",
+        loginName: "malformed@example.com",
+        creationTs: `${baseTime}`,
+        expirationTs: "not-a-number",
+        changeTs: `${baseTime}`,
+      } as unknown as Cookie;
+
+      await expect(addSessionToCookie({ session: malformedSession })).resolves.not.toThrow();
+
+      const setCall = mockCookies.set.mock.calls[0][0];
+      expect(setCall).not.toHaveProperty("maxAge");
+    });
+  });
+
   describe("updateSessionCookie", () => {
     const mockSession: Cookie = {
       id: "session-1",
