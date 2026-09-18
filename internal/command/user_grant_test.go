@@ -462,7 +462,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 							"project1",
 							"",
 							[]string{"rolekey1"},
-						),
+						).WithOwnerOrgs("org1", "org1", ""),
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
@@ -550,7 +550,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 							"project1",
 							"",
 							[]string{"rolekey1"},
-						),
+						).WithOwnerOrgs("org1", "org1", ""),
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
@@ -631,7 +631,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 							"project1",
 							"projectgrant1",
 							[]string{"rolekey1"},
-						),
+						).WithOwnerOrgs("org1", "org1", "org1"),
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
@@ -705,7 +705,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 							"project1",
 							"",
 							[]string{"rolekey1"},
-						),
+						).WithOwnerOrgs("org1", "org1", ""),
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
@@ -783,7 +783,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 							"project1",
 							"projectgrant1",
 							[]string{"rolekey1"},
-						),
+						).WithOwnerOrgs("org1", "org2", "org1"),
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
@@ -866,7 +866,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 							"project1",
 							"projectgrant1",
 							[]string{"rolekey1"},
-						),
+						).WithOwnerOrgs("org1", "org1", "org2"),
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
