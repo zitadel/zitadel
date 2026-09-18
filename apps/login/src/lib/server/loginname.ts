@@ -116,6 +116,10 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     return { error: t("errors.userNotFound") };
   };
 
+  // With an org domain suffix the user types only the local part, so put the
+  // login name back together for the checks below and for the IdP login hint.
+  const concatLoginname = command.suffix ? `${command.loginName}@${command.suffix}` : command.loginName;
+
   const redirectUserToIDP = async (userId?: string, organization?: string) => {
     // If userId is provided, check for user-specific IDP links first
     let identityProviders: IDPLink[] = [];
@@ -166,6 +170,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             failureUrl:
               `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/failure?` +
               new URLSearchParams(params),
+            loginHint: concatLoginname,
           },
         });
 
@@ -225,6 +230,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           failureUrl:
             `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/failure?` +
             new URLSearchParams(params),
+          // The user is already linked to this IdP, so prefer the username the
+          // IdP knows the user by over the ZITADEL login name (same as Login V1).
+          loginHint: identityProviders[0].userName || concatLoginname,
         },
       });
 
@@ -251,9 +259,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     const userId = users[0].userId;
 
     const userLoginSettings = await getLoginSettings({ serviceConfig, organization: user.details?.resourceOwner });
-
-    // compare with the concatenated suffix when set
-    const concatLoginname = command.suffix ? `${command.loginName}@${command.suffix}` : command.loginName;
 
     const humanUser = users[0].type.case === "human" ? users[0].type.value : undefined;
 

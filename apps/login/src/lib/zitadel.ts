@@ -929,6 +929,9 @@ export async function getOrgsByDomain({ serviceConfig, domain }: WithServiceConf
   );
 }
 
+// RedirectURLs.login_hint is validated with max_len 200 by the API.
+const MAX_LOGIN_HINT_LENGTH = 200;
+
 export async function startIdentityProviderFlow({
   serviceConfig,
   idpId,
@@ -943,12 +946,19 @@ export async function startIdentityProviderFlow({
     publicHost: "",
   });
 
+  // The login hint only improves the UX at the IdP, so a hint the API would
+  // reject (e.g. an overlong login_hint sent by the RP) is dropped instead of
+  // failing the whole IdP flow.
+  const { loginHint, ...redirectUrls } = urls;
+  const content: RedirectURLsJson =
+    loginHint && loginHint.length <= MAX_LOGIN_HINT_LENGTH ? { ...redirectUrls, loginHint } : redirectUrls;
+
   return userService
     .startIdentityProviderIntent({
       idpId,
       content: {
         case: "urls",
-        value: urls,
+        value: content,
       },
     })
     .then(async (resp) => {
