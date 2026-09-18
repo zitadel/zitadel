@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/go-jose/go-jose/v4"
@@ -108,6 +109,9 @@ type Commands struct {
 	loginPaths       LoginPaths
 	ipLookupFunction internal_net.IPLookupFunc
 	denyList         []denylist.AddressChecker
+
+	ownerDeleteReady       func(context.Context) (bool, error)
+	ownerDeleteReadyCached atomic.Bool
 }
 
 //go:generate mockgen -package command -destination ./mock_login_paths.go . LoginPaths
@@ -234,6 +238,8 @@ func StartCommands(
 		ipLookupFunction: ipLookupFunction,
 		denyList:         denyList,
 	}
+
+	repo.ownerDeleteReady = repo.uniqueConstraintOwnersBackfillFinalized
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {
 		repo.newHashedSecret = newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret)

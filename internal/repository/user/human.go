@@ -65,7 +65,7 @@ func (e *HumanAddedEvent) Payload() interface{} {
 }
 
 func (e *HumanAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain)}
+	return []*eventstore.UniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain).WithOwners(usernameOwnerTags(e.Aggregate())...)}
 }
 
 func (e *HumanAddedEvent) AddAddressData(
@@ -174,7 +174,7 @@ func (e *HumanRegisteredEvent) Payload() interface{} {
 }
 
 func (e *HumanRegisteredEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain)}
+	return []*eventstore.UniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain).WithOwners(usernameOwnerTags(e.Aggregate())...)}
 }
 
 func (e *HumanRegisteredEvent) AddAddressData(

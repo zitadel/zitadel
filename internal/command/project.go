@@ -365,14 +365,9 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
 
-	samlEntityIDsAgg, err := c.getSAMLEntityIdsWriteModelByProjectID(ctx, projectID, resourceOwner)
+	uniqueConstraints, err := c.projectRemovedUniqueConstraints(ctx, projectID, resourceOwner)
 	if err != nil {
 		return nil, err
-	}
-
-	uniqueConstraints := make([]*eventstore.UniqueConstraint, len(samlEntityIDsAgg.EntityIDs))
-	for i, entityID := range samlEntityIDsAgg.EntityIDs {
-		uniqueConstraints[i] = project.NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID.EntityID)
 	}
 
 	events := []eventstore.Command{
@@ -419,14 +414,9 @@ func (c *Commands) DeleteProject(ctx context.Context, id, resourceOwner string, 
 		return time.Time{}, err
 	}
 
-	samlEntityIDsAgg, err := c.getSAMLEntityIdsWriteModelByProjectID(ctx, id, resourceOwner)
+	uniqueConstraints, err := c.projectRemovedUniqueConstraints(ctx, id, resourceOwner)
 	if err != nil {
 		return time.Time{}, err
-	}
-
-	uniqueConstraints := make([]*eventstore.UniqueConstraint, len(samlEntityIDsAgg.EntityIDs))
-	for i, entityID := range samlEntityIDsAgg.EntityIDs {
-		uniqueConstraints[i] = project.NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID.EntityID)
 	}
 	events := []eventstore.Command{
 		project.NewProjectRemovedEvent(ctx,
@@ -448,6 +438,25 @@ func (c *Commands) DeleteProject(ctx context.Context, id, resourceOwner string, 
 		return time.Time{}, err
 	}
 	return existing.WriteModel.ChangeDate, nil
+}
+
+func (c *Commands) projectRemovedUniqueConstraints(ctx context.Context, projectID, resourceOwner string) ([]*eventstore.UniqueConstraint, error) {
+	ownerDeleteReady, err := c.isUniqueConstraintOwnerDeleteReady(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if ownerDeleteReady {
+		return nil, nil
+	}
+	samlEntityIDsAgg, err := c.getSAMLEntityIdsWriteModelByProjectID(ctx, projectID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	uniqueConstraints := make([]*eventstore.UniqueConstraint, len(samlEntityIDsAgg.EntityIDs))
+	for i, entityID := range samlEntityIDsAgg.EntityIDs {
+		uniqueConstraints[i] = project.NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID.EntityID)
+	}
+	return uniqueConstraints, nil
 }
 
 func (c *Commands) getProjectWriteModelByID(ctx context.Context, projectID, resourceOwner string) (_ *ProjectWriteModel, err error) {
