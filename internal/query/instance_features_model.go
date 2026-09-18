@@ -71,6 +71,7 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstancePermissionCheckV2,
 			feature_v2.InstanceManagementConsoleUseV2UserApi,
 			feature_v2.InstanceEnableRelationalTables,
+			feature_v2.InstanceAllowOTPCodeOverride,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -122,6 +123,8 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		features.ManagementConsoleUseV2UserApi.set(level, event.Value)
 	case feature.KeyEnableRelationalTables:
 		features.EnableRelationalTables.set(level, event.Value)
+	case feature.KeyAllowOTPCodeOverride:
+		features.AllowOTPCodeOverride.set(level, event.Value)
 	}
 	return nil
 }
