@@ -275,6 +275,7 @@ type CustomLoginTextReadModel struct {
 
 	ExternalUserNotFoundTitle                  string
 	ExternalUserNotFoundDescription            string
+	ExternalUserNotFoundNoOptionAvailable      string
 	ExternalUserNotFoundLinkButtonText         string
 	ExternalUserNotFoundAutoRegisterButtonText string
 	ExternalUserNotFoundTOSAndPrivacyLabel     string
@@ -2384,6 +2385,10 @@ func (wm *CustomLoginTextReadModel) handleExternalUserNotFoundScreenSetEvent(e *
 		wm.ExternalUserNotFoundDescription = e.Text
 		return
 	}
+	if e.Key == domain.LoginKeyExternalNotFoundNoOptionAvailable {
+		wm.ExternalUserNotFoundNoOptionAvailable = e.Text
+		return
+	}
 	if e.Key == domain.LoginKeyExternalNotFoundLinkButtonText {
 		wm.ExternalUserNotFoundLinkButtonText = e.Text
 		return
@@ -2421,6 +2426,10 @@ func (wm *CustomLoginTextReadModel) handleExternalUserNotFoundScreenRemoveEvent(
 	}
 	if e.Key == domain.LoginKeyExternalNotFoundDescription {
 		wm.ExternalUserNotFoundDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeyExternalNotFoundNoOptionAvailable {
+		wm.ExternalUserNotFoundNoOptionAvailable = ""
 		return
 	}
 	if e.Key == domain.LoginKeyExternalNotFoundLinkButtonText {

@@ -274,6 +274,7 @@ const (
 	LoginKeyExternalNotFound                       = "ExternalNotFound."
 	LoginKeyExternalNotFoundTitle                  = LoginKeyExternalNotFound + "Title"
 	LoginKeyExternalNotFoundDescription            = LoginKeyExternalNotFound + "Description"
+	LoginKeyExternalNotFoundNoOptionAvailable      = LoginKeyExternalNotFound + "NoOptionAvailable"
 	LoginKeyExternalNotFoundLinkButtonText         = LoginKeyExternalNotFound + "LinkButtonText"
 	LoginKeyExternalNotFoundAutoRegisterButtonText = LoginKeyExternalNotFound + "AutoRegisterButtonText"
 	LoginKeyExternalNotFoundTOSAndPrivacyLabel     = LoginKeyExternalNotFound + "TosAndPrivacyLabel"
@@ -619,6 +620,7 @@ type LinkingUserDoneScreenText struct {
 type ExternalUserNotFoundScreenText struct {
 	Title                  string
 	Description            string
+	NoOptionAvailable      string
 	LinkButtonText         string
 	AutoRegisterButtonText string
 	TOSAndPrivacyLabel     string

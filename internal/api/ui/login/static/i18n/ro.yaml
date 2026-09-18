@@ -369,6 +369,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Utilizator extern nu a fost găsit
   Description: Utilizatorul extern nu a fost găsit. Doriți să vă asociați utilizatorul sau să înregistrați automat unul nou?
+  NoOptionAvailable: Nu a fost găsit niciun cont care să corespundă utilizatorului dumneavoastră extern și nu poate fi creat un cont nou. Vă rugăm să contactați administratorul sau suportul.
   LinkButtonText: Asociază
   AutoRegisterButtonText: Înregistrare
   TosAndPrivacyLabel: Termeni și condiții

@@ -369,6 +369,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Det finns inget konto
   Description: Du kan registrera ett nytt konto eller koppla ihop det här kontot med ett befintligt.
+  NoOptionAvailable: Inget konto som matchar din externa användare hittades och inget nytt konto kan skapas. Kontakta din administratör eller supporten.
   LinkButtonText: Koppla ihop
   AutoRegisterButtonText: Registrera nytt
   TosConfirm: Jag accepterar

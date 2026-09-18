@@ -369,6 +369,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Utente esterno non trovato
   Description: Utente esterno non trovato. Vuoi collegare il tuo utente o registrarne uno nuovo automaticamente.
+  NoOptionAvailable: Non è stato trovato alcun account corrispondente al tuo utente esterno e non è possibile creare un nuovo account. Contatta il tuo amministratore o l'assistenza.
   LinkButtonText: Link
   AutoRegisterButtonText: Registra
   TosAndPrivacyLabel: Termini di servizio

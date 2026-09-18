@@ -60,6 +60,7 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   const r2 = new ExternalUserNotFoundScreenText();
   r2.setAutoRegisterButtonText(map.externalUserNotFoundText?.autoRegisterButtonText ?? '');
   r2.setDescription(map.externalUserNotFoundText?.description ?? '');
+  r2.setNoOptionAvailable(map.externalUserNotFoundText?.noOptionAvailable ?? '');
   r2.setLinkButtonText(map.externalUserNotFoundText?.linkButtonText ?? '');
   r2.setTitle(map.externalUserNotFoundText?.title ?? '');
   r2.setTosAndPrivacyLabel(map.externalUserNotFoundText?.tosAndPrivacyLabel ?? '');
