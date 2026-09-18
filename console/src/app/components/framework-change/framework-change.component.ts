@@ -8,6 +8,7 @@ import { Framework } from '../quickstart/quickstart.component';
 import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { FrameworkChangeDialogComponent } from './framework-change-dialog.component';
+import { OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
 
 @Component({
   selector: 'cnsl-framework-change',
@@ -19,14 +20,20 @@ export class FrameworkChangeComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject();
   public framework: BehaviorSubject<Framework | undefined> = new BehaviorSubject<Framework | undefined>(undefined);
   @Output() public frameworkChanged: EventEmitter<Framework> = new EventEmitter();
-  public frameworks: Framework[] = frameworkDefinition.map((f) => {
-    return {
-      ...f,
-      fragment: '',
-      imgSrcDark: `assets${f.imgSrcDark}`,
-      imgSrcLight: `assets${f.imgSrcLight ? f.imgSrcLight : f.imgSrcDark}`,
-    };
-  });
+  // Only frameworks with an OIDC configuration can be integrated: the
+  // integrate page builds its app request from OIDC_CONFIGURATIONS, so
+  // offering any other framework here leads the user to a dead end.
+  // QuickstartComponent filters the same way.
+  public frameworks: Framework[] = frameworkDefinition
+    .filter((f) => f.id && OIDC_CONFIGURATIONS[f.id])
+    .map((f) => {
+      return {
+        ...f,
+        fragment: '',
+        imgSrcDark: `assets${f.imgSrcDark}`,
+        imgSrcLight: `assets${f.imgSrcLight ? f.imgSrcLight : f.imgSrcDark}`,
+      };
+    });
 
   constructor(
     private activatedRoute: ActivatedRoute,
