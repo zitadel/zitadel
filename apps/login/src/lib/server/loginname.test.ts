@@ -188,6 +188,7 @@ describe("sendLoginname", () => {
     };
 
     const mockSession = {
+      id: "session123",
       factors: {
         user: {
           id: "user123",
@@ -256,6 +257,7 @@ describe("sendLoginname", () => {
         expect((result as any).redirect).toMatch(/^\/password\?/);
         expect((result as any).redirect).toContain("loginName=user%40example.com");
         expect((result as any).redirect).toContain("requestId=req123");
+        expect((result as any).redirect).toContain("sessionId=session123");
       });
 
       test("should attempt IDP redirect when password is not allowed but user has IDP links", async () => {
@@ -421,6 +423,7 @@ describe("sendLoginname", () => {
         expect((result as any).redirect).toMatch(/^\/passkey\?/);
         expect((result as any).redirect).toContain("loginName=user%40example.com");
         expect((result as any).redirect).toContain("requestId=req123");
+        expect((result as any).redirect).toContain("sessionId=session123");
       });
 
       test("should return error when passkeys are not allowed", async () => {
@@ -491,6 +494,7 @@ describe("sendLoginname", () => {
         expect(result).toHaveProperty("redirect");
         expect((result as any).redirect).toMatch(/^\/password\?/);
         expect((result as any).redirect).toContain("loginName=user%40example.com");
+        expect((result as any).redirect).not.toContain("sessionId=");
       });
     });
 
@@ -507,6 +511,7 @@ describe("sendLoginname", () => {
         expect(result).toHaveProperty("redirect");
         expect((result as any).redirect).toMatch(/^\/passkey\?/);
         expect((result as any).redirect).toContain("altPassword=true"); // password is allowed
+        expect((result as any).redirect).toContain("sessionId=session123");
       });
 
       test("should return error when allowLocalAuthentication is false (disabling both password and passkey)", async () => {
@@ -551,6 +556,7 @@ describe("sendLoginname", () => {
 
         expect(result).toBeDefined();
         expect(result?.redirect).toMatch(/^\/password\?/);
+        expect(result?.redirect).toContain("sessionId=session123");
       });
 
       test("should return error when password is only method in multi-method scenario but not allowed", async () => {
