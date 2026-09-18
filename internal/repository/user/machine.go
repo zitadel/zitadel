@@ -32,7 +32,7 @@ func (e *MachineAddedEvent) Payload() interface{} {
 }
 
 func (e *MachineAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain)}
+	return []*eventstore.UniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain).WithOwners(usernameOwnerTags(e.Aggregate())...)}
 }
 
 func NewMachineAddedEvent(

@@ -43,7 +43,7 @@ func (e *ApplicationAddedEvent) Payload() interface{} {
 }
 
 func (e *ApplicationAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID)}
+	return []*eventstore.UniqueConstraint{NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID).WithOwners(projectOwnerTags(e.Aggregate())...)}
 }
 
 func NewApplicationAddedEvent(
@@ -91,7 +91,7 @@ func (e *ApplicationChangedEvent) Payload() interface{} {
 func (e *ApplicationChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{
 		NewRemoveApplicationUniqueConstraint(e.oldName, e.Aggregate().ID),
-		NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID),
+		NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID).WithOwners(projectOwnerTags(e.Aggregate())...),
 	}
 }
 
