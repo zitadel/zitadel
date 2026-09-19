@@ -77,6 +77,26 @@ export async function loginWithOIDCAndSession({
         // handle already handled gracefully as these could come up if old emails with requestId are used (reset password, register emails etc.)
         console.error(error);
         if (isClassifiedError(error) && error.code === Code.FailedPrecondition) {
+          // createCallback also rejects an existing session when the auth request
+          // demands a fresh authentication (prompt=login, max_age=0). Falling
+          // straight through to defaultRedirectUri or /signedin abandons the OIDC
+          // request in that case: the user is authenticated, but the relying party
+          // never receives a code. Re-drive authentication for this user first,
+          // which is the same recovery the invalid-session branch above performs.
+          if (selectedSession.factors?.user?.loginName) {
+            const reauth: SendLoginnameCommand = {
+              loginName: selectedSession.factors.user.loginName,
+              organization: selectedSession.factors?.user?.organizationId,
+              requestId: `oidc_${authRequest}`,
+            };
+
+            const reauthRes = await sendLoginname(reauth);
+
+            if (reauthRes && "redirect" in reauthRes && reauthRes?.redirect) {
+              return { redirect: reauthRes.redirect };
+            }
+          }
+
           const loginSettings = await getLoginSettings({
             serviceConfig,
             organization: selectedSession.factors?.user?.organizationId,
