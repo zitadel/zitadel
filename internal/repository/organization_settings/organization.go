@@ -18,7 +18,7 @@ type OrganizationSettingsSetEvent struct {
 
 	OrganizationScopedUsernames    bool `json:"organizationScopedUsernames,omitempty"`
 	oldOrganizationScopedUsernames bool
-	usernameChanges                []string
+	usernameChanges                []user.UsernameChange
 }
 
 func (e *OrganizationSettingsSetEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -30,21 +30,13 @@ func (e *OrganizationSettingsSetEvent) Payload() any {
 }
 
 func (e *OrganizationSettingsSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	if len(e.usernameChanges) == 0 || e.oldOrganizationScopedUsernames == e.OrganizationScopedUsernames {
-		return []*eventstore.UniqueConstraint{}
-	}
-	changes := make([]*eventstore.UniqueConstraint, len(e.usernameChanges)*2)
-	for i, username := range e.usernameChanges {
-		changes[i*2] = user.NewRemoveUsernameUniqueConstraint(username, e.Aggregate().ResourceOwner, e.oldOrganizationScopedUsernames)
-		changes[i*2+1] = user.NewAddUsernameUniqueConstraint(username, e.Aggregate().ResourceOwner, e.OrganizationScopedUsernames)
-	}
-	return changes
+	return user.NewUsernameUniqueConstraints(e.usernameChanges, e.Aggregate().ResourceOwner, e.OrganizationScopedUsernames, e.oldOrganizationScopedUsernames)
 }
 
 func NewOrganizationSettingsAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	usernameChanges []string,
+	usernameChanges []user.UsernameChange,
 	organizationScopedUsernames bool,
 	oldOrganizationScopedUsernames bool,
 ) *OrganizationSettingsSetEvent {
@@ -63,7 +55,7 @@ type OrganizationSettingsRemovedEvent struct {
 
 	organizationScopedUsernames    bool
 	oldOrganizationScopedUsernames bool
-	usernameChanges                []string
+	usernameChanges                []user.UsernameChange
 }
 
 func (e *OrganizationSettingsRemovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -81,7 +73,7 @@ func (e *OrganizationSettingsRemovedEvent) UniqueConstraints() []*eventstore.Uni
 func NewOrganizationSettingsRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	usernameChanges []string,
+	usernameChanges []user.UsernameChange,
 	organizationScopedUsernames bool,
 	oldOrganizationScopedUsernames bool,
 ) *OrganizationSettingsRemovedEvent {
