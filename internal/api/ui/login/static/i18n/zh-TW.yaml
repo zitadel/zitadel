@@ -119,12 +119,12 @@ InitMFAU2F:
   RegisterTokenButtonText: 註冊雙因素
   ErrorRetry: 重試、建立新挑戰碼或選擇不同的方法。
 InitMFADone:
-  Title: 2-Factor設定完成
-  Description: 真棒！你剛剛成功地設定了你的雙因素，使你的帳戶更加安全。你剛剛成功地設定了你的雙因素，使你的帳戶更加安全。第二次因素必須在每次登入時輸入。
+  Title: 雙因素驗證設定完成
+  Description: 您已完成雙因素驗證設定。往後登入時，請使用您設定的第二驗證方式。
   NextButtonText: 繼續
   CancelButtonText: 取消
 MFAProvider:
-  Provider0: 軟體應用（如 Google/Migrosoft Authenticator、Authy）
+  Provider0: 軟體應用（如 Google/Microsoft Authenticator、Authy）
   Provider1: 硬體裝置（如 Face ID、Windows Hello、指紋）
   Provider3: 一次性密碼簡訊
   Provider4: 一次性密碼電子郵件

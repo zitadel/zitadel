@@ -289,8 +289,8 @@ Errors:
     IDPConfig:
       NotExisting: 身分提供者設定不存在
   Project:
-    ProjectIDMissing: P缺少專案 ID
-    AlreadyExists: 專案以存在於組織中
+    ProjectIDMissing: 缺少專案 ID
+    AlreadyExists: 專案已存在於組織中
     OrgNotExisting: 組織不存在
     UserNotExisting: 使用者不存在
     CouldNotGenerateClientSecret: 無法生成客戶端秘鑰
@@ -515,7 +515,7 @@ Errors:
       ScanFailed: 查詢已認證請求的使用情況失敗
     Execution:
       StorageFailed: 將行動執行日誌儲存到資料庫失敗
-      ScanFailed: Q查詢動作執行秒數的使用情況失敗
+      ScanFailed: 無法查詢動作執行時間的用量
   Session:
     NotExisting: 工作階段不存在
     Terminated: 工作階段已經終止
