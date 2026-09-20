@@ -1,0 +1,1424 @@
+Errors:
+  Internal: 發生了內部錯誤
+  NoChangesFound: 沒有變化
+  OriginNotAllowed: 這個"來源"是不被允許的
+  IDMissing: ID 丟失
+  ResourceOwnerMissing: 組織沒有資源所有者
+  RemoveFailed: 無法移除
+  ProjectionName:
+    Invalid: 錯誤的對映名稱
+  Assets:
+    EmptyKey: 資產的 Key 為空
+    Store:
+      NotInitialized: 資產儲存未初始化
+      NotConfigured: 未設定資產儲存
+    Bucket:
+      Internal: 建立桶時出現內部錯誤
+      AlreadyExists: 儲存桶已存在
+      CreateFailed: 未建立儲存桶
+      ListFailed: 無法讀取儲存桶
+      RemoveFailed: 未刪除儲存桶
+      SetPublicFailed: 無法將儲存桶設定為公開
+    Object:
+      PutFailed: 未建立物件
+      GetFailed: 無法讀取物件
+      NotFound: 找不到物件
+      PresignedTokenFailed: 無法建立簽名令牌
+      ListFailed: 無法讀取物件列表
+      RemoveFailed: 無法移除物件
+  Limit:
+    ExceedsDefault: 超出預設限制
+  Limits:
+    NotFound: 找不到限制
+    NoneSpecified: 未指定限制
+    Instance:
+      Blocked: 執行個體被阻止
+  Restrictions:
+    NoneSpecified: 未指定限制
+    DefaultLanguageMustBeAllowed: 預設語言必須被允許
+  Language:
+    NotParsed: 無法解析語言
+    NotSupported: 語言不支援
+    NotAllowed: 語言不被允許
+    Undefined: 語言未定義
+    Duplicate: 語言有重複
+  OIDCSettings:
+    NotFound: OIDC 設定找不到
+    AlreadyExists: OIDC 設定已存在
+  SecretGenerator:
+    AlreadyExists: 秘密生成器已經存在
+    TypeMissing: 缺少秘鑰生成器型別
+    NotFound: 找不到秘鑰生成器
+  SMSConfig:
+    NotFound: 找不到 SMS 設定
+    AlreadyActive: SMS 設定已啟用
+    AlreadyDeactivated: SMS 設定已停用
+    NotExternalVerification: SMS 設定不支援驗證碼
+  SMTP:
+    NotEmailMessage: 訊息不是電子郵件訊息
+    RequiredAttributes: 必須設定主題、收件人和內容，但部分或全部為空
+    CouldNotSplit: 無法拆分主機和埠以連線到 smtp
+    CouldNotDial: 無法與 SMTP 伺服器聯絡，請檢查埠、防火牆問題...
+    CouldNotDialTLS: 無法使用 TLS 與 SMTP 伺服器聯絡，請檢查埠、防火牆問題...
+    CouldNotCreateClient: 無法建立 smtp 客戶端
+    CouldNotStartTLS: 無法啟動 tls
+    CouldNotAuth: 無法新增 smtp 身分驗證，請檢查您的使用者名稱和密碼是否正確，如果正確，可能您的提供者需要 Zitadel 不支援的身分驗證方法
+    CouldNotSetSender: 無法設定發件人
+    CouldNotSetRecipient: 無法設定收件人
+  SMTPConfig:
+    TestPassword: 找不到測試密碼
+    NotFound: 找不到 SMTP 設定
+    AlreadyExists: SMTP 設定已存在
+    AlreadyDeactivated: SMTP 設定已停用
+    SenderAdressNotCustomDomain: 發件人地址必須在在執行個體的網域設定中驗證。
+    TestEmailNotFound: 找不到用於測試的電子郵件地址
+  Notification:
+    NoDomain: 找不到對應的網域
+  User:
+    NotFound: 找不到使用者
+    AlreadyExists: 使用者已存在
+    NotFoundOnOrg: 在所選組織中找不到使用者
+    NotAllowedOrg: 使用者不是所需組織的成員
+    UserIDMissing: 缺少使用者 ID
+    UserIDWrong: 請求使用者不等於經過身分驗證的使用者
+    DomainPolicyNil: 組織策略為空
+    EmailAsUsernameNotAllowed: 電子郵件不允許作為使用者名稱
+    Invalid: 使用者資料無效
+    DomainNotAllowedAsUsername: 域已儲存，但無法使用
+    AlreadyInactive: 使用者已處於停用狀態
+    NotInactive: 使用者未處於停用狀態
+    CantDeactivateInitial: 處於初始狀態的使用者只能刪除不能停用
+    ShouldBeActiveOrInitial: 使用者不是處於啟用的的或初始化的
+    AlreadyInitialised: 使用者已經初始化
+    NotInitialised: 使用者尚未初始化
+    NotLocked: 使用者未鎖定
+    NoChanges: 未發現任何更改
+    InitCodeNotFound: 找不到初始化驗證碼
+    UsernameNotChanged: 使用者名稱未更改
+    InvalidURLTemplate: URL模板無效
+    Locked: 使用者已被鎖定
+    Profile:
+      NotFound: 找不到個人資料
+      NotChanged: 個人資料未更改
+      Empty: 簡介是空的
+      FirstNameEmpty: 簡介中的名字是空的
+      LastNameEmpty: 簡介中的姓氏是空的
+      IDMissing: 簡介ID丟失
+    Email:
+      NotFound: 電子郵件找不到
+      Invalid: 電子郵件無效
+      AlreadyVerified: 電子郵件已經過驗證
+      NotChanged: 電子郵件未更改
+      Empty: 電子郵件是空的
+      IDMissing: 電子郵件ID丟失
+    Phone:
+      NotFound: 手機號碼找不到
+      Invalid: 手機號碼無效
+      AlreadyVerified: 手機號碼已經驗證
+      Empty: 電話號碼是空的
+      NotChanged: 電話號碼沒有改變
+      VerifyingRemovalIsNotSupported: 驗證手機號碼刪除不受支援
+    Address:
+      NotFound: 找不到地址
+      NotChanged: 地址沒有改變
+    Machine:
+      Key:
+        NotFound: 找不到機器金鑰
+        AlreadyExisting: 已有的機器鑰匙
+        Invalid: 公鑰不是採用 PEM 編碼的 PKIX 格式的有效 RSA 公鑰
+      Secret:
+        NotExisting: 秘密並不存在
+        Invalid: 秘密是無效的
+        CouldNotGenerate: 無法生成秘密
+    PAT:
+      NotFound: 找不到個人存取令牌
+    Metadata:
+      Conflicting: 後設資料不得同時在 [user] 和 [human] 欄位中設定
+    NotHuman: 使用者必須是個人
+    NotMachine: 使用者必須是技術人員
+    WrongType: 此使用者型別不允許
+    NotAllowedToLink: 不允許使用外部身分提供者登入並註冊使用者
+    Username:
+      AlreadyExists: 使用者名稱已被使用
+      Reserved: 使用者名稱已被使用
+      Empty: 使用者名稱是空的
+    Code:
+      Empty: 驗證碼為空
+      NotFound: 驗證碼不存在
+      Expired: 驗證碼已過期
+      GeneratorAlgNotSupported: 不支援的生成器演算法
+      Invalid: 驗證碼無效
+    Password:
+      NotFound: 找不到密碼
+      Empty: 密碼為空
+      Invalid: 密碼無效
+      NotSet: 使用者未設定密碼
+      NotChanged: 新密碼不能與您目前的密碼相同
+      NotSupported: 不支援密碼雜湊編碼。檢視 https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
+    PasswordComplexityPolicy:
+      NotFound: 找不到密碼策略
+      MinLength: 密碼太短
+      MinLengthNotAllowed: 給定的最小長度不被允許
+      HasLower: 密碼必須包含小寫
+      HasUpper: 密碼必須包含大寫
+      HasNumber: 密碼必須包含數字
+      HasSymbol: 密碼必須包含符號
+    ExternalIDP:
+      Invalid: 外部 IDP 無效
+      IDPConfigNotExisting: IDP 提供者對此組織無效
+      NotAllowed: 外部 IDP 不允許
+      MinimumExternalIDPNeeded: 必須新增至少一個 IDP
+      AlreadyExists: 外部 IDP 已存在
+      NotFound: 找不到外部 IDP
+      LoginFailed: 外部 IDP 登入失敗
+    MFA:
+      OTP:
+        AlreadyReady: OTP (一次性密碼) 已經設定好了
+        NotExisting: OTP (一次性密碼) 不存在
+        NotReady: OTP (一次性密碼) 還沒準備好
+        InvalidCode: 無效的驗證碼
+        Reused: 此驗證碼已被使用。請等待新的驗證碼
+      U2F:
+        NotExisting: U2F 不存在
+      Passwordless:
+        NotExisting: 未設定無密碼登入
+      RecoveryCodes:
+        InvalidCode: 提供的恢復驗證碼無效
+        MaxCountExceeded: 恢復驗證碼數量已超過最大限制
+        NotReady: 恢復驗證碼尚未準備好使用
+        ConfigInvalid: 恢復驗證碼設定無效
+        Empty: 備用驗證碼不得為空
+    WebAuthN:
+      NotFound: 找不到 WebAuthN 令牌
+      BeginRegisterFailed: WebAuthN 註冊失敗
+      MarshalError: 編組資料錯誤
+      ErrorOnParseCredential: 解析憑證資料時出錯
+      CreateCredentialFailed: 建立憑證時出錯
+      BeginLoginFailed: WebAuthN 登入失敗
+      ValidateLoginFailed: 驗證登入憑證時出錯
+      CloneWarning: 憑證可能被克隆
+    RefreshToken:
+      Invalid: Refresh Token 無效
+      NotFound: 找不到 Refresh Token
+  Org:
+    AlreadyExists: 該組織名稱或 ID 已被佔用
+    Invalid: 組織無效
+    AlreadyDeactivated: 組織已停用
+    AlreadyActive: 組織已處於啟用狀態
+    Empty: 組織為空
+    NotFound: 找不到組織
+    NotActive: 組織未啟用
+    NotChanged: 組織資訊未改變
+    DefaultOrgNotDeletable: 預設組織不應刪除
+    ZitadelOrgNotDeletable: 不得刪除與Zitadel專案有關的組織
+    InvalidDomain: 無效的網域
+    DomainMissing: 網域缺失
+    DomainNotOnOrg: 組織中不存在域
+    DomainNotVerified: 網域未驗證
+    DomainAlreadyVerified: 域已經過驗證
+    DomainVerificationTypeInvalid: 網域驗證型別無效
+    DomainVerificationMissing: 網域驗證尚未開始
+    DomainVerificationFailed: 網域驗證失敗
+    DomainVerificationTXTNotFound: 找不到您的域的 _zitadel-challenge TXT 記錄。檢查您是否已將其新增到 DNS 伺服器或等待新記錄傳播
+    DomainVerificationTXTNoMatch: 已找到您的域的 _zitadel-challenge TXT 記錄，但它不包含正確的令牌文字。檢查您是否已將正確的令牌新增到 DNS 伺服器或等待新記錄傳播
+    DomainVerificationHTTPNotFound: 在預期的 URL 中找不到包含質詢的檔案。檢查您是否已將檔案上傳到正確的位置並具有讀取權限
+    DomainVerificationHTTPNoMatch: 已在預期 URL 中找到包含質詢的檔案，但它不包含正確的標記文字。檢查其內容
+    DomainVerificationTimeout: 查詢 DNS 伺服器超時
+    PrimaryDomainNotDeletable: 不得刪除組織網域
+    DomainNotFound: 找不到網域
+    MemberIDMissing: 成員 ID 丟失
+    MemberNotFound: 找不到組織成員
+    InvalidMember: 組織成員無效
+    UserIDMissing: 缺少使用者 ID
+    PolicyAlreadyExists: 策略已存在
+    PolicyNotExisting: 策略不存在
+    IdpInvalid: IDP 設定無效
+    IdpNotExisting: IDP 設定不存在
+    OIDCConfigInvalid: OIDC IDP 設定無效
+    IdpIsNotOIDC: IDP 設定不是 OIDC 型別
+    Domain:
+      AlreadyExists: 網域已存在
+      InvalidCharacter: 只有字母數字字元，.和 - 允許用於網域中
+      EmptyString: 無效的非數字和字母字元被替換為空格，結果域是空字串
+    LoginPolicy:
+      NotFound: 找不到登入策略
+      Invalid: 登入策略無效
+      RedirectURIInvalid: 預設重新導向 URL 無效
+      NotExisting: 登入策略不存在
+      AlreadyExists: 登入策略已存在
+      IdpProviderAlreadyExisting: IDP 提供者已存在
+      IdpProviderNotExisting: IDP 提供者不存在
+      RegistrationNotAllowed: 不允許註冊
+      UsernamePasswordNotAllowed: 不允許使用使用者名稱/密碼登入
+      MFA:
+        AlreadyExists: 多因素身分認證已經存在
+        NotExisting: 多因素身分認證不存在
+        Unspecified: 多因素身分認證無效
+    MailTemplate:
+      NotFound: 找不到預設郵件模板
+      NotChanged: 預設郵件模板未更改
+      AlreadyExists: 預設郵件模板已存在
+      Invalid: 預設郵件模板無效
+    CustomMessageText:
+      NotFound: 找不到預設訊息文字
+      NotChanged: 預設訊息文字未更改
+      AlreadyExists: 預設訊息文字已存在
+      Invalid: 預設訊息文字無效
+    PasswordComplexityPolicy:
+      NotFound: 找不到密碼複雜性策略
+      Empty: 密碼複雜性策略為空
+      NotExisting: 密碼複雜性策略不存在
+      AlreadyExists: 密碼複雜性策略已存在
+    PasswordLockoutPolicy:
+      NotFound: 密碼鎖定策略不存在
+      Empty: 密碼鎖定策略為空
+      NotExisting: 密碼鎖定策略不存在
+      AlreadyExists: 密碼鎖定策略已存在
+    PasswordAgePolicy:
+      NotFound: 密碼過期策略不存在
+      Empty: 密碼過期策略為空
+      NotExisting: 密碼過期策略不存在
+      AlreadyExists: 密碼過期策略已存在
+    NotificationPolicy:
+      NotFound: 找不到通知政策
+      NotChanged: 通知政策沒有改變
+      AlreadyExists: 已經存在的通知政策
+    LabelPolicy:
+      NotFound: 不存在私人政策
+      NotChanged: 私人政策不改變
+    IDPConfig:
+      NotExisting: 身分提供者設定不存在
+  Project:
+    ProjectIDMissing: P缺少專案 ID
+    AlreadyExists: 專案以存在於組織中
+    OrgNotExisting: 組織不存在
+    UserNotExisting: 使用者不存在
+    CouldNotGenerateClientSecret: 無法生成客戶端秘鑰
+    Invalid: 專案無效
+    NotActive: 專案不是啟用狀態
+    NotInactive: 專案不是停用狀態
+    NotFound: 專案不存在
+    UserIDMissing: 缺少使用者 ID
+    Member:
+      NotFound: 專案成員不存在
+      Invalid: 專案成員無效
+      AlreadyExists: 專案成員已存在
+      NotExisting: 專案成員不存在
+    MinimumOneRoleNeeded: 必須新增至少一個角色
+    Role:
+      AlreadyExists: 角色已存在
+      Invalid: 角色無效
+      NotExisting: 角色不存在
+    IDMissing: 丟失 ID
+    App:
+      AlreadyExists: 應用已存在
+      NotFound: 應用不存在
+      Invalid: 無效的應用
+      NotExisting: 應用不存在
+      NotActive: 應用不是啟用狀態
+      NotInactive: 應用不是停用狀態
+      OIDCConfigInvalid: OIDC 設定無效
+      APIConfigInvalid: API 設定無效
+      SAMLConfigInvalid: SAML 設定無效
+      IsNotOIDC: 應用不是 OIDC 型別
+      IsNotAPI: 應用不是 API 型別
+      IsNotSAML: 應用不是 SAML 型別
+      SAMLMetadataMissing: SAML 後設資料丟失
+      SAMLMetadataFormat: SAML 後設資料格式化錯誤
+      SAMLEntityIDAlreadyExisting: SAML EntityID 已經存在
+      OIDCAuthMethodNoSecret: 選擇的 OIDC 身分驗證方法不需要秘鑰
+      APIAuthMethodNoSecret: 選擇的 API 身分驗證方法不需要秘鑰
+      AuthMethodNoPrivateKeyJWT: 選擇的身分驗證方法不需要 Key
+      ClientSecretInvalid: Client Secret 無效
+      Key:
+        AlreadyExisting: 已經存在的應用鑰匙
+        NotFound: 找不到應用鑰匙
+    RequiredFieldsMissing: 缺少一些必填欄位
+    Grant:
+      AlreadyExists: 專案授權已存在
+      NotFound: 找不到專案授權
+      Invalid: 專案授權無效
+      NotExisting: 專案授權不存在
+      HasNotExistingRole: 角色不存在與專案中
+      NotActive: 專案授權不是啟用狀態
+      NotInactive: 專案授權不是停用狀態
+  Instance:
+    AlreadyExists: 執行個體已經存在
+    NotChanged: 執行個體沒有改變
+    NotFound: 執行個體找不到。確保您有正確的域。檢視 https://zitadel.com/docs/apis/introduction#domains
+    Member:
+      RolesNotChanged: 角色沒有改變
+    MemberInvalid: 成員無效
+    MemberAlreadyExisting: 成員已存在
+    MemberNotExisting: 成員不存在
+    IDMissing: ID 丟失
+    IdpInvalid: IDP 設定無效
+    IdpNotExisting: IDP 設定不存在
+    OIDCConfigInvalid: OIDC IDP 設定無效
+    IdpIsNotOIDC: IDP 設定不是 OIDC 型別
+    LoginPolicyInvalid: 登入策略無效
+    LoginPolicyNotExisting: 登入策略不存在
+    IdpProviderInvalid: IDP 提供者無效
+    LoginPolicy:
+      NotFound: 預設登入策略不存在
+      NotChanged: 預設登入策略沒有改變
+      NotExisting: 預設登入策略不存在
+      AlreadyExists: 預設登入策略已存在
+      RedirectURIInvalid: 預設重新導向 URL 無效
+      MFA:
+        AlreadyExists: MFA 已存在
+        NotExisting: MFA 不存在
+        Unspecified: MFA 無效
+      IDP:
+        AlreadyExists: 身分提供者已存在
+        NotExisting: 身分提供者不存在
+        Invalid: 身分提供者無效
+      IDPConfig:
+        AlreadyExists: 身分提供者設定已存在
+        NotInactive: 身分提供者設定不是停用狀態
+        NotActive: 身分提供者設定不是啟動狀態
+    LabelPolicy:
+      NotFound: 預設私有策略不存在
+      NotChanged: 預設私有策略未更改
+    MailTemplate:
+      NotFound: 預設郵件模板不存在
+      NotChanged: 預設郵件模板未更改
+      AlreadyExists: 預設郵件模板已存在
+      Invalid: 預設郵件模板無效
+    CustomMessageText:
+      NotFound: 預設訊息文字不存在
+      NotChanged: 預設訊息文字未更改
+      AlreadyExists: 預設訊息文字已存在
+      Invalid: 預設訊息文字無效
+    PasswordComplexityPolicy:
+      NotFound: 預設密碼複雜策略不存在
+      NotExisting: 預設密碼複雜策略不存在
+      AlreadyExists: 預設密碼複雜策略已存在
+      Empty: 預設密碼複雜策略為空
+      NotChanged: 預設密碼複雜策略未更改
+    PasswordAgePolicy:
+      NotFound: 預設密碼有效期策略不存在
+      NotExisting: 預設密碼有效期策略不存在
+      AlreadyExists: 預設密碼有效期策略已存在
+      Empty: 預設密碼有效期策略為空
+      NotChanged: 預設密碼有效期策略未更改
+    PasswordLockoutPolicy:
+      NotFound: 預設密碼鎖策略不存在
+      NotExisting: 預設密碼鎖策略不存在
+      AlreadyExists: 預設密碼鎖策略已存在
+      Empty: 預設密碼鎖策略為空
+      NotChanged: 預設密碼鎖策略未更改
+    DomainPolicy:
+      NotFound: 組織域策略不存在
+      Empty: 組織域策略為空
+      NotExisting: 組織域策略不存在
+      AlreadyExists: 組織域策略已存在
+      NotChanged: 組織域策略未更改
+    NotificationPolicy:
+      NotFound: 找不到預設的通知政策
+      NotChanged: 預設的通知政策沒有改變
+      AlreadyExists: 預設的通知政策已經存在
+  Policy:
+    AlreadyExists: 策略已存在
+    Label:
+      Invalid:
+        PrimaryColor: 主色調不是有效的十六進位制顏色值
+        BackgroundColor: 背景顏色不是有效的十六進位制顏色值
+        WarnColor: 警告顏色不是有效的十六進位制顏色值
+        FontColor: 字型顏色不是有效的十六進位制顏色值
+        PrimaryColorDark: 主色調 (深色模式) 不是有效的十六進位制顏色值
+        BackgroundColorDark: 背景顏色 (深色模式) 不是有效的十六進位制顏色值
+        WarnColorDark: 警告顏色 (深色模式) 不是有效的十六進位制顏色值
+        FontColorDark: 字型顏色 (深色模式) 不是有效的十六進位制顏色值
+  UserGrant:
+    AlreadyExists: 使用者授權已存在
+    NotFound: 使用者授權不存在
+    Invalid: 使用者授權無效
+    NotChanged: 使用者授權未更改
+    IDMissing: 沒有 ID
+    NoPermissionForProject: 使用者對此專案沒有權限
+    RoleKeyNotFound: 角色不存在
+  Member:
+    AlreadyExists: 成員已存在
+  IDPConfig:
+    AlreadyExists: IDP 設定名稱已存在
+    NotExisting: 身分提供者設定不存在
+  Changes:
+    NotFound: 找不到任何歷史記錄
+    AuditRetention: 歷史記錄在稽核日誌保留範圍之外
+  Token:
+    NotFound: 令牌不存在
+    Invalid: 令牌無效
+  UserSession:
+    NotFound: 使用者工作階段不存在
+  Key:
+    NotFound: 找不到鑰匙
+    ExpireBeforeNow: 過期日期是過去的無效日期
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: MFA 已根據需要進行設定，但未設定任何可能的提供程式。請聯絡您的系統管理員。
+  Step:
+    Started:
+      AlreadyExists: 設定已存在
+    Done:
+      AlreadyExists: 設定完成已存在
+  CustomText:
+    AlreadyExists: 自定義文字已存在
+    Invalid: 自定義文字無效
+    NotFound: 自定義文字不存在
+  TranslationFile:
+    ReadError: 讀取翻譯檔案時出錯
+    MergeError: 翻譯檔案無法與自定義翻譯合併
+    NotFound: 翻譯檔案不存在
+  Metadata:
+    NotFound: 後設資料不存在
+    NoData: 後設資料列表為空
+    Invalid: 後設資料無效
+    KeyNotExisting: 一個或多個鍵不存在
+  Action:
+    Invalid: 動作無效
+    NotFound: 動作不存在
+    NotActive: 動作不是啟用狀態
+    NotInactive: 動作不是停用狀態
+    MaxAllowed: 不允許額外的動作
+    NotEnabled: 未啟用“操作”功能
+  Flow:
+    FlowTypeMissing: 缺少身分認證流程型別
+    Empty: 身分認證流程為空
+    WrongTriggerType: 觸發器型別無效
+    NoChanges: 未更改
+    ActionIDsNotExist: 動作 ID 不存在
+  Query:
+    CloseRows: SQL 語句無法完成
+    SQLStatement: 無法建立 SQL 語句
+    InvalidRequest: 請求無效
+    TooManyNestingLevels: 查詢巢狀級別過多（最多 20 個）
+    LimitExceeded: 限制已超出
+  Quota:
+    AlreadyExists: 這個單位的配額已經存在
+    NotFound: 找不到該單位的配額
+    Invalid:
+      CallURL: 配額呼叫的URL是無效的
+      Percent: 配額百分比低於1
+      Unimplemented: 該單位沒有實施配額
+      Amount: 配額數量低於1
+      ResetInterval: 配額重設時間間隔短於1分鐘
+      Noop: 沒有通知的無限配額沒有效果
+    Access:
+      Exhausted: 認證請求的配額已用完
+    Execution:
+      Exhausted: 行動秒數的配額已用完
+  LogStore:
+    Access:
+      StorageFailed: 儲存存取日誌到資料庫失敗
+      ScanFailed: 查詢已認證請求的使用情況失敗
+    Execution:
+      StorageFailed: 將行動執行日誌儲存到資料庫失敗
+      ScanFailed: Q查詢動作執行秒數的使用情況失敗
+  Session:
+    NotExisting: 工作階段不存在
+    Terminated: 工作階段已經終止
+    Expired: 工作階段已過期
+    PositiveLifetime: 工作階段生存期不得小於 0
+    Token:
+      Invalid: 工作階段令牌是無效的
+    WebAuthN:
+      NoChallenge: 沒有 WebAuthN 質詢的工作階段
+    IDMissing: 缺少工作階段 ID
+    NotFound: 找不到工作階段
+  Intent:
+    IDPMissing: 請求中缺少IDP ID
+    IDPInvalid: 請求的 IDP 無效
+    ResponseInvalid: IDP 響應無效
+    MissingSingleMappingAttribute: 不包含對映屬性或具有多個值
+    SuccessURLMissing: 請求中缺少成功URL
+    FailureURLMissing: 請求中缺少失敗的URL
+    StateMissing: 請求中缺少狀態引數
+    NotStarted: 意圖沒有開始或已經結束
+    NotSucceeded: 意圖不成功
+    Expired: 意圖已過期
+    TokenCreationFailed: 令牌建立失敗
+    InvalidToken: 意圖令牌是無效的
+    OtherUser: 意圖是為另一個使用者準備的
+  AuthRequest:
+    AlreadyExists: AuthRequest已經存在
+    NotExisting: AuthRequest不存在
+    WrongLoginClient: 其他登入客戶端建立的AuthRequest
+    AlreadyHandled: 身分驗證請求已被處理
+  OIDCSession:
+    RefreshTokenInvalid: Refresh Token 無效
+    Token:
+      Invalid: 令牌無效
+      Expired: 令牌已過期
+    InvalidClient: 沒有為該客戶發放令牌
+  SAMLRequest:
+    AlreadyExists: SAMLRequest 已存在
+    NotExisting: SAMLRequest不存在
+    WrongLoginClient: 其他登入客戶端建立的 SAMLRequest
+    AlreadyHandled: SAML請求已被處理
+  SAMLSession:
+    InvalidClient: 未向該客戶端發出 SAMLResponse
+  DeviceAuth:
+    NotFound: 裝置授權請求不存在
+    AlreadyHandled: 裝置授權請求已被處理
+  Feature:
+    NotExisting: 功能不存在
+    TypeNotSupported: 不支援功能型別
+    InvalidValue: 此功能的值無效
+  Target:
+    Invalid: 目標無效
+    NoTimeout: 目標沒有超時
+    InvalidURL: 目標的 URL 無效
+    NotFound: 找不到目標
+    InvalidExpirationDate: 金鑰的到期日期必須是將來的時間
+    PublicKeyExpired: 目標公鑰已過期
+    PublicKeyActive: 無法刪除處於活動狀態的目標公鑰
+    InvalidPublicKey: 公鑰無效。必須是 PEM 編碼的 RSA 或 ECDSA 公鑰，格式為 PKCS#8
+  Execution:
+    ConditionInvalid: 執行條件無效
+    Invalid: 執行無效
+    NotFound: 找不到執行
+    IncludeNotFound: 包括找不到的內容
+    NoTargets: 沒有定義目標
+    Failed: 執行失敗
+    ResponseIsNotValidJSON: 響應不是有效的 JSON
+    MissingEncryptionKey: 缺少加密金鑰
+  UserSchema:
+    NotEnabled: 未啟用“使用者架構”功能
+    Type:
+      Missing: 缺少使用者架構型別
+      AlreadyExists: 使用者架構型別已存在
+    Authenticator:
+      Invalid: 驗證器型別無效
+    NotActive: 使用者架構未啟用
+    NotInactive: 使用者架構未處於非活動狀態
+    NotExists: 使用者架構不存在
+    ID:
+      Missing: 缺少使用者架構 ID
+    Invalid: 使用者架構無效
+    Data:
+      Invalid: 使用者架構的資料無效
+  TokenExchange:
+    Token:
+      Missing: 令牌丟失
+      Invalid: 令牌無效
+      TypeMissing: 缺少令牌型別
+      TypeNotAllowed: 不允許的令牌型別
+      TypeNotSupported: 不支援令牌型別
+      NotForAPI: API 不允許使用模擬令牌
+    Impersonation:
+      PolicyDisabled: 執行個體安全策略中停用模擬
+  WebKey:
+    ActiveDelete: 無法刪除活動 Web 金鑰
+    Config: 無效的 Web 金鑰設定
+    Duplicate: Web 金鑰 ID 不唯一
+    NoActive: 找不到活動 Web 金鑰
+    NotFound: 找不到 Web 金鑰
+  IDP:
+    InvalidSearchQuery: 無效的搜尋查詢
+    ClientIDMissing: 客戶端 ID 丟失
+    TeamIDMissing: 團隊 ID 丟失
+    KeyIDMissing: 金鑰 ID 丟失
+    PrivateKeyMissing: 私鑰丟失
+    InvalidPrivateKey: 無效的私鑰格式
+  PermissionDenied: 權限遭拒
+AggregateTypes:
+  action: 動作
+  instance: 執行個體
+  key_pair: 金鑰對
+  org: 組織
+  project: 專案
+  user: 使用者
+  usergrant: 使用者授權
+  quota: 配額
+  feature: 特徵
+  target: 靶
+  execution: 執行
+  user_schema: 使用者模式
+  auth_request: 認證請求
+  device_auth: 裝置認證
+  idpintent: IDP 意圖
+  limits: 限制
+  milestone: 里程碑
+  oidc_session: OIDC 工作階段
+  restrictions: 限制
+  system: 系統
+  session: 工作階段
+  web_key: Web 金鑰
+  saml_request: SAML 請求
+  saml_session: SAML 工作階段
+EventTypes:
+  execution:
+    set: 執行集
+    removed: 執行已刪除
+  target:
+    added: 目標已建立
+    changed: 目標改變
+    removed: 目標已刪除
+  user:
+    added: 已新增使用者
+    selfregistered: 自注冊使用者
+    initialization:
+      code:
+        added: 生成初始化驗證碼
+        sent: 傳送初始化驗證碼
+      check:
+        succeeded: 初始化檢查成功
+        failed: 初始化檢查失敗
+    token:
+      added: 已建立存取令牌
+      v2.added: 已建立存取令牌
+      removed: 已刪除存取令牌
+    impersonated: 使用者冒充
+    username:
+      reserved: 保留使用者名稱
+      released: 使用者名稱已釋出
+      changed: 使用者名稱已更改
+    email:
+      reserved: 電子郵件地址已保留
+      released: 電子郵件地址已釋出
+      changed: 電子郵件地址已更改
+      verified: 電子郵件地址已驗證
+      verification:
+        failed: 電子郵件驗證失敗
+      code:
+        added: 生成電子郵件驗證碼
+        sent: 傳送電子郵件驗證碼
+    machine:
+      added: 新增了服務使用者
+      changed: 更改了服務使用者
+      key:
+        added: 新增服務使用者 Key
+        removed: 刪除服務使用者 Key
+      secret:
+        set: 秘密套裝
+        updated: 秘密雜湊已更新
+        removed: 秘密刪除
+        check:
+          succeeded: 成功的秘密控制
+          failed: 秘密控制失敗
+    human:
+      added: 新增使用者
+      selfregistered: 自注冊使用者
+      avatar:
+        added: 新增了頭像
+        removed: 刪除了頭像
+      initialization:
+        code:
+          added: 生成初始化驗證碼
+          sent: 傳送初始化驗證碼
+        check:
+          succeeded: 初始化檢查成功
+          failed: 初始化檢查失敗
+      invite:
+        code:
+          added: 生成了邀請碼
+          sent: 傳送了邀請碼
+        check:
+          succeeded: 邀請檢查成功
+          failed: 邀請檢查失敗
+      username:
+        reserved: 保留使用者名稱
+        released: 使用者名稱已釋出
+      email:
+        changed: 電子郵件地址已更改
+        verified: 電子郵件地址已驗證
+        verification:
+          failed: 電子郵件地址驗證失敗
+        code:
+          added: 生成電子郵件地址驗證碼
+          sent: 傳送電子郵件地址驗證碼
+      password:
+        changed: 變更密碼
+        code:
+          added: 生成重設密碼驗證碼
+          sent: 傳送重設密碼驗證碼
+        check:
+          succeeded: 密碼檢查成功
+          failed: 密碼檢查失敗
+        change:
+          sent: 密碼更改已傳送
+        hash:
+          updated: 密碼雜湊已更新
+      externallogin:
+        check:
+          succeeded: 外部登入成功
+      externalidp:
+        added: 新增了外部 IDP
+        removed: 移除了外部 IDP
+        cascade:
+          removed: 移除了外部 IDP
+        id:
+          migrated: IDP 的外部使用者 ID 已遷移
+      phone:
+        changed: 修改手機號碼
+        verified: 已驗證手機號碼
+        verification:
+          failed: 手機號碼驗證失敗
+        code:
+          added: 生成手機號碼驗證碼
+          sent: 傳送手機號碼驗證碼
+        removed: 刪除手機號碼
+      profile:
+        changed: 更改個人資料
+      address:
+        changed: 更改使用者地址
+      mfa:
+        otp:
+          added: 新增 MFA OTP
+          verified: 驗證 MFA OTP
+          removed: 刪除 MFA OTP
+          check:
+            succeeded: 驗證 MFA OTP 成功
+            failed: 驗證 MFA OTP 失敗
+            reused: 重複使用 MFA OTP 驗證碼
+          sms:
+            added: 新增了多因素 OTP 簡訊
+            removed: 刪除了多因素 OTP 簡訊
+            code:
+              added: 新增了多因素 OTP 簡訊驗證碼
+              sent: 已傳送多因素 OTP 簡訊驗證碼
+            check:
+              succeeded: 多因素 OTP 簡訊驗證成功
+              failed: 多因素 OTP 簡訊驗證失敗
+          email:
+            added: 新增了多因素 OTP 電子郵件
+            removed: 刪除了多因素 OTP 電子郵件
+            code:
+              added: 新增了多因素 OTP 電子郵件驗證碼
+              sent: 已傳送多因素 OTP 電子郵件驗證碼
+            check:
+              succeeded: 多因素 OTP 電子郵件驗證成功
+              failed: 多因素 OTP 電子郵件驗證失敗
+        u2f:
+          token:
+            added: 新增 MFA U2F 令牌
+            verified: 驗證 MFA U2F 令牌
+            removed: 刪除 MFA U2F 令牌
+            begin:
+              login: 開始驗證 MFA U2F
+            check:
+              succeeded: 驗證 MFA U2F 成功
+              failed: 驗證 MFA U2F 失敗
+            signcount:
+              changed: MFA U2F 令牌的校驗和已更改
+        init:
+          skipped: 跳過 MFA 初始化
+      passwordless:
+        token:
+          added: 新增無密碼登入令牌
+          verified: 驗證無密碼登入令牌
+          removed: 刪除無密碼登入令牌
+          begin:
+            login: 無密碼登入檢查開始
+          check:
+            succeeded: 無密碼登入檢查成功
+            failed: 無密碼登入檢查失敗
+          signcount:
+            changed: 無密碼登入令牌的校驗和已更改
+        initialization:
+          code:
+            added: 新增無密碼初始化驗證碼
+            sent: 傳送無密碼初始化驗證碼
+            requested: 發起無密碼初始化驗證碼請求
+            check:
+              succeeded: 無密碼初始化驗證碼驗證成功
+              failed: 無密碼初始化驗證碼驗證失敗
+      signed:
+        out: 使用者退出登入
+      refresh:
+        token:
+          added: 建立 Refresh Token
+          renewed: 刪除 Refresh Token
+          removed: 刪除 Refresh Token
+    locked: 使用者鎖定
+    unlocked: 解鎖使用者
+    deactivated: 停用使用者
+    reactivated: 啟用使用者
+    removed: 刪除使用者
+    password:
+      changed: 修改密碼
+      code:
+        added: 生成重設密碼驗證碼
+        sent: 傳送驗證碼
+      check:
+        succeeded: 密碼檢查成功
+        failed: 密碼檢查失敗
+    phone:
+      changed: 更改手機號碼
+      verified: 驗證手機號碼
+      verification:
+        failed: 手機號碼驗證失敗
+      code:
+        added: 生成的手機號碼驗證碼
+        sent: 傳送手機號碼驗證碼
+    profile:
+      changed: 修改使用者資料
+    address:
+      changed: 修改使用者地址
+    mfa:
+      otp:
+        added: 新增 MFA OTP
+        verified: 驗證 MFA OTP
+        removed: 刪除 MFA OTP
+        check:
+          succeeded: MFA OTP 驗證成功
+          failed: MFA OTP 驗證失敗
+        init:
+          skipped: 跳過 MFA 初始化
+      init:
+        skipped: 跳過多因素初始化
+    signed:
+      out: 使用者退出登入
+    grant:
+      added: 新增授權
+      changed: 更改授權
+      removed: 刪除授權
+      deactivated: 停用授權
+      reactivated: 啟用授權
+      reserved: 保留授權
+      released: 釋放授權
+      cascade:
+        removed: 刪除授權
+        changed: 更改授權
+    metadata:
+      set: 使用者後設資料集
+      removed: 刪除使用者後設資料
+      removed.all: 刪除所有使用者後設資料
+    domain:
+      claimed: 已認領網域
+      claimed.sent: 已傳送域宣告通知
+    pat:
+      added: 新增個人存取令牌
+      removed: 個人存取令牌已刪除
+  org:
+    added: 新增組織
+    changed: 更改組織
+    deactivated: 停用組織
+    reactivated: 啟用組織
+    removed: 刪除組織
+    domain:
+      added: 新增網域
+      verification:
+        added: 新增網域驗證
+        failed: 網域驗證失敗
+      verified: 驗證網域
+      removed: 刪除網域
+      primary:
+        set: 已設定組織網域
+      reserved: 保留網域
+      released: 釋放網域
+    name:
+      reserved: 保留組織名
+      released: 釋放組織名
+    member:
+      added: 新增組織成員
+      changed: 更改組織成員
+      removed: 刪除組織成員
+      cascade:
+        removed: 已刪除組織級聯成員
+    iam:
+      policy:
+        added: 新增系統策略
+        changed: 更改系統策略
+        removed: 刪除系統策略
+    idp:
+      config:
+        added: 新增 IDP 設定
+        changed: 更改 IDP 設定
+        removed: 刪除 IDP 設定
+        deactivated: 停用 IDP 設定
+        reactivated: 啟用 IDP 設定
+      oidc:
+        config:
+          added: 新增 OIDC IDP 設定
+          changed: 更改 OIDC IDP 設定
+      saml:
+        config:
+          added: 新增 SAML IDP 設定
+          changed: 更改 SAML IDP 設定
+      jwt:
+        config:
+          added: 新增了 JWT IDP 設定
+          changed: JWT IDP 設定已更改
+    customtext:
+      set: 設定自定義文字
+      removed: 刪除自定義文字
+      template:
+        removed: 刪除自定義文字模板
+    policy:
+      login:
+        added: 新增登入策略
+        changed: 更改登入策略
+        removed: 刪除登入策略
+        idpprovider:
+          added: 新增 IDP 到登入策略
+          removed: 從登入策略刪除 IDP
+          cascade:
+            removed: 從登入策略中刪除了身分提供者級聯
+        secondfactor:
+          added: 新增兩步認證到登入策略
+          removed: 刪除兩步認證到登入策略
+        multifactor:
+          added: 新增 MFA 到登入策略
+          removed: 從登入策略刪除 MFA
+      password:
+        complexity:
+          added: 新增密碼複雜性策略
+          changed: 變更密碼複雜性策略
+          removed: 刪除密碼複雜性策略
+        age:
+          added: 新增密碼有效期策略
+          changed: 變更密碼有效期策略
+          removed: 刪除密碼有效期策略
+        lockout:
+          added: 新增密碼鎖策略
+          changed: 變更密碼鎖策略
+          removed: 刪除密碼鎖策略
+      label:
+        added: 新增標籤策略
+        changed: 更改標籤策略
+        activated: 啟用標籤策略
+        removed: 刪除標籤策略
+        logo:
+          added: 新增 Logo 標籤策略
+          removed: 從標籤策略刪除 Logo
+          dark:
+            added: 新增 Logo (深色模式) Logo 標籤策略
+            removed: 刪除 Logo (深色模式) Logo 標籤策略
+        icon:
+          added: 新增圖示到標籤策略
+          removed: 從標籤策略中刪除圖示
+          dark:
+            added: 新增圖示(dark mode) 到標籤策略
+            removed: 從標籤策略中刪除圖示 (深色模式)
+        font:
+          added: 字型新增到標籤策略
+          removed: 從標籤策略中刪除字型
+        assets:
+          removed: 從標籤策略中刪除的資產
+      privacy:
+        added: 新增隱私政策和服務條款
+        changed: 隱私政策和服務條款已更改
+        removed: 隱私政策和 TOS 已刪除
+      domain:
+        added: 新增了域策略
+        changed: 域策略已更改
+        removed: 域策略已刪除
+      lockout:
+        added: 新增了鎖定策略
+        changed: 更改隱私政策和服務條款
+        removed: 刪除隱私政策和服務條款
+      notification:
+        added: 增加了通知政策
+        changed: 通知政策改變
+        removed: 刪除了通知政策
+    flow:
+      trigger_actions:
+        set: 設定動作
+        cascade:
+          removed: 刪除動作級聯
+        removed: 刪除動作
+      cleared: 流量已清除
+    mail:
+      template:
+        added: 新增了電子郵件模板
+        changed: 電子郵件模板已更改
+        removed: 電子郵件模板已刪除
+      text:
+        added: 新增了電子郵件文字
+        changed: 電子郵件文字已更改
+        removed: 電子郵件文字已刪除
+    metadata:
+      removed: 電子郵件文字已刪除
+      removed.all: 所有後設資料已刪除
+      set: 後設資料集
+  project:
+    added: 新增專案
+    changed: 更改專案
+    deactivated: 停用專案
+    reactivated: 啟用專案
+    removed: 刪除專案
+    member:
+      added: 新增專案成員
+      changed: 更改專案成員
+      removed: 刪除專案成員
+      cascade:
+        removed: 移除專案成員級聯
+    role:
+      added: 新增專案角色
+      changed: 更改專案角色
+      removed: 刪除專案角色
+    grant:
+      added: 新增外部授權
+      changed: 更改外部授權
+      removed: 刪除外部授權
+      deactivated: 停用外部授權
+      reactivated: 啟用外部授權
+      cascade:
+        changed: 更改外部授權
+      member:
+        added: 新增存取成員
+        changed: 更改存取成員
+        removed: 刪除存取成員
+        cascade:
+          removed: 刪除管理存取級聯
+    application:
+      added: 新增應用
+      changed: 更改應用
+      removed: 刪除應用
+      deactivated: 停用應用
+      reactivated: 啟用應用
+      oidc:
+        secret:
+          check:
+            succeeded: 檢查 OIDC Client Secret 成功
+            failed: 檢查 OIDC Client Secret 失敗
+        key:
+          added: 新增了 OIDC 應用金鑰
+          removed: OIDC 應用金鑰已刪除
+      api:
+        secret:
+          check:
+            succeeded: API密檢成功
+            failed: API 秘密檢查失敗
+        key:
+          added: 新增應用 Key
+          removed: 刪除應用 Key
+      config:
+        saml:
+          added: 新增 SAML 設定
+          changed: 更改 SAML 設定
+        oidc:
+          added: 新增 OIDC 設定
+          changed: 更改 OIDC 設定
+          secret:
+            changed: 更改 OIDC Secret
+            updated: OIDC 秘密雜湊已更新
+        api:
+          added: 新增 API 設定
+          changed: 更改 API 設定
+          secret:
+            changed: 更改 API Secret
+            updated: API 秘密雜湊已更新
+  policy:
+    password:
+      complexity:
+        added: 新增密碼複雜性策略
+        changed: 變更密碼複雜性策略
+      age:
+        added: 新增密碼過期策略
+        changed: 變更密碼過期策略
+      lockout:
+        added: 新增密碼鎖定策略
+        changed: 變更密碼鎖定策略
+  iam:
+    setup:
+      started: 開始 Zitadel 設定
+      done: Zitadel 設定完成
+    global:
+      org:
+        set: 設定全域性組織
+    project:
+      iam:
+        set: 設定 Zitadel 專案
+    member:
+      added: 新增 Zitadel 成員
+      changed: 更改 Zitadel 成員
+      removed: 刪除 Zitadel 成員
+      cascade:
+        removed: 刪除 Zitadel 成員級聯
+    idp:
+      config:
+        added: 新增 IDP 設定
+        changed: 更改 IDP 設定
+        removed: 刪除 IDP 設定
+        deactivated: 停用 IDP 設定
+        reactivated: 啟用 IDP 設定
+      oidc:
+        config:
+          added: 新增 OIDC IDP 設定
+          changed: 更改 OIDC IDP 設定
+      saml:
+        config:
+          added: 新增 SAML IDP 設定
+          changed: 更改 SAML IDP 設定
+      jwt:
+        config:
+          added: 新增了身分提供者的 JWT 設定
+          changed: 身分提供者的 JWT 設定已刪除
+    customtext:
+      set: 設定文字
+      removed: 刪除文字
+    policy:
+      login:
+        added: 新增預設登入策略
+        changed: 更改預設登入策略
+        idpprovider:
+          added: IDP 新增到預設登入策略
+          removed: 從預設登入策略中刪除 IDP
+      label:
+        added: 新增標籤策略
+        changed: 更改標籤策略
+        activated: 啟用標籤策略
+        logo:
+          added: 新增 Logo 標籤策略
+          removed: 從標籤策略刪除 Logo
+          dark:
+            added: 新增 Logo (深色模式) Logo 標籤策略
+            removed: 刪除Logo (深色模式) Logo 標籤策略
+        icon:
+          added: 新增圖示到標籤策略
+          removed: 從標籤策略中刪除圖示
+          dark:
+            added: 新增圖示(dark mode) 到標籤策略
+            removed: 從標籤策略中刪除圖示 (深色模式)
+        font:
+          added: 字型新增到標籤策略
+          removed: 從標籤策略中刪除字型
+        assets:
+          removed: 從標籤策略中刪除的資產
+    default:
+      language:
+        set: 設定預設語言
+    oidc:
+      settings:
+        added: 新增 OIDC 設定
+        changed: 更改 OIDC 設定
+        removed: 刪除 OIDC 設定
+    secret:
+      generator:
+        added: 新增秘鑰生成器
+        changed: 更改秘鑰生成器
+        removed: 刪除秘鑰生成器
+    smtp:
+      config:
+        added: 新增 SMTP 設定
+        changed: 更改 SMTP 設定
+        activated: SMTP 設定已啟用
+        deactivated: SMTP 設定已停用
+        removed: SMTP 設定已刪除
+        password:
+          changed: 更改 SMTP 安全設定
+    sms:
+      config:
+        twilio:
+          added: 新增 Twilio SMS 提供者
+          changed: 更改 Twilio SMS 提供者
+          token:
+            changed: 更改 Twilio SMS 提供者令牌
+          removed: 刪除 Twilio SMS 提供者
+          activated: 啟用 Twilio SMS 提供者
+          deactivated: 停用 Twilio SMS 提供者
+  key_pair:
+    added: 新增金鑰對
+    certificate:
+      added: 證書已新增
+  action:
+    added: 新增動作
+    changed: 更改動作
+    deactivated: 停用動作
+    reactivated: 啟用動作
+    removed: 刪除動作
+  instance:
+    added: 執行個體已新增
+    changed: 執行個體已更改
+    customtext:
+      removed: 自定義文字已刪除
+      set: 自定義文字集
+      template:
+        removed: 刪除了自定義文字模板
+    default:
+      language:
+        set: 預設語言設定
+      org:
+        set: 預設組織集
+    domain:
+      added: 已新增網域
+      primary:
+        set: 主域集
+      removed: 網域已刪除
+    iam:
+      console:
+        set: Zitadel管理控制檯應用程式已設定
+      project:
+        set: Zitadel 專案集
+    mail:
+      template:
+        added: 新增了電子郵件模板
+        changed: 電子郵件模板已更改
+      text:
+        added: 新增了電子郵件文字
+        changed: 電子郵件文字已更改
+    member:
+      added: 已新增執行個體成員
+      changed: 執行個體成員發生變化
+      removed: 執行個體成員已刪除
+      cascade:
+        removed: 執行個體成員級聯已刪除
+    notification:
+      provider:
+        debug:
+          fileadded: 新增了檔案除錯通知提供程式
+          filechanged: 檔案除錯通知提供程式已更改
+          fileremoved: 刪除檔案除錯通知提供程式
+          logadded: 新增了日誌除錯通知提供程式
+          logchanged: 日誌除錯通知提供程式已更改
+          logremoved: 日誌除錯通知提供程式已刪除
+    oidc:
+      settings:
+        added: 新增了 OIDC 設定
+        changed: OIDC 設定已更改
+    policy:
+      domain:
+        added: 新增了域策略
+        changed: 域策略已更改
+      label:
+        activated: 標籤政策已啟用
+        added: 新增了標籤策略
+        assets:
+          removed: 已刪除標籤政策中的資產
+        changed: 標籤政策已更改
+        font:
+          added: 新增到標籤政策的字型
+          removed: 從標籤政策中刪除的字型
+        icon:
+          added: 圖示已新增到標籤策略
+          removed: 圖示已從標籤政策中刪除
+          dark:
+            added: 圖示已新增到暗標籤政策
+            removed: 圖示已從暗標籤政策中刪除
+        logo:
+          added: 徽標已新增到標籤政策中
+          removed: 徽標已從標籤政策中刪除
+          dark:
+            added: 徽標已新增到暗標籤政策中
+            removed: 徽標從暗標籤政策中刪除
+      lockout:
+        added: 新增了鎖定策略
+        changed: 鎖定政策已更改
+      login:
+        added: 新增了登入策略
+        changed: 登入政策已更改
+        idpprovider:
+          added: 身分提供者已新增到登入策略中
+          cascade:
+            removed: 身分提供者級聯從登入策略中刪除
+          removed: 身分提供者已從登入策略中刪除
+        multifactor:
+          added: 登入策略中新增了多因素
+          removed: 從登入策略中刪除了多因素
+        secondfactor:
+          added: 新增到登入策略的第二個因素
+          removed: 從登入策略中刪除了第二個因素
+      password:
+        age:
+          added: 新增了密碼年齡策略
+          changed: 密碼期限政策已更改
+        complexity:
+          added: 新增了密碼複雜性策略
+          changed: 刪除了密碼複雜性策略
+      privacy:
+        added: 新增了隱私政策
+        changed: 隱私政策已更改
+      security:
+        set: 安全策略集
+    removed: 執行個體已刪除
+    secret:
+      generator:
+        added: 新增了秘密生成器
+        changed: 秘密生成器已更改
+        removed: 秘密生成器已移除
+    sms:
+      configtwilio:
+        activated: Twilio SMS 設定已啟用
+        added: 新增了 Twilio SMS 設定
+        changed: Twilio SMS 設定已更改
+        deactivated: Twilio SMS 設定已停用
+        removed: Twilio SMS 設定已刪除
+        token:
+          changed: Twilio SMS 設定的令牌已更改
+    smtp:
+      config:
+        added: 新增了 SMTP 設定
+        changed: SMTP 設定已更改
+        activated: SMTP 設定已啟用
+        deactivated: SMTP 設定已停用
+        password:
+          changed: SMTP 設定密碼已更改
+        removed: SMTP 設定已刪除
+  user_schema:
+    created: 已建立使用者架構
+    updated: 使用者架構已更新
+    deactivated: 使用者架構已停用
+    reactivated: 使用者架構已重新啟用
+    deleted: 使用者架構已刪除
+    user:
+      created: 使用者已建立
+      updated: 使用者已更新
+      deleted: 使用者已刪除
+      email:
+        updated: 電子郵件地址已更改
+        verified: 電子郵件地址已驗證
+        verification:
+          failed: 電子郵件地址驗證失敗
+        code:
+          added: 電子郵件地址驗證碼已生成
+          sent: 電子郵件地址驗證碼已傳送
+      phone:
+        updated: 電話號碼已更改
+        verified: 電話號碼已驗證
+        verification:
+          failed: 電話號碼驗證失敗
+        code:
+          added: 電話號碼驗證碼已生成
+          sent: 電話號碼驗證碼已傳送
+  web_key:
+    added: 已新增 Web Key
+    activated: 已啟用 Web Key
+    deactivated: 已停用 Web Key
+    removed: 已刪除 Web Key
+Application:
+  OIDC:
+    UnsupportedVersion: 不支援您的 OIDC 版本
+    V1:
+      NotCompliant: 您的設定不符合要求，並且與 OIDC 1.0 標準不同。
+      NoRedirectUris: 必須至少註冊一個重新導向 URL。
+      NotAllCombinationsAreAllowed: 設定是合規的，但並非所有可能的組合都是允許的。
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: 授權方式為 Code 模式時，僅允許 Web 和 Native 應用型別的應用使用 HTTP 重新導向。
+          CustomOnlyForNative: 授權方式為 Code 時支援自定義原生 App Schema  (e.g appname:// )
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: 授權型別為隱式時不允許自定義重新導向 URL。
+          HttpNotAllowed: 授權型別為隱式時不允許 HTTP 重新導向 URL。
+          HttpLocalhostOnlyForNative: http://localhost 重新導向 URL 僅允許用於本機應用程式。
+      Native:
+        AuthMethodType:
+          NotNone: 原生應用的身分驗證方式應該為 None。
+        RedirectUris:
+          MustBeHttpLocalhost: 重新導向 URL 必須以您自己的協議、http://127.0.0.1、http://[::1] 或 http://localhost 開頭。
+      UserAgent:
+        AuthMethodType:
+          NotNone: UserAgent 應用應使用 None 身分驗證方式。
+      GrantType:
+        Refresh:
+          NoAuthCode: Refresh Token 僅允許與授權碼（Authorization Code）模式一起使用。
+Action:
+  Flow:
+    Type:
+      Unspecified: 未指定的
+      ExternalAuthentication: 外部認證
+      CustomiseToken: 自定義令牌
+      InternalAuthentication: 內部認證
+      CustomizeSAMLResponse: 補充 SAMLResponse
+  TriggerType:
+    Unspecified: 未指定的
+    PostAuthentication: 後期認證
+    PreCreation: 建立前
+    PostCreation: 建立後
+    PreUserinfoCreation: 使用者資訊建立前
+    PreAccessTokenCreation: access 令牌建立前
+    PreSAMLResponseCreation: 建立 SAMLResponse 前
