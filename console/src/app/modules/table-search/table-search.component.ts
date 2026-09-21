@@ -2,7 +2,7 @@ import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output } fr
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map, take } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter, map } from 'rxjs/operators';
 
 const DEBOUNCE_MS = 300;
 /** Matches the max_len of the proto string queries this term is turned into. */
@@ -25,6 +25,12 @@ export class TableSearchComponent implements OnInit {
 
   protected value = '';
 
+  /**
+   * The term currently reflected in the URL. Starts empty so an initial visit without `q`
+   * does not emit, while `?q=…` still restores.
+   */
+  private lastSyncedTerm = '';
+
   private readonly input$ = new Subject<string>();
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -33,16 +39,18 @@ export class TableSearchComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParamMap
       .pipe(
-        take(1),
         // the proto string fields cap at 200, and maxlength does not cover the URL
         map((params) => (params.get('q') ?? '').slice(0, MAX_TERM_LENGTH)),
+        // Skip the writes this component made itself. Without it every keystroke would
+        // emit twice, and the grant list would fire a duplicate request per stroke.
+        filter((term) => term !== this.lastSyncedTerm),
+        distinctUntilChanged(),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((term) => {
+        this.lastSyncedTerm = term;
         this.value = term;
-        if (term) {
-          this.searchChanged.emit(term);
-        }
+        this.searchChanged.emit(term);
       });
 
     this.input$
@@ -73,6 +81,7 @@ export class TableSearchComponent implements OnInit {
   }
 
   private syncToUrl(term: string): void {
+    this.lastSyncedTerm = term;
     this.router
       .navigate([], {
         relativeTo: this.route,

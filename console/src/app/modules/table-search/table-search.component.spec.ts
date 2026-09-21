@@ -25,9 +25,9 @@ describe('TableSearchComponent', () => {
     router = jasmine.createSpyObj<Router>('Router', ['navigate']);
     router.navigate.and.resolveTo(true);
 
-    const route = {
-      queryParamMap: of(convertToParamMap(queryParams)),
-    } as unknown as ActivatedRoute;
+    // A subject, not of(): the component has to react to later URL changes too.
+    queryParamMap$ = new BehaviorSubject(convertToParamMap(queryParams));
+    const route = { queryParamMap: queryParamMap$ } as unknown as ActivatedRoute;
 
     await TestBed.configureTestingModule({
       declarations: [TableSearchComponent],
