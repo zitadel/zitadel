@@ -2823,7 +2823,7 @@
   "GRANTS": {
     "TITLE": "Rollen-Zuweisungen",
     "DESC": "Dies sind alle Rollen-Zuweisungen deiner Organisation.",
-    "SEARCHPLACEHOLDER": "Benutzer nach Anzeigename suchen",
+  "SEARCHPLACEHOLDER": "Benutzer suchen",
     "DELETE": "Rollen-Zuweisung löschen",
     "EMPTY": "Keine Rollen-Zuweisung gefunden",
     "ADD": "Rollen-Zuweisung erstellen",
