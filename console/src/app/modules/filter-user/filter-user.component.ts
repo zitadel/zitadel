@@ -1,7 +1,11 @@
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ActivatedRoute, Router } from '@angular/router';
-import { take } from 'rxjs';
+import { from, of, Subject, take } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { ManagementService } from 'src/app/services/mgmt.service';
+import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import {
   DisplayNameQuery,
@@ -14,6 +18,9 @@ import {
 
 import { FilterComponent } from '../filter/filter.component';
 import { filter, map } from 'rxjs/operators';
+
+/** Kept small: the list is a hint while typing, not a browsable result set. */
+const SUGGESTION_LIMIT = 10;
 
 export enum SubQuery {
   STATE,
@@ -39,8 +46,99 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
     UserState.USER_STATE_LOCKED,
     UserState.USER_STATE_INITIAL,
   ];
+  private readonly mgmtService = inject(ManagementService);
+
+  /**
+   * Value suggestions for the text filters. Typing an exact match by hand is close to
+   * impossible with the "equals" method, so the field offers existing values while
+   * still accepting free text for the "contains" and "ends with" methods.
+   */
+  protected suggestions: string[] = [];
+  private suggestionSubQuery: SubQuery | undefined;
+  private readonly suggest$ = new Subject<{ subquery: SubQuery; value: string }>();
+
   constructor(router: Router, route: ActivatedRoute, destroyRef: DestroyRef) {
     super(router, route, destroyRef);
+
+    this.suggest$
+      .pipe(
+        debounceTime(250),
+        distinctUntilChanged((a, b) => a.subquery === b.subquery && a.value === b.value),
+        switchMap(({ subquery, value }) =>
+          from(this.fetchSuggestions(subquery, value)).pipe(
+            // a failed lookup must not break typing, it just means no suggestions
+            catchError(() => of([] as string[])),
+          ),
+        ),
+        takeUntilDestroyed(destroyRef),
+      )
+      .subscribe((values) => (this.suggestions = values));
+  }
+
+  protected onSuggestionInput(subquery: SubQuery, event: Event): void {
+    this.suggestionSubQuery = subquery;
+    this.suggest$.next({ subquery, value: (event.target as HTMLInputElement).value });
+  }
+
+  /** Scoped per field so an open second filter never shows the first one's values. */
+  protected suggestionsFor(subquery: SubQuery): string[] {
+    return this.suggestionSubQuery === subquery ? this.suggestions : [];
+  }
+
+  protected selectSuggestion(subquery: SubQuery, query: any, value: string): void {
+    this.setValue(subquery, query, { value });
+  }
+
+  private async fetchSuggestions(subquery: SubQuery, value: string): Promise<string[]> {
+    const term = value.trim();
+    if (!term) {
+      return [];
+    }
+
+    const query = new UserSearchQuery();
+    switch (subquery) {
+      case SubQuery.DISPLAYNAME:
+        const dnq = new DisplayNameQuery();
+        dnq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+        dnq.setDisplayName(term);
+        query.setDisplayNameQuery(dnq);
+        break;
+      case SubQuery.EMAIL:
+        const eq = new EmailQuery();
+        eq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+        eq.setEmailAddress(term);
+        query.setEmailQuery(eq);
+        break;
+      case SubQuery.USERNAME:
+        const unq = new UserNameQuery();
+        unq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+        unq.setUserName(term);
+        query.setUserNameQuery(unq);
+        break;
+      default:
+        return [];
+    }
+
+    const response = await this.mgmtService.listUsers(SUGGESTION_LIMIT, 0, [query]);
+    const values = response.resultList
+      .map((user) => FilterUserComponent.suggestionValue(subquery, user))
+      .filter((v): v is string => !!v);
+
+    // Several users can share an address, so the raw list would repeat entries.
+    return Array.from(new Set(values));
+  }
+
+  private static suggestionValue(subquery: SubQuery, user: User.AsObject): string | undefined {
+    switch (subquery) {
+      case SubQuery.DISPLAYNAME:
+        return user.human?.profile?.displayName ?? user.machine?.name;
+      case SubQuery.EMAIL:
+        return user.human?.email?.email;
+      case SubQuery.USERNAME:
+        return user.userName;
+      default:
+        return undefined;
+    }
   }
 
   ngOnInit(): void {
