@@ -9,10 +9,11 @@ import { Translated } from "./translated";
 
 type Props = {
   sessions: Session[];
+  avatarUrls?: Record<string, string | undefined>;
   requestId?: string;
 };
 
-export function SessionsList({ sessions, requestId }: Props) {
+export function SessionsList({ sessions, requestId, avatarUrls }: Props) {
   const [list, setList] = useState<Session[]>(sessions);
   return sessions ? (
     <div className="flex flex-col space-y-2">
@@ -28,6 +29,7 @@ export function SessionsList({ sessions, requestId }: Props) {
         .map((session, index) => {
           return (
             <SessionItem
+              imageUrl={avatarUrls?.[session.factors?.user?.id ?? ""]}
               session={session}
               requestId={requestId}
               reload={() => {

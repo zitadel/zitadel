@@ -6,6 +6,7 @@ import { VerifyForm } from "@/components/verify-form";
 import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
+import { getUserAvatarUrl } from "@/lib/user-avatar";
 import { getBrandingSettings, getLoginSettings, getUserByID, searchUsers } from "@/lib/zitadel";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
@@ -117,6 +118,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
             displayName={sessionFactors.factors?.user?.displayName}
+            imageUrl={await getUserAvatarUrl({ serviceConfig, userId: sessionFactors.factors?.user?.id })}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
@@ -129,6 +131,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
                   ? human?.profile?.displayName
                   : (loginName ?? user?.preferredLoginName)
               }
+              imageUrl={!loginSettings?.ignoreUnknownUsernames ? human?.profile?.avatarUrl : undefined}
               showDropdown={false}
             />
           )

@@ -7,6 +7,7 @@ import { getSessionCookieById } from "@/lib/cookies";
 import { getPublicHost } from "@/lib/server/host";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
+import { getUserAvatarUrl } from "@/lib/user-avatar";
 import { getBrandingSettings, getLoginSettings, getSession } from "@/lib/zitadel";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -101,6 +102,7 @@ export default async function Page(props: {
           <UserAvatar
             loginName={loginName ?? session.factors?.user?.loginName}
             displayName={session.factors?.user?.displayName}
+            imageUrl={await getUserAvatarUrl({ serviceConfig, userId: session.factors?.user?.id })}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
