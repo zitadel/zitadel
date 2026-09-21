@@ -83,7 +83,7 @@ export class FilterUserGrantsComponent extends FilterComponent implements OnInit
         });
 
         this.searchQueries = userQueries.filter((q) => q !== undefined) as UserGrantQuery[];
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
         // this.showFilter = true;
         // this.filterOpen.emit(true);
       }
@@ -171,19 +171,19 @@ export class FilterUserGrantsComponent extends FilterComponent implements OnInit
     switch (subquery) {
       case SubQuery.DISPLAYNAME:
         (query as DisplayNameQuery).setDisplayName(event?.target?.value);
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
         break;
       case SubQuery.USERNAME:
         (query as UserNameQuery).setUserName(event?.target?.value);
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
         break;
       case SubQuery.ORGNAME:
         (query as UserGrantOrgNameQuery).setOrgName(event?.target?.value);
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
         break;
       case SubQuery.PROJECTNAME:
         (query as UserGrantProjectNameQuery).setProjectName(event?.target?.value);
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
         break;
     }
   }
@@ -224,13 +224,38 @@ export class FilterUserGrantsComponent extends FilterComponent implements OnInit
 
   public setMethod(query: any, event: any) {
     (query as UserNameQuery).setMethod(event.value);
-    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+    this.emitQueries();
   }
 
   public override emitFilter(): void {
-    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+    this.emitQueries();
     this.showFilter = false;
     this.filterOpen.emit(false);
+  }
+
+  /**
+   * Emits only queries that carry a value. Ticking a checkbox creates the query with an
+   * empty string, which the API rejects because text queries need at least one character.
+   */
+  private emitQueries(): void {
+    this.filterChanged.emit(this.searchQueries.filter((query) => FilterUserGrantsComponent.hasValue(query)));
+  }
+
+  private static hasValue(query: UserGrantQuery): boolean {
+    const q = query.toObject();
+    if (q.displayNameQuery) {
+      return !!q.displayNameQuery.displayName.trim();
+    }
+    if (q.userNameQuery) {
+      return !!q.userNameQuery.userName.trim();
+    }
+    if (q.orgNameQuery) {
+      return !!q.orgNameQuery.orgName.trim();
+    }
+    if (q.projectNameQuery) {
+      return !!q.projectNameQuery.projectName.trim();
+    }
+    return true;
   }
 
   public resetFilter(): void {

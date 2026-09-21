@@ -835,6 +835,7 @@
         "10": "filter for organization name",
         "12": "filter for project name"
       },
+      "SEARCHPLACEHOLDER": "Search name, e-mail or username",
       "EMPTY": "No entries"
     },
     "PASSWORDLESS": {
@@ -2851,6 +2852,7 @@
   "GRANTS": {
     "TITLE": "Role Assignments",
     "DESC": "These are all the role assignments on your organization.",
+    "SEARCHPLACEHOLDER": "Search user by display name",
     "DELETE": "Delete Role Assignment",
     "EMPTY": "No role assignment found",
     "ADD": "Create Role Assignment",

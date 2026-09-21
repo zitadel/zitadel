@@ -15,7 +15,7 @@ import {
 import { FilterComponent } from '../filter/filter.component';
 import { filter, map } from 'rxjs/operators';
 
-enum SubQuery {
+export enum SubQuery {
   STATE,
   DISPLAYNAME,
   EMAIL,
@@ -95,7 +95,7 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
         });
 
         this.searchQueries = userQueries.filter((q) => q !== undefined) as UserSearchQuery[];
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
         // this.showFilter = true;
         // this.filterOpen.emit(true);
       });
@@ -184,19 +184,19 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
     switch (subquery) {
       case SubQuery.STATE:
         (query as StateQuery).setState(value);
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
         break;
       case SubQuery.DISPLAYNAME:
         (query as DisplayNameQuery).setDisplayName(value);
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
         break;
       case SubQuery.EMAIL:
         (query as EmailQuery).setEmailAddress(value);
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
         break;
       case SubQuery.USERNAME:
         (query as UserNameQuery).setUserName(value);
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
         break;
     }
   }
@@ -236,11 +236,11 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
 
   public setMethod(query: any, event: any) {
     (query as UserNameQuery).setMethod(event.value);
-    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+    this.emitQueries();
   }
 
   public override emitFilter(): void {
-    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+    this.emitQueries();
     this.showFilter = false;
     this.filterOpen.emit(false);
   }
@@ -248,5 +248,32 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
   public resetFilter(): void {
     this.searchQueries = [];
     this.emitFilter();
+  }
+
+  /**
+   * Emits only queries that carry a value.
+   *
+   * Ticking a checkbox creates the query with an empty string, but the API rejects text
+   * queries shorter than one character. Sending those produced an "invalid argument"
+   * toast and, worse, persisted a broken filter in the URL that failed again on reload.
+   * The incomplete query stays in the local list so its input keeps rendering.
+   */
+  private emitQueries(): void {
+    this.filterChanged.emit(this.searchQueries.filter((query) => FilterUserComponent.hasValue(query)));
+  }
+
+  private static hasValue(query: UserSearchQuery): boolean {
+    const q = query.toObject();
+    if (q.displayNameQuery) {
+      return !!q.displayNameQuery.displayName.trim();
+    }
+    if (q.emailQuery) {
+      return !!q.emailQuery.emailAddress.trim();
+    }
+    if (q.userNameQuery) {
+      return !!q.userNameQuery.userName.trim();
+    }
+    // state queries always carry a valid enum value
+    return true;
   }
 }

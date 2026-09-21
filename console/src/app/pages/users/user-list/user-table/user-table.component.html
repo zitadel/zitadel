@@ -61,9 +61,14 @@
         }
       </ng-template>
       @if (!selection.hasValue()) {
+        <cnsl-table-search
+          actions
+          [placeholder]="'USER.TABLE.SEARCHPLACEHOLDER' | translate"
+          (searchChanged)="onSearchChanged($event)"
+        ></cnsl-table-search>
         <cnsl-filter-user
           actions
-          (filterChanged)="searchQueries$.next($any($event))"
+          (filterChanged)="onFilterChanged($any($event))"
           (filterOpen)="filterOpen = $event"
         ></cnsl-filter-user>
       }
@@ -90,7 +95,14 @@
         }
       </ng-template>
       <div class="table-wrapper">
-        <table class="table" mat-table [dataSource]="dataSource" matSort>
+        <table
+          class="table"
+          mat-table
+          [dataSource]="dataSource"
+          matSort
+          matSortActive="creationDate"
+          matSortDirection="desc"
+        >
           <ng-container matColumnDef="select">
             <th mat-header-cell *matHeaderCellDef>
               <div class="selection">
@@ -150,7 +162,9 @@
             </td>
           </ng-container>
           <ng-container matColumnDef="preferredLoginName">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            <!-- Not sortable: the API has no preferred login name field, sorting here would
+                 silently sort by username instead. Re-add mat-sort-header once it exists. -->
+            <th mat-header-cell *matHeaderCellDef>
               {{ 'USER.PROFILE.PREFERREDLOGINNAME' | translate }}
             </th>
             <td mat-cell *matCellDef="let user" [routerLink]="user.userId ? ['/users', user.userId] : null">
@@ -244,7 +258,8 @@
         [length]="dataSize()"
         [pageSize]="INITIAL_PAGE_SIZE"
         [timestamp]="(users$ | async)?.details?.timestamp"
-        [pageSizeOptions]="[10, 20, 50, 100]"
+        [pageSizeOptions]="PAGE_SIZE_OPTIONS"
+        [persistKey]="PAGE_SIZE_KEY"
       ></cnsl-paginator>
       <!--    (page)="changePage($event)"-->
     </cnsl-refresh-table>

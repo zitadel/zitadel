@@ -23,6 +23,11 @@
   }
 
   @if (!selection.hasValue()) {
+    <cnsl-table-search
+      actions
+      [placeholder]="'GRANTS.SEARCHPLACEHOLDER' | translate"
+      (searchChanged)="onSearchChanged($event)"
+    ></cnsl-table-search>
     <cnsl-filter-user-grants
       actions
       (filterChanged)="applySearchQuery($any($event))"
@@ -208,8 +213,8 @@
     [timestamp]="dataSource.viewTimestamp"
     [length]="dataSource.totalResult"
     [pageSize]="INITIAL_PAGE_SIZE"
-    [length]="dataSource.totalResult"
-    [pageSizeOptions]="[2, 3, 25, 50, 100, 250]"
+    [pageSizeOptions]="PAGE_SIZE_OPTIONS"
+    [persistKey]="PAGE_SIZE_KEY"
     (page)="changePage($event)"
   >
   </cnsl-paginator>

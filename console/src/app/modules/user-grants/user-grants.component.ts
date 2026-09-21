@@ -1,10 +1,9 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatInput } from '@angular/material/input';
 import { MatTable } from '@angular/material/table';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs/operators';
 import { RpcError } from 'grpc-web';
 import { enterAnimations } from 'src/app/animations';
 import { UserGrant as AuthUserGrant } from 'src/app/proto/generated/zitadel/auth_pb';
@@ -12,9 +11,11 @@ import {
   Type,
   UserGrant as MgmtUserGrant,
   UserGrant,
+  UserGrantDisplayNameQuery,
   UserGrantQuery,
   UserGrantState,
 } from 'src/app/proto/generated/zitadel/user_pb';
+import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -32,6 +33,7 @@ import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { NewOrganizationService } from '../../services/new-organization.service';
 import { AuthorizationService } from '../../services/authorization.service';
+import { PaginationPreferenceService } from '../../services/pagination-preference.service';
 
 export enum UserGrantListSearchKey {
   DISPLAY_NAME,
@@ -52,7 +54,14 @@ type UserGrantAsObject = AuthUserGrant.AsObject | MgmtUserGrant.AsObject;
 export class UserGrantsComponent implements OnInit, AfterViewInit {
   public userGrantListSearchKey: UserGrantListSearchKey | undefined = undefined;
 
-  public INITIAL_PAGE_SIZE: number = 50;
+  private readonly paginationPreference = inject(PaginationPreferenceService);
+  public readonly PAGE_SIZE_OPTIONS = [10, 25, 50, 100, 250];
+  public readonly PAGE_SIZE_KEY = 'user-grants';
+  public INITIAL_PAGE_SIZE: number = this.paginationPreference.get(this.PAGE_SIZE_KEY, 50, this.PAGE_SIZE_OPTIONS);
+
+  /** Filter panel and search bar narrow the same list independently of each other. */
+  private filterQueries: UserGrantQuery[] = [];
+  private searchTerm: string = '';
   @Input() context: UserGrantContext = UserGrantContext.NONE;
   @Input() refreshOnPreviousRoutes: string[] = [];
 
@@ -136,7 +145,8 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   }
 
   public ngAfterViewInit(): void {
-    this.paginator?.page.pipe(tap(() => this.loadGrantsPage(this.type))).subscribe();
+    // Paging is handled by the (page) binding in the template. Subscribing here as well
+    // used to fire a second request that dropped the active filter and search queries.
   }
 
   public setType(type: Type | undefined): void {
@@ -154,9 +164,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
   }
 
-  private loadGrantsPage(type: Type | undefined, searchQueries?: UserGrantQuery[]): void {
-    let queries: UserGrantQuery[] = [];
-
+  private loadGrantsPage(type: Type | undefined): void {
     this.dataSource.loadGrants(
       this.context,
       this.paginator?.pageIndex ?? 0,
@@ -166,8 +174,29 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         grantId: this.grantId,
         userId: this.userId,
       },
-      searchQueries ? [...searchQueries, ...queries] : queries,
+      this.buildQueries(),
     );
+  }
+
+  /**
+   * The v1 management API has no OR filter, so the search box can only match one column.
+   * Display name is the one the list actually renders in the user column.
+   */
+  private buildQueries(): UserGrantQuery[] {
+    const queries = [...this.filterQueries];
+
+    const term = this.searchTerm.trim();
+    if (term) {
+      const displayNameQuery = new UserGrantDisplayNameQuery();
+      displayNameQuery.setDisplayName(term);
+      displayNameQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+
+      const query = new UserGrantQuery();
+      query.setDisplayNameQuery(displayNameQuery);
+      queries.push(query);
+    }
+
+    return queries;
   }
 
   public isAllSelected(): boolean {
@@ -293,22 +322,30 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  public changePage(event?: PageEvent): void {
-    this.dataSource.loadGrants(
-      this.context,
-      event?.pageIndex ?? this.paginator?.pageIndex ?? 0,
-      event?.pageSize ?? this.paginator?.pageSize ?? this.INITIAL_PAGE_SIZE,
-      {
-        projectId: this.projectId,
-        grantId: this.grantId,
-        userId: this.userId,
-      },
-    );
+  public changePage(_event?: PageEvent): void {
+    // The paginator updates its own pageIndex/pageSize before emitting, so reading them
+    // back keeps paging, filtering and searching on a single code path.
+    this.loadGrantsPage(this.type);
   }
 
   public applySearchQuery(searchQueries?: UserGrantQuery[]): void {
     this.selection.clear();
-    this.loadGrantsPage(this.type, searchQueries);
+    this.filterQueries = searchQueries ?? [];
+    this.goToFirstPage();
+    this.loadGrantsPage(this.type);
+  }
+
+  public onSearchChanged(term: string): void {
+    this.selection.clear();
+    this.searchTerm = term;
+    this.goToFirstPage();
+    this.loadGrantsPage(this.type);
+  }
+
+  private goToFirstPage(): void {
+    if (this.paginator) {
+      this.paginator.pageIndex = 0;
+    }
   }
 
   public setFilter(key: UserGrantListSearchKey): void {
