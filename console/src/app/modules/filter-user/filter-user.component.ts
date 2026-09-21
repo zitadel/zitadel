@@ -4,8 +4,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ActivatedRoute, Router } from '@angular/router';
 import { from, of, Subject, take } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { ManagementService } from 'src/app/services/mgmt.service';
-import { User } from 'src/app/proto/generated/zitadel/user_pb';
+import { SuggestionField, UserSuggestionService } from 'src/app/services/user-suggestion.service';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import {
   DisplayNameQuery,
@@ -18,9 +17,6 @@ import {
 
 import { FilterComponent } from '../filter/filter.component';
 import { filter, map } from 'rxjs/operators';
-
-/** Kept small: the list is a hint while typing, not a browsable result set. */
-const SUGGESTION_LIMIT = 10;
 
 export enum SubQuery {
   STATE,
@@ -46,7 +42,7 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
     UserState.USER_STATE_LOCKED,
     UserState.USER_STATE_INITIAL,
   ];
-  private readonly mgmtService = inject(ManagementService);
+  private readonly suggestionService = inject(UserSuggestionService);
 
   /**
    * Value suggestions for the text filters. Typing an exact match by hand is close to
@@ -89,54 +85,21 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
     this.setValue(subquery, query, { value });
   }
 
-  private async fetchSuggestions(subquery: SubQuery, value: string): Promise<string[]> {
-    const term = value.trim();
-    if (!term) {
-      return [];
-    }
-
-    const query = new UserSearchQuery();
-    switch (subquery) {
-      case SubQuery.DISPLAYNAME:
-        const dnq = new DisplayNameQuery();
-        dnq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-        dnq.setDisplayName(term);
-        query.setDisplayNameQuery(dnq);
-        break;
-      case SubQuery.EMAIL:
-        const eq = new EmailQuery();
-        eq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-        eq.setEmailAddress(term);
-        query.setEmailQuery(eq);
-        break;
-      case SubQuery.USERNAME:
-        const unq = new UserNameQuery();
-        unq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-        unq.setUserName(term);
-        query.setUserNameQuery(unq);
-        break;
-      default:
-        return [];
-    }
-
-    const response = await this.mgmtService.listUsers(SUGGESTION_LIMIT, 0, [query]);
-    const values = response.resultList
-      .map((user) => FilterUserComponent.suggestionValue(subquery, user))
-      .filter((v): v is string => !!v);
-
-    // Several users can share an address, so the raw list would repeat entries.
-    return Array.from(new Set(values));
+  private fetchSuggestions(subquery: SubQuery, value: string): Promise<string[]> {
+    const field = FilterUserComponent.suggestionField(subquery);
+    return field ? this.suggestionService.suggest(field, value) : Promise.resolve([]);
   }
 
-  private static suggestionValue(subquery: SubQuery, user: User.AsObject): string | undefined {
+  private static suggestionField(subquery: SubQuery): SuggestionField | undefined {
     switch (subquery) {
       case SubQuery.DISPLAYNAME:
-        return user.human?.profile?.displayName ?? user.machine?.name;
+        return 'displayName';
       case SubQuery.EMAIL:
-        return user.human?.email?.email;
+        return 'email';
       case SubQuery.USERNAME:
-        return user.userName;
+        return 'userName';
       default:
+        // the state filter is a dropdown, there is nothing to suggest
         return undefined;
     }
   }

@@ -17,15 +17,20 @@
     min-width: 0;
   }
 
+  // The host is the flex item of the toolbar, so the width has to sit here. Putting it on
+  // the inner div did nothing and left the input at the browser default of ~20 characters.
+  // 360px fits the longest placeholder ("Benutzer nach Anzeigename suchen").
+  cnsl-table-search {
+    display: block;
+    flex: 0 1 360px;
+    min-width: 0;
+  }
+
   .cnsl-table-search {
     display: flex;
     align-items: center;
     box-sizing: border-box;
-    // A definite basis, not width 100%: as a flex item the latter made the box claim the
-    // whole row and pushed the filter button onto the next line. 360px fits the longest
-    // placeholder ("Benutzer nach Anzeigename suchen") without truncation.
-    flex: 0 1 360px;
-    min-width: 0;
+    width: 100%;
     padding: 0 0.5rem;
     border: 1px solid $border-color;
     border-radius: 0.5rem;

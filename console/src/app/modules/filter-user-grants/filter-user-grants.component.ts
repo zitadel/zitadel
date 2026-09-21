@@ -1,7 +1,10 @@
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ActivatedRoute, Router } from '@angular/router';
-import { take } from 'rxjs';
+import { from, of, Subject, take } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { SuggestionField, UserSuggestionService } from 'src/app/services/user-suggestion.service';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import {
   DisplayNameQuery,
@@ -34,8 +37,59 @@ export class FilterUserGrantsComponent extends FilterComponent implements OnInit
   public SubQuery: any = SubQuery;
   public searchQueries: UserGrantQuery[] = [];
 
+  private readonly suggestionService = inject(UserSuggestionService);
+
+  /**
+   * Value suggestions for the user related text filters. Role keys are deliberately left
+   * out: suggesting them needs a project, and this list spans every project at once.
+   */
+  protected suggestions: string[] = [];
+  private suggestionSubQuery: SubQuery | undefined;
+  private readonly suggest$ = new Subject<{ subquery: SubQuery; value: string }>();
+
   constructor(router: Router, route: ActivatedRoute, destroyRef: DestroyRef) {
     super(router, route, destroyRef);
+
+    this.suggest$
+      .pipe(
+        debounceTime(250),
+        distinctUntilChanged((a, b) => a.subquery === b.subquery && a.value === b.value),
+        switchMap(({ subquery, value }) => {
+          const field = FilterUserGrantsComponent.suggestionField(subquery);
+          if (!field) {
+            return of([] as string[]);
+          }
+          // a failed lookup must not break typing, it just means no suggestions
+          return from(this.suggestionService.suggest(field, value)).pipe(catchError(() => of([] as string[])));
+        }),
+        takeUntilDestroyed(destroyRef),
+      )
+      .subscribe((values) => (this.suggestions = values));
+  }
+
+  protected onSuggestionInput(subquery: SubQuery, event: Event): void {
+    this.suggestionSubQuery = subquery;
+    this.suggest$.next({ subquery, value: (event.target as HTMLInputElement).value });
+  }
+
+  /** Scoped per field so an open second filter never shows the first one's values. */
+  protected suggestionsFor(subquery: SubQuery): string[] {
+    return this.suggestionSubQuery === subquery ? this.suggestions : [];
+  }
+
+  protected selectSuggestion(subquery: SubQuery, query: any, value: string): void {
+    this.setValue(subquery, query, { target: { value } });
+  }
+
+  private static suggestionField(subquery: SubQuery): SuggestionField | undefined {
+    switch (subquery) {
+      case SubQuery.DISPLAYNAME:
+        return 'displayName';
+      case SubQuery.USERNAME:
+        return 'userName';
+      default:
+        return undefined;
+    }
   }
 
   ngOnInit(): void {

@@ -3,7 +3,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { SearchQuery as UserSearchQuery } from 'src/app/proto/generated/zitadel/user_pb';
-import { ManagementService } from 'src/app/services/mgmt.service';
+import { UserSuggestionService } from 'src/app/services/user-suggestion.service';
 
 import { FilterUserComponent, SubQuery } from './filter-user.component';
 
@@ -24,15 +24,15 @@ describe('FilterUserComponent', () => {
     } as unknown as ActivatedRoute;
 
     // Only used for the value suggestions, which these specs do not exercise.
-    const mgmtService = jasmine.createSpyObj<ManagementService>('ManagementService', ['listUsers']);
-    mgmtService.listUsers.and.resolveTo({ resultList: [] } as any);
+    const suggestionService = jasmine.createSpyObj<UserSuggestionService>('UserSuggestionService', ['suggest']);
+    suggestionService.suggest.and.resolveTo([]);
 
     await TestBed.configureTestingModule({
       declarations: [FilterUserComponent],
       providers: [
         { provide: Router, useValue: router },
         { provide: ActivatedRoute, useValue: route },
-        { provide: ManagementService, useValue: mgmtService },
+        { provide: UserSuggestionService, useValue: suggestionService },
       ],
     })
       .overrideComponent(FilterUserComponent, { set: { template: '' } })
