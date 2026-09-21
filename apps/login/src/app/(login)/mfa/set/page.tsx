@@ -7,7 +7,6 @@ import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceConfig } from "@/lib/service-url";
 import { hasVerifiedPrimaryFactor, loadMostRecentSession } from "@/lib/session";
-import { getUserAvatarUrl } from "@/lib/user-avatar";
 import {
   getBrandingSettings,
   getLoginSettings,
@@ -56,6 +55,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           authMethods: methods.authMethodTypes ?? [],
           phoneVerified: humanUser?.phone?.isVerified ?? false,
           emailVerified: humanUser?.email?.isVerified ?? false,
+          avatarUrl: humanUser?.profile?.avatarUrl,
           expirationDate: session?.expirationDate,
         };
       });
@@ -144,7 +144,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           <UserAvatar
             loginName={loginName ?? sessionWithData.factors?.user?.loginName}
             displayName={sessionWithData.factors?.user?.displayName}
-            imageUrl={await getUserAvatarUrl({ serviceConfig, userId: sessionWithData.factors?.user?.id })}
+            imageUrl={sessionWithData.avatarUrl}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
