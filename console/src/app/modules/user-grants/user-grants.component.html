@@ -22,7 +22,9 @@
     </button>
   }
 
-  @if (!selection.hasValue()) {
+  <!-- Hidden for AUTHUSER: listMyUserGrants takes no queries, so search and filter
+       would render but never affect the result. -->
+  @if (!selection.hasValue() && context !== UserGrantContext.AUTHUSER) {
     <!-- Single projected node, see the comment in user-table.component.html -->
     <div actions class="cnsl-table-toolbar">
       <cnsl-table-search

@@ -707,7 +707,7 @@
     "USERNAME": "User Name",
     "PROJECTNAME": "Project Name",
     "ROLEKEY": "Role",
-    "WITHGRANTED": "Include granted projects",
+    "WITHGRANTED": "Include project grants",
     "RESOURCEOWNER": "Resource Owner",
     "METHODS": {
       "5": "contains",
@@ -2854,7 +2854,7 @@
   "GRANTS": {
     "TITLE": "Role Assignments",
     "DESC": "These are all the role assignments on your organization.",
-    "SEARCHPLACEHOLDER": "Search user by display name",
+    "SEARCHPLACEHOLDER": "Search user",
     "DELETE": "Delete Role Assignment",
     "EMPTY": "No role assignment found",
     "ADD": "Create Role Assignment",

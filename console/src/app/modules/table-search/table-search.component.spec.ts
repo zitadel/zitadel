@@ -16,7 +16,12 @@ describe('TableSearchComponent', () => {
     input.dispatchEvent(new Event('input'));
   }
 
-  async function setup(queryParams: Record<string, string> = {}): Promise<void> {
+  /**
+   * Configures the TestBed. Kept out of fakeAsync: zone.js restores the real zone once the
+   * callback returns, so anything after an await would run outside the fake zone and
+   * tick() would throw.
+   */
+  async function configure(queryParams: Record<string, string> = {}): Promise<void> {
     router = jasmine.createSpyObj<Router>('Router', ['navigate']);
     router.navigate.and.resolveTo(true);
 
@@ -37,7 +42,10 @@ describe('TableSearchComponent', () => {
         },
       })
       .compileComponents();
+  }
 
+  /** Synchronous, so it can be called from inside a fakeAsync callback. */
+  function create(): void {
     fixture = TestBed.createComponent(TableSearchComponent);
     component = fixture.componentInstance;
 
@@ -47,80 +55,91 @@ describe('TableSearchComponent', () => {
     fixture.detectChanges();
   }
 
-  afterEach(() => {
-    TestBed.resetTestingModule();
+  describe('without a term in the url', () => {
+    beforeEach(async () => {
+      await configure();
+    });
+
+    it('should create', () => {
+      create();
+      expect(component).toBeTruthy();
+    });
+
+    it('does not emit on init', () => {
+      create();
+      expect(emitted).toEqual([]);
+    });
+
+    it('debounces typing into a single emission', fakeAsync(() => {
+      create();
+
+      type('m');
+      type('me');
+      type('mei');
+      tick(299);
+      expect(emitted).toEqual([]);
+
+      tick(1);
+      expect(emitted).toEqual(['mei']);
+    }));
+
+    it('trims the term before emitting', fakeAsync(() => {
+      create();
+
+      type('  meier  ');
+      tick(300);
+
+      expect(emitted).toEqual(['meier']);
+    }));
+
+    it('does not emit again when the trimmed term did not change', fakeAsync(() => {
+      create();
+
+      type('meier');
+      tick(300);
+      type('meier ');
+      tick(300);
+
+      expect(emitted).toEqual(['meier']);
+    }));
+
+    it('mirrors the term into the q query parameter', fakeAsync(() => {
+      create();
+
+      type('meier');
+      tick(300);
+
+      expect(router.navigate).toHaveBeenCalledWith(
+        [],
+        jasmine.objectContaining({ queryParams: { q: 'meier' }, queryParamsHandling: 'merge' }),
+      );
+    }));
+
+    it('drops the q parameter instead of leaving it empty', fakeAsync(() => {
+      create();
+
+      type('meier');
+      tick(300);
+      type('');
+      tick(300);
+
+      expect(router.navigate).toHaveBeenCalledWith([], jasmine.objectContaining({ queryParams: { q: undefined } }));
+    }));
   });
 
-  it('should create', async () => {
-    await setup();
-    expect(component).toBeTruthy();
+  describe('with a term in the url', () => {
+    it('restores and emits it on init', async () => {
+      await configure({ q: 'meier' });
+      create();
+
+      expect(emitted).toEqual(['meier']);
+    });
+
+    it('caps it at the proto string limit', async () => {
+      await configure({ q: 'x'.repeat(250) });
+      create();
+
+      expect(emitted).toEqual(['x'.repeat(200)]);
+    });
   });
-
-  it('debounces typing into a single emission', fakeAsync(async () => {
-    await setup();
-
-    type('m');
-    type('me');
-    type('mei');
-    tick(299);
-    expect(emitted).toEqual([]);
-
-    tick(1);
-    expect(emitted).toEqual(['mei']);
-  }));
-
-  it('trims the term before emitting', fakeAsync(async () => {
-    await setup();
-
-    type('  meier  ');
-    tick(300);
-
-    expect(emitted).toEqual(['meier']);
-  }));
-
-  it('does not emit again when the trimmed term did not change', fakeAsync(async () => {
-    await setup();
-
-    type('meier');
-    tick(300);
-    type('meier ');
-    tick(300);
-
-    expect(emitted).toEqual(['meier']);
-  }));
-
-  it('mirrors the term into the q query parameter', fakeAsync(async () => {
-    await setup();
-
-    type('meier');
-    tick(300);
-
-    expect(router.navigate).toHaveBeenCalledWith(
-      [],
-      jasmine.objectContaining({ queryParams: { q: 'meier' }, queryParamsHandling: 'merge' }),
-    );
-  }));
-
-  it('drops the q parameter instead of leaving it empty', fakeAsync(async () => {
-    await setup();
-
-    type('meier');
-    tick(300);
-    type('');
-    tick(300);
-
-    expect(router.navigate).toHaveBeenCalledWith([], jasmine.objectContaining({ queryParams: { q: undefined } }));
-  }));
-
-  it('restores the term from the url on init', fakeAsync(async () => {
-    await setup({ q: 'meier' });
-
-    expect(emitted).toEqual(['meier']);
-  }));
-
-  it('does not emit on init when no term is in the url', fakeAsync(async () => {
-    await setup();
-
-    expect(emitted).toEqual([]);
-  }));
 });

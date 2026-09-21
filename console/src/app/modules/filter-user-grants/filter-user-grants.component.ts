@@ -65,6 +65,8 @@ export class FilterUserGrantsComponent extends FilterComponent implements OnInit
   }
 
   protected onSuggestionInput(subquery: SubQuery, event: Event): void {
+    // drop the previous field's values, they would briefly show under the new field
+    this.suggestions = [];
     this.suggestionSubQuery = subquery;
     this.suggest$.next({ subquery, value: (event.target as HTMLInputElement).value });
   }

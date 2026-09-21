@@ -5,6 +5,8 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, take } from 'rxjs/operators';
 
 const DEBOUNCE_MS = 300;
+/** Matches the max_len of the proto string queries this term is turned into. */
+const MAX_TERM_LENGTH = 200;
 
 /**
  * Free text search box for list pages. Emits a plain string and knows nothing about
@@ -32,7 +34,8 @@ export class TableSearchComponent implements OnInit {
     this.route.queryParamMap
       .pipe(
         take(1),
-        map((params) => params.get('q') ?? ''),
+        // the proto string fields cap at 200, and maxlength does not cover the URL
+        map((params) => (params.get('q') ?? '').slice(0, MAX_TERM_LENGTH)),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((term) => {

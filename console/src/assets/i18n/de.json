@@ -706,7 +706,7 @@
     "PRIMARYDOMAIN": "Organisationsdomäne",
     "PROJECTNAME": "Projektname",
     "ROLEKEY": "Rolle",
-    "WITHGRANTED": "Grant-Projekte einbeziehen",
+    "WITHGRANTED": "Projekt-Grants einbeziehen",
     "RESOURCEOWNER": "Ressourcenbesitzer",
     "METHODS": {
       "5": "beinhaltet",
@@ -2823,7 +2823,7 @@
   "GRANTS": {
     "TITLE": "Rollen-Zuweisungen",
     "DESC": "Dies sind alle Rollen-Zuweisungen deiner Organisation.",
-  "SEARCHPLACEHOLDER": "Benutzer suchen",
+    "SEARCHPLACEHOLDER": "Benutzer suchen",
     "DELETE": "Rollen-Zuweisung löschen",
     "EMPTY": "Keine Rollen-Zuweisung gefunden",
     "ADD": "Rollen-Zuweisung erstellen",
