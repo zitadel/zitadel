@@ -169,7 +169,21 @@ describe("Avatar Component", () => {
 
 describe("Avatar image errors", () => {
   beforeEach(cleanup);
-  afterEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
+
+  it("falls back when an image has already failed before hydration", () => {
+    vi.spyOn(HTMLImageElement.prototype, "complete", "get").mockReturnValue(true);
+    vi.spyOn(HTMLImageElement.prototype, "naturalWidth", "get").mockReturnValue(0);
+    const { queryByRole, getByText } = render(
+      <Avatar name="Alex Rivera" loginName="alex@example.com" imageUrl="https://idp.example.com/missing" />,
+    );
+    expect(queryByRole("img")).not.toBeInTheDocument();
+    expect(getByText("AR")).toBeInTheDocument();
+  });
+
   it("falls back to initials when the image cannot load and retries a changed URL", () => {
     const { getByRole, queryByRole, getByText, rerender } = render(
       <Avatar name="Alex Rivera" loginName="alex@example.com" imageUrl="https://idp.example.com/missing" />,
