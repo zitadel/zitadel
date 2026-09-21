@@ -7108,5 +7108,466 @@
       "tryagain": "Tentar Novamente",
       "couldNotContinueSession": "Não foi possível continuar a sessão — informações do usuário ausentes"
     }
+  },
+  "ca": {
+    "common": {
+      "back": "Enrere",
+      "title": "Inicia la sessió amb Zitadel"
+    },
+    "accounts": {
+      "title": "Comptes",
+      "description": "Seleccioneu el compte que voleu utilitzar.",
+      "addAnother": "Afegeix un altre compte",
+      "noResults": "No s'ha trobat cap compte",
+      "verified": "verificat",
+      "expired": "caducat"
+    },
+    "logout": {
+      "title": "Tanca la sessió",
+      "description": "Selecciona el compte que vols eliminar",
+      "noResults": "No s'ha trobat cap compte",
+      "clear": "Elimina la sessió",
+      "verifiedAt": "Última activitat: {time}",
+      "success": {
+        "title": "Sessió tancada correctament",
+        "description": "Has tancat la sessió correctament."
+      }
+    },
+    "loginname": {
+      "title": "Benvingut de nou!",
+      "description": "Introdueix les teves dades d'accés.",
+      "register": "Registra un usuari nou",
+      "submit": "Continua",
+      "labels": {
+        "loginname": "Nom d'inici de sessió",
+        "username": "Nom d'usuari",
+        "usernameOrPhoneNumber": "Nom d'usuari o número de telèfon",
+        "usernameOrEmail": "Nom d'usuari o correu electrònic"
+      },
+      "required": {
+        "loginName": "Aquest camp és obligatori"
+      },
+      "errors": {
+        "internalError": "S'ha produït un error intern",
+        "couldNotGetLoginSettings": "No s'han pogut obtenir els paràmetres d'inici de sessió",
+        "couldNotSearchUsers": "No s'han pogut cercar usuaris",
+        "couldNotGetDomain": "No s'ha pogut obtenir el domini",
+        "couldNotGetHost": "No s'ha pogut obtenir l'amfitrió",
+        "couldNotStartIDPFlow": "No s'ha pogut iniciar el flux de l'IdP",
+        "moreThanOneUserFound": "S'ha trobat més d'un usuari. Proporcioneu un identificador únic.",
+        "userNotFound": "Usuari no trobat al sistema",
+        "couldNotCreateSession": "No s'ha pogut crear la sessió per a l'usuari",
+        "initialUserNotSupported": "Usuari inicial no admès",
+        "localAuthenticationNotAllowed": "L'autenticació local no està permesa! Contacteu amb el vostre administrador per a més informació.",
+        "passkeysNotAllowed": "Les claus d'accés no estan permeses. Contacteu amb el vostre administrador per a més informació.",
+        "couldNotFindIdentityProvider": "No s'ha pogut trobar el proveïdor d'identitat.",
+        "userNotActive": "L'usuari no està actiu. Contacteu amb el vostre administrador per a més informació."
+      }
+    },
+    "zitadel": {
+      "errors": {
+        "errorOccured": "S'ha produït un error",
+        "multipleUsersFound": "S'han trobat diversos usuaris",
+        "userNotFound": "Usuari no trobat al sistema"
+      }
+    },
+    "password": {
+      "verify": {
+        "title": "Contrasenya",
+        "description": "Introdueix la teva contrasenya.",
+        "resetPassword": "Restableix la contrasenya",
+        "submit": "Continua",
+        "labels": {
+          "password": "Contrasenya"
+        },
+        "required": {
+          "password": "Aquest camp és obligatori"
+        },
+        "errors": {
+          "couldNotVerifyPassword": "No s'ha pogut verificar la contrasenya",
+          "couldNotResetPassword": "No s'ha pogut restablir la contrasenya"
+        },
+        "info": {
+          "passwordResetSent": "S'ha restablert la contrasenya. Comproveu el vostre correu electrònic"
+        }
+      },
+      "set": {
+        "title": "Estableix la contrasenya",
+        "description": "Estableix la contrasenya per al teu compte",
+        "codeSent": "S'ha enviat un codi nou a la vostra adreça de correu electrònic.",
+        "noCodeReceived": "No has rebut cap codi?",
+        "resend": "Torna a enviar el codi",
+        "submit": "Continua",
+        "labels": {
+          "code": "Codi",
+          "newPassword": "Contrasenya nova",
+          "confirmPassword": "Confirma la contrasenya"
+        },
+        "required": {
+          "code": "Aquest camp és obligatori",
+          "newPassword": "Has de proporcionar una contrasenya!",
+          "confirmPassword": "Aquest camp és obligatori"
+        },
+        "errors": {
+          "couldNotSetPassword": "No s'ha pogut establir la contrasenya",
+          "couldNotResetPassword": "No s'ha pogut restablir la contrasenya",
+          "couldNotVerifyPassword": "No s'ha pogut verificar la contrasenya"
+        }
+      },
+      "change": {
+        "title": "Canvia la contrasenya",
+        "description": "Estableix la contrasenya per al teu compte",
+        "submit": "Continua",
+        "labels": {
+          "currentPassword": "Contrasenya actual",
+          "newPassword": "Contrasenya nova",
+          "confirmPassword": "Confirma la contrasenya"
+        },
+        "required": {
+          "currentPassword": "Has de proporcionar la teva contrasenya actual!",
+          "newPassword": "Has de proporcionar una contrasenya nova!",
+          "confirmPassword": "Aquest camp és obligatori"
+        },
+        "errors": {
+          "currentPasswordInvalid": "La contrasenya actual és incorrecta.",
+          "couldNotChangePassword": "No s'ha pogut canviar la contrasenya",
+          "couldNotVerifyPassword": "No s'ha pogut verificar la contrasenya",
+          "unknownError": "Error desconegut"
+        }
+      },
+      "complexity": {
+        "length": "Ha de tenir com a mínim {minLength} caràcters.",
+        "hasSymbol": "Ha d'incloure un símbol.",
+        "hasNumber": "Ha d'incloure un número.",
+        "hasUppercase": "Ha d'incloure una lletra majúscula.",
+        "hasLowercase": "Ha d'incloure una lletra minúscula.",
+        "equals": "La confirmació de la contrasenya coincideix.",
+        "matches": "Coincideix",
+        "doesNotMatch": "No coincideix"
+      },
+      "errors": {
+        "noHostFound": "No s'ha trobat l'amfitrió",
+        "couldNotSendResetLink": "No s'ha pogut enviar l'enllaç per restablir la contrasenya",
+        "couldNotCreateSessionForUser": "No s'ha pogut crear la sessió per a l'usuari",
+        "couldNotVerifyPassword": "No s'ha pogut verificar la contrasenya",
+        "failedToAuthenticate": "Error en autenticar. Has fet {failedAttempts} de {maxPasswordAttempts} intents de contrasenya.{lockoutMessage}",
+        "failedToAuthenticateNoLimit": "Error en autenticar.",
+        "accountLockedContactAdmin": " Contacteu amb el vostre administrador per desbloquejar el vostre compte",
+        "userNotFound": "Usuari no trobat al sistema",
+        "initialUserNotSupported": "Usuari inicial no admès",
+        "userInitialStateNotSupported": "L'estat inicial de l'usuari no és compatible",
+        "codeOrVerificationRequired": "Cal proporcionar un codi o tenir una verificació d'usuari vàlida",
+        "verificationRequired": "Cal fer la verificació de l'usuari",
+        "couldNotLoadSession": "No s'ha pogut carregar la sessió",
+        "couldNotLoadAuthMethods": "No s'han pogut carregar els mètodes d'autenticació",
+        "failedPrecondition": "Precondició fallida",
+        "sessionNotValid": "La sessió no és vàlida",
+        "passwordVerificationMissing": "Falta la verificació de la contrasenya.",
+        "passwordVerificationTooOld": "La verificació de la contrasenya és massa antiga. Verifiqueu la vostra contrasenya de nou."
+      }
+    },
+    "idp": {
+      "title": "Inicia la sessió amb SSO",
+      "description": "Selecciona un dels proveïdors següents per iniciar la sessió",
+      "orSignInWith": "o inicia la sessió amb",
+      "signInWithApple": "Inicia la sessió amb Apple",
+      "signInWithGoogle": "Inicia la sessió amb Google",
+      "signInWithAzureAD": "Inicia la sessió amb AzureAD",
+      "signInWithGithub": "Inicia la sessió amb GitHub",
+      "signInWithGitlab": "Inicia la sessió amb GitLab",
+      "loginError": {
+        "title": "Error d'inici de sessió",
+        "description": "S'ha produït un error en intentar iniciar la sessió."
+      },
+      "linkingError": {
+        "title": "Error en vincular el compte",
+        "description": "S'ha produït un error en intentar vincular el teu compte."
+      },
+      "completeRegister": {
+        "title": "Completa el registre",
+        "description": "Per completar el registre, has d'establir una contrasenya."
+      },
+      "accountNotFound": {
+        "title": "Compte no trobat",
+        "description": "No hem pogut trobar cap compte associat a les teves credencials del proveïdor d'identitat.",
+        "info": "No s'ha trobat cap compte existent. Inicia la sessió amb un compte existent o contacta amb el teu administrador per obtenir assistència.",
+        "backToLogin": "Torna a l'inici de sessió"
+      },
+      "registrationFailed": {
+        "title": "Registre no disponible",
+        "description": "No hem pogut completar el procés de registre.",
+        "info": "No s'ha pogut determinar l'organització per al registre. Contacta amb el teu administrador per obtenir assistència.",
+        "backToLogin": "Torna a l'inici de sessió"
+      },
+      "processing": {
+        "message": "S'està processant l'autenticació...",
+        "noRedirect": "No s'ha rebut cap redirecció ni error del servidor",
+        "unexpectedError": "S'ha produït un error inesperat"
+      },
+      "errors": {
+        "missingParameters": "Falten paràmetres obligatoris",
+        "missingIdpInfo": "Falta informació de l'IdP",
+        "idpNotFound": "Proveïdor d'identitat no trobat",
+        "linkingNotAllowed": "La vinculació no està permesa per a aquest proveïdor d'identitat",
+        "linkingFailed": "Error en vincular el proveïdor d'identitat amb el compte",
+        "autoLinkingFailed": "Error en vincular automàticament el compte",
+        "userCreationFailed": "Error en crear el compte d'usuari",
+        "orgResolutionFailed": "No s'ha pogut determinar l'organització per al registre",
+        "sessionCreationFailed": "No s'ha pogut crear la sessió ni determinar la redirecció",
+        "unknownError": "S'ha produït un error desconegut"
+      }
+    },
+    "ldap": {
+      "title": "Inicia la sessió amb LDAP",
+      "description": "Introdueix les teves credencials LDAP.",
+      "submit": "Continua",
+      "labels": {
+        "username": "Nom d'usuari",
+        "password": "Contrasenya"
+      },
+      "required": {
+        "username": "Aquest camp és obligatori",
+        "password": "Aquest camp és obligatori"
+      }
+    },
+    "mfa": {
+      "verify": {
+        "title": "Verifica la teva identitat",
+        "description": "Tria un dels factors següents.",
+        "noResults": "No hi ha factors secundaris disponibles per configurar."
+      },
+      "set": {
+        "title": "Configura l'autenticació de 2 factors",
+        "description": "Tria un dels factors secundaris següents.",
+        "skip": "Omet"
+      }
+    },
+    "otp": {
+      "verify": {
+        "title": "Verifica l'autenticació de 2 factors",
+        "totpDescription": "Introdueix el codi de la teva aplicació d'autenticació.",
+        "smsDescription": "Introdueix el codi que has rebut per SMS.",
+        "emailDescription": "Introdueix el codi que has rebut per correu electrònic.",
+        "noCodeReceived": "No has rebut cap codi?",
+        "resendCode": "Torna a enviar el codi",
+        "submit": "Continua",
+        "labels": {
+          "code": "Codi"
+        },
+        "required": {
+          "code": "Aquest camp és obligatori"
+        }
+      },
+      "set": {
+        "title": "Configura l'autenticació de 2 factors",
+        "totpDescription": "Escaneja el codi QR amb la teva aplicació d'autenticació.",
+        "smsDescription": "Introdueix el teu número de telèfon per rebre un codi per SMS.",
+        "emailDescription": "Introdueix la teva adreça de correu electrònic per rebre un codi per correu electrònic.",
+        "totpRegisterDescription": "Escaneja el codi QR o navega manualment a l'URL.",
+        "submit": "Continua",
+        "labels": {
+          "code": "Codi"
+        },
+        "required": {
+          "code": "Aquest camp és obligatori"
+        }
+      }
+    },
+    "passkey": {
+      "verify": {
+        "title": "Autentica't amb una clau d'accés",
+        "description": "El teu dispositiu et demanarà l'empremta digital, el rostre o el bloqueig de pantalla",
+        "usePassword": "Utilitza la contrasenya",
+        "submit": "Continua",
+        "errors": {
+          "couldNotRequestChallenge": "No s'ha pogut sol·licitar el repte de la clau d'accés",
+          "couldNotVerifyPasskey": "No s'ha pogut verificar la clau d'accés",
+          "noResponseReceived": "La verificació de la clau d'accés ha fallat: no s'ha rebut cap resposta",
+          "noRedirectProvided": "La verificació de la clau d'accés s'ha completat però no s'ha proporcionat cap redirecció",
+          "couldNotRetrievePasskey": "S'ha produït un error en recuperar la clau d'accés",
+          "verificationCancelled": "S'ha cancel·lat la verificació de la clau d'accés",
+          "verificationFailed": "S'ha produït un error durant la verificació de la clau d'accés",
+          "couldNotFindSession": "No s'ha pogut trobar la sessió",
+          "couldNotUpdateSession": "No s'ha pogut actualitzar la sessió",
+          "userNotFound": "Usuari no trobat al sistema",
+          "couldNotDetermineRedirect": "No s'ha pogut determinar l'URL de redirecció després de la verificació de la clau d'accés"
+        }
+      },
+      "set": {
+        "title": "Configura una clau d'accés",
+        "description": "El teu dispositiu et demanarà l'empremta digital, el rostre o el bloqueig de pantalla",
+        "info": {
+          "description": "Una clau d'accés és un mètode d'autenticació en un dispositiu com la teva empremta digital, Apple FaceID o similar.",
+          "link": "Autenticació sense contrasenya"
+        },
+        "skip": "Omet",
+        "submit": "Continua"
+      }
+    },
+    "u2f": {
+      "verify": {
+        "title": "Verifica l'autenticació de 2 factors",
+        "description": "Verifica el teu compte amb el teu dispositiu."
+      },
+      "set": {
+        "title": "Configura l'autenticació de 2 factors",
+        "description": "Configura un dispositiu com a segon factor.",
+        "submit": "Continua"
+      }
+    },
+    "register": {
+      "methods": {
+        "passkey": "Clau d'accés",
+        "password": "Contrasenya"
+      },
+      "disabled": {
+        "title": "Registre desactivat",
+        "description": "El registre està desactivat en aquest moment."
+      },
+      "missingdata": {
+        "title": "Dades que falten",
+        "description": "No s'han proporcionat prou dades per al registre."
+      },
+      "title": "Registra't",
+      "description": "Crea el teu compte de Zitadel.",
+      "noMethodAvailableWarning": "No hi ha mètodes d'autenticació disponibles. Contacta amb el teu administrador.",
+      "selectMethod": "Selecciona el mètode amb el qual vols autenticar-te",
+      "agreeTo": "Per registrar-te has d'acceptar els termes i condicions",
+      "termsOfService": "Termes del servei",
+      "privacyPolicy": "Política de privacitat",
+      "submit": "Continua",
+      "password": {
+        "title": "Estableix la contrasenya",
+        "description": "Estableix la contrasenya per al teu compte",
+        "submit": "Continua",
+        "labels": {
+          "password": "Contrasenya",
+          "confirmPassword": "Confirma la contrasenya"
+        },
+        "required": {
+          "password": "Has de proporcionar una contrasenya!",
+          "confirmPassword": "Aquest camp és obligatori"
+        }
+      },
+      "labels": {
+        "firstname": "Nom",
+        "lastname": "Cognoms",
+        "email": "Correu electrònic"
+      },
+      "required": {
+        "firstname": "Aquest camp és obligatori",
+        "lastname": "Aquest camp és obligatori",
+        "email": "Aquest camp és obligatori"
+      },
+      "errors": {
+        "couldNotCreateUser": "No s'ha pogut crear l'usuari",
+        "couldNotCreateSession": "No s'ha pogut crear la sessió",
+        "userNotFound": "Usuari no trobat al sistema",
+        "couldNotLinkIDP": "No s'ha pogut vincular l'IdP a l'usuari",
+        "couldNotRegisterUser": "No s'ha pogut registrar l'usuari"
+      }
+    },
+    "invite": {
+      "title": "Convida un usuari",
+      "description": "Introdueix el correu electrònic de l'usuari que vols convidar.",
+      "info": "L'usuari rebrà un correu electrònic amb un enllaç per completar el registre.",
+      "notAllowed": "No tens permís per convidar usuaris.",
+      "submit": "Convida l'usuari",
+      "success": {
+        "title": "Usuari convidat!",
+        "description": "S'ha convidat l'usuari.",
+        "verified": "S'ha convidat l'usuari i ja ha verificat el seu correu electrònic.",
+        "notVerifiedYet": "S'ha convidat l'usuari. Rebrà un correu electrònic amb més instruccions.",
+        "submit": "Convida un altre usuari"
+      }
+    },
+    "signedin": {
+      "title": "Benvingut, {user}!",
+      "description": "Has iniciat la sessió.",
+      "continue": "Continua",
+      "error": {
+        "title": "Error",
+        "description": "S'ha produït un error en iniciar la sessió."
+      }
+    },
+    "verify": {
+      "userIdMissing": "No s'ha proporcionat cap userId!",
+      "successTitle": "Usuari verificat",
+      "successDescription": "L'usuari s'ha verificat correctament.",
+      "successContinue": "Continua",
+      "setupAuthenticator": "Configura l'autenticador",
+      "verify": {
+        "title": "Verifica l'usuari",
+        "description": "Introdueix el codi proporcionat al correu electrònic de verificació.",
+        "noCodeReceived": "No has rebut cap codi?",
+        "resendCode": "Torna a enviar el codi",
+        "codeSent": "S'ha enviat un codi a la teva adreça de correu electrònic.",
+        "submit": "Continua",
+        "labels": {
+          "code": "Codi"
+        },
+        "required": {
+          "code": "Aquest camp és obligatori"
+        }
+      },
+      "errors": {
+        "couldNotResendEmail": "No s'ha pogut tornar a enviar el correu electrònic",
+        "couldNotVerifyUser": "No s'ha pogut verificar l'usuari",
+        "couldNotVerifyInvite": "No s'ha pogut verificar la invitació",
+        "couldNotVerifyEmail": "No s'ha pogut verificar el correu electrònic",
+        "couldNotVerify": "No s'ha pogut verificar",
+        "couldNotLoadUser": "No s'ha pogut carregar l'usuari",
+        "couldNotLoadAuthenticators": "No s'han pogut carregar els autenticadors possibles",
+        "couldNotCreateSession": "No s'ha pogut crear la sessió",
+        "noHostFound": "No s'ha trobat l'amfitrió",
+        "userAlreadyVerified": "L'usuari ja està verificat!",
+        "couldNotResendInvite": "No s'ha pogut tornar a enviar la invitació",
+        "inviteSendFailed": "No s'ha pogut enviar el correu d'invitació",
+        "emailSendFailed": "No s'ha pogut enviar el correu electrònic de verificació",
+        "contextMissing": "S'ha produït un error. Torneu-ho a provar."
+      }
+    },
+    "authenticator": {
+      "title": "Selecciona el mètode d'autenticació",
+      "description": "Selecciona el mètode amb el qual vols autenticar-te",
+      "noMethodsAvailable": "No hi ha mètodes d'autenticació disponibles",
+      "allSetup": "Ja has configurat un autenticador!",
+      "linkWithIDP": "o vincula'l amb un proveïdor d'identitat"
+    },
+    "device": {
+      "usercode": {
+        "title": "Codi del dispositiu",
+        "description": "Introdueix el codi.",
+        "submit": "Continua",
+        "labels": {
+          "code": "Codi"
+        },
+        "required": {
+          "code": "Aquest camp és obligatori"
+        }
+      },
+      "request": {
+        "title": "{appName} es vol connectar:",
+        "description": "{appName} tindrà accés a:",
+        "disclaimer": "Si fas clic a Permet, autoritzes {appName} i Zitadel a utilitzar la teva informació d'acord amb els seus respectius termes del servei i polítiques de privacitat. Pots revocar aquest accés en qualsevol moment.",
+        "submit": "Permet",
+        "deny": "Denega"
+      },
+      "scope": {
+        "openid": "Verifica la teva identitat.",
+        "email": "Accedeix a la teva adreça de correu electrònic.",
+        "profile": "Accedeix a la informació completa del teu perfil.",
+        "offline_access": "Permet l'accés sense connexió al teu compte."
+      }
+    },
+    "error": {
+      "noUserCode": "No s'ha proporcionat cap codi d'usuari!",
+      "noDeviceRequest": "No s'ha trobat cap sol·licitud de dispositiu.",
+      "unknownContext": "No s'ha pogut obtenir el context de l'usuari. Assegura't d'introduir primer el nom d'usuari o de proporcionar un loginName com a paràmetre de cerca.",
+      "sessionExpired": "La teva sessió actual ha caducat. Inicia la sessió de nou.",
+      "failedLoading": "No s'han pogut carregar les dades. Torna-ho a provar.",
+      "tryagain": "Torna-ho a provar",
+      "couldNotContinueSession": "No s'ha pogut continuar la sessió: falta informació de l'usuari"
+    }
   }
 }
