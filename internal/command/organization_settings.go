@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -127,14 +128,14 @@ func (c *Commands) getOrganizationScopedUsernamesWriteModelByID(ctx context.Cont
 	return wm, nil
 }
 
-func (c *Commands) getOrganizationScopedUsernames(ctx context.Context, id string) ([]string, error) {
+func (c *Commands) getOrganizationScopedUsernames(ctx context.Context, id string) ([]user.UsernameChange, error) {
 	wm, err := c.getOrganizationScopedUsernamesWriteModelByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-	usernames := make([]string, len(wm.Users))
-	for i, user := range wm.Users {
-		usernames[i] = user.username
+	usernames := make([]user.UsernameChange, len(wm.Users))
+	for i, u := range wm.Users {
+		usernames[i] = user.UsernameChange{Username: u.username, UserID: u.id}
 	}
 	return usernames, nil
 }
