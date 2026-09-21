@@ -22,8 +22,11 @@
   // 360px fits the longest placeholder ("Benutzer nach Anzeigename suchen").
   cnsl-table-search {
     display: block;
-    flex: 0 1 360px;
-    min-width: 0;
+    // A definite width rather than a flex basis, so the box keeps its size even if the
+    // surrounding toolbar ever stops being a flex container.
+    flex: 0 0 auto;
+    width: 360px;
+    max-width: 100%;
   }
 
   .cnsl-table-search {
@@ -51,6 +54,7 @@
 
     .search-input {
       flex: 1 1 auto;
+      width: 100%;
       min-width: 0;
       padding: 0.6rem 0.5rem;
       border: none;
