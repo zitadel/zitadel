@@ -61,16 +61,18 @@
         }
       </ng-template>
       @if (!selection.hasValue()) {
-        <cnsl-table-search
-          actions
-          [placeholder]="'USER.TABLE.SEARCHPLACEHOLDER' | translate"
-          (searchChanged)="onSearchChanged($event)"
-        ></cnsl-table-search>
-        <cnsl-filter-user
-          actions
-          (filterChanged)="onFilterChanged($any($event))"
-          (filterOpen)="filterOpen = $event"
-        ></cnsl-filter-user>
+        <!-- Single projected node: Angular does not reliably project multiple root nodes
+             of an @if block into a named slot, which pushed these below the header row. -->
+        <div actions class="cnsl-table-toolbar">
+          <cnsl-table-search
+            [placeholder]="'USER.TABLE.SEARCHPLACEHOLDER' | translate"
+            (searchChanged)="onSearchChanged($event)"
+          ></cnsl-table-search>
+          <cnsl-filter-user
+            (filterChanged)="onFilterChanged($any($event))"
+            (filterOpen)="filterOpen = $event"
+          ></cnsl-filter-user>
+        </div>
       }
       <ng-template cnslHasRole [hasRole]="['user.write']" actions>
         @if (!selection.hasValue()) {

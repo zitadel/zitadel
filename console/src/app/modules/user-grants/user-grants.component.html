@@ -23,16 +23,17 @@
   }
 
   @if (!selection.hasValue()) {
-    <cnsl-table-search
-      actions
-      [placeholder]="'GRANTS.SEARCHPLACEHOLDER' | translate"
-      (searchChanged)="onSearchChanged($event)"
-    ></cnsl-table-search>
-    <cnsl-filter-user-grants
-      actions
-      (filterChanged)="applySearchQuery($any($event))"
-      (filterOpen)="filterOpen = $event"
-    ></cnsl-filter-user-grants>
+    <!-- Single projected node, see the comment in user-table.component.html -->
+    <div actions class="cnsl-table-toolbar">
+      <cnsl-table-search
+        [placeholder]="'GRANTS.SEARCHPLACEHOLDER' | translate"
+        (searchChanged)="onSearchChanged($event)"
+      ></cnsl-table-search>
+      <cnsl-filter-user-grants
+        (filterChanged)="applySearchQuery($any($event))"
+        (filterOpen)="filterOpen = $event"
+      ></cnsl-filter-user-grants>
+    </div>
   }
 
   @if (disableWrite === false && selection.hasValue() === false && routerLink) {

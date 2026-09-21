@@ -9,12 +9,22 @@
   $secondary-text-color: map-get($foreground, secondary-text);
   $border-color: rgba(#8795a1, 0.2);
 
+  // Keeps the search box, the filter button and the create button on one toolbar row.
+  .cnsl-table-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
   .cnsl-table-search {
     display: flex;
     align-items: center;
     box-sizing: border-box;
-    width: 100%;
-    max-width: 420px;
+    // A definite basis, not width 100%: as a flex item the latter made the box claim the
+    // whole row and pushed the filter button onto the next line.
+    flex: 0 1 260px;
+    min-width: 0;
     padding: 0 0.5rem;
     border: 1px solid $border-color;
     border-radius: 0.5rem;
