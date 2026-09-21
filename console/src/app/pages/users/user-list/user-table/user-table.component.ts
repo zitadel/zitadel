@@ -177,7 +177,6 @@ export class UserTableComponent implements OnInit {
       .subscribe(() => this.refresh$.next(true));
   }
 
-  /** Keeps existing rows alive across reloads instead of rebuilding avatars and cells. */
   protected trackByUserId(_index: number, user: User): string {
     return user.userId;
   }
@@ -193,7 +192,7 @@ export class UserTableComponent implements OnInit {
   }
 
   private goToFirstPage(): void {
-    // Keep the paginator's own label in sync with the offset we are about to request.
+    // keeps the paginator label in sync with the offset we are about to request
     this.paginator$.pipe(take(1), takeUntilDestroyed(this.destroyRef)).subscribe((paginator) => {
       paginator.pageIndex = 0;
     });
@@ -285,7 +284,6 @@ export class UserTableComponent implements OnInit {
   }
 
   /**
-   * Turns the free text term into a single OR query across the columns the list shows.
    * Display name and email are human only columns in the query layer, so including them
    * on the machine tab would produce conditions that can never match.
    */

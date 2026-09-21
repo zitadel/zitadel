@@ -39,10 +39,7 @@ export class FilterUserGrantsComponent extends FilterComponent implements OnInit
 
   private readonly suggestionService = inject(UserSuggestionService);
 
-  /**
-   * Value suggestions for the user related text filters. Role keys are deliberately left
-   * out: suggesting them needs a project, and this list spans every project at once.
-   */
+  /** Role keys are left out: suggesting them needs a project, this list spans all. */
   protected suggestions: string[] = [];
   private suggestionSubQuery: SubQuery | undefined;
   private readonly suggest$ = new Subject<{ subquery: SubQuery; value: string }>();
@@ -225,8 +222,7 @@ export class FilterUserGrantsComponent extends FilterComponent implements OnInit
           break;
 
         case SubQuery.WITHGRANTED:
-          // A plain toggle: the API only knows "include grants of granted projects",
-          // there is no value to type and nothing to compare against.
+          // a plain toggle, the API takes a bool with nothing to compare against
           const wgq = new UserGrantWithGrantedQuery();
           wgq.setWithGranted(true);
 
@@ -362,10 +358,7 @@ export class FilterUserGrantsComponent extends FilterComponent implements OnInit
     this.filterOpen.emit(false);
   }
 
-  /**
-   * Emits only queries that carry a value. Ticking a checkbox creates the query with an
-   * empty string, which the API rejects because text queries need at least one character.
-   */
+  /** Ticking a checkbox creates the query with an empty string, which the API rejects. */
   private emitQueries(): void {
     this.filterChanged.emit(this.activeQueries);
   }

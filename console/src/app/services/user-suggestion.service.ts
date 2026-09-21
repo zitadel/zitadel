@@ -12,14 +12,11 @@ import { ManagementService } from './mgmt.service';
 
 export type SuggestionField = 'displayName' | 'userName' | 'email';
 
-/** Kept small: the list is a hint while typing, not a browsable result set. */
 const SUGGESTION_LIMIT = 10;
 
 /**
- * Supplies existing field values for the list filters.
- *
- * Typing an exact match by hand is close to impossible with the "equals" method, so the
- * filter inputs offer what is actually stored while still accepting free text.
+ * Supplies existing field values for the list filters, so the "equals" method does not
+ * require guessing a stored value. Free text stays possible.
  */
 @Injectable({
   providedIn: 'root',

@@ -25,11 +25,7 @@ export class PaginatorComponent {
   @Input() public hidePagination: boolean = false;
   @Input() public showMoreButton: boolean = false;
   @Input() public disableShowMore: boolean | null = false;
-  /**
-   * When set, the selected page size is remembered under this key across reloads.
-   * The hosting table has to read the same key for its initial page size, otherwise
-   * the first request would still use the hardcoded default.
-   */
+  /** The hosting table has to read the same key for its initial page size. */
   @Input() public persistKey?: string;
   @Output() public moreRequested: EventEmitter<void> = new EventEmitter();
   @Output() public page: EventEmitter<PageEvent> = new EventEmitter();
@@ -58,17 +54,15 @@ export class PaginatorComponent {
   }
 
   get nextPossible(): boolean {
-    // Comparing against length / pageSize used to leave "next" enabled on the last page
-    // whenever length was an exact multiple of pageSize, leading to an empty page.
     return (this.pageIndex + 1) * this.pageSize < this.length;
   }
 
-  /** Zero based offset of the first row on the current page, used for requests. */
+  /** Zero based, used for request offsets. */
   get startIndex(): number {
     return this.pageIndex * this.pageSize;
   }
 
-  /** One based position of the first row on the current page, used for display. */
+  /** One based, used for the "x - y" label. */
   get displayStartIndex(): number {
     return this.length === 0 ? 0 : this.startIndex + 1;
   }

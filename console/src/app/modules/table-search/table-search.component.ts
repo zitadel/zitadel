@@ -7,14 +7,9 @@ import { debounceTime, distinctUntilChanged, map, take } from 'rxjs/operators';
 const DEBOUNCE_MS = 300;
 
 /**
- * Free text search box for list pages.
- *
- * Deliberately knows nothing about protobuf queries: it emits a plain string and lets the
- * hosting table decide how to translate that into an API request. That is what allows the
- * same component to serve the v2 user list and the v1 user grant list.
- *
- * The current term is mirrored into the `q` query parameter so reloads and shared links
- * keep working, matching how cnsl-filter persists its own state.
+ * Free text search box for list pages. Emits a plain string and knows nothing about
+ * protobuf, which lets the same component serve the v2 user list and the v1 grant list.
+ * The term is mirrored into the `q` query parameter so reloads and shared links work.
  */
 @Component({
   selector: 'cnsl-table-search',

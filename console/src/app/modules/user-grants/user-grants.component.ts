@@ -154,11 +154,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     this.loadGrantsPage(type);
   }
 
-  /**
-   * Without this the table tears down and rebuilds every row on each load, which is
-   * noticeable at larger page sizes because each row carries an avatar, a chip per role
-   * and an actions menu. Auth and management grants name the identifier differently.
-   */
+  /** Auth and management grants name the identifier differently. */
   public trackByGrantId(_index: number, grant: UserGrantAsObject): string {
     return 'id' in grant ? grant.id : grant.grantId;
   }
@@ -187,10 +183,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     );
   }
 
-  /**
-   * The v1 management API has no OR filter, so the search box can only match one column.
-   * Display name is the one the list actually renders in the user column.
-   */
+  /** The v1 API has no OR filter, so the search box can only match one column. */
   private buildQueries(): UserGrantQuery[] {
     const queries = [...this.filterQueries];
 
@@ -332,8 +325,8 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   }
 
   public changePage(_event?: PageEvent): void {
-    // The paginator updates its own pageIndex/pageSize before emitting, so reading them
-    // back keeps paging, filtering and searching on a single code path.
+    // The paginator updates its own state before emitting, so reading it back keeps
+    // paging, filtering and searching on a single code path.
     this.loadGrantsPage(this.type);
   }
 

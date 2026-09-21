@@ -44,11 +44,7 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
   ];
   private readonly suggestionService = inject(UserSuggestionService);
 
-  /**
-   * Value suggestions for the text filters. Typing an exact match by hand is close to
-   * impossible with the "equals" method, so the field offers existing values while
-   * still accepting free text for the "contains" and "ends with" methods.
-   */
+  /** Existing values offered while typing, so the "equals" method becomes usable. */
   protected suggestions: string[] = [];
   private suggestionSubQuery: SubQuery | undefined;
   private readonly suggest$ = new Subject<{ subquery: SubQuery; value: string }>();
@@ -312,12 +308,9 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
   }
 
   /**
-   * Emits only queries that carry a value.
-   *
-   * Ticking a checkbox creates the query with an empty string, but the API rejects text
-   * queries shorter than one character. Sending those produced an "invalid argument"
-   * toast and, worse, persisted a broken filter in the URL that failed again on reload.
-   * The incomplete query stays in the local list so its input keeps rendering.
+   * Ticking a checkbox creates the query with an empty string, which the API rejects and
+   * which used to end up in the URL. The query stays in the local list so its input keeps
+   * rendering, it is only excluded from the request.
    */
   private emitQueries(): void {
     this.filterChanged.emit(this.searchQueries.filter((query) => FilterUserComponent.hasValue(query)));

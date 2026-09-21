@@ -4,11 +4,8 @@ import { StorageLocation, StorageService } from './storage.service';
 const KEY_PREFIX = 'pagesize-';
 
 /**
- * Remembers the page size a user picked per table, so it survives navigation and reloads.
- *
- * Stored values are validated against the options the table actually offers. That guards
- * against keys written by an older option set as well as hand edited storage, either of
- * which would otherwise end up in a request the backend rejects.
+ * Remembers the page size a user picked per table. Values are validated against the
+ * options the table offers, so a stale or hand edited entry never reaches the API.
  */
 @Injectable({
   providedIn: 'root',
@@ -21,7 +18,7 @@ export class PaginationPreferenceService {
     try {
       stored = this.storage.getItem<number>(KEY_PREFIX + key, StorageLocation.local);
     } catch {
-      // storage can be unavailable (private mode, blocked by the browser) or hold invalid JSON
+      // storage can be blocked by the browser or hold invalid JSON
       return fallback;
     }
 
@@ -38,7 +35,7 @@ export class PaginationPreferenceService {
     try {
       this.storage.setItem<number>(KEY_PREFIX + key, size, StorageLocation.local);
     } catch {
-      // remembering the page size is a convenience and must never break the table
+      // a convenience, never worth breaking the table for
     }
   }
 }

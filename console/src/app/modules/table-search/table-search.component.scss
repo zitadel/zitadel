@@ -9,7 +9,6 @@
   $secondary-text-color: map-get($foreground, secondary-text);
   $border-color: rgba(#8795a1, 0.2);
 
-  // Keeps the search box, the filter button and the create button on one toolbar row.
   .cnsl-table-toolbar {
     display: flex;
     align-items: center;
@@ -17,13 +16,10 @@
     min-width: 0;
   }
 
-  // The host is the flex item of the toolbar, so the width has to sit here. Putting it on
-  // the inner div did nothing and left the input at the browser default of ~20 characters.
-  // 360px fits the longest placeholder ("Benutzer nach Anzeigename suchen").
+  // The width has to sit on the host, it is the toolbar's flex item. On the inner div it
+  // has no effect and the input falls back to the browser default of ~20 characters.
   cnsl-table-search {
     display: block;
-    // A definite width rather than a flex basis, so the box keeps its size even if the
-    // surrounding toolbar ever stops being a flex container.
     flex: 0 0 auto;
     width: 360px;
     max-width: 100%;
