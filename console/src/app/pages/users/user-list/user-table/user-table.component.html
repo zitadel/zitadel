@@ -245,7 +245,11 @@
           <tr
             class="highlight pointer"
             mat-row
-            *matRowDef="let user; columns: type === Type.HUMAN ? displayedColumnsHuman : displayedColumnsMachine"
+            *matRowDef="
+              let user;
+              columns: type === Type.HUMAN ? displayedColumnsHuman : displayedColumnsMachine;
+              trackBy: trackByUserId
+            "
           ></tr>
         </table>
       </div>

@@ -154,6 +154,15 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     this.loadGrantsPage(type);
   }
 
+  /**
+   * Without this the table tears down and rebuilds every row on each load, which is
+   * noticeable at larger page sizes because each row carries an avatar, a chip per role
+   * and an actions menu. Auth and management grants name the identifier differently.
+   */
+  public trackByGrantId(_index: number, grant: UserGrantAsObject): string {
+    return 'id' in grant ? grant.id : grant.grantId;
+  }
+
   public getType(grant: UserGrantAsObject): string {
     if (grant.projectGrantId) {
       return 'Project Grant';

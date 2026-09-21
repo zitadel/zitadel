@@ -177,6 +177,11 @@ export class UserTableComponent implements OnInit {
       .subscribe(() => this.refresh$.next(true));
   }
 
+  /** Keeps existing rows alive across reloads instead of rebuilding avatars and cells. */
+  protected trackByUserId(_index: number, user: User): string {
+    return user.userId;
+  }
+
   protected onSearchChanged(term: string): void {
     this.goToFirstPage();
     this.searchTerm$.next(term);

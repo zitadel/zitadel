@@ -198,7 +198,7 @@
         (click)="!disableWrite ? openEditDialog(grant) : null"
         [ngClass]="{ 'highlight pointer': !disableWrite }"
         mat-row
-        *matRowDef="let grant; columns: displayedColumns"
+        *matRowDef="let grant; columns: displayedColumns; trackBy: trackByGrantId"
       ></tr>
     </table>
   </div>
