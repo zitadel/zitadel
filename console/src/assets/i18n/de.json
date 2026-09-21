@@ -705,6 +705,8 @@
     "ORGID": "Organisations ID",
     "PRIMARYDOMAIN": "Organisationsdomäne",
     "PROJECTNAME": "Projektname",
+    "ROLEKEY": "Rolle",
+    "WITHGRANTED": "Grant-Projekte einbeziehen",
     "RESOURCEOWNER": "Ressourcenbesitzer",
     "METHODS": {
       "5": "beinhaltet",

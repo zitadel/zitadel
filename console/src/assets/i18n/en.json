@@ -706,6 +706,8 @@
     "EMAIL": "Email",
     "USERNAME": "User Name",
     "PROJECTNAME": "Project Name",
+    "ROLEKEY": "Role",
+    "WITHGRANTED": "Include granted projects",
     "RESOURCEOWNER": "Resource Owner",
     "METHODS": {
       "5": "contains",
