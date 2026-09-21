@@ -1,6 +1,6 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
-import { of } from 'rxjs';
+import { ActivatedRoute, convertToParamMap, ParamMap, Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
 
 import { TableSearchComponent } from './table-search.component';
 
@@ -8,6 +8,7 @@ describe('TableSearchComponent', () => {
   let component: TableSearchComponent;
   let fixture: ComponentFixture<TableSearchComponent>;
   let router: jasmine.SpyObj<Router>;
+  let queryParamMap$: BehaviorSubject<ParamMap>;
   let emitted: Array<string>;
 
   function type(term: string): void {
@@ -124,6 +125,38 @@ describe('TableSearchComponent', () => {
       tick(300);
 
       expect(router.navigate).toHaveBeenCalledWith([], jasmine.objectContaining({ queryParams: { q: undefined } }));
+    }));
+
+    // Regression: the component writes q itself. Echoing that write back must not emit a
+    // second time, which would make the grant list fire a duplicate request per keystroke.
+    it('ignores the url update it caused itself', fakeAsync(() => {
+      create();
+
+      type('meier');
+      tick(300);
+      queryParamMap$.next(convertToParamMap({ q: 'meier' }));
+
+      expect(emitted).toEqual(['meier']);
+    }));
+
+    it('reacts to a term removed from the url elsewhere', fakeAsync(() => {
+      create();
+
+      type('meier');
+      tick(300);
+      // e.g. clicking the list entry in the nav, which routes without queryParamsHandling
+      queryParamMap$.next(convertToParamMap({}));
+
+      expect(emitted).toEqual(['meier', '']);
+      expect(component['value']).toBe('');
+    }));
+
+    it('reacts to a different term arriving in the url', fakeAsync(() => {
+      create();
+
+      queryParamMap$.next(convertToParamMap({ q: 'kittel' }));
+
+      expect(emitted).toEqual(['kittel']);
     }));
   });
 
