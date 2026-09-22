@@ -549,8 +549,9 @@ Projections:
   Customizations:
     custom_texts:
       BulkLimit: 400
-    # The sessions projection subscribes to many event types.
-    # A higher bulk limit processes more events per batch, reducing catch-up time after the projection fell behind.
+    # The sessions projection processes the highest event volume.
+    # A higher bulk limit amortizes the fixed cost per batch over more events,
+    # which shortens catch-up after the projection fell behind.
     sessions:
       BulkLimit: 1000 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_SESSIONS_BULKLIMIT
     project_grant_fields:
