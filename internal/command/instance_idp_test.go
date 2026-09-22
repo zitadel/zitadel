@@ -5810,6 +5810,135 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 	}
 }
 
+func TestCommandSide_RefreshInstanceSAMLProviderMetadata(t *testing.T) {
+	const (
+		metadataURL           = "https://idp.example.com/metadata"
+		concurrentMetadataURL = "https://new-idp.example.com/metadata"
+	)
+	refreshedMetadata := append(append([]byte(nil), validSAMLMetadata...), '\n')
+	providerEvents := func(metadata []byte, changes ...idp.SAMLIDPChanges) []eventstore.Event {
+		aggregate := instance.NewAggregate("instance1")
+		events := []eventstore.Event{
+			eventFromEventPusher(instance.NewSAMLIDPAddedEvent(context.Background(), &aggregate.Aggregate,
+				"id1",
+				"name",
+				metadata,
+				metadataURL,
+				&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("key")},
+				[]byte("certificate"),
+				"binding",
+				false,
+				"signatureAlgorithm",
+				gu.Ptr(domain.SAMLNameIDFormatUnspecified),
+				"attribute",
+				false,
+				idp.Options{})),
+		}
+		if len(changes) > 0 {
+			changed, err := instance.NewSAMLIDPChangedEvent(context.Background(), &aggregate.Aggregate, "id1", changes)
+			if err != nil {
+				panic(err)
+			}
+			events = append(events, eventFromEventPusher(changed))
+		}
+		return events
+	}
+	metadataChangedEvent := func() eventstore.Command {
+		event, err := instance.NewSAMLIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate, "id1", []idp.SAMLIDPChanges{
+			idp.ChangeSAMLMetadata(refreshedMetadata),
+		})
+		if err != nil {
+			panic(err)
+		}
+		return event
+	}
+	isTrue := true
+	concurrentChanges := []idp.SAMLIDPChanges{
+		idp.ChangeSAMLName("concurrent name"),
+		idp.ChangeSAMLMetadataURL(concurrentMetadataURL),
+		idp.ChangeSAMLBinding("concurrent binding"),
+		idp.ChangeSAMLWithSignedRequest(true),
+		idp.ChangeSAMLSignatureAlgorithm("concurrent signature algorithm"),
+		idp.ChangeSAMLNameIDFormat(gu.Ptr(domain.SAMLNameIDFormatTransient)),
+		idp.ChangeSAMLTransientMappingAttributeName("concurrent attribute"),
+		idp.ChangeSAMLFederatedLogoutEnabled(true),
+		idp.ChangeSAMLOptions(idp.OptionChanges{
+			IsCreationAllowed: &isTrue,
+			IsLinkingAllowed:  &isTrue,
+			IsAutoCreation:    &isTrue,
+			IsAutoUpdate:      &isTrue,
+		}),
+	}
+	tests := []struct {
+		name       string
+		eventstore func(*testing.T) *eventstore.Eventstore
+		httpClient int
+		metadata   []byte
+		err        func(error) bool
+	}{
+		{
+			name:       "metadata fetch error",
+			eventstore: expectEventstore(expectFilter(providerEvents(validSAMLMetadata)...)),
+			httpClient: 404,
+			err: func(err error) bool {
+				return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-x3n9vkb1lm", ""))
+			},
+		},
+		{
+			name:       "metadata validation error",
+			eventstore: expectEventstore(expectFilter(providerEvents(validSAMLMetadata)...)),
+			httpClient: 200,
+			metadata:   []byte("invalid metadata"),
+			err: func(err error) bool {
+				return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-9qmv2tpl4r", ""))
+			},
+		},
+		{
+			name: "metadata unchanged",
+			eventstore: expectEventstore(
+				expectFilter(providerEvents(validSAMLMetadata)...),
+				expectFilter(providerEvents(validSAMLMetadata)...),
+			),
+			httpClient: 200,
+			metadata:   validSAMLMetadata,
+		},
+		{
+			name: "metadata changed",
+			eventstore: expectEventstore(
+				expectFilter(providerEvents(validSAMLMetadata)...),
+				expectFilter(providerEvents(validSAMLMetadata)...),
+				expectPush(metadataChangedEvent()),
+			),
+			httpClient: 200,
+			metadata:   refreshedMetadata,
+		},
+		{
+			name: "concurrent provider change is not overwritten",
+			eventstore: expectEventstore(
+				expectFilter(providerEvents(validSAMLMetadata)...),
+				expectFilter(providerEvents(validSAMLMetadata, concurrentChanges...)...),
+				expectPush(metadataChangedEvent()),
+			),
+			httpClient: 200,
+			metadata:   refreshedMetadata,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore: tt.eventstore(t),
+				httpClient: newTestClient(tt.httpClient, tt.metadata),
+			}
+			err := c.RefreshInstanceSAMLProviderMetadata(authz.WithInstanceID(context.Background(), "instance1"), "id1")
+			if tt.err == nil {
+				assert.NoError(t, err)
+			} else if !tt.err(err) {
+				t.Errorf("got wrong err: %v", err)
+			}
+		})
+	}
+}
+
 func TestCommandSide_RegenerateInstanceSAMLProviderCertificate(t *testing.T) {
 	type fields struct {
 		eventstore                 func(*testing.T) *eventstore.Eventstore
