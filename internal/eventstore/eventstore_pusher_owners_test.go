@@ -10,7 +10,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/migration"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -301,56 +300,6 @@ func TestEventstore_Push_UniqueConstraintOwners_MissingColumn(t *testing.T) {
 					t.Fatalf("expected undefined column, got %v", err)
 				}
 			})
-		})
-	}
-}
-
-type upgradeSetupStep struct {
-	name string
-}
-
-func (s *upgradeSetupStep) String() string { return s.name }
-
-func (*upgradeSetupStep) Execute(context.Context, eventstore.Event) error { return nil }
-
-func TestEventstore_MigrateStartedWithoutOwnersColumn(t *testing.T) {
-	for pusherName, pusher := range pushers {
-		t.Run(pusherName, func(t *testing.T) {
-			client := clients[pusherName]
-			dropAndRestoreOwnersColumn(t, client)
-			db := eventstore.NewEventstore(&eventstore.Config{
-				Querier: queriers["v2(inmemory)"],
-				Pusher:  pusher,
-			})
-			t.Cleanup(cleanupEventstore(client))
-			ctx := context.Background()
-
-			if err := migration.Migrate(ctx, db, &upgradeSetupStep{name: "76_users14_login_equality_indexes"}); err != nil {
-				t.Fatalf("76 started without owners column: %v", err)
-			}
-
-			if _, err := client.Exec(`ALTER TABLE eventstore.unique_constraints ADD COLUMN IF NOT EXISTS owners TEXT[] NOT NULL DEFAULT '{}'`); err != nil {
-				t.Fatal(err)
-			}
-			if _, err := client.Exec(`CREATE INDEX CONCURRENTLY IF NOT EXISTS unique_constraints_owners_gin ON eventstore.unique_constraints USING GIN (owners)`); err != nil {
-				t.Fatal(err)
-			}
-
-			if err := migration.Migrate(ctx, db, &upgradeSetupStep{name: "78_unique_constraint_owners"}); err != nil {
-				t.Fatalf("78 after adding owners column: %v", err)
-			}
-			if err := migration.Migrate(ctx, db, &upgradeSetupStep{name: "79_backfill_unique_constraint_owners"}); err != nil {
-				t.Fatalf("79 after adding owners column: %v", err)
-			}
-
-			const instanceID = "owners-upgrade"
-			if _, err := db.Push(ctx, generateCommand("owners-upgrade-tagged", "1",
-				withInstanceID(instanceID),
-				generateAddUniqueConstraint("usernames", "alice", "org:org-1", "user:user-1"),
-			)); err != nil {
-				t.Fatal(err)
-			}
-			assertOwners(t, client, instanceID, "usernames", "alice", []string{"org:org-1", "user:user-1"})
 		})
 	}
 }

@@ -224,17 +224,17 @@ func uniqueConstraints(ctx context.Context, tx *sql.Tx, commands []*command) (er
 					stmt.WriteString(`, `)
 					stmt.WriteArg(constraint.UniqueField)
 					stmt.WriteString(`)`)
-					break
+				} else {
+					stmt.WriteString(`INSERT INTO eventstore.unique_constraints (instance_id, unique_type, unique_field, owners) VALUES (`)
+					stmt.WriteArg(instance)
+					stmt.WriteString(`, `)
+					stmt.WriteArg(constraint.UniqueType)
+					stmt.WriteString(`, `)
+					stmt.WriteArg(constraint.UniqueField)
+					stmt.WriteString(`, `)
+					stmt.WriteArg(constraint.Owners)
+					stmt.WriteString(`)`)
 				}
-				stmt.WriteString(`INSERT INTO eventstore.unique_constraints (instance_id, unique_type, unique_field, owners) VALUES (`)
-				stmt.WriteArg(instance)
-				stmt.WriteString(`, `)
-				stmt.WriteArg(constraint.UniqueType)
-				stmt.WriteString(`, `)
-				stmt.WriteArg(constraint.UniqueField)
-				stmt.WriteString(`, `)
-				stmt.WriteArg(constraint.Owners)
-				stmt.WriteString(`)`)
 			case eventstore.UniqueConstraintInstanceRemove:
 				stmt.WriteString(`DELETE FROM eventstore.unique_constraints WHERE instance_id = `)
 				stmt.WriteArgs(instance)

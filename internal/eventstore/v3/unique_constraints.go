@@ -54,10 +54,10 @@ func handleUniqueConstraints(ctx context.Context, tx database.Transaction, comma
 				if len(constraint.Owners) == 0 {
 					addWithoutOwnersPlaceholders = append(addWithoutOwnersPlaceholders, fmt.Sprintf("($%d, $%d, $%d)", len(addWithoutOwnersArgs)+1, len(addWithoutOwnersArgs)+2, len(addWithoutOwnersArgs)+3))
 					addWithoutOwnersArgs = append(addWithoutOwnersArgs, instanceID, constraint.UniqueType, constraint.UniqueField)
-					break
+				} else {
+					addWithOwnersPlaceholders = append(addWithOwnersPlaceholders, fmt.Sprintf("($%d, $%d, $%d, $%d)", len(addWithOwnersArgs)+1, len(addWithOwnersArgs)+2, len(addWithOwnersArgs)+3, len(addWithOwnersArgs)+4))
+					addWithOwnersArgs = append(addWithOwnersArgs, instanceID, constraint.UniqueType, constraint.UniqueField, constraint.Owners)
 				}
-				addWithOwnersPlaceholders = append(addWithOwnersPlaceholders, fmt.Sprintf("($%d, $%d, $%d, $%d)", len(addWithOwnersArgs)+1, len(addWithOwnersArgs)+2, len(addWithOwnersArgs)+3, len(addWithOwnersArgs)+4))
-				addWithOwnersArgs = append(addWithOwnersArgs, instanceID, constraint.UniqueType, constraint.UniqueField, constraint.Owners)
 			case eventstore.UniqueConstraintRemove:
 				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf(deleteConstraintPlaceholdersStmt, len(deleteArgs)+1, len(deleteArgs)+2, len(deleteArgs)+3))
 				deleteArgs = append(deleteArgs, instanceID, constraint.UniqueType, constraint.UniqueField)
