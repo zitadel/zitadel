@@ -40,7 +40,10 @@ func NewPostgres(client *database.DB) *Postgres {
 
 func (db *Postgres) Health(ctx context.Context) error { return db.Ping() }
 
-const eventSortKeySQL = `"position", in_tx_order, instance_id, aggregate_type, aggregate_id, "sequence"`
+const (
+	eventSortKeySQL = `"position", in_tx_order, instance_id, aggregate_type, aggregate_id, "sequence"`
+	eventColumnsSQL = `created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order`
+)
 
 // FilterToReducer finds all events matching the given search query and passes them to the reduce function.
 func (psql *Postgres) FilterToReducer(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder, reduce eventstore.Reducer) (err error) {
@@ -115,20 +118,7 @@ func (db *Postgres) eventQuery(useV1 bool) string {
 			", aggregate_version" +
 			" FROM eventstore.events"
 	}
-	return "SELECT" +
-		" created_at" +
-		", event_type" +
-		`, "sequence"` +
-		`, "position"` +
-		", payload" +
-		", creator" +
-		`, "owner"` +
-		", instance_id" +
-		", aggregate_type" +
-		", aggregate_id" +
-		", revision" +
-		", in_tx_order" +
-		" FROM eventstore.events2"
+	return "SELECT " + eventColumnsSQL + " FROM eventstore.events2"
 }
 
 func (db *Postgres) maxPositionQuery(useV1 bool) string {

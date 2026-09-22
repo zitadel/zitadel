@@ -28,6 +28,7 @@ type SearchQueryBuilder struct {
 	positionAtLeast       decimal.Decimal
 	eventSortKeyAfter     *EventSortKey
 	awaitOpenTransactions bool
+	scanEventTypes        bool
 	creationDateAfter     time.Time
 	creationDateBefore    time.Time
 	eventSequenceGreater  uint64
@@ -87,6 +88,10 @@ func (b SearchQueryBuilder) GetEventSortKeyAfter() *EventSortKey {
 
 func (b SearchQueryBuilder) GetAwaitOpenTransactions() bool {
 	return b.awaitOpenTransactions
+}
+
+func (b SearchQueryBuilder) GetScanEventTypesSeparately() bool {
+	return b.scanEventTypes
 }
 
 func (q SearchQueryBuilder) GetEventSequenceGreater() uint64 {
@@ -300,6 +305,19 @@ func (builder *SearchQueryBuilder) AfterEventSortKey(key EventSortKey) *SearchQu
 // AwaitOpenTransactions filters for events which are older than the oldest transaction of the database
 func (builder *SearchQueryBuilder) AwaitOpenTransactions() *SearchQueryBuilder {
 	builder.awaitOpenTransactions = true
+	return builder
+}
+
+// ScanEventTypesSeparately reads the events of each combination of aggregate type and event type of the sub queries
+// separately, in sort key order up to the limit, and merges the results.
+// Without it, a query for multiple types cannot stop reading at the limit:
+// it reads every matching event after the position and sorts them, so its cost grows with the number of matching events.
+// With it, the cost is bounded by the limit and the number of combinations.
+//
+// It is only applied to queries for events of a single instance, ordered ascending with a limit,
+// whose sub queries filter by aggregate types and event types only. Other queries ignore it.
+func (builder *SearchQueryBuilder) ScanEventTypesSeparately() *SearchQueryBuilder {
+	builder.scanEventTypes = true
 	return builder
 }
 
