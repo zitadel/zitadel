@@ -84,10 +84,14 @@ export async function loginWithOIDCAndSession({
               requestId: `oidc_${authRequest}`,
             };
 
-            const reauthRes = await sendLoginname(reauth);
+            try {
+              const reauthRes = await sendLoginname(reauth);
 
-            if (reauthRes && "redirect" in reauthRes && reauthRes?.redirect) {
-              return { redirect: reauthRes.redirect };
+              if (reauthRes && "redirect" in reauthRes && reauthRes?.redirect) {
+                return { redirect: reauthRes.redirect };
+              }
+            } catch (reauthError) {
+              console.error(reauthError);
             }
           }
 
