@@ -3,7 +3,10 @@ package eventstore_test
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"testing"
+
+	"github.com/jackc/pgx/v5/pgconn"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -223,6 +226,22 @@ var uniqueConstraintOwnerCases = []uniqueConstraintOwnerCase{
 		},
 	},
 	{
+		name: "mixed add tagged and empty owners",
+		run: func(t *testing.T, db *eventstore.Eventstore, client *database.DB, instanceID string) {
+			_, err := db.Push(context.Background(), generateCommand("owners-mixed-add", "1",
+				withInstanceID(instanceID),
+				generateAddUniqueConstraint("usernames", "tagged", "org:org-1", "user:u1"),
+				generateAddUniqueConstraint("usernames", "untagged"),
+			))
+			if err != nil {
+				t.Fatal(err)
+			}
+			assertUniqueCount(t, client, instanceID, 2)
+			assertOwners(t, client, instanceID, "usernames", "tagged", []string{"org:org-1", "user:u1"})
+			assertOwners(t, client, instanceID, "usernames", "untagged", nil)
+		},
+	},
+	{
 		name: "mixed batch deletes then inserts",
 		run: func(t *testing.T, db *eventstore.Eventstore, client *database.DB, instanceID string) {
 			if err := insertUniqueConstraint(client, instanceID, "usernames", "old", "org:org-1"); err != nil {
@@ -244,6 +263,74 @@ var uniqueConstraintOwnerCases = []uniqueConstraintOwnerCase{
 			assertOwners(t, client, instanceID, "usernames", "new", []string{"org:org-1", "user:u1"})
 		},
 	},
+}
+
+func TestEventstore_Push_UniqueConstraintOwners_MissingColumn(t *testing.T) {
+	for pusherName, pusher := range pushers {
+		t.Run(pusherName, func(t *testing.T) {
+			client := clients[pusherName]
+			tx, err := client.Begin()
+			if err != nil {
+				t.Fatal(err)
+			}
+			// DROP COLUMN takes AccessExclusiveLock until rollback. Other tests
+			// against the same database may stall; they still complete afterwards.
+			t.Cleanup(func() {
+				if err := tx.Rollback(); err != nil && !errors.Is(err, sql.ErrTxDone) {
+					t.Errorf("rollback missing-column tx: %v", err)
+				}
+			})
+			if _, err := tx.Exec("ALTER TABLE eventstore.unique_constraints DROP COLUMN IF EXISTS owners"); err != nil {
+				t.Fatal(err)
+			}
+
+			db := eventstore.NewEventstore(&eventstore.Config{
+				Querier: queriers["v2(inmemory)"],
+				Pusher:  pusher,
+			})
+			const instanceID = "owners-missing-col"
+
+			t.Run("empty owners add succeeds", func(t *testing.T) {
+				_, err := db.PushWithClient(context.Background(), tx, generateCommand("owners-missing-empty", "1",
+					withInstanceID(instanceID),
+					generateAddUniqueConstraint("usernames", "bob"),
+				))
+				if err != nil {
+					t.Fatal(err)
+				}
+				assertUniqueCountTx(t, tx, instanceID, 1)
+			})
+
+			t.Run("tagged owners add fails", func(t *testing.T) {
+				_, err := db.PushWithClient(context.Background(), tx, generateCommand("owners-missing-tagged", "1",
+					withInstanceID(instanceID),
+					generateAddUniqueConstraint("usernames", "alice", "org:org-1", "user:u1"),
+				))
+				if err == nil {
+					t.Fatal("expected missing owners column error")
+				}
+				if !isUndefinedColumn(err) {
+					t.Fatalf("expected undefined column, got %v", err)
+				}
+			})
+		})
+	}
+}
+
+func isUndefinedColumn(err error) bool {
+	var pgErr *pgconn.PgError
+	return errors.As(err, &pgErr) && pgErr.Code == "42703"
+}
+
+func assertUniqueCountTx(t *testing.T, tx *sql.Tx, instanceID string, want int) {
+	t.Helper()
+	var count int
+	if err := tx.QueryRow("SELECT COUNT(*) FROM eventstore.unique_constraints WHERE instance_id = $1", instanceID).Scan(&count); err != nil {
+		t.Fatal(err)
+	}
+	if count != want {
+		t.Errorf("unique count = %d, want %d", count, want)
+	}
 }
 
 func assertUniqueCount(t *testing.T, db *database.DB, instanceID string, want int) {
