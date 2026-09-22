@@ -124,7 +124,7 @@ func DomainPolicyChangedEventMapper(event eventstore.Event) (eventstore.Event, e
 type DomainPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	usernameChanges          []string
+	usernameChanges          []user.UsernameChange
 	userLoginMustBeDomain    bool
 	oldUserLoginMustBeDomain bool
 }
@@ -149,7 +149,7 @@ func DomainPolicyRemovedEventMapper(event eventstore.Event) (eventstore.Event, e
 	}, nil
 }
 
-func (e *DomainPolicyRemovedEvent) AddUniqueConstraintChanges(usernameChanges []string, userLoginMustBeDomain, oldUserLoginMustBeDomain bool) {
+func (e *DomainPolicyRemovedEvent) AddUniqueConstraintChanges(usernameChanges []user.UsernameChange, userLoginMustBeDomain, oldUserLoginMustBeDomain bool) {
 	e.usernameChanges = usernameChanges
 	e.userLoginMustBeDomain = userLoginMustBeDomain
 	e.oldUserLoginMustBeDomain = oldUserLoginMustBeDomain
