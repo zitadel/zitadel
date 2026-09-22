@@ -1,6 +1,7 @@
 import { docs, versions } from '../.source/server';
 import { loader } from 'fumadocs-core/source';
 import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
+import { expandApiPages } from './llms-openapi';
 
 const DOCS_BASE_PATH = '/docs';
 
@@ -52,7 +53,7 @@ export function getPageImage(page: DocPage) {
 }
 
 export async function getLLMText(page: LatestPage) {
-  const processed = await page.data.getText('processed');
+  const processed = await expandApiPages(await page.data.getText('processed'));
 
   return `# ${page.data.title}
 
