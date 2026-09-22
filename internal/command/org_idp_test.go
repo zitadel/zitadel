@@ -5521,6 +5521,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 							"id1",
 							"name",
 							validSAMLMetadata,
+							"",
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
@@ -5534,8 +5535,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 							nil,
 							"",
 							false,
-							idp.Options{},
-						),
+							idp.Options{}),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -5564,6 +5564,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 							"id1",
 							"name",
 							validSAMLMetadata,
+							"",
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
@@ -5582,8 +5583,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 								IsLinkingAllowed:  true,
 								IsAutoCreation:    true,
 								IsAutoUpdate:      true,
-							},
-						),
+							}),
 					),
 				),
 				idGenerator:                id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -5764,6 +5764,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 								"id1",
 								"name",
 								validSAMLMetadata,
+								"",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -5777,8 +5778,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 								nil,
 								"",
 								false,
-								idp.Options{},
-							)),
+								idp.Options{})),
 					),
 				),
 			},
@@ -5805,6 +5805,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 								"id1",
 								"name",
 								[]byte("metadata"),
+								"",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -5818,8 +5819,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 								gu.Ptr(domain.SAMLNameIDFormatUnspecified),
 								"",
 								false,
-								idp.Options{},
-							)),
+								idp.Options{})),
 					),
 					expectPush(
 						func() eventstore.Command {
@@ -5957,6 +5957,7 @@ func TestCommandSide_RegenerateOrgSAMLProviderCertificate(t *testing.T) {
 								"id1",
 								"name",
 								[]byte("metadata"),
+								"",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -5970,8 +5971,7 @@ func TestCommandSide_RegenerateOrgSAMLProviderCertificate(t *testing.T) {
 								gu.Ptr(domain.SAMLNameIDFormatUnspecified),
 								"",
 								false,
-								idp.Options{},
-							)),
+								idp.Options{})),
 					),
 					expectPush(
 						func() eventstore.Command {

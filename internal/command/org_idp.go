@@ -1,6 +1,7 @@
 package command
 
 import (
+	"bytes"
 	"context"
 	"strings"
 
@@ -486,6 +487,58 @@ func (c *Commands) UpdateOrgSAMLProvider(ctx context.Context, resourceOwner, id 
 		return nil, err
 	}
 	return pushedEventsToObjectDetails(pushedEvents), nil
+}
+
+// RefreshOrgSAMLProviderMetadata re-fetches the SAML metadata from the URL
+// configured for the provider and updates the provider if the metadata changed.
+// It is used by the periodic metadata refresh worker.
+func (c *Commands) RefreshOrgSAMLProviderMetadata(ctx context.Context, resourceOwner, id string) error {
+	orgAgg := org.NewAggregate(resourceOwner)
+	writeModel := NewSAMLOrgIDPWriteModel(resourceOwner, id)
+	events, err := c.eventstore.Filter(ctx, writeModel.Query())
+	if err != nil {
+		return err
+	}
+	writeModel.AppendEvents(events...)
+	if err = writeModel.Reduce(); err != nil {
+		return err
+	}
+	if !writeModel.State.Exists() {
+		return zerrors.ThrowNotFound(nil, "ORG-1k8scv4m7d", "Errors.Org.IDPConfig.NotExisting")
+	}
+	if writeModel.MetadataURL == "" {
+		return nil
+	}
+	data, err := xml.ReadMetadataFromURL(c.httpClient, writeModel.MetadataURL)
+	if err != nil {
+		return zerrors.ThrowInvalidArgument(err, "ORG-6tln3p9wqa", "Errors.Project.App.SAMLMetadataMissing")
+	}
+	if _, err := saml.ParseMetadata(data); err != nil {
+		return zerrors.ThrowInvalidArgument(err, "ORG-j2vr7xme5c", "Errors.Project.App.SAMLMetadataFormat")
+	}
+	if bytes.Equal(writeModel.Metadata, data) {
+		return nil
+	}
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgSAMLProvider(orgAgg, writeModel, &SAMLProvider{
+		Name:                          writeModel.Name,
+		Metadata:                      data,
+		MetadataURL:                   writeModel.MetadataURL,
+		Binding:                       writeModel.Binding,
+		WithSignedRequest:             writeModel.WithSignedRequest,
+		SignatureAlgorithm:            writeModel.SignatureAlgorithm,
+		NameIDFormat:                  writeModel.NameIDFormat,
+		TransientMappingAttributeName: writeModel.TransientMappingAttributeName,
+		FederatedLogoutEnabled:        writeModel.FederatedLogoutEnabled,
+		IDPOptions:                    writeModel.Options,
+	}))
+	if err != nil {
+		return err
+	}
+	if len(cmds) == 0 {
+		return nil
+	}
+	_, err = c.eventstore.Push(ctx, cmds...)
+	return err
 }
 
 func (c *Commands) RegenerateOrgSAMLProviderCertificate(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
@@ -1773,6 +1826,7 @@ func (c *Commands) prepareAddOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSA
 					writeModel.ID,
 					provider.Name,
 					provider.Metadata,
+					provider.MetadataURL,
 					keyEnc,
 					cert,
 					provider.Binding,
@@ -1827,6 +1881,7 @@ func (c *Commands) prepareUpdateOrgSAMLProvider(a *org.Aggregate, writeModel *Or
 				writeModel.ID,
 				provider.Name,
 				provider.Metadata,
+				provider.MetadataURL,
 				nil,
 				nil,
 				c.idpConfigEncryption,
@@ -1874,6 +1929,7 @@ func (c *Commands) prepareRegenerateOrgSAMLProviderCertificate(a *org.Aggregate,
 				writeModel.ID,
 				writeModel.Name,
 				writeModel.Metadata,
+				writeModel.MetadataURL,
 				key,
 				cert,
 				c.idpConfigEncryption,

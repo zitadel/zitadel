@@ -94,6 +94,7 @@ var (
 		// saml
 		` projections.idp_templates6_saml.idp_id,` +
 		` projections.idp_templates6_saml.metadata,` +
+		` projections.idp_templates6_saml.metadata_url,` +
 		` projections.idp_templates6_saml.key,` +
 		` projections.idp_templates6_saml.certificate,` +
 		` projections.idp_templates6_saml.binding,` +
@@ -234,6 +235,7 @@ var (
 		// saml config
 		"idp_id",
 		"metadata",
+		"metadata_url",
 		"key",
 		"certificate",
 		"binding",
@@ -360,6 +362,7 @@ var (
 		// saml
 		` projections.idp_templates6_saml.idp_id,` +
 		` projections.idp_templates6_saml.metadata,` +
+		` projections.idp_templates6_saml.metadata_url,` +
 		` projections.idp_templates6_saml.key,` +
 		` projections.idp_templates6_saml.certificate,` +
 		` projections.idp_templates6_saml.binding,` +
@@ -501,6 +504,7 @@ var (
 		// saml config
 		"idp_id",
 		"metadata",
+		"metadata_url",
 		"key",
 		"certificate",
 		"binding",
@@ -676,6 +680,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -830,6 +835,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// saml
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1002,6 +1008,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -1153,6 +1160,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// saml
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1322,6 +1330,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -1471,6 +1480,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// saml
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1641,6 +1651,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -1792,6 +1803,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						// saml
 						"idp-id",
 						[]byte("metadata"),
+						"https://idp.example.com/metadata",
 						nil,
 						nil,
 						"binding",
@@ -1860,6 +1872,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 				SAMLIDPTemplate: &SAMLIDPTemplate{
 					IDPID:                         "idp-id",
 					Metadata:                      []byte("metadata"),
+					MetadataURL:                   "https://idp.example.com/metadata",
 					Key:                           nil,
 					Certificate:                   nil,
 					Binding:                       "binding",
@@ -1955,6 +1968,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// saml
+						nil,
 						nil,
 						nil,
 						nil,
@@ -2145,6 +2159,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -2296,6 +2311,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// saml
+						nil,
 						nil,
 						nil,
 						nil,
@@ -2462,6 +2478,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// saml
+						nil,
 						nil,
 						nil,
 						nil,
@@ -2661,6 +2678,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// ldap config
 							"idp-id",
 							database.TextArray[string]{"server"},
@@ -2850,6 +2868,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// ldap config
 							nil,
 							nil,
@@ -3012,6 +3031,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// ldap config
 							"idp-id-ldap",
 							database.TextArray[string]{"server"},
@@ -3131,6 +3151,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							// saml
 							"idp-id-saml",
 							[]byte("metadata"),
+							nil,
 							nil,
 							nil,
 							"binding",
@@ -3256,6 +3277,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							database.TextArray[string]{"profile"},
 							// saml
+							nil,
 							nil,
 							nil,
 							nil,
@@ -3393,6 +3415,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// ldap config
 							nil,
 							nil,
@@ -3510,6 +3533,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							// saml
+							nil,
 							nil,
 							nil,
 							nil,
@@ -3647,6 +3671,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// ldap config
 							nil,
 							nil,
@@ -3764,6 +3789,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							// saml
+							nil,
 							nil,
 							nil,
 							nil,

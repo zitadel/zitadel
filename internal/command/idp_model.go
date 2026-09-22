@@ -1781,6 +1781,7 @@ type SAMLIDPWriteModel struct {
 	Name                          string
 	ID                            string
 	Metadata                      []byte
+	MetadataURL                   string
 	Key                           *crypto.CryptoValue
 	Certificate                   []byte
 	Binding                       string
@@ -1811,6 +1812,7 @@ func (wm *SAMLIDPWriteModel) Reduce() error {
 func (wm *SAMLIDPWriteModel) reduceAddedEvent(e *idp.SAMLIDPAddedEvent) {
 	wm.Name = e.Name
 	wm.Metadata = e.Metadata
+	wm.MetadataURL = e.MetadataURL
 	wm.Key = e.Key
 	wm.Certificate = e.Certificate
 	wm.Binding = e.Binding
@@ -1836,6 +1838,9 @@ func (wm *SAMLIDPWriteModel) reduceChangedEvent(e *idp.SAMLIDPChangedEvent) {
 	if e.Metadata != nil {
 		wm.Metadata = e.Metadata
 	}
+	if e.MetadataURL != nil {
+		wm.MetadataURL = *e.MetadataURL
+	}
 	if e.Binding != nil {
 		wm.Binding = *e.Binding
 	}
@@ -1859,7 +1864,8 @@ func (wm *SAMLIDPWriteModel) reduceChangedEvent(e *idp.SAMLIDPChangedEvent) {
 
 func (wm *SAMLIDPWriteModel) NewChanges(
 	name string,
-	metadata,
+	metadata []byte,
+	metadataURL string,
 	key,
 	certificate []byte,
 	secretCrypto crypto.EncryptionAlgorithm,
@@ -1887,6 +1893,9 @@ func (wm *SAMLIDPWriteModel) NewChanges(
 	}
 	if !reflect.DeepEqual(wm.Metadata, metadata) {
 		changes = append(changes, idp.ChangeSAMLMetadata(metadata))
+	}
+	if wm.MetadataURL != metadataURL {
+		changes = append(changes, idp.ChangeSAMLMetadataURL(metadataURL))
 	}
 	if wm.Binding != binding {
 		changes = append(changes, idp.ChangeSAMLBinding(binding))

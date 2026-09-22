@@ -917,7 +917,8 @@ func (wm *InstanceSAMLIDPWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	id,
 	name string,
-	metadata,
+	metadata []byte,
+	metadataURL string,
 	key,
 	certificate []byte,
 	secretCrypto crypto.EncryptionAlgorithm,
@@ -932,6 +933,7 @@ func (wm *InstanceSAMLIDPWriteModel) NewChangedEvent(
 	changes, err := wm.SAMLIDPWriteModel.NewChanges(
 		name,
 		metadata,
+		metadataURL,
 		key,
 		certificate,
 		secretCrypto,

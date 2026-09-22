@@ -338,6 +338,10 @@ func samlConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.SAMLIDPTemplate
 	if template.NameIDFormat.Valid {
 		nameIDFormat = nameIDToPb(template.NameIDFormat.V)
 	}
+	var metadataURL *string
+	if template.MetadataURL != "" {
+		metadataURL = gu.Ptr(template.MetadataURL)
+	}
 	idpConfig.Config = &idp_pb.IDPConfig_Saml{
 		Saml: &idp_pb.SAMLConfig{
 			MetadataXml:                   template.Metadata,
@@ -347,6 +351,7 @@ func samlConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.SAMLIDPTemplate
 			NameIdFormat:                  nameIDFormat,
 			TransientMappingAttributeName: gu.Ptr(template.TransientMappingAttributeName),
 			FederatedLogoutEnabled:        gu.Ptr(template.FederatedLogoutEnabled),
+			MetadataUrl:                   metadataURL,
 		},
 	}
 }

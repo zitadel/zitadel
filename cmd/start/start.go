@@ -114,6 +114,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/queue"
+	"github.com/zitadel/zitadel/internal/samlidpmetadata"
 	"github.com/zitadel/zitadel/internal/serviceping"
 	"github.com/zitadel/zitadel/internal/static"
 	es_v4 "github.com/zitadel/zitadel/internal/v2/eventstore"
@@ -369,12 +370,18 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		return err
 	}
 
+	samlidpmetadata.Register(ctx, q, queries, commands, config.SAMLIDPMetadata)
+
 	if err = q.Start(ctx); err != nil {
 		return err
 	}
 
 	// the scheduler / periodic jobs need to be started after the queue already runs
 	if err = serviceping.Start(ctx, config.ServicePing, q); err != nil {
+		return err
+	}
+
+	if err = samlidpmetadata.Start(ctx, q, config.SAMLIDPMetadata); err != nil {
 		return err
 	}
 

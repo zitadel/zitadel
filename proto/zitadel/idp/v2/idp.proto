@@ -325,6 +325,8 @@ message SAMLConfig {
   // Specify a Signature Algorithm that should used to sign SAML requests and responses.
   // Can be set only if `with_signed_request` is set.
   SAMLSignatureAlgorithm signature_algorithm = 7;
+  // URL from which the SAML identity provider metadata is fetched.
+  optional string metadata_url = 8;
 }
 
 message AzureADConfig {
