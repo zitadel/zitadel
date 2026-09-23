@@ -5,6 +5,7 @@ import (
 	"errors"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/shopspring/decimal"
@@ -40,10 +41,37 @@ func NewPostgres(client *database.DB) *Postgres {
 
 func (db *Postgres) Health(ctx context.Context) error { return db.Ping() }
 
-const (
-	eventSortKeySQL = `"position", in_tx_order, instance_id, aggregate_type, aggregate_id, "sequence"`
-	eventColumnsSQL = `created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order`
-)
+const eventColumnsSQL = `created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order`
+
+// eventSortKeyColumns is the lexicographic sort key of events.
+// It defines the default ORDER BY and the tuple of the resume cursor ([eventstore.EventSortKey]),
+// both must always use the same columns in the same order.
+var eventSortKeyColumns = []string{`"position"`, "in_tx_order", "instance_id", "aggregate_type", "aggregate_id", `"sequence"`}
+
+// eventSortKeySQL is the comma separated [eventSortKeyColumns], used as tuple in the resume cursor
+// and as ORDER BY of the per event type scans.
+var eventSortKeySQL = strings.Join(eventSortKeyColumns, ", ")
+
+// orderBy builds the ORDER BY clause of the given columns, all in the same direction.
+// It is deliberately written as a column list and not as a row constructor (ORDER BY (a, b) DESC):
+// only a column list allows postgres to presort from an index (incremental sort) and stop after
+// LIMIT rows instead of sorting all matching events.
+func orderBy(desc bool, columns ...string) string {
+	direction := ""
+	if desc {
+		direction = " DESC"
+	}
+	var b strings.Builder
+	b.WriteString(" ORDER BY ")
+	for i, column := range columns {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		b.WriteString(column)
+		b.WriteString(direction)
+	}
+	return b.String()
+}
 
 // FilterToReducer finds all events matching the given search query and passes them to the reduce function.
 func (psql *Postgres) FilterToReducer(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder, reduce eventstore.Reducer) (err error) {
@@ -83,24 +111,18 @@ func (db *Postgres) Client() *database.DB {
 	return db.DB
 }
 
-func (db *Postgres) orderByEventSequence(desc, shouldOrderBySequence, useV1 bool) string {
+func (db *Postgres) orderByEventSequence(desc, shouldOrderBySequence, orderByCreationDate, useV1 bool) string {
 	if useV1 {
-		if desc {
-			return ` ORDER BY event_sequence DESC`
-		}
-		return ` ORDER BY event_sequence`
+		return orderBy(desc, "event_sequence")
 	}
 	if shouldOrderBySequence {
-		if desc {
-			return ` ORDER BY "sequence" DESC`
-		}
-		return ` ORDER BY "sequence"`
+		return orderBy(desc, `"sequence"`)
 	}
-
-	if desc {
-		return ` ORDER BY (` + eventSortKeySQL + `) DESC`
+	if orderByCreationDate {
+		// created_at first and the sort key as tie breaker for events created in the same microsecond
+		return orderBy(desc, append([]string{"created_at"}, eventSortKeyColumns...)...)
 	}
-	return ` ORDER BY ` + eventSortKeySQL
+	return orderBy(desc, eventSortKeyColumns...)
 }
 
 func (db *Postgres) eventQuery(useV1 bool) string {

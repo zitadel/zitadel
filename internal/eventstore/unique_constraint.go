@@ -32,6 +32,7 @@ const (
 	UniqueConstraintOwnerIDP     = "idp"
 	UniqueConstraintOwnerProject = "project"
 	UniqueConstraintOwnerGrant   = "grant"
+	UniqueConstraintOwnerApp     = "app"
 
 	// UniqueConstraintOwnersBackfillStep is the setup migration that stamps owners from projections.
 	UniqueConstraintOwnersBackfillStep = "79_backfill_unique_constraint_owners"

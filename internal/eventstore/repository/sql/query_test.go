@@ -904,8 +904,106 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(
-					regexp.QuoteMeta(`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND "position" >= $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND "position" >= $8) ORDER BY (`+eventSortKeySQL+`) DESC LIMIT $9`),
+					regexp.QuoteMeta(`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND "position" >= $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND "position" >= $8) ORDER BY "position" DESC, in_tx_order DESC, instance_id DESC, aggregate_type DESC, aggregate_id DESC, "sequence" DESC LIMIT $9`),
 					[]driver.Value{"instanceID", eventstore.AggregateType("notify"), eventstore.EventType("notify.foo.bar"), decimal.NewFromFloat(123.456), eventstore.AggregateType("notify"), []eventstore.EventType{"notification.failed", "notification.success"}, "instanceID", decimal.NewFromFloat(123.456), uint64(5)},
+				),
+			},
+			res: res{
+				wantErr: false,
+			},
+		},
+		{
+			name: "order by creation date desc, instance only, v2",
+			args: args{
+				dest: &[]*repository.Event{},
+				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					InstanceID("instanceID").
+					OrderDesc().
+					OrderByCreationDate().
+					AwaitOpenTransactions().
+					Limit(1000),
+				useV1: false,
+			},
+			fields: fields{
+				mock: newMockClient(t).
+					expectExec(regexp.QuoteMeta(
+						`select pg_advisory_lock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1)), pg_advisory_unlock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))`),
+						[]driver.Value{"instanceID"}).
+					expectQuery(
+						regexp.QuoteMeta(`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2 WHERE instance_id = $1 AND "position" <= EXTRACT(EPOCH FROM now()) ORDER BY created_at DESC, "position" DESC, in_tx_order DESC, instance_id DESC, aggregate_type DESC, aggregate_id DESC, "sequence" DESC LIMIT $2`),
+						[]driver.Value{"instanceID", uint64(1000)},
+					),
+			},
+			res: res{
+				wantErr: false,
+			},
+		},
+		{
+			name: "order by creation date asc, aggregate / event type and created after, v2",
+			args: args{
+				dest: &[]*repository.Event{},
+				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					InstanceID("instanceID").
+					OrderAsc().
+					OrderByCreationDate().
+					Limit(5).
+					CreationDateAfter(time.Unix(123, 456)).
+					AddQuery().
+					AggregateTypes("user").
+					EventTypes("user.human.added").
+					Builder(),
+				useV1: false,
+			},
+			fields: fields{
+				mock: newMockClient(t).expectQuery(
+					regexp.QuoteMeta(`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND created_at > $4 ORDER BY created_at, "position", in_tx_order, instance_id, aggregate_type, aggregate_id, "sequence" LIMIT $5`),
+					[]driver.Value{"instanceID", eventstore.AggregateType("user"), eventstore.EventType("user.human.added"), time.Unix(123, 456), uint64(5)},
+				),
+			},
+			res: res{
+				wantErr: false,
+			},
+		},
+		{
+			name: "order by creation date is ignored for single aggregate id, v2",
+			args: args{
+				dest: &[]*repository.Event{},
+				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					InstanceID("instanceID").
+					OrderDesc().
+					OrderByCreationDate().
+					Limit(5).
+					AddQuery().
+					AggregateTypes("user").
+					AggregateIDs("agg-a").
+					Builder(),
+				useV1: false,
+			},
+			fields: fields{
+				mock: newMockClient(t).expectQuery(
+					regexp.QuoteMeta(`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND aggregate_id = $3 ORDER BY "sequence" DESC LIMIT $4`),
+					[]driver.Value{"instanceID", eventstore.AggregateType("user"), "agg-a", uint64(5)},
+				),
+			},
+			res: res{
+				wantErr: false,
+			},
+		},
+		{
+			name: "order by creation date is ignored for v1",
+			args: args{
+				dest: &[]*repository.Event{},
+				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					InstanceID("instanceID").
+					OrderDesc().
+					OrderByCreationDate().
+					Limit(5),
+				useV1: true,
+			},
+			fields: fields{
+				mock: newMockClient(t).expectQuery(
+					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE instance_id = $1 ORDER BY event_sequence DESC LIMIT $2`),
+					[]driver.Value{"instanceID", uint64(5)},
 				),
 			},
 			res: res{
@@ -933,7 +1031,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(
-					regexp.QuoteMeta(`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND created_at > $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND created_at > $8) ORDER BY (`+eventSortKeySQL+`) DESC LIMIT $9`),
+					regexp.QuoteMeta(`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND created_at > $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND created_at > $8) ORDER BY "position" DESC, in_tx_order DESC, instance_id DESC, aggregate_type DESC, aggregate_id DESC, "sequence" DESC LIMIT $9`),
 					[]driver.Value{"instanceID", eventstore.AggregateType("notify"), eventstore.EventType("notify.foo.bar"), time.Unix(123, 456), eventstore.AggregateType("notify"), []eventstore.EventType{"notification.failed", "notification.success"}, "instanceID", time.Unix(123, 456), uint64(5)},
 				),
 			},
