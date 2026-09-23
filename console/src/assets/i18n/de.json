@@ -2373,7 +2373,8 @@
       "HEADERNAME": "Header Name",
       "JWTENDPOINT": "JWT Endpoint",
       "JWTKEYSENDPOINT": "JWT Keys Endpoint",
-      "AUDIENCE": "Audience"
+      "AUDIENCE": "Audience",
+      "AUDIENCE_EMPTY_WARNING": "Ohne Audience akzeptiert ZITADEL jedes gültige Token dieses Issuers, unabhängig davon, für welche Anwendung es ausgestellt wurde. Es wird dringend empfohlen, eine Audience zu setzen."
     },
     "TOAST": {
       "SAVED": "Erfolgreich gespeichert.",
