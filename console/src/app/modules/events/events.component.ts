@@ -188,7 +188,8 @@ export class EventsComponent implements OnDestroy {
     req.setEditorUserId(filterRequest.getEditorUserId());
     req.setResourceOwner(filterRequest.getResourceOwner());
     req.setSequence(filterRequest.getSequence());
-    req.setRange(filterRequest.getRange());
+    // the range is tightened in place by the paging cursor, so the filter request must keep its own copy
+    req.setRange(filterRequest.getRange()?.clone());
     req.setFrom(filterRequest.getFrom());
     return req;
   }
