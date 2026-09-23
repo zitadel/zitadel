@@ -87,7 +87,7 @@ func Test_query_event_type_scans(t *testing.T) {
 				Limit(200).
 				ScanEventTypesSeparately().
 				AddQuery().AggregateTypes("org").EventTypes("org.removed").Builder(),
-			sql: `SELECT ` + eventColumnsSQL + ` FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND "position" <= EXTRACT(EPOCH FROM now()) ORDER BY (` + eventSortKeySQL + `) DESC LIMIT $4`,
+			sql: `SELECT ` + eventColumnsSQL + ` FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND "position" <= EXTRACT(EPOCH FROM now()) ORDER BY "position" DESC, in_tx_order DESC, instance_id DESC, aggregate_type DESC, aggregate_id DESC, "sequence" DESC LIMIT $4`,
 			args: []driver.Value{
 				"instanceID", eventstore.AggregateType("org"), eventstore.EventType("org.removed"),
 				uint64(200),
