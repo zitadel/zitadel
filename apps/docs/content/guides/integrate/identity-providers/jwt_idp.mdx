@@ -68,8 +68,9 @@ It's recommended to set this to ensure the JWT is intended to be used by ZITADEL
 If the JWT contains multiple audiences, the configured audience must be one of them.
 
 <Callout type="warn" title="Security Notice">
-If no audience is configured, ZITADEL does not validate the `aud` claim at all. Every token that carries a valid
-signature from this issuer and has not expired is accepted, no matter which application it was issued for.
+If no audience is configured, ZITADEL does not validate the `aud` claim at all. The remaining checks still apply, so
+the token must come from the configured issuer, carry a valid signature, and pass the expiration and issued-at checks.
+Any otherwise valid token is then accepted, no matter which application it was issued for.
 
 Issuers commonly serve more than one application. Without an audience, a token minted for any of them, including an
 application with weaker security requirements, can be presented to ZITADEL and will authenticate the user it describes.
