@@ -421,7 +421,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	// Owner backfill joins projection rows, so it runs after those tables are created and after event replay when prefill is enabled.
 	setupErr = executeMigration(ctx, eventstoreClient, steps.BackfillUniqueConstraintOwners, "migration failed")
 	if setupErr != nil {
-		return
+		return setupErr
 	}
 	return nil
 }
