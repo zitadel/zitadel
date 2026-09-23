@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -677,4 +678,30 @@ func TestCommandSide_RemoveApplication(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCommandSide_RemoveApplicationOwnerDeleteReady(t *testing.T) {
+	r := &Commands{
+		eventstore: expectEventstore(
+			expectFilter(
+				eventFromEventPusher(project.NewApplicationAddedEvent(context.Background(),
+					&project.NewAggregate("project1", "org1").Aggregate,
+					"app1",
+					"app",
+				)),
+			),
+			expectFilter(),
+			expectPush(
+				project.NewApplicationRemovedByOwnerEvent(context.Background(),
+					&project.NewAggregate("project1", "org1").Aggregate,
+					"app1",
+				),
+			),
+		)(t),
+		checkPermission:  newMockPermissionCheckAllowed(),
+		ownerDeleteReady: func(context.Context) (bool, error) { return true, nil },
+	}
+	got, err := r.RemoveApplication(context.Background(), "project1", "app1", "org1")
+	require.NoError(t, err)
+	assertObjectDetails(t, &domain.ObjectDetails{ResourceOwner: "org1"}, got)
 }
