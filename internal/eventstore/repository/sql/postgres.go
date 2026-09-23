@@ -45,6 +45,15 @@ const (
 	eventColumnsSQL = `created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order`
 )
 
+// creationDateOrderSQL orders by created_at first and uses the event sort key as tie breaker.
+// It is deliberately written as a column list and not as a row constructor like the
+// default order: only a column list allows postgres to presort from an index on created_at
+// (incremental sort) and stop after LIMIT rows instead of sorting all matching events.
+var (
+	creationDateOrderAscSQL  = ` ORDER BY created_at, ` + eventSortKeySQL
+	creationDateOrderDescSQL = ` ORDER BY created_at DESC, "position" DESC, in_tx_order DESC, instance_id DESC, aggregate_type DESC, aggregate_id DESC, "sequence" DESC`
+)
+
 // FilterToReducer finds all events matching the given search query and passes them to the reduce function.
 func (psql *Postgres) FilterToReducer(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder, reduce eventstore.Reducer) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
@@ -83,7 +92,7 @@ func (db *Postgres) Client() *database.DB {
 	return db.DB
 }
 
-func (db *Postgres) orderByEventSequence(desc, shouldOrderBySequence, useV1 bool) string {
+func (db *Postgres) orderByEventSequence(desc, shouldOrderBySequence, orderByCreationDate, useV1 bool) string {
 	if useV1 {
 		if desc {
 			return ` ORDER BY event_sequence DESC`
@@ -95,6 +104,12 @@ func (db *Postgres) orderByEventSequence(desc, shouldOrderBySequence, useV1 bool
 			return ` ORDER BY "sequence" DESC`
 		}
 		return ` ORDER BY "sequence"`
+	}
+	if orderByCreationDate {
+		if desc {
+			return creationDateOrderDescSQL
+		}
+		return creationDateOrderAscSQL
 	}
 
 	if desc {

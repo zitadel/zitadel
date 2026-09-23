@@ -22,6 +22,7 @@ type SearchQuery struct {
 	Limit                 uint64
 	Offset                uint32
 	Desc                  bool
+	OrderByCreationDate   bool
 
 	InstanceID          *Filter
 	InstanceIDs         *Filter
@@ -142,6 +143,7 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 		Limit:                 builder.GetLimit(),
 		Offset:                builder.GetOffset(),
 		Desc:                  builder.GetDesc(),
+		OrderByCreationDate:   builder.GetOrderByCreationDate(),
 		Tx:                    builder.GetTx(),
 		AwaitOpenTransactions: builder.GetAwaitOpenTransactions(),
 		SubQueries:            make([][]*Filter, len(builder.GetQueries())),

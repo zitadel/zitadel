@@ -29,7 +29,7 @@ type querier interface {
 	maxPositionQuery(useV1 bool) string
 	instanceIDsQuery(useV1 bool) string
 	Client() *database.DB
-	orderByEventSequence(desc, shouldOrderBySequence, useV1 bool) string
+	orderByEventSequence(desc, shouldOrderBySequence, orderByCreationDate, useV1 bool) string
 	dialect.Database
 }
 
@@ -118,7 +118,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 		switch q.Columns {
 		case eventstore.ColumnsEvent,
 			eventstore.ColumnsMaxPosition:
-			query += criteria.orderByEventSequence(q.Desc, shouldOrderBySequence, useV1)
+			query += criteria.orderByEventSequence(q.Desc, shouldOrderBySequence, q.OrderByCreationDate, useV1)
 		}
 
 		if q.Limit > 0 {
@@ -161,6 +161,7 @@ func canScanEventTypesSeparately(q *repository.SearchQuery, useV1 bool) bool {
 		q.Columns == eventstore.ColumnsEvent &&
 		q.Limit > 0 &&
 		!q.Desc &&
+		!q.OrderByCreationDate &&
 		q.Offset == 0 &&
 		q.InstanceID != nil &&
 		q.InstanceIDs == nil &&
