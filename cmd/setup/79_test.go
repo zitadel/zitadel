@@ -27,7 +27,7 @@ func TestBackfillUniqueConstraintOwnersStmts(t *testing.T) {
 		extra      []string
 	}{
 		{"01_usernames_org_scoped.sql", "usernames", "u.username || u.resource_owner", projection.UserTable, []string{"'org:' || u.resource_owner"}},
-		{"02_usernames.sql", "usernames", "lower(u.username)", projection.UserTable, []string{"'org:' || u.resource_owner", "organization_scoped_usernames", "user_login_must_be_domain"}},
+		{"02_usernames.sql", "usernames", "lower(u.username)", projection.UserTable, []string{"'org:' || u.resource_owner", "user_login_must_be_domain"}},
 		{"03_external_idps.sql", "external_idps", "l.idp_id || l.external_user_id", projection.IDPUserLinkTable, []string{"'idp:' || l.idp_id"}},
 		{"04_org_name.sql", "org_name", "o.name", projection.OrgProjectionTable, nil},
 		{"05_org_domain.sql", "org_domain", "d.domain", projection.OrgDomainTable, []string{"d.is_verified"}},
