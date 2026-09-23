@@ -30,18 +30,30 @@ func (s *TextArray[T]) Scan(src any) error {
 }
 
 // Value implements the [database/sql/driver.Valuer] interface.
+// Every element is quoted so commas, quotes, and backslashes stay inside one element.
+// An empty array is NULL, which keeps ANY($1) filters unchanged.
 func (s TextArray[T]) Value() (driver.Value, error) {
 	if len(s) == 0 {
 		return nil, nil
 	}
 
-	typed := make([]string, len(s))
-
+	var b strings.Builder
+	b.WriteByte('{')
 	for i, value := range s {
-		typed[i] = string(value)
+		if i > 0 {
+			b.WriteByte(',')
+		}
+		b.WriteByte('"')
+		for _, r := range string(value) {
+			if r == '"' || r == '\\' {
+				b.WriteByte('\\')
+			}
+			b.WriteRune(r)
+		}
+		b.WriteByte('"')
 	}
-
-	return []byte("{" + strings.Join(typed, ",") + "}"), nil
+	b.WriteByte('}')
+	return []byte(b.String()), nil
 }
 
 type ByteArray[T ~byte] pgtype.FlatArray[T]
