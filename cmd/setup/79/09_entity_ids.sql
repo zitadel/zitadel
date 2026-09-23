@@ -2,7 +2,7 @@
 WITH page AS MATERIALIZED (
 	SELECT s.instance_id, s.app_id, s.entity_id
 	FROM {{.apps_saml}} s
-	WHERE (s.instance_id, s.app_id) > (COALESCE($1::jsonb->>0, ''), COALESCE($1::jsonb->>1, ''))
+	WHERE (s.instance_id, s.app_id) > (COALESCE(($1::text[])[1], ''), COALESCE(($1::text[])[2], ''))
 	ORDER BY s.instance_id, s.app_id
 	LIMIT $2
 ),

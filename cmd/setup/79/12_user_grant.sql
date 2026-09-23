@@ -3,7 +3,7 @@
 WITH page AS MATERIALIZED (
 	SELECT g.instance_id, g.id, g.resource_owner, g.resource_owner_user, g.resource_owner_project, g.user_id, g.project_id, g.granted_org, g.grant_id
 	FROM {{.user_grants}} g
-	WHERE (g.instance_id, g.id) > (COALESCE($1::jsonb->>0, ''), COALESCE($1::jsonb->>1, ''))
+	WHERE (g.instance_id, g.id) > (COALESCE(($1::text[])[1], ''), COALESCE(($1::text[])[2], ''))
 	ORDER BY g.instance_id, g.id
 	LIMIT $2
 ),

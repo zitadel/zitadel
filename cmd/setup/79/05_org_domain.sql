@@ -2,7 +2,7 @@
 WITH page AS MATERIALIZED (
 	SELECT d.org_id, d.domain, d.instance_id
 	FROM {{.org_domains}} d
-	WHERE (d.org_id, d.domain, d.instance_id) > (COALESCE($1::jsonb->>0, ''), COALESCE($1::jsonb->>1, ''), COALESCE($1::jsonb->>2, ''))
+	WHERE (d.org_id, d.domain, d.instance_id) > (COALESCE(($1::text[])[1], ''), COALESCE(($1::text[])[2], ''), COALESCE(($1::text[])[3], ''))
 		AND d.is_verified
 	ORDER BY d.org_id, d.domain, d.instance_id
 	LIMIT $2

@@ -2,7 +2,7 @@
 WITH page AS MATERIALIZED (
 	SELECT u.instance_id, u.id, u.resource_owner, u.username
 	FROM {{.users}} u
-	WHERE (u.instance_id, u.id) > (COALESCE($1::jsonb->>0, ''), COALESCE($1::jsonb->>1, ''))
+	WHERE (u.instance_id, u.id) > (COALESCE(($1::text[])[1], ''), COALESCE(($1::text[])[2], ''))
 	ORDER BY u.instance_id, u.id
 	LIMIT $2
 ),

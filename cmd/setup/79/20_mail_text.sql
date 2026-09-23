@@ -2,7 +2,7 @@
 WITH page AS MATERIALIZED (
 	SELECT t.instance_id, t.aggregate_id, t.type, t.language
 	FROM {{.message_texts}} t
-	WHERE (t.instance_id, t.aggregate_id, t.type, t.language) > (COALESCE($1::jsonb->>0, ''), COALESCE($1::jsonb->>1, ''), COALESCE($1::jsonb->>2, ''), COALESCE($1::jsonb->>3, ''))
+	WHERE (t.instance_id, t.aggregate_id, t.type, t.language) > (COALESCE(($1::text[])[1], ''), COALESCE(($1::text[])[2], ''), COALESCE(($1::text[])[3], ''), COALESCE(($1::text[])[4], ''))
 		AND t.aggregate_id <> t.instance_id
 	ORDER BY t.instance_id, t.aggregate_id, t.type, t.language
 	LIMIT $2
