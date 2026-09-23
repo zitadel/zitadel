@@ -27,7 +27,7 @@ func TestBackfillUniqueConstraintOwnersStmts(t *testing.T) {
 		extra      []string
 	}{
 		{"01_usernames_org_scoped.sql", "usernames", "u.username || u.resource_owner", projection.UserTable, []string{"'org:' || u.resource_owner"}},
-		{"02_usernames.sql", "usernames", "u.username, lower(u.username)", projection.UserTable, []string{"'org:' || u.resource_owner", "organization_scoped_usernames", "user_login_must_be_domain"}},
+		{"02_usernames.sql", "usernames", "lower(u.username)", projection.UserTable, []string{"'org:' || u.resource_owner", "organization_scoped_usernames", "user_login_must_be_domain"}},
 		{"03_external_idps.sql", "external_idps", "l.idp_id || l.external_user_id", projection.IDPUserLinkTable, []string{"'idp:' || l.idp_id"}},
 		{"04_org_name.sql", "org_name", "o.name", projection.OrgProjectionTable, nil},
 		{"05_org_domain.sql", "org_domain", "d.domain", projection.OrgDomainTable, []string{"d.is_verified"}},
@@ -54,7 +54,10 @@ func TestBackfillUniqueConstraintOwnersStmts(t *testing.T) {
 		assert.Contains(t, stmt.query, "unique_type = '"+want[i].uniqueType+"'")
 		assert.Contains(t, stmt.query, want[i].field)
 		assert.Contains(t, stmt.query, want[i].table)
-		assert.Contains(t, stmt.query, "uc.unique_field IN (")
+		assert.Contains(t, stmt.query, "uc.unique_field =")
+		assert.Contains(t, stmt.query, "LIMIT $2")
+		assert.Contains(t, stmt.query, "$1::jsonb->>0")
+		assert.NotContains(t, stmt.query, "uc.unique_field IN (")
 		assert.NotContains(t, stmt.query, "lower(uc.unique_field)")
 		assert.NotContains(t, stmt.query, "{{.")
 		for _, extra := range want[i].extra {
@@ -190,11 +193,18 @@ func TestUniqueTypesWithOwnersOmitsMailText(t *testing.T) {
 	assert.Contains(t, eventstore.UniqueTypesWithOwners, "idp_config_names")
 }
 
+func TestBackfillUniqueConstraintOwnersBatchSize(t *testing.T) {
+	assert.Equal(t, defaultUniqueConstraintOwnerBatchSize, (&BackfillUniqueConstraintOwners{}).batchSize())
+	assert.Equal(t, defaultUniqueConstraintOwnerBatchSize, (&BackfillUniqueConstraintOwners{BatchSize: -1}).batchSize())
+	assert.Equal(t, 10, (&BackfillUniqueConstraintOwners{BatchSize: 10}).batchSize())
+}
+
 func TestBackfillUniqueConstraintOwnersJSONOmitsForceFinalize(t *testing.T) {
 	mig := &BackfillUniqueConstraintOwners{
 		Version:       "v2.0.0",
 		Finalized:     true,
 		ForceFinalize: true,
+		BatchSize:     10,
 		lastVersion:   "v1.0.0",
 		lastFinalized: true,
 	}
@@ -207,6 +217,8 @@ func TestBackfillUniqueConstraintOwnersJSONOmitsForceFinalize(t *testing.T) {
 	assert.Equal(t, true, payload["finalized"])
 	assert.NotContains(t, payload, "ForceFinalize")
 	assert.NotContains(t, payload, "forceFinalize")
+	assert.NotContains(t, payload, "BatchSize")
+	assert.NotContains(t, payload, "batchSize")
 	assert.NotContains(t, payload, "lastVersion")
 	assert.NotContains(t, payload, "lastFinalized")
 	assert.False(t, strings.Contains(string(data), "v1.0.0"))

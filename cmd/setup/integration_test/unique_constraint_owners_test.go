@@ -33,7 +33,7 @@ func TestBackfillUniqueConstraintOwners_OrgDomainVerifiedOnly(t *testing.T) {
 
 	query, err := setup.BackfillUniqueConstraintOwnersQuery("05_org_domain.sql")
 	require.NoError(t, err)
-	_, err = dbPool.Exec(CTX, query)
+	_, err = dbPool.Exec(CTX, query, "[]", 5000)
 	require.NoError(t, err)
 
 	var owners []string
@@ -79,7 +79,7 @@ func TestBackfillUniqueConstraintOwners_UsernameInstanceScopedOrg(t *testing.T) 
 
 	query, err := setup.BackfillUniqueConstraintOwnersQuery("02_usernames.sql")
 	require.NoError(t, err)
-	_, err = dbPool.Exec(CTX, query)
+	_, err = dbPool.Exec(CTX, query, "[]", 5000)
 	require.NoError(t, err)
 
 	var instanceOwners []string
