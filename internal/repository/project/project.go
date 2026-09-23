@@ -60,6 +60,10 @@ func projectOwnerTags(agg *eventstore.Aggregate) []string {
 	}
 }
 
+func appOwnerTags(agg *eventstore.Aggregate, appID string) []string {
+	return append(projectOwnerTags(agg), eventstore.OwnerTag(eventstore.UniqueConstraintOwnerApp, appID))
+}
+
 func grantOwnerTags(agg *eventstore.Aggregate, grantID, grantedOrgID string) []string {
 	return []string{
 		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, agg.ResourceOwner),

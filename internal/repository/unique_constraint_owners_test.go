@@ -53,7 +53,7 @@ func TestUniqueConstraintOwners(t *testing.T) {
 		{
 			name: "app name",
 			cmd:  project.NewApplicationAddedEvent(ctx, agg(project.AggregateType, "project-1", "org-1"), "app-1", "console"),
-			want: [][]string{{"org:org-1", "project:project-1"}},
+			want: [][]string{{"org:org-1", "project:project-1", "app:app-1"}},
 		},
 		{
 			name: "project role",
@@ -63,7 +63,7 @@ func TestUniqueConstraintOwners(t *testing.T) {
 		{
 			name: "saml entity id",
 			cmd:  project.NewSAMLConfigAddedEvent(ctx, agg(project.AggregateType, "project-1", "org-1"), "app-1", "https://sp.example", nil, "", 0, ""),
-			want: [][]string{{"org:org-1", "project:project-1"}},
+			want: [][]string{{"org:org-1", "project:project-1", "app:app-1"}},
 		},
 		{
 			name: "project name",
