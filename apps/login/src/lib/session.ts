@@ -1,3 +1,4 @@
+import { Code, ConnectError } from "@connectrpc/connect";
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { AuthRequest } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { SAMLRequest } from "@zitadel/proto/zitadel/saml/v2/authorization_pb";
@@ -29,26 +30,27 @@ export async function loadMostRecentSession({
     return undefined;
   }
 
-  return getSession({ serviceConfig, sessionId: recent.id, sessionToken: recent.token })
-    .then((resp: GetSessionResponse) => resp.session)
-    .catch(async (error) => {
-      const { Code, ConnectError } = await import("@connectrpc/connect");
-      const isNotFound = error instanceof ConnectError && error.code === Code.NotFound;
-
-      // The `sessions` cookie has no maxAge, so it can outlive the server-side session
-      // and reference one the session projection no longer holds — e.g. the user logged out, an
-      // admin/API terminated the session, or the user/org/instance was removed. In that
-      // case getSession throws `not_found`. Treat it like the no-cookie case above and
-      // return undefined instead of letting the error crash the caller's render. Every
-      // call site already handles an undefined session — either with a graceful fallback
-      // or by throwing its own explicit "no session" error.
-      if (isNotFound) {
-        console.warn("[Session] Could not load most recent session", error);
-        return undefined;
-      }
-
-      throw error;
+  try {
+    const response: GetSessionResponse = await getSession({
+      serviceConfig,
+      sessionId: recent.id,
+      sessionToken: recent.token,
     });
+    return response.session;
+  } catch (error) {
+    // The `sessions` cookie has no maxAge, so it can outlive the server-side session
+    // (logout, admin/API termination, removed user/org/instance) and getSession throws
+    // `not_found`. Treat it like the no-cookie case above. The stale entry is not pruned
+    // here: nearly every caller is a server-component render, where Next.js forbids
+    // cookie writes. Pruning lives in the server actions that already rewrite the
+    // cookie with the instance's iframe setting (see clearSession in server/session.ts).
+    if (error instanceof ConnectError && error.code === Code.NotFound) {
+      console.warn("[Session] Could not load most recent session", error);
+      return undefined;
+    }
+
+    throw error;
+  }
 }
 
 /**
