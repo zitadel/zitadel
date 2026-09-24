@@ -1,0 +1,612 @@
+---
+title: Set up SATOSA as a SAML Identity Provider in ZITADEL
+sidebar_label: SATOSA (SAML Federation)
+id: satosa-saml
+---
+
+import GeneralConfigDescription from './_general_config_description.mdx';
+import Intro from './_intro.mdx';
+import CustomLoginPolicy from './_custom_login_policy.mdx';
+import IDPsOverview from './_idps_overview.mdx';
+import Activate from './_activate.mdx';
+import TestSetup from './_test_setup.mdx';
+
+<Intro components={props.components} provider="SATOSA"/>
+
+## Overview
+
+Integrating with a federation containing dozens or hundreds of IDPs can be a challenge as it would require you to declare a new IDP in ZITADEL for each member of the federation. On top of this, most federations require you to provide a single Service Provider identity (EntityID) to identify your service in their system.
+
+To solve this, you can use SATOSA to declare a single instance-wide IDP in ZITADEL and enable it for everyone or on a per-organization basis.
+
+[SATOSA](https://github.com/IdentityPython/SATOSA) is a configurable proxy for translating between different authentication protocols. In this guide, we will use SATOSA to bridge **ZITADEL** (acting as a Service Provider) with the **SWITCHaai Federation** (acting as the Identity Provider via a Discovery Service). The instructions below can be used to integrate with most federations with minor changes (mainly endpoint URLs and SAML attribute mappings).
+
+The architecture looks like this:
+`ZITADEL <(SAML)> SATOSA <(SAML)> SWITCHaai`
+
+- **ZITADEL**: `https://zitadel.example.com`
+- **SATOSA**: `https://satosa.example.com`
+- **Federation**: `switch.ch` (SWITCHaai)
+
+This way, from ZITADEL's point of view we have a single IDP and from the federation's point of view only a single SP.
+
+## SATOSA Configuration
+
+For this example we will deploy SATOSA using Docker Compose. We need to generate signing certificates and configure the backend (Federation side) and frontend (ZITADEL side) interfaces.
+
+### Prerequisites
+
+1.  A server with Docker and Docker Compose installed.
+2.  DNS records configured for `satosa.example.com`.
+3.  A Reverse proxy with TLS termination.
+4.  Access to the [SWITCHaai Resource Registry](https://rr.aai.switch.ch/) (or your target federation's registry) to register the SATOSA Service Provider.
+
+Most federations have a test environment to freely test your integration before officially submitting your registration as a Service Provider. Adjust URLs accordingly.
+
+### Directory Structure
+
+Create a folder for your deployment (e.g., `satosa-bridge`) and the following subdirectories:
+
+```bash
+mkdir -p satosa-bridge/{config,certs,plugins/backends,plugins/frontends}
+cd satosa-bridge
+```
+
+### Generate Certificates
+
+SATOSA requires private keys and certificates to sign SAML requests and metadata. We will generate two sets: one for the Backend (facing SWITCHaai) and one for the Frontend (facing ZITADEL).
+
+**1. Backend Keys (for SWITCHaai):**
+
+```bash
+openssl req -x509 -newkey rsa:4096 -keyout certs/switch_backend.key -out certs/switch_backend.crt -days 365 -nodes -subj "/CN=satosa.example.com"
+```
+
+**2. Frontend Keys (for ZITADEL):**
+
+```bash
+openssl req -x509 -newkey rsa:4096 -keyout certs/zitadel_frontend.key -out certs/zitadel_frontend.crt -days 365 -nodes -subj "/CN=satosa.example.com"
+```
+
+### Configuration Files
+
+Create the following configuration files in your folder structure.
+
+`config/proxy_conf.yaml`
+
+This is the main entry point for SATOSA.
+
+```yaml
+# proxy_conf.yaml
+BASE: !ENV BASE_URL
+
+# Cookie name used for state during authentication
+COOKIE_STATE_NAME: "SATOSA_STATE"
+
+# Encryption key used for cookie encryption
+STATE_ENCRYPTION_KEY: !ENV STATE_ENCRYPTION_KEY
+
+# Internal attributes maps attributes names to internal SATOSA names to translate between parties
+INTERNAL_ATTRIBUTES: "/etc/satosa/internal_attributes.yaml"
+
+# Backends are the interface between SATOSA and the remote IDPs (here SWITCHaai)
+BACKEND_MODULES:
+  - "/etc/satosa/plugins/backends/saml2_backend_switch.yaml"
+
+# Frontends are the interface between SATOSA and the SPs (here ZITADEL)
+FRONTEND_MODULES:
+  - "/etc/satosa/plugins/frontends/saml2_frontend_zitadel.yaml"
+```
+
+`config/internal_attributes.yaml`
+
+This file maps external SAML OIDs to internal SATOSA names.
+
+```yaml
+# internal_attributes.yaml
+attributes:
+  # eduPersonPrincipalName (ePPN) - Unique Identifier
+  edupersonprincipalname:
+    saml:
+      - urn:oid:1.3.6.1.4.1.5923.1.1.1.6
+      - eduPersonPrincipalName
+
+  # Mail
+  mail:
+    saml:
+      - urn:oid:0.9.2342.19200300.100.1.3
+      - mail
+
+  # Display Name
+  displayname:
+    saml:
+      - urn:oid:2.16.840.1.113730.3.1.241
+      - displayName
+
+  # Given Name
+  givenname:
+    saml:
+      - urn:oid:2.5.4.42
+      - givenName
+
+  # Surname
+  surname:
+    saml:
+      - urn:oid:2.5.4.4
+      - sn
+
+user_id_from_attrs:
+  - edupersonprincipalname
+
+user_id_to_attr: edupersonprincipalname
+```
+
+`plugins/backends/saml2_backend_switch.yaml`
+
+This configures how SATOSA talks to the Federation.
+
+```yaml
+module: satosa.backends.saml2.SAMLBackend
+name: switch
+config:
+  # SWITCHaai Discovery Service URL
+  disco_srv: !ENV SWITCH_DISCOVERY_URL
+  attribute_profile: saml
+  entityid_endpoint: true
+
+  sp_config:
+    name: "ZITADEL SATOSA Bridge"
+    # This entityID is what we register with SWITCHaai, here it will be "https://satosa.example.com/switch"
+    # You can change to anything you want as long as it's uniquely identifying you within the federation
+    entityid: "<base_url>/<name>"
+    accepted_time_diff: 60
+    key_file: /etc/satosa/saml_keys/switch_backend.key
+    cert_file: /etc/satosa/saml_keys/switch_backend.crt
+    organization:
+      name: Example Org
+      display_name: Example Org
+      url: https://example.com
+    contact_person:
+      - given_name: Support
+        email_address: mailto:support@example.com
+        contact_type: technical
+
+    metadata:
+      # SWITCHaai Metadata
+      remote:
+        - url: !ENV SWITCH_METADATA_URL
+          # You should download the SWITCHaai Root CA and mount it if validation is required
+          # cert: /etc/satosa/switch_cert.pem
+
+    service:
+      sp:
+        ui_info:
+          display_name:
+            - lang: en
+              text: My ZITADEL Service
+        authn_requests_signed: true
+        want_response_signed: true
+        allow_unsolicited: true
+        signing_algorithm: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
+
+        # Attributes we request from the Federation
+        required_attributes:
+          - urn:oid:1.3.6.1.4.1.5923.1.1.1.6   # eduPersonPrincipalName
+          - urn:oid:0.9.2342.19200300.100.1.3  # mail
+          - urn:oid:2.16.840.1.113730.3.1.241  # displayName
+          - urn:oid:2.5.4.42                   # givenName
+          - urn:oid:2.5.4.4                    # sn
+
+        endpoints:
+          assertion_consumer_service:
+            - [ "<base_url>/<name>/acs/post", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" ]
+          discovery_response:
+            - [ "<base_url>/<name>/disco", "urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol" ]
+```
+
+`plugins/frontends/saml2_frontend_zitadel.yaml`
+
+This configures how SATOSA presents itself to ZITADEL.
+
+```yaml
+module: satosa.frontends.saml2.SAMLFrontend
+name: zitadel
+config:
+  attribute_profile: saml
+  entityid_endpoint: true
+  enable_metadata_reload: false
+
+  endpoints:
+    single_sign_on_service:
+      "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect": "sso/redirect"
+      "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST": "sso/post"
+
+  idp_config:
+    # The entityID presented to ZITADEL
+    entityid: "<base_url>/<name>"
+    accepted_time_diff: 60
+
+    key_file: /etc/satosa/saml_keys/zitadel_frontend.key
+    cert_file: /etc/satosa/saml_keys/zitadel_frontend.crt
+
+    service:
+      idp:
+        name_id_format:
+          - "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
+          - "urn:oasis:names:tc:SAML:2.0:nameid-format:transient"
+
+        endpoints:
+          single_sign_on_service: []
+
+        policy:
+          default:
+            lifetime: { "minutes": 15 }
+            attribute_restrictions: null
+            fail_on_missing_requested: false
+            # Use URI format (OIDs) for attributes sent to ZITADEL
+            name_form: urn:oasis:names:tc:SAML:2.0:attrname-format:uri
+
+    # Metadata: SATOSA needs to know about ZITADEL
+    metadata:
+      remote:
+        - url: !ENV ZITADEL_METADATA_URL
+```
+
+### Docker Compose
+
+Create `docker-compose.yaml`. Replace the `STATE_ENCRYPTION_KEY` with a random string of your choice.
+
+```yaml
+services:
+  satosa:
+    image: satosa/satosa:8.5.1-alpine3.22
+    container_name: satosa
+    # We assume a reverse proxy with TLS termination is sitting in front of SATOSA
+    ports:
+      - "8000:8000"
+    environment:
+      # General
+      SATOSA_BIND_ADDRESS: 0.0.0.0
+      SATOSA_PORT: 8000
+      STATE_ENCRYPTION_KEY: "change_me_to_a_random_secure_string"
+      BASE_URL: "https://satosa.example.com"
+      LOG_LEVEL: "INFO"
+
+      # Federation (SWITCHaai) Config
+      SWITCH_DISCOVERY_URL: "https://wayf.switch.ch/SWITCHaai/WAYF"
+      SWITCH_METADATA_URL: "https://metadata.aai.switch.ch/metadata.switchaai+idp.xml"
+
+      # ZITADEL Config
+      # This URL comes from your ZITADEL SAML IdP configuration (see next section).
+      ZITADEL_METADATA_URL: "https://zitadel.example.com/idps/<id>/saml/metadata"
+
+    volumes:
+      - ./config/proxy_conf.yaml:/etc/satosa/proxy_conf.yaml
+      - ./config/internal_attributes.yaml:/etc/satosa/internal_attributes.yaml
+      - ./plugins:/etc/satosa/plugins
+      - ./certs:/etc/satosa/saml_keys
+```
+
+Start the service:
+
+```bash
+docker compose up -d
+```
+
+At this point we'll assume our SATOSA installation is available publicly at `https://satosa.example.com`.
+
+## ZITADEL Settings
+
+### Create a new SAML Service Provider
+
+In ZITADEL, we need to treat SATOSA as the Identity Provider.
+
+<IDPsOverview components={props.components} templates="SAML"/>
+
+1.  Go to **Settings > Identity Providers > New > SAML**.
+2.  Select **SAML**.
+3.  **Name**: `SWITCHaai` (or similar).
+4.  **Metadata XML / URL**: Input the Metadata URL of the SATOSA Frontend.
+    *   URL: `https://satosa.example.com/zitadel/metadata`
+    *   *Note: Ensure SATOSA is running and reachable by ZITADEL.*
+5.  **Binding**: Ensure `POST` or `REDIRECT` is selected (SATOSA supports both).
+6.  **Advanced Options**:
+    *   Check **Signed Request**.
+    *   **Custom Mapping Attribute Name**: `urn:oid:1.3.6.1.4.1.5923.1.1.1.6`
+        *   *Why?* SATOSA is configured to send the user ID (ePPN) as the NameID, but ZITADEL maps the unique ID based on this attribute setting. This OID corresponds to `eduPersonPrincipalName`.
+
+<GeneralConfigDescription components={props.components} provider_account="SATOSA" />
+
+After saving, note the **ZITADEL Metadata URL** shown in the details page (e.g., `https://zitadel.example.com/idps/.../saml/metadata`) and copy it into `ZITADEL_METADATA_URL` in `docker-compose.yaml`. Make sure to restart the SATOSA container.
+
+### Federation Registration
+
+You must register your SATOSA instance with the Federation (SWITCHaai).
+
+1.  Locate your SATOSA Backend Metadata URL: `https://satosa.example.com/switch/metadata`
+2.  Log in to the **SWITCHaai Resource Registry**.
+3.  Register a new **Service Provider**.
+4.  Provide the Metadata URL.
+5.  Configure requested attributes (ePPN, mail, givenName, sn, displayName) to match those defined in `saml2_backend_switch.yaml`.
+
+## Configure an Action to Autofill User Data
+
+### Required for Login V2
+The creation of users in ZITADEL will fail if the required fields to create a user are not set.
+
+**Actions V2** can be used to map the SAML attributes returned by the IdP to the required fields in ZITADEL.
+See the [Actions V2 Response Manipulation](/guides/integrate/actions/testing-response-manipulation)
+guide for more information on setting up a Target and an Execution. In short,
+* Create an Actions V2 Target of type `REST Call`
+* Create an Execution of type `Response` on the method `/zitadel.user.v2.UserService/RetrieveIdentityProviderIntent`
+
+The following minimal example modifies the response of `/zitadel.user.v2.UserService/RetrieveIdentityProviderIntent` to set the required fields
+for user creation. This is just an example, please adjust the attributes according to your Federation.
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"io"
+	"log"
+	"net/http"
+
+	"github.com/muhlemmer/gu"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/user/v2"
+	"google.golang.org/protobuf/encoding/protojson"
+)
+
+// Standard OIDs used in Federation
+const (
+	OID_EMAIL      = "urn:oid:0.9.2342.19200300.100.1.3"
+	OID_GIVEN_NAME = "urn:oid:2.5.4.42"
+	OID_SURNAME    = "urn:oid:2.5.4.4"
+	OID_DISPLAY    = "urn:oid:2.16.840.1.113730.3.1.241"
+)
+
+type contextResponse struct {
+	Request  *retrieveIdentityProviderIntentRequestWrapper  `json:"request"`
+	Response *retrieveIdentityProviderIntentResponseWrapper `json:"response"`
+}
+
+type retrieveIdentityProviderIntentRequestWrapper struct {
+	user.RetrieveIdentityProviderIntentRequest
+}
+
+func (r *retrieveIdentityProviderIntentRequestWrapper) MarshalJSON() ([]byte, error) {
+	data, err := protojson.Marshal(r)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (r *retrieveIdentityProviderIntentRequestWrapper) UnmarshalJSON(data []byte) error {
+	return protojson.Unmarshal(data, r)
+}
+
+type retrieveIdentityProviderIntentResponseWrapper struct {
+	user.RetrieveIdentityProviderIntentResponse
+}
+
+func (r *retrieveIdentityProviderIntentResponseWrapper) MarshalJSON() ([]byte, error) {
+	data, err := protojson.Marshal(r)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (r *retrieveIdentityProviderIntentResponseWrapper) UnmarshalJSON(data []byte) error {
+	return protojson.Unmarshal(data, r)
+}
+
+func call(w http.ResponseWriter, req *http.Request) {
+	sentBody, err := io.ReadAll(req.Body)
+	if err != nil {
+		http.Error(w, "error", http.StatusInternalServerError)
+		return
+	}
+	defer req.Body.Close()
+
+	request := new(contextResponse)
+	if err := json.Unmarshal(sentBody, request); err != nil {
+		http.Error(w, "error", http.StatusInternalServerError)
+		return
+	}
+
+	resp := request.Response
+	if err = manipulateResponse(resp); err != nil {
+		http.Error(w, "error modifying response", http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(resp)
+	if err != nil {
+		http.Error(w, "error marshaling response", http.StatusInternalServerError)
+		return
+	}
+	w.Write(data)
+}
+
+// Struct to parse the raw SAML attributes coming from SATOSA
+type rawInformation struct {
+	Attributes map[string][]string `json:"attributes"`
+	Id         string              `json:"id"`
+}
+
+func manipulateResponse(resp *retrieveIdentityProviderIntentResponseWrapper) error {
+	if resp == nil || resp.IdpInformation == nil || resp.IdpInformation.RawInformation == nil {
+		return nil
+	}
+
+	var rawInfoBytes []byte
+	var err error
+	if rawInfoBytes, err = resp.IdpInformation.RawInformation.MarshalJSON(); err != nil {
+		return err
+	}
+
+	var rawInfo rawInformation
+	if err = json.Unmarshal(rawInfoBytes, &rawInfo); err != nil {
+		return err
+	}
+
+	// Helper to safely get the first value of an attribute
+	getAttr := func(oid string) string {
+		if vals, ok := rawInfo.Attributes[oid]; ok && len(vals) > 0 {
+			return vals[0]
+		}
+		return ""
+	}
+
+	email := getAttr(OID_EMAIL)
+	firstName := getAttr(OID_GIVEN_NAME)
+	lastName := getAttr(OID_SURNAME)
+
+	// If mandatory fields are missing, let ZITADEL handle the error or fallback
+	if email == "" || firstName == "" || lastName == "" {
+		log.Println("Missing required federation attributes (Mail, GivenName, or Sn)")
+		return nil
+	}
+
+	if resp.AddHumanUser != nil {
+		resp.IdpInformation.UserName = email
+
+		resp.AddHumanUser.Profile = &user.SetHumanProfile{
+			GivenName:  firstName,
+			FamilyName: lastName,
+		}
+		resp.AddHumanUser.Email = &user.SetHumanEmail{
+			Email:        email,
+			Verification: &user.SetHumanEmail_IsVerified{IsVerified: true},
+		}
+		resp.AddHumanUser.Username = gu.Ptr(email)
+	}
+	return nil
+}
+
+func main() {
+	http.HandleFunc("/call", call)
+	http.ListenAndServe(":8090", nil)
+}
+```
+
+## Activate IdP
+
+<Activate components={props.components} />
+
+### Ensure your Login Policy allows External IdPs
+
+<CustomLoginPolicy components={props.components} />
+
+## Test the setup
+
+<TestSetup components={props.components} loginscreen="SWITCHaai"/>
+
+1.  Open an incognito window and go to your ZITADEL login page.
+2.  Click the **SWITCHaai** button.
+3.  You should be redirected to `satosa.example.com`, which immediately redirects to the **SWITCHaai Discovery Service** (WAYF).
+4.  Select your Home Organization (University/Institution) and log in.
+5.  You will be redirected back to SATOSA, and then to ZITADEL.
+6.  The user should be logged in, and their profile created automatically.
+
+## Troubleshooting
+
+Bridging a Federation with an SP-Gateway like SATOSA involves multiple parties. If authentication fails, check the following locations.
+
+### 1. SATOSA Logs
+
+SATOSA provides detailed logs that are essential for debugging SAML flows. If `LOG_LEVEL` is set to `INFO` or `DEBUG` in your Docker environment, you can inspect the logs:
+
+```bash
+docker compose logs -f satosa
+```
+
+**Common errors to look for:**
+*   **`StateNotFound`**: The user took too long to log in, or the browser blocked the `SATOSA_STATE` cookie (check SameSite/Secure settings if running on HTTPS).
+*   **`Missing required attribute`**: The Federation (SWITCHaai) did not return an attribute required by your `saml2_backend_switch.yaml` config.
+*   **`Signature validation failed`**: The metadata certificates do not match. Ensure you are using the correct SWITCHaai MDQ URL and that ZITADEL has the correct SATOSA metadata.
+
+### 2. Attribute Mapping
+
+The most common issue in Federation setups is attribute naming.
+
+1.  **SWITCHaai (IdP)** sends attributes as OIDs (e.g., `urn:oid:2.5.4.42`).
+2.  **SATOSA Backend** receives them.
+3.  **SATOSA Internal** maps them to internal names (e.g., `givenname`) using `internal_attributes.yaml`.
+4.  **SATOSA Frontend** maps internal names back to OIDs or text names based on `saml2_frontend_zitadel.yaml`.
+5.  **ZITADEL** receives the assertion.
+
+If user profiles are empty in ZITADEL:
+*   Check the SATOSA logs to see exactly what attributes are being received from SWITCHaai.
+*   Ensure `internal_attributes.yaml` covers the OIDs sent by SWITCH.
+*   Ensure the **Action** in ZITADEL is looking for the exact keys SATOSA is sending to ZITADEL (configured in the Frontend module).
+
+### 3. Metadata Refresh
+
+If you change major settings in SATOSA (like the signing key or entityID), you must:
+1.  Restart the SATOSA container.
+2.  Refresh the metadata in ZITADEL (re-save the IdP configuration or update the metadata URL).
+3.  Update the registration in the SWITCHaai Resource Registry if the Backend EntityID or keys changed.
+
+## Advanced: Using `swissEduPersonUniqueID`
+
+While this guide uses `eduPersonPrincipalName` (ePPN) as the unique identifier, many Swiss universities prefer `swissEduPersonUniqueID` (OID `2.16.756.1.2.5.1.1.1`) because it is persistent even if a user's email changes.
+
+To use this instead:
+
+1.  **Update `internal_attributes.yaml`**:
+    Add the mapping for the internal attribute and set it as the user ID.
+    ```yaml
+    attributes:
+      swissedupersonuniqueid:
+        saml:
+          - urn:oid:2.16.756.1.2.5.1.1.1
+
+    user_id_from_attrs:
+      - swissedupersonuniqueid
+      - edupersonprincipalname # Fallback
+
+    user_id_to_attr: swissedupersonuniqueid
+    ```
+
+2.  **Update ZITADEL IdP Settings**:
+    Change the **Custom Mapping Attribute Name** in ZITADEL to `urn:oid:2.16.756.1.2.5.1.1.1`.
+
+3.  **Update the ZITADEL Action**:
+    You must update the **Map SWITCH Attributes** action to recognize the new OID.
+
+    Add the constant to the `const` block:
+    ```go
+    const (
+        OID_SWISS_ID = "urn:oid:2.16.756.1.2.5.1.1.1"
+        // ... existing constants
+    )
+    ```
+
+    And update the logic inside `manipulateResponse` if you want to use this ID as the ZITADEL Username:
+    ```go
+    // ... inside manipulateResponse
+    swissID := getAttr(OID_SWISS_ID)
+
+    if swissID != "" {
+        // Use the Swiss ID as the ZITADEL username instead of Email
+        resp.IdpInformation.UserName = swissID
+    } else {
+        resp.IdpInformation.UserName = email
+    }
+    // ...
+    ```
+
+## Summary
+
+You have now successfully deployed a SAML Gateway that allows ZITADEL to accept identities from the SWITCHaai Federation.
+
+*   **ZITADEL** sees SATOSA as a single, standard SAML Identity Provider.
+*   **SATOSA** handles the complexity of Federation metadata, discovery services (WAYF), and attribute translation.
+*   **SWITCHaai** sees SATOSA as a single standard Service Provider.
+
+In the event you need to integrate with more than one federation you can create additional frontends and backends in SATOSA or even create dedicated SATOSA instances for each federations depending on your needs.
+
+This architecture ensures that your ZITADEL instance remains clean and decoupled from the specific requirements of academic federations.
