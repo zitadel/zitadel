@@ -6,9 +6,10 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { Skeleton } from "@/components/skeleton";
 import { ThemeProvider } from "@/components/theme-provider";
 import ThemeSwitch from "@/components/theme-switch";
+import { ColorSchemeMeta } from "@/components/theme-wrapper";
 import { LANGS, getLanguage } from "@/lib/i18n";
 import { getServiceConfig } from "@/lib/service-url";
-import { getAllowedLanguages } from "@/lib/zitadel";
+import { getAllowedLanguages, getBrandingSettings } from "@/lib/zitadel";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -30,6 +31,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
+  // Instance-level theme mode for the streamed shell. Pages render the
+  // organization-specific branding once their data has resolved. Started
+  // before the language request so both settings calls run concurrently.
+  const shellThemeModePromise = getBrandingSettings({ serviceConfig })
+    .then((branding) => branding?.themeMode)
+    .catch((e) => {
+      console.error("Failed to load branding settings", e);
+      return undefined;
+    });
+
   let languages = LANGS;
   try {
     const settings = await getAllowedLanguages({ serviceConfig });
@@ -42,6 +53,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     console.error("Failed to load supported languages", e);
   }
 
+  const shellThemeMode = await shellThemeModePromise;
+
   return (
     <html className={`${lato.className}`} suppressHydrationWarning>
       <head />
@@ -53,6 +66,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <BackgroundWrapper
                   className={`bg-background-light-600 dark:bg-background-dark-600 relative flex min-h-screen flex-col justify-center`}
                 >
+                  <ColorSchemeMeta themeMode={shellThemeMode} />
                   <div className="relative mx-auto w-full max-w-[440px] py-8">
                     <Skeleton>
                       <div className="h-40"></div>
