@@ -369,6 +369,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: 外部ユーザーが見つかりません
   Description: 外部ユーザーが見つかりません。ユーザーをリンクさせるか、新規に自動登録しますか？
+  NoOptionAvailable: 外部ユーザーに一致するアカウントが見つからず、新しいアカウントを作成することもできません。管理者またはサポートにお問い合わせください。
   LinkButtonText: リンク
   AutoRegisterButtonText: 登録
   TosAndPrivacyLabel: 利用規約
