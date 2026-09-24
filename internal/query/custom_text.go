@@ -944,6 +944,9 @@ func registrationOptionKeyToDomain(text *CustomText, result *domain.CustomLoginT
 	if text.Key == domain.LoginKeyRegistrationOptionUserNameButtonText {
 		result.RegisterOption.RegisterUsernamePasswordButtonText = text.Text
 	}
+	if text.Key == domain.LoginKeyRegistrationOptionLoginButtonText {
+		result.RegisterOption.LoginButtonText = text.Text
+	}
 }
 
 func externalRegistrationUserKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
