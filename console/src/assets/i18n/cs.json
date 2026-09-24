@@ -2374,7 +2374,8 @@
       "HEADERNAME": "Název hlavičky",
       "JWTENDPOINT": "JWT koncový bod",
       "JWTKEYSENDPOINT": "Koncový bod klíčů JWT",
-      "AUDIENCE": "Audience"
+      "AUDIENCE": "Audience",
+      "AUDIENCE_EMPTY_WARNING": "Bez nastavené audience přijme ZITADEL jakýkoli platný token od tohoto vystavitele bez ohledu na to, pro kterou aplikaci byl vydán. Důrazně doporučujeme audience nastavit."
     },
     "APPLE": {
       "TEAMID": "ID týmu",

@@ -2374,7 +2374,8 @@
       "HEADERNAME": "Nom de l'en-tête",
       "JWTENDPOINT": "Point de terminaison JWT",
       "JWTKEYSENDPOINT": "Point de terminaison des clés JWT",
-      "AUDIENCE": "Audience"
+      "AUDIENCE": "Audience",
+      "AUDIENCE_EMPTY_WARNING": "Sans Audience, ZITADEL accepte tout jeton valide de cet émetteur, quelle que soit l'application pour laquelle il a été émis. Il est fortement recommandé de définir une Audience."
     },
     "TOAST": {
       "SAVED": "Enregistré avec succès.",

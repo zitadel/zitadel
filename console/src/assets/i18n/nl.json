@@ -2377,7 +2377,8 @@
       "HEADERNAME": "Header Naam",
       "JWTENDPOINT": "JWT Eindpunt",
       "JWTKEYSENDPOINT": "JWT Sleutels Eindpunt",
-      "AUDIENCE": "Audience"
+      "AUDIENCE": "Audience",
+      "AUDIENCE_EMPTY_WARNING": "Zonder Audience accepteert ZITADEL elk geldig token van deze uitgever, ongeacht voor welke applicatie het is uitgegeven. Het wordt sterk aanbevolen een Audience in te stellen."
     },
     "APPLE": {
       "TEAMID": "Team ID",
