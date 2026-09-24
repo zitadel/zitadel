@@ -209,7 +209,9 @@
         "PREVIOUS_TABLE": {
           "TITLE": "이전 웹 키",
           "DESCRIPTION": "더 이상 활성 상태가 아닌 이전 웹 키 목록입니다.",
-          "DEACTIVATED_ON": "비활성화된 날짜"
+          "DEACTIVATED_ON": "비활성화된 날짜",
+          "DELETE_TITLE": "이전 웹 키 삭제",
+          "DELETE_DESCRIPTION": "이 이전 웹 키를 제거하면 해당 키로 서명된 모든 토큰이 무효화됩니다. 이 작업은 되돌릴 수 없습니다."
         }
       },
       "MESSAGE_TEXTS": {
