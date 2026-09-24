@@ -186,6 +186,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
               requestId={requestId}
               organization={sessionWithData.factors?.user?.organizationId}
               sessionId={sessionWithData.id} // tell the callback function to link the IDP
+              loginHint={sessionWithData.factors?.user?.loginName}
             ></SignInWithIdp>
           </>
         )}

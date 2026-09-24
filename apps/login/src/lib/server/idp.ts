@@ -35,6 +35,7 @@ export async function redirectToIdp(prevState: RedirectToIdpState, formData: For
   const idpId = formData.get("id") as string;
   const provider = formData.get("provider") as string;
   const postErrorRedirectUrl = formData.get("postErrorRedirectUrl") as string;
+  const loginHint = formData.get("loginHint") as string;
 
   if (sessionId) {
     try {
@@ -72,6 +73,7 @@ export async function redirectToIdp(prevState: RedirectToIdpState, formData: For
     idpId,
     successUrl: `/idp/${provider}/process?` + params.toString(),
     failureUrl: `/idp/${provider}/failure?` + params.toString(),
+    loginHint: loginHint || undefined,
   });
 
   if (!response) {
@@ -99,6 +101,7 @@ export type StartIDPFlowCommand = {
   idpId: string;
   successUrl: string;
   failureUrl: string;
+  loginHint?: string;
 };
 
 async function startIDPFlow(command: StartIDPFlowCommand) {
@@ -110,6 +113,7 @@ async function startIDPFlow(command: StartIDPFlowCommand) {
     urls: {
       successUrl: `${command.host.includes("localhost") ? "http://" : "https://"}${command.host}${basePath}${command.successUrl}`,
       failureUrl: `${command.host.includes("localhost") ? "http://" : "https://"}${command.host}${basePath}${command.failureUrl}`,
+      loginHint: command.loginHint,
     },
   });
 

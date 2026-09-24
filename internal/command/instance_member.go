@@ -22,13 +22,14 @@ func (c *Commands) AddInstanceMemberCommand(a *instance.Aggregate, userID string
 			return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-4m0fS", "Errors.Instance.MemberInvalid")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-				if exists, err := ExistsUser(ctx, filter, userID, "", false); err != nil || !exists {
+				userResourceOwner, exists, err := existingUser(ctx, filter, userID, "", false)
+				if err != nil || !exists {
 					return nil, zerrors.ThrowPreconditionFailed(err, "INSTA-GSXOn", "Errors.User.NotFound")
 				}
 				if isMember, err := IsInstanceMember(ctx, filter, a.ID, userID); err != nil || isMember {
 					return nil, zerrors.ThrowAlreadyExists(err, "INSTA-pFDwe", "Errors.Instance.Member.AlreadyExists")
 				}
-				return []eventstore.Command{instance.NewMemberAddedEvent(ctx, &a.Aggregate, userID, roles...)}, nil
+				return []eventstore.Command{instance.NewMemberAddedEvent(ctx, &a.Aggregate, userID, roles...).WithUserResourceOwner(userResourceOwner)}, nil
 			},
 			nil
 	}
