@@ -17,6 +17,7 @@ services:
   zitadel-setup:
     image: ghcr.io/zitadel/zitadel:${ZITADEL_VERSION}
     restart: "no"
+    user: "0"
     command: setup --masterkey "${ZITADEL_MASTERKEY}"
     environment:
       <<: *zitadel-db-env
