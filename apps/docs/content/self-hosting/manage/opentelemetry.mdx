@@ -1,0 +1,218 @@
+---
+title: OpenTelemetry
+description: "Export ZITADEL metrics, traces, and logs using OpenTelemetry."
+---
+
+Zitadel is often deployed as a critical component in modern, distributed infrastructures — Kubernetes, microservices, service meshes, and beyond. As an identity provider sitting in the critical path of every authentication and authorization flow, understanding what Zitadel is doing at any given moment is essential for debugging, performance tuning, and incident response.
+
+OpenTelemetry has become the de-facto standard for observability in cloud-native environments. Zitadel supports it natively across all three signals — traces, metrics, and logs — giving you end-to-end visibility into authentication flows, the ability to correlate Zitadel requests with upstream reverse proxies and downstream services, and seamless integration with any OTel-compatible backend: Jaeger, Grafana Tempo, Honeycomb, Datadog, New Relic, and more.
+
+Zitadel uses the standard OTel environment variables. If you've configured OTel before, this will feel familiar. Zitadel-specific variables are only needed for things outside the OTel spec — Prometheus scraping, log streams, and field masking.
+
+---
+
+## Quickstart
+
+```bash
+OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+```
+
+Nothing is exported unless an endpoint is set.
+
+> **Two containers:** Zitadel runs two containers — the main Zitadel container (Go) and the Login v2 container (Node.js). Apply these env vars to both. Note that their SDK defaults differ: Go defaults to gRPC (port `4317`) and Node.js defaults to `http/protobuf` (port `4318`), so setting `OTEL_EXPORTER_OTLP_PROTOCOL` explicitly keeps both consistent.
+
+---
+
+## How it works
+
+`OTEL_EXPORTER_OTLP_ENDPOINT` is the global endpoint for all signals. Per-signal variables take precedence over it if set:
+
+| Variable | Scope |
+|----------|-------|
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | All signals (global) |
+| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` | Traces only |
+| `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` | Metrics only |
+| `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT` | Logs only |
+
+The default exporter for all signals is `otlp`. To disable a specific signal:
+
+```bash
+OTEL_TRACES_EXPORTER=none
+```
+
+---
+
+## Protocol
+
+Supported values: `grpc`, `http/protobuf`, `http/json`. Per-signal overrides follow the same pattern: `OTEL_EXPORTER_OTLP_TRACES_PROTOCOL`, `OTEL_EXPORTER_OTLP_METRICS_PROTOCOL`, `OTEL_EXPORTER_OTLP_LOGS_PROTOCOL`.
+
+See the [OTel exporter spec](https://opentelemetry.io/docs/specs/otel/protocol/exporter/) for the full protocol reference.
+
+---
+
+## TLS
+
+TLS is determined by the scheme in the endpoint URL — no separate flag needed:
+
+```bash
+OTEL_EXPORTER_OTLP_ENDPOINT=https://otel-collector:4317   # TLS on
+OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317    # TLS off
+```
+
+For mTLS, provide the CA certificate, client certificate, and client key:
+
+```bash
+OTEL_EXPORTER_OTLP_CERTIFICATE=/path/to/ca.crt
+OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE=/path/to/client.crt
+OTEL_EXPORTER_OTLP_CLIENT_KEY=/path/to/client.key
+```
+
+Per-signal variants exist: `OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE`, `OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE`, etc.
+
+---
+
+## Compression
+
+To reduce network overhead, enable gzip compression:
+
+```bash
+OTEL_EXPORTER_OTLP_COMPRESSION=gzip
+```
+
+Per-signal: `OTEL_EXPORTER_OTLP_TRACES_COMPRESSION`, `OTEL_EXPORTER_OTLP_METRICS_COMPRESSION`, `OTEL_EXPORTER_OTLP_LOGS_COMPRESSION`. The only supported value is `gzip`.
+
+---
+
+## Context propagation
+
+Zitadel sits behind reverse proxies and in front of downstream services. The `OTEL_PROPAGATORS` variable controls how trace context is propagated across those boundaries via request headers:
+
+```bash
+OTEL_PROPAGATORS=tracecontext,baggage
+```
+
+Default: `tracecontext,baggage` (W3C Trace Context + W3C Baggage). Common values:
+
+| Value | Description |
+|-------|-------------|
+| `tracecontext` | W3C Trace Context — default, works with most modern proxies |
+| `baggage` | W3C Baggage — propagates key-value pairs alongside traces |
+| `b3` | B3 single header — used by Zipkin and older Envoy setups |
+| `b3multi` | B3 multi-header variant |
+| `jaeger` | Jaeger propagation format (deprecated) |
+
+If your reverse proxy (Nginx, Traefik, Envoy) injects or expects a specific propagation format, set this accordingly so Zitadel's traces join the same trace context.
+
+---
+
+## Resource attributes
+
+To attach additional attributes to every span, metric, and log record:
+
+```bash
+OTEL_RESOURCE_ATTRIBUTES=deployment.environment=production,team=platform
+```
+
+See the [OTel SDK environment variable spec](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/) for the full list of standard resource attributes.
+
+---
+
+## Headers
+
+To send auth headers to a backend that requires them (Grafana Tempo, Honeycomb, New Relic):
+
+```bash
+OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic <base64>
+```
+
+Per-signal: `OTEL_EXPORTER_OTLP_TRACES_HEADERS`, `OTEL_EXPORTER_OTLP_METRICS_HEADERS`, `OTEL_EXPORTER_OTLP_LOGS_HEADERS`. Values are comma-separated `key=value` pairs following the [W3C Baggage format](https://www.w3.org/TR/baggage/#header-content).
+
+> **Note:** Support for `OTEL_EXPORTER_OTLP_HEADERS` in Zitadel is tracked in [#11633](https://github.com/zitadel/zitadel/issues/11633). Until it lands, use an OTel Collector as a proxy and set headers there.
+
+---
+
+## Traces
+
+Traces record the full lifecycle of each request — gRPC handlers, database queries, OIDC flows, and event processing.
+
+### Sampling
+
+```bash
+OTEL_TRACES_SAMPLER=parentbased_traceidratio
+OTEL_TRACES_SAMPLER_ARG=0.1
+```
+
+Default sampler is `parentbased_always_on` (100% sampled). In production, lower this — tracing every request at high traffic generates serious storage and collector overhead.
+
+Common sampler values: `always_on`, `always_off`, `traceidratio`, `parentbased_traceidratio`.
+
+### Trusting remote spans
+
+```bash
+ZITADEL_INSTRUMENTATION_TRACE_TRUSTREMOTESPANS=true
+```
+
+Allows Zitadel to join an existing trace started by an upstream service via the W3C `traceparent` header. **Disabled by default** — enabling it on a public deployment lets callers inject trace headers and overwhelm your backend. Only use this behind a trusted gateway.
+
+---
+
+## Metrics
+
+Metrics cover gRPC/HTTP request durations, event processing throughput, projection lag, database connection pool stats, and more.
+
+### Prometheus scraping
+
+To expose a Prometheus scrape endpoint instead of pushing to a collector:
+
+```bash
+ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_TYPE=prometheus
+```
+
+This exposes `http://<host>:8080/debug/metrics`.
+
+---
+
+## Logs
+
+### Structured logging to stderr
+
+Independent of the OTel endpoint, switch Zitadel's stderr output to structured JSON:
+
+```bash
+ZITADEL_INSTRUMENTATION_LOG_STDERR=json
+```
+
+| Value | Description |
+|-------|-------------|
+| `disabled` | Unstructured output (default) |
+| `text` | Human-readable key=value — good for local dev |
+| `json` | JSON structured logs — works with most log shippers |
+| `gcp` | JSON for Google Cloud Logging |
+| `gcp_error_reporting` | JSON for Google Cloud Error Reporting |
+
+### Log streams
+
+Zitadel splits logs into named streams. All are on by default except `event_pusher`:
+
+```bash
+ZITADEL_INSTRUMENTATION_LOG_STREAMS=runtime,ready,request,event_handler,queue
+```
+
+| Stream | Description |
+|--------|-------------|
+| `runtime` | Startup, shutdown, general ops |
+| `ready` | Readiness and health check events |
+| `request` | Incoming API and HTTP requests |
+| `event_handler` | Event processing and projections |
+| `queue` | Background job queue |
+| `event_pusher` | Raw event writes — **contains sensitive data, off by default** |
+
+### Field masking
+
+```bash
+ZITADEL_INSTRUMENTATION_LOG_MASK_KEYS=password,client_secret,access_token
+ZITADEL_INSTRUMENTATION_LOG_MASK_VALUE=****
+```
+
+Replaces matched attribute values at any nesting depth. Important for the `request` stream where HTTP bodies or headers could leak secrets.
