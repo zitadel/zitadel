@@ -1,5 +1,6 @@
 Errors:
   Internal: "Dahili bir hata oluştu"
+  PermissionDenied: "İzin reddedildi"
   NoChangesFound: "Değişiklik bulunamadı"
   OriginNotAllowed: "Bu \"Origin\" izin verilmiyor"
   IDMissing: "ID eksik"
@@ -183,6 +184,7 @@ Errors:
       Passwordless:
         NotExisting: "Şifresiz giriş mevcut değil"
       RecoveryCodes:
+        Empty: "Kurtarma kodu boş"
         InvalidCode: "Geçersiz kurtarma kodu sağlandı"
         MaxCountExceeded: "Maksimum kurtarma kodu sayısı aşıldı"
         NotReady: "Kurtarma kodları kullanıma hazır değil"
@@ -516,6 +518,8 @@ Errors:
       StorageFailed: "Eylem yürütme günlüğünü veritabanına kaydetme başarısız"
       ScanFailed: "Eylem yürütme saniyeleri için kullanım sorgulama başarısız"
   Session:
+    IDMissing: "Oturum ID'si eksik"
+    NotFound: "Oturum bulunamadı"
     NotExisting: "Oturum mevcut değil"
     Terminated: "Oturum zaten sonlandırılmış"
     Expired: "Oturumun süresi dolmuş"
