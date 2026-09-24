@@ -272,6 +272,7 @@ func NewSMTPConfigPasswordChangedEvent(
 			aggregate,
 			SMTPConfigPasswordChangedEventType,
 		),
+		ID:       id,
 		Password: password,
 	}
 }
