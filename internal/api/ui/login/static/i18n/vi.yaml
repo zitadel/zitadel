@@ -1,0 +1,529 @@
+Login:
+  Title: Chào mừng trở lại!
+  Description: Nhập chi tiết đăng nhập của bạn.
+  TitleLinking: Đăng nhập để liên kết người dùng
+  DescriptionLinking: Nhập chi tiết đăng nhập của bạn để liên kết người dùng bên ngoài
+    của bạn.
+  LoginNameLabel: Tên đăng nhập
+  UsernamePlaceHolder: tên người dùng
+  LoginnamePlaceHolder: tên người dùng@miền
+  ExternalUserDescription: Đăng nhập với người dùng bên ngoài.
+  MustBeMemberOfOrg: Người dùng phải là thành viên của tổ chức {{\.OrgName}} .
+  RegisterButtonText: Đăng ký
+  NextButtonText: Tiếp theo
+LDAP:
+  Title: Đăng nhập
+  Description: Nhập chi tiết đăng nhập của bạn.
+  LoginNameLabel: Tên đăng nhập
+  PasswordLabel: Mật khẩu
+  NextButtonText: Tiếp theo
+SelectAccount:
+  Title: Chọn tài khoản
+  Description: Sử dụng tài khoản của bạn
+  TitleLinking: Chọn tài khoản để liên kết người dùng
+  DescriptionLinking: Chọn tài khoản của bạn để liên kết với người dùng bên ngoài
+    của bạn.
+  OtherUser: Người dùng khác
+  SessionState0: đang hoạt động
+  SessionState1: Đã đăng xuất
+  MustBeMemberOfOrg: Người dùng phải là thành viên của tổ chức {{\.OrgName}} .
+Password:
+  Title: Mật khẩu
+  Description: Nhập chi tiết đăng nhập của bạn.
+  PasswordLabel: Mật khẩu
+  MinLength: Ít nhất phải là
+  MinLengthp2: ký tự dài.
+  MaxLength: Phải dài ít hơn 70 ký tự.
+  HasUppercase: Phải bao gồm một chữ cái viết hoa.
+  HasLowercase: Phải bao gồm một chữ cái viết thường.
+  HasNumber: Phải bao gồm một số.
+  HasSymbol: Phải bao gồm một biểu tượng.
+  Confirmation: Xác nhận mật khẩu trùng khớp.
+  ResetLinkText: Đặt lại mật khẩu
+  BackButtonText: Quay lại
+  NextButtonText: Tiếp theo
+UsernameChange:
+  Title: Thay đổi tên người dùng
+  Description: Đặt tên người dùng mới của bạn
+  UsernameLabel: Tên người dùng
+  CancelButtonText: Hủy
+  NextButtonText: Tiếp theo
+UsernameChangeDone:
+  Title: Tên người dùng đã thay đổi
+  Description: Tên người dùng của bạn đã được thay đổi thành công.
+  NextButtonText: Tiếp theo
+InitPassword:
+  Title: Đặt mật khẩu
+  Description: Bạn đã nhận được một mã mà bạn phải nhập vào biểu mẫu bên dưới để đặt
+    mật khẩu mới.
+  CodeLabel: Mã
+  NewPasswordLabel: Mật khẩu mới
+  NewPasswordConfirmLabel: Xác nhận mật khẩu
+  ResendButtonText: Gửi lại mã
+  NextButtonText: Tiếp theo
+InitPasswordDone:
+  Title: Đặt mật khẩu
+  Description: Đặt mật khẩu thành công
+  NextButtonText: Tiếp theo
+  CancelButtonText: Hủy
+InitUser:
+  Title: Kích hoạt người dùng
+  Description: Xác minh e-mail của bạn bằng mã bên dưới và đặt mật khẩu của bạn.
+  CodeLabel: Mã
+  NewPasswordLabel: Mật khẩu mới
+  NewPasswordConfirm: Xác nhận mật khẩu
+  NextButtonText: Tiếp theo
+  ResendButtonText: Gửi lại mã
+InitUserDone:
+  Title: Người dùng đã kích hoạt
+  Description: Đã xác minh email và đặt mật khẩu thành công
+  NextButtonText: Tiếp theo
+  CancelButtonText: Hủy
+InviteUser:
+  Title: Kích hoạt người dùng
+  Description: Xác minh e-mail của bạn bằng mã bên dưới và đặt mật khẩu của bạn.
+  CodeLabel: Mã
+  NewPasswordLabel: Mật khẩu mới
+  NewPasswordConfirm: Xác nhận mật khẩu
+  NextButtonText: Tiếp theo
+  ResendButtonText: Gửi lại mã
+InitMFAPrompt:
+  Title: Thiết lập 2 yếu tố
+  Description: Xác thực 2 yếu tố cung cấp cho bạn mức độ bảo mật bổ sung cho tài khoản
+    người dùng của bạn. Điều này đảm bảo rằng chỉ có bạn mới có quyền truy cập vào
+    tài khoản của mình.
+  Provider0: 'Ứng dụng Authenticator (ví dụ: Google/Microsoft Authenticator, Authy)'
+  Provider1: 'Phụ thuộc vào thiết bị (ví dụ: FaceID, Windows Hello, Dấu vân tay)'
+  Provider3: SMS OTP
+  Provider4: Email OTP
+  NextButtonText: Tiếp theo
+  SkipButtonText: Bỏ qua
+InitMFAOTP:
+  Title: Xác minh 2 yếu tố
+  Description: Tạo yếu tố 2 của bạn. Tải xuống ứng dụng xác thực nếu bạn chưa có.
+  OTPDescription: 'Quét mã bằng ứng dụng xác thực của bạn (ví dụ: Google/Microsoft
+    Authenticator, Authy) hoặc sao chép bí mật và chèn mã được tạo bên dưới.'
+  SecretLabel: Bí mật
+  CodeLabel: Mã
+  NextButtonText: Tiếp theo
+  CancelButtonText: Hủy
+InitMFAOTPSMS:
+  Title: Xác minh 2 yếu tố
+  DescriptionPhone: Tạo yếu tố 2 của bạn. Nhập số điện thoại của bạn để xác minh nó.
+  DescriptionCode: Tạo yếu tố 2 của bạn. Nhập mã nhận được để xác minh số điện thoại
+    của bạn.
+  CountryCodeLabel: Quốc gia
+  PhoneLabel: Điện thoại
+  CodeLabel: Mã
+  EditButtonText: Chỉnh sửa
+  ResendButtonText: Gửi lại mã
+  NextButtonText: Tiếp theo
+InitMFAU2F:
+  Title: Thêm Khóa Bảo Mật
+  Description: Khóa bảo mật là một phương thức xác minh có thể được tích hợp vào điện
+    thoại của bạn, sử dụng Bluetooth hoặc cắm trực tiếp vào cổng USB của máy tính.
+  TokenNameLabel: Tên khóa/thiết bị bảo mật
+  NotSupported: 'WebAuthN không được trình duyệt của bạn hỗ trợ. Hãy đảm bảo phiên
+    bản này được cập nhật hoặc sử dụng phiên bản khác (ví dụ: Chrome, Safari, Firefox)'
+  RegisterTokenButtonText: Thêm khóa bảo mật
+  ErrorRetry: Thử lại, tạo thử thách mới hoặc chọn phương pháp khác.
+InitMFADone:
+  Title: Đã xác minh 2 yếu tố
+  Description: Tuyệt vời! Bạn vừa thiết lập thành công tính năng 2 yếu tố và làm cho
+    tài khoản của bạn an toàn hơn nhiều. Yếu tố phải được nhập vào mỗi lần đăng nhập.
+  NextButtonText: Tiếp theo
+  CancelButtonText: Hủy
+MFAProvider:
+  Provider0: 'Ứng dụng Authenticator (ví dụ: Google/Microsoft Authenticator, Authy)'
+  Provider1: 'Phụ thuộc vào thiết bị (ví dụ: FaceID, Windows Hello, Dấu vân tay)'
+  Provider3: SMS OTP
+  Provider4: Email OTP
+  ChooseOther: hoặc chọn phương án khác
+VerifyMFAOTP:
+  Title: Xác minh 2 yếu tố
+  Description: Xác minh yếu tố thứ hai của bạn
+  CodeLabel: Mã
+  NextButtonText: Tiếp theo
+VerifyOTP:
+  Title: Xác minh 2 yếu tố
+  Description: Xác minh yếu tố thứ hai của bạn
+  CodeLabel: Mã
+  ResendButtonText: Gửi lại mã
+  NextButtonText: Tiếp theo
+VerifyMFAU2F:
+  Title: Xác minh 2 yếu tố
+  Description: 'Xác minh 2-Factor của bạn bằng thiết bị đã đăng ký (ví dụ: FaceID,
+    Windows Hello, Vân tay)'
+  NotSupported: WebAuthN không được trình duyệt của bạn hỗ trợ. Đảm bảo bạn đang sử
+    dụng phiên bản mới nhất hoặc thay đổi trình duyệt của mình sang phiên bản được
+    hỗ trợ (Chrome, Safari, Firefox)
+  ErrorRetry: Hãy thử lại, tạo một yêu cầu mới hoặc chọn một phương pháp khác.
+  ValidateTokenButtonText: Xác minh 2 yếu tố
+Passwordless:
+  Title: Đăng nhập Không cần mật khẩu
+  Description: Đăng nhập bằng các phương thức xác thực do thiết bị của bạn cung cấp
+    như FaceID, Windows Hello hoặc Dấu vân tay.
+  NotSupported: 'WebAuthN không được trình duyệt của bạn hỗ trợ. Hãy đảm bảo phiên
+    bản này được cập nhật hoặc sử dụng phiên bản khác (ví dụ: Chrome, Safari, Firefox)'
+  ErrorRetry: Thử lại, tạo thử thách mới hoặc chọn phương pháp khác.
+  LoginWithPwButtonText: Đăng nhập bằng mật khẩu
+  ValidateTokenButtonText: Đăng nhập không cần mật khẩu
+PasswordlessPrompt:
+  Title: Thiết lập không cần mật khẩu
+  Description: Bạn có muốn thiết lập đăng nhập không cần mật khẩu không? (Các phương
+    thức xác thực thiết bị của bạn như FaceID, Windows Hello hoặc Vân tay)
+  DescriptionInit: Bạn cần thiết lập đăng nhập không cần mật khẩu. Sử dụng liên kết
+    bạn đã được cung cấp để đăng ký thiết bị của bạn.
+  PasswordlessButtonText: Đăng nhập không cần mật khẩu
+  NextButtonText: Tiếp theo
+  SkipButtonText: Bỏ qua
+PasswordlessRegistration:
+  Title: Thiết lập không cần mật khẩu
+  Description: 'Thêm xác thực của bạn bằng cách cung cấp tên (ví dụ: MyMobilePhone,
+    MacBook, v.v.) rồi nhấp vào nút ''Đăng ký không cần mật khẩu'' bên dưới.'
+  TokenNameLabel: Tên thiết bị
+  NotSupported: 'WebAuthN không được trình duyệt của bạn hỗ trợ. Hãy đảm bảo phiên
+    bản này được cập nhật hoặc sử dụng phiên bản khác (ví dụ: Chrome, Safari, Firefox)'
+  RegisterTokenButtonText: Đăng ký không cần mật khẩu
+  ErrorRetry: Thử lại, tạo thử thách mới hoặc chọn phương pháp khác.
+PasswordlessRegistrationDone:
+  Title: Thiết lập không cần mật khẩu
+  Description: Thiết bị không cần mật khẩu đã được thêm thành công.
+  DescriptionClose: Bây giờ bạn có thể đóng cửa sổ này.
+  NextButtonText: Tiếp theo
+  CancelButtonText: Hủy
+PasswordChange:
+  Title: Đổi mật khẩu
+  Description: Thay đổi mật khẩu của bạn. Nhập mật khẩu cũ và mới của bạn.
+  ExpiredDescription: Mật khẩu của bạn đã hết hạn và phải được thay đổi. Nhập mật
+    khẩu cũ và mới của bạn.
+  OldPasswordLabel: Mật khẩu cũ
+  NewPasswordLabel: Mật khẩu mới
+  NewPasswordConfirmLabel: Xác nhận mật khẩu
+  CancelButtonText: Hủy
+  NextButtonText: Tiếp theo
+  Footer: Chân trang
+PasswordChangeDone:
+  Title: Đổi mật khẩu
+  Description: Mật khẩu của bạn đã được thay đổi thành công.
+  NextButtonText: Tiếp theo
+PasswordResetDone:
+  Title: Đã gửi liên kết đặt lại mật khẩu
+  Description: Kiểm tra email của bạn để thiết lập lại mật khẩu của bạn.
+  NextButtonText: Tiếp theo
+EmailVerification:
+  Title: Xác minh E-mail
+  Description: Chúng tôi đã gửi cho bạn một email để xác minh địa chỉ của bạn. Vui
+    lòng nhập mã vào mẫu dưới đây.
+  CodeLabel: Mã
+  NextButtonText: Tiếp theo
+  ResendButtonText: Gửi lại mã
+EmailVerificationDone:
+  Title: Xác minh E-mail
+  Description: Địa chỉ email của bạn đã được xác minh thành công.
+  NextButtonText: Tiếp theo
+  CancelButtonText: Hủy
+  LoginButtonText: Đăng nhập
+RegisterOption:
+  Title: Tùy chọn đăng ký
+  Description: Chọn cách bạn muốn đăng ký
+  RegisterUsernamePasswordButtonText: Với tên người dùng và mật khẩu
+  ExternalLoginDescription: hoặc đăng ký với người dùng bên ngoài
+  LoginButtonText: Đăng nhập
+RegistrationUser:
+  Title: Đăng ký
+  Description: Nhập dữ liệu người dùng của bạn. Địa chỉ email của bạn sẽ được sử dụng
+    làm tên đăng nhập của bạn.
+  DescriptionOrgRegister: Nhập dữ liệu người dùng của bạn.
+  EmailLabel: Thư điện tử
+  UsernameLabel: Tên người dùng
+  FirstnameLabel: Tên
+  LastnameLabel: Họ
+  LanguageLabel: Ngôn ngữ
+  German: Tiếng Đức
+  English: Tiếng Anh
+  Italian: Tiếng Ý
+  French: Tiếng Pháp
+  Chinese: 简体中文
+  Polish: Tiếng Ba Lan
+  Japanese: 日本語
+  Spanish: Tiếng Tây Ban Nha
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Vietnamese: Tiếng Việt
+  GenderLabel: Giới tính
+  Female: Nữ
+  Male: Nam
+  Diverse: đa dạng / X
+  PasswordLabel: Mật khẩu
+  PasswordConfirmLabel: Xác nhận mật khẩu
+  TosAndPrivacyLabel: Điều khoản và điều kiện
+  TosConfirm: Tôi chấp nhận
+  TosLinkText: ĐKDV
+  PrivacyConfirm: Tôi chấp nhận
+  PrivacyLinkText: chính sách bảo mật
+  ExternalLogin: hoặc đăng ký với người dùng bên ngoài
+  BackButtonText: Đăng nhập
+  NextButtonText: Tiếp theo
+ExternalRegistrationUserOverview:
+  Title: Đăng ký người dùng bên ngoài
+  Description: Chúng tôi đã lấy thông tin chi tiết người dùng của bạn từ nhà cung
+    cấp đã chọn. Bây giờ bạn có thể thay đổi hoặc hoàn thành chúng.
+  EmailLabel: Thư điện tử
+  UsernameLabel: Tên người dùng
+  FirstnameLabel: Tên
+  LastnameLabel: Họ
+  NicknameLabel: Biệt danh
+  PhoneLabel: Số điện thoại
+  LanguageLabel: Ngôn ngữ
+  German: Tiếng Đức
+  English: Tiếng Anh
+  Italian: Tiếng Ý
+  French: Tiếng Pháp
+  Chinese: 简体中文
+  Polish: Tiếng Ba Lan
+  Japanese: 日本語
+  Spanish: Tiếng Tây Ban Nha
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Vietnamese: Tiếng Việt
+  TosAndPrivacyLabel: Điều khoản và điều kiện
+  TosConfirm: Tôi chấp nhận
+  TosLinkText: ĐKDV
+  PrivacyConfirm: Tôi chấp nhận
+  PrivacyLinkText: chính sách bảo mật
+  ExternalLogin: hoặc đăng ký với người dùng bên ngoài
+  BackButtonText: Quay lại
+  NextButtonText: Lưu
+RegistrationOrg:
+  Title: Đăng ký tổ chức
+  Description: Nhập tên tổ chức và dữ liệu người dùng của bạn.
+  OrgNameLabel: Tên tổ chức
+  EmailLabel: Thư điện tử
+  UsernameLabel: Tên người dùng
+  FirstnameLabel: Tên
+  LastnameLabel: Họ
+  PasswordLabel: Mật khẩu
+  PasswordConfirmLabel: Xác nhận mật khẩu
+  TosAndPrivacyLabel: Điều khoản và điều kiện
+  TosConfirm: Tôi chấp nhận
+  TosLinkText: ĐKDV
+  PrivacyConfirm: Tôi chấp nhận
+  PrivacyLinkText: chính sách bảo mật
+  SaveButtonText: Tạo tổ chức
+LoginSuccess:
+  Title: Đăng nhập thành công
+  AutoRedirectDescription: Bạn sẽ tự động được chuyển trở lại ứng dụng của mình. Nếu
+    không, hãy nhấp vào nút bên dưới. Bạn có thể đóng cửa sổ sau đó.
+  RedirectedDescription: Bây giờ bạn có thể đóng cửa sổ này.
+  NextButtonText: Tiếp theo
+LogoutDone:
+  Title: Đã đăng xuất
+  Description: Bạn đã đăng xuất thành công.
+  LoginButtonText: Đăng nhập
+LinkingUserPrompt:
+  Title: Đã tìm thấy người dùng hiện tại
+  Description: 'Bạn có muốn liên kết tài khoản hiện tại của mình:'
+  LinkButtonText: Liên kết
+  OtherButtonText: Các lựa chọn khác
+LinkingUsersDone:
+  Title: Liên kết người dùng
+  Description: Người dùng đã liên kết.
+  CancelButtonText: Hủy
+  NextButtonText: Tiếp theo
+ExternalNotFound:
+  Title: Không tìm thấy người dùng bên ngoài
+  Description: Không tìm thấy người dùng bên ngoài. Bạn có muốn liên kết người dùng
+    của mình hoặc tự động đăng ký một người dùng mới không?
+  LinkButtonText: Liên kết
+  AutoRegisterButtonText: Đăng ký
+  TosAndPrivacyLabel: Điều khoản và điều kiện
+  TosConfirm: Tôi chấp nhận
+  TosLinkText: ĐKDV
+  PrivacyConfirm: Tôi chấp nhận
+  PrivacyLinkText: chính sách bảo mật
+  German: Tiếng Đức
+  English: Tiếng Anh
+  Italian: Tiếng Ý
+  French: Tiếng Pháp
+  Chinese: 简体中文
+  Polish: Tiếng Ba Lan
+  Japanese: 日本語
+  Spanish: Tiếng Tây Ban Nha
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Vietnamese: Tiếng Việt
+DeviceAuth:
+  Title: Ủy quyền thiết bị
+  UserCode:
+    Label: Mã người dùng
+    Description: Nhập mã người dùng được hiển thị trên thiết bị.
+    ButtonNext: Tiếp theo
+  Action:
+    Description: Cấp quyền truy cập thiết bị.
+    GrantDevice: bạn sắp cấp thiết bị
+    AccessToScopes: truy cập vào các phạm vi sau
+    Button:
+      Allow: Cho phép
+      Deny: Từ chối
+  Done:
+    Description: Xong.
+    Approved: Ủy quyền thiết bị đã được phê duyệt. Bây giờ bạn có thể quay lại thiết
+      bị.
+    Denied: Ủy quyền thiết bị bị từ chối. Bây giờ bạn có thể quay lại thiết bị.
+Footer:
+  PoweredBy: Được cung cấp bởi
+  Tos: ĐKDV
+  PrivacyPolicy: Chính sách bảo mật
+  Help: Trợ giúp
+  SupportEmail: Email hỗ trợ
+SignIn: Đăng nhập bằng {{\.Provider}}
+Errors:
+  Internal: Đã xảy ra lỗi nội bộ
+  AuthRequest:
+    NotFound: Không thể tìm thấy yêu cầu xác thực
+    UserAgentNotCorresponding: Tác nhân người dùng không tương ứng
+    UserAgentNotFound: Không tìm thấy ID tác nhân người dùng
+    TokenNotFound: Không tìm thấy mã thông báo
+    RequestTypeNotSupported: Loại yêu cầu không được hỗ trợ
+    MissingParameters: Thiếu tham số bắt buộc
+  User:
+    NotFound: Không thể tìm thấy người dùng
+    AlreadyExists: Người dùng đã tồn tại
+    Inactive: Người dùng không hoạt động
+    NotFoundOnOrg: Không thể tìm thấy người dùng trên tổ chức đã chọn
+    NotAllowedOrg: Người dùng không phải là thành viên của tổ chức được yêu cầu
+    NotMatchingUserID: Người dùng và người dùng trong yêu cầu xác thực không khớp
+    UserIDMissing: ID người dùng trống
+    Invalid: Dữ liệu người dùng không hợp lệ
+    DomainNotAllowedAsUsername: Tên miền đã được bảo lưu và không thể sử dụng được
+    NotAllowedToLink: Người dùng không được phép liên kết với nhà cung cấp đăng nhập
+      bên ngoài
+    Profile:
+      NotFound: Không tìm thấy hồ sơ
+      NotChanged: Hồ sơ không thay đổi
+      Empty: Hồ sơ trống
+      FirstNameEmpty: Tên trong hồ sơ trống
+      LastNameEmpty: Họ trong hồ sơ trống
+      IDMissing: ID hồ sơ bị thiếu
+    Email:
+      NotFound: Không tìm thấy email
+      Invalid: Email không hợp lệ
+      AlreadyVerified: Email đã được xác minh
+      NotChanged: Email không thay đổi
+      Empty: Email trống
+      IDMissing: ID email bị thiếu
+    Phone:
+      NotFound: Không tìm thấy điện thoại
+      Invalid: Điện thoại không hợp lệ
+      AlreadyVerified: Điện thoại đã được xác minh
+      Empty: Điện thoại trống
+      NotChanged: Điện thoại không đổi
+    Address:
+      NotFound: Không tìm thấy địa chỉ
+      NotChanged: Địa chỉ không thay đổi
+    Username:
+      AlreadyExists: Tên người dùng đã được sử dụng
+      Reserved: Tên người dùng đã được sử dụng
+      Empty: Tên người dùng trống
+    Password:
+      ConfirmationWrong: Xác nhận mật khẩu sai
+      Empty: Mật khẩu trống
+      Invalid: Mật khẩu không hợp lệ
+      InvalidAndLocked: Mật khẩu không hợp lệ và người dùng đã bị khóa, hãy liên hệ
+        với quản trị viên của bạn.
+      NotChanged: Mật khẩu mới không được giống với mật khẩu hiện tại của bạn
+    UsernameOrPassword:
+      Invalid: Tên người dùng hoặc mật khẩu không hợp lệ
+    PasswordComplexityPolicy:
+      NotFound: Không tìm thấy chính sách mật khẩu
+      MinLength: Mật khẩu quá ngắn
+      HasLower: Mật khẩu phải chứa chữ thường
+      HasUpper: Mật khẩu phải chứa chữ hoa
+      HasNumber: Mật khẩu phải chứa số
+      HasSymbol: Mật khẩu phải chứa ký hiệu
+    Code:
+      Expired: Mã đã hết hạn
+      Invalid: Mã không hợp lệ
+      Empty: Mã trống
+      CryptoCodeNil: Mã xác minh không hợp lệ (nil)
+      NotFound: Không thể tìm thấy mã
+      GeneratorAlgNotSupported: Thuật toán tạo không được hỗ trợ
+    EmailVerify:
+      UserIDEmpty: ID người dùng trống
+    ExternalData:
+      CouldNotRead: Dữ liệu bên ngoài không thể đọc chính xác
+    MFA:
+      NoProviders: Không có nhà cung cấp đa yếu tố nào
+      OTP:
+        AlreadyReady: Multifactor OTP (OneTimePassword) đã được thiết lập
+        NotExisting: OTP đa yếu tố (OneTimePassword) không tồn tại
+        InvalidCode: Mã không hợp lệ
+        NotReady: OTP đa yếu tố (OneTimePassword) chưa sẵn sàng
+    Locked: Người dùng đã bị khóa
+    SomethingWentWrong: Đã xảy ra lỗi
+    NotActive: Người dùng không hoạt động
+    ExternalIDP:
+      IDPTypeNotImplemented: Loại IDP không được triển khai
+      NotAllowed: Nhà cung cấp đăng nhập bên ngoài không được phép
+      IDPConfigIDEmpty: ID nhà cung cấp danh tính trống
+      ExternalUserIDEmpty: ID người dùng bên ngoài trống
+      UserDisplayNameEmpty: Tên hiển thị của người dùng trống
+      NoExternalUserData: Không nhận được Dữ liệu người dùng bên ngoài
+      CreationNotAllowed: Không được phép tạo người dùng mới trên nhà cung cấp này
+      LinkingNotAllowed: Nhà cung cấp này không cho phép liên kết người dùng
+      NoOptionAllowed: Nhà cung cấp này không được phép tạo liên kết. Vui lòng liên
+        hệ với quản trị viên của bạn.
+      LoginFailedSwitchLocal: 'Đăng nhập tại IDP bên ngoài không thành công. Quay
+        trở lại đăng nhập cục bộ. Chi tiết lỗi: {{\.Details}}'
+    GrantRequired: Đăng nhập không thể. Người dùng được yêu cầu phải có ít nhất một
+      khoản trợ cấp trên ứng dụng. Vui lòng liên hệ với quản trị viên của bạn.
+    ProjectRequired: Đăng nhập không thể. Tổ chức của người dùng phải được cấp cho
+      dự án. Vui lòng liên hệ với quản trị viên của bạn.
+  IdentityProvider:
+    InvalidConfig: Cấu hình Nhà cung cấp danh tính không hợp lệ
+  IAM:
+    LockoutPolicy:
+      NotExisting: Chính sách khóa không tồn tại
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Không được phép đăng ký
+  DeviceAuth:
+    NotExisting: Mã người dùng không tồn tại
+optional: (không bắt buộc)

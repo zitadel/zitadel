@@ -1,0 +1,2872 @@
+{
+  "APP_NAME": "Zitadel",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "Siêu dữ liệu",
+    "HOME": {
+      "TITLE": "Bắt đầu với Zitadel",
+      "NEXT": {
+        "TITLE": "Các bước tiếp theo của bạn",
+        "DESCRIPTION": "Hoàn thành các bước sau để bảo mật ứng dụng của bạn.",
+        "CREATE_PROJECT": {
+          "TITLE": "Tạo một dự án",
+          "DESCRIPTION": "Thêm một dự án và xác định vai trò cũng như phân công vai trò của nó."
+        }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "Bắt đầu",
+          "DESCRIPTION": "Hãy làm theo hướng dẫn từng bước bắt đầu nhanh và bắt đầu xây dựng ngay lập tức."
+        },
+        "DOCS": {
+          "TITLE": "Tài liệu",
+          "DESCRIPTION": "Khám phá nền tảng kiến ​​thức của Zitadels để làm quen với các khái niệm và ý tưởng cốt lõi. Tìm hiểu cách Zitadel hoạt động và cách sử dụng nó."
+        },
+        "EXAMPLES": {
+          "TITLE": "Ví dụ và Bộ công cụ phát triển phần mềm",
+          "DESCRIPTION": "Duyệt qua các ví dụ và SDK của chúng tôi để sử dụng Zitadel cùng với các công cụ và ngôn ngữ lập trình yêu thích của bạn."
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "Tổ chức",
+      "DESCRIPTION": "Một tổ chức lưu trữ người dùng, dự án có ứng dụng, nhà cung cấp danh tính và cài đặt như xây dựng thương hiệu công ty. Bạn có muốn chia sẻ cài đặt trên nhiều tổ chức không? Định cấu hình cài đặt mặc định.",
+      "METADATA": "Thêm thuộc tính tùy chỉnh vào tổ chức như vị trí của tổ chức hoặc mã nhận dạng trong hệ thống khác. Bạn có thể sử dụng thông tin này trong hành động của mình."
+    },
+    "PROJECTS": {
+      "TITLE": "Dự án",
+      "DESCRIPTION": "Dự án lưu trữ một hoặc nhiều ứng dụng mà bạn có thể sử dụng để xác thực người dùng của mình. Ví dụ: bạn có thể có một dự án với 3 ứng dụng: mỗi ứng dụng dành cho giao diện người dùng web, ứng dụng di động và các dịch vụ phụ trợ của bạn. Ngoài ra, bạn có thể ủy quyền cho người dùng của mình với các dự án. Để cho phép người dùng từ các tổ chức khác đăng nhập vào ứng dụng của bạn, hãy cấp cho họ quyền truy cập vào dự án của bạn. <br/> <br/> Nếu bạn không tìm thấy dự án, hãy liên hệ với chủ sở hữu dự án hoặc người có quyền tương ứng để có quyền truy cập.",
+      "OWNED": {
+        "TITLE": "Dự án sở hữu",
+        "DESCRIPTION": "Đây là những dự án bạn sở hữu. Bạn có thể quản lý các cài đặt dự án, phân công vai trò và ứng dụng này."
+      },
+      "GRANTED": {
+        "TITLE": "Dự án được cấp",
+        "DESCRIPTION": "Đây là những dự án mà các tổ chức khác đã cấp cho bạn. Với các dự án được cấp, bạn có thể cấp cho người dùng quyền truy cập vào các ứng dụng của tổ chức khác."
+      }
+    },
+    "USERS": {
+      "TITLE": "Người dùng",
+      "DESCRIPTION": "Người dùng là tài khoản con người hoặc tài khoản dịch vụ có thể truy cập vào ứng dụng của bạn.",
+      "HUMANS": {
+        "TITLE": "Người dùng",
+        "DESCRIPTION": "Người dùng xác thực tương tác trong phiên trình duyệt bằng lời nhắc đăng nhập.",
+        "METADATA": "Thêm thuộc tính tùy chỉnh cho người dùng như bộ phận. Bạn có thể sử dụng thông tin này trong hành động của mình."
+      },
+      "MACHINES": {
+        "TITLE": "Tài khoản dịch vụ",
+        "DESCRIPTION": "Tài khoản dịch vụ xác thực không tương tác bằng cách sử dụng mã thông báo mang JWT được ký bằng khóa riêng. Họ cũng có thể sử dụng mã thông báo truy cập cá nhân.",
+        "METADATA": "Thêm thuộc tính tùy chỉnh vào tài khoản như hệ thống xác thực. Bạn có thể sử dụng thông tin này trong hành động của mình."
+      },
+      "SELF": {
+        "METADATA": "Thêm thuộc tính tùy chỉnh cho người dùng của bạn như bộ phận của bạn. Bạn có thể sử dụng thông tin này trong các hoạt động của tổ chức mình."
+      }
+    },
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Phân công vai trò",
+      "DESCRIPTION": "Phân công vai trò xác định quyền truy cập của người dùng vào dự án. Bạn có thể cấp cho người dùng quyền truy cập vào một dự án và xác định vai trò của người dùng trong dự án đó."
+    },
+    "ACTIONS": {
+      "TITLE": "Hành động",
+      "DESCRIPTION": "Chạy mã tùy chỉnh trên các sự kiện xảy ra khi người dùng của bạn xác thực tại Zitadel. Tự động hóa quy trình của bạn, làm phong phú thêm siêu dữ liệu người dùng và mã thông báo của họ hoặc thông báo cho các hệ thống bên ngoài.",
+      "SCRIPTS": {
+        "TITLE": "Kịch bản",
+        "DESCRIPTION": "Viết mã JavaScript của bạn một lần và kích hoạt nó theo nhiều luồng."
+      },
+      "FLOWS": {
+        "TITLE": "Dòng chảy",
+        "DESCRIPTION": "Chọn một luồng xác thực và kích hoạt hành động của bạn đối với một sự kiện cụ thể trong luồng này."
+      },
+      "ACTIONSTWO_NOTE": "Actions V2 hiện đã có phiên bản Actions mới, cải tiến. Phiên bản hiện tại vẫn có thể truy cập được nhưng sự phát triển trong tương lai của chúng tôi sẽ tập trung vào phiên bản mới, phiên bản này cuối cùng sẽ thay thế phiên bản hiện tại."
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "Cài đặt phiên bản",
+        "DESCRIPTION": "Cài đặt mặc định cho tất cả các tổ chức. Với các quyền phù hợp, một số quyền trong số đó có thể được ghi đè trong cài đặt tổ chức."
+      },
+      "ORG": {
+        "TITLE": "Cài đặt tổ chức",
+        "DESCRIPTION": "Tùy chỉnh cài đặt của tổ chức của bạn."
+      },
+      "FEATURES": {
+        "TITLE": "Cài đặt tính năng",
+        "DESCRIPTION": "Mở khóa các tính năng cho phiên bản của bạn."
+      },
+      "IDPS": {
+        "TITLE": "Nhà cung cấp danh tính",
+        "DESCRIPTION": "Tạo và kích hoạt các nhà cung cấp danh tính bên ngoài. Chọn một nhà cung cấp nổi tiếng hoặc định cấu hình bất kỳ nhà cung cấp tương thích OIDC, OAuth hoặc SAML nào khác mà bạn chọn. Bạn thậm chí có thể sử dụng mã thông báo JWT hiện có của mình làm danh tính liên kết bằng cách định cấu hình nhà cung cấp danh tính JWT.",
+        "NEXT": "Bây giờ thì sao?",
+        "SAML": {
+          "TITLE": "Định cấu hình Nhà cung cấp danh tính SAML của bạn",
+          "DESCRIPTION": "Zitadel đã được cấu hình. Bây giờ Nhà cung cấp danh tính SAML của bạn cần một số thiết lập. Hầu hết các nhà cung cấp đều cho phép bạn tải lên toàn bộ XML siêu dữ liệu Zitadel. Các nhà cung cấp khác yêu cầu bạn chỉ cung cấp một số URL riêng biệt, chẳng hạn như ID thực thể (URL siêu dữ liệu), URL Dịch vụ người tiêu dùng xác nhận (ACS) hoặc URL đăng xuất một lần."
+        },
+        "CALLBACK": {
+          "TITLE": "Định cấu hình Nhà cung cấp danh tính {{provider}} của bạn",
+          "DESCRIPTION": "Trước khi bạn có thể định cấu hình Zitadel, hãy chuyển URL này tới Nhà cung cấp danh tính của bạn để cho phép chuyển hướng trình duyệt trở lại Zitadel sau khi xác thực."
+        },
+        "JWT": {
+          "TITLE": "Sử dụng JWT làm Danh tính liên kết",
+          "DESCRIPTION": "Nhà cung cấp danh tính JWT cho phép bạn sử dụng mã thông báo JWT hiện có của mình làm danh tính liên kết. Tính năng này rất hữu ích nếu bạn đã có tổ chức phát hành JWT. Với IdP JWT, bạn có thể sử dụng các JWT này để tạo và cập nhật người dùng trong Zitadel một cách nhanh chóng."
+        },
+        "LDAP": {
+          "TITLE": "Định cấu hình Zitadel để kết nối với Nhà cung cấp danh tính LDAP của bạn",
+          "DESCRIPTION": "Cung cấp chi tiết kết nối tới máy chủ LDAP của bạn và định cấu hình ánh xạ các thuộc tính LDAP của bạn với thuộc tính Zitadel."
+        },
+        "AUTOFILL": {
+          "TITLE": "Tự động điền dữ liệu người dùng",
+          "DESCRIPTION": "Sử dụng một hành động để cải thiện trải nghiệm người dùng của bạn. Bạn có thể điền trước vào biểu mẫu đăng ký Zitadels các giá trị từ nhà cung cấp danh tính."
+        },
+        "ACTIVATE": {
+          "TITLE": "Kích hoạt IdP",
+          "DESCRIPTION": "IdP của bạn chưa hoạt động. Kích hoạt nó để cho phép người dùng của bạn đăng nhập."
+        }
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "Độ phức tạp của mật khẩu",
+        "DESCRIPTION": "Đảm bảo người dùng của bạn sử dụng mật khẩu mạnh bằng cách xác định các quy tắc phức tạp."
+      },
+      "BRANDING": {
+        "TITLE": "Xây dựng thương hiệu",
+        "DESCRIPTION": "Tùy chỉnh giao diện của mẫu đăng nhập của bạn. Hãy nhớ áp dụng các cài đặt của bạn khi bạn hoàn tất."
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "Liên kết ngoài",
+        "DESCRIPTION": "Hướng dẫn người dùng của bạn tới các tài nguyên bên ngoài tùy chỉnh được hiển thị trên trang đăng nhập. Người dùng cần chấp nhận Điều khoản dịch vụ và Chính sách quyền riêng tư trước khi có thể đăng ký. Thay đổi liên kết tới tài liệu của bạn hoặc đặt một chuỗi trống để ẩn nút tài liệu khỏi trang quản trị quản lý. Thêm liên kết bên ngoài tùy chỉnh và văn bản tùy chỉnh cho liên kết đó trong trang quản trị quản lý hoặc đặt chúng trống để ẩn nút đó."
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "Cài đặt SMTP",
+        "DESCRIPTION": "Định cấu hình máy chủ SMTP của bạn để sử dụng miền cho địa chỉ người gửi mà người dùng của bạn biết và tin cậy."
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "Cài đặt SMS",
+        "DESCRIPTION": "Để mở khóa tất cả các tính năng của Zitadel, hãy định cấu hình Twilio để gửi tin nhắn SMS cho người dùng của bạn."
+      },
+      "IAM_EVENTS": {
+        "TITLE": "Sự kiện",
+        "DESCRIPTION": "Trang này hiển thị tất cả các thay đổi trạng thái trong phiên bản của bạn cho đến giới hạn dấu vết kiểm tra phiên bản của bạn. Lọc danh sách theo phạm vi thời gian cho mục đích gỡ lỗi hoặc lọc danh sách theo tổng hợp cho mục đích kiểm tra."
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "Sự Kiện Thất Bại",
+        "DESCRIPTION": "Trang này hiển thị tất cả các sự kiện không thành công trong phiên bản của bạn. Nếu Zitadel không hoạt động như bạn mong đợi, hãy luôn kiểm tra danh sách này trước."
+      },
+      "IAM_VIEWS": {
+        "TITLE": "Lượt xem",
+        "DESCRIPTION": "Trang này hiển thị tất cả các chế độ xem cơ sở dữ liệu của bạn và thời điểm họ xử lý sự kiện mới nhất của mình. Nếu bạn bỏ lỡ một số dữ liệu, hãy kiểm tra xem chế độ xem đã được cập nhật chưa."
+      },
+      "LANGUAGES": {
+        "TITLE": "Ngôn ngữ",
+        "DESCRIPTION": "Hạn chế các ngôn ngữ mà biểu mẫu đăng nhập và tin nhắn thông báo được dịch sang. Nếu bạn muốn tắt một số ngôn ngữ, hãy kéo chúng vào phần Ngôn ngữ không được phép. Bạn có thể chỉ định một ngôn ngữ được phép làm ngôn ngữ mặc định. Nếu ngôn ngữ ưa thích của người dùng không được phép thì ngôn ngữ mặc định sẽ được sử dụng."
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "Máy phát điện bí mật",
+        "DESCRIPTION": "Xác định độ phức tạp và thời gian sống của bí mật của bạn. Độ phức tạp và tuổi thọ cao hơn sẽ cải thiện tính bảo mật, độ phức tạp và tuổi thọ thấp hơn sẽ cải thiện hiệu suất giải mã."
+      },
+      "SECURITY": {
+        "TITLE": "Cài đặt bảo mật",
+        "DESCRIPTION": "Kích hoạt các tính năng của Zitadel có thể có tác động đến bảo mật. Bạn thực sự nên biết mình đang làm gì trước khi thay đổi các cài đặt này."
+      },
+      "OIDC": {
+        "TITLE": "Cài đặt kết nối OpenID",
+        "DESCRIPTION": "Định cấu hình thời gian tồn tại của mã thông báo OIDC của bạn. Sử dụng thời gian tồn tại ngắn hơn để tăng cường bảo mật cho người dùng của bạn, sử dụng thời gian dài hơn để tăng sự thuận tiện cho người dùng của bạn.",
+        "LABEL_HOURS": "Tuổi thọ tối đa tính bằng giờ",
+        "LABEL_DAYS": "Tuổi thọ tối đa tính theo ngày",
+        "ACCESS_TOKEN": {
+          "TITLE": "Mã thông báo truy cập",
+          "DESCRIPTION": "Mã thông báo truy cập được sử dụng để xác thực người dùng. Nó là mã thông báo có thời gian sử dụng ngắn hạn được sử dụng để truy cập dữ liệu của người dùng. Sử dụng thời gian sử dụng ngắn để giảm thiểu nguy cơ truy cập trái phép. Mã thông báo truy cập có thể được làm mới tự động bằng mã thông báo làm mới."
+        },
+        "ID_TOKEN": {
+          "TITLE": "Mã thông báo ID",
+          "DESCRIPTION": "Mã thông báo ID là Mã thông báo Web JSON (JWT) chứa các xác nhận quyền sở hữu về người dùng. Thời gian tồn tại của mã thông báo ID không được vượt quá thời gian tồn tại của mã thông báo truy cập."
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "Làm mới mã thông báo",
+          "DESCRIPTION": "Mã thông báo làm mới được sử dụng để nhận mã thông báo truy cập mới. Đó là mã thông báo tồn tại lâu dài được sử dụng để làm mới mã thông báo truy cập. Người dùng phải xác thực lại theo cách thủ công khi mã thông báo làm mới hết hạn."
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "Mã thông báo làm mới không hoạt động",
+          "DESCRIPTION": "Thời gian tồn tại của mã thông báo làm mới không hoạt động là thời gian tối đa mà mã thông báo làm mới có thể không được sử dụng."
+        }
+      },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Quản lý Khóa Web OIDC của bạn để ký và xác thực mã thông báo một cách an toàn cho phiên bản Zitadel của bạn.",
+        "TABLE": {
+          "TITLE": "Khóa web đang hoạt động và tương lai",
+          "DESCRIPTION": "Khóa web đang hoạt động và sắp tới của bạn. Kích hoạt khóa mới sẽ vô hiệu hóa khóa hiện tại.",
+          "NOTE": "Lưu ý: Điểm cuối OIDC của JWK trả về phản hồi có thể lưu vào bộ nhớ đệm (mặc định là 5 phút). Tránh kích hoạt khóa quá sớm vì khóa này có thể chưa có sẵn trong bộ nhớ đệm và ứng dụng.",
+          "ACTIVATE": "Kích hoạt Khóa Web tiếp theo",
+          "ACTIVE": "Hiện đang hoạt động",
+          "NEXT": "Tiếp theo trong hàng đợi",
+          "FUTURE": "Tương lai",
+          "WARNING": "Web Key chưa đầy 5 phút"
+        },
+        "CREATE": {
+          "TITLE": "Tạo khóa Web mới",
+          "DESCRIPTION": "Tạo khóa web mới sẽ thêm khóa đó vào danh sách của bạn. Zitadel sử dụng khóa RSA2048 với hàm băm SHA256 theo mặc định.",
+          "KEY_TYPE": "Loại khóa",
+          "BITS": "Bit",
+          "HASHER": "Máy băm",
+          "CURVE": "Đường cong"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Khóa Web trước đó",
+          "DESCRIPTION": "Đây là các khóa web trước đây của bạn không còn hoạt động.",
+          "DEACTIVATED_ON": "Đã ngừng kích hoạt trên"
+        }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Nội dung tin nhắn",
+        "DESCRIPTION": "Tùy chỉnh văn bản của email thông báo hoặc tin nhắn SMS của bạn. Nếu bạn muốn tắt một số ngôn ngữ, hãy hạn chế chúng trong cài đặt ngôn ngữ phiên bản của bạn.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "Khi bạn xác nhận quyền sở hữu miền cho tổ chức của mình, những người dùng không sử dụng miền này làm tên đăng nhập của họ sẽ được nhắc thay đổi tên đăng nhập để khớp với miền đã xác nhận quyền sở hữu.",
+          "INIT": "Khi người dùng được tạo, họ sẽ nhận được email có liên kết để đặt mật khẩu.",
+          "PC": "Khi người dùng thay đổi mật khẩu, họ sẽ nhận được thông báo về thay đổi nếu bạn đã bật tính năng này trong cài đặt thông báo.",
+          "PL": "Khi người dùng thêm phương thức xác thực bằng mật mã, họ cần kích hoạt phương thức đó bằng cách nhấp vào liên kết trong email.",
+          "PR": "Khi người dùng đặt lại mật khẩu, họ sẽ nhận được email có liên kết để đặt mật khẩu mới.",
+          "VE": "Khi người dùng thay đổi địa chỉ email, họ sẽ nhận được email có liên kết để xác minh địa chỉ mới.",
+          "VP": "Khi người dùng thay đổi số điện thoại của họ, họ sẽ nhận được SMS có mã để xác minh số mới.",
+          "VEO": "Khi người dùng thêm OTP qua phương thức email, họ cần kích hoạt nó bằng cách nhập mã được gửi đến địa chỉ email của họ.",
+          "VSO": "Khi người dùng thêm OTP qua phương thức SMS, họ cần kích hoạt nó bằng cách nhập mã được gửi đến số điện thoại của họ.",
+          "IU": "Khi mã mời người dùng được tạo, họ sẽ nhận được email có liên kết để đặt phương thức xác thực."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Giao diện đăng nhập Nội dung",
+        "DESCRIPTION": "Tùy chỉnh văn bản của mẫu đăng nhập của bạn. Nếu văn bản trống, phần giữ chỗ sẽ hiển thị giá trị mặc định. Nếu bạn muốn tắt một số ngôn ngữ, hãy hạn chế chúng trong cài đặt ngôn ngữ phiên bản của bạn."
+      },
+      "DOMAINS": {
+        "TITLE": "Cài đặt tên miền",
+        "DESCRIPTION": "Xác định các hạn chế đối với tên miền của bạn và định cấu hình mẫu tên đăng nhập của bạn.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Yêu cầu xác minh miền tùy chỉnh",
+          "DESCRIPTION": "Nếu tính năng này được kích hoạt, Miền tổ chức phải được xác minh trước khi chúng có thể được sử dụng để khám phá miền hoặc thêm hậu tố tên người dùng."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Mẫu tên đăng nhập",
+          "DESCRIPTION": "Kiểm soát mẫu tên đăng nhập người dùng của bạn. Zitadel chọn tổ chức người dùng của bạn ngay khi họ nhập tên đăng nhập. Do đó, tên đăng nhập cần phải là duy nhất trong tất cả các tổ chức. Nếu bạn có người dùng có tài khoản trên nhiều miền, bạn có thể đảm bảo tính duy nhất bằng cách thêm hậu tố tên đăng nhập của mình vào Miền tổ chức."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Xác minh tên miền",
+          "DESCRIPTION": "Chỉ cho phép tổ chức của bạn sử dụng các miền mà họ thực sự kiểm soát. Nếu được kích hoạt, Miền tổ chức sẽ được xác minh định kỳ bằng thử thách DNS hoặc HTTP trước khi có thể sử dụng. Đây là một tính năng bảo mật để ngăn chặn việc chiếm quyền điều khiển tên miền."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "Địa chỉ người gửi SMTP",
+          "DESCRIPTION": "Chỉ cho phép địa chỉ người gửi SMTP nếu nó khớp với một trong các miền phiên bản của bạn."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Đăng nhập trọn đời",
+          "DESCRIPTION": "Tăng cường bảo mật của bạn bằng cách giảm thời gian sử dụng tối đa liên quan đến đăng nhập.",
+          "LABEL": "Tuổi thọ tối đa tính bằng giờ",
+          "PW_CHECK": {
+            "TITLE": "Kiểm tra mật khẩu",
+            "DESCRIPTION": "Người dùng sẽ được yêu cầu xác thực lại bằng mật khẩu của mình sau khoảng thời gian này."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "Kiểm tra đăng nhập bên ngoài",
+            "DESCRIPTION": "Người dùng của bạn sẽ được chuyển hướng đến nhà cung cấp danh tính bên ngoài của họ sau khoảng thời gian này."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Kiểm tra ban đầu đa yếu tố",
+            "DESCRIPTION": "Người dùng của bạn sẽ được nhắc thiết lập yếu tố thứ hai hoặc Đa yếu tố sau khoảng thời gian này nếu họ chưa làm như vậy. Thời gian tồn tại bằng 0 sẽ tắt lời nhắc này."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Kiểm tra yếu tố thứ hai",
+            "DESCRIPTION": "Người dùng của bạn phải xác nhận lại yếu tố thứ hai của họ trong những khoảng thời gian này."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Kiểm tra đa yếu tố",
+            "DESCRIPTION": "Người dùng của bạn phải xác nhận lại Multifactor của họ trong những khoảng thời gian này."
+          }
+        },
+        "FORM": {
+          "TITLE": "Mẫu đăng nhập",
+          "DESCRIPTION": "Tùy chỉnh hình thức đăng nhập.",
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Cho phép xác thực cục bộ",
+            "DESCRIPTION": "Cho phép người dùng của bạn đăng nhập bằng tên người dùng và mật khẩu hoặc xác thực mật mã của họ. Nếu tính năng này bị tắt, người dùng của bạn chỉ có thể đăng nhập bằng cách sử dụng nhà cung cấp danh tính bên ngoài."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "Cho phép đăng ký người dùng",
+            "DESCRIPTION": "Cho phép người dùng ẩn danh tạo tài khoản."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Tổ chức được phép đăng ký",
+            "DESCRIPTION": "Cho phép người dùng ẩn danh tạo tổ chức."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "Cho phép đăng nhập bên ngoài",
+            "DESCRIPTION": "Cho phép người dùng của bạn đăng nhập bằng nhà cung cấp danh tính bên ngoài thay vì sử dụng người dùng Zitadel để đăng nhập."
+          },
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Đặt lại mật khẩu bị ẩn",
+            "DESCRIPTION": "Không cho phép người dùng của bạn đặt lại mật khẩu của họ."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Cho phép khám phá tên miền",
+            "DESCRIPTION": "Tìm tổ chức người dùng của bạn tùy thuộc vào tên miền tên đăng nhập của họ, ví dụ: địa chỉ email của họ."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Bỏ qua tên người dùng không xác định",
+            "DESCRIPTION": "Nếu tính năng này được kích hoạt, biểu mẫu đăng nhập sẽ không hiển thị thông báo lỗi nếu không xác định được tên người dùng. Điều này giúp ngăn chặn việc đoán tên người dùng."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "Tắt Đăng nhập Email",
+            "DESCRIPTION": "Nếu tính năng này được kích hoạt, người dùng của bạn không thể sử dụng địa chỉ email của họ để đăng nhập. Xin lưu ý rằng nếu bạn tắt tính năng này, địa chỉ email của người dùng của bạn phải là duy nhất trên tất cả các tổ chức để đăng nhập."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Tắt Đăng nhập bằng điện thoại",
+            "DESCRIPTION": "Nếu tính năng này được kích hoạt, người dùng của bạn không thể sử dụng số điện thoại của họ để đăng nhập. Xin lưu ý rằng nếu bạn tắt tính năng này, số điện thoại của người dùng của bạn phải là duy nhất trên tất cả các tổ chức để đăng nhập."
+          }
+        }
+      }
+    }
+  },
+  "PAGINATOR": {
+    "PREVIOUS": "Trước",
+    "NEXT": "Tiếp theo",
+    "COUNT": "Tổng kết quả",
+    "MORE": "Thêm"
+  },
+  "FOOTER": {
+    "LINKS": {
+      "CONTACT": "Liên hệ",
+      "TOS": "Điều khoản dịch vụ",
+      "PP": "Chính sách bảo mật"
+    },
+    "THEME": {
+      "DARK": "Tối",
+      "LIGHT": "Ánh sáng"
+    }
+  },
+  "HOME": {
+    "WELCOME": "Bắt đầu với Zitadel",
+    "DISCLAIMER": "Zitadel xử lý dữ liệu của bạn một cách bảo mật và an toàn.",
+    "DISCLAIMERLINK": "Thông tin thêm",
+    "DOCUMENTATION": {
+      "DESCRIPTION": "Bắt đầu với Zitadel một cách nhanh chóng."
+    },
+    "GETSTARTED": {
+      "DESCRIPTION": "Bắt đầu với Zitadel một cách nhanh chóng."
+    },
+    "QUICKSTARTS": {
+      "LABEL": "Những bước đầu tiên",
+      "DESCRIPTION": "Bắt đầu với Zitadel một cách nhanh chóng."
+    },
+    "SHORTCUTS": {
+      "SHORTCUTS": "Phím tắt",
+      "SETTINGS": "Các phím tắt có sẵn",
+      "PROJECTS": "Dự án",
+      "REORDER": "Giữ và kéo ô để di chuyển nó",
+      "ADD": "Giữ và kéo một ô để thêm"
+    }
+  },
+  "ONBOARDING": {
+    "DESCRIPTION": "Các bước tiếp theo của bạn",
+    "MOREDESCRIPTION": "thêm phím tắt",
+    "COMPLETED": "đã hoàn thành",
+    "DISMISS": "Không, cảm ơn, tôi là dân chuyên nghiệp.",
+    "CARD": {
+      "TITLE": "Chạy Zitadel của bạn",
+      "DESCRIPTION": "Danh sách kiểm tra này giúp thiết lập phiên bản của bạn và hướng dẫn bạn qua các bước cần thiết nhất"
+    },
+    "MILESTONES": {
+      "instance.policy.label.added": {
+        "title": "Thiết lập thương hiệu của bạn",
+        "description": "Xác định màu sắc và hình dạng đăng nhập của bạn và tải lên logo và biểu tượng của bạn.",
+        "action": "Thiết lập thương hiệu"
+      },
+      "instance.smtp.config.added": {
+        "title": "Thiết lập cài đặt SMTP của bạn",
+        "description": "Đặt cài đặt máy chủ thư của riêng bạn.",
+        "action": "Thiết lập SMTP"
+      },
+      "PROJECT_CREATED": {
+        "title": "Tạo một dự án",
+        "description": "Thêm một dự án và xác định vai trò cũng như phân công vai trò của nó.",
+        "action": "Tạo dự án"
+      },
+      "APPLICATION_CREATED": {
+        "title": "Đăng ký ứng dụng của bạn",
+        "description": "Đăng ký ứng dụng web, ứng dụng gốc, api hoặc saml của bạn và thiết lập luồng xác thực.",
+        "action": "Đăng ký ứng dụng"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Đăng nhập vào ứng dụng của bạn",
+        "description": "Tích hợp ứng dụng của bạn với Zitadel để xác thực và kiểm tra nó bằng cách đăng nhập bằng người dùng quản trị viên của bạn.",
+        "action": "Đăng nhập"
+      },
+      "user.human.added": {
+        "title": "Thêm người dùng",
+        "description": "Thêm người dùng ứng dụng của bạn",
+        "action": "Thêm người dùng"
+      },
+      "user.grant.added": {
+        "title": "Gán vai trò cho người dùng",
+        "description": "Cho phép người dùng truy cập ứng dụng của bạn và thiết lập vai trò của họ.",
+        "action": "Gán vai trò cho người dùng"
+      }
+    }
+  },
+  "MENU": {
+    "INSTANCE": "Cài đặt mặc định",
+    "DASHBOARD": "Trang chủ",
+    "PERSONAL_INFO": "Thông tin cá nhân",
+    "DOCUMENTATION": "Tài liệu",
+    "INSTANCEOVERVIEW": "Ví dụ",
+    "ORGS": "Tổ chức",
+    "VIEWS": "Lượt xem",
+    "EVENTS": "Sự kiện",
+    "FAILEDEVENTS": "Sự Kiện Thất Bại",
+    "ORGANIZATION": "Tổ chức",
+    "PROJECT": "Dự án",
+    "PROJECTOVERVIEW": "Tổng quan",
+    "PROJECTGRANTS": "Tài trợ dự án",
+    "ROLES": "Vai trò",
+    "GRANTEDPROJECT": "Dự án được cấp",
+    "HUMANUSERS": "Người dùng",
+    "MACHINEUSERS": "Tài khoản dịch vụ",
+    "LOGOUT": "Đăng xuất Tất cả người dùng",
+    "NEWORG": "Tổ Chức Mới",
+    "IAMADMIN": "Bạn là Quản trị viên IAM. Lưu ý rằng bạn có quyền mở rộng.",
+    "SHOWORGS": "Hiển thị tất cả các tổ chức",
+    "GRANTS": "Phân công vai trò",
+    "ACTIONS": "Hành động",
+    "TARGETS": "Mục tiêu",
+    "PRIVACY": "Quyền riêng tư",
+    "TOS": "Điều khoản dịch vụ",
+    "OPENSHORTCUTSTOOLTIP": "Kiểu ? để hiển thị phím tắt",
+    "SETTINGS": "Cài đặt",
+    "CUSTOMERPORTAL": "Cổng thông tin khách hàng"
+  },
+  "QUICKSTART": {
+    "TITLE": "Tích hợp Zitadel vào ứng dụng của bạn",
+    "DESCRIPTION": "Tích hợp Zitadel vào ứng dụng của bạn hoặc sử dụng một trong các mẫu của chúng tôi để bắt đầu sau vài phút.",
+    "BTN_START": "Tạo ứng dụng",
+    "BTN_LEARNMORE": "Tìm hiểu thêm",
+    "CREATEPROJECTFORAPP": "Tạo dự án {{value}}",
+    "SELECT_FRAMEWORK": "Chọn Khung",
+    "FRAMEWORK": "Khung",
+    "FRAMEWORK_OTHER": "Khác (OIDC, SAML, API)",
+    "ALMOSTDONE": "Bạn gần như đã hoàn tất.",
+    "REVIEWCONFIGURATION": "Xem lại cài đặt",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Chúng tôi đã tạo thiết lập cơ bản cho ứng dụng {{value}} . Bạn có thể điều chỉnh các cài đặt này theo nhu cầu của mình sau khi tạo.",
+    "REDIRECTS": "Định cấu hình chuyển hướng",
+    "DEVMODEWARN": "Chế độ Dev được bật theo mặc định. Bạn có thể cập nhật giá trị cho sản xuất sau này.",
+    "GUIDE": "Hướng dẫn",
+    "BROWSEEXAMPLES": "Duyệt qua các ví dụ và SDK",
+    "DUPLICATEAPPRENAME": "Một ứng dụng có cùng tên đã tồn tại. Vui lòng chọn một tên khác.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Thay đổi khung",
+        "DESCRIPTION": "Chọn một trong các khung có sẵn để thiết lập nhanh ứng dụng của bạn."
+      }
+    }
+  },
+  "ACTIONS": {
+    "ACTIONS": "Hành động",
+    "FILTER": "Lọc",
+    "RENAME": "Đổi tên",
+    "SET": "Đặt",
+    "COPY": "Sao chép vào Clipboard",
+    "COPIED": "Đã sao chép vào bảng nhớ tạm.",
+    "RESET": "Đặt lại",
+    "RESETDEFAULT": "Đặt lại về mặc định",
+    "RESETTO": "Đặt lại về:",
+    "RESETCURRENT": "Đặt lại về hiện tại",
+    "SHOW": "Hiển thị",
+    "HIDE": "Ẩn",
+    "SAVE": "Lưu",
+    "SAVENOW": "Lưu ngay",
+    "NEW": "Mới",
+    "ADD": "Thêm",
+    "CREATE": "Tạo",
+    "CONTINUE": "Tiếp tục",
+    "CONTINUEWITH": "Tiếp tục với {{value}}",
+    "BACK": "Quay lại",
+    "CLOSE": "Đóng",
+    "CLEAR": "Xóa",
+    "CANCEL": "Hủy",
+    "INFO": "Thông tin",
+    "OK": "được",
+    "SELECT": "Chọn",
+    "VIEW": "Hiển thị",
+    "SELECTIONDELETE": "Xóa lựa chọn",
+    "DELETE": "Xóa",
+    "REMOVE": "Xóa",
+    "VERIFY": "Xác minh",
+    "FINISH": "Kết thúc",
+    "FINISHED": "Đóng",
+    "CHANGE": "Thay đổi",
+    "REACTIVATE": "Kích hoạt lại",
+    "ACTIVATE": "Kích hoạt",
+    "DEACTIVATE": "Vô hiệu hóa",
+    "REFRESH": "Làm mới",
+    "LOGIN": "Đăng nhập",
+    "EDIT": "Chỉnh sửa",
+    "PIN": "Ghim / Bỏ ghim",
+    "CONFIGURE": "Định cấu hình",
+    "SEND": "Gửi",
+    "NEWVALUE": "Giá trị mới",
+    "RESTORE": "Khôi phục",
+    "CONTINUEWITHOUTSAVE": "Tiếp tục mà không lưu",
+    "OF": "của",
+    "PREVIOUS": "Trước",
+    "NEXT": "Tiếp theo",
+    "MORE": "thêm",
+    "STEP": "Bước",
+    "SETUP": "Thiết lập",
+    "TEST": "Kiểm tra",
+    "UNSAVEDCHANGES": "Những thay đổi chưa được lưu",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Bạn có chắc chắn muốn hủy hành động mới này không? Hành động của bạn sẽ bị mất",
+        "CANCEL": "Hủy",
+        "DISCARD": "Loại bỏ"
+      }
+    },
+    "TABLE": {
+      "SHOWUSER": "Hiển thị người dùng {{value}}"
+    },
+    "DOWNLOAD": "Tải xuống",
+    "APPLY": "Áp dụng"
+  },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "Bạn hiện đang sử dụng Actions V2 mới, đang trong giai đoạn thử nghiệm. Phiên bản 1 trước đó vẫn có sẵn nhưng sẽ bị ngừng trong tương lai. Vui lòng báo cáo bất kỳ vấn đề hoặc phản hồi.",
+    "EXECUTION": {
+      "TITLE": "Hành động",
+      "DESCRIPTION": "Các hành động cho phép bạn chạy mã tùy chỉnh để đáp ứng các yêu cầu API, sự kiện hoặc chức năng cụ thể. Sử dụng chúng để mở rộng Zitadel, tự động hóa quy trình làm việc và tích hợp với các hệ thống khác.",
+      "TYPES": {
+        "request": "Yêu cầu",
+        "response": "Phản hồi",
+        "event": "Sự kiện",
+        "function": "Chức năng"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Tạo một hành động",
+        "UPDATE_TITLE": "Cập nhật một hành động",
+        "TYPE": {
+          "DESCRIPTION": "Chọn thời điểm bạn muốn Hành động này chạy",
+          "REQUEST": {
+            "TITLE": "Yêu cầu",
+            "DESCRIPTION": "Các yêu cầu xảy ra trong Zitadel. Đây có thể là một cuộc gọi yêu cầu đăng nhập."
+          },
+          "RESPONSE": {
+            "TITLE": "Phản hồi",
+            "DESCRIPTION": "Phản hồi từ một yêu cầu trong Zitadel. Hãy nghĩ về phản hồi bạn nhận được khi tìm nạp người dùng."
+          },
+          "EVENTS": {
+            "TITLE": "Sự kiện",
+            "DESCRIPTION": "Các sự kiện xảy ra trong Zitadel. Đây có thể là bất cứ điều gì giống như người dùng tạo tài khoản, đăng nhập thành công, v.v."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Chức năng",
+            "DESCRIPTION": "Các chức năng mà bạn có thể gọi trong Zitadel. Đây có thể là bất cứ điều gì từ việc gửi email đến tạo người dùng."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Chọn xem hành động này có áp dụng cho tất cả yêu cầu, một dịch vụ cụ thể (ví dụ: quản lý người dùng) hay một yêu cầu duy nhất (ví dụ: tạo người dùng).",
+          "ALL": {
+            "TITLE": "Tất cả",
+            "DESCRIPTION": "Chọn tùy chọn này nếu bạn muốn thực hiện hành động của mình theo mọi yêu cầu"
+          },
+          "ALL_EVENTS": "Chọn tùy chọn này nếu bạn muốn thực hiện hành động của mình trên mọi sự kiện",
+          "SELECT_SERVICE": {
+            "TITLE": "Chọn Dịch vụ",
+            "DESCRIPTION": "Chọn Dịch vụ Zitadel cho hành động của bạn."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Chọn phương pháp",
+            "DESCRIPTION": "Nếu bạn chỉ muốn thực hiện một yêu cầu cụ thể, hãy chọn yêu cầu đó ở đây",
+            "NOTE": "Nếu bạn không chọn một phương thức, hành động của bạn sẽ chạy theo mọi yêu cầu trong dịch vụ bạn đã chọn."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Tên hàm",
+            "DESCRIPTION": "Chọn chức năng bạn muốn thực thi"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Đặt nhóm",
+            "DESCRIPTION": "Nếu bạn chỉ muốn thực thi trên một nhóm sự kiện, hãy đặt nhóm ở đây"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Chọn Sự kiện",
+            "DESCRIPTION": "Nếu bạn chỉ muốn thực thi trên một sự kiện cụ thể, hãy chỉ định nó ở đây"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Bạn có thể chọn thực thi một mục tiêu hoặc chạy nó trên cùng điều kiện với các mục tiêu khác.",
+          "TARGET": {
+            "DESCRIPTION": "Mục tiêu bạn muốn thực hiện cho hành động này"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Điều kiện thực hiện"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Tình trạng",
+        "TYPE": "Loại",
+        "TARGET": "Mục tiêu",
+        "CREATIONDATE": "Ngày tạo"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Mục tiêu",
+      "DESCRIPTION": "Mục tiêu là đích của mã bạn muốn thực thi từ một hành động. Tạo mục tiêu ở đây và tại đó cho hành động của bạn.",
+      "CREATE": {
+        "TITLE": "Tạo mục tiêu của bạn",
+        "DESCRIPTION": "Tạo mục tiêu của riêng bạn bên ngoài Zitadel",
+        "NAME": "Tên",
+        "NAME_DESCRIPTION": "Đặt cho mục tiêu của bạn một cái tên mô tả rõ ràng để sau này dễ dàng xác định",
+        "TYPE": "Loại",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "Cuộc gọi REST",
+          "restAsync": "REST Không đồng bộ"
+        },
+        "TYPES_DESCRIPTION": "Webhook, cuộc gọi xử lý mã trạng thái nhưng phản hồi không liên quan Cuộc gọi, cuộc gọi xử lý mã trạng thái và phản hồi Không đồng bộ, cuộc gọi không xử lý mã trạng thái cũng như phản hồi nhưng có thể được gọi song song với các Mục tiêu khác",
+        "PAYLOAD_TYPE": "Loại tải trọng",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Không xác định",
+          "JSON": "JSON",
+          "JWT": "Mã thông báo Web JSON (JWT)",
+          "JWE": "Mã thông báo web JSON được mã hóa (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: Tải trọng JSON tiêu chuẩn có tiêu đề chữ ký để xác minh. JWT: Tải trọng được gửi dưới dạng JWT đã ký. Việc xác minh được thực hiện độc lập bằng chữ ký JWT. JWE: JWT được mã hóa bổ sung để ngăn chặn truy cập trái phép vào thông tin tải trọng.",
+        "ENDPOINT": "Điểm cuối",
+        "ENDPOINT_DESCRIPTION": "Nhập điểm cuối nơi mã của bạn được lưu trữ. Hãy chắc chắn rằng nó có thể truy cập được cho chúng tôi!",
+        "TIMEOUT": "Hết thời gian chờ",
+        "TIMEOUT_DESCRIPTION": "Đặt thời gian tối đa mà mục tiêu của bạn phải phản hồi. Nếu mất nhiều thời gian hơn, chúng tôi sẽ dừng yêu cầu.",
+        "INTERRUPT_ON_ERROR": "Ngắt khi có lỗi",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Dừng tất cả các lần thực thi khi mục tiêu trả về có lỗi",
+        "INTERRUPT_ON_ERROR_WARNING": "Thận trọng: “Ngắt khi có lỗi” tạm dừng hoạt động khi có lỗi, có nguy cơ bị khóa. Kiểm tra với tính năng này bị vô hiệu hóa để ngăn việc chặn đăng nhập/tạo.",
+        "AWAIT_RESPONSE": "Chờ phản hồi",
+        "AWAIT_RESPONSE_DESCRIPTION": "Chúng tôi sẽ chờ phản hồi trước khi làm bất cứ điều gì khác. Hữu ích nếu bạn có ý định sử dụng nhiều mục tiêu cho một hành động"
+      },
+      "TABLE": {
+        "NAME": "Tên",
+        "ENDPOINT": "Điểm cuối",
+        "CREATIONDATE": "Ngày tạo",
+        "REORDER": "Sắp xếp lại"
+      }
+    }
+  },
+  "MEMBERROLES": {
+    "IAM_OWNER": "Có quyền kiểm soát toàn bộ trường hợp, bao gồm tất cả các tổ chức",
+    "IAM_OWNER_VIEWER": "Có quyền xem xét toàn bộ trường hợp, bao gồm tất cả các tổ chức",
+    "IAM_ORG_MANAGER": "Được quyền thành lập và quản lý tổ chức",
+    "IAM_USER_MANAGER": "Có quyền tạo và quản lý người dùng",
+    "IAM_ADMIN_IMPERSONATOR": "Có quyền mạo danh quản trị viên và người dùng cuối từ tất cả các tổ chức",
+    "IAM_END_USER_IMPERSONATOR": "Có quyền mạo danh người dùng cuối từ tất cả các tổ chức",
+    "IAM_LOGIN_CLIENT": "Có quyền quản lý ứng dụng đăng nhập",
+    "ORG_OWNER": "Có quyền đối với toàn bộ tổ chức",
+    "ORG_USER_MANAGER": "Có quyền tạo và quản lý người dùng của tổ chức",
+    "ORG_OWNER_VIEWER": "Được quyền xem xét toàn bộ tổ chức",
+    "ORG_SETTINGS_MANAGER": "Có quyền quản lý cài đặt tổ chức",
+    "ORG_USER_PERMISSION_EDITOR": "Có quyền quản lý phân công vai trò",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Có quyền quản lý tài trợ dự án",
+    "ORG_PROJECT_CREATOR": "Có quyền tạo dự án và cài đặt cơ bản của riêng mình",
+    "ORG_ADMIN_IMPERSONATOR": "Có quyền mạo danh quản trị viên và người dùng cuối của tổ chức",
+    "ORG_END_USER_IMPERSONATOR": "Có quyền mạo danh người dùng cuối của tổ chức",
+    "ORG_USER_SELF_MANAGER": "Có quyền quản lý người dùng của riêng mình",
+    "PROJECT_OWNER": "Có quyền đối với toàn bộ dự án",
+    "PROJECT_OWNER_VIEWER": "Được quyền review toàn bộ dự án",
+    "PROJECT_OWNER_GLOBAL": "Có quyền đối với toàn bộ dự án",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Được quyền review toàn bộ dự án",
+    "PROJECT_GRANT_OWNER": "Được quyền quản lý tài trợ dự án",
+    "PROJECT_GRANT_OWNER_VIEWER": "Được phép xem xét tài trợ dự án"
+  },
+  "OVERLAYS": {
+    "ORGSWITCHER": {
+      "TEXT": "Tất cả các bảng và cài đặt tổ chức trong Trang quản trị quản lý đều dựa trên một tổ chức đã chọn. Bấm vào nút này để chuyển đổi tổ chức hoặc tạo một tổ chức mới."
+    },
+    "INSTANCE": {
+      "TEXT": "Nhấn vào đây để đến các cài đặt mặc định. Lưu ý rằng bạn chỉ có quyền truy cập vào nút này nếu bạn có quyền nâng cao."
+    },
+    "PROFILE": {
+      "TEXT": "Tại đây bạn có thể chuyển đổi giữa các tài khoản người dùng và quản lý phiên cũng như hồ sơ của mình."
+    },
+    "NAV": {
+      "TEXT": "Điều hướng này thay đổi dựa trên tổ chức bạn đã chọn ở trên hoặc phiên bản của bạn"
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "Bối cảnh tổ chức đã thay đổi."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "Chế độ xem vừa thay đổi thành ví dụ!"
+    }
+  },
+  "FILTER": {
+    "TITLE": "Lọc",
+    "ORGNAME": "Tên tổ chức",
+    "ORGID": "ID tổ chức",
+    "STATE": "Bang",
+    "PRIMARYDOMAIN": "Tên miền tổ chức",
+    "DISPLAYNAME": "Tên hiển thị của người dùng",
+    "EMAIL": "Email",
+    "USERNAME": "Tên người dùng",
+    "PROJECTNAME": "Tên dự án",
+    "RESOURCEOWNER": "Chủ sở hữu tài nguyên",
+    "METHODS": {
+      "5": "chứa",
+      "7": "kết thúc bằng",
+      "1": "bằng"
+    }
+  },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "Phím tắt",
+    "UNDERORGCONTEXT": "Trong các trang của tổ chức",
+    "SIDEWIDE": "Phím tắt trên toàn trang web",
+    "SHORTCUTS": {
+      "HOME": "<strong> G </strong> o đến <strong> H </strong> ome",
+      "INSTANCE": "<strong> G </strong> o tới <strong> I </strong> nstance",
+      "ORG": "<strong> G </strong> o tới <strong> O </strong> tổ chức",
+      "ORGSETTINGS": "<strong> G </strong> o tới cài đặt Tổ chức <strong> S </strong>",
+      "ORGSWITCHER": "Thay đổi tổ chức",
+      "ME": "Đi tới hồ sơ riêng",
+      "PROJECTS": "<strong> G </strong> o tới <strong> P </strong> dự án",
+      "USERS": "<strong> G </strong> o tới <strong> U </strong> máy",
+      "ROLEASSIGNMENTS": "<strong> G </strong> o tới <strong> R </strong> Bài tập cũ",
+      "ACTIONS": "<strong> G </strong> o đến Hành động và <strong> F </strong> mức thấp",
+      "DOMAINS": "<strong> G </strong> o đến <strong> D </strong> omain"
+    }
+  },
+  "INSTANCEID": "ID phiên bản",
+  "RESOURCEID": "Id tài nguyên",
+  "NAME": "Tên",
+  "VERSION": "Phiên bản",
+  "TABLE": {
+    "NOROWS": "Không có dữ liệu"
+  },
+  "ERRORS": {
+    "REQUIRED": "Vui lòng điền vào trường này.",
+    "ATLEASTONE": "Cung cấp ít nhất một giá trị.",
+    "TOKENINVALID": {
+      "TITLE": "Mã thông báo ủy quyền của bạn đã hết hạn.",
+      "DESCRIPTION": "Nhấp vào nút bên dưới để đăng nhập lại."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Phiên bản của bạn bị chặn.",
+      "DESCRIPTION": "Yêu cầu quản trị viên phiên bản Zitadel của bạn cập nhật gói đăng ký."
+    },
+    "INVALID_FORMAT": "Định dạng không hợp lệ.",
+    "NOTANEMAIL": "Giá trị đã cho không phải là địa chỉ email.",
+    "MINLENGTH": "Phải dài ít nhất {{requiredLength}} ký tự.",
+    "MAXLENGTH": "Phải ít hơn {{requiredLength}} ký tự.",
+    "UPPERCASEMISSING": "Phải bao gồm một chữ cái viết hoa.",
+    "LOWERCASEMISSING": "Phải bao gồm một chữ cái viết thường.",
+    "SYMBOLERROR": "Phải bao gồm một ký hiệu hoặc dấu chấm câu.",
+    "NUMBERERROR": "Phải bao gồm một chữ số.",
+    "PWNOTEQUAL": "Mật khẩu được cung cấp không khớp.",
+    "PHONE": "Số điện thoại phải bắt đầu bằng +."
+  },
+  "USER": {
+    "SETTINGS": {
+      "TITLE": "Cài đặt",
+      "GENERAL": "Chung",
+      "IDP": "Nhà cung cấp danh tính",
+      "SECURITY": "Mật khẩu và bảo mật",
+      "KEYS": "Phím",
+      "PAT": "Mã thông báo truy cập cá nhân",
+      "ROLEASSIGNMENTS": "Phân công vai trò",
+      "MEMBERSHIPS": "Vai trò quản trị viên",
+      "METADATA": "Siêu dữ liệu"
+    },
+    "TITLE": "Thông tin cá nhân",
+    "DESCRIPTION": "Quản lý thông tin và cài đặt bảo mật của bạn.",
+    "PAGES": {
+      "TITLE": "Người dùng",
+      "DETAIL": "Chi tiết",
+      "CREATE": "Tạo",
+      "MY": "Thông tin của tôi",
+      "LOGINNAMES": "Tên đăng nhập",
+      "LOGINMETHODS": "Phương thức đăng nhập",
+      "LOGINNAMESDESC": "Đây là tên đăng nhập của bạn:",
+      "NOUSER": "Không có người dùng liên quan.",
+      "REACTIVATE": "Kích hoạt lại",
+      "DEACTIVATE": "Vô hiệu hóa",
+      "FILTER": "Lọc",
+      "STATE": "Trạng thái",
+      "DELETE": "Xóa người dùng",
+      "UNLOCK": "Mở khóa người dùng",
+      "GENERATESECRET": "Tạo bí mật khách hàng",
+      "REMOVESECRET": "Xóa bí mật khách hàng",
+      "LOCKEDDESCRIPTION": "Người dùng này đã bị khóa do vượt quá số lần đăng nhập tối đa và phải được mở khóa để sử dụng lại.",
+      "DELETEACCOUNT": "Xóa tài khoản",
+      "DELETEACCOUNT_DESC": "Nếu bạn thực hiện hành động này, bạn sẽ bị đăng xuất và không còn quyền truy cập vào tài khoản của mình nữa. Hành động này không thể đảo ngược được, vì vậy hãy thận trọng khi tiếp tục.",
+      "DELETEACCOUNT_BTN": "Xóa tài khoản",
+      "DELETEACCOUNT_SUCCESS": "Đã xóa tài khoản thành công!"
+    },
+    "DETAILS": {
+      "DATECREATED": "Đã tạo",
+      "DATECHANGED": "Đã thay đổi"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Xóa người dùng",
+      "DELETE_SELF_TITLE": "Xóa tài khoản",
+      "DELETE_DESCRIPTION": "Bạn sắp xóa vĩnh viễn một người dùng. Bạn có chắc không?",
+      "DELETE_SELF_DESCRIPTION": "Bạn sắp xóa vĩnh viễn tài khoản cá nhân của mình. Điều này sẽ đăng xuất bạn và xóa người dùng của bạn. Hành động này không thể hoàn tác được!",
+      "DELETE_AUTH_DESCRIPTION": "Bạn sắp xóa vĩnh viễn tài khoản cá nhân của mình. Bạn có chắc không?",
+      "TYPEUSERNAME": "Nhập ' {{value}} ', để xác nhận và xóa người dùng.",
+      "USERNAME": "Tên đăng nhập",
+      "DELETE_BTN": "Xóa vĩnh viễn"
+    },
+    "SENDEMAILDIALOG": {
+      "TITLE": "Gửi thông báo qua email",
+      "DESCRIPTION": "Nhấp vào nút bên dưới để gửi thông báo đến địa chỉ email hiện tại hoặc thay đổi địa chỉ email trong trường.",
+      "NEWEMAIL": "Địa chỉ email mới"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Bí mật khách hàng",
+      "CLIENTSECRET_DESCRIPTION": "Giữ bí mật khách hàng của bạn ở nơi an toàn vì nó sẽ biến mất sau khi hộp thoại đóng lại."
+    },
+    "TABLE": {
+      "DEACTIVATE": "Vô hiệu hóa",
+      "ACTIVATE": "Kích hoạt",
+      "CHANGEDATE": "Sửa đổi lần cuối",
+      "CREATIONDATE": "Được tạo tại",
+      "FILTER": {
+        "0": "Lọc cho Tên hiển thị",
+        "1": "Lọc tên người dùng",
+        "2": "bộ lọc cho Tên hiển thị",
+        "3": "lọc tên người dùng",
+        "4": "bộ lọc cho Email",
+        "5": "bộ lọc cho Tên hiển thị",
+        "10": "lọc tên tổ chức",
+        "12": "lọc tên dự án"
+      },
+      "EMPTY": "Không có mục nào"
+    },
+    "PASSWORDLESS": {
+      "SEND": "Gửi link đăng ký",
+      "TABLETYPE": "Loại",
+      "TABLESTATE": "Trạng thái",
+      "NAME": "Tên",
+      "EMPTY": "Chưa đặt thiết bị",
+      "TITLE": "Xác thực bằng mật mã",
+      "DESCRIPTION": "Thêm Phương thức xác thực dựa trên WebAuthn để đăng nhập vào Zitadel bằng mật mã.",
+      "MANAGE_DESCRIPTION": "Quản lý các phương pháp yếu tố thứ hai của người dùng của bạn.",
+      "U2F": "Thêm phương thức",
+      "U2F_DIALOG_TITLE": "Xác minh trình xác thực",
+      "U2F_DIALOG_DESCRIPTION": "Nhập tên cho mật mã đã sử dụng của bạn Đăng nhập",
+      "U2F_SUCCESS": "Xác thực mật khẩu đã được tạo thành công!",
+      "U2F_ERROR": "Đã xảy ra lỗi trong quá trình thiết lập!",
+      "U2F_NAME": "Tên người xác thực",
+      "TYPE": {
+        "0": "Không có MFA được xác định",
+        "1": "OTP",
+        "2": "Mã khóa"
+      },
+      "STATE": {
+        "0": "Không có trạng thái",
+        "1": "Chưa sẵn sàng",
+        "2": "Sẵn sàng",
+        "3": "Đã xóa"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Xóa mật mã",
+        "DELETE_DESCRIPTION": "Bạn sắp xóa mật mã. Bạn có chắc không?",
+        "ADD_TITLE": "Xác thực bằng mật mã",
+        "ADD_DESCRIPTION": "Chọn một trong các tùy chọn có sẵn để tạo mật mã.",
+        "SEND_DESCRIPTION": "Gửi cho mình một liên kết đăng ký đến địa chỉ email của bạn.",
+        "SEND": "Gửi link đăng ký",
+        "SENT": "Email đã được gửi thành công. Kiểm tra hộp thư của bạn để tiếp tục thiết lập.",
+        "QRCODE_DESCRIPTION": "Tạo mã QR để quét bằng thiết bị khác.",
+        "QRCODE": "Tạo mã QR",
+        "QRCODE_SCAN": "Quét mã QR này để tiếp tục thiết lập trên thiết bị của bạn.",
+        "NEW_DESCRIPTION": "Sử dụng thiết bị này để thiết lập mật mã.",
+        "NEW": "Thêm mới"
+      }
+    },
+    "MFA": {
+      "TABLETYPE": "Loại",
+      "TABLESTATE": "Trạng thái",
+      "NAME": "Tên",
+      "EMPTY": "Không có yếu tố bổ sung",
+      "TITLE": "Xác thực đa yếu tố",
+      "DESCRIPTION": "Thêm yếu tố thứ hai để đảm bảo an toàn tối ưu cho tài khoản của bạn.",
+      "MANAGE_DESCRIPTION": "Quản lý các phương pháp yếu tố thứ hai của người dùng của bạn.",
+      "ADD": "Thêm yếu tố",
+      "OTP": "Ứng dụng xác thực cho TOTP",
+      "OTP_DIALOG_TITLE": "Thêm OTP",
+      "OTP_DIALOG_DESCRIPTION": "Quét mã QR bằng ứng dụng xác thực và nhập mã bên dưới để xác minh và kích hoạt phương thức TOTP.",
+      "U2F": "Mã khóa",
+      "U2F_DIALOG_TITLE": "Xác minh hệ số",
+      "U2F_DIALOG_DESCRIPTION": "Nhập tên cho Multifactor phổ quát đã sử dụng của bạn.",
+      "U2F_SUCCESS": "Yếu tố được thêm thành công!",
+      "U2F_ERROR": "Đã xảy ra lỗi trong quá trình thiết lập!",
+      "U2F_NAME": "Tên người xác thực",
+      "OTPSMS": "OTP bằng SMS",
+      "OTPEMAIL": "OTP với Email",
+      "SETUPOTPSMSDESCRIPTION": "Bạn có muốn thiết lập số điện thoại này làm yếu tố thứ hai OTP không?",
+      "OTPSMSSUCCESS": "Yếu tố OTP được thiết lập thành công.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Điện thoại của bạn phải được xác minh để sử dụng phương pháp này.",
+      "OTPEMAILSUCCESS": "Yếu tố OTP được thiết lập thành công.",
+      "TYPE": {
+        "0": "Không có MFA được xác định",
+        "1": "OTP",
+        "2": "Mã khóa"
+      },
+      "STATE": {
+        "0": "Không có trạng thái",
+        "1": "Chưa sẵn sàng",
+        "2": "Sẵn sàng",
+        "3": "Đã xóa"
+      },
+      "DIALOG": {
+        "MFA_DELETE_TITLE": "Loại bỏ yếu tố thứ hai",
+        "MFA_DELETE_DESCRIPTION": "Bạn sắp xóa yếu tố thứ hai. Bạn có chắc không?",
+        "ADD_MFA_TITLE": "Thêm yếu tố thứ hai",
+        "ADD_MFA_DESCRIPTION": "Chọn một trong các tùy chọn sau."
+      }
+    },
+    "EXTERNALIDP": {
+      "TITLE": "Nhà cung cấp danh tính bên ngoài",
+      "DESC": "",
+      "IDPCONFIGID": "ID cấu hình IDP",
+      "IDPNAME": "Tên IDP",
+      "USERDISPLAYNAME": "Tên bên ngoài",
+      "EXTERNALUSERID": "ID người dùng bên ngoài",
+      "EMPTY": "Không tìm thấy IdP bên ngoài",
+      "DIALOG": {
+        "DELETE_TITLE": "Xóa IdP",
+        "DELETE_DESCRIPTION": "Bạn sắp xóa Nhà cung cấp danh tính khỏi một người dùng. Bạn có thực sự muốn tiếp tục không?"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Tạo người dùng mới",
+      "DESCRIPTION": "Vui lòng cung cấp thông tin cần thiết.",
+      "NAMEANDEMAILSECTION": "Tên và E-mail",
+      "GENDERLANGSECTION": "Giới tính và Ngôn ngữ",
+      "PHONESECTION": "Số điện thoại",
+      "PASSWORDSECTION": "Mật khẩu ban đầu",
+      "ADDRESSANDPHONESECTION": "Số điện thoại",
+      "INITMAILDESCRIPTION": "Nếu cả hai tùy chọn được chọn, sẽ không có email khởi tạo nào được gửi. Nếu chỉ chọn một trong các tùy chọn, một thư cung cấp/xác minh dữ liệu sẽ được gửi.",
+      "SETUPAUTHENTICATIONLATER": "Thiết lập xác thực sau cho Người dùng này.",
+      "INVITATION": "Gửi lời mời E-Mail để thiết lập xác thực và xác minh E-Mail.",
+      "INITIALPASSWORD": "Đặt mật khẩu ban đầu cho Người dùng."
+    },
+    "CODEDIALOG": {
+      "TITLE": "Xác minh số điện thoại",
+      "DESCRIPTION": "Nhập mã bạn nhận được qua tin nhắn văn bản để xác minh số điện thoại của bạn.",
+      "CODE": "Mã"
+    },
+    "DATA": {
+      "STATE": "Trạng thái",
+      "STATE0": "Không rõ",
+      "STATE1": "Đang hoạt động",
+      "STATE2": "Không hoạt động",
+      "STATE3": "Đã xóa",
+      "STATE4": "Đã khóa",
+      "STATE5": "Bị đình chỉ",
+      "STATE6": "Ban đầu"
+    },
+    "PROFILE": {
+      "TITLE": "Hồ sơ",
+      "EMAIL": "Thư điện tử",
+      "PHONE": "Số điện thoại",
+      "PHONE_HINT": "Sử dụng biểu tượng + theo sau là mã quốc gia gọi hoặc chọn quốc gia từ danh sách thả xuống và cuối cùng nhập số điện thoại",
+      "PHONE_VERIFIED": "Số điện thoại đã được xác minh",
+      "SEND_SMS": "Gửi SMS xác minh",
+      "SEND_EMAIL": "Gửi E-mail",
+      "USERNAME": "Tên người dùng",
+      "CHANGEUSERNAME": "sửa đổi",
+      "CHANGEUSERNAME_TITLE": "Thay đổi tên người dùng",
+      "CHANGEUSERNAME_DESC": "Nhập tên mới vào trường bên dưới.",
+      "FIRSTNAME": "Họ Tên",
+      "LASTNAME": "Họ",
+      "NICKNAME": "Biệt danh",
+      "DISPLAYNAME": "Tên hiển thị",
+      "PREFERREDLOGINNAME": "Tên đăng nhập ưa thích",
+      "PREFERRED_LANGUAGE": "Ngôn ngữ",
+      "GENDER": "Giới tính",
+      "PASSWORD": "Mật khẩu",
+      "AVATAR": {
+        "UPLOADTITLE": "Tải lên Ảnh hồ sơ của bạn",
+        "UPLOADBTN": "Chọn tập tin",
+        "UPLOAD": "Tải lên",
+        "CURRENT": "Hình ảnh hiện tại",
+        "PREVIEW": "Xem trước",
+        "DELETESUCCESS": "Đã xóa thành công!",
+        "CROPPERERROR": "Đã xảy ra lỗi khi tải tệp của bạn lên. Hãy thử định dạng và kích thước khác nếu cần thiết."
+      },
+      "COUNTRY": "Quốc gia"
+    },
+    "MACHINE": {
+      "TITLE": "Chi tiết tài khoản dịch vụ",
+      "USERNAME": "Tên người dùng",
+      "NAME": "Tên",
+      "DESCRIPTION": "Mô tả",
+      "KEYSTITLE": "Phím",
+      "KEYSDESC": "Xác định khóa của bạn và thêm ngày hết hạn tùy chọn.",
+      "TOKENSTITLE": "Mã thông báo truy cập cá nhân",
+      "TOKENSDESC": "Mã thông báo truy cập cá nhân hoạt động giống như mã thông báo truy cập OAuth thông thường.",
+      "ID": "ID khóa",
+      "TYPE": "Loại",
+      "EXPIRATIONDATE": "Ngày hết hạn",
+      "CHOOSEDATEAFTER": "Nhập ngày hết hạn hợp lệ sau",
+      "CHOOSEEXPIRY": "Chọn ngày hết hạn",
+      "CREATIONDATE": "Ngày tạo",
+      "KEYDETAILS": "Chi tiết chính",
+      "ACCESSTOKENTYPE": "Loại mã thông báo truy cập",
+      "ACCESSTOKENTYPES": {
+        "0": "Người mang",
+        "1": "JWT"
+      },
+      "ADD": {
+        "TITLE": "Thêm khóa",
+        "DESCRIPTION": "Chọn loại khóa của bạn và chọn ngày hết hạn tùy chọn."
+      },
+      "ADDED": {
+        "TITLE": "Chìa khóa đã được tạo",
+        "DESCRIPTION": "Tải xuống khóa vì nó sẽ không hiển thị sau khi đóng hộp thoại này!"
+      },
+      "KEYTYPES": {
+        "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "Xóa khóa",
+          "DESCRIPTION": "Bạn có muốn xóa khóa đã chọn không? Điều này không thể hoàn tác được."
+        }
+      }
+    },
+    "PASSWORD": {
+      "TITLE": "Mật khẩu",
+      "LABEL": "Mật khẩu an toàn giúp bảo vệ tài khoản",
+      "DESCRIPTION": "Nhập mật khẩu mới theo chính sách bên dưới.",
+      "OLD": "Mật khẩu hiện tại",
+      "NEW": "Mật khẩu mới",
+      "CONFIRM": "Xác nhận mật khẩu mới",
+      "NEWINITIAL": "Mật khẩu",
+      "CONFIRMINITIAL": "Xác nhận mật khẩu",
+      "RESET": "Đặt lại mật khẩu hiện tại",
+      "SET": "Đặt mật khẩu mới",
+      "RESENDNOTIFICATION": "Gửi liên kết đặt lại mật khẩu",
+      "REQUIRED": "Thiếu một số trường bắt buộc.",
+      "MINLENGTHERROR": "Phải dài ít nhất {{value}} ký tự.",
+      "MAXLENGTHERROR": "Phải ít hơn {{value}} ký tự."
+    },
+    "ID": "ID người dùng",
+    "EMAIL": "Thư điện tử",
+    "PHONE": "Số điện thoại",
+    "PHONEEMPTY": "Không có số điện thoại được xác định",
+    "PHONEVERIFIED": "Số điện thoại đã được xác minh.",
+    "EMAILVERIFIED": "Email đã được xác minh",
+    "NOTVERIFIED": "chưa được xác minh",
+    "PREFERRED_LOGINNAME": "Tên đăng nhập ưa thích",
+    "ISINITIAL": "Người dùng chưa hoạt động.",
+    "LOGINMETHODS": {
+      "TITLE": "Thông tin liên hệ",
+      "DESCRIPTION": "Thông tin được cung cấp được sử dụng để gửi thông tin quan trọng, như email đặt lại mật khẩu cho bạn.",
+      "EMAIL": {
+        "TITLE": "Thư điện tử",
+        "VALID": "xác thực",
+        "ISVERIFIED": "Email đã được xác minh",
+        "ISVERIFIEDDESC": "Nếu email được chỉ định là đã được xác minh thì sẽ không có yêu cầu xác minh email nào được thực hiện.",
+        "RESEND": "Gửi lại E-mail xác minh",
+        "EDITTITLE": "Thay đổi Email",
+        "EDITDESC": "Nhập email mới vào trường bên dưới."
+      },
+      "PHONE": {
+        "TITLE": "Điện thoại",
+        "VALID": "xác thực",
+        "RESEND": "Gửi lại tin nhắn văn bản xác minh",
+        "EDITTITLE": "Thay đổi số",
+        "EDITVALUE": "Số điện thoại",
+        "EDITDESC": "Nhập số điện thoại mới vào trường bên dưới.",
+        "DELETETITLE": "Xóa số điện thoại",
+        "DELETEDESC": "Bạn có thực sự muốn xóa số điện thoại",
+        "OTPSMSREMOVALWARNING": "Tài khoản này sử dụng số điện thoại này làm yếu tố thứ hai. Bạn sẽ không thể sử dụng nó sau khi tiếp tục."
+      },
+      "RESENDCODE": "Gửi lại mã",
+      "ENTERCODE": "Xác minh",
+      "ENTERCODE_DESC": "Mã xác minh"
+    },
+    "GRANTS": {
+      "TITLE": "Phân công vai trò",
+      "DESCRIPTION": "Cấp cho người dùng này quyền truy cập vào một số dự án nhất định",
+      "CREATE": {
+        "TITLE": "Tạo phân công vai trò",
+        "DESCRIPTION": "Tìm kiếm tổ chức, dự án và các vai trò dự án tương ứng."
+      },
+      "PROJECTNAME": "Tên dự án",
+      "PROJECT-OWNED": "Dự án",
+      "PROJECT-GRANTED": "Dự án được cấp",
+      "FILTER": {
+        "0": "bộ lọc cho người dùng",
+        "1": "lọc tên miền",
+        "2": "bộ lọc tên dự án",
+        "3": "bộ lọc tên vai trò"
+      }
+    },
+    "STATE": {
+      "0": "Không rõ",
+      "1": "Đang hoạt động",
+      "2": "Không hoạt động",
+      "3": "Đã xóa",
+      "4": "Đã khóa",
+      "5": "Bị đình chỉ",
+      "6": "Ban đầu"
+    },
+    "STATEV2": {
+      "0": "Không rõ",
+      "1": "Đang hoạt động",
+      "2": "Không hoạt động",
+      "3": "Đã xóa",
+      "4": "Đã khóa",
+      "5": "Ban đầu"
+    },
+    "SEARCH": {
+      "ADDITIONAL": "Tên đăng nhập (tổ chức hiện tại)",
+      "ADDITIONAL-EXTERNAL": "Tên đăng nhập (tổ chức bên ngoài)"
+    },
+    "TARGET": {
+      "SELF": "Nếu bạn muốn gán vai trò cho người dùng từ tổ chức khác",
+      "EXTERNAL": "Để chỉ định vai trò cho người dùng trong tổ chức của bạn",
+      "CLICKHERE": "bấm vào đây"
+    },
+    "SIGNEDOUT": "Bạn đã đăng xuất. Nhấp vào nút \"Đăng nhập\" để đăng nhập lại.",
+    "SIGNEDOUT_BTN": "Đăng nhập",
+    "EDITACCOUNT": "Chỉnh sửa tài khoản",
+    "ADDACCOUNT": "Đăng nhập bằng tài khoản khác",
+    "RESENDINITIALEMAIL": "Gửi lại thư kích hoạt",
+    "RESENDEMAILNOTIFICATION": "Gửi lại Email thông báo",
+    "TOAST": {
+      "CREATED": "Người dùng đã tạo thành công.",
+      "SAVED": "Đã lưu hồ sơ thành công.",
+      "USERNAMECHANGED": "Tên người dùng đã thay đổi.",
+      "EMAILSAVED": "Đã lưu email thành công.",
+      "INITEMAILSENT": "Thư khởi tạo đã được gửi.",
+      "PHONESAVED": "Đã lưu điện thoại thành công.",
+      "PHONEREMOVED": "Điện thoại đã bị xóa.",
+      "PHONEVERIFIED": "Đã xác minh điện thoại thành công.",
+      "PHONEVERIFICATIONSENT": "Mã xác minh điện thoại đã được gửi.",
+      "EMAILVERIFICATIONSENT": "Mã xác minh email đã được gửi.",
+      "OTPREMOVED": "OTP đã bị xóa.",
+      "U2FREMOVED": "Yếu tố bị loại bỏ.",
+      "PASSWORDLESSREMOVED": "Đã xóa mật mã.",
+      "INITIALPASSWORDSET": "Đã đặt mật khẩu ban đầu.",
+      "PASSWORDNOTIFICATIONSENT": "Đã gửi thông báo thay đổi mật khẩu.",
+      "PASSWORDCHANGED": "Mật khẩu đã được thay đổi thành công.",
+      "REACTIVATED": "Người dùng đã kích hoạt lại.",
+      "DEACTIVATED": "Người dùng đã bị vô hiệu hóa.",
+      "SELECTEDREACTIVATED": "Người dùng được chọn đã được kích hoạt lại.",
+      "SELECTEDDEACTIVATED": "Người dùng được chọn đã bị vô hiệu hóa.",
+      "SELECTEDKEYSDELETED": "Các phím đã chọn đã bị xóa.",
+      "KEYADDED": "Đã thêm khóa!",
+      "MACHINEADDED": "Tài khoản dịch vụ đã được tạo!",
+      "DELETED": "Người dùng đã xóa thành công!",
+      "UNLOCKED": "Người dùng đã mở khóa thành công!",
+      "PASSWORDLESSREGISTRATIONSENT": "Link đăng ký đã được gửi thành công.",
+      "SECRETGENERATED": "Bí mật được tạo thành công!",
+      "SECRETREMOVED": "Đã xóa bí mật thành công!"
+    },
+    "MEMBERSHIPS": {
+      "TITLE": "Vai trò quản trị viên Zitadel",
+      "DESCRIPTION": "Đây là tất cả các vai trò quản trị viên của người dùng. Bạn cũng có thể sửa đổi chúng trên các trang chi tiết về tổ chức, dự án hoặc IAM.",
+      "ORGCONTEXT": "Bạn thấy tất cả các tổ chức và dự án có liên quan đến tổ chức hiện được chọn.",
+      "USERCONTEXT": "Bạn thấy tất cả các tổ chức và dự án mà bạn được ủy quyền. Bao gồm cả các tổ chức khác.",
+      "CREATIONDATE": "Ngày tạo",
+      "CHANGEDATE": "Sửa đổi lần cuối",
+      "DISPLAYNAME": "Tên hiển thị",
+      "REMOVE": "Xóa",
+      "TYPE": "Loại",
+      "ORGID": "ID tổ chức",
+      "UPDATED": "Vai trò quản trị viên đã được cập nhật.",
+      "NOPERMISSIONTOEDIT": "Bạn đang thiếu các quyền cần thiết để chỉnh sửa vai trò!",
+      "TYPES": {
+        "UNKNOWN": "Không rõ",
+        "ORG": "Tổ chức",
+        "PROJECT": "Dự án",
+        "GRANTEDPROJECT": "Dự án được cấp"
+      }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "Mã số",
+      "TOKEN": "Mã thông báo",
+      "ADD": {
+        "TITLE": "Tạo Mã thông báo truy cập cá nhân mới",
+        "DESCRIPTION": "Xác định thời hạn tùy chỉnh cho mã thông báo.",
+        "CHOOSEEXPIRY": "Chọn ngày hết hạn",
+        "CHOOSEDATEAFTER": "Nhập ngày hết hạn hợp lệ sau"
+      },
+      "ADDED": {
+        "TITLE": "Mã thông báo truy cập cá nhân",
+        "DESCRIPTION": "Đảm bảo sao chép mã thông báo truy cập cá nhân của bạn. Bạn sẽ không thể nhìn thấy nó nữa!"
+      },
+      "DELETE": {
+        "TITLE": "Xóa mã thông báo",
+        "DESCRIPTION": "Bạn sắp xóa mã thông báo truy cập cá nhân. Bạn có chắc không?"
+      },
+      "DELETED": "Đã xóa mã thông báo thành công."
+    }
+  },
+  "METADATA": {
+    "TITLE": "Siêu dữ liệu",
+    "KEY": "Chìa khóa",
+    "VALUE": "Giá trị",
+    "ADD": "Mục Mới",
+    "SAVE": "Lưu",
+    "EMPTY": "Không có siêu dữ liệu",
+    "SETSUCCESS": "Phần tử được lưu thành công",
+    "REMOVESUCCESS": "Đã xóa phần tử thành công"
+  },
+  "FLOWS": {
+    "ID": "Mã số",
+    "NAME": "Tên",
+    "STATE": "Bang",
+    "STATES": {
+      "0": "không có trạng thái",
+      "1": "không hoạt động",
+      "2": "đang hoạt động"
+    },
+    "ADDTRIGGER": "Thêm trình kích hoạt",
+    "FLOWCHANGED": "Luồng đã được thay đổi thành công",
+    "FLOWCLEARED": "Luồng đã được đặt lại thành công",
+    "TIMEOUT": "Hết thời gian chờ",
+    "TIMEOUTINSEC": "Thời gian chờ tính bằng giây",
+    "ALLOWEDTOFAIL": "Được phép thất bại",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Cảnh báo",
+      "DESCRIPTION": "Nếu bạn tắt cài đặt này, điều này có thể khiến người dùng trong tổ chức của bạn không thể đăng nhập. Ngoài ra, bạn sẽ không thể truy cập trang quản trị quản lý để tắt tác vụ nữa. Chúng tôi khuyên bạn nên tạo người dùng quản trị viên trong một tổ chức riêng biệt hoặc thử nghiệm các tập lệnh trước trong môi trường phát triển hoặc tổ chức phát triển."
+    },
+    "SCRIPT": "Kịch bản",
+    "FLOWTYPE": "Loại luồng",
+    "TRIGGERTYPE": "Loại kích hoạt",
+    "ACTIONS": "Hành động",
+    "ACTIONSMAX": "Dựa trên Cấp độ của bạn, bạn có sẵn Số lượng hành động giới hạn ( {{value}} ). Đảm bảo tắt những thứ bạn không cần hoặc cân nhắc nâng cấp cấp độ của mình.",
+    "DIALOG": {
+      "ADD": {
+        "TITLE": "Tạo một hành động"
+      },
+      "UPDATE": {
+        "TITLE": "Cập nhật hành động"
+      },
+      "DELETEACTION": {
+        "TITLE": "Xóa hành động?",
+        "DESCRIPTION": "Bạn sắp xóa một hành động. Điều này không thể được hoàn nguyên. Bạn có chắc không?",
+        "DELETE_SUCCESS": "Hành động đã được xóa thành công."
+      },
+      "CLEAR": {
+        "TITLE": "Dòng chảy rõ ràng?",
+        "DESCRIPTION": "Bạn sắp đặt lại quy trình cùng với các yếu tố kích hoạt và hành động của quy trình đó. Không thể khôi phục thay đổi này. Bạn có chắc không?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Xóa hành động đã chọn?",
+        "DESCRIPTION": "Bạn có chắc chắn muốn xóa các hành động đã chọn khỏi quy trình không?"
+      },
+      "ABOUTNAME": "Tên của hành động và tên của hàm trong javascript phải giống nhau"
+    },
+    "TOAST": {
+      "ACTIONSSET": "Đã đặt hành động",
+      "ACTIONREACTIVATED": "Hành động được kích hoạt lại thành công",
+      "ACTIONDEACTIVATED": "Hành động đã bị vô hiệu hóa thành công"
+    }
+  },
+  "IAM": {
+    "POLICIES": {
+      "TITLE": "Chính sách hệ thống và cài đặt truy cập",
+      "DESCRIPTION": "Quản lý Cài đặt quyền truy cập quản lý và Chính sách chung của bạn."
+    },
+    "EVENTSTORE": {
+      "TITLE": "Quản trị lưu trữ IAM",
+      "DESCRIPTION": "Quản lý lượt xem Zitadel của bạn và các sự kiện thất bại."
+    },
+    "MEMBER": {
+      "TITLE": "Quản trị viên",
+      "DESCRIPTION": "Những quản trị viên này được phép thực hiện các thay đổi trong phiên bản của bạn."
+    },
+    "PAGES": {
+      "STATE": "Trạng thái",
+      "DOMAINLIST": "Tên miền tùy chỉnh"
+    },
+    "STATE": {
+      "0": "Không xác định",
+      "1": "Đang tạo",
+      "2": "Đang chạy",
+      "3": "Đang dừng",
+      "4": "Đã dừng"
+    },
+    "VIEWS": {
+      "VIEWNAME": "Tên",
+      "DATABASE": "Cơ sở dữ liệu",
+      "SEQUENCE": "Trình tự",
+      "EVENTTIMESTAMP": "Dấu thời gian",
+      "LASTSPOOL": "Cuộn dây thành công",
+      "ACTIONS": "Hành động",
+      "CLEAR": "Xóa",
+      "CLEARED": "Chế độ xem đã được xóa thành công!",
+      "DIALOG": {
+        "VIEW_CLEAR_TITLE": "Xóa chế độ xem",
+        "VIEW_CLEAR_DESCRIPTION": "Bạn sắp xóa một chế độ xem. Việc xóa chế độ xem sẽ tạo ra một quy trình trong đó dữ liệu có thể không có sẵn cho người dùng cuối. Bạn có thực sự chắc chắn không?"
+      }
+    },
+    "FAILEDEVENTS": {
+      "VIEWNAME": "Tên",
+      "DATABASE": "Cơ sở dữ liệu",
+      "FAILEDSEQUENCE": "Trình tự thất bại",
+      "FAILURECOUNT": "Số lần thất bại",
+      "LASTFAILED": "Thất bại lần cuối tại",
+      "ERRORMESSAGE": "Thông Báo Lỗi",
+      "ACTIONS": "Hành động",
+      "DELETE": "Xóa",
+      "DELETESUCCESS": "Đã xóa các sự kiện không thành công."
+    },
+    "EVENTS": {
+      "EDITOR": "Biên tập viên",
+      "EDITORID": "ID người biên tập",
+      "AGGREGATE": "Tổng hợp",
+      "AGGREGATEID": "ID tổng hợp",
+      "AGGREGATETYPE": "Loại tổng hợp",
+      "RESOURCEOWNER": "Chủ sở hữu tài nguyên",
+      "SEQUENCE": "Trình tự",
+      "CREATIONDATE": "Được tạo tại",
+      "TYPE": "Loại",
+      "PAYLOAD": "Tải trọng",
+      "FILTERS": {
+        "BTN": "Lọc",
+        "USER": {
+          "IDLABEL": "Mã số",
+          "CHECKBOX": "Lọc theo Trình chỉnh sửa"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Loại tổng hợp",
+          "IDLABEL": "Mã số",
+          "CHECKBOX": "Lọc theo Tổng hợp"
+        },
+        "TYPE": {
+          "TYPELABEL": "Loại",
+          "CHECKBOX": "Lọc theo loại"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "Mã số",
+          "CHECKBOX": "Lọc theo chủ sở hữu tài nguyên"
+        },
+        "SEQUENCE": {
+          "LABEL": "Trình tự",
+          "CHECKBOX": "Lọc theo trình tự"
+        },
+        "SORT": "Sắp xếp",
+        "ASC": "Tăng dần",
+        "DESC": "Giảm dần",
+        "CREATIONDATE": {
+          "RADIO_FROM": "Từ",
+          "RADIO_RANGE": "Phạm vi",
+          "LABEL_SINCE": "Vì",
+          "LABEL_UNTIL": "Cho đến"
+        },
+        "OTHER": "khác",
+        "OTHERS": "những người khác"
+      },
+      "DIALOG": {
+        "TITLE": "Chi tiết sự kiện"
+      }
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Quản trị viên đã xóa.",
+      "MEMBERSADDED": "Quản trị viên đã thêm.",
+      "MEMBERADDED": "Quản trị viên đã thêm.",
+      "MEMBERCHANGED": "Quản trị viên đã thay đổi.",
+      "ROLEREMOVED": "Đã xóa vai trò.",
+      "ROLECHANGED": "Vai trò đã thay đổi.",
+      "REACTIVATED": "Đã kích hoạt lại",
+      "DEACTIVATED": "Đã tắt"
+    }
+  },
+  "ORG": {
+    "PAGES": {
+      "NAME": "Tên",
+      "ID": "ID tổ chức",
+      "CREATIONDATE": "Ngày tạo",
+      "DATECHANGED": "Đã thay đổi",
+      "FILTER": "Lọc",
+      "FILTERPLACEHOLDER": "Lọc tên",
+      "LIST": "Tổ chức",
+      "LISTDESCRIPTION": "Chọn một tổ chức.",
+      "ACTIVE": "Đang hoạt động",
+      "CREATE": "Tạo tổ chức",
+      "DEACTIVATE": "Vô hiệu hóa tổ chức",
+      "REACTIVATE": "Kích hoạt lại tổ chức",
+      "NOPERMISSION": "Bạn không có quyền truy cập cài đặt tổ chức.",
+      "USERSELFACCOUNT": "Sử dụng tài khoản cá nhân của bạn với tư cách là chủ sở hữu tổ chức",
+      "ORGDETAIL_TITLE": "Nhập tên và miền của tổ chức mới của bạn.",
+      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Nhập tên tổ chức mới của bạn.",
+      "ORGDETAILUSER_TITLE": "Định cấu hình Chủ sở hữu tổ chức",
+      "DELETE": "Xóa tổ chức",
+      "DEFAULTLABEL": "Mặc định",
+      "SETASDEFAULT": "Đặt làm tổ chức mặc định",
+      "DEFAULTORGSET": "Tổ chức mặc định đã thay đổi thành công",
+      "RENAME": {
+        "ACTION": "Đổi tên",
+        "TITLE": "Đổi tên tổ chức",
+        "DESCRIPTION": "Nhập tên mới cho tổ chức của bạn",
+        "BTN": "Đổi tên"
+      },
+      "ORGDOMAIN": {
+        "TITLE": "Xác minh quyền sở hữu {{value}}",
+        "VERIFICATION": "Chúng tôi cung cấp cho bạn hai phương pháp để xác thực miền của bạn theo cách thủ công:",
+        "VERIFICATION_HTML": "- HTTP. Lưu trữ tệp xác minh tạm thời trên trang web của bạn",
+        "VERIFICATION_DNS": "- DNS. Tạo mục nhập DNS Bản ghi TXT",
+        "VERIFICATION_DNS_DESC": "Nếu bạn quản lý {{value}} và có quyền truy cập vào bản ghi DNS của mình, bạn có thể tạo bản ghi TXT mới với các giá trị sau:",
+        "VERIFICATION_DNS_HOST_LABEL": "Chủ nhà:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Sử dụng mã này cho giá trị của bản ghi TXT:",
+        "VERIFICATION_HTTP_DESC": "Nếu bạn có quyền truy cập vào dịch vụ lưu trữ trang web của mình, bạn chỉ cần tải xuống tệp xác minh và tải tệp đó lên tại URL được cung cấp",
+        "VERIFICATION_HTTP_URL_LABEL": "URL dự kiến:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Tệp xác minh:",
+        "VERIFICATION_SKIP": "Bạn có thể bỏ qua xác minh ngay bây giờ và tiếp tục tạo tổ chức của mình, nhưng để sử dụng miền, bước này phải được hoàn thành!",
+        "VERIFICATION_VALIDATION_DESC": "Đừng xóa mã xác minh vì Zitadel sẽ thỉnh thoảng kiểm tra lại quyền sở hữu tên miền của bạn.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Yêu cầu mã thông báo mới",
+        "VERIFICATION_VALIDATION_ONGOING": "Phương thức {{value}} đã được chọn để xác minh Miền tổ chức của bạn. Nhấp vào nút để kích hoạt kiểm tra xác minh hoặc đặt lại quy trình xác minh.",
+        "VERIFICATION_SUCCESSFUL": "Tên miền đã được xác minh thành công!",
+        "RESETMETHOD": "Đặt lại phương thức xác minh"
+      },
+      "DOWNLOAD_FILE": "Tải tập tin",
+      "SELECTORGTOOLTIP": "Chọn tổ chức này.",
+      "PRIMARYDOMAIN": "Tên miền tổ chức",
+      "STATE": "Bang",
+      "USEPASSWORD": "Đặt mật khẩu ban đầu",
+      "USEPASSWORDDESC": "Người dùng không phải đặt mật khẩu trong quá trình khởi tạo."
+    },
+    "LIST": {
+      "TITLE": "Tổ chức",
+      "DESCRIPTION": "Đây là những tổ chức trong trường hợp của bạn"
+    },
+    "DOMAINS": {
+      "NEW": "Thêm tên miền",
+      "TITLE": "Tên miền tổ chức",
+      "DESCRIPTION": "Định cấu hình Miền tổ chức của bạn. Tên miền này có thể được sử dụng để khám phá tên miền và thêm hậu tố tên người dùng.",
+      "SETPRIMARY": "Đặt làm Miền tổ chức",
+      "DELETE": {
+        "TITLE": "Xóa tên miền",
+        "DESCRIPTION": "Bạn sắp xóa một trong các miền của mình."
+      },
+      "ADD": {
+        "TITLE": "Thêm tên miền",
+        "DESCRIPTION": "Bạn sắp thêm miền cho tổ chức của mình. Sau khi quá trình thành công, miền có thể được sử dụng để khám phá miền và làm hậu tố cho người dùng của bạn."
+      }
+    },
+    "STATE": {
+      "0": "Không được xác định",
+      "1": "Đang hoạt động",
+      "2": "Đã tắt"
+    },
+    "MEMBER": {
+      "TITLE": "Quản trị viên tổ chức",
+      "DESCRIPTION": "Xác định người dùng có thể thay đổi tùy chọn tổ chức của bạn."
+    },
+    "TOAST": {
+      "UPDATED": "Tổ chức được cập nhật thành công.",
+      "DEACTIVATED": "Tổ chức đã bị vô hiệu hóa.",
+      "REACTIVATED": "Tổ chức đã được kích hoạt lại.",
+      "DOMAINADDED": "Đã thêm tên miền.",
+      "DOMAINREMOVED": "Đã xóa miền.",
+      "MEMBERADDED": "Quản trị viên đã thêm.",
+      "MEMBERREMOVED": "Quản trị viên đã xóa.",
+      "MEMBERCHANGED": "Quản trị viên đã thay đổi.",
+      "SETPRIMARY": "Tên miền tổ chức được đặt thành công.",
+      "DELETED": "Đã xóa tổ chức thành công",
+      "DEFAULTORGNOTFOUND": "Không tìm thấy tổ chức mặc định",
+      "ORG_WAS_DELETED": "Tổ chức đã bị xóa."
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Vô hiệu hóa tổ chức",
+        "DESCRIPTION": "Bạn sắp hủy kích hoạt tổ chức của mình. Người dùng sẽ không thể đăng nhập sau đó. Bạn có chắc chắn tiếp tục không?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Kích hoạt lại tổ chức",
+        "DESCRIPTION": "Bạn sắp kích hoạt lại tổ chức của mình. Người dùng sẽ có thể đăng nhập lại. Bạn có chắc chắn tiếp tục không?"
+      },
+      "DELETE": {
+        "TITLE": "Xóa tổ chức",
+        "DESCRIPTION": "Bạn sắp xóa tổ chức của mình. Điều này bắt đầu một quá trình trong đó tất cả dữ liệu liên quan đến tổ chức sẽ bị xóa. Hiện tại, bạn không thể hoàn nguyên hành động này.",
+        "TYPENAME": "Nhập ' {{value}} ' để xóa tổ chức của bạn.",
+        "ORGNAME": "Tên",
+        "BTN": "Xóa"
+      }
+    }
+  },
+  "SETTINGS": {
+    "LIST": {
+      "ORGS": "Tổ chức",
+      "FEATURESETTINGS": "Tính năng",
+      "LANGUAGES": "Ngôn ngữ",
+      "LOGIN": "Hành vi đăng nhập và bảo mật",
+      "LOCKOUT": "Khóa",
+      "AGE": "Mật khẩu hết hạn",
+      "COMPLEXITY": "Độ phức tạp của mật khẩu",
+      "NOTIFICATIONS": "Thông báo",
+      "SMTP_PROVIDER": "Nhà cung cấp SMTP",
+      "SMS_PROVIDER": "Nhà cung cấp tin nhắn SMS/điện thoại",
+      "NOTIFICATIONS_DESC": "Cài đặt SMTP và SMS",
+      "MESSAGETEXTS": "Nội dung tin nhắn",
+      "IDP": "Nhà cung cấp danh tính",
+      "VERIFIED_DOMAINS": "Tên miền tổ chức",
+      "DOMAIN": "Cài đặt tên miền",
+      "LOGINTEXTS": "Giao diện đăng nhập Nội dung",
+      "BRANDING": "Xây dựng thương hiệu",
+      "PRIVACYPOLICY": "Liên kết ngoài",
+      "OIDC": "Thời gian tồn tại và hết hạn của mã thông báo OIDC",
+      "WEB_KEYS": "Khóa web OIDC",
+      "SECRETS": "Trình tạo bí mật",
+      "SECURITY": "Cài đặt bảo mật",
+      "EVENTS": "Sự kiện",
+      "FAILEDEVENTS": "Sự Kiện Thất Bại",
+      "VIEWS": "Lượt xem",
+      "ACTIONS": "Hành động",
+      "TARGETS": "Mục tiêu"
+    },
+    "GROUPS": {
+      "GENERAL": "Thông tin chung",
+      "NOTIFICATIONS": "Thông báo",
+      "LOGIN": "Đăng nhập và truy cập",
+      "DOMAIN": "Tên miền",
+      "TEXTS": "Văn bản và Ngôn ngữ",
+      "APPEARANCE": "Ngoại hình",
+      "OTHER": "Khác",
+      "STORAGE": "Lưu trữ",
+      "ACTIONS": "Hành động"
+    },
+    "BETA": "THỬ NGHIỆM"
+  },
+  "SETTING": {
+    "LANGUAGES": {
+      "DEFAULT": "Ngôn ngữ mặc định",
+      "ALLOWED": "Ngôn ngữ được phép",
+      "NOT_ALLOWED": "Ngôn ngữ không được phép",
+      "ALLOW_ALL": "Cho phép tất cả",
+      "DISALLOW_ALL": "Không cho phép tất cả",
+      "SETASDEFAULT": "Đặt làm ngôn ngữ mặc định",
+      "DEFAULT_SAVED": "Đã lưu ngôn ngữ mặc định",
+      "ALLOWED_SAVED": "Đã lưu ngôn ngữ được phép",
+      "OPTIONS": {
+        "de": "Tiếng Đức",
+        "en": "Tiếng Anh",
+        "es": "Tiếng Tây Ban Nha",
+        "fr": "Tiếng Pháp",
+        "it": "Tiếng Ý",
+        "ja": "日本語",
+        "pl": "Tiếng Ba Lan",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Tiếng Bồ Đào Nha",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Hà Lan",
+        "sv": "Svenska",
+        "id": "Tiếng Bahasa Indonesia",
+        "hu": "Tiếng Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Thổ Nhĩ Kỳ",
+        "uk": "Українська",
+        "ar": "العربية"
+      }
+    },
+    "SMTP": {
+      "TITLE": "Nhà cung cấp SMTP",
+      "DESCRIPTION": "Mô tả",
+      "SENDERADDRESS": "Địa chỉ Email của người gửi",
+      "SENDERNAME": "Tên người gửi",
+      "REPLYTOADDRESS": "Địa chỉ trả lời",
+      "HOSTANDPORT": "Máy chủ và cổng",
+      "USER": "Người dùng",
+      "PASSWORD": "Mật khẩu",
+      "SETPASSWORD": "Đặt mật khẩu SMTP",
+      "PASSWORDSET": "Mật khẩu SMTP đã được đặt thành công.",
+      "TLS": "Bảo mật lớp vận chuyển (TLS)",
+      "SAVED": "Đã lưu thành công!",
+      "NOCHANGES": "Không có thay đổi!",
+      "REQUIREDWARN": "Để gửi thông báo từ miền của bạn, bạn phải nhập dữ liệu SMTP của mình."
+    },
+    "SMS": {
+      "PROVIDERS": "Nhà cung cấp",
+      "PROVIDER": "Nhà cung cấp tin nhắn SMS",
+      "ADDPROVIDER": "Thêm nhà cung cấp SMS",
+      "ADDPROVIDERDESCRIPTION": "Chọn một trong những nhà cung cấp có sẵn và nhập dữ liệu cần thiết.",
+      "REMOVEPROVIDER": "Xóa nhà cung cấp",
+      "REMOVEPROVIDER_DESC": "Bạn sắp xóa một nhà cung cấp. Bạn có muốn tiếp tục không?",
+      "SMSPROVIDERSTATE": {
+        "0": "Không xác định",
+        "1": "Đang hoạt động",
+        "2": "Không hoạt động"
+      },
+      "ACTIVATED": "Đã kích hoạt nhà cung cấp",
+      "DEACTIVATED": "Nhà cung cấp bị vô hiệu hóa.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Mã thông báo",
+        "SENDERNUMBER": "Số người gửi",
+        "VERIFYSERVICESID": "Dịch vụ xác minh Sid",
+        "VERIFYSERVICESID_DESCRIPTION": "Đặt Sid dịch vụ xác minh, cho phép sử dụng Dịch vụ xác minh Twilio thay vì Dịch vụ tin nhắn để xác minh số điện thoại và SMS OTP",
+        "ADDED": "Twilio đã thêm thành công.",
+        "UPDATED": "Twilio đã cập nhật thành công.",
+        "REMOVED": "Twilio đã bị xóa",
+        "CHANGETOKEN": "Thay đổi mã thông báo",
+        "SETTOKEN": "Đặt mã thông báo",
+        "TOKENSET": "Mã thông báo được đặt thành công."
+      }
+    },
+    "SECRETS": {
+      "TYPES": "Các loại bí mật",
+      "TYPE": {
+        "1": "Thư khởi tạo",
+        "2": "Xác minh email",
+        "3": "Xác minh điện thoại",
+        "4": "Đặt lại mật khẩu",
+        "5": "Khởi tạo mật mã",
+        "6": "Bí mật ứng dụng",
+        "7": "OTP - SMS",
+        "8": "OTP - Email"
+      },
+      "EXPIRY": "Hết hạn (tính bằng phút)",
+      "INCLUDEDIGITS": "Bao gồm các số",
+      "INCLUDESYMBOLS": "Bao gồm các ký hiệu",
+      "INCLUDELOWERLETTERS": "Bao gồm các chữ cái viết thường",
+      "INCLUDEUPPERLETTERS": "Bao gồm các chữ cái viết hoa",
+      "LENGTH": "Chiều dài",
+      "UPDATED": "Đã cập nhật cài đặt."
+    },
+    "SECURITY": {
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Cài đặt này đặt CSP để cho phép đóng khung từ một tập hợp các miền được phép. Lưu ý rằng khi cho phép sử dụng iFrames, bạn có nguy cơ cho phép nhấp chuột.",
+      "IFRAMEENABLED": "Cho phép iFrame",
+      "ALLOWEDORIGINS": "URL được phép",
+      "IMPERSONATIONTITLE": "Mạo danh",
+      "IMPERSONATIONENABLED": "Cho phép mạo danh",
+      "IMPERSONATIONDESCRIPTION": "Cài đặt này cho phép sử dụng mạo danh về nguyên tắc. Lưu ý rằng người mạo danh cũng cần được chỉ định các vai trò `*_IMPERSONATOR` thích hợp."
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "Đăng nhập Tổ chức mặc định",
+      "LOGINDEFAULTORG_DESCRIPTION": "Giao diện người dùng đăng nhập sẽ sử dụng cài đặt của tổ chức mặc định (chứ không phải từ phiên bản) nếu không có bối cảnh tổ chức nào được đặt",
+      "USERSCHEMA": "Lược đồ người dùng",
+      "USERSCHEMA_DESCRIPTION": "Lược đồ người dùng cho phép quản lý lược đồ dữ liệu của người dùng. Nếu cờ được bật, bạn sẽ có thể sử dụng API mới và các tính năng của nó.",
+      "ACTIONS": "Hành động",
+      "ACTIONS_DESCRIPTION": "Hành động v2 cho phép quản lý việc thực thi và mục tiêu dữ liệu. Nếu cờ được bật, bạn sẽ có thể sử dụng API mới và các tính năng của nó.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "Chấm dứt phiên V1 đơn OIDC",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Nếu cờ được bật, bạn sẽ có thể chấm dứt một phiên từ giao diện người dùng đăng nhập bằng cách cung cấp id_token với xác nhận quyền sở hữu `sid` là id_token_hint trên điểm cuối end_session. Lưu ý rằng hiện tại tất cả các phiên từ cùng một tác nhân người dùng (trình duyệt) đều bị chấm dứt trong giao diện người dùng đăng nhập. Các phiên được quản lý thông qua API phiên đã cho phép chấm dứt các phiên đơn lẻ.",
+      "DEBUGOIDCPARENTERROR": "Gỡ lỗi lỗi gốc OIDC",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Nếu cờ được bật, lỗi gốc OIDC sẽ được ghi vào trang quản trị.",
+      "PERMISSIONCHECKV2": "Kiểm tra quyền V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Nếu cờ được bật, bạn sẽ có thể sử dụng API mới và các tính năng của nó.",
+      "STATES": {
+        "INHERITED": "Kế thừa",
+        "ENABLED": "Đã bật",
+        "DISABLED": "Đã tắt"
+      },
+      "INHERITED_DESCRIPTION": "Điều này đặt giá trị thành giá trị mặc định của hệ thống.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Đã bật\" được kế thừa",
+        "DISABLED": "\"Người khuyết tật\" được kế thừa"
+      },
+      "RESET": "Đặt tất cả thành kế thừa",
+      "CONSOLEUSEV2USERAPI": "Sử dụng V2 Api trong Trang quản trị quản lý để tạo Người dùng",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Khi cờ này được bật, Trang quản trị quản lý sẽ sử dụng API người dùng V2 để tạo người dùng mới. Với API V2, người dùng mới tạo sẽ bắt đầu mà không có trạng thái ban đầu.",
+      "LOGINV2": "Đăng nhập V2",
+      "LOGINV2_DESCRIPTION": "Việc kích hoạt tính năng này sẽ kích hoạt giao diện người dùng đăng nhập dựa trên TypeScript mới với tính năng bảo mật, hiệu suất và tùy chỉnh được cải thiện.",
+      "LOGINV2_BASEURI": "URI cơ sở",
+      "ENABLERELATIONALTABLES": "Bảng quan hệ",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Kích hoạt tính năng này để sử dụng các bảng quan hệ thay vì các phép chiếu để lưu trữ dữ liệu. Hiện tại, nút chuyển đổi này không có tác dụng gì."
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "Đặt lại cài đặt",
+        "DEFAULTDESCRIPTION": "Bạn sắp đặt lại cài đặt của mình về cài đặt mặc định cho phiên bản của bạn. Bạn có chắc chắn muốn tiếp tục không?",
+        "LOGINPOLICY_DESCRIPTION": "Cảnh báo: Nếu bạn tiếp tục, cài đặt Nhà cung cấp danh tính cũng sẽ được đặt lại về cài đặt phiên bản."
+      }
+    }
+  },
+  "POLICY": {
+    "APPLIEDTO": "Áp dụng cho",
+    "PWD_COMPLEXITY": {
+      "TITLE": "Độ phức tạp của mật khẩu",
+      "DESCRIPTION": "Đảm bảo rằng tất cả mật khẩu đã đặt đều tương ứng với một mẫu cụ thể",
+      "SYMBOLANDNUMBERERROR": "Phải bao gồm một chữ số và một ký hiệu/dấu chấm câu.",
+      "SYMBOLERROR": "Phải bao gồm ký hiệu/dấu chấm câu.",
+      "NUMBERERROR": "Phải bao gồm một chữ số.",
+      "PATTERNERROR": "Mật khẩu không đáp ứng mẫu được yêu cầu."
+    },
+    "NOTIFICATION": {
+      "TITLE": "Thông báo",
+      "DESCRIPTION": "Xác định những thay đổi, thông báo sẽ được gửi.",
+      "PASSWORDCHANGE": "Mật khẩu đã thay đổi"
+    },
+    "PRIVATELABELING": {
+      "DESCRIPTION": "Cung cấp thông tin đăng nhập theo phong cách cá nhân của bạn và sửa đổi hành vi của nó.",
+      "PREVIEW_DESCRIPTION": "Những thay đổi của chính sách sẽ tự động được triển khai tới môi trường xem trước.",
+      "BTN": "Chọn Tệp",
+      "ACTIVATEPREVIEW": "Áp dụng cài đặt",
+      "DARK": "Chế độ tối",
+      "LIGHT": "Chế độ ánh sáng",
+      "CHANGEVIEW": "Thay đổi chế độ xem",
+      "ACTIVATED": "Các thay đổi về chính sách hiện đang TRỰC TIẾP",
+      "THEME": "Chủ đề",
+      "COLORS": "Màu sắc",
+      "FONT": "Phông chữ",
+      "ADVANCEDBEHAVIOR": "Hành vi nâng cao",
+      "DROP": "Thả hình ảnh vào đây hoặc",
+      "RELEASE": "Phát hành",
+      "DROPFONT": "Thả tập tin phông chữ vào đây",
+      "RELEASEFONT": "Phát hành",
+      "USEOFLOGO": "Logo của bạn sẽ được sử dụng trong phần Đăng nhập cũng như email, trong khi biểu tượng được sử dụng cho các thành phần giao diện người dùng nhỏ hơn như trong trình chuyển đổi tổ chức trong trang quản trị quản lý",
+      "MAXSIZE": "Kích thước tối đa được giới hạn ở mức 524kB",
+      "EMAILNOSVG": "Định dạng tệp SVG không được hỗ trợ trong email. Do đó, hãy tải lên logo của bạn ở định dạng PNG hoặc định dạng được hỗ trợ khác.",
+      "MAXSIZEEXCEEDED": "Đã vượt quá kích thước tối đa 524kB.",
+      "NOSVGSUPPORTED": "SVG không được hỗ trợ!",
+      "FONTINLOGINONLY": "Font chữ hiện tại chỉ hiển thị ở giao diện đăng nhập.",
+      "BACKGROUNDCOLOR": "Màu nền",
+      "PRIMARYCOLOR": "Màu cơ bản",
+      "WARNCOLOR": "Màu cảnh báo",
+      "FONTCOLOR": "Màu chữ",
+      "VIEWS": {
+        "PREVIEW": "Xem trước",
+        "CURRENT": "Cài đặt hiện tại"
+      },
+      "PREVIEW": {
+        "TITLE": "Đăng nhập",
+        "SECOND": "đăng nhập bằng Tài khoản Zitadel của bạn.",
+        "ERROR": "Không thể tìm thấy người dùng!",
+        "PRIMARYBUTTON": "tiếp theo",
+        "SECONDARYBUTTON": "đăng ký"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Chế độ tự động",
+        "THEME_MODE_LIGHT": "Chỉ Chế độ ánh sáng",
+        "THEME_MODE_DARK": "Chỉ Chế độ tối"
+      }
+    },
+    "PWD_AGE": {
+      "TITLE": "Mật khẩu hết hạn",
+      "DESCRIPTION": "Bạn có thể đặt chính sách cho việc hết hạn mật khẩu. Chính sách này sẽ buộc người dùng thay đổi mật khẩu vào lần đăng nhập tiếp theo sau khi hết hạn. Không có cảnh báo và thông báo tự động."
+    },
+    "PWD_LOCKOUT": {
+      "TITLE": "Chính sách khóa",
+      "DESCRIPTION": "Đặt số lần thử lại mật khẩu tối đa, sau đó tài khoản sẽ bị chặn."
+    },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "Xây dựng thương hiệu",
+      "BTN": "Chọn Tệp",
+      "DESCRIPTION": "Tùy chỉnh giao diện của Đăng nhập",
+      "ACTIVATEPREVIEW": "Kích hoạt cài đặt"
+    },
+    "LOGIN_POLICY": {
+      "TITLE": "Cài đặt đăng nhập",
+      "DESCRIPTION": "Xác định cách Người dùng có thể được xác thực và định cấu hình Nhà cung cấp danh tính",
+      "DESCRIPTIONCREATEADMIN": "Người dùng có thể chọn từ các nhà cung cấp danh tính có sẵn bên dưới.",
+      "DESCRIPTIONCREATEMGMT": "Người dùng có thể chọn từ các nhà cung cấp danh tính có sẵn bên dưới. Lưu ý: Bạn chỉ có thể sử dụng các nhà cung cấp do Hệ thống thiết lập cũng như các nhà cung cấp được thiết lập cho tổ chức của mình.",
+      "LIFETIME_INVALID": "Biểu mẫu chứa (các) giá trị không hợp lệ.",
+      "SAVED": "Đã lưu thành công!",
+      "PROVIDER_ADDED": "Đã kích hoạt nhà cung cấp danh tính."
+    },
+    "PRIVACY_POLICY": {
+      "DESCRIPTION": "Đặt Chính sách quyền riêng tư và Điều khoản dịch vụ của bạn Liên kết",
+      "TOSLINK": "Liên kết đến Điều khoản dịch vụ",
+      "POLICYLINK": "Liên kết đến Chính sách quyền riêng tư",
+      "HELPLINK": "Liên kết trợ giúp",
+      "SUPPORTEMAIL": "Email hỗ trợ",
+      "DOCSLINK": "Liên kết Tài liệu (Trang quản trị quản lý)",
+      "CUSTOMLINK": "Liên kết tùy chỉnh (Trang quản trị quản lý)",
+      "CUSTOMLINKTEXT": "Văn bản liên kết tùy chỉnh (Trang quản trị quản lý)",
+      "SAVED": "Đã lưu thành công!",
+      "RESET_TITLE": "Khôi phục giá trị mặc định",
+      "RESET_DESCRIPTION": "Bạn sắp khôi phục các Liên kết mặc định cho ĐKDV và Chính sách quyền riêng tư. Bạn có thực sự muốn tiếp tục không?"
+    },
+    "LOGIN_TEXTS": {
+      "TITLE": "Văn bản giao diện đăng nhập",
+      "DESCRIPTION": "Xác định văn bản của bạn cho các giao diện đăng nhập. Nếu văn bản trống thì Giá trị mặc định được hiển thị dưới dạng trình giữ chỗ sẽ được sử dụng.",
+      "DESCRIPTION_SHORT": "Xác định văn bản của bạn cho các giao diện đăng nhập.",
+      "NEWERVERSIONEXISTS": "Phiên bản mới hơn tồn tại",
+      "CURRENTDATE": "Cài đặt hiện tại",
+      "CHANGEDATE": "Phiên bản mới hơn từ",
+      "KEYNAME": "Màn hình/Giao diện đăng nhập",
+      "RESET_TITLE": "Khôi phục giá trị mặc định",
+      "RESET_DESCRIPTION": "Bạn sắp khôi phục tất cả các giá trị mặc định. Tất cả những thay đổi bạn đã thực hiện sẽ bị xóa vĩnh viễn. Bạn có thực sự muốn tiếp tục không?",
+      "UNSAVED_TITLE": "Tiếp tục mà không lưu?",
+      "UNSAVED_DESCRIPTION": "Bạn đã thực hiện thay đổi mà không lưu. Bạn có muốn lưu bây giờ không?",
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Bạn đã chọn một ngôn ngữ không được phép. Bạn có thể tiếp tục sửa đổi văn bản. Nhưng nếu bạn muốn người dùng của mình thực sự có thể sử dụng ngôn ngữ này, hãy thay đổi các hạn chế về phiên bản của bạn.",
+      "LANGUAGES_NOT_ALLOWED": "Không được phép:",
+      "LANGUAGE": "Ngôn ngữ",
+      "LANGUAGES": {
+        "de": "Tiếng Đức",
+        "en": "Tiếng Anh",
+        "es": "Tiếng Tây Ban Nha",
+        "fr": "Tiếng Pháp",
+        "it": "Tiếng Ý",
+        "ja": "日本語",
+        "pl": "Tiếng Ba Lan",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Tiếng Bồ Đào Nha",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Hà Lan",
+        "sv": "Svenska",
+        "id": "Tiếng Bahasa Indonesia",
+        "hu": "Tiếng Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Thổ Nhĩ Kỳ",
+        "uk": "Українська",
+        "ar": "العربية"
+      },
+      "KEYS": {
+        "emailVerificationDoneText": "Đã xác minh email",
+        "emailVerificationText": "Xác minh email",
+        "externalUserNotFoundText": "Không tìm thấy người dùng bên ngoài",
+        "footerText": "Chân trang",
+        "initMfaDoneText": "Khởi tạo MFA xong",
+        "initMfaOtpText": "Khởi tạo MFA",
+        "initMfaPromptText": "Khởi tạo lời nhắc MFA",
+        "initMfaU2fText": "Khởi tạo nhân tố thứ hai phổ quát",
+        "initPasswordDoneText": "Khởi tạo mật khẩu xong",
+        "initPasswordText": "Khởi tạo mật khẩu",
+        "initializeDoneText": "Khởi tạo người dùng xong",
+        "initializeUserText": "Khởi tạo người dùng",
+        "linkingUserDoneText": "Đã hoàn tất liên kết người dùng",
+        "loginText": "Đăng nhập",
+        "logoutText": "Đăng xuất",
+        "mfaProvidersText": "Nhà cung cấp MFA",
+        "passwordChangeDoneText": "Đã đổi mật khẩu xong",
+        "passwordChangeText": "Đổi mật khẩu",
+        "passwordResetDoneText": "Đã đặt lại mật khẩu",
+        "passwordText": "Mật khẩu",
+        "registrationOptionText": "Tùy chọn đăng ký",
+        "registrationOrgText": "Đăng ký tổ chức",
+        "registrationUserText": "Đăng ký người dùng",
+        "selectAccountText": "Chọn tài khoản",
+        "successLoginText": "Đăng nhập thành công",
+        "usernameChangeDoneText": "Thay đổi tên người dùng đã xong",
+        "usernameChangeText": "Thay đổi tên người dùng",
+        "verifyMfaOtpText": "Xác minh OTP",
+        "verifyMfaU2fText": "Xác minh yếu tố thứ hai phổ quát",
+        "passwordlessPromptText": "Nhắc mật mã",
+        "passwordlessRegistrationDoneText": "Đăng ký mật khẩu đã hoàn tất",
+        "passwordlessRegistrationText": "Đăng ký mật khẩu",
+        "passwordlessText": "Mã khóa",
+        "externalRegistrationUserOverviewText": "Tổng quan về người dùng đăng ký bên ngoài"
+      }
+    },
+    "MESSAGE_TEXTS": {
+      "TYPE": "Thông báo",
+      "TYPES": {
+        "INIT": "Khởi tạo",
+        "VE": "Xác minh Email",
+        "VP": "Xác minh điện thoại",
+        "VSO": "Xác minh SMS OTP",
+        "VEO": "Xác minh Email OTP",
+        "PR": "Đặt lại mật khẩu",
+        "DC": "Yêu cầu tên miền",
+        "PL": "Mã khóa",
+        "PC": "Thay đổi mật khẩu",
+        "IU": "Mời người dùng"
+      },
+      "CHIPS": {
+        "firstname": "Họ tên",
+        "lastname": "Họ",
+        "code": "Mã",
+        "preferredLoginName": "Tên đăng nhập ưa thích",
+        "displayName": "Tên hiển thị",
+        "nickName": "Biệt danh",
+        "loginnames": "Tên đăng nhập",
+        "domain": "Tên miền",
+        "lastEmail": "Email cuối cùng",
+        "lastPhone": "Điện thoại cuối cùng",
+        "verifiedEmail": "Email đã được xác minh",
+        "verifiedPhone": "Điện thoại đã được xác minh",
+        "changedate": "Thay đổi ngày",
+        "username": "Tên người dùng",
+        "tempUsername": "Tên người dùng tạm thời",
+        "otp": "OTP",
+        "verifyUrl": "Xác minh URL OTP",
+        "expiry": "Hết hạn",
+        "applicationName": "Tên ứng dụng"
+      },
+      "TOAST": {
+        "UPDATED": "Đã lưu văn bản tùy chỉnh."
+      }
+    },
+    "DEFAULTLABEL": "Các cài đặt hiện tại tương ứng với tiêu chuẩn của Instance của bạn.",
+    "BTN_INSTALL": "Thiết lập",
+    "BTN_EDIT": "Sửa đổi",
+    "DATA": {
+      "DESCRIPTION": "Mô tả",
+      "MINLENGTH": "phải có độ dài tối thiểu",
+      "HASNUMBER": "phải bao gồm một số",
+      "HASSYMBOL": "phải bao gồm ký hiệu",
+      "HASLOWERCASE": "phải bao gồm một chữ cái viết thường",
+      "HASUPPERCASE": "phải bao gồm chữ in hoa",
+      "SHOWLOCKOUTFAILURES": "hiển thị lỗi khóa",
+      "MAXPASSWORDATTEMPTS": "Số lần thử mật khẩu tối đa",
+      "MAXOTPATTEMPTS": "Số lần thử tối đa OTP",
+      "EXPIREWARNDAYS": "Cảnh báo hết hạn sau nhiều ngày",
+      "MAXAGEDAYS": "Hiệu lực tối đa tính theo ngày",
+      "USERLOGINMUSTBEDOMAIN": "Thêm Miền tổ chức làm hậu tố cho tên đăng nhập",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Nếu bạn bật cài đặt này, tất cả tên đăng nhập sẽ có hậu tố Miền tổ chức. Nếu cài đặt này bị tắt, bạn phải đảm bảo rằng tên người dùng là duy nhất trên tất cả các tổ chức.",
+      "VALIDATEORGDOMAINS": "Yêu cầu xác minh tên miền của tổ chức (thử thách DNS hoặc HTTP)",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "Địa chỉ người gửi SMTP khớp với Tên miền phiên bản",
+      "ALLOWUSERNAMEPASSWORD_DESC": "Việc đăng nhập thông thường với tên người dùng và mật khẩu được cho phép.",
+      "ALLOWEXTERNALIDP_DESC": "Việc đăng nhập được phép đối với các nhà cung cấp danh tính cơ bản",
+      "ALLOWREGISTER_DESC": "Nếu tùy chọn được chọn, một bước bổ sung để đăng ký người dùng sẽ xuất hiện trong thông tin đăng nhập.",
+      "FORCEMFA": "Buộc MFA cho tất cả người dùng",
+      "FORCEMFALOCALONLY": "Buộc MFA chỉ dành cho người dùng được xác thực cục bộ",
+      "FORCEMFALOCALONLY_DESC": "Nếu tùy chọn được chọn, người dùng được xác thực cục bộ phải định cấu hình yếu tố thứ hai để đăng nhập.",
+      "HIDEPASSWORDRESET_DESC": "Nếu tùy chọn được chọn, người dùng không thể đặt lại mật khẩu của mình trong quá trình đăng nhập.",
+      "HIDELOGINNAMESUFFIX": "Ẩn hậu tố tên đăng nhập",
+      "HIDELOGINNAMESUFFIX_DESC": "Ẩn hậu tố tên đăng nhập trong giao diện đăng nhập",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "Nếu tùy chọn được chọn, màn hình mật khẩu sẽ được hiển thị trong quá trình đăng nhập ngay cả khi không tìm thấy người dùng. Lỗi kiểm tra mật khẩu sẽ không tiết lộ tên người dùng hoặc mật khẩu có sai hay không.",
+      "ALLOWDOMAINDISCOVERY_DESC": "Nếu tùy chọn này được chọn, hậu tố (@domain.com) của tên người dùng không xác định được nhập trên màn hình đăng nhập sẽ được khớp với Miền tổ chức và sẽ chuyển hướng đến đăng ký của tổ chức đó thành công.",
+      "DEFAULTREDIRECTURI": "URI chuyển hướng mặc định",
+      "DEFAULTREDIRECTURI_DESC": "Xác định nơi người dùng sẽ được chuyển hướng đến nếu quá trình đăng nhập bắt đầu mà không có ngữ cảnh ứng dụng (ví dụ: từ thư)",
+      "ERRORMSGPOPUP": "Hiển thị lỗi trong hộp thoại",
+      "DISABLEWATERMARK": "Ẩn hình mờ",
+      "DISABLEWATERMARK_DESC": "Ẩn hình mờ Powered by Zitadel trong giao diện đăng nhập"
+    },
+    "RESET": "Đặt lại về mặc định của phiên bản",
+    "CREATECUSTOM": "Tạo chính sách tùy chỉnh",
+    "TOAST": {
+      "SET": "Chính sách được thiết lập thành công!",
+      "RESETSUCCESS": "Thiết lập lại chính sách thành công!",
+      "UPLOADSUCCESS": "Đã tải lên thành công!",
+      "DELETESUCCESS": "Đã xóa thành công!",
+      "UPLOADFAILED": "Tải lên không thành công!"
+    }
+  },
+  "ORG_DETAIL": {
+    "TITLE": "Tổ chức",
+    "DESCRIPTION": "Tại đây bạn có thể chỉnh sửa cài đặt của tổ chức và quản lý thành viên.",
+    "DETAIL": {
+      "TITLE": "Chi tiết",
+      "NAME": "Tên",
+      "DOMAIN": "Tên miền",
+      "STATE": {
+        "0": "Không được xác định",
+        "1": "Đang hoạt động",
+        "2": "Không hoạt động"
+      }
+    },
+    "MEMBER": {
+      "TITLE": "Quản trị viên",
+      "USERNAME": "Tên người dùng",
+      "DISPLAYNAME": "Tên hiển thị",
+      "LOGINNAME": "Tên đăng nhập",
+      "EMAIL": "Thư điện tử",
+      "ROLES": "Vai trò",
+      "ADD": "Thêm quản trị viên",
+      "ADDDESCRIPTION": "Nhập tên của người dùng sẽ được thêm vào."
+    },
+    "TABLE": {
+      "TOTAL": "Tổng số bài dự thi",
+      "SELECTION": "Các phần tử được chọn",
+      "DEACTIVATE": "Vô hiệu hóa người dùng",
+      "ACTIVATE": "Kích hoạt người dùng",
+      "DELETE": "Xóa người dùng",
+      "CLEAR": "Lựa chọn rõ ràng"
+    }
+  },
+  "PROJECT": {
+    "PAGES": {
+      "ID": "Mã dự án",
+      "TITLE": "Dự án",
+      "DESCRIPTION": "Tại đây, bạn có thể xác định ứng dụng, quản lý vai trò và cấp quyền cho các tổ chức khác sử dụng dự án của mình.",
+      "DELETE": "Xóa dự án",
+      "DETAIL": "Chi tiết",
+      "CREATE": "Tạo dự án",
+      "CREATE_DESC": "Chèn tên dự án của bạn.",
+      "ROLE": "Vai trò",
+      "NOITEMS": "Không có dự án",
+      "ZITADELPROJECT": "Cái này thuộc về dự án Zitadel. Cẩn thận: Nếu bạn thực hiện thay đổi, Zitadel có thể không hoạt động như dự kiến.",
+      "TYPE": {
+        "OWNED": "Dự án sở hữu",
+        "OWNED_SINGULAR": "Dự án sở hữu",
+        "GRANTED_SINGULAR": "Dự án được cấp của {{name}}"
+      },
+      "PRIVATELABEL": {
+        "TITLE": "Thiết lập thương hiệu",
+        "0": {
+          "TITLE": "Không xác định",
+          "DESC": "Ngay sau khi người dùng được xác định, nhãn hiệu tổ chức của người dùng được xác định sẽ được hiển thị trước khi mặc định hệ thống được hiển thị."
+        },
+        "1": {
+          "TITLE": "Sử dụng cài đặt dự án",
+          "DESC": "Thương hiệu của tổ chức sở hữu dự án sẽ được thể hiện"
+        },
+        "2": {
+          "TITLE": "Sử dụng cài đặt Tổ chức người dùng",
+          "DESC": "Thương hiệu tổ chức của dự án sẽ được hiển thị, nhưng ngay sau khi người dùng được xác định, cài đặt tổ chức của người dùng được xác định sẽ được hiển thị."
+        },
+        "DIALOG": {
+          "TITLE": "Thiết lập thương hiệu",
+          "DESCRIPTION": "Chọn hành vi đăng nhập khi sử dụng dự án."
+        }
+      },
+      "PINNED": "Đã ghim",
+      "ALL": "Tất cả",
+      "CREATEDON": "Được tạo vào",
+      "LASTMODIFIED": "Sửa đổi lần cuối vào",
+      "ADDNEW": "Tạo dự án mới",
+      "DIALOG": {
+        "REACTIVATE": {
+          "TITLE": "Kích hoạt lại dự án",
+          "DESCRIPTION": "Bạn có thực sự muốn kích hoạt lại dự án của mình không?"
+        },
+        "DEACTIVATE": {
+          "TITLE": "Vô hiệu hóa dự án",
+          "DESCRIPTION": "Bạn có thực sự muốn hủy kích hoạt dự án của mình không?"
+        },
+        "DELETE": {
+          "TITLE": "Xóa dự án",
+          "DESCRIPTION": "Bạn có thực sự muốn xóa dự án của mình?",
+          "TYPENAME": "Nhập tên của dự án để xóa nó vĩnh viễn."
+        }
+      }
+    },
+    "SETTINGS": {
+      "TITLE": "Cài đặt",
+      "DESCRIPTION": ""
+    },
+    "STATE": {
+      "TITLE": "Trạng thái",
+      "0": "Không được xác định",
+      "1": "Đang hoạt động",
+      "2": "Không hoạt động"
+    },
+    "TYPE": {
+      "TITLE": "Loại",
+      "0": "Loại không xác định",
+      "1": "Sở hữu",
+      "2": "Được cấp"
+    },
+    "NAME": "Tên",
+    "NAMEDIALOG": {
+      "TITLE": "Đổi tên dự án",
+      "DESCRIPTION": "Nhập tên mới cho dự án của bạn",
+      "NAME": "Tên Mới"
+    },
+    "MEMBER": {
+      "TITLE": "Quản trị viên",
+      "TITLEDESC": "Quản trị viên có thể thực hiện các thay đổi đối với dự án này dựa trên vai trò của họ.",
+      "DESCRIPTION": "Những quản trị viên này có thể chỉnh sửa dự án của bạn.",
+      "USERNAME": "Tên người dùng",
+      "DISPLAYNAME": "Tên hiển thị",
+      "LOGINNAME": "Tên đăng nhập",
+      "EMAIL": "Thư điện tử",
+      "ROLES": "Vai trò",
+      "USERID": "ID người dùng"
+    },
+    "GRANT": {
+      "EMPTY": "Không có tổ chức được cấp.",
+      "TITLE": "Tài trợ dự án",
+      "DESCRIPTION": "Cho phép tổ chức khác sử dụng dự án của bạn.",
+      "EDITTITLE": "Chỉnh sửa vai trò",
+      "CREATE": {
+        "TITLE": "Tạo tài trợ dự án",
+        "SEL_USERS": "Chọn người dùng bạn muốn cấp quyền truy cập",
+        "SEL_PROJECT": "Tìm kiếm một dự án",
+        "SEL_ROLES": "Chọn vai trò bạn muốn được thêm vào tài trợ dự án",
+        "SEL_USER": "Chọn người dùng",
+        "SEL_ORG": "Tìm kiếm một tổ chức",
+        "SEL_ORG_DESC": "Tìm kiếm tổ chức để cấp.",
+        "ORG_DESCRIPTION": "Bạn sắp cấp người dùng cho tổ chức {{name}} .",
+        "ORG_DESCRIPTION_DESC": "Chuyển ngữ cảnh trong tiêu đề ở trên để cấp quyền cho người dùng cho tổ chức khác.",
+        "SEL_ORG_FORMFIELD": "Tổ chức",
+        "FOR_ORG": "Khoản tài trợ dự án được tạo cho:"
+      },
+      "DETAIL": {
+        "TITLE": "Tài trợ dự án",
+        "DESC": "Bạn có thể chọn những vai trò mà tổ chức được chỉ định có thể sử dụng và bầu chọn quản trị viên",
+        "MEMBERTITLE": "Quản trị viên",
+        "MEMBERDESC": "Đây là những quản trị viên của tổ chức được cấp. Thêm người dùng ở đây sẽ có quyền truy cập để chỉnh sửa dữ liệu của dự án.",
+        "PROJECTNAME": "Tên dự án",
+        "GRANTEDORG": "Tổ chức được cấp",
+        "RESOURCEOWNER": "Chủ sở hữu tài nguyên"
+      },
+      "STATE": "Trạng thái",
+      "STATES": {
+        "1": "Đang hoạt động",
+        "2": "Không hoạt động"
+      },
+      "ALL": "Tất cả",
+      "SHOWDETAIL": "Hiển thị chi tiết",
+      "USER": "Người dùng",
+      "MEMBERS": "Quản trị viên",
+      "ORG": "Tổ chức",
+      "PROJECTNAME": "Tên dự án",
+      "GRANTEDORG": "Tổ chức được cấp",
+      "GRANTEDORGDOMAIN": "Tên miền",
+      "RESOURCEOWNER": "Chủ sở hữu tài nguyên",
+      "GRANTEDORGNAME": "Tên tổ chức",
+      "GRANTID": "Cấp ID",
+      "CREATIONDATE": "Ngày tạo",
+      "CHANGEDATE": "Sửa đổi lần cuối",
+      "DATES": "Ngày",
+      "ROLENAMESLIST": "Vai trò",
+      "NOROLES": "Không có vai trò",
+      "TYPE": "Loại",
+      "TOAST": {
+        "PROJECTGRANTUSERGRANTADDED": "Dự án tài trợ đã được tạo.",
+        "PROJECTGRANTADDED": "Dự án tài trợ đã được tạo.",
+        "PROJECTGRANTCHANGED": "Dự án tài trợ đã thay đổi.",
+        "PROJECTGRANTMEMBERADDED": "Cấp quản trị viên được thêm vào.",
+        "PROJECTGRANTMEMBERCHANGED": "Cấp quản trị viên đã thay đổi.",
+        "PROJECTGRANTMEMBERREMOVED": "Đã xóa quản trị viên cấp quyền.",
+        "PROJECTGRANTUPDATED": "Tài trợ dự án được cập nhật"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Xóa tài trợ dự án",
+        "DELETE_DESCRIPTION": "Bạn sắp xóa một khoản trợ cấp dự án. Bạn có chắc không?"
+      },
+      "ROLES": "Vai trò dự án"
+    },
+    "APP": {
+      "TITLE": "Ứng dụng",
+      "NAME": "Tên",
+      "NAMEREQUIRED": "Cần phải có một cái tên."
+    },
+    "ROLE": {
+      "EMPTY": "Chưa có vai trò nào được tạo.",
+      "ADDNEWLINE": "Thêm vai trò bổ sung",
+      "KEY": "Chìa khóa",
+      "TITLE": "Vai trò",
+      "DESCRIPTION": "Xác định một số vai trò có thể được sử dụng để tạo tài trợ cho dự án.",
+      "NAME": "Tên",
+      "DISPLAY_NAME": "Tên hiển thị",
+      "GROUP": "Nhóm",
+      "ACTIONS": "Hành động",
+      "ADDTITLE": "Tạo vai trò",
+      "ADDDESCRIPTION": "Nhập dữ liệu cho vai trò mới.",
+      "EDITTITLE": "Chỉnh sửa vai trò",
+      "EDITDESCRIPTION": "Nhập dữ liệu mới cho vai trò.",
+      "DELETE": "Xóa vai trò",
+      "CREATIONDATE": "Đã tạo",
+      "CHANGEDATE": "Sửa đổi lần cuối",
+      "SELECTGROUPTOOLTIP": "Chọn tất cả Vai trò của nhóm {{group}} .",
+      "OPTIONS": "Tùy chọn",
+      "ASSERTION": "Trả lại vai trò của người dùng trong quá trình xác thực",
+      "ASSERTION_DESCRIPTION": "Khi người dùng xác thực, thông tin vai trò của họ sẽ được cung cấp cho ứng dụng của bạn. Đối với OpenID Connect, các vai trò có thể được yêu cầu từ điểm cuối UserInfo hoặc được gửi trong ID hoặc Mã thông báo truy cập, dựa trên cài đặt ứng dụng của bạn.",
+      "CHECK": "Chỉ những người dùng được ủy quyền mới có thể xác thực",
+      "CHECK_DESCRIPTION": "Từ chối xác thực nếu người dùng không có vai trò nào được chỉ định cho dự án này. Được phép truy cập vào dự án mà không có vai trò cụ thể nào được chỉ định cho người dùng.",
+      "DIALOG": {
+        "DELETE_TITLE": "Xóa vai trò",
+        "DELETE_DESCRIPTION": "Bạn sắp xóa một vai trò trong dự án. Bạn có chắc không?"
+      }
+    },
+    "HAS_PROJECT": "Việc xác thực được giới hạn đối với người dùng từ các tổ chức đã được cấp quyền truy cập vào dự án này",
+    "HAS_PROJECT_DESCRIPTION": "Trước khi người dùng có thể được xác thực, phải xác minh rằng tổ chức liên kết của họ đã được cấp quyền truy cập vào dự án này. Xác thực không được phép đối với người dùng từ các tổ chức trái phép.",
+    "TABLE": {
+      "TOTAL": "Tổng số bài dự thi:",
+      "SELECTION": "Các phần tử được chọn",
+      "DEACTIVATE": "Vô hiệu hóa dự án",
+      "ACTIVATE": "Kích hoạt dự án",
+      "DELETE": "Xóa dự án",
+      "ORGNAME": "Tên tổ chức",
+      "ORGID": "ID tổ chức",
+      "ORGDOMAIN": "Tên miền tổ chức",
+      "STATE": "Trạng thái",
+      "TYPE": "Loại",
+      "CREATIONDATE": "Được tạo tại",
+      "CHANGEDATE": "Sửa đổi lần cuối",
+      "RESOURCEOWNER": "Chủ sở hữu",
+      "SHOWTABLE": "Hiển thị bảng",
+      "SHOWGRID": "Hiển thị lưới",
+      "EMPTY": "Không tìm thấy dự án"
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Quản trị viên đã xóa.",
+      "MEMBERSADDED": "Quản trị viên đã thêm.",
+      "MEMBERADDED": "Quản trị viên đã thêm.",
+      "MEMBERCHANGED": "Quản trị viên đã thay đổi.",
+      "ROLESCREATED": "Các vai trò đã được tạo.",
+      "ROLEREMOVED": "Đã xóa vai trò.",
+      "ROLECHANGED": "Vai trò đã thay đổi.",
+      "REACTIVATED": "Đã kích hoạt lại.",
+      "DEACTIVATED": "Đã bị vô hiệu hóa.",
+      "CREATED": "Dự án đã được tạo.",
+      "UPDATED": "Dự án đã thay đổi.",
+      "GRANTUPDATED": "Dự án tài trợ đã thay đổi.",
+      "DELETED": "Dự án đã bị xóa."
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Xóa vai trò",
+      "DELETE_DESCRIPTION": "Bạn sắp xóa một vai trò. Bạn có chắc không?"
+    }
+  },
+  "NEXTSTEPS": {
+    "TITLE": "Các bước tiếp theo"
+  },
+  "IDP": {
+    "LIST": {
+      "ACTIVETITLE": "Nhà cung cấp danh tính đang hoạt động"
+    },
+    "CREATE": {
+      "TITLE": "Thêm nhà cung cấp",
+      "DESCRIPTION": "Chọn một hoặc nhiều nhà cung cấp sau.",
+      "STEPPERTITLE": "Tạo Nhà cung cấp",
+      "OIDC": {
+        "TITLE": "Nhà cung cấp OIDC",
+        "DESCRIPTION": "Nhập dữ liệu cần thiết cho nhà cung cấp OIDC của bạn."
+      },
+      "OAUTH": {
+        "TITLE": "Nhà cung cấp OAuth",
+        "DESCRIPTION": "Nhập dữ liệu cần thiết cho nhà cung cấp OAuth của bạn."
+      },
+      "JWT": {
+        "TITLE": "Nhà cung cấp JWT",
+        "DESCRIPTION": "Nhập dữ liệu cần thiết cho nhà cung cấp JWT của bạn."
+      },
+      "GOOGLE": {
+        "TITLE": "Nhà cung cấp Google",
+        "DESCRIPTION": "Nhập thông tin xác thực cho Nhà cung cấp danh tính Google của bạn"
+      },
+      "GITLAB": {
+        "TITLE": "Nhà cung cấp Gitlab",
+        "DESCRIPTION": "Nhập thông tin đăng nhập cho Nhà cung cấp danh tính Gitlab của bạn"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Nhà cung cấp dịch vụ tự lưu trữ Gitlab",
+        "DESCRIPTION": "Nhập thông tin xác thực cho Nhà cung cấp danh tính tự lưu trữ Gitlab của bạn"
+      },
+      "GITHUBES": {
+        "TITLE": "Nhà cung cấp máy chủ doanh nghiệp GitHub",
+        "DESCRIPTION": "Nhập thông tin đăng nhập cho Nhà cung cấp danh tính máy chủ doanh nghiệp GitHub của bạn"
+      },
+      "GITHUB": {
+        "TITLE": "Nhà cung cấp Github",
+        "DESCRIPTION": "Nhập thông tin đăng nhập cho Nhà cung cấp danh tính Github của bạn"
+      },
+      "AZUREAD": {
+        "TITLE": "Nhà cung cấp Microsoft",
+        "DESCRIPTION": "Nhập thông tin xác thực cho Nhà cung cấp danh tính Microsoft của bạn"
+      },
+      "LDAP": {
+        "TITLE": "Thư mục hoạt động / LDAP",
+        "DESCRIPTION": "Nhập thông tin xác thực cho Nhà cung cấp LDAP của bạn"
+      },
+      "APPLE": {
+        "TITLE": "Đăng nhập bằng Apple",
+        "DESCRIPTION": "Nhập thông tin đăng nhập cho Nhà cung cấp Apple của bạn"
+      },
+      "SAML": {
+        "TITLE": "Đăng nhập bằng SAML",
+        "DESCRIPTION": "Nhập thông tin xác thực cho Nhà cung cấp SAML của bạn"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Nhà cung cấp danh tính",
+      "DESCRIPTION": "Cập nhật cài đặt nhà cung cấp của bạn",
+      "DATECREATED": "Đã tạo",
+      "DATECHANGED": "Đã thay đổi"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Tự động tạo",
+      "ISAUTOCREATION_DESC": "Nếu được chọn, một tài khoản sẽ được tạo nếu nó chưa tồn tại.",
+      "ISAUTOUPDATE": "Tự động cập nhật",
+      "ISAUTOUPDATE_DESC": "Nếu được chọn, tài khoản sẽ được cập nhật khi xác thực lại.",
+      "ISCREATIONALLOWED": "Cho phép tạo tài khoản (thủ công)",
+      "ISCREATIONALLOWED_DESC": "Xác định xem có thể tạo tài khoản bằng tài khoản bên ngoài hay không. Tắt nếu người dùng không thể chỉnh sửa thông tin tài khoản khi bật auto_creation.",
+      "ISLINKINGALLOWED": "Cho phép liên kết tài khoản (thủ công)",
+      "ISLINKINGALLOWED_DESC": "Xác định xem danh tính có thể được liên kết thủ công với tài khoản hiện có hay không. Tắt nếu người dùng chỉ được phép liên kết tài khoản được đề xuất trong trường hợp tự động liên kết đang hoạt động.",
+      "AUTOLINKING_DESC": "Xác định xem danh tính có được nhắc liên kết với tài khoản hiện có hay không.",
+      "AUTOLINKINGTYPE": {
+        "0": "Đã tắt",
+        "1": "Kiểm tra tên người dùng hiện có",
+        "2": "Kiểm tra Email hiện có"
+      }
+    },
+    "OWNERTYPES": {
+      "0": "chưa biết",
+      "1": "Ví dụ",
+      "2": "Tổ chức"
+    },
+    "STATES": {
+      "1": "đang hoạt động",
+      "2": "không hoạt động"
+    },
+    "AZUREADTENANTTYPES": {
+      "3": "ID người thuê",
+      "0": "Chung",
+      "1": "Tổ chức",
+      "2": "Người tiêu dùng"
+    },
+    "AZUREADTENANTTYPE": "Loại đối tượng thuê",
+    "AZUREADTENANTID": "ID người thuê",
+    "EMAILVERIFIED": "Email đã được xác minh",
+    "NAMEHINT": "Nếu được chỉ định nó sẽ được hiển thị trong giao diện đăng nhập.",
+    "OPTIONAL": "tùy chọn",
+    "LDAPATTRIBUTES": "Thuộc tính LDAP",
+    "UPDATEBINDPASSWORD": "cập nhật Ràng buộc mật khẩu",
+    "UPDATECLIENTSECRET": "cập nhật bí mật khách hàng",
+    "ADD": "Thêm nhà cung cấp danh tính",
+    "TYPE": "Loại",
+    "OWNER": "Chủ sở hữu",
+    "ID": "ID nhà cung cấp danh tính",
+    "NAME": "Tên",
+    "AUTHORIZATIONENDPOINT": "Điểm cuối ủy quyền",
+    "TOKENENDPOINT": "Điểm cuối mã thông báo",
+    "USERENDPOINT": "Điểm cuối của người dùng",
+    "IDATTRIBUTE": "Thuộc tính ID",
+    "AVAILABILITY": "Sẵn có",
+    "AVAILABLE": "có sẵn",
+    "AVAILABLEBUTINACTIVE": "có sẵn nhưng không hoạt động",
+    "SETAVAILABLE": "đặt ở trạng thái có sẵn",
+    "SETUNAVAILABLE": "được đặt là không có sẵn",
+    "CONFIG": "Cài đặt",
+    "STATE": "Trạng thái",
+    "ISSUER": "Nhà phát hành",
+    "SCOPESLIST": "Danh sách phạm vi",
+    "CLIENTID": "ID khách hàng",
+    "CLIENTSECRET": "Bí mật khách hàng",
+    "LDAPCONNECTION": "Kết nối",
+    "LDAPUSERBINDING": "Ràng buộc người dùng",
+    "BASEDN": "Căn cứDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Ràng buộc mật khẩu",
+    "SERVERS": "Máy chủ",
+    "STARTTLS": "Bắt đầu TLS",
+    "TIMEOUT": "Thời gian chờ tính bằng giây",
+    "USERBASE": "Cơ sở người dùng",
+    "USERFILTERS": "Bộ lọc người dùng",
+    "USEROBJECTCLASSES": "Các lớp đối tượng người dùng",
+    "REQUIRED": "bắt buộc",
+    "LDAPIDATTRIBUTE": "Thuộc tính ID",
+    "AVATARURLATTRIBUTE": "Thuộc tính Url hình đại diện",
+    "DISPLAYNAMEATTRIBUTE": "Thuộc tính tên hiển thị",
+    "EMAILATTRIBUTEATTRIBUTE": "Thuộc tính email",
+    "EMAILVERIFIEDATTRIBUTE": "Thuộc tính email đã được xác minh",
+    "FIRSTNAMEATTRIBUTE": "Thuộc tính tên",
+    "LASTNAMEATTRIBUTE": "Thuộc tính họ",
+    "NICKNAMEATTRIBUTE": "Thuộc tính biệt hiệu",
+    "PHONEATTRIBUTE": "Thuộc tính điện thoại",
+    "PHONEVERIFIEDATTRIBUTE": "Thuộc tính đã xác minh số điện thoại",
+    "PREFERREDLANGUAGEATTRIBUTE": "Thuộc tính ngôn ngữ ưa thích",
+    "PREFERREDUSERNAMEATTRIBUTE": "Thuộc tính tên người dùng ưa thích",
+    "PROFILEATTRIBUTE": "Thuộc tính hồ sơ",
+    "IDPDISPLAYNAMMAPPING": "Ánh xạ tên hiển thị IdP",
+    "USERNAMEMAPPING": "Ánh xạ tên người dùng",
+    "DATES": "Ngày",
+    "CREATIONDATE": "Được tạo tại",
+    "CHANGEDATE": "Sửa đổi lần cuối",
+    "DEACTIVATE": "Vô hiệu hóa",
+    "ACTIVATE": "Kích hoạt",
+    "DELETE": "Xóa",
+    "DELETE_TITLE": "Xóa IdP",
+    "DELETE_DESCRIPTION": "Bạn sắp xóa một nhà cung cấp danh tính. Những thay đổi kết quả là không thể hủy bỏ. Bạn có thực sự muốn làm điều này?",
+    "REMOVE_WARN_TITLE": "Xóa IdP",
+    "REMOVE_WARN_DESCRIPTION": "Bạn sắp xóa một nhà cung cấp danh tính. Thao tác này sẽ loại bỏ lựa chọn IdP có sẵn cho người dùng của bạn và những người dùng đã đăng ký sẽ không thể đăng nhập lại. Bạn có chắc chắn tiếp tục không?",
+    "DELETE_SELECTION_TITLE": "Xóa IdP",
+    "DELETE_SELECTION_DESCRIPTION": "Bạn sắp xóa một nhà cung cấp danh tính. Những thay đổi kết quả là không thể hủy bỏ. Bạn có thực sự muốn làm điều này?",
+    "FEDERATEDLOGOUTENABLED": "Đã bật đăng xuất liên kết",
+    "FEDERATEDLOGOUTENABLED_DESC": "Nếu được bật, người dùng cũng sẽ đăng xuất khỏi IdP nếu người dùng chấm dứt phiên trong Zitadel.",
+    "EMPTY": "Không có IdP nào",
+    "OIDC": {
+      "GENERAL": "Thông tin chung",
+      "TITLE": "Cài đặt OIDC",
+      "DESCRIPTION": "Nhập dữ liệu cho Nhà cung cấp danh tính OIDC."
+    },
+    "JWT": {
+      "TITLE": "Cài đặt JWT",
+      "DESCRIPTION": "Nhập dữ liệu cho Nhà cung cấp danh tính JWT.",
+      "HEADERNAME": "Tên tiêu đề",
+      "JWTENDPOINT": "Điểm cuối JWT",
+      "JWTKEYSENDPOINT": "Điểm cuối của khóa JWT"
+    },
+    "APPLE": {
+      "TEAMID": "ID nhóm",
+      "KEYID": "ID khóa",
+      "PRIVATEKEY": "Khóa riêng",
+      "UPDATEPRIVATEKEY": "Cập nhật khóa riêng",
+      "UPLOADPRIVATEKEY": "Tải lên khóa riêng",
+      "KEYMAXSIZEEXCEEDED": "Đã vượt quá kích thước tối đa 5kB."
+    },
+    "SAML": {
+      "METADATAXML": "Siêu dữ liệu Xml",
+      "METADATAURL": "URL siêu dữ liệu",
+      "BINDING": "Ràng buộc",
+      "SIGNEDREQUEST": "Yêu cầu đã ký",
+      "SIGNATUREALGORITHM": "Thuật toán chữ ký",
+      "NAMEIDFORMAT": "Định dạng ID tên",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Tên thuộc tính ánh xạ tùy chỉnh",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Tên thuộc tính thay thế để ánh xạ người dùng trong trường hợp `nameid-format` được trả về là `transient`, ví dụ: `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    },
+    "TOAST": {
+      "SAVED": "Đã lưu thành công.",
+      "REACTIVATED": "Idp đã được kích hoạt lại.",
+      "DEACTIVATED": "Idp bị vô hiệu hóa.",
+      "SELECTEDREACTIVATED": "Idps đã chọn đã được kích hoạt lại.",
+      "SELECTEDDEACTIVATED": "Idps đã chọn đã bị vô hiệu hóa.",
+      "SELECTEDKEYSDELETED": "Idps đã chọn đã bị xóa.",
+      "DELETED": "Idp đã được gỡ bỏ thành công!",
+      "ADDED": "Đã thêm thành công.",
+      "REMOVED": "Đã xóa thành công."
+    },
+    "ISIDTOKENMAPPING": "Bản đồ từ mã thông báo ID",
+    "ISIDTOKENMAPPING_DESC": "Nếu được chọn, thông tin nhà cung cấp sẽ được ánh xạ từ mã thông báo ID chứ không phải từ điểm cuối thông tin người dùng.",
+    "USEPKCE": "Sử dụng PKCE",
+    "USEPKCE_DESC": "Xác định xem các thông số code_challenge và code_challenge_method có được đưa vào yêu cầu xác thực hay không"
+  },
+  "MFA": {
+    "LIST": {
+      "MULTIFACTORTITLE": "Mã khóa",
+      "MULTIFACTORDESCRIPTION": "Xác định Multifactors cho Passkey của bạn tại đây.",
+      "SECONDFACTORTITLE": "Xác thực đa yếu tố",
+      "SECONDFACTORDESCRIPTION": "Xác định thêm các yếu tố có thể giúp bạn có thể bảo mật việc xác thực mật khẩu của mình."
+    },
+    "CREATE": {
+      "TITLE": "Yếu Tố Mới",
+      "DESCRIPTION": "Chọn loại Yếu tố mới của bạn."
+    },
+    "DELETE": {
+      "TITLE": "Xóa hệ số",
+      "DESCRIPTION": "Bạn sắp xóa Yếu tố khỏi Cài đặt đăng nhập. Bạn có chắc không?"
+    },
+    "TOAST": {
+      "ADDED": "Đã thêm thành công.",
+      "SAVED": "Đã lưu thành công.",
+      "DELETED": "Đã xóa thành công"
+    },
+    "TYPE": "Loại",
+    "MULTIFACTORTYPES": {
+      "0": "Không rõ",
+      "1": "Mã khóa"
+    },
+    "SECONDFACTORTYPES": {
+      "0": "Không rõ",
+      "1": "TOTP (Ứng dụng xác thực)",
+      "2": "Mã khóa",
+      "3": "OTP qua Email (Email OTP)",
+      "4": "OTP bằng SMS (OTP SMS)",
+      "5": "Mã khôi phục"
+    }
+  },
+  "LOGINPOLICY": {
+    "CREATE": {
+      "TITLE": "Cài đặt đăng nhập",
+      "DESCRIPTION": "Xác định cách người dùng có thể được xác thực trong tổ chức của bạn."
+    },
+    "IDPS": "Nhà cung cấp danh tính",
+    "ADDIDP": {
+      "TITLE": "Thêm nhà cung cấp danh tính",
+      "DESCRIPTION": "Bạn có thể chọn nhà cung cấp được xác định trước hoặc tự tạo để xác thực.",
+      "SELECTIDPS": "Nhà cung cấp danh tính"
+    },
+    "PASSWORDLESS": "Đăng nhập bằng mật mã",
+    "PASSWORDLESSTYPE": {
+      "0": "Không được phép",
+      "1": "Được phép"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "Nhà cung cấp SMTP",
+      "DESCRIPTION": "Đây là các nhà cung cấp SMTP cho phiên bản Zitadel của bạn. Kích hoạt cái bạn muốn sử dụng để gửi thông báo cho người dùng của mình.",
+      "EMPTY": "Không có nhà cung cấp SMTP nào",
+      "ACTIVATED": "Đã kích hoạt",
+      "ACTIVATE": "Kích hoạt nhà cung cấp",
+      "DEACTIVATE": "Vô hiệu hóa nhà cung cấp",
+      "TEST": "Kiểm tra nhà cung cấp của bạn",
+      "TYPE": "Loại",
+      "DIALOG": {
+        "ACTIVATED": "Nhà cung cấp SMTP đã được kích hoạt",
+        "ACTIVATE_WARN_TITLE": "Kích hoạt cài đặt SMTP",
+        "ACTIVATE_WARN_DESCRIPTION": "Bạn sắp kích hoạt nhà cung cấp SMTP. Trước tiên, chúng tôi sẽ hủy kích hoạt nhà cung cấp đang hoạt động hiện tại, sau đó kích hoạt nhà cung cấp này. Bạn có chắc không?",
+        "DEACTIVATE_WARN_TITLE": "Tắt cài đặt SMTP",
+        "DEACTIVATE_WARN_DESCRIPTION": "Bạn sắp hủy kích hoạt nhà cung cấp SMTP. Bạn có chắc không?",
+        "DEACTIVATED": "Nhà cung cấp SMTP đã bị vô hiệu hóa",
+        "DELETE_TITLE": "Xóa nhà cung cấp SMTP",
+        "DELETE_DESCRIPTION": "Bạn sắp xóa một nhà cung cấp. Xác nhận hành động này bằng cách nhập tên người gửi",
+        "DELETED": "Nhà cung cấp SMTP đã bị xóa",
+        "SENDER": "Nhập {{value}} , để xóa nhà cung cấp SMTP này.",
+        "TEST_TITLE": "Kiểm tra cài đặt SMTP của bạn",
+        "TEST_DESCRIPTION": "Chỉ định một địa chỉ email để kiểm tra cài đặt SMTP của bạn",
+        "TEST_EMAIL": "Địa chỉ email",
+        "TEST_RESULT": "Kết quả kiểm tra"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Thêm nhà cung cấp SMTP",
+      "DESCRIPTION": "Chọn một hoặc nhiều nhà cung cấp sau.",
+      "STEPS": {
+        "TITLE": "Thêm {{value}} Nhà cung cấp SMTP",
+        "CREATE_DESC_TITLE": "Nhập cài đặt {{value}} SMTP của bạn từng bước",
+        "CURRENT_DESC_TITLE": "Đây là cài đặt SMTP của bạn",
+        "PROVIDER_SETTINGS": "Cài đặt nhà cung cấp SMTP",
+        "SENDER_SETTINGS": "Cài đặt người gửi",
+        "NEXT_STEPS": "Các bước tiếp theo",
+        "ACTIVATE": {
+          "TITLE": "Kích hoạt Nhà cung cấp SMTP của bạn",
+          "DESCRIPTION": "Zitadel không thể sử dụng Nhà cung cấp SMTP này để gửi thông báo cho đến khi bạn kích hoạt nó. Nếu bạn kích hoạt nhà cung cấp này thì bất kỳ nhà cung cấp nào khác đang hoạt động giờ đây sẽ bị vô hiệu hóa."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Vô hiệu hóa Nhà cung cấp SMTP của bạn",
+          "DESCRIPTION": "Nếu bạn hủy kích hoạt Nhà cung cấp SMTP này, Zitadel không thể sử dụng nó để gửi thông báo cho đến khi bạn kích hoạt lại."
+        },
+        "SAVE_SETTINGS": "Lưu cài đặt của bạn",
+        "TEST": {
+          "TITLE": "Kiểm tra cài đặt của bạn",
+          "DESCRIPTION": "Bạn có thể kiểm tra cài đặt nhà cung cấp SMTP của mình và kiểm tra kết quả kiểm tra trước khi lưu chúng",
+          "RESULT": "Email của bạn đã được gửi thành công"
+        }
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Cài đặt nhà cung cấp SMTP"
+    },
+    "EMPTY": "Không có nhà cung cấp SMTP nào"
+  },
+  "APP": {
+    "LIST": "Ứng dụng",
+    "COMPLIANCE": "Tuân thủ OIDC",
+    "URLS": "URL",
+    "CONFIGURATION": "Cài đặt",
+    "TOKEN": "Cài đặt mã thông báo",
+    "PAGES": {
+      "TITLE": "Ứng dụng",
+      "ID": "ID ứng dụng",
+      "DESCRIPTION": "Tại đây bạn có thể chỉnh sửa dữ liệu ứng dụng của mình và cài đặt của nó.",
+      "CREATE": "Tạo ứng dụng",
+      "CREATE_SELECT_PROJECT": "Chọn dự án của bạn trước",
+      "CREATE_NEW_PROJECT": "hoặc nhập tên cho dự án mới của bạn",
+      "CREATE_DESC_TITLE": "Nhập chi tiết đơn đăng ký của bạn từng bước",
+      "CREATE_DESC_SUB": "Một thiết lập được đề xuất sẽ được tạo tự động.",
+      "STATE": "Trạng thái",
+      "DATECREATED": "Đã tạo",
+      "DATECHANGED": "Đã thay đổi",
+      "URLS": "URL",
+      "DELETE": "Xóa ứng dụng",
+      "JUMPTOPROJECT": "Để định cấu hình vai trò, phân công vai trò và hơn thế nữa, hãy điều hướng đến dự án.",
+      "DETAIL": {
+        "TITLE": "Chi tiết",
+        "STATE": {
+          "0": "Không được xác định",
+          "1": "Đang hoạt động",
+          "2": "Không hoạt động"
+        }
+      },
+      "DIALOG": {
+        "CONFIG": {
+          "TITLE": "Thay đổi cài đặt OIDC"
+        },
+        "DELETE": {
+          "TITLE": "Xóa ứng dụng",
+          "DESCRIPTION": "Bạn có thực sự muốn xóa ứng dụng này?"
+        }
+      },
+      "NEXTSTEPS": {
+        "TITLE": "Các bước tiếp theo",
+        "0": {
+          "TITLE": "Thêm vai trò",
+          "DESC": "Nhập vai trò dự án của bạn"
+        },
+        "1": {
+          "TITLE": "Thêm người dùng",
+          "DESC": "Thêm người dùng mới cho tổ chức của bạn"
+        },
+        "2": {
+          "TITLE": "Trợ giúp & Hỗ trợ",
+          "DESC": "Đọc tài liệu của chúng tôi về cách tạo ứng dụng hoặc liên hệ với bộ phận hỗ trợ của chúng tôi"
+        }
+      }
+    },
+    "NAMEDIALOG": {
+      "TITLE": "Đổi tên ứng dụng",
+      "DESCRIPTION": "Nhập tên mới cho ứng dụng của bạn",
+      "NAME": "Tên Mới"
+    },
+    "NAME": "Tên",
+    "TYPE": "Loại ứng dụng",
+    "AUTHMETHOD": "Phương thức xác thực",
+    "AUTHMETHODSECTION": "Phương thức xác thực",
+    "GRANT": "Các loại tài trợ",
+    "ADDITIONALORIGINS": "Nguồn gốc bổ sung",
+    "ADDITIONALORIGINSDESC": "Nếu bạn muốn thêm Nguồn gốc bổ sung vào ứng dụng của mình mà không được sử dụng làm chuyển hướng, bạn có thể thực hiện việc đó tại đây.",
+    "ORIGINS": "Nguồn gốc",
+    "NOTANORIGIN": "Giá trị đã nhập không phải là gốc",
+    "PROSWITCH": "Tôi là một người chuyên nghiệp. Bỏ qua trình hướng dẫn này.",
+    "NAMEANDTYPESECTION": "Tên và Loại",
+    "TITLEFIRST": "Tên ứng dụng",
+    "TYPETITLE": "Loại ứng dụng",
+    "OIDC": {
+      "WELLKNOWN": "Có thể truy xuất thêm các liên kết từ điểm cuối khám phá <a href='{{url}}' title='Discovery endpoint' target='_blank'> </a> .",
+      "INFO": {
+        "ISSUER": "Nhà phát hành",
+        "CLIENTID": "Id khách hàng"
+      },
+      "CURRENT": "Cấu hình hiện tại",
+      "TOKENSECTIONTITLE": "Tùy chọn AuthToken",
+      "REDIRECTSECTIONTITLE": "Cài đặt chuyển hướng",
+      "REDIRECTTITLE": "Chỉ định các URI nơi thông tin đăng nhập sẽ chuyển hướng đến.",
+      "POSTREDIRECTTITLE": "Đây là URI chuyển hướng sau khi đăng xuất.",
+      "REDIRECTDESCRIPTIONWEB": "URI chuyển hướng phải bắt đầu bằng https://. http:// chỉ hợp lệ khi bật chế độ phát triển.",
+      "REDIRECTDESCRIPTIONNATIVE": "URI chuyển hướng phải bắt đầu bằng giao thức của riêng bạn, http://127.0.0.1, http://[::1] hoặc http://localhost.",
+      "REDIRECTNOTVALID": "URI chuyển hướng này không hợp lệ.",
+      "COMMAORENTERSEPERATION": "tách biệt bằng ↵",
+      "TYPEREQUIRED": "Loại này là bắt buộc.",
+      "TITLE": "Cài đặt OIDC",
+      "CLIENTID": "ID khách hàng",
+      "CLIENTDETAILS": "Chi tiết khách hàng",
+      "CLIENTSECRET_NOSECRET": "Với luồng xác thực bạn đã chọn, không yêu cầu bí mật nào và do đó không có sẵn.",
+      "CLIENTSECRET_DESCRIPTION": "Giữ bí mật khách hàng của bạn ở nơi an toàn vì nó sẽ biến mất sau khi hộp thoại đóng lại.",
+      "REGENERATESECRET": "Tạo lại bí mật khách hàng",
+      "DEVMODE": "Chế độ phát triển",
+      "DEVMODE_ENABLED": "Đã bật",
+      "DEVMODE_DISABLED": "Đã tắt",
+      "DEVMODEDESC": "Cẩn thận: Khi bật chế độ phát triển, các URI chuyển hướng sẽ không được xác thực.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Bỏ qua Đăng nhập Trang thành công",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Bỏ qua trang thành công sau khi đăng nhập vào ứng dụng gốc này.",
+      "REDIRECT": "URI chuyển hướng",
+      "REDIRECTSECTION": "URI chuyển hướng",
+      "POSTLOGOUTREDIRECT": "Đăng URI đăng xuất",
+      "RESPONSESECTION": "Các loại phản hồi",
+      "GRANTSECTION": "Các loại tài trợ",
+      "GRANTTITLE": "Chọn loại trợ cấp của bạn. Lưu ý: Implicit chỉ khả dụng cho các ứng dụng dựa trên trình duyệt.",
+      "APPTYPE": {
+        "0": "Web",
+        "1": "Tác nhân người dùng",
+        "2": "Bản địa"
+      },
+      "RESPONSETYPE": "Các loại phản hồi",
+      "RESPONSE": {
+        "0": "Mã",
+        "1": "Mã thông báo ID",
+        "2": "Mã thông báo-ID mã thông báo"
+      },
+      "REFRESHTOKEN": "Làm mới mã thông báo",
+      "GRANTTYPE": "Các loại tài trợ",
+      "GRANT": {
+        "0": "Mã ủy quyền",
+        "1": "Tiềm ẩn",
+        "2": "Làm mới mã thông báo",
+        "3": "Mã thiết bị",
+        "4": "Trao đổi mã thông báo"
+      },
+      "AUTHMETHOD": {
+        "0": "Cơ bản",
+        "1": "Đăng",
+        "2": "Không có",
+        "3": "Khóa riêng JWT"
+      },
+      "TOKENTYPE": "Loại mã thông báo xác thực",
+      "TOKENTYPE0": "Mã thông báo mang",
+      "TOKENTYPE1": "JWT",
+      "UNSECUREREDIRECT": "Tôi chắc chắn hy vọng bạn biết những gì bạn đang làm.",
+      "OVERVIEWSECTION": "Tổng quan",
+      "OVERVIEWTITLE": "Bây giờ bạn đã hoàn tất. Xem lại cài đặt của bạn.",
+      "ACCESSTOKENROLEASSERTION": "Thêm vai trò của người dùng vào mã thông báo truy cập",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Nếu được chọn, vai trò được yêu cầu của người dùng được xác thực sẽ được thêm vào mã thông báo truy cập.",
+      "IDTOKENROLEASSERTION": "Vai trò của người dùng bên trong ID Token",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "Khi tùy chọn này được bật, vai trò được chỉ định của người dùng đã xác thực sẽ được thêm trực tiếp vào mã thông báo ID của họ. Đảm bảo bật cài đặt Dự án 'Chỉ định vai trò người dùng trong quá trình xác thực' hoặc yêu cầu qua phạm vi tùy chỉnh.",
+      "IDTOKENUSERINFOASSERTION": "Bao gồm thông tin hồ sơ của người dùng trong ID Token",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Cho phép các ứng dụng truy xuất các xác nhận quyền sở hữu hồ sơ, email, điện thoại và địa chỉ từ mã thông báo ID.",
+      "CLOCKSKEW": "Cho phép các ứng dụng xử lý độ lệch đồng hồ của OP và ứng dụng. Thời lượng (0-5 giây) sẽ được thêm vào yêu cầu exp và trừ đi iats, auth_time và nbf.",
+      "RECOMMENDED": "được đề xuất",
+      "NOTRECOMMENDED": "không được đề xuất",
+      "SELECTION": {
+        "APPTYPE": {
+          "WEB": {
+            "TITLE": "Web",
+            "DESCRIPTION": "Các ứng dụng Web thông thường như .net, PHP, Node.js, Java, v.v."
+          },
+          "NATIVE": {
+            "TITLE": "Bản địa",
+            "DESCRIPTION": "Ứng dụng dành cho thiết bị di động, Máy tính để bàn, Thiết bị thông minh, v.v."
+          },
+          "USERAGENT": {
+            "TITLE": "Tác nhân người dùng",
+            "DESCRIPTION": "Ứng dụng Trang Đơn (SPA) và nói chung tất cả các khung JS được thực thi trong trình duyệt"
+          }
+        }
+      },
+      "BACKCHANNELLOOGOUTURI": "URI đăng xuất kênh sau"
+    },
+    "API": {
+      "INFO": {
+        "CLIENTID": "Id khách hàng"
+      },
+      "REGENERATESECRET": "Tạo lại bí mật khách hàng",
+      "SELECTION": {
+        "TITLE": "API",
+        "DESCRIPTION": "API nói chung"
+      },
+      "AUTHMETHOD": {
+        "0": "Cơ bản",
+        "1": "Khóa riêng JWT"
+      }
+    },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "Ứng dụng SAML"
+      },
+      "CONFIGSECTION": "Cài đặt SAML",
+      "CHOOSEMETADATASOURCE": "Cung cấp cài đặt SAML của bạn bằng một trong các tùy chọn sau:",
+      "METADATAOPT1": "Tùy chọn 1. Chỉ định url nơi đặt tệp siêu dữ liệu",
+      "METADATAOPT2": "Tùy chọn 2. Tải lên tệp chứa siêu dữ liệu XML của bạn",
+      "METADATAOPT3": "Tùy chọn 3. Tạo nhanh chóng tệp siêu dữ liệu tối thiểu cung cấp URL ENTITYID và ACS",
+      "UPLOAD": "Tải lên tệp XML",
+      "METADATA": "Siêu dữ liệu",
+      "METADATAFROMFILE": "Siêu dữ liệu từ tệp",
+      "CERTIFICATE": "Chứng chỉ SAML",
+      "DOWNLOADCERT": "Tải xuống chứng chỉ SAML",
+      "CREATEMETADATA": "Tạo siêu dữ liệu",
+      "ENTITYID": "ID thực thể",
+      "ACSURL": "URL điểm cuối ACS"
+    },
+    "AUTHMETHODS": {
+      "CODE": {
+        "TITLE": "Mã",
+        "DESCRIPTION": "Đổi mã ủy quyền lấy token"
+      },
+      "PKCE": {
+        "TITLE": "PKCE",
+        "DESCRIPTION": "Sử dụng hàm băm ngẫu nhiên thay vì bí mật khách hàng tĩnh để bảo mật hơn"
+      },
+      "POST": {
+        "TITLE": "ĐĂNG",
+        "DESCRIPTION": "Gửi client_id và client_secret như một phần của biểu mẫu"
+      },
+      "PK_JWT": {
+        "TITLE": "Khóa riêng JWT",
+        "DESCRIPTION": "Sử dụng khóa riêng để ủy quyền cho ứng dụng của bạn"
+      },
+      "BASIC": {
+        "TITLE": "Cơ bản",
+        "DESCRIPTION": "Xác thực bằng Tên người dùng và Mật khẩu"
+      },
+      "IMPLICIT": {
+        "TITLE": "Tiềm ẩn",
+        "DESCRIPTION": "Nhận mã thông báo trực tiếp từ điểm cuối ủy quyền"
+      },
+      "DEVICECODE": {
+        "TITLE": "Mã thiết bị",
+        "DESCRIPTION": "Ủy quyền thiết bị trên máy tính hoặc điện thoại thông minh."
+      },
+      "CUSTOM": {
+        "TITLE": "Tùy chỉnh",
+        "DESCRIPTION": "Cài đặt của bạn không tương ứng với bất kỳ tùy chọn nào khác."
+      }
+    },
+    "TOAST": {
+      "REACTIVATED": "Ứng dụng đã được kích hoạt lại.",
+      "DEACTIVATED": "Ứng dụng bị vô hiệu hóa.",
+      "OIDCUPDATED": "Đã cập nhật ứng dụng.",
+      "APIUPDATED": "Đã cập nhật ứng dụng",
+      "UPDATED": "Đã cập nhật ứng dụng.",
+      "CREATED": "Đã tạo ứng dụng.",
+      "CLIENTSECRETREGENERATED": "bí mật của khách hàng được tạo ra.",
+      "DELETED": "Đã xóa ứng dụng.",
+      "CONFIGCHANGED": "Đã phát hiện thấy những thay đổi!"
+    },
+    "LOGINV2": {
+      "USEV2": "Sử dụng giao diện người dùng đăng nhập mới",
+      "BASEURL": "URL cơ sở tùy chỉnh cho giao diện người dùng đăng nhập mới"
+    }
+  },
+  "GENDERS": {
+    "0": "Không rõ",
+    "1": "Nữ",
+    "2": "Nam",
+    "3": "Khác"
+  },
+  "LANGUAGES": {
+    "de": "Tiếng Đức",
+    "en": "Tiếng Anh",
+    "es": "Tiếng Tây Ban Nha",
+    "fr": "Tiếng Pháp",
+    "it": "Tiếng Ý",
+    "ja": "日本語",
+    "pl": "Tiếng Ba Lan",
+    "zh": "简体中文",
+    "bg": "Български",
+    "pt": "Tiếng Bồ Đào Nha",
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский",
+    "nl": "Hà Lan",
+    "sv": "Svenska",
+    "id": "Tiếng Bahasa Indonesia",
+    "hu": "Tiếng Magyar",
+    "ko": "한국어",
+    "ro": "Română",
+    "tr": "Thổ Nhĩ Kỳ",
+    "uk": "Українська",
+    "ar": "العربية"
+  },
+  "MEMBER": {
+    "ADD": "Thêm quản trị viên",
+    "CREATIONTYPE": "Loại sáng tạo",
+    "CREATIONTYPES": {
+      "3": "IAM",
+      "2": "Tổ chức",
+      "0": "Dự án sở hữu",
+      "1": "Dự án được cấp",
+      "4": "Dự án"
+    },
+    "EDITROLE": "Chỉnh sửa vai trò",
+    "EDITFOR": "Chỉnh sửa vai trò của người dùng: {{value}}",
+    "DIALOG": {
+      "DELETE_TITLE": "Xóa quản trị viên",
+      "DELETE_DESCRIPTION": "Bạn sắp xóa quản trị viên. Bạn có chắc không?"
+    },
+    "SHOWDETAILS": "Nhấn vào đây để hiển thị chi tiết."
+  },
+  "ROLESLABEL": "Vai trò",
+  "GRANTS": {
+    "TITLE": "Phân công vai trò",
+    "DESC": "Đây là tất cả các nhiệm vụ được phân công trong tổ chức của bạn.",
+    "DELETE": "Xóa phân công vai trò",
+    "EMPTY": "Không tìm thấy sự phân công vai trò nào",
+    "ADD": "Tạo phân công vai trò",
+    "ADD_BTN": "Mới",
+    "PROJECT": {
+      "TITLE": "Phân công vai trò",
+      "DESCRIPTION": "Xác định phân công vai trò cho dự án được chỉ định. Lưu ý rằng bạn chỉ có thể xem các mục của dự án và người dùng mà bạn có quyền."
+    },
+    "USER": {
+      "TITLE": "Phân công vai trò",
+      "DESCRIPTION": "Xác định phân công vai trò cho người dùng được chỉ định. Lưu ý rằng bạn chỉ có thể xem các mục của dự án và người dùng mà bạn có quyền."
+    },
+    "CREATE": {
+      "TITLE": "Tạo phân công vai trò",
+      "DESCRIPTION": "Tìm kiếm tổ chức, dự án và các vai trò tương ứng."
+    },
+    "EDIT": {
+      "TITLE": "Thay đổi phân công vai trò"
+    },
+    "DETAIL": {
+      "TITLE": "Chi tiết phân công vai trò",
+      "DESCRIPTION": "Tại đây bạn có thể xem tất cả các chi tiết về việc phân công vai trò."
+    },
+    "TOAST": {
+      "UPDATED": "Đã cập nhật phân công vai trò.",
+      "REMOVED": "Đã xóa phân công vai trò",
+      "BULKREMOVED": "Đã xóa nhiệm vụ vai trò.",
+      "CANTSHOWINFO": "Bạn không thể truy cập hồ sơ của người dùng này vì bạn không phải là quản trị viên của tổ chức nơi người dùng này thuộc về"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Xóa phân công vai trò",
+      "DELETE_DESCRIPTION": "Bạn sắp xóa một nhiệm vụ vai trò. Bạn có muốn tiếp tục không?",
+      "BULK_DELETE_TITLE": "Xóa phân công vai trò",
+      "BULK_DELETE_DESCRIPTION": "Bạn sắp xóa nhiều nhiệm vụ vai trò. Bạn có muốn tiếp tục không?"
+    }
+  },
+  "CHANGES": {
+    "LISTTITLE": "Những thay đổi cuối cùng",
+    "BOTTOM": "Bạn đã đến cuối danh sách.",
+    "LOADMORE": "Tải thêm",
+    "ORG": {
+      "TITLE": "Hoạt động",
+      "DESCRIPTION": "Tại đây bạn có thể xem các sự kiện mới nhất đã tạo ra sự thay đổi trong tổ chức."
+    },
+    "PROJECT": {
+      "TITLE": "Hoạt động",
+      "DESCRIPTION": "Tại đây bạn có thể xem các sự kiện mới nhất đã tạo ra sự thay đổi trong dự án."
+    },
+    "USER": {
+      "TITLE": "Hoạt động",
+      "DESCRIPTION": "Tại đây bạn có thể xem các sự kiện mới nhất đã tạo ra sự thay đổi của người dùng."
+    }
+  }
+}

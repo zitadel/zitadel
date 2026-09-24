@@ -270,6 +270,7 @@ RegistrationUser:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: Vietnamese
   GenderLabel: 性别
   Female: 女性
   Male: 男性
@@ -284,7 +285,6 @@ RegistrationUser:
   ExternalLogin: 使用外部身份提供者注册
   BackButtonText: 登录
   NextButtonText: 继续
-
 ExternalRegistrationUserOverview:
   Title: 外部用户注册
   Description: 我们已从所选提供商处获取您的用户详细信息。您现在可以更改或完善它们。
@@ -317,6 +317,7 @@ ExternalRegistrationUserOverview:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: Vietnamese
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
@@ -325,7 +326,6 @@ ExternalRegistrationUserOverview:
   ExternalLogin: 使用外部身份提供者注册
   BackButtonText: 返回
   NextButtonText: 保存
-
 RegistrationOrg:
   Title: 注册组织
   Description: 输入您的组织名称和用户数据。
@@ -398,6 +398,7 @@ ExternalNotFound:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: Vietnamese
 DeviceAuth:
   Title: 设备授权
   UserCode:

@@ -240,6 +240,7 @@ RegistrationUser:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: Vietnam
   GenderLabel: Jenis kelamin
   Female: Perempuan
   Male: Pria
@@ -361,6 +362,7 @@ ExternalNotFound:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: Vietnam
 DeviceAuth:
   Title: Otorisasi Perangkat
   UserCode:
