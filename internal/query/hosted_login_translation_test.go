@@ -132,13 +132,29 @@ func TestGetTranslationOutput(t *testing.T) {
 }
 
 func TestGetHostedLoginTranslation(t *testing.T) {
-	query := `SELECT projections.hosted_login_translations.file, projections.hosted_login_translations.aggregate_type, projections.hosted_login_translations.etag
+	// Query used when requesting at organization level with inheritance
+	// enabled: the WHERE clause matches either the org row or the instance
+	// row so that the instance-level translations can be merged in.
+	orgWithInheritanceQuery := `SELECT projections.hosted_login_translations.file, projections.hosted_login_translations.aggregate_type, projections.hosted_login_translations.etag
+	FROM projections.hosted_login_translations
+	WHERE (projections.hosted_login_translations.aggregate_id = $1
+		AND projections.hosted_login_translations.aggregate_type = $2
+		AND projections.hosted_login_translations.instance_id = $3
+		OR projections.hosted_login_translations.aggregate_id = $4
+		AND projections.hosted_login_translations.aggregate_type = $5
+		AND projections.hosted_login_translations.instance_id = $6)
+	AND (projections.hosted_login_translations.locale = $7 OR projections.hosted_login_translations.locale = $8)
+	LIMIT 4`
+
+	// Query used when inheritance is disabled or when requesting at
+	// instance level (no parent level exists to merge).
+	singleLevelQuery := `SELECT projections.hosted_login_translations.file, projections.hosted_login_translations.aggregate_type, projections.hosted_login_translations.etag
 	FROM projections.hosted_login_translations
 	WHERE projections.hosted_login_translations.aggregate_id = $1
 	AND projections.hosted_login_translations.aggregate_type = $2
 	AND projections.hosted_login_translations.instance_id = $3
 	AND (projections.hosted_login_translations.locale = $4 OR projections.hosted_login_translations.locale = $5)
-	LIMIT 2`
+	LIMIT 4`
 	okTranslation := defaultLoginTranslations
 
 	parsedOKTranslation := map[string]map[string]any{}
@@ -216,8 +232,8 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 			defaultInstanceLanguage: language.English,
 			sqlExpectations: []mock.Expectation{
 				mock.ExpectQuery(
-					query,
-					mock.WithQueryArgs("123", "org", "instance-id", "en-US", "en"),
+					orgWithInheritanceQuery,
+					mock.WithQueryArgs("123", "org", "instance-id", "instance-id", "instance", "instance-id", "en-US", "en"),
 					mock.WithQueryErr(sql.ErrConnDone),
 				),
 			},
@@ -236,8 +252,8 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 			defaultInstanceLanguage: language.English,
 			sqlExpectations: []mock.Expectation{
 				mock.ExpectQuery(
-					query,
-					mock.WithQueryArgs("123", "org", "instance-id", "en-US", "en"),
+					orgWithInheritanceQuery,
+					mock.WithQueryArgs("123", "org", "instance-id", "instance-id", "instance", "instance-id", "en-US", "en"),
 					mock.WithQueryResult(
 						[]string{"file", "aggregate_type", "etag"},
 						[][]driver.Value{},
@@ -262,7 +278,7 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 			defaultInstanceLanguage: language.English,
 			sqlExpectations: []mock.Expectation{
 				mock.ExpectQuery(
-					query,
+					singleLevelQuery,
 					mock.WithQueryArgs("123", "org", "instance-id", "en-US", "en"),
 					mock.WithQueryResult(
 						[]string{"file", "aggregate_type", "etag"},
@@ -289,8 +305,8 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 			defaultInstanceLanguage: language.English,
 			sqlExpectations: []mock.Expectation{
 				mock.ExpectQuery(
-					query,
-					mock.WithQueryArgs("123", "org", "instance-id", "en-US", "en"),
+					orgWithInheritanceQuery,
+					mock.WithQueryArgs("123", "org", "instance-id", "instance-id", "instance", "instance-id", "en-US", "en"),
 					mock.WithQueryResult(
 						[]string{"file", "aggregate_type", "etag"},
 						[][]driver.Value{
@@ -311,6 +327,72 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 				Etag:         "etag-org",
 				Translations: protoDefaultWithDBTranslation,
 			},
+		},
+		{
+			testName: "when only instance row exists should merge it into empty org result",
+
+			defaultInstanceLanguage: language.English,
+			sqlExpectations: []mock.Expectation{
+				mock.ExpectQuery(
+					orgWithInheritanceQuery,
+					mock.WithQueryArgs("123", "org", "instance-id", "instance-id", "instance", "instance-id", "en-US", "en"),
+					mock.WithQueryResult(
+						[]string{"file", "aggregate_type", "etag"},
+						[][]driver.Value{
+							{[]byte(`{"test2": "translation2"}`), "instance", "etag-instance"},
+						},
+					),
+				),
+			},
+			inputRequest: &settings.GetHostedLoginTranslationRequest{
+				Locale: "en-US",
+				Level: &settings.GetHostedLoginTranslationRequest_OrganizationId{
+					OrganizationId: "123",
+				},
+			},
+
+			expectedResult: func() *settings.GetHostedLoginTranslationResponse {
+				merged := maps.Clone(parsedOKTranslation["en"])
+				merged["test2"] = "translation2"
+				proto, err := structpb.NewStruct(merged)
+				require.NoError(t, err)
+				return &settings.GetHostedLoginTranslationResponse{
+					Etag:         "etag-instance",
+					Translations: proto,
+				}
+			}(),
+		},
+		{
+			testName: "when instance level requested should use single-level query",
+
+			defaultInstanceLanguage: language.English,
+			sqlExpectations: []mock.Expectation{
+				mock.ExpectQuery(
+					singleLevelQuery,
+					mock.WithQueryArgs("instance-id", "instance", "instance-id", "en-US", "en"),
+					mock.WithQueryResult(
+						[]string{"file", "aggregate_type", "etag"},
+						[][]driver.Value{
+							{[]byte(`{"test2": "translation2"}`), "instance", "etag-instance"},
+						},
+					),
+				),
+			},
+			inputRequest: &settings.GetHostedLoginTranslationRequest{
+				Locale: "en-US",
+				Level:  &settings.GetHostedLoginTranslationRequest_Instance{Instance: true},
+			},
+
+			expectedResult: func() *settings.GetHostedLoginTranslationResponse {
+				merged := maps.Clone(parsedOKTranslation["en"])
+				merged["test2"] = "translation2"
+				proto, err := structpb.NewStruct(merged)
+				require.NoError(t, err)
+				return &settings.GetHostedLoginTranslationResponse{
+					Etag:         "etag-instance",
+					Translations: proto,
+				}
+			}(),
 		},
 	}
 
