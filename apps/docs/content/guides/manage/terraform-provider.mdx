@@ -1,38 +1,124 @@
 ---
-title: ZITADEL Terraform Provider
-description: "Manage ZITADEL instances, organizations, and resources programmatically using the official Terraform Provider."
+title: Zitadel Terraform Provider
+description: "Manage Zitadel instances, organizations, and resources programmatically using the official Terraform Provider."
 sidebar_label: Terraform Provider
 ---
 
-The [ZITADEL Terraform Provider](https://registry.terraform.io/providers/zitadel/zitadel/latest/docs) is a tool that allows you to manage ZITADEL resources through Terraform.
-In other words, it lets you define and provision infrastructure for ZITADEL using Terraform configuration files.
+The [Zitadel Terraform Provider](https://registry.terraform.io/providers/zitadel/zitadel/latest/docs) lets you manage Zitadel resources — organizations, projects, applications, users, identity providers, policies, and more — using Terraform's declarative configuration language.
 
-This Terraform provider acts as a bridge, allowing you to manage various aspects of your ZITADEL instance directly through the [ZITADEL API](/apis/introduction), using Terraform's declarative configuration language.
-It can be used to create, update, and delete ZITADEL resources, as well as to manage the relationships between those resources.
+The provider communicates with the [ZITADEL API](/apis/introduction), so any resource you can configure through the Console or API can also be managed as code.
 
 ## Before you start
 
-Make sure you create the following resources in ZITADEL and have [Terraform installed](https://learn.hashicorp.com/tutorials/terraform/install-cli):
+- [Install Terraform](https://developer.hashicorp.com/terraform/install) (v1.0+)
+- Have a running [Zitadel instance](/guides/start/quickstart)
+- Create a [service account](/guides/integrate/service-accounts/authenticate-service-accounts) with [sufficient authorization](/guides/manage/console/administrators) to manage the desired resources
 
-- [A ZITADEL Instance](../start/quickstart)
-- [A service account](/guides/integrate/service-accounts/authenticate-service-accounts) with [enough authorization](/guides/manage/console/administrators) to manage the desired resources
+## Configure the provider
 
-## Manage ZITADEL resources through terraform
+Create a `main.tf` file and configure the provider block:
 
-The full documentation and examples are available on the [Terraform registry](https://registry.terraform.io/providers/zitadel/zitadel/latest/docs).
+```hcl
+terraform {
+  required_providers {
+    zitadel = {
+      source  = "zitadel/zitadel"
+      version = "~> 2.0"
+    }
+  }
+}
 
-To provide a small guide to where to start:
+provider "zitadel" {
+  domain           = "my-instance.zitadel.cloud"
+  jwt_profile_file = "service-user.json"
+}
+```
 
-1. Create a folder where all the terraform files reside.
-2. Configure the provider to use the right domain, port and token, with, for example, a `main.tf`file [as shown in the example](https://registry.terraform.io/providers/zitadel/zitadel/latest/docs).
-3. Add a `zitadel_org` resource to the `main.tf` file, to create and manage a new organization in the instance, [as shown in the example](https://registry.terraform.io/providers/zitadel/zitadel/latest/docs/resources/org).
-4. Add any resources to the organization in the `main.tf` file, [as an example a user](https://registry.terraform.io/providers/zitadel/zitadel/latest/docs/resources/human_user).
-5. (Optional) Use Terraform in the directory with the command `terraform plan`, to see which resources would be created and how.
-6. Apply the changes and start managing your resources with terraform with `terraform apply`.
-7. (Optional) Delete your created resources with `terraform destroy` to clean-up.
+### Authentication methods
 
-## References
+The provider supports several authentication options. Use exactly one:
 
-- [Deploy ZITADEL in your infrastructure](/self-hosting/deploy/overview)
-- [ZITADEL CLI](/self-hosting/manage/cli/overview)
-- [Configuration Options in ZITADEL](/self-hosting/manage/configure)
+| Method | Configuration | Description |
+| --- | --- | --- |
+| JWT Profile File | `jwt_profile_file = "path/to/key.json"` | Path to a downloaded service-account key file. Recommended for production. |
+| JWT Profile JSON | `jwt_profile_json = "{...}"` | Inline JSON string of the service-account key. Useful for CI/CD secrets. |
+| Presigned JWT | `jwt_file = "path/to/jwt"` | Path to a file containing a presigned JWT. |
+| Personal Access Token | `access_token = "PAT_VALUE"` | A personal access token. Suitable for development and testing. |
+
+### Provider options
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `domain` | string | — | Domain of your Zitadel instance (required). |
+| `port` | string | — | Used port if not the default ports 80 or 443 are configured. |
+| `insecure` | bool | `false` | Use insecure (HTTP) connection. |
+| `insecure_skip_verify_tls` | bool | `false` | Disable TLS certificate verification. Only use in development or testing. |
+| `access_token` | string | — | Personal Access Token to connect to Zitadel. |
+| `jwt_profile_file` | string | — | Path to a service-account key JSON file. |
+| `jwt_profile_json` | string | — | Service-account key JSON as an inline string. |
+| `jwt_file` | string | — | Path to a file containing a presigned JWT. |
+| `token` | string | — | Deprecated. Path to a JWT profile file. Use `jwt_profile_file` instead. |
+| `transport_headers` | map | — | Custom headers to add to HTTP and gRPC requests. |
+
+## Create resources
+
+After configuring the provider, declare Zitadel resources in your Terraform files. The example below creates an organization and a human user:
+
+```hcl
+resource "zitadel_org" "demo" {
+  name = "Demo Organization"
+}
+
+resource "zitadel_human_user" "alice" {
+  org_id             = zitadel_org.demo.id
+  user_name          = "alice@example.com"
+  first_name         = "Alice"
+  last_name          = "Example"
+  display_name       = "Alice Example"
+  preferred_language = "en"
+  email              = "alice@example.com"
+  is_email_verified  = true
+}
+```
+
+## Apply the configuration
+
+Run Terraform in the directory containing your `.tf` files:
+
+```bash
+# Initialize the provider
+terraform init
+
+# Preview the changes
+terraform plan
+
+# Apply the changes
+terraform apply
+```
+
+To remove all resources managed by Terraform:
+
+```bash
+terraform destroy
+```
+
+## Available resources
+
+The provider covers a wide range of Zitadel resources including:
+
+- **Organizations** — `zitadel_org`
+- **Users** — `zitadel_human_user`, `zitadel_machine_user`
+- **Projects and applications** — `zitadel_project`, `zitadel_application_oidc`, `zitadel_application_api`, `zitadel_application_saml`
+- **Identity providers** — `zitadel_idp_google`, `zitadel_idp_azure_ad`, `zitadel_idp_github`, `zitadel_idp_gitlab`, `zitadel_idp_ldap`, `zitadel_idp_saml`, and more
+- **Policies** — `zitadel_login_policy`, `zitadel_password_complexity_policy`, `zitadel_label_policy`, `zitadel_privacy_policy`, and more
+- **Actions** — `zitadel_action`, `zitadel_trigger_actions`
+- **Access control** — `zitadel_user_grant`, `zitadel_org_member`, `zitadel_project_role`
+
+Browse the full list of resources and data sources on the [Terraform Registry](https://registry.terraform.io/providers/zitadel/zitadel/latest/docs).
+
+## Reference
+
+- [Terraform Registry — Zitadel Provider](https://registry.terraform.io/providers/zitadel/zitadel/latest/docs)
+- [Deploy Zitadel in your infrastructure](/self-hosting/deploy/overview)
+- [Zitadel CLI](/self-hosting/manage/cli/overview)
+- [Configuration Options in Zitadel](/self-hosting/manage/configure)
