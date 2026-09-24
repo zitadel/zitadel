@@ -1,7 +1,32 @@
 import { describe, expect, it } from "vitest";
-import { getValidLocaleFromUILocales, isRSCRequest, isValidLanguage, validateAuthRequest } from "./auth-utils";
+import {
+  equalsIgnoreCase,
+  getValidLocaleFromUILocales,
+  isRSCRequest,
+  isValidLanguage,
+  validateAuthRequest,
+} from "./auth-utils";
 
 describe("auth-utils", () => {
+  describe("equalsIgnoreCase", () => {
+    it("should match identifiers regardless of case", () => {
+      expect(equalsIgnoreCase("jackson@example.com", "Jackson@Example.com")).toBe(true);
+      expect(equalsIgnoreCase("USER@ORGDOMAIN.COM", "user@orgdomain.com")).toBe(true);
+      expect(equalsIgnoreCase("user", "user")).toBe(true);
+    });
+
+    it("should not match different identifiers", () => {
+      expect(equalsIgnoreCase("jackson@example.com", "jane@example.com")).toBe(false);
+      expect(equalsIgnoreCase("user@example.com", "user@other.com")).toBe(false);
+    });
+
+    it("should return false when either value is undefined", () => {
+      expect(equalsIgnoreCase(undefined, "user@example.com")).toBe(false);
+      expect(equalsIgnoreCase("user@example.com", undefined)).toBe(false);
+      expect(equalsIgnoreCase(undefined, undefined)).toBe(false);
+    });
+  });
+
   describe("isValidLanguage", () => {
     it("should return true for valid language codes", () => {
       expect(isValidLanguage("en")).toBe(true);
