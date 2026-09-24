@@ -301,6 +301,39 @@ func TestCommands_ChangeSchemaUserEmail(t *testing.T) {
 			},
 		},
 		{
+			"self cannot mark email verified",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"type",
+								1,
+								json.RawMessage(`{
+						"name": "user"
+					}`),
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "user1", ""),
+				user: &ChangeSchemaUserEmail{
+					ID:    "user1",
+					Email: &Email{Address: "test@example.com", Verified: true},
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+				},
+			},
+		},
+		{
 			"user updated, verified",
 			fields{
 				eventstore: expectEventstore(
