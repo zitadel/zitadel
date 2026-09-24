@@ -197,6 +197,7 @@ func (l *ErrorContextLogger) Panic(msg string, args ...any) {
 func (l *ErrorContextLogger) Fatal(msg string, args ...any) {
 	log(l.ctx, l.logger, sloggcp.LevelEmergency, msg, 1, args...)
 	if l.canTerminate {
+		_ = instrumentation.Shutdown(l.ctx)
 		exit(1)
 	}
 }
