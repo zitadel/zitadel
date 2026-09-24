@@ -5,6 +5,7 @@ package oidc_test
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"testing"
 	"time"
@@ -13,6 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/op"
 	"google.golang.org/grpc/metadata"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -500,4 +502,13 @@ func assertOIDCTime(t *testing.T, actual oidc.Time, expected time.Time) {
 
 func assertOIDCTimeRange(t *testing.T, actual oidc.Time, expectedStart, expectedEnd time.Time) {
 	assert.WithinRange(t, actual.AsTime(), expectedStart.Add(-10*time.Second), expectedEnd.Add(10*time.Second))
+}
+
+func decodeJWTAccessToken(t *testing.T, instance *integration.Instance, accessToken string) *oidc.AccessTokenClaims {
+	t.Helper()
+	require.Contains(t, accessToken, ".", "expected JWT access token, got opaque value")
+	verifier := op.NewAccessTokenVerifier(instance.OIDCIssuer(), rp.NewRemoteKeySet(http.DefaultClient, instance.OIDCIssuer()+"/oauth/v2/keys"))
+	claims, err := op.VerifyAccessToken[*oidc.AccessTokenClaims](context.Background(), accessToken, verifier)
+	require.NoError(t, err)
+	return claims
 }
