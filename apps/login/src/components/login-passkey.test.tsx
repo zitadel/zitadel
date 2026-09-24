@@ -1,6 +1,6 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { LoginPasskey } from "./login-passkey";
 
 // Mock next/navigation
@@ -71,6 +71,10 @@ describe("LoginPasskey Component", () => {
 
     mockSendPasskey = vi.mocked(sendPasskey);
     mockUpdateSession = vi.mocked(updateOrCreateSession);
+  });
+
+  afterEach(() => {
+    cleanup();
   });
 
   describe("Initialization and Challenge Request", () => {
@@ -436,6 +440,138 @@ describe("LoginPasskey Component", () => {
 
       // Should still only be called once
       expect(mockUpdateSession).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("Overlapping ceremony prevention (#12495)", () => {
+    const challengeResponse = () => ({
+      challenges: {
+        webAuthN: {
+          publicKeyCredentialRequestOptions: {
+            publicKey: {
+              challenge: new Uint8Array([1, 2, 3]),
+              allowCredentials: [{ id: new Uint8Array([4, 5, 6]), type: "public-key" }],
+            },
+          },
+        },
+      },
+    });
+
+    test("keeps the submit button disabled while a passkey ceremony is in flight", async () => {
+      mockUpdateSession.mockResolvedValue(challengeResponse());
+      // Never resolve the WebAuthn request: the ceremony stays in flight.
+      mockCredentialsGet.mockReturnValue(new Promise(() => {}));
+
+      renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+
+      await waitFor(() => {
+        expect(mockCredentialsGet).toHaveBeenCalled();
+      });
+
+      // While the authenticator prompt is open the button must stay disabled, so a
+      // click cannot start a second, overlapping ceremony — the root cause of #12495.
+      await waitFor(() => {
+        expect(screen.getByTestId("submit-button")).toBeDisabled();
+      });
+    });
+
+    test("passes an AbortSignal to navigator.credentials.get", async () => {
+      mockUpdateSession.mockResolvedValue(challengeResponse());
+      mockCredentialsGet.mockResolvedValue(null);
+
+      renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+
+      await waitFor(() => {
+        expect(mockCredentialsGet).toHaveBeenCalledWith(expect.objectContaining({ signal: expect.any(AbortSignal) }));
+      });
+    });
+
+    test("aborts the in-flight WebAuthn request when the component unmounts", async () => {
+      mockUpdateSession.mockResolvedValue(challengeResponse());
+      let capturedSignal: AbortSignal | undefined;
+      // Reject with AbortError when the signal fires, mirroring a real credentials.get().
+      mockCredentialsGet.mockImplementation(
+        (options: any) =>
+          new Promise((_resolve, reject) => {
+            capturedSignal = options?.signal;
+            options?.signal?.addEventListener("abort", () => {
+              const abortError = new Error("The operation was aborted.");
+              (abortError as any).name = "AbortError";
+              reject(abortError);
+            });
+          }),
+      );
+
+      const { unmount } = renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+
+      await waitFor(() => {
+        expect(mockCredentialsGet).toHaveBeenCalled();
+      });
+      expect(capturedSignal?.aborted).toBe(false);
+
+      await act(async () => {
+        unmount();
+      });
+
+      // The effect cleanup aborts the ceremony's controller, cancelling the open request
+      // so it can never resolve against a challenge a later navigation replaced; the
+      // resulting AbortError is swallowed (no unhandled rejection).
+      expect(capturedSignal?.aborted).toBe(true);
+    });
+
+    test("surfaces an unexpected AbortError as a verification error", async () => {
+      mockUpdateSession.mockResolvedValue(challengeResponse());
+      // An AbortError raised without us aborting the signal is unexpected and must be
+      // shown, not silently swallowed — only aborts we initiate are swallowed.
+      const abortError = new Error("The operation was aborted.");
+      (abortError as any).name = "AbortError";
+      mockCredentialsGet.mockRejectedValue(abortError);
+
+      renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+
+      await waitFor(() => {
+        expect(screen.getByText("An error occurred during passkey verification")).toBeInTheDocument();
+      });
+    });
+
+    test("does not submit an assertion when the request resolves after being aborted", async () => {
+      mockUpdateSession.mockResolvedValue(challengeResponse());
+      let resolveGet: (value: unknown) => void = () => {};
+      let capturedSignal: AbortSignal | undefined;
+      mockCredentialsGet.mockImplementation((options: any) => {
+        capturedSignal = options?.signal;
+        return new Promise((resolve) => {
+          resolveGet = resolve;
+        });
+      });
+      mockSendPasskey.mockResolvedValue({ redirect: "/success" });
+
+      const { unmount } = renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+      await waitFor(() => {
+        expect(mockCredentialsGet).toHaveBeenCalled();
+      });
+
+      // Unmount aborts the ceremony...
+      unmount();
+      expect(capturedSignal?.aborted).toBe(true);
+
+      // ...and only then does the authenticator result arrive. An aborted get() can still
+      // resolve, but the abandoned ceremony must not submit its assertion.
+      await act(async () => {
+        resolveGet({
+          id: "credential-id",
+          rawId: new ArrayBuffer(8),
+          type: "public-key",
+          response: {
+            authenticatorData: new ArrayBuffer(8),
+            clientDataJSON: new ArrayBuffer(8),
+            signature: new ArrayBuffer(8),
+            userHandle: new ArrayBuffer(8),
+          },
+        });
+      });
+
+      expect(mockSendPasskey).not.toHaveBeenCalled();
     });
   });
 });
