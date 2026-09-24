@@ -282,6 +282,7 @@ type OrgRemovedEvent struct {
 	domains                     []string
 	externalIDPs                []*domain.UserIDPLink
 	samlEntityIDs               []string
+	projectNames                []string
 }
 
 func (e *OrgRemovedEvent) Payload() interface{} {
@@ -305,6 +306,9 @@ func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	for _, entityID := range e.samlEntityIDs {
 		constraints = append(constraints, project.NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID))
 	}
+	for _, projectName := range e.projectNames {
+		constraints = append(constraints, project.NewRemoveProjectNameUniqueConstraint(projectName, e.Aggregate().ID))
+	}
 	return constraints
 }
 
@@ -315,7 +319,7 @@ func (e *OrgRemovedEvent) Fields() []*eventstore.FieldOperation {
 	}
 }
 
-func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string, usernames []string, organizationScopedUsernames bool, domains []string, externalIDPs []*domain.UserIDPLink, samlEntityIDs []string) *OrgRemovedEvent {
+func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string, usernames []string, organizationScopedUsernames bool, domains []string, externalIDPs []*domain.UserIDPLink, samlEntityIDs, projectNames []string) *OrgRemovedEvent {
 	return &OrgRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -327,6 +331,7 @@ func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, na
 		domains:                     domains,
 		externalIDPs:                externalIDPs,
 		samlEntityIDs:               samlEntityIDs,
+		projectNames:                projectNames,
 		organizationScopedUsernames: organizationScopedUsernames,
 	}
 }
