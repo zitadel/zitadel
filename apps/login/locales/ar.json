@@ -1,7 +1,9 @@
 {
   "common": {
     "back": "رجوع",
-    "title": "تسجيل الدخول باستخدام Zitadel"
+    "title": "تسجيل الدخول باستخدام Zitadel",
+    "showPassword": "إظهار كلمة المرور",
+    "hidePassword": "إخفاء كلمة المرور"
   },
   "accounts": {
     "title": "الحسابات",
