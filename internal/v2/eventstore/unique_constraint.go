@@ -32,6 +32,7 @@ const (
 	UniqueConstraintOwnerIDP     = "idp"
 	UniqueConstraintOwnerProject = "project"
 	UniqueConstraintOwnerGrant   = "grant"
+	UniqueConstraintOwnerApp     = "app"
 )
 
 func (f UniqueConstraintAction) Valid() bool {

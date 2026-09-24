@@ -27,14 +27,14 @@ func TestBackfillUniqueConstraintOwnersStmts(t *testing.T) {
 		extra      []string
 	}{
 		{"01_usernames_org_scoped.sql", "usernames", "u.username || u.resource_owner", projection.UserTable, []string{"'org:' || u.resource_owner"}},
-		{"02_usernames.sql", "usernames", "u.username, lower(u.username)", projection.UserTable, []string{"'org:' || u.resource_owner", "organization_scoped_usernames", "user_login_must_be_domain"}},
+		{"02_usernames.sql", "usernames", "lower(u.username)", projection.UserTable, []string{"'org:' || u.resource_owner", "organization_scoped_usernames", "user_login_must_be_domain"}},
 		{"03_external_idps.sql", "external_idps", "l.idp_id || l.external_user_id", projection.IDPUserLinkTable, []string{"'idp:' || l.idp_id"}},
 		{"04_org_name.sql", "org_name", "o.name", projection.OrgProjectionTable, nil},
 		{"05_org_domain.sql", "org_domain", "d.domain", projection.OrgDomainTable, []string{"d.is_verified"}},
 		{"06_project_names.sql", "project_names", "p.name || p.resource_owner", projection.ProjectProjectionTable, nil},
-		{"07_appname.sql", "appname", "a.name || ':' || a.project_id", projection.AppProjectionTable, nil},
+		{"07_appname.sql", "appname", "a.name || ':' || a.project_id", projection.AppProjectionTable, []string{"'app:' || a.id"}},
 		{"08_project_role.sql", "project_role", "r.role_key || ':' || r.project_id", projection.ProjectRoleProjectionTable, nil},
-		{"09_entity_ids.sql", "entity_ids", "s.entity_id", projection.AppProjectionTable, []string{projection.AppSAMLTable}},
+		{"09_entity_ids.sql", "entity_ids", "s.entity_id", projection.AppProjectionTable, []string{projection.AppSAMLTable, "'app:' || a.id"}},
 		{"10_project_grant.sql", "project_grant", "g.granted_org_id || ':' || g.project_id", projection.ProjectGrantProjectionTable, []string{"'org:' || g.granted_org_id", "'grant:' || g.grant_id"}},
 		{"11_project_grant_member.sql", "project_grant_member", "m.project_id || ':' || m.user_id || ':' || m.grant_id", projection.ProjectGrantMemberProjectionTable, []string{"'grant:' || m.grant_id", "m.user_resource_owner", "m.granted_org"}},
 		{"12_user_grant.sql", "user_grant", "g.resource_owner || ':' || g.user_id || ':' || g.project_id || ':' || g.grant_id", projection.UserGrantProjectionTable, []string{"'grant:' || g.grant_id", "g.resource_owner_user", "g.granted_org"}},
@@ -54,7 +54,10 @@ func TestBackfillUniqueConstraintOwnersStmts(t *testing.T) {
 		assert.Contains(t, stmt.query, "unique_type = '"+want[i].uniqueType+"'")
 		assert.Contains(t, stmt.query, want[i].field)
 		assert.Contains(t, stmt.query, want[i].table)
-		assert.Contains(t, stmt.query, "uc.unique_field IN (")
+		assert.Contains(t, stmt.query, "uc.unique_field =")
+		assert.Contains(t, stmt.query, "LIMIT $2")
+		assert.Contains(t, stmt.query, "($1::text[])[1]")
+		assert.NotContains(t, stmt.query, "uc.unique_field IN (")
 		assert.NotContains(t, stmt.query, "lower(uc.unique_field)")
 		assert.NotContains(t, stmt.query, "{{.")
 		for _, extra := range want[i].extra {
@@ -195,6 +198,7 @@ func TestBackfillUniqueConstraintOwnersJSONOmitsForceFinalize(t *testing.T) {
 		Version:       "v2.0.0",
 		Finalized:     true,
 		ForceFinalize: true,
+		BatchSize:     10,
 		lastVersion:   "v1.0.0",
 		lastFinalized: true,
 	}
@@ -207,6 +211,8 @@ func TestBackfillUniqueConstraintOwnersJSONOmitsForceFinalize(t *testing.T) {
 	assert.Equal(t, true, payload["finalized"])
 	assert.NotContains(t, payload, "ForceFinalize")
 	assert.NotContains(t, payload, "forceFinalize")
+	assert.NotContains(t, payload, "BatchSize")
+	assert.NotContains(t, payload, "batchSize")
 	assert.NotContains(t, payload, "lastVersion")
 	assert.NotContains(t, payload, "lastFinalized")
 	assert.False(t, strings.Contains(string(data), "v1.0.0"))

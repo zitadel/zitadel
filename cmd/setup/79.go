@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"embed"
 	"errors"
+	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/jackc/pgx/v5/pgconn"
@@ -26,6 +28,7 @@ type BackfillUniqueConstraintOwners struct {
 	Version       string `json:"version"`
 	Finalized     bool   `json:"finalized"`
 	ForceFinalize bool   `json:"-"` // YAML/env only; not persisted on lastRun
+	BatchSize     uint16 `json:"-"` // YAML/env only; not persisted on lastRun
 
 	lastVersion   string `json:"-"`
 	lastFinalized bool   `json:"-"`
@@ -55,13 +58,28 @@ func (mig *BackfillUniqueConstraintOwners) Execute(ctx context.Context, _ events
 		return err
 	}
 	for _, stmt := range statements {
-		logging.Info(ctx, "backfill unique constraint owners", "file", stmt.file, "migration", mig.String())
-		if _, err := mig.dbClient.ExecContext(ctx, stmt.query); err != nil {
-			if isUndefinedTable(err) {
-				logging.Info(ctx, "skip unique constraint owners backfill, relation missing", "file", stmt.file, "migration", mig.String())
-				continue
+		var cursor database.TextArray[string]
+		for page := 1; ; page++ {
+			var next database.TextArray[string]
+			var updated int64
+			err := mig.dbClient.QueryRowContext(ctx, func(row *sql.Row) error {
+				return row.Scan(&next, &updated)
+			}, stmt.query, cursor, mig.BatchSize)
+			if err != nil {
+				if isUndefinedTable(err) {
+					logging.Info(ctx, "skip unique constraint owners backfill, relation missing", "file", stmt.file, "migration", mig.String())
+					break
+				}
+				return fmt.Errorf("backfill unique constraint owners %s: %w", stmt.file, err)
 			}
-			return err
+			if len(next) == 0 {
+				break
+			}
+			if slices.Equal(cursor, next) {
+				return fmt.Errorf("backfill unique constraint owners %s: cursor did not advance", stmt.file)
+			}
+			logging.Info(ctx, "backfill unique constraint owners page", "file", stmt.file, "page", page, "updated", updated, "migration", mig.String())
+			cursor = next
 		}
 	}
 
@@ -125,6 +143,8 @@ func backfillUniqueConstraintOwnersStatements() ([]statement, error) {
 }
 
 // BackfillUniqueConstraintOwnersQuery returns the interpolated SQL for a setup 79 file.
+// The statement reads one projection page: $1 is a text[] primary-key cursor (nil starts at the beginning) and $2 is the page size.
+// It returns the next cursor and the number of unique-constraint rows updated.
 func BackfillUniqueConstraintOwnersQuery(file string) (string, error) {
 	statements, err := backfillUniqueConstraintOwnersStatements()
 	if err != nil {
