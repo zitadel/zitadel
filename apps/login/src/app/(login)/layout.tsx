@@ -8,7 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import ThemeSwitch from "@/components/theme-switch";
 import { LANGS, getLanguage } from "@/lib/i18n";
 import { getServiceConfig } from "@/lib/service-url";
-import { getAllowedLanguages } from "@/lib/zitadel";
+import { getAllowedLanguages, getBrandingSettings } from "@/lib/zitadel";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -23,7 +23,24 @@ const lato = Lato({
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("common");
-  return { title: t("title") };
+  const metadata: Metadata = { title: t("title") };
+
+  // Use the org/instance branding icon (LabelPolicy) as the favicon, so the
+  // hosted login shows the tenant's brand mark in the browser tab with no baked
+  // asset — the same runtime source as the in-page logo.
+  try {
+    const _headers = await headers();
+    const { serviceConfig } = getServiceConfig(_headers);
+    const branding = await getBrandingSettings({ serviceConfig });
+    const iconUrl = branding?.lightTheme?.iconUrl || branding?.darkTheme?.iconUrl;
+    if (iconUrl) {
+      metadata.icons = { icon: iconUrl, shortcut: iconUrl, apple: iconUrl };
+    }
+  } catch (error) {
+    console.error("Failed to load branding favicon", error);
+  }
+
+  return metadata;
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
