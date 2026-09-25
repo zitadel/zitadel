@@ -19,7 +19,8 @@ Run every command from the repository root. Workspaces are listed in `pnpm-works
 2. **Overrides are temporary.** Every override needs a comment that names the parent that pins the old version. Anyone can then check later whether it can be removed.
 3. **Review existing overrides every time.** Remove all of them, reinstall and re-add only the ones that audit still needs.
 4. **Keep the lockfile diff small.** Don't delete `pnpm-lock.yaml` to regenerate it. Update only the packages you are fixing, so reviewers can follow the change.
-5. **Write the PR as a dependency update.** This is a public repository. Describe version bumps, behavior changes and what to test. Leave out exploit details, attack scenarios and "how this could be abused" commentary. Linking to a public advisory is fine but not needed.
+5. **Keep the lockfile in sync.** Run `pnpm install` after every edit to a `package.json` or to `overrides`, and commit `pnpm-lock.yaml` together with it. CI installs with `--frozen-lockfile` and fails when they disagree.
+6. **Write the PR as a dependency update.** This is a public repository. Describe version bumps, behavior changes and what to test. Leave out exploit details, attack scenarios and "how this could be abused" commentary. Linking to a public advisory is fine but not needed.
 
 ## 1. Collect the findings
 
@@ -50,7 +51,7 @@ npm view <parent>@latest dependencies.<pkg>                # does the latest par
 | Situation | Fix |
 |---|---|
 | The direct dependency at the top of the path is unused (`git grep -l "<pkg>" -- <project> ':!**/package.json'` finds nothing, and it isn't a peer dependency of another package) | Remove it with `pnpm --filter <project> remove <pkg>`. This removes its whole subtree. |
-| The vulnerable package is a direct dependency | Raise its version in `package.json`, and raise the lower bound as well (`^4.1.6` → `^4.1.11`) so the fix is explicit. |
+| The vulnerable package is a direct dependency | Raise its version in `package.json`, and raise the lower bound as well (`^4.1.6` → `^4.1.11`) so the fix is explicit. Then run `pnpm install`. |
 | Transitive, and the parent's range already allows the fixed version | Refresh it in the lockfile (see below). No `package.json` change needed. |
 | Transitive, the parent pins an old version, but a newer parent release allows the fix | Bump the parent. If that's a major version or 0.x minor bump, check its breaking changes (step 4). |
 | The parent pins it exactly, even in its latest release (also check `npm view <parent> dist-tags` for a `next`/beta that fixes it) | Add an override with a comment (step 3). |
@@ -84,7 +85,8 @@ overrides:
   "smol-toml@<1.7.1": "^1.7.1"
 ```
 
-6. For each override you removed, confirm the resolved version is still at or above the floor the override enforced (`pnpm why -r <package>`). List the removed overrides in the PR.
+6. Run `pnpm install` so the lockfile records the overrides, then `pnpm audit` again. It must report no findings.
+7. For each override you removed, confirm the resolved version is still at or above the floor the override enforced (`pnpm why -r <package>`). List the removed overrides in the PR.
 
 An override forces a version the parent never tested with. Stay inside the same major version, and run the parent's build or tests after adding one.
 
@@ -92,6 +94,7 @@ A range override also applies to **direct** dependencies whose declared range ov
 
 ```bash
 git grep -nE '"<package>": "' -- '**/package.json'     # direct users of the overridden package
+pnpm install                                            # after raising the ranges
 ```
 
 ## 4. Assess breaking changes
