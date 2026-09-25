@@ -11,6 +11,8 @@ type UniqueConstraint struct {
 	ErrorMessage string
 	// IsGlobal defines if the unique constraint is globally unique or just within a single instance
 	IsGlobal bool
+	// Owners is a bag of kind:id tags used for bulk lifecycle deletes
+	Owners []string
 }
 
 type UniqueConstraintAction int8
@@ -19,12 +21,46 @@ const (
 	UniqueConstraintAdd UniqueConstraintAction = iota
 	UniqueConstraintRemove
 	UniqueConstraintInstanceRemove
+	UniqueConstraintRemoveByOwner
 
 	uniqueConstraintActionCount
 )
 
+const (
+	UniqueConstraintOwnerOrg     = "org"
+	UniqueConstraintOwnerUser    = "user"
+	UniqueConstraintOwnerIDP     = "idp"
+	UniqueConstraintOwnerProject = "project"
+	UniqueConstraintOwnerGrant   = "grant"
+	UniqueConstraintOwnerApp     = "app"
+)
+
 func (f UniqueConstraintAction) Valid() bool {
 	return f >= 0 && f < uniqueConstraintActionCount
+}
+
+func OwnerTag(kind, id string) string {
+	if kind == "" || id == "" {
+		return ""
+	}
+	return kind + ":" + id
+}
+
+func (u *UniqueConstraint) WithOwners(tags ...string) *UniqueConstraint {
+	owners := make([]string, 0, len(tags))
+	seen := make(map[string]struct{}, len(tags))
+	for _, tag := range tags {
+		if tag == "" {
+			continue
+		}
+		if _, ok := seen[tag]; ok {
+			continue
+		}
+		seen[tag] = struct{}{}
+		owners = append(owners, tag)
+	}
+	u.Owners = owners
+	return u
 }
 
 func NewAddEventUniqueConstraint(
@@ -36,6 +72,7 @@ func NewAddEventUniqueConstraint(
 		UniqueField:  uniqueField,
 		ErrorMessage: errMessage,
 		Action:       UniqueConstraintAdd,
+		Owners:       []string{},
 	}
 }
 
@@ -55,6 +92,16 @@ func NewRemoveInstanceUniqueConstraints() *UniqueConstraint {
 	}
 }
 
+func NewRemoveUniqueConstraintsByOwner(kind, id string) *UniqueConstraint {
+	constraint := &UniqueConstraint{
+		Action: UniqueConstraintRemoveByOwner,
+	}
+	if tag := OwnerTag(kind, id); tag != "" {
+		constraint.Owners = []string{tag}
+	}
+	return constraint
+}
+
 func NewAddGlobalUniqueConstraint(
 	uniqueType,
 	uniqueField,
@@ -65,6 +112,7 @@ func NewAddGlobalUniqueConstraint(
 		ErrorMessage: errMessage,
 		IsGlobal:     true,
 		Action:       UniqueConstraintAdd,
+		Owners:       []string{},
 	}
 }
 

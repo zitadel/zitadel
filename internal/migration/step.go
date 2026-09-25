@@ -35,15 +35,20 @@ func (s *StepStates) Reduce() error {
 			state = new(Step)
 			s.Steps = append(s.Steps, state)
 		}
-		state.SetupStep = step
 		switch step.EventType {
 		case StartedType:
+			state.SetupStep = step
 			state.state = StepStarted
 		case DoneType:
+			state.SetupStep = step
 			state.state = StepDone
 		case repeatableDoneType:
+			state.SetupStep = step
 			state.state = StepDone
 		case failedType:
+			if state.SetupStep == nil {
+				state.SetupStep = step
+			}
 			state.state = StepFailed
 		}
 	}
