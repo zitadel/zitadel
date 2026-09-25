@@ -11,11 +11,12 @@ function getUserAvatarRoundness(): string {
 type Props = {
   loginName?: string;
   displayName?: string;
+  imageUrl?: string;
   showDropdown: boolean;
   searchParams?: Record<string | number | symbol, string | undefined>;
 };
 
-export function UserAvatar({ loginName, displayName, showDropdown, searchParams }: Props) {
+export function UserAvatar({ loginName, displayName, imageUrl, showDropdown, searchParams }: Props) {
   const params = new URLSearchParams({});
   const userAvatarRoundness = getUserAvatarRoundness();
 
@@ -38,7 +39,7 @@ export function UserAvatar({ loginName, displayName, showDropdown, searchParams 
   return (
     <div className={`flex h-full flex-row items-center border p-[1px] dark:border-white/20 ${userAvatarRoundness}`}>
       <div>
-        <Avatar size="small" name={displayName ?? loginName ?? ""} loginName={loginName ?? ""} />
+        <Avatar imageUrl={imageUrl} size="small" name={displayName ?? loginName ?? ""} loginName={loginName ?? ""} />
       </div>
       <span className="text-14px ml-4 max-w-[250px] overflow-hidden pr-4 text-ellipsis">{loginName}</span>
       <span className="flex-grow"></span>

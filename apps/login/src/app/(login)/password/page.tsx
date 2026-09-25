@@ -5,6 +5,7 @@ import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
+import { getUserAvatarUrl } from "@/lib/user-avatar";
 import { getBrandingSettings, getDefaultOrg, getLoginSettings } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
@@ -64,6 +65,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
             displayName={sessionFactors.factors?.user?.displayName}
+            imageUrl={await getUserAvatarUrl({ serviceConfig, userId: sessionFactors.factors?.user?.id })}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>

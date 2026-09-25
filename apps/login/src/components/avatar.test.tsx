@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { cleanup, fireEvent, render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Avatar, getInitials } from "./avatar";
 
@@ -164,5 +164,34 @@ describe("Avatar Component", () => {
       const { container } = render(<Avatar name="Test" loginName="required@example.com" />);
       expect(container.firstChild).toBeTruthy();
     });
+  });
+});
+
+describe("Avatar image errors", () => {
+  beforeEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
+
+  it("falls back when an image has already failed before hydration", () => {
+    vi.spyOn(HTMLImageElement.prototype, "complete", "get").mockReturnValue(true);
+    vi.spyOn(HTMLImageElement.prototype, "naturalWidth", "get").mockReturnValue(0);
+    const { queryByRole, getByText } = render(
+      <Avatar name="Alex Rivera" loginName="alex@example.com" imageUrl="https://idp.example.com/missing" />,
+    );
+    expect(queryByRole("img")).not.toBeInTheDocument();
+    expect(getByText("AR")).toBeInTheDocument();
+  });
+
+  it("falls back to initials when the image cannot load and retries a changed URL", () => {
+    const { getByRole, queryByRole, getByText, rerender } = render(
+      <Avatar name="Alex Rivera" loginName="alex@example.com" imageUrl="https://idp.example.com/missing" />,
+    );
+    fireEvent.error(getByRole("img"));
+    expect(queryByRole("img")).not.toBeInTheDocument();
+    expect(getByText("AR")).toBeInTheDocument();
+    rerender(<Avatar name="Alex Rivera" loginName="alex@example.com" imageUrl="https://idp.example.com/photo" />);
+    expect(getByRole("img")).toHaveAttribute("src", "https://idp.example.com/photo");
   });
 });

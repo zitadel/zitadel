@@ -3,6 +3,7 @@ import { SessionsList } from "@/components/sessions-list";
 import { Translated } from "@/components/translated";
 import { getAllSessions } from "@/lib/cookies";
 import { getServiceConfig } from "@/lib/service-url";
+import { getUserAvatarUrl } from "@/lib/user-avatar";
 import { getBrandingSettings, getDefaultOrg, listSessions, ServiceConfig } from "@/lib/zitadel";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
 import { create } from "@zitadel/client";
@@ -88,6 +89,13 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   let sessions = await loadSessions({ serviceConfig, organization });
 
+  const userIds = Array.from(
+    new Set(sessions.flatMap((session) => (session.factors?.user?.id ? [session.factors.user.id] : []))),
+  );
+  const avatarUrls = Object.fromEntries(
+    await Promise.all(userIds.map(async (userId) => [userId, await getUserAvatarUrl({ serviceConfig, userId })])),
+  );
+
   const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization });
 
   const params = new URLSearchParams();
@@ -117,7 +125,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
       <div className="w-full">
         <div className="flex w-full flex-col space-y-2">
-          <SessionsList sessions={sessions} requestId={requestId} />
+          <SessionsList avatarUrls={avatarUrls} sessions={sessions} requestId={requestId} />
           <Link href={`/loginname?` + params}>
             <div className="flex flex-row items-center rounded-md px-4 py-3 transition-all hover:bg-black/10 dark:hover:bg-white/10">
               <div className="mr-4 flex h-8 w-8 flex-row items-center justify-center rounded-full bg-black/5 dark:bg-white/5">

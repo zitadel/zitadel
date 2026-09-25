@@ -3,6 +3,7 @@
 import { ColorShade, getColorHash } from "@/helpers/colors";
 import { getComponentRoundness } from "@/lib/theme";
 import { useTheme } from "next-themes";
+import { useCallback, useState } from "react";
 
 interface AvatarProps {
   name: string | null | undefined;
@@ -36,6 +37,14 @@ function getAvatarRoundness(): string {
 }
 
 export function Avatar({ size = "base", name, loginName, imageUrl, shadow }: AvatarProps) {
+  const [failedImageUrl, setFailedImageUrl] = useState<string>();
+  const handleImageRef = useCallback(
+    (image: HTMLImageElement | null) => {
+      // An SSR image can fail before React attaches its error handler.
+      if (image?.complete && image.naturalWidth === 0) setFailedImageUrl(imageUrl);
+    },
+    [imageUrl],
+  );
   const { resolvedTheme } = useTheme();
   const credentials = getInitials(name ?? loginName, loginName);
   const avatarRoundness = getAvatarRoundness();
@@ -67,13 +76,15 @@ export function Avatar({ size = "base", name, loginName, imageUrl, shadow }: Ava
       }`}
       style={resolvedTheme === "light" ? avatarStyleLight : avatarStyleDark}
     >
-      {imageUrl ? (
+      {imageUrl && imageUrl !== failedImageUrl ? (
         <img
           height={48}
           width={48}
           alt="avatar"
-          className={`border-divider-light dark:border-divider-dark h-full w-full border ${avatarRoundness}`}
+          className={`border-divider-light dark:border-divider-dark h-full w-full border object-cover ${avatarRoundness}`}
+          ref={handleImageRef}
           src={imageUrl}
+          onError={() => setFailedImageUrl(imageUrl)}
         />
       ) : (
         <span className={`uppercase ${size === "large" ? "text-xl" : "text-13px"}`}>{credentials}</span>

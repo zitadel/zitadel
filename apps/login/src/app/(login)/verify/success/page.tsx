@@ -4,6 +4,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { VerifySuccessContinue } from "@/components/verify-success-continue";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
+import { getUserAvatarUrl } from "@/lib/user-avatar";
 import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { headers } from "next/headers";
@@ -66,12 +67,18 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
             displayName={sessionFactors.factors?.user?.displayName}
+            imageUrl={await getUserAvatarUrl({ serviceConfig, userId: sessionFactors.factors?.user?.id })}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
         ) : (
           user && (
-            <UserAvatar loginName={user.preferredLoginName} displayName={human?.profile?.displayName} showDropdown={false} />
+            <UserAvatar
+              loginName={user.preferredLoginName}
+              displayName={human?.profile?.displayName}
+              imageUrl={human?.profile?.avatarUrl}
+              showDropdown={false}
+            />
           )
         )}
       </div>

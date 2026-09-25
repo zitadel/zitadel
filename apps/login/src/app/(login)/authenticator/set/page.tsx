@@ -59,6 +59,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
       authMethods: methods.authMethodTypes ?? [],
       phoneVerified: humanUser?.phone?.isVerified ?? false,
       emailVerified: humanUser?.email?.isVerified ?? false,
+      avatarUrl: humanUser?.profile?.avatarUrl,
       expirationDate: session?.expirationDate,
     };
   }
@@ -158,6 +159,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
         <UserAvatar
           loginName={sessionWithData.factors?.user?.loginName}
           displayName={sessionWithData.factors?.user?.displayName}
+          imageUrl={sessionWithData.avatarUrl}
           showDropdown
           searchParams={searchParams}
         ></UserAvatar>

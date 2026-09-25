@@ -6,6 +6,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { getEnrollmentAuthorizationError } from "@/lib/server/enrollment-guard";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
+import { getUserAvatarUrl } from "@/lib/user-avatar";
 import { getBrandingSettings } from "@/lib/zitadel";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -62,6 +63,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
             displayName={sessionFactors.factors?.user?.displayName}
+            imageUrl={await getUserAvatarUrl({ serviceConfig, userId: sessionFactors.factors?.user?.id })}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
