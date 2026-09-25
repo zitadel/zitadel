@@ -261,6 +261,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s76Users14LoginEqualityIndexes = &Users14LoginEqualityIndexes{dbClient: dbClient}
 	steps.s77StampEventPositionAtInsert = &StampEventPositionAtInsert{dbClient: dbClient}
 	steps.s78UniqueConstraintOwners = &UniqueConstraintOwners{dbClient: dbClient}
+	steps.s80SAMLMetadataURL = &SAMLMetadataURL{dbClient: dbClient}
 	if steps.BackfillUniqueConstraintOwners == nil {
 		steps.BackfillUniqueConstraintOwners = &BackfillUniqueConstraintOwners{}
 	}
@@ -327,6 +328,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s76Users14LoginEqualityIndexes,
 		steps.s77StampEventPositionAtInsert,
 		steps.s78UniqueConstraintOwners,
+		steps.s80SAMLMetadataURL,
+		steps.BackfillUniqueConstraintOwners,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {

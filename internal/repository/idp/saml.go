@@ -13,6 +13,7 @@ type SAMLIDPAddedEvent struct {
 	ID                            string                   `json:"id"`
 	Name                          string                   `json:"name,omitempty"`
 	Metadata                      []byte                   `json:"metadata,omitempty"`
+	MetadataURL                   string                   `json:"metadataUrl,omitempty"`
 	Key                           *crypto.CryptoValue      `json:"key,omitempty"`
 	Certificate                   []byte                   `json:"certificate,omitempty"`
 	Binding                       string                   `json:"binding,omitempty"`
@@ -29,6 +30,7 @@ func NewSAMLIDPAddedEvent(
 	id,
 	name string,
 	metadata []byte,
+	metadataURL string,
 	key *crypto.CryptoValue,
 	certificate []byte,
 	binding string,
@@ -44,6 +46,7 @@ func NewSAMLIDPAddedEvent(
 		ID:                            id,
 		Name:                          name,
 		Metadata:                      metadata,
+		MetadataURL:                   metadataURL,
 		Key:                           key,
 		Certificate:                   certificate,
 		Binding:                       binding,
@@ -83,6 +86,7 @@ type SAMLIDPChangedEvent struct {
 	ID                            string                   `json:"id"`
 	Name                          *string                  `json:"name,omitempty"`
 	Metadata                      []byte                   `json:"metadata,omitempty"`
+	MetadataURL                   *string                  `json:"metadataUrl,omitempty"`
 	Key                           *crypto.CryptoValue      `json:"key,omitempty"`
 	Certificate                   []byte                   `json:"certificate,omitempty"`
 	Binding                       *string                  `json:"binding,omitempty"`
@@ -123,6 +127,12 @@ func ChangeSAMLName(name string) func(*SAMLIDPChangedEvent) {
 func ChangeSAMLMetadata(metadata []byte) func(*SAMLIDPChangedEvent) {
 	return func(e *SAMLIDPChangedEvent) {
 		e.Metadata = metadata
+	}
+}
+
+func ChangeSAMLMetadataURL(metadataURL string) func(*SAMLIDPChangedEvent) {
+	return func(e *SAMLIDPChangedEvent) {
+		e.MetadataURL = &metadataURL
 	}
 }
 
