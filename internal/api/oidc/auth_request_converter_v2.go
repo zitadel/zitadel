@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"log/slog"
 	"time"
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -70,6 +71,20 @@ func (a *AuthRequestV2) GetSubject() string {
 
 func (a *AuthRequestV2) Done() bool {
 	return a.UserID != "" && a.SessionID != ""
+}
+
+func (a *AuthRequestV2) LogValue() slog.Value {
+	if a == nil || a.CurrentAuthRequest == nil || a.AuthRequest == nil {
+		return slog.Value{}
+	}
+	return slog.GroupValue(
+		slog.String("id", a.ID),
+		slog.String("client_id", a.GetClientID()),
+		slog.String("issuer", a.Issuer),
+		slog.String("org_id", a.OrganizationID),
+		slog.Any("scopes", a.GetScopes()),
+		slog.String("redirect_uri", a.GetRedirectURI()),
+	)
 }
 
 type RefreshTokenRequestV2 struct {
