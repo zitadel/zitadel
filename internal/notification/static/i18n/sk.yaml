@@ -1,0 +1,67 @@
+InitCode:
+  Title: "Inicializácia používateľa"
+  PreHeader: "Inicializácia používateľa"
+  Subject: "Inicializácia používateľa"
+  Greeting: "Dobrý deň, {{.DisplayName}},"
+  Text: "Tento používateľ bol vytvorený. Na prihlásenie použite používateľské meno {{.PreferredLoginName}}. Kliknutím na tlačidlo nižšie dokončite proces inicializácie. (Kód {{.Code}}) Ak ste o tento e-mail nežiadali, ignorujte ho."
+  ButtonText: "Dokončiť inicializáciu"
+PasswordReset:
+  Title: "Obnovenie hesla"
+  PreHeader: "Obnovenie hesla"
+  Subject: "Obnovenie hesla"
+  Greeting: "Dobrý deň, {{.DisplayName}},"
+  Text: "Prijali sme žiadosť o obnovenie hesla. Na obnovenie hesla použite tlačidlo nižšie. (Kód {{.Code}}) Ak ste o tento e-mail nežiadali, ignorujte ho."
+  ButtonText: "Obnoviť heslo"
+VerifyEmail:
+  Title: "Overenie e-mailu"
+  PreHeader: "Overenie e-mailu"
+  Subject: "Overenie e-mailu"
+  Greeting: "Dobrý deň, {{.DisplayName}},"
+  Text: "Bola pridaná nová e-mailová adresa. Na jej overenie použite tlačidlo nižšie. (Kód {{.Code}}) Ak ste novú e-mailovú adresu nepridávali, tento e-mail ignorujte."
+  ButtonText: "Overiť e-mail"
+VerifyPhone:
+  Title: "Overenie telefónneho čísla"
+  PreHeader: "Overenie telefónneho čísla"
+  Subject: "Overenie telefónneho čísla"
+  Greeting: "Dobrý deň, {{.DisplayName}},"
+  Text: "Bolo pridané nové telefónne číslo. Na jeho overenie použite nasledujúci kód {{.Code}}"
+  ButtonText: "Overiť telefónne číslo"
+VerifyEmailOTP:
+  Title: "Overenie OTP"
+  PreHeader: "Overenie OTP"
+  Subject: "Overenie OTP"
+  Greeting: "Dobrý deň, {{.DisplayName}},"
+  Text: "Na overenie použite v priebehu nasledujúcich piatich minút OTP kód {{.OTP}} alebo kliknite na tlačidlo „Overiť“."
+  ButtonText: "Overiť"
+VerifySMSOTP:
+  Text: |-
+    {{.OTP}} je váš OTP kód pre {{ .Domain }}. Použite ho v priebehu nasledujúcich {{.Expiry}}.
+    @{{.Domain}} #{{.OTP}}
+DomainClaimed:
+  Title: "Doména bola prevzatá"
+  PreHeader: "Zmena e-mailu / používateľského mena"
+  Subject: "Doména bola prevzatá"
+  Greeting: "Dobrý deň, {{.DisplayName}},"
+  Text: "Doménu {{.Domain}} prevzala organizácia. Váš súčasný používateľ {{.Username}} nie je súčasťou tejto organizácie. Pri prihlásení si preto budete musieť zmeniť e-mailovú adresu. Pre toto prihlásenie sme vytvorili dočasné používateľské meno ({{.TempUsername}})."
+  ButtonText: "Prihlásiť sa"
+PasswordlessRegistration:
+  Title: "Pridanie prihlásenia prístupovým kľúčom"
+  PreHeader: "Pridanie prihlásenia prístupovým kľúčom"
+  Subject: "Pridanie prihlásenia prístupovým kľúčom"
+  Greeting: "Dobrý deň, {{.DisplayName}},"
+  Text: "Prijali sme žiadosť o pridanie tokenu na prihlásenie prístupovým kľúčom. Na pridanie tokenu alebo zariadenia použite tlačidlo nižšie."
+  ButtonText: "Pridať prístupový kľúč"
+PasswordChange:
+  Title: "Heslo používateľa bolo zmenené"
+  PreHeader: "Zmena hesla"
+  Subject: "Heslo používateľa bolo zmenené"
+  Greeting: "Dobrý deň, {{.DisplayName}},"
+  Text: "Heslo vášho používateľa bolo zmenené. Ak ste túto zmenu nevykonali vy, odporúčame vám okamžite si heslo obnoviť."
+  ButtonText: "Prihlásiť sa"
+InviteUser:
+  Title: "Pozvánka do {{.ApplicationName}}"
+  PreHeader: "Pozvánka do {{.ApplicationName}}"
+  Subject: "Pozvánka do {{.ApplicationName}}"
+  Greeting: "Dobrý deň, {{.DisplayName}},"
+  Text: "Váš používateľ bol pozvaný do {{.ApplicationName}}. Kliknutím na tlačidlo nižšie dokončite proces pozvania. Ak ste o tento e-mail nežiadali, ignorujte ho."
+  ButtonText: "Prijať pozvánku"
