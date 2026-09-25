@@ -8,10 +8,10 @@
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.69.0",
-    "@changesets/cli": "^2.31.0",
-    "nx": "22.7.7",
+    "@changesets/cli": "^2.31.1",
+    "nx": "22.7.12",
     "sass": "^1.99.0",
     "shiki": "^3.23.0",
-    "wait-on": "^9.0.10"
+    "wait-on": "^9.1.0"
   }
 }

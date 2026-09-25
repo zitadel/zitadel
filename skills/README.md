@@ -1,8 +1,8 @@
 # Skills
 
 Self-contained runbooks for manual verification of Zitadel features against a **local** test
-instance. Each skill is a Markdown file describing what it verifies, what it needs and how to
-run it, usually next to a script that does the work.
+instance, and for recurring repository maintenance. Each skill is a Markdown file describing what
+it does, what it needs and how to run it, usually next to a script that does the work.
 
 They are deliberately tool neutral: plain Markdown and plain shell, no assistant-specific
 frontmatter or directory layout. Read one and follow it yourself, or hand it to whichever AI
@@ -12,7 +12,14 @@ assistant you use.
 | --- | --- |
 | [test-actor-in-action-v2.md](test-actor-in-action-v2.md) | The impersonation actor is passed to Actions v2 execution targets and appears in the token claims. |
 
+| Maintenance skill | Covers |
+| --- | --- |
+| [npm-dependency-audit.md](npm-dependency-audit.md) | Fixing `pnpm audit` findings at the package that introduces them, pruning `pnpm-workspace.yaml` overrides and preparing a version-bump PR. |
+
 ## Conventions for new skills
+
+These apply to skills that talk to a Zitadel instance. Maintenance skills that only change the
+repository work on a branch and end with a PR instead.
 
 - **Local only.** A skill may create users, flip instance settings and delete things. Refuse to
   run against anything but `localhost`, and enforce it in the script rather than only saying it
