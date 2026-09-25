@@ -3,8 +3,8 @@
 // the installed versions, the fixed range and the dependency paths that pull it in.
 //
 // Usage (from the repository root):
-//   pnpm audit --json > /tmp/audit.json; node .agents/skills/npm-dependency-audit/scripts/summarize-audit.mjs /tmp/audit.json
-//   pnpm audit --json | node .agents/skills/npm-dependency-audit/scripts/summarize-audit.mjs
+//   pnpm audit --json > /tmp/audit.json; node skills/npm-dependency-audit-summary.mjs /tmp/audit.json
+//   pnpm audit --json | node skills/npm-dependency-audit-summary.mjs
 import { readFileSync } from "node:fs";
 
 const input = readFileSync(process.argv[2] ?? 0, "utf8");

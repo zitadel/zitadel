@@ -1,11 +1,12 @@
----
-name: npm-dependency-audit
-description: Investigate and fix npm dependency vulnerabilities reported by `pnpm audit` in this pnpm/Nx monorepo. Fixes each finding at the package that introduces it (direct bump, in-range lockfile refresh or parent bump), keeps `pnpm.overrides` as a documented last resort, prunes overrides that are no longer needed and prepares a version-bump PR with manual test notes. Use when asked to fix npm/pnpm audit findings, Dependabot or GitHub security alerts for JavaScript packages, or to clean up pnpm overrides.
----
+# Fix npm dependency audit findings
 
-# npm dependency audit
+> One of the runbooks in [`skills/`](README.md). It doesn't touch a Zitadel instance. It changes
+> `package.json` files, `pnpm-workspace.yaml` and `pnpm-lock.yaml` on a branch, and ends with a PR.
 
-Use this workflow to fix `pnpm audit` findings in this repository. Fix each finding at the package that introduces it. Treat an override as a documented exception, not the default fix.
+Use it when `pnpm audit`, Dependabot or GitHub security alerts report vulnerable JavaScript
+packages, or when the `overrides` in `pnpm-workspace.yaml` need a cleanup.
+
+Fix each finding at the package that introduces it. Treat an override as a documented exception, not the default fix.
 
 Run every command from the repository root. Workspaces are listed in `pnpm-workspace.yaml`, and overrides live under `overrides:` in the same file.
 
@@ -28,7 +29,7 @@ Run every command from the repository root. Workspaces are listed in `pnpm-works
 git switch main && git pull --ff-only
 pnpm install
 pnpm audit --json > /tmp/audit.json
-node .agents/skills/npm-dependency-audit/scripts/summarize-audit.mjs /tmp/audit.json
+node skills/npm-dependency-audit-summary.mjs /tmp/audit.json
 ```
 
 The summary shows each vulnerable package, its installed and fixed versions and its dependency paths. In a path like `apps__docs>raw-loader>webpack>schema-utils>ajv>fast-uri`:

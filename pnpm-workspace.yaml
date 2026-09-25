@@ -10,7 +10,7 @@ exclude:
 
 # Only for transitive dependencies whose parent pins a vulnerable version and
 # has no fixed release yet. Name the pinning parent so the entry can be removed
-# once the parent is updated. See .agents/skills/npm-dependency-audit/SKILL.md.
+# once the parent is updated. See skills/npm-dependency-audit.md.
 overrides:
   # nx pins brace-expansion 5.0.8 and smol-toml 1.6.1 (latest nx 22.x and 23.x)
   "brace-expansion@>=4.0.0 <5.0.9": "^5.0.9"

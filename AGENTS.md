@@ -121,8 +121,9 @@ PR titles are validated by the Semantic PR app. Format:
 **Scopes**: optional, but if used must come from the list in [`.github/semantic.yml`](.github/semantic.yml) under `scopes:`. When in doubt, omit the scope — do not invent values not on that list.
 
 ## Skills
-Task-specific workflows live in `.agents/skills/<name>/SKILL.md`. Read the matching skill before starting such a task.
-- **`npm-dependency-audit`**: Fix `pnpm audit` findings at their origin, prune `pnpm-workspace.yaml` overrides and prepare a version-bump PR.
+Tool-neutral runbooks live in `skills/` (see `skills/README.md`). Read the matching one before starting such a task.
+- **`skills/npm-dependency-audit.md`**: Fix `pnpm audit` findings at their origin, prune `pnpm-workspace.yaml` overrides and prepare a version-bump PR.
+- **`skills/test-actor-in-action-v2.md`**: Verify the impersonation actor reaches Actions v2 targets on a local instance.
 
 ## Documentation
 - **Human Guide**: See `CONTRIBUTING.md` for setup and contribution details.
