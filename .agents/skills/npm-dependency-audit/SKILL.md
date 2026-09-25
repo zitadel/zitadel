@@ -88,6 +88,12 @@ overrides:
 
 An override forces a version the parent never tested with. Stay inside the same major version, and run the parent's build or tests after adding one.
 
+A range override also applies to **direct** dependencies whose declared range overlaps the selector. pnpm then writes the overridden range into that project's `importers` entry in `pnpm-lock.yaml`. For example, with the `esbuild@>=0.27.3 <0.28.1` override, `"esbuild": "^0.28.0"` is recorded as `specifier: ^0.28.1`. Frozen installs accept this, but the manifest and lockfile no longer match, which confuses reviewers and review bots. Raise the lower bound of each such direct dependency to the override's floor:
+
+```bash
+git grep -nE '"<package>": "' -- '**/package.json'     # direct users of the overridden package
+```
+
 ## 4. Assess breaking changes
 
 For every bump that is a major, a 0.x minor or a large minor version, read the changes between the old and new versions:
@@ -107,7 +113,14 @@ grep -rn "<api-or-config-key>" apps console packages tests --exclude-dir=node_mo
 
 Watch for:
 
-- **engine requirements** (`npm view <package> engines`), compared with the Node version in `.github/workflows/*.yml`,
+- **engine requirements.** pnpm only warns when a package's `engines` doesn't match the running Node version (this repository doesn't set `engine-strict`). Installs succeed, and the failure only shows up at runtime. Check the new version and any new dependencies it brings in, for example `npm view <package>@<new> engines.node` and `npm view <new-dependency> engines.node`. Compare against **every** place that declares a Node version:
+  - `.nvmrc`
+  - the Node.js prerequisite in `CONTRIBUTING.md`
+  - `node-version` in `.github/workflows/*.yml`
+  - `.devcontainer/docker-compose.yaml`
+  - the `FROM` lines in `apps/login/Dockerfile*`
+
+  If a bump raises the minimum above one of them, update the stale declaration in the same PR and explain why in the description. Or keep the older release if the declared version must stay supported. If the declarations already disagree with each other, point that out in the PR,
 - **ESM-only packages** consumed from CommonJS code,
 - **changed defaults**, for example a test container's wait strategy or a logger's flush interval,
 - **anything operators can observe.** This includes telemetry attribute names, log format, HTTP headers, config keys, the Docker image and `output: "standalone"`. These changes affect self-hosters. Ask the maintainer whether to ship them in the same PR or separately; if it's separate, keep the override for now,
@@ -119,6 +132,7 @@ Use only Nx targets that exist (see the root `AGENTS.md`, or run `pnpm nx show p
 
 ```bash
 pnpm audit                                   # expect: No known vulnerabilities found
+pnpm install --frozen-lockfile               # what CI runs; fails if a manifest and the lockfile disagree
 pnpm nx run-many -t build test-unit lint -p @zitadel/login @zitadel/client @zitadel/console @zitadel/docs
 ```
 
