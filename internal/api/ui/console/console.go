@@ -117,7 +117,7 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 	env.Use(
 		callDurationInterceptor,
 		middleware.RequestDetailsHandler(),
-		middleware.TraceHandler(),
+		middleware.TraceHandler(false),
 		middleware.LogHandler("console"),
 		instanceHandler,
 	)
