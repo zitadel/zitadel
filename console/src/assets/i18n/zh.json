@@ -654,6 +654,7 @@
     "IAM_OWNER_VIEWER": "有权审查整个实例，包括所有组织",
     "IAM_ORG_MANAGER": "有权创建和管理组织",
     "IAM_USER_MANAGER": "有权创建和管理用户",
+    "IAM_USER_VIEWER": "有权查看用户",
     "IAM_ADMIN_IMPERSONATOR": "有权模拟所有组织的管理员和最终用户",
     "IAM_END_USER_IMPERSONATOR": "有权模拟所有组织的最终用户",
     "IAM_LOGIN_CLIENT": "具有管理登录应用程序的权限",
