@@ -29,19 +29,31 @@ import type { LoggerProvider } from "@opentelemetry/api-logs";
 let _loggerProvider: LoggerProvider | null = null;
 
 export async function register(): Promise<void> {
-  // Only run OpenTelemetry in the Node.js environment
-  if (process.env.NEXT_RUNTIME === "nodejs") {
-    // Disable by default in local development to avoid unnecessary overhead
-    if (process.env.NODE_ENV === "development" && process.env.OTEL_SDK_DISABLED !== "false") {
-      return;
-    }
+  // Only run in the Node.js environment
+  if (process.env.NEXT_RUNTIME !== "nodejs") return;
 
-    // Explicit check for disabled env variable
-    if (process.env.OTEL_SDK_DISABLED === "true") return;
-
+  if (isOtelEnabled()) {
     const { registerNode } = await import("./instrumentation.node");
     _loggerProvider = await registerNode();
   }
+
+  // Verify the configured API credentials once at startup (fail fast).
+  // Connectivity problems are only logged; reachability is covered by the
+  // readiness probe (/ready) and ZITADEL_API_AWAITINITIALCONN.
+  const { verifyApiCredentials, FATAL_CREDENTIAL_CHECK_RESULTS } = await import("./lib/verify-credentials");
+  const result = await verifyApiCredentials();
+  if (FATAL_CREDENTIAL_CHECK_RESULTS.has(result)) {
+    process.exit(1);
+  }
+}
+
+function isOtelEnabled(): boolean {
+  // Disable by default in local development to avoid unnecessary overhead
+  if (process.env.NODE_ENV === "development" && process.env.OTEL_SDK_DISABLED !== "false") {
+    return false;
+  }
+  // Explicit check for disabled env variable
+  return process.env.OTEL_SDK_DISABLED !== "true";
 }
 
 export function getLoggerProvider(): LoggerProvider | null {
