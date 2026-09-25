@@ -288,8 +288,8 @@ Errors:
     IDPConfig:
       NotExisting: "身份提供者配置不存在"
   Project:
-    ProjectIDMissing: "P缺少项目 ID"
-    AlreadyExists: "项目以存在于组织中"
+    ProjectIDMissing: "缺少项目 ID"
+    AlreadyExists: "项目已存在于组织中"
     OrgNotExisting: "组织不存在"
     UserNotExisting: "用户不存在"
     CouldNotGenerateClientSecret: "无法生成客户端秘钥"
@@ -514,7 +514,7 @@ Errors:
       ScanFailed: "查询已认证请求的使用情况失败"
     Execution:
       StorageFailed: "将行动执行日志存储到数据库失败"
-      ScanFailed: "Q查询动作执行秒数的使用情况失败"
+      ScanFailed: "查询动作执行秒数的使用情况失败"
   Session:
     NotExisting: "会话不存在"
     Terminated: "会话已经终止"
