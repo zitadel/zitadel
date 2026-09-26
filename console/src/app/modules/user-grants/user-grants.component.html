@@ -22,12 +22,20 @@
     </button>
   }
 
-  @if (!selection.hasValue()) {
-    <cnsl-filter-user-grants
-      actions
-      (filterChanged)="applySearchQuery($any($event))"
-      (filterOpen)="filterOpen = $event"
-    ></cnsl-filter-user-grants>
+  <!-- Hidden for AUTHUSER: listMyUserGrants takes no queries, so search and filter
+       would render but never affect the result. -->
+  @if (!selection.hasValue() && context !== UserGrantContext.AUTHUSER) {
+    <!-- Single projected node, see the comment in user-table.component.html -->
+    <div actions class="cnsl-table-toolbar">
+      <cnsl-table-search
+        [placeholder]="'GRANTS.SEARCHPLACEHOLDER' | translate"
+        (searchChanged)="onSearchChanged($event)"
+      ></cnsl-table-search>
+      <cnsl-filter-user-grants
+        (filterChanged)="applySearchQuery($any($event))"
+        (filterOpen)="filterOpen = $event"
+      ></cnsl-filter-user-grants>
+    </div>
   }
 
   @if (disableWrite === false && selection.hasValue() === false && routerLink) {
@@ -192,7 +200,7 @@
         (click)="!disableWrite ? openEditDialog(grant) : null"
         [ngClass]="{ 'highlight pointer': !disableWrite }"
         mat-row
-        *matRowDef="let grant; columns: displayedColumns"
+        *matRowDef="let grant; columns: displayedColumns; trackBy: trackByGrantId"
       ></tr>
     </table>
   </div>
@@ -208,8 +216,8 @@
     [timestamp]="dataSource.viewTimestamp"
     [length]="dataSource.totalResult"
     [pageSize]="INITIAL_PAGE_SIZE"
-    [length]="dataSource.totalResult"
-    [pageSizeOptions]="[2, 3, 25, 50, 100, 250]"
+    [pageSizeOptions]="PAGE_SIZE_OPTIONS"
+    [persistKey]="PAGE_SIZE_KEY"
     (page)="changePage($event)"
   >
   </cnsl-paginator>

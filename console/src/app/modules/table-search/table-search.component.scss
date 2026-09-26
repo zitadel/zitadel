@@ -1,0 +1,85 @@
+@mixin table-search-theme($theme) {
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
+  $primary: map-get($theme, primary);
+
+  $primary-color: map-get($primary, 500);
+  $card-background-color: map-get($background, cards);
+  $text-color: map-get($foreground, text);
+  $secondary-text-color: map-get($foreground, secondary-text);
+  $border-color: rgba(#8795a1, 0.2);
+
+  .cnsl-table-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  // The width has to sit on the host, it is the toolbar's flex item. On the inner div it
+  // has no effect and the input falls back to the browser default of ~20 characters.
+  cnsl-table-search {
+    display: block;
+    flex: 0 0 auto;
+    width: 360px;
+    max-width: 100%;
+  }
+
+  .cnsl-table-search {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 0.5rem;
+    border: 1px solid $border-color;
+    border-radius: 0.5rem;
+    background-color: $card-background-color;
+    transition:
+      border-color 0.2s ease,
+      background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+
+    &:focus-within {
+      border-color: $primary-color;
+    }
+
+    .search-icon {
+      flex: 0 0 auto;
+      font-size: 1.1rem;
+      color: $secondary-text-color;
+    }
+
+    .search-input {
+      flex: 1 1 auto;
+      width: 100%;
+      min-width: 0;
+      padding: 0.6rem 0.5rem;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: $text-color;
+      font-size: 14px;
+      font-family: inherit;
+
+      &::placeholder {
+        color: $secondary-text-color;
+      }
+    }
+
+    .clear-button {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.25rem;
+      border: none;
+      border-radius: 50%;
+      background: transparent;
+      color: $secondary-text-color;
+      cursor: pointer;
+
+      &:hover {
+        color: $text-color;
+      }
+    }
+  }
+}

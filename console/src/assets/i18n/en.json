@@ -706,6 +706,8 @@
     "EMAIL": "Email",
     "USERNAME": "User Name",
     "PROJECTNAME": "Project Name",
+    "ROLEKEY": "Role",
+    "WITHGRANTED": "Include project grants",
     "RESOURCEOWNER": "Resource Owner",
     "METHODS": {
       "5": "contains",
@@ -835,6 +837,7 @@
         "10": "filter for organization name",
         "12": "filter for project name"
       },
+      "SEARCHPLACEHOLDER": "Search name, e-mail or username",
       "EMPTY": "No entries"
     },
     "PASSWORDLESS": {
@@ -2851,6 +2854,7 @@
   "GRANTS": {
     "TITLE": "Role Assignments",
     "DESC": "These are all the role assignments on your organization.",
+    "SEARCHPLACEHOLDER": "Search user",
     "DELETE": "Delete Role Assignment",
     "EMPTY": "No role assignment found",
     "ADD": "Create Role Assignment",

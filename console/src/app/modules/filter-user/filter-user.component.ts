@@ -1,7 +1,10 @@
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ActivatedRoute, Router } from '@angular/router';
-import { take } from 'rxjs';
+import { from, of, Subject, take } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { SuggestionField, UserSuggestionService } from 'src/app/services/user-suggestion.service';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import {
   DisplayNameQuery,
@@ -15,7 +18,7 @@ import {
 import { FilterComponent } from '../filter/filter.component';
 import { filter, map } from 'rxjs/operators';
 
-enum SubQuery {
+export enum SubQuery {
   STATE,
   DISPLAYNAME,
   EMAIL,
@@ -39,8 +42,64 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
     UserState.USER_STATE_LOCKED,
     UserState.USER_STATE_INITIAL,
   ];
+  private readonly suggestionService = inject(UserSuggestionService);
+
+  /** Existing values offered while typing, so the "equals" method becomes usable. */
+  protected suggestions: string[] = [];
+  private suggestionSubQuery: SubQuery | undefined;
+  private readonly suggest$ = new Subject<{ subquery: SubQuery; value: string }>();
+
   constructor(router: Router, route: ActivatedRoute, destroyRef: DestroyRef) {
     super(router, route, destroyRef);
+
+    this.suggest$
+      .pipe(
+        debounceTime(250),
+        distinctUntilChanged((a, b) => a.subquery === b.subquery && a.value === b.value),
+        switchMap(({ subquery, value }) =>
+          from(this.fetchSuggestions(subquery, value)).pipe(
+            // a failed lookup must not break typing, it just means no suggestions
+            catchError(() => of([] as string[])),
+          ),
+        ),
+        takeUntilDestroyed(destroyRef),
+      )
+      .subscribe((values) => (this.suggestions = values));
+  }
+
+  protected onSuggestionInput(subquery: SubQuery, event: Event): void {
+    // drop the previous field's values, they would briefly show under the new field
+    this.suggestions = [];
+    this.suggestionSubQuery = subquery;
+    this.suggest$.next({ subquery, value: (event.target as HTMLInputElement).value });
+  }
+
+  /** Scoped per field so an open second filter never shows the first one's values. */
+  protected suggestionsFor(subquery: SubQuery): string[] {
+    return this.suggestionSubQuery === subquery ? this.suggestions : [];
+  }
+
+  protected selectSuggestion(subquery: SubQuery, query: any, value: string): void {
+    this.setValue(subquery, query, { value });
+  }
+
+  private fetchSuggestions(subquery: SubQuery, value: string): Promise<string[]> {
+    const field = FilterUserComponent.suggestionField(subquery);
+    return field ? this.suggestionService.suggest(field, value) : Promise.resolve([]);
+  }
+
+  private static suggestionField(subquery: SubQuery): SuggestionField | undefined {
+    switch (subquery) {
+      case SubQuery.DISPLAYNAME:
+        return 'displayName';
+      case SubQuery.EMAIL:
+        return 'email';
+      case SubQuery.USERNAME:
+        return 'userName';
+      default:
+        // the state filter is a dropdown, there is nothing to suggest
+        return undefined;
+    }
   }
 
   ngOnInit(): void {
@@ -95,7 +154,7 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
         });
 
         this.searchQueries = userQueries.filter((q) => q !== undefined) as UserSearchQuery[];
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
         // this.showFilter = true;
         // this.filterOpen.emit(true);
       });
@@ -184,19 +243,19 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
     switch (subquery) {
       case SubQuery.STATE:
         (query as StateQuery).setState(value);
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
         break;
       case SubQuery.DISPLAYNAME:
         (query as DisplayNameQuery).setDisplayName(value);
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
         break;
       case SubQuery.EMAIL:
         (query as EmailQuery).setEmailAddress(value);
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
         break;
       case SubQuery.USERNAME:
         (query as UserNameQuery).setUserName(value);
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
         break;
     }
   }
@@ -236,11 +295,11 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
 
   public setMethod(query: any, event: any) {
     (query as UserNameQuery).setMethod(event.value);
-    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+    this.emitQueries();
   }
 
   public override emitFilter(): void {
-    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+    this.emitQueries();
     this.showFilter = false;
     this.filterOpen.emit(false);
   }
@@ -248,5 +307,29 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
   public resetFilter(): void {
     this.searchQueries = [];
     this.emitFilter();
+  }
+
+  /**
+   * Ticking a checkbox creates the query with an empty string, which the API rejects and
+   * which used to end up in the URL. The query stays in the local list so its input keeps
+   * rendering, it is only excluded from the request.
+   */
+  private emitQueries(): void {
+    this.filterChanged.emit(this.searchQueries.filter((query) => FilterUserComponent.hasValue(query)));
+  }
+
+  private static hasValue(query: UserSearchQuery): boolean {
+    const q = query.toObject();
+    if (q.displayNameQuery) {
+      return !!q.displayNameQuery.displayName.trim();
+    }
+    if (q.emailQuery) {
+      return !!q.emailQuery.emailAddress.trim();
+    }
+    if (q.userNameQuery) {
+      return !!q.userNameQuery.userName.trim();
+    }
+    // state queries always carry a valid enum value
+    return true;
   }
 }

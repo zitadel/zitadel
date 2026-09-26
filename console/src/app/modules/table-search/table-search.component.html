@@ -1,0 +1,18 @@
+<div class="cnsl-table-search">
+  <i class="las la-search search-icon" aria-hidden="true"></i>
+  <input
+    class="search-input"
+    type="text"
+    autocomplete="off"
+    maxlength="200"
+    [attr.aria-label]="placeholder"
+    [placeholder]="placeholder"
+    [value]="value"
+    (input)="onInput($event)"
+  />
+  @if (value) {
+    <button class="clear-button" type="button" (click)="clear()" [attr.aria-label]="'ACTIONS.RESET' | translate">
+      <i class="las la-times" aria-hidden="true"></i>
+    </button>
+  }
+</div>
