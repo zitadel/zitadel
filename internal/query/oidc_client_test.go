@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -275,6 +276,99 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 				got, err := q.ActiveOIDCClientByID(ctx, "clientID", true)
 				require.ErrorIs(t, err, tt.wantErr)
 				assert.Equal(t, tt.want, got)
+			})
+		})
+	}
+}
+
+func TestQueries_ActiveOIDCClientByID_LoginV2Fallback(t *testing.T) {
+	expQuery := regexp.QuoteMeta(oidcClientQuery)
+	cols := []string{"client"}
+	instanceBaseURI, _ := url.Parse("https://instance.example.com/login")
+	appBaseURI, _ := url.Parse("https://app.example.com/login")
+
+	tests := []struct {
+		name             string
+		mock             sqlExpectation
+		features         feature.Features
+		wantLoginVersion domain.LoginVersion
+		wantBaseURI      *URL
+	}{
+		{
+			name: "loginV2 required, app has baseURI — preserve app baseURI",
+			mock: mockQuery(expQuery, cols, []driver.Value{testdataOidcClientJWTLoginVersion}, "instanceID", "clientID", true),
+			features: feature.Features{
+				LoginV2: feature.LoginV2{
+					Required: true,
+					BaseURI:  instanceBaseURI,
+				},
+			},
+			wantLoginVersion: domain.LoginVersion2,
+			wantBaseURI: func() *URL {
+				ret, _ := url.Parse("https://test.com/login")
+				retURL := URL(*ret)
+				return &retURL
+			}(),
+		},
+		{
+			name: "loginV2 required, app has no baseURI — use instance fallback",
+			mock: mockQuery(expQuery, cols, []driver.Value{testdataOidcClientPublic}, "instanceID", "clientID", true),
+			features: feature.Features{
+				LoginV2: feature.LoginV2{
+					Required: true,
+					BaseURI:  instanceBaseURI,
+				},
+			},
+			wantLoginVersion: domain.LoginVersion2,
+			wantBaseURI:      (*URL)(instanceBaseURI),
+		},
+		{
+			name: "loginV2 not required — no override",
+			mock: mockQuery(expQuery, cols, []driver.Value{testdataOidcClientJWTLoginVersion}, "instanceID", "clientID", true),
+			features: feature.Features{
+				LoginV2: feature.LoginV2{
+					Required: false,
+					BaseURI:  instanceBaseURI,
+				},
+			},
+			wantLoginVersion: domain.LoginVersion1,
+			wantBaseURI: func() *URL {
+				ret, _ := url.Parse("https://test.com/login")
+				retURL := URL(*ret)
+				return &retURL
+			}(),
+		},
+		{
+			name: "loginV2 required, app has explicit baseURI — not overwritten",
+			mock: mockQuery(expQuery, cols, []driver.Value{testdataOidcClientJWTLoginVersion}, "instanceID", "clientID", true),
+			features: feature.Features{
+				LoginV2: feature.LoginV2{
+					Required: true,
+					BaseURI:  appBaseURI,
+				},
+			},
+			wantLoginVersion: domain.LoginVersion2,
+			wantBaseURI: func() *URL {
+				ret, _ := url.Parse("https://test.com/login")
+				retURL := URL(*ret)
+				return &retURL
+			}(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			execMock(t, tt.mock, func(db *sql.DB) {
+				q := &Queries{
+					client: &database.DB{
+						DB: db,
+					},
+				}
+				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient",
+					authz.WithMockFeatures(tt.features))
+				got, err := q.ActiveOIDCClientByID(ctx, "clientID", true)
+				require.NoError(t, err)
+				assert.Equal(t, tt.wantLoginVersion, got.LoginVersion)
+				assert.Equal(t, tt.wantBaseURI, got.LoginBaseURI)
 			})
 		})
 	}
