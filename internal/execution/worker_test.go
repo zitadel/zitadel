@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"testing"
 	"time"
 
+	"github.com/go-jose/go-jose/v4"
 	"github.com/riverqueue/river"
 	"github.com/riverqueue/river/rivertype"
 	"github.com/stretchr/testify/assert"
@@ -59,10 +61,19 @@ func newExecutionWorker(f fieldsWorker) *execution.Worker {
 			MaxTtl:              5 * time.Minute,
 		},
 		nil,
-		mockGetActiveSigningWebKey,
+		instanceSigningWebKey,
 		f.now,
 		http.DefaultClient,
 	)
+}
+
+// instanceSigningWebKey mimics [query.Queries.GetActiveSigningWebKey], which
+// resolves the key of the instance in the context.
+func instanceSigningWebKey(ctx context.Context) (*jose.JSONWebKey, error) {
+	if id := authz.GetInstance(ctx).InstanceID(); id != instanceID {
+		return nil, fmt.Errorf("no active signing web key for instance %q", id)
+	}
+	return mockGetActiveSigningWebKey(ctx)
 }
 
 const (
@@ -276,8 +287,10 @@ func Test_handleEventExecution(t *testing.T) {
 			require.NoError(t, err)
 			a.job.Args.TargetsData = data
 
+			// river invokes the worker with a plain context, so the instance
+			// has to be taken from the job's aggregate
 			err = newExecutionWorker(f).Work(
-				authz.WithInstanceID(context.Background(), instanceID),
+				context.Background(),
 				a.job,
 			)
 
