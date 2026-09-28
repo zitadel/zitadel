@@ -9,8 +9,10 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -1233,6 +1235,91 @@ func Test_UserPrepares(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+		})
+	}
+}
+
+func TestQueries_IsUserAdmin(t *testing.T) {
+	const (
+		instanceID = "instance-id"
+		userID     = "user-id"
+	)
+
+	// The projection handlers are nil until projection.Create has run,
+	// so the trigger is always stubbed here.
+	triggerErr := errors.New("trigger failed")
+
+	tests := []struct {
+		name       string
+		triggerErr error
+		expect     sqlExpectation
+		want       bool
+		wantErr    error
+	}{
+		{
+			name:       "trigger error",
+			triggerErr: triggerErr,
+			wantErr:    zerrors.ThrowInternal(triggerErr, "QUERY-UTh3k", "Errors.Internal"),
+		},
+		{
+			name:    "query error",
+			expect:  mockQueryErr(userIsAdminQuery, sql.ErrConnDone, instanceID, userID),
+			wantErr: zerrors.ThrowInternal(sql.ErrConnDone, "QUERY-Ao1re", "Errors.Internal"),
+		},
+		{
+			name: "no rows (user not admin)",
+			expect: mockQuery(
+				userIsAdminQuery,
+				[]string{"f1"},
+				nil,
+				instanceID,
+				userID,
+			),
+			want:    false,
+			wantErr: nil,
+		},
+		{
+			name: "admin user",
+			expect: mockQuery(
+				userIsAdminQuery,
+				[]string{"f1"},
+				[]driver.Value{true},
+				instanceID,
+				userID,
+			),
+			want:    true,
+			wantErr: nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client, mock, err := sqlmock.New(
+				sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual),
+			)
+			require.NoError(t, err, "mock client setup")
+			defer client.Close()
+			// A test case without expectation must not reach the database.
+			if tt.expect != nil {
+				mock = tt.expect(mock)
+			}
+
+			var triggered bool
+			q := &Queries{
+				client: &database.DB{DB: client},
+				triggerMemberProjections: func(ctx context.Context) (context.Context, error) {
+					triggered = true
+					return ctx, tt.triggerErr
+				},
+			}
+
+			ctx := authz.WithInstanceID(t.Context(), instanceID)
+			got, err := q.IsUserAdmin(ctx, userID)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.want, got)
+			assert.True(t, triggered, "member projections must be triggered")
+
+			err = mock.ExpectationsWereMet()
+			assert.NoError(t, err)
 		})
 	}
 }
